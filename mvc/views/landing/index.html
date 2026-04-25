@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forge — Python Web Framework</title>
+  <link rel="stylesheet" href="./static/tailwind.css">
+</head>
+<body class="landing-code-font bg-white text-slate-900 antialiased">
+
+<!-- Navigation -->
+<nav class="fixed top-0 inset-x-0 z-50 bg-[#111110] border-b border-white/10 h-16 flex items-center px-8">
+  <div class="flex items-center gap-7">
+    <a href="#démarrer"
+       class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Démarrer</a>
+    <a href="#crud" class="text-sm font-medium text-white/60 hover:text-white transition-colors">CRUD</a>
+    <a href="#starters" class="text-sm font-medium text-white/60 hover:text-white transition-colors">Starters</a>
+    <a href="https://caucrogegit.github.io/Forge/entity_architecture/"
+       target="_blank" rel="noopener noreferrer"
+       class="text-sm font-medium text-white/60 hover:text-white transition-colors">Architecture</a>
+    <a href="https://caucrogegit.github.io/Forge/reference/"
+       target="_blank" rel="noopener noreferrer"
+       class="text-sm font-medium text-white/60 hover:text-white transition-colors">Référence</a>
+    <a href="https://github.com/caucrogeGit/Forge"
+       target="_blank" rel="noopener noreferrer"
+       class="text-sm font-medium text-white/60 hover:text-white transition-colors">GitHub</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="landing-hero-bg pt-32 pb-24 px-6 text-center">
+  <div class="flex justify-center mb-10">
+    <img src="./static/img/forge-logo.png" alt="Forge" class="landing-logo-glow landing-logo-size object-contain">
+  </div>
+  <div class="landing-version-strip landing-accent-text flex justify-center gap-2 text-sm font-medium mb-12">
+    <span>v1.0.0</span><span class="opacity-40">·</span>
+    <span>Python 3.11+</span><span class="opacity-40">·</span>
+    <span>MariaDB 10.6+</span>
+  </div>
+
+  <h1 class="text-5xl sm:text-7xl font-bold leading-tight tracking-tight text-white mb-3">
+    Forgez propre.
+  </h1>
+  <h1 class="landing-accent-text text-5xl sm:text-7xl font-bold leading-tight tracking-tight mb-8">
+    Ne fondez pas dans la magie.
+  </h1>
+  <p class="landing-accent-text text-lg font-medium max-w-2xl mx-auto leading-relaxed mb-6">
+    JSON canonique. SQL visible. CRUD généré. Uploads validés. Déploiement guidé.
+  </p>
+  <p class="text-lg text-white/55 max-w-3xl mx-auto leading-relaxed mb-16">
+    Forge lit <code class="text-white/80">mvc/entities/&lt;entity&gt;/&lt;entity&gt;.json</code>,
+    produit du SQL explicite, génère contrôleurs, formulaires et vues Jinja2,
+    gère les uploads avec validation MIME, prépare le déploiement Nginx + systemd,
+    puis vous laisse les choix importants. Pas d’ORM magique, pas de fichiers métier écrasés.
+  </p>
+
+  <div class="landing-panel mx-auto max-w-xl text-left rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+    <div class="flex items-center gap-1.5 px-4 py-3 border-b border-white/10">
+      <span class="w-3 h-3 rounded-full bg-[#ff5f56]"></span>
+      <span class="w-3 h-3 rounded-full bg-[#ffbd2e]"></span>
+      <span class="w-3 h-3 rounded-full bg-[#27c93f]"></span>
+      <span class="ml-3 text-xs text-[#bc9898]">workflow Forge v1.0.0</span>
+    </div>
+    <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> forge doctor
+<span class="landing-accent-text">$</span> forge make:entity Contact --no-input
+<span class="text-white/35"># Ajouter les champs métier dans mvc/entities/contact/contact.json</span>
+<span class="landing-accent-text">$</span> forge build:model --dry-run
+<span class="landing-accent-text">$</span> forge build:model
+<span class="landing-accent-text">$</span> forge db:apply
+<span class="landing-accent-text">$</span> forge make:crud Contact</pre>
+  </div>
+</section>
+
+<!-- Fonctionnalités -->
+<section id="crud" class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Un CRUD MVC généré, mais jamais enfermant.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Forge génère les projections répétitives et garde visibles les choix importants :
+        modèle JSON, SQL, routes, fichiers générés et fichiers préservés.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <div class="rounded-xl border border-slate-200 p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-4 font-bold">JSON</div>
+        <h3 class="font-semibold mb-2">Source canonique JSON</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Le modèle réel vit dans <code>mvc/entities/&lt;entity&gt;/&lt;entity&gt;.json</code>.
+          C’est la source lisible qui pilote la génération.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-4 font-bold">SQL</div>
+        <h3 class="font-semibold mb-2">SQL visible</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Forge génère des fichiers <code>*.sql</code> et <code>relations.sql</code>
+          inspectables avant application. Le schéma reste proche du réel.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-4 font-bold">DRY</div>
+        <h3 class="font-semibold mb-2">Génération sûre avec --dry-run</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code>forge build:model --dry-run</code> montre ce qui serait écrit
+          avant de toucher aux projections régénérables.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-4 font-bold">MVC</div>
+        <h3 class="font-semibold mb-2">CRUD explicite avec forge make:crud</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Contrôleur, modèle applicatif, formulaire et vues Jinja2 sont générés
+          comme squelette modifiable, avec CSRF dans le formulaire.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-4 font-bold">OK</div>
+        <h3 class="font-semibold mb-2">Diagnostic avec forge doctor</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code>forge doctor</code> vérifie l’environnement, les fichiers attendus,
+          la configuration et les prérequis avant d’aller plus loin.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-4 font-bold">UP</div>
+        <h3 class="font-semibold mb-2">Service d’upload sécurisé</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Validation MIME, extension, taille, protection path traversal.
+          <code>forge upload:init</code> prépare les dossiers de stockage.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-4 font-bold">&#x2693;</div>
+        <h3 class="font-semibold mb-2">Déploiement guidé</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code>forge deploy:init</code> génère la conf Nginx et le service systemd.
+          <code>forge deploy:check</code> valide l’environnement de production.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center text-lg mb-4 font-bold">4</div>
+        <h3 class="font-semibold mb-2">Starter apps progressives</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Quatre parcours montent en complexité : contact simple, authentification,
+          carnet relationnel et suivi métier d’élèves.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Code -->
+<section id="code" class="bg-[#111110] py-24 px-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-14">
+      <h2 class="text-4xl font-bold tracking-tight text-white mb-3">
+        Le flux complet reste lisible.
+      </h2>
+      <p class="text-white/50 text-lg">
+        Le modèle JSON produit SQL et bases Python. Le CRUD produit un squelette MVC.
+        Les routes restent un choix explicite dans <code>mvc/routes.py</code>.
+      </p>
+    </div>
+
+    <div data-tabs class="landing-panel rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+      <div class="flex border-b border-white/10 overflow-x-auto">
+        <div class="flex items-center gap-1.5 px-4 py-3 flex-shrink-0">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></span>
+        </div>
+        <button data-tab-btn class="px-5 py-3 text-xs border-b-2 border-transparent text-white/40 hover:text-white transition-colors">workflow</button>
+        <button data-tab-btn class="px-5 py-3 text-xs border-b-2 border-transparent text-white/40 hover:text-white transition-colors">contact.json</button>
+        <button data-tab-btn class="px-5 py-3 text-xs border-b-2 border-transparent text-white/40 hover:text-white transition-colors">make:crud</button>
+        <button data-tab-btn class="px-5 py-3 text-xs border-b-2 border-transparent text-white/40 hover:text-white transition-colors">routes</button>
+        <button data-tab-btn class="px-5 py-3 text-xs border-b-2 border-transparent text-white/40 hover:text-white transition-colors">dry-run</button>
+      </div>
+
+      <div data-tab-panel>
+        <pre class="px-7 py-6 text-sm leading-loose overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> forge doctor
+<span class="landing-accent-text">$</span> forge make:entity Contact --no-input
+<span class="text-white/35"># Ajouter les champs métier dans mvc/entities/contact/contact.json</span>
+<span class="landing-accent-text">$</span> forge build:model --dry-run
+<span class="landing-accent-text">$</span> forge build:model
+<span class="landing-accent-text">$</span> forge db:apply
+<span class="landing-accent-text">$</span> forge make:crud Contact</pre>
+      </div>
+
+      <div data-tab-panel class="hidden">
+        <pre class="px-7 py-6 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]">{
+  <span class="syntax-key">"format_version"</span>: <span class="syntax-number">1</span>,
+  <span class="syntax-key">"entity"</span>: <span class="syntax-string">"Contact"</span>,
+  <span class="syntax-key">"table"</span>: <span class="syntax-string">"contact"</span>,
+  <span class="syntax-key">"fields"</span>: [
+    {
+      <span class="syntax-key">"name"</span>: <span class="syntax-string">"id"</span>,
+      <span class="syntax-key">"sql_type"</span>: <span class="syntax-string">"INT"</span>,
+      <span class="syntax-key">"primary_key"</span>: <span class="syntax-number">true</span>,
+      <span class="syntax-key">"auto_increment"</span>: <span class="syntax-number">true</span>
+    },
+    {
+      <span class="syntax-key">"name"</span>: <span class="syntax-string">"nom"</span>,
+      <span class="syntax-key">"sql_type"</span>: <span class="syntax-string">"VARCHAR(80)"</span>,
+      <span class="syntax-key">"constraints"</span>: {
+        <span class="syntax-key">"not_empty"</span>: <span class="syntax-number">true</span>,
+        <span class="syntax-key">"max_length"</span>: <span class="syntax-number">80</span>
+      }
+    },
+    {
+      <span class="syntax-key">"name"</span>: <span class="syntax-string">"email"</span>,
+      <span class="syntax-key">"sql_type"</span>: <span class="syntax-string">"VARCHAR(120)"</span>,
+      <span class="syntax-key">"nullable"</span>: <span class="syntax-number">true</span>,
+      <span class="syntax-key">"unique"</span>: <span class="syntax-number">true</span>
+    }
+  ]
+}</pre>
+      </div>
+
+      <div data-tab-panel class="hidden">
+        <pre class="px-7 py-6 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> forge make:crud Contact
+
+[CRÉÉ]      mvc/controllers/contact_controller.py
+[CRÉÉ]      mvc/models/contact_model.py
+[CRÉÉ]      mvc/forms/contact_form.py
+[CRÉÉ]      mvc/views/layouts/app.html
+[CRÉÉ]      mvc/views/contact/index.html
+[CRÉÉ]      mvc/views/contact/show.html
+[CRÉÉ]      mvc/views/contact/form.html
+
+Routes à ajouter dans mvc/routes.py :
+...</pre>
+      </div>
+
+      <div data-tab-panel class="hidden">
+        <pre class="px-7 py-6 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]">from mvc.controllers.contact_controller import ContactController
+
+# Routes protégées par défaut.
+# Pour un test local sans authentification :
+# with router.group("/contacts", public=True, csrf=False) as g:
+with router.group("/contacts") as g:
+    g.add("GET",  "",              ContactController.index,   name="contact_index")
+    g.add("GET",  "/new",          ContactController.new,     name="contact_new")
+    g.add("POST", "",              ContactController.create,  name="contact_create")
+    g.add("GET",  "/{id}",         ContactController.show,    name="contact_show")
+    g.add("GET",  "/{id}/edit",    ContactController.edit,    name="contact_edit")
+    g.add("POST", "/{id}",         ContactController.update,  name="contact_update")
+    g.add("POST", "/{id}/delete",  ContactController.destroy, name="contact_destroy")</pre>
+      </div>
+
+      <div data-tab-panel class="hidden">
+        <pre class="px-7 py-6 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> forge build:model --dry-run
+
+[ÉCRIT]     mvc/entities/contact/contact.sql
+[ÉCRIT]     mvc/entities/contact/contact_base.py
+[ÉCRIT]     mvc/entities/relations.sql
+[PRÉSERVÉ]  mvc/entities/contact/contact.py
+[PRÉSERVÉ]  mvc/entities/contact/__init__.py
+
+3 régénéré(s), 0 créé(s), 2 préservé(s).
+[DRY-RUN]   Aucun fichier modifié.</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Installation -->
+<section id="démarrer" class="py-24 px-6 bg-white">
+  <div class="max-w-2xl mx-auto">
+    <div class="text-center mb-14">
+      <h2 class="text-4xl font-bold tracking-tight mb-3">
+        Démarrer par le chemin officiel.
+      </h2>
+      <p class="text-slate-500 text-lg">
+        Créez un projet, vérifiez l’environnement, générez le modèle,
+        appliquez le SQL puis produisez le CRUD MVC.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">1</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Créer le projet</div>
+          <code class="syntax-command text-sm break-all">$ forge new MonProjet</code>
+        </div>
+        <button data-copy="forge new MonProjet" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">2</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Entrer dans le projet</div>
+          <code class="syntax-command text-sm break-all">$ cd MonProjet</code>
+        </div>
+        <button data-copy="cd MonProjet" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">3</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Activer l’environnement</div>
+          <code class="syntax-command text-sm break-all">$ source .venv/bin/activate</code>
+        </div>
+        <button data-copy="source .venv/bin/activate" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">4</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Diagnostiquer le projet</div>
+          <code class="syntax-command text-sm break-all">$ forge doctor</code>
+        </div>
+        <button data-copy="forge doctor" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">5</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Initialiser la base</div>
+          <code class="syntax-command text-sm break-all">$ forge db:init</code>
+        </div>
+        <button data-copy="forge db:init" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">6</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Créer l’entité canonique</div>
+          <code class="syntax-command text-sm break-all">$ forge make:entity Contact --no-input</code>
+        </div>
+        <button data-copy="forge make:entity Contact --no-input" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">7</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Ajouter les champs métier</div>
+          <div class="text-xs text-white/40 mb-2">Après make:entity --no-input, le JSON contient seulement la clé primaire. Ajoutez les champs métier avant de générer le modèle.</div>
+          <code class="syntax-command text-sm break-all">$ nano mvc/entities/contact/contact.json</code>
+        </div>
+        <button data-copy="nano mvc/entities/contact/contact.json" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">8</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Prévisualiser la génération</div>
+          <code class="syntax-command text-sm break-all">$ forge build:model --dry-run</code>
+        </div>
+        <button data-copy="forge build:model --dry-run" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">9</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Écrire les projections régénérables</div>
+          <code class="syntax-command text-sm break-all">$ forge build:model</code>
+        </div>
+        <button data-copy="forge build:model" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">10</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Appliquer le SQL</div>
+          <code class="syntax-command text-sm break-all">$ forge db:apply</code>
+        </div>
+        <button data-copy="forge db:apply" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">11</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Générer le CRUD MVC</div>
+          <code class="syntax-command text-sm break-all">$ forge make:crud Contact</code>
+        </div>
+        <button data-copy="forge make:crud Contact" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">12</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Lancer l’application</div>
+          <code class="syntax-command text-sm break-all">$ python app.py</code>
+        </div>
+        <button data-copy="python app.py" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+    </div>
+
+    <div class="landing-highlight-note mt-10 rounded-xl p-5 border text-sm leading-relaxed">
+      <strong>Note :</strong> <code>forge new</code> prépare le projet, l’environnement local
+      et la configuration de développement. MariaDB doit être disponible avant <code>forge db:apply</code>.
+    </div>
+  </div>
+</section>
+
+<!-- Starters -->
+<section id="starters" class="py-24 px-6 bg-slate-50">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Quatre starters progressifs.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Chaque starter avance d’un cran : d’abord le CRUD simple,
+        puis la sécurité, les relations et enfin une application métier plus dense.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <a href="https://caucrogegit.github.io/Forge/starter-app-01-contact-simple/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 1</div>
+        <h3 class="font-semibold text-lg mb-2">Contact simple</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Apprendre le cycle complet d’un CRUD sur une seule entité :
+          JSON, SQL, formulaire, contrôleur, vues et messages flash.
+        </p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starter-app-02-utilisateurs-auth/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 2</div>
+        <h3 class="font-semibold text-lg mb-2">Utilisateurs et authentification</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Comprendre sessions, login, logout, CSRF,
+          routes publiques et routes protégées dans une application Forge.
+        </p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starter-app-03-carnet-contacts/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 3</div>
+        <h3 class="font-semibold text-lg mb-2">Carnet de contacts relationnel</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Lire un modèle relationnel explicite avec <code>many_to_one</code>,
+          pivot many-to-many explicite et requêtes SQL visibles.
+        </p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starter-app-04-suivi-comportement-eleves/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 4</div>
+        <h3 class="font-semibold text-lg mb-2">Suivi comportement élèves</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Construire une application métier plus dense :
+          formulaires, cases à cocher, vues de synthèse et règles applicatives.
+        </p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="bg-[#111110] py-24 px-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight text-white mb-4">
+        Questions fréquentes.
+      </h2>
+      <p class="text-white/50 text-lg max-w-2xl mx-auto">
+        Forge privilégie les fichiers visibles et les décisions explicites.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="rounded-xl border border-white/10 p-7 bg-[#0d0f14]">
+        <h3 class="text-white font-semibold mb-3">Que génère make:crud ?</h3>
+        <p class="text-white/60 text-sm leading-relaxed">
+          Un contrôleur, un modèle applicatif, un formulaire, un layout
+          et les vues Jinja2 <code>index</code>, <code>show</code> et <code>form</code>.
+          Le formulaire contient le token CSRF.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-white/10 p-7 bg-[#0d0f14]">
+        <h3 class="text-white font-semibold mb-3">Pourquoi les routes ne sont pas injectées automatiquement ?</h3>
+        <p class="text-white/60 text-sm leading-relaxed">
+          Parce que les routes sont une décision applicative. Forge affiche le bloc prêt à copier,
+          puis vous choisissez où et comment l’intégrer dans <code>mvc/routes.py</code>.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-white/10 p-7 bg-[#0d0f14]">
+        <h3 class="text-white font-semibold mb-3">Que signifie fichier généré / fichier préservé ?</h3>
+        <p class="text-white/60 text-sm leading-relaxed">
+          <code>*_base.py</code>, <code>*.sql</code> et les vues CRUD générées sont régénérables.
+          Les fichiers métier manuels, comme <code>contact.py</code>, sont préservés.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-white/10 p-7 bg-[#0d0f14]">
+        <h3 class="text-white font-semibold mb-3">Pourquoi --dry-run ?</h3>
+        <p class="text-white/60 text-sm leading-relaxed">
+          Pour vérifier l’impact d’une génération avant écriture.
+          C’est particulièrement utile quand le modèle JSON évolue ou quand plusieurs entités changent.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-white/10 p-7 bg-[#0d0f14]">
+        <h3 class="text-white font-semibold mb-3">Pourquoi pas d’ORM ?</h3>
+        <p class="text-white/60 text-sm leading-relaxed">
+          Forge veut garder le SQL visible et le développeur au centre.
+          Les modèles applicatifs peuvent contenir les requêtes dont le projet a besoin,
+          sans couche implicite qui masque les tables, les jointures ou les contraintes.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-white/10 p-7 bg-[#0d0f14]">
+        <h3 class="text-white font-semibold mb-3">Comment gérer des fichiers uploadés ?</h3>
+        <p class="text-white/60 text-sm leading-relaxed">
+          Lancez <code>forge upload:init</code> pour créer les dossiers de stockage.
+          Appelez <code>save_upload(file, category=…)</code> dans le contrôleur.
+          La validation MIME, l’extension et la taille sont automatiques.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-white/10 p-7 bg-[#0d0f14] md:col-span-2">
+        <h3 class="text-white font-semibold mb-3">Comment préparer le déploiement ?</h3>
+        <p class="text-white/60 text-sm leading-relaxed">
+          <code>forge deploy:init</code> génère la configuration Nginx (reverse proxy vers
+          <code>127.0.0.1:8000</code>) et l’unité systemd dans <code>deploy/</code>.
+          <code>forge deploy:check</code> vérifie Python, les variables DB, les dossiers
+          et les modules avant mise en production. Aucune commande ne touche au serveur.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Positionnement -->
+<section class="bg-white py-24 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Ce que Forge permet réellement aujourd’hui.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Forge n’est pas un framework universel. Il vise des applications lisibles,
+        structurées et maîtrisées, avec une sécurité HTTP explicite.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-10">
+      <div class="rounded-xl border border-slate-200 p-8">
+        <h3 class="text-xl font-semibold mb-4">Ce que Forge fait bien</h3>
+        <ul class="text-slate-500 text-sm leading-relaxed space-y-2">
+          <li>Back-offices simples à intermédiaires</li>
+          <li>Applications de gestion : contacts, clients, stocks, commandes</li>
+          <li>CRUD MVC structuré avec formulaires générés</li>
+          <li>Projets où le SQL doit rester lisible</li>
+          <li>Applications pédagogiques et prototypes propres</li>
+          <li>Sécurité HTTP : CSRF, refus 413, chemins statiques durcis</li>
+          <li>Uploads sécurisés : validation MIME, extension, path traversal</li>
+          <li>Déploiement guidé : conf Nginx + systemd générées par la CLI</li>
+        </ul>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-8">
+        <h3 class="text-xl font-semibold mb-4">Ce que Forge ne cache pas</h3>
+        <ul class="text-slate-500 text-sm leading-relaxed space-y-2">
+          <li>Pas d’ORM riche ni de migrations opaques</li>
+          <li>Pas d’admin automatique type Django</li>
+          <li>Pas d’injection silencieuse de routes</li>
+          <li>Pas de many-to-many magique : utilisez un pivot explicite</li>
+          <li>Pas de logique métier dans les JSON</li>
+          <li>Pas d’écrasement volontaire des fichiers manuels</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="landing-panel py-7 px-8 border-t border-white/10 text-center text-xs text-white/30">
+  © 2026 Roger Cauchon — Tous droits réservés
+</footer>
+
+<script src="./static/js/landing.js"></script>
+</body>
+</html>

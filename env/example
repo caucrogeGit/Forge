@@ -1,0 +1,37 @@
+# Application
+APP_NAME=Forge
+APP_ROUTES_MODULE=mvc.routes
+
+# Administration MariaDB globale
+DB_ADMIN_HOST=localhost
+DB_ADMIN_PORT=3306
+DB_ADMIN_LOGIN=root
+DB_ADMIN_PWD=
+
+# Base projet
+DB_NAME=forge_db
+DB_CHARSET=utf8mb4
+DB_COLLATION=utf8mb4_unicode_ci
+
+# Utilisateur applicatif du projet
+DB_APP_HOST=localhost
+DB_APP_PORT=3306
+DB_APP_LOGIN=forge
+DB_APP_PWD=
+DB_POOL_SIZE=5
+
+# Uploads
+UPLOAD_ROOT=storage/uploads
+UPLOAD_MAX_SIZE=5242880
+UPLOAD_ALLOWED_EXTENSIONS=jpg,jpeg,png,webp,pdf
+UPLOAD_ALLOWED_MIME_TYPES=image/jpeg,image/png,image/webp,application/pdf
+
+# Serveur
+APP_HOST=127.0.0.1
+APP_PORT=8000
+# Dev : HTTPS local par défaut. Prod derrière Nginx : HTTP local par défaut.
+# APP_SSL_ENABLED=true
+
+# Certificats SSL (générés avec openssl, voir app.py)
+SSL_CERTFILE=cert.pem
+SSL_KEYFILE=key.pem

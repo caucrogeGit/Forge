@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{app_name}</title>
+    <link rel="icon" href="/static/img/forge-logo.svg" type="image/svg+xml">
+    <link rel="icon" href="/static/favicon.ico" sizes="any">
+    <link rel="stylesheet" href="/static/tailwind.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <nav class="bg-blue-700 text-white px-6 py-4 shadow flex justify-between items-center">
+        <a href="/" class="text-xl font-bold">{app_name}</a>
+        <form method="post" action="/logout" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{csrf_token}">
+            <button type="submit" class="text-sm bg-blue-800 hover:bg-blue-900 px-3 py-1 rounded cursor-pointer">
+                Déconnexion
+            </button>
+        </form>
+    </nav>
+
+    <main class="max-w-5xl mx-auto mt-8 px-4">
+        {contenu}
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forge — Bienvenue</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/static/tailwind.css">
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
+
+    <!-- En-tête -->
+    <header class="border-b border-gray-800 px-8 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <svg class="w-7 h-7 text-orange-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
+            </svg>
+            <span class="text-xl font-bold tracking-tight">Forge</span>
+            <span class="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">v1.0.0</span>
+        </div>
+        <a href="/login"
+           class="text-sm bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
+            Se connecter
+        </a>
+    </header>
+
+    <!-- Hero -->
+    <section class="max-w-3xl mx-auto px-8 pt-20 pb-12 text-center">
+        <p class="text-orange-400 text-sm font-mono tracking-widest uppercase mb-4">Framework MVC Python</p>
+        <h1 class="text-5xl font-bold mb-5 leading-tight">
+            Bienvenue sur&nbsp;<span class="text-orange-400">Forge</span>
+        </h1>
+        <p class="text-gray-400 text-lg leading-relaxed">
+            Framework web artisanal — HTTP/HTTPS natif, routeur, sessions, validation,
+            pool MariaDB et générateurs de code. Sans magie cachée.
+        </p>
+    </section>
+
+    <!-- Tunnel de création -->
+    <section class="max-w-3xl mx-auto px-8 pb-20">
+
+        <h2 class="text-sm font-mono text-gray-500 uppercase tracking-widest mb-8 text-center">
+            Créer une application en 5 étapes
+        </h2>
+
+        <div class="space-y-4">
+
+            <!-- Étape 1 -->
+            <div class="flex gap-5 items-start bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 font-bold text-sm flex items-center justify-center">1</div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-100 mb-1">Créer la base de données</p>
+                    <p class="text-gray-400 text-sm mb-3">Configure la connexion MariaDB et crée la base de données.</p>
+                    <pre class="bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-sm font-mono text-green-400 overflow-x-auto">python cmd/make.py schema:create</pre>
+                </div>
+            </div>
+
+            <!-- Étape 2 -->
+            <div class="flex gap-5 items-start bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 font-bold text-sm flex items-center justify-center">2</div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-100 mb-1">Initialiser la sécurité</p>
+                    <p class="text-gray-400 text-sm mb-3">Crée les tables <code class="text-orange-300">utilisateur</code>, <code class="text-orange-300">role</code> et le premier compte admin.</p>
+                    <pre class="bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-sm font-mono text-green-400 overflow-x-auto">python cmd/make.py security:init</pre>
+                </div>
+            </div>
+
+            <!-- Étape 3 -->
+            <div class="flex gap-5 items-start bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 font-bold text-sm flex items-center justify-center">3</div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-100 mb-1">Générer une entité MVC</p>
+                    <p class="text-gray-400 text-sm mb-3">
+                        Génère en une commande le model, le validator, le controller,
+                        les vues HTML et les routes pour une entité.
+                    </p>
+                    <pre class="bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-sm font-mono text-green-400 overflow-x-auto">python cmd/make.py mvc NomEntite</pre>
+                    <p class="text-gray-500 text-xs mt-2">Exemple : <code class="text-gray-400">python cmd/make.py mvc Produit</code></p>
+                </div>
+            </div>
+
+            <!-- Étape 4 -->
+            <div class="flex gap-5 items-start bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 font-bold text-sm flex items-center justify-center">4</div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-100 mb-1">Créer la table SQL</p>
+                    <p class="text-gray-400 text-sm mb-3">Génère et exécute le DDL <code class="text-orange-300">CREATE TABLE</code> pour l'entité.</p>
+                    <pre class="bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-sm font-mono text-green-400 overflow-x-auto">python cmd/make.py table:create NomEntite</pre>
+                </div>
+            </div>
+
+            <!-- Étape 5 -->
+            <div class="flex gap-5 items-start bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 font-bold text-sm flex items-center justify-center">5</div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-100 mb-1">Démarrer le serveur</p>
+                    <p class="text-gray-400 text-sm mb-3">Lance Forge en mode développement ou production.</p>
+                    <div class="space-y-2">
+                        <pre class="bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-sm font-mono text-green-400 overflow-x-auto">python app.py</pre>
+                        <pre class="bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-sm font-mono text-gray-500 overflow-x-auto">python app.py --env prod</pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Commandes annexes -->
+        <div class="mt-10 bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <p class="text-sm font-semibold text-gray-300 mb-4">Autres commandes utiles</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-mono">
+                <div>
+                    <p class="text-gray-500 text-xs mb-1">Vérifier une entité</p>
+                    <p class="text-green-400">make.py check NomEntite</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-xs mb-1">Lister toutes les entités</p>
+                    <p class="text-green-400">make.py list</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-xs mb-1">Générer une migration</p>
+                    <p class="text-green-400">make.py migration NomEntite</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-xs mb-1">Hasher un mot de passe</p>
+                    <p class="text-green-400">make.py security:hash</p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Pied de page -->
+    <footer class="border-t border-gray-800 px-8 py-6 text-center text-gray-600 text-xs">
+        Forge v1.0.0 — Framework MVC Python artisanal
+    </footer>
+
+</body>
+</html>

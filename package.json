@@ -1,0 +1,25 @@
+{
+  "name": "forge",
+  "version": "1.0.0",
+  "description": "Framework web MVC pur Python, HTTPS natif, Jinja2 intégré. Dépendances runtime explicites : MariaDB, python-dotenv et Jinja2.",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/src/input.css -o ./static/tailwind.css --minify",
+    "test": "python -m pytest tests/ -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caucrogeGit/Forge.git"
+  },
+  "keywords": ["python", "mvc", "framework", "https"],
+  "author": "Roger Cauchon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/caucrogeGit/Forge/issues"
+  },
+  "homepage": "https://github.com/caucrogeGit/Forge#readme",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwindcss": "^4.2.2"
+  }
+}

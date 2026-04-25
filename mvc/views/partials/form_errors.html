@@ -1,0 +1,11 @@
+{% if form and form.errors %}
+<div class="border bg-red-100 border-red-400 text-red-800 px-4 py-3 rounded mb-4">
+    <ul class="list-disc list-inside">
+        {% for field, messages in form.errors.items() %}
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

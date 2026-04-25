@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc"
+version = "1.0.0"
+description = "CLI d'initialisation de projets Forge"
+authors = [
+    { name = "Roger Cauchon" },
+]
+requires-python = ">=3.11"
+dependencies = [
+    "mariadb==1.1.14",
+    "python-dotenv==1.2.2",
+    "jinja2==3.1.6",
+]
+
+[project.scripts]
+forge = "forge:cli_entrypoint"
+
+[tool.setuptools]
+py-modules = ["forge"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "forge_cli*", "integrations*"]

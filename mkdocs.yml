@@ -1,0 +1,87 @@
+site_name: Forge
+site_description: Framework web MVC pur Python
+site_author: Roger Cauchon
+site_url: https://caucrogegit.github.io/Forge/
+
+repo_name: caucrogeGit/Forge
+repo_url: https://github.com/caucrogeGit/Forge
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  language: fr
+  favicon: static/favicon.svg
+  logo: static/forge-logo.png
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+    - search.share
+  palette:
+    - scheme: default
+      primary: black
+      accent: deep orange
+
+nav:
+  - Accueil: index.html
+  - Démarrer avec Forge:
+      - Guide de démarrage: guide.md
+      - CRUD explicite: crud.md
+  - Comprendre Forge:
+      - Concepts: concepts.md
+      - Positionnement: positioning.md
+      - Architecture des entités: entity_architecture.md
+  - Starter apps:
+      - Présentation: starter-app.md
+      - Démos et réutilisation: starter-apps.md
+      - Niveau 1 — Contact simple: starter-app-01-contact-simple.md
+      - Reconstruction contact simple:
+          - README: starters/01-contact-simple/README.md
+          - Étapes: starters/01-contact-simple/rebuild.md
+      - Niveau 2 — Utilisateurs/auth: starter-app-02-utilisateurs-auth.md
+      - Reconstruction utilisateurs/auth:
+          - README: starters/02-utilisateurs-auth/README.md
+          - Étapes: starters/02-utilisateurs-auth/rebuild.md
+      - Niveau 3 — Carnet relationnel: starter-app-03-carnet-contacts.md
+      - Reconstruction carnet relationnel:
+          - README: starters/03-carnet-contacts/README.md
+          - Étapes: starters/03-carnet-contacts/rebuild.md
+      - Niveau 4 — Suivi élèves: starter-app-04-suivi-comportement-eleves.md
+      - Reconstruction suivi élèves:
+          - README: starters/04-suivi-comportement-eleves/README.md
+          - Étapes: starters/04-suivi-comportement-eleves/rebuild.md
+  - Référence:
+      - API et CLI: reference.md
+  - Déploiement:
+      - Guide de déploiement: deployment.md
+  - Projet:
+      - Roadmap: roadmap.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search:
+      lang: fr
+      separator: '[\s\-\.:\_/]+'
+
+extra:
+  homepage: /
+
+docs_dir: docs
+site_dir: site
