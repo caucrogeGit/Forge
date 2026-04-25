@@ -1,0 +1,4602 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Framework web MVC pur Python">
+      
+      
+        <meta name="author" content="Roger Cauchon">
+      
+      
+        <link rel="canonical" href="https://caucrogegit.github.io/Forge/guide/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../crud/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../static/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Guide de démarrage - Forge</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#forge-guide-de-demarrage" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="/" title="Forge" class="md-header__button md-logo" aria-label="Forge" data-md-component="logo">
+      
+  <img src="../static/forge-logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Forge
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Guide de démarrage
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Partager" aria-label="Partager" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/caucrogeGit/Forge" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    caucrogeGit/Forge
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Démarrer avec Forge
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../concepts/" class="md-tabs__link">
+          
+  
+  
+  Comprendre Forge
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../starter-app/" class="md-tabs__link">
+          
+  
+  
+  Starter apps
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/" class="md-tabs__link">
+          
+  
+  
+  Référence
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../deployment/" class="md-tabs__link">
+          
+  
+  
+  Déploiement
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../roadmap/" class="md-tabs__link">
+          
+  
+  
+  Projet
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="/" title="Forge" class="md-nav__button md-logo" aria-label="Forge" data-md-component="logo">
+      
+  <img src="../static/forge-logo.png" alt="logo">
+
+    </a>
+    Forge
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/caucrogeGit/Forge" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    caucrogeGit/Forge
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Démarrer avec Forge
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Démarrer avec Forge
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de démarrage
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de démarrage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sommaire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sommaire
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#philosophie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Philosophie
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limites-assumees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limites assumées
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-prerequis-et-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Prérequis et installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Prérequis et installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prérequis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation-manuelle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation manuelle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation manuelle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-installer-les-prerequis-systeme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Installer les prérequis système
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-cloner-le-projet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Cloner le projet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-creer-lenvironnement-virtuel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Créer l'environnement virtuel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-generer-les-certificats-https-locaux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Générer les certificats HTTPS locaux
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-preparer-lenvironnement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Préparer l'environnement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-preparer-mariadb-avec-forge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Préparer MariaDB avec Forge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-lancer-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Lancer l'application
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dépendances
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-structure-du-projet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Structure du projet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#registre-coreforge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registre core.forge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cles-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clés disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fichiers-denvironnement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers d'environnement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cycle-de-vie-dune-requete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cycle de vie d'une requête
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Cycle de vie d&#39;une requête">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objet-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objet Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-routeur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Routeur
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Routeur">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#declarer-des-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Déclarer des routes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patterns-supportes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patterns supportés
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-controleurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Contrôleurs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Contrôleurs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methodes-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Méthodes disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-complet-controleur-crud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple complet : contrôleur CRUD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-templates-jinja2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Templates Jinja2
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Templates Jinja2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#moteur-de-rendu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moteur de rendu
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arborescence-recommandee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arborescence recommandée
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout-recommande" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layout recommandé
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-heritant-du-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template héritant du layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formulaire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formulaire
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-autonome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template autonome
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rendu-brut-avec-rawtrue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rendu brut avec raw=True
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-modeles-et-base-de-donnees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Modèles et base de données
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Modèles et base de données">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#helper-sql-leger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helper SQL léger
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chargeur-sql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chargeur SQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transactions-explicites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transactions explicites
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-securite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Sécurité
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Sécurité">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sessions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csrf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSRF
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decorateurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Décorateurs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hachage-des-mots-de-passe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hachage des mots de passe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messages-flash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages flash
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lancer-les-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lancer les tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fakerequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FakeRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-de-test-de-controleur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple de test de contrôleur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-architecture-des-entites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Architecture des entités
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-cli-officielle-du-modele" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. CLI officielle du modèle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-cli-historique-cmdmakepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. CLI historique — cmd/make.py
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-cli-forge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. CLI — forge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-upload-minimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. Upload minimal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-cycle-crud-complet-forge-makecrud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. Cycle CRUD complet — forge make:crud
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="18. Cycle CRUD complet — forge make:crud">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequis_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prérequis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Génération
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajouter-les-routes-manuellement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ajouter les routes manuellement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lancer-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lancer l'application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#personnalisation-apres-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Personnalisation après génération
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limites-v10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limites V1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../crud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRUD explicite
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Comprendre Forge
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Comprendre Forge
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positionnement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../entity_architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture des entités
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Starter apps
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Starter apps
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Présentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-apps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Démos et réutilisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app-01-contact-simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 1 — Contact simple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction contact simple
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reconstruction contact simple
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/01-contact-simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/01-contact-simple/rebuild/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Étapes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app-02-utilisateurs-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 2 — Utilisateurs/auth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction utilisateurs/auth
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reconstruction utilisateurs/auth
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/02-utilisateurs-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/02-utilisateurs-auth/rebuild/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Étapes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app-03-carnet-contacts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 3 — Carnet relationnel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction carnet relationnel
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reconstruction carnet relationnel
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/03-carnet-contacts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/03-carnet-contacts/rebuild/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Étapes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app-04-suivi-comportement-eleves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 4 — Suivi élèves
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction suivi élèves
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reconstruction suivi élèves
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/04-suivi-comportement-eleves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/04-suivi-comportement-eleves/rebuild/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Étapes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Référence
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Référence
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API et CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Déploiement
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Déploiement
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de déploiement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projet
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Projet
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sommaire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sommaire
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#philosophie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Philosophie
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limites-assumees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limites assumées
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-prerequis-et-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Prérequis et installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Prérequis et installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prérequis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation-manuelle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation manuelle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation manuelle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-installer-les-prerequis-systeme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Installer les prérequis système
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-cloner-le-projet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Cloner le projet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-creer-lenvironnement-virtuel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Créer l'environnement virtuel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-generer-les-certificats-https-locaux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Générer les certificats HTTPS locaux
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-preparer-lenvironnement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Préparer l'environnement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-preparer-mariadb-avec-forge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Préparer MariaDB avec Forge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-lancer-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Lancer l'application
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dépendances
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-structure-du-projet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Structure du projet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#registre-coreforge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registre core.forge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cles-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clés disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fichiers-denvironnement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers d'environnement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cycle-de-vie-dune-requete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cycle de vie d'une requête
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Cycle de vie d&#39;une requête">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objet-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objet Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-routeur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Routeur
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Routeur">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#declarer-des-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Déclarer des routes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patterns-supportes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patterns supportés
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-controleurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Contrôleurs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Contrôleurs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methodes-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Méthodes disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-complet-controleur-crud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple complet : contrôleur CRUD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-templates-jinja2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Templates Jinja2
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Templates Jinja2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#moteur-de-rendu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moteur de rendu
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arborescence-recommandee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arborescence recommandée
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout-recommande" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layout recommandé
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-heritant-du-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template héritant du layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formulaire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formulaire
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-autonome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template autonome
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rendu-brut-avec-rawtrue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rendu brut avec raw=True
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-modeles-et-base-de-donnees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Modèles et base de données
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Modèles et base de données">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#helper-sql-leger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helper SQL léger
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chargeur-sql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chargeur SQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transactions-explicites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transactions explicites
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-securite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Sécurité
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Sécurité">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sessions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csrf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSRF
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decorateurs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Décorateurs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hachage-des-mots-de-passe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hachage des mots de passe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messages-flash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages flash
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lancer-les-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lancer les tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fakerequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FakeRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemple-de-test-de-controleur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple de test de contrôleur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-architecture-des-entites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Architecture des entités
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-cli-officielle-du-modele" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. CLI officielle du modèle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-cli-historique-cmdmakepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. CLI historique — cmd/make.py
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-cli-forge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. CLI — forge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-upload-minimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. Upload minimal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-cycle-crud-complet-forge-makecrud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. Cycle CRUD complet — forge make:crud
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="18. Cycle CRUD complet — forge make:crud">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequis_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prérequis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Génération
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ajouter-les-routes-manuellement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ajouter les routes manuellement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lancer-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lancer l'application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#personnalisation-apres-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Personnalisation après génération
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limites-v10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limites V1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="forge-guide-de-demarrage">Forge — Guide de démarrage<a class="headerlink" href="#forge-guide-de-demarrage" title="Permanent link">&para;</a></h1>
+<h2 id="sommaire">Sommaire<a class="headerlink" href="#sommaire" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#prerequis-installation">Prérequis et installation</a></li>
+<li><a href="#structure-projet">Structure du projet</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#cycle-vie-requete">Cycle de vie d'une requête</a></li>
+<li><a href="#routeur">Routeur</a></li>
+<li><a href="#controleurs">Contrôleurs</a></li>
+<li><a href="#templates-jinja2">Templates Jinja2</a></li>
+<li><a href="#modeles-base-donnees">Modèles et base de données</a></li>
+<li><a href="#validation">Validation</a></li>
+<li><a href="#securite">Sécurité</a></li>
+<li><a href="#tests">Tests</a></li>
+<li><a href="#architecture-des-entites">Architecture des entités</a></li>
+<li><a href="#cli-officielle-du-modele">CLI officielle du modèle</a></li>
+<li><a href="#cli-cmd-make">CLI historique — cmd/make.py</a></li>
+<li><a href="#cli-forge">CLI — forge</a></li>
+<li><a href="#upload-minimal">Upload minimal</a></li>
+<li><a href="#cycle-crud-complet-forge-makecrud">Cycle CRUD complet — forge make:crud</a></li>
+</ol>
+<hr />
+<p><a id="introduction"></a></p>
+<h2 id="1-introduction">1. Introduction<a class="headerlink" href="#1-introduction" title="Permanent link">&para;</a></h2>
+<p><strong>Forge</strong> est un framework web MVC en Python, avec HTTPS natif, SQL explicite, moteur de templates <strong>Jinja2</strong> et couche de sécurité intégrée.</p>
+<h3 id="philosophie">Philosophie<a class="headerlink" href="#philosophie" title="Permanent link">&para;</a></h3>
+<p>Forge suit deux règles fondamentales :</p>
+<p><strong>Règle 1 — Ce que le framework fournit (<code>core/</code>)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>core/http/</code></td>
+<td>Requête, réponse, routeur, helper <code>html()</code></td>
+</tr>
+<tr>
+<td><code>core/application.py</code></td>
+<td>Pipeline middlewares + dispatch</td>
+</tr>
+<tr>
+<td><code>core/security/</code></td>
+<td>Sessions, CSRF, hashing, middleware, décorateurs</td>
+</tr>
+<tr>
+<td><code>core/forms/</code></td>
+<td>Form, Field, cleaned_data, erreurs affichables</td>
+</tr>
+<tr>
+<td><code>core/mvc/</code></td>
+<td>BaseController, Validator historique, Pagination</td>
+</tr>
+<tr>
+<td><code>core/templating/</code></td>
+<td>Contrat Renderer + singleton <code>template_manager</code></td>
+</tr>
+<tr>
+<td><code>core/database/</code></td>
+<td>Pool MariaDB, chargeur SQL</td>
+</tr>
+<tr>
+<td><code>core/uploads/</code></td>
+<td>Upload local minimal : validation, stockage, suppression</td>
+</tr>
+<tr>
+<td><code>core/forge.py</code></td>
+<td>Registre de configuration</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Règle 2 — Ce que l'application implémente (<code>mvc/</code>)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Composant</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mvc/routes.py</code></td>
+<td>Déclaration des routes</td>
+</tr>
+<tr>
+<td><code>mvc/controllers/</code></td>
+<td>Logique métier</td>
+</tr>
+<tr>
+<td><code>mvc/models/</code></td>
+<td>Requêtes SQL</td>
+</tr>
+<tr>
+<td><code>mvc/forms/</code></td>
+<td>Formulaires applicatifs</td>
+</tr>
+<tr>
+<td><code>mvc/validators/</code></td>
+<td>Règles de validation réutilisables</td>
+</tr>
+<tr>
+<td><code>mvc/views/</code></td>
+<td>Templates HTML / Jinja2</td>
+</tr>
+<tr>
+<td><code>mvc/helpers/</code></td>
+<td>Helpers de rendu HTML</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Le framework ne connaît pas votre schéma de base et ne fournit pas d'ORM.</p>
+</blockquote>
+<h3 id="limites-assumees">Limites assumées<a class="headerlink" href="#limites-assumees" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Forge ne fournit pas</th>
+<th>Alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ORM / query builder</td>
+<td>SQL paramétré direct + <code>sql_loader.py</code></td>
+</tr>
+<tr>
+<td>Migrations auto complètes</td>
+<td><code>cmd/make.py migration</code> + scripts SQL versionnés</td>
+</tr>
+<tr>
+<td>Session persistante</td>
+<td>Mémoire par défaut — remplaçable dans <code>session.py</code></td>
+</tr>
+<tr>
+<td>Front build intégré au noyau</td>
+<td>Chaîne Node séparée via <code>package.json</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><a id="prerequis-installation"></a></p>
+<h2 id="2-prerequis-et-installation">2. Prérequis et installation<a class="headerlink" href="#2-prerequis-et-installation" title="Permanent link">&para;</a></h2>
+<h3 id="prerequis">Prérequis<a class="headerlink" href="#prerequis" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Outil</th>
+<th>Version minimale</th>
+<th>Obligatoire</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python</td>
+<td>3.11</td>
+<td>Oui</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>récent</td>
+<td>Oui</td>
+</tr>
+<tr>
+<td>OpenSSL</td>
+<td>disponible dans le terminal</td>
+<td>Oui</td>
+</tr>
+<tr>
+<td>MariaDB</td>
+<td>10.6</td>
+<td>Oui pour utiliser la base de données</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td>20</td>
+<td>Optionnel — uniquement si vous recompiliez Tailwind</td>
+</tr>
+</tbody>
+</table>
+<h3 id="installation-manuelle">Installation manuelle<a class="headerlink" href="#installation-manuelle" title="Permanent link">&para;</a></h3>
+<h4 id="1-installer-les-prerequis-systeme">1. Installer les prérequis système<a class="headerlink" href="#1-installer-les-prerequis-systeme" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>python3<span class="w"> </span>python3-venv<span class="w"> </span>python3-pip<span class="w"> </span>openssl<span class="w"> </span>mariadb-server<span class="w"> </span>build-essential<span class="w"> </span>python3-dev<span class="w"> </span>libmariadb-dev<span class="w"> </span>pkg-config
+</code></pre></div>
+<h4 id="2-cloner-le-projet">2. Cloner le projet<a class="headerlink" href="#2-cloner-le-projet" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>--branch<span class="w"> </span>v1.0.0<span class="w"> </span>--depth<span class="o">=</span><span class="m">1</span><span class="w"> </span>https://github.com/caucrogeGit/Forge.git<span class="w"> </span>NomDuProjet
+<span class="nb">cd</span><span class="w"> </span>NomDuProjet
+</code></pre></div>
+<p>Remplacez <code>NomDuProjet</code> par le nom réel de votre application.</p>
+<p>Le clone sur un tag laisse le dépôt en <em>detached HEAD</em>. Réinitialisez-le immédiatement :</p>
+<div class="highlight"><pre><span></span><code>rm<span class="w"> </span>-rf<span class="w"> </span>.git
+git<span class="w"> </span>init
+git<span class="w"> </span>add<span class="w"> </span>-A
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;init: NomDuProjet — based on Forge v1.0.0&quot;</span>
+</code></pre></div>
+<blockquote>
+<p><code>forge new NomDuProjet</code> fait ces deux étapes automatiquement et est la voie recommandée.</p>
+</blockquote>
+<h4 id="3-creer-lenvironnement-virtuel">3. Créer l'environnement virtuel<a class="headerlink" href="#3-creer-lenvironnement-virtuel" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">        </span><span class="c1"># Linux / macOS</span>
+<span class="c1"># .venv\Scripts\activate       # Windows</span>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</code></pre></div>
+<h4 id="4-generer-les-certificats-https-locaux">4. Générer les certificats HTTPS locaux<a class="headerlink" href="#4-generer-les-certificats-https-locaux" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>openssl<span class="w"> </span>req<span class="w"> </span>-x509<span class="w"> </span>-newkey<span class="w"> </span>rsa:2048<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-keyout<span class="w"> </span>key.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-out<span class="w"> </span>cert.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-days<span class="w"> </span><span class="m">365</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-nodes<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-subj<span class="w"> </span><span class="s2">&quot;/CN=localhost&quot;</span>
+</code></pre></div>
+<h4 id="5-preparer-lenvironnement">5. Préparer l'environnement<a class="headerlink" href="#5-preparer-lenvironnement" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>env/example<span class="w"> </span>env/dev
+</code></pre></div>
+<p>Éditez ensuite <code>env/dev</code> avec vos paramètres MariaDB.</p>
+<p>Exemple :</p>
+<div class="highlight"><pre><span></span><code>APP_NAME=Forge
+APP_ROUTES_MODULE=mvc.routes
+
+# Administration MariaDB globale
+DB_ADMIN_HOST=localhost
+DB_ADMIN_PORT=3306
+DB_ADMIN_LOGIN=root
+DB_ADMIN_PWD=
+
+# Base projet
+DB_NAME=contacts
+DB_CHARSET=utf8mb4
+DB_COLLATION=utf8mb4_unicode_ci
+
+# Utilisateur applicatif du projet
+DB_APP_HOST=localhost
+DB_APP_PORT=3306
+DB_APP_LOGIN=forge
+DB_APP_PWD=motdepassefort
+DB_POOL_SIZE=5
+
+APP_HOST=127.0.0.1
+APP_PORT=8000
+
+SSL_CERTFILE=cert.pem
+SSL_KEYFILE=key.pem
+</code></pre></div>
+<h4 id="6-preparer-mariadb-avec-forge">6. Préparer MariaDB avec Forge<a class="headerlink" href="#6-preparer-mariadb-avec-forge" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>forge<span class="w"> </span>db:init
+</code></pre></div>
+<p>Cette commande utilise <code>DB_ADMIN_*</code> pour créer la base <code>DB_NAME</code>, créer l'utilisateur <code>DB_APP_LOGIN</code> si nécessaire, puis appliquer les droits applicatifs sur <code>DB_NAME.*</code>.</p>
+<p>Ne lancez <code>forge db:apply</code> qu'après génération du modèle. <code>db:init</code> prépare l'environnement ; <code>db:apply</code> applique les SQL déjà générés.</p>
+<h4 id="7-lancer-lapplication">7. Lancer l'application<a class="headerlink" href="#7-lancer-lapplication" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>app.py
+</code></pre></div>
+<p>Ouvrir ensuite <strong>https://localhost:8000</strong>.</p>
+<h3 id="dependances">Dépendances<a class="headerlink" href="#dependances" title="Permanent link">&para;</a></h3>
+<p><strong>Runtime</strong> (<code>requirements.txt</code>)</p>
+<div class="highlight"><pre><span></span><code>mariadb==1.1.14
+python-dotenv==1.2.2
+jinja2==3.1.6
+</code></pre></div>
+<p><strong>Développement</strong> (<code>requirements-dev.txt</code>)</p>
+<div class="highlight"><pre><span></span><code>-r requirements.txt
+pytest&gt;=8.0
+</code></pre></div>
+<p>Les tests n'ont pas besoin d'une instance MariaDB active, mais ils ont besoin des dépendances Python du runtime.</p>
+<hr />
+<p><a id="structure-projet"></a></p>
+<h2 id="3-structure-du-projet">3. Structure du projet<a class="headerlink" href="#3-structure-du-projet" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>.
+├── app.py                        # Point d&#39;entrée — serveur HTTPS
+├── forge.py                      # Point d&#39;entrée CLI du projet (non recommandé comme installation principale à ce stade)
+├── config.py                     # Chargement des variables d&#39;environnement
+│
+├── core/                         # Framework — à modifier seulement si vous travaillez sur Forge lui-même
+│   ├── forge.py                  # Registre de configuration du noyau
+│   ├── application.py            # Dispatcher : middlewares + routage + gestion des erreurs
+│   ├── http/
+│   │   ├── request.py            # Requête HTTP
+│   │   ├── response.py           # Classe Response
+│   │   └── helpers.py            # html() — helper de rendu principal
+│   ├── templating/
+│   │   ├── contracts.py          # Contrat Renderer
+│   │   └── manager.py            # Singleton template_manager
+│   ├── database/
+│   │   ├── connection.py         # Pool MariaDB
+│   │   └── sql_loader.py         # Chargeur SQL par environnement
+│   ├── forms/                    # Form, Field, cleaned_data, erreurs
+│   ├── mvc/
+│   │   ├── controller/
+│   │   │   └── base_controller.py
+│   │   ├── model/
+│   │   │   ├── validator.py
+│   │   │   └── exceptions.py
+│   │   └── view/
+│   │       └── pagination.py
+│   └── security/
+│       ├── session.py
+│       ├── hashing.py
+│       ├── middleware.py
+│       └── decorators.py
+│
+├── integrations/
+│   └── jinja2/
+│       └── renderer.py           # Jinja2Renderer
+│
+├── mvc/
+│   ├── routes.py
+│   ├── controllers/
+│   ├── forms/
+│   ├── models/
+│   ├── validators/
+│   ├── helpers/
+│   │   ├── flash.py
+│   │   └── form_errors.py
+│   └── views/
+│       ├── layouts/
+│       ├── landing/              # Landing publique Jinja2
+│       ├── auth/
+│       ├── errors/
+│       └── partials/
+│
+├── tests/
+├── cmd/
+│   └── make.py                   # CLI historique
+├── static/
+├── package.json                  # Chaîne front si Tailwind est utilisé
+└── env/
+    ├── example
+    ├── dev
+    └── prod
+</code></pre></div>
+<hr />
+<p><a id="configuration"></a></p>
+<h2 id="4-configuration">4. Configuration<a class="headerlink" href="#4-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="registre-coreforge">Registre <code>core.forge</code><a class="headerlink" href="#registre-coreforge" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">core.forge</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">forge</span>
+
+<span class="n">forge</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+    <span class="n">app_name</span><span class="o">=</span><span class="s2">&quot;MonApp&quot;</span><span class="p">,</span>
+    <span class="n">app_env</span><span class="o">=</span><span class="s2">&quot;prod&quot;</span><span class="p">,</span>
+    <span class="n">views_dir</span><span class="o">=</span><span class="s2">&quot;mvc/views&quot;</span><span class="p">,</span>
+    <span class="n">db_host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+    <span class="n">db_port</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span>
+    <span class="n">db_name</span><span class="o">=</span><span class="s2">&quot;ma_base&quot;</span><span class="p">,</span>
+    <span class="n">db_user</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+    <span class="n">db_password</span><span class="o">=</span><span class="s2">&quot;secret&quot;</span><span class="p">,</span>
+    <span class="n">db_pool_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="cles-disponibles">Clés disponibles<a class="headerlink" href="#cles-disponibles" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Clé</th>
+<th>Défaut</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app_name</code></td>
+<td><code>"Forge"</code></td>
+<td>Nom de l'application</td>
+</tr>
+<tr>
+<td><code>app_env</code></td>
+<td><code>"dev"</code></td>
+<td>Environnement</td>
+</tr>
+<tr>
+<td><code>views_dir</code></td>
+<td><code>"mvc/views"</code></td>
+<td>Dossier des templates</td>
+</tr>
+<tr>
+<td><code>sql_dir</code></td>
+<td><code>"mvc/models/sql"</code></td>
+<td>Dossier SQL</td>
+</tr>
+<tr>
+<td><code>db_host</code></td>
+<td><code>"localhost"</code></td>
+<td>Hôte MariaDB</td>
+</tr>
+<tr>
+<td><code>db_port</code></td>
+<td><code>3306</code></td>
+<td>Port MariaDB</td>
+</tr>
+<tr>
+<td><code>db_name</code></td>
+<td><code>"forge_db"</code></td>
+<td>Nom de la base</td>
+</tr>
+<tr>
+<td><code>db_user</code></td>
+<td><code>"root"</code></td>
+<td>Utilisateur</td>
+</tr>
+<tr>
+<td><code>db_password</code></td>
+<td><code>""</code></td>
+<td>Mot de passe</td>
+</tr>
+<tr>
+<td><code>db_pool_size</code></td>
+<td><code>5</code></td>
+<td>Taille du pool</td>
+</tr>
+<tr>
+<td><code>css_visible</code></td>
+<td><code>"block"</code></td>
+<td>Classe CSS visible (pagination)</td>
+</tr>
+<tr>
+<td><code>css_hidden</code></td>
+<td><code>"hidden"</code></td>
+<td>Classe CSS masquée (pagination)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fichiers-denvironnement">Fichiers d'environnement<a class="headerlink" href="#fichiers-denvironnement" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>env/
+├── example     # Commité : variables requises avec valeurs par défaut
+├── dev         # Ignoré par git
+└── prod        # Ignoré par git
+</code></pre></div>
+<p><code>config.py</code> charge d'abord <code>env/example</code>, puis <code>env/{APP_ENV}</code> en surcharge.</p>
+<hr />
+<p><a id="cycle-vie-requete"></a></p>
+<h2 id="5-cycle-de-vie-dune-requete">5. Cycle de vie d'une requête<a class="headerlink" href="#5-cycle-de-vie-dune-requete" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>Navigateur HTTPS
+    ↓
+ThreadingHTTPServer + ssl.SSLContext
+    ↓
+RequestHandler (GET / POST / PUT / PATCH / DELETE)
+    ↓
+Request(method, path, headers, params, body, json_body, ip)
+    ↓
+Application.dispatch(request)
+    ├─ route absente → 404
+    ├─ route protégée → middlewares
+    ├─ méthode unsafe → CSRF automatique sauf csrf=False
+    └─ handler
+       ↓  exception non gérée → 500 automatique
+Contrôleur → Modèle → MariaDB
+    ↓
+html(template, context) ou BaseController.json(data)
+    ↓
+Response(status, body, headers)
+    ↓
+Navigateur
+</code></pre></div>
+<h3 id="objet-request">Objet <code>Request</code><a class="headerlink" href="#objet-request" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Attribut</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>method</code></td>
+<td>str</td>
+<td><code>"GET"</code>, <code>"POST"</code>…</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>str</td>
+<td><code>"/clients/42"</code></td>
+</tr>
+<tr>
+<td><code>params</code></td>
+<td>dict</td>
+<td>Query string</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td>dict</td>
+<td>Formulaire POST</td>
+</tr>
+<tr>
+<td><code>json_body</code></td>
+<td>dict</td>
+<td>Corps JSON</td>
+</tr>
+<tr>
+<td><code>ip</code></td>
+<td>str</td>
+<td>IP du client</td>
+</tr>
+<tr>
+<td><code>route_params</code></td>
+<td>dict</td>
+<td>Paramètres dynamiques injectés par le routeur</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>BaseController.body(request)</code> aplatit <code>request.body</code> en scalaires.</p>
+</blockquote>
+<hr />
+<p><a id="routeur"></a></p>
+<h2 id="6-routeur">6. Routeur<a class="headerlink" href="#6-routeur" title="Permanent link">&para;</a></h2>
+<h3 id="declarer-des-routes">Déclarer des routes<a class="headerlink" href="#declarer-des-routes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.http.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mvc.controllers.home_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">HomeController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mvc.controllers.auth_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mvc.controllers.client_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mvc.controllers.webhook_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebhookController</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">Router</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">router</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">pub</span><span class="p">:</span>
+    <span class="n">pub</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/&quot;</span><span class="p">,</span>       <span class="n">HomeController</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>      <span class="n">name</span><span class="o">=</span><span class="s2">&quot;home&quot;</span><span class="p">)</span>
+    <span class="n">pub</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/login&quot;</span><span class="p">,</span>  <span class="n">AuthController</span><span class="o">.</span><span class="n">login_form</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;login_form&quot;</span><span class="p">)</span>
+    <span class="n">pub</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/login&quot;</span><span class="p">,</span>  <span class="n">AuthController</span><span class="o">.</span><span class="n">login</span><span class="p">,</span>      <span class="n">name</span><span class="o">=</span><span class="s2">&quot;login&quot;</span><span class="p">)</span>
+    <span class="n">pub</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/logout&quot;</span><span class="p">,</span> <span class="n">AuthController</span><span class="o">.</span><span class="n">logout</span><span class="p">,</span>     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;logout&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">router</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">protected</span><span class="p">:</span>
+    <span class="n">protected</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/clients&quot;</span><span class="p">,</span>               <span class="n">ClientController</span><span class="o">.</span><span class="n">list</span><span class="p">,</span>      <span class="n">name</span><span class="o">=</span><span class="s2">&quot;client_list&quot;</span><span class="p">)</span>
+    <span class="n">protected</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/clients/nouveau&quot;</span><span class="p">,</span>       <span class="n">ClientController</span><span class="o">.</span><span class="n">add_form</span><span class="p">,</span>  <span class="n">name</span><span class="o">=</span><span class="s2">&quot;client_add_form&quot;</span><span class="p">)</span>
+    <span class="n">protected</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/clients/nouveau&quot;</span><span class="p">,</span>       <span class="n">ClientController</span><span class="o">.</span><span class="n">add</span><span class="p">,</span>       <span class="n">name</span><span class="o">=</span><span class="s2">&quot;client_add&quot;</span><span class="p">)</span>
+    <span class="n">protected</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/clients/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">,</span>          <span class="n">ClientController</span><span class="o">.</span><span class="n">show</span><span class="p">,</span>      <span class="n">name</span><span class="o">=</span><span class="s2">&quot;client_show&quot;</span><span class="p">)</span>
+    <span class="n">protected</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/clients/</span><span class="si">{id}</span><span class="s2">/modifier&quot;</span><span class="p">,</span> <span class="n">ClientController</span><span class="o">.</span><span class="n">edit_form</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;client_edit_form&quot;</span><span class="p">)</span>
+    <span class="n">protected</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/clients/</span><span class="si">{id}</span><span class="s2">/modifier&quot;</span><span class="p">,</span> <span class="n">ClientController</span><span class="o">.</span><span class="n">edit</span><span class="p">,</span>      <span class="n">name</span><span class="o">=</span><span class="s2">&quot;client_edit&quot;</span><span class="p">)</span>
+    <span class="n">protected</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/clients/supprimer&quot;</span><span class="p">,</span>     <span class="n">ClientController</span><span class="o">.</span><span class="n">delete</span><span class="p">,</span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;client_delete&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">router</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;/api&quot;</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">csrf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">api</span><span class="p">:</span>
+    <span class="n">api</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/webhook&quot;</span><span class="p">,</span> <span class="n">WebhookController</span><span class="o">.</span><span class="n">receive</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;webhook&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><code>POST</code>, <code>PUT</code>, <code>PATCH</code> et <code>DELETE</code> exigent un token CSRF par défaut, même sur une route publique comme <code>/login</code>.
+Les webhooks et APIs doivent déclarer l'exemption avec <code>csrf=False</code>.</p>
+<h3 id="patterns-supportes">Patterns supportés<a class="headerlink" href="#patterns-supportes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Exemple</th>
+<th>Paramètres extraits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/clients</code></td>
+<td><code>/clients</code></td>
+<td><code>{}</code></td>
+</tr>
+<tr>
+<td><code>/clients/{id}</code></td>
+<td><code>/clients/42</code></td>
+<td><code>{"id": "42"}</code></td>
+</tr>
+<tr>
+<td><code>/clients/{id}/modifier</code></td>
+<td><code>/clients/42/modifier</code></td>
+<td><code>{"id": "42"}</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><a id="controleurs"></a></p>
+<h2 id="7-controleurs">7. Contrôleurs<a class="headerlink" href="#7-controleurs" title="Permanent link">&para;</a></h2>
+<p>Tout contrôleur hérite de <code>BaseController</code>. Les handlers sont généralement des <code>@staticmethod</code>.</p>
+<h3 id="methodes-disponibles">Méthodes disponibles<a class="headerlink" href="#methodes-disponibles" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.mvc.controller.base_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseController</span>
+
+<span class="c1"># Rendu HTML via Jinja2</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;clients/index.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;clients&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;errors/404.html&quot;</span><span class="p">,</span> <span class="mi">404</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;landing/index.html&quot;</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+
+<span class="c1"># Redirection</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/clients&quot;</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">redirect_with_flash</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;/clients&quot;</span><span class="p">,</span> <span class="s2">&quot;Ajouté avec succès.&quot;</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">redirect_to_route</span><span class="p">(</span><span class="s2">&quot;clients_show&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">client_id</span><span class="p">)</span>
+
+<span class="c1"># Erreurs HTTP</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">bad_request</span><span class="p">()</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">forbidden</span><span class="p">()</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">not_found</span><span class="p">()</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">validation_error</span><span class="p">(</span><span class="s2">&quot;clients/create.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">},</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">server_error</span><span class="p">()</span>
+
+<span class="c1"># JSON</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">json</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;nom&quot;</span><span class="p">:</span> <span class="s2">&quot;Dupont&quot;</span><span class="p">})</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">json</span><span class="p">({</span><span class="s2">&quot;erreur&quot;</span><span class="p">:</span> <span class="s2">&quot;non trouvé&quot;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
+
+<span class="c1"># Body POST (dict plat)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+<span class="c1"># Body JSON</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">json_body</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+<span class="c1"># Token CSRF</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">csrf_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+<span class="c1"># Utilisateur connecté</span>
+<span class="n">user</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">current_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+<span class="c1"># Message flash</span>
+<span class="n">BaseController</span><span class="o">.</span><span class="n">set_flash</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Ajouté avec succès.&quot;</span><span class="p">)</span>
+<span class="n">BaseController</span><span class="o">.</span><span class="n">set_flash</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Erreur.&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+
+<span class="c1"># Rendu d&#39;un partial Jinja2 (retourne str)</span>
+<span class="n">html_fragment</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">include</span><span class="p">(</span><span class="s2">&quot;partials/alerte.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Stock faible&quot;</span><span class="p">})</span>
+
+<span class="c1"># Formulaire (render + form_context)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render_form</span><span class="p">(</span><span class="s2">&quot;clients/create.html&quot;</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render_form</span><span class="p">(</span><span class="s2">&quot;clients/create.html&quot;</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="n">errors_html</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="exemple-complet-controleur-crud">Exemple complet : contrôleur CRUD<a class="headerlink" href="#exemple-complet-controleur-crud" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.mvc.controller.base_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.mvc.model.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">DoublonError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.mvc.view.pagination</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pagination</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mvc.helpers.flash</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_flash_html</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mvc.forms.client_form</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mvc.models.client_model</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">count_clients</span><span class="p">,</span> <span class="n">get_clients_page</span><span class="p">,</span> <span class="n">get_client_by_id</span><span class="p">,</span>
+    <span class="n">add_client</span><span class="p">,</span> <span class="n">update_client</span><span class="p">,</span> <span class="n">delete_client</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClientController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+
+    <span class="n">REDIRECT</span> <span class="o">=</span> <span class="s2">&quot;/clients&quot;</span>
+    <span class="n">PAR_PAGE</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="n">pagination</span> <span class="o">=</span> <span class="n">Pagination</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">count_clients</span><span class="p">(),</span> <span class="n">ClientController</span><span class="o">.</span><span class="n">PAR_PAGE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+            <span class="s2">&quot;clients/index.html&quot;</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;clients&quot;</span><span class="p">:</span> <span class="n">get_clients_page</span><span class="p">(</span><span class="n">pagination</span><span class="o">.</span><span class="n">limit</span><span class="p">,</span> <span class="n">pagination</span><span class="o">.</span><span class="n">offset</span><span class="p">),</span>
+                <span class="s2">&quot;flash&quot;</span><span class="p">:</span> <span class="n">render_flash_html</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">pagination</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="n">client_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">route_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">get_client_by_id</span><span class="p">(</span><span class="n">client_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">client_id</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">client</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">not_found</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;clients/show.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;client&quot;</span><span class="p">:</span> <span class="n">client</span><span class="p">},</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_form</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;clients/create.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">ClientForm</span><span class="p">()},</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ClientForm</span><span class="o">.</span><span class="n">from_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+                <span class="s2">&quot;clients/create.html&quot;</span><span class="p">,</span>
+                <span class="mi">400</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="o">**</span><span class="n">form</span><span class="o">.</span><span class="n">context</span><span class="p">},</span>
+                <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">add_client</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DoublonError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="s2">&quot;nom&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Ce client « </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> » existe déjà.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+                <span class="s2">&quot;clients/create.html&quot;</span><span class="p">,</span>
+                <span class="mi">400</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="o">**</span><span class="n">form</span><span class="o">.</span><span class="n">context</span><span class="p">},</span>
+                <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">redirect_with_flash</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="n">ClientController</span><span class="o">.</span><span class="n">REDIRECT</span><span class="p">,</span>
+            <span class="s2">&quot;Client ajouté avec succès.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre></div>
+<hr />
+<p><a id="templates-jinja2"></a></p>
+<h2 id="8-templates-jinja2">8. Templates Jinja2<a class="headerlink" href="#8-templates-jinja2" title="Permanent link">&para;</a></h2>
+<h3 id="moteur-de-rendu">Moteur de rendu<a class="headerlink" href="#moteur-de-rendu" title="Permanent link">&para;</a></h3>
+<p>Forge utilise <strong>Jinja2</strong> avec autoescape HTML activé sur les fichiers <code>.html</code>.</p>
+<ul>
+<li><code>{{ variable }}</code> échappe automatiquement le HTML ;</li>
+<li><code>{% if %}</code>, <code>{% for %}</code>, <code>{% include %}</code> et <code>{% extends %}</code> sont disponibles ;</li>
+<li><code>{{ url_for("route_name", id=1) }}</code> génère une URL depuis une route nommée ;</li>
+<li>pour injecter volontairement du HTML déjà construit, utiliser <code>|safe</code>.</li>
+</ul>
+<h3 id="arborescence-recommandee">Arborescence recommandée<a class="headerlink" href="#arborescence-recommandee" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>mvc/views/
+├── layouts/
+│   └── base.html
+├── landing/
+│   └── index.html
+├── clients/
+│   ├── index.html
+│   ├── create.html
+│   ├── edit.html
+│   ├── show.html
+│   └── partials/
+│       └── fields.html
+├── partials/
+│   └── flash.html
+└── errors/
+    ├── 403.html
+    ├── 404.html
+    ├── 429.html
+    └── 500.html
+</code></pre></div>
+<h3 id="layout-recommande">Layout recommandé<a class="headerlink" href="#layout-recommande" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;fr&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ app_name }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/static/tailwind.css&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">nav</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/&quot;</span><span class="p">&gt;</span>{{ app_name }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/logout&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:inline&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrf_token&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ csrf_token }}&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Déconnexion<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>
+        {% block contenu %}{% endblock %}
+    <span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<blockquote>
+<p>C'est le modèle recommandé pour un layout Jinja2. Les templates qui l'utilisent déclarent <code>{% extends "layouts/base.html" %}</code>.</p>
+</blockquote>
+<h3 id="template-heritant-du-layout">Template héritant du layout<a class="headerlink" href="#template-heritant-du-layout" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>{% extends &quot;layouts/base.html&quot; %}
+{% block contenu %}
+
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Clients<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+{{ flash | safe }}
+
+<span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">thead</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Nom<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Prénom<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Actions<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">thead</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">tbody</span><span class="p">&gt;</span>
+    {% for client in clients %}
+    <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>{{ client.nom }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>{{ client.prenom }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/clients/{{ client.ClientId }}/modifier&quot;</span><span class="p">&gt;</span>Modifier<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/clients/supprimer&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:inline&quot;</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrf_token&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ csrf_token }}&quot;</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;ClientId&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ client.ClientId }}&quot;</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Supprimer<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+    {% endfor %}
+  <span class="p">&lt;/</span><span class="nt">tbody</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">nav</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;?page={{ prev_page }}&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;{{ has_prev }}&quot;</span><span class="p">&gt;</span>Précédent<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>Page {{ page }} / {{ nb_pages }}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;?page={{ next_page }}&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;{{ has_next }}&quot;</span><span class="p">&gt;</span>Suivant<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+
+{% endblock %}
+</code></pre></div>
+<h3 id="formulaire">Formulaire<a class="headerlink" href="#formulaire" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>{% extends &quot;layouts/base.html&quot; %}
+{% block contenu %}
+
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Nouveau client<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+{{ erreurs | safe }}
+
+<span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/clients/nouveau&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrf_token&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ csrf_token }}&quot;</span><span class="p">&gt;</span>
+  {% include &quot;clients/partials/fields.html&quot; %}
+  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Créer<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+
+{% endblock %}
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- clients/partials/fields.html --&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>Nom<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;nom&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ nom }}&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>Prénom<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;prenom&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ prenom }}&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+<h3 id="template-autonome">Template autonome<a class="headerlink" href="#template-autonome" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;fr&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Connexion<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    {% if erreur %}
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;text-red-600&quot;</span><span class="p">&gt;</span>{{ erreur }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    {% endif %}
+    <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/login&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrf_token&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ csrf_token }}&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;login&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;password&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;password&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Se connecter<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<h3 id="rendu-brut-avec-rawtrue">Rendu brut avec <code>raw=True</code><a class="headerlink" href="#rendu-brut-avec-rawtrue" title="Permanent link">&para;</a></h3>
+<p><code>raw=True</code> sert uniquement à retourner un fichier HTML brut sans traitement Jinja2.</p>
+<p>À utiliser pour un fichier autonome contenant du JavaScript, du JSX ou des accolades incompatibles avec Jinja2. La landing officielle Forge n'utilise plus ce mode.</p>
+<div class="highlight"><pre><span></span><code><span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;raw/demo.html&quot;</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<p><a id="modeles-base-donnees"></a></p>
+<h2 id="9-modeles-et-base-de-donnees">9. Modèles et base de données<a class="headerlink" href="#9-modeles-et-base-de-donnees" title="Permanent link">&para;</a></h2>
+<h3 id="helper-sql-leger">Helper SQL léger<a class="headerlink" href="#helper-sql-leger" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">db</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.database.sql_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">charger_queries</span>
+
+<span class="n">q</span> <span class="o">=</span> <span class="n">charger_queries</span><span class="p">(</span><span class="s2">&quot;client_queries.py&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClientModel</span><span class="p">:</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">tx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">GET_CLIENTS_PAGE</span><span class="p">,</span> <span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="n">offset</span><span class="p">),</span> <span class="n">tx</span><span class="o">=</span><span class="n">tx</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">tx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">CREATE_CLIENT</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;nom&quot;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]),</span> <span class="n">tx</span><span class="o">=</span><span class="n">tx</span><span class="p">)</span>
+</code></pre></div>
+<p>Le helper DB exécute du SQL fourni explicitement. Il ne construit pas le SQL et ne connaît pas les entités.</p>
+<h3 id="chargeur-sql">Chargeur SQL<a class="headerlink" href="#chargeur-sql" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># mvc/models/sql/dev/client_queries.py</span>
+<span class="n">COUNT_CLIENTS</span> <span class="o">=</span> <span class="s2">&quot;SELECT COUNT(*) AS total FROM client&quot;</span>
+
+<span class="n">GET_CLIENTS_PAGE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    SELECT ClientId, nom, prenom, email</span>
+<span class="s2">    FROM client ORDER BY nom</span>
+<span class="s2">    LIMIT ? OFFSET ?</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">CREATE_CLIENT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    INSERT INTO client (Nom, Email)</span>
+<span class="s2">    VALUES (?, ?)</span>
+<span class="s2">&quot;&quot;&quot;</span>
+</code></pre></div>
+<h3 id="transactions-explicites">Transactions explicites<a class="headerlink" href="#transactions-explicites" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.database.transaction</span><span class="w"> </span><span class="kn">import</span> <span class="n">transaction</span>
+
+<span class="k">with</span> <span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
+    <span class="n">client_id</span> <span class="o">=</span> <span class="n">ClientModel</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">,</span> <span class="n">tx</span><span class="o">=</span><span class="n">tx</span><span class="p">)</span>
+    <span class="n">ClientGroupeModel</span><span class="o">.</span><span class="n">replace_for_client</span><span class="p">(</span>
+        <span class="n">client_id</span><span class="p">,</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;groupe_ids&quot;</span><span class="p">],</span>
+        <span class="n">tx</span><span class="o">=</span><span class="n">tx</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<hr />
+<p><a id="validation"></a></p>
+<h2 id="10-validation">10. Validation<a class="headerlink" href="#10-validation" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChoiceField</span><span class="p">,</span> <span class="n">Form</span><span class="p">,</span> <span class="n">RelatedIdsField</span><span class="p">,</span> <span class="n">StringField</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClientForm</span><span class="p">(</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">nom</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Nom&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">StringField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Email&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+    <span class="n">ville_id</span> <span class="o">=</span> <span class="n">ChoiceField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Ville&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choices_key</span><span class="o">=</span><span class="s2">&quot;allowed_ville_ids&quot;</span><span class="p">)</span>
+    <span class="n">groupe_ids</span> <span class="o">=</span> <span class="n">RelatedIdsField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Groupes&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">allowed_ids_key</span><span class="o">=</span><span class="s2">&quot;allowed_group_ids&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">form</span> <span class="o">=</span> <span class="n">ClientForm</span><span class="o">.</span><span class="n">from_request</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">,</span>
+    <span class="n">allowed_ville_ids</span><span class="o">=</span><span class="n">VilleModel</span><span class="o">.</span><span class="n">allowed_ids</span><span class="p">(),</span>
+    <span class="n">allowed_group_ids</span><span class="o">=</span><span class="n">GroupeModel</span><span class="o">.</span><span class="n">allowed_ids</span><span class="p">(),</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">validation_error</span><span class="p">(</span>
+        <span class="s2">&quot;clients/create.html&quot;</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="o">**</span><span class="n">form</span><span class="o">.</span><span class="n">context</span><span class="p">},</span>
+        <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Dans les templates :</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;nom&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ form.value(&#39;nom&#39;) }}&quot;</span><span class="p">&gt;</span>
+{% if form.has_error(&#39;nom&#39;) %}
+  <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;text-red-600&quot;</span><span class="p">&gt;</span>{{ form.error(&#39;nom&#39;) }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+{% endif %}
+</code></pre></div>
+<p><code>RelatedIdsField</code> prépare une liste d'identifiants liés pour un pivot explicite. Il ne charge pas la base et ne persiste rien.</p>
+<p><code>core.mvc.model.validator.Validator</code> reste disponible pour l'ancien style de validation, mais Forge V1.0 recommande <code>core.forms.Form</code> pour les formulaires applicatifs.</p>
+<hr />
+<p><a id="securite"></a></p>
+<h2 id="11-securite">11. Sécurité<a class="headerlink" href="#11-securite" title="Permanent link">&para;</a></h2>
+<h3 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.security.session</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">creer_session</span><span class="p">,</span> <span class="n">get_session</span><span class="p">,</span> <span class="n">get_session_id</span><span class="p">,</span>
+    <span class="n">supprimer_session</span><span class="p">,</span> <span class="n">authentifier_session</span><span class="p">,</span>
+    <span class="n">est_authentifie</span><span class="p">,</span> <span class="n">get_utilisateur</span><span class="p">,</span> <span class="n">utilisateur_a_role</span><span class="p">,</span>
+    <span class="n">set_flash</span><span class="p">,</span> <span class="n">get_flash</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="csrf">CSRF<a class="headerlink" href="#csrf" title="Permanent link">&para;</a></h3>
+<p>Le token CSRF est injecté dans le contexte quand <code>request=request</code> est passé à <code>BaseController.render()</code>.
+Forge vérifie automatiquement ce token sur <code>POST</code>, <code>PUT</code>, <code>PATCH</code> et <code>DELETE</code>, sauf si la route déclare <code>csrf=False</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrf_token&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ csrf_token }}&quot;</span><span class="p">&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="n">pub</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">AuthController</span><span class="o">.</span><span class="n">login</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;login&quot;</span><span class="p">)</span>
+<span class="n">api</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/api/webhook&quot;</span><span class="p">,</span> <span class="n">WebhookController</span><span class="o">.</span><span class="n">receive</span><span class="p">,</span> <span class="n">csrf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p>Method override pour les formulaires HTML :</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/clients/12&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;_method&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;DELETE&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrf_token&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ csrf_token }}&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">button</span><span class="p">&gt;</span>Supprimer<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>Forge traite ce formulaire comme <code>DELETE /clients/12</code>, après lecture du body et avant le routage.</p>
+<h3 id="decorateurs">Décorateurs<a class="headerlink" href="#decorateurs" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.security.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">require_auth</span><span class="p">,</span> <span class="n">require_role</span>
+
+<span class="nd">@staticmethod</span>
+<span class="nd">@require_auth</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span> <span class="o">...</span>
+
+<span class="nd">@staticmethod</span>
+<span class="nd">@require_auth</span>
+<span class="nd">@require_role</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">):</span> <span class="o">...</span>
+</code></pre></div>
+<p><code>@require_csrf</code> existe encore pour du code hérité, mais le chemin officiel Forge V1.0 est la protection automatique portée par les routes.</p>
+<h3 id="hachage-des-mots-de-passe">Hachage des mots de passe<a class="headerlink" href="#hachage-des-mots-de-passe" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.security.hashing</span><span class="w"> </span><span class="kn">import</span> <span class="n">hacher_mot_de_passe</span><span class="p">,</span> <span class="n">verifier_mot_de_passe</span>
+
+<span class="nb">hash</span> <span class="o">=</span> <span class="n">hacher_mot_de_passe</span><span class="p">(</span><span class="s2">&quot;mon_mot_de_passe&quot;</span><span class="p">)</span>
+<span class="n">ok</span> <span class="o">=</span> <span class="n">verifier_mot_de_passe</span><span class="p">(</span><span class="s2">&quot;mot_de_passe_saisi&quot;</span><span class="p">,</span> <span class="nb">hash</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="messages-flash">Messages flash<a class="headerlink" href="#messages-flash" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">mvc.helpers.flash</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_flash_html</span>
+
+<span class="n">BaseController</span><span class="o">.</span><span class="n">set_flash</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Client créé avec succès.&quot;</span><span class="p">)</span>
+<span class="n">flash_html</span> <span class="o">=</span> <span class="n">render_flash_html</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;clients/index.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;flash&quot;</span><span class="p">:</span> <span class="n">flash_html</span><span class="p">},</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>{{ flash | safe }}
+</code></pre></div>
+<hr />
+<p><a id="tests"></a></p>
+<h2 id="12-tests">12. Tests<a class="headerlink" href="#12-tests" title="Permanent link">&para;</a></h2>
+<h3 id="lancer-les-tests">Lancer les tests<a class="headerlink" href="#lancer-les-tests" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements-dev.txt
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/<span class="w"> </span>-v
+</code></pre></div>
+<h3 id="fakerequest"><code>FakeRequest</code><a class="headerlink" href="#fakerequest" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tests.fake_request</span><span class="w"> </span><span class="kn">import</span> <span class="n">FakeRequest</span>
+
+<span class="n">req</span> <span class="o">=</span> <span class="n">FakeRequest</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/clients&quot;</span><span class="p">)</span>
+<span class="n">req</span> <span class="o">=</span> <span class="n">FakeRequest</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/clients&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">})</span>
+<span class="n">req</span> <span class="o">=</span> <span class="n">FakeRequest</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/clients&quot;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;nom&quot;</span><span class="p">:</span> <span class="s2">&quot;Dupont&quot;</span><span class="p">,</span> <span class="s2">&quot;prenom&quot;</span><span class="p">:</span> <span class="s2">&quot;Jean&quot;</span><span class="p">})</span>
+<span class="n">req</span> <span class="o">=</span> <span class="n">FakeRequest</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/api/sync&quot;</span><span class="p">,</span> <span class="n">json_body</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]})</span>
+<span class="n">req</span> <span class="o">=</span> <span class="n">FakeRequest</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/tableau-de-bord&quot;</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="s2">&quot;abc123&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="exemple-de-test-de-controleur">Exemple de test de contrôleur<a class="headerlink" href="#exemple-de-test-de-controleur" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">patch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span> <span class="k">as</span> <span class="n">_s</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.templating.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">template_manager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">integrations.jinja2.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jinja2Renderer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mvc.controllers.client_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tests.fake_request</span><span class="w"> </span><span class="kn">import</span> <span class="n">FakeRequest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">core.forge</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_forge</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">autouse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_views</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">):</span>
+    <span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;clients&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;errors&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;partials&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+    <span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;clients&quot;</span> <span class="o">/</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+        <span class="s2">&quot;{</span><span class="si">% f</span><span class="s2">or c in clients %}{{ c.nom }}{</span><span class="si">% e</span><span class="s2">ndfor %}&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span>
+    <span class="p">)</span>
+    <span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;errors&quot;</span> <span class="o">/</span> <span class="s2">&quot;403.html&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;403&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;errors&quot;</span> <span class="o">/</span> <span class="s2">&quot;404.html&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;404&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;partials&quot;</span> <span class="o">/</span> <span class="s2">&quot;flash.html&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">&quot;{{ message }}&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">_forge</span><span class="o">.</span><span class="n">_cfg</span><span class="p">[</span><span class="s2">&quot;views_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
+    <span class="n">template_manager</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Jinja2Renderer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)))</span>
+
+
+<span class="nd">@patch</span><span class="p">(</span><span class="s2">&quot;mvc.controllers.client_controller.get_clients_page&quot;</span><span class="p">,</span> <span class="n">return_value</span><span class="o">=</span><span class="p">[])</span>
+<span class="nd">@patch</span><span class="p">(</span><span class="s2">&quot;mvc.controllers.client_controller.count_clients&quot;</span><span class="p">,</span> <span class="n">return_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_list_retourne_200</span><span class="p">(</span><span class="n">_cc</span><span class="p">,</span> <span class="n">_gcp</span><span class="p">):</span>
+    <span class="n">sid</span> <span class="o">=</span> <span class="n">_s</span><span class="o">.</span><span class="n">creer_session</span><span class="p">()</span>
+    <span class="n">new_sid</span> <span class="o">=</span> <span class="n">_s</span><span class="o">.</span><span class="n">authentifier_session</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s2">&quot;UtilisateurId&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Login&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="s2">&quot;Actif&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="p">[]</span>
+    <span class="p">})</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">FakeRequest</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/clients&quot;</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">new_sid</span><span class="p">)</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">ClientController</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span>
+</code></pre></div>
+<hr />
+<p><a id="architecture-des-entites"></a></p>
+<h2 id="13-architecture-des-entites">13. Architecture des entités<a class="headerlink" href="#13-architecture-des-entites" title="Permanent link">&para;</a></h2>
+<p>Le modèle d'entités officiel repose sur <code>mvc/entities/</code> et sépare strictement :</p>
+<ul>
+<li>la source canonique JSON,</li>
+<li>les projections SQL générées,</li>
+<li>la base Python générée,</li>
+<li>la classe métier manuelle.</li>
+</ul>
+<p>Exemple :</p>
+<div class="highlight"><pre><span></span><code>mvc/
+└── entities/
+    ├── relations.json
+    ├── relations.sql
+    └── contact/
+        ├── __init__.py
+        ├── contact.json
+        ├── contact.sql
+        ├── contact_base.py
+        └── contact.py
+</code></pre></div>
+<p>Rôle des fichiers :</p>
+<ul>
+<li><code>contact.json</code> : définition canonique locale de l'entité</li>
+<li><code>contact.sql</code> : projection SQL locale régénérable</li>
+<li><code>contact_base.py</code> : base Python générée régénérable</li>
+<li><code>contact.py</code> : classe métier manuelle finale, jamais écrasée si elle existe</li>
+<li><code>relations.json</code> : définition canonique globale des relations</li>
+<li><code>relations.sql</code> : projection SQL globale des relations</li>
+</ul>
+<p>Règles importantes :</p>
+<ul>
+<li><code>contact.py</code> n'est jamais régénéré s'il existe</li>
+<li><code>__init__.py</code> n'est jamais régénéré s'il existe</li>
+<li>les clés étrangères inter-entités vivent uniquement dans <code>relations.sql</code></li>
+<li>les SQL locaux d'entité ne contiennent pas de FK inter-entité</li>
+</ul>
+<p>Le format auteur peut rester concis.
+Tout attribut absent prend sa valeur par défaut. Le JSON auteur ne contient que les écarts au comportement standard.</p>
+<p>Par exemple, ce JSON est valide :</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;entity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Contact&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;fields&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INT&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;primary_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;auto_increment&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nom&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;VARCHAR(100)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;constraints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;not_empty&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;max_length&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><a id="cli-officielle-du-modele"></a></p>
+<h2 id="14-cli-officielle-du-modele">14. CLI officielle du modèle<a class="headerlink" href="#14-cli-officielle-du-modele" title="Permanent link">&para;</a></h2>
+<p>Commandes actuellement disponibles :</p>
+<p>Après l'installation editable décrite dans la section installation, les commandes officielles sont :</p>
+<div class="highlight"><pre><span></span><code>forge<span class="w"> </span>doctor
+forge<span class="w"> </span>make:entity<span class="w"> </span>Contact
+forge<span class="w"> </span>make:relation
+forge<span class="w"> </span>sync:entity<span class="w"> </span>Contact
+forge<span class="w"> </span>sync:relations
+forge<span class="w"> </span>build:model
+forge<span class="w"> </span>check:model
+forge<span class="w"> </span>db:init
+forge<span class="w"> </span>db:apply
+forge<span class="w"> </span>routes:list
+</code></pre></div>
+<p>Cycle recommandé :</p>
+<div class="highlight"><pre><span></span><code>forge<span class="w"> </span>doctor
+forge<span class="w"> </span>db:init
+forge<span class="w"> </span>make:entity<span class="w"> </span>Contact
+<span class="c1"># éditer mvc/entities/contact/contact.json</span>
+forge<span class="w"> </span>sync:entity<span class="w"> </span>Contact
+forge<span class="w"> </span>make:relation
+forge<span class="w"> </span>sync:relations
+forge<span class="w"> </span>build:model<span class="w"> </span>--dry-run<span class="w">   </span><span class="c1"># vérifier ce qui sera écrit / préservé</span>
+forge<span class="w"> </span>build:model
+forge<span class="w"> </span>db:apply
+forge<span class="w"> </span>routes:list
+</code></pre></div>
+<p>Comportement des commandes disponibles :</p>
+<ul>
+<li><code>forge doctor</code> : diagnostique l'environnement — Python, configuration, structure MVC, entités, SSL, Node.js et connexion base ; produit un rapport <code>[OK] / [WARN] / [FAIL] / [SKIP]</code> ; code de sortie 1 si au moins un FAIL</li>
+<li><code>forge make:entity Contact</code> : lance l'assistant interactif de création d'entité, écrit un JSON auteur court puis génère les fichiers dérivés</li>
+<li><code>forge make:entity Contact --no-input</code> : écrit directement un squelette court minimal pour un usage scriptable</li>
+<li><code>forge make:relation</code> : lance l'assistant interactif de création de relation, écrit <code>mvc/entities/relations.json</code>, puis laisse <code>forge sync:relations</code> régénérer <code>mvc/entities/relations.sql</code></li>
+<li><code>forge sync:entity Contact</code> : relit <code>mvc/entities/contact/contact.json</code> et régénère uniquement <code>contact.sql</code> et <code>contact_base.py</code></li>
+<li><code>forge sync:relations</code> : relit <code>mvc/entities/relations.json</code> et régénère <code>mvc/entities/relations.sql</code> pour les relations <code>many_to_one</code> supportées en V1</li>
+<li><code>forge build:model</code> : valide le modèle puis régénère les <code>*.sql</code>, les <code>*_base.py</code>, les fichiers manuels absents et <code>relations.sql</code> ; affiche <code>[ÉCRIT]</code>, <code>[CRÉÉ]</code>, <code>[PRÉSERVÉ]</code> pour chaque fichier et une synthèse finale ; <code>--dry-run</code> calcule sans écrire</li>
+<li><code>forge check:model</code> : valide tout le modèle sans écrire de fichier</li>
+<li><code>forge db:init</code> : prépare l'environnement MariaDB du projet avec <code>DB_ADMIN_*</code>, crée la base si absente, crée l'utilisateur applicatif s'il est absent, réapplique les privilèges limités à <code>DB_NAME.*</code> (<code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>INDEX</code>, <code>REFERENCES</code>) et demande une vérification manuelle si un utilisateur existant est ambigu ou non vérifiable</li>
+<li><code>forge db:apply</code> : applique les SQL déjà générés dans l'ordre entités puis relations dans une base déjà préparée, via <code>DB_APP_*</code></li>
+<li><code>forge routes:list</code> : affiche les routes déclarées, leur statut public, leur protection CSRF, leur marqueur API et leur handler</li>
+<li><code>forge upload:init</code> : crée <code>storage/uploads/</code>, les sous-dossiers <code>images</code>, <code>documents</code>, <code>tmp</code> et leurs <code>.gitkeep</code></li>
+</ul>
+<p>Doctrine relationnelle V1 :</p>
+<ul>
+<li><code>many_to_one</code> est le seul type de relation supporté directement</li>
+<li>Forge ne fournit pas de <code>many_to_many</code> direct ou implicite</li>
+<li>un <code>many_to_many</code> se modélise via une entité pivot explicite avec sa propre clé locale <code>id</code></li>
+<li>cette entité pivot porte des FK explicites comme <code>contact_id</code>, <code>groupe_id</code></li>
+<li>le lien est alors décrit par deux relations <code>many_to_one</code></li>
+</ul>
+<p><a id="cli-cmd-make"></a></p>
+<h2 id="15-cli-historique-cmdmakepy">15. CLI historique — cmd/make.py<a class="headerlink" href="#15-cli-historique-cmdmakepy" title="Permanent link">&para;</a></h2>
+<p>Cette CLI existe encore pour compatibilité interne et pour certains anciens scripts.</p>
+<p>Elle n'est plus le flux officiel de génération du modèle d'entités. Pour tout nouveau projet, utilisez la commande :</p>
+<div class="highlight"><pre><span></span><code>forge
+</code></pre></div>
+<p>Les anciennes commandes sont conservées, mais ne sont plus documentées comme parcours principal.</p>
+<hr />
+<p><a id="cli-forge"></a></p>
+<h2 id="16-cli-forge">16. CLI — forge<a class="headerlink" href="#16-cli-forge" title="Permanent link">&para;</a></h2>
+<p>La CLI <code>forge</code> est l'interface officielle du modèle d'entités.</p>
+<p>À ce stade, la méthode conseillée reste l'installation manuelle décrite en section 2.</p>
+<p>Puis :</p>
+<div class="highlight"><pre><span></span><code>forge<span class="w"> </span>db:init
+forge<span class="w"> </span>make:entity<span class="w"> </span>Contact
+forge<span class="w"> </span>sync:entity<span class="w"> </span>Contact
+forge<span class="w"> </span>check:model
+forge<span class="w"> </span>db:apply
+forge<span class="w"> </span>routes:list
+python<span class="w"> </span>app.py
+</code></pre></div>
+<p>L'ancien <code>cmd/make.py</code> reste disponible pour compatibilité, mais il ne doit pas être confondu avec le flux officiel du modèle d'entités.</p>
+<hr />
+<p><a id="upload-minimal"></a></p>
+<h2 id="17-upload-minimal">17. Upload minimal<a class="headerlink" href="#17-upload-minimal" title="Permanent link">&para;</a></h2>
+<p>Forge fournit un service local simple pour recevoir un fichier depuis un contrôleur.</p>
+<p>Initialisez les dossiers :</p>
+<div class="highlight"><pre><span></span><code>forge<span class="w"> </span>upload:init
+</code></pre></div>
+<p>Template HTML (dans une vue Jinja2) :</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/profil/avatar&quot;</span> <span class="na">enctype</span><span class="o">=</span><span class="s">&quot;multipart/form-data&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;csrf_token&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ csrf_token }}&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;avatar&quot;</span> <span class="na">accept</span><span class="o">=</span><span class="s">&quot;image/jpeg,image/png,image/webp&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Envoyer<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+<blockquote>
+<p><code>enctype="multipart/form-data"</code> est obligatoire pour les formulaires avec fichier. Sans cet attribut, le navigateur envoie uniquement le nom du fichier, pas son contenu.</p>
+</blockquote>
+<p>Exemple de contrôleur :</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.mvc.controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.uploads.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">UploadError</span><span class="p">,</span> <span class="n">UploadTooLargeError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.uploads.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_upload</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ProfilController</span><span class="p">(</span><span class="n">BaseController</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">store_avatar</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;avatar&quot;</span><span class="p">)</span>
+            <span class="n">saved_file</span> <span class="o">=</span> <span class="n">save_upload</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s2">&quot;images&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">UploadTooLargeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;errors/413.html&quot;</span><span class="p">,</span> <span class="mi">413</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">UploadError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">bad_request</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">BaseController</span><span class="o">.</span><span class="n">redirect_with_flash</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;/profil&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;Avatar enregistré : </span><span class="si">{</span><span class="n">saved_file</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p><strong>Validation MIME :</strong> si <code>UPLOAD_ALLOWED_MIME_TYPES</code> est non vide, tout fichier sans type MIME déclaré est refusé (<code>UploadInvalidMimeTypeError</code>). Si la liste est vide, la validation MIME est désactivée et seule l'extension est vérifiée.</p>
+</blockquote>
+<p>Limites assumées :</p>
+<ul>
+<li>stockage local uniquement ;</li>
+<li>pas de miniatures ;</li>
+<li>pas de redimensionnement automatique ;</li>
+<li>pas de médiathèque ;</li>
+<li>pas d'interface d'administration.</li>
+</ul>
+<hr />
+<p><a id="cycle-crud-complet-forge-makecrud"></a></p>
+<h2 id="18-cycle-crud-complet-forge-makecrud">18. Cycle CRUD complet — forge make:crud<a class="headerlink" href="#18-cycle-crud-complet-forge-makecrud" title="Permanent link">&para;</a></h2>
+<p><code>forge make:crud</code> génère le scaffolding CRUD d'une entité en une commande, à partir du JSON canonique.</p>
+<h3 id="prerequis_1">Prérequis<a class="headerlink" href="#prerequis_1" title="Permanent link">&para;</a></h3>
+<p>L'entité doit être définie et validée avant de lancer le CRUD :</p>
+<div class="highlight"><pre><span></span><code>forge<span class="w"> </span>make:entity<span class="w"> </span>Contact
+forge<span class="w"> </span>build:model<span class="w">          </span><span class="c1"># génère contact_base.py et contact.sql</span>
+forge<span class="w"> </span>db:apply<span class="w">             </span><span class="c1"># crée la table en base</span>
+</code></pre></div>
+<h3 id="generation">Génération<a class="headerlink" href="#generation" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>forge<span class="w"> </span>make:crud<span class="w"> </span>Contact<span class="w"> </span>--dry-run<span class="w">    </span><span class="c1"># prévisualiser sans écrire</span>
+forge<span class="w"> </span>make:crud<span class="w"> </span>Contact<span class="w">              </span><span class="c1"># générer les fichiers</span>
+</code></pre></div>
+<p>Sortie type :</p>
+<div class="highlight"><pre><span></span><code>[CRÉÉ]      mvc/controllers/contact_controller.py
+[CRÉÉ]      mvc/models/contact_model.py
+[CRÉÉ]      mvc/forms/contact_form.py
+[CRÉÉ]      mvc/views/layouts/app.html
+[CRÉÉ]      mvc/views/contact/index.html
+[CRÉÉ]      mvc/views/contact/show.html
+[CRÉÉ]      mvc/views/contact/form.html
+
+Routes à ajouter dans mvc/routes.py :
+──────────────────────────────────────────────────────────────────────
+  from mvc.controllers.contact_controller import ContactController
+
+  with router.group(&quot;/contacts&quot;) as g:
+      g.add(&quot;GET&quot;,  &quot;&quot;,              ContactController.index,   name=&quot;contact_index&quot;)
+      g.add(&quot;GET&quot;,  &quot;/new&quot;,          ContactController.new,     name=&quot;contact_new&quot;)
+      g.add(&quot;POST&quot;, &quot;&quot;,              ContactController.create,  name=&quot;contact_create&quot;)
+      g.add(&quot;GET&quot;,  &quot;/{id}&quot;,         ContactController.show,    name=&quot;contact_show&quot;)
+      g.add(&quot;GET&quot;,  &quot;/{id}/edit&quot;,    ContactController.edit,    name=&quot;contact_edit&quot;)
+      g.add(&quot;POST&quot;, &quot;/{id}&quot;,         ContactController.update,  name=&quot;contact_update&quot;)
+      g.add(&quot;POST&quot;, &quot;/{id}/delete&quot;,  ContactController.destroy, name=&quot;contact_destroy&quot;)
+</code></pre></div>
+<h3 id="ajouter-les-routes-manuellement">Ajouter les routes manuellement<a class="headerlink" href="#ajouter-les-routes-manuellement" title="Permanent link">&para;</a></h3>
+<p>Copier le bloc affiché dans <code>mvc/routes.py</code> :</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">mvc.controllers.contact_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContactController</span>
+
+<span class="k">with</span> <span class="n">router</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;/contacts&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">g</span><span class="p">:</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;&quot;</span><span class="p">,</span>              <span class="n">ContactController</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;contact_index&quot;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/new&quot;</span><span class="p">,</span>         <span class="n">ContactController</span><span class="o">.</span><span class="n">new</span><span class="p">,</span>     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;contact_new&quot;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="n">ContactController</span><span class="o">.</span><span class="n">create</span><span class="p">,</span>  <span class="n">name</span><span class="o">=</span><span class="s2">&quot;contact_create&quot;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">,</span>        <span class="n">ContactController</span><span class="o">.</span><span class="n">show</span><span class="p">,</span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;contact_show&quot;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>  <span class="s2">&quot;/</span><span class="si">{id}</span><span class="s2">/edit&quot;</span><span class="p">,</span>   <span class="n">ContactController</span><span class="o">.</span><span class="n">edit</span><span class="p">,</span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;contact_edit&quot;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">,</span>        <span class="n">ContactController</span><span class="o">.</span><span class="n">update</span><span class="p">,</span>  <span class="n">name</span><span class="o">=</span><span class="s2">&quot;contact_update&quot;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="si">{id}</span><span class="s2">/delete&quot;</span><span class="p">,</span> <span class="n">ContactController</span><span class="o">.</span><span class="n">destroy</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;contact_destroy&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Important :</strong> <code>/new</code> doit être déclaré avant <code>/{id}</code> — le routeur parcourt les routes dans l'ordre ; sinon <code>new</code> serait capturé comme un id.</p>
+<h3 id="lancer-lapplication">Lancer l'application<a class="headerlink" href="#lancer-lapplication" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>app.py
+</code></pre></div>
+<p>Accéder à <code>https://localhost:8000/contacts</code>.</p>
+<h3 id="personnalisation-apres-generation">Personnalisation après génération<a class="headerlink" href="#personnalisation-apres-generation" title="Permanent link">&para;</a></h3>
+<p>Les fichiers générés sont les points de départ — ils sont lisibles et à adapter :</p>
+<ul>
+<li><strong>Contrôleur</strong> : ajouter <code>@require_auth</code>, pagination, tri, règles métier.</li>
+<li><strong>Formulaire</strong> : ajouter des validations croisées via <code>clean()</code>, remplacer les <code>StringField</code> de type <code>DATE</code>.</li>
+<li><strong>Vues</strong> : adapter le style, ajouter des colonnes, affiner les messages.</li>
+<li><strong>Layout</strong> <code>mvc/views/layouts/app.html</code> : ajouter le nom de l'application, le menu de navigation.</li>
+</ul>
+<p>Les fichiers manuels ne sont <strong>jamais</strong> régénérés si vous relancez <code>forge make:crud</code> — ils sont protégés (<code>[PRÉSERVÉ]</code>).</p>
+<h3 id="limites-v10">Limites V1.0<a class="headerlink" href="#limites-v10" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Relations entre entités non générées (à câbler manuellement).</li>
+<li>Pas de pagination dans le contrôleur généré.</li>
+<li><code>DATE</code> / <code>DATETIME</code> → <code>StringField</code> avec avertissement <code>[WARN]</code> ; remplacer par un champ adapté.</li>
+<li>Routes injectées manuellement (jamais automatiques).</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2361 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Framework web MVC pur Python">
+      
+      
+        <meta name="author" content="Roger Cauchon">
+      
+      
+        <link rel="canonical" href="https://caucrogegit.github.io/Forge/starter-app-02-utilisateurs-auth/">
+      
+      
+        <link rel="prev" href="../starters/01-contact-simple/rebuild/">
+      
+      
+        <link rel="next" href="../starters/02-utilisateurs-auth/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../static/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Niveau 2 — Utilisateurs/auth - Forge</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#starter-2-utilisateurs-et-authentification" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="/" title="Forge" class="md-header__button md-logo" aria-label="Forge" data-md-component="logo">
+      
+  <img src="../static/forge-logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Forge
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Niveau 2 — Utilisateurs/auth
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Partager" aria-label="Partager" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/caucrogeGit/Forge" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    caucrogeGit/Forge
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guide/" class="md-tabs__link">
+          
+  
+  
+  Démarrer avec Forge
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../concepts/" class="md-tabs__link">
+          
+  
+  
+  Comprendre Forge
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../starter-app/" class="md-tabs__link">
+          
+  
+  
+  Starter apps
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/" class="md-tabs__link">
+          
+  
+  
+  Référence
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../deployment/" class="md-tabs__link">
+          
+  
+  
+  Déploiement
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../roadmap/" class="md-tabs__link">
+          
+  
+  
+  Projet
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="/" title="Forge" class="md-nav__button md-logo" aria-label="Forge" data-md-component="logo">
+      
+  <img src="../static/forge-logo.png" alt="logo">
+
+    </a>
+    Forge
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/caucrogeGit/Forge" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    caucrogeGit/Forge
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Démarrer avec Forge
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Démarrer avec Forge
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de démarrage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../crud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRUD explicite
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Comprendre Forge
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Comprendre Forge
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../positioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positionnement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../entity_architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture des entités
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Starter apps
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Starter apps
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Présentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-apps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Démos et réutilisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app-01-contact-simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 1 — Contact simple
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction contact simple
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reconstruction contact simple
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/01-contact-simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/01-contact-simple/rebuild/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Étapes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 2 — Utilisateurs/auth
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 2 — Utilisateurs/auth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objectif-de-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectif de l’application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#niveau-de-difficulte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Niveau de difficulté
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ce-que-lon-apprend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ce que l’on apprend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigation-de-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigation de l’application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#charte-graphique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charte graphique
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modele-de-donnees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modèle de données
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commandes-forge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commandes Forge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creer-un-utilisateur-de-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Créer un utilisateur de test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fichiers-crees-ou-modifies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers créés ou modifiés
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#classes-python-utilisees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Classes Python utilisées
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tags-jinja-utilises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tags Jinja utilisés
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#classes-csstailwind-importantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Classes CSS/Tailwind importantes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-navigateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test navigateur
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limites-du-starter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limites du starter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction utilisateurs/auth
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reconstruction utilisateurs/auth
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/02-utilisateurs-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/02-utilisateurs-auth/rebuild/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Étapes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app-03-carnet-contacts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 3 — Carnet relationnel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction carnet relationnel
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reconstruction carnet relationnel
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/03-carnet-contacts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/03-carnet-contacts/rebuild/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Étapes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starter-app-04-suivi-comportement-eleves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Niveau 4 — Suivi élèves
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reconstruction suivi élèves
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reconstruction suivi élèves
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/04-suivi-comportement-eleves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    README
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../starters/04-suivi-comportement-eleves/rebuild/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Étapes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Référence
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Référence
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API et CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Déploiement
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Déploiement
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de déploiement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projet
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Projet
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objectif-de-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectif de l’application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#niveau-de-difficulte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Niveau de difficulté
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ce-que-lon-apprend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ce que l’on apprend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigation-de-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigation de l’application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#charte-graphique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charte graphique
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modele-de-donnees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modèle de données
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commandes-forge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commandes Forge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creer-un-utilisateur-de-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Créer un utilisateur de test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fichiers-crees-ou-modifies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers créés ou modifiés
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#classes-python-utilisees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Classes Python utilisées
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tags-jinja-utilises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tags Jinja utilisés
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#classes-csstailwind-importantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Classes CSS/Tailwind importantes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-navigateur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test navigateur
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limites-du-starter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limites du starter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="starter-2-utilisateurs-et-authentification">Starter 2 — Utilisateurs et authentification<a class="headerlink" href="#starter-2-utilisateurs-et-authentification" title="Permanent link">&para;</a></h1>
+<p>Ce parcours transforme le socle de sécurité Forge en petite application navigable : accueil public, connexion, dashboard protégé, profil simple et déconnexion.</p>
+<h2 id="objectif-de-lapplication">Objectif de l’application<a class="headerlink" href="#objectif-de-lapplication" title="Permanent link">&para;</a></h2>
+<p>Construire un flux applicatif minimal :</p>
+<ul>
+<li>une page d’accueil publique ;</li>
+<li>un formulaire de connexion public ;</li>
+<li>un dashboard accessible uniquement après connexion ;</li>
+<li>une page profil simple ;</li>
+<li>une déconnexion en <code>POST</code>.</li>
+</ul>
+<p>Le starter explique les sessions, le CSRF, les messages flash et la différence entre routes publiques et routes protégées. Il ne met pas en place de permissions multi-rôles.</p>
+<h2 id="niveau-de-difficulte">Niveau de difficulté<a class="headerlink" href="#niveau-de-difficulte" title="Permanent link">&para;</a></h2>
+<p>Niveau 2 — intermédiaire Forge.</p>
+<p>Il suppose que le starter 1 est compris : routes, contrôleurs, formulaires, vues Jinja2 et flash. La nouveauté est la sécurité HTTP et le cycle de session.</p>
+<h2 id="ce-que-lon-apprend">Ce que l’on apprend<a class="headerlink" href="#ce-que-lon-apprend" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Déclarer des routes publiques et protégées.</li>
+<li>Garder <code>POST /logout</code> derrière un token CSRF.</li>
+<li>Lire les champs de formulaire depuis <code>request.body</code>.</li>
+<li>Créer, authentifier et supprimer une session.</li>
+<li>Utiliser <code>BaseController.redirect_with_flash(request, ...)</code>.</li>
+<li>Rendre un dashboard protégé avec <code>BaseController.render(..., request=request)</code>.</li>
+<li>Ne pas inventer de permissions avancées quand le besoin est seulement “connecté ou non”.</li>
+</ul>
+<h2 id="navigation-de-lapplication">Navigation de l’application<a class="headerlink" href="#navigation-de-lapplication" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>/               accueil public
+/login          formulaire de connexion public
+/dashboard      page protégée
+/profil         profil protégé
+/logout         déconnexion en POST
+</code></pre></div>
+<p><code>GET /logout</code> n’est pas proposé : la déconnexion modifie l’état de session et doit rester une action <code>POST</code>.</p>
+<h2 id="charte-graphique">Charte graphique<a class="headerlink" href="#charte-graphique" title="Permanent link">&para;</a></h2>
+<p>La charte reste proche du starter 1 :</p>
+<ul>
+<li>accueil public sobre avec un bouton “Se connecter” ;</li>
+<li>formulaire centré dans une carte ;</li>
+<li>dashboard en deux colonnes simples ;</li>
+<li>profil sous forme de fiche ;</li>
+<li>messages flash visibles après connexion et déconnexion ;</li>
+<li>bouton de déconnexion distinct, en style secondaire ou danger léger.</li>
+</ul>
+<h2 id="modele-de-donnees">Modèle de données<a class="headerlink" href="#modele-de-donnees" title="Permanent link">&para;</a></h2>
+<p>Pour un starter pédagogique, l’utilisateur peut être représenté par une table simple :</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;format_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;entity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Utilisateur&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;utilisateur&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Utilisateur applicatif simple&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;fields&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;utilisateur_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INT&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;primary_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;auto_increment&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;login&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;VARCHAR(80)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;unique&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;constraints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;not_empty&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;max_length&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prenom&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;VARCHAR(80)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;nullable&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;constraints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;max_length&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nom&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;VARCHAR(80)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;constraints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;not_empty&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;max_length&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;password_hash&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;VARCHAR(255)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;constraints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;not_empty&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;max_length&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">255</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;email&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;VARCHAR(120)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;nullable&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;constraints&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;max_length&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;actif&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;sql_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BOOLEAN&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Le mot de passe en clair ne va jamais dans le JSON ni dans la base. Le starter montre la structure, puis laisse le hachage au code applicatif.</p>
+<h2 id="commandes-forge">Commandes Forge<a class="headerlink" href="#commandes-forge" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>forge<span class="w"> </span>doctor
+forge<span class="w"> </span>db:init
+forge<span class="w"> </span>make:entity<span class="w"> </span>Utilisateur<span class="w"> </span>--no-input
+<span class="c1"># modifier mvc/entities/utilisateur/utilisateur.json</span>
+forge<span class="w"> </span>build:model<span class="w"> </span>--dry-run
+forge<span class="w"> </span>build:model
+forge<span class="w"> </span>check:model
+forge<span class="w"> </span>db:apply
+</code></pre></div>
+<p>Le CRUD complet utilisateur n’est pas l’objectif de ce starter. On écrit plutôt un <code>AuthController</code> et un modèle applicatif SQL visible pour chercher l’utilisateur par login.</p>
+<h2 id="creer-un-utilisateur-de-test">Créer un utilisateur de test<a class="headerlink" href="#creer-un-utilisateur-de-test" title="Permanent link">&para;</a></h2>
+<p>L’auth réelle Forge vérifie le mot de passe avec <code>core.security.hashing.verifier_mot_de_passe()</code>. La valeur stockée dans <code>PasswordHash</code> doit donc être produite avec <code>hacher_mot_de_passe()</code>, au format <code>sel_hex:hash_hex</code>.</p>
+<p>Si vous utilisez le modèle d’authentification livré avec Forge (<code>mvc.models.auth_model</code>), les tables <code>role</code> et <code>utilisateur_role</code> doivent aussi exister, même sans permission multi-rôles dans ce starter. <code>python cmd/make.py security:init --env dev</code> peut les créer. Vous pouvez ensuite insérer ou remplacer l’utilisateur de test avec le script ci-dessous.</p>
+<p>Méthode par script minimal :</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">core.database.connection</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_connection</span><span class="p">,</span> <span class="n">close_connection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">core.security.hashing</span><span class="w"> </span><span class="kn">import</span> <span class="n">hacher_mot_de_passe</span>
+
+<span class="n">connection</span> <span class="o">=</span> <span class="n">get_connection</span><span class="p">()</span>
+<span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    INSERT INTO utilisateur (Login, Prenom, Nom, Email, PasswordHash, Actif)</span>
+<span class="sd">    VALUES (?, ?, ?, ?, ?, ?)</span>
+<span class="sd">    &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Ada&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Lovelace&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;admin@example.test&quot;</span><span class="p">,</span>
+        <span class="n">hacher_mot_de_passe</span><span class="p">(</span><span class="s2">&quot;secret123&quot;</span><span class="p">),</span>
+        <span class="kc">True</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="n">cursor</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">close_connection</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+</code></pre></div>
+<p>Connexion navigateur :</p>
+<div class="highlight"><pre><span></span><code>login    admin
+password secret123
+</code></pre></div>
+<p>Si votre connecteur SQL utilise <code>%s</code> au lieu de <code>?</code>, gardez l’idée du script et adaptez uniquement les placeholders à votre connexion.</p>
+<h2 id="fichiers-crees-ou-modifies">Fichiers créés ou modifiés<a class="headerlink" href="#fichiers-crees-ou-modifies" title="Permanent link">&para;</a></h2>
+<p>Fichiers entité :</p>
+<div class="highlight"><pre><span></span><code>mvc/entities/utilisateur/utilisateur.json
+mvc/entities/utilisateur/utilisateur.sql
+mvc/entities/utilisateur/utilisateur_base.py
+mvc/entities/utilisateur/utilisateur.py
+</code></pre></div>
+<p>Fichiers applicatifs :</p>
+<div class="highlight"><pre><span></span><code>mvc/controllers/auth_controller.py
+mvc/controllers/dashboard_controller.py
+mvc/models/auth_model.py
+mvc/views/auth/login.html
+mvc/views/dashboard/index.html
+mvc/views/dashboard/profil.html
+mvc/views/layouts/app.html
+mvc/routes.py
+</code></pre></div>
+<h2 id="classes-python-utilisees">Classes Python utilisées<a class="headerlink" href="#classes-python-utilisees" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>BaseController</code> pour <code>render</code>, <code>redirect</code> et <code>redirect_with_flash</code>.</li>
+<li><code>core.security.session</code> pour créer, lire, authentifier et supprimer une session.</li>
+<li><code>core.security.csrf</code> via le middleware et le champ <code>csrf_token</code>.</li>
+<li><code>AuthController</code> pour login/logout.</li>
+<li><code>DashboardController</code> pour dashboard et profil.</li>
+<li><code>Utilisateur</code> et <code>UtilisateurBase</code> pour la structure métier.</li>
+</ul>
+<p>Lecture des données de connexion :</p>
+<div class="highlight"><pre><span></span><code><span class="n">login</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;login&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+<p>Le contrôleur lit les cookies et la session via les helpers de sécurité, pas via un attribut magique sur <code>request</code>.</p>
+<h2 id="tags-jinja-utilises">Tags Jinja utilisés<a class="headerlink" href="#tags-jinja-utilises" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>{% extends "layouts/app.html" %}</code> ;</li>
+<li><code>{% block content %}</code> ;</li>
+<li><code>{% if flash %}</code> ou affichage équivalent selon le contexte du layout ;</li>
+<li><code>{{ csrf_token }}</code> dans les formulaires <code>POST</code> ;</li>
+<li><code>{{ utilisateur.Nom }}</code>, <code>{{ utilisateur.Login }}</code> et <code>{{ utilisateur.Email }}</code> dans le profil si le contexte reçoit directement le dictionnaire SQL ;</li>
+<li><code>{% if utilisateur %}</code> pour adapter la navigation.</li>
+</ul>
+<h2 id="classes-csstailwind-importantes">Classes CSS/Tailwind importantes<a class="headerlink" href="#classes-csstailwind-importantes" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>min-h-screen</code>, <code>flex</code>, <code>items-center</code>, <code>justify-center</code> pour la page login ;</li>
+<li><code>max-w-md</code>, <code>rounded</code>, <code>border</code>, <code>shadow-sm</code> pour la carte de connexion ;</li>
+<li><code>bg-orange-600</code>, <code>hover:bg-orange-700</code> pour l’action principale ;</li>
+<li><code>bg-slate-100</code>, <code>text-slate-700</code> pour les actions secondaires ;</li>
+<li><code>grid</code>, <code>gap-6</code>, <code>md:grid-cols-2</code> pour le dashboard.</li>
+</ul>
+<h2 id="test-navigateur">Test navigateur<a class="headerlink" href="#test-navigateur" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Ouvrir <code>/</code> et vérifier que l’accueil est public.</li>
+<li>Ouvrir <code>/dashboard</code> sans session et vérifier la redirection vers <code>/login</code>.</li>
+<li>Ouvrir <code>/login</code>.</li>
+<li>Soumettre le formulaire sans token CSRF valide et vérifier le refus.</li>
+<li>Se connecter avec un utilisateur de test.</li>
+<li>Vérifier le message flash de connexion.</li>
+<li>Ouvrir <code>/dashboard</code>.</li>
+<li>Ouvrir <code>/profil</code>.</li>
+<li>Cliquer sur déconnexion, qui soumet <code>POST /logout</code>.</li>
+<li>Vérifier que <code>/dashboard</code> redevient inaccessible.</li>
+</ol>
+<h2 id="limites-du-starter">Limites du starter<a class="headerlink" href="#limites-du-starter" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Pas de permissions multi-rôles.</li>
+<li>Pas de réinitialisation de mot de passe.</li>
+<li>Pas d’inscription publique.</li>
+<li>Pas de politique de mot de passe avancée.</li>
+<li>Pas de gestion d’équipe ou d’organisation.</li>
+<li>Le modèle utilisateur est volontairement minimal.</li>
+</ul>
+<h2 id="reconstruction">Reconstruction<a class="headerlink" href="#reconstruction" title="Permanent link">&para;</a></h2>
+<p>Le fichier complet de reconstruction est disponible dans <a href="../starters/02-utilisateurs-auth/rebuild/">starters/02-utilisateurs-auth/rebuild.md</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

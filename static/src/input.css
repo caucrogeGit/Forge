@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@layer components {
+  .tab-active {
+    border-bottom-color: #E8651A !important;
+    color: #fff !important;
+  }
+
+  .landing-code-font pre,
+  .landing-code-font code {
+    font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, monospace;
+  }
+
+  .landing-accent-bg {
+    background: #E8651A;
+  }
+
+  .landing-accent-text {
+    color: #E8651A;
+  }
+
+  .landing-version-strip {
+    margin-top: -130px;
+  }
+
+  .landing-hero-bg {
+    background: linear-gradient(160deg, #111110 0%, #1e1a17 100%);
+  }
+
+  .landing-logo-glow {
+    filter: drop-shadow(0 0 32px rgba(232, 101, 26, 0.5));
+  }
+
+  .landing-logo-size {
+    width: 320px;
+    height: 320px;
+  }
+
+  .landing-panel {
+    background: #0d0f14;
+  }
+
+  .landing-icon-chip {
+    background: #fff3ea;
+    color: #E8651A;
+  }
+
+  .landing-copy-btn {
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .landing-dark-card {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .landing-highlight-note {
+    background: #fff3ea;
+    border-color: rgba(232, 101, 26, 0.2);
+    color: #111;
+  }
+
+  .syntax-key {
+    color: #e06c75;
+  }
+
+  .syntax-string {
+    color: #98c379;
+  }
+
+  .syntax-number {
+    color: #d19a66;
+  }
+
+  .syntax-keyword {
+    color: #c678dd;
+  }
+
+  .syntax-type {
+    color: #61afef;
+  }
+
+  .syntax-command {
+    color: #e5c07b;
+  }
+}
