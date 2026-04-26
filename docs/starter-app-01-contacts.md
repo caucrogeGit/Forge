@@ -76,7 +76,7 @@ flowchart TD
 
 Les deux méthodes arrivent au même résultat : un projet Forge local avec un environnement Python actif et une commande `forge` utilisable.
 
-=== "Méthode A — automatique recommandée"
+=== "Installation automatique"
 
     ```bash
     pipx install git+https://github.com/caucrogeGit/Forge.git
@@ -86,7 +86,7 @@ Les deux méthodes arrivent au même résultat : un projet Forge local avec un e
     forge doctor
     ```
 
-=== "Méthode B — manuelle"
+=== "Installation manuelle"
 
     ```bash
     git clone https://github.com/caucrogeGit/Forge.git Contacts
@@ -104,28 +104,10 @@ Les deux méthodes arrivent au même résultat : un projet Forge local avec un e
 
 ### 2.1 Schéma d'installation
 
-```text
-Méthode A — automatique
-pipx install ...
-   │
-   ▼
-forge new Contacts
-   │
-   ▼
-projet Forge prêt
-
-Méthode B — manuelle
-git clone ... Contacts
-   │
-   ▼
-python -m venv .venv
-   │
-   ▼
-pip install -r requirements.txt
-pip install -e .
-   │
-   ▼
-projet Forge prêt
+```mermaid
+flowchart LR
+    A1["Méthode A<br/>pipx install"] --> A2["forge new Contacts"] --> P["Projet Forge prêt"]
+    B1["Méthode B<br/>git clone"] --> B2["python -m venv .venv"] --> B3["pip install -r requirements.txt<br/>pip install -e ."] --> P
 ```
 
 <div class="grid cards" markdown>
@@ -197,26 +179,15 @@ DB_APP_PWD=ContactsApp_2026!
 
 ### 3.2 Schéma : rôle des comptes MariaDB
 
-```text
-Étape d'initialisation
+```mermaid
+flowchart TD
+    A["forge db:init"] --> B["DB_ADMIN_USER"]
+    B --> C["crée la base DB_NAME"]
+    B --> D["crée DB_APP_USER"]
+    B --> E["donne les droits nécessaires"]
 
-forge db:init
-   │
-   ▼
-DB_ADMIN_USER
-   │
-   ├── crée la base DB_NAME
-   ├── crée DB_APP_USER
-   └── donne les droits nécessaires à DB_APP_USER
-
-Étape d'exécution de l'application
-
-python app.py
-   │
-   ▼
-DB_APP_USER
-   │
-   └── lit et écrit uniquement dans la base du projet
+    F["python app.py"] --> G["DB_APP_USER"]
+    G --> H["lit et écrit uniquement<br/>dans la base du projet"]
 ```
 
 ### 3.3 Initialiser la base
@@ -304,23 +275,12 @@ flowchart TD
 
 ### 5.2 Schéma de navigation
 
-```text
-/contacts
-   │
-   ├── bouton "Nouveau contact"
-   │        ▼
-   │    /contacts/new
-   │
-   ├── lien "Voir"
-   │        ▼
-   │    /contacts/{id}
-   │
-   └── lien "Modifier"
-            ▼
-        /contacts/{id}/edit
-
-/contacts/{id}
-   └── bouton "Supprimer" en POST vers /contacts/{id}/delete
+```mermaid
+flowchart TD
+    A["/contacts<br/>liste"] -->|"Nouveau contact"| B["/contacts/new<br/>formulaire de création"]
+    A -->|"Voir"| C["/contacts/{id}<br/>détail"]
+    A -->|"Modifier"| D["/contacts/{id}/edit<br/>formulaire de modification"]
+    C -->|"Supprimer en POST"| E["/contacts/{id}/delete"]
 ```
 
 ---
@@ -410,21 +370,12 @@ mvc/entities/contact/contact.json
 
 ### 7.2 Ce que Forge génère depuis ce JSON
 
-```text
-contact.json
-   │
-   │ source canonique modifiée par le développeur
-   ▼
-forge build:model
-   │
-   ├── contact.sql
-   │      └── structure SQL visible de la table contact
-   │
-   └── contact_base.py
-          └── classe Python régénérable avec validations simples
-
-contact.py
-   └── fichier manuel préservé pour la logique métier
+```mermaid
+flowchart TD
+    A["contact.json<br/>source canonique"] --> B["forge build:model"]
+    B --> C["contact.sql<br/>structure SQL visible"]
+    B --> D["contact_base.py<br/>classe Python régénérable"]
+    A -.-> E["contact.py<br/>logique métier manuelle préservée"]
 ```
 
 !!! warning "Contrainte unique sur l'email"
@@ -585,7 +536,7 @@ Cette commande applique le SQL généré sur la base MariaDB configurée dans `e
 
 ### 8.7 Prévisualiser puis générer le CRUD
 
-=== "Prévisualiser"
+=== "Prévisualiser le CRUD"
 
     ```bash
     forge make:crud Contact --dry-run
@@ -593,7 +544,7 @@ Cette commande applique le SQL généré sur la base MariaDB configurée dans `e
 
     Cette commande montre les fichiers que Forge créerait pour le CRUD, sans les écrire.
 
-=== "Générer"
+=== "Générer le CRUD"
 
     ```bash
     forge make:crud Contact
@@ -603,20 +554,16 @@ Cette commande applique le SQL généré sur la base MariaDB configurée dans `e
 
 ### 8.8 Fichiers MVC générés par le CRUD
 
-```text
-forge make:crud Contact
-   │
-   ├── contact_controller.py
-   │      └── reçoit les requêtes et choisit la réponse
-   │
-   ├── contact_model.py
-   │      └── contient les requêtes SQL explicites
-   │
-   ├── contact_form.py
-   │      └── lit et valide les données de formulaire
-   │
-   └── views/contact/*.html
-          └── affichent la liste, le formulaire et le détail
+```mermaid
+flowchart TD
+    A["forge make:crud Contact"] --> B["contact_controller.py"]
+    A --> C["contact_model.py"]
+    A --> D["contact_form.py"]
+    A --> E["views/contact/*.html"]
+    B --> B1["reçoit les requêtes<br/>et choisit la réponse"]
+    C --> C1["contient les requêtes<br/>SQL explicites"]
+    D --> D1["lit et valide<br/>les données du formulaire"]
+    E --> E1["affiche la liste,<br/>le formulaire et le détail"]
 ```
 
 #### Extrait du modèle généré : `mvc/models/contact_model.py`
@@ -829,17 +776,14 @@ mvc/views/contact/show.html
 
 ### 12.1 Héritage des templates
 
-```text
-layouts/app.html
-   │
-   ├── barre supérieure
-   ├── messages flash
-   └── block content
-          ▲
-          │
-          ├── contact/index.html  # liste des contacts
-          ├── contact/form.html   # création et modification
-          └── contact/show.html   # détail d'un contact
+```mermaid
+flowchart TD
+    A["layouts/app.html"] --> B["barre supérieure"]
+    A --> C["messages flash"]
+    A --> D["block content"]
+    E["contact/index.html<br/>liste des contacts"] --> D
+    F["contact/form.html<br/>création et modification"] --> D
+    G["contact/show.html<br/>détail d'un contact"] --> D
 ```
 
 !!! note "Principe Jinja"
@@ -988,22 +932,15 @@ La vérification finale sert à contrôler trois choses : l'environnement Forge,
 
 ### 14.1 Schéma de vérification
 
-```text
-forge doctor
-   │
-   └── vérifie l'environnement du projet
-
-forge routes:list
-   │
-   └── vérifie que les routes /contacts existent
-
-python app.py
-   │
-   └── lance le serveur HTTPS local
-
-Navigateur
-   │
-   └── vérifie le CRUD complet
+```mermaid
+flowchart TD
+    A["forge doctor"] --> B["environnement du projet OK"]
+    B --> C["forge routes:list"]
+    C --> D["routes /contacts présentes"]
+    D --> E["python app.py"]
+    E --> F["serveur HTTPS local lancé"]
+    F --> G["navigateur"]
+    G --> H["CRUD complet vérifié"]
 ```
 
 ### 14.2 Vérifier l'environnement Forge
