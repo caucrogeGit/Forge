@@ -1,34 +1,128 @@
-# Reconstruction — Suivi comportement élèves
+# Reconstruction — Starter 4 Suivi pédagogique
 
-Ce fichier reconstruit le starter métier : élèves, cours, observations de comportement et tableau récapitulatif.
+Ce fichier détaille la reconstruction manuelle du starter 4 depuis un projet Forge vierge.
 
-## 1. Commandes Forge
+> **Note :** `forge starter:build 4` sera disponible dans une prochaine version et automatisera ces étapes.
+
+---
+
+## Prérequis
+
+- Projet Forge initialisé (`forge new SuiviApp` ou clone manuel)
+- MariaDB démarré, `env/dev` configuré avec `DB_ADMIN_LOGIN`, `DB_APP_LOGIN`, `DB_NAME`, etc.
+- Environnement virtuel activé (`source .venv/bin/activate`)
+
+---
+
+## 1. Initialisation de la base
 
 ```bash
-forge doctor
 forge db:init
+```
+
+---
+
+## 2. Création des entités
+
+```bash
 forge make:entity Eleve --no-input
 forge make:entity Cours --no-input
 forge make:entity ObservationCours --no-input
 ```
 
-Remplacez les trois JSON générés par les modèles ci-dessous.
+Remplacez les JSON générés par les modèles ci-dessous (section 6), puis :
 
 ```bash
-forge build:model --dry-run
-forge build:model
-forge make:relation
-forge make:relation
-forge sync:relations
 forge check:model
+forge build:model
+```
+
+Copiez `relations.json` (section 6) dans `mvc/entities/relations.json`, puis :
+
+```bash
 forge db:apply
+```
+
+---
+
+## 3. Génération du CRUD de base
+
+```bash
 forge make:crud Eleve
 forge make:crud Cours
 ```
 
-La saisie des observations est créée manuellement : c’est l’écran métier du starter.
+`ObservationCours` n'a pas de CRUD généré — son contrôleur, ses vues et ses routes sont écrits manuellement (c'est la partie métier du starter).
 
-## 2. JSON complets
+---
+
+## 4. Fichiers applicatifs à créer manuellement
+
+### Contrôleurs
+
+```text
+mvc/controllers/auth_controller.py
+mvc/controllers/suivi_controller.py        ← dashboard protégé
+mvc/controllers/observation_cours_controller.py
+```
+
+### Modèles SQL
+
+```text
+mvc/models/auth_model.py
+mvc/models/observation_cours_model.py
+```
+
+### Vues
+
+```text
+mvc/views/auth/login.html
+mvc/views/suivi/dashboard.html
+mvc/views/observations/new.html
+mvc/views/observations/show.html
+mvc/views/observations/edit.html
+```
+
+### Scripts
+
+```text
+scripts/create_auth_user.py    ← créer le compte enseignant de test
+scripts/seed_suivi.py          ← peupler la base avec des données démo
+```
+
+---
+
+## 5. Routes à câbler dans `mvc/routes.py`
+
+```python
+from mvc.controllers.auth_controller import AuthController
+from mvc.controllers.suivi_controller import SuiviController
+from mvc.controllers.eleve_controller import EleveController
+from mvc.controllers.cours_controller import CoursController
+from mvc.controllers.observation_cours_controller import ObservationCoursController
+
+# forge-starter:suivi-comportement-eleves:start
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/login",  AuthController.login_form, name="login_form")
+    pub.add("POST", "/login",  AuthController.login,      name="login")
+    pub.add("POST", "/logout", AuthController.logout,     name="logout")
+
+router.add("GET",  "/suivi",                SuiviController.index,                name="suivi_dashboard")
+router.add("GET",  "/eleves",               EleveController.index,                name="eleve_index")
+router.add("GET",  "/eleves/{id}",          EleveController.show,                 name="eleve_show")
+router.add("GET",  "/cours",                CoursController.index,                name="cours_index")
+router.add("GET",  "/cours/{id}",           CoursController.show,                 name="cours_show")
+router.add("GET",  "/observations/new",     ObservationCoursController.new,       name="obs_new")
+router.add("POST", "/observations",         ObservationCoursController.create,    name="obs_create")
+router.add("GET",  "/observations/{id}",    ObservationCoursController.show,      name="obs_show")
+router.add("GET",  "/observations/{id}/edit", ObservationCoursController.edit,    name="obs_edit")
+router.add("POST", "/observations/{id}",    ObservationCoursController.update,    name="obs_update")
+# forge-starter:suivi-comportement-eleves:end
+```
+
+---
+
+## 6. JSON canoniques
 
 ### `mvc/entities/eleve/eleve.json`
 
@@ -38,11 +132,11 @@ La saisie des observations est créée manuellement : c’est l’écran métier
   "entity": "Eleve",
   "table": "eleve",
   "fields": [
-    { "name": "id", "sql_type": "INT", "primary_key": true, "auto_increment": true },
-    { "name": "nom", "sql_type": "VARCHAR(80)", "constraints": { "not_empty": true, "max_length": 80 } },
-    { "name": "prenom", "sql_type": "VARCHAR(80)", "constraints": { "not_empty": true, "max_length": 80 } },
-    { "name": "classe", "sql_type": "VARCHAR(40)", "constraints": { "not_empty": true, "max_length": 40 } },
-    { "name": "actif", "sql_type": "BOOLEAN" }
+    { "name": "id",     "sql_type": "INT",         "primary_key": true, "auto_increment": true },
+    { "name": "nom",    "sql_type": "VARCHAR(80)",  "constraints": { "not_empty": true, "max_length": 80 } },
+    { "name": "prenom", "sql_type": "VARCHAR(80)",  "constraints": { "not_empty": true, "max_length": 80 } },
+    { "name": "classe", "sql_type": "VARCHAR(40)",  "constraints": { "not_empty": true, "max_length": 40 } },
+    { "name": "actif",  "sql_type": "BOOLEAN" }
   ]
 }
 ```
@@ -55,10 +149,10 @@ La saisie des observations est créée manuellement : c’est l’écran métier
   "entity": "Cours",
   "table": "cours",
   "fields": [
-    { "name": "id", "sql_type": "INT", "primary_key": true, "auto_increment": true },
-    { "name": "date_cours", "sql_type": "DATE", "constraints": { "not_empty": true } },
-    { "name": "titre", "sql_type": "VARCHAR(120)", "constraints": { "not_empty": true, "max_length": 120 } },
-    { "name": "classe", "sql_type": "VARCHAR(40)", "constraints": { "not_empty": true, "max_length": 40 } }
+    { "name": "id",         "sql_type": "INT",          "primary_key": true, "auto_increment": true },
+    { "name": "date_cours", "sql_type": "DATE",         "constraints": { "not_empty": true } },
+    { "name": "titre",      "sql_type": "VARCHAR(120)", "constraints": { "not_empty": true, "max_length": 120 } },
+    { "name": "classe",     "sql_type": "VARCHAR(40)",  "constraints": { "not_empty": true, "max_length": 40 } }
   ]
 }
 ```
@@ -71,138 +165,69 @@ La saisie des observations est créée manuellement : c’est l’écran métier
   "entity": "ObservationCours",
   "table": "observation_cours",
   "fields": [
-    { "name": "id", "sql_type": "INT", "primary_key": true, "auto_increment": true },
-    { "name": "eleve_id", "sql_type": "INT" },
-    { "name": "cours_id", "sql_type": "INT" },
+    { "name": "id",               "sql_type": "INT",     "primary_key": true, "auto_increment": true },
+    { "name": "eleve_id",         "sql_type": "INT" },
+    { "name": "cours_id",         "sql_type": "INT" },
     { "name": "ne_travaille_pas", "sql_type": "BOOLEAN" },
-    { "name": "bavarde", "sql_type": "BOOLEAN" },
-    { "name": "dort", "sql_type": "BOOLEAN" },
-    { "name": "telephone", "sql_type": "BOOLEAN" },
-    { "name": "perturbe", "sql_type": "BOOLEAN" },
-    { "name": "refuse_consigne", "sql_type": "BOOLEAN" },
-    { "name": "remarque", "sql_type": "TEXT", "nullable": true }
+    { "name": "bavarde",          "sql_type": "BOOLEAN" },
+    { "name": "dort",             "sql_type": "BOOLEAN" },
+    { "name": "telephone",        "sql_type": "BOOLEAN" },
+    { "name": "perturbe",         "sql_type": "BOOLEAN" },
+    { "name": "refuse_consigne",  "sql_type": "BOOLEAN" },
+    { "name": "remarque",         "sql_type": "TEXT",    "nullable": true }
   ]
 }
 ```
 
-## 3. Relations à déclarer
+### `mvc/entities/relations.json`
 
 ```json
-[
-  {
-    "name": "observation_cours_eleve",
-    "type": "many_to_one",
-    "from_entity": "ObservationCours",
-    "to_entity": "Eleve",
-    "from_field": "eleve_id",
-    "to_field": "id",
-    "foreign_key_name": "fk_observation_cours_eleve",
-    "on_delete": "CASCADE",
-    "on_update": "CASCADE"
-  },
-  {
-    "name": "observation_cours_cours",
-    "type": "many_to_one",
-    "from_entity": "ObservationCours",
-    "to_entity": "Cours",
-    "from_field": "cours_id",
-    "to_field": "id",
-    "foreign_key_name": "fk_observation_cours_cours",
-    "on_delete": "CASCADE",
-    "on_update": "CASCADE"
-  }
-]
+{
+  "format_version": 1,
+  "relations": [
+    {
+      "name": "observation_cours_eleve",
+      "type": "many_to_one",
+      "from_entity": "ObservationCours",
+      "to_entity": "Eleve",
+      "from_field": "eleve_id",
+      "to_field": "id",
+      "foreign_key_name": "fk_observation_cours_eleve",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    {
+      "name": "observation_cours_cours",
+      "type": "many_to_one",
+      "from_entity": "ObservationCours",
+      "to_entity": "Cours",
+      "from_field": "cours_id",
+      "to_field": "id",
+      "foreign_key_name": "fk_observation_cours_cours",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  ]
+}
 ```
 
-## 4. Routes à copier
+---
 
-Copiez les routes CRUD générées pour `Eleve` et `Cours`, puis ajoutez les routes métier :
+## 7. Création de l'utilisateur et seed
 
-```python
-from mvc.controllers.observation_cours_controller import ObservationCoursController
-
-with router.group("/cours") as g:
-    g.add("GET", "/{id}/observations", ObservationCoursController.edit_for_course, name="cours_observations")
-    g.add("POST", "/{id}/observations", ObservationCoursController.save_for_course, name="cours_observations_save")
-    g.add("GET", "/{id}/recapitulatif", ObservationCoursController.summary, name="cours_summary")
+```bash
+python scripts/create_auth_user.py
+python scripts/seed_suivi.py
 ```
 
-Si les routes CRUD de `Cours` contiennent `/{id}`, gardez les routes fixes ou spécifiques avant les routes génériques quand elles partagent le même préfixe.
+---
 
-## 5. Fichiers à créer ou modifier
-
-Générés :
-
-```text
-mvc/entities/eleve/eleve.sql
-mvc/entities/cours/cours.sql
-mvc/entities/observation_cours/observation_cours.sql
-mvc/entities/*/*_base.py
-mvc/entities/relations.sql
-mvc/controllers/eleve_controller.py
-mvc/controllers/cours_controller.py
-mvc/forms/eleve_form.py
-mvc/forms/cours_form.py
-mvc/models/eleve_model.py
-mvc/models/cours_model.py
-```
-
-Manuels métier :
-
-```text
-mvc/controllers/observation_cours_controller.py
-mvc/models/observation_cours_model.py
-mvc/forms/observation_cours_form.py
-mvc/views/cours/observations.html
-mvc/views/cours/recapitulatif.html
-mvc/routes.py
-```
-
-## 6. Formulaire métier
-
-Les cases à cocher correspondent directement aux colonnes booléennes :
-
-```python
-from core.forms import BooleanField, Form, StringField
-
-
-class ObservationCoursForm(Form):
-    ne_travaille_pas = BooleanField(label="Ne travaille pas")
-    bavarde = BooleanField(label="Bavarde")
-    dort = BooleanField(label="Dort")
-    telephone = BooleanField(label="Utilise son téléphone")
-    perturbe = BooleanField(label="Perturbe le cours")
-    refuse_consigne = BooleanField(label="Refuse une consigne")
-    remarque = StringField(label="Remarque", required=False, max_length=500)
-```
-
-Une case absente du `POST` devient `False`. La remarque libre est stockée dans `remarque`.
-
-## 7. Vérifications
+## 8. Vérification
 
 ```bash
 forge check:model
+forge routes:list
 python app.py
 ```
 
-Vérifiez aussi que les deux relations sont présentes dans `mvc/entities/relations.sql`.
-
-## 8. Test navigateur
-
-1. Créer trois élèves actifs dans la même classe.
-2. Créer un cours pour cette classe.
-3. Ouvrir `/cours/{id}/observations`.
-4. Cocher `bavarde` pour un élève.
-5. Cocher `telephone` et `refuse_consigne` pour un autre.
-6. Ajouter une remarque libre.
-7. Enregistrer.
-8. Ouvrir `/cours/{id}/recapitulatif`.
-9. Vérifier les coches et les remarques.
-10. Modifier une observation et revérifier le récapitulatif.
-
-## 9. Points pédagogiques
-
-- Les booléens sont adaptés aux cases à cocher.
-- Le tableau final est simple parce que les colonnes sont explicites.
-- La logique de saisie reste dans le contrôleur, le formulaire et le modèle applicatif.
-- Les JSON ne contiennent pas de logique métier.
+Ouvrir `https://localhost:8000/login`, se connecter avec le compte créé à l'étape 7, vérifier le dashboard `/suivi` et la navigation.
