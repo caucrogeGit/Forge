@@ -361,7 +361,7 @@ def test_has_failures_warn_seul_ne_declenche_pas_fail():
 
 def test_code_sortie_0_sans_fail(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "version_info", (3, 12, 0))
-    results = run_all(tmp_path, "v1.0.0")
+    results = run_all(tmp_path, "main")
     # Sans projet initialisé, on a des FAIL (structure MVC absente etc.)
     # On vérifie simplement la cohérence entre has_failures et les résultats
     assert has_failures(results) == any(r.status == "fail" for r in results)
@@ -395,4 +395,4 @@ def test_forge_doctor_utilise_le_cwd(monkeypatch, tmp_path):
     forge.cmd_doctor()
 
     assert captured["root"] == tmp_path
-    assert captured["version"] == "v1.0.0"
+    assert captured["version"] == "main"

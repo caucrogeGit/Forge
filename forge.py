@@ -53,7 +53,7 @@ from forge_cli.starters import main as starters_main
 
 
 _FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"
-_FORGE_VERSION = "v1.0.0"
+_FORGE_VERSION = "main"
 _FORGE_DEFAULT_BRANCH = "main"
 
 

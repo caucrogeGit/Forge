@@ -117,7 +117,7 @@ sudo apt install git python3 python3-venv python3-pip openssl mariadb-server bui
 ### 2. Cloner le projet
 
 ```bash
-git clone --branch v1.0.0 --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
+git clone --branch main --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
 cd NomDuProjet
 ```
 
@@ -129,7 +129,7 @@ Le clone sur un tag laisse le dépôt en *detached HEAD*. Réinitialisez-le imm�
 rm -rf .git
 git init
 git add -A
-git commit -m "init: NomDuProjet — based on Forge v1.0.0"
+git commit -m "init: NomDuProjet — based on Forge main"
 ```
 
 > `forge new NomDuProjet` fait ces deux étapes automatiquement et est la voie recommandée.

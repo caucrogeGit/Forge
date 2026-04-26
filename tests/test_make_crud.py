@@ -519,7 +519,7 @@ def test_pk_only_warn_dans_make_crud(tmp_path):
     assert any("champ" in w.lower() for w in result.warnings)
 
 
-# ── v1.0.0 : BaseController, HTML multiline, bloc routes ──────────────────────
+# ── main : BaseController, HTML multiline, bloc routes ──────────────────────
 
 def test_base_controller_importable():
     from core.mvc.controller import BaseController  # noqa: F401

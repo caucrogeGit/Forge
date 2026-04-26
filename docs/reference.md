@@ -1586,7 +1586,7 @@ Cette commande est informative : elle n'écrit aucun fichier. Les starters reste
 Diagnostique l'environnement du projet et produit un rapport lisible.
 
 ```
-Forge doctor — v1.0.0
+Forge doctor — main
 
   [OK  ]  Python — 3.14.4 (≥ 3.11 requis)
   [OK  ]  Configuration — env/dev chargé — clés essentielles présentes

@@ -14,7 +14,7 @@ Cette page regroupe les parcours applicatifs Forge v1.0. Les starters sont progr
 ## Préparer Un Projet
 
 ```bash
-git clone --branch v1.0.0 --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
+git clone --branch main --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
 cd NomDuProjet
 python3 -m venv .venv
 source .venv/bin/activate

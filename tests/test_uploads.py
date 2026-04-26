@@ -145,7 +145,7 @@ def test_ensure_upload_dirs_refuse_categorie_invalide(tmp_path):
         ensure_upload_dirs(tmp_path, categories=("../bad",))
 
 
-# ── Corrections v1.0.0 ────────────────────────────────────────────────────────
+# ── Corrections main ────────────────────────────────────────────────────────
 
 def test_save_upload_none_leve_storage_error(tmp_path):
     forge.configure(

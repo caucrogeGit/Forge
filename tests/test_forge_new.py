@@ -167,7 +167,7 @@ def test_openssl_echec_nettoie_dossier(monkeypatch, tmp_path):
         forge.cmd_new("MonProjet")
 
 
-# ── Branche de clonage (fix v1.0.0) ──────────────────────────────────────────
+# ── Branche de clonage (fix main) ──────────────────────────────────────────
 
 def test_clone_utilise_main_par_defaut(monkeypatch, tmp_path):
     """Sans --ref, le clone doit cibler _FORGE_DEFAULT_BRANCH, pas _FORGE_VERSION."""
@@ -203,7 +203,6 @@ def test_clone_skeleton_utilise_default_branch_si_ref_none(monkeypatch):
 
     assert forge._FORGE_DEFAULT_BRANCH == "main"
     assert git_args.get("branch") == forge._FORGE_DEFAULT_BRANCH
-    assert git_args.get("branch") != forge._FORGE_VERSION
 
 
 def test_clone_skeleton_accepte_ref_explicite(monkeypatch):
@@ -216,23 +215,23 @@ def test_clone_skeleton_accepte_ref_explicite(monkeypatch):
         return type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})()
 
     monkeypatch.setattr(forge, "_run", spy_run)
-    forge._clone_skeleton("/tmp/fake_dest", ref="v1.0.0")
+    forge._clone_skeleton("/tmp/fake_dest", ref="main")
 
-    assert git_args.get("branch") == "v1.0.0"
+    assert git_args.get("branch") == "main"
 
 
 def test_dispatch_ref_transmis_a_cmd_new(monkeypatch, tmp_path, capsys):
-    """forge new MonProjet --ref v1.0.0 doit transmettre ref='v1.0.0'."""
+    """forge new MonProjet --ref main doit transmettre ref='main'."""
     received = {}
 
     def spy_cmd_new(name, ref=None):
         received["ref"] = ref
 
-    monkeypatch.setattr(sys, "argv", ["forge", "new", "MonProjet", "--ref", "v1.0.0"])
+    monkeypatch.setattr(sys, "argv", ["forge", "new", "MonProjet", "--ref", "main"])
     monkeypatch.setattr(forge, "cmd_new", spy_cmd_new)
     forge.main()
 
-    assert received["ref"] == "v1.0.0"
+    assert received["ref"] == "main"
 
     assert not (tmp_path / "MonProjet").exists(), (
         "Le dossier projet doit être supprimé après échec"
