@@ -68,6 +68,18 @@ def _build_route_block(meta: dict, *, public: bool) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _read_routes_snippet(meta: dict) -> str:
+    data_dir: Path = meta["_dir"]
+    snippet = meta.get("routes_snippet", "routes.py.snippet")
+    path = data_dir / snippet
+    if not path.exists():
+        raise StarterBuildError(f"Snippet de routes introuvable : {path}")
+    content = path.read_text(encoding="utf-8")
+    if not content.endswith("\n"):
+        content += "\n"
+    return content
+
+
 def _routes_marker_present(routes_py: Path, marker: str) -> bool:
     if not routes_py.exists():
         return False
@@ -129,9 +141,41 @@ def _force_clean(meta: dict, root: Path) -> None:
         _remove_routes_marker(root / "mvc" / "routes.py", marker)
 
 
+def _force_clean_application(meta: dict, root: Path) -> None:
+    """Supprime les fichiers déclarés par un starter applicatif."""
+    entity_snake = _to_snake(meta["entity"])
+    entity_dir = Path("mvc") / "entities" / entity_snake
+    regenerable_entity_files = {
+        entity_dir / f"{entity_snake}.json",
+        entity_dir / f"{entity_snake}.sql",
+        entity_dir / f"{entity_snake}_base.py",
+    }
+
+    for rel in meta.get("check_paths", []):
+        p = root / rel
+        rel_path = Path(rel)
+        if rel_path == entity_dir:
+            for generated in regenerable_entity_files:
+                generated_path = root / generated
+                if generated_path.exists():
+                    generated_path.unlink()
+        elif p.is_dir():
+            shutil.rmtree(p)
+        elif p.exists():
+            p.unlink()
+
+    marker = meta.get("routes_marker", "")
+    if marker:
+        _remove_routes_marker(root / "mvc" / "routes.py", marker)
+
+
 # ── Dry-run ───────────────────────────────────────────────────────────────────
 
 def dry_run(meta: dict, *, public: bool = False) -> None:
+    if meta.get("kind", "crud") == "application":
+        _dry_run_application(meta)
+        return
+
     entity = meta["entity"]
     snake = _to_snake(entity)
     routes = meta.get("routes", {})
@@ -162,6 +206,31 @@ def dry_run(meta: dict, *, public: bool = False) -> None:
     print()
 
 
+def _dry_run_application(meta: dict) -> None:
+    entity = meta["entity"]
+    snake = _to_snake(entity)
+    data_dir: Path = meta["_dir"]
+    files_dir = data_dir / "files"
+
+    print(f"\nStarter : {meta['name']} (niveau {meta['number']})")
+    print()
+    print(f"  Entité créée        : mvc/entities/{snake}/")
+    print(f"  JSON injecté        : mvc/entities/{snake}/{snake}.json")
+    print(f"  SQL généré          : mvc/entities/{snake}/{snake}.sql")
+    print(f"  Classe générée      : mvc/entities/{snake}/{snake}_base.py")
+    print()
+    print("  Fichiers applicatifs copiés :")
+    if files_dir.exists():
+        for path in sorted(p for p in files_dir.rglob("*") if p.is_file()):
+            print(f"    {path.relative_to(files_dir).as_posix()}")
+    print()
+    print("  Routes injectées depuis :")
+    print(f"    {meta.get('routes_snippet', 'routes.py.snippet')}")
+    print()
+    print("  Aucun fichier écrit.")
+    print()
+
+
 # ── Build ─────────────────────────────────────────────────────────────────────
 
 def build(
@@ -171,6 +240,10 @@ def build(
     force: bool = False,
     public: bool = False,
 ) -> None:
+    if meta.get("kind", "crud") == "application":
+        _build_application(meta, init_db=init_db, force=force, public=public)
+        return
+
     from forge_cli.entities.make_entity import main as make_entity_main
     from forge_cli.entities.model import build_model, check_model, ModelValidationError
     from forge_cli.entities.db_init import init_project_database, DbInitError
@@ -311,6 +384,154 @@ def build(
     routes_prefix = meta.get("routes", {}).get("prefix", "")
     print(f"  Lancez  : python app.py")
     print(f"  Ouvrez  : https://localhost:8000{routes_prefix}")
+    if meta.get("doc_url"):
+        print(f"  Docs    : {meta['doc_url']}")
+    print("─" * 60)
+    print()
+
+
+def _copy_application_files(meta: dict, root: Path) -> list[Path]:
+    data_dir: Path = meta["_dir"]
+    files_dir = data_dir / "files"
+    written = []
+    if not files_dir.exists():
+        return written
+
+    for src in sorted(p for p in files_dir.rglob("*") if p.is_file()):
+        rel = src.relative_to(files_dir)
+        dest = root / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, dest)
+        written.append(dest)
+    return written
+
+
+def _build_application(
+    meta: dict,
+    *,
+    init_db: bool = False,
+    force: bool = False,
+    public: bool = False,
+) -> None:
+    from forge_cli.entities.make_entity import main as make_entity_main
+    from forge_cli.entities.model import build_model, check_model, ModelValidationError
+    from forge_cli.entities.db_init import init_project_database, DbInitError
+    from forge_cli.entities.db_apply import apply_model_sql, DbApplyError
+    from forge_cli.project_config import ProjectConfigError
+
+    if public:
+        raise StarterBuildError(
+            "--public n'est pas applicable au starter Utilisateurs / authentification : "
+            "il contient volontairement des routes publiques et protégées."
+        )
+
+    root = Path.cwd()
+    entity = meta["entity"]
+    snake = _to_snake(entity)
+    entities_root = root / "mvc" / "entities"
+    data_dir: Path = meta["_dir"]
+    canonical_json = data_dir / meta.get("entity_json", f"entities/{snake}.json")
+    if not canonical_json.exists():
+        raise StarterBuildError(f"Fichier JSON canonique introuvable : {canonical_json}")
+
+    routes_py = root / "mvc" / "routes.py"
+    total_steps = 7 if not init_db else 8
+    step = 0
+
+    def next_step(label: str) -> None:
+        nonlocal step
+        step += 1
+        _step(step, total_steps, label)
+
+    if not (root / "config.py").exists():
+        raise StarterBuildError(
+            "config.py introuvable. Exécutez cette commande depuis la racine d'un projet Forge."
+        )
+
+    existing = _check_existing(meta, root)
+    if existing and not force:
+        print(f"\nLe starter {meta['name']} semble déjà partiellement installé :")
+        for path in existing:
+            print(f"  • {path}")
+        print("\nAucun fichier modifié.")
+        print("Utilisez --force uniquement si vous savez ce que vous faites.")
+        return
+
+    if existing and force:
+        print(f"\n[FORCE] Nettoyage des fichiers existants...")
+        _force_clean_application(meta, root)
+
+    print(f"\nStarter : {meta['name']} (niveau {meta['number']})")
+
+    if init_db:
+        next_step("Initialisation de la base (db:init)...")
+        try:
+            actions = init_project_database()
+            print(out.ok("Environnement MariaDB du projet prêt."))
+            for action in actions:
+                print(out.ok(action))
+        except (DbInitError, ProjectConfigError) as exc:
+            raise StarterBuildError(f"db:init a échoué : {exc}") from exc
+
+    next_step(f"Création de l'entité {entity}...")
+    try:
+        make_entity_main([entity, "--no-input"])
+    except SystemExit as e:
+        if e.code not in (0, None):
+            raise StarterBuildError(f"make:entity a échoué (code {e.code})")
+
+    next_step("Injection du JSON canonique...")
+    target_json = entities_root / snake / f"{snake}.json"
+    target_json.write_text(canonical_json.read_text(encoding="utf-8"), encoding="utf-8")
+    print(out.written(target_json.relative_to(root).as_posix()))
+
+    next_step("Validation du modèle (check:model)...")
+    try:
+        check_model(entities_root)
+        print(out.ok("Modèle valide."))
+    except ModelValidationError as exc:
+        raise StarterBuildError(f"check:model a échoué : {exc}") from exc
+
+    next_step("Construction du modèle (build:model)...")
+    result = build_model(entities_root)
+    for path in result.written:
+        print(out.written(path.relative_to(root).as_posix()))
+    for path in result.created:
+        print(out.created(path.relative_to(root).as_posix()))
+    for path in result.preserved:
+        print(out.preserved(path.relative_to(root).as_posix()))
+
+    next_step("Application en base (db:apply)...")
+    try:
+        applied = apply_model_sql(entities_root)
+        print(out.ok("SQL du modèle appliqué."))
+        for path in applied:
+            print(f"  [EXÉCUTÉ] {path.as_posix()}")
+    except (DbApplyError, ProjectConfigError) as exc:
+        raise StarterBuildError(
+            f"db:apply a échoué : {exc}\n"
+            "  → Vérifiez que forge db:init a bien été exécuté, ou utilisez --init-db."
+        ) from exc
+
+    next_step("Copie des fichiers applicatifs...")
+    for path in _copy_application_files(meta, root):
+        print(out.written(path.relative_to(root).as_posix()))
+
+    next_step("Câblage des routes dans mvc/routes.py...")
+    if not routes_py.exists():
+        raise StarterBuildError("mvc/routes.py introuvable.")
+    route_block = _read_routes_snippet(meta)
+    _inject_routes(routes_py, route_block)
+    print(out.written("mvc/routes.py"))
+    print()
+    print(route_block)
+
+    print("\n" + "─" * 60)
+    print(f"  Starter {meta['name']} installé.")
+    print()
+    print("  Lancez  : python app.py")
+    print("  Ouvrez  : https://localhost:8000/login")
+    print("  Test    : python scripts/create_auth_user.py")
     if meta.get("doc_url"):
         print(f"  Docs    : {meta['doc_url']}")
     print("─" * 60)

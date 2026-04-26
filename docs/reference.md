@@ -1278,6 +1278,7 @@ forge deploy:init
 forge deploy:check
 forge starter:list
 forge starter:build 1
+forge starter:build 2
 forge help
 ```
 
@@ -1306,6 +1307,7 @@ forge help
 | `forge deploy:check` | Diagnostique l'environnement de production local | Non |
 | `forge starter:list` | Liste les starter apps disponibles | Non |
 | `forge starter:build 1` | Génère automatiquement le starter Contacts depuis un projet Forge | Oui |
+| `forge starter:build 2` | Génère automatiquement le starter Utilisateurs / authentification | Oui |
 | `forge help` | Affiche l'aide CLI intégrée | Non |
 
 ### `forge new <NomProjet>`
@@ -1588,19 +1590,19 @@ Cette commande est informative : elle n'écrit aucun fichier. Elle affiche les s
 | Niveau | Starter | Génération automatique |
 |---:|---|---|
 | 1 | Contacts | Disponible |
-| 2 | Utilisateurs / authentification | À venir |
+| 2 | Utilisateurs / authentification | Disponible |
 | 3 | Carnet de contacts | À venir |
 | 4 | Suivi comportement élèves | À venir |
 
 !!! note "Parcours et génération"
-    Les quatre starters existent comme parcours documentés. La génération automatique est disponible uniquement pour Contacts.
+    Les quatre starters existent comme parcours documentés. La génération automatique est disponible pour Contacts et Utilisateurs / authentification.
 
 ### `forge starter:build <identifiant>`
 
 Construit automatiquement un starter applicatif depuis un projet Forge vierge ou préparé.
 
-Seul le starter 1 — Contacts est actuellement disponible en génération automatique.
-Les starters 2, 3 et 4 sont enregistrés dans le registre, mais restent `coming_soon` : `forge starter:build` les refuse proprement.
+Les starters 1 — Contacts et 2 — Utilisateurs / authentification sont actuellement disponibles en génération automatique.
+Les starters 3 et 4 sont enregistrés dans le registre, mais restent `coming_soon` : `forge starter:build` les refuse proprement.
 
 !!! warning "Prudence"
     Cette commande écrit des fichiers applicatifs. Utilisez `--dry-run` pour prévisualiser, et réservez `--force` aux reconstructions volontaires.
@@ -1613,10 +1615,20 @@ forge starter:build contacts
 forge starter:build contact-simple
 ```
 
+Identifiants équivalents du starter Utilisateurs / authentification :
+
+```bash
+forge starter:build 2
+forge starter:build auth
+forge starter:build utilisateurs
+forge starter:build utilisateurs-auth
+```
+
 Prévisualiser sans écrire :
 
 ```bash
 forge starter:build 1 --dry-run
+forge starter:build 2 --dry-run
 ```
 
 Générer des routes publiques de test :
@@ -1625,10 +1637,13 @@ Générer des routes publiques de test :
 forge starter:build 1 --public
 ```
 
+`--public` n'est pas applicable au starter Utilisateurs / authentification, car ce starter montre volontairement des routes publiques et protégées.
+
 Initialiser explicitement la base avant la construction :
 
 ```bash
 forge starter:build 1 --init-db
+forge starter:build 2 --init-db
 ```
 
 `--init-db` lance `forge db:init` dans le flux du starter. Ce n'est pas automatique : sans cette option, la base doit déjà être préparée.
@@ -1637,6 +1652,7 @@ Reconstruire le starter Contacts s'il est déjà présent :
 
 ```bash
 forge starter:build 1 --force
+forge starter:build 2 --force
 ```
 
 `--force` doit être utilisé avec prudence. Il nettoie les fichiers détectés pour le starter Contacts, dont `mvc/entities/contact/`, le contrôleur, le modèle, le formulaire, les vues `mvc/views/contact/` et le bloc de routes marqué dans `mvc/routes.py`, puis reconstruit le starter.

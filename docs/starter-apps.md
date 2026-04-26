@@ -6,10 +6,10 @@
   <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Des applications de référence progressives pour apprendre, reconstruire vite, puis adapter à un vrai projet.</p>
 </div>
 
-Elles sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` est disponible pour le starter 1 — Contacts ; les starters 2, 3 et 4 sont documentés, mais leur génération automatique est encore à venir.
+Elles sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` est disponible pour les starters 1 — Contacts et 2 — Utilisateurs / authentification ; les starters 3 et 4 sont documentés, mais leur génération automatique est encore à venir.
 
 !!! warning "Disponibilité"
-    Seul le starter Contacts est générable automatiquement aujourd'hui. Les autres pages restent utiles comme guides pédagogiques et recettes de reconstruction.
+    Contacts et Utilisateurs / authentification sont générables automatiquement aujourd'hui. Carnet de contacts et Suivi comportement élèves restent des guides pédagogiques et recettes de reconstruction.
 
 ## Liste des starter apps
 
@@ -22,15 +22,19 @@ Elles sont d'abord des parcours pédagogiques. La génération automatique par `
 
 Pour voir la liste depuis la CLI : `forge starter:list`.
 
-Pour générer automatiquement le starter Contacts :
+Pour générer automatiquement les starters disponibles :
 
 ```bash
 forge starter:build 1
 forge starter:build contacts
 forge starter:build contact-simple
+forge starter:build 2
+forge starter:build auth
+forge starter:build utilisateurs-auth
 ```
 
-Les options utiles sont `--dry-run` pour prévisualiser, `--public` pour des routes publiques de test, `--init-db` pour lancer explicitement l'initialisation de base, et `--force` pour reconstruire avec prudence un starter déjà présent.
+Les options utiles sont `--dry-run` pour prévisualiser, `--init-db` pour lancer explicitement l'initialisation de base, et `--force` pour reconstruire avec prudence un starter déjà présent.
+`--public` est disponible pour Contacts, mais n'est pas applicable au starter Utilisateurs / authentification.
 
 <div class="grid cards" markdown>
 
@@ -50,7 +54,7 @@ Les options utiles sont `--dry-run` pour prévisualiser, `--public` pour des rou
 
     ---
 
-    Utiliser `forge starter:build 1` uniquement pour Contacts.
+    Utiliser `forge starter:build 1` pour Contacts et `forge starter:build 2` pour Utilisateurs / authentification.
 
 </div>
 

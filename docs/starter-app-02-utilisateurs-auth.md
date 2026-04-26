@@ -34,8 +34,8 @@
 
 </div>
 
-!!! warning "Génération automatique"
-    Ce starter est un parcours pédagogique. Il est enregistré dans `forge starter:list`, mais sa génération automatique par `forge starter:build` est encore à venir.
+!!! tip "Génération automatique"
+    Ce starter est maintenant générable avec `forge starter:build 2`, `forge starter:build auth` ou `forge starter:build utilisateurs-auth`. Il ne génère pas un CRUD utilisateur : il crée l'entité `Utilisateur`, copie les fichiers applicatifs d'authentification et injecte les routes explicites.
 
 ## Présentation rapide
 
@@ -233,6 +233,30 @@ Le mot de passe en clair ne va jamais dans le JSON ni dans la base. Le starter m
 
 ### Commandes Forge
 
+Pour générer directement ce starter depuis un projet Forge vierge :
+
+```bash
+forge starter:build 2
+```
+
+Alias disponibles :
+
+```bash
+forge starter:build auth
+forge starter:build utilisateurs
+forge starter:build utilisateurs-auth
+```
+
+Pour prévisualiser sans écrire :
+
+```bash
+forge starter:build 2 --dry-run
+```
+
+`--public` n'est pas applicable à ce starter : il sert justement à montrer la différence entre routes publiques (`/login`) et routes protégées (`/dashboard`, `/profil`, `/logout`).
+
+Le flux manuel équivalent reste :
+
 ```bash
 forge make:entity Utilisateur --no-input
 # modifier mvc/entities/utilisateur/utilisateur.json
@@ -248,7 +272,22 @@ Le CRUD complet utilisateur n'est pas l'objectif de ce starter. On écrit plutô
 
 L'auth réelle Forge vérifie le mot de passe avec `core.security.hashing.verifier_mot_de_passe()`. La valeur stockée dans `PasswordHash` doit donc être produite avec `hacher_mot_de_passe()`, au format `sel_hex:hash_hex`.
 
-Si vous utilisez le modèle d'authentification livré avec Forge (`mvc.models.auth_model`), les tables `role` et `utilisateur_role` doivent aussi exister, même sans permission multi-rôles dans ce starter. Vous pouvez ensuite insérer ou remplacer l'utilisateur de test avec le script ci-dessous.
+Le starter généré copie un modèle `mvc/models/auth_model.py` autonome : il lit uniquement la table `utilisateur` et ajoute `roles = []` pour rester compatible avec la session Forge sans dépendre de tables de rôles.
+
+Après génération automatique, le script suivant est disponible :
+
+```bash
+python scripts/create_auth_user.py
+```
+
+Il crée ou met à jour l'utilisateur de test :
+
+```text
+login    admin
+password secret123
+```
+
+Le mot de passe est stocké avec `hacher_mot_de_passe("secret123")`.
 
 ??? example "Script minimal de création d'utilisateur"
 
@@ -309,6 +348,7 @@ mvc/views/auth/login.html
 mvc/views/dashboard/index.html
 mvc/views/dashboard/profil.html
 mvc/views/layouts/app.html
+scripts/create_auth_user.py
 mvc/routes.py
 ```
 

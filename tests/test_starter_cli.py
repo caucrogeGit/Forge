@@ -47,17 +47,48 @@ def test_alias_contacts_resolvent_le_meme_starter():
     assert ids == ["contact-simple", "contact-simple", "contact-simple"]
 
 
-def test_starters_2_3_4_sont_coming_soon():
+def test_starter_2_disponible_et_3_4_coming_soon():
     statuses = {starter["number"]: starter["status"] for starter in all_starters()}
     assert statuses[1] == "available"
-    assert statuses[2] == "coming_soon"
+    assert statuses[2] == "available"
     assert statuses[3] == "coming_soon"
     assert statuses[4] == "coming_soon"
 
 
+def test_alias_utilisateurs_auth_resolvent_le_meme_starter():
+    ids = [
+        resolve(identifier)["id"]
+        for identifier in ("2", "auth", "utilisateurs", "utilisateurs-auth")
+    ]
+    assert ids == [
+        "utilisateurs-auth",
+        "utilisateurs-auth",
+        "utilisateurs-auth",
+        "utilisateurs-auth",
+    ]
+
+
+@pytest.mark.parametrize("identifier", ["2", "auth", "utilisateurs-auth"])
+def test_starter_build_auth_dry_run_fonctionne(identifier, capsys):
+    cmd_starter_build([identifier, "--dry-run"])
+    output = capsys.readouterr().out
+    assert "Utilisateurs / authentification" in output
+    assert "mvc/controllers/auth_controller.py" in output
+    assert "Aucun fichier écrit" in output
+
+
+def test_starter_build_auth_public_refuse(capsys):
+    with pytest.raises(SystemExit) as exc:
+        cmd_starter_build(["2", "--public"])
+
+    assert exc.value.code == 1
+    output = capsys.readouterr().out
+    assert "--public n'est pas applicable" in output
+
+
 def test_starter_build_refuse_un_starter_coming_soon(capsys):
     with pytest.raises(SystemExit) as exc:
-        cmd_starter_build(["2", "--dry-run"])
+        cmd_starter_build(["3", "--dry-run"])
 
     assert exc.value.code == 1
     output = capsys.readouterr().out
