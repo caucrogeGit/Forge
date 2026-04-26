@@ -1,0 +1,12 @@
+{
+  "format_version": 1,
+  "entity": "Eleve",
+  "table": "eleve",
+  "fields": [
+    { "name": "id",     "sql_type": "INT",        "primary_key": true, "auto_increment": true },
+    { "name": "nom",    "sql_type": "VARCHAR(80)", "constraints": { "not_empty": true, "max_length": 80 } },
+    { "name": "prenom", "sql_type": "VARCHAR(80)", "constraints": { "not_empty": true, "max_length": 80 } },
+    { "name": "classe", "sql_type": "VARCHAR(40)", "constraints": { "not_empty": true, "max_length": 40 } },
+    { "name": "actif",  "sql_type": "BOOLEAN" }
+  ]
+}

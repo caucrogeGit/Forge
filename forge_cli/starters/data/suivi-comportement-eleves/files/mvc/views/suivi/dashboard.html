@@ -1,0 +1,52 @@
+{% extends "layouts/app.html" %}
+
+{% block content %}
+<section class="bg-white border border-slate-200 rounded shadow-sm p-6 mb-6">
+    <p class="text-sm font-semibold text-orange-600 uppercase">Dashboard</p>
+    <h1 class="text-2xl font-bold text-slate-900 mt-1">
+        Bonjour {{ utilisateur.Prenom or utilisateur.Login }}
+    </h1>
+    <p class="text-slate-600 mt-2">Bienvenue dans l'application de suivi pédagogique.</p>
+</section>
+
+<div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-slate-800">Cours récents</h2>
+    <div class="flex gap-3">
+        <a href="/eleves" class="text-sm text-orange-700 hover:underline">Voir les élèves →</a>
+        <a href="/cours" class="text-sm text-orange-700 hover:underline">Voir tous les cours →</a>
+    </div>
+</div>
+
+{% if cours_recents %}
+<div class="bg-white shadow rounded overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b">
+            <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-slate-600">Date</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-slate-600">Cours</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-slate-600">Classe</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-slate-600">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for c in cours_recents %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm text-slate-700">{{ c.DateCours }}</td>
+                <td class="px-4 py-3">
+                    <a href="/cours/{{ c.Id }}" class="font-medium text-slate-900 hover:underline">{{ c.Titre }}</a>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ c.Classe }}</td>
+                <td class="px-4 py-3 text-right">
+                    <a href="/observations/new" class="text-sm text-orange-700 hover:underline">Nouvelle observation</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white shadow rounded p-6 text-slate-600">
+    Aucun cours pour l'instant. Lancez <code>python scripts/seed_suivi.py</code> pour peupler la base.
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+# forge-starter:suivi-comportement-eleves:start
+from mvc.controllers.auth_controller import AuthController
+from mvc.controllers.suivi_controller import SuiviController
+from mvc.controllers.eleve_controller import EleveController
+from mvc.controllers.cours_controller import CoursController
+from mvc.controllers.observation_cours_controller import ObservationCoursController
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/login", AuthController.login_form, name="login_form")
+    pub.add("POST", "/login", AuthController.login,      name="login")
+
+router.add("POST", "/logout",                 AuthController.logout,               name="logout")
+router.add("GET",  "/suivi",                  SuiviController.index,               name="suivi_dashboard")
+router.add("GET",  "/eleves",                 EleveController.index,               name="eleve_index")
+router.add("GET",  "/eleves/{id}",            EleveController.show,                name="eleve_show")
+router.add("GET",  "/cours",                  CoursController.index,               name="cours_index")
+router.add("GET",  "/cours/{id}",             CoursController.show,                name="cours_show")
+router.add("GET",  "/observations/new",       ObservationCoursController.new,      name="obs_new")
+router.add("POST", "/observations",           ObservationCoursController.create,   name="obs_create")
+router.add("GET",  "/observations/{id}",      ObservationCoursController.show,     name="obs_show")
+router.add("GET",  "/observations/{id}/edit", ObservationCoursController.edit,     name="obs_edit")
+router.add("POST", "/observations/{id}",      ObservationCoursController.update,   name="obs_update")
+# forge-starter:suivi-comportement-eleves:end

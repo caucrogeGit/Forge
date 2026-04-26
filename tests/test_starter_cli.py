@@ -44,7 +44,6 @@ def test_starter_list_contient_niveau_mot_cle(capsys):
     output = capsys.readouterr().out
     assert "Starter apps Forge" in output
     assert "disponible" in output
-    assert "à venir" in output
 
 
 def test_alias_contacts_resolvent_le_meme_starter():
@@ -52,12 +51,12 @@ def test_alias_contacts_resolvent_le_meme_starter():
     assert ids == ["contact-simple", "contact-simple", "contact-simple"]
 
 
-def test_starters_1_2_3_disponibles_et_4_coming_soon():
+def test_les_4_starters_sont_disponibles():
     statuses = {starter["number"]: starter["status"] for starter in all_starters()}
     assert statuses[1] == "available"
     assert statuses[2] == "available"
     assert statuses[3] == "available"
-    assert statuses[4] == "coming_soon"
+    assert statuses[4] == "available"
 
 
 def test_alias_utilisateurs_auth_resolvent_le_meme_starter():
@@ -325,14 +324,102 @@ def test_script_seed_villes_configure_le_projet():
     assert "Dreux" in script
 
 
-def test_starter_build_refuse_un_starter_coming_soon(capsys):
+def test_starter_build_refuse_un_identifiant_inconnu(capsys):
     with pytest.raises(SystemExit) as exc:
-        cmd_starter_build(["4", "--dry-run"])
+        cmd_starter_build(["99", "--dry-run"])
+
+    assert exc.value.code == 1
+
+
+def test_alias_suivi_resolvent_le_meme_starter():
+    ids = [
+        resolve(identifier)["id"]
+        for identifier in ("4", "suivi", "suivi-comportement-eleves")
+    ]
+    assert ids == [
+        "suivi-comportement-eleves",
+        "suivi-comportement-eleves",
+        "suivi-comportement-eleves",
+    ]
+
+
+@pytest.mark.parametrize("identifier", ["4", "suivi", "suivi-comportement-eleves"])
+def test_starter_build_suivi_dry_run_fonctionne(identifier, capsys):
+    cmd_starter_build([identifier, "--dry-run"])
+    output = capsys.readouterr().out
+    assert "Suivi pédagogique" in output
+    assert "mvc/entities/eleve/" in output
+    assert "mvc/entities/cours/" in output
+    assert "mvc/entities/observation_cours/" in output
+    assert "mvc/entities/relations.json" in output
+    assert "mvc/entities/relations.sql" in output
+    assert "scripts/create_auth_user.py" in output
+    assert "scripts/seed_suivi.py" in output
+    assert "Aucun fichier écrit" in output
+
+
+def test_starter_build_suivi_dry_run_annonce_routes(capsys):
+    cmd_starter_build(["4", "--dry-run"])
+    output = capsys.readouterr().out
+    assert "GET    /login" in output
+    assert "POST   /login" in output
+    assert "POST   /logout" in output
+    assert "GET    /suivi" in output
+    assert "GET    /eleves" in output
+    assert "GET    /cours" in output
+    assert "GET    /observations/new" in output
+    assert "POST   /observations" in output
+    assert "GET    /observations/{id}" in output
+    assert "GET    /observations/{id}/edit" in output
+    assert "POST   /observations/{id}" in output
+
+
+def test_starter_suivi_logout_pas_dans_groupe_public():
+    snippet_path = (
+        resolve("4")["_dir"] / "routes.py.snippet"
+    )
+    snippet = snippet_path.read_text(encoding="utf-8")
+    in_public_block = False
+    for line in snippet.splitlines():
+        if 'public=True' in line:
+            in_public_block = True
+        if in_public_block and '"/logout"' in line:
+            raise AssertionError("/logout est dans un bloc public=True")
+        if in_public_block and line.strip() == "":
+            in_public_block = False
+
+
+def test_starter_build_suivi_public_refuse(capsys):
+    with pytest.raises(SystemExit) as exc:
+        cmd_starter_build(["4", "--public"])
 
     assert exc.value.code == 1
     output = capsys.readouterr().out
-    assert "n'est pas encore disponible" in output
-    assert "forge starter:list" in output
+    assert "--public n'est pas applicable" in output
+
+
+def test_script_create_auth_user_suivi_configure_le_projet():
+    script = (
+        resolve("4")["_dir"]
+        / "files"
+        / "scripts"
+        / "create_auth_user.py"
+    ).read_text(encoding="utf-8")
+    assert "sys.path.insert(0, str(PROJECT_ROOT))" in script
+    assert "forge.configure(" in script
+    assert "hacher_mot_de_passe(PASSWORD)" in script
+
+
+def test_script_seed_suivi_configure_le_projet():
+    script = (
+        resolve("4")["_dir"]
+        / "files"
+        / "scripts"
+        / "seed_suivi.py"
+    ).read_text(encoding="utf-8")
+    assert "sys.path.insert(0, str(PROJECT_ROOT))" in script
+    assert "forge.configure(" in script
+    assert "observation_cours" in script
 
 
 def test_entrypoint_starter_list_accessible(monkeypatch, capsys):
@@ -341,4 +428,4 @@ def test_entrypoint_starter_list_accessible(monkeypatch, capsys):
     forge.main()
     output, _ = capsys.readouterr()
     assert "Starter apps Forge" in output
-    assert "Suivi comportement élèves" in output
+    assert "Suivi pédagogique" in output

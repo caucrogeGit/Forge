@@ -151,7 +151,7 @@ router.add("POST", "/observations/{id}",    ObservationCoursController.update,  
   "table": "cours",
   "fields": [
     { "name": "id",         "sql_type": "INT",          "primary_key": true, "auto_increment": true },
-    { "name": "date_cours", "sql_type": "DATE",         "constraints": { "not_empty": true } },
+    { "name": "date_cours", "sql_type": "DATE" },
     { "name": "titre",      "sql_type": "VARCHAR(120)", "constraints": { "not_empty": true, "max_length": 120 } },
     { "name": "classe",     "sql_type": "VARCHAR(40)",  "constraints": { "not_empty": true, "max_length": 40 } }
   ]

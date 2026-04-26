@@ -1,0 +1,63 @@
+{% extends "layouts/app.html" %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <p class="text-sm font-semibold text-orange-600 uppercase">Cours</p>
+        <h1 class="text-2xl font-bold text-slate-900 mt-1">{{ cours.Titre }}</h1>
+        <p class="text-sm text-slate-500 mt-1">{{ cours.DateCours }} — {{ cours.Classe }}</p>
+    </div>
+    <a href="/observations/new" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 text-sm">
+        Nouvelle observation
+    </a>
+</div>
+
+<h2 class="text-base font-semibold text-slate-800 mb-3">Observations pour ce cours</h2>
+
+{% if observations %}
+<div class="bg-white shadow rounded overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b">
+            <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-slate-600">Élève</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-slate-600">Comportements</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-slate-600"></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for obs in observations %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 text-sm font-medium text-slate-900">
+                    <a href="/eleves/{{ obs.EleveId }}" class="hover:underline">{{ obs.ElevePrenom }} {{ obs.EleveNom }}</a>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">
+                    {% set flags = [] %}
+                    {% if obs.NeTravaillePas %}{% set _ = flags.append("Ne travaille pas") %}{% endif %}
+                    {% if obs.Bavarde %}{% set _ = flags.append("Bavarde") %}{% endif %}
+                    {% if obs.Dort %}{% set _ = flags.append("Dort") %}{% endif %}
+                    {% if obs.Telephone %}{% set _ = flags.append("Téléphone") %}{% endif %}
+                    {% if obs.Perturbe %}{% set _ = flags.append("Perturbe") %}{% endif %}
+                    {% if obs.RefuseConsigne %}{% set _ = flags.append("Refuse consigne") %}{% endif %}
+                    {{ flags | join(", ") or "—" }}
+                    {% if obs.Remarque %}
+                    <div class="text-slate-500 italic">{{ obs.Remarque }}</div>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-right">
+                    <a href="/observations/{{ obs.Id }}" class="text-sm text-orange-700 hover:underline">Voir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white shadow rounded p-6 text-slate-600">
+    Aucune observation pour ce cours.
+</div>
+{% endif %}
+
+<div class="mt-6">
+    <a href="/cours" class="text-orange-700 hover:underline text-sm">← Retour aux cours</a>
+</div>
+{% endblock %}
