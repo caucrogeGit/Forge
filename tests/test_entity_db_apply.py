@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from forge_cli.entities import db_apply
 from forge_cli.entities.db_apply import (
     DbApplyError,
     apply_model_sql,
@@ -150,9 +151,39 @@ def _install_fake_modules(monkeypatch, connection: FakeConnection):
         return connection
 
     fake_mariadb = types.SimpleNamespace(connect=connect)
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+    _patch_db_apply_config(monkeypatch, fake_config)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
     return captured_kwargs
+
+
+def _patch_db_apply_config(monkeypatch, fake_config: types.SimpleNamespace) -> None:
+    monkeypatch.setattr(
+        db_apply,
+        "load_db_apply_config",
+        lambda: db_apply.DbApplyConfig(
+            host=fake_config.DB_APP_HOST,
+            port=fake_config.DB_APP_PORT,
+            login=fake_config.DB_APP_LOGIN,
+            password=fake_config.DB_APP_PWD,
+            database=fake_config.DB_NAME,
+        ),
+    )
+
+
+def _write_config(path: Path, fake_config: types.SimpleNamespace) -> None:
+    path.write_text(
+        "\n".join(
+            [
+                f"DB_APP_HOST={fake_config.DB_APP_HOST!r}",
+                f"DB_APP_PORT={fake_config.DB_APP_PORT!r}",
+                f"DB_APP_LOGIN={fake_config.DB_APP_LOGIN!r}",
+                f"DB_APP_PWD={fake_config.DB_APP_PWD!r}",
+                f"DB_NAME={fake_config.DB_NAME!r}",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
 
 
 def test_collect_sql_files_orders_entities_then_relations(tmp_path: Path):
@@ -223,7 +254,7 @@ def test_apply_model_sql_rolls_back_on_first_sql_error(tmp_path: Path, monkeypat
     assert connection.rolled_back is True
 
 
-def test_load_db_apply_config_uses_app_credentials(monkeypatch):
+def test_load_db_apply_config_uses_app_credentials(monkeypatch, tmp_path):
     fake_config = types.SimpleNamespace(
         DB_APP_HOST="app-host",
         DB_APP_PORT=3310,
@@ -231,7 +262,8 @@ def test_load_db_apply_config_uses_app_credentials(monkeypatch):
         DB_APP_PWD="app-pwd",
         DB_NAME="app-db",
     )
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+    _write_config(tmp_path / "config.py", fake_config)
+    monkeypatch.chdir(tmp_path)
 
     cfg = load_db_apply_config()
 
@@ -240,6 +272,33 @@ def test_load_db_apply_config_uses_app_credentials(monkeypatch):
     assert cfg.login == "app-user"
     assert cfg.password == "app-pwd"
     assert cfg.database == "app-db"
+
+
+def test_load_db_apply_config_uses_current_working_directory(monkeypatch, tmp_path):
+    fake_config = types.SimpleNamespace(
+        DB_APP_HOST="localhost",
+        DB_APP_PORT=3306,
+        DB_APP_LOGIN="forge_app",
+        DB_APP_PWD="secret",
+        DB_NAME="cwd_apply_db",
+    )
+    _write_config(tmp_path / "config.py", fake_config)
+    monkeypatch.chdir(tmp_path)
+
+    cfg = load_db_apply_config()
+
+    assert cfg.database == "cwd_apply_db"
+
+
+def test_db_apply_hors_projet_erreur_propre(monkeypatch, tmp_path, capsys):
+    monkeypatch.chdir(tmp_path)
+
+    with pytest.raises(SystemExit):
+        db_apply.main(["db:apply"])
+
+    output = capsys.readouterr().out
+    assert "config.py absent" in output or "mvc/entities" in output
+    assert "ModuleNotFoundError" not in output
 
 
 def test_apply_model_sql_reports_missing_database_preparation(tmp_path: Path, monkeypatch):
@@ -259,7 +318,7 @@ def test_apply_model_sql_reports_missing_database_preparation(tmp_path: Path, mo
         raise RuntimeError("Unknown database")
 
     fake_mariadb = types.SimpleNamespace(connect=connect)
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+    _patch_db_apply_config(monkeypatch, fake_config)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
 
     with pytest.raises(DbApplyError, match="forge db:init"):

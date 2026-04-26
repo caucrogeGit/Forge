@@ -3,6 +3,7 @@ import types
 
 import pytest
 
+from forge_cli.entities import db_init
 from forge_cli.entities.db_init import DbInitError, init_project_database, load_db_init_config
 
 
@@ -70,8 +71,8 @@ class FakeConnection:
         pass
 
 
-def test_load_db_init_config_reads_admin_and_app_separately(monkeypatch):
-    fake_config = types.SimpleNamespace(
+def _fake_config() -> types.SimpleNamespace:
+    return types.SimpleNamespace(
         DB_ADMIN_HOST="admin-host",
         DB_ADMIN_PORT=3307,
         DB_ADMIN_LOGIN="admin-user",
@@ -84,7 +85,54 @@ def test_load_db_init_config_reads_admin_and_app_separately(monkeypatch):
         DB_APP_LOGIN="app-user",
         DB_APP_PWD="app-pwd",
     )
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+
+
+def _patch_db_init_config(monkeypatch, fake_config: types.SimpleNamespace) -> None:
+    monkeypatch.setattr(
+        db_init,
+        "load_db_init_config",
+        lambda: db_init.DbInitConfig(
+            admin_host=fake_config.DB_ADMIN_HOST,
+            admin_port=fake_config.DB_ADMIN_PORT,
+            admin_login=fake_config.DB_ADMIN_LOGIN,
+            admin_password=fake_config.DB_ADMIN_PWD,
+            db_name=fake_config.DB_NAME,
+            db_charset=fake_config.DB_CHARSET,
+            db_collation=fake_config.DB_COLLATION,
+            app_host=fake_config.DB_APP_HOST,
+            app_port=fake_config.DB_APP_PORT,
+            app_login=fake_config.DB_APP_LOGIN,
+            app_password=fake_config.DB_APP_PWD,
+        ),
+    )
+
+
+def _write_config(path, fake_config: types.SimpleNamespace) -> None:
+    path.write_text(
+        "\n".join(
+            [
+                f"DB_ADMIN_HOST={fake_config.DB_ADMIN_HOST!r}",
+                f"DB_ADMIN_PORT={fake_config.DB_ADMIN_PORT!r}",
+                f"DB_ADMIN_LOGIN={fake_config.DB_ADMIN_LOGIN!r}",
+                f"DB_ADMIN_PWD={fake_config.DB_ADMIN_PWD!r}",
+                f"DB_NAME={fake_config.DB_NAME!r}",
+                f"DB_CHARSET={fake_config.DB_CHARSET!r}",
+                f"DB_COLLATION={fake_config.DB_COLLATION!r}",
+                f"DB_APP_HOST={fake_config.DB_APP_HOST!r}",
+                f"DB_APP_PORT={fake_config.DB_APP_PORT!r}",
+                f"DB_APP_LOGIN={fake_config.DB_APP_LOGIN!r}",
+                f"DB_APP_PWD={fake_config.DB_APP_PWD!r}",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_load_db_init_config_reads_admin_and_app_separately(monkeypatch, tmp_path):
+    fake_config = _fake_config()
+    _write_config(tmp_path / "config.py", fake_config)
+    monkeypatch.chdir(tmp_path)
 
     cfg = load_db_init_config()
 
@@ -99,6 +147,28 @@ def test_load_db_init_config_reads_admin_and_app_separately(monkeypatch):
     assert cfg.app_port == 3306
     assert cfg.app_login == "app-user"
     assert cfg.app_password == "app-pwd"
+
+
+def test_load_db_init_config_uses_current_working_directory(monkeypatch, tmp_path):
+    fake_config = _fake_config()
+    fake_config.DB_NAME = "cwd_db"
+    _write_config(tmp_path / "config.py", fake_config)
+    monkeypatch.chdir(tmp_path)
+
+    cfg = load_db_init_config()
+
+    assert cfg.db_name == "cwd_db"
+
+
+def test_db_init_hors_projet_erreur_propre(monkeypatch, tmp_path, capsys):
+    monkeypatch.chdir(tmp_path)
+
+    with pytest.raises(SystemExit):
+        db_init.main(["db:init"])
+
+    output = capsys.readouterr().out
+    assert "config.py absent" in output
+    assert "ModuleNotFoundError" not in output
 
 
 def test_db_init_creates_missing_database_and_app_user(monkeypatch):
@@ -130,7 +200,7 @@ def test_db_init_creates_missing_database_and_app_user(monkeypatch):
         return connection
 
     fake_mariadb = types.SimpleNamespace(connect=connect)
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+    _patch_db_init_config(monkeypatch, fake_config)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
 
     actions = init_project_database()
@@ -184,7 +254,7 @@ def test_db_init_reports_existing_database_and_user_then_reapplies_privileges(mo
         return connection
 
     fake_mariadb = types.SimpleNamespace(connect=connect)
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+    _patch_db_init_config(monkeypatch, fake_config)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
 
     actions = init_project_database()
@@ -231,7 +301,7 @@ def test_db_init_requires_manual_verification_for_existing_user_on_other_host(mo
         return connection
 
     fake_mariadb = types.SimpleNamespace(connect=connect)
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+    _patch_db_init_config(monkeypatch, fake_config)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
 
     with pytest.raises(DbInitError, match="Vérification manuelle nécessaire"):
@@ -271,7 +341,7 @@ def test_db_init_rolls_back_on_sql_error(monkeypatch):
         return connection
 
     fake_mariadb = types.SimpleNamespace(connect=connect)
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+    _patch_db_init_config(monkeypatch, fake_config)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
 
     with pytest.raises(DbInitError, match="Provisioning MariaDB impossible"):
@@ -317,7 +387,7 @@ def test_db_init_is_idempotent(monkeypatch):
         return connections.pop(0)
 
     fake_mariadb = types.SimpleNamespace(connect=connect)
-    monkeypatch.setitem(sys.modules, "config", fake_config)
+    _patch_db_init_config(monkeypatch, fake_config)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
 
     first_actions = init_project_database()

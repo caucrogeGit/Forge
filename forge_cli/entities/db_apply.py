@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from forge_cli.entities.model import ModelValidationError, check_model
+from forge_cli.project_config import ProjectConfigError, load_project_config
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,10 @@ class DbApplyConfig:
 
 
 def apply_model_sql(entities_root: Path) -> list[Path]:
+    if not entities_root.exists():
+        raise DbApplyError(
+            f"Projet Forge introuvable : {entities_root.as_posix()} absent."
+        )
     check_model(entities_root)
     sql_files = collect_sql_files(entities_root)
     sql_contents = verify_sql_files(sql_files)
@@ -111,13 +116,12 @@ def main(argv: list[str] | None = None) -> None:
             print(f"[EXECUTE] {path.as_posix()}")
         if relations_path.exists() and not relations_path.read_text(encoding="utf-8").strip():
             print(f"[NO-OP] {relations_path.as_posix()} est vide.")
-    except (ModelValidationError, DbApplyError, ValueError) as exc:
+    except (ModelValidationError, DbApplyError, ProjectConfigError, ValueError) as exc:
         print(f"[ERREUR] {exc}")
         raise SystemExit(1)
 
 
 def _connect_db():
-    import config
     import mariadb
 
     cfg = load_db_apply_config()
@@ -138,7 +142,7 @@ def _connect_db():
 
 
 def load_db_apply_config() -> DbApplyConfig:
-    import config
+    config = load_project_config()
 
     return DbApplyConfig(
         host=config.DB_APP_HOST,

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from forge_cli.project_config import ProjectConfigError, load_project_config
+
 DEFAULT_APP_PRIVILEGES = (
     "SELECT",
     "INSERT",
@@ -37,7 +39,7 @@ class DbInitConfig:
 
 
 def load_db_init_config() -> DbInitConfig:
-    import config
+    config = load_project_config()
 
     return DbInitConfig(
         admin_host=config.DB_ADMIN_HOST,
@@ -135,7 +137,7 @@ def main(argv: list[str] | None = None) -> None:
         print("[OK] Environnement MariaDB du projet prêt.")
         for action in actions:
             print(f"[FAIT] {action}")
-    except (DbInitError, ValueError) as exc:
+    except (DbInitError, ProjectConfigError, ValueError) as exc:
         print(f"[ERREUR] {exc}")
         raise SystemExit(1)
 
