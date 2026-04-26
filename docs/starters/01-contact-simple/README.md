@@ -43,5 +43,5 @@ python app.py
 
 ## Documentation complète
 
-- [Guide complet du starter](../../starter-app-01-contact-simple.md)
+- [Guide complet du starter](../../starter-app-01-contacts.md)
 - [Reconstruction pas à pas](rebuild.md)

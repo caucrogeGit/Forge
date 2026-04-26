@@ -6,7 +6,7 @@ Les starter apps Forge sont des applications de référence progressives. Chacun
 
 | Niveau | Application | Rôle principal |
 |--------|-------------|----------------|
-| 1 | [Contact simple](starter-app-01-contact-simple.md) | CRUD basique sur une entité unique |
+| 1 | [Contact simple](starter-app-01-contacts.md) | CRUD basique sur une entité unique |
 | 2 | [Utilisateurs / auth](starter-app-02-utilisateurs-auth.md) | Login, sessions, routes protégées, CSRF |
 | 3 | [Carnet relationnel](starter-app-03-carnet-contacts.md) | `many_to_one`, pivot many-to-many, `JOIN` SQL |
 | 4 | [Suivi élèves](starter-app-04-suivi-comportement-eleves.md) | Application métier, cases à cocher, synthèses |
