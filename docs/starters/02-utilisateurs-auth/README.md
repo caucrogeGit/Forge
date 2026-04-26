@@ -24,14 +24,12 @@ cd AuthApp
 source .venv/bin/activate
 forge doctor
 forge db:init
-forge make:entity Utilisateur --no-input
-# Éditer mvc/entities/utilisateur/utilisateur.json
-# Champs : login VARCHAR(80) unique, password_hash VARCHAR(255), actif BOOLEAN
-forge build:model
-forge db:apply
-# Créer manuellement AuthController, vues login et dashboard
-# Voir le guide du starter pour les détails
+forge starter:build 2
+python scripts/create_auth_user.py
 ```
+
+Alias disponibles : `auth`, `utilisateurs`, `utilisateurs-auth`.
+Ce starter ne génère pas un CRUD utilisateur ; il installe un flux applicatif login/dashboard/profil.
 
 ## Lancement
 

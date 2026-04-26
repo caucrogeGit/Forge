@@ -1,0 +1,13 @@
+# forge-starter:utilisateurs-auth:start
+from mvc.controllers.auth_controller import AuthController
+from mvc.controllers.dashboard_controller import DashboardController
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/login", AuthController.login_form, name="login_form")
+    pub.add("POST", "/login", AuthController.login,      name="login")
+
+with router.group("") as app:
+    app.add("GET",  "/dashboard", DashboardController.index,   name="dashboard")
+    app.add("GET",  "/profil",    DashboardController.profile, name="profile")
+    app.add("POST", "/logout",    AuthController.logout,       name="logout")
+# forge-starter:utilisateurs-auth:end

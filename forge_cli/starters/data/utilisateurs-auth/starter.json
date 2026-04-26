@@ -1,9 +1,27 @@
 {
   "id": "utilisateurs-auth",
   "number": 2,
-  "name": "Utilisateurs et authentification",
-  "aliases": ["utilisateurs", "auth", "2"],
+  "name": "Utilisateurs / authentification",
+  "kind": "application",
+  "entity": "Utilisateur",
+  "entity_json": "entities/utilisateur.json",
+  "aliases": ["utilisateurs-auth", "utilisateurs", "auth", "2"],
   "description": "Starter 2 — Login, sessions, routes protégées, CSRF",
-  "status": "coming_soon",
-  "doc_url": "https://caucrogegit.github.io/Forge/starter-app-02-utilisateurs-auth/"
+  "status": "available",
+  "requires_db": true,
+  "supports_public": false,
+  "routes_marker": "utilisateurs-auth",
+  "routes_snippet": "routes.py.snippet",
+  "doc_url": "https://caucrogegit.github.io/Forge/starter-app-02-utilisateurs-auth/",
+  "check_paths": [
+    "mvc/entities/utilisateur",
+    "mvc/controllers/auth_controller.py",
+    "mvc/controllers/dashboard_controller.py",
+    "mvc/models/auth_model.py",
+    "mvc/views/layouts/app.html",
+    "mvc/views/auth/login.html",
+    "mvc/views/dashboard/index.html",
+    "mvc/views/dashboard/profil.html",
+    "scripts/create_auth_user.py"
+  ]
 }

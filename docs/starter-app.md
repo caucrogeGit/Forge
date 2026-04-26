@@ -6,10 +6,10 @@
   <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Des parcours progressifs pour apprendre Forge avec JSON canonique, SQL visible, contrôleurs explicites et routes ajoutées manuellement.</p>
 </div>
 
-Les starters sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` existe actuellement pour le starter 1 — Contacts uniquement ; les starters 2, 3 et 4 sont documentés, mais leur génération automatique est encore à venir.
+Les starters sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` existe actuellement pour les starters 1 — Contacts et 2 — Utilisateurs / authentification ; les starters 3 et 4 sont documentés, mais leur génération automatique est encore à venir.
 
 !!! warning "État de la génération automatique"
-    `forge starter:build` est disponible pour le starter 1 — Contacts. Les starters 2, 3 et 4 restent des parcours pédagogiques documentés, avec génération automatique à venir.
+    `forge starter:build` est disponible pour Contacts et Utilisateurs / authentification. Les starters 3 et 4 restent des parcours pédagogiques documentés, avec génération automatique à venir.
 
 ## Vue D'ensemble
 
@@ -27,10 +27,14 @@ forge starter:list
 forge starter:build 1
 forge starter:build contacts
 forge starter:build contact-simple
+forge starter:build 2
+forge starter:build auth
+forge starter:build utilisateurs-auth
 ```
 
 Les alias `1`, `contacts` et `contact-simple` ciblent le même starter Contacts.
-Les autres starters apparaissent dans `forge starter:list`, mais restent marqués à venir.
+Les alias `2`, `auth`, `utilisateurs` et `utilisateurs-auth` ciblent le starter Utilisateurs / authentification.
+Les starters 3 et 4 apparaissent dans `forge starter:list`, mais restent marqués à venir.
 
 <div class="grid cards" markdown>
 
@@ -50,7 +54,7 @@ Les autres starters apparaissent dans `forge starter:list`, mais restent marqué
 
     ---
 
-    La commande `forge starter:build` automatise aujourd'hui uniquement Contacts.
+    La commande `forge starter:build` automatise aujourd'hui Contacts et Utilisateurs / authentification.
 
 </div>
 

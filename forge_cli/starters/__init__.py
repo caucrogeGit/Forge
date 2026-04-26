@@ -55,6 +55,13 @@ def cmd_starter_build(args: list[str]) -> None:
         print("Voir : forge starter:list")
         raise SystemExit(1)
 
+    if public and meta.get("supports_public") is False:
+        print(
+            "--public n'est pas applicable à ce starter : "
+            "il contient volontairement des routes publiques et protégées."
+        )
+        raise SystemExit(1)
+
     if dry:
         dry_run(meta, public=public)
         return

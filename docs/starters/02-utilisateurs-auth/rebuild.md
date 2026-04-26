@@ -4,6 +4,25 @@ Ce fichier reconstruit un flux applicatif simple : accueil public, login, dashbo
 
 ## 1. Commandes Forge
 
+Génération automatique :
+
+```bash
+forge doctor
+forge db:init
+forge starter:build 2
+python scripts/create_auth_user.py
+```
+
+Prévisualisation :
+
+```bash
+forge starter:build 2 --dry-run
+```
+
+`--public` n'est pas applicable à ce starter : les routes publiques et protégées font partie de l'exemple.
+
+Flux manuel équivalent :
+
 ```bash
 forge doctor
 forge db:init
@@ -90,10 +109,8 @@ Le CRUD utilisateur complet n’est pas nécessaire pour ce starter. Le flux d�
 ```python
 from mvc.controllers.auth_controller import AuthController
 from mvc.controllers.dashboard_controller import DashboardController
-from mvc.controllers.home_controller import HomeController
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home")
     pub.add("GET", "/login", AuthController.login_form, name="login_form")
     pub.add("POST", "/login", AuthController.login, name="login")
 
@@ -126,22 +143,21 @@ mvc/views/auth/login.html
 mvc/views/dashboard/index.html
 mvc/views/dashboard/profil.html
 mvc/views/layouts/app.html
+scripts/create_auth_user.py
 mvc/routes.py
 ```
 
 ## 5. Créer un utilisateur de test
 
-L’auth réelle Forge lit l’utilisateur avec `get_user_by_login(login)` et vérifie `PasswordHash` avec `verifier_mot_de_passe()`. Créez donc un hash avec `hacher_mot_de_passe()` avant insertion.
-
-Si vous conservez `mvc.models.auth_model` tel qu’il est livré par Forge, créez aussi les tables `role` et `utilisateur_role`, par exemple avec :
+L’auth réelle Forge lit l’utilisateur avec `get_user_by_login(login)` et vérifie `PasswordHash` avec `verifier_mot_de_passe()`. Le starter généré fournit un script prêt à l'emploi :
 
 ```bash
-python cmd/make.py security:init --env dev
+python scripts/create_auth_user.py
 ```
 
-Le starter ne donne pas de permissions multi-rôles à l’utilisateur : ces tables existent seulement parce que le modèle d’auth réel lit la liste des rôles.
+Le modèle `mvc/models/auth_model.py` du starter lit uniquement `utilisateur` et ajoute `roles = []`. Il ne dépend pas de tables `role` ou `utilisateur_role`.
 
-Script minimal :
+Script minimal équivalent :
 
 ```python
 from core.database.connection import get_connection, close_connection
