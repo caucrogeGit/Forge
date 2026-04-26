@@ -1,0 +1,9 @@
+{
+  "id": "utilisateurs-auth",
+  "number": 2,
+  "name": "Utilisateurs et authentification",
+  "aliases": ["utilisateurs", "auth", "2"],
+  "description": "Starter 2 — Login, sessions, routes protégées, CSRF",
+  "status": "coming_soon",
+  "doc_url": "https://caucrogegit.github.io/Forge/starter-app-02-utilisateurs-auth/"
+}

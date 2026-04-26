@@ -49,7 +49,7 @@ from forge_cli.entities.model import main as model_main
 from forge_cli.sync_landing import main as sync_landing_main
 from forge_cli.uploads import main as upload_main
 from forge_cli.deploy import main as deploy_main
-from forge_cli.starters import main as starters_main
+from forge_cli.starters import main as starters_main  # noqa: E402 (package replaces starters.py)
 
 
 _FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"
@@ -411,7 +411,7 @@ def main() -> None:
         deploy_main(args)
         return
 
-    if command == "starter:list":
+    if command in ("starter:list", "starter:build"):
         starters_main(args)
         return
 

@@ -1,0 +1,31 @@
+{
+  "id": "contact-simple",
+  "number": 1,
+  "name": "Contacts",
+  "entity": "Contact",
+  "aliases": ["contacts", "1"],
+  "description": "Starter 1 — CRUD simple de contacts",
+  "status": "available",
+  "requires_db": true,
+  "routes_marker": "contact-simple",
+  "doc_url": "https://caucrogegit.github.io/Forge/starter-app-01-contacts/",
+  "routes": {
+    "prefix": "/contacts",
+    "actions": [
+      {"method": "GET",  "path": "",              "action": "index",   "name": "contact_index"},
+      {"method": "GET",  "path": "/new",          "action": "new",     "name": "contact_new"},
+      {"method": "POST", "path": "",              "action": "create",  "name": "contact_create"},
+      {"method": "GET",  "path": "/{id}",         "action": "show",    "name": "contact_show"},
+      {"method": "GET",  "path": "/{id}/edit",    "action": "edit",    "name": "contact_edit"},
+      {"method": "POST", "path": "/{id}",         "action": "update",  "name": "contact_update"},
+      {"method": "POST", "path": "/{id}/delete",  "action": "destroy", "name": "contact_destroy"}
+    ]
+  },
+  "check_paths": [
+    "mvc/entities/contact",
+    "mvc/controllers/contact_controller.py",
+    "mvc/models/contact_model.py",
+    "mvc/forms/contact_form.py",
+    "mvc/views/contact"
+  ]
+}
