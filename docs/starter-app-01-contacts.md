@@ -523,30 +523,244 @@ update_contact(id, data)
 delete_contact(id)
 ```
 
-### Syntaxe Jinja utilisée
+### Création des templates Jinja
 
-Les vues générées utilisent la syntaxe Jinja2 classique :
+La commande `forge make:crud Contact` ne crée pas une interface cachée. Elle écrit de vrais fichiers HTML dans `mvc/views/`. Ces fichiers sont des templates Jinja2 classiques : le développeur peut les ouvrir, les lire, les modifier ou les remplacer.
 
-- `{% extends "layouts/app.html" %}` pour hériter du layout ;
-- `{% block content %}` pour remplir la zone principale ;
-- `{% for contact in contacts %}` pour afficher la liste ;
-- `{% if form.errors %}` pour afficher les erreurs ;
-- `{{ csrf_token }}` dans le champ caché du formulaire ;
-- `{{ contact.Nom }}`, `{{ contact.Email }}` et `{{ contact.Id }}` pour les dictionnaires SQL retournés par `cursor(dictionary=True)`.
+#### Fichiers de templates créés
 
-Les champs de formulaire utilisent les noms Python, par exemple `form.value("nom")`, tandis que les vues de liste et de détail générées affichent les colonnes SQL en PascalCase.
+```text
+mvc/views/layouts/app.html      layout commun de l'application
+mvc/views/contact/index.html    liste des contacts
+mvc/views/contact/show.html     détail d'un contact
+mvc/views/contact/form.html     formulaire de création et de modification
+```
 
-### Classes CSS/Tailwind importantes
+Le fichier `app.html` sert de squelette général. Les vues `index.html`, `show.html` et `form.html` remplissent seulement la zone centrale de la page.
 
-Le CRUD généré s'appuie sur des classes utilitaires simples :
+#### 1. Le layout commun
 
-- `max-w-5xl`, `mx-auto`, `px-6`, `py-8` pour la largeur et l'espacement ;
-- `bg-white`, `border`, `rounded`, `shadow-sm` pour les cartes ;
-- `text-slate-900`, `text-slate-500` pour la hiérarchie texte ;
-- `bg-orange-600`, `hover:bg-orange-700`, `text-white` pour les actions principales ;
-- `grid`, `gap-4`, `flex`, `items-center`, `justify-between` pour la composition.
+Le layout définit la structure HTML globale : chargement de Tailwind, barre supérieure, zone principale et affichage des messages flash.
 
-Ces classes peuvent être remplacées par votre propre design sans modifier la doctrine Forge.
+Extrait simplifié de `mvc/views/layouts/app.html` :
+
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titre | default("Application") }}</title>
+    <link rel="stylesheet" href="/static/tailwind.css">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-900">
+
+    <nav class="bg-slate-900 text-white px-6 py-4 shadow">
+        <a href="/" class="text-xl font-bold">Contacts</a>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-6 py-8">
+        {% if flash_html %}
+            {{ flash_html | safe }}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>
+```
+
+À retenir :
+
+- `{{ titre | default("Application") }}` affiche un titre si le contrôleur en fournit un ;
+- `{{ flash_html | safe }}` affiche les messages flash générés par Forge ;
+- `{% block content %}{% endblock %}` réserve l'emplacement que les autres templates vont remplir.
+
+#### 2. Le template de liste
+
+La liste des contacts est générée dans `mvc/views/contact/index.html`.
+
+Extrait simplifié :
+
+```jinja2
+{% extends "layouts/app.html" %}
+{% block content %}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Liste des contacts</h1>
+
+    <a href="/contacts/new"
+       class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded">
+        Nouveau contact
+    </a>
+</div>
+
+{% if contacts %}
+    <div class="bg-white border rounded shadow-sm overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-slate-50 border-b">
+                <tr>
+                    <th class="px-4 py-3 text-left">Nom</th>
+                    <th class="px-4 py-3 text-left">Prénom</th>
+                    <th class="px-4 py-3 text-left">Email</th>
+                    <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in contacts %}
+                <tr class="border-b">
+                    <td class="px-4 py-3">{{ contact.Nom }}</td>
+                    <td class="px-4 py-3">{{ contact.Prenom }}</td>
+                    <td class="px-4 py-3">{{ contact.Email }}</td>
+                    <td class="px-4 py-3 text-right">
+                        <a href="/contacts/{{ contact.Id }}">Voir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p class="text-slate-500">Aucun contact pour l'instant.</p>
+{% endif %}
+
+{% endblock %}
+```
+
+Ici, `contacts` vient du contrôleur. Chaque `contact` est un dictionnaire retourné par la base de données. C'est pour cette raison que la vue utilise les noms de colonnes SQL en PascalCase : `contact.Nom`, `contact.Prenom`, `contact.Email`, `contact.Id`.
+
+#### 3. Le template de formulaire
+
+Le formulaire de création et le formulaire de modification utilisent le même fichier : `mvc/views/contact/form.html`.
+
+Extrait simplifié :
+
+```jinja2
+{% extends "layouts/app.html" %}
+{% block content %}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">{{ titre }}</h1>
+    <a href="/contacts" class="text-slate-600 hover:underline">← Retour</a>
+</div>
+
+{% include "partials/form_errors.html" %}
+
+<div class="bg-white border rounded shadow-sm p-6">
+    <form method="post" action="{{ action }}" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Nom</label>
+            <input
+                type="text"
+                name="nom"
+                value="{{ form.value('nom') }}"
+                class="mt-1 w-full border rounded px-3 py-2"
+            >
+            {% if form.has_error('nom') %}
+                <p class="text-red-600 text-sm mt-1">{{ form.error('nom') }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-700">Email</label>
+            <input
+                type="text"
+                name="email"
+                value="{{ form.value('email') }}"
+                class="mt-1 w-full border rounded px-3 py-2"
+            >
+            {% if form.has_error('email') %}
+                <p class="text-red-600 text-sm mt-1">{{ form.error('email') }}</p>
+            {% endif %}
+        </div>
+
+        <div class="flex gap-4 pt-2">
+            <button type="submit"
+                    class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded">
+                Enregistrer
+            </button>
+            <a href="/contacts" class="text-slate-600 hover:underline self-center">Annuler</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+```
+
+Dans ce template, les champs utilisent les noms Python du JSON canonique : `nom`, `prenom`, `email`, `telephone`.
+
+Il ne faut donc pas confondre :
+
+| Contexte | Noms utilisés | Exemple |
+|---|---|---|
+| Formulaire HTML | noms Python du JSON | `name="nom"`, `form.value('nom')` |
+| Résultat SQL affiché | colonnes SQL retournées par MariaDB | `contact.Nom`, `contact.Email`, `contact.Id` |
+
+#### 4. Le template de détail
+
+La page de détail lit un seul contact et affiche ses champs.
+
+Extrait simplifié de `mvc/views/contact/show.html` :
+
+```jinja2
+{% extends "layouts/app.html" %}
+{% block content %}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-slate-900">Détail contact</h1>
+
+    <div class="space-x-2">
+        <a href="/contacts/{{ contact.Id }}/edit"
+           class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded">
+            Modifier
+        </a>
+        <a href="/contacts" class="text-slate-600 hover:underline">← Retour</a>
+    </div>
+</div>
+
+<div class="bg-white border rounded shadow-sm p-6 space-y-4">
+    <div>
+        <p class="text-sm text-slate-500">Nom</p>
+        <p class="text-slate-900">{{ contact.Nom }}</p>
+    </div>
+
+    <div>
+        <p class="text-sm text-slate-500">Email</p>
+        <p class="text-slate-900">{{ contact.Email }}</p>
+    </div>
+</div>
+
+<form method="post" action="/contacts/{{ contact.Id }}/delete" class="mt-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit"
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+        Supprimer
+    </button>
+</form>
+
+{% endblock %}
+```
+
+La suppression se fait volontairement en `POST`. Le starter évite ainsi une suppression déclenchée par un simple lien `GET`.
+
+#### 5. Classes CSS/Tailwind importantes
+
+Les templates générés s'appuient sur des classes utilitaires simples.
+
+| Rôle | Classes utilisées |
+|---|---|
+| Largeur et espacement | `max-w-5xl`, `mx-auto`, `px-6`, `py-8` |
+| Cartes | `bg-white`, `border`, `rounded`, `shadow-sm`, `p-6` |
+| Texte principal | `text-slate-900` |
+| Texte secondaire | `text-slate-500`, `text-slate-600` |
+| Boutons principaux | `bg-orange-600`, `hover:bg-orange-700`, `text-white` |
+| Boutons dangereux | `bg-red-600`, `hover:bg-red-700`, `text-white` |
+| Mise en page | `flex`, `items-center`, `justify-between`, `grid`, `gap-4`, `space-y-4` |
+
+Ces classes ne font pas partie de la doctrine Forge. Elles donnent seulement une interface lisible pour le starter. Le développeur peut les remplacer par son propre design sans modifier le modèle, le contrôleur ou les routes.
 
 ### Test navigateur
 
@@ -572,19 +786,100 @@ Ces classes peuvent être remplacées par votre propre design sans modifier la d
 
 ---
 
-## Vérification finale
+## Vérification finale du starter
+
+Cette dernière étape ne sert pas seulement à lancer l'application. Elle permet de vérifier chaque couche du parcours Forge : configuration, routes, serveur local, base de données, contrôleur, modèle SQL, formulaires et templates.
+
+### 1. Vérifier l'environnement Forge
 
 ```bash
 forge doctor
+```
+
+Cette commande vérifie que le projet Forge est cohérent avant le lancement.
+
+Elle permet notamment de repérer les problèmes classiques :
+
+- environnement mal configuré ;
+- variables manquantes dans `env/dev` ;
+- dépendances non installées ;
+- projet lancé depuis le mauvais dossier ;
+- configuration Forge incomplète.
+
+Si `forge doctor` signale une erreur, il faut la corriger avant de continuer. Lancer le serveur alors que cette commande échoue revient à chercher une panne trop tard dans le navigateur.
+
+### 2. Vérifier les routes réellement déclarées
+
+```bash
 forge routes:list
+```
+
+Cette commande affiche les routes connues par l'application. Elle permet de vérifier que les routes du CRUD Contact ont bien été copiées dans `mvc/routes.py`.
+
+On doit retrouver une liste proche de celle-ci :
+
+```text
+GET   /contacts              ContactController.index
+GET   /contacts/new          ContactController.new
+POST  /contacts              ContactController.create
+GET   /contacts/{id}         ContactController.show
+GET   /contacts/{id}/edit    ContactController.edit
+POST  /contacts/{id}         ContactController.update
+POST  /contacts/{id}/delete  ContactController.destroy
+```
+
+Point important :
+
+```text
+/contacts/new doit apparaître avant /contacts/{id}
+```
+
+Sinon, selon l'ordre de résolution des routes, `new` peut être interprété comme une valeur possible de `{id}`.
+
+### 3. Lancer le serveur local
+
+```bash
 python app.py
 ```
 
-Ouvrir dans le navigateur :
+Le serveur Forge démarre l'application en local. Pour ce starter, l'accès se fait ensuite en HTTPS local :
 
 ```text
 https://localhost:8000/contacts
 ```
+
+Si le navigateur affiche un avertissement de certificat, c'est normal en développement local lorsque le certificat HTTPS est auto-signé.
+
+### 4. Vérifier le comportement complet dans le navigateur
+
+| Test | Action | Résultat attendu |
+|---|---|---|
+| Liste | Ouvrir `/contacts` | La page de liste s'affiche, même sans contact |
+| Formulaire vide | Cliquer sur "Nouveau contact" puis valider sans remplir | Les erreurs de validation apparaissent |
+| Création | Remplir un contact valide puis valider | Retour à la liste avec un message flash |
+| Détail | Cliquer sur le lien de détail | La fiche du contact s'affiche |
+| Modification | Modifier le contact puis valider | Retour à la liste avec confirmation |
+| Suppression | Supprimer le contact avec le bouton prévu | Le contact disparaît de la liste |
+
+Cette vérification confirme que les éléments suivants communiquent correctement :
+
+```text
+routes → contrôleur → formulaire → modèle SQL → base MariaDB → templates Jinja
+```
+
+### 5. Comprendre les erreurs fréquentes
+
+| Symptôme | Cause probable | Fichier ou commande à vérifier |
+|---|---|---|
+| Page `/contacts` introuvable | Route non copiée ou mauvais ordre des routes | `mvc/routes.py`, `forge routes:list` |
+| Erreur indiquant que la table `contact` n'existe pas | SQL non appliqué | `forge db:apply` |
+| Erreur de connexion MariaDB | Variables incorrectes dans `env/dev` | `DB_HOST`, `DB_NAME`, `DB_APP_USER`, `DB_APP_PWD` |
+| Template introuvable | Vue absente ou mauvais chemin de template | `mvc/views/contact/` |
+| Les erreurs de formulaire ne s'affichent pas | Template `form.html` incomplet ou contexte incorrect | `mvc/views/contact/form.html`, `ContactController` |
+| Le bouton supprimer ne fonctionne pas | Route `POST` de suppression absente | `mvc/routes.py` |
+
+Une fois ces vérifications terminées, le starter Contact est fonctionnel. Il peut servir de base pour ajouter progressivement une recherche, une pagination, des relations ou une authentification.
+
 
 ## Reconstruction
 
