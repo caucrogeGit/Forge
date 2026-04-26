@@ -7,6 +7,7 @@
   "description": "Starter 1 — CRUD simple de contacts",
   "status": "available",
   "requires_db": true,
+  "home_route": "/contacts",
   "routes_marker": "contact-simple",
   "doc_url": "https://caucrogegit.github.io/Forge/starter-app-01-contacts/",
   "routes": {

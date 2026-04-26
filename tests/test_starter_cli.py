@@ -12,6 +12,7 @@ from forge_cli.entities.model import build_model
 from forge_cli.entities.relations import validate_relations_definition
 from forge_cli.starters.scaffold import check_existing as _check_existing, force_clean_application as _force_clean_application
 from forge_cli.starters.route_ops import remove_legacy_auth_block as _remove_legacy_auth_routes
+from forge_cli.starters.route_ops import replace_home_route as _replace_home_route
 from forge_cli.starters.registry import all_starters, resolve
 
 
@@ -429,3 +430,131 @@ def test_entrypoint_starter_list_accessible(monkeypatch, capsys):
     output, _ = capsys.readouterr()
     assert "Starter apps Forge" in output
     assert "Suivi pédagogique" in output
+
+
+# ── replace_home_route ────────────────────────────────────────────────────────
+
+_SKELETON_ROUTES = (
+    "from core.http.router import Router\n"
+    "from mvc.controllers.auth_controller import AuthController\n"
+    "from mvc.controllers.home_controller import HomeController\n\n"
+    "router = Router()\n\n"
+    'with router.group("", public=True) as pub:\n'
+    '    pub.add("GET", "/", HomeController.index, name="home")\n'
+)
+
+
+def test_replace_home_route_remplace_handler_landing(tmp_path):
+    routes_py = tmp_path / "routes.py"
+    routes_py.write_text(_SKELETON_ROUTES, encoding="utf-8")
+
+    _replace_home_route(routes_py, "/contacts")
+    content = routes_py.read_text(encoding="utf-8")
+
+    assert "HomeController.index" not in content
+    assert 'BaseController.redirect("/contacts")' in content
+    assert 'name="home"' in content
+
+
+def test_replace_home_route_ajoute_import_base_controller(tmp_path):
+    routes_py = tmp_path / "routes.py"
+    routes_py.write_text(_SKELETON_ROUTES, encoding="utf-8")
+
+    _replace_home_route(routes_py, "/contacts")
+    content = routes_py.read_text(encoding="utf-8")
+
+    assert "from core.mvc.controller.base_controller import BaseController" in content
+
+
+def test_replace_home_route_retire_import_home_controller(tmp_path):
+    routes_py = tmp_path / "routes.py"
+    routes_py.write_text(_SKELETON_ROUTES, encoding="utf-8")
+
+    _replace_home_route(routes_py, "/contacts")
+    content = routes_py.read_text(encoding="utf-8")
+
+    assert "HomeController" not in content
+
+
+def test_replace_home_route_idempotent(tmp_path):
+    routes_py = tmp_path / "routes.py"
+    routes_py.write_text(_SKELETON_ROUTES, encoding="utf-8")
+
+    _replace_home_route(routes_py, "/contacts")
+    first = routes_py.read_text(encoding="utf-8")
+    _replace_home_route(routes_py, "/contacts")
+    second = routes_py.read_text(encoding="utf-8")
+
+    assert first == second
+
+
+def test_replace_home_route_slash_sans_effet(tmp_path):
+    routes_py = tmp_path / "routes.py"
+    routes_py.write_text(_SKELETON_ROUTES, encoding="utf-8")
+
+    _replace_home_route(routes_py, "/")
+    content = routes_py.read_text(encoding="utf-8")
+
+    assert "HomeController.index" in content
+
+
+def test_replace_home_route_fichier_absent_sans_erreur(tmp_path):
+    _replace_home_route(tmp_path / "inexistant.py", "/contacts")
+
+
+def test_replace_home_route_sans_handler_landing_sans_effet(tmp_path):
+    """Sans HomeController.index, la fonction ne modifie pas le fichier."""
+    routes_py = tmp_path / "routes.py"
+    original = "router = Router()\n"
+    routes_py.write_text(original, encoding="utf-8")
+
+    _replace_home_route(routes_py, "/contacts")
+    assert routes_py.read_text(encoding="utf-8") == original
+
+
+# ── home_route dans les starters ─────────────────────────────────────────────
+
+def test_starter_1_a_home_route_contacts():
+    assert resolve("1").get("home_route") == "/contacts"
+
+
+def test_starter_3_a_home_route_contacts():
+    assert resolve("3").get("home_route") == "/contacts"
+
+
+def test_starter_4_a_home_route_suivi():
+    assert resolve("4").get("home_route") == "/suivi"
+
+
+def test_starter_2_sans_home_route():
+    hr = resolve("2").get("home_route", "/")
+    assert hr in ("/", None)
+
+
+# ── dry-run annonce home_route ────────────────────────────────────────────────
+
+def test_dry_run_starter_1_annonce_home_route(capsys):
+    cmd_starter_build(["1", "--dry-run"])
+    output = capsys.readouterr().out
+    assert "Route d'accueil" in output
+    assert "/contacts" in output
+
+
+def test_dry_run_starter_3_annonce_home_route(capsys):
+    cmd_starter_build(["3", "--dry-run"])
+    output = capsys.readouterr().out
+    assert "Route d'accueil" in output
+    assert "/contacts" in output
+
+
+def test_dry_run_starter_4_annonce_home_route(capsys):
+    cmd_starter_build(["4", "--dry-run"])
+    output = capsys.readouterr().out
+    assert "Route d'accueil" in output
+    assert "/suivi" in output
+
+
+def test_dry_run_starter_2_sans_home_route(capsys):
+    cmd_starter_build(["2", "--dry-run"])
+    output = capsys.readouterr().out
+    assert "Route d'accueil" not in output

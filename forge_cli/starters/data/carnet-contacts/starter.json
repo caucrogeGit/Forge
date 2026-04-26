@@ -13,6 +13,7 @@
   "status": "available",
   "requires_db": true,
   "supports_public": false,
+  "home_route": "/contacts",
   "routes_marker": "carnet-contacts",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/contacts",

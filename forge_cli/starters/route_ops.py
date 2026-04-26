@@ -88,6 +88,39 @@ def inject_block(routes_py: Path, block: str) -> None:
     routes_py.write_text(content + "\n" + block, encoding="utf-8")
 
 
+def replace_home_route(routes_py: Path, home_route: str) -> None:
+    """Remplace GET / → HomeController.index par une redirection vers home_route.
+
+    La route nommée "home" est conservée mais son handler devient une lambda
+    qui émet un 302. L'import HomeController est retiré s'il n'est plus utilisé.
+    Idempotent : sans effet si le handler n'est plus HomeController.index.
+    """
+    if not routes_py.exists() or home_route == "/":
+        return
+    content = routes_py.read_text(encoding="utf-8")
+
+    old_handler = 'pub.add("GET", "/", HomeController.index, name="home")'
+    if old_handler not in content:
+        return
+
+    bc_import = "from core.mvc.controller.base_controller import BaseController"
+    if bc_import not in content:
+        content = bc_import + "\n" + content
+
+    new_handler = (
+        f'pub.add("GET", "/", '
+        f'lambda req: BaseController.redirect("{home_route}"), '
+        f'name="home")'
+    )
+    content = content.replace(old_handler, new_handler)
+
+    hc_import = "from mvc.controllers.home_controller import HomeController\n"
+    if hc_import in content and "HomeController" not in content.replace(hc_import, ""):
+        content = content.replace(hc_import, "")
+
+    routes_py.write_text(content, encoding="utf-8")
+
+
 def remove_legacy_auth_block(routes_py: Path) -> None:
     """Retire le bloc auth public livré par le squelette Forge neuf."""
     if not routes_py.exists():
