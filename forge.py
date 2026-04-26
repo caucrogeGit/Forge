@@ -308,9 +308,21 @@ def cmd_doctor() -> None:
 
 def cmd_routes_list() -> None:
     """Affiche les routes déclarées par le module APP_ROUTES_MODULE."""
+    from forge_cli.project_config import load_project_config, ProjectConfigError
+
+    project_root = Path.cwd().resolve()
     try:
-        from config import APP_ROUTES_MODULE
-        routes_module = importlib.import_module(APP_ROUTES_MODULE)
+        config = load_project_config(project_root)
+        routes_module_name = config.APP_ROUTES_MODULE
+    except ProjectConfigError as exc:
+        sys.exit(f"Erreur : {exc}")
+
+    root_str = str(project_root)
+    path_inserted = root_str not in sys.path
+    if path_inserted:
+        sys.path.insert(0, root_str)
+    try:
+        routes_module = importlib.import_module(routes_module_name)
         router = getattr(routes_module, "router")
     except Exception as exc:
         sys.exit(f"Erreur : impossible de charger les routes applicatives ({exc}).")
