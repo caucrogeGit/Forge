@@ -1,0 +1,9 @@
+{
+  "id": "carnet-contacts",
+  "number": 3,
+  "name": "Carnet de contacts relationnel",
+  "aliases": ["carnet", "3"],
+  "description": "Starter 3 — many_to_one, pivot many-to-many, JOIN SQL",
+  "status": "coming_soon",
+  "doc_url": "https://caucrogegit.github.io/Forge/starter-app-03-carnet-contacts/"
+}

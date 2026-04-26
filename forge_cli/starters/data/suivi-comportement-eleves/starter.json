@@ -1,0 +1,9 @@
+{
+  "id": "suivi-comportement-eleves",
+  "number": 4,
+  "name": "Suivi comportement élèves",
+  "aliases": ["suivi", "eleves", "4"],
+  "description": "Starter 4 — Application métier, cases à cocher, synthèses",
+  "status": "coming_soon",
+  "doc_url": "https://caucrogegit.github.io/Forge/starter-app-04-suivi-comportement-eleves/"
+}
