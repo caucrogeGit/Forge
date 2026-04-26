@@ -161,7 +161,7 @@ Les deux méthodes produisent le même résultat : un projet Forge local avec `f
 !!! warning "Génération automatique à venir"
     `forge starter:build 4` sera disponible dans une prochaine version. En attendant, suivre les étapes ci-dessous ou consulter [rebuild.md](starters/04-suivi-comportement-eleves/rebuild.md).
 
-Depuis un projet Forge vierge, après `forge db:init` :
+Depuis un projet Forge vierge :
 
 ```bash
 # Créer les entités

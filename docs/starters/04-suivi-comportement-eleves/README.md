@@ -14,7 +14,8 @@
 ## Lancement rapide
 
 ```bash
-forge starter:build 4   # disponible dans une prochaine version
+# Commande prévue dans une prochaine version :
+forge starter:build 4
 ```
 
 En attendant, suivre le [guide complet](../../starter-app-04-suivi-comportement-eleves.md) ou le fichier [rebuild.md](rebuild.md) pour la reconstruction manuelle.
