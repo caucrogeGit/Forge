@@ -102,18 +102,54 @@ def _inject_routes(routes_py: Path, block: str) -> None:
     routes_py.write_text(content + "\n" + block, encoding="utf-8")
 
 
+def _remove_legacy_auth_routes(routes_py: Path) -> None:
+    """Retire le bloc auth public livré par l'ancien squelette Forge."""
+    if not routes_py.exists():
+        return
+
+    content = routes_py.read_text(encoding="utf-8")
+    legacy_block = """
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/login",  AuthController.login_form, name="login_form")
+    pub.add("POST", "/login",  AuthController.login,      name="login")
+    pub.add("POST", "/logout", AuthController.logout,     name="logout")
+"""
+    if legacy_block not in content:
+        return
+
+    content = content.replace("from mvc.controllers.auth_controller import AuthController\n", "")
+    content = content.replace(legacy_block, "\n")
+    routes_py.write_text(content, encoding="utf-8")
+
+
 # ── Vérification des fichiers existants ───────────────────────────────────────
 
 def _check_existing(meta: dict, root: Path) -> list[str]:
     found = []
     for rel in meta.get("check_paths", []):
         p = root / rel
-        if p.exists():
+        if p.exists() and not _is_adoptable_application_scaffold(meta, p, root):
             found.append(rel)
     marker = meta.get("routes_marker", "")
     if marker and _routes_marker_present(root / "mvc" / "routes.py", marker):
         found.append("mvc/routes.py (marqueurs déjà présents)")
     return found
+
+
+def _is_adoptable_application_scaffold(meta: dict, path: Path, root: Path) -> bool:
+    """Reconnaît les fichiers d'auth historiques d'un projet Forge neuf."""
+    if meta.get("id") != "utilisateurs-auth" or not path.is_file():
+        return False
+
+    rel = path.relative_to(root).as_posix()
+    content = path.read_text(encoding="utf-8")
+    if rel == "mvc/controllers/auth_controller.py":
+        return 'BaseController.redirect("/")' in content and "DashboardController" not in content
+    if rel == "mvc/models/auth_model.py":
+        return "GET_ROLES_UTILISATEUR" in content and "utilisateur_role" in content
+    if rel == "mvc/views/auth/login.html":
+        return 'action="/login"' in content and 'name="csrf_token"' in content
+    return False
 
 
 def _force_clean(meta: dict, root: Path) -> None:
@@ -211,6 +247,7 @@ def _dry_run_application(meta: dict) -> None:
     snake = _to_snake(entity)
     data_dir: Path = meta["_dir"]
     files_dir = data_dir / "files"
+    routes_snippet = _read_routes_snippet(meta)
 
     print(f"\nStarter : {meta['name']} (niveau {meta['number']})")
     print()
@@ -226,6 +263,10 @@ def _dry_run_application(meta: dict) -> None:
     print()
     print("  Routes injectées depuis :")
     print(f"    {meta.get('routes_snippet', 'routes.py.snippet')}")
+    print()
+    print("  Routes à ajouter :")
+    for method, path in re.findall(r'\.add\("([^"]+)",\s+"([^"]+)"', routes_snippet):
+        print(f"    {method:<5}  {path}")
     print()
     print("  Aucun fichier écrit.")
     print()
@@ -520,6 +561,8 @@ def _build_application(
     next_step("Câblage des routes dans mvc/routes.py...")
     if not routes_py.exists():
         raise StarterBuildError("mvc/routes.py introuvable.")
+    if meta.get("id") == "utilisateurs-auth":
+        _remove_legacy_auth_routes(routes_py)
     route_block = _read_routes_snippet(meta)
     _inject_routes(routes_py, route_block)
     print(out.written("mvc/routes.py"))
