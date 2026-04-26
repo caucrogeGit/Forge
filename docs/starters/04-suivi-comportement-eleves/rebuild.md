@@ -103,9 +103,10 @@ from mvc.controllers.observation_cours_controller import ObservationCoursControl
 
 # forge-starter:suivi-comportement-eleves:start
 with router.group("", public=True) as pub:
-    pub.add("GET",  "/login",  AuthController.login_form, name="login_form")
-    pub.add("POST", "/login",  AuthController.login,      name="login")
-    pub.add("POST", "/logout", AuthController.logout,     name="logout")
+    pub.add("GET",  "/login", AuthController.login_form, name="login_form")
+    pub.add("POST", "/login", AuthController.login,      name="login")
+
+router.add("POST", "/logout", AuthController.logout, name="logout")
 
 router.add("GET",  "/suivi",                SuiviController.index,                name="suivi_dashboard")
 router.add("GET",  "/eleves",               EleveController.index,                name="eleve_index")
