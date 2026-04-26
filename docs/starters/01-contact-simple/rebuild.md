@@ -1,10 +1,12 @@
 # Reconstruction — Contacts
 
-Ce fichier permet de reconstruire le starter 1 depuis un projet Forge propre.
+Recette courte pour reconstruire le starter 1 depuis un projet Forge propre.
 
-## 1. Commandes Forge
+---
 
-Créer le projet :
+## 1. Créer le projet
+
+Installation recommandée :
 
 ```bash
 pipx install git+https://github.com/caucrogeGit/Forge.git
@@ -14,29 +16,62 @@ source .venv/bin/activate
 forge doctor
 ```
 
-Préparer la base (renseigner `env/dev` avant) :
+Alternative manuelle :
+
+```bash
+git clone https://github.com/caucrogeGit/Forge.git Contacts
+cd Contacts
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+npm install
+forge doctor
+```
+
+---
+
+## 2. Configurer la base
+
+Dans `env/dev`, adapter au minimum :
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=contacts
+
+DB_ADMIN_USER=forge_admin
+DB_ADMIN_PWD=ForgeAdmin_2026!
+
+DB_APP_USER=contacts_app
+DB_APP_PWD=ContactsApp_2026!
+```
+
+Initialiser la base :
 
 ```bash
 forge db:init
 ```
 
-Créer l'entité :
+---
+
+## 3. Créer l'entité
 
 ```bash
 forge make:entity Contact --no-input
 ```
 
-Remplacez ensuite `mvc/entities/contact/contact.json` par le JSON ci-dessous.
+Remplacer ensuite le contenu de :
 
-```bash
-forge build:model --dry-run
-forge build:model
-forge check:model
-forge db:apply
-forge make:crud Contact
+```text
+mvc/entities/contact/contact.json
 ```
 
-## 2. JSON complet
+par le JSON ci-dessous.
+
+---
+
+## 4. JSON complet
 
 ```json
 {
@@ -88,9 +123,31 @@ forge make:crud Contact
 }
 ```
 
-## 3. Routes à copier
+---
 
-Ajoutez le bloc dans `mvc/routes.py`. La route `/new` doit rester avant `/{id}`.
+## 5. Générer le modèle
+
+```bash
+forge check:model
+forge build:model --dry-run
+forge build:model
+forge db:apply
+```
+
+---
+
+## 6. Générer le CRUD
+
+```bash
+forge make:crud Contact --dry-run
+forge make:crud Contact
+```
+
+---
+
+## 7. Copier les routes
+
+Ajouter dans `mvc/routes.py` :
 
 ```python
 from mvc.controllers.contact_controller import ContactController
@@ -112,9 +169,11 @@ with router.group("/contacts", public=True, csrf=False) as g:
     ...
 ```
 
-## 4. Fichiers à créer ou modifier
+La route `/new` doit rester avant `/{id}`.
 
-Créé par `make:entity` ou `build:model` :
+---
+
+## 8. Fichiers attendus
 
 ```text
 mvc/entities/contact/contact.json
@@ -122,11 +181,7 @@ mvc/entities/contact/contact.sql
 mvc/entities/contact/contact_base.py
 mvc/entities/contact/contact.py
 mvc/entities/contact/__init__.py
-```
 
-Créé par `make:crud` si absent :
-
-```text
 mvc/controllers/contact_controller.py
 mvc/models/contact_model.py
 mvc/forms/contact_form.py
@@ -134,47 +189,25 @@ mvc/views/layouts/app.html
 mvc/views/contact/index.html
 mvc/views/contact/show.html
 mvc/views/contact/form.html
-```
 
-Modifié manuellement :
-
-```text
 mvc/routes.py
 ```
 
-## 5. Vérifications
+---
+
+## 9. Vérifier
 
 ```bash
-forge check:model
 forge doctor
+forge check:model
 forge routes:list
 python app.py
 ```
 
-Ouvrir dans le navigateur :
+Ouvrir :
 
 ```text
 https://localhost:8000/contacts
 ```
 
-Vérifiez aussi que `forge make:crud Contact --dry-run` n’écrase aucun fichier existant.
-
-## 6. Test navigateur
-
-1. Ouvrir `/contacts`.
-2. Cliquer sur le lien de création.
-3. Soumettre le formulaire vide et vérifier les erreurs.
-4. Créer un contact valide.
-5. Vérifier le flash de succès.
-6. Ouvrir le détail.
-7. Modifier le contact.
-8. Supprimer le contact.
-9. Revenir à la liste.
-
-## 7. Points pédagogiques
-
-- `contact.json` est la source canonique.
-- `contact.sql` et `contact_base.py` sont régénérables.
-- `contact.py` et `__init__.py` sont préservés.
-- Le formulaire généré contient un champ CSRF.
-- Les routes restent ajoutées manuellement.
+Test rapide : créer, afficher, modifier puis supprimer un contact.
