@@ -39,6 +39,24 @@
 
 ---
 
+## Prérequis
+
+### Prérequis généraux
+
+- Python 3.11 ou supérieur
+- Git
+- `pipx` (recommandé) ou environnement virtuel Python
+- MariaDB installé et démarré
+- Accès à un compte administrateur MariaDB (pour `forge db:init`)
+- Fichier `env/dev` configuré avec les identifiants MariaDB
+
+### Prérequis spécifiques au starter
+
+- Projet Forge vierge (créé via `forge new` ou `git clone`)
+- Commandes `forge make:entity`, `forge build:model`, `forge db:apply` et `forge make:crud` disponibles (incluses dans l'installation Forge)
+
+---
+
 ## 1. Présentation rapide
 
 ### 1.1 Objectif

@@ -37,6 +37,26 @@
 !!! tip "Génération automatique"
     Ce starter est maintenant générable avec `forge starter:build 2`, `forge starter:build auth` ou `forge starter:build utilisateurs-auth`. Il ne génère pas un CRUD utilisateur : il crée l'entité `Utilisateur`, copie les fichiers applicatifs d'authentification et injecte les routes explicites.
 
+## Prérequis
+
+### Prérequis généraux
+
+- Python 3.11 ou supérieur
+- Git
+- `pipx` (recommandé) ou environnement virtuel Python
+- MariaDB installé et démarré
+- Accès à un compte administrateur MariaDB (pour `forge db:init`)
+- Fichier `env/dev` configuré avec les identifiants MariaDB
+
+### Prérequis spécifiques au starter
+
+- Starter 1 compris : routes, contrôleurs, formulaires, vues Jinja2, messages flash
+- Projet Forge vierge ou base MariaDB déjà initialisée
+- Module `core.security.hashing` disponible (inclus dans Forge) pour le hachage des mots de passe
+- Script `scripts/create_auth_user.py` fourni automatiquement par `forge starter:build 2`
+
+---
+
 ## Présentation rapide
 
 ### Objectif

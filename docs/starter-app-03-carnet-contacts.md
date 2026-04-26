@@ -40,6 +40,26 @@
 !!! note "Périmètre actuel"
     La génération automatique crée `Ville`, `Contact` et la relation `Contact.ville_id -> Ville.id`. Elle ne génère pas encore `Groupe`, `ContactGroupe` ni de many-to-many explicite.
 
+## Prérequis
+
+### Prérequis généraux
+
+- Python 3.11 ou supérieur
+- Git
+- `pipx` (recommandé) ou environnement virtuel Python
+- MariaDB installé et démarré
+- Accès à un compte administrateur MariaDB (pour `forge db:init`)
+- Fichier `env/dev` configuré avec les identifiants MariaDB
+
+### Prérequis spécifiques au starter
+
+- Starters 1 et 2 compris, ou au moins le cycle entité → SQL → CRUD
+- Projet Forge vierge, ou scaffold adoptable (le starter détecte et adopte un `relations.json` vide)
+- Support des relations Forge : `relations.json` et `relations.sql` (générés automatiquement)
+- Utiliser `--force` uniquement si le starter est déjà partiellement présent dans le projet
+
+---
+
 ## Présentation rapide
 
 Le starter construit une application de carnet de contacts avec :

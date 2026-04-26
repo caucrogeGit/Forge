@@ -11,19 +11,21 @@
 - Dashboard protégé (`/suivi`) point d'entrée après connexion
 - Seed de démonstration (`scripts/seed_suivi.py`) pour tester immédiatement
 
-## Lancement rapide
+## Installation locale
 
 ```bash
-# Commande prévue dans une prochaine version :
-forge starter:build 4
-```
-
-En attendant, suivre le [guide complet](../../starter-app-04-suivi-comportement-eleves.md) ou le fichier [rebuild.md](rebuild.md) pour la reconstruction manuelle.
-
-```bash
+forge new SuiviApp
+cd SuiviApp
+source .venv/bin/activate
+forge doctor
+forge starter:build 4 --init-db
+python scripts/create_auth_user.py
+python scripts/seed_suivi.py
 python app.py
 # https://localhost:8000/suivi
 ```
+
+Alias disponibles : `suivi`, `suivi-comportement-eleves`.
 
 ## Documentation complète
 
