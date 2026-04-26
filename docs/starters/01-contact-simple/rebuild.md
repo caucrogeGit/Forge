@@ -36,14 +36,16 @@ forge doctor
 Dans `env/dev`, adapter au minimum :
 
 ```env
-DB_HOST=localhost
-DB_PORT=3306
 DB_NAME=contacts
 
-DB_ADMIN_USER=forge_admin
+DB_ADMIN_HOST=localhost
+DB_ADMIN_PORT=3306
+DB_ADMIN_LOGIN=forge_admin
 DB_ADMIN_PWD=ForgeAdmin_2026!
 
-DB_APP_USER=contacts_app
+DB_APP_HOST=localhost
+DB_APP_PORT=3306
+DB_APP_LOGIN=contacts_app
 DB_APP_PWD=ContactsApp_2026!
 ```
 

@@ -1,4 +1,4 @@
-# Starter 3 — Carnet de Contacts Relationnel
+# Starter 3 — Carnet de contacts
 
 **Application démo :** carnet de contacts avec villes et groupes d'appartenance.
 

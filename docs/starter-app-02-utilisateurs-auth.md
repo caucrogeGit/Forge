@@ -1,6 +1,41 @@
-# Starter 2 — Utilisateurs et authentification
+# Starter 2 — Utilisateurs / authentification
 
-Ce parcours transforme le socle de sécurité Forge en petite application navigable : accueil public, connexion, dashboard protégé, profil simple et déconnexion.
+<div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 58%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
+  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Niveau 2</p>
+  <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">Utilisateurs / authentification</h2>
+  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Transformer le socle de sécurité Forge en petite application navigable : accueil public, connexion, dashboard protégé, profil simple et déconnexion.</p>
+</div>
+
+<div class="grid cards" markdown>
+
+-   **Objectif**
+
+    ---
+
+    Comprendre les sessions, le CSRF et les routes publiques/protégées.
+
+-   **Niveau**
+
+    ---
+
+    Intermédiaire Forge. Le CRUD mono-entité du starter 1 est supposé compris.
+
+-   **Temps estimé**
+
+    ---
+
+    2 h à 3 h.
+
+-   **Résultat attendu**
+
+    ---
+
+    Login, dashboard protégé, profil simple et logout en `POST`.
+
+</div>
+
+!!! warning "Génération automatique"
+    Ce starter est un parcours pédagogique. Il est enregistré dans `forge starter:list`, mais sa génération automatique par `forge starter:build` est encore à venir.
 
 ## Présentation rapide
 
@@ -30,6 +65,21 @@ Il suppose que le starter 1 est compris : routes, contrôleurs, formulaires, vue
 
 Application avec authentification fonctionnelle — accueil public, formulaire de connexion sécurisé par CSRF, dashboard protégé, page profil et déconnexion en `POST`.
 
+### Flux d'authentification
+
+```mermaid
+flowchart TD
+    A([Navigateur]) -->|"GET /login"| B["AuthController.login_form"]
+    B --> C["Formulaire + csrf_token"]
+    C -->|"POST /login"| D["AuthController.login"]
+    D --> E["auth_model.py<br/>SQL visible"]
+    E --> F["core.security.hashing"]
+    F --> G{"mot de passe valide ?"}
+    G -->|oui| H["session authentifiée"]
+    G -->|non| I["retour formulaire"]
+    H --> J["/dashboard protégé"]
+```
+
 ---
 
 ## Installation du projet Forge
@@ -53,10 +103,11 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 npm install
-python forge.py doctor
+pip install -e .
+forge doctor
 ```
 
-> Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+> La documentation utilisateur utilise la CLI officielle `forge`, disponible après `pip install -e .`.
 
 ---
 
@@ -112,69 +163,71 @@ La charte reste proche du starter 1 :
 
 ### Modèle de données
 
-Pour un starter pédagogique, l'utilisateur peut être représenté par une table simple :
+Pour un starter pédagogique, l'utilisateur peut être représenté par une table simple.
 
-```json
-{
-  "format_version": 1,
-  "entity": "Utilisateur",
-  "table": "utilisateur",
-  "description": "Utilisateur applicatif simple",
-  "fields": [
+??? example "JSON canonique complet de `Utilisateur`"
+
+    ```json
     {
-      "name": "utilisateur_id",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
-    },
-    {
-      "name": "login",
-      "sql_type": "VARCHAR(80)",
-      "unique": true,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 80
-      }
-    },
-    {
-      "name": "prenom",
-      "sql_type": "VARCHAR(80)",
-      "nullable": true,
-      "constraints": {
-        "max_length": 80
-      }
-    },
-    {
-      "name": "nom",
-      "sql_type": "VARCHAR(80)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 80
-      }
-    },
-    {
-      "name": "password_hash",
-      "sql_type": "VARCHAR(255)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 255
-      }
-    },
-    {
-      "name": "email",
-      "sql_type": "VARCHAR(120)",
-      "nullable": true,
-      "constraints": {
-        "max_length": 120
-      }
-    },
-    {
-      "name": "actif",
-      "sql_type": "BOOLEAN"
+      "format_version": 1,
+      "entity": "Utilisateur",
+      "table": "utilisateur",
+      "description": "Utilisateur applicatif simple",
+      "fields": [
+        {
+          "name": "utilisateur_id",
+          "sql_type": "INT",
+          "primary_key": true,
+          "auto_increment": true
+        },
+        {
+          "name": "login",
+          "sql_type": "VARCHAR(80)",
+          "unique": true,
+          "constraints": {
+            "not_empty": true,
+            "max_length": 80
+          }
+        },
+        {
+          "name": "prenom",
+          "sql_type": "VARCHAR(80)",
+          "nullable": true,
+          "constraints": {
+            "max_length": 80
+          }
+        },
+        {
+          "name": "nom",
+          "sql_type": "VARCHAR(80)",
+          "constraints": {
+            "not_empty": true,
+            "max_length": 80
+          }
+        },
+        {
+          "name": "password_hash",
+          "sql_type": "VARCHAR(255)",
+          "constraints": {
+            "not_empty": true,
+            "max_length": 255
+          }
+        },
+        {
+          "name": "email",
+          "sql_type": "VARCHAR(120)",
+          "nullable": true,
+          "constraints": {
+            "max_length": 120
+          }
+        },
+        {
+          "name": "actif",
+          "sql_type": "BOOLEAN"
+        }
+      ]
     }
-  ]
-}
-```
+    ```
 
 Le mot de passe en clair ne va jamais dans le JSON ni dans la base. Le starter montre la structure, puis laisse le hachage au code applicatif.
 
@@ -195,36 +248,36 @@ Le CRUD complet utilisateur n'est pas l'objectif de ce starter. On écrit plutô
 
 L'auth réelle Forge vérifie le mot de passe avec `core.security.hashing.verifier_mot_de_passe()`. La valeur stockée dans `PasswordHash` doit donc être produite avec `hacher_mot_de_passe()`, au format `sel_hex:hash_hex`.
 
-Si vous utilisez le modèle d'authentification livré avec Forge (`mvc.models.auth_model`), les tables `role` et `utilisateur_role` doivent aussi exister, même sans permission multi-rôles dans ce starter. `python cmd/make.py security:init --env dev` peut les créer. Vous pouvez ensuite insérer ou remplacer l'utilisateur de test avec le script ci-dessous.
+Si vous utilisez le modèle d'authentification livré avec Forge (`mvc.models.auth_model`), les tables `role` et `utilisateur_role` doivent aussi exister, même sans permission multi-rôles dans ce starter. Vous pouvez ensuite insérer ou remplacer l'utilisateur de test avec le script ci-dessous.
 
-Méthode par script minimal :
+??? example "Script minimal de création d'utilisateur"
 
-```python
-from core.database.connection import get_connection, close_connection
-from core.security.hashing import hacher_mot_de_passe
+    ```python
+    from core.database.connection import get_connection, close_connection
+    from core.security.hashing import hacher_mot_de_passe
 
-connection = get_connection()
-cursor = connection.cursor()
+    connection = get_connection()
+    cursor = connection.cursor()
 
-cursor.execute(
-    """
-    INSERT INTO utilisateur (Login, Prenom, Nom, Email, PasswordHash, Actif)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """,
-    (
-        "admin",
-        "Ada",
-        "Lovelace",
-        "admin@example.test",
-        hacher_mot_de_passe("secret123"),
-        True,
-    ),
-)
+    cursor.execute(
+        """
+        INSERT INTO utilisateur (Login, Prenom, Nom, Email, PasswordHash, Actif)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (
+            "admin",
+            "Ada",
+            "Lovelace",
+            "admin@example.test",
+            hacher_mot_de_passe("secret123"),
+            True,
+        ),
+    )
 
-connection.commit()
-cursor.close()
-close_connection(connection)
-```
+    connection.commit()
+    cursor.close()
+    close_connection(connection)
+    ```
 
 Connexion navigateur :
 

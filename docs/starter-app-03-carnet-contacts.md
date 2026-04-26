@@ -1,6 +1,41 @@
-# Starter 3 — Carnet relationnel
+# Starter 3 — Carnet de contacts
 
-Ce starter montre un modèle relationnel Forge V1 sans magie : `Contact` appartient éventuellement à une `Ville`, et l'appartenance aux groupes passe par une entité pivot explicite.
+<div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 58%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
+  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Niveau 3</p>
+  <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">Carnet de contacts</h2>
+  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Lire un modèle relationnel Forge V1 sans magie : `many_to_one`, entité pivot explicite et requêtes `JOIN` visibles.</p>
+</div>
+
+<div class="grid cards" markdown>
+
+-   **Objectif**
+
+    ---
+
+    Relier contacts, villes et groupes sans ORM implicite.
+
+-   **Niveau**
+
+    ---
+
+    Intermédiaire avancé. Le CRUD mono-entité est supposé compris.
+
+-   **Temps estimé**
+
+    ---
+
+    3 h à 4 h.
+
+-   **Résultat attendu**
+
+    ---
+
+    Listes et détails enrichis avec relations explicites et SQL visible.
+
+</div>
+
+!!! warning "Génération automatique"
+    Ce starter est un parcours pédagogique. Il est enregistré dans `forge starter:list`, mais sa génération automatique par `forge starter:build` est encore à venir.
 
 ## Présentation rapide
 
@@ -27,7 +62,20 @@ Le starter suppose que le CRUD mono-entité est compris. La nouveauté est la mo
 
 ### Résultat attendu
 
-Carnet de contacts relationnel — contacts liés à une ville, appartenance à des groupes via un pivot explicite, vues de liste et de détail enrichies avec `JOIN` SQL visibles.
+Carnet de contacts — contacts liés à une ville, appartenance à des groupes via un pivot explicite, vues de liste et de détail enrichies avec `JOIN` SQL visibles.
+
+### Flux relationnel
+
+```mermaid
+flowchart TD
+    A["Contact"] -->|"ville_id nullable"| B["Ville"]
+    C["ContactGroupe<br/>entité pivot"] -->|"contact_id"| A
+    C -->|"groupe_id"| D["Groupe"]
+    E["carnet_model.py"] -->|"JOIN SQL visibles"| A
+    E --> B
+    E --> C
+    E --> D
+```
 
 ---
 
@@ -52,10 +100,11 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 npm install
-python forge.py doctor
+pip install -e .
+forge doctor
 ```
 
-> Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+> La documentation utilisateur utilise la CLI officielle `forge`, disponible après `pip install -e .`.
 
 ---
 
@@ -127,6 +176,9 @@ ContactGroupe.groupe_id -> Groupe.id
 ```
 
 `ContactGroupe` est une entité normale, avec sa propre clé primaire `id`. Elle représente explicitement le pivot entre contacts et groupes.
+
+!!! tip "Doctrine relationnelle"
+    Forge V1 ne fournit pas de `many_to_many` direct. Le pivot est un fichier JSON canonique comme les autres, puis les liens sont déclarés dans `mvc/entities/relations.json`.
 
 Extrait `Contact` :
 
@@ -234,21 +286,21 @@ mvc/routes.py
 - Contrôleurs CRUD générés pour les écrans simples.
 - Modèle applicatif manuel pour les `JOIN`.
 
-Exemple de requête visible :
+??? example "Exemple de requête visible"
 
-```python
-LIST_CONTACTS = """
-SELECT
-    c.Id,
-    c.Prenom,
-    c.Nom,
-    c.Email,
-    v.Nom AS VilleNom
-FROM contact c
-LEFT JOIN ville v ON v.Id = c.VilleId
-ORDER BY c.Nom, c.Prenom
-"""
-```
+    ```python
+    LIST_CONTACTS = """
+    SELECT
+        c.Id,
+        c.Prenom,
+        c.Nom,
+        c.Email,
+        v.Nom AS VilleNom
+    FROM contact c
+    LEFT JOIN ville v ON v.Id = c.VilleId
+    ORDER BY c.Nom, c.Prenom
+    """
+    ```
 
 ### Tags Jinja utilisés
 

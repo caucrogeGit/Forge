@@ -99,8 +99,8 @@ Les deux méthodes arrivent au même résultat : un projet Forge local avec un e
     forge doctor
     ```
 
-!!! note "Commande locale de secours"
-    Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+!!! note "CLI officielle"
+    La documentation utilisateur suppose la CLI officielle `forge`, disponible après installation du package.
 
 ### 2.1 Schéma d'installation
 
@@ -149,44 +149,47 @@ Avant d'exécuter `forge db:init`, renseigner dans `env/dev` un compte MariaDB d
 En développement local, on peut utiliser temporairement un compte administrateur MariaDB existant.
 
 !!! warning "Ne pas confondre les deux comptes"
-    `DB_ADMIN_USER` prépare la base avec `forge db:init`.  
-    `DB_APP_USER` est utilisé ensuite par l'application pendant son fonctionnement normal.
+    `DB_ADMIN_LOGIN` prépare la base avec `forge db:init`.
+    `DB_APP_LOGIN` est utilisé ensuite par l'application pendant son fonctionnement normal.
 
 Exemple pour une application nommée `Contacts` :
 
 ```env
-DB_HOST=localhost
-DB_PORT=3306
+DB_ADMIN_HOST=localhost
+DB_ADMIN_PORT=3306
+DB_ADMIN_LOGIN=forge_admin
+DB_ADMIN_PWD=MotDePasseAdminFort
 
 DB_NAME=contacts
 
-DB_ADMIN_USER=forge_admin
-DB_ADMIN_PWD=MotDePasseAdminFort
-
-DB_APP_USER=contacts_app
+DB_APP_HOST=localhost
+DB_APP_PORT=3306
+DB_APP_LOGIN=contacts_app
 DB_APP_PWD=ContactsApp_2026!
 ```
 
 | Variable | Rôle | Moment d'utilisation |
 |---|---|---|
-| `DB_HOST` | Adresse du serveur MariaDB | Initialisation et exécution |
-| `DB_PORT` | Port MariaDB | Initialisation et exécution |
-| `DB_NAME` | Base de données du projet | Créée par `forge db:init` |
-| `DB_ADMIN_USER` | Compte qui crée la base et les droits | Uniquement pendant `forge db:init` |
+| `DB_ADMIN_HOST` | Adresse du serveur MariaDB pour l'administration | Pendant `forge db:init` |
+| `DB_ADMIN_PORT` | Port MariaDB pour l'administration | Pendant `forge db:init` |
+| `DB_ADMIN_LOGIN` | Compte qui crée la base et les droits | Uniquement pendant `forge db:init` |
 | `DB_ADMIN_PWD` | Mot de passe du compte administrateur | Uniquement pendant `forge db:init` |
-| `DB_APP_USER` | Compte applicatif limité | Utilisé par l'application |
+| `DB_NAME` | Base de données du projet | Créée par `forge db:init` |
+| `DB_APP_HOST` | Adresse du serveur MariaDB pour l'application | Exécution et `forge db:apply` |
+| `DB_APP_PORT` | Port MariaDB pour l'application | Exécution et `forge db:apply` |
+| `DB_APP_LOGIN` | Compte applicatif limité | Utilisé par l'application |
 | `DB_APP_PWD` | Mot de passe du compte applicatif | Utilisé par l'application |
 
 ### 3.2 Schéma : rôle des comptes MariaDB
 
 ```mermaid
 flowchart TD
-    A["forge db:init"] --> B["DB_ADMIN_USER"]
+    A["forge db:init"] --> B["DB_ADMIN_LOGIN"]
     B --> C["crée la base DB_NAME"]
-    B --> D["crée DB_APP_USER"]
+    B --> D["crée DB_APP_LOGIN"]
     B --> E["donne les droits nécessaires"]
 
-    F["python app.py"] --> G["DB_APP_USER"]
+    F["python app.py"] --> G["DB_APP_LOGIN"]
     G --> H["lit et écrit uniquement<br/>dans la base du projet"]
 ```
 
@@ -199,7 +202,7 @@ forge db:init
 Cette commande crée la base de données du projet, l'utilisateur applicatif et applique les droits.
 
 !!! success "Avant de continuer"
-    Vérifier que MariaDB est installé, démarré, et que les variables `DB_ADMIN_USER`, `DB_ADMIN_PWD`, `DB_APP_USER`, `DB_APP_PWD` et `DB_NAME` sont bien renseignées dans `env/dev`.
+    Vérifier que MariaDB est installé, démarré, et que les variables `DB_ADMIN_HOST`, `DB_ADMIN_PORT`, `DB_ADMIN_LOGIN`, `DB_ADMIN_PWD`, `DB_APP_HOST`, `DB_APP_PORT`, `DB_APP_LOGIN`, `DB_APP_PWD` et `DB_NAME` sont bien renseignées dans `env/dev`.
 
 ---
 
