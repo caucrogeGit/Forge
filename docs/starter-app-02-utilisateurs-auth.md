@@ -2,11 +2,13 @@
 
 Ce parcours transforme le socle de sécurité Forge en petite application navigable : accueil public, connexion, dashboard protégé, profil simple et déconnexion.
 
-## Objectif de l’application
+## Présentation rapide
+
+### Objectif
 
 Construire un flux applicatif minimal :
 
-- une page d’accueil publique ;
+- une page d'accueil publique ;
 - un formulaire de connexion public ;
 - un dashboard accessible uniquement après connexion ;
 - une page profil simple ;
@@ -14,13 +16,68 @@ Construire un flux applicatif minimal :
 
 Le starter explique les sessions, le CSRF, les messages flash et la différence entre routes publiques et routes protégées. Il ne met pas en place de permissions multi-rôles.
 
-## Niveau de difficulté
+### Niveau
 
 Niveau 2 — intermédiaire Forge.
 
 Il suppose que le starter 1 est compris : routes, contrôleurs, formulaires, vues Jinja2 et flash. La nouveauté est la sécurité HTTP et le cycle de session.
 
-## Ce que l’on apprend
+### Temps estimé
+
+2h à 3h.
+
+### Résultat attendu
+
+Application avec authentification fonctionnelle — accueil public, formulaire de connexion sécurisé par CSRF, dashboard protégé, page profil et déconnexion en `POST`.
+
+---
+
+## Installation du projet Forge
+
+### Méthode A — installation automatique (recommandée)
+
+```bash
+pipx install git+https://github.com/caucrogeGit/Forge.git
+forge new AppAuth
+cd AppAuth
+source .venv/bin/activate
+forge doctor
+```
+
+### Méthode B — installation manuelle
+
+```bash
+git clone https://github.com/caucrogeGit/Forge.git AppAuth
+cd AppAuth
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+npm install
+python forge.py doctor
+```
+
+> Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+
+---
+
+## Préparation de la base
+
+```bash
+forge db:init
+```
+
+Cette commande crée la base de données du projet, l'utilisateur applicatif et applique les droits.
+
+Prérequis :
+
+- MariaDB installé et en cours d'exécution.
+- Les identifiants de connexion renseignés dans `env/dev` (`DB_ADMIN_PWD`, `DB_APP_PWD`, etc.).
+
+---
+
+## Développement de l'application
+
+### Ce que l'on apprend
 
 - Déclarer des routes publiques et protégées.
 - Garder `POST /logout` derrière un token CSRF.
@@ -28,9 +85,9 @@ Il suppose que le starter 1 est compris : routes, contrôleurs, formulaires, vue
 - Créer, authentifier et supprimer une session.
 - Utiliser `BaseController.redirect_with_flash(request, ...)`.
 - Rendre un dashboard protégé avec `BaseController.render(..., request=request)`.
-- Ne pas inventer de permissions avancées quand le besoin est seulement “connecté ou non”.
+- Ne pas inventer de permissions avancées quand le besoin est seulement "connecté ou non".
 
-## Navigation de l’application
+### Navigation de l'application
 
 ```text
 /               accueil public
@@ -40,22 +97,22 @@ Il suppose que le starter 1 est compris : routes, contrôleurs, formulaires, vue
 /logout         déconnexion en POST
 ```
 
-`GET /logout` n’est pas proposé : la déconnexion modifie l’état de session et doit rester une action `POST`.
+`GET /logout` n'est pas proposé : la déconnexion modifie l'état de session et doit rester une action `POST`.
 
-## Charte graphique
+### Charte graphique
 
 La charte reste proche du starter 1 :
 
-- accueil public sobre avec un bouton “Se connecter” ;
+- accueil public sobre avec un bouton "Se connecter" ;
 - formulaire centré dans une carte ;
 - dashboard en deux colonnes simples ;
 - profil sous forme de fiche ;
 - messages flash visibles après connexion et déconnexion ;
 - bouton de déconnexion distinct, en style secondaire ou danger léger.
 
-## Modèle de données
+### Modèle de données
 
-Pour un starter pédagogique, l’utilisateur peut être représenté par une table simple :
+Pour un starter pédagogique, l'utilisateur peut être représenté par une table simple :
 
 ```json
 {
@@ -121,11 +178,9 @@ Pour un starter pédagogique, l’utilisateur peut être représenté par une ta
 
 Le mot de passe en clair ne va jamais dans le JSON ni dans la base. Le starter montre la structure, puis laisse le hachage au code applicatif.
 
-## Commandes Forge
+### Commandes Forge
 
 ```bash
-forge doctor
-forge db:init
 forge make:entity Utilisateur --no-input
 # modifier mvc/entities/utilisateur/utilisateur.json
 forge build:model --dry-run
@@ -134,13 +189,13 @@ forge check:model
 forge db:apply
 ```
 
-Le CRUD complet utilisateur n’est pas l’objectif de ce starter. On écrit plutôt un `AuthController` et un modèle applicatif SQL visible pour chercher l’utilisateur par login.
+Le CRUD complet utilisateur n'est pas l'objectif de ce starter. On écrit plutôt un `AuthController` et un modèle applicatif SQL visible pour chercher l'utilisateur par login.
 
-## Créer un utilisateur de test
+### Créer un utilisateur de test
 
-L’auth réelle Forge vérifie le mot de passe avec `core.security.hashing.verifier_mot_de_passe()`. La valeur stockée dans `PasswordHash` doit donc être produite avec `hacher_mot_de_passe()`, au format `sel_hex:hash_hex`.
+L'auth réelle Forge vérifie le mot de passe avec `core.security.hashing.verifier_mot_de_passe()`. La valeur stockée dans `PasswordHash` doit donc être produite avec `hacher_mot_de_passe()`, au format `sel_hex:hash_hex`.
 
-Si vous utilisez le modèle d’authentification livré avec Forge (`mvc.models.auth_model`), les tables `role` et `utilisateur_role` doivent aussi exister, même sans permission multi-rôles dans ce starter. `python cmd/make.py security:init --env dev` peut les créer. Vous pouvez ensuite insérer ou remplacer l’utilisateur de test avec le script ci-dessous.
+Si vous utilisez le modèle d'authentification livré avec Forge (`mvc.models.auth_model`), les tables `role` et `utilisateur_role` doivent aussi exister, même sans permission multi-rôles dans ce starter. `python cmd/make.py security:init --env dev` peut les créer. Vous pouvez ensuite insérer ou remplacer l'utilisateur de test avec le script ci-dessous.
 
 Méthode par script minimal :
 
@@ -178,9 +233,9 @@ login    admin
 password secret123
 ```
 
-Si votre connecteur SQL utilise `%s` au lieu de `?`, gardez l’idée du script et adaptez uniquement les placeholders à votre connexion.
+Si votre connecteur SQL utilise `%s` au lieu de `?`, gardez l'idée du script et adaptez uniquement les placeholders à votre connexion.
 
-## Fichiers créés ou modifiés
+### Fichiers créés ou modifiés
 
 Fichiers entité :
 
@@ -204,7 +259,7 @@ mvc/views/layouts/app.html
 mvc/routes.py
 ```
 
-## Classes Python utilisées
+### Classes Python utilisées
 
 - `BaseController` pour `render`, `redirect` et `redirect_with_flash`.
 - `core.security.session` pour créer, lire, authentifier et supprimer une session.
@@ -222,7 +277,7 @@ password = request.body.get("password", [""])[0]
 
 Le contrôleur lit les cookies et la session via les helpers de sécurité, pas via un attribut magique sur `request`.
 
-## Tags Jinja utilisés
+### Tags Jinja utilisés
 
 - `{% extends "layouts/app.html" %}` ;
 - `{% block content %}` ;
@@ -231,17 +286,17 @@ Le contrôleur lit les cookies et la session via les helpers de sécurité, pas 
 - `{{ utilisateur.Nom }}`, `{{ utilisateur.Login }}` et `{{ utilisateur.Email }}` dans le profil si le contexte reçoit directement le dictionnaire SQL ;
 - `{% if utilisateur %}` pour adapter la navigation.
 
-## Classes CSS/Tailwind importantes
+### Classes CSS/Tailwind importantes
 
 - `min-h-screen`, `flex`, `items-center`, `justify-center` pour la page login ;
 - `max-w-md`, `rounded`, `border`, `shadow-sm` pour la carte de connexion ;
-- `bg-orange-600`, `hover:bg-orange-700` pour l’action principale ;
+- `bg-orange-600`, `hover:bg-orange-700` pour l'action principale ;
 - `bg-slate-100`, `text-slate-700` pour les actions secondaires ;
 - `grid`, `gap-6`, `md:grid-cols-2` pour le dashboard.
 
-## Test navigateur
+### Test navigateur
 
-1. Ouvrir `/` et vérifier que l’accueil est public.
+1. Ouvrir `/` et vérifier que l'accueil est public.
 2. Ouvrir `/dashboard` sans session et vérifier la redirection vers `/login`.
 3. Ouvrir `/login`.
 4. Soumettre le formulaire sans token CSRF valide et vérifier le refus.
@@ -252,14 +307,30 @@ Le contrôleur lit les cookies et la session via les helpers de sécurité, pas 
 9. Cliquer sur déconnexion, qui soumet `POST /logout`.
 10. Vérifier que `/dashboard` redevient inaccessible.
 
-## Limites du starter
+### Limites du starter
 
 - Pas de permissions multi-rôles.
 - Pas de réinitialisation de mot de passe.
-- Pas d’inscription publique.
+- Pas d'inscription publique.
 - Pas de politique de mot de passe avancée.
-- Pas de gestion d’équipe ou d’organisation.
+- Pas de gestion d'équipe ou d'organisation.
 - Le modèle utilisateur est volontairement minimal.
+
+---
+
+## Vérification finale
+
+```bash
+forge doctor
+forge routes:list
+python app.py
+```
+
+Ouvrir dans le navigateur :
+
+```text
+https://localhost:8000/login
+```
 
 ## Reconstruction
 

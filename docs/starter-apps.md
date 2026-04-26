@@ -13,19 +13,43 @@ Les starter apps Forge sont des applications de référence progressives. Chacun
 
 Pour voir la liste depuis la CLI : `forge starter:list`
 
-## Tester localement
+## Installer et démarrer un starter
 
-Chaque starter se construit à partir d'un projet Forge vierge :
+Chaque starter se construit à partir d'un projet Forge vierge.
+
+### Méthode A — installation automatique (recommandée)
 
 ```bash
+pipx install git+https://github.com/caucrogeGit/Forge.git
 forge new NomDuProjet
 cd NomDuProjet
 source .venv/bin/activate
 forge doctor
+```
+
+### Méthode B — installation manuelle
+
+```bash
+git clone https://github.com/caucrogeGit/Forge.git NomDuProjet
+cd NomDuProjet
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+npm install
+python forge.py doctor
+```
+
+> Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+
+### Préparation de la base
+
+```bash
 forge db:init
 ```
 
-Suivez ensuite les étapes du starter souhaité. Le README de chaque starter liste les commandes exactes.
+Cette commande crée la base de données du projet, l'utilisateur applicatif et applique les droits. Les identifiants se règlent dans `env/dev` (`DB_ADMIN_PWD`, `DB_APP_PWD`, etc.).
+
+Suivez ensuite les étapes du starter souhaité. Chaque page de starter liste les commandes exactes.
 
 !!! tip "Astuce"
     Utilisez `forge build:model --dry-run` avant `forge build:model` pour vérifier ce qui sera généré.
