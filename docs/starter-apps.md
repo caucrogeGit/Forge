@@ -6,10 +6,7 @@
   <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Des applications de référence progressives pour apprendre, reconstruire vite, puis adapter à un vrai projet.</p>
 </div>
 
-Elles sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` est disponible pour les starters 1 — Contacts, 2 — Utilisateurs / authentification et 3 — Carnet de contacts ; le starter 4 est documenté, mais sa génération automatique est encore à venir.
-
-!!! warning "Disponibilité"
-    Contacts, Utilisateurs / authentification et Carnet de contacts sont générables automatiquement aujourd'hui. Suivi comportement élèves reste un guide pédagogique et une recette de reconstruction.
+Elles sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` est disponible pour les quatre starters.
 
 ## Liste des starter apps
 
@@ -18,7 +15,7 @@ Elles sont d'abord des parcours pédagogiques. La génération automatique par `
 | 1 | [Contacts](starter-app-01-contacts.md) | CRUD basique sur une entité unique |
 | 2 | [Utilisateurs / authentification](starter-app-02-utilisateurs-auth.md) | Login, sessions, routes protégées, CSRF |
 | 3 | [Carnet de contacts](starter-app-03-carnet-contacts.md) | `many_to_one`, relation globale, `JOIN` SQL |
-| 4 | [Suivi comportement élèves](starter-app-04-suivi-comportement-eleves.md) | Application métier, cases à cocher, synthèses |
+| 4 | [Suivi pédagogique](starter-app-04-suivi-comportement-eleves.md) | Auth, routes protégées, `many_to_one`, seed de démo |
 
 Pour voir la liste depuis la CLI : `forge starter:list`.
 
@@ -34,10 +31,13 @@ forge starter:build utilisateurs-auth
 forge starter:build 3
 forge starter:build carnet
 forge starter:build carnet-contacts
+forge starter:build 4
+forge starter:build suivi
+forge starter:build suivi-comportement-eleves
 ```
 
 Les options utiles sont `--dry-run` pour prévisualiser, `--init-db` pour lancer explicitement l'initialisation de base, et `--force` pour reconstruire avec prudence un starter déjà présent.
-`--public` est disponible pour Contacts, mais n'est pas applicable aux starters Utilisateurs / authentification et Carnet de contacts.
+`--public` est disponible pour Contacts, mais n'est pas applicable aux starters Utilisateurs / authentification, Carnet de contacts et Suivi pédagogique.
 
 <div class="grid cards" markdown>
 
@@ -57,7 +57,7 @@ Les options utiles sont `--dry-run` pour prévisualiser, `--init-db` pour lancer
 
     ---
 
-    Utiliser `forge starter:build 1` pour Contacts, `forge starter:build 2` pour Utilisateurs / authentification et `forge starter:build 3` pour Carnet de contacts.
+    Utiliser `forge starter:build 1` à `forge starter:build 4` pour générer automatiquement n'importe lequel des quatre starters.
 
 </div>
 
@@ -124,6 +124,6 @@ Le starter documente les intentions. Votre projet contient vos règles métier.
 | Contacts | *(à renseigner)* |
 | Utilisateurs / authentification | *(à renseigner)* |
 | Carnet de contacts | *(à renseigner)* |
-| Suivi comportement élèves | *(à renseigner)* |
+| Suivi pédagogique | *(à renseigner)* |
 
 Pour déployer une starter-app comme démonstration, consultez la section dédiée dans [le guide de déploiement](deployment.md#deployer-une-starter-app-comme-demonstration).
