@@ -85,8 +85,20 @@ DB_NAME=contact_simple
 DB_ADMIN_USER=forge_admin
 DB_ADMIN_PWD=MotDePasseAdminFort
 
-DB_APP_USER=contact_simple_user
-DB_APP_PWD=MotDePasseAppFort
+DB_APP_USER=contacts_app
+DB_APP_PWD=ContactsApp_2026!
+```
+
+Dans cet exemple :
+
+- `DB_ADMIN_USER=forge_admin` correspond à un utilisateur MariaDB déjà existant ;
+- `DB_ADMIN_PWD` est le mot de passe de cet utilisateur administrateur ;
+- `DB_NAME=contact_simple` est la base que Forge va créer ;
+- `DB_APP_USER=contacts_app` est l'utilisateur applicatif que Forge va créer ;
+- `DB_APP_PWD` est le mot de passe de l'utilisateur applicatif.
+
+`DB_ADMIN_USER` sert uniquement à l'initialisation de la base avec `forge db:init`.
+Ensuite, l'application utilise `DB_APP_USER`, plus limité, pour se connecter à la base.
 
 ### Initialiser la base
 
@@ -209,55 +221,219 @@ La contrainte `unique: true` empêche deux contacts d'utiliser le même email. D
 
 ### Commandes Forge
 
-Créer l'entité minimale :
+Cette partie montre les commandes, mais aussi ce que Forge écrit réellement dans le projet. L'objectif est de comprendre l'envers du décor : Forge ne cache pas le modèle, le SQL, le contrôleur ni les vues.
+
+#### 1. Créer l'entité minimale
 
 ```bash
 forge make:entity Contact --no-input
 ```
 
-Modifier ensuite le fichier canonique :
+Cette commande crée la structure de départ de l'entité :
 
 ```text
-mvc/entities/contact/contact.json
+mvc/entities/contact/
+├── __init__.py
+├── contact.json
+├── contact.sql
+├── contact_base.py
+└── contact.py
 ```
 
-Vérifier le modèle :
+À ce stade, `contact.json` est volontairement minimal. Le développeur le complète ensuite avec les champs métier présentés plus haut : `nom`, `prenom`, `email`, `telephone`.
+
+Le fichier manuel `contact.py` sert de point d'extension métier. Il n'est pas écrasé lors des régénérations.
+
+```python
+from .contact_base import ContactBase
+
+
+class Contact(ContactBase):
+    """Point d'extension métier pour Contact."""
+
+    pass
+```
+
+#### 2. Vérifier le modèle canonique
 
 ```bash
 forge check:model
 ```
 
-Prévisualiser la génération :
+Cette commande lit les fichiers JSON présents dans `mvc/entities/` et vérifie leur cohérence. Elle ne modifie aucun fichier.
+
+Elle sert à repérer les erreurs avant génération : champ incomplet, type SQL invalide, clé primaire absente, doublon de table ou incohérence de modèle.
+
+#### 3. Prévisualiser la génération du modèle
 
 ```bash
 forge build:model --dry-run
 ```
 
-Générer les fichiers `contact.sql` et `contact_base.py` :
+Le mode `--dry-run` indique ce que Forge générerait, sans écrire les fichiers. C'est une étape de contrôle.
+
+Forge prépare principalement deux fichiers régénérables :
+
+```text
+mvc/entities/contact/contact.sql
+mvc/entities/contact/contact_base.py
+```
+
+#### 4. Générer le SQL et la classe de base
 
 ```bash
 forge build:model
 ```
 
-Appliquer le SQL sur la base de développement :
+Cette commande régénère les fichiers techniques à partir de `contact.json`.
+
+Exemple de SQL généré dans `mvc/entities/contact/contact.sql` :
+
+```sql
+CREATE TABLE IF NOT EXISTS contact (
+    Id INT NOT NULL AUTO_INCREMENT,
+    Nom VARCHAR(80) NOT NULL,
+    Prenom VARCHAR(80) NOT NULL,
+    Email VARCHAR(120) NOT NULL,
+    UNIQUE KEY uk_contact_email (Email),
+    Telephone VARCHAR(20) NULL,
+    PRIMARY KEY (Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+Extrait simplifié de `mvc/entities/contact/contact_base.py` :
+
+```python
+from core.validation import ValidationError, max_length, not_empty, nullable, typed
+
+
+class ContactBase:
+    """Classe de base régénérable de Contact."""
+
+    def __init__(self, nom, prenom, email, id=None, telephone=None):
+        self.nom = nom
+        self.prenom = prenom
+        self.email = email
+        self.id = id
+        self.telephone = telephone
+
+    @property
+    def nom(self):
+        return self._nom
+
+    @nom.setter
+    @typed(str)
+    @not_empty
+    @max_length(80)
+    def nom(self, value):
+        if value is None:
+            raise ValidationError("nom", 'La propriété "nom" ne peut pas être nulle.')
+        self._nom = value
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "nom": self.nom,
+            "prenom": self.prenom,
+            "email": self.email,
+            "telephone": self.telephone,
+        }
+```
+
+Le fichier `contact_base.py` est régénérable. Il ne faut pas y écrire de logique métier manuelle. La logique métier se place dans `contact.py`.
+
+#### 5. Appliquer le SQL sur la base de développement
 
 ```bash
 forge db:apply
 ```
 
-Dans ce starter, `forge db:apply` est utilisé sur une base de développement neuve. Le starter ne présente pas encore un système complet de migrations avancées.
+Cette commande applique le SQL généré sur la base MariaDB configurée dans `env/dev`.
 
-Prévisualiser le CRUD :
+Dans ce starter, `forge db:apply` est utilisé sur une base de développement neuve. Le starter ne présente pas encore un système complet de migrations avancées. Si le modèle change fortement après création de la table, il faut traiter la modification de schéma avec prudence.
+
+#### 6. Prévisualiser le CRUD
 
 ```bash
 forge make:crud Contact --dry-run
 ```
 
-Générer le CRUD :
+Cette commande montre les fichiers que Forge créerait pour le CRUD, sans les écrire.
+
+Elle permet de vérifier que Forge va travailler sur la bonne entité et qu'aucun fichier existant ne sera créé par erreur.
+
+#### 7. Générer le CRUD
 
 ```bash
 forge make:crud Contact
 ```
+
+Cette commande crée les fichiers MVC applicatifs s'ils sont absents :
+
+```text
+mvc/controllers/contact_controller.py
+mvc/models/contact_model.py
+mvc/forms/contact_form.py
+mvc/views/layouts/app.html
+mvc/views/contact/index.html
+mvc/views/contact/show.html
+mvc/views/contact/form.html
+```
+
+Extrait du modèle généré dans `mvc/models/contact_model.py` :
+
+```python
+from core.database.connection import get_connection, close_connection
+
+SELECT_ALL   = "SELECT * FROM contact ORDER BY Id"
+SELECT_BY_ID = "SELECT * FROM contact WHERE Id = ?"
+INSERT       = "INSERT INTO contact (Nom, Prenom, Email, Telephone) VALUES (?, ?, ?, ?)"
+UPDATE       = "UPDATE contact SET Nom = ?, Prenom = ?, Email = ?, Telephone = ? WHERE Id = ?"
+DELETE       = "DELETE FROM contact WHERE Id = ?"
+```
+
+Extrait du formulaire généré dans `mvc/forms/contact_form.py` :
+
+```python
+from core.forms import Form, StringField
+
+
+class ContactForm(Form):
+    nom = StringField(label="Nom", required=True, max_length=80)
+    prenom = StringField(label="Prenom", required=True, max_length=80)
+    email = StringField(label="Email", required=True, max_length=120)
+    telephone = StringField(label="Telephone", required=False, max_length=20)
+```
+
+Extrait du contrôleur généré dans `mvc/controllers/contact_controller.py` :
+
+```python
+class ContactController(BaseController):
+
+    @staticmethod
+    def index(request):
+        contacts = get_contacts()
+        return BaseController.render(
+            "contact/index.html",
+            context={"contacts": contacts, "flash_html": render_flash_html(request)},
+            request=request,
+        )
+
+    @staticmethod
+    def create(request):
+        form = ContactForm.from_request(request)
+        if not form.is_valid():
+            return BaseController.validation_error(
+                "contact/form.html",
+                context={"form": form, "action": "/contacts", "titre": "Nouveau contact"},
+                request=request,
+            )
+
+        add_contact(form.cleaned_data)
+        return BaseController.redirect_with_flash(request, "/contacts", "Contact créé.")
+```
+
+Forge génère donc une base de travail lisible, mais le développeur garde la main : les routes restent à déclarer explicitement dans `mvc/routes.py`.
 
 ### Routes à ajouter
 
@@ -266,17 +442,20 @@ Après la génération du CRUD, copier ou vérifier les routes dans `mvc/routes.
 ```python
 from mvc.controllers.contact_controller import ContactController
 
-router.get("/contacts", ContactController.index)
-router.get("/contacts/new", ContactController.create)
-router.post("/contacts", ContactController.store)
-
-router.get("/contacts/{id}", ContactController.show)
-router.get("/contacts/{id}/edit", ContactController.edit)
-router.post("/contacts/{id}", ContactController.update)
-router.post("/contacts/{id}/delete", ContactController.delete)
+# Routes protégées par défaut.
+# Pour un test local sans authentification :
+# with router.group("/contacts", public=True, csrf=False) as g:
+with router.group("/contacts") as g:
+    g.add("GET",  "",              ContactController.index,   name="contact_index")
+    g.add("GET",  "/new",          ContactController.new,     name="contact_new")
+    g.add("POST", "",              ContactController.create,  name="contact_create")
+    g.add("GET",  "/{id}",         ContactController.show,    name="contact_show")
+    g.add("GET",  "/{id}/edit",    ContactController.edit,    name="contact_edit")
+    g.add("POST", "/{id}",         ContactController.update,  name="contact_update")
+    g.add("POST", "/{id}/delete",  ContactController.destroy, name="contact_destroy")
 ```
 
-La route `/contacts/new` doit rester déclarée avant `/contacts/{id}` afin d'éviter que `new` soit interprété comme un identifiant.
+Dans ce groupe, la route `/new` doit rester déclarée avant `/{id}` afin d'éviter que `new` soit interprété comme un identifiant.
 
 ### Fichiers créés ou modifiés
 
@@ -313,7 +492,7 @@ mvc/routes.py
 - `ContactBase` : classe générée depuis le JSON.
 - `Contact` : classe métier manuelle qui hérite de `ContactBase`.
 - `ContactForm` : formulaire généré, basé sur `core.forms.Form`.
-- `ContactController` : contrôleur MVC généré.
+- `ContactController` : contrôleur MVC généré, avec les actions `index`, `new`, `create`, `show`, `edit`, `update` et `destroy`.
 - `BaseController` : rendu HTML, redirections, flash et erreurs de validation.
 
 Le contrôleur généré lit les formulaires via l'API réelle Forge.
