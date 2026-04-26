@@ -39,8 +39,8 @@ Application CRUD complète pour gérer des contacts — liste, création, modifi
 
 ```bash
 pipx install git+https://github.com/caucrogeGit/Forge.git
-forge new ContactSimple
-cd ContactSimple
+forge new Contacts
+cd Contacts
 source .venv/bin/activate
 forge doctor
 ```
@@ -48,8 +48,8 @@ forge doctor
 ### Méthode B — installation manuelle
 
 ```bash
-git clone https://github.com/caucrogeGit/Forge.git ContactSimple
-cd ContactSimple
+git clone https://github.com/caucrogeGit/Forge.git Contacts
+cd Contacts
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -66,23 +66,27 @@ forge doctor
 
 ### Configurer l'administrateur MariaDB du projet
 
-Avant d'exécuter `forge db:init`, renseigner dans `env/dev` un compte MariaDB disposant des droits nécessaires pour créer la base, créer l'utilisateur applicatif et appliquer les privilèges.
+Avant d'exécuter `forge db:init`, renseigner dans `env/dev` un compte MariaDB disposant des droits nécessaires pour :
+
+- créer la base de données du projet ;
+- créer l'utilisateur applicatif ;
+- appliquer les privilèges nécessaires.
 
 En développement local, on peut utiliser temporairement un compte administrateur MariaDB existant.
 
-Exemple de variables à vérifier dans `env/dev` :
+Exemple pour une application nommée `Contacts` :
 
 ```env
-DB_ADMIN_USER=...
-DB_ADMIN_PWD=...
+DB_HOST=localhost
+DB_PORT=3306
 
-DB_APP_USER=...
-DB_APP_PWD=...
-DB_NAME=...
-```
+DB_NAME=contact_simple
 
-`DB_ADMIN_USER` sert uniquement à l'initialisation de la base.  
-`DB_APP_USER` est l'utilisateur utilisé ensuite par l'application.
+DB_ADMIN_USER=forge_admin
+DB_ADMIN_PWD=MotDePasseAdminFort
+
+DB_APP_USER=contact_simple_user
+DB_APP_PWD=MotDePasseAppFort
 
 ### Initialiser la base
 
