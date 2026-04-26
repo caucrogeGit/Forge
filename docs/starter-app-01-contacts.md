@@ -56,27 +56,15 @@ Le starter sert à comprendre le flux Forge minimal : JSON canonique, SQL visibl
 
 ### 1.2 Parcours général
 
-```text
-Navigateur
-   │
-   │ GET /contacts, POST /contacts, etc.
-   ▼
-mvc/routes.py
-   │
-   ▼
-ContactController
-   │
-   ├── utilise ContactForm pour lire et valider les formulaires
-   │
-   ├── appelle contact_model.py pour lire ou écrire en base
-   │        │
-   │        ▼
-   │      MariaDB
-   │
-   └── rend une vue Jinja2
-            │
-            ▼
-        HTML affiché
+```mermaid
+flowchart TD
+    A([Navigateur]) -->|"GET /contacts, POST /contacts…"| B["mvc/routes.py"]
+    B --> C[ContactController]
+    C -->|"lit et valide"| D[ContactForm]
+    C -->|"lit / écrit"| E[contact_model.py]
+    E --> F[(MariaDB)]
+    C -->|"rend"| G[Vue Jinja2]
+    G --> H([HTML affiché])
 ```
 
 !!! tip "Lecture du schéma"
@@ -278,40 +266,18 @@ Cette commande crée la base de données du projet, l'utilisateur applicatif et 
 
 ### 4.2 Parcours de développement
 
-```text
-make:entity
-   │
-   ▼
-édition de contact.json
-   │
-   ▼
-check:model
-   │
-   ▼
-build:model --dry-run
-   │
-   ▼
-build:model
-   │
-   ├── génère contact.sql
-   └── génère contact_base.py
-   │
-   ▼
-db:apply
-   │
-   ▼
-make:crud --dry-run
-   │
-   ▼
-make:crud
-   │
-   ├── génère le contrôleur
-   ├── génère le modèle SQL applicatif
-   ├── génère le formulaire
-   └── génère les templates
-   │
-   ▼
-copie des routes dans mvc/routes.py
+```mermaid
+flowchart TD
+    A["forge make:entity"] --> B["édition de contact.json"]
+    B --> C["forge check:model"]
+    C --> D["forge build:model --dry-run"]
+    D --> E["forge build:model"]
+    E --> F["contact.sql + contact_base.py"]
+    F --> G["forge db:apply"]
+    G --> H["forge make:crud --dry-run"]
+    H --> I["forge make:crud"]
+    I --> J["contrôleur · modèle · formulaire · templates"]
+    J --> K["copie des routes → mvc/routes.py"]
 ```
 
 !!! tip "Principe Forge"
@@ -833,30 +799,16 @@ delete_contact(id)
 
 ### 11.3 Schéma : cycle d'une création de contact
 
-```text
-Navigateur
-   │
-   │ POST /contacts
-   ▼
-mvc/routes.py
-   │
-   ▼
-ContactController.create(request)
-   │
-   ├── ContactForm.from_request(request)
-   │
-   ├── form.is_valid()
-   │       │
-   │       ├── non
-   │       │    └── retour vers contact/form.html avec les erreurs
-   │       │
-   │       └── oui
-   │            └── add_contact(form.cleaned_data)
-   │                    │
-   │                    ▼
-   │                  MariaDB
-   │
-   └── redirect_with_flash(request, "/contacts", "Contact créé.")
+```mermaid
+flowchart TD
+    A([Navigateur]) -->|"POST /contacts"| B["mvc/routes.py"]
+    B --> C["ContactController.create(request)"]
+    C --> D["ContactForm.from_request(request)"]
+    D --> E{"form.is_valid()"}
+    E -->|non| F["contact/form.html\navec les erreurs"]
+    E -->|oui| G["add_contact(form.cleaned_data)"]
+    G --> H[(MariaDB)]
+    H --> I["redirect_with_flash → /contacts"]
 ```
 
 !!! tip "À retenir"
