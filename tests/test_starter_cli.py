@@ -7,6 +7,7 @@ import sys
 import pytest
 
 from forge_cli.starters import cmd_starter_build, cmd_starter_list
+from forge_cli.starters.builder import _check_existing, _remove_legacy_auth_routes
 from forge_cli.starters.registry import all_starters, resolve
 
 
@@ -74,7 +75,18 @@ def test_starter_build_auth_dry_run_fonctionne(identifier, capsys):
     output = capsys.readouterr().out
     assert "Utilisateurs / authentification" in output
     assert "mvc/controllers/auth_controller.py" in output
+    assert "scripts/create_auth_user.py" in output
     assert "Aucun fichier écrit" in output
+
+
+def test_starter_build_auth_dry_run_annonce_routes(capsys):
+    cmd_starter_build(["2", "--dry-run"])
+    output = capsys.readouterr().out
+    assert "GET    /login" in output
+    assert "POST   /login" in output
+    assert "GET    /dashboard" in output
+    assert "GET    /profil" in output
+    assert "POST   /logout" in output
 
 
 def test_starter_build_auth_public_refuse(capsys):
@@ -84,6 +96,77 @@ def test_starter_build_auth_public_refuse(capsys):
     assert exc.value.code == 1
     output = capsys.readouterr().out
     assert "--public n'est pas applicable" in output
+
+
+def test_starter_auth_adopte_le_scaffold_auth_historique(tmp_path):
+    meta = resolve("2")
+    (tmp_path / "mvc/controllers").mkdir(parents=True)
+    (tmp_path / "mvc/models").mkdir(parents=True)
+    (tmp_path / "mvc/views/auth").mkdir(parents=True)
+    (tmp_path / "mvc/routes.py").parent.mkdir(parents=True, exist_ok=True)
+
+    (tmp_path / "mvc/controllers/auth_controller.py").write_text(
+        'from core.mvc.controller.base_controller import BaseController\n'
+        'class AuthController:\n'
+        '    def login(self):\n'
+        '        return BaseController.redirect("/")\n',
+        encoding="utf-8",
+    )
+    (tmp_path / "mvc/models/auth_model.py").write_text(
+        "GET_ROLES_UTILISATEUR = '''\n"
+        "SELECT ur.RoleId\n"
+        "FROM utilisateur_role ur\n"
+        "'''\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "mvc/views/auth/login.html").write_text(
+        '<form action="/login"><input name="csrf_token"></form>\n',
+        encoding="utf-8",
+    )
+    (tmp_path / "mvc/routes.py").write_text(
+        "from core.http.router import Router\n"
+        "router = Router()\n",
+        encoding="utf-8",
+    )
+
+    assert _check_existing(meta, tmp_path) == []
+
+
+def test_starter_auth_retire_les_routes_auth_publiques_legacy(tmp_path):
+    routes_py = tmp_path / "mvc/routes.py"
+    routes_py.parent.mkdir(parents=True)
+    routes_py.write_text(
+        "from core.http.router import Router\n"
+        "from mvc.controllers.auth_controller import AuthController\n"
+        "from mvc.controllers.home_controller import HomeController\n\n"
+        "router = Router()\n\n"
+        'with router.group("", public=True) as pub:\n'
+        '    pub.add("GET", "/", HomeController.index, name="home")\n\n'
+        'with router.group("", public=True) as pub:\n'
+        '    pub.add("GET",  "/login",  AuthController.login_form, name="login_form")\n'
+        '    pub.add("POST", "/login",  AuthController.login,      name="login")\n'
+        '    pub.add("POST", "/logout", AuthController.logout,     name="logout")\n',
+        encoding="utf-8",
+    )
+
+    _remove_legacy_auth_routes(routes_py)
+    output = routes_py.read_text(encoding="utf-8")
+    assert "AuthController" not in output
+    assert 'pub.add("GET", "/", HomeController.index, name="home")' in output
+    assert '"/login"' not in output
+    assert '"/logout"' not in output
+
+
+def test_script_create_auth_user_configure_le_projet():
+    script = (
+        resolve("2")["_dir"]
+        / "files"
+        / "scripts"
+        / "create_auth_user.py"
+    ).read_text(encoding="utf-8")
+    assert "sys.path.insert(0, str(PROJECT_ROOT))" in script
+    assert "forge.configure(" in script
+    assert "hacher_mot_de_passe(PASSWORD)" in script
 
 
 def test_starter_build_refuse_un_starter_coming_soon(capsys):
