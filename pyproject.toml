@@ -25,3 +25,10 @@ py-modules = ["forge"]
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["core*", "forge_cli*", "integrations*"]
+
+[tool.setuptools.package-data]
+"forge_cli" = [
+    "starters/data/**/*.json",
+    "starters/data/**/*.html",
+    "starters/data/**/*.snippet",
+]
