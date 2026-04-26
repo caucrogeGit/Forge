@@ -1,0 +1,2 @@
+class StarterBuildError(RuntimeError):
+    pass

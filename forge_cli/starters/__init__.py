@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import sys
 
+from forge_cli.starters._exceptions import StarterBuildError
 from forge_cli.starters.registry import all_starters, resolve, StarterNotFound, StarterUnavailable
-from forge_cli.starters.builder import build, dry_run, StarterBuildError
+from forge_cli.starters.builder import build, dry_run
 
 
 # ── starter:list ──────────────────────────────────────────────────────────────

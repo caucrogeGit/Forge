@@ -10,11 +10,8 @@ import pytest
 from forge_cli.starters import cmd_starter_build, cmd_starter_list
 from forge_cli.entities.model import build_model
 from forge_cli.entities.relations import validate_relations_definition
-from forge_cli.starters.builder import (
-    _check_existing,
-    _force_clean_application,
-    _remove_legacy_auth_routes,
-)
+from forge_cli.starters.scaffold import check_existing as _check_existing, force_clean_application as _force_clean_application
+from forge_cli.starters.route_ops import remove_legacy_auth_block as _remove_legacy_auth_routes
 from forge_cli.starters.registry import all_starters, resolve
 
 
