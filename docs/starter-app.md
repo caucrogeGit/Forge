@@ -6,10 +6,10 @@
   <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Des parcours progressifs pour apprendre Forge avec JSON canonique, SQL visible, contrôleurs explicites et routes ajoutées manuellement.</p>
 </div>
 
-Les starters sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` existe actuellement pour les starters 1 — Contacts et 2 — Utilisateurs / authentification ; les starters 3 et 4 sont documentés, mais leur génération automatique est encore à venir.
+Les starters sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` existe actuellement pour les starters 1 — Contacts, 2 — Utilisateurs / authentification et 3 — Carnet de contacts ; le starter 4 est documenté, mais sa génération automatique est encore à venir.
 
 !!! warning "État de la génération automatique"
-    `forge starter:build` est disponible pour Contacts et Utilisateurs / authentification. Les starters 3 et 4 restent des parcours pédagogiques documentés, avec génération automatique à venir.
+    `forge starter:build` est disponible pour Contacts, Utilisateurs / authentification et Carnet de contacts. Le starter 4 reste un parcours pédagogique documenté, avec génération automatique à venir.
 
 ## Vue D'ensemble
 
@@ -17,7 +17,7 @@ Les starters sont d'abord des parcours pédagogiques. La génération automatiqu
 |---|---|---|---|
 | 1 | [Contacts](starter-app-01-contacts.md) | Créer un CRUD complet sur une seule entité | `make:entity`, `make:crud`, formulaires, flash |
 | 2 | [Utilisateurs / authentification](starter-app-02-utilisateurs-auth.md) | Comprendre login, logout, sessions et routes protégées | sessions, CSRF, routes publiques/protégées |
-| 3 | [Carnet de contacts](starter-app-03-carnet-contacts.md) | Lire un modèle relationnel explicite | `many_to_one`, pivot explicite, `JOIN` SQL |
+| 3 | [Carnet de contacts](starter-app-03-carnet-contacts.md) | Lire un modèle relationnel explicite | `many_to_one`, `relations.json`, `JOIN` SQL |
 | 4 | [Suivi comportement élèves](starter-app-04-suivi-comportement-eleves.md) | Construire une application métier plus dense | formulaires, cases à cocher, vues de synthèse |
 
 ## Génération Automatique
@@ -30,11 +30,15 @@ forge starter:build contact-simple
 forge starter:build 2
 forge starter:build auth
 forge starter:build utilisateurs-auth
+forge starter:build 3
+forge starter:build carnet
+forge starter:build carnet-contacts
 ```
 
 Les alias `1`, `contacts` et `contact-simple` ciblent le même starter Contacts.
 Les alias `2`, `auth`, `utilisateurs` et `utilisateurs-auth` ciblent le starter Utilisateurs / authentification.
-Les starters 3 et 4 apparaissent dans `forge starter:list`, mais restent marqués à venir.
+Les alias `3`, `carnet` et `carnet-contacts` ciblent le starter Carnet de contacts.
+Le starter 4 apparaît dans `forge starter:list`, mais reste marqué à venir.
 
 <div class="grid cards" markdown>
 
@@ -54,7 +58,7 @@ Les starters 3 et 4 apparaissent dans `forge starter:list`, mais restent marqué
 
     ---
 
-    La commande `forge starter:build` automatise aujourd'hui Contacts et Utilisateurs / authentification.
+    La commande `forge starter:build` automatise aujourd'hui Contacts, Utilisateurs / authentification et Carnet de contacts.
 
 </div>
 

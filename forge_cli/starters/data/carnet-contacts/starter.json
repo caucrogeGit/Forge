@@ -2,8 +2,36 @@
   "id": "carnet-contacts",
   "number": 3,
   "name": "Carnet de contacts",
-  "aliases": ["carnet", "3"],
-  "description": "Starter 3 — many_to_one, pivot many-to-many, JOIN SQL",
-  "status": "coming_soon",
-  "doc_url": "https://caucrogegit.github.io/Forge/starter-app-03-carnet-contacts/"
+  "kind": "application",
+  "entities": [
+    { "entity": "Ville", "json": "entities/ville.json" },
+    { "entity": "Contact", "json": "entities/contact.json" }
+  ],
+  "relations_json": "relations.json",
+  "aliases": ["3", "carnet", "carnet-contacts"],
+  "description": "Starter 3 — Carnet relationnel avec Ville, Contact et JOIN SQL",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": false,
+  "routes_marker": "carnet-contacts",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/contacts",
+  "test_command": "python scripts/seed_villes.py",
+  "doc_url": "https://caucrogegit.github.io/Forge/starter-app-03-carnet-contacts/",
+  "check_paths": [
+    "mvc/entities/ville",
+    "mvc/entities/contact",
+    "mvc/entities/relations.json",
+    "mvc/controllers/contact_controller.py",
+    "mvc/controllers/ville_controller.py",
+    "mvc/models/contact_model.py",
+    "mvc/models/ville_model.py",
+    "mvc/forms/contact_form.py",
+    "mvc/views/layouts/app.html",
+    "mvc/views/contact/index.html",
+    "mvc/views/contact/form.html",
+    "mvc/views/contact/show.html",
+    "mvc/views/ville/index.html",
+    "scripts/seed_villes.py"
+  ]
 }

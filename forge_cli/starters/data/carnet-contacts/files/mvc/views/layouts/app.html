@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titre | default("Carnet de contacts") }}</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/static/tailwind.css">
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <nav class="bg-slate-900 text-white px-6 py-4 shadow">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <a href="/contacts" class="text-xl font-bold">Carnet de contacts</a>
+            <div class="flex gap-4 text-sm">
+                <a href="/contacts" class="text-white/80 hover:text-white">Contacts</a>
+                <a href="/villes" class="text-white/80 hover:text-white">Villes</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto mt-8 px-4">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
