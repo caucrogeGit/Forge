@@ -12,6 +12,8 @@
   "supports_public": false,
   "routes_marker": "utilisateurs-auth",
   "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/login",
+  "test_command": "python scripts/create_auth_user.py",
   "doc_url": "https://caucrogegit.github.io/Forge/starter-app-02-utilisateurs-auth/",
   "check_paths": [
     "mvc/entities/utilisateur",

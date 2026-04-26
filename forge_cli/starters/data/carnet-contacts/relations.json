@@ -1,0 +1,16 @@
+{
+  "format_version": 1,
+  "relations": [
+    {
+      "name": "contact_ville",
+      "type": "many_to_one",
+      "from_entity": "Contact",
+      "to_entity": "Ville",
+      "from_field": "ville_id",
+      "to_field": "id",
+      "foreign_key_name": "fk_contact_ville",
+      "on_delete": "SET NULL",
+      "on_update": "CASCADE"
+    }
+  ]
+}

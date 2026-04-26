@@ -80,6 +80,32 @@ def _read_routes_snippet(meta: dict) -> str:
     return content
 
 
+def _application_entity_specs(meta: dict) -> list[dict]:
+    specs = meta.get("entities")
+    if specs:
+        return [
+            {
+                "entity": item["entity"],
+                "json": item.get("json", f"entities/{_to_snake(item['entity'])}.json"),
+            }
+            for item in specs
+        ]
+    entity = meta["entity"]
+    return [
+        {
+            "entity": entity,
+            "json": meta.get("entity_json", f"entities/{_to_snake(entity)}.json"),
+        }
+    ]
+
+
+def _application_relations_json(meta: dict) -> Path | None:
+    relations_json = meta.get("relations_json")
+    if not relations_json:
+        return None
+    return meta["_dir"] / relations_json
+
+
 def _routes_marker_present(routes_py: Path, marker: str) -> bool:
     if not routes_py.exists():
         return False
@@ -122,6 +148,26 @@ with router.group("", public=True) as pub:
     routes_py.write_text(content, encoding="utf-8")
 
 
+def _routes_from_snippet(snippet: str) -> list[tuple[str, str]]:
+    routes: list[tuple[str, str]] = []
+    current_prefix = ""
+    group_re = re.compile(r'with router\.group\("([^"]*)"')
+    route_re = re.compile(r'\.add\("([^"]+)",\s+"([^"]*)"')
+
+    for line in snippet.splitlines():
+        group_match = group_re.search(line)
+        if group_match:
+            current_prefix = group_match.group(1)
+            continue
+
+        route_match = route_re.search(line)
+        if route_match:
+            method, path = route_match.groups()
+            routes.append((method, (current_prefix.rstrip("/") + "/" + path.lstrip("/")).rstrip("/") or "/"))
+
+    return routes
+
+
 # ── Vérification des fichiers existants ───────────────────────────────────────
 
 def _check_existing(meta: dict, root: Path) -> list[str]:
@@ -138,10 +184,17 @@ def _check_existing(meta: dict, root: Path) -> list[str]:
 
 def _is_adoptable_application_scaffold(meta: dict, path: Path, root: Path) -> bool:
     """Reconnaît les fichiers d'auth historiques d'un projet Forge neuf."""
+    rel = path.relative_to(root).as_posix()
+    if meta.get("id") == "carnet-contacts" and rel == "mvc/entities/relations.json":
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except ValueError:
+            return False
+        return data == {"format_version": 1, "relations": []}
+
     if meta.get("id") != "utilisateurs-auth" or not path.is_file():
         return False
 
-    rel = path.relative_to(root).as_posix()
     content = path.read_text(encoding="utf-8")
     if rel == "mvc/controllers/auth_controller.py":
         return 'BaseController.redirect("/")' in content and "DashboardController" not in content
@@ -179,19 +232,21 @@ def _force_clean(meta: dict, root: Path) -> None:
 
 def _force_clean_application(meta: dict, root: Path) -> None:
     """Supprime les fichiers déclarés par un starter applicatif."""
-    entity_snake = _to_snake(meta["entity"])
-    entity_dir = Path("mvc") / "entities" / entity_snake
-    regenerable_entity_files = {
-        entity_dir / f"{entity_snake}.json",
-        entity_dir / f"{entity_snake}.sql",
-        entity_dir / f"{entity_snake}_base.py",
-    }
+    regenerable_entity_files: dict[Path, set[Path]] = {}
+    for spec in _application_entity_specs(meta):
+        entity_snake = _to_snake(spec["entity"])
+        entity_dir = Path("mvc") / "entities" / entity_snake
+        regenerable_entity_files[entity_dir] = {
+            entity_dir / f"{entity_snake}.json",
+            entity_dir / f"{entity_snake}.sql",
+            entity_dir / f"{entity_snake}_base.py",
+        }
 
     for rel in meta.get("check_paths", []):
         p = root / rel
         rel_path = Path(rel)
-        if rel_path == entity_dir:
-            for generated in regenerable_entity_files:
+        if rel_path in regenerable_entity_files:
+            for generated in regenerable_entity_files[rel_path]:
                 generated_path = root / generated
                 if generated_path.exists():
                     generated_path.unlink()
@@ -243,18 +298,26 @@ def dry_run(meta: dict, *, public: bool = False) -> None:
 
 
 def _dry_run_application(meta: dict) -> None:
-    entity = meta["entity"]
-    snake = _to_snake(entity)
     data_dir: Path = meta["_dir"]
     files_dir = data_dir / "files"
     routes_snippet = _read_routes_snippet(meta)
+    entity_specs = _application_entity_specs(meta)
+    relations_json = _application_relations_json(meta)
 
     print(f"\nStarter : {meta['name']} (niveau {meta['number']})")
     print()
-    print(f"  Entité créée        : mvc/entities/{snake}/")
-    print(f"  JSON injecté        : mvc/entities/{snake}/{snake}.json")
-    print(f"  SQL généré          : mvc/entities/{snake}/{snake}.sql")
-    print(f"  Classe générée      : mvc/entities/{snake}/{snake}_base.py")
+    print("  Entités créées :")
+    for spec in entity_specs:
+        snake = _to_snake(spec["entity"])
+        print(f"    mvc/entities/{snake}/")
+        print(f"      JSON injecté   : mvc/entities/{snake}/{snake}.json")
+        print(f"      SQL généré     : mvc/entities/{snake}/{snake}.sql")
+        print(f"      Classe générée : mvc/entities/{snake}/{snake}_base.py")
+    if relations_json:
+        print()
+        print("  Relations :")
+        print("    mvc/entities/relations.json")
+        print("    mvc/entities/relations.sql")
     print()
     print("  Fichiers applicatifs copiés :")
     if files_dir.exists():
@@ -265,7 +328,7 @@ def _dry_run_application(meta: dict) -> None:
     print(f"    {meta.get('routes_snippet', 'routes.py.snippet')}")
     print()
     print("  Routes à ajouter :")
-    for method, path in re.findall(r'\.add\("([^"]+)",\s+"([^"]+)"', routes_snippet):
+    for method, path in _routes_from_snippet(routes_snippet):
         print(f"    {method:<5}  {path}")
     print()
     print("  Aucun fichier écrit.")
@@ -447,6 +510,59 @@ def _copy_application_files(meta: dict, root: Path) -> list[Path]:
     return written
 
 
+def _drop_application_foreign_keys(meta: dict, root: Path) -> None:
+    relations_json = _application_relations_json(meta)
+    if not relations_json:
+        return
+
+    from forge_cli.entities.db_apply import load_db_apply_config
+
+    try:
+        import mariadb
+
+        data = json.loads(relations_json.read_text(encoding="utf-8"))
+        relation_items = data.get("relations", [])
+        cfg = load_db_apply_config()
+        connection = mariadb.connect(
+            host=cfg.host,
+            port=cfg.port,
+            user=cfg.login,
+            password=cfg.password,
+            database=cfg.database,
+        )
+    except Exception:
+        return
+
+    try:
+        cursor = connection.cursor()
+        try:
+            for relation in relation_items:
+                table = relation.get("from_entity", "")
+                fk_name = relation.get("foreign_key_name", "")
+                if not table or not fk_name:
+                    continue
+                table_name = _to_snake(table)
+                cursor.execute(
+                    """
+                    SELECT CONSTRAINT_NAME
+                    FROM information_schema.TABLE_CONSTRAINTS
+                    WHERE CONSTRAINT_SCHEMA = ?
+                      AND TABLE_NAME = ?
+                      AND CONSTRAINT_NAME = ?
+                      AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+                    """,
+                    (cfg.database, table_name, fk_name),
+                )
+                if cursor.fetchone():
+                    cursor.execute(f"ALTER TABLE {table_name} DROP FOREIGN KEY {fk_name}")
+                    print(out.ok(f"Contrainte {fk_name} supprimée avant reconstruction."))
+            connection.commit()
+        finally:
+            cursor.close()
+    finally:
+        connection.close()
+
+
 def _build_application(
     meta: dict,
     *,
@@ -467,13 +583,19 @@ def _build_application(
         )
 
     root = Path.cwd()
-    entity = meta["entity"]
-    snake = _to_snake(entity)
+    entity_specs = _application_entity_specs(meta)
     entities_root = root / "mvc" / "entities"
     data_dir: Path = meta["_dir"]
-    canonical_json = data_dir / meta.get("entity_json", f"entities/{snake}.json")
-    if not canonical_json.exists():
-        raise StarterBuildError(f"Fichier JSON canonique introuvable : {canonical_json}")
+    canonical_jsons: list[tuple[dict, Path]] = []
+    for spec in entity_specs:
+        canonical_json = data_dir / spec["json"]
+        if not canonical_json.exists():
+            raise StarterBuildError(f"Fichier JSON canonique introuvable : {canonical_json}")
+        canonical_jsons.append((spec, canonical_json))
+
+    relations_json = _application_relations_json(meta)
+    if relations_json and not relations_json.exists():
+        raise StarterBuildError(f"Fichier relations.json introuvable : {relations_json}")
 
     routes_py = root / "mvc" / "routes.py"
     total_steps = 7 if not init_db else 8
@@ -514,17 +636,25 @@ def _build_application(
         except (DbInitError, ProjectConfigError) as exc:
             raise StarterBuildError(f"db:init a échoué : {exc}") from exc
 
-    next_step(f"Création de l'entité {entity}...")
-    try:
-        make_entity_main([entity, "--no-input"])
-    except SystemExit as e:
-        if e.code not in (0, None):
-            raise StarterBuildError(f"make:entity a échoué (code {e.code})")
+    entity_names = ", ".join(spec["entity"] for spec in entity_specs)
+    next_step(f"Création des entités {entity_names}...")
+    for spec in entity_specs:
+        try:
+            make_entity_main([spec["entity"], "--no-input"])
+        except SystemExit as e:
+            if e.code not in (0, None):
+                raise StarterBuildError(f"make:entity {spec['entity']} a échoué (code {e.code})")
 
-    next_step("Injection du JSON canonique...")
-    target_json = entities_root / snake / f"{snake}.json"
-    target_json.write_text(canonical_json.read_text(encoding="utf-8"), encoding="utf-8")
-    print(out.written(target_json.relative_to(root).as_posix()))
+    next_step("Injection des JSON canoniques...")
+    for spec, canonical_json in canonical_jsons:
+        snake = _to_snake(spec["entity"])
+        target_json = entities_root / snake / f"{snake}.json"
+        target_json.write_text(canonical_json.read_text(encoding="utf-8"), encoding="utf-8")
+        print(out.written(target_json.relative_to(root).as_posix()))
+    if relations_json:
+        target_relations = entities_root / "relations.json"
+        target_relations.write_text(relations_json.read_text(encoding="utf-8"), encoding="utf-8")
+        print(out.written(target_relations.relative_to(root).as_posix()))
 
     next_step("Validation du modèle (check:model)...")
     try:
@@ -543,6 +673,8 @@ def _build_application(
         print(out.preserved(path.relative_to(root).as_posix()))
 
     next_step("Application en base (db:apply)...")
+    if force:
+        _drop_application_foreign_keys(meta, root)
     try:
         applied = apply_model_sql(entities_root)
         print(out.ok("SQL du modèle appliqué."))
@@ -573,8 +705,9 @@ def _build_application(
     print(f"  Starter {meta['name']} installé.")
     print()
     print("  Lancez  : python app.py")
-    print("  Ouvrez  : https://localhost:8000/login")
-    print("  Test    : python scripts/create_auth_user.py")
+    print(f"  Ouvrez  : {meta.get('open_url', 'https://localhost:8000/')}")
+    if meta.get("test_command"):
+        print(f"  Test    : {meta['test_command']}")
     if meta.get("doc_url"):
         print(f"  Docs    : {meta['doc_url']}")
     print("─" * 60)

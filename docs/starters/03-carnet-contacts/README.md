@@ -1,19 +1,19 @@
 # Starter 3 — Carnet de contacts
 
-**Application démo :** carnet de contacts avec villes et groupes d'appartenance.
+**Application démo :** carnet de contacts avec villes.
 
 ## Objectif
 
-Lire et écrire un modèle relationnel Forge sans magie : `many_to_one` explicite, entité pivot `ContactGroupe` pour le many-to-many, et requêtes SQL avec `JOIN` visibles dans les modèles applicatifs.
+Lire et écrire un modèle relationnel Forge sans magie : deux JSON canoniques, une relation globale `many_to_one`, un `relations.sql` visible et des requêtes applicatives avec `LEFT JOIN`.
 
 ## Fonctionnalités principales
 
-- CRUD complet sur `Contact`
-- Rattachement optionnel d'un contact à une `Ville` (`many_to_one`)
-- Appartenance à des `Groupe`s via pivot `ContactGroupe` (many-to-many explicite)
-- Listes de villes et groupes avec pages dédiées
-- Sélecteur de ville dans le formulaire contact
-- Requêtes SQL visibles dans les modèles (`JOIN`, `WHERE`, `IN`)
+- Entités `Ville` et `Contact`
+- Relation `Contact.VilleId -> Ville.VilleId`
+- CRUD Contact avec sélection de ville
+- Liste simple des villes
+- Script `scripts/seed_villes.py`
+- SQL visible dans `mvc/models/contact_model.py`
 
 ## Installation locale
 
@@ -22,26 +22,20 @@ forge new CarnetApp
 cd CarnetApp
 source .venv/bin/activate
 forge doctor
-forge db:init
-# Créer les entités JSON : Contact, Ville, Groupe, ContactGroupe
-forge build:model
-forge db:apply
-# Générer les CRUD : forge make:crud Contact, forge make:crud Ville, forge make:crud Groupe
-# Câbler les routes dans mvc/routes.py
-```
-
-## Lancement
-
-```bash
+forge starter:build 3 --init-db
+python scripts/seed_villes.py
 python app.py
-# https://localhost:8000
 ```
 
-## Démo en ligne
+Alias disponibles : `carnet`, `carnet-contacts`.
 
-> *(lien à renseigner lors du déploiement)*
+## Notes
+
+Les routes de ce starter sont publiques et sans protection CSRF. C'est un choix pédagogique pour rester centré sur les relations entre entités — pas une pratique recommandée pour la production. Dans une application réelle, les routes d'écriture devront être protégées.
+
+Cette génération automatique ne crée pas encore `Groupe` ni `ContactGroupe`. Le pivot many-to-many explicite reste une évolution pédagogique possible.
 
 ## Documentation complète
 
 - [Guide complet du starter](../../starter-app-03-carnet-contacts.md)
-- [Reconstruction pas à pas](rebuild.md)
+- [Reconstruction rapide](rebuild.md)

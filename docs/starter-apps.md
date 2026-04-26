@@ -6,10 +6,10 @@
   <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Des applications de référence progressives pour apprendre, reconstruire vite, puis adapter à un vrai projet.</p>
 </div>
 
-Elles sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` est disponible pour les starters 1 — Contacts et 2 — Utilisateurs / authentification ; les starters 3 et 4 sont documentés, mais leur génération automatique est encore à venir.
+Elles sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` est disponible pour les starters 1 — Contacts, 2 — Utilisateurs / authentification et 3 — Carnet de contacts ; le starter 4 est documenté, mais sa génération automatique est encore à venir.
 
 !!! warning "Disponibilité"
-    Contacts et Utilisateurs / authentification sont générables automatiquement aujourd'hui. Carnet de contacts et Suivi comportement élèves restent des guides pédagogiques et recettes de reconstruction.
+    Contacts, Utilisateurs / authentification et Carnet de contacts sont générables automatiquement aujourd'hui. Suivi comportement élèves reste un guide pédagogique et une recette de reconstruction.
 
 ## Liste des starter apps
 
@@ -17,7 +17,7 @@ Elles sont d'abord des parcours pédagogiques. La génération automatique par `
 |--------|-------------|----------------|
 | 1 | [Contacts](starter-app-01-contacts.md) | CRUD basique sur une entité unique |
 | 2 | [Utilisateurs / authentification](starter-app-02-utilisateurs-auth.md) | Login, sessions, routes protégées, CSRF |
-| 3 | [Carnet de contacts](starter-app-03-carnet-contacts.md) | `many_to_one`, pivot many-to-many, `JOIN` SQL |
+| 3 | [Carnet de contacts](starter-app-03-carnet-contacts.md) | `many_to_one`, relation globale, `JOIN` SQL |
 | 4 | [Suivi comportement élèves](starter-app-04-suivi-comportement-eleves.md) | Application métier, cases à cocher, synthèses |
 
 Pour voir la liste depuis la CLI : `forge starter:list`.
@@ -31,10 +31,13 @@ forge starter:build contact-simple
 forge starter:build 2
 forge starter:build auth
 forge starter:build utilisateurs-auth
+forge starter:build 3
+forge starter:build carnet
+forge starter:build carnet-contacts
 ```
 
 Les options utiles sont `--dry-run` pour prévisualiser, `--init-db` pour lancer explicitement l'initialisation de base, et `--force` pour reconstruire avec prudence un starter déjà présent.
-`--public` est disponible pour Contacts, mais n'est pas applicable au starter Utilisateurs / authentification.
+`--public` est disponible pour Contacts, mais n'est pas applicable aux starters Utilisateurs / authentification et Carnet de contacts.
 
 <div class="grid cards" markdown>
 
@@ -54,7 +57,7 @@ Les options utiles sont `--dry-run` pour prévisualiser, `--init-db` pour lancer
 
     ---
 
-    Utiliser `forge starter:build 1` pour Contacts et `forge starter:build 2` pour Utilisateurs / authentification.
+    Utiliser `forge starter:build 1` pour Contacts, `forge starter:build 2` pour Utilisateurs / authentification et `forge starter:build 3` pour Carnet de contacts.
 
 </div>
 
