@@ -4,9 +4,25 @@ Ce fichier permet de reconstruire le starter 1 depuis un projet Forge propre.
 
 ## 1. Commandes Forge
 
+Créer le projet :
+
 ```bash
+pipx install git+https://github.com/caucrogeGit/Forge.git
+forge new Contacts
+cd Contacts
+source .venv/bin/activate
 forge doctor
+```
+
+Préparer la base (renseigner `env/dev` avant) :
+
+```bash
 forge db:init
+```
+
+Créer l'entité :
+
+```bash
 forge make:entity Contact --no-input
 ```
 
@@ -130,7 +146,15 @@ mvc/routes.py
 
 ```bash
 forge check:model
+forge doctor
+forge routes:list
 python app.py
+```
+
+Ouvrir dans le navigateur :
+
+```text
+https://localhost:8000/contacts
 ```
 
 Vérifiez aussi que `forge make:crud Contact --dry-run` n’écrase aucun fichier existant.
