@@ -2,7 +2,9 @@
 
 Premier parcours Forge : une seule entité `Contact`, un CRUD généré, puis un câblage manuel des routes.
 
-## Objectif de l’application
+## Présentation rapide
+
+### Objectif
 
 Construire une petite application de gestion de contacts avec :
 
@@ -15,13 +17,68 @@ Construire une petite application de gestion de contacts avec :
 
 Le starter sert à comprendre le flux Forge minimal : JSON canonique, SQL visible, modèle Python généré, CRUD MVC explicite et routes copiées manuellement.
 
-## Niveau de difficulté
+### Niveau
 
 Niveau 1 — débutant Forge.
 
 Le parcours ne contient ni relation, ni authentification métier spécifique, ni logique complexe. Il est conçu pour vérifier que le projet, la base de données, les formulaires, les vues Jinja2 et les routes fonctionnent ensemble.
 
-## Ce que l’on apprend
+### Temps estimé
+
+1h à 2h.
+
+### Résultat attendu
+
+Application CRUD complète pour gérer des contacts — liste, création, modification, suppression — avec formulaires validés, messages flash et HTTPS local.
+
+---
+
+## Installation du projet Forge
+
+### Méthode A — installation automatique (recommandée)
+
+```bash
+pipx install git+https://github.com/caucrogeGit/Forge.git
+forge new ContactSimple
+cd ContactSimple
+source .venv/bin/activate
+forge doctor
+```
+
+### Méthode B — installation manuelle
+
+```bash
+git clone https://github.com/caucrogeGit/Forge.git ContactSimple
+cd ContactSimple
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+npm install
+python forge.py doctor
+```
+
+> Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+
+---
+
+## Préparation de la base
+
+```bash
+forge db:init
+```
+
+Cette commande crée la base de données du projet, l'utilisateur applicatif et applique les droits.
+
+Prérequis :
+
+- MariaDB installé et en cours d'exécution.
+- Les identifiants de connexion renseignés dans `env/dev` (`DB_ADMIN_PWD`, `DB_APP_PWD`, etc.).
+
+---
+
+## Développement de l'application
+
+### Ce que l'on apprend
 
 - Créer une entité avec `forge make:entity`.
 - Compléter le JSON canonique après `--no-input`.
@@ -30,20 +87,20 @@ Le parcours ne contient ni relation, ni authentification métier spécifique, ni
 - Appliquer le SQL avec `forge db:apply`.
 - Générer un CRUD avec `forge make:crud Contact`.
 - Copier les routes dans `mvc/routes.py`.
-- Lire et adapter les fichiers générés sans attendre d’admin magique.
+- Lire et adapter les fichiers générés sans attendre d'admin magique.
 
-## Navigation de l’application
+### Navigation de l'application
 
 ```text
 /contacts           liste des contacts
 /contacts/new       formulaire de création
-/contacts/{id}      détail d’un contact
+/contacts/{id}      détail d'un contact
 /contacts/{id}/edit formulaire de modification
 ```
 
-`/contacts/new` doit rester déclaré avant `/{id}` dans les routes afin d’éviter que `new` soit interprété comme un identifiant.
+`/contacts/new` doit rester déclaré avant `/{id}` dans les routes afin d'éviter que `new` soit interprété comme un identifiant.
 
-## Charte graphique
+### Charte graphique
 
 Le starter utilise une charte volontairement simple :
 
@@ -54,9 +111,9 @@ Le starter utilise une charte volontairement simple :
 - cartes blanches bordées pour les formulaires et les détails ;
 - messages flash visibles au-dessus du contenu.
 
-Le but n’est pas de créer un thème complet, mais d’obtenir une interface lisible et facile à modifier.
+Le but n'est pas de créer un thème complet, mais d'obtenir une interface lisible et facile à modifier.
 
-## Modèle de données
+### Modèle de données
 
 Fichier canonique : `mvc/entities/contact/contact.json`.
 
@@ -112,11 +169,9 @@ Fichier canonique : `mvc/entities/contact/contact.json`.
 
 Forge génère ensuite `mvc/entities/contact/contact.sql` et `mvc/entities/contact/contact_base.py`. Le fichier manuel `mvc/entities/contact/contact.py` reste préservé.
 
-## Commandes Forge
+### Commandes Forge
 
 ```bash
-forge doctor
-forge db:init
 forge make:entity Contact --no-input
 # modifier mvc/entities/contact/contact.json avec les champs métier
 forge build:model --dry-run
@@ -128,7 +183,7 @@ forge make:crud Contact
 
 `forge make:crud Contact --dry-run` peut être utilisé pour vérifier les fichiers que le CRUD créerait sans écrire.
 
-## Fichiers créés ou modifiés
+### Fichiers créés ou modifiés
 
 Fichiers canoniques et générés :
 
@@ -140,7 +195,7 @@ mvc/entities/contact/contact.py         manuel, préservé
 mvc/entities/contact/__init__.py        manuel, préservé
 ```
 
-Fichiers CRUD créés s’ils sont absents :
+Fichiers CRUD créés s'ils sont absents :
 
 ```text
 mvc/controllers/contact_controller.py
@@ -158,7 +213,7 @@ Fichier à modifier manuellement :
 mvc/routes.py
 ```
 
-## Classes Python utilisées
+### Classes Python utilisées
 
 - `ContactBase` : classe générée depuis le JSON.
 - `Contact` : classe métier manuelle qui hérite de `ContactBase`.
@@ -166,7 +221,7 @@ mvc/routes.py
 - `ContactController` : contrôleur MVC généré.
 - `BaseController` : rendu HTML, redirections, flash et erreurs de validation.
 
-Le contrôleur généré lit les formulaires via l’API réelle Forge :
+Le contrôleur généré lit les formulaires via l'API réelle Forge :
 
 ```python
 form = ContactForm.from_request(request)
@@ -192,7 +247,7 @@ update_contact(id, data)
 delete_contact(id)
 ```
 
-## Tags Jinja utilisés
+### Tags Jinja utilisés
 
 Les vues générées utilisent les tags Jinja2 classiques :
 
@@ -205,11 +260,11 @@ Les vues générées utilisent les tags Jinja2 classiques :
 
 Les champs de formulaire utilisent les noms Python, par exemple `form.value("nom")`, tandis que les vues de liste et de détail générées affichent les colonnes SQL en PascalCase.
 
-## Classes CSS/Tailwind importantes
+### Classes CSS/Tailwind importantes
 
-Le CRUD généré s’appuie sur des classes utilitaires simples :
+Le CRUD généré s'appuie sur des classes utilitaires simples :
 
-- `max-w-5xl`, `mx-auto`, `px-6`, `py-8` pour la largeur et l’espacement ;
+- `max-w-5xl`, `mx-auto`, `px-6`, `py-8` pour la largeur et l'espacement ;
 - `bg-white`, `border`, `rounded`, `shadow-sm` pour les cartes ;
 - `text-slate-900`, `text-slate-500` pour la hiérarchie texte ;
 - `bg-orange-600`, `hover:bg-orange-700`, `text-white` pour les actions principales ;
@@ -217,12 +272,12 @@ Le CRUD généré s’appuie sur des classes utilitaires simples :
 
 Ces classes peuvent être remplacées par votre propre design sans modifier la doctrine Forge.
 
-## Test navigateur
+### Test navigateur
 
 1. Lancer `python app.py`.
 2. Ouvrir `/contacts`.
-3. Cliquer sur “Nouveau contact”.
-4. Soumettre le formulaire vide et vérifier l’affichage des erreurs.
+3. Cliquer sur "Nouveau contact".
+4. Soumettre le formulaire vide et vérifier l'affichage des erreurs.
 5. Créer un contact valide.
 6. Vérifier le retour à la liste et le message flash.
 7. Ouvrir le détail du contact.
@@ -230,14 +285,30 @@ Ces classes peuvent être remplacées par votre propre design sans modifier la d
 9. Supprimer le contact avec le bouton prévu.
 10. Vérifier que la liste est cohérente après suppression.
 
-## Limites du starter
+### Limites du starter
 
-- Pas d’authentification dédiée.
+- Pas d'authentification dédiée.
 - Pas de recherche avancée.
 - Pas de pagination générée automatiquement.
 - Pas de validation métier au-delà des contraintes simples.
 - Pas de relation : ce starter est volontairement mono-entité.
-- Pas d’ORM : les requêtes SQL restent visibles dans `mvc/models/contact_model.py`.
+- Pas d'ORM : les requêtes SQL restent visibles dans `mvc/models/contact_model.py`.
+
+---
+
+## Vérification finale
+
+```bash
+forge doctor
+forge routes:list
+python app.py
+```
+
+Ouvrir dans le navigateur :
+
+```text
+https://localhost:8000/contacts
+```
 
 ## Reconstruction
 

@@ -1,25 +1,82 @@
 # Starter 3 — Carnet relationnel
 
-Ce starter montre un modèle relationnel Forge V1 sans magie : `Contact` appartient éventuellement à une `Ville`, et l’appartenance aux groupes passe par une entité pivot explicite.
+Ce starter montre un modèle relationnel Forge V1 sans magie : `Contact` appartient éventuellement à une `Ville`, et l'appartenance aux groupes passe par une entité pivot explicite.
 
-## Objectif de l’application
+## Présentation rapide
+
+### Objectif
 
 Construire un carnet de contacts navigable :
 
 - liste des contacts avec leur ville ;
-- détail d’un contact ;
+- détail d'un contact ;
 - liste des villes ;
 - liste des groupes ;
-- affichage des groupes d’un contact ;
+- affichage des groupes d'un contact ;
 - modification manuelle des requêtes SQL applicatives quand le CRUD généré ne suffit plus.
 
-## Niveau de difficulté
+### Niveau
 
 Niveau 3 — intermédiaire avancé Forge.
 
 Le starter suppose que le CRUD mono-entité est compris. La nouveauté est la modélisation relationnelle explicite : `many_to_one`, clé étrangère nullable et pivot many-to-many représenté par une vraie entité.
 
-## Ce que l’on apprend
+### Temps estimé
+
+3h à 4h.
+
+### Résultat attendu
+
+Carnet de contacts relationnel — contacts liés à une ville, appartenance à des groupes via un pivot explicite, vues de liste et de détail enrichies avec `JOIN` SQL visibles.
+
+---
+
+## Installation du projet Forge
+
+### Méthode A — installation automatique (recommandée)
+
+```bash
+pipx install git+https://github.com/caucrogeGit/Forge.git
+forge new CarnetContacts
+cd CarnetContacts
+source .venv/bin/activate
+forge doctor
+```
+
+### Méthode B — installation manuelle
+
+```bash
+git clone https://github.com/caucrogeGit/Forge.git CarnetContacts
+cd CarnetContacts
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+npm install
+python forge.py doctor
+```
+
+> Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+
+---
+
+## Préparation de la base
+
+```bash
+forge db:init
+```
+
+Cette commande crée la base de données du projet, l'utilisateur applicatif et applique les droits.
+
+Prérequis :
+
+- MariaDB installé et en cours d'exécution.
+- Les identifiants de connexion renseignés dans `env/dev` (`DB_ADMIN_PWD`, `DB_APP_PWD`, etc.).
+
+---
+
+## Développement de l'application
+
+### Ce que l'on apprend
 
 - Créer plusieurs entités.
 - Déclarer des relations globales dans `mvc/entities/relations.json`.
@@ -28,20 +85,20 @@ Le starter suppose que le CRUD mono-entité est compris. La nouveauté est la mo
 - Lire les relations avec des requêtes `JOIN` visibles.
 - Distinguer ce que Forge génère et ce qui reste du code applicatif manuel.
 
-## Navigation de l’application
+### Navigation de l'application
 
 ```text
 /contacts            liste des contacts avec ville
-/contacts/{id}       détail d’un contact avec ville et groupes
+/contacts/{id}       détail d'un contact avec ville et groupes
 /villes              liste des villes
-/villes/{id}         détail d’une ville avec ses contacts
+/villes/{id}         détail d'une ville avec ses contacts
 /groupes             liste des groupes
-/groupes/{id}        détail d’un groupe avec ses contacts
+/groupes/{id}        détail d'un groupe avec ses contacts
 ```
 
-Le CRUD généré peut créer les écrans de base par entité. Les vues relationnelles enrichies, comme “contacts d’un groupe”, restent manuelles.
+Le CRUD généré peut créer les écrans de base par entité. Les vues relationnelles enrichies, comme "contacts d'un groupe", restent manuelles.
 
-## Charte graphique
+### Charte graphique
 
 - listes en tableaux sobres ;
 - badges pour les groupes ;
@@ -50,7 +107,7 @@ Le CRUD généré peut créer les écrans de base par entité. Les vues relation
 - liens de navigation entre contact, ville et groupes ;
 - formulaires simples, sans composant JavaScript obligatoire.
 
-## Modèle de données
+### Modèle de données
 
 Entités :
 
@@ -106,11 +163,9 @@ Exemple de relation :
 
 `SET NULL` exige que `Contact.ville_id` soit nullable.
 
-## Commandes Forge
+### Commandes Forge
 
 ```bash
-forge doctor
-forge db:init
 forge make:entity Ville --no-input
 forge make:entity Contact --no-input
 forge make:entity Groupe --no-input
@@ -129,9 +184,9 @@ forge make:crud Ville
 forge make:crud Groupe
 ```
 
-Le CRUD de `ContactGroupe` est rarement exposé tel quel à l’utilisateur final. On préfère souvent une interface manuelle sur la page détail du contact.
+Le CRUD de `ContactGroupe` est rarement exposé tel quel à l'utilisateur final. On préfère souvent une interface manuelle sur la page détail du contact.
 
-## Fichiers créés ou modifiés
+### Fichiers créés ou modifiés
 
 Génération entités :
 
@@ -172,7 +227,7 @@ mvc/views/carnet/contact_detail.html
 mvc/routes.py
 ```
 
-## Classes Python utilisées
+### Classes Python utilisées
 
 - `Ville`, `Contact`, `Groupe`, `ContactGroupe`.
 - `BaseController` pour rendre les vues relationnelles.
@@ -195,7 +250,7 @@ ORDER BY c.Nom, c.Prenom
 """
 ```
 
-## Tags Jinja utilisés
+### Tags Jinja utilisés
 
 - `{% for contact in contacts %}` pour les listes ;
 - `{% for groupe in groupes %}` pour les badges ;
@@ -205,7 +260,7 @@ ORDER BY c.Nom, c.Prenom
 
 Dans les templates CRUD générés par `make:crud`, les valeurs affichées suivent les noms de colonnes SQL (`Id`, `Nom`, `Email`). Les champs de formulaire restent en snake_case via `form.value("nom")`.
 
-## Classes CSS/Tailwind importantes
+### Classes CSS/Tailwind importantes
 
 - `table-auto`, `w-full`, `divide-y` pour les tableaux ;
 - `inline-flex`, `rounded-full`, `bg-orange-100`, `text-orange-700` pour les badges ;
@@ -213,23 +268,39 @@ Dans les templates CRUD générés par `make:crud`, les valeurs affichées suive
 - `text-slate-500` pour les informations secondaires ;
 - `hover:bg-slate-50` pour les lignes de liste.
 
-## Test navigateur
+### Test navigateur
 
 1. Créer quelques villes.
 2. Créer quelques contacts avec et sans ville.
 3. Créer quelques groupes.
 4. Insérer des lignes `ContactGroupe`.
-5. Ouvrir `/contacts` et vérifier l’affichage des villes.
-6. Ouvrir le détail d’un contact et vérifier ses groupes.
+5. Ouvrir `/contacts` et vérifier l'affichage des villes.
+6. Ouvrir le détail d'un contact et vérifier ses groupes.
 7. Ouvrir une ville et vérifier ses contacts.
 8. Ouvrir un groupe et vérifier ses contacts.
 
-## Limites du starter
+### Limites du starter
 
 - Le CRUD généré ne fabrique pas automatiquement une interface many-to-many confortable.
 - Les vues relationnelles enrichies restent manuelles.
-- Les filtres avancés et l’autocomplétion ne sont pas inclus.
-- Il n’y a pas d’ORM : les `JOIN` sont assumés dans le modèle applicatif.
+- Les filtres avancés et l'autocomplétion ne sont pas inclus.
+- Il n'y a pas d'ORM : les `JOIN` sont assumés dans le modèle applicatif.
+
+---
+
+## Vérification finale
+
+```bash
+forge doctor
+forge routes:list
+python app.py
+```
+
+Ouvrir dans le navigateur :
+
+```text
+https://localhost:8000/contacts
+```
 
 ## Reconstruction
 
