@@ -1,0 +1,27 @@
+{
+  "format_version": 1,
+  "relations": [
+    {
+      "name": "observation_cours_eleve",
+      "type": "many_to_one",
+      "from_entity": "ObservationCours",
+      "to_entity": "Eleve",
+      "from_field": "eleve_id",
+      "to_field": "id",
+      "foreign_key_name": "fk_observation_cours_eleve",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    {
+      "name": "observation_cours_cours",
+      "type": "many_to_one",
+      "from_entity": "ObservationCours",
+      "to_entity": "Cours",
+      "from_field": "cours_id",
+      "to_field": "id",
+      "foreign_key_name": "fk_observation_cours_cours",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  ]
+}

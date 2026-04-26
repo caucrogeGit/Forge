@@ -1,0 +1,47 @@
+{% extends "layouts/app.html" %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <p class="text-sm font-semibold text-orange-600 uppercase">Élèves</p>
+        <h1 class="text-2xl font-bold text-slate-900 mt-1">Liste des élèves</h1>
+    </div>
+</div>
+
+{% if eleves %}
+<div class="bg-white shadow rounded overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-slate-50 border-b">
+            <tr>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-slate-600">Élève</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-slate-600">Classe</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-slate-600">Statut</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for eleve in eleves %}
+            <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3">
+                    <a href="/eleves/{{ eleve.Id }}" class="font-medium text-slate-900 hover:underline">
+                        {{ eleve.Prenom }} {{ eleve.Nom }}
+                    </a>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-700">{{ eleve.Classe }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if eleve.Actif %}
+                    <span class="text-green-700">Actif</span>
+                    {% else %}
+                    <span class="text-slate-400">Inactif</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white shadow rounded p-6 text-slate-600">
+    Aucun élève enregistré.
+</div>
+{% endif %}
+{% endblock %}
