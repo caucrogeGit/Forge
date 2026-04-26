@@ -53,8 +53,9 @@ cd ContactSimple
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -e .
 npm install
-python forge.py doctor
+forge doctor
 ```
 
 > Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
@@ -62,6 +63,28 @@ python forge.py doctor
 ---
 
 ## Préparation de la base
+
+### Configurer l'administrateur MariaDB du projet
+
+Avant d'exécuter `forge db:init`, renseigner dans `env/dev` un compte MariaDB disposant des droits nécessaires pour créer la base, créer l'utilisateur applicatif et appliquer les privilèges.
+
+En développement local, on peut utiliser temporairement un compte administrateur MariaDB existant.
+
+Exemple de variables à vérifier dans `env/dev` :
+
+```env
+DB_ADMIN_USER=...
+DB_ADMIN_PWD=...
+
+DB_APP_USER=...
+DB_APP_PWD=...
+DB_NAME=...
+```
+
+`DB_ADMIN_USER` sert uniquement à l'initialisation de la base.  
+`DB_APP_USER` est l'utilisateur utilisé ensuite par l'application.
+
+### Initialiser la base
 
 ```bash
 forge db:init
@@ -71,8 +94,8 @@ Cette commande crée la base de données du projet, l'utilisateur applicatif et 
 
 Prérequis :
 
-- MariaDB installé et en cours d'exécution.
-- Les identifiants de connexion renseignés dans `env/dev` (`DB_ADMIN_PWD`, `DB_APP_PWD`, etc.).
+- MariaDB installé et en cours d'exécution ;
+- les identifiants de connexion renseignés dans `env/dev` (`DB_ADMIN_USER`, `DB_ADMIN_PWD`, `DB_APP_USER`, `DB_APP_PWD`, etc.).
 
 ---
 
@@ -82,9 +105,11 @@ Prérequis :
 
 - Créer une entité avec `forge make:entity`.
 - Compléter le JSON canonique après `--no-input`.
+- Vérifier le modèle avec `forge check:model`.
 - Prévisualiser la génération avec `forge build:model --dry-run`.
 - Générer `contact.sql` et `contact_base.py`.
 - Appliquer le SQL avec `forge db:apply`.
+- Prévisualiser un CRUD avec `forge make:crud Contact --dry-run`.
 - Générer un CRUD avec `forge make:crud Contact`.
 - Copier les routes dans `mvc/routes.py`.
 - Lire et adapter les fichiers générés sans attendre d'admin magique.
@@ -98,7 +123,7 @@ Prérequis :
 /contacts/{id}/edit formulaire de modification
 ```
 
-`/contacts/new` doit rester déclaré avant `/{id}` dans les routes afin d'éviter que `new` soit interprété comme un identifiant.
+`/contacts/new` doit rester déclaré avant `/contacts/{id}` dans les routes afin d'éviter que `new` soit interprété comme un identifiant.
 
 ### Charte graphique
 
@@ -169,19 +194,78 @@ Fichier canonique : `mvc/entities/contact/contact.json`.
 
 Forge génère ensuite `mvc/entities/contact/contact.sql` et `mvc/entities/contact/contact_base.py`. Le fichier manuel `mvc/entities/contact/contact.py` reste préservé.
 
+La contrainte `unique: true` empêche deux contacts d'utiliser le même email. Dans ce starter, cette contrainte est principalement portée par la base MariaDB. Si un doublon est saisi, la base peut refuser l'insertion ou la mise à jour.
+
 ### Commandes Forge
+
+Créer l'entité minimale :
 
 ```bash
 forge make:entity Contact --no-input
-# modifier mvc/entities/contact/contact.json avec les champs métier
-forge build:model --dry-run
-forge build:model
+```
+
+Modifier ensuite le fichier canonique :
+
+```text
+mvc/entities/contact/contact.json
+```
+
+Vérifier le modèle :
+
+```bash
 forge check:model
+```
+
+Prévisualiser la génération :
+
+```bash
+forge build:model --dry-run
+```
+
+Générer les fichiers `contact.sql` et `contact_base.py` :
+
+```bash
+forge build:model
+```
+
+Appliquer le SQL sur la base de développement :
+
+```bash
 forge db:apply
+```
+
+Dans ce starter, `forge db:apply` est utilisé sur une base de développement neuve. Le starter ne présente pas encore un système complet de migrations avancées.
+
+Prévisualiser le CRUD :
+
+```bash
+forge make:crud Contact --dry-run
+```
+
+Générer le CRUD :
+
+```bash
 forge make:crud Contact
 ```
 
-`forge make:crud Contact --dry-run` peut être utilisé pour vérifier les fichiers que le CRUD créerait sans écrire.
+### Routes à ajouter
+
+Après la génération du CRUD, copier ou vérifier les routes dans `mvc/routes.py`.
+
+```python
+from mvc.controllers.contact_controller import ContactController
+
+router.get("/contacts", ContactController.index)
+router.get("/contacts/new", ContactController.create)
+router.post("/contacts", ContactController.store)
+
+router.get("/contacts/{id}", ContactController.show)
+router.get("/contacts/{id}/edit", ContactController.edit)
+router.post("/contacts/{id}", ContactController.update)
+router.post("/contacts/{id}/delete", ContactController.delete)
+```
+
+La route `/contacts/new` doit rester déclarée avant `/contacts/{id}` afin d'éviter que `new` soit interprété comme un identifiant.
 
 ### Fichiers créés ou modifiés
 
@@ -221,7 +305,9 @@ mvc/routes.py
 - `ContactController` : contrôleur MVC généré.
 - `BaseController` : rendu HTML, redirections, flash et erreurs de validation.
 
-Le contrôleur généré lit les formulaires via l'API réelle Forge :
+Le contrôleur généré lit les formulaires via l'API réelle Forge.
+
+Exemple simplifié pour la création d'un contact :
 
 ```python
 form = ContactForm.from_request(request)
@@ -247,9 +333,9 @@ update_contact(id, data)
 delete_contact(id)
 ```
 
-### Tags Jinja utilisés
+### Syntaxe Jinja utilisée
 
-Les vues générées utilisent les tags Jinja2 classiques :
+Les vues générées utilisent la syntaxe Jinja2 classique :
 
 - `{% extends "layouts/app.html" %}` pour hériter du layout ;
 - `{% block content %}` pour remplir la zone principale ;
