@@ -1,49 +1,30 @@
-# Starter 4 — Suivi Comportement Élèves
+# Starter 4 — Suivi pédagogique
 
-**Application démo :** outil d'observation pour enseignants — saisie par cours, synthèse par élève.
+**Vitrine Forge complète :** authentification, routes protégées, plusieurs entités, relations SQL, dashboard et seed de démonstration.
 
-## Objectif
+## Ce que ce starter démontre
 
-Construire une application métier plus dense : formulaires de saisie avec cases à cocher, upsert SQL (`ON DUPLICATE KEY UPDATE`), et tableau récapitulatif à double entrée élèves × cours.
+- Login / logout avec session et CSRF actif
+- Routes protégées par défaut — comportement standard Forge
+- Trois entités générées depuis leurs JSON canoniques (`Eleve`, `Cours`, `ObservationCours`)
+- Deux relations `many_to_one` déclarées dans `relations.json`, SQL visible dans `relations.sql`
+- Dashboard protégé (`/suivi`) point d'entrée après connexion
+- Seed de démonstration (`scripts/seed_suivi.py`) pour tester immédiatement
 
-## Fonctionnalités principales
-
-- Gestion des élèves (`Eleve`) et des cours (`Cours`)
-- Saisie d'observations par cours avec `ObservationCours`
-- Upsert automatique — la même saisie peut être corrigée
-- Tableau récapitulatif croisant élèves et cours (`CROSS JOIN` + accès dict)
-- Cases à cocher générées pour chaque critère booléen
-- Vue de synthèse en fin de cours
-
-## Installation locale
+## Lancement rapide
 
 ```bash
-forge new SuiviApp
-cd SuiviApp
-source .venv/bin/activate
-forge doctor
-forge db:init
-# Créer les entités : Eleve, Cours, ObservationCours
-forge build:model
-forge db:apply
-forge make:crud Eleve
-forge make:crud Cours
-# Créer manuellement ObservationCoursController et les vues métier
-# Voir le guide du starter pour la structure complète
+forge starter:build 4   # disponible dans une prochaine version
 ```
 
-## Lancement
+En attendant, suivre le [guide complet](../../starter-app-04-suivi-comportement-eleves.md) ou le fichier [rebuild.md](rebuild.md) pour la reconstruction manuelle.
 
 ```bash
 python app.py
-# https://localhost:8000
+# https://localhost:8000/suivi
 ```
-
-## Démo en ligne
-
-> *(lien à renseigner lors du déploiement)*
 
 ## Documentation complète
 
-- [Guide complet du starter](../../starter-app-04-suivi-comportement-eleves.md)
-- [Reconstruction pas à pas](rebuild.md)
+- [Guide du starter 4](../../starter-app-04-suivi-comportement-eleves.md)
+- [Reconstruction manuelle pas à pas](rebuild.md)

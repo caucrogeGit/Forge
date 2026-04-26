@@ -49,8 +49,8 @@ nav:
       - Reconstruction carnet relationnel:
           - README: starters/03-carnet-contacts/README.md
           - Étapes: starters/03-carnet-contacts/rebuild.md
-      - Niveau 4 — Suivi élèves: starter-app-04-suivi-comportement-eleves.md
-      - Reconstruction suivi élèves:
+      - Niveau 4 — Suivi pédagogique: starter-app-04-suivi-comportement-eleves.md
+      - Reconstruction suivi pédagogique:
           - README: starters/04-suivi-comportement-eleves/README.md
           - Étapes: starters/04-suivi-comportement-eleves/rebuild.md
   - Référence:
