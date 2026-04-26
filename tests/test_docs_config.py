@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import yaml
@@ -6,9 +7,15 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _load_mkdocs_yaml() -> dict:
+    """Charge mkdocs.yml en supprimant les tags YAML Python incompatibles avec safe_load."""
+    text = (ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+    text = re.sub(r"!!python/\S+", '""', text)
+    return yaml.safe_load(text)
+
+
 def test_mkdocs_nav_entries_are_well_formed_and_point_to_existing_docs():
-    mkdocs = ROOT / "mkdocs.yml"
-    config = yaml.safe_load(mkdocs.read_text(encoding="utf-8"))
+    config = _load_mkdocs_yaml()
     nav = config["nav"]
     nav_targets = _flatten_nav(nav)
     nav_labels = {label for label, _ in nav_targets}
@@ -25,10 +32,10 @@ def test_mkdocs_nav_entries_are_well_formed_and_point_to_existing_docs():
         "Positionnement",
         "Architecture des entités",
         "Présentation",
-        "Niveau 1 — Contact simple",
+        "Niveau 1 — Contacts",
         "Niveau 2 — Utilisateurs/auth",
         "Niveau 3 — Carnet relationnel",
-        "Niveau 4 — Suivi élèves",
+        "Niveau 4 — Suivi pédagogique",
         "API et CLI",
         "Roadmap",
     ):

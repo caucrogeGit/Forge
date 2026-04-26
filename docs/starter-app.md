@@ -6,10 +6,7 @@
   <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Des parcours progressifs pour apprendre Forge avec JSON canonique, SQL visible, contrôleurs explicites et routes ajoutées manuellement.</p>
 </div>
 
-Les starters sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` existe actuellement pour les starters 1 — Contacts, 2 — Utilisateurs / authentification et 3 — Carnet de contacts ; le starter 4 est documenté, mais sa génération automatique est encore à venir.
-
-!!! warning "État de la génération automatique"
-    `forge starter:build` est disponible pour Contacts, Utilisateurs / authentification et Carnet de contacts. Le starter 4 reste un parcours pédagogique documenté, avec génération automatique à venir.
+Les starters sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` est disponible pour les quatre starters.
 
 ## Vue D'ensemble
 
@@ -18,7 +15,7 @@ Les starters sont d'abord des parcours pédagogiques. La génération automatiqu
 | 1 | [Contacts](starter-app-01-contacts.md) | Créer un CRUD complet sur une seule entité | `make:entity`, `make:crud`, formulaires, flash |
 | 2 | [Utilisateurs / authentification](starter-app-02-utilisateurs-auth.md) | Comprendre login, logout, sessions et routes protégées | sessions, CSRF, routes publiques/protégées |
 | 3 | [Carnet de contacts](starter-app-03-carnet-contacts.md) | Lire un modèle relationnel explicite | `many_to_one`, `relations.json`, `JOIN` SQL |
-| 4 | [Suivi comportement élèves](starter-app-04-suivi-comportement-eleves.md) | Construire une application métier plus dense | formulaires, cases à cocher, vues de synthèse |
+| 4 | [Suivi pédagogique](starter-app-04-suivi-comportement-eleves.md) | Vitrine Forge complète avec auth, relations et dashboard | auth, routes protégées, `many_to_one`, seed de démo |
 
 ## Génération Automatique
 
@@ -33,12 +30,15 @@ forge starter:build utilisateurs-auth
 forge starter:build 3
 forge starter:build carnet
 forge starter:build carnet-contacts
+forge starter:build 4
+forge starter:build suivi
+forge starter:build suivi-comportement-eleves
 ```
 
 Les alias `1`, `contacts` et `contact-simple` ciblent le même starter Contacts.
 Les alias `2`, `auth`, `utilisateurs` et `utilisateurs-auth` ciblent le starter Utilisateurs / authentification.
 Les alias `3`, `carnet` et `carnet-contacts` ciblent le starter Carnet de contacts.
-Le starter 4 apparaît dans `forge starter:list`, mais reste marqué à venir.
+Les alias `4`, `suivi` et `suivi-comportement-eleves` ciblent le starter Suivi pédagogique.
 
 <div class="grid cards" markdown>
 
@@ -58,7 +58,7 @@ Le starter 4 apparaît dans `forge starter:list`, mais reste marqué à venir.
 
     ---
 
-    La commande `forge starter:build` automatise aujourd'hui Contacts, Utilisateurs / authentification et Carnet de contacts.
+    La commande `forge starter:build` automatise les quatre starters. Utilisez `forge starter:list` pour voir les alias disponibles.
 
 </div>
 
@@ -97,4 +97,4 @@ Chaque starter dispose aussi d'un dossier de référence minimal :
 | Contacts | [README](starters/01-contact-simple/README.md) | [rebuild.md](starters/01-contact-simple/rebuild.md) |
 | Utilisateurs / authentification | [README](starters/02-utilisateurs-auth/README.md) | [rebuild.md](starters/02-utilisateurs-auth/rebuild.md) |
 | Carnet de contacts | [README](starters/03-carnet-contacts/README.md) | [rebuild.md](starters/03-carnet-contacts/rebuild.md) |
-| Suivi comportement élèves | [README](starters/04-suivi-comportement-eleves/README.md) | [rebuild.md](starters/04-suivi-comportement-eleves/rebuild.md) |
+| Suivi pédagogique | [README](starters/04-suivi-comportement-eleves/README.md) | [rebuild.md](starters/04-suivi-comportement-eleves/rebuild.md) |
