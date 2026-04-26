@@ -1,4 +1,4 @@
-# Starter 1 — Contact simple
+# Starter 1 — Contacts
 
 Premier parcours Forge : une seule entité `Contact`, un CRUD généré, puis un câblage manuel des routes.
 
@@ -158,7 +158,7 @@ Fichier canonique : `mvc/entities/contact/contact.json`.
   "format_version": 1,
   "entity": "Contact",
   "table": "contact",
-  "description": "Contact simple du starter niveau 1",
+  "description": "Contacts — starter niveau 1",
   "fields": [
     {
       "name": "id",
