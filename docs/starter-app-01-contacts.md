@@ -205,6 +205,15 @@ Cette commande crée la base de données du projet, l'utilisateur applicatif et 
 
 ## 4. Développement de l'application
 
+!!! tip "Commande rapide"
+    Pour générer directement ce starter depuis un projet Forge vierge :
+
+    ```bash
+    forge starter:build 1
+    ```
+
+    Le reste de ce chapitre détaille ce que cette commande fait étape par étape.
+
 ### 4.1 Ce que l'on apprend
 
 <div class="grid cards" markdown>
@@ -1016,4 +1025,50 @@ https://localhost:8000/contacts
 
 ## Reconstruction
 
-Le fichier court de reconstruction est disponible dans [starters/01-contact-simple/rebuild.md](starters/01-contact-simple/rebuild.md).
+Le starter peut être reconstruit de deux façons.
+
+### Génération automatique
+
+Depuis un projet Forge vierge, après configuration de `env/dev` et initialisation de la base :
+
+```bash
+forge starter:build 1
+```
+
+Alias disponibles :
+
+```bash
+forge starter:build contacts
+forge starter:build contact-simple
+```
+
+Pour prévisualiser sans écrire :
+
+```bash
+forge starter:build 1 --dry-run
+```
+
+Pour générer des routes publiques de test (sans authentification) :
+
+```bash
+forge starter:build 1 --public
+```
+
+Pour initialiser la base puis construire le starter en une seule commande :
+
+```bash
+forge starter:build 1 --init-db
+```
+
+Pour reconstruire un starter déjà présent :
+
+```bash
+forge starter:build 1 --force
+```
+
+!!! warning "Attention avec --force"
+    L'option `--force` reconstruit uniquement les fichiers du starter Contacts : `mvc/entities/contact/`, `mvc/controllers/contact_controller.py`, `mvc/models/contact_model.py`, `mvc/forms/contact_form.py`, `mvc/views/contact/` et le bloc de routes marqué. Elle ne touche pas les autres entités ni le reste de `mvc/routes.py`.
+
+### Reconstruction manuelle
+
+Le fichier de reconstruction pas à pas est disponible dans [starters/01-contact-simple/rebuild.md](starters/01-contact-simple/rebuild.md).
