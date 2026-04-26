@@ -5,7 +5,7 @@ site_url: https://caucrogegit.github.io/Forge/
 
 repo_name: caucrogeGit/Forge
 repo_url: https://github.com/caucrogeGit/Forge
-edit_uri: edit/master/docs/
+edit_uri: edit/main/docs/
 
 theme:
   name: material
@@ -88,9 +88,6 @@ plugins:
   - search:
       lang: fr
       separator: '[\s\-\.:\_/]+'
-
-extra:
-  homepage: /
 
 docs_dir: docs
 site_dir: site
