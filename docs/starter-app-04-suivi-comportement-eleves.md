@@ -1,6 +1,41 @@
 # Starter 4 — Suivi comportement élèves
 
-Ce starter illustre une application métier plus dense : pendant un cours, l'enseignant coche des comportements observés pour chaque élève, puis consulte un tableau récapitulatif en fin de séance.
+<div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 58%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
+  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Niveau 4</p>
+  <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">Suivi comportement élèves</h2>
+  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Application métier guidée : pendant un cours, l'enseignant coche des comportements observés puis consulte un récapitulatif.</p>
+</div>
+
+<div class="grid cards" markdown>
+
+-   **Objectif**
+
+    ---
+
+    Construire une saisie métier dense sans cacher le modèle ni le SQL.
+
+-   **Niveau**
+
+    ---
+
+    Application métier guidée avec plusieurs entités et relations.
+
+-   **Temps estimé**
+
+    ---
+
+    3 h à 4 h.
+
+-   **Résultat attendu**
+
+    ---
+
+    Grille de saisie par cours et tableau récapitulatif lisible.
+
+</div>
+
+!!! warning "Génération automatique"
+    Ce starter est un parcours pédagogique. Il est enregistré dans `forge starter:list`, mais sa génération automatique par `forge starter:build` est encore à venir.
 
 ## Présentation rapide
 
@@ -39,6 +74,18 @@ Le parcours combine plusieurs entités, relations, formulaires à cases à coche
 
 Interface de saisie des comportements par cours — grille élèves/comportements à cases à cocher, tableau récapitulatif lisible, données persistées dans MariaDB.
 
+### Flux de saisie
+
+```mermaid
+flowchart TD
+    A["Cours"] --> B["/cours/{id}/observations"]
+    B --> C["ObservationCoursController"]
+    C --> D["ObservationCoursForm"]
+    D --> E["ObservationCoursModel<br/>SQL visible"]
+    E --> F[(MariaDB)]
+    F --> G["/cours/{id}/recapitulatif"]
+```
+
 ---
 
 ## Installation du projet Forge
@@ -62,10 +109,11 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 npm install
-python forge.py doctor
+pip install -e .
+forge doctor
 ```
 
-> Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+> La documentation utilisateur utilise la CLI officielle `forge`, disponible après `pip install -e .`.
 
 ---
 
@@ -185,6 +233,9 @@ ObservationCours.cours_id -> Cours.id
 
 On choisit des booléens parce qu'ils correspondent directement aux cases à cocher, rendent le tableau récapitulatif simple, et suffisent pour un starter métier clair.
 
+!!! tip "Logique métier"
+    Les JSON décrivent la structure. La saisie par cours, la normalisation des cases à cocher et le récapitulatif restent dans les contrôleurs, formulaires, modèles SQL et vues applicatives.
+
 ### Commandes Forge
 
 ```bash
@@ -239,21 +290,21 @@ mvc/routes.py
 - `BaseController` pour rendre les vues avec `request=request`.
 - Modèle applicatif SQL visible pour charger élèves, cours et observations.
 
-Squelette minimal côté formulaire :
+??? example "Squelette minimal côté formulaire"
 
-```python
-from core.forms import BooleanField, Form, StringField
+    ```python
+    from core.forms import BooleanField, Form, StringField
 
 
-class ObservationCoursForm(Form):
-    ne_travaille_pas = BooleanField(label="Ne travaille pas")
-    bavarde = BooleanField(label="Bavarde")
-    dort = BooleanField(label="Dort")
-    telephone = BooleanField(label="Utilise son téléphone")
-    perturbe = BooleanField(label="Perturbe le cours")
-    refuse_consigne = BooleanField(label="Refuse une consigne")
-    remarque = StringField(label="Remarque", required=False, max_length=500)
-```
+    class ObservationCoursForm(Form):
+        ne_travaille_pas = BooleanField(label="Ne travaille pas")
+        bavarde = BooleanField(label="Bavarde")
+        dort = BooleanField(label="Dort")
+        telephone = BooleanField(label="Utilise son téléphone")
+        perturbe = BooleanField(label="Perturbe le cours")
+        refuse_consigne = BooleanField(label="Refuse une consigne")
+        remarque = StringField(label="Remarque", required=False, max_length=500)
+    ```
 
 Les `BooleanField` ne sont pas obligatoires par défaut : une case absente dans le `POST` devient `False`. La persistance reste dans `ObservationCours`.
 

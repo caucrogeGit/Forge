@@ -1,4 +1,4 @@
-# Reconstruction — Carnet relationnel
+# Reconstruction — Carnet de contacts
 
 Ce fichier reconstruit le starter relationnel `Ville`, `Contact`, `Groupe`, `ContactGroupe`.
 

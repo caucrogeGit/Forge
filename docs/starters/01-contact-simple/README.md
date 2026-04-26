@@ -1,6 +1,8 @@
-# Starter 1 — Contact Simple
+# Starter 1 — Contacts
 
 **Application démo :** carnet de contacts minimaliste sur une seule entité.
+
+Slug technique : `contact-simple`.
 
 ## Objectif
 

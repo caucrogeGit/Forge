@@ -1,4 +1,4 @@
-# Reconstruction — Utilisateurs et authentification
+# Reconstruction — Utilisateurs / authentification
 
 Ce fichier reconstruit un flux applicatif simple : accueil public, login, dashboard, profil et logout.
 

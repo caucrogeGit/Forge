@@ -1,17 +1,58 @@
 # Starter Apps — Démos et réutilisation
 
-Les starter apps Forge sont des applications de référence progressives. Chacune illustre un niveau de complexité différent et peut servir de point de départ pour un vrai projet.
+<div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 58%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
+  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Forge · Démos et réutilisation</p>
+  <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">Starter apps</h2>
+  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Des applications de référence progressives pour apprendre, reconstruire vite, puis adapter à un vrai projet.</p>
+</div>
+
+Elles sont d'abord des parcours pédagogiques. La génération automatique par `forge starter:build` est disponible pour le starter 1 — Contacts ; les starters 2, 3 et 4 sont documentés, mais leur génération automatique est encore à venir.
+
+!!! warning "Disponibilité"
+    Seul le starter Contacts est générable automatiquement aujourd'hui. Les autres pages restent utiles comme guides pédagogiques et recettes de reconstruction.
 
 ## Liste des starter apps
 
 | Niveau | Application | Rôle principal |
 |--------|-------------|----------------|
 | 1 | [Contacts](starter-app-01-contacts.md) | CRUD basique sur une entité unique |
-| 2 | [Utilisateurs / auth](starter-app-02-utilisateurs-auth.md) | Login, sessions, routes protégées, CSRF |
-| 3 | [Carnet relationnel](starter-app-03-carnet-contacts.md) | `many_to_one`, pivot many-to-many, `JOIN` SQL |
-| 4 | [Suivi élèves](starter-app-04-suivi-comportement-eleves.md) | Application métier, cases à cocher, synthèses |
+| 2 | [Utilisateurs / authentification](starter-app-02-utilisateurs-auth.md) | Login, sessions, routes protégées, CSRF |
+| 3 | [Carnet de contacts](starter-app-03-carnet-contacts.md) | `many_to_one`, pivot many-to-many, `JOIN` SQL |
+| 4 | [Suivi comportement élèves](starter-app-04-suivi-comportement-eleves.md) | Application métier, cases à cocher, synthèses |
 
-Pour voir la liste depuis la CLI : `forge starter:list`
+Pour voir la liste depuis la CLI : `forge starter:list`.
+
+Pour générer automatiquement le starter Contacts :
+
+```bash
+forge starter:build 1
+forge starter:build contacts
+forge starter:build contact-simple
+```
+
+Les options utiles sont `--dry-run` pour prévisualiser, `--public` pour des routes publiques de test, `--init-db` pour lancer explicitement l'initialisation de base, et `--force` pour reconstruire avec prudence un starter déjà présent.
+
+<div class="grid cards" markdown>
+
+-   **Apprendre**
+
+    ---
+
+    Lire la page principale du starter pour comprendre les décisions.
+
+-   **Reconstruire**
+
+    ---
+
+    Utiliser `docs/starters/**/rebuild.md` pour une recette courte.
+
+-   **Automatiser**
+
+    ---
+
+    Utiliser `forge starter:build 1` uniquement pour Contacts.
+
+</div>
 
 ## Installer et démarrer un starter
 
@@ -36,10 +77,11 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 npm install
-python forge.py doctor
+pip install -e .
+forge doctor
 ```
 
-> Si une commande globale `forge ...` échoue, utiliser la commande locale équivalente `python forge.py ...`.
+> La documentation utilisateur utilise la CLI officielle `forge`, disponible après `pip install -e .`.
 
 ### Préparation de la base
 
@@ -73,8 +115,8 @@ Le starter documente les intentions. Votre projet contient vos règles métier.
 | Starter | URL de démo |
 |---------|------------|
 | Contacts | *(à renseigner)* |
-| Utilisateurs / auth | *(à renseigner)* |
-| Carnet relationnel | *(à renseigner)* |
-| Suivi élèves | *(à renseigner)* |
+| Utilisateurs / authentification | *(à renseigner)* |
+| Carnet de contacts | *(à renseigner)* |
+| Suivi comportement élèves | *(à renseigner)* |
 
 Pour déployer une starter-app comme démonstration, consultez la section dédiée dans [le guide de déploiement](deployment.md#deployer-une-starter-app-comme-demonstration).

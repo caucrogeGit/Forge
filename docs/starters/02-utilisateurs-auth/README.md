@@ -1,4 +1,4 @@
-# Starter 2 — Utilisateurs et Authentification
+# Starter 2 — Utilisateurs / authentification
 
 **Application démo :** accueil public, connexion sécurisée, dashboard protégé, déconnexion.
 
@@ -9,7 +9,7 @@ Comprendre les mécanismes de sécurité Forge : sessions, hachage de mot de pas
 ## Fonctionnalités principales
 
 - Page d'accueil publique
-- Formulaire de connexion avec login et mot de passe haché (`bcrypt`)
+- Formulaire de connexion avec login et mot de passe haché en PBKDF2-HMAC-SHA256
 - Dashboard accessible uniquement après authentification
 - Page profil utilisateur (lecture seule)
 - Déconnexion et invalidation de session
