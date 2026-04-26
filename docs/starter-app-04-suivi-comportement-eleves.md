@@ -37,8 +37,29 @@
 !!! abstract "Ce que ce starter doit faire comprendre"
     Le starter 4 est une vitrine technique de Forge. Il ne vise pas à être un logiciel de suivi scolaire complet. Il vise à montrer comment Forge gère authentification, routes protégées, plusieurs entités et relations SQL dans une application cohérente et maîtrisée.
 
-!!! warning "Génération automatique à venir"
-    `forge starter:build 4` n'est pas encore disponible. Voir la section [Génération du starter](#4-generation-du-starter) et le fichier [rebuild.md](starters/04-suivi-comportement-eleves/rebuild.md) pour la reconstruction manuelle.
+!!! tip "Génération automatique disponible"
+    Ce starter est générable avec `forge starter:build 4`, `forge starter:build suivi` ou `forge starter:build suivi-comportement-eleves`. Voir la section [Génération du starter](#4-generation-du-starter) pour les détails.
+
+---
+
+## Prérequis
+
+### Prérequis généraux
+
+- Python 3.11 ou supérieur
+- Git
+- `pipx` (recommandé) ou environnement virtuel Python
+- MariaDB installé et démarré
+- Accès à un compte administrateur MariaDB (pour `forge db:init`)
+- Fichier `env/dev` configuré avec les identifiants MariaDB
+
+### Prérequis spécifiques au starter
+
+- Starters 1 à 3 compris, ou expérience équivalente avec Forge
+- Projet Forge vierge
+- Authentification Forge : sessions (`core.security.session`), hachage (`core.security.hashing`), CSRF actif
+- Support des routes protégées et des relations `many_to_one`
+- Scripts `scripts/create_auth_user.py` et `scripts/seed_suivi.py` fournis automatiquement par `forge starter:build 4`
 
 ---
 
@@ -158,10 +179,32 @@ Les deux méthodes produisent le même résultat : un projet Forge local avec `f
 
 ## 4. Génération du starter
 
-!!! warning "Génération automatique à venir"
-    `forge starter:build 4` sera disponible dans une prochaine version. En attendant, suivre les étapes ci-dessous ou consulter [rebuild.md](starters/04-suivi-comportement-eleves/rebuild.md).
+Depuis un projet Forge vierge, après configuration de `env/dev` :
 
-Depuis un projet Forge vierge :
+```bash
+forge starter:build 4
+```
+
+Alias équivalents :
+
+```bash
+forge starter:build suivi
+forge starter:build suivi-comportement-eleves
+```
+
+Pour prévisualiser sans écrire :
+
+```bash
+forge starter:build 4 --dry-run
+```
+
+Pour initialiser la base et construire le starter en une seule commande :
+
+```bash
+forge starter:build 4 --init-db
+```
+
+Le flux manuel équivalent reste :
 
 ```bash
 # Créer les entités
