@@ -18,6 +18,7 @@ from forge_cli.starters.route_ops import (
     inject_block,
     read_snippet,
     remove_legacy_auth_block,
+    replace_home_route,
     routes_from_snippet,
 )
 from forge_cli.starters.scaffold import (
@@ -57,6 +58,10 @@ def dry_run(meta: dict, *, public: bool = False) -> None:
     for view in ("index.html", "show.html", "form.html"):
         print(f"    mvc/views/{snake}/{view}")
     print()
+    home_route = meta.get("home_route")
+    if home_route and home_route != "/":
+        print(f"  Route d'accueil   : GET / → {home_route}")
+        print()
     print("  Routes à ajouter :")
     for action in routes.get("actions", []):
         print(f"    {action['method']:<5}  {prefix}{action['path']}")
@@ -92,6 +97,9 @@ def _dry_run_application(meta: dict) -> None:
             print(f"    {p.relative_to(files_dir).as_posix()}")
     print()
     print(f"  Routes injectées depuis : {meta.get('routes_snippet', 'routes.py.snippet')}")
+    home_route = meta.get("home_route")
+    if home_route and home_route != "/":
+        print(f"  Route d'accueil   : GET / → {home_route}")
     print()
     print("  Routes à ajouter :")
     for method, path in routes_from_snippet(snippet):
@@ -196,6 +204,9 @@ def _build_crud(
         raise StarterBuildError("mvc/routes.py introuvable.")
     block = build_route_block(meta, public=public)
     inject_block(routes_py, block)
+    home_route = meta.get("home_route")
+    if home_route and home_route != "/":
+        replace_home_route(routes_py, home_route)
     print(out.written("mvc/routes.py"))
     print()
     print(block)
@@ -300,6 +311,9 @@ def _build_application(
         remove_legacy_auth_block(routes_py)
     block = read_snippet(meta)
     inject_block(routes_py, block)
+    home_route = meta.get("home_route")
+    if home_route and home_route != "/":
+        replace_home_route(routes_py, home_route)
     print(out.written("mvc/routes.py"))
     print()
     print(block)

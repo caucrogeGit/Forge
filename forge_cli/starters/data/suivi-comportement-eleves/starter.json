@@ -15,6 +15,7 @@
   "status": "available",
   "requires_db": true,
   "supports_public": false,
+  "home_route": "/suivi",
   "routes_marker": "suivi-comportement-eleves",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/suivi",
