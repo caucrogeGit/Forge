@@ -37,8 +37,8 @@ nav:
   - Starter apps:
       - Présentation: starter-app.md
       - Démos et réutilisation: starter-apps.md
-      - Niveau 1 — Contact simple: starter-app-01-contacts.md
-      - Reconstruction contact simple:
+      - Niveau 1 — Contacts: starter-app-01-contacts.md
+      - Reconstruction Contacts:
           - README: starters/01-contact-simple/README.md
           - Étapes: starters/01-contact-simple/rebuild.md
       - Niveau 2 — Utilisateurs/auth: starter-app-02-utilisateurs-auth.md

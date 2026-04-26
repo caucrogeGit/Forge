@@ -1,4 +1,4 @@
-# Reconstruction — Contact simple
+# Reconstruction — Contacts
 
 Ce fichier permet de reconstruire le starter 1 depuis un projet Forge propre.
 
@@ -43,7 +43,7 @@ forge make:crud Contact
   "format_version": 1,
   "entity": "Contact",
   "table": "contact",
-  "description": "Contact simple du starter niveau 1",
+  "description": "Contacts — starter niveau 1",
   "fields": [
     {
       "name": "id",
