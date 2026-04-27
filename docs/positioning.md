@@ -1,6 +1,6 @@
 # Positionnement de Forge
 
-Forge est un framework web MVC Python orienté lisibilité, SQL explicite et génération déterministe du modèle.
+Forge est un framework web MVC Python orienté lisibilité, SQL explicite et génération déterministe du modèle. La V1.0 est stable.
 
 Il n'a pas vocation à remplacer Django, Flask ou FastAPI dans tous leurs usages. Son intérêt est ailleurs : fournir un socle compréhensible, pédagogique et maîtrisable pour des applications web de gestion.
 
