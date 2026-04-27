@@ -523,514 +523,340 @@ flowchart TD
 
 ---
 
-## 8. Commandes Forge et fichiers produits
+## Sous le capot — ce que Forge a produit
 
-Cette partie montre les commandes, mais aussi ce que Forge écrit réellement dans le projet. L'objectif est de comprendre l'envers du décor : Forge ne cache pas le modèle, le SQL, le contrôleur ni les vues.
+=== "Commandes"
 
-### 8.1 Vue synthétique des commandes
+    ### Vue synthétique
 
-| Étape | Commande | Produit ou vérifie |
-|---:|---|---|
-| 1 | `forge make:entity Contact --no-input` | Structure de l'entité |
-| 2 | Modifier `contact.json` | Modèle canonique complet |
-| 3 | `forge check:model` | Cohérence des JSON |
-| 4 | `forge build:model --dry-run` | Prévisualisation du modèle généré |
-| 5 | `forge build:model` | `contact.sql` et `contact_base.py` |
-| 6 | `forge db:apply` | Table SQL dans MariaDB |
-| 7 | `forge make:crud Contact --dry-run` | Prévisualisation du CRUD |
-| 8 | `forge make:crud Contact` | Contrôleur, modèle SQL, formulaire et vues |
+    | Étape | Commande | Produit ou vérifie |
+    |---:|---|---|
+    | 1 | `forge make:entity Contact --no-input` | Structure de l'entité |
+    | 2 | Modifier `contact.json` | Modèle canonique complet |
+    | 3 | `forge check:model` | Cohérence des JSON |
+    | 4 | `forge build:model --dry-run` | Prévisualisation du modèle généré |
+    | 5 | `forge build:model` | `contact.sql` et `contact_base.py` |
+    | 6 | `forge db:apply` | Table SQL dans MariaDB |
+    | 7 | `forge make:crud Contact --dry-run` | Prévisualisation du CRUD |
+    | 8 | `forge make:crud Contact` | Contrôleur, modèle SQL, formulaire et vues |
 
-### 8.2 Créer l'entité minimale
-
-```bash
-forge make:entity Contact --no-input
-```
-
-Cette commande crée la structure de départ de l'entité :
-
-```text
-mvc/entities/contact/
-├── __init__.py
-├── contact.json
-├── contact.sql
-├── contact_base.py
-└── contact.py
-```
-
-À ce stade, `contact.json` est volontairement minimal. Le développeur le complète ensuite avec les champs métier présentés plus haut : `nom`, `prenom`, `email`, `telephone`.
-
-Le fichier manuel `contact.py` sert de point d'extension métier. Il n'est pas écrasé lors des régénérations.
-
-```python
-from .contact_base import ContactBase
-
-
-class Contact(ContactBase):
-    """Point d'extension métier pour Contact."""
-
-    pass
-```
-
-### 8.3 Vérifier le modèle canonique
-
-```bash
-forge check:model
-```
-
-Cette commande lit les fichiers JSON présents dans `mvc/entities/` et vérifie leur cohérence. Elle ne modifie aucun fichier.
-
-Elle sert à repérer les erreurs avant génération : champ incomplet, type SQL invalide, clé primaire absente, doublon de table ou incohérence de modèle.
-
-### 8.4 Prévisualiser la génération du modèle
-
-```bash
-forge build:model --dry-run
-```
-
-Le mode `--dry-run` indique ce que Forge générerait, sans écrire les fichiers. C'est une étape de contrôle.
-
-Forge prépare principalement deux fichiers régénérables :
-
-```text
-mvc/entities/contact/contact.sql
-mvc/entities/contact/contact_base.py
-```
-
-### 8.5 Générer le SQL et la classe de base
-
-```bash
-forge build:model
-```
-
-Cette commande régénère les fichiers techniques à partir de `contact.json`.
-
-#### Exemple de SQL généré
-
-```sql
-CREATE TABLE IF NOT EXISTS contact (
-    Id INT NOT NULL AUTO_INCREMENT,
-    Nom VARCHAR(80) NOT NULL,
-    Prenom VARCHAR(80) NOT NULL,
-    Email VARCHAR(120) NOT NULL,
-    UNIQUE KEY uk_contact_email (Email),
-    Telephone VARCHAR(20) NULL,
-    PRIMARY KEY (Id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-```
-
-#### Extrait simplifié de `contact_base.py`
-
-```python
-from core.validation import ValidationError, max_length, not_empty, nullable, typed
-
-
-class ContactBase:
-    """Classe de base régénérable de Contact."""
-
-    def __init__(self, nom, prenom, email, id=None, telephone=None):
-        self.nom = nom
-        self.prenom = prenom
-        self.email = email
-        self.id = id
-        self.telephone = telephone
-
-    @property
-    def nom(self):
-        return self._nom
-
-    @nom.setter
-    @typed(str)
-    @not_empty
-    @max_length(80)
-    def nom(self, value):
-        if value is None:
-            raise ValidationError("nom", 'La propriété "nom" ne peut pas être nulle.')
-        self._nom = value
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "nom": self.nom,
-            "prenom": self.prenom,
-            "email": self.email,
-            "telephone": self.telephone,
-        }
-```
-
-!!! danger "Fichier régénérable"
-    Le fichier `contact_base.py` est régénérable. Il ne faut pas y écrire de logique métier manuelle. La logique métier se place dans `contact.py`.
-
-### 8.6 Appliquer le SQL sur la base de développement
-
-```bash
-forge db:apply
-```
-
-Cette commande applique le SQL généré sur la base MariaDB configurée dans `env/dev`.
-
-!!! warning "Pas une migration avancée"
-    Dans ce starter, `forge db:apply` est utilisé sur une base de développement neuve. Le starter ne présente pas encore un système complet de migrations avancées. Si le modèle change fortement après création de la table, il faut traiter la modification de schéma avec prudence.
-
-### 8.7 Prévisualiser puis générer le CRUD
-
-=== "Prévisualiser le CRUD"
+    ### make:entity
 
     ```bash
-    forge make:crud Contact --dry-run
+    forge make:entity Contact --no-input
     ```
 
-    Cette commande montre les fichiers que Forge créerait pour le CRUD, sans les écrire.
+    Crée la structure de départ. Le fichier manuel `contact.py` n'est pas écrasé lors des régénérations.
 
-=== "Générer le CRUD"
+    ```text
+    mvc/entities/contact/
+    ├── __init__.py
+    ├── contact.json
+    ├── contact.sql
+    ├── contact_base.py
+    └── contact.py
+    ```
+
+    ### check:model et build:model
 
     ```bash
-    forge make:crud Contact
+    forge check:model               # vérifie sans écrire
+    forge build:model --dry-run     # prévisualise
+    forge build:model               # génère contact.sql et contact_base.py
     ```
 
-    Cette commande crée les fichiers MVC applicatifs s'ils sont absents.
+    SQL produit :
 
-### 8.8 Fichiers MVC générés par le CRUD
+    ```sql
+    CREATE TABLE IF NOT EXISTS contact (
+        Id INT NOT NULL AUTO_INCREMENT,
+        Nom VARCHAR(80) NOT NULL,
+        Prenom VARCHAR(80) NOT NULL,
+        Email VARCHAR(120) NOT NULL,
+        UNIQUE KEY uk_contact_email (Email),
+        Telephone VARCHAR(20) NULL,
+        PRIMARY KEY (Id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ```
 
-```mermaid
-flowchart TD
-    A["forge make:crud Contact"] --> B["contact_controller.py"]
-    A --> C["contact_model.py"]
-    A --> D["contact_form.py"]
-    A --> E["views/contact/*.html"]
-    B --> B1["reçoit les requêtes<br/>et choisit la réponse"]
-    C --> C1["contient les requêtes<br/>SQL explicites"]
-    D --> D1["lit et valide<br/>les données du formulaire"]
-    E --> E1["affiche la liste,<br/>le formulaire et le détail"]
-```
+    !!! danger "Fichier régénérable"
+        `contact_base.py` est régénérable — ne pas y écrire de logique métier. La logique va dans `contact.py`.
 
-#### Extrait du modèle généré : `mvc/models/contact_model.py`
+    ### db:apply
 
-```python
-from core.database.connection import get_connection, close_connection
+    ```bash
+    forge db:apply
+    ```
 
-SELECT_ALL   = "SELECT * FROM contact ORDER BY Id"
-SELECT_BY_ID = "SELECT * FROM contact WHERE Id = ?"
-INSERT       = "INSERT INTO contact (Nom, Prenom, Email, Telephone) VALUES (?, ?, ?, ?)"
-UPDATE       = "UPDATE contact SET Nom = ?, Prenom = ?, Email = ?, Telephone = ? WHERE Id = ?"
-DELETE       = "DELETE FROM contact WHERE Id = ?"
-```
+    Applique `contact.sql` sur la base MariaDB configurée dans `env/dev`.
 
-#### Extrait du formulaire généré : `mvc/forms/contact_form.py`
+    ### make:crud
 
-```python
-from core.forms import Form, StringField
+    === "Prévisualiser"
 
+        ```bash
+        forge make:crud Contact --dry-run
+        ```
 
-class ContactForm(Form):
-    nom = StringField(label="Nom", required=True, max_length=80)
-    prenom = StringField(label="Prenom", required=True, max_length=80)
-    email = StringField(label="Email", required=True, max_length=120)
-    telephone = StringField(label="Telephone", required=False, max_length=20)
-```
+    === "Générer"
 
-#### Extrait du contrôleur généré : `mvc/controllers/contact_controller.py`
+        ```bash
+        forge make:crud Contact
+        ```
 
-```python
-class ContactController(BaseController):
+    ```mermaid
+    flowchart TD
+        A["forge make:crud Contact"] --> B["contact_controller.py"]
+        A --> C["contact_model.py"]
+        A --> D["contact_form.py"]
+        A --> E["views/contact/*.html"]
+        B --> B1["reçoit les requêtes<br/>et choisit la réponse"]
+        C --> C1["contient les requêtes<br/>SQL explicites"]
+        D --> D1["lit et valide<br/>les données du formulaire"]
+        E --> E1["affiche la liste,<br/>le formulaire et le détail"]
+    ```
 
-    @staticmethod
-    def index(request):
-        contacts = get_contacts()
-        return BaseController.render(
-            "contact/index.html",
-            context={"contacts": contacts, "flash_html": render_flash_html(request)},
+    Requêtes SQL générées dans `contact_model.py` :
+
+    ```python
+    SELECT_ALL   = "SELECT * FROM contact ORDER BY Id"
+    SELECT_BY_ID = "SELECT * FROM contact WHERE Id = ?"
+    INSERT       = "INSERT INTO contact (Nom, Prenom, Email, Telephone) VALUES (?, ?, ?, ?)"
+    UPDATE       = "UPDATE contact SET Nom = ?, Prenom = ?, Email = ?, Telephone = ? WHERE Id = ?"
+    DELETE       = "DELETE FROM contact WHERE Id = ?"
+    ```
+
+    !!! note "Responsabilité du développeur"
+        Les routes restent à déclarer explicitement dans `mvc/routes.py`.
+
+=== "Routes"
+
+    Copier dans `mvc/routes.py` après la génération du CRUD :
+
+    ```python
+    from mvc.controllers.contact_controller import ContactController
+
+    # Routes protégées par défaut.
+    # Pour un test local sans authentification :
+    # with router.group("/contacts", public=True, csrf=False) as g:
+    with router.group("/contacts") as g:
+        g.add("GET",  "",              ContactController.index,   name="contact_index")
+        g.add("GET",  "/new",          ContactController.new,     name="contact_new")
+        g.add("POST", "",              ContactController.create,  name="contact_create")
+        g.add("GET",  "/{id}",         ContactController.show,    name="contact_show")
+        g.add("GET",  "/{id}/edit",    ContactController.edit,    name="contact_edit")
+        g.add("POST", "/{id}",         ContactController.update,  name="contact_update")
+        g.add("POST", "/{id}/delete",  ContactController.destroy, name="contact_destroy")
+    ```
+
+    !!! warning "À ne pas inverser"
+        `/new` doit rester déclaré avant `/{id}` pour éviter que `new` soit interprété comme un identifiant.
+
+=== "Fichiers"
+
+    ### Fichiers canoniques et générés
+
+    | Fichier | Nature | Rôle |
+    |---|---|---|
+    | `mvc/entities/contact/contact.json` | Canonique | Source à modifier |
+    | `mvc/entities/contact/contact.sql` | Généré | SQL de création de la table |
+    | `mvc/entities/contact/contact_base.py` | Généré | Classe de base régénérable |
+    | `mvc/entities/contact/contact.py` | Manuel | Extension métier préservée |
+    | `mvc/entities/contact/__init__.py` | Manuel | Initialisation du module |
+
+    ### Fichiers CRUD créés s'ils sont absents
+
+    | Fichier | Rôle |
+    |---|---|
+    | `mvc/controllers/contact_controller.py` | Contrôleur HTTP du CRUD |
+    | `mvc/models/contact_model.py` | Requêtes SQL explicites |
+    | `mvc/forms/contact_form.py` | Formulaire et validation |
+    | `mvc/views/layouts/app.html` | Layout commun |
+    | `mvc/views/contact/index.html` | Liste des contacts |
+    | `mvc/views/contact/show.html` | Détail d'un contact |
+    | `mvc/views/contact/form.html` | Création et modification |
+    | `mvc/routes.py` | Fichier à modifier manuellement |
+
+    ### Arborescence
+
+    ```text
+    mvc/
+    ├── entities/
+    │   └── contact/
+    │       ├── contact.json        # source canonique
+    │       ├── contact.sql         # SQL généré
+    │       ├── contact_base.py     # classe générée
+    │       ├── contact.py          # classe métier manuelle
+    │       └── __init__.py
+    │
+    ├── controllers/
+    │   └── contact_controller.py   # logique HTTP du CRUD
+    │
+    ├── models/
+    │   └── contact_model.py        # requêtes SQL explicites
+    │
+    ├── forms/
+    │   └── contact_form.py         # validation du formulaire
+    │
+    ├── views/
+    │   ├── layouts/
+    │   │   └── app.html            # layout commun
+    │   └── contact/
+    │       ├── index.html          # liste
+    │       ├── form.html           # création / modification
+    │       └── show.html           # détail
+    │
+    └── routes.py                   # routes à compléter manuellement
+    ```
+
+=== "Classes Python"
+
+    | Classe | Origine | Rôle |
+    |---|---|---|
+    | `ContactBase` | Générée depuis le JSON | Propriétés, validations simples, conversion dictionnaire |
+    | `Contact` | Manuelle | Logique métier spécifique |
+    | `ContactForm` | Générée par le CRUD | Lecture et validation du formulaire |
+    | `ContactController` | Généré par le CRUD | Actions `index`, `new`, `create`, `show`, `edit`, `update`, `destroy` |
+    | `BaseController` | Core Forge | Rendu HTML, redirections, flash, erreurs de validation |
+
+    ### Cycle d'une création de contact
+
+    ```mermaid
+    flowchart TD
+        A([Navigateur]) -->|"POST /contacts"| B["mvc/routes.py"]
+        B --> C["ContactController.create(request)"]
+        C --> D["ContactForm.from_request(request)"]
+        D --> E{"form.is_valid()"}
+        E -->|non| F["contact/form.html\navec les erreurs"]
+        E -->|oui| G["add_contact(form.cleaned_data)"]
+        G --> H[(MariaDB)]
+        H --> I["redirect_with_flash → /contacts"]
+    ```
+
+    ### Exemple — création
+
+    ```python
+    form = ContactForm.from_request(request)
+
+    if not form.is_valid():
+        return BaseController.validation_error(
+            "contact/form.html",
+            context={"form": form, "action": "/contacts", "titre": "Nouveau contact"},
             request=request,
         )
 
-    @staticmethod
-    def create(request):
-        form = ContactForm.from_request(request)
-        if not form.is_valid():
-            return BaseController.validation_error(
-                "contact/form.html",
-                context={"form": form, "action": "/contacts", "titre": "Nouveau contact"},
-                request=request,
-            )
-
-        add_contact(form.cleaned_data)
-        return BaseController.redirect_with_flash(request, "/contacts", "Contact créé.")
-```
-
-!!! note "Responsabilité du développeur"
-    Forge génère une base de travail lisible, mais le développeur garde la main : les routes restent à déclarer explicitement dans `mvc/routes.py`.
-
----
-
-## 9. Routes à ajouter
-
-Après la génération du CRUD, copier ou vérifier les routes dans `mvc/routes.py`.
-
-```python
-from mvc.controllers.contact_controller import ContactController
-
-# Routes protégées par défaut.
-# Pour un test local sans authentification :
-# with router.group("/contacts", public=True, csrf=False) as g:
-with router.group("/contacts") as g:
-    g.add("GET",  "",              ContactController.index,   name="contact_index")
-    g.add("GET",  "/new",          ContactController.new,     name="contact_new")
-    g.add("POST", "",              ContactController.create,  name="contact_create")
-    g.add("GET",  "/{id}",         ContactController.show,    name="contact_show")
-    g.add("GET",  "/{id}/edit",    ContactController.edit,    name="contact_edit")
-    g.add("POST", "/{id}",         ContactController.update,  name="contact_update")
-    g.add("POST", "/{id}/delete",  ContactController.destroy, name="contact_destroy")
-```
-
-!!! warning "À ne pas inverser"
-    Dans ce groupe, la route `/new` doit rester déclarée avant `/{id}` afin d'éviter que `new` soit interprété comme un identifiant.
-
----
-
-## 10. Fichiers créés ou modifiés
-
-### 10.1 Fichiers canoniques et générés
-
-| Fichier | Nature | Rôle |
-|---|---|---|
-| `mvc/entities/contact/contact.json` | Canonique | Source à modifier |
-| `mvc/entities/contact/contact.sql` | Généré | SQL de création de la table |
-| `mvc/entities/contact/contact_base.py` | Généré | Classe de base régénérable |
-| `mvc/entities/contact/contact.py` | Manuel | Extension métier préservée |
-| `mvc/entities/contact/__init__.py` | Manuel | Initialisation du module |
-
-### 10.2 Fichiers CRUD créés s'ils sont absents
-
-| Fichier | Rôle |
-|---|---|
-| `mvc/controllers/contact_controller.py` | Contrôleur HTTP du CRUD |
-| `mvc/models/contact_model.py` | Requêtes SQL explicites |
-| `mvc/forms/contact_form.py` | Formulaire et validation |
-| `mvc/views/layouts/app.html` | Layout commun |
-| `mvc/views/contact/index.html` | Liste des contacts |
-| `mvc/views/contact/show.html` | Détail d'un contact |
-| `mvc/views/contact/form.html` | Création et modification |
-| `mvc/routes.py` | Fichier à modifier manuellement |
-
-### 10.3 Vue d'ensemble de l'arborescence
-
-```text
-mvc/
-├── entities/
-│   └── contact/
-│       ├── contact.json        # source canonique
-│       ├── contact.sql         # SQL généré
-│       ├── contact_base.py     # classe générée
-│       ├── contact.py          # classe métier manuelle
-│       └── __init__.py
-│
-├── controllers/
-│   └── contact_controller.py   # logique HTTP du CRUD
-│
-├── models/
-│   └── contact_model.py        # requêtes SQL explicites
-│
-├── forms/
-│   └── contact_form.py         # validation du formulaire
-│
-├── views/
-│   ├── layouts/
-│   │   └── app.html            # layout commun
-│   └── contact/
-│       ├── index.html          # liste
-│       ├── form.html           # création / modification
-│       └── show.html           # détail
-│
-└── routes.py                   # routes à compléter manuellement
-```
-
----
-
-## 11. Classes Python utilisées
-
-| Classe | Origine | Rôle |
-|---|---|---|
-| `ContactBase` | Générée depuis le JSON | Propriétés, validations simples, conversion dictionnaire |
-| `Contact` | Manuelle | Logique métier spécifique |
-| `ContactForm` | Générée par le CRUD | Lecture et validation du formulaire |
-| `ContactController` | Généré par le CRUD | Actions `index`, `new`, `create`, `show`, `edit`, `update`, `destroy` |
-| `BaseController` | Core Forge | Rendu HTML, redirections, flash, erreurs de validation |
+    add_contact(form.cleaned_data)
+    return BaseController.redirect_with_flash(request, "/contacts", "Contact créé.")
+    ```
 
-### 11.1 Exemple simplifié de création
+    ### Fonctions SQL du modèle
 
-```python
-form = ContactForm.from_request(request)
+    ```python
+    get_contacts()
+    get_contact_by_id(id)
+    add_contact(data)
+    update_contact(id, data)
+    delete_contact(id)
+    ```
 
-if not form.is_valid():
-    return BaseController.validation_error(
-        "contact/form.html",
-        context={"form": form, "action": "/contacts", "titre": "Nouveau contact"},
-        request=request,
-    )
+    !!! tip "À retenir"
+        Le formulaire ne va pas directement en base. Il passe par le contrôleur, puis par le modèle SQL.
 
-add_contact(form.cleaned_data)
-return BaseController.redirect_with_flash(request, "/contacts", "Contact créé.")
-```
+=== "Templates"
 
-### 11.2 Fonctions SQL exposées par le modèle
+    Quatre fichiers générés par `forge make:crud` :
 
-```python
-get_contacts()
-get_contact_by_id(id)
-add_contact(data)
-update_contact(id, data)
-delete_contact(id)
-```
+    ```text
+    mvc/views/layouts/app.html
+    mvc/views/contact/index.html
+    mvc/views/contact/form.html
+    mvc/views/contact/show.html
+    ```
 
-### 11.3 Schéma : cycle d'une création de contact
+    ### Héritage Jinja2
 
-```mermaid
-flowchart TD
-    A([Navigateur]) -->|"POST /contacts"| B["mvc/routes.py"]
-    B --> C["ContactController.create(request)"]
-    C --> D["ContactForm.from_request(request)"]
-    D --> E{"form.is_valid()"}
-    E -->|non| F["contact/form.html\navec les erreurs"]
-    E -->|oui| G["add_contact(form.cleaned_data)"]
-    G --> H[(MariaDB)]
-    H --> I["redirect_with_flash → /contacts"]
-```
+    ```mermaid
+    flowchart TD
+        A["layouts/app.html"] --> D["block content"]
+        E["contact/index.html"] --> D
+        F["contact/form.html"] --> D
+        G["contact/show.html"] --> D
+    ```
 
-!!! tip "À retenir"
-    Le formulaire ne va pas directement en base. Il passe par le contrôleur, puis par le modèle SQL.
+    ### index.html — liste
 
----
+    ```jinja2
+    {% extends "layouts/app.html" %}
 
-## 12. Création des templates Jinja
+    {% block content %}
+    <h1>Contacts</h1>
+    <a href="/contacts/new">Nouveau contact</a>
 
-Le CRUD génère trois vues pour `Contact`, plus un layout commun.
+    {% for contact in contacts %}
+        <article>
+            <h2>{{ contact.Nom }} {{ contact.Prenom }}</h2>
+            <p>{{ contact.Email }}</p>
+            <a href="/contacts/{{ contact.Id }}">Voir</a>
+            <a href="/contacts/{{ contact.Id }}/edit">Modifier</a>
+        </article>
+    {% endfor %}
+    {% endblock %}
+    ```
 
-```text
-mvc/views/layouts/app.html
-mvc/views/contact/index.html
-mvc/views/contact/form.html
-mvc/views/contact/show.html
-```
+    Les noms `contact.Nom`, `contact.Prenom`… correspondent aux colonnes SQL retournées par `cursor(dictionary=True)`.
 
-### 12.1 Héritage des templates
+    ### form.html — création et modification
 
-```mermaid
-flowchart TD
-    A["layouts/app.html"] --> B["barre supérieure"]
-    A --> C["messages flash"]
-    A --> D["block content"]
-    E["contact/index.html<br/>liste des contacts"] --> D
-    F["contact/form.html<br/>création et modification"] --> D
-    G["contact/show.html<br/>détail d'un contact"] --> D
-```
+    ```jinja2
+    {% extends "layouts/app.html" %}
 
-!!! note "Principe Jinja"
-    Le layout contient la structure commune de la page. Les vues `index.html`, `form.html` et `show.html` remplissent uniquement la zone principale avec `{% block content %}`.
+    {% block content %}
+    <h1>{{ titre }}</h1>
 
-### 12.2 Template de liste : `contact/index.html`
+    <form method="post" action="{{ action }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
-La liste reçoit une variable `contacts`, fournie par le contrôleur.
+        <label>Nom</label>
+        <input type="text" name="nom" value="{{ form.value('nom') }}">
 
-```jinja2
-{% extends "layouts/app.html" %}
+        <label>Prénom</label>
+        <input type="text" name="prenom" value="{{ form.value('prenom') }}">
 
-{% block content %}
-<h1>Contacts</h1>
+        <label>Email</label>
+        <input type="email" name="email" value="{{ form.value('email') }}">
 
-<a href="/contacts/new">Nouveau contact</a>
+        <label>Téléphone</label>
+        <input type="text" name="telephone" value="{{ form.value('telephone') }}">
 
-{% for contact in contacts %}
-    <article>
-        <h2>{{ contact.Nom }} {{ contact.Prenom }}</h2>
-        <p>{{ contact.Email }}</p>
-        <a href="/contacts/{{ contact.Id }}">Voir</a>
-        <a href="/contacts/{{ contact.Id }}/edit">Modifier</a>
-    </article>
-{% endfor %}
-{% endblock %}
-```
+        <button type="submit">Enregistrer</button>
+    </form>
+    {% endblock %}
+    ```
 
-Dans cette vue, `contact.Nom`, `contact.Prenom`, `contact.Email` et `contact.Id` correspondent aux colonnes SQL retournées par `cursor(dictionary=True)`.
+    Les noms de champs (`nom`, `prenom`…) sont les noms Python du JSON canonique. Les colonnes SQL (`Nom`, `Prenom`…) s'utilisent dans les vues de liste et de détail.
 
-### 12.3 Template de formulaire : `contact/form.html`
+    ### show.html — détail
 
-Le même template sert à la création et à la modification. La différence vient de la variable `action` fournie par le contrôleur.
+    ```jinja2
+    {% extends "layouts/app.html" %}
 
-```jinja2
-{% extends "layouts/app.html" %}
+    {% block content %}
+    <h1>{{ contact.Nom }} {{ contact.Prenom }}</h1>
 
-{% block content %}
-<h1>{{ titre }}</h1>
+    <p>Email : {{ contact.Email }}</p>
+    <p>Téléphone : {{ contact.Telephone }}</p>
 
-<form method="post" action="{{ action }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <a href="/contacts/{{ contact.Id }}/edit">Modifier</a>
 
-    <label>Nom</label>
-    <input type="text" name="nom" value="{{ form.value('nom') }}">
+    <form method="post" action="/contacts/{{ contact.Id }}/delete">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit">Supprimer</button>
+    </form>
+    {% endblock %}
+    ```
 
-    <label>Prénom</label>
-    <input type="text" name="prenom" value="{{ form.value('prenom') }}">
-
-    <label>Email</label>
-    <input type="email" name="email" value="{{ form.value('email') }}">
-
-    <label>Téléphone</label>
-    <input type="text" name="telephone" value="{{ form.value('telephone') }}">
-
-    <button type="submit">Enregistrer</button>
-</form>
-{% endblock %}
-```
-
-Dans le formulaire, les noms utilisés sont les noms Python du JSON canonique : `nom`, `prenom`, `email`, `telephone`.
-
-### 12.4 Template de détail : `contact/show.html`
-
-La page de détail reçoit un seul dictionnaire `contact`.
-
-```jinja2
-{% extends "layouts/app.html" %}
-
-{% block content %}
-<h1>{{ contact.Nom }} {{ contact.Prenom }}</h1>
-
-<p>Email : {{ contact.Email }}</p>
-<p>Téléphone : {{ contact.Telephone }}</p>
-
-<a href="/contacts/{{ contact.Id }}/edit">Modifier</a>
-
-<form method="post" action="/contacts/{{ contact.Id }}/delete">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button type="submit">Supprimer</button>
-</form>
-{% endblock %}
-```
-
-!!! warning "Suppression en POST"
-    La suppression utilise une requête `POST`. Cela évite de supprimer une donnée avec une simple navigation en `GET`.
-
-### 12.5 Noms Python et noms SQL
-
-```text
-Dans contact.json et ContactForm
-   └── noms Python : nom, prenom, email, telephone
-
-Dans les vues alimentées par MariaDB
-   └── colonnes SQL : Nom, Prenom, Email, Telephone, Id
-```
-
-Les champs de formulaire utilisent donc `form.value("nom")`, tandis que les vues de liste et de détail affichent `contact.Nom` ou `contact.Email`.
-
-### 12.6 Classes CSS/Tailwind importantes
-
-| Zone | Classes principales |
-|---|---|
-| Mise en page | `max-w-5xl`, `mx-auto`, `px-6`, `py-8` |
-| Cartes | `bg-white`, `border`, `rounded`, `shadow-sm` |
-| Texte | `text-slate-900`, `text-slate-500` |
-| Actions principales | `bg-orange-600`, `hover:bg-orange-700`, `text-white` |
-| Composition | `grid`, `gap-4`, `flex`, `items-center`, `justify-between` |
-
-Ces classes peuvent être remplacées par votre propre design sans modifier la doctrine Forge.
+    !!! warning "Suppression en POST"
+        La suppression utilise `POST` pour éviter une suppression accidentelle par navigation `GET`.
 
 ---
 
