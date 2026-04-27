@@ -1,10 +1,12 @@
 # Déploiement Forge
 
-## Architecture recommandée
+## 1. Architecture recommandée
 
-```
-Internet → Nginx/Apache → serveur Python → Forge → MariaDB
-                              :8000              :3306
+```mermaid
+flowchart LR
+    I(["Internet<br/>HTTPS :443"]) -->|"TLS terminé"| N["Nginx<br/>reverse proxy"]
+    N -->|"HTTP local"| F["Forge<br/>Python :8000"]
+    F -->|"SQL"| M[("MariaDB<br/>:3306")]
 ```
 
 Forge inclut un serveur HTTPS Python autonome adapté au développement local. En production, **ne jamais l'exposer directement à Internet** :
@@ -16,7 +18,37 @@ Forge inclut un serveur HTTPS Python autonome adapté au développement local. E
 
 En production, le flux recommandé est : **Nginx termine HTTPS publiquement**, puis relaie vers Forge en **HTTP local** sur `127.0.0.1:8000`. Le mode `prod` de `app.py` désactive HTTPS par défaut ; vous pouvez forcer l'ancien comportement avec `APP_SSL_ENABLED=true` si votre proxy est configuré pour parler HTTPS au backend.
 
-## Initialiser les fichiers de déploiement
+## 2. Checklist de déploiement
+
+```mermaid
+flowchart TD
+    A["forge deploy:init"] --> B["forge deploy:check"]
+    B --> C{"Erreurs ?"}
+    C -->|Oui| D["Corriger env/prod<br/>et les dépendances"]
+    D --> B
+    C -->|Non| E["Copier conf Nginx<br/>sur le serveur"]
+    E --> F["Installer le service systemd"]
+    F --> G["forge db:init (une seule fois)"]
+    G --> H["forge db:apply"]
+    H --> I["systemctl start forge-app"]
+    I --> J["nginx -t && reload"]
+```
+
+| Étape | Commande / action |
+|---|---|
+| 1. Générer les fichiers de déploiement | `forge deploy:init` |
+| 2. Vérifier l'environnement | `forge deploy:check` |
+| 3. Créer `env/prod` | `cp env/example env/prod` puis éditer |
+| 4. Copier la conf Nginx | `sudo cp deploy/nginx/forge-app.conf /etc/nginx/sites-available/` |
+| 5. Activer la conf Nginx | `sudo ln -sf ... /etc/nginx/sites-enabled/ && sudo nginx -t && sudo systemctl reload nginx` |
+| 6. Copier le service systemd | `sudo cp deploy/systemd/forge-app.service /etc/systemd/system/` |
+| 7. Activer le service | `sudo systemctl daemon-reload && sudo systemctl enable --now forge-app` |
+| 8. Initialiser la base | `forge db:init` (une seule fois) puis `forge db:apply` |
+| 9. Vérifier | `sudo systemctl status forge-app` |
+
+---
+
+## 3. Initialiser les fichiers de déploiement
 
 ```bash
 forge deploy:init
@@ -32,7 +64,7 @@ Crée le dossier `deploy/` avec :
 
 La commande est **idempotente** : elle affiche `[PRÉSERVÉ]` si un fichier existe déjà et ne l'écrase pas.
 
-## Vérifier l'environnement
+## 4. Vérifier l'environnement
 
 ```bash
 forge deploy:check
@@ -56,7 +88,7 @@ forge deploy:check
 
 La commande quitte avec le code 1 si au moins un `[ERREUR]` est détecté.
 
-## Configuration Nginx
+## 5. Configuration Nginx
 
 Fichier généré : `deploy/nginx/forge-app.conf`
 
@@ -94,7 +126,7 @@ sudo ln -s /etc/nginx/sites-available/forge-app.conf /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-## Configuration systemd
+## 6. Configuration systemd
 
 Fichier généré : `deploy/systemd/forge-app.service`
 
@@ -132,7 +164,7 @@ sudo systemctl start forge-app
 sudo systemctl status forge-app
 ```
 
-## Variables env/prod
+## 7. Variables env/prod
 
 Créer `env/prod` sur le serveur à partir du template :
 
@@ -156,7 +188,7 @@ DB_APP_PWD=mot_de_passe_fort
 DB_ADMIN_HOST=localhost
 DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=root
-DB_ADMIN_PWD=
+DB_ADMIN_PWD=<mot_de_passe_root_mariadb>
 
 SSL_CERTFILE=cert.pem
 SSL_KEYFILE=key.pem
@@ -172,7 +204,7 @@ UPLOAD_MAX_SIZE=5242880
 !!! warning "Sécurité"
     Ne jamais versionner `env/prod`. Vérifier que `.gitignore` contient `env/prod`.
 
-## Déployer une starter-app comme démonstration {#deployer-une-starter-app-comme-demonstration}
+## 8. Déployer une starter-app comme démonstration
 
 Une starter-app Forge est une application normale — elle se déploie exactement comme tout projet Forge.
 
@@ -196,7 +228,7 @@ Une starter-app Forge est une application normale — elle se déploie exactemen
 
 Consultez [la page des starter apps](starter-apps.md) pour la liste complète et les liens de démo.
 
-## Limites actuelles
+## 9. Limites actuelles
 
 - **Pas de déploiement automatique** — Forge génère les fichiers de configuration, l'installation sur le serveur reste manuelle.
 - **Pas de HTTPS automatique** — configurer Nginx pour terminer TLS (Let's Encrypt + Certbot recommandé).
