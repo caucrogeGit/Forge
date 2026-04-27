@@ -1,203 +1,54 @@
 # Architecture des entités Forge
 
-## Objectif
-
-Cette architecture vise à fournir un modèle d'entités lisible, durable et régénérable, sans magie excessive. L'objectif est de séparer clairement :
-
-* la description canonique du modèle,
-* les projections techniques générées,
-* le code métier manuel du développeur.
-
-Forge doit rester proche du code et garder le développeur au centre. L'outil aide à générer et synchroniser, mais ne doit pas masquer l'architecture.
+Forge sépare la description d'une entité en trois niveaux distincts : la source canonique JSON, les projections techniques générées, et le code métier manuel. Cette séparation permet de régénérer les fichiers techniques sans jamais écraser le travail manuel.
 
 ---
 
-## Doctrine générale
+## 1. Vue d'ensemble
 
-Pour chaque entité, Forge utilise un petit module dédié sous `mvc/entities/`.
+```mermaid
+flowchart TD
+    subgraph "mvc/entities/"
+        RJ["relations.json<br/>source canonique des relations"]
+        RS["relations.sql<br/>projection SQL des relations"]
 
-Exemple :
+        subgraph "contact/"
+            CJ["contact.json<br/>source canonique"]
+            CS["contact.sql<br/>projection SQL"]
+            CB["contact_base.py<br/>base Python générée"]
+            CP["contact.py<br/>classe métier manuelle"]
+            CI["__init__.py<br/>export de Contact"]
+        end
+    end
 
-```text
-mvc/
-└── entities/
-    ├── relations.json
-    ├── relations.sql
-    └── contact/
-        ├── __init__.py
-        ├── contact.json
-        ├── contact.sql
-        ├── contact_base.py
-        └── contact.py
+    CJ -->|"forge build:model"| CS
+    CJ -->|"forge build:model"| CB
+    RJ -->|"forge build:model"| RS
+    CB -.->|"hérite de"| CP
 ```
 
-## Convention de nommage
-
-Forge applique les conventions suivantes :
-
-* dossier d'entité : `snake_case`
-* nom de table (`table`) : `snake_case`
-* nom de classe (`entity`) : `PascalCase`
-* nom de champ Python (`field.name`) : `snake_case`
-* nom de colonne SQL (`field.column`) : convention SQL du projet, ici `PascalCase`
-
-Exemple :
-
-* dossier : `contact`
-* table : `contact`
-* classe : `Contact`
-* champ Python : `id`
-* colonne SQL : `Id`
-
-Cette convention doit être respectée par la CLI, la génération et la validation.
-
-### Source canonique
-
-* `*.json` = source canonique de description
-* `*.sql` = projection SQL générée
-* `*_base.py` = projection Python générée
-* `*.py` = code métier manuel
-
-### Règle stricte
-
-* `contact.py` n'est jamais régénéré automatiquement.
-* `contact_base.py` est régénérable et ne doit pas être modifié manuellement en usage normal.
-* `contact.sql` est régénérable.
-* `relations.sql` est régénérable.
+| Fichier | Nature | Régénérable | Règle |
+|---|---|---|---|
+| `contact.json` | Source canonique | Non | À modifier librement |
+| `contact.sql` | Projection SQL | Oui | Ne pas modifier manuellement |
+| `contact_base.py` | Base Python | Oui | Ne pas modifier manuellement |
+| `contact.py` | Classe métier | Non | Jamais écrasé par Forge |
+| `__init__.py` | Export | Non | Jamais écrasé par Forge |
+| `relations.json` | Source relationnelle | Non | À modifier librement |
+| `relations.sql` | Projection relationnelle | Oui | Ne pas modifier manuellement |
 
 ---
 
-## Structure d'une entité
+## 2. Le modèle canonique JSON
 
-Chaque entité possède son propre dossier.
-
-Exemple :
-
-```text
-mvc/entities/contact/
-├── __init__.py
-├── contact.json
-├── contact.sql
-├── contact_base.py
-└── contact.py
-```
-
-### `contact.json`
-
-Source canonique locale de l'entité.
-
-Contient :
-
-* la version du format,
-* le nom de l'entité,
-* le nom de la table,
-* une description optionnelle,
-* la liste des champs,
-* les types Python,
-* les types SQL,
-* la nullabilité,
-* la clé primaire,
-* l'auto-incrément,
-* les contraintes simples,
-* éventuellement une valeur par défaut,
-* éventuellement l'unicité.
-
-### `contact.sql`
-
-Projection SQL locale de l'entité.
-
-Contient :
-
-* le `CREATE TABLE IF NOT EXISTS`,
-* les colonnes,
-* la clé primaire,
-* les contraintes locales (`UNIQUE KEY`, etc.),
-* le moteur et le charset.
-
-Ne contient pas les relations inter-entités.
-
-### `contact_base.py`
-
-Classe Python générée, régénérable.
-
-Contient :
-
-* la classe `ContactBase`,
-* le constructeur `__init__`,
-* les propriétés,
-* les setters,
-* les décorateurs de validation,
-* `to_dict()`,
-* `from_dict()`,
-* `__repr__`.
-
-Ne contient pas la logique métier manuelle.
-
-### `contact.py`
-
-Classe métier finale, manuelle.
-
-Contient :
-
-* la classe `Contact(ContactBase)`,
-* les méthodes métier,
-* les surcharges éventuelles,
-* des commentaires/zones guidées.
-
-Ce fichier ne doit jamais être écrasé par Forge. Il est créé uniquement s'il est absent et n'est jamais régénéré ni fusionné automatiquement.
-
-### `__init__.py`
-
-Expose la classe finale.
-
-Exemple :
-
-```python
-from .contact import Contact
-```
-
-Ce fichier est créé uniquement s'il est absent et n'est jamais régénéré ni fusionné automatiquement.
-
----
-
-## Structure globale des relations
-
-Les relations entre entités sont décrites globalement, et non dans chaque entité individuellement.
-
-Fichiers :
-
-```text
-mvc/entities/
-├── relations.json
-└── relations.sql
-```
-
-### `relations.json`
-
-Source canonique globale des relations du modèle.
-
-### `relations.sql`
-
-Projection SQL globale des relations.
-
-Contient uniquement les contraintes relationnelles :
-
-* `ALTER TABLE`
-* `ADD CONSTRAINT`
-* `FOREIGN KEY`
-* `REFERENCES`
-* `ON DELETE`
-* `ON UPDATE`
-
----
-
-## Format canonique V1 d'une entité
-
-Exemple :
+### Format
 
 ```json
 {
+  "format_version": 1,
   "entity": "Contact",
+  "table": "contact",
+  "description": "Contacts de l'application",
   "fields": [
     {
       "name": "id",
@@ -207,11 +58,25 @@ Exemple :
     },
     {
       "name": "nom",
-      "sql_type": "VARCHAR(100)",
+      "sql_type": "VARCHAR(80)",
       "constraints": {
         "not_empty": true,
-        "max_length": 100
+        "max_length": 80
       }
+    },
+    {
+      "name": "email",
+      "sql_type": "VARCHAR(120)",
+      "unique": true,
+      "nullable": true,
+      "constraints": {
+        "max_length": 120
+      }
+    },
+    {
+      "name": "actif",
+      "sql_type": "BOOLEAN",
+      "default": true
     }
   ]
 }
@@ -219,264 +84,188 @@ Exemple :
 
 ### Clés racine
 
-Obligatoires :
-
-* `entity`
-* `fields`
-
-Optionnelles avec valeur par défaut implicite :
-
-* `format_version`
-* `table`
-* `description`
+| Clé | Obligatoire | Valeur par défaut |
+|---|---|---|
+| `entity` | Oui | — |
+| `fields` | Oui | — |
+| `format_version` | Non | `1` |
+| `table` | Non | `entity` converti en `snake_case` |
+| `description` | Non | `""` |
 
 ### Clés par champ
 
-Obligatoires :
+| Clé | Obligatoire | Valeur par défaut |
+|---|---|---|
+| `name` | Oui | — |
+| `sql_type` | Oui | — |
+| `column` | Non | `name` converti en `PascalCase` |
+| `python_type` | Non | déduit depuis `sql_type` |
+| `nullable` | Non | `false` |
+| `primary_key` | Non | `false` |
+| `auto_increment` | Non | `false` |
+| `unique` | Non | `false` |
+| `default` | Non | absent |
+| `constraints` | Non | `{}` |
 
-* `name`
-* `sql_type`
+!!! warning "Dérivation automatique de `column`"
+    La dérivation automatique ne préserve pas les acronymes métier.
+    `montant_ttc` devient `MontantTtc`, pas `MontantTTC`.
+    Si une casse spécifique est nécessaire, déclarer `column` explicitement.
 
-Optionnelles :
+### Contraintes disponibles dans `constraints`
 
-* `column`
-* `python_type`
-* `nullable`
-* `primary_key`
-* `auto_increment`
-* `constraints`
-* `default`
-* `unique`
+| Clé | Types compatibles |
+|---|---|
+| `not_empty` | `str` |
+| `min_length` | `str` |
+| `max_length` | `str` |
+| `min_value` | `int`, `float` |
+| `max_value` | `int`, `float` |
+| `pattern` | `str` (regex) |
 
-## Valeurs par défaut implicites
+### Valeurs par défaut (`default`)
 
-Tout attribut absent prend sa valeur par défaut. Le JSON auteur ne contient que les écarts au comportement standard.
+La clé `default` accepte uniquement des valeurs simples : `str`, `int`, `float`, `bool`, `null`.
 
-Valeurs injectées automatiquement à la racine :
+- Absence de `default` = aucune valeur par défaut
+- `default: null` n'est autorisé que si `nullable: true`
+- Pour les types `date` et `datetime`, `default` est une chaîne ISO (`"2024-01-01"`, `"2024-01-01T00:00:00"`)
+- Les expressions SQL complexes (`CURRENT_TIMESTAMP`, `NOW()`) sont hors V1
 
-* `format_version = 1`
-* `table = entity` converti en `snake_case`
-* `description = ""`
+---
 
-Valeurs injectées automatiquement pour chaque champ :
+## 3. Les projections générées
 
-* `nullable = false`
-* `primary_key = false`
-* `auto_increment = false`
-* `constraints = {}`
-* `column = name` converti en `PascalCase` SQL
-* `python_type =` déduit depuis `sql_type` quand la déduction est possible
+### `contact.sql` — projection SQL locale
 
-Précisions importantes :
+Contient uniquement la table de l'entité. Pas de clé étrangère.
 
-* la dérivation automatique de `column` ne préserve pas les acronymes métier
-* par exemple `montant_ttc` devient `MontantTtc`
-* si une casse spécifique est voulue, `column` doit être renseigné explicitement
-
-Exemple :
-
-```json
-{
-  "entity": "Contact",
-  "fields": [
-    {
-      "name": "id",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
-    },
-    {
-      "name": "nom",
-      "sql_type": "VARCHAR(100)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 100
-      }
-    }
-  ]
-}
+```sql
+CREATE TABLE IF NOT EXISTS contact (
+    Id INT NOT NULL AUTO_INCREMENT,
+    Nom VARCHAR(80) NOT NULL,
+    Email VARCHAR(120) NULL,
+    Actif BOOLEAN NOT NULL DEFAULT 1,
+    PRIMARY KEY (Id),
+    UNIQUE KEY uk_contact_email (Email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-## Sémantique de `default`
+Règles de formatage :
+- Mots-clés SQL en majuscules
+- 4 espaces d'indentation, une colonne par ligne
+- `PRIMARY KEY` et `UNIQUE KEY` en contraintes de table
+- Toujours `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
 
-La clé `default` est optionnelle.
+!!! danger "Règle stricte"
+    Les clés étrangères inter-entités n'apparaissent **jamais** dans un `.sql` d'entité.
+    Elles appartiennent exclusivement à `relations.sql`.
 
-Règles :
+### `contact_base.py` — base Python générée
 
-* absence de clé `default` = aucune valeur par défaut déclarée
-* présence de `default: null` = valeur par défaut explicite `None`
-* `default: null` n'est autorisé que si `nullable: true`
-* les valeurs par défaut V1 sont limitées aux valeurs simples :
-
-  * `str`
-  * `int`
-  * `float`
-  * `bool`
-  * `null`
-
-Les valeurs par défaut SQL complexes n'entrent pas dans la V1.
-
-Pour les types temporels V1 :
-
-* `python_type: "date"` est supporté
-* `python_type: "datetime"` est supporté
-* dans le JSON canonique, `default` reste une chaîne simple
-* `date` → chaîne ISO compatible `date.fromisoformat(...)`
-* `datetime` → chaîne ISO compatible `datetime.fromisoformat(...)`
-* aucune expression SQL complexe n'est autorisée
-
----
-
-## Contraintes V1 retenues
-
-### Contraintes structurelles
-
-Portées directement par le champ :
-
-* `nullable`
-* `primary_key`
-* `auto_increment`
-* `default`
-* `unique`
-
-### Contraintes métier simples
-
-Dans `constraints` :
-
-* `not_empty`
-* `min_length`
-* `max_length`
-* `min_value`
-* `max_value`
-* `pattern`
-
-### Ce qui n'entre pas en V1
-
-* logique métier complexe,
-* dépendances entre champs,
-* relations dans le JSON d'entité,
-* validations conditionnelles,
-* enum avancé,
-* hooks,
-* logique UI.
-
----
-
-## Décorateurs V1
-
-Les décorateurs de validation vivent dans :
-
-```text
-core/validation/
-├── __init__.py
-├── exceptions.py
-└── decorators.py
-```
-
-### Décorateurs retenus
-
-* `@typed(type_)`
-* `@nullable`
-* `@not_empty`
-* `@min_length(n)`
-* `@max_length(n)`
-* `@min_value(n)`
-* `@max_value(n)`
-* `@pattern(regex)`
-
-### Doctrine des décorateurs
-
-* un décorateur = une responsabilité,
-* validation uniquement,
-* aucune transformation implicite,
-* `None` est refusé par défaut au niveau de la propriété,
-* `@nullable` est le seul décorateur qui autorise explicitement `None`,
-* les autres décorateurs ne décident pas de la nullabilité et ne doivent pas échouer sur `None`,
-* les décorateurs lèvent `ValidationError`,
-* les messages d'erreur doivent inclure le nom de la propriété,
-* `typed(int)` doit refuser `bool`.
-
-### Mapping JSON → décorateurs
-
-* `python_type` → `@typed(...)`
-* `nullable: true` → `@nullable`
-* `constraints.not_empty` → `@not_empty`
-* `constraints.min_length` → `@min_length(...)`
-* `constraints.max_length` → `@max_length(...)`
-* `constraints.min_value` → `@min_value(...)`
-* `constraints.max_value` → `@max_value(...)`
-* `constraints.pattern` → `@pattern(...)`
-
-En V1, `@typed(...)` peut notamment porter :
-
-* `int`
-* `str`
-* `float`
-* `bool`
-* `date`
-* `datetime`
-
----
-
-## Doctrine des classes Python générées
-
-### `contact_base.py`
-
-Le constructeur `__init__` doit être cohérent avec les contraintes.
-
-Un champ devient paramètre obligatoire s'il est :
-
-* non nullable,
-* sans valeur par défaut,
-* non auto_increment.
-
-Exemple logique :
+Contient le constructeur, les propriétés avec décorateurs de validation, `to_dict()`, `from_dict()` et `__repr__`.
 
 ```python
-def __init__(self, nom, prenom, email=None, telephone=None, actif=True, id=None):
-    ...
+from core.validation import ValidationError, max_length, not_empty, nullable, typed
+
+
+class ContactBase:
+    """Classe de base régénérable de Contact."""
+
+    def __init__(self, nom, actif, email=None, id=None):
+        self.nom = nom
+        self.email = email
+        self.actif = actif
+        self.id = id
+
+    @property
+    def nom(self):
+        return self._nom
+
+    @nom.setter
+    @typed(str)
+    @not_empty
+    @max_length(80)
+    def nom(self, value):
+        if value is None:
+            raise ValidationError("nom", 'La propriété "nom" ne peut pas être nulle.')
+        self._nom = value
+
+    def to_dict(self) -> dict:
+        return {"id": self.id, "nom": self.nom, "email": self.email, "actif": self.actif}
 ```
 
-Pas :
+Règle du constructeur : un champ devient paramètre obligatoire s'il est non nullable, sans valeur par défaut et non auto-increment.
 
-```python
-def __init__(self, id=None, nom="", prenom="", email=None):
-    ...
-```
+### Décorateurs de validation disponibles
 
-### `to_dict()`
+| Décorateur | Source JSON |
+|---|---|
+| `@typed(type_)` | `python_type` |
+| `@nullable` | `nullable: true` |
+| `@not_empty` | `constraints.not_empty` |
+| `@min_length(n)` | `constraints.min_length` |
+| `@max_length(n)` | `constraints.max_length` |
+| `@min_value(n)` | `constraints.min_value` |
+| `@max_value(n)` | `constraints.max_value` |
+| `@pattern(regex)` | `constraints.pattern` |
 
-Retourne un dictionnaire utilisant les noms Python des champs.
+Types Python supportés : `int`, `str`, `float`, `bool`, `date`, `datetime`.
 
-Pour `date` et `datetime`, la sérialisation V1 utilise `isoformat()`.
-
-### `from_dict()`
-
-Version V1 permissive : lecture via `data.get(...)`.
-
-Pour `date` et `datetime`, la reconstruction V1 utilise :
-
-* `date.fromisoformat(...)`
-* `datetime.fromisoformat(...)`
-
-### `__repr__`
-
-Généré pour faciliter le debug.
-
-### `contact.py`
-
-Le fichier manuel doit contenir :
-
-* l'héritage depuis `ContactBase`,
-* une docstring claire,
-* des zones/commentaires guidés,
-* `pass` tant qu'aucune logique métier n'a été ajoutée.
+!!! note "Règle nullable"
+    `@nullable` est le seul décorateur qui autorise `None`.
+    Les autres décorateurs ne doivent pas échouer sur `None`.
+    `@typed(int)` refuse `bool`.
 
 ---
 
-## Format canonique V1 des relations
+## 4. Les fichiers manuels
 
-Exemple :
+### `contact.py` — classe métier
+
+Hérite de `ContactBase`. Créé une seule fois par Forge s'il est absent. Jamais écrasé.
+
+```python
+from .contact_base import ContactBase
+
+
+class Contact(ContactBase):
+    """Point d'extension métier pour Contact."""
+
+    pass
+```
+
+Ajouter ici les méthodes métier, les validations croisées et les surcharges spécifiques.
+
+### `__init__.py`
+
+Créé une seule fois. Jamais écrasé.
+
+```python
+from .contact import Contact
+```
+
+---
+
+## 5. Les relations
+
+### Structure globale
+
+```mermaid
+flowchart LR
+    subgraph "relations.json"
+        R1["relation: commande_client<br/>many_to_one<br/>Commande.client_id → Client.id"]
+        R2["relation: commande_produit<br/>many_to_one<br/>LigneCommande.produit_id → Produit.id"]
+    end
+    subgraph "relations.sql"
+        A1["ALTER TABLE commande<br/>ADD CONSTRAINT fk_commande_client..."]
+        A2["ALTER TABLE ligne_commande<br/>ADD CONSTRAINT fk_lc_produit..."]
+    end
+    R1 -->|"forge build:model"| A1
+    R2 -->|"forge build:model"| A2
+```
+
+### Format `relations.json`
 
 ```json
 {
@@ -497,158 +286,13 @@ Exemple :
 }
 ```
 
-### Doctrine V1 des relations
+Règles :
+- `many_to_one` est le seul type supporté en V1
+- `from_field` et `to_field` utilisent les noms Python des champs (pas les colonnes SQL)
+- `to_field` doit être la clé primaire de l'entité cible
+- `on_delete` et `on_update` sont toujours explicites
 
-* fichier global unique,
-* `many_to_one` seulement en V1,
-* `from_field` et `to_field` utilisent les noms de champ du modèle Forge,
-* la clé cible doit être la clé primaire de l'entité cible,
-* `on_delete` et `on_update` sont toujours explicites.
-
-### Doctrine officielle Forge V1
-
-Forge V1 supporte officiellement les relations `many_to_one` uniquement.
-Forge ne fournit pas de `many_to_many` direct ou implicite.
-
-Un `many_to_many` se modélise via une entité pivot explicite décrite comme toute autre entité Forge.
-Cette entité pivot possède sa propre clé primaire locale `id` et des clés étrangères explicites sous la forme `<entity>_id`.
-Le lien global est alors représenté par deux relations `many_to_one` dans `mvc/entities/relations.json`.
-
-Cette approche conserve un JSON canonique visible, un SQL généré compréhensible et évite toute abstraction magique.
-
-Note V1.0 côté formulaires :
-
-* les formulaires peuvent faciliter la manipulation des identifiants liés à une entité pivot explicite ;
-* `RelatedIdsField` prépare une liste d'identifiants validés ;
-* le formulaire ne devine pas la relation et n'écrit pas dans la base ;
-* le modèle applicatif SQL reste responsable de la persistance dans la table pivot.
-
-→ Voir le guide complet : [CRUD explicite — Forge](crud.md)
-
-### Exemple canonique de pivot explicite
-
-Entité pivot `ContactGroupe` :
-
-```json
-{
-  "entity": "ContactGroupe",
-  "fields": [
-    {
-      "name": "id",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
-    },
-    {
-      "name": "contact_id",
-      "sql_type": "INT"
-    },
-    {
-      "name": "groupe_id",
-      "sql_type": "INT"
-    }
-  ]
-}
-```
-
-Relations globales associées :
-
-```json
-{
-  "format_version": 1,
-  "relations": [
-    {
-      "name": "contact_groupe_contact",
-      "type": "many_to_one",
-      "from_entity": "ContactGroupe",
-      "to_entity": "Contact",
-      "from_field": "contact_id",
-      "to_field": "id",
-      "foreign_key_name": "fk_contact_groupe_contact",
-      "on_delete": "CASCADE",
-      "on_update": "CASCADE"
-    },
-    {
-      "name": "contact_groupe_groupe",
-      "type": "many_to_one",
-      "from_entity": "ContactGroupe",
-      "to_entity": "Groupe",
-      "from_field": "groupe_id",
-      "to_field": "id",
-      "foreign_key_name": "fk_contact_groupe_groupe",
-      "on_delete": "CASCADE",
-      "on_update": "CASCADE"
-    }
-  ]
-}
-```
-
-En pratique :
-
-* `ContactGroupe.id` = clé primaire locale du pivot,
-* `ContactGroupe.contact_id -> Contact.id`,
-* `ContactGroupe.groupe_id -> Groupe.id`.
-
----
-
-## Doctrine SQL
-
-### SQL d'entité
-
-Chaque entité génère un fichier `*.sql` local.
-
-Exemple :
-
-```sql
-CREATE TABLE IF NOT EXISTS contact (
-    Id INT NOT NULL AUTO_INCREMENT,
-    Nom VARCHAR(100) NOT NULL,
-    Prenom VARCHAR(100) NOT NULL,
-    Email VARCHAR(150) NULL,
-    Telephone VARCHAR(20) NULL,
-    Actif BOOLEAN NOT NULL DEFAULT 1,
-    PRIMARY KEY (Id),
-    UNIQUE KEY uk_contact_email (Email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-```
-
-### Règles SQL locales
-
-* mots-clés SQL en majuscules,
-* 4 espaces d'indentation,
-* une colonne par ligne,
-* une contrainte locale par ligne,
-* ordre des colonnes conforme au JSON,
-* `PRIMARY KEY` en contrainte de table,
-* `UNIQUE KEY` en contrainte de table,
-* `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`.
-
-Compatibilités minimales V1 entre `python_type` et `sql_type` :
-
-* `bool` ↔ `BOOL`
-* `bool` ↔ `BOOLEAN`
-* `date` ↔ `DATE`
-* `datetime` ↔ `DATETIME`
-* `datetime` ↔ `TIMESTAMP`
-
-Précision V1 :
-
-* Forge ne convertit pas implicitement `TINYINT(1)` en booléen
-* pour obtenir un booléen, il faut utiliser `BOOL` ou `BOOLEAN`
-
-### SQL des relations
-
-Les relations sont générées dans `relations.sql` uniquement.
-
-`relations.sql` ne doit contenir que des contraintes relationnelles globales.
-
-Règles strictes :
-
-* aucun `CREATE TABLE` ne doit apparaître dans `relations.sql`
-* aucune clé étrangère inter-entité ne doit apparaître dans un `*.sql` d'entité
-* `relations.sql` contient uniquement des blocs `ALTER TABLE ... ADD CONSTRAINT ... FOREIGN KEY ...`
-
-Exemple :
+### Format `relations.sql`
 
 ```sql
 ALTER TABLE commande
@@ -659,325 +303,167 @@ ALTER TABLE commande
     ON UPDATE CASCADE;
 ```
 
-### Règles SQL relationnelles
+!!! danger "Règle stricte"
+    `relations.sql` ne doit contenir que des `ALTER TABLE ... ADD CONSTRAINT`.
+    Aucun `CREATE TABLE` dans `relations.sql`.
 
-* un bloc `ALTER TABLE` par relation,
-* ligne vide entre deux relations,
-* noms de table issus de `table`,
-* noms de colonne issus de `column`,
-* toujours générer `ON DELETE` et `ON UPDATE`.
+### Pivot explicite pour many-to-many
 
-### Contraintes SQL hors V1
+Forge V1 ne fournit pas de `many_to_many` direct. Un lien many-to-many se modélise avec une entité pivot normale et deux relations `many_to_one`.
 
-Certaines contraintes utiles ne sont pas déclarables dans le JSON canonique V1.
-
-Exemples :
-
-* contrainte d'unicité composée,
-* index métier composé,
-* contrainte SQL spécifique à une application.
-
-Règle stricte :
-
-* ne jamais ajouter ces contraintes dans un `*.sql` d'entité généré ;
-* ne jamais les ajouter dans `relations.sql` ;
-* les porter dans un script SQL applicatif séparé, hors `mvc/entities/`, exécuté après `forge db:apply` selon l'organisation du projet.
-
----
-
-## Politique de génération
-
-Avant toute utilisation de la CLI `forge`, activez votre environnement virtuel puis installez le package en mode editable :
-
-```bash
-source .venv/bin/activate
-pip install -e .
+```mermaid
+flowchart LR
+    CG["ContactGroupe<br/>id, contact_id, groupe_id"]
+    C["Contact"]
+    G["Groupe"]
+    CG -->|"many_to_one<br/>contact_id → id"| C
+    CG -->|"many_to_one<br/>groupe_id → id"| G
 ```
 
-> La commande `forge` n'est disponible qu'après installation du package en mode editable.
-> Sans `pip install -e .`, la commande `forge` ne sera pas trouvée.
-
-### Génération d'une entité
-
-Commande :
-
-```bash
-forge make:entity Contact
-```
-
-Cette commande :
-
-* lance un assistant interactif dans le terminal,
-* pose les questions utiles pour construire l'entité,
-* écrit un JSON auteur court confirmé par l'utilisateur,
-* génère `contact.sql`,
-* génère `contact_base.py`,
-* crée `contact.py`,
-* crée `__init__.py`.
-
-### JSON minimal non interactif
-
-Exemple :
+JSON de l'entité pivot :
 
 ```json
 {
-  "entity": "Contact",
+  "entity": "ContactGroupe",
   "fields": [
+    { "name": "id",         "sql_type": "INT", "primary_key": true, "auto_increment": true },
+    { "name": "contact_id", "sql_type": "INT" },
+    { "name": "groupe_id",  "sql_type": "INT" }
+  ]
+}
+```
+
+Relations associées dans `relations.json` :
+
+```json
+{
+  "format_version": 1,
+  "relations": [
     {
-      "name": "id",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
+      "name": "contact_groupe_contact",
+      "type": "many_to_one",
+      "from_entity": "ContactGroupe", "to_entity": "Contact",
+      "from_field": "contact_id",     "to_field": "id",
+      "foreign_key_name": "fk_contact_groupe_contact",
+      "on_delete": "CASCADE", "on_update": "CASCADE"
+    },
+    {
+      "name": "contact_groupe_groupe",
+      "type": "many_to_one",
+      "from_entity": "ContactGroupe", "to_entity": "Groupe",
+      "from_field": "groupe_id",      "to_field": "id",
+      "foreign_key_name": "fk_contact_groupe_groupe",
+      "on_delete": "CASCADE", "on_update": "CASCADE"
     }
   ]
 }
 ```
 
-### Génération interactive
+---
 
-Commande :
+## 6. Conventions de nommage
 
-```bash
-forge make:entity Contact
-```
-
-Cette commande :
-
-* construit `contact.json` via un assistant CLI,
-* puis génère les fichiers dérivés.
-
-Exemple de parcours :
-
-```text
-$ forge make:entity Contact
-Nom de la table (Entrée = convention par défaut) :
-Nom du champ primaire [id] :
-Type SQL du champ primaire [INT, BIGINT, VARCHAR, CHAR, TEXT, DATE, DATETIME, BOOLEAN, DECIMAL] [INT] :
-Auto increment ? [O/n] :
-Ajouter un autre champ ? [o/N] : o
-Nom du champ : nom
-Type SQL [INT, BIGINT, VARCHAR, CHAR, TEXT, DATE, DATETIME, BOOLEAN, DECIMAL] : varchar
-Longueur SQL : 100
-Autoriser NULL ? [o/N] :
-Champ unique ? [o/N] :
-Ajouter not_empty ? [o/N] : o
-min_length [vide = aucun] :
-max_length [vide = aucun] : 100
-Validation regex [vide = aucune, ex: ^[A-Z]+$ ou ^[^@]+@[^@]+\\.[^@]+$] :
-Confirmer l'écriture des fichiers ? [O/n] :
-```
-
-### Génération non interactive
-
-Pour un usage scriptable, le mode non interactif reste disponible :
-
-```bash
-forge make:entity Contact --no-input
-```
-
-Ce mode écrit directement un squelette court minimal, sans assistant ni confirmation.
+| Élément | Convention | Exemple |
+|---|---|---|
+| Dossier d'entité | `snake_case` | `contact_client/` |
+| Nom de table (`table`) | `snake_case` | `contact_client` |
+| Nom de classe (`entity`) | `PascalCase` | `ContactClient` |
+| Nom de champ Python (`name`) | `snake_case` | `date_creation` |
+| Nom de colonne SQL (`column`) | `PascalCase` | `DateCreation` |
+| Nom de relation | `snake_case` | `commande_client` |
+| Nom de contrainte FK | `fk_<relation>` | `fk_commande_client` |
 
 ---
 
-## Politique de régénération
+## 7. Cycle de génération
 
-### `forge sync:entity Contact`
-
-Relit `contact.json` et régénère :
-
-* `contact.sql`
-* `contact_base.py`
-
-Ne touche jamais à :
-
-* `contact.py`
-* `__init__.py`
-
-### `forge sync:relations`
-
-Relit `relations.json` et régénère :
-
-* `relations.sql`
-
-### `forge make:relation`
-
-Commande :
-
-```bash
-forge make:relation
+```mermaid
+flowchart TD
+    A["forge make:entity Contact"] --> B["contact.json créé"]
+    B --> C["Éditer contact.json"]
+    C --> D["forge check:model"]
+    D --> E{"Validation OK ?"}
+    E -->|Non| C
+    E -->|Oui| F["forge build:model --dry-run"]
+    F --> G["forge build:model"]
+    G --> H["contact.sql + contact_base.py générés"]
+    H --> I["forge make:relation (si besoin)"]
+    I --> J["forge build:model"]
+    J --> K["relations.sql généré"]
+    K --> L["forge db:apply"]
+    L --> M[("MariaDB")]
 ```
 
-Cette commande :
+### Commandes et comportement
 
-* guide la saisie interactive d'une relation,
-* écrit ou met à jour `mvc/entities/relations.json`,
-* n'écrit jamais directement `relations.sql`,
-* reste limitée aux relations `many_to_one` supportées officiellement en V1.
+| Commande | Écrit | Préserve | Rôle |
+|---|---|---|---|
+| `forge make:entity Contact` | `contact.json`, `contact.sql`, `contact_base.py`, `contact.py`, `__init__.py` | fichiers existants | Création initiale |
+| `forge sync:entity Contact` | `contact.sql`, `contact_base.py` | `contact.py`, `__init__.py` | Resynchronisation d'une entité |
+| `forge make:relation` | `relations.json` | existant | Ajout interactif de relation |
+| `forge sync:relations` | `relations.sql` | — | Resynchronisation des relations |
+| `forge build:model` | tout le modèle | fichiers manuels | Régénération complète |
+| `forge check:model` | rien | — | Validation sans écriture |
 
-Le flux officiel détaillé est :
+### Ordre d'exécution SQL obligatoire
 
-1. créer ou modifier les entités ;
-2. lancer `forge sync:entity <Entity>` pour chaque entité modifiée ;
-3. ajouter les relations avec `forge make:relation` ;
-4. lancer `forge sync:relations` ;
-5. lancer `forge check:model` ;
-6. lancer `forge db:apply`.
+```
+1. Tous les *.sql d'entités (forge db:apply les applique dans cet ordre)
+2. relations.sql
+```
 
-Pour un modèle complet ou plusieurs entités modifiées ensemble, `forge build:model` peut remplacer les synchronisations individuelles.
-
-Pour un `many_to_many`, la commande ne fournit pas de magie dédiée :
-
-* créer d'abord une entité pivot explicite,
-* puis décrire deux relations `many_to_one`.
-
-### `forge build:model`
-
-Valide et régénère tout le modèle :
-
-1. validation des JSON d'entité,
-2. validation de `relations.json`,
-3. validation croisée globale,
-4. génération des SQL d'entité,
-5. génération des `*_base.py`,
-6. création des fichiers manuels absents,
-7. génération de `relations.sql`.
+Jamais l'inverse : `relations.sql` référence des tables qui doivent exister.
 
 ---
 
-## Ordre d'exécution SQL
+## 8. Validation interne
 
-L'ordre correct est :
-
-1. tous les `*.sql` des entités,
-2. `relations.sql`.
-
-Jamais l'inverse.
-
----
-
-## Validation interne
-
-Forge doit bloquer toute génération si la validation échoue.
+Forge bloque toute génération si une validation échoue.
 
 ### Validation d'entité
 
-* structure obligatoire,
-* noms valides,
-* unicité des champs,
-* unicité des colonnes,
-* une seule clé primaire,
-* compatibilité `python_type` / `sql_type`,
-* compatibilité des contraintes avec le type,
-* compatibilité des valeurs par défaut.
-
-Types Python supportés en V1 :
-
-* `int`
-* `str`
-* `float`
-* `bool`
-* `date`
-* `datetime`
+- Structure obligatoire présente (`entity`, `fields`)
+- Noms valides (format, unicité des champs et colonnes)
+- Une seule clé primaire par entité
+- Compatibilité `python_type` / `sql_type`
+- Compatibilité contraintes / type
+- Valeurs par défaut cohérentes avec la nullabilité
 
 ### Validation des relations
 
-* structure obligatoire,
-* entités existantes,
-* champs existants,
-* type de relation valide,
-* clé cible primaire,
-* types compatibles,
-* unicité des noms de relation.
+- Entités et champs référencés existants
+- Type de relation valide (`many_to_one` en V1)
+- Champ cible est une clé primaire
+- Types compatibles entre `from_field` et `to_field`
+- Unicité des noms de relation et de contrainte FK
 
 ### Validation globale
 
-* unicité des entités,
-* unicité des tables,
-* cohérence dossier / entité (`ContactClient` → `contact_client`),
-* table personnalisable mais obligatoirement `snake_case` et unique,
-* aucune génération si une incohérence existe.
+- Unicité des noms d'entité et de table
+- Cohérence dossier / nom d'entité (`ContactClient` → dossier `contact_client`)
+- Toutes les tables sont en `snake_case`
 
 ---
 
-## Non-objectifs de cette architecture
-
-Cette architecture n'a pas pour but de :
-
-* construire un ORM complet,
-* masquer le SQL réel,
-* générer de la logique métier,
-* déduire automatiquement des comportements complexes,
-* multiplier les sources de vérité.
-
-## Limites de la V1
-
-La première version de cette architecture reste volontairement limitée.
+## 9. Limites de la V1
 
 ### Retenu en V1
 
-* une seule clé primaire par entité,
-* source canonique JSON,
-* relations globales,
-* `many_to_one` seulement,
-* décorateurs simples,
-* SQL MariaDB/MySQL centré sur InnoDB,
-* pas de repository généré.
+- Une clé primaire simple par entité
+- Source canonique JSON locale par entité
+- Relations globales `many_to_one` uniquement
+- Décorateurs de validation simples
+- SQL MariaDB / InnoDB
+- Pivot explicite pour many-to-many
 
 ### Hors V1
 
-* clés composites,
-* `many_to_many` direct ou implicite,
-* `one_to_one`,
-* logique métier dans le JSON,
-* hooks de cycle de vie,
-* navigation objet automatique,
-* ORM complet,
-* génération de repository,
-* contraintes conditionnelles,
-* valeurs par défaut SQL complexes.
-
----
-
-## Commandes CLI
-
-### Commandes actuellement disponibles
-
-Interface officielle :
-
-Après l'installation editable décrite dans la politique de génération, l'interface officielle est :
-
-```bash
-forge make:entity Contact
-forge make:relation
-forge sync:entity Contact
-forge sync:relations
-forge build:model
-forge db:init
-forge db:apply
-forge check:model
-```
-
-La forme officielle est toujours :
-
-```bash
-forge <commande>
-```
-
-et jamais :
-
-```bash
-python3 forge.py <commande>
-```
-
----
-
-## Conclusion
-
-Cette architecture donne à Forge :
-
-* une source canonique claire,
-* une génération déterministe,
-* une séparation nette entre généré et manuel,
-* une validation forte,
-* une base solide pour Forge Design plus tard,
-* un modèle lisible, durable et sans magie excessive.
+- Clés primaires composites
+- `many_to_many` direct ou implicite
+- `one_to_one` dédié
+- Hooks de cycle de vie
+- Navigation objet automatique (ORM)
+- Génération de repository
+- Contraintes conditionnelles entre champs
+- Expressions SQL complexes dans `default`
+- Contraintes d'unicité composées dans le JSON (à porter dans un script SQL séparé)
