@@ -1,5 +1,7 @@
 # Starter 1 — Contacts
 
+[Accueil](../../index.html){ .md-button }
+
 **Application démo :** carnet de contacts minimaliste sur une seule entité.
 
 Slug technique : `contact-simple`.

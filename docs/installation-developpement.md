@@ -1,5 +1,7 @@
 # Mode développement
 
+[Accueil](index.html){ .md-button }
+
 Le mode développement sert à travailler sur le framework Forge lui-même.
 
 ## Cloner la branche de développement

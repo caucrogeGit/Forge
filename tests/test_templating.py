@@ -290,3 +290,13 @@ class TestVuesReelles:
         )
         assert "<script>" not in result
         assert "&lt;script&gt;" in result
+
+    def test_layout_base_est_un_template_jinja(self):
+        result = template_manager.render(
+            "layouts/base.html",
+            {"app_name": "Forge Test", "csrf_token": "tok"}
+        )
+        assert "Forge Test" in result
+        assert "tok" in result
+        assert "{app_name}" not in result
+        assert "{contenu}" not in result

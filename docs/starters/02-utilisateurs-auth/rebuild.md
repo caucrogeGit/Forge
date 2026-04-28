@@ -1,5 +1,7 @@
 # Reconstruction — Utilisateurs / authentification
 
+[Accueil](../../index.html){ .md-button }
+
 Ce fichier reconstruit un flux applicatif simple : accueil public, login, dashboard, profil et logout.
 
 ## 1. Commandes Forge

@@ -243,6 +243,18 @@ def _reinitialize_git(dest: str, project_name: str) -> None:
         )
 
 
+def _warn_initial_git_failed(exc: Exception) -> None:
+    print()
+    print("  Attention : le commit Git initial n’a pas pu être créé.")
+    print(f"  Détail : {exc}")
+    print("  Le projet est conservé. Configurez Git avec :")
+    print('    git config --global user.name "Votre nom"')
+    print('    git config --global user.email "votre.email@example.com"')
+    print("  Puis lancez :")
+    print("    git add .")
+    print('    git commit -m "Initial commit"')
+
+
 # ── Commande : new ────────────────────────────────────────────────────────────
 
 def cmd_new(project_name: str, ref: str | None = None) -> None:
@@ -270,13 +282,22 @@ def cmd_new(project_name: str, ref: str | None = None) -> None:
         _setup_python_environment(dest)
         node_warnings = _setup_node_environment(dest)
         _generate_certificates(dest)
-        _reinitialize_git(dest, project_name)
 
     except Exception as exc:
         shutil.rmtree(dest, ignore_errors=True)
         sys.exit(f"\nErreur lors de l'initialisation : {exc}")
 
-    print(f"\n  Projet '{project_name}' créé et initialisé dans ./{project_name}/\n")
+    git_initialized = True
+    try:
+        _reinitialize_git(dest, project_name)
+    except Exception as exc:
+        git_initialized = False
+        _warn_initial_git_failed(exc)
+
+    if git_initialized:
+        print(f"\n  Projet '{project_name}' créé et initialisé dans ./{project_name}/\n")
+    else:
+        print(f"\n  Projet '{project_name}' créé avec succès dans ./{project_name}/\n")
 
     if node_warnings:
         print("  Avertissements :")

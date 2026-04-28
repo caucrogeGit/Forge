@@ -1,5 +1,7 @@
 # Installation avec pipx
 
+[Accueil](index.html){ .md-button }
+
 `pipx` est la méthode la plus simple pour utiliser Forge comme commande globale.
 
 ## Prérequis

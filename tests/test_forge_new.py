@@ -127,6 +127,30 @@ def test_message_contient_python_app(monkeypatch, tmp_path, capsys):
     assert "python app.py" in capsys.readouterr().out
 
 
+def test_echec_commit_git_final_conserve_le_projet(monkeypatch, tmp_path, capsys):
+    def create_dest(dest, ref=None):
+        os.makedirs(dest, exist_ok=True)
+
+    def fail_git(dest, project_name):
+        raise RuntimeError("git user.email manquant")
+
+    monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
+    monkeypatch.setattr(forge, "_clone_skeleton", create_dest)
+    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
+    monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
+    monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
+    monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)
+    monkeypatch.setattr(forge, "_reinitialize_git", fail_git)
+    monkeypatch.chdir(tmp_path)
+
+    forge.cmd_new("MonProjet")
+
+    assert (tmp_path / "MonProjet").is_dir()
+    output = capsys.readouterr().out
+    assert "commit Git initial" in output
+    assert "git config --global user.email" in output
+
+
 # ── OpenSSL silencieux (V1.4.2) ───────────────────────────────────────────────
 
 def test_openssl_appele_avec_capture_true(monkeypatch, tmp_path):

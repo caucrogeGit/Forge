@@ -64,6 +64,7 @@ nav:
           - Étapes: starters/04-suivi-comportement-eleves/rebuild.md
   - Référence:
       - API et CLI: reference.md
+      - Schéma API: reference-schema.md
   - Déploiement:
       - Guide de déploiement: deployment.md
   - Projet:

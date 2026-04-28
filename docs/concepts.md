@@ -1,5 +1,7 @@
 # Concepts Forge
 
+[Accueil](index.html){ .md-button }
+
 Glossaire des termes utilisés dans le guide, l'architecture des entités et les starter apps.
 
 ---

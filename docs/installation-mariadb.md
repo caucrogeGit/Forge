@@ -1,5 +1,7 @@
 # Préparer MariaDB
 
+[Accueil](index.html){ .md-button }
+
 Forge utilise MariaDB pour les applications générées et les starters.
 
 ## Installer MariaDB

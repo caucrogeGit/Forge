@@ -1,5 +1,7 @@
 # Starter 2 — Utilisateurs / authentification
 
+[Accueil](../../index.html){ .md-button }
+
 **Application démo :** accueil public, connexion sécurisée, dashboard protégé, déconnexion.
 
 ## Objectif

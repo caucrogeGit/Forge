@@ -1,5 +1,7 @@
 # Reconstruction — Carnet de contacts
 
+[Accueil](../../index.html){ .md-button }
+
 Ce fichier reconstruit vite le starter 3 générable : `Ville`, `Contact` et la relation `Contact.ville_id -> Ville.id`.
 
 ## 1. Génération automatique

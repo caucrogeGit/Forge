@@ -1,5 +1,7 @@
 # Starter 3 — Carnet de contacts
 
+[Accueil](../../index.html){ .md-button }
+
 **Application démo :** carnet de contacts avec villes.
 
 ## Objectif

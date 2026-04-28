@@ -1,5 +1,7 @@
 # Installation
 
+[Accueil](index.html){ .md-button }
+
 Forge peut s'installer de plusieurs façons selon votre contexte. Choisissez le
 chemin le plus simple pour votre usage, puis passez au [guide de démarrage](guide.md).
 

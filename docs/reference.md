@@ -1,10 +1,14 @@
 # Forge - Référence API et CLI
 
-Cette page décrit l'API publique actuelle de Forge `1.0.1`. Elle est organisée comme un index : la liste donne la vue d'ensemble, puis chaque élément peut être ouvert pour afficher les détails, les signatures et des exemples.
+[Accueil](index.html){ .md-button }
+
+Cette page décrit l'API publique actuelle de Forge `1.0.1`. Elle est organisée comme un index interactif : cliquez sur un élément pour afficher les détails, les signatures et les exemples.
 
 Pour les flux guidés, voir aussi le [guide de démarrage](guide.md), le [CRUD explicite](crud.md) et l'[architecture des entités](entity_architecture.md).
 
 ## Schéma complet
+
+[Ouvrir le schéma en grand](reference-schema.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
 
 ```mermaid
 flowchart TD
@@ -46,28 +50,7 @@ flowchart TD
 
 ## Index API
 
-| Élément | Rôle |
-|---|---|
-| [`core.forge`](#coreforge) | Registre de configuration partagé par le noyau |
-| [`core.http.request`](#corehttprequest) | Requête entrante, paramètres, body, JSON et fichiers |
-| [`core.http.response`](#corehttpresponse) | Réponse HTTP retournée par les handlers |
-| [`core.http.helpers`](#corehttphelpers) | Helper `html()` pour rendre un template |
-| [`core.http.router`](#corehttprouter) | Routes, groupes, paramètres dynamiques, URL nommées |
-| [`core.application`](#coreapplication) | Dispatch HTTP, middleware, CSRF, erreurs 404/500 |
-| [`core.templating` et Jinja2](#coretemplating-et-jinja2) | Renderer de templates et helper `url_for()` |
-| [`core.security`](#coresecurity) | Sessions mémoire, auth, rôles, CSRF, mots de passe |
-| [`core.forms`](#coreforms) | Formulaires, champs typés et validation applicative |
-| [`core.mvc.controller`](#coremvccontroller) | Base controller, redirects, JSON, flash, helpers de formulaire |
-| [`core.mvc.model`](#coremvcmodel) | Validateur MVC simple et exception de doublon |
-| [`core.mvc.view`](#coremvcview) | Pagination |
-| [`mvc.helpers`](#mvchelpers) | Rendu HTML des flashs et erreurs de formulaire |
-| [`core.database`](#coredatabase) | Connexions MariaDB, transactions, SQL loader |
-| [`core.uploads`](#coreuploads) | Validation et stockage des fichiers uploadés |
-| [`core.validation`](#corevalidation) | Décorateurs V1 pour les propriétés d'entité |
-| [`forge` CLI](#forge-cli) | Commandes officielles du framework |
-| [`forge_cli.entities`](#forgeclieentities) | Génération et validation des entités |
-
-## Détails API
+Chaque entrée ci-dessous est repliée par défaut. Ouvrez uniquement la partie utile pour lire le détail de l'API sans quitter l'index.
 
 <details markdown="1" id="coreforge">
 <summary><code>core.forge</code> - Configuration centrale</summary>
@@ -487,7 +470,7 @@ if form.is_valid():
 
 | API | Description |
 |---|---|
-| `render(template, status=200, context=None, base="layouts/base.html", request=None, raw=False)` | Rend une vue. Injecte un token CSRF si `request` est fourni et si `raw=False`. |
+| `render(template, status=200, context=None, base="layouts/base.html", request=None, raw=False)` | Rend une vue Jinja2. Injecte un token CSRF si `request` est fourni et si `raw=False`. Le paramètre `base` est conservé pour compatibilité historique mais n'enveloppe plus le template. |
 | `redirect(location, status=302)` | Redirection simple. |
 | `redirect_with_flash(request, location, type_, message, status=302)` | Flash puis redirection. |
 | `redirect_to_route(name, status=302, **params)` | Redirection vers une route nommée. |

@@ -1,5 +1,7 @@
 # Déploiement Forge
 
+[Accueil](index.html){ .md-button }
+
 ## 1. Architecture recommandée
 
 ```mermaid

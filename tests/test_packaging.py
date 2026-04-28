@@ -90,6 +90,21 @@ def test_find_packages_couvre_forge_cli_et_integrations():
         assert pkg in found, f"{pkg} absent du packaging."
 
 
+def test_package_data_inclut_tous_les_fichiers_starters():
+    data = _load_pyproject()
+    package_data = data["tool"]["setuptools"]["package-data"]
+
+    assert package_data["forge_cli"] == ["starters/data/**/*"]
+
+
+def test_package_data_couvre_les_python_des_starters():
+    data = _load_pyproject()
+    patterns = data["tool"]["setuptools"]["package-data"]["forge_cli"]
+    starter_file = "starters/data/carnet-contacts/files/mvc/controllers/contact_controller.py"
+
+    assert any(fnmatch.fnmatch(starter_file, pattern) for pattern in patterns)
+
+
 # ── Importabilité directe ─────────────────────────────────────────────────────
 
 def test_core_uploads_importable():

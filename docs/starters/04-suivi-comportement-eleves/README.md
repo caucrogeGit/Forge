@@ -1,5 +1,7 @@
 # Starter 4 — Suivi pédagogique
 
+[Accueil](../../index.html){ .md-button }
+
 **Vitrine Forge complète :** authentification, routes protégées, plusieurs entités, relations SQL, dashboard et seed de démonstration.
 
 ## Ce que ce starter démontre

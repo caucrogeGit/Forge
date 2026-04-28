@@ -1,5 +1,7 @@
 # Guide de démarrage Forge
 
+[Accueil](index.html){ .md-button }
+
 Forge est un framework web MVC Python avec HTTPS natif, SQL explicite, templates Jinja2 et génération déterministe du modèle. Ce guide part d'un environnement Forge déjà installé et aboutit à un premier projet fonctionnel avec CRUD généré.
 
 Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir [Référence API et CLI](reference.md).

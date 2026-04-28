@@ -1,5 +1,7 @@
 # Architecture des entités Forge
 
+[Accueil](index.html){ .md-button }
+
 Forge sépare la description d'une entité en trois niveaux distincts : la source canonique JSON, les projections techniques générées, et le code métier manuel. Cette séparation permet de régénérer les fichiers techniques sans jamais écraser le travail manuel.
 
 ---

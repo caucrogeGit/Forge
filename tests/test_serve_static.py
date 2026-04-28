@@ -4,6 +4,9 @@ Tests de _is_safe_static_path (app.py) — protection contre le path traversal.
 import os
 import pytest
 
+import app
+from core.http.response import Response
+
 from app import _is_safe_static_path
 
 
@@ -44,3 +47,38 @@ class TestIsStaticPathSafe:
     @pytest.mark.skipif(os.name != "nt", reason="ValueError uniquement sur chemins Windows multi-drive")
     def test_value_error_retourne_false(self):
         assert _is_safe_static_path("C:\\static", "D:\\other\\file.css") is False
+
+
+class _StaticHandler:
+    def __init__(self):
+        self.responses = []
+
+    def _send_response(self, response):
+        self.responses.append(response)
+
+
+def test_static_directory_retourne_404_pas_500(monkeypatch, tmp_path):
+    static_dir = tmp_path / "static"
+    static_dir.mkdir()
+    monkeypatch.setattr(app, "STATIC_DIR", str(static_dir))
+    monkeypatch.setattr(app, "_html", lambda template, status: Response(status, template))
+
+    handler = _StaticHandler()
+    app.RequestHandler._serve_static(handler, "/static/")
+
+    assert handler.responses[-1].status == 404
+
+
+def test_static_file_reel_reste_servi(monkeypatch, tmp_path):
+    static_dir = tmp_path / "static"
+    static_dir.mkdir()
+    (static_dir / "style.css").write_text("body { color: black; }", encoding="utf-8")
+    monkeypatch.setattr(app, "STATIC_DIR", str(static_dir))
+
+    handler = _StaticHandler()
+    app.RequestHandler._serve_static(handler, "/static/style.css")
+
+    response = handler.responses[-1]
+    assert response.status == 200
+    assert response.content_type == "text/css"
+    assert b"color: black" in response.body

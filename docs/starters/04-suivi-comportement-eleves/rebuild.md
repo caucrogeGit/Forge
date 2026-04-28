@@ -1,5 +1,7 @@
 # Reconstruction — Starter 4 Suivi pédagogique
 
+[Accueil](../../index.html){ .md-button }
+
 Ce fichier détaille la reconstruction manuelle du starter 4 depuis un projet Forge vierge.
 
 > **Note :** `forge starter:build 4` sera disponible dans une prochaine version et automatisera ces étapes.

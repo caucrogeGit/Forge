@@ -1,5 +1,7 @@
 # Installation sur une VM Debian vierge
 
+[Accueil](index.html){ .md-button }
+
 Cette page prépare une machine Debian minimale pour utiliser Forge. Une fois cette étape terminée, continuez avec le [guide de démarrage](guide.md).
 
 ## 1. Mettre à jour Debian

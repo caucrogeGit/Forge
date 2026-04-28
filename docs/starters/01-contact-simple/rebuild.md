@@ -1,5 +1,7 @@
 # Reconstruction — Contacts
 
+[Accueil](../../index.html){ .md-button }
+
 Recette courte pour reconstruire le starter 1 depuis un projet Forge propre.
 
 ---
