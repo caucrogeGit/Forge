@@ -64,7 +64,7 @@
 
 ## Partie 1 — Installer Forge sur une VM Debian vierge
 
-> Si Forge est déjà installé et configuré sur votre machine, passez directement à la [Partie 2 — Construire l'application starter](#partie-2--construire-lapplication-starter).
+> Si Forge est déjà installé et configuré sur votre machine, passez directement à la [Partie 2 — Construire l'application starter](#partie-2-construire-lapplication-starter).
 
 ### 1. Mettre à jour Debian
 

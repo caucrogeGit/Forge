@@ -206,6 +206,8 @@ UPLOAD_MAX_SIZE=5242880
 !!! warning "Sécurité"
     Ne jamais versionner `env/prod`. Vérifier que `.gitignore` contient `env/prod`.
 
+<a id="deployer-une-starter-app-comme-demonstration"></a>
+
 ## 8. Déployer une starter-app comme démonstration
 
 Une starter-app Forge est une application normale — elle se déploie exactement comme tout projet Forge.

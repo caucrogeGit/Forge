@@ -95,7 +95,21 @@ forge starter:build 3 --force --dry-run
 forge starter:build 4 --force --dry-run
 ```
 
-C'est suffisant pour confirmer que les fichiers JSON/Python/HTML sont bien présents dans le package.
+!!! note "Ce que --dry-run valide"
+    `--dry-run` est une validation de **packaging et de chemin d'exécution CLI**. Il confirme que :
+
+    - la commande est disponible ;
+    - les ressources du starter sont trouvées dans le package installé ;
+    - la logique de génération est atteignable.
+
+    Il ne valide **pas** :
+
+    - la connexion MariaDB ;
+    - l'exécution réelle de `db:apply` ;
+    - la création effective des tables ;
+    - le fonctionnement final de l'application.
+
+    Pour une validation complète, utiliser `forge db:init` puis `forge starter:build N --force` dans un projet neuf par starter.
 
 ---
 
@@ -127,6 +141,45 @@ forge doctor
 forge db:init
 forge starter:build 1 --force
 ```
+
+### Starter 2 — Utilisateurs / authentification
+
+```bash
+cd ~/Projets
+forge new TestStarter2
+cd TestStarter2
+source .venv/bin/activate
+# éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
+forge doctor
+forge db:init
+forge starter:build 2 --force
+```
+
+Créer l'utilisateur de test :
+
+```bash
+python scripts/create_auth_user.py
+```
+
+Le script crée un utilisateur fixe et affiche ses identifiants :
+
+```
+Utilisateur de test prêt :
+  login    admin
+  password secret123
+```
+
+Lancer l'application :
+
+```bash
+python app.py
+```
+
+Dans le navigateur, à l'URL affichée par Forge :
+
+- aller sur `/login` ;
+- se connecter avec `admin` / `secret123` ;
+- vérifier l'accès à `/dashboard` (route protégée).
 
 ### Starter 3 — Carnet de contacts
 
@@ -178,5 +231,4 @@ Ces tests vérifient sans MariaDB :
 ## 7. Limites connues
 
 - Les tests `test_packaging.py` ne valident pas le contenu des fichiers, uniquement leur présence.
-- Le starter 2 (utilisateurs/auth) n'est pas couvert par la procédure MariaDB ci-dessus car il nécessite une configuration supplémentaire (création d'utilisateur auth).
-- `--dry-run` ne vérifie pas que le SQL généré est valide.
+- `--dry-run` ne valide pas la connexion MariaDB ni l'exécution de `db:apply`.
