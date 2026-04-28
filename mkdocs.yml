@@ -27,7 +27,13 @@ theme:
 
 nav:
   - Accueil: index.html
-  - Démarrer avec Forge:
+  - Installation:
+      - Vue d'ensemble: installation.md
+      - Avec pipx: installation-pipx.md
+      - Depuis GitHub: installation-github.md
+      - Mode développement: installation-developpement.md
+      - Préparer MariaDB: installation-mariadb.md
+  - Premiers pas:
       - Guide de démarrage: guide.md
       - CRUD explicite: crud.md
   - Comprendre Forge:

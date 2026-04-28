@@ -16,13 +16,13 @@
 <!-- Navigation -->
 <nav class="fixed top-0 inset-x-0 z-50 bg-[#111110] border-b border-white/10 h-16 flex items-center px-8">
   <div class="flex items-center gap-7">
-    <a href="#démarrer"
-       class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Démarrer</a>
+    <a href="#installation"
+       class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Installation</a>
     <a href="#crud" class="text-sm font-medium text-white/60 hover:text-white transition-colors">Fonctionnalités</a>
     <a href="#starters" class="text-sm font-medium text-white/60 hover:text-white transition-colors">Starters</a>
     <a href="https://caucrogegit.github.io/Forge/guide/"
        target="_blank" rel="noopener noreferrer"
-       class="text-sm font-medium text-white/60 hover:text-white transition-colors">Guide</a>
+       class="text-sm font-medium text-white/60 hover:text-white transition-colors">Premiers pas</a>
     <a href="https://caucrogegit.github.io/Forge/reference/"
        target="_blank" rel="noopener noreferrer"
        class="text-sm font-medium text-white/60 hover:text-white transition-colors">Référence</a>
@@ -281,15 +281,15 @@ with router.group("/contacts") as g:
 </section>
 
 <!-- Installation -->
-<section id="démarrer" class="py-24 px-6 bg-white">
+<section id="installation" class="py-24 px-6 bg-white">
   <div class="max-w-2xl mx-auto">
     <div class="text-center mb-14">
       <h2 class="text-4xl font-bold tracking-tight mb-3">
-        Démarrer par le chemin officiel.
+        Installer Forge selon votre contexte.
       </h2>
       <p class="text-slate-500 text-lg">
-        Créez un projet, vérifiez l’environnement, générez le modèle,
-        appliquez le SQL puis produisez le CRUD MVC.
+        Choisissez une installation stable pour créer une application,
+        ou un mode développement pour contribuer au framework.
       </p>
     </div>
 
@@ -297,116 +297,53 @@ with router.group("/contacts") as g:
       <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
         <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">1</div>
         <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Créer le projet</div>
+          <div class="text-xs text-white/30 mb-1">Installation globale recommandée</div>
+          <code class="syntax-command text-sm break-all">$ pipx install forge-mvc</code>
+        </div>
+        <button data-copy="pipx install forge-mvc" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+      </div>
+
+      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
+        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">2</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs text-white/30 mb-1">Créer un projet depuis la version stable</div>
           <code class="syntax-command text-sm break-all">$ forge new MonProjet</code>
         </div>
         <button data-copy="forge new MonProjet" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
       </div>
 
       <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
-        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">2</div>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Entrer dans le projet</div>
-          <code class="syntax-command text-sm break-all">$ cd MonProjet</code>
-        </div>
-        <button data-copy="cd MonProjet" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
-      </div>
-
-      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
         <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">3</div>
         <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Activer l’environnement</div>
-          <code class="syntax-command text-sm break-all">$ source .venv/bin/activate</code>
+          <div class="text-xs text-white/30 mb-1">Installation manuelle depuis GitHub</div>
+          <code class="syntax-command text-sm break-all">$ git clone --branch v1.0.1 --depth=1 https://github.com/caucrogeGit/Forge.git MonProjet</code>
         </div>
-        <button data-copy="source .venv/bin/activate" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+        <button data-copy="git clone --branch v1.0.1 --depth=1 https://github.com/caucrogeGit/Forge.git MonProjet" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
       </div>
 
       <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
         <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">4</div>
         <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Diagnostiquer le projet</div>
-          <code class="syntax-command text-sm break-all">$ forge doctor</code>
+          <div class="text-xs text-white/30 mb-1">Mode développement du framework</div>
+          <code class="syntax-command text-sm break-all">$ forge new MonProjet --ref main</code>
         </div>
-        <button data-copy="forge doctor" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
+        <button data-copy="forge new MonProjet --ref main" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
       </div>
 
       <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
         <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">5</div>
         <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Initialiser la base</div>
+          <div class="text-xs text-white/30 mb-1">Préparer MariaDB dans le projet</div>
           <code class="syntax-command text-sm break-all">$ forge db:init</code>
         </div>
         <button data-copy="forge db:init" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
       </div>
-
-      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
-        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">6</div>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Créer l’entité canonique</div>
-          <code class="syntax-command text-sm break-all">$ forge make:entity Contact --no-input</code>
-        </div>
-        <button data-copy="forge make:entity Contact --no-input" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
-      </div>
-
-      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
-        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">7</div>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Ajouter les champs métier</div>
-          <div class="text-xs text-white/40 mb-2">Après make:entity --no-input, le JSON contient seulement la clé primaire. Ajoutez les champs métier avant de générer le modèle.</div>
-          <code class="syntax-command text-sm break-all">$ nano mvc/entities/contact/contact.json</code>
-        </div>
-        <button data-copy="nano mvc/entities/contact/contact.json" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
-      </div>
-
-      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
-        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">8</div>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Prévisualiser la génération</div>
-          <code class="syntax-command text-sm break-all">$ forge build:model --dry-run</code>
-        </div>
-        <button data-copy="forge build:model --dry-run" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
-      </div>
-
-      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
-        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">9</div>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Écrire les projections régénérables</div>
-          <code class="syntax-command text-sm break-all">$ forge build:model</code>
-        </div>
-        <button data-copy="forge build:model" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
-      </div>
-
-      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
-        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">10</div>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Appliquer le SQL</div>
-          <code class="syntax-command text-sm break-all">$ forge db:apply</code>
-        </div>
-        <button data-copy="forge db:apply" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
-      </div>
-
-      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
-        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">11</div>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Générer le CRUD MVC</div>
-          <code class="syntax-command text-sm break-all">$ forge make:crud Contact</code>
-        </div>
-        <button data-copy="forge make:crud Contact" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
-      </div>
-
-      <div class="landing-panel flex items-start gap-4 rounded-xl p-5 border border-white/10">
-        <div class="landing-accent-bg w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">12</div>
-        <div class="flex-1 min-w-0">
-          <div class="text-xs text-white/30 mb-1">Lancer l’application</div>
-          <code class="syntax-command text-sm break-all">$ python app.py</code>
-        </div>
-        <button data-copy="python app.py" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-white/40 hover:text-white transition-colors flex-shrink-0">Copier</button>
-      </div>
     </div>
 
     <div class="landing-highlight-note mt-10 rounded-xl p-5 border text-sm leading-relaxed">
-      <strong>Note :</strong> <code>forge new</code> prépare le projet, l’environnement local
-      et la configuration de développement. MariaDB doit être disponible avant <code>forge db:apply</code>.
+      <strong>Après installation :</strong> suivez le guide de démarrage pour créer votre première entité,
+      générer les projections, appliquer le SQL puis produire le CRUD MVC explicite.
+      <a href="https://caucrogegit.github.io/Forge/guide/" class="landing-accent-text font-semibold">Ouvrir le guide</a>.
     </div>
   </div>
 </section>

@@ -21,11 +21,17 @@ def test_mkdocs_nav_entries_are_well_formed_and_point_to_existing_docs():
     nav_labels = {label for label, _ in nav_targets}
 
     for required in (
-        "Démarrer avec Forge",
+        "Installation",
+        "Premiers pas",
         "Comprendre Forge",
         "Starter apps",
         "Référence",
         "Projet",
+        "Vue d'ensemble",
+        "Avec pipx",
+        "Depuis GitHub",
+        "Mode développement",
+        "Préparer MariaDB",
         "Guide de démarrage",
         "CRUD explicite",
         "Concepts",
