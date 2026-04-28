@@ -1,6 +1,6 @@
 # Préparer MariaDB
 
-[Accueil](index.html){ .md-button }
+[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
 
 Forge utilise MariaDB pour les applications générées et les starters.
 

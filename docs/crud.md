@@ -1,6 +1,6 @@
 # CRUD explicite — Forge
 
-[Accueil](index.html){ .md-button }
+[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
 
 Forge génère un squelette CRUD lisible et modifiable à partir d'une entité JSON. La génération produit un point de départ, pas une cage : chaque fichier est ouvert, explicite, et ne sera jamais écrasé si vous le modifiez.
 

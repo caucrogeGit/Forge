@@ -1,6 +1,6 @@
 # Roadmap Forge
 
-[Accueil](index.html){ .md-button }
+[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
 
 Cette roadmap est volontairement prudente. Elle décrit une trajectoire possible, sans transformer les idées futures en promesses immédiates.
 

@@ -1,6 +1,6 @@
 # Installation sur une VM Debian vierge
 
-[Accueil](index.html){ .md-button }
+[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
 
 Cette page prépare une machine Debian minimale pour utiliser Forge. Une fois cette étape terminée, continuez avec le [guide de démarrage](guide.md).
 

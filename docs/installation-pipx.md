@@ -1,6 +1,6 @@
 # Installation avec pipx
 
-[Accueil](index.html){ .md-button }
+[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
 
 `pipx` est la méthode la plus simple pour utiliser Forge comme commande globale.
 

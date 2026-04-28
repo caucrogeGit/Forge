@@ -1,6 +1,6 @@
 # Déploiement Forge
 
-[Accueil](index.html){ .md-button }
+[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
 
 ## 1. Architecture recommandée
 

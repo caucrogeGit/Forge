@@ -1,6 +1,6 @@
 # Mode développement
 
-[Accueil](index.html){ .md-button }
+[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
 
 Le mode développement sert à travailler sur le framework Forge lui-même.
 

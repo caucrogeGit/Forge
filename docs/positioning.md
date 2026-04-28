@@ -1,6 +1,6 @@
 # Positionnement de Forge
 
-[Accueil](index.html){ .md-button }
+[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
 
 Forge est un framework web MVC Python orienté lisibilité, SQL explicite et génération déterministe du modèle. La V1.0 est stable.
 
