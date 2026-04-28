@@ -69,6 +69,7 @@ nav:
       - Guide de déploiement: deployment.md
   - Projet:
       - Roadmap: roadmap.md
+      - Validation locale: release-local.md
 
 markdown_extensions:
   - admonition
