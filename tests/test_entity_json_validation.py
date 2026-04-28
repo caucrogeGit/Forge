@@ -57,6 +57,21 @@ def test_collects_multiple_errors():
     assert "fields[1].column: doit etre unique" in message
 
 
+def test_reserved_sql_words_are_rejected_for_entity_table_and_column():
+    data = valid_entity()
+    data["entity"] = "User"
+    data["table"] = "order"
+    data["fields"][1]["column"] = "Group"
+
+    with pytest.raises(EntityDefinitionError) as exc_info:
+        validate_entity_definition(data, source="contact.json")
+
+    message = str(exc_info.value)
+    assert "entity: ne doit pas etre un mot reserve SQL/MariaDB" in message
+    assert "table: ne doit pas etre un mot reserve SQL/MariaDB" in message
+    assert "fields[1].column: ne doit pas etre un mot reserve SQL/MariaDB" in message
+
+
 def test_short_author_format_is_normalized_with_defaults():
     data = {
         "entity": "Contact",

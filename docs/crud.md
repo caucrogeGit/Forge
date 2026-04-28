@@ -160,9 +160,12 @@ return BaseController.redirect_with_flash(request, "/contacts", "Contact créé.
 | `VARCHAR(n)`, `CHAR(n)` | `StringField(max_length=n)` |
 | `TEXT`, `LONGTEXT` | `StringField()` + `textarea` dans le template |
 | `INT`, `BIGINT`, `TINYINT` | `IntegerField()` |
-| `DECIMAL`, `FLOAT`, `DOUBLE` | `DecimalField()` |
+| `DECIMAL`, `FLOAT`, `DOUBLE` | `DecimalField()` ; `cleaned_data` contient un `Decimal` |
 | `BOOL`, `BOOLEAN` | `BooleanField()` |
 | `DATE`, `DATETIME` | `StringField()` + avertissement `[WARN]` |
+
+!!! note "Choix numérique V1"
+    Les JSON d'entité gardent `python_type: "float"` pour les types SQL décimaux afin de rester compatibles avec la doctrine V1. Le formulaire généré utilise toutefois `DecimalField`, plus sûr pour la saisie utilisateur. Si votre classe métier attend strictement un `float`, convertissez explicitement dans le contrôleur ou dans votre code applicatif manuel.
 
 ---
 

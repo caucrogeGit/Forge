@@ -395,4 +395,4 @@ def test_forge_doctor_utilise_le_cwd(monkeypatch, tmp_path):
     forge.cmd_doctor()
 
     assert captured["root"] == tmp_path
-    assert captured["version"] == "main"
+    assert captured["version"] == "1.0.1"

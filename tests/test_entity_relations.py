@@ -19,7 +19,7 @@ def _write_entity(root: Path, name: str, data: dict) -> None:
     )
 
 
-def _contact_entity() -> dict:
+def _contact_entity(sql_type: str = "INT") -> dict:
     return {
         "format_version": 1,
         "entity": "Contact",
@@ -30,7 +30,7 @@ def _contact_entity() -> dict:
                 "name": "id",
                 "column": "Id",
                 "python_type": "int",
-                "sql_type": "INT",
+                "sql_type": sql_type,
                 "nullable": False,
                 "primary_key": True,
                 "auto_increment": True,
@@ -40,7 +40,7 @@ def _contact_entity() -> dict:
     }
 
 
-def _commande_entity() -> dict:
+def _commande_entity(contact_sql_type: str = "INT") -> dict:
     return {
         "format_version": 1,
         "entity": "Commande",
@@ -61,7 +61,7 @@ def _commande_entity() -> dict:
                 "name": "contact_id",
                 "column": "ContactId",
                 "python_type": "int",
-                "sql_type": "INT",
+                "sql_type": contact_sql_type,
                 "nullable": False,
                 "primary_key": False,
                 "auto_increment": False,
@@ -174,6 +174,64 @@ def test_set_null_requires_nullable_from_field(tmp_path: Path):
     with pytest.raises(EntityRelationsError, match="SET NULL requiert un from_field nullable"):
         validate_relations_definition(
             invalid,
+            source=str(entities_root / "relations.json"),
+            entities_root=entities_root,
+        )
+
+
+def test_relation_sql_type_int_to_int_is_accepted(tmp_path: Path):
+    entities_root = tmp_path / "entities"
+    _write_entity(entities_root, "Contact", _contact_entity("INT"))
+    _write_entity(entities_root, "Commande", _commande_entity("INT"))
+
+    relations = validate_relations_definition(
+        _relations_json(),
+        source=str(entities_root / "relations.json"),
+        entities_root=entities_root,
+    )
+
+    assert len(relations) == 1
+
+
+def test_relation_sql_type_int_to_bigint_is_rejected(tmp_path: Path):
+    entities_root = tmp_path / "entities"
+    _write_entity(entities_root, "Contact", _contact_entity("BIGINT"))
+    _write_entity(entities_root, "Commande", _commande_entity("INT"))
+
+    with pytest.raises(EntityRelationsError, match="types SQL identiques"):
+        validate_relations_definition(
+            _relations_json(),
+            source=str(entities_root / "relations.json"),
+            entities_root=entities_root,
+        )
+
+
+def test_relation_sql_type_int_to_unsigned_is_rejected(tmp_path: Path):
+    entities_root = tmp_path / "entities"
+    _write_entity(entities_root, "Contact", _contact_entity("INT UNSIGNED"))
+    _write_entity(entities_root, "Commande", _commande_entity("INT"))
+
+    with pytest.raises(EntityRelationsError, match="types SQL identiques"):
+        validate_relations_definition(
+            _relations_json(),
+            source=str(entities_root / "relations.json"),
+            entities_root=entities_root,
+        )
+
+
+def test_relation_varchar_lengths_must_match(tmp_path: Path):
+    entities_root = tmp_path / "entities"
+    contact = _contact_entity("VARCHAR(150)")
+    contact["fields"][0]["python_type"] = "str"
+    contact["fields"][0]["auto_increment"] = False
+    commande = _commande_entity("VARCHAR(100)")
+    commande["fields"][1]["python_type"] = "str"
+    _write_entity(entities_root, "Contact", contact)
+    _write_entity(entities_root, "Commande", commande)
+
+    with pytest.raises(EntityRelationsError, match="types SQL identiques"):
+        validate_relations_definition(
+            _relations_json(),
             source=str(entities_root / "relations.json"),
             entities_root=entities_root,
         )

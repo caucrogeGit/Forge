@@ -637,7 +637,7 @@ Dans le template : `{{ erreurs | safe }}`.
 
 ### `forge new <NomProjet>`
 
-Clone le tag `_FORGE_VERSION` du dépôt Forge, configure `env/dev`, crée le virtualenv Python, génère les certificats HTTPS locaux, réinitialise le dépôt Git.
+Clone par défaut la référence stable `v1.0.1` du dépôt Forge, configure `env/dev`, crée le virtualenv Python, génère les certificats HTTPS locaux, réinitialise le dépôt Git. Pour travailler explicitement depuis la branche de développement, utilisez `forge new <NomProjet> --ref main`.
 
 **Prérequis :** `git`, `openssl`, Python 3.11+. Node.js / npm est optionnel.
 
@@ -671,6 +671,8 @@ Régénère tout le modèle. Tags de sortie :
 ### `forge db:init`
 
 Crée la base `DB_NAME`, l'utilisateur `DB_APP_LOGIN` et applique les privilèges. Utilise `DB_ADMIN_*`.
+
+En Forge 1.0.1, le compte `DB_APP_LOGIN` reste volontairement compatible avec `forge db:apply` dans un contexte pédagogique : il reçoit les droits de lecture/écriture et les droits de migration sur `DB_NAME.*`. En production, utilisez un compte de migration séparé et un compte applicatif runtime limité à `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
 
 ### `forge db:apply`
 

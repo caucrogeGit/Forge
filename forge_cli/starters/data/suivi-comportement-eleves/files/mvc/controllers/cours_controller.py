@@ -3,6 +3,13 @@ from mvc.models.cours_model import get_cours, get_cours_by_id
 from mvc.models.observation_cours_model import get_observations_by_cours
 
 
+def _parse_id(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 class CoursController(BaseController):
 
     @staticmethod
@@ -16,7 +23,9 @@ class CoursController(BaseController):
 
     @staticmethod
     def show(request):
-        cours_id = int(request.route_params["id"])
+        cours_id = _parse_id(request.route_params.get("id"))
+        if cours_id is None:
+            return BaseController.not_found()
         cours = get_cours_by_id(cours_id)
         if cours is None:
             return BaseController.not_found()

@@ -30,6 +30,13 @@ def _form_data_from_contact(contact: dict) -> dict:
     }
 
 
+def _parse_id(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _form_context(request, form, *, action: str, titre: str) -> dict:
     villes = get_villes()
     return {
@@ -83,7 +90,9 @@ class ContactController(BaseController):
 
     @staticmethod
     def show(request):
-        contact_id = int(request.route_params["id"])
+        contact_id = _parse_id(request.route_params.get("id"))
+        if contact_id is None:
+            return BaseController.not_found()
         contact = get_contact_by_id(contact_id)
         if contact is None:
             return BaseController.not_found()
@@ -95,7 +104,9 @@ class ContactController(BaseController):
 
     @staticmethod
     def edit(request):
-        contact_id = int(request.route_params["id"])
+        contact_id = _parse_id(request.route_params.get("id"))
+        if contact_id is None:
+            return BaseController.not_found()
         contact = get_contact_by_id(contact_id)
         if contact is None:
             return BaseController.not_found()
@@ -114,7 +125,9 @@ class ContactController(BaseController):
 
     @staticmethod
     def update(request):
-        contact_id = int(request.route_params["id"])
+        contact_id = _parse_id(request.route_params.get("id"))
+        if contact_id is None:
+            return BaseController.not_found()
         if get_contact_by_id(contact_id) is None:
             return BaseController.not_found()
 
@@ -138,6 +151,8 @@ class ContactController(BaseController):
 
     @staticmethod
     def destroy(request):
-        contact_id = int(request.route_params["id"])
+        contact_id = _parse_id(request.route_params.get("id"))
+        if contact_id is None:
+            return BaseController.not_found()
         delete_contact(contact_id)
         return BaseController.redirect("/contacts")
