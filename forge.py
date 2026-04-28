@@ -52,7 +52,6 @@ from forge_cli.sync_landing import main as sync_landing_main
 from forge_cli.uploads import main as upload_main
 from forge_cli.deploy import main as deploy_main
 from forge_cli.starters import main as starters_main  # noqa: E402 (package replaces starters.py)
-from forge_cli.docs.quarkdown import main as docs_main
 
 
 _FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"
@@ -448,7 +447,8 @@ def main() -> None:
         return
 
     if command == "docs:pdf":
-        docs_main(args)
+        from forge_cli.docs.quarkdown import build_pdf
+        build_pdf()
         return
 
     if command in {"sync:relations", "build:model", "check:model"}:

@@ -1,6 +1,7 @@
 """forge docs:pdf — génération PDF de la documentation via Quarkdown (optionnel).
 
-Quarkdown est une dépendance externe facultative. Le cœur Forge ne l'importe pas.
+Quarkdown est une dépendance externe. Ce module ne l'importe jamais :
+il l'appelle via subprocess si le binaire est présent sur le PATH.
 """
 
 from __future__ import annotations
@@ -10,11 +11,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-import forge_cli.output as out
 
+_QD_SOURCE = Path("docs") / "quarkdown" / "forge-documentation.qd"
+_PDF_TARGET = Path("build") / "docs" / "forge-documentation.pdf"
 
-_INSTALL_HINT = """
-  Quarkdown n'est pas installé ou n'est pas dans le PATH.
+_QUARKDOWN_ABSENT = """
+[ERREUR] Quarkdown n'est pas installé ou n'est pas dans le PATH.
 
   Installation (Linux / macOS) :
     curl -fsSL https://raw.githubusercontent.com/quarkdown-labs/get-quarkdown/refs/heads/main/install.sh \\
@@ -24,13 +26,12 @@ _INSTALL_HINT = """
     brew install quarkdown
 
   Quarkdown requiert Java 17+.
-
-  La génération PDF est une fonctionnalité optionnelle.
-  Le cœur de Forge n'en dépend pas.
+  La génération PDF est optionnelle — le cœur de Forge n'en dépend pas.
 """
 
-_QD_SOURCE = Path("docs") / "quarkdown" / "forge-documentation.qd"
-_PDF_TARGET = Path("build") / "docs" / "forge-documentation.pdf"
+
+def _log(message: str) -> None:
+    print(f"[Forge] {message}")
 
 
 def _find_quarkdown() -> str | None:
@@ -39,89 +40,68 @@ def _find_quarkdown() -> str | None:
 
 def _find_repo_root() -> Path | None:
     """Remonte l'arborescence pour trouver la racine du dépôt Forge."""
-    for candidate in [Path.cwd()] + list(Path.cwd().parents):
-        if (candidate / "forge.py").exists() and (candidate / "docs").is_dir():
+    for candidate in [Path.cwd(), *Path.cwd().parents]:
+        if (candidate / "forge.py").exists() or (candidate / "pyproject.toml").exists():
             return candidate
     return None
 
 
-def _locate_generated_pdf(qd_file: Path) -> Path | None:
-    """Cherche le PDF généré par Quarkdown à côté du fichier source."""
+def _find_generated_pdf(qd_file: Path) -> Path | None:
+    """Cherche le PDF créé par Quarkdown à côté du fichier source."""
     stem = qd_file.stem
-    candidates = [
+    for candidate in (
         qd_file.parent / f"{stem}.pdf",
         qd_file.parent / stem / f"{stem}.pdf",
         qd_file.parent / "out" / f"{stem}.pdf",
-    ]
-    for path in candidates:
-        if path.exists():
-            return path
+    ):
+        if candidate.exists():
+            return candidate
     return None
 
 
-def cmd_docs_pdf(args: list[str]) -> None:
-    print("\nforge docs:pdf\n")
+def build_pdf() -> None:
+    """Génère le PDF de la documentation Forge via Quarkdown."""
 
     qk = _find_quarkdown()
     if not qk:
-        print(out.error("Quarkdown introuvable sur le PATH."))
-        print(_INSTALL_HINT)
-        raise SystemExit(1)
-
-    print(out.ok(f"Quarkdown : {qk}"))
+        sys.exit(_QUARKDOWN_ABSENT)
 
     root = _find_repo_root()
     if root is None:
-        print(out.error("Racine du dépôt Forge introuvable depuis le répertoire courant."))
-        print(out.info("Lancer forge docs:pdf depuis la racine du dépôt Forge."))
-        raise SystemExit(1)
+        sys.exit("[ERREUR] Racine du projet Forge introuvable. Lancer depuis le dépôt Forge.")
 
     qd_file = root / _QD_SOURCE
     if not qd_file.exists():
-        print(out.error(f"Fichier source introuvable : {_QD_SOURCE}"))
-        print(out.info("Créer docs/quarkdown/forge-documentation.qd avant de générer le PDF."))
-        print(out.info("Voir : docs/pdf.md pour la structure attendue."))
-        raise SystemExit(1)
+        sys.exit(
+            f"[ERREUR] Fichier source introuvable : {_QD_SOURCE}\n"
+            "  Créer docs/quarkdown/forge-documentation.qd avant de générer le PDF.\n"
+            "  Voir : docs/pdf.md"
+        )
 
     target = root / _PDF_TARGET
     target.parent.mkdir(parents=True, exist_ok=True)
 
-    print(out.info(f"Source : {_QD_SOURCE}"))
-    print(out.info(f"Cible  : {_PDF_TARGET}"))
-    print()
+    cmd = [qk, "c", str(qd_file), "--pdf"]
+    _log("Génération PDF en cours...")
+    _log(f"→ {' '.join(cmd)}")
 
-    result = subprocess.run(
-        [qk, "c", str(qd_file), "--pdf"],
-        cwd=root,
-    )
+    result = subprocess.run(cmd, cwd=root)
 
     if result.returncode != 0:
-        print()
-        print(out.error("Quarkdown a signalé une erreur (voir la sortie ci-dessus)."))
-        raise SystemExit(result.returncode)
+        sys.exit(f"[ERREUR] Quarkdown a échoué (code {result.returncode}).")
 
-    generated = _locate_generated_pdf(qd_file)
+    generated = _find_generated_pdf(qd_file)
     if generated and generated.resolve() != target.resolve():
-        shutil.move(str(generated), str(target))
+        try:
+            shutil.move(str(generated), str(target))
+        except OSError as exc:
+            sys.exit(f"[ERREUR] Impossible de déplacer le PDF : {exc}")
 
-    if target.exists():
-        print()
-        print(out.ok(f"PDF prêt : {_PDF_TARGET}"))
-    else:
-        print()
-        print(out.warn("PDF non trouvé à l'emplacement attendu."))
-        print(out.info("Quarkdown a peut-être placé le fichier ailleurs — consulter la sortie ci-dessus."))
+    if not target.exists():
+        sys.exit(
+            "[ERREUR] PDF non trouvé après génération.\n"
+            "  Quarkdown a peut-être placé le fichier à un emplacement inattendu.\n"
+            f"  Chercher manuellement dans : {qd_file.parent}"
+        )
 
-
-# ── Dispatch ──────────────────────────────────────────────────────────────────
-
-def main(args: list[str]) -> None:
-    if not args:
-        print("Usage : forge docs:pdf")
-        raise SystemExit(1)
-    command = args[0]
-    if command == "docs:pdf":
-        cmd_docs_pdf(args[1:])
-    else:
-        print(f"Commande inconnue : {command!r}")
-        raise SystemExit(1)
+    _log(f"PDF généré : {_PDF_TARGET}")
