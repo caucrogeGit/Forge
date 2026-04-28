@@ -1,0 +1,65 @@
+.doctype {paged}
+
+.doclang {French}
+
+.doc {Forge — Documentation complète}
+
+.author {Roger Cauchon}
+
+{{
+  Pages incluses dans ce document.
+
+  Ordre suggéré : du général vers le détail.
+  Désactiver une page en commentant la ligne .include avec {{...}}.
+
+  Limite V1 : les extensions MkDocs (admonitions !!! note, onglets === "Tab",
+  blocs <details>) ne sont pas rendues par Quarkdown — elles apparaissent
+  comme texte brut dans le PDF. Les pages les plus standard sont listées en
+  premier ; les pages plus complexes sont désactivées par défaut.
+}}
+
+# Forge — Documentation
+
+## Positionnement et concepts
+
+.include {../positioning.md}
+
+.include {../concepts.md}
+
+## Guide de démarrage
+
+.include {../guide.md}
+
+## Installation
+
+.include {../installation.md}
+
+.include {../installation-pipx.md}
+
+.include {../installation-vm-debian.md}
+
+.include {../installation-mariadb.md}
+
+## CRUD et entités
+
+.include {../crud.md}
+
+.include {../entity_architecture.md}
+
+## Déploiement
+
+.include {../deployment.md}
+
+## Roadmap
+
+.include {../roadmap.md}
+
+{{
+  Pages désactivées en V1 — syntaxe MkDocs trop spécifique pour Quarkdown :
+
+  .include {../reference.md}
+  .include {../starter-app-01-contacts.md}
+  .include {../starter-app-02-utilisateurs-auth.md}
+  .include {../starter-app-03-carnet-contacts.md}
+  .include {../starter-app-04-suivi-comportement-eleves.md}
+}}

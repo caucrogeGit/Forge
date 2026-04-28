@@ -67,6 +67,8 @@ nav:
       - Schéma API: reference-schema.md
   - Déploiement:
       - Guide de déploiement: deployment.md
+  - Outils:
+      - Génération PDF: pdf.md
   - Projet:
       - Roadmap: roadmap.md
       - Validation locale: release-local.md
