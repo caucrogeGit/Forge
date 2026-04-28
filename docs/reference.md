@@ -1,744 +1,966 @@
-# Forge — Référence API
+# Forge - Référence API et CLI
 
-Cette référence décrit l'API publique de Forge. Pour les procédures d'installation et les exemples complets, voir le [Guide de démarrage](guide.md).
+Cette page décrit l'API publique actuelle de Forge `1.0.1`. Elle est organisée comme un index : la liste donne la vue d'ensemble, puis chaque élément peut être ouvert pour afficher les détails, les signatures et des exemples.
 
----
+Pour les flux guidés, voir aussi le [guide de démarrage](guide.md), le [CRUD explicite](crud.md) et l'[architecture des entités](entity_architecture.md).
 
-## `core.forge`
+## Schéma complet
 
-Registre centralisé de configuration du noyau. Tous les modules `core/` lisent leurs paramètres via ce registre.
+```mermaid
+flowchart TD
+    CLI["CLI forge"] --> Project["Projet Forge"]
+    CLI --> EntityGen["Génération entités"]
+    CLI --> CrudGen["Génération CRUD"]
+    CLI --> DbTools["db:init / db:apply"]
+    CLI --> Starters["starter:list / starter:build"]
 
-### `configure(**kwargs) -> None`
+    Project --> CoreConfig["core.forge"]
+    Project --> Router["core.http.router"]
+    Project --> App["core.application"]
+    Project --> Templates["core.templating + integrations.jinja2"]
+    Project --> Controllers["core.mvc.controller"]
+    Project --> Forms["core.forms"]
+    Project --> Security["core.security"]
+    Project --> Database["core.database"]
+    Project --> Uploads["core.uploads"]
+    Project --> Entities["mvc/entities"]
 
-Configure le noyau Forge. À appeler une seule fois au démarrage.
+    App --> Router
+    App --> Security
+    Router --> Request["core.http.request"]
+    Router --> Response["core.http.response"]
+    Controllers --> Response
+    Controllers --> Templates
+    Controllers --> Forms
+    Controllers --> Security
+    Controllers --> Database
+    Forms --> Validation["core.validation"]
+    EntityGen --> Entities
+    Entities --> GeneratedSql["*.sql / relations.sql"]
+    Entities --> GeneratedBase["*_base.py"]
+    Entities --> ManualClass["classe métier manuelle"]
+    Database --> MariaDB["MariaDB"]
+    DbTools --> MariaDB
+    Uploads --> Storage["storage/uploads"]
+```
 
-**Raises :** `KeyError` si une clé est inconnue. Les chemins relatifs sont résolus depuis la racine du projet.
+## Index API
 
-**Clés disponibles :**
+| Élément | Rôle |
+|---|---|
+| [`core.forge`](#coreforge) | Registre de configuration partagé par le noyau |
+| [`core.http.request`](#corehttprequest) | Requête entrante, paramètres, body, JSON et fichiers |
+| [`core.http.response`](#corehttpresponse) | Réponse HTTP retournée par les handlers |
+| [`core.http.helpers`](#corehttphelpers) | Helper `html()` pour rendre un template |
+| [`core.http.router`](#corehttprouter) | Routes, groupes, paramètres dynamiques, URL nommées |
+| [`core.application`](#coreapplication) | Dispatch HTTP, middleware, CSRF, erreurs 404/500 |
+| [`core.templating` et Jinja2](#coretemplating-et-jinja2) | Renderer de templates et helper `url_for()` |
+| [`core.security`](#coresecurity) | Sessions mémoire, auth, rôles, CSRF, mots de passe |
+| [`core.forms`](#coreforms) | Formulaires, champs typés et validation applicative |
+| [`core.mvc.controller`](#coremvccontroller) | Base controller, redirects, JSON, flash, helpers de formulaire |
+| [`core.mvc.model`](#coremvcmodel) | Validateur MVC simple et exception de doublon |
+| [`core.mvc.view`](#coremvcview) | Pagination |
+| [`mvc.helpers`](#mvchelpers) | Rendu HTML des flashs et erreurs de formulaire |
+| [`core.database`](#coredatabase) | Connexions MariaDB, transactions, SQL loader |
+| [`core.uploads`](#coreuploads) | Validation et stockage des fichiers uploadés |
+| [`core.validation`](#corevalidation) | Décorateurs V1 pour les propriétés d'entité |
+| [`forge` CLI](#forge-cli) | Commandes officielles du framework |
+| [`forge_cli.entities`](#forgeclieentities) | Génération et validation des entités |
+
+## Détails API
+
+<details markdown="1" id="coreforge">
+<summary><code>core.forge</code> - Configuration centrale</summary>
+
+`core.forge` est le registre de configuration du noyau. Les modules `core/` lisent leurs paramètres avec `get()`.
+
+### Fonctions
+
+| API | Signature | Description |
+|---|---|---|
+| `configure` | `configure(**kwargs) -> None` | Configure Forge. Lève `KeyError` si une clé est inconnue. |
+| `get` | `get(key: str) -> object` | Retourne une valeur. Lève `KeyError` si la clé est inconnue. |
+
+### Clés disponibles
 
 | Clé | Défaut | Description |
-|-----|--------|-------------|
+|---|---|---|
 | `app_name` | `"Forge"` | Nom de l'application |
-| `app_env` | `"dev"` | Environnement |
-| `views_dir` | `"{racine}/mvc/views"` | Dossier des templates |
-| `sql_dir` | `"{racine}/mvc/models/sql"` | Dossier des requêtes SQL applicatives |
-| `upload_root` | `"{racine}/storage/uploads"` | Racine des fichiers uploadés |
-| `upload_max_size` | `5242880` | Taille maximale d'un fichier uploadé (octets) |
+| `app_env` | `"dev"` | Environnement actif |
+| `views_dir` | `mvc/views` | Dossier des templates |
+| `sql_dir` | `mvc/models/sql` | Dossier des requêtes SQL |
+| `upload_root` | `storage/uploads` | Racine des uploads |
+| `upload_max_size` | `5242880` | Taille maximale d'un fichier |
 | `upload_allowed_extensions` | `["jpg", "jpeg", "png", "webp", "pdf"]` | Extensions autorisées |
-| `upload_allowed_mime_types` | `["image/jpeg", "image/png", "image/webp", "application/pdf"]` | Types MIME autorisés |
-| `db_host` | `"localhost"` | Host MariaDB |
+| `upload_allowed_mime_types` | `["image/jpeg", "image/png", "image/webp", "application/pdf"]` | MIME autorisés |
+| `db_host` | `"localhost"` | Hôte MariaDB |
 | `db_port` | `3306` | Port MariaDB |
 | `db_name` | `"forge_db"` | Nom de la base |
-| `db_user` | `"root"` | Utilisateur |
+| `db_user` | `"root"` | Utilisateur MariaDB |
 | `db_password` | `""` | Mot de passe |
 | `db_pool_size` | `5` | Taille du pool |
-| `css_visible` | `"block"` | Classe CSS visible (pagination) |
-| `css_hidden` | `"hidden"` | Classe CSS masquée (pagination) |
-| `router` | `None` | Routeur actif pour `url_for` et `redirect_to_route` |
+| `css_visible` | `"block"` | Classe pagination visible |
+| `css_hidden` | `"hidden"` | Classe pagination masquée |
+| `router` | `None` | Routeur actif pour `url_for()` |
 
-### `get(key: str) -> object`
+Les chemins relatifs `views_dir`, `sql_dir` et `upload_root` sont résolus depuis la racine du projet.
 
-Retourne une valeur de configuration. **Raises :** `KeyError` si la clé est inconnue.
+### Exemple
 
----
+```python
+from core.forge import configure, get
 
-## `core.http.request`
+configure(
+    app_name="Carnet",
+    app_env="dev",
+    db_name="carnet_dev",
+    db_user="carnet_app",
+)
 
-### Classe `Request`
+print(get("app_name"))
+```
 
-Encapsule une requête HTTP entrante. Instanciée automatiquement par le serveur.
+</details>
+
+<details markdown="1" id="corehttprequest">
+<summary><code>core.http.request</code> - Requête HTTP</summary>
+
+### Classes
+
+| API | Description |
+|---|---|
+| `Request` | Représente une requête HTTP entrante. |
+| `UploadedFile` | Fichier reçu dans un formulaire `multipart/form-data`. |
+| `RequestEntityTooLarge` | Exception levée si le body dépasse la limite autorisée. |
+
+### `Request`
+
+Attributs principaux :
 
 | Attribut | Type | Description |
-|----------|------|-------------|
-| `method` | `str` | Verbe HTTP : `"GET"`, `"POST"`… |
-| `path` | `str` | Chemin : `"/clients/42"` |
-| `headers` | `HTTPMessage` | En-têtes HTTP |
-| `params` | `dict[str, list[str]]` | Query string parsée |
-| `body` | `dict[str, list[str]]` | Formulaire `POST`, `PUT`, `PATCH` ou `DELETE` parsé |
-| `files` | `dict[str, UploadedFile]` | Fichiers reçus en `multipart/form-data` |
-| `json_body` | `dict` | Corps JSON |
-| `ip` | `str` | Adresse IP client |
-| `route_params` | `dict[str, str]` | Paramètres dynamiques injectés par le routeur |
+|---|---|---|
+| `original_method` | `str` | Méthode reçue avant override. |
+| `method` | `str` | Méthode effective. `POST` peut devenir `PUT`, `PATCH` ou `DELETE` via `_method`. |
+| `path` | `str` | Chemin sans query string. |
+| `headers` | `HTTPMessage` | En-têtes HTTP. |
+| `params` | `dict[str, list[str]]` | Query string parsée avec `parse_qs`. |
+| `body` | `dict[str, list[str]]` | Formulaire parsé. |
+| `json_body` | `dict` | JSON parsé si `Content-Type` vaut `application/json`. |
+| `files` | `dict[str, UploadedFile]` | Fichiers uploadés. |
+| `ip` | `str` | Adresse IP client. |
+| `route_params` | `dict[str, str]` | Paramètres injectés par le routeur. |
 
-**Notes :**
-- `params` et `body` suivent le format `parse_qs` : les valeurs sont des listes. Utiliser `BaseController.body(request)` pour un dict plat.
-- `json_body` est vide si le `Content-Type` n'est pas `application/json`.
-- `GET`, `HEAD` et `OPTIONS` n'ont pas de body parsé.
-- `POST` avec `_method=PUT`, `_method=PATCH` ou `_method=DELETE` est traité comme la méthode indiquée.
+### Exemple
 
----
+```python
+def create_contact(request):
+    name = request.body.get("name", [""])[0]
+    avatar = request.files.get("avatar")
 
-## `core.http.response`
+    if avatar:
+        print(avatar.filename, avatar.content_type, avatar.size)
 
-### Classe `Response`
+    return Response(201, f"Contact {name} créé")
+```
+
+Notes :
+
+- `GET`, `HEAD` et `OPTIONS` ne lisent pas de body.
+- La limite de body par défaut est `1_048_576` octets.
+- Les uploads multipart utilisent au minimum `1 MiB` et ajoutent une marge de `65_536` octets à `upload_max_size`.
+
+</details>
+
+<details markdown="1" id="corehttpresponse">
+<summary><code>core.http.response</code> - Réponse HTTP</summary>
+
+### Classe
 
 ```python
 Response(status=200, body=b"", content_type="text/html; charset=utf-8", headers=None)
 ```
 
 | Attribut | Type | Description |
-|----------|------|-------------|
-| `status` | `int` | Code HTTP |
-| `body` | `bytes` | Contenu (str auto-converti en UTF-8) |
-| `content_type` | `str` | Type MIME |
-| `headers` | `dict` | En-têtes supplémentaires |
+|---|---|---|
+| `status` | `int` | Code HTTP. |
+| `body` | `bytes` | Corps de réponse. Une `str` est encodée en UTF-8. |
+| `content_type` | `str` | Type MIME. |
+| `headers` | `dict` | En-têtes additionnels. |
 
----
-
-## `core.http.helpers`
-
-### `html(template, status=200, context=None, *, raw=False) -> Response`
-
-Rend un template et retourne une `Response`.
-
-| Paramètre | Type | Défaut | Description |
-|-----------|------|--------|-------------|
-| `template` | `str` | — | Chemin relatif depuis `views_dir` |
-| `status` | `int` | `200` | Code HTTP |
-| `context` | `dict \| None` | `None` | Variables injectées dans le template |
-| `raw` | `bool` | `False` | Si `True`, retourne le fichier sans passer par Jinja2 |
-
-`raw=True` n'injecte pas de contexte Jinja2. Utile pour les fichiers contenant des accolades (CSS, JS).
-
----
-
-## `core.http.router`
-
-### Classe `Router`
-
-### `add(method, pattern, handler, *, name=None, public=False, csrf=True, api=False) -> Router`
-
-Enregistre une route. **Raises :** `ValueError` si le nom est déjà utilisé.
-
-### `group(prefix, *, public=False, csrf=True, api=False) -> RouteGroup`
-
-Crée un groupe de routes partageant un préfixe. Les routes unsafe (`POST`, `PUT`, `PATCH`, `DELETE`) sont protégées par CSRF par défaut.
-
-### `match(method, path) -> tuple | None`
-
-Trouve la première route correspondante et retourne l'objet route avec ses paramètres.
+### Exemples
 
 ```python
-entry, params = router.match("POST", "/clients")
-entry.pattern / entry.public / entry.csrf / entry.api
-entry.requires_csrf("POST")
+from core.http.response import Response
+
+def health(request):
+    return Response(200, "OK", content_type="text/plain; charset=utf-8")
 ```
 
-### `resolve(method, path) -> tuple | None`
-
-Retourne `(handler, params)` ou `None`.
-
-### `is_public(path, method=None) -> bool`
-
-Retourne `True` si le chemin correspond à une route publique.
-
-### `iter_routes() -> list[RouteEntry]`
-
-Retourne les routes dans l'ordre de déclaration. Utilisé par `forge routes:list`.
-
-### `url_for(name, **params) -> str`
-
-Génère l'URL d'une route nommée. **Raises :** `KeyError` si le nom ou un paramètre est inconnu.
-
-**Patterns supportés :**
-
-| Pattern | URL testée | Paramètres |
-|---------|-----------|------------|
-| `/clients` | `/clients` | `{}` |
-| `/clients/{id}` | `/clients/42` | `{"id": "42"}` |
-| `/clients/{id}/modifier` | `/clients/42/modifier` | `{"id": "42"}` |
-| `/api/{version}/clients/{id}` | `/api/v2/clients/5` | `{"version": "v2", "id": "5"}` |
-
----
-
-## `core.application`
-
-### Classe `Application`
-
 ```python
-app = Application(router)
-app = Application(router, middlewares=[AuthMiddleware("/login")])
+return Response(
+    302,
+    "",
+    headers={"Location": "/login"},
+)
 ```
 
-### `dispatch(request) -> Response`
+</details>
 
-Point d'entrée principal. Flux :
-1. Résout la route et injecte `route_params`
-2. Aucune route → `errors/404.html`
-3. Route protégée → exécute les middlewares dans l'ordre
-4. Route unsafe avec CSRF → vérifie le token
-5. Appelle le handler
-6. Exception non gérée → `errors/500.html`
+<details markdown="1" id="corehttphelpers">
+<summary><code>core.http.helpers</code> - Helper HTML</summary>
 
-### Interface middleware
+### Fonction
+
+| API | Signature | Description |
+|---|---|---|
+| `html` | `html(template, status=200, context=None, raw=False) -> Response` | Rend un template et retourne une `Response`. |
+
+`raw=True` lit le fichier depuis `views_dir` sans passer par Jinja2. C'est utile pour des fichiers contenant des accolades ou des fragments non templatisés.
+
+### Exemple
 
 ```python
-class MonMiddleware:
+from core.http.helpers import html
+
+def dashboard(request):
+    return html("dashboard/index.html", context={"title": "Tableau de bord"})
+```
+
+</details>
+
+<details markdown="1" id="corehttprouter">
+<summary><code>core.http.router</code> - Router, routes et URL nommées</summary>
+
+### Classes et constantes
+
+| API | Description |
+|---|---|
+| `Router` | Registre de routes. |
+| `RouteEntry` | Route compilée avec méthode, pattern, handler et options. |
+| `RouteGroup` | Groupe de routes partageant un préfixe et des options. |
+| `SAFE_METHODS` | `{"GET", "HEAD", "OPTIONS"}` |
+| `UNSAFE_METHODS` | `{"POST", "PUT", "PATCH", "DELETE"}` |
+
+### Méthodes publiques de `Router`
+
+| API | Signature | Description |
+|---|---|---|
+| `add` | `add(method, pattern, handler, name=None, public=False, csrf=True, api=False) -> Router` | Ajoute une route. |
+| `group` | `group(prefix, public=False, csrf=True, api=False) -> RouteGroup` | Crée un groupe utilisable avec `with`. |
+| `match` | `match(method, path) -> tuple[RouteEntry, dict] \| None` | Retourne la route et ses paramètres. |
+| `resolve` | `resolve(method, path) -> tuple[handler, dict] \| None` | Retourne le handler et ses paramètres. |
+| `is_public` | `is_public(path, method=None) -> bool` | Indique si une route est publique. |
+| `iter_routes` | `iter_routes() -> list[RouteEntry]` | Liste les routes déclarées. |
+| `url_for` | `url_for(name, **params) -> str` | Génère une URL depuis une route nommée. |
+
+### Patterns supportés
+
+| Pattern | URL | Paramètres |
+|---|---|---|
+| `/contacts` | `/contacts` | `{}` |
+| `/contacts/{id}` | `/contacts/42` | `{"id": "42"}` |
+| `/api/{version}/contacts/{id}` | `/api/v1/contacts/5` | `{"version": "v1", "id": "5"}` |
+
+### Exemples
+
+```python
+from core.http.router import Router
+
+router = Router()
+router.add("GET", "/", home, name="home", public=True, csrf=False)
+router.add("POST", "/contacts", create_contact, name="contacts.create")
+
+url = router.url_for("contacts.create")
+```
+
+```python
+with router.group("/admin", public=False) as admin:
+    admin.add("GET", "", admin_index, name="admin.index")
+    admin.add("POST", "/users", create_user, name="admin.users.create")
+```
+
+Une route `POST`, `PUT`, `PATCH` ou `DELETE` est protégée par CSRF par défaut, sauf si `csrf=False`.
+
+</details>
+
+<details markdown="1" id="coreapplication">
+<summary><code>core.application</code> - Dispatch applicatif</summary>
+
+### Classe
+
+```python
+Application(router, middlewares=None, login_url="/login", csrf_middleware=None)
+```
+
+### Méthode
+
+| API | Signature | Description |
+|---|---|---|
+| `dispatch` | `dispatch(request) -> Response` | Résout la route, applique CSRF et middlewares, appelle le handler. |
+
+### Flux réel
+
+1. Recherche de la route.
+2. Si aucune route ne correspond, retourne `errors/404.html`.
+3. Injection de `request.route_params`.
+4. Vérification CSRF pour les méthodes unsafe si la route le demande.
+5. Exécution des middlewares pour les routes non publiques.
+6. Appel du handler.
+7. En cas d'exception non gérée, retourne `errors/500.html`.
+
+### Exemple middleware
+
+```python
+from core.http.response import Response
+
+class AdminOnly:
     def check(self, request):
-        if not condition_remplie(request):
+        if not request.headers.get("X-Admin"):
             return Response(403, "Interdit")
         return None
 ```
 
----
+</details>
 
-## `core.templating.manager`
+<details markdown="1" id="coretemplating-et-jinja2">
+<summary><code>core.templating</code> et <code>integrations.jinja2</code> - Templates</summary>
 
-### Classe `TemplateManager`
+### API
 
-`template_manager` est le singleton à utiliser. Ne pas instancier `TemplateManager` manuellement sauf en test.
+| Élément | Signature | Description |
+|---|---|---|
+| `template_manager` | singleton `TemplateManager` | Renderer actif. |
+| `TemplateManager.register` | `register(renderer) -> None` | Enregistre ou remplace le renderer. |
+| `TemplateManager.render` | `render(template, context) -> str` | Rend un template. Lève `RuntimeError` sans renderer. |
+| `Jinja2Renderer` | `Jinja2Renderer(views_dir: str)` | Renderer Jinja2 avec autoescape HTML. |
 
-### `register(renderer) -> None`
+`Jinja2Renderer` expose le helper global `url_for(name, **params)`, branché sur `core.forge.get("router")`.
 
-Enregistre le renderer actif. Remplace le renderer précédent.
-
-### `render(template, context) -> str`
-
-Rend un template et retourne le HTML. **Raises :** `RuntimeError` si aucun renderer n'a été enregistré.
-
----
-
-## `integrations.jinja2.renderer`
-
-### Classe `Jinja2Renderer`
+### Exemples
 
 ```python
-Jinja2Renderer(views_dir: str)
+from core.forge import configure, get
+from core.templating.manager import template_manager
+from integrations.jinja2.renderer import Jinja2Renderer
+
+configure(views_dir="mvc/views", router=router)
+template_manager.register(Jinja2Renderer(get("views_dir")))
 ```
 
-Renderer Jinja2 avec autoescape HTML activé sur les fichiers `.html`. Helper global `url_for()` branché sur le routeur actif.
+```html
+<a href="{{ url_for('contacts.show', id=contact.ContactId) }}">
+  Voir
+</a>
+```
 
-| Cas | Syntaxe | Comportement |
-|-----|---------|--------------|
-| Valeur utilisateur | `{{ nom }}` | Échappée |
-| HTML pré-rendu | `{{ flash \| safe }}` | Injecté tel quel |
-| Bloc de layout | `{% block contenu %}{% endblock %}` | Héritage |
+</details>
 
----
+<details markdown="1" id="coresecurity">
+<summary><code>core.security</code> - Sessions, auth, CSRF et mots de passe</summary>
 
-## `core.security.session`
+### Sessions mémoire
 
-| Fonction | Description |
-|----------|-------------|
-| `creer_session() -> str` | Crée une session anonyme. Retourne le `session_id`. |
-| `get_session(session_id) -> dict \| None` | Retourne les données de la session ou `None`. |
-| `supprimer_session(session_id) -> None` | Supprime immédiatement la session. |
-| `authentifier_session(session_id, utilisateur) -> str \| None` | Marque la session comme authentifiée, rotation du `session_id`. |
-| `get_session_id(request) -> str \| None` | Extrait le `session_id` depuis le cookie. |
-| `est_authentifie(request) -> bool` | `True` si authentifié — repousse l'expiration. |
-| `get_utilisateur(request) -> dict \| None` | Retourne le profil de l'utilisateur connecté. |
-| `utilisateur_a_role(request, role) -> bool` | `True` si l'utilisateur possède le rôle. |
-| `set_flash(session_id, message, level="success") -> None` | Stocke un message flash. |
-| `get_flash(session_id) -> dict \| None` | Récupère puis supprime le message flash. |
+| API | Description |
+|---|---|
+| `creer_session()` | Crée une session et retourne son identifiant. |
+| `get_session(session_id)` | Retourne la session ou `None`. |
+| `supprimer_session(session_id)` | Supprime une session. |
+| `regenerer_session(old_session_id)` | Crée une nouvelle session en copiant les données. |
+| `authentifier_session(session_id, utilisateur)` | Marque une session comme authentifiée et retourne un nouveau `session_id`. |
+| `get_session_id(request)` | Lit le cookie `session_id`. |
+| `est_authentifie(request)` | Vérifie l'authentification. |
+| `get_utilisateur(request)` | Retourne l'utilisateur de session. |
+| `utilisateur_a_role(request, role)` | Vérifie un rôle. |
+| `set_flash(session_id, message, level="success")` | Stocke un message flash. |
+| `get_flash(session_id)` | Lit et consomme le flash. |
 
-**Structure d'une session :**
+Le stockage de session est en mémoire. Il convient au développement, à la pédagogie et aux petites applications mono-processus. Les sessions sont perdues au redémarrage, ne sont pas partagées entre workers et ne conviennent pas au scaling horizontal.
+
+### Middleware et décorateurs
+
+| API | Description |
+|---|---|
+| `AuthMiddleware(login_url="/login")` | Redirige vers `/login` si la session n'est pas authentifiée. |
+| `CsrfMiddleware(field_name="csrf_token", header_name="X-CSRF-Token")` | Vérifie le token CSRF sur les routes unsafe. |
+| `require_auth` | Décorateur de handler authentifié. |
+| `require_csrf` | Décorateur de handler avec CSRF. |
+| `require_role(role)` | Décorateur de handler limité à un rôle. |
+
+### Mots de passe et limitation
+
+| API | Description |
+|---|---|
+| `hacher_mot_de_passe(password)` | Hash PBKDF2-HMAC-SHA256 avec sel. |
+| `verifier_mot_de_passe(password, stored)` | Vérifie un mot de passe. |
+| `enregistrer_tentative(ip)` | Enregistre une tentative par IP. |
+| `est_limite(ip)` | Limite après `5` tentatives dans une fenêtre de `60` secondes. |
+
+### Exemples
 
 ```python
-{
-    "authentifie": bool,
-    "utilisateur": dict | None,
-    "csrf_token": str,
-    "expire_a": float,
-    "flash": dict,
-}
+from core.security.session import authentifier_session, creer_session, get_session
+
+session_id = creer_session()
+session_id = authentifier_session(session_id, {
+    "UtilisateurId": 1,
+    "Login": "roger",
+    "roles": ["admin"],
+})
+
+session = get_session(session_id)
+print(session["utilisateur"]["login"])
 ```
-
-**Durée de session :** 1 heure, renouvelée à chaque appel réussi à `est_authentifie()`.
-
----
-
-## `core.security.hashing`
-
-| Fonction | Description |
-|----------|-------------|
-| `hacher_mot_de_passe(mot_de_passe) -> str` | Retourne un hash sécurisé au format `"sel:hash"`. |
-| `verifier_mot_de_passe(mot_de_passe, hash_stocke) -> bool` | Compare un mot de passe avec son hash stocké. |
-| `enregistrer_tentative(ip) -> None` | Enregistre une tentative de connexion échouée. |
-| `est_limite(ip) -> bool` | `True` si l'IP a atteint la limite de tentatives. |
-
-**Spécifications :** PBKDF2-HMAC-SHA256, 260 000 itérations, sel aléatoire de 16 octets, comparaison via `hmac.compare_digest()`, fenêtre de rate limiting de 60 secondes.
-
----
-
-## `core.security.middleware`
-
-### Classe `AuthMiddleware`
 
 ```python
-middleware = AuthMiddleware(login_url="/login")
+from core.security.decorators import require_role
+
+@require_role("admin")
+def admin_dashboard(request):
+    return self.render("admin/dashboard.html", request=request)
 ```
 
-`check(request) -> Response | None` : redirection 302 vers `login_url` si non authentifié, `None` sinon.
+```html
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+```
 
-### Classe `CsrfMiddleware`
+</details>
 
-Vérifie le token CSRF des requêtes unsafe déclarées comme protégées par le routeur. Utilisé automatiquement par `Application`.
-
-`check(request) -> Response | None` : retourne `errors/403.html` si le token est absent ou invalide.
-
----
-
-## `core.security.decorators`
-
-### `@require_auth`
-
-Redirige vers `/login` si non authentifié.
-
-### `@require_csrf`
-
-Retourne 403 si le token CSRF ne correspond pas à la session. Disponible pour du code hérité ; la protection officielle passe par les métadonnées de route et `Application`.
-
-### `@require_role(role)`
-
-Redirige vers `/login` si non authentifié. Retourne 403 si le rôle est absent.
-
----
-
-## `core.forms`
-
-Mécanique générique des formulaires Forge. Les formulaires applicatifs vivent dans `mvc/forms/`.
+<details markdown="1" id="coreforms">
+<summary><code>core.forms</code> - Formulaires et champs</summary>
 
 ### Classe `Form`
 
+| API | Description |
+|---|---|
+| `Form(data=None, **options)` | Instancie un formulaire. |
+| `Form.from_request(request, **options)` | Crée un formulaire depuis `request.body`. |
+| `is_bound` | Indique si le formulaire a reçu des données. |
+| `errors` | Erreurs par champ. |
+| `non_field_errors` | Erreurs globales. |
+| `field_errors(name)` | Erreurs d'un champ. |
+| `value(name, default="")` | Valeur nettoyée ou brute. |
+| `error(name)` | Première erreur d'un champ. |
+| `has_error(name)` | Indique si un champ a une erreur. |
+| `add_error(name, message)` | Ajoute une erreur. |
+| `is_valid()` | Lance la validation et retourne un booléen. |
+| `clean()` | Hook de validation globale à surcharger. |
+| `context()` | Contexte prêt pour le template. |
+
+### Champs
+
+| Champ | Valeur nettoyée | Usage |
+|---|---|---|
+| `StringField` | `str` | Texte, longueur, regex. |
+| `IntegerField` | `int` | Entiers, min, max. |
+| `DecimalField` | `Decimal` | Valeurs décimales précises. |
+| `BooleanField` | `bool` | Checkbox. |
+| `ChoiceField` | `str` | Valeur parmi une liste. |
+| `RelatedIdsField` | `list[int]` | Liste d'identifiants reliés. |
+
+### Exemple
+
 ```python
+from core.forms import Form, StringField, IntegerField
+
 class ContactForm(Form):
-    nom = StringField(label="Nom", required=True, max_length=80)
-    age = IntegerField(label="Age", required=False, min_value=0)
+    prenom = StringField(required=True, max_length=100)
+    age = IntegerField(required=False, min_value=0)
+
+    def clean(self):
+        if self.cleaned_data.get("prenom") == "admin":
+            self.add_error("prenom", "Ce prénom est réservé.")
+
+
+form = ContactForm.from_request(request)
+if form.is_valid():
+    contact.prenom = form.cleaned_data["prenom"]
 ```
 
-### `Form.from_request(request, **options) -> Form`
+`DecimalField` retourne un `Decimal`. Les CRUD générés gardent la doctrine Forge actuelle : les champs JSON de type Python `float` restent convertis en `float`.
 
-Construit un formulaire depuis `request.body`. Les `options` servent à fournir des listes de validation explicites.
+</details>
 
-### `is_valid() -> bool`
+<details markdown="1" id="coremvccontroller">
+<summary><code>core.mvc.controller</code> - BaseController</summary>
 
-Nettoie les données, remplit `cleaned_data` et expose les erreurs.
+### Méthodes publiques
 
-### Helpers de rendu
+| API | Description |
+|---|---|
+| `render(template, status=200, context=None, base="layouts/base.html", request=None, raw=False)` | Rend une vue. Injecte un token CSRF si `request` est fourni et si `raw=False`. |
+| `redirect(location, status=302)` | Redirection simple. |
+| `redirect_with_flash(request, location, type_, message, status=302)` | Flash puis redirection. |
+| `redirect_to_route(name, status=302, **params)` | Redirection vers une route nommée. |
+| `not_found()` | Réponse 404. |
+| `bad_request()` | Réponse 400. |
+| `forbidden()` | Réponse 403. |
+| `validation_error(context=None)` | Réponse 422. |
+| `server_error()` | Réponse 500. |
+| `set_flash(request, type_, message)` | Ajoute un flash. |
+| `csrf_token(request)` | Retourne le token CSRF de session. |
+| `current_user(request)` | Retourne l'utilisateur courant. |
+| `include(template, context=None)` | Rend un fragment. |
+| `json(data, status=200)` | Retourne du JSON. |
+| `body(request)` | Aplatit `request.body`. |
+| `json_body(request)` | Retourne `request.json_body`. |
+| `render_form(template, form, status=200, context=None, request=None)` | Rend un template avec contexte de formulaire. |
+| `form_context(form)` | Retourne `form.context()`. |
+
+### Exemple
+
+```python
+from core.mvc.controller import BaseController
+
+class ContactController(BaseController):
+    def index(self, request):
+        return self.render(
+            "contacts/index.html",
+            context={"contacts": []},
+            request=request,
+        )
+
+    def api_index(self, request):
+        return self.json({"contacts": []})
+```
+
+Dans les CRUD générés, les identifiants de route sont parsés avant usage. Une valeur invalide comme `/contacts/abc` retourne une réponse de type `not_found()` au lieu de provoquer une erreur serveur.
+
+</details>
+
+<details markdown="1" id="coremvcmodel">
+<summary><code>core.mvc.model</code> - Validation MVC minimale</summary>
+
+### API
+
+| Élément | Description |
+|---|---|
+| `Validator` | Validateur simple avec erreurs par champ. |
+| `DoublonError` | Exception métier pour signaler un doublon. |
+
+### `Validator`
 
 | Méthode | Description |
-|---------|-------------|
-| `form.value("champ")` | Retourne la valeur saisie (pour réaffichage) |
-| `form.error("champ")` | Retourne le message d'erreur |
-| `form.has_error("champ")` | `True` si le champ a une erreur |
+|---|---|
+| `required(field, value, message=None)` | Vérifie une présence. |
+| `max_length(field, value, max_len, message=None)` | Vérifie une longueur maximale. |
+| `add_error(field, message)` | Ajoute une erreur. |
+| `is_valid()` | Retourne `True` sans erreur. |
+| `errors` | Dictionnaire des erreurs. |
 
-### Attributs
-
-| Attribut | Description |
-|----------|-------------|
-| `data` | Données d'origine aplaties |
-| `cleaned_data` | Données converties et validées |
-| `errors` | Erreurs par champ |
-| `non_field_errors` | Erreurs globales |
-| `context` | Dict prêt à injecter dans un template |
-
-### Champs disponibles
-
-| Champ | Rôle |
-|-------|------|
-| `StringField` | Chaîne avec `min_length`, `max_length`, `pattern` |
-| `IntegerField` | Entier avec `min_value`, `max_value` |
-| `DecimalField` | Nombre décimal |
-| `BooleanField` | Booléen de formulaire |
-| `ChoiceField` | Choix explicite fourni au champ ou au formulaire |
-| `RelatedIdsField` | Liste d'identifiants liés pour pivot explicite |
-
-Un formulaire Forge ne fait pas de SQL et ne décide pas d'une redirection.
-
-### `ChoiceField`
-
-Valide une valeur parmi une liste de choix fournie explicitement. Le champ ne charge jamais les choix depuis la base.
+### Exemple
 
 ```python
-ville_id = ChoiceField(required=False, choices_key="allowed_ville_ids")
+from core.mvc.model.validator import Validator
 
-form = ContactForm.from_request(request, allowed_ville_ids=VilleModel.allowed_ids())
+validator = Validator()
+validator.required("Email", email)
+validator.max_length("Nom", nom, 100)
+
+if not validator.is_valid():
+    return self.validation_error({"errors": validator.errors})
 ```
 
-### `RelatedIdsField`
+</details>
 
-Lit une liste d'identifiants, convertit en entiers, supprime les doublons, valide contre une liste autorisée fournie explicitement.
+<details markdown="1" id="coremvcview">
+<summary><code>core.mvc.view</code> - Pagination</summary>
+
+### Classe
 
 ```python
-groupe_ids = RelatedIdsField(required=False, allowed_ids_key="allowed_group_ids")
-
-form = ContactForm.from_request(request, allowed_group_ids=GroupeModel.allowed_ids())
+Pagination(request, total, par_page)
 ```
 
-Ne charge jamais les identifiants autorisés depuis la base. Ne connaît pas la table pivot et ne persiste rien.
+### Attributs et méthodes
 
----
+| API | Description |
+|---|---|
+| `total` | Nombre total d'éléments. |
+| `par_page` | Taille de page. |
+| `nb_pages` | Nombre de pages. |
+| `page` | Page courante, lue depuis `?page=`. |
+| `limit` | Limite SQL. |
+| `offset` | Offset SQL. |
+| `pages` | Liste des numéros de page. |
+| `context` | Contexte avec classes CSS `css_visible` / `css_hidden`. |
+| `to_dict()` | Version dictionnaire avec booléens `has_prev` et `has_next`. |
 
-## `core.mvc.controller.base_controller`
-
-### Classe `BaseController`
-
-| Méthode | Description |
-|---------|-------------|
-| `render(template, status=200, context=None, *, request=None, raw=False)` | Génère une réponse HTML. Injecte `csrf_token` si `request` est fourni. |
-| `redirect(location, *, request=None, flash=None, level="success")` | Redirection 302. |
-| `redirect_with_flash(request, location, message, level="success")` | Flux POST-Redirect-GET avec message flash. |
-| `redirect_to_route(name, *, request=None, flash=None, level="success", **params)` | Redirige vers une route nommée. |
-| `not_found()` | Retourne `errors/404.html` (404). |
-| `bad_request()` | 400 |
-| `forbidden()` | 403 |
-| `validation_error(template, context, request)` | 422 — affiche le formulaire avec erreurs. |
-| `server_error()` | 500 |
-| `json(data, status=200)` | Retourne une réponse JSON. |
-| `body(request) -> dict` | Dict plat depuis `request.body`. |
-| `json_body(request) -> dict` | Corps JSON parsé. |
-| `csrf_token(request) -> str` | Token CSRF de la session courante. |
-| `current_user(request) -> dict \| None` | Profil de l'utilisateur connecté. |
-| `set_flash(request, message, level="success")` | Stocke un message flash. |
-| `include(partial, context=None) -> str` | Rend un partial Jinja2 et retourne son HTML. |
-| `render_form(template, request, data, status=200, erreurs="")` | Raccourci `render()` + `form_context()`. |
-| `form_context(request, data, erreurs="") -> dict` | Construit le contexte commun à un formulaire. |
-
-**Note `form_context` :** les données sont injectées brutes. Utiliser `{{ erreurs | safe }}` dans le template uniquement pour cette sortie HTML contrôlée.
-
----
-
-## `core.mvc.model.validator`
-
-### Classe `Validator`
+### Exemple
 
 ```python
-class ClientValidator(Validator):
-    def __init__(self, data):
-        super().__init__()
-        self.required(data.get("nom", ""), "Nom")
-        self.max_length(data.get("nom", ""), 60, "Nom")
+pagination = Pagination(request, total=125, par_page=20)
+rows = fetch_all("SELECT * FROM Contact LIMIT ? OFFSET ?", [
+    pagination.limit,
+    pagination.offset,
+])
+
+return self.render("contacts/index.html", {
+    "contacts": rows,
+    "pagination": pagination.context,
+})
 ```
 
-| Méthode | Description |
-|---------|-------------|
-| `required(value, label)` | Erreur si vide, `None`, ou espaces seulement. |
-| `max_length(value, max_len, label)` | Erreur si `len(str(value)) > max_len`. Sans effet si vide. |
-| `add_error(message)` | Ajoute un message d'erreur. |
-| `is_valid() -> bool` | `True` si aucune erreur. |
-| `errors() -> list[str]` | Liste des erreurs. |
+</details>
 
----
+<details markdown="1" id="mvchelpers">
+<summary><code>mvc.helpers</code> - Fragments HTML utiles aux vues</summary>
 
-## `core.mvc.model.exceptions`
+### API
 
-### `DoublonError(Exception)`
+| Élément | Signature | Description |
+|---|---|---|
+| `render_flash_html` | `render_flash_html(request) -> str` | Lit le flash de session, le consomme et rend `partials/flash.html`. |
+| `render_errors_html` | `render_errors_html(errors: list[str]) -> str` | Convertit une liste d'erreurs en `<ul>` HTML échappée. |
 
-Levée lorsqu'une contrainte d'unicité est violée.
+### Niveaux de flash
 
-```python
-try:
-    add_client(data)
-except DoublonError as e:
-    validator.add_error(f"Ce nom « {e} » existe déjà.")
-```
-
----
-
-## `core.mvc.view.pagination`
-
-### Classe `Pagination`
-
-```python
-pagination = Pagination(request, count_clients(), par_page=10)
-items = get_clients_page(limit=pagination.limit, offset=pagination.offset)
-```
-
-### Attributs
-
-| Attribut | Type | Description |
-|----------|------|-------------|
-| `page` | `int` | Page courante |
-| `nb_pages` | `int` | Nombre total de pages |
-| `total` | `int` | Nombre total d'éléments |
-| `par_page` | `int` | Taille de page |
-| `limit` | `int` | Limite SQL recommandée |
-| `offset` | `int` | Décalage SQL recommandé |
-| `has_previous` | `bool` | Page précédente disponible |
-| `has_next` | `bool` | Page suivante disponible |
-| `previous_page` | `int \| None` | Numéro de page précédente |
-| `next_page` | `int \| None` | Numéro de page suivante |
-
-### `context -> dict`
-
-Retourne le dict prêt à injecter dans le template. Clés : `page`, `nb_pages`, `prev_page`, `next_page`, `has_prev`, `has_next`, `limit`, `offset`, `pagination`. Les classes CSS proviennent de `forge.get("css_visible")` / `forge.get("css_hidden")`.
-
-### `to_dict() -> dict`
-
-Bloc standard sans classes CSS, utile pour les APIs internes.
-
----
-
-## `core.database.db`
-
-Helper SQL léger. N'exécute que du SQL fourni explicitement par le développeur.
-
-| Méthode | Description |
-|---------|-------------|
-| `fetch_one(sql, params=(), *, tx=None)` | Retourne une ligne (`cursor(dictionary=True)`). |
-| `fetch_all(sql, params=(), *, tx=None)` | Retourne toutes les lignes. |
-| `execute(sql, params=(), *, tx=None)` | Exécute et retourne `rowcount`. |
-| `insert(sql, params=(), *, tx=None)` | Exécute une insertion et retourne `lastrowid`. |
-
-Hors transaction : ouvre, exécute, commit, ferme. Dans une transaction : réutilise `tx` sans commit.
-
----
-
-## `core.database.transaction`
-
-### `transaction()`
-
-```python
-from core.database.transaction import transaction
-
-with transaction() as tx:
-    contact_id = ContactModel.create(data, tx=tx)
-    ContactGroupeModel.replace_for_contact(contact_id, groupe_ids, tx=tx)
-```
-
----
-
-## `core.database.connection`
-
-### `get_connection() -> mariadb.Connection`
-
-Emprunte une connexion depuis le pool. **Raises :** `mariadb.PoolError` si épuisé.
-
-### `close_connection(connection) -> None`
-
-Restitue la connexion au pool. Sans effet si `connection` est `None`.
-
-Pool initialisé au premier appel. Configuration lue depuis `forge.get()`.
-
----
-
-## `core.database.sql_loader`
-
-### `charger_queries(nom_fichier) -> module`
-
-Charge un module de requêtes SQL depuis `{sql_dir}/{app_env}/`.
-
-```python
-q = charger_queries("client_queries.py")
-cursor.execute(q.COUNT_CLIENTS)
-```
-
-**Raises :** `FileNotFoundError` si le fichier n'existe pas.
-
----
-
-## `core.uploads`
-
-Service minimal d'upload local. Valide, génère un nom sûr, évite l'écrasement, stocke sous `storage/uploads/<category>/`.
-
-### `save_upload(file, category="documents") -> SavedUpload`
-
-Lève `UploadStorageError("Aucun fichier reçu.")` si `file` est `None`.
-
-**Comportement MIME :**
-
-| `allowed_mime_types` | MIME reçu | Résultat |
-|----------------------|-----------|---------|
-| vide `[]` | peu importe | pas de validation MIME |
-| non vide | présent et autorisé | accepté |
-| non vide | présent et non autorisé | `UploadInvalidMimeTypeError` |
-| non vide | absent (`None`) | `UploadInvalidMimeTypeError` |
-
-**`SavedUpload` :**
-
-| Attribut | Description |
-|----------|-------------|
-| `filename` | Nom sûr généré |
-| `original_name` | Nom reçu depuis le navigateur |
-| `path` | Chemin complet du fichier enregistré |
-| `category` | Sous-dossier utilisé |
-| `size` | Taille en octets |
-| `mime_type` | Type MIME reçu si disponible |
-
-### `delete_upload(path) -> bool`
-
-Supprime un fichier sous `upload_root`. Retourne `False` si absent. Refuse les chemins hors du dossier d'upload.
-
-### `get_upload_path(filename, category="documents") -> Path`
-
-Retourne le chemin attendu pour un fichier d'une catégorie.
-
-### Exceptions
-
-- `UploadError`
-- `UploadTooLargeError`
-- `UploadInvalidExtensionError`
-- `UploadInvalidMimeTypeError`
-- `UploadStorageError`
-
----
-
-## `mvc.helpers.flash`
-
-### `render_flash_html(request) -> str`
-
-Récupère puis supprime le message flash de la session et retourne son HTML pré-rendu. Retourne `""` si aucun flash.
-
-Dans le template : `{{ flash | safe }}`.
-
-| Niveau | Classes Tailwind |
-|--------|-----------------|
+| Niveau | Classes CSS |
+|---|---|
 | `success` | `bg-green-100 border-green-400 text-green-800` |
 | `error` | `bg-red-100 border-red-400 text-red-800` |
 | `warning` | `bg-gray-100 border-gray-300 text-gray-800` |
 | `info` | `bg-gray-100 border-gray-300 text-gray-800` |
 
-Partials standards disponibles :
+### Exemples
 
-```text
-partials/flash.html
-partials/form_errors.html
-partials/csrf.html
-partials/pagination.html
+```python
+from mvc.helpers.flash import render_flash_html
+
+flash = render_flash_html(request)
+return self.render("contacts/index.html", {
+    "flash": flash,
+}, request=request)
 ```
 
----
+```html
+{{ flash | safe }}
+```
 
-## `mvc.helpers.form_errors`
+```python
+from mvc.helpers.form_errors import render_errors_html
 
-### `render_errors_html(errors) -> str`
+errors_html = render_errors_html(["Le nom est obligatoire."])
+```
 
-Convertit une liste d'erreurs en bloc HTML. Retourne `""` si vide. Les messages sont échappés via `html.escape()`.
+</details>
 
-Dans le template : `{{ erreurs | safe }}`.
+<details markdown="1" id="coredatabase">
+<summary><code>core.database</code> - MariaDB, transactions et SQL loader</summary>
 
----
+### Connexions
 
-## `forge` CLI
+| API | Description |
+|---|---|
+| `get_connection()` | Retourne une connexion du pool MariaDB. |
+| `close_connection(conn)` | Rend ou ferme une connexion. |
 
-### Tableau des commandes
+La connexion lit `db_host`, `db_port`, `db_name`, `db_user`, `db_password` et `db_pool_size` dans `core.forge`.
 
-| Commande | Rôle | Écrit des fichiers |
-|----------|------|--------------------|
-| `forge new NomProjet` | Crée un nouveau projet depuis le squelette officiel | Oui, dans le nouveau projet |
-| `forge doctor` | Diagnostique l'environnement du projet courant | Non |
-| `forge make:entity Entity` | Crée une entité JSON canonique (interactif ou `--no-input`) | Oui |
-| `forge make:crud Entity [--dry-run]` | Génère le squelette CRUD MVC d'une entité | Oui |
-| `forge make:relation` | Ajoute une relation globale via assistant interactif | Oui |
-| `forge sync:entity Entity` | Régénère SQL et base Python d'une entité | Oui |
-| `forge sync:relations` | Régénère `mvc/entities/relations.sql` | Oui |
-| `forge sync:landing [--check]` | Copie la landing canonique vers `docs/index.html` | Oui / Non |
-| `forge upload:init` | Initialise les dossiers de stockage upload | Oui |
-| `forge build:model [--dry-run]` | Valide et régénère tout le modèle | Oui |
-| `forge check:model` | Valide le modèle sans écrire | Non |
-| `forge db:init` | Prépare la base MariaDB et l'utilisateur applicatif | Oui, côté base |
-| `forge db:apply` | Applique les SQL générés en base | Oui, côté base |
-| `forge routes:list` | Liste les routes déclarées | Non |
-| `forge deploy:init` | Génère Nginx, systemd et README de déploiement dans `deploy/` | Oui |
-| `forge deploy:check` | Diagnostique l'environnement de production local | Non |
-| `forge starter:list` | Liste les starter apps disponibles | Non |
-| `forge starter:build <id> [--dry-run] [--init-db] [--force] [--public]` | Construit automatiquement un starter applicatif | Oui |
-| `forge help` | Affiche l'aide CLI intégrée | Non |
+### Helpers SQL
 
-### `forge new <NomProjet>`
+| API | Description |
+|---|---|
+| `fetch_one(query, params=None, tx=None)` | Retourne une ligne ou `None`. |
+| `fetch_all(query, params=None, tx=None)` | Retourne toutes les lignes. |
+| `execute(query, params=None, tx=None)` | Exécute une requête et retourne le nombre de lignes affectées. |
+| `insert(query, params=None, tx=None)` | Exécute un insert et retourne le dernier id. |
 
-Clone par défaut la référence stable `v1.0.1` du dépôt Forge, configure `env/dev`, crée le virtualenv Python, génère les certificats HTTPS locaux, réinitialise le dépôt Git. Pour travailler explicitement depuis la branche de développement, utilisez `forge new <NomProjet> --ref main`.
+Sans transaction explicite, chaque helper ouvre une connexion et commit/rollback lui-même.
 
-**Prérequis :** `git`, `openssl`, Python 3.11+. Node.js / npm est optionnel.
+### Transactions
 
-### `forge make:entity <Entity>`
+| API | Description |
+|---|---|
+| `Transaction` | Transaction explicite avec connexion dédiée. |
+| `transaction()` | Context manager transactionnel. |
+
+### SQL loader
+
+| API | Description |
+|---|---|
+| `charger_queries(nom_fichier)` | Charge un fichier depuis `{sql_dir}/{app_env}/` et le met en cache. |
+
+Le cache est invalidé si la taille ou `mtime_ns` du fichier change.
+
+### Exemples
+
+```python
+from core.database.db import fetch_all
+
+contacts = fetch_all("SELECT * FROM Contact ORDER BY Nom")
+```
+
+```python
+from core.database.transaction import transaction
+from core.database.db import execute, insert
+
+with transaction() as tx:
+    contact_id = insert(
+        "INSERT INTO Contact (Nom) VALUES (?)",
+        ["Dupont"],
+        tx=tx,
+    )
+    execute(
+        "INSERT INTO Log (Message) VALUES (?)",
+        [f"Contact {contact_id} créé"],
+        tx=tx,
+    )
+```
+
+```python
+from core.database.sql_loader import charger_queries
+
+queries = charger_queries("contacts.sql")
+rows = fetch_all(queries["select_all"])
+```
+
+En production, l'utilisateur applicatif MariaDB doit rester limité aux droits runtime (`SELECT`, `INSERT`, `UPDATE`, `DELETE`). Les droits de migration (`CREATE`, `ALTER`, `DROP`, `INDEX`, `REFERENCES`) doivent être réservés à un utilisateur d'administration ou de migration.
+
+</details>
+
+<details markdown="1" id="coreuploads">
+<summary><code>core.uploads</code> - Uploads et stockage</summary>
+
+### Gestionnaire
+
+| API | Description |
+|---|---|
+| `SavedUpload` | Résultat d'un upload sauvegardé. |
+| `upload_root()` | Racine des fichiers uploadés. |
+| `save_upload(file, category="documents")` | Valide puis sauvegarde un fichier. |
+| `delete_upload(path_or_saved_upload)` | Supprime un fichier. |
+| `get_upload_path(relative_path)` | Résout un chemin d'upload. |
+
+### Stockage
+
+| API | Description |
+|---|---|
+| `ensure_upload_dirs()` | Crée les dossiers nécessaires. |
+| `safe_category(category)` | Nettoie un nom de catégorie. |
+| `secure_filename(filename)` | Nettoie un nom de fichier. |
+| `generate_unique_filename(filename)` | Génère un nom unique. |
+| `category_dir(category)` | Retourne le dossier de catégorie. |
+| `save_bytes(data, filename, category)` | Sauvegarde des octets. |
+| `delete_file(relative_path)` | Supprime un fichier. |
+
+### Validation et exceptions
+
+| API | Description |
+|---|---|
+| `validate_upload_metadata(filename, size, content_type)` | Valide nom, taille, extension et MIME. |
+| `UploadError` | Exception de base. |
+| `UploadTooLargeError` | Fichier trop volumineux. |
+| `UploadInvalidExtensionError` | Extension refusée. |
+| `UploadInvalidMimeTypeError` | MIME refusé. |
+| `UploadStorageError` | Erreur d'écriture ou suppression. |
+
+### Exemple
+
+```python
+from core.uploads.manager import save_upload
+
+def upload_avatar(request):
+    file = request.files.get("avatar")
+    if not file:
+        return self.bad_request()
+
+    saved = save_upload(file, category="avatars")
+    return self.json({
+        "filename": saved.filename,
+        "path": saved.relative_path,
+        "size": saved.size,
+    })
+```
+
+</details>
+
+<details markdown="1" id="corevalidation">
+<summary><code>core.validation</code> - Décorateurs V1 des entités</summary>
+
+Ces décorateurs vivent dans `core/validation/decorators.py` et lèvent `ValidationError`, l'exception centrale de validation V1.
+
+### Décorateurs autorisés
+
+| Décorateur | Description |
+|---|---|
+| `typed(expected_type)` | Vérifie le type Python sans transformation implicite. `bool` est refusé pour `int`. |
+| `nullable` | Marque explicitement une propriété nullable. |
+| `not_empty` | Refuse les chaînes vides ou blanches. |
+| `min_length(size)` | Longueur minimale d'une chaîne. |
+| `max_length(size)` | Longueur maximale d'une chaîne. |
+| `min_value(limit)` | Valeur numérique minimale. |
+| `max_value(limit)` | Valeur numérique maximale. |
+| `pattern(regex)` | Expression régulière avec `fullmatch`. |
+
+### Exemple
+
+```python
+from core.validation.decorators import max_length, not_empty, typed
+
+class ContactBase:
+    @property
+    def nom(self):
+        return self._nom
+
+    @nom.setter
+    @typed(str)
+    @not_empty
+    @max_length(100)
+    def nom(self, value):
+        self._nom = value
+```
+
+Les fichiers générés `*_base.py` peuvent utiliser ces décorateurs. La classe métier manuelle reste le bon endroit pour ajouter du comportement applicatif.
+
+</details>
+
+<details markdown="1" id="forge-cli">
+<summary><code>forge</code> CLI - Commandes officielles</summary>
+
+L'interface officielle est la commande `forge`. La version stable actuelle est `1.0.1`.
+
+### Commandes
+
+| Commande | Rôle |
+|---|---|
+| `forge --version` | Affiche la version CLI. |
+| `forge new NomProjet [--ref REF]` | Crée un projet depuis `v1.0.1` par défaut. `--ref main` est explicite pour le développement. |
+| `forge make:entity NomEntite` | Crée le JSON canonique d'une entité. |
+| `forge make:crud NomEntite [--dry-run]` | Génère contrôleur, vues et routes CRUD. |
+| `forge make:relation` | Assistant de création de relation. |
+| `forge sync:entity NomEntite` | Régénère `*_base.py` et SQL depuis le JSON. |
+| `forge sync:relations` | Régénère `relations.sql` depuis `relations.json`. |
+| `forge sync:landing [--check]` | Synchronise ou vérifie la landing. |
+| `forge upload:init` | Prépare les dossiers d'uploads. |
+| `forge build:model` | Régénère les modèles. |
+| `forge check:model` | Vérifie la cohérence des modèles. |
+| `forge db:init` | Prépare l'environnement MariaDB. |
+| `forge db:apply` | Applique le SQL généré. |
+| `forge routes:list` | Liste les routes de l'application. |
+| `forge deploy:init` | Prépare les fichiers de déploiement. |
+| `forge deploy:check` | Vérifie la configuration de déploiement. |
+| `forge starter:list` | Liste les starter apps. |
+| `forge starter:build` | Reconstruit une starter app. |
+| `forge doctor` | Lance les diagnostics projet. |
+| `forge help` | Affiche l'aide. |
+
+### Exemples
 
 ```bash
-forge make:entity Contact           # mode interactif
-forge make:entity Contact --no-input  # squelette minimal, utile en CI
+forge --version
+forge new GestionVentes
+forge new ForgeDev --ref main
 ```
-
-### `forge make:crud <Entity> [--dry-run]`
-
-Génère contrôleur, modèle, formulaire et vues depuis l'entité JSON canonique. Les fichiers existants sont marqués `[PRÉSERVÉ]`. Affiche le bloc de routes à copier dans `mvc/routes.py`.
-
-Tags de sortie : `[CRÉÉ]` nouveau fichier, `[PRÉSERVÉ]` fichier existant non touché.
-
-### `forge sync:entity <Entity>`
-
-Régénère `<entity>.sql` et `<entity>_base.py`. Ne touche jamais les fichiers manuels (`<entity>.py`, `__init__.py`).
-
-### `forge build:model [--dry-run]`
-
-Régénère tout le modèle. Tags de sortie :
-
-| Tag | Signification |
-|-----|---------------|
-| `[ÉCRIT]` | Fichier généré ou régénéré |
-| `[CRÉÉ]` | Fichier manuel squelette créé car absent |
-| `[PRÉSERVÉ]` | Fichier manuel existant — non touché |
-
-### `forge db:init`
-
-Crée la base `DB_NAME`, l'utilisateur `DB_APP_LOGIN` et applique les privilèges. Utilise `DB_ADMIN_*`.
-
-En Forge 1.0.1, le compte `DB_APP_LOGIN` reste volontairement compatible avec `forge db:apply` dans un contexte pédagogique : il reçoit les droits de lecture/écriture et les droits de migration sur `DB_NAME.*`. En production, utilisez un compte de migration séparé et un compte applicatif runtime limité à `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
-
-### `forge db:apply`
-
-Applique les SQL générés avec `DB_APP_*`, dans l'ordre : entités puis relations.
-
-### `forge routes:list`
-
-Affiche méthode, chemin, nom, statut public/protégé, CSRF requis, marqueur API, handler Python.
-
-### `forge deploy:init`
-
-Génère `deploy/nginx/forge-app.conf`, `deploy/systemd/forge-app.service`, `deploy/README_DEPLOY.md`. Idempotent : `[PRÉSERVÉ]` si un fichier existe.
-
-### `forge deploy:check`
-
-Vérifie : Python ≥ 3.11, `.venv`, `env/prod`, variables `DB_APP_*`, `UPLOAD_ROOT`, `storage/`, modules `mariadb` et `jinja2`, fichiers `deploy/`. Quitte avec le code `1` si au moins une erreur bloquante.
-
-### `forge starter:list`
-
-| Niveau | Starter | Génération automatique |
-|---:|---|---|
-| 1 | Contacts | Disponible |
-| 2 | Utilisateurs / authentification | Disponible |
-| 3 | Carnet de contacts | Disponible |
-| 4 | Suivi comportement élèves | À venir |
-
-### `forge starter:build <identifiant>`
-
-Construit un starter depuis un projet Forge vierge ou préparé.
-
-| Option | Effet |
-|--------|-------|
-| `--dry-run` | Prévisualise sans écrire |
-| `--init-db` | Lance `forge db:init` avant la construction |
-| `--force` | Nettoie et reconstruit (prudence) |
-| `--public` | Routes publiques de test (starter 1 uniquement) |
-
-Identifiants équivalents : `1`, `contacts`, `contact-simple` — `2`, `auth`, `utilisateurs`, `utilisateurs-auth` — `3`, `carnet`, `carnet-contacts`.
-
-### `forge doctor`
-
-Diagnostique l'environnement et produit un rapport lisible.
-
-| Statut | Signification |
-|--------|---------------|
-| `OK`   | Check passé |
-| `WARN` | Anomalie non bloquante |
-| `FAIL` | Problème bloquant — à corriger |
-| `SKIP` | Check ignoré faute de contexte |
-
-| Check | FAIL si | WARN si | SKIP si |
-|-------|---------|---------|---------|
-| Python | < 3.11 | — | — |
-| Environnement | `env/example` absent ou clé requise manquante | `env/dev` absent | — |
-| Structure MVC | dossiers obligatoires absents | — | — |
-| Entités | modèle invalide | aucune entité | `mvc/entities/` absent |
-| Certificats SSL | — | fichiers absents | `config.py` non chargeable |
-| Node.js / npm | — | npm absent | — |
-| Base de données | — | driver absent ou connexion refusée | `env/dev` absent |
-
-**Code de sortie :** `0` si aucun `FAIL`, `1` sinon.
-
-### `forge help`
 
 ```bash
-forge help
-forge --help
-forge -h
+forge make:entity Contact
+forge sync:entity Contact
+forge make:crud Contact --dry-run
+forge make:crud Contact
 ```
+
+```bash
+forge check:model
+forge db:init
+forge db:apply
+forge routes:list
+```
+
+</details>
+
+<details markdown="1" id="forgeclieentities">
+<summary><code>forge_cli.entities</code> - Génération et validation des entités</summary>
+
+Cette partie suit la doctrine V1 décrite dans l'[architecture des entités](entity_architecture.md).
+
+### Doctrine générée
+
+| Source | Statut | Règle |
+|---|---|---|
+| `mvc/entities/<entite>/<entite>.json` | Canonique | Décrit l'entité, ses champs et contraintes. |
+| `mvc/entities/<entite>/<entite>_base.py` | Régénérable | Classe Python générée avec validation. |
+| `mvc/entities/<entite>/<entite>.sql` | Régénérable | SQL de table. |
+| `mvc/entities/<entite>/<entite>.py` | Manuel | Classe métier, jamais écrasée si elle existe. |
+| `mvc/entities/<entite>/__init__.py` | Manuel | Jamais régénéré s'il existe. |
+| `mvc/entities/relations.json` | Canonique | Relations globales. |
+| `mvc/entities/relations.sql` | Régénérable | Contraintes de clés étrangères. |
+
+### Validation importante
+
+| Sujet | Règle actuelle |
+|---|---|
+| Noms | `snake_case` pour dossiers, tables et champs Python. Colonnes SQL en `PascalCase`. |
+| Mots réservés SQL | Les noms comme `order`, `user`, `group` ou `select` sont refusés. |
+| Relations | V1 accepte les relations `many_to_one`. |
+| Clés primaires | V1 limite les entités à une clé primaire simple. |
+| Types SQL de FK | Les types SQL normalisés doivent être compatibles. `INT` vers `BIGINT` ou `INT UNSIGNED` est refusé. |
+| Génération | Un JSON invalide bloque la génération. |
+
+### Exemple JSON entité
+
+```json
+{
+  "entity": "Contact",
+  "table": "contact",
+  "primary_key": {
+    "name": "contact_id",
+    "sql": "ContactId",
+    "python_type": "int",
+    "sql_type": "INT",
+    "auto_increment": true
+  },
+  "fields": [
+    {
+      "name": "prenom",
+      "sql": "Prenom",
+      "python_type": "str",
+      "sql_type": "VARCHAR(100)",
+      "nullable": false,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 100
+      }
+    }
+  ]
+}
+```
+
+### Exemple relation
+
+```json
+{
+  "relations": [
+    {
+      "name": "contact_ville",
+      "type": "many_to_one",
+      "from_entity": "contact",
+      "from_field": "ville_id",
+      "to_entity": "ville",
+      "to_field": "ville_id",
+      "on_delete": "RESTRICT",
+      "on_update": "CASCADE"
+    }
+  ]
+}
+```
+
+### Exemples de cycle complet
+
+```bash
+forge make:entity Ville
+forge make:entity Contact
+forge sync:entity Ville
+forge sync:entity Contact
+forge make:relation
+forge sync:relations
+forge check:model
+```
+
+```bash
+forge db:apply
+forge make:crud Contact
+```
+
+La génération CRUD applique la correction de robustesse sur les identifiants invalides : un `id` de route non entier est traité comme une ressource introuvable.
+
+</details>
