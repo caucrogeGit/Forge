@@ -16,20 +16,9 @@ rm -rf dist build *.egg-info
 PYENV_VERSION=3.14.4 python -m build
 ```
 
-Si `python -m build` échoue avec :
-
-```
-pyenv: python: command not found
-The `python' command exists in these Python versions: 3.14.4
-```
-
-Deux options :
+Le préfixe `PYENV_VERSION=3.14.4` est nécessaire si `python` n'est pas défini dans la version active de pyenv. Alternative permanente pour le dossier :
 
 ```bash
-# Option A — variable d'environnement ponctuelle
-PYENV_VERSION=3.14.4 python -m build
-
-# Option B — version locale permanente dans le dossier
 pyenv local 3.14.4
 python -m build
 ```
@@ -37,6 +26,14 @@ python -m build
 ---
 
 ## 2. Installer avec pipx
+
+Vérifier le nom exact de la wheel générée :
+
+```bash
+ls dist/
+```
+
+Puis installer :
 
 ```bash
 pipx install dist/forge_mvc-1.0.1-py3-none-any.whl --force
@@ -91,6 +88,7 @@ forge starter:list
 ```bash
 cd ~/Projets/TestForge101
 forge starter:build 1 --force --dry-run
+forge starter:build 2 --force --dry-run
 forge starter:build 3 --force --dry-run
 forge starter:build 4 --force --dry-run
 ```
@@ -129,6 +127,9 @@ DB_APP_USER=utilisateur_applicatif
 DB_APP_PWD=mot_de_passe_applicatif
 ```
 
+!!! note "Erreur db:apply sans db:init"
+    Le message `Connexion MariaDB applicative impossible. Lancez d'abord forge db:init` est **normal** si `db:init` n'a pas été exécuté. Ce n'est pas un bug du starter.
+
 ### Starter 1 — Contacts
 
 ```bash
@@ -140,7 +141,14 @@ source .venv/bin/activate
 forge doctor
 forge db:init
 forge starter:build 1 --force
+python app.py
 ```
+
+Dans le navigateur, à l'URL affichée par Forge :
+
+- vérifier `/contacts` (liste vide attendue) ;
+- créer un contact via `/contacts/new` ;
+- vérifier que la fiche apparaît dans la liste.
 
 ### Starter 2 — Utilisateurs / authentification
 
@@ -188,11 +196,29 @@ cd ~/Projets
 forge new TestStarter3
 cd TestStarter3
 source .venv/bin/activate
-# éditer env/dev
+# éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
 forge doctor
 forge db:init
 forge starter:build 3 --force
 ```
+
+Optionnellement, injecter des villes de référence :
+
+```bash
+python scripts/seed_villes.py
+```
+
+Lancer l'application :
+
+```bash
+python app.py
+```
+
+Dans le navigateur, à l'URL affichée par Forge :
+
+- vérifier `/contacts` (liste) ;
+- vérifier `/villes` (liste, peuplée si seed lancé) ;
+- créer un contact et lui associer une ville.
 
 ### Starter 4 — Suivi pédagogique
 
@@ -201,34 +227,78 @@ cd ~/Projets
 forge new TestStarter4
 cd TestStarter4
 source .venv/bin/activate
-# éditer env/dev
+# éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
 forge doctor
 forge db:init
 forge starter:build 4 --force
 ```
 
-!!! note "Erreur db:apply sans db:init"
-    Le message `Connexion MariaDB applicative impossible. Lancez d'abord forge db:init` est **normal** si `db:init` n'a pas été exécuté. Ce n'est pas un bug du starter.
+Créer l'utilisateur de test et injecter les données de démonstration :
+
+```bash
+python scripts/create_auth_user.py
+python scripts/seed_suivi.py
+```
+
+`create_auth_user.py` crée `admin` / `secret123` (identiques au starter 2).
+
+Lancer l'application :
+
+```bash
+python app.py
+```
+
+Dans le navigateur, à l'URL affichée par Forge :
+
+- se connecter sur `/login` avec `admin` / `secret123` ;
+- vérifier le tableau de bord `/suivi` ;
+- vérifier la liste des élèves `/eleves` ;
+- vérifier la liste des cours `/cours`.
 
 ---
 
-## 6. Tests de packaging automatiques
+## 6. Tests automatiques et documentation
 
 ```bash
 cd /chemin/vers/Forge
-pytest tests/test_packaging.py -v
+
+# Tests de packaging (sans MariaDB)
+PYENV_VERSION=3.14.4 python -m pytest tests/test_packaging.py -v
+
+# Vérification des ancres et liens de documentation
+PYENV_VERSION=3.14.4 python -m mkdocs build --strict
 ```
 
-Ces tests vérifient sans MariaDB :
+Les tests de packaging vérifient :
 
 - que `pyproject.toml` utilise bien `find_packages` avec les bons patterns ;
 - que tous les sous-packages `core`, `forge_cli` et `integrations` sont couverts ;
 - que les fichiers représentatifs de chaque starter existent sur disque ;
 - que le glob `starters/data/**/*` couvre tous les types (`.py`, `.json`, `.html`, `.snippet`).
 
+Le build MkDocs `--strict` détecte les ancres cassées et les liens internes invalides.
+
 ---
 
-## 7. Limites connues
+## 7. Récapitulatif — validation réussie
+
+| Étape | Résultat attendu |
+|---|---|
+| `python -m build` | wheel créée dans `dist/` |
+| `forge --version` | `Forge 1.0.1` |
+| `forge starter:list` | 4 starters affichés |
+| `forge starter:build N --dry-run` | plan affiché sans erreur (×4) |
+| `forge db:init` + `starter:build 1` | CRUD contacts fonctionnel |
+| `forge db:init` + `starter:build 2` | login `admin` / `secret123` → `/dashboard` |
+| `forge db:init` + `starter:build 3` | contacts + villes, seed optionnel |
+| `forge db:init` + `starter:build 4` | auth + suivi + seed |
+| `pytest tests/test_packaging.py` | 14/14 passants |
+| `mkdocs build --strict` | 0 avertissement d'ancre |
+
+---
+
+## 8. Limites connues
 
 - Les tests `test_packaging.py` ne valident pas le contenu des fichiers, uniquement leur présence.
 - `--dry-run` ne valide pas la connexion MariaDB ni l'exécution de `db:apply`.
+- `seed_suivi.py` requiert que les entités du starter 4 aient été créées (`db:apply` passé).
