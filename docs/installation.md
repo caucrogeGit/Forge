@@ -7,6 +7,7 @@ chemin le plus simple pour votre usage, puis passez au [guide de démarrage](gui
 
 | Usage | Méthode |
 |---|---|
+| Préparer une machine complète | [Installation sur une VM Debian vierge](installation-vm-debian.md) |
 | Utiliser Forge comme outil installé | [Installation avec pipx](installation-pipx.md) |
 | Créer un projet depuis une version stable | [Installation depuis GitHub](installation-github.md) |
 | Contribuer au framework Forge | [Mode développement](installation-developpement.md) |

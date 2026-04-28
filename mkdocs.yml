@@ -29,10 +29,13 @@ nav:
   - Accueil: index.html
   - Installation:
       - Vue d'ensemble: installation.md
-      - Avec pipx: installation-pipx.md
-      - Depuis GitHub: installation-github.md
-      - Mode développement: installation-developpement.md
-      - Préparer MariaDB: installation-mariadb.md
+      - Installer Forge:
+          - VM Debian vierge: installation-vm-debian.md
+          - Avec pipx: installation-pipx.md
+          - Depuis GitHub: installation-github.md
+      - Environnement:
+          - Préparer MariaDB: installation-mariadb.md
+          - Mode développement: installation-developpement.md
   - Premiers pas:
       - Guide de démarrage: guide.md
       - CRUD explicite: crud.md
