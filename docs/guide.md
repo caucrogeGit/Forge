@@ -113,7 +113,7 @@ forge doctor
     Si `forge new` n'est pas disponible ou pour un usage avancé :
 
     ```bash
-    git clone --branch main --depth=1 https://github.com/caucrogeGit/Forge.git MonProjet
+    git clone --branch v1.0.1 --depth=1 https://github.com/caucrogeGit/Forge.git MonProjet
     cd MonProjet
     rm -rf .git && git init && git add -A && git commit -m "init: MonProjet"
     python3 -m venv .venv
@@ -159,7 +159,9 @@ SSL_KEYFILE=key.pem
 
 !!! warning "Ne pas confondre les deux comptes MariaDB"
     `DB_ADMIN_LOGIN` est utilisé uniquement par `forge db:init` pour créer la base et l'utilisateur applicatif.
-    `DB_APP_LOGIN` est utilisé ensuite par l'application en fonctionnement normal.
+    `DB_APP_LOGIN` est utilisé ensuite par l'application en fonctionnement normal et par `forge db:apply` dans le flux pédagogique V1.
+
+    En production, utilisez idéalement un compte de migration séparé pour appliquer le schéma, puis un compte applicatif limité à `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
 
 ### 3. Générer les certificats HTTPS locaux
 
@@ -178,7 +180,7 @@ openssl req -x509 -newkey rsa:2048 \
 forge db:init
 ```
 
-Cette commande crée la base `DB_NAME`, crée l'utilisateur `DB_APP_LOGIN` avec les droits limités nécessaires et vérifie la configuration.
+Cette commande crée la base `DB_NAME`, crée l'utilisateur `DB_APP_LOGIN` et applique les droits nécessaires au flux Forge V1, y compris `forge db:apply` en développement.
 
 !!! success "Avant de continuer"
     Vérifier que MariaDB est démarré, que `env/dev` est configuré avec `DB_ADMIN_LOGIN`, `DB_ADMIN_PWD`, `DB_APP_LOGIN`, `DB_APP_PWD` et `DB_NAME`.

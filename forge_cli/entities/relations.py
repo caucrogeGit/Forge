@@ -87,6 +87,15 @@ def _is_pascal_case(value: str) -> bool:
     return bool(re.fullmatch(r"[A-Z][A-Za-z0-9]*", value))
 
 
+def _normalize_sql_type_for_fk(sql_type: str) -> str:
+    normalized = sql_type.strip().upper()
+    normalized = re.sub(r"\s+", " ", normalized)
+    normalized = re.sub(r"\s*\(\s*", "(", normalized)
+    normalized = re.sub(r"\s*,\s*", ",", normalized)
+    normalized = re.sub(r"\s*\)", ")", normalized)
+    return normalized
+
+
 def load_entity_definitions(entities_root: Path) -> dict[str, dict[str, Any]]:
     entity_map: dict[str, dict[str, Any]] = {}
     for json_path in sorted(entities_root.glob("*/*.json")):
@@ -265,6 +274,13 @@ def _validate_relation_item(
 
     if from_field.python_type != to_field.python_type:
         _add_issue(issues, path, "from_field et to_field doivent avoir des types Python compatibles")
+
+    if _normalize_sql_type_for_fk(from_field.sql_type) != _normalize_sql_type_for_fk(to_field.sql_type):
+        _add_issue(
+            issues,
+            path,
+            "from_field et to_field doivent avoir des types SQL identiques pour une cle etrangere MariaDB",
+        )
 
     if on_delete == "SET NULL" and not from_field.nullable:
         _add_issue(issues, f"{path}.on_delete", "SET NULL requiert un from_field nullable")

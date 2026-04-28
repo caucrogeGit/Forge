@@ -169,8 +169,8 @@ def test_openssl_echec_nettoie_dossier(monkeypatch, tmp_path):
 
 # ── Branche de clonage (fix main) ──────────────────────────────────────────
 
-def test_clone_utilise_main_par_defaut(monkeypatch, tmp_path):
-    """Sans --ref, le clone doit cibler _FORGE_DEFAULT_BRANCH, pas _FORGE_VERSION."""
+def test_clone_utilise_ref_stable_par_defaut(monkeypatch, tmp_path):
+    """Sans --ref, le clone doit utiliser la référence stable par défaut."""
     cloned_with = {}
 
     def spy_clone(dest, ref=None):
@@ -190,7 +190,7 @@ def test_clone_utilise_main_par_defaut(monkeypatch, tmp_path):
 
 
 def test_clone_skeleton_utilise_default_branch_si_ref_none(monkeypatch):
-    """_clone_skeleton sans ref doit passer main à git clone."""
+    """_clone_skeleton sans ref doit passer le tag stable à git clone."""
     git_args = {}
 
     def spy_run(args, **kwargs):
@@ -201,8 +201,8 @@ def test_clone_skeleton_utilise_default_branch_si_ref_none(monkeypatch):
     monkeypatch.setattr(forge, "_run", spy_run)
     forge._clone_skeleton("/tmp/fake_dest")
 
-    assert forge._FORGE_DEFAULT_BRANCH == "main"
-    assert git_args.get("branch") == forge._FORGE_DEFAULT_BRANCH
+    assert forge._FORGE_DEFAULT_REF == "v1.0.1"
+    assert git_args.get("branch") == forge._FORGE_DEFAULT_REF
 
 
 def test_clone_skeleton_accepte_ref_explicite(monkeypatch):
@@ -236,6 +236,14 @@ def test_dispatch_ref_transmis_a_cmd_new(monkeypatch, tmp_path, capsys):
     assert not (tmp_path / "MonProjet").exists(), (
         "Le dossier projet doit être supprimé après échec"
     )
+
+
+def test_version_cli_affiche_version_stable(monkeypatch, capsys):
+    monkeypatch.setattr(sys, "argv", ["forge", "--version"])
+
+    forge.main()
+
+    assert capsys.readouterr().out.strip() == "Forge 1.0.1"
 
 
 def test_openssl_ignoree_si_certs_existent(monkeypatch, tmp_path):

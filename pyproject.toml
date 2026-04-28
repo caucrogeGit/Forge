@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc"
-version = "1.0.0"
+version = "1.0.1"
 description = "CLI d'initialisation de projets Forge"
 authors = [
     { name = "Roger Cauchon" },

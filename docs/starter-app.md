@@ -65,7 +65,7 @@ Les alias `4`, `suivi` et `suivi-comportement-eleves` ciblent le starter Suivi p
 ## Préparer Un Projet
 
 ```bash
-git clone --branch main --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
+git clone --branch v1.0.1 --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
 cd NomDuProjet
 python3 -m venv .venv
 source .venv/bin/activate

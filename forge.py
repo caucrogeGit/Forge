@@ -3,6 +3,7 @@
 forge.py — CLI officielle de Forge
 
 Usage :
+    forge --version
     forge new NomProjet
     forge make:entity NomEntite
     forge make:crud NomEntite [--dry-run]
@@ -53,8 +54,8 @@ from forge_cli.starters import main as starters_main  # noqa: E402 (package repl
 
 
 _FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"
-_FORGE_VERSION = "main"
-_FORGE_DEFAULT_BRANCH = "main"
+_FORGE_VERSION = "1.0.1"
+_FORGE_DEFAULT_REF = "v1.0.1"
 
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────
@@ -113,7 +114,7 @@ def _safe_remove_git(dest: str) -> None:
 
 def _clone_skeleton(dest: str, ref: str | None = None) -> None:
     _print_step("Clonage du squelette Forge...")
-    branch = ref or _FORGE_DEFAULT_BRANCH
+    branch = ref or _FORGE_DEFAULT_REF
     result = _run(
         ["git", "clone", "--branch", branch, "--depth=1", "--quiet", _FORGE_REPO, dest],
         capture=True,
@@ -298,6 +299,10 @@ def cmd_help() -> None:
     print(__doc__)
 
 
+def cmd_version() -> None:
+    print(f"Forge {_FORGE_VERSION}")
+
+
 def cmd_doctor() -> None:
     from forge_cli.doctor import has_failures, print_report, run_all
     results = run_all(Path.cwd(), _FORGE_VERSION)
@@ -362,6 +367,10 @@ def cmd_routes_list() -> None:
 
 def main() -> None:
     args = sys.argv[1:]
+
+    if args and args[0] == "--version":
+        cmd_version()
+        return
 
     if not args or args[0] in ("help", "--help", "-h"):
         cmd_help()

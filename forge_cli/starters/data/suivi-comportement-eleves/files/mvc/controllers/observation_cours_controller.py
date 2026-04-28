@@ -24,6 +24,13 @@ def _parse_body(body: dict) -> dict:
     return data
 
 
+def _parse_id(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _csrf_ok(request) -> bool:
     session_id = get_session_id(request)
     session = get_session(session_id)
@@ -63,7 +70,9 @@ class ObservationCoursController(BaseController):
 
     @staticmethod
     def show(request):
-        obs_id = int(request.route_params["id"])
+        obs_id = _parse_id(request.route_params.get("id"))
+        if obs_id is None:
+            return BaseController.not_found()
         obs = get_observation_by_id(obs_id)
         if obs is None:
             return BaseController.not_found()
@@ -75,7 +84,9 @@ class ObservationCoursController(BaseController):
 
     @staticmethod
     def edit(request):
-        obs_id = int(request.route_params["id"])
+        obs_id = _parse_id(request.route_params.get("id"))
+        if obs_id is None:
+            return BaseController.not_found()
         obs = get_observation_by_id(obs_id)
         if obs is None:
             return BaseController.not_found()
@@ -93,7 +104,9 @@ class ObservationCoursController(BaseController):
 
     @staticmethod
     def update(request):
-        obs_id = int(request.route_params["id"])
+        obs_id = _parse_id(request.route_params.get("id"))
+        if obs_id is None:
+            return BaseController.not_found()
         if get_observation_by_id(obs_id) is None:
             return BaseController.not_found()
         if not _csrf_ok(request):

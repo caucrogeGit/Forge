@@ -395,6 +395,11 @@ def test_decimal_devient_decimalfield(tmp_path):
     assert "DecimalField" in code
 
 
+def test_decimal_field_signale_decimal_vs_float(tmp_path):
+    _, warnings = build_form(_PRODUIT_JSON)
+    assert any("cleaned_data retourne Decimal" in warning for warning in warnings)
+
+
 def test_text_reste_stringfield(tmp_path):
     code, _ = build_form(_PRODUIT_JSON)
     # TEXT → StringField (avec textarea dans le template)
@@ -465,6 +470,20 @@ def test_redirect_with_flash_apres_create(tmp_path):
 def test_not_found_si_id_absent(tmp_path):
     code = build_controller(_CONTACT_JSON)
     assert "not_found()" in code
+
+
+def test_controller_parse_id_invalides(tmp_path):
+    code = build_controller(_CONTACT_JSON)
+    assert "def _parse_id(value):" in code
+    assert "except (TypeError, ValueError):" in code
+    assert 'request.route_params.get("id")' in code
+    assert 'int(request.route_params["id"])' not in code
+
+
+def test_controller_verifie_id_invalide_avant_model(tmp_path):
+    code = build_controller(_CONTACT_JSON)
+    assert "if id is None:" in code
+    assert "return BaseController.not_found()" in code
 
 
 # ── Entité PK-only (aucun champ métier) ───────────────────────────────────────

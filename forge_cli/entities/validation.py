@@ -33,6 +33,30 @@ ALLOWED_CONSTRAINT_KEYS = {
 INTEGER_SQL_PREFIXES = ("INT", "BIGINT", "SMALLINT", "TINYINT", "MEDIUMINT")
 FLOAT_SQL_PREFIXES = ("FLOAT", "DOUBLE", "REAL", "DECIMAL", "NUMERIC")
 STRING_SQL_PREFIXES = ("CHAR", "VARCHAR", "TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT")
+SQL_RESERVED_WORDS = {
+    "add",
+    "alter",
+    "and",
+    "by",
+    "create",
+    "delete",
+    "drop",
+    "from",
+    "group",
+    "index",
+    "insert",
+    "into",
+    "join",
+    "key",
+    "order",
+    "primary",
+    "references",
+    "select",
+    "table",
+    "update",
+    "user",
+    "where",
+}
 
 
 @dataclass
@@ -75,6 +99,10 @@ def _is_snake_case(value: str) -> bool:
 
 def _is_sql_identifier(value: str) -> bool:
     return bool(re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", value))
+
+
+def _is_sql_reserved_word(value: str) -> bool:
+    return value.lower() in SQL_RESERVED_WORDS
 
 
 def _normalize_sql_type(sql_type: str) -> str:
@@ -307,10 +335,14 @@ def _validate_entity_local_consistency(data: dict[str, Any], issues: list[Entity
     entity = data.get("entity")
     if isinstance(entity, str) and not _is_pascal_case(entity):
         _add_issue(issues, "entity", "doit etre un nom PascalCase valide")
+    elif isinstance(entity, str) and _is_sql_reserved_word(entity):
+        _add_issue(issues, "entity", "ne doit pas etre un mot reserve SQL/MariaDB")
 
     table = data.get("table")
     if isinstance(table, str) and not _is_snake_case(table):
         _add_issue(issues, "table", "doit etre un nom snake_case valide")
+    elif isinstance(table, str) and _is_sql_reserved_word(table):
+        _add_issue(issues, "table", "ne doit pas etre un mot reserve SQL/MariaDB")
 
     fields = data.get("fields")
     if not isinstance(fields, list):
@@ -374,6 +406,8 @@ def _validate_field_consistency(field: dict[str, Any], index: int, issues: list[
     if isinstance(column, str):
         if not _is_sql_identifier(column):
             _add_issue(issues, f"{path}.column", "doit etre un identifiant SQL valide")
+        elif _is_sql_reserved_word(column):
+            _add_issue(issues, f"{path}.column", "ne doit pas etre un mot reserve SQL/MariaDB")
 
     if isinstance(python_type, str) and python_type not in ALLOWED_PYTHON_TYPES:
         _add_issue(

@@ -101,7 +101,15 @@ def _form_field_code(f: dict) -> tuple[str, str | None]:
 
     if python_type == "float":
         args = [f'label="{label}"', req_arg]
-        return f'DecimalField({", ".join(args)})', None
+        if "min_value" in constraints:
+            args.append(f'min_value={constraints["min_value"]}')
+        if "max_value" in constraints:
+            args.append(f'max_value={constraints["max_value"]}')
+        warn = (
+            f'{f["name"]} : {f["sql_type"]} → DecimalField'
+            " (cleaned_data retourne Decimal ; convertissez en float si votre entité métier l'exige)"
+        )
+        return f'DecimalField({", ".join(args)})', warn
 
     if python_type in ("date", "datetime"):
         args = [f'label="{label}"', req_arg]
@@ -306,6 +314,15 @@ def build_controller(definition: dict) -> str:
     lines.append("")
     lines.append("")
     lines.append(f"class {entity}Controller(BaseController):")
+    lines += [
+        "",
+        "    @staticmethod",
+        "    def _parse_id(value):",
+        "        try:",
+        "            return int(value)",
+        "        except (TypeError, ValueError):",
+        "            return None",
+    ]
 
     # index
     lines += [
@@ -348,7 +365,9 @@ def build_controller(definition: dict) -> str:
         "",
         "    @staticmethod",
         "    def show(request):",
-        f'        {pk_name} = int(request.route_params["id"])',
+        f'        {pk_name} = {entity}Controller._parse_id(request.route_params.get("id"))',
+        f"        if {pk_name} is None:",
+        "            return BaseController.not_found()",
         f'        {snake} = get_{snake}_by_id({pk_name})',
         f'        if {snake} is None:',
         "            return BaseController.not_found()",
@@ -362,7 +381,9 @@ def build_controller(definition: dict) -> str:
         "",
         "    @staticmethod",
         "    def edit(request):",
-        f'        {pk_name} = int(request.route_params["id"])',
+        f'        {pk_name} = {entity}Controller._parse_id(request.route_params.get("id"))',
+        f"        if {pk_name} is None:",
+        "            return BaseController.not_found()",
         f'        {snake} = get_{snake}_by_id({pk_name})',
         f'        if {snake} is None:',
         "            return BaseController.not_found()",
@@ -380,7 +401,9 @@ def build_controller(definition: dict) -> str:
         "",
         "    @staticmethod",
         "    def update(request):",
-        f'        {pk_name} = int(request.route_params["id"])',
+        f'        {pk_name} = {entity}Controller._parse_id(request.route_params.get("id"))',
+        f"        if {pk_name} is None:",
+        "            return BaseController.not_found()",
         f'        form = {entity}Form.from_request(request)',
         "        if not form.is_valid():",
         f'            return BaseController.validation_error("{snake}/form.html",',
@@ -400,7 +423,9 @@ def build_controller(definition: dict) -> str:
         "",
         "    @staticmethod",
         "    def destroy(request):",
-        f'        {pk_name} = int(request.route_params["id"])',
+        f'        {pk_name} = {entity}Controller._parse_id(request.route_params.get("id"))',
+        f"        if {pk_name} is None:",
+        "            return BaseController.not_found()",
         f'        delete_{snake}({pk_name})',
         f'        return BaseController.redirect_with_flash(request, "/{plural}", "{entity} supprimé.")',
         "",

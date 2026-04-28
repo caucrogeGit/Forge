@@ -2,7 +2,10 @@ import secrets
 import threading
 import time
 
-# Stockage en mémoire : session_id → données
+# Stockage en mémoire : session_id → données.
+# Adapté au développement, à la pédagogie et aux petites applications
+# mono-processus. Limites assumées en V1 : sessions perdues au redémarrage,
+# pas de partage entre workers, pas de scaling horizontal.
 # RLock (reentrant) : une même thread peut acquérir le verrou plusieurs fois
 # sans se bloquer elle-même (creer_session appelle _nettoyer_sessions).
 _sessions: dict = {}
