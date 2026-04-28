@@ -1,14 +1,12 @@
 # Forge - Référence API et CLI
 
-[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
+[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Cette page décrit l'API publique actuelle de Forge `1.0.1`. Elle est organisée comme un index interactif : cliquez sur un élément pour afficher les détails, les signatures et les exemples.
 
 Pour les flux guidés, voir aussi le [guide de démarrage](guide.md), le [CRUD explicite](crud.md) et l'[architecture des entités](entity_architecture.md).
 
 ## Schéma complet
-
-[Ouvrir le schéma en grand](reference-schema.md){ .md-button .md-button--primary target="_blank" rel="noopener" }
 
 <details>
 <summary>Voir le schéma complet</summary>

@@ -1,6 +1,6 @@
 # Installation
 
-[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
+[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Forge peut s'installer de plusieurs façons selon votre contexte. Choisissez le
 chemin le plus simple pour votre usage, puis passez au [guide de démarrage](guide.md).

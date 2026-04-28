@@ -1,6 +1,6 @@
 # Concepts Forge
 
-[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
+[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Glossaire des termes utilisés dans le guide, l'architecture des entités et les starter apps.
 

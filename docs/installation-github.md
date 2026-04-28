@@ -1,6 +1,6 @@
 # Installation depuis GitHub
 
-[Accueil](index.html){ .md-button } <button class="md-button" onclick="window.history.back()">← Retour</button>
+[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Cette méthode est utile si vous voulez créer un projet directement depuis la
 référence stable du dépôt.
