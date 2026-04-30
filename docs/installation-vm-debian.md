@@ -30,7 +30,22 @@ sudo apt install -y \
   openssl
 ```
 
-## 3. Activer pipx dans le PATH
+## 3. Node.js / npm — optionnel
+
+`forge new` utilise npm automatiquement s'il est présent pour installer les dépendances front et compiler le CSS Tailwind. S'il est absent, le projet est créé normalement et un avertissement est affiché — vous pourrez relancer `npm install && npm run build:css` plus tard.
+
+```bash
+sudo apt install -y nodejs npm
+```
+
+Vérifier :
+
+```bash
+node --version
+npm --version
+```
+
+## 4. Activer pipx dans le PATH
 
 ```bash
 pipx ensurepath
@@ -46,18 +61,19 @@ pipx --version
 mariadb --version
 mariadb_config --version
 openssl version
+node --version   # optionnel
 ```
 
-Si une commande échoue, la machine n'est pas encore prête.
+Si une commande obligatoire échoue, la machine n'est pas encore prête.
 
-## 4. Démarrer MariaDB
+## 5. Démarrer MariaDB
 
 ```bash
 sudo systemctl enable --now mariadb
 sudo systemctl status mariadb
 ```
 
-## 5. Vérifier l'accès administrateur MariaDB
+## 6. Vérifier l'accès administrateur MariaDB
 
 Sur certaines installations Debian, le compte `root` MariaDB peut être configuré avec l'authentification système `unix_socket`. Dans ce cas, `mariadb -u root -p` peut échouer alors que `sudo mariadb` fonctionne.
 
@@ -74,7 +90,7 @@ Entrer le mot de passe `root` MariaDB lorsqu'il est demandé. Une invite `MariaD
 
     Pour un environnement plus sécurisé, créer un compte dédié, par exemple `forge_admin`, et l'utiliser dans `DB_ADMIN_LOGIN` / `DB_ADMIN_PWD`.
 
-## 6. Installer Forge avec pipx
+## 7. Installer Forge avec pipx
 
 ```bash
 pipx install forge-mvc

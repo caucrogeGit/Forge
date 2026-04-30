@@ -16,94 +16,95 @@ Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir
 
 ## Créer votre premier projet
 
-### 1. Créer le projet
+Deux méthodes selon votre situation.
+
+### Cas A — Via `forge new` (recommandé)
 
 ```bash
 forge new MonProjet
 cd MonProjet
 source .venv/bin/activate
+```
+
+`forge new` fait tout automatiquement : clonage du squelette, environnement virtuel Python, installation des dépendances, compilation CSS (si npm est présent) et génération des certificats SSL. Un dépôt Git propre est initialisé.
+
+Il reste deux choses manuelles : **renseigner les mots de passe MariaDB** dans `env/dev`, puis lancer `forge db:init`.
+
+### Cas B — Installation manuelle (usage avancé)
+
+```bash
+git clone --branch v1.0.1 --depth=1 https://github.com/caucrogeGit/Forge.git MonProjet
+cd MonProjet
+rm -rf .git && git init && git add -A && git commit -m "init: MonProjet"
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+cp env/example env/dev
+openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=localhost"
+```
+
+---
+
+### 1. Vérifier l'environnement
+
+```bash
 forge doctor
 ```
 
-`forge new` clone le dépôt Forge, initialise un nouveau dépôt Git propre, crée l'environnement virtuel Python et installe les dépendances.
+### 2. Configurer `env/dev`
 
-!!! tip "Installation manuelle"
-    Si `forge new` n'est pas disponible ou pour un usage avancé :
-
-    ```bash
-    git clone --branch v1.0.1 --depth=1 https://github.com/caucrogeGit/Forge.git MonProjet
-    cd MonProjet
-    rm -rf .git && git init && git add -A && git commit -m "init: MonProjet"
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    pip install -e .
-    forge doctor
-    ```
-
-### 2. Configurer l'environnement
-
-```bash
-cp env/example env/dev
-```
-
-Éditer `env/dev` avec les paramètres du projet :
+`forge new` crée `env/dev` depuis `env/example` avec `APP_NAME` et `DB_NAME` déjà renseignés. Il reste à renseigner les mots de passe MariaDB :
 
 ```env
-APP_NAME=MonProjet
-APP_ROUTES_MODULE=mvc.routes
-
-DB_ADMIN_HOST=localhost
-DB_ADMIN_PORT=3306
+# Compte admin MariaDB — utilisé uniquement par forge db:init
 DB_ADMIN_LOGIN=root
 DB_ADMIN_PWD=<mot_de_passe_root_mariadb>
 
-DB_NAME=mon_projet
-DB_CHARSET=utf8mb4
-DB_COLLATION=utf8mb4_unicode_ci
-
-DB_APP_HOST=localhost
-DB_APP_PORT=3306
+# Compte applicatif — utilisé par l'application et forge db:apply
 DB_APP_LOGIN=mon_projet_app
 DB_APP_PWD=<mot_de_passe_applicatif>
-DB_POOL_SIZE=5
-
-APP_HOST=127.0.0.1
-APP_PORT=8000
-
-SSL_CERTFILE=cert.pem
-SSL_KEYFILE=key.pem
 ```
+
+??? info "Toutes les clés de `env/dev`"
+
+    | Clé | Rôle | Valeur par défaut |
+    |---|---|---|
+    | `APP_NAME` | Nom de l'application (titre, logs) | défini par `forge new` |
+    | `APP_ROUTES_MODULE` | Module Python des routes | `mvc.routes` |
+    | `DB_ADMIN_HOST` | Hôte MariaDB admin | `localhost` |
+    | `DB_ADMIN_PORT` | Port MariaDB admin | `3306` |
+    | `DB_ADMIN_LOGIN` | Login administrateur MariaDB | `root` |
+    | `DB_ADMIN_PWD` | Mot de passe administrateur | **à renseigner** |
+    | `DB_NAME` | Nom de la base du projet | défini par `forge new` |
+    | `DB_CHARSET` | Jeu de caractères | `utf8mb4` |
+    | `DB_COLLATION` | Collation | `utf8mb4_unicode_ci` |
+    | `DB_APP_HOST` | Hôte MariaDB applicatif | `localhost` |
+    | `DB_APP_PORT` | Port MariaDB applicatif | `3306` |
+    | `DB_APP_LOGIN` | Login applicatif MariaDB | **à renseigner** |
+    | `DB_APP_PWD` | Mot de passe applicatif | **à renseigner** |
+    | `DB_POOL_SIZE` | Taille du pool de connexions | `5` |
+    | `APP_HOST` | Adresse d'écoute du serveur | `127.0.0.1` |
+    | `APP_PORT` | Port du serveur | `8000` |
+    | `SSL_CERTFILE` | Certificat SSL | `cert.pem` |
+    | `SSL_KEYFILE` | Clé SSL | `key.pem` |
 
 !!! warning "Ne pas confondre les deux comptes MariaDB"
     `DB_ADMIN_LOGIN` est utilisé uniquement par `forge db:init` pour créer la base et l'utilisateur applicatif.
-    `DB_APP_LOGIN` est utilisé ensuite par l'application en fonctionnement normal et par `forge db:apply` dans le flux pédagogique V1.
+    `DB_APP_LOGIN` est utilisé ensuite par l'application en fonctionnement normal et par `forge db:apply` en développement.
 
-    En production, utilisez idéalement un compte de migration séparé pour appliquer le schéma, puis un compte applicatif limité à `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
-
-### 3. Générer les certificats HTTPS locaux
-
-```bash
-openssl req -x509 -newkey rsa:2048 \
-  -keyout key.pem \
-  -out cert.pem \
-  -days 365 \
-  -nodes \
-  -subj "/CN=localhost"
-```
-
-### 4. Initialiser la base MariaDB
+### 3. Initialiser la base MariaDB
 
 ```bash
 forge db:init
 ```
 
-Cette commande crée la base `DB_NAME`, crée l'utilisateur `DB_APP_LOGIN` et applique les droits nécessaires au flux Forge V1, y compris `forge db:apply` en développement.
+Crée la base `DB_NAME`, l'utilisateur `DB_APP_LOGIN` et applique les droits nécessaires.
 
 !!! success "Avant de continuer"
     Vérifier que MariaDB est démarré, que `env/dev` est configuré avec `DB_ADMIN_LOGIN`, `DB_ADMIN_PWD`, `DB_APP_LOGIN`, `DB_APP_PWD` et `DB_NAME`.
 
-### 5. Créer une entité
+### 4. Créer une entité
 
 ```bash
 forge make:entity Contact
@@ -123,16 +124,50 @@ Puis éditer le fichier canonique `mvc/entities/contact/contact.json` :
   "entity": "Contact",
   "table": "contact",
   "fields": [
-    { "name": "id",       "sql_type": "INT",         "primary_key": true, "auto_increment": true },
-    { "name": "nom",      "sql_type": "VARCHAR(80)",  "constraints": { "not_empty": true, "max_length": 80 } },
-    { "name": "prenom",   "sql_type": "VARCHAR(80)",  "constraints": { "not_empty": true, "max_length": 80 } },
-    { "name": "email",    "sql_type": "VARCHAR(120)", "unique": true, "constraints": { "not_empty": true, "max_length": 120 } },
-    { "name": "telephone","sql_type": "VARCHAR(20)",  "nullable": true, "constraints": { "max_length": 20 } }
+    { "name": "id",        "sql_type": "INT",          "primary_key": true, "auto_increment": true },
+    { "name": "nom",       "sql_type": "VARCHAR(80)",   "constraints": { "not_empty": true, "max_length": 80 } },
+    { "name": "prenom",    "sql_type": "VARCHAR(80)",   "constraints": { "not_empty": true, "max_length": 80 } },
+    { "name": "email",     "sql_type": "VARCHAR(120)",  "unique": true, "constraints": { "not_empty": true, "max_length": 120 } },
+    { "name": "telephone", "sql_type": "VARCHAR(20)",   "nullable": true, "constraints": { "max_length": 20 } }
   ]
 }
 ```
 
-### 6. Générer et appliquer le modèle
+??? info "Anatomie d'un JSON d'entité Forge"
+
+    | Clé | Obligatoire | Description |
+    |---|---|---|
+    | `format_version` | non | Toujours `1` en V1 (défaut si absent) |
+    | `entity` | **oui** | Nom PascalCase — devient le nom de la classe Python |
+    | `table` | non | Nom snake_case — déduit de `entity` si absent |
+    | `description` | non | Texte libre (documentaire) |
+    | `fields` | **oui** | Liste des champs |
+
+    **Chaque champ :**
+
+    | Clé | Obligatoire | Description |
+    |---|---|---|
+    | `name` | **oui** | Nom snake_case du champ Python |
+    | `sql_type` | **oui** | Type SQL MariaDB (`INT`, `VARCHAR(n)`, `DATE`…) |
+    | `column` | non | Nom de colonne SQL — déduit de `name` si absent |
+    | `python_type` | non | Type Python — déduit de `sql_type` si absent |
+    | `nullable` | non | `true` / `false` (défaut : `false`) |
+    | `primary_key` | non | `true` / `false` (défaut : `false`) |
+    | `auto_increment` | non | `true` / `false` (défaut : `false`) |
+    | `unique` | non | `true` / `false` (défaut : `false`) |
+    | `default` | non | Valeur par défaut compatible avec `python_type` |
+    | `constraints` | non | Validations applicatives (voir ci-dessous) |
+
+    **Contraintes disponibles :**
+
+    | Contrainte | Types | Description |
+    |---|---|---|
+    | `not_empty` | `str` | Interdit les chaînes vides |
+    | `min_length` / `max_length` | `str` | Longueur min/max |
+    | `min_value` / `max_value` | `int`, `float` | Valeur min/max |
+    | `pattern` | `str` | Expression régulière Python |
+
+### 5. Générer et appliquer le modèle
 
 ```bash
 forge check:model          # vérifier la cohérence du JSON
@@ -154,7 +189,7 @@ flowchart LR
     `contact.sql` et `contact_base.py` sont régénérables — ne pas y écrire de logique manuelle.
     La logique métier va dans `contact.py`, qui n'est jamais écrasé par Forge.
 
-### 7. Générer le CRUD
+### 6. Générer le CRUD
 
 ```bash
 forge make:crud Contact --dry-run  # prévisualiser
@@ -176,7 +211,7 @@ mvc/views/contact/form.html
 !!! tip "Génération non destructive"
     Si un fichier existe déjà, il est marqué `[PRÉSERVÉ]` et non touché.
 
-### 8. Déclarer les routes
+### 7. Déclarer les routes
 
 `forge make:crud` affiche le bloc de routes à ajouter dans `mvc/routes.py` — il ne l'écrit jamais automatiquement.
 
@@ -204,7 +239,7 @@ Vérifier les routes déclarées :
 forge routes:list
 ```
 
-### 9. Lancer l'application
+### 8. Lancer l'application
 
 ```bash
 python app.py
