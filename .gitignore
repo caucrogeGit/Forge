@@ -1,5 +1,7 @@
 .venv/
 .claude/
+CLAUDE.md
+TestForge101/
 __pycache__/
 *.pyc
 .pytest_cache/
