@@ -195,11 +195,61 @@ def main(argv: list[str] | None = None) -> None:
             print("Usage : forge sync:entity NomEntite | forge sync:relations | forge build:model | forge check:model")
             raise SystemExit(1)
 
-        check_model(entities_root)
-        print(out.ok("Modele valide."))
+        entity_sources, _ = check_model(entities_root)
+        _print_check_model_preview(entity_sources, entities_root)
     except (ModelValidationError, EntityRelationsError, EntityDefinitionError, ValueError) as exc:
         print(out.error(str(exc)))
         raise SystemExit(1)
+
+
+def _print_check_model_preview(entity_sources: list[EntitySource], entities_root: Path) -> None:
+    count = len(entity_sources)
+    print(out.ok(f"Modele valide — {count} entite(s)."))
+
+    headers = ["nom", "colonne", "sql_type", "python_type", "nullable", "PK", "AI", "unique", "contraintes"]
+
+    for source in entity_sources:
+        defn = source.definition
+        entity = defn["entity"]
+        table = defn["table"]
+        snake = source.entity_dir.name
+
+        print(f"\n  {entity}  (table : {table})")
+
+        rows: list[list[str]] = []
+        for field in defn["fields"]:
+            parts: list[str] = []
+            for k, v in field["constraints"].items():
+                parts.append(f"{k}:{v}")
+            if "default" in field:
+                parts.append(f"defaut:{field['default']!r}")
+            rows.append([
+                field["name"],
+                field["column"] or "",
+                field["sql_type"] or "",
+                field["python_type"] or "?",
+                "oui" if field["nullable"] else "non",
+                "oui" if field["primary_key"] else "non",
+                "oui" if field["auto_increment"] else "non",
+                "oui" if field["unique"] else "non",
+                "  ".join(parts),
+            ])
+
+        widths = [
+            max(len(headers[i]), *(len(row[i]) for row in rows))
+            for i in range(len(headers))
+        ]
+
+        indent = "    "
+        print(indent + "  ".join(h.ljust(widths[i]) for i, h in enumerate(headers)))
+        print(indent + "  ".join("-" * w for w in widths))
+        for row in rows:
+            print(indent + "  ".join(v.ljust(widths[i]) for i, v in enumerate(row)))
+
+        entity_dir = source.entity_dir
+        print(f"\n{indent}Fichiers cibles :")
+        for filename in (f"{snake}.sql", f"{snake}_base.py", f"{snake}.py", "__init__.py"):
+            print(f"      {(entity_dir / filename).as_posix()}")
 
 
 def _validate_model_or_raise(entities_root: Path) -> tuple[list[EntitySource], list[ValidatedRelation]]:

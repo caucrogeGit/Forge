@@ -17,6 +17,7 @@ DEFAULT_APP_PRIVILEGES = (
     "INDEX",
     "REFERENCES",
 )
+_ALLOWED_APP_PRIVILEGES = frozenset(DEFAULT_APP_PRIVILEGES)
 
 
 class DbInitError(ValueError):
@@ -36,10 +37,33 @@ class DbInitConfig:
     app_port: int
     app_login: str
     app_password: str
+    app_privileges: tuple[str, ...]
+
+
+def _parse_app_privileges(raw: object) -> tuple[str, ...]:
+    if not isinstance(raw, str):
+        raise DbInitError(
+            f"DB_APP_PRIVILEGES doit etre une chaine de privileges separes par des virgules "
+            f"(ex: SELECT,INSERT,UPDATE). Valeur recue : {raw!r}"
+        )
+    privileges = tuple(p.strip().upper() for p in raw.split(",") if p.strip())
+    if not privileges:
+        raise DbInitError("DB_APP_PRIVILEGES ne peut pas etre vide.")
+    for priv in privileges:
+        if priv not in _ALLOWED_APP_PRIVILEGES:
+            allowed_str = ", ".join(sorted(_ALLOWED_APP_PRIVILEGES))
+            raise DbInitError(
+                f"Privilege MariaDB non supporte dans DB_APP_PRIVILEGES : {priv}\n"
+                f"Privileges autorises : {allowed_str}"
+            )
+    return privileges
 
 
 def load_db_init_config() -> DbInitConfig:
     config = load_project_config()
+
+    raw_privileges = getattr(config, "DB_APP_PRIVILEGES", None)
+    app_privileges = _parse_app_privileges(raw_privileges) if raw_privileges is not None else DEFAULT_APP_PRIVILEGES
 
     return DbInitConfig(
         admin_host=config.DB_ADMIN_HOST,
@@ -53,6 +77,7 @@ def load_db_init_config() -> DbInitConfig:
         app_port=config.DB_APP_PORT,
         app_login=config.DB_APP_LOGIN,
         app_password=config.DB_APP_PWD,
+        app_privileges=app_privileges,
     )
 
 
@@ -103,12 +128,12 @@ def init_project_database() -> list[str]:
                 )
 
             cursor.execute(
-                f"GRANT {', '.join(DEFAULT_APP_PRIVILEGES)} ON {_quote_identifier(cfg.db_name)}.* "
+                f"GRANT {', '.join(cfg.app_privileges)} ON {_quote_identifier(cfg.db_name)}.* "
                 f"TO {_quote_user(cfg.app_login, cfg.app_host)}"
             )
             actions.append(
                 f"Privilèges appliqués sur {cfg.db_name} à {target_user} "
-                f"({', '.join(DEFAULT_APP_PRIVILEGES)})."
+                f"({', '.join(cfg.app_privileges)})."
             )
 
             cursor.execute("FLUSH PRIVILEGES")

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import difflib
 import re
 from datetime import date, datetime
 from dataclasses import dataclass
@@ -30,6 +31,7 @@ ALLOWED_CONSTRAINT_KEYS = {
     "max_value",
     "pattern",
 }
+ALLOWED_ROOT_KEYS = {"format_version", "entity", "table", "description", "fields"}
 INTEGER_SQL_PREFIXES = ("INT", "BIGINT", "SMALLINT", "TINYINT", "MEDIUMINT")
 FLOAT_SQL_PREFIXES = ("FLOAT", "DOUBLE", "REAL", "DECIMAL", "NUMERIC")
 STRING_SQL_PREFIXES = ("CHAR", "VARCHAR", "TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT")
@@ -190,6 +192,10 @@ def _validate_root_structure(data: Any, issues: list[EntityDefinitionIssue]) -> 
         _add_issue(issues, "$", "la racine doit etre un objet JSON")
         return
 
+    for key in data:
+        if key not in ALLOWED_ROOT_KEYS:
+            _add_issue(issues, key, "cle racine non supportee en V1")
+
     required_root_keys = ["entity", "fields"]
     for key in required_root_keys:
         if key not in data:
@@ -255,7 +261,9 @@ def _validate_field_structure(field: Any, index: int, issues: list[EntityDefinit
     elif isinstance(constraints, dict):
         for key in constraints:
             if key not in ALLOWED_CONSTRAINT_KEYS:
-                _add_issue(issues, f"{path}.constraints.{key}", "contrainte non supportee en V1")
+                close = difflib.get_close_matches(key, ALLOWED_CONSTRAINT_KEYS, n=1, cutoff=0.6)
+                hint = f" — vouliez-vous dire : {close[0]!r} ?" if close else ""
+                _add_issue(issues, f"{path}.constraints.{key}", f"contrainte non supportee en V1{hint}")
 
 
 def _normalize_entity_data(

@@ -88,6 +88,12 @@ def _fake_config() -> types.SimpleNamespace:
 
 
 def _patch_db_init_config(monkeypatch, fake_config: types.SimpleNamespace) -> None:
+    raw_privileges = getattr(fake_config, "DB_APP_PRIVILEGES", None)
+    privileges = (
+        db_init._parse_app_privileges(raw_privileges)
+        if raw_privileges is not None
+        else db_init.DEFAULT_APP_PRIVILEGES
+    )
     monkeypatch.setattr(
         db_init,
         "load_db_init_config",
@@ -103,30 +109,29 @@ def _patch_db_init_config(monkeypatch, fake_config: types.SimpleNamespace) -> No
             app_port=fake_config.DB_APP_PORT,
             app_login=fake_config.DB_APP_LOGIN,
             app_password=fake_config.DB_APP_PWD,
+            app_privileges=privileges,
         ),
     )
 
 
 def _write_config(path, fake_config: types.SimpleNamespace) -> None:
-    path.write_text(
-        "\n".join(
-            [
-                f"DB_ADMIN_HOST={fake_config.DB_ADMIN_HOST!r}",
-                f"DB_ADMIN_PORT={fake_config.DB_ADMIN_PORT!r}",
-                f"DB_ADMIN_LOGIN={fake_config.DB_ADMIN_LOGIN!r}",
-                f"DB_ADMIN_PWD={fake_config.DB_ADMIN_PWD!r}",
-                f"DB_NAME={fake_config.DB_NAME!r}",
-                f"DB_CHARSET={fake_config.DB_CHARSET!r}",
-                f"DB_COLLATION={fake_config.DB_COLLATION!r}",
-                f"DB_APP_HOST={fake_config.DB_APP_HOST!r}",
-                f"DB_APP_PORT={fake_config.DB_APP_PORT!r}",
-                f"DB_APP_LOGIN={fake_config.DB_APP_LOGIN!r}",
-                f"DB_APP_PWD={fake_config.DB_APP_PWD!r}",
-                "",
-            ]
-        ),
-        encoding="utf-8",
-    )
+    lines = [
+        f"DB_ADMIN_HOST={fake_config.DB_ADMIN_HOST!r}",
+        f"DB_ADMIN_PORT={fake_config.DB_ADMIN_PORT!r}",
+        f"DB_ADMIN_LOGIN={fake_config.DB_ADMIN_LOGIN!r}",
+        f"DB_ADMIN_PWD={fake_config.DB_ADMIN_PWD!r}",
+        f"DB_NAME={fake_config.DB_NAME!r}",
+        f"DB_CHARSET={fake_config.DB_CHARSET!r}",
+        f"DB_COLLATION={fake_config.DB_COLLATION!r}",
+        f"DB_APP_HOST={fake_config.DB_APP_HOST!r}",
+        f"DB_APP_PORT={fake_config.DB_APP_PORT!r}",
+        f"DB_APP_LOGIN={fake_config.DB_APP_LOGIN!r}",
+        f"DB_APP_PWD={fake_config.DB_APP_PWD!r}",
+    ]
+    if hasattr(fake_config, "DB_APP_PRIVILEGES"):
+        lines.append(f"DB_APP_PRIVILEGES={fake_config.DB_APP_PRIVILEGES!r}")
+    lines.append("")
+    path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def test_load_db_init_config_reads_admin_and_app_separately(monkeypatch, tmp_path):
@@ -147,6 +152,7 @@ def test_load_db_init_config_reads_admin_and_app_separately(monkeypatch, tmp_pat
     assert cfg.app_port == 3306
     assert cfg.app_login == "app-user"
     assert cfg.app_password == "app-pwd"
+    assert cfg.app_privileges == db_init.DEFAULT_APP_PRIVILEGES
 
 
 def test_load_db_init_config_uses_current_working_directory(monkeypatch, tmp_path):
@@ -395,3 +401,64 @@ def test_db_init_is_idempotent(monkeypatch):
 
     assert len(first_actions) == 3
     assert len(second_actions) == 4
+
+
+def test_load_db_init_config_reads_custom_db_app_privileges(monkeypatch, tmp_path):
+    fake_config = _fake_config()
+    fake_config.DB_APP_PRIVILEGES = "SELECT,INSERT,UPDATE"
+    _write_config(tmp_path / "config.py", fake_config)
+    monkeypatch.chdir(tmp_path)
+
+    cfg = load_db_init_config()
+
+    assert cfg.app_privileges == ("SELECT", "INSERT", "UPDATE")
+
+
+def test_load_db_init_config_rejects_invalid_privilege(monkeypatch, tmp_path):
+    from forge_cli.entities.db_init import DbInitError
+
+    fake_config = _fake_config()
+    fake_config.DB_APP_PRIVILEGES = "SELECT,TRUNCATE"
+    _write_config(tmp_path / "config.py", fake_config)
+    monkeypatch.chdir(tmp_path)
+
+    with pytest.raises(DbInitError, match="TRUNCATE"):
+        load_db_init_config()
+
+
+def test_db_init_uses_custom_privileges_in_grant(monkeypatch):
+    executed: list[str] = []
+    state = {
+        "db_name": "gestion_ventes",
+        "db_exists": False,
+        "user_hosts": [],
+        "app_host": "localhost",
+    }
+    connection = FakeConnection(state, executed)
+    fake_config = types.SimpleNamespace(
+        DB_ADMIN_HOST="admin-host",
+        DB_ADMIN_PORT=3307,
+        DB_ADMIN_LOGIN="admin-user",
+        DB_ADMIN_PWD="admin-pwd",
+        DB_NAME="gestion_ventes",
+        DB_CHARSET="utf8mb4",
+        DB_COLLATION="utf8mb4_unicode_ci",
+        DB_APP_HOST="localhost",
+        DB_APP_PORT=3306,
+        DB_APP_LOGIN="forge_app",
+        DB_APP_PWD="secret",
+        DB_APP_PRIVILEGES="SELECT,INSERT",
+    )
+
+    def connect(**kwargs):
+        return connection
+
+    fake_mariadb = types.SimpleNamespace(connect=connect)
+    _patch_db_init_config(monkeypatch, fake_config)
+    monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
+
+    actions = init_project_database()
+
+    grant_stmt = next(s for s in executed if s.startswith("GRANT"))
+    assert grant_stmt == "GRANT SELECT, INSERT ON `gestion_ventes`.* TO 'forge_app'@'localhost'"
+    assert any("SELECT, INSERT" in a for a in actions)

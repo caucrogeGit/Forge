@@ -294,3 +294,25 @@ def test_date_and_datetime_defaults_must_be_iso_strings():
     message = str(exc_info.value)
     assert "python_type='date'" in message
     assert "python_type='datetime'" in message
+
+
+def test_unknown_root_key_is_rejected():
+    data = valid_entity()
+    data["tabble"] = "contact"
+
+    with pytest.raises(EntityDefinitionError) as exc_info:
+        validate_entity_definition(data, source="contact.json")
+
+    assert "tabble: cle racine non supportee en V1" in str(exc_info.value)
+
+
+def test_constraint_typo_suggests_close_match():
+    data = valid_entity()
+    data["fields"][1]["constraints"] = {"max_lenght": 100}
+
+    with pytest.raises(EntityDefinitionError) as exc_info:
+        validate_entity_definition(data, source="contact.json")
+
+    message = str(exc_info.value)
+    assert "max_lenght" in message
+    assert "max_length" in message

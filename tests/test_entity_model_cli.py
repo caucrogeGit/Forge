@@ -364,6 +364,26 @@ def test_build_model_dry_run_shows_planned_writes(tmp_path: Path):
 
 # ── sync:entity — manual file not touched ─────────────────────────────────────
 
+def test_check_model_preview_displays_entity_and_fields(tmp_path: Path, capsys):
+    from forge_cli.entities.model import _print_check_model_preview
+
+    entities_root = tmp_path / "mvc" / "entities"
+    _write_entity(entities_root, "contact", _contact())
+    _write_relations(entities_root, {"format_version": 1, "relations": []})
+
+    entity_sources, _ = check_model(entities_root)
+    _print_check_model_preview(entity_sources, entities_root)
+
+    output = capsys.readouterr().out
+    assert "Contact" in output
+    assert "contact" in output
+    assert "id" in output
+    assert "INT" in output
+    assert "contact.sql" in output
+    assert "contact_base.py" in output
+    assert "__init__.py" in output
+
+
 def test_sync_entity_does_not_touch_manual_py(tmp_path: Path):
     from forge_cli.entities.model import sync_entity
 
