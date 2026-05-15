@@ -436,10 +436,9 @@ ecriture DB automatique.
     Non recommandé en production sensible sans protection additionnelle.
     Chiffrement applicatif prévu dans `SEC-MFA-SECRET-ENCRYPTION-001` (Forge 3.1.0).
 
-    Pour installer le module (non inclus dans `forge-mvc[all]`) :
-    ```bash
-    pip install "forge-mvc[mfa]"
-    ```
+    `forge-mvc-mfa` est **source-only** en `{{forge_version}}` et ne sera
+    pas publié sur PyPI en `1.0` — voir
+    [contrat d'installation](installation.md#contrat-dinstallation-des-opt-ins).
 
 > **Depuis Forge 2.4.0**, le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
 > L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré en Forge 3.0.

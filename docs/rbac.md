@@ -127,8 +127,8 @@ user_id -> user_roles -> roles -> role_permissions -> permissions
 API cote Auth/User :
 
 > ℹ️ Les fonctions ci-dessous sont fournies par le module optionnel
-> `forge-mvc-rbac`. Installez-le avec :
-> `pip install forge-mvc[rbac]`
+> `forge-mvc-rbac` (source-only en `{{forge_version}}` — voir
+> [contrat d'installation](installation.md#contrat-dinstallation-des-opt-ins)).
 
 ```python
 from forge_mvc_rbac import get_user_permissions, get_user_role_ids, user_has_permission
@@ -274,8 +274,8 @@ Forge fournit aussi une strategie serveur explicite pour les projets qui
 utilisent Auth/User et la table optionnelle `user_roles` :
 
 > ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-rbac`. Installez-le avec :
-> `pip install forge-mvc[rbac]`
+> optionnel `forge-mvc-rbac` (source-only en `{{forge_version}}` — voir
+> [contrat d'installation](installation.md#contrat-dinstallation-des-opt-ins)).
 
 ```python
 from forge_mvc_rbac import require_user_permission

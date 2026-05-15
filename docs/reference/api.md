@@ -2973,8 +2973,8 @@ TOTP RFC 6238, codes de récupération, challenge multi-facteur et revalidation.
 Inclut l'anti-replay TOTP.
 
 ```bash
-# Mode source-only en {{forge_version}} — voir installation-github.md
-# pip install forge-mvc[mfa]  # disponible sur PyPI en 3.1
+# Mode source-only en {{forge_version}} et non publié sur PyPI en 1.0
+# Voir docs/installation.md#contrat-dinstallation-des-opt-ins
 ```
 
 Référence détaillée : [auth-mfa.md](auth-mfa.md).
@@ -2984,10 +2984,9 @@ Référence détaillée : [auth-mfa.md](auth-mfa.md).
 Rôles, permissions, décorateur `@require_permission`, helpers Jinja
 `has_permission()` et politique d'attribution.
 
-```bash
-# Mode source-only en {{forge_version}} — voir installation-github.md
-# pip install forge-mvc[rbac]  # disponible sur PyPI en 3.1
-```
+> Installation PyPI prospective.
+> Les opt-ins `rbac`, `workflow` et `stats` ne sont pas documentés comme installables tant que leur publication coordonnée n'est pas effective.
+> La publication est prévue à partir de `1.0.0-beta.5` — voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [rbac.md](../rbac.md).
 
@@ -2996,10 +2995,9 @@ Référence détaillée : [rbac.md](../rbac.md).
 États, transitions et helpers d'affichage. Déclaration déclarative de statuts,
 fonctions de validation, helpers Jinja2. Aucun callback automatique.
 
-```bash
-# Mode source-only en {{forge_version}} — voir installation-github.md
-# pip install forge-mvc[workflow]  # disponible sur PyPI en 3.1
-```
+> Installation PyPI prospective.
+> Les opt-ins `rbac`, `workflow` et `stats` ne sont pas documentés comme installables tant que leur publication coordonnée n'est pas effective.
+> La publication est prévue à partir de `1.0.0-beta.5` — voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [workflow.md](workflow.md).
 
@@ -3008,10 +3006,9 @@ Référence détaillée : [workflow.md](workflow.md).
 Collecte d'événements métier, schéma SQL associé, agrégats et indicateurs
 calculés à la demande.
 
-```bash
-# Mode source-only en {{forge_version}} — voir installation-github.md
-# pip install forge-mvc[stats]  # disponible sur PyPI en 3.1
-```
+> Installation PyPI prospective.
+> Les opt-ins `rbac`, `workflow` et `stats` ne sont pas documentés comme installables tant que leur publication coordonnée n'est pas effective.
+> La publication est prévue à partir de `1.0.0-beta.5` — voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [stats.md](stats.md).
 

@@ -46,6 +46,40 @@ python -m pip install -r requirements-dev.txt
 (également en éditable) et les outils de développement. Voir
 [Installation depuis GitHub](installation-github.md) pour les détails.
 
+## Contrat d'installation des opt-ins
+
+En `1.0.0-beta.1` à `1.0.0-beta.4`, seul le core `forge-mvc` est publié comme
+package PyPI principal. Les modules opt-in existent dans le dépôt comme modules
+**source-only** ; ils ne sont pas disponibles via `pip install forge-mvc[...]`
+sur PyPI.
+
+Les commandes du type `pip install forge-mvc[mfa]` ou `pip install forge-mvc[rbac]`
+**ne fonctionnent pas** en `1.0.0-beta.1` à `1.0.0-beta.4` — ces extras ne sont
+pas enregistrés sur PyPI.
+
+À partir de `1.0.0-beta.5`, les opt-ins publiables (`forge-mvc-rbac`,
+`forge-mvc-workflow`, `forge-mvc-stats`) seront synchronisés avec la version
+du core et disponibles sur PyPI.
+
+**`forge-mvc-mfa` ne sera pas publié sur PyPI en `1.0`** : le module MFA
+reste Pre-Alpha tant que le secret TOTP est stocké en clair
+(`SEC-MFA-SECRET-ENCRYPTION-001`).
+
+Pour installer les opt-ins en `{{forge_version}}`, utiliser le mode source :
+
+```bash
+git clone --branch {{forge_tag}} https://github.com/caucrogeGit/Forge.git
+cd Forge
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+python -m pip install -r requirements-dev.txt
+```
+
+`requirements-dev.txt` installe les 4 modules opt-in en mode éditable.
+
+---
+
 ## Version stable
 
 Forge {{forge_version}} utilise la référence stable `{{forge_tag}}` par défaut.

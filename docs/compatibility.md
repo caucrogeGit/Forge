@@ -137,15 +137,24 @@ pas installées par défaut. Elles sont tirées via les extras du package
 
 ### Installation
 
+!!! warning "Extras PyPI non disponibles en 1.0.0-beta.1 à beta.4"
+    Les modules opt-in sont **source-only** dans les versions `1.0.0-beta.1`
+    à `1.0.0-beta.4`. Les extras PyPI (`forge-mvc[mfa]`, `forge-mvc[rbac]`,
+    etc.) ne sont pas enregistrés sur PyPI et ne fonctionneront pas.
+
+    À partir de `1.0.0-beta.5`, `forge-mvc-rbac`, `forge-mvc-workflow` et
+    `forge-mvc-stats` seront publiés et synchronisés avec le core.
+    `forge-mvc-mfa` reste Pre-Alpha et ne sera pas publié en `1.0`.
+
+Pour installer les opt-ins en `{{forge_version}}` :
+
 ```bash
-# Core uniquement (5 dépendances runtime)
-pip install forge-mvc
+# Core uniquement depuis PyPI (bêta publique)
+pip install --pre forge-mvc
 
-# Avec MFA
-pip install forge-mvc[mfa]
-
-# Avec RBAC, workflow et stats (sans MFA)
-pip install forge-mvc[rbac,workflow,stats]
+# Opt-ins : source-only — installer depuis le dépôt
+git clone --branch {{forge_tag}} https://github.com/caucrogeGit/Forge.git
+cd Forge && pip install -e . && pip install -r requirements-dev.txt
 ```
 
 **Note sur MFA** : le module `forge-mvc-mfa` est en statut Pre-Alpha

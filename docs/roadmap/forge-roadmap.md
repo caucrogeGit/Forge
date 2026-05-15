@@ -81,6 +81,17 @@ post-audits. Ce n'est pas une version de release.
 
 ---
 
+## Phase 1 — Corrections documentaires (post-audit)
+
+**Objectif** : traiter les constats documentaires prioritaires issus du tracker
+post-audit. Aucune modification de runtime, CLI, générateurs ou packaging.
+
+| Ticket | Description | État |
+|---|---|---|
+| DOCS-OPTIN-INSTALL-CONTRACT-001 | Clarifier le contrat d'installation des opt-ins | **livré** |
+
+---
+
 ## Socle livré en Forge 1.5.0
 
 Forge 1.5.0 fournit un socle MVC complet :

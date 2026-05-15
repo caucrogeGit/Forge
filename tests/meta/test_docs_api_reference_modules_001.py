@@ -76,14 +76,28 @@ class TestApiReferenceLinksToModuleDocs:
             )
 
 
-class TestApiReferenceMentionsPipExtras:
-    """Au moins une commande pip install forge-mvc[X] apparaît."""
+class TestApiReferenceNoActivePipExtras:
+    """Aucune commande active pip install forge-mvc[X] n'apparaît dans api.md.
 
-    def test_at_least_one_pip_install_extra(self):
+    Contrat post-DOCS-OPTIN-INSTALL-CONTRACT-001 : les extras PyPI ne sont pas
+    documentés comme installables tant que la publication coordonnée n'est pas
+    effective. Une note prospective en prose remplace les commandes copiables.
+    """
+
+    def test_no_active_pip_install_extra(self):
         text = API_REF.read_text(encoding="utf-8")
         pat = re.compile(r"pip\s+install\s+forge-mvc\[\w+\]")
         matches = pat.findall(text)
-        assert len(matches) >= 1, (
-            f"docs/reference/api.md doit montrer au moins une commande "
-            f"`pip install forge-mvc[X]`. Trouvé {len(matches)} occurrence(s)."
+        assert len(matches) == 0, (
+            f"docs/reference/api.md ne doit contenir aucune commande copiable "
+            f"`pip install forge-mvc[X]` — utiliser une note prospective en prose. "
+            f"Trouvé {len(matches)} occurrence(s) : {matches}"
+        )
+
+    def test_prospective_note_present(self):
+        """La note prospective d'installation est présente dans api.md."""
+        text = API_REF.read_text(encoding="utf-8")
+        assert "Installation PyPI prospective" in text, (
+            "docs/reference/api.md doit mentionner la note prospective d'installation "
+            "('Installation PyPI prospective') pour les opt-ins rbac/workflow/stats."
         )
