@@ -1,0 +1,92 @@
+{
+  "format_version": 1,
+  "entity": "Hebergement",
+  "table": "hebergement",
+  "description": "Hébergement publié dans le démonstrateur",
+  "fields": [
+    {
+      "name": "id",
+      "sql_type": "INT",
+      "primary_key": true,
+      "auto_increment": true
+    },
+    {
+      "name": "titre",
+      "sql_type": "VARCHAR(200)",
+      "constraints": {
+        "not_empty": true,
+        "max_length": 200
+      }
+    },
+    {
+      "name": "slug",
+      "sql_type": "VARCHAR(200)",
+      "unique": true,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 200
+      }
+    },
+    {
+      "name": "description",
+      "sql_type": "TEXT",
+      "nullable": true
+    },
+    {
+      "name": "adresse",
+      "sql_type": "VARCHAR(255)",
+      "nullable": true,
+      "constraints": {
+        "max_length": 255
+      }
+    },
+    {
+      "name": "capacite",
+      "sql_type": "INT",
+      "nullable": true
+    },
+    {
+      "name": "commune_id",
+      "sql_type": "INT",
+      "nullable": true
+    },
+    {
+      "name": "proprietaire_id",
+      "sql_type": "INT",
+      "nullable": true
+    },
+    {
+      "name": "is_published",
+      "sql_type": "BOOLEAN",
+      "default": false
+    },
+    {
+      "name": "created_at",
+      "sql_type": "DATETIME",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "sql_type": "DATETIME",
+      "nullable": true
+    }
+  ],
+  "media": [
+    {
+      "name": "cover",
+      "field": "image",
+      "role": "cover",
+      "variants": true,
+      "multiple": false,
+      "label": "Photo principale"
+    },
+    {
+      "name": "photos",
+      "field": "image",
+      "role": "gallery",
+      "variants": false,
+      "multiple": true,
+      "label": "Galerie photos"
+    }
+  ]
+}

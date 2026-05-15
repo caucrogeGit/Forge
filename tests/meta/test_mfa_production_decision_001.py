@@ -1,0 +1,101 @@
+"""Garde-fou MFA-PRODUCTION-DECISION-001.
+
+Vérifie que :
+1. forge-mvc-mfa n'est PAS dans l'extra [all] (décision option A — 3.0.2)
+2. forge-mvc-mfa reste disponible via [mfa] (opt-in conscient)
+3. Le README MFA documente clairement le statut Pre-Alpha
+
+Origine : trois audits convergents — MFA est marqué Pre-Alpha mais inclus
+dans forge-mvc[all]. Contradiction avec la charte principe 7 (sécuriser par
+défaut) et principe 10 (API publique = contrat de complétude). Décision :
+retirer MFA de [all] pour 3.0.2, réintégrer après SEC-MFA-SECRET-ENCRYPTION-001.
+
+Note T2b : le véhicule packages/forge-mvc/pyproject.toml a été supprimé.
+Un seul pyproject.toml (racine) publie forge-mvc.
+"""
+from __future__ import annotations
+
+import tomllib
+from pathlib import Path
+
+import pytest
+
+pytestmark = pytest.mark.meta
+
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
+MFA_README = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "README.md"
+MFA_PYPROJECT = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "pyproject.toml"
+
+
+def _read_extras(pyproject_path: Path) -> dict[str, list[str]]:
+    data = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
+    return data.get("project", {}).get("optional-dependencies", {})
+
+
+class TestMfaNotInAll:
+    """forge-mvc-mfa n'est PAS dans l'extra [all]."""
+
+    def test_mfa_excluded_from_root_all(self):
+        extras = _read_extras(ROOT_PYPROJECT)
+        all_deps = extras.get("all", [])
+        for dep in all_deps:
+            assert "forge-mvc-mfa" not in dep, (
+                f"forge-mvc-mfa est dans [all] : '{dep}'. "
+                f"Décision T3 (option A) : MFA est Pre-Alpha et ne doit pas "
+                f"être dans le metapackage all."
+            )
+
+
+class TestMfaAvailableViaExplicitExtra:
+    """forge-mvc-mfa est en mode source-only (extras PyPI temporairement désactivés).
+
+    Les extras [mfa], [rbac], [workflow], [stats], [all] ont été retirés du
+    pyproject.toml racine en 1.0.0b1 car les modules opt-in ne sont pas encore
+    sur PyPI. Réintroduction prévue dans une version ultérieure (OPTIN-PYPI-PUBLISH-001).
+    """
+
+    def test_extras_intentionally_absent(self):
+        """Les extras sont absents et leur suppression est documentée dans pyproject."""
+        extras = _read_extras(ROOT_PYPROJECT)
+        assert "mfa" not in extras, (
+            "L'extra [mfa] est présent dans pyproject.toml — il devrait être absent "
+            "en 3.0.x (mode source-only). Voir OPTIN-PYPI-PUBLISH-001."
+        )
+        assert "rbac" not in extras and "workflow" not in extras and "stats" not in extras, (
+            "Des extras PyPI sont présents dans pyproject.toml alors que les modules "
+            "opt-in ne sont pas encore publiés. Voir OPTIN-PYPI-PUBLISH-001."
+        )
+
+    def test_optin_publish_ticket_documented_in_pyproject(self):
+        """La suppression des extras est tracée dans pyproject.toml."""
+        text = ROOT_PYPROJECT.read_text(encoding="utf-8")
+        assert "OPTIN-PYPI-PUBLISH-001" in text, (
+            "pyproject.toml doit mentionner OPTIN-PYPI-PUBLISH-001 pour tracer "
+            "la réintroduction prévue des extras en 3.1."
+        )
+
+
+class TestMfaStatusDocumented:
+    """Le statut Pre-Alpha de MFA est documenté visiblement."""
+
+    def test_mfa_pyproject_is_pre_alpha(self):
+        text = MFA_PYPROJECT.read_text(encoding="utf-8")
+        assert "Development Status :: 2 - Pre-Alpha" in text, (
+            "Le classifier MFA doit rester 'Development Status :: 2 - Pre-Alpha' "
+            "tant que SEC-MFA-SECRET-ENCRYPTION-001 n'est pas livré."
+        )
+
+    def test_mfa_readme_documents_status(self):
+        text = MFA_README.read_text(encoding="utf-8")
+        assert "Pre-Alpha" in text, (
+            "Le README MFA doit afficher 'Pre-Alpha' clairement."
+        )
+
+    def test_mfa_readme_documents_source_install(self):
+        text = MFA_README.read_text(encoding="utf-8")
+        assert "OPTIN-PYPI-PUBLISH-001" in text, (
+            "Le README MFA doit mentionner OPTIN-PYPI-PUBLISH-001 "
+            "(ticket de publication PyPI des opt-in)."
+        )

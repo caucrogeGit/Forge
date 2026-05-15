@@ -1,0 +1,49 @@
+{
+  "format_version": 1,
+  "entity": "Proprietaire",
+  "table": "proprietaire",
+  "description": "Propriétaire ou gestionnaire d'un hébergement",
+  "fields": [
+    {
+      "name": "id",
+      "sql_type": "INT",
+      "primary_key": true,
+      "auto_increment": true
+    },
+    {
+      "name": "nom",
+      "sql_type": "VARCHAR(100)",
+      "constraints": {
+        "not_empty": true,
+        "max_length": 100
+      }
+    },
+    {
+      "name": "email",
+      "sql_type": "VARCHAR(120)",
+      "unique": true,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 120
+      }
+    },
+    {
+      "name": "telephone",
+      "sql_type": "VARCHAR(20)",
+      "nullable": true,
+      "constraints": {
+        "max_length": 20
+      }
+    },
+    {
+      "name": "created_at",
+      "sql_type": "DATETIME",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "sql_type": "DATETIME",
+      "nullable": true
+    }
+  ]
+}

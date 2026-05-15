@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "titre": "Mas des Cigales",
+    "slug": "mas-des-cigales",
+    "description": "Mas provençal au calme, jardin ombragé et piscine.",
+    "adresse": "Route de Maillane, 13210 Saint-Rémy-de-Provence",
+    "capacite": 6,
+    "commune_id": 1,
+    "proprietaire_id": 1,
+    "is_published": true
+  },
+  {
+    "id": 2,
+    "titre": "Gîte du Luberon",
+    "slug": "gite-du-luberon",
+    "description": "Gîte en pierre au cœur du Luberon, à deux pas des sentiers de randonnée.",
+    "adresse": "Chemin des Ocres, 84400 Apt",
+    "capacite": 4,
+    "commune_id": 2,
+    "proprietaire_id": 2,
+    "is_published": true
+  },
+  {
+    "id": 3,
+    "titre": "Chambre d'hôtes Camargue",
+    "slug": "chambre-hotes-camargue",
+    "description": "Chambre d'hôtes au bord des étangs, idéale pour observer les flamants roses.",
+    "adresse": "Lieu-dit Les Salins, 13460 Saintes-Maries-de-la-Mer",
+    "capacite": 2,
+    "commune_id": 3,
+    "proprietaire_id": 3,
+    "is_published": true
+  }
+]

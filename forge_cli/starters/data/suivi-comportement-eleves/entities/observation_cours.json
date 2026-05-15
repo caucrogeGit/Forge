@@ -1,0 +1,17 @@
+{
+  "format_version": 1,
+  "entity": "ObservationCours",
+  "table": "observation_cours",
+  "fields": [
+    { "name": "id",               "sql_type": "INT",  "primary_key": true, "auto_increment": true },
+    { "name": "eleve_id",         "sql_type": "INT" },
+    { "name": "cours_id",         "sql_type": "INT" },
+    { "name": "ne_travaille_pas", "sql_type": "BOOLEAN" },
+    { "name": "bavarde",          "sql_type": "BOOLEAN" },
+    { "name": "dort",             "sql_type": "BOOLEAN" },
+    { "name": "telephone",        "sql_type": "BOOLEAN" },
+    { "name": "perturbe",         "sql_type": "BOOLEAN" },
+    { "name": "refuse_consigne",  "sql_type": "BOOLEAN" },
+    { "name": "remarque",         "sql_type": "TEXT",  "nullable": true }
+  ]
+}

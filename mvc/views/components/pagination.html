@@ -1,0 +1,17 @@
+{% if pagination and pagination.nb_pages > 1 %}
+<nav class="flex items-center justify-between gap-4 mt-6">
+    {% if pagination.has_prev %}
+        <a class="px-3 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200" href="?page={{ pagination.prev_page }}">Précédent</a>
+    {% else %}
+        <span class="px-3 py-2 bg-gray-100 text-gray-400 rounded">Précédent</span>
+    {% endif %}
+
+    <span class="text-sm text-gray-600">Page {{ pagination.page }} / {{ pagination.nb_pages }}</span>
+
+    {% if pagination.has_next %}
+        <a class="px-3 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200" href="?page={{ pagination.next_page }}">Suivant</a>
+    {% else %}
+        <span class="px-3 py-2 bg-gray-100 text-gray-400 rounded">Suivant</span>
+    {% endif %}
+</nav>
+{% endif %}

@@ -1,0 +1,9 @@
+# forge-starter:communes-sejours:start
+from mvc.controllers.communes_sejours_controller import CommunesSejoursController
+
+with router.group("/communes-sejours", public=True) as cs:
+    cs.add("GET",  "",                           CommunesSejoursController.index,               name="communes_sejours_home")
+    cs.add("GET",  "/hebergements",              CommunesSejoursController.hebergements_index,  name="communes_sejours_hebergements")
+    cs.add("GET",  "/hebergements/{slug}",       CommunesSejoursController.hebergements_show,   name="communes_sejours_hebergement")
+    cs.add("POST", "/hebergements/{slug}/demande", CommunesSejoursController.hebergements_demande, name="communes_sejours_demande")
+# forge-starter:communes-sejours:end

@@ -1,0 +1,37 @@
+{% extends "layouts/app.html" %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <p class="text-sm font-semibold text-orange-600 uppercase">Contact</p>
+        <h1 class="text-2xl font-bold text-slate-900 mt-1">{{ contact.Prenom }} {{ contact.Nom }}</h1>
+    </div>
+    <a href="/contacts/{{ contact.ContactId }}/edit" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
+        Modifier
+    </a>
+</div>
+
+<div class="bg-white shadow rounded p-6 grid md:grid-cols-2 gap-6">
+    <section>
+        <h2 class="font-semibold text-slate-900 mb-3">Identité</h2>
+        <dl class="space-y-2 text-sm">
+            <div><dt class="text-slate-500">Email</dt><dd class="font-medium text-slate-900">{{ contact.Email }}</dd></div>
+            <div><dt class="text-slate-500">Téléphone</dt><dd class="font-medium text-slate-900">{{ contact.Telephone or "Non renseigné" }}</dd></div>
+        </dl>
+    </section>
+    <section>
+        <h2 class="font-semibold text-slate-900 mb-3">Ville</h2>
+        {% if contact.VilleNom %}
+            <p class="text-slate-900 font-medium">{{ contact.VilleNom }}</p>
+            {% if contact.VilleCodePostal %}
+                <p class="text-sm text-slate-500">{{ contact.VilleCodePostal }}</p>
+            {% endif %}
+        {% else %}
+            <p class="text-slate-500">Aucune ville associée.</p>
+        {% endif %}
+    </section>
+</div>
+
+<div class="mt-6">
+    <a href="/contacts" class="text-orange-700 hover:underline">Retour aux contacts</a>
+</div>
+{% endblock %}

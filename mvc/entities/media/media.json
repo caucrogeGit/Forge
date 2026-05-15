@@ -1,0 +1,143 @@
+{
+  "format_version": 1,
+  "entity": "Media",
+  "table": "media",
+  "description": "Socle generique Media v2 pour lier un fichier stocke a une entite applicative.",
+  "fields": [
+    {
+      "name": "id",
+      "column": "Id",
+      "python_type": "int",
+      "sql_type": "INT",
+      "nullable": false,
+      "primary_key": true,
+      "auto_increment": true,
+      "constraints": {}
+    },
+    {
+      "name": "entity_name",
+      "column": "EntityName",
+      "python_type": "str",
+      "sql_type": "VARCHAR(100)",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 100
+      }
+    },
+    {
+      "name": "entity_id",
+      "column": "EntityId",
+      "python_type": "int",
+      "sql_type": "INT",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "min_value": 1
+      }
+    },
+    {
+      "name": "path",
+      "column": "Path",
+      "python_type": "str",
+      "sql_type": "VARCHAR(500)",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 500
+      }
+    },
+    {
+      "name": "original_name",
+      "column": "OriginalName",
+      "python_type": "str",
+      "sql_type": "VARCHAR(255)",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 255
+      }
+    },
+    {
+      "name": "mime_type",
+      "column": "MimeType",
+      "python_type": "str",
+      "sql_type": "VARCHAR(120)",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 120
+      }
+    },
+    {
+      "name": "size",
+      "column": "Size",
+      "python_type": "int",
+      "sql_type": "INT",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "min_value": 0
+      }
+    },
+    {
+      "name": "role",
+      "column": "Role",
+      "python_type": "str",
+      "sql_type": "VARCHAR(50)",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 50
+      },
+      "default": "default"
+    },
+    {
+      "name": "position",
+      "column": "Position",
+      "python_type": "int",
+      "sql_type": "INT",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "min_value": 0
+      },
+      "default": 0
+    },
+    {
+      "name": "alt_text",
+      "column": "AltText",
+      "python_type": "str",
+      "sql_type": "VARCHAR(255)",
+      "nullable": true,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {
+        "max_length": 255
+      }
+    },
+    {
+      "name": "created_at",
+      "column": "CreatedAt",
+      "python_type": "datetime",
+      "sql_type": "DATETIME",
+      "nullable": false,
+      "primary_key": false,
+      "auto_increment": false,
+      "constraints": {}
+    }
+  ]
+}

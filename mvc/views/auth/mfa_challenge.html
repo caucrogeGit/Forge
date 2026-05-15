@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification MFA - {{ app_name }}</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/static/tailwind.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded shadow p-8 w-full max-w-sm">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Vérification MFA</h1>
+
+        {% if erreur %}
+        <p class="text-red-600 text-sm mb-4">{{ erreur }}</p>
+        {% endif %}
+
+        <form method="POST" action="/login/mfa" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Code MFA</label>
+                <input type="text" name="code" required autofocus autocomplete="one-time-code"
+                    inputmode="numeric" maxlength="32"
+                    class="mt-1 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="123456">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                Valider
+            </button>
+        </form>
+
+        <p class="mt-4 text-center text-sm text-gray-500">
+            <a href="/login" class="text-blue-600 hover:underline">Annuler et revenir à la connexion</a>
+        </p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+name: Dependency Audit
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pip-audit
+        run: python -m pip install pip-audit>=2.0
+
+      - name: Audit runtime dependencies
+        continue-on-error: true
+        run: pip-audit -r requirements.txt
+
+      - name: Audit dev dependencies
+        continue-on-error: true
+        run: pip-audit -r requirements-dev.txt

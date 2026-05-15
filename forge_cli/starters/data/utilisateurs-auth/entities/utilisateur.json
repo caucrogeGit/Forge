@@ -1,0 +1,59 @@
+{
+  "format_version": 1,
+  "entity": "Utilisateur",
+  "table": "utilisateur",
+  "description": "Utilisateur applicatif simple",
+  "fields": [
+    {
+      "name": "utilisateur_id",
+      "sql_type": "INT",
+      "primary_key": true,
+      "auto_increment": true
+    },
+    {
+      "name": "login",
+      "sql_type": "VARCHAR(80)",
+      "unique": true,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 80
+      }
+    },
+    {
+      "name": "prenom",
+      "sql_type": "VARCHAR(80)",
+      "nullable": true,
+      "constraints": {
+        "max_length": 80
+      }
+    },
+    {
+      "name": "nom",
+      "sql_type": "VARCHAR(80)",
+      "constraints": {
+        "not_empty": true,
+        "max_length": 80
+      }
+    },
+    {
+      "name": "password_hash",
+      "sql_type": "VARCHAR(255)",
+      "constraints": {
+        "not_empty": true,
+        "max_length": 255
+      }
+    },
+    {
+      "name": "email",
+      "sql_type": "VARCHAR(120)",
+      "nullable": true,
+      "constraints": {
+        "max_length": 120
+      }
+    },
+    {
+      "name": "actif",
+      "sql_type": "BOOLEAN"
+    }
+  ]
+}

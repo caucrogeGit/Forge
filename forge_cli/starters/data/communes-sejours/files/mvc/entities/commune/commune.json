@@ -1,0 +1,45 @@
+{
+  "format_version": 1,
+  "entity": "Commune",
+  "table": "commune",
+  "description": "Commune ou collectivité présentée dans le démonstrateur",
+  "fields": [
+    {
+      "name": "id",
+      "sql_type": "INT",
+      "primary_key": true,
+      "auto_increment": true
+    },
+    {
+      "name": "nom",
+      "sql_type": "VARCHAR(100)",
+      "constraints": {
+        "not_empty": true,
+        "max_length": 100
+      }
+    },
+    {
+      "name": "code_postal",
+      "sql_type": "VARCHAR(10)",
+      "nullable": true,
+      "constraints": {
+        "max_length": 10
+      }
+    },
+    {
+      "name": "description",
+      "sql_type": "TEXT",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "sql_type": "DATETIME",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "sql_type": "DATETIME",
+      "nullable": true
+    }
+  ]
+}

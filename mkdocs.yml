@@ -1,0 +1,188 @@
+site_name: Forge
+site_description: Framework web MVC pur Python
+site_author: Roger Cauchon
+site_url: https://caucrogegit.github.io/Forge/
+
+repo_name: caucrogeGit/Forge
+repo_url: https://github.com/caucrogeGit/Forge
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: fr
+  favicon: static/favicon.svg
+  logo: static/forge-logo.png
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+    - search.share
+  palette:
+    - scheme: default
+      primary: black
+      accent: deep orange
+
+nav:
+  - Accueil: index.html
+
+  - Installation:
+      - Vue d'ensemble: installation.md
+      - Installer Forge:
+          - VM Debian vierge: installation-vm-debian.md
+          - Avec pipx: installation-pipx.md
+          - Depuis GitHub: installation-github.md
+          - Windows (WSL2): installation-windows.md
+      - Environnement:
+          - Préparer MariaDB: installation-mariadb.md
+          - Mode développement: installation-developpement.md
+
+  - Premiers pas:
+      - Démarrer avec Forge: getting-started.md
+      - 15 minutes avec Forge: 15-minutes.md
+      - Application complète: app-complete-tutorial.md
+      - Guide de démarrage: guide.md
+      - CRUD explicite: crud.md
+
+  - Concepts:
+      - Vue d'ensemble: concepts.md
+      - Positionnement: positioning.md
+      - Architecture des entités: entity_architecture.md
+      - Front et CSS: front.md
+      - Profils de projet: profiles.md
+      - FAQ: faq.md
+
+  - Référence:
+      - Index: reference.md
+      - Commandes CLI: reference/cli-commands.md
+      - API Forge complète: reference/api.md
+      - Modules officiels:
+          - Workflow: reference/workflow.md
+          - Statistiques: reference/stats.md
+          - Modules Forge: reference/modules.md
+          - Auth — Challenge MFA: reference/auth-mfa.md
+      - CRUD et relations: reference/crud.md
+      - Pages publiques: reference/pages-publiques.md
+      - Sécurité et sessions:
+          - Audit Auth: reference/audit-auth.md
+          - Sessions: reference/sessions.md
+      - Outils:
+          - Profils de projet: reference/profils.md
+          - Tests E2E: reference/tests-e2e.md
+      - API JSON légère: api-json.md
+      - Migrations SQL: migrations.md
+      - Relations entre entités: relations.md
+      - Gestion des mails: mail.md
+      - Auth/User: auth.md
+      - Sécurité et RBAC: security.md
+      - RBAC — Contrôle d'accès: rbac.md
+      - Schéma API: reference-schema.md
+      - Schéma erreurs runtime: runtime-errors-schema.md
+
+  - Outils:
+      - Génération PDF: pdf.md
+      - Module média: media.md
+
+  - Modules et starters:
+      - Vue d'ensemble des starters: starters/index.md
+      - Créer un module: module-author-guide.md
+      - Créer un starter: starter-author-guide.md
+      - Contacts:
+          - Présentation: starters/01-contact-simple/index.md
+          - Reconstruction: starters/01-contact-simple/rebuild.md
+      - Utilisateurs / Auth:
+          - Présentation: starters/02-utilisateurs-auth/index.md
+          - Reconstruction: starters/02-utilisateurs-auth/rebuild.md
+      - Carnet de contacts:
+          - Présentation: starters/03-carnet-contacts/index.md
+          - Reconstruction: starters/03-carnet-contacts/rebuild.md
+      - Suivi pédagogique:
+          - Présentation: starters/04-suivi-comportement-eleves/index.md
+          - Reconstruction: starters/04-suivi-comportement-eleves/rebuild.md
+      - Communes & Séjours:
+          - Présentation: starters/communes-sejours/index.md
+          - Reconstruction: starters/communes-sejours/rebuild.md
+      - Auth MFA (Pre-Alpha):
+          - Présentation: starters/auth-mfa/index.md
+          - Reconstruction: starters/auth-mfa/rebuild.md
+
+  - Déploiement:
+      - Guide de déploiement: deployment.md
+      - Déploiement avancé: deploy-advanced.md
+      - Sécurité en production: production-security.md
+
+  - Release et compatibilité:
+      - Vue d'ensemble: release-and-compatibility.md
+      - Politique de release: release-policy.md
+      - Politique de dépréciation: deprecation-policy.md
+      - Matrice de compatibilité: compatibility.md
+      - Guide de migration: migration-guide.md
+      - Politique LTS: lts-policy.md
+      - Contrat de stabilité: stability-contract.md
+
+  - Philosophie:
+      - Charte v2: charter.md
+      - Décisions d'architecture:
+          - ADR-001 Auth Forge 2.x: adr/001-auth-strategy.md
+          - ADR-002 Sessions Forge 2.x: adr/002-session-strategy.md
+          - ADR-003 Langue API: adr/003-language-convention.md
+          - ADR-004 Périmètre core: adr/004-core-perimeter.md
+          - ADR-005 Packaging: adr/005-packaging.md
+          - ADR-006 Python 3.12+: adr/006-python-version.md
+          - ADR-007 Charte v2: adr/007-charter-v2-adoption.md
+          - ADR-008 Audit auth: adr/008-auth-audit-architecture.md
+
+  - Projet:
+      - Roadmap:
+          - Roadmap Forge: roadmap/forge-roadmap.md
+          - Forge Design: roadmap/forge-design-roadmap.md
+      - Historique:
+          - Roadmap Forge 1.5.0→2.0: history/forge-roadmap-history-2.0.md
+          - Charte documentaire v1: history/charte-v1.md
+          - Archives post-2.0 (consolidation): history/forge_post_2_0_consolidation_roadmap.md
+          - Archives post-2.0 (tickets): history/forge-roadmap-post-2.0.md
+          - Archives UX (phases 5-10): history/forge-roadmap-ux.md
+      - Procédure de release: release.md
+      - Validation locale: release-local.md
+      - Pour contribuer:
+          - Vue d'ensemble: contributing.md
+          - Conventions de travail: contributing/conventions.md
+      - Audits archivés: history/audits/README.md
+      - Licence: licence.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search:
+      lang: fr
+      separator: '[\s\-\.:\_/]+'
+
+docs_dir: docs
+site_dir: site
+
+hooks:
+  - tools/mkdocs_version_hook.py

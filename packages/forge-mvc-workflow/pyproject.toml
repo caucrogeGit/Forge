@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc-workflow"
+version = "1.0.0b1"
+description = "Forge workflow — statuts et transitions applicatives."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+authors = [
+    { name = "Roger Cauchon" },
+]
+license = "LicenseRef-Forge-Proprietary"
+keywords = ["python", "mvc", "forge", "workflow", "statuts"]
+dependencies = [
+    "forge-mvc==1.0.0b1",
+    "markupsafe>=2.0",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Private :: Do Not Upload",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://caucrogegit.github.io/Forge/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forge_mvc_workflow*"]

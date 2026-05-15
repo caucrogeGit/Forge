@@ -1,0 +1,1 @@
+{{ trans('starter.cs.mail.owner.subject') }} — {{ hebergement_titre }}

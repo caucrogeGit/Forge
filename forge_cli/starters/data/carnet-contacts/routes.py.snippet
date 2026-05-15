@@ -1,0 +1,16 @@
+# forge-starter:carnet-contacts:start
+from mvc.controllers.contact_controller import ContactController
+from mvc.controllers.ville_controller import VilleController
+
+with router.group("/contacts", public=True, csrf=False) as g:
+    g.add("GET",  "",              ContactController.index,   name="contact_index")
+    g.add("GET",  "/new",          ContactController.new,     name="contact_new")
+    g.add("POST", "",              ContactController.create,  name="contact_create")
+    g.add("GET",  "/{id}",         ContactController.show,    name="contact_show")
+    g.add("GET",  "/{id}/edit",    ContactController.edit,    name="contact_edit")
+    g.add("POST", "/{id}",         ContactController.update,  name="contact_update")
+    g.add("POST", "/{id}/delete",  ContactController.destroy, name="contact_destroy")
+
+with router.group("/villes", public=True, csrf=False) as g:
+    g.add("GET", "", VilleController.index, name="ville_index")
+# forge-starter:carnet-contacts:end

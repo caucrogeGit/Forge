@@ -1,0 +1,143 @@
+"""Session utilisateur minimale pour Auth/User."""
+
+from __future__ import annotations
+
+from collections.abc import Callable
+from functools import wraps
+from typing import Any
+
+from core.auth.exceptions import AuthError, InvalidAuthUserError
+from core.auth.password import verify_password
+from core.auth.user import AuthUser, normalize_auth_user, validate_auth_user_contract
+from core.http.response import Response
+
+
+AUTH_USER_ID_SESSION_KEY = "_auth_user_id"
+
+
+def authenticate_user(
+    email: str,
+    password: str,
+    user_loader: Callable[[str], Any],
+) -> AuthUser | None:
+    """Authentifie un email/mot de passe via un loader applicatif."""
+    if not isinstance(email, str) or not email.strip():
+        return None
+    if not isinstance(password, str) or not password:
+        return None
+    if not callable(user_loader):
+        raise AuthError("user_loader doit etre callable")
+
+    try:
+        raw_user = user_loader(email.strip())
+    except Exception:
+        return None
+
+    if raw_user is None:
+        return None
+
+    try:
+        user = raw_user if isinstance(raw_user, AuthUser) else normalize_auth_user(raw_user)
+    except (InvalidAuthUserError, TypeError, ValueError):
+        return None
+
+    if not user.is_active:
+        return None
+    if not verify_password(password, user.password_hash):
+        return None
+    return user
+
+
+def login_user(request: Any, user: AuthUser) -> None:
+    """Stocke uniquement l'identifiant utilisateur dans la session."""
+    validate_auth_user_contract(user)
+    session = _resolve_request_session(request)
+    if session is None:
+        raise AuthError("session introuvable")
+
+    session[AUTH_USER_ID_SESSION_KEY] = user.id
+
+
+def logout_user(request: Any) -> None:
+    """Retire l'identifiant utilisateur Auth/User de la session."""
+    session = _resolve_request_session(request)
+    if session is None:
+        return
+    session.pop(AUTH_USER_ID_SESSION_KEY, None)
+
+
+def get_authenticated_user_id(request: Any) -> int | None:
+    """Retourne l'identifiant utilisateur stocke par login_user."""
+    session = _resolve_request_session(request)
+    if session is None:
+        return None
+
+    user_id = session.get(AUTH_USER_ID_SESSION_KEY)
+    if isinstance(user_id, int) and not isinstance(user_id, bool) and user_id > 0:
+        return user_id
+    return None
+
+
+def current_user(request: Any, user_loader: Callable[[int], Any]) -> AuthUser | None:
+    """Retourne l'utilisateur courant via un loader applicatif."""
+    if not callable(user_loader):
+        raise AuthError("user_loader doit etre callable")
+
+    user_id = get_authenticated_user_id(request)
+    if user_id is None:
+        return None
+
+    try:
+        raw_user = user_loader(user_id)
+    except Exception:
+        return None
+
+    if raw_user is None:
+        return None
+
+    try:
+        user = raw_user if isinstance(raw_user, AuthUser) else normalize_auth_user(raw_user)
+    except (InvalidAuthUserError, TypeError, ValueError):
+        return None
+
+    if not user.is_active:
+        return None
+    return user
+
+
+def is_authenticated(request: Any) -> bool:
+    """Retourne True si une session Auth/User contient un id utilisateur."""
+    return get_authenticated_user_id(request) is not None
+
+
+def login_required(func: Callable | None = None, *, redirect_to: str | None = None):
+    """Protege une fonction controleur avec la session Auth/User minimale."""
+
+    def decorator(wrapped: Callable):
+        @wraps(wrapped)
+        def wrapper(request: Any, *args: Any, **kwargs: Any):
+            if is_authenticated(request):
+                return wrapped(request, *args, **kwargs)
+            if redirect_to:
+                return Response(302, headers={"Location": redirect_to})
+            return Response(401, body=b"Authentication required", content_type="text/plain; charset=utf-8")
+
+        return wrapper
+
+    if func is None:
+        return decorator
+    return decorator(func)
+
+
+def _resolve_request_session(request: Any) -> dict[str, Any] | None:
+    session = getattr(request, "session", None)
+    if isinstance(session, dict):
+        return session
+
+    try:
+        from core.security.session import get_session, get_session_id
+
+        session_id = get_session_id(request)
+        return get_session(session_id) if session_id else None
+    except Exception:
+        return None

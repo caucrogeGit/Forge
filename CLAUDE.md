@@ -1,0 +1,236 @@
+# CLAUDE.md — Briefing pour agents IA travaillant sur Forge
+
+Ce fichier briefe les agents IA (Claude Code, etc.) sur les conventions et
+l'architecture de Forge. Il est conçu pour rester valide sur la durée d'une
+version majeure.
+
+**Mise à jour** : ce fichier est refondu à chaque tag majeur (3.0, 4.0…).
+Pour les informations volatiles (version exacte, tickets en cours, compteur
+de tests), voir les sources canoniques — section 8.
+
+---
+
+## 1. Identité du projet
+
+Forge est un framework web Python **explicite, pédagogique, testable et durable**.
+Il conserve un runtime Python volontairement limité : MariaDB, python-dotenv,
+Jinja2, Pillow, Argon2, PyOTP.
+
+**Type** : framework MVC Python, distribué en plusieurs paquets PyPI :
+
+- `forge-mvc` (core)
+- `forge-mvc-mfa` (authentification multi-facteur)
+- `forge-mvc-rbac` (contrôle d'accès basé sur les rôles)
+- `forge-mvc-workflow` (transitions de statut)
+- `forge-mvc-stats` (agrégats statistiques)
+
+**Python** : 3.12+ minimum (ADR-006).
+
+**Statut** : version courante dans `pyproject.toml`. Série 3.x stable,
+consolidation 3.0.2 en cours. Voir `CHANGELOG.md` et `docs/roadmap/` pour
+l'avancement détaillé.
+
+---
+
+## 2. Charte philosophique v2 — 11 principes
+
+La charte v2 est le **document non négociable** de Forge. Lire `CHARTE_DOC.md`
+intégralement avant toute proposition d'évolution. Les ADR s'y rattachent tous.
+
+Les 11 principes (résumé — la formulation canonique est dans `CHARTE_DOC.md`) :
+
+1. **Séparer framework et application métier**
+2. **Petits tickets, une responsabilité**
+3. **Refuser la magie cachée**
+4. **Préserver le code utilisateur**
+5. **Garder SQL visible**
+6. **Tester avant d'élargir**
+7. **Sécuriser par défaut**
+8. **Noyau minimal, briques opt-in**
+9. **Pas d'écriture invisible dans le code utilisateur**
+10. **Une API publique est un contrat de complétude**
+11. **Une seule façon officielle de faire chaque chose**
+
+**Règles d'évolution A–D** (résumé) :
+
+- A — Retirer la cause, pas le symptôme
+- B — Révéler avant de corriger
+- C — Toute rupture d'API publique passe par une release majeure
+- D — Les tests testent le code, pas la documentation
+
+**Note pré-3.0** (convention pratique, pas dans la charte formelle) : avant le
+tag 3.0, les ruptures internes (suppressions, renommages) se font sans aliases
+dépréciés ni guide de migration formel — pas d'utilisateurs externes ni de code
+applicatif externe à protéger.
+
+---
+
+## 3. Architecture
+
+**Core minimal** (`core/`) :
+
+- HTTP (`Request`, `Response`, middlewares)
+- Routing et application principale
+- Configuration et variables d'environnement
+- Templating (Jinja2)
+- Accès base de données minimal (pas d'ORM)
+- Sessions et cookies
+- Sécurité de base (CSRF, headers, hachage)
+- CLI de génération (`forge_cli/`) — outils non destructifs
+
+**Modules officiels** (installables séparément via pip, dans `packages/`) :
+
+- `forge-mvc-mfa` — facteurs TOTP, codes de récupération, challenge, revalidation
+- `forge-mvc-rbac` — permissions déclaratives, contrôle par rôle
+- `forge-mvc-workflow` — états, transitions, historique
+- `forge-mvc-stats` — agrégats, compteurs, fenêtres temporelles
+
+**Hors scope Forge** (à charge de l'application) :
+
+- Persistance des audits auth (Forge fournit le logging Python — voir ADR-008)
+- OIDC / OAuth (retiré du dépôt — voir ADR-004)
+- Multi-tenant, paiement, SPA frontend
+- ORM complet, marketplace plugins
+
+---
+
+## 4. ADR — Décisions architecturales
+
+Chaque ADR est dans `docs/adr/` et a **force décisionnelle**. À lire avant toute
+proposition qui le concerne. Un nouvel ADR est requis pour toute décision
+structurante.
+
+| Numéro | Fichier | Sujet résumé |
+|---|---|---|
+| ADR-001 | `001-auth-strategy.md` | Stratégie d'authentification Forge 3.x |
+| ADR-002 | `002-session-strategy.md` | Stockage de session |
+| ADR-003 | `003-language-convention.md` | API publique en anglais |
+| ADR-004 | `004-core-perimeter.md` | Périmètre du core minimal strict |
+| ADR-005 | `005-packaging.md` | Packaging hybride monorepo + multi-distributions PyPI |
+| ADR-006 | `006-python-version.md` | Python 3.12+ minimum |
+| ADR-007 | `007-charter-v2-adoption.md` | Adoption formelle de la charte v2 |
+| ADR-008 | `008-auth-audit-architecture.md` | Audit auth : logging fourni, persistance applicative |
+
+Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format existant.
+
+---
+
+## 5. Convention de tickets
+
+**Format** : `DOMAINE-SUJET-NUMÉRO` (ex : `MFA-EXTRACT-001`, `LANG-MIGRATION-001`).
+
+**Un ticket = une responsabilité.** Chaque spec doit indiquer :
+
+- Ce qu'il fait / ce qu'il ne fait pas
+- Les fichiers concernés
+- La stratégie d'implémentation étape par étape
+- Les validations attendues
+- Les limites restantes
+- La charte appliquée
+
+**Workflow attendu** :
+
+1. Spec rédigée (en dialogue dans le chat web)
+2. Exécution par Claude Code
+3. Rapport : commit hash, fichiers créés/modifiés, tests qui passent,
+   écarts vs spec, limites découvertes
+4. Validation, puis ticket suivant
+
+**Format de commit** :
+
+```
+<type>: <message court> (<TICKET-CODE>)
+```
+
+Types : `feat`, `refactor`, `fix`, `docs`, `test`. Message en français,
+impératif, sans majuscule ni point final.
+
+---
+
+## 6. Convention de tests
+
+- pytest, tous les tests dans `tests/`
+- `tests/test_<TICKET>_001.py` pour les garde-fous liés à un ticket structurant
+- Les tests d'absence (`assert not Path("x.py").exists()`, `assert X not in content`)
+  sont la norme après suppressions et renommages
+- Tests paramétrés via `@pytest.mark.parametrize` pour les contrats à plusieurs valeurs
+- Pour inspecter le code source d'un module : `Path(module.__file__).read_text()`
+  plutôt qu'un chemin codé en dur
+
+**Validations attendues avant chaque commit** :
+
+```bash
+python -m pytest -x -q          # complet, 0 régression
+python -m compileall -q .
+ruff check .
+mkdocs build --strict
+git diff --check
+```
+
+---
+
+## 7. Modes d'action de Forge (principe 9)
+
+Forge suit trois modes :
+
+- **Forge génère** — crée des fichiers nouveaux (write-if-new)
+- **Forge affiche** — montre du code à copier-coller
+- **Forge lit** — lit des fichiers existants pour analyse
+
+Forge **ne réécrit jamais silencieusement** un fichier applicatif.
+Si un ticket pourrait modifier `mvc/routes.py`, `mvc/controllers/*.py` ou tout
+fichier sous contrôle utilisateur — **arrêter et proposer une alternative**.
+
+---
+
+## 8. Sources canoniques pour les informations volatiles
+
+Ne pas se fier à ce fichier pour les informations qui changent entre tickets.
+Consulter directement :
+
+| Information | Source canonique |
+|---|---|
+| Version courante | `pyproject.toml` → `[project].version` |
+| Compteur de tests | `python -m pytest --collect-only -q \| tail -3` |
+| Tickets livrés | `CHANGELOG.md` + `git log --oneline` |
+| Tickets en cours / à venir | `docs/roadmap/forge-roadmap.md` |
+| Modules officiels disponibles | `packages/` (un sous-dossier = un module) |
+| API publique d'un module | `<module>/__init__.py` |
+| Principes et règles détaillés | `CHARTE_DOC.md` |
+| Décisions d'architecture | `docs/adr/` |
+
+---
+
+## 9. Patterns émergents (Forge 3.x consolidation)
+
+Les conventions opérationnelles de Forge sont consolidées dans
+`docs/contributing/conventions.md` (18 patterns en 4 sections) :
+
+- **A. Audit avant action** : audit 5 racines, `.gitignore`, historique git,
+  production interne, doc référencée par les tests
+- **B. Tests** : helpers locaux pour formats legacy, `module.__file__`,
+  `PROJECT_ROOT` partagé, classification sémantique des `_001`,
+  généralisation plutôt que suppression, cohérence des noms de tests
+- **C. Code** : lock + delegate, `register_<module>_routes`, note
+  « Module extrait », garde-fous documentaires, word boundaries
+- **D. Documentation** : MkDocs strict + liens hors `docs/`,
+  `docs/history/` comme mémoire brute, section « Historique » dans la nav
+
+Note sur `packages/` : 4 sous-dossiers maintenus (`forge-mvc-mfa`,
+`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`), chacun avec son
+propre `pyproject.toml`. Le `pyproject.toml` racine est la source de vérité
+pour `forge-mvc` (résolu en T2 + T2b — consolidation 3.0.2).
+
+---
+
+## 10. Engagement de mise à jour
+
+Ce fichier a été refondu pour **Forge 3.0.2** — ticket `CLAUDE-MD-3.0.2-REFRESH-001`
+(scénario C de consolidation production-ready).
+
+Il est conçu pour rester valide sans modification pendant toute la série 3.x.
+Les informations volatiles ne sont pas ici — voir section 8.
+
+**Prochaine refonte prévue** : tag majeur 4.0 (ou refonte intermédiaire si
+un changement architectural important le justifie).
+**Dernière refonte** : 2026-05 (Forge 3.0.2, scénario C de consolidation production-ready)

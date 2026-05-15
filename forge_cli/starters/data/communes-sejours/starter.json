@@ -1,0 +1,27 @@
+{
+  "id": "communes-sejours",
+  "number": 5,
+  "name": "Communes & Séjours",
+  "kind": "skeleton",
+  "aliases": ["5", "communes-sejours", "communes"],
+  "description": "Starter 5 — Démonstrateur avancé Forge (pages publiques + formulaire + notifications mail)",
+  "status": "available",
+  "requires_db": false,
+  "routes_marker": "communes-sejours",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/communes-sejours",
+  "doc_url": "https://caucrogegit.github.io/Forge/starters/communes-sejours/",
+  "check_paths": [
+    "mvc/controllers/communes_sejours_controller.py",
+    "mvc/forms/demande_sejour_form.py",
+    "mvc/views/public/communes_sejours",
+    "mvc/mail/templates/communes_sejours",
+    "mvc/entities/commune",
+    "mvc/entities/proprietaire",
+    "mvc/entities/hebergement",
+    "mvc/entities/demande_sejour",
+    "mvc/entities/relations.json",
+    "translations/fr.json",
+    "seed"
+  ]
+}

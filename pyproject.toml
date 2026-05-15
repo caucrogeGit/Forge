@@ -1,0 +1,95 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc"
+version = "1.0.0b1"
+description = "Framework web applicatif Python minimaliste, pédagogique et extensible."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+
+authors = [
+    { name = "Roger Lequette" },
+]
+
+license = "LicenseRef-Forge-Proprietary"
+license-files = ["LICENSE"]
+
+keywords = ["python", "mvc", "framework", "web", "education", "forge"]
+
+dependencies = [
+    "mariadb==1.1.14",
+    "python-dotenv==1.2.2",
+    "jinja2==3.1.6",
+    "Pillow>=10.0,<13",
+    "argon2-cffi>=25.1,<26",
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://caucrogegit.github.io/Forge/"
+Issues = "https://github.com/caucrogeGit/Forge/issues"
+
+# Extras désactivés temporairement : les modules opt-in
+# (forge-mvc-mfa, -rbac, -workflow, -stats) ne sont pas encore publiés
+# sur PyPI. Ils restent installables via le mode dev (clone GitHub +
+# pip install -r requirements-dev.txt).
+# Réintroduction prévue en 3.1 (OPTIN-PYPI-PUBLISH-001).
+#
+# [project.optional-dependencies]
+# rbac = ["forge-mvc-rbac==3.X.Y"]
+# workflow = ["forge-mvc-workflow==3.X.Y"]
+# stats = ["forge-mvc-stats==3.X.Y"]
+# all = ["forge-mvc-rbac==3.X.Y", "forge-mvc-workflow==3.X.Y", "forge-mvc-stats==3.X.Y"]
+# mfa = ["forge-mvc-mfa==3.X.Y"]
+
+[project.scripts]
+forge = "forge:cli_entrypoint"
+
+[tool.setuptools]
+py-modules = ["forge"]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "forge_cli*", "integrations*"]
+
+[tool.setuptools.package-data]
+"forge_cli" = [
+    "starters/data/**/*",
+]
+
+[tool.setuptools.exclude-package-data]
+"forge_cli" = [
+    "starters/data/**/__pycache__/*",
+    "starters/data/**/*.pyc",
+    "starters/data/**/*.pyo",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+exclude = ["cmd/", ".venv/", "site/", "packages/core", "packages/forge_cli", "packages/integrations"]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = [
+    "E501",  # line-too-long — géré séparément
+    "E741",  # ambiguous-variable-name — intentionnel dans les boucles et générateurs
+    "E402",  # module-import-not-at-top — intentionnel dans app.py et scripts
+]

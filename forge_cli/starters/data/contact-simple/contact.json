@@ -1,0 +1,47 @@
+{
+  "format_version": 1,
+  "entity": "Contact",
+  "table": "contact",
+  "description": "Contacts — starter niveau 1",
+  "fields": [
+    {
+      "name": "id",
+      "sql_type": "INT",
+      "primary_key": true,
+      "auto_increment": true
+    },
+    {
+      "name": "nom",
+      "sql_type": "VARCHAR(80)",
+      "constraints": {
+        "not_empty": true,
+        "max_length": 80
+      }
+    },
+    {
+      "name": "prenom",
+      "sql_type": "VARCHAR(80)",
+      "constraints": {
+        "not_empty": true,
+        "max_length": 80
+      }
+    },
+    {
+      "name": "email",
+      "sql_type": "VARCHAR(120)",
+      "unique": true,
+      "constraints": {
+        "not_empty": true,
+        "max_length": 120
+      }
+    },
+    {
+      "name": "telephone",
+      "sql_type": "VARCHAR(20)",
+      "nullable": true,
+      "constraints": {
+        "max_length": 20
+      }
+    }
+  ]
+}

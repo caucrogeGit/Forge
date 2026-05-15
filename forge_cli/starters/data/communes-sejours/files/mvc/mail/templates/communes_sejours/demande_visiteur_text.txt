@@ -1,0 +1,15 @@
+Bonjour {{ nom }},
+
+Nous avons bien reçu votre demande de séjour pour l'hébergement suivant :
+
+  Hébergement  : {{ hebergement_titre }}
+  Commune      : {{ hebergement_commune }}
+  Arrivée      : {{ date_arrivee }}
+  Départ       : {{ date_depart }}
+  Personnes    : {{ nombre_personnes }}
+
+Cette demande ne constitue pas une réservation confirmée.
+Vous serez contacté(e) directement par le propriétaire ou gestionnaire.
+
+---
+Démonstrateur Forge — Communes & Séjours

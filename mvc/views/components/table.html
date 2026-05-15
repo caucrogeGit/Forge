@@ -1,0 +1,20 @@
+<div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200 rounded">
+        <thead class="bg-gray-50">
+            <tr>
+                {% for header in headers | default([]) %}
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for row in rows | default([]) %}
+            <tr class="hover:bg-gray-50">
+                {% for cell in row %}
+                <td class="px-4 py-3 text-sm text-gray-900">{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,38 @@
+{
+  "format_version": 1,
+  "relations": [
+    {
+      "name": "hebergement_commune",
+      "type": "many_to_one",
+      "from_entity": "Hebergement",
+      "to_entity": "Commune",
+      "from_field": "commune_id",
+      "to_field": "id",
+      "foreign_key_name": "fk_hebergement_commune",
+      "on_delete": "SET NULL",
+      "on_update": "CASCADE"
+    },
+    {
+      "name": "hebergement_proprietaire",
+      "type": "many_to_one",
+      "from_entity": "Hebergement",
+      "to_entity": "Proprietaire",
+      "from_field": "proprietaire_id",
+      "to_field": "id",
+      "foreign_key_name": "fk_hebergement_proprietaire",
+      "on_delete": "SET NULL",
+      "on_update": "CASCADE"
+    },
+    {
+      "name": "demande_hebergement",
+      "type": "many_to_one",
+      "from_entity": "DemandeSejour",
+      "to_entity": "Hebergement",
+      "from_field": "hebergement_id",
+      "to_field": "id",
+      "foreign_key_name": "fk_demande_hebergement",
+      "on_delete": "SET NULL",
+      "on_update": "CASCADE"
+    }
+  ]
+}

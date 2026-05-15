@@ -1,0 +1,19 @@
+{% extends "layouts/app.html" %}
+
+{% block content %}
+<section class="bg-white border border-slate-200 rounded shadow-sm p-6">
+    <p class="text-sm font-semibold text-orange-600 uppercase">Profil</p>
+    <h1 class="text-2xl font-bold text-slate-900 mt-1">{{ utilisateur.prenom }} {{ utilisateur.nom }}</h1>
+
+    <dl class="grid gap-4 mt-6 sm:grid-cols-2">
+        <div>
+            <dt class="text-sm text-slate-500">Login</dt>
+            <dd class="font-medium text-slate-900">{{ utilisateur.login }}</dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">Email</dt>
+            <dd class="font-medium text-slate-900">{{ utilisateur.email or "Non renseigné" }}</dd>
+        </div>
+    </dl>
+</section>
+{% endblock %}
