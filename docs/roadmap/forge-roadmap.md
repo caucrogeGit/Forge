@@ -65,6 +65,21 @@ Pour l'état détaillé du Scénario C, voir
 
 ---
 
+## Phase 0 — Baseline d'audit (post-1.0.0-beta.1)
+
+**Objectif** : figer officiellement la baseline d'audit avant toute correction
+post-audits. Ce n'est pas une version de release.
+
+| Ticket | Description | État |
+|---|---|---|
+| AUDIT-BASELINE-LOCK-001 | Figer la baseline d'audit (commit + tag non-release) | **livré** |
+| AUDIT-FINDINGS-TRACKER-001 | Créer le tracker détaillé des constats | à venir |
+
+**Baseline** : commit `d611636`, tag `baseline/audit-2026-05-15`.
+**Document de référence** : [`docs/history/audits/audit-baseline-2026-05-15.md`](../history/audits/audit-baseline-2026-05-15.md).
+
+---
+
 ## Socle livré en Forge 1.5.0
 
 Forge 1.5.0 fournit un socle MVC complet :
