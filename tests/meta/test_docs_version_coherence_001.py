@@ -94,3 +94,37 @@ class TestReleasePolicyOptInVersions:
             "docs/release-policy.md doit mentionner '1.0.0-beta.5' "
             "comme cible de publication coordonnée des opt-ins."
         )
+
+
+class TestRoadmapActiveSection:
+    """La roadmap publique ne présente pas 3.x comme trajectoire active ou future."""
+
+    def test_no_beyond_3x(self):
+        roadmap = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
+        if not roadmap.exists():
+            pytest.skip("forge-roadmap.md n'existe pas")
+        text = roadmap.read_text(encoding="utf-8")
+        assert "au-delà de 3.0" not in text, (
+            "forge-roadmap.md contient 'au-delà de 3.0' — "
+            "utiliser 'au-delà de la version 1.0.0 stable'."
+        )
+
+    def test_trajectory_mentions_beta6(self):
+        roadmap = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
+        if not roadmap.exists():
+            pytest.skip("forge-roadmap.md n'existe pas")
+        text = roadmap.read_text(encoding="utf-8")
+        assert "1.0.0-beta.6" in text, (
+            "forge-roadmap.md doit mentionner '1.0.0-beta.6' "
+            "comme T0 des tests terrain (conforme ADR-009)."
+        )
+
+    def test_trajectory_mentions_rc1(self):
+        roadmap = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
+        if not roadmap.exists():
+            pytest.skip("forge-roadmap.md n'existe pas")
+        text = roadmap.read_text(encoding="utf-8")
+        assert "1.0.0-rc1" in text, (
+            "forge-roadmap.md doit mentionner '1.0.0-rc1' "
+            "comme étape avant stable (conforme ADR-009)."
+        )

@@ -90,6 +90,28 @@ post-audit. Aucune modification de runtime, CLI, générateurs ou packaging.
 |---|---|---|
 | DOCS-OPTIN-INSTALL-CONTRACT-001 | Clarifier le contrat d'installation des opt-ins | **livré** |
 | VERSION-COHERENCE-1.0-001 | Aligner les références de version publiques avec la trajectoire 1.0 | **livré** |
+| ROADMAP-PUBLIC-VERSION-CLEANUP-001 | Nettoyer la roadmap publique pour la trajectoire 1.0 beta | **livré** |
+
+---
+
+## Trajectoire officielle — 1.0.0 stable
+
+Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :
+
+```text
+1.0.0-beta.1  ← point de départ (baseline/audit-2026-05-15)
+1.0.0-beta.2  ← corrections post-audit (Phase 1)
+1.0.0-beta.3  ← corrections post-audit (Phase 2)
+1.0.0-beta.4  ← corrections post-audit (Phase 3)
+1.0.0-beta.5  ← corrections post-audit (Phase 4) + publication opt-ins
+1.0.0-beta.6  ← bêta consolidée = T0 tests terrain
+→ tests terrain : 2 mois minimum
+→ 1.0.0-rc1   ← release candidate
+→ 1.0.0       ← stable
+```
+
+`1.0.0-beta.6` marque le T0 officiel des tests terrain (ADR-009).
+Un passage en stable ne peut intervenir qu'après terrain validé et RC publiée.
 
 ---
 
@@ -730,7 +752,7 @@ et documentation associée dans `docs/reference.md`.
 
 ## Phase 14 — Refonte vers Forge 3.0
 
-**État : en cours (v2.4.0 → v2.10.0+).**
+**État : terminée — historique (v2.4.0 → v2.10.0 → v3.0.0, puis renommée 1.0.0-beta.1 à la publication PyPI).**
 
 Objectif : reconstruire Forge avec un cœur minimal strict, une API publique
 anglophone, un packaging multi-distributions PyPI et des modules officiels
@@ -789,12 +811,11 @@ Extractions physiques, suppressions et reconstruction — de v2.5.0 à v2.10.0.
 
 ### Phase 14.4 — Clôture pré-3.0
 
-Tickets restants avant le tag v3.0.0 (à spécifier).
+*(Phase 14.4 close — tag v3.0.0 livré, renommé 1.0.0-beta.1 à la publication PyPI.)*
 
 | Ticket | Objectif |
 |---|---|
 | DOCS-REFERENCE-SPLIT-001 | mise à jour des références documentaires après consolidation |
-| … | (tickets 37-41 à définir) |
 
 ### Déférés post-3.0
 
@@ -810,7 +831,7 @@ Tickets restants avant le tag v3.0.0 (à spécifier).
 ## Phases futures possibles
 
 Ces phases ne font pas encore l'objet de tickets actifs. Elles prolongent Forge
-au-delà de 3.0.
+au-delà de la version 1.0.0 stable.
 
 | Phase | Contenu |
 |---|---|
@@ -835,6 +856,11 @@ Interdictions maintenues :
 
 ## Conclusion actualisée
 
+> **Note historique** — cette section documente l'état à la clôture de la Phase 13
+> et au lancement de la Phase 14 (refonte vers 3.0). La version publique actuelle
+> est **Forge 1.0.0-beta.1**. Pour la trajectoire active, voir la section
+> "Trajectoire officielle — 1.0.0 stable" ci-dessus.
+
 La roadmap Forge est désormais centrée sur un objectif clair :
 
 ```text
@@ -843,7 +869,7 @@ Faire de Forge une première version publiable et exploitable.
 
 Forge Design sort de cette roadmap et devient un projet compagnon séparé.
 
-**Forge 2.2.0 est la version courante.**
+**Forge 2.2.0 était la version courante à la clôture de la Phase 13.**
 
 - Release v2.0.0 : https://github.com/caucrogeGit/Forge/releases/tag/v2.0.0
 - Release v2.0.1 : https://github.com/caucrogeGit/Forge/releases/tag/v2.0.1
@@ -853,7 +879,7 @@ Forge Design sort de cette roadmap et devient un projet compagnon séparé.
 
 Phases 0–10 et phases post-2.0 (4.9, 5, 5.5, 6, 7, 8, 9, 10) terminées. Phase 4.5 Auth/User complète. Phase 11 Auth avancée / durcissement applicatif close (AUTH-MFA-004, AUTH-OIDC-AUDIT-001, AUTH-SESSION-HARDENING-001, AUTH-ADMIN-UX-001, AUTH-DOC-CONSOLIDATION-001, PHASE-11-AUTH-CLOSE-001). Phase 12 Dettes sécurité et UX applicative close (CRUD-RBAC-UI-001, SECURITY-CACHE-001, SECURITY-COOKIES-HOST-PREFIX-001, E2E-UPLOAD-HTTP-001, SECURITY-UPLOAD-RATE-LIMIT-001, PHASE-12-SECURITY-UX-CLOSE-001). Phase 13 CRUD avancé en cours — CRUD-FILTER-001 livré, CRUD-FILTER-HTMX-001 livré, CRUD-FILTER-DOC-001 livré, CRUD-BULK-ACTIONS-AUDIT-001 livré (audit : route `/bulk-delete`, CSRF automatique, RBAC réutilisé, IDs paramétrés, pas de JS ni HTMX initialement, recommande CRUD-BULK-DELETE-001). CRUD-BULK-DELETE-001 livré (cases à cocher, confirmation, CSRF, RBAC, `_parse_bulk_ids`, SQL paramétrée `IN(?)`, 60 tests, docs). CRUD-SORT-001 livré (whitelist `_ALLOWED_SORT`, validation sort/direction, liens de tri HTMX + fallback href, réinitialisation page, conservation q/filtres, 42 tests, docs). CRUD-HTMX-001 livré (audit consolidation : cible unique `#crud-results`, swap `innerHTML`, `hx-push-url` cohérents sur pagination/tri/filtres/reset, fallbacks HTML présents, suppression groupée intentionnellement classique, 59 tests, docs). CRUD-EXPORT-AUDIT-001 livré (audit export CSV : route `GET /{plural}/export.csv`, export filtré avec limite 1000, RBAC via `index`, protection injection CSV, headers `Content-Type`+`Content-Disposition`+`Cache-Control`, pas de HTMX, ticket suivant `CRUD-EXPORT-CSV-001`). CRUD-EXPORT-CSV-001 livré (export CSV généré : `_EXPORT_LIMIT=1000`, `find_{plural}_for_export`, `_csv_escape`, `export_csv`, route `GET /export.csv`, lien `<a href>` classique sans HTMX, headers corrects, RBAC via `index`, 66 tests). Phase 13 CRUD avancé close (PHASE-13-CRUD-CLOSE-001) — 9 tickets livrés : filtres déclaratifs, HTMX consolidé, tri sécurisé, suppression groupée, export CSV. RELEASE-2.3.0-001 livré — Forge 2.3.0 taggé, wheel construite, version figée avant refonte profonde. Roadmap unifiée en vigueur.
 
-Prochaine priorité immédiate :
+Prochaine priorité immédiate *(note historique — état à la clôture de la Phase 13)* :
 
 ```text
 FORGE-DESIGN-ROADMAP-001
@@ -950,7 +976,7 @@ fonctionnel et documentation à jour.
 
 | Ticket | Description courte | État |
 |---|---|---|
-| T6 ROADMAP-3.0.1-3.0.2-001 | Mise à jour de cette roadmap | **en cours** |
+| T6 ROADMAP-3.0.1-3.0.2-001 | Mise à jour de cette roadmap | **livré** |
 | T10 STARTER-6-DOC-001 | Documentation du starter 6 (auth-mfa) | à faire |
 | T11 FORGE-HELP-COVERAGE-001 | Couverture des aides `forge --help` | **livré** |
 | T12 PACKAGE-LOCK-SYNC-001 | Sync versions entre 5 pyproject | **livré** |

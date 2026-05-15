@@ -502,7 +502,7 @@ Après la migration :
 | Domaine | Ticket futur |
 |---|---|
 | Politique LTS (Long Term Support) | `RELEASE-LTS-001` |
-| Guide de migration spécifique 2.x → 3.0.0 | À créer avant Forge 3.0.0 |
+| Guide de migration entre anciennes séries et trajectoire 1.0.0 | À créer avant la version stable `1.0.0` |
 | Outil de détection automatique des dépréciations | post-roadmap |
 | Migrations SQL versionnées | post-roadmap |
 
