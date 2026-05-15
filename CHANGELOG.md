@@ -2,16 +2,16 @@
 
 ## [1.0.0-beta.1] — 2026-05-15
 
-Première publication publique du code source de Forge.
-La commande `pipx install forge-mvc` sera disponible après publication sur PyPI
-(ticket `PYPI-PUBLISH-001`).
+Première publication publique du code source de Forge et publication sur PyPI.
 
 ### Infrastructure PyPI
 
-- Publication PyPI du core `forge-mvc` prévue après validation TestPyPI (`PYPI-PUBLISH-001`).
-- Extras `[rbac]`, `[workflow]`, `[stats]`, `[all]`, `[mfa]` retirés temporairement
-  du `pyproject.toml` racine — les modules opt-in ne sont pas encore sur PyPI.
-  Réintroduction prévue ultérieurement (`OPTIN-PYPI-PUBLISH-001`).
+- Publication PyPI réalisée : `forge-mvc==1.0.0b1` disponible sur [PyPI](https://pypi.org/project/forge-mvc/1.0.0b1/).
+- TestPyPI validé avant PyPI — artefacts `twine check` PASSED.
+- Installation pip validée : `python -m pip install --pre forge-mvc`.
+- Installation pipx validée : `pipx install --pip-args="--pre" forge-mvc`.
+- `--pre` est nécessaire car `1.0.0b1` est une préversion bêta PEP 440.
+- Extras `[rbac]`, `[workflow]`, `[stats]`, `[all]`, `[mfa]` non publiés — modules opt-in en mode source-only via GitHub (`OPTIN-PYPI-PUBLISH-001`).
 
 ### Documentation
 

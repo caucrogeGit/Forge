@@ -2,14 +2,14 @@
 
 [Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-!!! info "Publication PyPI à venir"
+!!! info "Forge {{forge_version}} — bêta disponible sur PyPI"
 
-    Le core `forge-mvc` **sera** disponible sur PyPI dans une prochaine publication.
-    Pour **Forge {{forge_version}}** (bêta publique), l'installation recommandée
-    est depuis GitHub — voir [Installation depuis GitHub](installation-github.md).
+    Le core `forge-mvc` est publié sur [PyPI](https://pypi.org/project/forge-mvc/)
+    sous la version `{{forge_version}}`. L'option `--pip-args="--pre"` est nécessaire car
+    `{{forge_version}}` est une préversion bêta PEP 440.
 
     Les **modules opt-in** (MFA, RBAC, workflow, statistiques) restent en mode
-    source-only via GitHub.
+    source-only via GitHub — voir [Installation depuis GitHub](installation-github.md).
 
 `pipx` est la méthode la plus simple pour utiliser Forge comme commande globale.
 
@@ -25,7 +25,7 @@ exec $SHELL -l
 ## Installer Forge
 
 ```bash
-pipx install forge-mvc
+pipx install --pip-args="--pre" forge-mvc
 forge --version
 ```
 

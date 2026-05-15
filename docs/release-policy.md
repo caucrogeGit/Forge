@@ -307,12 +307,12 @@ Vérifications post-publication :
 
 ### Publication PyPI
 
-**État Forge {{forge_version}} :** le core `forge-mvc` **sera publié sur PyPI** après validation TestPyPI
-(ticket `PYPI-PUBLISH-001`). La commande `pipx install forge-mvc` sera disponible après cette étape.
+**État Forge {{forge_version}} :** le core `forge-mvc` est **publié sur PyPI** sous `forge-mvc=={{forge_version}}`.
+`{{forge_version}}` est une préversion bêta PEP 440 — l'option `--pre` est nécessaire pour l'installer.
 
 | Package | Publication PyPI | Notes |
 |---|---|---|
-| `forge-mvc` (core) | Publication prévue (`PYPI-PUBLISH-001`) | `pipx install forge-mvc` |
+| `forge-mvc` (core) | ✅ Publié — `{{forge_version}}` | `pip install --pre forge-mvc` |
 | `forge-mvc-mfa` | Prévue après `SEC-MFA-SECRET-ENCRYPTION-001` | mode source-only |
 | `forge-mvc-rbac` | Prévue 3.1+ (`OPTIN-PYPI-PUBLISH-001`) | mode source-only |
 | `forge-mvc-workflow` | Prévue 3.1+ (`OPTIN-PYPI-PUBLISH-001`) | mode source-only |

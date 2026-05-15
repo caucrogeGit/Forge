@@ -337,10 +337,9 @@
     <div class="mt-16 mb-10">
       <h3 id="modules" class="text-2xl font-bold tracking-tight mb-3">Modules officiels opt-in</h3>
       <p class="text-slate-500 text-sm max-w-2xl">
-        Distribués séparément sur PyPI. Installer un module se fait via
-        <code class="text-xs bg-slate-100 px-2 py-0.5 rounded">pip install forge-mvc-&lt;module&gt;</code>
-        ou via extras
-        <code class="text-xs bg-slate-100 px-2 py-0.5 rounded">forge-mvc[mfa]</code>.
+        Disponibles en mode source-only via GitHub. Installation depuis le monorepo — voir
+        <code class="text-xs bg-slate-100 px-2 py-0.5 rounded">requirements-dev.txt</code>.
+        Publication PyPI des opt-in prévue dans une version ultérieure.
       </p>
     </div>
 
@@ -571,23 +570,21 @@
           Pour installer la commande Forge, créer un projet et lancer le serveur de développement.
         </p>
         <div class="landing-panel rounded-xl overflow-hidden border border-white/10">
-          <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> pipx install forge-mvc
+          <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> pipx install --pip-args="--pre" forge-mvc
 <span class="landing-accent-text">$</span> forge new MonApplication
 <span class="landing-accent-text">$</span> cd MonApplication
 <span class="landing-accent-text">$</span> forge doctor
 <span class="landing-accent-text">$</span> python app.py</pre>
         </div>
         <p class="text-xs text-slate-400 mt-3 leading-relaxed">
-          Pour installer les modules officiels en plus du core :
-          <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded">pipx install "forge-mvc[all]"</code>
-          (ou <code class="text-xs">[mfa]</code>, <code class="text-xs">[rbac]</code>,
-          <code class="text-xs">[workflow]</code>, <code class="text-xs">[stats]</code>).
+          Forge 1.0.0-beta.1 est une préversion — <code class="text-xs">--pip-args="--pre"</code> est requis.
+          Les modules opt-in s'installent depuis GitHub via <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded">requirements-dev.txt</code>.
         </p>
         <div class="mt-5 flex gap-3">
           <a href="https://caucrogegit.github.io/Forge/installation/"
              target="_blank" rel="noopener noreferrer"
              class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Guide installation</a>
-          <button data-copy="pipx install forge-mvc && forge new MonApplication" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-slate-500 hover:text-slate-900 transition-colors">Copier</button>
+          <button data-copy='pipx install --pip-args="--pre" forge-mvc &amp;&amp; forge new MonApplication' class="landing-copy-btn text-xs px-3 py-1.5 rounded text-slate-500 hover:text-slate-900 transition-colors">Copier</button>
         </div>
       </div>
 

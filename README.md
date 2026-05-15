@@ -4,8 +4,8 @@
 [![Python](https://img.shields.io/pypi/pyversions/forge-mvc.svg)](https://pypi.org/project/forge-mvc/)
 [![License](https://img.shields.io/badge/license-Forge%20Proprietary-blue.svg)](https://github.com/caucrogeGit/Forge/blob/main/LICENSE)
 
-> **Forge 1.0.0-beta.1 — bêta publique.** Publication sur PyPI prévue dans une version ultérieure.
-> Pour l'instant, l'installation se fait depuis GitHub — voir [Installation depuis GitHub](#installation-depuis-github).
+> **Forge 1.0.0-beta.1 — bêta publique.** Disponible sur [PyPI](https://pypi.org/project/forge-mvc/1.0.0b1/) sous `forge-mvc==1.0.0b1`.
+> L'option `--pre` est nécessaire car `1.0.0b1` est une préversion bêta PEP 440.
 
 *Une forge pour les créer toutes. Framework web applicatif.*
 
@@ -64,7 +64,7 @@ et ce que **l'application implémente**.
 
 Forge sépare le noyau minimal des fonctionnalités spécialisées.
 Les modules suivants sont distribués en **mode source-only** via GitHub
-(publication PyPI prévue dans une version ultérieure) :
+(publication PyPI des opt-in prévue dans une version ultérieure) :
 
 | Module | Rôle | Statut |
 |--------|------|--------|
@@ -179,8 +179,8 @@ chemin standard généré par Forge. Voir `docs/front.md`.
 
 ## Installation depuis GitHub
 
-Forge 1.0.0-beta.1 n'est pas encore sur PyPI. L'installation recommandée est le clone depuis GitHub.
-La publication sur PyPI (`pipx install forge-mvc`) est prévue dans une version ultérieure.
+Le core `forge-mvc` est disponible sur [PyPI](https://pypi.org/project/forge-mvc/) — voir [Installation avec pipx](docs/installation-pipx.md).
+L'installation depuis GitHub est recommandée pour contribuer ou travailler directement sur les sources.
 
 ### 1. Installer les prérequis système
 

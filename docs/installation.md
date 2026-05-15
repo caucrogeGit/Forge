@@ -17,7 +17,7 @@ chemin le plus simple pour votre usage, puis passez au [guide de démarrage](gui
 
 ## Modèle de packages
 
-Forge {{forge_version}} prévoit de distribuer le **core** sur PyPI dans une prochaine publication.
+Forge {{forge_version}} distribue le **core** sur [PyPI](https://pypi.org/project/forge-mvc/) sous `forge-mvc=={{forge_version}}` (bêta publique — `--pre` requis).
 Les 4 modules opt-in restent en mode source-only via GitHub.
 Voir [Politique de release](release-policy.md#publication-pypi).
 
