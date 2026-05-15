@@ -28,5 +28,18 @@
       "Bash(rm -rf:*)",
       "Bash(rm -fr:*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/forge-write-if-new.sh"
+          }
+        ]
+      }
+    ]
   }
 }

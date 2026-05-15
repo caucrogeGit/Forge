@@ -265,3 +265,44 @@ rm -rf / rm -fr
 Les overrides personnels vont dans `.claude/settings.local.json` (non commité,
 ignoré par `.gitignore`). Ne pas modifier `settings.json` pour des préférences
 individuelles.
+
+---
+
+## 12. Fichiers protégés — hook PreToolUse
+
+Le script `.claude/hooks/forge-write-if-new.sh` est branché sur `Edit`,
+`Write` et `MultiEdit`. Il applique automatiquement les règles §4 et §9 de la
+charte avant chaque écriture.
+
+**Règles dans l'ordre (premier match gagne) :**
+
+| # | Condition | Résultat |
+|---|---|---|
+| 1 | Le fichier n'existe pas encore | Autorisé (write-if-new) |
+| 2 | Le nom se termine par `_base.py` | Autorisé (régénérable) |
+| 3 | Fichier structurant (liste ci-dessous) | **Bloqué §9** |
+| 4 | Chemin sous `starters/**` ou `examples/**`, fichier existant | **Bloqué §4** |
+| 5 | Tout le reste | Autorisé par défaut |
+
+**Fichiers toujours bloqués (règle 3) :**
+
+```
+charte_philosophique_forge_v2.md
+CLAUDE.md
+.claude/settings.json
+.claude/hooks/**
+pyproject.toml
+CHANGELOG.md
+.env  /  .env.*  /  **/.env  /  **/.env.*
+```
+
+**Zone code-utilisateur bloquée (règle 4) :**
+
+```
+starters/**     — starters Forge distribués
+examples/**     — exemples du framework
+```
+
+Si Claude Code est bloqué sur un fichier qu'il devrait pouvoir modifier,
+vérifier que le chemin ne matche pas l'une de ces règles et ajuster le ticket
+en conséquence.
