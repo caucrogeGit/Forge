@@ -314,9 +314,9 @@ Vérifications post-publication :
 |---|---|---|
 | `forge-mvc` (core) | ✅ Publié — `{{forge_version}}` | `pip install --pre forge-mvc` |
 | `forge-mvc-mfa` | Prévue après `SEC-MFA-SECRET-ENCRYPTION-001` | mode source-only |
-| `forge-mvc-rbac` | Prévue 3.1+ (`OPTIN-PYPI-PUBLISH-001`) | mode source-only |
-| `forge-mvc-workflow` | Prévue 3.1+ (`OPTIN-PYPI-PUBLISH-001`) | mode source-only |
-| `forge-mvc-stats` | Prévue 3.1+ (`OPTIN-PYPI-PUBLISH-001`) | mode source-only |
+| `forge-mvc-rbac` | Prévue à partir de `1.0.0-beta.5` (`OPTIN-PYPI-PUBLISH-001`) | mode source-only |
+| `forge-mvc-workflow` | Prévue à partir de `1.0.0-beta.5` (`OPTIN-PYPI-PUBLISH-001`) | mode source-only |
+| `forge-mvc-stats` | Prévue à partir de `1.0.0-beta.5` (`OPTIN-PYPI-PUBLISH-001`) | mode source-only |
 
 Pour les modules opt-in, utiliser [Installation depuis GitHub](installation-github.md).
 

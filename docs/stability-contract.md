@@ -1,16 +1,18 @@
-# Contrat de stabilité Forge 3.x
+# Contrat de stabilité Forge 1.x
+
+> **Note** : Ce document a été écrit pendant la série interne 3.x, renommée `1.x` lors de la publication PyPI. Les références à « Forge 3.x » ont été mises à jour pour refléter la série publique `1.x`.
 
 [Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Ce document définit ce que Forge considère comme stable, interne, expérimental ou garanti pour les projets construits sur Forge 3.x.
+Ce document définit ce que Forge considère comme stable, interne, expérimental ou garanti pour les projets construits sur Forge 1.x.
 
-Il ne décrit pas de nouvelles fonctionnalités. Il explicite les promesses implicites présentes dans le code, les générateurs et la documentation pour la série 3.x. Pour les changements entre versions majeures, voir le guide de migration.
+Il ne décrit pas de nouvelles fonctionnalités. Il explicite les promesses implicites présentes dans le code, les générateurs et la documentation pour la série 1.x. Pour les changements entre versions majeures, voir le guide de migration.
 
 ---
 
 ## Objectif du contrat
 
-Forge 3.x garantit la stabilité de son interface publique : commandes CLI documentées, structure projet générée, conventions `mvc/`, fichiers d'entités JSON, helpers publics et clés de configuration documentées.
+Forge 1.x garantit la stabilité de son interface publique : commandes CLI documentées, structure projet générée, conventions `mvc/`, fichiers d'entités JSON, helpers publics et clés de configuration documentées.
 
 Le contrat couvre également :
 
@@ -24,7 +26,7 @@ Ce qui n'est pas listé ici comme stable peut changer entre versions mineures sa
 
 ## Ce que Forge considère comme stable
 
-Les éléments suivants sont garantis pour toute la série 3.x :
+Les éléments suivants sont garantis pour toute la série 1.x :
 
 - Les commandes CLI listées dans la section [Commandes CLI stables](#commandes-cli-stables).
 - La structure de projet générée par `forge new` (dossiers `mvc/`, `env/`, `static/`, `app.py`, `forge_profile.txt`).
@@ -60,7 +62,7 @@ Les éléments suivants sont garantis pour toute la série 3.x :
 
 ## Ce qui est interne
 
-Les éléments suivants peuvent changer sans notice entre versions mineures de Forge 3.x :
+Les éléments suivants peuvent changer sans notice entre versions mineures de Forge 1.x :
 
 - Fonctions et modules internes de `forge_cli/` (générateurs, parseurs, builders).
 - Fonctions préfixées `_` dans tout le code source Forge.
@@ -86,8 +88,8 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 | `forge starter:build` | Expérimental |
 | Pages publiques (`make:public-*`) | Disponible, interface stable, comportement peut s'affiner |
 | Backends de session FileStore / MariaDbStore | Disponible, API stable, options de configuration susceptibles d'évoluer |
-| `forge-mvc-mfa` (Pre-Alpha) | Secret TOTP stocké en clair. Non recommandé en production sensible avant SEC-MFA-SECRET-ENCRYPTION-001 (3.1.0). |
-| OIDC | Retiré du core en 3.x (ADR-004). Si réintroduit via `forge-mvc-oidc`, sera expérimental jusqu'à Beta confirmée. |
+| `forge-mvc-mfa` (Pre-Alpha) | Secret TOTP stocké en clair. Non recommandé en production sensible avant `SEC-MFA-SECRET-ENCRYPTION-001` — ticket post-1.0, tant que MFA reste Pre-Alpha. |
+| OIDC | Retiré du core (ADR-004). Si réintroduit via `forge-mvc-oidc`, sera expérimental jusqu'à Beta confirmée. |
 
 ---
 
@@ -148,7 +150,7 @@ Forge ne modifie jamais ces fichiers sans action explicite du développeur :
 
 ## Commandes CLI stables
 
-Ces commandes et leurs options documentées sont garanties pour Forge 3.x.
+Ces commandes et leurs options documentées sont garanties pour Forge 1.x.
 
 ### Projet
 
@@ -227,7 +229,7 @@ Ces commandes et leurs options documentées sont garanties pour Forge 3.x.
 
 ## Format de l'aide CLI
 
-`forge help`, `forge --help`, `forge -h` et `forge` (sans argument) affichent une aide groupée par famille de commandes. Ce comportement est stable sur Forge 3.x.
+`forge help`, `forge --help`, `forge -h` et `forge` (sans argument) affichent une aide groupée par famille de commandes. Ce comportement est stable sur Forge 1.x.
 
 | Élément | Comportement |
 |---|---|
@@ -249,7 +251,7 @@ Conseil : <suggestion>   # optionnel
 ```
 
 - Sortie sur **stderr**, code de sortie **1**.
-- Ce format est stable sur Forge 3.x.
+- Ce format est stable sur Forge 1.x.
 - Les tags `[ERREUR]` dans les sorties de génération d'artefacts sont distincts et non concernés.
 
 Les conseils (`Conseil :`) indiquent une action simple à essayer. Ils n'appliquent jamais de correction automatique. Les détails des rapports `forge doctor` et `forge project:check` suivent le même principe : ils ajoutent une piste d'action à la fin du message de diagnostic.
@@ -271,18 +273,18 @@ Ces commandes sont disponibles mais leur interface peut évoluer :
 
 ---
 
-## Compatibilité attendue sur Forge 3.x
+## Compatibilité attendue sur Forge 1.x
 
-Pour tout projet généré avec Forge 3.x :
+Pour tout projet généré avec Forge 1.x :
 
-- La structure `mvc/` générée reste compatible entre versions 3.x.
+- La structure `mvc/` générée reste compatible entre versions 1.x.
 - Les options CLI documentées restent compatibles.
 - Le format JSON d'entité v1 reste lisible et générateur.
 - Les imports publics documentés de `core.*` restent stables.
 - Les clés `.env` documentées restent valides.
 - Les fichiers `*_base.py` existants restent compatibles (la régénération est optionnelle).
-- L'upgrade `3.0.x → 3.1.0` ne requiert aucune modification du code applicatif pour les API stables.
-- L'upgrade `3.x → 4.0` peut introduire des ruptures documentées dans un guide de migration dédié.
+- L'upgrade entre versions mineures de la série `1.0.x` ne requiert aucune modification du code applicatif pour les API stables.
+- L'upgrade `1.x → 2.0` peut introduire des ruptures documentées dans un guide de migration dédié.
 
 Les imports internes de `forge_cli.*` ne sont pas garantis entre versions mineures.
 

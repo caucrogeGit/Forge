@@ -239,7 +239,7 @@ Consultez [la page des starters](starters/index.md) pour la liste complète et l
 
 ## 9. Limite importante — sessions mémoire
 
-Forge 3.x utilise par défaut `MemorySessionStore` — sessions en mémoire processus, perdues au redémarrage. Des backends alternatifs sont disponibles.
+Forge utilise par défaut `MemorySessionStore` — sessions en mémoire processus, perdues au redémarrage. Des backends alternatifs sont disponibles.
 
 **Backends disponibles :**
 

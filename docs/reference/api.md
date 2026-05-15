@@ -1735,7 +1735,7 @@ L'interface officielle est la commande `forge`. La version actuelle est `2.5.0`.
 
 ### forge project:check — vérification structurelle
 
-`forge project:check` vérifie qu'un projet Forge respecte les conventions contractuelles de Forge 3.x. Elle est plus stricte que `forge doctor` et peut être utilisée avant un commit, avant une release locale ou dans une CI.
+`forge project:check` vérifie qu'un projet Forge respecte les conventions contractuelles de Forge 1.x. Elle est plus stricte que `forge doctor` et peut être utilisée avant un commit, avant une release locale ou dans une CI.
 
 **Différence avec `forge doctor` :**
 
@@ -2952,7 +2952,7 @@ Documentation complète : [RBAC — Contrôle d'accès](../rbac.md).
 
 ## Modules officiels (opt-in)
 
-Forge 3.0 sépare le **core minimal** des **modules officiels** distribués
+Forge sépare le **core minimal** des **modules officiels** distribués
 séparément. Le core couvre les primitives générales (HTTP, routing, sessions,
 mots de passe Argon2id, CSRF, uploads, SQL explicite). Les modules officiels
 ajoutent des fonctionnalités spécialisées installables via les extras pip.

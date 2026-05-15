@@ -90,8 +90,8 @@ prochaine version MAJOR.
 
 | Déprécié en | Maintenu jusqu'au moins | Retiré possible dès |
 |---|---|---|
-| 2.4.0 | Fin de la série 2.x | 3.0.0 |
-| 2.x (quelconque) | Fin de la série 2.x | 3.0.0 |
+| 2.4.0 | Fin de la série 2.x | 1.0.0 stable |
+| 2.x (quelconque) | Fin de la série 2.x | 1.0.0 stable |
 
 **Exception :** une vulnérabilité de sécurité grave peut imposer un retrait
 immédiat sans respecter cette durée (voir la section Exceptions de sécurité ci-dessous).
@@ -106,7 +106,7 @@ Ajouter dans `CHANGELOG.md` sous la section `### Modifié` ou `### Déprécié` 
 
 ```markdown
 - `forge old:command` est dépréciée. Utiliser `forge new:command` à la place.
-  Maintien garanti jusqu'à Forge 3.0.0.
+  Maintien garanti jusqu'à la prochaine version MAJOR.
 ```
 
 ### Avertissement runtime
@@ -116,7 +116,7 @@ Afficher un message clair sur `stderr` quand la commande dépréciée est invoqu
 ```
 AVERTISSEMENT — forge old:command est dépréciée.
 Utiliser désormais : forge new:command
-Suppression prévue : Forge 3.0.0.
+Suppression prévue : prochaine version MAJOR.
 ```
 
 Exemple de pattern :
@@ -150,7 +150,7 @@ def ancienne_fonction():
     warnings.warn(
         "ancienne_fonction() est dépréciée depuis Forge 2.4.0. "
         "Utiliser nouvelle_fonction() à la place. "
-        "Suppression prévue en Forge 3.0.0.",
+        "Suppression prévue à la prochaine version MAJOR.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -168,9 +168,9 @@ implémentation ou conserve son comportement original.
 ### Exemple concret : core.security.hashing
 
 `core.security.hashing` (PBKDF2 legacy) est déprécié en faveur de
-`core.auth.password` (Argon2id). Il reste disponible en Forge 2.x pour la
+`core.auth.password` (Argon2id). Il reste disponible pour la
 compatibilité et la migration transparente des anciens hashes. Son retrait
-est prévu en Forge 3.0.0.
+est prévu dans la trajectoire 1.x stable.
 
 ### Retrait
 
@@ -193,7 +193,7 @@ Si l'option est passée, afficher un avertissement avant d'exécuter la commande
 ```
 AVERTISSEMENT — L'option --ancien-flag est dépréciée.
 Utiliser --nouveau-flag à la place.
-Suppression prévue : Forge 3.0.0.
+Suppression prévue : prochaine version MAJOR.
 ```
 
 L'option continue de fonctionner (elle est relayée vers la nouvelle option
@@ -274,7 +274,7 @@ Exemple :
 ### Modifié
 
 - `core.security.hashing` est déprécié en faveur de `core.auth.password` (Argon2id).
-  Maintien garanti en Forge 2.x. Retrait prévu en Forge 3.0.0. (AUTH-LEGACY-BOUNDARY-001)
+  Retrait prévu dans la trajectoire 1.x stable. (AUTH-LEGACY-BOUNDARY-001)
 ```
 
 Chaque retrait doit figurer sous `### Supprimé`.
@@ -283,7 +283,7 @@ Chaque retrait doit figurer sous `### Supprimé`.
 
 ## Retrait en version MAJOR
 
-Un retrait de fonctionnalité stable est réservé à une version MAJOR (3.0.0, 4.0.0…).
+Un retrait de fonctionnalité stable est réservé à une version MAJOR (1.0.0, 2.0.0…).
 
 Avant le retrait :
 
@@ -331,14 +331,14 @@ Dans ce cas :
 - **Alternative** : `core.auth.password` (Argon2id).
 - **Maintien** : PBKDF2 reste disponible pour vérifier d'anciens hashes et
   effectuer la migration transparente.
-- **Retrait prévu** : Forge 3.0.0.
+- **Retrait prévu** : Forge 1.x stable.
 - **Référence** : ticket `AUTH-LEGACY-BOUNDARY-001`.
 
 ### Exemple 3 — Dépréciation de @require_auth (legacy decorator)
 
 - **Déprécié en** : Forge 2.x.
 - **Alternative** : `core.auth.session.login_required`.
-- **Retrait prévu** : Forge 3.0.0.
+- **Retrait prévu** : Forge 1.x stable.
 - **Référence** : `docs/auth.md`, section "Modules core.security dépréciés".
 
 ---

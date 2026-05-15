@@ -49,7 +49,7 @@ Issues = "https://github.com/caucrogeGit/Forge/issues"
 # (forge-mvc-mfa, -rbac, -workflow, -stats) ne sont pas encore publiés
 # sur PyPI. Ils restent installables via le mode dev (clone GitHub +
 # pip install -r requirements-dev.txt).
-# Réintroduction prévue en 3.1 (OPTIN-PYPI-PUBLISH-001).
+# Réintroduction prévue dans la trajectoire 1.0.0-beta.x, via publication coordonnée des opt-ins (OPTIN-PYPI-PUBLISH-001).
 #
 # [project.optional-dependencies]
 # rbac = ["forge-mvc-rbac==3.X.Y"]

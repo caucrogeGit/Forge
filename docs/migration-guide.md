@@ -340,14 +340,14 @@ Une fonctionnalité dépréciée peut se signaler de plusieurs façons :
 ```
 AVERTISSEMENT — forge old:command est dépréciée.
 Utiliser désormais : forge new:command
-Suppression prévue : Forge 3.0.0.
+Suppression prévue : prochaine version MAJOR.
 ```
 
 **API Python dépréciée :**
 
 ```python
 DeprecationWarning: ancienne_fonction() est dépréciée depuis Forge 2.4.0.
-Utiliser nouvelle_fonction() à la place. Suppression prévue en Forge 3.0.0.
+Utiliser nouvelle_fonction() à la place. Suppression prévue à la prochaine version MAJOR.
 ```
 
 **Convention documentaire :**

@@ -89,6 +89,7 @@ post-audit. Aucune modification de runtime, CLI, générateurs ou packaging.
 | Ticket | Description | État |
 |---|---|---|
 | DOCS-OPTIN-INSTALL-CONTRACT-001 | Clarifier le contrat d'installation des opt-ins | **livré** |
+| VERSION-COHERENCE-1.0-001 | Aligner les références de version publiques avec la trajectoire 1.0 | **livré** |
 
 ---
 
@@ -1029,7 +1030,7 @@ Voir `CHANGELOG.md` section [3.0.5] pour le détail.
 **Total : 1 ticket livré dans ce patch.**
 
 `pipx install forge-mvc` fonctionne depuis cette version. Les 4 modules opt-in
-restent en mode source-only via GitHub jusqu'à `OPTIN-PYPI-PUBLISH-001` (3.1+).
+restent en mode source-only via GitHub jusqu'à `OPTIN-PYPI-PUBLISH-001` (prévu à partir de `1.0.0-beta.5`).
 
 Voir `CHANGELOG.md` section [1.0.0-beta.1] pour le détail.
 

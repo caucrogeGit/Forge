@@ -13,7 +13,7 @@ Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.
 
 ## API officielle et compatibilité legacy
 
-Depuis Forge 2.x, et toujours en Forge 3.x, l'API officielle pour les nouveaux projets est `core.auth`.
+Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API officielle pour les nouveaux projets est `core.auth`.
 
 | Domaine | API officielle — `core.auth` | Compatibilité / transversal — `core.security` |
 |---|---|---|
@@ -31,7 +31,7 @@ Depuis Forge 2.x, et toujours en Forge 3.x, l'API officielle pour les nouveaux p
 
 ### Modules `core.security` encore officiels
 
-Tous les modules `core.security` ne sont pas legacy. Les briques transversales suivantes restent officielles en Forge 3.x :
+Tous les modules `core.security` ne sont pas legacy. Les briques transversales suivantes restent officielles dans Forge actuel :
 
 - `core.security.session` — moteur de session mémoire, utilisé en interne par `core.auth.session` ;
 - `core.security.csrf` et `CsrfMiddleware` — protection CSRF active ;
@@ -39,7 +39,7 @@ Tous les modules `core.security` ne sont pas legacy. Les briques transversales s
 
 ### Modules `core.security` dépréciés
 
-Les éléments suivants sont dépréciés en faveur de `core.auth` et seront supprimés en Forge 3.0 :
+Les éléments suivants sont dépréciés en faveur de `core.auth` et seront supprimés dans la trajectoire 1.x stable :
 
 - `core.security.hashing` — PBKDF2 legacy. Reste utilisable pour vérifier d'anciens hashes et effectuer la migration transparente vers Argon2id. Les nouveaux projets doivent utiliser `core.auth.password` (Argon2id) ;
 - `core.security.decorators.require_auth` — remplacé par `core.auth.session.login_required` ;
@@ -434,7 +434,7 @@ ecriture DB automatique.
     Le module MFA est marqué `Development Status :: 2 - Pre-Alpha`.
     Le secret TOTP est stocké **en clair** dans `auth_mfa_factors.totp_secret`.
     Non recommandé en production sensible sans protection additionnelle.
-    Chiffrement applicatif prévu dans `SEC-MFA-SECRET-ENCRYPTION-001` (Forge 3.1.0).
+    Chiffrement applicatif prévu dans `SEC-MFA-SECRET-ENCRYPTION-001` — ticket post-1.0, tant que MFA reste Pre-Alpha.
 
     `forge-mvc-mfa` est **source-only** en `{{forge_version}}` et ne sera
     pas publié sur PyPI en `1.0` — voir
@@ -716,7 +716,7 @@ dans les trois backends. Elle remplace integralement les donnees d'une session
 
 ## OIDC
 
-OIDC n'est pas fourni par Forge 3.0. La complexite d'une implementation
+OIDC n'est pas fourni par Forge. La complexite d'une implementation
 OIDC complete depasse ce qui peut etre livre dans une release publique stable.
 
 Les elements d'un flux OIDC rigoureux incluent : generation de state, nonce

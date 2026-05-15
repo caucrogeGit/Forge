@@ -12,8 +12,8 @@
     Installation depuis GitHub : voir [installation-github.md](../installation-github.md).
 
     Le chiffrement applicatif est planifié dans
-    `SEC-MFA-SECRET-ENCRYPTION-001` (Forge 3.1.0). À cette livraison,
-    le module passera en Beta et sera réintégré dans `[all]`.
+    `SEC-MFA-SECRET-ENCRYPTION-001` — ticket post-1.0, tant que MFA reste Pre-Alpha.
+    À cette livraison, le module passera en Beta.
 
 > **Module extrait** : depuis Forge 2.5.0, le code MFA vit dans
 > `forge-mvc-mfa`. Voir `packages/forge-mvc-mfa/README.md` pour

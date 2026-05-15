@@ -337,7 +337,7 @@ Ce document s'enrichit au fil des sessions de développement. Quand un
 nouveau pattern émerge d'un ticket structurant, l'ajouter dans la section
 thématique correspondante avec son ticket d'origine.
 
-À chaque tag majeur (3.0, 4.0…), revoir l'ensemble pour retirer les
+À chaque tag majeur (1.0, 2.0…), revoir l'ensemble pour retirer les
 patterns devenus obsolètes ou les conventions intégrées automatiquement
 au code.
 

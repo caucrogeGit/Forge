@@ -88,7 +88,7 @@ Une LTS qui n'est pas tenue est pire que pas de LTS du tout.
 | SQL versionné | Pas de système type Alembic |
 | Tests E2E MariaDB | Opt-in uniquement, pas en CI automatique |
 | Dettes sécurité | `SECURITY-CACHE-001`, `CRUD-RBAC-UI-001`, `E2E-UPLOAD-HTTP-001`, `SECURITY-UPLOAD-RATE-LIMIT-001` |
-| Guide migration MAJOR | À créer avant Forge 3.0 |
+| Guide migration MAJOR | À créer avant Forge 1.0.0 stable |
 | Forge Design | Projet compagnon pas encore disponible |
 
 ---
@@ -203,7 +203,7 @@ Une version future pourrait devenir candidate LTS après :
 - API JSON légère stable (API-JSON-001 à API-DOC-001) ;
 - dettes de sécurité corrigées (SECURITY-CACHE-001, CRUD-RBAC-UI-001, E2E-UPLOAD-HTTP-001) ;
 - tests E2E MariaDB intégrés en CI automatique ;
-- guide de migration MAJOR 2.x → 3.0 disponible si applicable.
+- guide de migration MAJOR 2.x → 1.0 disponible si applicable.
 
 **Avantages :**
 
@@ -216,9 +216,9 @@ Une version future pourrait devenir candidate LTS après :
 
 ---
 
-### Scénario C — LTS après Forge 3.0
+### Scénario C — LTS après stabilisation de Forge 1.0.0
 
-Forge attend une version majeure stabilisée pour déclarer sa première LTS.
+Forge attend la stabilisation de `1.0.0` pour déclarer sa première LTS.
 
 **Avantages :**
 
@@ -228,7 +228,7 @@ Forge attend une version majeure stabilisée pour déclarer sa première LTS.
 
 **Inconvénients :**
 
-- Forge 3.0 n'a pas de date définie ;
+- La première version stable `1.0.0` n'a pas encore de date définie ;
 - les projets actuels sur Forge 2.x n'ont pas de garantie formelle longue durée ;
 - délai potentiellement long.
 
@@ -324,8 +324,7 @@ Forge peut préparer une future version LTS candidate après :
 - intégration des tests E2E MariaDB en CI automatique ;
 - évaluation formelle de la capacité de maintenance.
 
-La LTS candidate la plus réaliste serait une version 2.x future
-(2.5.0 ou 2.6.0) ou une version 3.0 stabilisée.
+La LTS candidate la plus réaliste serait une version `1.0.0` stable ou une version ultérieure de la série 1.x.
 ```
 
 ---
