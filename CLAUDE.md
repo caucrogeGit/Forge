@@ -234,3 +234,34 @@ Les informations volatiles ne sont pas ici — voir section 8.
 **Prochaine refonte prévue** : tag majeur 4.0 (ou refonte intermédiaire si
 un changement architectural important le justifie).
 **Dernière refonte** : 2026-05 (Forge 3.0.2, scénario C de consolidation production-ready)
+
+---
+
+## 11. Configuration Claude Code (`.claude/settings.json`)
+
+Le fichier `.claude/settings.json` est commité dans le dépôt et définit la
+politique de permissions partagée pour tous les contributeurs.
+
+**Commandes pré-autorisées** (sans prompt) :
+
+```
+pytest / python -m pytest    — suite de tests
+python -m compileall         — vérification syntaxe
+ruff check / ruff format     — linting et formatage
+mkdocs build / mkdocs serve  — documentation
+forge                        — CLI Forge
+git status / diff / log / show / branch / add
+```
+
+**Commandes bloquées** (deny explicite) :
+
+```
+git push --force / git push -f
+git reset --hard
+git tag -d / git push --delete
+rm -rf / rm -fr
+```
+
+Les overrides personnels vont dans `.claude/settings.local.json` (non commité,
+ignoré par `.gitignore`). Ne pas modifier `settings.json` pour des préférences
+individuelles.
