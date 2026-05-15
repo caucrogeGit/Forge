@@ -74,6 +74,7 @@ post-audits. Ce n'est pas une version de release.
 |---|---|---|
 | AUDIT-BASELINE-LOCK-001 | Figer la baseline d'audit (commit + tag non-release) | **livré** |
 | AUDIT-FINDINGS-TRACKER-001 | Créer le tracker détaillé des constats | **livré** |
+| ADR-009-STABILITY-POLICY-TERRAIN-001 | Créer l'ADR de politique de stabilité terrain | **livré** |
 
 **Baseline** : commit `d611636`, tag `baseline/audit-2026-05-15`.
 **Document de référence** : [`docs/history/audits/audit-baseline-2026-05-15.md`](../history/audits/audit-baseline-2026-05-15.md).
