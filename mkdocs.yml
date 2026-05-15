@@ -150,6 +150,7 @@ nav:
           - Vue d'ensemble: contributing.md
           - Conventions de travail: contributing/conventions.md
       - Audits:
+          - Tracker des constats: history/audits/findings-tracker.md
           - Baseline 2026-05-15: history/audits/audit-baseline-2026-05-15.md
           - Audits archivés: history/audits/README.md
       - Licence: licence.md

@@ -73,7 +73,7 @@ post-audits. Ce n'est pas une version de release.
 | Ticket | Description | État |
 |---|---|---|
 | AUDIT-BASELINE-LOCK-001 | Figer la baseline d'audit (commit + tag non-release) | **livré** |
-| AUDIT-FINDINGS-TRACKER-001 | Créer le tracker détaillé des constats | à venir |
+| AUDIT-FINDINGS-TRACKER-001 | Créer le tracker détaillé des constats | **livré** |
 
 **Baseline** : commit `d611636`, tag `baseline/audit-2026-05-15`.
 **Document de référence** : [`docs/history/audits/audit-baseline-2026-05-15.md`](../history/audits/audit-baseline-2026-05-15.md).
