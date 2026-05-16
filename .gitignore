@@ -39,3 +39,4 @@ storage/uploads/images/medium/
 !storage/uploads/documents/.gitkeep
 !storage/uploads/tmp/
 !storage/uploads/tmp/.gitkeep
+forge-tests-terrain-roadmap.zip
