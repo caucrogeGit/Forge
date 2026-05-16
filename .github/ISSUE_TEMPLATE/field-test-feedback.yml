@@ -1,0 +1,209 @@
+name: "Retour de test terrain (FT)"
+description: "Formulaire de retour structuré après avoir exécuté un ticket FT-* de la campagne de tests terrain Forge."
+title: "[FT] Retour — "
+labels: ["field-test", "feedback"]
+body:
+
+  - type: input
+    id: ticket
+    attributes:
+      label: "Ticket FT testé"
+      description: "Identifiant exact du ticket exécuté (ex : FT-01-INSTALL-PIPX-001)"
+      placeholder: "FT-01-INSTALL-PIPX-001"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: statut
+    attributes:
+      label: "Verdict"
+      description: "Statut final du ticket après exécution."
+      options:
+        - "VALIDÉ"
+        - "VALIDÉ AVEC FRICTION"
+        - "ÉCHOUÉ"
+        - "BLOQUÉ PAR BUG FORGE"
+        - "BLOQUÉ PAR DOCUMENTATION"
+        - "HORS PÉRIMÈTRE"
+        - "NON TESTÉ"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: gravite
+    attributes:
+      label: "Gravité du problème éventuel"
+      description: "Laisser S5 si aucun problème rencontré."
+      options:
+        - "S5 — Hors périmètre / aucun problème"
+        - "S0 — Bloquant critique"
+        - "S1 — Bloquant fonctionnel"
+        - "S2 — Friction forte"
+        - "S3 — Friction mineure"
+        - "S4 — Suggestion"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: aide
+    attributes:
+      label: "Niveau d'aide utilisé"
+      description: "Niveau d'aide le plus élevé utilisé pendant le ticket."
+      options:
+        - "A0 — aucune aide"
+        - "A1 — documentation Forge uniquement"
+        - "A2 — recherche personnelle ou documentation externe"
+        - "A3 — aide d'un autre testeur"
+        - "A4 — aide du référent Forge"
+        - "A5 — impossible malgré aide"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: profil
+    attributes:
+      label: "Profil testeur"
+      description: "Votre profil au moment du test."
+      options:
+        - "Débutant Forge"
+        - "Développeur Python"
+        - "Développeur web"
+        - "Exploitation / DevOps"
+        - "Autre"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environnement
+    attributes:
+      label: "Environnement"
+      description: "Décrivez votre environnement d'exécution."
+      placeholder: |
+        OS :
+        Shell :
+        Version Python :
+        pip / pipx :
+        Version Forge (forge --version) :
+        Méthode d'installation Forge :
+        Base de données : MariaDB x.x / non configurée
+        Navigateur (si pertinent) :
+        Éditeur :
+    validations:
+      required: true
+
+  - type: textarea
+    id: documentation
+    attributes:
+      label: "Documentation consultée"
+      description: "Pages Forge lues pendant ce ticket. Indiquer ce qui était utile, confus ou manquant."
+      placeholder: |
+        Pages consultées :
+        - docs/installation-pipx.md
+        - docs/compatibility.md
+
+        Passages utiles :
+        Passages confus :
+        Passages manquants :
+    validations:
+      required: true
+
+  - type: textarea
+    id: objectif
+    attributes:
+      label: "Objectif du ticket (en une phrase)"
+      description: "Résumez ce que vous avez cherché à accomplir."
+      placeholder: "Installer Forge via pipx et vérifier que la commande forge est accessible."
+    validations:
+      required: true
+
+  - type: textarea
+    id: etapes
+    attributes:
+      label: "Étapes exécutées"
+      description: "Listez les étapes réellement suivies (numérotées). Indiquer les divergences avec la procédure du ticket."
+      placeholder: |
+        1. Exécuté pipx install forge-mvc
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: commandes
+    attributes:
+      label: "Commandes exécutées et sorties"
+      description: "Copiez les commandes exécutées et leurs sorties complètes."
+      value: |
+        ```bash
+        # Commande 1
+        # Sortie :
+
+        # Commande 2
+        # Sortie :
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: resultat_attendu
+    attributes:
+      label: "Résultat attendu"
+      description: "Que devait-il se passer selon le ticket ?"
+      placeholder: "forge --version affiche une version lisible sans erreur."
+    validations:
+      required: true
+
+  - type: textarea
+    id: resultat_obtenu
+    attributes:
+      label: "Résultat obtenu"
+      description: "Que s'est-il passé réellement ?"
+      placeholder: "forge --version affiche : forge-mvc 1.0.0b3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: probleme_doc
+    attributes:
+      label: "Problème de documentation (si applicable)"
+      description: "Si la documentation était fausse, incomplète ou contradictoire — remplir ce champ."
+      placeholder: |
+        Page concernée :
+        Passage erroné ou ambigu :
+        Ce que la documentation dit :
+        Ce que Forge fait réellement :
+        Impact sur le test :
+        Contournement utilisé :
+    validations:
+      required: false
+
+  - type: textarea
+    id: preuves
+    attributes:
+      label: "Preuves"
+      description: "Logs, captures d'écran, messages d'erreur, sorties terminal. Joindre les fichiers si nécessaire."
+      placeholder: |
+        Sortie forge --version :
+        Sortie pipx list :
+        Message d'erreur éventuel :
+    validations:
+      required: true
+
+  - type: textarea
+    id: fichiers
+    attributes:
+      label: "Fichiers créés ou modifiés (si applicable)"
+      description: "Listez les fichiers générés ou modifiés pendant le ticket."
+      placeholder: |
+        - mvc/controllers/contact.py (généré)
+        - .env (modifié)
+    validations:
+      required: false
+
+  - type: textarea
+    id: commentaire
+    attributes:
+      label: "Commentaire libre"
+      description: "Observations, suggestions, remarques hors protocole."
+      placeholder: "La procédure était claire mais l'ordre des étapes 3 et 4 mériterait d'être inversé..."
+    validations:
+      required: false

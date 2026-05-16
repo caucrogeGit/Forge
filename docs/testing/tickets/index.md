@@ -8,7 +8,7 @@ Ces tickets ne sont pas des tutoriels publics. Ce sont des outils de validation 
 
 Un ticket FT validé par un testeur externe pourra ensuite être converti en tutoriel. Voir [Conversion des tickets FT en tutoriels](../field-test-to-tutorial.md).
 
-Les retours doivent utiliser le [modèle de retour testeur](../field-test-feedback-template.md).
+Les retours doivent utiliser le [modèle de retour testeur](../field-test-feedback-template.md) ou le [formulaire GitHub Issue](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml).
 
 ---
 
@@ -21,6 +21,17 @@ Les retours doivent utiliser le [modèle de retour testeur](../field-test-feedba
 | [FT-00-DOC-ERROR-PROTOCOL-001](ft-00-doc-error-protocol-001.md) | Appliquer la procédure documentation officielle erronée | FT-00 |
 | [FT-01-INSTALL-PIPX-001](ft-01-install-pipx-001.md) | Installer Forge via pipx | FT-01 |
 | [FT-01-INSTALL-VERSION-CHECK-001](ft-01-install-version-check-001.md) | Vérifier la version Forge installée | FT-01 |
+
+---
+
+## Envoyer un retour après un ticket
+
+Deux options disponibles :
+
+| Option | Lien |
+|---|---|
+| Formulaire GitHub Issue (recommandé) | [Soumettre un retour →](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml) |
+| Modèle Markdown à copier-coller | [Modèle de retour testeur](../field-test-feedback-template.md) |
 
 ---
 

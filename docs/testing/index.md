@@ -52,5 +52,6 @@ Le référent Forge transforme ensuite le retour en ticket documentaire séparé
 | [Charte de campagne](field-test-charter.md) | Règles, niveaux de guidage, gravité, statuts, gestion des écarts |
 | [Modèle de ticket FT](field-test-ticket-template.md) | Structure obligatoire d'un ticket terrain exploitable |
 | [Modèle de retour testeur](field-test-feedback-template.md) | Formulaire à remplir après chaque ticket FT-* |
+| [Formulaire GitHub Issue](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml) | Soumettre un retour directement sur GitHub (recommandé) |
 | [Triage et stabilisation](field-test-triage.md) | Grille de décision bêta / stable |
 | [Conversion en tutoriel](field-test-to-tutorial.md) | Règles de transformation d'un ticket FT validé en tutoriel |
