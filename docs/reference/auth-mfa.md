@@ -71,3 +71,92 @@ if is_mfa_enabled(mfa_factors):
 
 Forge ne fournit pas encore dans ce flux : *remember device*, WebAuthn, SMS, email MFA, gestion des codes de récupération dans le formulaire de connexion.
 
+---
+
+## Politique de stockage des secrets MFA
+
+### Statut actuel
+
+`forge-mvc-mfa` est Pre-Alpha. Le stockage des secrets MFA n'est pas production-ready en l'état.
+
+Le module est opt-in, non inclus dans `forge-mvc[all]`, et ne doit pas être présenté comme sécurisé en production sans protection additionnelle explicite.
+
+### Développement et tests
+
+En développement et en environnement de test isolé, le stockage actuel est acceptable :
+
+- le secret TOTP est stocké en clair dans `auth_mfa_factors.totp_secret` ;
+- les codes de récupération sont stockés sous forme hashée (`hash_recovery_code()` — SHA-256 + `secrets.compare_digest`) ;
+- un avertissement `UserWarning` est émis à la création d'un facteur TOTP (`_warn_plaintext_secret_storage()`).
+
+**Conditions requises même en développement :**
+
+- accès à la table `auth_mfa_factors` limité à l'utilisateur applicatif ;
+- secrets jamais loggés (`totp_secret` et `recovery_code` sont dans les champs redactés de `sanitize_auth_audit_metadata()`) ;
+- base de données non exposée publiquement.
+
+### Production
+
+Le stockage actuel **n'est pas recommandé en production sensible** sans protection additionnelle.
+
+Raisons :
+
+- le secret TOTP est stocké en clair — toute lecture directe de la base expose les secrets de tous les utilisateurs ;
+- un secret TOTP exposé permet à un attaquant de générer des codes TOTP valides indéfiniment ;
+- la révocation d'un secret exposé nécessite de désactiver et recréer tous les facteurs TOTP concernés.
+
+Protections minimales si le déploiement en production ne peut pas attendre `SEC-MFA-SECRET-ENCRYPTION-001` :
+
+- restreindre les droits d'accès à la table `auth_mfa_factors` au strict minimum applicatif ;
+- chiffrement du disque de la base de données ;
+- surveillance des accès directs à la table ;
+- ne pas exporter `auth_mfa_factors` dans des dumps non chiffrés.
+
+Ces mesures réduisent le risque sans l'éliminer. Elles ne remplacent pas le chiffrement applicatif.
+
+### Secrets TOTP
+
+Le secret TOTP est une clé partagée utilisée pour calculer les codes TOTP (RFC 6238).
+
+**Pourquoi on ne peut pas simplement hasher le secret TOTP :**
+
+Un hash est à sens unique. Pour vérifier un code TOTP, le serveur doit pouvoir recalculer `TOTP(secret, timestamp)`. Si le secret est hashé, cette opération est impossible.
+
+Le stockage production-ready d'un secret TOTP nécessite :
+
+- un **chiffrement applicatif réversible** (AES-256-GCM ou équivalent avec clé de chiffrement séparée), **ou**
+- un **HSM** (*Hardware Security Module*), **ou**
+- un **gestionnaire de secrets** (Vault, AWS Secrets Manager, ou équivalent).
+
+Aucune de ces protections n'est implémentée dans `forge-mvc-mfa` 3.0.x. C'est l'objet du ticket `SEC-MFA-SECRET-ENCRYPTION-001`.
+
+### Codes de récupération
+
+Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` 3.0.x :
+
+- générés via `secrets.choice()` sur un alphabet sans ambiguïté ;
+- hashés avant stockage via `hash_recovery_code()` (SHA-256) ;
+- vérifiés via `secrets.compare_digest()` (résistant aux timing attacks) ;
+- stockés en base uniquement sous forme de hash — le code brut n'est jamais persisté.
+
+**Cette conception est conforme pour la production**, à condition que la base elle-même soit protégée. Un hash de code de récupération exposé ne permet pas de retrouver le code brut.
+
+### Exigences avant production-ready
+
+`forge-mvc-mfa` ne sera pas déclaré Beta tant que les exigences suivantes ne sont pas satisfaites :
+
+1. **Chiffrement applicatif des secrets TOTP** (`SEC-MFA-SECRET-ENCRYPTION-001`) — clé de chiffrement séparée des données.
+2. **Politique de rotation documentée** — rotation ou invalidation maîtrisée des secrets compromis.
+3. **Documentation de sauvegarde/restauration** — procédure en cas de perte de la clé de chiffrement.
+4. **Tests dédiés au stockage chiffré** — couverture de la création, vérification et rotation.
+5. **Revue sécurité explicite** — validation que le stockage chiffré est correct.
+6. **Décision explicite de changement de statut** — ticket de passage Pre-Alpha → Beta.
+
+### Tickets liés
+
+| Ticket | Description | État |
+|---|---|---|
+| `MFA-SECRET-STORAGE-POLICY-001` | Documenter la politique de stockage | livré |
+| `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif du secret TOTP | post-1.0 |
+| `OPTIN-PYPI-PUBLISH-001` | Publication PyPI de forge-mvc-mfa | conditionné à SEC-MFA-SECRET-ENCRYPTION-001 |
+
