@@ -97,6 +97,19 @@ post-audit. Aucune modification de runtime, CLI, générateurs ou packaging.
 
 ---
 
+## Phase 2 — Infrastructure de release (post-audit)
+
+**Objectif** : mettre en place l'infrastructure reproductible de validation et de
+release. Aboutit à la publication de `1.0.0-beta.2`.
+
+| Ticket | Description | État |
+|---|---|---|
+| RELEASE-VALIDATION-ENV-LOCK-001 | Documenter l'environnement de validation release | **livré** |
+| RELEASE-CHECK-SCRIPT-001 | Créer le script `scripts/release_check.sh` | à venir |
+| BETA-2-RELEASE-001 | Publier `1.0.0-beta.2` | à venir |
+
+---
+
 ## Trajectoire officielle — 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :

@@ -6,6 +6,97 @@ Ce document est destiné au développeur du framework. Il décrit la procédure 
 
 ---
 
+## Environnement de validation release
+
+### Objectif
+
+Permettre à un auditeur de reproduire la validation locale d'une release Forge
+sans publier.
+
+### Préconditions
+
+- Dépôt sur `main`, état propre (hors `.claude/settings.json` et fichiers
+  locaux explicitement exclus de Git).
+- Environnement virtuel dédié.
+- Python 3.12+ (version recommandée : 3.12.13 via pyenv — voir ADR-006).
+- Dépendances de développement installées depuis `requirements-dev.txt`.
+- Aucun accès réseau requis pour la validation une fois les dépendances installées.
+
+### Commandes de validation manuelle
+
+```bash
+# Préparer un environnement virtuel dédié
+python -m venv .venv-release-check
+source .venv-release-check/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements-dev.txt
+```
+
+Puis exécuter la validation complète (script existant) :
+
+```bash
+bash tools/release-validate.sh <VERSION>
+# ex. : bash tools/release-validate.sh 1.0.0b2
+```
+
+Ce script couvre : cohérence de version, CHANGELOG, pytest, ruff, compileall,
+mkdocs build --strict, état git propre, whitespace, tag absent.
+
+Compléter avec la validation packaging :
+
+```bash
+rm -rf dist build *.egg-info
+python -m build
+twine check dist/*
+```
+
+**Alternative rapide** si l'environnement de développement est déjà actif :
+
+```bash
+pytest
+python -m compileall -q .
+mkdocs build --strict
+git diff --check
+rm -rf dist build *.egg-info
+python -m build
+twine check dist/*
+```
+
+### Rôle du futur script `scripts/release_check.sh`
+
+`scripts/release_check.sh` regroupera ces validations en une seule commande
+reproductible. Il sera créé dans le ticket **2.2 RELEASE-CHECK-SCRIPT-001**.
+Ce ticket 2.1 documente uniquement la procédure manuelle.
+
+`tools/check_version_sync.py` n'existe pas encore — la synchronisation des
+versions entre core et opt-ins est assurée par `tools/release-validate.sh`.
+
+### Résultats attendus
+
+| Commande | Résultat attendu |
+|---|---|
+| `pytest` | 0 échec |
+| `python -m compileall -q .` | Aucune sortie |
+| `mkdocs build --strict` | 0 avertissement |
+| `git diff --check` | Aucune sortie |
+| `python -m build` | `dist/*.whl` et `dist/*.tar.gz` générés |
+| `twine check dist/*` | `PASSED` pour wheel et sdist |
+| `tools/release-validate.sh <VERSION>` | `RÉSULTAT : OK — prêt à releaser.` |
+
+### Artefacts produits
+
+Les répertoires `dist/`, `build/` et `*.egg-info/` sont des artefacts locaux.
+Ils sont exclus de Git (`.gitignore`). **Ils ne doivent pas être commités.**
+
+### Limites
+
+- Cette procédure ne publie rien sur PyPI.
+- Elle ne crée aucun tag.
+- `twine check` valide les métadonnées localement — `twine upload` est
+  l'opération de publication, réservée au ticket **2.3 BETA-2-RELEASE-001**.
+
+---
+
 ## 1. Construire la wheel
 
 Depuis la racine du dépôt Forge :
