@@ -90,7 +90,6 @@ _EXPECTED_IN_META = [
     "test_contributing_main_branch_001.py",
     "test_landing_license_wording_001.py",
     "test_docs_reference_modules_001.py",
-    "test_docs_phantom_modules_001.py",
     "test_docs_auth_consolidate_001.py",
     "test_docs_entity_relations_consistency_001.py",
     "test_docs_stats_readme_001.py",
@@ -196,6 +195,7 @@ _FORBIDDEN_AT_TOP = [
     "test_docs_forge_2x_sweep_001.py",
     "test_release_validation_git_001.py",
     "test_landing_positionnement_remove_001.py",
+    "test_docs_phantom_modules_001.py",
 ]
 
 
