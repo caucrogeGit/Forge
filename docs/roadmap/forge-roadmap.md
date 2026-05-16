@@ -164,6 +164,22 @@ applicatifs et imposer un branchement explicite par le développeur.
 
 ---
 
+## Phase 7 — Périmètre auth, MFA, RBAC (post-audit)
+
+**Objectif** : clarifier officiellement le périmètre du vocabulaire d'audit auth,
+les frontières core / opt-ins, et les politiques de publication et de stockage
+des modules opt-in.
+
+| Ticket | Description | État |
+|---|---|---|
+| AUTH-AUDIT-VOCAB-PERIMETER-001 | Clarifier le périmètre du vocabulaire d'audit MFA/RBAC dans le core | **livré** |
+| AUTH-DOCTOR-MFA-MISSING-DEP-WARNING-001 | Avertissement `forge doctor` si MFA utilisé sans forge-mvc-mfa installé | à venir |
+| RBAC-LIGHT-VS-FULL-DOC-001 | Documenter explicitement RBAC léger core vs RBAC complet opt-in | à venir |
+| MFA-SECRET-STORAGE-POLICY-001 | Clarifier et documenter la politique de stockage du secret TOTP | à venir |
+| OPTIN-PACKAGES-PUBLICATION-POLICY-001 | Définir la politique de publication des packages opt-in sur PyPI | à venir |
+
+---
+
 ## Trajectoire officielle — 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :

@@ -135,6 +135,7 @@ nav:
           - ADR-008 Audit auth: adr/008-auth-audit-architecture.md
           - ADR-009 Stabilité terrain: adr/009-stability-policy-terrain.md
           - ADR-010 API canonique auth/session: adr/010-auth-session-canonical-api.md
+          - ADR-011 Périmètre vocabulaire audit auth: adr/011-auth-audit-vocab-perimeter.md
 
   - Projet:
       - Roadmap:
