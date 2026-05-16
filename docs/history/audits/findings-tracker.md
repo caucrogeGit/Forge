@@ -104,7 +104,7 @@ Tant qu'aucun ticket de correction post-audit n'a été accepté,
 | ID | Domaine | Constat | Gravité | Statut | Ticket cible | Notes |
 |---|---|---|---|---|---|---|
 | FND-MODULE-001 | Modules | Modules monolithiques : `core/auth/oidc.py` 1011 LOC, `core/auth/mfa.py` 799 LOC | MINEUR | OUVERT | À définir | §4.2.3 audit Claude |
-| FND-MODULE-002 | Modules | Injection de routes modules via écriture dans `mvc/routes.py` — violation du principe §9 | IMPORTANT | FERMÉ | MODULE-ROUTES-INJECTION-REMOVE-001 | §7.3 audit Claude. `prepare_module_route_injection()` supprimée. `_build_injection_block`, `_module_marker` supprimés. `generate_module_routes()` est le seul mécanisme (explicite). Constat fermé — 2026-05-16. |
+| FND-MODULE-002 | Modules | Injection de routes modules via écriture dans `mvc/routes.py` — violation du principe §9 | IMPORTANT | FERMÉ | MODULE-ROUTES-INJECTION-REMOVE-001 + MODULE-ROUTES-EXPLICIT-DOC-001 | §7.3 audit Claude. `prepare_module_route_injection()` supprimée. `_build_injection_block`, `_module_marker` supprimés. `generate_module_routes()` est le seul mécanisme (explicite). Contrat explicite documenté dans `docs/module-author-guide.md` et `docs/reference/modules.md`. Constat fermé — 2026-05-16. |
 
 ---
 

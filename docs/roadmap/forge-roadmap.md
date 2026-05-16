@@ -159,7 +159,7 @@ applicatifs et imposer un branchement explicite par le développeur.
 | Ticket | Description | État |
 |---|---|---|
 | MODULE-ROUTES-INJECTION-REMOVE-001 | Supprimer l'injection automatique, préserver generate_module_routes | **livré** |
-| MODULE-ROUTES-EXPLICIT-DOC-001 | Documenter le contrat explicite des routes modules | à venir |
+| MODULE-ROUTES-EXPLICIT-DOC-001 | Documenter le contrat explicite des routes modules | **livré** |
 | BETA-3-RELEASE-001 | Publication 1.0.0-beta.3 | à venir |
 
 ---

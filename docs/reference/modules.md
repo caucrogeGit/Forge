@@ -13,8 +13,8 @@ Règles fondamentales :
 - un module est un dossier, pas une boîte noire ;
 - le manifeste central est `module.json` ;
 - aucun code de module n'est exécuté pendant son installation ;
-- l'installation est déclarative : elle enregistre, puis copie, puis injecte ;
-- le développeur garde la maîtrise des fichiers copiés ou injectés ;
+- l'installation est déclarative : elle enregistre, puis copie, puis génère ;
+- le développeur garde la maîtrise des fichiers copiés et du branchement des routes ;
 - aucun écrasement silencieux n'est autorisé ;
 - aucune marketplace ni téléchargement distant n'existe.
 
@@ -397,11 +397,14 @@ Comportement sur les routes :
 
 | Situation | Action |
 |---|---|
-| Marqueurs `forge-module-routes:<nom>:start/end` présents et non modifiés | Bloc retiré de `mvc/module_routes.py` |
+| `mvc/routes_<nom>.py` existe | **Conservé** — à retirer manuellement |
+| Marqueurs `forge-module-routes:<nom>:start/end` présents (anciens projets) | Bloc retiré de `mvc/module_routes.py` (compat arrière) |
 | Marqueurs absents | Nettoyage manuel requis — signalé |
 | Fichier `mvc/module_routes.py` absent | Ignoré |
 
-> **Note :** `forge module:remove` ne supprime pas `mvc/routes_<nom>.py`. Ce fichier généré par `forge module:routes` reste sur le disque ; retirez-le et les lignes correspondantes dans `mvc/routes.py` manuellement.
+> **Contrat explicite :** `forge module:remove` ne supprime pas `mvc/routes_<nom>.py`
+> ni les lignes que vous avez ajoutées dans `mvc/routes.py`.
+> Ces éléments restent sur le disque — à retirer manuellement si souhaité.
 
 Règles :
 
@@ -568,7 +571,6 @@ Si les fichiers copiés par `forge module:files` sont modifiés après l'install
 
 #### Tickets futurs
 
-- **`MODULE-REMOVE-001`** — ajouter une désinstallation contrôlée : retrait des routes injectées, nettoyage du registre, et signalement des fichiers à supprimer manuellement si modifiés.
 - **`MODULE-UPDATE-001`** — ajouter une mise à jour contrôlée : comparaison des fichiers, signalement des conflits, mise à jour sélective.
 
 ---
