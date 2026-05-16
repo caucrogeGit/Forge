@@ -24,8 +24,14 @@ Les retours doivent utiliser le [modèle de retour testeur](../field-test-feedba
 | [FT-00-TEST-CHARTER-001](ft-00-test-charter-001.md) | Lire et comprendre la charte de campagne | FT-00 |
 | [FT-00-FEEDBACK-TEMPLATE-001](ft-00-feedback-template-001.md) | Remplir un retour d'expérience de test à blanc | FT-00 |
 | [FT-00-DOC-ERROR-PROTOCOL-001](ft-00-doc-error-protocol-001.md) | Appliquer la procédure documentation officielle erronée | FT-00 |
+| [FT-00-DEBUG-TOOLS-INTRO-001](ft-00-debug-tools-intro-001.md) | Découvrir les outils de diagnostic Forge | FT-00 |
 | [FT-01-INSTALL-PIPX-001](ft-01-install-pipx-001.md) | Installer Forge via pipx | FT-01 |
 | [FT-01-INSTALL-VERSION-CHECK-001](ft-01-install-version-check-001.md) | Vérifier la version Forge installée | FT-01 |
+
+---
+
+!!! tip "En cas d'échec d'un ticket"
+    Avant de remplir le retour, consultez la page [Outils de diagnostic](../field-test-debug-tools.md) pour savoir quelle commande lancer et quelles preuves collecter.
 
 ---
 

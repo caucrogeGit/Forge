@@ -47,7 +47,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 | Parcours | Phases | Statut | Tickets rédigés | Tutoriel | Notes |
 |---|---|---|---|---|---|
-| Cadre de campagne | FT-00 | Prêt à tester | 3 / 9 | Non publié | Tickets essentiels disponibles |
+| Cadre de campagne | FT-00 | Prêt à tester | 4 / 10 | Non publié | Tickets essentiels disponibles |
 | Installation avec pipx | FT-01 | Prêt à tester | 2 / 9 | Non publié | pipx + vérification version |
 | Configuration environnement | FT-02 | À préparer | 0 / 10 | Non publié | |
 | MariaDB système | FT-03 | À préparer | 0 / 10 | Non publié | Inclure utilisateur non-root |
@@ -84,15 +84,16 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ### Parcours — Cadre de campagne (FT-00)
 
-**Statut :** Prêt à tester (3 tickets rédigés sur 9)
+**Statut :** Prêt à tester (4 tickets rédigés sur 10)
 
-**Objectif :** vérifier que le testeur comprend la campagne, le modèle de retour et la procédure documentation officielle erronée.
+**Objectif :** vérifier que le testeur comprend la campagne, le modèle de retour, la procédure documentation officielle erronée et les outils de diagnostic disponibles.
 
 **Tickets FT rédigés :**
 
 - [FT-00-TEST-CHARTER-001](tickets/ft-00-test-charter-001.md) — lire et valider la charte de campagne
 - [FT-00-FEEDBACK-TEMPLATE-001](tickets/ft-00-feedback-template-001.md) — remplir un retour d'expérience à blanc
 - [FT-00-DOC-ERROR-PROTOCOL-001](tickets/ft-00-doc-error-protocol-001.md) — appliquer la procédure documentation erronée
+- [FT-00-DEBUG-TOOLS-INTRO-001](tickets/ft-00-debug-tools-intro-001.md) — découvrir les outils de diagnostic Forge
 
 **Tickets FT restant à rédiger :** FT-00-SEVERITY-SCALE-001, FT-00-GUIDANCE-LEVELS-001, FT-00-HELP-LEVELS-001, FT-00-TICKET-FORMAT-001, FT-00-TRIAGE-RULES-001, FT-00-ENV-MATRIX-001
 

@@ -31,6 +31,7 @@ Objectif : préparer la méthode, les modèles et les règles.
 - `FT-00-TRIAGE-RULES-001` — Définir la transformation des retours en tickets correctifs.
 - `FT-00-DOC-ERROR-PROTOCOL-001` — Définir la procédure si la documentation officielle est erronée pendant un ticket.
 - `FT-00-ENV-MATRIX-001` — Définir les environnements de test.
+- `FT-00-DEBUG-TOOLS-INTRO-001` — Découvrir les outils de diagnostic Forge.
 
 ---
 

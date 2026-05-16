@@ -140,6 +140,7 @@ nav:
   - Tests terrain:
       - Vue d'ensemble: testing/index.md
       - État des parcours: testing/field-test-status.md
+      - Outils de diagnostic: testing/field-test-debug-tools.md
       - Charte de campagne: testing/field-test-charter.md
       - Modèle de ticket FT: testing/field-test-ticket-template.md
       - Modèle de retour testeur: testing/field-test-feedback-template.md
@@ -150,6 +151,7 @@ nav:
           - FT-00 — Charte de campagne: testing/tickets/ft-00-test-charter-001.md
           - FT-00 — Modèle de retour: testing/tickets/ft-00-feedback-template-001.md
           - FT-00 — Documentation erronée: testing/tickets/ft-00-doc-error-protocol-001.md
+          - FT-00 — Outils de diagnostic: testing/tickets/ft-00-debug-tools-intro-001.md
           - FT-01 — Installation pipx: testing/tickets/ft-01-install-pipx-001.md
           - FT-01 — Vérifier la version: testing/tickets/ft-01-install-version-check-001.md
 
