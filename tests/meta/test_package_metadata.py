@@ -8,6 +8,9 @@ import tomllib
 from pathlib import Path
 
 import core
+import pytest
+
+pytestmark = pytest.mark.meta
 
 _VERSION = "1.0.0b3"
 _VERSION_SEMVER = "1.0.0-beta.3"

@@ -1,6 +1,9 @@
 """Tests documentaires — DOC-APP-COMPLETE-001 : tutoriel application complète."""
 
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 DOC = Path("docs/app-complete-tutorial.md")
 MKDOCS = Path("mkdocs.yml")

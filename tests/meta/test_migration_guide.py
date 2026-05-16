@@ -1,6 +1,9 @@
 """Tests documentaires — RELEASE-MIGRATION-GUIDE-001 : guide de migration Forge."""
 
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 DOC = Path("docs/migration-guide.md")
 MKDOCS = Path("mkdocs.yml")

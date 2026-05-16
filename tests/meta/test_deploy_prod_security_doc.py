@@ -14,7 +14,9 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parent.parent
+pytestmark = pytest.mark.meta
+
+ROOT = Path(__file__).resolve().parents[2]
 GUIDE = ROOT / "docs" / "production-security.md"
 
 

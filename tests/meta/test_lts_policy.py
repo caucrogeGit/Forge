@@ -1,6 +1,9 @@
 """Tests documentaires — RELEASE-LTS-001 : politique LTS Forge."""
 
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 DOC = Path("docs/lts-policy.md")
 MKDOCS = Path("mkdocs.yml")

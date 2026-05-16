@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import tomllib
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 
 _LICENSE = Path("LICENSE")

@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
+pytestmark = pytest.mark.meta
+
+ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = ROOT / "docs" / "stability-contract.md"
 ROADMAP = ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 MKDOCS = ROOT / "mkdocs.yml"

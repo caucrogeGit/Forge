@@ -1,6 +1,9 @@
 """Tests documentaires — DOC-DEPLOY-ADVANCED-001 : guide déploiement avancé Forge."""
 
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 DOC = Path("docs/deploy-advanced.md")
 MKDOCS = Path("mkdocs.yml")

@@ -1,6 +1,9 @@
 """Tests documentaires — DOC-STRUCTURE-001 : organisation de la documentation par parcours."""
 
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 MKDOCS = Path("mkdocs.yml")
 ROADMAP = Path("docs/roadmap/forge-roadmap.md")

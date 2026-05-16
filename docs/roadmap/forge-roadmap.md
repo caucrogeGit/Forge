@@ -180,6 +180,22 @@ des modules opt-in.
 
 ---
 
+## Phase 8 — Organisation des tests (post-audit)
+
+**Objectif** : clarifier la structure des tests en séparant les tests méta
+(documentaires, roadmap, packaging statique, invariants textuels, frontières
+architecturales) des tests comportementaux.
+
+| Ticket | Description | État |
+|---|---|---|
+| META-TESTS-ROOT-MIGRATION-001 | Déplacer les tests méta de `tests/` vers `tests/meta/` | **livré** |
+| META-TESTS-ROTATION-POLICY-001 | Définir la politique de rotation des tests méta redondants | à venir |
+| META-TESTS-PRUNE-001 | Supprimer les tests méta devenus obsolètes | à venir |
+| TESTS-BEHAVIOR-FIRST-001 | Refactorer les tests comportementaux selon une convention unifiée | à venir |
+| PUBLIC-API-DUPLICATES-SCAN-001 | Identifier les doublons dans les tests d'API publique | à venir |
+
+---
+
 ## Trajectoire officielle — 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :

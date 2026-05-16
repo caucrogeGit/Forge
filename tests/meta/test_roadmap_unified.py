@@ -1,6 +1,9 @@
 """Tests — ROADMAP-UNIFIED-001 : roadmap Forge unifiée."""
 
 import pathlib
+import pytest
+
+pytestmark = pytest.mark.meta
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
 ARCHIVE = pathlib.Path("docs/history/forge_post_2_0_consolidation_roadmap.md")

@@ -1,6 +1,9 @@
 """Tests documentaires — DOC-CONTRIBUTE-001 : guide de contribution à Forge."""
 
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 DOC = Path("docs/contributing.md")
 MKDOCS = Path("mkdocs.yml")

@@ -174,12 +174,14 @@ Chaque nouvelle brique doit avoir ses tests. Forge distingue plusieurs types :
 | Type | Localisation | Rôle |
 |---|---|---|
 | **Tests unitaires** | `tests/test_<module>.py` | Vérifient une fonction ou une classe isolée |
-| **Tests documentaires** | `tests/test_doc_<sujet>.py` | Vérifient qu'une page de documentation existe et contient les sections attendues |
-| **Tests CLI** | `tests/test_e2e_cli.py` | Vérifient les commandes Forge dans un projet temporaire |
+| **Tests comportementaux** | `tests/test_<module>.py` | Vérifient un flux runtime, une CLI, un générateur ou une intégration |
+| **Tests E2E CLI** | `tests/test_e2e_cli.py` | Vérifient les commandes Forge dans un projet temporaire |
 | **Tests E2E starters** | `tests/test_e2e_starter.py` | Vérifient le build complet d'un starter |
 | **Tests E2E modules** | `tests/test_e2e_module.py` | Vérifient le cycle install → files → routes → remove d'un module |
 | **Tests sécurité** | `tests/test_security_*.py` | Vérifient CSRF, cookies, headers, uploads, RBAC |
 | **Tests MariaDB opt-in** | `tests/test_e2e_mariadb.py` | Nécessitent une base `forge_e2e_*` réelle |
+| **Tests méta et garde-fous** | `tests/meta/test_<sujet>.py` | Vérifient docs, roadmap, packaging statique, frontières architecturales |
+| **Tests documentaires** | `tests/meta/test_doc_<sujet>.py` | Vérifient qu'une page de documentation existe et contient les sections attendues |
 
 ### Tests MariaDB opt-in
 
@@ -201,6 +203,7 @@ documentés dans la [Matrice de compatibilité](compatibility.md).
 - Les fixtures `tmp_path` et `monkeypatch.chdir` isolent les tests CLI et E2E.
 - `apply_model_sql` est moquée dans les tests E2E starters pour ne pas dépendre de MariaDB.
 - Un test qui modifie `sys.path` ou l'état global doit nettoyer après lui.
+- **Tests méta dans `tests/meta/`** — tout test qui lit principalement des fichiers de documentation, vérifie une roadmap, une version déclarée, un classifier, l'absence d'une chaîne interdite, une frontière d'import ou un invariant textuel doit vivre dans `tests/meta/`, pas à la racine de `tests/`. Chaque fichier `tests/meta/` doit porter `pytestmark = pytest.mark.meta`.
 
 ---
 
@@ -290,7 +293,7 @@ Résumé final — <TICKET-ID>
 
 Branche        : main
 Commit         : <hash>
-Fichiers créés : docs/<fichier>.md, tests/test_doc_<fichier>.py
+Fichiers créés : docs/<fichier>.md, tests/meta/test_doc_<fichier>.py
 Fichiers modifiés : mkdocs.yml, docs/roadmap/forge-roadmap.md, ...
 
 Comportement ajouté :
@@ -416,7 +419,7 @@ grep -n "module" docs/reference.md | head -20
 **3. Créer les tests documentaires**
 
 ```bash
-# Créer tests/test_doc_module_author.py
+# Créer tests/meta/test_doc_module_author.py
 # Tester que les sections existent, les commandes sont mentionnées, etc.
 ```
 
@@ -430,7 +433,7 @@ grep -n "module" docs/reference.md | head -20
 **5. Valider**
 
 ```bash
-pytest tests/test_doc_module_author.py --tb=short -q
+pytest tests/meta/test_doc_module_author.py --tb=short -q
 python -m compileall -q .
 ruff check .
 mkdocs build --strict
@@ -440,7 +443,7 @@ git diff --check
 **6. Committer**
 
 ```bash
-git add docs/module-author-guide.md tests/test_doc_module_author.py \
+git add docs/module-author-guide.md tests/meta/test_doc_module_author.py \
     mkdocs.yml docs/roadmap/forge-roadmap.md \
     CHANGELOG.md
 git commit -m "feat: ajouter le guide de création de modules Forge"

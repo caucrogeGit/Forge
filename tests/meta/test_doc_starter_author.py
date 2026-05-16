@@ -1,6 +1,9 @@
 """Tests documentaires — DOC-STARTER-AUTHOR-001 : guide créer un starter Forge."""
 
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 DOC = Path("docs/starter-author-guide.md")
 MKDOCS = Path("mkdocs.yml")

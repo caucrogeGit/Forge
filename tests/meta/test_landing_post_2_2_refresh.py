@@ -1,6 +1,9 @@
 """Tests — LANDING-POST-2.2-REFRESH-001 : landing page Forge après phases 5 à 10."""
 
 import pathlib
+import pytest
+
+pytestmark = pytest.mark.meta
 
 SOURCE_PATH = pathlib.Path("mvc/views/landing/index.html")
 DOCS_PATH = pathlib.Path("docs/index.html")

@@ -1,6 +1,9 @@
 """Tests documentaires — DOC-15MIN-001 : tutoriel "15 minutes avec Forge"."""
 
 from pathlib import Path
+import pytest
+
+pytestmark = pytest.mark.meta
 
 DOC = Path("docs/15-minutes.md")
 MKDOCS = Path("mkdocs.yml")

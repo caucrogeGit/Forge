@@ -1,6 +1,9 @@
 """Tests — API-DOC-001 : documentation API JSON légère."""
 
 import pathlib
+import pytest
+
+pytestmark = pytest.mark.meta
 
 DOC_PATH = pathlib.Path("docs/api-json.md")
 MKDOCS_PATH = pathlib.Path("mkdocs.yml")
