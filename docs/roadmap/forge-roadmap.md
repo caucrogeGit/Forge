@@ -132,6 +132,7 @@ legacy et en dépréciant les fonctions `core.security.session`.
 |---|---|---|
 | AUTH-SESSION-CANONICAL-DECISION-001 | Décider et documenter l'API canonique (ADR-010) | **livré** |
 | AUTH-SESSION-DEDUP-001 | Aligner les imports runtime sur `core.auth.session` | partiel — analyse livrée, forge_mvc_mfa migré ; migration core bloquée (clés session divergentes) |
+| AUTH-SESSION-COMPATIBILITY-BRIDGE-001 | Pont bidirectionnel legacy↔canonique — reconnaissance croisée des sessions | **livré** |
 | AUTH-SESSION-LEGACY-DEPRECATION-001 | Ajouter les `DeprecationWarning` sur les fonctions legacy | à venir |
 | STARTER-AUTH-MODERNIZE-001 | Moderniser le starter auth sur `core.auth.session` | à venir |
 | CORE-AUTH-NO-HARDCODED-FIELDS-001 | Supprimer les champs applicatifs codés en dur dans le core | à venir |

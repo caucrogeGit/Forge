@@ -130,16 +130,20 @@ def test_require_auth_and_login_required_importable_simultaneously():
 # ── Mécanismes de session distincts ──────────────────────────────────────────
 
 
-def test_is_authenticated_canonical_requires_auth_user_id():
-    """core.auth.session.is_authenticated retourne False sans _auth_user_id dans la session."""
+def test_is_authenticated_canonical_recognizes_legacy_session():
+    """core.auth.session.is_authenticated reconnaît les sessions legacy via le pont 4.2b.
+
+    Après AUTH-SESSION-COMPATIBILITY-BRIDGE-001, une session avec authenticated=True
+    et user.id valide est reconnue par le flux canonique même sans _auth_user_id.
+    """
     from core.auth.session import is_authenticated
 
-    # Session legacy (authenticated=True, user={...}) sans _auth_user_id
+    # Session legacy (authenticated=True, user={...}) sans _auth_user_id — reconnue via pont
     request = SimpleNamespace(
         session={"authenticated": True, "user": {"id": 1}},
         headers={},
     )
-    assert is_authenticated(request) is False
+    assert is_authenticated(request) is True
 
 
 def test_is_authenticated_legacy_requires_legacy_keys():

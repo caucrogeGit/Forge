@@ -78,8 +78,8 @@ Tant qu'aucun ticket de correction post-audit n'a été accepté,
 
 | ID | Domaine | Constat | Gravité | Statut | Ticket cible | Notes |
 |---|---|---|---|---|---|---|
-| FND-AUTH-001 | Auth | Double pile auth `core/security/` (legacy FR) vs `core/auth/` (moderne EN) — API dupliquée, fallback explicite entre les deux | IMPORTANT | OUVERT | AUTH-SESSION-DEDUP-001 | §4.2.1 audit Claude. Décision canonique actée (ADR-010). AUTH-SESSION-DEDUP-001 a migré forge_mvc_mfa._resolve_mfa_session vers get_session_store().get() directement. Le reste (decorators.py, middleware.py, base_controller.py) reste legacy : core.security.session.is_authenticated vérifie SESSION_KEY_AUTHENTICATED+SESSION_KEY_USER ; core.auth.session.is_authenticated vérifie _auth_user_id — sémantiques incompatibles sans refonte du flux auth. Une décision explicite est nécessaire avant fermeture. |
-| FND-AUTH-002 | Auth | Doublons API : `login_required` vs `require_auth`, deux implémentations RBAC | MINEUR | OUVERT | AUTH-SESSION-DEDUP-001 | §6.4 audit Claude. `@login_required` canonique, `@require_auth` legacy. require_auth reste legacy — migration fonctionnelle non livrée dans AUTH-SESSION-DEDUP-001 car les clés session legacy et canonique divergent (SESSION_KEY_AUTHENTICATED vs _auth_user_id). Le ticket 4.3 (AUTH-SESSION-LEGACY-DEPRECATION-001) ajoutera seulement les warnings legacy. Une reprise dédiée ou une décision de compatibilité est nécessaire avant fermeture de ce constat. |
+| FND-AUTH-001 | Auth | Double pile auth `core/security/` (legacy FR) vs `core/auth/` (moderne EN) — API dupliquée, fallback explicite entre les deux | IMPORTANT | FERMÉ | AUTH-SESSION-COMPATIBILITY-BRIDGE-001 | §4.2.1 audit Claude. Décision canonique actée (ADR-010). Pont bidirectionnel livré par AUTH-SESSION-COMPATIBILITY-BRIDGE-001 : get_authenticated_user_id reconnaît les sessions legacy ; is_authenticated legacy reconnaît les sessions canoniques. Aucune pollution de session. Constat fermé — 2026-05-16. |
+| FND-AUTH-002 | Auth | Doublons API : `login_required` vs `require_auth`, deux implémentations RBAC | MINEUR | FERMÉ | AUTH-SESSION-COMPATIBILITY-BRIDGE-001 | §6.4 audit Claude. `@login_required` canonique, `@require_auth` legacy. Le pont 4.2b garantit que require_auth reconnaît les sessions canoniques et login_required reconnaît les sessions legacy — les deux décorateurs convergent sur les deux types de session sans migration fonctionnelle. Constat fermé — 2026-05-16. |
 
 ---
 
@@ -120,10 +120,10 @@ Tant qu'aucun ticket de correction post-audit n'a été accepté,
 
 | Statut | Nombre |
 |---|---|
-| **OUVERT** | 17 |
+| **OUVERT** | 15 |
 | **REPORTÉ** | 1 |
 | **HORS PÉRIMÈTRE** | 0 |
-| **FERMÉ** | 1 |
+| **FERMÉ** | 3 |
 | **Total** | 19 |
 
 ---

@@ -135,6 +135,34 @@ l'utiliser directement (via des imports intermédiaires dans le core).
 
 ---
 
+## Amendement — Pont de compatibilité bidirectionnel (4.2b)
+
+**Ticket** : `AUTH-SESSION-COMPATIBILITY-BRIDGE-001`  
+**Date** : 2026-05-16
+
+La divergence de clés de session (`_auth_user_id` vs `authenticated + user`)
+rendait les deux piles mutuellement opaques. Le ticket 4.2b a livré un pont de
+lecture bidirectionnel :
+
+**`core.auth.session.get_authenticated_user_id`** reconnaît les sessions legacy :
+si `_auth_user_id` est absent mais que `authenticated=True` et `user.id` sont
+présents (session créée par `authenticate_session`), l'identifiant est retourné.
+
+**`core.security.session.is_authenticated`** reconnaît les sessions canoniques :
+si les clés legacy sont absentes mais que `_auth_user_id` est un entier positif
+(session créée par `login_user`), la session est considérée authentifiée.
+
+**Propriétés garanties** :
+- Aucune écriture dans la session à la lecture — pas de pollution de clés.
+- L'expiration est étendue dans les deux cas.
+- Pas d'import circulaire : `core.security.session` utilise la clé littérale
+  `"_auth_user_id"` sans importer `core.auth.session`.
+
+Ce pont ferme les constats **FND-AUTH-001** et **FND-AUTH-002** du tracker
+post-audit 2026-05.
+
+---
+
 ## Ce que cette ADR ne fait pas
 
 - N'aligne pas `mvc/controllers/` sur `core.auth.session`.

@@ -80,9 +80,19 @@ def is_authenticated(request) -> bool:
     session = _get_store().get(session_id)
     if session is None:
         return False
+
+    # Chemin legacy : authenticated=True + user={...}
     if session_get(session, SESSION_KEY_AUTHENTICATED, False) and session_get(session, SESSION_KEY_USER):
         _get_store().touch_expiry(session_id, SESSION_DURATION)
         return True
+
+    # Pont de compatibilité : session canonique créée par login_user()
+    _CANONICAL_KEY = "_auth_user_id"  # core.auth.session.AUTH_USER_ID_SESSION_KEY
+    user_id = session.get(_CANONICAL_KEY)
+    if isinstance(user_id, int) and not isinstance(user_id, bool) and user_id > 0:
+        _get_store().touch_expiry(session_id, SESSION_DURATION)
+        return True
+
     return False
 
 

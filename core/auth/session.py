@@ -67,14 +67,25 @@ def logout_user(request: Any) -> None:
 
 
 def get_authenticated_user_id(request: Any) -> int | None:
-    """Retourne l'identifiant utilisateur stocke par login_user."""
+    """Retourne l'identifiant utilisateur stocke par login_user ou authenticate_session."""
     session = _resolve_request_session(request)
     if session is None:
         return None
 
+    # Chemin canonique : clé _auth_user_id posée par login_user()
     user_id = session.get(AUTH_USER_ID_SESSION_KEY)
     if isinstance(user_id, int) and not isinstance(user_id, bool) and user_id > 0:
         return user_id
+
+    # Pont de compatibilité : session legacy créée par authenticate_session()
+    from core.sessions.keys import SESSION_KEY_AUTHENTICATED, SESSION_KEY_USER, session_get
+    if session_get(session, SESSION_KEY_AUTHENTICATED, False):
+        legacy_user = session_get(session, SESSION_KEY_USER)
+        if isinstance(legacy_user, dict):
+            legacy_id = legacy_user.get("id")
+            if isinstance(legacy_id, int) and not isinstance(legacy_id, bool) and legacy_id > 0:
+                return legacy_id
+
     return None
 
 
