@@ -417,10 +417,11 @@ def _resolve_mfa_session(request: Any) -> "dict[str, Any] | None":
     if isinstance(session, dict):
         return session
     try:
-        from core.security.session import get_session, get_session_id
+        from core.security.session import get_session_id
+        from core.sessions.manager import get_session_store
 
         session_id = get_session_id(request)
-        return get_session(session_id) if session_id else None
+        return get_session_store().get(session_id) if session_id else None
     except Exception:
         return None
 
