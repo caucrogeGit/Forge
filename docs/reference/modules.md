@@ -444,13 +444,9 @@ from core.modules import (
     prepare_module_installation,
     install_module_manifest,
     # Routes
-    MODULE_ROUTES_FILE,
     ModuleRouteInjectionError,
-    ModuleRoutesAlreadyInjectedError,
     ModuleRoutesAlreadyGeneratedError,
-    ModuleRouteInjectionResult,
     ModuleRouteGenerationResult,
-    prepare_module_route_injection,
     generate_module_routes,
     # Fichiers
     INSTALLABLE_PROVIDES,

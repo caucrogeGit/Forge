@@ -13,7 +13,6 @@ from core.modules import (
     generate_module_routes,
     install_module_manifest,
     load_module_manifest,
-    prepare_module_route_injection,
 )
 
 
@@ -49,55 +48,14 @@ def _install(root: Path, module_dir: Path, name: str = "agenda") -> Path:
     return registry_path
 
 
-def test_prepare_module_routes_pour_module_installe(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    module_dir = _write_module(tmp_path)
-    registry_path = _install(tmp_path, module_dir)
-
-    result = prepare_module_route_injection("agenda", registry_path=registry_path)
-
-    assert result.module_name == "agenda"
-    assert result.source_routes_path == "modules/agenda/routes.py"
-    assert result.target_routes_path == "mvc/module_routes.py"
-    assert "from modules.agenda.routes import register_routes" in result.injection_block
-    assert not result.injected
-
-
-def test_prepare_refuse_module_non_installe(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    with pytest.raises(ModuleRouteInjectionError, match="Module non installé"):
-        prepare_module_route_injection(
-            "agenda",
-            registry_path=tmp_path / "forge_modules.json",
-        )
-
-
-def test_prepare_refuse_module_sans_routes(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    module_dir = _write_module(
-        tmp_path,
-        provides=[],
-        paths={},
-    )
-    registry_path = _install(tmp_path, module_dir)
-
-    with pytest.raises(ModuleRouteInjectionError, match="ne déclare pas de routes"):
-        prepare_module_route_injection("agenda", registry_path=registry_path)
-
-
 @pytest.mark.parametrize(
     "routes_path",
     ["/tmp/routes.py", "../routes.py", "https://example.test/routes.py"],
 )
-def test_prepare_refuse_chemins_routes_dangereux(tmp_path, monkeypatch, routes_path):
+def test_generate_refuse_chemins_routes_dangereux(tmp_path, monkeypatch, routes_path):
     monkeypatch.chdir(tmp_path)
-    module_dir = _write_module(
-        tmp_path,
-        provides=[],
-        paths={},
-    )
+    module_dir = _write_module(tmp_path)
     manifest = json.loads((module_dir / "module.json").read_text(encoding="utf-8"))
-    manifest["provides"] = ["routes"]
     manifest["paths"] = {"routes": routes_path}
     (module_dir / "module.json").write_text(json.dumps(manifest), encoding="utf-8")
     (tmp_path / "forge_modules.json").write_text(
@@ -119,7 +77,7 @@ def test_prepare_refuse_chemins_routes_dangereux(tmp_path, monkeypatch, routes_p
     )
 
     with pytest.raises(ModuleRouteInjectionError):
-        prepare_module_route_injection("agenda")
+        generate_module_routes("agenda")
 
 
 def test_generation_refuse_si_fichier_existe(tmp_path, monkeypatch):

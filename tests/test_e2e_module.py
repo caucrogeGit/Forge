@@ -12,9 +12,9 @@ Cycle testé :
   1  Découverte      — discover_module_manifests trouve le module
   2  module:install  — forge_modules.json créé avec les métadonnées
   3  module:files    — contrôleur copié dans mvc/controllers/
-  4  module:routes   — routes injectées dans mvc/module_routes.py
-                       + pont ajouté dans mvc/routes.py
-  5  module:remove   — fichiers supprimés, routes retirées, registre nettoyé
+  4  module:routes   — mvc/routes_<module>.py généré (explicite)
+                       mvc/routes.py non modifié
+  5  module:remove   — fichiers supprimés, registre nettoyé
   6  Préservation    — fichiers modifiés conservés lors de la suppression
   7  project:check + project:audit passent après installation complète
 """

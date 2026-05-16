@@ -22,14 +22,10 @@ from .registry import (
     save_installed_modules_registry,
 )
 from .routes import (
-    MODULE_ROUTES_FILE,
     ModuleRouteInjectionError,
-    ModuleRouteInjectionResult,
     ModuleRoutesAlreadyGeneratedError,
-    ModuleRoutesAlreadyInjectedError,
     ModuleRouteGenerationResult,
     generate_module_routes,
-    prepare_module_route_injection,
 )
 from .files import (
     INSTALLABLE_PROVIDES,
@@ -66,13 +62,9 @@ __all__ = [
     "is_module_installed",
     "prepare_module_installation",
     "install_module_manifest",
-    "MODULE_ROUTES_FILE",
     "ModuleRouteInjectionError",
-    "ModuleRoutesAlreadyInjectedError",
     "ModuleRoutesAlreadyGeneratedError",
-    "ModuleRouteInjectionResult",
     "ModuleRouteGenerationResult",
-    "prepare_module_route_injection",
     "generate_module_routes",
     "INSTALLABLE_PROVIDES",
     "ModuleFileInstallError",

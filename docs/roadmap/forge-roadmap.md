@@ -151,6 +151,19 @@ vérification, avec comparaison constant-time.
 
 ---
 
+## Phase 6 — Modules : branchement explicite des routes (post-audit)
+
+**Objectif** : supprimer l'injection automatique de routes modules dans les fichiers
+applicatifs et imposer un branchement explicite par le développeur.
+
+| Ticket | Description | État |
+|---|---|---|
+| MODULE-ROUTES-INJECTION-REMOVE-001 | Supprimer l'injection automatique, préserver generate_module_routes | **livré** |
+| MODULE-ROUTES-EXPLICIT-DOC-001 | Documenter le contrat explicite des routes modules | à venir |
+| BETA-3-RELEASE-001 | Publication 1.0.0-beta.3 | à venir |
+
+---
+
 ## Trajectoire officielle — 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :

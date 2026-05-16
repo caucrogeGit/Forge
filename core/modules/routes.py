@@ -1,4 +1,4 @@
-"""Préparation et génération explicite des routes de modules Forge."""
+"""Génération explicite des routes de modules Forge."""
 
 from __future__ import annotations
 
@@ -15,27 +15,11 @@ _URL_RE = re.compile(r"https?://|ftp://", re.IGNORECASE)
 
 
 class ModuleRouteInjectionError(ValueError):
-    """Erreur lors de la préparation ou génération des routes d'un module."""
-
-
-class ModuleRoutesAlreadyInjectedError(ModuleRouteInjectionError):
-    """Les routes du module sont déjà présentes dans le fichier cible (ancien format)."""
+    """Erreur lors de la génération des routes d'un module."""
 
 
 class ModuleRoutesAlreadyGeneratedError(ModuleRouteInjectionError):
     """Un fichier de routes dédié existe déjà pour ce module."""
-
-
-@dataclass(frozen=True)
-class ModuleRouteInjectionResult:
-    module_name: str
-    source_routes_path: str
-    target_routes_path: str
-    dry_run: bool
-    injected: bool
-    message: str
-    manifest: ModuleManifest
-    injection_block: str
 
 
 @dataclass(frozen=True)
@@ -84,25 +68,6 @@ def _safe_routes_path(manifest: ModuleManifest) -> str:
 def _module_import_path(source_dir: Path, routes_path: str) -> str:
     route_file = (source_dir / routes_path).with_suffix("")
     return ".".join(route_file.parts)
-
-
-def _module_marker(name: str) -> tuple[str, str]:
-    return (
-        f"    # forge-module-routes:{name}:start\n",
-        f"    # forge-module-routes:{name}:end\n",
-    )
-
-
-def _build_injection_block(manifest: ModuleManifest, source_dir: Path, routes_path: str) -> str:
-    start, end = _module_marker(manifest.name)
-    import_path = _module_import_path(source_dir, routes_path)
-    alias = f"register_{manifest.name}_routes"
-    return (
-        start +
-        f"    from {import_path} import register_routes as {alias}\n"
-        f"    {alias}(router)\n"
-        f"{end}"
-    )
 
 
 def _format_lines_to_add(module_name: str) -> str:
@@ -167,39 +132,6 @@ def _load_and_validate_module(
         )
 
     return manifest, source_dir, routes_path
-
-
-def prepare_module_route_injection(
-    module_name: str,
-    *,
-    registry_path: str | Path = MODULE_REGISTRY_FILE,
-    target_routes_path: str | Path = MODULE_ROUTES_FILE,
-    app_routes_path: str | Path = "mvc/routes.py",
-) -> ModuleRouteInjectionResult:
-    manifest, source_dir, routes_path = _load_and_validate_module(
-        module_name, registry_path
-    )
-    source_routes_path = source_dir / routes_path
-
-    target = Path(target_routes_path)
-    target_content = target.read_text(encoding="utf-8") if target.exists() else ""
-    start_marker, _ = _module_marker(module_name)
-    if start_marker.strip() in target_content:
-        raise ModuleRoutesAlreadyInjectedError(
-            f"Routes déjà injectées pour le module : {module_name}"
-        )
-
-    block = _build_injection_block(manifest, source_dir, routes_path)
-    return ModuleRouteInjectionResult(
-        module_name=manifest.name,
-        source_routes_path=source_routes_path.as_posix(),
-        target_routes_path=target.as_posix(),
-        dry_run=False,
-        injected=False,
-        message=f"Préparation prête : {manifest.name}",
-        manifest=manifest,
-        injection_block=block,
-    )
 
 
 def generate_module_routes(
