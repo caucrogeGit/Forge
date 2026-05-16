@@ -1,4 +1,5 @@
 import re
+import warnings
 
 from core.sessions.keys import SESSION_KEY_AUTHENTICATED, SESSION_KEY_USER, session_get
 from core.sessions.manager import get_session_store as _get_store
@@ -15,6 +16,12 @@ SESSION_DURATION = 3600  # 1 heure en secondes
 
 def create_session() -> str:
     """Crée une nouvelle session et retourne son identifiant."""
+    warnings.warn(
+        "core.security.session.create_session() is deprecated; "
+        "use core.sessions.manager.get_session_store().create() instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return _get_store().create()
 
 
@@ -40,6 +47,12 @@ def authenticate_session(session_id: str, user: dict) -> str | None:
     Returns :
         str | None : nouveau session_id après rotation, ou None si session absente
     """
+    warnings.warn(
+        "core.security.session.authenticate_session() is deprecated; "
+        "use core.auth.session.login_user(request, user) with AuthUser instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     user_data = {
         "id"    : user["UtilisateurId"],
         "login" : user["Login"],
@@ -74,6 +87,12 @@ def is_authenticated(request) -> bool:
     Retourne True si la requête provient d'un utilisateur authentifié.
     Repousse l'expiration de la session à chaque requête valide.
     """
+    warnings.warn(
+        "core.security.session.is_authenticated() is deprecated; "
+        "use core.auth.session.is_authenticated(request) instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     session_id = get_session_id(request)
     if not session_id:
         return False
@@ -98,6 +117,12 @@ def is_authenticated(request) -> bool:
 
 def get_user(request) -> dict | None:
     """Retourne l'utilisateur courant depuis la session si authentifié."""
+    warnings.warn(
+        "core.security.session.get_user() is deprecated; "
+        "use core.auth.session.current_user(request, user_loader) instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     session_id = get_session_id(request)
     if not session_id:
         return None
@@ -109,7 +134,13 @@ def get_user(request) -> dict | None:
 
 def user_has_role(request, role: str) -> bool:
     """Retourne True si l'utilisateur courant possède le rôle demandé."""
-    user = get_user(request)
+    session_id = get_session_id(request)
+    if not session_id:
+        return False
+    session = _get_store().get(session_id)
+    if not session or not session_get(session, SESSION_KEY_AUTHENTICATED):
+        return False
+    user = session_get(session, SESSION_KEY_USER)
     if not user:
         return False
     return role in user.get("roles", [])

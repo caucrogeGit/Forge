@@ -135,6 +135,39 @@ l'utiliser directement (via des imports intermédiaires dans le core).
 
 ---
 
+## Amendement — Dépréciations API legacy (4.3)
+
+**Ticket** : `AUTH-SESSION-LEGACY-DEPRECATION-001`
+**Date** : 2026-05-16
+
+Les fonctions legacy suivantes de `core.security.session` émettent désormais un
+`DeprecationWarning` à l'appel, avec le chemin canonique à utiliser :
+
+| Fonction dépréciée | API canonique à utiliser |
+|---|---|
+| `create_session()` | `get_session_store().create()` |
+| `authenticate_session(session_id, user)` | `login_user(request, user)` avec `AuthUser` |
+| `is_authenticated(request)` | `core.auth.session.is_authenticated(request)` |
+| `get_user(request)` | `core.auth.session.current_user(request, user_loader)` |
+
+**Fonctions infrastructure conservées sans warning** : `get_session_id`,
+`get_session`, `delete_session`, `regenerate_session`, `user_has_role`,
+`set_flash`, `get_flash` — pas d'équivalent canonique direct ou utilisées
+en interne par le framework.
+
+**Propriétés garanties** :
+- L'import de `core.security.session` n'émet aucun `DeprecationWarning`.
+- Les fonctions dépréciées continuent à fonctionner — la migration est
+  progressive, non cassante.
+- `stacklevel=2` : le warning pointe vers le code appelant.
+- `user_has_role` ne cascade pas le warning de `get_user` (refactorisé
+  pour lire le store directement).
+
+La suppression effective et la migration des usages applicatifs appartiennent
+aux tickets 4.4 (`STARTER-AUTH-MODERNIZE-001`) et suivants.
+
+---
+
 ## Amendement — Pont de compatibilité bidirectionnel (4.2b)
 
 **Ticket** : `AUTH-SESSION-COMPATIBILITY-BRIDGE-001`  

@@ -177,24 +177,30 @@ def test_memory_store_thread_safe_create():
 
 
 def test_security_session_create_session_works():
-    """core.security.session.create_session() fonctionne encore."""
+    """core.security.session.create_session() fonctionne encore malgré la dépréciation."""
+    import pytest
     from core.security.session import create_session, get_session
-    sid = create_session()
+    with pytest.warns(DeprecationWarning, match="create_session"):
+        sid = create_session()
     assert get_session(sid) is not None
 
 
 def test_security_session_delete_session_works():
     """core.security.session.delete_session() fonctionne encore."""
+    import pytest
     from core.security.session import create_session, get_session, delete_session
-    sid = create_session()
+    with pytest.warns(DeprecationWarning):
+        sid = create_session()
     delete_session(sid)
     assert get_session(sid) is None
 
 
 def test_security_session_regenerate_session_works():
     """core.security.session.regenerate_session() fonctionne encore."""
+    import pytest
     from core.security.session import create_session, get_session, regenerate_session
-    sid = create_session()
+    with pytest.warns(DeprecationWarning):
+        sid = create_session()
     nouveau = regenerate_session(sid)
     assert nouveau != sid
     assert get_session(sid) is None

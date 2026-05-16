@@ -54,14 +54,18 @@ def _unauthenticated_request() -> SimpleNamespace:
 
 
 def test_require_auth_redirects_unauthenticated():
-    """require_auth redirige vers /login si la requête n'est pas authentifiée."""
+    """require_auth redirige vers /login si la requête n'est pas authentifiée.
+
+    require_auth appelle is_authenticated() deprecated — DeprecationWarning attendu.
+    """
     from core.security.decorators import require_auth
 
     @require_auth
     def protected(request):
         return SimpleNamespace(status=200)
 
-    response = protected(_unauthenticated_request())
+    with pytest.warns(DeprecationWarning, match="is_authenticated"):
+        response = protected(_unauthenticated_request())
     assert response.status == 302
     assert response.headers["Location"] == "/login"
 
@@ -147,12 +151,17 @@ def test_is_authenticated_canonical_recognizes_legacy_session():
 
 
 def test_is_authenticated_legacy_requires_legacy_keys():
-    """core.security.session.is_authenticated retourne False sans SESSION_KEY_AUTHENTICATED."""
+    """core.security.session.is_authenticated retourne False sans SESSION_KEY_AUTHENTICATED.
+
+    is_authenticated() est dépréciée — DeprecationWarning attendu.
+    """
     from core.security.session import is_authenticated
 
     # Requête sans cookie de session
     request = SimpleNamespace(headers={})
-    assert is_authenticated(request) is False
+    with pytest.warns(DeprecationWarning, match="is_authenticated"):
+        result = is_authenticated(request)
+    assert result is False
 
 
 def test_session_store_not_broken_after_dedup():

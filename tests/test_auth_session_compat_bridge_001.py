@@ -5,6 +5,12 @@ Vérifie la reconnaissance croisée entre les deux piles de session :
 - une session canonique (login_user) est reconnue par le flux legacy ;
 - require_auth et login_required convergent sur les deux types de sessions ;
 - aucune pollution de session (pas d'écriture de clés supplémentaires).
+
+Note : ce fichier teste le pont de compatibilité, pas les API legacy elles-mêmes.
+Les appels directs à core.security.session.is_authenticated() sont intentionnels
+pour valider que le pont est fonctionnel côté legacy. Les DeprecationWarning
+sont des effets de bord connus et intentionnellement ignorés ici — les tests
+dédiés à la dépréciation se trouvent dans test_auth_session_legacy_deprecation_001.py.
 """
 from __future__ import annotations
 
@@ -15,6 +21,8 @@ import pytest
 
 from core.sessions import MemorySessionStore
 from core.sessions.manager import set_session_store
+
+pytestmark = pytest.mark.filterwarnings("ignore::DeprecationWarning")
 
 
 @pytest.fixture(autouse=True)
@@ -27,18 +35,20 @@ def isolated_store():
 
 
 def _make_legacy_session(store: MemorySessionStore, user_id: int = 42) -> tuple[str, str]:
-    """Crée une session legacy via authenticate_session, retourne (session_id, cookie)."""
-    from core.security.session import authenticate_session, create_session
+    """Crée une session legacy via le store directement (bypass des API dépréciées).
 
-    sid = create_session()
-    new_sid = authenticate_session(sid, {
-        "UtilisateurId": user_id,
-        "Login": "alice",
-        "Prenom": "Alice",
-        "Nom": "Test",
-        "Email": "alice@example.com",
+    Simule l'état produit par authenticate_session() sans appeler la fonction dépréciée.
+    """
+    sid = store.create()
+    user_data = {
+        "id": user_id,
+        "login": "alice",
+        "prenom": "Alice",
+        "nom": "Test",
+        "email": "alice@example.com",
         "roles": ["admin"],
-    })
+    }
+    new_sid = store.authenticate(sid, user_data, 3600)
     cookie = f"__Host-session_id={new_sid}"
     return new_sid, cookie
 
@@ -198,9 +208,8 @@ def test_canonical_session_expiry_touched_by_legacy_is_authenticated(isolated_st
 def test_unauthenticated_session_rejected_by_canonical(isolated_store):
     """get_authenticated_user_id retourne None pour une session vide."""
     from core.auth.session import get_authenticated_user_id
-    from core.security.session import create_session
 
-    sid = create_session()
+    sid = isolated_store.create()
     cookie = f"__Host-session_id={sid}"
     request = _request_with_cookie(cookie)
     assert get_authenticated_user_id(request) is None
@@ -208,9 +217,9 @@ def test_unauthenticated_session_rejected_by_canonical(isolated_store):
 
 def test_unauthenticated_session_rejected_by_legacy(isolated_store):
     """is_authenticated legacy retourne False pour une session vide."""
-    from core.security.session import create_session, is_authenticated
+    from core.security.session import is_authenticated
 
-    sid = create_session()
+    sid = isolated_store.create()
     cookie = f"__Host-session_id={sid}"
     request = _request_with_cookie(cookie)
     assert is_authenticated(request) is False
