@@ -1815,8 +1815,11 @@ Résultats possibles : `OK`, `WARN`, `FAIL`, `SKIP`. Un `FAIL` retourne un code 
 | Certificats SSL | Présence des fichiers `SSL_CERTFILE` et `SSL_KEYFILE` |
 | Node.js / npm | Présence de `npm` (optionnel, Tailwind uniquement) |
 | Base de données | Connexion MariaDB avec les credentials applicatifs |
+| MFA (opt-in) | Détecte les indices d'usage MFA dans le projet — WARN si `forge_mvc_mfa` absent |
 
 Ce que `forge doctor` ne vérifie pas : contenu des templates, syntaxe SQL, validité des migrations appliquées, configuration Auth/User (voir `forge auth:doctor`), configuration mail (voir `forge mail:doctor`).
+
+**Diagnostic MFA (opt-in)** — `forge doctor` détecte les indices d'usage MFA dans un projet (nom de contrôleur, routes, imports). Si des indices sont trouvés mais que le module `forge_mvc_mfa` n'est pas installé, un `WARN` non bloquant est émis. MFA est une brique opt-in/source-only : `forge-mvc` (core) n'inclut ni `forge_mvc_mfa` ni `pyotp` dans ses dépendances runtime. Pour supprimer le warning, installez les dépendances du module MFA (`pip install forge-mvc-mfa`) ou retirez le flux MFA du projet.
 
 `forge auth:init` crée ou préserve les fichiers SQL suivants sans les appliquer :
 `users.sql`, `auth_tokens.sql`, `auth_mfa_factors.sql`,
