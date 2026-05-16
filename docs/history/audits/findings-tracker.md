@@ -95,7 +95,7 @@ Tant qu'aucun ticket de correction post-audit n'a été accepté,
 
 | ID | Domaine | Constat | Gravité | Statut | Ticket cible | Notes |
 |---|---|---|---|---|---|---|
-| FND-SESSION-001 | Sessions | Sessions in-memory bloquantes en production multi-process — sessions non partagées entre workers | IMPORTANT | OUVERT | SESSIONS-CONFIGURABLE-STORE-001 | Store configurable livré par SESSIONS-CONFIGURABLE-STORE-001 ; contrat des stores documenté par SESSIONS-STORE-CONTRACT-DOC-001 ; reste la documentation thread-safety mémoire avec SESSIONS-MEMORY-THREADSAFE-DOC-001. |
+| FND-SESSION-001 | Sessions | Sessions in-memory bloquantes en production multi-process — sessions non partagées entre workers | IMPORTANT | FERMÉ | SESSIONS-CONFIGURABLE-STORE-001 | Store configurable livré par SESSIONS-CONFIGURABLE-STORE-001 ; contrat des stores documenté par SESSIONS-STORE-CONTRACT-DOC-001 ; limites thread-safety de MemorySessionStore documentées par SESSIONS-MEMORY-THREADSAFE-DOC-001. Constat fermé — 2026-05-16. |
 
 ---
 
@@ -120,10 +120,10 @@ Tant qu'aucun ticket de correction post-audit n'a été accepté,
 
 | Statut | Nombre |
 |---|---|
-| **OUVERT** | 18 |
+| **OUVERT** | 17 |
 | **REPORTÉ** | 1 |
 | **HORS PÉRIMÈTRE** | 0 |
-| **FERMÉ** | 0 |
+| **FERMÉ** | 1 |
 | **Total** | 19 |
 
 ---

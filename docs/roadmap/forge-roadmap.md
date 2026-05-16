@@ -118,7 +118,7 @@ release. Aboutit à la publication de `1.0.0-beta.2`.
 |---|---|---|
 | SESSIONS-CONFIGURABLE-STORE-001 | Ajouter `forge.configure(session_store=...)` et brancher le store au flux session | **livré** |
 | SESSIONS-STORE-CONTRACT-DOC-001 | Documenter le contrat complet et les backends disponibles | **livré** |
-| SESSIONS-MEMORY-THREADSAFE-DOC-001 | Documenter la thread-safety de MemorySessionStore | à venir |
+| SESSIONS-MEMORY-THREADSAFE-DOC-001 | Documenter la thread-safety de MemorySessionStore | **livré** |
 
 ---
 
