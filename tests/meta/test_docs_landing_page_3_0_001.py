@@ -33,8 +33,8 @@ class TestVersionBumped:
         self.generated = LANDING_GENERATED.read_text(encoding="utf-8")
 
     @pytest.mark.parametrize("expected_version_string", [
-        "v1.0.0-beta.1",            # Version strip Hero
-        "Forge 1.0.0-beta.1",       # Section État + label terminal
+        "v1.0.0-beta.2",            # Version strip Hero
+        "Forge 1.0.0-beta.2",       # Section État + label terminal
         "Python 3.12+",             # Version strip Hero
     ])
     def test_version_mentioned_in_source(self, expected_version_string):
@@ -44,8 +44,8 @@ class TestVersionBumped:
         )
 
     @pytest.mark.parametrize("expected_version_string", [
-        "v1.0.0-beta.1",
-        "Forge 1.0.0-beta.1",
+        "v1.0.0-beta.2",
+        "Forge 1.0.0-beta.2",
         "Python 3.12+",
     ])
     def test_version_mentioned_in_generated(self, expected_version_string):
@@ -220,8 +220,8 @@ class TestStateSectionRefonte:
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
 
     def test_state_mentions_3_0(self):
-        assert "Forge 1.0.0-beta.1" in self.source, (
-            "Le bloc 'État actuel' devrait mentionner Forge 1.0.0-beta.1"
+        assert "Forge 1.0.0-beta.2" in self.source, (
+            "Le bloc 'État actuel' devrait mentionner Forge 1.0.0-beta.2"
         )
 
     def test_state_mentions_source_ouverture(self):
@@ -268,8 +268,8 @@ class TestSyncedToDocsIndex:
     def test_version_synced(self):
         source = LANDING_SOURCE.read_text(encoding="utf-8")
         generated = LANDING_GENERATED.read_text(encoding="utf-8")
-        assert "v1.0.0-beta.1" in source
-        assert "v1.0.0-beta.1" in generated, (
-            "docs/index.html devrait être synchronisé (contenir v1.0.0-beta.1). "
+        assert "v1.0.0-beta.2" in source
+        assert "v1.0.0-beta.2" in generated, (
+            "docs/index.html devrait être synchronisé (contenir v1.0.0-beta.2). "
             "Lancer `forge sync:landing` pour régénérer."
         )

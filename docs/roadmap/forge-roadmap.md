@@ -7,18 +7,17 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> La version publique actuelle est **Forge 1.0.0-beta.1**.
+> La version publique actuelle est **Forge 1.0.0-beta.2**.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.1
+## État actuel — Forge 1.0.0-beta.2
 
-**Tag courant : `v1.0.0-beta.1` (2026-05-15)**
+**Tag courant : `v1.0.0-beta.2` (2026-05-16)**
 
-Précédent : v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.1 — Scénario C (22 tickets) + Consolidation
-post-audit renforcé (11 tickets) + mini-Scénario D (4 tickets) + LANDING-ARTICLES-CLICKABLE-001 + publication PyPI du core complétés.**
+**Statut : v1.0.0-beta.2 — Corrections post-audit Phase 1 (README PyOTP, classifier PyPI, doc packaging), infrastructure release Phase 2 (validation reproductible, script release_check.sh) complétés.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -53,9 +52,9 @@ de 3.0.2 (voir [`audit-renforce-3.0.2-001`](../history/audits/audit-renforce-3.0
 Aucune rupture d'API publique. Voir `CHANGELOG.md` section [3.0.3]
 pour le détail.
 
-Dernière validation — Forge 1.0.0-beta.1 (PYPI-PUBLISH-CORE-3.0.5-001) :
+Dernière validation — Forge 1.0.0-beta.2 (BETA-2-RELEASE-001) :
 
-- `pytest` : **9 693 passed** (post-1.0.0-beta.1) ;
+- `pytest` : **9 725 passed** (post-1.0.0-beta.2) ;
 - `python -m compileall -q .` : **OK** ;
 - `mkdocs build --strict` : **OK** ;
 - `git diff --check` : **OK**.
@@ -106,7 +105,7 @@ release. Aboutit à la publication de `1.0.0-beta.2`.
 |---|---|---|
 | RELEASE-VALIDATION-ENV-LOCK-001 | Documenter l'environnement de validation release | **livré** |
 | RELEASE-CHECK-SCRIPT-001 | Créer le script `scripts/release_check.sh` | **livré** |
-| BETA-2-RELEASE-001 | Publier `1.0.0-beta.2` | à venir |
+| BETA-2-RELEASE-001 | Publier `1.0.0-beta.2` | **livré** |
 
 ---
 

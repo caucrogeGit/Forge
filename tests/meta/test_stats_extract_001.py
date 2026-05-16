@@ -35,7 +35,7 @@ class TestStatsModuleAvailable:
     def test_module_has_version(self):
         import forge_mvc_stats
         assert hasattr(forge_mvc_stats, "__version__")
-        assert forge_mvc_stats.__version__ == "1.0.0b1"
+        assert forge_mvc_stats.__version__ == "1.0.0b2"
 
     def test_all_exports_complete(self):
         import forge_mvc_stats
@@ -114,7 +114,7 @@ class TestStatsFunctional:
 class TestPyprojectMetadata:
     def test_pyproject_version(self):
         content = Path("packages/forge-mvc-stats/pyproject.toml").read_text(encoding="utf-8")
-        assert 'version = "1.0.0b1"' in content
+        assert 'version = "1.0.0b2"' in content
 
     def test_description_updated(self):
         content = Path("packages/forge-mvc-stats/pyproject.toml").read_text(encoding="utf-8")

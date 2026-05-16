@@ -11,9 +11,9 @@ import core
 
 ROOT = Path(__file__).resolve().parents[2]
 
-_EXPECTED = "1.0.0b1"
-_EXPECTED_SEMVER = "1.0.0-beta.1"
-_EXPECTED_REF = "v1.0.0-beta.1"
+_EXPECTED = "1.0.0b2"
+_EXPECTED_SEMVER = "1.0.0-beta.2"
+_EXPECTED_REF = "v1.0.0-beta.2"
 
 
 # ── Document d'audit ──────────────────────────────────────────────────────────

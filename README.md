@@ -1,11 +1,11 @@
-# Forge — Framework MVC Python 1.0.0-beta.1
+# Forge — Framework MVC Python 1.0.0-beta.2
 
 [![PyPI version](https://img.shields.io/pypi/v/forge-mvc.svg)](https://pypi.org/project/forge-mvc/)
 [![Python](https://img.shields.io/pypi/pyversions/forge-mvc.svg)](https://pypi.org/project/forge-mvc/)
 [![License](https://img.shields.io/badge/license-Forge%20Proprietary-blue.svg)](https://github.com/caucrogeGit/Forge/blob/main/LICENSE)
 
-> **Forge 1.0.0-beta.1 — bêta publique.** Disponible sur [PyPI](https://pypi.org/project/forge-mvc/1.0.0b1/) sous `forge-mvc==1.0.0b1`.
-> L'option `--pre` est nécessaire car `1.0.0b1` est une préversion bêta PEP 440.
+> **Forge 1.0.0-beta.2 — bêta publique.** Disponible sur [PyPI](https://pypi.org/project/forge-mvc/1.0.0b2/) sous `forge-mvc==1.0.0b2`.
+> L'option `--pre` est nécessaire car `1.0.0b2` est une préversion bêta PEP 440.
 
 *Une forge pour les créer toutes. Framework web applicatif.*
 
@@ -194,7 +194,7 @@ sudo apt install -y git python3 python3-venv python3-pip openssl mariadb-server 
 ### 2. Cloner Forge
 
 ```bash
-git clone --branch v1.0.0-beta.1 --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
+git clone --branch v1.0.0-beta.2 --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
 cd NomDuProjet
 ```
 
@@ -206,7 +206,7 @@ Remplacez `NomDuProjet` par le nom de votre application. Un profil peut être pr
 rm -rf .git
 git init
 git add -A
-git commit -m "init: NomDuProjet — based on Forge 1.0.0-beta.1"
+git commit -m "init: NomDuProjet — based on Forge 1.0.0-beta.2"
 ```
 
 ### 4. Créer l’environnement virtuel du projet

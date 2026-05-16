@@ -130,11 +130,11 @@ class TestSectionOrder:
 
     def test_302_at_top_after_header(self):
         text = _text()
-        # [1.0.0-beta.1] doit être la première section ## après # Changelog
+        # [1.0.0-beta.2] doit être la première section ## après # Changelog
         sections = re.findall(r"^## \[", text, re.MULTILINE)
         assert sections, "Aucune section ## trouvée"
         first_section_pos = text.index("## [")
-        pos_306 = text.index("## [1.0.0-beta.1]")
+        pos_306 = text.index("## [1.0.0-beta.2]")
         assert first_section_pos == pos_306, (
-            "[1.0.0-beta.1] doit être la première section du CHANGELOG"
+            "[1.0.0-beta.2] doit être la première section du CHANGELOG"
         )

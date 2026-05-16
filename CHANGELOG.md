@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.0.0-beta.2] — 2026-05-16
+
+Corrections post-audit Phase 1 et infrastructure release Phase 2.
+
+### Documentation
+
+- `README.md` : retrait de `pyotp` de la liste des dépendances runtime du core
+  (ticket README-RUNTIME-DEPS-CLEANUP-001) — PyOTP est une dépendance de `forge-mvc-mfa`,
+  pas du core.
+- `docs/contributing.md` : même correction sur la liste des dépendances runtime.
+- `docs/release-policy.md` : alignement du classifier PyPI `forge-mvc` sur
+  `4 - Beta` (ticket PYPI-CLASSIFIER-BETA-ALIGN-001) ; ajout section
+  « Verrouillage packaging » (ticket PACKAGE-LOCK-DOC-001).
+- `docs/release-local.md` : section « Environnement de validation release »
+  documentant la procédure reproductible (ticket RELEASE-VALIDATION-ENV-LOCK-001).
+- `docs/positioning.md` : mention de version mise à jour.
+
+### Infrastructure
+
+- `scripts/release_check.sh` : nouveau script de validation release locale
+  (ticket RELEASE-CHECK-SCRIPT-001). Mode standard (pytest, compileall, mkdocs
+  --strict, git diff --check, git status) et mode `--full` (+ build wheel +
+  twine check). Ne publie rien, ne crée aucun tag.
+
+### Packaging
+
+- `pyproject.toml` : classifier `Development Status :: 5 - Production/Stable`
+  corrigé en `4 - Beta` (ticket PYPI-CLASSIFIER-BETA-ALIGN-001).
+
+
 ## [1.0.0-beta.1] — 2026-05-15
 
 Première publication publique du code source de Forge et publication sur PyPI.

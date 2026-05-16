@@ -50,7 +50,7 @@ class TestSlogan:
 
 class TestVersion:
     def test_version_3_0_0_presente(self):
-        assert "1.0.0-beta.1" in _src()
+        assert "1.0.0-beta.2" in _src()
 
     def test_version_1_5_absente(self):
         assert "1.5.0" not in _src()
@@ -128,7 +128,7 @@ class TestApportsRecents:
 
 class TestEtatActuel:
     def test_forge_3_0_0_etat(self):
-        assert "Forge 1.0.0-beta.1" in _src()
+        assert "Forge 1.0.0-beta.2" in _src()
 
     def test_phases_recentes_mentionnees(self):
         src = _src()

@@ -20,7 +20,7 @@ import pytest
 
 PACKAGES_DIR = Path("packages")
 ROOT_PYPROJECT = Path("pyproject.toml")
-VERSION = "1.0.0b1"
+VERSION = "1.0.0b2"
 
 OPTIONAL_DISTS = [
     "forge-mvc-mfa",
@@ -129,7 +129,7 @@ class TestForgeMvcPackage:
         assert any("forge_cli" in p for p in include)
 
     def test_extras_intentionally_absent(self):
-        """En 1.0.0b1, les extras PyPI sont désactivés — modules opt-in non publiés sur PyPI.
+        """En 1.0.0b2, les extras PyPI sont désactivés — modules opt-in non publiés sur PyPI.
 
         Réintroduction prévue dans une version ultérieure (OPTIN-PYPI-PUBLISH-001).
         """
@@ -191,7 +191,7 @@ class TestRootPyprojectUpdated:
         assert data["project"]["version"] == VERSION
 
     def test_no_optional_dependencies_in_pyproject(self):
-        """En 1.0.0b1, [project.optional-dependencies] est absent (extras PyPI désactivés)."""
+        """En 1.0.0b2, [project.optional-dependencies] est absent (extras PyPI désactivés)."""
         data = self._load()
         assert "optional-dependencies" not in data["project"], (
             "[project.optional-dependencies] doit être absent du pyproject.toml racine en 3.0.x. "

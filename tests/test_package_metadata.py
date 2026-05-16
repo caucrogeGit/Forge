@@ -9,8 +9,8 @@ from pathlib import Path
 
 import core
 
-_VERSION = "1.0.0b1"
-_VERSION_SEMVER = "1.0.0-beta.1"
+_VERSION = "1.0.0b2"
+_VERSION_SEMVER = "1.0.0-beta.2"
 
 
 def test_package_json_author_is_current():

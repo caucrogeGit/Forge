@@ -34,7 +34,7 @@ class TestMfaModuleAvailable:
 
     def test_version_attribute(self):
         import forge_mvc_mfa
-        assert forge_mvc_mfa.__version__ == "1.0.0b1"
+        assert forge_mvc_mfa.__version__ == "1.0.0b2"
 
     def test_auth_mfa_factor_importable(self):
         from forge_mvc_mfa import AuthMfaFactor
@@ -330,7 +330,7 @@ class TestPyprojectMetadata:
         assert self._toml()["project"]["name"] == "forge-mvc-mfa"
 
     def test_version(self):
-        assert self._toml()["project"]["version"] == "1.0.0b1"
+        assert self._toml()["project"]["version"] == "1.0.0b2"
 
     def test_requires_python(self):
         assert self._toml()["project"]["requires-python"] == ">=3.12"

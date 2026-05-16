@@ -36,7 +36,7 @@ Puis exécuter la validation complète (script existant) :
 
 ```bash
 bash tools/release-validate.sh <VERSION>
-# ex. : bash tools/release-validate.sh 1.0.0b2
+# ex. : bash tools/release-validate.sh {{forge_version}}
 ```
 
 Ce script couvre : cohérence de version, CHANGELOG, pytest, ruff, compileall,
