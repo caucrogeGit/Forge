@@ -134,6 +134,7 @@ nav:
           - ADR-007 Charte v2: adr/007-charter-v2-adoption.md
           - ADR-008 Audit auth: adr/008-auth-audit-architecture.md
           - ADR-009 Stabilité terrain: adr/009-stability-policy-terrain.md
+          - ADR-010 API canonique auth/session: adr/010-auth-session-canonical-api.md
 
   - Projet:
       - Roadmap:

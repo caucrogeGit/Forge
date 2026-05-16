@@ -122,6 +122,22 @@ release. Aboutit à la publication de `1.0.0-beta.2`.
 
 ---
 
+## Phase 4 — Déduplication double pile auth/session (post-audit)
+
+**Objectif** : supprimer la double pile `core.auth.session` / `core.security.session`
+en formalisant `core.auth.session` comme API canonique, puis en migrant les imports
+legacy et en dépréciant les fonctions `core.security.session`.
+
+| Ticket | Description | État |
+|---|---|---|
+| AUTH-SESSION-CANONICAL-DECISION-001 | Décider et documenter l'API canonique (ADR-010) | **livré** |
+| AUTH-SESSION-DEDUP-001 | Aligner les imports runtime sur `core.auth.session` | à venir |
+| AUTH-SESSION-LEGACY-DEPRECATION-001 | Ajouter les `DeprecationWarning` sur les fonctions legacy | à venir |
+| STARTER-AUTH-MODERNIZE-001 | Moderniser le starter auth sur `core.auth.session` | à venir |
+| CORE-AUTH-NO-HARDCODED-FIELDS-001 | Supprimer les champs applicatifs codés en dur dans le core | à venir |
+
+---
+
 ## Trajectoire officielle — 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :

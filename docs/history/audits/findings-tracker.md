@@ -78,8 +78,8 @@ Tant qu'aucun ticket de correction post-audit n'a été accepté,
 
 | ID | Domaine | Constat | Gravité | Statut | Ticket cible | Notes |
 |---|---|---|---|---|---|---|
-| FND-AUTH-001 | Auth | Double pile auth `core/security/` (legacy FR) vs `core/auth/` (moderne EN) — API dupliquée, fallback explicite entre les deux | IMPORTANT | OUVERT | AUTH-SESSION-DEDUP-001 | §4.2.1 audit Claude |
-| FND-AUTH-002 | Auth | Doublons API : `login_required` vs `require_auth`, deux implémentations RBAC | MINEUR | OUVERT | AUTH-SESSION-DEDUP-001 | §6.4 audit Claude |
+| FND-AUTH-001 | Auth | Double pile auth `core/security/` (legacy FR) vs `core/auth/` (moderne EN) — API dupliquée, fallback explicite entre les deux | IMPORTANT | OUVERT | AUTH-SESSION-DEDUP-001 | §4.2.1 audit Claude. Décision canonique actée par AUTH-SESSION-CANONICAL-DECISION-001 (ADR-010) ; déduplication effective attendue dans AUTH-SESSION-DEDUP-001 ; warnings legacy attendus dans AUTH-SESSION-LEGACY-DEPRECATION-001. |
+| FND-AUTH-002 | Auth | Doublons API : `login_required` vs `require_auth`, deux implémentations RBAC | MINEUR | OUVERT | AUTH-SESSION-DEDUP-001 | §6.4 audit Claude. Décision canonique actée par AUTH-SESSION-CANONICAL-DECISION-001 : `@login_required` canonique, `@require_auth` legacy. Remplacement dans AUTH-SESSION-DEDUP-001. |
 
 ---
 
