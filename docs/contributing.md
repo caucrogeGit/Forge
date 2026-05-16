@@ -205,6 +205,67 @@ documentés dans la [Matrice de compatibilité](compatibility.md).
 - Un test qui modifie `sys.path` ou l'état global doit nettoyer après lui.
 - **Tests méta dans `tests/meta/`** — tout test qui lit principalement des fichiers de documentation, vérifie une roadmap, une version déclarée, un classifier, l'absence d'une chaîne interdite, une frontière d'import ou un invariant textuel doit vivre dans `tests/meta/`, pas à la racine de `tests/`. Chaque fichier `tests/meta/` doit porter `pytestmark = pytest.mark.meta`.
 
+### Politique de rotation des tests méta
+
+#### Pourquoi des tests méta ?
+
+Les tests méta vérifient des invariants qui ne peuvent pas être couverts par des tests comportementaux : cohérence documentaire, absence d'une dépendance interdite, respect d'une frontière d'import, conformité d'un fichier de configuration statique. Ils protègent la lisibilité et la maintenabilité du projet sans exécuter de code runtime.
+
+#### Tests méta permanents
+
+Garder indéfiniment. Suppression possible uniquement si l'invariant disparaît de l'architecture :
+
+- frontières d'import entre `core/` et les opt-ins (`ADR-004`, `ADR-011`) ;
+- contrat de packaging (packages déclarés dans `pyproject.toml`) ;
+- politique de sécurité documentée (`docs/production-security.md`, `docs/security.md`) ;
+- politique de dépréciation documentée ;
+- stabilité de l'API publique (`test_stability_contract_3_x_001.py`) ;
+- isolation des tests méta (`test_tests_meta_isolate_001.py`) ;
+- cohérence de version entre les fichiers (`test_release_current_version_001.py`).
+
+#### Tests méta temporaires
+
+Un test méta est temporaire s'il est créé pour empêcher la régression d'un ticket ponctuel (extraction, suppression, migration). Il doit mentionner dans son docstring le ticket ou la phase qui justifie son existence.
+
+Exemples : suppression d'OIDC, extraction de MFA, migration de l'API FR→EN.
+
+Critère : si le fichier a pour objet de vérifier qu'une transformation passée **n'est pas révoquée**, il est temporaire. Il peut être supprimé dans `META-TESTS-PRUNE-001` si l'invariant est couvert par un test comportemental plus fort, ou si la phase est définitivement close et la régression jugée improbable.
+
+**Règle obligatoire** : tout fichier `tests/meta/` dont le nom contient `legacy`, `stale`, `migration` ou `deprecation` doit mentionner un ticket ou une référence de phase dans ses 20 premières lignes.
+
+#### Tests méta release-snapshot
+
+Ces tests vérifient une version ou un état courant. Ils sont valides mais doivent être mis à jour à chaque release :
+
+- `test_release_current_version_001.py` — cohérence de la version dans tous les fichiers ;
+- `test_pypi_classifiers_001.py` — classifiers PyPI alignés avec le statut réel.
+
+La mise à jour est un acte délibéré, pas une anomalie.
+
+#### Fusion ou suppression
+
+Un test méta peut être **fusionné** si plusieurs fichiers vérifient le même invariant. Un test méta peut être **supprimé** uniquement :
+
+1. dans un ticket dédié (`META-TESTS-PRUNE-001` ou équivalent) ;
+2. avec validation que l'invariant reste couvert (par un autre test méta ou un test comportemental) ;
+3. avec une entrée dans le rapport du ticket.
+
+Jamais en passant une suppression dans un ticket non dédié aux tests.
+
+#### Règle de sécurité
+
+Un test méta de sécurité (frontière d'import, chaîne interdite, politique de stockage) ne doit jamais être supprimé sans validation explicite de sécurité. Le doute profite au maintien.
+
+#### Lien avec les tests comportementaux
+
+Un test comportemental est préférable à un test méta quand le comportement peut être exécuté directement. Si un test méta vérifie qu'une fonction existe dans le code source, et qu'un test comportemental l'appelle et vérifie son résultat, le test méta est candidat à suppression.
+
+Un test méta reste pertinent quand : (a) l'invariant est purement textuel ou documentaire, (b) l'exécuter en runtime serait trop coûteux ou dépendant d'un environnement extérieur, (c) il protège une frontière architecturale indépendamment du comportement observable.
+
+#### Ticket de nettoyage
+
+`META-TESTS-PRUNE-001` est le ticket prévu pour la suppression et la fusion effectives. Il applique les critères définis ici. Ce ticket (8.2) définit la politique ; `META-TESTS-PRUNE-001` (8.3) l'applique.
+
 ---
 
 ## Mettre à jour la documentation
