@@ -12,6 +12,11 @@ from pathlib import Path
 from typing import Literal
 
 _MIGRATION_RE = re.compile(r"^\d{14}_[A-Za-z0-9_]+\.sql$")
+_MFA_IMPORT_RE = re.compile(
+    r"^\s*(import|from)\s+(forge_mvc_mfa|pyotp)\b",
+    re.MULTILINE,
+)
+_MFA_ROUTE_KEYWORDS = ("mfa", "totp")
 
 
 @dataclass
@@ -301,6 +306,73 @@ def check_modules(root: Path) -> CheckResult:
     return CheckResult("ok", "Modules", f"{len(installed)} module(s) installé(s)")
 
 
+def _detect_mfa_indicators(root: Path) -> list[str]:
+    """Retourne les indices d'usage MFA détectés dans le projet (lecture seule)."""
+    indicators: list[str] = []
+
+    controllers_dir = root / "mvc" / "controllers"
+    if controllers_dir.exists():
+        for p in controllers_dir.iterdir():
+            if any(kw in p.name.lower() for kw in _MFA_ROUTE_KEYWORDS):
+                indicators.append(f"contrôleur : {p.name}")
+
+    views_dir = root / "mvc" / "views"
+    if views_dir.exists():
+        for p in views_dir.rglob("*"):
+            if any(kw in p.name.lower() for kw in _MFA_ROUTE_KEYWORDS):
+                indicators.append(f"vue : {p.relative_to(root)}")
+                break
+
+    routes_file = root / "mvc" / "routes.py"
+    if routes_file.exists():
+        try:
+            src = routes_file.read_text(encoding="utf-8").lower()
+            if any(kw in src for kw in _MFA_ROUTE_KEYWORDS):
+                indicators.append("mvc/routes.py contient des routes MFA/TOTP")
+        except (OSError, UnicodeDecodeError):
+            pass
+
+    mvc_dir = root / "mvc"
+    if mvc_dir.exists():
+        for py_file in mvc_dir.rglob("*.py"):
+            try:
+                src = py_file.read_text(encoding="utf-8")
+                if _MFA_IMPORT_RE.search(src):
+                    indicators.append(f"import MFA dans {py_file.relative_to(root)}")
+                    break
+            except (OSError, UnicodeDecodeError):
+                pass
+
+    return indicators
+
+
+def check_mfa_dependency(root: Path) -> CheckResult:
+    """Détecte un usage MFA dans le projet et vérifie que forge-mvc-mfa est disponible.
+
+    Émet un WARN non bloquant si des indices MFA sont présents mais que
+    forge_mvc_mfa n'est pas installé. MFA est une brique opt-in/source-only —
+    elle ne fait pas partie du runtime forge-mvc core.
+    """
+    indicators = _detect_mfa_indicators(root)
+    if not indicators:
+        return CheckResult("skip", "MFA (opt-in)", "aucun indice MFA dans ce projet")
+
+    mfa_available = importlib.util.find_spec("forge_mvc_mfa") is not None
+    if mfa_available:
+        return CheckResult(
+            "ok", "MFA (opt-in)",
+            f"forge_mvc_mfa disponible — {len(indicators)} indice(s) MFA détecté(s)",
+        )
+
+    return CheckResult(
+        "warn", "MFA (opt-in)",
+        f"forge_mvc_mfa non disponible — {len(indicators)} indice(s) MFA détecté(s) "
+        f"({indicators[0]}) — "
+        "MFA est une brique opt-in/source-only, non incluse dans forge-mvc core ; "
+        "installez les dépendances du module MFA ou désactivez le flux MFA",
+    )
+
+
 def run_all(root: Path, version: str) -> list[CheckResult]:
     """Exécute tous les checks dans l'ordre et retourne la liste des résultats."""
     config = load_project_config(root)
@@ -313,6 +385,7 @@ def run_all(root: Path, version: str) -> list[CheckResult]:
         lambda: check_i18n(root),
         lambda: check_templates(root),
         lambda: check_modules(root),
+        lambda: check_mfa_dependency(root),
         lambda: check_ssl(root, config),
         lambda: check_node(),
         lambda: check_db(root, config),

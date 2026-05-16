@@ -8,9 +8,11 @@ from pathlib import Path
 
 from forge_cli.doctor import (
     CheckResult,
+    _detect_mfa_indicators,
     check_db,
     check_env,
     check_i18n,
+    check_mfa_dependency,
     check_migrations,
     check_model_entities,
     check_modules,
@@ -614,3 +616,137 @@ def test_forge_doctor_utilise_le_cwd(monkeypatch, tmp_path):
 
     assert captured["root"] == tmp_path
     assert captured["version"] == forge._FORGE_VERSION
+
+
+# ── check_mfa_dependency ──────────────────────────────────────────────────────
+
+
+def _write_mfa_controller(tmp_path: Path) -> None:
+    ctrl = tmp_path / "mvc" / "controllers" / "mfa_challenge_controller.py"
+    ctrl.parent.mkdir(parents=True, exist_ok=True)
+    ctrl.write_text("# MFA challenge controller\n", encoding="utf-8")
+
+
+def _write_mfa_route(tmp_path: Path) -> None:
+    routes = tmp_path / "mvc" / "routes.py"
+    routes.parent.mkdir(parents=True, exist_ok=True)
+    routes.write_text('router.get("/login/mfa/", MfaChallengeController, "index")\n',
+                      encoding="utf-8")
+
+
+def _write_mfa_import(tmp_path: Path) -> None:
+    ctrl = tmp_path / "mvc" / "controllers" / "auth_controller.py"
+    ctrl.parent.mkdir(parents=True, exist_ok=True)
+    ctrl.write_text("from forge_mvc_mfa import is_mfa_enabled\n", encoding="utf-8")
+
+
+class TestDetectMfaIndicators:
+
+    def test_no_mvc_dir_returns_empty(self, tmp_path):
+        assert _detect_mfa_indicators(tmp_path) == []
+
+    def test_mfa_controller_detected(self, tmp_path):
+        _write_mfa_controller(tmp_path)
+        indicators = _detect_mfa_indicators(tmp_path)
+        assert any("mfa_challenge_controller" in i for i in indicators)
+
+    def test_mfa_route_detected(self, tmp_path):
+        _write_mfa_route(tmp_path)
+        indicators = _detect_mfa_indicators(tmp_path)
+        assert any("routes.py" in i for i in indicators)
+
+    def test_mfa_import_detected(self, tmp_path):
+        _write_mfa_import(tmp_path)
+        indicators = _detect_mfa_indicators(tmp_path)
+        assert any("forge_mvc_mfa" in i or "import MFA" in i for i in indicators)
+
+    def test_no_mfa_signs_returns_empty(self, tmp_path):
+        ctrl = tmp_path / "mvc" / "controllers" / "home_controller.py"
+        ctrl.parent.mkdir(parents=True, exist_ok=True)
+        ctrl.write_text("class HomeController: pass\n", encoding="utf-8")
+        assert _detect_mfa_indicators(tmp_path) == []
+
+
+class TestCheckMfaDependency:
+
+    def test_skip_when_no_mfa_indicators(self, tmp_path):
+        result = check_mfa_dependency(tmp_path)
+        assert result.status == "skip"
+        assert "aucun indice MFA" in result.detail
+
+    def test_warn_when_mfa_used_but_module_absent(self, tmp_path, monkeypatch):
+        _write_mfa_controller(tmp_path)
+        monkeypatch.setattr(
+            "forge_cli.doctor.importlib.util.find_spec",
+            lambda name: None,
+        )
+        result = check_mfa_dependency(tmp_path)
+        assert result.status == "warn"
+        assert "forge_mvc_mfa" in result.detail
+        assert "opt-in" in result.detail or "source-only" in result.detail
+
+    def test_ok_when_mfa_used_and_module_available(self, tmp_path, monkeypatch):
+        _write_mfa_controller(tmp_path)
+        import types as _types
+        fake_spec = _types.SimpleNamespace()
+        monkeypatch.setattr(
+            "forge_cli.doctor.importlib.util.find_spec",
+            lambda name: fake_spec if name == "forge_mvc_mfa" else None,
+        )
+        result = check_mfa_dependency(tmp_path)
+        assert result.status == "ok"
+        assert "forge_mvc_mfa" in result.detail
+
+    def test_warn_is_non_blocking(self, tmp_path, monkeypatch):
+        _write_mfa_controller(tmp_path)
+        monkeypatch.setattr(
+            "forge_cli.doctor.importlib.util.find_spec",
+            lambda name: None,
+        )
+        result = check_mfa_dependency(tmp_path)
+        assert result.status == "warn"
+
+    def test_warning_mentions_opt_in_nature(self, tmp_path, monkeypatch):
+        _write_mfa_route(tmp_path)
+        monkeypatch.setattr(
+            "forge_cli.doctor.importlib.util.find_spec",
+            lambda name: None,
+        )
+        result = check_mfa_dependency(tmp_path)
+        assert "opt-in" in result.detail or "source-only" in result.detail
+
+    def test_no_import_of_forge_mvc_mfa_at_check_time(self, tmp_path, monkeypatch):
+        """Le check ne tente pas d'importer forge_mvc_mfa — il utilise find_spec."""
+        calls: list[str] = []
+
+        original = __import__
+
+        def guarded_import(name, *args, **kwargs):
+            if name == "forge_mvc_mfa":
+                calls.append(name)
+            return original(name, *args, **kwargs)
+
+        monkeypatch.setattr("builtins.__import__", guarded_import)
+        _write_mfa_controller(tmp_path)
+        check_mfa_dependency(tmp_path)
+        assert "forge_mvc_mfa" not in calls, (
+            "check_mfa_dependency ne doit pas importer forge_mvc_mfa"
+        )
+
+    def test_no_import_of_pyotp_at_check_time(self, tmp_path, monkeypatch):
+        """Le check ne tente pas d'importer pyotp — il utilise find_spec."""
+        calls: list[str] = []
+
+        original = __import__
+
+        def guarded_import(name, *args, **kwargs):
+            if name == "pyotp":
+                calls.append(name)
+            return original(name, *args, **kwargs)
+
+        monkeypatch.setattr("builtins.__import__", guarded_import)
+        _write_mfa_controller(tmp_path)
+        check_mfa_dependency(tmp_path)
+        assert "pyotp" not in calls, (
+            "check_mfa_dependency ne doit pas importer pyotp"
+        )
