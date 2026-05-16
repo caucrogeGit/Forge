@@ -12,6 +12,11 @@ Cycle de vie :
 
 Les chemins relatifs (views_dir, sql_dir) sont automatiquement
 résolus en chemins absolus par rapport à la racine du projet.
+
+Store de session configurable (SESSIONS-CONFIGURABLE-STORE-001) :
+    forge.configure(session_store=my_store)
+    Le store doit implémenter le protocole SessionStore (core.sessions.contract).
+    Passer None réinitialise au MemorySessionStore par défaut.
 """
 import os
 
@@ -64,6 +69,9 @@ _cfg = {
     # I18n — langue par défaut et langue de fallback pour trans().
     "i18n_default_locale": "fr",
     "i18n_fallback_locale": "fr",
+    # Store de session configurable — None = MemorySessionStore par défaut.
+    # Accepte tout objet implémentant SessionStore (core.sessions.contract).
+    "session_store": None,
 }
 
 _PATH_KEYS = {"views_dir", "sql_dir", "upload_root", "mail_log_dir", "mail_templates_dir"}
@@ -75,9 +83,27 @@ def configure(**kwargs: object) -> None:
     if unknown:
         raise KeyError(f"Clés inconnues dans forge.configure() : {unknown}")
     for key, value in kwargs.items():
+        if key == "session_store":
+            _apply_session_store(value)
+            continue
         if key in _PATH_KEYS and isinstance(value, str) and not os.path.isabs(value):
             value = os.path.join(_PROJECT_ROOT, value)
         _cfg[key] = value
+
+
+def _apply_session_store(store: object) -> None:
+    """Valide et injecte le store de session dans le gestionnaire."""
+    from core.sessions.contract import SessionStore
+    from core.sessions.manager import set_session_store
+    if store is not None and not isinstance(store, SessionStore):
+        raise TypeError(
+            f"forge.configure(session_store=...) : valeur invalide {store!r}. "
+            "Le store doit implémenter le protocole SessionStore "
+            "(core.sessions.contract — méthodes : create, get, set, replace, delete, "
+            "regenerate, authenticate, touch_expiry, set_flash, get_flash)."
+        )
+    _cfg["session_store"] = store
+    set_session_store(store)
 
 
 def get(key: str) -> object:

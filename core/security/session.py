@@ -7,29 +7,30 @@ _SESSION_ID_RE = re.compile(r"^[0-9a-f]{64}$")
 
 SESSION_COOKIE_NAME = "__Host-session_id"
 
-_store = _get_store()
+# Le store est résolu à chaque appel via _get_store() pour que forge.configure(session_store=...)
+# soit pris en compte même si ce module est importé avant la configuration.
 
 SESSION_DURATION = 3600  # 1 heure en secondes
 
 
 def create_session() -> str:
     """Crée une nouvelle session et retourne son identifiant."""
-    return _store.create()
+    return _get_store().create()
 
 
 def get_session(session_id: str) -> dict | None:
     """Retourne les données de la session ou None si inexistante ou expirée."""
-    return _store.get(session_id)
+    return _get_store().get(session_id)
 
 
 def delete_session(session_id: str) -> None:
     """Supprime la session."""
-    _store.delete(session_id)
+    _get_store().delete(session_id)
 
 
 def regenerate_session(old_session_id: str) -> str:
     """Crée un nouveau session_id en conservant les données — protège contre la session fixation."""
-    return _store.regenerate(old_session_id)
+    return _get_store().regenerate(old_session_id)
 
 
 def authenticate_session(session_id: str, user: dict) -> str | None:
@@ -47,7 +48,7 @@ def authenticate_session(session_id: str, user: dict) -> str | None:
         "email" : user.get("Email") or "",
         "roles" : list(user.get("roles", [])),
     }
-    return _store.authenticate(session_id, user_data, SESSION_DURATION)
+    return _get_store().authenticate(session_id, user_data, SESSION_DURATION)
 
 
 def get_session_id(request) -> str | None:
@@ -76,11 +77,11 @@ def is_authenticated(request) -> bool:
     session_id = get_session_id(request)
     if not session_id:
         return False
-    session = _store.get(session_id)
+    session = _get_store().get(session_id)
     if session is None:
         return False
     if session_get(session, SESSION_KEY_AUTHENTICATED, False) and session_get(session, SESSION_KEY_USER):
-        _store.touch_expiry(session_id, SESSION_DURATION)
+        _get_store().touch_expiry(session_id, SESSION_DURATION)
         return True
     return False
 
@@ -108,11 +109,11 @@ def set_flash(session_id: str | None, message: str, level: str = "success") -> N
     """Stocke un message flash dans la session (affiché une seule fois)."""
     if not session_id:
         return
-    _store.set_flash(session_id, message, level)
+    _get_store().set_flash(session_id, message, level)
 
 
 def get_flash(session_id: str | None) -> dict | None:
     """Retourne et supprime le message flash de la session."""
     if not session_id:
         return None
-    return _store.get_flash(session_id)
+    return _get_store().get_flash(session_id)

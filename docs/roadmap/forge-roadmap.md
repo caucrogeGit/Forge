@@ -109,6 +109,19 @@ release. Aboutit à la publication de `1.0.0-beta.2`.
 
 ---
 
+## Phase 3 — Sessions configurables (post-audit)
+
+**Objectif** : rendre le store de session explicitement configurable via
+`forge.configure(session_store=...)`, sans modifier le comportement par défaut.
+
+| Ticket | Description | État |
+|---|---|---|
+| SESSIONS-CONFIGURABLE-STORE-001 | Ajouter `forge.configure(session_store=...)` et brancher le store au flux session | **livré** |
+| SESSIONS-STORE-CONTRACT-DOC-001 | Documenter le contrat complet et les backends disponibles | à venir |
+| SESSIONS-MEMORY-THREADSAFE-DOC-001 | Documenter la thread-safety de MemorySessionStore | à venir |
+
+---
+
 ## Trajectoire officielle — 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :

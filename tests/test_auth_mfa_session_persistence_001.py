@@ -60,12 +60,10 @@ def _make_user(user_id: int = 1) -> AuthUser:
 
 
 def _patch_both_stores(monkeypatch, store) -> None:
-    """Patche les deux references au store pour que _resolve et _persist voient le meme backend."""
-    import core.security.session as _sec_session
+    """Injecte le store via _configured_store pour que _resolve et _persist voient le meme backend."""
     import core.sessions.manager as _mgr
 
-    monkeypatch.setattr(_mgr, "_default_store", store)
-    monkeypatch.setattr(_sec_session, "_store", store)
+    monkeypatch.setattr(_mgr, "_configured_store", store)
 
 
 # ---------------------------------------------------------------------------

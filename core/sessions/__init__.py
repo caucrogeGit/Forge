@@ -6,7 +6,7 @@ Les backends fichier et MariaDB sont prévus dans des tickets séparés.
 
 from core.sessions.contract import SessionStore
 from core.sessions.file_store import FileSessionStore
-from core.sessions.manager import get_session_store
+from core.sessions.manager import get_session_store, set_session_store
 from core.sessions.mariadb_store import MariaDbSessionStore
 from core.sessions.memory_store import MemorySessionStore, SESSION_TTL
 
@@ -17,4 +17,5 @@ __all__ = [
     "MariaDbSessionStore",
     "SESSION_TTL",
     "get_session_store",
+    "set_session_store",
 ]

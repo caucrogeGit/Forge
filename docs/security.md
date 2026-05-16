@@ -83,6 +83,28 @@ nouveau_id = authentifier_session(session_id, utilisateur)
 
 ---
 
+## Store de session configurable
+
+Forge accepte un store de session explicite via :
+
+```python
+import core.forge as forge
+forge.configure(session_store=my_store)
+```
+
+Le store doit implémenter le protocole `SessionStore` (`core.sessions.contract`) :
+`create`, `get`, `set`, `replace`, `delete`, `regenerate`, `authenticate`,
+`touch_expiry`, `set_flash`, `get_flash`.
+
+Le store par défaut est `MemorySessionStore` (mono-processus, sessions perdues au
+redémarrage). Passer `None` réinitialise à ce comportement par défaut.
+
+Trois backends sont disponibles dans `core.sessions` :
+`MemorySessionStore`, `FileSessionStore`, `MariaDbSessionStore`.
+Leur documentation complète est traitée dans le ticket SESSIONS-STORE-CONTRACT-DOC-001.
+
+---
+
 ## Ce que Forge ne fait pas
 
 - Pas d'ORM complet pour les permissions.
