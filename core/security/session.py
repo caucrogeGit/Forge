@@ -40,6 +40,26 @@ def regenerate_session(old_session_id: str) -> str:
     return _get_store().regenerate(old_session_id)
 
 
+def _normalize_legacy_user(user: dict) -> dict:
+    """Normalise un dict utilisateur quelconque en structure interne générique.
+
+    Priorité des clés : génériques EN > legacy FR.
+    Isolé ici pour que le core ne dépende plus directement des noms de champs
+    applicatifs (UtilisateurId, Login, etc.) hors de cette fonction.
+    """
+    return {
+        "id"    : user.get("id") or user.get("user_id") or user.get("UtilisateurId"),
+        "login" : (
+            user.get("login") or user.get("username")
+            or user.get("Login") or user.get("email") or user.get("Email") or ""
+        ),
+        "prenom": user.get("prenom") or user.get("first_name") or user.get("Prenom") or "",
+        "nom"   : user.get("nom") or user.get("last_name") or user.get("Nom") or "",
+        "email" : user.get("email") or user.get("Email") or "",
+        "roles" : list(user.get("roles", [])),
+    }
+
+
 def authenticate_session(session_id: str, user: dict) -> str | None:
     """
     Marque une session comme authentifiée et y stocke l'utilisateur courant.
@@ -53,14 +73,7 @@ def authenticate_session(session_id: str, user: dict) -> str | None:
         DeprecationWarning,
         stacklevel=2,
     )
-    user_data = {
-        "id"    : user["UtilisateurId"],
-        "login" : user["Login"],
-        "prenom": user.get("Prenom") or "",
-        "nom"   : user.get("Nom") or "",
-        "email" : user.get("Email") or "",
-        "roles" : list(user.get("roles", [])),
-    }
+    user_data = _normalize_legacy_user(user)
     return _get_store().authenticate(session_id, user_data, SESSION_DURATION)
 
 

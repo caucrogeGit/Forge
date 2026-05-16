@@ -23,6 +23,7 @@ except ImportError:
         return []
 
 from core.auth.password import hash_password, verify_password
+from core.auth.session import login_user
 from core.auth.user import AuthUser
 from core.forge import get as _cfg
 from core.mvc.controller.base_controller import BaseController
@@ -30,7 +31,6 @@ from core.security.hashing import record_attempt, is_rate_limited, verify_passwo
 from core.sessions.manager import get_session_store as _get_session_store
 from core.security.session import (
     SESSION_COOKIE_NAME,
-    authenticate_session,
     get_session,
     get_session_id,
     delete_session,
@@ -93,19 +93,20 @@ class AuthController(BaseController):
                 except Exception:
                     pass  # migration non bloquante
 
+            _email = (
+                utilisateur.get("Email")
+                or utilisateur.get("Login")
+                or str(utilisateur["UtilisateurId"])
+            )
+            auth_user = AuthUser(
+                id=utilisateur["UtilisateurId"],
+                email=_email,
+                password_hash=utilisateur["PasswordHash"],
+                is_active=True,
+            )
+
             mfa_factors = get_active_mfa_factors(utilisateur["UtilisateurId"])
             if is_mfa_enabled(mfa_factors):
-                _email = (
-                    utilisateur.get("Email")
-                    or utilisateur.get("Login")
-                    or str(utilisateur["UtilisateurId"])
-                )
-                auth_user = AuthUser(
-                    id=utilisateur["UtilisateurId"],
-                    email=_email,
-                    password_hash=utilisateur["PasswordHash"],
-                    is_active=True,
-                )
                 start_mfa_challenge(request, auth_user)
                 safe_log_auth_event(
                     AUTH_EVENT_MFA_REQUIRED,
@@ -118,9 +119,8 @@ class AuthController(BaseController):
                 )
                 return response
 
-            nouveau_id = authenticate_session(session_id, utilisateur)
-            if not nouveau_id:
-                return BaseController.render("errors/403.html", 403, base=None)
+            login_user(request, auth_user)
+            nouveau_id = _get_session_store().regenerate(session_id)
             safe_log_auth_event(
                 AUTH_EVENT_LOGIN_SUCCESS,
                 user_id=utilisateur["UtilisateurId"],

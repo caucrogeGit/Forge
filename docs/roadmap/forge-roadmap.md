@@ -135,7 +135,7 @@ legacy et en dépréciant les fonctions `core.security.session`.
 | AUTH-SESSION-COMPATIBILITY-BRIDGE-001 | Pont bidirectionnel legacy↔canonique — reconnaissance croisée des sessions | **livré** |
 | AUTH-SESSION-LEGACY-DEPRECATION-001 | Ajouter les `DeprecationWarning` sur les fonctions legacy | **livré** |
 | STARTER-AUTH-MODERNIZE-001 | Moderniser le starter auth sur `core.auth.session` | **livré** |
-| CORE-AUTH-NO-HARDCODED-FIELDS-001 | Supprimer les champs applicatifs codés en dur dans le core | à venir |
+| CORE-AUTH-NO-HARDCODED-FIELDS-001 | Supprimer les champs applicatifs codés en dur dans le core | **livré** |
 
 ---
 

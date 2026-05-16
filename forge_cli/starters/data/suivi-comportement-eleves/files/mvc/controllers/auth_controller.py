@@ -1,10 +1,11 @@
 from core.auth.password import verify_password
+from core.auth.session import login_user
+from core.auth.user import AuthUser
 from core.forge import get as _cfg
 from core.mvc.controller.base_controller import BaseController
 from core.security.hashing import record_attempt, is_rate_limited, verify_password_legacy
 from core.sessions.manager import get_session_store as _get_session_store
 from core.security.session import (
-    authenticate_session,
     get_session,
     get_session_id,
     delete_session,
@@ -64,9 +65,19 @@ class AuthController(BaseController):
             and utilisateur.get("Actif")
             and _check_password(password, utilisateur["PasswordHash"])
         ):
-            nouveau_id = authenticate_session(session_id, utilisateur)
-            if not nouveau_id:
-                return BaseController.render("errors/403.html", 403, base=None)
+            _email = (
+                utilisateur.get("Email")
+                or utilisateur.get("Login")
+                or str(utilisateur.get("UtilisateurId", 0))
+            )
+            auth_user = AuthUser(
+                id=utilisateur["UtilisateurId"],
+                email=_email,
+                password_hash=utilisateur["PasswordHash"],
+                is_active=True,
+            )
+            login_user(request, auth_user)
+            nouveau_id = _get_session_store().regenerate(session_id)
 
             response = BaseController.redirect("/suivi")
             response.headers["Set-Cookie"] = (
