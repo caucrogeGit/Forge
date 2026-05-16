@@ -166,6 +166,7 @@ nav:
           - Archives UX (phases 5-10): history/forge-roadmap-ux.md
       - Procédure de release: release.md
       - Validation locale: release-local.md
+      - Paramètres GitHub du dépôt: project/github-repository-settings.md
       - Pour contribuer:
           - Vue d'ensemble: contributing.md
           - Conventions de travail: contributing/conventions.md

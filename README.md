@@ -16,6 +16,17 @@ Forge conserve un runtime Python volontairement limité, avec des dépendances e
 
 ---
 
+## Liens rapides
+
+| Ressource | Lien |
+|-----------|------|
+| Site officiel et documentation | [caucrogegit.github.io/Forge/](https://caucrogegit.github.io/Forge/) |
+| Tests terrain Forge | [Documentation tests terrain](https://caucrogegit.github.io/Forge/testing/) |
+| État des parcours testables | [Matrice de suivi](https://caucrogegit.github.io/Forge/testing/field-test-status/) |
+| Envoyer un retour de test terrain | [Formulaire GitHub Issue](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml) |
+
+---
+
 ## Charte et décisions architecturales
 
 Forge suit une [charte philosophique](CHARTE_DOC.md) qui définit ses
