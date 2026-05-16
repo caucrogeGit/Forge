@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-workflow"
-version = "1.0.0b2"
+version = "1.0.0b3"
 description = "Forge workflow — statuts et transitions applicatives."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "workflow", "statuts"]
 dependencies = [
-    "forge-mvc==1.0.0b2",
+    "forge-mvc==1.0.0b3",
     "markupsafe>=2.0",
 ]
 classifiers = [

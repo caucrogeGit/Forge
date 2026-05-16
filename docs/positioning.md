@@ -2,7 +2,7 @@
 
 [Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Forge est un framework web MVC Python orienté lisibilité, SQL explicite et génération déterministe du modèle. Forge 1.0.0-beta.2 est disponible en bêta publique.
+Forge est un framework web MVC Python orienté lisibilité, SQL explicite et génération déterministe du modèle. Forge 1.0.0-beta.3 est disponible en bêta publique.
 
 Il n'a pas vocation à remplacer Django, Flask ou FastAPI dans tous leurs usages. Son intérêt est ailleurs : fournir un socle compréhensible, pédagogique et maîtrisable pour des applications web de gestion.
 

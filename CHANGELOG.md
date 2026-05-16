@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.0.0-beta.3] — 2026-05-16
+
+Corrections post-audit Phase 2 — sécurité CSRF, routes modules explicites.
+
+### Sécurité
+
+- `tests/meta/test_security_meta_no_csrf_inequality_001.py` : garde-fou méta
+  empêchant toute comparaison naïve de tokens CSRF (`==` ou `!=`) dans les
+  fichiers canoniques de sécurité (ticket SECURITY-META-NO-CSRF-INEQUALITY-001).
+
+### Modules
+
+- `core/modules/routes.py` : suppression du mécanisme d'injection automatique
+  de routes (`prepare_module_route_injection`, `ModuleRouteInjectionResult`,
+  `ModuleRoutesAlreadyInjectedError`, `_build_injection_block`, `_module_marker`).
+  `generate_module_routes()` reste le seul mécanisme — explicite
+  (ticket MODULE-ROUTES-INJECTION-REMOVE-001).
+- `docs/module-author-guide.md`, `docs/reference/modules.md` : documentation
+  du contrat explicite de branchement de routes de modules
+  (ticket MODULE-ROUTES-EXPLICIT-DOC-001).
+
+### Métriques
+
+- Tests : 9 909 passed, 3 skipped (suite complète validée)
+
+
 ## [1.0.0-beta.2] — 2026-05-16
 
 Corrections post-audit Phase 1 et infrastructure release Phase 2.

@@ -7,17 +7,17 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> La version publique actuelle est **Forge 1.0.0-beta.2**.
+> La version publique actuelle est **Forge 1.0.0-beta.3**.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.2
+## État actuel — Forge 1.0.0-beta.3
 
-**Tag courant : `v1.0.0-beta.2` (2026-05-16)**
+**Tag courant : `v1.0.0-beta.3` (2026-05-16)**
 
-Précédent : v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.2 — Corrections post-audit Phase 1 (README PyOTP, classifier PyPI, doc packaging), infrastructure release Phase 2 (validation reproductible, script release_check.sh) complétés.**
+**Statut : v1.0.0-beta.3 — Corrections post-audit Phase 2 : garde-fou CSRF (SECURITY-META-NO-CSRF-INEQUALITY-001), suppression injection routes modules (MODULE-ROUTES-INJECTION-REMOVE-001), documentation contrat explicite (MODULE-ROUTES-EXPLICIT-DOC-001).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -52,9 +52,9 @@ de 3.0.2 (voir [`audit-renforce-3.0.2-001`](../history/audits/audit-renforce-3.0
 Aucune rupture d'API publique. Voir `CHANGELOG.md` section [3.0.3]
 pour le détail.
 
-Dernière validation — Forge 1.0.0-beta.2 (BETA-2-RELEASE-001) :
+Dernière validation — Forge 1.0.0-beta.3 (BETA-3-RELEASE-001) :
 
-- `pytest` : **9 725 passed** (post-1.0.0-beta.2) ;
+- `pytest` : **9 909 passed, 3 skipped** (post-1.0.0-beta.3) ;
 - `python -m compileall -q .` : **OK** ;
 - `mkdocs build --strict` : **OK** ;
 - `git diff --check` : **OK**.
@@ -160,7 +160,7 @@ applicatifs et imposer un branchement explicite par le développeur.
 |---|---|---|
 | MODULE-ROUTES-INJECTION-REMOVE-001 | Supprimer l'injection automatique, préserver generate_module_routes | **livré** |
 | MODULE-ROUTES-EXPLICIT-DOC-001 | Documenter le contrat explicite des routes modules | **livré** |
-| BETA-3-RELEASE-001 | Publication 1.0.0-beta.3 | à venir |
+| BETA-3-RELEASE-001 | Publication 1.0.0-beta.3 | **livré** |
 
 ---
 

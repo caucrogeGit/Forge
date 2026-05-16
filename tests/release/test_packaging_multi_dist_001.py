@@ -20,7 +20,7 @@ import pytest
 
 PACKAGES_DIR = Path("packages")
 ROOT_PYPROJECT = Path("pyproject.toml")
-VERSION = "1.0.0b2"
+VERSION = "1.0.0b3"
 
 OPTIONAL_DISTS = [
     "forge-mvc-mfa",
