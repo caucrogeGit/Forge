@@ -139,7 +139,7 @@ chaque package publiable :
 
 | Package | Classifier | Justification |
 |---|---|---|
-| `forge-mvc` (core) | `5 - Production/Stable` | ~9660 tests, deux années de cycle, charte v2, contrat de stabilité |
+| `forge-mvc` (core) | `4 - Beta` | 1.0.0 en bêta — corrections post-audit, tests terrain et RC requis avant stable |
 | `forge-mvc-rbac` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-workflow` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-stats` | `4 - Beta` | API stable et testée, usage production externe encore limité |

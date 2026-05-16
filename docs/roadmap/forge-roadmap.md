@@ -92,6 +92,7 @@ post-audit. Aucune modification de runtime, CLI, générateurs ou packaging.
 | VERSION-COHERENCE-1.0-001 | Aligner les références de version publiques avec la trajectoire 1.0 | **livré** |
 | ROADMAP-PUBLIC-VERSION-CLEANUP-001 | Nettoyer la roadmap publique pour la trajectoire 1.0 beta | **livré** |
 | README-RUNTIME-DEPS-CLEANUP-001 | Clarifier les dépendances runtime du core (retrait PyOTP) | **livré** |
+| PYPI-CLASSIFIER-BETA-ALIGN-001 | Aligner le classifier PyPI avec le statut bêta réel | **livré** |
 
 ---
 

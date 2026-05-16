@@ -34,10 +34,10 @@ class TestOptInPackagesPrivateClassifier:
         )
 
     def test_development_status_not_stable(self, package: str):
-        """Les packages opt-in ne doivent pas être marqués Production/Stable (réservé au core)."""
+        """Les packages opt-in ne doivent pas être marqués Production/Stable."""
         pyproject_path = ROOT / "packages" / package / "pyproject.toml"
         data = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
         classifiers = data["project"]["classifiers"]
         assert not any("5 - Production/Stable" in c for c in classifiers), (
-            f"{package} est marqué Production/Stable — seul forge-mvc (core) a ce statut"
+            f"{package} est marqué Production/Stable — statut réservé après 1.0.0-rc1"
         )

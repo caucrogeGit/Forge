@@ -15,7 +15,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 EXPECTED_CLASSIFIERS = {
-    "forge-mvc":          "Development Status :: 5 - Production/Stable",
+    "forge-mvc":          "Development Status :: 4 - Beta",
     "forge-mvc-rbac":     "Development Status :: 4 - Beta",
     "forge-mvc-workflow": "Development Status :: 4 - Beta",
     "forge-mvc-stats":    "Development Status :: 4 - Beta",
