@@ -147,6 +147,7 @@ vérification, avec comparaison constant-time.
 | Ticket | Description | État |
 |---|---|---|
 | CSRF-DEDUP-CONSTANT-TIME-001 | Dédupliquer la validation CSRF et garantir constant-time | **livré** |
+| SECURITY-META-NO-CSRF-INEQUALITY-001 | Garde-fou méta anti-régression comparaison naïve CSRF | **livré** |
 
 ---
 
