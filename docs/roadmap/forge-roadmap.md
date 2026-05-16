@@ -105,7 +105,7 @@ release. Aboutit à la publication de `1.0.0-beta.2`.
 | Ticket | Description | État |
 |---|---|---|
 | RELEASE-VALIDATION-ENV-LOCK-001 | Documenter l'environnement de validation release | **livré** |
-| RELEASE-CHECK-SCRIPT-001 | Créer le script `scripts/release_check.sh` | à venir |
+| RELEASE-CHECK-SCRIPT-001 | Créer le script `scripts/release_check.sh` | **livré** |
 | BETA-2-RELEASE-001 | Publier `1.0.0-beta.2` | à venir |
 
 ---

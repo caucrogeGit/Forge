@@ -62,11 +62,18 @@ python -m build
 twine check dist/*
 ```
 
-### Rôle du futur script `scripts/release_check.sh`
+### Script `scripts/release_check.sh` (disponible depuis le ticket 2.2)
 
-`scripts/release_check.sh` regroupera ces validations en une seule commande
-reproductible. Il sera créé dans le ticket **2.2 RELEASE-CHECK-SCRIPT-001**.
-Ce ticket 2.1 documente uniquement la procédure manuelle.
+La procédure manuelle ci-dessus peut désormais être lancée via :
+
+```bash
+bash scripts/release_check.sh          # mode standard
+bash scripts/release_check.sh --full   # mode complet (+ build wheel + twine check)
+bash scripts/release_check.sh --help   # aide
+```
+
+Le script valide localement, ne publie rien et ne crée aucun tag.
+La publication reste le ticket **2.3 BETA-2-RELEASE-001**.
 
 `tools/check_version_sync.py` n'existe pas encore — la synchronisation des
 versions entre core et opt-ins est assurée par `tools/release-validate.sh`.
