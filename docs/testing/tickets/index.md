@@ -1,0 +1,31 @@
+# Tests terrain — Tickets détaillés
+
+[Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+
+Cette section regroupe les premiers tickets détaillés de la campagne de tests terrain Forge.
+
+Ces tickets ne sont pas des tutoriels publics. Ce sont des outils de validation interne : ils guident un testeur à travers une action précise, demandent des preuves observables et un retour d'expérience structuré.
+
+Un ticket FT validé par un testeur externe pourra ensuite être converti en tutoriel. Voir [Conversion des tickets FT en tutoriels](../field-test-to-tutorial.md).
+
+Les retours doivent utiliser le [modèle de retour testeur](../field-test-feedback-template.md).
+
+---
+
+## Tickets disponibles
+
+| Ticket | Objectif | Phase |
+|---|---|---|
+| [FT-00-TEST-CHARTER-001](ft-00-test-charter-001.md) | Lire et comprendre la charte de campagne | FT-00 |
+| [FT-00-FEEDBACK-TEMPLATE-001](ft-00-feedback-template-001.md) | Remplir un retour d'expérience de test à blanc | FT-00 |
+| [FT-00-DOC-ERROR-PROTOCOL-001](ft-00-doc-error-protocol-001.md) | Appliquer la procédure documentation officielle erronée | FT-00 |
+| [FT-01-INSTALL-PIPX-001](ft-01-install-pipx-001.md) | Installer Forge via pipx | FT-01 |
+| [FT-01-INSTALL-VERSION-CHECK-001](ft-01-install-version-check-001.md) | Vérifier la version Forge installée | FT-01 |
+
+---
+
+## Rappel
+
+Ces tickets font partie de la campagne de tests terrain dont la roadmap complète est dans [Roadmap — Tests terrain Forge](../../roadmap/forge-field-test-roadmap.md).
+
+Chaque retour de ticket doit respecter la [charte de campagne](../field-test-charter.md).

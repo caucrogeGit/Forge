@@ -144,6 +144,13 @@ nav:
       - Modèle de retour testeur: testing/field-test-feedback-template.md
       - Triage et stabilisation: testing/field-test-triage.md
       - Conversion en tutoriel: testing/field-test-to-tutorial.md
+      - Tickets FT détaillés:
+          - Vue d'ensemble: testing/tickets/index.md
+          - FT-00 — Charte de campagne: testing/tickets/ft-00-test-charter-001.md
+          - FT-00 — Modèle de retour: testing/tickets/ft-00-feedback-template-001.md
+          - FT-00 — Documentation erronée: testing/tickets/ft-00-doc-error-protocol-001.md
+          - FT-01 — Installation pipx: testing/tickets/ft-01-install-pipx-001.md
+          - FT-01 — Vérifier la version: testing/tickets/ft-01-install-version-check-001.md
 
   - Projet:
       - Roadmap:
