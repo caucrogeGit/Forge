@@ -58,7 +58,7 @@ def test_auth_md_mentionne_modules_officiels_core_security():
     """docs/auth.md précise que certains modules core.security restent officiels."""
     content = _auth_md()
     assert "core.security.session" in content
-    assert "core.security.rbac" in content or "core.security.csrf" in content
+    assert "core.security.rbac" in content or "core.security.middleware" in content
 
 
 def test_reference_md_mentionne_frontiere_core_auth_core_security():

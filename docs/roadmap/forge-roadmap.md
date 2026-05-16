@@ -139,6 +139,17 @@ legacy et en dépréciant les fonctions `core.security.session`.
 
 ---
 
+## Phase 5 — Consolidation sécurité CSRF (post-audit)
+
+**Objectif** : consolider la gestion CSRF pour qu'il n'existe qu'un chemin de
+vérification, avec comparaison constant-time.
+
+| Ticket | Description | État |
+|---|---|---|
+| CSRF-DEDUP-CONSTANT-TIME-001 | Dédupliquer la validation CSRF et garantir constant-time | **livré** |
+
+---
+
 ## Trajectoire officielle — 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :

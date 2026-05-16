@@ -1,11 +1,12 @@
 from core.http.helpers import html as _html
 from core.http.response import Response
+from core.security.middleware import CsrfMiddleware as _CsrfMiddleware
 from core.security.session import (
     is_authenticated,
-    get_session_id,
-    get_session,
     user_has_role,
 )
+
+_csrf_check = _CsrfMiddleware()
 
 
 def require_auth(func):
@@ -27,6 +28,7 @@ def require_auth(func):
 def require_csrf(func):
     """
     Retourne une 403 si le token CSRF du formulaire ne correspond pas à la session.
+    Délègue à CsrfMiddleware pour garantir une comparaison constant-time.
     À placer après @require_auth pour garantir qu'une session existe.
 
     Usage :
@@ -36,12 +38,9 @@ def require_csrf(func):
         def add(request): ...
     """
     def wrapper(request):
-        session_id    = get_session_id(request)
-        session       = get_session(session_id)
-        token_form    = request.body.get("csrf_token", [None])[0]
-        token_session = session.get("csrf_token") if session else None
-        if token_form != token_session:
-            return _html("errors/403.html", 403)
+        denied = _csrf_check.check(request)
+        if denied is not None:
+            return denied
         return func(request)
     return wrapper
 

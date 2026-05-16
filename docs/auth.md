@@ -21,7 +21,7 @@ Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API offici
 | Session Auth | `core.auth.session` (`login_user`, `login_required`…) | `core.security.session` — moteur HTTP (officiel) |
 | Décorateur login | `core.auth.session.login_required` | `core.security.decorators.require_auth` — **legacy** |
 | RBAC | `forge_mvc_rbac` (voir [installation-github.md](installation-github.md)) | — |
-| CSRF | — | `core.security.csrf` + `require_csrf` — officiels |
+| CSRF | — | `core.security.middleware.CsrfMiddleware` + `require_csrf` — officiels |
 | Middleware | — | `core.security.middleware` — officiel |
 | MFA | `forge_mvc_mfa` (voir [installation-github.md](installation-github.md)) — **Pre-Alpha**, secret TOTP en clair (voir [auth-mfa](reference/auth-mfa.md)) | — |
 | Tokens à usage limité | `core.auth.tokens` | — |
@@ -34,7 +34,7 @@ Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API offici
 Tous les modules `core.security` ne sont pas legacy. Les briques transversales suivantes restent officielles dans Forge actuel :
 
 - `core.security.session` — moteur de session mémoire, utilisé en interne par `core.auth.session` ;
-- `core.security.csrf` et `CsrfMiddleware` — protection CSRF active ;
+- `core.security.middleware.CsrfMiddleware` — protection CSRF active ;
 - `core.security.middleware.AuthMiddleware` — middleware de redirection vers `/login`.
 
 ### Modules `core.security` dépréciés
