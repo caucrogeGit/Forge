@@ -58,7 +58,7 @@ Tant qu'aucun ticket de correction post-audit n'a été accepté,
 
 | ID | Domaine | Constat | Gravité | Statut | Ticket cible | Notes |
 |---|---|---|---|---|---|---|
-| FND-PKG-001 | Packaging | Paquets opt-in (`forge-mvc-mfa`, `-rbac`, `-workflow`, `-stats`) non publiés sur PyPI — source-only via GitHub | INFO | OUVERT | À définir | §6 audit renforcé. `forge-mvc` core publié en 1.0.0-beta.1. Publication opt-in bloquée tant que `forge-mvc` n'est pas sur PyPI avec la bonne version |
+| FND-PKG-001 | Packaging | Paquets opt-in (`forge-mvc-mfa`, `-rbac`, `-workflow`, `-stats`) non publiés sur PyPI — source-only via GitHub | INFO | FERMÉ | `OPTIN-PACKAGES-PUBLICATION-POLICY-001` | Politique de publication documentée dans `docs/release-policy.md`. rbac/workflow/stats publiables à beta.5 (publication coordonnée). forge-mvc-mfa non publié en série 1.0 (Pre-Alpha, SEC-MFA-SECRET-ENCRYPTION-001 requis). |
 
 ---
 

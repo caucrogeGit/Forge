@@ -380,6 +380,83 @@ Aucune automatisation ne déclenche la publication.
 
 ---
 
+## Politique de publication des opt-ins
+
+### État actuel
+
+`forge-mvc` (core) est publié sur PyPI depuis `1.0.0-beta.1`.
+Les packages opt-in (`forge-mvc-rbac`, `-workflow`, `-stats`, `-mfa`) suivent des règles de publication distinctes documentées ici.
+
+Cette politique est livrée par le ticket `OPTIN-PACKAGES-PUBLICATION-POLICY-001`.
+
+### Core publié sur PyPI
+
+`forge-mvc` est le seul package publié sur PyPI jusqu'à `1.0.0-beta.4` inclus.
+Il est le point d'entrée officiel du framework.
+
+### Opt-ins source-only avant beta.5
+
+Les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont disponibles en **source-only** via GitHub jusqu'à `1.0.0-beta.5` :
+
+- non publiés sur PyPI ;
+- installables depuis le dépôt GitHub (voir `docs/installation-github.md`) ;
+- versionnés indépendamment du core jusqu'à la publication coordonnée.
+
+### Opt-ins publiables à partir de beta.5
+
+À partir de `1.0.0-beta.5`, les trois opt-ins suivants rejoignent PyPI avec une publication coordonnée :
+
+| Package | Publication | Prérequis |
+|---|---|---|
+| `forge-mvc-rbac` | PyPI à beta.5 | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
+| `forge-mvc-workflow` | PyPI à beta.5 | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
+| `forge-mvc-stats` | PyPI à beta.5 | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
+
+La publication est strictement synchronisée : core et opt-ins portent la même version.
+
+### Cas particulier : forge-mvc-mfa
+
+`forge-mvc-mfa` n'est **pas publié sur PyPI en série 1.0**.
+
+Raisons :
+
+- statut Pre-Alpha (`Development Status :: 2 - Pre-Alpha`) ;
+- le secret TOTP est stocké en clair — non recommandé en production sans protection additionnelle ;
+- le chiffrement applicatif (`SEC-MFA-SECRET-ENCRYPTION-001`) est requis avant toute publication PyPI.
+
+Le module passe en Beta et rejoint PyPI uniquement après livraison de `SEC-MFA-SECRET-ENCRYPTION-001`.
+En attendant, l'installation se fait depuis GitHub (source-only).
+
+### Extras PyPI
+
+Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` ne sont disponibles qu'à partir de la publication coordonnée (`1.0.0-beta.5`).
+
+`forge-mvc[mfa]` n'est **pas déclaré** dans les extras PyPI en série 1.0.
+`forge-mvc[all]` n'inclut pas `forge-mvc-mfa`.
+
+### Règles de version
+
+- **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` est versionné à chaque release.
+- **À partir de `1.0.0-beta.5`** : core et opt-ins publiés (`rbac`, `workflow`, `stats`) sont strictement synchronisés sur la même version.
+- `forge-mvc-mfa` ne rejoint pas ce flux en série 1.0.
+
+### Ce qui est interdit avant publication coordonnée
+
+- `twine upload` pour un opt-in source-only — interdit avant `beta.5` ;
+- déclarer `forge-mvc[mfa]` dans les extras PyPI — interdit en série 1.0 ;
+- inclure `forge-mvc-mfa` dans `forge-mvc[all]` — interdit tant que Pre-Alpha ;
+- publier `forge-mvc-mfa` sans livrer `SEC-MFA-SECRET-ENCRYPTION-001` — interdit.
+
+### Tickets liés
+
+| Ticket | Description | État |
+|---|---|---|
+| `OPTIN-PACKAGES-PUBLICATION-POLICY-001` | Documenter la politique de publication des opt-ins | livré |
+| `OPTIN-PYPI-PUBLISH-001` | Publication coordonnée des opt-ins à beta.5 | conditionné à beta.5 |
+| `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif — prérequis à la publication de forge-mvc-mfa | post-1.0 |
+
+---
+
 ## Changelog
 
 Chaque release doit avoir une entrée dans `CHANGELOG.md` avec la structure :
