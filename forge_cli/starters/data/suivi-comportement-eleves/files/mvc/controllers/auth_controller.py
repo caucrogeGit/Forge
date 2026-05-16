@@ -2,9 +2,9 @@ from core.auth.password import verify_password
 from core.forge import get as _cfg
 from core.mvc.controller.base_controller import BaseController
 from core.security.hashing import record_attempt, is_rate_limited, verify_password_legacy
+from core.sessions.manager import get_session_store as _get_session_store
 from core.security.session import (
     authenticate_session,
-    create_session,
     get_session,
     get_session_id,
     delete_session,
@@ -26,7 +26,7 @@ class AuthController(BaseController):
         session_id = get_session_id(request)
         session = get_session(session_id) if session_id else None
         if not session:
-            session_id = create_session()
+            session_id = _get_session_store().create()
             session = get_session(session_id)
 
         response = BaseController.render(

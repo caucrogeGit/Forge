@@ -1,8 +1,9 @@
 import hmac as _hmac
 
+from core.auth.session import is_authenticated as _is_authenticated
 from core.http.response import Response
 from core.http.helpers import html as _html
-from core.security.session import is_authenticated, get_session_id, get_session
+from core.security.session import get_session_id, get_session
 
 
 class AuthMiddleware:
@@ -21,7 +22,7 @@ class AuthMiddleware:
         self._login_url = login_url
 
     def check(self, request) -> Response | None:
-        if not is_authenticated(request):
+        if not _is_authenticated(request):
             return Response(302, headers={"Location": self._login_url})
         return None
 
