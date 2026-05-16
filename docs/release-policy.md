@@ -340,6 +340,46 @@ reste manuelle et délibérée.
 
 ---
 
+## Verrouillage packaging
+
+### État actuel des packages (PACKAGE-LOCK-DOC-001)
+
+| Package | Statut PyPI | Règle |
+|---|---|---|
+| `forge-mvc` (core) | ✅ Publié — `{{forge_version}}` | Publié dès `1.0.0-beta.1` |
+| `forge-mvc-rbac` | Source-only jusqu'à `1.0.0-beta.5` | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
+| `forge-mvc-workflow` | Source-only jusqu'à `1.0.0-beta.5` | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
+| `forge-mvc-stats` | Source-only jusqu'à `1.0.0-beta.5` | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
+| `forge-mvc-mfa` | Non publié PyPI en `1.0` | Pre-Alpha — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant publication |
+| `forge-mvc-media` | Non documenté avant Phase 11 | Module non encore disponible |
+
+### Règles de version
+
+- **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` est bumped à chaque release. Les opt-ins source-only conservent leur version interne.
+- **À partir de `1.0.0-beta.5`** : le core et les opt-ins publiés (`rbac`, `workflow`, `stats`) doivent être strictement synchronisés sur la même version.
+- `forge-mvc-mfa` ne rejoindra pas ce flux en `1.0` — sa publication est conditionnée à `SEC-MFA-SECRET-ENCRYPTION-001`.
+
+### Artefacts de build
+
+Les répertoires `dist/`, `build/` et `*.egg-info/` sont des artefacts de validation locale.
+Ils sont exclus de Git (`.gitignore`) et **ne doivent pas être commités**.
+
+```bash
+# Validation locale uniquement — ne publie rien
+python -m build
+twine check dist/*
+```
+
+`twine check` valide les métadonnées localement sans rien publier sur PyPI.
+`twine upload` est l'opération de publication, réservée à un ticket release dédié.
+
+### Règle générale
+
+Toute publication PyPI est une action délibérée relevant d'un ticket de release dédié.
+Aucune automatisation ne déclenche la publication.
+
+---
+
 ## Changelog
 
 Chaque release doit avoir une entrée dans `CHANGELOG.md` avec la structure :
