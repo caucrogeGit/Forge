@@ -137,10 +137,19 @@ nav:
           - ADR-010 API canonique auth/session: adr/010-auth-session-canonical-api.md
           - ADR-011 Périmètre vocabulaire audit auth: adr/011-auth-audit-vocab-perimeter.md
 
+  - Tests terrain:
+      - Vue d'ensemble: testing/index.md
+      - Charte de campagne: testing/field-test-charter.md
+      - Modèle de ticket FT: testing/field-test-ticket-template.md
+      - Modèle de retour testeur: testing/field-test-feedback-template.md
+      - Triage et stabilisation: testing/field-test-triage.md
+      - Conversion en tutoriel: testing/field-test-to-tutorial.md
+
   - Projet:
       - Roadmap:
           - Roadmap Forge: roadmap/forge-roadmap.md
           - Forge Design: roadmap/forge-design-roadmap.md
+          - Tests terrain Forge: roadmap/forge-field-test-roadmap.md
       - Historique:
           - Roadmap Forge 1.5.0→2.0: history/forge-roadmap-history-2.0.md
           - Charte documentaire v1: history/charte-v1.md
