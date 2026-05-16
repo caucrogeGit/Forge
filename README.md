@@ -10,7 +10,7 @@
 *Une forge pour les créer toutes. Framework web applicatif.*
 
 Framework web MVC pur Python, HTTPS natif, Jinja2 intégré.  
-Forge conserve un runtime Python volontairement limité, avec des dépendances explicites et justifiées : MariaDB, python-dotenv, Jinja2, Pillow, Argon2 et PyOTP.
+Forge conserve un runtime Python volontairement limité, avec des dépendances explicites et justifiées : MariaDB, python-dotenv, Jinja2, Pillow, et Argon2.
 
 > Copyright (c) 2026 Roger Cauchon — voir [LICENSE](LICENSE)
 
@@ -830,7 +830,10 @@ Versions supportées et procédure de signalement : [SECURITY.md](SECURITY.md)
 | `jinja2` | Moteur de templates avec autoescape HTML |
 | `Pillow` | Traitement image et génération des variantes médias |
 | `argon2-cffi` | Hachage sécurisé des mots de passe (Argon2id) |
-| `pyotp` | TOTP pour l'authentification MFA |
+
+Les modules opt-in (`forge-mvc-mfa`, `-rbac`, `-workflow`, `-stats`) nécessitent des dépendances
+supplémentaires non installées avec `forge-mvc`. `forge-mvc-mfa` (Pre-Alpha) n'est pas publié sur
+PyPI en `1.0` — ses dépendances (dont `pyotp`) ne font pas partie du runtime core.
 
 **Développement** (`requirements-dev.txt`)
 

@@ -91,6 +91,7 @@ post-audit. Aucune modification de runtime, CLI, générateurs ou packaging.
 | DOCS-OPTIN-INSTALL-CONTRACT-001 | Clarifier le contrat d'installation des opt-ins | **livré** |
 | VERSION-COHERENCE-1.0-001 | Aligner les références de version publiques avec la trajectoire 1.0 | **livré** |
 | ROADMAP-PUBLIC-VERSION-CLEANUP-001 | Nettoyer la roadmap publique pour la trajectoire 1.0 beta | **livré** |
+| README-RUNTIME-DEPS-CLEANUP-001 | Clarifier les dépendances runtime du core (retrait PyOTP) | **livré** |
 
 ---
 
