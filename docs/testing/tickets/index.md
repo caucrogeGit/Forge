@@ -10,6 +10,11 @@ Un ticket FT validé par un testeur externe pourra ensuite être converti en tut
 
 Les retours doivent utiliser le [modèle de retour testeur](../field-test-feedback-template.md) ou le [formulaire GitHub Issue](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml).
 
+!!! tip "Après chaque ticket"
+    Une fois un ticket FT exécuté, remplissez le formulaire de retour :
+
+    [Soumettre un retour de test terrain →](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml)
+
 ---
 
 ## Tickets disponibles

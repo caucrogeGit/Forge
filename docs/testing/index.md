@@ -43,6 +43,13 @@ Le référent Forge transforme ensuite le retour en ticket documentaire séparé
 
 ---
 
+!!! tip "Envoyer un retour de test terrain"
+    Après avoir exécuté un ticket FT, utilisez le formulaire GitHub Issue pour transmettre un retour structuré.
+
+    [Soumettre un retour de test terrain →](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml)
+
+---
+
 ## Documents de la campagne
 
 | Document | Rôle |
