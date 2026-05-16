@@ -95,7 +95,7 @@ Tant qu'aucun ticket de correction post-audit n'a été accepté,
 
 | ID | Domaine | Constat | Gravité | Statut | Ticket cible | Notes |
 |---|---|---|---|---|---|---|
-| FND-SESSION-001 | Sessions | Sessions in-memory bloquantes en production multi-process — sessions non partagées entre workers | IMPORTANT | OUVERT | SESSIONS-CONFIGURABLE-STORE-001 | Store configurable livré par SESSIONS-CONFIGURABLE-STORE-001 ; restent le contrat des backends avec SESSIONS-STORE-CONTRACT-DOC-001 et la documentation thread-safety mémoire avec SESSIONS-MEMORY-THREADSAFE-DOC-001. |
+| FND-SESSION-001 | Sessions | Sessions in-memory bloquantes en production multi-process — sessions non partagées entre workers | IMPORTANT | OUVERT | SESSIONS-CONFIGURABLE-STORE-001 | Store configurable livré par SESSIONS-CONFIGURABLE-STORE-001 ; contrat des stores documenté par SESSIONS-STORE-CONTRACT-DOC-001 ; reste la documentation thread-safety mémoire avec SESSIONS-MEMORY-THREADSAFE-DOC-001. |
 
 ---
 
