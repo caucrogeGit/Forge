@@ -1,4 +1,10 @@
-"""Tests PACKAGES-OPTIN-INSTALL-001 : les packages opt-in ne doivent pas être publiés sur PyPI."""
+"""Tests PACKAGES-OPTIN-INSTALL-001 : politique de publication des packages opt-in.
+
+Apres OPTIN-PYPI-PUBLISH-PREPARE-001 :
+- forge-mvc-mfa et forge-mvc-media restent non publiables (Private :: Do Not Upload maintenu) ;
+- forge-mvc-rbac, forge-mvc-workflow, forge-mvc-stats sont prepares pour publication
+  (Private :: Do Not Upload retire) mais aucun n'est encore stable.
+"""
 
 from __future__ import annotations
 
@@ -11,7 +17,12 @@ pytestmark = pytest.mark.meta
 
 ROOT = Path(__file__).resolve().parents[2]
 
-_OPTIN_PACKAGES = [
+_NON_PUBLISHABLE = [
+    "forge-mvc-mfa",
+    "forge-mvc-media",
+]
+
+_ALL_OPTIN_PACKAGES = [
     "forge-mvc-mfa",
     "forge-mvc-rbac",
     "forge-mvc-workflow",
@@ -20,19 +31,23 @@ _OPTIN_PACKAGES = [
 ]
 
 
-@pytest.mark.parametrize("package", _OPTIN_PACKAGES)
-class TestOptInPackagesPrivateClassifier:
+@pytest.mark.parametrize("package", _NON_PUBLISHABLE)
+class TestNonPublishablePrivateClassifier:
 
     def test_private_classifier_present(self, package: str):
-        """Chaque package opt-in déclare 'Private :: Do Not Upload' dans ses classifiers."""
+        """forge-mvc-mfa et forge-mvc-media conservent 'Private :: Do Not Upload'."""
         pyproject_path = ROOT / "packages" / package / "pyproject.toml"
         assert pyproject_path.exists(), f"packages/{package}/pyproject.toml introuvable"
         data = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
         classifiers = data["project"]["classifiers"]
         assert any("Private :: Do Not Upload" in c for c in classifiers), (
             f"{package} : classifier 'Private :: Do Not Upload' absent — "
-            f"risque de publication accidentelle sur PyPI"
+            f"ce package ne doit pas etre publie (OPTIN-PYPI-PUBLISH-PREPARE-001)"
         )
+
+
+@pytest.mark.parametrize("package", _ALL_OPTIN_PACKAGES)
+class TestOptInPackagesDevelopmentStatus:
 
     def test_development_status_not_stable(self, package: str):
         """Les packages opt-in ne doivent pas être marqués Production/Stable."""

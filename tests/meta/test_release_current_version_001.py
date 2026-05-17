@@ -77,25 +77,31 @@ class TestAllVersionsBumped:
             f"(version racine)"
         )
 
-    @pytest.mark.parametrize("module", [
-        "forge-mvc-mfa", "forge-mvc-rbac",
-        "forge-mvc-workflow", "forge-mvc-stats",
-    ])
-    def test_optin_forge_mvc_dependency_version(self, module: str):
-        """Chaque module opt-in épingle forge-mvc==<version courante>."""
+    def test_optin_mfa_forge_mvc_dependency_pinned(self):
+        """forge-mvc-mfa épingle forge-mvc==<version courante> (non publiable — pinning strict)."""
         expected = _current_version()
-        path = PROJECT_ROOT / "packages" / module / "pyproject.toml"
+        path = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "pyproject.toml"
         data = tomllib.loads(path.read_text(encoding="utf-8"))
         deps = data.get("project", {}).get("dependencies", []) or []
         forge_mvc_deps = [d for d in deps if "forge-mvc==" in d]
+        assert forge_mvc_deps, "forge-mvc-mfa ne déclare pas forge-mvc dans dependencies"
+        for dep in forge_mvc_deps:
+            assert expected in dep, (
+                f"forge-mvc-mfa : dépendance {dep!r} pas alignée sur forge-mvc=={expected}"
+            )
+
+    @pytest.mark.parametrize("module", [
+        "forge-mvc-rbac", "forge-mvc-workflow", "forge-mvc-stats",
+    ])
+    def test_publishable_optin_forge_mvc_dependency_declared(self, module: str):
+        """rbac/workflow/stats déclarent forge-mvc (forme relachee acceptee apres OPTIN-PYPI-PUBLISH-PREPARE-001)."""
+        path = PROJECT_ROOT / "packages" / module / "pyproject.toml"
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+        deps = data.get("project", {}).get("dependencies", []) or []
+        forge_mvc_deps = [d for d in deps if d.startswith("forge-mvc")]
         assert forge_mvc_deps, (
             f"{module} ne déclare pas forge-mvc dans dependencies"
         )
-        for dep in forge_mvc_deps:
-            assert expected in dep, (
-                f"{module} : dépendance {dep!r} pas alignée sur "
-                f"forge-mvc=={expected}"
-            )
 
     def test_forge_py_version(self):
         expected = _current_version()

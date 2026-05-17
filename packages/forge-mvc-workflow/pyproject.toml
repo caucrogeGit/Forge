@@ -14,12 +14,11 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "workflow", "statuts"]
 dependencies = [
-    "forge-mvc==1.0.0b4",
+    "forge-mvc>=1.0.0b4,<2",
     "markupsafe>=2.0",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Private :: Do Not Upload",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",

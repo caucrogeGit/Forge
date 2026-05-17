@@ -347,9 +347,9 @@ reste manuelle et délibérée.
 | Package | Statut PyPI | Règle |
 |---|---|---|
 | `forge-mvc` (core) | ✅ Publié — `{{forge_version}}` | Publié dès `1.0.0-beta.1` |
-| `forge-mvc-rbac` | Source-only jusqu'à `1.0.0-beta.5` | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
-| `forge-mvc-workflow` | Source-only jusqu'à `1.0.0-beta.5` | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
-| `forge-mvc-stats` | Source-only jusqu'à `1.0.0-beta.5` | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
+| `forge-mvc-rbac` | Source-only jusqu'à `1.0.0-beta.5` — **prêt à publier** | Dépendance relâchée, `Private :: Do Not Upload` retiré (`OPTIN-PYPI-PUBLISH-PREPARE-001`) |
+| `forge-mvc-workflow` | Source-only jusqu'à `1.0.0-beta.5` — **prêt à publier** | Dépendance relâchée, `Private :: Do Not Upload` retiré (`OPTIN-PYPI-PUBLISH-PREPARE-001`) |
+| `forge-mvc-stats` | Source-only jusqu'à `1.0.0-beta.5` — **prêt à publier** | Dépendance relâchée, `Private :: Do Not Upload` retiré (`OPTIN-PYPI-PUBLISH-PREPARE-001`) |
 | `forge-mvc-mfa` | Non publié PyPI en `1.0` | Pre-Alpha — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant publication |
 | `forge-mvc-media` | Source-only — squelette Phase 11 | Extraction en cours — non publié PyPI (`MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001`) |
 
@@ -452,6 +452,8 @@ Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` ne sont 
 | Ticket | Description | État |
 |---|---|---|
 | `OPTIN-PACKAGES-PUBLICATION-POLICY-001` | Documenter la politique de publication des opt-ins | livré |
+| `OPTIN-PYPI-NAMES-CHECK-001` | Vérifier la disponibilité des noms PyPI pour les 5 opt-ins | livré |
+| `OPTIN-PYPI-PUBLISH-PREPARE-001` | Préparer rbac/workflow/stats pour publication (dépendances relâchées, `Private :: Do Not Upload` retiré) | livré |
 | `OPTIN-PYPI-PUBLISH-001` | Publication coordonnée des opt-ins à beta.5 | conditionné à beta.5 |
 | `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif — prérequis à la publication de forge-mvc-mfa | post-1.0 |
 
