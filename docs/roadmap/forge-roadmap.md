@@ -191,7 +191,7 @@ architecturales) des tests comportementaux.
 | META-TESTS-ROOT-MIGRATION-001 | Déplacer les tests méta de `tests/` vers `tests/meta/` | **livré** |
 | META-TESTS-ROTATION-POLICY-001 | Définir la politique de rotation des tests méta redondants | **livré** |
 | META-TESTS-PRUNE-001 | Supprimer les tests méta devenus obsolètes | **livré** |
-| TESTS-BEHAVIOR-FIRST-001 | Refactorer les tests comportementaux selon une convention unifiée | à venir |
+| TESTS-BEHAVIOR-FIRST-001 | Documenter et appliquer la règle behavior-first dans la suite de tests | **livré** |
 | PUBLIC-API-DUPLICATES-SCAN-001 | Identifier les doublons dans les tests d'API publique | à venir |
 
 ---

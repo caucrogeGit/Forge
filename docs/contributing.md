@@ -205,6 +205,38 @@ documentés dans la [Matrice de compatibilité](compatibility.md).
 - Un test qui modifie `sys.path` ou l'état global doit nettoyer après lui.
 - **Tests méta dans `tests/meta/`** — tout test qui lit principalement des fichiers de documentation, vérifie une roadmap, une version déclarée, un classifier, l'absence d'une chaîne interdite, une frontière d'import ou un invariant textuel doit vivre dans `tests/meta/`, pas à la racine de `tests/`. Chaque fichier `tests/meta/` doit porter `pytestmark = pytest.mark.meta`.
 
+### Règle behavior-first
+
+Un test méta vérifie une convention ou un invariant statique.
+Un test comportemental exécute Forge.
+
+Quand Forge expose une commande, une API, une génération ou un flux runtime,
+le test prioritaire doit exécuter ce comportement réellement. Un test méta
+peut compléter ce test, mais ne doit pas être la seule preuve du comportement.
+
+Les tests méta restent adaptés :
+
+- aux invariants documentaires (sections attendues dans un guide, une roadmap) ;
+- aux politiques et frontières d'import (absences de symboles retirés) ;
+- aux chaînes interdites ou aux vérifications de version dans les docstrings ;
+- aux invariants impossibles à exécuter sans environnement externe (base de données,
+  réseau, infra complète).
+
+Quand un comportement peut être exécuté dans un test unitaire ou avec
+`tmp_path`, il doit l'être. Un test comportemental fort rend son test méta
+complémentaire optionnel — pas l'inverse.
+
+**Exemples de tests déjà behavior-first dans Forge :**
+
+- `test_forge_help_safe_flag_001.py` — vérifie via subprocess que `--help` n'exécute
+  aucune logique métier ;
+- `test_modules_explicit_routes_001.py` — génère réellement des routes dans un
+  répertoire temporaire ;
+- `test_doctor_mfa_warning_001.py` — appelle `check_mfa_dependency` avec un
+  environnement contrôlé et vérifie le message retourné ;
+- `test_module_routes_injection_remove_001.py` — appelle `install_module_manifest`
+  et vérifie que `mvc/routes.py` n'est pas touché.
+
 ### Politique de rotation des tests méta
 
 #### Pourquoi des tests méta ?

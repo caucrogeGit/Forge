@@ -145,6 +145,9 @@ _EXPECTED_IN_META = [
     "test_install_contract_001.py",
     "test_pytest_core_only_contract_clarified_001.py",
     "test_landing_articles_clickable_001.py",
+    "test_meta_tests_root_migration_001.py",
+    "test_meta_tests_rotation_policy_001.py",
+    "test_tests_behavior_first_001.py",
 ]
 
 
