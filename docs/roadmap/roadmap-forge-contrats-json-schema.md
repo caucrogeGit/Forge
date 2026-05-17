@@ -475,7 +475,7 @@ Créer le contrat des tables pivot `many_to_many`.
 
 ---
 
-## ENTITY-CONTRACT-005 — Créer `schemas/relations.schema.json`
+## ENTITY-CONTRACT-005 — Créer `schemas/relations.schema.json` — **livré**
 
 ### Objectif
 
