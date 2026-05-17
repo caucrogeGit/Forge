@@ -537,7 +537,7 @@ many_to_many
 
 ---
 
-## ENTITY-CONTRACT-006 — Créer `schemas/forge.schema.index.json`
+## ENTITY-CONTRACT-006 — Créer `schemas/forge.schema.index.json` — **livré**
 
 ### Objectif
 
