@@ -810,21 +810,26 @@ stratégie recommandée (normaliseur canonique→legacy), 6 tickets proposés.
 
 ---
 
-## ENTITY-CONTRACT-011B — Créer normalize_canonical_to_legacy()
+## ENTITY-CONTRACT-011B — Créer normalize_canonical_to_legacy() ✓ livré
 
 ### Objectif
 
 Créer un traducteur interne `canonical → legacy_normalized` permettant à
 `build_entity_sql()` et `build_entity_base()` de fonctionner sans modification.
 
-### Périmètre
+### Résultat
 
-- nouveau module `forge_cli/entities/entity_canonical_adapter.py` ;
+- module `forge_cli/entities/canonical_model_normalizer.py` ;
+- fonction `normalize_canonical_entity_for_model_build()` ;
 - mapping complet des 12 types Forge → sql_type + python_type ;
-- parsing `VARCHAR(n)` → `string` + `max_length`, `DECIMAL(p,s)` → `decimal` ;
-- `constraints.not_empty` → `required`, `constraints.min_value` → `min` ;
-- gestion du champ `id` auto (absent du canonique, généré dans le legacy) ;
-- tests ciblés dans `tests/test_entity_canonical_adapter.py`.
+- id technique généré automatiquement (BIGINT UNSIGNED, PK, AUTO_INCREMENT) ;
+- timestamps et soft_delete gérés comme champs système DATETIME ;
+- indexes ignorés (non supportés par build:model) ;
+- `CanonicalNormalizationError` pour les types inconnus ou decimal sans precision/scale ;
+- string sans max_length → VARCHAR(255) par défaut (documenté) ;
+- boolean → BOOLEAN (et non TINYINT(1) — incompatible avec python_type='bool' dans _sql_family) ;
+- 72 tests dans `tests/test_build_model_canonical_normalizer.py` ;
+- dont une classe `TestLegacyCompatibility` qui passe la sortie dans validate_entity_definition().
 
 ---
 
