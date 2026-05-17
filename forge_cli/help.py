@@ -18,6 +18,7 @@ Entités
   make:entity        Génère une entité JSON et son modèle Python.
   make:crud          Génère un CRUD complet (liste, fiche, formulaires).
   make:relation      Déclare une relation entre entités.
+  entity:validate    Valide les entités et relations contre les schémas JSON.
   sync:entity        Régénère les fichiers modèles.
   sync:relations     Régénère relations.sql.
   sync:landing       Synchronise la landing page vers docs/.

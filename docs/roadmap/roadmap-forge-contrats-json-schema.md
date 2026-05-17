@@ -571,7 +571,7 @@ Ce registre pourra être utilisé par :
 
 # Bloc 2 — Validation Forge
 
-## ENTITY-CONTRACT-007 — Ajouter `forge entity:validate`
+## ENTITY-CONTRACT-007 — Ajouter `forge entity:validate` — **livré**
 
 ### Objectif
 

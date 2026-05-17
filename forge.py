@@ -19,6 +19,7 @@ from forge_cli.entities.make_entity import main as make_entity_main
 from forge_cli.entities.make_relation import main as make_relation_main
 from forge_cli.entities.make_crud import cmd_make_crud_main
 from forge_cli.entities.model import main as model_main
+from forge_cli.entities.entity_validate import main as entity_validate_main
 from forge_cli.public_contact import main as public_contact_main
 from forge_cli.public_form import main as public_form_main
 from forge_cli.public_list import main as public_list_main
@@ -493,6 +494,10 @@ def main() -> None:
         return
     if command == "make:relation":
         make_relation_main(args[1:])
+        return
+
+    if command == "entity:validate":
+        entity_validate_main(args[1:])
         return
 
     if command == "sync:entity":
