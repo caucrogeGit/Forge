@@ -92,7 +92,19 @@ def sync_entity(entities_root: Path, entity_name: str) -> tuple[Path, Path]:
     return sql_path, base_path
 
 
+def _assert_contracts_valid(entities_root: Path) -> None:
+    """Vérifie les contrats JSON Schema avant génération. Dégradation douce si jsonschema absent."""
+    from forge_cli.entities.entity_validate import collect_entity_validation_results
+    results = collect_entity_validation_results(entities_root)
+    if results is not None and results["errors"]:
+        raise ModelValidationError([
+            "Contrats d'entites invalides.\n"
+            "Lancez forge entity:validate pour obtenir le detail."
+        ])
+
+
 def build_model(entities_root: Path, *, dry_run: bool = False) -> BuildModelResult:
+    _assert_contracts_valid(entities_root)
     entity_sources, validated_relations = _validate_model_or_raise(entities_root)
 
     written: list[Path] = []

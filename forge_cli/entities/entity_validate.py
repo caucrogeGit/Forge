@@ -267,6 +267,93 @@ def _print_human(results: dict) -> None:
         print(f"Validation terminée : {files_valid} fichier{s_f} valide{s_f}, {error_count} erreur{s_e}.")
 
 
+def collect_entity_validation_results(entities_root: Path) -> dict | None:
+    """Valide les contrats JSON des entités et relations canoniques (schema_version '1.0').
+
+    Les entités au format legacy (sans schema_version) sont ignorées — elles sont
+    validées par _validate_model_or_raise() à l'étape suivante de build_model().
+
+    Retourne None si jsonschema est indisponible (dégradation douce).
+    Retourne un dict avec les clés 'errors', 'warnings', 'files_checked', 'files_valid'.
+    """
+    if not entities_root.is_dir():
+        return None
+    try:
+        import jsonschema  # noqa: F401
+    except ImportError:
+        return None
+    from forge_cli.entities.entity_validation_errors import (
+        FORGE_ENTITY_SCHEMA_INVALID,
+        FORGE_RELATION_SCHEMA_INVALID,
+    )
+    registry, _ = _build_registry()
+    if registry is None:
+        return None
+    entity_validator = _make_validator(_ENTITY_SCHEMA_ID, registry)
+    relations_validator = _make_validator(_RELATIONS_SCHEMA_ID, registry)
+    if entity_validator is None:
+        return None
+
+    errors: list[dict] = []
+    files_checked = 0
+    files_valid = 0
+    cwd = entities_root.parent.parent
+
+    for entity_file in _collect_entity_files(entities_root):
+        try:
+            data = json.loads(entity_file.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(data, dict) or data.get("schema_version") != "1.0":
+            continue
+        files_checked += 1
+        rel_str = str(entity_file.relative_to(cwd))
+        schema_errs = list(entity_validator.iter_errors(data))
+        if schema_errs:
+            for e in schema_errs:
+                errors.append({
+                    "code": FORGE_ENTITY_SCHEMA_INVALID,
+                    "file": rel_str,
+                    "path": _schema_error_path(e),
+                    "message": e.message,
+                    "hint": "Corrigez le fichier selon schemas/entity.schema.json.",
+                    "phase": "schema",
+                })
+        else:
+            files_valid += 1
+
+    relations_file = entities_root / "relations.json"
+    if relations_file.exists() and relations_validator is not None:
+        try:
+            rel_data = json.loads(relations_file.read_text(encoding="utf-8"))
+        except Exception:
+            rel_data = None
+        if isinstance(rel_data, dict) and rel_data.get("schema_version") == "1.0":
+            files_checked += 1
+            rel_str = str(relations_file.relative_to(cwd))
+            schema_errs = list(relations_validator.iter_errors(rel_data))
+            if schema_errs:
+                for e in schema_errs:
+                    errors.append({
+                        "code": FORGE_RELATION_SCHEMA_INVALID,
+                        "file": rel_str,
+                        "path": _schema_error_path(e),
+                        "message": e.message,
+                        "hint": "Corrigez le fichier selon schemas/relations.schema.json.",
+                        "phase": "schema",
+                    })
+            else:
+                files_valid += 1
+
+    return {
+        "files_checked": files_checked,
+        "files_valid": files_valid,
+        "errors": errors,
+        "warnings": [],
+        "human_events": [],
+    }
+
+
 def main(args: list[str] | None = None) -> None:
     from forge_cli.entities.entity_semantic_validate import validate_semantic
     from forge_cli.entities.entity_validation_errors import (

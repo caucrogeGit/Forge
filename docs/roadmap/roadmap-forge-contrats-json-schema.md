@@ -745,7 +745,7 @@ Phases : `json`, `schema`, `semantic`, `runtime`.
 
 # Bloc 3 — Branchement dans les générateurs
 
-## ENTITY-CONTRACT-011 — Brancher la validation dans `forge build:model` ⛔ BLOQUÉ → découpé en sous-tickets
+## ENTITY-CONTRACT-011 — Brancher la validation dans `forge build:model` ✓ CLÔTURÉ (011A–011G livrés)
 
 > **Note de structure** : ENTITY-CONTRACT-011 est le ticket parent.
 > Il a été découpé en sous-tickets 011A–011G pour lever les préconditions une par une.
@@ -758,8 +758,8 @@ Phases : `json`, `schema`, `semantic`, `runtime`.
 > | 011C | Routage build:model vers normaliseur canonique | ✓ livré |
 > | 011D | Tests build:model canoniques | ✓ livré |
 > | 011E | Migrer media.json vers canonique | ✓ livré |
-> | 011F | Migrer relations.json vers canonique | à faire |
-> | 011G | Reprendre le branchement strict entity:validate dans build:model | à faire |
+> | 011F | Migrer relations.json vers canonique | ✓ livré |
+> | 011G | Reprendre le branchement strict entity:validate dans build:model | ✓ livré |
 
 ### Objectif
 
@@ -935,7 +935,7 @@ Convertir `mvc/entities/relations.json` (vide, `format_version: 1`) vers
 
 ---
 
-## ENTITY-CONTRACT-011G — Brancher entity:validate dans build:model (reprise de 011)
+## ENTITY-CONTRACT-011G — Brancher entity:validate dans build:model (reprise de 011) ✓ livré
 
 ### Objectif
 
@@ -947,6 +947,24 @@ Reprendre ENTITY-CONTRACT-011 une fois 011C, 011D, 011E et 011F livrés.
 Erreur : les entités Forge sont invalides.
 Conseil : lancez forge entity:validate pour obtenir le détail.
 ```
+
+### Rapport de livraison
+
+**Fichiers modifiés :**
+
+- `forge_cli/entities/entity_validate.py` — ajout de `collect_entity_validation_results(entities_root)` : valide uniquement les entités canoniques (`schema_version: "1.0"`) ; dégradation douce si `jsonschema` absent ; retourne `dict` avec `errors`, `warnings`, `files_checked`, `files_valid`.
+- `forge_cli/entities/model.py` — ajout de `_assert_contracts_valid(entities_root)` ; appel en tête de `build_model()` avant `_validate_model_or_raise()`.
+- `tests/test_media_entity_canonical.py`, `tests/test_relations_entity_canonical.py` — retrait d'imports `pytest` inutilisés détectés par ruff.
+
+**Fichiers créés :**
+
+- `tests/test_build_model_entity_validation.py` — 11 tests : projet valide génère, projet invalide lève `ModelValidationError`, aucun fichier généré, message court avec conseil `entity:validate`, pas de traceback Python, API `collect_entity_validation_results()` détaillée, format `--json` inchangé, non-régression sur dépôt réel.
+
+**Décision clé — filtre canonique dans le garde :**
+
+`collect_entity_validation_results()` ignore les entités au format legacy (`format_version: 1`) : elles sont validées par `_validate_model_or_raise()` à l'étape suivante. Ce filtre était nécessaire pour ne pas bloquer les tests meta qui utilisent des fixtures legacy en `tmp_path`.
+
+**Résultat :** 10 961 tests passés, 6 ignorés, 0 régression.
 
 ---
 

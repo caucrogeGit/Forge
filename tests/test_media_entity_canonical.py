@@ -10,8 +10,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 from forge_cli.entities.model import build_model
 
 PROJECT_ROOT = Path(__file__).parent.parent
