@@ -349,7 +349,7 @@ git diff --check
 
 ---
 
-## ENTITY-CONTRACT-002 — Créer `schemas/field.schema.json`
+## ENTITY-CONTRACT-002 — Créer `schemas/field.schema.json` — **livré**
 
 ### Objectif
 
