@@ -11,7 +11,6 @@ from forge_mvc_mfa.model import get_active_mfa_factors
 
 from core.auth.password import hash_password, verify_password
 from core.auth.session import login_user
-from core.auth.user import AuthUser
 from core.forge import get as _cfg
 from core.mvc.controller.base_controller import BaseController
 from core.security.hashing import record_attempt, is_rate_limited, verify_password_legacy
@@ -22,7 +21,7 @@ from core.security.session import (
     get_session_id,
     delete_session,
 )
-from mvc.models.auth_model import get_user_by_login, update_password_hash
+from mvc.models.auth_model import build_auth_user, get_user_by_login, update_password_hash
 
 
 def mfa_available() -> bool:
@@ -80,17 +79,7 @@ class AuthController(BaseController):
                 except Exception:
                     pass
 
-            _email = (
-                utilisateur.get("Email")
-                or utilisateur.get("Login")
-                or str(utilisateur["UtilisateurId"])
-            )
-            auth_user = AuthUser(
-                id=utilisateur["UtilisateurId"],
-                email=_email,
-                password_hash=utilisateur["PasswordHash"],
-                is_active=True,
-            )
+            auth_user = build_auth_user(utilisateur)
 
             mfa_factors = get_active_mfa_factors(utilisateur["UtilisateurId"])
             if is_mfa_enabled(mfa_factors):

@@ -14,9 +14,12 @@ from forge_mvc_mfa import (
     verify_mfa_challenge,
 )
 
+from core.auth import normalize_auth_user
+from core.auth.session import login_user
 from core.forge import get as _cfg
 from core.mvc.controller.base_controller import BaseController
-from core.security.session import SESSION_COOKIE_NAME, authenticate_session, get_session, get_session_id
+from core.security.session import SESSION_COOKIE_NAME, get_session, get_session_id
+from core.sessions.manager import get_session_store as _get_session_store
 
 
 class MfaChallengeController(BaseController):
@@ -96,10 +99,10 @@ class MfaChallengeController(BaseController):
         if _finalize_login is not None:
             return _finalize_login(user_id, session_id, session, request)
 
-        return _default_finalize(user_id, session_id)
+        return _default_finalize(user_id, session_id, request)
 
 
-def _default_finalize(user_id: int, session_id: str | None) -> Any:
+def _default_finalize(user_id: int, session_id: str | None, request: Any) -> Any:
     """Finalise la connexion après validation MFA (chemin production)."""
     from forge_mvc_mfa.model import get_user_by_id
     utilisateur = get_user_by_id(user_id)
@@ -107,7 +110,14 @@ def _default_finalize(user_id: int, session_id: str | None) -> Any:
         return BaseController.render("errors/403.html", 403, base=None)
     if session_id is None:
         return BaseController.render("errors/403.html", 403, base=None)
-    nouveau_id = authenticate_session(session_id, utilisateur)
+    auth_user = normalize_auth_user({
+        "id": utilisateur["UtilisateurId"],
+        "email": utilisateur.get("Email") or utilisateur.get("Login") or "",
+        "password_hash": utilisateur["PasswordHash"],
+        "is_active": bool(utilisateur.get("Actif", True)),
+    })
+    login_user(request, auth_user)
+    nouveau_id = _get_session_store().regenerate(session_id)
     if not nouveau_id:
         return BaseController.render("errors/403.html", 403, base=None)
     from core.http.response import Response

@@ -1,6 +1,5 @@
 from core.auth.password import verify_password
 from core.auth.session import login_user
-from core.auth.user import AuthUser
 from core.forge import get as _cfg
 from core.mvc.controller.base_controller import BaseController
 from core.security.hashing import record_attempt, is_rate_limited, verify_password_legacy
@@ -10,7 +9,7 @@ from core.security.session import (
     get_session_id,
     delete_session,
 )
-from mvc.models.auth_model import get_user_by_login
+from mvc.models.auth_model import build_auth_user, get_user_by_login
 
 
 def _check_password(password: str, password_hash: str) -> bool:
@@ -65,17 +64,7 @@ class AuthController(BaseController):
             and utilisateur.get("Actif")
             and _check_password(password, utilisateur["PasswordHash"])
         ):
-            _email = (
-                utilisateur.get("Email")
-                or utilisateur.get("Login")
-                or str(utilisateur.get("UtilisateurId", 0))
-            )
-            auth_user = AuthUser(
-                id=utilisateur["UtilisateurId"],
-                email=_email,
-                password_hash=utilisateur["PasswordHash"],
-                is_active=True,
-            )
+            auth_user = build_auth_user(utilisateur)
             login_user(request, auth_user)
             nouveau_id = _get_session_store().regenerate(session_id)
 

@@ -993,11 +993,15 @@ def test_roadmap_ne_mentionne_plus_starter_auth_modernize_comme_priorite():
 
 
 def test_starters_1_3_4_5_non_modifies_par_auth_modernize():
-    """Les starters 1, 3, 4 et 5 ne contiennent pas d'imports core.auth."""
+    """Les starters 1, 4 et 5 ne contiennent pas d'imports core.auth.
+
+    Note : suivi-comportement-eleves (3) a été normalisé par STARTER-LANG-NORMALIZE-001
+    et contient maintenant des imports core.auth — il est retiré de cette liste.
+    """
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     starters_dir = root / "forge_cli" / "starters" / "data"
-    intacts = ["contact-simple", "carnet-contacts", "suivi-comportement-eleves", "communes-sejours"]
+    intacts = ["contact-simple", "carnet-contacts", "communes-sejours"]
     for slug in intacts:
         for path in (starters_dir / slug).rglob("*.py"):
             if "__pycache__" in path.parts:

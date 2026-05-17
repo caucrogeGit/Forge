@@ -149,6 +149,7 @@ _EXPECTED_IN_META = [
     "test_meta_tests_rotation_policy_001.py",
     "test_tests_behavior_first_001.py",
     "test_public_api_duplicates_scan_001.py",
+    "test_starter_lang_normalize_001.py",
 ]
 
 

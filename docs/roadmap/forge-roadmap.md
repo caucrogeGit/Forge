@@ -196,6 +196,19 @@ architecturales) des tests comportementaux.
 
 ---
 
+## Phase 9 — Normalisation des frontières linguistiques dans les starters
+
+**Objectif** : aligner les starters historiques sur la convention de frontière
+linguistique — le schéma SQL reste français (noms de colonnes), les variables
+Python et les contextes de template utilisent des noms canoniques anglais ou
+normalisés ; les API dépréciées sont supprimées.
+
+| Ticket | Description | État |
+|---|---|---|
+| STARTER-LANG-NORMALIZE-001 | Normaliser les frontières SQL/Python dans les starters actifs | **livré** |
+
+---
+
 ## Trajectoire officielle — 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :
