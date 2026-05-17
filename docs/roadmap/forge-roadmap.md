@@ -1180,6 +1180,19 @@ Voir `CHANGELOG.md` section [1.0.0-beta.1] pour le détail.
 
 ---
 
+## Phase 10 — Documentation et publication BaseController
+
+**Objectif** : auditer, documenter officiellement la surface publique de
+`BaseController`, puis publier beta.4.
+
+| Ticket | Description | État |
+|---|---|---|
+| BASE-CONTROLLER-SURFACE-AUDIT-001 | Audit de la surface publique de BaseController | **livré** |
+| BASE-CONTROLLER-API-DOC-001 | Documentation officielle de l'API BaseController | en cours |
+| BETA-4-RELEASE-001 | Publication de Forge 1.0.0-beta.4 | en attente |
+
+---
+
 ## Règle de mise à jour des roadmaps
 
 À partir de la séparation des roadmaps (DOC-ROADMAP-SPLIT-001) :
