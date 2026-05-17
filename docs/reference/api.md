@@ -729,47 +729,85 @@ if form.is_valid():
 <details markdown="1" id="coremvccontroller">
 <summary><code>core.mvc.controller</code> - BaseController</summary>
 
-### Méthodes publiques
+> Ticket : `BASE-CONTROLLER-API-DOC-001`.
+> Audit de surface : `docs/history/audits/base-controller-surface-audit-001.md`.
 
-| API | Description |
-|---|---|
-| `render(template, status=200, context=None, base="layouts/base.html", request=None, raw=False)` | Rend une vue Jinja2. Injecte un token CSRF si `request` est fourni et si `raw=False`. Le paramètre `base` est conservé pour compatibilité historique mais n'enveloppe plus le template. |
-| `redirect(location, status=302)` | Redirection simple. |
-| `redirect_with_flash(request, location, type_, message, status=302)` | Flash puis redirection. |
-| `redirect_to_route(name, status=302, **params)` | Redirection vers une route nommée. |
-| `not_found()` | Réponse 404. |
-| `bad_request()` | Réponse 400. |
-| `forbidden()` | Réponse 403. |
-| `validation_error(context=None)` | Réponse 422. |
-| `server_error()` | Réponse 500. |
-| `set_flash(request, type_, message)` | Ajoute un flash. |
-| `csrf_token(request)` | Retourne le token CSRF de session. |
-| `current_user(request)` | Retourne l'utilisateur courant. |
-| `include(template, context=None)` | Rend un fragment. |
-| `json(data, status=200)` | Retourne du JSON. |
-| `body(request)` | Aplatit `request.body`. |
-| `json_body(request)` | Retourne `request.json_body`. |
-| `render_form(template, form, status=200, context=None, request=None)` | Rend un template avec contexte de formulaire. |
-| `form_context(form)` | Retourne `form.context()`. |
+`BaseController` expose **18 méthodes statiques** : 17 canoniques, 1 legacy
+(`current_user()`), 2 à surveiller (`set_flash()`, `csrf_token()`).
 
-### Exemple
+### Méthodes canoniques
+
+| Méthode | Signature | Description |
+|---|---|---|
+| `render` | `render(template, status=200, context=None, base="layouts/base.html", *, request=None, raw=False)` | Génère une réponse HTML via Jinja2. Si `request` est fourni et `raw=False`, injecte `csrf_token` et appelle les fournisseurs de contexte Jinja enregistrés. |
+| `redirect` | `redirect(location, *, request=None, flash=None, level="success")` | Génère une réponse 302. Si `flash` est fourni avec `request`, stocke un message flash avant de rediriger. |
+| `redirect_with_flash` | `redirect_with_flash(request, location, message, level="success")` | Flux POST-Redirect-GET : stocke `message` en flash puis redirige vers `location`. |
+| `redirect_to_route` | `redirect_to_route(name, *, request=None, flash=None, level="success", **params)` | Redirige vers une route nommée via le routeur actif. Lève `RuntimeError` si aucun routeur n'est configuré. |
+| `not_found` | `not_found()` | Retourne une réponse 404. |
+| `bad_request` | `bad_request(context=None)` | Retourne une réponse 400. |
+| `forbidden` | `forbidden(context=None)` | Retourne une réponse 403. |
+| `validation_error` | `validation_error(template="errors/422.html", context=None, *, request=None)` | Retourne une réponse 422 via `render()`. |
+| `server_error` | `server_error(context=None)` | Retourne une réponse 500. |
+| `include` | `include(partial, context=None)` | Rend un partial Jinja2 et retourne son HTML sous forme de chaîne. |
+| `json` | `json(data, status=200)` | Génère une réponse `application/json; charset=utf-8`. |
+| `body` | `body(request)` | Aplatit `request.body` en dict `{champ: première_valeur}`. |
+| `json_body` | `json_body(request)` | Retourne `request.json_body` (dict parsé). Vide si `Content-Type != application/json`. |
+| `render_form` | `render_form(template, request, data, status=200, erreurs="")` | Raccourci `render()` + `form_context()` en une ligne. |
+| `form_context` | `form_context(request, data, erreurs="")` | Construit le contexte formulaire : fusionne `data`, `csrf_token` et `erreurs`. |
+
+### Méthodes À_SURVEILLER
+
+Stables et utilisables, mais dépendent de fonctions du module `core.security.session`
+qui n'est pas déprécié mais est qualifié de legacy. Elles seront réévaluées si ce
+module devait être supprimé à terme.
+
+| Méthode | Signature | Dépendance |
+|---|---|---|
+| `set_flash` | `set_flash(request, message, level="success")` | `core.security.session.set_flash`, `get_session_id` |
+| `csrf_token` | `csrf_token(request)` | `core.security.session.get_session_id`, `get_session` |
+
+### Méthode legacy — à ne pas utiliser
+
+| Méthode | Signature | Statut |
+|---|---|---|
+| `current_user` | `current_user(request)` | **LEGACY** — appelle `core.security.session.get_user()` qui émet un `DeprecationWarning`. Absente de tous les starters post-9.1. |
+
+Alternative canonique :
+
+```python
+from core.auth.session import get_authenticated_user_id
+from mvc.models.auth_model import get_user_by_id
+
+user_id = get_authenticated_user_id(request)
+utilisateur = get_user_by_id(user_id) if user_id else None
+```
+
+### Exemple d'utilisation canonique
 
 ```python
 from core.mvc.controller import BaseController
 
 class ContactController(BaseController):
     def index(self, request):
+        contacts = fetch_all("SELECT * FROM Contact")
         return self.render(
             "contacts/index.html",
-            context={"contacts": []},
+            context={"contacts": contacts},
             request=request,
         )
 
+    def create(self, request):
+        data = self.body(request)
+        # validation ...
+        return self.redirect_with_flash(request, "/contacts", "Contact créé.")
+
     def api_index(self, request):
-        return self.json({"contacts": []})
+        return self.json({"contacts": fetch_all("SELECT * FROM Contact")})
 ```
 
-Dans les CRUD générés, les identifiants de route sont parsés avant usage. Une valeur invalide comme `/contacts/abc` retourne une réponse de type `not_found()` au lieu de provoquer une erreur serveur.
+Dans les CRUD générés, les identifiants de route sont parsés avant usage.
+Une valeur invalide comme `/contacts/abc` retourne `not_found()` au lieu de
+provoquer une erreur serveur.
 
 </details>
 

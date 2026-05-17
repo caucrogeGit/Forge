@@ -1188,7 +1188,7 @@ Voir `CHANGELOG.md` section [1.0.0-beta.1] pour le détail.
 | Ticket | Description | État |
 |---|---|---|
 | BASE-CONTROLLER-SURFACE-AUDIT-001 | Audit de la surface publique de BaseController | **livré** |
-| BASE-CONTROLLER-API-DOC-001 | Documentation officielle de l'API BaseController | en cours |
+| BASE-CONTROLLER-API-DOC-001 | Documentation officielle de l'API BaseController | **livré** |
 | BETA-4-RELEASE-001 | Publication de Forge 1.0.0-beta.4 | en attente |
 
 ---
