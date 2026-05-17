@@ -153,6 +153,7 @@ _EXPECTED_IN_META = [
     "test_starter_conventions_doc_001.py",
     "test_base_controller_surface_audit_001.py",
     "test_base_controller_api_doc_001.py",
+    "test_media_core_boundary_audit_001.py",
 ]
 
 
