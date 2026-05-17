@@ -1195,7 +1195,7 @@ Voir `CHANGELOG.md` section [1.0.0-beta.1] pour le détail.
 
 ---
 
-## Phase 11 — Extraction du module forge-mvc-media (en cours)
+## Phase 11 — Extraction du module forge-mvc-media (close)
 
 **Objectif** : extraire le code média applicatif (`media_repository`, `media_gallery`)
 du core vers un module opt-in `forge-mvc-media`, en préservant la compatibilité
@@ -1207,7 +1207,7 @@ du code applicatif existant.
 | MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001 | Scaffold de `packages/forge-mvc-media/` | **livré** |
 | MEDIA-REPOSITORY-MOVE-001 | Déplacer `media_repository` + `media_gallery` vers `forge-mvc-media` | **livré** |
 | MEDIA-CRUD-INTEGRATION-OPTIN-001 | Mettre à jour les générateurs CLI pour les imports opt-in | **livré** |
-| MEDIA-DOCS-MIGRATION-001 | Mettre à jour `docs/media.md` et `docs/reference/api.md` | à venir |
+| MEDIA-DOCS-MIGRATION-001 | Mettre à jour `docs/media.md` et `docs/reference/api.md` | **livré** |
 
 ---
 

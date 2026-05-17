@@ -1090,17 +1090,6 @@ Voir aussi : [Front et CSS](../front.md).
 | `save_upload(file, category="documents", variants=False)` | Valide puis sauvegarde un fichier. |
 | `delete_media_file(path, variants=False)` | Supprime un fichier média relatif, et ses variantes si demandé. |
 | `serve_media_file(path)` | Retourne une réponse HTTP pour un fichier média relatif sûr. |
-| `attach_media_to_entity(saved_upload, entity_name=..., entity_id=...)` | Crée une ligne `media` depuis un upload déjà stocké. |
-| `create_media_record(...)` | Insère une ligne dans la table `media`. |
-| `get_media_record(media_id)` | Récupère un média par identifiant. |
-| `list_media_for_entity(entity_name, entity_id, role=None)` | Liste les médias liés à une entité. |
-| `delete_media_record(media_id)` | Supprime uniquement la ligne SQL `media`. |
-| `delete_media(media_id, delete_files=False, variants=True)` | Supprime une ligne `media` et, explicitement, ses fichiers. |
-| `update_media_alt_text(media_id, alt_text)` | Met à jour le texte alternatif d'un média. Chaîne vide → `None`. |
-| `update_media_position(media_id, position)` | Met à jour la position d'un média dans une galerie. |
-| `media_url(path)` | Construit une URL locale `/media/...` depuis un chemin média sûr. |
-| `get_media_gallery(entity_name, entity_id, role="gallery")` | Retourne une galerie ordonnée enrichie avec URLs et variantes. |
-| `get_cover_media(entity_name, entity_id, role="cover")` | Retourne l'image de couverture d'une entité, ou `None`. |
 | `delete_upload(path_or_saved_upload)` | Supprime un fichier. |
 | `get_upload_path(relative_path)` | Résout un chemin d'upload. |
 | `normalize_media_path(path)` | Normalise un chemin média relatif à `storage/uploads`. |
@@ -1218,29 +1207,6 @@ medias = list_media_for_entity("hebergement", 12)
 `position=0` si rien n'est fourni, puis insère une ligne SQL explicite.
 `list_media_for_entity()` filtre par `entity_name`, `entity_id`, optionnellement
 par `role`, et trie par `position ASC`, puis `id ASC`.
-
-Attacher un upload déjà stocké :
-
-```python
-from core.uploads import save_upload
-from forge_mvc_media import attach_media_to_entity
-
-saved = save_upload(file, category="images", variants=True)
-
-media_id = attach_media_to_entity(
-    saved,
-    entity_name="hebergement",
-    entity_id=12,
-    role="gallery",
-    position=1,
-    alt_text="Vue extérieure",
-)
-```
-
-`save_upload()` écrit le fichier. `attach_media_to_entity()` crée seulement la
-ligne SQL `Media` avec `path`, `original_name`, `mime_type` et `size` issus de
-l'upload. Les variantes restent celles de l'upload ; aucune interface CRUD
-n'est générée ici.
 
 Supprimer un média complet :
 
@@ -1393,28 +1359,28 @@ directement le système de fichiers. Exemple : `Media.path = "images/photo.png"`
 devient `/media/images/photo.png`. Les variantes sont accessibles si elles
 existent, par exemple `/media/images/medium/photo.png`.
 
-Les métadonnées SQL sont manipulées avec l'API `create_media_record()`,
-`get_media_record()`, `list_media_for_entity()` et `delete_media_record()`.
-La suppression SQL ne supprime pas les fichiers physiques ; utiliser
-`delete_media_file()` séparément lorsque c'est voulu.
+Les métadonnées SQL sont manipulées avec l'API `forge_mvc_media` :
+`create_media_record()`, `get_media_record()`, `list_media_for_entity()` et
+`delete_media_record()`. La suppression SQL ne supprime pas les fichiers physiques ;
+utiliser `delete_media_file()` (core) séparément lorsque c'est voulu.
 
-`attach_media_to_entity()` relie un `SavedUpload` à une entité métier en créant
-une ligne `media`. Elle ne déplace pas le fichier, ne régénère pas les variantes
-et ne déclenche aucune suppression automatique.
+`attach_media_to_entity()` (dans `forge_mvc_media`) relie un `SavedUpload` à une
+entité métier en créant une ligne `media`. Elle ne déplace pas le fichier, ne
+régénère pas les variantes et ne déclenche aucune suppression automatique.
 
-`delete_media(media_id, delete_files=True, variants=True)` supprime d'abord les
-fichiers demandés, puis la ligne SQL. Si le chemin stocké est dangereux, la
-suppression est refusée et la ligne SQL n'est pas supprimée silencieusement.
+`delete_media(media_id, delete_files=True, variants=True)` (dans `forge_mvc_media`)
+supprime d'abord les fichiers demandés, puis la ligne SQL. Si le chemin stocké est
+dangereux, la suppression est refusée et la ligne SQL n'est pas supprimée silencieusement.
 
-`get_media_gallery("hebergement", 12)` retourne les médias `role="gallery"`
-triés par `position`, puis `id`, avec les URLs locales `/media/...`. Les images
-reçoivent aussi les URLs `medium` et `thumbnail`; les documents non-image n'ont
-pas de variantes inventées.
+`get_media_gallery("hebergement", 12)` (dans `forge_mvc_media`) retourne les médias
+`role="gallery"` triés par `position`, puis `id`, avec les URLs locales `/media/...`.
+Les images reçoivent aussi les URLs `medium` et `thumbnail` ; les documents non-image
+n'ont pas de variantes inventées.
 
-`get_cover_media("hebergement", 12)` retourne le premier média `role="cover"`
-trié par `position`, puis `id`. Le fallback vers la galerie est optionnel via
-`fallback_to_gallery=True` et reste une aide de lecture, sans génération HTML ni
-modification des enregistrements.
+`get_cover_media("hebergement", 12)` (dans `forge_mvc_media`) retourne le premier
+média `role="cover"` trié par `position`, puis `id`. Le fallback vers la galerie est
+optionnel via `fallback_to_gallery=True` et reste une aide de lecture, sans génération
+HTML ni modification des enregistrements.
 
 ### Champs
 
@@ -1438,6 +1404,44 @@ Les projections standard `media.sql` et `media_base.py` sont générées depuis
 ### Limites
 
 Les variantes d'images (`thumbnail`, `medium`), l'intégration `FileField` / `ImageField` dans `make:crud`, l'upload CRUD et les routes publiques média sont disponibles. Les galeries `multiple=true`, les permissions média et les règles métier applicatives restent à venir.
+
+</details>
+
+<details markdown="1" id="forgemvcmedia">
+<summary><code>forge_mvc_media</code> - Helpers applicatifs médias (opt-in)</summary>
+
+`forge_mvc_media` est un module opt-in source-only (`forge-mvc-media`) qui fournit
+les helpers applicatifs liés à la table `media`. Il n'est pas publié sur PyPI ; il
+s'installe depuis les sources (`pip install -e ./packages/forge-mvc-media`).
+
+Les nouveaux fichiers générés par `forge make:crud --media` importent depuis ce module.
+
+### Repository
+
+| API | Description |
+|---|---|
+| `create_media_record(entity_name, entity_id, path, ...)` | Insère une ligne dans la table `media`. |
+| `attach_media_to_entity(saved_upload, entity_name, entity_id, ...)` | Crée une ligne `media` depuis un `SavedUpload`. |
+| `get_media_record(media_id)` | Récupère un média par identifiant. |
+| `list_media_for_entity(entity_name, entity_id, role=None)` | Liste les médias liés à une entité, triés position+id. |
+| `update_media_alt_text(media_id, alt_text)` | Met à jour le texte alternatif d'un média. |
+| `update_media_position(media_id, position)` | Met à jour la position d'un média dans une galerie. |
+| `delete_media_record(media_id)` | Supprime uniquement la ligne SQL `media`. |
+| `delete_media(media_id, delete_files=False, variants=True)` | Supprime une ligne `media` et, explicitement, ses fichiers. |
+
+### Galerie
+
+| API | Description |
+|---|---|
+| `media_url(path)` | Construit une URL locale `/media/...` depuis un chemin média sûr. |
+| `get_media_gallery(entity_name, entity_id, role="gallery")` | Galerie ordonnée enrichie avec URLs et variantes. |
+| `get_cover_media(entity_name, entity_id, role="cover")` | Image de couverture d'une entité, ou `None`. |
+
+### Shims de compatibilité
+
+Les anciens imports `from core.uploads import attach_media_to_entity` restent
+compatibles temporairement via des shims dans `core/uploads/`. Ils émettent un
+`DeprecationWarning`. L'usage recommandé est `from forge_mvc_media import ...`.
 
 </details>
 
@@ -2141,8 +2145,8 @@ aucune colonne supplémentaire.
 | `field: file`, `multiple: true` | liste de liens |
 
 Le contrôleur appelle `get_cover_media` pour les éléments uniques et
-`list_media_for_entity` pour les galeries. Les imports `core.uploads` sont
-ajoutés automatiquement si nécessaire. La génération est non destructive : un
+`list_media_for_entity` pour les galeries. Les imports `forge_mvc_media` sont
+ajoutés automatiquement pour les helpers applicatifs. La génération est non destructive : un
 contrôleur existant est complété, jamais écrasé.
 
 **Limites strictes** — aucun upload public, aucune suppression publique, aucune
@@ -2950,7 +2954,7 @@ Quand une entité déclare des médias, `make:crud` génère :
 - **Formulaire** : un `ImageField` ou `FileField` par entrée `media`, avec label et `required` issus de la déclaration.
 - **Vue formulaire** : `enctype="multipart/form-data"` sur le `<form>`, `<input type="file">` avec `accept="image/*"` pour les images.
 - **Contrôleur `create`** :
-  - Import de `save_upload`, `attach_media_to_entity`, `delete_media`, `list_media_for_entity` depuis `core.uploads`.
+  - Import de `save_upload` depuis `core.uploads` (primitive générique) et `attach_media_to_entity`, `delete_media`, `list_media_for_entity` depuis `forge_mvc_media` (helpers applicatifs).
   - Exclusion des clés média de `form.cleaned_data` avant l'insert SQL.
   - Capture de l'identifiant créé (`cursor.lastrowid`).
   - Pour chaque média soumis : `save_upload(file, category, variants=...)` puis `attach_media_to_entity(saved, entity_name=..., entity_id=created_id, role=..., position=0)`.
@@ -3008,6 +3012,7 @@ Chaque module est livré comme paquet PyPI distinct sous le namespace
 | RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../rbac.md) |
 | Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow.md](workflow.md) |
 | Statistiques | `forge-mvc-stats` | `[stats]` | [stats.md](stats.md) |
+| Médias applicatifs | `forge-mvc-media` | — | [media.md](../media.md) |
 
 ### MFA — `forge-mvc-mfa`
 
@@ -3053,4 +3058,14 @@ calculés à la demande.
 > La publication est prévue à partir de `1.0.0-beta.5` — voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [stats.md](stats.md).
+
+### Médias applicatifs — `forge-mvc-media`
+
+Repository, galerie et helpers applicatifs liés à la table `media`.
+
+> Source-only, non publié sur PyPI en `{{forge_version}}`.
+> Installe depuis les sources : `pip install -e ./packages/forge-mvc-media/`
+> Les générateurs `make:crud --media` et `make:public:list` importent depuis ce module.
+
+Référence détaillée : [media.md](../media.md).
 

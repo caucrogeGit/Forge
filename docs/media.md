@@ -2,7 +2,30 @@
 
 [Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Forge fournit un service générique d'upload et de gestion des images, disponible dans `core/uploads/`. Il est conçu pour être réutilisé par n'importe quelle application Forge sans logique métier imposée.
+Forge sépare les primitives génériques d'upload (`core/uploads/`) des helpers applicatifs médias (`forge_mvc_media`). Le core est installé avec Forge ; les helpers applicatifs sont fournis par le module opt-in `forge-mvc-media` (source-only, non publié sur PyPI).
+
+## Frontière core / opt-in média
+
+**`core.uploads` — primitives génériques** (toujours disponibles) :
+
+- `save_upload` — sauvegarde sécurisée d'un fichier
+- `save_image`, `generate_image_variants` — traitement Pillow
+- `serve_media_file` — route `/media/...` sécurisée
+- `delete_media_file` — suppression physique d'un fichier
+- exceptions (`UploadError`, `UploadStorageError`…)
+- validation MIME, stockage contrôlé, protection path traversal
+- rate limiting upload
+
+**`forge_mvc_media` — helpers applicatifs** (opt-in `forge-mvc-media`) :
+
+- `attach_media_to_entity`, `create_media_record`, `get_media_record`
+- `list_media_for_entity`, `update_media_alt_text`, `update_media_position`
+- `delete_media`, `delete_media_record`
+- `get_media_gallery`, `get_cover_media`, `media_url`
+
+Les anciens imports `from core.uploads import attach_media_to_entity` restent compatibles temporairement via des shims de compatibilité, mais ne sont plus l'usage recommandé.
+
+---
 
 **Ce que Média v2 sait faire** : déclaration dans `entity.json`, génération CRUD complète (formulaires multipart, upload à la création, remplacement et suppression explicite à l'édition, suppression des médias liés à la suppression de l'entité, preview dans `show` et `edit`), galerie `multiple=true` (affichage, ajout, multi-upload, suppression individuelle, réorganisation par position, alt_text), stockage dans la table `media`, route `/media/...`.
 
