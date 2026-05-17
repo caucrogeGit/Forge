@@ -922,6 +922,9 @@ API :
 
 ### Resilience des appels d'audit
 
+L'audit auth est **best-effort** par defaut : un echec du logger ne doit jamais
+bloquer un flux utilisateur critique (login, MFA, reset).
+
 Forge fournit deux fonctions pour emettre un evenement d'audit :
 
 - **`log_auth_event(...)`** : appel **strict**. Propage `InvalidAuthAuditEventError`

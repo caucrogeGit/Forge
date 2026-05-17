@@ -1211,6 +1211,13 @@ du code applicatif existant.
 
 ---
 
+## Phase 12 — Sécurité, résilience et préparation PyPI opt-ins (en cours)
+
+| Ticket | Description | État |
+|---|---|---|
+| AUTH-AUDIT-LOGGER-RESILIENCE-001 | Résilience du logger d'audit auth (best-effort, non bloquant) | **livré** |
+
+
 ## Règle de mise à jour des roadmaps
 
 À partir de la séparation des roadmaps (DOC-ROADMAP-SPLIT-001) :
