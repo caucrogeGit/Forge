@@ -1,143 +1,74 @@
 {
-  "format_version": 1,
-  "entity": "Media",
+  "$schema": "../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Media",
   "table": "media",
   "description": "Socle generique Media v2 pour lier un fichier stocke a une entite applicative.",
   "fields": [
     {
-      "name": "id",
-      "column": "Id",
-      "python_type": "int",
-      "sql_type": "INT",
-      "nullable": false,
-      "primary_key": true,
-      "auto_increment": true,
-      "constraints": {}
-    },
-    {
       "name": "entity_name",
-      "column": "EntityName",
-      "python_type": "str",
-      "sql_type": "VARCHAR(100)",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 100
-      }
+      "type": "string",
+      "max_length": 100,
+      "required": true
     },
     {
       "name": "entity_id",
-      "column": "EntityId",
-      "python_type": "int",
-      "sql_type": "INT",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "min_value": 1
-      }
+      "type": "integer",
+      "required": true,
+      "min": 1
     },
     {
       "name": "path",
-      "column": "Path",
-      "python_type": "str",
-      "sql_type": "VARCHAR(500)",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 500
-      }
+      "type": "string",
+      "max_length": 500,
+      "required": true
     },
     {
       "name": "original_name",
-      "column": "OriginalName",
-      "python_type": "str",
-      "sql_type": "VARCHAR(255)",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 255
-      }
+      "type": "string",
+      "max_length": 255,
+      "required": true
     },
     {
       "name": "mime_type",
-      "column": "MimeType",
-      "python_type": "str",
-      "sql_type": "VARCHAR(120)",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 120
-      }
+      "type": "string",
+      "max_length": 120,
+      "required": true
     },
     {
       "name": "size",
-      "column": "Size",
-      "python_type": "int",
-      "sql_type": "INT",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "min_value": 0
-      }
+      "type": "integer",
+      "required": true,
+      "min": 0
     },
     {
       "name": "role",
-      "column": "Role",
-      "python_type": "str",
-      "sql_type": "VARCHAR(50)",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 50
-      },
+      "type": "string",
+      "max_length": 50,
+      "required": true,
       "default": "default"
     },
     {
       "name": "position",
-      "column": "Position",
-      "python_type": "int",
-      "sql_type": "INT",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "min_value": 0
-      },
-      "default": 0
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
     },
     {
       "name": "alt_text",
-      "column": "AltText",
-      "python_type": "str",
-      "sql_type": "VARCHAR(255)",
-      "nullable": true,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {
-        "max_length": 255
-      }
+      "type": "string",
+      "max_length": 255,
+      "nullable": true
     },
     {
       "name": "created_at",
-      "column": "CreatedAt",
-      "python_type": "datetime",
-      "sql_type": "DATETIME",
-      "nullable": false,
-      "primary_key": false,
-      "auto_increment": false,
-      "constraints": {}
+      "type": "datetime",
+      "required": true
     }
-  ]
+  ],
+  "options": {
+    "timestamps": false,
+    "soft_delete": false
+  }
 }

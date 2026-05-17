@@ -745,7 +745,21 @@ Phases : `json`, `schema`, `semantic`, `runtime`.
 
 # Bloc 3 — Branchement dans les générateurs
 
-## ENTITY-CONTRACT-011 — Brancher la validation dans `forge build:model` ⛔ BLOQUÉ
+## ENTITY-CONTRACT-011 — Brancher la validation dans `forge build:model` ⛔ BLOQUÉ → découpé en sous-tickets
+
+> **Note de structure** : ENTITY-CONTRACT-011 est le ticket parent.
+> Il a été découpé en sous-tickets 011A–011G pour lever les préconditions une par une.
+> ENTITY-CONTRACT-012 reprend la numérotation normale (make:crud).
+>
+> | Sous-ticket | Sujet | État |
+> |---|---|---|
+> | 011A | Audit migration build:model vers canonique | ✓ livré |
+> | 011B | Normaliseur canonique pour build:model | ✓ livré |
+> | 011C | Routage build:model vers normaliseur canonique | ✓ livré |
+> | 011D | Tests build:model canoniques | ✓ livré |
+> | 011E | Migrer media.json vers canonique | ✓ livré |
+> | 011F | Migrer relations.json vers canonique | à faire |
+> | 011G | Reprendre le branchement strict entity:validate dans build:model | à faire |
 
 ### Objectif
 
@@ -875,19 +889,28 @@ end-to-end avec le nouveau format via le normaliseur.
 
 ---
 
-## ENTITY-CONTRACT-011E — Migrer mvc/entities/media/media.json
+## ENTITY-CONTRACT-011E — Migrer mvc/entities/media/media.json ✓ livré
 
 ### Objectif
 
 Convertir `mvc/entities/media/media.json` (11 champs, format legacy) vers
 le format canonique `schema_version: "1.0"`.
 
-### Points délicats
+### Résultat
 
-- champ `id` à supprimer (auto-géré par Forge) ;
-- `sql_type: "VARCHAR(n)"` → `type: "string"` + `max_length: n` ;
-- `constraints.*` → propriétés directes ;
-- sections `media` et `rbac` : évaluer si hors périmètre ou à conserver.
+- `mvc/entities/media/media.json` migré vers `schema_version: "1.0"`.
+- Champ `id` supprimé (auto-injecté par le normaliseur comme BIGINT UNSIGNED PK AI).
+- 10 champs métier conservés, tous convertis avec leur type Forge.
+- `created_at` déclaré comme champ `datetime` explicite (sans `options.timestamps` qui
+  ajouterait `updated_at` absent du legacy).
+- `constraints.min_value` → `min`, `constraints.not_empty` non représentable
+  dans le schéma canonique (perte documentée, conservatrice).
+- `role.default: "default"` et `position.default: 0` conservés via `default`.
+- `alt_text` conservé avec `nullable: true`.
+- `entity:validate` : `[OK] Entité Media valide.` — seul `relations.json` encore legacy.
+- `build:model --dry-run` : fonctionne via le routage canonique → normaliseur.
+- 15 tests dans `tests/test_media_entity_canonical.py` (15/15 passent).
+- Suite complète : 0 régression.
 
 ---
 

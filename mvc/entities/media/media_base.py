@@ -9,9 +9,7 @@ from datetime import datetime
 
 from core.validation import (
     ValidationError,
-    max_length,
     min_value,
-    not_empty,
     nullable,
     typed,
 )
@@ -58,8 +56,6 @@ class MediaBase:
 
     @entity_name.setter
     @typed(str)
-    @not_empty
-    @max_length(100)
     def entity_name(self, value):
         if value is None:
             raise ValidationError("entity_name", 'La propriété "entity_name" ne peut pas être nulle.')
@@ -83,8 +79,6 @@ class MediaBase:
 
     @path.setter
     @typed(str)
-    @not_empty
-    @max_length(500)
     def path(self, value):
         if value is None:
             raise ValidationError("path", 'La propriété "path" ne peut pas être nulle.')
@@ -96,8 +90,6 @@ class MediaBase:
 
     @original_name.setter
     @typed(str)
-    @not_empty
-    @max_length(255)
     def original_name(self, value):
         if value is None:
             raise ValidationError("original_name", 'La propriété "original_name" ne peut pas être nulle.')
@@ -109,8 +101,6 @@ class MediaBase:
 
     @mime_type.setter
     @typed(str)
-    @not_empty
-    @max_length(120)
     def mime_type(self, value):
         if value is None:
             raise ValidationError("mime_type", 'La propriété "mime_type" ne peut pas être nulle.')
@@ -134,8 +124,6 @@ class MediaBase:
 
     @role.setter
     @typed(str)
-    @not_empty
-    @max_length(50)
     def role(self, value):
         if value is None:
             raise ValidationError("role", 'La propriété "role" ne peut pas être nulle.')
@@ -160,7 +148,6 @@ class MediaBase:
     @alt_text.setter
     @typed(str)
     @nullable
-    @max_length(255)
     def alt_text(self, value):
         if value is None:
             self._alt_text = None

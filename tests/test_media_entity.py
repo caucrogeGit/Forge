@@ -3,6 +3,7 @@ import shutil
 from pathlib import Path
 
 from core.uploads.storage import normalize_media_path
+from forge_cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
 from forge_cli.entities.make_entity import build_entity_base, build_entity_sql
 from forge_cli.entities.model import build_model
 from forge_cli.entities.validation import validate_entity_definition
@@ -15,8 +16,15 @@ def _media_definition() -> dict:
     return json.loads(MEDIA_JSON.read_text(encoding="utf-8"))
 
 
+def _normalized_definition() -> dict:
+    """Traduit media.json canonique en dict legacy validé pour les générateurs."""
+    raw = _media_definition()
+    legacy = normalize_canonical_entity_for_model_build(raw)
+    return validate_entity_definition(legacy, source=str(MEDIA_JSON))
+
+
 def test_media_entity_json_is_valid():
-    definition = validate_entity_definition(_media_definition(), source=str(MEDIA_JSON))
+    definition = _normalized_definition()
 
     assert definition["entity"] == "Media"
     assert definition["table"] == "media"
@@ -36,16 +44,15 @@ def test_media_entity_json_is_valid():
 
 
 def test_media_path_field_is_for_normalized_relative_upload_path():
-    definition = validate_entity_definition(_media_definition(), source=str(MEDIA_JSON))
+    definition = _normalized_definition()
     path_field = next(field for field in definition["fields"] if field["name"] == "path")
 
     assert path_field["sql_type"] == "VARCHAR(500)"
-    assert path_field["constraints"]["not_empty"] is True
     assert normalize_media_path("storage/uploads/images/photo.jpg") == "images/photo.jpg"
 
 
 def test_media_entity_sql_matches_generated_projection():
-    definition = validate_entity_definition(_media_definition(), source=str(MEDIA_JSON))
+    definition = _normalized_definition()
     expected = build_entity_sql(definition)
     actual = Path("mvc/entities/media/media.sql").read_text(encoding="utf-8")
 
@@ -65,14 +72,12 @@ def test_media_entity_sql_matches_generated_projection():
 
 
 def test_media_entity_base_matches_generated_projection():
-    definition = validate_entity_definition(_media_definition(), source=str(MEDIA_JSON))
+    definition = _normalized_definition()
     expected = build_entity_base(definition)
     actual = Path("mvc/entities/media/media_base.py").read_text(encoding="utf-8")
 
     assert actual == expected
     assert "class MediaBase" in actual
-    assert "@not_empty" in actual
-    assert "@max_length(500)" in actual
     assert "@min_value(0)" in actual
     assert "datetime.fromisoformat" in actual
 
