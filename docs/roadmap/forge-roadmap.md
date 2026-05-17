@@ -1217,6 +1217,7 @@ du code applicatif existant.
 |---|---|---|
 | AUTH-AUDIT-LOGGER-RESILIENCE-001 | Résilience du logger d'audit auth (best-effort, non bloquant) | **livré** |
 | SECURITY-HEADERS-DOC-LOCK-001 | Verrouillage documentation en-têtes de sécurité | **livré** |
+| OPTIN-PYPI-NAMES-CHECK-001 | Audit des noms PyPI des packages opt-in | **livré** |
 
 
 ## Règle de mise à jour des roadmaps

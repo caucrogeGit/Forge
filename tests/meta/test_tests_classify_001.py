@@ -160,6 +160,7 @@ _EXPECTED_IN_META = [
     "test_media_docs_migration_001.py",
     "test_auth_audit_logger_resilience_001.py",
     "test_security_headers_doc_lock_001.py",
+    "test_optin_pypi_names_check_001.py",
 ]
 
 
