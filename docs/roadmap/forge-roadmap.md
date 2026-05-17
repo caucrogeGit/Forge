@@ -192,7 +192,7 @@ architecturales) des tests comportementaux.
 | META-TESTS-ROTATION-POLICY-001 | Définir la politique de rotation des tests méta redondants | **livré** |
 | META-TESTS-PRUNE-001 | Supprimer les tests méta devenus obsolètes | **livré** |
 | TESTS-BEHAVIOR-FIRST-001 | Documenter et appliquer la règle behavior-first dans la suite de tests | **livré** |
-| PUBLIC-API-DUPLICATES-SCAN-001 | Identifier les doublons dans les tests d'API publique | à venir |
+| PUBLIC-API-DUPLICATES-SCAN-001 | Auditer les doublons dans l'API publique Forge | **livré** |
 
 ---
 
