@@ -12,8 +12,8 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-_VERSION = "1.0.0b3"
-_VERSION_SEMVER = "1.0.0-beta.3"
+_VERSION = "1.0.0b4"
+_VERSION_SEMVER = "1.0.0-beta.4"
 
 
 def test_package_json_author_is_current():

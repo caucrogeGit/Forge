@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.0.0-beta.4] — 2026-05-17
+
+Release de consolidation des phases 7 à 10.
+
+- clarification du périmètre audit/auth/MFA/RBAC ;
+- warning `forge doctor` pour MFA opt-in manquant ;
+- politique de stockage des secrets MFA documentée ;
+- politique de publication des opt-ins documentée ;
+- tests méta réorganisés, politique de rotation définie, prune prudent appliqué ;
+- règle behavior-first documentée ;
+- audit des doublons d'API publique réalisé ;
+- langage des starters normalisé côté Python / SQL ;
+- conventions de langage des starters documentées ;
+- surface publique de `BaseController` auditée et documentée.
+
+
 ## [1.0.0-beta.3] — 2026-05-16
 
 Corrections post-audit Phase 2 — sécurité CSRF, routes modules explicites.

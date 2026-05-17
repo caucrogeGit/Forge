@@ -196,14 +196,14 @@ class TestForgePyVersionConsistency:
         text = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
         match = re.search(r'_FORGE_VERSION\s*=\s*"([^"]+)"', text)
         assert match, "forge.py doit déclarer _FORGE_VERSION"
-        assert match.group(1) == "1.0.0b3", (
-            f"forge.py _FORGE_VERSION = '{match.group(1)}', attendu '1.0.0b3'."
+        assert match.group(1) == "1.0.0b4", (
+            f"forge.py _FORGE_VERSION = '{match.group(1)}', attendu '1.0.0b4'."
         )
 
     def test_forge_default_ref_current(self):
         text = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
         match = re.search(r'_FORGE_DEFAULT_REF\s*=\s*"([^"]+)"', text)
         assert match, "forge.py doit déclarer _FORGE_DEFAULT_REF"
-        assert match.group(1) == "v1.0.0-beta.3", (
-            f"forge.py _FORGE_DEFAULT_REF = '{match.group(1)}', attendu 'v1.0.0-beta.3'."
+        assert match.group(1) == "v1.0.0-beta.4", (
+            f"forge.py _FORGE_DEFAULT_REF = '{match.group(1)}', attendu 'v1.0.0-beta.4'."
         )

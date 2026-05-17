@@ -52,7 +52,7 @@ class TestRbacModuleAvailable:
     def test_module_has_version(self):
         import forge_mvc_rbac
         assert hasattr(forge_mvc_rbac, "__version__")
-        assert forge_mvc_rbac.__version__ == "1.0.0b3"
+        assert forge_mvc_rbac.__version__ == "1.0.0b4"
 
     def test_all_exports_complete(self):
         import forge_mvc_rbac
@@ -166,7 +166,7 @@ class TestRbacFunctional:
 class TestPyprojectMetadata:
     def test_pyproject_version(self):
         content = Path("packages/forge-mvc-rbac/pyproject.toml").read_text(encoding="utf-8")
-        assert 'version = "1.0.0b3"' in content
+        assert 'version = "1.0.0b4"' in content
 
     def test_description_updated(self):
         content = Path("packages/forge-mvc-rbac/pyproject.toml").read_text(encoding="utf-8")

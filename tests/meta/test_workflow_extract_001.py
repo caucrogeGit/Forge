@@ -36,7 +36,7 @@ class TestWorkflowModuleAvailable:
     def test_module_has_version(self):
         import forge_mvc_workflow
         assert hasattr(forge_mvc_workflow, "__version__")
-        assert forge_mvc_workflow.__version__ == "1.0.0b3"
+        assert forge_mvc_workflow.__version__ == "1.0.0b4"
 
     def test_all_exports_complete(self):
         import forge_mvc_workflow
@@ -118,7 +118,7 @@ class TestWorkflowFunctional:
 class TestPyprojectMetadata:
     def test_pyproject_version(self):
         content = Path("packages/forge-mvc-workflow/pyproject.toml").read_text(encoding="utf-8")
-        assert 'version = "1.0.0b3"' in content
+        assert 'version = "1.0.0b4"' in content
 
     def test_markupsafe_dependency_declared(self):
         content = Path("packages/forge-mvc-workflow/pyproject.toml").read_text(encoding="utf-8")

@@ -24,7 +24,10 @@ DOCS_DIR = PROJECT_ROOT / "docs"
 EXCLUDED_DIRS: set[str] = {"history", "audits"}
 
 # Fichiers .md intentionnellement hors-nav (à documenter si on en ajoute).
-NAVLESS_FILES: set[str] = set()
+NAVLESS_FILES: set[str] = {
+    # Brouillon roadmap Contrats JSON Schema — prévu post-Phase 12, pas encore publié.
+    "docs/roadmap/roadmap-forge-contrats-json-schema.md",
+}
 
 
 def _md_files_on_disk() -> set[str]:
