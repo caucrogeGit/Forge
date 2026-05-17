@@ -11,9 +11,9 @@ import core
 
 ROOT = Path(__file__).resolve().parents[2]
 
-_EXPECTED = "1.0.0b4"
-_EXPECTED_SEMVER = "1.0.0-beta.4"
-_EXPECTED_REF = "v1.0.0-beta.4"
+_EXPECTED = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+_EXPECTED_SEMVER = re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _EXPECTED)
+_EXPECTED_REF = f"v{_EXPECTED_SEMVER}"
 
 
 # ── Document d'audit ──────────────────────────────────────────────────────────

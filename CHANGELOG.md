@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.0-beta.5] — 2026-05-17
+
+Release de consolidation de la Phase 12 — Sécurité, résilience et préparation PyPI opt-ins.
+
+- audit auth : logger best-effort et résilience documentée (AUTH-AUDIT-LOGGER-RESILIENCE-001) ;
+- contrat des en-têtes de sécurité documenté et verrouillé (SECURITY-HEADERS-DOC-LOCK-001) ;
+- audit des noms PyPI des opt-ins réalisé (OPTIN-PYPI-NAMES-CHECK-001) ;
+- préparation locale des opt-ins publiables (OPTIN-PYPI-PUBLISH-PREPARE-001) ;
+- extras optionnels `rbac`, `workflow`, `stats` et `all` synchronisés (VERSION-SYNC-OPTIN-EXTRAS-001) ;
+- publication groupée du core et des opt-ins publiables `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`.
+
+Non publié dans cette release :
+
+- `forge-mvc-media`, encore source-only après extraction Phase 11 ;
+- `forge-mvc-mfa`, encore Pre-Alpha, bloqué par `SEC-MFA-SECRET-ENCRYPTION-001`.
+
+
 ## [1.0.0-beta.4] — 2026-05-17
 
 Release de consolidation des phases 7 à 10.

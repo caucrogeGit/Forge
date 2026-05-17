@@ -192,18 +192,32 @@ class TestNoStaleVersionInActiveDocs:
 
 class TestForgePyVersionConsistency:
 
+    def _current_version(self) -> str:
+        import tomllib
+        return tomllib.loads(
+            (PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        )["project"]["version"]
+
+    def _current_ref(self) -> str:
+        import re as _re
+        v = self._current_version()
+        semver = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", v)
+        return f"v{semver}"
+
     def test_forge_version_current(self):
+        expected = self._current_version()
         text = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
         match = re.search(r'_FORGE_VERSION\s*=\s*"([^"]+)"', text)
         assert match, "forge.py doit déclarer _FORGE_VERSION"
-        assert match.group(1) == "1.0.0b4", (
-            f"forge.py _FORGE_VERSION = '{match.group(1)}', attendu '1.0.0b4'."
+        assert match.group(1) == expected, (
+            f"forge.py _FORGE_VERSION = '{match.group(1)}', attendu '{expected}'."
         )
 
     def test_forge_default_ref_current(self):
+        expected_ref = self._current_ref()
         text = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
         match = re.search(r'_FORGE_DEFAULT_REF\s*=\s*"([^"]+)"', text)
         assert match, "forge.py doit déclarer _FORGE_DEFAULT_REF"
-        assert match.group(1) == "v1.0.0-beta.4", (
-            f"forge.py _FORGE_DEFAULT_REF = '{match.group(1)}', attendu 'v1.0.0-beta.4'."
+        assert match.group(1) == expected_ref, (
+            f"forge.py _FORGE_DEFAULT_REF = '{match.group(1)}', attendu '{expected_ref}'."
         )

@@ -1,9 +1,12 @@
 """Tests STATS-EXTRACT-001 : stats déplacé dans forge-mvc-stats."""
 from __future__ import annotations
 
+import tomllib
 from pathlib import Path
 
 import pytest
+
+_CURRENT_VERSION = tomllib.loads((Path(__file__).parent.parent.parent / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
 pytest.importorskip("forge_mvc_stats")
 
 pytestmark = pytest.mark.meta
@@ -35,7 +38,7 @@ class TestStatsModuleAvailable:
     def test_module_has_version(self):
         import forge_mvc_stats
         assert hasattr(forge_mvc_stats, "__version__")
-        assert forge_mvc_stats.__version__ == "1.0.0b4"
+        assert forge_mvc_stats.__version__ == _CURRENT_VERSION
 
     def test_all_exports_complete(self):
         import forge_mvc_stats
@@ -114,7 +117,7 @@ class TestStatsFunctional:
 class TestPyprojectMetadata:
     def test_pyproject_version(self):
         content = Path("packages/forge-mvc-stats/pyproject.toml").read_text(encoding="utf-8")
-        assert 'version = "1.0.0b4"' in content
+        assert f'version = "{_CURRENT_VERSION}"' in content
 
     def test_description_updated(self):
         content = Path("packages/forge-mvc-stats/pyproject.toml").read_text(encoding="utf-8")

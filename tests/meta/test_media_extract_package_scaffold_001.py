@@ -11,6 +11,8 @@ from pathlib import Path
 
 import pytest
 
+_CURRENT_VERSION = tomllib.loads((Path(__file__).parent.parent.parent / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -43,14 +45,14 @@ class TestPackageVersion:
 
     def test_version_matches_core(self):
         data = _pyproject()
-        assert data["project"]["version"] == "1.0.0b4", (
+        assert data["project"]["version"] == _CURRENT_VERSION, (
             "forge-mvc-media doit être à la version 1.0.0b4 (synchronisé avec le core)."
         )
 
     def test_init_version(self):
         text = INIT.read_text(encoding="utf-8")
-        assert '__version__ = "1.0.0b4"' in text, (
-            "forge_mvc_media/__init__.py doit déclarer __version__ = '1.0.0b4'."
+        assert f'__version__ = "{_CURRENT_VERSION}"' in text, (
+            f"forge_mvc_media/__init__.py doit déclarer __version__ = '{_CURRENT_VERSION}'."
         )
 
 

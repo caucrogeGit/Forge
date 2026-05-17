@@ -1,12 +1,18 @@
 """Tests — LANDING-POST-2.2-REFRESH-001 : landing page Forge après phases 5 à 10."""
 
 import pathlib
+import tomllib
 import pytest
 
 pytestmark = pytest.mark.meta
 
 SOURCE_PATH = pathlib.Path("mvc/views/landing/index.html")
 DOCS_PATH = pathlib.Path("docs/index.html")
+
+def _current_semver() -> str:
+    import re
+    v = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    return re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", v)
 
 
 def _src():
@@ -52,8 +58,10 @@ class TestSlogan:
 
 
 class TestVersion:
-    def test_version_3_0_0_presente(self):
-        assert "1.0.0-beta.4" in _src()
+    def test_version_courante_presente(self):
+        assert _current_semver() in _src(), (
+            f"La version courante {_current_semver()!r} doit apparaître dans la landing page."
+        )
 
     def test_version_1_5_absente(self):
         assert "1.5.0" not in _src()
@@ -130,8 +138,10 @@ class TestApportsRecents:
 
 
 class TestEtatActuel:
-    def test_forge_3_0_0_etat(self):
-        assert "Forge 1.0.0-beta.4" in _src()
+    def test_forge_etat_actuel(self):
+        assert f"Forge {_current_semver()}" in _src(), (
+            f"'Forge {_current_semver()}' doit apparaître dans la landing page."
+        )
 
     def test_phases_recentes_mentionnees(self):
         src = _src()

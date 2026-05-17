@@ -128,13 +128,19 @@ class TestSectionOrder:
         pos_rc1 = text.index("## [3.0.0rc1]")
         assert pos_300 < pos_rc1, "[3.0.0] doit apparaître avant [3.0.0rc1]"
 
-    def test_302_at_top_after_header(self):
+    def test_latest_at_top_after_header(self):
         text = _text()
-        # [1.0.0-beta.4] doit être la première section ## après # Changelog
+        # La section la plus récente doit être la première ## après # Changelog
         sections = re.findall(r"^## \[", text, re.MULTILINE)
         assert sections, "Aucune section ## trouvée"
         first_section_pos = text.index("## [")
-        pos_306 = text.index("## [1.0.0-beta.4]")
-        assert first_section_pos == pos_306, (
-            "[1.0.0-beta.4] doit être la première section du CHANGELOG"
+        # Accepter 1.0.0-beta.5 (ou supérieur) comme première section
+        for candidate in ["## [1.0.0-beta.5]", "## [1.0.0-beta.4]"]:
+            if candidate in text:
+                pos_candidate = text.index(candidate)
+                if first_section_pos == pos_candidate:
+                    return  # OK
+        raise AssertionError(
+            f"La première section du CHANGELOG doit être la plus récente. "
+            f"Première section trouvée à pos={first_section_pos}."
         )

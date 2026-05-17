@@ -137,14 +137,14 @@ pas installées par défaut. Elles sont tirées via les extras du package
 
 ### Installation
 
-!!! warning "Extras PyPI non disponibles en 1.0.0-beta.1 à beta.4"
-    Les modules opt-in sont **source-only** dans les versions `1.0.0-beta.1`
-    à `1.0.0-beta.4`. Les extras PyPI (`forge-mvc[mfa]`, `forge-mvc[rbac]`,
-    etc.) ne sont pas enregistrés sur PyPI et ne fonctionneront pas.
+!!! info "Extras PyPI disponibles à partir de 1.0.0-beta.5"
+    Les modules opt-in étaient **source-only** dans les versions `1.0.0-beta.1`
+    à `1.0.0-beta.4`.
 
     À partir de `1.0.0-beta.5`, `forge-mvc-rbac`, `forge-mvc-workflow` et
-    `forge-mvc-stats` seront publiés et synchronisés avec le core.
+    `forge-mvc-stats` sont publiés et synchronisés avec le core.
     `forge-mvc-mfa` reste Pre-Alpha et ne sera pas publié en `1.0`.
+    `forge-mvc-media` reste source-only après extraction Phase 11.
 
 Pour installer les opt-ins en `{{forge_version}}` :
 

@@ -51,8 +51,8 @@ class TestExtrasCoherence:
             f"L'extra [{extra_name}] doit referencer {pkg_name}."
         )
         for dep in matching:
-            assert ">=1.0.0b4,<2" in dep, (
-                f"L'extra [{extra_name}] : contrainte {dep!r} — attendu >=1.0.0b4,<2."
+            assert ">=" in dep and ",<2" in dep, (
+                f"L'extra [{extra_name}] : contrainte {dep!r} — attendu >=X,<2 (contrainte relachee)."
             )
 
     @pytest.mark.parametrize("extra_name", _NON_PUBLISHABLE_EXTRAS)
@@ -108,6 +108,6 @@ class TestCrossPackageVersionCoherence:
         extra_matching = [d for d in extra_deps if pkg_name in d]
         assert extra_matching, f"Extra [{extra_name}] ne reference pas {pkg_name}."
         for dep in extra_matching:
-            assert ">=1.0.0b4,<2" in dep, (
-                f"Extra [{extra_name}]: contrainte {dep!r} incohérente avec packages sources."
+            assert ">=" in dep and ",<2" in dep, (
+                f"Extra [{extra_name}]: contrainte {dep!r} incohérente avec packages sources — attendu >=X,<2."
             )

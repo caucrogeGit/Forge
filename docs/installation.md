@@ -48,16 +48,11 @@ python -m pip install -r requirements-dev.txt
 
 ## Contrat d'installation des opt-ins
 
-En `1.0.0-beta.4`, seul le core `forge-mvc` est publié sur PyPI.
+À partir de `1.0.0-beta.5`, le core `forge-mvc` et les opt-ins publiables
+`forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont publiés sur PyPI.
 
-Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]` et `forge-mvc[stats]`
-sont **préparés pour publication** (métadonnées extras configurées —
-`VERSION-SYNC-OPTIN-EXTRAS-001`, `OPTIN-PYPI-PUBLISH-PREPARE-001`), mais
-la publication effective n'a pas encore eu lieu. Ces extras seront disponibles
-sur PyPI à partir de `1.0.0-beta.5`.
-
-Les commandes suivantes **ne fonctionneront qu'après la publication coordonnée**
-(`1.0.0-beta.5`) :
+Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et
+`forge-mvc[all]` sont disponibles :
 
 ```bash
 pip install --pre "forge-mvc[rbac]"

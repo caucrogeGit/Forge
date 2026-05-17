@@ -12,9 +12,12 @@ Vérifie que :
 from __future__ import annotations
 
 import importlib
+import tomllib
 from pathlib import Path
 
 import pytest
+
+_CURRENT_VERSION = tomllib.loads((Path(__file__).parent.parent.parent / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
 pytest.importorskip("forge_mvc_mfa")
 
 pytestmark = pytest.mark.meta
@@ -34,7 +37,7 @@ class TestMfaModuleAvailable:
 
     def test_version_attribute(self):
         import forge_mvc_mfa
-        assert forge_mvc_mfa.__version__ == "1.0.0b4"
+        assert forge_mvc_mfa.__version__ == _CURRENT_VERSION
 
     def test_auth_mfa_factor_importable(self):
         from forge_mvc_mfa import AuthMfaFactor
@@ -330,7 +333,7 @@ class TestPyprojectMetadata:
         assert self._toml()["project"]["name"] == "forge-mvc-mfa"
 
     def test_version(self):
-        assert self._toml()["project"]["version"] == "1.0.0b4"
+        assert self._toml()["project"]["version"] == _CURRENT_VERSION
 
     def test_requires_python(self):
         assert self._toml()["project"]["requires-python"] == ">=3.12"

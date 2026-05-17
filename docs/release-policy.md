@@ -391,12 +391,19 @@ Cette politique est livrée par le ticket `OPTIN-PACKAGES-PUBLICATION-POLICY-001
 
 ### Core publié sur PyPI
 
-`forge-mvc` est le seul package publié sur PyPI jusqu'à `1.0.0-beta.4` inclus.
+`forge-mvc` était le seul package publié sur PyPI jusqu'à `1.0.0-beta.4` inclus.
 Il est le point d'entrée officiel du framework.
 
-### Opt-ins source-only avant beta.5
+### Opt-ins publiés à partir de beta.5
 
-Les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont disponibles en **source-only** via GitHub jusqu'à `1.0.0-beta.5` :
+À partir de `1.0.0-beta.5`, `forge-mvc-rbac`, `forge-mvc-workflow` et
+`forge-mvc-stats` sont publiés sur PyPI et synchronisés avec le core.
+Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et
+`forge-mvc[all]` sont disponibles via `pip install --pre forge-mvc[all]`.
+
+### Historique : opt-ins source-only avant beta.5
+
+Les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` étaient disponibles en **source-only** via GitHub jusqu'à `1.0.0-beta.4` :
 
 - non publiés sur PyPI ;
 - installables depuis le dépôt GitHub (voir `docs/installation-github.md`) ;
@@ -429,14 +436,14 @@ En attendant, l'installation se fait depuis GitHub (source-only).
 
 ### Extras PyPI
 
-Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` ne sont disponibles qu'à partir de la publication coordonnée (`1.0.0-beta.5`).
+Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et `forge-mvc[all]` sont disponibles à partir de `1.0.0-beta.5`.
 
 `forge-mvc[mfa]` n'est **pas déclaré** dans les extras PyPI en série 1.0.
 `forge-mvc[all]` n'inclut pas `forge-mvc-mfa`.
 
 ### Règles de version
 
-- **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` est versionné à chaque release.
+- **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était versionné à chaque release.
 - **À partir de `1.0.0-beta.5`** : core et opt-ins publiés (`rbac`, `workflow`, `stats`) sont strictement synchronisés sur la même version.
 - `forge-mvc-mfa` ne rejoint pas ce flux en série 1.0.
 

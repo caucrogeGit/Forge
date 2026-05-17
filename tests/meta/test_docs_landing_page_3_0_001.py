@@ -26,33 +26,28 @@ class TestSourceFileExists:
 
 
 class TestVersionBumped:
-    """La version 3.0.0 est bien mentionnée dans la landing."""
+    """La version courante est bien mentionnée dans la landing."""
 
     def setup_method(self):
+        import tomllib
+        import re as _re
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
         self.generated = LANDING_GENERATED.read_text(encoding="utf-8")
+        _v = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+        _sv = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _v)
+        self.version_strings = [f"v{_sv}", f"Forge {_sv}", "Python 3.12+"]
 
-    @pytest.mark.parametrize("expected_version_string", [
-        "v1.0.0-beta.4",            # Version strip Hero
-        "Forge 1.0.0-beta.4",       # Section État + label terminal
-        "Python 3.12+",             # Version strip Hero
-    ])
-    def test_version_mentioned_in_source(self, expected_version_string):
-        assert expected_version_string in self.source, (
-            f"La source de la landing devrait mentionner "
-            f"'{expected_version_string}' (Forge 3.0)"
-        )
+    def test_version_mentioned_in_source(self):
+        for vs in self.version_strings:
+            assert vs in self.source, (
+                f"La source de la landing devrait mentionner '{vs}'."
+            )
 
-    @pytest.mark.parametrize("expected_version_string", [
-        "v1.0.0-beta.4",
-        "Forge 1.0.0-beta.4",
-        "Python 3.12+",
-    ])
-    def test_version_mentioned_in_generated(self, expected_version_string):
-        assert expected_version_string in self.generated, (
-            f"docs/index.html devrait mentionner "
-            f"'{expected_version_string}' (regénéré après modif source)"
-        )
+    def test_version_mentioned_in_generated(self):
+        for vs in self.version_strings:
+            assert vs in self.generated, (
+                f"docs/index.html devrait mentionner '{vs}'."
+            )
 
 
 class TestNoObsoleteContent:
@@ -214,14 +209,18 @@ class TestNavigationStructure:
 
 
 class TestStateSectionRefonte:
-    """La section État a été refondue pour Forge 3.0."""
+    """La section État a été refondue pour la version courante."""
 
     def setup_method(self):
+        import tomllib
+        import re as _re
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
+        _v = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+        self._semver = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _v)
 
-    def test_state_mentions_3_0(self):
-        assert "Forge 1.0.0-beta.4" in self.source, (
-            "Le bloc 'État actuel' devrait mentionner Forge 1.0.0-beta.4"
+    def test_state_mentions_current_version(self):
+        assert f"Forge {self._semver}" in self.source, (
+            f"Le bloc 'État actuel' devrait mentionner Forge {self._semver}"
         )
 
     def test_state_mentions_source_ouverture(self):
@@ -266,10 +265,15 @@ class TestSyncedToDocsIndex:
         )
 
     def test_version_synced(self):
+        import tomllib
+        import re as _re
+        _v = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+        _sv = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _v)
+        tag = f"v{_sv}"
         source = LANDING_SOURCE.read_text(encoding="utf-8")
         generated = LANDING_GENERATED.read_text(encoding="utf-8")
-        assert "v1.0.0-beta.4" in source
-        assert "v1.0.0-beta.4" in generated, (
-            "docs/index.html devrait être synchronisé (contenir v1.0.0-beta.4). "
+        assert tag in source, f"La source landing doit mentionner {tag}."
+        assert tag in generated, (
+            f"docs/index.html devrait être synchronisé (contenir {tag}). "
             "Lancer `forge sync:landing` pour régénérer."
         )

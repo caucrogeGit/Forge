@@ -1,9 +1,12 @@
 """Tests WORKFLOW-EXTRACT-001 : workflow deplace dans forge-mvc-workflow."""
 from __future__ import annotations
 
+import tomllib
 from pathlib import Path
 
 import pytest
+
+_CURRENT_VERSION = tomllib.loads((Path(__file__).parent.parent.parent / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
 pytest.importorskip("forge_mvc_workflow")
 
 pytestmark = pytest.mark.meta
@@ -36,7 +39,7 @@ class TestWorkflowModuleAvailable:
     def test_module_has_version(self):
         import forge_mvc_workflow
         assert hasattr(forge_mvc_workflow, "__version__")
-        assert forge_mvc_workflow.__version__ == "1.0.0b4"
+        assert forge_mvc_workflow.__version__ == _CURRENT_VERSION
 
     def test_all_exports_complete(self):
         import forge_mvc_workflow
@@ -118,7 +121,7 @@ class TestWorkflowFunctional:
 class TestPyprojectMetadata:
     def test_pyproject_version(self):
         content = Path("packages/forge-mvc-workflow/pyproject.toml").read_text(encoding="utf-8")
-        assert 'version = "1.0.0b4"' in content
+        assert f'version = "{_CURRENT_VERSION}"' in content
 
     def test_markupsafe_dependency_declared(self):
         content = Path("packages/forge-mvc-workflow/pyproject.toml").read_text(encoding="utf-8")

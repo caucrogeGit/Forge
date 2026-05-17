@@ -20,7 +20,7 @@ import pytest
 
 PACKAGES_DIR = Path("packages")
 ROOT_PYPROJECT = Path("pyproject.toml")
-VERSION = "1.0.0b4"
+VERSION = tomllib.loads(ROOT_PYPROJECT.read_text(encoding="utf-8"))["project"]["version"]
 
 OPTIONAL_DISTS = [
     "forge-mvc-mfa",

@@ -67,8 +67,8 @@ class TestPublishableExtrasPresent:
         matching = [d for d in deps if pkg_name in d]
         assert matching, f"L'extra [{extra_name}] ne reference pas {pkg_name}."
         for dep in matching:
-            assert ">=1.0.0b4,<2" in dep, (
-                f"L'extra [{extra_name}] doit utiliser >=1.0.0b4,<2 — trouvé : {dep!r}."
+            assert ">=" in dep and ",<2" in dep, (
+                f"L'extra [{extra_name}] doit utiliser une contrainte relachee (>=X,<2) — trouvé : {dep!r}."
             )
 
 

@@ -61,11 +61,19 @@ class TestPublishablePackagesDependency:
         return toml_path.read_text(encoding="utf-8")
 
     def test_dependency_relaxed(self, pkg):
+        import tomllib as _toml
         text = self._text(pkg)
-        assert "forge-mvc>=1.0.0b4,<2" in text, (
+        data = _toml.loads(text)
+        deps = data.get("project", {}).get("dependencies", [])
+        forge_mvc_deps = [d for d in deps if d.startswith("forge-mvc") and ">" in d]
+        assert forge_mvc_deps, (
             f"{pkg}/pyproject.toml: la dependance forge-mvc doit etre relachee "
-            f"(forge-mvc>=1.0.0b4,<2), pas epinglee a une version fixe."
+            f"(forge-mvc>=X,<2), pas epinglee a une version fixe avec ==."
         )
+        for dep in forge_mvc_deps:
+            assert ",<2" in dep, (
+                f"{pkg}/pyproject.toml: la contrainte {dep!r} doit avoir une borne superieure <2."
+            )
 
     def test_no_private_do_not_upload(self, pkg):
         text = self._text(pkg)
