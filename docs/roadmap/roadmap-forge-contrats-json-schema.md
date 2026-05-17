@@ -745,7 +745,7 @@ Phases : `json`, `schema`, `semantic`, `runtime`.
 
 # Bloc 3 — Branchement dans les générateurs
 
-## ENTITY-CONTRACT-011 — Brancher la validation dans `forge build:model`
+## ENTITY-CONTRACT-011 — Brancher la validation dans `forge build:model` ⛔ BLOQUÉ
 
 ### Objectif
 
@@ -762,6 +762,135 @@ Avant génération :
 ```
 
 ### Erreur attendue
+
+```text
+Erreur : les entités Forge sont invalides.
+Conseil : lancez forge entity:validate pour obtenir le détail.
+```
+
+### Blocage identifié (2026-05)
+
+`build:model` et `entity:validate` utilisent deux systèmes de validation incompatibles :
+
+| Système | Clé détection | Champs | Usage |
+|---|---|---|---|
+| Legacy (`model.py`, `validation.py`) | `format_version: 1` | `entity`, `sql_type`, `python_type` | `build:model` actuel |
+| Canonique (`entity_validate.py`) | `schema_version: "1.0"` | `name`, `fields[].type` (Forge types) | `entity:validate` |
+
+Un fichier valide pour l'un est invalide pour l'autre.
+Brancher la validation JSON Schema avant `build:model` bloquerait :
+- Le dépôt réel (`mvc/entities/media/media.json` est en format legacy → `entity:validate` le rejette)
+- Tous les tests existants de `build:model` (`test_entity_model_cli.py` utilise le format legacy)
+
+Même si la validation JSON Schema passait, la génération échouerait : `build_entity_sql`,
+`build_entity_base`, etc. lisent `sql_type`, `python_type`, `column` — absents du format canonique.
+
+### Précondition requise
+
+Un ticket de migration doit précéder ENTITY-CONTRACT-011. Plan détaillé dans :
+`docs/history/audits/entity-contract-build-model-migration-audit.md`
+
+---
+
+## ENTITY-CONTRACT-011A — Audit migration build:model vers format canonique ✓ livré
+
+### Objectif
+
+Documenter précisément l'incompatibilité entre `build:model` (format legacy) et
+`entity:validate` (format canonique) et proposer un plan de migration découpé.
+
+### Livraison
+
+Document d'audit complet dans :
+`docs/history/audits/entity-contract-build-model-migration-audit.md`
+
+Contenu : flux build:model, format legacy (8 clés racine, 12 clés de champ),
+format canonique (12 types Forge), table de correspondance complète,
+stratégie recommandée (normaliseur canonique→legacy), 6 tickets proposés.
+
+---
+
+## ENTITY-CONTRACT-011B — Créer normalize_canonical_to_legacy()
+
+### Objectif
+
+Créer un traducteur interne `canonical → legacy_normalized` permettant à
+`build_entity_sql()` et `build_entity_base()` de fonctionner sans modification.
+
+### Périmètre
+
+- nouveau module `forge_cli/entities/entity_canonical_adapter.py` ;
+- mapping complet des 12 types Forge → sql_type + python_type ;
+- parsing `VARCHAR(n)` → `string` + `max_length`, `DECIMAL(p,s)` → `decimal` ;
+- `constraints.not_empty` → `required`, `constraints.min_value` → `min` ;
+- gestion du champ `id` auto (absent du canonique, généré dans le legacy) ;
+- tests ciblés dans `tests/test_entity_canonical_adapter.py`.
+
+---
+
+## ENTITY-CONTRACT-011C — Adapter build:model pour le format canonique
+
+### Objectif
+
+Détection automatique du format (`schema_version` vs `format_version`) dans
+`build:model` et appel du normaliseur canonique si nécessaire.
+
+### Périmètre
+
+- modifier `_load_all_entity_sources()` dans `model.py` ;
+- détecter `schema_version: "1.0"` → passer par `normalize_canonical_to_legacy()` ;
+- détecter `format_version: 1` → continuer sur le chemin legacy existant ;
+- tests avec projets temporaires en format canonique.
+
+---
+
+## ENTITY-CONTRACT-011D — Migrer tests/test_entity_model_cli.py
+
+### Objectif
+
+Réécrire les 18 tests de `test_entity_model_cli.py` en format canonique
+(`schema_version: "1.0"`) pour valider que `build:model` fonctionne
+end-to-end avec le nouveau format via le normaliseur.
+
+---
+
+## ENTITY-CONTRACT-011E — Migrer mvc/entities/media/media.json
+
+### Objectif
+
+Convertir `mvc/entities/media/media.json` (11 champs, format legacy) vers
+le format canonique `schema_version: "1.0"`.
+
+### Points délicats
+
+- champ `id` à supprimer (auto-géré par Forge) ;
+- `sql_type: "VARCHAR(n)"` → `type: "string"` + `max_length: n` ;
+- `constraints.*` → propriétés directes ;
+- sections `media` et `rbac` : évaluer si hors périmètre ou à conserver.
+
+---
+
+## ENTITY-CONTRACT-011F — Migrer mvc/entities/relations.json
+
+### Objectif
+
+Convertir `mvc/entities/relations.json` (vide, `format_version: 1`) vers
+`schema_version: "1.0"`.
+
+### Travail
+
+Simple : remplacer `format_version: 1` par `schema_version: "1.0"` et
+retirer la clé obsolète. Vérifier que `entity:validate` accepte le fichier.
+
+---
+
+## ENTITY-CONTRACT-011G — Brancher entity:validate dans build:model (reprise de 011)
+
+### Objectif
+
+Reprendre ENTITY-CONTRACT-011 une fois 011C, 011D, 011E et 011F livrés.
+
+### Comportement attendu
 
 ```text
 Erreur : les entités Forge sont invalides.
