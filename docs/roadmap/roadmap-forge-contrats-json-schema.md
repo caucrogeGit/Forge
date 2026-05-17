@@ -573,6 +573,8 @@ Ce registre pourra être utilisé par :
 
 ## ENTITY-CONTRACT-007 — Ajouter `forge entity:validate` — **livré**
 
+> Dépendance `jsonschema` officialisée dans `pyproject.toml` par ENTITY-CONTRACT-007-FIX-DEPENDENCY.
+
 ### Objectif
 
 Ajouter une commande CLI de validation des fichiers canoniques.

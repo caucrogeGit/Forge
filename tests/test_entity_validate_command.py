@@ -1,4 +1,4 @@
-"""Garde-fou ENTITY-CONTRACT-007.
+"""Garde-fou ENTITY-CONTRACT-007 + ENTITY-CONTRACT-007-FIX-DEPENDENCY.
 
 Vérifie que la commande forge entity:validate :
 - est reconnue par le CLI ;
@@ -13,6 +13,9 @@ Vérifie que la commande forge entity:validate :
 - retourne non-nul pour un JSON syntaxiquement invalide ;
 - produit une sortie mentionnant le fichier concerné ;
 - produit une synthèse finale.
+
+Vérifie aussi (ENTITY-CONTRACT-007-FIX-DEPENDENCY) que :
+- jsonschema est déclaré dans pyproject.toml.
 
 Les tests utilisent des projets temporaires isolés (tmp_path) et n'ont
 pas de dépendance au format legacy réel du dépôt.
@@ -261,3 +264,17 @@ class TestOutputFormat:
         proj = _make_project(tmp_path, {"article.json": entity})
         result = _run(proj)
         assert "erreur" in result.stdout
+
+
+class TestDependencyDeclaration:
+    def test_pyproject_declares_jsonschema_dependency(self):
+        """jsonschema doit être déclaré dans pyproject.toml (ENTITY-CONTRACT-007-FIX-DEPENDENCY)."""
+        import tomllib
+        pyproject = PROJECT_ROOT / "pyproject.toml"
+        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+        deps = data.get("project", {}).get("dependencies", [])
+        declared = any("jsonschema" in dep for dep in deps)
+        assert declared, (
+            "jsonschema doit être dans [project].dependencies de pyproject.toml "
+            "(requis par forge entity:validate)."
+        )
