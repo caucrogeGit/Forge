@@ -83,6 +83,12 @@ def _collect_entity_files(entities_root: Path) -> Iterator[Path]:
 
 def main(args: list[str] | None = None) -> None:
     from forge_cli.entities.entity_semantic_validate import validate_semantic
+    from forge_cli.entities.entity_validation_errors import (
+        FORGE_ENTITY_JSON_INVALID,
+        FORGE_ENTITY_SCHEMA_INVALID,
+        FORGE_ENTITY_SCHEMA_MISSING,
+        FORGE_RELATION_SCHEMA_INVALID,
+    )
 
     cwd = Path.cwd()
     entities_root = cwd / "mvc" / "entities"
@@ -101,6 +107,7 @@ def main(args: list[str] | None = None) -> None:
 
     registry, _ = _build_registry()
     if registry is None:
+        print(f"  Code : {FORGE_ENTITY_SCHEMA_MISSING}", file=sys.stderr)
         print("Erreur : impossible de charger les schémas Forge.", file=sys.stderr)
         print(f"Conseil : vérifiez que {_schemas_dir()} est accessible.", file=sys.stderr)
         sys.exit(1)
@@ -109,6 +116,7 @@ def main(args: list[str] | None = None) -> None:
     relations_validator = _make_validator(_RELATIONS_SCHEMA_ID, registry)
 
     if entity_validator is None:
+        print(f"  Code : {FORGE_ENTITY_SCHEMA_MISSING}", file=sys.stderr)
         print("Erreur : schéma entity.schema.json introuvable.", file=sys.stderr)
         sys.exit(1)
 
@@ -129,6 +137,7 @@ def main(args: list[str] | None = None) -> None:
                 data = json.loads(entity_file.read_text(encoding="utf-8"))
             except json.JSONDecodeError as e:
                 print(f"[ERREUR] {rel_path}")
+                print(f"  Code : {FORGE_ENTITY_JSON_INVALID}")
                 print(f"  Raison : JSON invalide — {e}")
                 error_count += 1
                 continue
@@ -136,6 +145,7 @@ def main(args: list[str] | None = None) -> None:
             schema_errors = list(entity_validator.iter_errors(data))
             if schema_errors:
                 print(f"[ERREUR] {rel_path}")
+                print(f"  Code : {FORGE_ENTITY_SCHEMA_INVALID}")
                 for err in schema_errors:
                     print(_format_error(err))
                 print("  Conseil : corrigez le fichier selon schemas/entity.schema.json.")
@@ -157,6 +167,7 @@ def main(args: list[str] | None = None) -> None:
             data = json.loads(relations_file.read_text(encoding="utf-8"))
         except json.JSONDecodeError as e:
             print(f"[ERREUR] {rel_path}")
+            print(f"  Code : {FORGE_ENTITY_JSON_INVALID}")
             print(f"  Raison : JSON invalide — {e}")
             error_count += 1
             data = None
@@ -165,6 +176,7 @@ def main(args: list[str] | None = None) -> None:
             schema_errors = list(relations_validator.iter_errors(data))
             if schema_errors:
                 print(f"[ERREUR] {rel_path}")
+                print(f"  Code : {FORGE_RELATION_SCHEMA_INVALID}")
                 for err in schema_errors:
                     print(_format_error(err))
                 print("  Conseil : corrigez le fichier selon schemas/relations.schema.json.")
@@ -182,9 +194,10 @@ def main(args: list[str] | None = None) -> None:
             print()
             print("[ERREUR] Validation sémantique")
             for sem_err in semantic_errors:
-                print(f"  Fichier : {sem_err.source}")
+                print(f"  Fichier : {sem_err.file}")
+                print(f"  Code : {sem_err.code}")
                 print(f"  Chemin  : {sem_err.path}")
-                print(f"  Raison  : {sem_err.reason}")
+                print(f"  Raison  : {sem_err.message}")
                 if sem_err.hint:
                     print(f"  Conseil : {sem_err.hint}")
                 print()

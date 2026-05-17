@@ -85,7 +85,7 @@ def _errors(entities, relations=None) -> list[SemanticError]:
 
 
 def _reasons(entities, relations=None) -> list[str]:
-    return [e.reason for e in _errors(entities, relations)]
+    return [e.message for e in _errors(entities, relations)]
 
 
 ARTICLE = ("article.json", _entity("Article", "articles"))
@@ -101,7 +101,7 @@ class TestEntityDuplicateField:
             {"name": "title", "type": "text"},
         ])
         errors = _errors([("article.json", entity)])
-        assert any("déclaré deux fois" in r for r in [e.reason for e in errors])
+        assert any("déclaré deux fois" in r for r in [e.message for e in errors])
 
     def test_duplicate_field_path_correct(self):
         entity = _entity("Article", "articles", fields=[
@@ -109,7 +109,7 @@ class TestEntityDuplicateField:
             {"name": "title", "type": "text"},
         ])
         errors = _errors([("article.json", entity)])
-        assert any("fields[1].name" in e.path for e in errors)
+        assert any("fields[1].name" in e.path for e in errors)  # path inchangé
 
     def test_no_duplicate_no_error(self):
         entity = _entity("Article", "articles", fields=[
@@ -124,7 +124,7 @@ class TestPythonReservedWords:
     def test_reserved_word_produces_error(self, reserved):
         entity = _entity("Article", "articles", fields=[{"name": reserved, "type": "string"}])
         errors = _errors([("article.json", entity)])
-        assert any("réservé Python" in r for r in [e.reason for e in errors])
+        assert any("réservé Python" in r for r in [e.message for e in errors])
 
     def test_normal_name_no_error(self):
         entity = _entity("Article", "articles", fields=[{"name": "title", "type": "string"}])
@@ -136,7 +136,7 @@ class TestDuplicateTable:
         a = ("article.json", _entity("Article", "articles"))
         b = ("news.json", _entity("News", "articles"))
         errors = _errors([a, b])
-        assert any("articles" in e.reason and "déjà utilisée" in e.reason for e in errors)
+        assert any("articles" in e.message and "déjà utilisée" in e.message for e in errors)
 
     def test_unique_tables_no_error(self):
         a = ("article.json", _entity("Article", "articles"))
@@ -150,7 +150,7 @@ class TestIndexNonExistentField:
             {"name": "idx_articles_slug", "fields": ["slug"]}
         ])
         errors = _errors([("article.json", entity)])
-        assert any("slug" in e.reason and "index" in e.reason for e in errors)
+        assert any("slug" in e.message and "index" in e.message for e in errors)
 
     def test_index_pointing_to_existing_field(self):
         entity = _entity("Article", "articles",
@@ -165,12 +165,12 @@ class TestManyToOneUnknownEntity:
     def test_unknown_from_entity(self):
         rel = _relations([_m2o("Ghost", "Category", "category")])
         errors = _errors([CATEGORY], rel)
-        assert any("Ghost" in e.reason and "source" in e.reason for e in errors)
+        assert any("Ghost" in e.message and "source" in e.message for e in errors)
 
     def test_unknown_to_entity(self):
         rel = _relations([_m2o("Article", "Ghost", "category")])
         errors = _errors([ARTICLE], rel)
-        assert any("Ghost" in e.reason and "cible" in e.reason for e in errors)
+        assert any("Ghost" in e.message and "cible" in e.message for e in errors)
 
     def test_known_entities_no_error(self):
         rel = _relations([_m2o("Article", "Category", "category")])
@@ -184,7 +184,7 @@ class TestForeignKeyCollision:
                                           fields=[{"name": "category_id", "type": "integer"}]))
         rel = _relations([_m2o("Article", "Category", "category")])
         errors = _errors([entity, CATEGORY], rel)
-        assert any("category_id" in e.reason and "collision" in e.reason.lower() for e in errors)
+        assert any("category_id" in e.message and "collision" in e.message.lower() for e in errors)
 
     def test_explicit_fk_different_name_no_error(self):
         rel = _relations([_m2o("Article", "Category", "category", foreign_key="cat_id")])
@@ -196,7 +196,7 @@ class TestSetNullNullableFalse:
     def test_set_null_with_not_nullable_is_error(self):
         rel = _relations([_m2o("Article", "Category", "category", nullable=False, on_delete="set_null")])
         errors = _errors([ARTICLE, CATEGORY], rel)
-        assert any("set_null" in e.reason and "nullable=false" in e.reason for e in errors)
+        assert any("set_null" in e.message and "nullable=false" in e.message for e in errors)
 
     def test_set_null_with_nullable_true_ok(self):
         rel = _relations([_m2o("Article", "Category", "category", nullable=True, on_delete="set_null")])
@@ -218,26 +218,26 @@ class TestManyToManyUnknownEntity:
     def test_unknown_from(self):
         rel = _relations([_m2m("Ghost", "Tag", "tags", _pivot("article_tags", "ghost_id", "tag_id"))])
         errors = _errors([TAG], rel)
-        assert any("Ghost" in e.reason for e in errors)
+        assert any("Ghost" in e.message for e in errors)
 
     def test_unknown_to(self):
         rel = _relations([_m2m("Article", "Ghost", "tags", _pivot("article_tags", "article_id", "ghost_id"))])
         errors = _errors([ARTICLE], rel)
-        assert any("Ghost" in e.reason for e in errors)
+        assert any("Ghost" in e.message for e in errors)
 
 
 class TestManyToManySelfRelation:
     def test_self_relation_is_error(self):
         rel = _relations([_m2m("Article", "Article", "related", _pivot("article_related", "article_id", "related_id"))])
         errors = _errors([ARTICLE], rel)
-        assert any("elle-même" in e.reason for e in errors)
+        assert any("elle-même" in e.message for e in errors)
 
 
 class TestPivotTableCollision:
     def test_pivot_table_same_as_entity_table(self):
         rel = _relations([_m2m("Article", "Tag", "tags", _pivot("articles", "article_id", "tag_id"))])
         errors = _errors([ARTICLE, TAG], rel)
-        assert any("articles" in e.reason and "Article" in e.reason for e in errors)
+        assert any("articles" in e.message and "Article" in e.message for e in errors)
 
     def test_distinct_pivot_table_no_error(self):
         rel = _relations([_m2m("Article", "Tag", "tags", _pivot("article_tags", "article_id", "tag_id"))])
@@ -249,7 +249,7 @@ class TestPivotKeyCollision:
     def test_from_key_equals_to_key(self):
         rel = _relations([_m2m("Article", "Tag", "tags", _pivot("article_tags", "entity_id", "entity_id"))])
         errors = _errors([ARTICLE, TAG], rel)
-        assert any("from_key" in e.reason and "to_key" in e.reason for e in errors)
+        assert any("from_key" in e.message and "to_key" in e.message for e in errors)
 
     def test_distinct_keys_no_error(self):
         rel = _relations([_m2m("Article", "Tag", "tags", _pivot("article_tags", "article_id", "tag_id"))])
@@ -263,21 +263,21 @@ class TestPivotFieldsReserved:
                        fields=[{"name": "article_id", "type": "integer"}])
         rel = _relations([_m2m("Article", "Tag", "tags", pivot)])
         errors = _errors([ARTICLE, TAG], rel)
-        assert any("article_id" in e.reason and "réservé" in e.reason for e in errors)
+        assert any("article_id" in e.message and "réservé" in e.message for e in errors)
 
     def test_pivot_field_redeclares_to_key(self):
         pivot = _pivot("article_tags", "article_id", "tag_id",
                        fields=[{"name": "tag_id", "type": "integer"}])
         rel = _relations([_m2m("Article", "Tag", "tags", pivot)])
         errors = _errors([ARTICLE, TAG], rel)
-        assert any("tag_id" in e.reason and "réservé" in e.reason for e in errors)
+        assert any("tag_id" in e.message and "réservé" in e.message for e in errors)
 
     def test_pivot_field_redeclares_id(self):
         pivot = _pivot("article_tags", "article_id", "tag_id",
                        fields=[{"name": "id", "type": "integer"}])
         rel = _relations([_m2m("Article", "Tag", "tags", pivot)])
         errors = _errors([ARTICLE, TAG], rel)
-        assert any('"id"' in e.reason and "réservé" in e.reason for e in errors)
+        assert any('"id"' in e.message and "réservé" in e.message for e in errors)
 
     def test_pivot_field_other_name_ok(self):
         pivot = _pivot("article_tags", "article_id", "tag_id",
@@ -296,7 +296,7 @@ class TestManyToManyDuplicateInverse:
             _m2m("Tag", "Article", "articles", pivot_ba),
         ])
         errors = _errors([ARTICLE, TAG], rel)
-        assert any("deux fois" in e.reason for e in errors)
+        assert any("deux fois" in e.message for e in errors)
 
     def test_single_direction_ok(self):
         pivot = _pivot("article_tags", "article_id", "tag_id")
@@ -327,7 +327,7 @@ class TestValidProject:
             _m2m("Article", "Tag", "tags", pivot),
         ])
         errors = validate_semantic(entities, relations)
-        assert not errors, f"Erreurs inattendues : {[e.reason for e in errors]}"
+        assert not errors, f"Erreurs inattendues : {[e.message for e in errors]}"
 
 
 # ── Tests d'intégration CLI ───────────────────────────────────────────────────

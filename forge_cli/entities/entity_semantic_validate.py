@@ -27,12 +27,27 @@ from __future__ import annotations
 import keyword
 from dataclasses import dataclass
 
+from forge_cli.entities.entity_validation_errors import (
+    FORGE_ENTITY_DUPLICATE_FIELD,
+    FORGE_ENTITY_DUPLICATE_TABLE,
+    FORGE_ENTITY_INVALID_INDEX,
+    FORGE_ENTITY_RESERVED_PYTHON_NAME,
+    FORGE_PIVOT_KEY_COLLISION,
+    FORGE_PIVOT_RESERVED_FIELD,
+    FORGE_PIVOT_TABLE_COLLISION,
+    FORGE_RELATION_DUPLICATE,
+    FORGE_RELATION_FK_COLLISION,
+    FORGE_RELATION_INVALID_ON_DELETE,
+    FORGE_RELATION_UNKNOWN_ENTITY,
+)
+
 
 @dataclass(frozen=True)
 class SemanticError:
-    source: str
+    code: str
+    file: str
     path: str
-    reason: str
+    message: str
     hint: str = ""
 
 
@@ -69,9 +84,10 @@ def validate_semantic(
         for i, fname in enumerate(field_names):
             if fname in seen:
                 errors.append(SemanticError(
-                    source=source,
+                    code=FORGE_ENTITY_DUPLICATE_FIELD,
+                    file=source,
                     path=f"$.fields[{i}].name",
-                    reason=f"le champ \"{fname}\" est déclaré deux fois dans l'entité {name}.",
+                    message=f"le champ \"{fname}\" est déclaré deux fois dans l'entité {name}.",
                     hint="Supprimez ou renommez le champ en doublon.",
                 ))
             seen.add(fname)
@@ -81,9 +97,10 @@ def validate_semantic(
         for i, fname in enumerate(field_names):
             if fname in reserved:
                 errors.append(SemanticError(
-                    source=source,
+                    code=FORGE_ENTITY_RESERVED_PYTHON_NAME,
+                    file=source,
                     path=f"$.fields[{i}].name",
-                    reason=f"le champ \"{fname}\" est un mot réservé Python.",
+                    message=f"le champ \"{fname}\" est un mot réservé Python.",
                     hint="Choisissez un nom différent pour éviter les conflits de génération de code.",
                 ))
 
@@ -92,9 +109,10 @@ def validate_semantic(
             if table in table_to_entity:
                 other = table_to_entity[table]
                 errors.append(SemanticError(
-                    source=source,
+                    code=FORGE_ENTITY_DUPLICATE_TABLE,
+                    file=source,
                     path="$.table",
-                    reason=f"la table \"{table}\" est déjà utilisée par l'entité {other}.",
+                    message=f"la table \"{table}\" est déjà utilisée par l'entité {other}.",
                     hint="Chaque entité doit avoir une table SQL unique.",
                 ))
             else:
@@ -108,9 +126,10 @@ def validate_semantic(
             for col_i, col in enumerate(index.get("fields", [])):
                 if col not in field_name_set:
                     errors.append(SemanticError(
-                        source=source,
+                        code=FORGE_ENTITY_INVALID_INDEX,
+                        file=source,
                         path=f"$.indexes[{idx_i}].fields[{col_i}]",
-                        reason=(
+                        message=(
                             f"le champ \"{col}\" est utilisé par l'index "
                             f"\"{index.get('name', '?')}\" mais n'existe pas dans l'entité {name}."
                         ),
@@ -168,18 +187,20 @@ def _check_many_to_one(
     # 5. from → entité inconnue
     if rel_from and rel_from not in known_names:
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_RELATION_UNKNOWN_ENTITY,
+            file=source,
             path=f"{rel_path}.from",
-            reason=f"l'entité source \"{rel_from}\" n'est pas déclarée dans les entités validées.",
+            message=f"l'entité source \"{rel_from}\" n'est pas déclarée dans les entités validées.",
             hint="Vérifiez le nom de l'entité ou créez le fichier d'entité manquant.",
         ))
 
     # 6. to → entité inconnue
     if rel_to and rel_to not in known_names:
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_RELATION_UNKNOWN_ENTITY,
+            file=source,
             path=f"{rel_path}.to",
-            reason=f"l'entité cible \"{rel_to}\" n'est pas déclarée dans les entités validées.",
+            message=f"l'entité cible \"{rel_to}\" n'est pas déclarée dans les entités validées.",
             hint="Vérifiez le nom de l'entité ou créez le fichier d'entité manquant.",
         ))
 
@@ -192,9 +213,10 @@ def _check_many_to_one(
         fk = relation.get("foreign_key") or f"{rel_name}_id"
         if fk in existing_fields:
             errors.append(SemanticError(
-                source=source,
+                code=FORGE_RELATION_FK_COLLISION,
+                file=source,
                 path=f"{rel_path}.foreign_key",
-                reason=(
+                message=(
                     f"la clé étrangère \"{fk}\" (relation {rel_name}) collisionne avec "
                     f"un champ métier déclaré dans l'entité {rel_from}."
                 ),
@@ -206,9 +228,10 @@ def _check_many_to_one(
     nullable = relation.get("nullable", True)
     if on_delete == "set_null" and nullable is False:
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_RELATION_INVALID_ON_DELETE,
+            file=source,
             path=f"{rel_path}.on_delete",
-            reason=(
+            message=(
                 f"on_delete=\"set_null\" est incompatible avec nullable=false "
                 f"pour la relation {rel_name} (impossible de mettre NULL dans une colonne NOT NULL)."
             ),
@@ -233,27 +256,30 @@ def _check_many_to_many(
     # 9. from → entité inconnue
     if rel_from and rel_from not in known_names:
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_RELATION_UNKNOWN_ENTITY,
+            file=source,
             path=f"{rel_path}.from",
-            reason=f"l'entité source \"{rel_from}\" n'est pas déclarée dans les entités validées.",
+            message=f"l'entité source \"{rel_from}\" n'est pas déclarée dans les entités validées.",
             hint="Vérifiez le nom de l'entité ou créez le fichier d'entité manquant.",
         ))
 
     # 10. to → entité inconnue
     if rel_to and rel_to not in known_names:
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_RELATION_UNKNOWN_ENTITY,
+            file=source,
             path=f"{rel_path}.to",
-            reason=f"l'entité cible \"{rel_to}\" n'est pas déclarée dans les entités validées.",
+            message=f"l'entité cible \"{rel_to}\" n'est pas déclarée dans les entités validées.",
             hint="Vérifiez le nom de l'entité ou créez le fichier d'entité manquant.",
         ))
 
     # 11. self-relation
     if rel_from and rel_to and rel_from == rel_to:
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_RELATION_UNKNOWN_ENTITY,
+            file=source,
             path=f"{rel_path}.from",
-            reason=f"une relation many_to_many ne peut pas lier une entité à elle-même ({rel_from}).",
+            message=f"une relation many_to_many ne peut pas lier une entité à elle-même ({rel_from}).",
             hint="Les auto-relations many_to_many ne sont pas supportées en Forge 1.x.",
         ))
 
@@ -262,9 +288,10 @@ def _check_many_to_many(
     if pivot_table and pivot_table in table_to_entity:
         owner = table_to_entity[pivot_table]
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_PIVOT_TABLE_COLLISION,
+            file=source,
             path=f"{rel_path}.pivot.table",
-            reason=(
+            message=(
                 f"la table pivot \"{pivot_table}\" est déjà utilisée par l'entité {owner}."
             ),
             hint="Choisissez un nom de table pivot différent des tables d'entité.",
@@ -275,9 +302,10 @@ def _check_many_to_many(
     to_key = pivot.get("to_key", "")
     if from_key and to_key and from_key == to_key:
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_PIVOT_KEY_COLLISION,
+            file=source,
             path=f"{rel_path}.pivot.from_key",
-            reason=f"pivot.from_key et pivot.to_key sont identiques (\"{from_key}\").",
+            message=f"pivot.from_key et pivot.to_key sont identiques (\"{from_key}\").",
             hint="Les deux clés étrangères de la table pivot doivent avoir des noms différents.",
         ))
 
@@ -289,9 +317,10 @@ def _check_many_to_many(
         pf_name = pf.get("name", "")
         if pf_name in reserved_pivot:
             errors.append(SemanticError(
-                source=source,
+                code=FORGE_PIVOT_RESERVED_FIELD,
+                file=source,
                 path=f"{rel_path}.pivot.fields[{fi}].name",
-                reason=f"le champ pivot \"{pf_name}\" est réservé par Forge (id, from_key ou to_key).",
+                message=f"le champ pivot \"{pf_name}\" est réservé par Forge (id, from_key ou to_key).",
                 hint="Retirez ce champ de pivot.fields — il est géré automatiquement.",
             ))
 
@@ -299,9 +328,10 @@ def _check_many_to_many(
     pair = frozenset({rel_from, rel_to})
     if pair in m2m_pairs and rel_from and rel_to:
         errors.append(SemanticError(
-            source=source,
+            code=FORGE_RELATION_DUPLICATE,
+            file=source,
             path=f"{rel_path}.from",
-            reason=(
+            message=(
                 f"la relation many_to_many entre \"{rel_from}\" et \"{rel_to}\" est "
                 f"déclarée deux fois (dans les deux sens)."
             ),

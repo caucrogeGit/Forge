@@ -652,20 +652,21 @@ Intégré dans `forge entity:validate` (Passe 2 après JSON Schema).
 
 ---
 
-## ENTITY-CONTRACT-009 — Ajouter des codes d’erreur stables
+## ENTITY-CONTRACT-009 — Ajouter des codes d’erreur stables ✓ livré
 
 ### Objectif
 
 Normaliser les erreurs de validation avec des codes stables.
 
-### Codes initiaux proposés
+### Codes livrés (18)
 
 ```text
+FORGE_ENTITY_JSON_INVALID
+FORGE_ENTITY_SCHEMA_MISSING
 FORGE_ENTITY_SCHEMA_INVALID
-FORGE_ENTITY_RESERVED_FIELD
 FORGE_ENTITY_DUPLICATE_FIELD
-FORGE_ENTITY_UNKNOWN_TYPE
-FORGE_ENTITY_INVALID_FIELD_OPTION
+FORGE_ENTITY_RESERVED_PYTHON_NAME
+FORGE_ENTITY_DUPLICATE_TABLE
 FORGE_ENTITY_INVALID_INDEX
 FORGE_RELATION_SCHEMA_INVALID
 FORGE_RELATION_UNKNOWN_ENTITY
@@ -675,6 +676,7 @@ FORGE_RELATION_FK_COLLISION
 FORGE_PIVOT_SCHEMA_INVALID
 FORGE_PIVOT_TABLE_COLLISION
 FORGE_PIVOT_RESERVED_FIELD
+FORGE_PIVOT_KEY_COLLISION
 FORGE_PIVOT_UNIQUE_PAIR_REQUIRED
 ```
 
@@ -687,6 +689,13 @@ Ces codes doivent pouvoir servir :
 - à la sortie JSON ;
 - à Forge Design ;
 - aux futures traductions.
+
+### Livraison
+
+Module `forge_cli/entities/entity_validation_errors.py` — liste centrale `ALL_CODES`.
+`SemanticError` porte désormais `code`, `file`, `path`, `message`, `hint`.
+Sortie humaine affiche `Code :` pour toutes les erreurs (JSON Schema + sémantiques).
+58 tests dans `tests/test_entity_validation_error_codes.py`.
 
 ---
 
