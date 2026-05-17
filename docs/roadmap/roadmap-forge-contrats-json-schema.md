@@ -852,13 +852,26 @@ Détection automatique du format (`schema_version` vs `format_version`) dans
 
 ---
 
-## ENTITY-CONTRACT-011D — Migrer tests/test_entity_model_cli.py
+## ENTITY-CONTRACT-011D — Migrer tests/test_entity_model_cli.py ✓ livré
 
 ### Objectif
 
 Réécrire les 18 tests de `test_entity_model_cli.py` en format canonique
 (`schema_version: "1.0"`) pour valider que `build:model` fonctionne
 end-to-end avec le nouveau format via le normaliseur.
+
+### Résultat
+
+- `tests/test_entity_model_cli.py` réécrit : 18 tests → 20 tests (20/20 passent).
+- Fixtures canoniques : `_article()`, `_commande()`, `_relations_vides()`.
+- Fixtures legacy conservées : `_legacy_contact()`, `_legacy_commande()`, `_legacy_relations()`.
+- 2 tests maintenus en legacy : `test_sync_relations_writes_only_relations_sql` (FK complexe),
+  `test_sync_entity_does_not_touch_manual_py` (sync_entity non migré).
+- 2 nouveaux tests de non-régression legacy : `test_legacy_build_model_validates_then_writes`,
+  `test_legacy_check_model_preserves_entity_name`.
+- `test_build_model_accepts_short_and_mixed_entity_json` → renommé
+  `test_build_model_generates_correct_sql_and_base_py`, vérifie `Id BIGINT UNSIGNED NOT NULL`.
+- Suite complète : 0 régression.
 
 ---
 
