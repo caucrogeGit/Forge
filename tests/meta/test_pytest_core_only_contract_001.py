@@ -54,6 +54,7 @@ OPTIN_MODULES: dict[str, set[str]] = {
     "forge_mvc_rbac": set(),
     "forge_mvc_workflow": set(),
     "forge_mvc_stats": set(),
+    "forge_mvc_media": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

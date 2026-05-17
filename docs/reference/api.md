@@ -1199,7 +1199,7 @@ la bibliothèque standard `mimetypes`, avec fallback `application/octet-stream`.
 Créer et lister des métadonnées `Media` :
 
 ```python
-from core.uploads import create_media_record, list_media_for_entity
+from forge_mvc_media import create_media_record, list_media_for_entity
 
 media_id = create_media_record(
     entity_name="hebergement",
@@ -1222,7 +1222,8 @@ par `role`, et trie par `position ASC`, puis `id ASC`.
 Attacher un upload déjà stocké :
 
 ```python
-from core.uploads import attach_media_to_entity, save_upload
+from core.uploads import save_upload
+from forge_mvc_media import attach_media_to_entity
 
 saved = save_upload(file, category="images", variants=True)
 
@@ -1244,7 +1245,7 @@ n'est générée ici.
 Supprimer un média complet :
 
 ```python
-from core.uploads import delete_media
+from forge_mvc_media import delete_media
 
 result = delete_media(
     media_id,
@@ -1261,7 +1262,7 @@ accidentelle.
 Récupérer une galerie ordonnée :
 
 ```python
-from core.uploads import get_media_gallery
+from forge_mvc_media import get_media_gallery
 
 gallery = get_media_gallery("hebergement", 12)
 ```
@@ -1274,7 +1275,7 @@ Forge ne génère pas de galerie HTML dans cette API.
 Récupérer l'image de couverture :
 
 ```python
-from core.uploads import get_cover_media
+from forge_mvc_media import get_cover_media
 
 cover = get_cover_media("hebergement", 12)
 ```

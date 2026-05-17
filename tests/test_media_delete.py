@@ -1,10 +1,16 @@
 import pytest
+pytest.importorskip("forge_mvc_media")
 
-from core.uploads import create_media_record, delete_media, delete_media_file, delete_media_record
+from core.uploads import delete_media_file
 from core.uploads.exceptions import UploadStorageError
+from forge_mvc_media.media_repository import (
+    attach_media_to_entity,
+    create_media_record,
+    delete_media,
+    delete_media_record,
+)
 from tests.test_media_attach import _saved_upload
 from tests.test_media_repository import FakeMediaDb
-from core.uploads import attach_media_to_entity
 
 
 def _write_media_files(root, filename="photo.png", *, medium=True, thumbnail=True):
@@ -143,6 +149,5 @@ def test_attach_media_to_entity_non_regression():
 
 
 def test_delete_media_est_exporte_dans_api_publique():
-    from core.uploads import delete_media as exported_delete_media
-
-    assert exported_delete_media is delete_media
+    from forge_mvc_media import delete_media as pkg_delete_media
+    assert pkg_delete_media is delete_media

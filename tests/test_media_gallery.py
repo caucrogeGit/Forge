@@ -1,7 +1,8 @@
 import pytest
+pytest.importorskip("forge_mvc_media")
 
-from core.uploads import get_cover_media, get_media_gallery, media_url
 from core.uploads.exceptions import UploadStorageError
+from forge_mvc_media.media_gallery import get_cover_media, get_media_gallery, media_url
 
 
 class FakeGalleryDb:
@@ -188,13 +189,13 @@ def test_get_media_gallery_refuse_path_dangereux():
 
 
 def test_media_gallery_est_exporte_dans_api_publique():
-    from core.uploads import get_cover_media as exported_get_cover_media
-    from core.uploads import get_media_gallery as exported_get_media_gallery
-    from core.uploads import media_url as exported_media_url
+    from forge_mvc_media import get_cover_media as pkg_get_cover_media
+    from forge_mvc_media import get_media_gallery as pkg_get_media_gallery
+    from forge_mvc_media import media_url as pkg_media_url
 
-    assert exported_get_cover_media is get_cover_media
-    assert exported_get_media_gallery is get_media_gallery
-    assert exported_media_url is media_url
+    assert pkg_get_cover_media is get_cover_media
+    assert pkg_get_media_gallery is get_media_gallery
+    assert pkg_media_url is media_url
 
 
 def test_get_cover_media_retourne_none_si_aucun_cover():

@@ -1,14 +1,12 @@
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_media")
 
-from core.uploads import (
-    SavedUpload,
-    attach_media_to_entity,
-    get_cover_media,
-    get_media_gallery,
-)
+from core.uploads import SavedUpload
 from core.uploads.exceptions import UploadStorageError
+from forge_mvc_media.media_gallery import get_cover_media, get_media_gallery
+from forge_mvc_media.media_repository import attach_media_to_entity
 from tests.test_media_repository import FakeMediaDb
 
 
@@ -171,6 +169,5 @@ def test_attach_media_to_entity_alimente_le_cover():
 
 
 def test_attach_media_to_entity_est_exporte_dans_api_publique():
-    from core.uploads import attach_media_to_entity as exported_attach_media_to_entity
-
-    assert exported_attach_media_to_entity is attach_media_to_entity
+    from forge_mvc_media import attach_media_to_entity as pkg_attach
+    assert pkg_attach is attach_media_to_entity

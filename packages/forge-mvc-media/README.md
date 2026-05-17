@@ -2,21 +2,11 @@
 
 Module opt-in pour la gestion applicative des médias dans Forge MVC.
 
-## Statut : squelette source-only (Pre-Alpha)
+## Statut : Pre-Alpha — source-only
 
 `forge-mvc-media` est en cours d'extraction depuis `core/uploads/`.
 
-**Ce package ne contient pas encore de code fonctionnel.**
-
-Il a été créé comme squelette source-only dans le cadre du ticket
-`MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001` (Phase 11).
-
-Le code applicatif (`media_repository`, `media_gallery`) sera déplacé depuis
-`core/uploads/` dans le ticket `MEDIA-REPOSITORY-MOVE-001`.
-
-## Non publié sur PyPI
-
-`forge-mvc-media` **n'est pas publié sur PyPI** dans cette phase.
+**Non publié sur PyPI dans cette phase.**
 
 Il s'installe uniquement depuis les sources du dépôt Forge :
 
@@ -26,13 +16,17 @@ cd Forge
 pip install -e packages/forge-mvc-media/
 ```
 
-Sa publication coordonnée est prévue avec `OPTIN-PYPI-PUBLISH-001`,
-après extraction complète et validation des tickets 11.3 à 11.5.
+## Ce que contient ce module
 
-## Ce que contiendra ce module (après MEDIA-REPOSITORY-MOVE-001)
+Depuis `MEDIA-REPOSITORY-MOVE-001`, le package contient :
 
-- `media_repository` — persistance SQL des métadonnées médias (table `media`)
-- `media_gallery` — galerie, couverture, URL des médias par entité
+- `media_repository` — persistance SQL des métadonnées médias (table `media`) :
+  `create_media_record`, `attach_media_to_entity`, `get_media_record`,
+  `list_media_for_entity`, `update_media_alt_text`, `update_media_position`,
+  `delete_media_record`, `delete_media`
+
+- `media_gallery` — galerie, couverture, URL des médias par entité :
+  `get_media_gallery`, `get_cover_media`, `media_url`
 
 ## Ce qui reste dans le core (définitif)
 
@@ -45,12 +39,27 @@ Les briques génériques restent dans `core/uploads/` et ne bougent pas :
 - `image.py` — save_image, generate_image_variants (Pillow)
 - `rate_limit.py` — rate limiting in-memory
 
+## Note sur les générateurs CLI
+
+Les générateurs CRUD (`forge make:crud --media`) produisent encore
+`from core.uploads import ...` pour les fonctions applicatives.
+Cela sera corrigé dans `MEDIA-CRUD-INTEGRATION-OPTIN-001` (ticket 11.4).
+
+En attendant, les projets utilisant le module opt-in doivent importer
+directement depuis `forge_mvc_media`.
+
+## Shims de compatibilité dans core
+
+Les fichiers `core/uploads/media_repository.py` et `core/uploads/media_gallery.py`
+sont des shims de compatibilité qui re-exportent depuis ce module.
+Ils émettent un `DeprecationWarning` et seront supprimés dans une version future.
+
 ## Tickets de référence
 
 | Ticket | Description | État |
 |---|---|---|
 | `MEDIA-CORE-BOUNDARY-AUDIT-001` | Audit de la frontière core/opt-in | livré |
 | `MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001` | Création du squelette source-only | livré |
-| `MEDIA-REPOSITORY-MOVE-001` | Déplacement du code applicatif | à venir |
+| `MEDIA-REPOSITORY-MOVE-001` | Déplacement du code applicatif | livré |
 | `MEDIA-CRUD-INTEGRATION-OPTIN-001` | Mise à jour des générateurs CLI | à venir |
 | `MEDIA-DOCS-MIGRATION-001` | Mise à jour de la documentation | à venir |

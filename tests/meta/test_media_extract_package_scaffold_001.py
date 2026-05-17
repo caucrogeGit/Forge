@@ -100,31 +100,37 @@ class TestReadmeContent:
         assert "MEDIA-REPOSITORY-MOVE-001" in README.read_text(encoding="utf-8")
 
 
-class TestNoCodeMovedPrematurely:
+class TestMediaCodePresence:
 
-    def test_media_repository_not_in_package(self):
-        assert not (PACKAGE_DIR / "forge_mvc_media" / "media_repository.py").exists(), (
-            "media_repository.py ne doit pas encore être dans forge_mvc_media/ "
-            "(sera déplacé par MEDIA-REPOSITORY-MOVE-001)."
+    def test_media_repository_in_package(self):
+        assert (PACKAGE_DIR / "forge_mvc_media" / "media_repository.py").exists(), (
+            "media_repository.py doit être dans forge_mvc_media/ "
+            "(déplacé par MEDIA-REPOSITORY-MOVE-001)."
         )
 
-    def test_media_gallery_not_in_package(self):
-        assert not (PACKAGE_DIR / "forge_mvc_media" / "media_gallery.py").exists(), (
-            "media_gallery.py ne doit pas encore être dans forge_mvc_media/ "
-            "(sera déplacé par MEDIA-REPOSITORY-MOVE-001)."
+    def test_media_gallery_in_package(self):
+        assert (PACKAGE_DIR / "forge_mvc_media" / "media_gallery.py").exists(), (
+            "media_gallery.py doit être dans forge_mvc_media/ "
+            "(déplacé par MEDIA-REPOSITORY-MOVE-001)."
         )
 
-    def test_media_repository_still_in_core(self):
-        assert (PROJECT_ROOT / "core" / "uploads" / "media_repository.py").exists(), (
-            "core/uploads/media_repository.py doit rester en place jusqu'à "
-            "MEDIA-REPOSITORY-MOVE-001."
-        )
+    def test_core_media_repository_is_shim_or_absent(self):
+        core_repo = PROJECT_ROOT / "core" / "uploads" / "media_repository.py"
+        if core_repo.exists():
+            text = core_repo.read_text(encoding="utf-8")
+            assert "forge_mvc_media" in text, (
+                "core/uploads/media_repository.py existe encore — "
+                "il doit être un shim re-exportant depuis forge_mvc_media."
+            )
 
-    def test_media_gallery_still_in_core(self):
-        assert (PROJECT_ROOT / "core" / "uploads" / "media_gallery.py").exists(), (
-            "core/uploads/media_gallery.py doit rester en place jusqu'à "
-            "MEDIA-REPOSITORY-MOVE-001."
-        )
+    def test_core_media_gallery_is_shim_or_absent(self):
+        core_gallery = PROJECT_ROOT / "core" / "uploads" / "media_gallery.py"
+        if core_gallery.exists():
+            text = core_gallery.read_text(encoding="utf-8")
+            assert "forge_mvc_media" in text, (
+                "core/uploads/media_gallery.py existe encore — "
+                "il doit être un shim re-exportant depuis forge_mvc_media."
+            )
 
 
 class TestCoreNotDependOnOptIn:

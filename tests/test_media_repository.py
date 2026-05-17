@@ -1,8 +1,11 @@
 import pytest
+pytest.importorskip("forge_mvc_media")
 
 from types import SimpleNamespace
 
-from core.uploads import (
+from core.uploads.exceptions import UploadStorageError
+from core.uploads.storage import normalize_media_path
+from forge_mvc_media.media_repository import (
     attach_media_to_entity,
     create_media_record,
     delete_media_record,
@@ -11,9 +14,7 @@ from core.uploads import (
     update_media_alt_text,
     update_media_position,
 )
-from core.uploads.exceptions import UploadStorageError
-from core.uploads.media_repository import create_media_record as direct_create_media_record
-from core.uploads.storage import normalize_media_path
+from forge_mvc_media import media_repository as _media_repository_module
 
 
 class FakeMediaDb:
@@ -238,7 +239,9 @@ def test_delete_media_record_retourne_false_si_absent():
 
 
 def test_repository_est_exporte_dans_api_publique():
-    assert direct_create_media_record is create_media_record
+    from forge_mvc_media import create_media_record as pkg_create_media_record
+    assert pkg_create_media_record is create_media_record
+    assert _media_repository_module.create_media_record is create_media_record
 
 
 def test_normalisation_media_existante_reste_valide():

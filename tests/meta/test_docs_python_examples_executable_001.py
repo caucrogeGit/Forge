@@ -37,6 +37,7 @@ OPTIONAL_MODULES = {
     "forge_mvc_rbac",
     "forge_mvc_workflow",
     "forge_mvc_stats",
+    "forge_mvc_media",
 }
 
 # Modules applicatifs : toute vérification est ignorée (import + symboles).

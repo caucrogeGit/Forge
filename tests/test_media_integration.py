@@ -14,17 +14,20 @@ import io
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_media")
 from PIL import Image
 
 import core.forge
 from core.uploads import (
+    image_variant_paths,
+    save_upload,
+)
+from forge_mvc_media.media_repository import (
     attach_media_to_entity,
     create_media_record,
     delete_media,
     get_media_record,
-    image_variant_paths,
     list_media_for_entity,
-    save_upload,
     update_media_alt_text,
     update_media_position,
 )
