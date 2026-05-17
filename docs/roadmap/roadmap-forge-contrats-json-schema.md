@@ -699,27 +699,32 @@ Sortie humaine affiche `Code :` pour toutes les erreurs (JSON Schema + sémantiq
 
 ---
 
-## ENTITY-CONTRACT-010 — Ajouter `forge entity:validate --json`
+## ENTITY-CONTRACT-010 — Ajouter `forge entity:validate --json` ✓ livré
 
 ### Objectif
 
 Ajouter une sortie machine exploitable par des outils.
 
-### Exemple
+### Format livré
 
 ```json
 {
   "valid": false,
-  "files_checked": 3,
+  "files_checked": 2,
+  "files_valid": 0,
+  "errors_count": 3,
+  "warnings_count": 0,
   "errors": [
     {
-      "code": "FORGE_ENTITY_RESERVED_FIELD",
+      "code": "FORGE_ENTITY_SCHEMA_INVALID",
       "file": "mvc/entities/article.json",
-      "path": "$.fields[0].name",
-      "message": "Le champ id est réservé.",
-      "hint": "Supprimez id de fields[]. Forge le génère automatiquement."
+      "path": "$.fields.0.name",
+      "message": "'id' should not be valid under {'const': 'id'}",
+      "hint": "Corrigez le fichier selon schemas/entity.schema.json.",
+      "phase": "schema"
     }
-  ]
+  ],
+  "warnings": []
 }
 ```
 
@@ -728,6 +733,13 @@ Ajouter une sortie machine exploitable par des outils.
 - la sortie JSON doit être stable ;
 - elle ne doit pas contenir de traces inutiles ;
 - elle doit être exploitable par Forge Design plus tard.
+
+### Livraison
+
+Option `--json` dans `forge entity:validate`.
+Refactorisation de `entity_validate.py` : collecte structurée → sortie humaine ou JSON.
+Phases : `json`, `schema`, `semantic`, `runtime`.
+48 tests dans `tests/test_entity_validate_json_output.py`.
 
 ---
 
