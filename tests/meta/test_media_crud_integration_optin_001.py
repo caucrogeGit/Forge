@@ -138,9 +138,11 @@ class TestNoDependencyOnOptIn:
     """Le core ne dépend pas de forge-mvc-media comme dépendance obligatoire."""
 
     def test_root_pyproject_does_not_depend_on_forge_mvc_media(self):
-        text = ROOT_PYPROJECT.read_text(encoding="utf-8")
-        assert "forge-mvc-media" not in text, (
-            "Le pyproject.toml racine dépend de forge-mvc-media. "
+        lines = ROOT_PYPROJECT.read_text(encoding="utf-8").splitlines()
+        active_lines = [l for l in lines if not l.strip().startswith("#")]
+        active_text = "\n".join(active_lines)
+        assert "forge-mvc-media" not in active_text, (
+            "Le pyproject.toml racine dépend de forge-mvc-media (ligne active, hors commentaires). "
             "Ce module doit rester opt-in, non publié, non requis par le core."
         )
 

@@ -48,22 +48,29 @@ python -m pip install -r requirements-dev.txt
 
 ## Contrat d'installation des opt-ins
 
-En `1.0.0-beta.1` à `1.0.0-beta.4`, seul le core `forge-mvc` est publié comme
-package PyPI principal. Les modules opt-in existent dans le dépôt comme modules
-**source-only** ; ils ne sont pas disponibles via `pip install forge-mvc[...]`
-sur PyPI.
+En `1.0.0-beta.4`, seul le core `forge-mvc` est publié sur PyPI.
 
-Les commandes du type `pip install forge-mvc[mfa]` ou `pip install forge-mvc[rbac]`
-**ne fonctionnent pas** en `1.0.0-beta.1` à `1.0.0-beta.4` — ces extras ne sont
-pas enregistrés sur PyPI.
+Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]` et `forge-mvc[stats]`
+sont **préparés pour publication** (métadonnées extras configurées —
+`VERSION-SYNC-OPTIN-EXTRAS-001`, `OPTIN-PYPI-PUBLISH-PREPARE-001`), mais
+la publication effective n'a pas encore eu lieu. Ces extras seront disponibles
+sur PyPI à partir de `1.0.0-beta.5`.
 
-À partir de `1.0.0-beta.5`, les opt-ins publiables (`forge-mvc-rbac`,
-`forge-mvc-workflow`, `forge-mvc-stats`) seront synchronisés avec la version
-du core et disponibles sur PyPI.
+Les commandes suivantes **ne fonctionneront qu'après la publication coordonnée**
+(`1.0.0-beta.5`) :
 
-**`forge-mvc-mfa` ne sera pas publié sur PyPI en `1.0`** : le module MFA
-reste Pre-Alpha tant que le secret TOTP est stocké en clair
-(`SEC-MFA-SECRET-ENCRYPTION-001`).
+```bash
+pip install --pre "forge-mvc[rbac]"
+pip install --pre "forge-mvc[workflow]"
+pip install --pre "forge-mvc[stats]"
+pip install --pre "forge-mvc[all]"
+```
+
+`forge-mvc[media]` et `forge-mvc[mfa]` **ne sont pas disponibles** :
+
+- **`forge-mvc-media`** : source-only après extraction Phase 11.
+- **`forge-mvc-mfa`** : Pre-Alpha — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant
+  toute publication PyPI.
 
 Pour installer les opt-ins en `{{forge_version}}`, utiliser le mode source :
 

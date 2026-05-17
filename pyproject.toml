@@ -45,18 +45,21 @@ Repository = "https://github.com/caucrogeGit/Forge"
 Documentation = "https://caucrogegit.github.io/Forge/"
 Issues = "https://github.com/caucrogeGit/Forge/issues"
 
-# Extras désactivés temporairement : les modules opt-in
-# (forge-mvc-mfa, -rbac, -workflow, -stats) ne sont pas encore publiés
-# sur PyPI. Ils restent installables via le mode dev (clone GitHub +
-# pip install -r requirements-dev.txt).
-# Réintroduction prévue dans la trajectoire 1.0.0-beta.x, via publication coordonnée des opt-ins (OPTIN-PYPI-PUBLISH-001).
-#
-# [project.optional-dependencies]
-# rbac = ["forge-mvc-rbac==3.X.Y"]
-# workflow = ["forge-mvc-workflow==3.X.Y"]
-# stats = ["forge-mvc-stats==3.X.Y"]
-# all = ["forge-mvc-rbac==3.X.Y", "forge-mvc-workflow==3.X.Y", "forge-mvc-stats==3.X.Y"]
-# mfa = ["forge-mvc-mfa==3.X.Y"]
+# Extras préparés pour publication coordonnée beta.5
+# (OPTIN-PYPI-PUBLISH-PREPARE-001, OPTIN-PYPI-PUBLISH-001, VERSION-SYNC-OPTIN-EXTRAS-001).
+# forge-mvc-media et forge-mvc-mfa sont exclus :
+#   media = source-only après Phase 11
+#   mfa   = Pre-Alpha, SEC-MFA-SECRET-ENCRYPTION-001 requis avant publication
+
+[project.optional-dependencies]
+rbac = ["forge-mvc-rbac>=1.0.0b4,<2"]
+workflow = ["forge-mvc-workflow>=1.0.0b4,<2"]
+stats = ["forge-mvc-stats>=1.0.0b4,<2"]
+all = [
+    "forge-mvc-rbac>=1.0.0b4,<2",
+    "forge-mvc-workflow>=1.0.0b4,<2",
+    "forge-mvc-stats>=1.0.0b4,<2",
+]
 
 [project.scripts]
 forge = "forge:cli_entrypoint"

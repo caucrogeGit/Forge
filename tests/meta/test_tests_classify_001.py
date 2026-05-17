@@ -162,6 +162,7 @@ _EXPECTED_IN_META = [
     "test_security_headers_doc_lock_001.py",
     "test_optin_pypi_names_check_001.py",
     "test_optin_pypi_publish_prepare_001.py",
+    "test_version_sync_optin_extras_001.py",
 ]
 
 

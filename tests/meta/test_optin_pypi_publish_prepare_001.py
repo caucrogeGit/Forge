@@ -104,10 +104,11 @@ class TestMfaRequiresSecTicket:
         )
 
 
-class TestRootPyprojectNoOptinDeps:
-    def _active_deps(self) -> str:
-        lines = ROOT_PYPROJECT.read_text(encoding="utf-8").splitlines()
-        return "\n".join(line for line in lines if not line.strip().startswith("#"))
+class TestRootPyprojectNoMandatoryOptinDeps:
+    def _mandatory_deps(self) -> list[str]:
+        import tomllib
+        data = tomllib.loads(ROOT_PYPROJECT.read_text(encoding="utf-8"))
+        return data.get("project", {}).get("dependencies", [])
 
     @pytest.mark.parametrize("pkg", [
         "forge-mvc-rbac",
@@ -116,11 +117,11 @@ class TestRootPyprojectNoOptinDeps:
         "forge-mvc-media",
         "forge-mvc-mfa",
     ])
-    def test_root_pyproject_no_active_dep_on_optin(self, pkg):
-        active = self._active_deps()
-        assert pkg not in active, (
-            f"Le pyproject.toml racine ne doit pas avoir {pkg!r} comme dependance active "
-            f"(les commentaires sont exclus de cette verification)."
+    def test_root_pyproject_no_mandatory_dep_on_optin(self, pkg):
+        deps = self._mandatory_deps()
+        assert not any(pkg in d for d in deps), (
+            f"Le pyproject.toml racine ne doit pas avoir {pkg!r} comme dependance obligatoire. "
+            f"Les opt-ins sont autorises uniquement dans [project.optional-dependencies]."
         )
 
 

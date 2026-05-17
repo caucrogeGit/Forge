@@ -1219,6 +1219,7 @@ du code applicatif existant.
 | SECURITY-HEADERS-DOC-LOCK-001 | Verrouillage documentation en-têtes de sécurité | **livré** |
 | OPTIN-PYPI-NAMES-CHECK-001 | Audit des noms PyPI des packages opt-in | **livré** |
 | OPTIN-PYPI-PUBLISH-PREPARE-001 | Préparer rbac/workflow/stats pour publication PyPI | **livré** |
+| VERSION-SYNC-OPTIN-EXTRAS-001 | Synchroniser extras optionnels metadata core/opt-ins | **livré** |
 
 
 ## Règle de mise à jour des roadmaps

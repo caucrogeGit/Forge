@@ -56,16 +56,13 @@ class TestMfaAvailableViaExplicitExtra:
     sur PyPI. Réintroduction prévue dans une version ultérieure (OPTIN-PYPI-PUBLISH-001).
     """
 
-    def test_extras_intentionally_absent(self):
-        """Les extras sont absents et leur suppression est documentée dans pyproject."""
+    def test_mfa_extra_intentionally_absent(self):
+        """L'extra [mfa] doit rester absent — forge-mvc-mfa n'est pas publiable (Pre-Alpha)."""
         extras = _read_extras(ROOT_PYPROJECT)
         assert "mfa" not in extras, (
-            "L'extra [mfa] est présent dans pyproject.toml — il devrait être absent "
-            "en 3.0.x (mode source-only). Voir OPTIN-PYPI-PUBLISH-001."
-        )
-        assert "rbac" not in extras and "workflow" not in extras and "stats" not in extras, (
-            "Des extras PyPI sont présents dans pyproject.toml alors que les modules "
-            "opt-in ne sont pas encore publiés. Voir OPTIN-PYPI-PUBLISH-001."
+            "L'extra [mfa] est présent dans pyproject.toml — il doit être absent "
+            "(forge-mvc-mfa est Pre-Alpha, SEC-MFA-SECRET-ENCRYPTION-001 requis). "
+            "Voir OPTIN-PYPI-PUBLISH-001."
         )
 
     def test_optin_publish_ticket_documented_in_pyproject(self):

@@ -128,24 +128,28 @@ class TestForgeMvcPackage:
         include = data["tool"]["setuptools"]["packages"]["find"]["include"]
         assert any("forge_cli" in p for p in include)
 
-    def test_extras_intentionally_absent(self):
-        """En 1.0.0b2, les extras PyPI sont désactivés — modules opt-in non publiés sur PyPI.
+    def test_publishable_extras_declared(self):
+        """Apres VERSION-SYNC-OPTIN-EXTRAS-001, les extras rbac/workflow/stats/all sont declares.
 
-        Réintroduction prévue dans une version ultérieure (OPTIN-PYPI-PUBLISH-001).
+        forge-mvc-mfa et forge-mvc-media restent exclus (non publiables).
         """
         data = self._load()
         opts = data["project"].get("optional-dependencies", {})
-        for extra in ("mfa", "rbac", "workflow", "stats", "all"):
+        for extra in ("rbac", "workflow", "stats", "all"):
+            assert extra in opts, (
+                f"L'extra [{extra}] doit etre present dans pyproject.toml "
+                f"(VERSION-SYNC-OPTIN-EXTRAS-001)."
+            )
+        for extra in ("mfa", "media"):
             assert extra not in opts, (
-                f"L'extra [{extra}] est présent dans pyproject.toml — il doit être absent "
-                f"en 3.0.x (modules opt-in non publiés). Voir OPTIN-PYPI-PUBLISH-001."
+                f"L'extra [{extra}] ne doit pas etre present — package non publiable."
             )
 
     def test_optin_publish_documented_in_pyproject(self):
-        """La suppression temporaire des extras est documentée dans le pyproject."""
+        """Le ticket de publication coordonnee est trace dans le pyproject."""
         text = ROOT_PYPROJECT.read_text(encoding="utf-8")
         assert "OPTIN-PYPI-PUBLISH-001" in text, (
-            "pyproject.toml doit tracer OPTIN-PYPI-PUBLISH-001 (réintroduction des extras en 3.1)."
+            "pyproject.toml doit tracer OPTIN-PYPI-PUBLISH-001."
         )
 
     def test_has_forge_entrypoint(self):
@@ -190,16 +194,16 @@ class TestRootPyprojectUpdated:
         data = self._load()
         assert data["project"]["version"] == VERSION
 
-    def test_no_optional_dependencies_in_pyproject(self):
-        """En 1.0.0b2, [project.optional-dependencies] est absent (extras PyPI désactivés)."""
+    def test_optional_dependencies_declared_for_publishable(self):
+        """Apres VERSION-SYNC-OPTIN-EXTRAS-001, [project.optional-dependencies] est present."""
         data = self._load()
-        assert "optional-dependencies" not in data["project"], (
-            "[project.optional-dependencies] doit être absent du pyproject.toml racine en 3.0.x. "
-            "Les modules opt-in ne sont pas encore sur PyPI. Voir OPTIN-PYPI-PUBLISH-001."
+        assert "optional-dependencies" in data["project"], (
+            "[project.optional-dependencies] doit etre present dans pyproject.toml racine "
+            "(extras rbac/workflow/stats/all — VERSION-SYNC-OPTIN-EXTRAS-001)."
         )
 
     def test_optin_publish_ticket_in_pyproject_comment(self):
-        """OPTIN-PYPI-PUBLISH-001 doit être tracé dans le pyproject (en commentaire)."""
+        """OPTIN-PYPI-PUBLISH-001 doit etre trace dans le pyproject."""
         text = ROOT_PYPROJECT.read_text(encoding="utf-8")
         assert "OPTIN-PYPI-PUBLISH-001" in text
 
