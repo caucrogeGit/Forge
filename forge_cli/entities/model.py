@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from forge_cli.entities.canonical_model_normalizer import (
+    CanonicalNormalizationError,
+    normalize_canonical_entity_for_model_build,
+)
 from forge_cli.entities.make_entity import (
     build_entity_base,
     build_entity_init,
@@ -307,8 +311,17 @@ def _load_all_entity_sources(entities_root: Path, blocks: list[str]) -> list[Ent
             blocks.append(f"{json_path}: fichier JSON d'entite introuvable")
             continue
         try:
-            definition = validate_entity_definition(_read_json_file(json_path), source=str(json_path))
-        except (ValueError, EntityDefinitionError) as exc:
+            raw_data = _read_json_file(json_path)
+        except ValueError as exc:
+            blocks.append(str(exc))
+            continue
+        try:
+            if isinstance(raw_data, dict) and raw_data.get("schema_version") == "1.0":
+                legacy_data = normalize_canonical_entity_for_model_build(raw_data)
+                definition = validate_entity_definition(legacy_data, source=str(json_path))
+            else:
+                definition = validate_entity_definition(raw_data, source=str(json_path))
+        except (ValueError, EntityDefinitionError, CanonicalNormalizationError) as exc:
             blocks.append(str(exc))
             continue
         sources.append(EntitySource(entity_dir=entity_dir, json_path=json_path, definition=definition))

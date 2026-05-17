@@ -833,19 +833,22 @@ Créer un traducteur interne `canonical → legacy_normalized` permettant à
 
 ---
 
-## ENTITY-CONTRACT-011C — Adapter build:model pour le format canonique
+## ENTITY-CONTRACT-011C — Adapter build:model pour le format canonique ✓ livré
 
 ### Objectif
 
 Détection automatique du format (`schema_version` vs `format_version`) dans
 `build:model` et appel du normaliseur canonique si nécessaire.
 
-### Périmètre
+### Résultat
 
-- modifier `_load_all_entity_sources()` dans `model.py` ;
-- détecter `schema_version: "1.0"` → passer par `normalize_canonical_to_legacy()` ;
-- détecter `format_version: 1` → continuer sur le chemin legacy existant ;
-- tests avec projets temporaires en format canonique.
+- `_load_all_entity_sources()` dans `model.py` : routage schema_version "1.0" → normaliseur ;
+- `load_entity_definitions()` dans `relations.py` : même routage (relations lit aussi les entités) ;
+- `_safe_load_entities()` dans `relations.py` : attrape aussi `CanonicalNormalizationError` ;
+- support legacy préservé strictement inchangé ;
+- 35 tests dans `tests/test_build_model_canonical_routing.py` ;
+- `build:model` accepte désormais le format canonique via normalisation interne ;
+- `entity:validate` n'est pas encore branché comme garde-fou global (→ 011G).
 
 ---
 

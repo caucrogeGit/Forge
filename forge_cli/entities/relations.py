@@ -8,6 +8,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from forge_cli.entities.canonical_model_normalizer import (
+    CanonicalNormalizationError,
+    normalize_canonical_entity_for_model_build,
+)
 from forge_cli.entities.validation import EntityDefinitionError, validate_entity_definition
 
 
@@ -130,10 +134,12 @@ def load_entity_definitions(entities_root: Path) -> dict[str, dict[str, Any]]:
     for json_path in sorted(entities_root.glob("*/*.json")):
         if json_path.name == "relations.json":
             continue
-        data = validate_entity_definition(
-            json.loads(json_path.read_text(encoding="utf-8")),
-            source=str(json_path),
-        )
+        raw_data = json.loads(json_path.read_text(encoding="utf-8"))
+        if isinstance(raw_data, dict) and raw_data.get("schema_version") == "1.0":
+            legacy_data = normalize_canonical_entity_for_model_build(raw_data)
+            data = validate_entity_definition(legacy_data, source=str(json_path))
+        else:
+            data = validate_entity_definition(raw_data, source=str(json_path))
         entity_name = data["entity"]
         entity_map[entity_name] = data
     return entity_map
@@ -238,7 +244,7 @@ def _generate_many_to_many_sql(relation: ValidatedManyToManyRelation) -> str:
 def _safe_load_entities(entities_root: Path, issues: list[RelationIssue]) -> dict[str, dict[str, Any]]:
     try:
         return load_entity_definitions(entities_root)
-    except EntityDefinitionError as exc:
+    except (EntityDefinitionError, CanonicalNormalizationError) as exc:
         _add_issue(issues, "entities", str(exc))
         return {}
 
