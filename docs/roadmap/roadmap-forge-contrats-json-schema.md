@@ -391,7 +391,7 @@ json
 
 ---
 
-## ENTITY-CONTRACT-003 — Créer `schemas/entity.schema.json`
+## ENTITY-CONTRACT-003 — Créer `schemas/entity.schema.json` — **livré**
 
 ### Objectif
 
