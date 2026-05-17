@@ -498,6 +498,183 @@ est toujours moquée.
 
 ---
 
+## Conventions de langage des starters
+
+*Ticket de référence : STARTER-CONVENTIONS-DOC-001. Appliqué dans les starters officiels par STARTER-LANG-NORMALIZE-001.*
+
+### Principe
+
+Un starter Forge peut être francophone côté domaine : noms de tables, colonnes,
+labels d'interface, textes utilisateur. C'est le choix du domaine métier, pas
+une contrainte du framework.
+
+En revanche, le code Python exposé dans les contrôleurs, modèles et fonctions
+d'un starter doit utiliser des noms clairs, stables et cohérents — en anglais,
+conformément à l'[ADR-003](adr/003-language-convention.md).
+
+La règle ne concerne pas les noms SQL. Elle concerne les fonctions Python,
+les noms de paramètres et les clés de dictionnaire exposées au reste du code.
+
+### SQL et schéma
+
+- Les colonnes SQL d'un starter peuvent avoir des noms français ou métier
+  (`UtilisateurId`, `Login`, `PasswordHash`, `Actif`).
+- Ne pas renommer ces colonnes sans migration SQL explicite — le schéma
+  appartient au domaine applicatif, pas au framework.
+- Les requêtes SQL et les chaînes d'interpolation peuvent contenir ces noms
+  directement.
+
+```sql
+-- Autorisé dans un starter
+SELECT UtilisateurId, Login, PasswordHash, Actif
+FROM utilisateur
+WHERE Login = ?
+```
+
+### Code Python
+
+- Les fonctions Python recommandées dans un starter doivent avoir des noms
+  en anglais : `get_user_by_login`, `get_user_by_id`, `build_auth_user`.
+- Les variables intermédiaires locales peuvent rester françaises si elles sont
+  des alias courts d'un résultat SQL (`utilisateur = fetch_one(...)`).
+- Les clés de dictionnaire exposées au template ou à d'autres fonctions doivent
+  être normalisées : `{"id": ..., "login": ..., "prenom": ...}`.
+
+```python
+# Correct : noms de fonctions anglais, clés normalisées
+def get_user_by_id(user_id: int) -> dict | None:
+    row = fetch_one(GET_UTILISATEUR_PAR_ID, (user_id,))
+    if not row:
+        return None
+    return {
+        "id": row["UtilisateurId"],
+        "login": row["Login"],
+        "prenom": row.get("Prenom") or "",
+    }
+```
+
+### Labels et interface utilisateur
+
+Les textes visibles par l'utilisateur final peuvent rester entièrement en
+français, sans restriction :
+
+- Labels de formulaire : "Identifiant", "Mot de passe", "Connexion"
+- Titres de page : "Tableau de bord", "Bienvenue"
+- Messages d'erreur : "Identifiant ou mot de passe incorrect."
+
+Ce qui pose problème n'est pas le français dans l'UI, mais l'exposition de
+noms SQL métier dans les API Python.
+
+### Pont SQL → Python
+
+Le passage du résultat SQL brut vers un objet Python propre doit être
+**explicite** et **localisé dans le modèle** (`mvc/models/auth_model.py`).
+
+La fonction `build_auth_user()` est le pont recommandé pour les starters auth.
+Elle traduit un dict SQL en `AuthUser` via `normalize_auth_user()` :
+
+```python
+from core.auth import AuthUser, normalize_auth_user
+
+def build_auth_user(utilisateur: dict) -> AuthUser:
+    """Convertit un dict DB en AuthUser pour core.auth.login_user."""
+    email = utilisateur.get("Email") or utilisateur.get("Login") or ""
+    return normalize_auth_user({
+        "id": utilisateur["UtilisateurId"],
+        "email": email,
+        "password_hash": utilisateur["PasswordHash"],
+        "is_active": bool(utilisateur.get("Actif", True)),
+    })
+```
+
+Le code réel peut utiliser directement `normalize_auth_user()` si une fonction
+dédiée n'est pas justifiée — l'important est que le mapping soit isolé hors du
+contrôleur.
+
+### AuthUser et user_loader
+
+`AuthUser` est la forme Python propre attendue par l'auth canonique de Forge :
+
+- `login_user(request, auth_user)` attend un `AuthUser`.
+- `current_user(request, user_loader)` appelle un `user_loader(user_id)` pour
+  recharger l'utilisateur depuis la base.
+- `get_authenticated_user_id(request)` retourne l'identifiant stocké en session.
+
+Le contrôleur ne doit pas construire un `AuthUser` directement depuis les clés
+SQL. Cette construction appartient au modèle :
+
+```python
+# Dans le contrôleur — correct
+auth_user = build_auth_user(utilisateur)
+login_user(request, auth_user)
+
+# Dans le contrôleur — à éviter
+auth_user = AuthUser(
+    id=utilisateur["UtilisateurId"],   # clé SQL dans le contrôleur
+    email=utilisateur["Login"],
+    password_hash=utilisateur["PasswordHash"],
+    is_active=True,
+)
+```
+
+### Exemples corrects
+
+```python
+# auth_model.py — pont SQL → AuthUser dans le modèle
+def build_auth_user(row: dict) -> AuthUser:
+    return normalize_auth_user({
+        "id": row["UtilisateurId"],
+        "email": row.get("Email") or row.get("Login") or "",
+        "password_hash": row["PasswordHash"],
+        "is_active": bool(row.get("Actif", True)),
+    })
+
+# auth_controller.py — contrôleur propre
+utilisateur = get_user_by_login(login)
+if utilisateur and _check_password(password, utilisateur["PasswordHash"]):
+    auth_user = build_auth_user(utilisateur)
+    login_user(request, auth_user)
+
+# suivi_controller.py — lecture de l'utilisateur courant
+user_id = get_authenticated_user_id(request)
+utilisateur = get_user_by_id(user_id) if user_id else None
+```
+
+### Exemples à éviter
+
+```python
+# À éviter : exposition de noms SQL dans la signature d'une fonction publique
+def connecter_utilisateur(UtilisateurId, MotDePasse):
+    ...
+
+# À éviter : construction AuthUser inline dans le contrôleur
+auth_user = AuthUser(
+    id=utilisateur["UtilisateurId"],
+    email=utilisateur["Login"],
+    ...
+)
+
+# À éviter : API dépréciée du core
+from core.security.session import get_user, authenticate_session
+utilisateur = get_user(request)           # déprécié
+nouveau_id = authenticate_session(sid, u) # déprécié
+```
+
+### Ce que le core ne doit jamais absorber
+
+Le core Forge est générique. Il ne connaît pas les noms de colonnes applicatifs
+(`UtilisateurId`, `Login`, `MotDePasse`). Ces noms appartiennent au domaine du
+starter ou de l'application.
+
+Le pont doit vivre dans le starter ou dans une fonction de compatibilité
+explicitement isolée dans le modèle — jamais dans `core/auth/`, `core/security/`
+ou tout autre fichier du core.
+
+Si un starter a besoin d'un mapping spécifique, il l'écrit dans son propre
+`mvc/models/auth_model.py`. Le core ne s'adapte pas au schéma du starter.
+
+---
+
 ## Limites actuelles
 
 | Limite | État |
