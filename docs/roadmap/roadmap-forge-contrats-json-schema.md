@@ -438,7 +438,7 @@ mvc/entities/*.json
 
 ---
 
-## ENTITY-CONTRACT-004 — Créer `schemas/pivot.schema.json`
+## ENTITY-CONTRACT-004 — Créer `schemas/pivot.schema.json` — **livré**
 
 ### Objectif
 
