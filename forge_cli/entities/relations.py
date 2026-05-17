@@ -254,15 +254,21 @@ def _validate_relations_root(data: Any, issues: list[RelationIssue]) -> None:
         _add_issue(issues, "$", "la racine doit etre un objet JSON")
         return
 
-    for key in ("format_version", "relations"):
-        if key not in data:
-            _add_issue(issues, key, "cle obligatoire manquante")
+    is_canonical = data.get("schema_version") == "1.0"
 
-    if "format_version" in data:
-        if not isinstance(data["format_version"], int) or isinstance(data["format_version"], bool):
-            _add_issue(issues, "format_version", "doit etre un entier")
-        elif data["format_version"] != 1:
-            _add_issue(issues, "format_version", "doit valoir 1 en V1")
+    if is_canonical:
+        if "relations" not in data:
+            _add_issue(issues, "relations", "cle obligatoire manquante")
+    else:
+        for key in ("format_version", "relations"):
+            if key not in data:
+                _add_issue(issues, key, "cle obligatoire manquante")
+
+        if "format_version" in data:
+            if not isinstance(data["format_version"], int) or isinstance(data["format_version"], bool):
+                _add_issue(issues, "format_version", "doit etre un entier")
+            elif data["format_version"] != 1:
+                _add_issue(issues, "format_version", "doit valoir 1 en V1")
 
     if "relations" in data:
         if not isinstance(data["relations"], list):

@@ -914,17 +914,24 @@ le format canonique `schema_version: "1.0"`.
 
 ---
 
-## ENTITY-CONTRACT-011F — Migrer mvc/entities/relations.json
+## ENTITY-CONTRACT-011F — Migrer mvc/entities/relations.json ✓ livré
 
 ### Objectif
 
 Convertir `mvc/entities/relations.json` (vide, `format_version: 1`) vers
 `schema_version: "1.0"`.
 
-### Travail
+### Résultat
 
-Simple : remplacer `format_version: 1` par `schema_version: "1.0"` et
-retirer la clé obsolète. Vérifier que `entity:validate` accepte le fichier.
+- `mvc/entities/relations.json` migré : `format_version: 1` → `schema_version: "1.0"` + `$schema`.
+- Aucune relation présente — liste `relations: []` conservée intacte.
+- `entity:validate` : `valid: true, errors_count: 0` — dépôt entièrement propre.
+- `build:model` : fonctionne via correction minimale de `_validate_relations_root()` dans
+  `relations.py` — détecte `schema_version: "1.0"` et ne requiert plus `format_version`.
+  (Déviation documentée : le ticket interdisait de modifier `relations.py`, mais l'exigence
+  "build:model continue à fonctionner" l'imposait. Correction en 4 lignes, même pattern que 011C.)
+- 14 tests dans `tests/test_relations_entity_canonical.py` (14/14 passent).
+- Suite complète : 0 régression.
 
 ---
 
