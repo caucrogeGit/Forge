@@ -624,7 +624,7 @@ Supprimez ce champ. Forge génère automatiquement l’identifiant technique.
 
 ---
 
-## ENTITY-CONTRACT-008 — Ajouter la validation sémantique Python
+## ENTITY-CONTRACT-008 — Ajouter la validation sémantique Python ✓ livré
 
 ### Objectif
 
@@ -643,6 +643,12 @@ Compléter JSON Schema par des contrôles que le schéma ne peut pas garantir se
 - doublon de `many_to_many` déclaré dans les deux sens ;
 - `pivot.unique_pair` obligatoire à `true` ;
 - `pivot.fields[]` ne peut pas redéclarer `id`, `from_key` ou `to_key`.
+
+### Livraison
+
+Module `forge_cli/entities/entity_semantic_validate.py` — `SemanticError` + `validate_semantic()` — 15 contrôles.
+Intégré dans `forge entity:validate` (Passe 2 après JSON Schema).
+41 tests dans `tests/test_entity_semantic_validation.py`.
 
 ---
 

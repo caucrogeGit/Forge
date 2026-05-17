@@ -1,10 +1,9 @@
-"""Commande forge entity:validate — validation structurelle JSON Schema.
+"""Commande forge entity:validate — validation JSON Schema + sémantique.
 
-Valide les fichiers d'entités et de relations d'un projet Forge contre les
-schémas JSON canoniques définis dans le dossier schemas/ de Forge.
+Valide les fichiers d'entités et de relations d'un projet Forge en deux passes :
 
-Ce module ne fait pas de validation sémantique (cohérence des références
-entre entités, collisions de noms SQL, etc.). Cette couche viendra plus tard.
+1. Validation structurelle JSON Schema (entity.schema.json / relations.schema.json).
+2. Validation sémantique Forge (doublons, noms réservés, cohérence relationnelle).
 
 Prérequis : jsonschema >= 4.18 (pip install jsonschema).
 """
@@ -83,6 +82,8 @@ def _collect_entity_files(entities_root: Path) -> Iterator[Path]:
 
 
 def main(args: list[str] | None = None) -> None:
+    from forge_cli.entities.entity_semantic_validate import validate_semantic
+
     cwd = Path.cwd()
     entities_root = cwd / "mvc" / "entities"
 
@@ -113,8 +114,11 @@ def main(args: list[str] | None = None) -> None:
 
     valid_count = 0
     error_count = 0
+    valid_entities: list[tuple[str, dict]] = []
+    valid_relations: dict | None = None
 
-    # Validate entity files
+    # ── Passe 1 : validation structurelle JSON Schema ─────────────────────────
+
     entity_files = list(_collect_entity_files(entities_root))
     if not entity_files:
         print("Avertissement : aucun fichier d'entité trouvé dans mvc/entities/.")
@@ -129,10 +133,10 @@ def main(args: list[str] | None = None) -> None:
                 error_count += 1
                 continue
 
-            errors = list(entity_validator.iter_errors(data))
-            if errors:
+            schema_errors = list(entity_validator.iter_errors(data))
+            if schema_errors:
                 print(f"[ERREUR] {rel_path}")
-                for err in errors:
+                for err in schema_errors:
                     print(_format_error(err))
                 print("  Conseil : corrigez le fichier selon schemas/entity.schema.json.")
                 error_count += 1
@@ -140,8 +144,8 @@ def main(args: list[str] | None = None) -> None:
                 entity_name = data.get("name", rel_path.stem)
                 print(f"[OK] Entité {entity_name} valide.")
                 valid_count += 1
+                valid_entities.append((str(rel_path), data))
 
-    # Validate relations.json
     relations_file = entities_root / "relations.json"
     if not relations_file.exists():
         print("Avertissement : mvc/entities/relations.json absent (optionnel).")
@@ -158,16 +162,33 @@ def main(args: list[str] | None = None) -> None:
             data = None
 
         if data is not None:
-            errors = list(relations_validator.iter_errors(data))
-            if errors:
+            schema_errors = list(relations_validator.iter_errors(data))
+            if schema_errors:
                 print(f"[ERREUR] {rel_path}")
-                for err in errors:
+                for err in schema_errors:
                     print(_format_error(err))
                 print("  Conseil : corrigez le fichier selon schemas/relations.schema.json.")
                 error_count += 1
             else:
                 print("[OK] relations.json valide.")
                 valid_count += 1
+                valid_relations = data
+
+    # ── Passe 2 : validation sémantique Forge ────────────────────────────────
+
+    if valid_entities:
+        semantic_errors = validate_semantic(valid_entities, valid_relations)
+        if semantic_errors:
+            print()
+            print("[ERREUR] Validation sémantique")
+            for sem_err in semantic_errors:
+                print(f"  Fichier : {sem_err.source}")
+                print(f"  Chemin  : {sem_err.path}")
+                print(f"  Raison  : {sem_err.reason}")
+                if sem_err.hint:
+                    print(f"  Conseil : {sem_err.hint}")
+                print()
+            error_count += len(semantic_errors)
 
     print()
     if error_count == 0:
