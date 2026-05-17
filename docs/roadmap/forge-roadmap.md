@@ -1216,6 +1216,7 @@ du code applicatif existant.
 | Ticket | Description | État |
 |---|---|---|
 | AUTH-AUDIT-LOGGER-RESILIENCE-001 | Résilience du logger d'audit auth (best-effort, non bloquant) | **livré** |
+| SECURITY-HEADERS-DOC-LOCK-001 | Verrouillage documentation en-têtes de sécurité | **livré** |
 
 
 ## Règle de mise à jour des roadmaps

@@ -45,6 +45,53 @@ APP_CSP_NONCE_ENABLED=true
 
 ---
 
+## En-têtes de sécurité
+
+Forge applique des en-têtes HTTP de sécurité par défaut sur toutes les réponses (200, 302, 404, fichiers statiques, erreurs). Ces en-têtes sont des garde-fous par défaut — ils ne remplacent pas une configuration de déploiement complète.
+
+### Contrat actuel
+
+| En-tête | Rôle | Valeur | Limite |
+|---|---|---|---|
+| `X-Frame-Options` | Protection clickjacking | `DENY` | Complété par `frame-ancestors 'none'` en CSP |
+| `X-Content-Type-Options` | Blocage MIME sniffing | `nosniff` | — |
+| `Strict-Transport-Security` | Forcer HTTPS (HSTS) | `max-age=31536000; includeSubDomains` | Émis même en HTTP local ; la protection réelle requiert HTTPS côté reverse proxy |
+| `Referrer-Policy` | Contrôle du referrer | `strict-origin-when-cross-origin` | — |
+| `Content-Security-Policy` | Restriction des sources | Voir section CSP | Ne remplace pas une revue des templates |
+| `Permissions-Policy` | Restriction des API navigateur | `camera=(), microphone=(), geolocation=(), payment=()` | Ne couvre pas toutes les API navigateur |
+
+### CSP
+
+La valeur par défaut :
+
+```
+default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:;
+frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'
+```
+
+`unsafe-inline` et `unsafe-eval` ne sont jamais ajoutés automatiquement. Pour les scripts inline contrôlés, activer le nonce par requête (`APP_CSP_NONCE_ENABLED=true` — voir section Nonce CSP ci-dessus).
+
+### HSTS
+
+Forge émet `Strict-Transport-Security` sur toutes les réponses, y compris en HTTP local. En développement, cet en-tête est inoffensif mais techniquement redondant. **En production, HTTPS doit être terminé par Nginx** ou un reverse proxy équivalent.
+
+### Limites
+
+Ces en-têtes ne remplacent pas :
+
+- la configuration HTTPS et TLS du reverse proxy ;
+- une revue de sécurité des templates applicatifs ;
+- une politique de déploiement sécurisé complète (voir [Sécurité en production](production-security.md)).
+
+Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis sont des garde-fous raisonnables, testés et verrouillés comme contrat public (`SECURITY-HEADERS-DOC-LOCK-001`).
+
+### Ce que Forge n'émet pas encore
+
+- `Cross-Origin-Resource-Policy` et `Cross-Origin-Opener-Policy` ne sont pas émis par défaut.
+- `Permissions-Policy` ne liste pas toutes les API navigateur disponibles.
+
+---
+
 ## RBAC — documentation complète
 
 La documentation complète du RBAC Forge (rôles, permissions, décorateurs,
