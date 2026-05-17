@@ -164,9 +164,9 @@ def article_env(monkeypatch):
     form_mod   = _mod("mvc.forms.article_form",   ArticleForm=ArticleForm)
     flash_mod  = _mod("mvc.helpers.flash",         render_flash_html=lambda req: "")
     ctrl_mod   = _mod("core.mvc.controller",       BaseController=_FakeBaseController)
-    upload_mod = _mod(
-        "core.uploads",
-        save_upload=_save_upload,
+    upload_mod = _mod("core.uploads", save_upload=_save_upload)
+    forge_media_mod = _mod(
+        "forge_mvc_media",
         attach_media_to_entity=_attach,
         list_media_for_entity=_list_media,
         delete_media=_delete_media,
@@ -184,6 +184,7 @@ def article_env(monkeypatch):
     monkeypatch.setitem(sys.modules, "mvc.helpers.flash",         flash_mod)
     monkeypatch.setitem(sys.modules, "core.mvc.controller",       ctrl_mod)
     monkeypatch.setitem(sys.modules, "core.uploads",              upload_mod)
+    monkeypatch.setitem(sys.modules, "forge_mvc_media",           forge_media_mod)
 
     # 4. Générer et exécuter le contrôleur
     ctrl_code = build_controller(definition)

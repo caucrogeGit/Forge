@@ -41,12 +41,18 @@ Les briques génériques restent dans `core/uploads/` et ne bougent pas :
 
 ## Note sur les générateurs CLI
 
-Les générateurs CRUD (`forge make:crud --media`) produisent encore
-`from core.uploads import ...` pour les fonctions applicatives.
-Cela sera corrigé dans `MEDIA-CRUD-INTEGRATION-OPTIN-001` (ticket 11.4).
+À partir de `MEDIA-CRUD-INTEGRATION-OPTIN-001`, les nouveaux générateurs média
+applicatifs (`forge make:crud --media`, `forge make:public:list`, `forge make:public:show`)
+ciblent `forge_mvc_media` pour les helpers applicatifs :
 
-En attendant, les projets utilisant le module opt-in doivent importer
-directement depuis `forge_mvc_media`.
+```python
+from core.uploads import save_upload          # générique — reste dans core
+from forge_mvc_media import attach_media_to_entity, delete_media, get_cover_media, ...
+```
+
+Les anciens imports `from core.uploads import attach_media_to_entity` restent
+compatibles temporairement via les shims de compatibilité.
+Le package reste source-only et non publié sur PyPI.
 
 ## Shims de compatibilité dans core
 
@@ -61,5 +67,5 @@ Ils émettent un `DeprecationWarning` et seront supprimés dans une version futu
 | `MEDIA-CORE-BOUNDARY-AUDIT-001` | Audit de la frontière core/opt-in | livré |
 | `MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001` | Création du squelette source-only | livré |
 | `MEDIA-REPOSITORY-MOVE-001` | Déplacement du code applicatif | livré |
-| `MEDIA-CRUD-INTEGRATION-OPTIN-001` | Mise à jour des générateurs CLI | à venir |
+| `MEDIA-CRUD-INTEGRATION-OPTIN-001` | Mise à jour des générateurs CLI | livré |
 | `MEDIA-DOCS-MIGRATION-001` | Mise à jour de la documentation | à venir |

@@ -190,7 +190,7 @@ def test_list_controller_avec_cover_image_importe_get_cover_media():
     spec = build_public_list_spec(HEBERGEMENT_COVER_JSON)
     controller = build_public_list_controller(spec)
 
-    assert "from core.uploads import get_cover_media" in controller
+    assert "from forge_mvc_media import get_cover_media" in controller
 
 
 def test_list_controller_sans_media_inchange():
@@ -302,21 +302,21 @@ def test_show_controller_avec_cover_importe_get_cover_media():
     spec = build_public_list_spec(HEBERGEMENT_COVER_JSON)
     controller = build_public_show_controller(spec)
 
-    assert "from core.uploads import get_cover_media" in controller
+    assert "from forge_mvc_media import get_cover_media" in controller
 
 
 def test_show_controller_avec_gallery_importe_list_media_for_entity():
     spec = build_public_list_spec(HEBERGEMENT_GALLERY_JSON)
     controller = build_public_show_controller(spec)
 
-    assert "from core.uploads import list_media_for_entity" in controller
+    assert "from forge_mvc_media import list_media_for_entity" in controller
 
 
 def test_show_controller_avec_cover_et_gallery_importe_les_deux():
     spec = build_public_list_spec(HEBERGEMENT_ALL_MEDIA_JSON)
     controller = build_public_show_controller(spec)
 
-    assert "from core.uploads import get_cover_media, list_media_for_entity" in controller
+    assert "from forge_mvc_media import get_cover_media, list_media_for_entity" in controller
 
 
 def test_show_controller_sans_media_pas_dimport_uploads():
@@ -401,7 +401,7 @@ def test_make_public_list_avec_media_genere_controleur_complet(tmp_path):
     make_public_list("Hebergement", output_root=tmp_path)
 
     controller = _read(tmp_path, "mvc/controllers/public_hebergements_controller.py")
-    assert "from core.uploads import get_cover_media" in controller
+    assert "from forge_mvc_media import get_cover_media" in controller
     assert "_entity_id" in controller
     assert "_cover_media" in controller
 
@@ -412,7 +412,7 @@ def test_make_public_show_avec_media_genere_controleur_complet(tmp_path):
     make_public_show("Hebergement", output_root=tmp_path)
 
     controller = _read(tmp_path, "mvc/controllers/public_hebergements_controller.py")
-    assert "from core.uploads import get_cover_media" in controller
+    assert "from forge_mvc_media import get_cover_media" in controller
     assert "get_cover_media" in controller
     assert "cover_media" in controller
 

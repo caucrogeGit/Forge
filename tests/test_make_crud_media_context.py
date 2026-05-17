@@ -158,9 +158,9 @@ def _build_context_env(monkeypatch, definition, cover_media=None):
     form_mod  = _mod(f"mvc.forms.{snake}_form",  **{f"{entity}Form": ArticleForm})
     flash_mod = _mod("mvc.helpers.flash",         render_flash_html=lambda req: "")
     ctrl_mod  = _mod("core.mvc.controller",       BaseController=_FakeBaseController)
-    upload_mod = _mod(
-        "core.uploads",
-        save_upload=_save_upload,
+    upload_mod = _mod("core.uploads", save_upload=_save_upload)
+    forge_media_mod = _mod(
+        "forge_mvc_media",
         attach_media_to_entity=lambda *a, **kw: None,
         list_media_for_entity=_list_media,
         delete_media=_delete_media,
@@ -178,6 +178,7 @@ def _build_context_env(monkeypatch, definition, cover_media=None):
     monkeypatch.setitem(sys.modules, "mvc.helpers.flash",          flash_mod)
     monkeypatch.setitem(sys.modules, "core.mvc.controller",        ctrl_mod)
     monkeypatch.setitem(sys.modules, "core.uploads",               upload_mod)
+    monkeypatch.setitem(sys.modules, "forge_mvc_media",            forge_media_mod)
 
     ctrl_code = build_controller(definition)
     ctrl_ns: dict = {}

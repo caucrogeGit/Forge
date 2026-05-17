@@ -1206,8 +1206,8 @@ du code applicatif existant.
 | MEDIA-CORE-BOUNDARY-AUDIT-001 | Audit de la frontière core média / module opt-in | **livré** |
 | MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001 | Scaffold de `packages/forge-mvc-media/` | **livré** |
 | MEDIA-REPOSITORY-MOVE-001 | Déplacer `media_repository` + `media_gallery` vers `forge-mvc-media` | **livré** |
-| MEDIA-CRUD-INTEGRATION-001 | Mettre à jour les générateurs CLI pour les imports opt-in | à venir |
-| MEDIA-DOCS-UPDATE-001 | Mettre à jour `docs/media.md` et `docs/reference/api.md` | à venir |
+| MEDIA-CRUD-INTEGRATION-OPTIN-001 | Mettre à jour les générateurs CLI pour les imports opt-in | **livré** |
+| MEDIA-DOCS-MIGRATION-001 | Mettre à jour `docs/media.md` et `docs/reference/api.md` | à venir |
 
 ---
 
