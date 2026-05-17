@@ -29,6 +29,28 @@ from core.uploads.storage import (
     normalize_media_path,
 )
 
+# Re-exports de compatibilité — fonctions applicatives médias (OPTIN_MEDIA).
+# Conditionnels : disponibles si forge-mvc-media est installé, silencieux sinon.
+# Ces re-exports resteront jusqu'à MEDIA-CRUD-INTEGRATION-OPTIN-001 (ticket 11.4).
+try:
+    from forge_mvc_media.media_repository import (  # noqa: F401
+        attach_media_to_entity,
+        create_media_record,
+        delete_media,
+        delete_media_record,
+        get_media_record,
+        list_media_for_entity,
+        update_media_alt_text,
+        update_media_position,
+    )
+    from forge_mvc_media.media_gallery import (  # noqa: F401
+        get_cover_media,
+        get_media_gallery,
+        media_url,
+    )
+except ImportError:
+    pass
+
 __all__ = [
     "ALLOWED_IMAGE_EXTENSIONS",
     "ALLOWED_IMAGE_MIME_TYPES",

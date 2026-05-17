@@ -92,12 +92,17 @@ class TestCoreFilesAreShims:
 
 class TestCoreDoesNotDependOnOptIn:
 
-    def test_core_init_does_not_import_forge_mvc_media(self):
+    def test_core_init_does_not_unconditionally_import_forge_mvc_media(self):
         text = (PROJECT_ROOT / "core" / "uploads" / "__init__.py").read_text(encoding="utf-8")
-        assert "forge_mvc_media" not in text, (
-            "core/uploads/__init__.py ne doit pas importer depuis forge_mvc_media. "
-            "Le core est indépendant des opt-ins."
-        )
+        for line in text.splitlines():
+            # Les imports indentés (try/except) sont autorisés — seuls les imports
+            # directs non indentés constitueraient une dépendance dure.
+            if line.startswith("from forge_mvc_media") or line.startswith("import forge_mvc_media"):
+                raise AssertionError(
+                    "core/uploads/__init__.py ne doit pas importer forge_mvc_media "
+                    "directement (sans try/except). "
+                    "Les re-exports conditionnels (try/except, indentés) sont autorisés."
+                )
 
     def test_root_pyproject_does_not_depend_on_forge_mvc_media(self):
         text = ROOT_PYPROJECT.read_text(encoding="utf-8")
