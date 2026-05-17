@@ -28,6 +28,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from forge_cli.entities.canonical_model_normalizer import (
+    CanonicalNormalizationError,
+    normalize_canonical_entity_for_model_build,
+)
 from forge_cli.entities.relations import (
     EntityRelationsError,
 )
@@ -145,8 +149,15 @@ def make_crud(
     """Génère le scaffolding CRUD pour une entité Forge.
 
     Raises:
-        SystemExit : si l'entité est introuvable ou le JSON invalide.
+        SystemExit : si les contrats sont invalides, l'entité est introuvable ou le JSON invalide.
     """
+    from forge_cli.entities.entity_validate import collect_entity_validation_results
+    results = collect_entity_validation_results(entities_root)
+    if results is not None and results["errors"]:
+        print(out.error("Les entités Forge sont invalides."))
+        print("Conseil : lancez forge entity:validate pour obtenir le détail.")
+        raise SystemExit(1)
+
     snake = _to_snake(entity_name)
     json_path = entities_root / snake / f"{snake}.json"
 
@@ -156,8 +167,10 @@ def make_crud(
 
     try:
         raw = json.loads(json_path.read_text(encoding="utf-8"))
+        if isinstance(raw, dict) and raw.get("schema_version") == "1.0":
+            raw = normalize_canonical_entity_for_model_build(raw)
         definition = validate_entity_definition(raw, source=str(json_path))
-    except (json.JSONDecodeError, ValueError) as exc:
+    except (json.JSONDecodeError, ValueError, CanonicalNormalizationError) as exc:
         print(out.error(str(exc)))
         raise SystemExit(1)
 

@@ -968,7 +968,7 @@ Conseil : lancez forge entity:validate pour obtenir le détail.
 
 ---
 
-## ENTITY-CONTRACT-012 — Brancher la validation dans `forge make:crud`
+## ENTITY-CONTRACT-012 — Brancher la validation dans `forge make:crud` ✓ livré
 
 ### Objectif
 
@@ -981,6 +981,37 @@ Empêcher la génération CRUD depuis un contrat invalide.
 - valider les relations nécessaires ;
 - refuser les JSON invalides ;
 - ne pas refondre le CRUD.
+
+### Rapport de livraison
+
+**Flux réel identifié :**
+
+```
+forge.py → command == "make:crud" → cmd_make_crud_main()
+  → make_crud(entity_name, entities_root, output_root)
+    → [NOUVEAU] collect_entity_validation_results(entities_root)  ← garde
+    → lit entities_root/snake/snake.json
+    → [NOUVEAU] normalize_canonical_entity_for_model_build() si schema_version 1.0
+    → validate_entity_definition(raw)   ← attend format legacy normalisé
+    → _load_crud_many_to_one_relations() ← supporte déjà canonical via relations.py
+    → génère fichiers CRUD
+```
+
+**Fichiers modifiés :**
+
+- `forge_cli/entities/make_crud.py` — ajout du garde `collect_entity_validation_results()` en tête de `make_crud()` ; ajout de la normalisation canonique avant `validate_entity_definition()` (même pattern que `model.py:_load_all_entity_sources`).
+
+**Fichiers créés :**
+
+- `tests/test_make_crud_entity_validation.py` — 14 tests : projet valide génère contrôleur/modèle/formulaire, entité invalide lève SystemExit, aucun fichier généré, message court avec conseil `entity:validate`, pas de traceback Python, relations invalides bloquent, API `collect_entity_validation_results()` détaillée préservée, format `--json` inchangé.
+
+**Décision clé — normalisation canonique dans `make_crud()` :**
+
+`validate_entity_definition()` n’acceptait que le format legacy. Sans normalisation, les entités canoniques valides échouaient à l’étape 2 du flux. Ajout de 3 lignes identiques au pattern de `model.py`. Ce n’est pas une refonte — c’est la correction minimale requise pour que le cas valide canonical fonctionne.
+
+**Note :** `_load_crud_many_to_one_relations()` utilisait déjà `load_entity_definitions()` (dans `relations.py`) qui supporte canonical depuis 011B — aucun changement nécessaire pour les relations.
+
+**Résultat :** 14 tests passés.
 
 ---
 
