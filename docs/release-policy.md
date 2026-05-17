@@ -351,7 +351,7 @@ reste manuelle et délibérée.
 | `forge-mvc-workflow` | Source-only jusqu'à `1.0.0-beta.5` | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
 | `forge-mvc-stats` | Source-only jusqu'à `1.0.0-beta.5` | Publication coordonnée (`OPTIN-PYPI-PUBLISH-001`) |
 | `forge-mvc-mfa` | Non publié PyPI en `1.0` | Pre-Alpha — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant publication |
-| `forge-mvc-media` | Non documenté avant Phase 11 | Module non encore disponible |
+| `forge-mvc-media` | Source-only — squelette Phase 11 | Extraction en cours — non publié PyPI (`MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001`) |
 
 ### Règles de version
 

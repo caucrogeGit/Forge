@@ -154,6 +154,7 @@ _EXPECTED_IN_META = [
     "test_base_controller_surface_audit_001.py",
     "test_base_controller_api_doc_001.py",
     "test_media_core_boundary_audit_001.py",
+    "test_media_extract_package_scaffold_001.py",
 ]
 
 

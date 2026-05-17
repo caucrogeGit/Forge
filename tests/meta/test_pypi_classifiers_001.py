@@ -20,6 +20,7 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-workflow": "Development Status :: 4 - Beta",
     "forge-mvc-stats":    "Development Status :: 4 - Beta",
     "forge-mvc-mfa":      "Development Status :: 2 - Pre-Alpha",
+    "forge-mvc-media":    "Development Status :: 2 - Pre-Alpha",
 }
 
 

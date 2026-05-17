@@ -16,6 +16,7 @@ _OPTIN_PACKAGES = [
     "forge-mvc-rbac",
     "forge-mvc-workflow",
     "forge-mvc-stats",
+    "forge-mvc-media",
 ]
 
 
