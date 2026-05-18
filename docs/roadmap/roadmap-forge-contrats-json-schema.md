@@ -1519,15 +1519,31 @@ docs/entities/vscode-json-schema.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-008 — Documenter les limites assumées
+## ENTITY-CONTRACT-DOC-008 — Documenter les limites assumées ✓ livré
 
 ### Objectif
 
 Éviter que cette roadmap soit interprétée comme une refonte complète de Forge.
 
-### Contenu attendu
+### Page livrée
 
-Cette roadmap ne couvre pas :
+```text
+docs/entities/limites-contrats-json.md
+```
+
+### Contenu livré
+
+- JSON Schema vs validation sémantique Forge ;
+- limites de VS Code : aide à la saisie, pas de validation officielle ;
+- compatibilité legacy temporaire : support transitoire, suppression à décider ;
+- starters non migrés : limite assumée ;
+- attributs pivot et CRUD avancé : hors périmètre actuel ;
+- mapping SQL : `min`/`max` sans `CHECK`, `nullable` différent entre entité et pivot ;
+- `entity:validate` ne vérifie pas la base MariaDB réelle ;
+- générateurs protégés mais non magiques ;
+- travaux futurs possibles listés sans engagements.
+
+Cette roadmap ne couvre pas (hors périmètre permanent) :
 
 - Forge Design ;
 - un éditeur graphique ;

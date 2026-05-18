@@ -57,6 +57,7 @@ nav:
       - Types Forge vers MariaDB: entities/types-forge-mariadb.md
       - Valider les contrats JSON: entities/entity-validate.md
       - Autocomplétion VS Code: entities/vscode-json-schema.md
+      - Limites des contrats JSON: entities/limites-contrats-json.md
       - Front et CSS: front.md
       - Profils de projet: profiles.md
       - FAQ: faq.md
