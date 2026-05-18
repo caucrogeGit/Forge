@@ -17,6 +17,12 @@ from forge_cli.entities.validation import EntityDefinitionError, validate_entity
 
 ALLOWED_RELATION_TYPES = {"many_to_one", "many_to_many"}
 ALLOWED_ACTIONS = {"RESTRICT", "CASCADE", "SET NULL", "NO ACTION"}
+_CANONICAL_ON_DELETE_TO_SQL = {
+    "restrict": "RESTRICT",
+    "cascade": "CASCADE",
+    "set_null": "SET NULL",
+    "no_action": "NO ACTION",
+}
 RELATION_KEYS = {
     "name",
     "type",
@@ -173,6 +179,15 @@ def validate_relations_definition(
                         seen_pivot_tables,
                         issues,
                     )
+            elif "from" in relation and "from_entity" not in relation:
+                validated = _validate_relation_item_canonical(
+                    relation,
+                    index,
+                    entity_map,
+                    seen_names,
+                    seen_fk_names,
+                    issues,
+                )
             else:
                 validated = _validate_relation_item(
                     relation,
@@ -279,6 +294,127 @@ def _validate_relations_root(data: Any, issues: list[RelationIssue]) -> None:
                     _add_issue(issues, f"relations[{index}]", "doit etre un objet")
 
 
+def _validate_relation_item_canonical(
+    relation: dict[str, Any],
+    index: int,
+    entity_map: dict[str, dict[str, Any]],
+    seen_names: dict[str, int],
+    seen_fk_names: dict[str, int],
+    issues: list[RelationIssue],
+) -> ValidatedRelation | None:
+    """Validate a canonical many_to_one relation (schema_version 1.0) and produce a ValidatedRelation."""
+    path = f"relations[{index}]"
+
+    required_keys = {"type", "from", "to", "name", "foreign_key", "on_delete"}
+    for key in required_keys:
+        if key not in relation:
+            _add_issue(issues, f"{path}.{key}", "cle obligatoire manquante (relation canonique)")
+    if any(key not in relation for key in required_keys):
+        return None
+
+    for key in required_keys:
+        if not isinstance(relation[key], str):
+            _add_issue(issues, f"{path}.{key}", "doit etre une chaine")
+
+    relation_name = relation["name"]
+    from_entity_name = relation["from"]
+    to_entity_name = relation["to"]
+    foreign_key = relation["foreign_key"]
+    on_delete_raw = relation["on_delete"]
+
+    if not _is_sql_identifier(relation_name):
+        _add_issue(issues, f"{path}.name", "doit etre un identifiant valide")
+    if not _is_pascal_case(from_entity_name):
+        _add_issue(issues, f"{path}.from", "doit etre un nom d'entite PascalCase valide")
+    if not _is_pascal_case(to_entity_name):
+        _add_issue(issues, f"{path}.to", "doit etre un nom d'entite PascalCase valide")
+    if not _is_sql_identifier(foreign_key):
+        _add_issue(issues, f"{path}.foreign_key", "doit etre un identifiant SQL valide")
+
+    on_delete_sql = _CANONICAL_ON_DELETE_TO_SQL.get(on_delete_raw if isinstance(on_delete_raw, str) else "")
+    if on_delete_sql is None:
+        _add_issue(
+            issues,
+            f"{path}.on_delete",
+            f"valeur invalide : {on_delete_raw!r}. Valeurs attendues : {', '.join(sorted(_CANONICAL_ON_DELETE_TO_SQL))}",
+        )
+
+    if relation_name in seen_names:
+        _add_issue(
+            issues,
+            f"{path}.name",
+            f"doit etre unique (deja utilise par relations[{seen_names[relation_name]}].name)",
+        )
+    else:
+        seen_names[relation_name] = index
+
+    if foreign_key in seen_fk_names:
+        _add_issue(
+            issues,
+            f"{path}.foreign_key",
+            f"doit etre unique (deja utilise par relations[{seen_fk_names[foreign_key]}].foreign_key)",
+        )
+    else:
+        seen_fk_names[foreign_key] = index
+
+    from_entity = entity_map.get(from_entity_name)
+    if from_entity is None:
+        _add_issue(issues, path, f"l'entite {from_entity_name!r} est introuvable")
+    to_entity = entity_map.get(to_entity_name)
+    if to_entity is None:
+        _add_issue(issues, path, f"l'entite {to_entity_name!r} est introuvable")
+
+    if from_entity is None or to_entity is None or on_delete_sql is None:
+        return None
+
+    from_table = from_entity["table"]
+    to_table = to_entity["table"]
+
+    to_pk = next((f for f in to_entity["fields"] if f.get("primary_key")), None)
+    if to_pk is None:
+        _add_issue(issues, path, f"l'entite cible {to_entity_name!r} n'a pas de cle primaire")
+        return None
+
+    to_field_name = to_pk["name"]
+    to_column = to_pk["column"]
+    to_python_type = to_pk["python_type"]
+
+    from_field_match = next(
+        (f for f in from_entity["fields"] if f.get("column") == foreign_key or f.get("name") == foreign_key),
+        None,
+    )
+    if from_field_match is not None:
+        from_field_name = from_field_match["name"]
+        from_python_type = from_field_match["python_type"]
+        if from_python_type != to_python_type:
+            _add_issue(issues, path, "from et to doivent avoir des types Python compatibles")
+        if on_delete_sql == "SET NULL" and not from_field_match.get("nullable", False):
+            _add_issue(issues, f"{path}.on_delete", "SET NULL requiert un from_field nullable")
+    else:
+        from_field_name = foreign_key
+        from_python_type = to_python_type
+
+    constraint_name = f"fk_{from_table}_{foreign_key}"
+
+    return ValidatedRelation(
+        name=relation_name,
+        relation_type="many_to_one",
+        foreign_key_name=constraint_name,
+        from_entity=from_entity_name,
+        from_table=from_table,
+        from_field=from_field_name,
+        from_column=foreign_key,
+        from_python_type=from_python_type,
+        to_entity=to_entity_name,
+        to_table=to_table,
+        to_field=to_field_name,
+        to_column=to_column,
+        to_python_type=to_python_type,
+        on_delete=on_delete_sql,
+        on_update="RESTRICT",
+    )
+
+
 def _validate_relation_item(
     relation: Any,
     index: int,
@@ -289,11 +425,6 @@ def _validate_relation_item(
 ) -> ValidatedRelation | None:
     path = f"relations[{index}]"
     if not isinstance(relation, dict):
-        return None
-
-    # Canonical relation (schema_version "1.0") uses "from"/"to" instead of "from_entity"/"to_entity".
-    # JSON Schema validation (entity:validate) covers canonical semantics — skip legacy validation here.
-    if "from" in relation and "from_entity" not in relation:
         return None
 
     for key in RELATION_KEYS:

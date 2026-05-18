@@ -1081,7 +1081,7 @@ Les entités générées doivent contenir :
 
 # Bloc 4 — Relations et pivots
 
-## ENTITY-CONTRACT-015 — Verrouiller la génération `many_to_one` ✓ livré
+## ENTITY-CONTRACT-015 — Verrouiller la génération `many_to_one` ✓ livré après correctif 015-FIX
 
 ### Objectif
 
@@ -1095,6 +1095,37 @@ Garantir que `many_to_one` génère une FK claire et valide.
 - référence vers `target_table(id)` ;
 - `on_delete` contrôlé ;
 - index selon règle Forge.
+
+---
+
+## ENTITY-CONTRACT-015-FIX — Suppression du skip silencieux des relations canoniques ✓ livré
+
+### Objectif
+
+Corriger le traitement des relations `many_to_one` canoniques dans `relations.py`.
+Le ticket 015 avait introduit un `return None` silencieux pour les relations canoniques,
+empêchant la génération SQL FK.
+
+### Ce qui a été corrigé
+
+- Suppression du skip silencieux dans `_validate_relation_item()`.
+- Ajout de `_validate_relation_item_canonical()` : valide explicitement les relations
+  canoniques et retourne un `ValidatedRelation` complet.
+- Mapping `on_delete` canonique (lowercase) vers SQL : `restrict → RESTRICT`,
+  `cascade → CASCADE`, `set_null → SET NULL`, `no_action → NO ACTION`.
+- Contrainte dérivée automatiquement : `fk_{from_table}_{foreign_key}`.
+- Si la FK column n'est pas déclarée comme champ dans l'entité source,
+  la SQL FK est quand même générée (from_python_type déduit du PK cible).
+- `on_update` fixé à `RESTRICT` pour les relations canoniques (non spécifié dans le format).
+- `entity:validate` reste vert ; `build:model` ne plante pas ; legacy préservé.
+
+### Limites restantes
+
+- Ce ticket ne traite pas `many_to_many`.
+- Ce ticket ne migre pas les starters.
+- Ce ticket ne supprime pas le support legacy.
+
+**Prochain ticket recommandé : ENTITY-CONTRACT-016.**
 
 ---
 
