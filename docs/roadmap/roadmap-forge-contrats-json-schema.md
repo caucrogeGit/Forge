@@ -1252,7 +1252,7 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 - Starters non migrés.
 - Legacy non supprimé.
 
-**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-005.**
+**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-006.**
 
 ---
 
@@ -1406,32 +1406,53 @@ L'exemple SQL de la spec proposait `BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY` 
 
 ## ENTITY-CONTRACT-DOC-005 — Documenter le mapping types Forge → MariaDB
 
+**Statut : LIVRÉ**
+
+**Commit** : `docs: document Forge to MariaDB type mapping (ENTITY-CONTRACT-DOC-005)`
+
 ### Objectif
 
 Publier la table de correspondance officielle.
 
-### Page cible
+### Page livrée
 
 ```text
-docs/entities/types-mariadb.md
+docs/entities/types-forge-mariadb.md
 ```
 
-### Mapping initial
+### Mapping réel documenté (audité dans `canonical_model_normalizer.py` et `relations.py`)
 
-| Type Forge | MariaDB généré | Remarque |
+| Type Forge | SQL MariaDB réel | Note |
 |---|---|---|
-| `string` | `VARCHAR(n)` | `max_length` requis ou défaut Forge documenté |
-| `text` | `TEXT` | contenu long |
-| `integer` | `INT` | entier standard |
-| `big_integer` | `BIGINT` | gros entier |
-| `float` | `DOUBLE` | mesures, pas argent |
-| `decimal` | `DECIMAL(p,s)` | précision obligatoire |
-| `boolean` | `TINYINT(1)` | booléen MariaDB |
-| `date` | `DATE` | date |
-| `datetime` | `DATETIME` | date + heure |
-| `email` | `VARCHAR(255)` | validation applicative |
-| `password` | `VARCHAR(255)` | hash uniquement |
-| `json` | `LONGTEXT` + stratégie JSON | selon choix Forge documenté |
+| `string` | `VARCHAR(n)` | défaut 255 si `max_length` absent |
+| `text` | `TEXT` | |
+| `integer` | `INT` | |
+| `big_integer` | `BIGINT` | |
+| `float` | `DOUBLE` | |
+| `decimal` | `DECIMAL(p,s)` | `precision` et `scale` obligatoires |
+| `boolean` | `BOOLEAN` | **correction** : la roadmap indiquait `TINYINT(1)` — le code utilise `BOOLEAN` |
+| `date` | `DATE` | |
+| `datetime` | `DATETIME` | |
+| `email` | `VARCHAR(255)` | longueur fixe |
+| `password` | `VARCHAR(255)` | longueur fixe |
+| `json` | `LONGTEXT` | pas de stratégie JSON supplémentaire |
+
+### Contenu livré
+
+- principe (types Forge vs projections SQL) ;
+- table de mapping complète avec python type ;
+- champs système automatiques (id, timestamps, soft_delete) ;
+- types paramétrés (string avec max_length, decimal avec precision/scale) ;
+- contraintes courantes (required, nullable, unique, default, min/max) ;
+- divergence nullable entre `fields[]` et `pivot.fields[]` documentée ;
+- champs pivot ;
+- clés legacy interdites (sql_type, python_type, types SQL bruts…) ;
+- limites.
+
+### Garde-fous
+
+- `tests/meta/test_docs_types_forge_mariadb_001.py` (14 tests dont 12 paramétrés)
+- `mkdocs.yml` nav mis à jour (Concepts → Types Forge vers MariaDB)
 
 ---
 

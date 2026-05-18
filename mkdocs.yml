@@ -54,6 +54,7 @@ nav:
       - Schéma des entités: entities/entity-schema.md
       - Schéma des relations: entities/relations-schema.md
       - Tables pivot many-to-many: entities/pivots-many-to-many.md
+      - Types Forge vers MariaDB: entities/types-forge-mariadb.md
       - Front et CSS: front.md
       - Profils de projet: profiles.md
       - FAQ: faq.md
