@@ -1252,7 +1252,7 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 - Starters non migrés.
 - Legacy non supprimé.
 
-**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-001.**
+**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-002.**
 
 ---
 
@@ -1260,23 +1260,36 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 
 ## ENTITY-CONTRACT-DOC-001 — Documenter le rôle du JSON canonique
 
+**Statut : LIVRÉ**
+
+**Commit** : `docs: explain canonical JSON role (ENTITY-CONTRACT-DOC-001)`
+
 ### Objectif
 
 Expliquer pourquoi les fichiers JSON d’entité sont la source canonique de Forge.
 
-### Page cible
+### Page livrée
 
 ```text
-docs/entities/json-schema.md
+docs/entities/json-canonique.md
 ```
 
-### Contenu attendu
+### Contenu livré
 
-- rôle du JSON canonique ;
-- différence entre JSON canonique, JSON Schema et validateur Forge ;
-- place du SQL généré ;
-- place des modèles `_base.py` ;
+- principe central JSON canonique → entity:validate → build:model ;
+- fichiers concernés (entités, relations, schémas JSON Schema) ;
+- format canonique commenté (Article avec title et published_at) ;
+- flux Forge en ASCII art ;
+- fichiers générés vs manuels (table) ;
+- mapping types Forge → SQL ;
+- relations many_to_one et many_to_many avec pivot.fields[] ;
+- aide à la saisie VS Code ($schema) ;
 - limites assumées.
+
+### Garde-fous
+
+- `tests/meta/test_docs_entity_json_canonical_001.py` (12 tests)
+- `mkdocs.yml` nav mis à jour (Concepts → Le JSON canonique)
 
 ---
 

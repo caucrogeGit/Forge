@@ -163,6 +163,7 @@ _EXPECTED_IN_META = [
     "test_optin_pypi_names_check_001.py",
     "test_optin_pypi_publish_prepare_001.py",
     "test_version_sync_optin_extras_001.py",
+    "test_docs_entity_json_canonical_001.py",
 ]
 
 
