@@ -1223,25 +1223,36 @@ protection des clés techniques.
 - Les starters ne sont pas migrés.
 - Le support legacy reste inchangé.
 
-**Prochain ticket recommandé : ENTITY-CONTRACT-018.**
+**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-001.**
 
 ---
 
-## ENTITY-CONTRACT-018 — Tester les pivots many-to-many
+## ENTITY-CONTRACT-018 — Tests d'intégration des pivots many_to_many ✓ livré
 
 ### Objectif
 
-Ajouter des tests de non-régression sur les pivots.
+Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
+`relations.json → entity:validate → build:model → SQL pivot généré`.
 
-### Tests minimaux
+### Ce qui a été livré
 
-- pivot avec `id` généré ;
-- pivot avec `PRIMARY KEY(id)` ;
-- pivot avec `UNIQUE(from_key, to_key)` ;
-- absence de `PRIMARY KEY(from_key, to_key)` ;
-- attribut pivot généré ;
-- collision avec clé technique refusée ;
-- `unique_pair: false` refusé pour Forge 1.x.
+- `tests/test_many_to_many_pivot_integration.py` (41 tests) :
+  - Pivot minimal : CREATE TABLE, id AUTO_INCREMENT, article_id, tag_id, UNIQUE KEY, FK ×2, ON DELETE CASCADE.
+  - Pivot avec champs métier : `role VARCHAR(50) NOT NULL`, `joined_at DATETIME NULL`, FK et UNIQUE pair préservées.
+  - Collisions interdites : `id`, `from_key`, `to_key` → `EntityRelationsError` avec message stable, sans traceback.
+  - `entity:validate` CLI : retourne 0 pour pivot valide, non-nul pour collision.
+  - `build:model` / `sync_relations` : génère `relations.sql` avec le SQL attendu.
+  - Non-régression `many_to_one` canonique : ALTER TABLE préservé.
+  - Non-régression legacy M2M : PRIMARY KEY composite préservé.
+  - Coexistence M2O canonique + M2M canonique dans le même `relations.json`.
+
+### Limites restantes
+
+- CRUD avancé des champs pivot : hors périmètre.
+- Starters non migrés.
+- Legacy non supprimé.
+
+**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-001.**
 
 ---
 
