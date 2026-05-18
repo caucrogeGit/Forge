@@ -1252,7 +1252,7 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 - Starters non migrés.
 - Legacy non supprimé.
 
-**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-003.**
+**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-004.**
 
 ---
 
@@ -1330,25 +1330,37 @@ docs/entities/entity-schema.md
 
 ## ENTITY-CONTRACT-DOC-003 — Documenter `relations.schema.json`
 
+**Statut : LIVRÉ**
+
+**Commit** : `docs: document relations schema contract (ENTITY-CONTRACT-DOC-003)`
+
 ### Objectif
 
 Documenter la structure officielle de `relations.json`.
 
-### Page cible
+### Page livrée
 
 ```text
-docs/entities/relations-json.md
+docs/entities/relations-schema.md
 ```
 
-### Contenu attendu
+### Contenu livré
 
-- exemple minimal ;
-- `many_to_one` ;
-- `many_to_many` ;
-- `from`, `to`, `name`, `inverse_name` ;
-- `nullable` ;
-- `on_delete` ;
-- erreurs fréquentes.
+- rôle du schéma (forme vs sémantique, séparation entités/relations) ;
+- exemple racine minimal ;
+- propriétés racine (table) ;
+- `many_to_one` : propriétés, table, exemple complet, note sur la clé étrangère technique ;
+- `many_to_many` : propriétés, table, exemple complet avec pivot ;
+- table pivot : toutes les propriétés de `pivot.schema.json`, `id: true`, `unique_pair: true`, `fields[]` ;
+- valeurs `on_delete` (table avec comportement SQL) ;
+- clés legacy interdites (9 clés avec remplacement) ;
+- erreurs fréquentes (8 cas) ;
+- section validation (`entity:validate`, `--json`, `build:model`).
+
+### Garde-fous
+
+- `tests/meta/test_docs_relations_schema_001.py` (13 tests)
+- `mkdocs.yml` nav mis à jour (Concepts → Schéma des relations)
 
 ---
 
