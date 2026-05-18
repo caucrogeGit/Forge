@@ -1559,29 +1559,29 @@ Cette roadmap ne couvre pas (hors périmètre permanent) :
 
 # Bloc 6 — Expérience développeur et tests
 
-## ENTITY-CONTRACT-019 — Ajouter les fixtures canoniques
+## ENTITY-CONTRACT-019 — Ajouter les fixtures canoniques ✓ livré
 
 ### Objectif
 
 Créer des exemples valides et invalides utilisés par les tests.
 
-### Structure
+### Structure livrée
 
 ```text
-tests/fixtures/entity_contracts/
-├── valid/
-│   ├── article.json
-│   ├── category.json
-│   ├── tag.json
-│   └── relations.json
-└── invalid/
-    ├── field_id_forbidden.json
-    ├── unknown_type.json
-    ├── duplicate_field.json
-    ├── unknown_relation_target.json
-    ├── pivot_without_unique_pair.json
-    └── relation_set_null_not_nullable.json
+tests/fixtures/entities/canonical/
+├── article/article.json    entité riche (string, text, boolean, datetime, indexes, timestamps)
+├── category/category.json  entité simple (un champ unique)
+├── tag/tag.json            cible many_to_many simple
+├── user/user.json          fixture structurelle (entity "Account" — dossier/entité incompatibles avec build_model, réservé SQL)
+├── member/member.json      source many_to_many avec pivot.fields[]
+├── project/project.json    cible many_to_many avec pivot.fields[]
+└── relations.json          M2O (Article→Category) + M2M simple + M2M avec pivot.fields[]
 ```
+
+Tests : `tests/test_canonical_fixtures.py` (39 tests).
+
+Limite découverte : `"User"` est un mot réservé SQL/MariaDB — le dossier `user/`
+ne peut pas héberger une entité valide pour `build_model`. Documenté dans `user/user.json`.
 
 ---
 

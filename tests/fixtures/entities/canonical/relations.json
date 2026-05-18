@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../../schemas/relations.schema.json",
+  "schema_version": "1.0",
+  "relations": [
+    {
+      "type": "many_to_one",
+      "from": "Article",
+      "to": "Category",
+      "name": "category",
+      "inverse_name": "articles",
+      "foreign_key": "category_id",
+      "nullable": true,
+      "on_delete": "restrict",
+      "index": true
+    },
+    {
+      "type": "many_to_many",
+      "from": "Article",
+      "to": "Tag",
+      "name": "tags",
+      "pivot": {
+        "table": "article_tag",
+        "from_key": "article_id",
+        "to_key": "tag_id",
+        "id": true,
+        "unique_pair": true,
+        "on_delete": "cascade",
+        "fields": []
+      }
+    },
+    {
+      "type": "many_to_many",
+      "from": "Member",
+      "to": "Project",
+      "name": "projects",
+      "pivot": {
+        "table": "member_project",
+        "from_key": "member_id",
+        "to_key": "project_id",
+        "id": true,
+        "unique_pair": true,
+        "on_delete": "cascade",
+        "fields": [
+          {
+            "name": "role",
+            "type": "string",
+            "max_length": 50,
+            "required": true
+          },
+          {
+            "name": "joined_at",
+            "type": "datetime",
+            "nullable": true
+          }
+        ]
+      }
+    }
+  ]
+}

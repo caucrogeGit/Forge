@@ -1,0 +1,21 @@
+{
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Tag",
+  "table": "tags",
+  "label": "Tag",
+  "plural_label": "Tags",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "max_length": 80,
+      "required": true,
+      "unique": true
+    }
+  ],
+  "options": {
+    "timestamps": false,
+    "soft_delete": false
+  }
+}

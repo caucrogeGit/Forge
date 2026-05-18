@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Project",
+  "table": "projects",
+  "label": "Projet",
+  "plural_label": "Projets",
+  "fields": [
+    {
+      "name": "title",
+      "type": "string",
+      "max_length": 255,
+      "required": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "nullable": true
+    }
+  ],
+  "options": {
+    "timestamps": true,
+    "soft_delete": false
+  }
+}

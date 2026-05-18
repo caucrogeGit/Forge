@@ -1,0 +1,42 @@
+{
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Article",
+  "table": "articles",
+  "label": "Article",
+  "plural_label": "Articles",
+  "description": "Article de démonstration pour les fixtures canoniques.",
+  "fields": [
+    {
+      "name": "title",
+      "type": "string",
+      "max_length": 255,
+      "required": true
+    },
+    {
+      "name": "content",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "published",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "name": "published_at",
+      "type": "datetime",
+      "nullable": true
+    }
+  ],
+  "options": {
+    "timestamps": true,
+    "soft_delete": false
+  },
+  "indexes": [
+    {
+      "name": "idx_articles_title",
+      "fields": ["title"]
+    }
+  ]
+}

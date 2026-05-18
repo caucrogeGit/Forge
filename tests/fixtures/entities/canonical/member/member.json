@@ -1,0 +1,26 @@
+{
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Member",
+  "table": "members",
+  "label": "Membre",
+  "plural_label": "Membres",
+  "fields": [
+    {
+      "name": "email",
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "username",
+      "type": "string",
+      "max_length": 80,
+      "required": true
+    }
+  ],
+  "options": {
+    "timestamps": true,
+    "soft_delete": false
+  }
+}
