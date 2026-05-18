@@ -51,6 +51,7 @@ nav:
       - Positionnement: positioning.md
       - Architecture des entités: entity_architecture.md
       - Le JSON canonique: entities/json-canonique.md
+      - Schéma des entités: entities/entity-schema.md
       - Front et CSS: front.md
       - Profils de projet: profiles.md
       - FAQ: faq.md

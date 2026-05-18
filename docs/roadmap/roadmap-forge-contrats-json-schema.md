@@ -1252,7 +1252,7 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 - Starters non migrés.
 - Legacy non supprimé.
 
-**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-002.**
+**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-003.**
 
 ---
 
@@ -1295,26 +1295,36 @@ docs/entities/json-canonique.md
 
 ## ENTITY-CONTRACT-DOC-002 — Documenter `entity.schema.json`
 
+**Statut : LIVRÉ**
+
+**Commit** : `docs: document entity schema contract (ENTITY-CONTRACT-DOC-002)`
+
 ### Objectif
 
 Documenter la structure officielle d’une entité Forge.
 
-### Page cible
+### Page livrée
 
 ```text
-docs/entities/entity-json.md
+docs/entities/entity-schema.md
 ```
 
-### Contenu attendu
+### Contenu livré
 
-- exemple minimal valide ;
-- exemple complet ;
-- clés obligatoires ;
-- clés optionnelles ;
-- rôle de `schema_version` ;
-- rôle de `$schema` ;
-- règle du champ `id` automatique ;
-- règle des champs système.
+- rôle du schéma (forme vs sémantique) ;
+- exemple minimal valide commenté (Article) ;
+- propriétés racine avec table (obligatoire/optionnel/format) ;
+- `fields[]` : types Forge, clés obligatoires/optionnelles, exemples, interdits (`id`, `sql_type`, `python_type`) ;
+- `options` : `timestamps` et `soft_delete` avec effet sur la projection SQL ;
+- `indexes` : déclaratifs, validation sémantique par `entity:validate` ;
+- "Ce qui n’est plus canonique" : liste des clés legacy interdites ;
+- erreurs fréquentes (8 cas) ;
+- section validation (`entity:validate`, `--json`, `build:model`).
+
+### Garde-fous
+
+- `tests/meta/test_docs_entity_schema_001.py` (13 tests)
+- `mkdocs.yml` nav mis à jour (Concepts → Schéma des entités)
 
 ---
 
