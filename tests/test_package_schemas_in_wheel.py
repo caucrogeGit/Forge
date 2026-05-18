@@ -129,3 +129,40 @@ def test_manifest_in_exists():
 def test_manifest_in_covers_schemas():
     content = Path("MANIFEST.in").read_text(encoding="utf-8")
     assert "forge_cli/schemas" in content and "*.json" in content
+
+
+# ---------------------------------------------------------------------------
+# Anti-dérive : schemas/ ↔ forge_cli/schemas/ doivent être identiques
+# ---------------------------------------------------------------------------
+
+SCHEMA_FILENAMES = [
+    "common.schema.json",
+    "field.schema.json",
+    "entity.schema.json",
+    "pivot.schema.json",
+    "relations.schema.json",
+    "forge.schema.index.json",
+]
+
+
+@pytest.mark.parametrize("filename", SCHEMA_FILENAMES)
+def test_schema_copies_are_identical(filename):
+    """schemas/<f> et forge_cli/schemas/<f> doivent être strictement identiques.
+
+    Comparaison JSON normalisée pour tolérer les différences de formatage.
+    """
+    import json
+
+    canonical = Path("schemas") / filename
+    runtime = Path("forge_cli/schemas") / filename
+
+    assert canonical.exists(), f"schemas/{filename} absent"
+    assert runtime.exists(), f"forge_cli/schemas/{filename} absent"
+
+    canonical_obj = json.loads(canonical.read_text(encoding="utf-8"))
+    runtime_obj = json.loads(runtime.read_text(encoding="utf-8"))
+
+    assert canonical_obj == runtime_obj, (
+        f"Dérive détectée : schemas/{filename} ≠ forge_cli/schemas/{filename}\n"
+        "Mettre à jour les deux copies après toute modification de schéma."
+    )
