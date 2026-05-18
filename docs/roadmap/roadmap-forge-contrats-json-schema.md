@@ -1153,24 +1153,41 @@ métier dans l'entité source.
 - Ce ticket ne traite pas `many_to_many`.
 - Ce ticket ne migre pas les starters.
 
-**Prochain ticket recommandé : ENTITY-CONTRACT-016.**
+**Prochain ticket recommandé : ENTITY-CONTRACT-017.**
 
 ---
 
-## ENTITY-CONTRACT-016 — Verrouiller la génération `many_to_many`
+## ENTITY-CONTRACT-016 — Générer les relations `many_to_many` canoniques ✓ livré
 
 ### Objectif
 
-Garantir que `many_to_many` génère une table pivot conforme.
+Permettre à `forge make:relation` de générer des relations `many_to_many`
+avec un bloc `pivot` canonique (`id`, `unique_pair`, deux FK), et valider/générer
+le SQL correspondant.
 
-### Règles
+### Ce qui a été livré
 
-- table pivot dédiée ;
-- `id` technique ;
-- deux FK ;
-- `UNIQUE(from_key, to_key)` ;
-- aucun `PRIMARY KEY(from_key, to_key)` ;
-- attributs pivot optionnels.
+- `make_relation.py` : suppression du rejet de `many_to_many` ;
+  ajout de `_build_m2m_relation_interactively()` avec prompts pour
+  `from`, `to`, `name`, `inverse_name`, `pivot.table`, `pivot.from_key`,
+  `pivot.to_key`, `pivot.on_delete`.
+- Format généré : `{"type": "many_to_many", "from": …, "to": …, "name": …, "pivot": {"table": …, "from_key": …, "to_key": …, "id": true, "unique_pair": true, "on_delete": …, "fields": []}}`.
+- `relations.py` : ajout de `ValidatedCanonicalManyToManyRelation` (dataclass),
+  `_validate_m2m_canonical()` (validation avec résolution d'entités et contrôle
+  `on_delete` strictement minuscule), `_generate_canonical_m2m_sql()` (CREATE TABLE
+  avec `id AUTO_INCREMENT`, `UNIQUE KEY`, indexes, contraintes FK).
+- Dispatch dans `validate_relations_definition()` : M2M canonique détecté par
+  `"pivot" in relation`, legacy M2M préservé.
+- `generate_relations_sql()` : gère les trois types (`ValidatedRelation`,
+  `ValidatedCanonicalManyToManyRelation`, legacy `ValidatedManyToManyRelation`).
+- Tests : `tests/test_many_to_many_canonical_generation.py` (57 tests),
+  `tests/test_make_relation_command.py` mis à jour.
+
+### Limites restantes
+
+- `pivot.fields` non traité par le wizard (champs métier du pivot = ticket 017).
+- `make:crud` ne gère pas encore les relations M2M canoniques (ticket futur).
+- Ce ticket ne migre pas les starters.
 
 ---
 

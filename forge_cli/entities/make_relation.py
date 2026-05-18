@@ -76,21 +76,13 @@ def _prompt_relation_type(*, input_fn: Callable[[str], str] | None = None) -> st
     if input_fn is None:
         input_fn = input
     default = "many_to_one"
-    help_text = (
-        "Type de relation "
-        "[many_to_one ; many_to_many = entité pivot explicite + 2 many_to_one]"
-    )
+    allowed_display = ", ".join(sorted(ALLOWED_RELATION_TYPES))
+    help_text = f"Type de relation ({allowed_display})"
     while True:
         value = _prompt_text(help_text, default=default, input_fn=input_fn).strip().lower()
-        if value == "many_to_many":
-            print(
-                "Forge V1 ne supporte pas many_to_many directement. "
-                "Créez une entité pivot explicite, puis deux relations many_to_one."
-            )
-            continue
         if value in ALLOWED_RELATION_TYPES:
             return value
-        print("Type de relation invalide. Valeur supportée en V1 : many_to_one.")
+        print(f"Type de relation invalide. Valeurs supportées : {allowed_display}.")
 
 
 def _prompt_entity(
@@ -145,6 +137,58 @@ def _load_relations_document(path: Path) -> dict[str, Any]:
     return data
 
 
+def _build_m2m_relation_interactively(
+    entity_map: dict[str, dict[str, Any]],
+    entity_names: list[str],
+    *,
+    input_fn: Callable[[str], str] | None = None,
+) -> dict[str, Any]:
+    from_entity = _prompt_entity("Entité source", entity_names, input_fn=input_fn)
+    to_entity = _prompt_entity("Entité cible", entity_names, input_fn=input_fn)
+
+    from_snake = to_snake(from_entity)
+    to_snake_name = to_snake(to_entity)
+
+    default_name = to_snake_name + "s"
+    relation_name = _prompt_text("Nom de la relation", default=default_name, input_fn=input_fn)
+
+    inverse_name = _prompt_text(
+        "Nom inverse (côté cible, optionnel)",
+        allow_empty=True,
+        input_fn=input_fn,
+    )
+
+    default_table = f"{from_snake}_{to_snake_name}"
+    pivot_table = _prompt_text("Table pivot", default=default_table, input_fn=input_fn)
+
+    default_from_key = f"{from_snake}_id"
+    from_key = _prompt_text("Colonne source (from_key)", default=default_from_key, input_fn=input_fn)
+
+    default_to_key = f"{to_snake_name}_id"
+    to_key = _prompt_text("Colonne cible (to_key)", default=default_to_key, input_fn=input_fn)
+
+    on_delete = _prompt_action_canonical("ON DELETE pivot", default="cascade", input_fn=input_fn)
+
+    relation: dict[str, Any] = {
+        "type": "many_to_many",
+        "from": from_entity,
+        "to": to_entity,
+        "name": relation_name,
+    }
+    if inverse_name:
+        relation["inverse_name"] = inverse_name
+    relation["pivot"] = {
+        "table": pivot_table,
+        "from_key": from_key,
+        "to_key": to_key,
+        "id": True,
+        "unique_pair": True,
+        "on_delete": on_delete,
+        "fields": [],
+    }
+    return relation
+
+
 def _build_relation_interactively(
     entity_map: dict[str, dict[str, Any]],
     *,
@@ -152,6 +196,10 @@ def _build_relation_interactively(
 ) -> dict[str, Any]:
     entity_names = sorted(entity_map)
     relation_type = _prompt_relation_type(input_fn=input_fn)
+
+    if relation_type == "many_to_many":
+        return _build_m2m_relation_interactively(entity_map, entity_names, input_fn=input_fn)
+
     from_entity = _prompt_entity("Entité source (porte la FK)", entity_names, input_fn=input_fn)
     to_entity = _prompt_entity("Entité cible (porte la PK visée)", entity_names, input_fn=input_fn)
 
@@ -196,24 +244,37 @@ def _relation_summary(relation: dict[str, Any]) -> str:
     ]
     if relation.get("inverse_name"):
         lines.append(f"Inverse : {relation['inverse_name']}")
-    lines += [
-        f"Clé étrangère : {relation.get('foreign_key', '')}",
-        f"Nullable : {relation.get('nullable', True)}",
-        f"ON DELETE : {relation.get('on_delete', '')}",
-        f"Index : {relation.get('index', True)}",
-    ]
+    if relation.get("type") == "many_to_many" and isinstance(relation.get("pivot"), dict):
+        pivot = relation["pivot"]
+        lines += [
+            f"Table pivot : {pivot.get('table', '')}",
+            f"From key : {pivot.get('from_key', '')}",
+            f"To key : {pivot.get('to_key', '')}",
+            f"ON DELETE pivot : {pivot.get('on_delete', '')}",
+        ]
+    else:
+        lines += [
+            f"Clé étrangère : {relation.get('foreign_key', '')}",
+            f"Nullable : {relation.get('nullable', True)}",
+            f"ON DELETE : {relation.get('on_delete', '')}",
+            f"Index : {relation.get('index', True)}",
+        ]
     return "\n".join(lines)
 
 
 def _ensure_no_obvious_duplicates(relations: list[dict[str, Any]], relation: dict[str, Any], *, source: str) -> None:
     new_name = relation.get("name")
     new_fk = relation.get("foreign_key") or relation.get("foreign_key_name")
+    new_pivot_table = relation.get("pivot", {}).get("table") if isinstance(relation.get("pivot"), dict) else None
     for existing in relations:
         if existing.get("name") == new_name:
             raise ValueError(f"{source}: une relation nommée {new_name!r} existe déjà")
         existing_fk = existing.get("foreign_key") or existing.get("foreign_key_name")
         if new_fk and existing_fk and existing_fk == new_fk:
             raise ValueError(f"{source}: une clé étrangère nommée {new_fk!r} existe déjà")
+        existing_pivot = existing.get("pivot", {}).get("table") if isinstance(existing.get("pivot"), dict) else None
+        if new_pivot_table and existing_pivot and existing_pivot == new_pivot_table:
+            raise ValueError(f"{source}: une table pivot nommée {new_pivot_table!r} existe déjà")
         if "from" in relation and "from" in existing:
             if (
                 existing.get("type") == relation.get("type")
@@ -281,7 +342,6 @@ def main(argv: list[str] | None = None) -> None:
 
     print("[OK] Relation ajoutée dans mvc/entities/relations.json")
     print("[INFO] Lancez ensuite forge sync:relations pour régénérer mvc/entities/relations.sql.")
-    print("[INFO] En V1, un many_to_many se modélise via une entité pivot explicite et deux many_to_one.")
 
 
 if __name__ == "__main__":

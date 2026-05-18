@@ -78,6 +78,19 @@ class ValidatedRelation:
 
 
 @dataclass(frozen=True)
+class ValidatedCanonicalManyToManyRelation:
+    from_entity: str
+    from_table: str
+    to_entity: str
+    to_table: str
+    pivot_table: str
+    from_key: str
+    to_key: str
+    on_delete: str
+    relation_type: str = "many_to_many"
+
+
+@dataclass(frozen=True)
 class ValidatedManyToManyRelation:
     relation_type: str
     source: str
@@ -171,14 +184,24 @@ def validate_relations_definition(
                 continue
             rel_type = relation.get("type") if isinstance(relation.get("type"), str) else None
             if rel_type == "many_to_many":
-                validated = _validate_many_to_many_item(relation, index, issues)
-                if validated is not None:
-                    _validate_unique_pivot_table(
-                        validated,
+                if "pivot" in relation:
+                    validated = _validate_m2m_canonical(
+                        relation,
                         index,
+                        entity_map,
+                        seen_names,
                         seen_pivot_tables,
                         issues,
                     )
+                else:
+                    validated = _validate_many_to_many_item(relation, index, issues)
+                    if validated is not None:
+                        _validate_unique_pivot_table(
+                            validated,
+                            index,
+                            seen_pivot_tables,
+                            issues,
+                        )
             elif "from" in relation and "from_entity" not in relation:
                 validated = _validate_relation_item_canonical(
                     relation,
@@ -205,7 +228,7 @@ def validate_relations_definition(
     return validated_relations
 
 
-def generate_relations_sql(relations: list[ValidatedRelation | ValidatedManyToManyRelation]) -> str:
+def generate_relations_sql(relations: list[ValidatedRelation | ValidatedManyToManyRelation | ValidatedCanonicalManyToManyRelation]) -> str:
     blocks = []
     for relation in relations:
         if isinstance(relation, ValidatedRelation):
@@ -221,11 +244,156 @@ def generate_relations_sql(relations: list[ValidatedRelation | ValidatedManyToMa
                     ]
                 )
             )
+        elif isinstance(relation, ValidatedCanonicalManyToManyRelation):
+            blocks.append(_generate_canonical_m2m_sql(relation))
         else:
             blocks.append(_generate_many_to_many_sql(relation))
     if not blocks:
         return ""
     return "\n\n".join(blocks) + "\n"
+
+
+def _generate_canonical_m2m_sql(relation: ValidatedCanonicalManyToManyRelation) -> str:
+    pivot = relation.pivot_table
+    fk = relation.from_key
+    tk = relation.to_key
+    on_delete = relation.on_delete
+    return "\n".join(
+        [
+            f"CREATE TABLE IF NOT EXISTS {pivot} (",
+            "    id INT NOT NULL AUTO_INCREMENT,",
+            f"    {fk} INT NOT NULL,",
+            f"    {tk} INT NOT NULL,",
+            "    PRIMARY KEY (id),",
+            f"    UNIQUE KEY uq_{pivot} ({fk}, {tk}),",
+            f"    INDEX idx_{pivot}_{fk} ({fk}),",
+            f"    INDEX idx_{pivot}_{tk} ({tk}),",
+            f"    CONSTRAINT fk_{pivot}_{fk}",
+            f"        FOREIGN KEY ({fk})",
+            f"        REFERENCES {relation.from_table} (id)",
+            f"        ON DELETE {on_delete},",
+            f"    CONSTRAINT fk_{pivot}_{tk}",
+            f"        FOREIGN KEY ({tk})",
+            f"        REFERENCES {relation.to_table} (id)",
+            f"        ON DELETE {on_delete}",
+            ");",
+        ]
+    )
+
+
+def _validate_m2m_canonical(
+    relation: dict[str, Any],
+    index: int,
+    entity_map: dict[str, dict[str, Any]],
+    seen_names: dict[str, int],
+    seen_pivot_tables: dict[str, tuple[int, tuple]],
+    issues: list[RelationIssue],
+) -> ValidatedCanonicalManyToManyRelation | None:
+    path = f"relations[{index}]"
+
+    for key in ("type", "from", "to", "name", "pivot"):
+        if key not in relation:
+            _add_issue(issues, f"{path}.{key}", "cle obligatoire manquante (relation canonique many_to_many)")
+    if any(key not in relation for key in ("type", "from", "to", "name", "pivot")):
+        return None
+
+    for key in ("from", "to", "name"):
+        if not isinstance(relation[key], str):
+            _add_issue(issues, f"{path}.{key}", "doit etre une chaine")
+
+    relation_name = relation["name"]
+    from_entity_name = relation["from"]
+    to_entity_name = relation["to"]
+
+    if not _is_sql_identifier(relation_name):
+        _add_issue(issues, f"{path}.name", "doit etre un identifiant valide")
+    if not _is_pascal_case(from_entity_name):
+        _add_issue(issues, f"{path}.from", "doit etre un nom d'entite PascalCase valide")
+    if not _is_pascal_case(to_entity_name):
+        _add_issue(issues, f"{path}.to", "doit etre un nom d'entite PascalCase valide")
+
+    if relation_name in seen_names:
+        _add_issue(
+            issues,
+            f"{path}.name",
+            f"doit etre unique (deja utilise par relations[{seen_names[relation_name]}].name)",
+        )
+    else:
+        seen_names[relation_name] = index
+
+    pivot = relation["pivot"]
+    if not isinstance(pivot, dict):
+        _add_issue(issues, f"{path}.pivot", "doit etre un objet")
+        return None
+
+    for key in ("table", "from_key", "to_key"):
+        if key not in pivot:
+            _add_issue(issues, f"{path}.pivot.{key}", "cle obligatoire manquante")
+
+    if pivot.get("id") is not True:
+        _add_issue(issues, f"{path}.pivot.id", "doit valoir true")
+    if pivot.get("unique_pair") is not True:
+        _add_issue(issues, f"{path}.pivot.unique_pair", "doit valoir true")
+
+    pivot_table = pivot.get("table", "")
+    from_key = pivot.get("from_key", "")
+    to_key = pivot.get("to_key", "")
+
+    if not isinstance(pivot_table, str) or not _is_sql_identifier(pivot_table):
+        _add_issue(issues, f"{path}.pivot.table", "doit etre un identifiant SQL valide")
+        pivot_table = ""
+    if not isinstance(from_key, str) or not _is_sql_identifier(from_key):
+        _add_issue(issues, f"{path}.pivot.from_key", "doit etre un identifiant SQL valide")
+        from_key = ""
+    if not isinstance(to_key, str) or not _is_sql_identifier(to_key):
+        _add_issue(issues, f"{path}.pivot.to_key", "doit etre un identifiant SQL valide")
+        to_key = ""
+
+    if from_key and to_key and from_key == to_key:
+        _add_issue(issues, path, "pivot.from_key et pivot.to_key doivent etre differents")
+
+    on_delete_raw = pivot.get("on_delete", "cascade")
+    on_delete_sql = _CANONICAL_ON_DELETE_TO_SQL.get(on_delete_raw if isinstance(on_delete_raw, str) else "")
+    if on_delete_sql is None:
+        _add_issue(
+            issues,
+            f"{path}.pivot.on_delete",
+            f"valeur invalide : {on_delete_raw!r}. Valeurs attendues : {', '.join(sorted(_CANONICAL_ON_DELETE_TO_SQL))}",
+        )
+
+    if pivot_table:
+        if pivot_table in seen_pivot_tables:
+            prev_index, _ = seen_pivot_tables[pivot_table]
+            _add_issue(
+                issues,
+                f"{path}.pivot.table",
+                f"table pivot deja utilisee par relations[{prev_index}]",
+            )
+        else:
+            seen_pivot_tables[pivot_table] = (index, (pivot_table,))
+
+    from_entity = entity_map.get(from_entity_name)
+    if from_entity is None:
+        _add_issue(issues, path, f"l'entite {from_entity_name!r} est introuvable")
+    to_entity = entity_map.get(to_entity_name)
+    if to_entity is None:
+        _add_issue(issues, path, f"l'entite {to_entity_name!r} est introuvable")
+
+    if from_entity is None or to_entity is None or on_delete_sql is None:
+        return None
+    if not pivot_table or not from_key or not to_key or from_key == to_key:
+        return None
+
+    return ValidatedCanonicalManyToManyRelation(
+        from_entity=from_entity_name,
+        from_table=from_entity["table"],
+        to_entity=to_entity_name,
+        to_table=to_entity["table"],
+        pivot_table=pivot_table,
+        from_key=from_key,
+        to_key=to_key,
+        on_delete=on_delete_sql,
+    )
 
 
 def _generate_many_to_many_sql(relation: ValidatedManyToManyRelation) -> str:

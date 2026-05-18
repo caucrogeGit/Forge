@@ -8,15 +8,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from forge_cli.entities.crud.relations_loader import _load_crud_many_to_one_relations
 from forge_cli.entities.make_crud import (
     MakeCrudResult,
     build_controller,
     build_form,
     make_crud,
-    _to_snake,
 )
 
 

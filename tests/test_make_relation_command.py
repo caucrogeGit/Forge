@@ -230,31 +230,44 @@ def test_make_relation_rejects_obvious_duplicate(monkeypatch: pytest.MonkeyPatch
         make_relation.main([])
 
 
-def test_make_relation_explains_many_to_many_is_not_directly_supported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys):
+def test_make_relation_many_to_many_writes_canonical_relation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys):
     entities_dir = _configure_roots(monkeypatch, tmp_path)
     _write_entity(entities_dir, "contact", _contact())
-    _write_entity(entities_dir, "contact_groupe", _contact_groupe())
+    _write_entity(entities_dir, "groupe", _groupe())
 
     answers = iter(
         [
-            "many_to_many", # rejected
-            "",             # type (many_to_one)
-            "ContactGroupe",
-            "Contact",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "n",            # cancel
+            "many_to_many", # type
+            "Contact",      # from entity
+            "Groupe",       # to entity
+            "",             # name (default: "groupes")
+            "",             # inverse_name (empty)
+            "",             # pivot table (default: "contact_groupe")
+            "",             # from_key (default: "contact_id")
+            "",             # to_key (default: "groupe_id")
+            "",             # on_delete (default: "cascade")
+            "o",            # confirm
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
 
-    with pytest.raises(SystemExit, match="0"):
-        make_relation.main([])
+    make_relation.main([])
 
+    relations_json = json.loads((entities_dir / "relations.json").read_text(encoding="utf-8"))
     output = capsys.readouterr().out
-    assert "ne supporte pas many_to_many directement" in output
-    assert "Aucune écriture effectuée." in output
+
+    assert relations_json["schema_version"] == "1.0"
+    assert len(relations_json["relations"]) == 1
+    relation = relations_json["relations"][0]
+    assert relation["type"] == "many_to_many"
+    assert relation["from"] == "Contact"
+    assert relation["to"] == "Groupe"
+    assert relation["name"] == "groupes"
+    assert relation["pivot"]["table"] == "contact_groupe"
+    assert relation["pivot"]["from_key"] == "contact_id"
+    assert relation["pivot"]["to_key"] == "groupe_id"
+    assert relation["pivot"]["id"] is True
+    assert relation["pivot"]["unique_pair"] is True
+    assert relation["pivot"]["on_delete"] == "cascade"
+    assert "Résumé avant écriture" in output
+    assert "forge sync:relations" in output
