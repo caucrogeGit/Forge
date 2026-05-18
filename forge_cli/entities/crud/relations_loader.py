@@ -65,13 +65,16 @@ def _load_crud_many_to_one_relations(
 
         target = entity_map[relation.to_entity]
         label_field = _first_relation_label_field(target)
-        source_field = current_fields[relation.from_field]
+        source_field = current_fields.get(relation.from_field)
+        # For canonical relations, the FK column may not be declared as an entity field.
+        # Fall back to relation.from_column (= foreign_key for canonical).
+        field_column = source_field["column"] if source_field is not None else relation.from_column
         target_snake = _to_snake(relation.to_entity)
         field_name = relation.from_field
         crud_relations.append(
             CrudManyToOneRelation(
                 field_name=field_name,
-                field_column=source_field["column"],
+                field_column=field_column,
                 target_entity=relation.to_entity,
                 target_table=relation.to_table,
                 target_pk_column=relation.to_column,

@@ -1124,6 +1124,34 @@ empêchant la génération SQL FK.
 - Ce ticket ne traite pas `many_to_many`.
 - Ce ticket ne migre pas les starters.
 - Ce ticket ne supprime pas le support legacy.
+- La chaîne CRUD pouvait lever un `KeyError` si la FK n'était pas déclarée comme champ
+  dans l'entité source — corrigé par `ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O`.
+
+---
+
+## ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O — `make:crud` compatible avec `many_to_one` canonique sans FK déclarée ✓ livré
+
+### Objectif
+
+Corriger `relations_loader.py` pour que `make:crud` fonctionne avec une relation
+`many_to_one` canonique même si la clé étrangère n'est pas déclarée comme champ
+métier dans l'entité source.
+
+### Ce qui a été corrigé
+
+- Remplacement de `source_field = current_fields[relation.from_field]` par
+  `source_field = current_fields.get(relation.from_field)` avec fallback sur
+  `relation.from_column` (= valeur de `foreign_key` pour les relations canoniques).
+- Le contexte CRUD (`CrudManyToOneRelation`) est correctement produit avec
+  `field_column = foreign_key` quand le champ FK n'est pas déclaré dans l'entité.
+- Legacy many_to_one préservé : si le champ est déclaré, `source_field["column"]` est utilisé.
+
+### Limites restantes
+
+- Si la FK n'est pas déclarée comme champ dans l'entité, `build_form` ne génère pas
+  de `RelationField` pour cette FK (comportement attendu — FK technique invisible du formulaire).
+- Ce ticket ne traite pas `many_to_many`.
+- Ce ticket ne migre pas les starters.
 
 **Prochain ticket recommandé : ENTITY-CONTRACT-016.**
 
