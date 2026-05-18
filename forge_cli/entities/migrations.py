@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from forge_cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
 from forge_cli.entities.db_apply import _split_sql_statements
 from forge_cli.entities.make_entity import _sql_default_literal, to_snake, validate_entity_name
 from forge_cli.entities.validation import validate_entity_definition
@@ -347,6 +348,8 @@ def load_entity_definition(entity_name: str, *, project_root: Path | None = None
     root = project_root or Path.cwd()
     json_path = entity_json_file_path(entity_name, project_root=root)
     data = json.loads(json_path.read_text(encoding="utf-8"))
+    if isinstance(data, dict) and data.get("schema_version") == "1.0":
+        data = normalize_canonical_entity_for_model_build(data)
     return validate_entity_definition(data, source=str(json_path))
 
 
@@ -497,6 +500,16 @@ def main(argv: list[str] | None = None) -> None:
         raise SystemExit(1)
 
 
+def _assert_migration_contracts_valid(entities_root: Path) -> None:
+    """Vérifie les contrats JSON Schema avant génération/comparaison. Dégradation douce si jsonschema absent."""
+    from forge_cli.entities.entity_validate import collect_entity_validation_results
+    results = collect_entity_validation_results(entities_root)
+    if results is not None and results["errors"]:
+        print("[ERREUR] Les entités Forge sont invalides.")
+        print("Conseil : lancez forge entity:validate pour obtenir le détail.")
+        raise SystemExit(1)
+
+
 def _run_status_command() -> None:
     report = get_migration_status()
     print("[OK] Statut des migrations.")
@@ -531,6 +544,8 @@ def _run_make_command(args: list[str]) -> None:
         from_diff = args[3]
     elif len(args) == 3 and args[2] == "--from-entities":
         from_entities = True
+    if from_diff is not None:
+        _assert_migration_contracts_valid(Path.cwd() / "mvc" / "entities")
     try:
         path = make_migration_file(
             name,
@@ -545,6 +560,7 @@ def _run_make_command(args: list[str]) -> None:
 
 
 def _run_diff_command(args: list[str]) -> None:
+    _assert_migration_contracts_valid(Path.cwd() / "mvc" / "entities")
     report = diff_entity_schema(args[2])
     print(f"[OK] Diff de schéma pour l’entité {report.entity}.")
     print()

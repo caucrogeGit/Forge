@@ -1015,13 +1015,13 @@ forge.py → command == "make:crud" → cmd_make_crud_main()
 
 ---
 
-## ENTITY-CONTRACT-013 — Brancher la validation dans les migrations
+## ENTITY-CONTRACT-013 — Brancher la validation dans les migrations ✓ livré
 
 ### Objectif
 
 Sécuriser les commandes qui déduisent ou appliquent du SQL depuis les entités.
 
-### Commandes concernées
+### Commandes concernées (spec initiale)
 
 ```text
 forge migration:make
@@ -1032,6 +1032,31 @@ forge db:apply
 ### Règle
 
 Aucune migration générée depuis un contrat invalide.
+
+### Rapport de livraison
+
+**Audit des commandes — décisions :**
+
+| Commande | Lit JSON entité | Garde branché | Justification |
+|---|---|---|---|
+| `migration:status` | Non | Non | Lit `migrations/*.sql` uniquement |
+| `migration:apply` | Non | Non | Applique `migrations/*.sql` existants |
+| `migration:make <nom>` | Non | Non | Template vide, aucune entité |
+| `migration:make --from-entity` | Non | Non | Lit le `.sql` pré-généré |
+| `migration:make --from-entities` | Non | Non | Lit les `.sql` pré-générés |
+| `migration:make --from-diff <E>` | **Oui** | **Oui** | Lit JSON via `load_entity_definition()` |
+| `migration:diff --entity <E>` | **Oui** | **Oui** | Lit JSON via `load_entity_definition()` |
+| `db:apply` | Oui (via `check_model`) | Non | `check_model` déjà protège ; commande SQL, pas de génération |
+
+**Fichiers modifiés :**
+
+- `forge_cli/entities/migrations.py` — ajout `normalize_canonical_entity_for_model_build` dans `load_entity_definition()` (normalisation canonical) ; ajout `_assert_migration_contracts_valid()` ; appels dans `_run_diff_command()` et `_run_make_command()` quand `from_diff is not None`.
+
+**Fichiers créés :**
+
+- `tests/test_migration_entity_validation.py` — 14 tests : commandes protégées + entité invalide → SystemExit, message court, conseil `entity:validate`, aucun fichier généré, pas de traceback ; commandes non protégées (`migration:make` blank) non bloquées ; `collect_entity_validation_results()` et `--json` préservés.
+
+**Résultat :** 14 tests passés.
 
 ---
 
