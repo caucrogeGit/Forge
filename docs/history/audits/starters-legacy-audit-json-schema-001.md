@@ -5,6 +5,8 @@
 **Auteur** : Forge (audit automatique post-roadmap ENTITY-CONTRACT)  
 **Périmètre** : `forge_cli/starters/data/` — tous les starters distribués avec la CLI
 
+**Mise à jour** : 2026-05-18 — `contact-simple` migré par STARTERS-MIGRATE-001.
+
 ---
 
 ## 1. Résumé exécutif
@@ -18,10 +20,10 @@ Aucun starter n'a encore migré vers le format canonique (schema_version: "1.0")
 | Starters audités | 6 |
 | Starters avec fichiers entité/relation | 5 |
 | Starters sans entité (controllers-only) | 1 (`auth-mfa`) |
-| Fichiers entité `.json` (legacy) | 12 |
+| Fichiers entité `.json` (legacy) | 11 (12 à l'audit initial) |
 | Fichiers relation `.json` (legacy) | 3 |
-| Fichiers en format canonique | 0 |
-| Taux de migration | 0 % |
+| Fichiers en format canonique | 1 (`contact-simple/contact.json`) |
+| Taux de migration | 8 % (1/12 fichiers entité) |
 
 ---
 

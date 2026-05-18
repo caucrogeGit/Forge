@@ -139,7 +139,8 @@ class TestStarter1Crud:
         path = self.root / "mvc" / "entities" / "contact" / "contact.json"
         assert path.exists()
         data = json.loads(path.read_text(encoding="utf-8"))
-        assert data["entity"] == "Contact"
+        assert data.get("name") == "Contact"
+        assert data.get("schema_version") == "1.0"
 
     def test_entity_sql_exists(self):
         assert (self.root / "mvc" / "entities" / "contact" / "contact.sql").exists()
