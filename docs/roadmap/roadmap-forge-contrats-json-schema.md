@@ -1252,7 +1252,7 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 - Starters non migrés.
 - Legacy non supprimé.
 
-**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-004.**
+**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-005.**
 
 ---
 
@@ -1366,25 +1366,41 @@ docs/entities/relations-schema.md
 
 ## ENTITY-CONTRACT-DOC-004 — Documenter les tables pivot many-to-many
 
+**Statut : LIVRÉ**
+
+**Commit** : `docs: document many-to-many pivot tables (ENTITY-CONTRACT-DOC-004)`
+
 ### Objectif
 
 Documenter explicitement la décision Forge sur les pivots.
 
-### Page cible
+### Page livrée
 
 ```text
-docs/entities/pivot-tables.md
+docs/entities/pivots-many-to-many.md
 ```
 
-### Contenu attendu
+### Contenu livré
 
-- pourquoi la table pivot a un `id` technique ;
-- pourquoi on utilise `UNIQUE(from_key, to_key)` ;
-- pourquoi on refuse `PRIMARY KEY(from_key, to_key)` ;
-- comment ajouter des attributs pivot ;
-- exemples SQL ;
-- exemples JSON ;
-- limites assumées.
+- rôle d'une table pivot (liaison, générée, non-entité) ;
+- exemple minimal sans attribut (`fields: []`) ;
+- exemple avec attributs métier (`role`, `joined_at`) ;
+- table des propriétés du pivot ;
+- justification de l'`id` technique (extensibilité, homogénéité, références, évolution) ;
+- justification de `unique_pair: true` (contrainte UNIQUE, coexistence avec id) ;
+- `pivot.fields[]` : types Forge, exemples d'usages, règles ;
+- noms réservés (`id`, `from_key`, `to_key`) avec code d'erreur `FORGE_PIVOT_RESERVED_FIELD` ;
+- SQL généré réel pour pivot minimal et pivot avec attributs ;
+- limites actuelles (CRUD avancé, starters legacy).
+
+### Note d'audit
+
+L'exemple SQL de la spec proposait `BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY` — la projection réelle de Forge utilise `INT NOT NULL AUTO_INCREMENT` avec `PRIMARY KEY (id)` séparé. La documentation reflète la réalité du générateur.
+
+### Garde-fous
+
+- `tests/meta/test_docs_pivot_tables_001.py` (12 tests)
+- `mkdocs.yml` nav mis à jour (Concepts → Tables pivot many-to-many)
 
 ---
 

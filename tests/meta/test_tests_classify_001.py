@@ -166,6 +166,7 @@ _EXPECTED_IN_META = [
     "test_docs_entity_json_canonical_001.py",
     "test_docs_entity_schema_001.py",
     "test_docs_relations_schema_001.py",
+    "test_docs_pivot_tables_001.py",
 ]
 
 

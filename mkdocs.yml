@@ -53,6 +53,7 @@ nav:
       - Le JSON canonique: entities/json-canonique.md
       - Schéma des entités: entities/entity-schema.md
       - Schéma des relations: entities/relations-schema.md
+      - Tables pivot many-to-many: entities/pivots-many-to-many.md
       - Front et CSS: front.md
       - Profils de projet: profiles.md
       - FAQ: faq.md
