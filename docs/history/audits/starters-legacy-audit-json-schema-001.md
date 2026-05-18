@@ -9,6 +9,7 @@
 **Mise à jour** : 2026-05-18 — `utilisateurs-auth` migré par STARTERS-MIGRATE-002.
 **Mise à jour** : 2026-05-18 — `carnet-contacts` migré par STARTERS-MIGRATE-003.
 **Mise à jour** : 2026-05-18 — `suivi-comportement-eleves` migré par STARTERS-MIGRATE-004.
+**Mise à jour** : 2026-05-18 — `communes-sejours` migré par STARTERS-MIGRATE-005. Tous les starters avec entités/relations sont désormais en format canonique.
 
 ---
 
@@ -23,10 +24,10 @@ Aucun starter n'a encore migré vers le format canonique (schema_version: "1.0")
 | Starters audités | 6 |
 | Starters avec fichiers entité/relation | 5 |
 | Starters sans entité (controllers-only) | 1 (`auth-mfa`) |
-| Fichiers entité `.json` (legacy) | 4 (12 à l'audit initial) |
-| Fichiers relation `.json` (legacy) | 1 (3 à l'audit initial) |
-| Fichiers en format canonique | 8 entités + 2 relations |
-| Taux de migration | 67 % entités (8/12), 67 % relations (2/3) |
+| Fichiers entité `.json` (legacy) | 0 (12 à l'audit initial) |
+| Fichiers relation `.json` (legacy) | 0 (3 à l'audit initial) |
+| Fichiers en format canonique | 12 entités + 3 relations |
+| Taux de migration | 100 % entités (12/12), 100 % relations (3/3) |
 
 ---
 

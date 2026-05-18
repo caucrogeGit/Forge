@@ -1,49 +1,15 @@
 {
-  "format_version": 1,
-  "entity": "Proprietaire",
+  "$schema": "../../../../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Proprietaire",
   "table": "proprietaire",
   "description": "Propriétaire ou gestionnaire d'un hébergement",
   "fields": [
-    {
-      "name": "id",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
-    },
-    {
-      "name": "nom",
-      "sql_type": "VARCHAR(100)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 100
-      }
-    },
-    {
-      "name": "email",
-      "sql_type": "VARCHAR(120)",
-      "unique": true,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 120
-      }
-    },
-    {
-      "name": "telephone",
-      "sql_type": "VARCHAR(20)",
-      "nullable": true,
-      "constraints": {
-        "max_length": 20
-      }
-    },
-    {
-      "name": "created_at",
-      "sql_type": "DATETIME",
-      "nullable": true
-    },
-    {
-      "name": "updated_at",
-      "sql_type": "DATETIME",
-      "nullable": true
-    }
-  ]
+    { "name": "nom",        "type": "string",   "max_length": 100, "nullable": false },
+    { "name": "email",      "type": "string",   "max_length": 120, "unique": true, "nullable": false },
+    { "name": "telephone",  "type": "string",   "max_length": 20,  "nullable": true },
+    { "name": "created_at", "type": "datetime", "nullable": true },
+    { "name": "updated_at", "type": "datetime", "nullable": true }
+  ],
+  "options": { "timestamps": false, "soft_delete": false }
 }

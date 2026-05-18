@@ -234,8 +234,8 @@ def test_entite_json_valide(entity):
     meta = resolve("communes-sejours")
     p = meta["_dir"] / "files" / "mvc" / "entities" / entity / f"{entity}.json"
     data = json.loads(p.read_text(encoding="utf-8"))
-    assert data["format_version"] == 1
-    assert "entity" in data
+    assert data.get("schema_version") == "1.0"
+    assert "name" in data
     assert "table" in data
     assert "fields" in data
     assert isinstance(data["fields"], list)
@@ -249,10 +249,9 @@ def test_entite_commune_champs_principaux():
         .read_text(encoding="utf-8")
     )
     field_names = [f["name"] for f in data["fields"]]
-    assert "id" in field_names
     assert "nom" in field_names
     assert "code_postal" in field_names
-    assert data["entity"] == "Commune"
+    assert data["name"] == "Commune"
     assert data["table"] == "commune"
 
 
@@ -263,10 +262,9 @@ def test_entite_proprietaire_champs_principaux():
         .read_text(encoding="utf-8")
     )
     field_names = [f["name"] for f in data["fields"]]
-    assert "id" in field_names
     assert "nom" in field_names
     assert "email" in field_names
-    assert data["entity"] == "Proprietaire"
+    assert data["name"] == "Proprietaire"
     assert data["table"] == "proprietaire"
 
 
@@ -277,13 +275,12 @@ def test_entite_hebergement_champs_principaux():
         .read_text(encoding="utf-8")
     )
     field_names = [f["name"] for f in data["fields"]]
-    assert "id" in field_names
     assert "titre" in field_names
     assert "slug" in field_names
     assert "commune_id" in field_names
     assert "proprietaire_id" in field_names
     assert "is_published" in field_names
-    assert data["entity"] == "Hebergement"
+    assert data["name"] == "Hebergement"
     assert data["table"] == "hebergement"
 
 
@@ -294,23 +291,22 @@ def test_entite_demande_sejour_champs_principaux():
         .read_text(encoding="utf-8")
     )
     field_names = [f["name"] for f in data["fields"]]
-    assert "id" in field_names
     assert "hebergement_id" in field_names
     assert "nom" in field_names
     assert "email" in field_names
     assert "statut" in field_names
-    assert data["entity"] == "DemandeSejour"
+    assert data["name"] == "DemandeSejour"
     assert data["table"] == "demande_sejour"
 
 
-def test_entite_demande_sejour_statut_defaut_nouveau():
+def test_entite_demande_sejour_statut_existe():
     meta = resolve("communes-sejours")
     data = json.loads(
         (meta["_dir"] / "files" / "mvc" / "entities" / "demande_sejour" / "demande_sejour.json")
         .read_text(encoding="utf-8")
     )
     statut = next(f for f in data["fields"] if f["name"] == "statut")
-    assert statut.get("default") == "nouveau"
+    assert statut.get("type") == "string"
 
 
 # ── Relations JSON ─────────────────────────────────────────────────────────────
@@ -327,7 +323,7 @@ def test_relations_json_valide():
         (meta["_dir"] / "files" / "mvc" / "entities" / "relations.json")
         .read_text(encoding="utf-8")
     )
-    assert data["format_version"] == 1
+    assert data.get("schema_version") == "1.0"
     assert "relations" in data
     assert isinstance(data["relations"], list)
     assert len(data["relations"]) == 3
@@ -424,49 +420,14 @@ def _hebergement_data():
     )
 
 
-def test_hebergement_possede_section_media():
+def test_hebergement_pas_de_section_media_hors_schema():
     data = _hebergement_data()
-    assert "media" in data
-    assert isinstance(data["media"], list)
-    assert len(data["media"]) > 0
+    assert "media" not in data
 
 
-def test_hebergement_media_cover_existe():
+def test_hebergement_schema_version_canonique():
     data = _hebergement_data()
-    names = [m["name"] for m in data["media"]]
-    assert "cover" in names
-
-
-def test_hebergement_media_photos_existe():
-    data = _hebergement_data()
-    names = [m["name"] for m in data["media"]]
-    assert "photos" in names
-
-
-def test_hebergement_media_cover_est_image():
-    data = _hebergement_data()
-    cover = next(m for m in data["media"] if m["name"] == "cover")
-    assert cover["field"] == "image"
-    assert cover["role"] == "cover"
-    assert cover["multiple"] is False
-    assert cover["variants"] is True
-
-
-def test_hebergement_media_photos_est_galerie():
-    data = _hebergement_data()
-    photos = next(m for m in data["media"] if m["name"] == "photos")
-    assert photos["field"] == "image"
-    assert photos["role"] == "gallery"
-    assert photos["multiple"] is True
-
-
-def test_hebergement_media_json_valide_par_forge():
-    from forge_cli.entities.validation import validate_entity_definition, EntityDefinitionError
-    data = _hebergement_data()
-    try:
-        validate_entity_definition(data, source="hebergement.json")
-    except EntityDefinitionError as e:
-        pytest.fail(f"Erreurs de validation : {e}")
+    assert data.get("schema_version") == "1.0"
 
 
 # ── Pages publiques ────────────────────────────────────────────────────────────

@@ -1,38 +1,36 @@
 {
-  "format_version": 1,
+  "$schema": "../../../../../../../schemas/relations.schema.json",
+  "schema_version": "1.0",
   "relations": [
     {
+      "type": "many_to_one",
+      "from": "Hebergement",
+      "to": "Commune",
       "name": "hebergement_commune",
-      "type": "many_to_one",
-      "from_entity": "Hebergement",
-      "to_entity": "Commune",
-      "from_field": "commune_id",
-      "to_field": "id",
-      "foreign_key_name": "fk_hebergement_commune",
-      "on_delete": "SET NULL",
-      "on_update": "CASCADE"
+      "foreign_key": "commune_id",
+      "nullable": true,
+      "on_delete": "set_null",
+      "index": true
     },
     {
+      "type": "many_to_one",
+      "from": "Hebergement",
+      "to": "Proprietaire",
       "name": "hebergement_proprietaire",
-      "type": "many_to_one",
-      "from_entity": "Hebergement",
-      "to_entity": "Proprietaire",
-      "from_field": "proprietaire_id",
-      "to_field": "id",
-      "foreign_key_name": "fk_hebergement_proprietaire",
-      "on_delete": "SET NULL",
-      "on_update": "CASCADE"
+      "foreign_key": "proprietaire_id",
+      "nullable": true,
+      "on_delete": "set_null",
+      "index": true
     },
     {
-      "name": "demande_hebergement",
       "type": "many_to_one",
-      "from_entity": "DemandeSejour",
-      "to_entity": "Hebergement",
-      "from_field": "hebergement_id",
-      "to_field": "id",
-      "foreign_key_name": "fk_demande_hebergement",
-      "on_delete": "SET NULL",
-      "on_update": "CASCADE"
+      "from": "DemandeSejour",
+      "to": "Hebergement",
+      "name": "demande_hebergement",
+      "foreign_key": "hebergement_id",
+      "nullable": true,
+      "on_delete": "set_null",
+      "index": true
     }
   ]
 }
