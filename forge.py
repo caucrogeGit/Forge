@@ -610,6 +610,11 @@ def main() -> None:
         cmd_project_audit()
         return
 
+    if command == "schema:list":
+        from forge_cli.schemas.schema_list import schema_list_main
+        schema_list_main(args[1:])
+        return
+
     cli_fail(
         f"commande inconnue : «{command}».",
         hint="lancez «forge help» pour afficher les commandes disponibles.",

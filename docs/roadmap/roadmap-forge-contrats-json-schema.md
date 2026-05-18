@@ -1614,11 +1614,23 @@ Tout exemple JSON important présent dans la documentation doit exister comme fi
 
 ---
 
-## ENTITY-CONTRACT-021 — Ajouter `forge schema:list`
+## ENTITY-CONTRACT-021 — Ajouter `forge schema:list` ✓ livré
 
 ### Objectif
 
 Lister les schémas disponibles.
+
+### Ce qui a été livré
+
+- `forge_cli/schemas/__init__.py` + `forge_cli/schemas/schema_list.py` — module `schema:list`.
+- Lit `schemas/forge.schema.index.json` (registre local), affiche nom, chemin et statut.
+- Sortie humaine : liste alignée avec `OK` / `MANQUANT` + total.
+- Option `--json` : sortie machine avec `valid`, `registry`, `schema_version`, `count`, `schemas[]`.
+- Gestion d'erreurs : registre absent, JSON invalide, clé `schemas` manquante, fichier manquant.
+- Exit 1 si le registre est illisible ou si au moins un schéma est manquant.
+- `forge.py` : dispatch `schema:list` ajouté.
+- `forge_cli/help.py` : section "Schémas JSON" ajoutée.
+- `tests/test_schema_list_command.py` (34 tests).
 
 ### Exemple
 
@@ -1629,18 +1641,16 @@ forge schema:list
 Sortie :
 
 ```text
-Schémas Forge disponibles :
+Schémas JSON Forge disponibles :
 
-- common      schemas/common.schema.json
-- field       schemas/field.schema.json
-- entity      schemas/entity.schema.json
-- pivot       schemas/pivot.schema.json
-- relations   schemas/relations.schema.json
+  - common       schemas/common.schema.json       OK
+  - field        schemas/field.schema.json        OK
+  - entity       schemas/entity.schema.json       OK
+  - pivot        schemas/pivot.schema.json        OK
+  - relations    schemas/relations.schema.json    OK
+
+Total : 5 schéma(s)
 ```
-
-### Priorité
-
-Optionnel. À faire seulement si le socle principal est stable.
 
 ---
 

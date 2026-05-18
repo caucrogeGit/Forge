@@ -40,6 +40,9 @@ Base de données
   migration:make      Crée une nouvelle migration SQL.
   migration:diff      Génère un diff SQL entre entité et base.
 
+Schémas JSON
+  schema:list        Liste les schémas JSON Forge disponibles localement.
+
 Starters et modules
   starter:list        Liste les starter apps disponibles.
   starter:build       Génère un starter app dans le projet.
