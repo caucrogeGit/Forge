@@ -337,3 +337,41 @@ Ces traces confirment que les starters legacy sont incompatibles avec `entity:va
 - `forge new` clone `media.json` depuis GitHub — hors scope du présent audit (fichier externe au dépôt Forge).
 - La migration effective des fichiers est réservée aux tickets STARTERS-MIGRATE-001 à STARTERS-MIGRATE-005.
 - La section `media` de `hebergement.json` est documentée mais sa migration est hors scope immédiat.
+
+---
+
+## 8. Clôture de la migration des starters
+
+**Ticket de clôture** : STARTERS-MIGRATE-CLOSE-001
+**Date de clôture** : 2026-05-18
+**Statut** : terminée
+
+### 8.1 État final
+
+Tous les starters contenant des entités ou relations sont migrés vers le format JSON canonique (`schema_version: "1.0"`).
+
+| Starter | Entités | Relations | Format final | entity:validate | build:model | Statut |
+|---|---:|---:|---|---|---|---|
+| `contact-simple` | 1 | 0 | canonique | OK | OK | migré |
+| `utilisateurs-auth` | 1 | 0 | canonique | OK | OK | migré |
+| `carnet-contacts` | 2 | 1 | canonique | OK | OK | migré |
+| `suivi-comportement-eleves` | 4 | 2 | canonique | OK | OK | migré |
+| `communes-sejours` | 4 | 3 | canonique | OK | non applicable (skeleton) | migré |
+| `auth-mfa` | 0 | 0 | sans entité | N/A | N/A | hors périmètre |
+
+### 8.2 Traces legacy
+
+Aucune trace de clé legacy (`format_version`, `sql_type`, `primary_key`, `auto_increment`, `from_entity`, `to_entity`, `foreign_key_name`) ne subsiste dans les fichiers d'entité ou de relation des starters distribués.
+
+### 8.3 Décisions prises lors de la migration
+
+- **PK non standard `utilisateur_id`** : normalisée en `id` canonique (PK implicite) dans `utilisateurs-auth` et `suivi-comportement-eleves`.
+- **Alias `column` (`ContactId`, `VilleId`)** : supprimé de `carnet-contacts` ; les colonnes canoniques (`Id`, `EleveId`, etc.) sont dérivées automatiquement par `_column_from_name`.
+- **Section `media` de `hebergement.json`** : supprimée (Option B — hors schéma canonique, non fonctionnelle dans le starter skeleton). Support media canonique à traiter séparément si besoin.
+
+### 8.4 Limites restantes
+
+- Le support legacy du core (`format_version: 1`) n'est **pas supprimé** — il reste fonctionnel pour les projets existants. Sa dépréciation nécessite une décision séparée (`LEGACY-POLICY-001`).
+- La section `media` de `communes-sejours/hebergement.json` a été supprimée. Un ticket `MEDIA-CONTRACT-001` est proposé si un support media canonique dans le format entité est requis.
+- `auth-mfa` ne contient pas d'entités à migrer — hors périmètre de la campagne.
+- La publication PyPI reste hors périmètre de cette campagne de migration.
