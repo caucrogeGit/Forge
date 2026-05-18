@@ -23,16 +23,19 @@ from forge_cli.entities.validation import (
     validate_entity_definition,
 )
 
-SUPPORTED_SQL_BASE_TYPES = (
-    "INT",
-    "BIGINT",
-    "VARCHAR",
-    "CHAR",
-    "TEXT",
-    "DATE",
-    "DATETIME",
-    "BOOLEAN",
-    "DECIMAL",
+FORGE_TYPES = (
+    "string",
+    "text",
+    "integer",
+    "big_integer",
+    "float",
+    "decimal",
+    "boolean",
+    "date",
+    "datetime",
+    "email",
+    "password",
+    "json",
 )
 
 
@@ -60,70 +63,15 @@ def validate_entity_name(name: str) -> str:
     return name[0].upper() + name[1:]
 
 
-def build_entity_json(entity_name: str) -> dict:
+def build_entity_json_canonical(entity_name: str, table: str | None = None) -> dict:
     return {
-        "entity": entity_name,
+        "schema_version": "1.0",
+        "name": entity_name,
+        "table": table or to_snake(entity_name),
         "fields": [
-            {
-                "name": "id",
-                "sql_type": "INT",
-                "primary_key": True,
-                "auto_increment": True,
-            }
+            {"name": "title", "type": "string", "max_length": 255, "required": True},
         ],
-    }
-
-
-def _sql_family_for_prompt(sql_type: str) -> str | None:
-    normalized = sql_type.strip().upper()
-    if normalized == "DATE":
-        return "date"
-    if normalized in {"DATETIME", "TIMESTAMP"}:
-        return "datetime"
-    if normalized in {"BOOL", "BOOLEAN"}:
-        return "bool"
-    for prefix in ("INT", "BIGINT", "SMALLINT", "TINYINT", "MEDIUMINT"):
-        if normalized.startswith(prefix):
-            return "int"
-    for prefix in ("FLOAT", "DOUBLE", "REAL", "DECIMAL", "NUMERIC"):
-        if normalized.startswith(prefix):
-            return "float"
-    for prefix in ("CHAR", "VARCHAR", "TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT"):
-        if normalized.startswith(prefix):
-            return "str"
-    return None
-
-
-def _is_supported_sql_type(sql_type: str) -> bool:
-    normalized = sql_type.strip().upper()
-    if normalized.startswith("VARCHAR(") and normalized.endswith(")"):
-        return True
-    if normalized.startswith("CHAR(") and normalized.endswith(")"):
-        return True
-    if normalized.startswith("DECIMAL(") and normalized.endswith(")"):
-        return True
-    return normalized in {
-        "INT",
-        "BIGINT",
-        "SMALLINT",
-        "TINYINT",
-        "MEDIUMINT",
-        "FLOAT",
-        "DOUBLE",
-        "REAL",
-        "DECIMAL",
-        "NUMERIC",
-        "VARCHAR",
-        "CHAR",
-        "TEXT",
-        "TINYTEXT",
-        "MEDIUMTEXT",
-        "LONGTEXT",
-        "DATE",
-        "DATETIME",
-        "TIMESTAMP",
-        "BOOL",
-        "BOOLEAN",
+        "options": {"timestamps": False, "soft_delete": False},
     }
 
 
@@ -221,102 +169,46 @@ def _prompt_optional_number(
         return number
 
 
-def _prompt_sql_type(
+def _prompt_forge_type(
     label: str,
     *,
-    default: str | None = None,
     input_fn: Callable[[str], str] | None = None,
 ) -> str:
     help_label = (
         f"{label} "
-        "[INT, BIGINT, VARCHAR, CHAR, TEXT, DATE, DATETIME, BOOLEAN, DECIMAL]"
+        "[string, text, integer, big_integer, float, decimal, "
+        "boolean, date, datetime, email, password, json]"
     )
     while True:
-        raw_value = _prompt_text(help_label, default=default, input_fn=input_fn)
-        normalized = raw_value.strip().upper()
-
-        if not _is_supported_sql_type(normalized):
-            print(
-                "Type SQL invalide. Valeurs courantes attendues : "
-                "INT, BIGINT, VARCHAR, CHAR, TEXT, DATE, DATETIME, BOOLEAN, DECIMAL."
-            )
-            continue
-
-        if "(" in normalized and normalized.endswith(")"):
+        raw_value = _prompt_text(help_label, input_fn=input_fn)
+        normalized = raw_value.strip().lower()
+        if normalized in FORGE_TYPES:
             return normalized
-
-        if normalized in {"VARCHAR", "CHAR"}:
-            length = _prompt_required_int("Longueur SQL", input_fn=input_fn)
-            return f"{normalized}({length})"
-
-        if normalized == "DECIMAL":
-            precision = _prompt_required_int("Precision SQL", input_fn=input_fn)
-            scale = _prompt_required_int("Echelle SQL", input_fn=input_fn)
-            return f"DECIMAL({precision},{scale})"
-
-        return normalized
+        print(
+            "Type invalide. Valeurs attendues : "
+            "string, text, integer, big_integer, float, decimal, "
+            "boolean, date, datetime, email, password, json."
+        )
 
 
-def _build_primary_field(entity_name: str, *, input_fn: Callable[[str], str] | None = None) -> dict:
-    default_name = "id"
-    field_name = _prompt_text("Nom du champ primaire", default=default_name, input_fn=input_fn)
-    sql_type = _prompt_sql_type("Type SQL du champ primaire", default="INT", input_fn=input_fn)
-
-    field = {
-        "name": field_name,
-        "sql_type": sql_type,
-        "primary_key": True,
-    }
-
-    if _sql_family_for_prompt(sql_type) == "int":
-        if _prompt_yes_no("Auto increment ?", default=True, input_fn=input_fn):
-            field["auto_increment"] = True
-    return field
-
-
-def _build_additional_field(*, input_fn: Callable[[str], str] | None = None) -> dict:
+def _build_canonical_field(*, input_fn: Callable[[str], str] | None = None) -> dict:
     field_name = _prompt_text("Nom du champ", input_fn=input_fn)
-    sql_type = _prompt_sql_type("Type SQL", input_fn=input_fn)
-    field_family = _sql_family_for_prompt(sql_type)
+    forge_type = _prompt_forge_type("Type Forge", input_fn=input_fn)
 
-    field: dict[str, object] = {
-        "name": field_name,
-        "sql_type": sql_type,
-    }
+    field: dict[str, object] = {"name": field_name, "type": forge_type}
 
-    if _prompt_yes_no("Autoriser NULL ?", default=False, input_fn=input_fn):
-        field["nullable"] = True
-
-    if _prompt_yes_no("Champ unique ?", default=False, input_fn=input_fn):
-        field["unique"] = True
-
-    constraints: dict[str, object] = {}
-    if field_family == "str":
-        if not field.get("nullable") and _prompt_yes_no("Ajouter not_empty ?", default=False, input_fn=input_fn):
-            constraints["not_empty"] = True
-        min_length = _prompt_optional_int("min_length", input_fn=input_fn)
-        if min_length is not None:
-            constraints["min_length"] = min_length
+    if forge_type == "string":
         max_length = _prompt_optional_int("max_length", input_fn=input_fn)
         if max_length is not None:
-            constraints["max_length"] = max_length
-        pattern = _prompt_text(
-            "Validation regex [vide = aucune, ex: ^[A-Z]+$ ou ^[^@]+@[^@]+\\.[^@]+$]",
-            allow_empty=True,
-            input_fn=input_fn,
-        )
-        if pattern:
-            constraints["pattern"] = pattern
-    elif field_family in {"int", "float"}:
-        min_value = _prompt_optional_number("min_value", input_fn=input_fn)
-        if min_value is not None:
-            constraints["min_value"] = min_value
-        max_value = _prompt_optional_number("max_value", input_fn=input_fn)
-        if max_value is not None:
-            constraints["max_value"] = max_value
+            field["max_length"] = max_length
+    elif forge_type == "decimal":
+        field["precision"] = _prompt_required_int("Précision", input_fn=input_fn)
+        field["scale"] = _prompt_required_int("Échelle", input_fn=input_fn)
 
-    if constraints:
-        field["constraints"] = constraints
+    field["required"] = _prompt_yes_no("Champ requis ?", default=True, input_fn=input_fn)
+    field["nullable"] = _prompt_yes_no("Autoriser NULL ?", default=False, input_fn=input_fn)
+    field["unique"] = _prompt_yes_no("Champ unique ?", default=False, input_fn=input_fn)
+
     return field
 
 
@@ -340,41 +232,52 @@ def build_entity_json_interactively(
         "Nom de la table (Entrée = convention par défaut)",
         allow_empty=True,
         input_fn=input_fn,
+    ) or default_table
+
+    fields = [_build_canonical_field(input_fn=input_fn)]
+    while _prompt_yes_no("Ajouter un autre champ ?", default=False, input_fn=input_fn):
+        fields.append(_build_canonical_field(input_fn=input_fn))
+
+    timestamps = _prompt_yes_no(
+        "Activer timestamps (created_at / updated_at) ?", default=False, input_fn=input_fn
+    )
+    soft_delete = _prompt_yes_no(
+        "Activer soft_delete (deleted_at) ?", default=False, input_fn=input_fn
     )
 
-    fields = [_build_primary_field(entity_name, input_fn=input_fn)]
-    while _prompt_yes_no("Ajouter un autre champ ?", default=False, input_fn=input_fn):
-        fields.append(_build_additional_field(input_fn=input_fn))
-
-    entity_definition: dict[str, object] = {
-        "entity": entity_name,
+    return {
+        "schema_version": "1.0",
+        "name": entity_name,
+        "table": table_name,
         "fields": fields,
+        "options": {"timestamps": timestamps, "soft_delete": soft_delete},
     }
-    if table_name and table_name != default_table:
-        entity_definition["table"] = table_name
-    return entity_definition
 
 
 def _render_entity_summary(entity_definition: dict) -> str:
     lines = [
-        f"Entité : {entity_definition['entity']}",
-        f"Table : {entity_definition.get('table', to_snake(entity_definition['entity']))}",
+        f"Entité : {entity_definition['name']}",
+        f"Table : {entity_definition['table']}",
         "Champs :",
     ]
     for field in entity_definition["fields"]:
-        parts = [field["name"], field["sql_type"]]
-        if field.get("primary_key"):
-            parts.append("PK")
-        if field.get("auto_increment"):
-            parts.append("AUTO_INCREMENT")
+        parts = [field["name"], field["type"]]
+        if field.get("required"):
+            parts.append("required")
         if field.get("nullable"):
             parts.append("NULL")
         if field.get("unique"):
             parts.append("UNIQUE")
-        constraints = field.get("constraints")
-        if constraints:
-            parts.append(f"constraints={constraints}")
+        if field.get("max_length") is not None:
+            parts.append(f"max_length={field['max_length']}")
+        if field.get("precision") is not None:
+            parts.append(f"precision={field['precision']},scale={field.get('scale')}")
         lines.append(f"- {' | '.join(str(part) for part in parts)}")
+    opts = entity_definition.get("options", {})
+    if opts.get("timestamps"):
+        lines.append("Options : timestamps")
+    if opts.get("soft_delete"):
+        lines.append("Options : soft_delete")
     return "\n".join(lines)
 
 
@@ -407,7 +310,7 @@ def _write_entity_files(
     *,
     root: Path | None = None,
 ) -> tuple[str, str, list[Path], list[Path]]:
-    entity_name = entity_definition["entity"]
+    entity_name = entity_definition.get("name") or entity_definition.get("entity", "")
     snake = to_snake(entity_name)
     root = root or project_root()
     target_entities_dir = entities_dir(root)
@@ -775,20 +678,22 @@ def main(argv: list[str] | None = None) -> None:
                 validated_name = validate_entity_name(entity_name_arg)
             entity_definition = build_entity_json_interactively(validated_name)
         else:
-            entity_definition = build_entity_json(validate_entity_name(entity_name_arg or ""))
+            entity_definition = build_entity_json_canonical(validate_entity_name(entity_name_arg or ""))
     except ValueError as exc:
         print(out.error(str(exc)))
         raise SystemExit(1)
 
-    entity_name = entity_definition["entity"]
+    entity_name = entity_definition["name"]
     snake = to_snake(entity_name)
     root = project_root()
     entity_dir = entities_dir(root) / snake
     json_source = str(entity_dir / f"{snake}.json")
 
     try:
-        normalized_definition = validate_entity_definition(entity_definition, source=json_source)
-    except EntityDefinitionError as exc:
+        from forge_cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
+        legacy = normalize_canonical_entity_for_model_build(entity_definition)
+        normalized_definition = validate_entity_definition(legacy, source=json_source)
+    except (EntityDefinitionError, ValueError) as exc:
         print(out.error(str(exc)))
         raise SystemExit(1)
 

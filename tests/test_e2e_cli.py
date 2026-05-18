@@ -109,7 +109,7 @@ class TestEntityCreated:
         data = json.loads(
             (self._dir(built_project) / f"{_ENTITY_SNAKE}.json").read_text(encoding="utf-8")
         )
-        assert data["entity"] == _ENTITY_NAME
+        assert data["name"] == _ENTITY_NAME
 
     def test_entity_sql_exists(self, built_project):
         assert (self._dir(built_project) / f"{_ENTITY_SNAKE}.sql").exists()

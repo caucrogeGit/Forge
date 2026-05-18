@@ -82,7 +82,10 @@ def sync_entity(entities_root: Path, entity_name: str) -> tuple[Path, Path]:
     if not json_path.exists():
         raise ValueError(f"JSON d'entite introuvable : {json_path.as_posix()}")
 
-    definition = validate_entity_definition(_read_json_file(json_path), source=str(json_path))
+    raw_data = _read_json_file(json_path)
+    if isinstance(raw_data, dict) and raw_data.get("schema_version") == "1.0":
+        raw_data = normalize_canonical_entity_for_model_build(raw_data)
+    definition = validate_entity_definition(raw_data, source=str(json_path))
 
     sql_path = entity_dir / f"{snake}.sql"
     base_path = entity_dir / f"{snake}_base.py"

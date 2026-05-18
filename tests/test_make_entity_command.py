@@ -19,15 +19,11 @@ def test_make_entity_no_input_preserves_scriptable_mode(monkeypatch: pytest.Monk
     output = capsys.readouterr().out
 
     assert entity_json == {
-        "entity": "Contact",
-        "fields": [
-            {
-                "name": "id",
-                "sql_type": "INT",
-                "primary_key": True,
-                "auto_increment": True,
-            }
-        ],
+        "schema_version": "1.0",
+        "name": "Contact",
+        "table": "contact",
+        "fields": [{"name": "title", "type": "string", "max_length": 255, "required": True}],
+        "options": {"timestamps": False, "soft_delete": False},
     }
     assert "Résumé avant écriture" not in output
     assert "modifier mvc/entities/contact/contact.json manuellement" in output
@@ -41,26 +37,21 @@ def test_make_entity_uses_current_working_directory(monkeypatch: pytest.MonkeyPa
     assert (tmp_path / "mvc" / "entities" / "contact" / "contact.json").exists()
 
 
-def test_make_entity_interactive_builds_short_author_json(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys):
+def test_make_entity_interactive_builds_canonical_author_json(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys):
     _configure_cli_roots(monkeypatch, tmp_path)
     answers = iter(
         [
-            "",
-            "",
-            "",
-            "",
-            "o",
-            "nom",
-            "VARCHAR",
-            "100",
-            "n",
-            "n",
-            "o",
-            "",
-            "100",
-            "",
-            "n",
-            "o",
+            "",       # table name (default: contact)
+            "nom",    # first field name
+            "string", # forge type
+            "100",    # max_length
+            "",       # required? (default: yes)
+            "n",      # nullable? (no)
+            "n",      # unique? (no)
+            "n",      # add another field?
+            "n",      # timestamps?
+            "n",      # soft_delete?
+            "o",      # confirm write?
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
@@ -71,49 +62,40 @@ def test_make_entity_interactive_builds_short_author_json(monkeypatch: pytest.Mo
     output = capsys.readouterr().out
 
     assert entity_json == {
-        "entity": "Contact",
+        "schema_version": "1.0",
+        "name": "Contact",
+        "table": "contact",
         "fields": [
             {
-                "name": "id",
-                "sql_type": "INT",
-                "primary_key": True,
-                "auto_increment": True,
-            },
-            {
                 "name": "nom",
-                "sql_type": "VARCHAR(100)",
-                "constraints": {
-                    "not_empty": True,
-                    "max_length": 100,
-                },
+                "type": "string",
+                "max_length": 100,
+                "required": True,
+                "nullable": False,
+                "unique": False,
             },
         ],
+        "options": {"timestamps": False, "soft_delete": False},
     }
     assert "Résumé avant écriture" in output
-    assert '"entity": "Contact"' in output
+    assert '"name": "Contact"' in output
     assert "modifier mvc/entities/contact/contact.json manuellement" in output
 
 
-def test_make_entity_interactive_builds_char_sql_type(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+def test_make_entity_interactive_builds_integer_field(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     _configure_cli_roots(monkeypatch, tmp_path)
     answers = iter(
         [
-            "",
-            "",
-            "",
-            "",
-            "o",
-            "code",
-            "CHAR",
-            "10",
-            "n",
-            "n",
-            "o",
-            "",
-            "10",
-            "",
-            "n",
-            "o",
+            "",         # table name
+            "quantite", # field name
+            "integer",  # forge type
+            "",         # required? (yes)
+            "n",        # nullable?
+            "n",        # unique?
+            "n",        # add another field?
+            "n",        # timestamps?
+            "n",        # soft_delete?
+            "o",        # confirm write?
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
@@ -121,28 +103,26 @@ def test_make_entity_interactive_builds_char_sql_type(monkeypatch: pytest.Monkey
     make_entity.main(["Contact"])
 
     entity_json = json.loads((tmp_path / "mvc" / "entities" / "contact" / "contact.json").read_text(encoding="utf-8"))
-    assert entity_json["fields"][1]["sql_type"] == "CHAR(10)"
+    assert entity_json["fields"][0]["type"] == "integer"
+    assert entity_json["fields"][0]["name"] == "quantite"
 
 
-def test_make_entity_interactive_builds_decimal_sql_type(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+def test_make_entity_interactive_builds_decimal_field(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     _configure_cli_roots(monkeypatch, tmp_path)
     answers = iter(
         [
-            "",
-            "",
-            "",
-            "",
-            "o",
-            "montant_ttc",
-            "DECIMAL",
-            "10",
-            "2",
-            "n",
-            "n",
-            "",
-            "",
-            "n",
-            "o",
+            "",            # table name
+            "montant_ttc", # field name
+            "decimal",     # forge type
+            "10",          # precision
+            "2",           # scale
+            "",            # required? (yes)
+            "n",           # nullable?
+            "n",           # unique?
+            "n",           # add another field?
+            "n",           # timestamps?
+            "n",           # soft_delete?
+            "o",           # confirm write?
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
@@ -150,24 +130,25 @@ def test_make_entity_interactive_builds_decimal_sql_type(monkeypatch: pytest.Mon
     make_entity.main(["Contact"])
 
     entity_json = json.loads((tmp_path / "mvc" / "entities" / "contact" / "contact.json").read_text(encoding="utf-8"))
-    assert entity_json["fields"][1]["sql_type"] == "DECIMAL(10,2)"
+    assert entity_json["fields"][0]["type"] == "decimal"
+    assert entity_json["fields"][0]["precision"] == 10
+    assert entity_json["fields"][0]["scale"] == 2
 
 
-def test_make_entity_interactive_keeps_simple_sql_type(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+def test_make_entity_interactive_builds_date_nullable_field(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     _configure_cli_roots(monkeypatch, tmp_path)
     answers = iter(
         [
-            "",
-            "",
-            "",
-            "",
-            "o",
-            "date_naissance",
-            "DATE",
-            "o",
-            "n",
-            "n",
-            "o",
+            "",               # table name
+            "date_naissance", # field name
+            "date",           # forge type
+            "n",              # required? (no)
+            "o",              # nullable? (yes)
+            "n",              # unique?
+            "n",              # add another field?
+            "n",              # timestamps?
+            "n",              # soft_delete?
+            "o",              # confirm write?
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
@@ -175,31 +156,27 @@ def test_make_entity_interactive_keeps_simple_sql_type(monkeypatch: pytest.Monke
     make_entity.main(["Contact"])
 
     entity_json = json.loads((tmp_path / "mvc" / "entities" / "contact" / "contact.json").read_text(encoding="utf-8"))
-    assert entity_json["fields"][1]["sql_type"] == "DATE"
-    assert entity_json["fields"][1]["nullable"] is True
+    assert entity_json["fields"][0]["type"] == "date"
+    assert entity_json["fields"][0]["nullable"] is True
 
 
-def test_make_entity_interactive_reprompts_on_invalid_sql_type(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys):
+def test_make_entity_interactive_reprompts_on_invalid_forge_type(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys):
     _configure_cli_roots(monkeypatch, tmp_path)
     answers = iter(
         [
-            "",
-            "",
-            "",
-            "",
-            "o",
-            "nom",
-            "foo",
-            "varchar",
-            "60",
-            "n",
-            "n",
-            "o",
-            "",
-            "60",
-            "",
-            "n",
-            "o",
+            "",        # table name
+            "nom",     # field name
+            "foo",     # invalid forge type
+            "varchar", # still invalid
+            "string",  # valid
+            "60",      # max_length
+            "",        # required? (yes)
+            "n",       # nullable?
+            "n",       # unique?
+            "n",       # add another field?
+            "n",       # timestamps?
+            "n",       # soft_delete?
+            "o",       # confirm write?
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
@@ -209,21 +186,26 @@ def test_make_entity_interactive_reprompts_on_invalid_sql_type(monkeypatch: pyte
     entity_json = json.loads((tmp_path / "mvc" / "entities" / "contact" / "contact.json").read_text(encoding="utf-8"))
     output = capsys.readouterr().out
 
-    assert entity_json["fields"][1]["sql_type"] == "VARCHAR(60)"
-    assert "Type SQL invalide." in output
+    assert entity_json["fields"][0]["type"] == "string"
+    assert "Type invalide." in output
 
 
 def test_make_entity_interactive_can_ask_for_entity_name(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     _configure_cli_roots(monkeypatch, tmp_path)
     answers = iter(
         [
-            "Contact",
-            "",
-            "",
-            "",
-            "",
-            "n",
-            "o",
+            "Contact",  # entity name (prompted when not passed as arg)
+            "",         # table name
+            "titre",    # first field name
+            "string",   # forge type
+            "",         # max_length (none)
+            "",         # required? (yes)
+            "n",        # nullable?
+            "n",        # unique?
+            "n",        # add another field?
+            "n",        # timestamps?
+            "n",        # soft_delete?
+            "o",        # confirm write?
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
@@ -231,5 +213,5 @@ def test_make_entity_interactive_can_ask_for_entity_name(monkeypatch: pytest.Mon
     make_entity.main([])
 
     entity_json = json.loads((tmp_path / "mvc" / "entities" / "contact" / "contact.json").read_text(encoding="utf-8"))
-    assert entity_json["entity"] == "Contact"
-    assert entity_json["fields"][0]["name"] == "id"
+    assert entity_json["name"] == "Contact"
+    assert entity_json["fields"][0]["name"] == "titre"

@@ -1060,7 +1060,7 @@ Aucune migration générée depuis un contrat invalide.
 
 ---
 
-## ENTITY-CONTRACT-014 — Adapter les générateurs d’entités
+## ENTITY-CONTRACT-014 — Adapter les générateurs d’entités ✓ livré
 
 ### Objectif
 
