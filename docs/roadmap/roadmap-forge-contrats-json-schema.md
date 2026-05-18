@@ -1820,7 +1820,6 @@ Chacun nécessite un ticket séparé.
 | `min`/`max` sans `CHECK` SQL correspondant | non traité |
 | CRUD avancé des attributs `pivot.fields[]` | hors périmètre de cette roadmap |
 | Fichier `.vscode/settings.json` prêt à l’emploi non généré | documenté, ticket DX à créer |
-| PyPI opt-ins différés : `forge-mvc-mfa`, `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` | blocage 429 Too Many Requests — différé |
 
 ---
 
@@ -1833,7 +1832,6 @@ Ces éléments ne sont pas des engagements. Ils constituent des pistes pour les 
 - Ticket de correction nullable entre `fields[]` et `pivot.fields[]`.
 - Ticket CRUD avancé `pivot.fields[]`.
 - Ticket DX `.vscode/settings.json` généré automatiquement.
-- Reprise de la publication PyPI des opt-ins après fin du blocage 429.
 
 ---
 
