@@ -6,6 +6,7 @@
 **Périmètre** : `forge_cli/starters/data/` — tous les starters distribués avec la CLI
 
 **Mise à jour** : 2026-05-18 — `contact-simple` migré par STARTERS-MIGRATE-001.
+**Mise à jour** : 2026-05-18 — `utilisateurs-auth` migré par STARTERS-MIGRATE-002.
 
 ---
 
@@ -20,10 +21,10 @@ Aucun starter n'a encore migré vers le format canonique (schema_version: "1.0")
 | Starters audités | 6 |
 | Starters avec fichiers entité/relation | 5 |
 | Starters sans entité (controllers-only) | 1 (`auth-mfa`) |
-| Fichiers entité `.json` (legacy) | 11 (12 à l'audit initial) |
+| Fichiers entité `.json` (legacy) | 10 (12 à l'audit initial) |
 | Fichiers relation `.json` (legacy) | 3 |
-| Fichiers en format canonique | 1 (`contact-simple/contact.json`) |
-| Taux de migration | 8 % (1/12 fichiers entité) |
+| Fichiers en format canonique | 2 (`contact-simple/contact.json`, `utilisateurs-auth/entities/utilisateur.json`) |
+| Taux de migration | 17 % (2/12 fichiers entité) |
 
 ---
 

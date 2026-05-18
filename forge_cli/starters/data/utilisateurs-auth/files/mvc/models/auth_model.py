@@ -4,7 +4,7 @@ from core.database.db import fetch_one
 
 GET_UTILISATEUR_PAR_LOGIN = """
 SELECT
-    UtilisateurId,
+    Id,
     Login,
     PasswordHash,
     Prenom,
@@ -18,7 +18,7 @@ LIMIT 1
 
 GET_UTILISATEUR_PAR_ID = """
 SELECT
-    UtilisateurId,
+    Id,
     Login,
     PasswordHash,
     Prenom,
@@ -26,7 +26,7 @@ SELECT
     Email,
     Actif
 FROM utilisateur
-WHERE UtilisateurId = ?
+WHERE Id = ?
 LIMIT 1
 """
 
@@ -42,7 +42,7 @@ def get_user_by_id(user_id: int) -> dict | None:
     if not row:
         return None
     return {
-        "id": row["UtilisateurId"],
+        "id": row["Id"],
         "login": row["Login"],
         "prenom": row.get("Prenom") or "",
         "nom": row.get("Nom") or "",
@@ -53,7 +53,7 @@ def get_user_by_id(user_id: int) -> dict | None:
 def build_auth_user(utilisateur: dict) -> AuthUser:
     """Convertit un dict DB en AuthUser pour core.auth.login_user."""
     return normalize_auth_user({
-        "id": utilisateur["UtilisateurId"],
+        "id": utilisateur["Id"],
         "email": utilisateur["Login"],
         "password_hash": utilisateur["PasswordHash"],
         "is_active": bool(utilisateur["Actif"]),
