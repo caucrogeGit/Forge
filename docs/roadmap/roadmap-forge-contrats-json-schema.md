@@ -1492,26 +1492,29 @@ docs/entities/entity-validate.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-007 — Documenter l’autocomplétion VS Code
+## ENTITY-CONTRACT-DOC-007 — Documenter l’autocomplétion VS Code ✓ livré
 
 ### Objectif
 
 Expliquer comment utiliser les schémas dans l’éditeur.
 
-### Page cible
+### Page livrée
 
 ```text
-docs/guides/vscode-json-schema.md
+docs/entities/vscode-json-schema.md
 ```
 
-### Contenu attendu
+### Contenu livré
 
 - rôle de `$schema` ;
-- schéma local prioritaire ;
-- exemple de fichier entité ;
-- aide à la saisie ;
-- refus des clés inconnues ;
-- limites de JSON Schema ;
+- méthode `$schema` dans le fichier JSON (chemin relatif) ;
+- méthode `json.schemas` dans `.vscode/settings.json` ;
+- variante prudente avec motif `*/*.json` pour les sous-dossiers ;
+- détections VS Code : clés inconnues, types invalides, enum invalides, pivot incomplet ;
+- limites : VS Code ne remplace pas `forge entity:validate` ;
+- règles sémantiques exclues : entités inconnues, doublons, collisions `from_key`/`to_key` ;
+- tableau des schémas concernés (`entity`, `field`, `relations`, `pivot`, `common`) ;
+- compatibilité JSON Schema Draft 2020-12 (formulation prudente) ;
 - rappel : Forge ne dépend pas d’Internet pour valider un projet.
 
 ---
