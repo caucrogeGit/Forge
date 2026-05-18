@@ -1714,6 +1714,8 @@ Résultat : OK — 5 schéma(s), 0 erreur.
 
 ## ENTITY-CONTRACT-023 — Clôturer la roadmap Contrats JSON Schema
 
+**Statut : livré**
+
 ### Objectif
 
 Clôturer la roadmap autonome après validation complète.
@@ -1746,6 +1748,92 @@ git diff --check
 - la documentation est complète ;
 - la roadmap générale pointe vers cette roadmap autonome ;
 - Forge Design reste hors périmètre.
+
+---
+
+## Clôture de la roadmap
+
+**Statut : terminée.**
+
+La roadmap Contrats JSON Schema est clôturée après livraison de ENTITY-CONTRACT-023.
+
+| Phase | Statut |
+|---|---|
+| Phase 1 — Schémas JSON | terminée |
+| Phase 2 — Validation Forge | terminée |
+| Phase 3 — Générateurs | terminée |
+| Phase 4 — Relations et pivots | terminée |
+| Phase 5 — Documentation officielle | terminée |
+| Phase 6 — Expérience développeur et tests | terminée |
+| Phase 7 — Clôture | terminée |
+
+### Résumé de livraison
+
+La roadmap a livré :
+
+- les schémas JSON canoniques (`common`, `field`, `entity`, `pivot`, `relations`) ;
+- la validation JSON Schema Draft 2020-12 via `forge entity:validate` ;
+- la validation sémantique Forge (18 codes d’erreur stables) ;
+- la sortie JSON machine stable (`--json`) ;
+- l’intégration dans `forge build:model` ;
+- l’intégration dans `forge make:crud` ;
+- l’intégration dans les migrations concernées ;
+- la génération canonique des entités (`schema_version`, `name`, `table`, `fields[]`) ;
+- la génération canonique des relations ;
+- les pivots many-to-many avec `id` technique et contrainte `UNIQUE` sur les deux FK ;
+- `pivot.fields[]` contrôlés par le schéma ;
+- la documentation officielle complète (8 tickets DOC-001 à DOC-008) ;
+- les fixtures canoniques (`tests/fixtures/`) ;
+- la vérification automatique des exemples documentaires (`tests/meta/test_docs_json_examples_001.py`) ;
+- `forge schema:list` (inventaire des schémas) ;
+- `forge schema:doctor` (diagnostic complet des schémas).
+
+### Validations finales exécutées
+
+```
+python forge.py schema:list              → 5 schémas OK
+python forge.py schema:list --json       → valid: true
+python forge.py schema:doctor            → 5 schémas, 0 erreur
+python forge.py schema:doctor --json     → valid: true, errors_count: 0
+python forge.py entity:validate          → 2 fichiers valides, 0 erreur
+python forge.py entity:validate --json   → valid: true
+python forge.py build:model              → 3 régénéré(s), 2 préservé(s)
+pytest (suite complète)                  → 11 482 passed, 6 skipped
+python -m compileall -q .               → OK
+ruff check .                             → All checks passed
+mkdocs build --strict                    → OK
+git diff --check                         → OK
+```
+
+---
+
+## Limites restantes hors roadmap
+
+Ces éléments sont documentés mais non traités dans cette roadmap.
+Chacun nécessite un ticket séparé.
+
+| Limite | Statut |
+|---|---|
+| Starters legacy non migrés vers le format canonique | non traité, ticket séparé nécessaire |
+| Support legacy encore présent dans les générateurs | maintenu par compatibilité, décision différée |
+| Nullable : harmonisation entre `fields[]` et `pivot.fields[]` | non traité |
+| `min`/`max` sans `CHECK` SQL correspondant | non traité |
+| CRUD avancé des attributs `pivot.fields[]` | hors périmètre de cette roadmap |
+| Fichier `.vscode/settings.json` prêt à l’emploi non généré | documenté, ticket DX à créer |
+| PyPI opt-ins différés : `forge-mvc-mfa`, `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` | blocage 429 Too Many Requests — différé |
+
+---
+
+## Suites possibles
+
+Ces éléments ne sont pas des engagements. Ils constituent des pistes pour les roadmaps suivantes.
+
+- Roadmap de migration des starters vers le format canonique.
+- Ticket de décision sur le support legacy (maintien ou suppression).
+- Ticket de correction nullable entre `fields[]` et `pivot.fields[]`.
+- Ticket CRUD avancé `pivot.fields[]`.
+- Ticket DX `.vscode/settings.json` généré automatiquement.
+- Reprise de la publication PyPI des opt-ins après fin du blocage 429.
 
 ---
 
