@@ -1585,7 +1585,7 @@ Note : `user/user.json` existe comme vestige neutre (`{}`) — non utilisé par 
 
 ---
 
-## ENTITY-CONTRACT-020 — Vérifier les exemples documentaires
+## ENTITY-CONTRACT-020 — Vérifier les exemples documentaires ✓ livré
 
 ### Objectif
 
@@ -1596,6 +1596,21 @@ Faire en sorte que les exemples JSON de la documentation soient aussi testés.
 ```text
 Tout exemple JSON important présent dans la documentation doit exister comme fixture de test ou être couvert par un test de validation.
 ```
+
+### Ce qui a été livré
+
+- `tests/meta/test_docs_json_examples_001.py` (56 tests) :
+  - Extraction automatique des blocs ```json des 8 pages `docs/entities/`.
+  - Classification automatique : exemple canonique d'entité (schema_version + name + table + fields), exemple canonique de relations (schema_version + relations), autres ignorés.
+  - 3 exemples d'entités canoniques validés contre `entity.schema.json` (entity-schema.md, json-canonique.md, vscode-json-schema.md).
+  - 3 exemples de relations canoniques validés contre `relations.schema.json` (json-canonique.md, relations-schema.md, vscode-json-schema.md).
+  - 4 pivots extraits et validés contre `pivot.schema.json` (json-canonique.md, relations-schema.md, pivots-many-to-many.md ×2).
+  - Contrôles pivot : `id: true`, `unique_pair: true`, `from_key ≠ to_key`, `pivot.fields[]` sans noms réservés.
+  - Absence de clés legacy dans les exemples canoniques.
+  - Exemples VS Code : $schema, json.schemas, blocs JSON valides.
+  - Vérification que `.vscode/settings.json` n'existe pas dans le dépôt.
+  - Exemples d'erreur non validés (ils ne portent pas `schema_version: "1.0"` — classification automatique).
+- `tests/meta/test_pytest_core_only_contract_001.py` : `jsonschema` et `referencing` ajoutés à `CORE_DEPS`.
 
 ---
 

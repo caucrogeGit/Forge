@@ -46,6 +46,9 @@ CORE_DEPS = {
     # Utilitaires de test
     "_pytest",
     "pytest",
+    # Validation JSON Schema (utilisé dans test_docs_json_examples_001.py)
+    "jsonschema",
+    "referencing",
 }
 
 # Modules opt-in Forge et leurs dépendances connues
