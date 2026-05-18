@@ -1656,6 +1656,8 @@ Total : 5 schéma(s)
 
 ## ENTITY-CONTRACT-022 — Ajouter `forge schema:doctor`
 
+**Statut : livré**
+
 ### Objectif
 
 Vérifier que les schémas Forge sont présents, lisibles et cohérents.
@@ -1672,6 +1674,39 @@ Vérifier que les schémas Forge sont présents, lisibles et cohérents.
 ### Priorité
 
 Optionnel mais utile avant publication.
+
+### Livraison
+
+- **`forge_cli/schemas/schema_doctor.py`** — commande `schema_doctor_main()` avec 5 contrôles par schéma
+  (existence, JSON valide, `$schema` Draft 2020-12, `$id`, `$ref` locaux résolus)
+- **`tests/test_schema_doctor_command.py`** — 42 tests (sortie humaine, sortie `--json`,
+  gestion d'erreurs, non-régression)
+- **`forge.py`** — dispatch `schema:doctor` ajouté
+- **`forge_cli/help.py`** — section « Schémas JSON » complétée avec `schema:doctor`
+- Suite complète : 11 440 tests passent, 6 skipped, 0 régression
+
+Exemple de sortie :
+
+```
+Diagnostic des schémas JSON Forge
+
+Registre : schemas/forge.schema.index.json
+Version  : 1.0
+
+Schémas :
+  - common      schemas/common.schema.json      OK
+  - field       schemas/field.schema.json       OK
+  - entity      schemas/entity.schema.json      OK
+  - pivot       schemas/pivot.schema.json       OK
+  - relations   schemas/relations.schema.json   OK
+
+Références locales :
+  - schemas/entity.schema.json    ->  common.schema.json    OK
+  - schemas/entity.schema.json    ->  field.schema.json     OK
+  ...
+
+Résultat : OK — 5 schéma(s), 0 erreur.
+```
 
 ---
 

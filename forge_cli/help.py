@@ -42,6 +42,7 @@ Base de données
 
 Schémas JSON
   schema:list        Liste les schémas JSON Forge disponibles localement.
+  schema:doctor      Diagnostique les schémas JSON Forge (présence, validité, $ref).
 
 Starters et modules
   starter:list        Liste les starter apps disponibles.

@@ -615,6 +615,11 @@ def main() -> None:
         schema_list_main(args[1:])
         return
 
+    if command == "schema:doctor":
+        from forge_cli.schemas.schema_doctor import schema_doctor_main
+        schema_doctor_main(args[1:])
+        return
+
     cli_fail(
         f"commande inconnue : «{command}».",
         hint="lancez «forge help» pour afficher les commandes disponibles.",
