@@ -1,17 +1,18 @@
 {
-  "format_version": 1,
-  "entity": "ObservationCours",
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "ObservationCours",
   "table": "observation_cours",
   "fields": [
-    { "name": "id",               "sql_type": "INT",  "primary_key": true, "auto_increment": true },
-    { "name": "eleve_id",         "sql_type": "INT" },
-    { "name": "cours_id",         "sql_type": "INT" },
-    { "name": "ne_travaille_pas", "sql_type": "BOOLEAN" },
-    { "name": "bavarde",          "sql_type": "BOOLEAN" },
-    { "name": "dort",             "sql_type": "BOOLEAN" },
-    { "name": "telephone",        "sql_type": "BOOLEAN" },
-    { "name": "perturbe",         "sql_type": "BOOLEAN" },
-    { "name": "refuse_consigne",  "sql_type": "BOOLEAN" },
-    { "name": "remarque",         "sql_type": "TEXT",  "nullable": true }
-  ]
+    { "name": "eleve_id",         "type": "integer", "nullable": false },
+    { "name": "cours_id",         "type": "integer", "nullable": false },
+    { "name": "ne_travaille_pas", "type": "boolean", "nullable": false },
+    { "name": "bavarde",          "type": "boolean", "nullable": false },
+    { "name": "dort",             "type": "boolean", "nullable": false },
+    { "name": "telephone",        "type": "boolean", "nullable": false },
+    { "name": "perturbe",         "type": "boolean", "nullable": false },
+    { "name": "refuse_consigne",  "type": "boolean", "nullable": false },
+    { "name": "remarque",         "type": "text",    "nullable": true }
+  ],
+  "options": { "timestamps": false, "soft_delete": false }
 }

@@ -1,11 +1,12 @@
 {
-  "format_version": 1,
-  "entity": "Cours",
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Cours",
   "table": "cours",
   "fields": [
-    { "name": "id",         "sql_type": "INT",          "primary_key": true, "auto_increment": true },
-    { "name": "date_cours", "sql_type": "DATE" },
-    { "name": "titre",      "sql_type": "VARCHAR(120)", "constraints": { "not_empty": true, "max_length": 120 } },
-    { "name": "classe",     "sql_type": "VARCHAR(40)",  "constraints": { "not_empty": true, "max_length": 40 } }
-  ]
+    { "name": "date_cours", "type": "date",   "nullable": false },
+    { "name": "titre",      "type": "string", "max_length": 120, "nullable": false },
+    { "name": "classe",     "type": "string", "max_length": 40,  "nullable": false }
+  ],
+  "options": { "timestamps": false, "soft_delete": false }
 }

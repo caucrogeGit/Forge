@@ -1,12 +1,13 @@
 {
-  "format_version": 1,
-  "entity": "Eleve",
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Eleve",
   "table": "eleve",
   "fields": [
-    { "name": "id",     "sql_type": "INT",        "primary_key": true, "auto_increment": true },
-    { "name": "nom",    "sql_type": "VARCHAR(80)", "constraints": { "not_empty": true, "max_length": 80 } },
-    { "name": "prenom", "sql_type": "VARCHAR(80)", "constraints": { "not_empty": true, "max_length": 80 } },
-    { "name": "classe", "sql_type": "VARCHAR(40)", "constraints": { "not_empty": true, "max_length": 40 } },
-    { "name": "actif",  "sql_type": "BOOLEAN" }
-  ]
+    { "name": "nom",    "type": "string",  "max_length": 80, "nullable": false },
+    { "name": "prenom", "type": "string",  "max_length": 80, "nullable": false },
+    { "name": "classe", "type": "string",  "max_length": 40, "nullable": false },
+    { "name": "actif",  "type": "boolean", "nullable": false }
+  ],
+  "options": { "timestamps": false, "soft_delete": false }
 }
