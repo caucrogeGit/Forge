@@ -168,6 +168,7 @@ _EXPECTED_IN_META = [
     "test_docs_relations_schema_001.py",
     "test_docs_pivot_tables_001.py",
     "test_docs_types_forge_mariadb_001.py",
+    "test_docs_entity_validate_001.py",
 ]
 
 

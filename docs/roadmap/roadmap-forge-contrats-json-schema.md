@@ -1252,7 +1252,7 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 - Starters non migrés.
 - Legacy non supprimé.
 
-**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-006.**
+**Prochain ticket recommandé : ENTITY-CONTRACT-DOC-007.**
 
 ---
 
@@ -1458,24 +1458,37 @@ docs/entities/types-forge-mariadb.md
 
 ## ENTITY-CONTRACT-DOC-006 — Documenter `forge entity:validate`
 
+**Statut : LIVRÉ**
+
+**Commit** : `docs: document entity validation command (ENTITY-CONTRACT-DOC-006)`
+
 ### Objectif
 
 Documenter la commande de validation.
 
-### Page cible
+### Page livrée
 
 ```text
-docs/entities/entity-validation.md
+docs/entities/entity-validate.md
 ```
 
-### Contenu attendu
+### Contenu livré
 
-- usage simple ;
-- usage avec `--json` ;
-- exemples d’erreurs ;
-- codes d’erreur ;
-- différence entre erreur de schéma et erreur sémantique ;
-- usage en CI.
+- rôle de la commande (diagnostic officiel, ne génère pas) ;
+- commandes (`entity:validate` et `--json`) ;
+- sortie humaine avec exemple OK et exemple erreur ;
+- sortie JSON machine : table des champs, structure d’une erreur (`code`, `file`, `path`, `message`, `hint`, `phase`) ;
+- phases (`json`, `schema`, `semantic`, `runtime`) ;
+- 17 codes d’erreur réels organisés par famille (`FORGE_ENTITY_*`, `FORGE_RELATION_*`, `FORGE_PIVOT_*`) ;
+- erreurs fréquentes (8 cas) ;
+- intégration avec `build:model`, `make:crud`, migrations ;
+- usage en CI (code de retour) ;
+- limites (VS Code, starters legacy, état base réelle).
+
+### Garde-fous
+
+- `tests/meta/test_docs_entity_validate_001.py` (13 tests)
+- `mkdocs.yml` nav mis à jour (Concepts → Valider les contrats JSON)
 
 ---
 
