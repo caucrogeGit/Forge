@@ -2,10 +2,6 @@
 
 Vérifie que les fixtures canoniques Forge sont valides, sans legacy,
 et que entity:validate et build:model fonctionnent correctement sur ces fixtures.
-
-Note : user/user.json (entity "Account") est testé structurellement mais ne peut
-pas participer à build_model — le dossier "user" ne correspond pas à to_snake("Account").
-Ce cas documente la règle Forge : dossier = to_snake(entity_name).
 """
 from __future__ import annotations
 
@@ -19,7 +15,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 FIXTURES_DIR = PROJECT_ROOT / "tests" / "fixtures" / "entities" / "canonical"
 
 # Tous les fichiers de fixtures canoniques (tests structurels JSON)
-ALL_ENTITY_NAMES = ["article", "category", "tag", "user", "member", "project"]
+ALL_ENTITY_NAMES = ["account", "article", "category", "member", "project", "tag"]
 
 # Entités compatibles build_model : dossier = to_snake(entity_name), sans mot réservé SQL
 BUILD_ENTITY_NAMES = ["article", "category", "tag", "member", "project"]

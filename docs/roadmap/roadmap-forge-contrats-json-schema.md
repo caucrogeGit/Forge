@@ -1569,19 +1569,19 @@ Créer des exemples valides et invalides utilisés par les tests.
 
 ```text
 tests/fixtures/entities/canonical/
+├── account/account.json    entité avec email, timestamps (source M2M alternative)
 ├── article/article.json    entité riche (string, text, boolean, datetime, indexes, timestamps)
 ├── category/category.json  entité simple (un champ unique)
-├── tag/tag.json            cible many_to_many simple
-├── user/user.json          fixture structurelle (entity "Account" — dossier/entité incompatibles avec build_model, réservé SQL)
 ├── member/member.json      source many_to_many avec pivot.fields[]
 ├── project/project.json    cible many_to_many avec pivot.fields[]
+├── tag/tag.json            cible many_to_many simple
 └── relations.json          M2O (Article→Category) + M2M simple + M2M avec pivot.fields[]
 ```
 
 Tests : `tests/test_canonical_fixtures.py` (39 tests).
 
-Limite découverte : `"User"` est un mot réservé SQL/MariaDB — le dossier `user/`
-ne peut pas héberger une entité valide pour `build_model`. Documenté dans `user/user.json`.
+Note : `user/user.json` existe comme vestige neutre (`{}`) — non utilisé par les tests.
+`"User"` est un mot réservé SQL/MariaDB : la fixture a été remplacée par `account/account.json`.
 
 ---
 
