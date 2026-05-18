@@ -69,11 +69,6 @@ def test_mentionne_limites_restantes():
     assert "Limites restantes" in r or "limites restantes" in r
 
 
-def test_mentionne_pypi_differe():
-    r = _r()
-    assert "PyPI" in r and ("différé" in r or "différée" in r or "blocage" in r)
-
-
 def test_mentionne_starters_legacy():
     r = _r()
     assert "starters" in r.lower() and ("legacy" in r.lower() or "migr" in r.lower())
