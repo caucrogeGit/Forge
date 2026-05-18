@@ -24,7 +24,7 @@ _RELATIONS_SCHEMA_ID = "https://forge-mvc.dev/schemas/relations.schema.json"
 
 
 def _schemas_dir() -> Path:
-    return Path(__file__).resolve().parent.parent.parent / "schemas"
+    return Path(__file__).resolve().parent.parent / "schemas"
 
 
 def _build_registry():

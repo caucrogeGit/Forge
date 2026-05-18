@@ -28,12 +28,8 @@ from pathlib import Path
 _DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema"
 
 
-def _forge_root() -> Path:
-    return Path(__file__).resolve().parent.parent.parent
-
-
 def _schemas_dir() -> Path:
-    return _forge_root() / "schemas"
+    return Path(__file__).resolve().parent
 
 
 def _registry_path() -> Path:

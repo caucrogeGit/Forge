@@ -18,12 +18,8 @@ import sys
 from pathlib import Path
 
 
-def _forge_root() -> Path:
-    return Path(__file__).resolve().parent.parent.parent
-
-
 def _schemas_dir() -> Path:
-    return _forge_root() / "schemas"
+    return Path(__file__).resolve().parent
 
 
 def _registry_path() -> Path:
