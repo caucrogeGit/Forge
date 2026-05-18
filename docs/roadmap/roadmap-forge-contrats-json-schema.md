@@ -1191,37 +1191,39 @@ le SQL correspondant.
 
 ---
 
-## ENTITY-CONTRACT-017 — Autoriser les attributs de pivot contrôlés
+## ENTITY-CONTRACT-017 — Attributs de pivot contrôlés ✓ livré
 
 ### Objectif
 
-Permettre des champs spécifiques sur la table pivot.
+Permettre des champs métier optionnels dans `pivot.fields[]` pour les
+relations `many_to_many` canoniques, avec validation, mapping SQL et
+protection des clés techniques.
 
-### Exemple
+### Ce qui a été livré
 
-```json
-"fields": [
-  {
-    "name": "position",
-    "type": "integer",
-    "nullable": true
-  },
-  {
-    "name": "note",
-    "type": "string",
-    "max_length": 255,
-    "nullable": true
-  }
-]
-```
+- `relations.py` : `ValidatedPivotField` étendu avec `unique: bool = False` ;
+  `ValidatedCanonicalManyToManyRelation` étendu avec `pivot_fields: tuple[ValidatedPivotField, ...]` ;
+  ajout de `_FORGE_PIVOT_SIMPLE_TYPES`, `_FORGE_PIVOT_ALL_TYPES`, `_pivot_field_sql_type()`,
+  `_validate_canonical_pivot_fields()`.
+- Mapping des 12 types Forge → SQL (string→VARCHAR, text→TEXT, integer→INT,
+  big_integer→BIGINT, float→DOUBLE, decimal→DECIMAL(p,s), boolean→BOOLEAN,
+  date→DATE, datetime→DATETIME, email→VARCHAR(255), password→VARCHAR(255), json→LONGTEXT).
+- Contraintes : `required: true` → NOT NULL ; `nullable: false` → NOT NULL ;
+  `nullable: true` → NULL ; `unique: true` → `UNIQUE KEY uq_{pivot}_{field}`.
+- Protection : `id`, `from_key`, `to_key` interdits dans `pivot.fields[]`.
+- `_generate_canonical_m2m_sql()` inclut les colonnes pivot et les UNIQUE KEY
+  correspondantes.
+- Tests : `tests/test_pivot_fields_controlled.py` (42 tests).
+- CRUD pivot avancé : hors périmètre (ticket futur).
+- `pivot.schema.json` inchangé (déjà conforme).
 
-### Interdictions
+### Limites restantes
 
-- `id` ;
-- `article_id` si c’est `from_key` ;
-- `tag_id` si c’est `to_key` ;
-- noms de champs en collision avec les colonnes techniques ;
-- types non autorisés.
+- Le CRUD avancé pour modifier les attributs pivot n’est pas généré.
+- Les starters ne sont pas migrés.
+- Le support legacy reste inchangé.
+
+**Prochain ticket recommandé : ENTITY-CONTRACT-018.**
 
 ---
 

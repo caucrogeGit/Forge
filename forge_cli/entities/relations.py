@@ -87,6 +87,7 @@ class ValidatedCanonicalManyToManyRelation:
     from_key: str
     to_key: str
     on_delete: str
+    pivot_fields: tuple[ValidatedPivotField, ...] = ()
     relation_type: str = "many_to_many"
 
 
@@ -107,6 +108,7 @@ class ValidatedPivotField:
     name: str
     sql_type: str
     nullable: bool
+    unique: bool = False
 
 
 @dataclass
@@ -258,27 +260,139 @@ def _generate_canonical_m2m_sql(relation: ValidatedCanonicalManyToManyRelation) 
     fk = relation.from_key
     tk = relation.to_key
     on_delete = relation.on_delete
-    return "\n".join(
-        [
-            f"CREATE TABLE IF NOT EXISTS {pivot} (",
-            "    id INT NOT NULL AUTO_INCREMENT,",
-            f"    {fk} INT NOT NULL,",
-            f"    {tk} INT NOT NULL,",
-            "    PRIMARY KEY (id),",
-            f"    UNIQUE KEY uq_{pivot} ({fk}, {tk}),",
-            f"    INDEX idx_{pivot}_{fk} ({fk}),",
-            f"    INDEX idx_{pivot}_{tk} ({tk}),",
-            f"    CONSTRAINT fk_{pivot}_{fk}",
-            f"        FOREIGN KEY ({fk})",
-            f"        REFERENCES {relation.from_table} (id)",
-            f"        ON DELETE {on_delete},",
-            f"    CONSTRAINT fk_{pivot}_{tk}",
-            f"        FOREIGN KEY ({tk})",
-            f"        REFERENCES {relation.to_table} (id)",
-            f"        ON DELETE {on_delete}",
-            ");",
-        ]
-    )
+
+    field_lines: list[str] = []
+    unique_key_lines: list[str] = []
+    for f in relation.pivot_fields:
+        null_sql = "NULL" if f.nullable else "NOT NULL"
+        field_lines.append(f"    {f.name} {f.sql_type} {null_sql},")
+        if f.unique:
+            unique_key_lines.append(f"    UNIQUE KEY uq_{pivot}_{f.name} ({f.name}),")
+
+    lines: list[str] = [
+        f"CREATE TABLE IF NOT EXISTS {pivot} (",
+        "    id INT NOT NULL AUTO_INCREMENT,",
+        f"    {fk} INT NOT NULL,",
+        f"    {tk} INT NOT NULL,",
+        *field_lines,
+        "    PRIMARY KEY (id),",
+        f"    UNIQUE KEY uq_{pivot} ({fk}, {tk}),",
+        *unique_key_lines,
+        f"    INDEX idx_{pivot}_{fk} ({fk}),",
+        f"    INDEX idx_{pivot}_{tk} ({tk}),",
+        f"    CONSTRAINT fk_{pivot}_{fk}",
+        f"        FOREIGN KEY ({fk})",
+        f"        REFERENCES {relation.from_table} (id)",
+        f"        ON DELETE {on_delete},",
+        f"    CONSTRAINT fk_{pivot}_{tk}",
+        f"        FOREIGN KEY ({tk})",
+        f"        REFERENCES {relation.to_table} (id)",
+        f"        ON DELETE {on_delete}",
+        ");",
+    ]
+    return "\n".join(lines)
+
+
+_FORGE_PIVOT_SIMPLE_TYPES: dict[str, str] = {
+    "text":        "TEXT",
+    "integer":     "INT",
+    "big_integer": "BIGINT",
+    "float":       "DOUBLE",
+    "boolean":     "BOOLEAN",
+    "date":        "DATE",
+    "datetime":    "DATETIME",
+    "email":       "VARCHAR(255)",
+    "password":    "VARCHAR(255)",
+    "json":        "LONGTEXT",
+}
+
+_FORGE_PIVOT_ALL_TYPES = set(_FORGE_PIVOT_SIMPLE_TYPES) | {"string", "decimal"}
+
+
+def _pivot_field_sql_type(
+    forge_type: str,
+    field: dict[str, Any],
+    field_path: str,
+    issues: list[RelationIssue],
+) -> str | None:
+    if forge_type == "string":
+        max_length = field.get("max_length", 255)
+        if not isinstance(max_length, int) or isinstance(max_length, bool) or max_length <= 0:
+            _add_issue(issues, f"{field_path}.max_length", "doit etre un entier positif pour le type 'string'")
+            return None
+        return f"VARCHAR({max_length})"
+    if forge_type == "decimal":
+        precision = field.get("precision")
+        scale = field.get("scale")
+        if not isinstance(precision, int) or isinstance(precision, bool) or precision <= 0:
+            _add_issue(issues, f"{field_path}.precision", "requis et entier positif pour le type 'decimal'")
+            return None
+        if not isinstance(scale, int) or isinstance(scale, bool) or scale < 0:
+            _add_issue(issues, f"{field_path}.scale", "requis et entier >= 0 pour le type 'decimal'")
+            return None
+        return f"DECIMAL({precision},{scale})"
+    return _FORGE_PIVOT_SIMPLE_TYPES.get(forge_type)
+
+
+def _validate_canonical_pivot_fields(
+    fields_raw: Any,
+    path: str,
+    from_key: str,
+    to_key: str,
+    issues: list[RelationIssue],
+) -> list[ValidatedPivotField]:
+    """Validate pivot.fields[] in a canonical many_to_many relation."""
+    if not isinstance(fields_raw, list):
+        _add_issue(issues, f"{path}.pivot.fields", "doit etre une liste")
+        return []
+
+    reserved = {"id", from_key, to_key}
+    result: list[ValidatedPivotField] = []
+
+    for i, field in enumerate(fields_raw):
+        field_path = f"{path}.pivot.fields[{i}]"
+        if not isinstance(field, dict):
+            _add_issue(issues, field_path, "doit etre un objet")
+            continue
+
+        name = field.get("name")
+        forge_type = field.get("type")
+
+        if not isinstance(name, str) or not name:
+            _add_issue(issues, f"{field_path}.name", "cle obligatoire manquante ou invalide")
+            continue
+        if not _is_sql_identifier(name):
+            _add_issue(issues, f"{field_path}.name", "doit etre un identifiant SQL valide")
+            continue
+        if name in reserved:
+            _add_issue(
+                issues,
+                f"{field_path}.name",
+                f"nom reserve interdit dans pivot.fields : {name!r} (id, from_key, to_key sont geres par Forge)",
+            )
+            continue
+
+        if not isinstance(forge_type, str) or forge_type not in _FORGE_PIVOT_ALL_TYPES:
+            allowed = ", ".join(sorted(_FORGE_PIVOT_ALL_TYPES))
+            _add_issue(
+                issues,
+                f"{field_path}.type",
+                f"type Forge invalide ou manquant. Valeurs supportees : {allowed}",
+            )
+            continue
+
+        sql_type = _pivot_field_sql_type(forge_type, field, field_path, issues)
+        if sql_type is None:
+            continue
+
+        nullable = bool(field.get("nullable", True))
+        if field.get("required") is True:
+            nullable = False
+
+        unique = bool(field.get("unique", False))
+        result.append(ValidatedPivotField(name=name, sql_type=sql_type, nullable=nullable, unique=unique))
+
+    return result
 
 
 def _validate_m2m_canonical(
@@ -384,6 +498,15 @@ def _validate_m2m_canonical(
     if not pivot_table or not from_key or not to_key or from_key == to_key:
         return None
 
+    fields_raw = pivot.get("fields", [])
+    pivot_fields = _validate_canonical_pivot_fields(
+        fields_raw,
+        f"relations[{index}]",
+        from_key,
+        to_key,
+        issues,
+    )
+
     return ValidatedCanonicalManyToManyRelation(
         from_entity=from_entity_name,
         from_table=from_entity["table"],
@@ -393,6 +516,7 @@ def _validate_m2m_canonical(
         from_key=from_key,
         to_key=to_key,
         on_delete=on_delete_sql,
+        pivot_fields=tuple(pivot_fields),
     )
 
 
