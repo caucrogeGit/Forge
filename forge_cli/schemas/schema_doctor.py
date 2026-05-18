@@ -205,7 +205,7 @@ def schema_doctor_main(args: list[str]) -> None:
         sys.exit(0 if all_ok else 1)
 
     print("Diagnostic des schémas JSON Forge\n")
-    print(f"Registre : schemas/forge.schema.index.json")
+    print("Registre : schemas/forge.schema.index.json")
     print(f"Version  : {schema_version}\n")
 
     print("Schémas :")

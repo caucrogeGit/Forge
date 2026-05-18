@@ -12,12 +12,10 @@ dépendre du binaire global forge ni de subprocess.
 from __future__ import annotations
 
 import json
-import sys
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
 
 from forge_cli.schemas.schema_list import schema_list_main, _registry_path, _schemas_dir
 
@@ -312,7 +310,6 @@ def test_entity_validate_still_runs(tmp_path):
 def test_forge_py_dispatches_schema_list(capsys):
     """forge.py route correctement «schema:list» vers schema_list_main."""
     with patch("sys.argv", ["forge", "schema:list"]):
-        import importlib
         import forge  # noqa: F401
         try:
             forge.main()

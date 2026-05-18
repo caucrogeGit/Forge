@@ -11,18 +11,14 @@ Les tests appellent schema_doctor_main() directement.
 from __future__ import annotations
 
 import json
-import sys
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
 
 from forge_cli.schemas.schema_doctor import (
     schema_doctor_main,
     _collect_local_refs,
-    _registry_path,
-    _schemas_dir,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
