@@ -152,8 +152,8 @@ plus pour les starters canoniques. Impact limité car :
 - la fonction retourne silencieusement si `mariadb` n'est pas installé ;
 - `drop_foreign_keys` n'est utile que lors d'un rebuild avec DB active.
 
-**Risque** : faible en pratique (bêta, pas de production) — mais à corriger dans un
-ticket dédié (`LEGACY-STARTERRELS-FIX-001`).
+**Risque** : faible en pratique (bêta, pas de production) — corrigé dans
+`LEGACY-STARTERRELS-FIX-001` (double fallback canonique + legacy).
 
 ---
 

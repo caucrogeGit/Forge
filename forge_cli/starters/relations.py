@@ -38,8 +38,8 @@ def drop_foreign_keys(meta: dict, root: Path) -> None:
         cur = conn.cursor()
         try:
             for rel in relations:
-                table = rel.get("from_entity", "")
-                fk = rel.get("foreign_key_name", "")
+                table = rel.get("from") or rel.get("from_entity", "")
+                fk = rel.get("foreign_key") or rel.get("foreign_key_name", "")
                 if not table or not fk:
                     continue
                 table_name = to_snake(table)
