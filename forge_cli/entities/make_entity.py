@@ -322,7 +322,7 @@ def _write_entity_files(
     ensure_file(target_entities_dir / "__init__.py", "", created, skipped)
     ensure_file(
         target_entities_dir / "relations.json",
-        json.dumps({"format_version": 1, "relations": []}, indent=2, ensure_ascii=True) + "\n",
+        json.dumps({"schema_version": "1.0", "relations": []}, indent=2, ensure_ascii=True) + "\n",
         created,
         skipped,
     )

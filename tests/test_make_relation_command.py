@@ -68,6 +68,19 @@ def _contact_groupe() -> dict:
     }
 
 
+def _canonical_relation_contact() -> dict:
+    return {
+        "type": "many_to_one",
+        "from": "ContactGroupe",
+        "to": "Contact",
+        "name": "contact",
+        "foreign_key": "contact_id",
+        "nullable": True,
+        "on_delete": "cascade",
+        "index": True,
+    }
+
+
 def test_make_relation_creates_relations_json_and_appends_relation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys):
     entities_dir = _configure_roots(monkeypatch, tmp_path)
     _write_entity(entities_dir, "contact", _contact())
@@ -76,16 +89,16 @@ def test_make_relation_creates_relations_json_and_appends_relation(monkeypatch: 
 
     answers = iter(
         [
-            "",
-            "ContactGroupe",
-            "Contact",
-            "",
-            "",
-            "contact_groupe_contact",
-            "fk_contact_groupe_contact",
-            "",
-            "",
-            "o",
+            "",             # type (many_to_one)
+            "ContactGroupe",# from
+            "Contact",      # to
+            "contact",      # name
+            "",             # inverse_name (empty)
+            "",             # foreign_key (default: contact_id)
+            "",             # nullable (default: True)
+            "",             # on_delete (default: restrict)
+            "",             # index (default: True)
+            "o",            # confirm
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
@@ -96,18 +109,17 @@ def test_make_relation_creates_relations_json_and_appends_relation(monkeypatch: 
     output = capsys.readouterr().out
 
     assert relations_json == {
-        "format_version": 1,
+        "schema_version": "1.0",
         "relations": [
             {
-                "name": "contact_groupe_contact",
                 "type": "many_to_one",
-                "from_entity": "ContactGroupe",
-                "to_entity": "Contact",
-                "from_field": "contact_id",
-                "to_field": "id",
-                "foreign_key_name": "fk_contact_groupe_contact",
-                "on_delete": "RESTRICT",
-                "on_update": "CASCADE",
+                "from": "ContactGroupe",
+                "to": "Contact",
+                "name": "contact",
+                "foreign_key": "contact_id",
+                "nullable": True,
+                "on_delete": "restrict",
+                "index": True,
             }
         ],
     }
@@ -128,8 +140,8 @@ def test_make_relation_uses_current_working_directory(monkeypatch: pytest.Monkey
             "Contact",
             "",
             "",
-            "contact_groupe_contact",
-            "fk_contact_groupe_contact",
+            "",
+            "",
             "",
             "",
             "o",
@@ -142,7 +154,7 @@ def test_make_relation_uses_current_working_directory(monkeypatch: pytest.Monkey
     assert (tmp_path / "mvc" / "entities" / "relations.json").exists()
 
 
-def test_make_relation_preserves_format_version_and_existing_relations(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+def test_make_relation_preserves_existing_relations_and_appends_second(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     entities_dir = _configure_roots(monkeypatch, tmp_path)
     _write_entity(entities_dir, "contact", _contact())
     _write_entity(entities_dir, "groupe", _groupe())
@@ -150,20 +162,8 @@ def test_make_relation_preserves_format_version_and_existing_relations(monkeypat
     (entities_dir / "relations.json").write_text(
         json.dumps(
             {
-                "format_version": 1,
-                "relations": [
-                    {
-                        "name": "contact_groupe_contact",
-                        "type": "many_to_one",
-                        "from_entity": "ContactGroupe",
-                        "to_entity": "Contact",
-                        "from_field": "contact_id",
-                        "to_field": "id",
-                        "foreign_key_name": "fk_contact_groupe_contact",
-                        "on_delete": "CASCADE",
-                        "on_update": "CASCADE",
-                    }
-                ],
+                "schema_version": "1.0",
+                "relations": [_canonical_relation_contact()],
             },
             indent=2,
         ) + "\n",
@@ -177,9 +177,9 @@ def test_make_relation_preserves_format_version_and_existing_relations(monkeypat
             "Groupe",
             "",
             "",
-            "contact_groupe_groupe",
-            "fk_contact_groupe_groupe",
-            "CASCADE",
+            "",
+            "",
+            "",
             "",
             "o",
         ]
@@ -189,10 +189,11 @@ def test_make_relation_preserves_format_version_and_existing_relations(monkeypat
     make_relation.main([])
 
     relations_json = json.loads((entities_dir / "relations.json").read_text(encoding="utf-8"))
-    assert relations_json["format_version"] == 1
+    assert relations_json["schema_version"] == "1.0"
     assert len(relations_json["relations"]) == 2
-    assert relations_json["relations"][1]["to_field"] == "id"
-    assert relations_json["relations"][1]["from_field"] == "groupe_id"
+    assert relations_json["relations"][1]["to"] == "Groupe"
+    assert relations_json["relations"][1]["name"] == "groupe"
+    assert relations_json["relations"][1]["foreign_key"] == "groupe_id"
 
 
 def test_make_relation_rejects_obvious_duplicate(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
@@ -202,20 +203,8 @@ def test_make_relation_rejects_obvious_duplicate(monkeypatch: pytest.MonkeyPatch
     (entities_dir / "relations.json").write_text(
         json.dumps(
             {
-                "format_version": 1,
-                "relations": [
-                    {
-                        "name": "contact_groupe_contact",
-                        "type": "many_to_one",
-                        "from_entity": "ContactGroupe",
-                        "to_entity": "Contact",
-                        "from_field": "contact_id",
-                        "to_field": "id",
-                        "foreign_key_name": "fk_contact_groupe_contact",
-                        "on_delete": "RESTRICT",
-                        "on_update": "CASCADE",
-                    }
-                ],
+                "schema_version": "1.0",
+                "relations": [_canonical_relation_contact()],
             },
             indent=2,
         ) + "\n",
@@ -227,10 +216,10 @@ def test_make_relation_rejects_obvious_duplicate(monkeypatch: pytest.MonkeyPatch
             "",
             "ContactGroupe",
             "Contact",
+            "contact",      # same name → duplicate
             "",
             "",
-            "contact_groupe_contact",
-            "fk_contact_groupe_contact",
+            "",
             "",
             "",
         ]
@@ -248,17 +237,17 @@ def test_make_relation_explains_many_to_many_is_not_directly_supported(monkeypat
 
     answers = iter(
         [
-            "many_to_many",
-            "",
+            "many_to_many", # rejected
+            "",             # type (many_to_one)
             "ContactGroupe",
             "Contact",
             "",
             "",
-            "contact_groupe_contact",
-            "fk_contact_groupe_contact",
             "",
             "",
-            "n",
+            "",
+            "",
+            "n",            # cancel
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))

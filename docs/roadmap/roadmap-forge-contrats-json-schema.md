@@ -1081,7 +1081,7 @@ Les entités générées doivent contenir :
 
 # Bloc 4 — Relations et pivots
 
-## ENTITY-CONTRACT-015 — Verrouiller la génération `many_to_one`
+## ENTITY-CONTRACT-015 — Verrouiller la génération `many_to_one` ✓ livré
 
 ### Objectif
 

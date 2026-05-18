@@ -291,6 +291,11 @@ def _validate_relation_item(
     if not isinstance(relation, dict):
         return None
 
+    # Canonical relation (schema_version "1.0") uses "from"/"to" instead of "from_entity"/"to_entity".
+    # JSON Schema validation (entity:validate) covers canonical semantics — skip legacy validation here.
+    if "from" in relation and "from_entity" not in relation:
+        return None
+
     for key in RELATION_KEYS:
         if key not in relation:
             _add_issue(issues, f"{path}.{key}", "cle obligatoire manquante")
