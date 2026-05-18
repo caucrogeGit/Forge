@@ -53,7 +53,7 @@
         <select name="ville_id" class="mt-1 w-full border border-slate-300 rounded px-3 py-2">
             <option value="">Sans ville</option>
             {% for ville in villes %}
-                <option value="{{ ville.VilleId }}" {% if form.value('ville_id')|string == ville.VilleId|string %}selected{% endif %}>
+                <option value="{{ ville.Id }}" {% if form.value('ville_id')|string == ville.Id|string %}selected{% endif %}>
                     {{ ville.Nom }}{% if ville.CodePostal %} ({{ ville.CodePostal }}){% endif %}
                 </option>
             {% endfor %}

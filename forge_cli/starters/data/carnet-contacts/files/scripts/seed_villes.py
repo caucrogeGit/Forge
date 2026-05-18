@@ -59,7 +59,7 @@ def main() -> None:
     try:
         for nom, code_postal in VILLES:
             cursor.execute(
-                "SELECT VilleId FROM ville WHERE Nom = ? AND CodePostal = ? LIMIT 1",
+                "SELECT Id FROM ville WHERE Nom = ? AND CodePostal = ? LIMIT 1",
                 (nom, code_postal),
             )
             if cursor.fetchone():

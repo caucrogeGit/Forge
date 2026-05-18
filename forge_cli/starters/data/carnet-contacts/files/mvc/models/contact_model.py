@@ -3,7 +3,7 @@ from core.database.db import execute, fetch_all, fetch_one, insert
 
 SELECT_CONTACTS = """
 SELECT
-    contact.ContactId,
+    contact.Id,
     contact.Nom,
     contact.Prenom,
     contact.Email,
@@ -12,13 +12,13 @@ SELECT
     ville.Nom AS VilleNom,
     ville.CodePostal AS VilleCodePostal
 FROM contact
-LEFT JOIN ville ON ville.VilleId = contact.VilleId
+LEFT JOIN ville ON ville.Id = contact.VilleId
 ORDER BY contact.Nom, contact.Prenom
 """
 
 SELECT_CONTACT_BY_ID = """
 SELECT
-    contact.ContactId,
+    contact.Id,
     contact.Nom,
     contact.Prenom,
     contact.Email,
@@ -27,8 +27,8 @@ SELECT
     ville.Nom AS VilleNom,
     ville.CodePostal AS VilleCodePostal
 FROM contact
-LEFT JOIN ville ON ville.VilleId = contact.VilleId
-WHERE contact.ContactId = ?
+LEFT JOIN ville ON ville.Id = contact.VilleId
+WHERE contact.Id = ?
 LIMIT 1
 """
 
@@ -40,10 +40,10 @@ VALUES (?, ?, ?, ?, ?)
 UPDATE_CONTACT = """
 UPDATE contact
 SET Nom = ?, Prenom = ?, Email = ?, Telephone = ?, VilleId = ?
-WHERE ContactId = ?
+WHERE Id = ?
 """
 
-DELETE_CONTACT = "DELETE FROM contact WHERE ContactId = ?"
+DELETE_CONTACT = "DELETE FROM contact WHERE Id = ?"
 
 
 def _clean_payload(data: dict) -> tuple:

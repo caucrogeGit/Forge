@@ -1,31 +1,25 @@
 {
-  "format_version": 1,
-  "entity": "Ville",
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Ville",
   "table": "ville",
   "description": "Ville de référence pour le carnet de contacts",
   "fields": [
     {
-      "name": "id",
-      "column": "VilleId",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
-    },
-    {
       "name": "nom",
-      "sql_type": "VARCHAR(100)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 100
-      }
+      "type": "string",
+      "max_length": 100,
+      "nullable": false
     },
     {
       "name": "code_postal",
-      "sql_type": "VARCHAR(10)",
-      "nullable": true,
-      "constraints": {
-        "max_length": 10
-      }
+      "type": "string",
+      "max_length": 10,
+      "nullable": true
     }
-  ]
+  ],
+  "options": {
+    "timestamps": false,
+    "soft_delete": false
+  }
 }

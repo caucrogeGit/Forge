@@ -1,53 +1,43 @@
 {
-  "format_version": 1,
-  "entity": "Contact",
+  "$schema": "../../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Contact",
   "table": "contact",
   "description": "Contact associé à une ville",
   "fields": [
     {
-      "name": "id",
-      "column": "ContactId",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
-    },
-    {
       "name": "nom",
-      "sql_type": "VARCHAR(80)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 80
-      }
+      "type": "string",
+      "max_length": 80,
+      "nullable": false
     },
     {
       "name": "prenom",
-      "sql_type": "VARCHAR(80)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 80
-      }
+      "type": "string",
+      "max_length": 80,
+      "nullable": false
     },
     {
       "name": "email",
-      "sql_type": "VARCHAR(120)",
+      "type": "string",
+      "max_length": 120,
       "unique": true,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 120
-      }
+      "nullable": false
     },
     {
       "name": "telephone",
-      "sql_type": "VARCHAR(20)",
-      "nullable": true,
-      "constraints": {
-        "max_length": 20
-      }
+      "type": "string",
+      "max_length": 20,
+      "nullable": true
     },
     {
       "name": "ville_id",
-      "sql_type": "INT",
+      "type": "integer",
       "nullable": true
     }
-  ]
+  ],
+  "options": {
+    "timestamps": false,
+    "soft_delete": false
+  }
 }

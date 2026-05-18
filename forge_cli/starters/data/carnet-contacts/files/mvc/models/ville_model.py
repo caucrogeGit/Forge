@@ -2,7 +2,7 @@ from core.database.db import fetch_all
 
 
 SELECT_VILLES = """
-SELECT VilleId, Nom, CodePostal
+SELECT Id, Nom, CodePostal
 FROM ville
 ORDER BY Nom
 """

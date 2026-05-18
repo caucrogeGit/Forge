@@ -25,7 +25,7 @@
             {% for contact in contacts %}
             <tr class="hover:bg-slate-50">
                 <td class="px-4 py-3">
-                    <a href="/contacts/{{ contact.ContactId }}" class="font-medium text-slate-900 hover:underline">
+                    <a href="/contacts/{{ contact.Id }}" class="font-medium text-slate-900 hover:underline">
                         {{ contact.Prenom }} {{ contact.Nom }}
                     </a>
                     {% if contact.Telephone %}
@@ -44,8 +44,8 @@
                     {% endif %}
                 </td>
                 <td class="px-4 py-3 text-right space-x-2">
-                    <a href="/contacts/{{ contact.ContactId }}/edit" class="text-sm text-orange-700 hover:underline">Modifier</a>
-                    <form method="post" action="/contacts/{{ contact.ContactId }}/delete" style="display:inline">
+                    <a href="/contacts/{{ contact.Id }}/edit" class="text-sm text-orange-700 hover:underline">Modifier</a>
+                    <form method="post" action="/contacts/{{ contact.Id }}/delete" style="display:inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <button type="submit" class="text-sm text-red-600 hover:underline">Supprimer</button>
                     </form>

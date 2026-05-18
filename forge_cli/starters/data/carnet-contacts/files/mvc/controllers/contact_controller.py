@@ -13,7 +13,7 @@ from mvc.models.ville_model import get_villes
 def _ville_choices(villes: list[dict]) -> list[tuple[int, str]]:
     return [
         (
-            ville["VilleId"],
+            ville["Id"],
             f"{ville['Nom']} ({ville['CodePostal']})" if ville.get("CodePostal") else ville["Nom"],
         )
         for ville in villes

@@ -192,12 +192,14 @@ class TestStarter3Application:
     def test_entity_ville_json_valid(self):
         path = self.root / "mvc" / "entities" / "ville" / "ville.json"
         data = json.loads(path.read_text(encoding="utf-8"))
-        assert data["entity"] == "Ville"
+        assert data.get("name") == "Ville"
+        assert data.get("schema_version") == "1.0"
 
     def test_entity_contact_json_valid(self):
         path = self.root / "mvc" / "entities" / "contact" / "contact.json"
         data = json.loads(path.read_text(encoding="utf-8"))
-        assert data["entity"] == "Contact"
+        assert data.get("name") == "Contact"
+        assert data.get("schema_version") == "1.0"
 
     def test_relations_json_exists(self):
         assert (self.root / "mvc" / "entities" / "relations.json").exists()

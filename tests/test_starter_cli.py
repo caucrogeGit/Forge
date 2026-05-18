@@ -286,9 +286,9 @@ def test_starter_carnet_relations_json_valide(tmp_path):
     assert len(relations) == 1
     relation = relations[0]
     assert relation.from_entity == "Contact"
-    assert relation.from_column == "VilleId"
+    assert relation.from_column == "ville_id"
     assert relation.to_entity == "Ville"
-    assert relation.to_column == "VilleId"
+    assert relation.to_column == "Id"
     assert relation.on_delete == "SET NULL"
 
 
@@ -310,8 +310,8 @@ def test_starter_carnet_build_model_genere_fk(tmp_path):
 
     build_model(entities_root)
 
-    assert "FOREIGN KEY (VilleId)" in (entities_root / "relations.sql").read_text(encoding="utf-8")
-    assert "REFERENCES ville (VilleId)" in (entities_root / "relations.sql").read_text(encoding="utf-8")
+    assert "FOREIGN KEY (ville_id)" in (entities_root / "relations.sql").read_text(encoding="utf-8")
+    assert "REFERENCES ville (Id)" in (entities_root / "relations.sql").read_text(encoding="utf-8")
 
 
 def test_script_seed_villes_configure_le_projet():
