@@ -276,6 +276,19 @@ règle d'arrêt du ticket.
 
 | Ticket | Objectif | Statut |
 |---|---|---|
-| `LEGACY-WARNINGS-004` | Implémenter warning non bloquant dans `make:crud` | À créer |
+| `LEGACY-WARNINGS-004` | Implémenter warning non bloquant dans `make:crud` | **Livré** |
 | `LEGACY-WARNINGS-005` | Décider si `make:relation` doit avertir sur `relations.json` legacy | À créer après LEGACY-WARNINGS-004 |
 | `LEGACY-TESTS-RECLASSIFY-001` | Reclasser les 75 tests legacy comme `pytest.mark.legacy` | À créer |
+
+---
+
+## 10. Mise en œuvre
+
+`LEGACY-WARNINGS-004` ajoute un warning humain non bloquant dans `make:crud` lorsqu'une
+entité `format_version: 1` est utilisée.
+
+Mécanisme : variable locale `is_legacy` dans `make_crud()`, message inséré dans
+`MakeCrudResult.warnings` après instanciation du résultat. Affiché via `out.warn()`
+dans `cmd_make_crud_main()`.
+
+`make:relation` reste volontairement sans warning.

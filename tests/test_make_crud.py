@@ -456,7 +456,10 @@ def test_pas_de_warn_pour_champ_date(tmp_path):
 
 def test_pas_de_warn_dans_resultat_make_crud(tmp_path):
     result = _run("Evenement", tmp_path, data=_EVENEMENT_JSON)
-    assert len(result.warnings) == 0
+    # _EVENEMENT_JSON est legacy (format_version: 1) → un warning de dépréciation est attendu.
+    # On vérifie qu'il n'y a aucun warning métier (form-builder) en dehors de ce warning legacy.
+    non_legacy = [w for w in result.warnings if "format_version" not in w]
+    assert len(non_legacy) == 0
 
 
 def test_pas_de_warn_pour_varchar_et_int(tmp_path):

@@ -167,7 +167,8 @@ def make_crud(
 
     try:
         raw = json.loads(json_path.read_text(encoding="utf-8"))
-        if isinstance(raw, dict) and raw.get("schema_version") == "1.0":
+        is_legacy = not (isinstance(raw, dict) and raw.get("schema_version") == "1.0")
+        if not is_legacy:
             raw = normalize_canonical_entity_for_model_build(raw)
         definition = validate_entity_definition(raw, source=str(json_path))
     except (json.JSONDecodeError, ValueError, CanonicalNormalizationError) as exc:
@@ -182,6 +183,13 @@ def make_crud(
         raise SystemExit(1)
 
     result = MakeCrudResult(dry_run=dry_run)
+
+    if is_legacy:
+        result.warnings.append(
+            f'Entité legacy : {entity_name}. '
+            'format_version: 1 est déprécié — utilisez schema_version: "1.0". '
+            "Guide : docs/entities/migration-legacy-vers-canonique.md"
+        )
 
     if not _non_pk_fields(definition):
         result.warnings.append(
