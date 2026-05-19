@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from forge_cli.entities.relations import (
+    ValidatedCanonicalManyToManyRelation,
     ValidatedManyToManyRelation,
     load_entity_definitions,
     validate_relations_definition,
@@ -110,15 +111,30 @@ def _load_crud_many_to_many_relations(
     crud_relations: list[CrudManyToManyRelation] = []
 
     for relation in validated_relations:
-        if not isinstance(relation, ValidatedManyToManyRelation):
-            continue
-        if relation.source.lower() not in current_names:
+        if isinstance(relation, ValidatedManyToManyRelation):
+            m2m_source = relation.source
+            m2m_target = relation.target
+            m2m_pivot_table = relation.pivot_table
+            m2m_source_key = relation.source_key
+            m2m_target_key = relation.target_key
+            m2m_order_column = relation.order_column
+        elif isinstance(relation, ValidatedCanonicalManyToManyRelation):
+            m2m_source = relation.from_entity
+            m2m_target = relation.to_entity
+            m2m_pivot_table = relation.pivot_table
+            m2m_source_key = relation.from_key
+            m2m_target_key = relation.to_key
+            m2m_order_column = None
+        else:
             continue
 
-        target = _entity_definition_by_relation_name(entity_map, relation.target)
+        if m2m_source.lower() not in current_names:
+            continue
+
+        target = _entity_definition_by_relation_name(entity_map, m2m_target)
         if target is None:
             raise ValueError(
-                f"Entité cible many_to_many introuvable pour {relation.target!r} "
+                f"Entité cible many_to_many introuvable pour {m2m_target!r} "
                 f"dans {relations_path.as_posix()}"
             )
 
@@ -128,11 +144,11 @@ def _load_crud_many_to_many_relations(
         field_name = f"{target_snake}_ids"
         crud_relations.append(
             CrudManyToManyRelation(
-                source=relation.source,
-                target=relation.target,
-                pivot_table=relation.pivot_table,
-                source_key=relation.source_key,
-                target_key=relation.target_key,
+                source=m2m_source,
+                target=m2m_target,
+                pivot_table=m2m_pivot_table,
+                source_key=m2m_source_key,
+                target_key=m2m_target_key,
                 target_entity=target["entity"],
                 target_table=target["table"],
                 target_pk_column=target_pk["column"],
@@ -148,7 +164,7 @@ def _load_crud_many_to_many_relations(
                 list_context_key=f"{target_snake}s_by_{snake}_id",
                 selected_key=f"{field_name}_selected",
                 show_context_key=f"{target_snake}_labels",
-                order_column=relation.order_column,
+                order_column=m2m_order_column,
             )
         )
     return crud_relations
