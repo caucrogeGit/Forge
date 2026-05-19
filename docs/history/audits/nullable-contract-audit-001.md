@@ -256,7 +256,19 @@ un changement comportemental dans un ticket dédié, pas comme une correction do
 
 ## 12. Prochains tickets proposés
 
-| Ticket | Objectif |
-|---|---|
-| `NULLABLE-CONTRACT-002` | Décider et appliquer la règle officielle `nullable` (défaut + `required` vs `nullable`) |
-| `NULLABLE-DOC-FIX-001` | Corriger `entity-schema.md` (défaut déclaré `true` → documenter le comportement réel) |
+| Ticket | Objectif | Statut |
+|---|---|---|
+| `NULLABLE-CONTRACT-002` | Décider et appliquer la règle officielle `nullable` (défaut + `required` vs `nullable`) | **Livré** |
+| `NULLABLE-DOC-FIX-001` | Corriger `entity-schema.md` (défaut déclaré `true` → documenter le comportement réel) | Ouvert |
+| `NULLABLE-CONTRACT-003` | Appliquer la règle officielle dans `canonical_model_normalizer.py` + tests | Ouvert |
+
+---
+
+## 13. Décision post-audit
+
+**Décision** : champ nullable par défaut, `required` prioritaire.
+
+Règle officielle : absent → NULL ; `required: true` → NOT NULL ; `nullable` explicite → respecté sauf si `required: true`.
+
+Voir **ADR-013 — Politique nullable / required dans les contrats JSON Forge** :
+`docs/adr/013-nullable-required-contract-policy.md`
