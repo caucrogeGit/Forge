@@ -143,6 +143,7 @@ La suppression sera traitée dans le ticket `LEGACY-REMOVE-001`, dans une versio
 
 ## Référence
 
+- Guide de migration : `docs/entities/migration-legacy-vers-canonique.md`
 - Audit : `docs/history/audits/legacy-support-core-audit-001.md`
 - Migrations starters : `STARTERS-MIGRATE-001` à `005`
 - Correctifs legacy : `LEGACY-STARTERRELS-FIX-001`, `LEGACY-SCAFFOLD-FIX-001`

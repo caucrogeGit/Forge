@@ -58,6 +58,7 @@ nav:
       - Valider les contrats JSON: entities/entity-validate.md
       - Autocomplétion VS Code: entities/vscode-json-schema.md
       - Limites des contrats JSON: entities/limites-contrats-json.md
+      - Migration legacy vers canonique: entities/migration-legacy-vers-canonique.md
       - Front et CSS: front.md
       - Profils de projet: profiles.md
       - FAQ: faq.md
