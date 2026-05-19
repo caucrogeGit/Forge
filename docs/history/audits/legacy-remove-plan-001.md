@@ -502,3 +502,44 @@ LEGACY-REMOVE-004 aligne la documentation sur la suppression du legacy. Le forma
 - `pytest`, `compileall`, `ruff check`, `mkdocs build --strict`, `git diff --check` : tous verts.
 - Aucune page utilisateur ne présente plus `format_version: 1` comme format utilisable.
 - Les audits historiques conservent les traces legacy par contexte.
+
+---
+
+## Mise en œuvre — LEGACY-STRICT-SCHEMA-001
+
+LEGACY-STRICT-SCHEMA-001 ferme le dernier interstice : les entités sans aucun marqueur
+de version (`format_version` ni `schema_version`) passaient silencieusement. Désormais,
+`build:model` et `check:model` les refusent explicitement.
+
+### Diagnostic
+
+Le ticket LEGACY-REMOVE-003 avait converti les fixtures entité en supprimant
+`format_version: 1`, les laissant sans marqueur de version. Ces entités circulaient
+encore via le chemin interne de `validate_entity_definition` dans les deux pipelines.
+
+### Changements apportés
+
+- **`forge_cli/entities/model.py`** — `_load_all_entity_sources` : après le refus
+  `format_version: 1`, ajout d'un refus explicite pour les entités sans
+  `schema_version: "1.0"`. Le message indique le fichier et pointe le guide de
+  migration. La branche `else` (chemin interne) est supprimée — seul le format
+  canonique est désormais accepté par `build:model` / `check:model`.
+- **`forge_cli/entities/make_crud.py`** — ajout d'un refus pour les entités sans
+  `schema_version: "1.0"` et sans clé `entity` (format inconnu). Les entités en
+  format interne pré-normalisé (clé `entity` présente) restent acceptées pour
+  la compatibilité des tests utilisant des structures internes directement.
+
+### Fichiers de tests créés
+
+- **`tests/test_require_schema_version_entities.py`** — 7 tests : refus par
+  `build_model` et `check_model`, acceptation du format canonique, refus par
+  `make_crud`, acceptation canonique.
+- **`tests/test_require_schema_version_relations.py`** — 4 tests : refus par
+  `validate_relations_definition`, `sync_relations`, `build_model` ; acceptation
+  du format canonique.
+
+### Résultat
+
+- `pytest`, `compileall`, `ruff check`, `mkdocs build --strict`, `git diff --check` : tous verts.
+- Aucune entité sans `schema_version` ne peut plus franchir `build:model` ou `check:model`.
+- Les relations sans `schema_version` étaient déjà refusées (LEGACY-REMOVE-002).

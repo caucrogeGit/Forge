@@ -174,7 +174,14 @@ def make_crud(
                 'Utilisez schema_version: "1.0".'
             ))
             raise SystemExit(1)
-        is_legacy = not (isinstance(raw, dict) and raw.get("schema_version") == "1.0")
+        if not isinstance(raw, dict) or (raw.get("schema_version") != "1.0" and "entity" not in raw):
+            print(out.error(
+                f"Entité sans schema_version : {entity_name}.\n"
+                'Ajoutez "schema_version": "1.0" à la racine du fichier JSON.\n'
+                "Guide : docs/entities/migration-legacy-vers-canonique.md"
+            ))
+            raise SystemExit(1)
+        is_legacy = raw.get("schema_version") != "1.0"
         if not is_legacy:
             raw = normalize_canonical_entity_for_model_build(raw)
         definition = validate_entity_definition(raw, source=str(json_path))

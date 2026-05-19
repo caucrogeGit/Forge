@@ -338,12 +338,16 @@ def _load_all_entity_sources(entities_root: Path, blocks: list[str]) -> list[Ent
                 "Guide : docs/entities/migration-legacy-vers-canonique.md"
             )
             continue
+        if not isinstance(raw_data, dict) or raw_data.get("schema_version") != "1.0":
+            blocks.append(
+                f"Entité sans schema_version : {json_path.as_posix()}.\n"
+                'Ajoutez "schema_version": "1.0" à la racine du fichier JSON.\n'
+                "Guide : docs/entities/migration-legacy-vers-canonique.md"
+            )
+            continue
         try:
-            if isinstance(raw_data, dict) and raw_data.get("schema_version") == "1.0":
-                normalized = normalize_canonical_entity_for_model_build(raw_data)
-                definition = validate_entity_definition(normalized, source=str(json_path))
-            else:
-                definition = validate_entity_definition(raw_data, source=str(json_path))
+            normalized = normalize_canonical_entity_for_model_build(raw_data)
+            definition = validate_entity_definition(normalized, source=str(json_path))
         except (ValueError, EntityDefinitionError, CanonicalNormalizationError) as exc:
             blocks.append(str(exc))
             continue

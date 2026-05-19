@@ -288,7 +288,7 @@ class TestErrorHandling:
         with pytest.raises(ModelValidationError):
             check_model(entities_root)
 
-    def test_no_version_falls_through_legacy(self, tmp_path):
+    def test_no_version_is_refused(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         no_version = {
             "entity": "Contact",
@@ -297,5 +297,6 @@ class TestErrorHandling:
         }
         _write_entity(entities_root, "contact", no_version)
         _write_relations(entities_root, _CANONICAL_RELATIONS)
-        sources, _ = check_model(entities_root)
-        assert sources[0].definition["entity"] == "Contact"
+        with pytest.raises(ModelValidationError) as exc_info:
+            check_model(entities_root)
+        assert "schema_version" in str(exc_info.value).lower() or "sans schema_version" in str(exc_info.value)
