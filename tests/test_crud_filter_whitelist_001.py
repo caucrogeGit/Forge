@@ -44,7 +44,7 @@ def _entity(extra_fields=None):
     ]
     fields.extend(extra_fields or [])
     return normalize_entity_definition({
-        "format_version": 1, "entity": "Contact", "table": "contact",
+        "entity": "Contact", "table": "contact",
         "description": "", "fields": fields,
     }, source="test.json")
 

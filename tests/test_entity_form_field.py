@@ -41,7 +41,6 @@ def _base_entity(extra_field=None):
         },
     ]
     return {
-        "format_version": 1,
         "entity": "Contact",
         "table": "contact",
         "description": "",
@@ -64,7 +63,6 @@ def _field_with_form(name, sql_type, python_type, form_field, nullable=False, co
 
 def _crud_entity(form_field, python_type="str", sql_type="VARCHAR(100)", nullable=False, constraints=None):
     return {
-        "format_version": 1,
         "entity": "Contact",
         "table": "contact",
         "description": "",
@@ -295,7 +293,7 @@ class TestMakeCrudFormField:
 
     def test_sans_form_field_comportement_actuel_preserve(self):
         entity = {
-            "format_version": 1, "entity": "Contact", "table": "contact", "description": "",
+            "entity": "Contact", "table": "contact", "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
                  "primary_key": True, "auto_increment": True, "nullable": False, "constraints": {}},

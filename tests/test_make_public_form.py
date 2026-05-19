@@ -17,7 +17,6 @@ from tests.test_make_public_list import _field
 
 
 DEMANDE_JSON = {
-    "format_version": 1,
     "entity": "Demande",
     "table": "demande",
     "description": "",
@@ -35,7 +34,6 @@ DEMANDE_JSON = {
 }
 
 BOOL_JSON = {
-    "format_version": 1,
     "entity": "Inscription",
     "table": "inscription",
     "description": "",
@@ -52,7 +50,6 @@ BOOL_JSON = {
 }
 
 SENSITIVE_ONLY_JSON = {
-    "format_version": 1,
     "entity": "Secret",
     "table": "secret",
     "description": "",

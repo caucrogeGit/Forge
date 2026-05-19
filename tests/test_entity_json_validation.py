@@ -9,7 +9,6 @@ from forge_cli.entities.validation import (
 
 def valid_entity() -> dict:
     return {
-        "format_version": 1,
         "entity": "Contact",
         "table": "contact",
         "description": "",

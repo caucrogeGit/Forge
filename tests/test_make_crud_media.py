@@ -19,7 +19,6 @@ from forge_cli.entities.make_crud import (
 
 def _entity(**extra):
     d = {
-        "format_version": 1,
         "entity": "Hebergement",
         "table": "hebergement",
         "description": "",
@@ -267,7 +266,6 @@ class TestBuildModelLastrowid:
 
     def test_add_sans_auto_increment_pas_de_lastrowid(self):
         d = {
-            "format_version": 1,
             "entity": "Tag",
             "table": "tag",
             "description": "",
@@ -899,7 +897,6 @@ class TestBuildControllerUpdateDelete:
 def _entity_complet():
     """Entité avec image cover (variants=True) + fichier brochure + champ SQL."""
     return normalize_entity_definition({
-        "format_version": 1,
         "entity": "Hebergement",
         "table": "hebergement",
         "description": "",

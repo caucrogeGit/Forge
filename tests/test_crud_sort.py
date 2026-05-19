@@ -43,7 +43,7 @@ def _mk_field(name, sql_type, python_type="str", nullable=False, list_meta=None)
 
 def _norm(fields=None):
     raw = {
-        "format_version": 1, "entity": "Contact", "table": "contact",
+        "entity": "Contact", "table": "contact",
         "description": "", "fields": [
             {"name": "id", "sql_type": "INT", "python_type": "int",
              "primary_key": True, "auto_increment": True, "nullable": False, "constraints": {}},

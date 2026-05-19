@@ -38,7 +38,6 @@ def _field(
 
 
 HEBERGEMENT_JSON = {
-    "format_version": 1,
     "entity": "Hebergement",
     "table": "hebergement",
     "description": "",

@@ -12,7 +12,6 @@ def _write(path: Path, content: str) -> None:
 
 def _contact_definition() -> str:
     return """{
-  "format_version": 1,
   "entity": "Contact",
   "table": "contact",
   "description": "",
@@ -119,7 +118,6 @@ def test_sync_entity_writes_nothing_if_json_is_invalid(tmp_path: Path):
     _write(
         entity_dir / "contact.json",
         """{
-  "format_version": 1,
   "entity": "contact",
   "table": "Contact",
   "description": "",

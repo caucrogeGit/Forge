@@ -105,7 +105,6 @@ def test_make_public_show_template_utilise_trans_pour_introuvable():
 
 def test_make_public_form_template_utilise_trans_pour_bouton():
     definition = {
-        "format_version": 1,
         "entity": "Demande",
         "table": "demande",
         "description": "",

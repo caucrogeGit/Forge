@@ -22,7 +22,6 @@ from tests.fake_request import FakeRequest
 def _article_def():
     return normalize_entity_definition(
         {
-            "format_version": 1,
             "entity": "Article",
             "table": "article",
             "description": "",

@@ -42,7 +42,6 @@ def _field(
 
 
 CONTACT = {
-    "format_version": 1,
     "entity": "Contact",
     "table": "contact",
     "description": "",

@@ -446,7 +446,7 @@ def test_crud_permission_invalide_refusee_a_la_validation():
     from forge_cli.entities.validation import EntityDefinitionError, validate_entity_definition
 
     defn = {
-        "format_version": 1, "entity": "Post", "table": "posts",
+        "entity": "Post", "table": "posts",
         "fields": [
             {"name": "id", "column": "Id", "python_type": "int", "sql_type": "INT",
              "nullable": False, "primary_key": True, "auto_increment": True,

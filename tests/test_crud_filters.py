@@ -57,7 +57,7 @@ def _entity(extra_fields=None):
     ]
     fields += extra_fields or [_mk_field("nom", "VARCHAR(80)")]
     return {
-        "format_version": 1, "entity": "Contact", "table": "contact",
+        "entity": "Contact", "table": "contact",
         "description": "", "fields": fields,
     }
 

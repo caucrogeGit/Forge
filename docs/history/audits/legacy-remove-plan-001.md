@@ -444,3 +444,29 @@ LEGACY-REMOVE-002 supprime le support du format `format_version: 1` dans les rel
 - `pytest`, `compileall`, `ruff check`, `mkdocs build --strict`, `git diff --check` : tous verts.
 - Format `format_version: 1` refusé dans `relations.json` par `validate_relations_definition`, `sync_relations`, `_load_crud_many_to_one_relations`, `_load_crud_many_to_many_relations`, `_load_existing_relations_doc`.
 - Clés legacy (`from_entity`, `to_entity`, `foreign_key_name`, `source`, `target`, `pivot_table`, `source_key`, `target_key`) rejetées dans les documents `schema_version: "1.0"`.
+
+---
+
+## Mise en œuvre — LEGACY-REMOVE-003
+
+LEGACY-REMOVE-003 nettoie les fixtures legacy restantes dans les fichiers de tests.
+
+### Classification appliquée
+
+- **Catégorie A (conservés)** — tests de rejet explicite du format legacy : `test_build_model_legacy_warning.py`, `test_make_crud_legacy_warning.py`, `test_build_model_canonical_routing.py`, `test_entity_semantic_validation.py` (1 test), `test_make_crud_many_to_one_canonical.py` (1 test), `test_entity_model_cli.py` (`_legacy_contact` / `_legacy_commande`), `test_entity_relations.py`, `test_relations_many_to_many.py`, `test_relations_ordered.py`, `test_many_to_many_canonical_generation.py`, `test_many_to_many_pivot_integration.py`, `test_pivot_fields_controlled.py`, `test_relations_many_to_one_canonical_sql.py`, `test_starter_scaffold_empty_relations.py`, méta-tests.
+- **Catégorie B (convertis)** — fixtures entité avec `format_version: 1` dans des tests de fonctionnalité non-legacy : 31 fichiers CRUD, media, public, RBAC, form, entity.
+- **Catégorie C (supprimés)** — aucun fichier entier supprimé.
+
+### Fichiers de tests convertis (Catégorie B)
+
+Suppression de `"format_version": 1,` dans les fixtures entité (passage à l'entité sans marqueur legacy) dans les 31 fichiers suivants :
+`test_crud_bulk_delete.py`, `test_crud_filters.py`, `test_crud_filters_htmx.py`, `test_crud_filter_whitelist_001.py`, `test_crud_htmx.py`, `test_crud_sort.py`, `test_entity_form_field.py`, `test_entity_json_validation.py`, `test_entity_media_declaration.py`, `test_entity_sync_command.py`, `test_make_crud_empty_states.py`, `test_make_crud_htmx_delete.py`, `test_make_crud_htmx_pagination.py`, `test_make_crud_htmx_search.py`, `test_make_crud_media.py`, `test_make_crud_media_alt.py`, `test_make_crud_media_context.py`, `test_make_crud_media_destroy.py`, `test_make_crud_media_gallery_add.py`, `test_make_crud_media_gallery_context.py`, `test_make_crud_media_gallery_delete.py`, `test_make_crud_media_gallery_multiupload.py`, `test_make_crud_media_gallery_order.py`, `test_make_crud_media_runtime.py`, `test_make_crud_pagination.py`, `test_make_crud_sort.py`, `test_make_public_form.py`, `test_make_public_i18n.py`, `test_make_public_list.py`, `test_make_public_list_media.py`, `test_rbac_security.py`.
+
+Conversion des fixtures relations legacy dans `test_starter_cli.py` (2 occurrences → format canonique).
+
+### Résultat
+
+- 11 877 tests passent (0 échec).
+- `pytest`, `compileall`, `ruff check`, `mkdocs build --strict`, `git diff --check` : tous verts.
+- Les fixtures entité dans les tests de fonctionnalité n'utilisent plus le marqueur `format_version: 1`.
+- Les fichiers restants avec `format_version: 1` sont exclusivement des tests de rejet (Catégorie A) ou des méta-tests documentaires.

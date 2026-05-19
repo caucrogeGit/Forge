@@ -28,7 +28,6 @@ from tests.fake_request import FakeRequest
 def _article_with_gallery():
     return normalize_entity_definition(
         {
-            "format_version": 1,
             "entity": "Article",
             "table": "article",
             "description": "",
@@ -55,7 +54,6 @@ def _article_with_gallery():
 def _article_without_media():
     return normalize_entity_definition(
         {
-            "format_version": 1,
             "entity": "Article",
             "table": "article",
             "description": "",
@@ -72,7 +70,6 @@ def _article_mixed():
     """Entité avec un champ single (cover) ET un champ multiple (photos)."""
     return normalize_entity_definition(
         {
-            "format_version": 1,
             "entity": "Article",
             "table": "article",
             "description": "",
@@ -118,7 +115,7 @@ class TestMultiuploadGeneration:
         def _single():
             return normalize_entity_definition(
                 {
-                    "format_version": 1, "entity": "Article", "table": "article", "description": "",
+                    "entity": "Article", "table": "article", "description": "",
                     "fields": [
                         {"name": "id", "sql_type": "INT", "primary_key": True, "auto_increment": True},
                         {"name": "titre", "sql_type": "VARCHAR(120)", "constraints": {"not_empty": True}},

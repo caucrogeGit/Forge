@@ -20,7 +20,6 @@ from tests.test_make_public_list import HEBERGEMENT_JSON, _field, _prepare_proje
 
 
 HEBERGEMENT_COVER_JSON = {
-    "format_version": 1,
     "entity": "Hebergement",
     "table": "hebergement",
     "description": "",
@@ -42,7 +41,6 @@ HEBERGEMENT_COVER_JSON = {
 }
 
 HEBERGEMENT_GALLERY_JSON = {
-    "format_version": 1,
     "entity": "Hebergement",
     "table": "hebergement",
     "description": "",
@@ -62,7 +60,6 @@ HEBERGEMENT_GALLERY_JSON = {
 }
 
 HEBERGEMENT_BROCHURE_JSON = {
-    "format_version": 1,
     "entity": "Hebergement",
     "table": "hebergement",
     "description": "",
@@ -82,7 +79,6 @@ HEBERGEMENT_BROCHURE_JSON = {
 }
 
 HEBERGEMENT_ALL_MEDIA_JSON = {
-    "format_version": 1,
     "entity": "Hebergement",
     "table": "hebergement",
     "description": "",
@@ -356,7 +352,6 @@ def test_show_template_avec_fichier_single_affiche_lien():
 
 def test_show_template_avec_fichiers_multiples_affiche_liste():
     definition = {
-        "format_version": 1,
         "entity": "Hebergement",
         "table": "hebergement",
         "description": "",

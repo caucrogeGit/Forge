@@ -29,7 +29,6 @@ def _field(name, sql_type, *, python_type, primary_key=False, auto_increment=Fal
 
 
 CONTACT = {
-    "format_version": 1,
     "entity": "Contact",
     "table": "contact",
     "description": "",

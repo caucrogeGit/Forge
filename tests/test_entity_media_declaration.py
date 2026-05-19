@@ -15,7 +15,6 @@ from forge_cli.entities.validation import (
 
 def _base_entity(**extra):
     d = {
-        "format_version": 1,
         "entity": "Hebergement",
         "table": "hebergement",
         "description": "",
@@ -302,7 +301,7 @@ class TestNonRegressionFormField:
 
     def test_form_field_email_toujours_valide(self):
         entity = {
-            "format_version": 1, "entity": "Contact", "table": "contact", "description": "",
+            "entity": "Contact", "table": "contact", "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "primary_key": True, "auto_increment": True},
                 {"name": "email", "sql_type": "VARCHAR(254)", "form": {"field": "email"}},
@@ -312,7 +311,7 @@ class TestNonRegressionFormField:
 
     def test_form_field_image_toujours_refuse(self):
         entity = {
-            "format_version": 1, "entity": "Contact", "table": "contact", "description": "",
+            "entity": "Contact", "table": "contact", "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "primary_key": True, "auto_increment": True},
                 {"name": "photo", "sql_type": "VARCHAR(255)", "form": {"field": "image"}},
@@ -323,7 +322,7 @@ class TestNonRegressionFormField:
 
     def test_entite_avec_media_et_form_field_simultanes(self):
         entity = {
-            "format_version": 1, "entity": "Article", "table": "article", "description": "",
+            "entity": "Article", "table": "article", "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "primary_key": True, "auto_increment": True},
                 {"name": "titre", "sql_type": "VARCHAR(200)", "form": {"field": "string"}},

@@ -214,18 +214,16 @@ def test_starter_carnet_refuse_relations_existantes_sans_force(tmp_path):
     relations.write_text(
         json.dumps(
             {
-                "format_version": 1,
+                "schema_version": "1.0",
                 "relations": [
                     {
-                        "name": "custom_relation",
                         "type": "many_to_one",
-                        "from_entity": "Contact",
-                        "to_entity": "Ville",
-                        "from_field": "ville_id",
-                        "to_field": "id",
-                        "foreign_key_name": "fk_custom_relation",
-                        "on_delete": "RESTRICT",
-                        "on_update": "CASCADE",
+                        "from": "Contact",
+                        "to": "Ville",
+                        "name": "ville",
+                        "foreign_key": "ville_id",
+                        "nullable": True,
+                        "on_delete": "SET NULL",
                     }
                 ],
             }
@@ -240,7 +238,7 @@ def test_starter_carnet_adopte_relations_vides_du_squelette(tmp_path):
     meta = resolve("3")
     relations = tmp_path / "mvc" / "entities" / "relations.json"
     relations.parent.mkdir(parents=True)
-    relations.write_text('{"format_version": 1, "relations": []}\n', encoding="utf-8")
+    relations.write_text('{"schema_version": "1.0", "relations": []}\n', encoding="utf-8")
 
     assert _check_existing(meta, tmp_path) == []
 

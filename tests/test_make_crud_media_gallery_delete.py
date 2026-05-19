@@ -26,7 +26,6 @@ from tests.fake_request import FakeRequest
 def _article_with_gallery():
     return normalize_entity_definition(
         {
-            "format_version": 1,
             "entity": "Article",
             "table": "article",
             "description": "",
@@ -53,7 +52,6 @@ def _article_with_gallery():
 def _article_without_media():
     return normalize_entity_definition(
         {
-            "format_version": 1,
             "entity": "Article",
             "table": "article",
             "description": "",
@@ -69,7 +67,6 @@ def _article_without_media():
 def _article_mixed():
     return normalize_entity_definition(
         {
-            "format_version": 1,
             "entity": "Article",
             "table": "article",
             "description": "",
