@@ -44,7 +44,6 @@ def _base_entity(extra_field=None):
         },
     ]
     return {
-        "format_version": 1,
         "entity": "Contact",
         "table": "contact",
         "description": "",
@@ -69,7 +68,6 @@ def _field(name, sql_type, python_type, nullable=False, list_meta=None):
 
 def _entity_with_filter_field(name, sql_type, python_type, filter_val=True):
     return {
-        "format_version": 1,
         "entity": "Contact",
         "table": "contact",
         "description": "",
@@ -284,7 +282,7 @@ class TestFilterFields:
         ]
         fields.extend(extra_fields)
         return {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "", "fields": fields,
         }
 
@@ -336,7 +334,7 @@ class TestBuildModelFilters:
 
     def _entity(self, extra_field):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -380,7 +378,7 @@ class TestBuildModelFilters:
 
     def test_filtre_relationnel_combine_avec_q_via_and(self):
         entity = normalize_entity_definition({
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -397,7 +395,7 @@ class TestBuildModelFilters:
 
     def test_filtre_relationnel_utilise_parametre_sql(self):
         entity = normalize_entity_definition({
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -420,7 +418,7 @@ class TestBuildControllerFilters:
 
     def _entity_with_statut(self):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -433,7 +431,7 @@ class TestBuildControllerFilters:
 
     def _entity_with_bool_filter(self):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -445,7 +443,7 @@ class TestBuildControllerFilters:
 
     def _entity_no_filter(self):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -457,7 +455,7 @@ class TestBuildControllerFilters:
 
     def _entity_with_relation(self):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -543,7 +541,7 @@ class TestBuildIndexViewFilters:
 
     def _entity_with_varchar_filter(self):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -555,7 +553,7 @@ class TestBuildIndexViewFilters:
 
     def _entity_with_bool_filter(self):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -567,7 +565,7 @@ class TestBuildIndexViewFilters:
 
     def _entity_no_filter(self):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",
@@ -579,7 +577,7 @@ class TestBuildIndexViewFilters:
 
     def _entity_with_relation(self):
         raw = {
-            "format_version": 1, "entity": "Contact", "table": "contact",
+            "entity": "Contact", "table": "contact",
             "description": "",
             "fields": [
                 {"name": "id", "sql_type": "INT", "python_type": "int",

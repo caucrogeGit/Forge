@@ -47,7 +47,6 @@ def _field(name, sql_type, *, python_type, primary_key=False, auto_increment=Fal
 
 
 _CONTACT_JSON = {
-    "format_version": 1,
     "entity": "Contact",
     "table": "contact",
     "description": "",
@@ -58,31 +57,40 @@ _CONTACT_JSON = {
     ],
 }
 
-_CONTACT_WITH_VILLE_JSON = {
-    "format_version": 1,
-    "entity": "Contact",
+# Fixtures canoniques pour les tests qui écrivent sur disque via make_crud()
+_CONTACT_DISK = {
+    "schema_version": "1.0",
+    "name": "Contact",
     "table": "contact",
     "description": "",
     "fields": [
-        _field("id",       "INT",          python_type="int", primary_key=True, auto_increment=True),
-        _field("nom",      "VARCHAR(100)", python_type="str", constraints={"not_empty": True, "max_length": 100}),
-        _field("ville_id", "INT",          python_type="int", nullable=True),
+        {"name": "nom", "type": "string", "max_length": 100, "required": True},
+        {"name": "email", "type": "string", "nullable": True},
+    ],
+}
+
+_CONTACT_WITH_VILLE_JSON = {
+    "schema_version": "1.0",
+    "name": "Contact",
+    "table": "contact",
+    "description": "",
+    "fields": [
+        {"name": "nom", "type": "string", "max_length": 100, "required": True},
+        {"name": "ville_id", "type": "integer", "nullable": True},
     ],
 }
 
 _VILLE_JSON = {
-    "format_version": 1,
-    "entity": "Ville",
+    "schema_version": "1.0",
+    "name": "Ville",
     "table": "ville",
     "description": "",
     "fields": [
-        _field("id",  "INT",          python_type="int", primary_key=True, auto_increment=True),
-        _field("nom", "VARCHAR(100)", python_type="str"),
+        {"name": "nom", "type": "string", "max_length": 100},
     ],
 }
 
 _VILLE_PK_ONLY_JSON = {
-    "format_version": 1,
     "entity": "Ville",
     "table": "ville",
     "description": "",
@@ -92,24 +100,20 @@ _VILLE_PK_ONLY_JSON = {
 }
 
 _CONTACT_VILLE_RELATIONS_JSON = {
-    "format_version": 1,
+    "schema_version": "1.0",
     "relations": [
         {
             "name": "contact_ville",
             "type": "many_to_one",
-            "from_entity": "Contact",
-            "to_entity": "Ville",
-            "from_field": "ville_id",
-            "to_field": "id",
-            "foreign_key_name": "fk_contact_ville",
-            "on_delete": "SET NULL",
-            "on_update": "CASCADE",
+            "from": "Contact",
+            "to": "Ville",
+            "foreign_key": "ville_id",
+            "on_delete": "set_null",
         }
     ],
 }
 
 _EVENEMENT_JSON = {
-    "format_version": 1,
     "entity": "Evenement",
     "table": "evenement",
     "description": "",
@@ -119,8 +123,17 @@ _EVENEMENT_JSON = {
     ],
 }
 
+_EVENEMENT_DISK = {
+    "schema_version": "1.0",
+    "name": "Evenement",
+    "table": "evenement",
+    "description": "",
+    "fields": [
+        {"name": "date_debut", "type": "date"},
+    ],
+}
+
 _PRODUIT_JSON = {
-    "format_version": 1,
     "entity": "Produit",
     "table": "produit",
     "description": "",
@@ -136,7 +149,7 @@ _PRODUIT_JSON = {
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 def _make_entity(tmp_path: Path, data: dict) -> Path:
-    entity = data["entity"]
+    entity = data.get("name") or data.get("entity")
     snake = _to_snake(entity)
     entity_dir = tmp_path / "mvc" / "entities" / snake
     entity_dir.mkdir(parents=True, exist_ok=True)
@@ -156,7 +169,7 @@ def _make_entities(tmp_path: Path, *definitions: dict, relations: dict | None = 
 
 
 def _run(entity_name: str, tmp_path: Path, data: dict = None, dry_run: bool = False) -> MakeCrudResult:
-    d = data if data is not None else _CONTACT_JSON
+    d = data if data is not None else _CONTACT_DISK
     entities_root = _make_entity(tmp_path, d)
     return make_crud(
         entity_name,
@@ -217,7 +230,7 @@ def test_make_crud_avec_relations_json_vide_continue_de_fonctionner(tmp_path):
     entities_root = _make_entities(
         tmp_path,
         _CONTACT_WITH_VILLE_JSON,
-        relations={"format_version": 1, "relations": []},
+        relations={"schema_version": "1.0", "relations": []},
     )
 
     make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
@@ -229,7 +242,7 @@ def test_make_crud_avec_relations_json_vide_continue_de_fonctionner(tmp_path):
 # ── Non-écrasement ─────────────────────────────────────────────────────────────
 
 def test_non_ecrasement_controller(tmp_path):
-    entities_root = _make_entity(tmp_path, _CONTACT_JSON)
+    entities_root = _make_entity(tmp_path, _CONTACT_DISK)
     ctrl_path = tmp_path / "mvc" / "controllers" / "contact_controller.py"
     ctrl_path.parent.mkdir(parents=True, exist_ok=True)
     ctrl_path.write_text("# existant", encoding="utf-8")
@@ -241,7 +254,7 @@ def test_non_ecrasement_controller(tmp_path):
 
 
 def test_non_ecrasement_form(tmp_path):
-    entities_root = _make_entity(tmp_path, _CONTACT_JSON)
+    entities_root = _make_entity(tmp_path, _CONTACT_DISK)
     form_path = tmp_path / "mvc" / "forms" / "contact_form.py"
     form_path.parent.mkdir(parents=True, exist_ok=True)
     form_path.write_text("# existant", encoding="utf-8")
@@ -253,7 +266,7 @@ def test_non_ecrasement_form(tmp_path):
 
 
 def test_non_ecrasement_layout(tmp_path):
-    entities_root = _make_entity(tmp_path, _CONTACT_JSON)
+    entities_root = _make_entity(tmp_path, _CONTACT_DISK)
     layout_path = tmp_path / "mvc" / "views" / "layouts" / "app.html"
     layout_path.parent.mkdir(parents=True, exist_ok=True)
     layout_path.write_text("<!-- existant -->", encoding="utf-8")
@@ -265,7 +278,7 @@ def test_non_ecrasement_layout(tmp_path):
 
 
 def test_non_ecrasement_vue_index(tmp_path):
-    entities_root = _make_entity(tmp_path, _CONTACT_JSON)
+    entities_root = _make_entity(tmp_path, _CONTACT_DISK)
     index_path = tmp_path / "mvc" / "views" / "contact" / "index.html"
     index_path.parent.mkdir(parents=True, exist_ok=True)
     index_path.write_text("<!-- existant -->", encoding="utf-8")
@@ -455,11 +468,8 @@ def test_pas_de_warn_pour_champ_date(tmp_path):
 
 
 def test_pas_de_warn_dans_resultat_make_crud(tmp_path):
-    result = _run("Evenement", tmp_path, data=_EVENEMENT_JSON)
-    # _EVENEMENT_JSON est legacy (format_version: 1) → un warning de dépréciation est attendu.
-    # On vérifie qu'il n'y a aucun warning métier (form-builder) en dehors de ce warning legacy.
-    non_legacy = [w for w in result.warnings if "format_version" not in w]
-    assert len(non_legacy) == 0
+    result = _run("Evenement", tmp_path, data=_EVENEMENT_DISK)
+    assert result.warnings == []
 
 
 def test_pas_de_warn_pour_varchar_et_int(tmp_path):
@@ -505,7 +515,7 @@ def test_date_dans_imports(tmp_path):
 
 
 _LOG_JSON = {
-    "format_version": 1, "entity": "Log", "table": "log", "description": "",
+    "entity": "Log", "table": "log", "description": "",
     "fields": [
         _field("id",         "INT",      python_type="int",      primary_key=True, auto_increment=True),
         _field("created_at", "DATETIME", python_type="datetime"),
@@ -623,7 +633,6 @@ def test_controller_verifie_id_invalide_avant_model(tmp_path):
 # ── Entité PK-only (aucun champ métier) ───────────────────────────────────────
 
 _PK_ONLY_JSON = {
-    "format_version": 1,
     "entity": "Token",
     "table": "token",
     "description": "",
@@ -657,7 +666,7 @@ def test_pk_only_warn_dans_make_crud(tmp_path):
     (tmp_path / "mvc" / "entities" / "token").mkdir(parents=True)
     (tmp_path / "mvc" / "entities" / "token" / "token.json").write_text(
         json.dumps({
-            "format_version": 1, "entity": "Token", "table": "token",
+            "entity": "Token", "table": "token",
             "fields": [{"name": "id", "sql_type": "INT",
                         "primary_key": True, "auto_increment": True}],
         }),
@@ -793,7 +802,7 @@ def test_search_cols_inclut_varchar(tmp_path):
 def test_search_cols_vides_si_aucun_texte(tmp_path):
     """Entité sans champ texte → _SEARCH_COLS = []."""
     D = {
-        "format_version": 1, "entity": "Score", "table": "score", "description": "",
+        "entity": "Score", "table": "score", "description": "",
         "fields": [
             _field("id",     "INT", python_type="int", primary_key=True, auto_increment=True),
             _field("valeur", "INT", python_type="int"),
@@ -819,7 +828,7 @@ def test_search_cols_inclut_champ_text(tmp_path):
 def test_search_cols_exclut_champ_int_non_pk(tmp_path):
     """Un champ INT non-PK (ex: une FK) ne doit pas être dans _SEARCH_COLS."""
     D = {
-        "format_version": 1, "entity": "Commande", "table": "commande", "description": "",
+        "entity": "Commande", "table": "commande", "description": "",
         "fields": [
             _field("id",         "INT",          python_type="int", primary_key=True, auto_increment=True),
             _field("reference",  "VARCHAR(20)",  python_type="str"),
@@ -914,7 +923,6 @@ def test_direction_invalide_ne_devient_pas_desc_par_defaut(tmp_path):
 # ── Types HTML formulaire ──────────────────────────────────────────────────────
 
 _RESERVATION_JSON = {
-    "format_version": 1,
     "entity": "Reservation",
     "table": "reservation",
     "description": "",
@@ -1240,7 +1248,7 @@ def test_many_to_one_index_titre_colonne_est_entite_cible(tmp_path):
 
 
 def test_sans_relation_pas_de_left_join(tmp_path):
-    entities_root = _make_entity(tmp_path, _CONTACT_JSON)
+    entities_root = _make_entity(tmp_path, _CONTACT_DISK)
     make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
     code = (tmp_path / "mvc" / "models" / "contact_model.py").read_text(encoding="utf-8")
     assert "LEFT JOIN" not in code
@@ -1248,7 +1256,7 @@ def test_sans_relation_pas_de_left_join(tmp_path):
 
 
 def test_sans_relation_colonnes_non_qualifiees(tmp_path):
-    entities_root = _make_entity(tmp_path, _CONTACT_JSON)
+    entities_root = _make_entity(tmp_path, _CONTACT_DISK)
     make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
     code = (tmp_path / "mvc" / "models" / "contact_model.py").read_text(encoding="utf-8")
     assert '_DEFAULT_SORT = "Id"' in code

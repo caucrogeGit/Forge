@@ -38,7 +38,6 @@ def _field(
 
 
 ARTICLE = {
-    "format_version": 1,
     "entity": "Article",
     "table": "article",
     "description": "",
@@ -53,7 +52,6 @@ ARTICLE = {
 }
 
 SCORE = {
-    "format_version": 1,
     "entity": "Score",
     "table": "score",
     "description": "",
@@ -64,7 +62,6 @@ SCORE = {
 }
 
 AUTHOR = {
-    "format_version": 1,
     "entity": "Auteur",
     "table": "auteur",
     "description": "",
@@ -75,7 +72,6 @@ AUTHOR = {
 }
 
 ARTICLE_WITH_TEXT_FK = {
-    "format_version": 1,
     "entity": "Article",
     "table": "article",
     "description": "",
@@ -87,7 +83,6 @@ ARTICLE_WITH_TEXT_FK = {
 }
 
 TAG = {
-    "format_version": 1,
     "entity": "Tag",
     "table": "tag",
     "description": "",
@@ -172,18 +167,15 @@ def test_entite_sans_champ_texte_garde_recherche_inactive():
 
 def test_fk_many_to_one_textuelle_est_exclue_des_champs_recherchables(tmp_path):
     relations = {
-        "format_version": 1,
+        "schema_version": "1.0",
         "relations": [
             {
                 "name": "article_auteur",
                 "type": "many_to_one",
-                "from_entity": "Article",
-                "to_entity": "Auteur",
-                "from_field": "auteur_code",
-                "to_field": "code",
-                "foreign_key_name": "fk_article_auteur",
-                "on_delete": "RESTRICT",
-                "on_update": "CASCADE",
+                "from": "Article",
+                "to": "Auteur",
+                "foreign_key": "auteur_code",
+                "on_delete": "restrict",
             }
         ],
     }
