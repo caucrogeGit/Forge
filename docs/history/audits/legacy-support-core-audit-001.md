@@ -331,10 +331,23 @@ Corrections prioritaires indépendantes :
 
 ## 11. Prochains tickets proposés
 
-| Ticket | Objectif |
-|---|---|
-| `LEGACY-STARTERRELS-FIX-001` | Corriger `drop_foreign_keys()` pour relations canoniques |
-| `LEGACY-SCAFFOLD-FIX-001` | Mettre à jour la détection de relations vides dans `scaffold.py` |
-| `LEGACY-POLICY-002` | Décider et documenter la politique de dépréciation du format legacy |
-| `LEGACY-MIGRATION-001` | Documenter ou outiller la migration des anciens projets |
-| `LEGACY-REMOVE-001` | Supprimer le support legacy (version majeure future) |
+| Ticket | Objectif | Statut |
+|---|---|---|
+| `LEGACY-STARTERRELS-FIX-001` | Corriger `drop_foreign_keys()` pour relations canoniques | **Livré** |
+| `LEGACY-SCAFFOLD-FIX-001` | Mettre à jour la détection de relations vides dans `scaffold.py` | **Livré** |
+| `LEGACY-POLICY-002` | Décider et documenter la politique de dépréciation du format legacy | **Livré** |
+| `LEGACY-MIGRATION-001` | Documenter ou outiller la migration des anciens projets | Ouvert |
+| `LEGACY-REMOVE-001` | Supprimer le support legacy (version majeure future) | Ouvert |
+
+---
+
+## 12. Décision post-audit
+
+**Décision** : maintien temporaire avec dépréciation documentée.
+
+Le format legacy `format_version: 1` est officiellement déprécié au profit du format canonique
+`schema_version: "1.0"`. Le support temporaire est maintenu pour la compatibilité du pipeline
+interne et des projets existants.
+
+Voir **ADR-012 — Politique de dépréciation du format legacy des entités Forge** :
+`docs/adr/012-legacy-format-deprecation-policy.md`
