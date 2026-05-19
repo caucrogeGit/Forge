@@ -329,8 +329,9 @@ concernées supportent déjà `--json`.
 | Ticket | Objectif | Statut |
 |---|---|---|
 | `LEGACY-WARNINGS-002` | Implémenter le warning non bloquant dans `build:model` | **Livré** |
-| `LEGACY-WARNINGS-003` | Étendre le warning à `make:crud` et `make:relation` | À créer après LEGACY-WARNINGS-002 |
-| `LEGACY-WARNINGS-004` | Warning ciblé dans `entity:validate` pour les fichiers legacy ignorés | À créer après évaluation |
+| `LEGACY-WARNINGS-003` | Audit make:crud / make:relation — stratégie warnings | **Livré** |
+| `LEGACY-WARNINGS-004` | Warning non bloquant dans `make:crud` | **Livré** |
+| `LEGACY-WARNINGS-005` | Décider si `make:relation` doit avertir sur `relations.json` legacy | À créer |
 | `LEGACY-TESTS-RECLASSIFY-001` | Reclasser les 75 tests legacy comme `pytest.mark.legacy` | À créer (référencé ADR-012) |
 
 ---
@@ -348,3 +349,38 @@ champ `legacy_warnings` sur `BuildModelResult`, collecte dans `build_model()`, a
 dans `main()`).
 
 Les autres commandes (`make:crud`, `make:relation`, migrations) restent hors périmètre.
+
+---
+
+## 11. Clôture du bloc warnings legacy
+
+**Statut : terminé.**
+
+Le bloc warnings legacy est clôturé après livraison de :
+
+- `LEGACY-WARNINGS-001` — audit stratégie warnings legacy ;
+- `LEGACY-WARNINGS-002` — warning non bloquant dans `build:model` ;
+- `LEGACY-WARNINGS-003` — audit `make:crud` / `make:relation` ;
+- `LEGACY-WARNINGS-004` — warning non bloquant dans `make:crud`.
+
+**État final des warnings legacy :**
+
+| Commande | Statut |
+|---|---|
+| `build:model` | Warning actif — `[WARN]` par entité `format_version: 1` chargée |
+| `make:crud` | Warning actif — `[WARN]` par entité `format_version: 1` utilisée |
+| `make:relation` | Pas de warning — conversion canonique automatique considérée suffisante |
+| Migrations | Pas de warning — risque de bruit CI ; traitement différé |
+| `entity:validate` | Pas de warning legacy — centré sur le format canonique (`schema_version: "1.0"`) |
+
+**Propriétés des warnings :**
+
+- Non bloquants — la génération se poursuit normalement.
+- Sorties humaines uniquement — aucun warning n'est ajouté aux sorties JSON.
+- Un warning par entité — pas de duplication dans une même exécution.
+
+**Ce qui reste inchangé :**
+
+- Le support legacy (`format_version: 1`) reste présent.
+- Aucun tag n'a été créé.
+- Aucune publication PyPI n'a été faite.
