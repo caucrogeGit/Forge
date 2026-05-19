@@ -147,6 +147,7 @@ nav:
           - ADR-011 Périmètre vocabulaire audit auth: adr/011-auth-audit-vocab-perimeter.md
           - ADR-012 Suppression format legacy: adr/012-legacy-format-deprecation-policy.md
           - ADR-013 Politique nullable/required: adr/013-nullable-required-contract-policy.md
+          - ADR-014 Contrat RBAC séparé: adr/014-rbac-contract-location.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md

@@ -163,8 +163,9 @@ Fichier `article.rbac.json` à côté de `article.json`.
    Le format interne fonctionne et est stable. Aucun utilisateur réel n'essaie d'écrire
    `rbac` dans un fichier `schema_version: "1.0"` aujourd'hui.
 
-3. **Principe 2 — petits tickets** : intégrer `rbac` dans le schéma canonique mérite
-   un ticket complet avec spec précise (ENTITY-SCHEMA-RBAC-002 ou similar).
+3. **Principe 2 — petits tickets** : définir où vit la configuration RBAC mérite
+   un ticket dédié (RBAC-CONTRACT-001). Ce ticket doit décider de l'emplacement
+   séparé, pas intégrer `rbac` dans `entity.schema.json`.
 
 4. **Séparation sémantique saine** : le schéma canonique décrit la structure de données
    (tables, champs, index, options). `rbac` décrit des règles d'autorisation applicatives.
@@ -187,15 +188,16 @@ Fichier `article.rbac.json` à côté de `article.json`.
 
 ## 6. Ticket suivant recommandé
 
-**ENTITY-SCHEMA-RBAC-002** — Intégrer `rbac` dans le schéma canonique.
+**RBAC-CONTRACT-001** — Définir un contrat RBAC séparé du schéma d'entité.
 
-Périmètre minimal :
-1. Ajouter propriété `rbac` dans `schemas/entity.schema.json`
-2. Mettre à jour `canonical_model_normalizer.py` pour préserver `rbac`
-3. Écrire des tests de bout-en-bout : entité canonique avec `rbac` → `make:crud` génère les guards
-4. Documenter dans `docs/entities/` la syntaxe RBAC canonique
+Objectif : décider où vit la configuration RBAC (emplacement, format, structure)
+sans toucher à `entity.schema.json`. L'emplacement recommandé est
+`mvc/security/rbac.json` (contrat séparé, fichier dédié).
 
 Prérequis : ENTITY-SCHEMA-RBAC-001 livré (ce document).
+
+**Note** : le ticket suivant N'est PAS une intégration dans `entity.schema.json`.
+La décision Option A est ferme : `rbac` hors du schéma d'entité.
 
 ---
 
