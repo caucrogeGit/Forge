@@ -328,7 +328,23 @@ concernées supportent déjà `--json`.
 
 | Ticket | Objectif | Statut |
 |---|---|---|
-| `LEGACY-WARNINGS-002` | Implémenter le warning non bloquant dans `build:model` | À créer |
+| `LEGACY-WARNINGS-002` | Implémenter le warning non bloquant dans `build:model` | **Livré** |
 | `LEGACY-WARNINGS-003` | Étendre le warning à `make:crud` et `make:relation` | À créer après LEGACY-WARNINGS-002 |
 | `LEGACY-WARNINGS-004` | Warning ciblé dans `entity:validate` pour les fichiers legacy ignorés | À créer après évaluation |
 | `LEGACY-TESTS-RECLASSIFY-001` | Reclasser les 75 tests legacy comme `pytest.mark.legacy` | À créer (référencé ADR-012) |
+
+---
+
+## 10. Mise en œuvre partielle
+
+`LEGACY-WARNINGS-002` ajoute un warning humain non bloquant dans `build:model` lorsqu'une
+entité `format_version: 1` est chargée.
+
+Mécanisme : `BuildModelResult.legacy_warnings` (liste de messages), affiché via `out.warn()`
+dans `main()` uniquement pour la commande `build:model`.
+
+Fichiers modifiés : `forge_cli/entities/model.py` (champ `is_legacy` sur `EntitySource`,
+champ `legacy_warnings` sur `BuildModelResult`, collecte dans `build_model()`, affichage
+dans `main()`).
+
+Les autres commandes (`make:crud`, `make:relation`, migrations) restent hors périmètre.

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +35,7 @@ class EntitySource:
     entity_dir: Path
     json_path: Path
     definition: dict[str, Any]
+    is_legacy: bool = False
 
 
 @dataclass
@@ -43,6 +44,7 @@ class BuildModelResult:
     created: list[Path]
     preserved: list[Path]
     dry_run: bool = False
+    legacy_warnings: list[str] = field(default_factory=list)
 
 
 class ModelValidationError(ValueError):
@@ -110,6 +112,14 @@ def build_model(entities_root: Path, *, dry_run: bool = False) -> BuildModelResu
     _assert_contracts_valid(entities_root)
     entity_sources, validated_relations = _validate_model_or_raise(entities_root)
 
+    legacy_warnings: list[str] = [
+        f'Entité legacy : {s.definition["entity"]}. '
+        'format_version: 1 est déprécié — utilisez schema_version: "1.0". '
+        "Guide : docs/entities/migration-legacy-vers-canonique.md"
+        for s in entity_sources
+        if s.is_legacy
+    ]
+
     written: list[Path] = []
     created: list[Path] = []
     preserved: list[Path] = []
@@ -151,7 +161,7 @@ def build_model(entities_root: Path, *, dry_run: bool = False) -> BuildModelResu
         relations_path.write_text(generate_relations_sql(validated_relations), encoding="utf-8")
     written.append(relations_path)
 
-    return BuildModelResult(written=written, created=created, preserved=preserved, dry_run=dry_run)
+    return BuildModelResult(written=written, created=created, preserved=preserved, dry_run=dry_run, legacy_warnings=legacy_warnings)
 
 
 def check_model(
@@ -204,6 +214,8 @@ def main(argv: list[str] | None = None) -> None:
                 print(out.created(path.as_posix()))
             for path in result.preserved:
                 print(out.preserved(path.as_posix()))
+            for w in result.legacy_warnings:
+                print(out.warn(w))
             print(
                 f"\n{len(result.written)} régénéré(s), "
                 f"{len(result.created)} créé(s), "
@@ -239,21 +251,21 @@ def _print_check_model_preview(entity_sources: list[EntitySource], entities_root
         print(f"\n  {entity}  (table : {table})")
 
         rows: list[list[str]] = []
-        for field in defn["fields"]:
+        for fld in defn["fields"]:
             parts: list[str] = []
-            for k, v in field["constraints"].items():
+            for k, v in fld["constraints"].items():
                 parts.append(f"{k}:{v}")
-            if "default" in field:
-                parts.append(f"defaut:{field['default']!r}")
+            if "default" in fld:
+                parts.append(f"defaut:{fld['default']!r}")
             rows.append([
-                field["name"],
-                field["column"] or "",
-                field["sql_type"] or "",
-                field["python_type"] or "?",
-                "oui" if field["nullable"] else "non",
-                "oui" if field["primary_key"] else "non",
-                "oui" if field["auto_increment"] else "non",
-                "oui" if field["unique"] else "non",
+                fld["name"],
+                fld["column"] or "",
+                fld["sql_type"] or "",
+                fld["python_type"] or "?",
+                "oui" if fld["nullable"] else "non",
+                "oui" if fld["primary_key"] else "non",
+                "oui" if fld["auto_increment"] else "non",
+                "oui" if fld["unique"] else "non",
                 "  ".join(parts),
             ])
 
@@ -331,15 +343,17 @@ def _load_all_entity_sources(entities_root: Path, blocks: list[str]) -> list[Ent
             blocks.append(str(exc))
             continue
         try:
+            is_legacy = False
             if isinstance(raw_data, dict) and raw_data.get("schema_version") == "1.0":
                 legacy_data = normalize_canonical_entity_for_model_build(raw_data)
                 definition = validate_entity_definition(legacy_data, source=str(json_path))
             else:
+                is_legacy = True
                 definition = validate_entity_definition(raw_data, source=str(json_path))
         except (ValueError, EntityDefinitionError, CanonicalNormalizationError) as exc:
             blocks.append(str(exc))
             continue
-        sources.append(EntitySource(entity_dir=entity_dir, json_path=json_path, definition=definition))
+        sources.append(EntitySource(entity_dir=entity_dir, json_path=json_path, definition=definition, is_legacy=is_legacy))
     return sources
 
 
