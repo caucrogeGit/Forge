@@ -543,3 +543,41 @@ encore via le chemin interne de `validate_entity_definition` dans les deux pipel
 - `pytest`, `compileall`, `ruff check`, `mkdocs build --strict`, `git diff --check` : tous verts.
 - Aucune entité sans `schema_version` ne peut plus franchir `build:model` ou `check:model`.
 - Les relations sans `schema_version` étaient déjà refusées (LEGACY-REMOVE-002).
+
+---
+
+## Clôture — LEGACY-CLOSE-001
+
+**Statut** : terminé.
+
+Le bloc legacy est clôturé après livraison de :
+
+- LEGACY-REMOVE-PLAN-001 ;
+- LEGACY-REMOVE-001A ;
+- LEGACY-REMOVE-001B ;
+- LEGACY-REMOVE-002 ;
+- LEGACY-REMOVE-003 ;
+- LEGACY-REMOVE-004 ;
+- LEGACY-STRICT-SCHEMA-001.
+
+### État final
+
+- Les entités utilisateur doivent déclarer `schema_version: "1.0"`.
+- `relations.json` doit déclarer `schema_version: "1.0"`.
+- `format_version: 1` est refusé par `build:model`, `check:model`, `make:crud`, `validate_relations_definition`.
+- Les clés relationnelles legacy (`from_entity`, `to_entity`, `foreign_key_name`, `pivot_table`, `source_key`, `target_key`) sont refusées dans les documents `schema_version: "1.0"`.
+- Les starters Forge sont canoniques — aucun fichier entité ou relations n'utilise `format_version: 1`.
+- Les tests legacy inutiles ont été nettoyés (LEGACY-REMOVE-003) ; les tests de rejet sont conservés comme garde-fous.
+- La documentation utilisateur est alignée — aucune page ne présente le legacy comme format accepté (LEGACY-REMOVE-004).
+- Aucun tag ni publication PyPI n'a été effectué.
+
+### Traces legacy restantes (intentionnelles)
+
+| Trace | Localisation | Justification |
+|---|---|---|
+| Code de refus `format_version: 1` | `model.py`, `make_crud.py`, `relations.py`, `make_relation.py` | Guards de rejet — intentionnels |
+| `ALLOWED_ROOT_KEYS` inclut `format_version` | `validation.py` | Pipeline interne pré-normalisé — interne uniquement |
+| Fallback `from_entity` / `foreign_key_name` | `starters/relations.py` | Défense en profondeur dans le module starters |
+| Vérification `format_version == 1` | `starters/scaffold.py` | Module starters — hors périmètre de ce bloc |
+| Fixtures `format_version: 1` | Tests de rejet (LEGACY-REMOVE-001A/001B) | Tests de non-régression nécessaires |
+| Mentions legacy | `docs/history/audits/` | Contexte historique — attendu |
