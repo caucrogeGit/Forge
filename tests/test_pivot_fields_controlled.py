@@ -397,7 +397,8 @@ def test_m2o_canonical_not_affected(tmp_path):
 
 
 def test_legacy_m2m_not_affected(tmp_path):
-    """Legacy many_to_many continue de fonctionner."""
+    """Legacy many_to_many (format_version: 1) est désormais refusé."""
+    from forge_cli.entities.relations import EntityRelationsError
     entities_root = _setup_entities(tmp_path)
     doc = {
         "format_version": 1,
@@ -412,5 +413,6 @@ def test_legacy_m2m_not_affected(tmp_path):
             }
         ],
     }
-    result = validate_relations_definition(doc, source="test", entities_root=entities_root)
-    assert len(result) == 1
+    with pytest.raises(EntityRelationsError) as exc_info:
+        validate_relations_definition(doc, source="test", entities_root=entities_root)
+    assert "format_version" in str(exc_info.value)

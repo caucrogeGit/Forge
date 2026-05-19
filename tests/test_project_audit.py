@@ -48,7 +48,7 @@ def _minimal_project(root: Path) -> None:
     (mvc / "entities").mkdir(parents=True)
     _write(mvc / "routes.py", "from core.http.router import Router\nrouter = Router()\n")
     _write(mvc / "entities" / "relations.json",
-           json.dumps({"format_version": 1, "relations": []}))
+           json.dumps({"schema_version": "1.0", "relations": []}))
     _write(mvc / "views" / "base.html", "<html></html>")
 
 

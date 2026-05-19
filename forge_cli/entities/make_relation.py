@@ -132,8 +132,13 @@ def _load_relations_document(path: Path) -> dict[str, Any]:
         raise ValueError(f"{path.as_posix()}: relations manquant")
     if not isinstance(data["relations"], list):
         raise ValueError(f"{path.as_posix()}: relations doit être une liste")
-    if "schema_version" not in data and "format_version" not in data:
-        raise ValueError(f"{path.as_posix()}: schema_version ou format_version manquant")
+    if "format_version" in data:
+        raise ValueError(
+            f"{path.as_posix()}: format_version: 1 n'est plus accepté pour relations.json. "
+            'Utilisez schema_version: "1.0".'
+        )
+    if "schema_version" not in data:
+        raise ValueError(f"{path.as_posix()}: schema_version manquant")
     return data
 
 
@@ -264,12 +269,12 @@ def _relation_summary(relation: dict[str, Any]) -> str:
 
 def _ensure_no_obvious_duplicates(relations: list[dict[str, Any]], relation: dict[str, Any], *, source: str) -> None:
     new_name = relation.get("name")
-    new_fk = relation.get("foreign_key") or relation.get("foreign_key_name")
+    new_fk = relation.get("foreign_key")
     new_pivot_table = relation.get("pivot", {}).get("table") if isinstance(relation.get("pivot"), dict) else None
     for existing in relations:
         if existing.get("name") == new_name:
             raise ValueError(f"{source}: une relation nommée {new_name!r} existe déjà")
-        existing_fk = existing.get("foreign_key") or existing.get("foreign_key_name")
+        existing_fk = existing.get("foreign_key")
         if new_fk and existing_fk and existing_fk == new_fk:
             raise ValueError(f"{source}: une clé étrangère nommée {new_fk!r} existe déjà")
         existing_pivot = existing.get("pivot", {}).get("table") if isinstance(existing.get("pivot"), dict) else None
@@ -280,15 +285,6 @@ def _ensure_no_obvious_duplicates(relations: list[dict[str, Any]], relation: dic
                 existing.get("type") == relation.get("type")
                 and existing.get("from") == relation.get("from")
                 and existing.get("to") == relation.get("to")
-            ):
-                raise ValueError(f"{source}: cette relation existe déjà")
-        elif "from_entity" in relation and "from_entity" in existing:
-            if (
-                existing.get("type") == relation.get("type")
-                and existing.get("from_entity") == relation.get("from_entity")
-                and existing.get("to_entity") == relation.get("to_entity")
-                and existing.get("from_field") == relation.get("from_field")
-                and existing.get("to_field") == relation.get("to_field")
             ):
                 raise ValueError(f"{source}: cette relation existe déjà")
 

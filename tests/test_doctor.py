@@ -74,7 +74,7 @@ def _write_entity(entities_root: Path, folder: str) -> None:
 
 def _write_relations(entities_root: Path) -> None:
     (entities_root / "relations.json").write_text(
-        json.dumps({"format_version": 1, "relations": []}), encoding="utf-8"
+        json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
 
 
@@ -190,7 +190,7 @@ def test_check_mvc_structure_ok(tmp_path):
     (mvc / "controllers").mkdir()
     (mvc / "routes.py").write_text("", encoding="utf-8")
     (mvc / "entities" / "relations.json").write_text(
-        json.dumps({"format_version": 1, "relations": []}), encoding="utf-8"
+        json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
     r = check_mvc_structure(tmp_path)
     assert r.status == "ok"
@@ -202,7 +202,7 @@ def test_check_mvc_structure_sans_views_et_controllers(tmp_path):
     (mvc / "entities").mkdir(parents=True)
     (mvc / "routes.py").write_text("", encoding="utf-8")
     (mvc / "entities" / "relations.json").write_text(
-        json.dumps({"format_version": 1, "relations": []}), encoding="utf-8"
+        json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
     r = check_mvc_structure(tmp_path)
     assert r.status == "fail"

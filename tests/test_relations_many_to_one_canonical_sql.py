@@ -369,23 +369,20 @@ def test_canonical_fk_column_not_in_entity_still_generates_sql(tmp_path):
     assert "FOREIGN KEY (category_id)" in sql
 
 
-# ── Support legacy many_to_one préservé ───────────────────────────────────────
+# ── Support legacy many_to_one refusé ────────────────────────────────────────
 
-def test_legacy_many_to_one_still_supported(tmp_path):
-    """Le format legacy many_to_one continue de fonctionner."""
+def test_legacy_many_to_one_is_rejected(tmp_path):
+    """Le format legacy many_to_one (format_version: 1) est désormais refusé."""
     entities_root = tmp_path / "entities"
     _write_entity(entities_root, "Commande", _commande_entity())
     _write_entity(entities_root, "Contact", _contact_entity())
-    result = validate_relations_definition(
-        _legacy_commande_contact(),
-        source="relations.json",
-        entities_root=entities_root,
-    )
-    assert len(result) == 1
-    assert isinstance(result[0], ValidatedRelation)
-    sql = generate_relations_sql(result)
-    assert "ALTER TABLE commande" in sql
-    assert "FOREIGN KEY (contact_id)" in sql
+    with pytest.raises(EntityRelationsError) as exc_info:
+        validate_relations_definition(
+            _legacy_commande_contact(),
+            source="relations.json",
+            entities_root=entities_root,
+        )
+    assert "format_version" in str(exc_info.value)
 
 
 # ── ValidatedRelation — attributs produits ────────────────────────────────────

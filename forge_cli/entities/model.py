@@ -22,7 +22,7 @@ from forge_cli.entities.make_entity import (
 import forge_cli.output as out
 from forge_cli.entities.relations import (
     EntityRelationsError,
-    ValidatedManyToManyRelation,
+    ValidatedCanonicalManyToManyRelation,
     ValidatedRelation,
     generate_relations_sql,
     validate_relations_definition,
@@ -156,7 +156,7 @@ def build_model(entities_root: Path, *, dry_run: bool = False) -> BuildModelResu
 
 def check_model(
     entities_root: Path,
-) -> tuple[list[EntitySource], list[ValidatedRelation | ValidatedManyToManyRelation]]:
+) -> tuple[list[EntitySource], list[ValidatedRelation | ValidatedCanonicalManyToManyRelation]]:
     return _validate_model_or_raise(entities_root)
 
 
@@ -276,14 +276,14 @@ def _print_check_model_preview(entity_sources: list[EntitySource], entities_root
 
 def _validate_model_or_raise(
     entities_root: Path,
-) -> tuple[list[EntitySource], list[ValidatedRelation | ValidatedManyToManyRelation]]:
+) -> tuple[list[EntitySource], list[ValidatedRelation | ValidatedCanonicalManyToManyRelation]]:
     blocks: list[str] = []
     entity_sources = _load_all_entity_sources(entities_root, blocks)
     if not blocks:
         _validate_global_entity_consistency(entity_sources, blocks)
 
     relations_path = entities_root / "relations.json"
-    validated_relations: list[ValidatedRelation | ValidatedManyToManyRelation] = []
+    validated_relations: list[ValidatedRelation | ValidatedCanonicalManyToManyRelation] = []
     if not relations_path.exists():
         blocks.append(f"{relations_path}: fichier introuvable")
     else:

@@ -552,12 +552,12 @@ class TestManyToOneNonRegression:
         assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
 
 
-# ── Non-régression legacy M2M ─────────────────────────────────────────────────
+# ── Rejet du format legacy M2M ────────────────────────────────────────────────
 
 class TestLegacyManyToManyNonRegression:
     def test_legacy_m2m_still_validates(self, tmp_path):
-        """Le format legacy many_to_many continue d'être validé."""
-        from forge_cli.entities.relations import ValidatedManyToManyRelation, validate_relations_definition
+        """Le format legacy many_to_many (format_version: 1) est désormais refusé."""
+        from forge_cli.entities.relations import EntityRelationsError, validate_relations_definition
         root = _entities_root(tmp_path)
         _write_entity(root, "article", _canonical_article())
         _write_entity(root, "tag", _canonical_tag())
@@ -572,13 +572,13 @@ class TestLegacyManyToManyNonRegression:
                 "target_key": "tag_id",
             }],
         }
-        result = validate_relations_definition(doc, source="test", entities_root=root)
-        assert len(result) == 1
-        assert isinstance(result[0], ValidatedManyToManyRelation)
+        with pytest.raises(EntityRelationsError) as exc_info:
+            validate_relations_definition(doc, source="test", entities_root=root)
+        assert "format_version" in str(exc_info.value)
 
     def test_legacy_m2m_sql_composite_pk(self, tmp_path):
-        """Legacy M2M génère PRIMARY KEY (article_id, tag_id) — pas id AUTO_INCREMENT."""
-        from forge_cli.entities.relations import generate_relations_sql, validate_relations_definition
+        """Le format legacy (format_version: 1) est refusé avant génération SQL."""
+        from forge_cli.entities.relations import EntityRelationsError, validate_relations_definition
         root = _entities_root(tmp_path)
         _write_entity(root, "article", _canonical_article())
         _write_entity(root, "tag", _canonical_tag())
@@ -593,10 +593,8 @@ class TestLegacyManyToManyNonRegression:
                 "target_key": "tag_id",
             }],
         }
-        validated = validate_relations_definition(doc, source="test", entities_root=root)
-        sql = generate_relations_sql(validated)
-        assert "PRIMARY KEY (article_id, tag_id)" in sql
-        assert "AUTO_INCREMENT" not in sql
+        with pytest.raises(EntityRelationsError):
+            validate_relations_definition(doc, source="test", entities_root=root)
 
     def test_legacy_and_canonical_m2o_coexist(self, tmp_path):
         """Legacy M2M et M2O canonique peuvent coexister dans le même projet."""

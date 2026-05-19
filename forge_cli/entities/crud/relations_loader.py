@@ -8,7 +8,6 @@ from typing import Any
 
 from forge_cli.entities.relations import (
     ValidatedCanonicalManyToManyRelation,
-    ValidatedManyToManyRelation,
     load_entity_definitions,
     validate_relations_definition,
 )
@@ -111,14 +110,7 @@ def _load_crud_many_to_many_relations(
     crud_relations: list[CrudManyToManyRelation] = []
 
     for relation in validated_relations:
-        if isinstance(relation, ValidatedManyToManyRelation):
-            m2m_source = relation.source
-            m2m_target = relation.target
-            m2m_pivot_table = relation.pivot_table
-            m2m_source_key = relation.source_key
-            m2m_target_key = relation.target_key
-            m2m_order_column = relation.order_column
-        elif isinstance(relation, ValidatedCanonicalManyToManyRelation):
+        if isinstance(relation, ValidatedCanonicalManyToManyRelation):
             m2m_source = relation.from_entity
             m2m_target = relation.to_entity
             m2m_pivot_table = relation.pivot_table

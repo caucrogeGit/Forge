@@ -33,7 +33,7 @@ def _write_entity(entities_root: Path, name: str, data: dict) -> None:
 
 def _write_relations(entities_root: Path) -> None:
     (entities_root / "relations.json").write_text(
-        json.dumps({"format_version": 1, "relations": []}, indent=2) + "\n",
+        json.dumps({"schema_version": "1.0", "relations": []}, indent=2) + "\n",
         encoding="utf-8",
     )
 

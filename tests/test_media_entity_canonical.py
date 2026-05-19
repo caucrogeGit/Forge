@@ -101,7 +101,7 @@ def test_build_model_with_canonical_media(tmp_path):
         MEDIA_JSON.read_text(encoding="utf-8"), encoding="utf-8"
     )
     (entities_root / "relations.json").write_text(
-        json.dumps({"format_version": 1, "relations": []}), encoding="utf-8"
+        json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
 
     result = build_model(entities_root)
@@ -119,7 +119,7 @@ def test_build_model_canonical_media_sql_no_none(tmp_path):
         MEDIA_JSON.read_text(encoding="utf-8"), encoding="utf-8"
     )
     (entities_root / "relations.json").write_text(
-        json.dumps({"format_version": 1, "relations": []}), encoding="utf-8"
+        json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
 
     build_model(entities_root)
@@ -137,7 +137,7 @@ def test_build_model_canonical_media_sql_has_primary_key(tmp_path):
         MEDIA_JSON.read_text(encoding="utf-8"), encoding="utf-8"
     )
     (entities_root / "relations.json").write_text(
-        json.dumps({"format_version": 1, "relations": []}), encoding="utf-8"
+        json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
 
     build_model(entities_root)
@@ -156,7 +156,7 @@ def test_build_model_canonical_media_base_py_has_entity_name(tmp_path):
         MEDIA_JSON.read_text(encoding="utf-8"), encoding="utf-8"
     )
     (entities_root / "relations.json").write_text(
-        json.dumps({"format_version": 1, "relations": []}), encoding="utf-8"
+        json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
 
     build_model(entities_root)

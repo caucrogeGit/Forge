@@ -16,7 +16,6 @@ from forge_cli.entities import make_relation
 from forge_cli.entities.relations import (
     EntityRelationsError,
     ValidatedCanonicalManyToManyRelation,
-    ValidatedManyToManyRelation,
     generate_relations_sql,
     validate_relations_definition,
 )
@@ -422,7 +421,7 @@ def test_generate_canonical_m2m_sql_indexes(tmp_path):
     assert "INDEX idx_contact_groupe_groupe_id" in sql
 
 
-# ── Support legacy M2M préservé ───────────────────────────────────────────────
+# ── Support legacy M2M refusé ─────────────────────────────────────────────────
 
 def _legacy_m2m_doc() -> dict:
     return {
@@ -440,18 +439,17 @@ def _legacy_m2m_doc() -> dict:
     }
 
 
-def test_legacy_m2m_still_validated(tmp_path):
-    """Le format legacy many_to_many (source/target/pivot_table) continue de fonctionner."""
+def test_legacy_m2m_format_version_is_rejected(tmp_path):
+    """Le format legacy (format_version: 1) est refusé avec EntityRelationsError."""
     entities_root = _setup_entities(tmp_path)
-    result = validate_relations_definition(_legacy_m2m_doc(), source="test", entities_root=entities_root)
-    assert len(result) == 1
-    assert isinstance(result[0], ValidatedManyToManyRelation)
+    with pytest.raises(EntityRelationsError) as exc_info:
+        validate_relations_definition(_legacy_m2m_doc(), source="test", entities_root=entities_root)
+    assert "format_version" in str(exc_info.value)
 
 
-def test_legacy_m2m_sql_uses_composite_pk(tmp_path):
-    """Legacy M2M génère PRIMARY KEY (source_key, target_key), pas id AUTO_INCREMENT."""
+def test_legacy_m2m_rejection_message_mentions_schema_version(tmp_path):
+    """Le message d'erreur invite à utiliser schema_version: 1.0."""
     entities_root = _setup_entities(tmp_path)
-    result = validate_relations_definition(_legacy_m2m_doc(), source="test", entities_root=entities_root)
-    sql = generate_relations_sql(result)
-    assert "PRIMARY KEY (contact_id, groupe_id)" in sql
-    assert "AUTO_INCREMENT" not in sql
+    with pytest.raises(EntityRelationsError) as exc_info:
+        validate_relations_definition(_legacy_m2m_doc(), source="test", entities_root=entities_root)
+    assert 'schema_version' in str(exc_info.value)

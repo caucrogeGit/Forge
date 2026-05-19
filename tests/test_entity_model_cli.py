@@ -43,8 +43,7 @@ def _commande() -> dict:
 
 
 def _relations_vides() -> dict:
-    # relations.json reste en legacy en attente de ENTITY-CONTRACT-011F
-    return {"format_version": 1, "relations": []}
+    return {"schema_version": "1.0", "relations": []}
 
 
 # ── Fixtures legacy (conservées pour les tests non migrés et la non-régression) ──
@@ -101,20 +100,18 @@ def _legacy_commande() -> dict:
     }
 
 
-def _legacy_relations() -> dict:
+def _canonical_relations_m2o() -> dict:
     return {
-        "format_version": 1,
+        "schema_version": "1.0",
         "relations": [
             {
-                "name": "commande_contact",
                 "type": "many_to_one",
-                "from_entity": "Commande",
-                "to_entity": "Contact",
-                "from_field": "contact_id",
-                "to_field": "id",
-                "foreign_key_name": "fk_commande_contact",
-                "on_delete": "RESTRICT",
-                "on_update": "CASCADE",
+                "from": "Commande",
+                "to": "Contact",
+                "name": "contact",
+                "foreign_key": "contact_id",
+                "nullable": False,
+                "on_delete": "restrict",
             }
         ],
     }
@@ -126,7 +123,7 @@ def test_sync_relations_writes_only_relations_sql(tmp_path: Path):
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _legacy_contact())
     _write_entity(entities_root, "commande", _legacy_commande())
-    _write_relations(entities_root, _legacy_relations())
+    _write_relations(entities_root, _canonical_relations_m2o())
 
     output = sync_relations(entities_root)
 
@@ -181,7 +178,7 @@ def test_check_model_aggregates_entity_then_relations_errors(tmp_path: Path):
         "fields": [{"name": "title", "type": "string", "max_length": 255}],
     }
     _write_entity(entities_root, "article", invalid)
-    _write_relations(entities_root, {"format_version": 1, "relations": []})
+    _write_relations(entities_root, {"schema_version": "1.0", "relations": []})
 
     with pytest.raises(ModelValidationError) as exc_info:
         check_model(entities_root)
@@ -201,7 +198,7 @@ def test_build_model_writes_nothing_if_invalid(tmp_path: Path):
         "fields": [{"name": "title", "type": "string", "max_length": 255}],
     }
     _write_entity(entities_root, "article", invalid)
-    _write_relations(entities_root, {"format_version": 1, "relations": []})
+    _write_relations(entities_root, {"schema_version": "1.0", "relations": []})
 
     with pytest.raises(ModelValidationError):
         build_model(entities_root)
@@ -221,7 +218,7 @@ def test_check_model_rejects_duplicate_entities(tmp_path: Path):
         "fields": [{"name": "title", "type": "string", "max_length": 255}],
     }
     _write_entity(entities_root, "post", duplicate)
-    _write_relations(entities_root, {"format_version": 1, "relations": []})
+    _write_relations(entities_root, {"schema_version": "1.0", "relations": []})
 
     with pytest.raises(ModelValidationError) as exc_info:
         check_model(entities_root)
@@ -240,7 +237,7 @@ def test_check_model_rejects_duplicate_tables(tmp_path: Path):
         "fields": [{"name": "title", "type": "string", "max_length": 255}],
     }
     _write_entity(entities_root, "post", other)
-    _write_relations(entities_root, {"format_version": 1, "relations": []})
+    _write_relations(entities_root, {"schema_version": "1.0", "relations": []})
 
     with pytest.raises(ModelValidationError) as exc_info:
         check_model(entities_root)
@@ -258,7 +255,7 @@ def test_check_model_accepts_explicit_table_name(tmp_path: Path):
         "fields": [{"name": "title", "type": "string", "max_length": 255}],
     }
     _write_entity(entities_root, "article", entity)
-    _write_relations(entities_root, {"format_version": 1, "relations": []})
+    _write_relations(entities_root, {"schema_version": "1.0", "relations": []})
 
     check_model(entities_root)
 
@@ -272,7 +269,7 @@ def test_check_model_rejects_folder_entity_mismatch(tmp_path: Path):
         "fields": [{"name": "title", "type": "string", "max_length": 255}],
     }
     _write_entity(entities_root, "article", entity)  # dossier "article" ≠ entité "Post"
-    _write_relations(entities_root, {"format_version": 1, "relations": []})
+    _write_relations(entities_root, {"schema_version": "1.0", "relations": []})
 
     with pytest.raises(ModelValidationError) as exc_info:
         check_model(entities_root)
@@ -431,7 +428,7 @@ def test_legacy_build_model_is_rejected(tmp_path: Path):
     """build:model refuse les entités format_version: 1 depuis LEGACY-REMOVE-001A."""
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _legacy_contact())
-    _write_relations(entities_root, {"format_version": 1, "relations": []})
+    _write_relations(entities_root, {"schema_version": "1.0", "relations": []})
 
     with pytest.raises(ModelValidationError) as exc_info:
         build_model(entities_root)
@@ -442,7 +439,7 @@ def test_legacy_check_model_is_rejected(tmp_path: Path):
     """check_model refuse les entités format_version: 1 depuis LEGACY-REMOVE-001A."""
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _legacy_contact())
-    _write_relations(entities_root, {"format_version": 1, "relations": []})
+    _write_relations(entities_root, {"schema_version": "1.0", "relations": []})
 
     with pytest.raises(ModelValidationError):
         check_model(entities_root)

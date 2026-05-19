@@ -71,18 +71,43 @@ def _write_entity(tmp_path: Path, definition: dict) -> None:
     (entity_dir / f"{snake}.json").write_text(json.dumps(definition), encoding="utf-8")
 
 
+def _canonical_m2m(from_entity: str, to_entity: str, name: str, pivot_table: str,
+                   from_key: str, to_key: str) -> dict:
+    return {
+        "type": "many_to_many",
+        "from": from_entity,
+        "to": to_entity,
+        "name": name,
+        "pivot": {
+            "table": pivot_table,
+            "from_key": from_key,
+            "to_key": to_key,
+            "id": True,
+            "unique_pair": True,
+            "on_delete": "cascade",
+            "fields": [],
+        },
+    }
+
+
+def _canonical_m2o(from_entity: str, to_entity: str, name: str, foreign_key: str,
+                   on_delete: str = "restrict", nullable: bool = False) -> dict:
+    return {
+        "type": "many_to_one",
+        "from": from_entity,
+        "to": to_entity,
+        "name": name,
+        "foreign_key": foreign_key,
+        "nullable": nullable,
+        "on_delete": on_delete,
+    }
+
+
 def _relations(*extra_relations: dict) -> dict:
     return {
-        "format_version": 1,
+        "schema_version": "1.0",
         "relations": [
-            {
-                "type": "many_to_many",
-                "source": "article",
-                "target": "tag",
-                "pivot_table": "article_tag",
-                "source_key": "article_id",
-                "target_key": "tag_id",
-            },
+            _canonical_m2m("Article", "Tag", "tags", "article_tag", "article_id", "tag_id"),
             *extra_relations,
         ],
     }
@@ -170,14 +195,7 @@ def test_plusieurs_relations_many_to_many_generent_plusieurs_selects(tmp_path):
     _run_article(
         tmp_path,
         relations=_relations(
-            {
-                "type": "many_to_many",
-                "source": "article",
-                "target": "category",
-                "pivot_table": "article_category",
-                "source_key": "article_id",
-                "target_key": "category_id",
-            }
+            _canonical_m2m("Article", "Category", "categories", "article_category", "article_id", "category_id")
         ),
     )
 
@@ -194,17 +212,8 @@ def test_relations_many_to_one_et_champs_classiques_restent_supportes(tmp_path):
     _run_article(
         tmp_path,
         relations=_relations(
-            {
-                "name": "article_category",
-                "type": "many_to_one",
-                "from_entity": "Article",
-                "to_entity": "Category",
-                "from_field": "category_id",
-                "to_field": "id",
-                "foreign_key_name": "fk_article_category",
-                "on_delete": "SET NULL",
-                "on_update": "CASCADE",
-            }
+            _canonical_m2o("Article", "Category", "article_category", "category_id",
+                           on_delete="set_null", nullable=True)
         ),
     )
 
@@ -249,14 +258,7 @@ def test_plusieurs_relations_many_to_many_generent_plusieurs_affichages(tmp_path
     _run_article(
         tmp_path,
         relations=_relations(
-            {
-                "type": "many_to_many",
-                "source": "article",
-                "target": "category",
-                "pivot_table": "article_category",
-                "source_key": "article_id",
-                "target_key": "category_id",
-            }
+            _canonical_m2m("Article", "Category", "categories", "article_category", "article_id", "category_id")
         ),
     )
 

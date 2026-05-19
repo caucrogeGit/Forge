@@ -410,3 +410,37 @@ LEGACY-REMOVE-001B refuse les entités `format_version: 1` dans `make:crud`.
 
 `build:model` a déjà été traité par LEGACY-REMOVE-001A.
 Les relations legacy restent hors périmètre et seront traitées dans LEGACY-REMOVE-002.
+
+---
+
+## Mise en œuvre — LEGACY-REMOVE-002
+
+LEGACY-REMOVE-002 supprime le support du format `format_version: 1` dans les relations.
+
+### Fichiers modifiés (core)
+
+- **`forge_cli/entities/relations.py`** — suppression de `ValidatedManyToManyRelation`, des validateurs M2M legacy, de la génération SQL M2M legacy, et rejet explicite de `format_version` à la racine du document relations.
+- **`forge_cli/entities/crud/relations_loader.py`** — suppression de la branche `isinstance(relation, ValidatedManyToManyRelation)`.
+- **`forge_cli/entities/model.py`** — remplacement des type hints incluant `ValidatedManyToManyRelation`.
+- **`forge_cli/entities/make_relation.py`** — `_load_existing_relations_doc()` lève une erreur si `format_version` est détecté ; `_ensure_no_obvious_duplicates()` n'accepte plus les clés legacy.
+
+### Fichiers de tests convertis
+
+- `tests/test_entity_relations.py` — réécriture complète : format canonique, tests de rejet du format legacy.
+- `tests/test_relations_many_to_many.py` — réécriture : tests de rejet du format legacy + tests du format canonique M2M.
+- `tests/test_relations_ordered.py` — réécriture : tous les tests deviennent des tests de rejet (feature `order_column` était exclusivement legacy).
+- `tests/test_relations_many_to_one_canonical_sql.py` — `test_legacy_many_to_one_still_supported` → `test_legacy_many_to_one_is_rejected`.
+- `tests/test_make_crud_many_to_one_canonical.py` — `test_legacy_m2o_still_supported` → test de rejet.
+- `tests/test_many_to_many_canonical_generation.py` — tests legacy M2M → tests de rejet.
+- `tests/test_many_to_many_pivot_integration.py` — `TestLegacyManyToManyNonRegression` → tests de rejet.
+- `tests/test_pivot_fields_controlled.py` — `test_legacy_m2m_not_affected` → test de rejet.
+- `tests/test_make_crud_many_to_many.py` — `_relations()` et extra relations convertis en format canonique.
+- `tests/test_make_crud_partials.py`, `tests/test_make_crud_search.py` — relations.json legacy → canonique.
+- `tests/meta/test_consolidation_non_overwrite_001.py`, `tests/test_build_model_canonical_routing.py`, `tests/test_entity_model_cli.py`, `tests/test_entity_db_apply.py`, `tests/test_doctor.py`, `tests/test_media_entity_canonical.py`, `tests/test_project_check.py`, `tests/test_project_audit.py` — relations.json vide legacy → canonique.
+
+### Résultat
+
+- 11 877 tests passent (0 échec).
+- `pytest`, `compileall`, `ruff check`, `mkdocs build --strict`, `git diff --check` : tous verts.
+- Format `format_version: 1` refusé dans `relations.json` par `validate_relations_definition`, `sync_relations`, `_load_crud_many_to_one_relations`, `_load_crud_many_to_many_relations`, `_load_existing_relations_doc`.
+- Clés legacy (`from_entity`, `to_entity`, `foreign_key_name`, `source`, `target`, `pivot_table`, `source_key`, `target_key`) rejetées dans les documents `schema_version: "1.0"`.

@@ -8,6 +8,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from forge_cli.entities.crud.relations_loader import _load_crud_many_to_one_relations
 from forge_cli.entities.make_crud import (
     MakeCrudResult,
@@ -228,10 +230,10 @@ def test_make_crud_with_canonical_m2o_generates_choices_in_controller(tmp_path):
 # ── Support legacy préservé ───────────────────────────────────────────────────
 
 def test_legacy_m2o_still_supported(tmp_path):
-    """Le format legacy many_to_one continue de fonctionner."""
+    """Le format legacy many_to_one (format_version: 1) est désormais refusé."""
+    from forge_cli.entities.relations import EntityRelationsError
     entities_root = tmp_path / "mvc" / "entities"
     contact = {
-        "format_version": 1,
         "entity": "Contact",
         "table": "contact",
         "description": "",
@@ -243,7 +245,6 @@ def test_legacy_m2o_still_supported(tmp_path):
         ],
     }
     ville = {
-        "format_version": 1,
         "entity": "Ville",
         "table": "ville",
         "description": "",
@@ -272,11 +273,9 @@ def test_legacy_m2o_still_supported(tmp_path):
     _write_entity(entities_root, "Ville", ville)
     (entities_root / "relations.json").write_text(json.dumps(legacy_relations), encoding="utf-8")
 
-    result = _load_crud_many_to_one_relations(contact, entities_root)
-    assert len(result) == 1
-    assert result[0].field_name == "ville_id"
-    assert result[0].field_column == "VilleId"
-    assert result[0].target_entity == "Ville"
+    with pytest.raises(EntityRelationsError) as exc_info:
+        _load_crud_many_to_one_relations(contact, entities_root)
+    assert "format_version" in str(exc_info.value)
 
 
 # ── Aucun diagnostic many_to_many ajouté ─────────────────────────────────────

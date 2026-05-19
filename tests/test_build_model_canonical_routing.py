@@ -21,7 +21,7 @@ from forge_cli.entities.model import BuildModelResult, ModelValidationError, bui
 
 pytestmark = pytest.mark.meta
 
-_LEGACY_RELATIONS = {"format_version": 1, "relations": []}
+_CANONICAL_RELATIONS = {"schema_version": "1.0", "relations": []}
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -70,21 +70,21 @@ class TestLegacyRejected:
     def test_legacy_entity_raises(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_contact())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError):
             check_model(entities_root)
 
     def test_legacy_build_model_raises(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_contact())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError):
             build_model(entities_root)
 
     def test_legacy_no_sql_generated(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_contact())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError):
             build_model(entities_root)
         assert not (entities_root / "contact" / "contact.sql").exists()
@@ -96,7 +96,7 @@ class TestLegacyRejected:
             "fields": [{"name": "id", "sql_type": "INT", "primary_key": True}],
         }
         _write_entity(entities_root, "contact", bad)
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError):
             check_model(entities_root)
 
@@ -107,28 +107,28 @@ class TestCanonicalRouting:
     def test_canonical_entity_loads_without_error(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         sources, _ = check_model(entities_root)
         assert len(sources) == 1
 
     def test_canonical_name_becomes_entity(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         sources, _ = check_model(entities_root)
         assert sources[0].definition["entity"] == "Article"
 
     def test_canonical_table_preserved(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         sources, _ = check_model(entities_root)
         assert sources[0].definition["table"] == "articles"
 
     def test_canonical_id_added_automatically(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         sources, _ = check_model(entities_root)
         defn = sources[0].definition
         id_field = next((f for f in defn["fields"] if f["name"] == "id"), None)
@@ -139,7 +139,7 @@ class TestCanonicalRouting:
     def test_canonical_build_model_succeeds(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         result = build_model(entities_root)
         assert isinstance(result, BuildModelResult)
         assert entities_root / "article" / "article.sql" in result.written
@@ -148,7 +148,7 @@ class TestCanonicalRouting:
     def test_canonical_sql_contains_primary_key(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         build_model(entities_root)
         sql = (entities_root / "article" / "article.sql").read_text(encoding="utf-8")
         assert "PRIMARY KEY" in sql
@@ -156,7 +156,7 @@ class TestCanonicalRouting:
     def test_canonical_sql_contains_title_varchar(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         build_model(entities_root)
         sql = (entities_root / "article" / "article.sql").read_text(encoding="utf-8")
         assert "VARCHAR(255)" in sql
@@ -164,7 +164,7 @@ class TestCanonicalRouting:
     def test_canonical_sql_no_missing_sql_type_error(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         build_model(entities_root)
         sql = (entities_root / "article" / "article.sql").read_text(encoding="utf-8")
         assert "None" not in sql
@@ -172,7 +172,7 @@ class TestCanonicalRouting:
     def test_canonical_base_py_generated(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         build_model(entities_root)
         base_py = (entities_root / "article" / "article_base.py").read_text(encoding="utf-8")
         assert "class ArticleBase" in base_py
@@ -180,7 +180,7 @@ class TestCanonicalRouting:
     def test_canonical_base_py_contains_title_field(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         build_model(entities_root)
         base_py = (entities_root / "article" / "article_base.py").read_text(encoding="utf-8")
         assert "title" in base_py
@@ -188,7 +188,7 @@ class TestCanonicalRouting:
     def test_canonical_base_py_contains_id_field(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         build_model(entities_root)
         base_py = (entities_root / "article" / "article_base.py").read_text(encoding="utf-8")
         assert "self.id" in base_py
@@ -196,7 +196,7 @@ class TestCanonicalRouting:
     def test_canonical_dry_run_does_not_write(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         build_model(entities_root, dry_run=True)
         assert not (entities_root / "article" / "article.sql").exists()
         assert not (entities_root / "article" / "article_base.py").exists()
@@ -205,7 +205,7 @@ class TestCanonicalRouting:
         entities_root = tmp_path / "mvc" / "entities"
         entity = _canonical_article(options={"timestamps": True})
         _write_entity(entities_root, "article", entity)
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         build_model(entities_root)
         base_py = (entities_root / "article" / "article_base.py").read_text(encoding="utf-8")
         assert "created_at" in base_py
@@ -223,7 +223,7 @@ class TestCanonicalRouting:
             {"name": "published_at", "type": "datetime"},
         ])
         _write_entity(entities_root, "article", entity)
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         result = build_model(entities_root)
         assert entities_root / "article" / "article.sql" in result.written
 
@@ -235,14 +235,14 @@ class TestLegacyInMixedProject:
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_contact())
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError):
             check_model(entities_root)
 
     def test_canonical_only_project_succeeds(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         result = build_model(entities_root)
         assert entities_root / "article" / "article.sql" in result.written
         assert entities_root / "article" / "article_base.py" in result.written
@@ -255,7 +255,7 @@ class TestErrorHandling:
         entities_root = tmp_path / "mvc" / "entities"
         invalid = _canonical_article(fields=[{"name": "broken", "type": "unknown_forge_type"}])
         _write_entity(entities_root, "article", invalid)
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError):
             check_model(entities_root)
 
@@ -263,7 +263,7 @@ class TestErrorHandling:
         entities_root = tmp_path / "mvc" / "entities"
         invalid = _canonical_article(fields=[{"name": "price", "type": "decimal"}])
         _write_entity(entities_root, "article", invalid)
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError) as exc_info:
             check_model(entities_root)
         msg = str(exc_info.value).lower()
@@ -273,7 +273,7 @@ class TestErrorHandling:
         entities_root = tmp_path / "mvc" / "entities"
         invalid = _canonical_article(fields=[{"name": "x", "type": "bad_type"}])
         _write_entity(entities_root, "article", invalid)
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError):
             check_model(entities_root)
 
@@ -284,7 +284,7 @@ class TestErrorHandling:
             "fields": [{"name": "id", "sql_type": "INT", "primary_key": True}],
         }
         _write_entity(entities_root, "contact", bad_legacy)
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         with pytest.raises(ModelValidationError):
             check_model(entities_root)
 
@@ -296,6 +296,6 @@ class TestErrorHandling:
             "fields": [{"name": "id", "sql_type": "INT", "primary_key": True, "auto_increment": True}],
         }
         _write_entity(entities_root, "contact", no_version)
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         sources, _ = check_model(entities_root)
         assert sources[0].definition["entity"] == "Contact"

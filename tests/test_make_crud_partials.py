@@ -69,26 +69,31 @@ CATEGORY = {
 
 
 RELATIONS = {
-    "format_version": 1,
+    "schema_version": "1.0",
     "relations": [
         {
-            "name": "article_category",
             "type": "many_to_one",
-            "from_entity": "Article",
-            "to_entity": "Category",
-            "from_field": "category_id",
-            "to_field": "id",
-            "foreign_key_name": "fk_article_category",
-            "on_delete": "SET NULL",
-            "on_update": "CASCADE",
+            "from": "Article",
+            "to": "Category",
+            "name": "article_category",
+            "foreign_key": "category_id",
+            "nullable": True,
+            "on_delete": "set_null",
         },
         {
             "type": "many_to_many",
-            "source": "article",
-            "target": "tag",
-            "pivot_table": "article_tag",
-            "source_key": "article_id",
-            "target_key": "tag_id",
+            "from": "Article",
+            "to": "Tag",
+            "name": "tags",
+            "pivot": {
+                "table": "article_tag",
+                "from_key": "article_id",
+                "to_key": "tag_id",
+                "id": True,
+                "unique_pair": True,
+                "on_delete": "cascade",
+                "fields": [],
+            },
         },
     ],
 }

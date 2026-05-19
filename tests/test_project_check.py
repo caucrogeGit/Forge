@@ -46,7 +46,7 @@ def _minimal_project(root: Path) -> None:
     (mvc / "entities").mkdir(parents=True)
     _write(mvc / "routes.py", "from core.http.router import Router\nrouter = Router()\n")
     _write(mvc / "entities" / "relations.json",
-           json.dumps({"format_version": 1, "relations": []}))
+           json.dumps({"schema_version": "1.0", "relations": []}))
     _write(mvc / "views" / "base.html", "<html></html>")
 
 
@@ -144,7 +144,7 @@ def test_check_project_entities_relations_invalide(tmp_path):
 def test_check_project_entities_vide(tmp_path):
     d = tmp_path / "mvc" / "entities"
     d.mkdir(parents=True)
-    _write(d / "relations.json", json.dumps({"format_version": 1, "relations": []}))
+    _write(d / "relations.json", json.dumps({"schema_version": "1.0", "relations": []}))
     r = check_project_entities(tmp_path)
     assert r.status == "ok"
     assert "aucune" in r.detail
@@ -153,7 +153,7 @@ def test_check_project_entities_vide(tmp_path):
 def test_check_project_entities_json_absent(tmp_path):
     d = tmp_path / "mvc" / "entities"
     (d / "contact").mkdir(parents=True)
-    _write(d / "relations.json", json.dumps({"format_version": 1, "relations": []}))
+    _write(d / "relations.json", json.dumps({"schema_version": "1.0", "relations": []}))
     r = check_project_entities(tmp_path)
     assert r.status == "fail"
     assert "contact.json" in r.detail
@@ -162,7 +162,7 @@ def test_check_project_entities_json_absent(tmp_path):
 def test_check_project_entities_json_invalide(tmp_path):
     d = tmp_path / "mvc" / "entities"
     (d / "contact").mkdir(parents=True)
-    _write(d / "relations.json", json.dumps({"format_version": 1, "relations": []}))
+    _write(d / "relations.json", json.dumps({"schema_version": "1.0", "relations": []}))
     _write(d / "contact" / "contact.json", "not json")
     r = check_project_entities(tmp_path)
     assert r.status == "fail"
@@ -172,7 +172,7 @@ def test_check_project_entities_json_invalide(tmp_path):
 def test_check_project_entities_ok(tmp_path):
     d = tmp_path / "mvc" / "entities"
     (d / "contact").mkdir(parents=True)
-    _write(d / "relations.json", json.dumps({"format_version": 1, "relations": []}))
+    _write(d / "relations.json", json.dumps({"schema_version": "1.0", "relations": []}))
     _write(d / "contact" / "contact.json",
            json.dumps({"entity": "Contact", "table": "contact",
                        "primary_key": {"name": "id", "sql": "Id", "python_type": "int",

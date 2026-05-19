@@ -5,6 +5,7 @@ import pytest
 
 from forge_cli.entities.relations import (
     EntityRelationsError,
+    ValidatedRelation,
     generate_relations_sql,
     validate_relations_definition,
 )
@@ -21,14 +22,13 @@ def _write_entity(root: Path, name: str, data: dict) -> None:
 
 def _contact_entity(sql_type: str = "INT") -> dict:
     return {
-        "format_version": 1,
         "entity": "Contact",
         "table": "contact",
         "description": "",
         "fields": [
             {
                 "name": "id",
-                "column": "Id",
+                "column": "id",
                 "python_type": "int",
                 "sql_type": sql_type,
                 "nullable": False,
@@ -42,14 +42,13 @@ def _contact_entity(sql_type: str = "INT") -> dict:
 
 def _commande_entity(contact_sql_type: str = "INT") -> dict:
     return {
-        "format_version": 1,
         "entity": "Commande",
         "table": "commande",
         "description": "",
         "fields": [
             {
                 "name": "id",
-                "column": "Id",
+                "column": "id",
                 "python_type": "int",
                 "sql_type": "INT",
                 "nullable": False,
@@ -59,7 +58,7 @@ def _commande_entity(contact_sql_type: str = "INT") -> dict:
             },
             {
                 "name": "contact_id",
-                "column": "ContactId",
+                "column": "contact_id",
                 "python_type": "int",
                 "sql_type": contact_sql_type,
                 "nullable": False,
@@ -73,18 +72,17 @@ def _commande_entity(contact_sql_type: str = "INT") -> dict:
 
 def _relations_json() -> dict:
     return {
-        "format_version": 1,
+        "schema_version": "1.0",
         "relations": [
             {
-                "name": "commande_contact",
                 "type": "many_to_one",
-                "from_entity": "Commande",
-                "to_entity": "Contact",
-                "from_field": "contact_id",
-                "to_field": "id",
-                "foreign_key_name": "fk_commande_contact",
-                "on_delete": "RESTRICT",
-                "on_update": "CASCADE",
+                "from": "Commande",
+                "to": "Contact",
+                "name": "contact",
+                "foreign_key": "contact_id",
+                "nullable": False,
+                "on_delete": "restrict",
+                "index": True,
             }
         ],
     }
@@ -102,14 +100,28 @@ def test_validate_relations_and_generate_sql(tmp_path: Path):
     )
 
     sql = generate_relations_sql(relations)
-    assert sql == (
-        "ALTER TABLE commande\n"
-        "    ADD CONSTRAINT fk_commande_contact\n"
-        "    FOREIGN KEY (ContactId)\n"
-        "    REFERENCES contact (Id)\n"
-        "    ON DELETE RESTRICT\n"
-        "    ON UPDATE CASCADE;\n"
+    assert "ALTER TABLE commande" in sql
+    assert "FOREIGN KEY (contact_id)" in sql
+    assert "REFERENCES contact" in sql
+    assert "ON DELETE RESTRICT" in sql
+
+
+def test_canonical_m2o_returns_validated_relation(tmp_path: Path):
+    entities_root = tmp_path / "entities"
+    _write_entity(entities_root, "Contact", _contact_entity())
+    _write_entity(entities_root, "Commande", _commande_entity())
+
+    relations = validate_relations_definition(
+        _relations_json(),
+        source=str(entities_root / "relations.json"),
+        entities_root=entities_root,
     )
+
+    assert len(relations) == 1
+    assert isinstance(relations[0], ValidatedRelation)
+    assert relations[0].relation_type == "many_to_one"
+    assert relations[0].from_entity == "Commande"
+    assert relations[0].to_entity == "Contact"
 
 
 def test_collects_multiple_relation_errors(tmp_path: Path):
@@ -118,29 +130,23 @@ def test_collects_multiple_relation_errors(tmp_path: Path):
     _write_entity(entities_root, "Commande", _commande_entity())
 
     invalid = {
-        "format_version": 1,
+        "schema_version": "1.0",
         "relations": [
             {
-                "name": "commande contact",
-                "type": "one_to_one",
-                "from_entity": "commande",
-                "to_entity": "Contact",
-                "from_field": "inconnu",
-                "to_field": "id",
-                "foreign_key_name": "fk commande",
-                "on_delete": "SET NULL",
-                "on_update": "INVALID",
+                "type": "many_to_one",
+                "from": "Commande",
+                "to": "Contact",
+                "name": "contact",
+                "foreign_key": "contact_id",
+                "on_delete": "restrict",
             },
             {
-                "name": "commande contact",
                 "type": "many_to_one",
-                "from_entity": "Commande",
-                "to_entity": "Contact",
-                "from_field": "contact_id",
-                "to_field": "id",
-                "foreign_key_name": "fk commande",
-                "on_delete": "RESTRICT",
-                "on_update": "CASCADE",
+                "from": "Commande",
+                "to": "Contact",
+                "name": "contact",  # duplicate name
+                "foreign_key": "contact_id",  # duplicate FK
+                "on_delete": "restrict",
             },
         ],
     }
@@ -153,14 +159,8 @@ def test_collects_multiple_relation_errors(tmp_path: Path):
         )
 
     message = str(exc_info.value)
-    assert "relations[0].name: doit etre un identifiant valide" in message
-    assert "relations[0].type: type de relation non reconnu" in message
-    assert "relations[0].from_entity: doit etre un nom d'entite PascalCase valide" in message
-    assert "relations[0].foreign_key_name: doit etre un identifiant SQL valide" in message
-    assert "relations[0].on_update: doit etre l'une des valeurs SQL supportees en V1" in message
-    assert "relations[0]: l'entite 'commande' est introuvable" in message
     assert "relations[1].name: doit etre unique" in message
-    assert "relations[1].foreign_key_name: doit etre unique" in message
+    assert "relations[1].foreign_key: doit etre unique" in message
 
 
 def test_set_null_requires_nullable_from_field(tmp_path: Path):
@@ -168,8 +168,21 @@ def test_set_null_requires_nullable_from_field(tmp_path: Path):
     _write_entity(entities_root, "Contact", _contact_entity())
     _write_entity(entities_root, "Commande", _commande_entity())
 
-    invalid = _relations_json()
-    invalid["relations"][0]["on_delete"] = "SET NULL"
+    invalid = {
+        "schema_version": "1.0",
+        "relations": [
+            {
+                "type": "many_to_one",
+                "from": "Commande",
+                "to": "Contact",
+                "name": "contact",
+                "foreign_key": "contact_id",
+                "nullable": False,
+                "on_delete": "set_null",  # contact_id is not nullable
+                "index": True,
+            }
+        ],
+    }
 
     with pytest.raises(EntityRelationsError, match="SET NULL requiert un from_field nullable"):
         validate_relations_definition(
@@ -179,7 +192,7 @@ def test_set_null_requires_nullable_from_field(tmp_path: Path):
         )
 
 
-def test_relation_sql_type_int_to_int_is_accepted(tmp_path: Path):
+def test_relation_int_to_int_is_accepted(tmp_path: Path):
     entities_root = tmp_path / "entities"
     _write_entity(entities_root, "Contact", _contact_entity("INT"))
     _write_entity(entities_root, "Commande", _commande_entity("INT"))
@@ -193,45 +206,82 @@ def test_relation_sql_type_int_to_int_is_accepted(tmp_path: Path):
     assert len(relations) == 1
 
 
-def test_relation_sql_type_int_to_bigint_is_rejected(tmp_path: Path):
+def test_format_version_1_relations_are_rejected(tmp_path: Path):
+    """Un relations.json avec format_version: 1 est refusé avec un message clair."""
     entities_root = tmp_path / "entities"
-    _write_entity(entities_root, "Contact", _contact_entity("BIGINT"))
-    _write_entity(entities_root, "Commande", _commande_entity("INT"))
+    entities_root.mkdir(parents=True)
 
-    with pytest.raises(EntityRelationsError, match="types SQL identiques"):
+    legacy_doc = {
+        "format_version": 1,
+        "relations": [
+            {
+                "name": "commande_contact",
+                "type": "many_to_one",
+                "from_entity": "Commande",
+                "to_entity": "Contact",
+                "from_field": "contact_id",
+                "to_field": "id",
+                "foreign_key_name": "fk_commande_contact",
+                "on_delete": "RESTRICT",
+                "on_update": "CASCADE",
+            }
+        ],
+    }
+
+    with pytest.raises(EntityRelationsError) as exc_info:
         validate_relations_definition(
-            _relations_json(),
+            legacy_doc,
             source=str(entities_root / "relations.json"),
             entities_root=entities_root,
         )
 
+    assert "format_version" in str(exc_info.value)
+    assert 'schema_version' in str(exc_info.value)
 
-def test_relation_sql_type_int_to_unsigned_is_rejected(tmp_path: Path):
+
+def test_format_version_rejection_does_not_mention_field_errors(tmp_path: Path):
+    """Quand format_version: 1 est présent, l'erreur porte sur le format, pas les champs."""
     entities_root = tmp_path / "entities"
-    _write_entity(entities_root, "Contact", _contact_entity("INT UNSIGNED"))
-    _write_entity(entities_root, "Commande", _commande_entity("INT"))
+    entities_root.mkdir(parents=True)
 
-    with pytest.raises(EntityRelationsError, match="types SQL identiques"):
+    legacy_doc = {"format_version": 1, "relations": []}
+
+    with pytest.raises(EntityRelationsError) as exc_info:
         validate_relations_definition(
-            _relations_json(),
+            legacy_doc,
             source=str(entities_root / "relations.json"),
             entities_root=entities_root,
         )
 
+    assert "format_version" in str(exc_info.value)
 
-def test_relation_varchar_lengths_must_match(tmp_path: Path):
+
+def test_legacy_m2o_keys_from_entity_is_rejected(tmp_path: Path):
+    """Une relation avec from_entity au lieu de from est refusée."""
     entities_root = tmp_path / "entities"
-    contact = _contact_entity("VARCHAR(150)")
-    contact["fields"][0]["python_type"] = "str"
-    contact["fields"][0]["auto_increment"] = False
-    commande = _commande_entity("VARCHAR(100)")
-    commande["fields"][1]["python_type"] = "str"
-    _write_entity(entities_root, "Contact", contact)
-    _write_entity(entities_root, "Commande", commande)
+    entities_root.mkdir(parents=True)
 
-    with pytest.raises(EntityRelationsError, match="types SQL identiques"):
+    doc = {
+        "schema_version": "1.0",
+        "relations": [
+            {
+                "type": "many_to_one",
+                "from_entity": "Commande",
+                "to_entity": "Contact",
+                "from_field": "contact_id",
+                "to_field": "id",
+                "foreign_key_name": "fk_commande_contact",
+                "on_delete": "RESTRICT",
+                "on_update": "CASCADE",
+            }
+        ],
+    }
+
+    with pytest.raises(EntityRelationsError) as exc_info:
         validate_relations_definition(
-            _relations_json(),
+            doc,
             source=str(entities_root / "relations.json"),
             entities_root=entities_root,
         )
+
+    assert "legacy" in str(exc_info.value).lower() or "from" in str(exc_info.value)

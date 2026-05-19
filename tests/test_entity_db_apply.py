@@ -257,7 +257,7 @@ def test_db_apply_hors_projet_erreur_propre(monkeypatch, tmp_path, capsys):
 def test_apply_model_sql_reports_missing_database_preparation(tmp_path: Path, monkeypatch):
     root = tmp_path / "mvc" / "entities"
     _write_entity(root, "contact", _contact(), "CREATE TABLE contact (Id INT);\n")
-    _write_relations(root, {"format_version": 1, "relations": []}, "")
+    _write_relations(root, {"schema_version": "1.0", "relations": []}, "")
 
     fake_config = types.SimpleNamespace(
         DB_APP_HOST="localhost",

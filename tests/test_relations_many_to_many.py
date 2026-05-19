@@ -1,4 +1,9 @@
-"""Tests REL-M2M-001/002 — declaration et SQL many_to_many."""
+"""Tests REL-M2M-001/002 — declaration et SQL many_to_many.
+
+Depuis LEGACY-REMOVE-002, le format format_version: 1 est refusé.
+Les tests ci-dessous vérifient le rejet du format legacy et le bon
+fonctionnement du format canonique (schema_version: "1.0").
+"""
 
 import json
 from pathlib import Path
@@ -7,7 +12,6 @@ import pytest
 
 from forge_cli.entities.relations import (
     EntityRelationsError,
-    ValidatedManyToManyRelation,
     ValidatedRelation,
     generate_relations_sql,
     validate_relations_definition,
@@ -31,14 +35,13 @@ def _write_entity(root: Path, name: str, data: dict) -> None:
 
 def _minimal_entity(name: str, table: str) -> dict:
     return {
-        "format_version": 1,
         "entity": name,
         "table": table,
         "description": "",
         "fields": [
             {
                 "name": "id",
-                "column": "Id",
+                "column": "id",
                 "python_type": "int",
                 "sql_type": "INT",
                 "nullable": False,
@@ -50,53 +53,15 @@ def _minimal_entity(name: str, table: str) -> dict:
     }
 
 
-def _valid_m2m() -> dict:
-    return {
-        "type": "many_to_many",
-        "source": "article",
-        "target": "tag",
-        "pivot_table": "article_tag",
-        "source_key": "article_id",
-        "target_key": "tag_id",
-    }
-
-
-def _m2m_doc(relations: list | None = None) -> dict:
-    return {
-        "format_version": 1,
-        "relations": relations if relations is not None else [_valid_m2m()],
-    }
-
-
-def _m2o_doc() -> dict:
-    return {
-        "format_version": 1,
-        "relations": [
-            {
-                "name": "commande_contact",
-                "type": "many_to_one",
-                "from_entity": "Commande",
-                "to_entity": "Contact",
-                "from_field": "contact_id",
-                "to_field": "id",
-                "foreign_key_name": "fk_commande_contact",
-                "on_delete": "RESTRICT",
-                "on_update": "CASCADE",
-            }
-        ],
-    }
-
-
 def _contact_entity() -> dict:
     return {
-        "format_version": 1,
         "entity": "Contact",
         "table": "contact",
         "description": "",
         "fields": [
             {
                 "name": "id",
-                "column": "Id",
+                "column": "id",
                 "python_type": "int",
                 "sql_type": "INT",
                 "nullable": False,
@@ -110,14 +75,13 @@ def _contact_entity() -> dict:
 
 def _commande_entity() -> dict:
     return {
-        "format_version": 1,
         "entity": "Commande",
         "table": "commande",
         "description": "",
         "fields": [
             {
                 "name": "id",
-                "column": "Id",
+                "column": "id",
                 "python_type": "int",
                 "sql_type": "INT",
                 "nullable": False,
@@ -127,7 +91,7 @@ def _commande_entity() -> dict:
             },
             {
                 "name": "contact_id",
-                "column": "ContactId",
+                "column": "contact_id",
                 "python_type": "int",
                 "sql_type": "INT",
                 "nullable": False,
@@ -139,236 +103,152 @@ def _commande_entity() -> dict:
     }
 
 
-# ---------------------------------------------------------------------------
-# Tests REL-M2M-001
-# ---------------------------------------------------------------------------
-
-
-def test_many_to_many_relation_is_accepted(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    relations = validate_relations_definition(
-        _m2m_doc(),
-        source=str(entities_root / "relations.json"),
-        entities_root=entities_root,
-    )
-
-    assert len(relations) == 1
-    rel = relations[0]
-    assert isinstance(rel, ValidatedManyToManyRelation)
-    assert rel.relation_type == "many_to_many"
-    assert rel.source == "article"
-    assert rel.target == "tag"
-    assert rel.pivot_table == "article_tag"
-    assert rel.source_key == "article_id"
-    assert rel.target_key == "tag_id"
-    assert rel.pivot_fields == ()
-
-
-def test_many_to_many_pivot_fields_are_optional_and_accepted(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = [
-        {"name": "position", "sql_type": "INT", "nullable": False},
-        {"name": "note", "sql_type": "VARCHAR(255)", "nullable": True},
-    ]
-
-    relations = validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    rel = relations[0]
-    assert isinstance(rel, ValidatedManyToManyRelation)
-    assert [field.name for field in rel.pivot_fields] == ["position", "note"]
-    assert [field.sql_type for field in rel.pivot_fields] == ["INT", "VARCHAR(255)"]
-    assert [field.nullable for field in rel.pivot_fields] == [False, True]
-
-
-def test_many_to_many_pivot_fields_must_be_a_list(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = {"name": "position"}
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].pivot_fields: doit etre une liste" in str(exc_info.value)
-
-
-def test_many_to_many_pivot_fields_null_is_rejected_when_provided(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = None
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].pivot_fields: doit etre une liste" in str(exc_info.value)
-
-
-def test_many_to_many_pivot_field_requires_name(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = [{"sql_type": "INT"}]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].pivot_fields[0].name: cle obligatoire manquante" in str(exc_info.value)
-
-
-def test_many_to_many_pivot_field_requires_sql_type(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = [{"name": "position"}]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].pivot_fields[0].sql_type: cle obligatoire manquante" in str(exc_info.value)
-
-
-def test_many_to_many_pivot_field_nullable_must_be_bool(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = [
-        {"name": "position", "sql_type": "INT", "nullable": "false"}
-    ]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].pivot_fields[0].nullable: doit etre un booleen" in str(exc_info.value)
-
-
-def test_many_to_many_pivot_field_cannot_duplicate_source_key(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = [{"name": "article_id", "sql_type": "INT"}]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "ne doit pas dupliquer source_key ou target_key" in str(exc_info.value)
-
-
-def test_many_to_many_pivot_field_cannot_duplicate_target_key(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = [{"name": "tag_id", "sql_type": "INT"}]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "ne doit pas dupliquer source_key ou target_key" in str(exc_info.value)
-
-
-def test_many_to_many_requires_source(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc()
-    del data["relations"][0]["source"]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].source: cle obligatoire manquante" in str(exc_info.value)
-
-
-def test_many_to_many_requires_target(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc()
-    del data["relations"][0]["target"]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].target: cle obligatoire manquante" in str(exc_info.value)
-
-
-def test_many_to_many_requires_pivot_table(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc()
-    del data["relations"][0]["pivot_table"]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].pivot_table: cle obligatoire manquante" in str(exc_info.value)
-
-
-def test_many_to_many_requires_source_key(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc()
-    del data["relations"][0]["source_key"]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].source_key: cle obligatoire manquante" in str(exc_info.value)
-
-
-def test_many_to_many_requires_target_key(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc()
-    del data["relations"][0]["target_key"]
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].target_key: cle obligatoire manquante" in str(exc_info.value)
-
-
-def test_unknown_relation_type_is_rejected(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = {
+def _legacy_m2m_doc() -> dict:
+    """Document legacy avec format_version: 1 — refusé depuis LEGACY-REMOVE-002."""
+    return {
         "format_version": 1,
         "relations": [
             {
-                "name": "rel",
-                "type": "one_to_one",
-                "from_entity": "Contact",
-                "to_entity": "Commande",
-                "from_field": "contact_id",
-                "to_field": "id",
-                "foreign_key_name": "fk_rel",
-                "on_delete": "RESTRICT",
-                "on_update": "CASCADE",
+                "type": "many_to_many",
+                "source": "article",
+                "target": "tag",
+                "pivot_table": "article_tag",
+                "source_key": "article_id",
+                "target_key": "tag_id",
             }
         ],
     }
 
+
+def _canonical_m2m_doc() -> dict:
+    """Document canonique schema_version: 1.0 — accepté."""
+    return {
+        "schema_version": "1.0",
+        "relations": [
+            {
+                "type": "many_to_many",
+                "from": "Article",
+                "to": "Tag",
+                "name": "tags",
+                "pivot": {
+                    "table": "article_tag",
+                    "from_key": "article_id",
+                    "to_key": "tag_id",
+                    "id": True,
+                    "unique_pair": True,
+                    "on_delete": "cascade",
+                    "fields": [],
+                },
+            }
+        ],
+    }
+
+
+def _canonical_m2o_commande_contact() -> dict:
+    """M2O canonique Commande → Contact."""
+    return {
+        "schema_version": "1.0",
+        "relations": [
+            {
+                "type": "many_to_one",
+                "from": "Commande",
+                "to": "Contact",
+                "name": "contact",
+                "foreign_key": "contact_id",
+                "nullable": False,
+                "on_delete": "restrict",
+            }
+        ],
+    }
+
+
+# ---------------------------------------------------------------------------
+# Rejet du format legacy (format_version: 1)
+# ---------------------------------------------------------------------------
+
+
+def _assert_format_version_rejected(tmp_path: Path, doc: dict) -> None:
+    entities_root = tmp_path / "entities"
+    entities_root.mkdir(exist_ok=True)
     with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
+        validate_relations_definition(
+            doc,
+            source=str(entities_root / "relations.json"),
+            entities_root=entities_root,
+        )
+    assert "format_version" in str(exc_info.value)
 
-    assert "type de relation non reconnu" in str(exc_info.value)
+
+def test_legacy_m2m_format_version_is_rejected(tmp_path: Path):
+    _assert_format_version_rejected(tmp_path, _legacy_m2m_doc())
 
 
-def test_many_to_one_existing_behavior_is_preserved(tmp_path: Path):
+def test_legacy_m2m_with_pivot_fields_is_rejected(tmp_path: Path):
+    doc = _legacy_m2m_doc()
+    doc["relations"][0]["pivot_fields"] = [{"name": "position", "sql_type": "INT", "nullable": False}]
+    _assert_format_version_rejected(tmp_path, doc)
+
+
+def test_legacy_m2m_missing_source_is_rejected(tmp_path: Path):
+    doc = _legacy_m2m_doc()
+    del doc["relations"][0]["source"]
+    _assert_format_version_rejected(tmp_path, doc)
+
+
+def test_legacy_m2m_missing_pivot_table_is_rejected(tmp_path: Path):
+    doc = _legacy_m2m_doc()
+    del doc["relations"][0]["pivot_table"]
+    _assert_format_version_rejected(tmp_path, doc)
+
+
+def test_legacy_m2m_unknown_type_is_rejected(tmp_path: Path):
+    doc = {
+        "format_version": 1,
+        "relations": [{"type": "one_to_one", "from_entity": "Contact", "to_entity": "Commande"}],
+    }
+    _assert_format_version_rejected(tmp_path, doc)
+
+
+def test_legacy_m2m_and_m2o_mixed_doc_is_rejected(tmp_path: Path):
+    doc = {
+        "format_version": 1,
+        "relations": [
+            {"type": "many_to_many", "source": "article", "target": "tag",
+             "pivot_table": "article_tag", "source_key": "article_id", "target_key": "tag_id"},
+            {"name": "commande_contact", "type": "many_to_one",
+             "from_entity": "Commande", "to_entity": "Contact",
+             "from_field": "contact_id", "to_field": "id",
+             "foreign_key_name": "fk_commande_contact", "on_delete": "RESTRICT", "on_update": "CASCADE"},
+        ],
+    }
+    _assert_format_version_rejected(tmp_path, doc)
+
+
+def test_legacy_m2m_multiple_pivot_tables_doc_is_rejected(tmp_path: Path):
+    doc = {
+        "format_version": 1,
+        "relations": [
+            {"type": "many_to_many", "source": "article", "target": "tag",
+             "pivot_table": "article_tag", "source_key": "article_id", "target_key": "tag_id"},
+            {"type": "many_to_many", "source": "article", "target": "category",
+             "pivot_table": "article_category", "source_key": "article_id", "target_key": "category_id"},
+        ],
+    }
+    _assert_format_version_rejected(tmp_path, doc)
+
+
+# ---------------------------------------------------------------------------
+# Format canonique — many_to_one
+# ---------------------------------------------------------------------------
+
+
+def test_many_to_one_canonical_is_accepted(tmp_path: Path):
     entities_root = tmp_path / "entities"
     _write_entity(entities_root, "Contact", _contact_entity())
     _write_entity(entities_root, "Commande", _commande_entity())
 
     relations = validate_relations_definition(
-        _m2o_doc(),
+        _canonical_m2o_commande_contact(),
         source=str(entities_root / "relations.json"),
         entities_root=entities_root,
     )
@@ -385,12 +265,22 @@ def test_many_to_one_existing_behavior_is_preserved(tmp_path: Path):
     assert "ADD CONSTRAINT fk_commande_contact" in sql
 
 
-def test_many_to_many_generates_pivot_sql(tmp_path: Path):
+# ---------------------------------------------------------------------------
+# Format canonique — many_to_many
+# ---------------------------------------------------------------------------
+
+
+def _setup_article_tag_entities(entities_root: Path) -> None:
+    _write_entity(entities_root, "Article", _minimal_entity("Article", "article"))
+    _write_entity(entities_root, "Tag", _minimal_entity("Tag", "tag"))
+
+
+def test_canonical_m2m_generates_pivot_table_sql(tmp_path: Path):
     entities_root = tmp_path / "entities"
-    entities_root.mkdir()
+    _setup_article_tag_entities(entities_root)
 
     relations = validate_relations_definition(
-        _m2m_doc(),
+        _canonical_m2m_doc(),
         source=str(entities_root / "relations.json"),
         entities_root=entities_root,
     )
@@ -399,60 +289,20 @@ def test_many_to_many_generates_pivot_sql(tmp_path: Path):
     assert "CREATE TABLE IF NOT EXISTS article_tag" in sql
     assert "article_id INT NOT NULL" in sql
     assert "tag_id INT NOT NULL" in sql
-    assert "PRIMARY KEY (article_id, tag_id)" in sql
-    assert "INDEX idx_article_tag_article_id (article_id)" in sql
-    assert "INDEX idx_article_tag_tag_id (tag_id)" in sql
+    assert "PRIMARY KEY (id)" in sql
+    assert "UNIQUE KEY uq_article_tag (article_id, tag_id)" in sql
     assert "CONSTRAINT fk_article_tag_article_id" in sql
     assert "FOREIGN KEY (article_id)" in sql
-    assert "REFERENCES article(id)" in sql
     assert "CONSTRAINT fk_article_tag_tag_id" in sql
     assert "FOREIGN KEY (tag_id)" in sql
-    assert "REFERENCES tag(id)" in sql
-    assert sql.count("ON DELETE CASCADE") == 2
 
 
-def test_many_to_many_generates_pivot_fields_sql(tmp_path: Path):
+def test_canonical_m2m_sql_is_stable_between_calls(tmp_path: Path):
     entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = [
-        {"name": "position", "sql_type": "INT", "nullable": False},
-        {"name": "note", "sql_type": "VARCHAR(255)", "nullable": True},
-    ]
+    _setup_article_tag_entities(entities_root)
 
     relations = validate_relations_definition(
-        data,
-        source=str(entities_root / "relations.json"),
-        entities_root=entities_root,
-    )
-
-    sql = generate_relations_sql(relations)
-    assert "article_id INT NOT NULL" in sql
-    assert "tag_id INT NOT NULL" in sql
-    assert "position INT NOT NULL" in sql
-    assert "note VARCHAR(255) NULL" in sql
-    assert sql.index("tag_id INT NOT NULL") < sql.index("position INT NOT NULL")
-    assert sql.index("position INT NOT NULL") < sql.index("note VARCHAR(255) NULL")
-    assert sql.index("note VARCHAR(255) NULL") < sql.index("PRIMARY KEY (article_id, tag_id)")
-    assert "PRIMARY KEY (article_id, tag_id)" in sql
-    primary_key_line = next(line for line in sql.splitlines() if "PRIMARY KEY" in line)
-    assert "position" not in primary_key_line
-    assert "note" not in primary_key_line
-    assert "idx_article_tag_position" not in sql
-    assert "idx_article_tag_note" not in sql
-
-
-def test_many_to_many_pivot_fields_sql_is_stable_between_calls(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-    data = _m2m_doc()
-    data["relations"][0]["pivot_fields"] = [
-        {"name": "position", "sql_type": "INT"},
-        {"name": "note", "sql_type": "VARCHAR(255)", "nullable": True},
-    ]
-
-    relations = validate_relations_definition(
-        data,
+        _canonical_m2m_doc(),
         source=str(entities_root / "relations.json"),
         entities_root=entities_root,
     )
@@ -460,152 +310,32 @@ def test_many_to_many_pivot_fields_sql_is_stable_between_calls(tmp_path: Path):
     assert generate_relations_sql(relations) == generate_relations_sql(relations)
 
 
-def test_many_to_many_invalid_identifier_is_rejected(tmp_path: Path):
+def test_canonical_m2m_does_not_generate_crud_artefacts(tmp_path: Path):
     entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc()
-    data["relations"][0]["pivot_table"] = "article tag"
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].pivot_table: doit etre un identifiant SQL valide" in str(exc_info.value)
-
-
-def test_many_to_many_unknown_key_is_rejected(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc()
-    data["relations"][0]["extra_key"] = "valeur_inconnue"
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(data, source="relations.json", entities_root=entities_root)
-
-    assert "relations[0].extra_key: cle non supportee pour many_to_many" in str(exc_info.value)
-
-
-def test_m2m_and_m2o_can_coexist(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    _write_entity(entities_root, "Contact", _contact_entity())
-    _write_entity(entities_root, "Commande", _commande_entity())
-
-    data = {
-        "format_version": 1,
-        "relations": [
-            _valid_m2m(),
-            _m2o_doc()["relations"][0],
-        ],
-    }
+    _setup_article_tag_entities(entities_root)
 
     relations = validate_relations_definition(
-        data,
-        source=str(entities_root / "relations.json"),
-        entities_root=entities_root,
-    )
-
-    assert len(relations) == 2
-    types = {rel.relation_type for rel in relations}
-    assert types == {"many_to_many", "many_to_one"}
-
-    sql = generate_relations_sql(relations)
-    assert "CREATE TABLE IF NOT EXISTS article_tag" in sql
-    assert "ALTER TABLE commande" in sql
-
-
-def test_many_to_many_generates_multiple_pivot_tables(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc([
-        _valid_m2m(),
-        {
-            "type": "many_to_many",
-            "source": "article",
-            "target": "category",
-            "pivot_table": "article_category",
-            "source_key": "article_id",
-            "target_key": "category_id",
-        },
-    ])
-
-    relations = validate_relations_definition(
-        data,
+        _canonical_m2m_doc(),
         source=str(entities_root / "relations.json"),
         entities_root=entities_root,
     )
 
     sql = generate_relations_sql(relations)
-
-    assert "CREATE TABLE IF NOT EXISTS article_tag" in sql
-    assert "CREATE TABLE IF NOT EXISTS article_category" in sql
-    assert sql.index("article_tag") < sql.index("article_category")
-
-
-def test_many_to_many_sql_is_stable_between_calls(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    relations = validate_relations_definition(
-        _m2m_doc(),
-        source=str(entities_root / "relations.json"),
-        entities_root=entities_root,
-    )
-
-    assert generate_relations_sql(relations) == generate_relations_sql(relations)
-
-
-def test_many_to_many_duplicate_pivot_table_incompatible_is_rejected(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    data = _m2m_doc([
-        _valid_m2m(),
-        {
-            "type": "many_to_many",
-            "source": "article",
-            "target": "category",
-            "pivot_table": "article_tag",
-            "source_key": "article_id",
-            "target_key": "category_id",
-        },
-    ])
-
-    with pytest.raises(EntityRelationsError) as exc_info:
-        validate_relations_definition(
-            data,
-            source=str(entities_root / "relations.json"),
-            entities_root=entities_root,
-        )
-
-    assert "pivot_table deja utilisee avec une definition incompatible" in str(exc_info.value)
-
-
-def test_many_to_many_sql_does_not_generate_crud_form_template_or_python_model(tmp_path: Path):
-    entities_root = tmp_path / "entities"
-    entities_root.mkdir()
-
-    relations = validate_relations_definition(
-        _m2m_doc(),
-        source=str(entities_root / "relations.json"),
-        entities_root=entities_root,
-    )
-
-    sql = generate_relations_sql(relations)
-
     assert "ChoiceField" not in sql
     assert "<select" not in sql
     assert "class ArticleTag" not in sql
-    assert "attach" not in sql
-    assert "detach" not in sql
 
 
-def test_sync_relations_writes_many_to_many_pivot_sql(tmp_path: Path):
+# ---------------------------------------------------------------------------
+# sync_relations avec format canonique
+# ---------------------------------------------------------------------------
+
+
+def test_sync_relations_writes_canonical_m2m_pivot_sql(tmp_path: Path):
     entities_root = tmp_path / "entities"
-    entities_root.mkdir()
+    _setup_article_tag_entities(entities_root)
     (entities_root / "relations.json").write_text(
-        json.dumps(_m2m_doc(), indent=2, ensure_ascii=True) + "\n",
+        json.dumps(_canonical_m2m_doc(), indent=2, ensure_ascii=True) + "\n",
         encoding="utf-8",
     )
 
@@ -614,4 +344,17 @@ def test_sync_relations_writes_many_to_many_pivot_sql(tmp_path: Path):
     assert output == entities_root / "relations.sql"
     sql = output.read_text(encoding="utf-8")
     assert "CREATE TABLE IF NOT EXISTS article_tag" in sql
-    assert "PRIMARY KEY (article_id, tag_id)" in sql
+    assert "PRIMARY KEY (id)" in sql
+
+
+def test_sync_relations_rejects_legacy_format(tmp_path: Path):
+    entities_root = tmp_path / "entities"
+    entities_root.mkdir(exist_ok=True)
+    (entities_root / "relations.json").write_text(
+        json.dumps(_legacy_m2m_doc(), indent=2, ensure_ascii=True) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(EntityRelationsError) as exc_info:
+        sync_relations(entities_root)
+    assert "format_version" in str(exc_info.value)

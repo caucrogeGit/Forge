@@ -199,15 +199,22 @@ def test_pagination_conserve_q_dans_les_liens():
 
 def test_recherche_compatible_avec_many_to_many_source(tmp_path):
     relations = {
-        "format_version": 1,
+        "schema_version": "1.0",
         "relations": [
             {
                 "type": "many_to_many",
-                "source": "article",
-                "target": "tag",
-                "pivot_table": "article_tag",
-                "source_key": "article_id",
-                "target_key": "tag_id",
+                "from": "Article",
+                "to": "Tag",
+                "name": "tags",
+                "pivot": {
+                    "table": "article_tag",
+                    "from_key": "article_id",
+                    "to_key": "tag_id",
+                    "id": True,
+                    "unique_pair": True,
+                    "on_delete": "cascade",
+                    "fields": [],
+                },
             }
         ],
     }
