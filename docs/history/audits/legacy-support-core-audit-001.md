@@ -167,8 +167,9 @@ return data == {"format_version": 1, "relations": []}
 Détecte si un fichier `relations.json` est le template legacy vide (pour savoir s'il est
 "adoptable" par un starter). Depuis la migration, ce template n'est plus utilisé.
 
-**Risque** : nul en pratique (condition jamais vraie pour les starters canoniques) —
-code potentiellement mort à documenter.
+**Correction** : détection étendue aux deux formats dans `LEGACY-SCAFFOLD-FIX-001` —
+`data.get("format_version") == 1` **ou** `data.get("schema_version") == "1.0"`, avec
+`data.get("relations") == []`. Le code n'est plus potentiellement mort pour les starters canoniques.
 
 ---
 

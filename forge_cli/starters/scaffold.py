@@ -36,7 +36,11 @@ def _is_adoptable(meta: dict, path: Path, root: Path) -> bool:
             data = json.loads(path.read_text(encoding="utf-8"))
         except ValueError:
             return False
-        return data == {"format_version": 1, "relations": []}
+        return (
+            isinstance(data, dict)
+            and data.get("relations") == []
+            and (data.get("format_version") == 1 or data.get("schema_version") == "1.0")
+        )
 
     # Fichiers auth du squelette → adoptables par utilisateurs-auth et suivi-comportement-eleves
     if meta.get("id") not in ("utilisateurs-auth", "suivi-comportement-eleves") or not path.is_file():
