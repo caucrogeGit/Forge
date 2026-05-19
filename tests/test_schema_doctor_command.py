@@ -140,10 +140,10 @@ def test_json_output_valid_true():
     assert code == 0
 
 
-def test_json_output_schemas_checked_five():
+def test_json_output_schemas_checked_six():
     stdout, _, _ = _run(["--json"])
     obj = json.loads(stdout)
-    assert obj["schemas_checked"] == 5
+    assert obj["schemas_checked"] == 6
 
 
 def test_json_output_errors_count_zero():

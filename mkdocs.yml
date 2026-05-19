@@ -87,6 +87,7 @@ nav:
       - Auth/User: auth.md
       - Sécurité et RBAC: security.md
       - RBAC — Contrôle d'accès: rbac.md
+      - Contrat RBAC séparé: security/rbac-contract.md
       - Schéma API: reference-schema.md
       - Schéma erreurs runtime: runtime-errors-schema.md
 
