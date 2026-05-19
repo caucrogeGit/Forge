@@ -108,8 +108,9 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
 
     sql_type, python_type = _build_sql_and_python_type(forge_type, field)
 
-    nullable = bool(field.get("nullable", False))
-    if field.get("required") and not field.get("nullable"):
+    # ADR-013 : nullable par défaut (True), required prioritaire.
+    nullable = bool(field.get("nullable", True))
+    if field.get("required") is True:
         nullable = False
 
     constraints: dict[str, Any] = {}

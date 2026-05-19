@@ -269,8 +269,21 @@ class TestConstraints:
         f = _find_field(result, "title")
         assert f["nullable"] is True
 
-    def test_default_nullable_is_false(self):
+    def test_default_nullable_is_true(self):
+        # ADR-013 : nullable par défaut (True = NULL)
         result = _normalize(_entity(fields=[_field("title", "string", max_length=100)]))
+        f = _find_field(result, "title")
+        assert f["nullable"] is True
+
+    def test_required_false_without_nullable_is_null(self):
+        # ADR-013 : required: false seul → NULL
+        result = _normalize(_entity(fields=[_field("title", "string", max_length=100, required=False)]))
+        f = _find_field(result, "title")
+        assert f["nullable"] is True
+
+    def test_required_true_overrides_nullable_true(self):
+        # ADR-013 : required: true gagne même si nullable: true
+        result = _normalize(_entity(fields=[_field("title", "string", max_length=100, required=True, nullable=True)]))
         f = _find_field(result, "title")
         assert f["nullable"] is False
 

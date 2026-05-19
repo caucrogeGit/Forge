@@ -264,6 +264,17 @@ un changement comportemental dans un ticket dédié, pas comme une correction do
 
 ---
 
+## 14. Correction runtime
+
+`NULLABLE-CONTRACT-003` aligne le normaliseur d'entité sur ADR-013 :
+`nullable` par défaut (`True`), `required` prioritaire.
+
+Fichier corrigé : `forge_cli/entities/canonical_model_normalizer.py::_normalize_field()`.
+Test mis à jour : `test_default_nullable_is_false` → `test_default_nullable_is_true`.
+3 nouveaux tests de matrice ADR-013 ajoutés.
+
+---
+
 ## 13. Décision post-audit
 
 **Décision** : champ nullable par défaut, `required` prioritaire.
