@@ -1,15 +1,14 @@
 """Garde-fou ENTITY-CONTRACT-011C.
 
 Vérifie que build:model route les entités canoniques (schema_version 1.0)
-via le normaliseur et préserve le support legacy existant sans régression.
+via le normaliseur, et refuse les entités legacy (format_version: 1).
 
 Couverture :
-- entité legacy → chemin existant inchangé
+- entité legacy format_version: 1 → ModelValidationError
 - entité canonique → normaliseur appelé, génération OK
 - SQL et _base.py générés depuis le format canonique
-- support mixte legacy + canonique dans le même projet
 - entité canonique invalide → ModelValidationError claire
-- entité legacy invalide → rejetée comme avant
+- entité sans version → chemin legacy non bloquant
 """
 from __future__ import annotations
 
@@ -65,33 +64,30 @@ def _legacy_contact():
     }
 
 
-# ── Legacy inchangé ───────────────────────────────────────────────────────────
+# ── Legacy refusé ─────────────────────────────────────────────────────────────
 
-class TestLegacyUnchanged:
-    def test_legacy_entity_loads(self, tmp_path):
+class TestLegacyRejected:
+    def test_legacy_entity_raises(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_contact())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        sources, _ = check_model(entities_root)
-        assert len(sources) == 1
-        assert sources[0].definition["entity"] == "Contact"
+        with pytest.raises(ModelValidationError):
+            check_model(entities_root)
 
-    def test_legacy_build_model_succeeds(self, tmp_path):
+    def test_legacy_build_model_raises(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_contact())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert isinstance(result, BuildModelResult)
-        assert entities_root / "contact" / "contact.sql" in result.written
+        with pytest.raises(ModelValidationError):
+            build_model(entities_root)
 
-    def test_legacy_sql_content_unchanged(self, tmp_path):
+    def test_legacy_no_sql_generated(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_contact())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        build_model(entities_root)
-        sql = (entities_root / "contact" / "contact.sql").read_text(encoding="utf-8")
-        assert "Id INT NOT NULL" in sql
-        assert "PRIMARY KEY (Id)" in sql
+        with pytest.raises(ModelValidationError):
+            build_model(entities_root)
+        assert not (entities_root / "contact" / "contact.sql").exists()
 
     def test_legacy_invalid_entity_rejected(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
@@ -232,34 +228,23 @@ class TestCanonicalRouting:
         assert entities_root / "article" / "article.sql" in result.written
 
 
-# ── Double support legacy + canonique ─────────────────────────────────────────
+# ── Legacy dans un projet mixte bloque tout ───────────────────────────────────
 
-class TestMixedFormat:
-    def test_legacy_and_canonical_coexist(self, tmp_path):
+class TestLegacyInMixedProject:
+    def test_legacy_in_mixed_project_raises(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_contact())
         _write_entity(entities_root, "article", _canonical_article())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        sources, _ = check_model(entities_root)
-        entity_names = {s.definition["entity"] for s in sources}
-        assert entity_names == {"Contact", "Article"}
+        with pytest.raises(ModelValidationError):
+            check_model(entities_root)
 
-    def test_legacy_and_canonical_both_generate_sql(self, tmp_path):
+    def test_canonical_only_project_succeeds(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "contact", _legacy_contact())
         _write_entity(entities_root, "article", _canonical_article())
         _write_relations(entities_root, _LEGACY_RELATIONS)
         result = build_model(entities_root)
-        assert entities_root / "contact" / "contact.sql" in result.written
         assert entities_root / "article" / "article.sql" in result.written
-
-    def test_legacy_and_canonical_both_generate_base_py(self, tmp_path):
-        entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "contact", _legacy_contact())
-        _write_entity(entities_root, "article", _canonical_article())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert entities_root / "contact" / "contact_base.py" in result.written
         assert entities_root / "article" / "article_base.py" in result.written
 
 

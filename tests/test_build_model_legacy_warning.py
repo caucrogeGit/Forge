@@ -1,11 +1,13 @@
-"""Tests LEGACY-WARNINGS-002 — warning non bloquant dans build_model pour entités legacy."""
+"""Tests LEGACY-REMOVE-001A — build:model refuse les entités format_version: 1."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from forge_cli.entities.model import BuildModelResult, build_model, check_model
+import pytest
+
+from forge_cli.entities.model import BuildModelResult, ModelValidationError, build_model, check_model
 
 _LEGACY_RELATIONS = {"format_version": 1, "relations": []}
 _CANONICAL_RELATIONS = {"schema_version": "1.0", "relations": []}
@@ -39,138 +41,88 @@ def _canonical_entity(name: str = "Article", table: str = "articles") -> dict:
     }
 
 
-# ── Warning présent pour une entité legacy ────────────────────────────────────
+# ── build:model lève une erreur sur format_version: 1 ────────────────────────
 
 
-class TestLegacyWarningPresent:
-    def test_build_model_legacy_produces_warning(self, tmp_path):
+class TestLegacyEntityRejected:
+    def test_build_model_legacy_raises(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_entity())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert len(result.legacy_warnings) == 1
+        with pytest.raises(ModelValidationError):
+            build_model(entities_root)
 
-    def test_warning_mentions_format_version(self, tmp_path):
+    def test_error_mentions_format_version(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_entity())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert "format_version" in result.legacy_warnings[0]
+        with pytest.raises(ModelValidationError) as exc_info:
+            build_model(entities_root)
+        assert "format_version" in str(exc_info.value)
 
-    def test_warning_mentions_schema_version(self, tmp_path):
+    def test_error_mentions_schema_version(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_entity())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert 'schema_version' in result.legacy_warnings[0]
+        with pytest.raises(ModelValidationError) as exc_info:
+            build_model(entities_root)
+        assert "schema_version" in str(exc_info.value)
 
-    def test_warning_mentions_deprecation(self, tmp_path):
+    def test_error_mentions_migration_guide(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_entity())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        w = result.legacy_warnings[0]
-        assert "déprécié" in w or "deprecated" in w
+        with pytest.raises(ModelValidationError) as exc_info:
+            build_model(entities_root)
+        assert "migration-legacy-vers-canonique" in str(exc_info.value)
 
-    def test_warning_mentions_entity_name(self, tmp_path):
-        entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "contact", _legacy_entity("Contact"))
-        _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert "Contact" in result.legacy_warnings[0]
-
-    def test_warning_mentions_migration_guide(self, tmp_path):
+    def test_check_model_legacy_raises(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_entity())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert "migration" in result.legacy_warnings[0].lower() or "Guide" in result.legacy_warnings[0]
+        with pytest.raises(ModelValidationError):
+            check_model(entities_root)
 
 
-# ── Génération SQL non affectée ───────────────────────────────────────────────
+# ── Aucune génération SQL pour une entité legacy ──────────────────────────────
 
 
-class TestLegacyGenerationUnchanged:
-    def test_build_model_still_generates_sql(self, tmp_path):
+class TestLegacyNoSqlGenerated:
+    def test_no_sql_file_created(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_entity())
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert isinstance(result, BuildModelResult)
-        assert entities_root / "contact" / "contact.sql" in result.written
+        with pytest.raises(ModelValidationError):
+            build_model(entities_root)
+        assert not (entities_root / "contact" / "contact.sql").exists()
 
-    def test_build_model_sql_content_correct(self, tmp_path):
-        entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "contact", _legacy_entity())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
-        build_model(entities_root)
-        sql = (entities_root / "contact" / "contact.sql").read_text(encoding="utf-8")
-        assert "Id INT NOT NULL" in sql
-
-    def test_legacy_warning_does_not_block_generation(self, tmp_path):
-        entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "contact", _legacy_entity())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert result.legacy_warnings
-        assert (entities_root / "contact" / "contact.sql").exists()
-
-
-# ── Pas de warning pour une entité canonique ─────────────────────────────────
-
-
-class TestCanonicalNoWarning:
-    def test_canonical_entity_no_warning(self, tmp_path):
-        entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "article", _canonical_entity())
-        _write_relations(entities_root, _CANONICAL_RELATIONS)
-        result = build_model(entities_root)
-        assert result.legacy_warnings == []
-
-    def test_canonical_entity_is_not_legacy(self, tmp_path):
-        entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "article", _canonical_entity())
-        _write_relations(entities_root, _CANONICAL_RELATIONS)
-        sources, _ = check_model(entities_root)
-        assert all(not s.is_legacy for s in sources)
-
-
-# ── Plusieurs entités legacy → un warning par entité ─────────────────────────
-
-
-class TestMultipleLegacyEntities:
-    def test_two_legacy_entities_two_warnings(self, tmp_path):
+    def test_two_legacy_entities_both_rejected(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "contact", _legacy_entity("Contact", "contact"))
         _write_entity(entities_root, "produit", _legacy_entity("Produit", "produit"))
         _write_relations(entities_root, _LEGACY_RELATIONS)
-        result = build_model(entities_root)
-        assert len(result.legacy_warnings) == 2
+        with pytest.raises(ModelValidationError):
+            build_model(entities_root)
+        assert not (entities_root / "contact" / "contact.sql").exists()
+        assert not (entities_root / "produit" / "produit.sql").exists()
 
-    def test_mixed_project_warning_only_for_legacy(self, tmp_path):
+
+# ── Entité canonique toujours acceptée ───────────────────────────────────────
+
+
+class TestCanonicalAccepted:
+    def test_canonical_build_model_succeeds(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "article", _canonical_entity("Article", "articles"))
-        _write_entity(entities_root, "contact", _legacy_entity("Contact", "contact"))
-        _write_relations(entities_root, _LEGACY_RELATIONS)
+        _write_entity(entities_root, "article", _canonical_entity())
+        _write_relations(entities_root, _CANONICAL_RELATIONS)
         result = build_model(entities_root)
-        assert len(result.legacy_warnings) == 1
-        assert "Contact" in result.legacy_warnings[0]
+        assert isinstance(result, BuildModelResult)
+        assert entities_root / "article" / "article.sql" in result.written
 
-
-# ── is_legacy sur EntitySource ────────────────────────────────────────────────
-
-
-class TestEntitySourceIsLegacy:
-    def test_legacy_source_is_marked(self, tmp_path):
-        entities_root = tmp_path / "mvc" / "entities"
-        _write_entity(entities_root, "contact", _legacy_entity())
-        _write_relations(entities_root, _LEGACY_RELATIONS)
-        sources, _ = check_model(entities_root)
-        assert sources[0].is_legacy is True
-
-    def test_canonical_source_not_marked(self, tmp_path):
+    def test_canonical_check_model_succeeds(self, tmp_path):
         entities_root = tmp_path / "mvc" / "entities"
         _write_entity(entities_root, "article", _canonical_entity())
         _write_relations(entities_root, _CANONICAL_RELATIONS)
         sources, _ = check_model(entities_root)
-        assert sources[0].is_legacy is False
+        assert len(sources) == 1
+        assert sources[0].definition["entity"] == "Article"

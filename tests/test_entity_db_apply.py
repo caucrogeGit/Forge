@@ -29,73 +29,26 @@ def _write_relations(root: Path, relations: dict, sql: str) -> None:
 
 def _contact() -> dict:
     return {
-        "format_version": 1,
-        "entity": "Contact",
+        "schema_version": "1.0",
+        "name": "Contact",
         "table": "contact",
         "description": "",
-        "fields": [
-            {
-                "name": "id",
-                "column": "Id",
-                "python_type": "int",
-                "sql_type": "INT",
-                "nullable": False,
-                "primary_key": True,
-                "auto_increment": True,
-                "constraints": {},
-            }
-        ],
+        "fields": [{"name": "nom", "type": "string", "max_length": 100}],
     }
 
 
 def _commande() -> dict:
     return {
-        "format_version": 1,
-        "entity": "Commande",
+        "schema_version": "1.0",
+        "name": "Commande",
         "table": "commande",
         "description": "",
-        "fields": [
-            {
-                "name": "id",
-                "column": "Id",
-                "python_type": "int",
-                "sql_type": "INT",
-                "nullable": False,
-                "primary_key": True,
-                "auto_increment": True,
-                "constraints": {},
-            },
-            {
-                "name": "contact_id",
-                "column": "ContactId",
-                "python_type": "int",
-                "sql_type": "INT",
-                "nullable": False,
-                "primary_key": False,
-                "auto_increment": False,
-                "constraints": {},
-            },
-        ],
+        "fields": [{"name": "contact_id", "type": "integer"}],
     }
 
 
 def _relations() -> dict:
-    return {
-        "format_version": 1,
-        "relations": [
-            {
-                "name": "commande_contact",
-                "type": "many_to_one",
-                "from_entity": "Commande",
-                "to_entity": "Contact",
-                "from_field": "contact_id",
-                "to_field": "id",
-                "foreign_key_name": "fk_commande_contact",
-                "on_delete": "RESTRICT",
-                "on_update": "CASCADE",
-            }
-        ],
-    }
+    return {"schema_version": "1.0", "relations": []}
 
 
 class FakeCursor:

@@ -15,31 +15,12 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def _contact_json() -> dict:
     return {
-        "format_version": 1,
-        "entity": "Contact",
+        "schema_version": "1.0",
+        "name": "Contact",
         "table": "contact",
         "description": "",
         "fields": [
-            {
-                "name": "id",
-                "column": "Id",
-                "python_type": "int",
-                "sql_type": "INT",
-                "nullable": False,
-                "primary_key": True,
-                "auto_increment": True,
-                "constraints": {},
-            },
-            {
-                "name": "nom",
-                "column": "Nom",
-                "python_type": "str",
-                "sql_type": "VARCHAR(100)",
-                "nullable": False,
-                "primary_key": False,
-                "auto_increment": False,
-                "constraints": {},
-            },
+            {"name": "nom", "type": "string", "max_length": 100},
         ],
     }
 

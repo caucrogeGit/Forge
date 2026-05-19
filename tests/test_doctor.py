@@ -65,11 +65,10 @@ def _write_entity(entities_root: Path, folder: str) -> None:
     d = entities_root / folder
     d.mkdir(parents=True, exist_ok=True)
     (d / f"{folder}.json").write_text(json.dumps({
-        "format_version": 1,
-        "entity": folder.capitalize(),
+        "schema_version": "1.0",
+        "name": folder.capitalize(),
         "table": folder,
-        "fields": [{"name": "id", "sql_type": "INT",
-                    "primary_key": True, "auto_increment": True}],
+        "fields": [{"name": "nom", "type": "string", "max_length": 100}],
     }), encoding="utf-8")
 
 

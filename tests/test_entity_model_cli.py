@@ -425,31 +425,24 @@ def test_sync_entity_does_not_touch_manual_py(tmp_path: Path):
     assert manual.read_text(encoding="utf-8") == "# existant\n"
 
 
-# ── Non-régression legacy ─────────────────────────────────────────────────────
+# ── Rejet legacy ─────────────────────────────────────────────────────────────
 
-def test_legacy_build_model_validates_then_writes(tmp_path: Path):
-    """Non-regression: le format legacy (format_version: 1) continue de produire le SQL attendu."""
+def test_legacy_build_model_is_rejected(tmp_path: Path):
+    """build:model refuse les entités format_version: 1 depuis LEGACY-REMOVE-001A."""
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _legacy_contact())
     _write_relations(entities_root, {"format_version": 1, "relations": []})
 
-    result = build_model(entities_root)
-
-    sql = (entities_root / "contact" / "contact.sql").read_text(encoding="utf-8")
-    assert isinstance(result, BuildModelResult)
-    assert entities_root / "contact" / "contact.sql" in result.written
-    assert "Id INT NOT NULL" in sql
-    assert "PRIMARY KEY (Id)" in sql
+    with pytest.raises(ModelValidationError) as exc_info:
+        build_model(entities_root)
+    assert "format_version" in str(exc_info.value)
 
 
-def test_legacy_check_model_preserves_entity_name(tmp_path: Path):
-    """Non-regression: le champ 'entity' du format legacy est preservé sans transformation."""
+def test_legacy_check_model_is_rejected(tmp_path: Path):
+    """check_model refuse les entités format_version: 1 depuis LEGACY-REMOVE-001A."""
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _legacy_contact())
     _write_relations(entities_root, {"format_version": 1, "relations": []})
 
-    sources, _ = check_model(entities_root)
-
-    assert len(sources) == 1
-    assert sources[0].definition["entity"] == "Contact"
-    assert sources[0].definition["table"] == "contact"
+    with pytest.raises(ModelValidationError):
+        check_model(entities_root)
