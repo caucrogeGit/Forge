@@ -112,7 +112,7 @@ assumées :
 |-----------|---------------------|
 | `min` / `max` | conservés dans la structure interne, **ne génèrent pas de contrainte SQL `CHECK`** |
 | `default` | projeté en SQL `DEFAULT` pour les cas courants |
-| `nullable` | comportement différent entre `fields[]` d'entité et `pivot.fields[]` — déclarer explicitement pour éviter toute ambiguïté |
+| `nullable` | la règle est définie par ADR-013 : `nullable` par défaut (`NULL`), `required: true` prioritaire (`NOT NULL`) — uniforme pour `fields[]` et `pivot.fields[]` |
 | `boolean` | projeté en `BOOLEAN` MariaDB |
 
 Le SQL généré est une **projection Forge**, pas un dialecte configurable par

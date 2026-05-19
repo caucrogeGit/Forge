@@ -89,13 +89,16 @@ price DECIMAL(10,2)
 
 | JSON canonique | SQL généré |
 |---|---|
-| `"required": true` | `NOT NULL` |
-| `"nullable": false` | `NOT NULL` |
+| rien (absent) | `NULL` (défaut) |
 | `"nullable": true` | `NULL` |
-| rien (entity `fields[]`) | `NOT NULL` (défaut implicite) |
-| rien (pivot `fields[]`) | `NULL` (défaut implicite) |
+| `"nullable": false` | `NOT NULL` |
+| `"required": true` | `NOT NULL` |
+| `"required": false` | `NULL` |
+| `"required": true` + `"nullable": true` | `NOT NULL` (`required` prioritaire) |
 
-**Note :** le comportement par défaut diffère entre `fields[]` d'entité et `pivot.fields[]`. Dans une entité, un champ sans `nullable` ni `required` est `NOT NULL`. Dans un pivot, il est `NULL`. Déclarer explicitement `nullable` ou `required` pour éviter toute ambiguïté.
+**Règle** (ADR-013) : un champ est nullable par défaut. `required: true` rend le champ `NOT NULL`,
+même si `nullable: true` est déclaré. Cette règle s'applique uniformément aux `fields[]` d'entité
+et aux `pivot.fields[]`.
 
 ### unique
 

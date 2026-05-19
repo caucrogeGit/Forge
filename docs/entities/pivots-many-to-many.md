@@ -129,6 +129,10 @@ Les champs pivot utilisent les **types Forge** autorisés par `field.schema.json
 
 Les clés optionnelles sont les mêmes que pour les champs d'entité : `required`, `nullable`, `unique`, `max_length`, `precision`, `scale`, `default`, `choices`…
 
+La règle nullable / required est la même que pour les `fields[]` d'entité (ADR-013) :
+un champ `pivot.fields[]` est **nullable par défaut**. `required: true` rend le champ `NOT NULL`
+et est prioritaire sur `nullable: true`.
+
 ---
 
 ## Noms réservés dans pivot.fields[]

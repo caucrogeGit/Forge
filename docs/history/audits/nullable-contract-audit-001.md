@@ -259,8 +259,8 @@ un changement comportemental dans un ticket dédié, pas comme une correction do
 | Ticket | Objectif | Statut |
 |---|---|---|
 | `NULLABLE-CONTRACT-002` | Décider et appliquer la règle officielle `nullable` (défaut + `required` vs `nullable`) | **Livré** |
-| `NULLABLE-DOC-FIX-001` | Corriger `entity-schema.md` (défaut déclaré `true` → documenter le comportement réel) | Ouvert |
-| `NULLABLE-CONTRACT-003` | Appliquer la règle officielle dans `canonical_model_normalizer.py` + tests | Ouvert |
+| `NULLABLE-DOC-FIX-001` | Corriger la documentation utilisateur | **Livré** |
+| `NULLABLE-CONTRACT-003` | Appliquer la règle officielle dans `canonical_model_normalizer.py` + tests | **Livré** |
 
 ---
 
@@ -272,6 +272,19 @@ un changement comportemental dans un ticket dédié, pas comme une correction do
 Fichier corrigé : `forge_cli/entities/canonical_model_normalizer.py::_normalize_field()`.
 Test mis à jour : `test_default_nullable_is_false` → `test_default_nullable_is_true`.
 3 nouveaux tests de matrice ADR-013 ajoutés.
+
+---
+
+## 15. Correction documentaire
+
+`NULLABLE-DOC-FIX-001` aligne la documentation utilisateur avec ADR-013 et le runtime
+corrigé par NULLABLE-CONTRACT-003.
+
+Pages mises à jour : `types-forge-mariadb.md` (table + note divergence → règle ADR-013),
+`limites-contrats-json.md` (limite divergence → règle uniforme), `pivots-many-to-many.md`
+(règle pivot.fields[] explicitée).
+
+`entity-schema.md` était déjà exact (`nullable: défaut true`).
 
 ---
 
