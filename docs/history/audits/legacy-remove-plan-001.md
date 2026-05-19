@@ -399,3 +399,14 @@ LEGACY-REMOVE-001A refuse les entités `format_version: 1` dans `build:model`.
 `forge_cli/entities/model.py` lève désormais une `ModelValidationError` si une entité JSON contient `format_version: 1`. Aucun SQL n'est généré pour cette entité. Le champ `is_legacy` sur `EntitySource` et la liste `legacy_warnings` sur `BuildModelResult` ont été supprimés.
 
 `make:crud`, les relations legacy et les tests CRUD restent hors périmètre.
+
+---
+
+## Mise en œuvre partielle — LEGACY-REMOVE-001B
+
+LEGACY-REMOVE-001B refuse les entités `format_version: 1` dans `make:crud`.
+
+`forge_cli/entities/make_crud.py` lève désormais `SystemExit(1)` avec un message explicite si une entité JSON contient `format_version: 1`. Aucun fichier CRUD n'est généré. Le warning legacy de `LEGACY-WARNINGS-004` a été retiré.
+
+`build:model` a déjà été traité par LEGACY-REMOVE-001A.
+Les relations legacy restent hors périmètre et seront traitées dans LEGACY-REMOVE-002.

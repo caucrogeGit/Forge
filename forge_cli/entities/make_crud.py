@@ -167,6 +167,13 @@ def make_crud(
 
     try:
         raw = json.loads(json_path.read_text(encoding="utf-8"))
+        if isinstance(raw, dict) and raw.get("format_version") == 1:
+            print(out.error(
+                f"Entité legacy refusée : {entity_name}.\n"
+                "Le format format_version: 1 n'est plus accepté par make:crud.\n"
+                'Utilisez schema_version: "1.0".'
+            ))
+            raise SystemExit(1)
         is_legacy = not (isinstance(raw, dict) and raw.get("schema_version") == "1.0")
         if not is_legacy:
             raw = normalize_canonical_entity_for_model_build(raw)
@@ -183,13 +190,6 @@ def make_crud(
         raise SystemExit(1)
 
     result = MakeCrudResult(dry_run=dry_run)
-
-    if is_legacy:
-        result.warnings.append(
-            f'Entité legacy : {entity_name}. '
-            'format_version: 1 est déprécié — utilisez schema_version: "1.0". '
-            "Guide : docs/entities/migration-legacy-vers-canonique.md"
-        )
 
     if not _non_pk_fields(definition):
         result.warnings.append(

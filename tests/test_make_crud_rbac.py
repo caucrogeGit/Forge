@@ -34,7 +34,6 @@ _BASE_FIELDS = [
 ]
 
 _DEF_SANS_RBAC = {
-    "format_version": 1,
     "entity": "Article",
     "table": "articles",
     "description": "",
@@ -42,7 +41,6 @@ _DEF_SANS_RBAC = {
 }
 
 _DEF_AVEC_RBAC_COMPLET = {
-    "format_version": 1,
     "entity": "Article",
     "table": "articles",
     "description": "",

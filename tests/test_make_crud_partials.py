@@ -34,7 +34,6 @@ def _field(
 
 
 ARTICLE = {
-    "format_version": 1,
     "entity": "Article",
     "table": "article",
     "description": "",
@@ -48,7 +47,6 @@ ARTICLE = {
 
 
 TAG = {
-    "format_version": 1,
     "entity": "Tag",
     "table": "tag",
     "description": "",
@@ -60,7 +58,6 @@ TAG = {
 
 
 CATEGORY = {
-    "format_version": 1,
     "entity": "Category",
     "table": "category",
     "description": "",

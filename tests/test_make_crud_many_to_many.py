@@ -31,7 +31,6 @@ def _field(
 
 
 ARTICLE_JSON = {
-    "format_version": 1,
     "entity": "Article",
     "table": "article",
     "description": "",
@@ -44,7 +43,6 @@ ARTICLE_JSON = {
 
 
 TAG_JSON = {
-    "format_version": 1,
     "entity": "Tag",
     "table": "tag",
     "description": "",
@@ -56,7 +54,6 @@ TAG_JSON = {
 
 
 CATEGORY_JSON = {
-    "format_version": 1,
     "entity": "Category",
     "table": "category",
     "description": "",

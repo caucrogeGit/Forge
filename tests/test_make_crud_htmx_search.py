@@ -62,9 +62,24 @@ def _write_entity(root: Path, definition: dict) -> None:
     (entity_dir / f"{snake}.json").write_text(json.dumps(definition), encoding="utf-8")
 
 
+_CONTACT_DISK = {
+    "schema_version": "1.0",
+    "name": "Contact",
+    "table": "contact",
+    "description": "",
+    "fields": [
+        {"name": "nom", "type": "string", "max_length": 100},
+        {"name": "email", "type": "string", "max_length": 150, "nullable": True},
+        {"name": "statut", "type": "string", "max_length": 50, "nullable": True},
+    ],
+}
+
+
 def _run_contact(tmp_path: Path) -> None:
     entities_root = tmp_path / "mvc" / "entities"
-    _write_entity(entities_root, CONTACT)
+    entity_dir = entities_root / "contact"
+    entity_dir.mkdir(parents=True, exist_ok=True)
+    (entity_dir / "contact.json").write_text(json.dumps(_CONTACT_DISK), encoding="utf-8")
     make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
 
 

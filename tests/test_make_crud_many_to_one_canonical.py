@@ -30,7 +30,6 @@ def _write_entity(root: Path, name: str, data: dict) -> None:
 def _article_no_fk() -> dict:
     """Article sans champ category_id — FK technique non déclarée."""
     return {
-        "format_version": 1,
         "entity": "Article",
         "table": "article",
         "description": "",
@@ -77,7 +76,6 @@ def _article_with_fk() -> dict:
 
 def _category_entity() -> dict:
     return {
-        "format_version": 1,
         "entity": "Category",
         "table": "category",
         "description": "",

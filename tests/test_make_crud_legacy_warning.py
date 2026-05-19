@@ -1,9 +1,11 @@
-"""Tests LEGACY-WARNINGS-004 — warning non bloquant dans make_crud pour entités legacy."""
+"""Tests LEGACY-REMOVE-001B — make:crud refuse les entités format_version: 1."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
+
+import pytest
 
 from forge_cli.entities.make_crud import make_crud
 
@@ -44,84 +46,60 @@ def _canonical_entity(name: str = "Article", table: str = "articles") -> dict:
     }
 
 
-# ── Warning présent pour entité legacy ───────────────────────────────────────
+# ── make:crud refuse les entités format_version: 1 ───────────────────────────
 
 
-class TestLegacyWarningPresent:
-    def test_make_crud_legacy_produces_warning(self, tmp_path):
+class TestLegacyEntityRejected:
+    def test_make_crud_legacy_raises_system_exit(self, tmp_path):
         entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=True)
-        assert any("legacy" in w.lower() or "format_version" in w for w in result.warnings)
+        with pytest.raises(SystemExit):
+            make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
 
-    def test_warning_mentions_format_version(self, tmp_path):
+    def test_error_output_mentions_format_version(self, tmp_path, capsys):
         entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=True)
-        legacy_warns = [w for w in result.warnings if "format_version" in w]
-        assert legacy_warns
+        with pytest.raises(SystemExit):
+            make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
+        assert "format_version" in capsys.readouterr().out
 
-    def test_warning_mentions_schema_version(self, tmp_path):
+    def test_error_output_mentions_schema_version(self, tmp_path, capsys):
         entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=True)
-        legacy_warns = [w for w in result.warnings if "schema_version" in w]
-        assert legacy_warns
+        with pytest.raises(SystemExit):
+            make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
+        assert "schema_version" in capsys.readouterr().out
 
-    def test_warning_mentions_deprecation(self, tmp_path):
+    def test_make_crud_dry_run_also_rejects_legacy(self, tmp_path):
         entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=True)
-        legacy_warns = [w for w in result.warnings if "déprécié" in w or "deprecated" in w]
-        assert legacy_warns
+        with pytest.raises(SystemExit):
+            make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=True)
 
-    def test_warning_mentions_migration_guide(self, tmp_path):
+
+# ── Aucun fichier CRUD généré pour une entité legacy ─────────────────────────
+
+
+class TestLegacyNoGeneration:
+    def test_no_controller_created(self, tmp_path):
         entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=True)
-        legacy_warns = [w for w in result.warnings if "migration" in w.lower() or "Guide" in w]
-        assert legacy_warns
+        with pytest.raises(SystemExit):
+            make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
+        assert not (tmp_path / "mvc" / "controllers" / "contact_controller.py").exists()
 
-    def test_warning_exposed_in_result_warnings(self, tmp_path):
+    def test_no_model_created(self, tmp_path):
         entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=True)
-        assert isinstance(result.warnings, list)
-        assert len(result.warnings) >= 1
+        with pytest.raises(SystemExit):
+            make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
+        assert not (tmp_path / "mvc" / "models" / "contact_model.py").exists()
 
 
-# ── Génération CRUD inchangée ─────────────────────────────────────────────────
+# ── Entité canonique toujours acceptée ───────────────────────────────────────
 
 
-class TestLegacyGenerationUnchanged:
-    def test_make_crud_still_generates_files(self, tmp_path):
-        entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=False)
-        assert result.created or result.preserved
-        controller = tmp_path / "mvc" / "controllers" / "contact_controller.py"
-        assert controller.exists()
-
-    def test_warning_does_not_block_generation(self, tmp_path):
-        entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=False)
-        legacy_warns = [w for w in result.warnings if "format_version" in w]
-        assert legacy_warns
-        assert (tmp_path / "mvc" / "models" / "contact_model.py").exists()
-
-    def test_warning_is_exactly_one_for_single_entity(self, tmp_path):
-        entities_root = _setup(tmp_path, _legacy_entity())
-        result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path, dry_run=True)
-        legacy_warns = [w for w in result.warnings if "format_version" in w]
-        assert len(legacy_warns) == 1
-
-
-# ── Pas de warning pour entité canonique ──────────────────────────────────────
-
-
-class TestCanonicalNoLegacyWarning:
-    def test_canonical_entity_no_legacy_warning(self, tmp_path):
+class TestCanonicalAccepted:
+    def test_canonical_entity_succeeds(self, tmp_path):
         entities_root = _setup(tmp_path, _canonical_entity(), _CANONICAL_RELATIONS)
-        result = make_crud("Article", entities_root=entities_root, output_root=tmp_path, dry_run=True)
-        legacy_warns = [w for w in result.warnings if "format_version" in w or "legacy" in w.lower()]
-        assert legacy_warns == []
-
-    def test_canonical_entity_generates_without_warning(self, tmp_path):
-        entities_root = _setup(tmp_path, _canonical_entity(), _CANONICAL_RELATIONS)
-        result = make_crud("Article", entities_root=entities_root, output_root=tmp_path, dry_run=False)
-        legacy_warns = [w for w in result.warnings if "format_version" in w]
-        assert legacy_warns == []
+        result = make_crud("Article", entities_root=entities_root, output_root=tmp_path)
         assert result.created or result.preserved
+
+    def test_canonical_entity_no_format_version_in_warnings(self, tmp_path):
+        entities_root = _setup(tmp_path, _canonical_entity(), _CANONICAL_RELATIONS)
+        result = make_crud("Article", entities_root=entities_root, output_root=tmp_path)
+        assert not any("format_version" in w for w in result.warnings)

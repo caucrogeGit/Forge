@@ -209,7 +209,6 @@ def test_order_column_ne_modifie_pas_le_sql_create_table(tmp_path):
 # ---------------------------------------------------------------------------
 
 _ARTICLE = {
-    "format_version": 1,
     "entity": "Article",
     "table": "article",
     "description": "",
@@ -240,7 +239,6 @@ _ARTICLE = {
 }
 
 _TAG = {
-    "format_version": 1,
     "entity": "Tag",
     "table": "tag",
     "description": "",
