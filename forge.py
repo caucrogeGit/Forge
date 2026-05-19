@@ -620,6 +620,11 @@ def main() -> None:
         schema_doctor_main(args[1:])
         return
 
+    if command == "rbac:validate":
+        from forge_cli.rbac_validate import rbac_validate_main
+        rbac_validate_main(args[1:])
+        return
+
     cli_fail(
         f"commande inconnue : «{command}».",
         hint="lancez «forge help» pour afficher les commandes disponibles.",

@@ -44,6 +44,9 @@ Schémas JSON
   schema:list        Liste les schémas JSON Forge disponibles localement.
   schema:doctor      Diagnostique les schémas JSON Forge (présence, validité, $ref).
 
+Sécurité
+  rbac:validate      Valide mvc/security/rbac.json avec le schéma RBAC Forge.
+
 Starters et modules
   starter:list        Liste les starter apps disponibles.
   starter:build       Génère un starter app dans le projet.

@@ -78,6 +78,21 @@ Il peut être référencé dans l'éditeur via la clé `$schema` :
 }
 ```
 
+## Validation
+
+Forge peut valider `mvc/security/rbac.json` depuis la racine du projet :
+
+```bash
+python forge.py rbac:validate
+python forge.py rbac:validate --json
+```
+
+Le fichier est **optionnel** : s'il est absent, la commande se termine avec succès
+(code retour 0) et affiche un message informatif. Le RBAC n'est pas requis.
+
+S'il existe, il doit respecter `rbac.schema.json`. En cas d'erreur, la commande
+affiche les problèmes et retourne le code 1.
+
 ## Limites
 
 Ce contrat n'est pas encore branché au runtime Forge.
