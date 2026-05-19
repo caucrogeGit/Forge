@@ -131,15 +131,15 @@ Puis éditer le fichier canonique `mvc/entities/contact/contact.json` :
 
 ```json
 {
-  "format_version": 1,
-  "entity": "Contact",
+  "$schema": "../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Contact",
   "table": "contact",
   "fields": [
-    { "name": "id",        "sql_type": "INT",          "primary_key": true, "auto_increment": true },
-    { "name": "nom",       "sql_type": "VARCHAR(80)",   "constraints": { "not_empty": true, "max_length": 80 } },
-    { "name": "prenom",    "sql_type": "VARCHAR(80)",   "constraints": { "not_empty": true, "max_length": 80 } },
-    { "name": "email",     "sql_type": "VARCHAR(120)",  "unique": true, "constraints": { "not_empty": true, "max_length": 120 } },
-    { "name": "telephone", "sql_type": "VARCHAR(20)",   "nullable": true, "constraints": { "max_length": 20 } }
+    { "name": "nom",       "type": "string",  "max_length": 80  },
+    { "name": "prenom",    "type": "string",  "max_length": 80  },
+    { "name": "email",     "type": "string",  "max_length": 120, "unique": true },
+    { "name": "telephone", "type": "string",  "max_length": 20,  "nullable": true }
   ]
 }
 ```
@@ -148,35 +148,24 @@ Puis éditer le fichier canonique `mvc/entities/contact/contact.json` :
 
     | Clé | Obligatoire | Description |
     |---|---|---|
-    | `format_version` | non | Toujours `1` (défaut si absent) |
-    | `entity` | **oui** | Nom PascalCase — devient le nom de la classe Python |
-    | `table` | non | Nom snake_case — déduit de `entity` si absent |
+    | `schema_version` | **oui** | Toujours `"1.0"` |
+    | `name` | **oui** | Nom PascalCase — devient le nom de la classe Python |
+    | `table` | non | Nom snake_case — déduit de `name` si absent |
     | `description` | non | Texte libre (documentaire) |
     | `fields` | **oui** | Liste des champs |
+
+    La clé primaire `Id` est générée automatiquement — ne pas la déclarer dans `fields[]`.
 
     **Chaque champ :**
 
     | Clé | Obligatoire | Description |
     |---|---|---|
-    | `name` | **oui** | Nom snake_case du champ Python |
-    | `sql_type` | **oui** | Type SQL MariaDB (`INT`, `VARCHAR(n)`, `DATE`…) |
-    | `column` | non | Nom de colonne SQL — déduit de `name` si absent |
-    | `python_type` | non | Type Python — déduit de `sql_type` si absent |
+    | `name` | **oui** | Nom snake_case du champ |
+    | `type` | **oui** | Type Forge (`string`, `integer`, `boolean`, `date`, `datetime`, `text`, `password`, `decimal`) |
+    | `max_length` | non (string) | Longueur maximale |
     | `nullable` | non | `true` / `false` (défaut : `false`) |
-    | `primary_key` | non | `true` / `false` (défaut : `false`) |
-    | `auto_increment` | non | `true` / `false` (défaut : `false`) |
     | `unique` | non | `true` / `false` (défaut : `false`) |
-    | `default` | non | Valeur par défaut compatible avec `python_type` |
-    | `constraints` | non | Validations applicatives (voir ci-dessous) |
-
-    **Contraintes disponibles :**
-
-    | Contrainte | Types | Description |
-    |---|---|---|
-    | `not_empty` | `str` | Interdit les chaînes vides |
-    | `min_length` / `max_length` | `str` | Longueur min/max |
-    | `min_value` / `max_value` | `int`, `float` | Valeur min/max |
-    | `pattern` | `str` | Expression régulière Python |
+    | `default` | non | Valeur par défaut simple (`str`, `int`, `bool`, `null`) |
 
 ### 5. Générer et appliquer le modèle
 

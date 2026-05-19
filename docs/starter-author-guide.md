@@ -252,22 +252,21 @@ Le JSON d'entité reste la source canonique. Forge génère automatiquement
 ## Relations fournies par un starter
 
 Si le starter déclare une `kind=application` avec des entités liées, fournissez
-un `relations.json` au format version 1 :
+un `relations.json` au format canonique :
 
 ```json
 {
-  "format_version": 1,
+  "$schema": "../../schemas/relations.schema.json",
+  "schema_version": "1.0",
   "relations": [
     {
-      "name": "produit_categorie",
       "type": "many_to_one",
-      "from_entity": "Produit",
-      "to_entity": "Categorie",
-      "from_field": "categorie_id",
-      "to_field": "id",
-      "foreign_key_name": "fk_produit_categorie",
-      "on_delete": "SET NULL",
-      "on_update": "CASCADE"
+      "from": "Produit",
+      "to": "Categorie",
+      "name": "categorie",
+      "foreign_key": "categorie_id",
+      "nullable": true,
+      "on_delete": "set_null"
     }
   ]
 }

@@ -58,7 +58,7 @@ nav:
       - Valider les contrats JSON: entities/entity-validate.md
       - Autocomplétion VS Code: entities/vscode-json-schema.md
       - Limites des contrats JSON: entities/limites-contrats-json.md
-      - Migration legacy vers canonique: entities/migration-legacy-vers-canonique.md
+      - Conversion depuis l'ancien format: entities/migration-legacy-vers-canonique.md
       - Front et CSS: front.md
       - Profils de projet: profiles.md
       - FAQ: faq.md
@@ -145,7 +145,7 @@ nav:
           - ADR-009 Stabilité terrain: adr/009-stability-policy-terrain.md
           - ADR-010 API canonique auth/session: adr/010-auth-session-canonical-api.md
           - ADR-011 Périmètre vocabulaire audit auth: adr/011-auth-audit-vocab-perimeter.md
-          - ADR-012 Dépréciation format legacy: adr/012-legacy-format-deprecation-policy.md
+          - ADR-012 Suppression format legacy: adr/012-legacy-format-deprecation-policy.md
           - ADR-013 Politique nullable/required: adr/013-nullable-required-contract-policy.md
 
   - Tests terrain:

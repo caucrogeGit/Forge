@@ -1,10 +1,13 @@
-# Migrer un ancien projet Forge vers le JSON canonique
+# Convertir un ancien projet Forge vers le JSON canonique
 
-Ce guide s'adresse aux projets utilisant encore le format legacy (`format_version: 1`).
-Le format legacy est **déprécié** depuis ADR-012 — le format canonique (`schema_version: "1.0"`)
-est le format officiel de Forge.
+!!! danger "Le format legacy est refusé"
+    Le format `format_version: 1` n'est plus accepté. `build:model` et `make:crud` lèvent
+    une erreur si un fichier d'entité ou de relations utilise l'ancien format.
+    Ce guide sert à convertir manuellement les anciens fichiers avant utilisation.
 
-Ce guide explique la migration manuelle. Il ne modifie pas le core Forge.
+Ce guide s'adresse aux projets dont les fichiers JSON utilisent encore l'ancien format
+(`format_version: 1`). Il explique la conversion manuelle vers le format canonique
+(`schema_version: "1.0"`), désormais obligatoire. Il ne modifie pas le core Forge.
 
 ---
 

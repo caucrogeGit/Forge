@@ -187,7 +187,7 @@ Le générateur déduit le `type` HTML à partir du type SQL **et du nom du cham
 
 ### Relations `many_to_one`
 
-Si `mvc/entities/relations.json` déclare une relation `many_to_one` dont l'entité courante est `from_entity`, `forge make:crud` exploite cette relation dans le formulaire généré.
+Si `mvc/entities/relations.json` déclare une relation `many_to_one` dont l'entité courante est la source (`from`), `forge make:crud` exploite cette relation dans le formulaire généré.
 
 Exemple : `Contact.ville_id -> Ville.id`.
 
@@ -334,7 +334,7 @@ Les fichiers générés sont des points de départ — ils sont lisibles et à a
 
 ### Ce que les relations `many_to_one` apportent déjà
 
-Si `mvc/entities/relations.json` déclare une relation `many_to_one` dont l'entité courante est `from_entity`, le CRUD généré exploite cette relation dans le formulaire :
+Si `mvc/entities/relations.json` déclare une relation `many_to_one` dont l'entité courante est la source (`from`), le CRUD généré exploite cette relation dans le formulaire :
 
 - le champ FK devient un `ChoiceField` ;
 - la vue `form.html` génère un `<select>` avec les options de la table cible ;

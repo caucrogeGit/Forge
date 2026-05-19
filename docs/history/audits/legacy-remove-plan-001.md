@@ -470,3 +470,35 @@ Conversion des fixtures relations legacy dans `test_starter_cli.py` (2 occurrenc
 - `pytest`, `compileall`, `ruff check`, `mkdocs build --strict`, `git diff --check` : tous verts.
 - Les fixtures entité dans les tests de fonctionnalité n'utilisent plus le marqueur `format_version: 1`.
 - Les fichiers restants avec `format_version: 1` sont exclusivement des tests de rejet (Catégorie A) ou des méta-tests documentaires.
+
+---
+
+## Mise en œuvre — LEGACY-REMOVE-004
+
+LEGACY-REMOVE-004 aligne la documentation sur la suppression du legacy. Le format canonique
+`schema_version: "1.0"` est désormais le seul format d'entrée documenté comme accepté.
+
+### Fichiers modifiés
+
+- **`docs/adr/012-legacy-format-deprecation-policy.md`** — réécriture de la décision : "refusé" remplace "déprécié temporairement". Historique conservé.
+- **`docs/entities/json-canonique.md`** — section Limites : "conservé temporairement" → "refusé".
+- **`docs/entities/entity-validate.md`** — section erreurs et section Limites : "accepté mais non recommandé" → "refusé".
+- **`docs/entities/limites-contrats-json.md`** — section "Compatibilité legacy temporaire" → "Format legacy refusé".
+- **`docs/entities/migration-legacy-vers-canonique.md`** — titre et avertissement danger ajouté en tête de page (Option B du ticket).
+- **`docs/entity_architecture.md`** — exemples d'entité et de `relations.json` legacy → format canonique.
+- **`docs/guide.md`** — exemple d'entité et table Anatomie → format canonique.
+- **`docs/crud.md`** — deux occurrences de `from_entity` dans le texte → `from`.
+- **`docs/app-complete-tutorial.md`** — exemple `relations.json` et référence `from_entity` → format canonique.
+- **`docs/starter-author-guide.md`** — exemple `relations.json` → format canonique.
+- **`mkdocs.yml`** — titres de navigation mis à jour.
+
+### Fichier créé
+
+- **`tests/meta/test_legacy_remove_docs_001.py`** — tests meta documentaires.
+
+### Résultat
+
+- 11 877 tests passent (0 échec).
+- `pytest`, `compileall`, `ruff check`, `mkdocs build --strict`, `git diff --check` : tous verts.
+- Aucune page utilisateur ne présente plus `format_version: 1` comme format utilisable.
+- Les audits historiques conservent les traces legacy par contexte.

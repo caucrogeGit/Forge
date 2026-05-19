@@ -156,11 +156,11 @@ class TestRelations:
     def test_many_to_one_mentionne(self):
         assert "many_to_one" in _text()
 
-    def test_from_entity_mentionne(self):
-        assert "from_entity" in _text()
+    def test_from_canonique_mentionne(self):
+        assert '"from"' in _text() or "'from'" in _text() or "source (`from`)" in _text()
 
-    def test_to_entity_mentionne(self):
-        assert "to_entity" in _text()
+    def test_to_canonique_mentionne(self):
+        assert '"to"' in _text() or "'to'" in _text() or "cible (`to`)" in _text()
 
     def test_foreign_key_mentionne(self):
         text = _text().lower()

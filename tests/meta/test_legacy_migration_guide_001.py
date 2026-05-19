@@ -87,9 +87,9 @@ def test_guide_mentionne_build_model():
 # ── Contenu obligatoire — politique ───────────────────────────────────────────
 
 
-def test_guide_mentionne_legacy_deprecie():
+def test_guide_mentionne_legacy_refusé():
     content = _guide()
-    assert "déprécié" in content or "Déprécié" in content
+    assert "refusé" in content or "Refusé" in content or "n'est plus accepté" in content
 
 
 def test_guide_mentionne_adr_012():

@@ -177,7 +177,8 @@ Erreur : `FORGE_ENTITY_SCHEMA_MISSING` — `schema_version` est obligatoire.
 { "format_version": 1, ... }
 ```
 
-Le format legacy est accepté mais non recommandé. Les nouvelles entités doivent utiliser `schema_version: "1.0"`.
+Le format `format_version: 1` est **refusé** — `build:model` et `make:crud` lèvent une erreur.
+Migrer vers le format canonique `schema_version: "1.0"` (voir `docs/entities/migration-legacy-vers-canonique.md`).
 
 ---
 
@@ -277,6 +278,6 @@ La sortie JSON peut être exploitée par un outil ou un script pour extraire les
 ## Limites
 
 - VS Code peut aider à la saisie via `$schema`, mais ne remplace pas `entity:validate` — les erreurs sémantiques (entités inconnues, collisions, doublons) ne sont pas détectées par l'éditeur.
-- Les starters legacy peuvent encore contenir d'anciens formats (`format_version: 1`) — ils passent la validation mais ne bénéficient pas des nouvelles fonctionnalités canoniques.
+- Les starters Forge utilisent tous le format canonique `schema_version: "1.0"`. Le format `format_version: 1` est refusé par `build:model` et `make:crud`.
 - `entity:validate` valide les contrats JSON, pas l'état réel d'une base MariaDB déjà déployée — utiliser les commandes de migration pour comparer avec la base.
 - La sortie JSON (`--json`) est un contrat d'outil maintenu par les tests — ne pas la parser manuellement en production sans vérifier la compatibilité de version.

@@ -36,9 +36,9 @@ def test_adr_mentionne_schema_version():
     assert "schema_version" in _adr()
 
 
-def test_adr_mentionne_format_canonique_recommande():
+def test_adr_mentionne_format_canonique_obligatoire():
     content = _adr()
-    assert "format officiel" in content or "recommandé" in content
+    assert "seul format" in content or "obligatoire" in content or "refusé" in content
 
 
 def test_adr_mentionne_legacy_deprecie():
@@ -57,9 +57,9 @@ def test_adr_mentionne_starters_sans_legacy():
     assert "canonique" in content or "canonical" in content
 
 
-def test_adr_mentionne_conditions_avant_suppression():
+def test_adr_mentionne_tickets_implementation():
     content = _adr()
-    assert "Conditions avant suppression" in content or "conditions" in content.lower()
+    assert "LEGACY-REMOVE-001" in content and "LEGACY-REMOVE-002" in content
 
 
 def test_adr_ne_dit_pas_legacy_supprime():
@@ -77,8 +77,9 @@ def test_adr_ne_dit_pas_pypi_publie():
 # ── Structure ──────────────────────────────────────────────────────────────────
 
 
-def test_adr_mentionne_statut_accepte():
-    assert "Acceptée" in _adr() or "Accepté" in _adr()
+def test_adr_mentionne_statut():
+    content = _adr()
+    assert "Acceptée" in content or "Mise à jour" in content
 
 
 def test_adr_mentionne_legacy_policy_001():

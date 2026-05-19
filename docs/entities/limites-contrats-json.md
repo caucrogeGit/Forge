@@ -57,32 +57,20 @@ détaillée de l'aide à la saisie.
 
 ---
 
-## Compatibilité legacy temporaire
+## Format legacy refusé
 
-Forge conserve temporairement un chemin de compatibilité avec l'ancien format
-d'entités (`format_version: 1`). Ce support permet aux projets existants de
-continuer à fonctionner sans migration immédiate.
+Le format `format_version: 1` n'est plus accepté comme format d'entrée utilisateur.
 
-**Ce que cela implique :**
+- `build:model` refuse les entités `format_version: 1` — lève `ModelValidationError`.
+- `make:crud` refuse les entités `format_version: 1` — quitte avec `SystemExit`.
+- `relations.json` avec `format_version: 1` est refusé par `validate_relations_definition`.
+- Les clés legacy (`from_entity`, `to_entity`, `foreign_key_name`) sont refusées.
 
-- les nouveaux fichiers générés par Forge sont toujours canoniques (`schema_version: "1.0"`) ;
-- les anciens fichiers en format legacy passent la validation mais n'activent pas
-  toutes les fonctionnalités canoniques ;
-- le support legacy est **transitoire** — sa suppression devra faire l'objet
-  d'une décision dédiée.
+**Migration** : voir `docs/entities/migration-legacy-vers-canonique.md`.
 
-Aucune date de suppression n'est fixée à ce stade.
-
----
-
-## Starters non migrés
-
-Les starters distribués avec Forge peuvent encore contenir des fichiers en
-format legacy tant qu'un ticket de migration dédié n'a pas été exécuté.
-
-Cette limite n'invalide pas le contrat canonique, mais elle impose de ne pas
-supprimer brutalement le support legacy avant que tous les starters soient
-migrés.
+Les starters distribués avec Forge sont tous au format canonique `schema_version: "1.0"`.
+La suppression du support legacy a été réalisée dans les tickets LEGACY-REMOVE-001A, 001B,
+002 et 003, pendant la phase de construction du framework (aucun projet réel à préserver).
 
 ---
 
@@ -160,8 +148,6 @@ contrat déclare, sans inférence cachée.
 Ces points ne sont pas des engagements — ce sont des pistes identifiées pendant
 la phase bêta :
 
-- migration des starters legacy vers le format canonique ;
-- décision sur la date de suppression du support legacy ;
 - harmonisation du comportement `nullable` entre `fields[]` et `pivot.fields[]` ;
 - support CRUD avancé des attributs `pivot.fields[]` dans `make:crud` ;
 - configuration VS Code prête à l'emploi (`.vscode/settings.json` dans les starters) ;

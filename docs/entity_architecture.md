@@ -47,72 +47,41 @@ flowchart TD
 
 ```json
 {
-  "format_version": 1,
-  "entity": "Contact",
+  "$schema": "../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Contact",
   "table": "contact",
   "description": "Contacts de l'application",
   "fields": [
-    {
-      "name": "id",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
-    },
-    {
-      "name": "nom",
-      "sql_type": "VARCHAR(80)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 80
-      }
-    },
-    {
-      "name": "email",
-      "sql_type": "VARCHAR(120)",
-      "unique": true,
-      "nullable": true,
-      "constraints": {
-        "max_length": 120
-      }
-    },
-    {
-      "name": "actif",
-      "sql_type": "BOOLEAN",
-      "default": true
-    }
+    { "name": "nom",   "type": "string",  "max_length": 80  },
+    { "name": "email", "type": "string",  "max_length": 120, "nullable": true },
+    { "name": "actif", "type": "boolean", "default": true   }
   ]
 }
 ```
+
+La clé primaire `Id` est générée automatiquement par `build:model` — elle n'est pas déclarée dans `fields[]`.
 
 ### Clés racine
 
 | Clé | Obligatoire | Valeur par défaut |
 |---|---|---|
-| `entity` | Oui | — |
-| `fields` | Oui | — |
-| `format_version` | Non | `1` |
-| `table` | Non | `entity` converti en `snake_case` |
+| `schema_version` | **Oui** | — (doit valoir `"1.0"`) |
+| `name` | **Oui** | — |
+| `fields` | **Oui** | — |
+| `table` | Non | `name` converti en `snake_case` |
 | `description` | Non | `""` |
 
 ### Clés par champ
 
 | Clé | Obligatoire | Valeur par défaut |
 |---|---|---|
-| `name` | Oui | — |
-| `sql_type` | Oui | — |
-| `column` | Non | `name` converti en `PascalCase` |
-| `python_type` | Non | déduit depuis `sql_type` |
+| `name` | **Oui** | — |
+| `type` | **Oui** | — (valeurs : `string`, `integer`, `boolean`, `date`, `datetime`, `text`, `password`, `decimal`) |
+| `max_length` | Non (string) | — |
 | `nullable` | Non | `false` |
-| `primary_key` | Non | `false` |
-| `auto_increment` | Non | `false` |
 | `unique` | Non | `false` |
 | `default` | Non | absent |
-| `constraints` | Non | `{}` |
-
-!!! warning "Dérivation automatique de `column`"
-    La dérivation automatique ne préserve pas les acronymes métier.
-    `montant_ttc` devient `MontantTtc`, pas `MontantTTC`.
-    Si une casse spécifique est nécessaire, déclarer `column` explicitement.
 
 ### Contraintes disponibles dans `constraints`
 
@@ -271,28 +240,27 @@ flowchart LR
 
 ```json
 {
-  "format_version": 1,
+  "$schema": "../../schemas/relations.schema.json",
+  "schema_version": "1.0",
   "relations": [
     {
-      "name": "commande_client",
       "type": "many_to_one",
-      "from_entity": "Commande",
-      "to_entity": "Client",
-      "from_field": "client_id",
-      "to_field": "id",
-      "foreign_key_name": "fk_commande_client",
-      "on_delete": "RESTRICT",
-      "on_update": "CASCADE"
+      "from": "Commande",
+      "to": "Client",
+      "name": "client",
+      "foreign_key": "client_id",
+      "nullable": false,
+      "on_delete": "restrict"
     }
   ]
 }
 ```
 
 Règles :
-- `many_to_one` est le seul type supporté actuellement
-- `from_field` et `to_field` utilisent les noms Python des champs (pas les colonnes SQL)
-- `to_field` doit être la clé primaire de l'entité cible
-- `on_delete` et `on_update` sont toujours explicites
+- `many_to_one` et `many_to_many` sont les types supportés
+- `from` est l'entité source, `to` est l'entité cible
+- `foreign_key` est le nom du champ FK dans l'entité source
+- `on_delete` est en minuscules : `cascade`, `set_null`, `restrict`, `no_action`
 
 ### Format `relations.sql`
 
@@ -341,23 +309,22 @@ Relations associées dans `relations.json` :
 
 ```json
 {
-  "format_version": 1,
+  "$schema": "../../schemas/relations.schema.json",
+  "schema_version": "1.0",
   "relations": [
     {
-      "name": "contact_groupe_contact",
       "type": "many_to_one",
-      "from_entity": "ContactGroupe", "to_entity": "Contact",
-      "from_field": "contact_id",     "to_field": "id",
-      "foreign_key_name": "fk_contact_groupe_contact",
-      "on_delete": "CASCADE", "on_update": "CASCADE"
+      "from": "ContactGroupe", "to": "Contact",
+      "name": "contact",
+      "foreign_key": "contact_id",
+      "nullable": false, "on_delete": "cascade"
     },
     {
-      "name": "contact_groupe_groupe",
       "type": "many_to_one",
-      "from_entity": "ContactGroupe", "to_entity": "Groupe",
-      "from_field": "groupe_id",      "to_field": "id",
-      "foreign_key_name": "fk_contact_groupe_groupe",
-      "on_delete": "CASCADE", "on_update": "CASCADE"
+      "from": "ContactGroupe", "to": "Groupe",
+      "name": "groupe",
+      "foreign_key": "groupe_id",
+      "nullable": false, "on_delete": "cascade"
     }
   ]
 }

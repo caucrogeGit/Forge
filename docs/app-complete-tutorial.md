@@ -202,28 +202,26 @@ suivantes :
 
 ```text
 Type de relation : many_to_one
-Entité source (from_entity) : Contact
-Entité cible (to_entity) : Ville
-Champ source (from_field) : ville_id
-Champ cible (to_field) : id
+Entité source (from) : Contact
+Entité cible (to) : Ville
+Clé étrangère (foreign_key) : ville_id
 ```
 
 Résultat dans `mvc/entities/relations.json` :
 
 ```json
 {
-  "format_version": 1,
+  "$schema": "../../schemas/relations.schema.json",
+  "schema_version": "1.0",
   "relations": [
     {
-      "name": "contact_ville",
       "type": "many_to_one",
-      "from_entity": "Contact",
-      "to_entity": "Ville",
-      "from_field": "ville_id",
-      "to_field": "id",
-      "foreign_key_name": "fk_contact_ville",
-      "on_delete": "SET NULL",
-      "on_update": "CASCADE"
+      "from": "Contact",
+      "to": "Ville",
+      "name": "ville",
+      "foreign_key": "ville_id",
+      "nullable": true,
+      "on_delete": "set_null"
     }
   ]
 }
@@ -280,7 +278,7 @@ forge make:crud Contact
 | `mvc/views/contact/delete.html` | Oui — **préservé** |
 
 !!! info "make:crud et les relations"
-    Quand `Contact` est le `from_entity` d'une relation `many_to_one`, `forge make:crud`
+    Quand `Contact` est la source (`from`) d'une relation `many_to_one`, `forge make:crud`
     génère automatiquement un champ `RelationField` pour `ville_id` dans le formulaire,
     et un `LEFT JOIN` dans la requête de liste pour afficher le nom de la ville.
 

@@ -195,9 +195,9 @@ class TestEntitesRelations:
     def test_many_to_one_mentionne(self):
         assert "many_to_one" in _text()
 
-    def test_format_v1_mentionne(self):
+    def test_schema_version_canonique_mentionne(self):
         text = _text()
-        assert "format_version" in text or "V1" in text
+        assert "schema_version" in text or '"1.0"' in text
 
 
 # ---------------------------------------------------------------------------

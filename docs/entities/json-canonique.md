@@ -213,6 +213,6 @@ VS Code aide à écrire, mais `forge entity:validate` reste la **validation offi
 ## Limites assumées
 
 - `forge entity:validate` est la validation officielle — VS Code aide mais ne remplace pas.
-- Le support du **format legacy** (`format_version: 1`) est conservé temporairement pour compatibilité. Les starters peuvent encore contenir des entités legacy tant qu'ils ne sont pas migrés.
+- Le format `format_version: 1` est **refusé** — `build:model` et `make:crud` lèvent une erreur si un fichier d'entité ou de relations utilise l'ancien format. Voir le guide de conversion `docs/entities/migration-legacy-vers-canonique.md`.
 - Le **CRUD avancé des attributs pivot** (`pivot.fields`) n'est pas encore couvert par `make:crud`.
 - La documentation détaillée des schémas JSON (`entity.schema.json`, `relations.schema.json`…) sera traitée dans des tickets documentaires dédiés.
