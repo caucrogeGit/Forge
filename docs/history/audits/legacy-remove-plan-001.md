@@ -1,0 +1,391 @@
+# Audit — Plan de suppression accélérée du legacy Forge
+
+**Ticket** : LEGACY-REMOVE-PLAN-001-ACCELERATED-LEGACY-REMOVAL-PLAN
+**Date** : 2026-05-19
+**Auteur** : Forge (audit de suppression)
+**Périmètre** : `forge_cli/entities/`, `forge_cli/starters/`, `tests/`, `docs/`
+
+---
+
+## 1. Résumé
+
+Cet audit établit le plan de suppression accélérée du support legacy (`format_version: 1`)
+dans Forge. Aucune application réelle Forge n'est à préserver. Les starters sont 100 %
+canoniques. Le CRUD M2M canonique vient d'être corrigé (CRUD-M2M-CANONICAL-001).
+
+La stratégie de compatibilité longue devient obsolète. Elle est remplacée par une
+bascule directe : le format canonique `schema_version: "1.0"` devient le seul format
+accepté.
+
+Le présent ticket est un plan. Aucune suppression n'est effectuée ici.
+
+---
+
+## 2. Contexte stratégique
+
+| Fait | Valeur |
+|---|---|
+| Applications Forge en production à préserver | 0 |
+| Starters migrés en canonique | 100 % |
+| Runtime canonique consolidé | Oui |
+| CRUD M2M canonique corrigé | Oui (CRUD-M2M-CANONICAL-001) |
+| Tests encore en format legacy | ~57 fichiers runtime, ~268 occurrences |
+| Politique actuelle | Dépréciation (ADR-012) |
+| Nouvelle politique cible | Suppression accélérée |
+
+---
+
+## 3. Méthode d'audit
+
+```bash
+grep -RInE 'format_version|sql_type|python_type|primary_key|auto_increment|\
+from_entity|to_entity|foreign_key_name|pivot_table|source_key|target_key|legacy' \
+  forge_cli/ tests/ docs/ 2>/dev/null
+
+python forge.py schema:list
+python forge.py schema:doctor
+python forge.py entity:validate
+python forge.py build:model
+
+pytest tests/test_build_model_legacy_warning.py \
+       tests/test_make_crud_legacy_warning.py \
+       tests/test_make_crud_many_to_many_canonical.py \
+       tests/meta/test_legacy_policy_002.py \
+       tests/meta/test_legacy_migration_guide_001.py -q
+```
+
+Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
+
+---
+
+## 4. Chemins legacy restants dans le core
+
+### 4.1 `forge_cli/entities/validation.py`
+
+**Zone legacy** : entrée principale du format `format_version: 1`.
+
+| Ligne | Objet | Legacy concerné | Action future |
+|---|---|---|---|
+| 55 | `ALLOWED_ROOT_KEYS` inclut `format_version`, `entity` | Clés racine du format legacy | LEGACY-REMOVE-001 : retirer ces clés ; lever une erreur claire si détectées |
+| 228–229 | Validation de `format_version` comme entier | Permissivité legacy | LEGACY-REMOVE-001 : supprimer |
+| 410 | `format_version` dans le dict normalisé retourné | Propagation legacy interne | LEGACY-REMOVE-001 : supprimer |
+| 509–510 | Vérification `format_version == 1` | Double entrée | LEGACY-REMOVE-001 : supprimer |
+
+### 4.2 `forge_cli/entities/model.py`
+
+**Zone legacy** : détection, normalisation et warning legacy dans `build:model`.
+
+| Ligne | Objet | Legacy concerné | Action future |
+|---|---|---|---|
+| 38 | `EntitySource.is_legacy: bool` | Flag legacy | LEGACY-REMOVE-001 : supprimer |
+| 47 | `BuildModelResult.legacy_warnings` | Liste de warnings | LEGACY-REMOVE-001 : supprimer |
+| 115–120 | Génération des warnings legacy | Message dépréciation | LEGACY-REMOVE-001 : supprimer |
+| 346–356 | Branche `is_legacy` : normalisation canonique→interne | Chemin de compatibilité | LEGACY-REMOVE-001 : remplacer par erreur si `format_version` détecté |
+
+### 4.3 `forge_cli/entities/relations.py`
+
+**Zone legacy** : format legacy des relations (`format_version: 1`, `source`/`target`, `ValidatedManyToManyRelation`).
+
+| Ligne | Objet | Legacy concerné | Action future |
+|---|---|---|---|
+| 95 | Dataclass `ValidatedManyToManyRelation` | Type M2M legacy | LEGACY-REMOVE-002 : supprimer |
+| 523 | `_generate_many_to_many_sql()` | Génération SQL M2M legacy | LEGACY-REMOVE-002 : supprimer |
+| 570–578 | Validation `format_version` dans la racine relations | Compatibilité relations legacy | LEGACY-REMOVE-002 : supprimer |
+| 854 | `_validate_many_to_many()` | Validateur M2M legacy | LEGACY-REMOVE-002 : supprimer |
+| 174, 179 | Type hints incluant `ValidatedManyToManyRelation` | Propagation du type legacy | LEGACY-REMOVE-002 : simplifier |
+
+### 4.4 `forge_cli/entities/make_crud.py`
+
+**Zone legacy** : détection + warning dans `make:crud`.
+
+| Ligne | Objet | Legacy concerné | Action future |
+|---|---|---|---|
+| 170–191 | Détection `is_legacy`, emission warning | Warning non bloquant | LEGACY-REMOVE-001 : remplacer par erreur bloquante |
+
+### 4.5 `forge_cli/entities/make_relation.py`
+
+**Zone legacy** : acceptation de `format_version` dans la racine relations.
+
+| Ligne | Objet | Legacy concerné | Action future |
+|---|---|---|---|
+| 135–136 | Accepte `format_version` ou `schema_version` | Double entrée | LEGACY-REMOVE-002 : n'accepter que `schema_version: "1.0"` |
+
+### 4.6 `forge_cli/entities/crud/relations_loader.py`
+
+**Zone legacy** : branche `ValidatedManyToManyRelation` maintenue après CRUD-M2M-CANONICAL-001.
+
+| Ligne | Objet | Legacy concerné | Action future |
+|---|---|---|---|
+| Import | `ValidatedManyToManyRelation` importé | Type M2M legacy | LEGACY-REMOVE-002 : supprimer branche legacy |
+| ~113 | Branche `isinstance(relation, ValidatedManyToManyRelation)` | Normalisation legacy→canonique | LEGACY-REMOVE-002 : supprimer, ne garder que le canonique |
+
+### 4.7 `forge_cli/entities/migrations.py`
+
+**Zone legacy** : lecture d'entités — vérification `schema_version == "1.0"`.
+
+| Ligne | Objet | Legacy concerné | Action future |
+|---|---|---|---|
+| 351 | Branche `if schema_version == "1.0"` (implicitement, les autres sont legacy) | Chemin dual | LEGACY-REMOVE-001 : supprimer la branche non-canonique |
+
+### 4.8 `forge_cli/entities/canonical_model_normalizer.py` — NOTE
+
+Ce fichier traduit les entités canoniques en représentation **interne** (avec `sql_type`,
+`python_type`, `primary_key`, `auto_increment`). Ce ne sont pas des clés du format
+utilisateur — elles constituent la représentation interne de Forge utilisée par
+`validation.py`, `model.py` et les générateurs.
+
+Ce fichier doit être **conservé** après suppression du support legacy utilisateur : il
+reste le traducteur canonique→interne. Sa suppression (ou le remplacement de la
+représentation interne) est hors scope de la série LEGACY-REMOVE.
+
+---
+
+## 5. Tests legacy restants
+
+### Rappel : catégories du nouveau plan
+
+Le plan accéléré supprime la catégorie « compatibilité à conserver » de l'audit précédent.
+Trois catégories seulement :
+
+- **A** — supprimer (test de compatibilité legacy devenu inutile)
+- **B** — convertir vers le canonique (teste une vraie fonctionnalité)
+- **C** — remplacer par un test de refus clair (doit vérifier que le legacy est rejeté)
+
+### Groupe A — Supprimer (4 fichiers)
+
+| Fichier | Tests | Motif |
+|---|---:|---|
+| `tests/test_make_crud_many_to_many.py` | 11 | Couvert par `test_make_crud_many_to_many_canonical.py` |
+| `tests/meta/test_legacy_warnings_audit_001.py` | ~8 | Audite des warnings qui n'existeront plus |
+| `tests/meta/test_legacy_warnings_close_001.py` | ~6 | Clôture de warnings obsolètes |
+| `tests/meta/test_legacy_warnings_makecrud_makerelation_audit_001.py` | ~7 | Audite des warnings à supprimer |
+
+### Groupe B — Convertir vers le canonique (51 fichiers)
+
+**Famille CRUD (make:crud, vues, formulaires)** — 17 fichiers :
+
+| Fichier | Ticket |
+|---|---|
+| `test_make_crud.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_empty_states.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_htmx_delete.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_htmx_pagination.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_htmx_search.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_many_to_one_canonical.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_pagination.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_partials.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_rbac.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_search.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_sort.py` | LEGACY-REMOVE-003 |
+| `test_crud_bulk_delete.py` | LEGACY-REMOVE-003 |
+| `test_crud_filters.py` | LEGACY-REMOVE-003 |
+| `test_crud_filters_htmx.py` | LEGACY-REMOVE-003 |
+| `test_crud_filter_whitelist_001.py` | LEGACY-REMOVE-003 |
+| `test_crud_htmx.py` | LEGACY-REMOVE-003 |
+| `test_crud_sort.py` | LEGACY-REMOVE-003 |
+
+**Famille Média** — 12 fichiers :
+
+| Fichier | Ticket |
+|---|---|
+| `test_make_crud_media.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_alt.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_context.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_destroy.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_gallery_add.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_gallery_context.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_gallery_delete.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_gallery_multiupload.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_gallery_order.py` | LEGACY-REMOVE-003 |
+| `test_make_crud_media_runtime.py` | LEGACY-REMOVE-003 |
+| `test_entity_media_declaration.py` | LEGACY-REMOVE-003 |
+| `test_entity_form_field.py` | LEGACY-REMOVE-003 |
+
+**Famille Public** — 4 fichiers :
+
+| Fichier | Ticket |
+|---|---|
+| `test_make_public_form.py` | LEGACY-REMOVE-003 |
+| `test_make_public_i18n.py` | LEGACY-REMOVE-003 |
+| `test_make_public_list.py` | LEGACY-REMOVE-003 |
+| `test_make_public_list_media.py` | LEGACY-REMOVE-003 |
+
+**Famille Relations** — 4 fichiers :
+
+| Fichier | Ticket |
+|---|---|
+| `test_relations_ordered.py` | LEGACY-REMOVE-002 |
+| `test_relations_many_to_many.py` | LEGACY-REMOVE-002 |
+| `test_relations_many_to_one_canonical_sql.py` | LEGACY-REMOVE-002 |
+| `test_entity_list_filter.py` | LEGACY-REMOVE-003 |
+
+**Famille Entités / Validation** — 7 fichiers (ancienne catégorie A, désormais à convertir) :
+
+| Fichier | Ticket |
+|---|---|
+| `test_entity_json_validation.py` | LEGACY-REMOVE-001 |
+| `test_entity_semantic_validation.py` | LEGACY-REMOVE-001 |
+| `test_entity_relations.py` | LEGACY-REMOVE-002 |
+| `test_entity_model_cli.py` | LEGACY-REMOVE-001 |
+| `test_entity_sync_command.py` | LEGACY-REMOVE-001 |
+| `test_build_model_canonical_routing.py` | LEGACY-REMOVE-001 |
+| `test_starter_scaffold_empty_relations.py` | LEGACY-REMOVE-001 |
+
+**Famille Outils / Diagnostic** — 4 fichiers :
+
+| Fichier | Ticket |
+|---|---|
+| `test_entity_db_apply.py` | LEGACY-REMOVE-001 |
+| `test_doctor.py` | LEGACY-REMOVE-001 |
+| `test_migrations.py` | LEGACY-REMOVE-001 |
+| `test_entity_relations.py` | LEGACY-REMOVE-002 |
+
+### Groupe C — Remplacer par un test de refus clair (3 fichiers)
+
+| Fichier actuel | Fichier futur | Comportement attendu |
+|---|---|---|
+| `test_build_model_legacy_warning.py` | `test_build_model_legacy_rejection.py` | `build:model` lève une erreur claire sur `format_version: 1` |
+| `test_make_crud_legacy_warning.py` | `test_make_crud_legacy_rejection.py` | `make:crud` lève une erreur claire sur `format_version: 1` |
+| `tests/meta/test_legacy_migration_guide_001.py` | `test_legacy_format_removal_001.py` | La doc indique que le format legacy n'est plus accepté |
+
+---
+
+## 6. Documentation à corriger
+
+| Document | Action future |
+|---|---|
+| `docs/adr/012-legacy-format-deprecation-policy.md` | Réécrire en ADR de suppression : « le format legacy n'est plus accepté depuis X.X » |
+| `docs/entities/migration-legacy-vers-canonique.md` | Remplacer par : « le format canonique est obligatoire — voici comment écrire un fichier canonique valide » |
+| `docs/entities/limites-contrats-json.md` | Supprimer les sections sur la compatibilité legacy temporaire |
+| `docs/15-minutes.md` | Retirer les exemples `format_version: 1` ou les remplacer par des exemples canoniques |
+| `docs/guide.md` | Vérifier et remplacer les exemples legacy |
+| `docs/concepts.md` | Si des références à `format_version` y existent |
+| `docs/history/audits/legacy-support-core-audit-001.md` | Archiver — supersédé par ce plan |
+| `docs/history/audits/legacy-tests-reclassification-audit-001.md` | Archiver — classification supersédée |
+| `mkdocs.yml` nav | `Migration legacy vers canonique` → renommer ou retirer selon la rédaction finale |
+
+---
+
+## 7. Risques de suppression
+
+### Risque 1 — Volume des tests à convertir
+
+57 fichiers de tests utilisent des fixtures legacy. La conversion est mécaniquement
+répétitive mais large. Elle doit se faire fichier par fichier dans LEGACY-REMOVE-003.
+
+**Mitigation** : fixer une convention canonique partagée (`_canonical_entity()` helper)
+et l'appliquer systématiquement.
+
+### Risque 2 — Représentation interne
+
+`canonical_model_normalizer.py` génère des dicts internes avec `sql_type`, `python_type`,
+`primary_key`, `auto_increment`. Ces clés **ne sont pas** le format legacy utilisateur.
+Supprimer le support legacy utilisateur ne touche pas cette représentation interne.
+
+**Mitigation** : ne pas toucher à `canonical_model_normalizer.py` dans les tickets LEGACY-REMOVE.
+
+### Risque 3 — `ValidatedManyToManyRelation` dans `relations_loader.py`
+
+Après CRUD-M2M-CANONICAL-001, `relations_loader.py` contient une branche pour chaque
+type. La suppression de `ValidatedManyToManyRelation` et de sa branche dans LEGACY-REMOVE-002
+est propre et isolée.
+
+**Mitigation** : supprimer en même temps le type, le validateur, le générateur SQL et la
+branche dans `relations_loader.py`.
+
+### Risque 4 — Tests `test_entity_json_validation.py` et `test_entity_semantic_validation.py`
+
+Ces fichiers testent que les entités legacy sont acceptées. Après suppression, la moitié
+des tests devient des tests de rejet, l'autre moitié devient des tests canoniques.
+Le refactoring est plus complexe que la plupart des fichiers du groupe B.
+
+**Mitigation** : traiter ces fichiers en tête du plan LEGACY-REMOVE-001 avec des tickets
+dédiés.
+
+---
+
+## 8. Plan court recommandé
+
+| Ticket | Objectif | Scope principal |
+|---|---|---|
+| LEGACY-REMOVE-001 | Supprimer le support legacy des entités | `validation.py`, `model.py`, `make_crud.py`, `migrations.py`, tests validation |
+| LEGACY-REMOVE-002 | Supprimer le support legacy des relations | `relations.py`, `make_relation.py`, `relations_loader.py`, tests relations |
+| LEGACY-REMOVE-003 | Nettoyer les tests legacy et les warnings | 44 fichiers B + 3 fichiers C ; supprimer les 4 fichiers A |
+| LEGACY-REMOVE-004 | Mettre à jour docs et ADR | ADR-012, migration guide, limites, mkdocs.yml |
+| LEGACY-CLOSE-001 | Clôturer la suppression : audit final + garantie zéro legacy | grep final, meta test de clôture |
+
+Chaque ticket = un commit. Pas de tunnel long.
+
+---
+
+## 9. Tickets proposés
+
+### LEGACY-REMOVE-001 — Entités
+
+Supprimer dans `validation.py` et `model.py` :
+- `format_version` de `ALLOWED_ROOT_KEYS`
+- Branche `is_legacy` dans `model.py`
+- Warning legacy → erreur bloquante dans `make:crud`
+- Branche non-canonique dans `migrations.py`
+
+Convertir ou remplacer :
+- `test_entity_json_validation.py`, `test_entity_semantic_validation.py`,
+  `test_entity_model_cli.py`, `test_entity_sync_command.py`,
+  `test_build_model_canonical_routing.py`, `test_entity_db_apply.py`,
+  `test_doctor.py`, `test_starter_scaffold_empty_relations.py`
+
+Créer :
+- `test_build_model_legacy_rejection.py`
+- `test_make_crud_legacy_rejection.py`
+
+### LEGACY-REMOVE-002 — Relations
+
+Supprimer dans `relations.py` :
+- Dataclass `ValidatedManyToManyRelation`
+- `_validate_many_to_many()` (validateur M2M legacy)
+- `_generate_many_to_many_sql()` (générateur SQL M2M legacy)
+- Validation `format_version` racine relations (lignes 570–578)
+
+Simplifier `make_relation.py` (n'accepter que `schema_version: "1.0"`).
+
+Simplifier `relations_loader.py` (supprimer branche `ValidatedManyToManyRelation`).
+
+Convertir : `test_relations_many_to_many.py`, `test_relations_ordered.py`,
+`test_entity_relations.py`, `test_relations_many_to_one_canonical_sql.py`.
+
+### LEGACY-REMOVE-003 — Tests
+
+Convertir les 44 fichiers du groupe B (CRUD, Média, Public, Diagnostic).
+Supprimer les 4 fichiers du groupe A.
+Créer le test meta de clôture.
+
+### LEGACY-REMOVE-004 — Docs
+
+Réécrire ADR-012 (suppression confirmée).
+Réécrire `docs/entities/migration-legacy-vers-canonique.md`.
+Nettoyer `docs/entities/limites-contrats-json.md`.
+Purger les exemples legacy dans les tutoriels.
+
+### LEGACY-CLOSE-001 — Clôture
+
+Grep de vérification zéro `format_version` dans `forge_cli/` (hors tests de rejet).
+Meta test de clôture (vérifie l'absence de format_version dans le core).
+Mise à jour `CHANGELOG.md`.
+
+---
+
+## 10. Conclusion
+
+Le plan de suppression accélérée est viable. Aucun projet réel n'est à préserver.
+Les conditions sont réunies :
+
+- Starters 100 % canoniques
+- CRUD M2M canonique corrigé
+- Fixtures de référence canoniques en place
+- Pipeline de validation canonique consolidé
+
+La suppression se déroule en 5 tickets courts et séquentiels. Le risque principal
+est le volume de conversion des tests (57 fichiers), mitigé par des helpers partagés
+et un plan ticket par ticket.
+
+**Aucune suppression n'a été effectuée dans ce ticket. Ce document est le plan.**
