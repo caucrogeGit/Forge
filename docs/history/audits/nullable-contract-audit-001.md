@@ -296,3 +296,30 @@ Règle officielle : absent → NULL ; `required: true` → NOT NULL ; `nullable`
 
 Voir **ADR-013 — Politique nullable / required dans les contrats JSON Forge** :
 `docs/adr/013-nullable-required-contract-policy.md`
+
+---
+
+## 16. Clôture du bloc nullable / required
+
+**Statut : terminé.**
+
+Le bloc nullable / required est clôturé après livraison de :
+
+- `NULLABLE-CONTRACT-001` — audit des incohérences ;
+- `NULLABLE-CONTRACT-002` — décision ADR-013 ;
+- `NULLABLE-CONTRACT-003` — alignement runtime (`canonical_model_normalizer.py`) ;
+- `NULLABLE-DOC-FIX-001` — documentation utilisateur alignée.
+
+**Règle officielle** : nullable par défaut, `required` prioritaire.
+
+`fields[]` d'entité et `pivot.fields[]` suivent désormais la même règle (ADR-013).
+
+| Élément | Statut |
+|---|---|
+| Audit | Livré — NULLABLE-CONTRACT-001 |
+| Décision | Livrée — ADR-013 (NULLABLE-CONTRACT-002) |
+| Runtime | Aligné — NULLABLE-CONTRACT-003 |
+| Documentation utilisateur | Alignée — NULLABLE-DOC-FIX-001 |
+| Schémas JSON | Non modifiés (conformes à la règle) |
+| Starters | Non modifiés (explicitement annotés) |
+| PyPI | Aucune publication |
