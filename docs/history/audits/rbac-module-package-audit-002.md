@@ -217,6 +217,19 @@ sans perturber l'API existante.
 
 ---
 
+## Mise en œuvre partielle — RBAC-MODULE-003
+
+RBAC-MODULE-003 ajoute le chargement validé de `mvc/security/rbac.json` depuis
+le module `forge-mvc-rbac`.
+
+- Nouveau module : `forge_mvc_rbac/contract.py`
+- Nouveaux exports publics : `load_rbac_contract`, `RbacContractResult`, `RbacContractError`
+- 30 tests ajoutés dans `tests/test_rbac_contract_loader.py`
+- Le chargeur est lecture seule : aucun fichier créé ni modifié
+- La limite "mvc/security/rbac.json non chargé" ci-dessus est levée
+
+---
+
 ## 10. Tickets futurs proposés
 
 | Ticket | Objectif |

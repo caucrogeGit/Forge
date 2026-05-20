@@ -93,6 +93,33 @@ Le fichier est **optionnel** : s'il est absent, la commande se termine avec succ
 S'il existe, il doit respecter `rbac.schema.json`. En cas d'erreur, la commande
 affiche les problèmes et retourne le code 1.
 
+## Chargement depuis le module RBAC opt-in
+
+Le package `forge-mvc-rbac` peut charger et valider `mvc/security/rbac.json`
+depuis Python :
+
+```python
+from forge_mvc_rbac import load_rbac_contract
+
+result = load_rbac_contract(".")  # ou Path("/chemin/vers/projet")
+
+if result.exists and result.valid:
+    print(f"Rôles : {result.roles_count}")
+    print(f"Entités : {result.entities_count}")
+elif result.exists and not result.valid:
+    for err in result.errors:
+        print(f"{err.path} : {err.message}")
+else:
+    print("Pas de contrat RBAC — RBAC est opt-in.")
+```
+
+Ce chargement est **lecture seule** — il ne crée ni ne modifie aucun fichier.
+Il ne branche pas automatiquement les routes.
+Il ne modifie pas `make:crud`.
+Il prépare les futurs services RBAC applicatifs (RBAC-MODULE-004).
+
+---
+
 ## Limites
 
 Ce contrat est non branché au runtime Forge (décision RBAC-CONTRACT-004).
