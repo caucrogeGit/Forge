@@ -11,13 +11,13 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.5
+## État actuel — Forge 1.0.0-beta.6
 
-**Tag courant : `v1.0.0-beta.5` (2026-05-17)**
+**Tag courant : `v1.0.0-beta.6` (2026-05-21)**
 
-Précédent : v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.5 — Release de consolidation Phase 12 : résilience audit auth, en-têtes sécurité, publication groupée opt-ins rbac/workflow/stats (BETA-5-RELEASE-001).**
+**Statut : v1.0.0-beta.6 — FIELD-TEST-APP-001 (T0 tests terrain), JSON Schema, RBAC, Pivot advanced, corrections frictions F-001/F-002/F-003 (RELEASE-BETA-NEXT-001).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)

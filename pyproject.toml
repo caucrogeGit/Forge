@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc"
-version = "1.0.0b5"
+version = "1.0.0b6"
 description = "Framework web applicatif Python minimaliste, pédagogique et extensible."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -46,7 +46,7 @@ Repository = "https://github.com/caucrogeGit/Forge"
 Documentation = "https://caucrogegit.github.io/Forge/"
 Issues = "https://github.com/caucrogeGit/Forge/issues"
 
-# Extras préparés pour publication coordonnée beta.5
+# Extras préparés pour publication coordonnée beta.5 → à aligner beta.6 dans PYPI-OPTINS-001
 # (OPTIN-PYPI-PUBLISH-PREPARE-001, OPTIN-PYPI-PUBLISH-001, VERSION-SYNC-OPTIN-EXTRAS-001).
 # forge-mvc-media et forge-mvc-mfa sont exclus :
 #   media = source-only après Phase 11

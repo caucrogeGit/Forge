@@ -198,6 +198,8 @@ nav:
           - Audits archivés: history/audits/README.md
       - Tests terrain:
           - Field Test App 001: history/field-tests/field-test-app-001.md
+      - Releases:
+          - 1.0.0-beta.6: history/releases/release-1.0.0-beta.6.md
       - Licence: licence.md
 
 markdown_extensions:

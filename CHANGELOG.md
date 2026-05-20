@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.0.0-beta.6] — 2026-05-21
+
+Release post-corrections terrain — RBAC contractuel, Pivot advanced, DX, test terrain et corrections.
+
+- JSON Schema contractuel pour entités, relations, RBAC, pivot (ENTITY-CONTRACT-*) ;
+- RBAC déclaratif opt-in : rbac:validate, rbac:audit, make:crud intégration (RBAC-*) ;
+- Pivot advanced : PivotAdvancedService, contraintes, erreurs UX (PIVOT-ADVANCED-*) ;
+- make:pivot-crud : générateur opt-in de sous-CRUD pivot (PIVOT-CRUD-*) ;
+- test terrain FIELD-TEST-APP-001 : flux complet validé ;
+- correction F-001 : clé canonique `"name"` documentée clairement (FIELD-FIX-001) ;
+- correction F-002 : structure `mvc/entities/<nom>/<nom>.json` documentée (FIELD-FIX-001) ;
+- correction F-003 : garde make:crud limité au côté source de la relation (FIELD-FIX-M2M-GUARD-001) ;
+- audit post-corrections terrain validé (RELEASE-AUDIT-002).
+
+Non publié dans cette release :
+
+- `forge-mvc-media`, encore source-only ;
+- `forge-mvc-mfa`, encore Pre-Alpha (SEC-MFA-SECRET-ENCRYPTION-001) ;
+- packages opt-ins `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` : publication prévue dans PYPI-OPTINS-001.
+
+
 ## [1.0.0-beta.5] — 2026-05-17
 
 Release de consolidation de la Phase 12 — Sécurité, résilience et préparation PyPI opt-ins.

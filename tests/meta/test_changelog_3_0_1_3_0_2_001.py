@@ -134,8 +134,8 @@ class TestSectionOrder:
         sections = re.findall(r"^## \[", text, re.MULTILINE)
         assert sections, "Aucune section ## trouvée"
         first_section_pos = text.index("## [")
-        # Accepter 1.0.0-beta.5 (ou supérieur) comme première section
-        for candidate in ["## [1.0.0-beta.5]", "## [1.0.0-beta.4]"]:
+        # Accepter 1.0.0-beta.6 (ou supérieur) comme première section
+        for candidate in ["## [1.0.0-beta.6]", "## [1.0.0-beta.5]", "## [1.0.0-beta.4]"]:
             if candidate in text:
                 pos_candidate = text.index(candidate)
                 if first_section_pos == pos_candidate:
