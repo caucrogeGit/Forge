@@ -5,7 +5,8 @@ TestForge101/
 __pycache__/
 *.pyc
 .pytest_cache/
-.vscode/
+.vscode/*
+!.vscode/settings.json
 env/dev
 env/prod
 mvc/models/sql/dev/

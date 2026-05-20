@@ -125,6 +125,12 @@ sélectionner `relations.json` via le motif générique :
         "/mvc/entities/*/*.json"
       ],
       "url": "./schemas/entity.schema.json"
+    },
+    {
+      "fileMatch": [
+        "/mvc/security/rbac.json"
+      ],
+      "url": "./schemas/rbac.schema.json"
     }
   ]
 }
@@ -138,9 +144,8 @@ mvc/entities/media/media.json       ✓
 mvc/entities/relations.json         ✗  (non ciblé — couvert par l'entrée précédente)
 ```
 
-> Ce ticket documente la configuration, mais ne crée pas de fichier
-> `.vscode/settings.json` dans le dépôt. La création d'une configuration
-> VS Code prête à l'emploi pourra être décidée dans un ticket DX séparé.
+Cette configuration est disponible dans `.vscode/settings.json` à la racine du dépôt.
+Elle est automatiquement prise en compte dès l'ouverture du projet dans VS Code.
 
 ---
 
@@ -172,10 +177,12 @@ valide en plus les **règles sémantiques** que le JSON Schema ne peut pas expri
 - collision entre `pivot.fields[]` et les noms réservés `from_key` / `to_key` ;
 - cohérence complète avec les générateurs Forge (`build:model`, `make:crud`).
 
-La commande officielle de diagnostic reste :
+Les commandes officielles de validation restent :
 
 ```bash
-python forge.py entity:validate
+python forge.py schema:doctor       # vérifie l'intégrité du registre de schémas
+python forge.py entity:validate     # validation sémantique des entités et relations
+python forge.py rbac:validate       # validation du contrat RBAC (optionnel)
 ```
 
 ---
@@ -188,6 +195,7 @@ python forge.py entity:validate
 | `schemas/field.schema.json` | structure d'un champ métier |
 | `schemas/relations.schema.json` | structure de `relations.json` |
 | `schemas/pivot.schema.json` | structure d'une table pivot |
+| `schemas/rbac.schema.json` | structure de `mvc/security/rbac.json` |
 | `schemas/common.schema.json` | définitions partagées (réutilisées par les autres schémas) |
 
 Les schémas sont autonomes : Forge n'a pas besoin d'Internet pour valider un

@@ -377,13 +377,14 @@ def test_vscode_json_schemas_example_is_valid_json(vscode_page_content):
         assert "json.schemas" in obj, "Clé 'json.schemas' absente du bloc VS Code"
 
 
-def test_no_vscode_settings_json_in_repo():
-    """Le ticket documente la config VS Code mais ne crée pas .vscode/settings.json."""
+def test_vscode_settings_json_in_repo():
+    """VSCODE-DX-001 crée .vscode/settings.json avec les json.schemas Forge."""
     vscode_settings = PROJECT_ROOT / ".vscode" / "settings.json"
-    assert not vscode_settings.exists(), (
-        ".vscode/settings.json ne doit pas être créé dans le dépôt Forge "
-        "(voir vscode-json-schema.md — configuration documentée, non committée)"
+    assert vscode_settings.exists(), (
+        ".vscode/settings.json doit exister dans le dépôt Forge "
+        "(créé par VSCODE-DX-001 — voir vscode-json-schema.md)"
     )
+    assert "json.schemas" in vscode_settings.read_text(encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------

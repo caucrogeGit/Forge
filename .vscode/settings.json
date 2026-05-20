@@ -1,0 +1,22 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "/mvc/entities/relations.json"
+      ],
+      "url": "./schemas/relations.schema.json"
+    },
+    {
+      "fileMatch": [
+        "/mvc/entities/*/*.json"
+      ],
+      "url": "./schemas/entity.schema.json"
+    },
+    {
+      "fileMatch": [
+        "/mvc/security/rbac.json"
+      ],
+      "url": "./schemas/rbac.schema.json"
+    }
+  ]
+}
