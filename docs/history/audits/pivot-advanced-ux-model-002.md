@@ -303,3 +303,8 @@ Sont hors périmètre :
 existe désormais dans `core/pivot_advanced.py`. L'UX décrite dans ce document
 n'est pas encore générée — les vues, routes et contrôleurs pivot advanced
 seront produits par la commande/générateur décidée ici (PIVOT-ADVANCED-004).
+
+**Note PIVOT-ADVANCED-004** : la commande `forge make:pivot-crud` est ajoutée.
+Elle génère un contrôleur dédié et deux templates (`index.html`, `form.html`)
+pour un pivot avec `pivot.fields[]`. Les routes ne sont pas branchées
+automatiquement — elles sont documentées dans la sortie de la commande.

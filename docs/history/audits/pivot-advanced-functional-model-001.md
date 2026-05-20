@@ -313,6 +313,15 @@ PIVOT-ADVANCED-002 (UX et modèle d'usage) puis implémenté dans PIVOT-ADVANCED
 
 ## Mise en œuvre partielle — PIVOT-ADVANCED-003
 
+## Mise en œuvre partielle — PIVOT-ADVANCED-004
+
+PIVOT-ADVANCED-004 ajoute la commande dédiée `make:pivot-crud`.
+La commande analyse une relation `many_to_many` avec `pivot.fields[]` et génère
+un contrôleur et des templates dédiés sans modifier `make:crud`.
+Les routes sont documentées mais non branchées automatiquement.
+
+---
+
 PIVOT-ADVANCED-003 crée le service technique `PivotAdvancedService`
 dans `core/pivot_advanced.py`.
 

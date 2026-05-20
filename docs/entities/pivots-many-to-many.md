@@ -210,6 +210,29 @@ Le SQL est une **projection générée** depuis `relations.json`. Ne pas le modi
 
 ---
 
+## Générer un sous-CRUD Pivot advanced
+
+Quand un pivot porte des attributs métier (`position`, `note`, `role`…), un sous-CRUD
+relationnel dédié peut être généré avec :
+
+```bash
+python forge.py make:pivot-crud Article tags
+python forge.py make:pivot-crud Article tags --dry-run
+```
+
+La commande :
+
+- charge `mvc/entities/relations.json` ;
+- vérifie que la relation `Article.tags` est `many_to_many` avec `pivot.fields[]` non vide ;
+- génère `mvc/controllers/pivot/article_tags_pivot_controller.py` ;
+- génère `mvc/templates/pivot/article_tags/index.html` et `form.html` ;
+- n'écrase pas les fichiers existants ;
+- affiche les routes à ajouter manuellement dans `mvc/routes.py`.
+
+Elle ne modifie pas `make:crud` et ne branche pas automatiquement les routes.
+
+---
+
 ## Limites actuelles
 
 - Les attributs pivot sont validés par `forge entity:validate` et générés en SQL.

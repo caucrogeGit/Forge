@@ -495,6 +495,15 @@ def main() -> None:
     if command == "make:relation":
         make_relation_main(args[1:])
         return
+    if command == "make:pivot-crud":
+        if len(args) < 3:
+            cli_fail(
+                "arguments manquants pour «forge make:pivot-crud».",
+                hint="indique l'entité source et le nom de la relation. Exemple : forge make:pivot-crud Article tags",
+            )
+        from forge_cli.entities.make_pivot_crud import cmd_make_pivot_crud_main
+        cmd_make_pivot_crud_main(args[1:])
+        return
 
     if command == "entity:validate":
         entity_validate_main(args[1:])
