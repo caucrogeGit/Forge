@@ -194,6 +194,7 @@ nav:
           - Pivot advanced — modèle UX: history/audits/pivot-advanced-ux-model-002.md
           - Audit final post-RBAC/Pivot: history/audits/release-audit-final-post-rbac-pivot-001.md
           - Audit make:crud garde M2M: history/audits/field-audit-m2m-guard-001.md
+          - Audit post-corrections terrain: history/audits/release-audit-post-field-fixes-002.md
           - Audits archivés: history/audits/README.md
       - Tests terrain:
           - Field Test App 001: history/field-tests/field-test-app-001.md
