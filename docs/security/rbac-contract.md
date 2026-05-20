@@ -95,13 +95,13 @@ affiche les problèmes et retourne le code 1.
 
 ## Limites
 
-Ce contrat n'est pas encore branché au runtime Forge.
+Ce contrat est non branché au runtime Forge (décision RBAC-CONTRACT-004).
 
-- `make:crud` ne lit pas encore `mvc/security/rbac.json`.
+- `make:crud` ne lit pas `mvc/security/rbac.json` — il ne génère pas de guards RBAC depuis ce contrat.
 - `build:model` ignore ce fichier.
-- Aucun CLI ne génère ni ne valide ce fichier automatiquement.
-
-La prochaine étape est RBAC-CONTRACT-003 : brancher `make:crud` au contrat RBAC séparé.
+- Aucun guard RBAC n'est généré par Forge Core depuis `mvc/security/rbac.json`.
+- Le runtime RBAC reste hors périmètre de Forge Core.
+- L'intégration d'un module RBAC opt-in est reportée.
 
 ## Relation avec entity.schema.json
 
@@ -118,3 +118,25 @@ La prochaine étape est RBAC-CONTRACT-003 : brancher `make:crud` au contrat RBAC
 ```
 
 La configuration RBAC vit exclusivement dans `mvc/security/rbac.json`.
+
+## Clôture du bloc contrat RBAC séparé
+
+**Statut : terminé.**
+
+Le bloc contrat RBAC séparé est clôturé après livraison de :
+
+- RBAC-CONTRACT-001 — décision : RBAC hors `entity.schema.json` ;
+- RBAC-CONTRACT-002 — création du schéma RBAC séparé (`rbac.schema.json`) ;
+- RBAC-CONTRACT-003 — validation via `forge rbac:validate` ;
+- RBAC-CONTRACT-004 — décision de non-branchement de `make:crud` au contrat séparé.
+
+État final :
+
+- le contrat RBAC vit hors du schéma d'entité ;
+- le fichier cible est `mvc/security/rbac.json` ;
+- le schéma est `rbac.schema.json` ;
+- le contrat est validable avec `forge rbac:validate` ;
+- `make:crud` ne consomme pas ce contrat ;
+- aucun guard RBAC n'est généré par Forge Core depuis `mvc/security/rbac.json` ;
+- le runtime RBAC reste hors périmètre de Forge Core ;
+- le futur module RBAC opt-in est reporté.
