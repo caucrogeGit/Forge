@@ -189,6 +189,7 @@ nav:
       - Audits:
           - Tracker des constats: history/audits/findings-tracker.md
           - Baseline 2026-05-15: history/audits/audit-baseline-2026-05-15.md
+          - Pivot advanced — modèle fonctionnel: history/audits/pivot-advanced-functional-model-001.md
           - Audits archivés: history/audits/README.md
       - Licence: licence.md
 
