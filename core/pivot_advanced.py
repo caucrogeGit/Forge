@@ -5,6 +5,7 @@ modifier make:crud. Utilise le même pattern d'injection que MariaDbSessionStore
 fetch_one, fetch_all et execute sont injectables pour les tests.
 
 Décision : PIVOT-ADVANCED-001 / PIVOT-ADVANCED-003.
+Contraintes : PIVOT-ADVANCED-006.
 UX future : PIVOT-ADVANCED-004 (commande/générateur dédié).
 """
 
@@ -37,6 +38,24 @@ class PivotRow:
     pivot_data: dict = dc_field(default_factory=dict)
 
 
+# ── Contraintes ───────────────────────────────────────────────────────────────
+
+@dataclass
+class PivotFieldConstraint:
+    """Contrainte déclarative sur un champ pivot.
+
+    required=True  → le champ doit être présent dans pivot_data lors d'un attach.
+    nullable=False → la valeur None est refusée lors d'un attach ou update.
+    """
+    name: str
+    required: bool = False
+    nullable: bool = True
+
+
+class PivotConstraintError(ValueError):
+    """Levée quand une contrainte pivot est violée (required, nullable, unique_pair)."""
+
+
 # ── Accesseurs DB par défaut (lazy — pas de connexion à l'import) ─────────────
 
 def _default_fetch_one(sql: str, params: tuple) -> dict | None:
@@ -65,13 +84,19 @@ class PivotAdvancedService:
     """Service générique pour lire et modifier des associations pivot avec attributs.
 
     Paramètres :
-        table           — nom de la table pivot (ex: "article_tag")
-        source_key      — colonne de clé source (ex: "article_id")
-        target_key      — colonne de clé cible (ex: "tag_id")
-        pivot_fields    — liste des noms de colonnes métier autorisés (ex: ["position", "note"])
+        table             — nom de la table pivot (ex: "article_tag")
+        source_key        — colonne de clé source (ex: "article_id")
+        target_key        — colonne de clé cible (ex: "tag_id")
+        pivot_fields      — liste des noms de colonnes métier autorisés (ex: ["position", "note"])
+        pivot_constraints — liste de PivotFieldConstraint pour les contraintes avancées
+        unique_pair       — si True, vérifie l'unicité avant INSERT (default False)
+        id_field          — nom de la colonne id technique (ex: "id"), active get_by_id etc.
 
     Les callables fetch_one, fetch_all, execute et insert_fn sont injectables pour les tests.
     En production ils délèguent aux helpers core.database.db.
+
+    API pivot_fields (ancienne) et pivot_constraints (nouvelle) sont mutuellement exclusives.
+    Si pivot_constraints est fourni, il prend la priorité et définit la liste des champs autorisés.
     """
 
     def __init__(
@@ -81,6 +106,9 @@ class PivotAdvancedService:
         target_key: str,
         pivot_fields: list[str] | None = None,
         *,
+        pivot_constraints: list[PivotFieldConstraint] | None = None,
+        unique_pair: bool = False,
+        id_field: str | None = None,
         fetch_one: Callable | None = None,
         fetch_all: Callable | None = None,
         execute: Callable | None = None,
@@ -89,10 +117,20 @@ class PivotAdvancedService:
         self._table = _safe_identifier(table, "table")
         self._source_key = _safe_identifier(source_key, "source_key")
         self._target_key = _safe_identifier(target_key, "target_key")
-        self._pivot_fields: tuple[str, ...] = tuple(
-            _safe_identifier(f, f"pivot_fields[{i}]")
-            for i, f in enumerate(pivot_fields or [])
-        )
+        self._unique_pair = unique_pair
+        self._id_field = _safe_identifier(id_field, "id_field") if id_field else None
+
+        if pivot_constraints is not None:
+            for c in pivot_constraints:
+                _safe_identifier(c.name, f"pivot_constraints[{c.name}].name")
+            self._pivot_fields: tuple[str, ...] = tuple(c.name for c in pivot_constraints)
+            self._constraints: dict[str, PivotFieldConstraint] = {c.name: c for c in pivot_constraints}
+        else:
+            self._pivot_fields = tuple(
+                _safe_identifier(f, f"pivot_fields[{i}]")
+                for i, f in enumerate(pivot_fields or [])
+            )
+            self._constraints = {}
 
         self._fetch_one = fetch_one or _default_fetch_one
         self._fetch_all = fetch_all or _default_fetch_all
@@ -109,6 +147,26 @@ class PivotAdvancedService:
                 f"Champs pivot inconnus : {sorted(unknown)}. "
                 f"Champs autorisés : {sorted(self._pivot_fields)}."
             )
+
+    def _enforce_attach_constraints(self, pivot_data: dict) -> None:
+        """Vérifie required et nullable lors d'un attach."""
+        for field_name, constraint in self._constraints.items():
+            if constraint.required and field_name not in pivot_data:
+                raise PivotConstraintError(
+                    f"Champ pivot requis absent : {field_name!r}."
+                )
+            if not constraint.nullable and field_name in pivot_data and pivot_data[field_name] is None:
+                raise PivotConstraintError(
+                    f"Champ pivot non nullable reçoit None : {field_name!r}."
+                )
+
+    def _enforce_update_constraints(self, pivot_data: dict) -> None:
+        """Vérifie nullable lors d'un update (required non vérifié — mise à jour partielle)."""
+        for field_name, constraint in self._constraints.items():
+            if not constraint.nullable and field_name in pivot_data and pivot_data[field_name] is None:
+                raise PivotConstraintError(
+                    f"Champ pivot non nullable reçoit None : {field_name!r}."
+                )
 
     def _row_to_pivot_row(self, row: dict) -> PivotRow:
         pivot_data = {k: v for k, v in row.items()
@@ -136,29 +194,52 @@ class PivotAdvancedService:
         row = self._fetch_one(sql, (source_id, target_id))
         return self._row_to_pivot_row(row) if row else None
 
-    def attach(self, source_id: int | str, target_id: int | str, pivot_data: dict | None = None) -> int:
+    def attach(
+        self,
+        source_id: int | str,
+        target_id: int | str,
+        pivot_data: dict | None = None,
+    ) -> int:
         """Crée une association. Retourne le lastrowid.
 
-        Seuls les champs déclarés dans pivot_fields sont acceptés dans pivot_data.
+        Seuls les champs déclarés dans pivot_fields / pivot_constraints sont acceptés.
+        Si unique_pair=True, lève PivotConstraintError si l'association existe déjà.
         """
         pivot_data = pivot_data or {}
         self._check_pivot_data(pivot_data)
+        self._enforce_attach_constraints(pivot_data)
 
-        columns = [self._source_key, self._target_key] + [f for f in self._pivot_fields if f in pivot_data]
+        if self._unique_pair and self.get(source_id, target_id) is not None:
+            raise PivotConstraintError(
+                f"Association ({source_id}, {target_id}) déjà existante dans {self._table}."
+            )
+
+        columns = [self._source_key, self._target_key] + [
+            f for f in self._pivot_fields if f in pivot_data
+        ]
         placeholders = ", ".join("?" for _ in columns)
         col_list = ", ".join(columns)
-        values = (source_id, target_id) + tuple(pivot_data[f] for f in self._pivot_fields if f in pivot_data)
+        values = (source_id, target_id) + tuple(
+            pivot_data[f] for f in self._pivot_fields if f in pivot_data
+        )
 
         sql = f"INSERT INTO {self._table} ({col_list}) VALUES ({placeholders})"
         return self._insert_fn(sql, values)
 
-    def update(self, source_id: int | str, target_id: int | str, pivot_data: dict) -> int:
+    def update(
+        self,
+        source_id: int | str,
+        target_id: int | str,
+        pivot_data: dict,
+    ) -> int:
         """Modifie les attributs pivot d'une association existante. Retourne rowcount.
 
         Ne modifie pas source_key ni target_key.
-        Seuls les champs déclarés dans pivot_fields sont acceptés.
+        Seuls les champs déclarés dans pivot_fields / pivot_constraints sont acceptés.
+        required n'est pas vérifié (mise à jour partielle autorisée).
         """
         self._check_pivot_data(pivot_data)
+        self._enforce_update_constraints(pivot_data)
         if not pivot_data:
             return 0
 
@@ -177,3 +258,33 @@ class PivotAdvancedService:
             f"WHERE {self._source_key} = ? AND {self._target_key} = ?"
         )
         return self._execute(sql, (source_id, target_id))
+
+    # ── Méthodes par id technique (requiert id_field) ─────────────────────────
+
+    def get_by_id(self, pivot_id: int | str) -> PivotRow | None:
+        """Retourne la ligne pivot par son id technique. Requiert id_field."""
+        if not self._id_field:
+            raise ValueError("get_by_id requiert id_field sur PivotAdvancedService.")
+        sql = f"SELECT * FROM {self._table} WHERE {self._id_field} = ?"
+        row = self._fetch_one(sql, (pivot_id,))
+        return self._row_to_pivot_row(row) if row else None
+
+    def update_by_id(self, pivot_id: int | str, pivot_data: dict) -> int:
+        """Modifie les attributs d'une ligne pivot par son id technique. Requiert id_field."""
+        if not self._id_field:
+            raise ValueError("update_by_id requiert id_field sur PivotAdvancedService.")
+        self._check_pivot_data(pivot_data)
+        self._enforce_update_constraints(pivot_data)
+        if not pivot_data:
+            return 0
+        set_clause = ", ".join(f"{f} = ?" for f in pivot_data)
+        values = tuple(pivot_data[f] for f in pivot_data) + (pivot_id,)
+        sql = f"UPDATE {self._table} SET {set_clause} WHERE {self._id_field} = ?"
+        return self._execute(sql, values)
+
+    def delete_by_id(self, pivot_id: int | str) -> int:
+        """Supprime une ligne pivot par son id technique. Requiert id_field."""
+        if not self._id_field:
+            raise ValueError("delete_by_id requiert id_field sur PivotAdvancedService.")
+        sql = f"DELETE FROM {self._table} WHERE {self._id_field} = ?"
+        return self._execute(sql, (pivot_id,))

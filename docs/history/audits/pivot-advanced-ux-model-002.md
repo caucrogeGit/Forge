@@ -313,3 +313,9 @@ sur SQLite in-memory.
 Elle génère un contrôleur dédié et deux templates (`index.html`, `form.html`)
 pour un pivot avec `pivot.fields[]`. Les routes ne sont pas branchées
 automatiquement — elles sont documentées dans la sortie de la commande.
+
+**Note PIVOT-ADVANCED-006** : les contraintes pivot sont applicables via
+`PivotFieldConstraint` et `pivot_constraints=[...]` dans `PivotAdvancedService`.
+`unique_pair=True` vérifie l'unicité avant INSERT. `id_field="id"` active les
+méthodes `get_by_id`, `update_by_id`, `delete_by_id`. L'API `pivot_fields=[...]`
+reste inchangée.

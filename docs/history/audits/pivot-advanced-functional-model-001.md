@@ -340,3 +340,18 @@ Le service fournit les opérations de base sur une table pivot avec attributs :
 Aucune commande, aucun écran et aucune intégration `make:crud` ne sont ajoutés
 dans ce ticket. Le service est utilisable en production et testé sans connexion
 MariaDB réelle via des callables injectables.
+
+---
+
+## Mise en œuvre partielle — PIVOT-ADVANCED-006
+
+PIVOT-ADVANCED-006 ajoute les contraintes déclaratives au service :
+
+- `PivotFieldConstraint(name, required, nullable)` — déclaration des contraintes par champ
+- `PivotConstraintError` — exception contrôlée (sous-classe de `ValueError`)
+- `pivot_constraints=[...]` — nouveau paramètre optionnel du constructeur
+- `unique_pair=True` — vérification applicative avant INSERT (lève `PivotConstraintError`)
+- `id_field="id"` — active `get_by_id`, `update_by_id`, `delete_by_id`
+
+L'API `pivot_fields=[...]` reste inchangée (backward compatible).
+34 nouveaux tests dans `tests/test_pivot_advanced_constraints.py`.
