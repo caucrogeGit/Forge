@@ -313,6 +313,15 @@ PIVOT-ADVANCED-002 (UX et modèle d'usage) puis implémenté dans PIVOT-ADVANCED
 
 ## Mise en œuvre partielle — PIVOT-ADVANCED-003
 
+## Mise en œuvre partielle — PIVOT-ADVANCED-005
+
+PIVOT-ADVANCED-005 ajoute des tests E2E du flux Pivot advanced :
+contrat `relations.json` canonique, génération `make:pivot-crud`, fichiers générés,
+et cycle complet `PivotAdvancedService` sur SQLite in-memory
+(`attach → get → list_for_source → update → detach`).
+
+---
+
 ## Mise en œuvre partielle — PIVOT-ADVANCED-004
 
 PIVOT-ADVANCED-004 ajoute la commande dédiée `make:pivot-crud`.
