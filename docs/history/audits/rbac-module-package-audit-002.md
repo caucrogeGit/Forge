@@ -217,6 +217,26 @@ sans perturber l'API existante.
 
 ---
 
+## Mise en œuvre partielle — RBAC-MODULE-006
+
+RBAC-MODULE-006 ajoute la commande `forge rbac:audit` pour auditer la cohérence
+fonctionnelle du contrat `mvc/security/rbac.json`.
+
+- Nouveau module : `forge_cli/rbac_audit.py`
+- Dispatch ajouté dans `forge.py` : `rbac:audit`
+- Aide mise à jour dans `forge_cli/help.py`
+- 21 tests ajoutés dans `tests/test_rbac_audit_command.py`
+- Documentation mise à jour dans `docs/security/rbac-contract.md`
+- Codes d'avertissement : `missing_roles`, `missing_entities`, `empty_role`,
+  `entity_without_permissions`, `missing_crud_action`, `role_permission_not_declared`,
+  `entity_permission_unused`
+- Contrat absent → exit 0 (RBAC optionnel)
+- Contrat invalide → exit 1
+- Contrat valide (avec ou sans avertissements) → exit 0
+- `make:crud` core inchangé — audit uniquement opt-in
+
+---
+
 ## Mise en œuvre partielle — RBAC-MODULE-005
 
 RBAC-MODULE-005 ajoute un helper opt-in permettant d'utiliser les permissions
@@ -263,6 +283,6 @@ le module `forge-mvc-rbac`.
 | RBAC-MODULE-003 | Charger et valider `mvc/security/rbac.json` depuis le module `forge-mvc-rbac` |
 | RBAC-MODULE-004 | Connecter le contrat chargé au service de permissions |
 | RBAC-MODULE-005 | Brancher les permissions sur routes / contrôleurs en opt-in |
-| RBAC-MODULE-006 | Ajouter la commande `forge rbac:audit` |
+| RBAC-MODULE-006 | ~~Ajouter la commande `forge rbac:audit`~~ — livré |
 | RBAC-MODULE-007 | Documenter l'usage RBAC applicatif complet |
 | RBAC-MODULE-CLOSE-001 | Clôturer le bloc RBAC applicatif |

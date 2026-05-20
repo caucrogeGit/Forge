@@ -93,6 +93,37 @@ Le fichier est **optionnel** : s'il est absent, la commande se termine avec succ
 S'il existe, il doit respecter `rbac.schema.json`. En cas d'erreur, la commande
 affiche les problèmes et retourne le code 1.
 
+## Audit de cohérence
+
+Forge peut auditer la cohérence fonctionnelle de `mvc/security/rbac.json` :
+
+```bash
+python forge.py rbac:audit
+python forge.py rbac:audit --json
+```
+
+L'audit vérifie :
+
+- `missing_roles` — aucun rôle déclaré
+- `missing_entities` — aucune entité déclarée
+- `empty_role` — rôle sans permissions
+- `entity_without_permissions` — entité sans permissions déclarées
+- `missing_crud_action` — entité sans les cinq actions CRUD (list, show, create, update, delete)
+- `role_permission_not_declared` — permission d'un rôle absente de toute entité
+- `entity_permission_unused` — permission déclarée dans une entité mais assignée à aucun rôle
+
+Ces avertissements n'entraînent pas un code de retour 1 — ils sont informatifs.
+Seule une erreur de schéma (contrat invalide) provoque un échec (code 1).
+
+| Situation | Code retour |
+|---|---|
+| Fichier absent | 0 (RBAC optionnel) |
+| Fichier invalide | 1 |
+| Fichier valide (avec ou sans avertissements) | 0 |
+
+Avec `--json`, la sortie inclut `warnings_count` et `warnings` (liste de dicts avec
+`code`, `message`, et selon le cas `role`, `entity`, `action`, `permission`).
+
 ## Chargement depuis le module RBAC opt-in
 
 Le package `forge-mvc-rbac` peut charger et valider `mvc/security/rbac.json`

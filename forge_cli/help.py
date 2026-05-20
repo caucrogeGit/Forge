@@ -46,6 +46,7 @@ Schémas JSON
 
 Sécurité
   rbac:validate      Valide mvc/security/rbac.json avec le schéma RBAC Forge.
+  rbac:audit         Audit de cohérence fonctionnelle de mvc/security/rbac.json.
 
 Starters et modules
   starter:list        Liste les starter apps disponibles.

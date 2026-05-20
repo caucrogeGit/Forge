@@ -625,6 +625,11 @@ def main() -> None:
         rbac_validate_main(args[1:])
         return
 
+    if command == "rbac:audit":
+        from forge_cli.rbac_audit import rbac_audit_main
+        rbac_audit_main(args[1:])
+        return
+
     cli_fail(
         f"commande inconnue : «{command}».",
         hint="lancez «forge help» pour afficher les commandes disponibles.",
