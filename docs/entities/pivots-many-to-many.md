@@ -233,6 +233,20 @@ Elle ne modifie pas `make:crud` et ne branche pas automatiquement les routes.
 
 ---
 
+## Pivot advanced — attributs métier complets
+
+Quand un pivot porte des attributs métier significatifs (`position`, `note`,
+`role`…) et que `make:crud` est insuffisant ou bloqué, consultez la
+documentation dédiée :
+
+**[Pivot advanced — tables pivot avec attributs](pivot-advanced.md)**
+
+Elle couvre la déclaration du contrat, la génération du sous-CRUD avec
+`make:pivot-crud`, l'utilisation de `PivotAdvancedService` et la gestion
+des erreurs UX.
+
+---
+
 ## Limites actuelles
 
 - Les attributs pivot sont validés par `forge entity:validate` et générés en SQL.

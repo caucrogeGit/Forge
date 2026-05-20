@@ -377,3 +377,15 @@ Le contrôleur généré par `make:pivot-crud` intègre maintenant `try/except` 
 `pivot_error_to_form_error` dans `add` et `edit`. Le template `form.html` affiche
 `error.message` si une erreur est présente. `make:crud` reste neutre.
 27 nouveaux tests dans `tests/test_pivot_advanced_error_ux.py`.
+
+---
+
+## Mise en œuvre partielle — PIVOT-ADVANCED-008
+
+PIVOT-ADVANCED-008 ajoute la documentation complète d'usage du Pivot advanced :
+contrat `relations.json`, commande `make:pivot-crud`, `PivotAdvancedService`,
+contraintes, erreurs UX et limites.
+
+Page créée : `docs/entities/pivot-advanced.md`.
+Référencée dans `mkdocs.yml` et liée depuis `docs/entities/pivots-many-to-many.md`.
+Tests meta : `tests/meta/test_pivot_advanced_usage_docs_008.py`.

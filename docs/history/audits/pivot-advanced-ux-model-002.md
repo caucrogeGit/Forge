@@ -327,3 +327,7 @@ du service en erreur formulaire sans exposer de détail SQL. Le contrôleur gén
 intègre les blocs `try/except` avec passage de l'erreur au template. Le template
 `form.html` généré affiche `error.message` dans un bloc conditionnel. `make:crud`
 reste neutre.
+
+**Note PIVOT-ADVANCED-008** : la documentation complète d'usage est disponible dans
+`docs/entities/pivot-advanced.md`. Elle couvre le contrat `relations.json`, la commande
+`make:pivot-crud`, `PivotAdvancedService`, les contraintes, les erreurs UX et les limites.
