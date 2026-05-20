@@ -182,7 +182,7 @@ Exemple de routes à ajouter :
 """
 from __future__ import annotations
 
-from core.pivot_advanced import PivotAdvancedService
+from core.pivot_advanced import PivotAdvancedService, PivotConstraintError, pivot_error_to_form_error
 from core.http.request import Request
 from core.http.response import Response
 
@@ -215,6 +215,7 @@ class {rel.from_entity}{rel.relation_name.capitalize()}PivotController:
             "{src_snake}_id": {src_snake}_id,
             "row": None,
             "action": f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}/add",
+            "error": None,
         }})
 
     @staticmethod
@@ -226,8 +227,17 @@ class {rel.from_entity}{rel.relation_name.capitalize()}PivotController:
             for field in {fields_repr}
             if request.form(field) is not None
         }}
-        _SERVICE.attach({src_snake}_id, {tgt_snake}_id, pivot_data)
-        return Response.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}")
+        try:
+            _SERVICE.attach({src_snake}_id, {tgt_snake}_id, pivot_data)
+            return Response.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}")
+        except Exception as exc:
+            error = pivot_error_to_form_error(exc)
+            return Response.render(_TEMPLATE_FORM, {{
+                "{src_snake}_id": {src_snake}_id,
+                "row": None,
+                "action": f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}/add",
+                "error": error,
+            }})
 
     @staticmethod
     def edit_form(request: Request, {src_snake}_id: int, {tgt_snake}_id: int) -> Response:
@@ -239,6 +249,7 @@ class {rel.from_entity}{rel.relation_name.capitalize()}PivotController:
             "{src_snake}_id": {src_snake}_id,
             "row": row,
             "action": f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}/{{{tgt_snake}_id}}/edit",
+            "error": None,
         }})
 
     @staticmethod
@@ -249,8 +260,18 @@ class {rel.from_entity}{rel.relation_name.capitalize()}PivotController:
             for field in {fields_repr}
             if request.form(field) is not None
         }}
-        _SERVICE.update({src_snake}_id, {tgt_snake}_id, pivot_data)
-        return Response.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}")
+        try:
+            _SERVICE.update({src_snake}_id, {tgt_snake}_id, pivot_data)
+            return Response.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}")
+        except Exception as exc:
+            error = pivot_error_to_form_error(exc)
+            row = _SERVICE.get({src_snake}_id, {tgt_snake}_id)
+            return Response.render(_TEMPLATE_FORM, {{
+                "{src_snake}_id": {src_snake}_id,
+                "row": row,
+                "action": f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}/{{{tgt_snake}_id}}/edit",
+                "error": error,
+            }})
 
     @staticmethod
     def remove(request: Request, {src_snake}_id: int, {tgt_snake}_id: int) -> Response:
@@ -331,6 +352,12 @@ def _build_form_template(rel: ResolvedPivotRelation) -> str:
 <h1 class="text-2xl font-bold text-gray-800 mb-6">
     {{{{ "Modifier" if row else "Ajouter" }}}} — {rel.from_entity}.{rel.relation_name}
 </h1>
+
+{{% if error %}}
+<div class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded mb-4">
+    {{{{ error.message }}}}
+</div>
+{{% endif %}}
 
 <form method="post" action="{{{{ action }}}}">
     <input type="hidden" name="csrf_token" value="{{{{ csrf_token }}}}">

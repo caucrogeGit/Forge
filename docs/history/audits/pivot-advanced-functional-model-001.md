@@ -355,3 +355,25 @@ PIVOT-ADVANCED-006 ajoute les contraintes déclaratives au service :
 
 L'API `pivot_fields=[...]` reste inchangée (backward compatible).
 34 nouveaux tests dans `tests/test_pivot_advanced_constraints.py`.
+
+---
+
+## Mise en œuvre partielle — PIVOT-ADVANCED-007
+
+PIVOT-ADVANCED-007 ajoute une couche de traduction UX pour les erreurs de contraintes pivot.
+Les erreurs techniques de `PivotAdvancedService` peuvent être converties en messages affichables
+par le sous-CRUD pivot.
+
+Ajouts dans `core/pivot_advanced.py` :
+
+- `PivotFormError(code, message, field)` — erreur normalisée affichable dans un formulaire
+- `PivotConstraintError` enrichi avec `code` et `field` (backward compatible)
+- `pivot_error_to_form_error(exc)` — helper de conversion exception → `PivotFormError`
+
+Codes stables : `required_field_missing`, `nullable_field_rejected`, `duplicate_pair`,
+`missing_id_field`, `unknown_pivot_field`, `invalid_pivot_data`.
+
+Le contrôleur généré par `make:pivot-crud` intègre maintenant `try/except` avec
+`pivot_error_to_form_error` dans `add` et `edit`. Le template `form.html` affiche
+`error.message` si une erreur est présente. `make:crud` reste neutre.
+27 nouveaux tests dans `tests/test_pivot_advanced_error_ux.py`.

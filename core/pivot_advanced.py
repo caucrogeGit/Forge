@@ -6,6 +6,7 @@ fetch_one, fetch_all et execute sont injectables pour les tests.
 
 Décision : PIVOT-ADVANCED-001 / PIVOT-ADVANCED-003.
 Contraintes : PIVOT-ADVANCED-006.
+UX erreurs : PIVOT-ADVANCED-007.
 UX future : PIVOT-ADVANCED-004 (commande/générateur dédié).
 """
 
@@ -38,6 +39,40 @@ class PivotRow:
     pivot_data: dict = dc_field(default_factory=dict)
 
 
+# ── Erreur UX ─────────────────────────────────────────────────────────────────
+
+@dataclass
+class PivotFormError:
+    """Erreur pivot normalisée — affichable dans un formulaire de sous-CRUD pivot.
+
+    code    : identifiant stable du type d'erreur
+    message : message humain à afficher dans le formulaire
+    field   : champ concerné si applicable, None sinon
+    """
+    code: str
+    message: str
+    field: str | None = None
+
+
+class PivotConstraintError(ValueError):
+    """Levée quand une contrainte pivot est violée (required, nullable, unique_pair).
+
+    Porte un code stable et éventuellement le champ concerné pour
+    permettre un affichage structuré dans les formulaires pivot.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        code: str = "invalid_pivot_data",
+        field: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.field = field
+
+
 # ── Contraintes ───────────────────────────────────────────────────────────────
 
 @dataclass
@@ -52,8 +87,30 @@ class PivotFieldConstraint:
     nullable: bool = True
 
 
-class PivotConstraintError(ValueError):
-    """Levée quand une contrainte pivot est violée (required, nullable, unique_pair)."""
+# ── Helper UX ─────────────────────────────────────────────────────────────────
+
+def pivot_error_to_form_error(error: Exception) -> PivotFormError:
+    """Convertit une exception de PivotAdvancedService en PivotFormError affichable.
+
+    - PivotConstraintError → PivotFormError avec le code et le champ structurés.
+    - ValueError (hors PivotConstraintError) → code unknown_pivot_field.
+    - Autre exception → code invalid_pivot_data, message générique (pas de détail SQL).
+    """
+    if isinstance(error, PivotConstraintError):
+        return PivotFormError(
+            code=error.code,
+            message=str(error),
+            field=error.field,
+        )
+    if isinstance(error, ValueError):
+        return PivotFormError(
+            code="unknown_pivot_field",
+            message=str(error),
+        )
+    return PivotFormError(
+        code="invalid_pivot_data",
+        message="Une erreur est survenue lors de l'enregistrement.",
+    )
 
 
 # ── Accesseurs DB par défaut (lazy — pas de connexion à l'import) ─────────────
@@ -153,11 +210,15 @@ class PivotAdvancedService:
         for field_name, constraint in self._constraints.items():
             if constraint.required and field_name not in pivot_data:
                 raise PivotConstraintError(
-                    f"Champ pivot requis absent : {field_name!r}."
+                    f"Champ pivot requis absent : {field_name!r}.",
+                    code="required_field_missing",
+                    field=field_name,
                 )
             if not constraint.nullable and field_name in pivot_data and pivot_data[field_name] is None:
                 raise PivotConstraintError(
-                    f"Champ pivot non nullable reçoit None : {field_name!r}."
+                    f"Champ pivot non nullable reçoit None : {field_name!r}.",
+                    code="nullable_field_rejected",
+                    field=field_name,
                 )
 
     def _enforce_update_constraints(self, pivot_data: dict) -> None:
@@ -165,7 +226,9 @@ class PivotAdvancedService:
         for field_name, constraint in self._constraints.items():
             if not constraint.nullable and field_name in pivot_data and pivot_data[field_name] is None:
                 raise PivotConstraintError(
-                    f"Champ pivot non nullable reçoit None : {field_name!r}."
+                    f"Champ pivot non nullable reçoit None : {field_name!r}.",
+                    code="nullable_field_rejected",
+                    field=field_name,
                 )
 
     def _row_to_pivot_row(self, row: dict) -> PivotRow:
@@ -211,7 +274,8 @@ class PivotAdvancedService:
 
         if self._unique_pair and self.get(source_id, target_id) is not None:
             raise PivotConstraintError(
-                f"Association ({source_id}, {target_id}) déjà existante dans {self._table}."
+                f"Association ({source_id}, {target_id}) déjà existante dans {self._table}.",
+                code="duplicate_pair",
             )
 
         columns = [self._source_key, self._target_key] + [
@@ -264,7 +328,10 @@ class PivotAdvancedService:
     def get_by_id(self, pivot_id: int | str) -> PivotRow | None:
         """Retourne la ligne pivot par son id technique. Requiert id_field."""
         if not self._id_field:
-            raise ValueError("get_by_id requiert id_field sur PivotAdvancedService.")
+            raise PivotConstraintError(
+                "get_by_id requiert id_field sur PivotAdvancedService.",
+                code="missing_id_field",
+            )
         sql = f"SELECT * FROM {self._table} WHERE {self._id_field} = ?"
         row = self._fetch_one(sql, (pivot_id,))
         return self._row_to_pivot_row(row) if row else None
@@ -272,7 +339,10 @@ class PivotAdvancedService:
     def update_by_id(self, pivot_id: int | str, pivot_data: dict) -> int:
         """Modifie les attributs d'une ligne pivot par son id technique. Requiert id_field."""
         if not self._id_field:
-            raise ValueError("update_by_id requiert id_field sur PivotAdvancedService.")
+            raise PivotConstraintError(
+                "update_by_id requiert id_field sur PivotAdvancedService.",
+                code="missing_id_field",
+            )
         self._check_pivot_data(pivot_data)
         self._enforce_update_constraints(pivot_data)
         if not pivot_data:
@@ -285,6 +355,9 @@ class PivotAdvancedService:
     def delete_by_id(self, pivot_id: int | str) -> int:
         """Supprime une ligne pivot par son id technique. Requiert id_field."""
         if not self._id_field:
-            raise ValueError("delete_by_id requiert id_field sur PivotAdvancedService.")
+            raise PivotConstraintError(
+                "delete_by_id requiert id_field sur PivotAdvancedService.",
+                code="missing_id_field",
+            )
         sql = f"DELETE FROM {self._table} WHERE {self._id_field} = ?"
         return self._execute(sql, (pivot_id,))

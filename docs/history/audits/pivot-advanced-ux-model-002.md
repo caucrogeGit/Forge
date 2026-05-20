@@ -319,3 +319,11 @@ automatiquement — elles sont documentées dans la sortie de la commande.
 `unique_pair=True` vérifie l'unicité avant INSERT. `id_field="id"` active les
 méthodes `get_by_id`, `update_by_id`, `delete_by_id`. L'API `pivot_fields=[...]`
 reste inchangée.
+
+**Note PIVOT-ADVANCED-007** : le sous-CRUD pivot dispose désormais d'un modèle
+d'erreur affichable dans les formulaires générés. `PivotFormError(code, message, field)`
+est la structure stable. `pivot_error_to_form_error(exc)` convertit toute exception
+du service en erreur formulaire sans exposer de détail SQL. Le contrôleur généré
+intègre les blocs `try/except` avec passage de l'erreur au template. Le template
+`form.html` généré affiche `error.message` dans un bloc conditionnel. `make:crud`
+reste neutre.
