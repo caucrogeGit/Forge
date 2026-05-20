@@ -1,0 +1,229 @@
+# Audit — Package RBAC opt-in existant
+
+**Ticket** : RBAC-MODULE-002-AUDIT-AND-LOCK-EXISTING-RBAC-PACKAGE
+**Date** : 2026-05-20
+**Statut** : audit terminé, package verrouillé
+
+---
+
+## 1. Résumé
+
+Le package `forge-mvc-rbac` (version `1.0.0b5`) est substantiellement implémenté.
+Il expose une API publique complète : `has_permission`, `require_permission`,
+`require_user_permission`, `PermissionDenied`, `make_can`, helpers Jinja,
+resolver SQL, modèles `Role` / `Permission`.
+
+274 tests passent dans `tests/` (aucun dans `packages/forge-mvc-rbac/` — les
+tests du package vivent dans le répertoire de tests principal du monorepo).
+
+Le seul chaînon absent : la lecture de `mvc/security/rbac.json` au runtime.
+Toute la résolution de permissions passe aujourd'hui par les tables SQL
+(`roles`, `permissions`, `role_permissions`, `user_roles`) ou par la session.
+
+---
+
+## 2. Contexte
+
+RBAC-MODULE-001 a conclu que le module existait avec des fonctionnalités
+substantielles, et que le chaînon manquant était le chargement du contrat
+déclaratif `mvc/security/rbac.json`. Ce ticket vérifie et verrouille cet état.
+
+---
+
+## 3. Méthode d'audit
+
+### Commandes exécutées
+
+```bash
+find packages/forge-mvc-rbac -maxdepth 4 -type f | sort
+cat packages/forge-mvc-rbac/pyproject.toml
+cat packages/forge-mvc-rbac/forge_mvc_rbac/__init__.py
+cat packages/forge-mvc-rbac/forge_mvc_rbac/rbac.py
+cat packages/forge-mvc-rbac/forge_mvc_rbac/authorization.py
+cat packages/forge-mvc-rbac/forge_mvc_rbac/resolver.py
+cat packages/forge-mvc-rbac/forge_mvc_rbac/jinja.py
+cat packages/forge-mvc-rbac/forge_mvc_rbac/user_rbac.py
+python -m pytest packages/forge-mvc-rbac -q
+python -m pytest tests/test_rbac_models.py tests/test_rbac_authorization.py \
+  tests/test_rbac_jinja.py tests/test_rbac_security.py tests/test_rbac_sql.py \
+  tests/test_auth_user_rbac.py tests/test_auth_user_rbac_resolver.py \
+  tests/test_auth_user_rbac_route.py tests/test_make_crud_rbac.py \
+  tests/test_crud_rbac_ui.py -q
+```
+
+### Zones auditées
+
+- Structure complète de `packages/forge-mvc-rbac/`
+- Tous les modules Python du package
+- SQL fourni par le package
+- Tests RBAC dans `tests/`
+
+---
+
+## 4. Structure du package
+
+| Élément | État | Commentaire |
+|---|---|---|
+| `packages/forge-mvc-rbac/` | Présent | Package autonome dans le monorepo |
+| `pyproject.toml` | Présent | version `1.0.0b5`, dépend de `forge-mvc>=1.0.0b5` |
+| `forge_mvc_rbac/__init__.py` | Présent | API publique complète, auto-enregistrement Jinja |
+| `forge_mvc_rbac/rbac.py` | Présent | Modèles, normalisation, `has_permission`, `require_permission`, `PermissionDenied`, `make_can` |
+| `forge_mvc_rbac/authorization.py` | Présent | `auth_user_can`, `require_user_permission` (Auth/User) |
+| `forge_mvc_rbac/resolver.py` | Présent | `user_has_permission`, `get_user_permissions`, `get_user_role_ids` — résolution SQL |
+| `forge_mvc_rbac/user_rbac.py` | Présent | `AuthUserRole`, association user ↔ role |
+| `forge_mvc_rbac/jinja.py` | Présent | `make_auth_jinja_context`, `make_auth_jinja_can`, `AuthJinjaUser` |
+| `sql/rbac.sql` | Présent | Tables `roles`, `permissions`, `role_permissions` |
+| `sql/user_roles.sql` | Présent | Table `user_roles` (pivot user ↔ role) |
+| Tests dans `packages/` | Absent | Les tests vivent dans `tests/` du monorepo |
+| Distributions `dist/` | Présentes | `1.0.0b4` et `1.0.0b5` en `.whl` et `.tar.gz` |
+
+---
+
+## 5. API publique existante
+
+### Fonctions et classes exposées par `__init__.py`
+
+| Symbole | Module source | Rôle |
+|---|---|---|
+| `has_permission(request, code)` | `rbac.py` | Retourne `True` si la permission est présente |
+| `require_permission(code)` | `rbac.py` | Décorateur → `Response(403)` si absent (session legacy) |
+| `require_user_permission(code)` | `authorization.py` | Décorateur → `Response(403)` si absent (Auth/User) |
+| `auth_user_can(request, permission)` | `authorization.py` | Helper boolean Auth/User |
+| `PermissionDenied` | `rbac.py` | Exception définie (non levée par `require_permission`) |
+| `RbacValidationError` | `rbac.py` | Validation des codes et slugs |
+| `Role` | `rbac.py` | Modèle de rôle sans ORM |
+| `Permission` | `rbac.py` | Modèle de permission sans ORM |
+| `normalize_role_slug(name)` | `rbac.py` | `"Super Admin"` → `"super-admin"` |
+| `normalize_permission_code(code)` | `rbac.py` | `"Posts.Edit"` → `"posts.edit"` |
+| `validate_role(name, slug)` | `rbac.py` | Lève `RbacValidationError` si invalide |
+| `validate_permission(code)` | `rbac.py` | Lève `RbacValidationError` si invalide |
+| `make_can(request)` | `rbac.py` | Retourne `can(code) -> bool` pour Jinja |
+| `get_request_permissions(request)` | `rbac.py` | Résout les permissions depuis session/injection |
+| `user_has_permission(user_id, code)` | `resolver.py` | Résolution SQL (via tables `user_roles`, `role_permissions`) |
+| `get_user_permissions(user_id)` | `resolver.py` | Toutes les permissions effectives d'un utilisateur |
+| `get_user_role_ids(user_id)` | `resolver.py` | IDs de rôles d'un utilisateur |
+| `AuthUserRbacResolverError` | `resolver.py` | Erreur de résolution SQL |
+| `FetchAll` | `resolver.py` | Type callable pour injecter la lecture SQL |
+| `AuthJinjaUser` | `jinja.py` | Représentation publique d'un utilisateur pour templates |
+| `sanitize_jinja_user(user)` | `jinja.py` | Nettoie un utilisateur pour exposition Jinja |
+| `get_jinja_current_user(request)` | `jinja.py` | Utilisateur courant pour templates |
+| `make_auth_jinja_can(request)` | `jinja.py` | Helper `can` pour templates |
+| `make_auth_jinja_context(request)` | `jinja.py` | Contexte complet `{current_user, is_authenticated, can}` |
+| `make_auth_jinja_context_with_can(request)` | `jinja.py` | Wrapper pour registre core |
+| `AuthUserRole` | `user_rbac.py` | Association user ↔ role (dataclass) |
+| `create_auth_user_role(user_id, role_id)` | `user_rbac.py` | Construit une association validée |
+| `auth_user_role_key(association)` | `user_rbac.py` | Clé stable `user_id:role_id` |
+| `auth_user_roles_match(left, right)` | `user_rbac.py` | Compare deux associations |
+| `is_valid_auth_user_role(association)` | `user_rbac.py` | Validateur booléen |
+
+### Détail `require_permission`
+
+```python
+def require_permission(permission_code: str):
+    # Valide le code à la décoration, retourne Response(403) si absent.
+    # NE lève PAS PermissionDenied — retourne un objet Response.
+```
+
+`require_permission` retourne `Response(403)` directement. `PermissionDenied` est
+défini comme classe d'exception mais n'est pas levé par ce décorateur — il est
+disponible pour l'usage applicatif.
+
+### Auto-enregistrement Jinja
+
+```python
+try:
+    from core.mvc.controller.registry import register_jinja_context_provider
+    from forge_mvc_rbac.jinja import make_auth_jinja_context_with_can
+    register_jinja_context_provider(make_auth_jinja_context_with_can)
+except ImportError:
+    pass
+```
+
+Le module s'auto-enregistre dans le registre de contexte Jinja de core
+à l'import, sans exception si core n'est pas disponible.
+
+---
+
+## 6. Tests existants ou ajoutés
+
+### Tests dans `tests/` (monorepo)
+
+| Fichier | Tests | Ce qu'il couvre |
+|---|---|---|
+| `test_rbac_models.py` | 37 | `Role`, `Permission`, normalisation, validation |
+| `test_rbac_authorization.py` | 24 | `has_permission`, `require_permission`, `PermissionDenied` |
+| `test_rbac_security.py` | 40 | Intégration sécurité RBAC |
+| `test_rbac_jinja.py` | 23 | Helpers Jinja, `make_can`, `AuthJinjaUser` |
+| `test_rbac_sql.py` | 23 | Schémas SQL (tables, colonnes, contraintes) |
+| `test_auth_user_rbac.py` | 30 | `AuthUserRole`, associations user ↔ role |
+| `test_auth_user_rbac_resolver.py` | 26 | `user_has_permission`, `get_user_permissions` |
+| `test_auth_user_rbac_route.py` | 15 | `require_user_permission` sur routes |
+| `test_make_crud_rbac.py` | 34 | Génération CRUD avec guards RBAC |
+| `test_crud_rbac_ui.py` | 22 | Interface CRUD avec permissions |
+| **Total** | **274** | **tous passent** |
+
+### Tests dans `packages/forge-mvc-rbac/`
+
+Aucun — les tests du package vivent dans `tests/` du monorepo. Comportement
+attendu pour un monorepo Forge (conforme au pattern établi pour les autres
+packages opt-in).
+
+### Tests ajoutés dans ce ticket
+
+Aucun test supplémentaire ajouté. L'API existante est déjà verrouillée par
+274 tests qui passent.
+
+---
+
+## 7. Packaging et dépendances
+
+| Élément | Valeur |
+|---|---|
+| Nom PyPI | `forge-mvc-rbac` |
+| Version | `1.0.0b5` |
+| Python | `>=3.12` |
+| Dépendances | `forge-mvc>=1.0.0b5,<2` — uniquement le core Forge |
+| Build system | `setuptools>=77.0.3` |
+| Distributions buildées | `dist/forge_mvc_rbac-1.0.0b4-py3-none-any.whl`, `1.0.0b5-py3-none-any.whl` |
+| Licence | Propriétaire Forge |
+
+Aucune dépendance externe (pas de `jsonschema`, pas de `sqlalchemy`, pas de
+bibliothèque tiers). Le package dépend uniquement de `forge-mvc`.
+
+---
+
+## 8. Limites actuelles
+
+| Limite | Description |
+|---|---|
+| `mvc/security/rbac.json` non chargé | Le module ne lit pas le contrat déclaratif au runtime |
+| Résolution uniquement SQL | Les permissions sont résolues depuis les tables `roles`/`permissions`/`user_roles` ou la session, pas depuis le fichier RBAC |
+| Non branché aux routes Forge | Aucune route Forge n'applique le RBAC automatiquement |
+| `make:crud` core reste neutre | Le CRUD core ne lit pas `mvc/security/rbac.json` |
+| `rbac:validate` valide sans appliquer | La commande CLI valide le contrat mais ne le charge pas au runtime |
+| `require_permission` retourne `Response(403)` | Ne lève pas `PermissionDenied` — distinction à documenter |
+| Tests dans `packages/` | Aucun test dans le répertoire du package lui-même |
+
+---
+
+## 9. Décision
+
+**Le package `forge-mvc-rbac` existant est conservé comme base du module RBAC
+opt-in de Forge.**
+
+L'API est stable, bien testée (274 tests) et couvre les besoins fondamentaux.
+Le prochain ticket doit connecter le module au contrat `mvc/security/rbac.json`
+sans perturber l'API existante.
+
+---
+
+## 10. Tickets futurs proposés
+
+| Ticket | Objectif |
+|---|---|
+| RBAC-MODULE-003 | Charger et valider `mvc/security/rbac.json` depuis le module `forge-mvc-rbac` |
+| RBAC-MODULE-004 | Connecter le contrat chargé au service de permissions |
+| RBAC-MODULE-005 | Brancher les permissions sur routes / contrôleurs en opt-in |
+| RBAC-MODULE-006 | Ajouter la commande `forge rbac:audit` |
+| RBAC-MODULE-007 | Documenter l'usage RBAC applicatif complet |
+| RBAC-MODULE-CLOSE-001 | Clôturer le bloc RBAC applicatif |
