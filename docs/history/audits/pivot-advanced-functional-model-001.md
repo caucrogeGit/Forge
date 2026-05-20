@@ -308,3 +308,17 @@ PIVOT-ADVANCED-002 (UX et modèle d'usage) puis implémenté dans PIVOT-ADVANCED
 | **PIVOT-ADVANCED-007** | Gestion UX des erreurs de validation pivot (formulaires, messages) |
 | **PIVOT-ADVANCED-008** | Documentation complète + exemples réels |
 | **PIVOT-ADVANCED-CLOSE-001** | Clôturer le bloc pivot advanced |
+
+---
+
+## Mise en œuvre partielle — PIVOT-ADVANCED-003
+
+PIVOT-ADVANCED-003 crée le service technique `PivotAdvancedService`
+dans `core/pivot_advanced.py`.
+
+Le service fournit les opérations de base sur une table pivot avec attributs :
+`attach`, `detach`, `update`, `list_for_source`, `get`.
+
+Aucune commande, aucun écran et aucune intégration `make:crud` ne sont ajoutés
+dans ce ticket. Le service est utilisable en production et testé sans connexion
+MariaDB réelle via des callables injectables.

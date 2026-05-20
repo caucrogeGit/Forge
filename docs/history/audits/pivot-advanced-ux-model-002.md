@@ -296,3 +296,10 @@ Sont hors périmètre :
 | **PIVOT-ADVANCED-007** | Gestion UX des erreurs de validation pivot dans les formulaires dédiés |
 | **PIVOT-ADVANCED-008** | Documentation complète + exemples réels |
 | **PIVOT-ADVANCED-CLOSE-001** | Clôturer le bloc pivot advanced |
+
+---
+
+**Note PIVOT-ADVANCED-003** : le service technique `PivotAdvancedService`
+existe désormais dans `core/pivot_advanced.py`. L'UX décrite dans ce document
+n'est pas encore générée — les vues, routes et contrôleurs pivot advanced
+seront produits par la commande/générateur décidée ici (PIVOT-ADVANCED-004).
