@@ -192,7 +192,10 @@ nav:
           - Baseline 2026-05-15: history/audits/audit-baseline-2026-05-15.md
           - Pivot advanced — modèle fonctionnel: history/audits/pivot-advanced-functional-model-001.md
           - Pivot advanced — modèle UX: history/audits/pivot-advanced-ux-model-002.md
+          - Audit final post-RBAC/Pivot: history/audits/release-audit-final-post-rbac-pivot-001.md
           - Audits archivés: history/audits/README.md
+      - Tests terrain:
+          - Field Test App 001: history/field-tests/field-test-app-001.md
       - Licence: licence.md
 
 markdown_extensions:
