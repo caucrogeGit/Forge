@@ -1,5 +1,18 @@
 # Tutoriel — Application complète avec Forge
 
+!!! warning "Tutoriel en cours de mise à jour"
+    Les exemples JSON de ce tutoriel utilisent le **format legacy** (avant Forge 1.0 canonique).
+    Les clés `"entity"`, `sql_type`, `primary_key`, `auto_increment` et `constraints`
+    ne sont **plus valides** dans le format actuel.
+
+    Pour créer une entité Forge correctement :
+
+    - La clé racine est `"name"` (et non `"entity"`).
+    - Le fichier se place dans `mvc/entities/<nom>/<nom>.json` (sous-dossier en minuscule).
+    - Le champ `id` est auto-généré — ne pas le déclarer dans `fields`.
+    - Les types de champs utilisent la syntaxe canonique : `"type": "string"`, pas `sql_type`.
+    - Référence : [Le JSON canonique dans Forge](entities/json-canonique.md).
+
 Ce tutoriel guide le développement d'une petite application Forge de bout en bout.
 Il suppose que Forge est déjà installé et que MariaDB est disponible.
 

@@ -292,18 +292,21 @@ flowchart LR
     CG -->|"many_to_one<br/>groupe_id → id"| G
 ```
 
-JSON de l'entité pivot :
+JSON de l'entité pivot (format canonique) :
 
 ```json
 {
-  "entity": "ContactGroupe",
+  "schema_version": "1.0",
+  "name": "ContactGroupe",
+  "table": "contact_groupe",
   "fields": [
-    { "name": "id",         "sql_type": "INT", "primary_key": true, "auto_increment": true },
-    { "name": "contact_id", "sql_type": "INT" },
-    { "name": "groupe_id",  "sql_type": "INT" }
+    { "name": "contact_id", "type": "integer" },
+    { "name": "groupe_id",  "type": "integer" }
   ]
 }
 ```
+
+La clé `id` et les `sql_type` ne sont pas déclarés dans le JSON canonique — Forge les dérive lors de `build:model`.
 
 Relations associées dans `relations.json` :
 

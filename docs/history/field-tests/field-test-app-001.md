@@ -166,3 +166,19 @@ mvc/templates/pivot/article_tags/form.html
 → RBAC) fonctionne de bout en bout. Trois frictions documentées, aucune
 bloquante au fond. F-001 et F-002 relèvent de la documentation ; F-003 mérite
 évaluation.
+
+---
+
+## 7. Corrections documentaires — FIELD-FIX-001
+
+Les frictions F-001 et F-002 ont été traitées dans le ticket FIELD-FIX-001.
+
+- **F-001** : la documentation rappelle désormais que la clé canonique racine
+  est `"name"`, pas `"entity"`. Les pages `entity_architecture.md`,
+  `15-minutes.md` et `app-complete-tutorial.md` ont été corrigées ou signalées.
+- **F-002** : la page `docs/entities/json-canonique.md` décrit explicitement
+  la structure `mvc/entities/<nom>/<nom>.json`, l'emplacement de
+  `mvc/entities/relations.json`, et le comportement de `build:model` vis-à-vis
+  des sous-dossiers.
+
+**F-003** reste ouvert et sera traité par FIELD-AUDIT-M2M-GUARD-001.

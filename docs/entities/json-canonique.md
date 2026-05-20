@@ -19,6 +19,42 @@ Le JSON ne contient pas de `sql_type`, ni de `python_type`, ni de `primary_key`.
 
 ---
 
+## Structure des fichiers
+
+Chaque entité vit dans son propre sous-dossier, nommé en **minuscule** (snake_case).
+Le fichier JSON de l'entité porte le même nom que le dossier.
+
+```text
+mvc/
+└── entities/
+    ├── article/
+    │   └── article.json      ← source canonique de l'entité Article
+    ├── tag/
+    │   └── tag.json          ← source canonique de l'entité Tag
+    └── relations.json        ← relations globales (many_to_one, many_to_many)
+```
+
+**Règles :**
+
+- `mvc/entities/<nom>/<nom>.json` — un sous-dossier par entité, nom en minuscule.
+- `mvc/entities/relations.json` — à la racine de `entities/`, pas dans un sous-dossier.
+- Un fichier JSON placé directement dans `mvc/entities/` (ex : `mvc/entities/article.json`) n'est **pas** reconnu par `build:model`.
+
+Exemples de chemins valides :
+
+- `mvc/entities/article/article.json`
+- `mvc/entities/tag/tag.json`
+- `mvc/entities/user_profile/user_profile.json`
+- `mvc/entities/relations.json`
+
+**Comportement de `build:model` :**
+
+`build:model` parcourt les sous-dossiers de `mvc/entities/`. Pour chaque sous-dossier dont le nom ne commence pas par `__`, il s'attend à trouver un fichier JSON du même nom. Tout sous-dossier sans fichier JSON correspondant déclenche une erreur.
+
+Les dossiers préfixés par `__` (ex : `__media/`) sont ignorés — ils servent à isoler des ressources techniques non-entités.
+
+---
+
 ## Fichiers concernés
 
 | Fichier | Rôle |

@@ -104,42 +104,42 @@ forge make:entity Contact --no-input
 
 `--no-input` génère une entité minimale sans poser de questions.
 
-Fichiers créés dans `mvc/entities/Contact/` :
+Fichiers créés dans `mvc/entities/contact/` :
 
 | Fichier | Rôle | Régénérable ? |
 |---|---|---|
-| `Contact.json` | Source de vérité de l'entité | Non (source) |
-| `Contact.sql` | Schéma SQL généré | Oui (`sync:entity`) |
-| `Contact_base.py` | Interface Python générée | Oui (`sync:entity`) |
-| `Contact.py` | Modèle manuel (vide au départ) | **Non — préservé** |
+| `contact.json` | Source de vérité de l'entité | Non (source) |
+| `contact.sql` | Schéma SQL généré | Oui (`build:model`) |
+| `contact_base.py` | Interface Python générée | Oui (`build:model`) |
+| `contact.py` | Modèle manuel (vide au départ) | **Non — préservé** |
 
 Le fichier JSON est la source de vérité. Forge génère le SQL et le `_base.py`
-à partir du JSON. Le fichier `Contact.py` est le seul que vous modifiez.
+à partir du JSON. Le fichier `contact.py` est le seul que vous modifiez.
 
 ### Personnaliser l'entité
 
-Éditez `mvc/entities/Contact/Contact.json` :
+Éditez `mvc/entities/contact/contact.json` :
 
 ```json
 {
-  "entity": "Contact",
+  "schema_version": "1.0",
+  "name": "Contact",
   "table": "contacts",
-  "primary_key": "id",
   "fields": [
-    {"name": "id",        "type": "INT",         "nullable": false, "auto_increment": true},
-    {"name": "nom",       "type": "VARCHAR(100)", "nullable": false},
-    {"name": "prenom",    "type": "VARCHAR(100)", "nullable": false},
-    {"name": "email",     "type": "VARCHAR(200)", "nullable": false},
-    {"name": "telephone", "type": "VARCHAR(20)",  "nullable": true}
-  ],
-  "constraints": []
+    { "name": "nom",       "type": "string",  "max_length": 100 },
+    { "name": "prenom",    "type": "string",  "max_length": 100 },
+    { "name": "email",     "type": "string",  "max_length": 200, "unique": true },
+    { "name": "telephone", "type": "string",  "max_length": 20,  "nullable": true }
+  ]
 }
 ```
+
+La clé primaire `id` est gérée automatiquement par Forge — ne pas la déclarer dans `fields`.
 
 Après chaque modification du JSON, régénérez le SQL et le `_base.py` :
 
 ```bash
-forge sync:entity Contact
+forge build:model
 ```
 
 ---
