@@ -8,6 +8,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.meta
+
 
 _USAGE_DOC = Path(__file__).parents[2] / "docs" / "security" / "rbac-usage.md"
 _CONTRACT_DOC = Path(__file__).parents[2] / "docs" / "security" / "rbac-contract.md"
