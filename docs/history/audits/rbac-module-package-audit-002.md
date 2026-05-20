@@ -294,9 +294,54 @@ le module `forge-mvc-rbac`.
 
 | Ticket | Objectif |
 |---|---|
-| RBAC-MODULE-003 | Charger et valider `mvc/security/rbac.json` depuis le module `forge-mvc-rbac` |
-| RBAC-MODULE-004 | Connecter le contrat chargé au service de permissions |
-| RBAC-MODULE-005 | Brancher les permissions sur routes / contrôleurs en opt-in |
+| RBAC-MODULE-003 | ~~Charger et valider `mvc/security/rbac.json` depuis le module~~ — livré |
+| RBAC-MODULE-004 | ~~Connecter le contrat chargé au service de permissions~~ — livré |
+| RBAC-MODULE-005 | ~~Brancher les permissions sur routes / contrôleurs en opt-in~~ — livré |
 | RBAC-MODULE-006 | ~~Ajouter la commande `forge rbac:audit`~~ — livré |
 | RBAC-MODULE-007 | ~~Documenter l'usage RBAC applicatif complet~~ — livré |
-| RBAC-MODULE-CLOSE-001 | Clôturer le bloc RBAC applicatif |
+| RBAC-MODULE-CLOSE-001 | ~~Clôturer le bloc RBAC applicatif~~ — livré |
+
+---
+
+## Clôture — RBAC-MODULE-CLOSE-001
+
+**Date** : 2026-05-20
+**Statut** : terminé.
+
+Le bloc RBAC applicatif opt-in est clôturé après livraison de :
+
+- **RBAC-MODULE-001** — définition du rôle du module RBAC opt-in ;
+- **RBAC-MODULE-002** — audit et verrouillage du package `forge-mvc-rbac` ;
+- **RBAC-MODULE-003** — chargement de `mvc/security/rbac.json` depuis le module (`load_rbac_contract`) ;
+- **RBAC-MODULE-004** — connexion du contrat au service de permissions (`has_contract_permission`, `require_contract_permission`) ;
+- **RBAC-MODULE-005** — guards opt-in pour routes / contrôleurs (`require_contract_permission_for_request`, `contract_permission_required`) ;
+- **RBAC-MODULE-006** — commande `forge rbac:audit` ;
+- **RBAC-MODULE-007** — documentation d'usage applicatif (`docs/security/rbac-usage.md`).
+
+### État final
+
+| Élément | Statut |
+|---|---|
+| `mvc/security/rbac.json` | contrat RBAC applicatif (optionnel, validable) |
+| `rbac.schema.json` | présent dans les registres `schemas/` et `forge_cli/schemas/` |
+| `forge rbac:validate` | opérationnel — valide la structure JSON |
+| `forge rbac:audit` | opérationnel — audite la cohérence fonctionnelle |
+| `load_rbac_contract` | exporté par `forge_mvc_rbac` |
+| `has_contract_permission` | exporté par `forge_mvc_rbac` |
+| `require_contract_permission_for_request` | exporté par `forge_mvc_rbac` |
+| `contract_permission_required` | exporté par `forge_mvc_rbac` |
+| `make:crud` core | neutre — ne lit pas `mvc/security/rbac.json` |
+| Routes automatiquement protégées | NON — guards opt-in explicites uniquement |
+| Cache applicatif RBAC | NON — lecture directe du contrat à chaque appel |
+| Publication PyPI | NON effectuée dans ce bloc |
+| Tag créé | NON |
+
+### Traces intentionnelles restantes
+
+| Fichier | Trace | Justification |
+|---|---|---|
+| `forge_cli/entities/make_crud.py` | `definition.get("rbac")` | Mécanisme interne existant, indépendant du contrat séparé |
+| `forge_cli/entities/validation.py` | `ALLOWED_ROOT_KEYS` inclut `rbac` | Pipeline interne du format d'entité |
+| `forge_cli/entities/crud/controller_builder.py` | Guards `@require_permission` | Génération conditionnelle depuis le format interne |
+| `tests/test_make_crud_rbac.py` | 34 tests format interne | Garde-fous actifs pour le mécanisme A |
+| `tests/test_crud_rbac_ui.py` | 22 tests guards UI | Garde-fous actifs pour le mécanisme A |
