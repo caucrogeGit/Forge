@@ -111,6 +111,18 @@ def _load_crud_many_to_many_relations(
 
     for relation in validated_relations:
         if isinstance(relation, ValidatedCanonicalManyToManyRelation):
+            incompatible = [pf.name for pf in relation.pivot_fields if not pf.nullable]
+            if incompatible:
+                field_list = ", ".join(incompatible)
+                raise ValueError(
+                    f"Relation many_to_many incompatible avec make:crud : "
+                    f"{relation.from_entity} → {relation.to_entity} "
+                    f"(pivot {relation.pivot_table}).\n"
+                    f"Le pivot {relation.pivot_table} contient des champs obligatoires "
+                    f"non gérés par le CRUD simple : {field_list}.\n"
+                    f"make:crud synchronise uniquement les identifiants.\n"
+                    f"Rendez ces champs nullable ou utilisez un module/CRUD pivot dédié."
+                )
             m2m_source = relation.from_entity
             m2m_target = relation.to_entity
             m2m_pivot_table = relation.pivot_table

@@ -213,6 +213,11 @@ Le SQL est une **projection générée** depuis `relations.json`. Ne pas le modi
 ## Limites actuelles
 
 - Les attributs pivot sont validés par `forge entity:validate` et générés en SQL.
-- Le CRUD avancé pour créer, modifier ou supprimer des lignes pivot avec attributs n'est pas encore couvert par `make:crud` — les vues générées traitent la relation mais pas les attributs supplémentaires.
-- Les starters legacy peuvent encore contenir l'ancien format (`format_version: 1`) avec `pivot_table`, `source_key`, `target_key` — ces starters restent fonctionnels en lecture mais ne produisent pas de pivot avec attributs.
+- `make:crud` **refuse** de générer le CRUD si un champ pivot est `required: true` ou
+  `nullable: false`. Ces champs sont `NOT NULL` en base mais ne peuvent pas être renseignés
+  par la synchronisation d'IDs générée. Pour utiliser ces champs, rendez-les nullable ou
+  utilisez un module CRUD pivot dédié (voir ticket `PIVOT-CRUD-004`).
+- Le CRUD avancé pour créer, modifier ou supprimer des lignes pivot avec attributs n'est
+  pas encore couvert par `make:crud` — les vues générées traitent la relation mais pas les
+  attributs supplémentaires.
 - `forge entity:validate` reste la validation officielle avant toute génération.

@@ -80,6 +80,13 @@ La suppression du support legacy a été réalisée dans les tickets LEGACY-REMO
 `build:model`. Les champs pivot peuvent exister dans le contrat et être générés
 en base.
 
+**Garde-fou `make:crud` :** si un champ pivot est `required: true` ou
+`nullable: false`, `make:crud` refuse de générer le CRUD et affiche un message
+d'erreur. En effet, `make:crud` synchronise uniquement les identifiants — un
+champ `NOT NULL` sans valeur fournie produirait une erreur d'intégrité à
+l'exécution. Pour lever ce blocage, rendez les champs pivot nullable ou utilisez
+un module CRUD pivot dédié.
+
 **Ce qui reste hors périmètre actuel :**
 
 - l'édition des attributs pivot dans les formulaires CRUD générés par `make:crud` ;

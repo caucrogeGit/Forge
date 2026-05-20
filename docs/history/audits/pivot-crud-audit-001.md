@@ -342,3 +342,26 @@ les tables pivot avec attributs.
 
 **Recommandation** : poursuivre avec `PIVOT-CRUD-002` — protéger contre le cas
 d'intégrité d'un pivot avec champ `NOT NULL` sans valeur par défaut.
+
+---
+
+## Mise en œuvre partielle — PIVOT-CRUD-002
+
+PIVOT-CRUD-002 a ajouté un garde-fou dans `make:crud` contre les
+`pivot.fields[]` obligatoires non gérés par le CRUD simple.
+
+**Comportement après PIVOT-CRUD-002** :
+
+| Cas | Résultat |
+|---|---|
+| pivot sans `fields[]` | Accepté |
+| `pivot.fields[]` tous `nullable: true` | Accepté |
+| `pivot.fields[]` sans `nullable` ni `required` | Accepté (nullable par défaut) |
+| `pivot.fields[]` avec `required: true` | **Refusé** — erreur bloquante |
+| `pivot.fields[]` avec `nullable: false` | **Refusé** — erreur bloquante |
+
+**Implémentation** : garde-fou dans `forge_cli/entities/crud/relations_loader.py`,
+fonction `_load_crud_many_to_many_relations()`. L'erreur est une `ValueError`
+capturée par `make_crud()` qui la projette en `SystemExit(1)` avec message clair.
+
+**Tests** : `tests/test_make_crud_pivot_fields_guard.py` — 13 tests.

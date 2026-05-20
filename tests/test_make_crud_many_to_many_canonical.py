@@ -77,7 +77,7 @@ RELATIONS_CANONICAL_WITH_PIVOT_FIELDS = {
                 "unique_pair": True,
                 "on_delete": "cascade",
                 "fields": [
-                    {"name": "role", "type": "string", "max_length": 50, "required": True},
+                    {"name": "role", "type": "string", "max_length": 50, "nullable": True},
                     {"name": "joined_at", "type": "datetime", "nullable": True},
                 ],
             },
