@@ -13,9 +13,12 @@ Comportement :
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+from core.http.response import Response  # noqa: E402
 
 
 _RBAC_CONTRACT_RELATIVE = Path("mvc") / "security" / "rbac.json"
@@ -185,3 +188,61 @@ def load_rbac_contract(project_root: str | Path = ".") -> RbacContractResult:
         errors=errors,
         data=instance if is_valid else None,
     )
+
+
+def get_contract_permissions(result: RbacContractResult, roles: Iterable[str]) -> set[str]:
+    """Retourne l'ensemble des permissions accordées aux rôles selon le contrat.
+
+    Retourne un ensemble vide si le contrat est absent, invalide ou si aucun
+    des rôles fournis n'est déclaré dans le contrat.
+    """
+    if not result.valid or not result.exists or result.data is None:
+        return set()
+
+    contract_roles = result.data.get("roles", {})
+    if not isinstance(contract_roles, dict):
+        return set()
+
+    permissions: set[str] = set()
+    for role in roles:
+        role_perms = contract_roles.get(role)
+        if isinstance(role_perms, list):
+            for perm in role_perms:
+                if isinstance(perm, str) and perm.strip():
+                    permissions.add(perm)
+    return permissions
+
+
+def has_contract_permission(
+    result: RbacContractResult,
+    roles: Iterable[str],
+    permission: str,
+) -> bool:
+    """Retourne True si au moins un des rôles possède la permission selon le contrat.
+
+    Retourne False si le contrat est absent, invalide, si le rôle est inconnu
+    ou si la permission n'est pas déclarée pour ce rôle.
+    """
+    if not result.valid or not result.exists:
+        return False
+    return permission in get_contract_permissions(result, roles)
+
+
+def require_contract_permission(
+    result: RbacContractResult,
+    roles: Iterable[str],
+    permission: str,
+) -> Response | None:
+    """Vérifie une permission contractuelle.
+
+    Retourne None si la permission est accordée.
+    Retourne Response(403) si la permission est refusée ou si le contrat est absent.
+
+    Usage dans un contrôleur :
+        response = require_contract_permission(contract, user_roles, "article.list")
+        if response is not None:
+            return response
+    """
+    if has_contract_permission(result, roles, permission):
+        return None
+    return Response(403, body=f"Permission required: {permission}".encode())

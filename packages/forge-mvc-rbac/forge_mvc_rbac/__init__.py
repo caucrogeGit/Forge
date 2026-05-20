@@ -2,7 +2,14 @@
 
 from __future__ import annotations
 
-from forge_mvc_rbac.contract import RbacContractError, RbacContractResult, load_rbac_contract
+from forge_mvc_rbac.contract import (
+    RbacContractError,
+    RbacContractResult,
+    get_contract_permissions,
+    has_contract_permission,
+    load_rbac_contract,
+    require_contract_permission,
+)
 from forge_mvc_rbac.authorization import auth_user_can, require_user_permission
 from forge_mvc_rbac.jinja import (
     AuthJinjaUser,
@@ -60,6 +67,9 @@ __all__ = [
     "load_rbac_contract",
     "RbacContractResult",
     "RbacContractError",
+    "get_contract_permissions",
+    "has_contract_permission",
+    "require_contract_permission",
     "auth_user_can",
     "require_user_permission",
     "AuthJinjaUser",

@@ -120,6 +120,47 @@ Il prépare les futurs services RBAC applicatifs (RBAC-MODULE-004).
 
 ---
 
+## Vérification des permissions depuis le contrat
+
+Une fois le contrat chargé, le module `forge-mvc-rbac` peut vérifier si un
+ensemble de rôles possède une permission déclarée dans `mvc/security/rbac.json` :
+
+```python
+from forge_mvc_rbac import (
+    load_rbac_contract,
+    has_contract_permission,
+    get_contract_permissions,
+    require_contract_permission,
+)
+
+contract = load_rbac_contract(".")
+
+# Vérification booléenne
+if has_contract_permission(contract, ["admin", "editor"], "article.update"):
+    ...
+
+# Toutes les permissions d'un rôle
+perms = get_contract_permissions(contract, ["reader"])
+# → {"article.list", "article.show"}
+
+# Protection directe dans un contrôleur
+response = require_contract_permission(contract, user_roles, "article.delete")
+if response is not None:
+    return response  # Response(403)
+```
+
+| Fonction | Retour si accordé | Retour si refusé |
+|---|---|---|
+| `has_contract_permission` | `True` | `False` |
+| `get_contract_permissions` | `set[str]` des permissions | `set()` vide |
+| `require_contract_permission` | `None` | `Response(403)` |
+
+Cette vérification ne protège pas automatiquement les routes.
+Elle ne modifie pas `make:crud`.
+Elle prépare le futur branchement opt-in des contrôleurs ou routes (RBAC-MODULE-005).
+
+---
+
 ## Limites
 
 Ce contrat est non branché au runtime Forge (décision RBAC-CONTRACT-004).

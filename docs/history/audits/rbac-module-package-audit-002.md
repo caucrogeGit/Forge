@@ -217,6 +217,19 @@ sans perturber l'API existante.
 
 ---
 
+## Mise en œuvre partielle — RBAC-MODULE-004
+
+RBAC-MODULE-004 connecte le contrat chargé au service de permissions contractuelles.
+
+- Nouvelles fonctions dans `forge_mvc_rbac/contract.py` :
+  `get_contract_permissions`, `has_contract_permission`, `require_contract_permission`
+- Nouveaux exports publics dans `__init__.py`
+- 35 tests ajoutés dans `tests/test_rbac_contract_permissions.py`
+- `require_contract_permission` retourne `None` (accordé) ou `Response(403)` (refusé)
+- `has_permission` et `require_permission` existants inchangés
+
+---
+
 ## Mise en œuvre partielle — RBAC-MODULE-003
 
 RBAC-MODULE-003 ajoute le chargement validé de `mvc/security/rbac.json` depuis
