@@ -1,5 +1,8 @@
 # Contrat RBAC Forge
 
+> **Usage applicatif** : pour le workflow complet (validation, audit, helpers Python,
+> guards opt-in), voir [RBAC opt-in — Guide d'usage applicatif](rbac-usage.md).
+
 ## Rôle
 
 Le contrat RBAC Forge définit les rôles et permissions d'accès dans un projet.
@@ -188,8 +191,6 @@ if response is not None:
 
 Cette vérification ne protège pas automatiquement les routes.
 Elle ne modifie pas `make:crud`.
-Elle prépare le futur branchement opt-in des contrôleurs ou routes (RBAC-MODULE-005).
-
 ---
 
 ## Protection opt-in d'une action
@@ -235,13 +236,14 @@ Cette protection :
 
 ## Limites
 
-Ce contrat est non branché au runtime Forge (décision RBAC-CONTRACT-004).
+Ce contrat est non branché au runtime Forge Core (décision RBAC-CONTRACT-004).
 
 - `make:crud` ne lit pas `mvc/security/rbac.json` — il ne génère pas de guards RBAC depuis ce contrat.
 - `build:model` ignore ce fichier.
-- Aucun guard RBAC n'est généré par Forge Core depuis `mvc/security/rbac.json`.
-- Le runtime RBAC reste hors périmètre de Forge Core.
-- L'intégration d'un module RBAC opt-in est reportée.
+- Aucun guard RBAC n'est généré automatiquement par Forge Core depuis `mvc/security/rbac.json`.
+- La protection des routes est opt-in — à appliquer explicitement via `forge-mvc-rbac`.
+
+Voir [les limites détaillées](rbac-usage.md#limites-actuelles) dans le guide d'usage.
 
 ## Relation avec entity.schema.json
 
@@ -278,5 +280,4 @@ Le bloc contrat RBAC séparé est clôturé après livraison de :
 - le contrat est validable avec `forge rbac:validate` ;
 - `make:crud` ne consomme pas ce contrat ;
 - aucun guard RBAC n'est généré par Forge Core depuis `mvc/security/rbac.json` ;
-- le runtime RBAC reste hors périmètre de Forge Core ;
-- le futur module RBAC opt-in est reporté.
+- la protection des routes est opt-in via `forge-mvc-rbac` (livré, RBAC-MODULE-003 à 006).

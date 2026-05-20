@@ -88,6 +88,7 @@ nav:
       - Sécurité et RBAC: security.md
       - RBAC — Contrôle d'accès: rbac.md
       - Contrat RBAC séparé: security/rbac-contract.md
+      - RBAC — Usage applicatif: security/rbac-usage.md
       - Schéma API: reference-schema.md
       - Schéma erreurs runtime: runtime-errors-schema.md
 

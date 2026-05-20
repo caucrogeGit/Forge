@@ -217,6 +217,20 @@ sans perturber l'API existante.
 
 ---
 
+## Mise en œuvre partielle — RBAC-MODULE-007
+
+RBAC-MODULE-007 documente l'usage applicatif complet du RBAC opt-in : contrat,
+validation, audit, helpers Python, guards opt-in et limites.
+
+- Nouvelle page : `docs/security/rbac-usage.md` — guide complet en 7 étapes
+- `docs/security/rbac-contract.md` mis à jour : sections obsolètes corrigées,
+  lien vers le guide d'usage, limites actualisées
+- `mkdocs.yml` mis à jour : page `RBAC — Usage applicatif` ajoutée
+- 17 tests documentaires dans `tests/meta/test_rbac_application_usage_docs_007.py`
+- Aucun runtime modifié — documentation uniquement
+
+---
+
 ## Mise en œuvre partielle — RBAC-MODULE-006
 
 RBAC-MODULE-006 ajoute la commande `forge rbac:audit` pour auditer la cohérence
@@ -284,5 +298,5 @@ le module `forge-mvc-rbac`.
 | RBAC-MODULE-004 | Connecter le contrat chargé au service de permissions |
 | RBAC-MODULE-005 | Brancher les permissions sur routes / contrôleurs en opt-in |
 | RBAC-MODULE-006 | ~~Ajouter la commande `forge rbac:audit`~~ — livré |
-| RBAC-MODULE-007 | Documenter l'usage RBAC applicatif complet |
+| RBAC-MODULE-007 | ~~Documenter l'usage RBAC applicatif complet~~ — livré |
 | RBAC-MODULE-CLOSE-001 | Clôturer le bloc RBAC applicatif |
