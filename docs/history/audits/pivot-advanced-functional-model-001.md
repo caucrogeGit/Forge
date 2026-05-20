@@ -389,3 +389,35 @@ contraintes, erreurs UX et limites.
 Page créée : `docs/entities/pivot-advanced.md`.
 Référencée dans `mkdocs.yml` et liée depuis `docs/entities/pivots-many-to-many.md`.
 Tests meta : `tests/meta/test_pivot_advanced_usage_docs_008.py`.
+
+---
+
+## Clôture — PIVOT-ADVANCED-CLOSE-001
+
+**Statut : terminé.**
+
+Le bloc Pivot advanced est clôturé après livraison de :
+
+- **PIVOT-ADVANCED-001** — modèle fonctionnel ;
+- **PIVOT-ADVANCED-002** — UX et modèle d'usage ;
+- **PIVOT-ADVANCED-003** — `PivotAdvancedService` ;
+- **PIVOT-ADVANCED-004** — commande `make:pivot-crud` ;
+- **PIVOT-ADVANCED-005** — tests E2E ;
+- **PIVOT-ADVANCED-006** — contraintes `required`, `nullable`, `unique_pair`, `id` technique ;
+- **PIVOT-ADVANCED-007** — erreurs UX ;
+- **PIVOT-ADVANCED-008** — documentation complète.
+
+### État final
+
+- `PivotAdvancedService` fournit les opérations `attach`, `get`, `list_for_source`,
+  `update`, `detach` ;
+- `PivotAdvancedService` gère les contraintes `required`, `nullable`, `unique_pair`
+  et `id_field` ;
+- `make:pivot-crud` génère un sous-CRUD pivot opt-in ;
+- les erreurs de contrainte sont convertibles en `PivotFormError` via
+  `pivot_error_to_form_error` ;
+- `docs/entities/pivot-advanced.md` documente l'usage complet ;
+- `make:crud` reste **neutre** ;
+- les routes ne sont **pas branchées automatiquement** ;
+- aucun schéma JSON n'est modifié ;
+- aucune publication PyPI ni création de tag n'a été effectuée.

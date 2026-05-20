@@ -331,3 +331,17 @@ reste neutre.
 **Note PIVOT-ADVANCED-008** : la documentation complète d'usage est disponible dans
 `docs/entities/pivot-advanced.md`. Elle couvre le contrat `relations.json`, la commande
 `make:pivot-crud`, `PivotAdvancedService`, les contraintes, les erreurs UX et les limites.
+
+---
+
+## Clôture — PIVOT-ADVANCED-CLOSE-001
+
+Le modèle UX Pivot advanced est clôturé.
+
+La décision initiale est conservée :
+
+- écran relationnel dédié ;
+- commande opt-in `make:pivot-crud` ;
+- templates minimaux ;
+- routes manuelles ;
+- `make:crud` neutre.
