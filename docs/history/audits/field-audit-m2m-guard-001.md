@@ -213,3 +213,23 @@ Ce ticket est un audit. Aucun fichier de code n'a été modifié.
 - Schémas : NON modifiés
 - PyPI : NON publié
 - Tag : NON créé
+
+---
+
+## 12. Correction — FIELD-FIX-M2M-GUARD-001
+
+Le bug confirmé dans cet audit a été corrigé dans le ticket FIELD-FIX-M2M-GUARD-001.
+
+Le garde `make:crud` lié aux `pivot.fields[]` est désormais appliqué uniquement
+après filtrage du côté source de la relation (`if m2m_source.lower() not in current_names: continue`).
+
+État final :
+
+- `make:crud Article` reste bloqué si `Article.tags` contient des champs pivot
+  incompatibles avec le CRUD simple (`nullable: false` ou `required: true`) ;
+- `make:crud Tag` n'est plus bloqué par la relation inverse — le CRUD Tag se
+  génère normalement ;
+- `make:pivot-crud Article tags` reste la commande dédiée pour le sous-CRUD pivot ;
+- `make:crud` reste neutre vis-à-vis du Pivot advanced généré côté `to`.
+
+Fichier modifié : `forge_cli/entities/crud/relations_loader.py`

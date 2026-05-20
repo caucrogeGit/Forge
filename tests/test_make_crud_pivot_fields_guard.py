@@ -216,3 +216,72 @@ def test_aucun_fichier_genere_si_refuse(tmp_path, capsys):
     assert not (tmp_path / "mvc" / "controllers" / "article_controller.py").exists()
     assert not (tmp_path / "mvc" / "models" / "article_model.py").exists()
     assert not (tmp_path / "mvc" / "views" / "article").exists()
+
+
+# ── FIELD-FIX-M2M-GUARD-001 — garde limité au côté source ────────────────────
+
+
+def _run_tag(tmp_path: Path) -> None:
+    make_crud(
+        "Tag",
+        entities_root=tmp_path / "mvc" / "entities",
+        output_root=tmp_path,
+    )
+
+
+def test_source_side_still_blocked_for_required_pivot_fields(tmp_path, capsys):
+    """Article (côté source) reste bloqué si pivot.fields[] contient un champ non-nullable."""
+    _setup(tmp_path, [{"name": "position", "type": "integer", "nullable": False}])
+    with pytest.raises(SystemExit) as exc_info:
+        _run(tmp_path)
+    assert exc_info.value.code == 1
+
+
+def test_target_side_is_not_blocked_by_source_pivot_fields(tmp_path):
+    """Tag (côté inverse) ne doit pas être bloqué par les pivot.fields[] de la relation Article→Tag."""
+    _setup(tmp_path, [{"name": "position", "type": "integer", "nullable": False}])
+    _run_tag(tmp_path)
+    assert (tmp_path / "mvc" / "controllers" / "tag_controller.py").exists()
+
+
+def test_target_side_generates_full_crud(tmp_path):
+    """make:crud Tag génère le CRUD complet même quand le pivot d'Article a des champs obligatoires."""
+    _setup(tmp_path, [{"name": "position", "type": "integer", "nullable": False}])
+    _run_tag(tmp_path)
+    assert (tmp_path / "mvc" / "models" / "tag_model.py").exists()
+    assert (tmp_path / "mvc" / "views" / "tag").exists()
+
+
+def test_error_message_mentions_make_pivot_crud(tmp_path, capsys):
+    """Le message d'erreur côté source mentionne make:pivot-crud."""
+    _setup(tmp_path, [{"name": "position", "type": "integer", "nullable": False}])
+    with pytest.raises(SystemExit):
+        _run(tmp_path)
+    captured = capsys.readouterr()
+    assert "make:pivot-crud" in captured.out
+
+
+def test_make_pivot_crud_still_works_for_same_relation(tmp_path):
+    """make:pivot-crud Article tags reste fonctionnel indépendamment du garde make:crud."""
+    from forge_cli.entities.make_pivot_crud import make_pivot_crud
+
+    _setup(tmp_path, [
+        {"name": "position", "type": "integer", "nullable": False},
+        {"name": "note", "type": "string", "max_length": 120, "nullable": True},
+    ])
+    make_pivot_crud(
+        "Article",
+        "tags",
+        entities_root=tmp_path / "mvc" / "entities",
+        output_root=tmp_path,
+    )
+    assert (tmp_path / "mvc" / "controllers" / "pivot" / "article_tags_pivot_controller.py").exists()
+
+
+def test_make_crud_guard_fix_documented(tmp_path):
+    """Le rapport FIELD-AUDIT-M2M-GUARD-001 mentionne la correction FIELD-FIX-M2M-GUARD-001."""
+    from pathlib import Path as P
+
+    audit = P(__file__).resolve().parents[1] / "docs/history/audits/field-audit-m2m-guard-001.md"
+    assert audit.exists()
+    assert "FIELD-FIX-M2M-GUARD-001" in audit.read_text()

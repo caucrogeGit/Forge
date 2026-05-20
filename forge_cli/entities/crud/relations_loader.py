@@ -110,30 +110,32 @@ def _load_crud_many_to_many_relations(
     crud_relations: list[CrudManyToManyRelation] = []
 
     for relation in validated_relations:
-        if isinstance(relation, ValidatedCanonicalManyToManyRelation):
-            incompatible = [pf.name for pf in relation.pivot_fields if not pf.nullable]
-            if incompatible:
-                field_list = ", ".join(incompatible)
-                raise ValueError(
-                    f"Relation many_to_many incompatible avec make:crud : "
-                    f"{relation.from_entity} → {relation.to_entity} "
-                    f"(pivot {relation.pivot_table}).\n"
-                    f"Le pivot {relation.pivot_table} contient des champs obligatoires "
-                    f"non gérés par le CRUD simple : {field_list}.\n"
-                    f"make:crud synchronise uniquement les identifiants.\n"
-                    f"Rendez ces champs nullable ou utilisez un module/CRUD pivot dédié."
-                )
-            m2m_source = relation.from_entity
-            m2m_target = relation.to_entity
-            m2m_pivot_table = relation.pivot_table
-            m2m_source_key = relation.from_key
-            m2m_target_key = relation.to_key
-            m2m_order_column = None
-        else:
+        if not isinstance(relation, ValidatedCanonicalManyToManyRelation):
             continue
+
+        m2m_source = relation.from_entity
+        m2m_target = relation.to_entity
+        m2m_pivot_table = relation.pivot_table
+        m2m_source_key = relation.from_key
+        m2m_target_key = relation.to_key
+        m2m_order_column = None
 
         if m2m_source.lower() not in current_names:
             continue
+
+        incompatible = [pf.name for pf in relation.pivot_fields if not pf.nullable]
+        if incompatible:
+            field_list = ", ".join(incompatible)
+            raise ValueError(
+                f"Relation many_to_many incompatible avec make:crud : "
+                f"{relation.from_entity} → {relation.to_entity} "
+                f"(pivot {relation.pivot_table}).\n"
+                f"Le pivot {relation.pivot_table} contient des champs obligatoires "
+                f"non gérés par le CRUD simple : {field_list}.\n"
+                f"make:crud synchronise uniquement les identifiants.\n"
+                f"Rendez ces champs nullable ou utilisez make:pivot-crud "
+                f"pour générer le sous-CRUD pivot dédié."
+            )
 
         target = _entity_definition_by_relation_name(entity_map, m2m_target)
         if target is None:
