@@ -345,6 +345,29 @@ d'intégrité d'un pivot avec champ `NOT NULL` sans valeur par défaut.
 
 ---
 
+## Clôture — PIVOT-CRUD-CLOSE-001
+
+**Statut : terminé.**
+
+Le bloc CRUD `pivot.fields[]` est clôturé après livraison de :
+
+- PIVOT-CRUD-001 — audit du comportement CRUD des attributs pivot ;
+- PIVOT-CRUD-002 — garde-fou `make:crud` contre les champs pivot obligatoires non gérés.
+
+État final :
+
+- `pivot.fields[]` est accepté par le contrat `many_to_many` canonique ;
+- `build:model` génère les colonnes SQL de pivot ;
+- `make:crud` détecte les relations `many_to_many` canoniques ;
+- `make:crud` synchronise uniquement les identifiants ;
+- `make:crud` n'édite pas les attributs pivot ;
+- `make:crud` accepte les champs pivot `nullable` ;
+- `make:crud` refuse les champs pivot `required: true` ou `nullable: false` ;
+- aucun CRUD pivot avancé n'est implémenté dans Forge Core ;
+- un module ou une commande dédiée pourra être envisagé plus tard.
+
+---
+
 ## Mise en œuvre partielle — PIVOT-CRUD-002
 
 PIVOT-CRUD-002 a ajouté un garde-fou dans `make:crud` contre les
