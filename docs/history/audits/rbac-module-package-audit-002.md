@@ -217,6 +217,19 @@ sans perturber l'API existante.
 
 ---
 
+## Mise en œuvre partielle — RBAC-MODULE-005
+
+RBAC-MODULE-005 ajoute un helper opt-in permettant d'utiliser les permissions
+contractuelles dans une route ou un contrôleur.
+
+- `get_request_roles(request)` — extrait les rôles depuis `request.roles` ou la session
+- `require_contract_permission_for_request(request, permission, project_root)` — helper direct
+- `contract_permission_required(permission, project_root)` — décorateur
+- 27 tests ajoutés dans `tests/test_rbac_contract_guards.py`
+- `make:crud` core inchangé — protection uniquement opt-in
+
+---
+
 ## Mise en œuvre partielle — RBAC-MODULE-004
 
 RBAC-MODULE-004 connecte le contrat chargé au service de permissions contractuelles.

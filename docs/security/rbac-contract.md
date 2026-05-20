@@ -161,6 +161,47 @@ Elle prépare le futur branchement opt-in des contrôleurs ou routes (RBAC-MODUL
 
 ---
 
+## Protection opt-in d'une action
+
+Le module `forge-mvc-rbac` peut être utilisé explicitement dans une route ou
+un contrôleur pour protéger une action avec une permission contractuelle.
+
+### Avec le helper direct
+
+```python
+from forge_mvc_rbac import require_contract_permission_for_request
+
+def delete(request, article_id):
+    denied = require_contract_permission_for_request(request, "article.delete")
+    if denied:
+        return denied  # Response(403)
+    # ... traitement
+```
+
+### Avec le décorateur
+
+```python
+from forge_mvc_rbac import contract_permission_required
+
+@contract_permission_required("article.delete")
+def delete(request, article_id):
+    # ... uniquement exécuté si la permission est accordée
+```
+
+Cette protection :
+- ne modifie pas `make:crud` ;
+- n'est pas générée automatiquement ;
+- dépend des rôles présents dans `request.roles` ou la session ;
+- retourne `Response(403)` si la permission est absente ou si le contrat est absent ;
+- charge `mvc/security/rbac.json` à chaque appel (utiliser un cache si nécessaire en production).
+
+| Helper | Retour si accordé | Retour si refusé |
+|---|---|---|
+| `require_contract_permission_for_request(request, permission)` | `None` | `Response(403)` |
+| `@contract_permission_required(permission)` | exécute la fonction | `Response(403)` |
+
+---
+
 ## Limites
 
 Ce contrat est non branché au runtime Forge (décision RBAC-CONTRACT-004).

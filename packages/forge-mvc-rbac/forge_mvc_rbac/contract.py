@@ -12,13 +12,15 @@ Comportement :
 
 from __future__ import annotations
 
+import functools
 import json
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from core.http.response import Response  # noqa: E402
+from core.http.response import Response          # noqa: E402
+from core.security.session import get_user       # noqa: E402
 
 
 _RBAC_CONTRACT_RELATIVE = Path("mvc") / "security" / "rbac.json"
@@ -246,3 +248,85 @@ def require_contract_permission(
     if has_contract_permission(result, roles, permission):
         return None
     return Response(403, body=f"Permission required: {permission}".encode())
+
+
+# ---------------------------------------------------------------------------
+# Guards opt-in pour routes et contrôleurs
+# ---------------------------------------------------------------------------
+
+
+def get_request_roles(request) -> list[str]:
+    """Extrait les rôles de la requête/session courante.
+
+    Ordre de résolution :
+    1. request.roles (injection directe, tests)
+    2. session utilisateur → champ "roles"
+    3. liste vide si rien trouvé
+
+    Ne lève jamais d'erreur si la requête ou la session est absente.
+    """
+    injected = getattr(request, "roles", None)
+    if injected is not None:
+        if isinstance(injected, list):
+            return [r for r in injected if isinstance(r, str)]
+        return []
+
+    try:
+        utilisateur = get_user(request)
+    except Exception:
+        return []
+
+    if utilisateur:
+        roles = utilisateur.get("roles", [])
+        if isinstance(roles, list):
+            return [r for r in roles if isinstance(r, str)]
+    return []
+
+
+def require_contract_permission_for_request(
+    request,
+    permission: str,
+    project_root: str | Path = ".",
+) -> Response | None:
+    """Vérifie une permission contractuelle depuis la requête.
+
+    Charge mvc/security/rbac.json depuis project_root, extrait les rôles
+    de la requête et délègue à require_contract_permission.
+
+    Retourne None si la permission est accordée.
+    Retourne Response(403) si refusée, si le contrat est absent ou invalide.
+    Ne modifie ni la requête ni aucun fichier.
+
+    Usage dans un contrôleur :
+        response = require_contract_permission_for_request(request, "article.delete")
+        if response is not None:
+            return response
+    """
+    result = load_rbac_contract(project_root)
+    roles = get_request_roles(request)
+    return require_contract_permission(result, roles, permission)
+
+
+def contract_permission_required(
+    permission: str,
+    project_root: str | Path = ".",
+):
+    """Décorateur opt-in protégeant une action avec une permission contractuelle.
+
+    Charge mvc/security/rbac.json depuis project_root et vérifie si la
+    requête possède la permission déclarée. Retourne Response(403) si refusée.
+
+    Usage :
+        @contract_permission_required("article.delete")
+        def delete(request, article_id):
+            ...
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(request, *args, **kwargs):
+            response = require_contract_permission_for_request(request, permission, project_root)
+            if response is not None:
+                return response
+            return func(request, *args, **kwargs)
+        return wrapper
+    return decorator
