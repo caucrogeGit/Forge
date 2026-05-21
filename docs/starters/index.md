@@ -16,7 +16,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 | Starter | Statut | Profil associé | Usage recommandé |
 |---|---|---|---|
-| [7 — Bienvenue](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact avec Forge — cycle HTTP illustré, sans SQL |
+| [Premier pas — Bienvenue dans Forge](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact avec Forge — cycle HTTP illustré, sans SQL |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
@@ -26,7 +26,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 ## Starter d'entrée (sans base de données)
 
-### Starter 7 — Bienvenue dans Forge
+### Premier pas — Bienvenue dans Forge
 
 Le starter d'entrée de Forge. Aucune base de données requise. Illustre le cycle HTTP en 6 pages éducatives.
 

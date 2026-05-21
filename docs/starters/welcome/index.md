@@ -1,4 +1,6 @@
-# Starter 7 — Bienvenue dans Forge
+# Premier pas — Bienvenue dans Forge
+
+> Ce starter est le point d'entrée recommandé pour découvrir Forge sans base de données.
 
 <div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 58%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
   <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Forge · Starter 7 — Sans base de données</p>

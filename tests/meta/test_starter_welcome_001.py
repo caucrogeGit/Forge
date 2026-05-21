@@ -145,7 +145,19 @@ class TestWelcomeStarterDoc:
 
     def test_index_md_mentionne_starter_7(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Starter 7" in content
+        assert "Starter 7" in content, "Starter 7 doit rester présent comme référence technique"
+
+    def test_index_md_mentionne_premier_pas(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Premier pas" in content, (
+            "La doc doit présenter le starter comme 'Premier pas' (libellé public)"
+        )
+
+    def test_index_md_titre_est_premier_pas(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert content.startswith("# Premier pas"), (
+            "Le titre H1 de la page doit être '# Premier pas — Bienvenue dans Forge'"
+        )
 
     def test_index_md_mentionne_forge_new_starter(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
@@ -242,6 +254,13 @@ class TestWelcomeStarterDocNavigation:
         assert "--starter welcome" in content or "starter:build 7" in content, (
             "docs/starters/index.md doit documenter 'forge new --starter welcome' "
             "ou 'forge starter:build 7'"
+        )
+
+    def test_starters_index_mentionne_premier_pas(self):
+        content = (PROJECT_ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
+        assert "Premier pas — Bienvenue dans Forge" in content, (
+            "docs/starters/index.md doit afficher 'Premier pas — Bienvenue dans Forge' "
+            "comme libellé public du starter welcome"
         )
 
     def test_landing_pointe_vers_starters_welcome(self):

@@ -419,7 +419,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ---
 
-### Starter 7 — Bienvenue dans Forge (sans BDD)
+### Premier pas — Bienvenue dans Forge (sans BDD)
 
 Ce starter ne nécessite aucune base de données. Il s'applique directement via `forge new --starter welcome`.
 
