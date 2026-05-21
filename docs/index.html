@@ -14,10 +14,10 @@
 <body class="landing-code-font bg-white text-slate-900 antialiased">
 
 <!-- Navigation -->
-<nav class="fixed top-0 inset-x-0 z-50 bg-[#111110] border-b border-white/10 h-16 flex items-center px-8">
+<nav class="fixed top-0 inset-x-0 z-50 bg-[#111110] border-b border-white/10 min-h-40 flex items-center px-8 py-3">
   <div class="flex items-center gap-7">
-    <a href="#top" class="flex items-center">
-      <img src="./static/img/forge-logo.png" alt="Forge" class="h-8 w-auto">
+    <a href="#top" class="flex items-center shrink-0">
+      <img src="./static/img/forge-logo.png" alt="Forge" class="h-32 w-auto object-contain">
     </a>
 
     <a href="https://caucrogegit.github.io/Forge/getting-started/"
@@ -59,7 +59,7 @@
 </nav>
 
 <!-- Hero -->
-<section id="top" class="landing-hero-bg pt-32 pb-24 px-6 text-center">
+<section id="top" class="landing-hero-bg pt-52 pb-24 px-6 text-center">
   <div class="flex justify-center mb-10">
     <img src="./static/img/forge-logo.png" alt="Forge" class="landing-logo-glow landing-logo-size object-contain">
   </div>
@@ -577,7 +577,7 @@ router = Router()
     </div>
 
     <div class="grid md:grid-cols-2 gap-5">
-      <a href="https://caucrogegit.github.io/Forge/starters/"
+      <a href="https://caucrogegit.github.io/Forge/starters/welcome/"
          target="_blank" rel="noopener noreferrer"
          class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all md:col-span-2">
         <div class="text-xs landing-accent-text font-semibold mb-2">Premier pas</div>
@@ -616,6 +616,22 @@ router = Router()
         <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 4</div>
         <h3 class="font-semibold text-lg mb-2">Suivi pédagogique</h3>
         <p class="text-sm text-slate-500 leading-relaxed">Démonstrateur plus dense : dashboard, relations, sécurité applicative et données métier.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/communes-sejours/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 5</div>
+        <h3 class="font-semibold text-lg mb-2">Communes &amp; Séjours</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Démonstrateur avancé : pages publiques, formulaire de demande, notifications mail et données réelles.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/auth-mfa/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 6</div>
+        <h3 class="font-semibold text-lg mb-2">Auth MFA (TOTP)</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Contrôleurs Auth avec authentification multi-facteurs TOTP. Nécessite <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>.</p>
       </a>
     </div>
   </div>

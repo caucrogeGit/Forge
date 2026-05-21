@@ -177,6 +177,20 @@ class TestNavigationStructure:
             "Le texte >Forge< ne devrait plus être dans la nav — remplacé par le logo"
         )
 
+    def test_nav_logo_h32(self):
+        """Le logo de navigation utilise h-32 w-auto object-contain (LANDING-STARTERS-RESTORE-001)."""
+        nav_end = self.source.find("</nav>")
+        nav_section = self.source[:nav_end] if nav_end != -1 else self.source[:600]
+        assert "h-32" in nav_section, (
+            "Le logo de navigation doit utiliser h-32 (taille lisible)"
+        )
+        assert "h-16" not in self.source[:nav_end + 10] or "min-h-" in nav_section, (
+            "La navbar ne devrait plus être en h-16 fixe avec un logo h-32"
+        )
+        assert "min-h-" in nav_section, (
+            "La navbar doit utiliser min-h- pour s'adapter au logo h-32"
+        )
+
     @pytest.mark.parametrize("nav_label", [
         ">Démarrer<",
         ">Starters<",
@@ -259,6 +273,44 @@ class TestStateSectionRefonte:
         assert "Auth/User avancée" not in self.source, (
             "La landing ne devrait plus dire 'Auth/User avancée' "
             "(MFA et RBAC sont déjà des modules)"
+        )
+
+
+class TestStartersSection:
+    """La section starters affiche les 7 starters (LANDING-STARTERS-RESTORE-001)."""
+
+    def setup_method(self):
+        self.source = LANDING_SOURCE.read_text(encoding="utf-8")
+
+    def test_starters_section_exists(self):
+        assert 'id="starters"' in self.source
+
+    def test_premier_pas_link_pointe_vers_welcome(self):
+        assert "starters/welcome/" in self.source, (
+            "La carte Premier pas doit pointer vers starters/welcome/ "
+            "(LANDING-STARTERS-RESTORE-001)"
+        )
+
+    def test_premier_pas_ne_pointe_plus_vers_starters_generique(self):
+        starters_idx = self.source.find('id="starters"')
+        section = self.source[starters_idx:starters_idx + 3000] if starters_idx != -1 else self.source
+        assert 'href="https://caucrogegit.github.io/Forge/starters/"' not in section, (
+            "La carte Premier pas ne doit plus pointer vers la page starters générique"
+        )
+
+    @pytest.mark.parametrize("starter_url", [
+        "starters/welcome/",
+        "starters/01-contact-simple/",
+        "starters/02-utilisateurs-auth/",
+        "starters/03-carnet-contacts/",
+        "starters/04-suivi-comportement-eleves/",
+        "starters/communes-sejours/",
+        "starters/auth-mfa/",
+    ])
+    def test_all_starter_urls_present(self, starter_url):
+        assert starter_url in self.source, (
+            f"La landing doit contenir le lien vers {starter_url} "
+            "(LANDING-STARTERS-RESTORE-001)"
         )
 
 
