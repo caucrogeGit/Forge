@@ -89,9 +89,9 @@ Chaque méthode correspond à une route. Chaque méthode retourne une réponse F
 
 ### 3. Les 6 vues complètes
 
-Les vues ci-dessous sont les fichiers HTML/Jinja2 réellement copiés dans `mvc/views/welcome/`.
+Ce starter contient une classe contrôleur principale, `WelcomeController`, et six templates HTML — un par route. Les vues ci-dessous sont les fichiers HTML/Jinja2 réellement copiés dans `mvc/views/welcome/`.
 
-<details>
+<details open>
 <summary><code>mvc/views/welcome/index.html</code> — route <code>/welcome</code>, méthode <code>WelcomeController.index</code>, vue <code>welcome/index.html</code></summary>
 
 ```html
@@ -207,7 +207,7 @@ Les vues ci-dessous sont les fichiers HTML/Jinja2 réellement copiés dans `mvc/
 ```
 
 </details>
-<details>
+<details open>
 <summary><code>mvc/views/welcome/cycle.html</code> — route <code>/welcome/cycle</code>, méthode <code>WelcomeController.cycle</code>, vue <code>welcome/cycle.html</code></summary>
 
 ```html
@@ -335,7 +335,7 @@ Les vues ci-dessous sont les fichiers HTML/Jinja2 réellement copiés dans `mvc/
 ```
 
 </details>
-<details>
+<details open>
 <summary><code>mvc/views/welcome/request_example.html</code> — route <code>/welcome/request</code>, méthode <code>WelcomeController.request_example</code>, vue <code>welcome/request_example.html</code></summary>
 
 ```html
@@ -423,7 +423,7 @@ def request_example(request):
 ```
 
 </details>
-<details>
+<details open>
 <summary><code>mvc/views/welcome/response_example.html</code> — route <code>/welcome/response</code>, méthode <code>WelcomeController.response_example</code>, vue <code>welcome/response_example.html</code></summary>
 
 ```html
@@ -518,7 +518,7 @@ return JSONResponse({"status": "ok", "version": "1.0"})
 ```
 
 </details>
-<details>
+<details open>
 <summary><code>mvc/views/welcome/routing_example.html</code> — route <code>/welcome/routing</code>, méthode <code>WelcomeController.routing_example</code>, vue <code>welcome/routing_example.html</code></summary>
 
 ```html
@@ -615,7 +615,7 @@ with router.group("", public=True) as pub:
 ```
 
 </details>
-<details>
+<details open>
 <summary><code>mvc/views/welcome/not_found_demo.html</code> — route <code>/welcome/404-demo</code>, méthode <code>WelcomeController.not_found_demo</code>, vue <code>welcome/not_found_demo.html</code></summary>
 
 ```html

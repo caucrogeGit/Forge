@@ -457,6 +457,43 @@ class TestWelcomeStarterDocPedagogy:
         assert "../index.md" not in content
 
 
+class TestWelcomeStarterDocCodeVisible:
+    """Les vues du starter welcome sont visibles par défaut (DOC-PREMIER-PAS-CODE-VISIBLE-001)."""
+
+    def test_pas_de_details_ferme_pour_les_vues(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "<details>\n<summary><code>mvc/views/welcome/" not in content, (
+            "Les blocs <details> des vues ne doivent pas être fermés par défaut"
+        )
+
+    def test_details_open_pour_chaque_vue(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        vues = [
+            "mvc/views/welcome/index.html",
+            "mvc/views/welcome/cycle.html",
+            "mvc/views/welcome/request_example.html",
+            "mvc/views/welcome/response_example.html",
+            "mvc/views/welcome/routing_example.html",
+            "mvc/views/welcome/not_found_demo.html",
+        ]
+        for vue in vues:
+            assert f"<details open>\n<summary><code>{vue}" in content, (
+                f"La vue {vue} doit être dans un <details open> visible par défaut"
+            )
+
+    def test_doc_mentionne_classe_controleur_principale(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "classe contrôleur principale" in content, (
+            "La doc doit mentionner qu'il y a une classe contrôleur principale"
+        )
+
+    def test_doc_mentionne_six_templates(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "six templates HTML" in content, (
+            "La doc doit préciser que le starter contient six templates HTML"
+        )
+
+
 class TestWelcomeStarterDryRun:
     """forge starter:build 7 --dry-run s'exécute sans erreur."""
 
