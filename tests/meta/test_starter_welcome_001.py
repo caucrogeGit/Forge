@@ -156,6 +156,44 @@ class TestWelcomeStarterDoc:
         assert "6 routes" in content or "/welcome" in content
 
 
+class TestWelcomeStarterDocNavigation:
+    """Le starter welcome est intégré dans la navigation MkDocs et la page générale des starters."""
+
+    def test_mkdocs_yml_reference_welcome(self):
+        content = (PROJECT_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+        assert "starters/welcome/index.md" in content, (
+            "mkdocs.yml doit référencer starters/welcome/index.md dans la navigation"
+        )
+
+    def test_starters_index_mentionne_bienvenue(self):
+        content = (PROJECT_ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
+        assert "Bienvenue" in content, (
+            "docs/starters/index.md doit mentionner 'Bienvenue dans Forge'"
+        )
+
+    def test_starters_index_mentionne_lien_welcome(self):
+        content = (PROJECT_ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
+        assert "welcome/" in content, (
+            "docs/starters/index.md doit contenir un lien vers welcome/"
+        )
+
+    def test_starters_index_documente_commande_welcome(self):
+        content = (PROJECT_ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
+        assert "--starter welcome" in content or "starter:build 7" in content, (
+            "docs/starters/index.md doit documenter 'forge new --starter welcome' "
+            "ou 'forge starter:build 7'"
+        )
+
+    def test_landing_pointe_vers_starters_welcome(self):
+        landing = (PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html").read_text(
+            encoding="utf-8"
+        )
+        assert "starters/welcome/" in landing, (
+            "La landing doit contenir un lien vers starters/welcome/ "
+            "(pas vers la page générale starters/)"
+        )
+
+
 class TestWelcomeStarterDryRun:
     """forge starter:build 7 --dry-run s'exécute sans erreur."""
 
