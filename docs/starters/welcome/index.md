@@ -7,7 +7,7 @@
     Il sert uniquement à comprendre comment Forge traite une requête HTTP.
 
 <div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 58%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
-  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Forge · Starter 7 — Sans base de données</p>
+  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Forge · Premier pas — Sans base de données</p>
   <h2 style="margin:.1rem 0 .45rem 0;font-size:1.6rem;line-height:1.15;color:#0F172A;">Cycle HTTP illustré</h2>
   <p style="margin:0;color:#334155;font-size:1rem;">Découvrez le traitement d'une requête HTTP dans Forge. Cycle HTML : Request → Router → Controller → View → Response HTML. Cycle JSON : Request → Router → Controller → Response JSON. Sans SQL, sans base de données, sans entité, sans migration, sans CRUD.</p>
 </div>
@@ -19,6 +19,8 @@ Ce starter montre **comment Forge traite une requête HTTP**, depuis l'URL saisi
 Vous n'avez pas besoin de configurer MariaDB, de créer des entités ni d'initialiser une base. Un simple `python app.py` suffit pour ouvrir les pages pédagogiques.
 
 Ce starter est volontairement rassurant : **sans SQL, sans base de données, sans entité, sans migration, sans CRUD**. Il isole le premier geste à comprendre avant tout le reste.
+
+Référence technique : ce starter reste le **Starter 7** dans la CLI Forge.
 
 ## Ce que vous allez comprendre
 
@@ -36,7 +38,7 @@ Forge distingue deux types de réponses. Ils partagent le même début, puis div
 ### Cycle HTML — via la View
 
 ```mermaid
-flowchart LR
+flowchart TB
     A["Request<br/>GET /welcome"] --> B["Router<br/>mvc/routes.py"]
     B --> C["Controller<br/>WelcomeController.index"]
     C --> D["View<br/>welcome/index.html"]
@@ -56,7 +58,7 @@ Forge charge alors le template Jinja2, produit le HTML, puis renvoie une `Respon
 ### Cycle JSON — sans View
 
 ```mermaid
-flowchart LR
+flowchart TB
     A["Request"] --> B["Router<br/>mvc/routes.py"]
     B --> C["Controller"]
     C --> D["Response JSON<br/>application/json"]
@@ -196,6 +198,7 @@ La Response ne décide pas du contrôleur à appeler. Elle porte le statut HTTP,
 
 ```text
 mvc/
+├── routes.py                    ← 6 routes injectées par le starter
 ├── controllers/
 │   └── welcome_controller.py    ← WelcomeController (6 méthodes)
 └── views/
@@ -206,7 +209,6 @@ mvc/
         ├── response_example.html  ← types de réponses Forge
         ├── routing_example.html   ← déclaration des routes
         └── not_found_demo.html    ← gestion 404 et erreurs
-mvc/routes.py                      ← 6 routes injectées par le starter
 ```
 
 ## Routes — correspondance route / concept / code
@@ -256,6 +258,13 @@ Ce starter est volontairement limité au cycle HTTP de base. Il n'illustre **pas
 
 Cette limite est une qualité pédagogique : le premier contact avec Forge reste lisible.
 
+!!! success "À retenir"
+    - Le Router choisit le Controller.
+    - Le Controller décide quoi retourner.
+    - La View produit le HTML.
+    - La Response repart vers le navigateur.
+    - Le JSON peut être renvoyé sans View.
+
 ## Après ce starter
 
 Une fois le cycle HTTP assimilé, passez au **Starter 1 — Contacts** pour un premier CRUD complet avec base de données.
@@ -264,4 +273,4 @@ Une fois le cycle HTTP assimilé, passez au **Starter 1 — Contacts** pour un p
 forge starter:build 1 --init-db
 ```
 
-[Starter 1 — Contacts](../01-contact-simple/index.md) · [Vue d'ensemble des starters](../index.md)
+[Starter 1 — Contacts](../01-contact-simple/) · [Vue d'ensemble des starters](../)

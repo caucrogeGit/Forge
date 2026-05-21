@@ -284,9 +284,14 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_contient_schema_mermaid(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "```mermaid" in content and "flowchart LR" in content, (
+        assert "```mermaid" in content and "flowchart TB" in content, (
             "La doc doit remplacer les schémas ASCII par des schémas Mermaid"
         )
+
+    def test_doc_badge_public_non_numerique(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Forge · Premier pas — Sans base de données" in content
+        assert "Forge · Starter 7 — Sans base de données" not in content
 
     def test_doc_cycle_html_complet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
@@ -353,6 +358,7 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_contient_structure_projet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "├── routes.py" in content
         assert "controllers/" in content and "views/" in content, (
             "La doc doit présenter la structure du projet déployé"
         )
@@ -372,6 +378,19 @@ class TestWelcomeStarterDocPedagogy:
     def test_doc_preserve_message_sans_sql(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert "Sans SQL, sans base de données, sans entité, sans migration, sans CRUD" in content
+
+    def test_doc_contient_bloc_a_retenir(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert '!!! success "À retenir"' in content
+        assert "Le Router choisit le Controller." in content
+        assert "Le JSON peut être renvoyé sans View." in content
+
+    def test_doc_liens_finaux_propres(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "[Starter 1 — Contacts](../01-contact-simple/)" in content
+        assert "[Vue d'ensemble des starters](../)" in content
+        assert "../01-contact-simple/index.md" not in content
+        assert "../index.md" not in content
 
 
 class TestWelcomeStarterDryRun:
