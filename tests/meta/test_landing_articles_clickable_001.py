@@ -1,7 +1,7 @@
 """Garde-fou LANDING-ARTICLES-CLICKABLE-001.
 
-Vérifie que les 6 cartes de la landing page sont wrappées dans un <a href>
-pointant vers une page de documentation existante.
+Vérifie que les 21 cartes de la landing page sont wrappées dans un <a href>
+pointant vers des URLs absolues valides de la documentation.
 """
 from __future__ import annotations
 
@@ -16,13 +16,30 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 LANDING = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
 DOCS = PROJECT_ROOT / "docs"
 
-EXPECTED_HREFS = [
-    # 6 cartes fonctionnalités (LANDING-BETA6-MENU-001)
-    "entities/json-canonique.html",
-    "migrations.html",
-    "crud.html",
-    "reference/cli-commands.html",
-    "starters/index.html",
+BASE_URL = "https://caucrogegit.github.io/Forge/"
+
+EXPECTED_DOC_PATHS = [
+    # Core Forge (17 cartes)
+    "concepts",
+    "front",
+    "migrations",
+    "entity_architecture",
+    "crud",
+    "reference/crud",
+    "security",
+    "auth",
+    "media",
+    "mail",
+    "reference/cli-commands",
+    "deployment",
+    "api-json",
+    # Nouveau beta.6
+    "entities/json-canonique",
+    # Modules opt-in (4 cartes)
+    "reference/auth-mfa",
+    "rbac",
+    "reference/workflow",
+    "reference/stats",
 ]
 
 
@@ -31,47 +48,48 @@ class TestLandingArticlesClickable:
     def test_landing_file_exists(self):
         assert LANDING.exists()
 
-    def test_6_articles_are_wrapped_in_links(self):
+    def test_21_articles_are_wrapped_in_links(self):
         text = LANDING.read_text(encoding="utf-8")
-        # Each wrapped article has <a href="..." class="block group">
-        wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group">', text)
-        assert len(wrapped) == 6, (
-            f"Attendu 6 articles wrappés dans <a class=\"block group\">, "
-            f"trouvé {len(wrapped)}. (LANDING-BETA6-MENU-001)"
+        wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
+        assert len(wrapped) == 21, (
+            f"Attendu 21 cartes wrappées dans <a class=\"block group\">, "
+            f"trouvé {len(wrapped)}."
         )
 
     def test_all_wrapped_articles_have_group_hover_on_h3(self):
         text = LANDING.read_text(encoding="utf-8")
-        # Extract each <a class="block group">...</a> block
         blocks = re.findall(
-            r'<a\s+href="[^"]+"\s+class="block group">.*?</a>',
+            r'<a\s+href="[^"]+"\s+class="block group"[^>]*>.*?</a>',
             text,
             re.DOTALL,
         )
-        missing = [
-            b for b in blocks
-            if 'group-hover:landing-accent-text' not in b
-        ]
+        missing = [b for b in blocks if 'group-hover:landing-accent-text' not in b]
         assert not missing, (
-            f"{len(missing)} article(s) wrappé(s) sans group-hover:landing-accent-text sur le <h3>."
+            f"{len(missing)} carte(s) sans group-hover:landing-accent-text sur le <h3>."
         )
 
-    @pytest.mark.parametrize("href", sorted(set(EXPECTED_HREFS)))
-    def test_href_target_doc_exists(self, href):
-        # .html → .md (docs source)
-        md_path = DOCS / href.replace(".html", ".md")
+    def test_all_links_are_absolute(self):
+        text = LANDING.read_text(encoding="utf-8")
+        hrefs = re.findall(r'<a\s+href="([^"]+)"\s+class="block group"', text)
+        relative = [h for h in hrefs if not h.startswith("http")]
+        assert not relative, (
+            f"Liens relatifs trouvés (causent des 404) : {relative}"
+        )
+
+    @pytest.mark.parametrize("doc_path", sorted(set(EXPECTED_DOC_PATHS)))
+    def test_doc_source_exists(self, doc_path):
+        md_path = DOCS / f"{doc_path}.md"
         assert md_path.exists(), (
-            f"Page doc manquante pour href='{href}' : {md_path.relative_to(PROJECT_ROOT)}"
+            f"Page doc manquante pour '{doc_path}' : {md_path.relative_to(PROJECT_ROOT)}"
         )
 
     def test_articles_have_cursor_pointer(self):
         text = LANDING.read_text(encoding="utf-8")
-        # All wrapped articles should have cursor-pointer
         article_blocks = re.findall(
-            r'<a\s+href="[^"]+"\s+class="block group">\s*<article[^>]+>',
+            r'<a\s+href="[^"]+"\s+class="block group"[^>]*>\s*<article[^>]+>',
             text,
         )
         missing = [b for b in article_blocks if "cursor-pointer" not in b]
         assert not missing, (
-            f"{len(missing)} article(s) wrappés sans cursor-pointer."
+            f"{len(missing)} carte(s) sans cursor-pointer."
         )
