@@ -89,18 +89,14 @@ class TestNewElementsPresent:
             "Forge est sous licence propriétaire / source disponible, pas open source (cf. LICENSE)"
         )
 
-    def test_core_h2_renamed(self):
-        assert "L'écosystème Forge" in self.source, (
-            "Le H2 de la section Core devrait être 'L'écosystème Forge.'"
+    def test_positioning_phrase_present(self):
+        assert "Forge génère un MVC CRUD explicite" in self.source, (
+            "La phrase de positionnement CRUD doit apparaître dans la landing (LANDING-BETA6-MENU-001)"
         )
 
-    def test_modules_subsection_exists(self):
-        assert 'id="modules"' in self.source, (
-            "La sous-section Modules officiels devrait avoir id='modules' "
-            "pour ancre nav"
-        )
-        assert "Modules officiels opt-in" in self.source, (
-            "Le H3 'Modules officiels opt-in' devrait être présent"
+    def test_faq_section_exists(self):
+        assert 'id="faq"' in self.source, (
+            "La section FAQ devrait avoir id='faq' (LANDING-BETA6-MENU-001)"
         )
 
     @pytest.mark.parametrize("module_name", [
@@ -114,12 +110,9 @@ class TestNewElementsPresent:
             f"Le module {module_name} devrait être mentionné dans la landing"
         )
 
-    def test_stack_section_exists(self):
-        assert 'id="stack"' in self.source, (
-            "La nouvelle section Stack devrait avoir id='stack'"
-        )
-        assert "La stack Forge" in self.source, (
-            "Le H2 de la section Stack devrait être 'La stack Forge.'"
+    def test_positioning_section_exists(self):
+        assert 'id="positionnement"' in self.source, (
+            "La section Positionnement devrait avoir id='positionnement' (LANDING-BETA6-MENU-001)"
         )
 
     @pytest.mark.parametrize("stack_techno", [
@@ -132,7 +125,7 @@ class TestNewElementsPresent:
     ])
     def test_stack_mentions_all_technos(self, stack_techno):
         assert stack_techno in self.source, (
-            f"La section Stack devrait mentionner {stack_techno}"
+            f"La landing devrait mentionner {stack_techno} quelque part dans le contenu"
         )
 
     @pytest.mark.parametrize("stack_url", [
@@ -148,68 +141,65 @@ class TestNewElementsPresent:
             f"La section Stack devrait avoir un lien vers {stack_url}"
         )
 
-    def test_charter_button_exists(self):
+    def test_charter_link_exists(self):
         assert "CHARTE_DOC.md" in self.source, (
-            "La section Documentation devrait avoir un bouton vers "
-            "CHARTE_DOC.md sur GitHub"
+            "La landing devrait avoir un lien vers CHARTE_DOC.md sur GitHub"
         )
 
     def test_test_count_mentioned(self):
-        assert "Plus de 9000 tests" in self.source, (
-            "La mention de tests devrait dire 'Plus de 9000 tests' "
-            "(au lieu de l'ancienne 'Plus de 8000 tests')"
+        assert "12 000 tests" in self.source, (
+            "La mention de tests devrait dire '12 000 tests' (version beta.6)"
         )
 
 
 class TestNavigationStructure:
-    """La navigation a la nouvelle structure (5 entrées + 2 dropdowns)."""
+    """La navigation a la structure beta.6 (7 entrées plates, sans dropdowns)."""
 
     def setup_method(self):
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
 
-    def test_uses_details_for_dropdowns(self):
-        """Les dropdowns sont implémentés avec <details>/<summary>."""
+    def test_uses_details_for_faq(self):
+        """La FAQ utilise <details>/<summary> pour les accordéons."""
         details_count = self.source.count("<details")
-        assert details_count >= 2, (
-            f"La nav devrait contenir au moins 2 <details> (dropdowns "
-            f"Briques et Projet), trouvé {details_count}"
+        assert details_count >= 6, (
+            f"La FAQ devrait contenir au moins 6 <details> (une par question), "
+            f"trouvé {details_count}"
         )
 
     @pytest.mark.parametrize("nav_label", [
-        ">Forge<",                  # logo/marque
-        ">Installation<",
+        ">Forge<",          # logo/marque
+        ">Démarrer<",
+        ">CRUD<",
         ">Starters<",
-        "Briques",                  # summary du dropdown (multi-ligne avec SVG)
-        ">Documentation<",
-        "Projet",                   # summary du dropdown (multi-ligne avec SVG)
+        ">Architecture<",
+        ">Référence<",
+        ">GitHub<",
     ])
     def test_nav_entry_present(self, nav_label):
         assert nav_label in self.source, (
-            f"La nav devrait contenir l'entrée '{nav_label}'"
+            f"La nav devrait contenir l'entrée '{nav_label}' "
+            f"(menu LANDING-BETA6-MENU-001)"
         )
 
-    def test_briques_dropdown_items(self):
-        """Le dropdown Briques contient Core, Modules, CLI."""
-        briques_pos = self.source.find("Briques")
-        if briques_pos == -1:
-            pytest.fail("Mention 'Briques' introuvable")
-        following = self.source[briques_pos:briques_pos + 1200]
-        assert ">Core<" in following, "Le dropdown Briques devrait contenir Core"
-        assert ">Modules<" in following, "Le dropdown Briques devrait contenir Modules"
-        assert ">CLI<" in following, "Le dropdown Briques devrait contenir CLI"
+    def test_no_briques_dropdown_in_nav(self):
+        """Le dropdown 'Briques' a été supprimé du menu principal (LANDING-BETA6-MENU-001)."""
+        nav_end = self.source.find("</nav>")
+        nav_section = self.source[:nav_end] if nav_end != -1 else self.source[:500]
+        assert ">Briques<" not in nav_section and "Briques\n" not in nav_section, (
+            "Le dropdown Briques ne devrait plus être dans la nav (remplacé par CRUD, Architecture)"
+        )
 
-    def test_projet_dropdown_items(self):
-        """Le dropdown Projet contient Roadmap et GitHub."""
-        projet_pos = self.source.find("Projet")
-        if projet_pos == -1:
-            pytest.fail("Mention 'Projet' introuvable")
-        following = self.source[projet_pos:projet_pos + 1500]
-        assert ">Roadmap<" in following, "Le dropdown Projet devrait contenir Roadmap"
-        assert ">GitHub<" in following, "Le dropdown Projet devrait contenir GitHub"
+    def test_no_projet_dropdown_in_nav(self):
+        """Le dropdown 'Projet' a été supprimé du menu principal (LANDING-BETA6-MENU-001)."""
+        nav_end = self.source.find("</nav>")
+        nav_section = self.source[:nav_end] if nav_end != -1 else self.source[:500]
+        assert ">Projet<" not in nav_section and "Projet\n" not in nav_section, (
+            "Le dropdown Projet ne devrait plus être dans la nav (GitHub direct en entrée)"
+        )
 
 
 class TestStateSectionRefonte:
-    """La section État a été refondue pour la version courante."""
+    """La section positionnement contient les éléments clés de l'état du projet."""
 
     def setup_method(self):
         import tomllib
@@ -220,18 +210,18 @@ class TestStateSectionRefonte:
 
     def test_state_mentions_current_version(self):
         assert f"Forge {self._semver}" in self.source, (
-            f"Le bloc 'État actuel' devrait mentionner Forge {self._semver}"
+            f"La landing devrait mentionner Forge {self._semver}"
         )
 
     def test_state_mentions_source_ouverture(self):
         assert "ouverture du code source" in self.source, (
-            "Le bloc 'État actuel' devrait mentionner l'ouverture du code source "
-            "(remplace 'open source' — cf. LANDING-LICENSE-WORDING-001)"
+            "La landing devrait mentionner l'ouverture du code source "
+            "(cf. LANDING-LICENSE-WORDING-001)"
         )
 
     def test_state_mentions_modules_count(self):
         assert "4 modules officiels" in self.source, (
-            "Le bloc 'État actuel' devrait mentionner les 4 modules officiels"
+            "La landing devrait mentionner les 4 modules officiels"
         )
 
     def test_state_no_obsolete_phases(self):
@@ -241,15 +231,15 @@ class TestStateSectionRefonte:
 
     def test_after_3_0_section(self):
         assert "Après 3.0" in self.source, (
-            "Le bloc droite devrait avoir le badge 'Après 3.0'"
+            "La landing devrait avoir un bloc 'Après 3.0' (roadmap)"
         )
 
     def test_after_3_0_mentions_stabilization(self):
         assert "Stabilisation" in self.source, (
-            "Le bloc 'Après 3.0' devrait parler de Stabilisation"
+            "La landing devrait parler de Stabilisation (roadmap 3.x)"
         )
         assert "Auth/User avancée" not in self.source, (
-            "Le bloc 'Après 3.0' ne devrait plus dire 'Auth/User avancée' "
+            "La landing ne devrait plus dire 'Auth/User avancée' "
             "(MFA et RBAC sont déjà des modules)"
         )
 
@@ -261,7 +251,7 @@ class TestSyncedToDocsIndex:
         content = LANDING_GENERATED.read_text(encoding="utf-8")
         assert "FICHIER GENERE PAR forge sync:landing" in content, (
             "docs/index.html devrait avoir l'en-tête indiquant qu'il est "
-            "généré par forge sync:landing"
+            "généré — ajouter le commentaire ou relancer forge sync:landing"
         )
 
     def test_version_synced(self):

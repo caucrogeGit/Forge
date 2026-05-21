@@ -1,6 +1,6 @@
 """Garde-fou LANDING-ARTICLES-CLICKABLE-001.
 
-Vérifie que les 21 articles de la landing page sont wrappés dans un <a href>
+Vérifie que les 6 cartes de la landing page sont wrappées dans un <a href>
 pointant vers une page de documentation existante.
 """
 from __future__ import annotations
@@ -17,26 +17,12 @@ LANDING = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
 DOCS = PROJECT_ROOT / "docs"
 
 EXPECTED_HREFS = [
-    # Core Forge (17)
-    "concepts.html",
-    "front.html",
+    # 6 cartes fonctionnalités (LANDING-BETA6-MENU-001)
+    "entities/json-canonique.html",
     "migrations.html",
-    "entity_architecture.html",
     "crud.html",
-    "reference/crud.html",
-    "security.html",
-    "auth.html",
-    "media.html",
-    "mail.html",
-    "deployment.html",
-    "api-json.html",
-    "reference/api.html",
     "reference/cli-commands.html",
-    # Modules opt-in (4)
-    "reference/auth-mfa.html",
-    "rbac.html",
-    "reference/workflow.html",
-    "reference/stats.html",
+    "starters/index.html",
 ]
 
 
@@ -45,13 +31,13 @@ class TestLandingArticlesClickable:
     def test_landing_file_exists(self):
         assert LANDING.exists()
 
-    def test_21_articles_are_wrapped_in_links(self):
+    def test_6_articles_are_wrapped_in_links(self):
         text = LANDING.read_text(encoding="utf-8")
         # Each wrapped article has <a href="..." class="block group">
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group">', text)
-        assert len(wrapped) == 21, (
-            f"Attendu 21 articles wrappés dans <a class=\"block group\">, "
-            f"trouvé {len(wrapped)}."
+        assert len(wrapped) == 6, (
+            f"Attendu 6 articles wrappés dans <a class=\"block group\">, "
+            f"trouvé {len(wrapped)}. (LANDING-BETA6-MENU-001)"
         )
 
     def test_all_wrapped_articles_have_group_hover_on_h3(self):

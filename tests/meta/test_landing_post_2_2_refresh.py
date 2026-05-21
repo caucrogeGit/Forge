@@ -80,19 +80,12 @@ class TestBriquesCore:
         assert "CRUD" in _src()
 
     def test_rbac(self):
-        assert "RBAC" in _src()
+        # "forge-mvc-rbac" remplace la carte "RBAC" (LANDING-BETA6-MENU-001)
+        assert "forge-mvc-rbac" in _src()
 
     def test_auth_user(self):
-        assert "Auth/User" in _src()
-
-    def test_media(self):
-        assert "Médias" in _src() or "médias" in _src()
-
-    def test_mail(self):
-        assert "Mail" in _src()
-
-    def test_api_json(self):
-        assert "API JSON" in _src()
+        # Section starter utilisateurs/auth remplace l'ancienne carte Auth/User
+        assert "utilisateurs-auth" in _src()
 
     def test_securite(self):
         assert "Sécurité" in _src() or "sécurité" in _src()
@@ -115,9 +108,10 @@ class TestApportsRecents:
         src = _src()
         assert "MFA" in src or "argon2" in src or "login" in src
 
-    def test_api_json_detail(self):
+    def test_modules_opt_in_mentionne(self):
+        # Les modules opt-in remplacent les briques API JSON / Médias / Mail
         src = _src()
-        assert "Bearer" in src or "json_response" in src or "endpoints JSON" in src
+        assert "forge-mvc-mfa" in src or "forge-mvc-rbac" in src
 
     def test_tests_mentionnes(self):
         src = _src()
@@ -149,12 +143,14 @@ class TestEtatActuel:
                 or "documentation avancée" in src)
 
     def test_prochaine_priorite_auth(self):
+        # Le starter auth remplace l'ancienne prochaine-priorité Auth/User
         src = _src()
-        assert "Auth/User" in src
+        assert "utilisateurs-auth" in src or "authentification" in src.lower()
 
-    def test_mfa_ou_oidc_mentionne(self):
+    def test_mfa_mentionne(self):
+        # forge-mvc-mfa remplace la mention "MFA" ou "OIDC" (OIDC retiré — ADR-004)
         src = _src()
-        assert "MFA" in src or "OIDC" in src
+        assert "forge-mvc-mfa" in src
 
 
 # ---------------------------------------------------------------------------
@@ -163,23 +159,24 @@ class TestEtatActuel:
 
 
 class TestLiens:
-    def test_lien_15min(self):
-        assert "15-minutes" in _src() or "15 min" in _src()
+    def test_lien_getting_started(self):
+        # "getting-started" remplace les anciens liens "15-minutes" et "app-complete"
+        assert "getting-started" in _src() or "guide" in _src()
 
-    def test_lien_app_complete(self):
-        assert "app-complete-tutorial" in _src() or "application complète" in _src().lower()
+    def test_lien_starters(self):
+        # Section Starters progressive remplace "app-complete-tutorial"
+        assert "starters" in _src()
 
     def test_lien_reference(self):
         assert "reference" in _src() or "référence" in _src().lower()
 
-    def test_lien_api_json(self):
-        assert "api-json" in _src()
+    def test_lien_deploiement(self):
+        # Lien déploiement remplace "production-security" et "api-json"
+        assert "deployment" in _src() or "déploiement" in _src().lower()
 
-    def test_lien_securite_production(self):
-        assert "production-security" in _src() or "sécurité production" in _src().lower()
-
-    def test_lien_release(self):
-        assert "release-policy" in _src() or "Release" in _src()
+    def test_lien_roadmap(self):
+        # Lien roadmap remplace "release-policy"
+        assert "roadmap" in _src()
 
     def test_lien_contributing(self):
         assert "contributing" in _src() or "Contribuer" in _src()
