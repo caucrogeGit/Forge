@@ -276,6 +276,55 @@ class TestWelcomeStarterDocNavigation:
 class TestWelcomeStarterDocPedagogy:
     """La documentation welcome est pédagogique et détaillée (DOC-PREMIER-PAS-PEDAGOGY-001)."""
 
+    def test_doc_contient_code_complet_genere(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "## Le code complet généré par ce starter" in content
+        assert "### 1. Les routes complètes" in content
+        assert "### 2. Le contrôleur complet" in content
+        assert "### 3. Les 6 vues complètes" in content
+
+    def test_doc_contient_chemins_code_reel(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        expected_paths = [
+            "mvc/routes.py",
+            "mvc/controllers/welcome_controller.py",
+            "mvc/views/welcome/index.html",
+            "mvc/views/welcome/cycle.html",
+            "mvc/views/welcome/request_example.html",
+            "mvc/views/welcome/response_example.html",
+            "mvc/views/welcome/routing_example.html",
+            "mvc/views/welcome/not_found_demo.html",
+        ]
+        for path in expected_paths:
+            assert path in content, f"{path} doit apparaître dans la doc welcome"
+
+    def test_doc_contient_routes_reelles_completes(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        expected_routes = [
+            'pub.add("GET", "/welcome",           WelcomeController.index',
+            'pub.add("GET", "/welcome/cycle",     WelcomeController.cycle',
+            'pub.add("GET", "/welcome/request",   WelcomeController.request_example',
+            'pub.add("GET", "/welcome/response",  WelcomeController.response_example',
+            'pub.add("GET", "/welcome/routing",   WelcomeController.routing_example',
+            'pub.add("GET", "/welcome/404-demo",  WelcomeController.not_found_demo',
+        ]
+        for route in expected_routes:
+            assert route in content, f"Route réelle absente de la doc : {route}"
+
+    def test_doc_contient_controller_reel_complet(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        expected_methods = [
+            "def index(request):",
+            "def cycle(request):",
+            "def request_example(request):",
+            "def response_example(request):",
+            "def routing_example(request):",
+            "def not_found_demo(request):",
+        ]
+        assert "class WelcomeController(BaseController):" in content
+        for method in expected_methods:
+            assert method in content, f"Méthode réelle absente de la doc : {method}"
+
     def test_doc_titre_public_complet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert "Premier pas — Bienvenue dans Forge" in content, (
@@ -325,12 +374,19 @@ class TestWelcomeStarterDocPedagogy:
             "La doc doit expliquer le Controller avec l'API réelle du starter"
         )
 
-    def test_doc_contient_table_routes_concepts(self):
+    def test_doc_contient_table_url_methode_vue(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "| Route | Concept | À lire dans le code |" in content
-        assert "/welcome/cycle" in content and "WelcomeController.cycle" in content, (
-            "La doc doit contenir une table route/concept/code avec /welcome/cycle"
-        )
+        assert "| URL | Méthode contrôleur | Vue rendue |" in content
+        expected_rows = [
+            "| `/welcome` | `WelcomeController.index` | `welcome/index.html` |",
+            "| `/welcome/cycle` | `WelcomeController.cycle` | `welcome/cycle.html` |",
+            "| `/welcome/request` | `WelcomeController.request_example` | `welcome/request_example.html` |",
+            "| `/welcome/response` | `WelcomeController.response_example` | `welcome/response_example.html` |",
+            "| `/welcome/routing` | `WelcomeController.routing_example` | `welcome/routing_example.html` |",
+            "| `/welcome/404-demo` | `WelcomeController.not_found_demo` | `welcome/not_found_demo.html` |",
+        ]
+        for row in expected_rows:
+            assert row in content, f"Ligne table URL/méthode/vue absente : {row}"
 
     def test_doc_url_http_pas_https(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
@@ -346,9 +402,10 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_contient_parcours_lecture(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "## Visite guidée en 10 minutes" in content, (
-            "La doc doit proposer une visite guidée directive"
+        assert "## Lire l’application dans le bon ordre" in content, (
+            "La doc doit proposer un parcours de lecture directive"
         )
+        assert "## Visite guidée en 10 minutes" not in content
 
     def test_doc_contient_limites(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
@@ -371,9 +428,16 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_ne_contient_pas_api_inventee(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        forbidden = ["self.render", "self.redirect", "router.get", "JSONResponse"]
+        forbidden = ["self.render", "self.redirect", "router.get("]
         found = [needle for needle in forbidden if needle in content]
         assert not found, f"API approximative ou absente du starter documentée : {found}"
+
+    def test_doc_ne_documente_pas_router_get(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "router.get(" not in content, (
+            "La doc ne doit pas documenter router.get( si cette API n'existe pas "
+            "dans le starter welcome"
+        )
 
     def test_doc_preserve_message_sans_sql(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
