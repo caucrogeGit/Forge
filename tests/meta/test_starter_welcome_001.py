@@ -273,6 +273,84 @@ class TestWelcomeStarterDocNavigation:
         )
 
 
+class TestWelcomeStarterDocPedagogy:
+    """La documentation welcome est pédagogique et détaillée (DOC-PREMIER-PAS-PEDAGOGY-001)."""
+
+    def test_doc_contient_diagramme_ascii(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "───" in content, (
+            "La doc doit contenir un diagramme ASCII avec des traits horizontaux ───"
+        )
+
+    def test_doc_cycle_html_complet(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Request → Router → Controller → View → Response HTML" in content, (
+            "La doc doit présenter le cycle HTML complet : "
+            "'Request → Router → Controller → View → Response HTML'"
+        )
+
+    def test_doc_cycle_json_complet(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Request → Router → Controller → Response JSON" in content, (
+            "La doc doit présenter le cycle JSON complet : "
+            "'Request → Router → Controller → Response JSON'"
+        )
+
+    def test_doc_explique_request(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "request.method" in content or "request.path" in content, (
+            "La doc doit expliquer l'objet Request avec ses attributs"
+        )
+
+    def test_doc_explique_router(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "mvc/routes.py" in content, (
+            "La doc doit mentionner mvc/routes.py pour expliquer le Router"
+        )
+
+    def test_doc_explique_controller(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "self.render" in content or "WelcomeController" in content, (
+            "La doc doit expliquer le Controller avec des exemples concrets"
+        )
+
+    def test_doc_contient_table_routes_concepts(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "/welcome/cycle" in content, (
+            "La doc doit contenir une table routes/concepts avec /welcome/cycle"
+        )
+
+    def test_doc_url_http_pas_https(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "http://localhost:8000/welcome" in content, (
+            "La doc doit utiliser http:// et non https:// pour localhost"
+        )
+
+    def test_doc_pas_url_https_localhost(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "https://localhost:8000/welcome" not in content, (
+            "La doc ne doit pas contenir https://localhost (le dev tourne en HTTP)"
+        )
+
+    def test_doc_contient_parcours_lecture(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Parcours" in content or "parcours" in content, (
+            "La doc doit proposer un parcours de lecture recommandé"
+        )
+
+    def test_doc_contient_limites(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "ne fait pas" in content or "ne fait **pas**" in content, (
+            "La doc doit décrire ce que ce starter ne fait pas"
+        )
+
+    def test_doc_contient_structure_projet(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "controllers/" in content and "views/" in content, (
+            "La doc doit présenter la structure du projet déployé"
+        )
+
+
 class TestWelcomeStarterDryRun:
     """forge starter:build 7 --dry-run s'exécute sans erreur."""
 
