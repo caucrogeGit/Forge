@@ -229,14 +229,15 @@ class TestStateSectionRefonte:
             "L'ancien texte 'Phases 0 à 10' ne devrait plus apparaître"
         )
 
-    def test_after_3_0_section(self):
-        assert "Après 3.0" in self.source, (
-            "La landing devrait avoir un bloc 'Après 3.0' (roadmap)"
+    def test_trajectoire_section(self):
+        # "Après 3.0" remplacé par "Trajectoire 1.0" (LANDING-CARDS-LINKS-ORDER-001)
+        assert "Trajectoire 1.0" in self.source, (
+            "La landing devrait avoir un bloc 'Trajectoire 1.0' (roadmap)"
         )
 
-    def test_after_3_0_mentions_stabilization(self):
+    def test_trajectoire_mentions_stabilization(self):
         assert "Stabilisation" in self.source, (
-            "La landing devrait parler de Stabilisation (roadmap 3.x)"
+            "La landing devrait parler de Stabilisation (roadmap)"
         )
         assert "Auth/User avancée" not in self.source, (
             "La landing ne devrait plus dire 'Auth/User avancée' "

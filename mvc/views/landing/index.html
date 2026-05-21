@@ -114,6 +114,92 @@
   </div>
 </section>
 
+<!-- Installation -->
+<section id="installation" class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Installer Forge selon votre usage.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Deux parcours séparés : utiliser Forge pour créer une application, ou travailler sur le framework lui-même.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="rounded-xl border border-slate-200 p-8">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Créer une application avec Forge</div>
+        <h3 class="text-xl font-semibold mb-4">Parcours utilisateur du framework</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-5">
+          Pour installer la commande Forge, créer un projet et lancer le serveur de développement.
+        </p>
+        <div class="landing-panel rounded-xl overflow-hidden border border-white/10">
+          <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="text-white/35"># Dernière bêta</span>
+<span class="landing-accent-text">$</span> pip install --pre forge-mvc
+
+<span class="text-white/35"># Version fixée</span>
+<span class="landing-accent-text">$</span> pip install forge-mvc==1.0.0b6
+
+<span class="landing-accent-text">$</span> forge new mon-app
+<span class="landing-accent-text">$</span> cd mon-app
+<span class="landing-accent-text">$</span> forge doctor
+<span class="landing-accent-text">$</span> python app.py</pre>
+        </div>
+        <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+          Version publique : <strong>1.0.0-beta.6</strong> — Version PyPI : <strong>1.0.0b6</strong><br>
+          Forge est en bêta — <code class="text-xs">--pre</code> est requis avec pip ou pipx.
+        </p>
+        <div class="mt-5 flex gap-3">
+          <a href="https://caucrogegit.github.io/Forge/installation/"
+             target="_blank" rel="noopener noreferrer"
+             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Guide installation</a>
+          <button data-copy="pip install --pre forge-mvc" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-slate-500 hover:text-slate-900 transition-colors">Copier</button>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-8">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Contribuer au framework Forge</div>
+        <h3 class="text-xl font-semibold mb-4">Parcours développement du core</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-5">
+          Pour cloner le dépôt, installer l'environnement de développement et lancer les validations.
+        </p>
+        <div class="landing-panel rounded-xl overflow-hidden border border-white/10">
+          <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> git clone https://github.com/caucrogeGit/Forge.git
+<span class="landing-accent-text">$</span> cd Forge
+<span class="landing-accent-text">$</span> python -m venv .venv
+<span class="landing-accent-text">$</span> source .venv/bin/activate
+<span class="landing-accent-text">$</span> pip install -e .
+<span class="landing-accent-text">$</span> pytest
+<span class="landing-accent-text">$</span> mkdocs build --strict</pre>
+        </div>
+        <div class="mt-5 flex gap-3">
+          <a href="https://caucrogegit.github.io/Forge/installation-developpement/"
+             target="_blank" rel="noopener noreferrer"
+             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Guide développement</a>
+          <button data-copy="git clone https://github.com/caucrogeGit/Forge.git" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-slate-500 hover:text-slate-900 transition-colors">Copier</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="landing-highlight-note mt-10 rounded-xl p-5 border text-sm leading-relaxed">
+      Pour la production, le déploiement est traité séparément : Nginx, systemd, variables d'environnement,
+      HTTPS et contrôles avec <code>forge deploy:check</code>.
+      <a href="https://caucrogegit.github.io/Forge/deployment/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Voir le guide de déploiement</a>.
+      Sur Windows, la voie recommandée est WSL2.
+      <a href="https://caucrogegit.github.io/Forge/installation-windows/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Guide Windows (WSL2)</a>.
+      <span class="block mt-3 text-slate-400 text-xs">
+        Forge repose sur
+        <a href="https://docs.python.org/3.12/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Python 3.12+</a>,
+        <a href="https://mariadb.org/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">MariaDB</a>,
+        <a href="https://jinja.palletsprojects.com/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Jinja2</a> pour le rendu serveur,
+        <a href="https://htmx.org/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">HTMX</a> pour l'interactivité progressive,
+        <a href="https://alpinejs.dev/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Alpine.js</a> en option légère,
+        et <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Tailwind</a> pour les utilities CSS.
+      </span>
+    </div>
+  </div>
+</section>
+
 <!-- Cartes de fonctionnalités -->
 <section class="py-24 px-6 bg-white">
   <div class="max-w-5xl mx-auto">
@@ -267,8 +353,8 @@
       </article>
       </a>
 
-      <!-- Nouveau beta.6 : JSON Schema pour les entités -->
-      <a href="https://caucrogegit.github.io/Forge/entities/json-canonique/" class="block group" target="_blank" rel="noopener noreferrer">
+      <!-- JSON Schema (entity-schema) -->
+      <a href="https://caucrogegit.github.io/Forge/entities/entity-schema/" class="block group" target="_blank" rel="noopener noreferrer">
       <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
         <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
@@ -314,7 +400,8 @@
     <div id="modules" class="mt-16 mb-10">
       <h3 class="text-2xl font-bold tracking-tight mb-3">Modules officiels opt-in</h3>
       <p class="text-slate-500 text-sm max-w-2xl">
-        Installables séparément via pip. Publiés sur PyPI depuis 1.0.0-beta.6 —
+        Modules officiels opt-in de Forge, installables séparément selon leur état de disponibilité.
+        Leur publication PyPI est progressive à partir de la série 1.0.0-beta.6 —
         <code class="text-xs bg-slate-100 px-2 py-0.5 rounded">pip install --pre forge-mvc-rbac</code>.
       </p>
     </div>
@@ -460,92 +547,6 @@ router = Router()
 <span class="text-white/35"># Garder la main.</span></pre>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- Installation -->
-<section id="installation" class="py-24 px-6 bg-white">
-  <div class="max-w-5xl mx-auto">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold tracking-tight mb-4">
-        Installer Forge selon votre usage.
-      </h2>
-      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
-        Deux parcours séparés : utiliser Forge pour créer une application, ou travailler sur le framework lui-même.
-      </p>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-5">
-      <div class="rounded-xl border border-slate-200 p-8">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Créer une application avec Forge</div>
-        <h3 class="text-xl font-semibold mb-4">Parcours utilisateur du framework</h3>
-        <p class="text-sm text-slate-500 leading-relaxed mb-5">
-          Pour installer la commande Forge, créer un projet et lancer le serveur de développement.
-        </p>
-        <div class="landing-panel rounded-xl overflow-hidden border border-white/10">
-          <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="text-white/35"># Dernière bêta</span>
-<span class="landing-accent-text">$</span> pip install --pre forge-mvc
-
-<span class="text-white/35"># Version fixée</span>
-<span class="landing-accent-text">$</span> pip install forge-mvc==1.0.0b6
-
-<span class="landing-accent-text">$</span> forge new mon-app
-<span class="landing-accent-text">$</span> cd mon-app
-<span class="landing-accent-text">$</span> forge doctor
-<span class="landing-accent-text">$</span> python app.py</pre>
-        </div>
-        <p class="text-xs text-slate-400 mt-3 leading-relaxed">
-          Version publique : <strong>1.0.0-beta.6</strong> — Version PyPI : <strong>1.0.0b6</strong><br>
-          Forge est en bêta — <code class="text-xs">--pre</code> est requis avec pip ou pipx.
-        </p>
-        <div class="mt-5 flex gap-3">
-          <a href="https://caucrogegit.github.io/Forge/installation/"
-             target="_blank" rel="noopener noreferrer"
-             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Guide installation</a>
-          <button data-copy="pip install --pre forge-mvc" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-slate-500 hover:text-slate-900 transition-colors">Copier</button>
-        </div>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 p-8">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Contribuer au framework Forge</div>
-        <h3 class="text-xl font-semibold mb-4">Parcours développement du core</h3>
-        <p class="text-sm text-slate-500 leading-relaxed mb-5">
-          Pour cloner le dépôt, installer l'environnement de développement et lancer les validations.
-        </p>
-        <div class="landing-panel rounded-xl overflow-hidden border border-white/10">
-          <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> git clone https://github.com/caucrogeGit/Forge.git
-<span class="landing-accent-text">$</span> cd Forge
-<span class="landing-accent-text">$</span> python -m venv .venv
-<span class="landing-accent-text">$</span> source .venv/bin/activate
-<span class="landing-accent-text">$</span> pip install -e .
-<span class="landing-accent-text">$</span> pytest
-<span class="landing-accent-text">$</span> mkdocs build --strict</pre>
-        </div>
-        <div class="mt-5 flex gap-3">
-          <a href="https://caucrogegit.github.io/Forge/installation-developpement/"
-             target="_blank" rel="noopener noreferrer"
-             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Guide développement</a>
-          <button data-copy="git clone https://github.com/caucrogeGit/Forge.git" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-slate-500 hover:text-slate-900 transition-colors">Copier</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="landing-highlight-note mt-10 rounded-xl p-5 border text-sm leading-relaxed">
-      Pour la production, le déploiement est traité séparément : Nginx, systemd, variables d'environnement,
-      HTTPS et contrôles avec <code>forge deploy:check</code>.
-      <a href="https://caucrogegit.github.io/Forge/deployment/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Voir le guide de déploiement</a>.
-      Sur Windows, la voie recommandée est WSL2.
-      <a href="https://caucrogegit.github.io/Forge/installation-windows/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Guide Windows (WSL2)</a>.
-      <span class="block mt-3 text-slate-400 text-xs">
-        Forge repose sur
-        <a href="https://docs.python.org/3.12/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Python 3.12+</a>,
-        <a href="https://mariadb.org/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">MariaDB</a>,
-        <a href="https://jinja.palletsprojects.com/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Jinja2</a> pour le rendu serveur,
-        <a href="https://htmx.org/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">HTMX</a> pour l'interactivité progressive,
-        <a href="https://alpinejs.dev/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Alpine.js</a> en option légère,
-        et <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Tailwind</a> pour les utilities CSS.
-      </span>
     </div>
   </div>
 </section>
@@ -754,12 +755,11 @@ router = Router()
       </div>
 
       <div class="landing-panel rounded-xl p-8 border border-white/10">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Après 3.0</div>
-        <h3 class="text-2xl font-bold tracking-tight text-white mb-4">Stabilisation</h3>
+        <div class="text-xs landing-accent-text font-semibold mb-2">Trajectoire 1.0</div>
+        <h3 class="text-2xl font-bold tracking-tight text-white mb-4">Stabilisation bêta</h3>
         <p class="text-white/60 text-sm leading-relaxed mb-5">
           Stabilisation continue, consolidation des APIs modules, raffinements de packaging.
           Forge reste un framework explicite, pédagogique et durable.
-          Rendu possible par le socle technique solide de la série 3.x.
         </p>
         <a href="https://caucrogegit.github.io/Forge/roadmap/forge-roadmap/"
            target="_blank" rel="noopener noreferrer"

@@ -33,8 +33,8 @@ EXPECTED_DOC_PATHS = [
     "reference/cli-commands",
     "deployment",
     "api-json",
-    # Nouveau beta.6
-    "entities/json-canonique",
+    # Nouveau beta.6 — page spécifique entity-schema
+    "entities/entity-schema",
     # Modules opt-in (4 cartes)
     "reference/auth-mfa",
     "rbac",
