@@ -1,29 +1,29 @@
 # Publication PyPI — forge-mvc-rbac 1.0.0-beta.6
 
 **Date** : 2026-05-21
-**Ticket** : PYPI-OPTINS-001-PUBLISH-FORGE-MVC-RBAC-1.0.0B6
-**Statut** : **ARRÊT CONTRÔLÉ — TOKEN INSUFFISANT**
+**Ticket** : PYPI-OPTINS-001-RETRY-PUBLISH-FORGE-MVC-RBAC-1.0.0B6
+**Statut** : **LIVRÉ**
 
 ---
 
 ## 1. Résumé
 
-Tentative de publication de `forge-mvc-rbac==1.0.0b6` sur PyPI.
-Upload bloqué par HTTP 403 : le token API configuré est scopé au seul projet
-`forge-mvc` et ne dispose pas des droits pour `forge-mvc-rbac`.
+Publication de `forge-mvc-rbac==1.0.0b6` sur PyPI réalisée avec succès.
+Upload effectué en une seule tentative, sans erreur HTTP 403 ni HTTP 429.
 
-**Aucune publication effective. Aucune boucle d'upload. Aucune autre opt-in tentée.**
+Contexte : la tentative précédente (PYPI-OPTINS-001) avait échoué sur HTTP 403
+car le token PyPI était limité au projet `forge-mvc`. Un nouveau token
+« Tous les projets » a été créé et configuré dans `~/.pypirc` (PYPI-TOKEN-001).
 
 ---
 
-## 2. Version publiée
+## 2. Contexte
 
 | Élément | Valeur |
 |---|---|
-| Package | forge-mvc-rbac |
-| Version PEP 440 | `1.0.0b6` |
-| Version publique | `1.0.0-beta.6` |
-| PyPI | **NON publié** — arrêt sur 403 |
+| Ticket précédent | PYPI-OPTINS-001 — arrêt HTTP 403 |
+| Correction appliquée | PYPI-TOKEN-001 — nouveau token account-scoped |
+| Core déjà publié | `forge-mvc==1.0.0b6` (PYPI-PUBLISH-CORE-001) |
 
 ---
 
@@ -32,7 +32,7 @@ Upload bloqué par HTTP 403 : le token API configuré est scopé au seul projet
 | Élément | Valeur |
 |---|---|
 | Branche | `main` |
-| Commit HEAD | `ea663fe` |
+| Commit HEAD avant publication | `c701150` — docs: record PyPI token setup for opt-ins |
 | Tag | `v1.0.0-beta.6` ✓ |
 | Copie de travail | propre (rien à valider) |
 
@@ -41,8 +41,9 @@ Upload bloqué par HTTP 403 : le token API configuré est scopé au seul projet
 ## 4. Vérification préalable PyPI
 
 - `forge-mvc-rbac==1.0.0b6` existait déjà : **NON**
-- Commande : `python -m pip install --no-cache-dir --pre forge-mvc-rbac==1.0.0b6 --dry-run`
-- Résultat : `Could not find a version that satisfies the requirement forge-mvc-rbac==1.0.0b6 (from versions: none)`
+- Commande : `python -m pip index versions forge-mvc-rbac`
+- Résultat : `ERROR: No matching distribution found for forge-mvc-rbac`
+- Décision : upload autorisé
 
 ---
 
@@ -50,8 +51,9 @@ Upload bloqué par HTTP 403 : le token API configuré est scopé au seul projet
 
 | Commande | Résultat |
 |---|---|
-| Nettoyage dist (b4, b5) | OK |
-| `python -m build` | `forge_mvc_rbac-1.0.0b6.tar.gz` + `.whl` ✓ |
+| Nettoyage dist/build/egg-info | OK (shutil.rmtree) |
+| `python -m build` | `Successfully built forge_mvc_rbac-1.0.0b6.tar.gz and forge_mvc_rbac-1.0.0b6-py3-none-any.whl` |
+| `python -m twine check dist/*` | **PASSED** (whl + tar.gz) |
 
 ---
 
@@ -66,42 +68,29 @@ Upload bloqué par HTTP 403 : le token API configuré est scopé au seul projet
 
 ## 7. Upload PyPI
 
-- Commande : `python -m twine upload forge_mvc_rbac-1.0.0b6-py3-none-any.whl forge_mvc_rbac-1.0.0b6.tar.gz`
-- Résultat : **ÉCHEC — HTTP 403 Forbidden**
+- Commande : `python -m twine upload dist/*`
+- Résultat : **succès**
+- URL : https://pypi.org/project/forge-mvc-rbac/1.0.0b6/
+- HTTP 403 rencontré : **NON**
 - HTTP 429 rencontré : **NON**
-- Nombre de tentatives upload : **1** (arrêt immédiat après l'échec)
-
-**Erreur exacte (extrait verbose) :**
-
-```
-403 Invalid API Token: project-scoped token is not valid for project:
-'forge-mvc-rbac', project-scoped token is not valid for project: 'forge-mvc-rbac'
-```
-
-**Cause** : le token API dans `~/.pypirc` est scopé au projet `forge-mvc` uniquement.
-Il n'a pas les droits pour publier un nouveau projet `forge-mvc-rbac`.
-
-**Action requise** : créer sur PyPI un nouveau token API avec l'un des scopes suivants :
-
-- **Option A (recommandée)** : token **account-scoped** (`Entire account`) couvrant
-  tous les projets `forge-mvc-*` à publier.
-- **Option B** : token project-scoped pour `forge-mvc-rbac` — mais il faut d'abord
-  que le projet existe sur PyPI (premier upload depuis l'interface ou avec un token
-  account-scoped).
-
-Procédure : https://pypi.org/manage/account/token/
+- Nombre de tentatives upload : **1**
 
 ---
 
 ## 8. Vérification installation
 
-Non effectuée — upload échoué.
+Venv isolé : `/tmp/forge-rbac-pypi-check`
+
+| Commande | Résultat |
+|---|---|
+| `pip install --pre forge-mvc==1.0.0b6` | OK |
+| `pip install --pre forge-mvc-rbac==1.0.0b6` | OK |
+| `import forge_mvc_rbac` | `forge_mvc_rbac import OK` |
+| `from forge_mvc_rbac import has_permission, require_permission` | `RBAC public imports OK` |
 
 ---
 
 ## 9. Autres opt-ins
-
-Aucun opt-in tenté dans ce ticket, conformément à la règle d'arrêt.
 
 | Package | Statut |
 |---|---|
@@ -110,39 +99,33 @@ Aucun opt-in tenté dans ce ticket, conformément à la règle d'arrêt.
 | forge-mvc-media | **NON publié** |
 | forge-mvc-mfa | **NON publié** |
 
+Aucun autre opt-in n'était dans le périmètre de ce ticket.
+
 ---
 
-## 10. Incidents éventuels
+## 10. Incidents
 
-**HTTP 403 — Token project-scoped insuffisant**
-
-Le token configuré dans `~/.pypirc` a été créé avec le scope `forge-mvc`
-(projet unique). PyPI refuse l'upload pour tout autre nom de projet, même
-appartenant au même compte.
-
-Ce blocage est attendu et documenté. Il n'y a pas de bug dans le package.
+Aucun incident. Le token « Tous les projets » (PYPI-TOKEN-001) a fonctionné
+correctement dès la première tentative.
 
 ---
 
 ## 11. Prochain ticket recommandé
 
-**PYPI-TOKEN-OPTINS-001** — Créer un token PyPI account-scoped (ou des tokens
-project-scoped par opt-in) et relancer la publication des opt-ins.
-
-Après résolution du token, reprendre avec :
-- PYPI-OPTINS-001 (rbac) — à relancer
-- PYPI-OPTINS-002 (workflow)
-- PYPI-OPTINS-003 (stats)
+**PYPI-OPTINS-002** — Publier `forge-mvc-workflow==1.0.0b6`
 
 ---
 
 ## 12. Conclusion
 
-Ticket arrêté proprement après HTTP 403 conformément à la règle d'arrêt.
+Ticket considéré comme terminé parce que :
 
-- `forge-mvc-rbac` : **non publié** — token insuffisant
-- `forge-mvc` core : déjà publié (ticket PYPI-PUBLISH-CORE-001)
+- `forge-mvc-rbac==1.0.0b6` est publié sur PyPI
+- L'installation depuis PyPI est vérifiée dans un venv isolé
+- Les imports publics (`has_permission`, `require_permission`) fonctionnent
 - Aucun tag créé
 - Aucune modification de version
 - Aucune boucle d'upload (1 seule tentative)
-- opt-ins workflow/stats/media/mfa : non tentés
+- HTTP 429 : NON — HTTP 403 : NON
+- `forge-mvc` core : déjà publié (PYPI-PUBLISH-CORE-001)
+- opt-ins workflow/stats/media/mfa : non tentés (hors périmètre)
