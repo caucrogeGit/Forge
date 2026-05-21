@@ -173,7 +173,7 @@ def test_dispatch_parse_profile_option():
 
     calls = []
 
-    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE):
+    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE, starter=None):
         calls.append({"name": name, "ref": ref, "profile": profile})
 
     with (
@@ -192,7 +192,7 @@ def test_dispatch_profile_defaut_si_absent():
 
     calls = []
 
-    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE):
+    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE, starter=None):
         calls.append({"profile": profile})
 
     with (
@@ -209,7 +209,7 @@ def test_dispatch_profile_et_ref_simultanement():
 
     calls = []
 
-    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE):
+    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE, starter=None):
         calls.append({"ref": ref, "profile": profile})
 
     with (

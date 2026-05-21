@@ -254,7 +254,7 @@ def test_dispatch_ref_transmis_a_cmd_new(monkeypatch, tmp_path, capsys):
     """forge new MonProjet --ref main doit transmettre ref='main'."""
     received = {}
 
-    def spy_cmd_new(name, ref=None, profile="standard"):
+    def spy_cmd_new(name, ref=None, profile="standard", starter=None):
         received["ref"] = ref
 
     monkeypatch.setattr(sys, "argv", ["forge", "new", "MonProjet", "--ref", "main"])

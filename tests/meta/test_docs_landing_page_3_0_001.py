@@ -166,10 +166,19 @@ class TestNavigationStructure:
             f"trouvé {details_count}"
         )
 
+    def test_nav_logo_present(self):
+        """Le logo forge-logo.png remplace le texte >Forge< dans la nav (LANDING-WELCOME-POLISH-001)."""
+        nav_end = self.source.find("</nav>")
+        nav_section = self.source[:nav_end] if nav_end != -1 else self.source[:600]
+        assert "forge-logo.png" in nav_section, (
+            "La nav devrait contenir une image forge-logo.png (logo remplace le texte Forge)"
+        )
+        assert ">Forge<" not in nav_section, (
+            "Le texte >Forge< ne devrait plus être dans la nav — remplacé par le logo"
+        )
+
     @pytest.mark.parametrize("nav_label", [
-        ">Forge<",          # logo/marque
         ">Démarrer<",
-        ">CRUD<",
         ">Starters<",
         ">Architecture<",
         ">Référence<",
@@ -179,6 +188,14 @@ class TestNavigationStructure:
         assert nav_label in self.source, (
             f"La nav devrait contenir l'entrée '{nav_label}' "
             f"(menu LANDING-BETA6-MENU-001)"
+        )
+
+    def test_no_crud_in_nav(self):
+        """CRUD supprimé de la nav principale (LANDING-WELCOME-POLISH-001)."""
+        nav_end = self.source.find("</nav>")
+        nav_section = self.source[:nav_end] if nav_end != -1 else self.source[:600]
+        assert ">CRUD<" not in nav_section, (
+            "L'entrée CRUD ne devrait plus être dans la nav principale"
         )
 
     def test_no_briques_dropdown_in_nav(self):
