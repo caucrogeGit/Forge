@@ -32,10 +32,16 @@
     <h1 class="text-4xl font-bold mb-4 leading-tight">
       Bienvenue dans <span class="text-orange-400">Forge</span>.
     </h1>
-    <p class="text-gray-400 text-lg leading-relaxed mb-12">
+    <p class="text-gray-400 text-lg leading-relaxed mb-6">
       Ce starter illustre le cycle HTTP de Forge sans base de données.
       Chaque page démontre une étape du traitement d'une requête.
     </p>
+
+    <div class="mb-10 p-5 bg-gray-900 border border-gray-800 rounded-xl text-sm space-y-2">
+      <p class="text-xs font-mono text-gray-500 uppercase tracking-wide mb-3">Les deux cycles MVC Forge</p>
+      <p class="font-mono text-gray-300">Cycle HTML&nbsp;: Request → Router → Controller → <span class="text-green-400">View</span> → Response HTML</p>
+      <p class="font-mono text-gray-300">Cycle JSON&nbsp;: Request → Router → Controller → Response JSON</p>
+    </div>
 
     <div class="grid gap-4">
 
@@ -44,7 +50,7 @@
         <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center text-lg font-bold">1</div>
         <div>
           <h2 class="font-semibold text-gray-100 group-hover:text-orange-400 transition-colors mb-1">Cycle HTTP</h2>
-          <p class="text-sm text-gray-500">Visualiser le chemin complet : Navigateur → Requête → Routeur → Contrôleur → Réponse → Navigateur.</p>
+          <p class="text-sm text-gray-500">Visualiser les deux cycles : HTML (via View) et JSON (sans View). Comprendre le rôle de chaque étape.</p>
           <p class="text-xs text-orange-400 mt-2 font-mono">GET /welcome/cycle →</p>
         </div>
       </a>

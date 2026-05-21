@@ -156,6 +156,66 @@ class TestWelcomeStarterDoc:
         assert "6 routes" in content or "/welcome" in content
 
 
+class TestWelcomeStarterView:
+    """Le starter welcome documente explicitement la couche View (STARTER-WELCOME-VIEW-001)."""
+
+    def test_cycle_html_nomme_view(self):
+        cycle = (FILES_DIR / "mvc" / "views" / "welcome" / "cycle.html").read_text(encoding="utf-8")
+        assert "View" in cycle, "cycle.html doit nommer la couche View explicitement"
+
+    def test_cycle_html_documente_cycle_html_complet(self):
+        cycle = (FILES_DIR / "mvc" / "views" / "welcome" / "cycle.html").read_text(encoding="utf-8")
+        assert "Response HTML" in cycle, (
+            "cycle.html doit documenter le cycle HTML complet avec 'Response HTML'"
+        )
+
+    def test_cycle_html_documente_cycle_json(self):
+        cycle = (FILES_DIR / "mvc" / "views" / "welcome" / "cycle.html").read_text(encoding="utf-8")
+        assert "Response JSON" in cycle, (
+            "cycle.html doit documenter le cycle JSON séparé avec 'Response JSON'"
+        )
+
+    def test_index_html_presente_les_deux_cycles(self):
+        idx = (FILES_DIR / "mvc" / "views" / "welcome" / "index.html").read_text(encoding="utf-8")
+        assert "View" in idx, "index.html doit mentionner la couche View"
+        assert "JSON" in idx, "index.html doit mentionner le cycle JSON"
+
+    def test_response_example_distingue_html_et_json(self):
+        resp = (FILES_DIR / "mvc" / "views" / "welcome" / "response_example.html").read_text(
+            encoding="utf-8"
+        )
+        assert "View" in resp, "response_example.html doit mentionner la couche View"
+        assert "sans View" in resp or "Response JSON" in resp, (
+            "response_example.html doit préciser que JSON ne passe pas par une View"
+        )
+
+    def test_doc_mentionne_view(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "View" in content, "La doc du starter doit mentionner la couche View"
+
+    def test_doc_mentionne_cycle_html_avec_view(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Controller → View → Response HTML" in content, (
+            "La doc doit contenir 'Controller → View → Response HTML'"
+        )
+
+    def test_doc_mentionne_cycle_json_sans_view(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Response JSON" in content, (
+            "La doc doit mentionner le cycle JSON avec 'Response JSON'"
+        )
+
+    def test_pas_de_sql_dans_les_vues_welcome(self):
+        for view in ["index.html", "cycle.html", "response_example.html", "routing_example.html"]:
+            content = (FILES_DIR / "mvc" / "views" / "welcome" / view).read_text(
+                encoding="utf-8"
+            )
+            assert "import mariadb" not in content, f"{view} ne doit pas importer mariadb"
+            assert "SELECT " not in content and "INSERT " not in content, (
+                f"{view} ne doit pas contenir de requêtes SQL"
+            )
+
+
 class TestWelcomeStarterDocNavigation:
     """Le starter welcome est intégré dans la navigation MkDocs et la page générale des starters."""
 

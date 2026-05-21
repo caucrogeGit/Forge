@@ -4,7 +4,7 @@
   "name": "Bienvenue dans Forge",
   "kind": "skeleton",
   "aliases": ["welcome", "bienvenue", "7"],
-  "description": "Starter 7 — Cycle HTTP illustré : Request → Router → Controller → Response. Sans base de données.",
+  "description": "Starter 7 — Cycle HTTP illustré : HTML (via View) et JSON (sans View). Sans base de données.",
   "status": "available",
   "requires_db": false,
   "supports_public": true,

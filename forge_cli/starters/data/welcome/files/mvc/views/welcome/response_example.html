@@ -32,10 +32,11 @@
 
     <div class="space-y-4">
 
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
-        <p class="text-xs font-mono text-gray-500 uppercase tracking-wide mb-3">Réponse HTML (le plus courant)</p>
+      <div class="bg-gray-900 border border-green-500/20 rounded-xl p-6">
+        <p class="text-xs font-mono text-green-400/70 uppercase tracking-wide mb-1">Cycle HTML — via View</p>
+        <p class="text-xs text-gray-600 mb-3 font-mono">Request → Router → Controller → <span class="text-green-400">View</span> → Response HTML</p>
         <pre class="text-xs font-mono text-green-400 leading-relaxed overflow-x-auto">return BaseController.render(
-    "welcome/response_example.html",
+    "welcome/response_example.html",  # ← la View
     context={"cle": "valeur"},
     request=request,
 )
@@ -48,11 +49,13 @@
 # → HTTP 302 Found  +  Location: /welcome</pre>
       </div>
 
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
-        <p class="text-xs font-mono text-gray-500 uppercase tracking-wide mb-3">Réponse JSON (API)</p>
+      <div class="bg-gray-900 border border-blue-500/20 rounded-xl p-6">
+        <p class="text-xs font-mono text-blue-400/70 uppercase tracking-wide mb-1">Cycle JSON — sans View</p>
+        <p class="text-xs text-gray-600 mb-3 font-mono">Request → Router → Controller → Response JSON</p>
         <pre class="text-xs font-mono text-green-400 leading-relaxed overflow-x-auto">from core.http.response import JSONResponse
 return JSONResponse({"status": "ok", "version": "1.0"})
-# → HTTP 200 OK  +  Content-Type: application/json</pre>
+# → HTTP 200 OK  +  Content-Type: application/json
+# ↑ pas de View : le contrôleur construit directement la réponse</pre>
       </div>
 
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
