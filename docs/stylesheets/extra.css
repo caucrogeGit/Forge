@@ -1,0 +1,21 @@
+/* DOCS-NAV-LOGO-SIZE-001 — Agrandir le logo Forge dans la barre MkDocs */
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 8rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.md-header {
+  min-height: 8rem;
+}
+
+.md-header__inner {
+  min-height: 8rem;
+}
+
+/* Masquer le libellé texte "Forge" à côté du logo — redondant visuellement */
+.md-header__title .md-header__topic:first-child {
+  display: none;
+}
