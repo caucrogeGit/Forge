@@ -331,16 +331,23 @@ class TestWelcomeStarterDocPedagogy:
             "La doc doit conserver le libellé public complet du starter welcome"
         )
 
-    def test_doc_contient_schema_mermaid(self):
+    def test_doc_ne_contient_plus_bloc_html_orange(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "```mermaid" in content and "flowchart TB" in content, (
-            "La doc doit remplacer les schémas ASCII par des schémas Mermaid"
+        assert "border:1px solid #FED7AA" not in content
+        assert "linear-gradient" not in content
+
+    def test_doc_place_cycles_avant_code_complet(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "## Les deux cycles HTTP Forge" in content
+        assert "## Le code complet généré par ce starter" in content
+        assert content.index("## Les deux cycles HTTP Forge") < content.index(
+            "## Le code complet généré par ce starter"
         )
 
-    def test_doc_badge_public_non_numerique(self):
+    def test_doc_contient_onglets_cycles_http(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Forge · Premier pas — Sans base de données" in content
-        assert "Forge · Starter 7 — Sans base de données" not in content
+        assert '=== "Cycle HTML"' in content
+        assert '=== "Cycle JSON"' in content
 
     def test_doc_cycle_html_complet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
@@ -355,6 +362,23 @@ class TestWelcomeStarterDocPedagogy:
             "La doc doit présenter le cycle JSON complet : "
             "'Request → Router → Controller → Response JSON'"
         )
+
+    def test_doc_explique_app_py(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "## Où intervient `app.py` ?" in content
+        assert "python app.py" in content
+        assert "Forge reçoit la requête HTTP transmise par le serveur de développement" in content
+
+    def test_doc_explique_execution_controller(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "## Comment Forge exécute le contrôleur ?" in content
+        assert "Forge appelle WelcomeController.index(request)" in content
+        assert 'pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")' in content
+
+    def test_doc_contient_encadre_symfony(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert '!!! info "Si vous venez de Symfony"' in content
+        assert "`WelcomeController` est la classe contrôleur" in content
 
     def test_doc_explique_request(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
@@ -376,14 +400,14 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_contient_table_url_methode_vue(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "| URL | Méthode contrôleur | Vue rendue |" in content
+        assert "| URL | Méthode appelée | Vue rendue |" in content
         expected_rows = [
-            "| `/welcome` | `WelcomeController.index` | `welcome/index.html` |",
-            "| `/welcome/cycle` | `WelcomeController.cycle` | `welcome/cycle.html` |",
-            "| `/welcome/request` | `WelcomeController.request_example` | `welcome/request_example.html` |",
-            "| `/welcome/response` | `WelcomeController.response_example` | `welcome/response_example.html` |",
-            "| `/welcome/routing` | `WelcomeController.routing_example` | `welcome/routing_example.html` |",
-            "| `/welcome/404-demo` | `WelcomeController.not_found_demo` | `welcome/not_found_demo.html` |",
+            "| `/welcome` | `WelcomeController.index(request)` | `welcome/index.html` |",
+            "| `/welcome/cycle` | `WelcomeController.cycle(request)` | `welcome/cycle.html` |",
+            "| `/welcome/request` | `WelcomeController.request_example(request)` | `welcome/request_example.html` |",
+            "| `/welcome/response` | `WelcomeController.response_example(request)` | `welcome/response_example.html` |",
+            "| `/welcome/routing` | `WelcomeController.routing_example(request)` | `welcome/routing_example.html` |",
+            "| `/welcome/404-demo` | `WelcomeController.not_found_demo(request)` | `welcome/not_found_demo.html` |",
         ]
         for row in expected_rows:
             assert row in content, f"Ligne table URL/méthode/vue absente : {row}"
@@ -441,7 +465,17 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_preserve_message_sans_sql(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Sans SQL, sans base de données, sans entité, sans migration, sans CRUD" in content
+        assert "Sans SQL." in content
+        assert "Sans base de données." in content
+        assert "Sans entité." in content
+        assert "Sans migration." in content
+        assert "Sans CRUD." in content
+
+    def test_doc_explique_vues_html_simples(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "vues sont volontairement des fichiers HTML complets" in content
+        for marker in ["base.html", "include", "extends", "block"]:
+            assert marker in content
 
     def test_doc_contient_bloc_a_retenir(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
@@ -487,10 +521,10 @@ class TestWelcomeStarterDocCodeVisible:
             "La doc doit mentionner qu'il y a une classe contrôleur principale"
         )
 
-    def test_doc_mentionne_six_templates(self):
+    def test_doc_mentionne_six_vues_html(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "six templates HTML" in content, (
-            "La doc doit préciser que le starter contient six templates HTML"
+        assert "six vues HTML" in content, (
+            "La doc doit préciser que le starter contient six vues HTML"
         )
 
 

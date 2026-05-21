@@ -6,13 +6,97 @@
     Ce starter ne crée aucune table, ne lance aucune migration et ne demande aucune base de données.
     Il sert uniquement à comprendre comment Forge traite une requête HTTP.
 
-<div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 58%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
-  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Forge · Premier pas — Sans base de données</p>
-  <h2 style="margin:.1rem 0 .45rem 0;font-size:1.6rem;line-height:1.15;color:#0F172A;">Code réel, cycle HTTP visible</h2>
-  <p style="margin:0;color:#334155;font-size:1rem;">Avant les concepts, cette page montre le code complet généré par le starter. Sans SQL, sans base de données, sans entité, sans migration, sans CRUD.</p>
-</div>
+Sans SQL. Sans base de données. Sans entité. Sans migration. Sans CRUD.
 
 Référence technique : ce starter reste le **Starter 7** dans la CLI Forge.
+
+## Les deux cycles HTTP Forge
+
+Une requête Forge suit toujours le même début : elle devient une `Request`, le `Router` cherche une route, puis Forge appelle la méthode de contrôleur déclarée. Ensuite, le contrôleur choisit ce qu'il retourne.
+
+=== "Cycle HTML"
+
+    ```text
+    Request → Router → Controller → View → Response HTML
+    ```
+
+    Le contrôleur demande le rendu d'une vue HTML. Forge construit ensuite une réponse HTML envoyée au navigateur.
+
+    Dans ce starter, c'est le cycle réellement exécuté par les six routes `/welcome`.
+
+=== "Cycle JSON"
+
+    ```text
+    Request → Router → Controller → Response JSON
+    ```
+
+    Le contrôleur peut aussi retourner directement une réponse JSON. Dans ce cas, aucune View HTML n'est nécessaire.
+
+    Ce starter explique ce principe, mais il **n'expose pas de route JSON dédiée**.
+
+## Où intervient `app.py` ?
+
+`app.py` est le point d'entrée de l'application Forge en développement.
+
+Quand vous lancez :
+
+```bash
+python app.py
+```
+
+Forge démarre l'application, charge la configuration utile, prépare le routage et attend les requêtes HTTP.
+
+`app.py` ne contient pas la logique de la page `/welcome`. Il démarre l'application. Ensuite, quand le navigateur demande `/welcome`, Forge reçoit la requête HTTP transmise par le serveur de développement, construit une `Request`, puis la transmet au `Router`.
+
+```text
+python app.py
+    ↓
+application Forge démarrée
+    ↓
+navigateur → GET /welcome
+    ↓
+Request
+    ↓
+Router
+    ↓
+Controller
+    ↓
+View
+    ↓
+Response HTML
+```
+
+## Comment Forge exécute le contrôleur ?
+
+Ce n'est pas la classe seule qui s'exécute. Forge appelle une méthode précise de cette classe quand une route correspond à la requête.
+
+```text
+GET /welcome
+    ↓
+mvc/routes.py
+    ↓
+pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")
+    ↓
+Forge appelle WelcomeController.index(request)
+    ↓
+la méthode retourne une réponse Forge
+    ↓
+Response HTML
+```
+
+Dans le fichier réel, l'alignement contient des espaces pour rendre les six routes lisibles, mais le lien important reste celui-ci : `/welcome` appelle `WelcomeController.index`.
+
+!!! info "Si vous venez de Symfony"
+    Dans Symfony, une route appelle une action de contrôleur.
+    Dans Forge, le principe est similaire, mais volontairement explicite :
+
+    - `WelcomeController` est la classe contrôleur ;
+    - `index(request)` est l'action appelée ;
+    - la route dans `mvc/routes.py` relie l'URL à cette action ;
+    - la méthode retourne une réponse Forge ;
+    - Forge construit ensuite la réponse HTTP.
+
+    La différence importante : Forge montre directement le lien entre route et méthode, sans annotation ni configuration cachée.
 
 ## Le code complet généré par ce starter
 
@@ -89,7 +173,21 @@ Chaque méthode correspond à une route. Chaque méthode retourne une réponse F
 
 ### 3. Les 6 vues complètes
 
-Ce starter contient une classe contrôleur principale, `WelcomeController`, et six templates HTML — un par route. Les vues ci-dessous sont les fichiers HTML/Jinja2 réellement copiés dans `mvc/views/welcome/`.
+Ce starter contient une classe contrôleur principale, `WelcomeController`, et six vues HTML — une par route. Les vues ci-dessous sont les fichiers HTML complets réellement copiés dans `mvc/views/welcome/`.
+
+!!! note "Vues volontairement simples"
+    Dans ce premier starter, les vues sont volontairement des fichiers HTML complets.
+
+    Elles n'utilisent pas encore :
+
+    - `base.html` ;
+    - `{% include %}` ;
+    - `{% extends %}` ;
+    - `{% block %}`.
+
+    Ces mécanismes seront introduits plus tard. Ici, l'objectif est d'abord de comprendre le trajet :
+
+    route → contrôleur → vue → réponse.
 
 <details open>
 <summary><code>mvc/views/welcome/index.html</code> — route <code>/welcome</code>, méthode <code>WelcomeController.index</code>, vue <code>welcome/index.html</code></summary>
@@ -713,14 +811,14 @@ with router.group("", public=True) as pub:
 
 ## Correspondance URL / contrôleur / vue
 
-| URL | Méthode contrôleur | Vue rendue |
+| URL | Méthode appelée | Vue rendue |
 |---|---|---|
-| `/welcome` | `WelcomeController.index` | `welcome/index.html` |
-| `/welcome/cycle` | `WelcomeController.cycle` | `welcome/cycle.html` |
-| `/welcome/request` | `WelcomeController.request_example` | `welcome/request_example.html` |
-| `/welcome/response` | `WelcomeController.response_example` | `welcome/response_example.html` |
-| `/welcome/routing` | `WelcomeController.routing_example` | `welcome/routing_example.html` |
-| `/welcome/404-demo` | `WelcomeController.not_found_demo` | `welcome/not_found_demo.html` |
+| `/welcome` | `WelcomeController.index(request)` | `welcome/index.html` |
+| `/welcome/cycle` | `WelcomeController.cycle(request)` | `welcome/cycle.html` |
+| `/welcome/request` | `WelcomeController.request_example(request)` | `welcome/request_example.html` |
+| `/welcome/response` | `WelcomeController.response_example(request)` | `welcome/response_example.html` |
+| `/welcome/routing` | `WelcomeController.routing_example(request)` | `welcome/routing_example.html` |
+| `/welcome/404-demo` | `WelcomeController.not_found_demo(request)` | `welcome/not_found_demo.html` |
 
 ## Lire l’application dans le bon ordre
 
@@ -730,52 +828,6 @@ with router.group("", public=True) as pub:
 4. Ouvrez la vue rendue dans `mvc/views/welcome/`.
 5. Comparez le code HTML avec ce que vous voyez dans le navigateur.
 6. Refaites le même trajet avec `/welcome/cycle` puis `/welcome/request`.
-
-## Les deux cycles HTTP
-
-Les schémas ci-dessous résument le code que vous venez de lire.
-
-### Cycle HTML — via la View
-
-```mermaid
-flowchart TB
-    A["Request<br/>GET /welcome"] --> B["Router<br/>mvc/routes.py"]
-    B --> C["Controller<br/>WelcomeController.index"]
-    C --> D["View<br/>welcome/index.html"]
-    D --> E["Response HTML<br/>200 OK"]
-```
-
-**Request → Router → Controller → View → Response HTML**
-
-Dans le starter réel, le contrôleur appelle :
-
-```python
-return BaseController.render("welcome/index.html", request=request)
-```
-
-Forge charge alors le template Jinja2, produit le HTML, puis renvoie une `Response` au navigateur.
-
-### Cycle JSON — sans View
-
-```mermaid
-flowchart TB
-    A["Request"] --> B["Router<br/>mvc/routes.py"]
-    B --> C["Controller"]
-    C --> D["Response JSON<br/>application/json"]
-```
-
-**Request → Router → Controller → Response JSON**
-
-Ce starter explique le principe d'une réponse JSON, mais il **n'expose pas de route JSON dédiée**. Les six routes générées renvoient toutes des pages HTML pédagogiques.
-
-Dans Forge, une réponse JSON réelle peut être produite par un contrôleur avec l'API du `BaseController` :
-
-```python
-# Exemple conceptuel : cette route n'existe pas dans le starter welcome.
-return BaseController.json({"status": "ok"})
-```
-
-Ce point pourra être matérialisé par une route dédiée dans un ticket suivant si le starter doit démontrer le JSON en exécution.
 
 ## Les composants en détail
 
@@ -800,7 +852,7 @@ ctx = {
 }
 ```
 
-Elle ne choisit pas la route, ne rend pas de template et ne contient pas la logique métier. Elle transporte les informations de l'appel HTTP.
+Elle ne choisit pas la route, ne rend pas de vue et ne contient pas la logique métier. Elle transporte les informations de l'appel HTTP.
 
 ### Router
 
@@ -828,7 +880,7 @@ Les méthodes sont statiques et reçoivent explicitement `request`. Elles ne par
 
 ### View
 
-La `View` est le template HTML/Jinja2. Elle produit le corps HTML de la page.
+La `View` est une vue HTML rendue par le moteur de templates de Forge. Elle produit le corps HTML de la page.
 
 Dans ce starter, vous l'observez dans :
 
