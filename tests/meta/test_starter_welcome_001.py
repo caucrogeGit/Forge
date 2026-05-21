@@ -276,10 +276,16 @@ class TestWelcomeStarterDocNavigation:
 class TestWelcomeStarterDocPedagogy:
     """La documentation welcome est pédagogique et détaillée (DOC-PREMIER-PAS-PEDAGOGY-001)."""
 
-    def test_doc_contient_diagramme_ascii(self):
+    def test_doc_titre_public_complet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "───" in content, (
-            "La doc doit contenir un diagramme ASCII avec des traits horizontaux ───"
+        assert "Premier pas — Bienvenue dans Forge" in content, (
+            "La doc doit conserver le libellé public complet du starter welcome"
+        )
+
+    def test_doc_contient_schema_mermaid(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "```mermaid" in content and "flowchart LR" in content, (
+            "La doc doit remplacer les schémas ASCII par des schémas Mermaid"
         )
 
     def test_doc_cycle_html_complet(self):
@@ -310,14 +316,15 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_explique_controller(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "self.render" in content or "WelcomeController" in content, (
-            "La doc doit expliquer le Controller avec des exemples concrets"
+        assert "BaseController.render" in content and "WelcomeController" in content, (
+            "La doc doit expliquer le Controller avec l'API réelle du starter"
         )
 
     def test_doc_contient_table_routes_concepts(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "/welcome/cycle" in content, (
-            "La doc doit contenir une table routes/concepts avec /welcome/cycle"
+        assert "| Route | Concept | À lire dans le code |" in content
+        assert "/welcome/cycle" in content and "WelcomeController.cycle" in content, (
+            "La doc doit contenir une table route/concept/code avec /welcome/cycle"
         )
 
     def test_doc_url_http_pas_https(self):
@@ -334,8 +341,8 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_contient_parcours_lecture(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Parcours" in content or "parcours" in content, (
-            "La doc doit proposer un parcours de lecture recommandé"
+        assert "## Visite guidée en 10 minutes" in content, (
+            "La doc doit proposer une visite guidée directive"
         )
 
     def test_doc_contient_limites(self):
@@ -349,6 +356,22 @@ class TestWelcomeStarterDocPedagogy:
         assert "controllers/" in content and "views/" in content, (
             "La doc doit présenter la structure du projet déployé"
         )
+
+    def test_doc_clarifie_absence_route_json_reelle(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "n'expose pas de route JSON dédiée" in content, (
+            "La doc doit clarifier que le starter explique JSON sans route JSON réelle"
+        )
+
+    def test_doc_ne_contient_pas_api_inventee(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        forbidden = ["self.render", "self.redirect", "router.get", "JSONResponse"]
+        found = [needle for needle in forbidden if needle in content]
+        assert not found, f"API approximative ou absente du starter documentée : {found}"
+
+    def test_doc_preserve_message_sans_sql(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Sans SQL, sans base de données, sans entité, sans migration, sans CRUD" in content
 
 
 class TestWelcomeStarterDryRun:
