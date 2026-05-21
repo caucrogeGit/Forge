@@ -16,12 +16,37 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 | Starter | Statut | Profil associé | Usage recommandé |
 |---|---|---|---|
+| [7 — Bienvenue](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact avec Forge — cycle HTTP illustré, sans SQL |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
 | [4 — Suivi pédagogique](04-suivi-comportement-eleves/index.md) | Historique / legacy | Aucun profil principal | Consulter un exemple métier historique, non recommandé comme base moderne |
 | [5 — Communes & Séjours](communes-sejours/index.md) | Démonstrateur avancé principal | `standard` | Voir une application démonstratrice couvrant les briques modernes de Forge |
 | [6 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Pre-Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` |
+
+## Starter d'entrée (sans base de données)
+
+### Starter 7 — Bienvenue dans Forge
+
+Le starter d'entrée de Forge. Aucune base de données requise. Illustre le cycle HTTP en 6 pages éducatives.
+
+Profil recommandé : aucun — fonctionne sans `forge db:init`.
+
+- cycle HTTP complet illustré pas à pas ;
+- objet `Request` inspecté en direct ;
+- types de réponses (`render`, `redirect`, `JSONResponse`) ;
+- déclaration des routes dans `mvc/routes.py` ;
+- gestion des erreurs 404.
+
+**Usage :**
+
+```bash
+forge new mon-projet --starter welcome
+# ou dans un projet existant :
+forge starter:build 7
+```
+
+[Présentation](welcome/index.md)
 
 ## Starters officiels simples
 
@@ -139,12 +164,14 @@ Pour choisir un profil : [Profils de projet](../profiles.md).
 ## Génération automatique
 
 ```bash
+forge new mon-projet --starter welcome  # Bienvenue (sans BDD) — via forge new
 forge starter:build 1        # Contacts
 forge starter:build 2        # Utilisateurs / Auth
 forge starter:build 3        # Carnet de contacts
 forge starter:build 4        # Suivi pédagogique
 forge starter:build 5        # Communes & Séjours
 forge starter:build 6        # Auth MFA (Pre-Alpha)
+forge starter:build 7        # Bienvenue dans Forge (sans BDD)
 ```
 
 Les alias `contacts`, `auth`, `carnet`, `suivi`, `communes-sejours` et leurs variantes sont également supportés.

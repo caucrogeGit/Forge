@@ -18,15 +18,15 @@ ROOT = Path(__file__).resolve().parents[2]
 
 # ── Contrat des starters ──────────────────────────────────────────────────────
 
-def test_six_starters_declares():
-    """6 starters officiels sont déclarés."""
-    assert len(all_starters()) == 6
+def test_sept_starters_declares():
+    """7 starters officiels sont déclarés."""
+    assert len(all_starters()) == 7
 
 
-def test_starters_numero_1_a_6():
-    """Les starters sont numérotés de 1 à 6 sans trou."""
+def test_starters_numero_1_a_7():
+    """Les starters sont numérotés de 1 à 7 sans trou."""
     nums = [s["number"] for s in all_starters()]
-    assert nums == [1, 2, 3, 4, 5, 6]
+    assert nums == [1, 2, 3, 4, 5, 6, 7]
 
 
 def test_tous_les_starters_sont_disponibles():
@@ -35,8 +35,8 @@ def test_tous_les_starters_sont_disponibles():
         assert s.get("status") == "available", f"Starter {s['number']} non disponible"
 
 
-def test_starter_list_affiche_6_starters(capsys):
-    """forge starter:list affiche les 6 starters."""
+def test_starter_list_affiche_7_starters(capsys):
+    """forge starter:list affiche les 7 starters."""
     cmd_starter_list()
     output = capsys.readouterr().out
     for s in all_starters():
@@ -119,6 +119,7 @@ def test_chaque_starter_a_un_index_md():
         "03-carnet-contacts",
         "04-suivi-comportement-eleves",
         "communes-sejours",
+        "welcome",
     ]
     for dossier in attendus:
         index = ROOT / "docs" / "starters" / dossier / "index.md"

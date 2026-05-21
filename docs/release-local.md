@@ -175,7 +175,7 @@ forge doctor
 forge starter:list
 ```
 
-`forge starter:list` doit afficher les 6 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
+`forge starter:list` doit afficher les 7 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
 
 ---
 
@@ -191,6 +191,7 @@ forge starter:build 3 --force --dry-run
 forge starter:build 4 --force --dry-run
 forge starter:build 5 --force --dry-run
 forge starter:build 6 --force --dry-run
+forge starter:build 7 --force --dry-run
 ```
 
 !!! note "Ce que --dry-run valide"
@@ -418,6 +419,22 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ---
 
+### Starter 7 — Bienvenue dans Forge (sans BDD)
+
+Ce starter ne nécessite aucune base de données. Il s'applique directement via `forge new --starter welcome`.
+
+```bash
+cd ~/Projets
+forge new TestStarter7 --starter welcome
+cd TestStarter7
+source .venv/bin/activate
+python app.py
+```
+
+Dans le navigateur, ouvrir `https://localhost:8000/welcome` et naviguer entre les 6 pages éducatives.
+
+---
+
 ## 6. Tests automatiques et documentation
 
 ```bash
@@ -447,14 +464,15 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 |---|---|
 | `python -m build` | wheel créée dans `dist/` |
 | `forge --version` | `Forge {{forge_version}}` |
-| `forge starter:list` | 6 starters affichés |
-| `forge starter:build N --dry-run` | plan affiché sans erreur (×6) |
+| `forge starter:list` | 7 starters affichés |
+| `forge starter:build N --dry-run` | plan affiché sans erreur (×7) |
 | `forge db:init` + `starter:build 1` | CRUD contacts fonctionnel |
 | `forge db:init` + `starter:build 2` | login `admin` / `secret123` → `/dashboard` |
 | `forge db:init` + `starter:build 3` | contacts + villes, seed optionnel |
 | `forge db:init` + `starter:build 4` | auth + suivi + seed |
 | `forge db:init` + `starter:build 5` | pages publiques + formulaire séjour |
 | `forge db:init` + `starter:build 6` | auth + MFA TOTP (nécessite forge-mvc-mfa) |
+| `forge new MonProjet --starter welcome` | pages éducatives HTTP sans BDD |
 | `pytest tests/test_packaging.py` | 14/14 passants |
 | `mkdocs build --strict` | 0 avertissement d'ancre |
 

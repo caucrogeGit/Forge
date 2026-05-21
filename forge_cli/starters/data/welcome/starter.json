@@ -1,0 +1,20 @@
+{
+  "id": "welcome",
+  "number": 7,
+  "name": "Bienvenue dans Forge",
+  "kind": "skeleton",
+  "aliases": ["welcome", "bienvenue", "7"],
+  "description": "Starter 7 — Cycle HTTP illustré : Request → Router → Controller → Response. Sans base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/welcome",
+  "routes_marker": "welcome",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/welcome",
+  "doc_url": "https://caucrogegit.github.io/Forge/starters/welcome/",
+  "check_paths": [
+    "mvc/controllers/welcome_controller.py",
+    "mvc/views/welcome/index.html"
+  ]
+}

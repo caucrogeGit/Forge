@@ -101,6 +101,8 @@ nav:
       - Vue d'ensemble des starters: starters/index.md
       - Créer un module: module-author-guide.md
       - Créer un starter: starter-author-guide.md
+      - Bienvenue dans Forge:
+          - Présentation: starters/welcome/index.md
       - Contacts:
           - Présentation: starters/01-contact-simple/index.md
           - Reconstruction: starters/01-contact-simple/rebuild.md
