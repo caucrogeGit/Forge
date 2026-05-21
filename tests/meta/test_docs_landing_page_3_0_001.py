@@ -178,17 +178,17 @@ class TestNavigationStructure:
         )
 
     def test_nav_logo_h32(self):
-        """Le logo de navigation utilise h-32 w-auto object-contain (LANDING-STARTERS-RESTORE-001)."""
+        """Le logo de navigation utilise h-32 w-auto object-contain (LANDING-NAV-COMPACT-001)."""
         nav_end = self.source.find("</nav>")
         nav_section = self.source[:nav_end] if nav_end != -1 else self.source[:600]
         assert "h-32" in nav_section, (
             "Le logo de navigation doit utiliser h-32 (taille lisible)"
         )
-        assert "h-16" not in self.source[:nav_end + 10] or "min-h-" in nav_section, (
-            "La navbar ne devrait plus être en h-16 fixe avec un logo h-32"
+        assert "h-16" not in nav_section, (
+            "La navbar ne devrait plus être en h-16"
         )
-        assert "min-h-" in nav_section, (
-            "La navbar doit utiliser min-h- pour s'adapter au logo h-32"
+        assert "min-h-40" not in nav_section, (
+            "La navbar ne devrait plus utiliser min-h-40 — remplacé par h-32 compacte"
         )
 
     @pytest.mark.parametrize("nav_label", [

@@ -14,7 +14,7 @@
 <body class="landing-code-font bg-white text-slate-900 antialiased">
 
 <!-- Navigation -->
-<nav class="fixed top-0 inset-x-0 z-50 bg-[#111110] border-b border-white/10 min-h-40 flex items-center px-8 py-3">
+<nav class="fixed top-0 inset-x-0 z-50 bg-[#111110] border-b border-white/10 h-32 flex items-center px-8">
   <div class="flex items-center gap-7">
     <a href="#top" class="flex items-center shrink-0">
       <img src="./static/img/forge-logo.png" alt="Forge" class="h-32 w-auto object-contain">
@@ -59,7 +59,7 @@
 </nav>
 
 <!-- Hero -->
-<section id="top" class="landing-hero-bg pt-52 pb-24 px-6 text-center">
+<section id="top" class="landing-hero-bg pt-40 pb-24 px-6 text-center">
   <div class="flex justify-center mb-10">
     <img src="./static/img/forge-logo.png" alt="Forge" class="landing-logo-glow landing-logo-size object-contain">
   </div>
@@ -200,6 +200,88 @@
         <a href="https://alpinejs.dev/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Alpine.js</a> en option légère,
         et <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Tailwind</a> pour les utilities CSS.
       </span>
+    </div>
+  </div>
+</section>
+
+<!-- Starters -->
+<section id="starters" class="py-24 px-6 bg-slate-50">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Starters progressifs.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Les starters Forge sont des points de départ progressifs. Ils servent à découvrir,
+        tester et valider le framework, sans imposer une application métier unique.
+        Ils ne remplacent pas le core.
+      </p>
+      <p class="text-slate-400 text-sm max-w-2xl mx-auto mt-4">
+        4 modules officiels opt-in disponibles :
+        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-rbac</code>,
+        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-workflow</code>,
+        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-stats</code>,
+        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <a href="https://caucrogegit.github.io/Forge/starters/welcome/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all md:col-span-2">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Premier pas</div>
+        <h3 class="font-semibold text-lg mb-2">Bienvenue dans Forge</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Cycle HTTP illustré en 6 pages : Request → Router → Controller → Response. Fonctionne sans <code class="text-xs bg-slate-100 px-1 rounded">forge db:init</code>. Idéal comme premier contact.</p>
+        <p class="text-xs text-slate-400 mt-3 font-mono">forge new mon-projet --starter welcome</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/01-contact-simple/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 1</div>
+        <h3 class="font-semibold text-lg mb-2">Contacts</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Cycle complet d'un CRUD sur une entité : JSON canonique, SQL, formulaire, contrôleur et vues.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/02-utilisateurs-auth/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 2</div>
+        <h3 class="font-semibold text-lg mb-2">Utilisateurs et authentification</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Application de démonstration autour des sessions, du login/logout et des routes protégées.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/03-carnet-contacts/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 3</div>
+        <h3 class="font-semibold text-lg mb-2">Carnet relationnel</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Relations explicites, clés étrangères, tables pivots visibles et requêtes SQL lisibles.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/04-suivi-comportement-eleves/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 4</div>
+        <h3 class="font-semibold text-lg mb-2">Suivi pédagogique</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Démonstrateur plus dense : dashboard, relations, sécurité applicative et données métier.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/communes-sejours/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 5</div>
+        <h3 class="font-semibold text-lg mb-2">Communes &amp; Séjours</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Démonstrateur avancé : pages publiques, formulaire de demande, notifications mail et données réelles.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/auth-mfa/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 6</div>
+        <h3 class="font-semibold text-lg mb-2">Auth MFA (TOTP)</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Contrôleurs Auth avec authentification multi-facteurs TOTP. Nécessite <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>.</p>
+      </a>
     </div>
   </div>
 </section>
@@ -551,88 +633,6 @@ router = Router()
 <span class="text-white/35"># Garder la main.</span></pre>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- Starters -->
-<section id="starters" class="py-24 px-6 bg-slate-50">
-  <div class="max-w-5xl mx-auto">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold tracking-tight mb-4">
-        Starters progressifs.
-      </h2>
-      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
-        Les starters Forge sont des points de départ progressifs. Ils servent à découvrir,
-        tester et valider le framework, sans imposer une application métier unique.
-        Ils ne remplacent pas le core.
-      </p>
-      <p class="text-slate-400 text-sm max-w-2xl mx-auto mt-4">
-        4 modules officiels opt-in disponibles :
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-rbac</code>,
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-workflow</code>,
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-stats</code>,
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>.
-      </p>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-5">
-      <a href="https://caucrogegit.github.io/Forge/starters/welcome/"
-         target="_blank" rel="noopener noreferrer"
-         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all md:col-span-2">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Premier pas</div>
-        <h3 class="font-semibold text-lg mb-2">Bienvenue dans Forge</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">Cycle HTTP illustré en 6 pages : Request → Router → Controller → Response. Fonctionne sans <code class="text-xs bg-slate-100 px-1 rounded">forge db:init</code>. Idéal comme premier contact.</p>
-        <p class="text-xs text-slate-400 mt-3 font-mono">forge new mon-projet --starter welcome</p>
-      </a>
-
-      <a href="https://caucrogegit.github.io/Forge/starters/01-contact-simple/"
-         target="_blank" rel="noopener noreferrer"
-         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 1</div>
-        <h3 class="font-semibold text-lg mb-2">Contacts</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">Cycle complet d'un CRUD sur une entité : JSON canonique, SQL, formulaire, contrôleur et vues.</p>
-      </a>
-
-      <a href="https://caucrogegit.github.io/Forge/starters/02-utilisateurs-auth/"
-         target="_blank" rel="noopener noreferrer"
-         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 2</div>
-        <h3 class="font-semibold text-lg mb-2">Utilisateurs et authentification</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">Application de démonstration autour des sessions, du login/logout et des routes protégées.</p>
-      </a>
-
-      <a href="https://caucrogegit.github.io/Forge/starters/03-carnet-contacts/"
-         target="_blank" rel="noopener noreferrer"
-         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 3</div>
-        <h3 class="font-semibold text-lg mb-2">Carnet relationnel</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">Relations explicites, clés étrangères, tables pivots visibles et requêtes SQL lisibles.</p>
-      </a>
-
-      <a href="https://caucrogegit.github.io/Forge/starters/04-suivi-comportement-eleves/"
-         target="_blank" rel="noopener noreferrer"
-         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 4</div>
-        <h3 class="font-semibold text-lg mb-2">Suivi pédagogique</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">Démonstrateur plus dense : dashboard, relations, sécurité applicative et données métier.</p>
-      </a>
-
-      <a href="https://caucrogegit.github.io/Forge/starters/communes-sejours/"
-         target="_blank" rel="noopener noreferrer"
-         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 5</div>
-        <h3 class="font-semibold text-lg mb-2">Communes &amp; Séjours</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">Démonstrateur avancé : pages publiques, formulaire de demande, notifications mail et données réelles.</p>
-      </a>
-
-      <a href="https://caucrogegit.github.io/Forge/starters/auth-mfa/"
-         target="_blank" rel="noopener noreferrer"
-         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 6</div>
-        <h3 class="font-semibold text-lg mb-2">Auth MFA (TOTP)</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">Contrôleurs Auth avec authentification multi-facteurs TOTP. Nécessite <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>.</p>
-      </a>
     </div>
   </div>
 </section>
