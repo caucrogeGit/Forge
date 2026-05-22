@@ -207,8 +207,11 @@ class TestWelcomeStarterView:
 
     def test_doc_mentionne_cycle_html_avec_view(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Controller → View → Response HTML" in content, (
-            "La doc doit contenir 'Controller → View → Response HTML'"
+        assert 'View HTML' in content, (
+            "La doc doit représenter la View dans le cycle HTML (Mermaid 'View HTML')"
+        )
+        assert '!!! success "Cycle HTML — page rendue au navigateur"' in content, (
+            "La doc doit confirmer le cycle HTML via l'encadré success"
         )
 
     def test_doc_mentionne_cycle_json_sans_view(self):
@@ -372,9 +375,14 @@ class TestWelcomeStarterDocPedagogy:
 
     def test_doc_cycle_html_complet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Request → Router → Controller → View → Response HTML" in content, (
-            "La doc doit présenter le cycle HTML complet : "
-            "'Request → Router → Controller → View → Response HTML'"
+        idx_html = content.index('=== "Cycle HTML"')
+        idx_json = content.index('=== "Cycle JSON"')
+        tab_html = content[idx_html:idx_json]
+        assert 'View HTML' in tab_html, (
+            "Le cycle HTML doit représenter la View HTML dans le schéma Mermaid"
+        )
+        assert 'Response HTML' in tab_html, (
+            "Le cycle HTML doit représenter Response HTML dans le schéma Mermaid"
         )
 
     def test_doc_cycle_json_complet(self):
@@ -592,6 +600,93 @@ class TestWelcomeStarterDocCodeVisible:
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert "six vues HTML" in content, (
             "La doc doit préciser que le starter contient six vues HTML"
+        )
+
+
+class TestWelcomeStarterDocCycleTabs:
+    """Les onglets Cycle HTML / Cycle JSON contiennent des schémas Mermaid (DOC-PREMIER-PAS-CYCLES-TABS-VISUAL-001)."""
+
+    def test_onglet_cycle_html_present(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert '=== "Cycle HTML"' in content, (
+            'La doc doit contenir l\'onglet === "Cycle HTML"'
+        )
+
+    def test_onglet_cycle_json_present(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert '=== "Cycle JSON"' in content, (
+            'La doc doit contenir l\'onglet === "Cycle JSON"'
+        )
+
+    def test_cycle_html_contient_mermaid(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        idx_html = content.index('=== "Cycle HTML"')
+        idx_json = content.index('=== "Cycle JSON"')
+        tab_html = content[idx_html:idx_json]
+        assert "```mermaid" in tab_html, (
+            "L'onglet Cycle HTML doit contenir un schéma Mermaid"
+        )
+        assert "flowchart LR" in tab_html, (
+            "L'onglet Cycle HTML doit utiliser flowchart LR"
+        )
+        assert 'View HTML' in tab_html, (
+            "L'onglet Cycle HTML doit représenter la View HTML dans le schéma"
+        )
+
+    def test_cycle_json_contient_mermaid(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        idx_json = content.index('=== "Cycle JSON"')
+        tab_json = content[idx_json:idx_json + 600]
+        assert "```mermaid" in tab_json, (
+            "L'onglet Cycle JSON doit contenir un schéma Mermaid"
+        )
+        assert "flowchart LR" in tab_json, (
+            "L'onglet Cycle JSON doit utiliser flowchart LR"
+        )
+
+    def test_cycle_html_admonition_success(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert '!!! success "Cycle HTML — page rendue au navigateur"' in content, (
+            "L'onglet Cycle HTML doit contenir un encadré !!! success avec ce libellé"
+        )
+
+    def test_cycle_json_admonition_info(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert '!!! info "Cycle JSON — données renvoyées directement"' in content, (
+            "L'onglet Cycle JSON doit contenir un encadré !!! info avec ce libellé"
+        )
+
+    def test_pas_de_text_fence_dans_onglets(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert '    ```text\n    Request → Router → Controller → View → Response HTML' not in content, (
+            "L'onglet Cycle HTML ne doit plus utiliser un bloc ```text simple"
+        )
+        assert '    ```text\n    Request → Router → Controller → Response JSON' not in content, (
+            "L'onglet Cycle JSON ne doit plus utiliser un bloc ```text simple"
+        )
+
+    def test_schema_texte_redondant_app_py_supprime(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "navigateur → GET /welcome\n    ↓\nRequest" not in content, (
+            "Le schéma texte redondant de la section app.py doit être supprimé"
+        )
+
+    def test_phrase_code_complet_correcte(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "Après ces repères, regardons maintenant le code complet généré par Forge" in content, (
+            "La phrase doit être 'Après ces repères...' et non 'Avant d'expliquer...'"
+        )
+        assert "Avant d'expliquer les concepts, regardons d'abord ce que Forge génère réellement" not in content, (
+            "L'ancienne phrase incohérente doit être supprimée"
+        )
+
+    def test_symfony_formulation_factuelle(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "sans annotation ni configuration cachée" not in content, (
+            "La formulation polémique Symfony doit être remplacée"
+        )
+        assert "Dans ce starter Forge, le lien route → méthode est visible directement dans" in content, (
+            "La formulation factuelle doit être présente"
         )
 
 

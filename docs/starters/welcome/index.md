@@ -16,23 +16,32 @@ Une requête Forge suit toujours le même début : elle devient une `Request`, l
 
 === "Cycle HTML"
 
-    ```text
-    Request → Router → Controller → View → Response HTML
+    ```mermaid
+    flowchart LR
+        A["Request"] --> B["Router"]
+        B --> C["Controller"]
+        C --> D["View HTML"]
+        D --> E["Response HTML"]
     ```
 
-    Le contrôleur demande le rendu d'une vue HTML. Forge construit ensuite une réponse HTML envoyée au navigateur.
+    !!! success "Cycle HTML — page rendue au navigateur"
+        Le contrôleur demande le rendu d'une vue HTML. Forge construit ensuite une réponse HTML envoyée au navigateur.
 
-    Dans ce starter, c'est le cycle réellement exécuté par les six routes `/welcome`.
+        Dans ce starter, c'est le cycle réellement exécuté par les six routes `/welcome`.
 
 === "Cycle JSON"
 
-    ```text
-    Request → Router → Controller → Response JSON
+    ```mermaid
+    flowchart LR
+        A["Request"] --> B["Router"]
+        B --> C["Controller"]
+        C --> D["Response JSON"]
     ```
 
-    Le contrôleur peut aussi retourner directement une réponse JSON. Dans ce cas, aucune View HTML n'est nécessaire.
+    !!! info "Cycle JSON — données renvoyées directement"
+        Le contrôleur peut aussi retourner directement une réponse JSON. Dans ce cas, aucune View HTML n'est nécessaire.
 
-    Ce starter explique ce principe, mais il **n'expose pas de route JSON dédiée**.
+        Ce starter explique ce principe, mais il **n'expose pas de route JSON dédiée**.
 
 ```mermaid
 flowchart TD
@@ -77,7 +86,7 @@ Forge démarre l'application et le serveur de développement.
 La route `/` est appelée ensuite parce que le navigateur demande l'adresse :
 
 ```text
-http://localhost:8000/
+localhost:8000/
 ```
 
 Cette demande produit une requête HTTP :
@@ -110,7 +119,7 @@ La méthode du contrôleur construit ensuite une réponse, que Forge renvoie au 
 ```mermaid
 flowchart TD
     A["python app.py"] --> B["Serveur Forge démarré"]
-    B --> C["Navigateur : http://localhost:8000/"]
+    B --> C["Navigateur : localhost:8000/"]
     C --> D["Requête HTTP : GET /"]
     D --> E["Router cherche GET + /"]
     E --> F["HomeController.index(request)"]
@@ -130,23 +139,6 @@ flowchart TD
     G --> H["Response HTML"]
 ```
 
-```text
-python app.py
-    ↓
-application Forge démarrée
-    ↓
-navigateur → GET /welcome
-    ↓
-Request
-    ↓
-Router
-    ↓
-Controller
-    ↓
-View
-    ↓
-Response HTML
-```
 
 ## Comment Forge exécute le contrôleur ?
 
@@ -211,7 +203,7 @@ Ces repères servent uniquement à traduire le vocabulaire. Forge ne cherche pas
     vue HTML ou réponse JSON
     ```
 
-    La différence importante : Forge montre directement le lien entre route et méthode, sans annotation ni configuration cachée.
+    Dans ce starter Forge, le lien route → méthode est visible directement dans `mvc/routes.py`.
 
 === "Django"
 
@@ -251,7 +243,7 @@ Ces repères servent uniquement à traduire le vocabulaire. Forge ne cherche pas
 
 ## Le code complet généré par ce starter
 
-Avant d'expliquer les concepts, regardons d'abord ce que Forge génère réellement. Le starter tient en trois morceaux : les routes, le contrôleur et six vues HTML.
+Après ces repères, regardons maintenant le code complet généré par Forge. Le starter tient en trois morceaux : les routes, le contrôleur et six vues HTML.
 
 ### 1. Les routes complètes
 
@@ -973,7 +965,7 @@ with router.group("", public=True) as pub:
 
 ## Lire l’application dans le bon ordre
 
-1. Ouvrez `http://localhost:8000/welcome`.
+1. Ouvrez `localhost:8000/welcome`.
 2. Lisez la route correspondante dans `mvc/routes.py`.
 3. Retrouvez la méthode du contrôleur dans `mvc/controllers/welcome_controller.py`.
 4. Ouvrez la vue rendue dans `mvc/views/welcome/`.
