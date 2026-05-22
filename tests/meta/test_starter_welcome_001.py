@@ -428,7 +428,7 @@ class TestWelcomeStarterDocPedagogy:
     def test_doc_explique_execution_controller(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert "## Comment Forge exécute le contrôleur ?" in content
-        assert "Forge appelle WelcomeController.index(request)" in content
+        assert "WelcomeController.index(request)" in content
         assert 'pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")' in content
 
     def test_doc_contient_onglets_frameworks_symfony_django(self):

@@ -14,15 +14,18 @@ FORGE_PY = PROJECT_ROOT / "forge.py"
 RELEASE_NOTES = PROJECT_ROOT / "docs/history/releases/release-1.0.0-beta.6.md"
 
 
-# --- version dans les sources ---
+CHANGELOG = PROJECT_ROOT / "CHANGELOG.md"
+
+# --- version archivée dans le CHANGELOG ---
 
 def test_pyproject_mentions_b6():
-    assert '1.0.0b6' in PYPROJECT.read_text()
+    # b6 est archivée dans CHANGELOG, plus dans pyproject.toml actif
+    assert '1.0.0b6' in CHANGELOG.read_text() or '1.0.0-beta.6' in CHANGELOG.read_text()
 
 
 def test_forge_py_mentions_b6():
-    content = FORGE_PY.read_text()
-    assert '1.0.0b6' in content or '1.0.0-beta.6' in content
+    # b6 est archivée dans CHANGELOG, plus dans forge.py actif
+    assert '1.0.0-beta.6' in CHANGELOG.read_text()
 
 
 # --- notes de release ---

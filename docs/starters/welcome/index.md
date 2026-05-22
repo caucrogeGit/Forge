@@ -144,20 +144,6 @@ flowchart TD
 
 Ce n'est pas la classe seule qui s'exécute. Forge appelle une méthode précise de cette classe quand une route correspond à la requête.
 
-```text
-GET /welcome
-    ↓
-mvc/routes.py
-    ↓
-pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")
-    ↓
-Forge appelle WelcomeController.index(request)
-    ↓
-la méthode retourne une réponse Forge
-    ↓
-Response HTML
-```
-
 ```mermaid
 flowchart LR
     A["GET /welcome"] --> B["mvc/routes.py"]

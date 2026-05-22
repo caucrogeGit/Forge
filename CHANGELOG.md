@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.0-beta.7] — 2026-05-22
+
+Release documentation pédagogique — Premier pas refondu, logo MkDocs, cycles MVC visuels.
+
+- refonte pédagogique du starter Welcome : diagrammes ASCII, cycles HTML/JSON Mermaid, tables route→concept (DOC-PREMIER-PAS-PEDAGOGY-001) ;
+- agrandissement logo MkDocs via CSS dédié (DOCS-NAV-LOGO-SIZE-001) ;
+- vues du starter visibles par défaut : `<details open>` (DOC-PREMIER-PAS-CODE-VISIBLE-001) ;
+- onglets Cycle HTML/JSON remplacés par diagrammes Mermaid + admonitions (DOC-PREMIER-PAS-CYCLES-TABS-VISUAL-001) ;
+- nettoyage final documentation Premier pas (DOC-PREMIER-PAS-FINAL-CLEANUP-001).
+
+Non publié dans cette release :
+
+- `forge-mvc-media`, encore source-only ;
+- `forge-mvc-mfa`, encore Pre-Alpha (SEC-MFA-SECRET-ENCRYPTION-001) ;
+- packages opt-ins `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` : publication prévue dans PYPI-OPTINS-001.
+
+
 ## [1.0.0-beta.6] — 2026-05-21
 
 Release post-corrections terrain — RBAC contractuel, Pivot advanced, DX, test terrain et corrections.
