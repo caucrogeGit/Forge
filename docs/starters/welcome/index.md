@@ -177,17 +177,77 @@ flowchart LR
 
 Dans le fichier réel, l'alignement contient des espaces pour rendre les six routes lisibles, mais le lien important reste celui-ci : `/welcome` appelle `WelcomeController.index`.
 
-!!! info "Si vous venez de Symfony"
+## Si vous venez d’un autre framework
+
+Ces repères servent uniquement à traduire le vocabulaire. Forge ne cherche pas à copier Symfony ou Django : il garde un flux volontairement explicite.
+
+=== "Symfony"
+
     Dans Symfony, une route appelle une action de contrôleur.
-    Dans Forge, le principe est similaire, mais volontairement explicite :
+
+    Dans Forge, le principe est proche, mais volontairement explicite :
 
     - `WelcomeController` est la classe contrôleur ;
-    - `index(request)` est l'action appelée ;
-    - la route dans `mvc/routes.py` relie l'URL à cette action ;
+    - `index(request)` est l’action appelée ;
+    - la route dans `mvc/routes.py` relie l’URL à cette action ;
     - la méthode retourne une réponse Forge ;
     - Forge construit ensuite la réponse HTTP.
 
+    Exemple Forge :
+
+    ```python
+    pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")
+    ```
+
+    Ce lien signifie :
+
+    ```text
+    GET /welcome
+        ↓
+    Router
+        ↓
+    WelcomeController.index(request)
+        ↓
+    vue HTML ou réponse JSON
+    ```
+
     La différence importante : Forge montre directement le lien entre route et méthode, sans annotation ni configuration cachée.
+
+=== "Django"
+
+    Django parle souvent d’architecture MTV :
+
+    - `Model` : les données ;
+    - `Template` : le rendu HTML ;
+    - `View` : la fonction ou classe Python qui traite la requête.
+
+    Dans Forge, le vocabulaire est volontairement plus proche du MVC classique :
+
+    - `Model` : les données ;
+    - `View` : le fichier HTML rendu ;
+    - `Controller` : la classe Python qui reçoit la requête et prépare la réponse.
+
+    Donc ce que Django appelle souvent une `view` ressemble davantage, dans Forge, à une méthode de contrôleur.
+
+    Exemple Forge :
+
+    ```python
+    pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")
+    ```
+
+    Ce lien signifie :
+
+    ```text
+    GET /welcome
+        ↓
+    Router
+        ↓
+    WelcomeController.index(request)
+        ↓
+    vue HTML ou réponse JSON
+    ```
+
+    La différence importante : Forge garde le lien route → contrôleur → vue très explicite, sans mélanger le rôle du fichier HTML avec celui de la méthode Python.
 
 ## Le code complet généré par ce starter
 

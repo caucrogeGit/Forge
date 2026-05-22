@@ -423,10 +423,29 @@ class TestWelcomeStarterDocPedagogy:
         assert "Forge appelle WelcomeController.index(request)" in content
         assert 'pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")' in content
 
-    def test_doc_contient_encadre_symfony(self):
+    def test_doc_contient_onglets_frameworks_symfony_django(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert '!!! info "Si vous venez de Symfony"' in content
+        assert "## Si vous venez d’un autre framework" in content
+        assert '=== "Symfony"' in content
+        assert '=== "Django"' in content
+        assert '!!! info "Si vous venez de Symfony"' not in content
         assert "`WelcomeController` est la classe contrôleur" in content
+
+    def test_doc_explique_vocabulaire_django_mtv(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        expected_terms = [
+            "architecture MTV",
+            "`Model`",
+            "`Template`",
+            "`View`",
+            "`Controller`",
+            "Django appelle souvent une `view`",
+            "méthode de contrôleur",
+            "route → contrôleur → vue",
+            "WelcomeController.index(request)",
+        ]
+        for term in expected_terms:
+            assert term in content, f"Repère Django/Forge absent : {term}"
 
     def test_doc_explique_request(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
