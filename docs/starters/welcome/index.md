@@ -62,6 +62,63 @@ Forge démarre l'application, charge la configuration utile, prépare le routage
 
 `app.py` ne contient pas la logique de la page `/welcome`. Il démarre l'application. Ensuite, quand le navigateur demande `/welcome`, Forge reçoit la requête HTTP transmise par le serveur de développement, construit une `Request`, puis la transmet au `Router`.
 
+### `app.py` ne choisit pas la route `/`
+
+Quand on lance :
+
+```bash
+python app.py
+```
+
+Forge démarre l'application et le serveur de développement.
+
+À ce moment-là, aucune page n'est encore choisie.
+
+La route `/` est appelée ensuite parce que le navigateur demande l'adresse :
+
+```text
+http://localhost:8000/
+```
+
+Cette demande produit une requête HTTP :
+
+```text
+GET /
+```
+
+Forge reçoit alors cette requête, puis le routeur cherche une route correspondant à :
+
+```text
+méthode : GET
+chemin  : /
+```
+
+Dans ce projet Forge, une route réelle existe dans `mvc/routes.py` :
+
+```python
+pub.add("GET", "/", HomeController.index, name="home")
+```
+
+Forge appelle alors :
+
+```python
+HomeController.index(request)
+```
+
+La méthode du contrôleur construit ensuite une réponse, que Forge renvoie au navigateur.
+
+```mermaid
+flowchart TD
+    A["python app.py"] --> B["Serveur Forge démarré"]
+    B --> C["Navigateur : http://localhost:8000/"]
+    C --> D["Requête HTTP : GET /"]
+    D --> E["Router cherche GET + /"]
+    E --> F["HomeController.index(request)"]
+    F --> G["Response HTML"]
+```
+
+En résumé : `app.py` démarre Forge. Le navigateur demande une URL. Le routeur choisit le contrôleur. Le contrôleur produit la réponse.
+
 ```mermaid
 flowchart TD
     A["python app.py"] --> B["Application Forge démarrée"]

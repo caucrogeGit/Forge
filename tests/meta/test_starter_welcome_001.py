@@ -390,6 +390,33 @@ class TestWelcomeStarterDocPedagogy:
         assert "python app.py" in content
         assert "Forge reçoit la requête HTTP transmise par le serveur de développement" in content
 
+    def test_doc_clarifie_app_py_et_route_racine(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        expected_terms = [
+            "`app.py` ne choisit pas la route `/`",
+            "GET /",
+            "Router cherche GET + /",
+            "HomeController.index(request)",
+            "app.py` démarre Forge",
+            "Le navigateur demande une URL",
+            "Le routeur choisit le contrôleur",
+            "Le contrôleur produit la réponse",
+        ]
+        for term in expected_terms:
+            assert term in content, f"Clarification app.py / route racine absente : {term}"
+
+    def test_doc_ne_decrit_pas_app_py_comme_routeur(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        forbidden = [
+            "app.py prend la route /",
+            "app.py appelle /",
+            "app.py affiche la page /",
+            "app.py choisit la page d’accueil",
+            "app.py choisit la page d'accueil",
+        ]
+        found = [needle for needle in forbidden if needle in content]
+        assert not found, f"Formulation trompeuse sur app.py : {found}"
+
     def test_doc_explique_execution_controller(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert "## Comment Forge exécute le contrôleur ?" in content
