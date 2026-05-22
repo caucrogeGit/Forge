@@ -7,7 +7,7 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> La version publique actuelle est **Forge 1.0.0-beta.4**.
+> La version publique actuelle est **Forge 1.0.0-beta.8**.
 
 ---
 
@@ -17,7 +17,7 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 Précédent : v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.8 — Consolidation modules opt-in media et mfa, chiffrement TOTP Fernet, préparation publication (RELEASE-BETA8-001).**
+**Statut : v1.0.0-beta.8 publiée (core + 5 opt-ins). Audit post-publication conduit — Phase 13 planifiée pour 1.0.0-beta.9 (14 tickets : sécurité, WSGI, sessions, docs).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -223,6 +223,9 @@ Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de st
 1.0.0-beta.4  ← corrections post-audit (Phase 3)
 1.0.0-beta.5  ← corrections post-audit (Phase 4) + publication opt-ins
 1.0.0-beta.6  ← bêta consolidée = T0 tests terrain
+1.0.0-beta.7  ← corrections terrain (Phase 10-11) + publication opt-ins supplémentaires
+1.0.0-beta.8  ← consolidation media/mfa + chiffrement TOTP Fernet (Phase 12) — PyPI complet
+1.0.0-beta.9  ← corrections sécurité + WSGI + docs (Phase 13 — en cours)
 → tests terrain : 2 mois minimum
 → 1.0.0-rc1   ← release candidate
 → 1.0.0       ← stable
@@ -1222,6 +1225,33 @@ du code applicatif existant.
 | VERSION-SYNC-OPTIN-EXTRAS-001 | Synchroniser extras optionnels metadata core/opt-ins | **livré** |
 | BETA-5-RELEASE-001 | Publication groupée core + rbac/workflow/stats | **livré** |
 
+---
+
+## Phase 13 — Corrections post-audit beta.8 → 1.0.0-beta.9
+
+**Objectif** : solder les constats de l'[audit post-publication beta.8](../history/audits/audit-post-publication-beta8.md)
+avant d'ouvrir les tests terrain sur une base saine.
+
+**14 tickets**, classés par priorité décroissante :
+
+| Ticket | Description | État |
+|---|---|---|
+| SECURITY-CRYPTOGRAPHY-MFA-001 | Mettre à jour `cryptography>=42,<46` → `>=46.0.7,<47` dans `forge-mvc-mfa` | à faire |
+| SECURITY-API-AUTH-COMPARE-DIGEST-001 | Remplacer `==` par `hmac.compare_digest` dans `core/security/api_auth.py` | à faire |
+| WSGI-ENTRYPOINT-001 | Ajouter un callable WSGI minimal dans `core/wsgi.py` | à faire |
+| SECURITY-SESSION-COOKIE-HELPER-001 | Créer `set_session_cookie()` dans `core/security/cookies.py` | à faire |
+| SECURITY-SESSION-COOKIE-STARTERS-001 | Corriger les starters qui posent `session_id` au lieu de `__Host-session_id` | à faire |
+| HTTP-TRUSTED-PROXY-IP-001 | Lire `X-Real-IP` dans `core/http/request.py` | à faire |
+| AUTH-RATE-LIMIT-PROD-WARNING-001 | Avertir au démarrage si `MemorySessionStore` en production | à faire |
+| DOCS-PRODUCTION-LIMITS-001 | Documenter explicitement les limites de production (ThreadingHTTPServer, rate limit mono-process) | à faire |
+| CI-OPTIN-MEDIA-BUILD-001 | Ajouter `forge-mvc-media` à la matrice CI | à faire |
+| SESSION-CLEANUP-AUTO-001 | Nettoyage automatique des sessions expirées (`MemorySessionStore`) | à faire |
+| CORE-SESSION-DEDOMAIN-001 | Supprimer les noms de champs en français dans `core/security/session.py` (ADR-003) | à faire |
+| RELEASE-PACKAGE-LOCK-SYNC-001 | Synchroniser `package-lock.json` (version `3.0.0`) avec `package.json` (`1.0.0-beta.8`) | à faire |
+| DOCS-VERSION-SWEEP-BETA9-001 | Nettoyer les références `3.0.x` et `beta.4` dans les docs actives | à faire |
+| RELEASE-BETA9-001 | Publication `1.0.0-beta.9` (core + opt-ins) | à faire |
+
+---
 
 ## Règle de mise à jour des roadmaps
 
