@@ -144,7 +144,7 @@ pas installées par défaut. Elles sont tirées via les extras du package
     À partir de `1.0.0-beta.5`, `forge-mvc-rbac`, `forge-mvc-workflow` et
     `forge-mvc-stats` sont publiés et synchronisés avec le core.
     `forge-mvc-mfa` reste Pre-Alpha et ne sera pas publié en `1.0`.
-    `forge-mvc-media` reste source-only après extraction Phase 11.
+    `forge-mvc-media` est en statut Alpha depuis `MEDIA-PYPI-READY-002` — non publié en `{{forge_version}}`, publication prévue dans une prochaine release.
 
 Pour installer les opt-ins en `{{forge_version}}` :
 

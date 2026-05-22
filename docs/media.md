@@ -2,16 +2,14 @@
 
 [Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-!!! warning "Statut : Pre-Alpha — source-only"
-    `forge-mvc-media` n'est **pas publié sur PyPI**. Le classifier `"Private :: Do Not Upload"`
-    est volontaire. L'installation via `pip install forge-mvc-media` est impossible.
+!!! info "Statut : Alpha — préparé pour publication future"
+    `forge-mvc-media` n'est **pas publié sur PyPI dans la vague `{{forge_version}}`**.
+    Le module est en statut `3 - Alpha` depuis `MEDIA-PYPI-READY-002`.
+    L'installation via `pip install forge-mvc-media` reste impossible pour l'instant.
 
-    Ce module reste source-only jusqu'à la complétion des tickets :
-    `MEDIA-DOCS-MIGRATION-001`, `MEDIA-SHIMS-REMOVE-001` et `MEDIA-PYPI-READY-002`.
+    Publication PyPI prévue dans une prochaine release (ticket dédié requis).
 
-    Son API est considérée comme **non stable** tant que le statut Pre-Alpha est actif.
-
-Forge sépare les primitives génériques d'upload (`core/uploads/`) des helpers applicatifs médias (`forge_mvc_media`). Le core est installé avec Forge ; les helpers applicatifs sont fournis par le module opt-in `forge-mvc-media` (source-only, non publié sur PyPI).
+Forge sépare les primitives génériques d'upload (`core/uploads/`) des helpers applicatifs médias (`forge_mvc_media`). Le core est installé avec Forge ; les helpers applicatifs sont fournis par le module opt-in `forge-mvc-media` (non publié sur PyPI en `{{forge_version}}`, publication prévue dans une prochaine release).
 
 ## Frontière core / opt-in média
 
@@ -706,8 +704,8 @@ Ces conditions doivent toutes être remplies avant de retirer le classifier
 |---|---|---|
 | Documentation publique du module | `MEDIA-DOCS-MIGRATION-001` | livré |
 | Suppression des shims `core/uploads/media_repository.py` et `media_gallery.py` | `MEDIA-SHIMS-REMOVE-001` | livré |
-| Passage à `Development Status :: 3 - Alpha` minimum | `MEDIA-PYPI-READY-002` | à créer |
-| Classifier `"Private :: Do Not Upload"` retiré | `MEDIA-PYPI-READY-002` | à créer |
+| Passage à `Development Status :: 3 - Alpha` minimum | `MEDIA-PYPI-READY-002` | livré |
+| Classifier `"Private :: Do Not Upload"` retiré | `MEDIA-PYPI-READY-002` | livré |
 
 Tant que ces conditions ne sont pas toutes validées, **ne pas relancer**
 `PYPI-PUBLISH-B7-MEDIA-001` ni aucune variante de publication PyPI pour ce module.

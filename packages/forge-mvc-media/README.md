@@ -2,13 +2,15 @@
 
 Module opt-in pour la gestion applicative des médias dans Forge MVC.
 
-## Statut : Pre-Alpha — source-only
+## Statut : Alpha — préparé pour publication future
 
-`forge-mvc-media` est en cours d'extraction depuis `core/uploads/`.
+`forge-mvc-media` est en statut `3 - Alpha` depuis `MEDIA-PYPI-READY-002`.
+L'extraction depuis `core/uploads/` est complète. La documentation et les shims
+de compatibilité ont été livrés.
 
-**Non publié sur PyPI dans cette phase.**
+**Non publié sur PyPI dans la vague `1.0.0b7`.** Publication prévue dans une prochaine release.
 
-Il s'installe uniquement depuis les sources du dépôt Forge :
+Il s'installe depuis les sources du dépôt Forge :
 
 ```bash
 git clone https://github.com/caucrogeGit/Forge.git
@@ -69,10 +71,8 @@ Les critères suivants doivent être remplis avant toute publication :
 1. ~~**`MEDIA-DOCS-MIGRATION-001` livré**~~ ✓ livré — documentation technique à jour dans `docs/`.
 2. ~~**Shims supprimés**~~ ✓ livré (`MEDIA-SHIMS-REMOVE-001`) — `core/uploads/media_repository.py` et
    `core/uploads/media_gallery.py` retirés du core.
-3. **`Development Status` ajusté** — passer d'au moins `3 - Alpha` avant publication
-   PyPI ; `4 - Beta` si les tests d'intégration sont complets.
-4. **Classifier retiré** — supprimer `"Private :: Do Not Upload"` du `pyproject.toml`
-   uniquement après validation des trois points ci-dessus.
+3. ~~**`Development Status` ajusté**~~ ✓ livré (`MEDIA-PYPI-READY-002`) — statut `3 - Alpha` actif.
+4. ~~**Classifier retiré**~~ ✓ livré (`MEDIA-PYPI-READY-002`) — `"Private :: Do Not Upload"` supprimé du `pyproject.toml`.
 
 Le ticket de publication PyPI sera `PYPI-PUBLISH-MEDIA-001` (ou `PYPI-PUBLISH-B8-MEDIA-001`
 selon la version cible).
@@ -88,3 +88,4 @@ selon la version cible).
 | `MEDIA-DOCS-MIGRATION-001` | Mise à jour de la documentation | livré |
 | `MEDIA-SHIMS-REMOVE-001` | Suppression des shims core/uploads | livré |
 | `MEDIA-PYPI-READY-001` | Décision source-only confirmée | livré |
+| `MEDIA-PYPI-READY-002` | Requalification Alpha, retrait classifier privé | livré |

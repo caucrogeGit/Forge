@@ -162,9 +162,10 @@ class TestCoreNoDependsOnOptins:
         )
 
 
-@pytest.mark.parametrize("pkg", ["forge-mvc-media", "forge-mvc-mfa"])
+@pytest.mark.parametrize("pkg", ["forge-mvc-mfa"])
 class TestNonPublishablePrivateClassifier:
     def test_private_classifier_preserved(self, pkg):
+        """forge-mvc-mfa seul conserve Private :: Do Not Upload (MEDIA-PYPI-READY-002 retiré pour media)."""
         toml = PROJECT_ROOT / "packages" / pkg / "pyproject.toml"
         data = tomllib.loads(toml.read_text(encoding="utf-8"))
         classifiers = data["project"]["classifiers"]

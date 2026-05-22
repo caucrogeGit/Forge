@@ -1,7 +1,8 @@
 """Tests PACKAGES-OPTIN-INSTALL-001 : politique de publication des packages opt-in.
 
-Apres OPTIN-PYPI-PUBLISH-PREPARE-001 :
-- forge-mvc-mfa et forge-mvc-media restent non publiables (Private :: Do Not Upload maintenu) ;
+Apres MEDIA-PYPI-READY-002 :
+- forge-mvc-mfa reste non publiable (Private :: Do Not Upload maintenu — SEC-MFA-SECRET-ENCRYPTION-001) ;
+- forge-mvc-media a été requalifié Alpha et préparé pour publication future (Private :: Do Not Upload retiré) ;
 - forge-mvc-rbac, forge-mvc-workflow, forge-mvc-stats sont prepares pour publication
   (Private :: Do Not Upload retire) mais aucun n'est encore stable.
 """
@@ -19,7 +20,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 _NON_PUBLISHABLE = [
     "forge-mvc-mfa",
-    "forge-mvc-media",
 ]
 
 _ALL_OPTIN_PACKAGES = [
@@ -35,7 +35,7 @@ _ALL_OPTIN_PACKAGES = [
 class TestNonPublishablePrivateClassifier:
 
     def test_private_classifier_present(self, package: str):
-        """forge-mvc-mfa et forge-mvc-media conservent 'Private :: Do Not Upload'."""
+        """forge-mvc-mfa conserve 'Private :: Do Not Upload' (SEC-MFA-SECRET-ENCRYPTION-001)."""
         pyproject_path = ROOT / "packages" / package / "pyproject.toml"
         assert pyproject_path.exists(), f"packages/{package}/pyproject.toml introuvable"
         data = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))

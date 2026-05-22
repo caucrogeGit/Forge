@@ -56,12 +56,14 @@ class TestPackageVersion:
         )
 
 
-class TestPackagePrivateClassifier:
+class TestPackageClassifier:
 
-    def test_private_do_not_upload(self):
+    def test_private_do_not_upload_removed(self):
+        """MEDIA-PYPI-READY-002 : le classifier privé a été retiré."""
         classifiers = _pyproject()["project"]["classifiers"]
-        assert any("Private :: Do Not Upload" in c for c in classifiers), (
-            "forge-mvc-media doit avoir le classifier 'Private :: Do Not Upload'."
+        assert not any("Private :: Do Not Upload" in c for c in classifiers), (
+            "forge-mvc-media ne doit plus avoir 'Private :: Do Not Upload' "
+            "(retiré dans MEDIA-PYPI-READY-002)."
         )
 
     def test_not_stable(self):

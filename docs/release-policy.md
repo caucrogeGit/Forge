@@ -144,6 +144,7 @@ chaque package publiable :
 | `forge-mvc-workflow` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-stats` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-mfa` | `2 - Pre-Alpha` | Secret TOTP stocké en clair, ticket `SEC-MFA-SECRET-ENCRYPTION-001` requis avant Beta |
+| `forge-mvc-media` | `3 - Alpha` | Docs complètes, shims supprimés — préparé pour publication future (`MEDIA-PYPI-READY-002`) |
 
 Critères de passage Beta → Stable d'un module opt-in :
 
@@ -351,7 +352,7 @@ reste manuelle et délibérée.
 | `forge-mvc-workflow` | Source-only jusqu'à `1.0.0-beta.5` — **prêt à publier** | Dépendance relâchée, `Private :: Do Not Upload` retiré (`OPTIN-PYPI-PUBLISH-PREPARE-001`) |
 | `forge-mvc-stats` | Source-only jusqu'à `1.0.0-beta.5` — **prêt à publier** | Dépendance relâchée, `Private :: Do Not Upload` retiré (`OPTIN-PYPI-PUBLISH-PREPARE-001`) |
 | `forge-mvc-mfa` | Non publié PyPI en `1.0` | Pre-Alpha — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant publication |
-| `forge-mvc-media` | Source-only — squelette Phase 11 | Extraction en cours — non publié PyPI (`MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001`) |
+| `forge-mvc-media` | Alpha — préparé pour publication future | Docs complètes, shims supprimés, `Private :: Do Not Upload` retiré (`MEDIA-PYPI-READY-002`) |
 
 ### Règles de version
 

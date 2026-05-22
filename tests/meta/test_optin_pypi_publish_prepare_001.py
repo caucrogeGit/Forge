@@ -4,7 +4,7 @@ Verifie que :
 - OPTIN-PYPI-PUBLISH-PREPARE-001 est reference dans la roadmap et marque livré ;
 - la dependance forge-mvc est relachee (>=1.0.0b4,<2) dans rbac/workflow/stats ;
 - forge-mvc-rbac, workflow, stats n'ont plus 'Private :: Do Not Upload' ;
-- forge-mvc-media et forge-mvc-mfa conservent 'Private :: Do Not Upload' ;
+- forge-mvc-mfa conserve 'Private :: Do Not Upload' (forge-mvc-media requalifié Alpha dans MEDIA-PYPI-READY-002) ;
 - forge-mvc-mfa mentionne SEC-MFA-SECRET-ENCRYPTION-001 dans la doc release-policy ;
 - le root pyproject.toml ne depend pas des opt-ins ;
 - aucune commande twine upload dist/ n'est recommandee dans release-policy.
@@ -32,7 +32,6 @@ _PUBLISHABLE = [
 ]
 
 _NON_PUBLISHABLE = [
-    "forge-mvc-media",
     "forge-mvc-mfa",
 ]
 
