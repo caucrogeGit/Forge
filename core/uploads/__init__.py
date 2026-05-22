@@ -29,9 +29,8 @@ from core.uploads.storage import (
     normalize_media_path,
 )
 
-# Re-exports de compatibilité — fonctions applicatives médias (OPTIN_MEDIA).
-# Conditionnels : disponibles si forge-mvc-media est installé, silencieux sinon.
-# Ces re-exports resteront jusqu'à MEDIA-CRUD-INTEGRATION-OPTIN-001 (ticket 11.4).
+# Re-exports opt-in — fonctions applicatives médias (MEDIA-SHIMS-REMOVE-001).
+# Disponibles si forge-mvc-media est installé, silencieux sinon.
 try:
     from forge_mvc_media.media_repository import (  # noqa: F401
         attach_media_to_entity,

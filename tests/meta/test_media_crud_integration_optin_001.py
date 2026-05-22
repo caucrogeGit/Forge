@@ -106,31 +106,19 @@ class TestGeneratorsMentionForgeMediaOptIn:
         )
 
 
-class TestShimsStillExist:
-    """Les shims de compatibilité dans core/uploads ne sont pas supprimés."""
+class TestShimsRemoved:
+    """Les shims de compatibilité dans core/uploads ont été supprimés (MEDIA-SHIMS-REMOVE-001)."""
 
-    def test_core_media_repository_shim_exists(self):
-        assert CORE_REPO_SHIM.exists(), (
-            "core/uploads/media_repository.py a été supprimé. "
-            "Les shims de compatibilité doivent rester jusqu'à la fin de la dépréciation."
+    def test_core_media_repository_shim_absent(self):
+        assert not CORE_REPO_SHIM.exists(), (
+            "core/uploads/media_repository.py est présent mais doit être absent. "
+            "Le shim a été supprimé dans MEDIA-SHIMS-REMOVE-001."
         )
 
-    def test_core_media_gallery_shim_exists(self):
-        assert CORE_GALLERY_SHIM.exists(), (
-            "core/uploads/media_gallery.py a été supprimé. "
-            "Les shims de compatibilité doivent rester jusqu'à la fin de la dépréciation."
-        )
-
-    def test_core_media_repository_shim_re_exports_forge_mvc_media(self):
-        text = CORE_REPO_SHIM.read_text(encoding="utf-8")
-        assert "forge_mvc_media" in text, (
-            "core/uploads/media_repository.py n'est plus un shim forge_mvc_media."
-        )
-
-    def test_core_media_gallery_shim_re_exports_forge_mvc_media(self):
-        text = CORE_GALLERY_SHIM.read_text(encoding="utf-8")
-        assert "forge_mvc_media" in text, (
-            "core/uploads/media_gallery.py n'est plus un shim forge_mvc_media."
+    def test_core_media_gallery_shim_absent(self):
+        assert not CORE_GALLERY_SHIM.exists(), (
+            "core/uploads/media_gallery.py est présent mais doit être absent. "
+            "Le shim a été supprimé dans MEDIA-SHIMS-REMOVE-001."
         )
 
 

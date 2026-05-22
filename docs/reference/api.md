@@ -1437,11 +1437,11 @@ Les nouveaux fichiers générés par `forge make:crud --media` importent depuis 
 | `get_media_gallery(entity_name, entity_id, role="gallery")` | Galerie ordonnée enrichie avec URLs et variantes. |
 | `get_cover_media(entity_name, entity_id, role="cover")` | Image de couverture d'une entité, ou `None`. |
 
-### Shims de compatibilité
+### Imports applicatifs médias
 
-Les anciens imports `from core.uploads import attach_media_to_entity` restent
-compatibles temporairement via des shims dans `core/uploads/`. Ils émettent un
-`DeprecationWarning`. L'usage recommandé est `from forge_mvc_media import ...`.
+Les anciens imports `from core.uploads import attach_media_to_entity` ne sont
+plus supportés depuis `MEDIA-SHIMS-REMOVE-001`. L'import correct est
+`from forge_mvc_media import ...`.
 
 </details>
 

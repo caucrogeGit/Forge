@@ -1,7 +1,7 @@
 """Garde-fou MEDIA-REPOSITORY-MOVE-001.
 
 Vérifie que media_repository et media_gallery ont été déplacés vers
-forge_mvc_media, que les fichiers core sont des shims de compatibilité,
+forge_mvc_media, que les shims core ont été supprimés (MEDIA-SHIMS-REMOVE-001),
 et que le core ne dépend pas de forge-mvc-media comme dépendance obligatoire.
 """
 from __future__ import annotations
@@ -47,46 +47,19 @@ class TestOptInContainsMovedCode:
         )
 
 
-class TestCoreFilesAreShims:
+class TestCoreFilesAbsent:
+    """Les shims de compatibilité ont été supprimés (MEDIA-SHIMS-REMOVE-001)."""
 
-    def test_core_media_repository_is_shim(self):
-        assert CORE_REPO.exists(), (
-            "core/uploads/media_repository.py doit exister (shim de compatibilité)."
-        )
-        text = CORE_REPO.read_text(encoding="utf-8")
-        assert "forge_mvc_media" in text, (
-            "core/uploads/media_repository.py doit re-importer depuis forge_mvc_media "
-            "(shim de compatibilité)."
-        )
-        assert "INSERT INTO media" not in text, (
-            "core/uploads/media_repository.py ne doit plus contenir la logique SQL "
-            "(il est un shim, pas le code propriétaire)."
+    def test_core_media_repository_shim_removed(self):
+        assert not CORE_REPO.exists(), (
+            "core/uploads/media_repository.py est présent mais doit être absent. "
+            "Ce shim a été supprimé dans MEDIA-SHIMS-REMOVE-001."
         )
 
-    def test_core_media_gallery_is_shim(self):
-        assert CORE_GALLERY.exists(), (
-            "core/uploads/media_gallery.py doit exister (shim de compatibilité)."
-        )
-        text = CORE_GALLERY.read_text(encoding="utf-8")
-        assert "forge_mvc_media" in text, (
-            "core/uploads/media_gallery.py doit re-importer depuis forge_mvc_media "
-            "(shim de compatibilité)."
-        )
-        assert "def get_media_gallery" not in text, (
-            "core/uploads/media_gallery.py ne doit plus définir get_media_gallery "
-            "(il est un shim, pas le code propriétaire)."
-        )
-
-    def test_core_media_repository_shim_has_deprecation_warning(self):
-        text = CORE_REPO.read_text(encoding="utf-8")
-        assert "DeprecationWarning" in text, (
-            "Le shim core/uploads/media_repository.py doit émettre DeprecationWarning."
-        )
-
-    def test_core_media_gallery_shim_has_deprecation_warning(self):
-        text = CORE_GALLERY.read_text(encoding="utf-8")
-        assert "DeprecationWarning" in text, (
-            "Le shim core/uploads/media_gallery.py doit émettre DeprecationWarning."
+    def test_core_media_gallery_shim_removed(self):
+        assert not CORE_GALLERY.exists(), (
+            "core/uploads/media_gallery.py est présent mais doit être absent. "
+            "Ce shim a été supprimé dans MEDIA-SHIMS-REMOVE-001."
         )
 
 

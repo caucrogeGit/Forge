@@ -50,15 +50,32 @@ from core.uploads import save_upload          # générique — reste dans core
 from forge_mvc_media import attach_media_to_entity, delete_media, get_cover_media, ...
 ```
 
-Les anciens imports `from core.uploads import attach_media_to_entity` restent
-compatibles temporairement via les shims de compatibilité.
+Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus
+supportés depuis `MEDIA-SHIMS-REMOVE-001`.
 Le package reste source-only et non publié sur PyPI.
 
 ## Shims de compatibilité dans core
 
 Les fichiers `core/uploads/media_repository.py` et `core/uploads/media_gallery.py`
-sont des shims de compatibilité qui re-exportent depuis ce module.
-Ils émettent un `DeprecationWarning` et seront supprimés dans une version future.
+étaient des shims de compatibilité qui re-exportaient depuis ce module.
+Ils ont été supprimés dans `MEDIA-SHIMS-REMOVE-001`.
+
+## Conditions avant publication sur PyPI
+
+La décision de maintenir ce package source-only a été actée dans `MEDIA-PYPI-READY-001`.
+
+Les critères suivants doivent être remplis avant toute publication :
+
+1. ~~**`MEDIA-DOCS-MIGRATION-001` livré**~~ ✓ livré — documentation technique à jour dans `docs/`.
+2. ~~**Shims supprimés**~~ ✓ livré (`MEDIA-SHIMS-REMOVE-001`) — `core/uploads/media_repository.py` et
+   `core/uploads/media_gallery.py` retirés du core.
+3. **`Development Status` ajusté** — passer d'au moins `3 - Alpha` avant publication
+   PyPI ; `4 - Beta` si les tests d'intégration sont complets.
+4. **Classifier retiré** — supprimer `"Private :: Do Not Upload"` du `pyproject.toml`
+   uniquement après validation des trois points ci-dessus.
+
+Le ticket de publication PyPI sera `PYPI-PUBLISH-MEDIA-001` (ou `PYPI-PUBLISH-B8-MEDIA-001`
+selon la version cible).
 
 ## Tickets de référence
 
@@ -68,4 +85,6 @@ Ils émettent un `DeprecationWarning` et seront supprimés dans une version futu
 | `MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001` | Création du squelette source-only | livré |
 | `MEDIA-REPOSITORY-MOVE-001` | Déplacement du code applicatif | livré |
 | `MEDIA-CRUD-INTEGRATION-OPTIN-001` | Mise à jour des générateurs CLI | livré |
-| `MEDIA-DOCS-MIGRATION-001` | Mise à jour de la documentation | à venir |
+| `MEDIA-DOCS-MIGRATION-001` | Mise à jour de la documentation | livré |
+| `MEDIA-SHIMS-REMOVE-001` | Suppression des shims core/uploads | livré |
+| `MEDIA-PYPI-READY-001` | Décision source-only confirmée | livré |

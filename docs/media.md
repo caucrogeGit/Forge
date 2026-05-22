@@ -2,6 +2,15 @@
 
 [Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
+!!! warning "Statut : Pre-Alpha — source-only"
+    `forge-mvc-media` n'est **pas publié sur PyPI**. Le classifier `"Private :: Do Not Upload"`
+    est volontaire. L'installation via `pip install forge-mvc-media` est impossible.
+
+    Ce module reste source-only jusqu'à la complétion des tickets :
+    `MEDIA-DOCS-MIGRATION-001`, `MEDIA-SHIMS-REMOVE-001` et `MEDIA-PYPI-READY-002`.
+
+    Son API est considérée comme **non stable** tant que le statut Pre-Alpha est actif.
+
 Forge sépare les primitives génériques d'upload (`core/uploads/`) des helpers applicatifs médias (`forge_mvc_media`). Le core est installé avec Forge ; les helpers applicatifs sont fournis par le module opt-in `forge-mvc-media` (source-only, non publié sur PyPI).
 
 ## Frontière core / opt-in média
@@ -23,7 +32,22 @@ Forge sépare les primitives génériques d'upload (`core/uploads/`) des helpers
 - `delete_media`, `delete_media_record`
 - `get_media_gallery`, `get_cover_media`, `media_url`
 
-Les anciens imports `from core.uploads import attach_media_to_entity` restent compatibles temporairement via des shims de compatibilité, mais ne sont plus l'usage recommandé.
+Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus supportés depuis `MEDIA-SHIMS-REMOVE-001`. Les fichiers `core/uploads/media_repository.py` et `core/uploads/media_gallery.py` ont été supprimés. Utiliser `from forge_mvc_media import ...`.
+
+## Installation depuis les sources
+
+`forge-mvc-media` n'étant pas sur PyPI, l'installation se fait depuis le dépôt Forge :
+
+```bash
+git clone https://github.com/caucrogeGit/Forge.git
+cd Forge
+pip install -e packages/forge-mvc-media/
+```
+
+L'option `-e` permet des modifications locales sans réinstallation.
+
+La dépendance `forge-mvc=={{forge_version}}` doit être satisfaite. Si vous travaillez depuis
+le dépôt Forge directement (sans venv isolé), le core est déjà disponible via `PYTHONPATH`.
 
 ---
 
@@ -650,7 +674,50 @@ Avec l'entité ci-dessous, `make:crud` génère la chaîne complète.
 
 ---
 
+## Garanties de sécurité
+
+Les garanties suivantes sont assurées par `core/uploads/storage.py` et s'appliquent
+à l'ensemble du module `forge-mvc-media` qui délègue toutes les opérations sur les chemins à ce core.
+
+| Menace | Garantie | Mécanisme |
+|---|---|---|
+| **Path traversal** (`../`) | Bloqué | `posixpath.normpath` + rejet des composants `..` |
+| **Chemins absolus Unix** (`/...`) | Bloqué | Rejet si le chemin commence par `/` après nettoyage |
+| **Chemins Windows** (`\...`, `C:\`) | Normalisé puis bloqué | `\\` → `/`, puis règle chemins absolus |
+| **URI schemes** (`file://`, `http://`) | Bloqué | Expression régulière sur les schémas URI |
+| **Null bytes** (`\x00`) | Bloqué | Rejet explicite avant toute opération |
+| **Chemins relatifs hors racine** | Bloqué | `os.path.commonpath` vérifie que la cible reste sous `storage/uploads/` |
+| **Stockage absolu** | Impossible | `normalize_media_path` retourne toujours un chemin relatif |
+| **Suppression accidentelle** | Opt-in uniquement | `delete_media(id, delete_files=False)` par défaut — la suppression fichier est explicite |
+| **Validation MIME/extension** | Présente | `core/uploads/validators.py` valide contre des listes d'extensions et MIME autorisées |
+| **Exposition hors racine** | Impossible | La route `/media/...` refuse tout chemin sortant de `storage/uploads/` |
+| **Double slash / normpath** | Nettoyé | `//` réduits avant normalisation |
+
+Ces garanties couvrent le code source audité en `{{forge_version}}`. Elles ne couvrent pas la
+détection MIME côté serveur (repose sur le `Content-Type` déclaré par le navigateur ;
+`python-magic` est hors périmètre) ni les permissions d'accès aux médias servis.
+
+## Conditions avant publication PyPI
+
+Ces conditions doivent toutes être remplies avant de retirer le classifier
+`"Private :: Do Not Upload"` et de publier sur PyPI :
+
+| Condition | Ticket | État |
+|---|---|---|
+| Documentation publique du module | `MEDIA-DOCS-MIGRATION-001` | livré |
+| Suppression des shims `core/uploads/media_repository.py` et `media_gallery.py` | `MEDIA-SHIMS-REMOVE-001` | livré |
+| Passage à `Development Status :: 3 - Alpha` minimum | `MEDIA-PYPI-READY-002` | à créer |
+| Classifier `"Private :: Do Not Upload"` retiré | `MEDIA-PYPI-READY-002` | à créer |
+
+Tant que ces conditions ne sont pas toutes validées, **ne pas relancer**
+`PYPI-PUBLISH-B7-MEDIA-001` ni aucune variante de publication PyPI pour ce module.
+
+La publication PyPI sera traitée dans `PYPI-PUBLISH-MEDIA-001`
+(ou `PYPI-PUBLISH-B8-MEDIA-001` selon la version cible au moment de la publication).
+
 ## Roadmap
 
+- `MEDIA-SHIMS-REMOVE-001` — shims de compatibilité supprimés de `core/uploads/` (livré).
+- `MEDIA-PYPI-READY-002` — requalifier en Alpha, retirer le classifier, préparer la publication PyPI.
 - Détection MIME fiable via `python-magic`.
 - Permissions et accès contrôlés aux médias.
