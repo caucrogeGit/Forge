@@ -88,7 +88,7 @@ Forge sépare le noyau minimal des fonctionnalités spécialisées.
 | Module | Rôle | Statut | Raison |
 |--------|------|--------|--------|
 | `forge-mvc-media` | Gestion applicative des médias | Alpha | Préparé — publication prévue dans une prochaine release |
-| `forge-mvc-mfa` | Authentification multi-facteurs (TOTP, codes de récupération) | Pre-Alpha | Bloqué — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant publication |
+| `forge-mvc-mfa` | Authentification multi-facteurs (TOTP, codes de récupération) | Alpha | Préparé — secret TOTP chiffré (`SEC-MFA-SECRET-ENCRYPTION-001`), publication prévue dans une prochaine release |
 
 Installation depuis le monorepo (voir [installation-github.md](docs/installation-github.md)) :
 
@@ -849,8 +849,8 @@ Versions supportées et procédure de signalement : [SECURITY.md](SECURITY.md)
 | `argon2-cffi` | Hachage sécurisé des mots de passe (Argon2id) |
 
 Les modules opt-in (`forge-mvc-mfa`, `-rbac`, `-workflow`, `-stats`) nécessitent des dépendances
-supplémentaires non installées avec `forge-mvc`. `forge-mvc-mfa` (Pre-Alpha) n'est pas publié sur
-PyPI en `1.0` — ses dépendances (dont `pyotp`) ne font pas partie du runtime core.
+supplémentaires non installées avec `forge-mvc`. `forge-mvc-mfa` (Alpha) n'est pas publié sur
+PyPI en `1.0.0b7` — ses dépendances (`pyotp`, `cryptography`) ne font pas partie du runtime core.
 
 **Développement** (`requirements-dev.txt`)
 

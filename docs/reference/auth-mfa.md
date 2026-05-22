@@ -1,18 +1,16 @@
 # Auth — Challenge MFA à la connexion
 
-!!! warning "Module en Pre-Alpha"
-    `forge-mvc-mfa` est marqué `Development Status :: 2 - Pre-Alpha`.
+!!! info "Module en Alpha — non publié sur PyPI en {{forge_version}}"
+    `forge-mvc-mfa` est marqué `Development Status :: 3 - Alpha` depuis `MFA-PYPI-READY-001`.
 
-    Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, le secret TOTP est **chiffré au repos**
-    via Fernet (`cryptography`) avec la clé `FORGE_MFA_SECRET_KEY`. Le chiffrement
-    est obligatoire — démarrer sans cette variable d'environnement lève
-    `MfaSecretKeyMissing`.
+    Le secret TOTP est **chiffré au repos** via Fernet (`cryptography`) avec la clé
+    `FORGE_MFA_SECRET_KEY`. Le chiffrement est obligatoire — démarrer sans cette
+    variable d'environnement lève `MfaSecretKeyMissing`.
 
-    Le module **n'est pas inclus** dans `forge-mvc[all]` (cf. T3).
+    **Non publié sur PyPI dans la vague `{{forge_version}}`.** Non inclus dans `forge-mvc[all]`.
     Installation depuis GitHub : voir [installation-github.md](../installation-github.md).
 
-    Le module reste Pre-Alpha. La requalification Beta est prévue dans
-    `MFA-PYPI-READY-001` après revue sécurité et documentation complète.
+    Publication PyPI prévue lors d'une release dédiée.
 
 > **Module extrait** : depuis Forge 2.5.0, le code MFA vit dans
 > `forge-mvc-mfa`. Voir `packages/forge-mvc-mfa/README.md` pour
@@ -76,8 +74,8 @@ Forge ne fournit pas encore dans ce flux : *remember device*, WebAuthn, SMS, ema
 
 ### Statut actuel
 
-`forge-mvc-mfa` est Pre-Alpha. Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, le secret
-TOTP est **chiffré au repos** via Fernet (bibliothèque `cryptography`).
+`forge-mvc-mfa` est Alpha depuis `MFA-PYPI-READY-001`. Le secret TOTP est
+**chiffré au repos** via Fernet (bibliothèque `cryptography`).
 
 Le module est opt-in, non inclus dans `forge-mvc[all]`, et doit être configuré avec
 `FORGE_MFA_SECRET_KEY` avant tout déploiement.
@@ -99,8 +97,8 @@ En développement et en environnement de test isolé :
 
 ### Production
 
-Le module reste Pre-Alpha. Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`),
-mais les exigences de production-ready complètes (rotation, sauvegarde/restauration,
+Le module est Alpha. Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`).
+Les exigences de production-ready complètes (rotation, sauvegarde/restauration,
 revue sécurité) ne sont pas encore satisfaites.
 
 **Protection additionnelle recommandée en production :**
@@ -145,14 +143,15 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` 3.
 
 ### Exigences avant production-ready
 
-`forge-mvc-mfa` ne sera pas déclaré Beta tant que les exigences suivantes ne sont pas satisfaites :
+`forge-mvc-mfa` ne sera pas déclaré Beta et publié sur PyPI tant que les exigences suivantes ne sont pas satisfaites :
 
 1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) — Fernet + `FORGE_MFA_SECRET_KEY`.
 2. **Politique de rotation documentée** — rotation ou invalidation maîtrisée des secrets compromis.
 3. **Documentation de sauvegarde/restauration** — procédure en cas de perte de la clé de chiffrement.
 4. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) — `tests/test_mfa_secret_crypto.py`.
 5. **Revue sécurité explicite** — validation que le stockage chiffré est correct.
-6. **Décision explicite de changement de statut** — ticket `MFA-PYPI-READY-001` de passage Pre-Alpha → Beta.
+6. ~~**Décision explicite de changement de statut Pre-Alpha → Alpha**~~ ✓ livré (`MFA-PYPI-READY-001`).
+7. **Décision de passage Alpha → Beta** et publication PyPI — ticket futur post-b7.
 
 ### Tickets liés
 
@@ -160,5 +159,5 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` 3.
 |---|---|---|
 | `MFA-SECRET-STORAGE-POLICY-001` | Documenter la politique de stockage | livré |
 | `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif du secret TOTP (Fernet) | livré |
-| `MFA-PYPI-READY-001` | Requalification Beta et publication PyPI | post-livraison SEC-MFA-SECRET-ENCRYPTION-001 |
+| `MFA-PYPI-READY-001` | Requalification Alpha (Pre-Alpha → Alpha) | livré |
 

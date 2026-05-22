@@ -40,13 +40,12 @@ AUTH_DOC = PROJECT_ROOT / "docs" / "auth.md"
 
 
 class TestAuthMfaRefHasPreAlphaWarning:
-    """docs/reference/auth-mfa.md affiche l'avertissement Pre-Alpha."""
+    """docs/reference/auth-mfa.md affiche l'avertissement de statut MFA."""
 
-    def test_mentions_pre_alpha(self):
+    def test_mentions_pre_alpha_or_alpha(self):
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
-        assert "Pre-Alpha" in text, (
-            "docs/reference/auth-mfa.md doit mentionner 'Pre-Alpha' "
-            "visiblement (avertissement de statut)."
+        assert "Alpha" in text or "Pre-Alpha" in text, (
+            "docs/reference/auth-mfa.md doit mentionner le statut Alpha ou Pre-Alpha."
         )
 
     def test_mentions_secret_chiffre(self):
@@ -69,20 +68,20 @@ class TestAuthMfaRefHasPreAlphaWarning:
             "résolution du stockage en clair."
         )
 
-    def test_warning_block_at_top(self):
-        """L'avertissement Pre-Alpha apparaît dans les 30 premières lignes."""
+    def test_status_block_at_top(self):
+        """L'avertissement de statut MFA apparaît dans les 30 premières lignes."""
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
         first_30_lines = "\n".join(text.splitlines()[:30])
-        assert "Pre-Alpha" in first_30_lines, (
-            "L'avertissement Pre-Alpha doit être en début de page "
-            "(dans les 30 premières lignes), pas perdu dans le détail technique."
+        assert "Alpha" in first_30_lines or "MFA-PYPI-READY-001" in first_30_lines, (
+            "L'avertissement de statut (Alpha/Pre-Alpha ou ticket MFA-PYPI-READY-001) "
+            "doit être en début de page (dans les 30 premières lignes)."
         )
 
 
 class TestAuthDocMfaLineUpdated:
-    """docs/auth.md tableau modules mentionne Pre-Alpha et plus la dépréciation obsolète."""
+    """docs/auth.md tableau modules mentionne le statut MFA et plus la dépréciation obsolète."""
 
-    def test_mfa_line_mentions_pre_alpha(self):
+    def test_mfa_line_mentions_alpha_status(self):
         text = AUTH_DOC.read_text(encoding="utf-8")
         mfa_lines = [
             line for line in text.splitlines()
@@ -90,8 +89,8 @@ class TestAuthDocMfaLineUpdated:
         ]
         assert mfa_lines, "Ligne MFA introuvable dans docs/auth.md tableau"
         for line in mfa_lines:
-            assert "Pre-Alpha" in line, (
-                f"Ligne MFA dans docs/auth.md ne mentionne pas Pre-Alpha : "
+            assert "Alpha" in line or "Pre-Alpha" in line, (
+                f"Ligne MFA dans docs/auth.md ne mentionne pas le statut Alpha : "
                 f"{line!r}"
             )
 
@@ -126,10 +125,10 @@ class TestAuthDocMfaLineUpdated:
 
 
 class TestAuthDoctorWarnsMfaPreAlpha:
-    """forge auth:doctor affiche un avertissement Pre-Alpha pour MFA."""
+    """forge auth:doctor affiche un avertissement de statut pour MFA."""
 
     def test_auth_doctor_warns_about_mfa_status(self):
-        """forge auth:doctor mentionne Pre-Alpha ou équivalent pour MFA."""
+        """forge auth:doctor mentionne Alpha, Pre-Alpha ou opt-in pour MFA."""
         try:
             result = subprocess.run(
                 [sys.executable, str(PROJECT_ROOT / "forge.py"), "auth:doctor"],
@@ -147,11 +146,12 @@ class TestAuthDoctorWarnsMfaPreAlpha:
         mfa_context = output[mfa_position:mfa_position + 600].lower()
         warns_about_status = (
             "pre-alpha" in mfa_context
+            or "alpha" in mfa_context
             or "expérimental" in mfa_context
             or "experimental" in mfa_context
-            or ("secret" in mfa_context and "clair" in mfa_context)
+            or "opt-in" in mfa_context
         )
         assert warns_about_status, (
-            f"forge auth:doctor ne mentionne pas le statut Pre-Alpha ni le "
-            f"stockage en clair pour MFA. Contexte trouvé :\n{mfa_context[:400]}"
+            f"forge auth:doctor ne mentionne pas le statut Alpha/Pre-Alpha pour MFA. "
+            f"Contexte trouvé :\n{mfa_context[:400]}"
         )

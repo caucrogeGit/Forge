@@ -23,7 +23,7 @@ Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API offici
 | RBAC | `forge_mvc_rbac` (voir [installation-github.md](installation-github.md)) | — |
 | CSRF | — | `core.security.middleware.CsrfMiddleware` + `require_csrf` — officiels |
 | Middleware | — | `core.security.middleware` — officiel |
-| MFA | `forge_mvc_mfa` (voir [installation-github.md](installation-github.md)) — **Pre-Alpha**, secret TOTP en clair (voir [auth-mfa](reference/auth-mfa.md)) | — |
+| MFA | `forge_mvc_mfa` (voir [installation-github.md](installation-github.md)) — **Alpha**, secret TOTP chiffré au repos (voir [auth-mfa](reference/auth-mfa.md)) | — |
 | Tokens à usage limité | `core.auth.tokens` | — |
 | OIDC / SSO | ❌ non fourni nativement — voir [section OIDC](#oidc) | — |
 | Contrat utilisateur | `core.auth.user` | — |
@@ -430,14 +430,12 @@ ecriture DB automatique.
 
 ## MFA
 
-!!! warning "forge-mvc-mfa est en Pre-Alpha"
-    Le module MFA est marqué `Development Status :: 2 - Pre-Alpha`.
-    Le secret TOTP est stocké **en clair** dans `auth_mfa_factors.totp_secret`.
-    Non recommandé en production sensible sans protection additionnelle.
-    Chiffrement applicatif prévu dans `SEC-MFA-SECRET-ENCRYPTION-001` — ticket post-1.0, tant que MFA reste Pre-Alpha.
+!!! info "forge-mvc-mfa est en Alpha — non publié PyPI en {{forge_version}}"
+    Le module MFA est marqué `Development Status :: 3 - Alpha` depuis `MFA-PYPI-READY-001`.
+    Le secret TOTP est **chiffré au repos** via Fernet (`FORGE_MFA_SECRET_KEY`).
 
-    `forge-mvc-mfa` est **source-only** en `{{forge_version}}` et ne sera
-    pas publié sur PyPI en `1.0` — voir
+    `forge-mvc-mfa` n'est pas publié sur PyPI en `{{forge_version}}`.
+    Installation depuis GitHub — voir
     [contrat d'installation](installation.md#contrat-dinstallation-des-opt-ins).
 
 > **Depuis Forge 2.4.0**, le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
@@ -494,12 +492,12 @@ CREATE TABLE IF NOT EXISTS auth_mfa_factors (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-Le champ `totp_secret` contient le secret TOTP stocke en clair dans la base.
-Il doit etre protege. Forge ne l'affiche jamais ni ne l'inclut dans un audit
-ou une tentative rate limit.
+Le champ `totp_secret` contient le secret TOTP **chiffré** dans la base
+(Fernet, clé `FORGE_MFA_SECRET_KEY`). Forge ne l'affiche jamais ni ne l'inclut
+dans un audit ou une tentative rate limit.
 
-**Limite connue :** le secret est stocke en clair (pas de chiffrement applicatif).
-Un chiffrement optionnel est prevu dans `SEC-MFA-SECRET-ENCRYPTION-001`.
+**Exigence :** `FORGE_MFA_SECRET_KEY` doit être positionné dans l'environnement.
+Voir `SEC-MFA-SECRET-ENCRYPTION-001` pour les détails du chiffrement.
 
 ### TOTP
 

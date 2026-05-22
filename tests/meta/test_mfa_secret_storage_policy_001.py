@@ -169,11 +169,10 @@ class TestNoUnqualifiedProductionReadyClaim:
 class TestMfaRemainsOptIn:
     """MFA reste opt-in et Pre-Alpha."""
 
-    def test_mfa_pre_alpha_in_pyproject(self):
+    def test_mfa_alpha_in_pyproject(self):
         text = MFA_PYPROJECT.read_text(encoding="utf-8")
-        assert "Development Status :: 2 - Pre-Alpha" in text, (
-            "forge-mvc-mfa doit rester 'Development Status :: 2 - Pre-Alpha'. "
-            "La requalification est prévue dans MFA-PYPI-READY-001."
+        assert "Development Status :: 3 - Alpha" in text, (
+            "forge-mvc-mfa est 'Development Status :: 3 - Alpha' depuis MFA-PYPI-READY-001."
         )
 
     def test_pyotp_not_in_core_dependencies(self):

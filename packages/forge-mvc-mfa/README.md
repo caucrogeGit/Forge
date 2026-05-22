@@ -2,16 +2,17 @@
 
 Brique MFA (TOTP + codes de récupération) pour le framework Forge.
 
-## Statut : Pre-Alpha (Forge 3.0.x) — chiffrement Fernet livré
+## Statut : Alpha — préparé pour publication future (MFA-PYPI-READY-001)
 
-`forge-mvc-mfa` est marqué `Development Status :: 2 - Pre-Alpha`.
+`forge-mvc-mfa` est marqué `Development Status :: 3 - Alpha`.
 
 Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, **le secret TOTP est chiffré au repos**
 via Fernet (`cryptography`). La clé est lue depuis `FORGE_MFA_SECRET_KEY` —
 obligatoire au démarrage.
 
-Le module **n'est pas inclus** dans `forge-mvc[all]`. La requalification Beta
-est prévue dans `MFA-PYPI-READY-001`.
+Le module **n'est pas publié sur PyPI dans la vague `1.0.0b7`**.
+Non inclus dans `forge-mvc[all]`. Publication prévue lors d'une release dédiée
+après ticket `MFA-PYPI-READY-001`.
 
 **Mode d'installation (Forge 3.0.x)** : `forge-mvc-mfa` n'est pas encore publié
 sur PyPI. Installation depuis les sources (mode dev) :

@@ -16,7 +16,7 @@ Forge 1.x garantit la stabilité de son interface publique : commandes CLI docum
 
 Le contrat couvre également :
 
-- Les modules opt-in extraits (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` — Beta ; `forge-mvc-mfa` — Pre-Alpha).
+- Les modules opt-in extraits (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` — Beta ; `forge-mvc-mfa` — Alpha).
 - Le mécanisme de plugins pour étendre le contexte Jinja (`core.mvc.controller.register_jinja_context_provider`).
 - L'absence de dépendance nominale du core sur les modules opt-in.
 
@@ -88,7 +88,7 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 | `forge starter:build` | Expérimental |
 | Pages publiques (`make:public-*`) | Disponible, interface stable, comportement peut s'affiner |
 | Backends de session FileStore / MariaDbStore | Disponible, API stable, options de configuration susceptibles d'évoluer |
-| `forge-mvc-mfa` (Pre-Alpha) | Secret TOTP stocké en clair. Non recommandé en production sensible avant `SEC-MFA-SECRET-ENCRYPTION-001` — ticket post-1.0, tant que MFA reste Pre-Alpha. |
+| `forge-mvc-mfa` (Alpha) | Secret TOTP chiffré au repos via Fernet (`FORGE_MFA_SECRET_KEY`). Non publié PyPI en `{{forge_version}}` — publication future. |
 | OIDC | Retiré du core (ADR-004). Si réintroduit via `forge-mvc-oidc`, sera expérimental jusqu'à Beta confirmée. |
 
 ---
@@ -303,7 +303,7 @@ Les points suivants seront traités dans des tickets dédiés :
 - Garantie sur les modules internes non documentés.
 - Garantie sur les starters (code généré, non versionnés dans les projets utilisateur).
 - Garantie sur les backends de session expérimentaux (FileStore, MariaDbStore).
-- La rétrocompatibilité du module `forge-mvc-mfa` tant qu'il reste Pre-Alpha (cf. décision T3).
+- La rétrocompatibilité du module `forge-mvc-mfa` tant qu'il reste Alpha — les API peuvent évoluer avant Beta.
 - Les API privées préfixées par `_` peuvent changer entre versions mineures sans notice.
 
 ---

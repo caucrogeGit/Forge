@@ -81,7 +81,7 @@ class TestNewSectionsFor3X:
             f"Le doc doit mentionner au moins 3 modules opt-in (vu : {modules_mentioned})."
         )
 
-    def test_mfa_marked_pre_alpha(self):
+    def test_mfa_marked_alpha_or_experimental(self):
         text = STABILITY_DOC.read_text(encoding="utf-8")
         if "forge-mvc-mfa" in text:
             mfa_match = re.search(r"forge-mvc-mfa.{0,300}", text, re.DOTALL)
@@ -89,10 +89,11 @@ class TestNewSectionsFor3X:
             context = mfa_match.group(0)
             assert (
                 "Pre-Alpha" in context
+                or "Alpha" in context
                 or "expérimental" in context
                 or "experimentale" in context.lower()
             ), (
-                f"forge-mvc-mfa doit être marqué Pre-Alpha ou expérimental. "
+                f"forge-mvc-mfa doit être marqué Alpha ou expérimental. "
                 f"Contexte : {context[:200]}"
             )
 

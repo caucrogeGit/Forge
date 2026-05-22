@@ -19,8 +19,7 @@ dependencies = [
     "cryptography>=42,<46",
 ]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
-    "Private :: Do Not Upload",
+    "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",

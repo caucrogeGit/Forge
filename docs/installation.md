@@ -24,7 +24,7 @@ Voir [Politique de release](release-policy.md#publication-pypi).
 | Package (monorepo) | Contenu | Statut |
 |---|---|---|
 | `forge-mvc` | Noyau complet — core, CLI, intégrations | Bêta |
-| `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Pre-Alpha** (secret en clair) |
+| `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Alpha** — non publié PyPI en `{{forge_version}}` |
 | `forge-mvc-rbac` | Brique RBAC — contrôle d'accès par rôles | Beta |
 | `forge-mvc-workflow` | Brique workflow — statuts et transitions | Beta |
 | `forge-mvc-stats` | Brique statistiques — agrégations | Beta |
@@ -64,8 +64,8 @@ pip install --pre "forge-mvc[all]"
 `forge-mvc[media]` et `forge-mvc[mfa]` **ne sont pas disponibles** :
 
 - **`forge-mvc-media`** : source-only après extraction Phase 11.
-- **`forge-mvc-mfa`** : Pre-Alpha — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant
-  toute publication PyPI.
+- **`forge-mvc-mfa`** : Alpha — secret TOTP chiffré au repos (Fernet). Non publié
+  sur PyPI en `{{forge_version}}` — publication prévue lors d'une release dédiée.
 
 Pour installer les opt-ins en `{{forge_version}}`, utiliser le mode source :
 

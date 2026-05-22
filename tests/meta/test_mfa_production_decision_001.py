@@ -77,17 +77,23 @@ class TestMfaAvailableViaExplicitExtra:
 class TestMfaStatusDocumented:
     """Le statut Pre-Alpha de MFA est documenté visiblement."""
 
-    def test_mfa_pyproject_is_pre_alpha(self):
+    def test_mfa_pyproject_is_alpha(self):
         text = MFA_PYPROJECT.read_text(encoding="utf-8")
-        assert "Development Status :: 2 - Pre-Alpha" in text, (
-            "Le classifier MFA doit rester 'Development Status :: 2 - Pre-Alpha'. "
-            "La requalification Beta est prévue dans MFA-PYPI-READY-001."
+        assert "Development Status :: 3 - Alpha" in text, (
+            "Le classifier MFA doit être 'Development Status :: 3 - Alpha' "
+            "depuis MFA-PYPI-READY-001."
+        )
+
+    def test_mfa_pyproject_no_private_do_not_upload(self):
+        text = MFA_PYPROJECT.read_text(encoding="utf-8")
+        assert "Private :: Do Not Upload" not in text, (
+            "forge-mvc-mfa n'a plus 'Private :: Do Not Upload' depuis MFA-PYPI-READY-001."
         )
 
     def test_mfa_readme_documents_status(self):
         text = MFA_README.read_text(encoding="utf-8")
-        assert "Pre-Alpha" in text, (
-            "Le README MFA doit afficher 'Pre-Alpha' clairement."
+        assert "Alpha" in text, (
+            "Le README MFA doit afficher le statut 'Alpha' clairement."
         )
 
     def test_mfa_readme_documents_pypi_roadmap(self):

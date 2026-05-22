@@ -149,7 +149,7 @@ chaque package publiable :
 | `forge-mvc-rbac` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-workflow` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-stats` | `4 - Beta` | API stable et testée, usage production externe encore limité |
-| `forge-mvc-mfa` | `2 - Pre-Alpha` | Secret TOTP stocké en clair, ticket `SEC-MFA-SECRET-ENCRYPTION-001` requis avant Beta |
+| `forge-mvc-mfa` | `3 - Alpha` | Secret TOTP chiffré au repos (Fernet, `MFA-PYPI-READY-001`) — non publié PyPI en `{{forge_version}}` |
 | `forge-mvc-media` | `3 - Alpha` | Docs complètes, shims supprimés — préparé pour publication future (`MEDIA-PYPI-READY-002`) |
 
 Critères de passage Beta → Stable d'un module opt-in :
@@ -324,7 +324,7 @@ Vérifications post-publication :
 | `forge-mvc-workflow` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-workflow` |
 | `forge-mvc-stats` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-stats` |
 | `forge-mvc-media` | Non publié en `{{forge_version}}` — publication future | Alpha — préparé (`MEDIA-PYPI-READY-002`) |
-| `forge-mvc-mfa` | Non publié — `SEC-MFA-SECRET-ENCRYPTION-001` requis | Pre-Alpha, source-only |
+| `forge-mvc-mfa` | Non publié en `{{forge_version}}` — publication future | Alpha — préparé (`MFA-PYPI-READY-001`) |
 
 Pour `forge-mvc-media` et `forge-mvc-mfa`, utiliser [Installation depuis GitHub](installation-github.md).
 
@@ -358,14 +358,14 @@ reste manuelle et délibérée.
 | `forge-mvc-rbac` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-rbac` |
 | `forge-mvc-workflow` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-workflow` |
 | `forge-mvc-stats` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-stats` |
-| `forge-mvc-mfa` | Non publié PyPI en `1.0` | Pre-Alpha — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant publication |
+| `forge-mvc-mfa` | Non publié en `{{forge_version}}` — publication future | Alpha — préparé (`MFA-PYPI-READY-001`, `SEC-MFA-SECRET-ENCRYPTION-001` livré) |
 | `forge-mvc-media` | Alpha — préparé pour publication future | Docs complètes, shims supprimés, `Private :: Do Not Upload` retiré (`MEDIA-PYPI-READY-002`) |
 
 ### Règles de version
 
 - **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` est bumped à chaque release. Les opt-ins source-only conservent leur version interne.
 - Les opt-ins publiés (`rbac`, `workflow`, `stats`) doivent rester strictement synchronisés avec la version du core.
-- `forge-mvc-mfa` ne rejoindra pas ce flux en `1.0` — sa publication est conditionnée à `SEC-MFA-SECRET-ENCRYPTION-001`.
+- `forge-mvc-mfa` ne rejoint pas ce flux en `{{forge_version}}` — publication prévue lors d'une release dédiée post-{{forge_version}}.
 
 ### Artefacts de build
 
@@ -430,16 +430,16 @@ La publication est strictement synchronisée : core et opt-ins portent la même 
 
 ### Cas particulier : forge-mvc-mfa
 
-`forge-mvc-mfa` n'est **pas publié sur PyPI en série 1.0**.
+`forge-mvc-mfa` n'est **pas publié sur PyPI en `{{forge_version}}`**.
 
-Raisons :
+État après `MFA-PYPI-READY-001` :
 
-- statut Pre-Alpha (`Development Status :: 2 - Pre-Alpha`) ;
-- le secret TOTP est stocké en clair — non recommandé en production sans protection additionnelle ;
-- le chiffrement applicatif (`SEC-MFA-SECRET-ENCRYPTION-001`) est requis avant toute publication PyPI.
+- statut Alpha (`Development Status :: 3 - Alpha`) ;
+- le secret TOTP est chiffré au repos via Fernet (`SEC-MFA-SECRET-ENCRYPTION-001`) ;
+- `FORGE_MFA_SECRET_KEY` obligatoire au démarrage.
 
-Le module passe en Beta et rejoint PyPI uniquement après livraison de `SEC-MFA-SECRET-ENCRYPTION-001`.
-En attendant, l'installation se fait depuis GitHub (source-only).
+Le module n'est pas publié sur PyPI dans la vague `{{forge_version}}`. La publication est
+prévue lors d'une release dédiée post-{{forge_version}}. L'installation se fait depuis GitHub.
 
 ### Extras PyPI
 
@@ -456,10 +456,9 @@ Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et `forg
 
 ### Ce qui est interdit avant publication coordonnée
 
-- `twine upload` pour un opt-in source-only — interdit tant que le package n’est pas explicitement requalifié publiable ;
-- déclarer `forge-mvc[mfa]` dans les extras PyPI — interdit en série 1.0 ;
-- inclure `forge-mvc-mfa` dans `forge-mvc[all]` — interdit tant que Pre-Alpha ;
-- publier `forge-mvc-mfa` sans livrer `SEC-MFA-SECRET-ENCRYPTION-001` — interdit.
+- `twine upload` pour un opt-in non publié — interdit sans ticket de release dédié ;
+- déclarer `forge-mvc[mfa]` dans les extras PyPI — non disponible en `{{forge_version}}` ;
+- inclure `forge-mvc-mfa` dans `forge-mvc[all]` — non inclus en `{{forge_version}}`.
 
 ### Tickets liés
 
@@ -469,7 +468,8 @@ Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et `forg
 | `OPTIN-PYPI-NAMES-CHECK-001` | Vérifier la disponibilité des noms PyPI pour les 5 opt-ins | livré |
 | `OPTIN-PYPI-PUBLISH-PREPARE-001` | Préparer rbac/workflow/stats pour publication (dépendances relâchées, `Private :: Do Not Upload` retiré) | livré |
 | `OPTIN-PYPI-PUBLISH-001` | Publication coordonnée des opt-ins publiables | historique / livré selon version cible |
-| `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif — prérequis à la publication de forge-mvc-mfa | post-1.0 |
+| `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement Fernet des secrets TOTP | livré |
+| `MFA-PYPI-READY-001` | Requalification Alpha de forge-mvc-mfa | livré |
 
 ---
 

@@ -7,7 +7,7 @@ Verifie que :
 - les extras rbac/workflow/stats utilisent les contraintes >=1.0.0b4,<2 ;
 - l'extra all contient exactement rbac/workflow/stats (pas media, pas mfa) ;
 - les dependances obligatoires du core ne contiennent aucun opt-in ;
-- media et mfa conservent Private :: Do Not Upload ;
+- media et mfa n'ont plus Private :: Do Not Upload (requalifiés Alpha) ;
 - la documentation ne présente pas forge-mvc[media] ou forge-mvc[mfa] comme disponibles.
 """
 from __future__ import annotations
@@ -162,15 +162,16 @@ class TestCoreNoDependsOnOptins:
         )
 
 
-@pytest.mark.parametrize("pkg", ["forge-mvc-mfa"])
-class TestNonPublishablePrivateClassifier:
-    def test_private_classifier_preserved(self, pkg):
-        """forge-mvc-mfa seul conserve Private :: Do Not Upload (MEDIA-PYPI-READY-002 retiré pour media)."""
+@pytest.mark.parametrize("pkg", ["forge-mvc-mfa", "forge-mvc-media"])
+class TestAlphaPreparedClassifier:
+    def test_no_private_classifier(self, pkg):
+        """forge-mvc-mfa et forge-mvc-media ont retiré 'Private :: Do Not Upload' (requalifiés Alpha)."""
         toml = PROJECT_ROOT / "packages" / pkg / "pyproject.toml"
         data = tomllib.loads(toml.read_text(encoding="utf-8"))
         classifiers = data["project"]["classifiers"]
-        assert any("Private :: Do Not Upload" in c for c in classifiers), (
-            f"{pkg} doit conserver 'Private :: Do Not Upload'."
+        assert not any("Private :: Do Not Upload" in c for c in classifiers), (
+            f"{pkg} ne doit plus avoir 'Private :: Do Not Upload' "
+            f"(requalifié Alpha : MFA-PYPI-READY-001 / MEDIA-PYPI-READY-002)."
         )
 
 

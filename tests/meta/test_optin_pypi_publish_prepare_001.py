@@ -4,7 +4,7 @@ Verifie que :
 - OPTIN-PYPI-PUBLISH-PREPARE-001 est reference dans la roadmap et marque livré ;
 - la dependance forge-mvc est relachee (>=1.0.0b4,<2) dans rbac/workflow/stats ;
 - forge-mvc-rbac, workflow, stats n'ont plus 'Private :: Do Not Upload' ;
-- forge-mvc-mfa conserve 'Private :: Do Not Upload' (forge-mvc-media requalifié Alpha dans MEDIA-PYPI-READY-002) ;
+- forge-mvc-mfa n'a plus 'Private :: Do Not Upload' (requalifié Alpha dans MFA-PYPI-READY-001) ;
 - forge-mvc-mfa mentionne SEC-MFA-SECRET-ENCRYPTION-001 dans la doc release-policy ;
 - le root pyproject.toml ne depend pas des opt-ins ;
 - aucune commande twine upload dist/ n'est recommandee dans release-policy.
@@ -31,8 +31,9 @@ _PUBLISHABLE = [
     "forge-mvc-stats",
 ]
 
-_NON_PUBLISHABLE = [
+_ALPHA_PREPARED = [
     "forge-mvc-mfa",
+    "forge-mvc-media",
 ]
 
 
@@ -82,23 +83,26 @@ class TestPublishablePackagesDependency:
         )
 
 
-@pytest.mark.parametrize("pkg", _NON_PUBLISHABLE)
-class TestNonPublishablePackagesProtected:
+@pytest.mark.parametrize("pkg", _ALPHA_PREPARED)
+class TestAlphaPreparedPackages:
     def _text(self, pkg: str) -> str:
         toml_path = PROJECT_ROOT / "packages" / pkg / "pyproject.toml"
         return toml_path.read_text(encoding="utf-8")
 
-    def test_private_do_not_upload_preserved(self, pkg):
+    def test_no_private_do_not_upload(self, pkg):
         text = self._text(pkg)
-        assert "Private :: Do Not Upload" in text, (
-            f"{pkg}/pyproject.toml: 'Private :: Do Not Upload' doit rester present "
-            f"— ce package ne doit pas etre publie."
+        assert "Private :: Do Not Upload" not in text, (
+            f"{pkg}/pyproject.toml: 'Private :: Do Not Upload' doit etre retire "
+            f"— ce package a ete requalifie Alpha (MFA-PYPI-READY-001 / MEDIA-PYPI-READY-002)."
         )
 
-    def test_pre_alpha_status(self, pkg):
+    def test_alpha_status(self, pkg):
+        import tomllib as _toml
         text = self._text(pkg)
-        assert "Pre-Alpha" in text or "2 - Pre-Alpha" in text, (
-            f"{pkg}/pyproject.toml: le statut Pre-Alpha doit etre maintenu."
+        data = _toml.loads(text)
+        classifiers = data.get("project", {}).get("classifiers", [])
+        assert any("3 - Alpha" in c for c in classifiers), (
+            f"{pkg}: doit avoir 'Development Status :: 3 - Alpha'."
         )
 
 
