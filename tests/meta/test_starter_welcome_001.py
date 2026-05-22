@@ -349,6 +349,27 @@ class TestWelcomeStarterDocPedagogy:
         assert '=== "Cycle HTML"' in content
         assert '=== "Cycle JSON"' in content
 
+    def test_doc_contient_schemas_visuels_mermaid(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "```mermaid" in content
+        assert content.count("flowchart") >= 3
+        expected_terms = [
+            "python app.py",
+            "Application Forge démarrée",
+            "GET /welcome",
+            "WelcomeController.index(request)",
+            "Response HTML",
+            "Response JSON",
+        ]
+        for term in expected_terms:
+            assert term in content, f"Terme absent des schémas visuels : {term}"
+
+    def test_doc_contient_schema_route_controller_vue(self):
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert 'A["GET /welcome"] --> B["mvc/routes.py"]' in content
+        assert 'B --> C["pub.add(...)"]' in content
+        assert 'D --> E["welcome/index.html"]' in content
+
     def test_doc_cycle_html_complet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert "Request → Router → Controller → View → Response HTML" in content, (

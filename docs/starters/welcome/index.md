@@ -34,6 +34,20 @@ Une requête Forge suit toujours le même début : elle devient une `Request`, l
 
     Ce starter explique ce principe, mais il **n'expose pas de route JSON dédiée**.
 
+```mermaid
+flowchart TD
+    A["Request"] --> B["Router"]
+    B --> C["Controller"]
+
+    C --> D["View HTML"]
+    D --> E["Response HTML"]
+
+    C --> F["JSON direct"]
+    F --> G["Response JSON"]
+```
+
+Ce schéma compare les deux sorties possibles : une réponse HTML passe par une vue, alors qu'une réponse JSON peut être produite directement par le contrôleur.
+
 ## Où intervient `app.py` ?
 
 `app.py` est le point d'entrée de l'application Forge en développement.
@@ -47,6 +61,17 @@ python app.py
 Forge démarre l'application, charge la configuration utile, prépare le routage et attend les requêtes HTTP.
 
 `app.py` ne contient pas la logique de la page `/welcome`. Il démarre l'application. Ensuite, quand le navigateur demande `/welcome`, Forge reçoit la requête HTTP transmise par le serveur de développement, construit une `Request`, puis la transmet au `Router`.
+
+```mermaid
+flowchart TD
+    A["python app.py"] --> B["Application Forge démarrée"]
+    B --> C["Navigateur : GET /welcome"]
+    C --> D["Request"]
+    D --> E["Router"]
+    E --> F["WelcomeController.index(request)"]
+    F --> G["Vue HTML"]
+    G --> H["Response HTML"]
+```
 
 ```text
 python app.py
@@ -82,6 +107,15 @@ Forge appelle WelcomeController.index(request)
 la méthode retourne une réponse Forge
     ↓
 Response HTML
+```
+
+```mermaid
+flowchart LR
+    A["GET /welcome"] --> B["mvc/routes.py"]
+    B --> C["pub.add(...)"]
+    C --> D["WelcomeController.index(request)"]
+    D --> E["welcome/index.html"]
+    E --> F["Response HTML"]
 ```
 
 Dans le fichier réel, l'alignement contient des espaces pour rendre les six routes lisibles, mais le lien important reste celui-ci : `/welcome` appelle `WelcomeController.index`.
