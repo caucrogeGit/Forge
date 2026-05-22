@@ -54,7 +54,7 @@ from forge_mvc_media import attach_media_to_entity, delete_media, get_cover_medi
 
 Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus
 supportés depuis `MEDIA-SHIMS-REMOVE-001`.
-Le package reste source-only et non publié sur PyPI.
+Ce package n'est pas encore publié sur PyPI — publication prévue dans une prochaine release.
 
 ## Shims de compatibilité dans core
 
@@ -64,9 +64,10 @@ Ils ont été supprimés dans `MEDIA-SHIMS-REMOVE-001`.
 
 ## Conditions avant publication sur PyPI
 
-La décision de maintenir ce package source-only a été actée dans `MEDIA-PYPI-READY-001`.
+Toutes les conditions préparatoires sont remplies depuis `MEDIA-PYPI-READY-002`.
+La publication PyPI sera déclenchée par un ticket dédié lors d'une prochaine release.
 
-Les critères suivants doivent être remplis avant toute publication :
+Les critères étaient :
 
 1. ~~**`MEDIA-DOCS-MIGRATION-001` livré**~~ ✓ livré — documentation technique à jour dans `docs/`.
 2. ~~**Shims supprimés**~~ ✓ livré (`MEDIA-SHIMS-REMOVE-001`) — `core/uploads/media_repository.py` et

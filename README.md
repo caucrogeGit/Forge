@@ -74,15 +74,21 @@ et ce que **l'application implémente**.
 ### Modules officiels disponibles
 
 Forge sépare le noyau minimal des fonctionnalités spécialisées.
-Les modules suivants sont distribués en **mode source-only** via GitHub
-(publication PyPI des opt-in prévue dans une version ultérieure) :
+
+**Publiés sur PyPI** (`pip install --pre <module>`) :
 
 | Module | Rôle | Statut |
 |--------|------|--------|
-| `forge-mvc-mfa` | Authentification multi-facteurs (TOTP, codes de récupération) | Pre-Alpha |
 | `forge-mvc-rbac` | RBAC fin (rôles, permissions, décorateurs) | Beta |
 | `forge-mvc-workflow` | Cycles de vie applicatifs (statuts, transitions) | Beta |
 | `forge-mvc-stats` | Tracking d'événements génériques | Beta |
+
+**Non publiés sur PyPI** (installation depuis les sources) :
+
+| Module | Rôle | Statut | Raison |
+|--------|------|--------|--------|
+| `forge-mvc-media` | Gestion applicative des médias | Alpha | Préparé — publication prévue dans une prochaine release |
+| `forge-mvc-mfa` | Authentification multi-facteurs (TOTP, codes de récupération) | Pre-Alpha | Bloqué — `SEC-MFA-SECRET-ENCRYPTION-001` requis avant publication |
 
 Installation depuis le monorepo (voir [installation-github.md](docs/installation-github.md)) :
 
