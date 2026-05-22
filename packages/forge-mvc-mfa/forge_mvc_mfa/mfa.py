@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import warnings as _warnings
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import wraps
@@ -12,6 +11,7 @@ import pyotp
 
 from core.auth.exceptions import AuthError, InvalidAuthUserError, InvalidMfaFactorError
 from core.sessions.keys import session_get as _session_get
+from forge_mvc_mfa.secret_crypto import decrypt_totp_secret, encrypt_totp_secret
 
 
 MFA_FACTOR_TOTP = "totp"
@@ -24,22 +24,6 @@ MFA_STATUS_DISABLED = "disabled"
 _KNOWN_FACTOR_TYPES = frozenset({MFA_FACTOR_TOTP, MFA_FACTOR_RECOVERY})
 _KNOWN_STATUSES = frozenset({MFA_STATUS_PENDING, MFA_STATUS_ACTIVE, MFA_STATUS_DISABLED})
 
-_PLAINTEXT_SECRET_WARNING_EMITTED = False
-
-
-def _warn_plaintext_secret_storage() -> None:
-    global _PLAINTEXT_SECRET_WARNING_EMITTED
-    if _PLAINTEXT_SECRET_WARNING_EMITTED:
-        return
-    _PLAINTEXT_SECRET_WARNING_EMITTED = True
-    _warnings.warn(
-        "Forge stocke le secret TOTP en clair dans la colonne TotpSecret. "
-        "Cette implementation n'est pas adaptee a un usage en production "
-        "sans protection additionnelle de la table auth_mfa_factors "
-        "(chiffrement applicatif prevu : SEC-MFA-SECRET-ENCRYPTION-001).",
-        UserWarning,
-        stacklevel=2,
-    )
 
 
 @dataclass(frozen=True)
@@ -207,12 +191,8 @@ class TotpSetup:
 
     secret   : secret base32 brut a afficher une fois ou utiliser pour generer un QR.
     factor   : AuthMfaFactor en statut pending pret a etre stocke.
+               factor.totp_secret est chiffre (prefixe "enc:") via FORGE_MFA_SECRET_KEY.
     provisioning_uri : URI otpauth:// a passer a l'application d'authentification.
-
-    Note : factor.totp_secret contient le secret TOTP en clair necessaire a la
-    verification. Ce champ est stocke non chiffre dans la colonne TotpSecret.
-    Restreindre l'acces a la table auth_mfa_factors en attendant le chiffrement
-    applicatif (SEC-MFA-SECRET-ENCRYPTION-001).
     """
 
     secret: str
@@ -259,8 +239,6 @@ def create_totp_factor(
     - un AuthMfaFactor en statut pending pret au stockage ;
     - l'URI otpauth:// de provisioning.
     """
-    _warn_plaintext_secret_storage()
-
     if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
         raise InvalidMfaFactorError("user_id doit etre un entier strictement positif")
 
@@ -272,7 +250,7 @@ def create_totp_factor(
         id=None,
         user_id=user_id,
         factor_type=MFA_FACTOR_TOTP,
-        totp_secret=secret,
+        totp_secret=encrypt_totp_secret(secret),
         status=MFA_STATUS_PENDING,
         label=label,
         confirmed_at=None,
@@ -336,7 +314,8 @@ def confirm_totp_factor(
         if factor.status != MFA_STATUS_PENDING:
             return None
 
-        if not verify_totp_code(factor.totp_secret, code, now=now):
+        raw_secret = decrypt_totp_secret(factor.totp_secret)
+        if not verify_totp_code(raw_secret, code, now=now):
             return None
 
         ts = now if now is not None else datetime.now(tz=timezone.utc)
@@ -639,7 +618,8 @@ def verify_mfa_challenge(
                     continue
                 if factor.id is not None and _replay.is_replay(factor.id, current_step):
                     continue
-                if verify_totp_code(factor.totp_secret, code, now=now):
+                raw_secret = decrypt_totp_secret(factor.totp_secret)
+                if verify_totp_code(raw_secret, code, now=now):
                     if factor.id is not None:
                         _replay.record_used(factor.id, current_step)
                     updated_factor = AuthMfaFactor(
@@ -890,7 +870,8 @@ def verify_mfa_revalidation(
                     continue
                 if factor.id is not None and _replay.is_replay(factor.id, current_step):
                     continue
-                if verify_totp_code(factor.totp_secret, code, now=now):
+                raw_secret = decrypt_totp_secret(factor.totp_secret)
+                if verify_totp_code(raw_secret, code, now=now):
                     if factor.id is not None:
                         _replay.record_used(factor.id, current_step)
                     updated_factor = AuthMfaFactor(

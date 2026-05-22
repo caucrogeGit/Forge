@@ -80,8 +80,8 @@ class TestMfaStatusDocumented:
     def test_mfa_pyproject_is_pre_alpha(self):
         text = MFA_PYPROJECT.read_text(encoding="utf-8")
         assert "Development Status :: 2 - Pre-Alpha" in text, (
-            "Le classifier MFA doit rester 'Development Status :: 2 - Pre-Alpha' "
-            "tant que SEC-MFA-SECRET-ENCRYPTION-001 n'est pas livré."
+            "Le classifier MFA doit rester 'Development Status :: 2 - Pre-Alpha'. "
+            "La requalification Beta est prévue dans MFA-PYPI-READY-001."
         )
 
     def test_mfa_readme_documents_status(self):
@@ -90,9 +90,9 @@ class TestMfaStatusDocumented:
             "Le README MFA doit afficher 'Pre-Alpha' clairement."
         )
 
-    def test_mfa_readme_documents_source_install(self):
+    def test_mfa_readme_documents_pypi_roadmap(self):
         text = MFA_README.read_text(encoding="utf-8")
-        assert "OPTIN-PYPI-PUBLISH-001" in text, (
-            "Le README MFA doit mentionner OPTIN-PYPI-PUBLISH-001 "
-            "(ticket de publication PyPI des opt-in)."
+        assert "MFA-PYPI-READY-001" in text, (
+            "Le README MFA doit mentionner MFA-PYPI-READY-001 "
+            "(ticket de requalification Beta et publication PyPI de forge-mvc-mfa)."
         )

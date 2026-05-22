@@ -1,8 +1,8 @@
 """Tests SEC-MFA-SECRET-NAMING-001 — renommage secret_hash → totp_secret.
 
-Vérifie (état post-T4 MFA-SECRET-HASH-DEPRECATION-RESOLVE-001) :
+Vérifie (état post-SEC-MFA-SECRET-ENCRYPTION-001) :
 - AuthMfaFactor.totp_secret est le champ canonique (unique — secret_hash retiré en 3.0.1)
-- create_totp_factor émet un UserWarning unique sur le stockage en clair
+- create_totp_factor chiffre le secret (préfixe "enc:") — plus de UserWarning plaintext
 - La colonne SQL s'appelle totp_secret dans les deux sources (SQL file et CLI constant)
 """
 
@@ -13,15 +13,24 @@ import warnings
 import pytest
 
 pytest.importorskip("forge_mvc_mfa")
+pytest.importorskip("cryptography")
 
 from forge_mvc_mfa import (
     MFA_FACTOR_TOTP,
     MFA_STATUS_PENDING,
     AuthMfaFactor,
     create_totp_factor,
+    decrypt_totp_secret,
 )
 
 pytestmark = pytest.mark.meta
+
+_TEST_KEY = "zTXlmDcTEiMkxDmNKyPaxQsXaujLxJ9-vptH3Pt8Ico="
+
+
+@pytest.fixture(autouse=True)
+def _mfa_key(monkeypatch):
+    monkeypatch.setenv("FORGE_MFA_SECRET_KEY", _TEST_KEY)
 
 
 # ---------------------------------------------------------------------------
@@ -51,37 +60,32 @@ class TestTotpSecretField:
 
 
 # ---------------------------------------------------------------------------
-# TestPlaintextWarning — avertissement stockage en clair
+# TestEncryptedSecret — chiffrement remplace l'avertissement plaintext
+# (SEC-MFA-SECRET-ENCRYPTION-001 : _warn_plaintext_secret_storage supprimé)
 # ---------------------------------------------------------------------------
 
 
-class TestPlaintextWarning:
-    def setup_method(self):
-        import forge_mvc_mfa.mfa as _mfa_module
-        _mfa_module._PLAINTEXT_SECRET_WARNING_EMITTED = False
+class TestEncryptedSecret:
+    def test_create_totp_factor_totp_secret_is_encrypted(self):
+        result = create_totp_factor(user_id=1)
+        assert result.factor.totp_secret.startswith("enc:")
 
-    def test_create_totp_factor_emits_user_warning(self):
+    def test_create_totp_factor_raw_secret_decryptable(self):
+        result = create_totp_factor(user_id=1)
+        assert decrypt_totp_secret(result.factor.totp_secret) == result.secret
+
+    def test_create_totp_factor_no_plaintext_warning(self):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             create_totp_factor(user_id=1)
-        assert any(issubclass(w.category, UserWarning) for w in caught)
-
-    def test_create_totp_factor_warning_mentions_totp_secret(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            create_totp_factor(user_id=1)
-        messages = [str(w.message) for w in caught if issubclass(w.category, UserWarning)]
-        assert any("TotpSecret" in m for m in messages)
-
-    def test_create_totp_factor_warning_emitted_once_per_process(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            create_totp_factor(user_id=1)
-            create_totp_factor(user_id=2)
-            create_totp_factor(user_id=3)
-        user_warnings = [w for w in caught if issubclass(w.category, UserWarning)
-                         and "TotpSecret" in str(w.message)]
-        assert len(user_warnings) == 1
+        plaintext_warnings = [
+            w for w in caught
+            if issubclass(w.category, UserWarning) and "clair" in str(w.message).lower()
+        ]
+        assert not plaintext_warnings, (
+            "Aucun UserWarning 'en clair' ne doit être émis depuis "
+            "SEC-MFA-SECRET-ENCRYPTION-001."
+        )
 
 
 # ---------------------------------------------------------------------------

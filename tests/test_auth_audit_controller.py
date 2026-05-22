@@ -15,6 +15,15 @@ pytest.importorskip("forge_mvc_mfa")
 pytest.importorskip("pyotp")
 import pyotp
 
+from forge_mvc_mfa.secret_crypto import encrypt_totp_secret
+
+_TEST_FERNET_KEY = "aGsgWXh_DXIOTYw2nsUvnhb8tQkPflH-rWnGywxsg8I="
+
+@pytest.fixture(autouse=True)
+def _mfa_secret_key(monkeypatch):
+    monkeypatch.setenv("FORGE_MFA_SECRET_KEY", _TEST_FERNET_KEY)
+
+
 import core.forge as _forge
 from core.auth.audit import (
     AUTH_EVENT_LOGIN_FAILED,
@@ -408,7 +417,7 @@ class TestMfaChallengeControllerAudit:
             user_id=user_id,
             factor_type=MFA_FACTOR_TOTP,
             status=MFA_STATUS_ACTIVE,
-            totp_secret=secret,
+            totp_secret=encrypt_totp_secret(secret),
             last_used_at=None,
             created_at=None,
         )

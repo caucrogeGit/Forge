@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 pytest.importorskip("forge_mvc_mfa")
 pytest.importorskip("pyotp")
+pytest.importorskip("cryptography")
 
 import pyotp
 
@@ -16,6 +17,7 @@ from forge_mvc_mfa import (
     TotpSetup,
     confirm_totp_factor,
     create_totp_factor,
+    decrypt_totp_secret,
     generate_totp_secret,
     totp_provisioning_uri,
     verify_totp_code,
@@ -28,6 +30,14 @@ from forge_mvc_mfa import (
     MFA_STATUS_PENDING,
 )
 from core.auth.exceptions import InvalidMfaFactorError
+
+
+_TEST_FERNET_KEY = "zTXlmDcTEiMkxDmNKyPaxQsXaujLxJ9-vptH3Pt8Ico="
+
+
+@pytest.fixture(autouse=True)
+def _mfa_secret_key(monkeypatch):
+    monkeypatch.setenv("FORGE_MFA_SECRET_KEY", _TEST_FERNET_KEY)
 
 
 ROOT = Path(__file__).parent.parent
@@ -144,7 +154,8 @@ def test_create_totp_factor_label_none_by_default():
 
 def test_create_totp_factor_secret_in_factor_totp_secret():
     result = create_totp_factor(user_id=1)
-    assert result.factor.totp_secret == result.secret
+    assert result.factor.totp_secret.startswith("enc:")
+    assert decrypt_totp_secret(result.factor.totp_secret) == result.secret
 
 
 def test_create_totp_factor_secret_is_non_empty():

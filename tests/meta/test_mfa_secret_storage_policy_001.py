@@ -79,15 +79,16 @@ class TestStoragePolicySectionExists:
 class TestTotpSecretStorageDocumented:
     """Le stockage du secret TOTP est documenté avec précision."""
 
-    def test_totp_stored_in_plaintext_documented(self):
+    def test_totp_encryption_documented(self):
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
         assert (
-            "en clair" in text
-            or "plaintext" in text.lower()
-            or "non chiffré" in text
+            "chiffré" in text.lower()
+            or "chiffrement" in text.lower()
+            or "encrypt" in text.lower()
+            or "Fernet" in text
         ), (
-            "docs/reference/auth-mfa.md doit mentionner explicitement que "
-            "le secret TOTP est stocké en clair."
+            "docs/reference/auth-mfa.md doit documenter que le secret TOTP "
+            "est chiffré au repos (SEC-MFA-SECRET-ENCRYPTION-001 livré)."
         )
 
     def test_totp_cannot_be_hashed(self):
@@ -171,8 +172,8 @@ class TestMfaRemainsOptIn:
     def test_mfa_pre_alpha_in_pyproject(self):
         text = MFA_PYPROJECT.read_text(encoding="utf-8")
         assert "Development Status :: 2 - Pre-Alpha" in text, (
-            "forge-mvc-mfa doit rester 'Development Status :: 2 - Pre-Alpha' "
-            "tant que SEC-MFA-SECRET-ENCRYPTION-001 n'est pas livré."
+            "forge-mvc-mfa doit rester 'Development Status :: 2 - Pre-Alpha'. "
+            "La requalification est prévue dans MFA-PYPI-READY-001."
         )
 
     def test_pyotp_not_in_core_dependencies(self):

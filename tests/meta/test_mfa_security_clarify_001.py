@@ -49,16 +49,16 @@ class TestAuthMfaRefHasPreAlphaWarning:
             "visiblement (avertissement de statut)."
         )
 
-    def test_mentions_secret_en_clair(self):
+    def test_mentions_secret_chiffre(self):
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
         assert (
-            "en clair" in text
-            or "non chiffré" in text
-            or "non chiffre" in text
-            or "stocké en clair" in text
+            "chiffré" in text.lower()
+            or "chiffrement" in text.lower()
+            or "encrypt" in text.lower()
+            or "Fernet" in text
         ), (
-            "docs/reference/auth-mfa.md doit mentionner explicitement que "
-            "le secret TOTP est stocké en clair."
+            "docs/reference/auth-mfa.md doit documenter que le secret TOTP "
+            "est maintenant chiffré au repos (SEC-MFA-SECRET-ENCRYPTION-001)."
         )
 
     def test_mentions_sec_encryption_ticket(self):

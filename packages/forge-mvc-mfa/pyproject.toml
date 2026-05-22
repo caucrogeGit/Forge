@@ -16,6 +16,7 @@ keywords = ["python", "mvc", "forge", "mfa", "totp"]
 dependencies = [
     "forge-mvc==1.0.0b7",
     "pyotp>=2.9,<3",
+    "cryptography>=42,<46",
 ]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",

@@ -3,6 +3,13 @@
 Module officiel Forge distribue separement depuis Forge 2.4.0.
 Voir packages/forge-mvc-mfa/README.md pour la documentation.
 """
+from forge_mvc_mfa.secret_crypto import (
+    MfaSecretInvalidKey,
+    MfaSecretKeyMissing,
+    MfaSecretNotEncrypted,
+    decrypt_totp_secret,
+    encrypt_totp_secret,
+)
 from forge_mvc_mfa.mfa import (
     MFA_CHALLENGE_STARTED_AT_KEY,
     MFA_CHALLENGE_USER_ID_KEY,
@@ -122,6 +129,12 @@ __all__ = [
     "validate_recovery_code_contract",
     "normalize_recovery_code_record",
     "is_valid_recovery_code_record",
+    # secret_crypto
+    "encrypt_totp_secret",
+    "decrypt_totp_secret",
+    "MfaSecretKeyMissing",
+    "MfaSecretInvalidKey",
+    "MfaSecretNotEncrypted",
     # totp_replay
     "is_replay",
     "record_used",

@@ -1,5 +1,11 @@
 # Politique de release Forge
 
+!!! note "Historique beta.5"
+    `1.0.0-beta.5` reste le jalon historique de publication coordonnée initiale des opt-ins `rbac`, `workflow` et `stats`.
+
+    Les tableaux de cette page décrivent l’état courant : les opt-ins publiés restent synchronisés avec la version du core.
+
+
 Ce document définit comment Forge numérote, prépare, valide, tague et publie ses versions.
 
 Il complète :

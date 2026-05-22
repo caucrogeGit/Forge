@@ -3,17 +3,16 @@
 !!! warning "Module en Pre-Alpha"
     `forge-mvc-mfa` est marqué `Development Status :: 2 - Pre-Alpha`.
 
-    Le secret TOTP est actuellement **stocké en clair** dans la colonne
-    `TotpSecret` de la table `auth_mfa_factors`. **Non recommandé en
-    production sensible** sans protection additionnelle (restriction
-    d'accès à la table au minimum).
+    Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, le secret TOTP est **chiffré au repos**
+    via Fernet (`cryptography`) avec la clé `FORGE_MFA_SECRET_KEY`. Le chiffrement
+    est obligatoire — démarrer sans cette variable d'environnement lève
+    `MfaSecretKeyMissing`.
 
     Le module **n'est pas inclus** dans `forge-mvc[all]` (cf. T3).
     Installation depuis GitHub : voir [installation-github.md](../installation-github.md).
 
-    Le chiffrement applicatif est planifié dans
-    `SEC-MFA-SECRET-ENCRYPTION-001` — ticket post-1.0, tant que MFA reste Pre-Alpha.
-    À cette livraison, le module passera en Beta.
+    Le module reste Pre-Alpha. La requalification Beta est prévue dans
+    `MFA-PYPI-READY-001` après revue sécurité et documentation complète.
 
 > **Module extrait** : depuis Forge 2.5.0, le code MFA vit dans
 > `forge-mvc-mfa`. Voir `packages/forge-mvc-mfa/README.md` pour
@@ -77,42 +76,40 @@ Forge ne fournit pas encore dans ce flux : *remember device*, WebAuthn, SMS, ema
 
 ### Statut actuel
 
-`forge-mvc-mfa` est Pre-Alpha. Le stockage des secrets MFA n'est pas production-ready en l'état.
+`forge-mvc-mfa` est Pre-Alpha. Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, le secret
+TOTP est **chiffré au repos** via Fernet (bibliothèque `cryptography`).
 
-Le module est opt-in, non inclus dans `forge-mvc[all]`, et ne doit pas être présenté comme sécurisé en production sans protection additionnelle explicite.
+Le module est opt-in, non inclus dans `forge-mvc[all]`, et doit être configuré avec
+`FORGE_MFA_SECRET_KEY` avant tout déploiement.
 
 ### Développement et tests
 
-En développement et en environnement de test isolé, le stockage actuel est acceptable :
+En développement et en environnement de test isolé :
 
-- le secret TOTP est stocké en clair dans `auth_mfa_factors.totp_secret` ;
-- les codes de récupération sont stockés sous forme hashée (`hash_recovery_code()` — SHA-256 + `secrets.compare_digest`) ;
-- un avertissement `UserWarning` est émis à la création d'un facteur TOTP (`_warn_plaintext_secret_storage()`).
+- le secret TOTP est chiffré dans `auth_mfa_factors.totp_secret` (Fernet, préfixe `enc:`) ;
+- la clé de chiffrement est lue depuis `FORGE_MFA_SECRET_KEY` — requis même en dev ;
+- les codes de récupération sont stockés sous forme hashée (`hash_recovery_code()` — SHA-256 + `secrets.compare_digest`).
 
 **Conditions requises même en développement :**
 
+- `FORGE_MFA_SECRET_KEY` positionné dans l'environnement ;
 - accès à la table `auth_mfa_factors` limité à l'utilisateur applicatif ;
 - secrets jamais loggés (`totp_secret` et `recovery_code` sont dans les champs redactés de `sanitize_auth_audit_metadata()`) ;
 - base de données non exposée publiquement.
 
 ### Production
 
-Le stockage actuel **n'est pas recommandé en production sensible** sans protection additionnelle.
+Le module reste Pre-Alpha. Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`),
+mais les exigences de production-ready complètes (rotation, sauvegarde/restauration,
+revue sécurité) ne sont pas encore satisfaites.
 
-Raisons :
-
-- le secret TOTP est stocké en clair — toute lecture directe de la base expose les secrets de tous les utilisateurs ;
-- un secret TOTP exposé permet à un attaquant de générer des codes TOTP valides indéfiniment ;
-- la révocation d'un secret exposé nécessite de désactiver et recréer tous les facteurs TOTP concernés.
-
-Protections minimales si le déploiement en production ne peut pas attendre `SEC-MFA-SECRET-ENCRYPTION-001` :
+**Protection additionnelle recommandée en production :**
 
 - restreindre les droits d'accès à la table `auth_mfa_factors` au strict minimum applicatif ;
+- stocker `FORGE_MFA_SECRET_KEY` dans un gestionnaire de secrets (Vault, AWS Secrets Manager…) ;
 - chiffrement du disque de la base de données ;
-- surveillance des accès directs à la table ;
-- ne pas exporter `auth_mfa_factors` dans des dumps non chiffrés.
-
-Ces mesures réduisent le risque sans l'éliminer. Elles ne remplacent pas le chiffrement applicatif.
+- ne pas exporter `auth_mfa_factors` dans des dumps non chiffrés ;
+- documenter la procédure de rotation et de sauvegarde/restauration de la clé.
 
 ### Secrets TOTP
 
@@ -128,7 +125,12 @@ Le stockage production-ready d'un secret TOTP nécessite :
 - un **HSM** (*Hardware Security Module*), **ou**
 - un **gestionnaire de secrets** (Vault, AWS Secrets Manager, ou équivalent).
 
-Aucune de ces protections n'est implémentée dans `forge-mvc-mfa` 3.0.x. C'est l'objet du ticket `SEC-MFA-SECRET-ENCRYPTION-001`.
+Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, `forge-mvc-mfa` implémente le chiffrement Fernet
+(`cryptography.fernet.Fernet`, AES-128-CBC + HMAC-SHA256) via la clé `FORGE_MFA_SECRET_KEY`.
+Les valeurs stockées en base sont préfixées `enc:` pour distinguer les secrets chiffrés
+d'éventuelles valeurs legacy.
+
+Pour renforcer davantage, coupler `FORGE_MFA_SECRET_KEY` à un gestionnaire de secrets externe.
 
 ### Codes de récupération
 
@@ -145,18 +147,18 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` 3.
 
 `forge-mvc-mfa` ne sera pas déclaré Beta tant que les exigences suivantes ne sont pas satisfaites :
 
-1. **Chiffrement applicatif des secrets TOTP** (`SEC-MFA-SECRET-ENCRYPTION-001`) — clé de chiffrement séparée des données.
+1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) — Fernet + `FORGE_MFA_SECRET_KEY`.
 2. **Politique de rotation documentée** — rotation ou invalidation maîtrisée des secrets compromis.
 3. **Documentation de sauvegarde/restauration** — procédure en cas de perte de la clé de chiffrement.
-4. **Tests dédiés au stockage chiffré** — couverture de la création, vérification et rotation.
+4. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) — `tests/test_mfa_secret_crypto.py`.
 5. **Revue sécurité explicite** — validation que le stockage chiffré est correct.
-6. **Décision explicite de changement de statut** — ticket de passage Pre-Alpha → Beta.
+6. **Décision explicite de changement de statut** — ticket `MFA-PYPI-READY-001` de passage Pre-Alpha → Beta.
 
 ### Tickets liés
 
 | Ticket | Description | État |
 |---|---|---|
 | `MFA-SECRET-STORAGE-POLICY-001` | Documenter la politique de stockage | livré |
-| `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif du secret TOTP | post-1.0 |
-| `OPTIN-PYPI-PUBLISH-001` | Publication PyPI de forge-mvc-mfa | conditionné à SEC-MFA-SECRET-ENCRYPTION-001 |
+| `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif du secret TOTP (Fernet) | livré |
+| `MFA-PYPI-READY-001` | Requalification Beta et publication PyPI | post-livraison SEC-MFA-SECRET-ENCRYPTION-001 |
 

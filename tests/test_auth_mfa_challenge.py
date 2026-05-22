@@ -10,6 +10,15 @@ pytest.importorskip("pyotp")
 
 import pyotp
 
+from forge_mvc_mfa.secret_crypto import encrypt_totp_secret
+
+_TEST_FERNET_KEY = "aGsgWXh_DXIOTYw2nsUvnhb8tQkPflH-rWnGywxsg8I="
+
+@pytest.fixture(autouse=True)
+def _mfa_secret_key(monkeypatch):
+    monkeypatch.setenv("FORGE_MFA_SECRET_KEY", _TEST_FERNET_KEY)
+
+
 from core.auth.exceptions import InvalidAuthUserError
 from forge_mvc_mfa import (
     MFA_CHALLENGE_STARTED_AT_KEY,
@@ -53,7 +62,7 @@ def _make_totp_factor(user_id: int, secret: str, status: str = MFA_STATUS_ACTIVE
         id=1,
         user_id=user_id,
         factor_type=MFA_FACTOR_TOTP,
-        totp_secret=secret,
+        totp_secret=encrypt_totp_secret(secret),
         status=status,
         confirmed_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
     )

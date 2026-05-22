@@ -2,15 +2,16 @@
 
 Brique MFA (TOTP + codes de récupération) pour le framework Forge.
 
-## Statut : Pre-Alpha (Forge 3.0.x)
+## Statut : Pre-Alpha (Forge 3.0.x) — chiffrement Fernet livré
 
 `forge-mvc-mfa` est marqué `Development Status :: 2 - Pre-Alpha`.
 
-**Non recommandé en production sensible** sans protection additionnelle :
-le secret TOTP est actuellement stocké en clair dans la table
-`auth_mfa_factors`. Voir section "Limites connues" plus bas.
+Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, **le secret TOTP est chiffré au repos**
+via Fernet (`cryptography`). La clé est lue depuis `FORGE_MFA_SECRET_KEY` —
+obligatoire au démarrage.
 
-Le module **n'est pas inclus** dans `forge-mvc[all]` pour cette raison.
+Le module **n'est pas inclus** dans `forge-mvc[all]`. La requalification Beta
+est prévue dans `MFA-PYPI-READY-001`.
 
 **Mode d'installation (Forge 3.0.x)** : `forge-mvc-mfa` n'est pas encore publié
 sur PyPI. Installation depuis les sources (mode dev) :
@@ -22,11 +23,18 @@ pip install -e .
 pip install -r requirements-dev.txt
 ```
 
-Les extras PyPI (`forge-mvc[mfa]`) seront disponibles en 3.1 après livraison
-de `SEC-MFA-SECRET-ENCRYPTION-001` (chiffrement applicatif du secret TOTP) et
-`OPTIN-PYPI-PUBLISH-001` (publication des modules opt-in).
+### Configuration requise
 
-Une version stable (Beta) est planifiée pour Forge 3.1.0.
+```bash
+# Générer une clé Fernet (à stocker dans .env ou un gestionnaire de secrets)
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Ajouter dans `.env` :
+
+```
+FORGE_MFA_SECRET_KEY=<clé générée ci-dessus>
+```
 
 ## Installation (mode source)
 
@@ -70,7 +78,7 @@ Les anciens chemins `core.auth.mfa`, `core.auth.recovery` et
 
 ## Limites connues
 
-- Le secret TOTP est stocké en clair dans la base (pas de chiffrement applicatif).
-  Chiffrement prévu : `SEC-MFA-SECRET-ENCRYPTION-001` (Forge 3.1.0).
 - Le store anti-replay et le rate-limit sont in-memory process-local.
   En multi-worker, utiliser des sticky sessions.
+- La politique de rotation et la procédure de sauvegarde/restauration de la
+  clé Fernet ne sont pas encore formalisées (exigences Beta restantes).
