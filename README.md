@@ -1,11 +1,11 @@
-# Forge — Framework MVC Python 1.0.0-beta.7
+# Forge — Framework MVC Python 1.0.0-beta.8
 
 [![PyPI version](https://img.shields.io/pypi/v/forge-mvc.svg)](https://pypi.org/project/forge-mvc/)
 [![Python](https://img.shields.io/pypi/pyversions/forge-mvc.svg)](https://pypi.org/project/forge-mvc/)
 [![License](https://img.shields.io/badge/license-Forge%20Proprietary-blue.svg)](https://github.com/caucrogeGit/Forge/blob/main/LICENSE)
 
-> **Forge 1.0.0-beta.7 — bêta publique.** Disponible sur [PyPI](https://pypi.org/project/forge-mvc/1.0.0b7/) sous `forge-mvc==1.0.0b7`.
-> L'option `--pre` est nécessaire car `1.0.0b7` est une préversion bêta PEP 440.
+> **Forge 1.0.0-beta.8 — bêta publique.** Disponible sur [PyPI](https://pypi.org/project/forge-mvc/1.0.0b8/) sous `forge-mvc==1.0.0b8`.
+> L'option `--pre` est nécessaire car `1.0.0b8` est une préversion bêta PEP 440.
 
 *Une forge pour les créer toutes. Framework web applicatif.*
 
@@ -211,7 +211,7 @@ sudo apt install -y git python3 python3-venv python3-pip openssl mariadb-server 
 ### 2. Cloner Forge
 
 ```bash
-git clone --branch v1.0.0-beta.7 --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
+git clone --branch v1.0.0-beta.8 --depth=1 https://github.com/caucrogeGit/Forge.git NomDuProjet
 cd NomDuProjet
 ```
 
@@ -223,7 +223,7 @@ Remplacez `NomDuProjet` par le nom de votre application. Un profil peut être pr
 rm -rf .git
 git init
 git add -A
-git commit -m "init: NomDuProjet — based on Forge 1.0.0-beta.7"
+git commit -m "init: NomDuProjet — based on Forge 1.0.0-beta.8"
 ```
 
 ### 4. Créer l’environnement virtuel du projet
@@ -850,7 +850,7 @@ Versions supportées et procédure de signalement : [SECURITY.md](SECURITY.md)
 
 Les modules opt-in (`forge-mvc-mfa`, `-rbac`, `-workflow`, `-stats`) nécessitent des dépendances
 supplémentaires non installées avec `forge-mvc`. `forge-mvc-mfa` (Alpha) n'est pas publié sur
-PyPI en `1.0.0b7` — ses dépendances (`pyotp`, `cryptography`) ne font pas partie du runtime core.
+PyPI en `1.0.0b8` — ses dépendances (`pyotp`, `cryptography`) ne font pas partie du runtime core.
 
 **Développement** (`requirements-dev.txt`)
 

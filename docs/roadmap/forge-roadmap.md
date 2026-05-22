@@ -11,13 +11,13 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.7
+## État actuel — Forge 1.0.0-beta.8
 
-**Tag courant : `v1.0.0-beta.7` (2026-05-22)**
+**Tag courant : `v1.0.0-beta.8` (2026-05-22)**
 
-Précédent : v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.7 — Documentation pédagogique, starter Welcome refondu, cycles MVC Mermaid, logo MkDocs (RELEASE-BETA7-001).**
+**Statut : v1.0.0-beta.8 — Consolidation modules opt-in media et mfa, chiffrement TOTP Fernet, préparation publication (RELEASE-BETA8-001).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)

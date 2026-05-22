@@ -1,5 +1,26 @@
 # Changelog
 
+
+## [1.0.0-beta.8] — 2026-05-22
+
+### Added / Changed
+
+- Requalification de `forge-mvc-media` en Alpha.
+- Requalification de `forge-mvc-mfa` en Alpha.
+- Chiffrement des secrets TOTP MFA au repos via Fernet.
+- Documentation opt-ins alignée.
+- Préparation des packages `media` et `mfa` pour publication future.
+
+### Security
+
+- Les secrets TOTP MFA ne sont plus stockés en clair.
+- `FORGE_MFA_SECRET_KEY` devient obligatoire pour le module MFA.
+
+### Packaging
+
+- Tous les packages sont alignés en `1.0.0b8`.
+- Aucun upload PyPI effectué dans cette release de préparation.
+
 ## [1.0.0-beta.7] — 2026-05-22
 
 Release documentation pédagogique — Premier pas refondu, logo MkDocs, cycles MVC visuels.

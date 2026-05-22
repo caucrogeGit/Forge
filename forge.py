@@ -42,8 +42,8 @@ from forge_cli.errors import cli_fail
 
 
 _FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"
-_FORGE_VERSION = "1.0.0b7"
-_FORGE_DEFAULT_REF = "v1.0.0-beta.7"
+_FORGE_VERSION = "1.0.0b8"
+_FORGE_DEFAULT_REF = "v1.0.0-beta.8"
 
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────

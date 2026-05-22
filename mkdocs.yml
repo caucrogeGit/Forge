@@ -201,6 +201,7 @@ nav:
       - Tests terrain:
           - Field Test App 001: history/field-tests/field-test-app-001.md
       - Releases:
+          - 1.0.0-beta.8: history/releases/release-1.0.0-beta.8.md
           - 1.0.0-beta.7: history/releases/release-1.0.0-beta.7.md
           - 1.0.0-beta.6: history/releases/release-1.0.0-beta.6.md
       - Licence: licence.md
