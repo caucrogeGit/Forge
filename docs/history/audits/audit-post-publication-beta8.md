@@ -44,7 +44,7 @@ Double source :
 |---|---|---|
 | A-1 | Rate limiting en mémoire de processus : inutile en multi-workers — aucun avertissement au démarrage | **Moyenne** |
 | A-2 | `MemorySessionStore` : sessions non nettoyées automatiquement — leak mémoire en longue durée | **Basse** |
-| A-3 | `core/security/session.py` : noms de champs en français (`nom`, `prénom`) dans une API publique anglaise (ADR-003) | **Basse** |
+| A-3 | `core/security/session.py` : noms ou conventions métier francophones encore présents dans le core, à dédomainiser conformément à l'ADR-003 | **Basse** |
 
 ### 4. Packaging / CI
 
@@ -57,13 +57,13 @@ Double source :
 
 | Réf | Constat | Sévérité |
 |---|---|---|
-| D-1 | `docs/roadmap/forge-roadmap.md` ligne 10 : indique "beta.4" comme version publique actuelle | **Basse** |
+| D-1 | Roadmap active : anciennes références beta.4 / 3.0.x encore présentes dans des sections historiques ou actives à clarifier | **Basse** |
 | D-2 | Docs actives contenant des références à `3.0.x` ou `beta.4` encore non mises à jour | **Basse** |
 | D-3 | Limites de production (ThreadingHTTPServer, rate limiting mono-process) non documentées explicitement | **Moyenne** |
 
 ---
 
-## Plan de correction — Phase 13 (beta.9)
+## Plan de correction — Phase B9 (beta.9)
 
 14 tickets planifiés, classés par priorité décroissante :
 

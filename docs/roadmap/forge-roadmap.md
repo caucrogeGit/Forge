@@ -17,7 +17,7 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 Précédent : v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.8 publiée (core + 5 opt-ins). Audit post-publication conduit — Phase 13 planifiée pour 1.0.0-beta.9 (14 tickets : sécurité, WSGI, sessions, docs).**
+**Statut : v1.0.0-beta.8 publiée (core + 5 opt-ins). Audit post-publication conduit — Phase B9 planifiée pour 1.0.0-beta.9 (14 tickets : sécurité, WSGI, sessions, docs).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -225,7 +225,7 @@ Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de st
 1.0.0-beta.6  ← bêta consolidée = T0 tests terrain
 1.0.0-beta.7  ← corrections terrain (Phase 10-11) + publication opt-ins supplémentaires
 1.0.0-beta.8  ← consolidation media/mfa + chiffrement TOTP Fernet (Phase 12) — PyPI complet
-1.0.0-beta.9  ← corrections sécurité + WSGI + docs (Phase 13 — en cours)
+1.0.0-beta.9  ← corrections sécurité + WSGI + docs (Phase B9 — en cours)
 → tests terrain : 2 mois minimum
 → 1.0.0-rc1   ← release candidate
 → 1.0.0       ← stable
@@ -1227,7 +1227,7 @@ du code applicatif existant.
 
 ---
 
-## Phase 13 — Corrections post-audit beta.8 → 1.0.0-beta.9
+## Phase B9 — Corrections post-audit beta.8 → 1.0.0-beta.9
 
 **Objectif** : solder les constats de l'[audit post-publication beta.8](../history/audits/audit-post-publication-beta8.md)
 avant d'ouvrir les tests terrain sur une base saine.
