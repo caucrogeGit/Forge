@@ -1238,7 +1238,6 @@ avant d'ouvrir les tests terrain sur une base saine.
 |---|---|---|
 | SECURITY-CRYPTOGRAPHY-MFA-001 | Mettre à jour `cryptography>=42,<46` → `>=46.0.7,<47` dans `forge-mvc-mfa` | **livré** |
 | SECURITY-API-AUTH-COMPARE-DIGEST-001 | Remplacer `==` par `hmac.compare_digest` dans `core/security/api_auth.py` | **livré** |
-| WSGI-ENTRYPOINT-001 | Ajouter un callable WSGI minimal dans `core/wsgi.py` | **livré** |
 | SECURITY-SESSION-COOKIE-HELPER-001 | Créer `set_session_cookie()` dans `core/security/cookies.py` | **livré** |
 | SECURITY-SESSION-COOKIE-STARTERS-001 | Corriger les starters qui posent `session_id` au lieu de `__Host-session_id` | **livré** |
 | HTTP-TRUSTED-PROXY-IP-001 | Lire `X-Real-IP` dans `core/http/request.py` | **livré** |
@@ -1250,6 +1249,25 @@ avant d'ouvrir les tests terrain sur une base saine.
 | RELEASE-PACKAGE-LOCK-SYNC-001 | Synchroniser `package-lock.json` (version `3.0.0`) avec `package.json` (`1.0.0-beta.8`) | à faire |
 | DOCS-VERSION-SWEEP-BETA9-001 | Nettoyer les références `3.0.x` et `beta.4` dans les docs actives | à faire |
 | RELEASE-BETA9-001 | Publication `1.0.0-beta.9` (core + opt-ins) | à faire |
+
+> **Ordre de traitement** : les tickets WSGI du Bloc B9-D ci-dessous précèdent
+> `DOCS-PRODUCTION-LIMITS-001` afin que la documentation de production reflète
+> l'état final de l'intégration WSGI.
+
+### Bloc B9-D — Intégration WSGI production
+
+Ce bloc complète `WSGI-ENTRYPOINT-001` (entrée WSGI minimale déjà livrée)
+pour rendre Forge exploitable derrière un serveur WSGI externe avant
+`1.0.0-beta.9`, sans présenter `python app.py` comme une solution de
+production publique.
+
+| Ticket | Description | État |
+|---|---|---|
+| `WSGI-ENTRYPOINT-001` | Ajouter une entrée WSGI minimale (`core.wsgi.create_wsgi_app`) | **livré** |
+| `WSGI-APP-FACTORY-CONFIG-001` | Garantir que l'application WSGI charge la même configuration que `app.py` | à faire |
+| `WSGI-PROD-WARNINGS-001` | Émettre les warnings production (memory store, multi-worker) aussi en contexte WSGI | à faire |
+| `WSGI-PRODUCTION-SMOKE-TESTS-001` | Ajouter des tests de cohérence WSGI production (factory + warnings + IP client) | à faire |
+| `WSGI-DEPLOY-DOCS-001` | Documenter un déploiement WSGI minimal derrière reverse proxy | à faire |
 
 ### Bloc B9-C — Stabilisation CLI / aide développeur
 
