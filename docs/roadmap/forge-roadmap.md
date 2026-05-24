@@ -17,7 +17,7 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 Précédent : v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.8 publiée (core + 5 opt-ins). Audit post-publication conduit — Phase B9 planifiée pour 1.0.0-beta.9 (14 tickets : sécurité, WSGI, sessions, docs).**
+**Statut : v1.0.0-beta.8 publiée (core + 5 opt-ins). Audit post-publication conduit — Phase B9 planifiée pour 1.0.0-beta.9 (14 tickets sécurité/WSGI/sessions/docs + Bloc B9-C : 12 tickets stabilisation CLI déjà clos).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -1250,6 +1250,37 @@ avant d'ouvrir les tests terrain sur une base saine.
 | RELEASE-PACKAGE-LOCK-SYNC-001 | Synchroniser `package-lock.json` (version `3.0.0`) avec `package.json` (`1.0.0-beta.8`) | à faire |
 | DOCS-VERSION-SWEEP-BETA9-001 | Nettoyer les références `3.0.x` et `beta.4` dans les docs actives | à faire |
 | RELEASE-BETA9-001 | Publication `1.0.0-beta.9` (core + opt-ins) | à faire |
+
+### Bloc B9-C — Stabilisation CLI / aide développeur
+
+Série menée en parallèle des corrections sécurité, intégrée à B9 pour que
+l'aide `--help` / `-h` de toutes les commandes Forge soit fiable et sans
+effet de bord avant `1.0.0-beta.9`.
+
+Audit initial (62 commandes) puis dispatcher central, puis enrichissement
+groupe par groupe. **Série close** : 100 % des commandes dispatchées par
+`forge.py` sont classifiées (45 aide riche, 8 argparse natives, 9 manuelles,
+0 manquant). Garde-fou méta `tests/meta/test_cli_help_flags_closing_audit_001.py`
+verrouille toute régression. Détail dans
+[`docs/history/audits/cli-help-flags-closing-audit-001.md`](../history/audits/cli-help-flags-closing-audit-001.md).
+
+| Ticket | Description | État |
+|---|---|---|
+| CLI-HELP-FLAGS-AUDIT-001 | Auditer le support `--help` des 62 commandes CLI Forge | **livré** |
+| CLI-HELP-FLAGS-DISPATCHER-001 | Intercepter `--help` / `-h` au dispatcher avant exécution métier | **livré** |
+| CLI-HELP-FLAGS-INIT-COMMANDS-001 | Enrichir l'aide des 6 commandes `*:init` critiques | **livré** |
+| CLI-HELP-FLAGS-SCHEMA-RBAC-001 | Enrichir l'aide des 4 commandes schema / RBAC | **livré** |
+| CLI-HELP-FLAGS-PUBLIC-PAGES-001 | Enrichir l'aide des 5 commandes `make:public-*` | **livré** |
+| CLI-HELP-FLAGS-MAIL-001 | Enrichir l'aide des 4 commandes mail restantes | **livré** |
+| CLI-HELP-FLAGS-MIGRATIONS-001 | Enrichir l'aide des 3 commandes migration restantes | **livré** |
+| CLI-HELP-FLAGS-PROJECT-DIAGNOSTICS-001 | Enrichir l'aide des 4 commandes de diagnostic projet | **livré** |
+| CLI-HELP-FLAGS-ENTITY-MODEL-CRUD-001 | Enrichir l'aide des 5 commandes entité / modèle / CRUD | **livré** |
+| CLI-HELP-FLAGS-AUTH-COMPLETION-001 | Enrichir l'aide des 5 commandes Auth restantes | **livré** |
+| CLI-HELP-FLAGS-REMAINING-MINOR-001 | Enrichir l'aide des 9 dernières commandes génériques (sync, build, new, starter, js:init, docs, i18n, deploy) | **livré** |
+| CLI-HELP-FLAGS-CLOSING-AUDIT-001 | Audit final + garde-fou méta de classification (125 tests) | **livré** |
+
+**Total Bloc B9-C : 12 tickets livrés.** Série officiellement close —
+plus de tickets `CLI-HELP-FLAGS-*` prévus.
 
 ---
 
