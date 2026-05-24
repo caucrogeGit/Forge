@@ -736,6 +736,159 @@ Limites:
   - ne génère pas de migration prête à appliquer — utiliser
     forge migration:make <nom> --from-diff <Entite> pour produire un
     fichier .sql à partir du diff.""",
+
+    # ── Diagnostic projet (CLI-HELP-FLAGS-PROJECT-DIAGNOSTICS-001) ───────────
+    # 4 commandes lecture seule destinées à comprendre l'état d'un projet
+    # Forge sans rien modifier.
+
+    "doctor": """\
+Usage:
+  forge doctor
+
+Description:
+  Diagnostic large et tolérant d'un projet Forge. Inspecte
+  l'environnement Python, la configuration, l'arborescence et les
+  dépendances optionnelles. Ne modifie rien.
+
+Effets (12 contrôles, lecture seule) :
+  - Python : version >= 3.12 ;
+  - env/example + env/dev : variables fusionnées valides ;
+  - structure mvc/ : dossiers et fichiers attendus ;
+  - entités mvc/entities/*.json : présence et lisibilité ;
+  - migrations mvc/migrations/ : présence ;
+  - i18n translations/ : présence ;
+  - templates mvc/views/ : présence ;
+  - modules : registre projet ;
+  - dépendance MFA (forge_mvc_mfa / pyotp) si indices détectés ;
+  - SSL : certificats cert.pem / key.pem si HTTPS activé ;
+  - Node : npm disponible pour build:css ;
+  - base de données : DB_APP_* renseignés, MariaDB joignable.
+
+Comportement:
+  - chaque contrôle remonte un état (ok / warn / fail / skip) ;
+  - tolérant : un projet incomplet remonte des warnings sans bloquer ;
+  - exit 1 uniquement si au moins un contrôle est fail.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne corrige rien — les warnings sont à traiter manuellement ;
+  - pour un contrôle strict CI, voir forge project:check ;
+  - pour un rapport détaillé multi-familles, voir forge project:audit ;
+  - ne lance ni la suite de tests ni les migrations.""",
+
+    "project:check": """\
+Usage:
+  forge project:check
+
+Description:
+  Contrôle strict des conventions Forge d'un projet, conçu pour la CI.
+  Plus restrictif que doctor : se concentre sur la structure et les
+  conventions, sans dépendances réseau ni base.
+
+Effets (7 contrôles structurels, lecture seule) :
+  - structure de projet (app.py, mvc/, config.py) ;
+  - config.py et variables d'environnement essentielles ;
+  - entités mvc/entities/ (format, nommage) ;
+  - routes mvc/routes.py (déclaration cohérente) ;
+  - templates mvc/views/ (arborescence attendue) ;
+  - modules (registre, cohérence) ;
+  - migrations mvc/migrations/ (nommage et intégrité).
+
+Comportement:
+  - chaque contrôle remonte un état ok / warn / fail ;
+  - exit 1 dès qu'au moins un contrôle est fail ;
+  - exit 0 sinon (avec ou sans avertissements).
+
+Prérequis:
+  - être à la racine d'un projet Forge (app.py + mvc/) ; sinon la
+    commande échoue avec un message explicite.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne modifie aucun fichier ;
+  - ne remplace pas une suite de tests pytest ;
+  - ne fait pas d'appel réseau (utiliser forge doctor pour vérifier
+    aussi MariaDB / Node / SSL) ;
+  - pour un rapport détaillé multi-familles, voir forge project:audit.""",
+
+    "project:audit": """\
+Usage:
+  forge project:audit
+
+Description:
+  Rapport d'audit détaillé non destructif d'un projet Forge. Plus
+  profond que project:check : produit plusieurs résultats par famille
+  pour offrir une vue exhaustive.
+
+Effets (9 familles d'audit, lecture seule) :
+  - structure (arborescence, fichiers attendus) ;
+  - config (config.py, env/*, variables) ;
+  - entités (mvc/entities/, cohérence multi-fichiers) ;
+  - routes (mvc/routes.py, conventions) ;
+  - templates (mvc/views/, présence des layouts) ;
+  - modules (registre, fichiers, routes injectées) ;
+  - migrations (nommage, séquence, intégrité) ;
+  - documentation (présence et cohérence des fichiers .md) ;
+  - tests (présence et structure du dossier tests/).
+
+Comportement:
+  - chaque famille produit une LISTE de résultats (ok / warn / fail
+    / info) ;
+  - le rapport groupe les résultats par famille puis affiche un
+    résumé par statut ;
+  - exit 1 dès qu'au moins un résultat est fail.
+
+Prérequis:
+  - être à la racine d'un projet Forge (app.py + mvc/).
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne modifie aucun fichier ;
+  - ne contacte pas la base de données (voir forge doctor) ;
+  - ne lance pas la suite de tests ;
+  - pour un contrôle court CI, voir forge project:check.""",
+
+    "routes:list": """\
+Usage:
+  forge routes:list
+
+Description:
+  Affiche les routes déclarées par l'application Forge, dans l'ordre
+  d'enregistrement, sous forme de tableau.
+
+Effets:
+  - lit APP_ROUTES_MODULE depuis config.py (par défaut mvc.routes) ;
+  - importe le module et récupère son router ;
+  - itère router.iter_routes() ;
+  - imprime un tableau à 7 colonnes :
+      METHOD   méthode HTTP (ou liste)
+      PATH     motif de route (pattern)
+      NAME     nom logique de la route (ou « - »)
+      PUBLIC   oui / non — accessible sans authentification
+      CSRF     oui / non — protection CSRF requise
+      API      oui / non — route déclarée comme API
+      HANDLER  qualname du handler ;
+  - signale si le router est vide ;
+  - n'écrit, ne modifie et ne purge rien.
+
+Prérequis:
+  - être à la racine d'un projet Forge (app.py + config.py) ;
+  - APP_ROUTES_MODULE importable.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule ;
+  - n'exécute aucune route ;
+  - ne valide pas les handlers (utiliser forge project:check pour la
+    cohérence des routes).""",
 }
 
 
