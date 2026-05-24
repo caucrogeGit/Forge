@@ -1,20 +1,20 @@
-"""core/wsgi.py — Callable WSGI minimal pour Forge.
+"""core/wsgi.py — Callables WSGI pour Forge.
 
-Ticket : WSGI-ENTRYPOINT-001.
-
-Fournit `create_wsgi_app(application)` : une fabrique qui transforme une
-`core.application.Application` Forge en callable WSGI standard
-`app(environ, start_response) -> Iterable[bytes]`.
+Tickets :
+- WSGI-ENTRYPOINT-001 : `create_wsgi_app(application)` — adaptateur minimal
+  qui prend une `Application` déjà construite et retourne un callable WSGI ;
+- WSGI-APP-FACTORY-CONFIG-001 : `create_configured_wsgi_app()` — charge la
+  même configuration que `python app.py` (via `core.app_factory`) et
+  retourne le callable WSGI prêt à l'emploi.
 
 Usage typique — dans le `wsgi.py` de l'application :
 
-    from core.application import Application
-    from core.wsgi import create_wsgi_app
-    from mvc.routes import router
+    from core.wsgi import create_configured_wsgi_app
 
-    application = create_wsgi_app(Application(router))
+    application = create_configured_wsgi_app()
 
-Puis exposer `application` à un serveur WSGI externe.
+Puis exposer `application` à un serveur WSGI externe (ex.
+`gunicorn wsgi:application`).
 
 Périmètre :
 - ne remplace pas `python app.py` (serveur de développement) ;
@@ -133,3 +133,18 @@ def create_wsgi_app(application):
         return _response_to_wsgi(response, start_response)
 
     return app
+
+
+def create_configured_wsgi_app():
+    """Construit l'`Application` Forge configurée et retourne le callable WSGI.
+
+    Source unique d'initialisation : charge la même configuration que
+    `python app.py` via `core.app_factory.build_application`, puis enveloppe
+    l'application dans un adaptateur WSGI standard.
+
+    Garantit que les paramètres `forge.configure(...)` (dont
+    `trusted_proxies`) sont appliqués avant que la première requête WSGI
+    ne soit dispatched.
+    """
+    from core.app_factory import build_application
+    return create_wsgi_app(build_application())
