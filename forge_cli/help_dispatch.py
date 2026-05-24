@@ -889,6 +889,219 @@ Limites:
   - n'exécute aucune route ;
   - ne valide pas les handlers (utiliser forge project:check pour la
     cohérence des routes).""",
+
+    # ── Cycle entité / modèle / CRUD (CLI-HELP-FLAGS-ENTITY-MODEL-CRUD-001) ──
+    # JSON canonique → validation → modèle → contrôle → CRUD → pivot CRUD.
+    # 5 commandes cœur génératif de Forge.
+
+    "entity:validate": """\
+Usage:
+  forge entity:validate [--json]
+
+Description:
+  Valide les contrats JSON canoniques des entités et des relations Forge
+  contre les schémas Draft 2020-12, puis applique la validation
+  sémantique propre à Forge (types reconnus, références croisées, etc.).
+  Lecture seule.
+
+Effets:
+  - parcourt mvc/entities/*/*.json (un dossier par entité) ;
+  - lit aussi mvc/entities/relations.json s'il existe ;
+  - applique le schéma entity.schema.json sur chaque définition
+    d'entité ;
+  - applique le schéma relations.schema.json sur le contrat de
+    relations ;
+  - applique ensuite une validation sémantique (types SQL valides,
+    références entre entités, cohérence pivots) ;
+  - imprime un rapport humain ou JSON ;
+  - ne modifie aucun fichier, ne touche pas à la base.
+
+Options:
+  --json        Sortie machine JSON (valid, errors_count, warnings_count,
+                liste detaillée des erreurs et avertissements).
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Prérequis:
+  - être à la racine d'un projet Forge (mvc/entities/ existe) ;
+  - jsonschema installé (déjà dans requirements.txt).
+
+Codes de retour:
+  0  aucun problème détecté
+  1  au moins une erreur (schéma ou sémantique) OU mvc/entities/ absent
+     OU jsonschema/schemas Forge indisponibles
+
+Limites:
+  - lecture seule — voir forge build:model pour régénérer les
+    artefacts Python/SQL ;
+  - ne valide pas le schéma JSON Forge lui-même (voir forge
+    schema:doctor).""",
+
+    "build:model": """\
+Usage:
+  forge build:model [--dry-run]
+
+Description:
+  Régénère les artefacts Python et SQL de toutes les entités du projet
+  à partir de leurs contrats JSON canoniques.
+
+Effets (un projet PEUT être modifié) :
+  - exécute d'abord la validation des contrats (équivalent
+    entity:validate) ; refuse de continuer si une entité est invalide ;
+  - pour chaque entité de mvc/entities/<E>/ :
+      * RÉGÉNÈRE <e>.sql (DDL canonique de la table) ;
+      * RÉGÉNÈRE <e>_base.py (classe modèle régénérable) ;
+      * crée <e>.py (modèle manuel) si absent — write-if-new ;
+      * crée __init__.py si absent — write-if-new ;
+  - RÉGÉNÈRE mvc/entities/relations.sql à partir de relations.json ;
+  - imprime la liste des fichiers régénérés / créés / préservés ;
+  - --dry-run : calcule tout sans écrire.
+
+ATTENTION:
+  - cette commande ÉCRASE <e>.sql et <e>_base.py à chaque exécution
+    (ces fichiers sont régénérables par convention Forge) ;
+  - <e>.py et __init__.py sont PRÉSERVÉS s'ils existent déjà
+    (code utilisateur protégé) ;
+  - vérifier le diff Git après exécution ;
+  - utiliser --dry-run pour prévisualiser avant écriture.
+
+Options:
+  --dry-run     Affiche les fichiers qui seraient écrits sans rien
+                modifier.
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne génère pas le CRUD (contrôleurs, formulaires, vues) — voir
+    forge make:crud ;
+  - ne crée ni la base ni les tables (voir forge db:init / db:apply) ;
+  - ne génère pas de migration SQL (voir forge migration:make).""",
+
+    "check:model": """\
+Usage:
+  forge check:model
+
+Description:
+  Valide la cohérence des modèles Forge et imprime un aperçu détaillé
+  par entité, sans rien écrire. Identique à la validation effectuée par
+  build:model mais SANS la phase de génération.
+
+Effets (lecture seule) :
+  - parcourt mvc/entities/ et applique la validation contractuelle
+    (JSON Schema + sémantique) ;
+  - calcule pour chaque entité la liste des champs (nom, colonne,
+    sql_type, python_type, nullable, PK, AI, unique, contraintes) ;
+  - imprime un tableau par entité avec ses champs et les fichiers
+    cibles (<e>.sql, <e>_base.py, <e>.py, __init__.py) ;
+  - n'écrit aucun fichier, ne touche pas à la base.
+
+Différence avec build:model:
+  - build:model VALIDE puis GÉNÈRE ;
+  - check:model VALIDE puis AFFICHE l'aperçu sans générer.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Codes de retour:
+  0  modèles valides
+  1  au moins une entité invalide
+
+Limites:
+  - ne corrige rien — voir forge entity:validate pour un rapport
+    purement contractuel ;
+  - n'écrit jamais (utiliser forge build:model pour générer).""",
+
+    "make:crud": """\
+Usage:
+  forge make:crud <Entite> [--dry-run]
+
+Description:
+  Génère le scaffolding CRUD complet pour une entité existante :
+  contrôleur, modèle applicatif, formulaire, layout, vues
+  (index, fiche, formulaire, suppression en masse).
+
+Effets (un projet PEUT être modifié) :
+  - applique d'abord la validation des contrats (équivalent
+    entity:validate) ; refuse de continuer si invalide ;
+  - lit mvc/entities/<entite>/<entite>.json (refuse le legacy
+    format_version: 1 — schema_version: "1.0" requis) ;
+  - écrit en mode write-if-new (aucun fichier existant n'est écrasé) :
+      * mvc/controllers/<entite>_controller.py ;
+      * mvc/models/<entite>_model.py ;
+      * mvc/forms/__init__.py et mvc/forms/<entite>_form.py ;
+      * mvc/views/layouts/app.html ;
+      * mvc/views/partials/form_errors.html ;
+      * mvc/views/<entite>/index.html, _table.html, _pagination.html,
+        _results.html, show.html, form.html,
+        bulk_delete_confirm.html ;
+  - imprime le bloc de routes à insérer manuellement dans
+    mvc/routes.py ;
+  - --dry-run : calcule tout sans écrire.
+
+ATTENTION:
+  - cette commande peut créer plusieurs fichiers d'un coup ;
+  - tous les fichiers sont écrits en write-if-new : le code utilisateur
+    déjà présent est PRÉSERVÉ ;
+  - vérifier le diff Git après exécution ;
+  - le bloc de routes affiché doit être copié manuellement dans
+    mvc/routes.py (Forge n'écrit jamais silencieusement ce fichier).
+
+Options:
+  --dry-run     Affiche les fichiers qui seraient écrits sans rien
+                modifier.
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne génère pas de pages publiques (voir forge make:public-page,
+    make:public-list, make:public-show, make:public-form) ;
+  - ne génère pas de logique métier personnalisée ;
+  - ne traite pas les pivots avec attributs (voir forge
+    make:pivot-crud) ;
+  - utiliser forge entity:validate pour diagnostiquer un contrat
+    invalide.""",
+
+    "make:pivot-crud": """\
+Usage:
+  forge make:pivot-crud <EntiteSource> <nom_relation> [--dry-run]
+
+Description:
+  Génère un sous-CRUD dédié pour une relation many-to-many comportant
+  des attributs propres (pivot.fields[]). Permet d'éditer chaque
+  association du pivot via un écran spécifique.
+
+Effets (un projet PEUT être modifié) :
+  - lit mvc/entities/relations.json et résout la relation
+    many_to_many entre <EntiteSource> et son partenaire ;
+  - vérifie que la relation comporte un pivot.fields[] non vide ;
+  - écrit en mode write-if-new (aucun fichier existant n'est écrasé) :
+      * mvc/controllers/pivot/<src>_<relation>_pivot_controller.py ;
+      * mvc/templates/pivot/<src>_<relation>/index.html ;
+      * mvc/templates/pivot/<src>_<relation>/form.html ;
+  - --dry-run : affiche la liste des fichiers qui seraient générés
+    sans rien écrire.
+
+ATTENTION:
+  - cette commande peut créer plusieurs fichiers d'un coup ;
+  - tous les fichiers sont écrits en write-if-new : un fichier déjà
+    présent est PRÉSERVÉ ;
+  - vérifier le diff Git après exécution.
+
+Prérequis:
+  - la relation <nom_relation> doit exister dans relations.json en
+    type many_to_many ;
+  - elle doit posséder un bloc pivot.fields[] non vide (sinon utiliser
+    le CRUD standard).
+
+Options:
+  --dry-run     Affiche les fichiers qui seraient écrits sans rien
+                modifier.
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne génère pas le CRUD principal des deux entités liées (voir
+    forge make:crud) ;
+  - le runtime côté Forge est dans core.pivot_advanced
+    (PIVOT-ADVANCED-003) ;
+  - ne modifie pas mvc/routes.py — le routage du sous-CRUD pivot est
+    à brancher manuellement.""",
 }
 
 
