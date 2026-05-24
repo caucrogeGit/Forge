@@ -346,6 +346,9 @@ if __name__ == "__main__":
             "Voir ADR-002 : docs/adr/002-session-strategy.md"
         )
 
+    from core.prod_warnings import emit_memory_store_warning_if_needed
+    emit_memory_store_warning_if_needed(APP_ENV, forge.get("session_store"), logger=logger)
+
     try:
         server.serve_forever()
     except KeyboardInterrupt:
