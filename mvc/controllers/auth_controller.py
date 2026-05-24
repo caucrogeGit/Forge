@@ -27,10 +27,10 @@ from core.auth.session import login_user
 from core.auth.user import AuthUser
 from core.forge import get as _cfg
 from core.mvc.controller.base_controller import BaseController
+from core.security.cookies import clear_session_cookie, set_session_cookie
 from core.security.hashing import record_attempt, is_rate_limited, verify_password_legacy
 from core.sessions.manager import get_session_store as _get_session_store
 from core.security.session import (
-    SESSION_COOKIE_NAME,
     get_session,
     get_session_id,
     delete_session,
@@ -63,9 +63,7 @@ class AuthController(BaseController):
             "app_name"  : _cfg("app_name"),
             "erreur"    : "",
         })
-        response.headers["Set-Cookie"] = (
-            f"{SESSION_COOKIE_NAME}={session_id}; Path=/; HttpOnly; SameSite=Strict; Secure"
-        )
+        set_session_cookie(response, session_id)
         return response
 
     @staticmethod
@@ -114,9 +112,7 @@ class AuthController(BaseController):
                     ip_address=request.ip,
                 )
                 response = BaseController.redirect("/login/mfa")
-                response.headers["Set-Cookie"] = (
-                    f"{SESSION_COOKIE_NAME}={session_id}; Path=/; HttpOnly; SameSite=Strict; Secure"
-                )
+                set_session_cookie(response, session_id)
                 return response
 
             login_user(request, auth_user)
@@ -127,9 +123,7 @@ class AuthController(BaseController):
                 ip_address=request.ip,
             )
             response = BaseController.redirect("/")
-            response.headers["Set-Cookie"] = (
-                f"{SESSION_COOKIE_NAME}={nouveau_id}; Path=/; HttpOnly; SameSite=Strict; Secure"
-            )
+            set_session_cookie(response, nouveau_id)
             return response
 
         if utilisateur is not None and not utilisateur.get("Actif"):
@@ -159,7 +153,5 @@ class AuthController(BaseController):
         safe_log_auth_event(AUTH_EVENT_LOGOUT, user_id=user_id, ip_address=request.ip)
         delete_session(session_id)
         response = BaseController.redirect("/login")
-        response.headers["Set-Cookie"] = (
-            f"{SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=0"
-        )
+        clear_session_cookie(response)
         return response

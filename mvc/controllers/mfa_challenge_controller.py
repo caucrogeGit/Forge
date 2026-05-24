@@ -29,7 +29,8 @@ except ImportError:
 
 from core.forge import get as _cfg
 from core.mvc.controller.base_controller import BaseController
-from core.security.session import SESSION_COOKIE_NAME, authenticate_session, get_session, get_session_id
+from core.security.cookies import set_session_cookie
+from core.security.session import authenticate_session, get_session, get_session_id
 
 
 class MfaChallengeController(BaseController):
@@ -133,7 +134,5 @@ def _default_finalize(user_id: int, session_id: str | None) -> Any:
         return BaseController.render("errors/403.html", 403, base=None)
     from core.http.response import Response
     response = Response(302, headers={"Location": "/"})
-    response.headers["Set-Cookie"] = (
-        f"{SESSION_COOKIE_NAME}={nouveau_id}; Path=/; HttpOnly; SameSite=Strict; Secure"
-    )
+    set_session_cookie(response, nouveau_id)
     return response
