@@ -1269,6 +1269,312 @@ Limites:
     auth:user:* (create, show, disable, enable, password, role:add,
     role:remove, roles) reposent sur argparse et conservent leur
     aide --help native (non couverte par ce ticket).""",
+
+    # ── Commandes restantes (CLI-HELP-FLAGS-REMAINING-MINOR-001) ─────────────
+    # Clôture du chantier --help : 9 commandes hétérogènes regroupées ici.
+
+    "new": """\
+Usage:
+  forge new <NomProjet> [--ref <branche>] [--profile <profil>]
+                        [--starter <id>]
+
+Description:
+  Crée un nouveau projet Forge dans ./<NomProjet>/ à partir du
+  squelette officiel : clone Git, configuration env/, environnement
+  virtuel Python, dépendances Node, certificats SSL de développement
+  et application optionnelle d'un starter.
+
+Arguments:
+  <NomProjet>        Nom du projet (lettres, chiffres, _ ou -, doit
+                     commencer par une lettre).
+
+Options:
+  --ref <branche>    Branche Forge à cloner (défaut : tag courant).
+  --profile <id>     Profil de projet (voir SUPPORTED_PROJECT_PROFILES).
+  --starter <id>     Applique un starter app après l'initialisation
+                     (voir forge starter:list pour les identifiants).
+  -h, --help         Affiche cette aide sans exécuter la commande.
+
+Effets (CRÉE un dossier complet) :
+  - refuse si ./<NomProjet>/ existe déjà ;
+  - git clone du squelette Forge avec --depth=1 ;
+  - configure env/example et env/dev (APP_NAME, DB_NAME, DB_APP_LOGIN) ;
+  - python -m venv .venv puis pip install -r requirements.txt ;
+  - npm install + npm run build:css si package.json présent ;
+  - openssl req génère cert.pem / key.pem (HTTPS local) ;
+  - écrit forge_profile.txt ;
+  - applique éventuellement le starter (fichiers + routes) ;
+  - réinitialise le dépôt Git (.git supprimé + git init + commit
+    initial) ;
+  - en cas d'erreur, supprime tout le dossier créé (rollback).
+
+ATTENTION:
+  - cette commande crée un grand nombre de fichiers en une fois ;
+  - elle EXIGE git et openssl dans le PATH ;
+  - elle suppose une connexion réseau (git clone, pip, npm) ;
+  - le commit Git initial peut échouer si user.name/user.email Git
+    ne sont pas configurés (le projet reste créé, message d'aide).
+
+Limites:
+  - ne crée AUCUNE base de données (lancer forge db:init dans le
+    projet créé) ;
+  - ne configure pas le déploiement (voir forge deploy:init).""",
+
+    "starter:list": """\
+Usage:
+  forge starter:list
+
+Description:
+  Liste les starter apps Forge disponibles avec leur numéro,
+  identifiant, statut (disponible / à venir), description et lien
+  documentaire. Lecture seule.
+
+Effets:
+  - lit le registre des starters embarqué dans forge_cli/starters/ ;
+  - imprime numéro, nom, statut, description et URL doc de chaque
+    starter ;
+  - n'écrit aucun fichier.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule ;
+  - ne télécharge rien et ne déclenche aucune génération ;
+  - pour construire un starter, voir forge starter:build <n|nom> ;
+  - pour appliquer un starter à un projet neuf, voir
+    forge new <NomProjet> --starter <id>.""",
+
+    "sync:entity": """\
+Usage:
+  forge sync:entity <NomEntite>
+
+Description:
+  Régénère les artefacts d'une SEULE entité depuis son JSON canonique.
+  Sous-ensemble de forge build:model ciblé sur une entité.
+
+Arguments:
+  <NomEntite>    Nom de l'entité (PascalCase) ; le dossier
+                 mvc/entities/<entite>/ doit exister avec son
+                 <entite>.json.
+
+Effets:
+  - lit mvc/entities/<entite>/<entite>.json (refuse si introuvable) ;
+  - valide la définition canonique ;
+  - RÉGÉNÈRE mvc/entities/<entite>/<entite>.sql ;
+  - RÉGÉNÈRE mvc/entities/<entite>/<entite>_base.py ;
+  - PRÉSERVE mvc/entities/<entite>/<entite>.py (fichier manuel —
+    jamais écrasé) ;
+  - imprime les fichiers écrits / préservés.
+
+ATTENTION:
+  - <e>.sql et <e>_base.py sont ÉCRASÉS à chaque exécution (fichiers
+    régénérables par convention Forge) ;
+  - <e>.py est intact ;
+  - vérifier le diff Git après exécution.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne traite qu'UNE entité ; pour toutes, voir forge build:model ;
+  - ne traite pas relations.sql (voir forge sync:relations) ;
+  - ne crée pas la base ni la table — voir forge db:init / db:apply.""",
+
+    "sync:relations": """\
+Usage:
+  forge sync:relations
+
+Description:
+  Régénère mvc/entities/relations.sql à partir de
+  mvc/entities/relations.json. Sous-ensemble de forge build:model
+  ciblé sur les relations.
+
+Effets:
+  - lit mvc/entities/relations.json ;
+  - valide le contrat de relations contre les définitions d'entités ;
+  - RÉGÉNÈRE mvc/entities/relations.sql ;
+  - imprime le fichier régénéré.
+
+ATTENTION:
+  - relations.sql est ÉCRASÉ à chaque exécution ;
+  - vérifier le diff Git après exécution.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne traite pas les artefacts d'entité (.sql, _base.py) — voir
+    forge sync:entity ou forge build:model ;
+  - ne crée pas la base ni les tables — voir forge db:apply.""",
+
+    "sync:landing": """\
+Usage:
+  forge sync:landing [--check]
+
+Description:
+  Synchronise la landing du framework (mvc/views/landing/index.html
+  + static/) vers docs/index.html et docs/static/ pour la version
+  publiée sur GitHub Pages / MkDocs.
+
+Effets:
+  - mode normal :
+      * lit mvc/views/landing/index.html ;
+      * RÉGÉNÈRE docs/index.html (préfixé du commentaire « FICHIER
+        GENERE PAR forge sync:landing ») ;
+      * copie récursivement static/* vers docs/static/* ;
+  - mode --check :
+      * vérifie que docs/index.html et docs/static/ sont synchrones ;
+      * exit 0 si OK, 1 si désynchronisé ; n'écrit rien.
+
+ATTENTION:
+  - en mode normal, docs/index.html est ÉCRASÉ ;
+  - les fichiers de docs/static/ sont COPIÉS depuis static/
+    (écrasement par shutil.copy2) ;
+  - vérifier le diff Git après exécution.
+
+Options:
+  --check       Mode lecture seule : vérifie la synchronisation sans
+                rien écrire.
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - destiné au DÉPÔT Forge lui-même, pas à un projet applicatif ;
+  - ne publie rien (la publication GitHub Pages est gérée par CI).""",
+
+    "js:init": """\
+Usage:
+  forge js:init htmx
+  forge js:init alpine
+  forge js:init htmx-alpine
+
+Description:
+  Installe htmx, alpine ou les deux dans le projet : copie le bundle
+  minifié depuis node_modules/ vers static/vendor/<lib>/ pour usage
+  direct dans les templates Jinja2.
+
+Arguments:
+  htmx           Installe htmx (htmx.org) ;
+  alpine         Installe alpine.js (alpinejs) ;
+  htmx-alpine    Installe les deux.
+
+Effets:
+  - lance npm install pour ajouter la lib si absente de
+    node_modules/ ;
+  - copie node_modules/<lib>/dist/<lib>.min.js vers
+    static/vendor/<lib>/<lib>.min.js ;
+  - n'écrit pas dans mvc/.
+
+ATTENTION:
+  - cette commande peut télécharger des paquets npm (réseau requis) ;
+  - elle copie un fichier sous static/vendor/ (créé si nécessaire).
+
+Prérequis:
+  - npm disponible dans le PATH ;
+  - package.json présent à la racine (le squelette Forge en fournit
+    un).
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne configure aucun build Tailwind ni bundler ;
+  - ne modifie pas vos templates — l'inclusion <script src="..."> reste
+    à votre charge ;
+  - les versions installées sont celles de package.json.""",
+
+    "docs:pdf": """\
+Usage:
+  forge docs:pdf
+
+Description:
+  Génère un PDF de la documentation Forge à partir de
+  docs/quarkdown/forge-documentation.qd via l'outil Quarkdown.
+  Destiné au DÉPÔT Forge lui-même, pas à un projet applicatif.
+
+Effets:
+  - cherche l'exécutable quarkdown dans le PATH ;
+  - cherche la racine du dépôt Forge ;
+  - lance « quarkdown c docs/quarkdown/forge-documentation.qd --pdf »
+    dans un sous-processus ;
+  - déplace le PDF produit vers l'emplacement cible attendu ;
+  - sort en erreur si quarkdown est absent, si la source .qd manque,
+    si quarkdown échoue, ou si le PDF n'apparaît pas à l'emplacement
+    attendu.
+
+Prérequis:
+  - quarkdown installé et accessible (voir le message d'erreur de la
+    commande pour les instructions d'installation) ;
+  - fichier source docs/quarkdown/forge-documentation.qd présent.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - dépend d'un outil externe (Quarkdown) — pas de fallback ;
+  - destiné au dépôt Forge, pas aux projets applicatifs ;
+  - ne publie pas le PDF ; il est généré localement.""",
+
+    "i18n:check": """\
+Usage:
+  forge i18n:check
+
+Description:
+  Vérifie la complétude et la validité des catalogues de traductions
+  du projet (translations/*.json). Lecture seule.
+
+Effets:
+  - vérifie que translations/ existe ;
+  - vérifie que translations/fr.json existe ;
+  - pour chaque translations/*.json :
+      * lit le JSON ;
+      * vérifie que c'est un objet ;
+      * pour chaque clé : type chaîne, non vide, notation pointée
+        (« common.save » et non « commonSave »), pas de terme métier
+        interdit ;
+      * pour chaque valeur : type chaîne, non vide ;
+  - imprime un statut par catalogue + nombre de clés vérifiées ;
+  - n'écrit rien ;
+  - exit 0 si tout est OK, 1 sinon.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule — aucune correction automatique ;
+  - ne crée pas le dossier translations/ (voir forge i18n:init) ;
+  - ne télécharge ni ne fusionne aucune traduction externe.""",
+
+    "deploy:check": """\
+Usage:
+  forge deploy:check
+
+Description:
+  Diagnostique l'environnement de déploiement du projet : racine
+  Forge, Python, .venv, env/, env/prod, variables DB, dossiers
+  storage, cohérence HTTP/HTTPS local vs Nginx. Lecture seule.
+
+Effets:
+  - vérifie d'être à la racine d'un projet Forge ;
+  - vérifie Python 3.12+ ;
+  - vérifie .venv/ ;
+  - vérifie env/ et env/prod ;
+  - parse env/prod et contrôle DB_APP_HOST, DB_NAME, DB_APP_LOGIN,
+    UPLOAD_ROOT ;
+  - vérifie storage/ et storage/uploads/ ;
+  - vérifie la cohérence APP_SSL_ENABLED vs deploy/nginx/forge-app.conf
+    (Nginx termine TLS, Forge écoute en HTTP local) ;
+  - imprime un tableau de statuts + résumé ;
+  - exit 1 s'il existe au moins une erreur.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule — aucun fichier modifié ;
+  - ne contacte aucun serveur distant ;
+  - ne lance ni Nginx, ni systemd, ni le serveur Forge ;
+  - pour générer les fichiers de déploiement, voir forge deploy:init.""",
 }
 
 
