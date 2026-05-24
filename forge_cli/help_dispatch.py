@@ -357,6 +357,143 @@ Limites:
   - n'altère ni rbac.json ni le code applicatif ;
   - ne corrige rien automatiquement — les avertissements doivent être
     traités manuellement.""",
+
+    # ── Pages publiques (CLI-HELP-FLAGS-PUBLIC-PAGES-001) ────────────────────
+    # Convention Forge : une page publique est distincte du CRUD admin. Elle
+    # est faite pour le visiteur, pas pour l'administrateur, et ne doit jamais
+    # exposer directement les actions destructives d'un CRUD.
+
+    "make:public-page": """\
+Usage:
+  forge make:public-page <nom>
+
+Description:
+  Génère une page publique statique distincte du CRUD admin.
+  Le <nom> est slugifié (kebab-case) ; les caractères acceptés sont
+  lettres, chiffres et tirets internes.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - crée mvc/views/public/<slug>.html (template Jinja2 héritant de
+    layouts/public.html) ;
+  - crée ou complète mvc/controllers/public_pages_controller.py avec une
+    méthode <slug>() ;
+  - insère la route GET /<slug> dans mvc/routes.py (public, sans CSRF) ;
+  - n'écrase ni le template, ni la méthode, ni la route si déjà présents.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - page statique uniquement (aucun lien automatique vers une entité) ;
+  - ne remplace pas make:crud ;
+  - ne publie rien automatiquement ;
+  - n'expose aucune action destructive au visiteur.""",
+
+    "make:public-list": """\
+Usage:
+  forge make:public-list <Entite>
+
+Description:
+  Génère une liste publique paginée pour une entité existante.
+  Lecture seule, conçue pour le visiteur — pas un CRUD admin exposé.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - lit mvc/entities/<Entite>/<entite>.json pour découvrir les champs
+    publics ;
+  - crée mvc/views/public/<plural>/list.html (template Jinja2 paginé) ;
+  - ajoute la méthode liste publique au contrôleur correspondant ;
+  - insère la route GET /<plural> dans mvc/routes.py.
+
+Prérequis:
+  - l'entité <Entite> doit exister (forge make:entity <Entite>).
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule — aucune action de création/modification/suppression ;
+  - différent du CRUD admin : pas d'écran de gestion ;
+  - ne génère pas de fiche détaillée (voir forge make:public-show).""",
+
+    "make:public-show": """\
+Usage:
+  forge make:public-show <Entite>
+
+Description:
+  Génère une fiche publique détaillée pour une entité existante.
+  Affichage en lecture seule destiné au visiteur.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - lit mvc/entities/<Entite>/<entite>.json pour découvrir les champs
+    publics ;
+  - crée mvc/views/public/<plural>/show.html (template fiche) ;
+  - ajoute la méthode fiche publique au contrôleur correspondant ;
+  - insère la route GET /<plural>/<id> dans mvc/routes.py.
+
+Prérequis:
+  - l'entité <Entite> doit exister.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule — n'expose aucune action destructive ;
+  - différent de la vue détaillée du CRUD admin ;
+  - ne génère pas la liste publique (voir forge make:public-list).""",
+
+    "make:public-form": """\
+Usage:
+  forge make:public-form <Entite>
+
+Description:
+  Génère un formulaire public pour soumettre une instance d'entité,
+  avec protection CSRF intégrée.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - lit mvc/entities/<Entite>/<entite>.json pour découvrir les champs ;
+  - crée mvc/views/public/<plural>/form.html (template avec
+    {{ csrf_token }}) ;
+  - ajoute la méthode formulaire (GET) et la méthode soumission (POST) au
+    contrôleur ;
+  - insère les routes GET et POST /<plural>/form dans mvc/routes.py.
+
+Prérequis:
+  - l'entité <Entite> doit exister ;
+  - core.security.csrf actif pour valider le jeton à la soumission.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - protège contre CSRF mais ne remplace pas la validation métier
+    côté contrôleur ;
+  - différent du formulaire admin du CRUD ;
+  - n'expose ni édition ni suppression — un formulaire public sert à
+    soumettre, pas à éditer en place.""",
+
+    "make:public-contact": """\
+Usage:
+  forge make:public-contact
+
+Description:
+  Génère la page de contact publique du projet (cas particulier de page
+  publique avec route /contact figée). N'attend aucun argument.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - crée mvc/views/public/contact.html (formulaire de contact Jinja2) ;
+  - crée ou complète mvc/controllers/public_pages_controller.py avec la
+    méthode contact() ;
+  - insère la route GET /contact (et POST si applicable) dans
+    mvc/routes.py.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - route /contact figée (non paramétrable) ;
+  - aucun envoi de mail n'est branché par défaut — la soumission est à
+    raccorder dans le contrôleur (voir forge mail:test pour tester
+    l'envoi).""",
 }
 
 
