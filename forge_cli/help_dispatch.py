@@ -1,21 +1,50 @@
 """
 forge_cli/help_dispatch.py — Interception centrale de `--help` / `-h`.
 
-Ticket : CLI-HELP-FLAGS-DISPATCHER-001.
+Tickets : CLI-HELP-FLAGS-DISPATCHER-001 (mécanisme),
+          CLI-HELP-FLAGS-* (enrichissements par groupe),
+          CLI-HELP-FLAGS-CLOSING-AUDIT-001 (clôture du chantier).
 
-Audit préalable : docs/history/audits/cli-help-flags-audit-001.md (62 commandes
-auditées, 44 sans `--help` exploitable, 6 avec effets de bord critiques).
+Audit initial   : docs/history/audits/cli-help-flags-audit-001.md.
+Audit de clôture : docs/history/audits/cli-help-flags-closing-audit-001.md
+(62 commandes dispatchées par forge.py, 45 aide riche, 17 aide native,
+ 0 aide générique non assumée).
 
-Ce module fournit une aide générique courte pour les commandes qui ne gèrent
-pas elles-mêmes `--help`, et un test booléen pour détecter le flag dans `argv`.
+Ce module fournit deux niveaux d'aide centrale pour les commandes qui ne
+gèrent pas elles-mêmes `--help`, et un test booléen pour détecter le flag
+dans `argv`.
 
 Politique d'inclusion : seules les commandes **sans** support `--help` natif
-sont listées dans `HELP_DESCRIPTIONS`. Les commandes argparse-iso
-(`auth:user:*`) et celles qui font déjà un check `--help` manuel
-(`make:entity`, `make:relation`, `db:apply`, `migration:make`,
-`starter:build`, `module:*`) restent gérées par leur propre `main()` afin
-d'afficher leur aide détaillée — l'interception centrale ne s'applique pas
-à elles.
+sont listées dans ce module. Les commandes argparse-iso (`auth:user:*`,
+8 cas) et celles qui font déjà un check `--help` manuel (`make:entity`,
+`make:relation`, `db:apply`, `migration:make`, `starter:build`, `module:*`,
+9 cas) restent gérées par leur propre `main()` afin d'afficher leur aide
+détaillée — l'interception centrale ne s'applique pas à elles.
+
+Architecture en deux dictionnaires :
+
+- `HELP_TEXTS_RICH`  : aide longue par commande (Usage / Description /
+                       Effets / Prérequis / Options / Limites). Consultée
+                       en priorité par `format_command_help`.
+- `HELP_DESCRIPTIONS` : description d'une ligne. Sert de **filet de
+                        sécurité** :
+                        1. Si une commande est dans HELP_DESCRIPTIONS et
+                           absente de HELP_TEXTS_RICH, le gabarit
+                           générique de `format_command_help` est
+                           produit ;
+                        2. Si une nouvelle commande est ajoutée à
+                           HELP_DESCRIPTIONS sans entrée riche, elle
+                           reçoit immédiatement un `--help` propre, sans
+                           effet de bord ;
+                        3. Si une commande est dans `forge.py` mais
+                           absente des deux dicts ET sans aide native,
+                           `tests/meta/test_cli_help_flags_closing_audit_001.py`
+                           lève une erreur de classification (garde-fou).
+
+Aujourd'hui les 45 commandes riches sont aussi présentes dans
+HELP_DESCRIPTIONS — la version riche prend le pas. La duplication est
+**délibérée** : elle garantit qu'aucune future entrée riche introuvable
+ne tombe pas dans le fallback.
 """
 from __future__ import annotations
 
@@ -24,6 +53,12 @@ HELP_FLAGS: frozenset[str] = frozenset({"--help", "-h"})
 
 # Description courte par commande — une ligne, ton constant avec forge_cli/help.py.
 # Ne contient PAS les commandes qui ont déjà un `--help` natif fonctionnel.
+# Filet de sécurité : si une commande arrive ici sans entrée riche
+# correspondante dans HELP_TEXTS_RICH, format_command_help produit un
+# gabarit générique (Usage + Description + Options) — pas d'effet de bord.
+# Décision CLI-HELP-FLAGS-CLOSING-AUDIT-001 : on conserve la duplication
+# pour qu'une future commande oubliée bénéficie quand même d'une aide
+# minimale et de l'interception dispatcher.
 HELP_DESCRIPTIONS: dict[str, str] = {
     # Projet
     "new":              "Crée un nouveau projet Forge.",
