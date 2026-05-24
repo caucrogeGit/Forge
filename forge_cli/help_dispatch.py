@@ -236,6 +236,127 @@ Limites:
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",
+
+    # ── Schémas JSON & RBAC (CLI-HELP-FLAGS-SCHEMA-RBAC-001) ─────────────────
+
+    "schema:list": """\
+Usage:
+  forge schema:list [--json]
+
+Description:
+  Liste les schémas JSON Forge embarqués (registre interne).
+
+Effets:
+  - lit forge_cli/schemas/forge.schema.index.json (registre des schémas) ;
+  - pour chaque schéma référencé, vérifie l'existence du fichier ;
+  - affiche le nom, le chemin et le statut OK / MANQUANT ;
+  - ne modifie aucun fichier du projet ni du framework.
+
+Options:
+  --json        Sortie machine JSON stable (aucune ligne humaine).
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Codes de retour:
+  0  registre lisible et tous les schémas présents
+  1  registre illisible OU au moins un schéma manquant
+
+Limites:
+  - ne valide pas le contenu des schémas (voir forge schema:doctor) ;
+  - ne valide pas les entités utilisateur (voir forge entity:validate).""",
+
+    "schema:doctor": """\
+Usage:
+  forge schema:doctor [--json]
+
+Description:
+  Diagnostique chaque schéma JSON Forge référencé dans le registre :
+  présence, validité JSON, conformité Draft 2020-12 et résolution des $ref
+  locaux.
+
+Effets:
+  - lit forge_cli/schemas/forge.schema.index.json ;
+  - pour chaque schéma référencé : fichier présent, JSON valide,
+    $schema = https://json-schema.org/draft/2020-12/schema, $id présent,
+    chaque $ref local (hors '#' et 'http') pointe vers un fichier existant ;
+  - affiche un rapport humain ou JSON ;
+  - ne modifie aucun fichier.
+
+Options:
+  --json        Sortie machine JSON stable (aucune ligne humaine).
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Codes de retour:
+  0  aucun problème détecté
+  1  au moins une erreur (registre illisible, schéma absent/invalide,
+     $ref mort, $schema/$id manquant)
+
+Limites:
+  - ne valide pas les entités utilisateur mvc/entities/*.json
+    (c'est le rôle de forge entity:validate) ;
+  - ne valide pas les contrats applicatifs comme mvc/security/rbac.json
+    (voir forge rbac:validate).""",
+
+    "rbac:validate": """\
+Usage:
+  forge rbac:validate [--json]
+
+Description:
+  Valide mvc/security/rbac.json contre le schéma RBAC Forge
+  (forge_cli/schemas/rbac.schema.json, JSON Schema Draft 2020-12).
+
+Effets:
+  - cherche mvc/security/rbac.json à la racine du projet ;
+  - si absent : exit 0 (RBAC est opt-in, son absence n'est pas une erreur) ;
+  - sinon : charge le fichier, instancie un Draft202012Validator,
+    parcourt les erreurs schéma et affiche un rapport humain ou JSON.
+
+Prérequis:
+  - jsonschema et referencing installés (déjà dans requirements.txt).
+
+Options:
+  --json        Sortie machine JSON (errors_count, errors, roles_count…).
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Codes de retour:
+  0  fichier absent OU fichier valide
+  1  fichier présent mais invalide (JSON ou schéma) OU schémas Forge
+     introuvables
+
+Limites:
+  - validation structurelle uniquement (conformité au schéma) ;
+  - pour l'audit fonctionnel (rôles orphelins, permissions inutilisées,
+    entités sans CRUD), voir forge rbac:audit.""",
+
+    "rbac:audit": """\
+Usage:
+  forge rbac:audit [--json]
+
+Description:
+  Audit de cohérence fonctionnelle de mvc/security/rbac.json. Va au-delà
+  de la validation schéma : détecte les rôles sans permissions, les entités
+  sans actions CRUD, les permissions non déclarées et les permissions
+  inutilisées.
+
+Effets:
+  - applique d'abord la validation schéma (équivalent rbac:validate) ;
+  - puis parcourt rôles, entités et permissions pour détecter les
+    incohérences ;
+  - affiche un rapport humain ou JSON avec compte d'erreurs et
+    d'avertissements ;
+  - ne modifie aucun fichier.
+
+Options:
+  --json        Sortie machine JSON (warnings_count, errors_count, détails).
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Codes de retour:
+  0  fichier absent OU fichier valide (avec ou sans avertissements)
+  1  fichier présent mais invalide (JSON ou schéma) OU option inconnue
+
+Limites:
+  - n'altère ni rbac.json ni le code applicatif ;
+  - ne corrige rien automatiquement — les avertissements doivent être
+    traités manuellement.""",
 }
 
 
