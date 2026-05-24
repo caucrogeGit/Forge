@@ -39,6 +39,7 @@ from forge_cli.project_profiles import (
     DEFAULT_PROJECT_PROFILE,
 )
 from forge_cli.errors import cli_fail
+from forge_cli.help_dispatch import format_command_help, wants_help
 
 
 _FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"
@@ -491,6 +492,16 @@ def main() -> None:
         return
 
     command = args[0]
+
+    # Garde-fou central CLI-HELP-FLAGS-DISPATCHER-001 : intercepte --help/-h
+    # avant toute exécution métier pour les commandes connues sans support
+    # --help natif (cf. forge_cli/help_dispatch.py et l'audit
+    # docs/history/audits/cli-help-flags-audit-001.md).
+    if wants_help(args[1:]):
+        help_text = format_command_help(command)
+        if help_text is not None:
+            print(help_text)
+            return
 
     if command == "new":
         if len(args) < 2:
