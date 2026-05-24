@@ -72,6 +72,10 @@ _cfg = {
     # Store de session configurable — None = MemorySessionStore par défaut.
     # Accepte tout objet implémentant SessionStore (core.sessions.contract).
     "session_store": None,
+    # Reverse proxy — IPs des proxies de confiance autorisés à fournir X-Real-IP.
+    # frozenset vide par défaut : X-Real-IP est ignoré tant qu'aucun proxy
+    # n'est explicitement déclaré (HTTP-TRUSTED-PROXY-IP-001).
+    "trusted_proxies": frozenset(),
 }
 
 _PATH_KEYS = {"views_dir", "sql_dir", "upload_root", "mail_log_dir", "mail_templates_dir"}

@@ -115,3 +115,10 @@ SSL_KEYFILE       = os.getenv("SSL_KEYFILE", "key.pem")
 APP_CSP_NONCE_ENABLED = os.getenv("APP_CSP_NONCE_ENABLED", "false").strip().lower() in {
     "1", "true", "yes", "on"
 }
+
+# Reverse proxy — IPs des proxies de confiance autorisés à fournir X-Real-IP.
+# Liste séparée par virgules, espaces tolérés. Vide par défaut : Forge ignore
+# alors complètement X-Real-IP (HTTP-TRUSTED-PROXY-IP-001).
+APP_TRUSTED_PROXIES = frozenset(
+    p.strip() for p in os.getenv("APP_TRUSTED_PROXIES", "").split(",") if p.strip()
+)

@@ -86,7 +86,7 @@ from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFI
                     MAIL_FROM, MAIL_USE_TLS, MAIL_USE_SSL, MAIL_TIMEOUT, MAIL_ENABLED,
                     MAIL_TRANSPORT, MAIL_LOG_DIR, MAIL_TEMPLATES_DIR, MAIL_LOG_ENABLED,
                     DB_APP_HOST, DB_APP_PORT, DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE,
-                    APP_CSP_NONCE_ENABLED)
+                    APP_CSP_NONCE_ENABLED, APP_TRUSTED_PROXIES)
 import core.security.csp as _csp
 import core.forge as forge
 from core.dev_server import format_port_in_use_message, format_startup_messages
@@ -118,6 +118,7 @@ forge.configure(
     db_user      = DB_APP_LOGIN,
     db_password  = DB_APP_PWD,
     db_pool_size = DB_POOL_SIZE,
+    trusted_proxies = APP_TRUSTED_PROXIES,
 )
 from core.http.request import Request, RequestEntityTooLarge
 from core.http.response import Response

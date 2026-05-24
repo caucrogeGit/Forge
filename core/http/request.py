@@ -1,4 +1,6 @@
+import ipaddress
 import json as _json
+from collections.abc import Iterable
 from dataclasses import dataclass
 from email.parser import BytesParser
 from email.policy import default as _email_policy
@@ -11,6 +13,30 @@ from core.forge import get as _cfg
 BODY_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 METHOD_OVERRIDE_TARGETS = {"PUT", "PATCH", "DELETE"}
 MAX_BODY_SIZE = 1_048_576  # 1 Mo
+
+
+def resolve_client_ip(remote_addr: str, headers, trusted_proxies: Iterable[str]) -> str:
+    """Résout l'IP client en honorant `X-Real-IP` uniquement derrière proxy fiable.
+
+    Règle de sécurité (HTTP-TRUSTED-PROXY-IP-001) : `X-Real-IP` est utilisé
+    seulement si `remote_addr` figure exactement dans `trusted_proxies`. Sinon,
+    l'IP retournée reste celle observée par le socket — pas d'usurpation
+    possible depuis un client direct.
+
+    Comparaison stricte sur la chaîne (pas de plages CIDR). `0.0.0.0` n'a aucune
+    signification spéciale : il ne vaut que pour lui-même.
+    """
+    trusted = frozenset(trusted_proxies or ())
+    if not trusted or remote_addr not in trusted:
+        return remote_addr
+    forwarded = (headers.get("X-Real-IP", "") or "").strip()
+    if not forwarded:
+        return remote_addr
+    try:
+        ipaddress.ip_address(forwarded)
+    except ValueError:
+        return remote_addr
+    return forwarded
 
 
 class RequestEntityTooLarge(Exception):
@@ -69,7 +95,11 @@ class Request:
         self.headers  = handler.headers
         self.params   = parse_qs(parsed.query)
         self.files    = {}
-        self.ip           = handler.client_address[0]
+        self.ip           = resolve_client_ip(
+            handler.client_address[0],
+            handler.headers,
+            _cfg("trusted_proxies"),
+        )
         self.route_params = {}  # injecté par Application.dispatch() pour les routes dynamiques
 
         if self.method in BODY_METHODS:
