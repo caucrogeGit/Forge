@@ -1237,7 +1237,7 @@ avant d'ouvrir les tests terrain sur une base saine.
 | Ticket | Description | État |
 |---|---|---|
 | SECURITY-CRYPTOGRAPHY-MFA-001 | Mettre à jour `cryptography>=42,<46` → `>=46.0.7,<47` dans `forge-mvc-mfa` | **livré** |
-| SECURITY-API-AUTH-COMPARE-DIGEST-001 | Remplacer `==` par `hmac.compare_digest` dans `core/security/api_auth.py` | à faire |
+| SECURITY-API-AUTH-COMPARE-DIGEST-001 | Remplacer `==` par `hmac.compare_digest` dans `core/security/api_auth.py` | **livré** |
 | WSGI-ENTRYPOINT-001 | Ajouter un callable WSGI minimal dans `core/wsgi.py` | à faire |
 | SECURITY-SESSION-COOKIE-HELPER-001 | Créer `set_session_cookie()` dans `core/security/cookies.py` | à faire |
 | SECURITY-SESSION-COOKIE-STARTERS-001 | Corriger les starters qui posent `session_id` au lieu de `__Host-session_id` | à faire |

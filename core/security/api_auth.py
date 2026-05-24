@@ -1,4 +1,5 @@
 """Auth API minimale — protection par token Bearer statique."""
+import hmac
 import os
 
 from core.http import api_error
@@ -34,7 +35,9 @@ def is_valid_api_token(request):
     if not expected:
         return False
     token = get_api_token_from_request(request)
-    return token == expected
+    if not token:
+        return False
+    return hmac.compare_digest(token, expected)
 
 
 def require_api_token(func):
@@ -71,7 +74,7 @@ def require_api_token(func):
             )
 
         expected = _get_configured_token()
-        if not expected or parts[1] != expected:
+        if not expected or not hmac.compare_digest(parts[1], expected):
             return api_error(
                 "Token API invalide",
                 status=401,
