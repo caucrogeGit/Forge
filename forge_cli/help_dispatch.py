@@ -620,6 +620,122 @@ Limites:
   - lecture seule — ne supprime pas et ne tronque pas mail_log ;
   - ne déclenche aucun envoi ;
   - --limit doit être un entier positif.""",
+
+    # ── Migrations (CLI-HELP-FLAGS-MIGRATIONS-001) ───────────────────────────
+    # migration:make est déjà couvert par une aide native (--help détaillé
+    # dans forge_cli/entities/migrations.py:458-487), hors périmètre de
+    # ce ticket.
+
+    "migration:status": """\
+Usage:
+  forge migration:status
+
+Description:
+  Affiche le statut des migrations SQL Forge en comparant les fichiers
+  locaux du dossier mvc/migrations/ et la table de suivi
+  forge_migrations en base.
+
+Effets:
+  - lit les fichiers de migration mvc/migrations/<version>_<slug>.sql ;
+  - se connecte à la base configurée (env/dev → DB_APP_*) et lit
+    SELECT version, name, filename, checksum FROM forge_migrations ;
+  - calcule un statut par version :
+      APPLIED  — fichier local + ligne en base, checksums identiques ;
+      CHANGED  — fichier local + ligne en base, checksum différent ;
+      PENDING  — fichier local sans ligne en base ;
+      MISSING  — ligne en base sans fichier local correspondant ;
+  - imprime un tableau version / statut / fichier ;
+  - n'exécute AUCUN SQL de migration, n'écrit nulle part.
+
+Prérequis:
+  - mvc/migrations/ peut être absent (la commande l'indique) ;
+  - table forge_migrations créée par forge db:init.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule — n'applique aucune migration (voir migration:apply) ;
+  - ne crée pas de fichier (voir migration:make) ;
+  - ne compare pas le schéma SQL avec les entités (voir migration:diff).""",
+
+    "migration:apply": """\
+Usage:
+  forge migration:apply
+
+Description:
+  Applique sur la base configurée toutes les migrations SQL en statut
+  PENDING, dans l'ordre de leur version (timestamp).
+
+Effets:
+  - lit mvc/migrations/ et la table forge_migrations ;
+  - calcule le statut comme migration:status ;
+  - refuse de continuer si une migration est en statut CHANGED ou
+    MISSING (intégrité) ;
+  - pour chaque migration PENDING (ordre version croissante) :
+      ouvre une transaction, exécute chaque instruction SQL du fichier,
+      insère une ligne dans forge_migrations (version, nom, checksum,
+      date, durée), commit ;
+  - imprime chaque fichier appliqué puis le total final.
+
+ATTENTION:
+  - cette commande MODIFIE RÉELLEMENT la base de données configurée
+    dans env/dev (ou env/prod selon APP_ENV) ;
+  - les instructions SQL des migrations sont exécutées telles quelles
+    (CREATE TABLE, ALTER TABLE, INSERT, etc.) ;
+  - vérifier l'état avec forge migration:status AVANT d'appliquer ;
+  - en cas d'erreur SQL, la migration en cours est annulée mais les
+    migrations déjà appliquées sont conservées.
+
+Prérequis:
+  - DB_APP_* configurés dans env/dev ;
+  - table forge_migrations créée (forge db:init) ;
+  - mvc/migrations/ contenant au moins un fichier PENDING.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne crée pas de fichier (voir migration:make) ;
+  - ne propose pas de rollback (annulation manuelle via SQL inverse) ;
+  - différent de forge db:apply qui exécute le SQL des entités sans
+    suivi de version.""",
+
+    "migration:diff": """\
+Usage:
+  forge migration:diff --entity <Entite>
+
+Description:
+  Compare le schéma JSON d'une entité Forge à l'état réel de sa table
+  en base, et imprime un rapport de différences (colonnes manquantes,
+  types divergents, nullable/auto_increment, défauts).
+
+Arguments:
+  --entity <Entite>    Nom de l'entité à comparer (obligatoire).
+
+Effets:
+  - charge env/dev et se connecte à la base ;
+  - lit mvc/entities/<Entite>/<entite>.json pour les colonnes attendues ;
+  - lit INFORMATION_SCHEMA.COLUMNS pour les colonnes réelles ;
+  - calcule le diff ligne à ligne (manquantes, supplémentaires,
+    divergentes) ;
+  - imprime un rapport humain ;
+  - ne génère AUCUN fichier SQL et ne modifie ni la base ni les
+    fichiers d'entité.
+
+Prérequis:
+  - DB_APP_* configurés dans env/dev ;
+  - l'entité <Entite> existe (forge make:entity) ;
+  - la table correspondante existe en base.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule, aucun effet sur la base ni sur les fichiers ;
+  - ne génère pas de migration prête à appliquer — utiliser
+    forge migration:make <nom> --from-diff <Entite> pour produire un
+    fichier .sql à partir du diff.""",
 }
 
 
