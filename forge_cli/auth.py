@@ -739,12 +739,20 @@ def run_auth_doctor(root: Path | None = None) -> tuple[AuthCliCheck, ...]:
         else:
             checks.append(AuthCliCheck("ok", module_name, "importable"))
 
-    if any(c.label == "forge_mvc_mfa" and c.status == "ok" for c in checks):
+    mfa_importable = any(c.label == "forge_mvc_mfa" and c.status == "ok" for c in checks)
+    if mfa_importable:
         checks.append(AuthCliCheck(
             "warn",
             "forge_mvc_mfa",
             "Pre-Alpha — secret TOTP stocké en clair. "
             "Voir docs/reference/auth-mfa.md et SEC-MFA-SECRET-ENCRYPTION-001",
+        ))
+    else:
+        checks.append(AuthCliCheck(
+            "warn",
+            "forge_mvc_mfa",
+            "Opt-in non installé — module Pre-Alpha (secret TOTP en clair si activé). "
+            "Voir docs/reference/auth-mfa.md",
         ))
 
     for module_name, attr_name in AUTH_CONTRACTS:

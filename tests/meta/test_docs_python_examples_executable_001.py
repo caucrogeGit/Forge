@@ -32,12 +32,14 @@ EXCLUDED_FILES: set[Path] = set()
 
 # Modules opt-in : leur ABSENCE est tolérée, mais s'ils sont installés,
 # leurs symboles sont vérifiés normalement.
+# Inclut les dépendances tierces tirées par un opt-in (pyotp ← forge-mvc-mfa).
 OPTIONAL_MODULES = {
     "forge_mvc_mfa",
     "forge_mvc_rbac",
     "forge_mvc_workflow",
     "forge_mvc_stats",
     "forge_mvc_media",
+    "pyotp",
 }
 
 # Modules applicatifs : toute vérification est ignorée (import + symboles).

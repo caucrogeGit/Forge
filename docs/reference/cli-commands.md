@@ -157,6 +157,19 @@ Mode interactif : pose les questions sur les deux entités et le type de relatio
 
 ---
 
+### `forge make:pivot-crud`
+
+Génère un sous-CRUD dédié pour un pivot porteur d'attributs.
+
+```bash
+forge make:pivot-crud <EntiteSource> <nom_relation>
+```
+
+À utiliser quand une relation many-to-many comporte des champs propres (date,
+quantité, statut…) qui méritent leurs propres écrans d'édition.
+
+---
+
 ### `forge sync:entity`
 
 Régénère les fichiers modèles d'une entité depuis son JSON.
@@ -195,6 +208,20 @@ Vérifie la cohérence des modèles : JSON valide, champs requis, types reconnus
 ```bash
 forge check:model
 ```
+
+---
+
+### `forge entity:validate`
+
+Valide les entités (`mvc/entities/*.json`) et `relations.json` contre les
+schémas JSON Forge.
+
+```bash
+forge entity:validate
+```
+
+Vérifie la structure JSON, les références entre fichiers et les types
+reconnus. Sort en erreur si un fichier viole le schéma.
 
 ---
 
@@ -695,6 +722,61 @@ Génère un PDF depuis la documentation du projet.
 ```bash
 forge docs:pdf
 ```
+
+---
+
+## Commandes de schémas JSON
+
+### `forge schema:list`
+
+Liste les schémas JSON Forge disponibles localement.
+
+```bash
+forge schema:list
+```
+
+Affiche les fichiers de schéma embarqués et leur version.
+
+---
+
+### `forge schema:doctor`
+
+Diagnostique les schémas JSON Forge : présence, validité, résolution des `$ref`.
+
+```bash
+forge schema:doctor
+```
+
+À utiliser pour vérifier l'installation des schémas avant un `entity:validate`
+ou un `rbac:validate`.
+
+---
+
+## Commandes RBAC
+
+### `forge rbac:validate`
+
+Valide `mvc/security/rbac.json` avec le schéma RBAC Forge.
+
+```bash
+forge rbac:validate
+```
+
+Vérifie la structure du fichier (rôles, permissions, héritages) sans
+exécuter de logique applicative.
+
+---
+
+### `forge rbac:audit`
+
+Audit de cohérence fonctionnelle de `mvc/security/rbac.json`.
+
+```bash
+forge rbac:audit
+```
+
+Détecte les rôles orphelins, les permissions non référencées et les
+incohérences entre la configuration RBAC et le code.
 
 ---
 
