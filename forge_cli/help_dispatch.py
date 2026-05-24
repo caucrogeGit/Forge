@@ -1102,6 +1102,173 @@ Limites:
     (PIVOT-ADVANCED-003) ;
   - ne modifie pas mvc/routes.py — le routage du sous-CRUD pivot est
     à brancher manuellement.""",
+
+    # ── Auth — commandes restantes (CLI-HELP-FLAGS-AUTH-COMPLETION-001) ──────
+    # 5 commandes qui n'ont pas l'aide argparse native des auth:user:*
+    # (lesquelles restent gérées par leur propre main() et ne sont pas
+    # interceptées par le dispatcher).
+
+    "auth:init": """\
+Usage:
+  forge auth:init
+
+Description:
+  Initialise les fichiers SQL optionnels du socle Auth/User Forge dans
+  le projet. Ne touche pas la base de données.
+
+Effets (un projet PEUT être modifié) :
+  - crée mvc/models/sql/ si absent ;
+  - écrit en mode write-if-new (aucun fichier existant n'est écrasé) :
+      * users.sql                       — table des comptes ;
+      * auth_tokens.sql                 — jetons (reset, vérification…) ;
+      * auth_mfa_factors.sql            — facteurs MFA (TOTP) ;
+      * auth_mfa_recovery_codes.sql     — codes de récupération MFA ;
+      * user_roles.sql                  — pont Auth/User vers RBAC ;
+      * auth_audit_log.sql              — journal d'audit Auth ;
+      * auth_rate_limit_attempts.sql    — anti-bruteforce ;
+  - affiche la commande suivante recommandée (forge db:apply).
+
+ATTENTION:
+  - cette commande peut créer plusieurs fichiers d'un coup ;
+  - les fichiers existants sont PRÉSERVÉS (write-if-new) ;
+  - vérifier le diff Git après exécution.
+
+Limites:
+  - ne crée AUCUNE table : utiliser forge db:apply pour exécuter le
+    SQL produit ;
+  - ne configure ni la session ni le hachage de mot de passe (déjà
+    fournis par core.auth) ;
+  - ne crée aucun utilisateur (voir forge auth:user:create) ;
+  - tous les fichiers sont opt-in : MFA, RBAC, audit, rate limit
+    peuvent être omis si vous ne les utilisez pas.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+
+    "auth:doctor": """\
+Usage:
+  forge auth:doctor
+
+Description:
+  Diagnostic d'importabilité du socle Auth/User Forge : modules,
+  contrats publics, brique MFA et RBAC, fichiers SQL optionnels.
+  Lecture seule. Ne contacte pas la base.
+
+Effets:
+  - vérifie l'importabilité de chaque module Auth :
+      core.auth.user / session / tokens / reset / audit / rate_limit,
+      forge_mvc_mfa (+ recovery), forge_mvc_rbac ;
+  - émet un avertissement MFA Pre-Alpha (installée ou pas) : secret
+    TOTP stocké en clair, voir docs/reference/auth-mfa.md et
+    SEC-MFA-SECRET-ENCRYPTION-001 ;
+  - vérifie la présence des contrats publics (AuthUser, login_user,
+    AuthToken, PasswordResetRequest, AuthMfaFactor,
+    AuthMfaRecoveryCode, AuthUserRole, user_has_permission,
+    AuthAuditEvent, AuthRateLimitAttempt…) ;
+  - vérifie les contrats RBAC optionnels (Role, Permission,
+    require_permission, make_can) ;
+  - liste les fichiers SQL optionnels (équivalent auth:list-sql) ;
+  - imprime un tableau de statuts (ok / warn / fail) + résumé ;
+  - exit 1 s'il existe au moins une erreur.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - n'ouvre aucune connexion à la base ;
+  - ne crée ni utilisateur ni table ;
+  - pour l'état effectif (modules + SQL présents) par fonctionnalité,
+    voir forge auth:status ;
+  - pour la liste seule des fichiers SQL, voir forge auth:list-sql.""",
+
+    "auth:status": """\
+Usage:
+  forge auth:status
+
+Description:
+  État des briques d'authentification disponibles dans le projet :
+  pour chaque fonctionnalité (users, sessions, tokens, reset password,
+  MFA, user_roles, Jinja helpers, audit, rate limit), indique si le
+  module est importable et si le fichier SQL correspondant est
+  présent. Lecture seule. Ne contacte pas la base.
+
+Effets:
+  - pour chaque fonctionnalité Auth/User Forge :
+      * vérifie que le module est importable et que le contrat public
+        attendu existe ;
+      * si un fichier SQL est attendu, vérifie sa présence dans
+        mvc/models/sql/ ;
+  - imprime un tableau de statuts (ok / warn / fail) + résumé ;
+  - exit 1 s'il existe au moins une erreur.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule, pas de connexion à la base ;
+  - ne crée ni fichier ni table ;
+  - pour un diagnostic plus détaillé (tous les modules et contrats,
+    pas seulement les fonctionnalités), voir forge auth:doctor.""",
+
+    "auth:list-sql": """\
+Usage:
+  forge auth:list-sql
+
+Description:
+  Liste les fichiers SQL optionnels du socle Auth/User Forge et leur
+  présence dans le projet. Aucune écriture, aucune connexion DB.
+
+Effets:
+  - pour chaque fichier attendu sous mvc/models/sql/ :
+      * users.sql, auth_tokens.sql, auth_mfa_factors.sql,
+        auth_mfa_recovery_codes.sql, user_roles.sql,
+        auth_audit_log.sql, auth_rate_limit_attempts.sql ;
+      * vérifie si le fichier est présent ;
+      * statue ok si présent, warn si absent (SQL optionnel, non
+        appliqué automatiquement) ;
+  - imprime un résumé + rappel qu'aucun secret n'est affiché.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - n'applique AUCUN SQL — voir forge db:apply ou forge
+    migration:apply pour appliquer ;
+  - ne crée aucun fichier — voir forge auth:init pour les générer ;
+  - ne vérifie pas l'état réel des tables en base — voir forge
+    auth:doctor / auth:status.""",
+
+    "auth:user:list": """\
+Usage:
+  forge auth:user:list
+
+Description:
+  Liste les comptes utilisateurs présents dans la table users du
+  projet. Lecture seule sur la base configurée.
+
+Effets:
+  - charge env/dev puis configure core.forge.db_* depuis les variables
+    DB_APP_* (HOST, PORT, NAME, LOGIN, PWD, POOL_SIZE) ;
+  - ouvre une connexion à la base et exécute un SELECT sur users ;
+  - imprime un tableau id / email / actif / created_at ;
+  - signale si aucun utilisateur n'est présent ;
+  - n'écrit, ne modifie et ne purge rien.
+
+Prérequis:
+  - DB_APP_* configurés dans env/dev (ou env/prod) ;
+  - table users créée (forge auth:init puis forge db:apply).
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule — n'affiche aucun mot de passe ni hash ;
+  - n'affiche pas les rôles RBAC (voir forge auth:user:roles
+    --email <…>) ;
+  - cette commande utilise un parseur manuel ; les autres
+    auth:user:* (create, show, disable, enable, password, role:add,
+    role:remove, roles) reposent sur argparse et conservent leur
+    aide --help native (non couverte par ce ticket).""",
 }
 
 
