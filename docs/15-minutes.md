@@ -267,6 +267,33 @@ scripts/dev-server.sh
 Le script vérifie que le port est libre avant de lancer `python app.py` et
 affiche l'URL correcte ; il ne tue aucun processus existant.
 
+### Comment lancer Forge ?
+
+Forge peut être lancé de plusieurs façons selon le contexte.
+
+| Contexte | Commande | Usage |
+|---|---|---|
+| Développement quotidien | `scripts/dev-server.sh` | Lance le serveur de développement avec diagnostic du port, du protocole HTTP/HTTPS et de l'URL à ouvrir. |
+| Test direct simple | `python app.py` | Lance directement l'application avec le serveur Python intégré. Utile pour un test local rapide ou une démonstration, **pas pour une production publique**. |
+| Commandes Forge | `python forge.py <commande>` ou `forge <commande>` | Utilise la CLI Forge : diagnostic, génération, migrations, CRUD, documentation, etc. |
+| Production encadrée | WSGI + Gunicorn + reverse proxy | Chemin recommandé pour exposer Forge proprement derrière Caddy ou Nginx. |
+
+En développement quotidien, la commande recommandée est :
+
+```bash
+scripts/dev-server.sh
+```
+
+Pour une exposition publique, ne pas utiliser `python app.py` directement.
+Utiliser l'entrée WSGI documentée avec `create_configured_wsgi_app()`,
+Gunicorn et un reverse proxy.
+
+Voir aussi :
+
+- [Déploiement WSGI minimal](wsgi-deployment.md)
+- [Limites de production](production-limits.md)
+- [Commandes CLI Forge](reference/cli-commands.md)
+
 ---
 
 ## 8. Limites du tutoriel

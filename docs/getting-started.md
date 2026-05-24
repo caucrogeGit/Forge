@@ -46,6 +46,27 @@ source .venv/bin/activate
 Il reste deux étapes manuelles : renseigner les mots de passe MariaDB dans `env/dev`,
 puis lancer `forge db:init`.
 
+### Comment lancer Forge ?
+
+Forge peut être lancé de plusieurs façons selon le contexte.
+
+| Contexte | Commande | Usage |
+|---|---|---|
+| Développement quotidien | `scripts/dev-server.sh` | Lance le serveur de développement avec diagnostic du port, du protocole HTTP/HTTPS et de l'URL à ouvrir. |
+| Test direct simple | `python app.py` | Lance directement l'application avec le serveur Python intégré. Utile pour un test local rapide ou une démonstration, **pas pour une production publique**. |
+| Commandes Forge | `python forge.py <commande>` ou `forge <commande>` | Utilise la CLI Forge : diagnostic, génération, migrations, CRUD, documentation, etc. |
+| Production encadrée | WSGI + Gunicorn + reverse proxy | Chemin recommandé pour exposer Forge proprement derrière Caddy ou Nginx. |
+
+En développement quotidien, la commande recommandée à l'intérieur du projet :
+
+```bash
+scripts/dev-server.sh
+```
+
+Pour une exposition publique, utiliser l'entrée WSGI dédiée — voir
+[Déploiement WSGI minimal](wsgi-deployment.md) et
+[Limites de production](production-limits.md).
+
 ---
 
 ## Étape 3 — Continuer
