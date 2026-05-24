@@ -43,20 +43,31 @@ def regenerate_session(old_session_id: str) -> str:
 def _normalize_legacy_user(user: dict) -> dict:
     """Normalise un dict utilisateur quelconque en structure interne générique.
 
-    Priorité des clés : génériques EN > legacy FR.
-    Isolé ici pour que le core ne dépende plus directement des noms de champs
-    applicatifs (UtilisateurId, Login, etc.) hors de cette fonction.
+    Priorité des clés en entrée : génériques EN > legacy FR > legacy PascalCase.
+    Sortie : noms canoniques anglais (ADR-003) — `first_name`, `last_name`.
+    Les clés legacy `prenom`/`nom` sont conservées en alias de sortie pour
+    compatibilité avec les starters historiques (`carnet-contacts`,
+    `suivi-comportement-eleves`) qui les consomment encore. À retirer dans
+    Forge 2.0 (cf CORE-SESSION-DEDOMAIN-001).
+
+    Cette fonction reste utilisée uniquement par `authenticate_session()`,
+    elle-même dépréciée au profit de `core.auth.session.login_user()`.
     """
+    first = user.get("first_name") or user.get("prenom") or user.get("Prenom") or ""
+    last = user.get("last_name") or user.get("nom") or user.get("Nom") or ""
     return {
-        "id"    : user.get("id") or user.get("user_id") or user.get("UtilisateurId"),
-        "login" : (
+        "id"        : user.get("id") or user.get("user_id") or user.get("UtilisateurId"),
+        "login"     : (
             user.get("login") or user.get("username")
             or user.get("Login") or user.get("email") or user.get("Email") or ""
         ),
-        "prenom": user.get("prenom") or user.get("first_name") or user.get("Prenom") or "",
-        "nom"   : user.get("nom") or user.get("last_name") or user.get("Nom") or "",
-        "email" : user.get("email") or user.get("Email") or "",
-        "roles" : list(user.get("roles", [])),
+        "first_name": first,
+        "last_name" : last,
+        # Alias legacy — à supprimer dans Forge 2.0.
+        "prenom"    : first,
+        "nom"       : last,
+        "email"     : user.get("email") or user.get("Email") or "",
+        "roles"     : list(user.get("roles", [])),
     }
 
 
