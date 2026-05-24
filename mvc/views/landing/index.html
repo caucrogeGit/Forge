@@ -19,6 +19,13 @@
        target="_blank" rel="noopener noreferrer"
        class="text-sm font-medium text-white/60 hover:text-white transition-colors">Démarrer</a>
 
+    <a href="https://caucrogegit.github.io/Forge/crud/"
+       target="_blank" rel="noopener noreferrer"
+       class="text-sm font-medium text-white/60 hover:text-white transition-colors">CRUD</a>
+
+    <a href="#api"
+       class="text-sm font-medium text-white/60 hover:text-white transition-colors">API</a>
+
     <a href="#starters"
        class="text-sm font-medium text-white/60 hover:text-white transition-colors">Starters</a>
 
@@ -212,11 +219,12 @@
         Ils ne remplacent pas le core.
       </p>
       <p class="text-slate-400 text-sm max-w-2xl mx-auto mt-4">
-        4 modules officiels opt-in disponibles :
+        5 modules officiels opt-in, conservés hors du core :
         <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-rbac</code>,
         <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-workflow</code>,
         <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-stats</code>,
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>.
+        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>,
+        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-media</code>.
       </p>
     </div>
 
@@ -276,6 +284,161 @@
         <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 6</div>
         <h3 class="font-semibold text-lg mb-2">Auth MFA (TOTP)</h3>
         <p class="text-sm text-slate-500 leading-relaxed">Contrôleurs Auth avec authentification multi-facteurs TOTP. Nécessite <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Aperçu Forge 1.0.0-beta.9 (en cours) -->
+<section id="beta9" class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-12">
+      <div class="landing-accent-text text-sm font-semibold uppercase tracking-wider mb-3">En cours — Phase B9</div>
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Aperçu Forge 1.0.0-beta.9
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Beta.9 consolide le chemin production encadrée sans transformer Forge en plateforme clé en main.
+        Les apports principaux, déjà livrés en branche principale :
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">CLI</div>
+        <h3 class="font-semibold mb-2">CLI plus sûre</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code class="text-xs bg-slate-100 px-1 rounded">--help</code> /
+          <code class="text-xs bg-slate-100 px-1 rounded">-h</code>
+          n'exécute plus les commandes métier. Les commandes sensibles (diagnostic, mail, migrations, CRUD) documentent leurs effets.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">WSGI</div>
+        <h3 class="font-semibold mb-2">Production encadrée</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Entrée <code class="text-xs bg-slate-100 px-1 rounded">create_configured_wsgi_app()</code> documentée pour Gunicorn derrière reverse proxy. Smoke tests transversaux inclus.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Sécurité HTTP</div>
+        <h3 class="font-semibold mb-2"><code class="text-xs bg-slate-100 px-1 rounded">X-Real-IP</code> sous contrôle</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code class="text-xs bg-slate-100 px-1 rounded">APP_TRUSTED_PROXIES</code> explicite, vide par défaut. Aucun header client n'est cru aveuglément.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Sessions</div>
+        <h3 class="font-semibold mb-2">Cookies et stores renforcés</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Helpers <code class="text-xs bg-slate-100 px-1 rounded">set_session_cookie</code> /
+          <code class="text-xs bg-slate-100 px-1 rounded">clear_session_cookie</code> centralisés,
+          <code class="text-xs bg-slate-100 px-1 rounded">cleanup_expired()</code> aligné sur les 3 stores, dédomainisation progressive.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Production</div>
+        <h3 class="font-semibold mb-2">Limites explicites</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code class="text-xs bg-slate-100 px-1 rounded">python app.py</code> reste réservé au développement / démonstration. Page dédiée :
+          <a href="https://caucrogegit.github.io/Forge/production-limits/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Limites de production</a>
+          + warnings au démarrage WSGI si <code class="text-xs bg-slate-100 px-1 rounded">MemorySessionStore</code> en prod.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Opt-ins</div>
+        <h3 class="font-semibold mb-2">Core autonome préservé</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-media</code> intégré à la matrice CI opt-in. Aucun module métier n'est imposé au core Forge.
+        </p>
+      </div>
+    </div>
+
+    <p class="text-center text-sm text-slate-400 mt-10 max-w-3xl mx-auto">
+      Forge reste <span class="text-slate-600 font-medium">petit dans son cœur</span>,
+      <span class="text-slate-600 font-medium">riche par ses briques</span>,
+      <span class="text-slate-600 font-medium">clair dans ses générateurs</span>,
+      <span class="text-slate-600 font-medium">fortement documenté</span>,
+      <span class="text-slate-600 font-medium">très testé</span>.
+    </p>
+  </div>
+</section>
+
+<!-- API Forge -->
+<section id="api" class="py-24 px-6 bg-slate-50">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        API Forge.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Six points d'entrée stables et documentés. Chaque famille reste minimale et auditable.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <a href="https://caucrogegit.github.io/Forge/reference/api/" target="_blank" rel="noopener noreferrer"
+         class="block rounded-xl border border-slate-200 bg-white p-6 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">core/</div>
+        <h3 class="font-semibold mb-2">API Framework</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Les briques Python publiques ou semi-publiques de Forge : configuration, HTTP, sessions, sécurité, WSGI.
+        </p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/reference/cli-commands/" target="_blank" rel="noopener noreferrer"
+         class="block rounded-xl border border-slate-200 bg-white p-6 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">forge.py / forge_cli/</div>
+        <h3 class="font-semibold mb-2">API CLI</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Les commandes <code class="text-xs bg-slate-100 px-1 rounded">forge ...</code> utilisées pour créer, diagnostiquer, générer et maintenir un projet Forge.
+        </p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/reference/api/" target="_blank" rel="noopener noreferrer"
+         class="block rounded-xl border border-slate-200 bg-white p-6 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">core/http/</div>
+        <h3 class="font-semibold mb-2">API HTTP</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Les objets <code class="text-xs bg-slate-100 px-1 rounded">Request</code>,
+          <code class="text-xs bg-slate-100 px-1 rounded">Response</code>,
+          <code class="text-xs bg-slate-100 px-1 rounded">Router</code>
+          et le fonctionnement des routes.
+        </p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/reference/" target="_blank" rel="noopener noreferrer"
+         class="block rounded-xl border border-slate-200 bg-white p-6 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">mvc/</div>
+        <h3 class="font-semibold mb-2">API applicative</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          La structure <code class="text-xs bg-slate-100 px-1 rounded">mvc/routes.py</code> et
+          <code class="text-xs bg-slate-100 px-1 rounded">mvc/controllers/</code>
+          utilisée par les applications Forge.
+        </p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/wsgi-deployment/" target="_blank" rel="noopener noreferrer"
+         class="block rounded-xl border border-slate-200 bg-white p-6 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">core/wsgi.py</div>
+        <h3 class="font-semibold mb-2">API WSGI</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          L'entrée <code class="text-xs bg-slate-100 px-1 rounded">create_configured_wsgi_app()</code> pour brancher Forge derrière un serveur WSGI externe (Gunicorn, …).
+        </p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/reference/" target="_blank" rel="noopener noreferrer"
+         class="block rounded-xl border border-slate-200 bg-white p-6 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">docs/reference/</div>
+        <h3 class="font-semibold mb-2">Référence complète</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Accès à la documentation technique détaillée : modèle d'entités, schémas JSON, contrats publics.
+        </p>
       </a>
     </div>
   </div>
