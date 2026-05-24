@@ -494,6 +494,132 @@ Limites:
   - aucun envoi de mail n'est branché par défaut — la soumission est à
     raccorder dans le contrôleur (voir forge mail:test pour tester
     l'envoi).""",
+
+    # ── Mail (CLI-HELP-FLAGS-MAIL-001) ───────────────────────────────────────
+    # mail:init est déjà couvert par CLI-HELP-FLAGS-INIT-COMMANDS-001.
+    # Ce groupe traite les 4 commandes mail restantes.
+
+    "mail:test": """\
+Usage:
+  forge mail:test --to <adresse>
+
+Description:
+  Construit et expédie un message de test via le transport mail configuré
+  pour le projet (smtp, log ou null).
+
+Arguments:
+  --to <adresse>    Destinataire du mail de test (obligatoire).
+
+Effets:
+  - charge env/dev puis instancie MailConfig depuis les variables MAIL_* ;
+  - construit le transport correspondant à MAIL_TRANSPORT (smtp|log|null) ;
+  - prépare un MailMessage daté avec corps texte et HTML ;
+  - délègue à core.mail.mailer.Mailer.send().
+
+Selon la configuration:
+  - MAIL_ENABLED=false ou transport null  → AUCUN envoi réel
+    (la commande l'indique explicitement) ;
+  - MAIL_TRANSPORT=log                    → écriture sous storage/mail/,
+                                            aucun envoi réseau ;
+  - MAIL_TRANSPORT=smtp + MAIL_ENABLED=true → ENVOI RÉEL via SMTP.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - peut envoyer un mail réel selon la config (vérifier au préalable
+    avec forge mail:doctor) ;
+  - ne valide pas le contenu envoyé, ne consulte pas mail_log
+    (voir forge mail:logs) ;
+  - ne crée ni template ni dossier (voir forge mail:init).""",
+
+    "mail:render": """\
+Usage:
+  forge mail:render <template> [--context fichier.json]
+
+Description:
+  Affiche le rendu d'un template mail Forge (sujet, corps texte et HTML)
+  sans envoyer ni journaliser quoi que ce soit.
+
+Arguments:
+  <template>              Nom du template à rendre (sans extension).
+  --context fichier.json  Optionnel — chemin vers un JSON fournissant le
+                          contexte de rendu Jinja2.
+
+Effets:
+  - charge env/dev puis lit le template dans mail_templates_dir
+    (par défaut mvc/mail/templates) ;
+  - applique le contexte JSON s'il est fourni ;
+  - instancie core.mail.templates.MailTemplateRenderer ;
+  - affiche le rendu encadré : Template, Sujet, corps texte, corps HTML ;
+  - n'envoie aucun mail, ne touche ni storage/mail/ ni mail_log.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - ne crée pas de template (voir forge mail:init pour les exemples) ;
+  - échoue si le template ou le fichier de contexte est introuvable
+    ou JSON invalide ;
+  - ne valide pas la configuration SMTP (voir forge mail:doctor).""",
+
+    "mail:doctor": """\
+Usage:
+  forge mail:doctor
+
+Description:
+  Diagnostique la configuration mail du projet : variables
+  d'environnement, transport, dossiers et journalisation.
+
+Effets:
+  - charge env/dev et reconstruit MailConfig depuis les variables MAIL_* ;
+  - vérifie MAIL_ENABLED, MAIL_TRANSPORT (smtp|log|null), MAIL_FROM,
+    dossier mvc/mail/templates et stockage storage/mail/ ;
+  - pour MAIL_TRANSPORT=smtp : vérifie aussi MAIL_HOST et MAIL_PORT ;
+  - vérifie MAIL_LOG_ENABLED ;
+  - peut créer storage/mail/ s'il est absent (mkdir best-effort) ;
+  - imprime un tableau de checks avec un compte d'avertissements et
+    d'erreurs ; exit 1 s'il existe au moins une erreur.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - n'envoie aucun mail (utiliser forge mail:test pour cela) ;
+  - ne consulte pas la table mail_log (voir forge mail:logs) ;
+  - ne corrige rien — les warnings/erreurs sont à traiter manuellement
+    dans env/dev.""",
+
+    "mail:logs": """\
+Usage:
+  forge mail:logs [--limit N]
+
+Description:
+  Affiche les N derniers enregistrements de la table mail_log (par
+  défaut 20). Lecture seule.
+
+Arguments:
+  --limit N    Nombre maximum d'enregistrements à afficher (défaut 20).
+
+Effets:
+  - charge env/dev ;
+  - vérifie MAIL_LOG_ENABLED (sinon avertit et sort) ;
+  - lit la table mail_log via core.mail.log.MailLogger.fetch_recent(N) ;
+  - imprime un tableau ID / DATE / STATUS / TRANSPORT / TO / SUJET ;
+  - n'écrit, ne modifie et ne purge rien.
+
+Prérequis:
+  - MAIL_LOG_ENABLED=true dans env/dev ;
+  - table mail_log présente (créée par forge db:apply après
+    forge mail:init).
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Limites:
+  - lecture seule — ne supprime pas et ne tronque pas mail_log ;
+  - ne déclenche aucun envoi ;
+  - --limit doit être un entier positif.""",
 }
 
 
