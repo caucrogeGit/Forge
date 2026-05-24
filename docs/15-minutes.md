@@ -257,6 +257,16 @@ python app.py
 
 L'application démarre sur `https://localhost:8000` avec HTTPS de développement.
 
+Pour un démarrage avec diagnostic du port, du protocole HTTP/HTTPS et de
+l'adresse à ouvrir (utile en VM ou via SSH/VS Code Remote) :
+
+```bash
+scripts/dev-server.sh
+```
+
+Le script vérifie que le port est libre avant de lancer `python app.py` et
+affiche l'URL correcte ; il ne tue aucun processus existant.
+
 ---
 
 ## 8. Limites du tutoriel
