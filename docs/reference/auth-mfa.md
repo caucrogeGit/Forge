@@ -132,7 +132,7 @@ Pour renforcer davantage, coupler `FORGE_MFA_SECRET_KEY` à un gestionnaire de s
 
 ### Codes de récupération
 
-Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` 3.0.x :
+Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (série `1.0.0-beta.x`) :
 
 - générés via `secrets.choice()` sur un alphabet sans ambiguïté ;
 - hashés avant stockage via `hash_recovery_code()` (SHA-256) ;

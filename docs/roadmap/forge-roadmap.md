@@ -1248,7 +1248,7 @@ avant d'ouvrir les tests terrain sur une base saine.
 | CORE-SESSION-DEDOMAIN-001 | Supprimer les noms de champs en français dans `core/security/session.py` (ADR-003) | **livré** |
 | LANDING-BETA9-UPDATE-001 | Mettre à jour la landing : nav `CRUD` + `API`, aperçu beta.9, section API, opt-in media | **livré** |
 | RELEASE-PACKAGE-LOCK-SYNC-001 | Synchroniser `package-lock.json` (version `3.0.0`) avec `package.json` (`1.0.0-beta.8`) | **livré** |
-| DOCS-VERSION-SWEEP-BETA9-001 | Nettoyer les références `3.0.x` et `beta.4` dans les docs actives | à faire |
+| DOCS-VERSION-SWEEP-BETA9-001 | Nettoyer les références `3.0.x` et `beta.4` dans les docs actives | **livré** |
 | RELEASE-BETA9-001 | Publication `1.0.0-beta.9` (core + opt-ins) | à faire |
 
 > **Ordre de traitement** : les tickets WSGI du Bloc B9-D ci-dessous précèdent

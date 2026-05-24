@@ -8,7 +8,8 @@ Module opt-in pour la gestion applicative des médias dans Forge MVC.
 L'extraction depuis `core/uploads/` est complète. La documentation et les shims
 de compatibilité ont été livrés.
 
-**Non publié sur PyPI dans la vague `1.0.0b7`.** Publication prévue dans une prochaine release.
+**Non publié sur PyPI** — le module reste source-only dans la série
+`1.0.0-beta.x`. Publication prévue dans une prochaine release.
 
 Il s'installe depuis les sources du dépôt Forge :
 

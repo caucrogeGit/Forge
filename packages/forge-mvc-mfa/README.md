@@ -10,12 +10,12 @@ Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, **le secret TOTP est chiffré au repos**
 via Fernet (`cryptography`). La clé est lue depuis `FORGE_MFA_SECRET_KEY` —
 obligatoire au démarrage.
 
-Le module **n'est pas publié sur PyPI dans la vague `1.0.0b7`**.
-Non inclus dans `forge-mvc[all]`. Publication prévue lors d'une release dédiée
-après ticket `MFA-PYPI-READY-001`.
+Le module **n'est pas encore publié sur PyPI**. Non inclus dans
+`forge-mvc[all]`. Le statut `Development Status :: 3 - Alpha` reflète son
+caractère encore expérimental ; la publication est prévue lors d'une release
+dédiée.
 
-**Mode d'installation (Forge 3.0.x)** : `forge-mvc-mfa` n'est pas encore publié
-sur PyPI. Installation depuis les sources (mode dev) :
+**Mode d'installation** : depuis les sources du dépôt Forge (mode dev) :
 
 ```bash
 git clone https://github.com/caucrogeGit/Forge.git
