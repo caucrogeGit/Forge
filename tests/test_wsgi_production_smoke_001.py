@@ -49,11 +49,16 @@ class _FakePersistentStore:
 
 @pytest.fixture(autouse=True)
 def _restore_state(monkeypatch):
-    """Isole les tests : renderer Jinja, app_env, trusted_proxies, store."""
+    """Isole les tests : renderer Jinja, app_env, trusted_proxies, store.
+
+    Le session_store est explicitement remis à `None` au teardown (force
+    reset, pas restauration) — voir note dans `test_wsgi_prod_warnings_001`.
+    Évite la contamination si un test antérieur a laissé `forge._cfg`
+    désynchronisé du `set_session_store()` du manager.
+    """
     prev_renderer = template_manager._renderer
     prev_env = forge.get("app_env")
     prev_proxies = forge.get("trusted_proxies")
-    prev_store = forge.get("session_store")
     template_manager.register(_StubRenderer())
     # Empêche `build_application()` de relire `config.py` et d'écraser les
     # valeurs posées dans les tests prod.
@@ -62,7 +67,7 @@ def _restore_state(monkeypatch):
     template_manager._renderer = prev_renderer
     forge.configure(app_env=prev_env)
     forge.configure(trusted_proxies=prev_proxies)
-    forge.configure(session_store=prev_store)
+    forge.configure(session_store=None)
 
 
 def _capture():

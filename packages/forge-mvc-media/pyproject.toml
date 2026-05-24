@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-media"
-version = "1.0.0b8"
+version = "1.0.0b9"
 description = "Brique médias applicatifs pour Forge — repository, galerie, couverture."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "media", "uploads", "gallery"]
 dependencies = [
-    "forge-mvc==1.0.0b8",
+    "forge-mvc==1.0.0b9",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",

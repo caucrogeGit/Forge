@@ -37,14 +37,20 @@ class _FakePersistentStore:
 
 @pytest.fixture(autouse=True)
 def _restore_state():
-    """Restaure renderer Jinja, session_store et app_env entre tests."""
+    """Restaure renderer Jinja, app_env entre tests, force reset du store.
+
+    Le store est explicitement remis à `None` au teardown plutôt que restauré
+    à `prev_store` : si un test précédent (ex. `test_configurable_session_store_001`)
+    a laissé `forge._cfg["session_store"]` désynchronisé du manager, le
+    « restaurer » réinstallerait l'état corrompu via `forge.configure(...)`.
+    Forcer `None` garantit un état neutre pour les tests suivants.
+    """
     prev_renderer = template_manager._renderer
-    prev_store = forge.get("session_store")
     prev_env = forge.get("app_env")
     template_manager.register(_StubRenderer())
     yield
     template_manager._renderer = prev_renderer
-    forge.configure(session_store=prev_store)
+    forge.configure(session_store=None)
     forge.configure(app_env=prev_env)
 
 

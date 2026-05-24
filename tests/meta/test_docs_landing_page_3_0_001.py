@@ -193,6 +193,8 @@ class TestNavigationStructure:
 
     @pytest.mark.parametrize("nav_label", [
         ">Démarrer<",
+        ">CRUD<",
+        ">API<",
         ">Starters<",
         ">Architecture<",
         ">Référence<",
@@ -201,15 +203,7 @@ class TestNavigationStructure:
     def test_nav_entry_present(self, nav_label):
         assert nav_label in self.source, (
             f"La nav devrait contenir l'entrée '{nav_label}' "
-            f"(menu LANDING-BETA6-MENU-001)"
-        )
-
-    def test_no_crud_in_nav(self):
-        """CRUD supprimé de la nav principale (LANDING-WELCOME-POLISH-001)."""
-        nav_end = self.source.find("</nav>")
-        nav_section = self.source[:nav_end] if nav_end != -1 else self.source[:600]
-        assert ">CRUD<" not in nav_section, (
-            "L'entrée CRUD ne devrait plus être dans la nav principale"
+            f"(menu LANDING-BETA9-UPDATE-001)"
         )
 
     def test_no_briques_dropdown_in_nav(self):

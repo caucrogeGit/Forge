@@ -79,9 +79,12 @@ class TestApiReferenceLinksToModuleDocs:
 class TestApiReferenceNoActivePipExtras:
     """Aucune commande active pip install forge-mvc[X] n'apparaît dans api.md.
 
-    Contrat post-DOCS-OPTIN-INSTALL-CONTRACT-001 : les extras PyPI ne sont pas
-    documentés comme installables tant que la publication coordonnée n'est pas
-    effective. Une note prospective en prose remplace les commandes copiables.
+    Contrat post-DOCS-OPTIN-INSTALL-CONTRACT-001 + DOCS-VERSION-SWEEP-BETA9-001 :
+    les opt-ins `rbac`/`workflow`/`stats` ont été publiés en `1.0.0-beta.5`. La
+    note documentaire est désormais rétrospective (« Disponible sur PyPI
+    depuis … ») plutôt que prospective. Les commandes copiables restent
+    interdites pour éviter qu'un copier-coller pré-publication soit possible
+    avant qu'une vague PyPI ne soit effective.
     """
 
     def test_no_active_pip_install_extra(self):
@@ -90,14 +93,14 @@ class TestApiReferenceNoActivePipExtras:
         matches = pat.findall(text)
         assert len(matches) == 0, (
             f"docs/reference/api.md ne doit contenir aucune commande copiable "
-            f"`pip install forge-mvc[X]` — utiliser une note prospective en prose. "
+            f"`pip install forge-mvc[X]`. "
             f"Trouvé {len(matches)} occurrence(s) : {matches}"
         )
 
-    def test_prospective_note_present(self):
-        """La note prospective d'installation est présente dans api.md."""
+    def test_retrospective_pypi_note_present(self):
+        """La note PyPI rétrospective est présente dans api.md (publication beta.5 déjà faite)."""
         text = API_REF.read_text(encoding="utf-8")
-        assert "Installation PyPI prospective" in text, (
-            "docs/reference/api.md doit mentionner la note prospective d'installation "
-            "('Installation PyPI prospective') pour les opt-ins rbac/workflow/stats."
+        assert "Disponible sur PyPI depuis `1.0.0-beta.5`" in text, (
+            "docs/reference/api.md doit mentionner la disponibilité PyPI des opt-ins "
+            "rbac/workflow/stats depuis 1.0.0-beta.5 (cf DOCS-VERSION-SWEEP-BETA9-001)."
         )

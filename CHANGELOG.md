@@ -1,6 +1,37 @@
 # Changelog
 
 
+## [1.0.0-beta.9] — 2026-05-24
+
+### Added / Changed
+
+- Phase B9 close — release de consolidation production encadrée.
+- CLI: `--help`/`-h` interceptés au dispatcher avant exécution métier (12 tickets `CLI-HELP-FLAGS-*`, série close).
+- WSGI: `core.wsgi.create_configured_wsgi_app()` — factory configurée partagée avec `app.py` via `core.app_factory.build_application()`.
+- WSGI: warnings production émis à la construction de l'application (`MemorySessionStore` en `APP_ENV=prod`).
+- HTTP: `APP_TRUSTED_PROXIES` + `resolve_client_ip()` — `X-Real-IP` honoré uniquement derrière proxy fiable, validation `ipaddress`.
+- Sessions: helpers centralisés `core.security.cookies.set_session_cookie()` / `clear_session_cookie()`, migration des contrôleurs Auth et MFA.
+- Sessions: `MemorySessionStore.cleanup_expired()` aligné sur File/MariaDb, retourne `int`.
+- Sessions: dédomainisation `_normalize_legacy_user()` — `first_name`/`last_name` canoniques (alias FR conservés temporairement).
+- Sécurité: `core/security/api_auth.py` utilise `hmac.compare_digest` (comparaison constant-time du token Bearer).
+- Sécurité MFA: dépendance `cryptography>=46.0.7,<47` (sortie de la plage vulnérable `>=42,<46`).
+- CI: `forge-mvc-media` ajouté à la matrice de build des opt-ins.
+- Documentation: nouvelles pages [Déploiement WSGI minimal](wsgi-deployment.md) et [Limites de production](production-limits.md).
+- Landing: nav enrichie (`CRUD` + `API`), section Aperçu beta.9, section API à 6 cartes, formule de continuité.
+
+### Packaging
+
+- Tous les packages alignés en `1.0.0b9`.
+- `package.json` et `package-lock.json` alignés en `1.0.0-beta.9` (garde-fou méta verrouille la cohérence).
+- Pas de changement de dépendance runtime côté core.
+- Aucun upload PyPI effectué dans cette release de préparation.
+
+### Security
+
+- `X-Real-IP` ne peut plus être falsifié par un client direct (proxy fiable obligatoire).
+- Token API Bearer comparé en temps constant.
+- `cryptography` MFA hors zone vulnérable.
+
 ## [1.0.0-beta.8] — 2026-05-22
 
 ### Added / Changed

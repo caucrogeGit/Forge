@@ -7,17 +7,17 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> La version publique actuelle est **Forge 1.0.0-beta.8**.
+> La version publique actuelle est **Forge 1.0.0-beta.9**.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.8
+## État actuel — Forge 1.0.0-beta.9
 
-**Tag courant : `v1.0.0-beta.8` (2026-05-22)**
+**Tag courant : `v1.0.0-beta.9` (2026-05-24)**
 
-Précédent : v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.8 publiée (core + 5 opt-ins). Audit post-publication conduit — Phase B9 planifiée pour 1.0.0-beta.9 (14 tickets sécurité/WSGI/sessions/docs + Bloc B9-C : 12 tickets stabilisation CLI déjà clos).**
+**Statut : v1.0.0-beta.9 préparée (core + 5 opt-ins). Phase B9 close : sécurité (cryptography, compare_digest, X-Real-IP), WSGI production encadrée, sessions renforcées, opt-in media en CI, dédomainisation core, landing rafraîchie, sweep documentaire. Bloc B9-C : 12 tickets CLI déjà clos.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -1249,7 +1249,7 @@ avant d'ouvrir les tests terrain sur une base saine.
 | LANDING-BETA9-UPDATE-001 | Mettre à jour la landing : nav `CRUD` + `API`, aperçu beta.9, section API, opt-in media | **livré** |
 | RELEASE-PACKAGE-LOCK-SYNC-001 | Synchroniser `package-lock.json` (version `3.0.0`) avec `package.json` (`1.0.0-beta.8`) | **livré** |
 | DOCS-VERSION-SWEEP-BETA9-001 | Nettoyer les références `3.0.x` et `beta.4` dans les docs actives | **livré** |
-| RELEASE-BETA9-001 | Publication `1.0.0-beta.9` (core + opt-ins) | à faire |
+| RELEASE-BETA9-001 | Publication `1.0.0-beta.9` (core + opt-ins) | **livré** |
 
 > **Ordre de traitement** : les tickets WSGI du Bloc B9-D ci-dessous précèdent
 > `DOCS-PRODUCTION-LIMITS-001` afin que la documentation de production reflète
