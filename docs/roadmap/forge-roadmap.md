@@ -1242,7 +1242,7 @@ avant d'ouvrir les tests terrain sur une base saine.
 | SECURITY-SESSION-COOKIE-STARTERS-001 | Corriger les starters qui posent `session_id` au lieu de `__Host-session_id` | **livré** |
 | HTTP-TRUSTED-PROXY-IP-001 | Lire `X-Real-IP` dans `core/http/request.py` | **livré** |
 | AUTH-RATE-LIMIT-PROD-WARNING-001 | Avertir au démarrage si `MemorySessionStore` en production | **livré** |
-| DOCS-PRODUCTION-LIMITS-001 | Documenter explicitement les limites de production (ThreadingHTTPServer, rate limit mono-process) | à faire |
+| DOCS-PRODUCTION-LIMITS-001 | Documenter explicitement les limites de production (ThreadingHTTPServer, rate limit mono-process) | **livré** |
 | CI-OPTIN-MEDIA-BUILD-001 | Ajouter `forge-mvc-media` à la matrice CI | à faire |
 | SESSION-CLEANUP-AUTO-001 | Nettoyage automatique des sessions expirées (`MemorySessionStore`) | à faire |
 | CORE-SESSION-DEDOMAIN-001 | Supprimer les noms de champs en français dans `core/security/session.py` (ADR-003) | à faire |
