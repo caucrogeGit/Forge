@@ -5,7 +5,10 @@ Tickets :
   qui prend une `Application` déjà construite et retourne un callable WSGI ;
 - WSGI-APP-FACTORY-CONFIG-001 : `create_configured_wsgi_app()` — charge la
   même configuration que `python app.py` (via `core.app_factory`) et
-  retourne le callable WSGI prêt à l'emploi.
+  retourne le callable WSGI prêt à l'emploi ;
+- WSGI-PROD-WARNINGS-001 : `create_configured_wsgi_app()` émet aussi
+  les warnings production (`MemorySessionStore` en `APP_ENV=prod`) — une
+  seule fois à la construction de l'application, jamais par requête.
 
 Usage typique — dans le `wsgi.py` de l'application :
 
@@ -25,6 +28,7 @@ Périmètre :
 """
 from __future__ import annotations
 
+import logging
 from io import BytesIO
 from typing import Iterable
 
@@ -135,7 +139,11 @@ def create_wsgi_app(application):
     return app
 
 
-def create_configured_wsgi_app():
+def create_configured_wsgi_app(
+    *,
+    emit_prod_warnings: bool = True,
+    logger: logging.Logger | None = None,
+):
     """Construit l'`Application` Forge configurée et retourne le callable WSGI.
 
     Source unique d'initialisation : charge la même configuration que
@@ -145,6 +153,22 @@ def create_configured_wsgi_app():
     Garantit que les paramètres `forge.configure(...)` (dont
     `trusted_proxies`) sont appliqués avant que la première requête WSGI
     ne soit dispatched.
+
+    Si `emit_prod_warnings=True` (défaut), émet une seule fois — à la
+    construction, pas à chaque requête — les avertissements production
+    de `core.prod_warnings` (ex. `MemorySessionStore` en `APP_ENV=prod`).
+    Passer `emit_prod_warnings=False` pour les tests qui ne veulent pas
+    polluer le logger.
     """
+    import core.forge as forge
     from core.app_factory import build_application
-    return create_wsgi_app(build_application())
+    from core.prod_warnings import emit_memory_store_warning_if_needed
+
+    application = build_application()
+    if emit_prod_warnings:
+        emit_memory_store_warning_if_needed(
+            str(forge.get("app_env") or ""),
+            forge.get("session_store"),
+            logger=logger,
+        )
+    return create_wsgi_app(application)
