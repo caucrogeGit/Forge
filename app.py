@@ -61,7 +61,9 @@ Démarrage :
     python3 app.py --env prod   → mode prod (HTTP local par défaut)
 """
 import argparse as _argparse
+import errno as _errno
 import os as _os
+import sys as _sys
 
 # ── Détection de l'environnement avant tout import de config ──────────────────
 # L'argument --env est parsé ici, point d'entrée unique de la CLI.
@@ -87,6 +89,7 @@ from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFI
                     APP_CSP_NONCE_ENABLED)
 import core.security.csp as _csp
 import core.forge as forge
+from core.dev_server import format_port_in_use_message, format_startup_messages
 forge.configure(
     app_name     = APP_NAME,
     app_env      = APP_ENV,
@@ -310,8 +313,14 @@ if __name__ == "__main__":
     )
 
     ThreadingHTTPServer.allow_reuse_address = True
-    server = ThreadingHTTPServer((APP_HOST, APP_PORT), RequestHandler)
-    scheme = "https" if APP_SSL_ENABLED else "http"
+    try:
+        server = ThreadingHTTPServer((APP_HOST, APP_PORT), RequestHandler)
+    except OSError as exc:
+        if exc.errno == _errno.EADDRINUSE:
+            for _line in format_port_in_use_message(APP_HOST, APP_PORT).splitlines():
+                logger.error(_line)
+            _sys.exit(1)
+        raise
 
     if APP_SSL_ENABLED:
         ssl_ctx = _make_ssl_context()
@@ -319,7 +328,8 @@ if __name__ == "__main__":
         server.socket = ssl_ctx.wrap_socket(server.socket, server_side=True)
 
     logger.info("Environnement : %s", APP_ENV)
-    logger.info("Serveur en écoute sur %s://%s:%s", scheme, APP_HOST, APP_PORT)
+    for _line in format_startup_messages(APP_HOST, APP_PORT, APP_SSL_ENABLED):
+        logger.info(_line)
 
     _server_sw = _os.environ.get("SERVER_SOFTWARE", "").lower()
     _web_concurrency = _os.environ.get("WEB_CONCURRENCY", "1")
