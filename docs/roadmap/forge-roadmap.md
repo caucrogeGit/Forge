@@ -1304,6 +1304,73 @@ plus de tickets `CLI-HELP-FLAGS-*` prévus.
 
 ---
 
+## Phase B10 — Stabilisation post-beta.9 / pré-RC
+
+**Objectif** : phase corrective post-publication `1.0.0-beta.9`. Remettre la
+base en état strictement vert (4 tests rouges, validateur PEP 440 / SemVer,
+documentation opt-ins PyPI) puis durcir les derniers points sensibles (headers
+WSGI, isolation tests opt-in, défense uploads, validation MFA au boot) avant
+d'envisager une release candidate.
+
+L'audit post-publication beta.9 a identifié 14 tickets répartis en
+4 catégories : bloquants immédiats, critiques pré-RC, durcissement,
+et clôture.
+
+### Bloquants immédiats (3 tickets)
+
+| Ticket | Statut | Rôle |
+|---|---|---|
+| `AUTH-SESSION-HARDENING-TESTS-ALIGN-001` | à faire | Corriger les 4 tests rouges dans `tests/test_auth_session_hardening.py` après l'évolution du contrat session `first_name` / `last_name` (cf `CORE-SESSION-DEDOMAIN-001`). |
+| `RELEASE-VALIDATE-PEP440-SEMVERSION-001` | à faire | Rendre `tools/release-validate.sh` compatible avec `1.0.0-beta.x` côté SemVer public et `1.0.0bx` côté PEP 440. |
+| `DOCS-OPTINS-PYPI-BETA9-SWEEP-001` | à faire | Corriger les docs indiquant encore que `forge-mvc-mfa` / `forge-mvc-media` ne sont pas publiés alors que les opt-ins beta.9 sont disponibles sur PyPI. |
+
+### Critiques pré-RC (4 tickets)
+
+| Ticket | Statut | Rôle |
+|---|---|---|
+| `WSGI-SECURITY-HEADERS-001` | à faire | Garantir les headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, HSTS, Referrer-Policy, Permissions-Policy, CSP) dans le chemin WSGI ou documenter clairement leur responsabilité côté reverse proxy. |
+| `TESTS-OPTIN-IMPORTORSKIP-001` | à faire | Protéger les tests opt-in avec `pytest.importorskip(...)` ou un mécanisme équivalent pour préserver une installation core-only. |
+| `CI-PAGES-MKDOCS-STRICT-001` | à faire | Passer le workflow GitHub Pages en `mkdocs build --strict`. |
+| `DEPENDENCY-AUDIT-RELEASE-GUARD-001` | à faire | Décider si l'audit de dépendances (CVE) doit devenir bloquant pour les releases. |
+
+### Durcissement (5 tickets)
+
+| Ticket | Statut | Rôle |
+|---|---|---|
+| `UPLOADS-SYMLINK-DEFENSE-001` | à faire | Vérifier par tests la défense contre les symlinks dans `uploads/` et statics, puis corriger si nécessaire (`is_symlink()` / `resolve(strict=True)`). |
+| `MFA-SECRET-KEY-BOOT-VALIDATION-001` | à faire | Valider au boot la configuration `FORGE_MFA_SECRET_KEY` quand MFA est installé ou activé. |
+| `APP-PY-PROD-HOST-GUARD-001` | à faire | Empêcher une exposition accidentelle de `python app.py` en production sur `0.0.0.0` (erreur fatale si `APP_ENV=prod` + `APP_HOST != 127.0.0.1`). |
+| `DOCS-IMPORTS-VALIDITY-SWEEP-001` | à faire | Corriger les imports obsolètes ou invalides dans les exemples de documentation (ex. `from core.auth import is_mfa_enabled` → `from forge_mvc_mfa import ...`). |
+| `TESTS-AUTOUSE-FIXTURES-AUDIT-001` | à faire | Auditer les fixtures `autouse` hors `conftest.py` pour limiter les contaminations d'état global (cas révélé par `test_configurable_session_store_001` lors de B9). |
+
+### Clôture (2 tickets)
+
+| Ticket | Statut | Rôle |
+|---|---|---|
+| `B10-CLOSING-AUDIT-001` | à faire | Relancer l'audit complet après livraison des corrections B10. |
+| `RELEASE-BETA10-001` | à faire | Préparer une release corrective `1.0.0-beta.10` si tous les contrôles sont verts. |
+
+### Ordre officiel recommandé
+
+1. `AUTH-SESSION-HARDENING-TESTS-ALIGN-001`
+2. `RELEASE-VALIDATE-PEP440-SEMVERSION-001`
+3. `DOCS-OPTINS-PYPI-BETA9-SWEEP-001`
+4. `WSGI-SECURITY-HEADERS-001`
+5. `TESTS-OPTIN-IMPORTORSKIP-001`
+6. `CI-PAGES-MKDOCS-STRICT-001`
+7. `DEPENDENCY-AUDIT-RELEASE-GUARD-001`
+8. `UPLOADS-SYMLINK-DEFENSE-001`
+9. `MFA-SECRET-KEY-BOOT-VALIDATION-001`
+10. `APP-PY-PROD-HOST-GUARD-001`
+11. `DOCS-IMPORTS-VALIDITY-SWEEP-001`
+12. `TESTS-AUTOUSE-FIXTURES-AUDIT-001`
+13. `B10-CLOSING-AUDIT-001`
+14. `RELEASE-BETA10-001`
+
+**Total Phase B10 : 14 tickets prévus.**
+
+---
+
 ## Règle de mise à jour des roadmaps
 
 À partir de la séparation des roadmaps (DOC-ROADMAP-SPLIT-001) :
