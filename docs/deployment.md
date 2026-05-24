@@ -7,6 +7,11 @@
     Pour la checklist de sécurité complète (cookies, headers, CSRF, RBAC, uploads, secrets),
     voir **[Sécurité en production](production-security.md)**.
 
+!!! info "Déploiement WSGI"
+    Pour exposer Forge publiquement via Gunicorn + reverse proxy
+    (recommandé en production), voir
+    **[Déploiement WSGI minimal](wsgi-deployment.md)**.
+
 ## 1. Architecture recommandée
 
 ```mermaid

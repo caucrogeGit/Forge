@@ -124,6 +124,7 @@ nav:
 
   - Déploiement:
       - Guide de déploiement: deployment.md
+      - Déploiement WSGI minimal: wsgi-deployment.md
       - Déploiement avancé: deploy-advanced.md
       - Sécurité en production: production-security.md
 
