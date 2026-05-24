@@ -134,9 +134,34 @@ class MemorySessionStore:
         with self._lock:
             self._sessions.clear()
 
-    def _cleanup(self) -> None:
-        """Supprime les sessions expirées — doit être appelée avec _lock déjà acquis."""
+    def cleanup_expired(self) -> int:
+        """Supprime toutes les sessions expirées. Retourne le nombre supprimé.
+
+        Complète le nettoyage opportuniste déjà en place :
+
+          * `get()` / `replace()` / `touch_expiry()` retirent paresseusement
+            chaque session expirée à son accès individuel ;
+          * `create()` déclenche en plus un balayage global à chaque nouvelle
+            session ;
+          * `cleanup_expired()` permet à l'application de déclencher
+            explicitement un balayage complet à tout moment (ex. cron
+            applicatif, healthcheck, fin de batch).
+
+        Aucun thread, aucun scheduler — l'appel reste explicite et borné
+        (alignement avec `FileSessionStore.cleanup_expired()` et
+        `MariaDbSessionStore.cleanup_expired()`).
+        """
+        with self._lock:
+            return self._cleanup()
+
+    def _cleanup(self) -> int:
+        """Supprime les sessions expirées et retourne le nombre supprimé.
+
+        Doit être appelée avec `_lock` déjà acquis (raison du `RLock` :
+        `create()` appelle `_cleanup()` à l'intérieur de son propre verrou).
+        """
         now = time.time()
         expired = [sid for sid, s in self._sessions.items() if now > s.get("expires_at", s.get("expire_a", 0))]
         for sid in expired:
             del self._sessions[sid]
+        return len(expired)
