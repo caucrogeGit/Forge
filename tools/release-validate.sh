@@ -1,10 +1,67 @@
 #!/usr/bin/env bash
 # Validation pré-release Forge.
 # Usage : bash tools/release-validate.sh [VERSION]
-# Ex.   : bash tools/release-validate.sh 3.0.2
+# Ex.   : bash tools/release-validate.sh 1.0.0-beta.9
+#         bash tools/release-validate.sh 1.0.0b9
+#
+# Forge utilise deux formats équivalents pour la même release :
+#   - SemVer public : 1.0.0-beta.9 (CHANGELOG, tags git, package.json, docs)
+#   - PEP 440       : 1.0.0b9      (pyproject.toml, core/__init__.py, forge.py)
+# Le script accepte l'un ou l'autre en entrée et normalise vers le format
+# attendu de chaque source.
+#
+# Mode utilitaire (testabilité) :
+#   bash tools/release-validate.sh --convert pep440   1.0.0-beta.9
+#   bash tools/release-validate.sh --convert semver   1.0.0b9
+#   bash tools/release-validate.sh --convert validate 1.0.0-beta.9
 set -euo pipefail
 
+# ── Helpers de conversion / validation de version ───────────────────────────
+# Définis tôt pour être utilisables en mode --convert (test méta).
+
+to_pep440() {
+    # SemVer public -> PEP 440. Stable inchangé.
+    #   1.0.0-alpha.N -> 1.0.0aN
+    #   1.0.0-beta.N  -> 1.0.0bN
+    #   1.0.0-rc.N    -> 1.0.0rcN
+    printf '%s\n' "$1" \
+        | sed -E 's/-alpha\.([0-9]+)$/a\1/; s/-beta\.([0-9]+)$/b\1/; s/-rc\.([0-9]+)$/rc\1/'
+}
+
+to_semver_public() {
+    # PEP 440 -> SemVer public. Stable inchangé.
+    # Ordre : `rc` traité avant `b` (sinon `b` matcherait la fin de `rc`).
+    printf '%s\n' "$1" \
+        | sed -E 's/rc([0-9]+)$/-rc.\1/; s/a([0-9]+)$/-alpha.\1/; s/b([0-9]+)$/-beta.\1/'
+}
+
+is_valid_version() {
+    # Accepte SemVer public OU PEP 440 (sous-ensemble Forge).
+    #   stable      : 1.0.0
+    #   pre-release : 1.0.0-{alpha,beta,rc}.N (SemVer) ou 1.0.0{a,b,rc}N (PEP 440)
+    local v="${1:-}"
+    if [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta|rc)\.[0-9]+)?$ ]]; then
+        return 0
+    fi
+    if [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+((a|b|rc)[0-9]+)?$ ]]; then
+        return 0
+    fi
+    return 1
+}
+
+# ── Mode utilitaire --convert (testabilité, n'exécute pas la validation) ────
+if [ "${1:-}" = "--convert" ]; then
+    case "${2:-}" in
+        pep440)   to_pep440 "${3:-}"; exit 0 ;;
+        semver)   to_semver_public "${3:-}"; exit 0 ;;
+        validate) is_valid_version "${3:-}" && exit 0 || exit 1 ;;
+        *) echo "Usage: $0 --convert {pep440|semver|validate} VERSION" >&2 ; exit 2 ;;
+    esac
+fi
+
 VERSION="${1:-}"
+PUBLIC_VERSION=""
+PEP440_VERSION=""
 ERRORS=0
 WARNS=0
 
@@ -17,13 +74,23 @@ echo ""
 
 # ── 1. Version fournie ────────────────────────────────────────────────────────
 if [ -z "$VERSION" ]; then
-    _warn "Aucune version fournie en argument (ex : bash tools/release-validate.sh 3.0.2)"
+    _warn "Aucune version fournie en argument (ex : bash tools/release-validate.sh 1.0.0-beta.9)"
+elif ! is_valid_version "$VERSION"; then
+    _fail "Version '$VERSION' invalide. Formats acceptés :"
+    _fail "  - SemVer public : 1.0.0, 1.0.0-alpha.N, 1.0.0-beta.N, 1.0.0-rc.N"
+    _fail "  - PEP 440       : 1.0.0, 1.0.0aN, 1.0.0bN, 1.0.0rcN"
 else
-    _ok "Version cible : $VERSION"
+    PUBLIC_VERSION=$(to_semver_public "$VERSION")
+    PEP440_VERSION=$(to_pep440 "$VERSION")
+    if [ "$PUBLIC_VERSION" = "$PEP440_VERSION" ]; then
+        _ok "Version cible : $VERSION (stable, même format SemVer/PEP 440)"
+    else
+        _ok "Version cible : $PUBLIC_VERSION (SemVer) ≡ $PEP440_VERSION (PEP 440)"
+    fi
 fi
 
-# ── 2. Cohérence des versions ─────────────────────────────────────────────────
-if [ -n "$VERSION" ]; then
+# ── 2. Cohérence des versions (format PEP 440) ───────────────────────────────
+if [ -n "$PEP440_VERSION" ]; then
     PYPROJECT_VER=$(python3 -c "
 import tomllib, sys
 with open('pyproject.toml', 'rb') as f:
@@ -31,10 +98,10 @@ with open('pyproject.toml', 'rb') as f:
 print(d['project']['version'])
 " 2>/dev/null || echo "ERREUR")
 
-    if [ "$PYPROJECT_VER" = "$VERSION" ]; then
-        _ok "pyproject.toml version = $VERSION"
+    if [ "$PYPROJECT_VER" = "$PEP440_VERSION" ]; then
+        _ok "pyproject.toml version = $PEP440_VERSION (PEP 440)"
     else
-        _fail "pyproject.toml version = '$PYPROJECT_VER' (attendu : '$VERSION')"
+        _fail "pyproject.toml version = '$PYPROJECT_VER' (attendu : '$PEP440_VERSION' au format PEP 440)"
     fi
 
     CORE_VER=$(python3 -c "
@@ -49,10 +116,10 @@ for node in ast.walk(tree):
 print('INTROUVABLE')
 " 2>/dev/null || echo "ERREUR")
 
-    if [ "$CORE_VER" = "$VERSION" ]; then
-        _ok "core/__init__.py __version__ = $VERSION"
+    if [ "$CORE_VER" = "$PEP440_VERSION" ]; then
+        _ok "core/__init__.py __version__ = $PEP440_VERSION (PEP 440)"
     else
-        _fail "core/__init__.py __version__ = '$CORE_VER' (attendu : '$VERSION')"
+        _fail "core/__init__.py __version__ = '$CORE_VER' (attendu : '$PEP440_VERSION' au format PEP 440)"
     fi
 
     FORGE_VER=$(python3 -c "
@@ -67,19 +134,19 @@ for node in ast.walk(tree):
 print('INTROUVABLE')
 " 2>/dev/null || echo "ERREUR")
 
-    if [ "$FORGE_VER" = "$VERSION" ]; then
-        _ok "forge.py _FORGE_VERSION = $VERSION"
+    if [ "$FORGE_VER" = "$PEP440_VERSION" ]; then
+        _ok "forge.py _FORGE_VERSION = $PEP440_VERSION (PEP 440)"
     else
-        _fail "forge.py _FORGE_VERSION = '$FORGE_VER' (attendu : '$VERSION')"
+        _fail "forge.py _FORGE_VERSION = '$FORGE_VER' (attendu : '$PEP440_VERSION' au format PEP 440)"
     fi
 fi
 
-# ── 3. CHANGELOG ─────────────────────────────────────────────────────────────
-if [ -n "$VERSION" ]; then
-    if grep -qF "## [$VERSION]" CHANGELOG.md 2>/dev/null; then
-        _ok "CHANGELOG.md contient ## [$VERSION]"
+# ── 3. CHANGELOG (format SemVer public) ──────────────────────────────────────
+if [ -n "$PUBLIC_VERSION" ]; then
+    if grep -qF "## [$PUBLIC_VERSION]" CHANGELOG.md 2>/dev/null; then
+        _ok "CHANGELOG.md contient ## [$PUBLIC_VERSION] (SemVer)"
     else
-        _fail "CHANGELOG.md ne contient pas ## [$VERSION]"
+        _fail "CHANGELOG.md ne contient pas ## [$PUBLIC_VERSION] (SemVer)"
     fi
 fi
 
@@ -147,12 +214,12 @@ else
     _warn "Whitespace : $WS"
 fi
 
-# ── 10. Tag absent (pré-release) ──────────────────────────────────────────────
-if [ -n "$VERSION" ]; then
-    if git tag --list "v$VERSION" | grep -q "v$VERSION"; then
-        _warn "Tag v$VERSION existe déjà (re-release ?)"
+# ── 10. Tag absent (pré-release) — format SemVer public ─────────────────────
+if [ -n "$PUBLIC_VERSION" ]; then
+    if git tag --list "v$PUBLIC_VERSION" | grep -q "v$PUBLIC_VERSION"; then
+        _warn "Tag v$PUBLIC_VERSION existe déjà (re-release ?)"
     else
-        _ok "Tag v$VERSION absent — prêt à créer"
+        _ok "Tag v$PUBLIC_VERSION absent — prêt à créer"
     fi
 fi
 
