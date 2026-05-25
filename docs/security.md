@@ -92,6 +92,29 @@ Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis 
 
 ---
 
+## Service de fichiers — défense symlinks (UPLOADS-SYMLINK-DEFENSE-001)
+
+Les fichiers publics servis par Forge (route `/static/...` par `app.py`, route
+`/media/...` via [`core.uploads.serve_media_file`](https://github.com/caucrogeGit/Forge/blob/main/core/uploads/manager.py))
+**ne doivent pas traverser de symlinks**. Les chemins sont résolus via
+`os.path.realpath()` / `Path.resolve()` puis vérifiés par `os.path.commonpath()` :
+toute cible résolue hors de la racine autorisée (`static/`, `storage/uploads/`)
+fait échouer le check et la requête retourne `403` (statics) ou `404` (media).
+
+Cette défense couvre :
+
+- les symlinks **fichier** dans `static/` ou `storage/uploads/` pointant
+  vers un fichier hors racine (`/etc/passwd`, etc.) ;
+- les symlinks **répertoire** intermédiaires dans le chemin demandé
+  (`uploads/dir_link/secret.txt` où `dir_link → /tmp/secret_dir`) ;
+- les `..` classiques de path traversal.
+
+Le contrat est verrouillé par
+[`tests/test_uploads_symlink_defense_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/test_uploads_symlink_defense_001.py)
+(12 tests, dont 3 garde-fous source-level sur `app.py`).
+
+---
+
 ## RBAC — documentation complète
 
 La documentation complète du RBAC Forge (rôles, permissions, décorateurs,

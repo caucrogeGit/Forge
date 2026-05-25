@@ -1337,7 +1337,7 @@ et clôture.
 
 | Ticket | Statut | Rôle |
 |---|---|---|
-| `UPLOADS-SYMLINK-DEFENSE-001` | à faire | Vérifier par tests la défense contre les symlinks dans `uploads/` et statics, puis corriger si nécessaire (`is_symlink()` / `resolve(strict=True)`). |
+| `UPLOADS-SYMLINK-DEFENSE-001` | **livré** | Vérifier par tests la défense contre les symlinks dans `uploads/` et statics, puis corriger si nécessaire (`is_symlink()` / `resolve(strict=True)`). |
 | `MFA-SECRET-KEY-BOOT-VALIDATION-001` | à faire | Valider au boot la configuration `FORGE_MFA_SECRET_KEY` quand MFA est installé ou activé. |
 | `APP-PY-PROD-HOST-GUARD-001` | à faire | Empêcher une exposition accidentelle de `python app.py` en production, notamment lorsque `APP_ENV=prod` et que `APP_HOST` cible une interface publique (`0.0.0.0`, `::`, ou équivalent). |
 | `DOCS-IMPORTS-VALIDITY-SWEEP-001` | à faire | Corriger les imports obsolètes ou invalides dans les exemples de documentation (ex. `from core.auth import is_mfa_enabled` → `from forge_mvc_mfa import ...`). |
