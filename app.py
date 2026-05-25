@@ -89,6 +89,7 @@ from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFI
                     DB_APP_HOST, DB_APP_PORT, DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE,
                     APP_CSP_NONCE_ENABLED, APP_TRUSTED_PROXIES)
 import core.security.csp as _csp
+from core.security.headers import apply_security_headers
 import core.forge as forge
 from core.dev_server import format_port_in_use_message, format_startup_messages
 forge.configure(
@@ -231,22 +232,30 @@ class RequestHandler(BaseHTTPRequestHandler):
         return _app.dispatch(request)
 
     def _send_response(self, response: Response) -> None:
-        """Envoie un objet Response au navigateur avec les headers de sécurité."""
+        """Envoie un objet Response au navigateur avec les headers de sécurité.
+
+        Les headers de sécurité Forge (X-Frame-Options, CSP, etc.) sont posés
+        en `setdefault` via `core.security.headers.apply_security_headers` —
+        une route applicative qui définit explicitement un de ces headers
+        garde la main. Voir `WSGI-SECURITY-HEADERS-001`.
+        """
         self.send_response(response.status)
         self.send_header("Content-Type", response.content_type)
         self.send_header("Content-Length", str(len(response.body)))
-        self.send_header("X-Frame-Options", "DENY")
-        self.send_header("X-Content-Type-Options", "nosniff")
-        self.send_header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-        self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
-        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()")
-        if self.path.split("?")[0] in _AUTH_NO_STORE_PATHS and "Cache-Control" not in response.headers:
-            self.send_header("Cache-Control", "no-store")
-        for key, value in response.headers.items():
+
+        # Couche de défense partagée avec le chemin WSGI : un seul helper,
+        # un seul contrat. `include_hsts=True` : le serveur de dev sait quand
+        # il sert TLS via APP_SSL_ENABLED ; HSTS sur HTTP local est inoffensif.
+        headers_out: dict[str, str] = {str(k): str(v) for k, v in response.headers.items()}
+        if self.path.split("?")[0] in _AUTH_NO_STORE_PATHS:
+            headers_out.setdefault("Cache-Control", "no-store")
+        apply_security_headers(
+            headers_out,
+            include_hsts=True,
+            csp=_csp.build_csp_header(_csp.get_request_nonce()),
+        )
+        for key, value in headers_out.items():
             self.send_header(key, value)
-        if "Content-Security-Policy" not in response.headers:
-            nonce = _csp.get_request_nonce()
-            self.send_header("Content-Security-Policy", _csp.build_csp_header(nonce))
         self.end_headers()
         self.wfile.write(response.body)
 

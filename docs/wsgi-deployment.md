@@ -31,9 +31,9 @@ flowchart LR
 
 Trois responsabilités sont séparées :
 
-- **Reverse proxy** : TLS, fichiers statiques, headers de sécurité, `X-Real-IP`.
+- **Reverse proxy** : TLS, fichiers statiques, `X-Real-IP`, et `Strict-Transport-Security` (HSTS) — voir [§4.1 Headers de sécurité](#41-headers-de-securite-et-hsts) ci-dessous.
 - **Gunicorn** : pool de workers Python, gestion du cycle de vie.
-- **Forge** : dispatch des routes via le callable WSGI.
+- **Forge** : dispatch des routes via le callable WSGI. Depuis `WSGI-SECURITY-HEADERS-001`, Forge pose lui-même le socle des autres headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Content-Security-Policy`) sur toutes les réponses WSGI.
 
 ---
 
@@ -111,6 +111,60 @@ server {
 Les fichiers statiques (`/static/...`) et les médias (`/media/...`) peuvent
 être servis directement par le reverse proxy pour soulager Gunicorn — voir
 [§7](#7-limites-actuelles-en-production).
+
+### 4.1 Headers de sécurité et HSTS
+
+Depuis `WSGI-SECURITY-HEADERS-001`, le chemin WSGI applique automatiquement
+le même socle de headers que `python app.py` :
+
+| Header | Valeur | Source |
+|---|---|---|
+| `X-Frame-Options` | `DENY` | Forge (WSGI) |
+| `X-Content-Type-Options` | `nosniff` | Forge (WSGI) |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Forge (WSGI) |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=()` | Forge (WSGI) |
+| `Content-Security-Policy` | `default-src 'self'; …` | Forge (WSGI) |
+| `Strict-Transport-Security` (HSTS) | `max-age=31536000; includeSubDomains` | **Reverse proxy** (déploiement standard) ou Forge si `wsgi.url_scheme == "https"` |
+
+Tous ces headers sont posés en `setdefault` via
+[`core/security/headers.py`](https://github.com/caucrogeGit/Forge/blob/main/core/security/headers.py) :
+une route applicative qui définit explicitement un de ces headers (`response.headers["Content-Security-Policy"] = "..."` par exemple) garde la main.
+
+**HSTS — décision conservatrice WSGI.** Forge ne pose HSTS que lorsque la
+requête a réellement atteint Forge en TLS (`wsgi.url_scheme == "https"`).
+Dans le déploiement standard ci-dessus (reverse proxy qui termine TLS,
+Forge écoute en HTTP local sur `127.0.0.1:8000`), `wsgi.url_scheme` vaut
+`http` côté Forge — c'est donc au reverse proxy d'ajouter `Strict-Transport-Security`.
+
+Exemples de configuration :
+
+```caddy
+forgemvc.example {
+    reverse_proxy 127.0.0.1:8000 {
+        header_up X-Real-IP {remote_host}
+    }
+    # Caddy émet HSTS automatiquement quand TLS est actif (header `Strict-Transport-Security`).
+}
+```
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name forgemvc.example;
+    # ... ssl_certificate / ssl_certificate_key ...
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+Cette répartition est protégée par
+[`tests/test_wsgi_security_headers_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/test_wsgi_security_headers_001.py).
 
 ---
 

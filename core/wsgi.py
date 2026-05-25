@@ -22,8 +22,10 @@ Puis exposer `application` à un serveur WSGI externe (ex.
 Périmètre :
 - ne remplace pas `python app.py` (serveur de développement) ;
 - ne sert pas les fichiers statiques (responsabilité du reverse proxy) ;
-- n'ajoute pas d'en-têtes de sécurité (ils restent dans `app.py`
-  ou dans la configuration du reverse proxy) ;
+- ajoute le socle de headers de sécurité partagé avec `app.py` via
+  `core.security.headers.apply_security_headers` (`WSGI-SECURITY-HEADERS-001`)
+  — HSTS conditionné à `wsgi.url_scheme == "https"` ; derrière un reverse
+  proxy TLS-terminé, c'est le proxy qui pose HSTS ;
 - ne couvre pas la production complète — cf `DOCS-PRODUCTION-LIMITS-001`.
 """
 from __future__ import annotations
@@ -34,6 +36,8 @@ from typing import Iterable
 
 from core.http.request import Request
 from core.http.response import Response
+from core.security import csp as _csp
+from core.security.headers import apply_security_headers
 
 
 _REASONS = {
@@ -105,14 +109,42 @@ def _format_status(code: int) -> str:
     return f"{code} {reason}".rstrip()
 
 
-def _response_to_wsgi(response: Response, start_response) -> Iterable[bytes]:
+def _response_to_wsgi(
+    response: Response,
+    start_response,
+    *,
+    is_https: bool = False,
+) -> Iterable[bytes]:
+    """Adapte une `Response` Forge en réponse WSGI avec headers de sécurité.
+
+    Les headers de sécurité par défaut (X-Frame-Options, CSP, etc.) sont
+    posés en `setdefault` via `core.security.headers.apply_security_headers`
+    — une route applicative qui définit explicitement un de ces headers garde
+    la main. HSTS est conditionné à `is_https=True` (cf
+    `WSGI-SECURITY-HEADERS-001`).
+    """
     body = response.body if response.body is not None else b""
+
+    # On part des headers applicatifs, on superpose les défauts de sécurité,
+    # puis on construit la liste WSGI finale. Content-Type / Content-Length
+    # restent en tête, calculés ici (jamais issus du dict applicatif).
+    headers_dict: dict[str, str] = {str(k): str(v) for k, v in response.headers.items()}
+    apply_security_headers(
+        headers_dict,
+        include_hsts=is_https,
+        # En WSGI on n'a pas (encore) de nonce CSP par requête : on pose une
+        # CSP par défaut sans nonce. L'application peut toujours définir sa
+        # propre `Content-Security-Policy` dans `response.headers` — le
+        # setdefault la respecte.
+        csp=_csp.build_csp_header(None),
+    )
+
     headers: list[tuple[str, str]] = [
         ("Content-Type", response.content_type),
         ("Content-Length", str(len(body))),
     ]
-    for key, value in response.headers.items():
-        headers.append((str(key), str(value)))
+    for key, value in headers_dict.items():
+        headers.append((key, value))
     start_response(_format_status(response.status), headers)
     return [body]
 
@@ -124,17 +156,22 @@ def create_wsgi_app(application):
     """
 
     def app(environ, start_response):
+        is_https = environ.get("wsgi.url_scheme") == "https"
         handler = _WsgiHandlerStub(environ)
         try:
             request = Request(handler)
         except Exception:
-            start_response(
-                _format_status(400),
-                [("Content-Type", "text/plain; charset=utf-8")],
+            # Même le 400 d'entrée ne doit pas être moins protégé que la
+            # réponse nominale : on passe par _response_to_wsgi pour profiter
+            # du socle de headers de sécurité.
+            bad_request = Response(
+                status=400,
+                body=b"Bad Request",
+                content_type="text/plain; charset=utf-8",
             )
-            return [b"Bad Request"]
+            return _response_to_wsgi(bad_request, start_response, is_https=is_https)
         response = application.dispatch(request)
-        return _response_to_wsgi(response, start_response)
+        return _response_to_wsgi(response, start_response, is_https=is_https)
 
     return app
 

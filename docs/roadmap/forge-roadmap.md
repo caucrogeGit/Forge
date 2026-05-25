@@ -1328,7 +1328,7 @@ et clôture.
 
 | Ticket | Statut | Rôle |
 |---|---|---|
-| `WSGI-SECURITY-HEADERS-001` | à faire | Garantir les headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, HSTS, Referrer-Policy, Permissions-Policy, CSP) dans le chemin WSGI via un helper ou middleware Forge, puis documenter l’articulation avec le reverse proxy. |
+| `WSGI-SECURITY-HEADERS-001` | **livré** | Garantir les headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, HSTS, Referrer-Policy, Permissions-Policy, CSP) dans le chemin WSGI via un helper ou middleware Forge, puis documenter l’articulation avec le reverse proxy. |
 | `TESTS-OPTIN-IMPORTORSKIP-001` | à faire | Protéger les tests opt-in avec `pytest.importorskip(...)` ou un mécanisme équivalent pour préserver une installation core-only. |
 | `CI-PAGES-MKDOCS-STRICT-001` | à faire | Passer le workflow GitHub Pages en `mkdocs build --strict`. |
 | `DEPENDENCY-AUDIT-RELEASE-GUARD-001` | à faire | Décider si l'audit de dépendances (CVE) doit devenir bloquant pour les releases. |
