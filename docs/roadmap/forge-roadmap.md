@@ -1341,7 +1341,7 @@ et clôture.
 | `MFA-SECRET-KEY-BOOT-VALIDATION-001` | **livré** | Valider au boot la configuration `FORGE_MFA_SECRET_KEY` quand MFA est installé ou activé. |
 | `APP-PY-PROD-HOST-GUARD-001` | **livré** | Empêcher une exposition accidentelle de `python app.py` en production, notamment lorsque `APP_ENV=prod` et que `APP_HOST` cible une interface publique (`0.0.0.0`, `::`, ou équivalent). |
 | `DOCS-CLI-COMMANDS-EXAMPLES-RESTRUCTURE-001` | **livré** | Réorganiser la référence CLI et ajouter des exemples d'utilisation par scénarios. |
-| `DOCS-IMPORTS-VALIDITY-SWEEP-001` | à faire | Corriger les imports obsolètes ou invalides dans les exemples de documentation (ex. `from core.auth import is_mfa_enabled` → `from forge_mvc_mfa import ...`). |
+| `DOCS-IMPORTS-VALIDITY-SWEEP-001` | **livré** | Corriger les imports obsolètes ou invalides dans les exemples de documentation (ex. `from core.auth import is_mfa_enabled` → `from forge_mvc_mfa import ...`). |
 | `DOCS-SITE-ARTIFACT-POLICY-001` | à faire | Clarifier que `docs/` est la source MkDocs officielle et que `site/` est uniquement un artefact généré localement par `mkdocs build`, ignoré par Git et supprimable sans perte. |
 | `TESTS-AUTOUSE-FIXTURES-AUDIT-001` | à faire | Auditer les fixtures `autouse` hors `conftest.py` pour limiter les contaminations d'état global (cas révélé par `test_configurable_session_store_001` lors de B9). |
 

@@ -55,8 +55,13 @@ applicatifs (`forge make:crud --media`, `forge make:public:list`, `forge make:pu
 ciblent `forge_mvc_media` pour les helpers applicatifs :
 
 ```python
-from core.uploads import save_upload          # générique — reste dans core
-from forge_mvc_media import attach_media_to_entity, delete_media, get_cover_media, ...
+from core.uploads import save_upload  # générique — reste dans core
+from forge_mvc_media import (
+    attach_media_to_entity,
+    delete_media,
+    get_cover_media,
+    # ... autres helpers : voir packages/forge-mvc-media/forge_mvc_media/__init__.py
+)
 ```
 
 Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus

@@ -53,7 +53,10 @@ CORE_DEPS = {
 
 # Modules opt-in Forge et leurs dépendances connues
 OPTIN_MODULES: dict[str, set[str]] = {
-    "forge_mvc_mfa": {"pyotp"},
+    # `cryptography` est utilisé pour le chiffrement Fernet des secrets TOTP
+    # (cf MFA-SECRET-KEY-BOOT-VALIDATION-001) ; les tests qui le tirent au
+    # niveau module sont gardés par `pytest.importorskip("cryptography")`.
+    "forge_mvc_mfa": {"pyotp", "cryptography"},
     "forge_mvc_rbac": set(),
     "forge_mvc_workflow": set(),
     "forge_mvc_stats": set(),

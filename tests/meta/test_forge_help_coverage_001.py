@@ -66,6 +66,11 @@ def _get_documented_commands() -> set[str]:
     commands = set()
     for match in re.finditer(r"^### `forge ([a-z][a-z0-9:_-]+)`", text, re.MULTILINE):
         commands.add(match.group(1))
+    for match in re.finditer(
+        r"<summary><code>forge ([a-z][a-z0-9:_-]+)</code>",
+        text,
+    ):
+        commands.add(match.group(1))
     return commands
 
 
