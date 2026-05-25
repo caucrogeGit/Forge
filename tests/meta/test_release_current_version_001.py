@@ -271,15 +271,48 @@ class TestForgeCommandReturnsCurrentVersion:
 
 
 # ---------------------------------------------------------------------------
-# Tag git
+# Tag git — convention SemVer publique (RELEASE-TAG-CONVENTION-TEST-ALIGN-001)
 # ---------------------------------------------------------------------------
+#
+# Forge utilise DEUX formats coexistants pour la même release :
+#   - PEP 440 (Python)  : 1.0.0b9       → pyproject.toml, core/__init__.py,
+#                                          forge.py, paquets PyPI
+#   - SemVer (public)   : 1.0.0-beta.9  → CHANGELOG, tags Git, package.json,
+#                                          documentation
+#
+# Le tag Git officiel suit la convention SemVer : `v1.0.0-beta.9`, pas
+# `v1.0.0b9`. La conversion PEP 440 → SemVer est fournie par
+# `_current_semver()` plus haut (cf RELEASE-VALIDATE-PEP440-SEMVERSION-001),
+# et l'utilitaire `tools/release-validate.sh --convert semver <pep440>`
+# implémente la même règle côté script release.
 
 class TestTagExists:
-    """Le tag vN.Y.Z existe localement (skip si pas encore créé)."""
+    """Le tag `v<SemVer>` existe localement (skip si pas encore créé)."""
+
+    def test_current_version_tag_uses_semver_format(self):
+        """Le tag attendu pour la version courante est `v1.0.0-beta.N` —
+        jamais `v1.0.0bN`."""
+        version = _current_version()
+        tag = _semver_tag()
+        # Le tag attendu doit dériver la forme SemVer, pas PEP 440.
+        assert tag.startswith("v"), f"Le tag doit commencer par `v`, reçu : {tag!r}"
+        # Si la version courante est une pre-release PEP 440 (b/a/rc),
+        # le tag doit utiliser la forme SemVer correspondante (-beta./-alpha./-rc.).
+        if re.search(r"\d+\.\d+\.\d+[abrc]+\d+$", version):
+            assert tag != f"v{version}", (
+                f"Le tag `{tag}` ne doit PAS être identique à `v{version}` "
+                "(format PEP 440). Forge utilise SemVer pour les tags Git — "
+                "voir `_current_semver()` et `tools/release-validate.sh "
+                "--convert semver`."
+            )
+            # Le tag doit contenir un séparateur SemVer (« -beta. » / « -alpha. » / « -rc. »).
+            assert re.search(r"-(alpha|beta|rc)\.\d+$", tag), (
+                f"Le tag pre-release `{tag}` doit suivre la forme SemVer "
+                "(`v<major>.<minor>.<patch>-(alpha|beta|rc).<n>`)."
+            )
 
     def test_current_version_tag_exists_locally(self):
-        version = _current_version()
-        tag = f"v{version}"
+        tag = _semver_tag()
         try:
             result = subprocess.run(
                 ["git", "tag", "-l", tag],
@@ -295,3 +328,28 @@ class TestTagExists:
                 f"À créer via : git tag -a {tag} -m '...'"
             )
         assert tag in tags
+
+    def test_release_validate_helper_agrees_on_tag_format(self):
+        """`tools/release-validate.sh --convert semver <pep440>` doit
+        produire la même forme SemVer que `_current_semver()`. C'est le
+        garde-fou contre une divergence entre le test et le script release."""
+        script = PROJECT_ROOT / "tools" / "release-validate.sh"
+        if not script.is_file():
+            pytest.skip("tools/release-validate.sh absent")
+        try:
+            result = subprocess.run(
+                ["bash", str(script), "--convert", "semver", _current_version()],
+                capture_output=True, text=True, timeout=10,
+            )
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pytest.skip("bash non disponible")
+        assert result.returncode == 0, (
+            f"--convert semver a échoué : {result.stderr!r}"
+        )
+        script_semver = result.stdout.strip()
+        assert script_semver == _current_semver(), (
+            f"Divergence entre helpers : `_current_semver()` = "
+            f"{_current_semver()!r} mais `release-validate.sh --convert semver "
+            f"{_current_version()}` = {script_semver!r}. Aligner les deux "
+            "(une seule source de vérité pour la conversion PEP 440 ↔ SemVer)."
+        )

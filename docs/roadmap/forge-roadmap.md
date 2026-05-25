@@ -1362,7 +1362,7 @@ pendant la stabilisation. Les tickets sont regroupés par rôle :
 |---|---|---|
 | `RELEASE-VALIDATE-PATH-ROBUSTNESS-001` | **livré** | Rendre `tools/release-validate.sh` plus robuste en utilisant un interpréteur Python explicite (`PYTHON_BIN`) au lieu d'un `PATH` implicite. |
 | `ROADMAP-B10-CONSISTENCY-SWEEP-001` | **livré** | Nettoyer la cohérence de la roadmap B10 avant l'audit final : compteurs, sections, statuts et tickets ajoutés en cours de phase. |
-| `RELEASE-TAG-CONVENTION-TEST-ALIGN-001` | à faire | Aligner `tests/meta/test_release_current_version_001.py` sur la convention de tag SemVer Forge (`v1.0.0-beta.x` et non `v1.0.0bx`). |
+| `RELEASE-TAG-CONVENTION-TEST-ALIGN-001` | **livré** | Aligner `tests/meta/test_release_current_version_001.py` sur la convention de tag SemVer Forge (`v1.0.0-beta.x` et non `v1.0.0bx`). |
 
 ### Clôture
 

@@ -177,22 +177,37 @@ passage de `forge-mvc` à Stable ne tire pas les opt-in avec lui.
 
 ### Format de tag
 
+Les tags Git Forge suivent la convention **SemVer publique**, jamais la
+forme PEP 440 :
+
 ```
-vX.Y.Z
+vX.Y.Z              # stable
+vX.Y.Z-beta.N       # pre-release beta
+vX.Y.Z-alpha.N      # pre-release alpha
+vX.Y.Z-rc.N         # release candidate
 ```
 
 Exemples :
 
 ```
 v2.2.0
-v2.2.1
 v2.3.0
-v3.0.0
+v1.0.0-beta.9
+v1.0.0-beta.10
 ```
 
 - Les tags utilisent le préfixe `v` (minuscule).
 - Les tags sont annotés (`git tag -a`).
 - Le tag est créé sur le commit de release, après validation complète.
+- **Ne PAS utiliser** la forme PEP 440 pour les tags (`v<major>.<minor>.<patch>bN`
+  est interdit). Le tag suit toujours la forme publique lisible — la
+  version PEP 440 reste limitée à `pyproject.toml`, `core/__init__.py`,
+  `forge.py` et la publication PyPI. Voir
+  `RELEASE-VALIDATE-PEP440-SEMVERSION-001`.
+
+L'utilitaire `tools/release-validate.sh --convert semver <pep440>` produit
+le suffixe SemVer correspondant à la version PEP 440 courante — c'est la
+source de vérité pour construire le nom de tag depuis la version Python.
 
 ### Immuabilité des tags publiés
 
