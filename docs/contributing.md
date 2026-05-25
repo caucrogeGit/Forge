@@ -300,6 +300,43 @@ Un test méta reste pertinent quand : (a) l'invariant est purement textuel ou do
 
 ---
 
+## Sources documentaires et artefacts générés
+
+Forge distingue **trois couches** dans sa documentation. Ne pas les
+confondre — chacune a un rôle strict.
+
+| Chemin | Rôle | Suivi Git ? | Modifier à la main ? |
+|---|---|---|---|
+| `docs/` | **Source documentaire canonique** (Markdown + assets) | ✅ Oui | ✅ Oui — c'est la source à éditer |
+| `mvc/views/landing/index.html` | **Source canonique de la landing publique** | ✅ Oui | ✅ Oui — éditer ici puis synchroniser |
+| `docs/index.html` | **Landing synchronisée** depuis `mvc/views/landing/index.html` | ✅ Oui | ❌ Non — régénéré par `forge sync:landing` |
+| `site/` | **Artefact MkDocs** généré par `mkdocs build` | ❌ Non (ignoré par `.gitignore`) | ❌ Jamais — supprimable sans perte |
+
+La chaîne complète à suivre quand on modifie la landing :
+
+```bash
+# 1. Éditer la source canonique
+$EDITOR mvc/views/landing/index.html
+
+# 2. Synchroniser docs/index.html depuis la source canonique
+forge sync:landing
+
+# 3. Régénérer le site MkDocs (zéro warning autorisé)
+mkdocs build --strict
+
+# 4. Vérifier l'état Git
+git diff --check
+```
+
+`site/` est **supprimable sans perte** : c'est uniquement la sortie de
+`mkdocs build`, jamais une référence. Si `site/` est suivi par Git par
+erreur (commit accidentel), il faut le retirer de l'index — pas l'inverse.
+
+Le contrat est verrouillé par
+[`tests/meta/test_docs_site_artifact_policy_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/meta/test_docs_site_artifact_policy_001.py).
+
+---
+
 ## Mettre à jour la documentation
 
 Une fonctionnalité non documentée est incomplète.
