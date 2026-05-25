@@ -167,11 +167,11 @@ _EXPECTED_DELIVERED_B10 = [
     "RELEASE-TAG-CONVENTION-TEST-ALIGN-001",
     # Clôture (livré quand l'audit a conclu GO)
     "B10-CLOSING-AUDIT-001",
-]
-
-_EXPECTED_PENDING_B10 = [
+    # Release (livré une fois la beta.10 préparée et taguée localement)
     "RELEASE-BETA10-001",
 ]
+
+_EXPECTED_PENDING_B10: list[str] = []
 
 
 class TestExpectedTicketsPresent:
