@@ -1312,7 +1312,7 @@ documentation opt-ins PyPI) puis durcir les derniers points sensibles (headers
 WSGI, isolation tests opt-in, défense uploads, validation MFA au boot) avant
 d'envisager une release candidate.
 
-L'audit post-publication beta.9 a identifié 15 tickets répartis en
+L'audit post-publication beta.9 a identifié 16 tickets répartis en
 4 catégories : bloquants immédiats, critiques pré-RC, durcissement,
 et clôture.
 
@@ -1333,13 +1333,14 @@ et clôture.
 | `CI-PAGES-MKDOCS-STRICT-001` | **livré** | Passer le workflow GitHub Pages en `mkdocs build --strict`. |
 | `DEPENDENCY-AUDIT-RELEASE-GUARD-001` | **livré** | Décider si l'audit de dépendances (CVE) doit devenir bloquant pour les releases. |
 
-### Durcissement (6 tickets)
+### Durcissement (7 tickets)
 
 | Ticket | Statut | Rôle |
 |---|---|---|
 | `UPLOADS-SYMLINK-DEFENSE-001` | **livré** | Vérifier par tests la défense contre les symlinks dans `uploads/` et statics, puis corriger si nécessaire (`is_symlink()` / `resolve(strict=True)`). |
 | `MFA-SECRET-KEY-BOOT-VALIDATION-001` | **livré** | Valider au boot la configuration `FORGE_MFA_SECRET_KEY` quand MFA est installé ou activé. |
 | `APP-PY-PROD-HOST-GUARD-001` | **livré** | Empêcher une exposition accidentelle de `python app.py` en production, notamment lorsque `APP_ENV=prod` et que `APP_HOST` cible une interface publique (`0.0.0.0`, `::`, ou équivalent). |
+| `DOCS-CLI-COMMANDS-EXAMPLES-RESTRUCTURE-001` | **livré** | Réorganiser la référence CLI et ajouter des exemples d'utilisation par scénarios. |
 | `DOCS-IMPORTS-VALIDITY-SWEEP-001` | à faire | Corriger les imports obsolètes ou invalides dans les exemples de documentation (ex. `from core.auth import is_mfa_enabled` → `from forge_mvc_mfa import ...`). |
 | `DOCS-SITE-ARTIFACT-POLICY-001` | à faire | Clarifier que `docs/` est la source MkDocs officielle et que `site/` est uniquement un artefact généré localement par `mkdocs build`, ignoré par Git et supprimable sans perte. |
 | `TESTS-AUTOUSE-FIXTURES-AUDIT-001` | à faire | Auditer les fixtures `autouse` hors `conftest.py` pour limiter les contaminations d'état global (cas révélé par `test_configurable_session_store_001` lors de B9). |
@@ -1363,13 +1364,14 @@ et clôture.
 8. `UPLOADS-SYMLINK-DEFENSE-001`
 9. `MFA-SECRET-KEY-BOOT-VALIDATION-001`
 10. `APP-PY-PROD-HOST-GUARD-001`
-11. `DOCS-IMPORTS-VALIDITY-SWEEP-001`
-12. `DOCS-SITE-ARTIFACT-POLICY-001`
-13. `TESTS-AUTOUSE-FIXTURES-AUDIT-001`
-14. `B10-CLOSING-AUDIT-001`
-15. `RELEASE-BETA10-001`
+11. `DOCS-CLI-COMMANDS-EXAMPLES-RESTRUCTURE-001`
+12. `DOCS-IMPORTS-VALIDITY-SWEEP-001`
+13. `DOCS-SITE-ARTIFACT-POLICY-001`
+14. `TESTS-AUTOUSE-FIXTURES-AUDIT-001`
+15. `B10-CLOSING-AUDIT-001`
+16. `RELEASE-BETA10-001`
 
-**Total Phase B10 : 15 tickets prévus.**
+**Total Phase B10 : 16 tickets prévus.**
 
 ### Corrections terrain hors-audit (livrées en cours de phase)
 

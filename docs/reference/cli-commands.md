@@ -13,9 +13,132 @@ Pour l'aide complète d'une section : `forge --help`.
 
 ---
 
+## Vue d'ensemble
+
+La CLI Forge couvre quatre familles d'usages :
+
+| Famille | Rôle | Sections de cette page |
+|---|---|---|
+| **Création de projet** | Démarrer un projet Forge à partir d'un profil starter | [Commandes de projet](#commandes-de-projet) |
+| **Génération** | Créer entités, CRUD, pages publiques, migrations SQL | [Entités](#commandes-dentites), [Pages publiques](#commandes-de-pages-publiques), [Base de données](#commandes-de-base-de-donnees) |
+| **Diagnostic** | Contrôler la santé du projet avant commit ou release | [`doctor`](#forge-doctor), [`project:check`](#forge-projectcheck), [`project:audit`](#forge-projectaudit) |
+| **Configuration** | Initialiser auth, mail, médias, i18n, déploiement | [Authentification](#commandes-dauthentification), [Mail](#commandes-mail), [Médias et JavaScript](#commandes-medias-et-javascript) |
+
+Toutes les commandes ci-dessous appartiennent au **core Forge** (`forge-mvc`)
+sauf mention explicite. Les commandes opt-in (livrées par les paquets
+`forge-mvc-rbac`, `forge-mvc-workflow`, etc.) sont regroupées dans la
+section [Modules opt-in](#modules-opt-in).
+
+---
+
+## Commandes essentielles
+
+Tableau synthétique des commandes utilisées quotidiennement.
+
+| Besoin | Commande | Statut |
+|---|---|---|
+| Créer un projet | [`forge new`](#forge-new) | Core |
+| Diagnostic large | [`forge doctor`](#forge-doctor) | Core |
+| Contrôle strict (CI) | [`forge project:check`](#forge-projectcheck) | Core |
+| Audit détaillé | [`forge project:audit`](#forge-projectaudit) | Core |
+| Voir les routes | [`forge routes:list`](#forge-routeslist) | Core |
+| Créer une entité | [`forge make:entity`](#forge-makeentity) | Core |
+| Valider les entités JSON | [`forge entity:validate`](#forge-entityvalidate) | Core |
+| Générer les modèles Python | [`forge build:model`](#forge-buildmodel) | Core |
+| Générer un CRUD complet | [`forge make:crud`](#forge-makecrud) | Core |
+| Voir le statut des migrations | [`forge migration:status`](#forge-migrationstatus) | Core |
+| Créer une migration | [`forge migration:make`](#forge-migrationmake) | Core |
+| Appliquer les migrations | [`forge migration:apply`](#forge-migrationapply) | Core |
+| Initialiser l'auth | [`forge auth:init`](#forge-authinit) | Core |
+| Créer un utilisateur | [`forge auth:user:create`](#forge-authusercreate) | Core |
+| Valider RBAC | [`forge rbac:validate`](#forge-rbacvalidate) | Opt-in (`forge-mvc-rbac`) |
+
+---
+
+## Parcours rapides
+
+Scénarios d'enchaînement des commandes — copiables tels quels.
+
+### Créer une application minimale
+
+```bash
+forge new GestionVentes
+cd GestionVentes
+forge doctor
+python app.py
+```
+
+`forge new` génère le squelette ; `forge doctor` valide la configuration
+locale ; `python app.py` démarre le serveur de développement.
+
+### Créer une entité et générer un CRUD
+
+```bash
+forge make:entity Produit
+forge entity:validate
+forge build:model
+forge make:crud Produit
+forge routes:list
+```
+
+`make:entity` crée le JSON de l'entité ; `entity:validate` vérifie la
+conformité au schéma ; `build:model` régénère les modèles Python ;
+`make:crud` génère contrôleurs et vues ; `routes:list` confirme que les
+nouvelles routes sont déclarées.
+
+### Vérifier un projet avant commit
+
+```bash
+forge doctor
+forge project:check
+forge project:audit
+```
+
+`doctor` reste tolérant (lecture seule) ; `project:check` est CI-ready
+(échec si convention violée) ; `project:audit` produit un rapport
+détaillé non destructif.
+
+### Gérer les migrations
+
+```bash
+forge migration:status
+forge migration:make
+forge migration:apply
+forge migration:status
+```
+
+Le `status` final confirme que toutes les migrations sont appliquées.
+`migration:diff` peut aider à générer le SQL à partir d'une modification
+d'entité.
+
+### Ajouter une page publique
+
+```bash
+forge make:public-page accueil
+forge routes:list
+```
+
+Variantes : `make:public-list` (liste paginée), `make:public-show`
+(fiche), `make:public-form` (formulaire), `make:public-contact` (page
+de contact).
+
+### Utiliser un opt-in officiel — exemple RBAC
+
+```bash
+pip install --pre forge-mvc-rbac
+forge rbac:validate
+forge rbac:audit
+```
+
+L'opt-in expose ses propres commandes une fois le paquet installé.
+Voir [Modules opt-in](#modules-opt-in) pour la liste complète.
+
+---
+
 ## Commandes de projet
 
-### `forge new`
+<details markdown="1" id="forge-new">
+<summary><code>forge new</code> - Crée un nouveau projet Forge à partir d'un profil starter</summary>
 
 Crée un nouveau projet Forge à partir d'un profil starter.
 
@@ -48,11 +171,14 @@ forge new MonAppli --profile auth-mfa
 
 **Voir aussi :** [Profils de projet](profils.md)
 
----
+</details>
 
-### `forge doctor`
+<details markdown="1" id="forge-doctor">
+<summary><code>forge doctor</code> - diagnostic large et tolérant de l'environnement courant (lecture seule)</summary>
 
-Diagnostic large et tolérant de l'environnement courant (lecture seule).
+**Rôle :** diagnostic large et tolérant de l'environnement courant (lecture seule).
+
+**Quand l'utiliser :** quotidien — première commande à lancer après `forge new`, et avant un commit.
 
 ```bash
 forge doctor
@@ -60,11 +186,19 @@ forge doctor
 
 Vérifie : version Python, chargement `.env`, structure `mvc/`, entités, migrations, i18n, templates.
 
----
+**À ne pas confondre avec :**
 
-### `forge project:check`
+- [`forge project:check`](#forge-projectcheck) — strict (échec si convention violée), pour la CI ;
+- [`forge project:audit`](#forge-projectaudit) — rapport détaillé non destructif.
 
-Contrôle strict des conventions — conçu pour la CI.
+**Statut :** core.
+
+</details>
+
+<details markdown="1" id="forge-projectcheck">
+<summary><code>forge project:check</code> - contrôle strict des conventions Forge — conçu pour la CI</summary>
+
+**Rôle :** contrôle strict des conventions Forge — conçu pour la CI.
 
 ```bash
 forge project:check
@@ -73,9 +207,14 @@ forge project:check
 Retourne code de sortie non-nul si le projet ne respecte pas les conventions Forge.
 Doit être lancé depuis la racine d'un projet Forge.
 
----
+**À ne pas confondre avec :** `forge doctor` (tolérant, lecture seule).
 
-### `forge project:audit`
+**Statut :** core.
+
+</details>
+
+<details markdown="1" id="forge-projectaudit">
+<summary><code>forge project:audit</code> - Rapport d'audit détaillé non destructif</summary>
 
 Rapport d'audit détaillé non destructif.
 
@@ -86,9 +225,10 @@ forge project:audit
 Inspecte la structure complète du projet et produit un rapport humain lisible.
 Doit être lancé depuis la racine d'un projet Forge.
 
----
+</details>
 
-### `forge routes:list`
+<details markdown="1" id="forge-routeslist">
+<summary><code>forge routes:list</code> - Affiche toutes les routes déclarées dans mvc/routes.py</summary>
 
 Affiche toutes les routes déclarées dans `mvc/routes.py`.
 
@@ -96,11 +236,12 @@ Affiche toutes les routes déclarées dans `mvc/routes.py`.
 forge routes:list
 ```
 
----
+</details>
 
 ## Commandes d'entités
 
-### `forge make:entity`
+<details markdown="1" id="forge-makeentity">
+<summary><code>forge make:entity</code> - Génère une entité JSON et son modèle Python</summary>
 
 Génère une entité JSON et son modèle Python.
 
@@ -122,11 +263,14 @@ Crée `mvc/entities/<NomEntite>/<nomEntite>.json` et `mvc/entities/<NomEntite>/<
 forge make:entity Contact
 ```
 
----
+</details>
 
-### `forge make:crud`
+<details markdown="1" id="forge-makecrud">
+<summary><code>forge make:crud</code> - générer un CRUD complet (liste, fiche, formulaires de création, modification, suppression) à partir d'une entité Forge déjà déclarée</summary>
 
-Génère un CRUD complet : liste, fiche, formulaires de création, modification et suppression.
+**Rôle :** générer un CRUD complet (liste, fiche, formulaires de création, modification, suppression) à partir d'une entité Forge déjà déclarée.
+
+**Quand l'utiliser :** après création et validation d'une entité via `make:entity` + `entity:validate`.
 
 ```bash
 forge make:crud <NomEntite>
@@ -143,9 +287,24 @@ forge make:crud <NomEntite> --dry-run
 forge make:entity Contact && forge make:crud Contact
 ```
 
----
+**Effets :**
 
-### `forge make:relation`
+- génère les contrôleurs CRUD applicatifs ;
+- génère les vues HTML associées (liste, fiche, formulaires) ;
+- préserve les fichiers utilisateurs déjà présents (write-if-new — voir charte §9).
+
+**À ne pas confondre avec :**
+
+- [`forge make:entity`](#forge-makeentity) — crée seulement le JSON d'entité, pas le CRUD ;
+- [`forge make:pivot-crud`](#forge-makepivot-crud) — pour les pivots avec attributs ;
+- [`forge build:model`](#forge-buildmodel) — régénère uniquement les modèles Python, pas les contrôleurs/vues.
+
+**Statut :** core.
+
+</details>
+
+<details markdown="1" id="forge-makerelation">
+<summary><code>forge make:relation</code> - Déclare une relation entre deux entités dans mvc/entities/relations.json</summary>
 
 Déclare une relation entre deux entités dans `mvc/entities/relations.json`.
 
@@ -155,9 +314,10 @@ forge make:relation
 
 Mode interactif : pose les questions sur les deux entités et le type de relation.
 
----
+</details>
 
-### `forge make:pivot-crud`
+<details markdown="1" id="forge-makepivot-crud">
+<summary><code>forge make:pivot-crud</code> - Génère un sous-CRUD dédié pour un pivot porteur d'attributs</summary>
 
 Génère un sous-CRUD dédié pour un pivot porteur d'attributs.
 
@@ -168,9 +328,10 @@ forge make:pivot-crud <EntiteSource> <nom_relation>
 À utiliser quand une relation many-to-many comporte des champs propres (date,
 quantité, statut…) qui méritent leurs propres écrans d'édition.
 
----
+</details>
 
-### `forge sync:entity`
+<details markdown="1" id="forge-syncentity">
+<summary><code>forge sync:entity</code> - Régénère les fichiers modèles d'une entité depuis son JSON</summary>
 
 Régénère les fichiers modèles d'une entité depuis son JSON.
 
@@ -178,9 +339,10 @@ Régénère les fichiers modèles d'une entité depuis son JSON.
 forge sync:entity <NomEntite>
 ```
 
----
+</details>
 
-### `forge sync:relations`
+<details markdown="1" id="forge-syncrelations">
+<summary><code>forge sync:relations</code> - Régénère mvc/entities/relations.sql depuis relations.json</summary>
 
 Régénère `mvc/entities/relations.sql` depuis `relations.json`.
 
@@ -188,9 +350,10 @@ Régénère `mvc/entities/relations.sql` depuis `relations.json`.
 forge sync:relations
 ```
 
----
+</details>
 
-### `forge build:model`
+<details markdown="1" id="forge-buildmodel">
+<summary><code>forge build:model</code> - Régénère tous les modèles Python depuis leurs entités JSON</summary>
 
 Régénère tous les modèles Python depuis leurs entités JSON.
 
@@ -199,9 +362,10 @@ forge build:model
 forge build:model --dry-run
 ```
 
----
+</details>
 
-### `forge check:model`
+<details markdown="1" id="forge-checkmodel">
+<summary><code>forge check:model</code> - Vérifie la cohérence des modèles : JSON valide, champs requis, types reconnus</summary>
 
 Vérifie la cohérence des modèles : JSON valide, champs requis, types reconnus.
 
@@ -209,9 +373,10 @@ Vérifie la cohérence des modèles : JSON valide, champs requis, types reconnus
 forge check:model
 ```
 
----
+</details>
 
-### `forge entity:validate`
+<details markdown="1" id="forge-entityvalidate">
+<summary><code>forge entity:validate</code> - Valide les entités et les relations contre les schémas JSON Forge</summary>
 
 Valide les entités (`mvc/entities/*.json`) et `relations.json` contre les
 schémas JSON Forge.
@@ -223,13 +388,14 @@ forge entity:validate
 Vérifie la structure JSON, les références entre fichiers et les types
 reconnus. Sort en erreur si un fichier viole le schéma.
 
----
+</details>
 
 ## Commandes de pages publiques
 
 Ces commandes génèrent des pages accessibles sans authentification.
 
-### `forge make:public-page`
+<details markdown="1" id="forge-makepublic-page">
+<summary><code>forge make:public-page</code> - Génère une page statique publique</summary>
 
 Génère une page statique publique.
 
@@ -237,9 +403,10 @@ Génère une page statique publique.
 forge make:public-page <NomPage>
 ```
 
----
+</details>
 
-### `forge make:public-list`
+<details markdown="1" id="forge-makepublic-list">
+<summary><code>forge make:public-list</code> - Génère une liste publique paginée pour une entité</summary>
 
 Génère une liste publique paginée pour une entité.
 
@@ -247,9 +414,10 @@ Génère une liste publique paginée pour une entité.
 forge make:public-list <NomEntite>
 ```
 
----
+</details>
 
-### `forge make:public-show`
+<details markdown="1" id="forge-makepublic-show">
+<summary><code>forge make:public-show</code> - Génère une fiche publique détaillée pour une entité</summary>
 
 Génère une fiche publique détaillée pour une entité.
 
@@ -257,9 +425,10 @@ Génère une fiche publique détaillée pour une entité.
 forge make:public-show <NomEntite>
 ```
 
----
+</details>
 
-### `forge make:public-form`
+<details markdown="1" id="forge-makepublic-form">
+<summary><code>forge make:public-form</code> - Génère un formulaire public pour une entité</summary>
 
 Génère un formulaire public pour une entité.
 
@@ -267,9 +436,10 @@ Génère un formulaire public pour une entité.
 forge make:public-form <NomEntite>
 ```
 
----
+</details>
 
-### `forge make:public-contact`
+<details markdown="1" id="forge-makepublic-contact">
+<summary><code>forge make:public-contact</code> - Génère une page de contact publique</summary>
 
 Génère une page de contact publique.
 
@@ -279,11 +449,12 @@ forge make:public-contact <NomPage>
 
 **Voir aussi :** [Pages publiques](pages-publiques.md)
 
----
+</details>
 
 ## Commandes de base de données
 
-### `forge db:init`
+<details markdown="1" id="forge-dbinit">
+<summary><code>forge db:init</code> - Crée la base de données depuis les entités définies</summary>
 
 Crée la base de données depuis les entités définies.
 
@@ -294,9 +465,10 @@ forge db:init
 Requiert les variables `DB_ADMIN_*` dans `env/dev`.
 Crée la base, les tables, et insère les données initiales si présentes.
 
----
+</details>
 
-### `forge db:apply`
+<details markdown="1" id="forge-dbapply">
+<summary><code>forge db:apply</code> - Applique le schéma SQL courant</summary>
 
 Applique le schéma SQL courant.
 
@@ -304,9 +476,10 @@ Applique le schéma SQL courant.
 forge db:apply
 ```
 
----
+</details>
 
-### `forge migration:status`
+<details markdown="1" id="forge-migrationstatus">
+<summary><code>forge migration:status</code> - Affiche le statut des migrations : appliquées, en attente</summary>
 
 Affiche le statut des migrations : appliquées, en attente.
 
@@ -314,9 +487,10 @@ Affiche le statut des migrations : appliquées, en attente.
 forge migration:status
 ```
 
----
+</details>
 
-### `forge migration:apply`
+<details markdown="1" id="forge-migrationapply">
+<summary><code>forge migration:apply</code> - Applique les migrations SQL en attente dans mvc/migrations/</summary>
 
 Applique les migrations SQL en attente dans `mvc/migrations/`.
 
@@ -324,9 +498,10 @@ Applique les migrations SQL en attente dans `mvc/migrations/`.
 forge migration:apply
 ```
 
----
+</details>
 
-### `forge migration:make`
+<details markdown="1" id="forge-migrationmake">
+<summary><code>forge migration:make</code> - Crée un nouveau fichier de migration SQL horodaté</summary>
 
 Crée un nouveau fichier de migration SQL horodaté.
 
@@ -336,9 +511,10 @@ forge migration:make <nom>
 
 Crée `mvc/migrations/<timestamp>_<nom>.sql`.
 
----
+</details>
 
-### `forge migration:diff`
+<details markdown="1" id="forge-migrationdiff">
+<summary><code>forge migration:diff</code> - Génère un diff SQL entre la définition d'une entité et la base de données actuelle</summary>
 
 Génère un diff SQL entre la définition d'une entité et la base de données actuelle.
 
@@ -346,11 +522,12 @@ Génère un diff SQL entre la définition d'une entité et la base de données a
 forge migration:diff --entity <NomEntite>
 ```
 
----
+</details>
 
 ## Commandes de starters et modules
 
-### `forge starter:list`
+<details markdown="1" id="forge-starterlist">
+<summary><code>forge starter:list</code> - Liste les starter apps disponibles avec leur statut et leur URL de documentation</summary>
 
 Liste les starter apps disponibles avec leur statut et leur URL de documentation.
 
@@ -358,9 +535,10 @@ Liste les starter apps disponibles avec leur statut et leur URL de documentation
 forge starter:list
 ```
 
----
+</details>
 
-### `forge starter:build`
+<details markdown="1" id="forge-starterbuild">
+<summary><code>forge starter:build</code> - Génère un starter app dans le projet courant</summary>
 
 Génère un starter app dans le projet courant.
 
@@ -368,9 +546,10 @@ Génère un starter app dans le projet courant.
 forge starter:build <nom>
 ```
 
----
+</details>
 
-### `forge module:list`
+<details markdown="1" id="forge-modulelist">
+<summary><code>forge module:list</code> - Liste les modules Forge disponibles</summary>
 
 Liste les modules Forge disponibles.
 
@@ -378,9 +557,10 @@ Liste les modules Forge disponibles.
 forge module:list
 ```
 
----
+</details>
 
-### `forge module:install`
+<details markdown="1" id="forge-moduleinstall">
+<summary><code>forge module:install</code> - Installe un module Forge dans le projet</summary>
 
 Installe un module Forge dans le projet.
 
@@ -390,9 +570,10 @@ forge module:install <nom> --path <chemin>
 forge module:install <nom> --dry-run
 ```
 
----
+</details>
 
-### `forge module:files`
+<details markdown="1" id="forge-modulefiles">
+<summary><code>forge module:files</code> - Copie les fichiers d'un module dans le projet sans modifier les routes</summary>
 
 Copie les fichiers d'un module dans le projet sans modifier les routes.
 
@@ -400,9 +581,10 @@ Copie les fichiers d'un module dans le projet sans modifier les routes.
 forge module:files <nom>
 ```
 
----
+</details>
 
-### `forge module:routes`
+<details markdown="1" id="forge-moduleroutes">
+<summary><code>forge module:routes</code> - Injecte les routes d'un module dans mvc/routes.py</summary>
 
 Injecte les routes d'un module dans `mvc/routes.py`.
 
@@ -410,11 +592,12 @@ Injecte les routes d'un module dans `mvc/routes.py`.
 forge module:routes <nom>
 ```
 
----
+</details>
 
 ## Commandes d'authentification
 
-### `forge auth:init`
+<details markdown="1" id="forge-authinit">
+<summary><code>forge auth:init</code> - Initialise les tables et fichiers d'authentification du projet</summary>
 
 Initialise les tables et fichiers d'authentification du projet.
 
@@ -427,9 +610,10 @@ et les formulaires d'authentification.
 
 **Voir aussi :** [Auth](../auth.md)
 
----
+</details>
 
-### `forge auth:doctor`
+<details markdown="1" id="forge-authdoctor">
+<summary><code>forge auth:doctor</code> - Diagnostic du système d'authentification</summary>
 
 Diagnostic du système d'authentification.
 
@@ -437,9 +621,10 @@ Diagnostic du système d'authentification.
 forge auth:doctor
 ```
 
----
+</details>
 
-### `forge auth:status`
+<details markdown="1" id="forge-authstatus">
+<summary><code>forge auth:status</code> - Affiche l'état des briques d'authentification installées (modules disponibles, contrats vérifiés)</summary>
 
 Affiche l'état des briques d'authentification installées (modules disponibles, contrats vérifiés).
 
@@ -447,9 +632,10 @@ Affiche l'état des briques d'authentification installées (modules disponibles,
 forge auth:status
 ```
 
----
+</details>
 
-### `forge auth:list-sql`
+<details markdown="1" id="forge-authlist-sql">
+<summary><code>forge auth:list-sql</code> - Affiche les fichiers SQL optionnels du système d'authentification et leur statut (présent / absent)</summary>
 
 Affiche les fichiers SQL optionnels du système d'authentification et leur statut (présent / absent).
 
@@ -457,9 +643,10 @@ Affiche les fichiers SQL optionnels du système d'authentification et leur statu
 forge auth:list-sql
 ```
 
----
+</details>
 
-### `forge auth:user:show`
+<details markdown="1" id="forge-authusershow">
+<summary><code>forge auth:user:show</code> - Affiche les détails d'un compte utilisateur</summary>
 
 Affiche les détails d'un compte utilisateur.
 
@@ -468,9 +655,10 @@ forge auth:user:show --id <id>
 forge auth:user:show --email <email>
 ```
 
----
+</details>
 
-### `forge auth:user:create`
+<details markdown="1" id="forge-authusercreate">
+<summary><code>forge auth:user:create</code> - Crée un compte utilisateur en base</summary>
 
 Crée un compte utilisateur en base.
 
@@ -486,9 +674,10 @@ forge auth:user:create --email <email> --password-prompt
 - `--password <mdp>` — mot de passe en clair
 - `--password-prompt` — saisie interactive sécurisée
 
----
+</details>
 
-### `forge auth:user:list`
+<details markdown="1" id="forge-authuserlist">
+<summary><code>forge auth:user:list</code> - Liste les comptes utilisateurs</summary>
 
 Liste les comptes utilisateurs.
 
@@ -496,9 +685,10 @@ Liste les comptes utilisateurs.
 forge auth:user:list
 ```
 
----
+</details>
 
-### `forge auth:user:disable`
+<details markdown="1" id="forge-authuserdisable">
+<summary><code>forge auth:user:disable</code> - Désactive un compte utilisateur</summary>
 
 Désactive un compte utilisateur.
 
@@ -506,9 +696,10 @@ Désactive un compte utilisateur.
 forge auth:user:disable --email <email>
 ```
 
----
+</details>
 
-### `forge auth:user:enable`
+<details markdown="1" id="forge-authuserenable">
+<summary><code>forge auth:user:enable</code> - Réactive un compte utilisateur désactivé</summary>
 
 Réactive un compte utilisateur désactivé.
 
@@ -516,9 +707,10 @@ Réactive un compte utilisateur désactivé.
 forge auth:user:enable --email <email>
 ```
 
----
+</details>
 
-### `forge auth:user:password`
+<details markdown="1" id="forge-authuserpassword">
+<summary><code>forge auth:user:password</code> - Modifie le mot de passe d'un compte</summary>
 
 Modifie le mot de passe d'un compte.
 
@@ -527,9 +719,10 @@ forge auth:user:password --email <email> --password <mdp>
 forge auth:user:password --email <email> --password-prompt
 ```
 
----
+</details>
 
-### `forge auth:user:role:add`
+<details markdown="1" id="forge-authuserroleadd">
+<summary><code>forge auth:user:role:add</code> - Assigne un rôle à un utilisateur</summary>
 
 Assigne un rôle à un utilisateur.
 
@@ -537,9 +730,10 @@ Assigne un rôle à un utilisateur.
 forge auth:user:role:add --email <email> --role <role>
 ```
 
----
+</details>
 
-### `forge auth:user:role:remove`
+<details markdown="1" id="forge-authuserroleremove">
+<summary><code>forge auth:user:role:remove</code> - Retire un rôle d'un utilisateur</summary>
 
 Retire un rôle d'un utilisateur.
 
@@ -547,9 +741,10 @@ Retire un rôle d'un utilisateur.
 forge auth:user:role:remove --email <email> --role <role>
 ```
 
----
+</details>
 
-### `forge auth:user:roles`
+<details markdown="1" id="forge-authuserroles">
+<summary><code>forge auth:user:roles</code> - Affiche les rôles d'un utilisateur</summary>
 
 Affiche les rôles d'un utilisateur.
 
@@ -557,11 +752,12 @@ Affiche les rôles d'un utilisateur.
 forge auth:user:roles --email <email>
 ```
 
----
+</details>
 
 ## Commandes mail
 
-### `forge mail:init`
+<details markdown="1" id="forge-mailinit">
+<summary><code>forge mail:init</code> - Initialise la configuration mail du projet</summary>
 
 Initialise la configuration mail du projet.
 
@@ -569,9 +765,10 @@ Initialise la configuration mail du projet.
 forge mail:init
 ```
 
----
+</details>
 
-### `forge mail:test`
+<details markdown="1" id="forge-mailtest">
+<summary><code>forge mail:test</code> - Envoie un mail de test pour vérifier la configuration</summary>
 
 Envoie un mail de test pour vérifier la configuration.
 
@@ -579,9 +776,10 @@ Envoie un mail de test pour vérifier la configuration.
 forge mail:test
 ```
 
----
+</details>
 
-### `forge mail:render`
+<details markdown="1" id="forge-mailrender">
+<summary><code>forge mail:render</code> - Rend un template de mail en HTML pour prévisualisation</summary>
 
 Rend un template de mail en HTML pour prévisualisation.
 
@@ -589,9 +787,10 @@ Rend un template de mail en HTML pour prévisualisation.
 forge mail:render <template>
 ```
 
----
+</details>
 
-### `forge mail:doctor`
+<details markdown="1" id="forge-maildoctor">
+<summary><code>forge mail:doctor</code> - Diagnostic de la configuration mail</summary>
 
 Diagnostic de la configuration mail.
 
@@ -599,9 +798,10 @@ Diagnostic de la configuration mail.
 forge mail:doctor
 ```
 
----
+</details>
 
-### `forge mail:logs`
+<details markdown="1" id="forge-maillogs">
+<summary><code>forge mail:logs</code> - Affiche les derniers logs d'envoi mail</summary>
 
 Affiche les derniers logs d'envoi mail.
 
@@ -609,11 +809,12 @@ Affiche les derniers logs d'envoi mail.
 forge mail:logs
 ```
 
----
+</details>
 
 ## Commandes médias et JavaScript
 
-### `forge upload:init`
+<details markdown="1" id="forge-uploadinit">
+<summary><code>forge upload:init</code> - Configure le stockage des fichiers uploadés</summary>
 
 Configure le stockage des fichiers uploadés.
 
@@ -623,9 +824,10 @@ forge upload:init
 
 Crée `storage/uploads/` et ses sous-dossiers (`images`, `documents`, `tmp`).
 
----
+</details>
 
-### `forge media:init`
+<details markdown="1" id="forge-mediainit">
+<summary><code>forge media:init</code> - Configure le stockage des médias avec génération de vignettes</summary>
 
 Configure le stockage des médias avec génération de vignettes.
 
@@ -635,9 +837,10 @@ forge media:init
 
 Crée `storage/uploads/` avec sous-dossiers `images/thumbnail` et `images/medium`.
 
----
+</details>
 
-### `forge js:init`
+<details markdown="1" id="forge-jsinit">
+<summary><code>forge js:init</code> - Installe une bibliothèque JavaScript dans le projet</summary>
 
 Installe une bibliothèque JavaScript dans le projet.
 
@@ -647,11 +850,12 @@ forge js:init alpine
 forge js:init htmx-alpine
 ```
 
----
+</details>
 
 ## Commandes d'internationalisation
 
-### `forge i18n:init`
+<details markdown="1" id="forge-i18ninit">
+<summary><code>forge i18n:init</code> - Initialise la configuration i18n du projet</summary>
 
 Initialise la configuration i18n du projet.
 
@@ -661,9 +865,10 @@ forge i18n:init
 
 Crée `translations/fr.json` si absent.
 
----
+</details>
 
-### `forge i18n:check`
+<details markdown="1" id="forge-i18ncheck">
+<summary><code>forge i18n:check</code> - Vérifie la cohérence des catalogues i18n</summary>
 
 Vérifie la cohérence des catalogues i18n.
 
@@ -671,11 +876,12 @@ Vérifie la cohérence des catalogues i18n.
 forge i18n:check
 ```
 
----
+</details>
 
 ## Commandes de déploiement
 
-### `forge deploy:init`
+<details markdown="1" id="forge-deployinit">
+<summary><code>forge deploy:init</code> - Initialise les fichiers de configuration de déploiement</summary>
 
 Initialise les fichiers de configuration de déploiement.
 
@@ -686,9 +892,10 @@ forge deploy:init
 Crée `deploy/nginx/forge-app.conf`, `deploy/systemd/forge-app.service` et
 `deploy/README_DEPLOY.md`.
 
----
+</details>
 
-### `forge deploy:check`
+<details markdown="1" id="forge-deploycheck">
+<summary><code>forge deploy:check</code> - Vérifie la configuration de déploiement et l'environnement cible</summary>
 
 Vérifie la configuration de déploiement et l'environnement cible.
 
@@ -696,11 +903,12 @@ Vérifie la configuration de déploiement et l'environnement cible.
 forge deploy:check
 ```
 
----
+</details>
 
 ## Commandes de synchronisation
 
-### `forge sync:landing`
+<details markdown="1" id="forge-synclanding">
+<summary><code>forge sync:landing</code> - Synchronise la landing page source vers docs/index.html</summary>
 
 Synchronise la landing page source vers `docs/index.html`.
 
@@ -711,11 +919,12 @@ forge sync:landing
 Copie `mvc/views/landing/index.html` → `docs/index.html` et `static/` → `docs/static/`.
 À utiliser après toute modification de la landing page source.
 
----
+</details>
 
 ## Commandes de documentation
 
-### `forge docs:pdf`
+<details markdown="1" id="forge-docspdf">
+<summary><code>forge docs:pdf</code> - Génère un PDF depuis la documentation du projet</summary>
 
 Génère un PDF depuis la documentation du projet.
 
@@ -723,11 +932,12 @@ Génère un PDF depuis la documentation du projet.
 forge docs:pdf
 ```
 
----
+</details>
 
 ## Commandes de schémas JSON
 
-### `forge schema:list`
+<details markdown="1" id="forge-schemalist">
+<summary><code>forge schema:list</code> - Liste les schémas JSON Forge disponibles localement</summary>
 
 Liste les schémas JSON Forge disponibles localement.
 
@@ -737,9 +947,10 @@ forge schema:list
 
 Affiche les fichiers de schéma embarqués et leur version.
 
----
+</details>
 
-### `forge schema:doctor`
+<details markdown="1" id="forge-schemadoctor">
+<summary><code>forge schema:doctor</code> - Diagnostique les schémas JSON Forge : présence, validité, résolution des $ref</summary>
 
 Diagnostique les schémas JSON Forge : présence, validité, résolution des `$ref`.
 
@@ -750,11 +961,39 @@ forge schema:doctor
 À utiliser pour vérifier l'installation des schémas avant un `entity:validate`
 ou un `rbac:validate`.
 
----
+</details>
 
-## Commandes RBAC
+## Modules opt-in
 
-### `forge rbac:validate`
+Les commandes ci-dessous proviennent de paquets opt-in officiels Forge.
+Elles ne sont disponibles qu'**après installation du paquet concerné**.
+
+Les opt-ins **restent optionnels** : le core Forge ne dépend d'aucun d'eux,
+et leur absence ne casse jamais la CLI core (les commandes opt-in simplement
+n'apparaissent pas dans `forge --help`).
+
+| Module | Paquet PyPI | Commandes CLI exposées |
+|---|---|---|
+| RBAC — rôles et permissions | `forge-mvc-rbac` | [`rbac:validate`](#forge-rbacvalidate), [`rbac:audit`](#forge-rbacaudit) |
+| Workflow — statuts, transitions | `forge-mvc-workflow` | aucune commande CLI dédiée — usage applicatif |
+| Stats — agrégats et événements | `forge-mvc-stats` | aucune commande CLI dédiée — usage applicatif |
+| MFA — TOTP, codes de récupération | `forge-mvc-mfa` | aucune commande CLI dédiée — voir profil `auth-mfa` dans [`forge new`](#forge-new) |
+| Media — helpers applicatifs upload | `forge-mvc-media` | aucune commande CLI dédiée — usage applicatif |
+
+Installation type (depuis `1.0.0-beta.9`, tous publiés sur PyPI) :
+
+```bash
+pip install --pre forge-mvc-rbac
+pip install --pre forge-mvc-workflow
+pip install --pre forge-mvc-stats
+pip install --pre forge-mvc-mfa
+pip install --pre forge-mvc-media
+```
+
+Voir [Installation — Contrat d'installation des opt-ins](../installation.md#contrat-dinstallation-des-opt-ins).
+
+<details markdown="1" id="forge-rbacvalidate">
+<summary><code>forge rbac:validate</code> - Valide mvc/security/rbac.json avec le schéma RBAC Forge</summary>
 
 Valide `mvc/security/rbac.json` avec le schéma RBAC Forge.
 
@@ -765,9 +1004,10 @@ forge rbac:validate
 Vérifie la structure du fichier (rôles, permissions, héritages) sans
 exécuter de logique applicative.
 
----
+</details>
 
-### `forge rbac:audit`
+<details markdown="1" id="forge-rbacaudit">
+<summary><code>forge rbac:audit</code> - Audit de cohérence fonctionnelle de mvc/security/rbac.json</summary>
 
 Audit de cohérence fonctionnelle de `mvc/security/rbac.json`.
 
@@ -778,11 +1018,12 @@ forge rbac:audit
 Détecte les rôles orphelins, les permissions non référencées et les
 incohérences entre la configuration RBAC et le code.
 
----
+</details>
 
 ## Utilitaires
 
-### `forge --version`
+<details markdown="1" id="forge-version">
+<summary><code>forge --version</code> - Affiche la version courante de Forge</summary>
 
 Affiche la version courante de Forge.
 
@@ -791,7 +1032,10 @@ $ forge --version
 Forge {{forge_version}}
 ```
 
-### `forge --help`
+</details>
+
+<details markdown="1" id="forge-help">
+<summary><code>forge --help</code> - Affiche l'aide générale avec toutes les commandes disponibles</summary>
 
 Affiche l'aide générale avec toutes les commandes disponibles.
 
@@ -800,3 +1044,76 @@ forge --help
 forge help
 forge -h
 ```
+
+</details>
+
+## Index alphabétique
+
+Toutes les commandes documentées dans cette page.
+
+| Commande | Domaine | Statut |
+|---|---|---|
+| [`forge auth:doctor`](#forge-authdoctor) | Authentification | Core |
+| [`forge auth:init`](#forge-authinit) | Authentification | Core |
+| [`forge auth:list-sql`](#forge-authlist-sql) | Authentification | Core |
+| [`forge auth:status`](#forge-authstatus) | Authentification | Core |
+| [`forge auth:user:create`](#forge-authusercreate) | Authentification | Core |
+| [`forge auth:user:disable`](#forge-authuserdisable) | Authentification | Core |
+| [`forge auth:user:enable`](#forge-authuserenable) | Authentification | Core |
+| [`forge auth:user:list`](#forge-authuserlist) | Authentification | Core |
+| [`forge auth:user:password`](#forge-authuserpassword) | Authentification | Core |
+| [`forge auth:user:role:add`](#forge-authuserroleadd) | Authentification | Core |
+| [`forge auth:user:role:remove`](#forge-authuserroleremove) | Authentification | Core |
+| [`forge auth:user:roles`](#forge-authuserroles) | Authentification | Core |
+| [`forge auth:user:show`](#forge-authusershow) | Authentification | Core |
+| [`forge build:model`](#forge-buildmodel) | Entités | Core |
+| [`forge check:model`](#forge-checkmodel) | Entités | Core |
+| [`forge db:apply`](#forge-dbapply) | Base de données | Core |
+| [`forge db:init`](#forge-dbinit) | Base de données | Core |
+| [`forge deploy:check`](#forge-deploycheck) | Déploiement | Core |
+| [`forge deploy:init`](#forge-deployinit) | Déploiement | Core |
+| [`forge docs:pdf`](#forge-docspdf) | Documentation | Core |
+| [`forge doctor`](#forge-doctor) | Diagnostic | Core |
+| [`forge entity:validate`](#forge-entityvalidate) | Entités | Core |
+| [`forge --help`](#forge-help) | Utilitaires | Core |
+| [`forge i18n:check`](#forge-i18ncheck) | Internationalisation | Core |
+| [`forge i18n:init`](#forge-i18ninit) | Internationalisation | Core |
+| [`forge js:init`](#forge-jsinit) | Médias et JavaScript | Core |
+| [`forge mail:doctor`](#forge-maildoctor) | Mail | Core |
+| [`forge mail:init`](#forge-mailinit) | Mail | Core |
+| [`forge mail:logs`](#forge-maillogs) | Mail | Core |
+| [`forge mail:render`](#forge-mailrender) | Mail | Core |
+| [`forge mail:test`](#forge-mailtest) | Mail | Core |
+| [`forge make:crud`](#forge-makecrud) | Entités | Core |
+| [`forge make:entity`](#forge-makeentity) | Entités | Core |
+| [`forge make:pivot-crud`](#forge-makepivot-crud) | Entités | Core |
+| [`forge make:public-contact`](#forge-makepublic-contact) | Pages publiques | Core |
+| [`forge make:public-form`](#forge-makepublic-form) | Pages publiques | Core |
+| [`forge make:public-list`](#forge-makepublic-list) | Pages publiques | Core |
+| [`forge make:public-page`](#forge-makepublic-page) | Pages publiques | Core |
+| [`forge make:public-show`](#forge-makepublic-show) | Pages publiques | Core |
+| [`forge make:relation`](#forge-makerelation) | Entités | Core |
+| [`forge media:init`](#forge-mediainit) | Médias et JavaScript | Core |
+| [`forge migration:apply`](#forge-migrationapply) | Base de données | Core |
+| [`forge migration:diff`](#forge-migrationdiff) | Base de données | Core |
+| [`forge migration:make`](#forge-migrationmake) | Base de données | Core |
+| [`forge migration:status`](#forge-migrationstatus) | Base de données | Core |
+| [`forge module:files`](#forge-modulefiles) | Starters et modules | Core |
+| [`forge module:install`](#forge-moduleinstall) | Starters et modules | Core |
+| [`forge module:list`](#forge-modulelist) | Starters et modules | Core |
+| [`forge module:routes`](#forge-moduleroutes) | Starters et modules | Core |
+| [`forge new`](#forge-new) | Projet | Core |
+| [`forge project:audit`](#forge-projectaudit) | Projet | Core |
+| [`forge project:check`](#forge-projectcheck) | Projet | Core |
+| [`forge rbac:audit`](#forge-rbacaudit) | RBAC | Opt-in (`forge-mvc-rbac`) |
+| [`forge rbac:validate`](#forge-rbacvalidate) | RBAC | Opt-in (`forge-mvc-rbac`) |
+| [`forge routes:list`](#forge-routeslist) | Projet | Core |
+| [`forge schema:doctor`](#forge-schemadoctor) | Schémas JSON | Core |
+| [`forge schema:list`](#forge-schemalist) | Schémas JSON | Core |
+| [`forge starter:build`](#forge-starterbuild) | Starters et modules | Core |
+| [`forge starter:list`](#forge-starterlist) | Starters et modules | Core |
+| [`forge sync:entity`](#forge-syncentity) | Entités | Core |
+| [`forge sync:landing`](#forge-synclanding) | Synchronisation | Core |
+| [`forge sync:relations`](#forge-syncrelations) | Entités | Core |
+| [`forge upload:init`](#forge-uploadinit) | Médias et JavaScript | Core |
+| [`forge --version`](#forge-version) | Utilitaires | Core |
