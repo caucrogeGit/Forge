@@ -17,7 +17,7 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 Précédent : v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.9 préparée (core + 5 opt-ins). Phase B9 close : sécurité (cryptography, compare_digest, X-Real-IP), WSGI production encadrée, sessions renforcées, opt-in media en CI, dédomainisation core, landing rafraîchie, sweep documentaire. Bloc B9-C : 12 tickets CLI déjà clos.**
+**Statut : v1.0.0-beta.9 publiée (core + 5 opt-ins). Phase B9 close : sécurité (cryptography, compare_digest, X-Real-IP), WSGI production encadrée, sessions renforcées, opt-in media en CI, dédomainisation core, landing rafraîchie, sweep documentaire. Bloc B9-C : 12 tickets CLI déjà clos.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -1312,7 +1312,7 @@ documentation opt-ins PyPI) puis durcir les derniers points sensibles (headers
 WSGI, isolation tests opt-in, défense uploads, validation MFA au boot) avant
 d'envisager une release candidate.
 
-L'audit post-publication beta.9 a identifié 14 tickets répartis en
+L'audit post-publication beta.9 a identifié 15 tickets répartis en
 4 catégories : bloquants immédiats, critiques pré-RC, durcissement,
 et clôture.
 
@@ -1328,19 +1328,20 @@ et clôture.
 
 | Ticket | Statut | Rôle |
 |---|---|---|
-| `WSGI-SECURITY-HEADERS-001` | à faire | Garantir les headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, HSTS, Referrer-Policy, Permissions-Policy, CSP) dans le chemin WSGI ou documenter clairement leur responsabilité côté reverse proxy. |
+| `WSGI-SECURITY-HEADERS-001` | à faire | Garantir les headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, HSTS, Referrer-Policy, Permissions-Policy, CSP) dans le chemin WSGI via un helper ou middleware Forge, puis documenter l’articulation avec le reverse proxy. |
 | `TESTS-OPTIN-IMPORTORSKIP-001` | à faire | Protéger les tests opt-in avec `pytest.importorskip(...)` ou un mécanisme équivalent pour préserver une installation core-only. |
 | `CI-PAGES-MKDOCS-STRICT-001` | à faire | Passer le workflow GitHub Pages en `mkdocs build --strict`. |
 | `DEPENDENCY-AUDIT-RELEASE-GUARD-001` | à faire | Décider si l'audit de dépendances (CVE) doit devenir bloquant pour les releases. |
 
-### Durcissement (5 tickets)
+### Durcissement (6 tickets)
 
 | Ticket | Statut | Rôle |
 |---|---|---|
 | `UPLOADS-SYMLINK-DEFENSE-001` | à faire | Vérifier par tests la défense contre les symlinks dans `uploads/` et statics, puis corriger si nécessaire (`is_symlink()` / `resolve(strict=True)`). |
 | `MFA-SECRET-KEY-BOOT-VALIDATION-001` | à faire | Valider au boot la configuration `FORGE_MFA_SECRET_KEY` quand MFA est installé ou activé. |
-| `APP-PY-PROD-HOST-GUARD-001` | à faire | Empêcher une exposition accidentelle de `python app.py` en production sur `0.0.0.0` (erreur fatale si `APP_ENV=prod` + `APP_HOST != 127.0.0.1`). |
+| `APP-PY-PROD-HOST-GUARD-001` | à faire | Empêcher une exposition accidentelle de `python app.py` en production, notamment lorsque `APP_ENV=prod` et que `APP_HOST` cible une interface publique (`0.0.0.0`, `::`, ou équivalent). |
 | `DOCS-IMPORTS-VALIDITY-SWEEP-001` | à faire | Corriger les imports obsolètes ou invalides dans les exemples de documentation (ex. `from core.auth import is_mfa_enabled` → `from forge_mvc_mfa import ...`). |
+| `DOCS-SITE-ARTIFACT-POLICY-001` | à faire | Clarifier que `docs/` est la source MkDocs officielle et que `site/` est uniquement un artefact généré localement par `mkdocs build`, ignoré par Git et supprimable sans perte. |
 | `TESTS-AUTOUSE-FIXTURES-AUDIT-001` | à faire | Auditer les fixtures `autouse` hors `conftest.py` pour limiter les contaminations d'état global (cas révélé par `test_configurable_session_store_001` lors de B9). |
 
 ### Clôture (2 tickets)
@@ -1363,11 +1364,23 @@ et clôture.
 9. `MFA-SECRET-KEY-BOOT-VALIDATION-001`
 10. `APP-PY-PROD-HOST-GUARD-001`
 11. `DOCS-IMPORTS-VALIDITY-SWEEP-001`
-12. `TESTS-AUTOUSE-FIXTURES-AUDIT-001`
-13. `B10-CLOSING-AUDIT-001`
-14. `RELEASE-BETA10-001`
+12. `DOCS-SITE-ARTIFACT-POLICY-001`
+13. `TESTS-AUTOUSE-FIXTURES-AUDIT-001`
+14. `B10-CLOSING-AUDIT-001`
+15. `RELEASE-BETA10-001`
 
-**Total Phase B10 : 14 tickets prévus.**
+**Total Phase B10 : 15 tickets prévus.**
+
+### Corrections terrain hors-audit (livrées en cours de phase)
+
+Tickets résolvant des problèmes découverts en condition réelle pendant la
+phase B10, hors du périmètre de l'audit initial. Ne sont pas comptés dans
+les 15 tickets ci-dessus.
+
+| Ticket | Statut | Rôle |
+|---|---|---|
+| `APP-PY-TLS-HANDSHAKE-PER-THREAD-001` | **livré** | Corriger le blocage TLS de la boucle d'accept dans `app.py` — handshake TLS exécuté dans le thread du client via `TLSThreadingHTTPServer`, borné par `TLS_HANDSHAKE_TIMEOUT = 10s`. Découvert terrain (VS Code Remote SSH + certificat auto-signé non encore accepté). |
+| `APP-PY-TLS-HANDSHAKE-DOCS-001` | **livré** | Documenter le correctif TLS via ADR-015 et enrichir la docstring de `TLSThreadingHTTPServer` pour empêcher une future régression par « simplification ». |
 
 ---
 

@@ -308,12 +308,28 @@ TLS_HANDSHAKE_TIMEOUT = 10  # secondes
 
 class TLSThreadingHTTPServer(ThreadingHTTPServer):
     """
-    Variante de ThreadingHTTPServer qui réalise le handshake TLS dans le
-    thread du client, et non dans la boucle d'accept du thread principal.
+    Serveur HTTPS de développement avec handshake TLS par thread client.
 
-    Évite qu'un client TLS lent, muet, ou parlant le mauvais protocole ne
-    fige toute la boucle d'acceptation des connexions — comportement par
-    défaut de `wrap_socket()` appliqué sur le socket d'écoute.
+    Le socket d'écoute reste volontairement un socket TCP brut. L'ancien code
+    `server.socket = ssl_ctx.wrap_socket(server.socket, server_side=True)`
+    appliquait TLS au socket d'écoute, ce qui faisait exécuter le handshake
+    dans la boucle accept() du thread principal : un client TLS lent, muet,
+    parlant le mauvais protocole, ou refusant le certificat auto-signé
+    pouvait alors figer tout le serveur de développement (Recv-Q saturé,
+    ERR_TIMED_OUT côté client, aucun traceback).
+
+    Flux réel :
+
+        TCP accept()                       (thread principal — non bloquant)
+            → ThreadingMixIn lance un thread (thread du client)
+                → wrap_socket()              (handshake TLS, borné par timeout)
+                    → RequestHandler         (requête HTTP)
+
+    Ne pas simplifier cette classe en réintroduisant
+    `wrap_socket(server.socket)` sur le socket d'écoute : ce serait
+    exactement la régression du bug d'origine. Voir ADR-015 — Handshake TLS
+    par thread client pour le serveur de développement
+    (`docs/adr/015-dev-tls-handshake-per-thread.md`).
     """
     ssl_context: ssl.SSLContext | None = None
 
