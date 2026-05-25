@@ -20,10 +20,10 @@ Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API offici
 | Hash mot de passe | `core.auth.password` — Argon2id | `core.security.hashing` — PBKDF2 **legacy** |
 | Session Auth | `core.auth.session` (`login_user`, `login_required`…) | `core.security.session` — moteur HTTP (officiel) |
 | Décorateur login | `core.auth.session.login_required` | `core.security.decorators.require_auth` — **legacy** |
-| RBAC | `forge_mvc_rbac` (voir [installation-github.md](installation-github.md)) | — |
+| RBAC | `forge_mvc_rbac` (`pip install --pre forge-mvc-rbac` — publié sur PyPI) | — |
 | CSRF | — | `core.security.middleware.CsrfMiddleware` + `require_csrf` — officiels |
 | Middleware | — | `core.security.middleware` — officiel |
-| MFA | `forge_mvc_mfa` (voir [installation-github.md](installation-github.md)) — **Alpha**, secret TOTP chiffré au repos (voir [auth-mfa](reference/auth-mfa.md)) | — |
+| MFA | `forge_mvc_mfa` (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`) — **Alpha**, secret TOTP chiffré au repos (voir [auth-mfa](reference/auth-mfa.md)) | — |
 | Tokens à usage limité | `core.auth.tokens` | — |
 | OIDC / SSO | ❌ non fourni nativement — voir [section OIDC](#oidc) | — |
 | Contrat utilisateur | `core.auth.user` | — |
@@ -430,12 +430,19 @@ ecriture DB automatique.
 
 ## MFA
 
-!!! info "forge-mvc-mfa est en Alpha — non publié PyPI en {{forge_version}}"
+!!! info "forge-mvc-mfa — opt-in officiel Alpha publié sur PyPI depuis 1.0.0-beta.9"
     Le module MFA est marqué `Development Status :: 3 - Alpha` depuis `MFA-PYPI-READY-001`.
     Le secret TOTP est **chiffré au repos** via Fernet (`FORGE_MFA_SECRET_KEY`).
 
-    `forge-mvc-mfa` n'est pas publié sur PyPI en `{{forge_version}}`.
-    Installation depuis GitHub — voir
+    Installation :
+
+    ```bash
+    pip install --pre forge-mvc-mfa
+    ```
+
+    MFA est disponible comme module opt-in officiel `forge-mvc-mfa`, publié
+    sur PyPI depuis `1.0.0-beta.9`. Il **n'est pas intégré au core** Forge
+    — le core ne dépend pas de `forge-mvc-mfa`. Voir le
     [contrat d'installation](installation.md#contrat-dinstallation-des-opt-ins).
 
 > **Depuis Forge 2.4.0**, le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
@@ -738,7 +745,7 @@ sans un ticket dedie `OIDC-IMPLEMENT-COMPLETE-001` partant d'une page blanche.
 RBAC existants.
 
 > ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-rbac`. Voir [Installation depuis GitHub](installation-github.md).
+> optionnel `forge-mvc-rbac` (`pip install --pre forge-mvc-rbac` — publié sur PyPI).
 
 ```python
 from forge_mvc_rbac import (
@@ -1203,7 +1210,8 @@ souhaite.
 ### Login avec MFA
 
 > ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-mfa`. Voir [Installation depuis GitHub](installation-github.md).
+> optionnel `forge-mvc-mfa` (`pip install --pre forge-mvc-mfa` — publié sur
+> PyPI depuis `1.0.0-beta.9`, statut Alpha).
 
 ```python
 from core.auth import authenticate_user, login_user
@@ -1274,7 +1282,7 @@ if verify_email_verification_token(raw_token, token_record):
 ### Protection route avec `require_user_permission`
 
 > ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-rbac`. Voir [Installation depuis GitHub](installation-github.md).
+> optionnel `forge-mvc-rbac` (`pip install --pre forge-mvc-rbac` — publié sur PyPI).
 
 ```python
 from forge_mvc_rbac import require_user_permission
@@ -1297,7 +1305,8 @@ Le helper Jinja masque l'action ; le decorateur serveur protege la route.
 ### Action sensible avec revalidation MFA
 
 > ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-mfa`. Voir [Installation depuis GitHub](installation-github.md).
+> optionnel `forge-mvc-mfa` (`pip install --pre forge-mvc-mfa` — publié sur
+> PyPI depuis `1.0.0-beta.9`, statut Alpha).
 
 ```python
 from forge_mvc_mfa import require_recent_mfa

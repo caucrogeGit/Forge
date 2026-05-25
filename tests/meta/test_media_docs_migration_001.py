@@ -109,18 +109,25 @@ class TestApiDocSeparatesGenericFromApplicative:
 
 
 class TestSourceOnlyAndPyPIStatus:
-    """forge-mvc-media est documenté comme source-only, non publié sur PyPI."""
+    """forge-mvc-media est publié sur PyPI depuis `1.0.0-beta.9` au statut Alpha.
 
-    def test_media_md_mentions_source_only(self):
+    L'historique de la phase source-only reste consigné dans le README via le
+    tableau des tickets (`MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001`, etc.) — c'est
+    légitime et préservé. Le présent garde-fou vérifie en revanche que la
+    documentation utilisateur active reflète l'état réel : publication PyPI.
+    """
+
+    def test_media_md_mentions_pypi_publication(self):
         text = MEDIA_DOC.read_text(encoding="utf-8")
-        assert "source-only" in text or "non publié" in text, (
-            "docs/media.md doit indiquer que forge-mvc-media est source-only / non publié PyPI."
+        assert "publié sur PyPI" in text or "publié PyPI" in text, (
+            "docs/media.md doit indiquer que forge-mvc-media est publié sur PyPI "
+            "depuis `1.0.0-beta.9` (DOCS-OPTINS-PYPI-BETA9-SWEEP-001)."
         )
 
-    def test_readme_mentions_source_only(self):
+    def test_readme_mentions_pypi_publication(self):
         text = README.read_text(encoding="utf-8")
-        assert "source-only" in text or "non publié" in text, (
-            "README forge-mvc-media doit indiquer le statut source-only / non publié PyPI."
+        assert "publié sur PyPI" in text or "Publié sur PyPI" in text, (
+            "README forge-mvc-media doit indiquer la publication PyPI depuis `1.0.0-beta.9`."
         )
 
     def test_readme_does_not_advertise_pip_install_pypi(self):

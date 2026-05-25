@@ -8,8 +8,9 @@
     sous la version `{{forge_version}}`. L'option `--pip-args="--pre"` est nécessaire car
     `{{forge_version}}` est une préversion bêta PEP 440.
 
-    Les **modules opt-in** (MFA, RBAC, workflow, statistiques) restent en mode
-    source-only via GitHub — voir [Installation depuis GitHub](installation-github.md).
+    Depuis `1.0.0-beta.9`, **tous les opt-ins officiels** (MFA, RBAC, workflow,
+    statistiques, media) sont publiés sur PyPI — voir
+    [Installation](installation.md#contrat-dinstallation-des-opt-ins).
 
 `pipx` est la méthode la plus simple pour utiliser Forge comme commande globale.
 

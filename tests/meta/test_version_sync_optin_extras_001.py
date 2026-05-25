@@ -176,14 +176,32 @@ class TestAlphaPreparedClassifier:
 
 
 class TestDocumentationExtrasCoherence:
+    # Formulations acceptées pour clarifier qu'un extra n'est pas exposé par le
+    # core. La liste reste large car la doc peut évoluer ; l'intention est que
+    # le lecteur ne croit JAMAIS pouvoir lancer `pip install forge-mvc[mfa]`
+    # ou `pip install forge-mvc[media]` directement.
+    _NOT_AVAILABLE_HINTS = (
+        "pas disponible",
+        "non disponible",
+        "ne sont pas disponibles",
+        "ne sont pas définis comme extras",
+        "ne sont pas déclarés",
+    )
+
+    def _has_unavailable_hint(self, text: str) -> bool:
+        lowered = text.lower()
+        return any(hint in lowered for hint in self._NOT_AVAILABLE_HINTS)
+
     def test_install_doc_no_media_available_claim(self):
         text = INSTALL_DOC.read_text(encoding="utf-8")
-        assert "forge-mvc[media]" not in text or "pas disponible" in text or "non disponible" in text.lower() or "ne sont pas disponibles" in text, (
-            "installation.md ne doit pas presenter forge-mvc[media] comme disponible."
+        assert "forge-mvc[media]" not in text or self._has_unavailable_hint(text), (
+            "installation.md ne doit pas presenter forge-mvc[media] comme disponible "
+            "(les paquets s'installent directement via `pip install --pre forge-mvc-media`)."
         )
 
     def test_install_doc_no_mfa_available_claim(self):
         text = INSTALL_DOC.read_text(encoding="utf-8")
-        assert "forge-mvc[mfa]" not in text or "pas disponible" in text or "non disponible" in text.lower() or "ne sont pas disponibles" in text, (
-            "installation.md ne doit pas presenter forge-mvc[mfa] comme disponible."
+        assert "forge-mvc[mfa]" not in text or self._has_unavailable_hint(text), (
+            "installation.md ne doit pas presenter forge-mvc[mfa] comme disponible "
+            "(les paquets s'installent directement via `pip install --pre forge-mvc-mfa`)."
         )

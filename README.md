@@ -75,20 +75,20 @@ et ce que **l'application implémente**.
 
 Forge sépare le noyau minimal des fonctionnalités spécialisées.
 
-**Publiés sur PyPI** (`pip install --pre <module>`) :
+Tous les opt-ins officiels sont **publiés sur PyPI** depuis `1.0.0-beta.9`
+(`pip install --pre <module>`) :
 
 | Module | Rôle | Statut |
 |--------|------|--------|
 | `forge-mvc-rbac` | RBAC fin (rôles, permissions, décorateurs) | Beta |
 | `forge-mvc-workflow` | Cycles de vie applicatifs (statuts, transitions) | Beta |
 | `forge-mvc-stats` | Tracking d'événements génériques | Beta |
+| `forge-mvc-mfa` | Authentification multi-facteurs (TOTP, codes de récupération) | Alpha — secret TOTP chiffré (`SEC-MFA-SECRET-ENCRYPTION-001`) |
+| `forge-mvc-media` | Gestion applicative des médias | Alpha — API encore bêta (voir [Limites](docs/production-limits.md)) |
 
-**Non publiés sur PyPI** (installation depuis les sources) :
-
-| Module | Rôle | Statut | Raison |
-|--------|------|--------|--------|
-| `forge-mvc-media` | Gestion applicative des médias | Alpha | Préparé — publication prévue dans une prochaine release |
-| `forge-mvc-mfa` | Authentification multi-facteurs (TOTP, codes de récupération) | Alpha | Préparé — secret TOTP chiffré (`SEC-MFA-SECRET-ENCRYPTION-001`), publication prévue dans une prochaine release |
+Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
+`forge-mvc[mfa]` et `forge-mvc[media]` ne sont pas déclarés comme extras du
+core — installer les paquets directement.
 
 Installation depuis le monorepo (voir [installation-github.md](docs/installation-github.md)) :
 
@@ -848,9 +848,11 @@ Versions supportées et procédure de signalement : [SECURITY.md](SECURITY.md)
 | `Pillow` | Traitement image et génération des variantes médias |
 | `argon2-cffi` | Hachage sécurisé des mots de passe (Argon2id) |
 
-Les modules opt-in (`forge-mvc-mfa`, `-rbac`, `-workflow`, `-stats`) nécessitent des dépendances
-supplémentaires non installées avec `forge-mvc`. `forge-mvc-mfa` (Alpha) n'est pas publié sur
-PyPI en `1.0.0b9` — ses dépendances (`pyotp`, `cryptography`) ne font pas partie du runtime core.
+Les modules opt-in (`forge-mvc-mfa`, `-rbac`, `-workflow`, `-stats`, `-media`) nécessitent des
+dépendances supplémentaires non installées avec `forge-mvc`. Ils sont publiés sur PyPI
+depuis `1.0.0-beta.9` (forme PEP 440 : `1.0.0b9`) et restent opt-in : le core Forge ne
+dépend pas d'eux. `forge-mvc-mfa` (Alpha) tire `pyotp` et `cryptography` au moment de
+son installation, mais ces dépendances ne font pas partie du runtime core.
 
 **Développement** (`requirements-dev.txt`)
 

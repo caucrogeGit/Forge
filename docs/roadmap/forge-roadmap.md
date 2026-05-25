@@ -1322,7 +1322,7 @@ et clôture.
 |---|---|---|
 | `AUTH-SESSION-HARDENING-TESTS-ALIGN-001` | **livré** | Corriger les 4 tests rouges dans `tests/test_auth_session_hardening.py` après l'évolution du contrat session `first_name` / `last_name` (cf `CORE-SESSION-DEDOMAIN-001`). |
 | `RELEASE-VALIDATE-PEP440-SEMVERSION-001` | **livré** | Rendre `tools/release-validate.sh` compatible avec `1.0.0-beta.x` côté SemVer public et `1.0.0bx` côté PEP 440. |
-| `DOCS-OPTINS-PYPI-BETA9-SWEEP-001` | à faire | Corriger les docs indiquant encore que `forge-mvc-mfa` / `forge-mvc-media` ne sont pas publiés alors que les opt-ins beta.9 sont disponibles sur PyPI. |
+| `DOCS-OPTINS-PYPI-BETA9-SWEEP-001` | **livré** | Corriger les docs indiquant encore que `forge-mvc-mfa` / `forge-mvc-media` ne sont pas publiés alors que les opt-ins beta.9 sont disponibles sur PyPI. |
 
 ### Critiques pré-RC (4 tickets)
 

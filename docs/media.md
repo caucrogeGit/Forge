@@ -2,14 +2,24 @@
 
 [Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-!!! info "Statut : Alpha — préparé pour publication future"
-    `forge-mvc-media` n'est **pas publié sur PyPI dans la vague `{{forge_version}}`**.
-    Le module est en statut `3 - Alpha` depuis `MEDIA-PYPI-READY-002`.
-    L'installation via `pip install forge-mvc-media` reste impossible pour l'instant.
+!!! info "Statut : opt-in officiel publié sur PyPI, API encore bêta"
+    `forge-mvc-media` est publié sur PyPI depuis `1.0.0-beta.9`. L'API
+    applicative reste bêta — voir [Limites](production-limits.md) avant
+    déploiement en production.
 
-    Publication PyPI prévue dans une prochaine release (ticket dédié requis).
+    Installation :
 
-Forge sépare les primitives génériques d'upload (`core/uploads/`) des helpers applicatifs médias (`forge_mvc_media`). Le core est installé avec Forge ; les helpers applicatifs sont fournis par le module opt-in `forge-mvc-media` (non publié sur PyPI en `{{forge_version}}`, publication prévue dans une prochaine release).
+    ```bash
+    pip install --pre forge-mvc-media
+    ```
+
+    Le module reste opt-in : le core Forge ne dépend pas de
+    `forge-mvc-media`.
+
+Forge sépare les primitives génériques d'upload (`core/uploads/`) des helpers
+applicatifs médias (`forge_mvc_media`). Le core est installé avec Forge ; les
+helpers applicatifs sont fournis par le module opt-in `forge-mvc-media`,
+publié sur PyPI depuis `1.0.0-beta.9` (API encore bêta).
 
 ## Frontière core / opt-in média
 

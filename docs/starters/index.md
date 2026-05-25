@@ -22,7 +22,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
 | [4 — Suivi pédagogique](04-suivi-comportement-eleves/index.md) | Historique / legacy | Aucun profil principal | Consulter un exemple métier historique, non recommandé comme base moderne |
 | [5 — Communes & Séjours](communes-sejours/index.md) | Démonstrateur avancé principal | `standard` | Voir une application démonstratrice couvrant les briques modernes de Forge |
-| [6 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Pre-Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` |
+| [6 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 
 ## Starter d'entrée (sans base de données)
 
@@ -118,7 +118,7 @@ Ce starter démontre :
 
 [Présentation](communes-sejours/index.md) · [Reconstruction](communes-sejours/rebuild.md)
 
-## Démonstrateur MFA (Pre-Alpha)
+## Démonstrateur MFA (Alpha)
 
 ### Starter 6 — Auth MFA
 
@@ -132,9 +132,18 @@ Profil recommandé : `auth-mfa`.
 - état temporaire de challenge avec expiration 10 min ;
 - rate-limit et audit des événements MFA inclus.
 
-!!! warning "Module en Pre-Alpha"
-    Le module `forge-mvc-mfa` stocke le secret TOTP en clair. Non recommandé
-    en production sensible. Voir `packages/forge-mvc-mfa/README.md`.
+!!! info "Module Alpha — publié sur PyPI depuis 1.0.0-beta.9"
+    `forge-mvc-mfa` est un opt-in officiel publié sur PyPI au statut
+    **Alpha**. Le secret TOTP est **chiffré au repos** via Fernet
+    (`FORGE_MFA_SECRET_KEY` obligatoire au démarrage,
+    `SEC-MFA-SECRET-ENCRYPTION-001`). Installation :
+
+    ```bash
+    pip install --pre forge-mvc-mfa
+    ```
+
+    Le passage Alpha → Beta reste un ticket futur, voir
+    `packages/forge-mvc-mfa/README.md`.
 
 [Présentation](auth-mfa/index.md) · [Reconstruction](auth-mfa/rebuild.md)
 
@@ -170,7 +179,7 @@ forge starter:build 2        # Utilisateurs / Auth
 forge starter:build 3        # Carnet de contacts
 forge starter:build 4        # Suivi pédagogique
 forge starter:build 5        # Communes & Séjours
-forge starter:build 6        # Auth MFA (Pre-Alpha)
+forge starter:build 6        # Auth MFA (Alpha)
 forge starter:build 7        # Bienvenue dans Forge (sans BDD)
 ```
 
@@ -211,4 +220,4 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 | 3 — Carnet de contacts | Starter officiel relationnel |
 | 4 — Suivi pédagogique | Exemple pédagogique historique / legacy |
 | 5 — Communes & Séjours | Démonstrateur avancé principal |
-| 6 — Auth MFA | Démonstrateur MFA (Pre-Alpha) |
+| 6 — Auth MFA | Démonstrateur MFA (Alpha) |

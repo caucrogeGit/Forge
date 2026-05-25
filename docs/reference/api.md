@@ -1410,9 +1410,16 @@ Les variantes d'images (`thumbnail`, `medium`), l'intégration `FileField` / `Im
 <details markdown="1" id="forgemvcmedia">
 <summary><code>forge_mvc_media</code> - Helpers applicatifs médias (opt-in)</summary>
 
-`forge_mvc_media` est un module opt-in source-only (`forge-mvc-media`) qui fournit
-les helpers applicatifs liés à la table `media`. Il n'est pas publié sur PyPI ; il
-s'installe depuis les sources (`pip install -e ./packages/forge-mvc-media`).
+`forge_mvc_media` est un module opt-in (`forge-mvc-media`) qui fournit les
+helpers applicatifs liés à la table `media`. Il est publié sur PyPI depuis
+`1.0.0-beta.9` :
+
+```bash
+pip install --pre forge-mvc-media
+```
+
+Le module reste opt-in : le core Forge ne dépend pas de `forge-mvc-media`.
+L'API applicative reste bêta — voir [Limites](../production-limits.md).
 
 Les nouveaux fichiers générés par `forge make:crud --media` importent depuis ce module.
 
@@ -1862,7 +1869,7 @@ Résultats possibles : `OK`, `WARN`, `FAIL`, `SKIP`. Un `FAIL` retourne un code 
 
 Ce que `forge doctor` ne vérifie pas : contenu des templates, syntaxe SQL, validité des migrations appliquées, configuration Auth/User (voir `forge auth:doctor`), configuration mail (voir `forge mail:doctor`).
 
-**Diagnostic MFA (opt-in)** — `forge doctor` détecte les indices d'usage MFA dans un projet (nom de contrôleur, routes, imports). Si des indices sont trouvés mais que le module `forge_mvc_mfa` n'est pas installé, un `WARN` non bloquant est émis. MFA est une brique opt-in/source-only : `forge-mvc` (core) n'inclut ni `forge_mvc_mfa` ni `pyotp` dans ses dépendances runtime. Pour supprimer le warning, installez les dépendances du module MFA (`pip install forge-mvc-mfa`) ou retirez le flux MFA du projet.
+**Diagnostic MFA (opt-in)** — `forge doctor` détecte les indices d'usage MFA dans un projet (nom de contrôleur, routes, imports). Si des indices sont trouvés mais que le module `forge_mvc_mfa` n'est pas installé, un `WARN` non bloquant est émis. MFA est une brique opt-in officielle publiée sur PyPI depuis `1.0.0-beta.9` : `forge-mvc` (core) n'inclut ni `forge_mvc_mfa` ni `pyotp` dans ses dépendances runtime. Pour supprimer le warning, installez le module MFA (`pip install --pre forge-mvc-mfa`) ou retirez le flux MFA du projet.
 
 `forge auth:init` crée ou préserve les fichiers SQL suivants sans les appliquer :
 `users.sql`, `auth_tokens.sql`, `auth_mfa_factors.sql`,
@@ -3008,11 +3015,16 @@ Chaque module est livré comme paquet PyPI distinct sous le namespace
 
 | Module | Package PyPI | Extra pip | Documentation détaillée |
 |---|---|---|---|
-| MFA / TOTP | `forge-mvc-mfa` | `[mfa]` | [auth-mfa.md](auth-mfa.md) |
+| MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa.md](auth-mfa.md) |
 | RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../rbac.md) |
 | Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow.md](workflow.md) |
 | Statistiques | `forge-mvc-stats` | `[stats]` | [stats.md](stats.md) |
-| Médias applicatifs | `forge-mvc-media` | — | [media.md](../media.md) |
+| Médias applicatifs | `forge-mvc-media` | — (installer directement) | [media.md](../media.md) |
+
+Tous les opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`.
+`forge-mvc[mfa]` et `forge-mvc[media]` ne sont pas définis comme extras du
+core — installer les paquets directement avec `pip install --pre forge-mvc-mfa`
+ou `pip install --pre forge-mvc-media`.
 
 ### MFA — `forge-mvc-mfa`
 
@@ -3020,9 +3032,12 @@ TOTP RFC 6238, codes de récupération, challenge multi-facteur et revalidation.
 Inclut l'anti-replay TOTP.
 
 ```bash
-# Mode source-only en {{forge_version}} et non publié sur PyPI en 1.0
-# Voir docs/installation.md#contrat-dinstallation-des-opt-ins
+pip install --pre forge-mvc-mfa
 ```
+
+> Publié sur PyPI depuis `1.0.0-beta.9` au statut **Alpha**. MFA reste opt-in :
+> le core Forge ne dépend pas de `forge-mvc-mfa`.
+> Voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [auth-mfa.md](auth-mfa.md).
 
@@ -3060,9 +3075,14 @@ Référence détaillée : [stats.md](stats.md).
 
 Repository, galerie et helpers applicatifs liés à la table `media`.
 
-> Source-only, non publié sur PyPI en `{{forge_version}}`.
-> Installe depuis les sources : `pip install -e ./packages/forge-mvc-media/`
-> Les générateurs `make:crud --media` et `make:public:list` importent depuis ce module.
+```bash
+pip install --pre forge-mvc-media
+```
+
+> Publié sur PyPI depuis `1.0.0-beta.9` (API encore bêta — voir
+> [Limites](../production-limits.md)). Les générateurs `make:crud --media` et
+> `make:public:list` importent depuis ce module.
+> Voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [media.md](../media.md).
 

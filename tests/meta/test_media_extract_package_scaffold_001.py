@@ -81,17 +81,25 @@ class TestPackageClassifier:
 
 class TestReadmeContent:
 
-    def test_readme_mentions_source_only(self):
+    def test_readme_mentions_source_only_history(self):
+        # L'historique source-only reste consigné via le tableau de tickets
+        # (`MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001`, `MEDIA-PYPI-READY-001`) —
+        # garde-fou pour s'assurer que l'histoire n'est pas effacée.
         text = README.read_text(encoding="utf-8")
         assert "source-only" in text.lower() or "source only" in text.lower(), (
-            "Le README doit mentionner le statut source-only."
+            "Le README doit conserver la trace historique du statut source-only "
+            "via le tableau des tickets (MEDIA-EXTRACT-PACKAGE-SCAFFOLD-001, "
+            "MEDIA-PYPI-READY-001)."
         )
 
-    def test_readme_mentions_not_published(self):
+    def test_readme_mentions_pypi_publication(self):
+        # Depuis DOCS-OPTINS-PYPI-BETA9-SWEEP-001, le README doit refléter la
+        # publication PyPI effective en `1.0.0-beta.9`.
         text = README.read_text(encoding="utf-8")
-        assert "PyPI" in text, "Le README doit mentionner PyPI (non publié)."
-        assert "pas publié" in text.lower() or "non publié" in text.lower() or "not published" in text.lower() or "n'est pas publié" in text.lower(), (
-            "Le README doit indiquer que le package n'est pas publié sur PyPI."
+        assert "PyPI" in text, "Le README doit mentionner PyPI."
+        assert "publié sur PyPI" in text or "Publié sur PyPI" in text, (
+            "Le README doit indiquer que le package est publié sur PyPI "
+            "depuis `1.0.0-beta.9` (DOCS-OPTINS-PYPI-BETA9-SWEEP-001)."
         )
 
     def test_readme_mentions_scaffold_ticket(self):

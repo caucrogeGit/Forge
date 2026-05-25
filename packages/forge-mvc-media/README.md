@@ -2,16 +2,22 @@
 
 Module opt-in pour la gestion applicative des médias dans Forge MVC.
 
-## Statut : Alpha — préparé pour publication future
+## Statut : Alpha — opt-in officiel publié sur PyPI depuis 1.0.0-beta.9
 
 `forge-mvc-media` est en statut `3 - Alpha` depuis `MEDIA-PYPI-READY-002`.
 L'extraction depuis `core/uploads/` est complète. La documentation et les shims
 de compatibilité ont été livrés.
 
-**Non publié sur PyPI** — le module reste source-only dans la série
-`1.0.0-beta.x`. Publication prévue dans une prochaine release.
+**Publié sur PyPI** depuis `1.0.0-beta.9` (forme PEP 440 : `1.0.0b9`). L'API
+applicative reste bêta — voir `docs/production-limits.md` avant déploiement.
 
-Il s'installe depuis les sources du dépôt Forge :
+Installation :
+
+```bash
+pip install --pre forge-mvc-media
+```
+
+Pour développer le paquet en mode éditable depuis les sources du dépôt Forge :
 
 ```bash
 git clone https://github.com/caucrogeGit/Forge.git
@@ -55,7 +61,7 @@ from forge_mvc_media import attach_media_to_entity, delete_media, get_cover_medi
 
 Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus
 supportés depuis `MEDIA-SHIMS-REMOVE-001`.
-Ce package n'est pas encore publié sur PyPI — publication prévue dans une prochaine release.
+Ce package est publié sur PyPI depuis `1.0.0-beta.9` : `pip install --pre forge-mvc-media`.
 
 ## Shims de compatibilité dans core
 

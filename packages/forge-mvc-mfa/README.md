@@ -2,20 +2,27 @@
 
 Brique MFA (TOTP + codes de récupération) pour le framework Forge.
 
-## Statut : Alpha — préparé pour publication future (MFA-PYPI-READY-001)
+## Statut : Alpha — opt-in officiel publié sur PyPI depuis 1.0.0-beta.9
 
-`forge-mvc-mfa` est marqué `Development Status :: 3 - Alpha`.
+`forge-mvc-mfa` est marqué `Development Status :: 3 - Alpha` depuis
+`MFA-PYPI-READY-001`.
 
 Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, **le secret TOTP est chiffré au repos**
 via Fernet (`cryptography`). La clé est lue depuis `FORGE_MFA_SECRET_KEY` —
 obligatoire au démarrage.
 
-Le module **n'est pas encore publié sur PyPI**. Non inclus dans
-`forge-mvc[all]`. Le statut `Development Status :: 3 - Alpha` reflète son
-caractère encore expérimental ; la publication est prévue lors d'une release
-dédiée.
+Le module est **publié sur PyPI** depuis `1.0.0-beta.9` (forme PEP 440 :
+`1.0.0b9`). Il reste **hors** de `forge-mvc[all]` (statut Alpha) — installer
+le paquet directement. Le passage Alpha → Beta reste un ticket futur,
+indépendant de la publication PyPI déjà effectuée.
 
-**Mode d'installation** : depuis les sources du dépôt Forge (mode dev) :
+Installation :
+
+```bash
+pip install --pre forge-mvc-mfa
+```
+
+Pour développer le paquet en mode éditable depuis les sources du dépôt Forge :
 
 ```bash
 git clone https://github.com/caucrogeGit/Forge.git

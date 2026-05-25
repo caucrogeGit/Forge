@@ -385,7 +385,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ### Starter 6 — Auth MFA (TOTP)
 
-**Prérequis** : `forge-mvc-mfa` installé (source-only — `pip install -r requirements-dev.txt` depuis le dépôt).
+**Prérequis** : `forge-mvc-mfa` installé (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`, statut Alpha).
 
 ```bash
 cd ~/Projets

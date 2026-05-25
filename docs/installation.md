@@ -17,17 +17,19 @@ chemin le plus simple pour votre usage, puis passez au [guide de démarrage](gui
 
 ## Modèle de packages
 
-Forge {{forge_version}} distribue le **core** sur [PyPI](https://pypi.org/project/forge-mvc/) sous `forge-mvc=={{forge_version}}` (bêta publique — `--pre` requis).
-Les 4 modules opt-in restent en mode source-only via GitHub.
+Depuis `1.0.0-beta.9`, Forge distribue le **core** et **tous les opt-ins officiels**
+sur [PyPI](https://pypi.org/project/forge-mvc/) (bêta publique — `--pre` requis).
+Les opt-ins restent optionnels : le core Forge ne dépend pas d'eux.
 Voir [Politique de release](release-policy.md#publication-pypi).
 
 | Package (monorepo) | Contenu | Statut |
 |---|---|---|
-| `forge-mvc` | Noyau complet — core, CLI, intégrations | Bêta |
-| `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Alpha** — non publié PyPI en `{{forge_version}}` |
-| `forge-mvc-rbac` | Brique RBAC — contrôle d'accès par rôles | Beta |
-| `forge-mvc-workflow` | Brique workflow — statuts et transitions | Beta |
-| `forge-mvc-stats` | Brique statistiques — agrégations | Beta |
+| `forge-mvc` | Noyau complet — core, CLI, intégrations | Bêta — publié PyPI |
+| `forge-mvc-rbac` | Brique RBAC — contrôle d'accès par rôles | Bêta — publié PyPI |
+| `forge-mvc-workflow` | Brique workflow — statuts et transitions | Bêta — publié PyPI |
+| `forge-mvc-stats` | Brique statistiques — agrégations | Bêta — publié PyPI |
+| `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Alpha** — publié PyPI depuis `1.0.0-beta.9` |
+| `forge-mvc-media` | Brique media — helpers applicatifs upload | **Alpha** — publié PyPI depuis `1.0.0-beta.9` (API encore bêta, voir [Limites](production-limits.md)) |
 
 Pour installer Forge avec toutes les briques opt-in :
 
@@ -48,11 +50,23 @@ python -m pip install -r requirements-dev.txt
 
 ## Contrat d'installation des opt-ins
 
-À partir de `1.0.0-beta.5`, le core `forge-mvc` et les opt-ins publiables
-`forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont publiés sur PyPI.
+Depuis `1.0.0-beta.9`, le core `forge-mvc` et les cinq opt-ins officiels
+(`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
+`forge-mvc-media`) sont publiés sur PyPI.
 
-Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et
-`forge-mvc[all]` sont disponibles :
+Installation directe d'un opt-in (méthode recommandée — disponible pour tous) :
+
+```bash
+pip install --pre forge-mvc-rbac
+pip install --pre forge-mvc-workflow
+pip install --pre forge-mvc-stats
+pip install --pre forge-mvc-mfa
+pip install --pre forge-mvc-media
+```
+
+Le core fournit également les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`,
+`forge-mvc[stats]` et `forge-mvc[all]` (raccourcis vers les opt-ins
+correspondants) :
 
 ```bash
 pip install --pre "forge-mvc[rbac]"
@@ -61,13 +75,13 @@ pip install --pre "forge-mvc[stats]"
 pip install --pre "forge-mvc[all]"
 ```
 
-`forge-mvc[media]` et `forge-mvc[mfa]` **ne sont pas disponibles** :
+`forge-mvc[mfa]` et `forge-mvc[media]` ne sont pas définis comme extras du core —
+installer `forge-mvc-mfa` ou `forge-mvc-media` directement comme ci-dessus. MFA
+est officiellement publié au statut **Alpha** (secret TOTP chiffré au repos via
+Fernet) ; l'API de `forge-mvc-media` reste bêta — voir
+[Limites](production-limits.md).
 
-- **`forge-mvc-media`** : source-only après extraction Phase 11.
-- **`forge-mvc-mfa`** : Alpha — secret TOTP chiffré au repos (Fernet). Non publié
-  sur PyPI en `{{forge_version}}` — publication prévue lors d'une release dédiée.
-
-Pour installer les opt-ins en `{{forge_version}}`, utiliser le mode source :
+Pour installer en mode éditable depuis les sources (contribution Forge) :
 
 ```bash
 git clone --branch {{forge_tag}} https://github.com/caucrogeGit/Forge.git
@@ -78,7 +92,7 @@ python -m pip install -e .
 python -m pip install -r requirements-dev.txt
 ```
 
-`requirements-dev.txt` installe les 4 modules opt-in en mode éditable.
+`requirements-dev.txt` installe les cinq opt-ins en mode éditable.
 
 ---
 

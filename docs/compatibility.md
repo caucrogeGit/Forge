@@ -137,28 +137,33 @@ pas installées par défaut. Elles sont tirées via les extras du package
 
 ### Installation
 
-!!! info "Extras PyPI disponibles pour les opt-ins publiés"
-    Les modules opt-in ont d'abord été traités en **source-only** avant leur publication progressive sur PyPI.
+!!! info "Tous les opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`"
+    `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) ainsi que
+    `forge-mvc-mfa` (Alpha) et `forge-mvc-media` (Bêta — API encore bêta) sont
+    publiés sur PyPI et synchronisés avec le core.
 
-    `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont publiés sur PyPI et synchronisés avec le core.
-    `forge-mvc-mfa` est en statut Alpha depuis `MFA-PYPI-READY-001` — non publié en `{{forge_version}}`, publication prévue dans une prochaine release.
-    `forge-mvc-media` est en statut Alpha depuis `MEDIA-PYPI-READY-002` — non publié en `{{forge_version}}`, publication prévue dans une prochaine release.
+    Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
 
-Pour installer les opt-ins en `{{forge_version}}` :
+Pour installer les opt-ins :
 
 ```bash
-# Core + opt-ins publiés depuis PyPI
-pip install --pre forge-mvc forge-mvc-rbac forge-mvc-workflow forge-mvc-stats
+# Core + opt-ins via PyPI (méthode recommandée)
+pip install --pre forge-mvc \
+                  forge-mvc-rbac \
+                  forge-mvc-workflow \
+                  forge-mvc-stats \
+                  forge-mvc-mfa \
+                  forge-mvc-media
 
-# forge-mvc-media et forge-mvc-mfa — installer depuis les sources
+# Mode éditable depuis les sources (contribution Forge)
 git clone --branch {{forge_tag}} https://github.com/caucrogeGit/Forge.git
 cd Forge && pip install -e . && pip install -r requirements-dev.txt
 ```
 
 **Note sur MFA** : le module `forge-mvc-mfa` est en statut Alpha
-(`Development Status :: 3`) depuis `MFA-PYPI-READY-001`. Le secret TOTP est
-chiffré au repos via Fernet (`FORGE_MFA_SECRET_KEY`). Non publié sur PyPI
-en `{{forge_version}}` — publication prévue dans une prochaine release.
+(`Development Status :: 3 - Alpha`) depuis `MFA-PYPI-READY-001`. Le secret TOTP
+est chiffré au repos via Fernet (`FORGE_MFA_SECRET_KEY`). Publié sur PyPI
+depuis `1.0.0-beta.9`. Le passage Alpha → Beta reste un ticket futur.
 
 ---
 

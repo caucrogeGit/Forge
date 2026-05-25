@@ -52,12 +52,21 @@ class TestStarter6IndexContent:
             "Le titre doit identifier clairement le starter 6."
         )
 
-    def test_mentions_pre_alpha_warning(self):
-        """L'avertissement Pre-Alpha est visible."""
+    def test_mentions_alpha_status_and_pypi_publication(self):
+        """Le statut Alpha et la publication PyPI depuis `1.0.0-beta.9` sont visibles.
+
+        `forge-mvc-mfa` a été requalifié Pre-Alpha → Alpha par
+        `MFA-PYPI-READY-001`, puis publié sur PyPI en `1.0.0-beta.9`
+        (DOCS-OPTINS-PYPI-BETA9-SWEEP-001). Le starter 6 doit refléter cet état.
+        """
         text = (STARTER_6_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Pre-Alpha" in text, (
-            "Le starter 6 doit mentionner clairement que forge-mvc-mfa "
-            "est Pre-Alpha (décision T3)."
+        assert "Alpha" in text, (
+            "Le starter 6 doit mentionner le statut Alpha de `forge-mvc-mfa` "
+            "(MFA-PYPI-READY-001)."
+        )
+        assert "publié sur PyPI" in text or "Publié sur PyPI" in text, (
+            "Le starter 6 doit indiquer que `forge-mvc-mfa` est publié sur PyPI "
+            "depuis `1.0.0-beta.9` (DOCS-OPTINS-PYPI-BETA9-SWEEP-001)."
         )
 
     def test_mentions_profil_auth_mfa(self):

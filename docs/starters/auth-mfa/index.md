@@ -8,12 +8,19 @@
   <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Ajouter un challenge TOTP au flux de connexion d'un projet Forge standard : après le mot de passe, l'utilisateur doit saisir un code temporaire généré par une application d'authentification.</p>
 </div>
 
-!!! warning "Module en Pre-Alpha"
-    Ce starter repose sur `forge-mvc-mfa`, marqué **Pre-Alpha** (décision T3,
-    Scénario C). Le secret TOTP est stocké en clair dans la colonne
-    `auth_mfa_factors.totp_secret`. **Non recommandé en production sensible**
-    sans chiffrement applicatif additionnel. L'intégration dans `forge-mvc[all]`
-    est planifiée après `SEC-MFA-SECRET-ENCRYPTION-001` (série 3.1.0).
+!!! info "Module Alpha — opt-in officiel publié sur PyPI depuis 1.0.0-beta.9"
+    Ce starter repose sur `forge-mvc-mfa`, requalifié **Alpha** par
+    `MFA-PYPI-READY-001`. Le secret TOTP est désormais **chiffré au repos** via
+    Fernet (`SEC-MFA-SECRET-ENCRYPTION-001`), avec la variable
+    `FORGE_MFA_SECRET_KEY` obligatoire au démarrage. Installation :
+
+    ```bash
+    pip install --pre forge-mvc-mfa
+    ```
+
+    `forge-mvc-mfa` reste **hors** de `forge-mvc[all]` (statut Alpha). Le
+    passage Alpha → Beta reste un ticket futur, voir
+    [reference/auth-mfa.md](../../reference/auth-mfa.md#exigences-avant-production-ready).
 
 ## Profil associé
 
@@ -90,7 +97,7 @@ Voir [Reconstruction](rebuild.md) pour les étapes détaillées.
 - Ne démontre pas RBAC (voir [Communes & Séjours](../communes-sejours/index.md))
 - Ne démontre pas OIDC (retiré du core en ADR-004)
 - Ne démontre pas WebAuthn / passkeys (planifié post-3.0)
-- Le secret TOTP est stocké en clair — Pre-Alpha
+- Le secret TOTP est chiffré au repos (Fernet, `FORGE_MFA_SECRET_KEY`) — `forge-mvc-mfa` reste au statut Alpha (passage Alpha → Beta à venir)
 - Pas de SMS / email comme second facteur
 
 Pour le détail technique du flux et l'API complète :

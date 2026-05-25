@@ -1,16 +1,25 @@
 # Auth — Challenge MFA à la connexion
 
-!!! info "Module en Alpha — non publié sur PyPI en {{forge_version}}"
+!!! info "Module Alpha — opt-in officiel publié sur PyPI depuis 1.0.0-beta.9"
     `forge-mvc-mfa` est marqué `Development Status :: 3 - Alpha` depuis `MFA-PYPI-READY-001`.
 
     Le secret TOTP est **chiffré au repos** via Fernet (`cryptography`) avec la clé
     `FORGE_MFA_SECRET_KEY`. Le chiffrement est obligatoire — démarrer sans cette
     variable d'environnement lève `MfaSecretKeyMissing`.
 
-    **Non publié sur PyPI dans la vague `{{forge_version}}`.** Non inclus dans `forge-mvc[all]`.
-    Installation depuis GitHub : voir [installation-github.md](../installation-github.md).
+    Installation :
 
-    Publication PyPI prévue lors d'une release dédiée.
+    ```bash
+    pip install --pre forge-mvc-mfa
+    ```
+
+    `forge-mvc-mfa` n'est **pas inclus dans `forge-mvc[all]`** (les extras core
+    couvrent uniquement RBAC, workflow et stats — installer le paquet
+    directement). MFA reste opt-in : le core Forge ne dépend pas de
+    `forge-mvc-mfa`.
+
+    Le passage Alpha → Beta reste un ticket futur, indépendant de la
+    publication PyPI déjà effectuée en `1.0.0-beta.9`.
 
 > **Module extrait** : depuis Forge 2.5.0, le code MFA vit dans
 > `forge-mvc-mfa`. Voir `packages/forge-mvc-mfa/README.md` pour
@@ -143,7 +152,7 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (s
 
 ### Exigences avant production-ready
 
-`forge-mvc-mfa` ne sera pas déclaré Beta et publié sur PyPI tant que les exigences suivantes ne sont pas satisfaites :
+`forge-mvc-mfa` a été publié sur PyPI au statut **Alpha** en `1.0.0-beta.9`. Le passage **Alpha → Beta** reste conditionné aux exigences suivantes :
 
 1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) — Fernet + `FORGE_MFA_SECRET_KEY`.
 2. **Politique de rotation documentée** — rotation ou invalidation maîtrisée des secrets compromis.
@@ -151,7 +160,8 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (s
 4. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) — `tests/test_mfa_secret_crypto.py`.
 5. **Revue sécurité explicite** — validation que le stockage chiffré est correct.
 6. ~~**Décision explicite de changement de statut Pre-Alpha → Alpha**~~ ✓ livré (`MFA-PYPI-READY-001`).
-7. **Décision de passage Alpha → Beta** et publication PyPI — ticket futur post-b7.
+7. ~~**Publication PyPI au statut Alpha**~~ ✓ livré en `1.0.0-beta.9`.
+8. **Décision de passage Alpha → Beta** — ticket futur indépendant de la publication PyPI.
 
 ### Tickets liés
 

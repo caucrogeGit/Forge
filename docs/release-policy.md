@@ -149,8 +149,8 @@ chaque package publiable :
 | `forge-mvc-rbac` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-workflow` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-stats` | `4 - Beta` | API stable et testée, usage production externe encore limité |
-| `forge-mvc-mfa` | `3 - Alpha` | Secret TOTP chiffré au repos (Fernet, `MFA-PYPI-READY-001`) — non publié PyPI en `{{forge_version}}` |
-| `forge-mvc-media` | `3 - Alpha` | Docs complètes, shims supprimés — préparé pour publication future (`MEDIA-PYPI-READY-002`) |
+| `forge-mvc-mfa` | `3 - Alpha` | Secret TOTP chiffré au repos (Fernet, `MFA-PYPI-READY-001`) — publié sur PyPI depuis `1.0.0-beta.9`, passage Alpha → Beta à venir |
+| `forge-mvc-media` | `3 - Alpha` | API applicative encore bêta — publié sur PyPI depuis `1.0.0-beta.9` (voir `production-limits.md`) |
 
 Critères de passage Beta → Stable d'un module opt-in :
 
@@ -323,10 +323,10 @@ Vérifications post-publication :
 | `forge-mvc-rbac` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-rbac` |
 | `forge-mvc-workflow` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-workflow` |
 | `forge-mvc-stats` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-stats` |
-| `forge-mvc-media` | Non publié en `{{forge_version}}` — publication future | Alpha — préparé (`MEDIA-PYPI-READY-002`) |
-| `forge-mvc-mfa` | Non publié en `{{forge_version}}` — publication future | Alpha — préparé (`MFA-PYPI-READY-001`) |
+| `forge-mvc-mfa` | ✅ Publié sur PyPI depuis `1.0.0-beta.9` — version alignée avec le core | `pip install --pre forge-mvc-mfa` (Alpha, `MFA-PYPI-READY-001`) |
+| `forge-mvc-media` | ✅ Publié sur PyPI depuis `1.0.0-beta.9` — version alignée avec le core | `pip install --pre forge-mvc-media` (Alpha, API encore bêta, `MEDIA-PYPI-READY-002`) |
 
-Pour `forge-mvc-media` et `forge-mvc-mfa`, utiliser [Installation depuis GitHub](installation-github.md).
+Tous les opt-ins officiels sont publiables directement depuis PyPI.
 
 Procédure de publication (manuelle, délibérée) :
 
@@ -358,14 +358,13 @@ reste manuelle et délibérée.
 | `forge-mvc-rbac` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-rbac` |
 | `forge-mvc-workflow` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-workflow` |
 | `forge-mvc-stats` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-stats` |
-| `forge-mvc-mfa` | Non publié en `{{forge_version}}` — publication future | Alpha — préparé (`MFA-PYPI-READY-001`, `SEC-MFA-SECRET-ENCRYPTION-001` livré) |
-| `forge-mvc-media` | Alpha — préparé pour publication future | Docs complètes, shims supprimés, `Private :: Do Not Upload` retiré (`MEDIA-PYPI-READY-002`) |
+| `forge-mvc-mfa` | ✅ Publié sur PyPI depuis `1.0.0-beta.9` — version alignée avec le core | `pip install --pre forge-mvc-mfa` (statut Alpha, `MFA-PYPI-READY-001`, `SEC-MFA-SECRET-ENCRYPTION-001` livré) |
+| `forge-mvc-media` | ✅ Publié sur PyPI depuis `1.0.0-beta.9` — version alignée avec le core | `pip install --pre forge-mvc-media` (statut Alpha, API encore bêta — voir `production-limits.md`) |
 
 ### Règles de version
 
-- **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` est bumped à chaque release. Les opt-ins source-only conservent leur version interne.
-- Les opt-ins publiés (`rbac`, `workflow`, `stats`) doivent rester strictement synchronisés avec la version du core.
-- `forge-mvc-mfa` ne rejoint pas ce flux en `{{forge_version}}` — publication prévue lors d'une release dédiée post-{{forge_version}}.
+- **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était bumped à chaque release. Les opt-ins source-only conservaient leur version interne.
+- Depuis `1.0.0-beta.9`, **tous les opt-ins officiels** (`rbac`, `workflow`, `stats`, `mfa`, `media`) sont publiés sur PyPI et strictement synchronisés avec la version du core.
 
 ### Artefacts de build
 
@@ -393,7 +392,10 @@ Aucune automatisation ne déclenche la publication.
 ### État actuel
 
 `forge-mvc` (core) est publié sur PyPI depuis `1.0.0-beta.1`.
-Les packages opt-in (`forge-mvc-rbac`, `-workflow`, `-stats`, `-mfa`) suivent des règles de publication distinctes documentées ici.
+Depuis `1.0.0-beta.9`, **tous les opt-ins officiels** (`forge-mvc-rbac`,
+`-workflow`, `-stats`, `-mfa`, `-media`) sont publiés sur PyPI et
+synchronisés avec le core. Les règles applicables à chaque package
+restent documentées ici.
 
 Cette politique est livrée par le ticket `OPTIN-PACKAGES-PUBLICATION-POLICY-001`.
 
@@ -404,9 +406,17 @@ Il est le point d'entrée officiel du framework.
 
 ### Opt-ins publiés sur PyPI
 
-`forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont publiés sur PyPI et synchronisés avec le core.
+Depuis `1.0.0-beta.9`, les cinq opt-ins officiels sont publiés sur PyPI :
+
+- `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) — publication
+  initiale en `1.0.0-beta.5` ;
+- `forge-mvc-mfa` (Alpha) — publication en `1.0.0-beta.9` ;
+- `forge-mvc-media` (Alpha — API encore bêta) — publication en `1.0.0-beta.9`.
+
 Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et
 `forge-mvc[all]` sont disponibles via `pip install --pre forge-mvc[all]`.
+`forge-mvc[mfa]` et `forge-mvc[media]` ne sont pas déclarés comme extras :
+installer `forge-mvc-mfa` ou `forge-mvc-media` directement.
 
 ### Historique : opt-ins source-only avant publication PyPI
 
@@ -418,19 +428,21 @@ Avant leur publication PyPI, les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` 
 
 ### Opt-ins publiés et synchronisés
 
-Les trois opt-ins suivants sont publiés sur PyPI avec une version synchronisée avec le core :
+Les cinq opt-ins officiels sont publiés sur PyPI avec une version synchronisée avec le core :
 
-| Package | Publication | Prérequis |
-|---|---|---|
-| `forge-mvc-rbac` | PyPI | Version alignée avec le core |
-| `forge-mvc-workflow` | PyPI | Version alignée avec le core |
-| `forge-mvc-stats` | PyPI | Version alignée avec le core |
+| Package | Publication | Statut | Prérequis |
+|---|---|---|---|
+| `forge-mvc-rbac` | PyPI depuis `1.0.0-beta.5` | Bêta | Version alignée avec le core |
+| `forge-mvc-workflow` | PyPI depuis `1.0.0-beta.5` | Bêta | Version alignée avec le core |
+| `forge-mvc-stats` | PyPI depuis `1.0.0-beta.5` | Bêta | Version alignée avec le core |
+| `forge-mvc-mfa` | PyPI depuis `1.0.0-beta.9` | Alpha | `FORGE_MFA_SECRET_KEY` obligatoire au démarrage ; secret TOTP chiffré au repos (Fernet) |
+| `forge-mvc-media` | PyPI depuis `1.0.0-beta.9` | Alpha (API encore bêta) | Voir `production-limits.md` |
 
 La publication est strictement synchronisée : core et opt-ins portent la même version.
 
 ### Cas particulier : forge-mvc-mfa
 
-`forge-mvc-mfa` n'est **pas publié sur PyPI en `{{forge_version}}`**.
+`forge-mvc-mfa` est publié sur PyPI depuis `1.0.0-beta.9` au statut **Alpha**.
 
 État après `MFA-PYPI-READY-001` :
 
@@ -438,27 +450,28 @@ La publication est strictement synchronisée : core et opt-ins portent la même 
 - le secret TOTP est chiffré au repos via Fernet (`SEC-MFA-SECRET-ENCRYPTION-001`) ;
 - `FORGE_MFA_SECRET_KEY` obligatoire au démarrage.
 
-Le module n'est pas publié sur PyPI dans la vague `{{forge_version}}`. La publication est
-prévue lors d'une release dédiée post-{{forge_version}}. L'installation se fait depuis GitHub.
+Le passage **Alpha → Beta** reste un ticket futur, indépendant de la publication
+PyPI déjà effectuée. Voir [reference/auth-mfa.md](reference/auth-mfa.md#exigences-avant-production-ready) pour la checklist.
 
 ### Extras PyPI
 
 Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et `forge-mvc[all]` sont disponibles pour les opt-ins publiés.
 
-`forge-mvc[mfa]` n'est **pas déclaré** dans les extras PyPI en série 1.0.
-`forge-mvc[all]` n'inclut pas `forge-mvc-mfa`.
+`forge-mvc[mfa]` et `forge-mvc[media]` ne sont **pas déclarés** dans les extras PyPI.
+`forge-mvc[all]` n'inclut ni `forge-mvc-mfa` ni `forge-mvc-media` — installer
+ces deux paquets directement avec `pip install --pre forge-mvc-mfa` ou
+`pip install --pre forge-mvc-media`.
 
 ### Règles de version
 
 - **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était versionné à chaque release.
-- Core et opt-ins publiés (`rbac`, `workflow`, `stats`) sont strictement synchronisés sur la même version.
-- `forge-mvc-mfa` ne rejoint pas ce flux en série 1.0.
+- Depuis `1.0.0-beta.9`, le core et les cinq opt-ins (`rbac`, `workflow`, `stats`, `mfa`, `media`) sont strictement synchronisés sur la même version PEP 440.
 
-### Ce qui est interdit avant publication coordonnée
+### Ce qui reste interdit sans ticket de release dédié
 
-- `twine upload` pour un opt-in non publié — interdit sans ticket de release dédié ;
-- déclarer `forge-mvc[mfa]` dans les extras PyPI — non disponible en `{{forge_version}}` ;
-- inclure `forge-mvc-mfa` dans `forge-mvc[all]` — non inclus en `{{forge_version}}`.
+- `twine upload` d'un nouveau package non encore publié — interdit sans ticket de release dédié ;
+- déclarer `forge-mvc[mfa]` ou `forge-mvc[media]` dans les extras PyPI sans décision explicite (les deux paquets s'installent directement) ;
+- inclure `forge-mvc-mfa` ou `forge-mvc-media` dans `forge-mvc[all]` — exclusion volontaire (statut Alpha ou API bêta).
 
 ### Tickets liés
 
