@@ -74,6 +74,7 @@ _os.environ.setdefault("APP_ENV", _p.parse_known_args()[0].env)
 
 import logging
 import mimetypes
+import socket
 import ssl
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import importlib
@@ -300,6 +301,44 @@ def _make_ssl_context() -> ssl.SSLContext:
     return ctx
 
 
+# Délai max accordé au handshake TLS d'un client avant abandon de la connexion.
+# Protège la boucle d'accept des clients muets, lents, ou des scanners.
+TLS_HANDSHAKE_TIMEOUT = 10  # secondes
+
+
+class TLSThreadingHTTPServer(ThreadingHTTPServer):
+    """
+    Variante de ThreadingHTTPServer qui réalise le handshake TLS dans le
+    thread du client, et non dans la boucle d'accept du thread principal.
+
+    Évite qu'un client TLS lent, muet, ou parlant le mauvais protocole ne
+    fige toute la boucle d'acceptation des connexions — comportement par
+    défaut de `wrap_socket()` appliqué sur le socket d'écoute.
+    """
+    ssl_context: ssl.SSLContext | None = None
+
+    def get_request(self):
+        # accept() retourne un socket TCP brut, sans TLS.
+        # Le wrap se fera dans process_request_thread (= thread du client).
+        return self.socket.accept()
+
+    def process_request_thread(self, request, client_address):
+        # Cette méthode s'exécute dans le thread lancé par ThreadingMixIn,
+        # donc le handshake TLS ne bloque jamais la boucle d'accept.
+        if self.ssl_context is not None:
+            request.settimeout(TLS_HANDSHAKE_TIMEOUT)
+            try:
+                request = self.ssl_context.wrap_socket(request, server_side=True)
+            except (ssl.SSLError, OSError, socket.timeout) as exc:
+                logger.warning(
+                    "Handshake TLS échoué depuis %s : %s", client_address, exc
+                )
+                self.shutdown_request(request)
+                return
+            request.settimeout(None)  # comportement bloquant standard ensuite
+        super().process_request_thread(request, client_address)
+
+
 # ── Point d'entrée ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -313,9 +352,9 @@ if __name__ == "__main__":
         format = _fmt[APP_ENV],
     )
 
-    ThreadingHTTPServer.allow_reuse_address = True
+    TLSThreadingHTTPServer.allow_reuse_address = True
     try:
-        server = ThreadingHTTPServer((APP_HOST, APP_PORT), RequestHandler)
+        server = TLSThreadingHTTPServer((APP_HOST, APP_PORT), RequestHandler)
     except OSError as exc:
         if exc.errno == _errno.EADDRINUSE:
             for _line in format_port_in_use_message(APP_HOST, APP_PORT).splitlines():
@@ -326,7 +365,7 @@ if __name__ == "__main__":
     if APP_SSL_ENABLED:
         ssl_ctx = _make_ssl_context()
         ssl_ctx.load_cert_chain(certfile=SSL_CERTFILE, keyfile=SSL_KEYFILE)
-        server.socket = ssl_ctx.wrap_socket(server.socket, server_side=True)
+        server.ssl_context = ssl_ctx
 
     logger.info("Environnement : %s", APP_ENV)
     for _line in format_startup_messages(APP_HOST, APP_PORT, APP_SSL_ENABLED):
