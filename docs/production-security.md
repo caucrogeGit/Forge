@@ -484,6 +484,57 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON mon_projet_db.* TO 'app_user'@'localhost
 FLUSH PRIVILEGES;
 ```
 
+### Politique de stockage des secrets DB_ADMIN_* (ENV-PROD-DB-ADMIN-SECRETS-POLICY-001)
+
+**Règle stricte** : aucun mot de passe root/admin MariaDB réel ne doit
+être stocké dans `env/prod` (ou tout fichier commité).
+
+Le **runtime applicatif Forge** (`app.py`, WSGI, dispatcher) n'utilise
+**que** `DB_APP_*`. La preuve est dans
+[`app.py`](https://github.com/caucrogeGit/Forge/blob/main/app.py) :
+l'import depuis `config` cite `DB_APP_HOST, DB_APP_PORT, DB_NAME,
+DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE` — `DB_ADMIN_*` n'apparaît pas.
+
+| Variable | Utilisée par | Stockée où en production ? |
+|---|---|---|
+| `DB_APP_*` | Runtime applicatif Forge (chaque requête) | `env/prod` (mot de passe applicatif limité) |
+| `DB_ADMIN_*` | CLI de provisioning (`forge db:init`, `forge db:apply`) | **Fichier local non commité** `env/db-admin.local` (ignoré par `.gitignore` via `env/*.local`) ou variables d'environnement du shell de provisioning |
+
+Procédure recommandée pour la production :
+
+```bash
+# 1. env/prod (commité ou copié sur le serveur, SANS DB_ADMIN_PWD réel)
+DB_ADMIN_HOST=
+DB_ADMIN_PORT=3306
+DB_ADMIN_LOGIN=
+DB_ADMIN_PWD=
+
+DB_APP_HOST=localhost
+DB_APP_PORT=3306
+DB_APP_LOGIN=app_user
+DB_APP_PWD=<mot_de_passe_applicatif>
+
+# 2. env/db-admin.local (NON commité — pour les opérations de provisioning)
+DB_ADMIN_HOST=localhost
+DB_ADMIN_PORT=3306
+DB_ADMIN_LOGIN=root
+DB_ADMIN_PWD=<mot_de_passe_root_réel>
+
+# 3. Pour exécuter une commande de provisioning, charger en plus le local :
+export $(grep -v '^#' env/db-admin.local | xargs)
+forge db:init
+```
+
+Une fois `forge db:init` exécuté et le compte applicatif créé, les
+variables `DB_ADMIN_*` ne sont plus nécessaires côté serveur de runtime
+— elles peuvent être absentes ou vides dans `env/prod`. Voir
+[`deploy-advanced.md`](deploy-advanced.md) §138 : « Les credentials
+admin (`DB_ADMIN_*`) servent uniquement lors des migrations — les
+supprimer de `env/prod` après `db:init` si vous n'en avez plus besoin. »
+
+Cette politique est verrouillée par
+[`tests/meta/test_env_prod_db_admin_policy_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/meta/test_env_prod_db_admin_policy_001.py).
+
 ### Tests E2E MariaDB
 
 Les tests E2E MariaDB (`test_e2e_mariadb.py`) ne s'exécutent que si

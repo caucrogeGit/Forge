@@ -9,6 +9,10 @@ __pycache__/
 !.vscode/settings.json
 env/dev
 env/prod
+# Secrets de provisioning DB (ENV-PROD-DB-ADMIN-SECRETS-POLICY-001).
+# Fichiers locaux non commités pour DB_ADMIN_* en production —
+# voir docs/production-security.md.
+env/*.local
 mvc/models/sql/dev/
 mvc/models/sql/prod/
 .test
