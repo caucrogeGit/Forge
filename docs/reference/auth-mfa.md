@@ -114,9 +114,45 @@ revue sécurité) ne sont pas encore satisfaites.
 
 - restreindre les droits d'accès à la table `auth_mfa_factors` au strict minimum applicatif ;
 - stocker `FORGE_MFA_SECRET_KEY` dans un gestionnaire de secrets (Vault, AWS Secrets Manager…) ;
+- appeler `validate_mfa_secret_key_config()` au démarrage applicatif (cf.
+  [Validation au démarrage](#validation-au-demarrage) ci-dessous) ;
 - chiffrement du disque de la base de données ;
 - ne pas exporter `auth_mfa_factors` dans des dumps non chiffrés ;
 - documenter la procédure de rotation et de sauvegarde/restauration de la clé.
+
+### Validation au démarrage
+
+`MFA-SECRET-KEY-BOOT-VALIDATION-001` ajoute la fonction
+`validate_mfa_secret_key_config()` qui échoue **tôt** sur une configuration
+dangereuse, plutôt qu'au moment où un utilisateur tente de s'enrôler ou
+de se connecter avec MFA.
+
+```python
+from forge_mvc_mfa import validate_mfa_secret_key_config
+
+# Au démarrage applicatif (app.py, wsgi.py, ou tout bootstrap équivalent).
+validate_mfa_secret_key_config()
+```
+
+Refusé explicitement :
+
+- `FORGE_MFA_SECRET_KEY` absente, vide, ou n'ayant que des espaces ;
+- valeurs placeholder évidentes : `change-me`, `changeme`, `default`,
+  `secret`, `dev`, `development`, `test`, `testing`, `placeholder`,
+  `xxx`, `your-key-here`… (insensible à la casse, strippée) ;
+- clé non Fernet (mauvaise longueur ou base64 invalide).
+
+Exceptions levées : `MfaSecretKeyMissing`, `MfaSecretKeyPlaceholder`,
+`MfaSecretInvalidKey`. **Aucun message ne contient la valeur de la clé
+tentée** — pour éviter de fuir un secret dans un log applicatif. Le
+message inclut toujours la commande de génération d'une clé valide :
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+MFA reste opt-in : Forge ne force pas cette validation au niveau du
+core. C'est l'application qui décide de l'appeler.
 
 ### Secrets TOTP
 

@@ -6,9 +6,11 @@ Voir packages/forge-mvc-mfa/README.md pour la documentation.
 from forge_mvc_mfa.secret_crypto import (
     MfaSecretInvalidKey,
     MfaSecretKeyMissing,
+    MfaSecretKeyPlaceholder,
     MfaSecretNotEncrypted,
     decrypt_totp_secret,
     encrypt_totp_secret,
+    validate_mfa_secret_key_config,
 )
 from forge_mvc_mfa.mfa import (
     MFA_CHALLENGE_STARTED_AT_KEY,
@@ -132,8 +134,10 @@ __all__ = [
     # secret_crypto
     "encrypt_totp_secret",
     "decrypt_totp_secret",
+    "validate_mfa_secret_key_config",
     "MfaSecretKeyMissing",
     "MfaSecretInvalidKey",
+    "MfaSecretKeyPlaceholder",
     "MfaSecretNotEncrypted",
     # totp_replay
     "is_replay",
