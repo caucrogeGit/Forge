@@ -1368,7 +1368,7 @@ pendant la stabilisation. Les tickets sont regroupés par rôle :
 
 | Ticket | Statut | Rôle |
 |---|---|---|
-| `B10-CLOSING-AUDIT-001` | à faire | Relancer l'audit complet après livraison des corrections B10. |
+| `B10-CLOSING-AUDIT-001` | **livré** | Audit final B10 réalisé (`docs/history/audits/audit-pre-release-beta10.md`) ; décision **GO** pour `RELEASE-BETA10-001`. |
 | `RELEASE-BETA10-001` | à faire | Préparer une release corrective `1.0.0-beta.10` si tous les contrôles sont verts. |
 
 ### Ordre de traitement
