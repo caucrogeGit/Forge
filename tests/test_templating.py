@@ -182,8 +182,18 @@ class TestVuesReelles:
 
     @pytest.fixture(autouse=True)
     def _setup(self):
+        # Sauvegarde l'état Forge global avant modification, puis restaure au
+        # teardown : sans cette restauration, les tests suivants exécutés
+        # dans la même session pytest verraient `views_dir` pointer sur les
+        # vues du dépôt et non sur leur propre `tmp_path`
+        # (TESTS-AUTOUSE-FIXTURES-AUDIT-001).
+        prev_views = forge._cfg.get("views_dir")
+        prev_renderer = template_manager._renderer
         forge._cfg["views_dir"] = _VIEWS
         template_manager.register(Jinja2Renderer(_VIEWS))
+        yield
+        forge._cfg["views_dir"] = prev_views
+        template_manager._renderer = prev_renderer
 
     # -- Pages d'erreur ------------------------------------------------------
 
