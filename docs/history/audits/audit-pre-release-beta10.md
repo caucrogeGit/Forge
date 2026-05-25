@@ -92,8 +92,8 @@ Aucun compteur fragile (`(N tickets)`, `Total Phase B10 : N`, `15 tickets ci-des
 
 ## Identité publique
 
-* `Roger Cauchon` → **0 occurrence** dans le dépôt suivi (hors le test méta lui-même qui exclut son propre fichier)
-* `caucroge@gmail.com` → **0 occurrence** idem
+* ancien nom propriétaire (chaîne `Roger·Cauchon` sans le séparateur) → **0 occurrence** dans le dépôt suivi (hors le test méta lui-même qui exclut son propre fichier)
+* ancien email (chaîne `caucroge·@gmail.com` sans le séparateur) → **0 occurrence** idem
 * `Roger Lequette` → présent dans README, LICENSE, mkdocs.yml, pyproject.toml × 6, landing canonique, docs publiques
 * `forgemvc@gmail.com` → présent dans landing (section #contact + footer mailto), SECURITY.md, CONTRIBUTING.md, packages READMEs
 

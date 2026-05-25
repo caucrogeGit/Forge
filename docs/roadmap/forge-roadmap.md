@@ -7,17 +7,17 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> La version publique actuelle est **Forge 1.0.0-beta.9**.
+> La version publique actuelle est **Forge 1.0.0-beta.10**.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.9
+## État actuel — Forge 1.0.0-beta.10
 
-**Tag courant : `v1.0.0-beta.9` (2026-05-24)**
+**Tag courant : `v1.0.0-beta.10` (2026-05-25)**
 
-Précédent : v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.9 publiée (core + 5 opt-ins). Phase B9 close : sécurité (cryptography, compare_digest, X-Real-IP), WSGI production encadrée, sessions renforcées, opt-in media en CI, dédomainisation core, landing rafraîchie, sweep documentaire. Bloc B9-C : 12 tickets CLI déjà clos.**
+**Statut : v1.0.0-beta.10 publiée (core + 5 opt-ins). Phase B10 close : 20 tickets livrés couvrant stabilisation post-beta.9, WSGI headers partagés, MFA secret key boot validation, défense symlinks, app.py prod guard, audits dépendances bloquants en release, identité publique alignée (Roger Lequette / forgemvc@gmail.com), politique DB_ADMIN_* clarifiée, validation release indépendante du PATH, convention de tag SemVer publique verrouillée. Audit pré-release `B10-CLOSING-AUDIT-001` validé GO.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -1369,7 +1369,7 @@ pendant la stabilisation. Les tickets sont regroupés par rôle :
 | Ticket | Statut | Rôle |
 |---|---|---|
 | `B10-CLOSING-AUDIT-001` | **livré** | Audit final B10 réalisé (`docs/history/audits/audit-pre-release-beta10.md`) ; décision **GO** pour `RELEASE-BETA10-001`. |
-| `RELEASE-BETA10-001` | à faire | Préparer une release corrective `1.0.0-beta.10` si tous les contrôles sont verts. |
+| `RELEASE-BETA10-001` | **livré** | Release corrective `1.0.0-beta.10` préparée (2026-05-25) — bump versions (core + 4 opt-ins), CHANGELOG, build/twine/install isolé OK ; tag `v1.0.0-beta.10` créé. Push et publication PyPI conditionnés à validation explicite. |
 
 ### Ordre de traitement
 

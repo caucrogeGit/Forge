@@ -1,6 +1,42 @@
 # Changelog
 
 
+## [1.0.0-beta.10] — 2026-05-25
+
+### Stabilisation B10
+
+- Alignement des tests de durcissement session avec le contrat courant `first_name` / `last_name` + alias legacy `prenom` / `nom`.
+- Validation release robuste SemVer ↔ PEP 440 (`tools/release-validate.sh` : mode `--convert`, validation explicite des deux formes en entrée).
+- Validation release indépendante du `PATH` : interpréteur Python explicite via `PYTHON_BIN="${PYTHON:-python3}"`, modules invoqués par `python -m <module>`.
+- Statut PyPI des opt-ins officiel aligné dans la documentation (5 opt-ins publiés depuis beta.9).
+- Headers de sécurité appliqués aussi au chemin WSGI (helper partagé `core/security/headers.py`, HSTS conditionné à `wsgi.url_scheme == "https"`).
+- Tests opt-in protégés par `pytest.importorskip(...)` pour les environnements core-only.
+- Workflow GitHub Pages passé en `mkdocs build --strict`.
+- Audits dépendances (`pip-audit`, `npm audit`) bloquants en validation release ; workflow informatif distinct conservé.
+- Défense symlinks uploads/statics verrouillée par tests (`realpath` + `commonpath` + 3 garde-fous source-level sur `app.py`).
+- Validation explicite de `FORGE_MFA_SECRET_KEY` au boot côté opt-in MFA (refus des placeholders : `change-me`, `default`, `dev`, etc.).
+- Garde `python app.py` contre exposition publique en production (`APP_ENV=prod` + `APP_HOST` ∈ `{0.0.0.0, ::, [::]}` → refus de démarrer).
+- Référence CLI restructurée avec parcours rapides + index alphabétique de 63 commandes.
+- Imports documentaires validés par tests méta AST (378 tests, 0 import framework invalide).
+- Audit fixtures `autouse=True` et correction d'isolation `tests/test_templating.py::_setup`.
+- Landing : section contact statique `mailto:forgemvc@gmail.com` (pas de route `/contact`, pas de `ContactController`) ; identité publique alignée sur Roger Lequette / forgemvc@gmail.com.
+- Politique `docs/` source canonique vs `site/` artefact MkDocs documentée + verrouillée par tests méta.
+- Politique `DB_ADMIN_*` réservée au provisioning CLI documentée ; runtime applicatif sur `DB_APP_*` uniquement ; protection `env/*.local` dans `.gitignore`.
+- Roadmap B10 consolidée en 5 sections (Bloquants / Critiques / Durcissement / Cohérence release / Clôture), compteurs fragiles retirés, audit pré-release validé `GO`.
+- Convention de tag Git alignée : SemVer publique (`v1.0.0-beta.10`), jamais PEP 440 (`v1.0.0b10`).
+
+### Sécurité
+
+- 0 vulnérabilité détectée par `pip-audit` (runtime + dev) et `npm audit --omit=dev`.
+- Renforcement WSGI (headers partagés app.py/WSGI), MFA (validation clé Fernet au boot), uploads/statics (défense symlinks vérifiée), `app.py` prod guard, release validation (Python explicite, audits bloquants).
+
+### Notes
+
+- Forge core reste autonome.
+- Les opt-ins (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`, `forge-mvc-media`) restent optionnels et publiés séparément sur PyPI.
+- La production publique reste recommandée via WSGI + Gunicorn + reverse proxy. `python app.py` reste un serveur de développement.
+
+
 ## [1.0.0-beta.9] — 2026-05-24
 
 ### Added / Changed
