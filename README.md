@@ -12,7 +12,7 @@
 Framework web MVC pur Python, HTTPS natif, Jinja2 intégré.  
 Forge conserve un runtime Python volontairement limité, avec des dépendances explicites et justifiées : MariaDB, python-dotenv, Jinja2, Pillow, et Argon2.
 
-> Copyright (c) 2026 Roger Cauchon — voir [LICENSE](LICENSE)
+> Copyright (c) 2026 Roger Lequette — voir [LICENSE](LICENSE)
 
 ---
 
@@ -901,7 +901,7 @@ Ne modifiez pas `docs/index.html` à la main.
 Forge est distribué sous licence propriétaire / source disponible.
 
 L'usage professionnel, commercial ou institutionnel n'est pas autorisé sans
-accord écrit préalable de Roger Cauchon.
+accord écrit préalable de Roger Lequette.
 
 Les usages autorisés sans accord écrit sont limités à la lecture, l'étude,
 l'évaluation personnelle et l'usage éducatif non commercial.

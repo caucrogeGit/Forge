@@ -50,4 +50,4 @@ Le texte complet de la licence se trouve dans le fichier `LICENSE`
 ## Contact
 
 Pour toute demande d'autorisation d'usage professionnel ou commercial, contacter
-Roger Cauchon directement.
+Roger Lequette directement.

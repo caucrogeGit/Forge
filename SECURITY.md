@@ -21,7 +21,7 @@ Merci de **ne pas publier** les détails d'une vulnérabilité dans les issues G
 2. Décrire le problème, les étapes de reproduction et l'impact estimé.
 3. Laisser le champ exploit vide ou en accès restreint.
 
-Si les advisories privés ne sont pas disponibles sur ce dépôt, envoyer un email à **caucroge@gmail.com** avec le sujet `[SECURITY] Forge — <titre court>`.
+Si les advisories privés ne sont pas disponibles sur ce dépôt, envoyer un email à **forgemvc@gmail.com** avec le sujet `[SECURITY] Forge — <titre court>`.
 
 Une confirmation de réception sera envoyée sous **5 jours ouvrés**.
 Un correctif sera préparé, validé et publié dans les meilleurs délais avant divulgation publique.

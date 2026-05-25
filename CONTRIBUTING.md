@@ -24,7 +24,7 @@ principe de la charte ou faire l'objet d'une nouvelle ADR.
 
 En soumettant une contribution (Pull Request, patch, suggestion de code), vous
 acceptez de céder l'intégralité des droits de propriété intellectuelle sur
-cette contribution à Roger Cauchon, sans restriction et sans compensation.
+cette contribution à Roger Lequette, sans restriction et sans compensation.
 
 Votre contribution sera intégrée sous la même licence propriétaire que le
 reste du projet (voir [LICENSE](LICENSE)).
@@ -204,4 +204,4 @@ d'abord.
 
 ## Contact
 
-Pour toute question avant de contribuer : caucroge@gmail.com
+Pour toute question avant de contribuer : forgemvc@gmail.com

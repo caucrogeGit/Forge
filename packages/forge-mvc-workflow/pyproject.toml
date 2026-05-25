@@ -9,7 +9,7 @@ description = "Forge workflow — statuts et transitions applicatives."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
 authors = [
-    { name = "Roger Cauchon" },
+    { name = "Roger Lequette" },
 ]
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "workflow", "statuts"]

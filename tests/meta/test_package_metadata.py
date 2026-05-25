@@ -20,7 +20,7 @@ def test_package_json_author_is_current():
     package_json = Path("package.json")
     data = json.loads(package_json.read_text(encoding="utf-8"))
 
-    assert data["author"] == "Roger Cauchon"
+    assert data["author"] == "Roger Lequette"
 
 
 def test_pyproject_version_is_current():

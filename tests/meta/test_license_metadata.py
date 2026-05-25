@@ -72,7 +72,7 @@ def test_license_mentions_written_authorization():
 
 def test_license_mentions_copyright():
     text = _LICENSE.read_text(encoding="utf-8")
-    assert "Roger Cauchon" in text
+    assert "Roger Lequette" in text
 
 
 def test_license_does_not_say_mit():

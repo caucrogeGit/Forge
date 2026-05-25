@@ -38,7 +38,7 @@ périmètre. La suite post-2.0 est proposée via `POST-2.0-ROADMAP-001`.
 
 ```
 tag v2.0.0
-Tagger: Roger Lequette <caucroge@gmail.com>
+Tagger: Roger Lequette <forgemvc@gmail.com>
 Date:   Sat May 9 01:51:46 2026 +0200
 
 Release Forge 2.0.0

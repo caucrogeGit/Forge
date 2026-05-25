@@ -550,7 +550,7 @@ git commit -m "feat: ajouter le guide de création de modules Forge"
 |---|---|
 | Pas de CI automatique publique | Les validations sont manuelles en local |
 | Tests MariaDB non automatisés en CI | `FORGE_E2E_MARIADB=1` requis, base séparée nécessaire |
-| Pas de contribution externe formalisée | Forge est maintenu par Roger Cauchon — toute contribution suit la cession de droits documentée dans `CONTRIBUTING.md` |
+| Pas de contribution externe formalisée | Forge est maintenu par Roger Lequette — toute contribution suit la cession de droits documentée dans `CONTRIBUTING.md` |
 | Pas de bot de review automatique | La review est humaine |
 | Pas de guide de contribution graphique | Forge Design est un projet séparé |
 

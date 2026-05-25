@@ -40,6 +40,9 @@
     <a href="https://github.com/caucrogeGit/Forge"
        target="_blank" rel="noopener noreferrer"
        class="text-sm font-medium text-white/60 hover:text-white transition-colors">GitHub</a>
+
+    <a href="#contact"
+       class="text-sm font-medium text-white/60 hover:text-white transition-colors">Contact</a>
   </div>
 
   <!-- Barre de recherche documentation -->
@@ -956,6 +959,87 @@ router = Router()
   </div>
 </section>
 
+<!--
+  LANDING-CONTACT-NAV-FORM-001 — Décision définitive.
+
+  Le formulaire de contact de la landing Forge reste VOLONTAIREMENT
+  statique. Il utilise `mailto:forgemvc@gmail.com` exclusivement et
+  ouvre le client mail de l'utilisateur.
+
+  Forge NE DOIT PAS :
+    - créer de route `/contact` ;
+    - créer de `ContactController` ;
+    - traiter un POST côté serveur ;
+    - stocker un message ;
+    - envoyer du SMTP depuis la landing ;
+    - dépendre d'un service tiers de formulaire.
+
+  Raison : Forge est un framework générique. Le site officiel peut
+  proposer un moyen de contact, mais il ne doit pas polluer le framework
+  avec une route ou une logique applicative qui ne concerne pas les
+  projets futurs des développeurs Forge. Contact = site officiel,
+  pas fonctionnalité imposée au framework.
+
+  Ce contrat est verrouillé par
+  `tests/meta/test_public_contact_identity_001.py`.
+-->
+<section id="contact" class="py-24 px-6 bg-white">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-3xl font-bold mb-6 text-center">Contact</h2>
+    <p class="text-center text-slate-600 mb-2">
+      Ce contact concerne le projet Forge — questions, retours d'usage,
+      remontées de bugs, demandes de licence.
+    </p>
+    <p class="text-center text-slate-500 text-sm mb-10">
+      Roger Lequette · <a href="mailto:forgemvc@gmail.com" class="landing-accent-text font-semibold">forgemvc@gmail.com</a>
+    </p>
+
+    <form action="mailto:forgemvc@gmail.com" method="post" enctype="text/plain"
+          class="space-y-5 bg-slate-50 border border-slate-200 rounded-2xl p-8">
+      <p class="text-xs text-slate-500 leading-relaxed">
+        <strong>Le bouton Envoyer ouvre un email vers
+        <code>forgemvc@gmail.com</code> dans votre client mail local.
+        Il ne déclenche aucun traitement serveur Forge.</strong><br>
+        Aucune route <code>/contact</code>, aucun
+        <code>ContactController</code>, aucune base SMTP — la landing reste
+        volontairement statique pour ne pas imposer de logique applicative
+        au framework. Contact = site officiel, pas fonctionnalité du core.
+      </p>
+
+      <div>
+        <label for="contact-nom" class="block text-sm font-medium text-slate-700 mb-1">Nom</label>
+        <input id="contact-nom" name="nom" type="text" required
+               class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/40">
+      </div>
+
+      <div>
+        <label for="contact-email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+        <input id="contact-email" name="email" type="email" required
+               class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/40">
+      </div>
+
+      <div>
+        <label for="contact-sujet" class="block text-sm font-medium text-slate-700 mb-1">Sujet</label>
+        <input id="contact-sujet" name="sujet" type="text" required
+               class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/40">
+      </div>
+
+      <div>
+        <label for="contact-message" class="block text-sm font-medium text-slate-700 mb-1">Message</label>
+        <textarea id="contact-message" name="message" rows="6" required
+                  class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/40"></textarea>
+      </div>
+
+      <div class="flex justify-end">
+        <button type="submit"
+                class="landing-accent-bg text-white font-semibold px-6 py-2.5 rounded-md hover:opacity-90 transition-opacity">
+          Envoyer
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
 <!-- Footer -->
 <footer class="landing-panel py-10 px-8 border-t border-white/10">
   <div class="max-w-5xl mx-auto flex flex-col items-center gap-5">
@@ -977,7 +1061,7 @@ router = Router()
          class="text-white/40 hover:text-white transition-colors">Charte</a>
     </div>
     <p class="text-xs text-white/30 text-center">
-      © 2026 Roger Cauchon — Tous droits réservés
+      © 2026 Roger Lequette — Tous droits réservés
     </p>
   </div>
 </footer>
