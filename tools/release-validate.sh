@@ -197,7 +197,53 @@ else
     echo "$MKDOCS_OUT" | grep -v "Material for MkDocs" | head -10 | sed 's/^/         /'
 fi
 
-# ── 8. État git propre ────────────────────────────────────────────────────────
+# ── 8. Audit dépendances Python (pip-audit) — bloquant release ───────────────
+# DEPENDENCY-AUDIT-RELEASE-GUARD-001 : `.github/workflows/dependency-audit.yml`
+# reste informatif (continue-on-error: true) pour la surveillance hebdo ; ici
+# en validation release, toute CVE ouverte sur les requirements bloque.
+echo ""
+echo "--- Audit dépendances Python (pip-audit) ---"
+if ! command -v pip-audit >/dev/null 2>&1; then
+    _fail "pip-audit non installé — requis pour la validation release."
+    echo "         Installer : python -m pip install 'pip-audit>=2.0'"
+else
+    PIP_AUDIT_RT_OUT=$(pip-audit -r requirements.txt 2>&1); PIP_AUDIT_RT_EXIT=$?; true
+    if [ $PIP_AUDIT_RT_EXIT -eq 0 ]; then
+        _ok "pip-audit (requirements.txt) : aucune vulnérabilité"
+    else
+        _fail "pip-audit (requirements.txt) : vulnérabilités détectées"
+        echo "$PIP_AUDIT_RT_OUT" | head -20 | sed 's/^/         /'
+    fi
+    PIP_AUDIT_DEV_OUT=$(pip-audit -r requirements-dev.txt 2>&1); PIP_AUDIT_DEV_EXIT=$?; true
+    if [ $PIP_AUDIT_DEV_EXIT -eq 0 ]; then
+        _ok "pip-audit (requirements-dev.txt) : aucune vulnérabilité"
+    else
+        _fail "pip-audit (requirements-dev.txt) : vulnérabilités détectées"
+        echo "$PIP_AUDIT_DEV_OUT" | head -20 | sed 's/^/         /'
+    fi
+fi
+
+# ── 9. Audit dépendances Node (npm audit) — bloquant release ─────────────────
+# `--omit=dev` : ne contrôle que les dépendances de production déclarées dans
+# `package.json` (devDependencies non vérifiées ici).
+echo ""
+echo "--- Audit dépendances Node (npm audit --omit=dev) ---"
+if [ ! -f package.json ]; then
+    _ok "npm audit : aucun package.json — étape sans objet."
+elif ! command -v npm >/dev/null 2>&1; then
+    _fail "npm non installé — requis pour la validation release Node."
+    echo "         Installer Node.js / npm puis relancer."
+else
+    NPM_AUDIT_OUT=$(npm audit --omit=dev 2>&1); NPM_AUDIT_EXIT=$?; true
+    if [ $NPM_AUDIT_EXIT -eq 0 ]; then
+        _ok "npm audit (--omit=dev) : aucune vulnérabilité"
+    else
+        _fail "npm audit (--omit=dev) : vulnérabilités détectées"
+        echo "$NPM_AUDIT_OUT" | head -20 | sed 's/^/         /'
+    fi
+fi
+
+# ── 10. État git propre ──────────────────────────────────────────────────────
 DIRTY=$(git status --porcelain 2>/dev/null | grep -v "^??" || true)
 if [ -z "$DIRTY" ]; then
     _ok "Git : répertoire de travail propre"
@@ -206,7 +252,7 @@ else
     echo "$DIRTY" | head -10 | sed 's/^/         /'
 fi
 
-# ── 9. Whitespace ─────────────────────────────────────────────────────────────
+# ── 11. Whitespace ───────────────────────────────────────────────────────────
 WS=$(git diff --check HEAD 2>/dev/null || true)
 if [ -z "$WS" ]; then
     _ok "git diff --check : aucun problème de whitespace"
@@ -214,7 +260,7 @@ else
     _warn "Whitespace : $WS"
 fi
 
-# ── 10. Tag absent (pré-release) — format SemVer public ─────────────────────
+# ── 12. Tag absent (pré-release) — format SemVer public ─────────────────────
 if [ -n "$PUBLIC_VERSION" ]; then
     if git tag --list "v$PUBLIC_VERSION" | grep -q "v$PUBLIC_VERSION"; then
         _warn "Tag v$PUBLIC_VERSION existe déjà (re-release ?)"

@@ -219,13 +219,40 @@ python -m compileall -q .
 ruff check .
 mkdocs build --strict
 git diff --check
+pip-audit -r requirements.txt
+pip-audit -r requirements-dev.txt
+npm audit --omit=dev
 ```
 
 Aucune dérogation n'est tolérée. Si une validation échoue, le ticket doit
 être corrigé avant le tag.
 
+L'ensemble est aussi vérifié automatiquement par
+[`tools/release-validate.sh`](https://github.com/caucrogeGit/Forge/blob/main/tools/release-validate.sh) (sections 1 à 12).
+
 Voir aussi [Procédure de release](release.md) pour la checklist complète
-incluant l'audit des dépendances et la construction de la wheel.
+incluant la construction de la wheel.
+
+### Audits dépendances
+
+Les audits de dépendances peuvent exister en surveillance continue, mais
+une release Forge ne doit être validée que si les audits Python et Node
+passent en mode **bloquant**. Deux contextes coexistent :
+
+| Contexte | Outil | Mode | Effet d'une CVE |
+|---|---|---|---|
+| Surveillance hebdomadaire | [`.github/workflows/dependency-audit.yml`](https://github.com/caucrogeGit/Forge/blob/main/.github/workflows/dependency-audit.yml) | **Informatif** (`continue-on-error: true`) | Rapport visible dans l'historique Actions, aucun blocage |
+| Validation release | [`tools/release-validate.sh`](https://github.com/caucrogeGit/Forge/blob/main/tools/release-validate.sh) — sections 8 (`pip-audit`) et 9 (`npm audit --omit=dev`) | **Bloquant** | Échec immédiat, release impossible |
+
+Cette séparation évite de bloquer le développement quotidien sur une
+CVE transitoire (typiquement le délai entre la publication d'un avis et
+la disponibilité d'un patch upstream), tout en garantissant qu'aucune
+release Forge ne sort avec un audit dépendances rouge.
+
+Aucun masquage par `|| true` ou `continue-on-error: true` n'est toléré
+dans le chemin de validation release. Si une CVE bloque, le ticket de
+correction dépendance doit être ouvert et résolu avant la release —
+pas contourné.
 
 ---
 

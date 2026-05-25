@@ -1,5 +1,19 @@
 name: Dependency Audit
 
+# Rôle — DEPENDENCY-AUDIT-RELEASE-GUARD-001 :
+# Workflow d'observation HEBDOMADAIRE — NON BLOQUANT par conception.
+# `continue-on-error: true` sur les steps pip-audit permet de continuer à
+# voir tous les rapports même quand une CVE transitoire apparaît sur une
+# dépendance non encore corrigée upstream.
+#
+# Le GARDE RELEASE est posé séparément dans `tools/release-validate.sh`
+# (sections « Audit dépendances Python » et « Audit dépendances Node »),
+# où les mêmes commandes `pip-audit` sont BLOQUANTES — aucune publication
+# ne peut être validée tant que les audits ne sont pas verts.
+#
+# Voir `docs/release-policy.md#audits-dependances` pour la politique
+# complète.
+
 on:
   schedule:
     - cron: "0 6 * * 1"
@@ -21,10 +35,10 @@ jobs:
       - name: Install pip-audit
         run: python -m pip install pip-audit>=2.0
 
-      - name: Audit runtime dependencies
+      - name: Audit runtime dependencies (informatif — non bloquant)
         continue-on-error: true
         run: pip-audit -r requirements.txt
 
-      - name: Audit dev dependencies
+      - name: Audit dev dependencies (informatif — non bloquant)
         continue-on-error: true
         run: pip-audit -r requirements-dev.txt
