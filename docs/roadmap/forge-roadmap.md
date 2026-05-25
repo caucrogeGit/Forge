@@ -1304,19 +1304,28 @@ plus de tickets `CLI-HELP-FLAGS-*` prévus.
 
 ---
 
-## Phase B10 — Stabilisation post-beta.9 / pré-RC
+## Phase B10 — Stabilisation post-beta.9 / pré-release beta.10
 
 **Objectif** : phase corrective post-publication `1.0.0-beta.9`. Remettre la
-base en état strictement vert (4 tests rouges, validateur PEP 440 / SemVer,
+base en état strictement vert (tests rouges, validateur PEP 440 / SemVer,
 documentation opt-ins PyPI) puis durcir les derniers points sensibles (headers
-WSGI, isolation tests opt-in, défense uploads, validation MFA au boot) avant
-d'envisager une release candidate.
+WSGI, isolation tests opt-in, défense uploads, validation MFA au boot, garde
+prod sur `app.py`, identité publique alignée) avant la release corrective
+`1.0.0-beta.10`.
 
-L'audit post-publication beta.9 a identifié 16 tickets répartis en
-4 catégories : bloquants immédiats, critiques pré-RC, durcissement,
-et clôture.
+La phase B10 consolide les corrections issues de l'audit post-beta.9, puis
+ajoute plusieurs tickets de durcissement et de cohérence release apparus
+pendant la stabilisation. Les tickets sont regroupés par rôle :
 
-### Bloquants immédiats (3 tickets)
+* **Bloquants immédiats** — fait passer la suite de tests au vert
+* **Critiques pré-RC** — durcissements indispensables avant toute release
+* **Durcissement et garde-fous** — qualité, défenses en profondeur,
+  cohérence documentaire et tests méta
+* **Cohérence release** — robustesse de l'outillage de validation et de la
+  roadmap elle-même
+* **Clôture** — audit final + tag `beta.10`
+
+### Bloquants immédiats
 
 | Ticket | Statut | Rôle |
 |---|---|---|
@@ -1324,7 +1333,7 @@ et clôture.
 | `RELEASE-VALIDATE-PEP440-SEMVERSION-001` | **livré** | Rendre `tools/release-validate.sh` compatible avec `1.0.0-beta.x` côté SemVer public et `1.0.0bx` côté PEP 440. |
 | `DOCS-OPTINS-PYPI-BETA9-SWEEP-001` | **livré** | Corriger les docs indiquant encore que `forge-mvc-mfa` / `forge-mvc-media` ne sont pas publiés alors que les opt-ins beta.9 sont disponibles sur PyPI. |
 
-### Critiques pré-RC (4 tickets)
+### Critiques pré-RC
 
 | Ticket | Statut | Rôle |
 |---|---|---|
@@ -1333,7 +1342,7 @@ et clôture.
 | `CI-PAGES-MKDOCS-STRICT-001` | **livré** | Passer le workflow GitHub Pages en `mkdocs build --strict`. |
 | `DEPENDENCY-AUDIT-RELEASE-GUARD-001` | **livré** | Décider si l'audit de dépendances (CVE) doit devenir bloquant pour les releases. |
 
-### Durcissement (7 tickets)
+### Durcissement et garde-fous
 
 | Ticket | Statut | Rôle |
 |---|---|---|
@@ -1346,41 +1355,36 @@ et clôture.
 | `TESTS-AUTOUSE-FIXTURES-AUDIT-001` | **livré** | Auditer les fixtures `autouse` hors `conftest.py` pour limiter les contaminations d'état global (cas révélé par `test_configurable_session_store_001` lors de B9). |
 | `LANDING-CONTACT-NAV-FORM-001` | **livré** | Ajouter Contact à la navigation landing, créer une section formulaire vers `forgemvc@gmail.com`, et aligner l'identité publique Forge sur Roger Lequette. |
 | `ENV-PROD-DB-ADMIN-SECRETS-POLICY-001` | **livré** | Clarifier que les secrets MariaDB admin/root ne doivent pas être stockés dans l'environnement runtime de production ; réserver `DB_ADMIN_*` au provisioning CLI ou à un fichier local non commité. |
-| `RELEASE-VALIDATE-PATH-ROBUSTNESS-001` | **livré** | Rendre `tools/release-validate.sh` plus robuste en utilisant un interpréteur Python explicite (`PYTHON_BIN`) au lieu d'un `PATH` implicite. |
 
-### Clôture (2 tickets)
+### Cohérence release
+
+| Ticket | Statut | Rôle |
+|---|---|---|
+| `RELEASE-VALIDATE-PATH-ROBUSTNESS-001` | **livré** | Rendre `tools/release-validate.sh` plus robuste en utilisant un interpréteur Python explicite (`PYTHON_BIN`) au lieu d'un `PATH` implicite. |
+| `ROADMAP-B10-CONSISTENCY-SWEEP-001` | **livré** | Nettoyer la cohérence de la roadmap B10 avant l'audit final : compteurs, sections, statuts et tickets ajoutés en cours de phase. |
+| `RELEASE-TAG-CONVENTION-TEST-ALIGN-001` | à faire | Aligner `tests/meta/test_release_current_version_001.py` sur la convention de tag SemVer Forge (`v1.0.0-beta.x` et non `v1.0.0bx`). |
+
+### Clôture
 
 | Ticket | Statut | Rôle |
 |---|---|---|
 | `B10-CLOSING-AUDIT-001` | à faire | Relancer l'audit complet après livraison des corrections B10. |
 | `RELEASE-BETA10-001` | à faire | Préparer une release corrective `1.0.0-beta.10` si tous les contrôles sont verts. |
 
-### Ordre officiel recommandé
+### Ordre de traitement
 
-1. `AUTH-SESSION-HARDENING-TESTS-ALIGN-001`
-2. `RELEASE-VALIDATE-PEP440-SEMVERSION-001`
-3. `DOCS-OPTINS-PYPI-BETA9-SWEEP-001`
-4. `WSGI-SECURITY-HEADERS-001`
-5. `TESTS-OPTIN-IMPORTORSKIP-001`
-6. `CI-PAGES-MKDOCS-STRICT-001`
-7. `DEPENDENCY-AUDIT-RELEASE-GUARD-001`
-8. `UPLOADS-SYMLINK-DEFENSE-001`
-9. `MFA-SECRET-KEY-BOOT-VALIDATION-001`
-10. `APP-PY-PROD-HOST-GUARD-001`
-11. `DOCS-CLI-COMMANDS-EXAMPLES-RESTRUCTURE-001`
-12. `DOCS-IMPORTS-VALIDITY-SWEEP-001`
-13. `DOCS-SITE-ARTIFACT-POLICY-001`
-14. `TESTS-AUTOUSE-FIXTURES-AUDIT-001`
-15. `B10-CLOSING-AUDIT-001`
-16. `RELEASE-BETA10-001`
-
-**Total Phase B10 : 16 tickets prévus.**
+L'ordre de réalisation suit l'ordre des sections ci-dessus : bloquants
+immédiats d'abord (pour repasser au vert), puis critiques pré-RC,
+durcissement, cohérence release et enfin clôture. La numérotation rigide
+qui figurait dans cette section a été retirée — l'ordre des sections
+suffit, et la liste évoluait à chaque ajout de ticket en cours de phase
+(`ROADMAP-B10-CONSISTENCY-SWEEP-001`).
 
 ### Corrections terrain hors-audit (livrées en cours de phase)
 
 Tickets résolvant des problèmes découverts en condition réelle pendant la
-phase B10, hors du périmètre de l'audit initial. Ne sont pas comptés dans
-les 15 tickets ci-dessus.
+phase B10, hors du périmètre de l'audit initial. Indépendants des
+sections ci-dessus.
 
 | Ticket | Statut | Rôle |
 |---|---|---|
