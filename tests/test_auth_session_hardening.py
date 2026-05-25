@@ -326,10 +326,19 @@ class TestDonneesSensiblesAbsentes:
         assert set(session.keys()) <= expected_top | {"_auth_mfa_user_id", "_auth_mfa_started_at"}
 
     def test_utilisateur_session_ne_contient_que_champs_prevus(self):
+        # Contrat session post-CORE-SESSION-DEDOMAIN-001 :
+        #   - clés canoniques anglaises : first_name, last_name
+        #   - alias legacy francophones préservés : prenom, nom
+        # Aucun champ sensible (password, hash, secret MFA) ne doit s'y glisser.
         sid = create_session()
         nouveau_sid = authenticate_session(sid, _UTILISATEUR)
         user_data = get_session(nouveau_sid)["user"]
-        expected_fields = {"id", "login", "prenom", "nom", "email", "roles"}
+        expected_fields = {
+            "id", "login",
+            "first_name", "last_name",
+            "prenom", "nom",
+            "email", "roles",
+        }
         assert set(user_data.keys()) == expected_fields
 
 
@@ -339,24 +348,59 @@ class TestDonneesSensiblesAbsentes:
 
 
 class TestCookieAttributes:
-    def test_auth_controller_cookie_securise(self):
+    """Le durcissement des cookies de session vit dans `core/security/cookies.py`
+    (SECURITY-SESSION-COOKIE-HELPER-001). Les attributs `SameSite=...` et
+    `Max-Age=...` sont construits dynamiquement par f-string — un grep textuel
+    sur le source produirait des faux négatifs. On teste donc :
+
+      1. le comportement réel du helper (le header `Set-Cookie` produit
+         contient bien HttpOnly / SameSite=Strict / Secure / Max-Age=0) ;
+      2. la délégation : les contrôleurs `auth` et `mfa` utilisent les helpers
+         et n'écrivent pas `Set-Cookie` en direct (régression à éviter).
+    """
+
+    @staticmethod
+    def _new_response():
+        # Mock minimal compatible avec set_session_cookie / clear_session_cookie :
+        # le helper attend seulement un attribut `.headers` indexable.
+        return type("R", (), {"headers": {}})()
+
+    def test_set_session_cookie_attributs_securises(self):
+        from core.security.cookies import set_session_cookie
+        response = self._new_response()
+        set_session_cookie(response, "a" * 64)
+        cookie = response.headers["Set-Cookie"]
+        assert "HttpOnly" in cookie
+        assert "SameSite=Strict" in cookie
+        assert "Secure" in cookie
+
+    def test_clear_session_cookie_max_age_zero(self):
+        from core.security.cookies import clear_session_cookie
+        response = self._new_response()
+        clear_session_cookie(response)
+        cookie = response.headers["Set-Cookie"]
+        assert "Max-Age=0" in cookie
+        # Le cookie de suppression doit rester sécurisé.
+        assert "HttpOnly" in cookie
+        assert "SameSite=Strict" in cookie
+        assert "Secure" in cookie
+
+    def test_auth_controller_delegue_au_helper_cookie(self):
         import mvc.controllers.auth_controller as mod
         source = open(mod.__file__).read()
-        assert "HttpOnly" in source
-        assert "SameSite=Strict" in source
-        assert "Secure" in source
+        # auth_controller utilise les helpers centraux…
+        assert "set_session_cookie" in source
+        assert "clear_session_cookie" in source
+        # …et n'écrit jamais le header Set-Cookie en direct.
+        assert 'headers["Set-Cookie"]' not in source
+        assert "headers['Set-Cookie']" not in source
 
-    def test_logout_cookie_max_age_zero(self):
-        import mvc.controllers.auth_controller as mod
-        source = open(mod.__file__).read()
-        assert "Max-Age=0" in source
-
-    def test_mfa_controller_cookie_securise(self):
+    def test_mfa_controller_delegue_au_helper_cookie(self):
         import mvc.controllers.mfa_challenge_controller as mod
         source = open(mod.__file__).read()
-        assert "HttpOnly" in source
-        assert "SameSite=Strict" in source
-        assert "Secure" in source
+        assert "set_session_cookie" in source
+        assert 'headers["Set-Cookie"]' not in source
+        assert "headers['Set-Cookie']" not in source
 
 
 # ---------------------------------------------------------------------------
