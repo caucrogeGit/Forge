@@ -78,6 +78,15 @@ Notes :
 - pour un démarrage type production, ajouter `--workers <N>` adapté au CPU
   disponible. **Voir la note multi-worker en [§7](#7-limites-actuelles-en-production)**.
 
+!!! warning "`python app.py` refuse de démarrer en prod sur une interface publique"
+    Depuis `APP-PY-PROD-HOST-GUARD-001`, `python app.py` refuse de démarrer
+    quand `APP_ENV=prod` ET `APP_HOST` cible une interface publique
+    (`0.0.0.0`, `::`, `[::]`). Le serveur direct reste un outil de
+    développement — la production publique doit passer par
+    WSGI + Gunicorn + reverse proxy (cette page). Les hôtes locaux
+    (`127.0.0.1`, `localhost`, `::1`) restent autorisés en prod pour
+    permettre les tests de validation locale.
+
 ---
 
 ## 4. Reverse proxy

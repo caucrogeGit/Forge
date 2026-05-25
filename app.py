@@ -91,7 +91,12 @@ from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFI
 import core.security.csp as _csp
 from core.security.headers import apply_security_headers
 import core.forge as forge
-from core.dev_server import format_port_in_use_message, format_startup_messages
+from core.dev_server import (
+    format_port_in_use_message,
+    format_prod_host_guard_error,
+    format_startup_messages,
+    should_block_prod_public_host,
+)
 forge.configure(
     app_name     = APP_NAME,
     app_env      = APP_ENV,
@@ -376,6 +381,17 @@ if __name__ == "__main__":
         level  = logging.DEBUG if APP_ENV == "dev" else logging.INFO,
         format = _fmt[APP_ENV],
     )
+
+    # APP-PY-PROD-HOST-GUARD-001 : `python app.py` n'est pas un serveur de
+    # production publique. Si APP_ENV=prod ET APP_HOST écoute sur toutes les
+    # interfaces (0.0.0.0 / ::), on refuse de démarrer plutôt que d'émettre
+    # un simple warning ignorable. Le garde n'est PAS dans le chemin WSGI
+    # (`create_configured_wsgi_app`) — la production WSGI/Gunicorn reste
+    # entièrement fonctionnelle.
+    if should_block_prod_public_host(APP_ENV, APP_HOST):
+        for _line in format_prod_host_guard_error(APP_ENV, APP_HOST).splitlines():
+            logger.error(_line)
+        _sys.exit(1)
 
     TLSThreadingHTTPServer.allow_reuse_address = True
     try:
