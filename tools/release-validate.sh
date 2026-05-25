@@ -69,6 +69,20 @@ _ok()   { printf "[OK]    %s\n" "$1"; }
 _warn() { printf "[WARN]  %s\n" "$1"; WARNS=$((WARNS+1)); }
 _fail() { printf "[FAIL]  %s\n" "$1"; ERRORS=$((ERRORS+1)); }
 
+# ── Interpréteur Python — RELEASE-VALIDATE-PATH-ROBUSTNESS-001 ───────────────
+# Tous les appels Python du script (pytest, compileall, ruff, mkdocs,
+# pip-audit) passent par "$PYTHON_BIN" -m … plutôt que par les binaires
+# du PATH. Ainsi, lancer le script sans venv activé donne une erreur
+# explicite « Python introuvable », plutôt qu'un cascadé `command not found`
+# sur chaque outil. Configurable via la variable d'environnement
+# `PYTHON=/chemin/vers/python`.
+PYTHON_BIN="${PYTHON:-python3}"
+if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+    printf "[FAIL]  Python introuvable : %s\n" "$PYTHON_BIN" >&2
+    printf "         Définissez PYTHON=/chemin/vers/python ou activez votre environnement Python.\n" >&2
+    exit 1
+fi
+
 echo "=== Validation pré-release Forge ${VERSION:-<version non fournie>} ==="
 echo ""
 
@@ -91,7 +105,7 @@ fi
 
 # ── 2. Cohérence des versions (format PEP 440) ───────────────────────────────
 if [ -n "$PEP440_VERSION" ]; then
-    PYPROJECT_VER=$(python3 -c "
+    PYPROJECT_VER=$("$PYTHON_BIN" -c "
 import tomllib, sys
 with open('pyproject.toml', 'rb') as f:
     d = tomllib.load(f)
@@ -104,7 +118,7 @@ print(d['project']['version'])
         _fail "pyproject.toml version = '$PYPROJECT_VER' (attendu : '$PEP440_VERSION' au format PEP 440)"
     fi
 
-    CORE_VER=$(python3 -c "
+    CORE_VER=$("$PYTHON_BIN" -c "
 import ast, sys
 tree = ast.parse(open('core/__init__.py').read())
 for node in ast.walk(tree):
@@ -122,7 +136,7 @@ print('INTROUVABLE')
         _fail "core/__init__.py __version__ = '$CORE_VER' (attendu : '$PEP440_VERSION' au format PEP 440)"
     fi
 
-    FORGE_VER=$(python3 -c "
+    FORGE_VER=$("$PYTHON_BIN" -c "
 import ast, sys
 tree = ast.parse(open('forge.py').read())
 for node in ast.walk(tree):
@@ -153,7 +167,7 @@ fi
 # ── 4. Tests ──────────────────────────────────────────────────────────────────
 echo ""
 echo "--- Exécution des tests (pytest -x -q) ---"
-PYTEST_OUT=$(python -m pytest -x -q 2>&1 || true)
+PYTEST_OUT=$("$PYTHON_BIN" -m pytest -x -q 2>&1 || true)
 echo "$PYTEST_OUT" | tail -5
 if echo "$PYTEST_OUT" | grep -qE "passed|no tests ran"; then
     if ! echo "$PYTEST_OUT" | grep -qE "^(FAILED|ERROR)"; then
@@ -168,7 +182,7 @@ fi
 # ── 5. Qualité de code ────────────────────────────────────────────────────────
 echo ""
 echo "--- Ruff ---"
-RUFF_OUT=$(ruff check . --quiet 2>&1 || true)
+RUFF_OUT=$("$PYTHON_BIN" -m ruff check . --quiet 2>&1 || true)
 if [ -z "$RUFF_OUT" ]; then
     _ok "Ruff : aucune violation"
 else
@@ -177,7 +191,7 @@ else
 fi
 
 # ── 6. Compilation Python ─────────────────────────────────────────────────────
-COMPILE_OUT=$(python -m compileall -q . 2>&1 || true)
+COMPILE_OUT=$("$PYTHON_BIN" -m compileall -q . 2>&1 || true)
 SYNTAX_ERRORS=$(echo "$COMPILE_OUT" | grep -v "^Listing" || true)
 if [ -z "$SYNTAX_ERRORS" ]; then
     _ok "compileall : OK"
@@ -189,7 +203,7 @@ fi
 # ── 7. MkDocs strict ─────────────────────────────────────────────────────────
 echo ""
 echo "--- MkDocs --strict ---"
-MKDOCS_OUT=$(mkdocs build --strict --quiet 2>&1); MKDOCS_EXIT=$?; true
+MKDOCS_OUT=$("$PYTHON_BIN" -m mkdocs build --strict --quiet 2>&1); MKDOCS_EXIT=$?; true
 if [ $MKDOCS_EXIT -eq 0 ]; then
     _ok "MkDocs build --strict : OK"
 else
@@ -203,18 +217,18 @@ fi
 # en validation release, toute CVE ouverte sur les requirements bloque.
 echo ""
 echo "--- Audit dépendances Python (pip-audit) ---"
-if ! command -v pip-audit >/dev/null 2>&1; then
-    _fail "pip-audit non installé — requis pour la validation release."
-    echo "         Installer : python -m pip install 'pip-audit>=2.0'"
+if ! "$PYTHON_BIN" -m pip_audit --version >/dev/null 2>&1; then
+    _fail "pip-audit non installé dans $PYTHON_BIN — requis pour la validation release."
+    echo "         Installer : $PYTHON_BIN -m pip install 'pip-audit>=2.0'"
 else
-    PIP_AUDIT_RT_OUT=$(pip-audit -r requirements.txt 2>&1); PIP_AUDIT_RT_EXIT=$?; true
+    PIP_AUDIT_RT_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements.txt 2>&1); PIP_AUDIT_RT_EXIT=$?; true
     if [ $PIP_AUDIT_RT_EXIT -eq 0 ]; then
         _ok "pip-audit (requirements.txt) : aucune vulnérabilité"
     else
         _fail "pip-audit (requirements.txt) : vulnérabilités détectées"
         echo "$PIP_AUDIT_RT_OUT" | head -20 | sed 's/^/         /'
     fi
-    PIP_AUDIT_DEV_OUT=$(pip-audit -r requirements-dev.txt 2>&1); PIP_AUDIT_DEV_EXIT=$?; true
+    PIP_AUDIT_DEV_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements-dev.txt 2>&1); PIP_AUDIT_DEV_EXIT=$?; true
     if [ $PIP_AUDIT_DEV_EXIT -eq 0 ]; then
         _ok "pip-audit (requirements-dev.txt) : aucune vulnérabilité"
     else

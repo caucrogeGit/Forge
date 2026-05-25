@@ -1346,6 +1346,7 @@ et clôture.
 | `TESTS-AUTOUSE-FIXTURES-AUDIT-001` | **livré** | Auditer les fixtures `autouse` hors `conftest.py` pour limiter les contaminations d'état global (cas révélé par `test_configurable_session_store_001` lors de B9). |
 | `LANDING-CONTACT-NAV-FORM-001` | **livré** | Ajouter Contact à la navigation landing, créer une section formulaire vers `forgemvc@gmail.com`, et aligner l'identité publique Forge sur Roger Lequette. |
 | `ENV-PROD-DB-ADMIN-SECRETS-POLICY-001` | **livré** | Clarifier que les secrets MariaDB admin/root ne doivent pas être stockés dans l'environnement runtime de production ; réserver `DB_ADMIN_*` au provisioning CLI ou à un fichier local non commité. |
+| `RELEASE-VALIDATE-PATH-ROBUSTNESS-001` | **livré** | Rendre `tools/release-validate.sh` plus robuste en utilisant un interpréteur Python explicite (`PYTHON_BIN`) au lieu d'un `PATH` implicite. |
 
 ### Clôture (2 tickets)
 
