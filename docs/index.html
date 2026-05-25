@@ -989,59 +989,24 @@ router = Router()
   `tests/meta/test_public_contact_identity_001.py`.
 -->
 <section id="contact" class="py-24 px-6 bg-white">
-  <div class="max-w-3xl mx-auto">
-    <h2 class="text-3xl font-bold mb-6 text-center">Contact</h2>
-    <p class="text-center text-slate-600 mb-2">
-      Ce contact concerne le projet Forge — questions, retours d'usage,
-      remontées de bugs, demandes de licence.
-    </p>
-    <p class="text-center text-slate-500 text-sm mb-10">
-      Roger Lequette · <a href="mailto:forgemvc@gmail.com" class="landing-accent-text font-semibold">forgemvc@gmail.com</a>
+  <div class="max-w-3xl mx-auto text-center">
+    <h2 class="text-3xl font-bold mb-6">Contact</h2>
+
+    <p class="text-slate-600 mb-2">
+      Pour toute question sur Forge, retour d'usage, remontée de bug ou demande de licence.
     </p>
 
-    <form action="mailto:forgemvc@gmail.com" method="post" enctype="text/plain"
-          class="space-y-5 bg-slate-50 border border-slate-200 rounded-2xl p-8">
-      <p class="text-xs text-slate-500 leading-relaxed">
-        <strong>Le bouton Envoyer ouvre un email vers
-        <code>forgemvc@gmail.com</code> dans votre client mail local.
-        Il ne déclenche aucun traitement serveur Forge.</strong><br>
-        Aucune route <code>/contact</code>, aucun
-        <code>ContactController</code>, aucune base SMTP — la landing reste
-        volontairement statique pour ne pas imposer de logique applicative
-        au framework. Contact = site officiel, pas fonctionnalité du core.
-      </p>
+    <p class="text-slate-500 text-sm mb-8">
+      Roger Lequette ·
+      <a href="mailto:forgemvc@gmail.com" class="landing-accent-text font-semibold">
+        forgemvc@gmail.com
+      </a>
+    </p>
 
-      <div>
-        <label for="contact-nom" class="block text-sm font-medium text-slate-700 mb-1">Nom</label>
-        <input id="contact-nom" name="nom" type="text" required
-               class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/40">
-      </div>
-
-      <div>
-        <label for="contact-email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-        <input id="contact-email" name="email" type="email" required
-               class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/40">
-      </div>
-
-      <div>
-        <label for="contact-sujet" class="block text-sm font-medium text-slate-700 mb-1">Sujet</label>
-        <input id="contact-sujet" name="sujet" type="text" required
-               class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/40">
-      </div>
-
-      <div>
-        <label for="contact-message" class="block text-sm font-medium text-slate-700 mb-1">Message</label>
-        <textarea id="contact-message" name="message" rows="6" required
-                  class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/40"></textarea>
-      </div>
-
-      <div class="flex justify-end">
-        <button type="submit"
-                class="landing-accent-bg text-white font-semibold px-6 py-2.5 rounded-md hover:opacity-90 transition-opacity">
-          Envoyer
-        </button>
-      </div>
-    </form>
+    <a href="mailto:forgemvc@gmail.com?subject=Contact%20Forge"
+       class="landing-accent-bg inline-flex items-center justify-center text-white font-semibold px-6 py-3 rounded-md hover:opacity-90 transition-opacity">
+      Écrire à Forge
+    </a>
   </div>
 </section>
 
