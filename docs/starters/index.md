@@ -24,7 +24,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Premier formulaire POST](form-post/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 6 de la progression — afficher un formulaire HTML minimal (avec CSRF), envoyer un POST, lire la valeur avec `request.form("name", ...)`, aucune base de données |
 | [Validation serveur](server-validation/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
 | [Première base SQL](first-sql/index.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
-| [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
+| [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | **Palier 9** de la progression — synthèse avancée du CRUD officiel ; suppose les 8 paliers précédents acquis |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
 | [4 — Suivi pédagogique](04-suivi-comportement-eleves/index.md) | Historique / legacy | Aucun profil principal | Consulter un exemple métier historique, non recommandé comme base moderne |
@@ -55,7 +55,7 @@ d'aborder le CRUD sereinement. La progression officielle est :
 8. **Première base SQL** — comprendre MariaDB, les migrations et le SQL visible.
    *(livré — starter `first-sql`, ticket `STARTER-FIRST-SQL-001`)*
 9. **Premier CRUD** — utiliser le starter Contacts quand les bases précédentes sont acquises.
-   *(livré — starter `01-contact-simple`, à repositionner pédagogiquement via `STARTER-CONTACTS-CRUD-REPOSITION-001`)*
+   *(livré — starter `01-contact-simple` ; synthèse avancée, repositionnement pédagogique formalisé par `STARTER-CONTACTS-CRUD-REPOSITION-001`)*
 
 !!! warning "Saut Bonjour Forge → Contacts CRUD"
     Tant que les starters 2 à 8 ne sont pas livrés, un utilisateur qui
@@ -107,9 +107,15 @@ Le starter officiel simple de Forge. Une seule entité `Contact`, un CRUD géné
 
 Profil recommandé : `minimal` ou `standard`.
 
-- idéal pour découvrir Forge ;
+- **palier 9** de la progression pédagogique officielle — synthèse avancée ;
 - aucune relation, aucune authentification ;
-- premier parcours Forge.
+- suppose acquis les 8 paliers pédagogiques précédents
+  (routes, contrôleurs, vues HTML, paramètres d'URL, route dynamique,
+  formulaires POST avec CSRF, validation serveur, migrations SQL).
+
+Pour le **premier** contact avec Forge, démarrer par
+[Bonjour Forge](welcome/index.md) (palier 1, sans BDD), pas par ce
+starter.
 
 [Présentation](01-contact-simple/index.md) · [Reconstruction](01-contact-simple/rebuild.md)
 

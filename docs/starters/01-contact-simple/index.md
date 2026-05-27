@@ -3,10 +3,29 @@
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 <div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 55%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
-  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Niveau 1</p>
+  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Palier 9 (avancé)</p>
   <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">Application Contacts</h2>
-  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Premier parcours Forge : une seule entité <code>Contact</code>, un CRUD généré, puis un câblage manuel des routes.</p>
+  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Synthèse avancée et point d'arrivée de la <a href="../index.md#progression-recommandee">progression officielle des starters</a> : une seule entité <code>Contact</code>, un CRUD généré, puis un câblage manuel des routes. Ce starter officiel reste le CRUD le plus simple, mais il assemble toutes les briques vues aux paliers 1 à 8.</p>
 </div>
+
+!!! warning "Palier 9 — synthèse avancée"
+    Ce starter est une **synthèse avancée**, pas une étape immédiate
+    après Bonjour Forge. Avant de l'aborder, il est recommandé
+    d'avoir compris :
+
+    - les routes (palier 1 — `Bonjour Forge`) ;
+    - les contrôleurs et `Response.text(...)` (palier 1) ;
+    - les paramètres d'URL avec `request.param(...)` (palier 2 — `query-params`) ;
+    - le rendu HTML avec `BaseController.render(...)` (palier 3 — `first-html-view`) ;
+    - les routes dynamiques `/{id}` avec `request.route_param(...)` (palier 4 — `dynamic-route`) ;
+    - l'inspection de la requête (palier 5 — `request-debug`) ;
+    - les formulaires POST avec CSRF (palier 6 — `form-post`) ;
+    - la validation serveur minimale (palier 7 — `server-validation`) ;
+    - les migrations SQL et `core.database.db.fetch_one` (palier 8 — `first-sql`).
+
+    Voir la
+    [Progression recommandée des starters](../index.md#progression-recommandee)
+    pour le détail.
 
 <div class="grid cards" markdown>
 
@@ -14,13 +33,16 @@
 
     ---
 
-    Construire une petite application CRUD pour gérer des contacts.
+    Construire une petite application CRUD pour gérer des contacts —
+    synthèse avancée des paliers 1 à 8 de la progression officielle.
 
 -   **Niveau**
 
     ---
 
-    Débutant Forge. Aucune relation, aucune authentification métier spécifique.
+    Avancé. Ce starter assemble toutes les briques vues aux paliers
+    pédagogiques précédents (routes, contrôleurs, vues HTML,
+    formulaires POST avec CSRF, validation serveur, migrations SQL).
 
 -   **Temps estimé**
 
@@ -74,7 +96,11 @@ Une fois que `forge --version` s'affiche correctement, revenez ici pour construi
 ## Partie 2 — Construire l'application starter
 
 !!! tip "Profil recommandé"
-    Ce starter est le point d'entrée officiel de Forge. Il correspond au profil `minimal` ou `standard`. Voir [Profils de projet](../../profiles.md) pour choisir le bon profil au moment de `forge new`.
+    Ce starter officiel correspond au profil `minimal` ou `standard`.
+    Voir [Profils de projet](../../profiles.md) pour choisir le bon
+    profil au moment de `forge new`. Pour le **premier** contact
+    avec Forge, démarrer plutôt par
+    [Bonjour Forge](../welcome/index.md) (palier 1, sans BDD).
 
 ## 1. Présentation rapide
 

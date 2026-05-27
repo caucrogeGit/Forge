@@ -18,15 +18,38 @@ ROOT = Path(__file__).resolve().parents[2]
 
 # ── Contrat des starters ──────────────────────────────────────────────────────
 
-def test_huit_starters_declares():
-    """8 starters officiels sont déclarés (palier 2 livré : query-params)."""
-    assert len(all_starters()) == 8
+def test_count_starters_matches_filesystem():
+    """Le nombre de starters déclarés correspond au contenu de
+    `forge_cli/starters/data/`. Refactor STARTER-CONTACTS-CRUD-REPOSITION-001
+    pour ne plus geler le count dans le code de test — chaque palier
+    pédagogique livré (paliers 2 à 8, plus toute extension future)
+    incrémente naturellement le total sans casser ce garde-fou."""
+    data_dir = ROOT / "forge_cli" / "starters" / "data"
+    expected = sum(
+        1 for d in data_dir.iterdir()
+        if d.is_dir() and (d / "starter.json").exists()
+    )
+    assert len(all_starters()) == expected, (
+        f"Décompte registre ({len(all_starters())}) != décompte "
+        f"filesystem ({expected})."
+    )
+    # Au moins les 8 paliers de la progression pédagogique officielle
+    # (7 historiques 1–6+welcome → number 7 + 1 nouveau par palier 2–8).
+    assert expected >= 8, (
+        f"Au moins 8 starters attendus (progression pédagogique 1–8 livrée) ; "
+        f"trouvé {expected}."
+    )
 
 
-def test_starters_numero_1_a_8():
-    """Les starters sont numérotés de 1 à 8 sans trou."""
-    nums = [s["number"] for s in all_starters()]
-    assert nums == [1, 2, 3, 4, 5, 6, 7, 8]
+def test_starters_numero_sans_trou():
+    """Les starters sont numérotés sans trou à partir de 1.
+    Refactor STARTER-CONTACTS-CRUD-REPOSITION-001 — ne fige plus
+    le numéro maximal pour rester robuste aux ajouts futurs."""
+    nums = sorted(s["number"] for s in all_starters())
+    expected_range = list(range(1, len(nums) + 1))
+    assert nums == expected_range, (
+        f"Numérotation des starters avec trou : {nums} (attendu : {expected_range})."
+    )
 
 
 def test_tous_les_starters_sont_disponibles():
@@ -35,8 +58,8 @@ def test_tous_les_starters_sont_disponibles():
         assert s.get("status") == "available", f"Starter {s['number']} non disponible"
 
 
-def test_starter_list_affiche_8_starters(capsys):
-    """forge starter:list affiche les 8 starters."""
+def test_starter_list_affiche_tous_les_starters(capsys):
+    """forge starter:list affiche tous les starters déclarés."""
     cmd_starter_list()
     output = capsys.readouterr().out
     for s in all_starters():
