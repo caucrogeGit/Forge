@@ -7,17 +7,17 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> La version publique actuelle est **Forge 1.0.0-beta.10**.
+> La version publique actuelle est **Forge 1.0.0-beta.11**.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.10
+## État actuel — Forge 1.0.0-beta.11
 
-**Tag courant : `v1.0.0-beta.10` (2026-05-25)**
+**Tag courant : `v1.0.0-beta.11` (2026-05-25)**
 
 Précédent : v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.10 publiée (core + 5 opt-ins). Phase B10 close : 20 tickets livrés couvrant stabilisation post-beta.9, WSGI headers partagés, MFA secret key boot validation, défense symlinks, app.py prod guard, audits dépendances bloquants en release, identité publique alignée (Roger Lequette / forgemvc@gmail.com), politique DB_ADMIN_* clarifiée, validation release indépendante du PATH, convention de tag SemVer publique verrouillée. Audit pré-release `B10-CLOSING-AUDIT-001` validé GO.**
+**Statut : v1.0.0-beta.11 publiée (core + 5 opt-ins). Phase B10 close : 20 tickets livrés couvrant stabilisation post-beta.9, WSGI headers partagés, MFA secret key boot validation, défense symlinks, app.py prod guard, audits dépendances bloquants en release, identité publique alignée (Roger Lequette / forgemvc@gmail.com), politique DB_ADMIN_* clarifiée, validation release indépendante du PATH, convention de tag SemVer publique verrouillée. Audit pré-release `B10-CLOSING-AUDIT-001` validé GO.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -1311,7 +1311,7 @@ base en état strictement vert (tests rouges, validateur PEP 440 / SemVer,
 documentation opt-ins PyPI) puis durcir les derniers points sensibles (headers
 WSGI, isolation tests opt-in, défense uploads, validation MFA au boot, garde
 prod sur `app.py`, identité publique alignée) avant la release corrective
-`1.0.0-beta.10`.
+`1.0.0-beta.11`.
 
 La phase B10 consolide les corrections issues de l'audit post-beta.9, puis
 ajoute plusieurs tickets de durcissement et de cohérence release apparus
@@ -1369,7 +1369,7 @@ pendant la stabilisation. Les tickets sont regroupés par rôle :
 | Ticket | Statut | Rôle |
 |---|---|---|
 | `B10-CLOSING-AUDIT-001` | **livré** | Audit final B10 réalisé (`docs/history/audits/audit-pre-release-beta10.md`) ; décision **GO** pour `RELEASE-BETA10-001`. |
-| `RELEASE-BETA10-001` | **livré** | Release corrective `1.0.0-beta.10` préparée (2026-05-25) — bump versions (core + 4 opt-ins), CHANGELOG, build/twine/install isolé OK ; tag `v1.0.0-beta.10` créé. Push et publication PyPI conditionnés à validation explicite. |
+| `RELEASE-BETA10-001` | **livré** | Release corrective `1.0.0-beta.11` préparée (2026-05-25) — bump versions (core + 4 opt-ins), CHANGELOG, build/twine/install isolé OK ; tag `v1.0.0-beta.11` créé. Push et publication PyPI conditionnés à validation explicite. |
 | `INSTALL-DOCS-STRUCTURE-001` | **livré** | Réorganisation propre des parcours d'installation sous `docs/install/` : `git mv` de `installation.md`, `installation-pipx.md`, `installation-developpement.md`, `installation-mariadb.md`, `installation-vm-debian.md`, `installation-windows.md`, `installation-github.md` vers `docs/install/{index,pipx,core-dev,mariadb,vm-debian,windows,github}.md` (historique préservé). Création de `docs/install/index.md` (aiguillage utilisateur ↔ développeur core) et `docs/install/production.md` (entrée courte vers `wsgi-deployment.md` / `production-limits.md` / `deployment.md`). Mise à jour de `mkdocs.yml` (section Installation reconstruite), des liens internes dans toute la doc active (`auth.md`, `bonjour-forge.md`, `getting-started.md`, `guide.md`, `pdf.md`, `rbac.md`, `reference/api.md`, `reference/cli-commands.md`, `release-policy.md`, starters), de la source landing (URLs `install/pipx/` + `install/core-dev/`) et de 10 tests méta. Test méta dédié : `tests/meta/test_install_docs_structure_001.py` (31 cas — existence, aiguillage, anciens chemins absents, landing, mkdocs nav, mkdocs strict). Validations : pytest meta, ruff, mkdocs --strict, git diff --check, forge sync:landing --check. |
 | `LANDING-PUBLIC-CONTRACT-REALIGN-001` | **livré** | Réalignement de la landing canonique sur son contrat public réel après modifications manuelles. Correction HTML : ajout des 2 `</div>` manquants en section Installation et uniformisation du design de la card Production (`landing-panel`, `<pre>` réindenté, suppression de `flex flex-wrap` et de 3 CTA juxtaposés — un seul CTA principal vers `install/production`, les 3 guides cités en ligne). Aucune card d'installation n'utilise `md:col-span-2`. Décisions de suppression assumées et documentées dans les tests : 5e card « Bonjour Forge » de la section Installation (le starter `welcome` reste dans Starters), section FAQ et bloc « Stack technos » (Python/MariaDB/Jinja2/HTMX/Alpine.js/Tailwind + URLs externes), compteur « 12 000 tests » du Hero. Tests réalignés : `test_landing_install_cards_001.py` (5→4 cards, vérification `md:col-span-2` interdit), `test_landing_post_2_2_refresh.py::test_phases_recentes_mentionnees` (phrasing aligné sur les 4 cards Installation actuelles : `forge run`, Windows + WSL, pipx, Développement du core, Production — WSGI, Bienvenue dans Forge), `test_landing_public_contract.py::test_modules_description_wording` (chapeau « Modules officiels opt-in installables séparément » à la place de l'ancien « publication PyPI est progressive »), `test_docs_landing_page_3_0_001.py` (FAQ + Stack + 12 000 tests). `forge sync:landing` régénéré. Validations : pytest meta, ruff, mkdocs --strict, git diff --check, forge sync:landing --check. |
 

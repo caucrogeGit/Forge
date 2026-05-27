@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-mfa"
-version = "1.0.0b10"
+version = "1.0.0b11"
 description = "Brique MFA pour Forge — TOTP et codes de récupération."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "mfa", "totp"]
 dependencies = [
-    "forge-mvc==1.0.0b10",
+    "forge-mvc==1.0.0b11",
     "pyotp>=2.9,<3",
     "cryptography>=46.0.7,<47",
 ]

@@ -1,6 +1,92 @@
 # Changelog
 
 
+## [1.0.0-beta.11] — 2026-05-27
+
+### Expérience développeur — point d'entrée unifié et inspectabilité
+
+- `forge run` officialise le point d'entrée du serveur de développement
+  (FORGE-RUN-COMMAND-001) — refus du serveur intégré en `APP_ENV=prod`
+  avec message WSGI clair, délégation à `scripts/dev-server.sh` ou
+  `python app.py` en `dev`.
+- Superviseur d'autoreload `forge_cli.dev_reloader`
+  (DEV-SERVER-AUTORELOAD-001) — polling `stat()` sur `app.py`,
+  `config.py`, `env/dev`, `mvc/**/*.{py,html,json,sql}`, `core/**/*.py`,
+  stdlib uniquement. Désactivable via `--no-reload`.
+- Convention d'inspection des classes API publiques
+  (API-INSPECTABLE-OBJECTS-CONVENTION-001) — `Request` et `Response`
+  exposent `.data` avec masquage automatique
+  (Authorization/Cookie/password/csrf/token/api_key/secret) ; helpers
+  `text/html/json/debug` côté `Response` ; convention documentée dans
+  `docs/reference/http.md`.
+- Squelettes générés typés (DX-TYPED-SKELETONS-001) — imports
+  `Request`/`Response` automatiques et annotations
+  `def action(request: Request) -> Response:` sur toutes les actions
+  publiques du starter `welcome`, des générateurs `make:crud`,
+  `make:public-*` et des 6 starters officiels.
+- Erreur développeur claire quand `BaseController.render(...)` cible une
+  vue inexistante (DX-RENDER-ERROR-001) — `TemplateNotFoundError`
+  pédagogique en `dev`, réponse minimale en `prod`, aucun stacktrace.
+- Rendu HTML pédagogique pour `Response.debug(obj)`
+  (DX-DEBUG-DUMP-HTML-001) — `core.http.debug_dumper` (masquage des clés
+  sensibles, profondeur bornée, détection des cycles) ; comportement
+  prod inchangé (404 minimal, aucune fuite).
+
+### Starter d'entrée — Bonjour Forge
+
+- Refonte pédagogique du starter `welcome` (STARTER-BONJOUR-FORGE-001) —
+  alias `bonjour` / `bonjour-forge` / `bienvenue` / `7`. Progression :
+  `index` retourne `Response.text("Bonjour Forge")`, puis
+  `/welcome/greet?name=…` (`request.param(...)`),
+  `/welcome/inspect` (`Response.debug(request.data)`), enfin
+  `/welcome/cycle` introduit `BaseController.render(...)`. Vue
+  `welcome/index.html` retirée.
+
+### Documentation, installation et landing
+
+- Clôture documentaire « Bonjour Forge » (DX-DOCS-BONJOUR-FORGE-CLOSE-001)
+  — renommage `docs/15-minutes.md` → `docs/bonjour-forge.md`, refonte
+  autour du parcours développeur livré.
+- Guide officiel d'installation Windows + WSL (INSTALL-WSL-DOCS-001 +
+  INSTALL-WSL-DOCS-FIELD-FIX-001) — `docs/install/windows-wsl.md`,
+  parcours WSL Ubuntu 24.04 + VS Code Remote WSL + pipx + Node 20 +
+  MariaDB avec compte `forge_admin@localhost` dédié.
+- Section « Installer Forge selon votre usage » de la landing
+  (LANDING-INSTALL-CARDS-001) — 4 cards homogènes
+  (`windows-wsl`, `pipx-user`, `core-dev`, `production`).
+- Consolidation `docs/install/core-dev.md`
+  (INSTALL-CORE-DEV-DOCS-AUDIT-001) — 9 sections couvrant l'installation
+  éditable, les 5 validations canoniques avant commit, Tailwind, opt-ins.
+- Réorganisation `docs/install/` (INSTALL-DOCS-STRUCTURE-001) —
+  `git mv` des 7 pages d'installation sous `docs/install/{index,pipx,
+  core-dev,mariadb,vm-debian,windows,github,production}.md`, mise à jour
+  des liens internes et de la nav MkDocs.
+- Réalignement de la landing canonique sur son contrat public actuel
+  (LANDING-PUBLIC-CONTRACT-REALIGN-001) — décisions de suppression
+  assumées (5e card Installation, FAQ, Stack technos, compteur tests) ;
+  tests landing réalignés.
+
+### Audit
+
+- `BETA11-POST-DOCS-CONSOLIDATION-AUDIT-001` — audit de l'état réel
+  après tous les tickets DX/docs/install/landing ; décision OK pour
+  lancer `BETA11-DX-CLOSING-AUDIT-001`.
+- `BETA11-DX-CLOSING-AUDIT-001` — découpe et commit du WIP en
+  5 commits cohérents, suite complète à 15 051 tests passants
+  (6 skipped), décision GO pour `RELEASE-BETA11-001`.
+- `RELEASE-BETA11-001` (ce ticket) — bump version `1.0.0b10` →
+  `1.0.0b11`, validations release, build distributions, twine check,
+  tag SemVer `v1.0.0-beta.11`.
+
+### Notes
+
+- Forge core reste autonome ; les opt-ins (`forge-mvc-rbac`,
+  `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
+  `forge-mvc-media`) restent indépendants.
+- La production publique reste WSGI + Gunicorn + reverse proxy.
+  `forge run` reste explicitement un outil de développement.
+
+
 ## [1.0.0-beta.10] — 2026-05-25
 
 ### Stabilisation B10
