@@ -17,7 +17,7 @@ Ce tutoriel guide le développement d'une petite application Forge de bout en bo
 Il suppose que Forge est déjà installé et que MariaDB est disponible.
 
 !!! tip "Nouveau sur Forge ?"
-    Commencez par [15 minutes avec Forge](15-minutes.md) pour découvrir les
+    Commencez par [Bonjour Forge](bonjour-forge.md) pour découvrir les
     bases avant d'aborder ce tutoriel.
 
 ---
@@ -589,7 +589,7 @@ python app.py                      # lancer l'application
 
 ## Voir aussi
 
-- [15 minutes avec Forge](15-minutes.md) — tutoriel de démarrage rapide
+- [Bonjour Forge](bonjour-forge.md) — premier contact, sans BDD
 - [Guide de démarrage](guide.md) — parcours complet avec MariaDB
 - [Relations entre entités](relations.md) — format `relations.json` complet
 - [Architecture des entités](entity_architecture.md) — rôle de chaque fichier généré
