@@ -60,6 +60,7 @@ class TestReferenceIndexIsLight:
 _EXPECTED_SUBFILES = [
     "api.md",
     "cli-commands.md",
+    "http.md",
     "workflow.md",
     "stats.md",
     "auth-mfa.md",

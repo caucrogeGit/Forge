@@ -16,7 +16,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 | Starter | Statut | Profil associé | Usage recommandé |
 |---|---|---|---|
-| [Premier pas — Bienvenue dans Forge](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact avec Forge — cycle HTTP illustré, sans SQL |
+| [Bonjour Forge — premier pas](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact avec Forge — `Response.text(...)` → `Response.debug(...)` → `BaseController.render(...)`, sans SQL |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
@@ -26,22 +26,29 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 ## Starter d'entrée (sans base de données)
 
-### Premier pas — Bienvenue dans Forge
+### Bonjour Forge — premier pas
 
-Le starter d'entrée de Forge. Aucune base de données requise. Illustre le cycle HTTP en 6 pages éducatives.
+Le starter d'entrée de Forge. Aucune base de données requise. La
+progression pédagogique va du chemin le plus court (`Response.text(...)`)
+jusqu'au rendu de templates Jinja2 (`BaseController.render(...)`), en
+passant par `request.param(...)` et `Response.debug(request.data)`.
+
+Ce starter est référencé en interne comme `Bienvenue dans Forge` (alias
+historique conservé).
 
 Profil recommandé : aucun — fonctionne sans `forge db:init`.
 
-- cycle HTTP complet illustré pas à pas ;
-- objet `Request` inspecté en direct ;
-- types de réponses (`render`, `redirect`, `JSONResponse`) ;
+- texte brut puis évolution vers le rendu Jinja2 ;
+- `request.param(name, default=...)` introduit simplement ;
+- inspection de `request.data` via `Response.debug(obj)` ;
 - déclaration des routes dans `mvc/routes.py` ;
-- gestion des erreurs 404.
+- gestion des erreurs 404 illustrée.
 
 **Usage :**
 
 ```bash
 forge new mon-projet --starter welcome
+# alias acceptés : bonjour, bonjour-forge, bienvenue, 7
 # ou dans un projet existant :
 forge starter:build 7
 ```

@@ -12,7 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 ENTRY_FILES = [
     PROJECT_ROOT / "README.md",
-    PROJECT_ROOT / "docs" / "15-minutes.md",
+    PROJECT_ROOT / "docs" / "bonjour-forge.md",
     PROJECT_ROOT / "docs" / "guide.md",
     PROJECT_ROOT / "docs" / "app-complete-tutorial.md",
 ]

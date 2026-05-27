@@ -1,6 +1,7 @@
-# Premier pas — Bienvenue dans Forge
+# Bonjour Forge
 
-> Ce starter est le point d'entrée recommandé pour découvrir Forge sans base de données.
+> Premier pas avec Forge : du chemin le plus court entre une requête et
+> une réponse, jusqu'au rendu d'une vue HTML — sans base de données.
 
 !!! tip "Aucun risque pour commencer"
     Ce starter ne crée aucune table, ne lance aucune migration et ne demande aucune base de données.
@@ -8,7 +9,95 @@
 
 Sans SQL. Sans base de données. Sans entité. Sans migration. Sans CRUD.
 
-Référence technique : ce starter reste le **Starter 7** dans la CLI Forge.
+Référence technique : ce starter reste le **Starter 7** dans la CLI Forge
+(identifiant `welcome`, alias `bienvenue` / `bonjour` / `bonjour-forge`).
+
+## Premier contact — `Response.text("Bonjour Forge")`
+
+Quand vous avez lancé `forge run`, le navigateur sur `http://localhost:8000/welcome`
+affiche simplement :
+
+```text
+Bonjour Forge
+```
+
+Voici la méthode qui produit cette réponse. C'est **la plus courte
+possible** : pas de template, pas de vue HTML, pas de moteur Jinja2.
+
+```python
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
+
+class WelcomeController(BaseController):
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return Response.text("Bonjour Forge")
+```
+
+Le cycle complet est minimal :
+
+```text
+Navigateur → GET /welcome → Router → WelcomeController.index(request) → Response.text("Bonjour Forge")
+```
+
+### Étape suivante — lire un paramètre d'URL
+
+`request.param("name", default="Forge")` renvoie la première valeur du
+paramètre `?name=...`, ou la valeur par défaut.
+
+```python
+@staticmethod
+def greet(request: Request) -> Response:
+    name = request.param("name", default="Forge")
+    return Response.text(f"Bonjour {name}")
+```
+
+Visitez `http://localhost:8000/welcome/greet?name=Roger` → `Bonjour Roger`.
+Sans paramètre, vous voyez `Bonjour Forge`.
+
+### Étape suivante — inspecter la requête
+
+`request.data` retourne un dictionnaire stable décrivant la requête
+courante (méthode, chemin, paramètres, headers, body) avec masquage des
+champs sensibles (`Authorization`, `password`, `csrf_token`, …).
+`Response.debug(obj)` rend une page HTML pédagogique **en développement**
+et refuse en production (voir [`docs/reference/http.md`](../../reference/http.md)).
+
+```python
+@staticmethod
+def inspect(request: Request) -> Response:
+    return Response.debug(request.data)
+```
+
+Visitez `http://localhost:8000/welcome/inspect` pour voir la structure
+complète de la requête, sans risque d'exposer de secret.
+
+### Étape suivante — rendre une vue HTML avec `render()`
+
+Quand vous avez besoin de pages HTML structurées (layout, navigation,
+templates Jinja2), passez à `BaseController.render(...)`. Forge cherche
+le chemin sous `mvc/views/` :
+
+```python
+@staticmethod
+def cycle(request: Request) -> Response:
+    return BaseController.render("welcome/cycle.html", request=request)
+```
+
+C'est ce que font les autres routes du starter (`/welcome/cycle`,
+`/welcome/request`, `/welcome/response`, …). Si vous écrivez par erreur
+`BaseController.render("bonjour", request=request)` en `APP_ENV=dev`,
+Forge affiche un message clair qui rappelle ce contrat et propose
+`Response.text(...)` ou `Response.debug(...)`. Voir
+[DX-RENDER-ERROR-001](../../roadmap/forge-roadmap.md).
+
+!!! success "À retenir"
+    - `Response.text(...)` retourne **directement** du texte au navigateur.
+    - `BaseController.render(...)` rend une **vue HTML** située dans `mvc/views/`.
+    - `Response.debug(obj)` est utile pour explorer un objet en dev.
 
 ## Les deux cycles HTTP Forge
 
@@ -146,14 +235,18 @@ Ce n'est pas la classe seule qui s'exécute. Forge appelle une méthode précise
 
 ```mermaid
 flowchart LR
-    A["GET /welcome"] --> B["mvc/routes.py"]
+    A["GET /welcome/cycle"] --> B["mvc/routes.py"]
     B --> C["pub.add(...)"]
-    C --> D["WelcomeController.index(request)"]
-    D --> E["welcome/index.html"]
+    C --> D["WelcomeController.cycle(request)"]
+    D --> E["welcome/cycle.html"]
     E --> F["Response HTML"]
 ```
 
-Dans le fichier réel, l'alignement contient des espaces pour rendre les six routes lisibles, mais le lien important reste celui-ci : `/welcome` appelle `WelcomeController.index`.
+Dans le fichier réel, l'alignement contient des espaces pour rendre les
+huit routes lisibles. Pour `/welcome` (le premier exemple), il n'y a pas
+de vue : la méthode retourne `Response.text("Bonjour Forge")` directement.
+Pour `/welcome/cycle` (et les autres routes HTML), le chemin passe par
+`mvc/views/welcome/<nom>.html`.
 
 ## Si vous venez d’un autre framework
 
@@ -229,7 +322,7 @@ Ces repères servent uniquement à traduire le vocabulaire. Forge ne cherche pas
 
 ## Le code complet généré par ce starter
 
-Après ces repères, regardons maintenant le code complet généré par Forge. Le starter tient en trois morceaux : les routes, le contrôleur et six vues HTML.
+Après ces repères, regardons maintenant le code complet généré par Forge. Le starter tient en trois morceaux : les routes, le contrôleur et cinq vues HTML.
 
 ### 1. Les routes complètes
 
@@ -241,12 +334,14 @@ Après ces repères, regardons maintenant le code complet généré par Forge. L
 from mvc.controllers.welcome_controller import WelcomeController
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/welcome",           WelcomeController.index,          name="welcome_index")
-    pub.add("GET", "/welcome/cycle",     WelcomeController.cycle,          name="welcome_cycle")
+    pub.add("GET", "/welcome",           WelcomeController.index,           name="welcome_index")
+    pub.add("GET", "/welcome/greet",     WelcomeController.greet,           name="welcome_greet")
+    pub.add("GET", "/welcome/inspect",   WelcomeController.inspect,         name="welcome_inspect")
+    pub.add("GET", "/welcome/cycle",     WelcomeController.cycle,           name="welcome_cycle")
     pub.add("GET", "/welcome/request",   WelcomeController.request_example, name="welcome_request")
     pub.add("GET", "/welcome/response",  WelcomeController.response_example, name="welcome_response")
     pub.add("GET", "/welcome/routing",   WelcomeController.routing_example, name="welcome_routing")
-    pub.add("GET", "/welcome/404-demo",  WelcomeController.not_found_demo, name="welcome_404_demo")
+    pub.add("GET", "/welcome/404-demo",  WelcomeController.not_found_demo,  name="welcome_404_demo")
 # forge-starter:welcome:end
 ```
 
@@ -260,6 +355,8 @@ Chaque ligne associe une URL à une méthode du contrôleur. Le routeur ne devin
 <summary><code>mvc/controllers/welcome_controller.py</code></summary>
 
 ```python
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 
 
@@ -267,15 +364,24 @@ class WelcomeController(BaseController):
     """Cycle HTTP illustré — starter d'entrée Forge sans base de données."""
 
     @staticmethod
-    def index(request):
-        return BaseController.render("welcome/index.html", request=request)
+    def index(request: Request) -> Response:
+        return Response.text("Bonjour Forge")
 
     @staticmethod
-    def cycle(request):
+    def greet(request: Request) -> Response:
+        name = request.param("name", default="Forge")
+        return Response.text(f"Bonjour {name}")
+
+    @staticmethod
+    def inspect(request: Request) -> Response:
+        return Response.debug(request.data)
+
+    @staticmethod
+    def cycle(request: Request) -> Response:
         return BaseController.render("welcome/cycle.html", request=request)
 
     @staticmethod
-    def request_example(request):
+    def request_example(request: Request) -> Response:
         ctx = {
             "method": request.method,
             "path": request.path,
@@ -284,15 +390,15 @@ class WelcomeController(BaseController):
         return BaseController.render("welcome/request_example.html", context=ctx, request=request)
 
     @staticmethod
-    def response_example(request):
+    def response_example(request: Request) -> Response:
         return BaseController.render("welcome/response_example.html", request=request)
 
     @staticmethod
-    def routing_example(request):
+    def routing_example(request: Request) -> Response:
         return BaseController.render("welcome/routing_example.html", request=request)
 
     @staticmethod
-    def not_found_demo(request):
+    def not_found_demo(request: Request) -> Response:
         return BaseController.render("welcome/not_found_demo.html", request=request)
 ```
 
@@ -300,9 +406,13 @@ class WelcomeController(BaseController):
 
 Chaque méthode correspond à une route. Chaque méthode retourne une réponse Forge. Dans ce starter, les méthodes retournent principalement des vues HTML avec `BaseController.render(...)`.
 
-### 3. Les 6 vues complètes
+### 3. Les 5 vues HTML
 
-Ce starter contient une classe contrôleur principale, `WelcomeController`, et six vues HTML — une par route. Les vues ci-dessous sont les fichiers HTML complets réellement copiés dans `mvc/views/welcome/`.
+Ce starter contient une classe contrôleur principale, `WelcomeController`,
+deux routes sans vue (`/welcome` et `/welcome/greet` retournent
+`Response.text(...)`, `/welcome/inspect` retourne `Response.debug(...)`)
+et **cinq vues HTML** — une par route restante. Les vues ci-dessous sont
+les fichiers HTML complets réellement copiés dans `mvc/views/welcome/`.
 
 !!! note "Vues volontairement simples"
     Dans ce premier starter, les vues sont volontairement des fichiers HTML complets.
@@ -318,122 +428,12 @@ Ce starter contient une classe contrôleur principale, `WelcomeController`, et s
 
     route → contrôleur → vue → réponse.
 
-<details open>
-<summary><code>mvc/views/welcome/index.html</code> — route <code>/welcome</code>, méthode <code>WelcomeController.index</code>, vue <code>welcome/index.html</code></summary>
+<!-- SKIP_INDEX_HTML_BLOCK
+La vue `mvc/views/welcome/index.html` a été retirée par
+STARTER-BONJOUR-FORGE-001 : la route `/welcome` retourne désormais
+`Response.text("Bonjour Forge")` directement, sans template.
+-->
 
-```html
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bienvenue — Forge</title>
-  <link rel="stylesheet" href="/static/tailwind.css">
-</head>
-<body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
-
-  <header class="border-b border-gray-800 px-8 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z"/>
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z"/>
-      </svg>
-      <span class="font-bold tracking-tight">Forge</span>
-      <span class="text-xs bg-gray-800 text-orange-400 px-2 py-0.5 rounded-full">Starter 7 — Bienvenue</span>
-    </div>
-    <nav class="hidden md:flex items-center gap-5 text-sm">
-      <a href="/welcome" class="text-orange-400 font-semibold">Accueil</a>
-      <a href="/welcome/cycle" class="text-gray-400 hover:text-white transition-colors">Cycle HTTP</a>
-      <a href="/welcome/request" class="text-gray-400 hover:text-white transition-colors">Requête</a>
-      <a href="/welcome/response" class="text-gray-400 hover:text-white transition-colors">Réponse</a>
-      <a href="/welcome/routing" class="text-gray-400 hover:text-white transition-colors">Routage</a>
-      <a href="/welcome/404-demo" class="text-gray-400 hover:text-white transition-colors">404</a>
-    </nav>
-  </header>
-
-  <main class="max-w-3xl mx-auto px-8 py-16">
-    <p class="text-orange-400 text-xs font-mono tracking-widest uppercase mb-4">Framework MVC Python</p>
-    <h1 class="text-4xl font-bold mb-4 leading-tight">
-      Bienvenue dans <span class="text-orange-400">Forge</span>.
-    </h1>
-    <p class="text-gray-400 text-lg leading-relaxed mb-6">
-      Ce starter illustre le cycle HTTP de Forge sans base de données.
-      Chaque page démontre une étape du traitement d'une requête.
-    </p>
-
-    <div class="mb-10 p-5 bg-gray-900 border border-gray-800 rounded-xl text-sm space-y-2">
-      <p class="text-xs font-mono text-gray-500 uppercase tracking-wide mb-3">Les deux cycles MVC Forge</p>
-      <p class="font-mono text-gray-300">Cycle HTML&nbsp;: Request → Router → Controller → <span class="text-green-400">View</span> → Response HTML</p>
-      <p class="font-mono text-gray-300">Cycle JSON&nbsp;: Request → Router → Controller → Response JSON</p>
-    </div>
-
-    <div class="grid gap-4">
-
-      <a href="/welcome/cycle"
-         class="group flex items-start gap-5 bg-gray-900 border border-gray-800 hover:border-orange-500/40 rounded-xl p-6 transition-all">
-        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center text-lg font-bold">1</div>
-        <div>
-          <h2 class="font-semibold text-gray-100 group-hover:text-orange-400 transition-colors mb-1">Cycle HTTP</h2>
-          <p class="text-sm text-gray-500">Visualiser les deux cycles : HTML (via View) et JSON (sans View). Comprendre le rôle de chaque étape.</p>
-          <p class="text-xs text-orange-400 mt-2 font-mono">GET /welcome/cycle →</p>
-        </div>
-      </a>
-
-      <a href="/welcome/request"
-         class="group flex items-start gap-5 bg-gray-900 border border-gray-800 hover:border-orange-500/40 rounded-xl p-6 transition-all">
-        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center text-lg font-bold">2</div>
-        <div>
-          <h2 class="font-semibold text-gray-100 group-hover:text-orange-400 transition-colors mb-1">L'objet Requête</h2>
-          <p class="text-sm text-gray-500">Inspecter en direct les attributs de la requête courante : méthode, chemin, paramètres.</p>
-          <p class="text-xs text-orange-400 mt-2 font-mono">GET /welcome/request →</p>
-        </div>
-      </a>
-
-      <a href="/welcome/response"
-         class="group flex items-start gap-5 bg-gray-900 border border-gray-800 hover:border-orange-500/40 rounded-xl p-6 transition-all">
-        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center text-lg font-bold">3</div>
-        <div>
-          <h2 class="font-semibold text-gray-100 group-hover:text-orange-400 transition-colors mb-1">L'objet Réponse</h2>
-          <p class="text-sm text-gray-500">Comprendre comment un contrôleur construit et retourne une réponse HTTP.</p>
-          <p class="text-xs text-orange-400 mt-2 font-mono">GET /welcome/response →</p>
-        </div>
-      </a>
-
-      <a href="/welcome/routing"
-         class="group flex items-start gap-5 bg-gray-900 border border-gray-800 hover:border-orange-500/40 rounded-xl p-6 transition-all">
-        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center text-lg font-bold">4</div>
-        <div>
-          <h2 class="font-semibold text-gray-100 group-hover:text-orange-400 transition-colors mb-1">Le routeur</h2>
-          <p class="text-sm text-gray-500">Voir comment les routes sont déclarées et comment le routeur associe une URL à un contrôleur.</p>
-          <p class="text-xs text-orange-400 mt-2 font-mono">GET /welcome/routing →</p>
-        </div>
-      </a>
-
-      <a href="/welcome/404-demo"
-         class="group flex items-start gap-5 bg-gray-900 border border-gray-800 hover:border-orange-500/40 rounded-xl p-6 transition-all">
-        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center text-lg font-bold">5</div>
-        <div>
-          <h2 class="font-semibold text-gray-100 group-hover:text-orange-400 transition-colors mb-1">Gestion des erreurs</h2>
-          <p class="text-sm text-gray-500">Comprendre comment Forge gère les routes inconnues et retourne une réponse 404 structurée.</p>
-          <p class="text-xs text-orange-400 mt-2 font-mono">GET /welcome/404-demo →</p>
-        </div>
-      </a>
-
-    </div>
-
-    <div class="mt-16 border-t border-gray-800 pt-8 text-sm text-gray-600">
-      <p>Prochaines étapes :
-        <a href="https://caucrogegit.github.io/Forge/getting-started/" class="text-orange-400 hover:underline" target="_blank">documentation</a> ·
-        <code class="bg-gray-800 px-1.5 py-0.5 rounded text-gray-300 text-xs">forge starter:build 1</code> pour un CRUD complet.
-      </p>
-    </div>
-  </main>
-
-</body>
-</html>
-```
-
-</details>
 <details open>
 <summary><code>mvc/views/welcome/cycle.html</code> — route <code>/welcome/cycle</code>, méthode <code>WelcomeController.cycle</code>, vue <code>welcome/cycle.html</code></summary>
 
@@ -629,7 +629,7 @@ Ce starter contient une classe contrôleur principale, `WelcomeController`, et s
     <div class="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-6">
       <p class="text-sm font-semibold text-gray-300 mb-3">Code du contrôleur</p>
       <pre class="text-xs font-mono text-green-400 leading-relaxed overflow-x-auto">@staticmethod
-def request_example(request):
+def request_example(request: Request) -> Response:
     ctx = {
         "method": request.method,   # "GET"
         "path":   request.path,     # "/welcome/request"
@@ -942,7 +942,9 @@ with router.group("", public=True) as pub:
 
 | URL | Méthode appelée | Vue rendue |
 |---|---|---|
-| `/welcome` | `WelcomeController.index(request)` | `welcome/index.html` |
+| `/welcome` | `WelcomeController.index(request)` | _(aucune — `Response.text("Bonjour Forge")`)_ |
+| `/welcome/greet?name=…` | `WelcomeController.greet(request)` | _(aucune — `Response.text(...)`)_ |
+| `/welcome/inspect` | `WelcomeController.inspect(request)` | _(aucune — `Response.debug(request.data)`)_ |
 | `/welcome/cycle` | `WelcomeController.cycle(request)` | `welcome/cycle.html` |
 | `/welcome/request` | `WelcomeController.request_example(request)` | `welcome/request_example.html` |
 | `/welcome/response` | `WelcomeController.response_example(request)` | `welcome/response_example.html` |
@@ -951,12 +953,12 @@ with router.group("", public=True) as pub:
 
 ## Lire l’application dans le bon ordre
 
-1. Ouvrez `localhost:8000/welcome`.
-2. Lisez la route correspondante dans `mvc/routes.py`.
-3. Retrouvez la méthode du contrôleur dans `mvc/controllers/welcome_controller.py`.
-4. Ouvrez la vue rendue dans `mvc/views/welcome/`.
-5. Comparez le code HTML avec ce que vous voyez dans le navigateur.
-6. Refaites le même trajet avec `/welcome/cycle` puis `/welcome/request`.
+1. Ouvrez `localhost:8000/welcome` → vous voyez « Bonjour Forge » sans aucun template.
+2. Visitez `localhost:8000/welcome/greet?name=Roger` → `Response.text` avec un paramètre.
+3. Visitez `localhost:8000/welcome/inspect` → dump masqué de `request.data` via `Response.debug`.
+4. Visitez `localhost:8000/welcome/cycle` → première vue HTML rendue par `BaseController.render(...)`.
+5. Lisez la route correspondante dans `mvc/routes.py`, puis la méthode dans `mvc/controllers/welcome_controller.py`.
+6. Ouvrez la vue rendue dans `mvc/views/welcome/` et comparez le code HTML avec ce que vous voyez dans le navigateur.
 
 ## Les composants en détail
 

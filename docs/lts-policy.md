@@ -334,7 +334,7 @@ La LTS candidate la plus réaliste serait une version `1.0.0` stable ou une vers
 | Ticket | Domaine |
 |---|---|
 | `DOC-STRUCTURE-001` | Documentation par parcours |
-| `DOC-15MIN-001` | Tutoriel "15 minutes avec Forge" |
+| `DOC-15MIN-001` | Tutoriel d'entrée Forge (devenu « Bonjour Forge » — voir `docs/bonjour-forge.md`) |
 | `DOC-APP-COMPLETE-001` | Tutoriel application complète |
 | `DOC-CONTRIBUTE-001` | Guide contribuer |
 | `API-JSON-001` à `API-DOC-001` | API JSON légère |

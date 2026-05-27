@@ -82,7 +82,7 @@ class TestMovedFilesInMeta:
 
     _META_DIR = TESTS_ROOT / "meta"
     _EXPECTED = [
-        "test_doc_15min.py",
+        "test_doc_bonjour_forge.py",
         "test_doc_app_complete.py",
         "test_doc_contribute.py",
         "test_doc_deploy_advanced.py",
