@@ -16,7 +16,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 | Starter | Statut | Profil associé | Usage recommandé |
 |---|---|---|---|
-| [Bonjour Forge — premier pas](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact avec Forge — `Response.text(...)` → `Response.debug(...)` → `BaseController.render(...)`, sans SQL |
+| [Bonjour Forge — premier pas](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact minimal avec Forge — `Response.text(...)` et `request.param(...)`, deux routes, aucune vue HTML, aucune base de données |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
@@ -28,21 +28,19 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 ### Bonjour Forge — premier pas
 
-Le starter d'entrée de Forge. Aucune base de données requise. La
-progression pédagogique va du chemin le plus court (`Response.text(...)`)
-jusqu'au rendu de templates Jinja2 (`BaseController.render(...)`), en
-passant par `request.param(...)` et `Response.debug(request.data)`.
+Le starter d'entrée minimal de Forge. Aucune base de données, aucune
+vue HTML, aucun moteur Jinja2. Deux routes texte qui montrent le
+chemin le plus court entre une requête et une réponse.
 
 Ce starter est référencé en interne comme `Bienvenue dans Forge` (alias
 historique conservé).
 
 Profil recommandé : aucun — fonctionne sans `forge db:init`.
 
-- texte brut puis évolution vers le rendu Jinja2 ;
-- `request.param(name, default=...)` introduit simplement ;
-- inspection de `request.data` via `Response.debug(obj)` ;
-- déclaration des routes dans `mvc/routes.py` ;
-- gestion des erreurs 404 illustrée.
+- `GET /welcome` → `Response.text("Bonjour Forge")` ;
+- `GET /welcome/greet?name=Roger` → `Response.text("Bonjour Roger")` ;
+- introduction à `request.param(key, default=...)` ;
+- déclaration des routes dans `mvc/routes.py`.
 
 **Usage :**
 

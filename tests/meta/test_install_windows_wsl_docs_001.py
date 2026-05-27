@@ -143,10 +143,20 @@ class TestRoutesStarter:
 
     def test_routes_welcome_listees(self):
         text = _text()
-        # Au moins /welcome et /welcome/inspect doivent apparaître pour
-        # valider l'installation côté starter Bonjour Forge.
+        # Le starter minimal expose deux routes texte : /welcome et /welcome/greet.
         assert "/welcome" in text
-        assert "/welcome/inspect" in text
+        assert "/welcome/greet" in text
+
+    def test_routes_retirees_absentes(self):
+        """STARTER-BONJOUR-FORGE-MINIMAL-001 : les routes /inspect, /cycle,
+        /request, /response, /routing, /404-demo ont été retirées."""
+        text = _text()
+        for retired in ("/welcome/inspect", "/welcome/cycle",
+                        "/welcome/request", "/welcome/response",
+                        "/welcome/routing", "/welcome/404-demo"):
+            assert retired not in text, (
+                f"La doc install ne doit plus mentionner {retired}"
+            )
 
 
 class TestPrerequisLinux:

@@ -457,9 +457,8 @@ Depuis Windows, ouvrir le navigateur sur :
 | URL | Réponse attendue |
 |---|---|
 | `https://localhost:8000/welcome` | Texte brut : `Bonjour Forge` |
+| `https://localhost:8000/welcome/greet` | Texte brut : `Bonjour Forge` |
 | `https://localhost:8000/welcome/greet?name=Roger` | Texte brut : `Bonjour Roger` |
-| `https://localhost:8000/welcome/inspect` | Page HTML « Debug Forge » avec le dump masqué de `request.data` |
-| `https://localhost:8000/welcome/cycle` | Vue HTML Jinja2 — premier exemple de `BaseController.render(...)` |
 | `https://localhost:8000/` | Page d'accueil par défaut du squelette (HomeController) |
 
 Si une route renvoie 404, vérifier que le starter `welcome` a bien
@@ -564,7 +563,7 @@ Si une route renvoie 404, vérifier que le starter `welcome` a bien
 | `forge db:init` | OK |
 | `forge doctor` | OK |
 | `forge run` actif (autoreload) | OK |
-| Routes `/welcome`, `/welcome/greet`, `/welcome/inspect` | OK |
+| Routes `/welcome`, `/welcome/greet` | OK |
 
 > **Forge est installé. Le projet répond. Vous pouvez maintenant
 > créer votre application.**

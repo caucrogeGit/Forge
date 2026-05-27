@@ -2,12 +2,6 @@
 from mvc.controllers.welcome_controller import WelcomeController
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/welcome",           WelcomeController.index,           name="welcome_index")
-    pub.add("GET", "/welcome/greet",     WelcomeController.greet,           name="welcome_greet")
-    pub.add("GET", "/welcome/inspect",   WelcomeController.inspect,         name="welcome_inspect")
-    pub.add("GET", "/welcome/cycle",     WelcomeController.cycle,           name="welcome_cycle")
-    pub.add("GET", "/welcome/request",   WelcomeController.request_example, name="welcome_request")
-    pub.add("GET", "/welcome/response",  WelcomeController.response_example, name="welcome_response")
-    pub.add("GET", "/welcome/routing",   WelcomeController.routing_example, name="welcome_routing")
-    pub.add("GET", "/welcome/404-demo",  WelcomeController.not_found_demo,  name="welcome_404_demo")
+    pub.add("GET", "/welcome",       WelcomeController.index, name="welcome_index")
+    pub.add("GET", "/welcome/greet", WelcomeController.greet, name="welcome_greet")
 # forge-starter:welcome:end

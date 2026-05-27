@@ -1,14 +1,17 @@
-"""Tests documentaires — DX-DOCS-BONJOUR-FORGE-CLOSE-001.
+"""Tests documentaires — DX-DOCS-BONJOUR-FORGE-CLOSE-001
+(adapté par STARTER-BONJOUR-FORGE-MINIMAL-001).
 
 Verrouille le contrat de la page d'entrée `docs/bonjour-forge.md` après
 renommage de l'ancien tutoriel `docs/15-minutes.md` (clôture phase
-beta 11 DX). La page doit présenter le parcours développeur livré :
+beta 11 DX) et alignement sur le starter `welcome` minimal :
 
     forge run → route → contrôleur → Response.text → request.param
-                → request.data → Response.debug → BaseController.render
 
 Le ticket d'origine `DOC-15MIN-001` reste mentionné dans la roadmap
-(historique). Le marqueur courant est `DX-DOCS-BONJOUR-FORGE-CLOSE-001`.
+(historique). Les concepts `request.data`, `Response.debug` et
+`BaseController.render` restent documentés dans `docs/reference/http.md`
+et seront repris par de futurs starters dédiés ; la page d'entrée
+`bonjour-forge.md` ne les couvre plus.
 """
 
 from pathlib import Path
@@ -77,51 +80,31 @@ class TestParcoursPedagogique:
     def test_request_param_documente(self):
         assert "request.param(" in _text()
 
-    def test_request_data_documente(self):
-        assert "request.data" in _text()
-
-    def test_response_debug_documente(self):
-        assert "Response.debug(request.data)" in _text()
-
-    def test_base_controller_render_documente(self):
-        assert "BaseController.render(" in _text()
-
-    def test_difference_text_vs_render_explicite(self):
+    def test_ordre_route_avant_response_text(self):
+        """L'ordre des sections suit la progression pédagogique :
+        forge run → route → contrôleur → Response.text → request.param."""
         text = _text()
-        assert 'Response.text("Bonjour Forge")' in text
-        assert 'BaseController.render("welcome/index.html"' in text
+        idx_route = text.find("## 2. Comprendre la route")
+        idx_text = text.find("Retourner `Response.text")
+        assert idx_route != -1 and idx_text != -1
+        assert idx_route < idx_text
 
-    def test_ordre_text_avant_render(self):
-        """L'ordre des sections H2 dédiées doit suivre la progression
-        pédagogique : Response.text → request.param → request.data →
-        Response.debug → BaseController.render."""
+
+class TestNotionsRepoussees:
+    """STARTER-BONJOUR-FORGE-MINIMAL-001 : les notions repoussées à de
+    futurs starters dédiés ne doivent plus apparaître dans la doc d'entrée."""
+
+    @pytest.mark.parametrize("notion", [
+        "request.data",
+        "Response.debug",
+        "BaseController.render",
+    ])
+    def test_notion_repoussee_absente(self, notion: str):
         text = _text()
-        idx_text_section = text.find("Retourner `Response.text")
-        idx_render_section = text.find("Comprendre `BaseController.render")
-        assert idx_text_section != -1, "Section dédiée à Response.text introuvable."
-        assert idx_render_section != -1, (
-            "Section dédiée à BaseController.render introuvable."
+        assert notion not in text, (
+            f"`{notion}` ne doit plus figurer dans bonjour-forge.md "
+            "(repoussé à un futur starter dédié)."
         )
-        assert idx_text_section < idx_render_section, (
-            "La section Response.text doit précéder la section "
-            "BaseController.render dans la progression pédagogique."
-        )
-
-
-# ---------------------------------------------------------------------------
-# Sécurité / masquage évoqué
-# ---------------------------------------------------------------------------
-
-
-class TestSecurite:
-    def test_masquage_documente(self):
-        text = _text().lower()
-        assert "masqué" in text or "[masked]" in _text() or "masqu" in text
-
-    def test_dev_vs_prod_response_debug(self):
-        text = _text()
-        assert "APP_ENV=dev" in text
-        assert "APP_ENV=prod" in text
 
 
 # ---------------------------------------------------------------------------
