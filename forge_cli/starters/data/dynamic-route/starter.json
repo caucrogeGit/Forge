@@ -1,0 +1,19 @@
+{
+  "id": "dynamic-route",
+  "number": 10,
+  "name": "Route dynamique",
+  "kind": "skeleton",
+  "aliases": ["dynamic-route", "dynamic_route", "route-param", "10"],
+  "description": "Starter 10 — Route dynamique : palier 4 de la progression pédagogique officielle, après Première vue HTML. Une route `/dynamic-route/articles/{id}` qui apprend à lire un paramètre de route avec `request.route_param(...)`. Aucune vue HTML, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/dynamic-route/articles/42",
+  "routes_marker": "dynamic-route",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/dynamic-route/articles/42",
+  "doc_url": "https://caucrogegit.github.io/Forge/starters/dynamic-route/",
+  "check_paths": [
+    "mvc/controllers/dynamic_route_controller.py"
+  ]
+}

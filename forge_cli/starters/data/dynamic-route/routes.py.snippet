@@ -1,0 +1,6 @@
+# forge-starter:dynamic-route:start
+from mvc.controllers.dynamic_route_controller import DynamicRouteController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/dynamic-route/articles/{id}", DynamicRouteController.show, name="dynamic_route_article_show")
+# forge-starter:dynamic-route:end

@@ -66,11 +66,9 @@ class TestProgressionSectionInStartersIndex:
         )
 
     @pytest.mark.parametrize("ticket_code", [
-        # STARTER-QUERY-PARAMS-001 livré, désormais référencé comme
-        # « livré — starter `query-params` » (voir test_palier_2_livre).
-        # STARTER-FIRST-HTML-VIEW-001 livré, désormais référencé comme
-        # « livré — starter `first-html-view` » (voir test_palier_3_livre).
-        "STARTER-DYNAMIC-ROUTE-001",
+        # STARTER-QUERY-PARAMS-001 livré → voir test_palier_2_livre.
+        # STARTER-FIRST-HTML-VIEW-001 livré → voir test_palier_3_livre.
+        # STARTER-DYNAMIC-ROUTE-001 livré → voir test_palier_4_livre.
         "STARTER-REQUEST-DEBUG-001",
         "STARTER-FORM-POST-001",
         "STARTER-SERVER-VALIDATION-001",
@@ -135,6 +133,32 @@ class TestProgressionSectionInStartersIndex:
         )
         assert "first-html-view" in palier3_block, (
             "Le palier 3 doit mentionner le starter `first-html-view`."
+        )
+
+    def test_palier_4_dynamic_route_marque_livre(self):
+        # STARTER-DYNAMIC-ROUTE-001 livré : palier 4 doit l'indiquer
+        # explicitement avec la mention « livré ».
+        # Cf. test_palier_2/3 — on ancre sur l'item numéroté.
+        assert "STARTER-DYNAMIC-ROUTE-001" in self.content, (
+            "STARTER-DYNAMIC-ROUTE-001 doit rester référencé dans la "
+            "progression (palier 4)."
+        )
+        text = self.content
+        idx_palier4 = text.find("4. **Route dynamique**")
+        idx_palier5 = text.find("5. **Inspecter une requête**")
+        assert idx_palier4 != -1, (
+            "Item « 4. **Route dynamique** » introuvable dans la progression."
+        )
+        assert idx_palier5 != -1, (
+            "Item « 5. **Inspecter une requête** » introuvable dans la progression."
+        )
+        palier4_block = text[idx_palier4:idx_palier5]
+        assert "livré" in palier4_block, (
+            "Le palier 4 (Route dynamique) doit être marqué « livré » "
+            "depuis STARTER-DYNAMIC-ROUTE-001."
+        )
+        assert "dynamic-route" in palier4_block, (
+            "Le palier 4 doit mentionner le starter `dynamic-route`."
         )
 
     def test_warning_admonition_present(self):
@@ -267,7 +291,7 @@ class TestFutureStartersNotYetCreated:
     @pytest.mark.parametrize("future_starter_slug", [
         # query-params retiré : livré par STARTER-QUERY-PARAMS-001 (palier 2).
         # first-html-view retiré : livré par STARTER-FIRST-HTML-VIEW-001 (palier 3).
-        "dynamic-route",
+        # dynamic-route retiré : livré par STARTER-DYNAMIC-ROUTE-001 (palier 4).
         "request-debug",
         "form-post",
         "server-validation",
