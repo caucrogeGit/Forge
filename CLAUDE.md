@@ -292,8 +292,10 @@ CLAUDE.md
 .claude/settings.json
 .claude/hooks/**
 pyproject.toml
-CHANGELOG.md
 .env  /  .env.*  /  **/.env  /  **/.env.*
+env/*    — fichiers d'environnement Forge (env/dev, env/test, env/prod,
+           env/*.local) ; protégés même quand le fichier n'existe pas
+           encore (le check passe avant la règle 1 « write-if-new »)
 ```
 
 **Zone code-utilisateur bloquée (règle 4) :**
@@ -302,6 +304,19 @@ CHANGELOG.md
 starters/**     — starters Forge distribués
 examples/**     — exemples du framework
 ```
+
+### Cas particulier : `CHANGELOG.md`
+
+`CHANGELOG.md` est **modifiable** par les agents lorsqu'un ticket le demande
+explicitement (ticket `AGENTS-CHANGELOG-WRITE-ALLOW-001`).
+
+Raison : le changelog fait partie du flux normal de release, d'audit et de
+clôture Forge. Il ne doit plus être traité comme un fichier structurel
+toujours bloqué.
+
+Les agents doivent toutefois limiter leurs modifications à la section
+concernée par le ticket en cours, sans toucher aux entrées historiques
+d'autres tickets ou d'autres versions.
 
 Si Claude Code est bloqué sur un fichier qu'il devrait pouvoir modifier,
 vérifier que le chemin ne matche pas l'une de ces règles et ajuster le ticket
