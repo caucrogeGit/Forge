@@ -348,3 +348,20 @@ d'autres tickets ou d'autres versions.
 Si Claude Code est bloqué sur un fichier qu'il devrait pouvoir modifier,
 vérifier que le chemin ne matche pas l'une de ces règles et ajuster le ticket
 en conséquence.
+
+### Validations : pas d’attente passive
+
+Les agents ne doivent pas lancer les validations Forge en arrière-plan.
+
+Interdit :
+- lancer `pytest`, `mkdocs`, `ruff`, `compileall` en tâche de fond ;
+- répondre “j’attends la fin” ;
+- masquer une validation finale avec `tail`, `head` ou une sortie tronquée ;
+- considérer une commande réussie sans exit code ou résumé complet.
+
+Attendu :
+- lancer les validations en foreground ;
+- afficher le résultat utile complet ;
+- donner le code retour si disponible ;
+- en cas d’échec, afficher l’erreur complète ;
+- si une commande est trop longue pour l’outil, demander à l’utilisateur de la lancer et de coller le résultat.
