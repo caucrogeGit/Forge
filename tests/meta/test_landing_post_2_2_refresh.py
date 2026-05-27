@@ -138,17 +138,17 @@ class TestEtatActuel:
         )
 
     def test_phases_recentes_mentionnees(self):
-        """Apports phases récentes — phrasing aligné sur la section
-        « Aperçu Forge 1.0.0-beta.10 » de la landing actuelle
-        (LANDING-PUBLIC-CONTRACT-REALIGN-001)."""
+        """Apports phases récentes — phrasing aligné sur les parcours
+        d'installation actuels de la landing (cards Installer Forge)
+        après LANDING-PUBLIC-CONTRACT-REALIGN-001."""
         src = _src()
         assert (
-            "CLI plus sûre" in src
-            or "Production encadrée" in src
-            or "X-Real-IP" in src
-            or "Cookies et stores renforcés" in src
-            or "Limites explicites" in src
-            or "Core autonome préservé" in src
+            "forge run" in src
+            or "Windows + WSL" in src
+            or "pipx" in src
+            or "Développement du core" in src
+            or "Production — WSGI" in src
+            or "Bienvenue dans Forge" in src
         )
 
     def test_prochaine_priorite_auth(self):

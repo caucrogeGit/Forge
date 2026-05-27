@@ -100,10 +100,6 @@
       <h2 class="text-4xl font-bold tracking-tight mb-4">
         Installer Forge selon votre usage.
       </h2>
-      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
-        Cinq parcours, du premier contact au déploiement encadré.
-        Choisissez le vôtre.
-      </p>
     </div>
 
     <div class="grid md:grid-cols-2 gap-5">
@@ -253,8 +249,6 @@ application = create_configured_wsgi_app()
          class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all md:col-span-2">
         <div class="text-xs landing-accent-text font-semibold mb-2">Premier pas</div>
         <h3 class="font-semibold text-lg mb-2">Bienvenue dans Forge</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">Cycle HTTP illustré en 6 pages : Request → Router → Controller → Response. Fonctionne sans <code class="text-xs bg-slate-100 px-1 rounded">forge db:init</code>. Idéal comme premier contact.</p>
-        <p class="text-xs text-slate-400 mt-3 font-mono">forge new mon-projet --starter welcome</p>
       </a>
 
       <a href="https://caucrogegit.github.io/Forge/starters/01-contact-simple/"
@@ -315,9 +309,6 @@ application = create_configured_wsgi_app()
       <h2 class="text-4xl font-bold tracking-tight mb-4">
         API Forge.
       </h2>
-      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
-        Six points d'entrée stables et documentés. Chaque famille reste minimale et auditable.
-      </p>
     </div>
 
     <div class="grid md:grid-cols-2 gap-5">
@@ -397,11 +388,7 @@ application = create_configured_wsgi_app()
     </div>
 
     <div id="crud" class="mt-12 mb-10">
-      <h3 class="text-2xl font-bold tracking-tight mb-3">Le core Forge</h3>
-      <p class="text-slate-500 text-sm max-w-2xl">
-        Le cœur du framework fournit les briques génériques. Tout starter Forge
-        n'est qu'un démonstrateur — le moteur reste dans le core.
-      </p>
+      <h3 class="text-2xl font-bold tracking-tight mb-3">Le core Forge fournit les briques génériques.</h3>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -581,12 +568,7 @@ application = create_configured_wsgi_app()
 
     <!-- Modules officiels opt-in -->
     <div id="modules" class="mt-16 mb-10">
-      <h3 class="text-2xl font-bold tracking-tight mb-3">Modules officiels opt-in</h3>
-      <p class="text-slate-500 text-sm max-w-2xl">
-        Modules officiels opt-in de Forge, installables séparément selon leur état de disponibilité.
-        Leur publication PyPI est progressive à partir de la série 1.0.0-beta.6 —
-        <code class="text-xs bg-slate-100 px-2 py-0.5 rounded">pip install --pre forge-mvc-rbac</code>.
-      </p>
+      <h3 class="text-2xl font-bold tracking-tight mb-3">Modules officiels opt-in installables séparément selon leur état de disponibilité.</h3>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -632,86 +614,6 @@ application = create_configured_wsgi_app()
       </a>
 
     </div>
-  </div>
-</section>
-
-<!-- Aperçu Forge 1.0.0-beta.10 (en cours) -->
-<section id="beta9" class="py-24 px-6 bg-white">
-  <div class="max-w-5xl mx-auto">
-    <div class="text-center mb-12">
-      <div class="landing-accent-text text-sm font-semibold uppercase tracking-wider mb-3">En cours — Phase B9</div>
-      <h2 class="text-4xl font-bold tracking-tight mb-4">
-        Aperçu Forge 1.0.0-beta.10
-      </h2>
-      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
-        Beta.9 consolide le chemin production encadrée sans transformer Forge en plateforme clé en main.
-        Les apports principaux, déjà livrés en branche principale :
-      </p>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-5">
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">CLI</div>
-        <h3 class="font-semibold mb-2">CLI plus sûre</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          <code class="text-xs bg-slate-100 px-1 rounded">--help</code> /
-          <code class="text-xs bg-slate-100 px-1 rounded">-h</code>
-          n'exécute plus les commandes métier. Les commandes sensibles (diagnostic, mail, migrations, CRUD) documentent leurs effets.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">WSGI</div>
-        <h3 class="font-semibold mb-2">Production encadrée</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          Entrée <code class="text-xs bg-slate-100 px-1 rounded">create_configured_wsgi_app()</code> documentée pour Gunicorn derrière reverse proxy. Smoke tests transversaux inclus.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Sécurité HTTP</div>
-        <h3 class="font-semibold mb-2"><code class="text-xs bg-slate-100 px-1 rounded">X-Real-IP</code> sous contrôle</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          <code class="text-xs bg-slate-100 px-1 rounded">APP_TRUSTED_PROXIES</code> explicite, vide par défaut. Aucun header client n'est cru aveuglément.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Sessions</div>
-        <h3 class="font-semibold mb-2">Cookies et stores renforcés</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          Helpers <code class="text-xs bg-slate-100 px-1 rounded">set_session_cookie</code> /
-          <code class="text-xs bg-slate-100 px-1 rounded">clear_session_cookie</code> centralisés,
-          <code class="text-xs bg-slate-100 px-1 rounded">cleanup_expired()</code> aligné sur les 3 stores, dédomainisation progressive.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Production</div>
-        <h3 class="font-semibold mb-2">Limites explicites</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          <code class="text-xs bg-slate-100 px-1 rounded">python app.py</code> reste réservé au développement / démonstration. Page dédiée :
-          <a href="https://caucrogegit.github.io/Forge/production-limits/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Limites de production</a>
-          + warnings au démarrage WSGI si <code class="text-xs bg-slate-100 px-1 rounded">MemorySessionStore</code> en prod.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Opt-ins</div>
-        <h3 class="font-semibold mb-2">Core autonome préservé</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-media</code> intégré à la matrice CI opt-in. Aucun module métier n'est imposé au core Forge.
-        </p>
-      </div>
-    </div>
-
-    <p class="text-center text-sm text-slate-400 mt-10 max-w-3xl mx-auto">
-      Forge reste <span class="text-slate-600 font-medium">petit dans son cœur</span>,
-      <span class="text-slate-600 font-medium">riche par ses briques</span>,
-      <span class="text-slate-600 font-medium">clair dans ses générateurs</span>,
-      <span class="text-slate-600 font-medium">fortement documenté</span>,
-      <span class="text-slate-600 font-medium">très testé</span>.
-    </p>
   </div>
 </section>
 
@@ -819,11 +721,8 @@ router = Router()
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
       <h2 class="text-4xl font-bold tracking-tight text-slate-900 mb-4">
-        Où se place Forge ?
-      </h2>
-      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
         Forge se place entre Flask et Django.
-      </p>
+      </h2>
     </div>
 
     <div class="grid md:grid-cols-2 gap-5 mb-10">

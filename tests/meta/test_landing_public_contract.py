@@ -125,9 +125,16 @@ class TestOptInModules:
         assert module in text, f"Module opt-in '{module}' manquant dans la landing."
 
     def test_modules_description_wording(self):
+        """Le bloc « Modules officiels opt-in » a son chapeau actualisé
+        (LANDING-PUBLIC-CONTRACT-REALIGN-001) — il mentionne l'installation
+        séparée selon l'état de disponibilité, pas l'ancien wording
+        « publication PyPI est progressive »."""
         text = LANDING.read_text(encoding="utf-8")
-        assert "publication PyPI est progressive" in text, (
-            "Le texte des modules opt-in doit mentionner la publication progressive sur PyPI."
+        assert "Modules officiels opt-in" in text, (
+            "Le bloc des modules opt-in doit conserver son titre canonique."
+        )
+        assert "installables séparément" in text, (
+            "Le bloc des modules opt-in doit indiquer qu'ils s'installent séparément."
         )
 
 
