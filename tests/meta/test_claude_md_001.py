@@ -125,3 +125,109 @@ class TestPointsToSources:
         assert source in self.content, (
             f"CLAUDE.md devrait pointer vers la source canonique '{source}'"
         )
+
+
+# ── Règle : pas de validations Forge en arrière-plan ──────────────────────────
+
+
+# Caractères Unicode présents tels quels dans CLAUDE.md (smart quotes).
+# RIGHT SINGLE QUOTATION MARK (U+2019) — `’`
+# LEFT/RIGHT DOUBLE QUOTATION MARK (U+201C / U+201D) — `“ ”`
+_RULE_HEADER = "### Validations : pas d’attente passive"
+_J_ATTENDS = "“j’attends la fin”"
+
+
+def _validation_rule_block() -> str:
+    """Extrait le bloc « Validations : pas d'attente passive » de
+    CLAUDE.md (du header jusqu'à la prochaine section `##`/`###` ou
+    EOF) pour pouvoir vérifier que les marqueurs requis sont DANS la
+    règle elle-même, pas ailleurs dans le fichier."""
+    text = CLAUDE_MD.read_text(encoding="utf-8")
+    start = text.find(_RULE_HEADER)
+    if start == -1:
+        return ""
+    # Trouve la fin du bloc : prochain `##` (header de section) après
+    # le header de notre sous-section.
+    rest = text[start + len(_RULE_HEADER):]
+    next_section_offset = rest.find("\n## ")
+    if next_section_offset == -1:
+        return text[start:]
+    return text[start: start + len(_RULE_HEADER) + next_section_offset]
+
+
+class TestNoBackgroundValidationRule:
+    """Verrouille AGENTS-NO-BACKGROUND-VALIDATION-001 :
+    CLAUDE.md doit interdire explicitement les validations Forge en
+    arrière-plan, l'attente passive et le masquage par tail/head.
+    """
+
+    @pytest.fixture(autouse=True)
+    def _load(self):
+        self.content = CLAUDE_MD.read_text(encoding="utf-8")
+        self.block = _validation_rule_block()
+
+    def test_rule_header_present(self):
+        assert _RULE_HEADER in self.content, (
+            "CLAUDE.md doit comporter la sous-section "
+            "« Validations : pas d’attente passive » "
+            "(AGENTS-NO-BACKGROUND-VALIDATION-001)."
+        )
+
+    def test_rule_block_extractable(self):
+        # Garde-fou de l'extracteur : la règle a bien un corps non vide
+        assert self.block, "Bloc de règle introuvable"
+        assert len(self.block) > 200, (
+            "Le bloc de règle semble tronqué — vérifier que les listes "
+            "Interdit/Attendu sont bien présentes."
+        )
+
+    @pytest.mark.parametrize("marker", [
+        # Concepts-clés (présents dans la règle elle-même)
+        "arrière-plan",
+        "foreground",
+        "exit code",
+        # Outils ciblés par l'interdiction
+        "pytest",
+        "mkdocs",
+        "ruff",
+        "compileall",
+        # Anti-patterns nommés
+        "tail",
+        "head",
+        # Réponse-type interdite, citée littéralement avec smart quotes
+        _J_ATTENDS,
+    ])
+    def test_marker_present_in_rule_block(self, marker: str):
+        assert marker in self.block, (
+            f"Le marqueur '{marker}' doit apparaître DANS la sous-section "
+            "« Validations : pas d’attente passive » de CLAUDE.md "
+            "(et pas seulement ailleurs dans le fichier)."
+        )
+
+    def test_rule_lists_interdit_and_attendu(self):
+        # Les deux listes structurantes (Interdit / Attendu) sont
+        # exigées : le contraste rend la règle non ambiguë.
+        assert "Interdit :" in self.block, (
+            "Le bloc doit comporter une liste « Interdit : »."
+        )
+        assert "Attendu :" in self.block, (
+            "Le bloc doit comporter une liste « Attendu : »."
+        )
+
+    def test_rule_is_inside_hooks_section(self):
+        # La règle doit cohabiter avec les autres consignes agent —
+        # placée dans la section 12 (Fichiers protégés — hook
+        # PreToolUse), pas perdue ailleurs dans le fichier.
+        text = self.content
+        idx_section_12 = text.find("## 12. Fichiers prot")
+        idx_rule = text.find(_RULE_HEADER)
+        assert idx_section_12 != -1, (
+            "Section 12 « Fichiers protégés — hook PreToolUse » "
+            "introuvable dans CLAUDE.md."
+        )
+        assert idx_rule != -1, "Sous-section de règle introuvable."
+        assert idx_rule > idx_section_12, (
+            "La règle « Validations : pas d’attente passive » doit "
+            "être à l'intérieur de la section 12 (hooks/agents), pas "
+            "avant — sinon elle est isolée des autres consignes agent."
+        )
