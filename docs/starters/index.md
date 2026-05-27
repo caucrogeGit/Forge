@@ -20,6 +20,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Paramètres d'URL](query-params/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 2 de la progression — lire une valeur d'URL avec `request.param("name", default=...)`, deux routes, aucune vue HTML, aucune base de données |
 | [Première vue HTML](first-html-view/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 3 de la progression — rendre une page HTML avec `BaseController.render(...)`, une route, une vue, aucune base de données |
 | [Route dynamique](dynamic-route/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 4 de la progression — lire un paramètre de route avec `request.route_param("id")`, une route `/dynamic-route/articles/{id}`, aucune vue HTML, aucune base de données |
+| [Inspecter une requête](request-debug/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 5 de la progression — explorer `request.data` avec `Response.debug(...)`, une route `/request-debug`, aucune vue HTML, aucune base de données |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
@@ -43,7 +44,7 @@ d'aborder le CRUD sereinement. La progression officielle est :
 4. **Route dynamique** — lire un paramètre de route comme `/articles/{id}`.
    *(livré — starter `dynamic-route`, ticket `STARTER-DYNAMIC-ROUTE-001`)*
 5. **Inspecter une requête** — explorer `request.data` avec `Response.debug(...)` en développement.
-   *(à venir — `STARTER-REQUEST-DEBUG-001`)*
+   *(livré — starter `request-debug`, ticket `STARTER-REQUEST-DEBUG-001`)*
 6. **Premier formulaire POST** — envoyer des données depuis un formulaire HTML.
    *(à venir — `STARTER-FORM-POST-001`)*
 7. **Validation serveur** — refuser ou accepter les données reçues.

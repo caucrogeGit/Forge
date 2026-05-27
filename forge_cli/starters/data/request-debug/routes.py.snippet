@@ -1,0 +1,6 @@
+# forge-starter:request-debug:start
+from mvc.controllers.request_debug_controller import RequestDebugController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/request-debug", RequestDebugController.index, name="request_debug_index")
+# forge-starter:request-debug:end

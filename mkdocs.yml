@@ -112,6 +112,8 @@ nav:
           - Présentation: starters/first-html-view/index.md
       - Route dynamique:
           - Présentation: starters/dynamic-route/index.md
+      - Inspecter une requête:
+          - Présentation: starters/request-debug/index.md
       - Contacts:
           - Présentation: starters/01-contact-simple/index.md
           - Reconstruction: starters/01-contact-simple/rebuild.md
