@@ -1,0 +1,6 @@
+# forge-starter:first-sql:start
+from mvc.controllers.first_sql_controller import FirstSqlController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/first-sql", FirstSqlController.index, name="first_sql_index")
+# forge-starter:first-sql:end

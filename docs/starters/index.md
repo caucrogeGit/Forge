@@ -23,6 +23,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Inspecter une requête](request-debug/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 5 de la progression — explorer `request.data` avec `Response.debug(...)`, une route `/request-debug`, aucune vue HTML, aucune base de données |
 | [Premier formulaire POST](form-post/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 6 de la progression — afficher un formulaire HTML minimal (avec CSRF), envoyer un POST, lire la valeur avec `request.form("name", ...)`, aucune base de données |
 | [Validation serveur](server-validation/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
+| [Première base SQL](first-sql/index.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
@@ -52,7 +53,7 @@ d'aborder le CRUD sereinement. La progression officielle est :
 7. **Validation serveur** — refuser ou accepter les données reçues.
    *(livré — starter `server-validation`, ticket `STARTER-SERVER-VALIDATION-001`)*
 8. **Première base SQL** — comprendre MariaDB, les migrations et le SQL visible.
-   *(à venir — `STARTER-FIRST-SQL-001`)*
+   *(livré — starter `first-sql`, ticket `STARTER-FIRST-SQL-001`)*
 9. **Premier CRUD** — utiliser le starter Contacts quand les bases précédentes sont acquises.
    *(livré — starter `01-contact-simple`, à repositionner pédagogiquement via `STARTER-CONTACTS-CRUD-REPOSITION-001`)*
 

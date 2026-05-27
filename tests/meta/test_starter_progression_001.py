@@ -72,7 +72,7 @@ class TestProgressionSectionInStartersIndex:
         # STARTER-REQUEST-DEBUG-001 livré → voir test_palier_5_livre.
         # STARTER-FORM-POST-001 livré → voir test_palier_6_livre.
         # STARTER-SERVER-VALIDATION-001 livré → voir test_palier_7_livre.
-        "STARTER-FIRST-SQL-001",
+        # STARTER-FIRST-SQL-001 livré → voir test_palier_8_livre.
         "STARTER-CONTACTS-CRUD-REPOSITION-001",
     ])
     def test_future_ticket_codes_listed(self, ticket_code):
@@ -236,6 +236,31 @@ class TestProgressionSectionInStartersIndex:
             "Le palier 7 doit mentionner le starter `server-validation`."
         )
 
+    def test_palier_8_first_sql_marque_livre(self):
+        # STARTER-FIRST-SQL-001 livré : palier 8 doit l'indiquer
+        # explicitement avec la mention « livré ».
+        assert "STARTER-FIRST-SQL-001" in self.content, (
+            "STARTER-FIRST-SQL-001 doit rester référencé dans la "
+            "progression (palier 8)."
+        )
+        text = self.content
+        idx_palier8 = text.find("8. **Première base SQL**")
+        idx_palier9 = text.find("9. **Premier CRUD**")
+        assert idx_palier8 != -1, (
+            "Item « 8. **Première base SQL** » introuvable dans la progression."
+        )
+        assert idx_palier9 != -1, (
+            "Item « 9. **Premier CRUD** » introuvable dans la progression."
+        )
+        palier8_block = text[idx_palier8:idx_palier9]
+        assert "livré" in palier8_block, (
+            "Le palier 8 (Première base SQL) doit être marqué « livré » "
+            "depuis STARTER-FIRST-SQL-001."
+        )
+        assert "first-sql" in palier8_block, (
+            "Le palier 8 doit mentionner le starter `first-sql`."
+        )
+
     def test_warning_admonition_present(self):
         # Le saut welcome → CRUD est explicitement mis en garde
         assert "!!! warning" in self.content, (
@@ -370,7 +395,10 @@ class TestFutureStartersNotYetCreated:
         # request-debug retiré : livré par STARTER-REQUEST-DEBUG-001 (palier 5).
         # form-post retiré : livré par STARTER-FORM-POST-001 (palier 6).
         # server-validation retiré : livré par STARTER-SERVER-VALIDATION-001 (palier 7).
-        "first-sql",
+        # first-sql retiré : livré par STARTER-FIRST-SQL-001 (palier 8).
+        # Plus aucun starter pédagogique « non créé » dans la progression :
+        # le palier 9 est Contacts CRUD (déjà livré comme `01-contact-simple`,
+        # à repositionner via CONTACTS-CRUD-REPOSITION-001).
     ])
     def test_future_starter_not_created(self, future_starter_slug):
         starter_dir = (
