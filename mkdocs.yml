@@ -116,6 +116,8 @@ nav:
           - Présentation: starters/request-debug/index.md
       - Premier formulaire POST:
           - Présentation: starters/form-post/index.md
+      - Validation serveur:
+          - Présentation: starters/server-validation/index.md
       - Contacts:
           - Présentation: starters/01-contact-simple/index.md
           - Reconstruction: starters/01-contact-simple/rebuild.md

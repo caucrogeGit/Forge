@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Validation serveur — Forge</title>
+</head>
+<body>
+  <h1>Validation serveur</h1>
+
+  <form method="post" action="/server-validation">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <label for="name">Prénom</label>
+    <input id="name" name="name" type="text">
+
+    <button type="submit">Envoyer</button>
+  </form>
+</body>
+</html>

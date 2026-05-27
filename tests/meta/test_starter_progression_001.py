@@ -71,7 +71,7 @@ class TestProgressionSectionInStartersIndex:
         # STARTER-DYNAMIC-ROUTE-001 livré → voir test_palier_4_livre.
         # STARTER-REQUEST-DEBUG-001 livré → voir test_palier_5_livre.
         # STARTER-FORM-POST-001 livré → voir test_palier_6_livre.
-        "STARTER-SERVER-VALIDATION-001",
+        # STARTER-SERVER-VALIDATION-001 livré → voir test_palier_7_livre.
         "STARTER-FIRST-SQL-001",
         "STARTER-CONTACTS-CRUD-REPOSITION-001",
     ])
@@ -211,6 +211,31 @@ class TestProgressionSectionInStartersIndex:
             "Le palier 6 doit mentionner le starter `form-post`."
         )
 
+    def test_palier_7_server_validation_marque_livre(self):
+        # STARTER-SERVER-VALIDATION-001 livré : palier 7 doit
+        # l'indiquer explicitement avec la mention « livré ».
+        assert "STARTER-SERVER-VALIDATION-001" in self.content, (
+            "STARTER-SERVER-VALIDATION-001 doit rester référencé dans "
+            "la progression (palier 7)."
+        )
+        text = self.content
+        idx_palier7 = text.find("7. **Validation serveur**")
+        idx_palier8 = text.find("8. **Première base SQL**")
+        assert idx_palier7 != -1, (
+            "Item « 7. **Validation serveur** » introuvable dans la progression."
+        )
+        assert idx_palier8 != -1, (
+            "Item « 8. **Première base SQL** » introuvable dans la progression."
+        )
+        palier7_block = text[idx_palier7:idx_palier8]
+        assert "livré" in palier7_block, (
+            "Le palier 7 (Validation serveur) doit être marqué « livré » "
+            "depuis STARTER-SERVER-VALIDATION-001."
+        )
+        assert "server-validation" in palier7_block, (
+            "Le palier 7 doit mentionner le starter `server-validation`."
+        )
+
     def test_warning_admonition_present(self):
         # Le saut welcome → CRUD est explicitement mis en garde
         assert "!!! warning" in self.content, (
@@ -344,7 +369,7 @@ class TestFutureStartersNotYetCreated:
         # dynamic-route retiré : livré par STARTER-DYNAMIC-ROUTE-001 (palier 4).
         # request-debug retiré : livré par STARTER-REQUEST-DEBUG-001 (palier 5).
         # form-post retiré : livré par STARTER-FORM-POST-001 (palier 6).
-        "server-validation",
+        # server-validation retiré : livré par STARTER-SERVER-VALIDATION-001 (palier 7).
         "first-sql",
     ])
     def test_future_starter_not_created(self, future_starter_slug):

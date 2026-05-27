@@ -1,0 +1,7 @@
+# forge-starter:server-validation:start
+from mvc.controllers.server_validation_controller import ServerValidationController
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/server-validation", ServerValidationController.index,  name="server_validation_index")
+    pub.add("POST", "/server-validation", ServerValidationController.submit, name="server_validation_submit")
+# forge-starter:server-validation:end
