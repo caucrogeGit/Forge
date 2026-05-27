@@ -35,6 +35,7 @@ DOC = PROJECT_ROOT / "docs" / "contributing" / "canonical-repo.md"
 CONTRIBUTING = PROJECT_ROOT / "docs" / "contributing.md"
 MKDOCS = PROJECT_ROOT / "mkdocs.yml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
+CLAUDE_MD = PROJECT_ROOT / "CLAUDE.md"
 
 
 def _text() -> str:
@@ -219,4 +220,61 @@ class TestDocIntegration:
         # Le ticket est marqué « livré » dans son entrée
         assert "GIT-RECOVERY-WORKFLOW-GUARD-001" in text and "**livré**" in text, (
             "Le ticket doit être marqué livré dans la roadmap."
+        )
+
+
+# ── CLAUDE.md : étape 0 obligatoire ────────────────────────────────────────────
+
+
+class TestClaudeMdEtapeZero:
+    """Verrouille l'étape 0 (CLAUDE-MD-CANONICAL-REPO-GUARD-001 +
+    CLAUDE-MD-CANONICAL-REPO-GUARD-TEST-001) : CLAUDE.md doit imposer
+    la vérification du dépôt canonique avant tout ticket Forge.
+
+    Le contournement ponctuel du hook qui a permis l'insertion est
+    acceptable parce que CLAUDE.md est volontairement protégé ; en
+    contrepartie, ce test verrouille le résultat pour qu'une suppression
+    ou un drift accidentel soit immédiatement détecté.
+    """
+
+    @pytest.fixture(autouse=True)
+    def _load(self):
+        self.content = CLAUDE_MD.read_text(encoding="utf-8")
+
+    @pytest.mark.parametrize("marker", [
+        "Étape 0 — Vérifier le dépôt canonique",
+        "/home/roger/Projets/Forge",
+        "git@github.com:caucrogeGit/Forge.git",
+        "forge-test-*",
+        "branche `master`",
+        "arrêter immédiatement",
+    ])
+    def test_etape_zero_marker_present(self, marker):
+        assert marker in self.content, (
+            f"CLAUDE.md doit mentionner '{marker}' dans l'étape 0. "
+            "Voir CLAUDE-MD-CANONICAL-REPO-GUARD-001."
+        )
+
+    def test_etape_zero_is_inside_section_5(self):
+        # L'étape 0 doit être placée dans la section « Convention de
+        # tickets » (section 5) — c'est le contrat de placement
+        # convenu : pas un ajout en fin de fichier, pas une nouvelle
+        # section qui renuméroterait les suivantes.
+        idx_section_5 = self.content.find("## 5. Convention de tickets")
+        idx_etape_0 = self.content.find("Étape 0 — Vérifier le dépôt canonique")
+        idx_section_6 = self.content.find("## 6. Convention de tests")
+        assert idx_section_5 != -1, "Section 5 introuvable dans CLAUDE.md"
+        assert idx_etape_0 != -1, "Étape 0 introuvable dans CLAUDE.md"
+        assert idx_section_6 != -1, "Section 6 introuvable dans CLAUDE.md"
+        assert idx_section_5 < idx_etape_0 < idx_section_6, (
+            "Étape 0 doit être placée à l'intérieur de la section 5, "
+            "entre '## 5. Convention de tickets' et '## 6. Convention de tests'."
+        )
+
+    def test_etape_zero_points_to_canonical_repo_doc(self):
+        # L'étape 0 renvoie vers la page de procédure complète
+        # (signaux d'un mauvais dépôt + portage par patchs).
+        assert "docs/contributing/canonical-repo.md" in self.content, (
+            "L'étape 0 doit pointer explicitement vers "
+            "docs/contributing/canonical-repo.md."
         )
