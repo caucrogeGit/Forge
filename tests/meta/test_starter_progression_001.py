@@ -292,23 +292,29 @@ class TestWelcomeStarterRedirectsToProgression:
             "(STARTER-ROADMAP-PROGRESSION-001)."
         )
 
-    def test_points_to_progression(self):
-        assert "Progression recommandée des starters" in self.content, (
-            "La section « Après ce starter » doit pointer vers la "
-            "« Progression recommandée des starters »."
+    def test_points_to_next_palier(self):
+        # STARTER-SEQUENTIAL-NAV-001 a remplacé le pointeur vers la
+        # progression générale par un pointeur direct vers le palier
+        # suivant (query-params). La garantie « ne pas pousser Contacts
+        # immédiatement » reste portée par
+        # `test_no_immediate_crud_recommendation` ci-dessus.
+        assert "../query-params/" in self.content, (
+            "La section « Après ce starter » de welcome doit pointer "
+            "directement vers le palier suivant (query-params), pas "
+            "vers la progression générale."
         )
 
-    def test_mentions_progression_anchor(self):
-        assert "../index.md#progression-recommandee" in self.content, (
-            "Le lien vers la progression doit cibler l'ancre "
-            "#progression-recommandee de starters/index.md."
-        )
-
-    def test_contacts_labeled_as_advanced(self):
-        # Quand Contacts reste mentionné, c'est comme « niveau avancé »
-        assert "niveau avancé" in self.content, (
-            "Le lien vers Starter 1 — Contacts doit être étiqueté "
-            "« niveau avancé » pour éviter l'effet d'étape immédiate."
+    def test_does_not_label_contacts_as_advanced_anymore(self):
+        # Avant STARTER-SEQUENTIAL-NAV-001, welcome mentionnait
+        # Contacts CRUD comme « niveau avancé » avec la commande
+        # `forge starter:build 1 --init-db`. Le nouveau contrat
+        # supprime entièrement la mention de Contacts dans welcome :
+        # la chaîne pédagogique passe par les 7 paliers intermédiaires
+        # avant d'aborder Contacts CRUD à first-sql.
+        assert "Starter 1 — Contacts" not in self.content, (
+            "welcome ne doit plus mentionner « Starter 1 — Contacts » "
+            "directement (la progression passe par les paliers "
+            "intermédiaires)."
         )
 
 

@@ -72,8 +72,11 @@ class TestQueryParamsDocContent:
         "QueryParamsController",
         'request.param("name", default="Forge")',
         "Bonjour Roger",
-        # commande publique par identifiant (jamais par numéro)
-        "forge starter:build query-params",
+        # `forge starter:build query-params` retiré de cette liste par
+        # STARTER-SEQUENTIAL-NAV-001 : les pages starters ne doivent
+        # plus contenir AUCUNE commande `forge starter:build` ; la
+        # création/application du starter est faite depuis la doc
+        # globale (cli-commands.md), pas depuis la page pédagogique.
     ])
     def test_contenu_attendu_present(self, marker: str):
         assert marker in self.content, (
@@ -81,10 +84,13 @@ class TestQueryParamsDocContent:
         )
 
     def test_mentionne_palier_suivant(self):
-        # Pointeur vers le palier 3 (Première vue HTML), à venir
-        assert "STARTER-FIRST-HTML-VIEW-001" in self.content, (
-            "La doc doit pointer vers le palier 3 à venir "
-            "(STARTER-FIRST-HTML-VIEW-001)."
+        # STARTER-SEQUENTIAL-NAV-001 : le pointeur vers le palier
+        # suivant utilise le lien direct `../first-html-view/...`
+        # plutôt qu'un code de ticket (mis en place avant que le
+        # starter ne soit livré ; désormais le starter existe).
+        assert "../first-html-view/" in self.content, (
+            "La doc doit pointer directement vers le palier suivant "
+            "(`../first-html-view/index.md`)."
         )
 
     def test_lien_vers_progression(self):
@@ -107,7 +113,11 @@ class TestQueryParamsDocNoise:
         self.content = _text()
 
     @pytest.mark.parametrize("noise", [
-        "BaseController.render",
+        # `BaseController.render` retiré de cette liste par
+        # STARTER-SEQUENTIAL-NAV-001 : la section « Après ce starter »
+        # tease explicitement le palier suivant (Première vue HTML)
+        # en montrant son API-clé. Acceptable comme forward
+        # reference courte.
         "Response.debug",
         "<form",
         "POST",

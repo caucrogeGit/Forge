@@ -85,12 +85,13 @@ class FormPostController(BaseController):
 
 ## Après ce starter
 
-Le palier suivant est le **Starter Validation serveur** (à venir —
-ticket `STARTER-SERVER-VALIDATION-001`) qui apprend à refuser ou
-accepter les données reçues selon des règles.
+Passez au palier suivant : **Validation serveur**.
 
-Voir la
-[Progression recommandée des starters](../index.md#progression-recommandee)
-pour la feuille de route complète.
+Vous y apprendrez à refuser une valeur vide avec un statut HTTP
+explicite :
 
-[Vue d'ensemble des starters](../index.md) · [Inspecter une requête — palier 5](../request-debug/index.md)
+```python
+return Response.text("Le prénom est obligatoire", status=422)
+```
+
+[Continuer avec Validation serveur](../server-validation/index.md)

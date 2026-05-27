@@ -68,12 +68,15 @@ def submit(request: Request) -> Response:
 
 ## Après ce starter
 
-Le palier suivant est le **Starter Première base SQL** (à venir —
-ticket `STARTER-FIRST-SQL-001`) qui introduit MariaDB, les
-migrations et le SQL visible.
+Passez au palier suivant : **Première base SQL**.
 
-Voir la
-[Progression recommandée des starters](../index.md#progression-recommandee)
-pour la feuille de route complète.
+Vous y apprendrez à lire une donnée depuis MariaDB avec du SQL
+visible :
 
-[Vue d'ensemble des starters](../index.md) · [Premier formulaire POST — palier 6](../form-post/index.md)
+```python
+from core.database.db import fetch_one
+
+row = fetch_one("SELECT content FROM first_sql_messages ORDER BY id LIMIT 1")
+```
+
+[Continuer avec Première base SQL](../first-sql/index.md)

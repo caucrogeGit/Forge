@@ -81,12 +81,12 @@ class DynamicRouteController(BaseController):
 
 ## Après ce starter
 
-Le palier suivant est le **Starter Inspecter une requête** (à venir —
-ticket `STARTER-REQUEST-DEBUG-001`) qui introduit `request.data` et
-`Response.debug(...)` en développement.
+Passez au palier suivant : **Inspecter une requête**.
 
-Voir la
-[Progression recommandée des starters](../index.md#progression-recommandee)
-pour la feuille de route complète.
+Vous y apprendrez à explorer la structure d'une requête avec :
 
-[Vue d'ensemble des starters](../index.md) · [Première vue HTML — palier 3](../first-html-view/index.md)
+```python
+Response.debug(request.data)
+```
+
+[Continuer avec Inspecter une requête](../request-debug/index.md)

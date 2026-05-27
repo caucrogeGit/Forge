@@ -196,13 +196,14 @@ class TestWelcomeStarterDoc:
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert content.startswith("# Bonjour Forge")
 
-    def test_index_md_mentionne_starter_7(self):
-        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Starter 7" in content
-
-    def test_index_md_mentionne_forge_new_starter(self):
-        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "--starter welcome" in content
+    # Assertions retirées par STARTER-SEQUENTIAL-NAV-001 :
+    # « Starter 7 » et « --starter welcome » sont désormais INTERDITS
+    # dans les pages pédagogiques de starters (la page suppose que
+    # l'utilisateur est déjà dans un projet créé avec ce starter ; les
+    # numéros internes restent confinés à starter.json + tests
+    # techniques). Voir tests/meta/test_starter_sequential_nav_001.py
+    # qui assert l'ABSENCE de ces patterns sur toutes les pages
+    # docs/starters/*/index.md.
 
     def test_index_md_documente_les_deux_routes(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")

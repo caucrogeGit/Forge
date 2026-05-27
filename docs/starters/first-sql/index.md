@@ -94,16 +94,19 @@ WHERE NOT EXISTS (
 
 ## Après ce starter
 
-Le palier suivant est le **CRUD Contacts** — c'est le palier final
-de la progression officielle, et c'est le passage vers la
-construction d'applications réelles. Voir
-[Starter 1 — Contacts](../01-contact-simple/index.md) (positionné en
-niveau avancé : le ticket
-`STARTER-CONTACTS-CRUD-REPOSITION-001` formalisera ce
-repositionnement pédagogique).
+Vous avez maintenant parcouru les bases nécessaires avant le CRUD :
 
-Voir la
-[Progression recommandée des starters](../index.md#progression-recommandee)
-pour la feuille de route complète.
+- routes ;
+- contrôleurs ;
+- réponses texte ;
+- vues HTML ;
+- paramètres d'URL ;
+- routes dynamiques ;
+- inspection de requête ;
+- formulaires POST ;
+- validation serveur ;
+- SQL visible.
 
-[Vue d'ensemble des starters](../index.md) · [Validation serveur — palier 7](../server-validation/index.md)
+Vous pouvez passer au palier final : **Contacts CRUD**.
+
+[Continuer avec Contacts CRUD](../01-contact-simple/index.md)

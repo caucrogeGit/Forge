@@ -3,8 +3,7 @@
 Premier contact avec Forge : afficher une réponse texte. Pas de vue HTML,
 pas de base de données, pas de moteur Jinja2.
 
-Ce starter reste le **Starter 7** dans la CLI Forge (identifiant
-`welcome`, alias `bienvenue` / `bonjour` / `bonjour-forge`).
+Identifiant : `welcome` (alias `bienvenue` / `bonjour` / `bonjour-forge`).
 
 ## Ce que ce starter installe
 
@@ -54,24 +53,6 @@ class WelcomeController(BaseController):
 | `http://localhost:8000/welcome/greet` | `Bonjour Forge` |
 | `http://localhost:8000/welcome/greet?name=Roger` | `Bonjour Roger` |
 
-## Démarrer
-
-```bash
-# Nouveau projet avec le starter pré-appliqué (recommandé)
-forge new mon-projet --starter welcome
-cd mon-projet
-source .venv/bin/activate
-forge run
-# Ouvrir http://localhost:8000/welcome
-```
-
-Ou dans un projet Forge existant :
-
-```bash
-forge starter:build 7
-forge run
-```
-
 ## À retenir
 
 - Une URL appelle une route.
@@ -81,22 +62,19 @@ forge run
 
 ## Après ce starter
 
-Ce premier contact assimilé, la **progression pédagogique officielle**
-des starters Forge passe par plusieurs étapes intermédiaires avant
-d'aborder un CRUD complet. Le saut direct vers Contacts CRUD est
-explicitement déconseillé : Jinja2, routes dynamiques, formulaires POST,
-validation serveur et SQL/migrations méritent chacun leur propre starter.
+Passez au palier suivant : **Paramètres d'URL**.
 
-La feuille de route détaillée :
-[Progression recommandée des starters](../index.md#progression-recommandee).
+Vous y apprendrez à lire une valeur transmise dans l'adresse, par
+exemple :
 
-En attendant la livraison des starters intermédiaires (tickets
-`STARTER-QUERY-PARAMS-001` → `STARTER-FIRST-SQL-001` dans la
-[roadmap Forge](../../roadmap/forge-roadmap.md)), le starter Contacts
-CRUD reste accessible si vous êtes déjà familier des notions ci-dessus :
-
-```bash
-forge starter:build 1 --init-db
+```text
+/query-params/hello?name=Roger
 ```
 
-[Vue d'ensemble des starters](../index.md) · [Starter 1 — Contacts (niveau avancé)](../01-contact-simple/index.md)
+avec :
+
+```python
+request.param("name", default="Forge")
+```
+
+[Continuer avec Paramètres d'URL](../query-params/index.md)

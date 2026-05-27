@@ -71,18 +71,6 @@ class QueryParamsController(BaseController):
 | `http://localhost:8000/query-params/hello?name=Roger` | `Bonjour Roger` |
 | `http://localhost:8000/query-params/hello?name=Alice` | `Bonjour Alice` |
 
-## Démarrer
-
-Dans un projet Forge existant, appliquer le starter par son
-identifiant public :
-
-```bash
-forge starter:build query-params
-forge run
-```
-
-Puis ouvrir `http://localhost:8000/query-params/hello?name=Roger`.
-
 ## À retenir
 
 - `request.param(key, default=...)` lit une valeur de la *query string*
@@ -95,12 +83,12 @@ Puis ouvrir `http://localhost:8000/query-params/hello?name=Roger`.
 
 ## Après ce starter
 
-Le palier suivant est le **Starter Première vue HTML** (à venir —
-ticket `STARTER-FIRST-HTML-VIEW-001`) qui introduit le moteur Jinja2 et
-le rendu d'une page complète.
+Passez au palier suivant : **Première vue HTML**.
 
-Voir la
-[Progression recommandée des starters](../index.md#progression-recommandee)
-pour la feuille de route complète.
+Vous y apprendrez à rendre une page HTML avec :
 
-[Vue d'ensemble des starters](../index.md) · [Bonjour Forge — palier 1](../welcome/index.md)
+```python
+BaseController.render(...)
+```
+
+[Continuer avec Première vue HTML](../first-html-view/index.md)

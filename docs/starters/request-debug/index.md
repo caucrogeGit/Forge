@@ -59,12 +59,13 @@ def index(request: Request) -> Response:
 
 ## Après ce starter
 
-Le palier suivant est le **Starter Premier formulaire POST** (à venir
-— ticket `STARTER-FORM-POST-001`) qui introduit l'envoi de données
-depuis un formulaire HTML.
+Passez au palier suivant : **Premier formulaire POST**.
 
-Voir la
-[Progression recommandée des starters](../index.md#progression-recommandee)
-pour la feuille de route complète.
+Vous y apprendrez à envoyer des données depuis un formulaire HTML
+et à lire la valeur reçue côté serveur avec :
 
-[Vue d'ensemble des starters](../index.md) · [Route dynamique — palier 4](../dynamic-route/index.md)
+```python
+request.form("name", default="Forge")
+```
+
+[Continuer avec Premier formulaire POST](../form-post/index.md)

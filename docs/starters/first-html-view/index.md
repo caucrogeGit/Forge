@@ -77,12 +77,12 @@ class FirstHtmlViewController(BaseController):
 
 ## Après ce starter
 
-Le palier suivant est le **Starter Route dynamique** (à venir — ticket
-`STARTER-DYNAMIC-ROUTE-001`) qui introduit les paramètres de route
-comme `/articles/{id}`.
+Passez au palier suivant : **Route dynamique**.
 
-Voir la
-[Progression recommandée des starters](../index.md#progression-recommandee)
-pour la feuille de route complète.
+Vous y apprendrez à lire un paramètre de route avec :
 
-[Vue d'ensemble des starters](../index.md) · [Paramètres d'URL — palier 2](../query-params/index.md)
+```python
+request.route_param("id", default="inconnu")
+```
+
+[Continuer avec Route dynamique](../dynamic-route/index.md)
