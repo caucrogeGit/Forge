@@ -18,15 +18,15 @@ ROOT = Path(__file__).resolve().parents[2]
 
 # ── Contrat des starters ──────────────────────────────────────────────────────
 
-def test_sept_starters_declares():
-    """7 starters officiels sont déclarés."""
-    assert len(all_starters()) == 7
+def test_huit_starters_declares():
+    """8 starters officiels sont déclarés (palier 2 livré : query-params)."""
+    assert len(all_starters()) == 8
 
 
-def test_starters_numero_1_a_7():
-    """Les starters sont numérotés de 1 à 7 sans trou."""
+def test_starters_numero_1_a_8():
+    """Les starters sont numérotés de 1 à 8 sans trou."""
     nums = [s["number"] for s in all_starters()]
-    assert nums == [1, 2, 3, 4, 5, 6, 7]
+    assert nums == [1, 2, 3, 4, 5, 6, 7, 8]
 
 
 def test_tous_les_starters_sont_disponibles():
@@ -35,8 +35,8 @@ def test_tous_les_starters_sont_disponibles():
         assert s.get("status") == "available", f"Starter {s['number']} non disponible"
 
 
-def test_starter_list_affiche_7_starters(capsys):
-    """forge starter:list affiche les 7 starters."""
+def test_starter_list_affiche_8_starters(capsys):
+    """forge starter:list affiche les 8 starters."""
     cmd_starter_list()
     output = capsys.readouterr().out
     for s in all_starters():

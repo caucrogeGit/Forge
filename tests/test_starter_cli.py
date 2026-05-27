@@ -16,13 +16,13 @@ from forge_cli.starters.route_ops import replace_home_route as _replace_home_rou
 from forge_cli.starters.registry import all_starters, resolve
 
 
-def test_sept_starters_definis():
-    assert len(all_starters()) == 7
+def test_huit_starters_definis():
+    assert len(all_starters()) == 8
 
 
-def test_niveaux_ordonnes_de_1_a_7():
+def test_niveaux_ordonnes_de_1_a_8():
     levels = [s["number"] for s in all_starters()]
-    assert levels == [1, 2, 3, 4, 5, 6, 7]
+    assert levels == [1, 2, 3, 4, 5, 6, 7, 8]
 
 
 def test_starter_list_affiche_les_4_niveaux(capsys):

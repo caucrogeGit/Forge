@@ -66,7 +66,8 @@ class TestProgressionSectionInStartersIndex:
         )
 
     @pytest.mark.parametrize("ticket_code", [
-        "STARTER-QUERY-PARAMS-001",
+        # STARTER-QUERY-PARAMS-001 livré, désormais référencé comme
+        # « livré — starter `query-params` » (voir test_palier_2_livre).
         "STARTER-FIRST-HTML-VIEW-001",
         "STARTER-DYNAMIC-ROUTE-001",
         "STARTER-REQUEST-DEBUG-001",
@@ -79,6 +80,29 @@ class TestProgressionSectionInStartersIndex:
         assert ticket_code in self.content, (
             f"Le ticket futur {ticket_code} doit être inscrit comme "
             "trajectoire dans la progression."
+        )
+
+    def test_palier_2_query_params_marque_livre(self):
+        # STARTER-QUERY-PARAMS-001 est livré : palier 2 doit l'indiquer
+        # explicitement avec la mention « livré ».
+        assert "STARTER-QUERY-PARAMS-001" in self.content, (
+            "STARTER-QUERY-PARAMS-001 doit rester référencé dans la "
+            "progression (palier 2)."
+        )
+        # Recherche une ligne qui combine palier 2 (Paramètres d'URL)
+        # et la mention « livré »
+        text = self.content
+        idx_palier2 = text.find("Paramètres d'URL")
+        idx_palier3 = text.find("Première vue HTML")
+        assert idx_palier2 != -1, "Palier 2 « Paramètres d'URL » introuvable"
+        assert idx_palier3 != -1, "Palier 3 « Première vue HTML » introuvable"
+        palier2_block = text[idx_palier2:idx_palier3]
+        assert "livré" in palier2_block, (
+            "Le palier 2 (Paramètres d'URL) doit être marqué « livré » "
+            "depuis STARTER-QUERY-PARAMS-001."
+        )
+        assert "query-params" in palier2_block, (
+            "Le palier 2 doit mentionner le starter `query-params`."
         )
 
     def test_warning_admonition_present(self):
@@ -209,7 +233,8 @@ class TestFutureStartersNotYetCreated:
     ne doit avoir été ajouté par ce ticket."""
 
     @pytest.mark.parametrize("future_starter_slug", [
-        "query-params",
+        # query-params retiré de cette liste : le starter est livré
+        # par STARTER-QUERY-PARAMS-001 (palier 2).
         "first-html-view",
         "dynamic-route",
         "request-debug",

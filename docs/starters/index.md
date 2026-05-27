@@ -17,6 +17,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | Starter | Statut | Profil associé | Usage recommandé |
 |---|---|---|---|
 | [Bonjour Forge — premier pas](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact minimal avec Forge — `Response.text(...)` et `request.param(...)`, deux routes, aucune vue HTML, aucune base de données |
+| [Paramètres d'URL](query-params/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 2 de la progression — lire une valeur d'URL avec `request.param("name", default=...)`, deux routes, aucune vue HTML, aucune base de données |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
@@ -34,7 +35,7 @@ d'aborder le CRUD sereinement. La progression officielle est :
 1. **Bonjour Forge** — afficher une réponse texte avec `Response.text(...)`.
    *(livré — starter `welcome`)*
 2. **Paramètres d'URL** — lire une valeur simple avec `request.param(...)`.
-   *(à venir — `STARTER-QUERY-PARAMS-001`)*
+   *(livré — starter `query-params`, ticket `STARTER-QUERY-PARAMS-001`)*
 3. **Première vue HTML** — rendre une page avec `BaseController.render(...)`.
    *(à venir — `STARTER-FIRST-HTML-VIEW-001`)*
 4. **Route dynamique** — lire un paramètre de route comme `/articles/{id}`.
@@ -217,7 +218,7 @@ Pour choisir un profil : [Profils de projet](../profiles.md).
 ## Génération automatique
 
 ```bash
-forge new mon-projet --starter welcome  # Bienvenue (sans BDD) — via forge new
+forge new mon-projet --starter welcome       # Bienvenue (sans BDD) — via forge new
 forge starter:build 1        # Contacts
 forge starter:build 2        # Utilisateurs / Auth
 forge starter:build 3        # Carnet de contacts
@@ -227,7 +228,11 @@ forge starter:build 6        # Auth MFA (Alpha)
 forge starter:build 7        # Bienvenue dans Forge (sans BDD)
 ```
 
-Les alias `contacts`, `auth`, `carnet`, `suivi`, `communes-sejours` et leurs variantes sont également supportés.
+Pour le starter pédagogique `query-params` (palier 2 de la progression),
+voir la page dédiée [Paramètres d'URL](query-params/index.md) — il
+s'applique par son identifiant public, pas par un numéro.
+
+Les alias `contacts`, `auth`, `carnet`, `suivi`, `communes-sejours`, `query-params` et leurs variantes sont également supportés.
 
 `forge starter:list` affiche la liste complète depuis la CLI.
 

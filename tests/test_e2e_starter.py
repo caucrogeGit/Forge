@@ -78,11 +78,11 @@ def _build_starter(identifier: str) -> None:
 # ── Métadonnées des starters ──────────────────────────────────────────────────
 
 class TestStarterRegistry:
-    def test_sept_starters_disponibles(self):
-        assert len(all_starters()) == 7
+    def test_huit_starters_disponibles(self):
+        assert len(all_starters()) == 8
 
-    def test_numeros_1_a_7(self):
-        assert [s["number"] for s in all_starters()] == [1, 2, 3, 4, 5, 6, 7]
+    def test_numeros_1_a_8(self):
+        assert [s["number"] for s in all_starters()] == [1, 2, 3, 4, 5, 6, 7, 8]
 
     def test_tous_available(self):
         assert all(s["status"] == "available" for s in all_starters())

@@ -106,6 +106,8 @@ nav:
       - Créer un starter: starter-author-guide.md
       - Bienvenue dans Forge:
           - Présentation: starters/welcome/index.md
+      - Paramètres d'URL:
+          - Présentation: starters/query-params/index.md
       - Contacts:
           - Présentation: starters/01-contact-simple/index.md
           - Reconstruction: starters/01-contact-simple/rebuild.md

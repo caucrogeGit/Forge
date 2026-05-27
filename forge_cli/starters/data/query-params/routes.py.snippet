@@ -1,0 +1,7 @@
+# forge-starter:query-params:start
+from mvc.controllers.query_params_controller import QueryParamsController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/query-params",       QueryParamsController.index, name="query_params_index")
+    pub.add("GET", "/query-params/hello", QueryParamsController.hello, name="query_params_hello")
+# forge-starter:query-params:end
