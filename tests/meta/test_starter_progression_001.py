@@ -68,7 +68,8 @@ class TestProgressionSectionInStartersIndex:
     @pytest.mark.parametrize("ticket_code", [
         # STARTER-QUERY-PARAMS-001 livré, désormais référencé comme
         # « livré — starter `query-params` » (voir test_palier_2_livre).
-        "STARTER-FIRST-HTML-VIEW-001",
+        # STARTER-FIRST-HTML-VIEW-001 livré, désormais référencé comme
+        # « livré — starter `first-html-view` » (voir test_palier_3_livre).
         "STARTER-DYNAMIC-ROUTE-001",
         "STARTER-REQUEST-DEBUG-001",
         "STARTER-FORM-POST-001",
@@ -85,17 +86,22 @@ class TestProgressionSectionInStartersIndex:
     def test_palier_2_query_params_marque_livre(self):
         # STARTER-QUERY-PARAMS-001 est livré : palier 2 doit l'indiquer
         # explicitement avec la mention « livré ».
+        # On vise l'item numéroté de la progression (« 2. **Paramètres
+        # d'URL** ») pour éviter de matcher la ligne du tableau de
+        # synthèse qui répète le même nom.
         assert "STARTER-QUERY-PARAMS-001" in self.content, (
             "STARTER-QUERY-PARAMS-001 doit rester référencé dans la "
             "progression (palier 2)."
         )
-        # Recherche une ligne qui combine palier 2 (Paramètres d'URL)
-        # et la mention « livré »
         text = self.content
-        idx_palier2 = text.find("Paramètres d'URL")
-        idx_palier3 = text.find("Première vue HTML")
-        assert idx_palier2 != -1, "Palier 2 « Paramètres d'URL » introuvable"
-        assert idx_palier3 != -1, "Palier 3 « Première vue HTML » introuvable"
+        idx_palier2 = text.find("2. **Paramètres d'URL**")
+        idx_palier3 = text.find("3. **Première vue HTML**")
+        assert idx_palier2 != -1, (
+            "Item « 2. **Paramètres d'URL** » introuvable dans la progression."
+        )
+        assert idx_palier3 != -1, (
+            "Item « 3. **Première vue HTML** » introuvable dans la progression."
+        )
         palier2_block = text[idx_palier2:idx_palier3]
         assert "livré" in palier2_block, (
             "Le palier 2 (Paramètres d'URL) doit être marqué « livré » "
@@ -103,6 +109,32 @@ class TestProgressionSectionInStartersIndex:
         )
         assert "query-params" in palier2_block, (
             "Le palier 2 doit mentionner le starter `query-params`."
+        )
+
+    def test_palier_3_first_html_view_marque_livre(self):
+        # STARTER-FIRST-HTML-VIEW-001 livré : palier 3 doit l'indiquer
+        # explicitement avec la mention « livré ».
+        # Cf. test_palier_2 — on ancre sur l'item numéroté.
+        assert "STARTER-FIRST-HTML-VIEW-001" in self.content, (
+            "STARTER-FIRST-HTML-VIEW-001 doit rester référencé dans la "
+            "progression (palier 3)."
+        )
+        text = self.content
+        idx_palier3 = text.find("3. **Première vue HTML**")
+        idx_palier4 = text.find("4. **Route dynamique**")
+        assert idx_palier3 != -1, (
+            "Item « 3. **Première vue HTML** » introuvable dans la progression."
+        )
+        assert idx_palier4 != -1, (
+            "Item « 4. **Route dynamique** » introuvable dans la progression."
+        )
+        palier3_block = text[idx_palier3:idx_palier4]
+        assert "livré" in palier3_block, (
+            "Le palier 3 (Première vue HTML) doit être marqué « livré » "
+            "depuis STARTER-FIRST-HTML-VIEW-001."
+        )
+        assert "first-html-view" in palier3_block, (
+            "Le palier 3 doit mentionner le starter `first-html-view`."
         )
 
     def test_warning_admonition_present(self):
@@ -233,9 +265,8 @@ class TestFutureStartersNotYetCreated:
     ne doit avoir été ajouté par ce ticket."""
 
     @pytest.mark.parametrize("future_starter_slug", [
-        # query-params retiré de cette liste : le starter est livré
-        # par STARTER-QUERY-PARAMS-001 (palier 2).
-        "first-html-view",
+        # query-params retiré : livré par STARTER-QUERY-PARAMS-001 (palier 2).
+        # first-html-view retiré : livré par STARTER-FIRST-HTML-VIEW-001 (palier 3).
         "dynamic-route",
         "request-debug",
         "form-post",

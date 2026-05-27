@@ -18,6 +18,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 |---|---|---|---|
 | [Bonjour Forge — premier pas](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact minimal avec Forge — `Response.text(...)` et `request.param(...)`, deux routes, aucune vue HTML, aucune base de données |
 | [Paramètres d'URL](query-params/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 2 de la progression — lire une valeur d'URL avec `request.param("name", default=...)`, deux routes, aucune vue HTML, aucune base de données |
+| [Première vue HTML](first-html-view/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 3 de la progression — rendre une page HTML avec `BaseController.render(...)`, une route, une vue, aucune base de données |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Découvrir Forge avec un exemple CRUD simple |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
@@ -37,7 +38,7 @@ d'aborder le CRUD sereinement. La progression officielle est :
 2. **Paramètres d'URL** — lire une valeur simple avec `request.param(...)`.
    *(livré — starter `query-params`, ticket `STARTER-QUERY-PARAMS-001`)*
 3. **Première vue HTML** — rendre une page avec `BaseController.render(...)`.
-   *(à venir — `STARTER-FIRST-HTML-VIEW-001`)*
+   *(livré — starter `first-html-view`, ticket `STARTER-FIRST-HTML-VIEW-001`)*
 4. **Route dynamique** — lire un paramètre de route comme `/articles/{id}`.
    *(à venir — `STARTER-DYNAMIC-ROUTE-001`)*
 5. **Inspecter une requête** — explorer `request.data` avec `Response.debug(...)` en développement.

@@ -1,0 +1,20 @@
+{
+  "id": "first-html-view",
+  "number": 9,
+  "name": "Première vue HTML",
+  "kind": "skeleton",
+  "aliases": ["first-html-view", "first_html_view", "html-view", "9"],
+  "description": "Starter 9 — Première vue HTML : palier 3 de la progression pédagogique officielle, après Paramètres d'URL. Une route (`/first-html-view`), un contrôleur, et une vue HTML rendue avec `BaseController.render(...)`. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/first-html-view",
+  "routes_marker": "first-html-view",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/first-html-view",
+  "doc_url": "https://caucrogegit.github.io/Forge/starters/first-html-view/",
+  "check_paths": [
+    "mvc/controllers/first_html_view_controller.py",
+    "mvc/views/first_html_view/index.html"
+  ]
+}
