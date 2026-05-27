@@ -1,0 +1,20 @@
+{
+  "id": "form-post",
+  "number": 12,
+  "name": "Premier formulaire POST",
+  "kind": "skeleton",
+  "aliases": ["form-post", "form_post", "post-form", "12"],
+  "description": "Starter 12 — Premier formulaire POST : palier 6 de la progression pédagogique officielle, après Inspecter une requête. Deux routes (`GET /form-post`, `POST /form-post`), une vue HTML minimale avec champ CSRF, un contrôleur qui lit la valeur envoyée avec `request.form(...)`. Aucune base de données, aucune validation avancée.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/form-post",
+  "routes_marker": "form-post",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/form-post",
+  "doc_url": "https://caucrogegit.github.io/Forge/starters/form-post/",
+  "check_paths": [
+    "mvc/controllers/form_post_controller.py",
+    "mvc/views/form_post/index.html"
+  ]
+}

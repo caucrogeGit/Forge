@@ -1,0 +1,7 @@
+# forge-starter:form-post:start
+from mvc.controllers.form_post_controller import FormPostController
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/form-post", FormPostController.index,  name="form_post_index")
+    pub.add("POST", "/form-post", FormPostController.submit, name="form_post_submit")
+# forge-starter:form-post:end

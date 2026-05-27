@@ -70,7 +70,7 @@ class TestProgressionSectionInStartersIndex:
         # STARTER-FIRST-HTML-VIEW-001 livré → voir test_palier_3_livre.
         # STARTER-DYNAMIC-ROUTE-001 livré → voir test_palier_4_livre.
         # STARTER-REQUEST-DEBUG-001 livré → voir test_palier_5_livre.
-        "STARTER-FORM-POST-001",
+        # STARTER-FORM-POST-001 livré → voir test_palier_6_livre.
         "STARTER-SERVER-VALIDATION-001",
         "STARTER-FIRST-SQL-001",
         "STARTER-CONTACTS-CRUD-REPOSITION-001",
@@ -184,6 +184,31 @@ class TestProgressionSectionInStartersIndex:
         )
         assert "request-debug" in palier5_block, (
             "Le palier 5 doit mentionner le starter `request-debug`."
+        )
+
+    def test_palier_6_form_post_marque_livre(self):
+        # STARTER-FORM-POST-001 livré : palier 6 doit l'indiquer
+        # explicitement avec la mention « livré ».
+        assert "STARTER-FORM-POST-001" in self.content, (
+            "STARTER-FORM-POST-001 doit rester référencé dans la "
+            "progression (palier 6)."
+        )
+        text = self.content
+        idx_palier6 = text.find("6. **Premier formulaire POST**")
+        idx_palier7 = text.find("7. **Validation serveur**")
+        assert idx_palier6 != -1, (
+            "Item « 6. **Premier formulaire POST** » introuvable dans la progression."
+        )
+        assert idx_palier7 != -1, (
+            "Item « 7. **Validation serveur** » introuvable dans la progression."
+        )
+        palier6_block = text[idx_palier6:idx_palier7]
+        assert "livré" in palier6_block, (
+            "Le palier 6 (Premier formulaire POST) doit être marqué « livré » "
+            "depuis STARTER-FORM-POST-001."
+        )
+        assert "form-post" in palier6_block, (
+            "Le palier 6 doit mentionner le starter `form-post`."
         )
 
     def test_warning_admonition_present(self):
@@ -318,7 +343,7 @@ class TestFutureStartersNotYetCreated:
         # first-html-view retiré : livré par STARTER-FIRST-HTML-VIEW-001 (palier 3).
         # dynamic-route retiré : livré par STARTER-DYNAMIC-ROUTE-001 (palier 4).
         # request-debug retiré : livré par STARTER-REQUEST-DEBUG-001 (palier 5).
-        "form-post",
+        # form-post retiré : livré par STARTER-FORM-POST-001 (palier 6).
         "server-validation",
         "first-sql",
     ])
