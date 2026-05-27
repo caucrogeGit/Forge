@@ -234,25 +234,12 @@ application = create_configured_wsgi_app()
 </section>
 
 <!-- Starters -->
-<section id="starters" class="py-24 px-6 bg-slate-50">
+<section id="starters" class="py-24 px-6 bg-[#fff3ea]">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
       <h2 class="text-4xl font-bold tracking-tight mb-4">
         Starters progressifs.
       </h2>
-      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
-        Les starters Forge sont des points de départ progressifs. Ils servent à découvrir,
-        tester et valider le framework, sans imposer une application métier unique.
-        Ils ne remplacent pas le core.
-      </p>
-      <p class="text-slate-400 text-sm max-w-2xl mx-auto mt-4">
-        5 modules officiels opt-in, conservés hors du core :
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-rbac</code>,
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-workflow</code>,
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-stats</code>,
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-mfa</code>,
-        <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-media</code>.
-      </p>
     </div>
 
     <div class="grid md:grid-cols-2 gap-5">
@@ -316,88 +303,8 @@ application = create_configured_wsgi_app()
   </div>
 </section>
 
-<!-- Aperçu Forge 1.0.0-beta.10 (en cours) -->
-<section id="beta9" class="py-24 px-6 bg-white">
-  <div class="max-w-5xl mx-auto">
-    <div class="text-center mb-12">
-      <div class="landing-accent-text text-sm font-semibold uppercase tracking-wider mb-3">En cours — Phase B9</div>
-      <h2 class="text-4xl font-bold tracking-tight mb-4">
-        Aperçu Forge 1.0.0-beta.10
-      </h2>
-      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
-        Beta.9 consolide le chemin production encadrée sans transformer Forge en plateforme clé en main.
-        Les apports principaux, déjà livrés en branche principale :
-      </p>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-5">
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">CLI</div>
-        <h3 class="font-semibold mb-2">CLI plus sûre</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          <code class="text-xs bg-slate-100 px-1 rounded">--help</code> /
-          <code class="text-xs bg-slate-100 px-1 rounded">-h</code>
-          n'exécute plus les commandes métier. Les commandes sensibles (diagnostic, mail, migrations, CRUD) documentent leurs effets.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">WSGI</div>
-        <h3 class="font-semibold mb-2">Production encadrée</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          Entrée <code class="text-xs bg-slate-100 px-1 rounded">create_configured_wsgi_app()</code> documentée pour Gunicorn derrière reverse proxy. Smoke tests transversaux inclus.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Sécurité HTTP</div>
-        <h3 class="font-semibold mb-2"><code class="text-xs bg-slate-100 px-1 rounded">X-Real-IP</code> sous contrôle</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          <code class="text-xs bg-slate-100 px-1 rounded">APP_TRUSTED_PROXIES</code> explicite, vide par défaut. Aucun header client n'est cru aveuglément.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Sessions</div>
-        <h3 class="font-semibold mb-2">Cookies et stores renforcés</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          Helpers <code class="text-xs bg-slate-100 px-1 rounded">set_session_cookie</code> /
-          <code class="text-xs bg-slate-100 px-1 rounded">clear_session_cookie</code> centralisés,
-          <code class="text-xs bg-slate-100 px-1 rounded">cleanup_expired()</code> aligné sur les 3 stores, dédomainisation progressive.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Production</div>
-        <h3 class="font-semibold mb-2">Limites explicites</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          <code class="text-xs bg-slate-100 px-1 rounded">python app.py</code> reste réservé au développement / démonstration. Page dédiée :
-          <a href="https://caucrogegit.github.io/Forge/production-limits/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Limites de production</a>
-          + warnings au démarrage WSGI si <code class="text-xs bg-slate-100 px-1 rounded">MemorySessionStore</code> en prod.
-        </p>
-      </div>
-
-      <div class="rounded-xl border border-slate-200 bg-white p-6">
-        <div class="text-xs landing-accent-text font-semibold mb-2">Opt-ins</div>
-        <h3 class="font-semibold mb-2">Core autonome préservé</h3>
-        <p class="text-sm text-slate-500 leading-relaxed">
-          <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-media</code> intégré à la matrice CI opt-in. Aucun module métier n'est imposé au core Forge.
-        </p>
-      </div>
-    </div>
-
-    <p class="text-center text-sm text-slate-400 mt-10 max-w-3xl mx-auto">
-      Forge reste <span class="text-slate-600 font-medium">petit dans son cœur</span>,
-      <span class="text-slate-600 font-medium">riche par ses briques</span>,
-      <span class="text-slate-600 font-medium">clair dans ses générateurs</span>,
-      <span class="text-slate-600 font-medium">fortement documenté</span>,
-      <span class="text-slate-600 font-medium">très testé</span>.
-    </p>
-  </div>
-</section>
-
 <!-- API Forge -->
-<section id="api" class="py-24 px-6 bg-slate-50">
+<section id="api" class="py-24 px-6 bg-white">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-12">
       <h2 class="text-4xl font-bold tracking-tight mb-4">
@@ -472,7 +379,7 @@ application = create_configured_wsgi_app()
 </section>
 
 <!-- Cartes de fonctionnalités -->
-<section class="py-24 px-6 bg-white">
+<section class="py-24 px-6 bg-[#fff3ea]">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
       <h2 class="text-4xl font-bold tracking-tight mb-4">
@@ -723,6 +630,86 @@ application = create_configured_wsgi_app()
   </div>
 </section>
 
+<!-- Aperçu Forge 1.0.0-beta.10 (en cours) -->
+<section id="beta9" class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-12">
+      <div class="landing-accent-text text-sm font-semibold uppercase tracking-wider mb-3">En cours — Phase B9</div>
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Aperçu Forge 1.0.0-beta.10
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Beta.9 consolide le chemin production encadrée sans transformer Forge en plateforme clé en main.
+        Les apports principaux, déjà livrés en branche principale :
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">CLI</div>
+        <h3 class="font-semibold mb-2">CLI plus sûre</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code class="text-xs bg-slate-100 px-1 rounded">--help</code> /
+          <code class="text-xs bg-slate-100 px-1 rounded">-h</code>
+          n'exécute plus les commandes métier. Les commandes sensibles (diagnostic, mail, migrations, CRUD) documentent leurs effets.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">WSGI</div>
+        <h3 class="font-semibold mb-2">Production encadrée</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Entrée <code class="text-xs bg-slate-100 px-1 rounded">create_configured_wsgi_app()</code> documentée pour Gunicorn derrière reverse proxy. Smoke tests transversaux inclus.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Sécurité HTTP</div>
+        <h3 class="font-semibold mb-2"><code class="text-xs bg-slate-100 px-1 rounded">X-Real-IP</code> sous contrôle</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code class="text-xs bg-slate-100 px-1 rounded">APP_TRUSTED_PROXIES</code> explicite, vide par défaut. Aucun header client n'est cru aveuglément.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Sessions</div>
+        <h3 class="font-semibold mb-2">Cookies et stores renforcés</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          Helpers <code class="text-xs bg-slate-100 px-1 rounded">set_session_cookie</code> /
+          <code class="text-xs bg-slate-100 px-1 rounded">clear_session_cookie</code> centralisés,
+          <code class="text-xs bg-slate-100 px-1 rounded">cleanup_expired()</code> aligné sur les 3 stores, dédomainisation progressive.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Production</div>
+        <h3 class="font-semibold mb-2">Limites explicites</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code class="text-xs bg-slate-100 px-1 rounded">python app.py</code> reste réservé au développement / démonstration. Page dédiée :
+          <a href="https://caucrogegit.github.io/Forge/production-limits/" target="_blank" rel="noopener noreferrer" class="landing-accent-text">Limites de production</a>
+          + warnings au démarrage WSGI si <code class="text-xs bg-slate-100 px-1 rounded">MemorySessionStore</code> en prod.
+        </p>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-6">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Opt-ins</div>
+        <h3 class="font-semibold mb-2">Core autonome préservé</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">
+          <code class="text-xs bg-slate-100 px-1 rounded">forge-mvc-media</code> intégré à la matrice CI opt-in. Aucun module métier n'est imposé au core Forge.
+        </p>
+      </div>
+    </div>
+
+    <p class="text-center text-sm text-slate-400 mt-10 max-w-3xl mx-auto">
+      Forge reste <span class="text-slate-600 font-medium">petit dans son cœur</span>,
+      <span class="text-slate-600 font-medium">riche par ses briques</span>,
+      <span class="text-slate-600 font-medium">clair dans ses générateurs</span>,
+      <span class="text-slate-600 font-medium">fortement documenté</span>,
+      <span class="text-slate-600 font-medium">très testé</span>.
+    </p>
+  </div>
+</section>
+
 <!-- Bloc code avec onglets -->
 <section class="bg-[#111110] py-24 px-6">
   <div class="max-w-5xl mx-auto">
@@ -823,13 +810,13 @@ router = Router()
 </section>
 
 <!-- section positionnement (LANDING-BETA6-MENU-001) -->
-<section id="positionnement" class="bg-white py-24 px-6">
+<section id="positionnement" class="bg-[#fff3ea] py-24 px-6">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold tracking-tight text-white mb-4">
+      <h2 class="text-4xl font-bold tracking-tight text-slate-900 mb-4">
         Où se place Forge ?
       </h2>
-      <p class="text-white/50 text-lg max-w-2xl mx-auto">
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
         Forge se place entre Flask et Django.
       </p>
     </div>

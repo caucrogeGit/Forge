@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@source "../../mvc/views/landing/index.html";
+@source "../../docs/index.html";
+
 @layer components {
   .tab-active {
     border-bottom-color: #E8651A !important;
