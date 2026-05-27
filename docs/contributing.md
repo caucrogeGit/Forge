@@ -595,6 +595,8 @@ git commit -m "feat: ajouter le guide de création de modules Forge"
 
 ## Voir aussi
 
+- [Dépôt canonique et récupération de commits](contributing/canonical-repo.md) — checklist pré-ticket et procédure officielle de portage par patchs si des commits ont été créés hors du dépôt canonique
+- [Conventions internes de Forge](contributing/conventions.md) — patterns opérationnels (audit, tests, code, doc)
 - [Politique de release](release-policy.md) — SemVer adapté, règles de publication
 - [Politique de dépréciation](deprecation-policy.md) — cycle d'annonce et de retrait
 - [Matrice de compatibilité](compatibility.md) — Python, MariaDB, dépendances
