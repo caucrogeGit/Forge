@@ -109,7 +109,7 @@ def test_make_public_list_genere_controleur_public_dedie(tmp_path):
 
     controller = _read(tmp_path, "mvc/controllers/public_hebergements_controller.py")
     assert "class PublicHebergementsController(BaseController):" in controller
-    assert "def index(request):" in controller
+    assert "def index(request: Request) -> Response:" in controller
     assert 'BaseController.render(\n            "public/hebergements/index.html",' in controller
     assert '"hebergements": rows' in controller
 

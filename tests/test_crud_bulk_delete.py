@@ -335,11 +335,11 @@ class TestControleurBulk:
 
     def test_methode_bulk_delete_presente(self):
         ctrl = build_controller(_entity_simple())
-        assert "def bulk_delete(request)" in ctrl
+        assert "def bulk_delete(request: Request)" in ctrl
 
     def test_methode_bulk_delete_confirm_presente(self):
         ctrl = build_controller(_entity_simple())
-        assert "def bulk_delete_confirm(request)" in ctrl
+        assert "def bulk_delete_confirm(request: Request)" in ctrl
 
     def test_parse_bulk_ids_presente(self):
         ctrl = build_controller(_entity_simple())
@@ -347,14 +347,14 @@ class TestControleurBulk:
 
     def test_redirect_si_aucun_id(self):
         ctrl = build_controller(_entity_simple())
-        idx = ctrl.find("def bulk_delete(request)")
+        idx = ctrl.find("def bulk_delete(request: Request)")
         bloc = ctrl[idx: idx + 300]
         assert "redirect_with_flash" in bloc
         assert "Aucun élément" in bloc
 
     def test_bulk_delete_confirm_appelle_bulk_delete_contacts(self):
         ctrl = build_controller(_entity_simple())
-        idx = ctrl.find("def bulk_delete_confirm(request)")
+        idx = ctrl.find("def bulk_delete_confirm(request: Request)")
         bloc = ctrl[idx: idx + 300]
         assert "bulk_delete_contacts" in bloc
 
@@ -378,13 +378,13 @@ class TestControleurBulk:
 
     def test_bulk_delete_rend_template_confirmation(self):
         ctrl = build_controller(_entity_simple())
-        idx = ctrl.find("def bulk_delete(request)")
+        idx = ctrl.find("def bulk_delete(request: Request)")
         bloc = ctrl[idx: idx + 300]
         assert "bulk_delete_confirm.html" in bloc
 
     def test_sans_rbac_pas_de_require_permission_sur_bulk(self):
         ctrl = build_controller(_entity_simple())
-        idx = ctrl.find("def bulk_delete(request)")
+        idx = ctrl.find("def bulk_delete(request: Request)")
         # Les 2 lignes avant ne doivent pas contenir require_permission
         before = ctrl[max(0, idx - 100): idx]
         assert "require_permission" not in before
@@ -393,7 +393,7 @@ class TestControleurBulk:
         pytest.importorskip("forge_mvc_rbac")
         defn = _entity_with_rbac()
         ctrl = build_controller(defn)
-        idx = ctrl.find("def bulk_delete(request)")
+        idx = ctrl.find("def bulk_delete(request: Request)")
         before = ctrl[max(0, idx - 150): idx]
         assert "require_permission" in before
         assert "contact.delete" in before
@@ -402,7 +402,7 @@ class TestControleurBulk:
         pytest.importorskip("forge_mvc_rbac")
         defn = _entity_with_rbac()
         ctrl = build_controller(defn)
-        idx = ctrl.find("def bulk_delete_confirm(request)")
+        idx = ctrl.find("def bulk_delete_confirm(request: Request)")
         before = ctrl[max(0, idx - 150): idx]
         assert "require_permission" in before
 

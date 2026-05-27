@@ -38,6 +38,69 @@ class FakeRequest:
         if override and str(override).upper() in {"PUT", "PATCH", "DELETE"}:
             self.method = str(override).upper()
 
+    # ── Convention d'inspection — miroir des accesseurs de `Request` ────────
+    #
+    # Ajouté par STARTER-BONJOUR-FORGE-001 / API-INSPECTABLE-OBJECTS-CONVENTION-001
+    # pour que `FakeRequest` se comporte comme `core.http.request.Request`
+    # dans les tests qui exercent les contrôleurs typés.
+
+    def param(self, key, default=None):
+        values = self.params.get(key)
+        if not values:
+            return default
+        return values[0]
+
+    def header(self, name, default=None):
+        return self.headers.get(name, default)
+
+    def form(self, key, default=None):
+        values = self.body.get(key)
+        if not values:
+            return default
+        if isinstance(values, list):
+            return values[0] if values else default
+        return values
+
+    def json(self, key, default=None):
+        body = self.json_body
+        if not isinstance(body, dict):
+            return default
+        return body.get(key, default)
+
+    def file(self, key, default=None):
+        return self.files.get(key, default)
+
+    def route_param(self, key, default=None):
+        return self.route_params.get(key, default)
+
+    @property
+    def data(self):
+        """Mini-version de `Request.data` pour les tests de contrôleurs.
+
+        Reproduit les clés canoniques (method, path, ip, params,
+        route_params, headers, body, json_body, files) mais sans le
+        masquage avancé (les tests ne devraient pas avoir besoin de
+        passer par FakeRequest pour vérifier le masquage — `Request`
+        réel est utilisé pour ça)."""
+        headers_view = {}
+        for key in list(getattr(self.headers, "_headers", {})):
+            headers_view[key] = self.headers.get(key)
+        return {
+            "method": self.method,
+            "original_method": self.original_method,
+            "path": self.path,
+            "ip": self.ip,
+            "params": dict(self.params),
+            "route_params": dict(self.route_params),
+            "headers": headers_view,
+            "body": dict(self.body),
+            "json_body": dict(self.json_body) if isinstance(self.json_body, dict) else self.json_body,
+            "files": {k: {"filename": getattr(f, "filename", None),
+                          "size": getattr(f, "size", None),
+                          "content_type": getattr(f, "content_type", None)}
+                      for k, f in self.files.items()},
+        }
+
 
 class _FakeHeaders:
     """Simule http.client.HTTPMessage pour get("Cookie") et get("Content-Type")."""

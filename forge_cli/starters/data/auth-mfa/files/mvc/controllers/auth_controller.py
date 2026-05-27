@@ -12,6 +12,8 @@ from forge_mvc_mfa.model import get_active_mfa_factors
 from core.auth.password import hash_password, verify_password
 from core.auth.session import login_user
 from core.forge import get as _cfg
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 from core.security.hashing import record_attempt, is_rate_limited, verify_password_legacy
 from core.sessions.manager import get_session_store as _get_session_store
@@ -38,7 +40,7 @@ def _check_password(password: str, password_hash: str) -> bool:
 class AuthController(BaseController):
 
     @staticmethod
-    def login_form(request):
+    def login_form(request: Request) -> Response:
         session_id = get_session_id(request)
         session    = get_session(session_id) if session_id else None
         if not session:
@@ -55,7 +57,7 @@ class AuthController(BaseController):
         return response
 
     @staticmethod
-    def login(request):
+    def login(request: Request) -> Response:
         if is_rate_limited(request.ip):
             return BaseController.render("errors/429.html", 429, base=None)
 
@@ -124,7 +126,7 @@ class AuthController(BaseController):
         })
 
     @staticmethod
-    def logout(request):
+    def logout(request: Request) -> Response:
         session_id = get_session_id(request)
         session    = get_session(session_id)
         if not session:

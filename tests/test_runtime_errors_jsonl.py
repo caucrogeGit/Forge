@@ -443,7 +443,10 @@ class TestIntegrationDispatch:
             raise RuntimeError("x")
 
         router = Router()
-        router.add("POST", "/form", _handler_crash, public=True)
+        # csrf=False : on veut atteindre le handler pour valider le filtrage
+        # des clés POST. Sans cela, le middleware CSRF bloque la requête
+        # avant le handler et aucune ligne JSONL n'est écrite.
+        router.add("POST", "/form", _handler_crash, public=True, csrf=False)
         app = Application(router, middlewares=[])
         req = FakeRequest("POST", "/form", body={"username": "alice", "password": "secret123"})
 

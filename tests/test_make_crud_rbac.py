@@ -201,14 +201,14 @@ def test_permission_index():
     defn = {**_DEF_SANS_RBAC, "rbac": {"permissions": {"index": "articles.view"}}}
     code = build_controller(defn)
     assert '@require_permission("articles.view")' in code
-    assert "def index(request)" in code
+    assert "def index(request: Request)" in code
 
 
 def test_permission_show():
     defn = {**_DEF_SANS_RBAC, "rbac": {"permissions": {"show": "articles.view"}}}
     code = build_controller(defn)
     assert '@require_permission("articles.view")' in code
-    assert "def show(request)" in code
+    assert "def show(request: Request)" in code
 
 
 def test_permission_create_protege_new():
@@ -216,7 +216,7 @@ def test_permission_create_protege_new():
     defn = {**_DEF_SANS_RBAC, "rbac": {"permissions": {"create": "articles.create"}}}
     code = build_controller(defn)
     assert '@require_permission("articles.create")' in code
-    assert "def new(request)" in code
+    assert "def new(request: Request)" in code
     # Vérifier l'ordre : @staticmethod avant @require_permission avant def new
     idx = code.find("    @staticmethod\n    @require_permission(\"articles.create\")\n    def new(")
     assert idx >= 0, "Ordre incorrect: @staticmethod doit précéder @require_permission avant def new"
@@ -227,7 +227,7 @@ def test_permission_store_protege_create():
     defn = {**_DEF_SANS_RBAC, "rbac": {"permissions": {"store": "articles.create"}}}
     code = build_controller(defn)
     assert '@require_permission("articles.create")' in code
-    assert "def create(request)" in code
+    assert "def create(request: Request)" in code
     idx = code.find("    @staticmethod\n    @require_permission(\"articles.create\")\n    def create(")
     assert idx >= 0, "Ordre incorrect: @staticmethod doit précéder @require_permission avant def create"
 
@@ -265,7 +265,7 @@ def test_rbac_partiel_ne_protege_que_les_actions_declarees():
     assert '@require_permission("articles.edit")' in code
     # index, show, new, create, update, destroy non protégés
     # Vérifier qu'index n'a pas de @require_permission devant lui
-    idx_index = code.find("    def index(request)")
+    idx_index = code.find("    def index(request: Request)")
     assert "@require_permission" not in code[max(0, idx_index - 60):idx_index]
 
 

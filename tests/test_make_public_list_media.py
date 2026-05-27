@@ -419,8 +419,8 @@ def test_make_public_show_complete_controleur_list_avec_media(tmp_path):
     make_public_show("Hebergement", output_root=tmp_path)
 
     controller = _read(tmp_path, "mvc/controllers/public_hebergements_controller.py")
-    assert "def index(request):" in controller
-    assert "def show(request):" in controller
+    assert "def index(request: Request) -> Response:" in controller
+    assert "def show(request: Request) -> Response:" in controller
     assert "SELECT_PUBLIC_LIST" in controller
     assert "SELECT_PUBLIC_DETAIL" in controller
     assert "get_cover_media" in controller

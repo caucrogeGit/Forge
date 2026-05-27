@@ -1,7 +1,8 @@
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound, select_autoescape
 from core.forge import get as _cfg
 from core.i18n import trans as _trans
 from core.security.csp import get_request_nonce as _get_nonce
+from core.templating.errors import TemplateNotFoundError
 
 
 def _csp_nonce() -> str:
@@ -11,6 +12,7 @@ def _csp_nonce() -> str:
 
 class Jinja2Renderer:
     def __init__(self, views_dir: str) -> None:
+        self._views_dir = views_dir
         self._env = Environment(
             loader=FileSystemLoader(views_dir),
             autoescape=select_autoescape(["html"]),
@@ -28,7 +30,14 @@ class Jinja2Renderer:
             pass
 
     def render(self, template: str, context: dict) -> str:
-        return self._env.get_template(template).render(context)
+        try:
+            tmpl = self._env.get_template(template)
+        except TemplateNotFound as exc:
+            # Conversion vers l'exception Forge — découple le moteur Jinja2
+            # de l'erreur publique exposée par les contrôleurs et le helper
+            # `core.http.helpers.html`. Voir DX-RENDER-ERROR-001.
+            raise TemplateNotFoundError(template, self._views_dir) from exc
+        return tmpl.render(context)
 
     @staticmethod
     def _url_for(name: str, **params) -> str:

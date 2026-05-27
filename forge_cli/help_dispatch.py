@@ -62,6 +62,7 @@ HELP_FLAGS: frozenset[str] = frozenset({"--help", "-h"})
 HELP_DESCRIPTIONS: dict[str, str] = {
     # Projet
     "new":              "Crée un nouveau projet Forge.",
+    "run":              "Lance Forge (dev) ou affiche la stratégie WSGI (prod).",
     "doctor":           "Diagnostic large et tolérant (lecture seule).",
     "project:check":    "Contrôle strict des conventions (CI-ready).",
     "project:audit":    "Rapport d'audit détaillé non destructif.",
@@ -126,6 +127,48 @@ HELP_DESCRIPTIONS: dict[str, str] = {
 # CLI-HELP-FLAGS-INIT-COMMANDS-001 : décrit usage, rôle, effets,
 # prérequis, limites et rappel que --help n'exécute rien.
 HELP_TEXTS_RICH: dict[str, str] = {
+    "run": """\
+Usage:
+  forge run [--env dev|prod] [--no-reload]
+
+Description:
+  Point d'entrée officiel pour lancer Forge. Remplace l'usage direct
+  de `python app.py` et `scripts/dev-server.sh`.
+
+Comportement:
+  - APP_ENV=dev  : superviseur d'autoreload (défaut).
+                   Spawne `python app.py` en sous-processus, surveille
+                   les fichiers du projet via stat() et redémarre
+                   automatiquement quand un fichier surveillé change.
+                   Avec --no-reload : délègue à scripts/dev-server.sh
+                   (POSIX) ; fallback `python app.py`.
+  - APP_ENV=prod : refuse le serveur intégré et affiche la stratégie
+                   WSGI recommandée (Gunicorn + reverse proxy).
+
+Fichiers surveillés (dev, autoreload):
+  - app.py, config.py, env/dev ;
+  - mvc/**/*.{py,html,json,sql} ;
+  - core/**/*.py.
+
+Dossiers ignorés:
+  .venv/, __pycache__/, .pytest_cache/, .ruff_cache/, .mypy_cache/,
+  storage/, logs/, site/, node_modules/, .git/, build/, dist/.
+
+Options:
+  --env dev|prod   Force l'environnement (sinon lit APP_ENV, défaut: dev).
+  --no-reload      Désactive l'autoreload (mode legacy : dev-server.sh).
+  -h, --help       Affiche cette aide sans exécuter la commande.
+
+Prérequis:
+  - lancé depuis la racine d'un projet Forge (app.py + mvc/) ;
+  - en dev : env/dev configuré ; certificats SSL générés (forge new).
+
+Limites:
+  - autoreload par polling stat() (pas d'inotify) ;
+  - pas de live reload navigateur ni de WebSocket ;
+  - ne lance pas Gunicorn automatiquement en prod ;
+  - aucun changement du routeur ni du chemin WSGI.""",
+
     "db:init": """\
 Usage:
   forge db:init

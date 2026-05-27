@@ -225,6 +225,8 @@ def build_public_list_controller(spec: PublicListSpec) -> str:
     cover = _list_cover_entry(spec)
     parts: list[str] = [
         "from core.database.connection import get_connection, close_connection\n",
+        "from core.http.request import Request\n",
+        "from core.http.response import Response\n",
         "from core.mvc.controller.base_controller import BaseController\n",
     ]
     if cover is not None:
@@ -239,7 +241,7 @@ def build_public_list_controller(spec: PublicListSpec) -> str:
         f"class {spec.class_name}(BaseController):\n",
         "\n",
         "    @staticmethod\n",
-        "    def index(request):\n",
+        "    def index(request: Request) -> Response:\n",
         "        connection = None\n",
         "        cursor = None\n",
         "        try:\n",
@@ -277,6 +279,8 @@ def build_public_show_controller(spec: PublicListSpec) -> str:
     media_import = _media_import_line(spec)
     parts: list[str] = [
         "from core.database.connection import get_connection, close_connection\n",
+        "from core.http.request import Request\n",
+        "from core.http.response import Response\n",
         "from core.mvc.controller.base_controller import BaseController\n",
     ]
     if media_import:
@@ -305,7 +309,7 @@ def build_public_show_method(
     parts: list[str] = [
         "\n",
         "    @staticmethod\n",
-        "    def show(request):\n",
+        "    def show(request: Request) -> Response:\n",
         "        public_id = request.route_params.get(\"id\")\n",
         "        connection = None\n",
         "        cursor = None\n",

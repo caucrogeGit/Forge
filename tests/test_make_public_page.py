@@ -61,7 +61,7 @@ def test_make_public_page_ajoute_controleur_public(tmp_path):
 
     controller = _read(tmp_path, "mvc/controllers/public_pages_controller.py")
     assert "class PublicPagesController(BaseController):" in controller
-    assert "def accueil(request):" in controller
+    assert "def accueil(request: Request) -> Response:" in controller
     assert 'BaseController.render("public/accueil.html", request=request)' in controller
 
 

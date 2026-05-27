@@ -232,7 +232,7 @@ def test_form_controller_contient_methode_new():
     spec = build_public_form_spec(DEMANDE_JSON)
     controller = build_public_form_controller(spec)
 
-    assert "def new(request):" in controller
+    assert "def new(request: Request) -> Response:" in controller
     assert "FORM_FIELDS" in controller
     assert "render_flash_html(request)" in controller
 
@@ -241,7 +241,7 @@ def test_form_controller_contient_methode_create():
     spec = build_public_form_spec(DEMANDE_JSON)
     controller = build_public_form_controller(spec)
 
-    assert "def create(request):" in controller
+    assert "def create(request: Request) -> Response:" in controller
     assert "cursor.execute(INSERT_PUBLIC_FORM" in controller
     assert "connection.commit()" in controller
     assert "redirect_with_flash" in controller
@@ -382,8 +382,8 @@ def test_make_public_form_cree_controleur(tmp_path):
     controller = _read(tmp_path, "mvc/controllers/public_demandes_controller.py")
     assert "INSERT_PUBLIC_FORM" in controller
     assert "FORM_FIELDS" in controller
-    assert "def new(request):" in controller
-    assert "def create(request):" in controller
+    assert "def new(request: Request) -> Response:" in controller
+    assert "def create(request: Request) -> Response:" in controller
 
 
 def test_make_public_form_cree_routes(tmp_path):
@@ -417,9 +417,9 @@ def test_make_public_form_apres_make_list_ajoute_methodes(tmp_path):
     make_public_form("Demande", output_root=tmp_path)
 
     controller = _read(tmp_path, "mvc/controllers/public_demandes_controller.py")
-    assert "def index(request):" in controller
-    assert "def new(request):" in controller
-    assert "def create(request):" in controller
+    assert "def index(request: Request) -> Response:" in controller
+    assert "def new(request: Request) -> Response:" in controller
+    assert "def create(request: Request) -> Response:" in controller
     assert "INSERT_PUBLIC_FORM" in controller
     assert "FORM_FIELDS" in controller
 

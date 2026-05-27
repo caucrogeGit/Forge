@@ -86,7 +86,7 @@ class TestDestroyGenerationMedia:
         lines = code.split("\n")
         in_destroy = False
         for line in lines:
-            if "def destroy(request)" in line:
+            if "def destroy(request: Request)" in line:
                 in_destroy = True
             elif line.startswith("    def ") and "destroy" not in line:
                 in_destroy = False
@@ -99,7 +99,7 @@ class TestDestroyGenerationMedia:
         lines = code.split("\n")
         in_destroy = False
         for line in lines:
-            if "def destroy(request)" in line:
+            if "def destroy(request: Request)" in line:
                 in_destroy = True
             elif line.startswith("    def ") and "destroy" not in line:
                 in_destroy = False
@@ -112,7 +112,7 @@ class TestDestroyGenerationMedia:
         lines = code.split("\n")
         in_destroy = False
         for line in lines:
-            if "def destroy(request)" in line:
+            if "def destroy(request: Request)" in line:
                 in_destroy = True
             elif line.startswith("    def ") and "destroy" not in line:
                 in_destroy = False
@@ -126,7 +126,7 @@ class TestDestroyGenerationMedia:
         lines = code.split("\n")
         in_destroy = False
         for line in lines:
-            if "def destroy(request)" in line:
+            if "def destroy(request: Request)" in line:
                 in_destroy = True
             elif line.startswith("    def ") and "destroy" not in line:
                 in_destroy = False
@@ -140,7 +140,7 @@ class TestDestroyGenerationMedia:
         lines = code.split("\n")
         in_destroy = False
         for line in lines:
-            if "def destroy(request)" in line:
+            if "def destroy(request: Request)" in line:
                 in_destroy = True
             elif line.startswith("    def ") and "destroy" not in line:
                 in_destroy = False
@@ -152,7 +152,7 @@ class TestDestroyGenerationMedia:
         lines = code.split("\n")
         in_destroy = False
         for line in lines:
-            if "def destroy(request)" in line:
+            if "def destroy(request: Request)" in line:
                 in_destroy = True
             elif line.startswith("    def ") and "destroy" not in line:
                 in_destroy = False
@@ -165,7 +165,7 @@ class TestDestroyGenerationMedia:
         lines = code.split("\n")
         in_destroy = False
         for line in lines:
-            if "def destroy(request)" in line:
+            if "def destroy(request: Request)" in line:
                 in_destroy = True
             elif line.startswith("    def ") and "destroy" not in line:
                 in_destroy = False

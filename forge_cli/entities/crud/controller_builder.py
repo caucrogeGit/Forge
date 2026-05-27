@@ -70,6 +70,7 @@ def build_controller(
     lines: list[str] = [
         "import csv",
         "import io",
+        "from core.http.request import Request",
         "from core.http.response import Response",
     ]
     if _rbac:
@@ -306,7 +307,7 @@ def build_controller(
     index_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def index(request):",
+        "    def index(request: Request) -> Response:",
         f"        context = {entity}Controller._list_context(request)",
         f'        template = "{snake}/_results.html" if _is_hx_request(request) else "{snake}/index.html"',
         "        return BaseController.render(template, context=context, request=request)",
@@ -317,7 +318,7 @@ def build_controller(
     new_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def new(request):",
+        "    def new(request: Request) -> Response:",
         (
             f'        form = {entity}Form(**_{snake}_form_options())'
             if choice_options else
@@ -342,7 +343,7 @@ def build_controller(
     create_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def create(request):",
+        "    def create(request: Request) -> Response:",
         (
             f'        form = {entity}Form.from_request(request, **_{snake}_form_options())'
             if choice_options else
@@ -443,7 +444,7 @@ def build_controller(
     show_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def show(request):",
+        "    def show(request: Request) -> Response:",
         f'        {pk_name} = {entity}Controller._parse_id(request.route_params.get("id"))',
         f"        if {pk_name} is None:",
         "            return BaseController.not_found()",
@@ -481,7 +482,7 @@ def build_controller(
     edit_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def edit(request):",
+        "    def edit(request: Request) -> Response:",
         f'        {pk_name} = {entity}Controller._parse_id(request.route_params.get("id"))',
         f"        if {pk_name} is None:",
         "            return BaseController.not_found()",
@@ -531,7 +532,7 @@ def build_controller(
     update_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def update(request):",
+        "    def update(request: Request) -> Response:",
         f'        {pk_name} = {entity}Controller._parse_id(request.route_params.get("id"))',
         f"        if {pk_name} is None:",
         "            return BaseController.not_found()",
@@ -707,7 +708,7 @@ def build_controller(
     destroy_lines = [
         "",
         "    @staticmethod",
-        "    def destroy(request):",
+        "    def destroy(request: Request) -> Response:",
         f'        {pk_name} = {entity}Controller._parse_id(request.route_params.get("id"))',
         f"        if {pk_name} is None:",
         "            return BaseController.not_found()",
@@ -731,7 +732,7 @@ def build_controller(
     bulk_delete_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def bulk_delete(request):",
+        "    def bulk_delete(request: Request) -> Response:",
         f"        ids = {entity}Controller._parse_bulk_ids(request)",
         "        if not ids:",
         f'            return BaseController.redirect_with_flash(request, "/{plural}", "Aucun élément sélectionné.")',
@@ -745,7 +746,7 @@ def build_controller(
     bulk_delete_confirm_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def bulk_delete_confirm(request):",
+        "    def bulk_delete_confirm(request: Request) -> Response:",
         f"        ids = {entity}Controller._parse_bulk_ids(request)",
         "        if not ids:",
         f'            return BaseController.redirect_with_flash(request, "/{plural}", "Aucun élément sélectionné.")',
@@ -773,7 +774,7 @@ def build_controller(
     export_csv_lines: list[str] = [
         "",
         "    @staticmethod",
-        "    def export_csv(request):",
+        "    def export_csv(request: Request) -> Response:",
         '        q = _query_param(request, "q").strip()',
         '        sort = _query_param(request, "sort")',
         f"        if sort not in {allowed_sort_keys_repr}:",

@@ -1,3 +1,5 @@
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller import BaseController
 from mvc.forms.contact_form import ContactForm
 from mvc.models.contact_model import (
@@ -51,7 +53,7 @@ def _form_context(request, form, *, action: str, titre: str) -> dict:
 
 class ContactController(BaseController):
     @staticmethod
-    def index(request):
+    def index(request: Request) -> Response:
         contacts = get_contacts()
         return BaseController.render(
             "contact/index.html",
@@ -60,7 +62,7 @@ class ContactController(BaseController):
         )
 
     @staticmethod
-    def new(request):
+    def new(request: Request) -> Response:
         form = ContactForm()
         return BaseController.render(
             "contact/form.html",
@@ -69,7 +71,7 @@ class ContactController(BaseController):
         )
 
     @staticmethod
-    def create(request):
+    def create(request: Request) -> Response:
         villes = get_villes()
         form = ContactForm.from_request(request, ville_choices=_ville_choices(villes))
         if not form.is_valid():
@@ -89,7 +91,7 @@ class ContactController(BaseController):
         return BaseController.redirect(f"/contacts/{contact_id}")
 
     @staticmethod
-    def show(request):
+    def show(request: Request) -> Response:
         contact_id = _parse_id(request.route_params.get("id"))
         if contact_id is None:
             return BaseController.not_found()
@@ -103,7 +105,7 @@ class ContactController(BaseController):
         )
 
     @staticmethod
-    def edit(request):
+    def edit(request: Request) -> Response:
         contact_id = _parse_id(request.route_params.get("id"))
         if contact_id is None:
             return BaseController.not_found()
@@ -124,7 +126,7 @@ class ContactController(BaseController):
         )
 
     @staticmethod
-    def update(request):
+    def update(request: Request) -> Response:
         contact_id = _parse_id(request.route_params.get("id"))
         if contact_id is None:
             return BaseController.not_found()
@@ -150,7 +152,7 @@ class ContactController(BaseController):
         return BaseController.redirect(f"/contacts/{contact_id}")
 
     @staticmethod
-    def destroy(request):
+    def destroy(request: Request) -> Response:
         contact_id = _parse_id(request.route_params.get("id"))
         if contact_id is None:
             return BaseController.not_found()

@@ -15,6 +15,74 @@ METHOD_OVERRIDE_TARGETS = {"PUT", "PATCH", "DELETE"}
 MAX_BODY_SIZE = 1_048_576  # 1 Mo
 
 
+# ── Convention d'inspection (API-INSPECTABLE-OBJECTS-CONVENTION-001) ────────
+# Clés systématiquement masquées dans Request.data pour éviter de fuiter
+# des secrets en logs / debug / sortie pédagogique. La comparaison est faite
+# en lower-case, sur l'égalité exacte pour les headers (qui sont des noms
+# standardisés) et par sous-chaîne pour les champs formulaire/JSON (qui
+# couvrent un univers ouvert : `csrf_token`, `confirm_password`, `_token`, …).
+
+SENSITIVE_HEADER_NAMES: frozenset[str] = frozenset({
+    "authorization",
+    "proxy-authorization",
+    "cookie",
+    "set-cookie",
+    "x-api-key",
+    "x-auth-token",
+    "x-csrf-token",
+})
+
+
+SENSITIVE_FIELD_FRAGMENTS: tuple[str, ...] = (
+    "password",
+    "passwd",
+    "secret",
+    "token",
+    "csrf",
+    "api_key",
+    "apikey",
+)
+
+
+MASKED_VALUE = "[masked]"
+
+
+def _is_sensitive_field(key: str) -> bool:
+    """True si `key` ressemble à un champ sensible (formulaire/JSON)."""
+    lowered = str(key).lower()
+    return any(fragment in lowered for fragment in SENSITIVE_FIELD_FRAGMENTS)
+
+
+def _is_sensitive_header(name: str) -> bool:
+    """True si `name` est un header HTTP standardisé sensible."""
+    return str(name).lower() in SENSITIVE_HEADER_NAMES
+
+
+def _mask_mapping(
+    mapping,
+    *,
+    sensitive_check,
+):
+    """Retourne une copie de `mapping` avec les valeurs sensibles masquées.
+
+    Accepte les `dict`, `HTTPMessage` ou tout objet itérable type
+    `(key, value)`. Préserve la structure originale (list vs valeur seule).
+    """
+    if mapping is None:
+        return {}
+    if hasattr(mapping, "items"):
+        items = mapping.items()
+    else:
+        items = list(mapping)
+    masked: dict = {}
+    for key, value in items:
+        if sensitive_check(key):
+            masked[key] = MASKED_VALUE
+        else:
+            masked[key] = value
+    return masked
+
+
 def resolve_client_ip(remote_addr: str, headers, trusted_proxies: Iterable[str]) -> str:
     """Résout l'IP client en honorant `X-Real-IP` uniquement derrière proxy fiable.
 
@@ -151,6 +219,102 @@ class Request:
         override = str(override).upper()
         if override in METHOD_OVERRIDE_TARGETS:
             self.method = override
+
+    # ── Accesseurs publics (API-INSPECTABLE-OBJECTS-CONVENTION-001) ─────────
+    #
+    # Forme commune : `obj.lookup(key, default=None)`. Renvoient une valeur
+    # scalaire (str ou objet métier) et `default` si la clé est absente.
+    # Pour les conteneurs qui parsent en `list[str]` (params, body), on
+    # retourne la première valeur — l'attribut brut reste accessible si le
+    # contrôleur a besoin de toutes les valeurs.
+
+    def param(self, key: str, default: str | None = None) -> str | None:
+        """Premier paramètre de query string pour `key`."""
+        values = self.params.get(key)
+        if not values:
+            return default
+        return values[0]
+
+    def header(self, name: str, default: str | None = None) -> str | None:
+        """Header HTTP (recherche insensible à la casse, via HTTPMessage)."""
+        if self.headers is None:
+            return default
+        value = self.headers.get(name)
+        return value if value is not None else default
+
+    def form(self, key: str, default: str | None = None) -> str | None:
+        """Premier champ de formulaire (`application/x-www-form-urlencoded`
+        ou `multipart/form-data`) pour `key`."""
+        values = self.body.get(key)
+        if not values:
+            return default
+        if isinstance(values, list):
+            return values[0] if values else default
+        return values
+
+    def json(self, key: str, default=None):
+        """Champ JSON (`application/json`) pour `key`. Renvoie `default` si
+        le body JSON est vide ou si la clé est absente.
+
+        N'éclate pas si `json_body` n'est pas un `dict` (par exemple un
+        body JSON racine de type liste) — retourne `default` dans ce cas.
+        """
+        body = self.json_body
+        if not isinstance(body, dict):
+            return default
+        return body.get(key, default)
+
+    def file(self, key: str, default: "UploadedFile | None" = None):
+        """Fichier uploadé pour le champ `key` (`UploadedFile` ou `default`)."""
+        return self.files.get(key, default)
+
+    def route_param(self, key: str, default: str | None = None) -> str | None:
+        """Paramètre dynamique de route (`/clients/{id}` → `route_param('id')`)."""
+        return self.route_params.get(key, default)
+
+    # ── Vue d'inspection (.data) ────────────────────────────────────────────
+
+    @property
+    def data(self) -> dict:
+        """Représentation publique stable de la requête, sûre à afficher.
+
+        Toute clé/header sensible (Authorization, Cookie, password, csrf…)
+        est remplacée par `[masked]`. Le contenu binaire des fichiers
+        uploadés n'est jamais inclus — seuls leurs métadonnées le sont.
+
+        Cette vue est destinée à la pédagogie et au debug en développement.
+        Elle ne reflète pas le format wire ; ce n'est pas une sérialisation
+        canonique de la requête.
+        """
+        headers_dict = {}
+        if self.headers is not None:
+            for key in self.headers.keys():
+                value = self.headers.get(key)
+                headers_dict[key] = MASKED_VALUE if _is_sensitive_header(key) else value
+
+        files_meta: dict[str, dict] = {}
+        for field_name, upload in self.files.items():
+            files_meta[field_name] = {
+                "filename": upload.filename,
+                "size": upload.size,
+                "content_type": upload.content_type,
+            }
+
+        return {
+            "method": self.method,
+            "original_method": self.original_method,
+            "path": self.path,
+            "ip": self.ip,
+            "params": dict(self.params),
+            "route_params": dict(self.route_params),
+            "headers": headers_dict,
+            "body": _mask_mapping(self.body, sensitive_check=_is_sensitive_field),
+            "json_body": _mask_mapping(self.json_body, sensitive_check=_is_sensitive_field),
+            "files": files_meta,
+        }
+
+    def __repr__(self) -> str:  # pragma: no cover — purement cosmétique
+        return f"<Request {self.method} {self.path}>"
 
     @staticmethod
     def _parse_multipart(content_type: str, raw: bytes):

@@ -236,11 +236,11 @@ def test_recherche_ne_modifie_pas_show_ni_formulaires():
     form_html = build_form_view(ARTICLE)
     controller = build_controller(ARTICLE)
 
-    assert "def show(request):" in controller
-    assert "def new(request):" in controller
-    assert "def create(request):" in controller
-    assert "def edit(request):" in controller
-    assert "def update(request):" in controller
-    assert "def destroy(request):" in controller
+    assert "def show(request: Request) -> Response:" in controller
+    assert "def new(request: Request) -> Response:" in controller
+    assert "def create(request: Request) -> Response:" in controller
+    assert "def edit(request: Request) -> Response:" in controller
+    assert "def update(request: Request) -> Response:" in controller
+    assert "def destroy(request: Request) -> Response:" in controller
     assert 'type="search"' not in show_html
     assert 'type="search"' not in form_html

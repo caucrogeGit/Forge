@@ -9,6 +9,7 @@ Forge {version} — Framework MVC Python
 
 Projet
   new <NomProjet>    Crée un nouveau projet Forge.
+  run                Lance Forge (dev) ou affiche la stratégie WSGI (prod).
   doctor             Diagnostic large et tolérant (lecture seule).
   project:check      Contrôle strict des conventions (CI-ready).
   project:audit      Rapport d'audit détaillé non destructif.

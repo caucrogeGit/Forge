@@ -176,7 +176,7 @@ def build_public_form_new_method(spec: PublicFormSpec) -> str:
     return "".join([
         "\n",
         "    @staticmethod\n",
-        "    def new(request):\n",
+        "    def new(request: Request) -> Response:\n",
         "        return BaseController.render(\n",
         f'            "{spec.template_name}",\n',
         "            context={\n",
@@ -194,7 +194,7 @@ def build_public_form_create_method(spec: PublicFormSpec) -> str:
     return "".join([
         "\n",
         "    @staticmethod\n",
-        "    def create(request):\n",
+        "    def create(request: Request) -> Response:\n",
         "        errors = {}\n",
         "        form_data = {}\n",
         "        for _field in FORM_FIELDS:\n",
@@ -242,6 +242,8 @@ def build_public_form_create_method(spec: PublicFormSpec) -> str:
 def build_public_form_controller(spec: PublicFormSpec) -> str:
     return "".join([
         "from core.database.connection import get_connection, close_connection\n",
+        "from core.http.request import Request\n",
+        "from core.http.response import Response\n",
         "from core.mvc.controller.base_controller import BaseController\n",
         "from mvc.helpers.flash import render_flash_html\n",
         "\n",

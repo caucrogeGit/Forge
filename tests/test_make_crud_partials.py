@@ -193,10 +193,10 @@ def test_partials_ne_changent_pas_create_edit_show_delete_ni_sql(tmp_path):
 
     assert 'else "article/index.html"' in controller
     assert "HX-Request" in controller
-    assert "def create(request):" in controller
-    assert "def edit(request):" in controller
-    assert "def update(request):" in controller
-    assert "def destroy(request):" in controller
+    assert "def create(request: Request) -> Response:" in controller
+    assert "def edit(request: Request) -> Response:" in controller
+    assert "def update(request: Request) -> Response:" in controller
+    assert "def destroy(request: Request) -> Response:" in controller
     assert "LIKE ?" in model
     assert "LIMIT ? OFFSET ?" in model
     assert 'name="tag_ids"' in form

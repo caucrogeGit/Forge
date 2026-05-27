@@ -124,7 +124,7 @@ def test_make_public_contact_cree_controleur(tmp_path):
 
     controller = _read(tmp_path, "mvc/controllers/public_pages_controller.py")
     assert "class PublicPagesController" in controller
-    assert "def contact(request):" in controller
+    assert "def contact(request: Request) -> Response:" in controller
     assert 'BaseController.render("public/contact.html"' in controller
 
 
@@ -170,8 +170,8 @@ def test_make_public_contact_preserve_controleur_existant(tmp_path):
     make_public_contact(root=tmp_path)
 
     controller = _read(tmp_path, "mvc/controllers/public_pages_controller.py")
-    assert "def accueil(request):" in controller
-    assert "def contact(request):" in controller
+    assert "def accueil(request: Request) -> Response:" in controller
+    assert "def contact(request: Request) -> Response:" in controller
 
 
 def test_make_public_contact_idempotent(tmp_path):

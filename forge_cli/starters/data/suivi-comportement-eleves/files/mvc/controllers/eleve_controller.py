@@ -1,3 +1,5 @@
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 from mvc.models.eleve_model import get_eleve_by_id, get_eleves
 from mvc.models.observation_cours_model import get_observations_by_eleve
@@ -13,7 +15,7 @@ def _parse_id(value):
 class EleveController(BaseController):
 
     @staticmethod
-    def index(request):
+    def index(request: Request) -> Response:
         eleves = get_eleves()
         return BaseController.render(
             "eleve/index.html",
@@ -22,7 +24,7 @@ class EleveController(BaseController):
         )
 
     @staticmethod
-    def show(request):
+    def show(request: Request) -> Response:
         eleve_id = _parse_id(request.route_params.get("id"))
         if eleve_id is None:
             return BaseController.not_found()

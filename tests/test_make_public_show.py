@@ -41,7 +41,7 @@ def test_make_public_show_genere_controleur_public_dedie(tmp_path):
 
     controller = _read(tmp_path, "mvc/controllers/public_hebergements_controller.py")
     assert "class PublicHebergementsController(BaseController):" in controller
-    assert "def show(request):" in controller
+    assert "def show(request: Request) -> Response:" in controller
     assert 'BaseController.render(\n            "public/hebergements/show.html",' in controller
     assert '"hebergement": row' in controller
     assert "return BaseController.not_found()" in controller
@@ -54,8 +54,8 @@ def test_make_public_show_complete_controleur_public_existant(tmp_path):
     make_public_show("Hebergement", output_root=tmp_path)
 
     controller = _read(tmp_path, "mvc/controllers/public_hebergements_controller.py")
-    assert "def index(request):" in controller
-    assert "def show(request):" in controller
+    assert "def index(request: Request) -> Response:" in controller
+    assert "def show(request: Request) -> Response:" in controller
     assert "SELECT_PUBLIC_LIST" in controller
     assert "SELECT_PUBLIC_DETAIL" in controller
 

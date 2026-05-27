@@ -110,11 +110,11 @@ def test_create_edit_show_delete_et_auth_rbac_hors_perimetre():
     code = build_controller(CONTACT)
     show = build_show_view(CONTACT)
 
-    assert "def new(request):" in code
-    assert "def create(request):" in code
-    assert "def edit(request):" in code
-    assert "def update(request):" in code
-    assert "def destroy(request):" in code
+    assert "def new(request: Request) -> Response:" in code
+    assert "def create(request: Request) -> Response:" in code
+    assert "def edit(request: Request) -> Response:" in code
+    assert "def update(request: Request) -> Response:" in code
+    assert "def destroy(request: Request) -> Response:" in code
     assert "HX-Request" not in show
     assert "require_user_permission" not in code
     assert "auth" not in code.lower()

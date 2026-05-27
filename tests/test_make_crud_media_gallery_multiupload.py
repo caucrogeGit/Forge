@@ -93,7 +93,7 @@ def _lines_in_method(code: str, method_name: str) -> list[str]:
     result = []
     inside = False
     for line in lines:
-        if f"def {method_name}(request)" in line:
+        if f"def {method_name}(request: Request)" in line:
             inside = True
             continue
         if inside:

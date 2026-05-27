@@ -1,3 +1,5 @@
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 from core.security.session import get_session, get_session_id
 from mvc.models.cours_model import get_cours
@@ -41,7 +43,7 @@ def _csrf_ok(request) -> bool:
 class ObservationCoursController(BaseController):
 
     @staticmethod
-    def new(request):
+    def new(request: Request) -> Response:
         eleves = get_eleves()
         cours = get_cours()
         return BaseController.render(
@@ -56,7 +58,7 @@ class ObservationCoursController(BaseController):
         )
 
     @staticmethod
-    def create(request):
+    def create(request: Request) -> Response:
         if not _csrf_ok(request):
             return BaseController.render("errors/403.html", 403, base=None)
 
@@ -69,7 +71,7 @@ class ObservationCoursController(BaseController):
         return BaseController.redirect(f"/observations/{obs_id}")
 
     @staticmethod
-    def show(request):
+    def show(request: Request) -> Response:
         obs_id = _parse_id(request.route_params.get("id"))
         if obs_id is None:
             return BaseController.not_found()
@@ -83,7 +85,7 @@ class ObservationCoursController(BaseController):
         )
 
     @staticmethod
-    def edit(request):
+    def edit(request: Request) -> Response:
         obs_id = _parse_id(request.route_params.get("id"))
         if obs_id is None:
             return BaseController.not_found()
@@ -103,7 +105,7 @@ class ObservationCoursController(BaseController):
         )
 
     @staticmethod
-    def update(request):
+    def update(request: Request) -> Response:
         obs_id = _parse_id(request.route_params.get("id"))
         if obs_id is None:
             return BaseController.not_found()

@@ -89,7 +89,7 @@ def _lines_in_method(code: str, method_name: str) -> list[str]:
     result = []
     inside = False
     for line in lines:
-        if f"def {method_name}(request)" in line:
+        if f"def {method_name}(request: Request)" in line:
             inside = True
             continue
         if inside:
@@ -105,7 +105,7 @@ def _update_invalid_block(code: str) -> list[str]:
     in_invalid = False
     block: list[str] = []
     for line in lines:
-        if "def update(request)" in line:
+        if "def update(request: Request)" in line:
             in_update = True
             continue
         if not in_update:

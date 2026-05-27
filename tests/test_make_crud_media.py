@@ -390,7 +390,7 @@ class TestBuildControllerCreateMedia:
         lines = code.split("\n")
         in_destroy = False
         for line in lines:
-            if "def destroy(request)" in line:
+            if "def destroy(request: Request)" in line:
                 in_destroy = True
             elif line.startswith("    def ") and "destroy" not in line:
                 in_destroy = False
@@ -506,7 +506,7 @@ class TestBuildControllerUpdateMedia:
         lines = code.split("\n")
         in_update = False
         for line in lines:
-            if "def update(request)" in line:
+            if "def update(request: Request)" in line:
                 in_update = True
             elif line.startswith("    def ") and "update" not in line:
                 in_update = False
@@ -829,7 +829,7 @@ class TestBuildControllerUpdateDelete:
         found_list_media = False
         found_has_file_guard = False
         for i, line in enumerate(lines):
-            if "def update(request)" in line:
+            if "def update(request: Request)" in line:
                 in_update = True
             if not in_update:
                 continue
@@ -853,7 +853,7 @@ class TestBuildControllerUpdateDelete:
         in_update = False
         update_list_calls = 0
         for line in lines:
-            if "def update(request)" in line:
+            if "def update(request: Request)" in line:
                 in_update = True
             elif line.startswith("    def ") and "update" not in line:
                 in_update = False
@@ -1061,7 +1061,7 @@ class TestBuildControllerUpdateInvalidContext:
         in_invalid = False
         block: list[str] = []
         for line in lines:
-            if "def update(request)" in line:
+            if "def update(request: Request)" in line:
                 in_update = True
                 continue
             if not in_update:

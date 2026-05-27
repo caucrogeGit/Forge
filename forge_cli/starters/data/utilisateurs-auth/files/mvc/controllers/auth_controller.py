@@ -1,5 +1,7 @@
 from core.auth import login_user, logout_user, verify_password
 from core.forge import get as _cfg
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 from core.sessions.manager import get_session_store as _get_session_store
 from core.security.session import get_session, get_session_id, delete_session
@@ -10,7 +12,7 @@ class AuthController(BaseController):
     """Contrôleur applicatif explicite pour login et logout."""
 
     @staticmethod
-    def login_form(request):
+    def login_form(request: Request) -> Response:
         session_id = get_session_id(request)
         session = get_session(session_id) if session_id else None
         if not session:
@@ -33,7 +35,7 @@ class AuthController(BaseController):
         return response
 
     @staticmethod
-    def login(request):
+    def login(request: Request) -> Response:
         session_id = get_session_id(request)
         session = get_session(session_id)
         csrf_token = request.body.get("csrf_token", [None])[0]
@@ -69,7 +71,7 @@ class AuthController(BaseController):
         )
 
     @staticmethod
-    def logout(request):
+    def logout(request: Request) -> Response:
         session_id = get_session_id(request)
         session = get_session(session_id)
         csrf_token = request.body.get("csrf_token", [None])[0]

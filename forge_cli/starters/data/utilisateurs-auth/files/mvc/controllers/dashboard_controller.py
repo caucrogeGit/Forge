@@ -1,4 +1,6 @@
 from core.auth import get_authenticated_user_id, login_required
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 from mvc.models.auth_model import get_user_by_id
 
@@ -8,7 +10,7 @@ class DashboardController(BaseController):
 
     @staticmethod
     @login_required(redirect_to="/login")
-    def index(request):
+    def index(request: Request) -> Response:
         user_id = get_authenticated_user_id(request)
         utilisateur = get_user_by_id(user_id)
         return BaseController.render(
@@ -19,7 +21,7 @@ class DashboardController(BaseController):
 
     @staticmethod
     @login_required(redirect_to="/login")
-    def profile(request):
+    def profile(request: Request) -> Response:
         user_id = get_authenticated_user_id(request)
         utilisateur = get_user_by_id(user_id)
         return BaseController.render(

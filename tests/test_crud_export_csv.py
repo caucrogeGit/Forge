@@ -318,7 +318,9 @@ class TestExportCsvMethode:
     def test_export_csv_retourne_response(self):
         c = _ctrl()
         idx = c.find("def export_csv")
-        bloc = c[idx: idx + 800]
+        # Fenêtre étendue pour absorber l'annotation `-> Response:` qui
+        # rallonge la signature (DX-TYPED-SKELETONS-001).
+        bloc = c[idx: idx + 1000]
         assert "return Response" in bloc
 
     def test_export_csv_content_type_csv(self):

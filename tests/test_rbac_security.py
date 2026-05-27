@@ -418,7 +418,7 @@ def test_crud_genere_protege_uniquement_actions_declarees():
     # edit protégé
     assert '@require_permission("posts.edit")' in code
     # index non protégé (pas déclaré)
-    idx = code.find("    def index(request)")
+    idx = code.find("    def index(request: Request)")
     assert "@require_permission" not in code[max(0, idx - 70):idx]
 
 

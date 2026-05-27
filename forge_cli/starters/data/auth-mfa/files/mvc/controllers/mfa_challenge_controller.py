@@ -17,6 +17,8 @@ from forge_mvc_mfa import (
 from core.auth import normalize_auth_user
 from core.auth.session import login_user
 from core.forge import get as _cfg
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 from core.security.session import SESSION_COOKIE_NAME, get_session, get_session_id
 from core.sessions.manager import get_session_store as _get_session_store
@@ -35,7 +37,7 @@ class MfaChallengeController(BaseController):
         return session_id, get_session(session_id) if session_id else None
 
     @staticmethod
-    def form(request: Any) -> Any:
+    def form(request: Request) -> Response:
         """GET /login/mfa — affiche le formulaire de code MFA si challenge actif."""
         _, session = MfaChallengeController._resolve_session(request)
         if not has_pending_mfa_challenge(request):
@@ -48,11 +50,11 @@ class MfaChallengeController(BaseController):
 
     @staticmethod
     def verify(
-        request: Any,
+        request: Request,
         *,
         _load_factors: Callable | None = None,
         _finalize_login: Callable | None = None,
-    ) -> Any:
+    ) -> Response:
         """POST /login/mfa — vérifie le code MFA et finalise la connexion.
 
         _load_factors(user_id) et _finalize_login(user_id, session_id, session, request)

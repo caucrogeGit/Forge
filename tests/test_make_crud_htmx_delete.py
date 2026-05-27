@@ -86,7 +86,7 @@ def test_destroy_classique_redirige_et_hx_rend_results():
 
 def test_destroy_hx_ne_rend_pas_index_complet():
     code = build_controller(CONTACT)
-    destroy_block = code[code.index("    def destroy(request):"):]
+    destroy_block = code[code.index("    def destroy(request: Request) -> Response:"):]
 
     assert '"contact/_results.html"' in destroy_block
     assert '"contact/index.html"' not in destroy_block
@@ -126,7 +126,7 @@ def test_method_override_absent_reste_absent_car_route_post():
 
     assert 'method="post"' in html
     assert 'name="_method"' not in html
-    assert 'def destroy(request):' in route_block
+    assert 'def destroy(request: Request) -> Response:' in route_block
 
 
 def test_recherche_pagination_create_edit_show_hors_perimetre():
@@ -138,10 +138,10 @@ def test_recherche_pagination_create_edit_show_hors_perimetre():
     assert 'hx-get="/contacts"' in index
     assert 'hx-get="?page={{ pagination.page - 1 }}' in pagination
     assert 'hx-get="?page={{ pagination.page + 1 }}' in pagination
-    assert "def new(request):" in controller
-    assert "def create(request):" in controller
-    assert "def edit(request):" in controller
-    assert "def update(request):" in controller
+    assert "def new(request: Request) -> Response:" in controller
+    assert "def create(request: Request) -> Response:" in controller
+    assert "def edit(request: Request) -> Response:" in controller
+    assert "def update(request: Request) -> Response:" in controller
     assert "HX-Request" not in show
     assert "require_user_permission" not in controller
     assert "auth" not in controller.lower()

@@ -1,6 +1,8 @@
 from core.i18n import trans
 from core.mail import Mailer
 from core.mail.templates import MailTemplateRenderer
+from core.http.request import Request
+from core.http.response import Response
 from core.mvc.controller import BaseController
 from mvc.forms.demande_sejour_form import DemandeSejourForm
 
@@ -92,7 +94,7 @@ def send_demande_sejour_notifications(
 
 class CommunesSejoursController:
     @staticmethod
-    def index(request):
+    def index(request: Request) -> Response:
         return BaseController.render(
             "public/communes_sejours/home.html",
             context={},
@@ -100,7 +102,7 @@ class CommunesSejoursController:
         )
 
     @staticmethod
-    def hebergements_index(request):
+    def hebergements_index(request: Request) -> Response:
         return BaseController.render(
             "public/communes_sejours/hebergements_index.html",
             context={"hebergements": _HEBERGEMENTS},
@@ -108,7 +110,7 @@ class CommunesSejoursController:
         )
 
     @staticmethod
-    def hebergements_show(request):
+    def hebergements_show(request: Request) -> Response:
         slug = request.route_params.get("slug")
         hebergement = _find_hebergement(slug)
         if hebergement is None:
@@ -120,7 +122,7 @@ class CommunesSejoursController:
         )
 
     @staticmethod
-    def hebergements_demande(request):
+    def hebergements_demande(request: Request) -> Response:
         slug = request.route_params.get("slug")
         hebergement = _find_hebergement(slug)
         if hebergement is None:

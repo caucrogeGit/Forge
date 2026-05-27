@@ -90,13 +90,15 @@ def build_controller_method(spec: PublicPageSpec) -> str:
     return (
         "\n"
         "    @staticmethod\n"
-        f"    def {spec.method_name}(request):\n"
+        f"    def {spec.method_name}(request: Request) -> Response:\n"
         f'        return BaseController.render("public/{spec.slug}.html", request=request)\n'
     )
 
 
 def build_controller(spec: PublicPageSpec) -> str:
     return (
+        "from core.http.request import Request\n"
+        "from core.http.response import Response\n"
         "from core.mvc.controller.base_controller import BaseController\n"
         "\n"
         "\n"
@@ -107,6 +109,36 @@ def build_controller(spec: PublicPageSpec) -> str:
 
 def _ensure_trailing_newline(content: str) -> str:
     return content if content.endswith("\n") else content + "\n"
+
+
+_REQUEST_IMPORT_LINE = "from core.http.request import Request\n"
+_RESPONSE_IMPORT_LINE = "from core.http.response import Response\n"
+
+
+def _ensure_typed_imports(content: str) -> str:
+    """Insère les imports Request/Response si manquants (DX-TYPED-SKELETONS-001).
+
+    Insère AVANT la première importation `core.mvc...` repérée, ou à défaut en
+    tête du fichier. Idempotent : ne dédouble jamais une ligne déjà présente.
+    """
+    needs_request = _REQUEST_IMPORT_LINE.rstrip() not in content
+    needs_response = _RESPONSE_IMPORT_LINE.rstrip() not in content
+    if not needs_request and not needs_response:
+        return content
+
+    lines = content.splitlines(keepends=True)
+    anchor = next(
+        (i for i, line in enumerate(lines)
+         if line.startswith("from core.mvc.controller")),
+        0,
+    )
+    insertion: list[str] = []
+    if needs_request:
+        insertion.append(_REQUEST_IMPORT_LINE)
+    if needs_response:
+        insertion.append(_RESPONSE_IMPORT_LINE)
+    lines[anchor:anchor] = insertion
+    return "".join(lines)
 
 
 def _ensure_controller_method(controller_path: Path, spec: PublicPageSpec) -> tuple[bool, str | None]:
@@ -138,7 +170,8 @@ def _ensure_controller_method(controller_path: Path, spec: PublicPageSpec) -> tu
     lines = _ensure_trailing_newline(content).splitlines(keepends=True)
     insert_at = target_class.end_lineno
     lines.insert(insert_at, build_controller_method(spec))
-    controller_path.write_text("".join(lines), encoding="utf-8")
+    new_content = _ensure_typed_imports("".join(lines))
+    controller_path.write_text(new_content, encoding="utf-8")
     return True, None
 
 
