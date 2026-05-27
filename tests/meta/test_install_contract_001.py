@@ -24,8 +24,8 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 DEV_GUIDES = [
-    PROJECT_ROOT / "docs" / "installation-developpement.md",
-    PROJECT_ROOT / "docs" / "installation-github.md",
+    PROJECT_ROOT / "docs" / "install" / "core-dev.md",
+    PROJECT_ROOT / "docs" / "install" / "github.md",
     PROJECT_ROOT / "CONTRIBUTING.md",
     PROJECT_ROOT / "README.md",
 ]

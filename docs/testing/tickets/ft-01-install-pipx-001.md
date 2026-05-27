@@ -72,8 +72,8 @@ Si `forge` n'est pas trouvé après installation, vérifier que le répertoire `
 ## 6. Documentation Forge à consulter
 
 ```text
-docs/installation.md
-docs/installation-pipx.md
+docs/install/index.md
+docs/install/pipx.md
 docs/compatibility.md
 docs/getting-started.md
 ```
@@ -170,7 +170,7 @@ Pour ce ticket, transposer avec les commandes Forge indiquées dans la documenta
 1. Ouvrir un terminal.
 2. Vérifier la version de Python disponible.
 3. Vérifier si `pipx` est installé.
-4. Si absent, installer `pipx` selon la documentation `docs/installation-pipx.md`.
+4. Si absent, installer `pipx` selon la documentation `docs/install/pipx.md`.
 5. Installer Forge via `pipx` selon la documentation officielle.
 6. Vérifier que la commande `forge` est accessible.
 7. Si `forge` n'est pas trouvé, diagnostiquer le PATH selon la documentation.

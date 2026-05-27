@@ -32,13 +32,13 @@
 
 ## Installation
 
-.include {../installation.md}
+.include {../install/index.md}
 
-.include {../installation-pipx.md}
+.include {../install/pipx.md}
 
-.include {../installation-vm-debian.md}
+.include {../install/vm-debian.md}
 
-.include {../installation-mariadb.md}
+.include {../install/mariadb.md}
 
 ## CRUD et entités
 

@@ -138,9 +138,18 @@ class TestEtatActuel:
         )
 
     def test_phases_recentes_mentionnees(self):
+        """Apports phases récentes — phrasing aligné sur la section
+        « Aperçu Forge 1.0.0-beta.10 » de la landing actuelle
+        (LANDING-PUBLIC-CONTRACT-REALIGN-001)."""
         src = _src()
-        assert ("DX" in src or "E2E" in src or "sécurité renforcée" in src
-                or "documentation avancée" in src)
+        assert (
+            "CLI plus sûre" in src
+            or "Production encadrée" in src
+            or "X-Real-IP" in src
+            or "Cookies et stores renforcés" in src
+            or "Limites explicites" in src
+            or "Core autonome préservé" in src
+        )
 
     def test_prochaine_priorite_auth(self):
         # Le starter auth remplace l'ancienne prochaine-priorité Auth/User

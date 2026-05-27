@@ -69,7 +69,7 @@
 
 > Si Forge est déjà installé et configuré sur votre machine, passez directement à la [Partie 2 — Construire l'application starter](#partie-2-construire-lapplication-starter).
 
-La procédure complète est documentée sur la page [Installation sur VM Debian vierge](../../installation-vm-debian.md).
+La procédure complète est documentée sur la page [Installation sur VM Debian vierge](../../install/vm-debian.md).
 
 Elle couvre en 7 étapes : mise à jour du système, dépendances Python/MariaDB, Node.js optionnel, configuration de pipx, démarrage de MariaDB, vérification de l'accès administrateur et installation de Forge via pipx.
 

@@ -465,7 +465,7 @@ installer `forge-mvc-mfa` ou `forge-mvc-media` directement.
 Avant leur publication PyPI, les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` étaient disponibles en **source-only** via GitHub :
 
 - non publiés sur PyPI ;
-- installables depuis le dépôt GitHub (voir `docs/installation-github.md`) ;
+- installables depuis le dépôt GitHub (voir `docs/install/github.md`) ;
 - versionnés indépendamment du core jusqu'à la publication coordonnée.
 
 ### Opt-ins publiés et synchronisés

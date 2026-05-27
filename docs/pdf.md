@@ -87,7 +87,7 @@ Le fichier `.qd` est versionné. Le PDF généré ne l'est pas.
 
 ```
 .include {../guide.md}
-.include {../installation.md}
+.include {../install/index.md}
 ```
 
 Les commentaires Quarkdown utilisent la syntaxe `{{ texte commenté }}`.

@@ -90,7 +90,7 @@ Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
 `forge-mvc[mfa]` et `forge-mvc[media]` ne sont pas déclarés comme extras du
 core — installer les paquets directement.
 
-Installation depuis le monorepo (voir [installation-github.md](docs/installation-github.md)) :
+Installation depuis le monorepo (voir [install/github.md](docs/install/github.md)) :
 
 ```bash
 python -m pip install -e .                   # core
@@ -196,7 +196,7 @@ chemin standard généré par Forge. Voir `docs/front.md`.
 
 ## Installation depuis GitHub
 
-Le core `forge-mvc` est disponible sur [PyPI](https://pypi.org/project/forge-mvc/) — voir [Installation avec pipx](docs/installation-pipx.md).
+Le core `forge-mvc` est disponible sur [PyPI](https://pypi.org/project/forge-mvc/) — voir [Installation avec pipx](docs/install/pipx.md).
 L'installation depuis GitHub est recommandée pour contribuer ou travailler directement sur les sources.
 
 ### 1. Installer les prérequis système

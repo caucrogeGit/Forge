@@ -98,7 +98,7 @@ body:
       description: "Pages Forge lues pendant ce ticket. Indiquer ce qui était utile, confus ou manquant."
       placeholder: |
         Pages consultées :
-        - docs/installation-pipx.md
+        - docs/install/pipx.md
         - docs/compatibility.md
 
         Passages utiles :

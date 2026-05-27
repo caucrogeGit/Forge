@@ -165,7 +165,7 @@ API cote Auth/User :
 
 > ℹ️ Les fonctions ci-dessous sont fournies par le module optionnel
 > `forge-mvc-rbac` (opt-in officiel publié sur PyPI depuis `1.0.0-beta.9` — voir
-> [contrat d'installation](installation.md#contrat-dinstallation-des-opt-ins)).
+> [contrat d'installation](install/index.md#contrat-dinstallation-des-opt-ins)).
 
 ```python
 from forge_mvc_rbac import get_user_permissions, get_user_role_ids, user_has_permission
@@ -312,7 +312,7 @@ utilisent Auth/User et la table optionnelle `user_roles` :
 
 > ℹ️ Cette section utilise des symboles fournis par le module
 > optionnel `forge-mvc-rbac` (opt-in officiel publié sur PyPI depuis `1.0.0-beta.9` — voir
-> [contrat d'installation](installation.md#contrat-dinstallation-des-opt-ins)).
+> [contrat d'installation](install/index.md#contrat-dinstallation-des-opt-ins)).
 
 ```python
 from forge_mvc_rbac import require_user_permission

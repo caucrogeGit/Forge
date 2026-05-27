@@ -1,6 +1,6 @@
 # Installation avec pipx
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 !!! info "Forge {{forge_version}} — bêta disponible sur PyPI"
 
@@ -10,7 +10,7 @@
 
     Depuis `1.0.0-beta.9`, **tous les opt-ins officiels** (MFA, RBAC, workflow,
     statistiques, media) sont publiés sur PyPI — voir
-    [Installation](installation.md#contrat-dinstallation-des-opt-ins).
+    [Installation](index.md#contrat-dinstallation-des-opt-ins).
 
 `pipx` est la méthode la plus simple pour utiliser Forge comme commande globale.
 

@@ -77,6 +77,9 @@ print(get("app_name"))
 
 ### `Request`
 
+> Convention d'inspection (`.data`, accesseurs, masquage des champs sensibles)
+> détaillée dans [Convention HTTP inspectable](http.md).
+
 Attributs principaux :
 
 | Attribut | Type | Description |
@@ -115,6 +118,10 @@ Notes :
 
 <details markdown="1" id="corehttpresponse">
 <summary><code>core.http.response</code> - Réponse HTTP</summary>
+
+> Constructeurs nommés (`Response.text`, `Response.html`, `Response.json`,
+> `Response.debug`) et vue d'inspection (`.data`, `.cookies`) :
+> [Convention HTTP inspectable](http.md).
 
 ### Classe
 
@@ -3037,7 +3044,7 @@ pip install --pre forge-mvc-mfa
 
 > Publié sur PyPI depuis `1.0.0-beta.9` au statut **Alpha**. MFA reste opt-in :
 > le core Forge ne dépend pas de `forge-mvc-mfa`.
-> Voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [auth-mfa.md](auth-mfa.md).
 
@@ -3047,7 +3054,7 @@ Rôles, permissions, décorateur `@require_permission`, helpers Jinja
 `has_permission()` et politique d'attribution.
 
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
-> Voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [rbac.md](../rbac.md).
 
@@ -3057,7 +3064,7 @@ Référence détaillée : [rbac.md](../rbac.md).
 fonctions de validation, helpers Jinja2. Aucun callback automatique.
 
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
-> Voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [workflow.md](workflow.md).
 
@@ -3067,7 +3074,7 @@ Collecte d'événements métier, schéma SQL associé, agrégats et indicateurs
 calculés à la demande.
 
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
-> Voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [stats.md](stats.md).
 
@@ -3082,7 +3089,7 @@ pip install --pre forge-mvc-media
 > Publié sur PyPI depuis `1.0.0-beta.9` (API encore bêta — voir
 > [Limites](../production-limits.md)). Les générateurs `make:crud --media` et
 > `make:public:list` importent depuis ce module.
-> Voir [contrat d'installation](../installation.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
 Référence détaillée : [media.md](../media.md).
 

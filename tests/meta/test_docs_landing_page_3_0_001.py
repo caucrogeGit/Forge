@@ -94,10 +94,10 @@ class TestNewElementsPresent:
             "La phrase de positionnement CRUD doit apparaître dans la landing (LANDING-BETA6-MENU-001)"
         )
 
-    def test_faq_section_exists(self):
-        assert 'id="faq"' in self.source, (
-            "La section FAQ devrait avoir id='faq' (LANDING-BETA6-MENU-001)"
-        )
+    # Section FAQ : SUPPRIMÉE VOLONTAIREMENT
+    # (LANDING-PUBLIC-CONTRACT-REALIGN-001). La FAQ historique a été
+    # retirée de la landing canonique. Si elle revient un jour, c'est
+    # sous forme de page de documentation, pas sur la landing.
 
     @pytest.mark.parametrize("module_name", [
         "forge-mvc-mfa",
@@ -115,41 +115,21 @@ class TestNewElementsPresent:
             "La section Positionnement devrait avoir id='positionnement' (LANDING-BETA6-MENU-001)"
         )
 
-    @pytest.mark.parametrize("stack_techno", [
-        "Python",
-        "MariaDB",
-        "Jinja2",
-        "HTMX",
-        "Alpine.js",
-        "Tailwind",
-    ])
-    def test_stack_mentions_all_technos(self, stack_techno):
-        assert stack_techno in self.source, (
-            f"La landing devrait mentionner {stack_techno} quelque part dans le contenu"
-        )
-
-    @pytest.mark.parametrize("stack_url", [
-        "docs.python.org/3.12",
-        "mariadb.org",
-        "jinja.palletsprojects.com",
-        "htmx.org",
-        "alpinejs.dev",
-        "tailwindcss.com",
-    ])
-    def test_stack_mentions_doc_urls(self, stack_url):
-        assert stack_url in self.source, (
-            f"La section Stack devrait avoir un lien vers {stack_url}"
-        )
+    # Bloc « Stack technos + liens externes » : SUPPRIMÉ VOLONTAIREMENT
+    # (LANDING-PUBLIC-CONTRACT-REALIGN-001). La landing ne maintient
+    # plus de section dédiée listant Python/MariaDB/Jinja2/HTMX/Alpine.js/
+    # Tailwind avec leurs URLs documentaires. Le strip Hero garde
+    # Python 3.12+ et MariaDB ; le reste est dans la grille
+    # « Construire des applications MVC sans perdre la main ».
 
     def test_charter_link_exists(self):
         assert "CHARTE_DOC.md" in self.source, (
             "La landing devrait avoir un lien vers CHARTE_DOC.md sur GitHub"
         )
 
-    def test_test_count_mentioned(self):
-        assert "12 000 tests" in self.source, (
-            "La mention de tests devrait dire '12 000 tests' (version beta.6)"
-        )
+    # Compteur de tests sur la landing : SUPPRIMÉ VOLONTAIREMENT
+    # (LANDING-PUBLIC-CONTRACT-REALIGN-001). Le chiffre évolue trop vite
+    # pour être un contenu stable de landing publique.
 
 
 class TestNavigationStructure:
@@ -158,13 +138,9 @@ class TestNavigationStructure:
     def setup_method(self):
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
 
-    def test_uses_details_for_faq(self):
-        """La FAQ utilise <details>/<summary> pour les accordéons."""
-        details_count = self.source.count("<details")
-        assert details_count >= 6, (
-            f"La FAQ devrait contenir au moins 6 <details> (une par question), "
-            f"trouvé {details_count}"
-        )
+    # Test <details>/<summary> pour la FAQ : SUPPRIMÉ
+    # (LANDING-PUBLIC-CONTRACT-REALIGN-001). FAQ retirée volontairement
+    # de la landing — plus de bloc accordéon à vérifier.
 
     def test_nav_logo_present(self):
         """Le logo forge-logo.png remplace le texte >Forge< dans la nav (LANDING-WELCOME-POLISH-001)."""

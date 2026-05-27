@@ -7,7 +7,7 @@ devrait apparaître.
 Frictions corrigées par T7 :
 - F6 : app.py docstring 'Forge 2.0.1'
 - F5 : docs/release-local.md 'Forge 2.0.0' (lignes 50 et 351)
-- F4 : guide.md, installation-github.md, profiles.md 'v3.0.0'
+- F4 : guide.md, install/github.md, profiles.md 'v3.0.0'
 
 Les fichiers HISTORIQUES sont explicitement exclus du check large :
 - docs/history/, docs/audits/, docs/adr/ — archives
@@ -104,10 +104,10 @@ class TestNoStaleForgeVersionInActiveDocs:
         )
 
     def test_no_forge_2_x_in_installation_github(self):
-        text = (PROJECT_ROOT / "docs" / "installation-github.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "install" / "github.md").read_text(encoding="utf-8")
         match = STALE_FORGE_VERSION_PATTERN.search(text)
         assert not match, (
-            f"docs/installation-github.md contient une mention obsolète : "
+            f"docs/install/github.md contient une mention obsolète : "
             f"'{match.group()}'. (T7 — F4)."
         )
 
@@ -123,10 +123,10 @@ class TestNoStaleTagV300InActiveDocs:
         )
 
     def test_no_v3_0_0_in_installation_github(self):
-        text = (PROJECT_ROOT / "docs" / "installation-github.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "install" / "github.md").read_text(encoding="utf-8")
         match = STALE_TAG_V3_0_0_PATTERN.search(text)
         assert not match, (
-            "docs/installation-github.md référence encore v3.0.0. "
+            "docs/install/github.md référence encore v3.0.0. "
             "À remplacer par v3.0.1 (T7 — F4)."
         )
 

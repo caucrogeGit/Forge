@@ -38,6 +38,7 @@ Tableau synthétique des commandes utilisées quotidiennement.
 | Besoin | Commande | Statut |
 |---|---|---|
 | Créer un projet | [`forge new`](#forge-new) | Core |
+| Lancer le projet (dev) | [`forge run`](#forge-run) | Core |
 | Diagnostic large | [`forge doctor`](#forge-doctor) | Core |
 | Contrôle strict (CI) | [`forge project:check`](#forge-projectcheck) | Core |
 | Audit détaillé | [`forge project:audit`](#forge-projectaudit) | Core |
@@ -65,11 +66,12 @@ Scénarios d'enchaînement des commandes — copiables tels quels.
 forge new GestionVentes
 cd GestionVentes
 forge doctor
-python app.py
+forge run
 ```
 
 `forge new` génère le squelette ; `forge doctor` valide la configuration
-locale ; `python app.py` démarre le serveur de développement.
+locale ; `forge run` démarre le serveur de développement
+(point d'entrée officiel ; remplace `python app.py` et `scripts/dev-server.sh`).
 
 ### Créer une entité et générer un CRUD
 
@@ -170,6 +172,59 @@ forge new MonAppli --profile auth-mfa
 ```
 
 **Voir aussi :** [Profils de projet](profils.md)
+
+</details>
+
+<details markdown="1" id="forge-run">
+<summary><code>forge run</code> - Point d'entrée officiel pour lancer Forge (dev + autoreload / refus prod)</summary>
+
+**Rôle :** point d'entrée officiel pour lancer Forge. Remplace l'usage
+direct de `python app.py` et `scripts/dev-server.sh`.
+
+```bash
+forge run
+forge run --env dev
+forge run --env prod
+forge run --no-reload
+```
+
+**Comportement :**
+
+- `APP_ENV=dev` (défaut) — superviseur d'autoreload :
+  `forge run` spawne `python app.py` comme sous-processus, surveille
+  les fichiers du projet (polling `stat()`) et redémarre automatiquement
+  le serveur dès qu'un fichier surveillé change.
+  Avec `--no-reload` : délégation à `scripts/dev-server.sh` (POSIX) ou
+  fallback `python app.py`.
+- `APP_ENV=prod` — refuse le serveur intégré et imprime la stratégie
+  WSGI recommandée (Gunicorn + reverse proxy). Code de sortie non nul.
+
+**Fichiers surveillés (dev, autoreload) :**
+
+- `app.py`, `config.py`, `env/dev` ;
+- `mvc/**/*.{py,html,json,sql}` ;
+- `core/**/*.py`.
+
+**Dossiers ignorés :** `.venv/`, `__pycache__/`, `.pytest_cache/`,
+`.ruff_cache/`, `.mypy_cache/`, `storage/`, `logs/`, `site/`,
+`node_modules/`, `.git/`, `build/`, `dist/`.
+
+**Options :**
+
+- `--env dev|prod` — force l'environnement (sinon lit `APP_ENV`, défaut `dev`).
+- `--no-reload` — désactive l'autoreload (mode legacy : `dev-server.sh`).
+- `-h`, `--help` — affiche l'aide sans rien exécuter.
+
+**Prérequis :** lancé depuis la racine d'un projet Forge (`app.py` + `mvc/`).
+
+**Limites :** autoreload par polling `stat()` (pas d'inotify) ; pas de
+live reload navigateur ni de WebSocket ; ne lance pas Gunicorn
+automatiquement en prod.
+
+**Voir aussi :** [Déploiement WSGI minimal](../wsgi-deployment.md),
+[Limites de production](../production-limits.md).
+
+**Statut :** core.
 
 </details>
 
@@ -289,7 +344,9 @@ forge make:entity Contact && forge make:crud Contact
 
 **Effets :**
 
-- génère les contrôleurs CRUD applicatifs ;
+- génère les contrôleurs CRUD applicatifs, **typés** : import
+  `Request`/`Response` et signatures `def <action>(request: Request) -> Response:`
+  (DX-TYPED-SKELETONS-001) ;
 - génère les vues HTML associées (liste, fiche, formulaires) ;
 - préserve les fichiers utilisateurs déjà présents (write-if-new — voir charte §9).
 
@@ -990,7 +1047,7 @@ pip install --pre forge-mvc-mfa
 pip install --pre forge-mvc-media
 ```
 
-Voir [Installation — Contrat d'installation des opt-ins](../installation.md#contrat-dinstallation-des-opt-ins).
+Voir [Installation — Contrat d'installation des opt-ins](../install/index.md#contrat-dinstallation-des-opt-ins).
 
 <details markdown="1" id="forge-rbacvalidate">
 <summary><code>forge rbac:validate</code> - Valide mvc/security/rbac.json avec le schéma RBAC Forge</summary>

@@ -31,7 +31,7 @@ Vérifier que la version de Forge affichée par la CLI est lisible, cohérente a
 Ce ticket vérifie que :
 
 - la commande `forge --version` produit une sortie claire et non ambiguë ;
-- la version affichée correspond à la version documentée dans `docs/installation-pipx.md` ou `docs/compatibility.md` ;
+- la version affichée correspond à la version documentée dans `docs/install/pipx.md` ou `docs/compatibility.md` ;
 - un testeur débutant peut confirmer qu'il utilise la bonne version sans ambiguïté ;
 - le format de version affiché est cohérent (PEP 440 ou SemVer selon la documentation).
 
@@ -72,8 +72,8 @@ Ces deux notations désignent la même version.
 ## 6. Documentation Forge à consulter
 
 ```text
-docs/installation.md
-docs/installation-pipx.md
+docs/install/index.md
+docs/install/pipx.md
 docs/compatibility.md
 docs/release-and-compatibility.md
 ```

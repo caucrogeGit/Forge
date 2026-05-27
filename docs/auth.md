@@ -443,7 +443,7 @@ ecriture DB automatique.
     MFA est disponible comme module opt-in officiel `forge-mvc-mfa`, publié
     sur PyPI depuis `1.0.0-beta.9`. Il **n'est pas intégré au core** Forge
     — le core ne dépend pas de `forge-mvc-mfa`. Voir le
-    [contrat d'installation](installation.md#contrat-dinstallation-des-opt-ins).
+    [contrat d'installation](install/index.md#contrat-dinstallation-des-opt-ins).
 
 > **Depuis Forge 2.4.0**, le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
 > L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré en Forge 3.0.

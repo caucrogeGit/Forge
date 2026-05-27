@@ -1,26 +1,41 @@
-# Installation
+# Installer Forge
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Forge peut s'installer de plusieurs façons selon votre contexte. Choisissez le
-chemin le plus simple pour votre usage, puis passez au [guide de démarrage](guide.md).
+Forge s'installe différemment selon votre intention. Choisissez d'abord votre
+parcours, puis enchaînez avec le [guide de démarrage](../guide.md).
 
-## Chemins recommandés
+## Utilisateur du framework ou développeur du core ?
 
-| Usage | Méthode |
+Deux parcours **distincts**, qui ne se mélangent pas :
+
+| | **Utilisateur du framework** | **Développeur du core** |
+|---|---|---|
+| But | Créer une application **avec** Forge | Modifier Forge lui-même |
+| Installation | `pipx install --pip-args="--pre" forge-mvc` | `git clone` du dépôt + `pip install -e .` |
+| Point d'entrée | `forge new mon-app` | `cd Forge` (le dépôt cloné) |
+| Lancement | `forge run` dans le projet généré | `python -m pytest` + outils de dev |
+| Référence | [Installation avec pipx](pipx.md) | [Développement du core](core-dev.md) |
+
+## Choisir son parcours
+
+| Usage | Parcours |
 |---|---|
-| Préparer une machine complète | [Installation sur une VM Debian vierge](installation-vm-debian.md) |
-| Utiliser Forge comme outil installé | [Installation avec pipx](installation-pipx.md) |
-| Créer un projet depuis une version stable | [Installation depuis GitHub](installation-github.md) |
-| Contribuer au framework Forge | [Mode développement](installation-developpement.md) |
-| Préparer la base locale | [Préparer MariaDB](installation-mariadb.md) |
+| Windows 11 (poste de travail) | [Windows + WSL — parcours complet](windows-wsl.md) |
+| Utilisateur du framework — Linux / macOS | [Installation avec pipx](pipx.md) |
+| Préparer une machine Debian vierge | [Installation sur une VM Debian vierge](vm-debian.md) |
+| Créer un projet depuis une version stable | [Installation depuis GitHub](github.md) |
+| Windows (résumé court historique) | [Installation Windows](windows.md) |
+| Contribuer au framework Forge | [Développement du core](core-dev.md) |
+| Préparer la base locale | [Préparer MariaDB](mariadb.md) |
+| Déploiement encadré | [Production](production.md) |
 
 ## Modèle de packages
 
 Depuis `1.0.0-beta.9`, Forge distribue le **core** et **tous les opt-ins officiels**
 sur [PyPI](https://pypi.org/project/forge-mvc/) (bêta publique — `--pre` requis).
 Les opt-ins restent optionnels : le core Forge ne dépend pas d'eux.
-Voir [Politique de release](release-policy.md#publication-pypi).
+Voir [Politique de release](../release-policy.md#publication-pypi).
 
 | Package (monorepo) | Contenu | Statut |
 |---|---|---|
@@ -29,7 +44,7 @@ Voir [Politique de release](release-policy.md#publication-pypi).
 | `forge-mvc-workflow` | Brique workflow — statuts et transitions | Bêta — publié PyPI |
 | `forge-mvc-stats` | Brique statistiques — agrégations | Bêta — publié PyPI |
 | `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Alpha** — publié PyPI depuis `1.0.0-beta.9` |
-| `forge-mvc-media` | Brique media — helpers applicatifs upload | **Alpha** — publié PyPI depuis `1.0.0-beta.9` (API encore bêta, voir [Limites](production-limits.md)) |
+| `forge-mvc-media` | Brique media — helpers applicatifs upload | **Alpha** — publié PyPI depuis `1.0.0-beta.9` (API encore bêta, voir [Limites](../production-limits.md)) |
 
 Pour installer Forge avec toutes les briques opt-in :
 
@@ -46,7 +61,7 @@ python -m pip install -r requirements-dev.txt
 `pip install -e .` installe le core en mode éditable.
 `requirements-dev.txt` installe ensuite les 4 modules opt-in
 (également en éditable) et les outils de développement. Voir
-[Installation depuis GitHub](installation-github.md) pour les détails.
+[Installation depuis GitHub](github.md) pour les détails.
 
 ## Contrat d'installation des opt-ins
 
@@ -79,7 +94,7 @@ pip install --pre "forge-mvc[all]"
 installer `forge-mvc-mfa` ou `forge-mvc-media` directement comme ci-dessus. MFA
 est officiellement publié au statut **Alpha** (secret TOTP chiffré au repos via
 Fernet) ; l'API de `forge-mvc-media` reste bêta — voir
-[Limites](production-limits.md).
+[Limites](../production-limits.md).
 
 Pour installer en mode éditable depuis les sources (contribution Forge) :
 

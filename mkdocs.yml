@@ -29,19 +29,21 @@ nav:
   - Accueil: index.html
 
   - Installation:
-      - Vue d'ensemble: installation.md
+      - Vue d'ensemble: install/index.md
       - Installer Forge:
-          - VM Debian vierge: installation-vm-debian.md
-          - Avec pipx: installation-pipx.md
-          - Depuis GitHub: installation-github.md
-          - Windows (WSL2): installation-windows.md
+          - Windows + WSL (parcours complet): install/windows-wsl.md
+          - Avec pipx: install/pipx.md
+          - Mode développement: install/core-dev.md
+          - VM Debian vierge: install/vm-debian.md
+          - Depuis GitHub: install/github.md
+          - Windows (résumé court): install/windows.md
       - Environnement:
-          - Préparer MariaDB: installation-mariadb.md
-          - Mode développement: installation-developpement.md
+          - Préparer MariaDB: install/mariadb.md
+          - Production: install/production.md
 
   - Premiers pas:
       - Démarrer avec Forge: getting-started.md
-      - 15 minutes avec Forge: 15-minutes.md
+      - Bonjour Forge: bonjour-forge.md
       - Application complète: app-complete-tutorial.md
       - Guide de démarrage: guide.md
       - CRUD explicite: crud.md
@@ -68,6 +70,7 @@ nav:
       - Index: reference.md
       - Commandes CLI: reference/cli-commands.md
       - API Forge complète: reference/api.md
+      - Convention HTTP inspectable: reference/http.md
       - Modules officiels:
           - Workflow: reference/workflow.md
           - Statistiques: reference/stats.md
