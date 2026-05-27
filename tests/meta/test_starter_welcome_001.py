@@ -1,11 +1,14 @@
-"""Garde-fou STARTER-WELCOME-001.
+"""Garde-fou STARTER-WELCOME-001 (refondu par STARTER-BONJOUR-FORGE-001).
 
-Contrat public du starter 7 — Bienvenue dans Forge :
+Contrat public du starter 7 — Bonjour Forge :
 - registered avec id "welcome" et number 7 ;
+- alias historiques (`welcome`, `bienvenue`, `7`) + nouveaux
+  (`bonjour`, `bonjour-forge`) ;
 - kind "skeleton", requires_db false ;
-- 6 routes dans le snippet ;
-- fichiers contrôleur et vues présents ;
-- doc présente ;
+- 8 routes dans le snippet (index/greet/inspect en `Response.text/debug`
+  + cycle/request/response/routing/404-demo qui rendent un template) ;
+- contrôleur + 5 vues HTML présentes ;
+- doc présente et repositionnée autour de « Bonjour Forge » ;
 - --dry-run fonctionnel.
 """
 from __future__ import annotations
@@ -66,17 +69,28 @@ class TestWelcomeStarterMetadata:
 
 
 class TestWelcomeStarterRoutes:
-    """Le snippet contient exactement 6 routes sous /welcome."""
+    """Le snippet contient les 8 routes sous /welcome (STARTER-BONJOUR-FORGE-001).
+
+    Ajout de `/welcome/greet` (`Response.text` + `request.param`) et
+    `/welcome/inspect` (`Response.debug(request.data)`) en plus des 6
+    routes historiques.
+    """
 
     def test_snippet_existe(self):
         assert (STARTER_DIR / "routes.py.snippet").exists()
 
-    def test_six_routes_dans_snippet(self):
+    def test_huit_routes_dans_snippet(self):
         snippet = (STARTER_DIR / "routes.py.snippet").read_text(encoding="utf-8")
         parsed = routes_from_snippet(snippet)
-        assert len(parsed) == 6, (
-            f"Attendu 6 routes dans le snippet welcome, trouvé {len(parsed)} : {parsed}"
+        assert len(parsed) == 8, (
+            f"Attendu 8 routes dans le snippet welcome, trouvé {len(parsed)} : {parsed}"
         )
+
+    def test_routes_greet_et_inspect_presentes(self):
+        snippet = (STARTER_DIR / "routes.py.snippet").read_text(encoding="utf-8")
+        paths = {path for _method, path in routes_from_snippet(snippet)}
+        assert "/welcome/greet" in paths
+        assert "/welcome/inspect" in paths
 
     def test_routes_sous_welcome(self):
         snippet = (STARTER_DIR / "routes.py.snippet").read_text(encoding="utf-8")
@@ -107,16 +121,38 @@ class TestWelcomeStarterFiles:
         content = ctrl.read_text(encoding="utf-8")
         assert "BaseController" in content
 
-    def test_controller_a_six_methodes(self):
+    def test_controller_a_huit_methodes(self):
         ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
         content = ctrl.read_text(encoding="utf-8")
-        methodes = ["index", "cycle", "request_example", "response_example",
+        methodes = ["index", "greet", "inspect",
+                    "cycle", "request_example", "response_example",
                     "routing_example", "not_found_demo"]
         for m in methodes:
             assert f"def {m}(" in content, f"Méthode {m} absente de WelcomeController"
 
+    def test_index_utilise_response_text(self):
+        """STARTER-BONJOUR-FORGE-001 : `index` retourne `Response.text("Bonjour Forge")`."""
+        ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
+        content = ctrl.read_text(encoding="utf-8")
+        assert 'Response.text("Bonjour Forge")' in content, (
+            "WelcomeController.index doit utiliser Response.text(\"Bonjour Forge\")"
+        )
+
+    def test_greet_utilise_request_param(self):
+        ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
+        content = ctrl.read_text(encoding="utf-8")
+        assert 'request.param("name"' in content, (
+            "WelcomeController.greet doit montrer request.param(\"name\", default=...)"
+        )
+
+    def test_inspect_utilise_response_debug(self):
+        ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
+        content = ctrl.read_text(encoding="utf-8")
+        assert "Response.debug(request.data)" in content, (
+            "WelcomeController.inspect doit utiliser Response.debug(request.data)"
+        )
+
     @pytest.mark.parametrize("view", [
-        "index.html",
         "cycle.html",
         "request_example.html",
         "response_example.html",
@@ -126,6 +162,15 @@ class TestWelcomeStarterFiles:
     def test_vue_presente(self, view: str):
         path = FILES_DIR / "mvc" / "views" / "welcome" / view
         assert path.exists(), f"Vue {view} absente du starter welcome"
+
+    def test_vue_welcome_index_html_retiree(self):
+        """STARTER-BONJOUR-FORGE-001 : la vue `welcome/index.html` a été
+        retirée — `index` retourne `Response.text("Bonjour Forge")` sans
+        template."""
+        path = FILES_DIR / "mvc" / "views" / "welcome" / "index.html"
+        assert not path.exists(), (
+            "welcome/index.html doit être retirée (Response.text remplace le rendu)"
+        )
 
     def test_controller_ne_reference_pas_sql(self):
         ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
@@ -150,13 +195,15 @@ class TestWelcomeStarterDoc:
     def test_index_md_mentionne_premier_pas(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert "Premier pas" in content, (
-            "La doc doit présenter le starter comme 'Premier pas' (libellé public)"
+            "La doc doit continuer à mentionner 'Premier pas' "
+            "(sous-titre ou rappel pour ne pas casser la pédagogie historique)"
         )
 
-    def test_index_md_titre_est_premier_pas(self):
+    def test_index_md_titre_est_bonjour_forge(self):
+        """STARTER-BONJOUR-FORGE-001 : le titre H1 est désormais 'Bonjour Forge'."""
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert content.startswith("# Premier pas"), (
-            "Le titre H1 de la page doit être '# Premier pas — Bienvenue dans Forge'"
+        assert content.startswith("# Bonjour Forge"), (
+            "Le titre H1 de la page doit être '# Bonjour Forge'"
         )
 
     def test_index_md_mentionne_forge_new_starter(self):
@@ -187,10 +234,12 @@ class TestWelcomeStarterView:
             "cycle.html doit documenter le cycle JSON séparé avec 'Response JSON'"
         )
 
-    def test_index_html_presente_les_deux_cycles(self):
-        idx = (FILES_DIR / "mvc" / "views" / "welcome" / "index.html").read_text(encoding="utf-8")
-        assert "View" in idx, "index.html doit mentionner la couche View"
-        assert "JSON" in idx, "index.html doit mentionner le cycle JSON"
+    def test_doc_presente_les_deux_cycles_html_et_json(self):
+        """STARTER-BONJOUR-FORGE-001 : la vue `index.html` a été retirée ;
+        c'est désormais la doc qui présente les deux cycles HTML/JSON."""
+        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        assert "View" in content, "La doc doit mentionner la couche View"
+        assert "Response JSON" in content, "La doc doit mentionner le cycle JSON"
 
     def test_response_example_distingue_html_et_json(self):
         resp = (FILES_DIR / "mvc" / "views" / "welcome" / "response_example.html").read_text(
@@ -221,7 +270,8 @@ class TestWelcomeStarterView:
         )
 
     def test_pas_de_sql_dans_les_vues_welcome(self):
-        for view in ["index.html", "cycle.html", "response_example.html", "routing_example.html"]:
+        # `index.html` retirée par STARTER-BONJOUR-FORGE-001.
+        for view in ["cycle.html", "response_example.html", "routing_example.html"]:
             content = (FILES_DIR / "mvc" / "views" / "welcome" / view).read_text(
                 encoding="utf-8"
             )
@@ -259,11 +309,11 @@ class TestWelcomeStarterDocNavigation:
             "ou 'forge starter:build 7'"
         )
 
-    def test_starters_index_mentionne_premier_pas(self):
+    def test_starters_index_mentionne_bonjour_forge(self):
         content = (PROJECT_ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-        assert "Premier pas — Bienvenue dans Forge" in content, (
-            "docs/starters/index.md doit afficher 'Premier pas — Bienvenue dans Forge' "
-            "comme libellé public du starter welcome"
+        assert "Bonjour Forge" in content, (
+            "docs/starters/index.md doit afficher 'Bonjour Forge' "
+            "comme libellé public du starter welcome (STARTER-BONJOUR-FORGE-001)"
         )
 
     def test_landing_pointe_vers_starters_welcome(self):
@@ -284,14 +334,17 @@ class TestWelcomeStarterDocPedagogy:
         assert "## Le code complet généré par ce starter" in content
         assert "### 1. Les routes complètes" in content
         assert "### 2. Le contrôleur complet" in content
-        assert "### 3. Les 6 vues complètes" in content
+        # 5 vues HTML désormais (STARTER-BONJOUR-FORGE-001).
+        assert "### 3. Les 5 vues HTML" in content
 
     def test_doc_contient_chemins_code_reel(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        # Note : `mvc/views/welcome/index.html` n'est plus dans la liste
+        # (STARTER-BONJOUR-FORGE-001 — la vue a été retirée). Sa mention
+        # textuelle dans la doc (note explicative) reste tolérée.
         expected_paths = [
             "mvc/routes.py",
             "mvc/controllers/welcome_controller.py",
-            "mvc/views/welcome/index.html",
             "mvc/views/welcome/cycle.html",
             "mvc/views/welcome/request_example.html",
             "mvc/views/welcome/response_example.html",
@@ -305,6 +358,8 @@ class TestWelcomeStarterDocPedagogy:
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         expected_routes = [
             'pub.add("GET", "/welcome",           WelcomeController.index',
+            'pub.add("GET", "/welcome/greet",     WelcomeController.greet',
+            'pub.add("GET", "/welcome/inspect",   WelcomeController.inspect',
             'pub.add("GET", "/welcome/cycle",     WelcomeController.cycle',
             'pub.add("GET", "/welcome/request",   WelcomeController.request_example',
             'pub.add("GET", "/welcome/response",  WelcomeController.response_example',
@@ -317,21 +372,24 @@ class TestWelcomeStarterDocPedagogy:
     def test_doc_contient_controller_reel_complet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         expected_methods = [
-            "def index(request):",
-            "def cycle(request):",
-            "def request_example(request):",
-            "def response_example(request):",
-            "def routing_example(request):",
-            "def not_found_demo(request):",
+            "def index(request: Request) -> Response:",
+            "def greet(request: Request) -> Response:",
+            "def inspect(request: Request) -> Response:",
+            "def cycle(request: Request) -> Response:",
+            "def request_example(request: Request) -> Response:",
+            "def response_example(request: Request) -> Response:",
+            "def routing_example(request: Request) -> Response:",
+            "def not_found_demo(request: Request) -> Response:",
         ]
         assert "class WelcomeController(BaseController):" in content
         for method in expected_methods:
             assert method in content, f"Méthode réelle absente de la doc : {method}"
 
-    def test_doc_titre_public_complet(self):
+    def test_doc_titre_public(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Premier pas — Bienvenue dans Forge" in content, (
-            "La doc doit conserver le libellé public complet du starter welcome"
+        assert "Bonjour Forge" in content, (
+            "La doc doit conserver le libellé public 'Bonjour Forge' "
+            "(STARTER-BONJOUR-FORGE-001)"
         )
 
     def test_doc_ne_contient_plus_bloc_html_orange(self):
@@ -368,10 +426,13 @@ class TestWelcomeStarterDocPedagogy:
             assert term in content, f"Terme absent des schémas visuels : {term}"
 
     def test_doc_contient_schema_route_controller_vue(self):
+        """Schéma route→contrôleur→vue : pointé sur `/welcome/cycle` qui
+        rend une vue (STARTER-BONJOUR-FORGE-001 — `/welcome` n'a plus de
+        vue puisque `index` retourne `Response.text`)."""
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert 'A["GET /welcome"] --> B["mvc/routes.py"]' in content
+        assert 'A["GET /welcome/cycle"] --> B["mvc/routes.py"]' in content
         assert 'B --> C["pub.add(...)"]' in content
-        assert 'D --> E["welcome/index.html"]' in content
+        assert 'D --> E["welcome/cycle.html"]' in content
 
     def test_doc_cycle_html_complet(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
@@ -476,8 +537,12 @@ class TestWelcomeStarterDocPedagogy:
     def test_doc_contient_table_url_methode_vue(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
         assert "| URL | Méthode appelée | Vue rendue |" in content
+        # `/welcome`, `/welcome/greet` et `/welcome/inspect` n'ont pas de
+        # vue : ils retournent `Response.text(...)` ou `Response.debug(...)`.
         expected_rows = [
-            "| `/welcome` | `WelcomeController.index(request)` | `welcome/index.html` |",
+            "| `/welcome` | `WelcomeController.index(request)` |",
+            "| `/welcome/greet?name=…` | `WelcomeController.greet(request)` |",
+            "| `/welcome/inspect` | `WelcomeController.inspect(request)` |",
             "| `/welcome/cycle` | `WelcomeController.cycle(request)` | `welcome/cycle.html` |",
             "| `/welcome/request` | `WelcomeController.request_example(request)` | `welcome/request_example.html` |",
             "| `/welcome/response` | `WelcomeController.response_example(request)` | `welcome/response_example.html` |",
@@ -577,8 +642,9 @@ class TestWelcomeStarterDocCodeVisible:
 
     def test_details_open_pour_chaque_vue(self):
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        # `welcome/index.html` n'est plus listée — la vue a été retirée
+        # par STARTER-BONJOUR-FORGE-001.
         vues = [
-            "mvc/views/welcome/index.html",
             "mvc/views/welcome/cycle.html",
             "mvc/views/welcome/request_example.html",
             "mvc/views/welcome/response_example.html",
@@ -596,10 +662,13 @@ class TestWelcomeStarterDocCodeVisible:
             "La doc doit mentionner qu'il y a une classe contrôleur principale"
         )
 
-    def test_doc_mentionne_six_vues_html(self):
+    def test_doc_mentionne_cinq_vues_html(self):
+        """STARTER-BONJOUR-FORGE-001 : 5 vues HTML, plus 3 routes sans vue."""
         content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
-        assert "six vues HTML" in content, (
-            "La doc doit préciser que le starter contient six vues HTML"
+        assert "cinq vues HTML" in content, (
+            "La doc doit préciser que le starter contient cinq vues HTML "
+            "(les trois routes /welcome, /welcome/greet et /welcome/inspect "
+            "n'ont pas de vue)"
         )
 
 
@@ -698,10 +767,12 @@ class TestWelcomeStarterDryRun:
         output = capsys.readouterr().out
         assert "welcome" in output.lower() or "bienvenue" in output.lower()
 
-    def test_dry_run_affiche_6_routes(self, capsys):
+    def test_dry_run_affiche_au_moins_huit_routes(self, capsys):
+        """STARTER-BONJOUR-FORGE-001 : le starter expose désormais 8 routes
+        (ajout de `/welcome/greet` et `/welcome/inspect`)."""
         cmd_starter_build(["7", "--dry-run"])
         output = capsys.readouterr().out
         count = output.count("/welcome")
-        assert count >= 6, (
-            f"Le dry-run devrait afficher au moins 6 routes /welcome, trouvé {count}"
+        assert count >= 8, (
+            f"Le dry-run devrait afficher au moins 8 routes /welcome, trouvé {count}"
         )

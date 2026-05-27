@@ -1,10 +1,10 @@
 {
   "id": "welcome",
   "number": 7,
-  "name": "Bienvenue dans Forge",
+  "name": "Bonjour Forge",
   "kind": "skeleton",
-  "aliases": ["welcome", "bienvenue", "7"],
-  "description": "Starter 7 — Cycle HTTP illustré : HTML (via View) et JSON (sans View). Sans base de données.",
+  "aliases": ["welcome", "bienvenue", "bonjour", "bonjour-forge", "7"],
+  "description": "Starter 7 — Bonjour Forge : progression pédagogique du cycle HTTP, de `Response.text(...)` jusqu'à `BaseController.render(...)`. Sans base de données.",
   "status": "available",
   "requires_db": false,
   "supports_public": true,
@@ -15,6 +15,6 @@
   "doc_url": "https://caucrogegit.github.io/Forge/starters/welcome/",
   "check_paths": [
     "mvc/controllers/welcome_controller.py",
-    "mvc/views/welcome/index.html"
+    "mvc/views/welcome/cycle.html"
   ]
 }
