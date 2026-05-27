@@ -81,11 +81,22 @@ forge run
 
 ## Après ce starter
 
-Une fois ce premier contact assimilé, passez au **Starter 1 — Contacts**
-pour un premier CRUD complet avec base de données.
+Ce premier contact assimilé, la **progression pédagogique officielle**
+des starters Forge passe par plusieurs étapes intermédiaires avant
+d'aborder un CRUD complet. Le saut direct vers Contacts CRUD est
+explicitement déconseillé : Jinja2, routes dynamiques, formulaires POST,
+validation serveur et SQL/migrations méritent chacun leur propre starter.
+
+La feuille de route détaillée :
+[Progression recommandée des starters](../index.md#progression-recommandee).
+
+En attendant la livraison des starters intermédiaires (tickets
+`STARTER-QUERY-PARAMS-001` → `STARTER-FIRST-SQL-001` dans la
+[roadmap Forge](../../roadmap/forge-roadmap.md)), le starter Contacts
+CRUD reste accessible si vous êtes déjà familier des notions ci-dessus :
 
 ```bash
 forge starter:build 1 --init-db
 ```
 
-[Starter 1 — Contacts](../01-contact-simple/index.md) · [Vue d'ensemble des starters](../index.md)
+[Vue d'ensemble des starters](../index.md) · [Starter 1 — Contacts (niveau avancé)](../01-contact-simple/index.md)

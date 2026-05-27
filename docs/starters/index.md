@@ -24,6 +24,45 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [5 — Communes & Séjours](communes-sejours/index.md) | Démonstrateur avancé principal | `standard` | Voir une application démonstratrice couvrant les briques modernes de Forge |
 | [6 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 
+## Progression recommandée
+
+Le starter `Bonjour Forge` est volontairement minimal (deux routes texte,
+zéro vue HTML, zéro base de données). **Ne sautez pas directement au
+starter Contacts CRUD** : plusieurs notions intermédiaires permettent
+d'aborder le CRUD sereinement. La progression officielle est :
+
+1. **Bonjour Forge** — afficher une réponse texte avec `Response.text(...)`.
+   *(livré — starter `welcome`)*
+2. **Paramètres d'URL** — lire une valeur simple avec `request.param(...)`.
+   *(à venir — `STARTER-QUERY-PARAMS-001`)*
+3. **Première vue HTML** — rendre une page avec `BaseController.render(...)`.
+   *(à venir — `STARTER-FIRST-HTML-VIEW-001`)*
+4. **Route dynamique** — lire un paramètre de route comme `/articles/{id}`.
+   *(à venir — `STARTER-DYNAMIC-ROUTE-001`)*
+5. **Inspecter une requête** — explorer `request.data` avec `Response.debug(...)` en développement.
+   *(à venir — `STARTER-REQUEST-DEBUG-001`)*
+6. **Premier formulaire POST** — envoyer des données depuis un formulaire HTML.
+   *(à venir — `STARTER-FORM-POST-001`)*
+7. **Validation serveur** — refuser ou accepter les données reçues.
+   *(à venir — `STARTER-SERVER-VALIDATION-001`)*
+8. **Première base SQL** — comprendre MariaDB, les migrations et le SQL visible.
+   *(à venir — `STARTER-FIRST-SQL-001`)*
+9. **Premier CRUD** — utiliser le starter Contacts quand les bases précédentes sont acquises.
+   *(livré — starter `01-contact-simple`, à repositionner pédagogiquement via `STARTER-CONTACTS-CRUD-REPOSITION-001`)*
+
+!!! warning "Saut Bonjour Forge → Contacts CRUD"
+    Tant que les starters 2 à 8 ne sont pas livrés, un utilisateur qui
+    enchaîne directement `welcome` → `01-contact-simple` rencontre
+    plusieurs notions (vue Jinja2, route dynamique, formulaire,
+    validation, SQL, migrations) sans transition. Le ticket
+    `STARTER-ROADMAP-PROGRESSION-001` formalise cette dette
+    pédagogique ; les tickets `STARTER-*-001` listés ci-dessus la
+    soldent étape par étape.
+
+Le tableau de synthèse plus haut reste utile comme catalogue exhaustif
+des starters disponibles aujourd'hui, mais l'ordre d'apprentissage
+recommandé est celui des 9 paliers ci-dessus.
+
 ## Starter d'entrée (sans base de données)
 
 ### Bonjour Forge — premier pas

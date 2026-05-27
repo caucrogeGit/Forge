@@ -102,4 +102,5 @@ configurer MariaDB, créer une entité, générer le CRUD et lancer l'applicatio
 Pour aller plus vite, essayez les tutoriels guidés :
 
 - [Bonjour Forge](bonjour-forge.md) — premier contact : route → contrôleur → `Response.text`/`Response.debug` → `render(...)`
+- [Progression officielle des starters](starters/index.md#progression-recommandee) — neuf paliers depuis `Bonjour Forge` jusqu'au premier CRUD ; ne sautez pas directement vers Contacts CRUD
 - [Application complète](app-complete-tutorial.md) — CRUD, relations, formulaires

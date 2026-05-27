@@ -171,6 +171,7 @@ Une fois ce premier contact assimilé :
 
 | Étape | Ressource |
 |---|---|
+| **Progression officielle des starters** | [Progression recommandée](starters/index.md#progression-recommandee) |
 | Démarrer un projet réel | [Démarrer avec Forge](getting-started.md) |
 | Parcours guidé avec MariaDB | [Guide de démarrage](guide.md) |
 | Première application complète | [Application complète](app-complete-tutorial.md) |
@@ -178,6 +179,13 @@ Une fois ce premier contact assimilé :
 | Détails du starter `welcome` | [Bonjour Forge — starter](starters/welcome/index.md) |
 | Référence HTTP complète | [Convention HTTP inspectable](reference/http.md) |
 | Toutes les commandes CLI | [Commandes CLI](reference/cli-commands.md) |
+
+!!! info "Ne sautez pas directement vers le CRUD Contacts"
+    Le starter `Contacts CRUD` est l'**étape 9** d'une progression de
+    neuf paliers. Plusieurs notions intermédiaires (vue Jinja2, route
+    dynamique, formulaire POST, validation, SQL) méritent leurs propres
+    starters — voir la
+    [progression recommandée](starters/index.md#progression-recommandee).
 
 ---
 
