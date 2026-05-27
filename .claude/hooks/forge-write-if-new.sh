@@ -9,12 +9,104 @@
 set -uo pipefail
 
 # ── Lecture du payload stdin ──────────────────────────────────────────────────
+#
+# Le hook DOIT être fail-closed (HOOK-JQ-FALLBACK-001) : si l'on ne peut
+# pas extraire le chemin cible du JSON envoyé par PreToolUse, on REFUSE
+# l'écriture plutôt que de l'autoriser silencieusement.
+#
+# Stratégie d'extraction :
+#   1. tenter `jq` (rapide, standard sur les machines CI Forge) ;
+#   2. retomber sur `python3` (toujours présent — exigence ADR-006
+#      Python 3.12+) si `jq` est absent ;
+#   3. si ni `jq` ni `python3` ne sont disponibles, ou si le JSON est
+#      invalide, exit 2 (fail-closed).
+#
+# La distinction `FILE_PATH vide après parsing OK` (cas légitime
+# Bash/Read sans file_path) vs `parser en échec` est portée par le RC
+# de la fonction.
+
+extract_file_path() {
+  local payload="$1"
+
+  if command -v jq >/dev/null 2>&1; then
+    printf '%s' "$payload" | jq -r '.tool_input.file_path // empty'
+    return $?
+  fi
+
+  if command -v python3 >/dev/null 2>&1; then
+    # Passer le payload via argv[1] (pas via stdin) pour éviter tout
+    # conflit avec un heredoc / pipe et garder un parsing robuste de
+    # la chaîne complète, espaces et quotes inclus.
+    python3 -c '
+import json
+import sys
+
+try:
+    data = json.loads(sys.argv[1])
+except Exception:
+    sys.exit(1)
+
+value = ""
+if isinstance(data, dict):
+    tool_input = data.get("tool_input")
+    if isinstance(tool_input, dict):
+        candidate = tool_input.get("file_path")
+        if isinstance(candidate, str):
+            value = candidate
+
+sys.stdout.write(value)
+' "$payload"
+    return $?
+  fi
+
+  # Ni jq ni python3 disponibles : impossible de parser sans risque.
+  return 127
+}
 
 PAYLOAD=$(cat)
-FILE_PATH=$(printf '%s' "$PAYLOAD" | jq -r '.tool_input.file_path // empty' 2>/dev/null || true)
+PARSER_OUTPUT=$(extract_file_path "$PAYLOAD")
+PARSER_RC=$?
+
+if (( PARSER_RC != 0 )); then
+  echo "[forge-hook] Impossible de lire le fichier cible depuis l'entrée PreToolUse." >&2
+  if (( PARSER_RC == 127 )); then
+    echo "[forge-hook] Ni 'jq' ni 'python3' disponibles pour parser le JSON." >&2
+  else
+    echo "[forge-hook] Payload JSON invalide ou parser en échec (RC=$PARSER_RC)." >&2
+  fi
+  echo "[forge-hook] Écriture refusée par sécurité (fail-closed)." >&2
+  exit 2
+fi
+
+FILE_PATH="$PARSER_OUTPUT"
 
 # Outil sans file_path (ex. Bash, Read) → pas de vérification à faire
 [[ -z "${FILE_PATH:-}" ]] && exit 0
+
+# ── Règle 0b — fichiers d'environnement Forge (env/*) ────────────────────────
+#
+# HOOK-ENV-FORGE-PATTERN-001 — Les fichiers `env/dev`, `env/test`,
+# `env/prod` et leurs variantes `*.local` peuvent contenir des secrets
+# (`DB_ADMIN_PWD`, `DB_APP_PWD`, clés applicatives…). Ils sont protégés
+# au même titre que `.env`. Cette règle s'applique AVANT la règle 1
+# (write-if-new) pour bloquer même la création initiale d'un fichier
+# `env/prod.local` par un agent (sinon write-if-new l'autoriserait).
+#
+# Le test porte sur `$FILE_PATH` direct (pas sur `$REL_PATH`) pour
+# couvrir aussi les paths absolus hors du REPO_ROOT, ce qui est le cas
+# quand le hook tourne sur un repo Forge installé à un autre endroit.
+# Les pages de documentation qui MENTIONNENT « env/dev » dans leur
+# contenu (par ex. `docs/install/windows-wsl.md`) restent modifiables :
+# seuls les CHEMINS sous `env/` sont concernés.
+
+case "$FILE_PATH" in
+  env/*|./env/*|*/env/*)
+    echo "FORGE §9 — fichier d'environnement Forge protégé : '$FILE_PATH'" >&2
+    echo "Règle : env/* contient potentiellement des secrets (mots de passe DB, clés…)." >&2
+    echo "Action : modifier manuellement ; créer un ticket dédié si un agent doit y toucher." >&2
+    exit 2
+    ;;
+esac
 
 # ── Règle 1 — write-if-new : fichier inexistant → toujours autorisé ──────────
 
@@ -51,6 +143,22 @@ block_user_zone() {
 }
 
 # ── Règle 3 — toujours bloqué : fichiers structurants du dépôt ───────────────
+#
+# Note (AGENTS-CHANGELOG-WRITE-ALLOW-001) : CHANGELOG.md a été retiré
+# de cette liste. C'est un fichier projet normal qui fait partie du
+# flux normal de release et d'audit Forge, et il doit pouvoir être mis
+# à jour par les agents (Claude Code, Codex, etc.) lorsqu'un ticket
+# le demande explicitement. Les autres entrées (charte, CLAUDE.md,
+# settings du hook, pyproject, fichiers .env) restent protégées.
+#
+# Note (HOOK-ENV-FORGE-PATTERN-001) : les fichiers `env/*` (Forge
+# utilise `env/dev`, `env/test`, `env/prod`, et leurs variantes
+# `*.local`) sont des fichiers d'environnement applicatif et peuvent
+# contenir des secrets (mots de passe MariaDB, clés applicatives, etc.).
+# Ils sont protégés au même titre que les `.env` classiques. Les pages
+# de documentation qui mentionnent textuellement « env/dev » (par
+# exemple `docs/install/windows-wsl.md`) restent modifiables car le
+# pattern ne matche QUE les chemins ciblés, pas le contenu des fichiers.
 
 case "$REL_PATH" in
   "charte_philosophique_forge_v2.md"|\
@@ -58,7 +166,6 @@ case "$REL_PATH" in
   ".claude/settings.json"|\
   ".claude/hooks/"*|\
   "pyproject.toml"|\
-  "CHANGELOG.md"|\
   ".env"|".env."*|\
   *"/.env"|*"/.env."*)
     block_structural
