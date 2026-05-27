@@ -33,6 +33,7 @@ from forge_cli.mail import main as mail_main
 from forge_cli.deploy import main as deploy_main
 from forge_cli.i18n import main as i18n_main
 from forge_cli.run import main as run_main
+from forge_cli.update import main as update_main
 from forge_cli.starters import main as starters_main  # noqa: E402 (package replaces starters.py)
 from forge_cli.modules import main as modules_main
 from forge_cli.project_profiles import (
@@ -547,6 +548,12 @@ def main() -> None:
 
     if command == "run":
         run_main(args[1:])
+        return
+
+    if command == "update":
+        rc = update_main(args[1:])
+        if rc:
+            sys.exit(rc)
         return
 
     if command == "make:entity":

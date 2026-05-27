@@ -39,6 +39,7 @@ Tableau synthétique des commandes utilisées quotidiennement.
 |---|---|---|
 | Créer un projet | [`forge new`](#forge-new) | Core |
 | Lancer le projet (dev) | [`forge run`](#forge-run) | Core |
+| Mettre à jour Forge | [`forge update`](#forge-update) | Core |
 | Diagnostic large | [`forge doctor`](#forge-doctor) | Core |
 | Contrôle strict (CI) | [`forge project:check`](#forge-projectcheck) | Core |
 | Audit détaillé | [`forge project:audit`](#forge-projectaudit) | Core |
@@ -223,6 +224,56 @@ automatiquement en prod.
 
 **Voir aussi :** [Déploiement WSGI minimal](../wsgi-deployment.md),
 [Limites de production](../production-limits.md).
+
+**Statut :** core.
+
+</details>
+
+<details markdown="1" id="forge-update">
+<summary><code>forge update</code> - met à jour Forge dans l'environnement courant (.venv / pipx)</summary>
+
+**Rôle :** met à jour le package `forge-mvc` dans l'environnement
+Python courant (`sys.executable`). Cible le `.venv` du projet ou le
+venv pipx isolé selon le contexte d'installation.
+
+**Quand l'utiliser :** quand un projet a été créé avec une ancienne
+beta et qu'il faut s'aligner sur la dernière version de Forge.
+
+```bash
+forge update            # pip install --upgrade forge-mvc
+forge update --pre      # idem avec --pre (utile en beta)
+forge update --check    # affiche version installée + commande, ne modifie rien
+forge update --dry-run  # affiche la commande pip, ne l'exécute pas
+```
+
+**Modes :**
+
+- défaut — lance `pip install --upgrade forge-mvc` via `sys.executable` ;
+- `--pre` — ajoute `--pre` à la commande pip (versions de
+  pré-release ; recommandé tant que Forge reste en beta) ;
+- `--check` — mode lecture seule, affiche la version installée et
+  la commande qui serait lancée ;
+- `--dry-run` — affiche la commande pip sans l'exécuter.
+
+**Cas pipx :** si Forge a été installé via `pipx install forge-mvc`,
+`sys.executable` pointe vers `~/.local/share/pipx/venvs/forge-mvc/`.
+Dans ce cas, `forge update` n'exécute **pas** `pip install` (qui ne
+mettrait pas à jour l'install pipx globale) — la commande affiche
+le bon `pipx upgrade forge-mvc` à lancer manuellement.
+
+**Options :**
+
+- `--pre` — autorise les versions de pré-release ;
+- `--check` — mode vérification, lecture seule ;
+- `--dry-run` — affiche la commande sans l'exécuter ;
+- `-h`, `--help` — affiche l'aide sans rien exécuter.
+
+**Hors périmètre :** aucune migration projet, aucun fichier `env/*`
+touché, aucun fichier généré sous `mvc/` modifié, aucune mise à jour
+du `pyproject.toml` du projet.
+
+**Après mise à jour :** lancer `forge doctor` pour vérifier la
+cohérence du projet.
 
 **Statut :** core.
 

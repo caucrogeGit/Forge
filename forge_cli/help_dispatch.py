@@ -63,6 +63,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Projet
     "new":              "Crée un nouveau projet Forge.",
     "run":              "Lance Forge (dev) ou affiche la stratégie WSGI (prod).",
+    "update":           "Met à jour Forge dans l'environnement courant (.venv / pipx).",
     "doctor":           "Diagnostic large et tolérant (lecture seule).",
     "project:check":    "Contrôle strict des conventions (CI-ready).",
     "project:audit":    "Rapport d'audit détaillé non destructif.",
@@ -127,6 +128,55 @@ HELP_DESCRIPTIONS: dict[str, str] = {
 # CLI-HELP-FLAGS-INIT-COMMANDS-001 : décrit usage, rôle, effets,
 # prérequis, limites et rappel que --help n'exécute rien.
 HELP_TEXTS_RICH: dict[str, str] = {
+    "update": """\
+Usage:
+  forge update [--pre] [--check] [--dry-run]
+
+Description:
+  Met à jour Forge dans l'environnement Python courant (`.venv` ou
+  pipx isolé). Cible `sys.executable` pour rester dans le bon
+  environnement, ne modifie aucun fichier projet, ne lance aucune
+  migration.
+
+  Cas typique : un utilisateur a créé son projet avec une ancienne
+  beta de Forge et veut s'assurer qu'il utilise bien la dernière —
+  `forge update --pre` met à jour `forge-mvc` dans le venv courant.
+
+Modes:
+  forge update            Lance `pip install --upgrade forge-mvc`
+                          dans `sys.executable`.
+  forge update --pre      Idem mais avec `--pre` (versions de
+                          pré-release ; utile tant que Forge est en
+                          beta).
+  forge update --check    Affiche la version installée et la
+                          commande qui serait lancée, sans rien
+                          modifier.
+  forge update --dry-run  Affiche la commande pip qui serait
+                          exécutée, sans la lancer.
+
+Options:
+  --pre        Autorise les versions de pré-release.
+  --check      Mode vérification, lecture seule.
+  --dry-run    Affiche la commande sans l'exécuter.
+  -h, --help   Affiche cette aide sans exécuter la commande.
+
+Cas pipx:
+  Si Forge a été installé via pipx (`pipx install forge-mvc`),
+  `sys.executable` pointe vers `~/.local/share/pipx/venvs/forge-mvc/`.
+  Dans ce cas, `forge update` n'exécute PAS pip : il affiche le bon
+  `pipx upgrade forge-mvc` à lancer manuellement, car pipx isole
+  chaque app et `pip install` depuis ce venv ne mettrait pas à jour
+  l'install pipx globale.
+
+Hors périmètre:
+  - aucune migration projet, aucun fichier `env/*` touché ;
+  - aucun fichier généré sous `mvc/` modifié ;
+  - aucune mise à jour automatique du `pyproject.toml` du projet.
+
+Après mise à jour:
+  Lancez `forge doctor` pour vérifier la cohérence du projet.
+""",
+
     "run": """\
 Usage:
   forge run [--env dev|prod] [--no-reload]

@@ -200,6 +200,14 @@ pipx inject forge-mvc --pip-args="--pre" forge-mvc-workflow
 Voir [Installation — vue d'ensemble](index.md) pour les
 détails.
 
+!!! tip "Mettre à jour Forge plus tard"
+    Si vous avez créé votre projet avec une beta précédente, lancez
+    `forge update --check` pour voir la version installée et la
+    commande pip à exécuter. `forge update --pre` met à jour Forge
+    dans l'environnement courant (`.venv`) — pour une install pipx,
+    la commande affichera le bon `pipx upgrade forge-mvc` à lancer.
+    Voir [`forge update`](../reference/cli-commands.md#forge-update).
+
 ---
 
 ## 8. Étape 6 — Configurer Git
