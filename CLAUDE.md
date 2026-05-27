@@ -117,6 +117,33 @@ Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format ex
 
 ## 5. Convention de tickets
 
+### Étape 0 — Vérifier le dépôt canonique
+
+Avant tout ticket Forge, vérifier impérativement que le dépôt courant
+est bien le dépôt canonique :
+
+- chemin = `/home/roger/Projets/Forge` ;
+- branche = `main` ou une branche ticket issue de `main` ;
+- remote `origin` = `git@github.com:caucrogeGit/Forge.git` ;
+- working tree propre.
+
+Commandes de contrôle :
+
+```bash
+pwd
+git status --short
+git branch --show-current
+git remote -v
+git log -3 --oneline
+```
+
+Si **l'un** de ces critères n'est pas rempli, **arrêter immédiatement**.
+Ne pas continuer un ticket Forge depuis un projet généré
+(`forge-test-*`, dossier `mvc/` isolé), un clone temporaire ou une
+branche `master`. Procédure officielle de portage par patchs et liste
+complète des signaux d'un mauvais dépôt :
+[`docs/contributing/canonical-repo.md`](docs/contributing/canonical-repo.md).
+
 **Format** : `DOMAINE-SUJET-NUMÉRO` (ex : `MFA-EXTRACT-001`, `LANG-MIGRATION-001`).
 
 **Un ticket = une responsabilité.** Chaque spec doit indiquer :
