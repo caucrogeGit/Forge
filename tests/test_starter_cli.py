@@ -16,13 +16,24 @@ from forge_cli.starters.route_ops import replace_home_route as _replace_home_rou
 from forge_cli.starters.registry import all_starters, resolve
 
 
-def test_huit_starters_definis():
-    assert len(all_starters()) == 8
+def test_count_starters_matches_filesystem():
+    """Refactor cleanup (régressions paliers 3→8) : ne fige plus le
+    count. Le registre doit déclarer tous les starters trouvés sur
+    disque sous `forge_cli/starters/data/`."""
+    from pathlib import Path as _P
+    data_dir = _P(__file__).resolve().parent.parent / "forge_cli" / "starters" / "data"
+    expected = sum(
+        1 for d in data_dir.iterdir()
+        if d.is_dir() and (d / "starter.json").exists()
+    )
+    assert len(all_starters()) == expected
+    assert expected >= 8
 
 
-def test_niveaux_ordonnes_de_1_a_8():
-    levels = [s["number"] for s in all_starters()]
-    assert levels == [1, 2, 3, 4, 5, 6, 7, 8]
+def test_niveaux_ordonnes_sans_trou():
+    """Les starters sont numérotés sans trou à partir de 1."""
+    levels = sorted(s["number"] for s in all_starters())
+    assert levels == list(range(1, len(levels) + 1))
 
 
 def test_starter_list_affiche_les_4_niveaux(capsys):

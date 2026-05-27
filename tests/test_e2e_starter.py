@@ -78,11 +78,29 @@ def _build_starter(identifier: str) -> None:
 # ── Métadonnées des starters ──────────────────────────────────────────────────
 
 class TestStarterRegistry:
-    def test_huit_starters_disponibles(self):
-        assert len(all_starters()) == 8
+    def test_count_starters_matches_filesystem(self):
+        """Le registre déclare tous les starters trouvés sous `data/`.
+        Refactor (cleanup régressions paliers 3→8) : ne fige plus le
+        count pour rester robuste à chaque palier pédagogique ajouté."""
+        from pathlib import Path as _P
+        data_dir = _P(__file__).resolve().parent.parent / "forge_cli" / "starters" / "data"
+        expected = sum(
+            1 for d in data_dir.iterdir()
+            if d.is_dir() and (d / "starter.json").exists()
+        )
+        assert len(all_starters()) == expected, (
+            f"Registre={len(all_starters())} vs filesystem={expected}"
+        )
+        assert expected >= 8, (
+            f"Au moins 8 starters attendus (progression pédagogique livrée) ; trouvé {expected}."
+        )
 
-    def test_numeros_1_a_8(self):
-        assert [s["number"] for s in all_starters()] == [1, 2, 3, 4, 5, 6, 7, 8]
+    def test_numeros_sans_trou(self):
+        """Les starters sont numérotés sans trou à partir de 1."""
+        nums = sorted(s["number"] for s in all_starters())
+        assert nums == list(range(1, len(nums) + 1)), (
+            f"Numérotation avec trou : {nums}"
+        )
 
     def test_tous_available(self):
         assert all(s["status"] == "available" for s in all_starters())

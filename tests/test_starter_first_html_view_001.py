@@ -134,11 +134,17 @@ def test_doc_mentions_palier_3_and_render():
 
 
 def test_progression_marks_palier_3_as_delivered():
+    # On ancre sur l'item numéroté de la progression (« 3. **Première
+    # vue HTML** ») pour ne pas matcher la ligne du tableau de
+    # synthèse qui répète le même nom (le `find()` retournerait la
+    # première occurrence — celle du tableau — au lieu de l'item
+    # progression).
     text = STARTERS_INDEX.read_text(encoding="utf-8")
     assert "STARTER-FIRST-HTML-VIEW-001" in text
-    idx_palier3 = text.find("Première vue HTML")
-    idx_palier4 = text.find("Route dynamique")
-    assert idx_palier3 != -1 and idx_palier4 != -1
+    idx_palier3 = text.find("3. **Première vue HTML**")
+    idx_palier4 = text.find("4. **Route dynamique**")
+    assert idx_palier3 != -1, "Item « 3. **Première vue HTML** » introuvable."
+    assert idx_palier4 != -1, "Item « 4. **Route dynamique** » introuvable."
     palier3_block = text[idx_palier3:idx_palier4]
     assert "livré" in palier3_block, (
         "Le palier 3 (Première vue HTML) doit être marqué « livré » "
