@@ -122,6 +122,10 @@ d'une installation cassée :
 Solution : réinstaller le package (`pip install -e packages/forge-mvc-iot`
 ou `pip install --force-reinstall forge-mvc-iot`).
 
+Pour **copier ensuite** la migration dans le projet, voir
+[`forge iot:init`](init-command.md) — copie idempotente vers
+`mvc/migrations/`, sans exécuter le SQL.
+
 ### Module non installé
 
 Si l'utilisateur tape `forge iot:doctor` sans avoir installé

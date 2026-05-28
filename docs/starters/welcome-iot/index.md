@@ -128,10 +128,12 @@ Sinon — table absente, base non configurée, etc. — réponse
 
 Pour activer le stockage :
 
-1. Copier la migration depuis le package vers `mvc/migrations/` :
-   `cp packages/forge-mvc-iot/forge_mvc_iot/migrations/*.sql mvc/migrations/`
-2. Appliquer : `forge migration:apply`
-3. (Une future commande `forge iot:init` automatisera ces deux étapes.)
+```bash
+forge iot:init          # copie la migration vers mvc/migrations/ (idempotent)
+forge migration:apply   # crée la table iot_events en base
+```
+
+Voir [`forge iot:init`](../../iot/init-command.md) pour le détail.
 
 ### Lecture par device — `/welcome-iot/device/{site}/{device_id}`
 

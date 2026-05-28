@@ -110,6 +110,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "mail:logs":        "Affiche les derniers logs mail.",
     # IoT
     "iot:doctor":       "Diagnostic statique du module IoT (package, config, migration, API HTTP).",
+    "iot:init":         "Copie la migration IoT vers mvc/migrations/ (idempotent, sans appliquer).",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
     # Internationalisation
@@ -130,6 +131,43 @@ HELP_DESCRIPTIONS: dict[str, str] = {
 # CLI-HELP-FLAGS-INIT-COMMANDS-001 : décrit usage, rôle, effets,
 # prérequis, limites et rappel que --help n'exécute rien.
 HELP_TEXTS_RICH: dict[str, str] = {
+    "iot:init": """\
+Usage:
+  forge iot:init
+
+Description:
+  Copie la (les) migration(s) SQL Forge IoT depuis le package
+  `forge-mvc-iot` (ressources packagées) vers le dossier
+  `mvc/migrations/` du projet courant.
+
+  La commande **n'applique pas** la migration : c'est `forge
+  migration:apply` qui le fait, dans un second temps. Cette séparation
+  permet de relire la migration avant de la jouer en base.
+
+Comportement:
+  - Si `mvc/migrations/` n'existe pas → il est créé.
+  - Si la migration n'est pas encore présente → copiée.
+  - Si elle est déjà présente avec un contenu identique → idempotent,
+    exit 0.
+  - Si elle est présente avec un contenu différent → aucun écrasement,
+    `[WARN]` affiché, exit 0 (la décision reste à l'humain).
+
+Prérequis:
+  - dossier `mvc/` à la racine du dossier courant (sinon `[ERREUR]`,
+    exit 1).
+  - module opt-in `forge-mvc-iot` installé.
+
+Limites:
+  - aucune option à ce ticket.
+  - n'exécute aucun SQL, ne se connecte à aucune base.
+  - ne supprime ni ne rollback aucune migration.
+
+Suite recommandée:
+  forge iot:doctor       # vérifier que tout est prêt
+  forge iot:init         # copier la migration
+  forge migration:apply  # appliquer en base
+  forge run              # lancer l'application
+""",
     "iot:doctor": """\
 Usage:
   forge iot:doctor

@@ -184,6 +184,7 @@ nav:
       - Stockage des événements: iot/storage-events.md
       - API HTTP: iot/http-api.md
       - Diagnostic (doctor): iot/doctor.md
+      - Initialisation (iot:init): iot/init-command.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md
