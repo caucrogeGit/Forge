@@ -9,7 +9,7 @@
   "requires_db": true,
   "home_route": "/contacts",
   "routes_marker": "contact-simple",
-  "doc_url": "https://caucrogegit.github.io/Forge/starters/01-contact-simple/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/01-contact-simple/",
   "routes": {
     "prefix": "/contacts",
     "actions": [

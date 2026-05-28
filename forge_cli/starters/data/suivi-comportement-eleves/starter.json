@@ -20,7 +20,7 @@
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/suivi",
   "test_command": "python scripts/seed_suivi.py",
-  "doc_url": "https://caucrogegit.github.io/Forge/starters/04-suivi-comportement-eleves/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/04-suivi-comportement-eleves/",
   "check_paths": [
     "mvc/entities/utilisateur",
     "mvc/entities/eleve",

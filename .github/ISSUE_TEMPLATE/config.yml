@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation Forge
-    url: https://caucrogegit.github.io/Forge/
+    url: https://forgemvc.com/docs/forge/
     about: Consulter la documentation officielle Forge avant de soumettre un retour.
   - name: Charte de campagne de tests terrain
-    url: https://caucrogegit.github.io/Forge/testing/field-test-charter/
+    url: https://forgemvc.com/docs/forge/testing/field-test-charter/
     about: Lire la charte de campagne pour comprendre les niveaux de gravité et d'aide.

@@ -10,7 +10,7 @@
   "routes_marker": "communes-sejours",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/communes-sejours",
-  "doc_url": "https://caucrogegit.github.io/Forge/starters/communes-sejours/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/communes-sejours/",
   "check_paths": [
     "mvc/controllers/communes_sejours_controller.py",
     "mvc/forms/demande_sejour_form.py",

@@ -12,7 +12,7 @@
   "routes_marker": "query-params",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/query-params",
-  "doc_url": "https://caucrogegit.github.io/Forge/starters/query-params/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/query-params/",
   "check_paths": [
     "mvc/controllers/query_params_controller.py"
   ]

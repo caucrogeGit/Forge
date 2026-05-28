@@ -20,9 +20,9 @@ Forge conserve un runtime Python volontairement limité, avec des dépendances e
 
 | Ressource | Lien |
 |-----------|------|
-| Site officiel et documentation | [caucrogegit.github.io/Forge/](https://caucrogegit.github.io/Forge/) |
-| Tests terrain Forge | [Documentation tests terrain](https://caucrogegit.github.io/Forge/testing/) |
-| État des parcours testables | [Matrice de suivi](https://caucrogegit.github.io/Forge/testing/field-test-status/) |
+| Site officiel et documentation | [forgemvc.com](https://forgemvc.com/) |
+| Tests terrain Forge | [Documentation tests terrain](https://forgemvc.com/docs/forge/testing/) |
+| État des parcours testables | [Matrice de suivi](https://forgemvc.com/docs/forge/testing/field-test-status/) |
 | Envoyer un retour de test terrain | [Formulaire GitHub Issue](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml) |
 
 ---

@@ -12,7 +12,7 @@
   "routes_marker": "welcome",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/welcome",
-  "doc_url": "https://caucrogegit.github.io/Forge/starters/welcome/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome/",
   "check_paths": [
     "mvc/controllers/welcome_controller.py"
   ]
