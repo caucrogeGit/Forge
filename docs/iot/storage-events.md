@@ -186,10 +186,96 @@ assert params[6] is None  # metadata_json
 Aucun MariaDB n'est requis. La validation runtime du schéma viendra
 avec la migration appliquée.
 
-## Hors périmètre de ce ticket
+## Repository d'insertion
 
-- **Pas d'insertion réelle** — branchement à `core.database.db.execute`
-  par `IOT-STORAGE-REPOSITORY-001`.
+Le repository est la première couche qui **exécute réellement le SQL**.
+Il ne crée pas la table — il suppose que la migration `iot_events` a
+déjà été appliquée.
+
+Module : `forge_mvc_iot.storage.repository` — exporté par
+`forge_mvc_iot.storage`.
+
+```python
+from forge_mvc_iot.storage import IotEventRepository
+
+repo = IotEventRepository()                  # adapter par défaut : core.database.db
+result = repo.insert(measurement)            # exécute INSERT_IOT_EVENT_SQL via db.execute(...)
+```
+
+### Adapter injectable
+
+Le repository accepte n'importe quel objet exposant
+`execute(sql, params)`. Par défaut, il utilise `core.database.db` —
+qui gère le pool de connexions, le commit et le rollback
+automatiquement (voir `core/database/db.py`).
+
+Pour les tests, on injecte un `MagicMock` (aucun MariaDB requis) :
+
+```python
+from unittest.mock import MagicMock
+from forge_mvc_iot.storage import IotEventRepository
+
+adapter = MagicMock()
+repo = IotEventRepository(db_adapter=adapter)
+repo.insert(measurement)
+adapter.execute.assert_called_once()
+```
+
+Pour récupérer le `lastrowid` plutôt que le `rowcount`, on enveloppe
+soi-même `core.database.db.insert` :
+
+```python
+from core.database import db
+
+class _InsertAdapter:
+    def execute(self, sql, params):
+        return db.insert(sql, params)  # retourne lastrowid
+
+repo = IotEventRepository(db_adapter=_InsertAdapter())
+new_id = repo.insert(measurement)
+```
+
+### Flux complet (subscriber → repository → base)
+
+```text
+subscriber.handle_message(topic, payload)
+        │
+        │  parse_message(topic, payload)
+        ▼
+   Measurement
+        │
+        │  repo.insert(measurement, received_at=...)
+        ▼
+   build_insert_iot_event_sql(...)  →  (sql, params)
+        │
+        │  db_adapter.execute(sql, params)
+        ▼
+   iot_events
+```
+
+> **Le branchement automatique** `on_measurement=repo.insert` reste
+> **un exemple documentaire**. Le subscriber ne tire pas le repository
+> dans son code ; c'est le code applicatif qui décide explicitement de
+> connecter les deux :
+>
+> ```python
+> repo = IotEventRepository()
+> sub = MqttSubscriber(cfg, on_measurement=repo.insert)
+> sub.connect()
+> sub.loop_forever()
+> ```
+
+### Comportement
+
+- Les erreurs SQL sont **propagées telles quelles** — le repository
+  n'intercepte rien silencieusement.
+- Aucun `commit` ou `rollback` manuel — c'est l'adapter (par défaut
+  Forge) qui s'en charge.
+- Le `id` n'est pas retourné par défaut (puisque `db.execute` renvoie
+  `rowcount`). Utiliser le pattern d'adapter ci-dessus pour récupérer
+  `lastrowid`.
+
+## Hors périmètre de ce ticket
 - **Pas d'API HTTP** — lecture JSON par `IOT-HTTP-API-001`.
 - **Pas de CLI**, pas de dashboard, pas d'intégration Forge Design.
 - **Pas de rétention long terme**, pas d'agrégation, pas de
@@ -201,8 +287,8 @@ Ces points feront chacun l'objet d'un ticket dédié — voir
 ## Découpage rappelé
 
 ```text
-IOT-STORAGE-EVENTS-001        contrat SQL + sérialisation  ← livré
-IOT-STORAGE-MIGRATION-001     migration versionnée          ← livré
-IOT-STORAGE-REPOSITORY-001    insertion réelle en base      (à venir)
-IOT-HTTP-API-001              lecture HTTP JSON             (à venir)
+IOT-STORAGE-EVENTS-001        contrat SQL + sérialisation   ← livré
+IOT-STORAGE-MIGRATION-001     migration versionnée           ← livré
+IOT-STORAGE-REPOSITORY-001    insertion réelle en base       ← livré
+IOT-HTTP-API-001              lecture HTTP JSON              (à venir)
 ```
