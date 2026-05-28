@@ -180,6 +180,7 @@ nav:
       - Configuration: iot/configuration.md
       - Subscriber MQTT: iot/mqtt-subscriber.md
       - Stockage des événements: iot/storage-events.md
+      - API HTTP: iot/http-api.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md
