@@ -30,11 +30,25 @@ API exposée :
 | `serialize_measurement_for_storage(measurement, *, received_at=None)` | `dict[str, object]` | dict prêt à insertion |
 | `build_insert_iot_event_sql(measurement, *, received_at=None)` | `tuple[str, tuple]` | `(sql, params)` |
 
-## Schéma SQL cible (informatif)
+## Schéma SQL cible
 
-La migration qui sera produite dans `IOT-STORAGE-MIGRATION-001` créera
-la table suivante. Elle est documentée ici pour figer le contrat ; ce
-ticket **n'applique aucune migration**.
+La migration versionnée a été livrée par `IOT-STORAGE-MIGRATION-001`
+dans :
+
+```text
+packages/forge-mvc-iot/migrations/20260528120000_create_iot_events.sql
+```
+
+Elle utilise `CREATE TABLE IF NOT EXISTS` (idempotente) et reproduit
+exactement le schéma ci-dessous. Le contrat Python (`COLUMNS`) reste la
+source de vérité : le test
+`tests/test_iot_storage_migration_001.py::TestMigrationMirrorsPythonContract`
+vérifie que les colonnes du DDL correspondent à l'ordre canonique
+Python.
+
+L'application réelle de la migration (`forge migration:apply` après
+copie dans `mvc/migrations/`) reste à la charge de l'utilisateur et
+sera automatisée dans un ticket dédié.
 
 ```sql
 CREATE TABLE IF NOT EXISTS iot_events (
@@ -174,8 +188,6 @@ avec la migration appliquée.
 
 ## Hors périmètre de ce ticket
 
-- **Pas de migration SQL** — fichier `mvc/migrations/*.sql` à produire
-  par `IOT-STORAGE-MIGRATION-001`.
 - **Pas d'insertion réelle** — branchement à `core.database.db.execute`
   par `IOT-STORAGE-REPOSITORY-001`.
 - **Pas d'API HTTP** — lecture JSON par `IOT-HTTP-API-001`.
@@ -189,8 +201,8 @@ Ces points feront chacun l'objet d'un ticket dédié — voir
 ## Découpage rappelé
 
 ```text
-IOT-STORAGE-EVENTS-001        contrat SQL + sérialisation  ← ce ticket
-IOT-STORAGE-MIGRATION-001     migration versionnée
-IOT-STORAGE-REPOSITORY-001    insertion réelle en base
-IOT-HTTP-API-001              lecture HTTP JSON
+IOT-STORAGE-EVENTS-001        contrat SQL + sérialisation  ← livré
+IOT-STORAGE-MIGRATION-001     migration versionnée          ← livré
+IOT-STORAGE-REPOSITORY-001    insertion réelle en base      (à venir)
+IOT-HTTP-API-001              lecture HTTP JSON             (à venir)
 ```
