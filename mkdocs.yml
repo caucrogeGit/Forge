@@ -174,6 +174,9 @@ nav:
           - ADR-014 Contrat RBAC séparé: adr/014-rbac-contract-location.md
           - ADR-015 Handshake TLS par thread (dev): adr/015-dev-tls-handshake-per-thread.md
 
+  - IoT:
+      - Architecture Forge IoT: iot/architecture.md
+
   - Tests terrain:
       - Vue d'ensemble: testing/index.md
       - État des parcours: testing/field-test-status.md
