@@ -32,23 +32,38 @@ API exposée :
 
 ## Schéma SQL cible
 
-La migration versionnée a été livrée par `IOT-STORAGE-MIGRATION-001`
-dans :
+La migration versionnée est livrée comme **ressource embarquée** du
+package depuis `IOT-PACKAGE-DATA-MIGRATIONS-001` :
 
 ```text
-packages/forge-mvc-iot/migrations/20260528120000_create_iot_events.sql
+packages/forge-mvc-iot/forge_mvc_iot/migrations/20260528120000_create_iot_events.sql
 ```
 
-Elle utilise `CREATE TABLE IF NOT EXISTS` (idempotente) et reproduit
-exactement le schéma ci-dessous. Le contrat Python (`COLUMNS`) reste la
-source de vérité : le test
+Elle est déclarée dans `pyproject.toml` via
+`[tool.setuptools.package-data]` pour voyager avec la distribution
+PyPI. Lecture côté code Python :
+
+```python
+from importlib import resources
+
+migration = (
+    resources.files("forge_mvc_iot")
+    / "migrations"
+    / "20260528120000_create_iot_events.sql"
+)
+content = migration.read_text(encoding="utf-8")
+```
+
+La migration utilise `CREATE TABLE IF NOT EXISTS` (idempotente) et
+reproduit exactement le schéma ci-dessous. Le contrat Python
+(`COLUMNS`) reste la source de vérité : le test
 `tests/test_iot_storage_migration_001.py::TestMigrationMirrorsPythonContract`
 vérifie que les colonnes du DDL correspondent à l'ordre canonique
 Python.
 
 L'application réelle de la migration (`forge migration:apply` après
-copie dans `mvc/migrations/`) reste à la charge de l'utilisateur et
-sera automatisée dans un ticket dédié.
+copie dans `mvc/migrations/` du projet utilisateur) reste à la charge
+de l'utilisateur et sera automatisée dans un ticket dédié.
 
 ```sql
 CREATE TABLE IF NOT EXISTS iot_events (

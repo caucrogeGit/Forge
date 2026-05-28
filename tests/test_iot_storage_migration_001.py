@@ -23,7 +23,10 @@ from forge_mvc_iot.storage.events import COLUMNS, TABLE_NAME
 
 PROJECT_ROOT = Path(__file__).parent.parent
 IOT_PKG_DIR = PROJECT_ROOT / "packages" / "forge-mvc-iot"
-MIGRATIONS_DIR = IOT_PKG_DIR / "migrations"
+# Depuis IOT-PACKAGE-DATA-MIGRATIONS-001, les migrations vivent en tant
+# que ressources du package Python pour voyager avec la distribution
+# PyPI (cf. [tool.setuptools.package-data] dans pyproject.toml).
+MIGRATIONS_DIR = IOT_PKG_DIR / "forge_mvc_iot" / "migrations"
 STORAGE_MODULE_FILE = (
     IOT_PKG_DIR / "forge_mvc_iot" / "storage" / "events.py"
 )

@@ -27,7 +27,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Literal
 
 __all__ = [
@@ -117,64 +116,43 @@ def check_config_loadable(env: Mapping[str, str] | None = None) -> CheckResult:
     )
 
 
-def _find_iot_package_root() -> Path | None:
-    """Retourne le dossier ``packages/forge-mvc-iot/`` en install éditable.
+def check_migration_present() -> CheckResult:
+    """Vérifie la présence du fichier ``*_create_iot_events.sql``.
 
-    Pour une installation pip non-éditable, le dossier ``migrations/``
-    n'est pas forcément shippé (cf. ``pyproject.toml.tool.setuptools.
-    packages.find``). Dans ce cas, on retourne ``None`` et l'appelant
-    décide du statut.
+    Lit la ressource via ``importlib.resources.files("forge_mvc_iot") /
+    "migrations"`` — fonctionne identiquement en install éditable, en
+    wheel et en sdist (dès que ``[tool.setuptools.package-data]``
+    embarque les ``.sql``, ce qui est le cas depuis
+    ``IOT-PACKAGE-DATA-MIGRATIONS-001``).
     """
     try:
-        import forge_mvc_iot
-    except ImportError:
-        return None
-    pkg_file = getattr(forge_mvc_iot, "__file__", None)
-    if pkg_file is None:
-        return None
-    # forge_mvc_iot/__init__.py → forge_mvc_iot/ → packages/forge-mvc-iot/
-    return Path(pkg_file).resolve().parent.parent
+        from importlib import resources
 
-
-def check_migration_present() -> CheckResult:
-    """Vérifie la présence du fichier de migration ``*_create_iot_events.sql``.
-
-    En install éditable (cas du dépôt monorepo), le fichier vit dans
-    ``packages/forge-mvc-iot/migrations/``. En install PyPI réelle,
-    une intégration de ressources reste à faire — la vérification
-    remonte alors un ``warn`` plutôt qu'un ``fail`` pour ne pas casser
-    le diagnostic en dehors du contexte dev.
-    """
-    pkg_root = _find_iot_package_root()
-    if pkg_root is None:
+        anchor = resources.files("forge_mvc_iot") / "migrations"
+        candidates = sorted(
+            entry for entry in anchor.iterdir()
+            if entry.name.endswith("_create_iot_events.sql")
+        )
+    except (ImportError, ModuleNotFoundError, FileNotFoundError) as exc:
         return CheckResult(
             status="warn",
             label="migration iot_events",
-            detail="impossible de localiser le package forge-mvc-iot",
+            detail=f"ressource indisponible : {exc}",
         )
-    migrations_dir = pkg_root / "migrations"
-    if not migrations_dir.is_dir():
-        return CheckResult(
-            status="warn",
-            label="migration iot_events",
-            detail=(
-                f"dossier {migrations_dir} introuvable — "
-                "réinstaller en éditable (pip install -e packages/forge-mvc-iot) "
-                "ou attendre la livraison des resources d'installation"
-            ),
-        )
-    matches = sorted(migrations_dir.glob("*_create_iot_events.sql"))
-    if not matches:
+    if not candidates:
         return CheckResult(
             status="fail",
             label="migration iot_events",
-            detail=f"aucun fichier *_create_iot_events.sql dans {migrations_dir}",
+            detail=(
+                "aucun *_create_iot_events.sql sous forge_mvc_iot/migrations/ — "
+                "vérifier l'installation (pip install -e packages/forge-mvc-iot) "
+                "et [tool.setuptools.package-data] dans pyproject.toml"
+            ),
         )
-    name = matches[0].name
     return CheckResult(
         status="ok",
         label="migration iot_events",
-        detail=f"présente ({name})",
+        detail=f"présente ({candidates[0].name})",
     )
 
 

@@ -103,18 +103,24 @@ Idem pour un port hors plage, un topic vide, etc. Voir
 
 ### Migration manquante
 
-Si la migration n'est pas trouvée à côté du package :
+Depuis `IOT-PACKAGE-DATA-MIGRATIONS-001`, le doctor lit la migration
+via `importlib.resources.files("forge_mvc_iot") / "migrations"` — la
+ressource est embarquée dans le package Python lui-même
+(`forge_mvc_iot/migrations/`) et déclarée dans `pyproject.toml`
+(`[tool.setuptools.package-data]`).
+
+Si le doctor ne trouve plus la migration, c'est probablement le signe
+d'une installation cassée :
 
 ```text
-  [WARN]  migration iot_events — dossier .../migrations introuvable —
-           réinstaller en éditable (pip install -e packages/forge-mvc-iot)
-           ou attendre la livraison des resources d'installation
+  [FAIL]  migration iot_events — aucun *_create_iot_events.sql sous
+           forge_mvc_iot/migrations/ — vérifier l'installation
+           (pip install -e packages/forge-mvc-iot) et
+           [tool.setuptools.package-data] dans pyproject.toml
 ```
 
-C'est un `warn` (et non un `fail`) car le module reste utilisable —
-seule l'application de la migration via `forge migration:apply` est
-bloquée. La livraison des ressources via une installation PyPI propre
-fera l'objet d'un ticket d'empaquetage dédié.
+Solution : réinstaller le package (`pip install -e packages/forge-mvc-iot`
+ou `pip install --force-reinstall forge-mvc-iot`).
 
 ### Module non installé
 
