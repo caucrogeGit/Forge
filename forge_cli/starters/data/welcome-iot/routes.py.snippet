@@ -1,0 +1,14 @@
+# forge-starter:welcome-iot:start
+from mvc.controllers.welcome_iot_controller import WelcomeIotController
+from forge_mvc_iot import register_iot_routes
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/welcome-iot",                            WelcomeIotController.index,          name="welcome_iot_index")
+    pub.add("GET", "/welcome-iot/inspect",                    WelcomeIotController.inspect,        name="welcome_iot_inspect")
+    pub.add("GET", "/welcome-iot/events",                     WelcomeIotController.events,         name="welcome_iot_events")
+    pub.add("GET", "/welcome-iot/device/{site}/{device_id}",  WelcomeIotController.find_by_device, name="welcome_iot_find_by_device")
+
+# API HTTP IoT officielle (lecture seule). Coexiste avec le parcours
+# pédagogique ci-dessus — /welcome-iot/* reste indépendant.
+register_iot_routes(router)
+# forge-starter:welcome-iot:end

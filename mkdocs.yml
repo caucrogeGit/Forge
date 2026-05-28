@@ -138,6 +138,8 @@ nav:
       - Auth MFA (Pre-Alpha):
           - Présentation: starters/auth-mfa/index.md
           - Reconstruction: starters/auth-mfa/rebuild.md
+      - Bonjour IoT:
+          - Présentation: starters/welcome-iot/index.md
 
   - Déploiement:
       - Guide de déploiement: deployment.md

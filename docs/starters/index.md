@@ -30,6 +30,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [4 — Suivi pédagogique](04-suivi-comportement-eleves/index.md) | Historique / legacy | Aucun profil principal | Consulter un exemple métier historique, non recommandé comme base moderne |
 | [5 — Communes & Séjours](communes-sejours/index.md) | Démonstrateur avancé principal | `standard` | Voir une application démonstratrice couvrant les briques modernes de Forge |
 | [6 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
+| [Bonjour IoT](welcome-iot/index.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-iot`, `/welcome-iot/inspect`, `/welcome-iot/events`, `/welcome-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
 
 ## Progression recommandée
 
@@ -203,6 +204,37 @@ Profil recommandé : `auth-mfa`.
     `packages/forge-mvc-mfa/README.md`.
 
 [Présentation](auth-mfa/index.md) · [Reconstruction](auth-mfa/rebuild.md)
+
+## Démonstrateur IoT (sans broker requis)
+
+### Bonjour IoT
+
+Premier contact avec le module opt-in `forge-mvc-iot`. Fonctionne
+**sans broker MQTT** et **sans table créée** — les routes de lecture
+détectent et signalent pédagogiquement quand `iot_events` n'est pas
+encore disponible (HTTP 503 avec message clair, pas une trace
+technique).
+
+Aucun profil requis. Identifiant : `welcome-iot` (alias `bonjour-iot`
+/ `iot` / `15`).
+
+- `GET /welcome-iot` → `Response.text("Bonjour Forge IoT")` ;
+- `GET /welcome-iot/inspect` → JSON de la configuration IoT, mot de
+  passe masqué (`"***"` ou `null`) ;
+- `GET /welcome-iot/events` → derniers événements via
+  `IotEventRepository.list_recent`, ou message `iot_storage_not_ready`
+  si la table n'existe pas ;
+- `GET /welcome-iot/device/{site}/{device_id}` → événements d'un
+  capteur précis ;
+- en parallèle, l'API HTTP officielle `/api/iot/...` est branchée via
+  `register_iot_routes(router)`.
+
+Aucun subscriber MQTT n'est lancé par le starter — c'est de la lecture
+seule côté HTTP. Avant de tester, lancer `forge iot:doctor` pour
+vérifier que le package, la configuration, la migration et l'API HTTP
+sont en place.
+
+[Présentation](welcome-iot/index.md)
 
 ## Différence entre profil et starter
 
