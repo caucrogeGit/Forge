@@ -179,6 +179,7 @@ nav:
       - Contrat MQTT: iot/mqtt-contract.md
       - Configuration: iot/configuration.md
       - Subscriber MQTT: iot/mqtt-subscriber.md
+      - Stockage des événements: iot/storage-events.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md
