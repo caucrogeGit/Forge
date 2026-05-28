@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc-iot"
+version = "1.0.0b11"
+description = "Forge IoT — module opt-in pour la réception et l'exposition de données IoT (MQTT, stockage, diagnostics). Squelette initial sans implémentation."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+authors = [
+    { name = "Roger Lequette" },
+]
+license = "LicenseRef-Forge-Proprietary"
+keywords = ["python", "mvc", "forge", "iot", "mqtt"]
+dependencies = [
+    "forge-mvc>=1.0.0b5,<2",
+]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://forgemvc.com/docs/forge/iot/architecture/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forge_mvc_iot*"]
