@@ -18,7 +18,6 @@ tous les tests injectent un mapping explicite.
 
 from __future__ import annotations
 
-import tomllib
 from pathlib import Path
 
 import pytest
@@ -39,7 +38,6 @@ from forge_mvc_iot.config import (
 )
 
 PROJECT_ROOT = Path(__file__).parent.parent
-IOT_PYPROJECT = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "pyproject.toml"
 CORE_DIR = PROJECT_ROOT / "core"
 
 
@@ -217,18 +215,6 @@ class TestImmutability:
 
 
 # ── Garde-fous périmètre ────────────────────────────────────────────────────
-
-
-class TestNoPahoMqttDependency:
-    """L'itération 1 ne déclare pas paho-mqtt comme dépendance."""
-
-    def test_pyproject_no_paho_mqtt(self):
-        data = tomllib.loads(IOT_PYPROJECT.read_text(encoding="utf-8"))
-        deps = data["project"].get("dependencies", [])
-        for dep in deps:
-            assert "paho" not in dep.lower(), (
-                f"Aucune dépendance paho-mqtt à ce ticket (vu : {dep!r})"
-            )
 
 
 class TestNoCoreImportsIotConfig:

@@ -88,14 +88,6 @@ class TestPyprojectContract:
             "Le package doit dépendre de forge-mvc"
         )
 
-    def test_no_paho_mqtt_dependency(self, iot_pyproject_data):
-        deps = iot_pyproject_data["project"]["dependencies"]
-        for dep in deps:
-            assert "paho" not in dep.lower(), (
-                f"Aucune dépendance paho-mqtt ne doit être déclarée "
-                f"au scaffold (vu : {dep!r})"
-            )
-
     def test_setuptools_finds_forge_mvc_iot(self, iot_pyproject_data):
         include = iot_pyproject_data["tool"]["setuptools"]["packages"]["find"]["include"]
         assert any("forge_mvc_iot" in entry for entry in include), (
