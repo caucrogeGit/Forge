@@ -275,6 +275,73 @@ subscriber.handle_message(topic, payload)
   `rowcount`). Utiliser le pattern d'adapter ci-dessus pour récupérer
   `lastrowid`.
 
+### Méthodes de lecture
+
+Trois méthodes pour interroger la table, toutes paramétrées et toutes
+testables via le même adapter (`fetch_one`/`fetch_all`) :
+
+```python
+repo.list_recent(limit=100)
+repo.find_by_device("atelier", "esp32-001", limit=100)
+repo.count_by_device("atelier", "esp32-001")
+```
+
+Chaque ligne retournée par `list_recent` et `find_by_device` est un
+dict **prêt à consommer** :
+
+```python
+{
+    "id": 42,
+    "site": "atelier",
+    "device_id": "esp32-001",
+    "kind": "temperature",
+    "value": 22.4,
+    "unit": "°C",
+    "timestamp": "2026-05-28T10:00:00Z",
+    "metadata": {"room": "atelier", "sensor": "dht22"},   # ou None
+    "received_at": datetime(2026, 5, 28, 10, 0, 5, tzinfo=UTC),
+}
+```
+
+Notes :
+
+- `metadata_json` (interne stockage) est automatiquement parsé en
+  `metadata` (dict ou `None`). Le consommateur n'a jamais à voir le
+  JSON sérialisé.
+- `received_at` reste un `datetime` tel que retourné par le connecteur
+  MariaDB (UTC). La conversion en chaîne JSON-friendly sera le travail
+  de la future API HTTP.
+- L'ordre est `received_at DESC` — les événements les plus récents en
+  premier.
+
+### Limites et validation
+
+- `limit` doit être un `int` strict dans `1..MAX_LIMIT` (par défaut
+  `MAX_LIMIT = 1000`). Hors plage → `ValueError`. Type incorrect →
+  `TypeError`. `True`/`False` sont refusés bien qu'ils héritent de
+  `int`.
+- Pas de pagination par offset à ce ticket — un appel qui voudrait
+  paginer au-delà de `MAX_LIMIT` est probablement le signe qu'il faut
+  un autre endpoint (agrégat, filtre temporel, etc.).
+- Aucun filtre temporel exposé pour l'instant (`since=`, `until=`).
+  Sera ajouté avec l'API HTTP si nécessaire.
+
+### SQL exposé
+
+Les requêtes de lecture sont publiques pour rester lisibles
+(charte v2 §5) :
+
+```python
+from forge_mvc_iot.storage import (
+    SELECT_IOT_EVENTS_RECENT_SQL,
+    SELECT_IOT_EVENTS_BY_DEVICE_SQL,
+    COUNT_IOT_EVENTS_BY_DEVICE_SQL,
+)
+```
+
+Toutes utilisent les placeholders qmark `?` (cohérent avec le reste
+de Forge) et la table `iot_events`.
+
 ## Hors périmètre de ce ticket
 - **Pas d'API HTTP** — lecture JSON par `IOT-HTTP-API-001`.
 - **Pas de CLI**, pas de dashboard, pas d'intégration Forge Design.
@@ -287,8 +354,9 @@ Ces points feront chacun l'objet d'un ticket dédié — voir
 ## Découpage rappelé
 
 ```text
-IOT-STORAGE-EVENTS-001        contrat SQL + sérialisation   ← livré
-IOT-STORAGE-MIGRATION-001     migration versionnée           ← livré
-IOT-STORAGE-REPOSITORY-001    insertion réelle en base       ← livré
-IOT-HTTP-API-001              lecture HTTP JSON              (à venir)
+IOT-STORAGE-EVENTS-001            contrat SQL + sérialisation   ← livré
+IOT-STORAGE-MIGRATION-001         migration versionnée           ← livré
+IOT-STORAGE-REPOSITORY-001        insertion réelle en base       ← livré
+IOT-STORAGE-REPOSITORY-READ-001   lectures repository            ← livré
+IOT-HTTP-API-001                  lecture HTTP JSON              (à venir)
 ```
