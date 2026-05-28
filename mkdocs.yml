@@ -177,6 +177,7 @@ nav:
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
       - Contrat MQTT: iot/mqtt-contract.md
+      - Configuration: iot/configuration.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md
