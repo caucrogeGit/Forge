@@ -21,6 +21,14 @@ Aucun formulaire.
 Aucune validation avancée.
 Aucune jointure.
 
+## Classes Forge utilisées
+
+| Classe | Rôle dans ce starter | Référence |
+|--------|----------------------|-----------|
+| `Request` | Reçue par la méthode du contrôleur. | [reference/http.md](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [reference/http.md](../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+
 ## Tester
 
 Depuis le projet Forge déjà créé avec ce starter, appliquer

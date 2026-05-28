@@ -13,6 +13,14 @@ après [Paramètres d'URL](../query-params/index.md).
 - une vue `mvc/views/first_html_view/index.html`
 - un appel à `BaseController.render(...)`
 
+## Classes Forge utilisées
+
+| Classe | Rôle dans ce starter | Référence |
+|--------|----------------------|-----------|
+| `Request` | Reçue par la méthode et transmise à `render(...)`. | [reference/http.md](../../reference/http.md#3-request-reference) |
+| `Response` | Retournée par le contrôleur (produite ici via `render`). | [reference/http.md](../../reference/http.md#4-response-reference) |
+| `BaseController` | Fournit le helper `render(...)` qui rend la vue HTML. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+
 ## Tester
 
 Depuis le projet Forge déjà créé avec ce starter :

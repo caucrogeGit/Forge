@@ -19,6 +19,13 @@ Aucune base de données.
 Aucun formulaire.
 Aucun CRUD.
 
+## Classes Forge utilisées
+
+| Classe | Rôle dans ce starter | Référence |
+|--------|----------------------|-----------|
+| `Request` | Source de `request.data`, vue globale et stable de la requête. | [reference/http.md](../../reference/http.md#3-request-reference) |
+| `Response` | Rendu de debug avec `Response.debug(...)` (refusé en `prod`). | [reference/http.md](../../reference/http.md#4-response-reference) |
+
 ## Tester
 
 Depuis le projet Forge déjà créé avec ce starter :

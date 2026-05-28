@@ -19,6 +19,14 @@ Aucune base de données.
 Aucune validation serveur avancée.
 Aucun CRUD.
 
+## Classes Forge utilisées
+
+| Classe | Rôle dans ce starter | Référence |
+|--------|----------------------|-----------|
+| `Request` | Lire les champs envoyés avec `request.form(...)`. | [reference/http.md](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [reference/http.md](../../reference/http.md#4-response-reference) |
+| `BaseController` | Fournit `render(...)` pour la vue et `csrf_token(...)` pour le jeton CSRF. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+
 ## Tester
 
 Depuis le projet Forge déjà créé avec ce starter :

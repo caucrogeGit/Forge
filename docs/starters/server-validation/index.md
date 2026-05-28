@@ -20,6 +20,14 @@ Aucune base de données.
 Aucun CRUD.
 Aucun système complet de validation.
 
+## Classes Forge utilisées
+
+| Classe | Rôle dans ce starter | Référence |
+|--------|----------------------|-----------|
+| `Request` | Lire le champ envoyé avec `request.form(...)`. | [reference/http.md](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte, succès ou erreur (`status=422`). | [reference/http.md](../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+
 ## Tester
 
 Depuis le projet Forge déjà créé avec ce starter :

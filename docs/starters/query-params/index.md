@@ -16,6 +16,14 @@ juste après [Bonjour Forge](../welcome/index.md).
 - aucune vue HTML
 - aucune base de données
 
+## Classes Forge utilisées
+
+| Classe | Rôle dans ce starter | Référence |
+|--------|----------------------|-----------|
+| `Request` | Lire un paramètre de *query string* avec `request.param(...)`. | [reference/http.md](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [reference/http.md](../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+
 ## Exemple
 
 `/query-params/hello?name=Roger`

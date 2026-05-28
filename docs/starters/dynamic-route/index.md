@@ -18,6 +18,15 @@ Aucune base de données.
 Aucun formulaire.
 Aucun CRUD.
 
+## Classes Forge utilisées
+
+| Classe | Rôle dans ce starter | Référence |
+|--------|----------------------|-----------|
+| `Request` | Lire la partie variable de l'URL avec `request.route_param(...)`. | [reference/http.md](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [reference/http.md](../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+| Routage | Déclarer le segment dynamique `{id}` dans `mvc/routes.py`. | [reference/api.md](../../reference/api.md#corehttprouter) |
+
 ## Tester
 
 Depuis le projet Forge déjà créé avec ce starter :
