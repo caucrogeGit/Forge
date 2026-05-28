@@ -29,9 +29,9 @@ Forge **1.0.0-beta.11** — bêta publique.
 | Site officiel | [forgemvc.com](https://forgemvc.com/) |
 | Documentation | [forgemvc.com/docs/forge/](https://forgemvc.com/docs/forge/) |
 | Installation | [forgemvc.com/docs/forge/install/](https://forgemvc.com/docs/forge/install/) |
-| Windows + WSL | [forgemvc.com/docs/forge/install/windows/](https://forgemvc.com/docs/forge/install/windows/) |
-| Bonjour Forge | [forgemvc.com/docs/forge/tutorials/hello-forge/](https://forgemvc.com/docs/forge/tutorials/hello-forge/) |
-| Référence CLI | [forgemvc.com/docs/forge/cli/](https://forgemvc.com/docs/forge/cli/) |
+| Windows + WSL | [forgemvc.com/docs/forge/install/windows-wsl/](https://forgemvc.com/docs/forge/install/windows-wsl/) |
+| Bonjour Forge | [forgemvc.com/docs/forge/bonjour-forge/](https://forgemvc.com/docs/forge/bonjour-forge/) |
+| Référence CLI | [forgemvc.com/docs/forge/reference/cli-commands/](https://forgemvc.com/docs/forge/reference/cli-commands/) |
 | PyPI | [pypi.org/project/forge-mvc/](https://pypi.org/project/forge-mvc/) |
 | Retours terrain | [forgemvc.com/docs/forge/testing/](https://forgemvc.com/docs/forge/testing/) |
 
