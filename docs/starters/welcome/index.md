@@ -17,9 +17,9 @@ Identifiant : `welcome` (alias `bienvenue` / `bonjour` / `bonjour-forge`).
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Reçue par chaque méthode du contrôleur. | [reference/http.md](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [reference/http.md](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+| `Request` | Reçue par chaque méthode du contrôleur. | [Request](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
 
 ## Les routes
 
@@ -31,6 +31,16 @@ with router.group("", public=True) as pub:
     pub.add("GET", "/welcome",       WelcomeController.index, name="welcome_index")
     pub.add("GET", "/welcome/greet", WelcomeController.greet, name="welcome_greet")
 ```
+
+### Comprendre ce code
+
+- `router.group("", public=True)` ouvre un groupe de routes publiques
+  (sans authentification requise) et sans préfixe d'URL.
+- Chaque `pub.add(...)` enregistre une route : verbe HTTP, URL, méthode
+  de contrôleur à appeler, et un `name=` pour générer l'URL ailleurs
+  sans la coder en dur.
+- Le routeur lit ce fichier au démarrage et oriente chaque requête
+  entrante vers la bonne méthode.
 
 ## Le contrôleur
 
@@ -52,6 +62,18 @@ class WelcomeController(BaseController):
         name = request.param("name", default="Forge")
         return Response.text(f"Bonjour {name}")
 ```
+
+### Comprendre ce code
+
+- `WelcomeController` hérite de `BaseController` — c'est ce qui en fait
+  un contrôleur Forge utilisable par le routeur.
+- Chaque action reçoit `request: Request` et doit renvoyer `Response`.
+  C'est la signature unique d'une méthode de contrôleur Forge.
+- `Response.text(...)` produit une réponse `text/plain` ; aucun template
+  HTML n'est rendu à ce stade.
+- `request.param("name", default="Forge")` lit la valeur de `?name=...`
+  dans l'URL. Si la clé est absente, `default` est retourné — pas
+  d'exception, pas de `None` à manipuler.
 
 ## Tester dans le navigateur
 

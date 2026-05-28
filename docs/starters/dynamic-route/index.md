@@ -22,10 +22,10 @@ Aucun CRUD.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire la partie variable de l'URL avec `request.route_param(...)`. | [reference/http.md](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [reference/http.md](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [reference/api.md](../../reference/api.md#coremvccontroller) |
-| Routage | Déclarer le segment dynamique `{id}` dans `mvc/routes.py`. | [reference/api.md](../../reference/api.md#corehttprouter) |
+| `Request` | Lire la partie variable de l'URL avec `request.route_param(...)`. | [Request](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
+| Routage | Déclarer le segment dynamique `{id}` dans `mvc/routes.py`. | [Routage](../../reference/api.md#corehttprouter) |
 
 ## Tester
 
@@ -62,6 +62,14 @@ with router.group("", public=True) as pub:
     pub.add("GET", "/dynamic-route/articles/{id}", DynamicRouteController.show, name="dynamic_route_article_show")
 ```
 
+### Comprendre ce code
+
+- Le segment `{id}` dans le motif de route est une partie *variable*
+  de l'URL : Forge capture sa valeur et la rend disponible au contrôleur.
+- Contrairement à `?id=...` (query string), le segment dynamique fait
+  partie du chemin lui-même. Cela produit des URL plus lisibles pour
+  identifier une ressource : `/articles/42` plutôt que `/articles?id=42`.
+
 ```python
 # mvc/controllers/dynamic_route_controller.py
 from core.http.request import Request
@@ -77,6 +85,18 @@ class DynamicRouteController(BaseController):
         article_id = request.route_param("id", default="inconnu")
         return Response.text(f"Article {article_id}")
 ```
+
+### Comprendre ce code
+
+- `request.route_param("id", default="inconnu")` lit la valeur du
+  segment `{id}` déclaré dans la route. Le `default=` protège contre
+  une mauvaise déclaration de route.
+- Ne pas confondre :
+  - `request.param(...)` lit la *query string* (`?id=42`) ;
+  - `request.route_param(...)` lit un segment dynamique du chemin
+    (`/articles/42`).
+- Cette forme est typique pour identifier une ressource précise :
+  l'article 42, le contact 7, le produit 18.
 
 ## À retenir
 

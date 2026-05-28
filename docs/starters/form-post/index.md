@@ -23,9 +23,9 @@ Aucun CRUD.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire les champs envoyés avec `request.form(...)`. | [reference/http.md](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [reference/http.md](../../reference/http.md#4-response-reference) |
-| `BaseController` | Fournit `render(...)` pour la vue et `csrf_token(...)` pour le jeton CSRF. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+| `Request` | Lire les champs envoyés avec `request.form(...)`. | [Request](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
+| `BaseController` | Fournit `render(...)` pour la vue et `csrf_token(...)` pour le jeton CSRF. | [BaseController](../../reference/api.md#coremvccontroller) |
 
 ## Tester
 
@@ -69,6 +69,20 @@ class FormPostController(BaseController):
         return Response.text(f"Bonjour {name}")
 ```
 
+### Comprendre ce code
+
+- Deux méthodes pour un même chemin `/form-post`, mais des verbes HTTP
+  différents : `GET` *affiche* le formulaire, `POST` *reçoit* la
+  soumission.
+- `BaseController.csrf_token(request)` génère le jeton CSRF à injecter
+  dans la vue. Sans ce jeton, Forge refuse le `POST` (protection contre
+  les soumissions cross-site).
+- Côté `submit`, `request.form("name", default="Forge")` lit la valeur
+  envoyée dans le corps du formulaire — pas dans l'URL.
+- Une fois la donnée traitée, le contrôleur retourne une réponse. Ici un
+  simple `Response.text(...)` ; dans une vraie application on
+  redirigerait généralement vers une page de confirmation.
+
 ```html
 <!-- mvc/views/form_post/index.html -->
 <form method="post" action="/form-post">
@@ -78,6 +92,15 @@ class FormPostController(BaseController):
   <button type="submit">Envoyer</button>
 </form>
 ```
+
+### Comprendre ce code
+
+- `method="post"` indique au navigateur d'envoyer les données dans le
+  corps de la requête, pas dans l'URL.
+- Le champ caché `csrf_token` transporte le jeton généré par le
+  contrôleur. Le middleware CSRF de Forge vérifie sa correspondance
+  avant d'appeler `submit`.
+- `name="name"` est la clé lue côté serveur par `request.form("name")`.
 
 ## À retenir
 

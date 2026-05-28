@@ -24,9 +24,9 @@ Aucun système complet de validation.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire le champ envoyé avec `request.form(...)`. | [reference/http.md](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte, succès ou erreur (`status=422`). | [reference/http.md](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+| `Request` | Lire le champ envoyé avec `request.form(...)`. | [Request](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte, succès ou erreur (`status=422`). | [Response](../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
 
 ## Tester
 
@@ -59,6 +59,19 @@ def submit(request: Request) -> Response:
 
     return Response.text(f"Bonjour {name}")
 ```
+
+### Comprendre ce code
+
+- `request.form("name", default="").strip()` lit la valeur soumise et
+  supprime les espaces autour. Le `default=""` évite un `None` à gérer.
+- `if not name:` détecte les cas vides (chaîne vide, espaces uniquement).
+  C'est la **validation côté serveur** dans sa forme la plus simple.
+- Si la donnée est invalide, le contrôleur retourne `422 Unprocessable
+  Entity` avec un message d'erreur — pas un `200` trompeur.
+- Règle d'or : **le serveur ne fait jamais confiance aux données reçues**.
+  Toute requête peut venir d'un client modifié (curl, JS désactivé,
+  Postman), donc la validation client doit toujours être doublée
+  côté serveur.
 
 ## À retenir
 

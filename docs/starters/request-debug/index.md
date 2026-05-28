@@ -23,8 +23,8 @@ Aucun CRUD.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Source de `request.data`, vue globale et stable de la requête. | [reference/http.md](../../reference/http.md#3-request-reference) |
-| `Response` | Rendu de debug avec `Response.debug(...)` (refusé en `prod`). | [reference/http.md](../../reference/http.md#4-response-reference) |
+| `Request` | Source de `request.data`, vue globale et stable de la requête. | [Request](../../reference/http.md#3-request-reference) |
+| `Response` | Rendu de debug avec `Response.debug(...)` (refusé en `prod`). | [Response](../../reference/http.md#4-response-reference) |
 
 ## Tester
 
@@ -51,6 +51,20 @@ sont masquées automatiquement).
 def index(request: Request) -> Response:
     return Response.debug(request.data)
 ```
+
+### Comprendre ce code
+
+- `request.data` est une vue globale et stable de la requête : méthode,
+  chemin, paramètres, headers, body, fichiers. Les valeurs sensibles
+  (`Authorization`, `Cookie`, `password`, `csrf`…) sont automatiquement
+  remplacées par `[masked]`.
+- `Response.debug(...)` rend cette structure sous forme de page HTML
+  lisible. C'est un outil de **développement**, pas une réponse destinée
+  au public.
+- En `APP_ENV=prod`, `Response.debug(...)` retourne `404` sans aucun
+  détail — le starter reste sûr à laisser branché en dev.
+- À observer dans la sortie : le chemin, les paramètres reçus et les
+  headers. C'est ce que voit réellement votre contrôleur.
 
 ## À retenir
 

@@ -25,9 +25,9 @@ Aucune jointure.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Reçue par la méthode du contrôleur. | [reference/http.md](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [reference/http.md](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [reference/api.md](../../reference/api.md#coremvccontroller) |
+| `Request` | Reçue par la méthode du contrôleur. | [Request](../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
 
 ## Tester
 
@@ -73,6 +73,17 @@ class FirstSqlController(BaseController):
         return Response.text(f"Message depuis la base : {message}")
 ```
 
+### Comprendre ce code
+
+- La requête SQL est déclarée comme une chaîne Python lisible —
+  **Forge garde le SQL visible**, sans génération cachée par un ORM.
+- `fetch_one(...)` exécute la requête et retourne la première ligne
+  sous forme de `dict`, ou `None` si la table est vide.
+- Le contrôleur extrait la colonne `content` puis la réinjecte dans
+  une réponse texte.
+- Le cycle reste minimal : route → contrôleur → SQL → réponse. Dans une
+  vraie application, on isolerait la requête dans un module modèle.
+
 ```sql
 -- mvc/migrations/20260527120000_create_first_sql_messages.sql
 CREATE TABLE IF NOT EXISTS first_sql_messages (
@@ -87,6 +98,15 @@ WHERE NOT EXISTS (
     SELECT 1 FROM first_sql_messages WHERE content = 'Bonjour SQL'
 );
 ```
+
+### Comprendre ce code
+
+- `CREATE TABLE IF NOT EXISTS ...` rend la migration idempotente :
+  rejouée, elle ne lève pas d'erreur si la table existe déjà.
+- `INSERT ... WHERE NOT EXISTS (...)` insère la donnée de démo une
+  seule fois — utile pour réappliquer la migration sans dupliquer.
+- Les migrations Forge sont des fichiers SQL versionnés dans
+  `mvc/migrations/` ; `forge migration:apply` les exécute dans l'ordre.
 
 ## À retenir
 
