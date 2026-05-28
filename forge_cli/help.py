@@ -81,6 +81,9 @@ Mail
   mail:doctor         Diagnostic de la configuration mail.
   mail:logs           Affiche les derniers logs mail.
 
+IoT (module opt-in forge-mvc-iot)
+  iot:doctor          Diagnostic statique du module IoT (package, config, migration, API HTTP).
+
 Documentation
   docs:pdf            Génère un PDF depuis la documentation.
 

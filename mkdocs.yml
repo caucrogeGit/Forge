@@ -181,6 +181,7 @@ nav:
       - Subscriber MQTT: iot/mqtt-subscriber.md
       - Stockage des événements: iot/storage-events.md
       - API HTTP: iot/http-api.md
+      - Diagnostic (doctor): iot/doctor.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md

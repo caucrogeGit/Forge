@@ -108,6 +108,8 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "mail:render":      "Rend un template de mail (preview).",
     "mail:doctor":      "Diagnostic de la configuration mail.",
     "mail:logs":        "Affiche les derniers logs mail.",
+    # IoT
+    "iot:doctor":       "Diagnostic statique du module IoT (package, config, migration, API HTTP).",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
     # Internationalisation
@@ -128,6 +130,35 @@ HELP_DESCRIPTIONS: dict[str, str] = {
 # CLI-HELP-FLAGS-INIT-COMMANDS-001 : décrit usage, rôle, effets,
 # prérequis, limites et rappel que --help n'exécute rien.
 HELP_TEXTS_RICH: dict[str, str] = {
+    "iot:doctor": """\
+Usage:
+  forge iot:doctor
+
+Description:
+  Diagnostic statique du module opt-in `forge-mvc-iot`. Ne se connecte
+  à aucun broker MQTT et à aucune base de données — utile avant un
+  starter pédagogique ou avant de brancher l'API HTTP IoT.
+
+Vérifications:
+  - package `forge-mvc-iot` importable (et version) ;
+  - configuration `load_iot_config()` chargeable, mot de passe masqué ;
+  - fichier de migration `*_create_iot_events.sql` présent dans le
+    package ;
+  - fonction `register_iot_routes` exposée pour brancher l'API HTTP.
+
+Options:
+  (aucune à ce ticket)
+
+Limites:
+  Les options `--mqtt` (test de connexion broker) et `--db` (test
+  SELECT sur `iot_events`) sont volontairement reportées à des
+  tickets ultérieurs pour ne pas mélanger diagnostic CLI, réseau MQTT
+  et base MariaDB dans une seule commande.
+
+Code de sortie:
+  0 si aucun check en erreur, 1 sinon. Les statuts `warn` et `skip`
+  n'affectent pas le code de sortie.
+""",
     "update": """\
 Usage:
   forge update [--pre] [--check] [--dry-run]
