@@ -141,10 +141,14 @@ class TestRoutesSnippet:
             "import WelcomeIotController"
         ) in self.text
 
-    def test_imports_register_iot_routes(self):
-        # Le starter expose aussi l'API officielle.
-        assert "from forge_mvc_iot import register_iot_routes" in self.text
-        assert "register_iot_routes(router)" in self.text
+    def test_branches_optins_not_iot_routes_directly(self):
+        # Depuis OPTINS-IOT-PROJECT-BRIDGE-001, le snippet ne branche plus
+        # l'API IoT en direct : il passe par la couche optins/ (registre
+        # explicite). register_iot_routes vit désormais dans
+        # optins/iot/routes.py, pas dans le snippet de routes.
+        assert "from optins.registry import register_optins" in self.text
+        assert "register_optins(router)" in self.text
+        assert "from forge_mvc_iot import register_iot_routes" not in self.text
 
     def test_routes_in_public_group(self):
         # Toutes les routes sont publiques — pas d'auth dans ce starter.

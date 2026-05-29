@@ -15,8 +15,10 @@ Identifiant : `welcome-iot` (alias `bonjour-iot` / `iot` / `15`).
 - une route `/welcome-iot/inspect` (JSON, mot de passe masqué)
 - une route `/welcome-iot/events` (JSON, lecture si table prête)
 - une route `/welcome-iot/device/{site}/{device_id}` (JSON)
-- l'API HTTP IoT officielle via `register_iot_routes(router)`
+- l'API HTTP IoT officielle, branchée via la couche **`optins/`** (voir
+  [Branchement opt-in](#branchement-opt-in-optins))
 - un contrôleur `WelcomeIotController` (4 méthodes)
+- une couche `optins/` (registre explicite + branchement IoT local)
 - aucune vue HTML
 - aucune base de données requise pour la page d'accueil
 - aucun broker MQTT lancé
@@ -194,6 +196,54 @@ class WelcomeIotController(BaseController):
 - Aucun subscriber MQTT n'est lancé par le starter — c'est de la
   **lecture seule** côté HTTP.
 
+## Branchement opt-in (`optins/`)
+
+`welcome-iot` est aussi l'**exemple de référence** de la convention
+[structure des opt-ins](../../architecture/optins-project-structure.md) :
+le paquet `forge-mvc-iot` reste distribué, et le projet le **branche
+localement** via un dossier `optins/`, sans découverte automatique.
+
+```text
+optins/
+├── __init__.py
+├── registry.py          # register_optins(router) — registre explicite
+└── iot/
+    ├── __init__.py
+    ├── routes.py        # register(router) -> register_iot_routes(router)
+    ├── README.md        # mode d'emploi local court
+    └── migrations/
+        └── README.md
+```
+
+Le branchement est **explicite et lisible** — trois sauts, aucun magie :
+
+```python
+# mvc/routes.py
+from optins.registry import register_optins
+
+register_optins(router)
+```
+
+```python
+# optins/registry.py
+def register_optins(router):
+    from optins.iot.routes import register as register_iot
+
+    register_iot(router)
+```
+
+```python
+# optins/iot/routes.py
+from forge_mvc_iot import register_iot_routes
+
+def register(router):
+    register_iot_routes(router)   # /api/iot/events, etc.
+```
+
+Le code métier reste dans le paquet `forge-mvc-iot` ; `optins/iot/` ne
+fait que le câblage. `optins/iot/README.md` reste court et renvoie vers
+la [doc IoT officielle](../../iot/http-api.md) plutôt que de la dupliquer.
+
 ## À retenir
 
 - Le starter fonctionne **sans broker**, **sans table**, **sans
@@ -203,8 +253,10 @@ class WelcomeIotController(BaseController):
 - Les routes événements détectent et signalent gentiment l'absence de
   table — c'est le bon signal pédagogique « tu n'as pas encore
   appliqué la migration ».
-- L'API officielle `/api/iot/...` est branchée en parallèle via
-  `register_iot_routes(router)` — même module, même repository.
+- L'API officielle `/api/iot/...` est branchée en parallèle via la
+  couche `optins/` (`register_optins(router)` → `optins/iot/routes.py` →
+  `register_iot_routes(router)`) — même module, même repository, mais
+  branchement explicite et localisé.
 
 ## Après ce starter
 

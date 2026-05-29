@@ -1,6 +1,6 @@
 # forge-starter:welcome-iot:start
 from mvc.controllers.welcome_iot_controller import WelcomeIotController
-from forge_mvc_iot import register_iot_routes
+from optins.registry import register_optins
 
 with router.group("", public=True) as pub:
     pub.add("GET", "/welcome-iot",                            WelcomeIotController.index,          name="welcome_iot_index")
@@ -8,7 +8,10 @@ with router.group("", public=True) as pub:
     pub.add("GET", "/welcome-iot/events",                     WelcomeIotController.events,         name="welcome_iot_events")
     pub.add("GET", "/welcome-iot/device/{site}/{device_id}",  WelcomeIotController.find_by_device, name="welcome_iot_find_by_device")
 
-# API HTTP IoT officielle (lecture seule). Coexiste avec le parcours
-# pédagogique ci-dessus — /welcome-iot/* reste indépendant.
-register_iot_routes(router)
+# Branchement local des opt-ins — explicite, sans découverte automatique.
+# register_optins() est défini dans optins/registry.py et délègue à
+# optins/iot/routes.py, qui appelle register_iot_routes(router) (API HTTP
+# IoT officielle, lecture seule). Le parcours pédagogique /welcome-iot/*
+# ci-dessus reste indépendant.
+register_optins(router)
 # forge-starter:welcome-iot:end

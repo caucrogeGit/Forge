@@ -14,6 +14,9 @@
   "open_url": "https://localhost:8000/welcome-iot",
   "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-iot/",
   "check_paths": [
-    "mvc/controllers/welcome_iot_controller.py"
+    "mvc/controllers/welcome_iot_controller.py",
+    "optins/registry.py",
+    "optins/iot/routes.py",
+    "optins/iot/README.md"
   ]
 }

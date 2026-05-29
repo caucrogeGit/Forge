@@ -187,6 +187,14 @@ le reste : contrat MQTT, subscriber, repository, API HTTP, CLI
 l'[architecture Forge IoT](../iot/architecture.md) et l'[audit de
 clôture IoT](../history/audits/audit-iot-closing.md).
 
+!!! example "Exemple vivant : le starter `welcome-iot`"
+    Cette convention n'est pas que théorique : le starter
+    [`welcome-iot`](../starters/welcome-iot/index.md) **génère réellement**
+    cette structure `optins/iot/` dans le projet créé
+    (`OPTINS-IOT-PROJECT-BRIDGE-001`). C'est le premier opt-in officiel
+    branché via `optins/registry.py`. Les autres modules (`rbac`,
+    `media`…) suivront le même modèle dans des tickets ultérieurs.
+
 ## Comparaison avec les bundles Symfony
 
 | Symfony | Forge (cible `optins/`) |
@@ -231,6 +239,9 @@ Ce ticket **pose le contrat**. Ne sont **pas** faits ici :
 
 ## Tickets suivants
 
-- `OPTINS-IOT-PROJECT-BRIDGE-001` — appliquer concrètement cette
-  structure à Forge IoT (via le starter `welcome-iot` ou une future
-  commande `forge optin:enable iot`).
+- `OPTINS-IOT-PROJECT-BRIDGE-001` (**livré**) — applique concrètement
+  cette structure à Forge IoT : le starter `welcome-iot` génère
+  `optins/iot/` et branche l'API via `optins/registry.py`.
+- `OPTINS-CLI-ENABLE-AUDIT-001` — concevoir (sans l'implémenter trop
+  vite) une future commande `forge optin:enable`, qui pourrait toucher
+  routes, migrations, fichiers projet et starters.
