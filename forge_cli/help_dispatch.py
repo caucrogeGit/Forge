@@ -111,6 +111,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # IoT
     "iot:doctor":       "Diagnostic du module IoT (statique ; --db pour la table, --mqtt pour le broker).",
     "iot:init":         "Copie la migration IoT vers mvc/migrations/ (idempotent, sans appliquer).",
+    "iot:simulate":     "Publie des mesures MQTT factices conformes au contrat (sans capteur).",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
     # Internationalisation
@@ -209,6 +210,52 @@ Vérification optionnelle (--mqtt):
 Code de sortie:
   0 si aucun check en erreur, 1 sinon. Les statuts `warn` et `skip`
   n'affectent pas le code de sortie.
+""",
+    "iot:simulate": """\
+Usage:
+  forge iot:simulate
+  forge iot:simulate --site atelier --device esp32-001
+  forge iot:simulate --kind humidity --value 55 --unit %
+  forge iot:simulate --count 10 --interval 1
+
+Description:
+  Publie des mesures **factices** mais conformes au contrat MQTT Forge
+  IoT vers le broker configuré (`load_iot_config()`), sans capteur
+  physique. But pédagogique : tester le flux complet
+  doctor --mqtt → simulate → subscriber → iot_events → /api/iot/events.
+
+Comportement par défaut:
+  - topic   : forge/atelier/esp32-001/telemetry
+  - payload : {"kind": "temperature", "value": 22.4, "unit": "°C",
+              "timestamp": "<UTC Z>", "metadata": {"source":
+              "forge-iot-simulator"}}
+  - une seule mesure publiée (QoS 0, pas de retain).
+
+Options:
+  --site <slug>      Site (défaut: atelier). Slug [a-z0-9-]+.
+  --device <slug>    Identifiant capteur (défaut: esp32-001).
+  --kind <slug>      Type de mesure (défaut: temperature).
+  --value <nombre>   Valeur mesurée (défaut: 22.4).
+  --unit <texte>     Unité (défaut: °C).
+  --count <n>        Nombre de messages, borné 1..1000 (défaut: 1).
+  --interval <s>     Délai entre messages, borné 0..60 s (défaut: 1).
+  -h, --help         Affiche cette aide sans rien publier.
+
+Effets:
+  - se connecte brièvement au broker, publie puis se déconnecte ;
+  - n'ouvre aucune connexion si une option est invalide (validation
+    contre le contrat AVANT toute connexion) ;
+  - le mot de passe MQTT n'est jamais affiché.
+
+Limites (hors périmètre):
+  - ne lance pas le subscriber, n'écrit pas en base, n'appelle pas
+    l'API HTTP ;
+  - pas de retain, pas de QoS avancé, pas de downlink ;
+  - vérifie d'abord le broker avec `forge iot:doctor --mqtt`.
+
+Code de sortie:
+  0 publication réussie ; 2 option invalide ; 1 configuration invalide
+  ou échec de connexion / publication.
 """,
     "update": """\
 Usage:

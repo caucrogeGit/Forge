@@ -212,11 +212,20 @@ Pour aller plus loin avec Forge IoT :
 
 - lancer un broker [Mosquitto](../../iot/architecture.md) local et
   publier des messages selon le
-  [contrat MQTT](../../iot/mqtt-contract.md) ;
+  [contrat MQTT](../../iot/mqtt-contract.md) — sans capteur, le
+  [simulateur `forge iot:simulate`](../../iot/simulator.md) publie des
+  mesures factices conformes au contrat ;
 - brancher le [subscriber MQTT](../../iot/mqtt-subscriber.md) sur le
   repository pour ingérer en base ;
 - consommer l'[API HTTP officielle](../../iot/http-api.md) depuis une
   interface de votre choix.
+
+Flux de test rapide, une fois la table créée :
+
+```bash
+forge iot:doctor --mqtt                     # le broker répond ?
+forge iot:simulate --count 3 --interval 1   # publier 3 mesures factices
+```
 
 [Architecture Forge IoT](../../iot/architecture.md) liste les tickets
 restants (capteurs simulés, dashboard, downlink, …).

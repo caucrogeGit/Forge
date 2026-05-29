@@ -672,6 +672,19 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "iot:simulate":
+        try:
+            from forge_mvc_iot.cli.simulate import main as iot_simulate_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-iot non installé.",
+                hint="installe le module opt-in : pip install forge-mvc-iot",
+            )
+        rc = iot_simulate_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command in ("deploy:init", "deploy:check"):
         deploy_main(args)
         return

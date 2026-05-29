@@ -185,6 +185,7 @@ nav:
       - API HTTP: iot/http-api.md
       - Diagnostic (doctor): iot/doctor.md
       - Initialisation (iot:init): iot/init-command.md
+      - Simulateur (iot:simulate): iot/simulator.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md
