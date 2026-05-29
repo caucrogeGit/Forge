@@ -242,6 +242,7 @@ nav:
           - Audit post-publication beta.8: history/audits/audit-post-publication-beta8.md
           - Audit de clôture Forge IoT: history/audits/audit-iot-closing.md
           - Audit de clôture opt-ins: history/audits/audit-optins-closing.md
+          - Audit pré-release beta.12: history/audits/audit-pre-release-beta12.md
           - Audits archivés: history/audits/README.md
       - Tests terrain:
           - Field Test App 001: history/field-tests/field-test-app-001.md
