@@ -59,6 +59,7 @@ forge iot:simulate --help
 
 | Option | Défaut | Description |
 |--------|--------|-------------|
+| `--profile <nom>` | _(aucun)_ | Profil pédagogique : `temperature`, `humidity`, `presence`, `energy`. Fournit des défauts `kind`/`value`/`unit`. |
 | `--site <slug>` | `atelier` | Site (slug `[a-z0-9-]+`). |
 | `--device <slug>` | `esp32-001` | Identifiant capteur (slug `[a-z0-9-]+`). |
 | `--kind <slug>` | `temperature` | Type de mesure (slug `[a-z0-9_-]+`). |
@@ -74,6 +75,60 @@ forge iot:simulate --site atelier --device esp32-001
 forge iot:simulate --kind humidity --value 55 --unit %
 forge iot:simulate --count 10 --interval 1
 ```
+
+## Profils de simulation
+
+Plutôt que de retenir les bonnes valeurs `--kind`/`--value`/`--unit` pour
+chaque type de mesure, un **profil** les fournit d'un coup. Pratique pour
+construire des exercices sans capteur réel :
+
+```bash
+forge iot:simulate --profile temperature --count 5
+forge iot:simulate --profile humidity --count 5
+forge iot:simulate --profile presence --count 5
+forge iot:simulate --profile energy --count 5
+```
+
+| Profil | `kind` | `value` | `unit` | Note |
+|--------|--------|---------|--------|------|
+| `temperature` | `temperature` | `22.4` | `°C` | température ambiante |
+| `humidity` | `humidity` | `55.0` | `%` | humidité relative |
+| `presence` | `presence` | `1.0` | `state` | `0` = absence, `1` = présence |
+| `energy` | `energy` | `120.5` | `W` | puissance instantanée |
+
+Quand un profil est actif, le payload porte `metadata.profile` :
+
+```json
+{
+  "kind": "temperature",
+  "value": 22.4,
+  "unit": "°C",
+  "timestamp": "2026-05-29T10:00:00Z",
+  "metadata": {
+    "source": "forge-iot-simulator",
+    "profile": "temperature"
+  }
+}
+```
+
+Un profil ne fournit que des **défauts** : `--kind`, `--value` et
+`--unit` peuvent encore les surcharger explicitement, quel que soit leur
+ordre :
+
+```bash
+forge iot:simulate --profile temperature --value 24.8
+forge iot:simulate --profile humidity --unit "g/m³"
+```
+
+Un profil inconnu est rejeté (exit code 2) :
+
+```text
+[ERREUR] Profil inconnu : unknown
+Profils disponibles : temperature, humidity, presence, energy
+```
+
+Sans `--profile`, le comportement est **inchangé** (température simple,
+`metadata` sans `profile`).
 
 ## Conformité au contrat
 

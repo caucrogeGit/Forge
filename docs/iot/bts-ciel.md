@@ -52,6 +52,15 @@ humidité, luminosité…) transformée en nombre. En classe, on le remplace
 par `forge iot:simulate`, qui produit des mesures factices mais
 réalistes.
 
+Les **profils** du simulateur (`--profile temperature|humidity|presence|energy`)
+permettent de construire des exercices sans capteur réel : chaque profil
+fournit un `kind`, une `value` et une `unit` cohérents. Voir
+[Simulateur — profils de simulation](simulator.md#profils-de-simulation).
+
+```bash
+forge iot:simulate --profile humidity --count 5
+```
+
 ## Rôle de MQTT
 
 MQTT est le **protocole de transport**. Une mesure est publiée sur un

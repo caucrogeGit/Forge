@@ -47,6 +47,7 @@ __all__ = [
     "DEFAULT_VALUE",
     "DEFAULT_UNIT",
     "DEFAULT_SOURCE",
+    "SIMULATION_PROFILES",
     "MIN_COUNT",
     "MAX_COUNT",
     "MIN_INTERVAL",
@@ -73,6 +74,18 @@ MAX_COUNT = 1000
 MIN_INTERVAL = 0.0
 MAX_INTERVAL = 60.0
 
+# Profils pédagogiques : valeurs par défaut prêtes à l'emploi pour générer
+# plusieurs types de mesures sans capteur physique. Un profil ne fournit que
+# des défauts (kind/value/unit) ; ``--kind`` / ``--value`` / ``--unit``
+# peuvent encore les surcharger explicitement. Volontairement simple : pas de
+# random-walk, pas de bruit statistique, pas de scénario multi-capteurs.
+SIMULATION_PROFILES: dict[str, dict[str, Any]] = {
+    "temperature": {"kind": "temperature", "value": 22.4, "unit": "°C"},
+    "humidity": {"kind": "humidity", "value": 55.0, "unit": "%"},
+    "presence": {"kind": "presence", "value": 1.0, "unit": "state"},
+    "energy": {"kind": "energy", "value": 120.5, "unit": "W"},
+}
+
 
 class ArgumentError(Exception):
     """Option de ligne de commande invalide (message destiné à l'humain)."""
@@ -89,6 +102,9 @@ class SimulateOptions:
     unit: str = DEFAULT_UNIT
     count: int = 1
     interval: float = 1.0
+    # Nom du profil pédagogique appliqué (``None`` = aucun, comportement
+    # historique). Renseigne ``metadata.profile`` dans le payload publié.
+    profile: str | None = None
 
 
 # ── Construction des messages ───────────────────────────────────────────────
@@ -119,14 +135,24 @@ def build_payload(
     unit: str,
     timestamp: str,
     source: str = DEFAULT_SOURCE,
+    profile: str | None = None,
 ) -> dict[str, Any]:
-    """Construit le payload JSON conforme au contrat MQTT Forge IoT."""
+    """Construit le payload JSON conforme au contrat MQTT Forge IoT.
+
+    ``profile`` (s'il est fourni) est ajouté à ``metadata`` sous la clé
+    ``profile`` — une string, comme l'exige le contrat (toutes les valeurs
+    de ``metadata`` doivent être des chaînes). Sans profil, le payload est
+    inchangé (``metadata = {"source": ...}``).
+    """
+    metadata: dict[str, str] = {"source": source}
+    if profile is not None:
+        metadata["profile"] = profile
     return {
         "kind": kind,
         "value": value,
         "unit": unit,
         "timestamp": timestamp,
-        "metadata": {"source": source},
+        "metadata": metadata,
     }
 
 
@@ -147,11 +173,18 @@ def parse_args(args: list[str]) -> SimulateOptions:
     """
     site = DEFAULT_SITE
     device = DEFAULT_DEVICE
-    kind = DEFAULT_KIND
-    value: int | float = DEFAULT_VALUE
-    unit = DEFAULT_UNIT
     count = 1
     interval = 1.0
+    profile: str | None = None
+
+    # Surcharges explicites kind/value/unit : ``None`` tant que l'utilisateur
+    # ne les a pas fournies, pour distinguer « non précisé » de « précisé ».
+    # On résout l'ordre profil → surcharge **après** la boucle, pour que
+    # ``--kind``/``--value``/``--unit`` gagnent quel que soit leur ordre vs
+    # ``--profile``.
+    kind_override: str | None = None
+    value_override: int | float | None = None
+    unit_override: str | None = None
 
     i = 0
     while i < len(args):
@@ -160,14 +193,16 @@ def parse_args(args: list[str]) -> SimulateOptions:
             site = _expect_value(args, i, flag)
         elif flag == "--device":
             device = _expect_value(args, i, flag)
+        elif flag == "--profile":
+            profile = _expect_value(args, i, flag)
         elif flag == "--kind":
-            kind = _expect_value(args, i, flag)
+            kind_override = _expect_value(args, i, flag)
         elif flag == "--unit":
-            unit = _expect_value(args, i, flag)
+            unit_override = _expect_value(args, i, flag)
         elif flag == "--value":
             raw = _expect_value(args, i, flag)
             try:
-                value = float(raw)
+                value_override = float(raw)
             except ValueError as exc:
                 raise ArgumentError(
                     f"--value doit être un nombre (vu : {raw!r})"
@@ -201,6 +236,29 @@ def parse_args(args: list[str]) -> SimulateOptions:
             raise ArgumentError(f"option inconnue : {flag}")
         i += 2
 
+    # Résolution kind/value/unit : défauts globaux → profil → surcharges
+    # explicites (premier match gagne au profit du plus spécifique).
+    kind = DEFAULT_KIND
+    value: int | float = DEFAULT_VALUE
+    unit = DEFAULT_UNIT
+    if profile is not None:
+        if profile not in SIMULATION_PROFILES:
+            available = ", ".join(SIMULATION_PROFILES)
+            raise ArgumentError(
+                f"Profil inconnu : {profile}\n"
+                f"Profils disponibles : {available}"
+            )
+        preset = SIMULATION_PROFILES[profile]
+        kind = preset["kind"]
+        value = preset["value"]
+        unit = preset["unit"]
+    if kind_override is not None:
+        kind = kind_override
+    if value_override is not None:
+        value = value_override
+    if unit_override is not None:
+        unit = unit_override
+
     return SimulateOptions(
         site=site,
         device=device,
@@ -209,6 +267,7 @@ def parse_args(args: list[str]) -> SimulateOptions:
         unit=unit,
         count=count,
         interval=interval,
+        profile=profile,
     )
 
 
@@ -266,6 +325,7 @@ def publish_measurements(
                 value=options.value,
                 unit=options.unit,
                 timestamp=utc_timestamp(now),
+                profile=options.profile,
             )
             body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
             info = client.publish(topic, body, qos=0)
@@ -328,6 +388,7 @@ def main(args: list[str] | None = None) -> int:
         value=options.value,
         unit=options.unit,
         timestamp=utc_timestamp(),
+        profile=options.profile,
     )
     try:
         parse_message(build_topic(options.site, options.device), json.dumps(sample))

@@ -224,6 +224,7 @@ Usage:
   forge iot:simulate --site atelier --device esp32-001
   forge iot:simulate --kind humidity --value 55 --unit %
   forge iot:simulate --count 10 --interval 1
+  forge iot:simulate --profile humidity --count 5
 
 Description:
   Publie des mesures **factices** mais conformes au contrat MQTT Forge
@@ -238,7 +239,17 @@ Comportement par défaut:
               "forge-iot-simulator"}}
   - une seule mesure publiée (QoS 0, pas de retain).
 
+Profils (--profile):
+  Fournissent des défauts prêts à l'emploi (kind/value/unit) :
+  - temperature  → kind=temperature value=22.4 unit=°C
+  - humidity     → kind=humidity    value=55.0 unit=%
+  - presence     → kind=presence    value=1.0  unit=state (0=absence, 1=présence)
+  - energy       → kind=energy      value=120.5 unit=W
+  Un profil ajoute `metadata.profile`. `--kind`/`--value`/`--unit`
+  surchargent encore le profil. Profil inconnu → exit 2.
+
 Options:
+  --profile <nom>    Profil pédagogique : temperature|humidity|presence|energy.
   --site <slug>      Site (défaut: atelier). Slug [a-z0-9-]+.
   --device <slug>    Identifiant capteur (défaut: esp32-001).
   --kind <slug>      Type de mesure (défaut: temperature).
