@@ -77,8 +77,30 @@ Dans un **deuxième terminal**, publie des mesures :
 forge iot:simulate --count 3 --interval 1
 ```
 
-Trois lignes `[OK]` doivent apparaître côté `forge iot:listen`. Enfin,
-avec l'application lancée (`forge run`), relis les mesures stockées :
+Trois lignes `[OK]` doivent apparaître côté `forge iot:listen`. Quand tu
+arrêtes l'écoute (`Ctrl+C`), un résumé de session confirme le compte :
+
+```text
+[INFO] Arrêt demandé.
+[OK] Écoute MQTT arrêtée proprement.
+
+Résumé :
+  mesures reçues       : 3
+  mesures stockées     : 3
+  erreurs de contrat   : 0
+  erreurs de stockage  : 0
+```
+
+Si un message invalide arrive, il est **ignoré** (`[WARN] Message MQTT
+ignoré — …`) et compté dans `erreurs de contrat` sans arrêter l'écoute.
+Si la table manque, `forge iot:listen` affiche `Table iot_events
+absente` et renvoie vers `forge iot:init` / `forge migration:apply` ; si
+la base est injoignable, il affiche `Connexion base impossible` et
+renvoie vers `forge iot:doctor --db`. Détail dans
+[Écoute](listen-command.md).
+
+Enfin, avec l'application lancée (`forge run`), relis les mesures
+stockées :
 
 ```bash
 curl http://localhost:8000/api/iot/events

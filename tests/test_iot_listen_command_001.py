@@ -89,6 +89,7 @@ class _FakeSubscriber:
     ) -> None:
         self.config = None
         self.on_measurement = None
+        self.on_contract_error = None
         self.calls: list[str] = []
         self._deliver = list(deliver)
         self._connect_raises = connect_raises
@@ -111,9 +112,10 @@ class _FakeSubscriber:
 
 
 def _factory(sub: _FakeSubscriber):
-    def _make(*, config, on_measurement):
+    def _make(*, config, on_measurement, on_contract_error=None):
         sub.config = config
         sub.on_measurement = on_measurement
+        sub.on_contract_error = on_contract_error
         return sub
     return _make
 
@@ -209,7 +211,7 @@ class TestRunListenerStorageErrors:
         )
         err = capsys.readouterr().err
         assert rc == 1
-        assert "Stockage IoT indisponible" in err
+        assert "Table iot_events absente" in err
         assert "forge iot:init" in err
         assert "forge migration:apply" in err
         # L'arrêt a bien été demandé au subscriber.
@@ -235,7 +237,7 @@ class TestRunListenerStorageErrors:
         )
         err = capsys.readouterr().err
         assert rc == 1
-        assert "Insertion en base impossible" in err
+        assert "Stockage IoT impossible" in err
         assert "Traceback" not in err
 
 
