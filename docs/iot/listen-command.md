@@ -100,7 +100,8 @@ Exit code 1. Voir [Configuration Forge IoT](configuration.md).
 ```
 
 Exit code 1. Le broker n'est pas démarré ou l'hôte/port est faux —
-diagnostique avec `forge iot:doctor --mqtt`.
+diagnostique avec `forge iot:doctor --mqtt`. Pour installer et lancer un
+broker local, voir [Mosquitto local](mosquitto-local.md).
 
 ### Table `iot_events` absente
 

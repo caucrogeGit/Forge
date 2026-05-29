@@ -146,7 +146,9 @@ importé tant que `--mqtt` n'est pas passé.
 
 > **Astuce ateliers** : si Mosquitto n'est pas lancé, `forge iot:doctor
 > --mqtt` sort légitimement en `[FAIL]` avec un message clair — c'est le
-> signal attendu avant de démarrer un subscriber ou un simulateur.
+> signal attendu avant de démarrer un subscriber ou un simulateur. Pour
+> installer et lancer un broker local, voir
+> [Mosquitto local](mosquitto-local.md).
 
 ## Parcours recommandé
 

@@ -116,6 +116,9 @@ diagnostiquer le broker.
 
 ## Parcours recommandé
 
+Besoin d'un broker pour ces commandes ? Voir
+[Mosquitto local](mosquitto-local.md) pour l'installer et le lancer.
+
 ```bash
 forge iot:doctor --mqtt              # 1. confirmer que le broker répond
 forge iot:simulate --count 3 --interval 1   # 2. publier 3 mesures

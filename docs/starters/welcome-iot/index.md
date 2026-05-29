@@ -210,7 +210,7 @@ class WelcomeIotController(BaseController):
 
 Pour aller plus loin avec Forge IoT :
 
-- lancer un broker [Mosquitto](../../iot/architecture.md) local et
+- lancer un broker [Mosquitto local](../../iot/mosquitto-local.md) et
   publier des messages selon le
   [contrat MQTT](../../iot/mqtt-contract.md) — sans capteur, le
   [simulateur `forge iot:simulate`](../../iot/simulator.md) publie des
