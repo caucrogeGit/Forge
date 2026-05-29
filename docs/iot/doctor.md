@@ -315,7 +315,13 @@ Sont volontairement **hors périmètre**, y compris pour `--mqtt` :
 - pas de test de topic via `subscribe` / `publish` ;
 - pas de vérification de la version du contrat MQTT déployé côté
   capteurs ;
-- pas de TLS ni d'audit des permissions ACL Mosquitto avancées.
+- pas de TLS ni d'audit des permissions ACL Mosquitto avancées —
+  `--mqtt` se connecte **en clair**. La configuration TLS
+  (`FORGE_IOT_MQTT_TLS_ENABLED`, `FORGE_IOT_MQTT_TLS_CA_FILE`) existe
+  désormais côté config (voir
+  [Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation))
+  mais n'est **pas encore** consommée par `--mqtt` (ticket
+  `IOT-MQTT-TLS-CLIENTS-001`).
 
 Côté `--db` et contrôle de schéma, sont aussi **hors périmètre** :
 
