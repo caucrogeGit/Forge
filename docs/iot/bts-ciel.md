@@ -207,11 +207,12 @@ Associer chaque panne à la commande utile :
 
 Cette page pose le cadre pédagogique général. Sont **hors périmètre** :
 
-- le **capteur réel** (Arduino / ESP32 réel) n'est pas couvert ici, c'est hors périmètre — on utilise `forge iot:simulate` ;
+- en classe, on part du simulateur `forge iot:simulate` ; pour un
+  capteur réel, voir l'[exemple ESP32](esp32-example.md) ;
+- l'**Arduino R4** n'est pas couvert ici (hors périmètre) — l'exemple cible l'ESP32 ;
 - pas de fiche élève PDF, pas de grille d'évaluation, pas de séquence
   pédagogique complète — pourront venir plus tard ;
 - pas de cockpit de visualisation (Forge Design) — à venir ;
 - pas de TLS ni d'authentification MQTT.
 
-Les fiches élèves détaillées et un exemple de capteur réel feront l'objet
-de tickets ultérieurs.
+Les fiches élèves détaillées feront l'objet de tickets ultérieurs.

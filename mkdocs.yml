@@ -190,6 +190,7 @@ nav:
       - Mosquitto local: iot/mosquitto-local.md
       - Smoke test local: iot/local-smoke-test.md
       - Pour Bac Pro / BTS CIEL: iot/bts-ciel.md
+      - Exemple ESP32: iot/esp32-example.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md

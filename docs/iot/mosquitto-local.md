@@ -148,7 +148,8 @@ mosquitto_pub -h localhost \
 ```
 
 Le message doit apparaître dans `mosquitto_sub` **et**, si
-`forge iot:listen` tourne, être inséré dans `iot_events`.
+`forge iot:listen` tourne, être inséré dans `iot_events`. Pour publier
+depuis un vrai microcontrôleur, voir l'[exemple ESP32](esp32-example.md).
 
 ## Erreurs fréquentes
 
