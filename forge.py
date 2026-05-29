@@ -705,6 +705,13 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "optin:list":
+        from forge_cli.optins.list import main as optin_list_main
+        rc = optin_list_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command in ("deploy:init", "deploy:check"):
         deploy_main(args)
         return

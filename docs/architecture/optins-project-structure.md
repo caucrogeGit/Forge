@@ -253,3 +253,6 @@ Ce ticket **pose le contrat**. Ne sont **pas** faits ici :
 - `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` (**livré**) — `--apply` branche
   `mvc/routes.py` **si la structure est reconnue** (`router = Router()`),
   sinon `[WARN]` + instruction manuelle (aucune modification).
+- `OPTINS-CLI-LIST-001` (**livré**) — `forge optin:list`, commande
+  **lecture seule** qui affiche l'état local des opt-ins (`absent` /
+  `partiel` / `activé` pour `iot`), sans rien créer ni modifier.

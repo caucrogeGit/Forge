@@ -1276,6 +1276,31 @@ l'[audit `forge optin:enable`](../architecture/optins-cli-enable-audit.md).
 
 </details>
 
+<details markdown="1" id="forge-optinlist">
+<summary><code>forge optin:list</code> - Affiche l'état local des opt-ins connus (lecture seule)</summary>
+
+Affiche l'état local des opt-ins connus dans un projet Forge.
+**Commande lecture seule : elle ne crée, ne modifie et n'installe rien.**
+
+```bash
+forge optin:list
+```
+
+Elle inspecte seulement le texte de quelques fichiers du projet
+(`optins/iot/routes.py`, `optins/registry.py`, `mvc/routes.py`) — sans
+importer `forge_mvc_iot`, sans découverte automatique. États détectés
+pour `iot` :
+
+- `absent` : `optins/iot/` n'existe pas ;
+- `partiel` : `optins/iot/` présent, mais `register_optins(router)` absent
+  de `mvc/routes.py` (conseil : `forge optin:enable iot --apply`) ;
+- `activé` : `optins/iot/` présent **et** `register_optins(router)` présent.
+
+Complément lecture seule de [`forge optin:enable`](#forge-optinenable).
+Seul l'opt-in `iot` est analysé dans cette version.
+
+</details>
+
 ## Utilitaires
 
 <details markdown="1" id="forge-version">

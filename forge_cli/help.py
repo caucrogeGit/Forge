@@ -89,6 +89,7 @@ IoT (module opt-in forge-mvc-iot)
 
 Opt-ins (branchement projet)
   optin:enable        Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.
+  optin:list          Affiche l'état local des opt-ins connus (lecture seule).
 
 Documentation
   docs:pdf            Génère un PDF depuis la documentation.

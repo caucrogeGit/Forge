@@ -115,6 +115,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "iot:listen":       "Écoute le broker MQTT et insère les mesures reçues dans iot_events.",
     # Opt-ins (branchement projet)
     "optin:enable":     "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
+    "optin:list":       "Affiche l'état local des opt-ins connus (lecture seule).",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
     # Internationalisation
@@ -347,6 +348,30 @@ Important:
 Code de sortie:
   0 succès (création, idempotent ou dry-run) ; 2 opt-in inconnu ou nom
   manquant ; 1 paquet absent, ou (avec `--apply`) conflit de fichier.
+""",
+    "optin:list": """\
+Usage:
+  forge optin:list
+
+Description:
+  Affiche l'état local des opt-ins connus dans un projet Forge.
+  **Commande lecture seule** : elle ne crée, ne modifie et n'installe
+  rien. Elle inspecte seulement le texte de quelques fichiers du projet
+  (`optins/iot/routes.py`, `optins/registry.py`, `mvc/routes.py`).
+
+États détectés pour `iot`:
+  - absent   : `optins/iot/` n'existe pas ;
+  - partiel  : `optins/iot/` présent, mais `register_optins(router)`
+               absent de `mvc/routes.py` ;
+  - activé   : `optins/iot/` présent + `register_optins(router)` présent.
+
+Important:
+  - n'importe pas `forge_mvc_iot` ni aucun paquet opt-in ;
+  - pas de découverte automatique, pas de scan des paquets installés ;
+  - seul l'opt-in `iot` est analysé dans cette version.
+
+Code de sortie:
+  0 toujours (lecture seule).
 """,
     "update": """\
 Usage:
