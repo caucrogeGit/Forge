@@ -24,12 +24,17 @@ EXPECTED_SCHEMAS = {
 
 
 def _latest_wheel() -> Path | None:
-    wheels = sorted(DIST.glob("*.whl"))
+    # Cible le paquet **core** `forge_mvc` : ce sont ses distributions qui
+    # embarquent `forge_cli/schemas/` (les opt-ins `forge_mvc_*` ne les
+    # contiennent pas). Le motif `forge_mvc-*` (tiret) exclut les opt-ins
+    # `forge_mvc_<nom>` (underscore) quand `dist/` contient plusieurs
+    # paquets construits ensemble lors d'une release multi-paquets.
+    wheels = sorted(DIST.glob("forge_mvc-*.whl"))
     return wheels[-1] if wheels else None
 
 
 def _latest_sdist() -> Path | None:
-    sdists = sorted(DIST.glob("*.tar.gz"))
+    sdists = sorted(DIST.glob("forge_mvc-*.tar.gz"))
     return sdists[-1] if sdists else None
 
 

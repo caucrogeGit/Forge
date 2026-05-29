@@ -1,6 +1,45 @@
 # Changelog
 
 
+## [1.0.0-beta.12] — 2026-05-29
+
+### Forge IoT — nouveau module opt-in `forge-mvc-iot`
+
+- Module IoT opt-in complet : contrat MQTT `forge/{site}/{device_id}/telemetry`,
+  subscriber `paho-mqtt`, stockage `iot_events` (migration packagée,
+  repository), et API HTTP JSON en lecture
+  (`/api/iot/events`, `/api/iot/events/{site}/{device_id}`,
+  `/api/iot/devices/{site}/{device_id}/count`).
+- CLI : `forge iot:doctor` (diagnostic statique ; `--db` table + schéma,
+  `--mqtt` broker), `forge iot:init` (copie la migration), `forge iot:listen`
+  (écoute + insère, arrêt propre + résumé), `forge iot:simulate`
+  (mesures factices ; profils `temperature`/`humidity`/`presence`/`energy`).
+- Sécurité : **TLS MQTT** (`FORGE_IOT_MQTT_TLS_ENABLED`,
+  `FORGE_IOT_MQTT_TLS_CA_FILE`) branché dans les clients ; **Bearer token**
+  optionnel sur l'API HTTP (`FORGE_IOT_API_TOKEN`).
+- Pédagogie : guides Mosquitto local, smoke test local, Bac Pro / BTS CIEL,
+  exemple ESP32, évaluation Arduino R4 ; starter `welcome-iot`.
+- `forge-mvc-iot` publié sur PyPI (statut Alpha) au même titre que les
+  autres opt-ins.
+
+### Opt-ins côté projet utilisateur — structure `optins/`
+
+- Convention `optins/` : couche de branchement local explicite des opt-ins
+  (registre `optins/registry.py`, pas de découverte automatique) ; les
+  paquets restent distribués dans `packages/forge-mvc-*`.
+- `forge optin:enable iot` (dry-run par défaut, `--apply` ; branche
+  prudemment `mvc/routes.py` si la structure est reconnue) et
+  `forge optin:list` (lecture seule, états absent/partiel/activé).
+- Le starter `welcome-iot` génère cette structure `optins/iot/`.
+
+### Qualité
+
+- Référence CLI complétée (commandes IoT + opt-ins).
+- Suite de tests complète revenue à **0 échec** avant release
+  (corrections de garde-fous méta et de références de doc obsolètes,
+  sans affaiblir les garde-fous).
+
+
 ## [1.0.0-beta.11] — 2026-05-27
 
 ### Expérience développeur — point d'entrée unifié et inspectabilité

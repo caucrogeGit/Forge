@@ -45,8 +45,8 @@ from forge_cli.help_dispatch import format_command_help, wants_help
 
 
 _FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"
-_FORGE_VERSION = "1.0.0b11"
-_FORGE_DEFAULT_REF = "v1.0.0-beta.11"
+_FORGE_VERSION = "1.0.0b12"
+_FORGE_DEFAULT_REF = "v1.0.0-beta.12"
 
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────
