@@ -160,4 +160,5 @@ Cet exemple reste volontairement simple. Sont **hors périmètre** :
   pas une dépendance de Forge ;
 - **Arduino R4 n'est pas couvert ici** (hors périmètre) — ce ticket
   cible l'ESP32, la cible la plus simple et la plus standard pour MQTT.
-  Une évaluation Arduino R4 fera l'objet d'un ticket dédié.
+  Voir l'[évaluation Arduino R4](arduino-r4-assessment.md) pour l'état de
+  cette piste.
