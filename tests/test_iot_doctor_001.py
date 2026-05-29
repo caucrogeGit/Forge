@@ -216,9 +216,10 @@ class TestMainEntry:
         capsys.readouterr()  # nettoyer la sortie
 
     def test_main_ignores_unknown_args(self, capsys):
-        # Les options --mqtt / --db viendront plus tard. Pour l'instant
-        # le doctor n'examine pas args (les ignore silencieusement).
-        rc = main(["--mqtt", "--db"])
+        # --mqtt reste réservé pour un ticket ultérieur, le doctor
+        # ignore silencieusement. --db est reconnu depuis
+        # IOT-DOCTOR-DB-001 → testé dans test_iot_doctor_db_001.py.
+        rc = main(["--mqtt", "--unknown-flag"])
         assert rc == 0
         capsys.readouterr()
 
@@ -280,21 +281,6 @@ class TestNoRealConnections:
         offenders = [line for line in import_lines if "paho" in line.lower()]
         assert not offenders, (
             f"doctor.py ne doit pas importer paho à ce ticket : {offenders}"
-        )
-
-    def test_doctor_does_not_import_db(self):
-        from forge_mvc_iot.cli import doctor as doctor_module
-        src = Path(doctor_module.__file__).read_text(encoding="utf-8")
-        import_lines = [
-            line for line in src.splitlines()
-            if line.lstrip().startswith(("import ", "from "))
-        ]
-        offenders = [
-            line for line in import_lines
-            if "core.database" in line or "import mariadb" in line
-        ]
-        assert not offenders, (
-            f"doctor.py ne doit pas importer la base à ce ticket : {offenders}"
         )
 
     def test_doctor_does_not_import_subscriber(self):

@@ -170,28 +170,33 @@ Suite recommandée:
 """,
     "iot:doctor": """\
 Usage:
-  forge iot:doctor
+  forge iot:doctor          # diagnostic statique (sans réseau, sans base)
+  forge iot:doctor --db     # + vérification de la table iot_events
 
 Description:
-  Diagnostic statique du module opt-in `forge-mvc-iot`. Ne se connecte
-  à aucun broker MQTT et à aucune base de données — utile avant un
-  starter pédagogique ou avant de brancher l'API HTTP IoT.
+  Diagnostic du module opt-in `forge-mvc-iot`. Par défaut, ne se
+  connecte à aucun broker MQTT et à aucune base de données — utile
+  avant un starter pédagogique ou avant de brancher l'API HTTP IoT.
 
-Vérifications:
+Vérifications statiques (toujours actives):
   - package `forge-mvc-iot` importable (et version) ;
   - configuration `load_iot_config()` chargeable, mot de passe masqué ;
   - fichier de migration `*_create_iot_events.sql` présent dans le
     package ;
   - fonction `register_iot_routes` exposée pour brancher l'API HTTP.
 
-Options:
-  (aucune à ce ticket)
+Vérification optionnelle (--db):
+  - connexion MariaDB Forge (via core.database.db.fetch_one) +
+    `SELECT COUNT(*) FROM iot_events`.
+  - Résultats :
+      [OK]   table accessible (N événement(s))
+      [WARN] table absente → lance forge iot:init && forge migration:apply
+      [FAIL] connexion MariaDB impossible (exit 1)
 
 Limites:
-  Les options `--mqtt` (test de connexion broker) et `--db` (test
-  SELECT sur `iot_events`) sont volontairement reportées à des
-  tickets ultérieurs pour ne pas mélanger diagnostic CLI, réseau MQTT
-  et base MariaDB dans une seule commande.
+  L'option `--mqtt` (test de connexion broker) reste volontairement
+  reportée à un ticket ultérieur pour ne pas mélanger diagnostic CLI
+  et réseau MQTT dans une seule commande.
 
 Code de sortie:
   0 si aucun check en erreur, 1 sinon. Les statuts `warn` et `skip`

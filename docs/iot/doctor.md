@@ -22,25 +22,29 @@ C'est l'étape recommandée **avant** un starter pédagogique
 ## Usage
 
 ```bash
-forge iot:doctor
+forge iot:doctor          # diagnostic statique (sans réseau ni base)
+forge iot:doctor --db     # + connexion MariaDB et SELECT COUNT(*) FROM iot_events
 ```
 
-Aucune option à ce ticket. Aide via :
+Aide via :
 
 ```bash
 forge iot:doctor --help
 ```
 
+L'option `--mqtt` reste réservée pour un ticket ultérieur (test de
+connexion broker).
+
 ## Vérifications
 
-| # | Vérification | Statut possible |
-|---|--------------|-----------------|
-| 1 | Package `forge-mvc-iot` importable (et version) | `ok` / `fail` |
-| 2 | `load_iot_config()` chargeable, mot de passe masqué | `ok` / `fail` |
-| 3 | Migration `*_create_iot_events.sql` présente dans le package | `ok` / `warn` |
-| 4 | `register_iot_routes` exposée | `ok` / `fail` |
-| 5 | Broker MQTT — **non testé** | `skip` |
-| 6 | Base `iot_events` — **non testée** | `skip` |
+| # | Vérification | Statut possible | Activée par |
+|---|--------------|-----------------|-------------|
+| 1 | Package `forge-mvc-iot` importable (et version) | `ok` / `fail` | toujours |
+| 2 | `load_iot_config()` chargeable, mot de passe masqué | `ok` / `fail` | toujours |
+| 3 | Migration `*_create_iot_events.sql` présente dans le package | `ok` / `warn` | toujours |
+| 4 | `register_iot_routes` exposée | `ok` / `fail` | toujours |
+| 5 | Broker MQTT — **non testé** | `skip` | (`--mqtt` à venir) |
+| 6 | Base `iot_events` accessible | `skip` / `ok` / `warn` / `fail` | `--db` |
 
 ### Codes de sortie
 
@@ -54,7 +58,7 @@ forge iot:doctor --help
 Le doctor exit 0 dès qu'aucun `fail` n'est remonté — un `warn` ou un
 `skip` ne casse pas la CI.
 
-## Sortie exemple
+## Sortie exemple — diagnostic statique
 
 ```text
 Forge IoT doctor
@@ -70,10 +74,53 @@ Forge IoT doctor
   [OK]    migration iot_events — présente (20260528120000_create_iot_events.sql)
   [OK]    API HTTP IoT — register_iot_routes disponible
   [SKIP]  broker MQTT — non testé à ce ticket (option --mqtt prévue dans un ticket ultérieur)
-  [SKIP]  base iot_events — non testée à ce ticket (option --db prévue dans un ticket ultérieur)
+  [SKIP]  base iot_events — non testée par défaut — passe --db pour vérifier l'accès à la table
 
 0 avertissement(s), 0 erreur(s), 2 info(s).
 ```
+
+## Sortie exemple — avec `--db`
+
+Table présente :
+
+```text
+  [OK]    base iot_events — table accessible (42 événement(s))
+```
+
+Table absente (migration pas appliquée) :
+
+```text
+  [WARN]  base iot_events — table absente ou migration non appliquée
+           Conseil : lance forge iot:init puis forge migration:apply
+```
+
+Le `--db` traite l'absence de table comme un **`warn`** (pas un `fail`) :
+le module est installé correctement, c'est juste l'étape « apply »
+qui manque. Exit code 0.
+
+Connexion MariaDB impossible :
+
+```text
+  [FAIL]  base iot_events — connexion MariaDB impossible — OperationalError: Can't connect to MySQL server on 'localhost' (111)
+```
+
+Cas typiques : MariaDB pas démarré, mauvais host/port, identifiants
+refusés, base inexistante. Exit code 1. Le mot de passe n'est jamais
+inclus dans le message — les drivers MariaDB n'incluent que `using
+password: YES/NO`, sans la valeur.
+
+## Parcours recommandé
+
+```bash
+forge iot:doctor          # 1. diagnostic statique
+forge iot:init            # 2. copier la migration vers mvc/migrations/
+forge migration:apply     # 3. créer la table iot_events en base
+forge iot:doctor --db     # 4. confirmer que la table est lisible
+forge run                 # 5. démarrer
+```
+
+Chaque étape produit un signal clair avant la suivante — pas besoin
+de deviner ce qui manque.
 
 Avec un username/password configurés :
 
