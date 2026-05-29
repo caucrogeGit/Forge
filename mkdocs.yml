@@ -189,6 +189,7 @@ nav:
       - Écoute (iot:listen): iot/listen-command.md
       - Mosquitto local: iot/mosquitto-local.md
       - Smoke test local: iot/local-smoke-test.md
+      - Pour Bac Pro / BTS CIEL: iot/bts-ciel.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md

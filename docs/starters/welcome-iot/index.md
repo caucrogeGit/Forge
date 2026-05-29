@@ -231,5 +231,9 @@ forge iot:simulate --count 3 --interval 1   # publier 3 mesures factices
 curl http://localhost:8000/api/iot/events   # relire les mesures stockées
 ```
 
+Pour un usage en classe (Bac Pro / BTS CIEL), voir
+[Forge IoT pour Bac Pro / BTS CIEL](../../iot/bts-ciel.md) : flux
+expliqué et activités prêtes à l'emploi.
+
 [Architecture Forge IoT](../../iot/architecture.md) liste les tickets
 restants (capteurs simulés, dashboard, downlink, …).

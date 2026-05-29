@@ -12,6 +12,9 @@ Permettre à Forge de devenir une brique utile pour des projets IoT
 éducatives) **sans transformer le framework en plateforme IoT
 monolithique**.
 
+Pour une entrée pédagogique orientée enseignement, voir
+[Forge IoT pour Bac Pro / BTS CIEL](bts-ciel.md).
+
 Forge IoT doit rester :
 
 - explicite (pas de magie cachée derrière les messages MQTT) ;
