@@ -1258,10 +1258,15 @@ les fichiers absents (`optins/__init__.py`, `optins/registry.py`,
 fichier déjà présent et identique → `[OK] déjà présent` ; présent mais
 différent → `[WARN]`, **aucune écriture**.
 
-> **La commande crée la structure locale `optins/iot/`, mais ne modifie
-> pas automatiquement `mvc/routes.py` dans cette première version.** Elle
-> affiche l'instruction à ajouter (`from optins.registry import
-> register_optins` + `register_optins(router)`).
+**Branchement `mvc/routes.py`** (depuis `OPTINS-CLI-ENABLE-ROUTES-APPLY-001`) :
+avec `--apply`, la commande peut brancher `mvc/routes.py` **uniquement si
+sa structure est reconnue** (présence de `router = Router()`) — elle
+ajoute alors l'import `from optins.registry import register_optins` et
+l'appel `register_optins(router)`. Si le fichier a déjà l'appel → `[OK]
+déjà branché` (idempotent, pas de doublon). Si la structure est
+**ambiguë** (ou le fichier absent) → `[WARN]` + **aucune modification**,
+l'instruction manuelle est affichée. En dry-run, le branchement est
+seulement annoncé. Pas de marqueurs, pas de découverte automatique.
 
 Le branchement reste **explicite**, sans découverte automatique ; Forge
 Core ne dépend pas des opt-ins. Le paquet doit être installé

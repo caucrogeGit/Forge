@@ -7,11 +7,16 @@
 > du paquet `forge-mvc-iot`. L'implémentation fera l'objet du ticket
 > `OPTINS-CLI-ENABLE-IOT-001`, **après validation de ce contrat**.
 
-!!! success "Implémenté pour `iot` (OPTINS-CLI-ENABLE-IOT-001)"
+!!! success "Implémenté pour `iot` (OPTINS-CLI-ENABLE-IOT-001 + OPTINS-CLI-ENABLE-ROUTES-APPLY-001)"
     Ce contrat est désormais **réalisé** pour le premier opt-in :
     `forge optin:enable iot` existe (dry-run par défaut, `--apply` pour
-    écrire, idempotent, `mvc/routes.py` non modifié automatiquement). Ce
-    document reste la **référence de conception** ; voir la
+    écrire, idempotent). Le branchement de `mvc/routes.py` est implémenté
+    par `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` : insertion **uniquement si
+    la structure est reconnue** (`router = Router()`), **sans marqueurs**
+    (l'idempotence repose sur la présence de l'appel `register_optins`) ;
+    structure ambiguë ou fichier absent → `[WARN]` + instruction
+    manuelle, aucune écriture. Ce document reste la **référence de
+    conception** ; voir la
     [référence CLI](../reference/cli-commands.md#opt-ins-branchement-projet).
     Les autres opt-ins (`rbac`, `media`…) restent à venir.
 
@@ -143,17 +148,21 @@ réécriture.
 ### `mvc/routes.py`
 
 C'est le point le plus sensible (code utilisateur, charte v2 §9).
-Politique retenue :
+Politique **retenue et implémentée** (`OPTINS-CLI-ENABLE-ROUTES-APPLY-001`) :
 
-- **par défaut** : la commande **n'écrit pas** dans `mvc/routes.py` —
-  elle **affiche** l'instruction exacte à ajouter
-  (`from optins.registry import register_optins` + `register_optins(router)`) ;
-- **avec `--apply`** (ou un état de fichier **reconnu et non ambigu**) :
-  elle peut insérer le branchement, **idempotemment**, entre des
-  marqueurs dédiés (style `# forge-optin:iot:start/end`, cohérent avec
-  les snippets de starters) ;
-- si `mvc/routes.py` a une **structure non reconnue** → **WARN +
-  instruction manuelle**, jamais d'insertion « au jugé ».
+- **en dry-run** : la commande **n'écrit pas** dans `mvc/routes.py` —
+  elle annonce le branchement (`serait branché`) ;
+- **avec `--apply`, si la structure est reconnue** (présence de
+  `router = Router()`, même heuristique que `make:public-page`) : elle
+  insère l'import `from optins.registry import register_optins` (près des
+  imports) et l'appel `register_optins(router)` (en fin de fichier),
+  **idempotemment** ;
+- **sans marqueurs** : l'idempotence repose sur la présence de l'appel
+  `register_optins(router)` (un 2e `--apply` ne duplique rien). Choix
+  délibéré pour ne pas ajouter de bruit `# forge-optin: …` dans le
+  fichier utilisateur ;
+- si `mvc/routes.py` a une **structure non reconnue** (ou est absent) →
+  **WARN + instruction manuelle**, jamais d'insertion « au jugé ».
 
 ### `mvc/migrations/`
 
@@ -184,8 +193,9 @@ Règles :
 
 - aucun **doublon** dans `optins/registry.py` (l'appel `register_iot`
   n'est ajouté qu'une fois) ;
-- aucun **doublon** dans `mvc/routes.py` (le branchement entre marqueurs
-  n'est inséré qu'une fois) ;
+- aucun **doublon** dans `mvc/routes.py` (l'import et l'appel
+  `register_optins(router)` ne sont insérés qu'une fois ; si l'appel est
+  déjà là → `[OK] déjà branché`) ;
 - un fichier **déjà présent et identique** → `[OK]` silencieux, exit 0 ;
 - un fichier **présent mais différent** → voir conflits.
 

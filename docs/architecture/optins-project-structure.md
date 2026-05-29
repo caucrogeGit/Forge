@@ -247,6 +247,9 @@ Ce ticket **pose le contrat**. Ne sont **pas** faits ici :
   (commande cible, idempotence, dry-run, gestion des conflits, sans
   discovery ni écrasement silencieux).
 - `OPTINS-CLI-ENABLE-IOT-001` (**livré**) — implémente
-  `forge optin:enable iot` (dry-run par défaut, `--apply`, idempotent,
-  `mvc/routes.py` non modifié automatiquement). Voir la
+  `forge optin:enable iot` (dry-run par défaut, `--apply`, idempotent).
+  Voir la
   [référence CLI](../reference/cli-commands.md#opt-ins-branchement-projet).
+- `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` (**livré**) — `--apply` branche
+  `mvc/routes.py` **si la structure est reconnue** (`router = Router()`),
+  sinon `[WARN]` + instruction manuelle (aucune modification).

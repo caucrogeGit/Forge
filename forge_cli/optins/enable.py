@@ -189,28 +189,96 @@ SUPPORTED_OPTINS: dict[str, dict] = {
 }
 
 
-# ── Branchement mvc/routes.py (affiché, jamais appliqué) ─────────────────────
+# ── Branchement mvc/routes.py (insertion prudente, OPTINS-CLI-ENABLE-ROUTES-APPLY-001) ──
+#
+# Le branchement n'est appliqué QUE si la structure du fichier est
+# **reconnue** : présence de `router = Router()` (forme canonique des
+# projets Forge, même heuristique que `make:public-page`). Sinon, on
+# n'écrit rien et on affiche l'instruction manuelle. Pas de marqueurs
+# (l'idempotence repose sur la présence de l'appel `register_optins`),
+# pas de parsing AST, pas de discovery.
 
-_ROUTES_INSTRUCTION = (
-    "    from optins.registry import register_optins\n"
-    "\n"
-    "    register_optins(router)"
-)
-
-
-def _print_routes_instruction() -> None:
-    print("")
-    print(
-        f"{STATUS_INFO} Branche les opt-ins dans mvc/routes.py "
-        "(non modifié automatiquement) :"
-    )
-    print("")
-    for line in _ROUTES_INSTRUCTION.splitlines():
-        print(f"    {line}")
+_ROUTES_REL = "mvc/routes.py"
+_ROUTES_IMPORT = "from optins.registry import register_optins"
+_ROUTES_CALL = "register_optins(router)"
+_ROUTES_ANCHOR = "router = Router()"
 
 
 def _is_package_available(import_name: str) -> bool:
     return importlib.util.find_spec(import_name) is not None
+
+
+def _ensure_trailing_newline(text: str) -> str:
+    return text if text.endswith("\n") else text + "\n"
+
+
+def _insert_import(content: str, import_line: str) -> str:
+    """Insère ``import_line`` après le dernier import en tête de fichier.
+
+    No-op si l'import est déjà présent (pas de doublon). Logique alignée
+    sur ``forge_cli.public_page._insert_import``.
+    """
+    if import_line in content:
+        return content
+    lines = _ensure_trailing_newline(content).splitlines(keepends=True)
+    insert_at = 0
+    for index, line in enumerate(lines):
+        if line.startswith("from ") or line.startswith("import "):
+            insert_at = index + 1
+            continue
+        if line.strip() == "":
+            continue
+        break
+    lines.insert(insert_at, import_line + "\n")
+    return "".join(lines)
+
+
+def _print_manual_routes_instruction() -> None:
+    print("       Ajoute manuellement :")
+    print("")
+    print(f"       {_ROUTES_IMPORT}")
+    print(f"       {_ROUTES_CALL}")
+
+
+def _branch_routes(routes_path: Path, *, apply: bool) -> None:
+    """Branche (ou propose de brancher) les opt-ins dans ``mvc/routes.py``.
+
+    Prudent : ne modifie que si la structure est reconnue
+    (``router = Router()``). Idempotent : ne touche rien si l'appel
+    ``register_optins(router)`` est déjà présent. N'affecte pas le code
+    de sortie (avertissement informatif).
+    """
+    if not routes_path.exists():
+        print(f"{STATUS_WARN} {_ROUTES_REL} introuvable — aucune modification.")
+        _print_manual_routes_instruction()
+        return
+
+    content = routes_path.read_text(encoding="utf-8")
+
+    if _ROUTES_CALL in content:
+        print(f"{STATUS_OK} {_ROUTES_REL} déjà branché")
+        return
+
+    if _ROUTES_ANCHOR not in content:
+        print(
+            f"{STATUS_WARN} {_ROUTES_REL} n'a pas une structure reconnue."
+        )
+        print("       Aucune modification automatique.")
+        _print_manual_routes_instruction()
+        return
+
+    # Structure reconnue.
+    if not apply:
+        print(
+            f"{STATUS_DRYRUN} {_ROUTES_REL} serait branché "
+            f"(import + {_ROUTES_CALL})"
+        )
+        return
+
+    new_content = _insert_import(content, _ROUTES_IMPORT)
+    new_content = _ensure_trailing_newline(new_content) + f"\n{_ROUTES_CALL}\n"
+    routes_path.write_text(new_content, encoding="utf-8")
+    print(f"{STATUS_OK} {_ROUTES_REL} branché (import + {_ROUTES_CALL})")
 
 
 def enable_optin(
@@ -274,7 +342,8 @@ def enable_optin(
         else:
             print(f"{STATUS_DRYRUN} {rel} serait créé")
 
-    _print_routes_instruction()
+    print("")
+    _branch_routes(project_root / "mvc" / "routes.py", apply=apply)
 
     print("")
     if not apply:
