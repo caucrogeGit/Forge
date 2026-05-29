@@ -388,6 +388,14 @@ class TestMainWithMqttFlag:
 
         monkeypatch.setattr(doctor_module, "check_mqtt_broker", _fake_mqtt)
         monkeypatch.setattr(doctor_module, "check_database_table", _fake_db)
+        # Table ok → le contrôle de schéma est aussi déclenché (IOT-DOCTOR-
+        # SCHEMA-001) : on le stubbe pour rester hors-ligne dans ce test.
+        monkeypatch.setattr(
+            doctor_module, "check_database_schema",
+            lambda **kw: CheckResult(
+                status="ok", label="schéma iot_events", detail="conforme",
+            ),
+        )
         rc = main(["--db", "--mqtt"])
         out = capsys.readouterr().out
         assert mqtt_called == [True]

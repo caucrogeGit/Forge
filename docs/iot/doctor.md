@@ -48,6 +48,7 @@ sont pas passées, aucune connexion réseau ou base n'est tentée.
 | 4 | `register_iot_routes` exposée | `ok` / `fail` | toujours |
 | 5 | Broker MQTT joignable | `skip` / `ok` / `fail` | `--mqtt` |
 | 6 | Base `iot_events` accessible | `skip` / `ok` / `warn` / `fail` | `--db` |
+| 7 | Schéma `iot_events` conforme au contrat | `ok` / `warn` / `fail` | `--db` (si table accessible) |
 
 ### Codes de sortie
 
@@ -84,11 +85,15 @@ Forge IoT doctor
 
 ## Sortie exemple — avec `--db`
 
-Table présente :
+Table présente et schéma conforme :
 
 ```text
   [OK]    base iot_events — table accessible (42 événement(s))
+  [OK]    schéma iot_events — conforme
 ```
+
+Le contrôle de schéma (ligne 7) n'est lancé **que** si la table est
+accessible — voir [Vérification du schéma `iot_events`](#verification-du-schema-iot_events).
 
 Table absente (migration pas appliquée) :
 
@@ -111,6 +116,77 @@ Cas typiques : MariaDB pas démarré, mauvais host/port, identifiants
 refusés, base inexistante. Exit code 1. Le mot de passe n'est jamais
 inclus dans le message — les drivers MariaDB n'incluent que `using
 password: YES/NO`, sans la valeur.
+
+## Vérification du schéma `iot_events`
+
+> **Statut** : `IOT-DOCTOR-SCHEMA-001`.
+
+`forge iot:doctor --db` vérifie deux choses :
+
+1. que la table `iot_events` est **accessible** (`SELECT COUNT(*)`) ;
+2. que ses **colonnes principales** correspondent au contrat Forge IoT
+   (types SQL, nullabilité, `AUTO_INCREMENT` de `id`).
+
+Le contrôle de schéma s'appuie sur `INFORMATION_SCHEMA.COLUMNS` (plus
+propre et plus testable qu'un parsing de `SHOW CREATE TABLE`). Il n'est
+lancé **que si la table est accessible** : table absente ou connexion
+impossible sont déjà signalées par la ligne précédente, sans bruit
+redondant.
+
+### Contrat vérifié
+
+| Colonne | Type attendu | Nullabilité |
+|---------|--------------|-------------|
+| `id` | `BIGINT UNSIGNED AUTO_INCREMENT` | `NOT NULL` |
+| `site` | `VARCHAR(64)` | `NOT NULL` |
+| `device_id` | `VARCHAR(64)` | `NOT NULL` |
+| `kind` | `VARCHAR(64)` | `NOT NULL` |
+| `value` | `DOUBLE` | `NOT NULL` |
+| `unit` | `VARCHAR(32)` | `NOT NULL` |
+| `timestamp` | `VARCHAR(40)` | `NOT NULL` |
+| `metadata_json` | `TEXT` | `NULL` |
+| `received_at` | `DATETIME(6)` | `NOT NULL` |
+
+Une colonne **supplémentaire** (non prévue par le contrat) est
+**tolérée** : une migration future peut en ajouter sans casser le
+contrat actuel. Les colonnes manquantes ou incompatibles sont le vrai
+problème.
+
+### Exemple — schéma conforme
+
+```bash
+forge iot:doctor --db
+```
+
+```text
+  [OK]    base iot_events — table accessible (0 événement(s))
+  [OK]    schéma iot_events — conforme
+```
+
+Exit code 0.
+
+### Exemple — colonne manquante
+
+```text
+  [WARN]  schéma iot_events — colonne manquante : metadata_json
+           Conseil : vérifie la migration Forge IoT ou recrée la table dans un environnement de test.
+```
+
+### Exemple — type inattendu
+
+```text
+  [WARN]  schéma iot_events — type inattendu pour value : attendu DOUBLE, obtenu VARCHAR(255)
+```
+
+Une divergence (colonne manquante, type ou nullabilité inattendus, `id`
+sans `AUTO_INCREMENT`) est un **`warn`**, jamais un `fail` : la base est
+joignable, le problème est réparable. Le `fail` reste réservé aux
+erreurs bloquantes — connexion impossible ou lecture
+`INFORMATION_SCHEMA` impossible. Exit code 0 pour un `warn`.
+
+> **Le doctor diagnostique, il ne répare pas.** Aucun `ALTER TABLE`,
+> aucune migration ni recréation de table n'est déclenché — voir
+> [Limites](#limites).
 
 ## Sortie exemple — avec `--mqtt`
 
@@ -240,6 +316,15 @@ Sont volontairement **hors périmètre**, y compris pour `--mqtt` :
 - pas de vérification de la version du contrat MQTT déployé côté
   capteurs ;
 - pas de TLS ni d'audit des permissions ACL Mosquitto avancées.
+
+Côté `--db` et contrôle de schéma, sont aussi **hors périmètre** :
+
+- aucune réparation : pas d'`ALTER TABLE`, pas de migration ni de
+  recréation de table déclenchée par le doctor ;
+- pas de gestion multi-version du schéma, pas de comparaison de hash de
+  migration ;
+- pas d'audit SQL complet (collation, moteur, index secondaires
+  au-delà du contrat de colonnes).
 
 Chacun de ces points peut justifier sa propre option / commande pour
 rester lisible et localement testable.

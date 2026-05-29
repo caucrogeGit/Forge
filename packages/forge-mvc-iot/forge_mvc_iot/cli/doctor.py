@@ -41,6 +41,7 @@ __all__ = [
     "check_migration_present",
     "check_http_api_registrable",
     "check_database_table",
+    "check_database_schema",
     "check_mqtt_broker",
     "info_mqtt_not_tested",
     "info_db_not_tested",
@@ -288,6 +289,203 @@ def check_database_table(fetch_one_func=None) -> CheckResult:
     )
 
 
+# ── Vérification du schéma iot_events (IOT-DOCTOR-SCHEMA-001) ────────────────
+#
+# Le contrat ci-dessous reflète la migration *_create_iot_events.sql et le
+# contrat figé par IOT-STORAGE-EVENTS-001. Il est volontairement diagnostique :
+# une divergence donne un WARN clair, jamais une réparation automatique.
+
+
+@dataclass(frozen=True)
+class _ColumnContract:
+    """Contrat attendu pour une colonne de ``iot_events``.
+
+    - ``data_type`` : valeur attendue de ``INFORMATION_SCHEMA.DATA_TYPE``
+      (minuscule, ex. ``varchar``, ``bigint``, ``double``) ;
+    - ``display``   : forme lisible attendue affichée dans les messages
+      (ex. ``VARCHAR(64)``, ``BIGINT UNSIGNED``) ; sert aussi de référence
+      de longueur / précision pour ``varchar`` et ``datetime`` ;
+    - ``nullable``  : ``True`` si la colonne doit accepter ``NULL`` ;
+    - ``unsigned`` / ``auto_increment`` : attributs supplémentaires
+      vérifiés via ``COLUMN_TYPE`` et ``EXTRA``.
+    """
+
+    name: str
+    data_type: str
+    display: str
+    nullable: bool
+    unsigned: bool = False
+    auto_increment: bool = False
+
+
+# Ordre canonique aligné sur la migration (id en tête, puis COLUMNS).
+_SCHEMA_CONTRACT: tuple[_ColumnContract, ...] = (
+    _ColumnContract("id", "bigint", "BIGINT UNSIGNED", nullable=False,
+                    unsigned=True, auto_increment=True),
+    _ColumnContract("site", "varchar", "VARCHAR(64)", nullable=False),
+    _ColumnContract("device_id", "varchar", "VARCHAR(64)", nullable=False),
+    _ColumnContract("kind", "varchar", "VARCHAR(64)", nullable=False),
+    _ColumnContract("value", "double", "DOUBLE", nullable=False),
+    _ColumnContract("unit", "varchar", "VARCHAR(32)", nullable=False),
+    _ColumnContract("timestamp", "varchar", "VARCHAR(40)", nullable=False),
+    _ColumnContract("metadata_json", "text", "TEXT", nullable=True),
+    _ColumnContract("received_at", "datetime", "DATETIME(6)", nullable=False),
+)
+
+_SCHEMA_HINT = (
+    "Conseil : vérifie la migration Forge IoT ou recrée la table "
+    "dans un environnement de test."
+)
+
+
+def _row_value(row: Mapping[str, Any], key: str) -> str:
+    """Lit une colonne INFORMATION_SCHEMA quelle que soit la casse de la clé.
+
+    Selon le connecteur, les clés peuvent être renvoyées en majuscules
+    (``COLUMN_NAME``) ou minuscules (``column_name``). On normalise.
+    """
+    for candidate in (key, key.lower(), key.upper()):
+        if candidate in row:
+            value = row[candidate]
+            return "" if value is None else str(value)
+    return ""
+
+
+def _type_matches(contract: _ColumnContract, data_type: str, column_type: str) -> bool:
+    """Vérifie que le type SQL observé respecte le contrat.
+
+    Comparaison tolérante à la largeur d'affichage des entiers
+    (``bigint(20)`` vs ``bigint``) : pour ``bigint`` on s'appuie sur
+    ``data_type`` + l'attribut ``unsigned``. Pour ``varchar`` et
+    ``datetime``, la longueur / précision est significative et comparée
+    à ``display``.
+    """
+    dt = data_type.strip().lower()
+    ct = column_type.strip().lower()
+    if dt != contract.data_type:
+        return False
+    if contract.unsigned != ("unsigned" in ct):
+        return False
+    expected = contract.display.lower()
+    if contract.data_type in ("varchar", "char", "datetime"):
+        return ct == expected
+    # bigint / double / text : data_type (+ unsigned déjà vérifié) suffit.
+    return True
+
+
+def check_database_schema(*, fetch_all_func=None) -> CheckResult:
+    """Vérifie que le schéma réel de ``iot_events`` respecte le contrat IoT.
+
+    Lit ``INFORMATION_SCHEMA.COLUMNS`` (plus propre et plus testable qu'un
+    parsing de ``SHOW CREATE TABLE``) et compare colonnes, types, nullabilité
+    et l'``AUTO_INCREMENT`` de ``id`` au contrat ``_SCHEMA_CONTRACT``.
+
+    Le paramètre ``fetch_all_func`` permet l'injection en test (mock). Par
+    défaut, utilise ``core.database.db.fetch_all`` — import différé, comme
+    ``check_database_table``.
+
+    Retourne :
+
+    - ``ok``   si toutes les colonnes attendues sont conformes ;
+    - ``warn`` si une colonne manque, a un type / nullable inattendu, ou si
+      ``id`` n'est pas ``AUTO_INCREMENT`` — problèmes réparables, la base
+      reste joignable ;
+    - ``fail`` uniquement si la lecture système échoue (driver introuvable,
+      requête ``INFORMATION_SCHEMA`` impossible).
+
+    Les colonnes **supplémentaires** (non prévues par le contrat) sont
+    tolérées : une migration future peut en ajouter sans casser le contrat
+    actuel.
+    """
+    if fetch_all_func is None:
+        try:
+            from core.database.db import fetch_all as fetch_all_func  # noqa: PLC0415
+        except ImportError as exc:
+            return CheckResult(
+                status="fail",
+                label="schéma iot_events",
+                detail=f"core.database.db introuvable : {exc}",
+            )
+
+    sql = (
+        "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_TYPE, IS_NULLABLE, EXTRA "
+        "FROM INFORMATION_SCHEMA.COLUMNS "
+        "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'iot_events' "
+        "ORDER BY ORDINAL_POSITION"
+    )
+    try:
+        rows = fetch_all_func(sql, ())
+    except Exception as exc:
+        # Échec de lecture système (connexion, droits sur INFORMATION_SCHEMA).
+        # Message sobre : type d'erreur, pas de stacktrace ni de SQL brut.
+        return CheckResult(
+            status="fail",
+            label="schéma iot_events",
+            detail=f"lecture du schéma impossible — {type(exc).__name__}: {exc}",
+        )
+
+    rows = rows or []
+    observed = {_row_value(r, "COLUMN_NAME"): r for r in rows}
+
+    if not observed:
+        # Aucune colonne : la table n'existe pas (ou plus). Le check
+        # check_database_table couvre déjà ce cas en amont — on reste sobre.
+        return CheckResult(
+            status="warn",
+            label="schéma iot_events",
+            detail="table absente ou migration non appliquée",
+            lines=(_SCHEMA_HINT,),
+        )
+
+    issues: list[str] = []
+    for contract in _SCHEMA_CONTRACT:
+        row = observed.get(contract.name)
+        if row is None:
+            issues.append(f"colonne manquante : {contract.name}")
+            continue
+
+        data_type = _row_value(row, "DATA_TYPE")
+        column_type = _row_value(row, "COLUMN_TYPE")
+        is_nullable = _row_value(row, "IS_NULLABLE")
+        extra = _row_value(row, "EXTRA")
+
+        if not _type_matches(contract, data_type, column_type):
+            observed_type = column_type.upper() if column_type else data_type.upper()
+            issues.append(
+                f"type inattendu pour {contract.name} : "
+                f"attendu {contract.display}, obtenu {observed_type}"
+            )
+
+        observed_nullable = is_nullable.strip().upper() == "YES"
+        if observed_nullable != contract.nullable:
+            attendu = "NULL" if contract.nullable else "NOT NULL"
+            obtenu = "NULL" if observed_nullable else "NOT NULL"
+            issues.append(
+                f"nullable inattendu pour {contract.name} : "
+                f"attendu {attendu}, obtenu {obtenu}"
+            )
+
+        if contract.auto_increment and "auto_increment" not in extra.lower():
+            issues.append(
+                f"{contract.name} sans AUTO_INCREMENT — "
+                f"la colonne {contract.name} doit être AUTO_INCREMENT"
+            )
+
+    if not issues:
+        return CheckResult(
+            status="ok",
+            label="schéma iot_events",
+            detail="conforme",
+        )
+
+    return CheckResult(
+        status="warn",
+        label="schéma iot_events",
+        detail=issues[0],
+        lines=tuple(issues[1:]) + (_SCHEMA_HINT,),
+    )
+
+
 def _default_mqtt_client_factory(config) -> Any:
     """Construit le client ``paho-mqtt`` par défaut pour le diagnostic.
 
@@ -430,15 +628,29 @@ def run_all(
     test_mqtt: bool = False,
 ) -> list[CheckResult]:
     mqtt_check = _mqtt_check(env) if test_mqtt else info_mqtt_not_tested()
-    db_check = check_database_table() if test_db else info_db_not_tested()
+    db_checks = _db_checks() if test_db else [info_db_not_tested()]
     return [
         check_package_importable(),
         check_config_loadable(env),
         check_migration_present(),
         check_http_api_registrable(),
         mqtt_check,
-        db_check,
+        *db_checks,
     ]
+
+
+def _db_checks() -> list[CheckResult]:
+    """Exécute les vérifications base déclenchées par ``--db``.
+
+    Le contrôle de schéma (``check_database_schema``) n'est lancé **que** si
+    la table est accessible : si elle est absente ou la connexion impossible,
+    ``check_database_table`` porte déjà le message (WARN / FAIL) et le schéma
+    ne ré-émet pas de bruit redondant.
+    """
+    table_check = check_database_table()
+    if table_check.status != "ok":
+        return [table_check]
+    return [table_check, check_database_schema()]
 
 
 def _mqtt_check(env: Mapping[str, str] | None) -> CheckResult:

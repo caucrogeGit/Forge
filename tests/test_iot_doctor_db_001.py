@@ -214,6 +214,14 @@ class TestRunAllToggle:
         monkeypatch.setattr(
             doctor_module, "check_database_table", _fake_check,
         )
+        # Table ok → le contrôle de schéma est aussi déclenché ;
+        # on le stubbe pour ne toucher aucune base réelle.
+        monkeypatch.setattr(
+            doctor_module, "check_database_schema",
+            lambda **kw: CheckResult(
+                status="ok", label="schéma iot_events", detail="conforme",
+            ),
+        )
         results = run_all(test_db=True)
         assert called == [True]
         db_result = next(r for r in results if r.label == "base iot_events")
@@ -238,6 +246,14 @@ class TestMainWithDbFlag:
 
         monkeypatch.setattr(
             doctor_module, "check_database_table", _fake_check,
+        )
+        # Table ok → schéma vérifié aussi : on le stubbe pour rester
+        # hors-ligne dans ce test.
+        monkeypatch.setattr(
+            doctor_module, "check_database_schema",
+            lambda **kw: CheckResult(
+                status="ok", label="schéma iot_events", detail="conforme",
+            ),
         )
         rc = main(["--db"])
         out = capsys.readouterr().out

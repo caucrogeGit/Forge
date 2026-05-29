@@ -196,6 +196,12 @@ Vérification optionnelle (--db):
       [OK]   table accessible (N événement(s))
       [WARN] table absente → lance forge iot:init && forge migration:apply
       [FAIL] connexion MariaDB impossible (exit 1)
+  - Si la table est accessible, le schéma réel est aussi comparé au
+    contrat Forge IoT (colonnes, types, nullabilité, AUTO_INCREMENT)
+    via INFORMATION_SCHEMA :
+      [OK]   schéma iot_events — conforme
+      [WARN] colonne manquante / type ou nullable inattendu (exit 0)
+  - Diagnostic seulement : aucun ALTER TABLE, aucune migration auto.
 
 Vérification optionnelle (--mqtt):
   - connexion brève au broker MQTT configuré (paho-mqtt) : ouverture
