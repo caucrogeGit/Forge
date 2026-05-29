@@ -221,9 +221,18 @@ def test_doc_profiles_mentionne_correspondance_starters():
 
 
 def test_readme_mentionne_option_profile():
-    """README.md mentionne l'option --profile."""
+    """L'option `--profile` reste documentée.
+
+    Le README public simplifié délègue le détail des profils au site de
+    doc : on vérifie que `--profile` est documenté dans le README **ou**
+    dans `docs/profiles.md` (page de référence des profils).
+    """
     content = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert "--profile" in content
+    profiles_doc = ROOT / "docs" / "profiles.md"
+    documented = "--profile" in content or (
+        profiles_doc.exists() and "--profile" in profiles_doc.read_text(encoding="utf-8")
+    )
+    assert documented
 
 
 # ── Séparation Forge Design ────────────────────────────────────────────────────

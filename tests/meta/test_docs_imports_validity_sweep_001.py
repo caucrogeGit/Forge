@@ -74,11 +74,19 @@ _USER_PROJECT_ROOTS = frozenset({
     # voir `docs/module-author-guide.md`). Les modules concrets vivent dans
     # le projet, pas dans le repo Forge.
     "modules",
+    # `optins/` est la couche de branchement local des opt-ins, générée
+    # dans le projet utilisateur (voir docs/architecture/optins-project-structure.md).
+    # Le code `optins.*` n'existe pas dans le repo Forge — c'est de
+    # l'illustration projet, comme `mvc.*`.
+    "optins",
 })
 _FRAMEWORK_ROOTS = frozenset({
     "core",
     "forge_mvc_mfa", "forge_mvc_rbac", "forge_mvc_workflow",
     "forge_mvc_stats", "forge_mvc_media",
+    # forge-mvc-iot : paquet opt-in framework au même titre que ses frères
+    # ci-dessus (oublié à l'ajout du chantier IoT).
+    "forge_mvc_iot",
     "forge_cli",
     # `integrations/` est dans le repo Forge (Jinja2 renderer, etc.).
     "integrations",

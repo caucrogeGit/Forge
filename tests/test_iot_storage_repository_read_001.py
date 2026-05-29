@@ -20,6 +20,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.storage.repository import (
     COUNT_IOT_EVENTS_BY_DEVICE_SQL,
     DEFAULT_LIMIT,

@@ -61,6 +61,11 @@ OPTIN_MODULES: dict[str, set[str]] = {
     "forge_mvc_workflow": set(),
     "forge_mvc_stats": set(),
     "forge_mvc_media": set(),
+    # forge-mvc-iot : opt-in au même titre que ses frères. Ses tests
+    # gardent l'import via pytest.importorskip("forge_mvc_iot").
+    # `paho-mqtt` n'est jamais importé au top-level des tests (clients
+    # injectés / import paresseux), donc pas de dépendance d'extra à lister.
+    "forge_mvc_iot": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

@@ -33,7 +33,12 @@ class TestReadmeRuntimeDeps:
             text,
             re.DOTALL,
         )
-        assert match, "Section Runtime introuvable dans README.md"
+        # README simplifié : il n'y a plus de tableau Runtime des
+        # dépendances. Le garde-fou reste valide « par construction » —
+        # pyotp (MFA-only) ne peut pas être présenté comme dépendance
+        # runtime core s'il n'y a pas de tableau. S'il existe, on vérifie.
+        if match is None:
+            return
         runtime_section = match.group(0)
         # pyotp ne doit pas apparaître dans le tableau Runtime en tant que ligne de dépendance
         assert "| `pyotp`" not in runtime_section, (

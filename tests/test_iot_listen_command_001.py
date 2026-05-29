@@ -22,6 +22,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.cli import listen as listen_module
 from forge_mvc_iot.cli.listen import main, run_listener
 from forge_mvc_iot.config import IotConfig

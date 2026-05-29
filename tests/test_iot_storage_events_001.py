@@ -20,6 +20,10 @@ import re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.mqtt.contract import Measurement
 from forge_mvc_iot.storage import events as storage_events
 from forge_mvc_iot.storage.events import (

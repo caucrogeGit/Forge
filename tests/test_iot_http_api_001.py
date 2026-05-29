@@ -19,6 +19,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from core.http.router import Router
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.http import (
     ERROR_INTERNAL,
     ERROR_INVALID_LIMIT,

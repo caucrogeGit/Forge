@@ -21,6 +21,7 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-stats":    "Development Status :: 4 - Beta",
     "forge-mvc-mfa":      "Development Status :: 3 - Alpha",
     "forge-mvc-media":    "Development Status :: 3 - Alpha",
+    "forge-mvc-iot":      "Development Status :: 1 - Planning",
 }
 
 

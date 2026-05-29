@@ -47,7 +47,7 @@ def test_starter_list_affiche_les_4_niveaux(capsys):
 def test_starter_list_contient_docs_urls(capsys):
     cmd_starter_list()
     output = capsys.readouterr().out
-    assert "caucrogegit.github.io" in output
+    assert "forgemvc.com" in output
     assert "starters/" in output
 
 

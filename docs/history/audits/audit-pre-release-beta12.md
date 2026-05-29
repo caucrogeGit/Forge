@@ -5,6 +5,18 @@
 > publication. Ce document **dit si on est prêt** ; il ne fait pas la
 > release. Instantané pris après `712d008` (`OPTINS-CLOSING-AUDIT-001`).
 
+!!! success "Suivi — RELEASE-BETA12-FULLSUITE-FIX-001 (résolu)"
+    Le verdict ci-dessous (**NO-GO**, 56 échecs) est l'instantané au
+    moment de l'audit. Le ticket de correction `RELEASE-BETA12-FULLSUITE-FIX-001`
+    a ramené la suite complète à **0 échec** (`16613 passed, 7 skipped`) :
+    les ~41 échecs introduits par les chantiers IoT/opt-ins ont été
+    corrigés (allow-lists `forge_mvc_iot`/`optins`, `importorskip` dans
+    les tests IoT, `release-local.md` starter 15, classifier PyPI
+    `forge-mvc-iot`, version `{{forge_version}}` dans `doctor.md`), et la
+    baseline pré-existante (migration `forgemvc.com`, README simplifié) a
+    été traitée en alignant les garde-fous stale sur l'état canonique
+    (sans les supprimer). La voie est libre pour `RELEASE-BETA12-001`.
+
 ## Verdict
 
 **NO-GO** pour `1.0.0-beta.12` en l'état.

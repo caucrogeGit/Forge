@@ -22,6 +22,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.config import (
     DEFAULT_CLIENT_ID,
     DEFAULT_HOST,

@@ -28,6 +28,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.cli import simulate as simulate_module
 from forge_mvc_iot.cli.simulate import (
     ArgumentError,

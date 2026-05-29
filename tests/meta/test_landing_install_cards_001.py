@@ -164,7 +164,7 @@ class TestCardWindowsWsl:
 
     def test_lien_cible(self):
         text = _src()
-        assert "caucrogegit.github.io/Forge/install/windows-wsl/" in text
+        assert "forgemvc.com/docs/forge/install/windows-wsl/" in text
 
 
 # ---------------------------------------------------------------------------
@@ -206,7 +206,7 @@ class TestCardPipxUser:
 
     def test_lien_cible(self):
         text = _src()
-        assert "caucrogegit.github.io/Forge/install/pipx/" in text
+        assert "forgemvc.com/docs/forge/install/pipx/" in text
 
 
 # ---------------------------------------------------------------------------
@@ -256,7 +256,7 @@ class TestCardCoreDev:
         end = text.find('data-install-card="production"')
         card_block = text[idx:end]
         assert "landing-accent-bg" in card_block
-        assert "caucrogegit.github.io/Forge/install/core-dev/" in card_block
+        assert "forgemvc.com/docs/forge/install/core-dev/" in card_block
 
 
 # ---------------------------------------------------------------------------
@@ -294,9 +294,9 @@ class TestCardProduction:
         end = text.find('</section>', idx)
         card_block = text[idx:end]
         # Les 3 guides production doivent être référencés depuis la card.
-        assert "caucrogegit.github.io/Forge/wsgi-deployment/" in card_block
-        assert "caucrogegit.github.io/Forge/production-limits/" in card_block
-        assert "caucrogegit.github.io/Forge/deployment/" in card_block
+        assert "forgemvc.com/docs/forge/wsgi-deployment/" in card_block
+        assert "forgemvc.com/docs/forge/production-limits/" in card_block
+        assert "forgemvc.com/docs/forge/deployment/" in card_block
 
 
 # ---------------------------------------------------------------------------

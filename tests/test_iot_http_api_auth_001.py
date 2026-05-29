@@ -23,6 +23,8 @@ import pytest
 
 from core.http.router import Router
 
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.config import IotConfig
 from forge_mvc_iot.http import (
     IotHttpController,

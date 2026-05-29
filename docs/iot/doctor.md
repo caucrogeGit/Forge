@@ -67,7 +67,7 @@ Le doctor exit 0 dès qu'aucun `fail` n'est remonté — un `warn` ou un
 ```text
 Forge IoT doctor
 
-  [OK]    package forge-mvc-iot — installé (version 1.0.0b11)
+  [OK]    package forge-mvc-iot — installé (version {{forge_version}})
   [OK]    configuration IoT — chargée
            mqtt_host       : localhost
            mqtt_port       : 1883

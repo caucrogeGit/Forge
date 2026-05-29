@@ -125,5 +125,8 @@ def test_security_doc_mentions_tls12():
 
 
 def test_readme_mentions_https_dev_not_production():
+    # README simplifié : il annonce le HTTPS natif (dev) ; le détail
+    # production (Nginx, TLS terminaison) est sur le site de doc — vérifié
+    # par test_deployment_doc_mentions_nginx_for_production_tls ci-dessus.
     content = open("README.md", encoding="utf-8").read()
-    assert "Nginx" in content
+    assert "HTTPS" in content

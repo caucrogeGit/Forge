@@ -21,6 +21,8 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.config import IotConfig
 from forge_mvc_iot.mqtt.contract import (
     CODE_PAYLOAD_FIELD_MISSING,

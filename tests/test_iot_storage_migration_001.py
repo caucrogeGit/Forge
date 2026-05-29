@@ -19,6 +19,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.storage.events import COLUMNS, TABLE_NAME
 
 PROJECT_ROOT = Path(__file__).parent.parent

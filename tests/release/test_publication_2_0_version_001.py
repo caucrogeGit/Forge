@@ -89,15 +89,25 @@ def test_versions_actives_sont_alignees():
 # ── Cohérence documentaire ────────────────────────────────────────────────────
 
 def test_readme_titre_mentionne_version_3_0():
-    """README.md titre contient la version courante."""
+    """README.md déclare la version courante.
+
+    Depuis la simplification du README public (`docs: simplify public
+    README`), la version figure dans la section « Statut » plutôt que
+    dans le titre H1 — on vérifie sa présence dans le document.
+    """
     content = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert _EXPECTED_SEMVER in content.splitlines()[0]
+    assert _EXPECTED_SEMVER in content
 
 
 def test_readme_git_clone_utilise_ref_3_0():
-    """README.md git clone utilise le tag courant."""
+    """README.md référence le dépôt GitHub canonique pour le dev framework.
+
+    Le README simplifié clone le dépôt de développement (HEAD) sans
+    épingler de tag de version — on vérifie que le clone pointe le dépôt
+    officiel.
+    """
     content = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert _EXPECTED_REF in content
+    assert "github.com/caucrogeGit/Forge" in content
 
 
 def test_docs_index_html_mentionne_version_3_0():

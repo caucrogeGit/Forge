@@ -20,6 +20,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.cli.doctor import check_mqtt_broker
 from forge_mvc_iot.cli.simulate import SimulateOptions, publish_measurements
 from forge_mvc_iot.config import load_iot_config

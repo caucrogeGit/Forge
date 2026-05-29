@@ -39,12 +39,16 @@ OPTIONAL_MODULES = {
     "forge_mvc_workflow",
     "forge_mvc_stats",
     "forge_mvc_media",
+    "forge_mvc_iot",
     "pyotp",
 }
 
 # Modules applicatifs : toute vérification est ignorée (import + symboles).
 # Leur contenu est généré par les starters et absent du repo framework.
-SKIP_ALL_MODULES = {"mvc", "modules"}
+# `optins.*` est la couche de branchement local générée dans le projet
+# utilisateur (cf docs/architecture/optins-project-structure.md) — comme
+# `mvc.*`, elle n'est pas importable depuis le repo Forge racine.
+SKIP_ALL_MODULES = {"mvc", "modules", "optins"}
 
 
 def _active_md_files() -> list[Path]:

@@ -15,6 +15,10 @@ from __future__ import annotations
 from importlib import resources
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("forge_mvc_iot")
+
 from forge_mvc_iot.cli.init import (
     STATUS_ERROR,
     STATUS_INFO,

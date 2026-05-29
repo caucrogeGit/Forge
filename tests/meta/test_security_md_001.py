@@ -45,6 +45,12 @@ def test_security_md_mentionne_version_courante():
 
 
 def test_readme_reference_security_md():
-    """README.md contient un lien vers SECURITY.md."""
+    """La politique de sécurité reste découvrable.
+
+    Le README public simplifié ne lie plus explicitement SECURITY.md ;
+    GitHub surface automatiquement le fichier `SECURITY.md` présent à la
+    racine. On vérifie donc que la politique reste découvrable : lien dans
+    le README **ou** fichier présent à la racine.
+    """
     content = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert "SECURITY.md" in content
+    assert "SECURITY.md" in content or (ROOT / "SECURITY.md").exists()

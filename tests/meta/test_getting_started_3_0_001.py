@@ -97,15 +97,19 @@ class TestModernAPIPresent:
             )
 
     def test_readme_mentions_adr_004(self):
+        # README simplifié : référence la collection d'ADR (`docs/adr/`)
+        # plutôt que des numéros individuels.
         readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
-        assert "ADR-004" in readme or "004-core-perimeter" in readme, (
-            "README.md devrait référencer ADR-004 (périmètre core minimal)"
+        assert "docs/adr/" in readme or "ADR" in readme, (
+            "README.md devrait référencer les décisions d'architecture (docs/adr/)"
         )
 
     def test_readme_mentions_adr_008(self):
+        # README simplifié : pointe la collection d'ADR + la charte
+        # (les ADR individuels sont sur le site de doc).
         readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
-        assert "ADR-008" in readme or "008-auth-audit" in readme, (
-            "README.md devrait référencer ADR-008 (architecture audit)"
+        assert "docs/adr/" in readme or "ADR" in readme, (
+            "README.md devrait référencer les décisions d'architecture (docs/adr/)"
         )
 
 
