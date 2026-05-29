@@ -69,6 +69,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "auth:user:role:add", "auth:user:role:remove", "auth:user:roles",
     # Mail
     "mail:init", "mail:test", "mail:render", "mail:doctor", "mail:logs",
+    # IoT (module opt-in forge-mvc-iot)
+    "iot:doctor", "iot:init",
     # Documentation
     "docs:pdf",
     # Internationalisation

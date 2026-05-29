@@ -109,7 +109,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "mail:doctor":      "Diagnostic de la configuration mail.",
     "mail:logs":        "Affiche les derniers logs mail.",
     # IoT
-    "iot:doctor":       "Diagnostic statique du module IoT (package, config, migration, API HTTP).",
+    "iot:doctor":       "Diagnostic du module IoT (statique ; --db pour la table, --mqtt pour le broker).",
     "iot:init":         "Copie la migration IoT vers mvc/migrations/ (idempotent, sans appliquer).",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
@@ -172,6 +172,8 @@ Suite recommandée:
 Usage:
   forge iot:doctor          # diagnostic statique (sans réseau, sans base)
   forge iot:doctor --db     # + vérification de la table iot_events
+  forge iot:doctor --mqtt   # + connexion brève au broker MQTT
+  forge iot:doctor --db --mqtt   # les deux options sont cumulables
 
 Description:
   Diagnostic du module opt-in `forge-mvc-iot`. Par défaut, ne se
@@ -193,10 +195,16 @@ Vérification optionnelle (--db):
       [WARN] table absente → lance forge iot:init && forge migration:apply
       [FAIL] connexion MariaDB impossible (exit 1)
 
-Limites:
-  L'option `--mqtt` (test de connexion broker) reste volontairement
-  reportée à un ticket ultérieur pour ne pas mélanger diagnostic CLI
-  et réseau MQTT dans une seule commande.
+Vérification optionnelle (--mqtt):
+  - connexion brève au broker MQTT configuré (paho-mqtt) : ouverture
+    TCP, attente du CONNACK, déconnexion. Pas d'abonnement, pas de
+    publication, pas de boucle durable.
+  - Résultats :
+      [OK]   connexion réussie à host:port
+      [FAIL] authentification refusée (exit 1)
+      [FAIL] connexion impossible à host:port (exit 1)
+  - Le mot de passe MQTT n'est jamais affiché. L'import `paho` reste
+    paresseux : rien n'est importé tant que `--mqtt` n'est pas passé.
 
 Code de sortie:
   0 si aucun check en erreur, 1 sinon. Les statuts `warn` et `skip`

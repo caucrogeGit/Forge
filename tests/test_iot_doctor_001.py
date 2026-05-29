@@ -216,10 +216,10 @@ class TestMainEntry:
         capsys.readouterr()  # nettoyer la sortie
 
     def test_main_ignores_unknown_args(self, capsys):
-        # --mqtt reste réservé pour un ticket ultérieur, le doctor
-        # ignore silencieusement. --db est reconnu depuis
-        # IOT-DOCTOR-DB-001 → testé dans test_iot_doctor_db_001.py.
-        rc = main(["--mqtt", "--unknown-flag"])
+        # Les flags reconnus (--db, --mqtt) sont testés dans leurs
+        # fichiers dédiés. Ici on vérifie qu'un flag inconnu est
+        # silencieusement ignoré et ne casse pas le diagnostic statique.
+        rc = main(["--unknown-flag"])
         assert rc == 0
         capsys.readouterr()
 
@@ -271,16 +271,23 @@ class TestForgePyDispatch:
 class TestNoRealConnections:
     """Le doctor n'ouvre aucune connexion réseau ou base."""
 
-    def test_doctor_does_not_import_paho(self):
+    def test_doctor_does_not_import_paho_at_module_level(self):
+        # Depuis IOT-DOCTOR-MQTT-001, doctor.py PEUT importer paho — mais
+        # uniquement de façon paresseuse, dans le corps d'une fonction.
+        # Aucun import paho ne doit apparaître au niveau module (avant la
+        # première fonction), pour que `forge iot:doctor` sans --mqtt
+        # n'importe jamais paho.
         from forge_mvc_iot.cli import doctor as doctor_module
         src = Path(doctor_module.__file__).read_text(encoding="utf-8")
-        import_lines = [
-            line for line in src.splitlines()
+        head = src.split("\ndef ", 1)[0]
+        head_imports = [
+            line for line in head.splitlines()
             if line.lstrip().startswith(("import ", "from "))
         ]
-        offenders = [line for line in import_lines if "paho" in line.lower()]
+        offenders = [line for line in head_imports if "paho" in line.lower()]
         assert not offenders, (
-            f"doctor.py ne doit pas importer paho à ce ticket : {offenders}"
+            "paho doit être importé paresseusement (dans une fonction), "
+            f"jamais au niveau module : {offenders}"
         )
 
     def test_doctor_does_not_import_subscriber(self):

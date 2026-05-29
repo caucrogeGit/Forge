@@ -1,10 +1,11 @@
 # Diagnostic Forge IoT — `forge iot:doctor`
 
-> **Statut** : diagnostic **statique** uniquement à ce ticket
-> (`IOT-DOCTOR-001`). Les options `--mqtt` (test broker) et `--db`
-> (test `iot_events`) sont reportées à des tickets ultérieurs pour ne
-> pas mélanger CLI, réseau MQTT et base MariaDB dans une seule
-> commande.
+> **Statut** : diagnostic **statique par défaut** (`IOT-DOCTOR-001`).
+> Deux options activent des vérifications réseau / base de manière
+> **explicite** : `--db` (test de la table `iot_events`,
+> `IOT-DOCTOR-DB-001`) et `--mqtt` (connexion au broker MQTT,
+> `IOT-DOCTOR-MQTT-001`). Sans option, le doctor ne touche ni au broker
+> ni à la base, et n'importe ni `paho` ni `core.database`.
 
 ## Objectif
 
@@ -22,8 +23,10 @@ C'est l'étape recommandée **avant** un starter pédagogique
 ## Usage
 
 ```bash
-forge iot:doctor          # diagnostic statique (sans réseau ni base)
-forge iot:doctor --db     # + connexion MariaDB et SELECT COUNT(*) FROM iot_events
+forge iot:doctor             # diagnostic statique (sans réseau ni base)
+forge iot:doctor --db        # + connexion MariaDB et SELECT COUNT(*) FROM iot_events
+forge iot:doctor --mqtt      # + connexion brève au broker MQTT
+forge iot:doctor --db --mqtt # les deux options sont cumulables
 ```
 
 Aide via :
@@ -32,8 +35,8 @@ Aide via :
 forge iot:doctor --help
 ```
 
-L'option `--mqtt` reste réservée pour un ticket ultérieur (test de
-connexion broker).
+Les options `--db` et `--mqtt` sont **explicites** : tant qu'elles ne
+sont pas passées, aucune connexion réseau ou base n'est tentée.
 
 ## Vérifications
 
@@ -43,7 +46,7 @@ connexion broker).
 | 2 | `load_iot_config()` chargeable, mot de passe masqué | `ok` / `fail` | toujours |
 | 3 | Migration `*_create_iot_events.sql` présente dans le package | `ok` / `warn` | toujours |
 | 4 | `register_iot_routes` exposée | `ok` / `fail` | toujours |
-| 5 | Broker MQTT — **non testé** | `skip` | (`--mqtt` à venir) |
+| 5 | Broker MQTT joignable | `skip` / `ok` / `fail` | `--mqtt` |
 | 6 | Base `iot_events` accessible | `skip` / `ok` / `warn` / `fail` | `--db` |
 
 ### Codes de sortie
@@ -73,7 +76,7 @@ Forge IoT doctor
            mqtt_password   : (none)
   [OK]    migration iot_events — présente (20260528120000_create_iot_events.sql)
   [OK]    API HTTP IoT — register_iot_routes disponible
-  [SKIP]  broker MQTT — non testé à ce ticket (option --mqtt prévue dans un ticket ultérieur)
+  [SKIP]  broker MQTT — non testé par défaut — passe --mqtt pour vérifier le broker
   [SKIP]  base iot_events — non testée par défaut — passe --db pour vérifier l'accès à la table
 
 0 avertissement(s), 0 erreur(s), 2 info(s).
@@ -109,6 +112,42 @@ refusés, base inexistante. Exit code 1. Le mot de passe n'est jamais
 inclus dans le message — les drivers MariaDB n'incluent que `using
 password: YES/NO`, sans la valeur.
 
+## Sortie exemple — avec `--mqtt`
+
+L'option `--mqtt` établit une connexion **brève** au broker configuré :
+ouverture TCP, attente du CONNACK, déconnexion immédiate. Pas
+d'abonnement durable, pas de publication, pas de boucle bloquante. Le
+but est de confirmer qu'un **vrai broker MQTT** (et pas seulement un
+port ouvert) accepte la connexion — d'où l'usage de `paho-mqtt` plutôt
+qu'un simple `socket` TCP.
+
+Broker joignable :
+
+```text
+  [OK]    broker MQTT — connexion réussie à localhost:1883
+```
+
+Broker injoignable (Mosquitto pas démarré, mauvais host/port, réseau
+coupé) :
+
+```text
+  [FAIL]  broker MQTT — connexion impossible à localhost:1883
+```
+
+Authentification refusée (mauvais username/password) :
+
+```text
+  [FAIL]  broker MQTT — authentification refusée
+```
+
+Exit code 1 dans les deux cas d'échec. Le mot de passe MQTT n'apparaît
+**jamais** dans la sortie. L'import `paho` est paresseux : rien n'est
+importé tant que `--mqtt` n'est pas passé.
+
+> **Astuce ateliers** : si Mosquitto n'est pas lancé, `forge iot:doctor
+> --mqtt` sort légitimement en `[FAIL]` avec un message clair — c'est le
+> signal attendu avant de démarrer un subscriber ou un simulateur.
+
 ## Parcours recommandé
 
 ```bash
@@ -116,7 +155,8 @@ forge iot:doctor          # 1. diagnostic statique
 forge iot:init            # 2. copier la migration vers mvc/migrations/
 forge migration:apply     # 3. créer la table iot_events en base
 forge iot:doctor --db     # 4. confirmer que la table est lisible
-forge run                 # 5. démarrer
+forge iot:doctor --mqtt   # 5. confirmer que le broker répond
+forge run                 # 6. démarrer
 ```
 
 Chaque étape produit un signal clair avant la suivante — pas besoin
@@ -186,32 +226,30 @@ indice : installe le module opt-in : pip install forge-mvc-iot
 Forge Core reste fonctionnel sans le module — l'import est paresseux
 côté dispatcher (`forge.py`).
 
-## Limites de ce ticket
+## Limites
 
-Sont volontairement **hors périmètre** :
+Sont volontairement **hors périmètre**, y compris pour `--mqtt` :
 
-- pas de test de connexion au broker MQTT (`tcp connect`,
-  `subscribe`) — futur `--mqtt` ;
-- pas de test de connexion à la base (`SELECT COUNT(*) FROM
-  iot_events`) — futur `--db` ;
-- pas de vérification de la version du subscriber MQTT démarré ;
+- aucun abonnement durable, aucune publication de mesure, aucun
+  `loop_forever` — `--mqtt` ne fait qu'un connect / disconnect bref ;
+- aucun subscriber lancé, aucun simulateur de capteur ;
+- aucune écriture en base déclenchée par `--mqtt` ;
+- pas de test de topic via `subscribe` / `publish` ;
 - pas de vérification de la version du contrat MQTT déployé côté
   capteurs ;
-- pas d'audit des permissions ACL Mosquitto.
+- pas de TLS ni d'audit des permissions ACL Mosquitto avancées.
 
 Chacun de ces points peut justifier sa propre option / commande pour
 rester lisible et localement testable.
 
 ## Tickets suivants
 
-- futur `IOT-DOCTOR-MQTT-001` ajoutera `forge iot:doctor --mqtt` qui
-  établit une connexion brève au broker (TCP + auth + un
-  `subscribe` test), avec timeout court ;
-- futur `IOT-DOCTOR-DB-001` ajoutera `forge iot:doctor --db` qui fait
-  un `SELECT COUNT(*) FROM iot_events` pour confirmer que la table
-  existe et est lisible.
+La trilogie `doctor` est complète :
 
-Ce ticket pose le squelette CLI + checks statiques. Les options
-réseau viennent quand le besoin est concret et que les conditions de
-test sont propres (un Mosquitto local lancé par les tests
-d'intégration, ou un compose).
+- `forge iot:doctor`        → diagnostic statique ;
+- `forge iot:doctor --db`   → diagnostic table `iot_events` ;
+- `forge iot:doctor --mqtt` → diagnostic broker MQTT.
+
+Pistes ultérieures : `IOT-SIMULATOR-001` (script de publication MQTT
+factice pour les ateliers) ou une intégration Forge Design IoT au-dessus
+de l'API HTTP JSON.
