@@ -91,6 +91,99 @@
   <p class="text-lg text-white font-medium max-w-2xl mx-auto leading-relaxed mb-4">
     Forge génère un MVC CRUD explicite à partir d'un modèle JSON visible.
   </p>
+  <p class="text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
+    <span class="landing-accent-text font-semibold">1.0.0-beta.12</span> introduit
+    <strong class="text-white">Forge IoT</strong>, le branchement
+    <strong class="text-white">opt-in</strong> explicite et un parcours
+    pédagogique complet MQTT → base → API.
+  </p>
+</section>
+
+<!-- Nouveautés 1.0.0-beta.12 — Forge IoT & opt-ins explicites -->
+<section id="beta12" class="py-24 px-6 bg-[#111110]">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="text-xs landing-accent-text font-semibold mb-2">Nouveautés 1.0.0-beta.12</div>
+      <h2 class="text-4xl font-bold tracking-tight text-white mb-4">
+        Forge IoT et opt-ins explicites.
+      </h2>
+      <p class="text-white/50 text-lg max-w-2xl mx-auto">
+        Un parcours pédagogique complet MQTT → base → API, branché
+        explicitement dans le projet. Le core reste autonome.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <!-- Bloc Forge IoT -->
+      <div class="landing-panel rounded-xl p-8 border border-white/10">
+        <div class="text-xs landing-accent-text font-semibold mb-2">forge-mvc-iot · publié sur PyPI</div>
+        <h3 class="text-2xl font-bold tracking-tight text-white mb-4">Forge IoT</h3>
+        <p class="text-white/60 text-sm leading-relaxed mb-5">
+          Réception <strong class="text-white/80">MQTT</strong> via
+          <strong class="text-white/80">Mosquitto</strong>, stockage des
+          relevés dans la table <code class="text-xs">iot_events</code> et
+          lecture via une <strong class="text-white/80">API HTTP JSON</strong>.
+          Pensé pour l'<strong class="text-white/80">ESP32</strong> et les
+          sections <strong class="text-white/80">BTS CIEL</strong> / Bac Pro.
+        </p>
+        <ul class="text-white/60 text-sm leading-relaxed space-y-2 mb-6">
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:doctor</code> — diagnostic IoT</li>
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:init</code> — migration <code class="text-xs">iot_events</code></li>
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:listen</code> — subscriber MQTT résilient</li>
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:simulate</code> — capteurs simulés</li>
+        </ul>
+        <div class="flex flex-wrap gap-3 text-sm">
+          <a href="https://forgemvc.com/docs/forge/iot/architecture/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Architecture →</a>
+          <a href="https://forgemvc.com/docs/forge/iot/mosquitto-local/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Mosquitto local →</a>
+          <a href="https://forgemvc.com/docs/forge/iot/doctor/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">iot:doctor →</a>
+          <a href="https://forgemvc.com/docs/forge/iot/listen-command/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">iot:listen →</a>
+          <a href="https://forgemvc.com/docs/forge/iot/simulator/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">iot:simulate →</a>
+          <a href="https://forgemvc.com/docs/forge/iot/esp32-example/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Exemple ESP32 →</a>
+          <a href="https://forgemvc.com/docs/forge/iot/bts-ciel/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">BTS CIEL →</a>
+        </div>
+      </div>
+
+      <!-- Bloc Opt-ins explicites -->
+      <div class="landing-panel rounded-xl p-8 border border-white/10">
+        <div class="text-xs landing-accent-text font-semibold mb-2">optins/ · branchement explicite</div>
+        <h3 class="text-2xl font-bold tracking-tight text-white mb-4">Opt-ins explicites</h3>
+        <p class="text-white/60 text-sm leading-relaxed mb-5">
+          Pas de découverte magique : les opt-ins sont branchés
+          explicitement dans le projet, sous <code class="text-xs">optins/</code>,
+          via un registre visible. Le starter
+          <code class="text-xs">welcome-iot</code> montre le parcours complet.
+        </p>
+        <ul class="text-white/60 text-sm leading-relaxed space-y-2 mb-6">
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge optin:enable iot</code> — branche l'opt-in (dry-run par défaut)</li>
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge optin:list</code> — état des opt-ins (lecture seule)</li>
+          <li><span class="text-white/30 mr-2">·</span>starter <code class="text-xs">welcome-iot</code></li>
+        </ul>
+        <div class="flex flex-wrap gap-3 text-sm">
+          <a href="https://forgemvc.com/docs/forge/architecture/optins-project-structure/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Structure des opt-ins →</a>
+          <a href="https://forgemvc.com/docs/forge/architecture/optins-cli-enable-audit/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Audit optin:enable →</a>
+          <a href="https://forgemvc.com/docs/forge/reference/cli-commands/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Référence CLI →</a>
+          <a href="https://forgemvc.com/docs/forge/starters/welcome-iot/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Starter welcome-iot →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Installation : core autonome, IoT opt-in -->
+    <div class="landing-panel rounded-xl overflow-hidden border border-white/10 mt-5">
+      <pre class="px-7 py-6 text-sm leading-loose overflow-x-auto text-[#abb2bf]"><span class="text-white/35"># Forge Core reste autonome</span>
+<span class="landing-accent-text">$</span> pip install --pre forge-mvc
+
+<span class="text-white/35"># Forge IoT s'installe seulement si le projet en a besoin</span>
+<span class="landing-accent-text">$</span> pip install --pre forge-mvc-iot</pre>
+    </div>
+
+    <!-- Preuve qualité -->
+    <p class="text-white/50 text-sm leading-relaxed text-center mt-8">
+      Forge 1.0.0-beta.12 a été publiée après retour de la suite complète à
+      <strong class="text-white/80">0 échec</strong>.
+      <a href="https://forgemvc.com/docs/forge/history/audits/audit-pre-release-beta12/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Audit pré-release →</a>
+      <a href="https://forgemvc.com/docs/forge/history/audits/audit-beta12-post-publish/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Audit post-publication →</a>
+    </p>
+  </div>
 </section>
 
 <!-- Installation -->
