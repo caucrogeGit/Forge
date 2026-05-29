@@ -39,6 +39,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from forge_mvc_iot.mqtt.contract import ContractError, parse_message
+from forge_mvc_iot.mqtt.tls import configure_tls
 
 __all__ = [
     "DEFAULT_SITE",
@@ -310,6 +311,9 @@ def publish_measurements(
     do_sleep = sleep if sleep is not None else time.sleep
 
     client = factory(config)
+    # TLS (si activé) doit être configuré avant connect(). No-op sinon :
+    # la publication en clair reste strictement identique.
+    configure_tls(client, config)
     if config.mqtt_username:
         client.username_pw_set(config.mqtt_username, config.mqtt_password)
 

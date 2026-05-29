@@ -220,6 +220,25 @@ Exit code 1 dans les deux cas d'échec. Le mot de passe MQTT n'apparaît
 **jamais** dans la sortie. L'import `paho` est paresseux : rien n'est
 importé tant que `--mqtt` n'est pas passé.
 
+### Connexion TLS
+
+Si `FORGE_IOT_MQTT_TLS_ENABLED=true`, `--mqtt` se connecte en **TLS**
+(`client.tls_set` appelé avant la connexion). Pense à configurer aussi le
+port TLS du broker (généralement `8883`) :
+
+```bash
+export FORGE_IOT_MQTT_HOST="mqtt.example.net"
+export FORGE_IOT_MQTT_PORT="8883"
+export FORGE_IOT_MQTT_TLS_ENABLED="true"
+export FORGE_IOT_MQTT_TLS_CA_FILE="/etc/ssl/certs/mosquitto-ca.crt"
+
+forge iot:doctor --mqtt
+```
+
+Sans `FORGE_IOT_MQTT_TLS_CA_FILE`, paho utilise les certificats système.
+Le chemin du CA n'apparaît jamais dans la sortie. Détails :
+[Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation).
+
 > **Astuce ateliers** : si Mosquitto n'est pas lancé, `forge iot:doctor
 > --mqtt` sort légitimement en `[FAIL]` avec un message clair — c'est le
 > signal attendu avant de démarrer un subscriber ou un simulateur. Pour
@@ -315,13 +334,12 @@ Sont volontairement **hors périmètre**, y compris pour `--mqtt` :
 - pas de test de topic via `subscribe` / `publish` ;
 - pas de vérification de la version du contrat MQTT déployé côté
   capteurs ;
-- pas de TLS ni d'audit des permissions ACL Mosquitto avancées —
-  `--mqtt` se connecte **en clair**. La configuration TLS
-  (`FORGE_IOT_MQTT_TLS_ENABLED`, `FORGE_IOT_MQTT_TLS_CA_FILE`) existe
-  désormais côté config (voir
-  [Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation))
-  mais n'est **pas encore** consommée par `--mqtt` (ticket
-  `IOT-MQTT-TLS-CLIENTS-001`).
+- pas d'audit des permissions ACL Mosquitto avancées, pas de certificat
+  client (mTLS). Le **TLS est désormais pris en charge** : si
+  `FORGE_IOT_MQTT_TLS_ENABLED=true`, `--mqtt` se connecte en TLS
+  (`client.tls_set`, `ca_certs` = `FORGE_IOT_MQTT_TLS_CA_FILE` si fourni)
+  — voir [Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation).
+  Sinon, la connexion reste en clair (comportement par défaut).
 
 Côté `--db` et contrôle de schéma, sont aussi **hors périmètre** :
 

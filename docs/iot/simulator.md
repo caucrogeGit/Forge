@@ -157,6 +157,26 @@ Forge IoT saura parser.
 Le mot de passe MQTT n'apparaît **jamais** dans la sortie, même quand un
 username/password est configuré (il est transmis au broker, pas affiché).
 
+## Connexion TLS
+
+`forge iot:simulate` consomme la configuration TLS : si
+`FORGE_IOT_MQTT_TLS_ENABLED=true`, le client appelle `client.tls_set(...)`
+avant de se connecter (`ca_certs` = `FORGE_IOT_MQTT_TLS_CA_FILE` si
+fourni, sinon les certificats système). Pense à configurer aussi le port
+TLS du broker (généralement `8883`) :
+
+```bash
+export FORGE_IOT_MQTT_HOST="mqtt.example.net"
+export FORGE_IOT_MQTT_PORT="8883"
+export FORGE_IOT_MQTT_TLS_ENABLED="true"
+export FORGE_IOT_MQTT_TLS_CA_FILE="/etc/ssl/certs/mosquitto-ca.crt"
+
+forge iot:simulate --profile temperature --count 3
+```
+
+Le chemin du CA n'apparaît jamais dans la sortie. Détails :
+[Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation).
+
 ## Codes de sortie
 
 | Code | Signification |

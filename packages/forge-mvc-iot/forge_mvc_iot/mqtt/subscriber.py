@@ -22,6 +22,7 @@ from forge_mvc_iot.mqtt.contract import (
     Measurement,
     parse_message,
 )
+from forge_mvc_iot.mqtt.tls import configure_tls
 
 __all__ = [
     "OnMeasurement",
@@ -90,6 +91,9 @@ class MqttSubscriber:
 
         factory = client_factory or _default_client_factory
         self.client = factory(config)
+
+        # TLS (si activé) doit être configuré avant connect().
+        configure_tls(self.client, config)
 
         if config.mqtt_username:
             self.client.username_pw_set(

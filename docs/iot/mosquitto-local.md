@@ -230,8 +230,4 @@ de tickets ultérieurs :
 
 Le broker décrit ici écoute en clair sur `localhost:1883`, sans TLS ni auth ni cloud — adapté à un atelier local, pas à une mise en production.
 
-Cette page reste **volontairement sans TLS ni authentification**. Côté
-Forge, la configuration TLS (`FORGE_IOT_MQTT_TLS_ENABLED`,
-`FORGE_IOT_MQTT_TLS_CA_FILE`, port `8883`) existe désormais et se prépare
-pour un broker exposé — voir [Configuration Forge IoT — TLS MQTT](configuration.md#tls-mqtt-preparation).
-En local, on la laisse désactivée (le défaut).
+Cette page reste **volontairement sans TLS ni authentification** : le chiffrement TLS et son certificat CA sont **hors périmètre** ici, et restent désactivés par défaut côté Forge ; pour un broker exposé, voir [Configuration Forge IoT — TLS MQTT](configuration.md#tls-mqtt-preparation).

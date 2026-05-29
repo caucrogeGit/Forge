@@ -183,6 +183,27 @@ Conseil : vérifie forge db:init et forge iot:doctor --db.
 [ERREUR] Stockage IoT impossible.
 ```
 
+## Connexion TLS
+
+`forge iot:listen` bénéficie du TLS **via le `MqttSubscriber`** : si
+`FORGE_IOT_MQTT_TLS_ENABLED=true`, le subscriber appelle
+`client.tls_set(...)` avant de se connecter (`ca_certs` =
+`FORGE_IOT_MQTT_TLS_CA_FILE` si fourni, sinon les certificats système).
+Pense à configurer aussi le port TLS du broker (généralement `8883`) :
+
+```bash
+export FORGE_IOT_MQTT_HOST="mqtt.example.net"
+export FORGE_IOT_MQTT_PORT="8883"
+export FORGE_IOT_MQTT_TLS_ENABLED="true"
+export FORGE_IOT_MQTT_TLS_CA_FILE="/etc/ssl/certs/mosquitto-ca.crt"
+
+forge iot:listen
+```
+
+Sans TLS (défaut), la connexion reste en clair — adapté au
+[Mosquitto local](mosquitto-local.md). Détails :
+[Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation).
+
 ## Limites
 
 `forge iot:listen` est conçue pour le **développement et la

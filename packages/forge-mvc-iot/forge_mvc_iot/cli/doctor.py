@@ -544,8 +544,14 @@ def check_mqtt_broker(
     """
     import threading  # noqa: PLC0415 — stdlib, n'introduit aucune dépendance
 
+    from forge_mvc_iot.mqtt.tls import configure_tls  # noqa: PLC0415
+
     factory = client_factory or _default_mqtt_client_factory
     client = factory(config)
+
+    # TLS (si activé) doit être configuré avant connect(). No-op sinon :
+    # le diagnostic en clair reste strictement identique.
+    configure_tls(client, config)
 
     # Le mot de passe est transmis à paho mais n'apparaît dans aucun message.
     if config.mqtt_username:
