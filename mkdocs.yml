@@ -188,6 +188,7 @@ nav:
       - Simulateur (iot:simulate): iot/simulator.md
       - Écoute (iot:listen): iot/listen-command.md
       - Mosquitto local: iot/mosquitto-local.md
+      - Smoke test local: iot/local-smoke-test.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md

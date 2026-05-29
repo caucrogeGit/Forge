@@ -25,7 +25,9 @@ iot_events                  # stockage
 /api/iot/events             # lecture HTTP (terminal 3)
 ```
 
-Cette page cible un poste **Linux / WSL / Debian / Ubuntu**.
+Cette page cible un poste **Linux / WSL / Debian / Ubuntu**. Pour
+dérouler ce flux d'un coup, voir le
+[smoke test local](local-smoke-test.md).
 
 ## Installer Mosquitto
 
