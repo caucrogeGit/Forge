@@ -85,6 +85,7 @@ IoT (module opt-in forge-mvc-iot)
   iot:doctor          Diagnostic statique du module IoT (package, config, migration, API HTTP).
   iot:init            Copie la migration IoT du package vers mvc/migrations/ (idempotent, sans appliquer).
   iot:simulate        Publie des mesures MQTT factices conformes au contrat (sans capteur).
+  iot:listen          Écoute le broker MQTT et insère les mesures reçues dans iot_events.
 
 Documentation
   docs:pdf            Génère un PDF depuis la documentation.

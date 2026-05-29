@@ -215,16 +215,20 @@ Pour aller plus loin avec Forge IoT :
   [contrat MQTT](../../iot/mqtt-contract.md) — sans capteur, le
   [simulateur `forge iot:simulate`](../../iot/simulator.md) publie des
   mesures factices conformes au contrat ;
-- brancher le [subscriber MQTT](../../iot/mqtt-subscriber.md) sur le
-  repository pour ingérer en base ;
+- ingérer les mesures en base avec [`forge iot:listen`](../../iot/listen-command.md),
+  qui branche le [subscriber MQTT](../../iot/mqtt-subscriber.md) sur le
+  repository ;
 - consommer l'[API HTTP officielle](../../iot/http-api.md) depuis une
   interface de votre choix.
 
-Flux de test rapide, une fois la table créée :
+Parcours de test complet, une fois la table `iot_events` créée :
 
 ```bash
 forge iot:doctor --mqtt                     # le broker répond ?
+forge iot:listen                            # écouter et stocker (laisser tourner)
+# … dans un autre terminal :
 forge iot:simulate --count 3 --interval 1   # publier 3 mesures factices
+curl http://localhost:8000/api/iot/events   # relire les mesures stockées
 ```
 
 [Architecture Forge IoT](../../iot/architecture.md) liste les tickets

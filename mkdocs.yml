@@ -186,6 +186,7 @@ nav:
       - Diagnostic (doctor): iot/doctor.md
       - Initialisation (iot:init): iot/init-command.md
       - Simulateur (iot:simulate): iot/simulator.md
+      - Écoute (iot:listen): iot/listen-command.md
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md

@@ -121,8 +121,9 @@ forge iot:doctor --mqtt              # 1. confirmer que le broker répond
 forge iot:simulate --count 3 --interval 1   # 2. publier 3 mesures
 ```
 
-Côté consommation, branche un subscriber MQTT dans ton application puis
-relis les mesures via `GET /api/iot/events`.
+Côté consommation, lance [`forge iot:listen`](listen-command.md) dans un
+autre terminal : il écoute le broker et insère les mesures reçues dans
+`iot_events`. Tu peux ensuite les relire via `GET /api/iot/events`.
 
 ## Limites (hors périmètre)
 

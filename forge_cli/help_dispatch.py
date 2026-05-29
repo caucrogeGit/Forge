@@ -112,6 +112,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "iot:doctor":       "Diagnostic du module IoT (statique ; --db pour la table, --mqtt pour le broker).",
     "iot:init":         "Copie la migration IoT vers mvc/migrations/ (idempotent, sans appliquer).",
     "iot:simulate":     "Publie des mesures MQTT factices conformes au contrat (sans capteur).",
+    "iot:listen":       "Écoute le broker MQTT et insère les mesures reçues dans iot_events.",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
     # Internationalisation
@@ -256,6 +257,42 @@ Limites (hors périmètre):
 Code de sortie:
   0 publication réussie ; 2 option invalide ; 1 configuration invalide
   ou échec de connexion / publication.
+""",
+    "iot:listen": """\
+Usage:
+  forge iot:listen
+
+Description:
+  Écoute le broker MQTT configuré (`load_iot_config()`) et **insère** en
+  base chaque mesure reçue, via `IotEventRepository`. Relie les briques
+  Forge IoT en un flux local :
+  Mosquitto → forge iot:listen → MqttSubscriber → iot_events.
+
+  Commande de **développement / pédagogie**, pas un service de
+  production : pas de daemon, pas de retry/backoff, pas de batch.
+
+Comportement:
+  - s'abonne au topic configuré (défaut: forge/+/+/telemetry) ;
+  - pour chaque mesure valide : INSERT dans iot_events + ligne `[OK]` ;
+  - reste active jusqu'à Ctrl+C, puis s'arrête proprement ;
+  - s'arrête au **premier échec base** (message pédagogique).
+
+Prérequis:
+  - un broker MQTT joignable — vérifier avec `forge iot:doctor --mqtt` ;
+  - la table iot_events créée — `forge iot:init` puis
+    `forge migration:apply` (vérifier avec `forge iot:doctor --db`).
+
+Options:
+  -h, --help   Affiche cette aide sans rien écouter.
+
+Limites (hors périmètre):
+  - ne lance pas le simulateur (voir `forge iot:simulate`) ;
+  - ne modifie pas l'API HTTP ni le contrat MQTT ;
+  - pas de TLS/auth avancé, pas de service systemd.
+
+Code de sortie:
+  0 arrêt normal (Ctrl+C) ; 1 configuration invalide, connexion MQTT
+  impossible, ou échec d'insertion en base.
 """,
     "update": """\
 Usage:
