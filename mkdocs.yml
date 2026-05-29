@@ -244,6 +244,7 @@ nav:
           - Audit de clôture opt-ins: history/audits/audit-optins-closing.md
           - Audit pré-release beta.12: history/audits/audit-pre-release-beta12.md
           - Audit post-publication beta.12: history/audits/audit-beta12-post-publish.md
+          - Clôture beta.12: history/audits/audit-beta12-closing-summary.md
           - Audits archivés: history/audits/README.md
       - Tests terrain:
           - Field Test App 001: history/field-tests/field-test-app-001.md
