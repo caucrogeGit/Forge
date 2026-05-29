@@ -246,5 +246,7 @@ Ce ticket **pose le contrat**. Ne sont **pas** faits ici :
   `forge optin:enable` : voir l'[audit `forge optin:enable`](optins-cli-enable-audit.md)
   (commande cible, idempotence, dry-run, gestion des conflits, sans
   discovery ni écrasement silencieux).
-- `OPTINS-CLI-ENABLE-IOT-001` — implémentation réelle de
-  `forge optin:enable iot`, conforme au contrat de l'audit.
+- `OPTINS-CLI-ENABLE-IOT-001` (**livré**) — implémente
+  `forge optin:enable iot` (dry-run par défaut, `--apply`, idempotent,
+  `mvc/routes.py` non modifié automatiquement). Voir la
+  [référence CLI](../reference/cli-commands.md#opt-ins-branchement-projet).

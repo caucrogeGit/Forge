@@ -71,6 +71,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "mail:init", "mail:test", "mail:render", "mail:doctor", "mail:logs",
     # IoT (module opt-in forge-mvc-iot)
     "iot:doctor", "iot:init", "iot:simulate", "iot:listen",
+    # Opt-ins (branchement projet)
+    "optin:enable",
     # Documentation
     "docs:pdf",
     # Internationalisation

@@ -7,6 +7,14 @@
 > du paquet `forge-mvc-iot`. L'implémentation fera l'objet du ticket
 > `OPTINS-CLI-ENABLE-IOT-001`, **après validation de ce contrat**.
 
+!!! success "Implémenté pour `iot` (OPTINS-CLI-ENABLE-IOT-001)"
+    Ce contrat est désormais **réalisé** pour le premier opt-in :
+    `forge optin:enable iot` existe (dry-run par défaut, `--apply` pour
+    écrire, idempotent, `mvc/routes.py` non modifié automatiquement). Ce
+    document reste la **référence de conception** ; voir la
+    [référence CLI](../reference/cli-commands.md#opt-ins-branchement-projet).
+    Les autres opt-ins (`rbac`, `media`…) restent à venir.
+
 ## Objectif
 
 Définir précisément ce qu'une commande `forge optin:enable <name>` aura

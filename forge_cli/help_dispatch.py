@@ -113,6 +113,8 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "iot:init":         "Copie la migration IoT vers mvc/migrations/ (idempotent, sans appliquer).",
     "iot:simulate":     "Publie des mesures MQTT factices conformes au contrat (sans capteur).",
     "iot:listen":       "Écoute le broker MQTT et insère les mesures reçues dans iot_events.",
+    # Opt-ins (branchement projet)
+    "optin:enable":     "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
     # Internationalisation
@@ -310,6 +312,41 @@ Limites (hors périmètre):
 Code de sortie:
   0 arrêt normal (Ctrl+C) ; 1 configuration invalide, connexion MQTT
   impossible, ou échec d'insertion en base.
+""",
+    "optin:enable": """\
+Usage:
+  forge optin:enable <name>            # dry-run (n'écrit rien)
+  forge optin:enable iot               # aperçu pour l'opt-in IoT
+  forge optin:enable iot --apply       # crée réellement optins/iot/
+  forge optin:enable iot --dry-run     # dry-run explicite
+
+Description:
+  Branche un opt-in **localement** dans le projet courant en créant la
+  couche `optins/` (registre explicite + dossier de l'opt-in). Premier
+  opt-in supporté : `iot` (paquet `forge-mvc-iot`).
+
+  Le branchement reste **explicite** : `mvc/routes.py` appelle
+  `register_optins(router)` → `optins/registry.py` → `optins/iot/routes.py`
+  → `register_iot_routes(router)`. Aucune découverte automatique.
+
+Comportement:
+  - **dry-run par défaut** : sans `--apply`, affiche ce qui serait créé,
+    n'écrit rien.
+  - `--apply` : crée les fichiers absents (`optins/__init__.py`,
+    `optins/registry.py`, `optins/iot/__init__.py`, `optins/iot/routes.py`,
+    `optins/iot/README.md`, `optins/iot/migrations/README.md`).
+  - **idempotent** : un fichier déjà présent et identique → `[OK] déjà
+    présent` ; présent mais différent → `[WARN]`, **aucune écriture**.
+
+Important:
+  - la commande **ne modifie pas** `mvc/routes.py` dans cette version :
+    elle affiche l'instruction à ajouter manuellement.
+  - le paquet de l'opt-in doit être installé (`pip install --pre
+    forge-mvc-iot`), sinon `[ERREUR]` + exit 1.
+
+Code de sortie:
+  0 succès (création, idempotent ou dry-run) ; 2 opt-in inconnu ou nom
+  manquant ; 1 paquet absent, ou (avec `--apply`) conflit de fichier.
 """,
     "update": """\
 Usage:

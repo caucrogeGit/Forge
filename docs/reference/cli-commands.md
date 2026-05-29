@@ -1232,6 +1232,45 @@ forge iot:listen                                       # 6. écouter et stocker 
 forge iot:simulate --profile temperature --count 3 --interval 1   # 7. publier (autre terminal)
 ```
 
+## Opt-ins (branchement projet)
+
+Commandes de **branchement local** des opt-ins dans un projet
+(convention [`optins/`](../architecture/optins-project-structure.md)).
+Elles ne déplacent ni n'installent les paquets ; elles câblent l'opt-in
+dans le projet, de façon explicite.
+
+<details markdown="1" id="forge-optinenable">
+<summary><code>forge optin:enable</code> - Branche un opt-in dans le projet (optins/) — dry-run par défaut</summary>
+
+Crée la couche `optins/` qui branche un opt-in dans le projet courant.
+Premier opt-in supporté : `iot` (paquet `forge-mvc-iot`).
+
+```bash
+forge optin:enable iot              # dry-run : montre ce qui serait créé
+forge optin:enable iot --apply      # crée réellement optins/iot/
+forge optin:enable iot --dry-run    # dry-run explicite
+```
+
+**Dry-run par défaut** : sans `--apply`, rien n'est écrit. `--apply` crée
+les fichiers absents (`optins/__init__.py`, `optins/registry.py`,
+`optins/iot/__init__.py`, `optins/iot/routes.py`, `optins/iot/README.md`,
+`optins/iot/migrations/README.md`). La commande est **idempotente** : un
+fichier déjà présent et identique → `[OK] déjà présent` ; présent mais
+différent → `[WARN]`, **aucune écriture**.
+
+> **La commande crée la structure locale `optins/iot/`, mais ne modifie
+> pas automatiquement `mvc/routes.py` dans cette première version.** Elle
+> affiche l'instruction à ajouter (`from optins.registry import
+> register_optins` + `register_optins(router)`).
+
+Le branchement reste **explicite**, sans découverte automatique ; Forge
+Core ne dépend pas des opt-ins. Le paquet doit être installé
+(`pip install --pre forge-mvc-iot`), sinon `[ERREUR]` + exit 1. Voir
+[structure des opt-ins](../architecture/optins-project-structure.md) et
+l'[audit `forge optin:enable`](../architecture/optins-cli-enable-audit.md).
+
+</details>
+
 ## Utilitaires
 
 <details markdown="1" id="forge-version">

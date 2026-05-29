@@ -698,6 +698,13 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "optin:enable":
+        from forge_cli.optins.enable import main as optin_enable_main
+        rc = optin_enable_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command in ("deploy:init", "deploy:check"):
         deploy_main(args)
         return

@@ -87,6 +87,9 @@ IoT (module opt-in forge-mvc-iot)
   iot:simulate        Publie des mesures MQTT factices conformes au contrat (sans capteur).
   iot:listen          Écoute le broker MQTT et insère les mesures reçues dans iot_events.
 
+Opt-ins (branchement projet)
+  optin:enable        Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.
+
 Documentation
   docs:pdf            Génère un PDF depuis la documentation.
 
