@@ -242,6 +242,9 @@ Ce ticket **pose le contrat**. Ne sont **pas** faits ici :
 - `OPTINS-IOT-PROJECT-BRIDGE-001` (**livré**) — applique concrètement
   cette structure à Forge IoT : le starter `welcome-iot` génère
   `optins/iot/` et branche l'API via `optins/registry.py`.
-- `OPTINS-CLI-ENABLE-AUDIT-001` — concevoir (sans l'implémenter trop
-  vite) une future commande `forge optin:enable`, qui pourrait toucher
-  routes, migrations, fichiers projet et starters.
+- `OPTINS-CLI-ENABLE-AUDIT-001` (**livré**) — cadre la future commande
+  `forge optin:enable` : voir l'[audit `forge optin:enable`](optins-cli-enable-audit.md)
+  (commande cible, idempotence, dry-run, gestion des conflits, sans
+  discovery ni écrasement silencieux).
+- `OPTINS-CLI-ENABLE-IOT-001` — implémentation réelle de
+  `forge optin:enable iot`, conforme au contrat de l'audit.

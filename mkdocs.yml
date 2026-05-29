@@ -105,6 +105,7 @@ nav:
       - Créer un module: module-author-guide.md
       - Créer un starter: starter-author-guide.md
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
+      - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Bienvenue dans Forge:
           - Présentation: starters/welcome/index.md
       - Paramètres d'URL:
