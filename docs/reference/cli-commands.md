@@ -1087,6 +1087,7 @@ n'apparaissent pas dans `forge --help`).
 | Stats — agrégats et événements | `forge-mvc-stats` | aucune commande CLI dédiée — usage applicatif |
 | MFA — TOTP, codes de récupération | `forge-mvc-mfa` | aucune commande CLI dédiée — voir profil `auth-mfa` dans [`forge new`](#forge-new) |
 | Media — helpers applicatifs upload | `forge-mvc-media` | aucune commande CLI dédiée — usage applicatif |
+| IoT — ingestion MQTT → SQL | `forge-mvc-iot` | [`iot:doctor`](#forge-iotdoctor), [`iot:init`](#forge-iotinit), [`iot:listen`](#forge-iotlisten), [`iot:simulate`](#forge-iotsimulate) |
 
 Installation type (depuis `1.0.0-beta.9`, tous publiés sur PyPI) :
 
@@ -1096,6 +1097,7 @@ pip install --pre forge-mvc-workflow
 pip install --pre forge-mvc-stats
 pip install --pre forge-mvc-mfa
 pip install --pre forge-mvc-media
+pip install --pre forge-mvc-iot
 ```
 
 Voir [Installation — Contrat d'installation des opt-ins](../install/index.md#contrat-dinstallation-des-opt-ins).
@@ -1127,6 +1129,108 @@ Détecte les rôles orphelins, les permissions non référencées et les
 incohérences entre la configuration RBAC et le code.
 
 </details>
+
+## Commandes Forge IoT
+
+Commandes du module opt-in `forge-mvc-iot` (ingestion MQTT → `iot_events`).
+Disponibles après `pip install --pre forge-mvc-iot`. Le core Forge ne
+dépend pas de ce module.
+
+<details markdown="1" id="forge-iotdoctor">
+<summary><code>forge iot:doctor</code> - Diagnostic du module IoT (statique par défaut ; --db / --mqtt optionnels)</summary>
+
+Diagnostic du module opt-in `forge-mvc-iot`. Par défaut **statique** : ne
+se connecte ni au broker MQTT ni à la base.
+
+```bash
+forge iot:doctor          # diagnostic statique
+forge iot:doctor --db     # + table iot_events (SELECT COUNT + schéma)
+forge iot:doctor --mqtt   # + connexion brève au broker MQTT
+```
+
+Vérifie que le package `forge-mvc-iot` est importable, que la
+configuration (`load_iot_config`) est cohérente (mot de passe masqué),
+que la migration packagée `*_create_iot_events.sql` est présente, et que
+`register_iot_routes` est exposée. **Ne teste ni la base ni le broker par
+défaut** : `--db` ajoute l'accès à `iot_events` (et la conformité du
+schéma), `--mqtt` ajoute une connexion brève au broker (TLS si
+`FORGE_IOT_MQTT_TLS_ENABLED=true`).
+
+**Voir aussi :** [Diagnostic Forge IoT](../iot/doctor.md)
+
+</details>
+
+<details markdown="1" id="forge-iotinit">
+<summary><code>forge iot:init</code> - Copie la migration IoT packagée vers mvc/migrations/ (idempotent, sans appliquer)</summary>
+
+Copie la (les) migration(s) SQL Forge IoT du package `forge-mvc-iot` vers
+`mvc/migrations/`.
+
+```bash
+forge iot:init
+```
+
+**N'applique pas** la migration et **ne se connecte pas** à la base :
+c'est `forge migration:apply` qui crée la table `iot_events`, dans un
+second temps. Commande **idempotente** (copie si absent, signale si
+identique, ne réécrit jamais une copie modifiée).
+
+**Étape suivante :** `forge migration:apply`.
+
+**Voir aussi :** [forge iot:init](../iot/init-command.md)
+
+</details>
+
+<details markdown="1" id="forge-iotlisten">
+<summary><code>forge iot:listen</code> - Écoute le broker MQTT et insère les mesures reçues dans iot_events</summary>
+
+Écoute le broker MQTT configuré et **insère** chaque mesure reçue dans
+`iot_events` via `IotEventRepository`.
+
+```bash
+forge iot:listen   # laisser tourner ; Ctrl+C pour arrêter
+```
+
+Commande de **développement / pédagogie**, **pas** un daemon de
+production (pas de retry/backoff, pas de batch). `Ctrl+C` arrête
+proprement (déconnexion garantie) puis affiche un résumé de session
+(mesures reçues / stockées / erreurs de contrat / erreurs de stockage).
+
+**Voir aussi :** [forge iot:listen](../iot/listen-command.md)
+
+</details>
+
+<details markdown="1" id="forge-iotsimulate">
+<summary><code>forge iot:simulate</code> - Publie des mesures MQTT factices conformes au contrat (sans capteur)</summary>
+
+Publie des mesures **factices** mais conformes au contrat MQTT vers le
+broker configuré, sans capteur physique.
+
+```bash
+forge iot:simulate
+forge iot:simulate --profile temperature --count 3 --interval 1
+```
+
+Options : `--profile temperature|humidity|presence|energy` (défauts prêts
+à l'emploi), `--site`, `--device`, `--kind`, `--value`, `--unit`,
+`--count` (1..1000), `--interval` (0..60 s). **Ne lance pas** le
+subscriber et **ne touche pas** la base : publie uniquement sur MQTT.
+
+**Voir aussi :** [Simulateur Forge IoT](../iot/simulator.md)
+
+</details>
+
+### Parcours IoT de bout en bout
+
+```bash
+forge iot:doctor                                       # 1. statique : package, config, migration, API
+forge iot:init                                         # 2. copier la migration vers mvc/migrations/
+forge migration:apply                                  # 3. créer la table iot_events
+forge iot:doctor --db                                  # 4. la table est lisible et conforme ?
+forge iot:doctor --mqtt                                # 5. le broker répond ?
+forge iot:listen                                       # 6. écouter et stocker (laisser tourner)
+forge iot:simulate --profile temperature --count 3 --interval 1   # 7. publier (autre terminal)
+```
 
 ## Utilitaires
 
