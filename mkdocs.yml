@@ -104,6 +104,7 @@ nav:
       - Vue d'ensemble des starters: starters/index.md
       - Créer un module: module-author-guide.md
       - Créer un starter: starter-author-guide.md
+      - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Bienvenue dans Forge:
           - Présentation: starters/welcome/index.md
       - Paramètres d'URL:
