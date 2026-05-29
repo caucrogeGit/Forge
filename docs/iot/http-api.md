@@ -1,8 +1,9 @@
 # API HTTP Forge IoT
 
-> **Statut** : première API JSON de **lecture** des événements IoT.
-> L'API d'ingestion (POST), l'authentification Bearer et le dashboard
-> sont **hors périmètre** à ce ticket — voir
+> **Statut** : API JSON de **lecture** des événements IoT, avec une
+> protection **optionnelle** par Bearer token (voir
+> [Protection par Bearer token](#protection-par-bearer-token)). L'API
+> d'ingestion (POST) et le dashboard restent **hors périmètre** — voir
 > [Architecture Forge IoT](architecture.md#tickets-suivants).
 
 ## Routes
@@ -15,9 +16,10 @@
 
 Toutes les routes sont :
 
-- `public=True` — pas d'authentification à ce ticket (la lecture des
-  mesures est volontairement ouverte tant qu'un Bearer token n'est pas
-  ajouté) ;
+- `public=True` — ouvertes par défaut (parcours local/pédagogique) ;
+  une protection **optionnelle** par Bearer token s'active via
+  `FORGE_IOT_API_TOKEN` (voir
+  [Protection par Bearer token](#protection-par-bearer-token)) ;
 - `csrf=False` — méthodes GET, sans état modifié ;
 - `api=True` — marquées comme routes API par Forge.
 
@@ -180,6 +182,52 @@ qui pourrait fuiter de l'information. Le détail est logué côté serveur
 sur le logger `forge_mvc_iot.http` (niveau `ERROR` via
 `logger.exception`).
 
+### Non autorisé — `401 Unauthorized`
+
+```json
+{"error": "unauthorized"}
+```
+
+Renvoyé quand un Bearer token est configuré (voir ci-dessous) mais que
+la requête n'en fournit pas, fournit un mauvais schéma, ou un mauvais
+token. La réponse reste **sobre** : elle ne précise pas la cause et ne
+renvoie jamais le token.
+
+## Protection par Bearer token
+
+Par défaut, l'API est **ouverte** — pratique en local et pour les
+parcours pédagogiques. Pour un projet **exposé sur le réseau**, définis
+`FORGE_IOT_API_TOKEN` : les trois routes exigent alors un en-tête
+`Authorization: Bearer <token>`.
+
+```bash
+export FORGE_IOT_API_TOKEN="change-me"
+
+# Sans header → 401
+curl http://localhost:8000/api/iot/events
+
+# Avec le bon token → réponse normale
+curl -H "Authorization: Bearer change-me" \
+  http://localhost:8000/api/iot/events
+```
+
+Règles :
+
+- `FORGE_IOT_API_TOKEN` **absent ou vide** → API ouverte (aucun header
+  requis) ;
+- `FORGE_IOT_API_TOKEN` **défini** → `Authorization: Bearer <token>`
+  obligatoire ; toute absence, mauvais schéma ou mauvais token → `401` ;
+- la comparaison utilise `secrets.compare_digest` (temps constant) ;
+- le token est **masqué** dans `repr(IotConfig)` et n'apparaît jamais
+  dans une réponse JSON.
+
+> Pour un test **local**, le token peut rester absent. Pour un projet
+> **exposé sur le réseau**, il **faut** définir `FORGE_IOT_API_TOKEN`.
+
+Cette protection vit dans le module `forge-mvc-iot` (`http.py`), jamais
+dans Forge Core. Hors périmètre : JWT, OAuth, session, RBAC, refresh
+token, rotation, stockage DB du token, TLS.
+
 ## Utilisation directe du contrôleur
 
 Pour un usage avancé (composer une route personnalisée, ajouter un
@@ -190,6 +238,8 @@ from forge_mvc_iot.http import IotHttpController
 from forge_mvc_iot.storage import IotEventRepository
 
 controller = IotHttpController(IotEventRepository())
+# Ou avec protection par token :
+#   IotHttpController(IotEventRepository(), api_token="change-me")
 router.add(
     "GET", "/custom/events", controller.list_events,
     name="custom_events_list",
@@ -197,9 +247,10 @@ router.add(
 )
 ```
 
-## Hors périmètre de ce ticket
+## Hors périmètre
 
-- pas d'authentification (Bearer token, session) ;
+- l'authentification se limite au **Bearer token statique** ci-dessus :
+  pas de JWT, OAuth, session, RBAC ni rotation ;
 - pas de POST/ingestion HTTP — l'ingestion se fait par MQTT
   (subscriber) ;
 - pas de pagination par offset (`?offset=`) ;

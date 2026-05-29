@@ -14,9 +14,15 @@ repository. Le module reste **opt-in** : l'application appelle
 explicitement ``register_iot_routes(router)`` pour les enregistrer.
 Aucune modification automatique de ``mvc/routes.py``.
 
+Sécurité (IOT-HTTP-API-AUTH-001) : protection **optionnelle** par token
+Bearer. Si ``FORGE_IOT_API_TOKEN`` est défini, les trois routes exigent
+un en-tête ``Authorization: Bearer <token>`` ; sinon l'API reste ouverte
+(mode local/pédagogique). L'auth vit dans ce module IoT, **jamais** dans
+Forge Core.
+
 Hors périmètre :
 
-- pas d'authentification (Bearer token, session) ;
+- pas de JWT/OAuth/session, pas de RBAC, pas de refresh token ;
 - pas d'ingestion HTTP (``POST``/downlink) ;
 - pas de pagination par offset ;
 - pas de filtres temporels ``since``/``until`` ;
@@ -26,11 +32,13 @@ Hors périmètre :
 from __future__ import annotations
 
 import logging
+import secrets
 from datetime import UTC, datetime
 from typing import Any
 
 from core.http.response import Response
 
+from forge_mvc_iot.config import IotConfig, load_iot_config
 from forge_mvc_iot.storage.repository import (
     DEFAULT_LIMIT,
     MAX_LIMIT,
@@ -56,6 +64,10 @@ ROUTE_DEVICE_COUNT = "/api/iot/devices/{site}/{device_id}/count"
 # Codes d'erreur HTTP exposés dans le JSON — taxonomie stable.
 ERROR_INVALID_LIMIT = "invalid_limit"
 ERROR_INTERNAL = "internal_server_error"
+ERROR_UNAUTHORIZED = "unauthorized"
+
+# Schéma d'autorisation attendu (exactement « Bearer <token> »).
+_BEARER_PREFIX = "Bearer "
 
 
 # ── Erreurs internes (capturées dans le contrôleur, jamais propagées) ──────
@@ -159,6 +171,45 @@ def _internal_error_response() -> Response:
     )
 
 
+def _unauthorized_response() -> Response:
+    # Réponse sobre : on n'indique jamais si c'est le header, le schéma ou
+    # le token qui est en cause, et on ne renvoie évidemment pas le token.
+    return Response.json(
+        {"error": ERROR_UNAUTHORIZED},
+        status=401,
+    )
+
+
+# ── Authentification optionnelle par Bearer token ──────────────────────────
+
+
+def _extract_bearer_token(request: Any) -> str | None:
+    """Extrait le token d'un en-tête ``Authorization: Bearer <token>``.
+
+    Retourne ``None`` si l'en-tête est absent ou si le schéma n'est pas
+    exactement ``Bearer `` (comparaison de schéma non secrète).
+    """
+    header = request.header("Authorization", None)
+    if not header or not header.startswith(_BEARER_PREFIX):
+        return None
+    return header[len(_BEARER_PREFIX):]
+
+
+def _is_authorized(request: Any, api_token: str | None) -> bool:
+    """Autorise la requête.
+
+    - ``api_token is None`` → API ouverte (mode local/pédagogique) ;
+    - sinon, exige un Bearer token égal au token configuré, comparé avec
+      ``secrets.compare_digest`` (temps constant).
+    """
+    if api_token is None:
+        return True
+    provided = _extract_bearer_token(request)
+    if provided is None:
+        return False
+    return secrets.compare_digest(provided, api_token)
+
+
 # ── Contrôleur ──────────────────────────────────────────────────────────────
 
 
@@ -169,10 +220,18 @@ class IotHttpController:
     au repository, sérialise la réponse. Aucune lecture SQL directe.
     """
 
-    def __init__(self, repository: IotEventRepository) -> None:
+    def __init__(
+        self,
+        repository: IotEventRepository,
+        *,
+        api_token: str | None = None,
+    ) -> None:
         self._repo = repository
+        self._api_token = api_token
 
     def list_events(self, request: Any) -> Response:
+        if not _is_authorized(request, self._api_token):
+            return _unauthorized_response()
         try:
             limit = _parse_limit(request)
         except _BadLimit as exc:
@@ -187,6 +246,8 @@ class IotHttpController:
         )
 
     def find_by_device(self, request: Any) -> Response:
+        if not _is_authorized(request, self._api_token):
+            return _unauthorized_response()
         site = request.route_param("site")
         device_id = request.route_param("device_id")
         try:
@@ -206,6 +267,8 @@ class IotHttpController:
         )
 
     def count_by_device(self, request: Any) -> Response:
+        if not _is_authorized(request, self._api_token):
+            return _unauthorized_response()
         site = request.route_param("site")
         device_id = request.route_param("device_id")
         try:
@@ -228,6 +291,7 @@ def register_iot_routes(
     router: Any,
     *,
     repository: IotEventRepository | None = None,
+    config: IotConfig | None = None,
 ) -> None:
     """Enregistre les routes Forge IoT sur un ``Router`` Forge.
 
@@ -241,6 +305,11 @@ def register_iot_routes(
     repository:
         ``IotEventRepository`` à utiliser. Par défaut, instancié sans
         adapter (donc avec ``core.database.db``).
+    config:
+        ``IotConfig`` source du ``api_token``. Par défaut, chargé via
+        ``load_iot_config()`` (lecture de l'environnement). Si
+        ``config.api_token`` est défini, les routes exigent un Bearer
+        token ; sinon l'API reste ouverte.
 
     Example
     -------
@@ -254,7 +323,9 @@ def register_iot_routes(
     """
     if repository is None:
         repository = IotEventRepository()
-    controller = IotHttpController(repository)
+    if config is None:
+        config = load_iot_config()
+    controller = IotHttpController(repository, api_token=config.api_token)
 
     router.add(
         "GET", ROUTE_LIST_EVENTS, controller.list_events,

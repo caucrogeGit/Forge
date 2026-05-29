@@ -22,6 +22,12 @@ questions « comment se connecter au broker ? ».
 | `FORGE_IOT_MQTT_CLIENT_ID` | `forge-iot` | oui (revient au défaut) | `str` |
 | `FORGE_IOT_MQTT_USERNAME` | `None` | oui (= `None`) | `str | None` |
 | `FORGE_IOT_MQTT_PASSWORD` | `None` | oui (= `None`) | `str | None` |
+| `FORGE_IOT_API_TOKEN` | `None` | oui (= `None`) | `str | None` |
+
+`FORGE_IOT_API_TOKEN` protège l'[API HTTP](http-api.md#protection-par-bearer-token) :
+**absent ou vide** → API ouverte (parcours local) ; **défini** →
+`Authorization: Bearer <token>` exigé sur les routes `/api/iot/*`. Comme
+le mot de passe MQTT, il est **masqué** dans `repr(IotConfig)`.
 
 Les valeurs par défaut sont **locales et pédagogiques** : un
 [Mosquitto](architecture.md#role-de-mosquitto) installé sur la même

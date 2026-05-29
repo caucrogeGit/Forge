@@ -25,6 +25,7 @@ __all__ = [
     "ENV_CLIENT_ID",
     "ENV_USERNAME",
     "ENV_PASSWORD",
+    "ENV_API_TOKEN",
     "IotConfig",
     "load_iot_config",
 ]
@@ -40,6 +41,7 @@ ENV_TOPIC = "FORGE_IOT_MQTT_TOPIC"
 ENV_CLIENT_ID = "FORGE_IOT_MQTT_CLIENT_ID"
 ENV_USERNAME = "FORGE_IOT_MQTT_USERNAME"
 ENV_PASSWORD = "FORGE_IOT_MQTT_PASSWORD"
+ENV_API_TOKEN = "FORGE_IOT_API_TOKEN"
 
 _PASSWORD_MASK = "***"
 
@@ -59,9 +61,13 @@ class IotConfig:
     mqtt_client_id: str
     mqtt_username: str | None
     mqtt_password: str | None
+    # API HTTP : token Bearer optionnel. Champ avec défaut (dernier) pour
+    # rester compatible avec les instanciations existantes à 6 champs.
+    api_token: str | None = None
 
     def __repr__(self) -> str:
         password_repr = repr(_PASSWORD_MASK) if self.mqtt_password else repr(None)
+        token_repr = repr(_PASSWORD_MASK) if self.api_token else repr(None)
         return (
             "IotConfig("
             f"mqtt_host={self.mqtt_host!r}, "
@@ -69,7 +75,8 @@ class IotConfig:
             f"mqtt_topic={self.mqtt_topic!r}, "
             f"mqtt_client_id={self.mqtt_client_id!r}, "
             f"mqtt_username={self.mqtt_username!r}, "
-            f"mqtt_password={password_repr}"
+            f"mqtt_password={password_repr}, "
+            f"api_token={token_repr}"
             ")"
         )
 
@@ -92,6 +99,8 @@ def load_iot_config(env: Mapping[str, str] | None = None) -> IotConfig:
     - ``FORGE_IOT_MQTT_CLIENT_ID`` non défini ou vide → ``"forge-iot"``.
     - ``FORGE_IOT_MQTT_USERNAME`` non défini ou vide → ``None``.
     - ``FORGE_IOT_MQTT_PASSWORD`` non défini ou vide → ``None``.
+    - ``FORGE_IOT_API_TOKEN`` non défini ou vide → ``None`` (API HTTP
+      ouverte) ; défini → token Bearer requis sur les routes IoT.
     """
     if env is None:
         env = os.environ
@@ -121,6 +130,7 @@ def load_iot_config(env: Mapping[str, str] | None = None) -> IotConfig:
 
     username = env.get(ENV_USERNAME) or None
     password = env.get(ENV_PASSWORD) or None
+    api_token = env.get(ENV_API_TOKEN) or None
 
     return IotConfig(
         mqtt_host=host,
@@ -129,4 +139,5 @@ def load_iot_config(env: Mapping[str, str] | None = None) -> IotConfig:
         mqtt_client_id=client_id,
         mqtt_username=username,
         mqtt_password=password,
+        api_token=api_token,
     )

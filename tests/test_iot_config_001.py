@@ -27,6 +27,7 @@ from forge_mvc_iot.config import (
     DEFAULT_HOST,
     DEFAULT_PORT,
     DEFAULT_TOPIC,
+    ENV_API_TOKEN,
     ENV_CLIENT_ID,
     ENV_HOST,
     ENV_PASSWORD,
@@ -202,6 +203,50 @@ class TestPasswordMasking:
         # en clair pour aider au diagnostic.
         cfg = load_iot_config({ENV_USERNAME: "forge"})
         assert "'forge'" in repr(cfg)
+
+
+# ── Token API HTTP (IOT-HTTP-API-AUTH-001) ──────────────────────────────────
+
+
+class TestApiToken:
+    def test_default_api_token_is_none(self):
+        assert load_iot_config({}).api_token is None
+
+    def test_empty_api_token_becomes_none(self):
+        assert load_iot_config({ENV_API_TOKEN: ""}).api_token is None
+
+    def test_api_token_loaded_when_set(self):
+        cfg = load_iot_config({ENV_API_TOKEN: "change-me"})
+        assert cfg.api_token == "change-me"
+
+    def test_api_token_masked_in_repr_when_set(self):
+        cfg = load_iot_config({ENV_API_TOKEN: "supersecret-token-xyz"})
+        text = repr(cfg)
+        assert "supersecret-token-xyz" not in text, (
+            f"Le token API ne doit pas apparaître en clair dans repr() "
+            f"(vu : {text})"
+        )
+        assert "api_token='***'" in text
+
+    def test_api_token_none_shown_as_none(self):
+        text = repr(load_iot_config({}))
+        assert "api_token=None" in text
+
+    def test_api_token_accessible_in_clear(self):
+        # Le contrôleur HTTP doit pouvoir comparer le token en clair sur
+        # l'attribut — seul le repr est masqué.
+        cfg = load_iot_config({ENV_API_TOKEN: "change-me"})
+        assert cfg.api_token == "change-me"
+
+    def test_default_construction_omits_api_token(self):
+        # Le champ a un défaut : IotConfig reste constructible avec les
+        # 6 champs historiques (compat ascendante).
+        cfg = IotConfig(
+            mqtt_host="localhost", mqtt_port=1883,
+            mqtt_topic="forge/+/+/telemetry", mqtt_client_id="forge-iot",
+            mqtt_username=None, mqtt_password=None,
+        )
+        assert cfg.api_token is None
 
 
 # ── Immutabilité ────────────────────────────────────────────────────────────

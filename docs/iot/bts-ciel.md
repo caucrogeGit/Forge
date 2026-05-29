@@ -99,6 +99,10 @@ La base est la **mémoire** du système.
 L'API HTTP `GET /api/iot/events` permet d'**exploiter** les mesures
 stockées (les afficher, les analyser, les visualiser). C'est le point
 d'entrée d'une future interface — sans dépendre du broker directement.
+En classe, l'API reste **ouverte** ; pour un projet exposé sur le
+réseau, on peut la protéger par un
+[token Bearer](http-api.md#protection-par-bearer-token)
+(`FORGE_IOT_API_TOKEN`).
 
 ## Exemple de message
 
