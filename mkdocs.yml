@@ -162,8 +162,9 @@ nav:
   - Philosophie:
       - Charte v2: charter.md
       - Décisions d'architecture:
-          - ADR-001 Auth Forge 2.x: adr/001-auth-strategy.md
-          - ADR-002 Sessions Forge 2.x: adr/002-session-strategy.md
+          - Index des ADR: adr/index.md
+          - ADR-001 Authentification: adr/001-auth-strategy.md
+          - ADR-002 Sessions: adr/002-session-strategy.md
           - ADR-003 Langue API: adr/003-language-convention.md
           - ADR-004 Périmètre core: adr/004-core-perimeter.md
           - ADR-005 Packaging: adr/005-packaging.md

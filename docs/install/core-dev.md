@@ -245,7 +245,7 @@ Détails complets dans [Contribuer à Forge](../contributing.md) (section
 | Processus de contribution complet | [Contribuer à Forge](../contributing.md) |
 | Conventions de code et de tests | [Conventions de travail](../contributing/conventions.md) |
 | Charte philosophique du projet | [Charte v2](../charter.md) |
-| Décisions architecturales | [ADR](../adr/) |
+| Décisions architecturales | [ADR](../adr/index.md) |
 | Procédure de release | [Politique de release](../release-policy.md) |
 | Tests E2E MariaDB | [Tests E2E](../reference/tests-e2e.md) |
 
