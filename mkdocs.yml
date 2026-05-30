@@ -89,7 +89,7 @@ nav:
       - Relations entre entités: relations.md
       - Gestion des mails: mail.md
       - Auth/User: auth.md
-      - Sécurité et RBAC: security.md
+      - Sécurité et RBAC: philosophy/security.md
       - RBAC — Contrôle d'accès: rbac.md
       - Contrat RBAC séparé: security/rbac-contract.md
       - RBAC — Usage applicatif: security/rbac-usage.md
@@ -102,8 +102,8 @@ nav:
 
   - Modules et starters:
       - Vue d'ensemble des starters: starters/index.md
-      - Créer un module: module-author-guide.md
-      - Créer un starter: starter-author-guide.md
+      - Créer un module: philosophy/module-author-guide.md
+      - Créer un starter: philosophy/starter-author-guide.md
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Bienvenue dans Forge:
@@ -160,7 +160,7 @@ nav:
       - Contrat de stabilité: release/stability-contract.md
 
   - Philosophie:
-      - Charte v2: charter.md
+      - Charte v2: philosophy/charter.md
       - Décisions d'architecture:
           - Index des ADR: adr/index.md
           - ADR-001 Authentification: adr/001-auth-strategy.md
@@ -229,7 +229,7 @@ nav:
       - Validation locale: release/release-local.md
       - Paramètres GitHub du dépôt: project/github-repository-settings.md
       - Pour contribuer:
-          - Vue d'ensemble: contributing.md
+          - Vue d'ensemble: philosophy/contributing.md
           - Conventions de travail: contributing/conventions.md
           - Dépôt canonique et récupération: contributing/canonical-repo.md
       - Audits:
@@ -253,7 +253,7 @@ nav:
           - 1.0.0-beta.8: history/releases/release-1.0.0-beta.8.md
           - 1.0.0-beta.7: history/releases/release-1.0.0-beta.7.md
           - 1.0.0-beta.6: history/releases/release-1.0.0-beta.6.md
-      - Licence: licence.md
+      - Licence: philosophy/licence.md
 
 markdown_extensions:
   - admonition

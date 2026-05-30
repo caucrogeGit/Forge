@@ -32,4 +32,4 @@ Plus :
 Lire l'intégralité de la charte dans `CHARTE_DOC.md` à la racine du dépôt.
 
 L'adoption formelle de la charte est consignée dans
-[ADR-007](adr/007-charter-v2-adoption.md).
+[ADR-007](../adr/007-charter-v2-adoption.md).

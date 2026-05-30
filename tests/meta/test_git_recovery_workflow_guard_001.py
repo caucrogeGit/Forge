@@ -17,7 +17,7 @@ Critères :
   `git apply --check`, `git am`, fast-forward, push) ;
 - elle pose des interdits explicites (merge direct d'un projet généré,
   patch WIP appliqué automatiquement) ;
-- elle est référencée depuis `docs/contributing.md` et `mkdocs.yml` ;
+- elle est référencée depuis `docs/philosophy/contributing.md` et `mkdocs.yml` ;
 - la roadmap mentionne le ticket comme livré.
 """
 
@@ -32,7 +32,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DOC = PROJECT_ROOT / "docs" / "contributing" / "canonical-repo.md"
-CONTRIBUTING = PROJECT_ROOT / "docs" / "contributing.md"
+CONTRIBUTING = PROJECT_ROOT / "docs" / "philosophy" / "contributing.md"
 MKDOCS = PROJECT_ROOT / "mkdocs.yml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 CLAUDE_MD = PROJECT_ROOT / "CLAUDE.md"
@@ -202,7 +202,7 @@ class TestDocIntegration:
     def test_referenced_from_contributing(self):
         text = CONTRIBUTING.read_text(encoding="utf-8")
         assert "contributing/canonical-repo.md" in text, (
-            "docs/contributing.md doit référencer la nouvelle page "
+            "docs/philosophy/contributing.md doit référencer la nouvelle page "
             "dans sa section « Voir aussi »."
         )
 

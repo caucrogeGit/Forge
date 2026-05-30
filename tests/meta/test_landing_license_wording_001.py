@@ -6,7 +6,7 @@ disponible (voir LICENSE).
 
 Mentions tolérées :
 - docs/adr/003-language-convention.md : référence à l'écosystème global
-- docs/licence.md : phrase qui PRÉCISE que Forge n'est PAS open source
+- docs/philosophy/licence.md : phrase qui PRÉCISE que Forge n'est PAS open source
 - CHANGELOG.md, docs/history/, docs/history/audits/ : historique
 """
 from __future__ import annotations

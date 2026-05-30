@@ -1,6 +1,6 @@
 """Garde-fou STARTER-CONVENTIONS-DOC-001.
 
-Vérifie que docs/starter-author-guide.md documente les conventions de langage
+Vérifie que docs/philosophy/starter-author-guide.md documente les conventions de langage
 des starters Forge :
 - SQL français possible ;
 - API Python en anglais ;
@@ -19,12 +19,12 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-GUIDE = PROJECT_ROOT / "docs" / "starter-author-guide.md"
+GUIDE = PROJECT_ROOT / "docs" / "philosophy" / "starter-author-guide.md"
 
 
 @pytest.fixture(scope="module")
 def guide() -> str:
-    assert GUIDE.exists(), f"docs/starter-author-guide.md introuvable : {GUIDE}"
+    assert GUIDE.exists(), f"docs/philosophy/starter-author-guide.md introuvable : {GUIDE}"
     return GUIDE.read_text(encoding="utf-8")
 
 

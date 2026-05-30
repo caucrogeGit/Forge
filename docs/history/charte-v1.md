@@ -6,7 +6,7 @@
 > Elle a été remplacée par la charte philosophique v2 lors de la phase 14.2 (ADR-007),
 > pour résoudre des tensions internes révélées par l'audit du code.
 >
-> La charte de référence est désormais [`CHARTE_DOC.md`](../charter.md)
+> La charte de référence est désormais [`CHARTE_DOC.md`](../philosophy/charter.md)
 > (également à la racine du dépôt).
 >
 > Conservée ici pour mémoire et pour comprendre l'évolution du projet.

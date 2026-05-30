@@ -71,7 +71,7 @@ _EXCLUDED_DIR_PARTS = frozenset({
 _USER_PROJECT_ROOTS = frozenset({
     "mvc", "app", "config", "wsgi",
     # `modules/` est aussi côté projet utilisateur (système de modules Forge :
-    # voir `docs/module-author-guide.md`). Les modules concrets vivent dans
+    # voir `docs/philosophy/module-author-guide.md`). Les modules concrets vivent dans
     # le projet, pas dans le repo Forge.
     "modules",
     # `optins/` est la couche de branchement local des opt-ins, générée

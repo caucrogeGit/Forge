@@ -519,7 +519,7 @@ Ce tutoriel couvre une application simple. Il ne couvre pas :
 | Limite | Documentation |
 |---|---|
 | Auth / connexion utilisateur | [Auth/User](../auth.md) |
-| Rôles et permissions (RBAC) | [Sécurité et RBAC](../security.md), [RBAC](../rbac.md) |
+| Rôles et permissions (RBAC) | [Sécurité et RBAC](../philosophy/security.md), [RBAC](../rbac.md) |
 | Relations `many_to_many` | [Relations entre entités](../relations.md) |
 | Envoi de mails | [Gestion des mails](../mail.md) |
 | Upload de fichiers / médias | [Module média](../media.md) |

@@ -12,7 +12,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-MODULE_AUTHOR_GUIDE = PROJECT_ROOT / "docs" / "module-author-guide.md"
+MODULE_AUTHOR_GUIDE = PROJECT_ROOT / "docs" / "philosophy" / "module-author-guide.md"
 REFERENCE_MODULES = PROJECT_ROOT / "docs" / "reference" / "modules.md"
 
 
@@ -30,7 +30,7 @@ def test_guide_mentions_generate_module_routes():
     """Le guide auteur doit mentionner generate_module_routes ou module:routes."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "module:routes" in src or "generate_module_routes" in src, (
-        "docs/module-author-guide.md doit documenter module:routes"
+        "docs/philosophy/module-author-guide.md doit documenter module:routes"
     )
 
 
@@ -38,7 +38,7 @@ def test_guide_mentions_dedicated_routes_file():
     """Le guide doit mentionner le fichier dédié mvc/routes_<module>.py."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "mvc/routes_" in src, (
-        "docs/module-author-guide.md doit mentionner mvc/routes_<module>.py"
+        "docs/philosophy/module-author-guide.md doit mentionner mvc/routes_<module>.py"
     )
 
 
@@ -46,7 +46,7 @@ def test_guide_mentions_explicit_lines_in_mvc_routes():
     """Le guide doit expliquer que le développeur ajoute les lignes dans mvc/routes.py."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "mvc/routes.py" in src, (
-        "docs/module-author-guide.md doit mentionner mvc/routes.py"
+        "docs/philosophy/module-author-guide.md doit mentionner mvc/routes.py"
     )
 
 
@@ -54,7 +54,7 @@ def test_guide_states_no_automatic_injection():
     """Le guide doit préciser que Forge ne modifie pas mvc/routes.py automatiquement."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "ne modifie" in src or "pas automatiquement" in src or "manuellement" in src, (
-        "docs/module-author-guide.md doit indiquer que Forge ne modifie pas "
+        "docs/philosophy/module-author-guide.md doit indiquer que Forge ne modifie pas "
         "mvc/routes.py automatiquement"
     )
 
@@ -63,7 +63,7 @@ def test_guide_mentions_migration_section():
     """Le guide doit contenir une section sur la migration des anciens projets."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "Migration" in src or "migration" in src, (
-        "docs/module-author-guide.md doit contenir une section migration"
+        "docs/philosophy/module-author-guide.md doit contenir une section migration"
     )
 
 
@@ -83,7 +83,7 @@ def test_guide_does_not_recommend_prepare_injection():
     """Le guide ne doit pas recommander prepare_module_route_injection."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "prepare_module_route_injection" not in src, (
-        "docs/module-author-guide.md ne doit pas référencer "
+        "docs/philosophy/module-author-guide.md ne doit pas référencer "
         "prepare_module_route_injection (supprimé en 6.1)"
     )
 
@@ -92,7 +92,7 @@ def test_guide_does_not_recommend_module_route_injection_result():
     """Le guide ne doit pas référencer ModuleRouteInjectionResult."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "ModuleRouteInjectionResult" not in src, (
-        "docs/module-author-guide.md ne doit pas référencer ModuleRouteInjectionResult"
+        "docs/philosophy/module-author-guide.md ne doit pas référencer ModuleRouteInjectionResult"
     )
 
 
@@ -100,7 +100,7 @@ def test_guide_does_not_describe_automatic_bridge_in_mvc_routes():
     """Le guide ne doit plus décrire un pont automatique injecté dans mvc/routes.py."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "Forge ajoute aussi automatiquement le pont" not in src, (
-        "docs/module-author-guide.md ne doit plus décrire l'ajout automatique "
+        "docs/philosophy/module-author-guide.md ne doit plus décrire l'ajout automatique "
         "d'un pont dans mvc/routes.py"
     )
 

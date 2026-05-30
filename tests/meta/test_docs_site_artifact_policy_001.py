@@ -32,7 +32,7 @@ pytestmark = pytest.mark.meta
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _GITIGNORE = _REPO_ROOT / ".gitignore"
-_CONTRIBUTING = _REPO_ROOT / "docs" / "contributing.md"
+_CONTRIBUTING = _REPO_ROOT / "docs" / "philosophy" / "contributing.md"
 
 
 # ---------------------------------------------------------------------------
@@ -79,7 +79,7 @@ class TestGitignore:
 
 
 # ---------------------------------------------------------------------------
-# Documentation — la politique est expliquée dans docs/contributing.md
+# Documentation — la politique est expliquée dans docs/philosophy/contributing.md
 # ---------------------------------------------------------------------------
 
 

@@ -115,12 +115,12 @@ def test_deployment_doc_mentions_tls12():
 
 
 def test_security_doc_mentions_nginx():
-    content = open("docs/security.md", encoding="utf-8").read()
+    content = open("docs/philosophy/security.md", encoding="utf-8").read()
     assert "Nginx" in content or "nginx" in content
 
 
 def test_security_doc_mentions_tls12():
-    content = open("docs/security.md", encoding="utf-8").read()
+    content = open("docs/philosophy/security.md", encoding="utf-8").read()
     assert "1.2" in content
 
 

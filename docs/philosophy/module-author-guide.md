@@ -512,7 +512,7 @@ forge project:audit
 
 ## Voir aussi
 
-- [API et CLI](reference/reference.md) — liste complète des commandes `forge module:*`
-- [Application complète](guide/app-complete-tutorial.md) — exemple avec plusieurs entités
-- [Contrat de stabilité](release/stability-contract.md) — garanties sur les fichiers préservés
-- [Vue d'ensemble des starters](starters/index.md) — différence module / starter
+- [API et CLI](../reference/reference.md) — liste complète des commandes `forge module:*`
+- [Application complète](../guide/app-complete-tutorial.md) — exemple avec plusieurs entités
+- [Contrat de stabilité](../release/stability-contract.md) — garanties sur les fichiers préservés
+- [Vue d'ensemble des starters](../starters/index.md) — différence module / starter

@@ -130,7 +130,7 @@ class TestContributingMdUpdated:
 
     @pytest.fixture(scope="class")
     def contributing_content(self):
-        return (ROOT / "docs" / "contributing.md").read_text(encoding="utf-8")
+        return (ROOT / "docs" / "philosophy" / "contributing.md").read_text(encoding="utf-8")
 
     def test_no_reference_to_archived_consolidation_roadmap(self, contributing_content):
         assert "forge_post_2_0_consolidation_roadmap" not in contributing_content

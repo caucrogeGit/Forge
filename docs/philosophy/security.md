@@ -3,11 +3,11 @@
 !!! tip "Guide production"
     Pour les bonnes pratiques de déploiement sécurisé (checklist, secrets, HTTPS,
     cookies, headers, CSRF, RBAC, uploads, logs), voir
-    **[Sécurité en production](deployment/production-security.md)**.
+    **[Sécurité en production](../deployment/production-security.md)**.
 
 !!! info "Auth/User avancée"
     Pour l'authentification complète (login, MFA, OIDC, sessions, audit, CLI admin),
-    voir **[Authentification Forge](auth.md)**.
+    voir **[Authentification Forge](../auth.md)**.
 
 ## Socle de sécurité
 
@@ -21,7 +21,7 @@ Forge fournit les briques de sécurité suivantes dans `core/security/` :
 | Middleware | `middleware.py` | `AuthMiddleware`, `CsrfMiddleware` |
 | Nonce CSP | `csp.py` | Nonce par requête pour scripts inline contrôlés (`APP_CSP_NONCE_ENABLED`) |
 
-Le RBAC complet (`Role`, `Permission`, `@require_permission`, `make_can`…) est fourni par le module opt-in `forge-mvc-rbac` — il n'y a pas de `rbac.py` dans `core/security/`. Voir [RBAC — Contrôle d'accès](rbac.md).
+Le RBAC complet (`Role`, `Permission`, `@require_permission`, `make_can`…) est fourni par le module opt-in `forge-mvc-rbac` — il n'y a pas de `rbac.py` dans `core/security/`. Voir [RBAC — Contrôle d'accès](../rbac.md).
 
 ### TLS du serveur de développement
 
@@ -41,7 +41,7 @@ APP_CSP_NONCE_ENABLED=true
 <script nonce="{{ csp_nonce() }}">/* script inline autorisé */</script>
 ```
 
-`unsafe-inline` n'est jamais ajouté automatiquement. Voir [référence API](reference/api.md#coresecurity) pour les détails.
+`unsafe-inline` n'est jamais ajouté automatiquement. Voir [référence API](../reference/api.md#coresecurity) pour les détails.
 
 ---
 
@@ -81,7 +81,7 @@ Ces en-têtes ne remplacent pas :
 
 - la configuration HTTPS et TLS du reverse proxy ;
 - une revue de sécurité des templates applicatifs ;
-- une politique de déploiement sécurisé complète (voir [Sécurité en production](deployment/production-security.md)).
+- une politique de déploiement sécurisé complète (voir [Sécurité en production](../deployment/production-security.md)).
 
 Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis sont des garde-fous raisonnables, testés et verrouillés comme contrat public (`SECURITY-HEADERS-DOC-LOCK-001`).
 
@@ -119,7 +119,7 @@ Le contrat est verrouillé par
 
 La documentation complète du RBAC Forge (rôles, permissions, décorateurs,
 helper Jinja, génération CRUD, chaîne de confiance) se trouve dans
-**[RBAC — Contrôle d'accès](rbac.md)**.
+**[RBAC — Contrôle d'accès](../rbac.md)**.
 
 ### Résumé rapide
 

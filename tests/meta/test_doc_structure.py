@@ -32,7 +32,7 @@ class TestPagesExistent:
         assert Path("docs/auth.md").exists()
 
     def test_security_existe(self):
-        assert Path("docs/security.md").exists()
+        assert Path("docs/philosophy/security.md").exists()
 
     def test_rbac_existe(self):
         assert Path("docs/rbac.md").exists()

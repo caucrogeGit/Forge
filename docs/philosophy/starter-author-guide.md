@@ -509,7 +509,7 @@ une contrainte du framework.
 
 En revanche, le code Python exposé dans les contrôleurs, modèles et fonctions
 d'un starter doit utiliser des noms clairs, stables et cohérents — en anglais,
-conformément à l'[ADR-003](adr/003-language-convention.md).
+conformément à l'[ADR-003](../adr/003-language-convention.md).
 
 La règle ne concerne pas les noms SQL. Elle concerne les fonctions Python,
 les noms de paramètres et les clés de dictionnaire exposées au reste du code.
@@ -770,8 +770,8 @@ forge project:audit
 
 ## Voir aussi
 
-- [API et CLI](reference/reference.md) — liste complète des commandes `forge starter:*`
+- [API et CLI](../reference/reference.md) — liste complète des commandes `forge starter:*`
 - [Créer un module](module-author-guide.md) — brique réutilisable installable dans un projet existant
-- [Vue d'ensemble des starters](starters/index.md) — starters officiels Forge
-- [Application complète](guide/app-complete-tutorial.md) — exemple de build manuel
-- [Relations entre entités](relations.md) — format `relations.json`
+- [Vue d'ensemble des starters](../starters/index.md) — starters officiels Forge
+- [Application complète](../guide/app-complete-tutorial.md) — exemple de build manuel
+- [Relations entre entités](../relations.md) — format `relations.json`

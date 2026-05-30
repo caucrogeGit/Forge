@@ -8,7 +8,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 CHARTER_ROOT = PROJECT_ROOT / "CHARTE_DOC.md"
-CHARTER_DOCS = PROJECT_ROOT / "docs" / "charter.md"
+CHARTER_DOCS = PROJECT_ROOT / "docs" / "philosophy" / "charter.md"
 
 
 class TestCanonicalCharter:
@@ -35,7 +35,7 @@ class TestCanonicalCharter:
 
 
 class TestDocsCharterIsAlias:
-    """docs/charter.md est un alias court vers la source canonique."""
+    """docs/philosophy/charter.md est un alias court vers la source canonique."""
 
     def test_charter_docs_exists(self):
         assert CHARTER_DOCS.exists()
@@ -44,7 +44,7 @@ class TestDocsCharterIsAlias:
         content = CHARTER_DOCS.read_text(encoding="utf-8")
         line_count = len(content.splitlines())
         assert line_count < 50, (
-            f"docs/charter.md fait {line_count} lignes — devrait être "
+            f"docs/philosophy/charter.md fait {line_count} lignes — devrait être "
             f"un alias court (<50 lignes). La charte complète est "
             f"dans CHARTE_DOC.md à la racine."
         )
@@ -52,7 +52,7 @@ class TestDocsCharterIsAlias:
     def test_charter_docs_references_canonical(self):
         content = CHARTER_DOCS.read_text(encoding="utf-8")
         assert "CHARTE_DOC.md" in content, (
-            "docs/charter.md devrait mentionner CHARTE_DOC.md à la racine"
+            "docs/philosophy/charter.md devrait mentionner CHARTE_DOC.md à la racine"
         )
 
 
@@ -63,7 +63,7 @@ class TestNoLongerIdentical:
         content_root = CHARTER_ROOT.read_text(encoding="utf-8")
         content_docs = CHARTER_DOCS.read_text(encoding="utf-8")
         assert content_root != content_docs, (
-            "CHARTE_DOC.md et docs/charter.md devraient avoir un "
+            "CHARTE_DOC.md et docs/philosophy/charter.md devraient avoir un "
             "contenu différent : le premier est la source canonique "
             "(complète), le second est un alias court."
         )
@@ -73,7 +73,7 @@ class TestNoLongerIdentical:
         size_docs = CHARTER_DOCS.stat().st_size
         assert size_root > size_docs * 3, (
             f"CHARTE_DOC.md ({size_root} octets) devrait être "
-            f"substantiellement plus gros que docs/charter.md "
+            f"substantiellement plus gros que docs/philosophy/charter.md "
             f"({size_docs} octets). Si c'est presque pareil, la "
             f"déduplication n'a pas été faite correctement."
         )

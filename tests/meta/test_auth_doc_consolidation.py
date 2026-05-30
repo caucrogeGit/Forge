@@ -7,7 +7,7 @@ Vérifie que :
 - les commandes admin CLI sont documentées avec erreurs et conseils ;
 - les liens croisés vers rbac.md, production-security.md et reference.md sont présents ;
 - docs/rbac.md pointe vers docs/auth.md ;
-- docs/security.md pointe vers docs/auth.md ;
+- docs/philosophy/security.md pointe vers docs/auth.md ;
 - les limites restantes sont explicitées.
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.meta
 
 AUTH_MD = pathlib.Path("docs/auth.md")
 RBAC_MD = pathlib.Path("docs/rbac.md")
-SECURITY_MD = pathlib.Path("docs/security.md")
+SECURITY_MD = pathlib.Path("docs/philosophy/security.md")
 PRODUCTION_MD = pathlib.Path("docs/deployment/production-security.md")
 REFERENCE_MD = pathlib.Path("docs/reference/api.md")
 ROADMAP_MD = pathlib.Path("docs/roadmap/forge-roadmap.md")

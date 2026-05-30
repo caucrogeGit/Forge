@@ -1,6 +1,6 @@
 """Garde-fou README-RUNTIME-DEPS-CLEANUP-001.
 
-Vérifie que le README et docs/contributing.md ne présentent pas pyotp
+Vérifie que le README et docs/philosophy/contributing.md ne présentent pas pyotp
 comme une dépendance runtime obligatoire du core forge-mvc.
 
 Règle : pyotp est MFA-only (principe 8). Les tests de packaging
@@ -60,12 +60,12 @@ class TestReadmeRuntimeDeps:
 
 
 class TestContributingRuntimeDeps:
-    """docs/contributing.md ne liste pas pyotp parmi les dépendances runtime core."""
+    """docs/philosophy/contributing.md ne liste pas pyotp parmi les dépendances runtime core."""
 
     def test_pyotp_absent_de_la_liste_runtime(self):
-        doc = PROJECT_ROOT / "docs" / "contributing.md"
+        doc = PROJECT_ROOT / "docs" / "philosophy" / "contributing.md"
         if not doc.exists():
-            pytest.skip("docs/contributing.md n'existe pas")
+            pytest.skip("docs/philosophy/contributing.md n'existe pas")
         text = doc.read_text(encoding="utf-8")
         # Extraire la liste des packages déclarés comme dépendances runtime core
         # (portion après "limitées à" jusqu'au premier point qui ferme la liste)
@@ -73,6 +73,6 @@ class TestContributingRuntimeDeps:
         if match:
             core_list = match.group(1)
             assert "`pyotp`" not in core_list, (
-                "docs/contributing.md liste `pyotp` dans les dépendances runtime core — "
+                "docs/philosophy/contributing.md liste `pyotp` dans les dépendances runtime core — "
                 "pyotp est MFA-only (principe 8)."
             )

@@ -16,7 +16,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 RBAC_DOC = PROJECT_ROOT / "docs" / "rbac.md"
-SECURITY_DOC = PROJECT_ROOT / "docs" / "security.md"
+SECURITY_DOC = PROJECT_ROOT / "docs" / "philosophy" / "security.md"
 CORE_ROOT = PROJECT_ROOT / "core"
 
 
@@ -76,7 +76,7 @@ class TestRbacDocDistinguishesCoreAndOptin:
 
 
 # ---------------------------------------------------------------------------
-# Documentation docs/security.md — pas de rbac.py fantôme dans core/security/
+# Documentation docs/philosophy/security.md — pas de rbac.py fantôme dans core/security/
 # ---------------------------------------------------------------------------
 
 class TestSecurityDocNoCoreRbacPhantom:
@@ -88,7 +88,7 @@ class TestSecurityDocNoCoreRbacPhantom:
             if "rbac.py" in line and "|" in line
         ]
         assert not lines_with_rbac_py, (
-            "docs/security.md ne doit pas lister rbac.py comme fichier core — "
+            "docs/philosophy/security.md ne doit pas lister rbac.py comme fichier core — "
             "ce fichier n'existe pas dans core/security/ : "
             + str(lines_with_rbac_py)
         )
@@ -96,7 +96,7 @@ class TestSecurityDocNoCoreRbacPhantom:
     def test_security_doc_points_to_forge_mvc_rbac(self):
         content = SECURITY_DOC.read_text(encoding="utf-8")
         assert "forge_mvc_rbac" in content or "forge-mvc-rbac" in content, (
-            "docs/security.md doit pointer vers forge_mvc_rbac / forge-mvc-rbac"
+            "docs/philosophy/security.md doit pointer vers forge_mvc_rbac / forge-mvc-rbac"
         )
 
 

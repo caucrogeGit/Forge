@@ -1,7 +1,7 @@
 """Garde-fou META-TESTS-ROTATION-POLICY-001.
 
 Vérifie que la politique de rotation des tests méta est documentée
-dans docs/contributing.md avec toutes les sections requises, et
+dans docs/philosophy/contributing.md avec toutes les sections requises, et
 applique la règle minimale sur les tests méta temporaires.
 
 Règles vérifiées :
@@ -21,7 +21,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-CONTRIBUTING = PROJECT_ROOT / "docs" / "contributing.md"
+CONTRIBUTING = PROJECT_ROOT / "docs" / "philosophy" / "contributing.md"
 META_DIR = Path(__file__).parent
 
 _TICKET_PATTERN = re.compile(
@@ -37,7 +37,7 @@ class TestPolicySectionExists:
     def test_section_header_present(self):
         text = CONTRIBUTING.read_text(encoding="utf-8")
         assert "Politique de rotation des tests méta" in text, (
-            "docs/contributing.md doit contenir une section "
+            "docs/philosophy/contributing.md doit contenir une section "
             "'Politique de rotation des tests méta'."
         )
 
@@ -88,7 +88,7 @@ class TestPolicySectionExists:
     def test_prune_ticket_referenced(self):
         text = CONTRIBUTING.read_text(encoding="utf-8")
         assert "META-TESTS-PRUNE-001" in text, (
-            "docs/contributing.md doit référencer META-TESTS-PRUNE-001 "
+            "docs/philosophy/contributing.md doit référencer META-TESTS-PRUNE-001 "
             "comme ticket de nettoyage effectif."
         )
 

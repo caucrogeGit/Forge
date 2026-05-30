@@ -5,7 +5,7 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-DOC = Path("docs/module-author-guide.md")
+DOC = Path("docs/philosophy/module-author-guide.md")
 MKDOCS = Path("mkdocs.yml")
 ROADMAP = Path("docs/roadmap/forge-roadmap.md")
 
@@ -21,7 +21,7 @@ def _text():
 
 class TestExistence:
     def test_fichier_existe(self):
-        assert DOC.exists(), "docs/module-author-guide.md introuvable"
+        assert DOC.exists(), "docs/philosophy/module-author-guide.md introuvable"
 
     def test_fichier_non_vide(self):
         assert len(_text()) > 1000

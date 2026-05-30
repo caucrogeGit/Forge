@@ -21,7 +21,7 @@ Deux parcours **distincts**, qui ne se mélangent pas :
 | Point d'entrée projet | `forge new mon-app` | `cd Forge` (le dépôt cloné) |
 | Fichiers modifiés | `mvc/`, `env/`, `mvc/entities/...` | `core/`, `forge_cli/`, `tests/`, `docs/`, `packages/` |
 | Lancement | `forge run` dans le projet généré | `python -m pytest` + outils de dev |
-| Référence | [Installation avec pipx](pipx.md) | cette page + [Contribuer](../contributing.md) |
+| Référence | [Installation avec pipx](pipx.md) | cette page + [Contribuer](../philosophy/contributing.md) |
 
 !!! warning "Ne pas utiliser `pipx` pour développer le core"
     `pipx` installe Forge dans un environnement isolé, en lecture seule
@@ -140,7 +140,7 @@ Pour les tests E2E MariaDB (optionnels, désactivés par défaut) :
 FORGE_E2E_MARIADB=1 python -m pytest tests/test_e2e_mariadb.py
 ```
 
-Voir [Contribuer à Forge](../contributing.md) pour le processus complet
+Voir [Contribuer à Forge](../philosophy/contributing.md) pour le processus complet
 (branche, message de commit, PR, checklist).
 
 ---
@@ -235,7 +235,7 @@ static/        CSS Tailwind compilé + assets de la landing
 mvc/views/landing/  Source canonique de la landing page
 ```
 
-Détails complets dans [Contribuer à Forge](../contributing.md) (section
+Détails complets dans [Contribuer à Forge](../philosophy/contributing.md) (section
 « Comprendre l'architecture »).
 
 ---
@@ -244,9 +244,9 @@ Détails complets dans [Contribuer à Forge](../contributing.md) (section
 
 | Étape | Ressource |
 |---|---|
-| Processus de contribution complet | [Contribuer à Forge](../contributing.md) |
+| Processus de contribution complet | [Contribuer à Forge](../philosophy/contributing.md) |
 | Conventions de code et de tests | [Conventions de travail](../contributing/conventions.md) |
-| Charte philosophique du projet | [Charte v2](../charter.md) |
+| Charte philosophique du projet | [Charte v2](../philosophy/charter.md) |
 | Décisions architecturales | [ADR](../adr/index.md) |
 | Procédure de release | [Politique de release](../release/release-policy.md) |
 | Tests E2E MariaDB | [Tests E2E](../reference/tests-e2e.md) |

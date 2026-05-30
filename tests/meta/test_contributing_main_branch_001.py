@@ -18,7 +18,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 ONBOARDING_PAGES = [
     PROJECT_ROOT / "CONTRIBUTING.md",
     PROJECT_ROOT / "README.md",
-    PROJECT_ROOT / "docs" / "contributing.md",
+    PROJECT_ROOT / "docs" / "philosophy" / "contributing.md",
 ]
 
 _MASTER_PATTERNS = [

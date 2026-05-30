@@ -103,12 +103,12 @@ starters/      Données des starters officiels Forge (dans forge_cli/starters/da
 
 Guides de référence pour comprendre les contrats :
 
-- [Contrat de stabilité](release/stability-contract.md) — fichiers garantis préservés
-- [Référence API et CLI](reference/reference.md) — toutes les commandes disponibles
-- [Guide de migration](migration-guide.md) — compatibilité entre versions
-- [Politique de release](release/release-policy.md) — SemVer adapté à Forge
-- [Politique de dépréciation](release/deprecation-policy.md) — cycle d'annonce et de retrait
-- [Matrice de compatibilité](release/compatibility.md) — Python, MariaDB, dépendances
+- [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
+- [Référence API et CLI](../reference/reference.md) — toutes les commandes disponibles
+- [Guide de migration](../migration-guide.md) — compatibilité entre versions
+- [Politique de release](../release/release-policy.md) — SemVer adapté à Forge
+- [Politique de dépréciation](../release/deprecation-policy.md) — cycle d'annonce et de retrait
+- [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, dépendances
 
 ---
 
@@ -163,7 +163,7 @@ Règles à respecter lors de toute modification :
 - **Ne pas changer une convention stable** — un changement de convention (nommage, structure JSON, format de fichier) sans ticket de dépréciation est une rupture de contrat.
 - **Ne pas ajouter de dépendance sans nécessité** — les dépendances runtime du core sont limitées à `mariadb`, `jinja2`, `python-dotenv`, `Pillow`, `argon2-cffi`. Les dépendances des modules opt-in (ex. `pyotp` pour MFA) ne font pas partie du core.
 - **Ne pas modifier la version** — la version dans `pyproject.toml` / `forge.py` / `core/__init__.py` n'est modifiée que par un ticket release dédié.
-- **Ne pas créer de tag manuellement** — les tags de version sont créés en suivant la [Procédure de release](release/release.md).
+- **Ne pas créer de tag manuellement** — les tags de version sont créés en suivant la [Procédure de release](../release/release.md).
 
 ---
 
@@ -195,7 +195,7 @@ FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py
 ```
 
 Ces tests ne sont pas requis dans la suite standard. Ils sont optionnels et
-documentés dans la [Matrice de compatibilité](release/compatibility.md).
+documentés dans la [Matrice de compatibilité](../release/compatibility.md).
 
 ### Règles pour les tests
 
@@ -344,17 +344,17 @@ Une fonctionnalité non documentée est incomplète.
 ### Quand modifier `docs/reference.md`
 
 Toute nouvelle commande CLI, tout nouveau paramètre ou tout changement de comportement
-observable doit être reflété dans [Référence API et CLI](reference/reference.md).
+observable doit être reflété dans [Référence API et CLI](../reference/reference.md).
 
 ### Quand modifier un guide spécifique
 
 Si la fonctionnalité est couverte par un guide existant, mettez-le à jour :
 
-- [Architecture des entités](entity_architecture.md) — nouveaux champs ou générateurs
-- [Relations entre entités](relations.md) — nouvelle syntaxe relationnelle
-- [Auth/User](auth.md) — nouvelles briques d'authentification
+- [Architecture des entités](../entity_architecture.md) — nouveaux champs ou générateurs
+- [Relations entre entités](../relations.md) — nouvelle syntaxe relationnelle
+- [Auth/User](../auth.md) — nouvelles briques d'authentification
 - [Sécurité et RBAC](security.md) — nouveaux mécanismes de sécurité
-- [Module média](media.md) — nouveaux comportements uploads
+- [Module média](../media.md) — nouveaux comportements uploads
 
 ### Quand modifier la roadmap
 
@@ -374,7 +374,7 @@ Choisissez la section la plus logique selon le contenu.
 ### Quand modifier le contrat de stabilité
 
 Si une nouvelle commande ou un nouveau fichier est garanti préservé (jamais écrasé
-par Forge), ajoutez-le dans [Contrat de stabilité](release/stability-contract.md).
+par Forge), ajoutez-le dans [Contrat de stabilité](../release/stability-contract.md).
 
 ---
 
@@ -452,7 +452,7 @@ Prochaine priorité : <PROCHAIN-TICKET-ID>
 
 ## Roadmap et priorités
 
-La feuille de route active est dans [Roadmap active](roadmap/forge-roadmap.md).
+La feuille de route active est dans [Roadmap active](../roadmap/forge-roadmap.md).
 
 La priorité courante est toujours indiquée dans le bloc :
 
@@ -489,7 +489,7 @@ Les phases sont regroupées par objectif :
 - **Créer une abstraction magique** — le comportement doit rester traçable
 - **Promettre une compatibilité non testée** — ne documentez que ce qui est vérifié
 - **Modifier une politique de release** sans ticket dédié (`RELEASE-POLICY-*`)
-- **Publier une release** sans suivre la [Procédure de release](release/release.md)
+- **Publier une release** sans suivre la [Procédure de release](../release/release.md)
 - **Modifier la version Forge** hors d'un ticket release
 - **Créer un tag** manuellement sans validation locale préalable
 
@@ -595,13 +595,13 @@ git commit -m "feat: ajouter le guide de création de modules Forge"
 
 ## Voir aussi
 
-- [Dépôt canonique et récupération de commits](contributing/canonical-repo.md) — checklist pré-ticket et procédure officielle de portage par patchs si des commits ont été créés hors du dépôt canonique
-- [Conventions internes de Forge](contributing/conventions.md) — patterns opérationnels (audit, tests, code, doc)
-- [Politique de release](release/release-policy.md) — SemVer adapté, règles de publication
-- [Politique de dépréciation](release/deprecation-policy.md) — cycle d'annonce et de retrait
-- [Matrice de compatibilité](release/compatibility.md) — Python, MariaDB, dépendances
-- [Guide de migration](migration-guide.md) — comment migrer entre versions
-- [Contrat de stabilité](release/stability-contract.md) — fichiers garantis préservés
-- [Procédure de release](release/release.md) — étapes de publication d'une version
-- [Validation locale](release/release-local.md) — checklist de validation avant release
-- [Référence API et CLI](reference/reference.md) — toutes les commandes Forge
+- [Dépôt canonique et récupération de commits](../contributing/canonical-repo.md) — checklist pré-ticket et procédure officielle de portage par patchs si des commits ont été créés hors du dépôt canonique
+- [Conventions internes de Forge](../contributing/conventions.md) — patterns opérationnels (audit, tests, code, doc)
+- [Politique de release](../release/release-policy.md) — SemVer adapté, règles de publication
+- [Politique de dépréciation](../release/deprecation-policy.md) — cycle d'annonce et de retrait
+- [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, dépendances
+- [Guide de migration](../migration-guide.md) — comment migrer entre versions
+- [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
+- [Procédure de release](../release/release.md) — étapes de publication d'une version
+- [Validation locale](../release/release-local.md) — checklist de validation avant release
+- [Référence API et CLI](../reference/reference.md) — toutes les commandes Forge

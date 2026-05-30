@@ -12,7 +12,7 @@ pytestmark = pytest.mark.meta
 _LICENSE = Path("LICENSE")
 _PYPROJECT = Path("pyproject.toml")
 _README = Path("README.md")
-_DOCS_LICENCE = Path("docs/licence.md")
+_DOCS_LICENCE = Path("docs/philosophy/licence.md")
 
 
 def _pyproject() -> dict:
@@ -107,7 +107,7 @@ def test_readme_licence_section_forbids_professional_use():
 
 
 # ---------------------------------------------------------------------------
-# docs/licence.md
+# docs/philosophy/licence.md
 # ---------------------------------------------------------------------------
 
 

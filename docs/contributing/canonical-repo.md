@@ -224,7 +224,7 @@ Pendant une récupération, **jamais** :
 
 - [Conventions internes de Forge](conventions.md) — patterns
   opérationnels (audit avant action, tests, code, doc).
-- [Vue d'ensemble du contributeur](../contributing.md) — préparation
+- [Vue d'ensemble du contributeur](../philosophy/contributing.md) — préparation
   de l'environnement, sélection du ticket, validations canoniques.
 - [Procédure de release](../release/release.md) — pour les tags officiels,
   qui ne sont **jamais** créés depuis un dépôt secondaire.
