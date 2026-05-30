@@ -85,7 +85,7 @@ LEGACY_KEYS = [
 
 MIGRATED_STARTERS = [
     "contact-simple",
-    "utilisateurs-auth",
+    "users-core-auth",
 ]
 
 

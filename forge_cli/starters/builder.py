@@ -382,7 +382,7 @@ def _build_application(
     next_step("Câblage des routes dans mvc/routes.py...")
     if not routes_py.exists():
         raise StarterBuildError("mvc/routes.py introuvable.")
-    if meta.get("id") in ("utilisateurs-auth",):
+    if meta.get("id") in ("users-core-auth",):
         remove_legacy_auth_block(routes_py)
     block = read_snippet(meta)
     inject_block(routes_py, block)

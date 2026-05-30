@@ -2,7 +2,7 @@
 
 Vérifie que :
 - les starters ne contiennent pas d'usage injustifié de core.security.hashing ;
-- le starter 2 (utilisateurs-auth) utilise déjà l'API Auth moderne.
+- le starter 2 (users-core-auth) utilise déjà l'API Auth moderne.
 """
 
 from __future__ import annotations
@@ -37,20 +37,20 @@ def test_no_verify_password_legacy_direct_in_login_starters():
             )
 
 
-# ── Starter 2 (utilisateurs-auth) : déjà conforme ───────────────────────────
+# ── Starter 2 (users-core-auth) : déjà conforme ─────────────────────────────
 
-def test_starter_utilisateurs_auth_utilise_hash_password():
-    """Le starter utilisateurs-auth utilise hash_password (Argon2id) — déjà conforme."""
+def test_starter_users_core_auth_utilise_hash_password():
+    """Le starter users-core-auth utilise hash_password (Argon2id) — déjà conforme."""
     script = (
-        STARTERS_DIR / "utilisateurs-auth" / "files" / "scripts" / "create_auth_user.py"
+        STARTERS_DIR / "users-core-auth" / "files" / "scripts" / "create_auth_user.py"
     ).read_text(encoding="utf-8")
     assert "hash_password(PASSWORD)" in script
 
 
-def test_starter_utilisateurs_auth_controller_utilise_verify_password():
-    """Le contrôleur auth du starter utilisateurs-auth utilise verify_password."""
+def test_starter_users_core_auth_controller_utilise_verify_password():
+    """Le contrôleur auth du starter users-core-auth utilise verify_password."""
     controller = (
-        STARTERS_DIR / "utilisateurs-auth" / "files" / "mvc" / "controllers" / "auth_controller.py"
+        STARTERS_DIR / "users-core-auth" / "files" / "mvc" / "controllers" / "auth_controller.py"
     ).read_text(encoding="utf-8")
     assert "verify_password" in controller
 

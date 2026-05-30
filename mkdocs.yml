@@ -124,9 +124,10 @@ nav:
       - Contacts:
           - Présentation: starters/contact-simple/index.md
           - Reconstruction: starters/contact-simple/rebuild.md
-      - Utilisateurs / Auth:
-          - Présentation: starters/utilisateurs-auth/index.md
-          - Reconstruction: starters/utilisateurs-auth/rebuild.md
+      - Auth (API cœur):
+          - Vue d'ensemble: starters/core-auth/index.md
+          - Auth minimal moderne: starters/core-auth/users-core-auth.md
+          - Reconstruction: starters/core-auth/users-core-auth-rebuild.md
       - MFA (opt-in):
           - Vue d'ensemble: starters/optin-mfa/index.md
           - Auth MFA (TOTP): starters/optin-mfa/welcome-optin-mfa.md

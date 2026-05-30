@@ -2,7 +2,7 @@
 
 Vérifie que :
 1. Le starter `auth-mfa` existe et contient les fichiers MFA attendus (sans stubs).
-2. Le starter `utilisateurs-auth` (baseline sans MFA) ne contient pas de contrôleur MFA.
+2. Le starter `users-core-auth` (baseline sans MFA) ne contient pas de contrôleur MFA.
 3. Le profil `auth-mfa` est déclaré dans SUPPORTED_PROJECT_PROFILES.
 
 Charte principe 8 (noyau minimal, briques opt-in) et principe 1 (séparer framework
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 STARTERS_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data"
-DEFAULT_AUTH_STARTER = STARTERS_DIR / "utilisateurs-auth"
+DEFAULT_AUTH_STARTER = STARTERS_DIR / "users-core-auth"
 MFA_STARTER = STARTERS_DIR / "welcome-optin-mfa"
 
 
@@ -91,15 +91,15 @@ class TestAuthMfaStarterIsClean:
         )
 
 
-# ── Baseline : utilisateurs-auth n'a pas de contrôleur MFA ───────────────────
+# ── Baseline : users-core-auth n'a pas de contrôleur MFA ───────────────────
 
 class TestDefaultAuthStarterHasNoMfaController:
-    """Le starter utilisateurs-auth (baseline) n'a pas de contrôleur MFA."""
+    """Le starter users-core-auth (baseline) n'a pas de contrôleur MFA."""
 
     def test_no_mfa_challenge_controller(self):
         controller = DEFAULT_AUTH_STARTER / "files" / "mvc" / "controllers" / "mfa_challenge_controller.py"
         assert not controller.exists(), (
-            "utilisateurs-auth ne doit pas contenir mfa_challenge_controller.py. "
+            "users-core-auth ne doit pas contenir mfa_challenge_controller.py. "
             "MFA est opt-in : utiliser le starter auth-mfa."
         )
 
@@ -109,7 +109,7 @@ class TestDefaultAuthStarterHasNoMfaController:
             return
         text = controller.read_text(encoding="utf-8")
         assert "forge_mvc_mfa" not in text, (
-            "auth_controller.py de utilisateurs-auth ne doit pas mentionner forge_mvc_mfa."
+            "auth_controller.py de users-core-auth ne doit pas mentionner forge_mvc_mfa."
         )
 
 

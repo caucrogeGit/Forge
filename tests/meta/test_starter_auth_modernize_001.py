@@ -33,7 +33,7 @@ _SUIVI_CONTROLLER = (
 )
 _UTILISATEURS_CONTROLLER = (
     _STARTERS_ROOT
-    / "utilisateurs-auth"
+    / "users-core-auth"
     / "files"
     / "mvc"
     / "controllers"
@@ -162,7 +162,7 @@ def test_starter_auth_mfa_uses_session_store_create():
         _UTILISATEURS_CONTROLLER,
         _AUTH_CONTROLLER_RUNTIME,
     ],
-    ids=["welcome-optin-mfa", "suivi-comportement-eleves", "utilisateurs-auth", "runtime"],
+    ids=["welcome-optin-mfa", "suivi-comportement-eleves", "users-core-auth", "runtime"],
 )
 def test_no_create_session_call_in_migrated_controllers(controller_path):
     src = _read(controller_path)
@@ -178,7 +178,7 @@ def test_no_create_session_call_in_migrated_controllers(controller_path):
         _SUIVI_CONTROLLER,
         _UTILISATEURS_CONTROLLER,
     ],
-    ids=["welcome-optin-mfa", "suivi-comportement-eleves", "utilisateurs-auth"],
+    ids=["welcome-optin-mfa", "suivi-comportement-eleves", "users-core-auth"],
 )
 def test_starters_import_session_store(controller_path):
     src = _read(controller_path)

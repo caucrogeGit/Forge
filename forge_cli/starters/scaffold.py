@@ -29,8 +29,8 @@ def _is_adoptable(meta: dict, path: Path, root: Path) -> bool:
     """
     rel = path.relative_to(root).as_posix()
 
-    # Fichiers auth du squelette → adoptables par utilisateurs-auth
-    if meta.get("id") not in ("utilisateurs-auth",) or not path.is_file():
+    # Fichiers auth du squelette → adoptables par users-core-auth
+    if meta.get("id") not in ("users-core-auth",) or not path.is_file():
         return False
     content = path.read_text(encoding="utf-8")
     if rel == "mvc/controllers/auth_controller.py":

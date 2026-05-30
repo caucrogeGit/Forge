@@ -945,9 +945,9 @@ Il rassemble les notions vues dans les paliers précédents : routes,
 contrôleurs, vues, formulaires, validation serveur, SQL et
 migrations.
 
-Prochain starter : **Utilisateurs / Auth** — comprendre une
+Prochain starter : **Auth (API cœur)** — comprendre une
 authentification minimale moderne avec `core.auth`.
 
-[Prochain starter : Utilisateurs / Auth](../utilisateurs-auth/index.md)
+[Prochain starter : Auth (API cœur)](../core-auth/users-core-auth.md)
 
 [Revenir à la vue d'ensemble des starters](../index.md)

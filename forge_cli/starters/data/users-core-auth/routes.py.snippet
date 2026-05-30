@@ -1,4 +1,4 @@
-# forge-starter:utilisateurs-auth:start
+# forge-starter:users-core-auth:start
 from mvc.controllers.auth_controller import AuthController
 from mvc.controllers.dashboard_controller import DashboardController
 
@@ -10,4 +10,4 @@ with router.group("") as app:
     app.add("GET",  "/dashboard", DashboardController.index,   name="dashboard")
     app.add("GET",  "/profil",    DashboardController.profile, name="profile")
     app.add("POST", "/logout",    AuthController.logout,       name="logout")
-# forge-starter:utilisateurs-auth:end
+# forge-starter:users-core-auth:end

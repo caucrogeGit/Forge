@@ -75,7 +75,7 @@ def test_starter_1_est_officiel_simple():
 
 def test_starter_2_reference_core_auth():
     """Starter 2 — le contrôleur auth importe depuis core.auth."""
-    auth_ctrl = ROOT / "forge_cli" / "starters" / "data" / "utilisateurs-auth" / "files" / "mvc" / "controllers" / "auth_controller.py"
+    auth_ctrl = ROOT / "forge_cli" / "starters" / "data" / "users-core-auth" / "files" / "mvc" / "controllers" / "auth_controller.py"
     assert auth_ctrl.exists()
     content = auth_ctrl.read_text(encoding="utf-8")
     assert "core.auth" in content
@@ -84,10 +84,10 @@ def test_starter_2_reference_core_auth():
 # ── doc_url cohérence ─────────────────────────────────────────────────────────
 
 def test_starter_2_doc_url_pointe_nouvelle_structure():
-    """Starter 2 — doc_url pointe vers starters/utilisateurs-auth/."""
+    """Starter 2 — doc_url pointe vers starters/core-auth/users-core-auth/."""
     meta = resolve("2")
     assert "starter-app-02" not in meta.get("doc_url", "")
-    assert "starters/utilisateurs-auth" in meta.get("doc_url", "")
+    assert "starters/core-auth/users-core-auth" in meta.get("doc_url", "")
 
 
 def test_tous_les_starters_ont_un_doc_url():
@@ -137,12 +137,21 @@ def test_chaque_starter_a_un_index_md():
     # Starters autonomes avec leur propre dossier docs/starters/<id>/index.md.
     starters_autonomes = [
         "contact-simple",
-        "utilisateurs-auth",
         "premier-crud",
     ]
     for dossier in starters_autonomes:
         index = ROOT / "docs" / "starters" / dossier / "index.md"
         assert index.exists(), f"doc de présentation absente pour {dossier}"
+
+    # Le starter Auth est regroupé sous le dossier-sujet core-auth/ :
+    # un index.md (vue d'ensemble) + la page users-core-auth.md.
+    core_auth = ROOT / "docs" / "starters" / "core-auth"
+    assert (core_auth / "index.md").exists(), (
+        "vue d'ensemble absente pour core-auth"
+    )
+    assert (core_auth / "users-core-auth.md").exists(), (
+        "page users-core-auth absente pour core-auth"
+    )
 
     # Le starter IoT est regroupé sous le dossier-sujet optin-iot/ :
     # un index.md (vue d'ensemble) + la page welcome-optin-iot.md.
@@ -166,20 +175,23 @@ def test_chaque_starter_a_un_index_md():
 
 
 def test_starters_avec_rebuild_md():
-    """Les starters autonomes scaffoldés (contact-simple, utilisateurs-auth)
-    ont un rebuild.md.
+    """Les starters autonomes scaffoldés (contact-simple, users-core-auth)
+    ont un guide de reconstruction.
 
     Réorganisation des starters : carnet-contacts et suivi-comportement-eleves
     ne sont plus des starters actifs (archivés sous docs/starters/old/) ; seuls
     les starters restants munis d'un guide de reconstruction sont vérifiés. Le
-    starter MFA a son guide sous optin-mfa/welcome-optin-mfa-rebuild.md."""
+    starter MFA a son guide sous optin-mfa/welcome-optin-mfa-rebuild.md ; le
+    starter Auth a le sien sous core-auth/users-core-auth-rebuild.md."""
     dossiers = [
         "contact-simple",
-        "utilisateurs-auth",
     ]
     for dossier in dossiers:
         rebuild = ROOT / "docs" / "starters" / dossier / "rebuild.md"
         assert rebuild.exists(), f"rebuild.md absent pour {dossier}"
+
+    core_auth_rebuild = ROOT / "docs" / "starters" / "core-auth" / "users-core-auth-rebuild.md"
+    assert core_auth_rebuild.exists(), "guide de reconstruction absent pour core-auth"
 
     # Le guide de reconstruction MFA vit sous le dossier-sujet optin-mfa/.
     rebuild_mfa = ROOT / "docs" / "starters" / "optin-mfa" / "welcome-optin-mfa-rebuild.md"

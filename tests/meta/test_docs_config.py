@@ -40,7 +40,7 @@ def test_mkdocs_nav_entries_are_well_formed_and_point_to_existing_docs():
         "Architecture des entités",
         "Présentation",
         "Contacts",
-        "Utilisateurs / Auth",
+        "Auth (API cœur)",
         "Carnet de contacts",
         "Suivi pédagogique",
         "API Forge complète",

@@ -69,20 +69,21 @@ def test_les_5_starters_sont_disponibles():
     assert statuses[5] == "available"
 
 
-def test_alias_utilisateurs_auth_resolvent_le_meme_starter():
+def test_alias_users_core_auth_resolvent_le_meme_starter():
     ids = [
         resolve(identifier)["id"]
-        for identifier in ("2", "auth", "utilisateurs", "utilisateurs-auth")
+        for identifier in ("2", "auth", "users-core-auth", "users_core_auth", "utilisateurs-auth")
     ]
     assert ids == [
-        "utilisateurs-auth",
-        "utilisateurs-auth",
-        "utilisateurs-auth",
-        "utilisateurs-auth",
+        "users-core-auth",
+        "users-core-auth",
+        "users-core-auth",
+        "users-core-auth",
+        "users-core-auth",
     ]
 
 
-@pytest.mark.parametrize("identifier", ["2", "auth", "utilisateurs-auth"])
+@pytest.mark.parametrize("identifier", ["2", "auth", "users-core-auth", "utilisateurs-auth"])
 def test_starter_build_auth_dry_run_fonctionne(identifier, capsys):
     cmd_starter_build([identifier, "--dry-run"])
     output = capsys.readouterr().out
@@ -357,7 +358,7 @@ def test_starter_2_utilise_api_auth_moderne():
     """La page starter-02 indique que le starter utilise les API Auth/User modernes."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "core-auth" / "users-core-auth.md").read_text(encoding="utf-8")
     assert "core.auth" in content
     assert "login_user" in content or "login_required" in content
 
@@ -555,7 +556,7 @@ def test_chaque_starter_a_un_index_md():
     s = root / "docs" / "starters"
     for slug in (
         "contact-simple",
-        "utilisateurs-auth",
+        "core-auth",
         "optin-mfa",
         "optin-iot",
         "premier-crud",
@@ -592,7 +593,7 @@ def test_starter_2_sans_core_security_hashing():
     """Le starter 2 n'importe plus core.security.hashing."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    starter_dir = root / "forge_cli" / "starters" / "data" / "utilisateurs-auth"
+    starter_dir = root / "forge_cli" / "starters" / "data" / "users-core-auth"
     for path in starter_dir.rglob("*.py"):
         if "__pycache__" in path.parts:
             continue
@@ -604,7 +605,7 @@ def test_starter_2_sans_authenticate_session():
     """Le starter 2 n'utilise plus authenticate_session de core.security.session."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    starter_dir = root / "forge_cli" / "starters" / "data" / "utilisateurs-auth"
+    starter_dir = root / "forge_cli" / "starters" / "data" / "users-core-auth"
     for path in starter_dir.rglob("*.py"):
         if "__pycache__" in path.parts:
             continue
@@ -617,7 +618,7 @@ def test_starter_2_importe_core_auth():
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     auth_ctrl = (
-        root / "forge_cli" / "starters" / "data" / "utilisateurs-auth"
+        root / "forge_cli" / "starters" / "data" / "users-core-auth"
         / "files" / "mvc" / "controllers" / "auth_controller.py"
     )
     content = auth_ctrl.read_text(encoding="utf-8")
@@ -632,7 +633,7 @@ def test_starter_2_dashboard_login_required():
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     dash_ctrl = (
-        root / "forge_cli" / "starters" / "data" / "utilisateurs-auth"
+        root / "forge_cli" / "starters" / "data" / "users-core-auth"
         / "files" / "mvc" / "controllers" / "dashboard_controller.py"
     )
     content = dash_ctrl.read_text(encoding="utf-8")
@@ -645,7 +646,7 @@ def test_starter_2_hash_password_dans_script():
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     script = (
-        root / "forge_cli" / "starters" / "data" / "utilisateurs-auth"
+        root / "forge_cli" / "starters" / "data" / "users-core-auth"
         / "files" / "scripts" / "create_auth_user.py"
     )
     content = script.read_text(encoding="utf-8")
@@ -657,7 +658,7 @@ def test_starter_2_doc_mentionne_limites():
     """La doc du starter 2 mentionne explicitement les limites (MFA, OIDC, etc.)."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "core-auth" / "users-core-auth.md").read_text(encoding="utf-8")
     assert "MFA" in content
     assert "OIDC" in content
 
@@ -666,7 +667,7 @@ def test_starter_2_doc_indique_auth_moderne():
     """La doc du starter 2 indique qu'il utilise les API Auth/User modernes."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "core-auth" / "users-core-auth.md").read_text(encoding="utf-8")
     assert "core.auth" in content
     assert "login_user" in content
 
@@ -801,7 +802,7 @@ def test_starters_index_contient_tableau_synthese():
     content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
     assert "Tableau de synthèse" in content or "tableau de synthèse" in content.lower()
     assert "Contacts" in content
-    assert "Utilisateurs" in content
+    assert "Auth (API cœur)" in content
     assert "Auth MFA" in content
     # Les 3 applications retirées ne sont plus dans le catalogue.
     assert "Carnet de contacts" not in content

@@ -150,7 +150,7 @@ def test_drop_lit_cle_foreign_key_name_legacy(tmp_path):
     ])
 
     with _mock_mariadb_stack(tmp_path, fetchone_result=None) as (conn, cur, cfg):
-        drop_foreign_keys(_make_meta("utilisateurs-auth"), tmp_path)
+        drop_foreign_keys(_make_meta("users-core-auth"), tmp_path)
 
     select_calls = [c for c in cur.execute.call_args_list if "information_schema" in str(c)]
     assert len(select_calls) == 1

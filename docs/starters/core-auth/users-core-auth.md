@@ -37,7 +37,7 @@
 </div>
 
 !!! tip "Génération automatique"
-    Ce starter est maintenant générable avec `forge starter:build 2`, `forge starter:build auth` ou `forge starter:build utilisateurs-auth`. Il ne génère pas un CRUD utilisateur : il crée l'entité `Utilisateur`, copie les fichiers applicatifs d'authentification et injecte les routes explicites.
+    Ce starter est maintenant générable avec `forge starter:build 2`, `forge starter:build auth` ou `forge starter:build users-core-auth`. Il ne génère pas un CRUD utilisateur : il crée l'entité `Utilisateur`, copie les fichiers applicatifs d'authentification et injecte les routes explicites.
 
 ## Prérequis
 
@@ -299,8 +299,7 @@ Alias disponibles :
 
 ```bash
 forge starter:build auth
-forge starter:build utilisateurs
-forge starter:build utilisateurs-auth
+forge starter:build users-core-auth
 ```
 
 Pour prévisualiser sans écrire :
@@ -485,7 +484,7 @@ https://localhost:8000/login
 
 ## Reconstruction
 
-Le fichier complet de reconstruction est disponible dans [starters/utilisateurs-auth/rebuild.md](rebuild.md).
+Le fichier complet de reconstruction est disponible dans [starters/core-auth/users-core-auth-rebuild.md](users-core-auth-rebuild.md).
 
 ---
 

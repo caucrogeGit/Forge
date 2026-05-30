@@ -18,13 +18,13 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STARTERS = PROJECT_ROOT / "forge_cli" / "starters" / "data"
 
-UTILISATEURS_AUTH = STARTERS / "utilisateurs-auth" / "files"
+UTILISATEURS_AUTH = STARTERS / "users-core-auth" / "files"
 AUTH_MFA = STARTERS / "welcome-optin-mfa" / "files"
 
 
-# ── utilisateurs-auth : référence ─────────────────────────────────────────────
+# ── users-core-auth : référence ───────────────────────────────────────────────
 
-class TestUtilisateursAuthReference:
+class TestUsersCoreAuthReference:
 
     def test_build_auth_user_present(self):
         src = (UTILISATEURS_AUTH / "mvc" / "models" / "auth_model.py").read_text()

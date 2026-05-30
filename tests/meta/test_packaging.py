@@ -103,7 +103,7 @@ def test_package_data_inclut_tous_les_fichiers_starters():
 def test_package_data_couvre_les_python_des_starters():
     data = _load_pyproject()
     patterns = data["tool"]["setuptools"]["package-data"]["forge_cli"]
-    starter_file = "starters/data/utilisateurs-auth/files/mvc/controllers/auth_controller.py"
+    starter_file = "starters/data/users-core-auth/files/mvc/controllers/auth_controller.py"
 
     assert any(fnmatch.fnmatch(starter_file, pattern) for pattern in patterns)
 
@@ -118,8 +118,8 @@ def test_starter1_fichiers_sur_disque():
 
 
 def test_starter2_fichiers_sur_disque():
-    """Starter 2 (utilisateurs-auth) : contrôleurs, modèles, vues, scripts."""
-    root = ROOT / "forge_cli" / "starters" / "data" / "utilisateurs-auth"
+    """Starter 2 (users-core-auth) : contrôleurs, modèles, vues, scripts."""
+    root = ROOT / "forge_cli" / "starters" / "data" / "users-core-auth"
     for rel in (
         "starter.json",
         "routes.py.snippet",
@@ -130,7 +130,7 @@ def test_starter2_fichiers_sur_disque():
         "files/mvc/views/dashboard/index.html",
         "files/scripts/create_auth_user.py",
     ):
-        assert (root / rel).exists(), f"Manquant : utilisateurs-auth/{rel}"
+        assert (root / rel).exists(), f"Manquant : users-core-auth/{rel}"
 
 
 def test_package_data_couvre_tous_types_fichiers_starters():
@@ -143,11 +143,11 @@ def test_package_data_couvre_tous_types_fichiers_starters():
         "starters/data/contact-simple/starter.json",
         "starters/data/contact-simple/contact.json",
         # Starter 2
-        "starters/data/utilisateurs-auth/starter.json",
-        "starters/data/utilisateurs-auth/routes.py.snippet",
-        "starters/data/utilisateurs-auth/files/mvc/controllers/auth_controller.py",
-        "starters/data/utilisateurs-auth/files/mvc/views/auth/login.html",
-        "starters/data/utilisateurs-auth/files/scripts/create_auth_user.py",
+        "starters/data/users-core-auth/starter.json",
+        "starters/data/users-core-auth/routes.py.snippet",
+        "starters/data/users-core-auth/files/mvc/controllers/auth_controller.py",
+        "starters/data/users-core-auth/files/mvc/views/auth/login.html",
+        "starters/data/users-core-auth/files/scripts/create_auth_user.py",
     ]
 
     for path in representative:

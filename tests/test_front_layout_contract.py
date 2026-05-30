@@ -9,7 +9,7 @@ LAYOUTS = [
     Path("mvc/views/layouts/base.html"),
     Path("mvc/views/layouts/public.html"),
     Path("mvc/views/layouts/admin.html"),
-    Path("forge_cli/starters/data/utilisateurs-auth/files/mvc/views/layouts/app.html"),
+    Path("forge_cli/starters/data/users-core-auth/files/mvc/views/layouts/app.html"),
 ]
 
 

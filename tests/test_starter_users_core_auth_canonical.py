@@ -1,6 +1,6 @@
-"""Tests — STARTERS-MIGRATE-002 : utilisateurs-auth en format canonique.
+"""Tests — STARTERS-MIGRATE-002 : users-core-auth en format canonique.
 
-Vérifie que le starter utilisateurs-auth utilise le format JSON canonique
+Vérifie que le starter users-core-auth utilise le format JSON canonique
 Forge (schema_version: "1.0") et que build:model passe sur un projet temporaire.
 """
 
@@ -14,7 +14,7 @@ import pytest
 from forge_cli.starters.builder import build
 from forge_cli.starters.registry import resolve
 
-STARTER_DIR = Path("forge_cli/starters/data/utilisateurs-auth")
+STARTER_DIR = Path("forge_cli/starters/data/users-core-auth")
 UTILISATEUR_JSON = STARTER_DIR / "entities" / "utilisateur.json"
 AUTH_MODEL = STARTER_DIR / "files" / "mvc" / "models" / "auth_model.py"
 

@@ -84,8 +84,8 @@ class TestBriquesCore:
         assert "forge-mvc-rbac" in _src()
 
     def test_auth_user(self):
-        # Section starter utilisateurs/auth remplace l'ancienne carte Auth/User
-        assert "utilisateurs-auth" in _src()
+        # Section starter Auth (API cœur) remplace l'ancienne carte Auth/User
+        assert "users-core-auth" in _src()
 
     def test_securite(self):
         assert "Sécurité" in _src() or "sécurité" in _src()
@@ -154,7 +154,7 @@ class TestEtatActuel:
     def test_prochaine_priorite_auth(self):
         # Le starter auth remplace l'ancienne prochaine-priorité Auth/User
         src = _src()
-        assert "utilisateurs-auth" in src or "authentification" in src.lower()
+        assert "users-core-auth" in src or "authentification" in src.lower()
 
     def test_mfa_mentionne(self):
         # forge-mvc-mfa remplace la mention "MFA" ou "OIDC" (OIDC retiré — ADR-004)

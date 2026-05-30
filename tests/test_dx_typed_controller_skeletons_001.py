@@ -10,7 +10,7 @@ livrés par Forge) exposent au minimum :
 Couvre :
   * starter `welcome` (Bonjour Forge) ;
   * starters CRUD livrés (`carnet-contacts`, `suivi-comportement-eleves`,
-    `utilisateurs-auth`, `auth-mfa`, `communes-sejours`) ;
+    `users-core-auth`, `auth-mfa`, `communes-sejours`) ;
   * générateur `forge make:crud` (`controller_builder.py`) ;
   * générateurs `forge make:public-page`, `make:public-list`,
     `make:public-show`, `make:public-form`, `make:public-contact`.

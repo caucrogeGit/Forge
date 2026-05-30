@@ -26,7 +26,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Première base SQL](welcome/first-sql.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
 | [Premier CRUD](premier-crud/index.md) | Capstone fondamentaux (avec BDD) | `minimal` / `standard` | Premier starter autonome après la progression — CRUD complet à SQL visible (`SELECT`/`INSERT`/`UPDATE`/`DELETE`) sur l'entité neutre `message`, aucun métier, aucun ORM |
 | [1 — Contacts](contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — synthèse du CRUD métier ; suppose les 11 paliers de découverte + le starter Premier CRUD acquis |
-| [2 — Utilisateurs / Auth](utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
+| [2 — Auth (API cœur)](core-auth/users-core-auth.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Auth MFA](optin-mfa/welcome-optin-mfa.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 | [Bonjour IoT](optin-iot/welcome-optin-iot.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-optin-iot`, `/welcome-optin-iot/inspect`, `/welcome-optin-iot/events`, `/welcome-optin-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
 
@@ -64,7 +64,7 @@ Une fois ces **11 paliers** acquis, vous avez terminé le starter de
 découverte *Bonjour Forge*. Le premier **starter autonome** à enchaîner
 est [Premier CRUD](premier-crud/index.md) — un CRUD complet à SQL visible
 sur une entité neutre (`message`), livré par `STARTER-PREMIER-CRUD-001`.
-Viennent ensuite les exemples : Contacts, Utilisateurs / Auth, puis le
+Viennent ensuite les exemples : Contacts, Auth (API cœur), puis le
 starter opt-in Auth MFA.
 
 !!! warning "Saut Bonjour Forge → Contacts CRUD"
@@ -149,7 +149,7 @@ starter.
 
 ## Starter Auth minimal moderne
 
-### Utilisateurs / Auth
+### Auth (API cœur)
 
 Un exemple d'authentification minimale alignée sur le socle `core.auth` de Forge.
 
@@ -162,7 +162,9 @@ Profil recommandé : `standard`.
 !!! info "Limites du starter 2"
     Ce starter ne démontre pas MFA, OIDC, RBAC avancé, reset password complet ou administration utilisateurs.
 
-[Présentation](utilisateurs-auth/index.md) · [Reconstruction](utilisateurs-auth/rebuild.md)
+Identifiant : `users-core-auth` (starter n°2, alias `auth` / `utilisateurs-auth` / `2`).
+
+[Vue d'ensemble du sujet](core-auth/index.md) · [Présentation](core-auth/users-core-auth.md) · [Reconstruction](core-auth/users-core-auth-rebuild.md)
 
 ## Démonstrateur MFA (Alpha)
 
@@ -253,7 +255,7 @@ Pour choisir un profil : [Profils de projet](../features/profiles.md).
 ```bash
 forge new mon-projet --starter welcome       # Bienvenue (sans BDD) — via forge new
 forge starter:build 1        # Contacts
-forge starter:build 2        # Utilisateurs / Auth
+forge starter:build 2        # Auth (API cœur)
 forge starter:build 3        # Auth MFA (Alpha)
 forge starter:build 4        # Bienvenue dans Forge (sans BDD)
 ```
@@ -284,7 +286,7 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 | Starter | Présentation | Reconstruction |
 |---|---|---|
 | Contacts | [Présentation](contact-simple/index.md) | [rebuild.md](contact-simple/rebuild.md) |
-| Utilisateurs / Auth | [Présentation](utilisateurs-auth/index.md) | [rebuild.md](utilisateurs-auth/rebuild.md) |
+| Auth (API cœur) | [Présentation](core-auth/users-core-auth.md) | [rebuild.md](core-auth/users-core-auth-rebuild.md) |
 | Auth MFA | [Présentation](optin-mfa/welcome-optin-mfa.md) | [rebuild.md](optin-mfa/welcome-optin-mfa-rebuild.md) |
 
 ## Statut officiel des starters
@@ -292,5 +294,5 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 | Starter | Statut |
 |---|---|
 | 1 — Contacts | Starter officiel simple |
-| 2 — Utilisateurs / Auth | Auth minimale moderne (`core.auth`) |
+| 2 — Auth (API cœur) | Auth minimale moderne (`core.auth`) |
 | 3 — Auth MFA | Démonstrateur MFA (Alpha) |
