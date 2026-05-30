@@ -10,13 +10,15 @@ pip-audit>=2.0
 ruff>=0.4
 
 # Modules opt-in Forge — installés en mode éditable depuis le monorepo.
-# Sans ces lignes, pytest plante en collecte sur ~46 fichiers de tests
-# qui importent forge_mvc_mfa, forge_mvc_rbac, forge_mvc_workflow,
-# forge_mvc_stats. Les packages opt-in ne sont pas (encore) publiés sur
-# PyPI, donc l'extra forge-mvc[all] ne peut pas les résoudre — on les
-# pointe explicitement vers le monorepo local.
+# Sans ces lignes, pytest plante en collecte sur les fichiers de tests qui
+# importent forge_mvc_mfa, forge_mvc_rbac, forge_mvc_workflow,
+# forge_mvc_stats, forge_mvc_media et forge_mvc_iot. L'extra
+# forge-mvc[all] ne couvre que rbac/workflow/stats (mfa/media/iot exclus —
+# voir pyproject.toml) : pour le dev on pointe tous les opt-ins vers le
+# monorepo local afin d'exécuter la suite complète.
 -e ./packages/forge-mvc-mfa
 -e ./packages/forge-mvc-rbac
 -e ./packages/forge-mvc-workflow
 -e ./packages/forge-mvc-stats
 -e ./packages/forge-mvc-media
+-e ./packages/forge-mvc-iot
