@@ -109,6 +109,7 @@ class HomeController:
 | [`forge-mvc-stats`](https://pypi.org/project/forge-mvc-stats/) | Agrégats et compteurs d'événements |
 | [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) |
 | [`forge-mvc-media`](https://pypi.org/project/forge-mvc-media/) | Gestion applicative des médias |
+| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) |
 
 Chaque module reste optionnel : le core Forge ne dépend d'aucun d'eux.
 
