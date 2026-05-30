@@ -139,12 +139,21 @@ def test_chaque_starter_a_un_index_md():
         "contact-simple",
         "utilisateurs-auth",
         "auth-mfa",
-        "welcome-iot",
         "premier-crud",
     ]
     for dossier in starters_autonomes:
         index = ROOT / "docs" / "starters" / dossier / "index.md"
         assert index.exists(), f"doc de présentation absente pour {dossier}"
+
+    # Le starter IoT est regroupé sous le dossier-sujet optin-iot/ :
+    # un index.md (vue d'ensemble) + la page welcome-optin-iot.md.
+    optin_iot = ROOT / "docs" / "starters" / "optin-iot"
+    assert (optin_iot / "index.md").exists(), (
+        "vue d'ensemble absente pour optin-iot"
+    )
+    assert (optin_iot / "welcome-optin-iot.md").exists(), (
+        "page welcome-optin-iot absente pour optin-iot"
+    )
 
 
 def test_starters_avec_rebuild_md():

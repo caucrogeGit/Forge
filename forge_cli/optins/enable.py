@@ -48,7 +48,7 @@ STATUS_DRYRUN = "[DRY-RUN]"
 
 # ── Contenu généré pour l'opt-in IoT ────────────────────────────────────────
 #
-# Cohérent avec la structure produite par le starter `welcome-iot`
+# Cohérent avec la structure produite par le starter `welcome-optin-iot`
 # (OPTINS-IOT-PROJECT-BRIDGE-001) : même branchement explicite, mêmes
 # fichiers. Le code métier reste dans le paquet `forge-mvc-iot`.
 

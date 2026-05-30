@@ -7,14 +7,14 @@ IoT lue (mot de passe masqué), et donne deux endpoints de lecture des
 événements `iot_events` — pédagogiques même quand la table n'existe
 pas encore.
 
-Identifiant : `welcome-iot` (alias `bonjour-iot` / `iot` / `15`).
+Identifiant : `welcome-optin-iot` (alias `bonjour-iot` / `iot` / `12`).
 
 ## Ce que ce starter installe
 
-- une route `/welcome-iot` (texte)
-- une route `/welcome-iot/inspect` (JSON, mot de passe masqué)
-- une route `/welcome-iot/events` (JSON, lecture si table prête)
-- une route `/welcome-iot/device/{site}/{device_id}` (JSON)
+- une route `/welcome-optin-iot` (texte)
+- une route `/welcome-optin-iot/inspect` (JSON, mot de passe masqué)
+- une route `/welcome-optin-iot/events` (JSON, lecture si table prête)
+- une route `/welcome-optin-iot/device/{site}/{device_id}` (JSON)
 - l'API HTTP IoT officielle, branchée via la couche **`optins/`** (voir
   [Branchement opt-in](#branchement-opt-in-optins))
 - un contrôleur `WelcomeIotController` (4 méthodes)
@@ -50,10 +50,10 @@ ticket). Si quelque chose ne passe pas, voir
 
 | URL | Résultat |
 |-----|----------|
-| `http://localhost:8000/welcome-iot` | `Bonjour Forge IoT` |
-| `http://localhost:8000/welcome-iot/inspect` | JSON de la configuration (password masqué) |
-| `http://localhost:8000/welcome-iot/events` | JSON des derniers événements (ou message pédagogique) |
-| `http://localhost:8000/welcome-iot/device/atelier/esp32-001` | JSON des événements d'un device |
+| `http://localhost:8000/welcome-optin-iot` | `Bonjour Forge IoT` |
+| `http://localhost:8000/welcome-optin-iot/inspect` | JSON de la configuration (password masqué) |
+| `http://localhost:8000/welcome-optin-iot/events` | JSON des derniers événements (ou message pédagogique) |
+| `http://localhost:8000/welcome-optin-iot/device/atelier/esp32-001` | JSON des événements d'un device |
 
 L'API HTTP officielle est branchée en parallèle :
 
@@ -65,7 +65,7 @@ L'API HTTP officielle est branchée en parallèle :
 
 Voir [API HTTP Forge IoT](../../iot/http-api.md) pour le détail.
 
-### Page d'accueil — `/welcome-iot`
+### Page d'accueil — `/welcome-optin-iot`
 
 Réponse texte simple :
 
@@ -76,7 +76,7 @@ Bonjour Forge IoT
 C'est le premier contact équivalent à `/welcome` du starter
 [Bonjour Forge](../welcome/welcome.md), mais ciblé sur l'écosystème IoT.
 
-### Inspection de la configuration — `/welcome-iot/inspect`
+### Inspection de la configuration — `/welcome-optin-iot/inspect`
 
 ```json
 {
@@ -96,7 +96,7 @@ que [`load_iot_config()`](../../iot/configuration.md).
 Pour changer la configuration, ajuster les variables `FORGE_IOT_MQTT_*`
 dans `env/dev` (voir [Configuration Forge IoT](../../iot/configuration.md)).
 
-### Lecture d'événements — `/welcome-iot/events`
+### Lecture d'événements — `/welcome-optin-iot/events`
 
 Si la table `iot_events` est disponible :
 
@@ -137,7 +137,7 @@ forge migration:apply   # crée la table iot_events en base
 
 Voir [`forge iot:init`](../../iot/init-command.md) pour le détail.
 
-### Lecture par device — `/welcome-iot/device/{site}/{device_id}`
+### Lecture par device — `/welcome-optin-iot/device/{site}/{device_id}`
 
 ```json
 {
@@ -153,7 +153,7 @@ n'est pas prête.
 ## Code essentiel
 
 ```python
-# mvc/controllers/welcome_iot_controller.py
+# mvc/controllers/welcome_optin_iot_controller.py
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
@@ -198,7 +198,7 @@ class WelcomeIotController(BaseController):
 
 ## Branchement opt-in (`optins/`)
 
-`welcome-iot` est aussi l'**exemple de référence** de la convention
+`welcome-optin-iot` est aussi l'**exemple de référence** de la convention
 [structure des opt-ins](../../architecture/optins-project-structure.md) :
 le paquet `forge-mvc-iot` reste distribué, et le projet le **branche
 localement** via un dossier `optins/`, sans découverte automatique.
@@ -247,7 +247,7 @@ la [doc IoT officielle](../../iot/http-api.md) plutôt que de la dupliquer.
 ## À retenir
 
 - Le starter fonctionne **sans broker**, **sans table**, **sans
-  capteur**. La page `/welcome-iot` répond immédiatement.
+  capteur**. La page `/welcome-optin-iot` répond immédiatement.
 - `inspect` est le bon endroit pour vérifier la configuration en
   un coup d'œil, sans craindre de fuiter le mot de passe.
 - Les routes événements détectent et signalent gentiment l'absence de

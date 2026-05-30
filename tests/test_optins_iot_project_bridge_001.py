@@ -1,6 +1,6 @@
 """Tests — OPTINS-IOT-PROJECT-BRIDGE-001.
 
-Vérifie que le starter `welcome-iot` applique concrètement la convention
+Vérifie que le starter `welcome-optin-iot` applique concrètement la convention
 `optins/` (contrat figé par OPTINS-PROJECT-STRUCTURE-001) au cas Forge
 IoT :
 
@@ -27,11 +27,11 @@ from pathlib import Path
 import pytest
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
-_STARTER = _REPO_ROOT / "forge_cli" / "starters" / "data" / "welcome-iot"
+_STARTER = _REPO_ROOT / "forge_cli" / "starters" / "data" / "welcome-optin-iot"
 _FILES = _STARTER / "files"
 _OPTINS = _FILES / "optins"
 _SNIPPET = _STARTER / "routes.py.snippet"
-_DOC = _REPO_ROOT / "docs" / "starters" / "welcome-iot" / "index.md"
+_DOC = _REPO_ROOT / "docs" / "starters" / "optin-iot" / "welcome-optin-iot.md"
 _ARCH_DOC = _REPO_ROOT / "docs" / "architecture" / "optins-project-structure.md"
 _ROADMAP = _REPO_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 _CORE_DIR = _REPO_ROOT / "core"
@@ -54,7 +54,7 @@ class TestOptinsStructure:
     )
     def test_optins_file_present(self, rel):
         assert (_OPTINS / rel).exists(), (
-            f"Le starter welcome-iot doit livrer optins/{rel}"
+            f"Le starter welcome-optin-iot doit livrer optins/{rel}"
         )
 
 
@@ -168,9 +168,9 @@ class TestDocs:
         assert "optins/" in text
         assert "register_optins" in text
 
-    def test_architecture_doc_references_welcome_iot(self):
+    def test_architecture_doc_references_welcome_optin_iot(self):
         text = _ARCH_DOC.read_text(encoding="utf-8")
-        assert "welcome-iot" in text
+        assert "welcome-optin-iot" in text
 
     def test_roadmap_mentions_ticket(self):
         assert "OPTINS-IOT-PROJECT-BRIDGE-001" in _ROADMAP.read_text(encoding="utf-8")

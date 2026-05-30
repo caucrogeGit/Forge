@@ -28,7 +28,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [1 — Contacts](contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — synthèse du CRUD métier ; suppose les 11 paliers de découverte + le starter Premier CRUD acquis |
 | [2 — Utilisateurs / Auth](utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
-| [Bonjour IoT](welcome-iot/index.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-iot`, `/welcome-iot/inspect`, `/welcome-iot/events`, `/welcome-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
+| [Bonjour IoT](optin-iot/welcome-optin-iot.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-optin-iot`, `/welcome-optin-iot/inspect`, `/welcome-optin-iot/events`, `/welcome-optin-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
 
 ## Progression recommandée
 
@@ -203,16 +203,16 @@ détectent et signalent pédagogiquement quand `iot_events` n'est pas
 encore disponible (HTTP 503 avec message clair, pas une trace
 technique).
 
-Aucun profil requis. Identifiant : `welcome-iot` (alias `bonjour-iot`
-/ `iot` / `15`).
+Aucun profil requis. Identifiant : `welcome-optin-iot` (alias `bonjour-iot`
+/ `iot` / `12`).
 
-- `GET /welcome-iot` → `Response.text("Bonjour Forge IoT")` ;
-- `GET /welcome-iot/inspect` → JSON de la configuration IoT, mot de
+- `GET /welcome-optin-iot` → `Response.text("Bonjour Forge IoT")` ;
+- `GET /welcome-optin-iot/inspect` → JSON de la configuration IoT, mot de
   passe masqué (`"***"` ou `null`) ;
-- `GET /welcome-iot/events` → derniers événements via
+- `GET /welcome-optin-iot/events` → derniers événements via
   `IotEventRepository.list_recent`, ou message `iot_storage_not_ready`
   si la table n'existe pas ;
-- `GET /welcome-iot/device/{site}/{device_id}` → événements d'un
+- `GET /welcome-optin-iot/device/{site}/{device_id}` → événements d'un
   capteur précis ;
 - en parallèle, l'API HTTP officielle `/api/iot/...` est branchée via
   `register_iot_routes(router)`.
@@ -222,7 +222,7 @@ seule côté HTTP. Avant de tester, lancer `forge iot:doctor` pour
 vérifier que le package, la configuration, la migration et l'API HTTP
 sont en place.
 
-[Présentation](welcome-iot/index.md)
+[Présentation](optin-iot/welcome-optin-iot.md)
 
 ## Différence entre profil et starter
 

@@ -3,7 +3,7 @@
 > Ticket : `OPTINS-CLI-ENABLE-AUDIT-001`. **Audit de conception** — ce
 > document **cadre** la future commande `forge optin:enable` sans
 > l'implémenter. Aucun code fonctionnel n'est ajouté : pas de
-> modification de `forge.py`, `forge_cli/`, du starter `welcome-iot`, ni
+> modification de `forge.py`, `forge_cli/`, du starter `welcome-optin-iot`, ni
 > du paquet `forge-mvc-iot`. L'implémentation fera l'objet du ticket
 > `OPTINS-CLI-ENABLE-IOT-001`, **après validation de ce contrat**.
 
@@ -76,7 +76,7 @@ auditer séparément si besoin).
 ## Modèle de branchement
 
 La commande **n'invente rien** : elle matérialise le modèle déjà
-documenté, identique à celui généré par le starter `welcome-iot`.
+documenté, identique à celui généré par le starter `welcome-optin-iot`.
 
 ```python
 # mvc/routes.py
@@ -229,7 +229,7 @@ sans exécuter le SQL) et `forge update --dry-run`.
 ## Cas Forge IoT
 
 `forge optin:enable iot` produira exactement la structure que le starter
-[`welcome-iot`](../starters/welcome-iot/index.md) génère déjà
+[`welcome-optin-iot`](../starters/optin-iot/welcome-optin-iot.md) génère déjà
 (`OPTINS-IOT-PROJECT-BRIDGE-001`) :
 
 1. crée `optins/` + `optins/iot/` (write-if-new) ;
@@ -253,7 +253,7 @@ Ce ticket **ne fait que cadrer**. Ne sont **pas** réalisés ici :
 - pas de modification de `forge.py` ni de `forge_cli/` ;
 - pas de génération automatique de fichiers ;
 - pas de modification de `mvc/routes.py` ;
-- pas de modification du starter `welcome-iot` ;
+- pas de modification du starter `welcome-optin-iot` ;
 - pas de modification du paquet `forge-mvc-iot` ;
 - pas de support `rbac` / `media` / `workflow` / `stats` / `mfa`.
 

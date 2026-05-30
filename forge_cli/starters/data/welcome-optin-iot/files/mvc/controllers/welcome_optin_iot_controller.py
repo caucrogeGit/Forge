@@ -4,14 +4,14 @@ Ticket : STARTER-WELCOME-IOT-001.
 
 Quatre routes pédagogiques :
 
-  1. ``index`` — ``/welcome-iot``
+  1. ``index`` — ``/welcome-optin-iot``
      Réponse texte simple ``"Bonjour Forge IoT"``. Premier contact.
-  2. ``inspect`` — ``/welcome-iot/inspect``
+  2. ``inspect`` — ``/welcome-optin-iot/inspect``
      Sérialise la configuration IoT en JSON, **mot de passe masqué**.
-  3. ``events`` — ``/welcome-iot/events``
+  3. ``events`` — ``/welcome-optin-iot/events``
      Lit les derniers événements via ``IotEventRepository.list_recent``.
      Réponse pédagogique si la table n'est pas encore disponible.
-  4. ``find_by_device`` — ``/welcome-iot/device/{site}/{device_id}``
+  4. ``find_by_device`` — ``/welcome-optin-iot/device/{site}/{device_id}``
      Lit les événements d'un capteur précis via ``find_by_device``.
 
 Le starter fonctionne **sans broker MQTT** (aucun subscriber n'est

@@ -144,7 +144,7 @@ Ce ticket ne déplace ni ne copie aucune migration : il fixe seulement
 
 Les **starters restent officiellement gérés par Forge CLI**
 (`forge starter:build`, profils `forge new`). Un starter opt-in (ex.
-`welcome-iot`) peut, à terme, **générer** une structure `optins/<module>/`
+`welcome-optin-iot`) peut, à terme, **générer** une structure `optins/<module>/`
 prête à brancher — mais la responsabilité du starter reste côté Forge
 CLI. Le dossier `optins/` est la **cible** de cette génération, pas un
 système concurrent.
@@ -187,9 +187,9 @@ le reste : contrat MQTT, subscriber, repository, API HTTP, CLI
 l'[architecture Forge IoT](../iot/architecture.md) et l'[audit de
 clôture IoT](../history/audits/audit-iot-closing.md).
 
-!!! example "Exemple vivant : le starter `welcome-iot`"
+!!! example "Exemple vivant : le starter `welcome-optin-iot`"
     Cette convention n'est pas que théorique : le starter
-    [`welcome-iot`](../starters/welcome-iot/index.md) **génère réellement**
+    [`welcome-optin-iot`](../starters/optin-iot/welcome-optin-iot.md) **génère réellement**
     cette structure `optins/iot/` dans le projet créé
     (`OPTINS-IOT-PROJECT-BRIDGE-001`). C'est le premier opt-in officiel
     branché via `optins/registry.py`. Les autres modules (`rbac`,
@@ -240,7 +240,7 @@ Ce ticket **pose le contrat**. Ne sont **pas** faits ici :
 ## Tickets suivants
 
 - `OPTINS-IOT-PROJECT-BRIDGE-001` (**livré**) — applique concrètement
-  cette structure à Forge IoT : le starter `welcome-iot` génère
+  cette structure à Forge IoT : le starter `welcome-optin-iot` génère
   `optins/iot/` et branche l'API via `optins/registry.py`.
 - `OPTINS-CLI-ENABLE-AUDIT-001` (**livré**) — cadre la future commande
   `forge optin:enable` : voir l'[audit `forge optin:enable`](optins-cli-enable-audit.md)

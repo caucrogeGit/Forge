@@ -50,7 +50,7 @@ HIGHLIGHTS = [
     "optins/",
     "forge optin:enable iot",
     "forge optin:list",
-    "welcome-iot",
+    "welcome-optin-iot",
     "0 échec",
 ]
 
@@ -98,7 +98,7 @@ OPTINS_LINKS = [
     ("architecture/optins-project-structure/", "architecture/optins-project-structure.md"),
     ("architecture/optins-cli-enable-audit/", "architecture/optins-cli-enable-audit.md"),
     ("reference/cli-commands/", "reference/cli-commands.md"),
-    ("starters/welcome-iot/", "starters/welcome-iot/index.md"),
+    ("starters/optin-iot/welcome-optin-iot/", "starters/optin-iot/welcome-optin-iot.md"),
 ]
 
 AUDIT_LINKS = [

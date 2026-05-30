@@ -1,0 +1,29 @@
+{
+  "id": "welcome-optin-iot",
+  "number": 12,
+  "name": "Bonjour IoT",
+  "kind": "skeleton",
+  "aliases": [
+    "welcome-optin-iot",
+    "welcome_optin_iot",
+    "bonjour-iot",
+    "bonjour_iot",
+    "iot",
+    "12"
+  ],
+  "description": "Bonjour IoT : premier contact avec le module opt-in forge-mvc-iot. Quatre routes (`/welcome-optin-iot`, `/welcome-optin-iot/inspect`, `/welcome-optin-iot/events`, `/welcome-optin-iot/device/{site}/{device_id}`), un contrôleur typé `Request -> Response`. Fonctionne sans broker MQTT, sans subscriber lancé, sans table créée — les routes événements signalent pédagogiquement quand la table iot_events n'est pas encore disponible. Inspecte la configuration IoT avec mot de passe masqué.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/welcome-optin-iot",
+  "routes_marker": "welcome-optin-iot",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/welcome-optin-iot",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/optin-iot/welcome-optin-iot/",
+  "check_paths": [
+    "mvc/controllers/welcome_optin_iot_controller.py",
+    "optins/registry.py",
+    "optins/iot/routes.py",
+    "optins/iot/README.md"
+  ]
+}

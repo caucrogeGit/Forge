@@ -557,10 +557,14 @@ def test_chaque_starter_a_un_index_md():
         "contact-simple",
         "utilisateurs-auth",
         "auth-mfa",
-        "welcome-iot",
+        "optin-iot",
         "premier-crud",
     ):
         assert (s / slug / "index.md").exists(), f"docs/starters/{slug}/index.md manquant"
+    # Starter IoT regroupé sous le dossier-sujet optin-iot/.
+    assert (s / "optin-iot" / "welcome-optin-iot.md").exists(), (
+        "docs/starters/optin-iot/welcome-optin-iot.md manquant"
+    )
     # Les 3 applications retirées ne sont plus des starters actifs.
     assert not (s / "carnet-contacts").exists()
     assert not (s / "suivi-comportement-eleves").exists()

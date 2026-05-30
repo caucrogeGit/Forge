@@ -8,7 +8,7 @@
 ## Objectif
 
 Boucler le parcours du starter
-[Bonjour IoT](../starters/welcome-iot/index.md) : passer de la
+[Bonjour IoT](../starters/optin-iot/welcome-optin-iot.md) : passer de la
 réponse pédagogique
 
 ```json
@@ -49,7 +49,7 @@ Avec ce parcours :
 - `forge migration:apply` (commande Forge Core existante) crée la
   table.
 - `forge run` démarre le serveur — les routes
-  `/welcome-iot/events` et `/api/iot/events` peuvent maintenant
+  `/welcome-optin-iot/events` et `/api/iot/events` peuvent maintenant
   retourner des données réelles.
 
 ## Comportement
@@ -148,4 +148,4 @@ côté dispatcher (`forge.py`).
 - [Architecture Forge IoT](architecture.md)
 - [Diagnostic — `forge iot:doctor`](doctor.md)
 - [Stockage des événements](storage-events.md)
-- [Starter Bonjour IoT](../starters/welcome-iot/index.md)
+- [Starter Bonjour IoT](../starters/optin-iot/welcome-optin-iot.md)

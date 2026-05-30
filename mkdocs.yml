@@ -130,8 +130,9 @@ nav:
       - Auth MFA (Pre-Alpha):
           - Présentation: starters/auth-mfa/index.md
           - Reconstruction: starters/auth-mfa/rebuild.md
-      - Bonjour IoT:
-          - Présentation: starters/welcome-iot/index.md
+      - IoT (opt-in):
+          - Vue d'ensemble: starters/optin-iot/index.md
+          - Bonjour IoT: starters/optin-iot/welcome-optin-iot.md
       - Anciennes applications (archive):
           - Carnet de contacts: starters/old/carnet-contacts/index.md
           - Carnet de contacts — reconstruction: starters/old/carnet-contacts/rebuild.md
