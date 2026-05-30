@@ -1,6 +1,6 @@
 # Déploiement Forge
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 !!! tip "Sécurité en production"
     Ce guide couvre l'installation et la configuration Nginx/systemd.
@@ -240,7 +240,7 @@ Une starter-app Forge est une application normale — elle se déploie exactemen
 - Limiter les permissions de l'utilisateur MariaDB au strict nécessaire (`SELECT`, `INSERT`, `UPDATE`, `DELETE` sur la base démo uniquement).
 - Activer la remise à zéro périodique des données si la démo est publiquement modifiable.
 
-Consultez [la page des starters](starters/index.md) pour la liste complète et les liens de démo.
+Consultez [la page des starters](../starters/index.md) pour la liste complète et les liens de démo.
 
 ## 9. Limite importante — sessions mémoire
 
@@ -289,7 +289,7 @@ Le backend MariaDB prépare les déploiements multi-processus (plusieurs process
 
 Si vous déployez Forge en production, le processus doit rester **unique**. En cas de redémarrage, toutes les sessions actives sont perdues et les utilisateurs doivent se reconnecter.
 
-Voir aussi [ADR-002 — Stratégie de session Forge 2.x](adr/002-session-strategy.md).
+Voir aussi [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md).
 
 ## 10. Serveur HTTPS de développement (TLS)
 

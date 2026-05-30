@@ -38,9 +38,9 @@ EXPECTED_TARGETS = [
     Path("docs/install/pipx.md"),
     Path("docs/install/core-dev.md"),
     Path("docs/install/production.md"),
-    Path("docs/wsgi-deployment.md"),
-    Path("docs/production-limits.md"),
-    Path("docs/deployment.md"),
+    Path("docs/deployment/wsgi-deployment.md"),
+    Path("docs/deployment/production-limits.md"),
+    Path("docs/deployment/deployment.md"),
 ]
 
 

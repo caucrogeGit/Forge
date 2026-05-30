@@ -454,7 +454,7 @@ navigateur au premier accès).
 
 En production, `forge run` refuse explicitement de démarrer le
 serveur intégré et affiche la stratégie WSGI à suivre. Voir
-[Déploiement WSGI minimal](../wsgi-deployment.md).
+[Déploiement WSGI minimal](../deployment/wsgi-deployment.md).
 
 ---
 

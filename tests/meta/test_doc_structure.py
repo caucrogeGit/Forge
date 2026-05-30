@@ -38,10 +38,10 @@ class TestPagesExistent:
         assert Path("docs/rbac.md").exists()
 
     def test_deployment_existe(self):
-        assert Path("docs/deployment.md").exists()
+        assert Path("docs/deployment/deployment.md").exists()
 
     def test_production_security_existe(self):
-        assert Path("docs/production-security.md").exists()
+        assert Path("docs/deployment/production-security.md").exists()
 
     def test_stability_contract_existe(self):
         assert Path("docs/stability-contract.md").exists()

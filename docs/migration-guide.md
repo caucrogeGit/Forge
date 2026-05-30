@@ -514,7 +514,7 @@ Après la migration :
 - [Politique de release](release-policy.md) — règles PATCH/MINOR/MAJOR
 - [Politique de dépréciation](deprecation-policy.md) — cycle annonce → retrait
 - [Matrice de compatibilité](compatibility.md) — versions supportées
-- [Sécurité en production](production-security.md) — checklist avant déploiement
+- [Sécurité en production](deployment/production-security.md) — checklist avant déploiement
 
 ---
 

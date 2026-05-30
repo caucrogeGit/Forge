@@ -144,11 +144,11 @@ nav:
           - Présentation: starters/welcome-iot/index.md
 
   - Déploiement:
-      - Guide de déploiement: deployment.md
-      - Déploiement WSGI minimal: wsgi-deployment.md
-      - Limites de production: production-limits.md
-      - Déploiement avancé: deploy-advanced.md
-      - Sécurité en production: production-security.md
+      - Guide de déploiement: deployment/deployment.md
+      - Déploiement WSGI minimal: deployment/wsgi-deployment.md
+      - Limites de production: deployment/production-limits.md
+      - Déploiement avancé: deployment/deploy-advanced.md
+      - Sécurité en production: deployment/production-security.md
 
   - Release et compatibilité:
       - Vue d'ensemble: release-and-compatibility.md

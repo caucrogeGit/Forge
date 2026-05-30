@@ -88,9 +88,9 @@ class TestProductionPage:
     def test_production_page_pointe_vers_pages_existantes(self):
         text = (INSTALL_DIR / "production.md").read_text(encoding="utf-8")
         # Page d'aiguillage courte vers les guides de déploiement existants.
-        assert "../wsgi-deployment.md" in text
-        assert "../production-limits.md" in text
-        assert "../deployment.md" in text
+        assert "../deployment/wsgi-deployment.md" in text
+        assert "../deployment/production-limits.md" in text
+        assert "../deployment/deployment.md" in text
 
     def test_production_avertit_outils_dev(self):
         text = (INSTALL_DIR / "production.md").read_text(encoding="utf-8")

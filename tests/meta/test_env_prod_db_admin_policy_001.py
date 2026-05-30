@@ -10,7 +10,7 @@ Verrouille la politique Forge sur les secrets MariaDB admin/root :
     absent ;
   * ``.gitignore`` protège les fichiers locaux d'administration via la
     règle ``env/*.local`` (ou un pattern équivalent) ;
-  * la documentation officielle (``docs/production-security.md``)
+  * la documentation officielle (``docs/deployment/production-security.md``)
     explicite la séparation provisioning / runtime.
 """
 from __future__ import annotations
@@ -27,7 +27,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _GITIGNORE = _REPO_ROOT / ".gitignore"
 _ENV_EXAMPLE = _REPO_ROOT / "env" / "example"
 _ENV_PROD_LOCAL = _REPO_ROOT / "env" / "prod"  # untracked local file
-_PROD_SECURITY_DOC = _REPO_ROOT / "docs" / "production-security.md"
+_PROD_SECURITY_DOC = _REPO_ROOT / "docs" / "deployment" / "production-security.md"
 _APP_PY = _REPO_ROOT / "app.py"
 
 

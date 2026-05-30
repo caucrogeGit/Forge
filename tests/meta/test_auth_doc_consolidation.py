@@ -20,7 +20,7 @@ pytestmark = pytest.mark.meta
 AUTH_MD = pathlib.Path("docs/auth.md")
 RBAC_MD = pathlib.Path("docs/rbac.md")
 SECURITY_MD = pathlib.Path("docs/security.md")
-PRODUCTION_MD = pathlib.Path("docs/production-security.md")
+PRODUCTION_MD = pathlib.Path("docs/deployment/production-security.md")
 REFERENCE_MD = pathlib.Path("docs/reference/api.md")
 ROADMAP_MD = pathlib.Path("docs/roadmap/forge-roadmap.md")
 

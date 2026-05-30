@@ -104,13 +104,13 @@ def test_app_py_uses_make_ssl_context_helper():
 # ── Documentation TLS/Nginx ─────────────────────────────────────────────────────
 
 def test_deployment_doc_mentions_nginx_for_production_tls():
-    content = open("docs/deployment.md", encoding="utf-8").read()
+    content = open("docs/deployment/deployment.md", encoding="utf-8").read()
     assert "Nginx" in content
     assert "TLS" in content or "HTTPS" in content
 
 
 def test_deployment_doc_mentions_tls12():
-    content = open("docs/deployment.md", encoding="utf-8").read()
+    content = open("docs/deployment/deployment.md", encoding="utf-8").read()
     assert "1.2" in content
 
 

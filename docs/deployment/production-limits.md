@@ -1,6 +1,6 @@
 # Limites de production — Forge 1.0.0-beta.12
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Cette page synthétise les limites de production connues de Forge à la veille de
 `1.0.0-beta.12`. Elle complète les pages
@@ -77,7 +77,7 @@ développement et les démonstrations. Il :
   le choix le plus robuste actuellement disponible côté Forge.
 
 Sélection explicite via `forge.configure(session_store=...)` ou
-[ADR-002](adr/002-session-strategy.md).
+[ADR-002](../adr/002-session-strategy.md).
 
 ### Rate-limits
 
@@ -185,5 +185,5 @@ explicitement** (cf §4).
 - [Déploiement WSGI minimal](wsgi-deployment.md) — Gunicorn + reverse proxy
 - [Guide de déploiement](deployment.md) — Architecture Nginx/systemd
 - [Sécurité en production](production-security.md) — Cookies, headers, CSRF, uploads
-- [ADR-002 — Stratégie de session](adr/002-session-strategy.md)
-- [ADR-009 — Politique de stabilité terrain](adr/009-stability-policy-terrain.md)
+- [ADR-002 — Stratégie de session](../adr/002-session-strategy.md)
+- [ADR-009 — Politique de stabilité terrain](../adr/009-stability-policy-terrain.md)

@@ -410,5 +410,5 @@ curl -H "Authorization: Bearer changeme-en-production" \
 
 - [Référence API et CLI](reference.md) — documentation complète des modules
 - [Sécurité et RBAC](security.md) — sécurité générale Forge
-- [Déploiement avancé](deploy-advanced.md) — HTTPS, Nginx, production
+- [Déploiement avancé](deployment/deploy-advanced.md) — HTTPS, Nginx, production
 - [Contrat de stabilité](stability-contract.md) — garanties sur les API publiques

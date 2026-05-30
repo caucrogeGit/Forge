@@ -222,8 +222,8 @@ forge run --no-reload
 live reload navigateur ni de WebSocket ; ne lance pas Gunicorn
 automatiquement en prod.
 
-**Voir aussi :** [Déploiement WSGI minimal](../wsgi-deployment.md),
-[Limites de production](../production-limits.md).
+**Voir aussi :** [Déploiement WSGI minimal](../deployment/wsgi-deployment.md),
+[Limites de production](../deployment/production-limits.md).
 
 **Statut :** core.
 

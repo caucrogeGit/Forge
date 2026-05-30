@@ -523,8 +523,8 @@ Ce tutoriel couvre une application simple. Il ne couvre pas :
 | Relations `many_to_many` | [Relations entre entités](../relations.md) |
 | Envoi de mails | [Gestion des mails](../mail.md) |
 | Upload de fichiers / médias | [Module média](../media.md) |
-| Déploiement en production | [Déploiement](../deployment.md) |
-| Sécurité en production | [Sécurité en production](../production-security.md) |
+| Déploiement en production | [Déploiement](../deployment/deployment.md) |
+| Sécurité en production | [Sécurité en production](../deployment/production-security.md) |
 | API JSON légère | À venir — API-JSON-001 |
 | Pages publiques | [Outils — Génération PDF, Module média](../media.md) |
 | Forge Design | Projet compagnon séparé |
@@ -548,8 +548,8 @@ pas démarrer.
 | Comprendre les entités et modèles | [Architecture des entités](../entity_architecture.md) |
 | Déclarer des relations avancées | [Relations entre entités](../relations.md) |
 | Ajouter l'authentification | [Auth/User](../auth.md) |
-| Déployer en production | [Guide de déploiement](../deployment.md) |
-| Sécurité en production | [Sécurité en production](../production-security.md) |
+| Déployer en production | [Guide de déploiement](../deployment/deployment.md) |
+| Sécurité en production | [Sécurité en production](../deployment/production-security.md) |
 | Utiliser un starter complet | [Vue d'ensemble des starters](../starters/index.md) |
 | Passer à une version suivante | [Guide de migration](../migration-guide.md) |
 | Garanties sur les fichiers préservés | [Contrat de stabilité](../stability-contract.md) |

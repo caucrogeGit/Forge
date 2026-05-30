@@ -15,7 +15,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
-PROD_MD = pathlib.Path("docs/production-security.md")
+PROD_MD = pathlib.Path("docs/deployment/production-security.md")
 
 
 def _roadmap():

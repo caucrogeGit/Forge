@@ -4,7 +4,7 @@
 
 !!! info "Statut : opt-in officiel publié sur PyPI, API encore bêta"
     `forge-mvc-media` est publié sur PyPI depuis `1.0.0-beta.9`. L'API
-    applicative reste bêta — voir [Limites](production-limits.md) avant
+    applicative reste bêta — voir [Limites](deployment/production-limits.md) avant
     déploiement en production.
 
     Installation :

@@ -91,10 +91,10 @@ class TestNoActiveForge2XInDocs:
         )
 
     def test_deployment_md_no_forge_2x_utilise(self):
-        """docs/deployment.md : 'Forge 2.x utilise' bumpé en 'Forge 3.x'."""
+        """docs/deployment/deployment.md : 'Forge 2.x utilise' bumpé en 'Forge 3.x'."""
         text = (DOCS_DIR / "deployment.md").read_text(encoding="utf-8")
         assert not re.search(r"Forge 2\.x\s+utilise\b", text, re.IGNORECASE), (
-            "docs/deployment.md : 'Forge 2.x utilise...' doit être "
+            "docs/deployment/deployment.md : 'Forge 2.x utilise...' doit être "
             "bumpé en 'Forge 3.x utilise...' (T20-C)."
         )
 

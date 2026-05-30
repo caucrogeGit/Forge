@@ -139,7 +139,7 @@ class TestErrorMessageContent:
         assert "'0.0.0.0'" in message
 
     def test_points_to_wsgi_deployment_doc(self, message):
-        assert "docs/wsgi-deployment.md" in message
+        assert "docs/deployment/wsgi-deployment.md" in message
 
     def test_offers_local_workaround(self, message):
         # Donne une issue de secours : limiter APP_HOST à 127.0.0.1.

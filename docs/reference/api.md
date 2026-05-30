@@ -558,7 +558,7 @@ Pour l'authentification des nouveaux projets, utiliser `core.auth`. Les modules 
 | `set_flash(session_id, message, level="success")` | Stocke un message flash. |
 | `get_flash(session_id)` | Lit et consomme le flash. |
 
-Le stockage de session délègue au backend actif via `core.sessions.get_session_store()`. Le backend par défaut est `MemorySessionStore` (dict Python en mémoire, thread-safe). Il convient au développement et aux petites applications mono-processus derrière Nginx. Les sessions sont perdues au redémarrage, ne sont pas partagées entre workers et ne conviennent pas au scaling horizontal. Voir [ADR-002 — Stratégie de session](../adr/002-session-strategy.md) et la [section sessions mémoire du guide de déploiement](../deployment.md#9-limite-importante-sessions-memoire).
+Le stockage de session délègue au backend actif via `core.sessions.get_session_store()`. Le backend par défaut est `MemorySessionStore` (dict Python en mémoire, thread-safe). Il convient au développement et aux petites applications mono-processus derrière Nginx. Les sessions sont perdues au redémarrage, ne sont pas partagées entre workers et ne conviennent pas au scaling horizontal. Voir [ADR-002 — Stratégie de session](../adr/002-session-strategy.md) et la [section sessions mémoire du guide de déploiement](../deployment/deployment.md#9-limite-importante-sessions-memoire).
 
 Le package `core.sessions` expose le contrat de backend :
 
@@ -1426,7 +1426,7 @@ pip install --pre forge-mvc-media
 ```
 
 Le module reste opt-in : le core Forge ne dépend pas de `forge-mvc-media`.
-L'API applicative reste bêta — voir [Limites](../production-limits.md).
+L'API applicative reste bêta — voir [Limites](../deployment/production-limits.md).
 
 Les nouveaux fichiers générés par `forge make:crud --media` importent depuis ce module.
 
@@ -3087,7 +3087,7 @@ pip install --pre forge-mvc-media
 ```
 
 > Publié sur PyPI depuis `1.0.0-beta.9` (API encore bêta — voir
-> [Limites](../production-limits.md)). Les générateurs `make:crud --media` et
+> [Limites](../deployment/production-limits.md)). Les générateurs `make:crud --media` et
 > `make:public:list` importent depuis ce module.
 > Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 

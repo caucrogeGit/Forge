@@ -70,8 +70,8 @@ et `core/**/*.py`. Les dossiers `.venv/`, `__pycache__/`, `storage/`, `logs/`,
 
 En production (`APP_ENV=prod`), `forge run` refuse de démarrer le serveur
 intégré et affiche la stratégie WSGI recommandée — voir
-[Déploiement WSGI minimal](../wsgi-deployment.md) et
-[Limites de production](../production-limits.md).
+[Déploiement WSGI minimal](../deployment/wsgi-deployment.md) et
+[Limites de production](../deployment/production-limits.md).
 
 Les contrôleurs générés par Forge sont typés (`request: Request`,
 `-> Response`) et importent `Request`/`Response`. L'autocomplétion VS

@@ -1,6 +1,6 @@
 """Tests documentaires — DEPLOY-PROD-SECURITY-DOC-001.
 
-Vérifient que docs/production-security.md existe et couvre les sujets
+Vérifient que docs/deployment/production-security.md existe et couvre les sujets
 requis : HTTPS/proxy, cookies, headers, CSRF, RBAC, uploads, logs,
 secrets, base de données, checklist production et limites restantes.
 
@@ -17,7 +17,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROOT = Path(__file__).resolve().parents[2]
-GUIDE = ROOT / "docs" / "production-security.md"
+GUIDE = ROOT / "docs" / "deployment" / "production-security.md"
 
 
 @pytest.fixture(scope="module")

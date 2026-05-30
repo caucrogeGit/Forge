@@ -24,7 +24,7 @@ PUBLIC_DOCS = [
     PROJECT_ROOT / "docs" / "stability-contract.md",
     PROJECT_ROOT / "docs" / "release-policy.md",
     PROJECT_ROOT / "docs" / "auth.md",
-    PROJECT_ROOT / "docs" / "deployment.md",
+    PROJECT_ROOT / "docs" / "deployment" / "deployment.md",
     PROJECT_ROOT / "docs" / "deprecation-policy.md",
     PROJECT_ROOT / "docs" / "lts-policy.md",
 ]

@@ -3,7 +3,7 @@
 Vérifie que :
 - la roadmap marque SECURITY-CACHE-001 comme livré ;
 - la prochaine priorité est SECURITY-COOKIES-HOST-PREFIX-001 ;
-- docs/production-security.md documente le Cache-Control sur les routes auth ;
+- docs/deployment/production-security.md documente le Cache-Control sur les routes auth ;
 - docs/auth.md mentionne Cache-Control: no-store.
 """
 from __future__ import annotations
@@ -14,7 +14,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
-PROD_SECURITY = pathlib.Path("docs/production-security.md")
+PROD_SECURITY = pathlib.Path("docs/deployment/production-security.md")
 AUTH_MD = pathlib.Path("docs/auth.md")
 
 

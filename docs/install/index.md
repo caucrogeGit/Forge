@@ -44,7 +44,7 @@ Voir [Politique de release](../release-policy.md#publication-pypi).
 | `forge-mvc-workflow` | Brique workflow — statuts et transitions | Bêta — publié PyPI |
 | `forge-mvc-stats` | Brique statistiques — agrégations | Bêta — publié PyPI |
 | `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Alpha** — publié PyPI depuis `1.0.0-beta.9` |
-| `forge-mvc-media` | Brique media — helpers applicatifs upload | **Alpha** — publié PyPI depuis `1.0.0-beta.9` (API encore bêta, voir [Limites](../production-limits.md)) |
+| `forge-mvc-media` | Brique media — helpers applicatifs upload | **Alpha** — publié PyPI depuis `1.0.0-beta.9` (API encore bêta, voir [Limites](../deployment/production-limits.md)) |
 
 Pour installer Forge avec toutes les briques opt-in :
 
@@ -95,7 +95,7 @@ pip install --pre "forge-mvc[all]"
 installer `forge-mvc-mfa` ou `forge-mvc-media` directement comme ci-dessus. MFA
 est officiellement publié au statut **Alpha** (secret TOTP chiffré au repos via
 Fernet) ; l'API de `forge-mvc-media` reste bêta — voir
-[Limites](../production-limits.md).
+[Limites](../deployment/production-limits.md).
 
 Pour installer en mode éditable depuis les sources (contribution Forge) :
 

@@ -1,6 +1,6 @@
 # Déploiement WSGI minimal
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Cette page documente le chemin **WSGI minimal** pour exposer une application
 Forge en production, derrière un serveur WSGI externe (Gunicorn) et un
@@ -251,7 +251,7 @@ complète. Les limites suivantes restent à la charge de l'opérateur :
 
 - **Session store mémoire** (`MemorySessionStore`) : volatile au
   redémarrage, mono-processus. Utiliser `FileSessionStore` ou
-  `MariaDbSessionStore` (voir [ADR-002](adr/002-session-strategy.md))
+  `MariaDbSessionStore` (voir [ADR-002](../adr/002-session-strategy.md))
   via `forge.configure(session_store=...)`.
 - **`FileSessionStore`** : utilisable, mais reste fragile en multi-worker
   (pas de verrou partagé strict). Pour un déploiement multi-worker fiable,

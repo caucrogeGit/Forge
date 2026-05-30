@@ -42,7 +42,7 @@ forge run --no-reload
 
 En production (`APP_ENV=prod`), `forge run` refuse de démarrer le
 serveur intégré et affiche la stratégie WSGI recommandée — voir
-[Déploiement WSGI minimal](../wsgi-deployment.md).
+[Déploiement WSGI minimal](../deployment/wsgi-deployment.md).
 
 Une fois le serveur démarré, ouvrez `https://localhost:8000/welcome`
 dans votre navigateur.

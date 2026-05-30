@@ -3,7 +3,7 @@
 !!! tip "Guide production"
     Pour les bonnes pratiques de déploiement sécurisé (checklist, secrets, HTTPS,
     cookies, headers, CSRF, RBAC, uploads, logs), voir
-    **[Sécurité en production](production-security.md)**.
+    **[Sécurité en production](deployment/production-security.md)**.
 
 !!! info "Auth/User avancée"
     Pour l'authentification complète (login, MFA, OIDC, sessions, audit, CLI admin),
@@ -81,7 +81,7 @@ Ces en-têtes ne remplacent pas :
 
 - la configuration HTTPS et TLS du reverse proxy ;
 - une revue de sécurité des templates applicatifs ;
-- une politique de déploiement sécurisé complète (voir [Sécurité en production](production-security.md)).
+- une politique de déploiement sécurisé complète (voir [Sécurité en production](deployment/production-security.md)).
 
 Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis sont des garde-fous raisonnables, testés et verrouillés comme contrat public (`SECURITY-HEADERS-DOC-LOCK-001`).
 

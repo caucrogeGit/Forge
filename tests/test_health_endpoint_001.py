@@ -253,8 +253,8 @@ def test_health_repetable(forge_server):
 
 
 def test_deployment_md_mentionne_health():
-    """docs/deployment.md mentionne /health."""
-    content = (ROOT / "docs" / "deployment.md").read_text(encoding="utf-8")
+    """docs/deployment/deployment.md mentionne /health."""
+    content = (ROOT / "docs" / "deployment" / "deployment.md").read_text(encoding="utf-8")
     assert "/health" in content
 
 
