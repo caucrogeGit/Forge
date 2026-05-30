@@ -67,6 +67,7 @@ class TestAllVersionsBumped:
     @pytest.mark.parametrize("module", [
         "forge-mvc-mfa", "forge-mvc-rbac",
         "forge-mvc-workflow", "forge-mvc-stats",
+        "forge-mvc-media", "forge-mvc-iot",
     ])
     def test_optin_module_version(self, module: str):
         expected = _current_version()
@@ -92,9 +93,10 @@ class TestAllVersionsBumped:
 
     @pytest.mark.parametrize("module", [
         "forge-mvc-rbac", "forge-mvc-workflow", "forge-mvc-stats",
+        "forge-mvc-iot",
     ])
     def test_publishable_optin_forge_mvc_dependency_declared(self, module: str):
-        """rbac/workflow/stats déclarent forge-mvc (forme relachee acceptee apres OPTIN-PYPI-PUBLISH-PREPARE-001)."""
+        """rbac/workflow/stats/iot déclarent forge-mvc (forme relachee acceptee apres OPTIN-PYPI-PUBLISH-PREPARE-001)."""
         path = PROJECT_ROOT / "packages" / module / "pyproject.toml"
         data = tomllib.loads(path.read_text(encoding="utf-8"))
         deps = data.get("project", {}).get("dependencies", []) or []

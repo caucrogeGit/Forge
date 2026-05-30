@@ -1,10 +1,15 @@
 """Garde-fou PACKAGE-LOCK-SYNC-001 (option B).
 
-Vérifie que les 5 pyproject.toml sont cohérents entre eux :
+Vérifie que les 7 pyproject.toml sont cohérents entre eux :
 1. requires-python aligné (>=3.12 pour tous — ADR-006)
-2. Les 4 modules opt-in déclarent forge-mvc comme dépendance directe
+2. Les 6 modules opt-in déclarent forge-mvc comme dépendance directe
 3. La version épinglée de forge-mvc dans les modules opt-in correspond
-   à la version actuelle de forge-mvc
+   à la version actuelle de forge-mvc (pin strict `==` ; les pins relâchés
+   `>=…,<2` des opt-ins publiables — rbac/workflow/stats/iot — sont ignorés
+   par TestVersionAlignment, leur version propre étant vérifiée ailleurs)
+
+Extension PKG-OPTINS-PINNING-POLICY-001 : media et iot, ajoutés après
+l'audit F24, sont désormais couverts par OPTIN_MODULES.
 
 Origine : audit F24 — les 4 modules opt-in (mfa, rbac, workflow, stats)
 ne déclaraient aucune dépendance vers forge-mvc. Conséquence : pip install
@@ -35,6 +40,8 @@ OPTIN_MODULES = [
     "forge-mvc-rbac",
     "forge-mvc-workflow",
     "forge-mvc-stats",
+    "forge-mvc-media",
+    "forge-mvc-iot",
 ]
 
 
@@ -78,7 +85,7 @@ class TestPythonVersionAligned:
 
 
 class TestOptinModulesDeclareForgeMvc:
-    """Les 4 modules opt-in déclarent forge-mvc comme dépendance directe."""
+    """Les modules opt-in déclarent forge-mvc comme dépendance directe."""
 
     @pytest.mark.parametrize("module", OPTIN_MODULES)
     def test_optin_has_forge_mvc_dependency(self, module: str):
