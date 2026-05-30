@@ -151,7 +151,7 @@ D'autres accesseurs nommés couvrent les autres canaux d'entrée :
 
 ## Récapitulatif des outils livrés
 
-Cette progression met en jeu les briques DX livrées en phase beta 11 :
+Cette progression met en jeu les briques DX livrées depuis la phase beta 11 :
 
 | Brique | Rôle |
 |---|---|
@@ -192,6 +192,6 @@ Une fois ce premier contact assimilé :
 ## Voir aussi
 
 - [API Forge complète](reference/api.md)
-- [Roadmap Forge](roadmap/forge-roadmap.md) — tickets DX livrés en phase beta 11
+- [Roadmap Forge](roadmap/forge-roadmap.md) — tickets DX livrés depuis la phase beta 11
 - [Contrat de stabilité](stability-contract.md) — fichiers garantis préservés
 - [Release et compatibilité](release-and-compatibility.md) — versions supportées
