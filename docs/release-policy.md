@@ -449,12 +449,13 @@ Il est le point d'entrée officiel du framework.
 
 ### Opt-ins publiés sur PyPI
 
-Depuis `1.0.0-beta.9`, les cinq opt-ins officiels sont publiés sur PyPI :
+Les six opt-ins officiels sont publiés sur PyPI :
 
 - `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) — publication
   initiale en `1.0.0-beta.5` ;
 - `forge-mvc-mfa` (Alpha) — publication en `1.0.0-beta.9` ;
-- `forge-mvc-media` (Alpha — API encore bêta) — publication en `1.0.0-beta.9`.
+- `forge-mvc-media` (Alpha — API encore bêta) — publication en `1.0.0-beta.9` ;
+- `forge-mvc-iot` (Alpha) — publication en `1.0.0-beta.12`.
 
 Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et
 `forge-mvc[all]` sont disponibles via `pip install --pre forge-mvc[all]`.
@@ -471,7 +472,7 @@ Avant leur publication PyPI, les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` 
 
 ### Opt-ins publiés et synchronisés
 
-Les cinq opt-ins officiels sont publiés sur PyPI avec une version synchronisée avec le core :
+Les six opt-ins officiels sont publiés sur PyPI avec une version synchronisée avec le core :
 
 | Package | Publication | Statut | Prérequis |
 |---|---|---|---|
@@ -480,6 +481,7 @@ Les cinq opt-ins officiels sont publiés sur PyPI avec une version synchronisée
 | `forge-mvc-stats` | PyPI depuis `1.0.0-beta.5` | Bêta | Version alignée avec le core |
 | `forge-mvc-mfa` | PyPI depuis `1.0.0-beta.9` | Alpha | `FORGE_MFA_SECRET_KEY` obligatoire au démarrage ; secret TOTP chiffré au repos (Fernet) |
 | `forge-mvc-media` | PyPI depuis `1.0.0-beta.9` | Alpha (API encore bêta) | Voir `production-limits.md` |
+| `forge-mvc-iot` | PyPI depuis `1.0.0-beta.12` | Alpha | Dépend de `paho-mqtt` ; API HTTP en lecture seule, token Bearer optionnel |
 
 La publication est strictement synchronisée : core et opt-ins portent la même version.
 
@@ -508,7 +510,7 @@ ces deux paquets directement avec `pip install --pre forge-mvc-mfa` ou
 ### Règles de version
 
 - **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était versionné à chaque release.
-- Depuis `1.0.0-beta.9`, le core et les cinq opt-ins (`rbac`, `workflow`, `stats`, `mfa`, `media`) sont strictement synchronisés sur la même version PEP 440.
+- Depuis `1.0.0-beta.9`, le core et les opt-ins (`rbac`, `workflow`, `stats`, `mfa`, `media`) sont strictement synchronisés sur la même version PEP 440 ; `forge-mvc-iot` a rejoint cette synchronisation en `1.0.0-beta.12` (six opt-ins au total).
 
 ### Ce qui reste interdit sans ticket de release dédié
 
