@@ -2,7 +2,7 @@
 
 Note : MFA extrait dans le module `forge-mvc-mfa` depuis Forge 2.4.0 (ADR-004).
 Note : RBAC extrait dans le module `forge-mvc-rbac` depuis Forge 2.5.0 (ADR-004).
-Note : OIDC non fourni dans Forge 3.0. Voir docs/auth.md pour la justification.
+Note : OIDC non fourni dans Forge 3.0. Voir docs/features/auth.md pour la justification.
 """
 
 from core.auth.audit import (

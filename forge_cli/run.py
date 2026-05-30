@@ -73,7 +73,7 @@ def _format_prod_refusal() -> str:
     """Message imprimé en mode prod — pas d'exécution.
 
     Ne mentionne PAS `python app.py` comme solution. La voie supportée
-    est WSGI + Gunicorn + reverse proxy (voir docs/wsgi-deployment.md).
+    est WSGI + Gunicorn + reverse proxy (voir docs/deployment/wsgi-deployment.md).
     """
     return (
         "forge run refuse de démarrer le serveur intégré en production.\n"
@@ -88,8 +88,8 @@ def _format_prod_refusal() -> str:
         "Nginx ou Caddy terminent HTTPS et reverse-proxy vers Gunicorn.\n"
         "\n"
         "Voir :\n"
-        "  - docs/wsgi-deployment.md\n"
-        "  - docs/production-limits.md\n"
+        "  - docs/deployment/wsgi-deployment.md\n"
+        "  - docs/deployment/production-limits.md\n"
         "  - forge deploy:init  (génère nginx/forge-app.conf + systemd)\n"
     )
 

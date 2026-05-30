@@ -77,7 +77,7 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
 
 ## Étapes d'installation
 
-1. Créer `env/prod` avec les variables de production (voir `docs/deployment.md`).
+1. Créer `env/prod` avec les variables de production (voir `docs/deployment/deployment.md`).
    En production derrière Nginx, Forge écoute en HTTP local (`APP_SSL_ENABLED=false`).
 2. Adapter `systemd/forge-app.service` : remplacer `User=www-data` si nécessaire.
 3. Copier `nginx/forge-app.conf` dans `/etc/nginx/sites-available/`.

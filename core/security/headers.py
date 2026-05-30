@@ -24,7 +24,7 @@ l'accès si émis à tort. Le helper expose `include_hsts: bool` :
     == "https"`` (la requête a réellement atteint Forge en TLS). Derrière un
     reverse proxy qui termine TLS, ``wsgi.url_scheme`` vaut ``http`` côté
     Forge — c'est alors le reverse proxy qui doit poser HSTS, et c'est sa
-    bonne pratique documentée (`docs/wsgi-deployment.md`).
+    bonne pratique documentée (`docs/deployment/wsgi-deployment.md`).
 
 Voir `tests/test_wsgi_security_headers_001.py` pour le verrouillage de ces
 invariants.

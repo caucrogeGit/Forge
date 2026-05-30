@@ -75,7 +75,7 @@ def build_pdf() -> None:
         sys.exit(
             f"[ERREUR] Fichier source introuvable : {_QD_SOURCE}\n"
             "  Créer docs/quarkdown/forge-documentation.qd avant de générer le PDF.\n"
-            "  Voir : docs/pdf.md"
+            "  Voir : docs/features/pdf.md"
         )
 
     target = root / _PDF_TARGET

@@ -9,7 +9,7 @@ L'extraction depuis `core/uploads/` est complète. La documentation et les shims
 de compatibilité ont été livrés.
 
 **Publié sur PyPI** depuis `1.0.0-beta.9` (forme PEP 440 : `1.0.0b9`). L'API
-applicative reste bêta — voir `docs/production-limits.md` avant déploiement.
+applicative reste bêta — voir `docs/deployment/production-limits.md` avant déploiement.
 
 Installation :
 

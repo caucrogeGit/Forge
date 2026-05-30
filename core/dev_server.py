@@ -61,7 +61,7 @@ def format_startup_messages(host: str, port: int, ssl_enabled: bool) -> list[str
 #
 # `python app.py` reste un serveur de développement. En production publique,
 # Forge documente `WSGI + Gunicorn + reverse proxy` comme seule voie supportée
-# (cf docs/wsgi-deployment.md). Le serveur direct écoutant sur `0.0.0.0` ou
+# (cf docs/deployment/wsgi-deployment.md). Le serveur direct écoutant sur `0.0.0.0` ou
 # `::` en `APP_ENV=prod` est presque toujours une mauvaise configuration —
 # on refuse explicitement plutôt que d'émettre un WARN ignorable.
 
@@ -104,7 +104,7 @@ def format_prod_host_guard_error(app_env: str, app_host: str) -> str:
         f"être exposé publiquement en production.\n"
         f"\n"
         f"Pour la production publique, utiliser WSGI + Gunicorn + reverse proxy.\n"
-        f"Voir docs/wsgi-deployment.md.\n"
+        f"Voir docs/deployment/wsgi-deployment.md.\n"
         f"\n"
         f"Pour rester sur `python app.py` en mode prod local, limiter APP_HOST à\n"
         f"127.0.0.1, localhost ou ::1.\n"
