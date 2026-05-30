@@ -62,10 +62,14 @@ class TestStructuralElements:
             "CLAUDE.md devrait mentionner les 11 principes de la charte v2"
         )
 
-    def test_mentions_pre_3_note(self):
+    def test_mentions_pre_1_0_note(self):
+        # GOV-CLAUDE-MD-1.0-RESYNC-001 : la trajectoire publique est 1.0
+        # (bêta en cours). La convention « pas d'aliases avant le tag
+        # stable » se rattache désormais au tag 1.0.0.
         content = self.content.lower()
-        assert "pré-3.0" in content or "pre-3" in content or "avant.*3.0" in content.replace("\n", " "), (
-            "CLAUDE.md devrait mentionner la note pré-3.0 (pas d'aliases avant le tag 3.0)"
+        assert "pré-1.0" in content or "pre-1.0" in content, (
+            "CLAUDE.md devrait mentionner la note pré-1.0 (pas d'aliases "
+            "avant le tag 1.0.0 stable)"
         )
 
     def test_mentions_adr_list(self):

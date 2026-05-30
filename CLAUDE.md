@@ -14,7 +14,7 @@ de tests), voir les sources canoniques — section 8.
 
 Forge est un framework web Python **explicite, pédagogique, testable et durable**.
 Il conserve un runtime Python volontairement limité : MariaDB, python-dotenv,
-Jinja2, Pillow, Argon2, PyOTP.
+Jinja2, Pillow, Argon2, jsonschema (PyOTP côté opt-in MFA).
 
 **Type** : framework MVC Python, distribué en plusieurs paquets PyPI :
 
@@ -23,12 +23,15 @@ Jinja2, Pillow, Argon2, PyOTP.
 - `forge-mvc-rbac` (contrôle d'accès basé sur les rôles)
 - `forge-mvc-workflow` (transitions de statut)
 - `forge-mvc-stats` (agrégats statistiques)
+- `forge-mvc-media` (gestion applicative des médias)
+- `forge-mvc-iot` (réception/exposition de données IoT via MQTT)
 
 **Python** : 3.12+ minimum (ADR-006).
 
-**Statut** : version courante dans `pyproject.toml`. Série 3.x stable,
-consolidation 3.0.2 en cours. Voir `CHANGELOG.md` et `docs/roadmap/` pour
-l'avancement détaillé.
+**Statut** : version courante dans `pyproject.toml`. Trajectoire publique
+1.0, actuellement en **bêta publique** (`1.0.0-beta.x`) ; consolidation
+bêta en cours. Voir `CHANGELOG.md` et `docs/roadmap/` pour l'avancement
+détaillé.
 
 ---
 
@@ -58,10 +61,10 @@ Les 11 principes (résumé — la formulation canonique est dans `CHARTE_DOC.md`
 - C — Toute rupture d'API publique passe par une release majeure
 - D — Les tests testent le code, pas la documentation
 
-**Note pré-3.0** (convention pratique, pas dans la charte formelle) : avant le
-tag 3.0, les ruptures internes (suppressions, renommages) se font sans aliases
-dépréciés ni guide de migration formel — pas d'utilisateurs externes ni de code
-applicatif externe à protéger.
+**Note pré-1.0** (convention pratique, pas dans la charte formelle) : avant le
+tag 1.0.0 stable (phase bêta en cours), les ruptures internes (suppressions,
+renommages) se font sans aliases dépréciés ni guide de migration formel — pas
+d'utilisateurs externes ni de code applicatif externe à protéger.
 
 ---
 
@@ -84,6 +87,8 @@ applicatif externe à protéger.
 - `forge-mvc-rbac` — permissions déclaratives, contrôle par rôle
 - `forge-mvc-workflow` — états, transitions, historique
 - `forge-mvc-stats` — agrégats, compteurs, fenêtres temporelles
+- `forge-mvc-media` — gestion applicative des médias (extraite du core)
+- `forge-mvc-iot` — subscriber MQTT, stockage `iot_events`, API HTTP JSON, CLI `iot:*`
 
 **Hors scope Forge** (à charge de l'application) :
 
@@ -102,7 +107,7 @@ structurante.
 
 | Numéro | Fichier | Sujet résumé |
 |---|---|---|
-| ADR-001 | `001-auth-strategy.md` | Stratégie d'authentification Forge 3.x |
+| ADR-001 | `001-auth-strategy.md` | Stratégie d'authentification Forge |
 | ADR-002 | `002-session-strategy.md` | Stockage de session |
 | ADR-003 | `003-language-convention.md` | API publique en anglais |
 | ADR-004 | `004-core-perimeter.md` | Périmètre du core minimal strict |
@@ -110,6 +115,13 @@ structurante.
 | ADR-006 | `006-python-version.md` | Python 3.12+ minimum |
 | ADR-007 | `007-charter-v2-adoption.md` | Adoption formelle de la charte v2 |
 | ADR-008 | `008-auth-audit-architecture.md` | Audit auth : logging fourni, persistance applicative |
+| ADR-009 | `009-stability-policy-terrain.md` | Politique de stabilité : audits, bêta consolidée, tests terrain |
+| ADR-010 | `010-auth-session-canonical-api.md` | API canonique auth/session |
+| ADR-011 | `011-auth-audit-vocab-perimeter.md` | Périmètre du vocabulaire d'audit auth |
+| ADR-012 | `012-legacy-format-deprecation-policy.md` | Politique de dépréciation du format legacy |
+| ADR-013 | `013-nullable-required-contract-policy.md` | Politique nullable / required des contrats |
+| ADR-014 | `014-rbac-contract-location.md` | Emplacement du contrat RBAC |
+| ADR-015 | `015-dev-tls-handshake-per-thread.md` | Handshake TLS par thread (dev-server) |
 
 Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format existant.
 
@@ -243,24 +255,25 @@ Les conventions opérationnelles de Forge sont consolidées dans
 - **D. Documentation** : MkDocs strict + liens hors `docs/`,
   `docs/history/` comme mémoire brute, section « Historique » dans la nav
 
-Note sur `packages/` : 4 sous-dossiers maintenus (`forge-mvc-mfa`,
-`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`), chacun avec son
-propre `pyproject.toml`. Le `pyproject.toml` racine est la source de vérité
-pour `forge-mvc` (résolu en T2 + T2b — consolidation 3.0.2).
+Note sur `packages/` : 6 sous-dossiers maintenus (`forge-mvc-mfa`,
+`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-media`,
+`forge-mvc-iot`), chacun avec son propre `pyproject.toml`. Le `pyproject.toml` racine est la source de vérité
+pour `forge-mvc` (résolu en T2 + T2b — consolidation bêta 1.0).
 
 ---
 
 ## 10. Engagement de mise à jour
 
-Ce fichier a été refondu pour **Forge 3.0.2** — ticket `CLAUDE-MD-3.0.2-REFRESH-001`
-(scénario C de consolidation production-ready).
+Ce fichier a été resynchronisé pour la **bêta publique 1.0** (`1.0.0-beta.x`)
+— ticket `GOV-CLAUDE-MD-1.0-RESYNC-001` (alignement après le renumérotage de
+la trajectoire publique vers 1.0).
 
-Il est conçu pour rester valide sans modification pendant toute la série 3.x.
+Il est conçu pour rester valide sans modification pendant toute la série 1.x.
 Les informations volatiles ne sont pas ici — voir section 8.
 
-**Prochaine refonte prévue** : tag majeur 4.0 (ou refonte intermédiaire si
+**Prochaine refonte prévue** : tag majeur 2.0 (ou refonte intermédiaire si
 un changement architectural important le justifie).
-**Dernière refonte** : 2026-05 (Forge 3.0.2, scénario C de consolidation production-ready)
+**Dernière refonte** : 2026-05 (resync bêta 1.0, `GOV-CLAUDE-MD-1.0-RESYNC-001`)
 
 ---
 

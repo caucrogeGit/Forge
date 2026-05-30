@@ -1,13 +1,15 @@
-"""Garde-fou CLAUDE-MD-3.0.2-REFRESH-001.
+"""Garde-fou GOV-CLAUDE-MD-1.0-RESYNC-001 (ex CLAUDE-MD-3.0.2-REFRESH-001).
 
-Vérifie que CLAUDE.md reflète la réalité Forge 3.0.x (et non 2.10.0).
+Historique : ce fichier verrouillait autrefois le récit « Forge 3.0.2 /
+série 3.x » dans CLAUDE.md. La trajectoire publique a depuis été
+renumérotée vers **1.0** (bêta en cours, ``1.0.0-beta.x``) : le briefing
+ne doit plus se présenter comme une version 3.0.x, sinon il ment sur la
+réalité du dépôt (``pyproject.toml`` fait foi — section 8 de CLAUDE.md).
 
-Origine : audit F8 — CLAUDE.md daté de 2.10.0, annonçait 'refonte 3.0 en cours'
-alors qu'on est en 3.0.1 stable + 3.0.2 en consolidation.
-
-Conservé intentionnellement :
-- Mentions de la refonte 3.0 au passé (patterns émergés pendant...)
-- Histoire CLAUDE-MD-UPDATE-001 (ancien ticket créateur du doc)
+Ce garde-fou empêche désormais la réapparition du récit 3.0.x et vérifie
+que CLAUDE.md reflète la trajectoire 1.0, tout en préservant la
+structure du document (charte v2, règle A « retirer la cause » et règle
+D « les tests testent le code, pas la documentation »).
 """
 from __future__ import annotations
 
@@ -22,74 +24,75 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 CLAUDE_MD = PROJECT_ROOT / "CLAUDE.md"
 
 
-class TestActiveMentionsAreCurrent:
+def _text() -> str:
+    return CLAUDE_MD.read_text(encoding="utf-8")
 
-    def test_no_active_2_10_0_refonte(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "refondu pour **Forge 2.10.0**" not in text, (
-            "CLAUDE.md mentionne encore 'refondu pour Forge 2.10.0' "
-            "comme état courant. Doit être 'Forge 3.0.2'."
-        )
 
-    def test_no_active_refonte_3_0_en_cours(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "Refonte vers 3.0 en cours" not in text, (
-            "CLAUDE.md disait 'Refonte vers 3.0 en cours'. "
-            "Doit être bumpé pour refléter 3.0.2 en consolidation."
-        )
+class TestNoStaleVersionNarrative:
+    """CLAUDE.md ne doit plus se présenter comme une version 3.0.x."""
 
-    def test_no_active_jusqu_au_tag_3_0_0(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "jusqu'au tag 3.0.0" not in text, (
-            "CLAUDE.md promettait 'valide jusqu'au tag 3.0.0'. "
-            "Le tag 3.0.0 est posé. Reformuler en 'série 3.x'."
-        )
-
-    def test_no_active_prochaine_3_0_0(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "Prochaine mise à jour prévue** : tag 3.0.0" not in text, (
-            "CLAUDE.md annonçait 'Prochaine mise à jour : tag 3.0.0'. "
-            "Le tag est posé. Annoncer 'tag majeur 4.0' à la place."
+    @pytest.mark.parametrize("fragment", [
+        "refondu pour **Forge 3.0.2**",
+        "consolidation 3.0.2 en cours",
+        "Série 3.x stable",
+        "pendant toute la série 3.x",
+        "refondu pour **Forge 2.10.0**",
+        "Refonte vers 3.0 en cours",
+    ])
+    def test_no_obsolete_version_claim(self, fragment):
+        assert fragment not in _text(), (
+            f"CLAUDE.md contient encore une mention de version périmée : "
+            f"{fragment!r}. La trajectoire publique est 1.0 (bêta)."
         )
 
 
-class TestAdrTitleMentionsAreCurrent:
+class TestReflectsOneZeroTrajectory:
+    """CLAUDE.md doit refléter la trajectoire publique 1.0."""
 
-    def test_adr_001_title_3_x(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        adr_001_lines = [
-            line for line in text.splitlines()
-            if "ADR-001" in line and "001-auth-strategy" in line
-        ]
-        assert adr_001_lines, "Ligne ADR-001 introuvable dans CLAUDE.md"
-        for line in adr_001_lines:
-            assert "Forge 2.x" not in line, (
-                f"Titre ADR-001 contient 'Forge 2.x' : {line!r}. "
-                f"Bumper en 'Forge 3.x' (cohérence avec T17)."
-            )
-
-
-class TestNewMentionsAdded:
-
-    def test_mentions_3_0_2(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "3.0.2" in text, (
-            "CLAUDE.md doit mentionner la version courante 3.0.2 "
-            "(consolidation en cours)."
+    def test_mentions_1_0_beta(self):
+        text = _text()
+        assert "1.0.0-beta" in text or "bêta publique 1.0" in text, (
+            "CLAUDE.md doit indiquer la trajectoire publique 1.0 "
+            "(bêta, 1.0.0-beta.x)."
         )
 
-    def test_mentions_serie_3_x(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "série 3.x" in text or "serie 3.x" in text, (
-            "CLAUDE.md doit mentionner 'la série 3.x' pour clarifier "
-            "la période de validité du briefing."
+    def test_mentions_serie_1_x(self):
+        assert "série 1.x" in _text(), (
+            "CLAUDE.md doit mentionner 'la série 1.x' pour clarifier la "
+            "période de validité du briefing."
         )
 
-    def test_no_obsolete_packaging_note(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "À résoudre par PACKAGING-SRC-LAYOUT-001" not in text, (
-            "La note obsolète sur PACKAGING-SRC-LAYOUT-001 (T2/T2b déjà livrés) "
-            "doit être retirée ou reformulée."
+    def test_pre_1_0_note_present(self):
+        text = _text().lower()
+        assert "pré-1.0" in text, (
+            "CLAUDE.md doit porter la note pré-1.0 (pas d'aliases avant le "
+            "tag 1.0.0 stable)."
+        )
+
+
+class TestModulesAndAdrCurrent:
+    """Le briefing liste les 6 modules et les ADR existants."""
+
+    @pytest.mark.parametrize("module", [
+        "forge-mvc-mfa",
+        "forge-mvc-rbac",
+        "forge-mvc-workflow",
+        "forge-mvc-stats",
+        "forge-mvc-media",
+        "forge-mvc-iot",
+    ])
+    def test_module_listed(self, module):
+        assert module in _text(), (
+            f"CLAUDE.md doit lister le module officiel {module}."
+        )
+
+    @pytest.mark.parametrize("adr", [
+        "ADR-009", "ADR-010", "ADR-011",
+        "ADR-012", "ADR-013", "ADR-014", "ADR-015",
+    ])
+    def test_adr_listed(self, adr):
+        assert adr in _text(), (
+            f"CLAUDE.md (tableau §4) doit lister {adr}."
         )
 
 
@@ -108,13 +111,11 @@ class TestStructurePreserved:
         "## 10. Engagement de mise à jour",
     ])
     def test_main_section_present(self, section):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert section in text, (
+        assert section in _text(), (
             f"Section '{section}' manquante. Refactor trop agressif ?"
         )
 
     def test_charte_v2_11_principes_mentioned(self):
-        text = CLAUDE_MD.read_text(encoding="utf-8")
-        assert "11 principes" in text, (
+        assert "11 principes" in _text(), (
             "La charte v2 a 11 principes — la mention doit rester."
         )
