@@ -19,7 +19,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STARTERS = PROJECT_ROOT / "forge_cli" / "starters" / "data"
 
 UTILISATEURS_AUTH = STARTERS / "utilisateurs-auth" / "files"
-AUTH_MFA = STARTERS / "auth-mfa" / "files"
+AUTH_MFA = STARTERS / "welcome-optin-mfa" / "files"
 
 
 # ── utilisateurs-auth : référence ─────────────────────────────────────────────
@@ -39,7 +39,7 @@ class TestUtilisateursAuthReference:
         assert "AuthUser(" not in src
 
 
-# ── auth-mfa ──────────────────────────────────────────────────────────────────
+# ── welcome-optin-mfa ─────────────────────────────────────────────────────────
 
 class TestAuthMfaController:
 

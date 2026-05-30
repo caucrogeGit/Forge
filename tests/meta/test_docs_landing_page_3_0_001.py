@@ -273,7 +273,7 @@ class TestStartersSection:
         "starters/welcome/",
         "starters/contact-simple/",
         "starters/utilisateurs-auth/",
-        "starters/auth-mfa/",
+        "starters/optin-mfa/welcome-optin-mfa/",
     ])
     def test_all_starter_urls_present(self, starter_url):
         assert starter_url in self.source, (

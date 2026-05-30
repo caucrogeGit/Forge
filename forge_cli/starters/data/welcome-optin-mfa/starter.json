@@ -1,19 +1,21 @@
 {
-  "id": "auth-mfa",
+  "id": "welcome-optin-mfa",
   "number": 3,
   "name": "Auth MFA (TOTP)",
   "kind": "skeleton",
   "aliases": [
-    "auth-mfa",
+    "welcome-optin-mfa",
+    "welcome_optin_mfa",
     "mfa",
+    "auth-mfa",
     "3"
   ],
   "description": "Contrôleurs Auth + MFA (TOTP) sans stubs — nécessite forge-mvc-mfa",
   "status": "available",
   "requires_db": false,
   "supports_public": false,
-  "routes_marker": "auth-mfa",
+  "routes_marker": "welcome-optin-mfa",
   "routes_snippet": "routes.py.snippet",
-  "doc_url": "https://forgemvc.com/docs/forge/profiles/#profil-auth-mfa",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/optin-mfa/welcome-optin-mfa/",
   "check_paths": []
 }

@@ -24,10 +24,10 @@ python -c "import forge_mvc_mfa; print(forge_mvc_mfa.__version__)"
 ## Génération automatique
 
 ```bash
-forge starter:build 6
+forge starter:build 3
 ```
 
-Alias : `forge starter:build auth-mfa` ou `forge starter:build mfa`.
+Alias : `forge starter:build welcome-optin-mfa`, `forge starter:build auth-mfa` ou `forge starter:build mfa`.
 
 Ce starter est un **skeleton** : il remplace deux contrôleurs existants sans
 modifier les entités ni `mvc/routes.py`.
@@ -49,14 +49,14 @@ Pour reproduire sans `forge starter:build` :
 **1.** Copier `auth_controller.py` depuis le starter :
 
 ```bash
-cp forge_cli/starters/data/auth-mfa/files/mvc/controllers/auth_controller.py \
+cp forge_cli/starters/data/welcome-optin-mfa/files/mvc/controllers/auth_controller.py \
    mvc/controllers/auth_controller.py
 ```
 
 **2.** Copier `mfa_challenge_controller.py` :
 
 ```bash
-cp forge_cli/starters/data/auth-mfa/files/mvc/controllers/mfa_challenge_controller.py \
+cp forge_cli/starters/data/welcome-optin-mfa/files/mvc/controllers/mfa_challenge_controller.py \
    mvc/controllers/mfa_challenge_controller.py
 ```
 

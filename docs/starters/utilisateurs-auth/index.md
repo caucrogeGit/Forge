@@ -506,4 +506,4 @@ Le fichier complet de reconstruction est disponible dans [starters/utilisateurs-
 Prochain starter : **Auth MFA** — ajouter un challenge TOTP au flux de
 connexion avec le module opt-in `forge-mvc-mfa`.
 
-[Prochain starter : Auth MFA](../auth-mfa/index.md)
+[Prochain starter : Auth MFA](../optin-mfa/welcome-optin-mfa.md)

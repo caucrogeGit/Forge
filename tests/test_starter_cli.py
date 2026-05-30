@@ -556,7 +556,7 @@ def test_chaque_starter_a_un_index_md():
     for slug in (
         "contact-simple",
         "utilisateurs-auth",
-        "auth-mfa",
+        "optin-mfa",
         "optin-iot",
         "premier-crud",
     ):
@@ -564,6 +564,10 @@ def test_chaque_starter_a_un_index_md():
     # Starter IoT regroupé sous le dossier-sujet optin-iot/.
     assert (s / "optin-iot" / "welcome-optin-iot.md").exists(), (
         "docs/starters/optin-iot/welcome-optin-iot.md manquant"
+    )
+    # Starter MFA regroupé sous le dossier-sujet optin-mfa/.
+    assert (s / "optin-mfa" / "welcome-optin-mfa.md").exists(), (
+        "docs/starters/optin-mfa/welcome-optin-mfa.md manquant"
     )
     # Les 3 applications retirées ne sont plus des starters actifs.
     assert not (s / "carnet-contacts").exists()

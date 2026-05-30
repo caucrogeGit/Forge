@@ -138,7 +138,6 @@ def test_chaque_starter_a_un_index_md():
     starters_autonomes = [
         "contact-simple",
         "utilisateurs-auth",
-        "auth-mfa",
         "premier-crud",
     ]
     for dossier in starters_autonomes:
@@ -155,22 +154,36 @@ def test_chaque_starter_a_un_index_md():
         "page welcome-optin-iot absente pour optin-iot"
     )
 
+    # Le starter MFA est regroupé sous le dossier-sujet optin-mfa/ :
+    # un index.md (vue d'ensemble) + la page welcome-optin-mfa.md.
+    optin_mfa = ROOT / "docs" / "starters" / "optin-mfa"
+    assert (optin_mfa / "index.md").exists(), (
+        "vue d'ensemble absente pour optin-mfa"
+    )
+    assert (optin_mfa / "welcome-optin-mfa.md").exists(), (
+        "page welcome-optin-mfa absente pour optin-mfa"
+    )
+
 
 def test_starters_avec_rebuild_md():
-    """Les starters autonomes scaffoldés (contact-simple, utilisateurs-auth,
-    auth-mfa) ont un rebuild.md.
+    """Les starters autonomes scaffoldés (contact-simple, utilisateurs-auth)
+    ont un rebuild.md.
 
     Réorganisation des starters : carnet-contacts et suivi-comportement-eleves
     ne sont plus des starters actifs (archivés sous docs/starters/old/) ; seuls
-    les starters restants munis d'un guide de reconstruction sont vérifiés."""
+    les starters restants munis d'un guide de reconstruction sont vérifiés. Le
+    starter MFA a son guide sous optin-mfa/welcome-optin-mfa-rebuild.md."""
     dossiers = [
         "contact-simple",
         "utilisateurs-auth",
-        "auth-mfa",
     ]
     for dossier in dossiers:
         rebuild = ROOT / "docs" / "starters" / dossier / "rebuild.md"
         assert rebuild.exists(), f"rebuild.md absent pour {dossier}"
+
+    # Le guide de reconstruction MFA vit sous le dossier-sujet optin-mfa/.
+    rebuild_mfa = ROOT / "docs" / "starters" / "optin-mfa" / "welcome-optin-mfa-rebuild.md"
+    assert rebuild_mfa.exists(), "welcome-optin-mfa-rebuild.md absent pour optin-mfa"
 
 
 # ── Profils recommandés ───────────────────────────────────────────────────────

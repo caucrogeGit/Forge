@@ -27,7 +27,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Premier CRUD](premier-crud/index.md) | Capstone fondamentaux (avec BDD) | `minimal` / `standard` | Premier starter autonome après la progression — CRUD complet à SQL visible (`SELECT`/`INSERT`/`UPDATE`/`DELETE`) sur l'entité neutre `message`, aucun métier, aucun ORM |
 | [1 — Contacts](contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — synthèse du CRUD métier ; suppose les 11 paliers de découverte + le starter Premier CRUD acquis |
 | [2 — Utilisateurs / Auth](utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
-| [3 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
+| [3 — Auth MFA](optin-mfa/welcome-optin-mfa.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 | [Bonjour IoT](optin-iot/welcome-optin-iot.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-optin-iot`, `/welcome-optin-iot/inspect`, `/welcome-optin-iot/events`, `/welcome-optin-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
 
 ## Progression recommandée
@@ -191,7 +191,9 @@ Profil recommandé : `auth-mfa`.
     Le passage Alpha → Beta reste un ticket futur, voir
     `packages/forge-mvc-mfa/README.md`.
 
-[Présentation](auth-mfa/index.md) · [Reconstruction](auth-mfa/rebuild.md)
+Identifiant : `welcome-optin-mfa` (starter n°3, alias `mfa` / `auth-mfa` / `3`).
+
+[Vue d'ensemble du sujet](optin-mfa/index.md) · [Présentation](optin-mfa/welcome-optin-mfa.md) · [Reconstruction](optin-mfa/welcome-optin-mfa-rebuild.md)
 
 ## Démonstrateur IoT (sans broker requis)
 
@@ -283,7 +285,7 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 |---|---|---|
 | Contacts | [Présentation](contact-simple/index.md) | [rebuild.md](contact-simple/rebuild.md) |
 | Utilisateurs / Auth | [Présentation](utilisateurs-auth/index.md) | [rebuild.md](utilisateurs-auth/rebuild.md) |
-| Auth MFA | [Présentation](auth-mfa/index.md) | [rebuild.md](auth-mfa/rebuild.md) |
+| Auth MFA | [Présentation](optin-mfa/welcome-optin-mfa.md) | [rebuild.md](optin-mfa/welcome-optin-mfa-rebuild.md) |
 
 ## Statut officiel des starters
 

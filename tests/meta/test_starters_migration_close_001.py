@@ -131,7 +131,7 @@ def test_starter_pas_de_media_hors_schema(starter):
 
 
 def test_auth_mfa_sans_entite_json():
-    auth_mfa_dir = STARTERS_DIR / "auth-mfa"
+    auth_mfa_dir = STARTERS_DIR / "welcome-optin-mfa"
     entity_jsons = [
         p for p in auth_mfa_dir.rglob("*.json")
         if p.name != "starter.json"

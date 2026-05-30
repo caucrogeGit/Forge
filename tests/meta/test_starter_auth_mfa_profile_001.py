@@ -19,7 +19,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 STARTERS_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data"
 DEFAULT_AUTH_STARTER = STARTERS_DIR / "utilisateurs-auth"
-MFA_STARTER = STARTERS_DIR / "auth-mfa"
+MFA_STARTER = STARTERS_DIR / "welcome-optin-mfa"
 
 
 # ── Existence et structure du starter auth-mfa ────────────────────────────────

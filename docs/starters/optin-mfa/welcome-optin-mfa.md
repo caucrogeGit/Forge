@@ -3,7 +3,7 @@
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 <div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 58%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
-  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Niveau 6</p>
+  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Niveau 3</p>
   <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">Auth MFA (TOTP)</h2>
   <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Ajouter un challenge TOTP au flux de connexion d'un projet Forge standard : après le mot de passe, l'utilisateur doit saisir un code temporaire généré par une application d'authentification.</p>
 </div>
@@ -21,6 +21,8 @@
     `forge-mvc-mfa` reste **hors** de `forge-mvc[all]` (statut Alpha). Le
     passage Alpha → Beta reste un ticket futur, voir
     [reference/auth-mfa.md](../../reference/auth-mfa.md#exigences-avant-production-ready).
+
+Identifiant : `welcome-optin-mfa` (starter n°3, alias `mfa` / `auth-mfa` / `3`).
 
 ## Profil associé
 
@@ -84,12 +86,12 @@ cd MonProjet
 source .venv/bin/activate
 forge doctor
 forge db:init
-forge starter:build 6
+forge starter:build 3
 ```
 
-Alias acceptés : `forge starter:build auth-mfa`, `forge starter:build mfa`.
+Alias acceptés : `forge starter:build welcome-optin-mfa`, `forge starter:build auth-mfa`, `forge starter:build mfa`.
 
-Voir [Reconstruction](rebuild.md) pour les étapes détaillées.
+Voir [Reconstruction](welcome-optin-mfa-rebuild.md) pour les étapes détaillées.
 
 ## Limites du starter
 

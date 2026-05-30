@@ -21,7 +21,7 @@ _MIDDLEWARE = PROJECT_ROOT / "core" / "security" / "middleware.py"
 _AUTH_CONTROLLER_RUNTIME = PROJECT_ROOT / "mvc" / "controllers" / "auth_controller.py"
 
 _AUTH_MFA_CONTROLLER = (
-    _STARTERS_ROOT / "auth-mfa" / "files" / "mvc" / "controllers" / "auth_controller.py"
+    _STARTERS_ROOT / "welcome-optin-mfa" / "files" / "mvc" / "controllers" / "auth_controller.py"
 )
 _SUIVI_CONTROLLER = (
     _STARTERS_ROOT
@@ -131,7 +131,7 @@ def test_starter_suivi_uses_session_store_create():
 
 
 # ---------------------------------------------------------------------------
-# starter auth-mfa — migration create_session
+# starter welcome-optin-mfa — migration create_session
 # ---------------------------------------------------------------------------
 
 
@@ -162,7 +162,7 @@ def test_starter_auth_mfa_uses_session_store_create():
         _UTILISATEURS_CONTROLLER,
         _AUTH_CONTROLLER_RUNTIME,
     ],
-    ids=["auth-mfa", "suivi-comportement-eleves", "utilisateurs-auth", "runtime"],
+    ids=["welcome-optin-mfa", "suivi-comportement-eleves", "utilisateurs-auth", "runtime"],
 )
 def test_no_create_session_call_in_migrated_controllers(controller_path):
     src = _read(controller_path)
@@ -178,7 +178,7 @@ def test_no_create_session_call_in_migrated_controllers(controller_path):
         _SUIVI_CONTROLLER,
         _UTILISATEURS_CONTROLLER,
     ],
-    ids=["auth-mfa", "suivi-comportement-eleves", "utilisateurs-auth"],
+    ids=["welcome-optin-mfa", "suivi-comportement-eleves", "utilisateurs-auth"],
 )
 def test_starters_import_session_store(controller_path):
     src = _read(controller_path)

@@ -127,9 +127,10 @@ nav:
       - Utilisateurs / Auth:
           - Présentation: starters/utilisateurs-auth/index.md
           - Reconstruction: starters/utilisateurs-auth/rebuild.md
-      - Auth MFA (Pre-Alpha):
-          - Présentation: starters/auth-mfa/index.md
-          - Reconstruction: starters/auth-mfa/rebuild.md
+      - MFA (opt-in):
+          - Vue d'ensemble: starters/optin-mfa/index.md
+          - Auth MFA (TOTP): starters/optin-mfa/welcome-optin-mfa.md
+          - Reconstruction: starters/optin-mfa/welcome-optin-mfa-rebuild.md
       - IoT (opt-in):
           - Vue d'ensemble: starters/optin-iot/index.md
           - Bonjour IoT: starters/optin-iot/welcome-optin-iot.md
