@@ -129,7 +129,13 @@ class TestForgeCoreIndependence:
 
 
 class TestReadme:
-    """Le README annonce le statut opt-in et le scaffold."""
+    """Le README annonce le statut opt-in et décrit le module implémenté.
+
+    Garde-fou IOT-PYPI-TRUTH-001 : le module est désormais implémenté
+    (subscriber MQTT, stockage, API HTTP, CLI). Le README ne doit plus
+    se décrire comme un squelette vide — il mentirait sur le produit
+    publié (charte v2, règle A « retirer la cause » et règle D).
+    """
 
     def setup_method(self):
         self.text = IOT_README.read_text(encoding="utf-8")
@@ -142,12 +148,30 @@ class TestReadme:
     def test_mentions_mqtt(self):
         assert "MQTT" in self.text
 
-    def test_announces_scaffold_status(self):
-        # Une mention explicite que le module n'est pas encore implémenté.
-        markers = ("squelette", "scaffold", "pas encore", "non implémenté")
-        assert any(m in self.text.lower() for m in markers), (
-            "README.md doit indiquer que l'implémentation n'est pas faite"
+    def test_no_longer_claims_empty_skeleton(self):
+        # IOT-PYPI-TRUTH-001 : le module étant implémenté, le README ne
+        # doit plus affirmer qu'aucune logique n'est en place.
+        lowered = self.text.lower()
+        forbidden = (
+            "squelette initial",
+            "aucune logique",
+            "pas de subscriber",
+            "pas de dépendance `paho-mqtt`",
+            "non implémenté",
         )
+        offenders = [m for m in forbidden if m in lowered]
+        assert not offenders, (
+            "README.md décrit encore forge-mvc-iot comme un squelette vide "
+            f"alors qu'il est implémenté : {offenders}"
+        )
+
+    def test_describes_implemented_features(self):
+        # Le README doit refléter les briques réellement livrées.
+        lowered = self.text.lower()
+        for feature in ("subscriber", "iot_events", "iot:listen", "api http"):
+            assert feature in lowered, (
+                f"README.md doit décrire la fonctionnalité livrée : {feature}"
+            )
 
 
 class TestRoadmapMentions:

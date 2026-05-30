@@ -1,8 +1,10 @@
-"""Futur subscriber MQTT de Forge IoT.
+"""Subscriber MQTT de Forge IoT.
 
-Squelette vide — l'implémentation suivra le ticket IOT-MQTT-SUBSCRIBER-001
-(et le contrat de message IOT-MQTT-CONTRACT-001). Aucune dépendance à
-``paho-mqtt`` n'est ajoutée tant que ces tickets ne sont pas ouverts.
+- ``forge_mvc_iot.mqtt.subscriber.MqttSubscriber`` — abonnement au broker
+  via ``paho-mqtt`` (``IOT-MQTT-SUBSCRIBER-001``) ;
+- ``forge_mvc_iot.mqtt.contract`` — validation du contrat de message
+  (``IOT-MQTT-CONTRACT-001``) ;
+- ``forge_mvc_iot.mqtt.tls`` — configuration TLS optionnelle du client.
 """
 
 from __future__ import annotations
