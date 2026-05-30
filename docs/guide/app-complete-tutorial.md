@@ -543,8 +543,8 @@ pas démarrer.
 
 | Étape | Ressource |
 |---|---|
-| Référence complète des commandes | [API et CLI](../reference.md) |
-| Filtres de liste CRUD (`list.filter`) | [API et CLI — Filtres CRUD](../reference.md) |
+| Référence complète des commandes | [API et CLI](../reference/reference.md) |
+| Filtres de liste CRUD (`list.filter`) | [API et CLI — Filtres CRUD](../reference/reference.md) |
 | Comprendre les entités et modèles | [Architecture des entités](../entity_architecture.md) |
 | Déclarer des relations avancées | [Relations entre entités](../relations.md) |
 | Ajouter l'authentification | [Auth/User](../auth.md) |
@@ -594,4 +594,4 @@ python app.py                      # lancer l'application
 - [Relations entre entités](../relations.md) — format `relations.json` complet
 - [Architecture des entités](../entity_architecture.md) — rôle de chaque fichier généré
 - [Contrat de stabilité](../release/stability-contract.md) — garanties sur les fichiers préservés
-- [Référence API et CLI](../reference.md) — toutes les commandes
+- [Référence API et CLI](../reference/reference.md) — toutes les commandes

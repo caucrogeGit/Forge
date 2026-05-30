@@ -5,7 +5,7 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-DOC_PATH = pathlib.Path("docs/api-json.md")
+DOC_PATH = pathlib.Path("docs/reference/api-json.md")
 MKDOCS_PATH = pathlib.Path("mkdocs.yml")
 
 
@@ -24,7 +24,7 @@ def _mkdocs():
 
 class TestExistence:
     def test_fichier_existe(self):
-        assert DOC_PATH.exists(), "docs/api-json.md doit exister"
+        assert DOC_PATH.exists(), "docs/reference/api-json.md doit exister"
 
     def test_fichier_non_vide(self):
         assert len(_doc()) > 500

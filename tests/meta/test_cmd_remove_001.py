@@ -89,11 +89,11 @@ class TestDeprecationDocsClean:
         )
 
     def test_reference_doc_does_not_promote_cmd(self):
-        path = ROOT / "docs" / "reference.md"
+        path = ROOT / "docs" / "reference" / "reference.md"
         if not path.exists():
-            pytest.skip("docs/reference.md absent")
+            pytest.skip("docs/reference/reference.md absent")
         content = path.read_text(encoding="utf-8")
         for pattern in ("python cmd/", "cmd/make.py", "cmd/mvc/", "cmd/security/"):
             assert pattern not in content, (
-                f"docs/reference.md contient encore '{pattern}'"
+                f"docs/reference/reference.md contient encore '{pattern}'"
             )

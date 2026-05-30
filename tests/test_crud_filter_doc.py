@@ -1,6 +1,6 @@
 """Tests — CRUD-FILTER-DOC-001 : conformité documentaire des filtres CRUD.
 
-Vérifie que docs/reference.md documente :
+Vérifie que docs/reference/reference.md documente :
 
 - la convention list.filter=true ;
 - les types SQL supportés ;

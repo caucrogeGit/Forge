@@ -1,6 +1,6 @@
 # Schéma API Forge
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 <style>
   .md-grid {

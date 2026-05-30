@@ -62,7 +62,7 @@ def test_auth_md_mentionne_modules_officiels_core_security():
 
 
 def test_reference_md_mentionne_frontiere_core_auth_core_security():
-    """docs/reference.md mentionne la frontière core.auth / core.security."""
+    """docs/reference/reference.md mentionne la frontière core.auth / core.security."""
     content = _reference_md()
     assert "core.auth" in content
     assert "core.security" in content

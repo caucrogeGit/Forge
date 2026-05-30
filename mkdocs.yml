@@ -67,7 +67,7 @@ nav:
       - FAQ: guide/faq.md
 
   - Référence:
-      - Index: reference.md
+      - Index: reference/reference.md
       - Commandes CLI: reference/cli-commands.md
       - API Forge complète: reference/api.md
       - Convention HTTP inspectable: reference/http.md
@@ -84,7 +84,7 @@ nav:
       - Outils:
           - Profils de projet: reference/profils.md
           - Tests E2E: reference/tests-e2e.md
-      - API JSON légère: api-json.md
+      - API JSON légère: reference/api-json.md
       - Migrations SQL: migrations.md
       - Relations entre entités: relations.md
       - Gestion des mails: mail.md
@@ -93,8 +93,8 @@ nav:
       - RBAC — Contrôle d'accès: rbac.md
       - Contrat RBAC séparé: security/rbac-contract.md
       - RBAC — Usage applicatif: security/rbac-usage.md
-      - Schéma API: reference-schema.md
-      - Schéma erreurs runtime: runtime-errors-schema.md
+      - Schéma API: reference/reference-schema.md
+      - Schéma erreurs runtime: reference/runtime-errors-schema.md
 
   - Outils:
       - Génération PDF: pdf.md

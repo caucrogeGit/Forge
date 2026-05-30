@@ -117,8 +117,8 @@ def test_docs_index_html_mentionne_version_3_0():
 
 
 def test_docs_reference_mentionne_version_courante():
-    """docs/reference.md mentionne la version courante ou son placeholder."""
-    content = (ROOT / "docs" / "reference.md").read_text(encoding="utf-8")
+    """docs/reference/reference.md mentionne la version courante ou son placeholder."""
+    content = (ROOT / "docs" / "reference" / "reference.md").read_text(encoding="utf-8")
     assert _EXPECTED in content or "{{forge_version}}" in content
 
 

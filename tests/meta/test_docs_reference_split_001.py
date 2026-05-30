@@ -1,7 +1,7 @@
 """Tests DOCS-REFERENCE-SPLIT-001 : reference.md decoupe en sous-fichiers.
 
 Verifie que :
-- docs/reference.md est devenu un index leger (<200 lignes) ;
+- docs/reference/reference.md est devenu un index leger (<200 lignes) ;
 - les 11 sous-fichiers existent dans docs/reference/ ;
 - les titres "Phase 5" et "Phase 6" ont disparu des sous-fichiers ;
 - les modules extraits sont mentionnes avec pointeurs ;
@@ -17,7 +17,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REFERENCE_DIR = PROJECT_ROOT / "docs" / "reference"
-REFERENCE_INDEX = PROJECT_ROOT / "docs" / "reference.md"
+REFERENCE_INDEX = PROJECT_ROOT / "docs" / "reference" / "reference.md"
 
 
 # ── reference.md est un index leger ──────────────────────────────────────────
@@ -31,21 +31,23 @@ class TestReferenceIndexIsLight:
         content = REFERENCE_INDEX.read_text(encoding="utf-8")
         line_count = len(content.splitlines())
         assert line_count < 200, (
-            f"docs/reference.md fait {line_count} lignes — devrait etre un "
+            f"docs/reference/reference.md fait {line_count} lignes — devrait etre un "
             f"index leger (<200 lignes)."
         )
 
+    # DOCS-REORG-REFERENCE-001 : reference.md vit désormais DANS docs/reference/,
+    # ses liens vers les sous-fichiers sont donc relatifs au même dossier (frères).
     def test_reference_md_links_to_api(self):
-        assert "reference/api.md" in REFERENCE_INDEX.read_text(encoding="utf-8")
+        assert "](api.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
     def test_reference_md_links_to_workflow(self):
-        assert "reference/workflow.md" in REFERENCE_INDEX.read_text(encoding="utf-8")
+        assert "](workflow.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
     def test_reference_md_links_to_stats(self):
-        assert "reference/stats.md" in REFERENCE_INDEX.read_text(encoding="utf-8")
+        assert "](stats.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
     def test_reference_md_links_to_modules(self):
-        assert "reference/modules.md" in REFERENCE_INDEX.read_text(encoding="utf-8")
+        assert "](modules.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
     def test_reference_md_mentions_extracted_modules(self):
         content = REFERENCE_INDEX.read_text(encoding="utf-8")
@@ -167,7 +169,15 @@ class TestNoUnexpectedSubfiles:
     def test_only_expected_subfiles(self):
         if not REFERENCE_DIR.exists():
             pytest.skip("docs/reference/ n'existe pas")
-        expected = set(_EXPECTED_SUBFILES)
+        # _EXPECTED_SUBFILES = les 13 sous-fichiers du découpage ; on autorise
+        # en plus l'index reference.md et les 3 docs de référence regroupées
+        # ici par DOCS-REORG-REFERENCE-001.
+        expected = set(_EXPECTED_SUBFILES) | {
+            "reference.md",
+            "reference-schema.md",
+            "api-json.md",
+            "runtime-errors-schema.md",
+        }
         actual = {f.name for f in REFERENCE_DIR.glob("*.md")}
         unexpected = actual - expected
         assert not unexpected, (

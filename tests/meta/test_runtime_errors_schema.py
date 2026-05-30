@@ -42,7 +42,7 @@ from core.runtime_errors import (
 pytestmark = pytest.mark.meta
 
 ROOT = pathlib.Path(__file__).parent.parent.parent
-SCHEMA_DOC = ROOT / "docs" / "runtime-errors-schema.md"
+SCHEMA_DOC = ROOT / "docs" / "reference" / "runtime-errors-schema.md"
 
 REQUIRED_SECTIONS = [
     "## Objectif",

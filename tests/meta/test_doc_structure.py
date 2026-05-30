@@ -26,7 +26,7 @@ class TestPagesExistent:
         assert Path("docs/guide/guide.md").exists()
 
     def test_reference_existe(self):
-        assert Path("docs/reference.md").exists()
+        assert Path("docs/reference/reference.md").exists()
 
     def test_auth_existe(self):
         assert Path("docs/auth.md").exists()

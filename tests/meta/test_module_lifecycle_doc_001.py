@@ -1,7 +1,7 @@
 """
 Tests documentaires MODULE-LIFECYCLE-DOC-001 — Cycle de vie des modules.
 
-Valide que docs/reference.md documente correctement :
+Valide que docs/reference/reference.md documente correctement :
 - les capacités actuelles du système de modules ;
 - ce qui n'est pas encore supporté ;
 - les risques connus ;

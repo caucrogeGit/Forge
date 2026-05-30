@@ -4,7 +4,7 @@
 
 Forge est un framework web MVC Python avec HTTPS natif, SQL explicite, templates Jinja2 et génération déterministe du modèle. Ce guide part d'un environnement Forge déjà installé et aboutit à un premier projet fonctionnel avec CRUD généré.
 
-Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir [Référence API et CLI](../reference.md).
+Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir [Référence API et CLI](../reference/reference.md).
 
 !!! tip "Forge n'est pas encore installé ?"
     Commencez par le parcours adapté dans le menu Installation :
@@ -336,7 +336,7 @@ flowchart TD
 | `forge make:crud Nom` | Génère contrôleur, modèle, formulaire, vues |
 | `forge routes:list` | Affiche les routes déclarées |
 
-Pour les commandes avancées et la référence complète des paramètres, voir [Référence API et CLI](../reference.md).
+Pour les commandes avancées et la référence complète des paramètres, voir [Référence API et CLI](../reference/reference.md).
 
 ---
 

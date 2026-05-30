@@ -364,4 +364,4 @@ Ce qui reste à venir :
 - back-office média intégré ;
 - permissions média (accès contrôlé aux fichiers servis via `/media/...`).
 
-Voir [Référence API et CLI](reference.md) et [Module média](media.md) pour les détails.
+Voir [Référence API et CLI](reference/reference.md) et [Module média](media.md) pour les détails.

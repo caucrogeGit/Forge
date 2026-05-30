@@ -770,7 +770,7 @@ forge project:audit
 
 ## Voir aussi
 
-- [API et CLI](reference.md) — liste complète des commandes `forge starter:*`
+- [API et CLI](reference/reference.md) — liste complète des commandes `forge starter:*`
 - [Créer un module](module-author-guide.md) — brique réutilisable installable dans un projet existant
 - [Vue d'ensemble des starters](starters/index.md) — starters officiels Forge
 - [Application complète](guide/app-complete-tutorial.md) — exemple de build manuel
