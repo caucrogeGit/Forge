@@ -7,7 +7,7 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> La version publique actuelle est **Forge 1.0.0-beta.11**.
+> La version publique actuelle est **Forge 1.0.0-beta.12**.
 
 ---
 
