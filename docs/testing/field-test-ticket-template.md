@@ -71,8 +71,8 @@ Le texte doit être opérationnel, pas scolaire.
 
 Exemple :
 
-> Dans Forge, une route relie une méthode HTTP et une URL à une méthode de contrôleur.  
-> Le fichier des routes applicatives est `mvc/routes.py`.  
+> Dans Forge, une route relie une méthode HTTP et une URL à une méthode de contrôleur.
+> Le fichier des routes applicatives est `mvc/routes.py`.
 > Le contrôleur appartient à l’application et se trouve dans `mvc/controllers/`.
 
 ---
@@ -159,7 +159,7 @@ forge routes:list
 
 ## 9. Exemple indicatif décorrélé
 
-L’exemple montre seulement la forme générale.  
+L’exemple montre seulement la forme générale.
 Il ne doit pas être recopié tel quel pour valider le ticket.
 
 ### Exemple de forme

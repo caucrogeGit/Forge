@@ -6,8 +6,8 @@
 
 Ce document définit les règles de la campagne indépendante de tests terrain Forge.
 
-Cette campagne commence après la consolidation fonctionnelle du framework.  
-Elle ne cherche pas à ajouter de nouvelles fonctionnalités.  
+Cette campagne commence après la consolidation fonctionnelle du framework.
+Elle ne cherche pas à ajouter de nouvelles fonctionnalités.
 Elle cherche à répondre à une question simple :
 
 > Un développeur qui ne connaît pas Forge peut-il l’installer, le comprendre, l’utiliser, diagnostiquer ses erreurs, construire une application et la maintenir ?
@@ -181,7 +181,7 @@ Les exemples sont autorisés et recommandés, mais ils doivent être décorrél�
 
 Règle :
 
-> L’exemple montre une forme, une syntaxe ou une logique.  
+> L’exemple montre une forme, une syntaxe ou une logique.
 > Il ne doit pas être copiable tel quel pour valider le ticket.
 
 Exemple de verrou :

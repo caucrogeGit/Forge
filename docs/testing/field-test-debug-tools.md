@@ -8,7 +8,7 @@
 
 Le testeur ne corrige pas Forge pendant un ticket FT. Son rôle est d'observer, de lancer les outils de diagnostic prévus, de collecter les preuves et de remplir un retour exploitable.
 
-Un bon retour terrain ne dit pas seulement "ça ne marche pas".  
+Un bon retour terrain ne dit pas seulement "ça ne marche pas".
 Il indique la commande lancée, le résultat obtenu, le diagnostic exécuté, les logs utiles, le statut et la gravité.
 
 ---

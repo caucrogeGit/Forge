@@ -170,7 +170,7 @@ aux tickets 4.4 (`STARTER-AUTH-MODERNIZE-001`) et suivants.
 
 ## Amendement — Pont de compatibilité bidirectionnel (4.2b)
 
-**Ticket** : `AUTH-SESSION-COMPATIBILITY-BRIDGE-001`  
+**Ticket** : `AUTH-SESSION-COMPATIBILITY-BRIDGE-001`
 **Date** : 2026-05-16
 
 La divergence de clés de session (`_auth_user_id` vs `authenticated + user`)
