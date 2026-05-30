@@ -28,10 +28,29 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REQUIRED_PACKAGES = ["core", "forge_cli", "integrations"]
 
 
+def _clean_build_dirs() -> None:
+    """Supprime build/ et *.egg-info pour un build représentatif.
+
+    PKG-WHEEL-NO-PYC-001 : ``python -m build --no-isolation`` réutilise
+    ``./build/lib`` sans en purger les fichiers obsolètes. Un build
+    enchaîné après un ``compileall`` y laisse des ``__pycache__/*.pyc``
+    qui remontent ensuite dans la wheel. On reproduit ici le nettoyage
+    fait par ``scripts/release_check.sh --full`` pour tester l'artefact
+    réellement publiable.
+    """
+    import shutil
+
+    if (PROJECT_ROOT / "build").exists():
+        shutil.rmtree(PROJECT_ROOT / "build")
+    for egg in PROJECT_ROOT.glob("*.egg-info"):
+        shutil.rmtree(egg)
+
+
 @pytest.fixture(scope="module")
 def fresh_wheel(tmp_path_factory):
     """Build une wheel fraîche depuis le pyproject.toml racine."""
     out_dir = tmp_path_factory.mktemp("wheel_build")
+    _clean_build_dirs()
     result = subprocess.run(
         [
             sys.executable, "-m", "build", "--wheel",
@@ -96,6 +115,29 @@ class TestWheelHasCode:
 # ---------------------------------------------------------------------------
 # Classe 2 — Entry point CLI déclaré
 # ---------------------------------------------------------------------------
+
+class TestWheelIsClean:
+    """Garde-fou PKG-WHEEL-NO-PYC-001 — pas de bytecode dans la wheel.
+
+    Une wheel propre ne doit embarquer que des sources : aucun
+    ``.pyc``/``.pyo`` ni dossier ``__pycache__``. Sinon l'artefact
+    dépend du poste de build et n'est pas reproductible.
+    """
+
+    def test_wheel_has_no_bytecode(self, fresh_wheel):
+        with zipfile.ZipFile(fresh_wheel) as zf:
+            names = zf.namelist()
+        bytecode = [
+            n for n in names
+            if n.endswith((".pyc", ".pyo")) or "__pycache__/" in n
+        ]
+        assert not bytecode, (
+            "La wheel contient du bytecode compilé "
+            f"({len(bytecode)} fichiers) — build non propre. "
+            f"Exemples : {bytecode[:5]}. "
+            "Nettoyer build/ avant python -m build (cf. release_check.sh --full)."
+        )
+
 
 class TestWheelEntryPoint:
 

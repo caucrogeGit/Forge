@@ -1,1 +1,8 @@
 recursive-include forge_cli/schemas *.json
+
+# PKG-WHEEL-NO-PYC-001 — ne jamais embarquer de bytecode compilé dans les
+# artefacts (wheel/sdist). Garantit des distributions propres et
+# reproductibles, indépendantes du poste de build.
+global-exclude *.pyc
+global-exclude *.pyo
+recursive-exclude * __pycache__

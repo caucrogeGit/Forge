@@ -79,6 +79,14 @@ include = ["core*", "forge_cli*", "integrations*"]
 ]
 
 [tool.setuptools.exclude-package-data]
+# PKG-WHEEL-NO-PYC-001 — exclusion globale du bytecode compilé : avec
+# include-package-data, tout __pycache__ présent dans l'arbre au moment
+# du build remonterait sinon dans la wheel (artefact non reproductible).
+"*" = [
+    "**/__pycache__/*",
+    "**/*.pyc",
+    "**/*.pyo",
+]
 "forge_cli" = [
     "starters/data/**/__pycache__/*",
     "starters/data/**/*.pyc",
