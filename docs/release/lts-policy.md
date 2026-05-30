@@ -8,7 +8,7 @@ Il complète :
 - [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
 - [Politique de dépréciation](deprecation-policy.md) — cycle annonce → retrait
 - [Matrice de compatibilité](compatibility.md) — Python, MariaDB, Node.js
-- [Guide de migration](../migration-guide.md) — passer d'une version à l'autre
+- [Guide de migration](../features/migration-guide.md) — passer d'une version à l'autre
 
 ---
 

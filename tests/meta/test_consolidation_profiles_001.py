@@ -149,8 +149,8 @@ def test_profil_affiche_dans_message_demarrage(tmp_path, monkeypatch, capsys):
 # ── Différences entre profils ─────────────────────────────────────────────────
 
 def test_limite_documentee_meme_squelette(tmp_path, monkeypatch):
-    """La limitation connue (même squelette pour tous les profils) est documentée dans docs/profiles.md."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """La limitation connue (même squelette pour tous les profils) est documentée dans docs/features/profiles.md."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "même structure" in content or "même squelette" in content or "même base" in content
 
 
@@ -164,38 +164,38 @@ def test_profils_coherents_avec_leur_hierarchie():
 # ── Cohérence documentaire ────────────────────────────────────────────────────
 
 def test_doc_profiles_md_existe():
-    """docs/profiles.md existe."""
-    assert (ROOT / "docs" / "profiles.md").exists()
+    """docs/features/profiles.md existe."""
+    assert (ROOT / "docs" / "features" / "profiles.md").exists()
 
 
 def test_doc_profiles_mentionne_les_quatre_profils():
-    """docs/profiles.md mentionne les 4 profils officiels."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """docs/features/profiles.md mentionne les 4 profils officiels."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     for profile in SUPPORTED_PROJECT_PROFILES:
         assert profile in content
 
 
 def test_doc_profiles_mentionne_htmx_pour_dynamic():
-    """docs/profiles.md mentionne HTMX dans la section dynamic."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """docs/features/profiles.md mentionne HTMX dans la section dynamic."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "HTMX" in content or "htmx" in content
 
 
 def test_doc_profiles_mentionne_i18n_pour_multilingual():
-    """docs/profiles.md mentionne i18n dans la section multilingual."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """docs/features/profiles.md mentionne i18n dans la section multilingual."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "i18n" in content
 
 
 def test_doc_profiles_mentionne_tailwind():
-    """docs/profiles.md mentionne Tailwind (standard contient Tailwind)."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """docs/features/profiles.md mentionne Tailwind (standard contient Tailwind)."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "tailwind" in content.lower() or "Tailwind" in content
 
 
 def test_doc_profiles_mentionne_limite_squelette():
-    """docs/profiles.md documente la limite : mêmes squelettes actuellement."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """docs/features/profiles.md documente la limite : mêmes squelettes actuellement."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "Limites" in content or "limite" in content.lower()
 
 
@@ -215,8 +215,8 @@ def test_doc_starters_index_explique_difference_profil_starter():
 
 
 def test_doc_profiles_mentionne_correspondance_starters():
-    """docs/profiles.md établit la correspondance entre profils et starters."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """docs/features/profiles.md établit la correspondance entre profils et starters."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "starter" in content.lower()
 
 
@@ -225,10 +225,10 @@ def test_readme_mentionne_option_profile():
 
     Le README public simplifié délègue le détail des profils au site de
     doc : on vérifie que `--profile` est documenté dans le README **ou**
-    dans `docs/profiles.md` (page de référence des profils).
+    dans `docs/features/profiles.md` (page de référence des profils).
     """
     content = (ROOT / "README.md").read_text(encoding="utf-8")
-    profiles_doc = ROOT / "docs" / "profiles.md"
+    profiles_doc = ROOT / "docs" / "features" / "profiles.md"
     documented = "--profile" in content or (
         profiles_doc.exists() and "--profile" in profiles_doc.read_text(encoding="utf-8")
     )
@@ -245,8 +245,8 @@ def test_profiles_py_ne_depend_pas_forge_design():
 
 
 def test_doc_profiles_ne_promet_pas_editeur_graphique():
-    """docs/profiles.md ne promet pas un éditeur graphique lié aux profils."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """docs/features/profiles.md ne promet pas un éditeur graphique lié aux profils."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "éditeur graphique" not in content.lower()
 
 

@@ -105,7 +105,7 @@ Guides de référence pour comprendre les contrats :
 
 - [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
 - [Référence API et CLI](../reference/reference.md) — toutes les commandes disponibles
-- [Guide de migration](../migration-guide.md) — compatibilité entre versions
+- [Guide de migration](../features/migration-guide.md) — compatibilité entre versions
 - [Politique de release](../release/release-policy.md) — SemVer adapté à Forge
 - [Politique de dépréciation](../release/deprecation-policy.md) — cycle d'annonce et de retrait
 - [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, dépendances
@@ -350,11 +350,11 @@ observable doit être reflété dans [Référence API et CLI](../reference/refer
 
 Si la fonctionnalité est couverte par un guide existant, mettez-le à jour :
 
-- [Architecture des entités](../entity_architecture.md) — nouveaux champs ou générateurs
-- [Relations entre entités](../relations.md) — nouvelle syntaxe relationnelle
-- [Auth/User](../auth.md) — nouvelles briques d'authentification
+- [Architecture des entités](../features/entity_architecture.md) — nouveaux champs ou générateurs
+- [Relations entre entités](../features/relations.md) — nouvelle syntaxe relationnelle
+- [Auth/User](../features/auth.md) — nouvelles briques d'authentification
 - [Sécurité et RBAC](security.md) — nouveaux mécanismes de sécurité
-- [Module média](../media.md) — nouveaux comportements uploads
+- [Module média](../features/media.md) — nouveaux comportements uploads
 
 ### Quand modifier la roadmap
 
@@ -600,7 +600,7 @@ git commit -m "feat: ajouter le guide de création de modules Forge"
 - [Politique de release](../release/release-policy.md) — SemVer adapté, règles de publication
 - [Politique de dépréciation](../release/deprecation-policy.md) — cycle d'annonce et de retrait
 - [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, dépendances
-- [Guide de migration](../migration-guide.md) — comment migrer entre versions
+- [Guide de migration](../features/migration-guide.md) — comment migrer entre versions
 - [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
 - [Procédure de release](../release/release.md) — étapes de publication d'une version
 - [Validation locale](../release/release-local.md) — checklist de validation avant release

@@ -1,6 +1,6 @@
 # Génération PDF
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Forge propose une commande optionnelle pour générer un PDF de sa documentation.
 Cette fonctionnalité repose sur [Quarkdown](https://quarkdown.com/), un outil externe indépendant du cœur du framework.

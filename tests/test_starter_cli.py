@@ -656,10 +656,10 @@ def test_avertissement_dans_starter_4():
 # ── STARTER-PROFILES-001 : tests documentaires ─────────────────────────────
 
 def test_profiles_md_contient_section_profils_et_starters():
-    """docs/profiles.md contient la section 'Profils et starters'."""
+    """docs/features/profiles.md contient la section 'Profils et starters'."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "Profils et starters" in content
 
 
@@ -667,17 +667,17 @@ def test_profiles_md_mentionne_les_cinq_starters():
     """La section Profils et starters mentionne les cinq starters."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "Contacts" in content
     assert "Carnet de contacts" in content
     assert "Communes" in content or "Séjours" in content
 
 
 def test_profiles_md_ne_mentionne_plus_audit_comme_futur():
-    """docs/profiles.md ne présente plus STARTER-LEGACY-AUDIT-001 comme un travail à venir."""
+    """docs/features/profiles.md ne présente plus STARTER-LEGACY-AUDIT-001 comme un travail à venir."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     # L'ancien texte indiquait que l'audit "sera" fait — il doit avoir disparu.
     assert "seront réévalués" not in content
     assert "seront audités" not in content
@@ -1067,10 +1067,10 @@ def test_starters_index_starter_2_non_a_moderniser():
 
 
 def test_profiles_starter_2_non_a_moderniser():
-    """docs/profiles.md ne dit plus que le starter 2 est à moderniser."""
+    """docs/features/profiles.md ne dit plus que le starter 2 est à moderniser."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "Utilisateurs/Auth (à moderniser)" not in content
 
 
@@ -1184,10 +1184,10 @@ def test_starters_index_starter_4_historique():
 
 
 def test_profiles_starter_4_non_profil_officiel():
-    """docs/profiles.md ne recommande pas le starter 4 comme profil officiel principal."""
+    """docs/features/profiles.md ne recommande pas le starter 4 comme profil officiel principal."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "Suivi pédagogique" not in content or "legacy" in content or "historique" in content or "non recommandé" in content
 
 

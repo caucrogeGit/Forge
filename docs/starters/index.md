@@ -257,7 +257,7 @@ Les profils et les starters sont indépendants :
 - un starter peut illustrer un ou plusieurs profils ;
 - Communes & Séjours est une vitrine avancée, pas un profil.
 
-Pour choisir un profil : [Profils de projet](../profiles.md).
+Pour choisir un profil : [Profils de projet](../features/profiles.md).
 
 ## Génération automatique
 

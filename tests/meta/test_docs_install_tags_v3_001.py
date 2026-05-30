@@ -23,7 +23,7 @@ INSTALL_GUIDES = [
     PROJECT_ROOT / "docs" / "install" / "vm-debian.md",
     PROJECT_ROOT / "docs" / "install" / "mariadb.md",
     PROJECT_ROOT / "docs" / "install" / "core-dev.md",
-    PROJECT_ROOT / "docs" / "profiles.md",
+    PROJECT_ROOT / "docs" / "features" / "profiles.md",
 ]
 
 _STALE_TAG = re.compile(r"v[12]\.\d+(\.\d+)?")
@@ -82,5 +82,5 @@ class TestInstallGuidesMatchCurrentMajor:
                 return
         raise AssertionError(
             f"Aucun guide d'installation ne mentionne la majeure courante v{current}.x. "
-            f"Vérifier docs/guide/guide.md, docs/install/github.md ou docs/profiles.md."
+            f"Vérifier docs/guide/guide.md, docs/install/github.md ou docs/features/profiles.md."
         )

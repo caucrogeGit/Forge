@@ -6,7 +6,7 @@ Cette section décrit l'API publique actuelle de Forge `{{forge_version}}`.
 Elle est organisée par thème pour faciliter la navigation.
 
 Pour les flux guidés, voir aussi le [guide de démarrage](../guide/guide.md),
-le [CRUD explicite](../crud.md) et l'[architecture des entités](../entity_architecture.md).
+le [CRUD explicite](../features/crud.md) et l'[architecture des entités](../features/entity_architecture.md).
 Pour les décisions d'architecture, voir [ADR-001](../adr/001-auth-strategy.md),
 [ADR-002](../adr/002-session-strategy.md) et l'[index des ADR](../adr/index.md).
 Pour ce qui est garanti stable, voir le [contrat de stabilité](../release/stability-contract.md).

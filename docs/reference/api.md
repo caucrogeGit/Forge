@@ -540,7 +540,7 @@ template_manager.register(Jinja2Renderer(get("views_dir")))
 <details markdown="1" id="coresecurity">
 <summary><code>core.security</code> - Sessions, auth, CSRF et mots de passe</summary>
 
-Pour l'authentification des nouveaux projets, utiliser `core.auth`. Les modules `core.security` historiques restent présents pour les briques transversales officielles (`core.security.session`, `core.security.csrf`). Le RBAC (`Role`, `Permission`, `require_permission`) est disponible via `forge-mvc-rbac`. Voir [docs/auth.md — Frontière API](../auth.md#api-officielle-et-compatibilite-legacy).
+Pour l'authentification des nouveaux projets, utiliser `core.auth`. Les modules `core.security` historiques restent présents pour les briques transversales officielles (`core.security.session`, `core.security.csrf`). Le RBAC (`Role`, `Permission`, `require_permission`) est disponible via `forge-mvc-rbac`. Voir [docs/auth.md — Frontière API](../features/auth.md#api-officielle-et-compatibilite-legacy).
 
 ### Sessions mémoire
 
@@ -1026,7 +1026,7 @@ Elle stocke la version, le nom, le fichier, le checksum, la date d'application
 et le temps d'exécution d'une migration. Les migrations restent des fichiers SQL
 lisibles dans `mvc/migrations/`.
 
-Le workflow complet est documenté dans [Migrations SQL](../migrations.md).
+Le workflow complet est documenté dans [Migrations SQL](../features/migrations.md).
 
 ### `forge migration:status`
 
@@ -1081,7 +1081,7 @@ npm run build:css
 Node.js/npm est nécessaire uniquement pour recompiler le CSS, pas pour exécuter
 le serveur Python Forge lorsque `static/tailwind.css` existe déjà.
 
-Voir aussi : [Front et CSS](../front.md).
+Voir aussi : [Front et CSS](../features/front.md).
 
 </details>
 
@@ -1950,7 +1950,7 @@ forge routes:list
 <details markdown="1" id="forgeclieentities">
 <summary><code>forge_cli.entities</code> - Génération et validation des entités</summary>
 
-Cette partie suit la doctrine décrite dans l'[architecture des entités](../entity_architecture.md).
+Cette partie suit la doctrine décrite dans l'[architecture des entités](../features/entity_architecture.md).
 
 ### Doctrine générée
 
@@ -2959,7 +2959,7 @@ Les médias sont stockés dans la table `media` distincte via `media.entity_name
 | `required` | non | `bool` | `false` |
 | `label` | non | chaîne | — |
 
-**Règles** : `variants=true` est autorisé uniquement avec `field="image"`. Les doublons `name` et `role` dans une même entité sont refusés à la validation. Voir [docs/media.md](../media.md) pour les détails et la convention de rôles.
+**Règles** : `variants=true` est autorisé uniquement avec `field="image"`. Les doublons `name` et `role` dans une même entité sont refusés à la validation. Voir [docs/media.md](../features/media.md) pour les détails et la convention de rôles.
 
 ### Génération CRUD media (`make:crud` + `media`)
 
@@ -3004,7 +3004,7 @@ La clé optionnelle `"rbac"` dans `entity.json` déclare les permissions requise
 
 Actions acceptées : `index`, `show`, `create` (→ méthode `new`), `store` (→ méthode `create`), `edit`, `update`, `delete` (→ méthode `destroy`). Toute action inconnue déclenche une erreur à la génération. Sans clé `rbac`, le contrôleur est identique à celui généré sans RBAC.
 
-Documentation complète : [RBAC — Contrôle d'accès](../rbac.md).
+Documentation complète : [RBAC — Contrôle d'accès](../features/rbac.md).
 
 </details>
 
@@ -3023,10 +3023,10 @@ Chaque module est livré comme paquet PyPI distinct sous le namespace
 | Module | Package PyPI | Extra pip | Documentation détaillée |
 |---|---|---|---|
 | MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa.md](auth-mfa.md) |
-| RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../rbac.md) |
+| RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../features/rbac.md) |
 | Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow.md](workflow.md) |
 | Statistiques | `forge-mvc-stats` | `[stats]` | [stats.md](stats.md) |
-| Médias applicatifs | `forge-mvc-media` | — (installer directement) | [media.md](../media.md) |
+| Médias applicatifs | `forge-mvc-media` | — (installer directement) | [media.md](../features/media.md) |
 
 Tous les opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`.
 `forge-mvc[mfa]` et `forge-mvc[media]` ne sont pas définis comme extras du
@@ -3056,7 +3056,7 @@ Rôles, permissions, décorateur `@require_permission`, helpers Jinja
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
 > Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
-Référence détaillée : [rbac.md](../rbac.md).
+Référence détaillée : [rbac.md](../features/rbac.md).
 
 ### Workflow — `forge-mvc-workflow`
 
@@ -3091,5 +3091,5 @@ pip install --pre forge-mvc-media
 > `make:public:list` importent depuis ce module.
 > Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
-Référence détaillée : [media.md](../media.md).
+Référence détaillée : [media.md](../features/media.md).
 

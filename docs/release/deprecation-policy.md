@@ -359,7 +359,7 @@ Dans ce cas :
 
 - [Vue d'ensemble Release et compatibilité](release-and-compatibility.md)
 - [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Guide de migration](../migration-guide.md) — gérer les dépréciations lors d'une migration
+- [Guide de migration](../features/migration-guide.md) — gérer les dépréciations lors d'une migration
 - [Contrat de stabilité](stability-contract.md) — ce qui peut et ne peut pas changer
 
 ---

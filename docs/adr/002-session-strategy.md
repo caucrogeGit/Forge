@@ -8,7 +8,7 @@
 
     Pour l'état actuel, consulter :
 
-    - [`docs/auth.md`](../auth.md) — documentation utilisateur d'authentification
+    - [`docs/auth.md`](../features/auth.md) — documentation utilisateur d'authentification
     - [ADR-004 — Périmètre du noyau](004-core-perimeter.md) — séparation core/modules opt-in
 
 ## Statut

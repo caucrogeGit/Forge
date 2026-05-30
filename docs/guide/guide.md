@@ -26,7 +26,7 @@ cd MonProjet
 source .venv/bin/activate
 ```
 
-Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic`, `multilingual`) — le profil par défaut est `standard`. Voir [Profils de projet](../profiles.md).
+Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic`, `multilingual`) — le profil par défaut est `standard`. Voir [Profils de projet](../features/profiles.md).
 
 `forge new` fait tout automatiquement : clonage du squelette, environnement virtuel Python, installation des dépendances, compilation du CSS Tailwind officiel (si npm est présent) et génération des certificats SSL. Un dépôt Git propre est initialisé.
 
@@ -110,7 +110,7 @@ depuis un diff avec `--from-diff`. `forge migration:status` affiche l'état,
 `forge migration:diff --entity Contact` compare le JSON avec les colonnes
 MariaDB, et `forge migration:apply` applique les migrations en attente.
 
-Voir aussi : [Migrations SQL](../migrations.md).
+Voir aussi : [Migrations SQL](../features/migrations.md).
 
 !!! success "Avant de continuer"
     Vérifier que MariaDB est démarré, que `env/dev` est configuré avec `DB_ADMIN_LOGIN`, `DB_ADMIN_PWD`, `DB_APP_LOGIN`, `DB_APP_PWD` et `DB_NAME`.

@@ -4,10 +4,10 @@ Ce guide explique comment passer d'une version Forge à une autre en toute sécu
 
 Il complète :
 
-- [Politique de release](release/release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Politique de dépréciation](release/deprecation-policy.md) — cycle annonce → retrait
-- [Matrice de compatibilité](release/compatibility.md) — Python, MariaDB, Node.js
-- [Contrat de stabilité](release/stability-contract.md) — ce qui est stable, interne, expérimental
+- [Politique de release](../release/release-policy.md) — règles MAJOR/MINOR/PATCH
+- [Politique de dépréciation](../release/deprecation-policy.md) — cycle annonce → retrait
+- [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, Node.js
+- [Contrat de stabilité](../release/stability-contract.md) — ce qui est stable, interne, expérimental
 
 ---
 
@@ -52,7 +52,7 @@ La politique de release Forge définit trois niveaux :
 | MINOR | Nouvelles fonctionnalités compatibles | Opt-in, pas de rupture |
 | MAJOR | Ruptures d'API stable | Migration explicite requise |
 
-Lire [docs/release-policy.md](release/release-policy.md) avant toute migration.
+Lire [docs/release-policy.md](../release/release-policy.md) avant toute migration.
 
 ---
 
@@ -64,7 +64,7 @@ Le cycle de dépréciation Forge garantit qu'une fonctionnalité stable ne dispa
 Annonce en N.x → Maintien garanti jusqu'à fin de série N → Retrait possible en (N+1).0.0
 ```
 
-Avant de migrer, vérifier les dépréciations actives dans `CHANGELOG.md` et [docs/deprecation-policy.md](release/deprecation-policy.md).
+Avant de migrer, vérifier les dépréciations actives dans `CHANGELOG.md` et [docs/deprecation-policy.md](../release/deprecation-policy.md).
 
 ---
 
@@ -76,7 +76,7 @@ Avant de migrer, vérifier que l'environnement reste compatible :
 - **MariaDB** : le connecteur `mariadb` doit rester compatible.
 - **Node.js** : uniquement si le build CSS Tailwind est utilisé.
 
-Consulter la [matrice de compatibilité](release/compatibility.md) pour les versions officielles.
+Consulter la [matrice de compatibilité](../release/compatibility.md) pour les versions officielles.
 
 ---
 
@@ -510,11 +510,11 @@ Après la migration :
 
 ## Voir aussi
 
-- [Vue d'ensemble Release et compatibilité](release/release-and-compatibility.md)
-- [Politique de release](release/release-policy.md) — règles PATCH/MINOR/MAJOR
-- [Politique de dépréciation](release/deprecation-policy.md) — cycle annonce → retrait
-- [Matrice de compatibilité](release/compatibility.md) — versions supportées
-- [Sécurité en production](deployment/production-security.md) — checklist avant déploiement
+- [Vue d'ensemble Release et compatibilité](../release/release-and-compatibility.md)
+- [Politique de release](../release/release-policy.md) — règles PATCH/MINOR/MAJOR
+- [Politique de dépréciation](../release/deprecation-policy.md) — cycle annonce → retrait
+- [Matrice de compatibilité](../release/compatibility.md) — versions supportées
+- [Sécurité en production](../deployment/production-security.md) — checklist avant déploiement
 
 ---
 

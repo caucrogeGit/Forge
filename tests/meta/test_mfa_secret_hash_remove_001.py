@@ -68,14 +68,14 @@ class TestSecretHashNotImportable:
 
 
 class TestDocUpdated:
-    """docs/auth.md ne mentionne plus secret_hash comme API courante."""
+    """docs/features/auth.md ne mentionne plus secret_hash comme API courante."""
 
     def test_auth_md_no_active_secret_hash_alias(self):
-        auth_md = PROJECT_ROOT / "docs" / "auth.md"
+        auth_md = PROJECT_ROOT / "docs" / "features" / "auth.md"
         if not auth_md.exists():
-            pytest.skip("docs/auth.md absent")
+            pytest.skip("docs/features/auth.md absent")
         text = auth_md.read_text(encoding="utf-8")
         assert "alias deprecie" not in text or "secret_hash" not in text, (
-            "docs/auth.md mentionne encore secret_hash comme alias déprécié actif. "
+            "docs/features/auth.md mentionne encore secret_hash comme alias déprécié actif. "
             "Cette mention doit être retirée (retrait effectué en 3.0.1)."
         )

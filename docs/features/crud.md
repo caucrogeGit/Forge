@@ -1,6 +1,6 @@
 # CRUD explicite — Forge
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Forge génère un squelette CRUD lisible et modifiable à partir d'une entité JSON. La génération produit un point de départ, pas une cage : chaque fichier est ouvert, explicite, et ne sera jamais écrasé si vous le modifiez.
 
@@ -364,4 +364,4 @@ Ce qui reste à venir :
 - back-office média intégré ;
 - permissions média (accès contrôlé aux fichiers servis via `/media/...`).
 
-Voir [Référence API et CLI](reference/reference.md) et [Module média](media.md) pour les détails.
+Voir [Référence API et CLI](../reference/reference.md) et [Module média](media.md) pour les détails.

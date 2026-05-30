@@ -490,7 +490,7 @@ class TestAucunSecretEnSortie:
 # ---------------------------------------------------------------------------
 
 class TestDocumentation:
-    _auth_md = pathlib.Path("docs/auth.md").read_text(encoding="utf-8")
+    _auth_md = pathlib.Path("docs/features/auth.md").read_text(encoding="utf-8")
     _ref_md = pathlib.Path("docs/reference/api.md").read_text(encoding="utf-8")
 
     def test_auth_md_contient_disable(self):

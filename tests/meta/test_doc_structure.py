@@ -29,13 +29,13 @@ class TestPagesExistent:
         assert Path("docs/reference/reference.md").exists()
 
     def test_auth_existe(self):
-        assert Path("docs/auth.md").exists()
+        assert Path("docs/features/auth.md").exists()
 
     def test_security_existe(self):
         assert Path("docs/philosophy/security.md").exists()
 
     def test_rbac_existe(self):
-        assert Path("docs/rbac.md").exists()
+        assert Path("docs/features/rbac.md").exists()
 
     def test_deployment_existe(self):
         assert Path("docs/deployment/deployment.md").exists()
@@ -56,7 +56,7 @@ class TestPagesExistent:
         assert Path("docs/release/compatibility.md").exists()
 
     def test_migration_guide_existe(self):
-        assert Path("docs/migration-guide.md").exists()
+        assert Path("docs/features/migration-guide.md").exists()
 
     def test_lts_policy_existe(self):
         assert Path("docs/release/lts-policy.md").exists()
@@ -198,7 +198,7 @@ class TestLiensCroisesRelease:
         assert "release-policy.md" in text or "politique de release" in text.lower()
 
     def test_migration_guide_lien_vers_compatibility(self):
-        text = Path("docs/migration-guide.md").read_text(encoding="utf-8")
+        text = Path("docs/features/migration-guide.md").read_text(encoding="utf-8")
         assert "compatibility.md" in text or "compatibilité" in text.lower()
 
     def test_lts_policy_lien_vers_stability(self):

@@ -168,6 +168,6 @@ def test_reference_md_mentionne_les_quatre_profils():
 
 
 def test_profiles_md_documente_limites_actuelles():
-    """docs/profiles.md précise les limites actuelles de la différenciation."""
-    content = (ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+    """docs/features/profiles.md précise les limites actuelles de la différenciation."""
+    content = (ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "limit" in content.lower()

@@ -19,8 +19,8 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-MEDIA_DOC = PROJECT_ROOT / "docs" / "media.md"
-FRONT_DOC = PROJECT_ROOT / "docs" / "front.md"
+MEDIA_DOC = PROJECT_ROOT / "docs" / "features" / "media.md"
+FRONT_DOC = PROJECT_ROOT / "docs" / "features" / "front.md"
 API_DOC = PROJECT_ROOT / "docs" / "reference" / "api.md"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 README = PROJECT_ROOT / "packages" / "forge-mvc-media" / "README.md"
@@ -44,13 +44,13 @@ class TestMediaDocMentionsOptIn:
     def test_media_md_mentions_forge_mvc_media(self):
         text = MEDIA_DOC.read_text(encoding="utf-8")
         assert "forge_mvc_media" in text, (
-            "docs/media.md doit mentionner forge_mvc_media."
+            "docs/features/media.md doit mentionner forge_mvc_media."
         )
 
     def test_media_md_mentions_frontier(self):
         text = MEDIA_DOC.read_text(encoding="utf-8")
         assert "core.uploads" in text and "forge_mvc_media" in text, (
-            "docs/media.md doit distinguer core.uploads et forge_mvc_media."
+            "docs/features/media.md doit distinguer core.uploads et forge_mvc_media."
         )
 
     def test_api_md_mentions_forge_mvc_media(self):
@@ -62,13 +62,13 @@ class TestMediaDocMentionsOptIn:
     def test_front_md_uses_forge_mvc_media_for_helpers(self):
         text = FRONT_DOC.read_text(encoding="utf-8")
         assert "forge_mvc_media" in text, (
-            "docs/front.md doit mentionner forge_mvc_media pour les helpers publics."
+            "docs/features/front.md doit mentionner forge_mvc_media pour les helpers publics."
         )
 
     def test_front_md_no_longer_says_core_uploads_for_helpers(self):
         text = FRONT_DOC.read_text(encoding="utf-8")
         assert "issus de `core.uploads`" not in text, (
-            "docs/front.md ne doit plus présenter les helpers comme issus de core.uploads."
+            "docs/features/front.md ne doit plus présenter les helpers comme issus de core.uploads."
         )
 
 
@@ -120,7 +120,7 @@ class TestSourceOnlyAndPyPIStatus:
     def test_media_md_mentions_pypi_publication(self):
         text = MEDIA_DOC.read_text(encoding="utf-8")
         assert "publié sur PyPI" in text or "publié PyPI" in text, (
-            "docs/media.md doit indiquer que forge-mvc-media est publié sur PyPI "
+            "docs/features/media.md doit indiquer que forge-mvc-media est publié sur PyPI "
             "depuis `1.0.0-beta.9` (DOCS-OPTINS-PYPI-BETA9-SWEEP-001)."
         )
 
@@ -144,7 +144,7 @@ class TestShimsDocumented:
     def test_media_md_mentions_shims_as_temporary(self):
         text = MEDIA_DOC.read_text(encoding="utf-8")
         assert "shims" in text or "compatibilité" in text, (
-            "docs/media.md doit mentionner les shims de compatibilité."
+            "docs/features/media.md doit mentionner les shims de compatibilité."
         )
 
     def test_api_md_mentions_shims_as_deprecation(self):
@@ -160,7 +160,7 @@ class TestCorePrimitivesStillDocumented:
     def test_media_md_mentions_save_upload(self):
         text = MEDIA_DOC.read_text(encoding="utf-8")
         assert "save_upload" in text, (
-            "docs/media.md doit toujours documenter save_upload (primitive core)."
+            "docs/features/media.md doit toujours documenter save_upload (primitive core)."
         )
 
     def test_api_md_core_uploads_has_save_upload(self):

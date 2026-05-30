@@ -518,20 +518,20 @@ Ce tutoriel couvre une application simple. Il ne couvre pas :
 
 | Limite | Documentation |
 |---|---|
-| Auth / connexion utilisateur | [Auth/User](../auth.md) |
-| Rôles et permissions (RBAC) | [Sécurité et RBAC](../philosophy/security.md), [RBAC](../rbac.md) |
-| Relations `many_to_many` | [Relations entre entités](../relations.md) |
-| Envoi de mails | [Gestion des mails](../mail.md) |
-| Upload de fichiers / médias | [Module média](../media.md) |
+| Auth / connexion utilisateur | [Auth/User](../features/auth.md) |
+| Rôles et permissions (RBAC) | [Sécurité et RBAC](../philosophy/security.md), [RBAC](../features/rbac.md) |
+| Relations `many_to_many` | [Relations entre entités](../features/relations.md) |
+| Envoi de mails | [Gestion des mails](../features/mail.md) |
+| Upload de fichiers / médias | [Module média](../features/media.md) |
 | Déploiement en production | [Déploiement](../deployment/deployment.md) |
 | Sécurité en production | [Sécurité en production](../deployment/production-security.md) |
 | API JSON légère | À venir — API-JSON-001 |
-| Pages publiques | [Outils — Génération PDF, Module média](../media.md) |
+| Pages publiques | [Outils — Génération PDF, Module média](../features/media.md) |
 | Forge Design | Projet compagnon séparé |
 
 `forge make:relation` est interactif. Pour les projets sans terminal interactif,
 éditez directement `mvc/entities/relations.json` selon le format documenté
-dans [Relations entre entités](../relations.md).
+dans [Relations entre entités](../features/relations.md).
 
 `forge db:init` nécessite un MariaDB local configuré. Sans MariaDB, les
 fichiers JSON, SQL, modèles et vues sont générés mais l'application ne peut
@@ -545,13 +545,13 @@ pas démarrer.
 |---|---|
 | Référence complète des commandes | [API et CLI](../reference/reference.md) |
 | Filtres de liste CRUD (`list.filter`) | [API et CLI — Filtres CRUD](../reference/reference.md) |
-| Comprendre les entités et modèles | [Architecture des entités](../entity_architecture.md) |
-| Déclarer des relations avancées | [Relations entre entités](../relations.md) |
-| Ajouter l'authentification | [Auth/User](../auth.md) |
+| Comprendre les entités et modèles | [Architecture des entités](../features/entity_architecture.md) |
+| Déclarer des relations avancées | [Relations entre entités](../features/relations.md) |
+| Ajouter l'authentification | [Auth/User](../features/auth.md) |
 | Déployer en production | [Guide de déploiement](../deployment/deployment.md) |
 | Sécurité en production | [Sécurité en production](../deployment/production-security.md) |
 | Utiliser un starter complet | [Vue d'ensemble des starters](../starters/index.md) |
-| Passer à une version suivante | [Guide de migration](../migration-guide.md) |
+| Passer à une version suivante | [Guide de migration](../features/migration-guide.md) |
 | Garanties sur les fichiers préservés | [Contrat de stabilité](../release/stability-contract.md) |
 
 ---
@@ -591,7 +591,7 @@ python app.py                      # lancer l'application
 
 - [Bonjour Forge](bonjour-forge.md) — premier contact, sans BDD
 - [Guide de démarrage](guide.md) — parcours complet avec MariaDB
-- [Relations entre entités](../relations.md) — format `relations.json` complet
-- [Architecture des entités](../entity_architecture.md) — rôle de chaque fichier généré
+- [Relations entre entités](../features/relations.md) — format `relations.json` complet
+- [Architecture des entités](../features/entity_architecture.md) — rôle de chaque fichier généré
 - [Contrat de stabilité](../release/stability-contract.md) — garanties sur les fichiers préservés
 - [Référence API et CLI](../reference/reference.md) — toutes les commandes

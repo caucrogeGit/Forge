@@ -21,13 +21,13 @@ import pytest
 pytestmark = pytest.mark.meta
 
 _DOCS = Path("docs")
-_HUB = _DOCS / "release-and-compatibility.md"
+_HUB = _DOCS / "release" / "release-and-compatibility.md"
 
 _REQUIRED_RELEASE_DOCS = [
-    "release.md",
-    "release-local.md",
-    "release-policy.md",
-    "release-and-compatibility.md",
+    "release/release.md",
+    "release/release-local.md",
+    "release/release-policy.md",
+    "release/release-and-compatibility.md",
 ]
 
 # Seuil : ne pas dépasser ce nombre de docs release à la racine docs/

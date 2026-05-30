@@ -2,7 +2,7 @@
 
 Vérifie que la sécurité MFA est clarifiée visiblement sur 3 surfaces :
 1. docs/reference/auth-mfa.md mentionne Pre-Alpha + stockage en clair
-2. docs/auth.md tableau mentionne Pre-Alpha (et plus la dépréciation obsolète)
+2. docs/features/auth.md tableau mentionne Pre-Alpha (et plus la dépréciation obsolète)
 3. forge auth:doctor affiche un avertissement Pre-Alpha
 
 Origine : audit F14, partiellement adressé par T3/T4/T10. T13 finit
@@ -36,7 +36,7 @@ _SUBPROCESS_ENV = {
     ),
 }
 AUTH_MFA_REF = PROJECT_ROOT / "docs" / "reference" / "auth-mfa.md"
-AUTH_DOC = PROJECT_ROOT / "docs" / "auth.md"
+AUTH_DOC = PROJECT_ROOT / "docs" / "features" / "auth.md"
 
 
 class TestAuthMfaRefHasPreAlphaWarning:
@@ -79,7 +79,7 @@ class TestAuthMfaRefHasPreAlphaWarning:
 
 
 class TestAuthDocMfaLineUpdated:
-    """docs/auth.md tableau modules mentionne le statut MFA et plus la dépréciation obsolète."""
+    """docs/features/auth.md tableau modules mentionne le statut MFA et plus la dépréciation obsolète."""
 
     def test_mfa_line_mentions_alpha_status(self):
         text = AUTH_DOC.read_text(encoding="utf-8")
@@ -87,10 +87,10 @@ class TestAuthDocMfaLineUpdated:
             line for line in text.splitlines()
             if line.startswith("|") and "MFA" in line and "forge_mvc_mfa" in line
         ]
-        assert mfa_lines, "Ligne MFA introuvable dans docs/auth.md tableau"
+        assert mfa_lines, "Ligne MFA introuvable dans docs/features/auth.md tableau"
         for line in mfa_lines:
             assert "Alpha" in line or "Pre-Alpha" in line, (
-                f"Ligne MFA dans docs/auth.md ne mentionne pas le statut Alpha : "
+                f"Ligne MFA dans docs/features/auth.md ne mentionne pas le statut Alpha : "
                 f"{line!r}"
             )
 
@@ -103,7 +103,7 @@ class TestAuthDocMfaLineUpdated:
         ]
         for line in mfa_lines:
             assert "déprécié via" not in line and "deprecie via" not in line, (
-                f"Ligne MFA dans docs/auth.md mentionne encore une "
+                f"Ligne MFA dans docs/features/auth.md mentionne encore une "
                 f"dépréciation obsolète (T4 a retiré la dépréciation "
                 f"secret_hash, et core.auth.mfa n'existe plus). "
                 f"Ligne : {line!r}"
@@ -119,7 +119,7 @@ class TestAuthDocMfaLineUpdated:
         for line in mfa_lines:
             if "pip install" in line:
                 assert "forge-mvc[mfa]" in line or "forge-mvc-mfa" in line, (
-                    f"Ligne MFA dans docs/auth.md mentionne pip install "
+                    f"Ligne MFA dans docs/features/auth.md mentionne pip install "
                     f"mais pas la forme recommandée. Ligne : {line!r}"
                 )
 

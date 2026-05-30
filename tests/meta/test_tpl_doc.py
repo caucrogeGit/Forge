@@ -7,7 +7,7 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-FRONT_MD = Path("docs/front.md")
+FRONT_MD = Path("docs/features/front.md")
 
 
 def _doc() -> str:

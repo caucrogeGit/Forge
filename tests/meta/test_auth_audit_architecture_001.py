@@ -3,7 +3,7 @@
 Verifie que :
 - L'ADR-008 existe et decrit les trois briques (contrat, logger, table SQL).
 - L'ADR-008 dit explicitement que Forge ne persiste pas en base.
-- docs/auth.md a une section sur l'audit.
+- docs/features/auth.md a une section sur l'audit.
 - Le docstring de core/auth/audit.py mentionne que la persistance est applicative.
 - core/ et forge_cli/ ne contiennent aucun INSERT INTO auth_audit_log.
 """
@@ -51,28 +51,28 @@ class TestAdr008Exists:
         )
 
 
-# ── docs/auth.md ──────────────────────────────────────────────────────────────
+# ── docs/features/auth.md ──────────────────────────────────────────────────────────────
 
 class TestAuthDocHasAuditSection:
 
     def test_auth_doc_has_audit_section(self):
-        doc = Path("docs/auth.md")
-        assert doc.exists(), "docs/auth.md doit exister"
+        doc = Path("docs/features/auth.md")
+        assert doc.exists(), "docs/features/auth.md doit exister"
         content = doc.read_text(encoding="utf-8")
         assert "audit" in content.lower(), (
-            "docs/auth.md devrait avoir une section sur l'audit"
+            "docs/features/auth.md devrait avoir une section sur l'audit"
         )
 
     def test_auth_doc_mentions_adr_008(self):
-        content = Path("docs/auth.md").read_text(encoding="utf-8")
+        content = Path("docs/features/auth.md").read_text(encoding="utf-8")
         assert "ADR-008" in content or "008-auth-audit-architecture" in content, (
-            "docs/auth.md devrait pointer vers l'ADR-008"
+            "docs/features/auth.md devrait pointer vers l'ADR-008"
         )
 
     def test_auth_doc_mentions_persistence_is_applicative(self):
-        content = Path("docs/auth.md").read_text(encoding="utf-8").lower()
+        content = Path("docs/features/auth.md").read_text(encoding="utf-8").lower()
         assert "applicative" in content or "application" in content, (
-            "docs/auth.md devrait mentionner que la persistance est applicative"
+            "docs/features/auth.md devrait mentionner que la persistance est applicative"
         )
 
 

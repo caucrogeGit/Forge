@@ -13,7 +13,7 @@ Les fichiers HISTORIQUES sont explicitement exclus du check large :
 - docs/history/, docs/audits/, docs/adr/ — archives
 - docs/roadmap/ — planification historique
 - docs/reference/ — notes d'extraction depuis Forge 2.x
-- docs/release/deprecation-policy.md, docs/auth.md, docs/migration-guide.md,
+- docs/release/deprecation-policy.md, docs/features/auth.md, docs/features/migration-guide.md,
   docs/release/lts-policy.md, docs/release/release-policy.md — documentent intentionnellement
   les versions 2.x ou montrent des exemples de tags historiques
 - CHANGELOG.md, tests/ — historique ou tests de conformité historique
@@ -41,8 +41,8 @@ EXCLUDED_PATHS = [
     "docs/roadmap",
     "docs/reference",
     "docs/release/deprecation-policy.md",
-    "docs/auth.md",
-    "docs/migration-guide.md",
+    "docs/features/auth.md",
+    "docs/features/migration-guide.md",
     "docs/release/lts-policy.md",
     "docs/release/release-policy.md",
     "CHANGELOG.md",
@@ -131,10 +131,10 @@ class TestNoStaleTagV300InActiveDocs:
         )
 
     def test_no_v3_0_0_in_profiles(self):
-        text = (PROJECT_ROOT / "docs" / "profiles.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
         match = STALE_TAG_V3_0_0_PATTERN.search(text)
         assert not match, (
-            "docs/profiles.md référence encore v3.0.0. "
+            "docs/features/profiles.md référence encore v3.0.0. "
             "À remplacer par v3.0.1 (T7 — F4)."
         )
 

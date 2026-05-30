@@ -64,7 +64,7 @@ def test_make_crud_templates_do_not_inject_front_behaviors():
 
 
 def test_front_documentation_mentions_scripts_block_and_optional_vendors():
-    front_doc = _read(Path("docs/front.md"))
+    front_doc = _read(Path("docs/features/front.md"))
 
     assert '<script src="/static/js/app.js" defer></script>' in front_doc
     assert "{% block scripts %}{% endblock %}" in front_doc
@@ -72,7 +72,7 @@ def test_front_documentation_mentions_scripts_block_and_optional_vendors():
 
 
 def test_front_documentation_explains_htmx_usage_without_runtime_changes():
-    front_doc = _read(Path("docs/front.md"))
+    front_doc = _read(Path("docs/features/front.md"))
 
     assert "## Utiliser HTMX avec Forge" in front_doc
     assert '<script src="/static/vendor/htmx/htmx.min.js" defer></script>' in front_doc
@@ -97,7 +97,7 @@ def test_front_documentation_explains_htmx_usage_without_runtime_changes():
 
 
 def test_front_documentation_explains_alpine_usage_without_runtime_changes():
-    front_doc = _read(Path("docs/front.md"))
+    front_doc = _read(Path("docs/features/front.md"))
 
     assert "## Utiliser Alpine.js avec Forge" in front_doc
     assert '<script src="/static/vendor/alpine/alpine.min.js" defer></script>' in front_doc

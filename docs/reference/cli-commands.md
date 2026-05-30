@@ -716,7 +716,7 @@ forge auth:init
 Crée les fichiers SQL (`users.sql`, `sessions.sql`, etc.), les contrôleurs
 et les formulaires d'authentification.
 
-**Voir aussi :** [Auth](../auth.md)
+**Voir aussi :** [Auth](../features/auth.md)
 
 </details>
 

@@ -2,9 +2,9 @@
 
 Vérifie que les 3 documents de référence sur les relations entre entités
 disent la même chose sur many_to_many :
-  - docs/entity_architecture.md
+  - docs/features/entity_architecture.md
   - docs/reference/api.md
-  - docs/relations.md
+  - docs/features/relations.md
 
 Historiquement, entity_architecture.md affirmait « Forge V1 ne fournit pas
 de many_to_many direct » alors que reference/api.md et relations.md le
@@ -20,9 +20,9 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-ENTITY_ARCH = PROJECT_ROOT / "docs" / "entity_architecture.md"
+ENTITY_ARCH = PROJECT_ROOT / "docs" / "features" / "entity_architecture.md"
 API_REF = PROJECT_ROOT / "docs" / "reference" / "api.md"
-RELATIONS_MD = PROJECT_ROOT / "docs" / "relations.md"
+RELATIONS_MD = PROJECT_ROOT / "docs" / "features" / "relations.md"
 
 
 class TestManyToManyConsistency:
@@ -37,7 +37,7 @@ class TestManyToManyConsistency:
         """entity_architecture.md ne dit plus que many_to_many n'est pas supporté."""
         text = ENTITY_ARCH.read_text(encoding="utf-8")
         assert "ne fournit pas" not in text.lower() or "many_to_many" not in text, (
-            "docs/entity_architecture.md ne doit plus contenir une phrase niant "
+            "docs/features/entity_architecture.md ne doit plus contenir une phrase niant "
             "le support de many_to_many — ce type est supporté dans relations.json."
         )
         # Forme exacte de l'ancienne contradiction
@@ -66,10 +66,10 @@ class TestManyToManyConsistency:
         """entity_architecture.md affirme que many_to_many est supporté."""
         text = ENTITY_ARCH.read_text(encoding="utf-8")
         assert "many_to_many" in text, (
-            "docs/entity_architecture.md doit mentionner many_to_many."
+            "docs/features/entity_architecture.md doit mentionner many_to_many."
         )
         assert "supporté" in text, (
-            "docs/entity_architecture.md doit indiquer que many_to_many est supporté."
+            "docs/features/entity_architecture.md doit indiquer que many_to_many est supporté."
         )
 
     def test_api_ref_says_many_to_many_supported(self):
@@ -83,8 +83,8 @@ class TestManyToManyConsistency:
         """relations.md confirme le support de many_to_many."""
         text = RELATIONS_MD.read_text(encoding="utf-8")
         assert "many_to_many" in text, (
-            "docs/relations.md doit mentionner many_to_many."
+            "docs/features/relations.md doit mentionner many_to_many."
         )
         assert "supporté" in text, (
-            "docs/relations.md doit indiquer que many_to_many est supporté."
+            "docs/features/relations.md doit indiquer que many_to_many est supporté."
         )

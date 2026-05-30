@@ -46,12 +46,12 @@ nav:
       - Bonjour Forge: guide/bonjour-forge.md
       - Application complète: guide/app-complete-tutorial.md
       - Guide de démarrage: guide/guide.md
-      - CRUD explicite: crud.md
+      - CRUD explicite: features/crud.md
 
   - Concepts:
       - Vue d'ensemble: guide/concepts.md
       - Positionnement: guide/positioning.md
-      - Architecture des entités: entity_architecture.md
+      - Architecture des entités: features/entity_architecture.md
       - Le JSON canonique: entities/json-canonique.md
       - Schéma des entités: entities/entity-schema.md
       - Schéma des relations: entities/relations-schema.md
@@ -62,8 +62,8 @@ nav:
       - Autocomplétion VS Code: entities/vscode-json-schema.md
       - Limites des contrats JSON: entities/limites-contrats-json.md
       - Conversion depuis l'ancien format: entities/migration-legacy-vers-canonique.md
-      - Front et CSS: front.md
-      - Profils de projet: profiles.md
+      - Front et CSS: features/front.md
+      - Profils de projet: features/profiles.md
       - FAQ: guide/faq.md
 
   - Référence:
@@ -85,20 +85,20 @@ nav:
           - Profils de projet: reference/profils.md
           - Tests E2E: reference/tests-e2e.md
       - API JSON légère: reference/api-json.md
-      - Migrations SQL: migrations.md
-      - Relations entre entités: relations.md
-      - Gestion des mails: mail.md
-      - Auth/User: auth.md
+      - Migrations SQL: features/migrations.md
+      - Relations entre entités: features/relations.md
+      - Gestion des mails: features/mail.md
+      - Auth/User: features/auth.md
       - Sécurité et RBAC: philosophy/security.md
-      - RBAC — Contrôle d'accès: rbac.md
+      - RBAC — Contrôle d'accès: features/rbac.md
       - Contrat RBAC séparé: security/rbac-contract.md
       - RBAC — Usage applicatif: security/rbac-usage.md
       - Schéma API: reference/reference-schema.md
       - Schéma erreurs runtime: reference/runtime-errors-schema.md
 
   - Outils:
-      - Génération PDF: pdf.md
-      - Module média: media.md
+      - Génération PDF: features/pdf.md
+      - Module média: features/media.md
 
   - Modules et starters:
       - Vue d'ensemble des starters: starters/index.md
@@ -155,7 +155,7 @@ nav:
       - Politique de release: release/release-policy.md
       - Politique de dépréciation: release/deprecation-policy.md
       - Matrice de compatibilité: release/compatibility.md
-      - Guide de migration: migration-guide.md
+      - Guide de migration: features/migration-guide.md
       - Politique LTS: release/lts-policy.md
       - Contrat de stabilité: release/stability-contract.md
 

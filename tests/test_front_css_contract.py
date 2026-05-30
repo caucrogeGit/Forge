@@ -40,7 +40,7 @@ def test_alpine_vendor_file_is_not_committed_by_default():
 
 
 def test_front_documentation_mentions_application_javascript_directory():
-    front_doc = Path("docs/front.md").read_text(encoding="utf-8")
+    front_doc = Path("docs/features/front.md").read_text(encoding="utf-8")
 
     assert "static/js/" in front_doc
     assert "static/js/app.js" in front_doc

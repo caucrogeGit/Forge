@@ -77,7 +77,7 @@ Une fois que `forge --version` s'affiche correctement, revenez ici pour construi
 ## Partie 2 — Construire l'application starter
 
 !!! tip "Profil recommandé"
-    Ce starter est le starter relationnel officiel de Forge. Il correspond au profil `standard`. Voir [Profils de projet](../../profiles.md) pour choisir le bon profil au moment de `forge new`.
+    Ce starter est le starter relationnel officiel de Forge. Il correspond au profil `standard`. Voir [Profils de projet](../../features/profiles.md) pour choisir le bon profil au moment de `forge new`.
 
 ## Présentation rapide
 

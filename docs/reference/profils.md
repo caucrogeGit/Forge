@@ -30,7 +30,7 @@ forge new MonProjet --profile auth-mfa
 - La différenciation des squelettes sera renforcée dans des tickets ultérieurs.
 - Les profils ne remplacent pas les starters.
 
-Voir [docs/profiles.md](../profiles.md) pour la documentation complète.
+Voir [docs/profiles.md](../features/profiles.md) pour la documentation complète.
 
 ---
 

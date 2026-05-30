@@ -1,6 +1,6 @@
 """Garde-fou DOCS-AUTH-MD-CONSOLIDATE-001.
 
-Vérifie que docs/auth.md ne se contredit plus sur OIDC :
+Vérifie que docs/features/auth.md ne se contredit plus sur OIDC :
 - la table API ne présente pas core.auth.oidc comme module fourni ;
 - la liste des features disponibles n'inclut pas OIDC comme livré ;
 - la section OIDC (ligne ~715) continue d'indiquer clairement que OIDC
@@ -20,11 +20,11 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-AUTH_MD = PROJECT_ROOT / "docs" / "auth.md"
+AUTH_MD = PROJECT_ROOT / "docs" / "features" / "auth.md"
 
 
 class TestAuthMdNoOidcContradiction:
-    """docs/auth.md ne se contredit plus sur OIDC."""
+    """docs/features/auth.md ne se contredit plus sur OIDC."""
 
     def test_file_exists(self):
         assert AUTH_MD.exists()
@@ -33,7 +33,7 @@ class TestAuthMdNoOidcContradiction:
         """core.auth.oidc n'apparaît plus dans le fichier."""
         text = AUTH_MD.read_text(encoding="utf-8")
         assert "core.auth.oidc" not in text, (
-            "docs/auth.md ne doit plus mentionner `core.auth.oidc` "
+            "docs/features/auth.md ne doit plus mentionner `core.auth.oidc` "
             "(module retiré par ADR-004 — remplacer par la ligne ❌ non fourni)"
         )
 
@@ -58,7 +58,7 @@ class TestAuthMdNoOidcContradiction:
         """core.auth.tokens reste dans la table API (module légitime, existant)."""
         text = AUTH_MD.read_text(encoding="utf-8")
         assert "core.auth.tokens" in text, (
-            "docs/auth.md doit conserver `core.auth.tokens` dans la table API "
+            "docs/features/auth.md doit conserver `core.auth.tokens` dans la table API "
             "(module existant core/auth/tokens.py — tokens à usage limité)."
         )
 
@@ -72,7 +72,7 @@ class TestAuthMdNoOidcContradiction:
         ]
         found = any(re.search(p, text, re.IGNORECASE) for p in patterns)
         assert found, (
-            "docs/auth.md doit conserver une phrase claire indiquant que OIDC "
+            "docs/features/auth.md doit conserver une phrase claire indiquant que OIDC "
             "n'est pas fourni nativement par Forge 3.0 (section ## OIDC)."
         )
 
@@ -84,7 +84,7 @@ class TestAuthMdNoOidcContradiction:
         text = AUTH_MD.read_text(encoding="utf-8")
         matches = re.findall(r"\]\(.*?auth-oidc(?:\.md)?\)", text)
         assert not matches, (
-            f"docs/auth.md contient {len(matches)} lien(s) vers auth-oidc.md "
+            f"docs/features/auth.md contient {len(matches)} lien(s) vers auth-oidc.md "
             f"qui n'existe pas : {matches}"
         )
 
@@ -96,7 +96,7 @@ class TestAuthMdMfaDeprecationConserved:
         """La mention core.auth.mfa comme alias de dépréciation reste dans la table."""
         text = AUTH_MD.read_text(encoding="utf-8")
         assert "core.auth.mfa" in text, (
-            "docs/auth.md doit conserver `core.auth.mfa` (alias de dépréciation "
+            "docs/features/auth.md doit conserver `core.auth.mfa` (alias de dépréciation "
             "documenté dans la table API — décision Type 3 ticket C2)."
         )
 
@@ -105,6 +105,6 @@ class TestAuthMdMfaDeprecationConserved:
         text = AUTH_MD.read_text(encoding="utf-8")
         has_warning = "DeprecationWarning" in text and "core.auth.mfa" in text
         assert has_warning, (
-            "docs/auth.md doit conserver la note DeprecationWarning sur core.auth.mfa "
+            "docs/features/auth.md doit conserver la note DeprecationWarning sur core.auth.mfa "
             "(décision Type 3 ticket C2 — ligne ~434)."
         )

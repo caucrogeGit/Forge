@@ -774,4 +774,4 @@ forge project:audit
 - [Créer un module](module-author-guide.md) — brique réutilisable installable dans un projet existant
 - [Vue d'ensemble des starters](../starters/index.md) — starters officiels Forge
 - [Application complète](../guide/app-complete-tutorial.md) — exemple de build manuel
-- [Relations entre entités](../relations.md) — format `relations.json`
+- [Relations entre entités](../features/relations.md) — format `relations.json`

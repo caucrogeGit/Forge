@@ -19,7 +19,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 AUDIT_PY = PROJECT_ROOT / "core" / "auth" / "audit.py"
-AUTH_DOC = PROJECT_ROOT / "docs" / "auth.md"
+AUTH_DOC = PROJECT_ROOT / "docs" / "features" / "auth.md"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 
 
@@ -67,7 +67,7 @@ class TestDocumentationResilience:
     def test_doc_mentions_best_effort_or_non_bloquant(self):
         text = self._doc()
         assert "best-effort" in text or "non bloquant" in text, (
-            "docs/auth.md doit mentionner que l'audit est best-effort ou non bloquant."
+            "docs/features/auth.md doit mentionner que l'audit est best-effort ou non bloquant."
         )
 
     def test_doc_mentions_failure_does_not_break_flow(self):
@@ -78,5 +78,5 @@ class TestDocumentationResilience:
             or "ne bloque pas" in text
             or "ne doit pas casser" in text
         ), (
-            "docs/auth.md doit mentionner que l'echec du logger ne casse pas le flux auth."
+            "docs/features/auth.md doit mentionner que l'echec du logger ne casse pas le flux auth."
         )

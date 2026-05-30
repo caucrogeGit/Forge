@@ -5,7 +5,7 @@ utilisateur moderne sans transformer le framework en application metier. Elle
 fournit des contrats Python, des helpers explicites et des SQL visibles que les
 projets peuvent adopter progressivement.
 
-Voir aussi : [ADR-001 — Stratégie d'authentification Forge 2.x](adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session Forge 2.x](adr/002-session-strategy.md) · [RBAC — Contrôle d'accès](rbac.md) · [Sécurité en production](deployment/production-security.md) · [Référence CLI](reference/reference.md)
+Voir aussi : [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md) · [RBAC — Contrôle d'accès](rbac.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
 
 Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.py`) s'appuie sur `core.auth.password.verify_password` (Argon2id) pour la vérification des mots de passe. `core.security.hashing` reste disponible en repli pour les hashes PBKDF2 existants (voir ADR-001). Les nouveaux hashes PBKDF2 legacy utilisent désormais 600 000 itérations (format versionné `pbkdf2_sha256$…`) ; les anciens hashes restent vérifiables. Lorsqu'un utilisateur legacy PBKDF2 se connecte avec succès, Forge migre automatiquement son hash vers Argon2id (`auth_model.update_password_hash`). Cette migration est transparente et ne force pas de réinitialisation du mot de passe.
 
@@ -23,7 +23,7 @@ Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API offici
 | RBAC | `forge_mvc_rbac` (`pip install --pre forge-mvc-rbac` — publié sur PyPI) | — |
 | CSRF | — | `core.security.middleware.CsrfMiddleware` + `require_csrf` — officiels |
 | Middleware | — | `core.security.middleware` — officiel |
-| MFA | `forge_mvc_mfa` (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`) — **Alpha**, secret TOTP chiffré au repos (voir [auth-mfa](reference/auth-mfa.md)) | — |
+| MFA | `forge_mvc_mfa` (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`) — **Alpha**, secret TOTP chiffré au repos (voir [auth-mfa](../reference/auth-mfa.md)) | — |
 | Tokens à usage limité | `core.auth.tokens` | — |
 | OIDC / SSO | ❌ non fourni nativement — voir [section OIDC](#oidc) | — |
 | Contrat utilisateur | `core.auth.user` | — |
@@ -45,7 +45,7 @@ Les éléments suivants sont dépréciés en faveur de `core.auth` et seront sup
 - `core.security.decorators.require_auth` — remplacé par `core.auth.session.login_required` ;
 - `core.security.decorators.require_role` — remplacé par `forge_mvc_rbac.require_user_permission`.
 
-Voir [ADR-001 — Stratégie d'authentification Forge 2.x](adr/001-auth-strategy.md) pour la décision d'architecture.
+Voir [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md) pour la décision d'architecture.
 
 ---
 
@@ -158,7 +158,7 @@ La session Auth/User stocke uniquement l'identifiant utilisateur local sous une
 cle de session interne. Elle ne stocke ni `email`, ni `password_hash`, ni objet
 `AuthUser` complet.
 
-**Limite importante** : le backend de session par défaut (`MemorySessionStore`) est en mémoire processus — les sessions sont perdues au redémarrage. `FileSessionStore` offre une persistance locale ; `MariaDbSessionStore` offre un stockage partagé entre processus. Les deux sont disponibles dans `core.sessions` et doivent être configurés explicitement. Voir [ADR-002 — Stratégie de session](adr/002-session-strategy.md).
+**Limite importante** : le backend de session par défaut (`MemorySessionStore`) est en mémoire processus — les sessions sont perdues au redémarrage. `FileSessionStore` offre une persistance locale ; `MariaDbSessionStore` offre un stockage partagé entre processus. Les deux sont disponibles dans `core.sessions` et doivent être configurés explicitement. Voir [ADR-002 — Stratégie de session](../adr/002-session-strategy.md).
 
 ```python
 from core.auth import authenticate_user, login_user, logout_user
@@ -443,7 +443,7 @@ ecriture DB automatique.
     MFA est disponible comme module opt-in officiel `forge-mvc-mfa`, publié
     sur PyPI depuis `1.0.0-beta.9`. Il **n'est pas intégré au core** Forge
     — le core ne dépend pas de `forge-mvc-mfa`. Voir le
-    [contrat d'installation](install/index.md#contrat-dinstallation-des-opt-ins).
+    [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
 > **Depuis Forge 2.4.0**, le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
 > L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré en Forge 3.0.
@@ -809,7 +809,7 @@ Jinja, voir [RBAC — Contrôle d'accès](rbac.md).
 Les commandes Auth/User disponibles dans cette copie de Forge sont :
 
 Pour les signatures complètes et la description de chaque option, voir le
-[guide de référence](reference/reference.md).
+[guide de référence](../reference/reference.md).
 
 ```bash
 forge auth:init
@@ -1104,7 +1104,7 @@ logging.getLogger("forge.auth.audit").addHandler(AuditSqlHandler())
 ```
 
 Ce snippet est documentaire — à adapter au modèle d'accès DB de l'application.
-Voir [ADR-008](adr/008-auth-audit-architecture.md) pour les approches
+Voir [ADR-008](../adr/008-auth-audit-architecture.md) pour les approches
 alternatives (wrapper applicatif, stream externe).
 
 ## Rate limit Auth
@@ -1392,7 +1392,7 @@ politiques metier.
 ## Voir aussi
 
 - [RBAC — Contrôle d'accès](rbac.md) — rôles, permissions, décorateurs serveur, helper Jinja
-- [Sécurité en production](deployment/production-security.md) — checklist déploiement, headers, CSRF, secrets
-- [Référence CLI](reference/reference.md) — toutes les commandes `forge` avec signatures complètes
-- [ADR-001 — Stratégie d'authentification Forge 2.x](adr/001-auth-strategy.md)
-- [ADR-002 — Stratégie de session Forge 2.x](adr/002-session-strategy.md)
+- [Sécurité en production](../deployment/production-security.md) — checklist déploiement, headers, CSRF, secrets
+- [Référence CLI](../reference/reference.md) — toutes les commandes `forge` avec signatures complètes
+- [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md)
+- [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md)

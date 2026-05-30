@@ -249,51 +249,51 @@ def test_package_json_ne_contient_pas_webpack_ni_vite():
 
 
 def test_doc_front_ne_promet_pas_spa():
-    """docs/front.md ne transforme pas Forge en SPA."""
-    content = (ROOT / "docs" / "front.md").read_text(encoding="utf-8")
+    """docs/features/front.md ne transforme pas Forge en SPA."""
+    content = (ROOT / "docs" / "features" / "front.md").read_text(encoding="utf-8")
     assert "sans SPA" in content or "sans SPA" in content or "pas de SPA" in content or "ne transforme pas" in content
 
 
 # ── Cohérence documentaire ────────────────────────────────────────────────────
 
 def test_doc_front_md_existe():
-    """docs/front.md existe."""
-    assert (ROOT / "docs" / "front.md").exists()
+    """docs/features/front.md existe."""
+    assert (ROOT / "docs" / "features" / "front.md").exists()
 
 
 def test_doc_front_mentionne_tailwind():
-    """docs/front.md documente Tailwind."""
-    content = (ROOT / "docs" / "front.md").read_text(encoding="utf-8")
+    """docs/features/front.md documente Tailwind."""
+    content = (ROOT / "docs" / "features" / "front.md").read_text(encoding="utf-8")
     assert "tailwind" in content.lower()
 
 
 def test_doc_front_mentionne_htmx():
-    """docs/front.md documente HTMX."""
-    content = (ROOT / "docs" / "front.md").read_text(encoding="utf-8")
+    """docs/features/front.md documente HTMX."""
+    content = (ROOT / "docs" / "features" / "front.md").read_text(encoding="utf-8")
     assert "HTMX" in content or "htmx" in content
 
 
 def test_doc_front_mentionne_alpine():
-    """docs/front.md documente Alpine.js."""
-    content = (ROOT / "docs" / "front.md").read_text(encoding="utf-8")
+    """docs/features/front.md documente Alpine.js."""
+    content = (ROOT / "docs" / "features" / "front.md").read_text(encoding="utf-8")
     assert "Alpine" in content
 
 
 def test_doc_front_mentionne_js_init():
-    """docs/front.md documente la commande forge js:init."""
-    content = (ROOT / "docs" / "front.md").read_text(encoding="utf-8")
+    """docs/features/front.md documente la commande forge js:init."""
+    content = (ROOT / "docs" / "features" / "front.md").read_text(encoding="utf-8")
     assert "js:init" in content
 
 
 def test_doc_front_mentionne_bloc_scripts():
-    """docs/front.md documente le bloc {% block scripts %}."""
-    content = (ROOT / "docs" / "front.md").read_text(encoding="utf-8")
+    """docs/features/front.md documente le bloc {% block scripts %}."""
+    content = (ROOT / "docs" / "features" / "front.md").read_text(encoding="utf-8")
     assert "block scripts" in content
 
 
 def test_doc_front_mentionne_build_css():
-    """docs/front.md documente la recompilation du CSS."""
-    content = (ROOT / "docs" / "front.md").read_text(encoding="utf-8")
+    """docs/features/front.md documente la recompilation du CSS."""
+    content = (ROOT / "docs" / "features" / "front.md").read_text(encoding="utf-8")
     assert "build:css" in content or "npm" in content
 
 
@@ -307,8 +307,8 @@ def test_front_py_ne_depend_pas_forge_design():
 
 
 def test_doc_front_ne_promet_pas_editeur_graphique():
-    """docs/front.md ne promet pas un éditeur graphique."""
-    content = (ROOT / "docs" / "front.md").read_text(encoding="utf-8")
+    """docs/features/front.md ne promet pas un éditeur graphique."""
+    content = (ROOT / "docs" / "features" / "front.md").read_text(encoding="utf-8")
     assert "éditeur graphique" not in content.lower()
 
 

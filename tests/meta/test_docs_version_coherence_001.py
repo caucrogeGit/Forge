@@ -23,7 +23,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 PUBLIC_DOCS = [
     PROJECT_ROOT / "docs" / "release" / "stability-contract.md",
     PROJECT_ROOT / "docs" / "release" / "release-policy.md",
-    PROJECT_ROOT / "docs" / "auth.md",
+    PROJECT_ROOT / "docs" / "features" / "auth.md",
     PROJECT_ROOT / "docs" / "deployment" / "deployment.md",
     PROJECT_ROOT / "docs" / "release" / "deprecation-policy.md",
     PROJECT_ROOT / "docs" / "release" / "lts-policy.md",

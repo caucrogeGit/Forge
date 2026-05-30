@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def _auth_md():
-    return (ROOT / "docs" / "auth.md").read_text(encoding="utf-8")
+    return (ROOT / "docs" / "features" / "auth.md").read_text(encoding="utf-8")
 
 
 def _reference_md():
@@ -23,39 +23,39 @@ def _readme_md():
 
 
 def test_auth_md_mentionne_core_auth_officiel():
-    """docs/auth.md mentionne core.auth comme API officielle."""
+    """docs/features/auth.md mentionne core.auth comme API officielle."""
     content = _auth_md()
     assert "core.auth" in content
     assert "officielle" in content or "officiel" in content
 
 
 def test_auth_md_mentionne_core_security_hashing_legacy():
-    """docs/auth.md mentionne core.security.hashing comme legacy."""
+    """docs/features/auth.md mentionne core.security.hashing comme legacy."""
     content = _auth_md()
     assert "core.security.hashing" in content
     assert "legacy" in content.lower()
 
 
 def test_auth_md_mentionne_argon2id():
-    """docs/auth.md mentionne Argon2id."""
+    """docs/features/auth.md mentionne Argon2id."""
     content = _auth_md()
     assert "Argon2id" in content or "argon2id" in content.lower()
 
 
 def test_auth_md_mentionne_pbkdf2_compatibilite():
-    """docs/auth.md mentionne PBKDF2 dans un contexte de compatibilité."""
+    """docs/features/auth.md mentionne PBKDF2 dans un contexte de compatibilité."""
     content = _auth_md()
     assert "PBKDF2" in content
 
 
 def test_auth_md_contient_section_frontiere():
-    """docs/auth.md contient la section frontière API officielle / legacy."""
+    """docs/features/auth.md contient la section frontière API officielle / legacy."""
     content = _auth_md()
     assert "API officielle" in content and "legacy" in content.lower()
 
 
 def test_auth_md_mentionne_modules_officiels_core_security():
-    """docs/auth.md précise que certains modules core.security restent officiels."""
+    """docs/features/auth.md précise que certains modules core.security restent officiels."""
     content = _auth_md()
     assert "core.security.session" in content
     assert "core.security.rbac" in content or "core.security.middleware" in content

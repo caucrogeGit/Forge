@@ -37,7 +37,7 @@ EXCLUDED_PATHS = [
     "docs/roadmap",
     "docs/release/deprecation-policy.md",
     "docs/release/lts-policy.md",
-    "docs/migration-guide.md",
+    "docs/features/migration-guide.md",
     "docs/release/release-policy.md",
 ]
 
@@ -68,8 +68,8 @@ class TestNoActiveForge2XInDocs:
     """Les 4 mentions actives obsolètes ciblées ont été bumpées."""
 
     def test_auth_md_api_officielle_mentions_3x(self):
-        """docs/auth.md : 'Depuis Forge 2.x, l'API officielle' mentionne aussi 3.x."""
-        text = (DOCS_DIR / "auth.md").read_text(encoding="utf-8")
+        """docs/features/auth.md : 'Depuis Forge 2.x, l'API officielle' mentionne aussi 3.x."""
+        text = (DOCS_DIR / "features" / "auth.md").read_text(encoding="utf-8")
         for match in re.finditer(
             r"Depuis Forge 2\.x,?\s+l['']API officielle[^.]*\.",
             text,
@@ -81,18 +81,18 @@ class TestNoActiveForge2XInDocs:
             )
 
     def test_auth_md_briques_restent_officielles_3x(self):
-        """docs/auth.md : 'restent officielles' en Forge 3.x, plus 2.x."""
-        text = (DOCS_DIR / "auth.md").read_text(encoding="utf-8")
+        """docs/features/auth.md : 'restent officielles' en Forge 3.x, plus 2.x."""
+        text = (DOCS_DIR / "features" / "auth.md").read_text(encoding="utf-8")
         assert not re.search(
             r"restent?\s+officielles?\s+en\s+Forge 2\.x", text, re.IGNORECASE
         ), (
-            "docs/auth.md : 'restent officielles en Forge 2.x' doit être "
+            "docs/features/auth.md : 'restent officielles en Forge 2.x' doit être "
             "bumpé en 'Forge 3.x' (T20-B)."
         )
 
     def test_deployment_md_no_forge_2x_utilise(self):
         """docs/deployment/deployment.md : 'Forge 2.x utilise' bumpé en 'Forge 3.x'."""
-        text = (DOCS_DIR / "deployment.md").read_text(encoding="utf-8")
+        text = (DOCS_DIR / "deployment" / "deployment.md").read_text(encoding="utf-8")
         assert not re.search(r"Forge 2\.x\s+utilise\b", text, re.IGNORECASE), (
             "docs/deployment/deployment.md : 'Forge 2.x utilise...' doit être "
             "bumpé en 'Forge 3.x utilise...' (T20-C)."
@@ -138,7 +138,7 @@ class TestHistoricalMentionsPreserved:
     """Les mentions historiques 'depuis Forge X.Y.Z' sont préservées."""
 
     @pytest.mark.parametrize("doc_path,expected_mention", [
-        ("auth.md", "Depuis Forge 2.4.0"),
+        ("features/auth.md", "Depuis Forge 2.4.0"),
         ("reference/auth-mfa.md", "depuis Forge 2.5.0"),
         ("reference/stats.md", "depuis Forge 2.8.0"),
         ("reference/workflow.md", "depuis Forge 2.7.0"),

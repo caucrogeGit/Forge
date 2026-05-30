@@ -7,7 +7,7 @@
 
 !!! info "Auth/User avancée"
     Pour l'authentification complète (login, MFA, OIDC, sessions, audit, CLI admin),
-    voir **[Authentification Forge](../auth.md)**.
+    voir **[Authentification Forge](../features/auth.md)**.
 
 ## Socle de sécurité
 
@@ -21,7 +21,7 @@ Forge fournit les briques de sécurité suivantes dans `core/security/` :
 | Middleware | `middleware.py` | `AuthMiddleware`, `CsrfMiddleware` |
 | Nonce CSP | `csp.py` | Nonce par requête pour scripts inline contrôlés (`APP_CSP_NONCE_ENABLED`) |
 
-Le RBAC complet (`Role`, `Permission`, `@require_permission`, `make_can`…) est fourni par le module opt-in `forge-mvc-rbac` — il n'y a pas de `rbac.py` dans `core/security/`. Voir [RBAC — Contrôle d'accès](../rbac.md).
+Le RBAC complet (`Role`, `Permission`, `@require_permission`, `make_can`…) est fourni par le module opt-in `forge-mvc-rbac` — il n'y a pas de `rbac.py` dans `core/security/`. Voir [RBAC — Contrôle d'accès](../features/rbac.md).
 
 ### TLS du serveur de développement
 
@@ -119,7 +119,7 @@ Le contrat est verrouillé par
 
 La documentation complète du RBAC Forge (rôles, permissions, décorateurs,
 helper Jinja, génération CRUD, chaîne de confiance) se trouve dans
-**[RBAC — Contrôle d'accès](../rbac.md)**.
+**[RBAC — Contrôle d'accès](../features/rbac.md)**.
 
 ### Résumé rapide
 

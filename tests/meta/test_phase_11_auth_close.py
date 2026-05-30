@@ -14,8 +14,8 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
-AUTH_MD = pathlib.Path("docs/auth.md")
-RBAC_MD = pathlib.Path("docs/rbac.md")
+AUTH_MD = pathlib.Path("docs/features/auth.md")
+RBAC_MD = pathlib.Path("docs/features/rbac.md")
 
 
 def _roadmap():

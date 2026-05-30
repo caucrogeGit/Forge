@@ -97,7 +97,7 @@ Une fois que `forge --version` s'affiche correctement, revenez ici pour construi
 
 !!! tip "Profil recommandé"
     Ce starter officiel correspond au profil `minimal` ou `standard`.
-    Voir [Profils de projet](../../profiles.md) pour choisir le bon
+    Voir [Profils de projet](../../features/profiles.md) pour choisir le bon
     profil au moment de `forge new`. Pour le **premier** contact
     avec Forge, démarrer plutôt par
     [Bonjour Forge](../welcome/index.md) (palier 1, sans BDD).

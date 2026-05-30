@@ -48,7 +48,7 @@ enregistrées. `forge migration:diff --entity <Entite>` compare en lecture seule
 le JSON d'entité avec les colonnes MariaDB. `forge migration:apply` applique les
 migrations locales en attente dans l'ordre croissant de version.
 
-Le workflow complet est détaillé dans [Migrations SQL](../migrations.md).
+Le workflow complet est détaillé dans [Migrations SQL](../features/migrations.md).
 
 MariaDB ne garantit pas un rollback complet des DDL. Relisez les migrations SQL
 avant application ; Forge arrête au premier échec sans prétendre annuler tout ce

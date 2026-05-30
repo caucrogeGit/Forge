@@ -36,7 +36,7 @@ Documente les versions officiellement supportées :
 - OS et dépendances runtime et dev ;
 - tests opt-in MariaDB (`FORGE_E2E_MARIADB=1`).
 
-### [Guide de migration](../migration-guide.md)
+### [Guide de migration](../features/migration-guide.md)
 
 Explique comment passer d'une version Forge à une autre :
 

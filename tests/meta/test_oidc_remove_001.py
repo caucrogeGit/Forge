@@ -108,9 +108,9 @@ class TestPyprojectClean:
 
 class TestDocsClean:
     def test_auth_doc_has_oidc_section_as_note(self):
-        """docs/auth.md doit avoir ## OIDC mais comme note, pas comme API."""
-        content = Path("docs/auth.md").read_text(encoding="utf-8")
-        assert "## OIDC" in content, "Section ## OIDC absente de docs/auth.md"
+        """docs/features/auth.md doit avoir ## OIDC mais comme note, pas comme API."""
+        content = Path("docs/features/auth.md").read_text(encoding="utf-8")
+        assert "## OIDC" in content, "Section ## OIDC absente de docs/features/auth.md"
         assert "n'est pas fourni" in content.lower() or "non fourni" in content.lower() or (
             "supprim" in content.lower()
         ), "La section OIDC devrait expliquer l'absence d'OIDC"

@@ -355,38 +355,38 @@ def test_docs_roadmap_md_absent():
 # ── PROFILE-DOC-001 : tests documentaires ─────────────────────────────────────
 
 def test_doc_profiles_md_existe():
-    """docs/profiles.md doit exister."""
+    """docs/features/profiles.md doit exister."""
     root = pathlib.Path(__file__).resolve().parent.parent
-    assert (root / "docs" / "profiles.md").exists()
+    assert (root / "docs" / "features" / "profiles.md").exists()
 
 
 def test_doc_profiles_mentionne_les_quatre_profils():
-    """docs/profiles.md mentionne les 4 profils officiels."""
+    """docs/features/profiles.md mentionne les 4 profils officiels."""
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     for profile in SUPPORTED_PROJECT_PROFILES:
-        assert profile in content, f"Profil absent de docs/profiles.md : {profile}"
+        assert profile in content, f"Profil absent de docs/features/profiles.md : {profile}"
 
 
 def test_doc_profiles_mentionne_forge_profile_txt():
-    """docs/profiles.md documente forge_profile.txt."""
+    """docs/features/profiles.md documente forge_profile.txt."""
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "forge_profile.txt" in content
 
 
 def test_doc_profiles_mentionne_profil_par_defaut():
-    """docs/profiles.md précise que standard est le profil par défaut."""
+    """docs/features/profiles.md précise que standard est le profil par défaut."""
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "standard" in content
     assert "défaut" in content
 
 
 def test_doc_profiles_mentionne_option_profile():
-    """docs/profiles.md documente l'option --profile."""
+    """docs/features/profiles.md documente l'option --profile."""
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "profiles.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
     assert "--profile" in content
 
 

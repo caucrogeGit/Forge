@@ -3,7 +3,7 @@
 Vérifie que SECURITY.md reflète l'état Forge 3.0 :
 - table de support à jour (3.0.x supportée)
 - périmètre mentionne les modules opt-in
-- OIDC en posture 'non fourni' (cohérence avec docs/auth.md L.715)
+- OIDC en posture 'non fourni' (cohérence avec docs/features/auth.md L.715)
 - email de contact valide
 
 Historiquement SECURITY.md listait 2.0.x comme branche active
@@ -99,7 +99,7 @@ class TestSecurityMdPerimeterOptInModules:
 
 
 class TestSecurityMdOidcConsistent:
-    """OIDC est cohérent avec docs/auth.md — non fourni nativement."""
+    """OIDC est cohérent avec docs/features/auth.md — non fourni nativement."""
 
     def test_oidc_not_presented_as_future_feature(self):
         """Si OIDC est mentionné, ce n'est pas comme feature prévue."""
@@ -112,7 +112,7 @@ class TestSecurityMdOidcConsistent:
         for p in misleading:
             assert not re.search(p, text, re.IGNORECASE), (
                 f"SECURITY.md présente OIDC comme feature prévue : {p!r}. "
-                f"Cohérence avec docs/auth.md requise (OIDC non fourni nativement)."
+                f"Cohérence avec docs/features/auth.md requise (OIDC non fourni nativement)."
             )
 
 

@@ -1,13 +1,13 @@
 """Tests — AUTH-DOC-CONSOLIDATION-001 : cohérence et complétude de la documentation Auth.
 
 Vérifie que :
-- docs/auth.md couvre toutes les sections majeures Auth ;
+- docs/features/auth.md couvre toutes les sections majeures Auth ;
 - les parcours login/MFA sont documentés ;
 - les événements d'audit sont listés ;
 - les commandes admin CLI sont documentées avec erreurs et conseils ;
 - les liens croisés vers rbac.md, production-security.md et reference.md sont présents ;
-- docs/rbac.md pointe vers docs/auth.md ;
-- docs/philosophy/security.md pointe vers docs/auth.md ;
+- docs/features/rbac.md pointe vers docs/features/auth.md ;
+- docs/philosophy/security.md pointe vers docs/features/auth.md ;
 - les limites restantes sont explicitées.
 """
 from __future__ import annotations
@@ -17,8 +17,8 @@ import pathlib
 import pytest
 pytestmark = pytest.mark.meta
 
-AUTH_MD = pathlib.Path("docs/auth.md")
-RBAC_MD = pathlib.Path("docs/rbac.md")
+AUTH_MD = pathlib.Path("docs/features/auth.md")
+RBAC_MD = pathlib.Path("docs/features/rbac.md")
 SECURITY_MD = pathlib.Path("docs/philosophy/security.md")
 PRODUCTION_MD = pathlib.Path("docs/deployment/production-security.md")
 REFERENCE_MD = pathlib.Path("docs/reference/api.md")
@@ -63,7 +63,7 @@ class TestFichiersExistent:
 
 
 # ---------------------------------------------------------------------------
-# Sections principales de docs/auth.md
+# Sections principales de docs/features/auth.md
 # ---------------------------------------------------------------------------
 
 class TestSectionsPresentes:

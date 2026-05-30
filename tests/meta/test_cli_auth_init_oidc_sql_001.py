@@ -34,17 +34,17 @@ class TestAuthInitNoOidcSqlTemplates:
 
 
 class TestDocsAuthMdNoOidcSqlListing:
-    """docs/auth.md ne liste pas auth_oidc_*.sql comme sortie d'auth:init."""
+    """docs/features/auth.md ne liste pas auth_oidc_*.sql comme sortie d'auth:init."""
 
     def test_auth_md_no_oidc_accounts_sql(self):
-        text = (PROJECT_ROOT / "docs" / "auth.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "features" / "auth.md").read_text(encoding="utf-8")
         assert "auth_oidc_accounts.sql" not in text, (
-            "docs/auth.md mentionne encore auth_oidc_accounts.sql comme "
+            "docs/features/auth.md mentionne encore auth_oidc_accounts.sql comme "
             "sortie d'auth:init — a retirer."
         )
 
     def test_auth_md_no_oidc_identities_sql(self):
-        text = (PROJECT_ROOT / "docs" / "auth.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "features" / "auth.md").read_text(encoding="utf-8")
         assert "auth_oidc_identities.sql" not in text, (
-            "docs/auth.md mentionne encore auth_oidc_identities.sql."
+            "docs/features/auth.md mentionne encore auth_oidc_identities.sql."
         )

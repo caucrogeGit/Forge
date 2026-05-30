@@ -29,7 +29,7 @@ _HISTORICAL_MARKERS = [
 ]
 
 _CURRENT_LINKS = [
-    "../auth.md",
+    "../features/auth.md",
     "../sessions.md",
     "004-core-perimeter.md",
     "charte_philosophique",
