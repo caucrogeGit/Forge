@@ -3,13 +3,17 @@
 Premier contact avec Forge : afficher une réponse texte. Pas de vue HTML,
 pas de base de données, pas de moteur Jinja2.
 
+**Ce que vous allez apprendre :** écrire votre premier contrôleur Forge,
+déclarer une route dans `mvc/routes.py`, et renvoyer une réponse texte
+avec `Response.text(...)` — le cycle requête → contrôleur → réponse dans
+sa forme la plus minimale.
+
 Identifiant : `welcome` (alias `bienvenue` / `bonjour` / `bonjour-forge`).
 
-## Ce que ce starter installe
+## Ce que ce starter montre
 
 - une route `/welcome`
-- une route `/welcome/greet`
-- un contrôleur `WelcomeController` avec deux méthodes
+- un contrôleur `WelcomeController` avec une méthode `index`
 - aucune vue HTML
 - aucune base de données
 
@@ -28,8 +32,7 @@ Identifiant : `welcome` (alias `bienvenue` / `bonjour` / `bonjour-forge`).
 from mvc.controllers.welcome_controller import WelcomeController
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/welcome",       WelcomeController.index, name="welcome_index")
-    pub.add("GET", "/welcome/greet", WelcomeController.greet, name="welcome_greet")
+    pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")
 ```
 
 ### Comprendre ce code
@@ -56,11 +59,6 @@ class WelcomeController(BaseController):
     @staticmethod
     def index(request: Request) -> Response:
         return Response.text("Bonjour Forge")
-
-    @staticmethod
-    def greet(request: Request) -> Response:
-        name = request.param("name", default="Forge")
-        return Response.text(f"Bonjour {name}")
 ```
 
 ### Comprendre ce code
@@ -70,18 +68,15 @@ class WelcomeController(BaseController):
 - Chaque action reçoit `request: Request` et doit renvoyer `Response`.
   C'est la signature unique d'une méthode de contrôleur Forge.
 - `Response.text(...)` produit une réponse `text/plain` ; aucun template
-  HTML n'est rendu à ce stade.
-- `request.param("name", default="Forge")` lit la valeur de `?name=...`
-  dans l'URL. Si la clé est absente, `default` est retourné — pas
-  d'exception, pas de `None` à manipuler.
+  HTML n'est rendu à ce stade. La lecture d'un paramètre d'URL
+  (`request.param(...)`) est introduite au palier suivant
+  (`query-params`).
 
 ## Tester dans le navigateur
 
 | URL | Résultat |
 |---|---|
-| `http://localhost:8000/welcome` | `Bonjour Forge` |
-| `http://localhost:8000/welcome/greet` | `Bonjour Forge` |
-| `http://localhost:8000/welcome/greet?name=Roger` | `Bonjour Roger` |
+| `https://localhost:8000/welcome` | `Bonjour Forge` |
 
 ## À retenir
 
@@ -92,19 +87,8 @@ class WelcomeController(BaseController):
 
 ## Après ce starter
 
-Passez au palier suivant : **Paramètres d'URL**.
-
-Vous y apprendrez à lire une valeur transmise dans l'adresse, par
-exemple :
-
-```text
-/query-params/hello?name=Roger
-```
-
-avec :
-
-```python
-request.param("name", default="Forge")
-```
+Passez au palier suivant : **Paramètres d'URL** — vous y apprendrez à
+lire une valeur transmise dans l'adresse (`?name=...`) avec
+`request.param(...)`.
 
 [Continuer avec Paramètres d'URL](query-params.md)

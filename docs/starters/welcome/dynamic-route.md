@@ -2,6 +2,10 @@
 
 Objectif : lire une partie variable de l'URL avec `request.route_param(...)`.
 
+**Ce que vous allez apprendre :** déclarer une route avec un segment
+variable (`/dynamic-route/articles/{id}`) et lire ce segment côté
+contrôleur avec `request.route_param("id")`.
+
 Palier 4 de la
 [progression officielle des starters](../index.md#progression-recommandee),
 après [Première vue HTML](first-html-view.md).
@@ -38,7 +42,7 @@ forge run
 Ouvrez :
 
 ```
-http://localhost:8000/dynamic-route/articles/42
+https://localhost:8000/dynamic-route/articles/42
 ```
 
 Résultat attendu :

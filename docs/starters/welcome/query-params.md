@@ -2,6 +2,11 @@
 
 Objectif : lire une valeur passée dans l'URL avec `request.param(...)`.
 
+**Ce que vous allez apprendre :** récupérer une valeur de la query string
+(`?name=Roger`) avec `request.param("name", default=...)`, et fournir une
+valeur par défaut quand le paramètre est absent — sans exception ni
+`None` à gérer.
+
 Ce starter est identifié par `query-params` dans la CLI Forge
 (aliases `query_params` / `params`). Il représente le **palier 2** de
 la
@@ -93,10 +98,10 @@ class QueryParamsController(BaseController):
 
 | URL | Résultat |
 |---|---|
-| `http://localhost:8000/query-params` | message d'aide |
-| `http://localhost:8000/query-params/hello` | `Bonjour Forge` |
-| `http://localhost:8000/query-params/hello?name=Roger` | `Bonjour Roger` |
-| `http://localhost:8000/query-params/hello?name=Alice` | `Bonjour Alice` |
+| `https://localhost:8000/query-params` | message d'aide |
+| `https://localhost:8000/query-params/hello` | `Bonjour Forge` |
+| `https://localhost:8000/query-params/hello?name=Roger` | `Bonjour Roger` |
+| `https://localhost:8000/query-params/hello?name=Alice` | `Bonjour Alice` |
 
 ## À retenir
 

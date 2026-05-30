@@ -2,6 +2,10 @@
 
 Objectif : rendre une page HTML avec `BaseController.render(...)`.
 
+**Ce que vous allez apprendre :** rendre une vraie page HTML depuis un
+template Jinja2 avec `BaseController.render(...)`, et comprendre où Forge
+va chercher la vue dans `mvc/views/`.
+
 Palier 3 de la
 [progression officielle des starters](../index.md#progression-recommandee),
 après [Paramètres d'URL](query-params.md).
@@ -32,7 +36,7 @@ forge run
 Ouvrez :
 
 ```
-http://localhost:8000/first-html-view
+https://localhost:8000/first-html-view
 ```
 
 ## Code essentiel

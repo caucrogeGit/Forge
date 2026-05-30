@@ -3,9 +3,15 @@
 Objectif : vérifier côté serveur une valeur reçue depuis un
 formulaire.
 
-Palier 7 de la
+**Ce que vous allez apprendre :** ne jamais faire confiance au client —
+valider une donnée côté serveur, refuser une valeur vide et répondre
+avec un statut `422 Unprocessable Entity` plutôt qu'un `200` trompeur.
+
+Palier 9 de la
 [progression officielle des starters](../index.md#progression-recommandee),
 après [Premier formulaire POST](form-post.md).
+
+*Prérequis : savoir afficher et traiter un formulaire POST (palier 8).*
 
 ## Ce que ce starter montre
 
@@ -39,7 +45,7 @@ forge run
 Ouvrez :
 
 ```
-http://localhost:8000/server-validation
+https://localhost:8000/server-validation
 ```
 
 Essayez deux cas :
@@ -47,17 +53,45 @@ Essayez deux cas :
 - **Prénom = `Roger`** → `Bonjour Roger`
 - **Prénom vide** → `Le prénom est obligatoire` (HTTP 422)
 
-## Code essentiel
+## Les routes
 
 ```python
-@staticmethod
-def submit(request: Request) -> Response:
-    name = request.form("name", default="").strip()
+# mvc/routes.py
+from mvc.controllers.server_validation_controller import ServerValidationController
 
-    if not name:
-        return Response.text("Le prénom est obligatoire", status=422)
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/server-validation", ServerValidationController.index,  name="server_validation_index")
+    pub.add("POST", "/server-validation", ServerValidationController.submit, name="server_validation_submit")
+```
 
-    return Response.text(f"Bonjour {name}")
+## Le contrôleur
+
+```python
+# mvc/controllers/server_validation_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
+
+class ServerValidationController(BaseController):
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        csrf_token = BaseController.csrf_token(request)
+        return BaseController.render(
+            "server_validation/index.html",
+            context={"csrf_token": csrf_token},
+            request=request,
+        )
+
+    @staticmethod
+    def submit(request: Request) -> Response:
+        name = request.form("name", default="").strip()
+
+        if not name:
+            return Response.text("Le prénom est obligatoire", status=422)
+
+        return Response.text(f"Bonjour {name}")
 ```
 
 ### Comprendre ce code
@@ -72,6 +106,31 @@ def submit(request: Request) -> Response:
   Toute requête peut venir d'un client modifié (curl, JS désactivé,
   Postman), donc la validation client doit toujours être doublée
   côté serveur.
+
+## La vue
+
+```html
+<!-- mvc/views/server_validation/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Validation serveur — Forge</title>
+</head>
+<body>
+  <h1>Validation serveur</h1>
+
+  <form method="post" action="/server-validation">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <label for="name">Prénom</label>
+    <input id="name" name="name" type="text">
+
+    <button type="submit">Envoyer</button>
+  </form>
+</body>
+</html>
+```
 
 ## À retenir
 

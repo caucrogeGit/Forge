@@ -2,10 +2,14 @@
 
 Objectif : lire une donnée depuis MariaDB avec du SQL visible.
 
-Palier 8 de la
+**Ce que vous allez apprendre :** créer une table via une migration SQL
+versionnée et lisible, puis lire une donnée depuis MariaDB avec
+`fetch_one(...)` et une requête `SELECT` écrite à la main — sans ORM ni
+génération cachée.
+
+Palier 10 de la
 [progression officielle des starters](../index.md#progression-recommandee),
-après [Validation serveur](server-validation.md). C'est le
-**dernier palier avant le CRUD Contacts**.
+après [Validation serveur](server-validation.md).
 
 ## Ce que ce starter montre
 
@@ -42,7 +46,7 @@ forge run
 Ouvrez :
 
 ```
-http://localhost:8000/first-sql
+https://localhost:8000/first-sql
 ```
 
 Résultat attendu :
@@ -51,7 +55,17 @@ Résultat attendu :
 Message depuis la base : Bonjour SQL
 ```
 
-## Code essentiel
+## Les routes
+
+```python
+# mvc/routes.py
+from mvc.controllers.first_sql_controller import FirstSqlController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/first-sql", FirstSqlController.index, name="first_sql_index")
+```
+
+## Le contrôleur
 
 ```python
 # mvc/controllers/first_sql_controller.py
@@ -83,6 +97,8 @@ class FirstSqlController(BaseController):
   une réponse texte.
 - Le cycle reste minimal : route → contrôleur → SQL → réponse. Dans une
   vraie application, on isolerait la requête dans un module modèle.
+
+## La migration
 
 ```sql
 -- mvc/migrations/20260527120000_create_first_sql_messages.sql
@@ -122,19 +138,13 @@ WHERE NOT EXISTS (
 
 ## Après ce starter
 
-Vous avez maintenant parcouru les bases nécessaires avant le CRUD :
+Vous savez **lire** une donnée en base. Passez au palier suivant :
+**Écrire en base** — insérer une ligne depuis un formulaire :
 
-- routes ;
-- contrôleurs ;
-- réponses texte ;
-- vues HTML ;
-- paramètres d'URL ;
-- routes dynamiques ;
-- inspection de requête ;
-- formulaires POST ;
-- validation serveur ;
-- SQL visible.
+```python
+from core.database.db import insert
 
-Vous pouvez passer au palier final : **Contacts CRUD**.
+insert("INSERT INTO first_sql_messages (content) VALUES (?)", (content,))
+```
 
-[Continuer avec Contacts CRUD](../01-contact-simple/index.md)
+[Continuer avec Écrire en base](first-sql-write.md)

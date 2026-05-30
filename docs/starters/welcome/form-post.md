@@ -3,9 +3,16 @@
 Objectif : envoyer une valeur depuis un formulaire HTML et la lire
 côté contrôleur.
 
-Palier 6 de la
+**Ce que vous allez apprendre :** afficher un formulaire HTML protégé
+par un jeton CSRF, le soumettre en `POST`, et lire la valeur reçue dans
+le corps de la requête avec `request.form("name", ...)` (et non dans
+l'URL).
+
+Palier 8 de la
 [progression officielle des starters](../index.md#progression-recommandee),
-après [Inspecter une requête](request-debug.md).
+après [Le jeton CSRF](csrf.md).
+
+*Prérequis : comprendre le jeton CSRF (palier 7).*
 
 ## Ce que ce starter montre
 
@@ -38,7 +45,7 @@ forge run
 Ouvrez :
 
 ```
-http://localhost:8000/form-post
+https://localhost:8000/form-post
 ```
 
 Saisissez `Roger`, envoyez le formulaire.
@@ -49,10 +56,26 @@ Résultat attendu :
 Bonjour Roger
 ```
 
-## Code essentiel
+## Les routes
+
+```python
+# mvc/routes.py
+from mvc.controllers.form_post_controller import FormPostController
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/form-post", FormPostController.index,  name="form_post_index")
+    pub.add("POST", "/form-post", FormPostController.submit, name="form_post_submit")
+```
+
+## Le contrôleur
 
 ```python
 # mvc/controllers/form_post_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
+
 class FormPostController(BaseController):
 
     @staticmethod
@@ -83,14 +106,29 @@ class FormPostController(BaseController):
   simple `Response.text(...)` ; dans une vraie application on
   redirigerait généralement vers une page de confirmation.
 
+## La vue
+
 ```html
 <!-- mvc/views/form_post/index.html -->
-<form method="post" action="/form-post">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-  <label for="name">Prénom</label>
-  <input id="name" name="name" type="text" value="Forge">
-  <button type="submit">Envoyer</button>
-</form>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Premier formulaire POST — Forge</title>
+</head>
+<body>
+  <h1>Premier formulaire POST</h1>
+
+  <form method="post" action="/form-post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <label for="name">Prénom</label>
+    <input id="name" name="name" type="text" value="Forge">
+
+    <button type="submit">Envoyer</button>
+  </form>
+</body>
+</html>
 ```
 
 ### Comprendre ce code
@@ -111,8 +149,8 @@ class FormPostController(BaseController):
   POST (protection contre les soumissions cross-site). Il est
   généré par `BaseController.csrf_token(request)` et vérifié
   automatiquement par le middleware.
-- La validation serveur complète viendra dans le starter suivant
-  (palier 7).
+- La validation serveur complète viendra au palier suivant
+  (palier 9).
 
 ## Après ce starter
 
