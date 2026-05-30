@@ -109,9 +109,13 @@ class HomeController:
 | [`forge-mvc-stats`](https://pypi.org/project/forge-mvc-stats/) | Agrégats et compteurs d'événements |
 | [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) |
 | [`forge-mvc-media`](https://pypi.org/project/forge-mvc-media/) | Gestion applicative des médias |
-| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) |
+| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) — **Alpha** |
 
 Chaque module reste optionnel : le core Forge ne dépend d'aucun d'eux.
+Installez-les à la demande, par exemple `pip install --pre forge-mvc-rbac`.
+`forge-mvc-iot` est au statut **Alpha** : il s'installe **explicitement et
+séparément** (`pip install --pre forge-mvc-iot`) et n'est **pas** inclus dans
+l'extra `forge-mvc[all]` (dépendance MQTT `paho-mqtt`, maturité Alpha).
 
 ---
 
@@ -124,7 +128,7 @@ Toute la documentation est publiée sur
 - Référence de la CLI `forge`
 - Entités, modèles, SQL et migrations
 - Formulaires, validation, CSRF, sessions
-- Modules opt-in (RBAC, workflow, stats, MFA, media)
+- Modules opt-in (RBAC, workflow, stats, MFA, media, IoT)
 - ADR et charte philosophique
 
 ---
