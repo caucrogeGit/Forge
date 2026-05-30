@@ -30,6 +30,39 @@ Côté code (non liés ici car hors `docs/`) :
 
 ---
 
+## Conventions de nommage des starters
+
+Tout starter porte un **nom anglais**. Le nom encode **d'où vient la capacité
+démontrée** via un token central :
+
+| Famille | Schéma | Exemples |
+|---------|--------|----------|
+| Progression de découverte | `welcome` + nom de concept | `welcome`, `query-params`, `first-html-view`, `first-sql`… |
+| Capstone CRUD | `first-crud[-variante]` | `first-crud` (à la main), `first-crud-generated` (généré) |
+| Starter d'**opt-in** | `welcome-optin-<module>` | `welcome-optin-iot`, `welcome-optin-mfa` |
+| Starter d'**API cœur** | `<sujet>-core-<api>` | `users-core-auth` |
+
+Le token central (`optin` / `core`) signale d'où vient la capacité.
+
+**Multi-niveaux** : un sujet peut être augmenté de niveaux (découverte →
+intermédiaire → expert). Le niveau est porté par le **préfixe** (`welcome-` =
+découverte) : `welcome-optin-iot`, `intermediate-optin-iot`, `expert-optin-iot`.
+
+**Structure des dossiers** :
+
+- **docs groupées par sujet** : `docs/starters/<sujet>/` (dossier), un fichier par
+  niveau (= id du starter) + un `index.md` de sujet — ex.
+  `docs/starters/optin-iot/index.md` + `docs/starters/optin-iot/welcome-optin-iot.md`.
+- **data à plat** : `forge_cli/starters/data/<id>/` (un dossier par starter
+  buildable) ; le `doc_url` pointe vers le chemin-sujet.
+
+Une **application métier** (multi-entités, domaine réel) **n'est pas un starter** :
+elle est archivée sous `docs/starters/old/` et retirée du registry.
+
+> Détail et phasage : [roadmap de réorganisation des starters](../roadmap/starter-reorg-roadmap.md).
+
+---
+
 ## 1. Principe directeur — un palier = une responsabilité
 
 Chaque palier introduit **une seule notion nouvelle**. Aucune notion qui
