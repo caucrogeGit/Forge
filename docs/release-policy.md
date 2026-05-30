@@ -112,9 +112,9 @@ la mise à jour, c'est un MAJOR.
 
 ## API publique et API interne
 
-Se référer au [Contrat de stabilité Forge 2.x](stability-contract.md) pour la liste complète.
+Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la liste complète.
 
-### Stable — garantie 2.x
+### Stable — garantie 1.x
 
 - Commandes CLI documentées dans `docs/reference.md`.
 - Structure projet générée par `forge new`.
