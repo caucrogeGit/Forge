@@ -43,7 +43,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"
-Documentation = "https://caucrogegit.github.io/Forge/"
+Documentation = "https://forgemvc.com/docs/forge/"
 Issues = "https://github.com/caucrogeGit/Forge/issues"
 
 # Extras préparés pour publication coordonnée beta.5 → à aligner beta.6 dans PYPI-OPTINS-001

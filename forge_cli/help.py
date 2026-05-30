@@ -116,7 +116,8 @@ Exemples :
   forge make:entity Contact && forge make:crud Contact
   forge doctor && forge project:check
 
-Documentation : https://github.com/caucrogeGit/Forge
+Documentation : https://forgemvc.com/docs/forge/
+Dépôt         : https://github.com/caucrogeGit/Forge
 """
 
 
