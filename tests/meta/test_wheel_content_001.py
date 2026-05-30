@@ -73,6 +73,64 @@ def fresh_wheel(tmp_path_factory):
     return wheels[0]
 
 
+@pytest.fixture(scope="module")
+def fresh_sdist(tmp_path_factory):
+    """Build un sdist frais depuis le pyproject.toml racine."""
+    import tarfile
+
+    out_dir = tmp_path_factory.mktemp("sdist_build")
+    _clean_build_dirs()
+    result = subprocess.run(
+        [
+            sys.executable, "-m", "build", "--sdist",
+            "--outdir", str(out_dir),
+            "--no-isolation",
+            str(PROJECT_ROOT),
+        ],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    if result.returncode != 0:
+        pytest.fail(
+            f"Build sdist a échoué :\n"
+            f"stdout : {result.stdout[-500:]}\n"
+            f"stderr : {result.stderr[-500:]}"
+        )
+    sdists = list(out_dir.glob("forge_mvc-*.tar.gz"))
+    assert len(sdists) == 1, f"Attendu 1 sdist, trouvé {len(sdists)} : {sdists}"
+    with tarfile.open(sdists[0]) as tf:
+        return tf.getnames()
+
+
+class TestSdistContent:
+    """Garde-fou PKG-SDIST-TESTS-DECISION-001.
+
+    Le sdist distribué embarque le code installable mais PAS la suite de
+    tests Forge (outil de dev, exécuté depuis le monorepo). Décision
+    documentée dans MANIFEST.in (``prune tests``).
+    """
+
+    def test_sdist_excludes_tests(self, fresh_sdist):
+        offenders = [
+            n for n in fresh_sdist
+            if "/tests/" in n or n.split("/")[1:2] == ["tests"]
+        ]
+        assert not offenders, (
+            f"Le sdist embarque {len(offenders)} fichier(s) de tests "
+            f"(décision PKG-SDIST-TESTS-DECISION-001 : prune tests). "
+            f"Exemples : {offenders[:5]}"
+        )
+
+    def test_sdist_contains_core_and_entrypoint(self, fresh_sdist):
+        assert any("/core/" in n for n in fresh_sdist), (
+            "Le sdist doit contenir le package core/."
+        )
+        assert any(n.endswith("/forge.py") for n in fresh_sdist), (
+            "Le sdist doit contenir forge.py (module entry point)."
+        )
+
+
 # ---------------------------------------------------------------------------
 # Classe 1 — La wheel n'est pas vide
 # ---------------------------------------------------------------------------

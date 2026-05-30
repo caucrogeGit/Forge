@@ -6,3 +6,10 @@ recursive-include forge_cli/schemas *.json
 global-exclude *.pyc
 global-exclude *.pyo
 recursive-exclude * __pycache__
+
+# PKG-SDIST-TESTS-DECISION-001 — la suite de tests Forge est un outil de
+# développement (elle s'exécute depuis le monorepo avec les opt-ins en
+# éditable, cf. requirements-dev.txt). Elle n'a pas sa place dans le sdist
+# distribué : on l'exclut pour alléger l'archive et ne pas exposer
+# l'interne. Les tests restent versionnés dans le dépôt.
+prune tests
