@@ -1,3 +1,4 @@
+import io
 from types import SimpleNamespace
 
 import pytest
@@ -20,11 +21,26 @@ from core.uploads.image import (
 from forge_cli.uploads import init_media_storage
 
 
-def _img(filename="photo.jpg", content=b"img", content_type="image/jpeg"):
+def _real_image_bytes(content_type="image/jpeg"):
+    """Octets d'une vraie image décodable (SEC-UPLOAD-IMAGE-VERIFY-001)."""
+    fmt = {"image/png": "PNG", "image/webp": "WEBP", "image/jpeg": "JPEG"}.get(
+        content_type, "JPEG"
+    )
+    buf = io.BytesIO()
+    Image.new("RGB", (8, 8), color=(210, 40, 70)).save(buf, format=fmt)
+    return buf.getvalue()
+
+
+def _img(filename="photo.jpg", content=None, content_type="image/jpeg"):
+    # Depuis SEC-UPLOAD-IMAGE-VERIFY-001, save_image vérifie le contenu :
+    # par défaut on fournit donc une vraie image. ``content=`` permet
+    # d'injecter un contenu arbitraire (taille, contenu non-image).
+    if content is None:
+        content = _real_image_bytes(content_type)
     return SimpleNamespace(filename=filename, content=content, content_type=content_type)
 
 
-def _cfg(tmp_path, max_size=1000):
+def _cfg(tmp_path, max_size=100_000):
     forge.configure(
         upload_root=str(tmp_path / "uploads"),
         upload_max_size=max_size,
@@ -78,6 +94,29 @@ def test_save_image_refuse_fichier_trop_lourd(tmp_path):
     _cfg(tmp_path, max_size=5)
     with pytest.raises(UploadTooLargeError):
         save_image(_img(content=b"x" * 6))
+
+
+# ── Validation contenu (SEC-UPLOAD-IMAGE-VERIFY-001) ─────────────────────────
+
+def test_save_image_refuse_contenu_non_image(tmp_path):
+    """Extension + MIME d'image valides mais contenu falsifié → rejet.
+
+    Le Content-Type est fourni par le client (falsifiable) : un fichier
+    non-image déguisé en .jpg image/jpeg doit être rejeté AVANT écriture.
+    """
+    _cfg(tmp_path)
+    fake = _img(
+        "photo.jpg",
+        content=b"%PDF-1.4 ceci n'est pas une image",
+        content_type="image/jpeg",
+    )
+    with pytest.raises(UploadStorageError, match="n'est pas une image valide"):
+        save_image(fake)
+
+    # Et rien ne doit avoir été écrit sur le disque.
+    images_dir = tmp_path / "uploads" / "images"
+    written = list(images_dir.glob("*")) if images_dir.exists() else []
+    assert not written, f"un fichier a été écrit malgré un contenu invalide : {written}"
 
 
 # ── Nom dangereux ─────────────────────────────────────────────────────────────

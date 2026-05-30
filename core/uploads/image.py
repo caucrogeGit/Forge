@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -46,6 +47,23 @@ class MediaRecord:
     is_main: bool = True
 
 
+def _verify_image_content(data: bytes) -> None:
+    """Vérifie que ``data`` est une image décodable par Pillow.
+
+    SEC-UPLOAD-IMAGE-VERIFY-001 — défense contre un fichier non-image
+    présenté avec une extension/MIME d'image (Content-Type falsifiable).
+    ``Image.verify()`` invalide l'objet après usage : on l'appelle sur
+    une instance jetable ouverte depuis les octets en mémoire.
+    """
+    try:
+        with Image.open(io.BytesIO(data)) as probe:
+            probe.verify()
+    except (UnidentifiedImageError, OSError, SyntaxError, ValueError) as exc:
+        raise UploadStorageError(
+            "Le fichier fourni n'est pas une image valide."
+        ) from exc
+
+
 def save_image(
     file,
     *,
@@ -74,6 +92,12 @@ def save_image(
         allowed_mime_types=list(ALLOWED_IMAGE_MIME_TYPES),
         max_size=int(_cfg("upload_max_size")),
     )
+
+    # SEC-UPLOAD-IMAGE-VERIFY-001 — la validation ci-dessus ne porte que
+    # sur des métadonnées déclaratives (extension + Content-Type fournis
+    # par le client). On vérifie ici que le contenu est réellement une
+    # image décodable AVANT de l'écrire sur le disque (charte §7).
+    _verify_image_content(data)
 
     root = upload_root()
     saved_path = storage.save_bytes(
