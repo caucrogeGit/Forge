@@ -85,7 +85,7 @@ class TestReferenceInNav:
 class TestGettingStartedLinksToReference:
 
     def test_getting_started_links_to_cli(self):
-        text = (PROJECT_ROOT / "docs" / "getting-started.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "guide" / "getting-started.md").read_text(encoding="utf-8")
         assert "cli-commands" in text, (
-            "docs/getting-started.md doit lier vers reference/cli-commands.md."
+            "docs/guide/getting-started.md doit lier vers reference/cli-commands.md."
         )

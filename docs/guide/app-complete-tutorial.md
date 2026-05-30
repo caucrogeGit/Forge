@@ -11,7 +11,7 @@
     - Le fichier se place dans `mvc/entities/<nom>/<nom>.json` (sous-dossier en minuscule).
     - Le champ `id` est auto-généré — ne pas le déclarer dans `fields`.
     - Les types de champs utilisent la syntaxe canonique : `"type": "string"`, pas `sql_type`.
-    - Référence : [Le JSON canonique dans Forge](entities/json-canonique.md).
+    - Référence : [Le JSON canonique dans Forge](../entities/json-canonique.md).
 
 Ce tutoriel guide le développement d'une petite application Forge de bout en bout.
 Il suppose que Forge est déjà installé et que MariaDB est disponible.
@@ -403,7 +403,7 @@ de fois que nécessaire sans perte.
 | `mvc/routes.py` (entrées ajoutées) | `forge make:crud` |
 
 Ces fichiers sont les vôtres. Forge n'y touche plus après la création.
-Le [Contrat de stabilité](stability-contract.md) garantit formellement cette règle.
+Le [Contrat de stabilité](../stability-contract.md) garantit formellement cette règle.
 
 ---
 
@@ -518,20 +518,20 @@ Ce tutoriel couvre une application simple. Il ne couvre pas :
 
 | Limite | Documentation |
 |---|---|
-| Auth / connexion utilisateur | [Auth/User](auth.md) |
-| Rôles et permissions (RBAC) | [Sécurité et RBAC](security.md), [RBAC](rbac.md) |
-| Relations `many_to_many` | [Relations entre entités](relations.md) |
-| Envoi de mails | [Gestion des mails](mail.md) |
-| Upload de fichiers / médias | [Module média](media.md) |
-| Déploiement en production | [Déploiement](deployment.md) |
-| Sécurité en production | [Sécurité en production](production-security.md) |
+| Auth / connexion utilisateur | [Auth/User](../auth.md) |
+| Rôles et permissions (RBAC) | [Sécurité et RBAC](../security.md), [RBAC](../rbac.md) |
+| Relations `many_to_many` | [Relations entre entités](../relations.md) |
+| Envoi de mails | [Gestion des mails](../mail.md) |
+| Upload de fichiers / médias | [Module média](../media.md) |
+| Déploiement en production | [Déploiement](../deployment.md) |
+| Sécurité en production | [Sécurité en production](../production-security.md) |
 | API JSON légère | À venir — API-JSON-001 |
-| Pages publiques | [Outils — Génération PDF, Module média](media.md) |
+| Pages publiques | [Outils — Génération PDF, Module média](../media.md) |
 | Forge Design | Projet compagnon séparé |
 
 `forge make:relation` est interactif. Pour les projets sans terminal interactif,
 éditez directement `mvc/entities/relations.json` selon le format documenté
-dans [Relations entre entités](relations.md).
+dans [Relations entre entités](../relations.md).
 
 `forge db:init` nécessite un MariaDB local configuré. Sans MariaDB, les
 fichiers JSON, SQL, modèles et vues sont générés mais l'application ne peut
@@ -543,16 +543,16 @@ pas démarrer.
 
 | Étape | Ressource |
 |---|---|
-| Référence complète des commandes | [API et CLI](reference.md) |
-| Filtres de liste CRUD (`list.filter`) | [API et CLI — Filtres CRUD](reference.md) |
-| Comprendre les entités et modèles | [Architecture des entités](entity_architecture.md) |
-| Déclarer des relations avancées | [Relations entre entités](relations.md) |
-| Ajouter l'authentification | [Auth/User](auth.md) |
-| Déployer en production | [Guide de déploiement](deployment.md) |
-| Sécurité en production | [Sécurité en production](production-security.md) |
-| Utiliser un starter complet | [Vue d'ensemble des starters](starters/index.md) |
-| Passer à une version suivante | [Guide de migration](migration-guide.md) |
-| Garanties sur les fichiers préservés | [Contrat de stabilité](stability-contract.md) |
+| Référence complète des commandes | [API et CLI](../reference.md) |
+| Filtres de liste CRUD (`list.filter`) | [API et CLI — Filtres CRUD](../reference.md) |
+| Comprendre les entités et modèles | [Architecture des entités](../entity_architecture.md) |
+| Déclarer des relations avancées | [Relations entre entités](../relations.md) |
+| Ajouter l'authentification | [Auth/User](../auth.md) |
+| Déployer en production | [Guide de déploiement](../deployment.md) |
+| Sécurité en production | [Sécurité en production](../production-security.md) |
+| Utiliser un starter complet | [Vue d'ensemble des starters](../starters/index.md) |
+| Passer à une version suivante | [Guide de migration](../migration-guide.md) |
+| Garanties sur les fichiers préservés | [Contrat de stabilité](../stability-contract.md) |
 
 ---
 
@@ -591,7 +591,7 @@ python app.py                      # lancer l'application
 
 - [Bonjour Forge](bonjour-forge.md) — premier contact, sans BDD
 - [Guide de démarrage](guide.md) — parcours complet avec MariaDB
-- [Relations entre entités](relations.md) — format `relations.json` complet
-- [Architecture des entités](entity_architecture.md) — rôle de chaque fichier généré
-- [Contrat de stabilité](stability-contract.md) — garanties sur les fichiers préservés
-- [Référence API et CLI](reference.md) — toutes les commandes
+- [Relations entre entités](../relations.md) — format `relations.json` complet
+- [Architecture des entités](../entity_architecture.md) — rôle de chaque fichier généré
+- [Contrat de stabilité](../stability-contract.md) — garanties sur les fichiers préservés
+- [Référence API et CLI](../reference.md) — toutes les commandes

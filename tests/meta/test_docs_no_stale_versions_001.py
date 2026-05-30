@@ -115,10 +115,10 @@ class TestNoStaleForgeVersionInActiveDocs:
 class TestNoStaleTagV300InActiveDocs:
 
     def test_no_v3_0_0_in_guide(self):
-        text = (PROJECT_ROOT / "docs" / "guide.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "guide" / "guide.md").read_text(encoding="utf-8")
         match = STALE_TAG_V3_0_0_PATTERN.search(text)
         assert not match, (
-            "docs/guide.md référence encore v3.0.0. "
+            "docs/guide/guide.md référence encore v3.0.0. "
             "À remplacer par v3.0.1 (T7 — F4)."
         )
 

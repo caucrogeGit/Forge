@@ -1,6 +1,6 @@
 # FAQ Forge
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Cette page regroupe les questions fréquentes retirées de la landing page. La landing reste une vitrine courte ; la FAQ appartient à la documentation.
 

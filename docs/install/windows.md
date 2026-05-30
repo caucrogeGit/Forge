@@ -76,7 +76,7 @@ forge new MonProjet
 cd MonProjet
 ```
 
-Puis suivre le [Guide de démarrage](../getting-started.md) normalement.
+Puis suivre le [Guide de démarrage](../guide/getting-started.md) normalement.
 
 ---
 
@@ -132,4 +132,4 @@ pour le support natif Windows sont bienvenues, mais non planifiées.
 - [Vue d'ensemble de l'installation](index.md)
 - [Installation avec pipx](pipx.md)
 - [Préparer MariaDB](mariadb.md)
-- [Démarrer avec Forge](../getting-started.md)
+- [Démarrer avec Forge](../guide/getting-started.md)

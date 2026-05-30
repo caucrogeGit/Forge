@@ -3,7 +3,7 @@
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Forge s'installe différemment selon votre intention. Choisissez d'abord votre
-parcours, puis enchaînez avec le [guide de démarrage](../guide.md).
+parcours, puis enchaînez avec le [guide de démarrage](../guide/guide.md).
 
 ## Utilisateur du framework ou développeur du core ?
 

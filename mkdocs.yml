@@ -42,15 +42,15 @@ nav:
           - Production: install/production.md
 
   - Premiers pas:
-      - Démarrer avec Forge: getting-started.md
-      - Bonjour Forge: bonjour-forge.md
-      - Application complète: app-complete-tutorial.md
-      - Guide de démarrage: guide.md
+      - Démarrer avec Forge: guide/getting-started.md
+      - Bonjour Forge: guide/bonjour-forge.md
+      - Application complète: guide/app-complete-tutorial.md
+      - Guide de démarrage: guide/guide.md
       - CRUD explicite: crud.md
 
   - Concepts:
-      - Vue d'ensemble: concepts.md
-      - Positionnement: positioning.md
+      - Vue d'ensemble: guide/concepts.md
+      - Positionnement: guide/positioning.md
       - Architecture des entités: entity_architecture.md
       - Le JSON canonique: entities/json-canonique.md
       - Schéma des entités: entities/entity-schema.md
@@ -64,7 +64,7 @@ nav:
       - Conversion depuis l'ancien format: entities/migration-legacy-vers-canonique.md
       - Front et CSS: front.md
       - Profils de projet: profiles.md
-      - FAQ: faq.md
+      - FAQ: guide/faq.md
 
   - Référence:
       - Index: reference.md

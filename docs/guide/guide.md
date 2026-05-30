@@ -1,16 +1,16 @@
 # Guide de démarrage Forge
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Forge est un framework web MVC Python avec HTTPS natif, SQL explicite, templates Jinja2 et génération déterministe du modèle. Ce guide part d'un environnement Forge déjà installé et aboutit à un premier projet fonctionnel avec CRUD généré.
 
-Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir [Référence API et CLI](reference.md).
+Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir [Référence API et CLI](../reference.md).
 
 !!! tip "Forge n'est pas encore installé ?"
     Commencez par le parcours adapté dans le menu Installation :
-    [VM Debian vierge](install/vm-debian.md), [pipx](install/pipx.md),
-    [GitHub](install/github.md), [mode développement](install/core-dev.md)
-    ou [préparation MariaDB](install/mariadb.md).
+    [VM Debian vierge](../install/vm-debian.md), [pipx](../install/pipx.md),
+    [GitHub](../install/github.md), [mode développement](../install/core-dev.md)
+    ou [préparation MariaDB](../install/mariadb.md).
 
 ---
 
@@ -26,7 +26,7 @@ cd MonProjet
 source .venv/bin/activate
 ```
 
-Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic`, `multilingual`) — le profil par défaut est `standard`. Voir [Profils de projet](profiles.md).
+Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic`, `multilingual`) — le profil par défaut est `standard`. Voir [Profils de projet](../profiles.md).
 
 `forge new` fait tout automatiquement : clonage du squelette, environnement virtuel Python, installation des dépendances, compilation du CSS Tailwind officiel (si npm est présent) et génération des certificats SSL. Un dépôt Git propre est initialisé.
 
@@ -110,7 +110,7 @@ depuis un diff avec `--from-diff`. `forge migration:status` affiche l'état,
 `forge migration:diff --entity Contact` compare le JSON avec les colonnes
 MariaDB, et `forge migration:apply` applique les migrations en attente.
 
-Voir aussi : [Migrations SQL](migrations.md).
+Voir aussi : [Migrations SQL](../migrations.md).
 
 !!! success "Avant de continuer"
     Vérifier que MariaDB est démarré, que `env/dev` est configuré avec `DB_ADMIN_LOGIN`, `DB_ADMIN_PWD`, `DB_APP_LOGIN`, `DB_APP_PWD` et `DB_NAME`.
@@ -336,7 +336,7 @@ flowchart TD
 | `forge make:crud Nom` | Génère contrôleur, modèle, formulaire, vues |
 | `forge routes:list` | Affiche les routes déclarées |
 
-Pour les commandes avancées et la référence complète des paramètres, voir [Référence API et CLI](reference.md).
+Pour les commandes avancées et la référence complète des paramètres, voir [Référence API et CLI](../reference.md).
 
 ---
 

@@ -1,7 +1,7 @@
 """Garde-fou DOCS-GETTING-STARTED-CONSOLIDATE-001.
 
 Vérifie que la doc d'installation dispose d'un point d'entrée unique
-(docs/getting-started.md) qui oriente vers tous les modes d'installation
+(docs/guide/getting-started.md) qui oriente vers tous les modes d'installation
 et montre la commande de création de premier projet.
 
 Sans ce point d'entrée, le développeur doit deviner quel doc lire en
@@ -16,11 +16,11 @@ import pytest
 pytestmark = pytest.mark.meta
 
 
-GETTING_STARTED = Path("docs/getting-started.md")
+GETTING_STARTED = Path("docs/guide/getting-started.md")
 
 
 class TestGettingStartedExists:
-    """docs/getting-started.md existe comme point d'entrée."""
+    """docs/guide/getting-started.md existe comme point d'entrée."""
 
     def test_file_exists(self):
         assert GETTING_STARTED.exists(), (

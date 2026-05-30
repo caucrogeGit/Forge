@@ -326,11 +326,11 @@ class TestRoadmap:
 class TestLiensInternes:
     def test_lien_vers_bonjour_forge(self):
         text = _text()
-        assert "../bonjour-forge.md" in text
+        assert "../guide/bonjour-forge.md" in text
 
     def test_lien_vers_getting_started(self):
         text = _text()
-        assert "../getting-started.md" in text
+        assert "../guide/getting-started.md" in text
 
     def test_lien_vers_installation_mariadb(self):
         text = _text()

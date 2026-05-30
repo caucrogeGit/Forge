@@ -7,9 +7,9 @@ Verrouille la progression pédagogique officielle des starters Forge :
   des tickets futurs ;
 - `docs/starters/welcome/index.md` ne doit plus recommander
   directement le starter Contacts CRUD comme étape immédiate ;
-- `docs/bonjour-forge.md` doit afficher l'avertissement
+- `docs/guide/bonjour-forge.md` doit afficher l'avertissement
   « Ne sautez pas directement vers le CRUD Contacts » ;
-- `docs/getting-started.md` doit pointer vers la progression ;
+- `docs/guide/getting-started.md` doit pointer vers la progression ;
 - la roadmap mentionne `STARTER-ROADMAP-PROGRESSION-001` livré.
 
 Le ticket n'a pas créé les starters intermédiaires : les codes
@@ -29,8 +29,8 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 STARTER_WELCOME = PROJECT_ROOT / "docs" / "starters" / "welcome" / "index.md"
-BONJOUR_FORGE = PROJECT_ROOT / "docs" / "bonjour-forge.md"
-GETTING_STARTED = PROJECT_ROOT / "docs" / "getting-started.md"
+BONJOUR_FORGE = PROJECT_ROOT / "docs" / "guide" / "bonjour-forge.md"
+GETTING_STARTED = PROJECT_ROOT / "docs" / "guide" / "getting-started.md"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 
 
@@ -318,7 +318,7 @@ class TestWelcomeStarterRedirectsToProgression:
         )
 
 
-# ── docs/bonjour-forge.md : admonition d'avertissement ─────────────────────────
+# ── docs/guide/bonjour-forge.md : admonition d'avertissement ─────────────────────────
 
 
 class TestBonjourForgeWarning:
@@ -329,7 +329,7 @@ class TestBonjourForgeWarning:
 
     def test_warning_admonition_present(self):
         assert '!!! info "Ne sautez pas directement vers le CRUD Contacts"' in self.content, (
-            "docs/bonjour-forge.md doit afficher l'admonition "
+            "docs/guide/bonjour-forge.md doit afficher l'admonition "
             "« Ne sautez pas directement vers le CRUD Contacts »."
         )
 
@@ -347,7 +347,7 @@ class TestBonjourForgeWarning:
         )
 
 
-# ── docs/getting-started.md : bullet vers la progression ───────────────────────
+# ── docs/guide/getting-started.md : bullet vers la progression ───────────────────────
 
 
 class TestGettingStartedPointsToProgression:
@@ -355,7 +355,7 @@ class TestGettingStartedPointsToProgression:
     def test_progression_bullet_present(self):
         text = GETTING_STARTED.read_text(encoding="utf-8")
         assert "Progression officielle des starters" in text, (
-            "docs/getting-started.md doit pointer vers la progression "
+            "docs/guide/getting-started.md doit pointer vers la progression "
             "officielle dans son Étape 3 (« Continuer »)."
         )
         assert "starters/index.md#progression-recommandee" in text, (

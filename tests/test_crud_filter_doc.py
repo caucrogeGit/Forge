@@ -23,7 +23,7 @@ import pathlib
 
 REFERENCE = pathlib.Path("docs/reference/api.md")
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
-TUTORIAL = pathlib.Path("docs/app-complete-tutorial.md")
+TUTORIAL = pathlib.Path("docs/guide/app-complete-tutorial.md")
 
 
 def _ref():

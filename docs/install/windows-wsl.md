@@ -6,7 +6,7 @@ Guide complet d'installation de Forge sur un poste Windows 11 via
 **WSL2 + Ubuntu 24.04 + VS Code Remote WSL**. À la fin de cette page,
 l'utilisateur dispose d'un projet Forge fonctionnel, lancé par
 `forge run`, avec MariaDB opérationnel et le starter
-[Bonjour Forge](../bonjour-forge.md) répondant sur
+[Bonjour Forge](../guide/bonjour-forge.md) répondant sur
 `https://localhost:8000/welcome`.
 
 !!! tip "Public visé"
@@ -271,7 +271,7 @@ Détails complets : [Préparer MariaDB](mariadb.md).
     problèmes de permissions/Git/MariaDB liés au montage `/mnt/c`.
 
 Pour suivre la progression pédagogique de la documentation Forge,
-ce guide cible explicitement le starter [Bonjour Forge](../bonjour-forge.md).
+ce guide cible explicitement le starter [Bonjour Forge](../guide/bonjour-forge.md).
 Créer un nouveau projet avec ce starter pré-appliqué :
 
 ```bash
@@ -582,9 +582,9 @@ Si une route renvoie 404, vérifier que le starter `welcome` a bien
 
 | Étape suivante | Ressource |
 |---|---|
-| Comprendre le parcours Bonjour Forge | [Bonjour Forge](../bonjour-forge.md) |
-| Démarrer un vrai projet | [Démarrer avec Forge](../getting-started.md) |
-| Première application complète | [Application complète](../app-complete-tutorial.md) |
+| Comprendre le parcours Bonjour Forge | [Bonjour Forge](../guide/bonjour-forge.md) |
+| Démarrer un vrai projet | [Démarrer avec Forge](../guide/getting-started.md) |
+| Première application complète | [Application complète](../guide/app-complete-tutorial.md) |
 | Catalogue des starters | [Vue d'ensemble des starters](../starters/index.md) |
 | Référence HTTP | [Convention HTTP inspectable](../reference/http.md) |
 | Toutes les commandes CLI | [Commandes CLI](../reference/cli-commands.md) |

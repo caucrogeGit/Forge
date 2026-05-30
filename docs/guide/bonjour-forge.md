@@ -1,13 +1,13 @@
 # Bonjour Forge
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Premier contact avec Forge : du chemin le plus court entre une requête
 HTTP et une réponse texte. Sans base de données. Sans entité. Sans
 template Jinja2. Sans CRUD.
 
 Ce parcours suit l'ordre pédagogique du starter d'entrée
-[Bonjour Forge](starters/welcome/index.md) :
+[Bonjour Forge](../starters/welcome/index.md) :
 
 ```text
 forge run → route → contrôleur → Request → Response.text(...)
@@ -15,10 +15,10 @@ forge run → route → contrôleur → Request → Response.text(...)
 
 !!! tip "Forge n'est pas encore installé ?"
     Commencez par le parcours d'installation :
-    [VM Debian vierge](install/vm-debian.md),
-    [pipx](install/pipx.md),
-    [depuis GitHub](install/github.md),
-    [Windows + WSL (parcours complet)](install/windows-wsl.md).
+    [VM Debian vierge](../install/vm-debian.md),
+    [pipx](../install/pipx.md),
+    [depuis GitHub](../install/github.md),
+    [Windows + WSL (parcours complet)](../install/windows-wsl.md).
 
 ---
 
@@ -42,7 +42,7 @@ forge run --no-reload
 
 En production (`APP_ENV=prod`), `forge run` refuse de démarrer le
 serveur intégré et affiche la stratégie WSGI recommandée — voir
-[Déploiement WSGI minimal](wsgi-deployment.md).
+[Déploiement WSGI minimal](../wsgi-deployment.md).
 
 Une fois le serveur démarré, ouvrez `https://localhost:8000/welcome`
 dans votre navigateur.
@@ -92,7 +92,7 @@ Les annotations `request: Request -> Response` sont systématiques pour
 que Pylance/VS Code propose l'autocomplétion sur `request.param(...)`,
 `request.form(...)`, `request.json(...)`, `request.file(...)`,
 `request.route_param(...)` et `request.header(...)` sans import manuel.
-Voir [Convention HTTP inspectable](reference/http.md).
+Voir [Convention HTTP inspectable](../reference/http.md).
 
 ---
 
@@ -171,27 +171,27 @@ Une fois ce premier contact assimilé :
 
 | Étape | Ressource |
 |---|---|
-| **Progression officielle des starters** | [Progression recommandée](starters/index.md#progression-recommandee) |
+| **Progression officielle des starters** | [Progression recommandée](../starters/index.md#progression-recommandee) |
 | Démarrer un projet réel | [Démarrer avec Forge](getting-started.md) |
 | Parcours guidé avec MariaDB | [Guide de démarrage](guide.md) |
 | Première application complète | [Application complète](app-complete-tutorial.md) |
-| Catalogue des starters | [Vue d'ensemble des starters](starters/index.md) |
-| Détails du starter `welcome` | [Bonjour Forge — starter](starters/welcome/index.md) |
-| Référence HTTP complète | [Convention HTTP inspectable](reference/http.md) |
-| Toutes les commandes CLI | [Commandes CLI](reference/cli-commands.md) |
+| Catalogue des starters | [Vue d'ensemble des starters](../starters/index.md) |
+| Détails du starter `welcome` | [Bonjour Forge — starter](../starters/welcome/index.md) |
+| Référence HTTP complète | [Convention HTTP inspectable](../reference/http.md) |
+| Toutes les commandes CLI | [Commandes CLI](../reference/cli-commands.md) |
 
 !!! info "Ne sautez pas directement vers le CRUD Contacts"
     Le starter `Contacts CRUD` est l'**étape 9** d'une progression de
     neuf paliers. Plusieurs notions intermédiaires (vue Jinja2, route
     dynamique, formulaire POST, validation, SQL) méritent leurs propres
     starters — voir la
-    [progression recommandée](starters/index.md#progression-recommandee).
+    [progression recommandée](../starters/index.md#progression-recommandee).
 
 ---
 
 ## Voir aussi
 
-- [API Forge complète](reference/api.md)
-- [Roadmap Forge](roadmap/forge-roadmap.md) — tickets DX livrés depuis la phase beta 11
-- [Contrat de stabilité](stability-contract.md) — fichiers garantis préservés
-- [Release et compatibilité](release-and-compatibility.md) — versions supportées
+- [API Forge complète](../reference/api.md)
+- [Roadmap Forge](../roadmap/forge-roadmap.md) — tickets DX livrés depuis la phase beta 11
+- [Contrat de stabilité](../stability-contract.md) — fichiers garantis préservés
+- [Release et compatibilité](../release-and-compatibility.md) — versions supportées

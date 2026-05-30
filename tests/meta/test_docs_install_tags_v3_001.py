@@ -16,7 +16,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 INSTALL_GUIDES = [
-    PROJECT_ROOT / "docs" / "guide.md",
+    PROJECT_ROOT / "docs" / "guide" / "guide.md",
     PROJECT_ROOT / "docs" / "install" / "index.md",
     PROJECT_ROOT / "docs" / "install" / "github.md",
     PROJECT_ROOT / "docs" / "install" / "pipx.md",
@@ -82,5 +82,5 @@ class TestInstallGuidesMatchCurrentMajor:
                 return
         raise AssertionError(
             f"Aucun guide d'installation ne mentionne la majeure courante v{current}.x. "
-            f"Vérifier docs/guide.md, docs/install/github.md ou docs/profiles.md."
+            f"Vérifier docs/guide/guide.md, docs/install/github.md ou docs/profiles.md."
         )

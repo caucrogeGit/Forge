@@ -258,5 +258,5 @@ Détails complets dans [Contribuer à Forge](../contributing.md) (section
 - [Installation — vue d'ensemble](index.md)
 - [Installation avec pipx (utilisateur du framework)](pipx.md)
 - [Windows + WSL (parcours complet)](windows-wsl.md)
-- [Démarrer avec Forge](../getting-started.md)
+- [Démarrer avec Forge](../guide/getting-started.md)
 - [Roadmap Forge](../roadmap/forge-roadmap.md) — ticket `INSTALL-CORE-DEV-DOCS-AUDIT-001`

@@ -20,7 +20,7 @@ BASE_URL = "https://caucrogegit.github.io/Forge/"
 
 EXPECTED_DOC_PATHS = [
     # Core Forge (17 cartes)
-    "concepts",
+    "guide/concepts",
     "front",
     "migrations",
     "entity_architecture",

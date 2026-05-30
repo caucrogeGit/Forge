@@ -44,9 +44,9 @@ class TestInstallationWindowsDocExists:
 class TestWindowsDocReferenced:
 
     def test_getting_started_links_to_windows(self):
-        text = (PROJECT_ROOT / "docs" / "getting-started.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "guide" / "getting-started.md").read_text(encoding="utf-8")
         assert "install/windows.md" in text, (
-            "docs/getting-started.md doit lier vers install/windows.md."
+            "docs/guide/getting-started.md doit lier vers install/windows.md."
         )
 
     def test_landing_mentions_windows(self):

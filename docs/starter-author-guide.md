@@ -773,5 +773,5 @@ forge project:audit
 - [API et CLI](reference.md) — liste complète des commandes `forge starter:*`
 - [Créer un module](module-author-guide.md) — brique réutilisable installable dans un projet existant
 - [Vue d'ensemble des starters](starters/index.md) — starters officiels Forge
-- [Application complète](app-complete-tutorial.md) — exemple de build manuel
+- [Application complète](guide/app-complete-tutorial.md) — exemple de build manuel
 - [Relations entre entités](relations.md) — format `relations.json`

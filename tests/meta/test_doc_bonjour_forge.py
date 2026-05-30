@@ -1,7 +1,7 @@
 """Tests documentaires — DX-DOCS-BONJOUR-FORGE-CLOSE-001
 (adapté par STARTER-BONJOUR-FORGE-MINIMAL-001).
 
-Verrouille le contrat de la page d'entrée `docs/bonjour-forge.md` après
+Verrouille le contrat de la page d'entrée `docs/guide/bonjour-forge.md` après
 renommage de l'ancien tutoriel `docs/15-minutes.md` (clôture phase
 beta 11 DX) et alignement sur le starter `welcome` minimal :
 
@@ -20,7 +20,7 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-DOC = Path("docs/bonjour-forge.md")
+DOC = Path("docs/guide/bonjour-forge.md")
 OLD_DOC = Path("docs/15-minutes.md")
 MKDOCS = Path("mkdocs.yml")
 ROADMAP = Path("docs/roadmap/forge-roadmap.md")
@@ -38,12 +38,12 @@ def _text() -> str:
 class TestRename:
     def test_ancien_fichier_supprime(self):
         assert not OLD_DOC.exists(), (
-            "docs/15-minutes.md doit avoir été renommé en docs/bonjour-forge.md "
+            "docs/15-minutes.md doit avoir été renommé en docs/guide/bonjour-forge.md "
             "(DX-DOCS-BONJOUR-FORGE-CLOSE-001)."
         )
 
     def test_nouveau_fichier_existe(self):
-        assert DOC.exists(), "docs/bonjour-forge.md introuvable."
+        assert DOC.exists(), "docs/guide/bonjour-forge.md introuvable."
 
     def test_fichier_non_vide(self):
         assert len(_text()) > 500
@@ -148,12 +148,12 @@ class TestNoLegacyMentions:
         assert "15-minutes.md" not in text
 
     def test_getting_started_ne_pointe_plus_vers_15_minutes(self):
-        text = Path("docs/getting-started.md").read_text(encoding="utf-8")
+        text = Path("docs/guide/getting-started.md").read_text(encoding="utf-8")
         assert "15-minutes.md" not in text
         assert "Bonjour Forge" in text or "bonjour-forge.md" in text
 
     def test_app_complete_tutorial_pointe_vers_bonjour_forge(self):
-        text = Path("docs/app-complete-tutorial.md").read_text(encoding="utf-8")
+        text = Path("docs/guide/app-complete-tutorial.md").read_text(encoding="utf-8")
         assert "15-minutes.md" not in text
         assert "bonjour-forge.md" in text
 
