@@ -82,9 +82,10 @@ python -m pip install -r requirements-dev.txt
 2. installe les outils de développement (`pytest`, `build`,
    `setuptools`, `twine`, `mkdocs`, `mkdocs-material`,
    `pymdown-extensions`, `pip-audit`, `ruff`) ;
-3. installe les **5 modules opt-in** Forge en mode éditable depuis
+3. installe les **6 modules opt-in** Forge en mode éditable depuis
    le monorepo (`forge-mvc-mfa`, `forge-mvc-rbac`,
-   `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-media`).
+   `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-media`,
+   `forge-mvc-iot`).
 
 !!! note "Sans `requirements-dev.txt`, pytest casse"
     Environ 46 fichiers de tests importent les modules opt-in
@@ -199,7 +200,7 @@ Ce mode n'est **pas** utile pour :
 
 ## 7. Travailler sur les opt-ins (packages/)
 
-Les 5 modules opt-in vivent dans `packages/` :
+Les 6 modules opt-in vivent dans `packages/` :
 
 ```text
 packages/
@@ -207,7 +208,8 @@ packages/
 ├── forge-mvc-rbac/       Rôles et permissions
 ├── forge-mvc-workflow/   Statuts et transitions
 ├── forge-mvc-stats/      Agrégats statistiques
-└── forge-mvc-media/      Helpers applicatifs upload
+├── forge-mvc-media/      Helpers applicatifs upload
+└── forge-mvc-iot/        Réception/exposition de données IoT (MQTT)
 ```
 
 Chacun a son propre `pyproject.toml`. `requirements-dev.txt` les

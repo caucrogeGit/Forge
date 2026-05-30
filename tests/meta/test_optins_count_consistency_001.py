@@ -25,14 +25,18 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 CURRENT_STATE_DOCS = [
     "README.md",
     "CONTRIBUTING.md",
+    "CHARTE_DOC.md",
     "docs/install/index.md",
+    "docs/install/core-dev.md",
     "docs/release-policy.md",
 ]
 
 # Tournures qui figent un compte d'opt-ins périmé comme état courant.
 FORBIDDEN_COUNTS = [
     "4 modules opt-in",
+    "4 opt-in",
     "quatre modules opt-in",
+    "5 modules opt-in",
     "cinq opt-ins",
     "5 opt-ins officiels",
     "les cinq opt-ins",
