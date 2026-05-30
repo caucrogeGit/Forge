@@ -24,7 +24,6 @@ from forge_mvc_media.media_gallery import (
 )
 
 __all__ = [
-    "__version__",
     "attach_media_to_entity",
     "create_media_record",
     "delete_media",
