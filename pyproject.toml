@@ -50,7 +50,7 @@ Issues = "https://github.com/caucrogeGit/Forge/issues"
 # (OPTIN-PYPI-PUBLISH-PREPARE-001, OPTIN-PYPI-PUBLISH-001, VERSION-SYNC-OPTIN-EXTRAS-001).
 # forge-mvc-media, forge-mvc-mfa et forge-mvc-iot sont exclus de [all] :
 #   media = source-only après Phase 11
-#   mfa   = Pre-Alpha, SEC-MFA-SECRET-ENCRYPTION-001 requis avant publication
+#   mfa   = Alpha (SEC-MFA-SECRET-ENCRYPTION-001 livré) ; exclu de [all]
 #   iot   = Alpha + dépendance MQTT (paho-mqtt) ; s'installe directement
 #           (pip install forge-mvc-iot) ou via l'opt-in projet `forge optin:enable iot`.
 # Donc `forge-mvc[all]` ≠ « tous les modules publiés » : il cible le socle
