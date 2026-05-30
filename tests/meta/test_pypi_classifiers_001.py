@@ -66,13 +66,13 @@ class TestPypiClassifiers:
             raise AssertionError(
                 f"{len(offenders)} classifier(s) incohérent(s) :\n"
                 + "\n".join(f"  - {o}" for o in offenders)
-                + "\n\nVoir docs/release-policy.md section "
+                + "\n\nVoir docs/release/release-policy.md section "
                 + "« Stratégie de classification PyPI »."
             )
 
     def test_expected_classifiers_match_release_policy(self):
         """La table EXPECTED_CLASSIFIERS doit refléter release-policy.md."""
-        policy = (PROJECT_ROOT / "docs" / "release-policy.md").read_text(
+        policy = (PROJECT_ROOT / "docs" / "release" / "release-policy.md").read_text(
             encoding="utf-8"
         )
         for pkg_name, classifier in EXPECTED_CLASSIFIERS.items():

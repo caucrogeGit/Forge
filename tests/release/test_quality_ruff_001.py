@@ -34,8 +34,8 @@ def test_pyproject_ruff_line_length():
 
 
 def test_release_md_mentionne_ruff_check():
-    """docs/release.md mentionne ruff check dans la checklist."""
-    content = (ROOT / "docs" / "release.md").read_text(encoding="utf-8")
+    """docs/release/release.md mentionne ruff check dans la checklist."""
+    content = (ROOT / "docs" / "release" / "release.md").read_text(encoding="utf-8")
     assert "ruff check" in content
 
 

@@ -1,6 +1,6 @@
 """Tests documentaires — RELEASE-DEPRECATION-001.
 
-Vérifient que docs/deprecation-policy.md existe et couvre les sujets
+Vérifient que docs/release/deprecation-policy.md existe et couvre les sujets
 requis : cycle annonce→maintien→retrait, alternatives obligatoires,
 commandes CLI, API publique, exceptions de sécurité, changelog, MAJOR.
 """
@@ -13,7 +13,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-POLICY = ROOT / "docs" / "deprecation-policy.md"
+POLICY = ROOT / "docs" / "release" / "deprecation-policy.md"
 
 
 @pytest.fixture(scope="module")

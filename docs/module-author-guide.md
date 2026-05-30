@@ -514,5 +514,5 @@ forge project:audit
 
 - [API et CLI](reference.md) — liste complète des commandes `forge module:*`
 - [Application complète](guide/app-complete-tutorial.md) — exemple avec plusieurs entités
-- [Contrat de stabilité](stability-contract.md) — garanties sur les fichiers préservés
+- [Contrat de stabilité](release/stability-contract.md) — garanties sur les fichiers préservés
 - [Vue d'ensemble des starters](starters/index.md) — différence module / starter

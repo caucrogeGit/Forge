@@ -8,7 +8,7 @@ active et peut contenir des informations obsolètes par rapport à l'état coura
 framework. Pour le statut actuel, consulter :
 
 - [Roadmap courante](../../roadmap/forge-roadmap.md)
-- [Politique de dépréciation](../../deprecation-policy.md)
+- [Politique de dépréciation](../../release/deprecation-policy.md)
 - `CHANGELOG.md` à la racine du dépôt
 
 ## Catégories

@@ -217,7 +217,7 @@ installe **tous** en éditable, donc les modifications dans
 `packages/forge-mvc-*/` sont prises en compte sans réinstallation.
 
 Pour publier un opt-in sur PyPI, suivre la procédure release dédiée
-([release-policy.md](../release-policy.md)).
+([release-policy.md](../release/release-policy.md)).
 
 ---
 
@@ -248,7 +248,7 @@ Détails complets dans [Contribuer à Forge](../contributing.md) (section
 | Conventions de code et de tests | [Conventions de travail](../contributing/conventions.md) |
 | Charte philosophique du projet | [Charte v2](../charter.md) |
 | Décisions architecturales | [ADR](../adr/index.md) |
-| Procédure de release | [Politique de release](../release-policy.md) |
+| Procédure de release | [Politique de release](../release/release-policy.md) |
 | Tests E2E MariaDB | [Tests E2E](../reference/tests-e2e.md) |
 
 ---

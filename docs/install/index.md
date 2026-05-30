@@ -35,7 +35,7 @@ Deux parcours **distincts**, qui ne se mélangent pas :
 Depuis `1.0.0-beta.9`, Forge distribue le **core** et **tous les opt-ins officiels**
 sur [PyPI](https://pypi.org/project/forge-mvc/) (bêta publique — `--pre` requis).
 Les opt-ins restent optionnels : le core Forge ne dépend pas d'eux.
-Voir [Politique de release](../release-policy.md#publication-pypi).
+Voir [Politique de release](../release/release-policy.md#publication-pypi).
 
 | Package (monorepo) | Contenu | Statut |
 |---|---|---|

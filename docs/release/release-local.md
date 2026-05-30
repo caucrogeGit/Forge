@@ -1,6 +1,6 @@
 # Validation locale d'une wheel Forge
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Ce document est destiné au développeur du framework. Il décrit la procédure complète pour valider une wheel Forge avant publication.
 
@@ -445,7 +445,7 @@ Dans le navigateur, ouvrir `https://localhost:8000/welcome` et naviguer entre le
 
 ### Paramètres d'URL (sans BDD)
 
-Palier 2 de la [progression officielle des starters](starters/index.md#progression-recommandee). Aucune base de données — le starter s'applique par son identifiant public `query-params`.
+Palier 2 de la [progression officielle des starters](../starters/index.md#progression-recommandee). Aucune base de données — le starter s'applique par son identifiant public `query-params`.
 
 ```bash
 cd ~/Projets

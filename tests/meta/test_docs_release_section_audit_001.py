@@ -7,10 +7,10 @@ Vérifie que la documentation release est consolidée et cohérente :
 - chaque doc release est référencé dans mkdocs.yml
 
 Structure attendue (4 docs actifs, aucun docs/release/ séparé) :
-  docs/release.md                     — checklist process mainteneur
-  docs/release-local.md               — validation wheel locale
-  docs/release-policy.md              — politique SemVer Forge
-  docs/release-and-compatibility.md   — hub de la section
+  docs/release/release.md                     — checklist process mainteneur
+  docs/release/release-local.md               — validation wheel locale
+  docs/release/release-policy.md              — politique SemVer Forge
+  docs/release/release-and-compatibility.md   — hub de la section
 """
 from __future__ import annotations
 

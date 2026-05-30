@@ -80,12 +80,12 @@ class TestNoCmdImportsRemain:
 
 class TestDeprecationDocsClean:
     def test_deprecation_policy_no_longer_promotes_cmd(self):
-        path = ROOT / "docs" / "deprecation-policy.md"
+        path = ROOT / "docs" / "release" / "deprecation-policy.md"
         if not path.exists():
-            pytest.skip("docs/deprecation-policy.md absent")
+            pytest.skip("docs/release/deprecation-policy.md absent")
         content = path.read_text(encoding="utf-8")
         assert "cmd/ legacy" not in content.lower(), (
-            "docs/deprecation-policy.md mentionne encore cmd/ comme legacy actif"
+            "docs/release/deprecation-policy.md mentionne encore cmd/ comme legacy actif"
         )
 
     def test_reference_doc_does_not_promote_cmd(self):

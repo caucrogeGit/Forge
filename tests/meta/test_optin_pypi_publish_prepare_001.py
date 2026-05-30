@@ -22,7 +22,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
-RELEASE_POLICY = PROJECT_ROOT / "docs" / "release-policy.md"
+RELEASE_POLICY = PROJECT_ROOT / "docs" / "release" / "release-policy.md"
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 
 _PUBLISHABLE = [

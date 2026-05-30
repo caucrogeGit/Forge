@@ -1,6 +1,6 @@
 """Garde-fou STABILITY-CONTRACT-3.0-REFRESH-001.
 
-Vérifie que docs/stability-contract.md reflète la série 1.x (série publique actuelle) :
+Vérifie que docs/release/stability-contract.md reflète la série 1.x (série publique actuelle) :
 - Titre et sections principales mentionnent Forge 1.x (pas 3.x ni 2.x)
 - Aucune mention active de "Forge 2.x" ou "Forge 3.x" ne reste dans le contenu courant
 - Le doc mentionne les modules opt-in et le mécanisme plugin
@@ -19,7 +19,7 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-STABILITY_DOC = PROJECT_ROOT / "docs" / "stability-contract.md"
+STABILITY_DOC = PROJECT_ROOT / "docs" / "release" / "stability-contract.md"
 
 
 class TestTitleAndIntro:

@@ -37,37 +37,37 @@ class TestGitignoreBuildArtifacts:
 
 
 class TestReleasePolicyPackagingLock:
-    """docs/release-policy.md documente explicitement le verrouillage packaging."""
+    """docs/release/release-policy.md documente explicitement le verrouillage packaging."""
 
     def _policy(self) -> str:
-        doc = PROJECT_ROOT / "docs" / "release-policy.md"
+        doc = PROJECT_ROOT / "docs" / "release" / "release-policy.md"
         if not doc.exists():
-            pytest.skip("docs/release-policy.md n'existe pas")
+            pytest.skip("docs/release/release-policy.md n'existe pas")
         return doc.read_text(encoding="utf-8")
 
     def test_section_verrouillage_presente(self):
         assert "Verrouillage packaging" in self._policy(), (
-            "docs/release-policy.md doit contenir une section 'Verrouillage packaging' "
+            "docs/release/release-policy.md doit contenir une section 'Verrouillage packaging' "
             "(PACKAGE-LOCK-DOC-001)"
         )
 
     def test_twine_check_documente_comme_validation_locale(self):
         text = self._policy()
         assert "twine check" in text, (
-            "docs/release-policy.md doit documenter 'twine check' "
+            "docs/release/release-policy.md doit documenter 'twine check' "
             "comme validation locale (PACKAGE-LOCK-DOC-001)"
         )
 
     def test_publication_releve_dun_ticket_dedie(self):
         text = self._policy()
         assert "ticket" in text and "publication" in text.lower(), (
-            "docs/release-policy.md doit indiquer que la publication PyPI "
+            "docs/release/release-policy.md doit indiquer que la publication PyPI "
             "relève d'un ticket dédié (PACKAGE-LOCK-DOC-001)"
         )
 
     def test_mfa_non_publie_documente(self):
         text = self._policy()
         assert "forge-mvc-mfa" in text, (
-            "docs/release-policy.md doit mentionner forge-mvc-mfa "
+            "docs/release/release-policy.md doit mentionner forge-mvc-mfa "
             "et son statut de non-publication PyPI en 1.0"
         )

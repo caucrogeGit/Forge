@@ -36,7 +36,7 @@ Documente les versions officiellement supportées :
 - OS et dépendances runtime et dev ;
 - tests opt-in MariaDB (`FORGE_E2E_MARIADB=1`).
 
-### [Guide de migration](migration-guide.md)
+### [Guide de migration](../migration-guide.md)
 
 Explique comment passer d'une version Forge à une autre :
 
@@ -76,8 +76,8 @@ Ces documents concernent les mainteneurs de Forge :
 
 ## Voir aussi
 
-- [Guide de déploiement](deployment/deployment.md) — déployer un projet Forge
-- [Sécurité en production](deployment/production-security.md) — checklist sécurité 30 points
+- [Guide de déploiement](../deployment/deployment.md) — déployer un projet Forge
+- [Sécurité en production](../deployment/production-security.md) — checklist sécurité 30 points
 - [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
 
 ---

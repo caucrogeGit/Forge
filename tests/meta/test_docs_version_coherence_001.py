@@ -21,12 +21,12 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 # Documents publics actifs susceptibles de contenir des références trompeuses.
 # Ne pas inclure docs/history/, CHANGELOG.md, ni docs/adr/.
 PUBLIC_DOCS = [
-    PROJECT_ROOT / "docs" / "stability-contract.md",
-    PROJECT_ROOT / "docs" / "release-policy.md",
+    PROJECT_ROOT / "docs" / "release" / "stability-contract.md",
+    PROJECT_ROOT / "docs" / "release" / "release-policy.md",
     PROJECT_ROOT / "docs" / "auth.md",
     PROJECT_ROOT / "docs" / "deployment" / "deployment.md",
-    PROJECT_ROOT / "docs" / "deprecation-policy.md",
-    PROJECT_ROOT / "docs" / "lts-policy.md",
+    PROJECT_ROOT / "docs" / "release" / "deprecation-policy.md",
+    PROJECT_ROOT / "docs" / "release" / "lts-policy.md",
 ]
 
 # Patterns interdits : version 3.x présentée comme trajectoire actuelle ou future
@@ -64,16 +64,16 @@ class TestStabilityContractIsFor1x:
     """Le contrat de stabilité décrit la série 1.x, pas 3.x."""
 
     def test_title_mentions_1x(self):
-        doc = PROJECT_ROOT / "docs" / "stability-contract.md"
+        doc = PROJECT_ROOT / "docs" / "release" / "stability-contract.md"
         if not doc.exists():
             pytest.skip("stability-contract.md n'existe pas")
         text = doc.read_text(encoding="utf-8")
         assert "Forge 1.x" in text, (
-            "docs/stability-contract.md doit mentionner 'Forge 1.x' comme série courante."
+            "docs/release/stability-contract.md doit mentionner 'Forge 1.x' comme série courante."
         )
 
     def test_title_not_3x(self):
-        doc = PROJECT_ROOT / "docs" / "stability-contract.md"
+        doc = PROJECT_ROOT / "docs" / "release" / "stability-contract.md"
         if not doc.exists():
             pytest.skip("stability-contract.md n'existe pas")
         first_line = doc.read_text(encoding="utf-8").splitlines()[0]
@@ -86,12 +86,12 @@ class TestReleasePolicyOptInVersions:
     """La release-policy référence la trajectoire 1.0.0-beta.5 pour les opt-ins."""
 
     def test_optin_publication_references_beta5(self):
-        doc = PROJECT_ROOT / "docs" / "release-policy.md"
+        doc = PROJECT_ROOT / "docs" / "release" / "release-policy.md"
         if not doc.exists():
             pytest.skip("release-policy.md n'existe pas")
         text = doc.read_text(encoding="utf-8")
         assert "1.0.0-beta.5" in text, (
-            "docs/release-policy.md doit mentionner '1.0.0-beta.5' "
+            "docs/release/release-policy.md doit mentionner '1.0.0-beta.5' "
             "comme cible de publication coordonnée des opt-ins."
         )
 

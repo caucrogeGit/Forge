@@ -8,7 +8,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROOT = Path(__file__).resolve().parents[2]
-CONTRACT = ROOT / "docs" / "stability-contract.md"
+CONTRACT = ROOT / "docs" / "release" / "stability-contract.md"
 ROADMAP = ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 MKDOCS = ROOT / "mkdocs.yml"
 REFERENCE = ROOT / "docs" / "reference.md"

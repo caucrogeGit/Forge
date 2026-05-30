@@ -1,6 +1,6 @@
 """Tests documentaires — RELEASE-POLICY-001.
 
-Vérifient que docs/release-policy.md existe et couvre les sujets
+Vérifient que docs/release/release-policy.md existe et couvre les sujets
 requis : schéma MAJOR.MINOR.PATCH, règles de tag, validation obligatoire,
 build wheel, publication GitHub/PyPI, changelog, roadmap, limites restantes.
 """
@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-POLICY = ROOT / "docs" / "release-policy.md"
+POLICY = ROOT / "docs" / "release" / "release-policy.md"
 
 
 @pytest.fixture(scope="module")

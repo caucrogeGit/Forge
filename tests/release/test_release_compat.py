@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-DOC = Path("docs/compatibility.md")
+DOC = Path("docs/release/compatibility.md")
 
 
 def _text():
@@ -16,7 +16,7 @@ def _text():
 
 class TestExistence:
     def test_fichier_existe(self):
-        assert DOC.exists(), "docs/compatibility.md introuvable"
+        assert DOC.exists(), "docs/release/compatibility.md introuvable"
 
     def test_fichier_non_vide(self):
         assert len(_text()) > 500

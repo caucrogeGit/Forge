@@ -44,25 +44,25 @@ class TestPagesExistent:
         assert Path("docs/deployment/production-security.md").exists()
 
     def test_stability_contract_existe(self):
-        assert Path("docs/stability-contract.md").exists()
+        assert Path("docs/release/stability-contract.md").exists()
 
     def test_release_policy_existe(self):
-        assert Path("docs/release-policy.md").exists()
+        assert Path("docs/release/release-policy.md").exists()
 
     def test_deprecation_policy_existe(self):
-        assert Path("docs/deprecation-policy.md").exists()
+        assert Path("docs/release/deprecation-policy.md").exists()
 
     def test_compatibility_existe(self):
-        assert Path("docs/compatibility.md").exists()
+        assert Path("docs/release/compatibility.md").exists()
 
     def test_migration_guide_existe(self):
         assert Path("docs/migration-guide.md").exists()
 
     def test_lts_policy_existe(self):
-        assert Path("docs/lts-policy.md").exists()
+        assert Path("docs/release/lts-policy.md").exists()
 
     def test_release_and_compatibility_existe(self):
-        assert Path("docs/release-and-compatibility.md").exists()
+        assert Path("docs/release/release-and-compatibility.md").exists()
 
     def test_starters_index_existe(self):
         assert Path("docs/starters/index.md").exists()
@@ -156,30 +156,30 @@ class TestSecuriteNavigation:
 
 class TestReleaseAndCompatibilityPage:
     def test_page_existe(self):
-        assert Path("docs/release-and-compatibility.md").exists()
+        assert Path("docs/release/release-and-compatibility.md").exists()
 
     def test_lien_release_policy(self):
-        text = Path("docs/release-and-compatibility.md").read_text(encoding="utf-8")
+        text = Path("docs/release/release-and-compatibility.md").read_text(encoding="utf-8")
         assert "release-policy.md" in text or "Politique de release" in text
 
     def test_lien_deprecation_policy(self):
-        text = Path("docs/release-and-compatibility.md").read_text(encoding="utf-8")
+        text = Path("docs/release/release-and-compatibility.md").read_text(encoding="utf-8")
         assert "deprecation-policy.md" in text or "Politique de dépréciation" in text
 
     def test_lien_compatibility(self):
-        text = Path("docs/release-and-compatibility.md").read_text(encoding="utf-8")
+        text = Path("docs/release/release-and-compatibility.md").read_text(encoding="utf-8")
         assert "compatibility.md" in text or "Matrice de compatibilité" in text
 
     def test_lien_migration_guide(self):
-        text = Path("docs/release-and-compatibility.md").read_text(encoding="utf-8")
+        text = Path("docs/release/release-and-compatibility.md").read_text(encoding="utf-8")
         assert "migration-guide.md" in text or "Guide de migration" in text
 
     def test_lien_lts_policy(self):
-        text = Path("docs/release-and-compatibility.md").read_text(encoding="utf-8")
+        text = Path("docs/release/release-and-compatibility.md").read_text(encoding="utf-8")
         assert "lts-policy.md" in text or "Politique LTS" in text
 
     def test_lien_stability_contract(self):
-        text = Path("docs/release-and-compatibility.md").read_text(encoding="utf-8")
+        text = Path("docs/release/release-and-compatibility.md").read_text(encoding="utf-8")
         assert "stability-contract.md" in text or "Contrat de stabilité" in text
 
 
@@ -190,11 +190,11 @@ class TestReleaseAndCompatibilityPage:
 
 class TestLiensCroisesRelease:
     def test_release_policy_lien_vers_deprecation(self):
-        text = Path("docs/release-policy.md").read_text(encoding="utf-8")
+        text = Path("docs/release/release-policy.md").read_text(encoding="utf-8")
         assert "deprecation-policy.md" in text or "dépréciation" in text.lower()
 
     def test_deprecation_policy_lien_vers_release(self):
-        text = Path("docs/deprecation-policy.md").read_text(encoding="utf-8")
+        text = Path("docs/release/deprecation-policy.md").read_text(encoding="utf-8")
         assert "release-policy.md" in text or "politique de release" in text.lower()
 
     def test_migration_guide_lien_vers_compatibility(self):
@@ -202,7 +202,7 @@ class TestLiensCroisesRelease:
         assert "compatibility.md" in text or "compatibilité" in text.lower()
 
     def test_lts_policy_lien_vers_stability(self):
-        text = Path("docs/lts-policy.md").read_text(encoding="utf-8")
+        text = Path("docs/release/lts-policy.md").read_text(encoding="utf-8")
         assert "stability-contract.md" in text or "contrat de stabilité" in text.lower()
 
 

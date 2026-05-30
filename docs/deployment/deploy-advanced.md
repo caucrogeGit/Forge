@@ -470,7 +470,7 @@ sudo journalctl -u forge-app -n 20
 
 !!! warning "Avant de passer à une version majeure"
     Consultez le [Guide de migration](../migration-guide.md) et la
-    [Matrice de compatibilité](../compatibility.md) avant toute mise à jour majeure.
+    [Matrice de compatibilité](../release/compatibility.md) avant toute mise à jour majeure.
 
 ---
 
@@ -595,5 +595,5 @@ dossier n'a pas les permissions correctes.
 - [Déploiement](deployment.md) — `forge deploy:init`, `forge deploy:check`, fichiers générés
 - [Sécurité en production](production-security.md) — checklist sécurité complète
 - [Guide de migration](../migration-guide.md) — cycle de mise à jour entre versions
-- [Matrice de compatibilité](../compatibility.md) — Python, MariaDB, dépendances
-- [Contrat de stabilité](../stability-contract.md) — fichiers garantis préservés
+- [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, dépendances
+- [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés

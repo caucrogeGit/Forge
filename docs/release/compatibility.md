@@ -295,9 +295,9 @@ pip-audit
 ## Voir aussi
 
 - [Vue d'ensemble Release et compatibilité](release-and-compatibility.md)
-- [Guide de migration](migration-guide.md) — vérifier la compatibilité avant de migrer
+- [Guide de migration](../migration-guide.md) — vérifier la compatibilité avant de migrer
 - [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Sécurité en production](deployment/production-security.md) — checklist de déploiement
+- [Sécurité en production](../deployment/production-security.md) — checklist de déploiement
 
 ---
 

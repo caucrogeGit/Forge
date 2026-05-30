@@ -6,15 +6,15 @@ devrait apparaître.
 
 Frictions corrigées par T7 :
 - F6 : app.py docstring 'Forge 2.0.1'
-- F5 : docs/release-local.md 'Forge 2.0.0' (lignes 50 et 351)
+- F5 : docs/release/release-local.md 'Forge 2.0.0' (lignes 50 et 351)
 - F4 : guide.md, install/github.md, profiles.md 'v3.0.0'
 
 Les fichiers HISTORIQUES sont explicitement exclus du check large :
 - docs/history/, docs/audits/, docs/adr/ — archives
 - docs/roadmap/ — planification historique
 - docs/reference/ — notes d'extraction depuis Forge 2.x
-- docs/deprecation-policy.md, docs/auth.md, docs/migration-guide.md,
-  docs/lts-policy.md, docs/release-policy.md — documentent intentionnellement
+- docs/release/deprecation-policy.md, docs/auth.md, docs/migration-guide.md,
+  docs/release/lts-policy.md, docs/release/release-policy.md — documentent intentionnellement
   les versions 2.x ou montrent des exemples de tags historiques
 - CHANGELOG.md, tests/ — historique ou tests de conformité historique
 """
@@ -40,11 +40,11 @@ EXCLUDED_PATHS = [
     "docs/adr",
     "docs/roadmap",
     "docs/reference",
-    "docs/deprecation-policy.md",
+    "docs/release/deprecation-policy.md",
     "docs/auth.md",
     "docs/migration-guide.md",
-    "docs/lts-policy.md",
-    "docs/release-policy.md",
+    "docs/release/lts-policy.md",
+    "docs/release/release-policy.md",
     "CHANGELOG.md",
     "CLAUDE.md",        # note de mise à jour historique "Forge 2.10.0"
     "tests",
@@ -96,10 +96,10 @@ class TestNoStaleForgeVersionInActiveDocs:
         )
 
     def test_no_forge_2_x_in_release_local(self):
-        text = (PROJECT_ROOT / "docs" / "release-local.md").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "release" / "release-local.md").read_text(encoding="utf-8")
         match = STALE_FORGE_VERSION_PATTERN.search(text)
         assert not match, (
-            f"docs/release-local.md contient une mention obsolète : "
+            f"docs/release/release-local.md contient une mention obsolète : "
             f"'{match.group()}'. À remplacer par 'Forge 3.0.1' (T7 — F5)."
         )
 

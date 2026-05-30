@@ -151,13 +151,13 @@ nav:
       - Sécurité en production: deployment/production-security.md
 
   - Release et compatibilité:
-      - Vue d'ensemble: release-and-compatibility.md
-      - Politique de release: release-policy.md
-      - Politique de dépréciation: deprecation-policy.md
-      - Matrice de compatibilité: compatibility.md
+      - Vue d'ensemble: release/release-and-compatibility.md
+      - Politique de release: release/release-policy.md
+      - Politique de dépréciation: release/deprecation-policy.md
+      - Matrice de compatibilité: release/compatibility.md
       - Guide de migration: migration-guide.md
-      - Politique LTS: lts-policy.md
-      - Contrat de stabilité: stability-contract.md
+      - Politique LTS: release/lts-policy.md
+      - Contrat de stabilité: release/stability-contract.md
 
   - Philosophie:
       - Charte v2: charter.md
@@ -225,8 +225,8 @@ nav:
           - Archives post-2.0 (consolidation): history/forge_post_2_0_consolidation_roadmap.md
           - Archives post-2.0 (tickets): history/forge-roadmap-post-2.0.md
           - Archives UX (phases 5-10): history/forge-roadmap-ux.md
-      - Procédure de release: release.md
-      - Validation locale: release-local.md
+      - Procédure de release: release/release.md
+      - Validation locale: release/release-local.md
       - Paramètres GitHub du dépôt: project/github-repository-settings.md
       - Pour contribuer:
           - Vue d'ensemble: contributing.md

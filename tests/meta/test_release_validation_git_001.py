@@ -5,7 +5,7 @@ Vérifie :
 - storage/logs/ est couvert par .gitignore ;
 - aucun fichier aberrant du type '=X.Y.Z' n'existe à la racine ;
 - le script référence les 3 fichiers de version canoniques ;
-- docs/release-policy.md référence tools/release-validate.sh.
+- docs/release/release-policy.md référence tools/release-validate.sh.
 """
 from __future__ import annotations
 
@@ -86,7 +86,7 @@ class TestNoArtifactFilesAtRoot:
 class TestReleasePolicyDocumentsScript:
 
     def test_release_policy_references_script(self):
-        text = (PROJECT_ROOT / "docs" / "release-policy.md").read_text()
+        text = (PROJECT_ROOT / "docs" / "release" / "release-policy.md").read_text()
         assert "tools/release-validate.sh" in text, (
-            "docs/release-policy.md doit référencer tools/release-validate.sh"
+            "docs/release/release-policy.md doit référencer tools/release-validate.sh"
         )

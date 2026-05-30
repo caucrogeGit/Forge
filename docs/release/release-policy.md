@@ -496,7 +496,7 @@ La publication est strictement synchronisée : core et opt-ins portent la même 
 - `FORGE_MFA_SECRET_KEY` obligatoire au démarrage.
 
 Le passage **Alpha → Beta** reste un ticket futur, indépendant de la publication
-PyPI déjà effectuée. Voir [reference/auth-mfa.md](reference/auth-mfa.md#exigences-avant-production-ready) pour la checklist.
+PyPI déjà effectuée. Voir [reference/auth-mfa.md](../reference/auth-mfa.md#exigences-avant-production-ready) pour la checklist.
 
 ### Extras PyPI
 
@@ -602,7 +602,7 @@ Règles :
 - [Vue d'ensemble Release et compatibilité](release-and-compatibility.md)
 - [Politique de dépréciation](deprecation-policy.md) — cycle annonce → retrait
 - [Matrice de compatibilité](compatibility.md) — Python, MariaDB, Node.js
-- [Guide de migration](migration-guide.md) — passer d'une version à l'autre
+- [Guide de migration](../migration-guide.md) — passer d'une version à l'autre
 - [Contrat de stabilité](stability-contract.md) — API publique, interne, expérimentale
 
 ---

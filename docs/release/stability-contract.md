@@ -2,7 +2,7 @@
 
 > **Note** : Ce document a été écrit pendant la série interne 3.x, renommée `1.x` lors de la publication PyPI. Les références à « Forge 3.x » ont été mises à jour pour refléter la série publique `1.x`.
 
-[Accueil](index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Ce document définit ce que Forge considère comme stable, interne, expérimental ou garanti pour les projets construits sur Forge 1.x.
 

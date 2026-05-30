@@ -14,7 +14,7 @@ Ce meta-test verrouille :
   1. `tools/release-validate.sh` contient un audit Python (`pip-audit`) ;
   2. il contient un audit Node (`npm audit`) ;
   3. ces commandes ne sont jamais neutralisées par `|| true` ;
-  4. la documentation `docs/release-policy.md` énonce la politique ;
+  4. la documentation `docs/release/release-policy.md` énonce la politique ;
   5. le workflow `dependency-audit.yml` reste explicitement annoté comme
      informatif (la présence de `continue-on-error: true` doit s'accompagner
      d'un commentaire indiquant que ce workflow n'est PAS le garde release.
@@ -30,7 +30,7 @@ pytestmark = pytest.mark.meta
 
 _ROOT = Path(__file__).resolve().parents[2]
 _RELEASE_SCRIPT = _ROOT / "tools" / "release-validate.sh"
-_RELEASE_POLICY = _ROOT / "docs" / "release-policy.md"
+_RELEASE_POLICY = _ROOT / "docs" / "release" / "release-policy.md"
 _AUDIT_WORKFLOW = _ROOT / ".github" / "workflows" / "dependency-audit.yml"
 
 
@@ -205,14 +205,14 @@ class TestReleasePolicyDocumentsTheRule:
     def test_release_policy_mentions_pip_audit(self):
         text = _RELEASE_POLICY.read_text(encoding="utf-8")
         assert "pip-audit" in text, (
-            "docs/release-policy.md doit mentionner `pip-audit` dans la "
+            "docs/release/release-policy.md doit mentionner `pip-audit` dans la "
             "section audits dépendances."
         )
 
     def test_release_policy_mentions_npm_audit(self):
         text = _RELEASE_POLICY.read_text(encoding="utf-8")
         assert "npm audit" in text, (
-            "docs/release-policy.md doit mentionner `npm audit`."
+            "docs/release/release-policy.md doit mentionner `npm audit`."
         )
 
     def test_release_policy_states_blocking_in_release(self):
@@ -220,6 +220,6 @@ class TestReleasePolicyDocumentsTheRule:
         en release (et seulement à ce moment-là)."""
         text = _RELEASE_POLICY.read_text(encoding="utf-8").lower()
         assert "bloquant" in text, (
-            "docs/release-policy.md doit qualifier explicitement les audits "
+            "docs/release/release-policy.md doit qualifier explicitement les audits "
             "release de « bloquants »."
         )

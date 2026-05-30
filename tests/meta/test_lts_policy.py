@@ -5,7 +5,7 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-DOC = Path("docs/lts-policy.md")
+DOC = Path("docs/release/lts-policy.md")
 MKDOCS = Path("mkdocs.yml")
 ROADMAP = Path("docs/roadmap/forge-roadmap.md")
 
@@ -21,7 +21,7 @@ def _text():
 
 class TestExistence:
     def test_fichier_existe(self):
-        assert DOC.exists(), "docs/lts-policy.md introuvable"
+        assert DOC.exists(), "docs/release/lts-policy.md introuvable"
 
     def test_fichier_non_vide(self):
         assert len(_text()) > 500

@@ -8,43 +8,43 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_release_md_existe():
-    """docs/release.md existe."""
-    assert (ROOT / "docs" / "release.md").exists()
+    """docs/release/release.md existe."""
+    assert (ROOT / "docs" / "release" / "release.md").exists()
 
 
 def test_release_md_mentionne_pytest():
-    """docs/release.md documente pytest."""
-    content = (ROOT / "docs" / "release.md").read_text(encoding="utf-8")
+    """docs/release/release.md documente pytest."""
+    content = (ROOT / "docs" / "release" / "release.md").read_text(encoding="utf-8")
     assert "pytest" in content
 
 
 def test_release_md_mentionne_mkdocs_strict():
-    """docs/release.md documente mkdocs build --strict."""
-    content = (ROOT / "docs" / "release.md").read_text(encoding="utf-8")
+    """docs/release/release.md documente mkdocs build --strict."""
+    content = (ROOT / "docs" / "release" / "release.md").read_text(encoding="utf-8")
     assert "mkdocs build --strict" in content
 
 
 def test_release_md_mentionne_python_m_build():
-    """docs/release.md documente python -m build."""
-    content = (ROOT / "docs" / "release.md").read_text(encoding="utf-8")
+    """docs/release/release.md documente python -m build."""
+    content = (ROOT / "docs" / "release" / "release.md").read_text(encoding="utf-8")
     assert "python -m build" in content
 
 
 def test_release_md_mentionne_git_tag():
-    """docs/release.md documente la création du tag."""
-    content = (ROOT / "docs" / "release.md").read_text(encoding="utf-8")
+    """docs/release/release.md documente la création du tag."""
+    content = (ROOT / "docs" / "release" / "release.md").read_text(encoding="utf-8")
     assert "git tag" in content
 
 
 def test_release_md_mentionne_git_push():
-    """docs/release.md documente git push."""
-    content = (ROOT / "docs" / "release.md").read_text(encoding="utf-8")
+    """docs/release/release.md documente git push."""
+    content = (ROOT / "docs" / "release" / "release.md").read_text(encoding="utf-8")
     assert "git push" in content
 
 
 def test_release_md_mentionne_changelog():
-    """docs/release.md documente CHANGELOG.md."""
-    content = (ROOT / "docs" / "release.md").read_text(encoding="utf-8")
+    """docs/release/release.md documente CHANGELOG.md."""
+    content = (ROOT / "docs" / "release" / "release.md").read_text(encoding="utf-8")
     assert "CHANGELOG" in content
 
 

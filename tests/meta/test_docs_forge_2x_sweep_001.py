@@ -35,10 +35,10 @@ EXCLUDED_PATHS = [
     "docs/audits",
     "docs/adr",
     "docs/roadmap",
-    "docs/deprecation-policy.md",
-    "docs/lts-policy.md",
+    "docs/release/deprecation-policy.md",
+    "docs/release/lts-policy.md",
     "docs/migration-guide.md",
-    "docs/release-policy.md",
+    "docs/release/release-policy.md",
 ]
 
 ACTIVE_FORGE_2X_PATTERNS = [

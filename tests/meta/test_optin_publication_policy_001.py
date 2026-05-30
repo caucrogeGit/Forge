@@ -1,7 +1,7 @@
 """Garde-fou OPTIN-PACKAGES-PUBLICATION-POLICY-001.
 
 Vérifie que la politique officielle de publication des packages opt-in est
-documentée dans docs/release-policy.md avec toutes les sections requises.
+documentée dans docs/release/release-policy.md avec toutes les sections requises.
 
 Règles vérifiées :
 - La section "Politique de publication des opt-ins" existe.
@@ -22,7 +22,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-RELEASE_POLICY = PROJECT_ROOT / "docs" / "release-policy.md"
+RELEASE_POLICY = PROJECT_ROOT / "docs" / "release" / "release-policy.md"
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 
 
@@ -32,7 +32,7 @@ class TestPolicySectionExists:
     def test_section_header_present(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "Politique de publication des opt-ins" in text, (
-            "docs/release-policy.md doit contenir une section "
+            "docs/release/release-policy.md doit contenir une section "
             "'Politique de publication des opt-ins'."
         )
 
@@ -58,7 +58,7 @@ class TestPolicySectionExists:
     def test_tickets_lies_present(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "OPTIN-PACKAGES-PUBLICATION-POLICY-001" in text, (
-            "docs/release-policy.md doit référencer OPTIN-PACKAGES-PUBLICATION-POLICY-001 "
+            "docs/release/release-policy.md doit référencer OPTIN-PACKAGES-PUBLICATION-POLICY-001 "
             "comme ticket livré."
         )
 
@@ -69,14 +69,14 @@ class TestBetaMilestonesReferenced:
     def test_beta4_referenced(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "beta.4" in text or "beta-4" in text or "beta.4" in text, (
-            "docs/release-policy.md doit référencer le jalon beta.4 "
+            "docs/release/release-policy.md doit référencer le jalon beta.4 "
             "(limite où seul le core est publié)."
         )
 
     def test_beta5_referenced(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "beta.5" in text or "beta-5" in text, (
-            "docs/release-policy.md doit référencer le jalon beta.5 "
+            "docs/release/release-policy.md doit référencer le jalon beta.5 "
             "(publication coordonnée des opt-ins)."
         )
 
@@ -87,14 +87,14 @@ class TestPublicationCoordonnee:
     def test_publication_coordonnee_used(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "publication coordonnée" in text, (
-            "docs/release-policy.md doit utiliser le terme "
+            "docs/release/release-policy.md doit utiliser le terme "
             "'publication coordonnée' (pas 'publication atomique')."
         )
 
     def test_publication_atomique_absent(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "publication atomique" not in text, (
-            "docs/release-policy.md ne doit pas utiliser 'publication atomique' — "
+            "docs/release/release-policy.md ne doit pas utiliser 'publication atomique' — "
             "le terme officiel est 'publication coordonnée'."
         )
 
@@ -105,21 +105,21 @@ class TestOptinsPubliablesListed:
     def test_rbac_listed(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "forge-mvc-rbac" in text, (
-            "docs/release-policy.md doit lister forge-mvc-rbac comme opt-in "
+            "docs/release/release-policy.md doit lister forge-mvc-rbac comme opt-in "
             "publiable à beta.5."
         )
 
     def test_workflow_listed(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "forge-mvc-workflow" in text, (
-            "docs/release-policy.md doit lister forge-mvc-workflow comme opt-in "
+            "docs/release/release-policy.md doit lister forge-mvc-workflow comme opt-in "
             "publiable à beta.5."
         )
 
     def test_stats_listed(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "forge-mvc-stats" in text, (
-            "docs/release-policy.md doit lister forge-mvc-stats comme opt-in "
+            "docs/release/release-policy.md doit lister forge-mvc-stats comme opt-in "
             "publiable à beta.5."
         )
 
@@ -138,14 +138,14 @@ class TestMfaNonPublieSerie1:
                 or "n'est pas publié" in text
             )
         ), (
-            "docs/release-policy.md doit expliciter que forge-mvc-mfa n'est "
+            "docs/release/release-policy.md doit expliciter que forge-mvc-mfa n'est "
             "pas publié sur PyPI en série 1.0."
         )
 
     def test_sec_mfa_encryption_referenced(self):
         text = RELEASE_POLICY.read_text(encoding="utf-8")
         assert "SEC-MFA-SECRET-ENCRYPTION-001" in text, (
-            "docs/release-policy.md doit référencer SEC-MFA-SECRET-ENCRYPTION-001 "
+            "docs/release/release-policy.md doit référencer SEC-MFA-SECRET-ENCRYPTION-001 "
             "comme prérequis à la publication de forge-mvc-mfa."
         )
 
@@ -186,6 +186,6 @@ class TestNoActiveMfaInstallClaim:
             if "pip install forge-mvc[mfa]" in line and not line.strip().startswith("#"):
                 raise AssertionError(
                     f"Affirmation active 'pip install forge-mvc[mfa]' détectée "
-                    f"(ligne {i}) dans docs/release-policy.md : {line.strip()!r}. "
+                    f"(ligne {i}) dans docs/release/release-policy.md : {line.strip()!r}. "
                     f"forge-mvc[mfa] n'est pas disponible en série 1.0."
                 )

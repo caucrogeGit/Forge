@@ -226,7 +226,7 @@ Pendant une récupération, **jamais** :
   opérationnels (audit avant action, tests, code, doc).
 - [Vue d'ensemble du contributeur](../contributing.md) — préparation
   de l'environnement, sélection du ticket, validations canoniques.
-- [Procédure de release](../release.md) — pour les tags officiels,
+- [Procédure de release](../release/release.md) — pour les tags officiels,
   qui ne sont **jamais** créés depuis un dépôt secondaire.
 - `CLAUDE.md` (racine du dépôt) — briefing IA, mentionne cette page
   comme étape 0 obligatoire avant tout ticket.

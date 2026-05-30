@@ -403,7 +403,7 @@ de fois que nécessaire sans perte.
 | `mvc/routes.py` (entrées ajoutées) | `forge make:crud` |
 
 Ces fichiers sont les vôtres. Forge n'y touche plus après la création.
-Le [Contrat de stabilité](../stability-contract.md) garantit formellement cette règle.
+Le [Contrat de stabilité](../release/stability-contract.md) garantit formellement cette règle.
 
 ---
 
@@ -552,7 +552,7 @@ pas démarrer.
 | Sécurité en production | [Sécurité en production](../deployment/production-security.md) |
 | Utiliser un starter complet | [Vue d'ensemble des starters](../starters/index.md) |
 | Passer à une version suivante | [Guide de migration](../migration-guide.md) |
-| Garanties sur les fichiers préservés | [Contrat de stabilité](../stability-contract.md) |
+| Garanties sur les fichiers préservés | [Contrat de stabilité](../release/stability-contract.md) |
 
 ---
 
@@ -593,5 +593,5 @@ python app.py                      # lancer l'application
 - [Guide de démarrage](guide.md) — parcours complet avec MariaDB
 - [Relations entre entités](../relations.md) — format `relations.json` complet
 - [Architecture des entités](../entity_architecture.md) — rôle de chaque fichier généré
-- [Contrat de stabilité](../stability-contract.md) — garanties sur les fichiers préservés
+- [Contrat de stabilité](../release/stability-contract.md) — garanties sur les fichiers préservés
 - [Référence API et CLI](../reference.md) — toutes les commandes

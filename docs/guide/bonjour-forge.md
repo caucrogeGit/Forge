@@ -193,5 +193,5 @@ Une fois ce premier contact assimilé :
 
 - [API Forge complète](../reference/api.md)
 - [Roadmap Forge](../roadmap/forge-roadmap.md) — tickets DX livrés depuis la phase beta 11
-- [Contrat de stabilité](../stability-contract.md) — fichiers garantis préservés
-- [Release et compatibilité](../release-and-compatibility.md) — versions supportées
+- [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
+- [Release et compatibilité](../release/release-and-compatibility.md) — versions supportées

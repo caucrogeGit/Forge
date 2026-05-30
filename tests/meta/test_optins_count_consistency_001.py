@@ -28,7 +28,7 @@ CURRENT_STATE_DOCS = [
     "CHARTE_DOC.md",
     "docs/install/index.md",
     "docs/install/core-dev.md",
-    "docs/release-policy.md",
+    "docs/release/release-policy.md",
 ]
 
 # Tournures qui figent un compte d'opt-ins périmé comme état courant.
@@ -65,8 +65,8 @@ def test_no_stale_optin_count(doc):
 
 
 def test_release_policy_lists_all_six_optins():
-    text = (PROJECT_ROOT / "docs" / "release-policy.md").read_text(encoding="utf-8")
+    text = (PROJECT_ROOT / "docs" / "release" / "release-policy.md").read_text(encoding="utf-8")
     missing = [m for m in EXPECTED_OPTINS if m not in text]
     assert not missing, (
-        f"docs/release-policy.md ne mentionne pas tous les opt-ins : {missing}"
+        f"docs/release/release-policy.md ne mentionne pas tous les opt-ins : {missing}"
     )

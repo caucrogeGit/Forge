@@ -9,7 +9,7 @@ Pour les flux guidés, voir aussi le [guide de démarrage](guide/guide.md),
 le [CRUD explicite](crud.md) et l'[architecture des entités](entity_architecture.md).
 Pour les décisions d'architecture, voir [ADR-001](adr/001-auth-strategy.md),
 [ADR-002](adr/002-session-strategy.md) et l'[index des ADR](adr/index.md).
-Pour ce qui est garanti stable, voir le [contrat de stabilité](stability-contract.md).
+Pour ce qui est garanti stable, voir le [contrat de stabilité](release/stability-contract.md).
 
 ## Schéma complet
 

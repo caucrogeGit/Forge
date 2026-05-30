@@ -20,8 +20,8 @@ class TestPython312Consistency:
 
     ACTIVE_FILES = [
         Path("README.md"),
-        Path("docs/compatibility.md"),
-        Path("docs/release-and-compatibility.md"),
+        Path("docs/release/compatibility.md"),
+        Path("docs/release/release-and-compatibility.md"),
         Path("forge_cli/doctor.py"),
         Path("forge_cli/deploy.py"),
         Path(".github/workflows/tests.yml"),
