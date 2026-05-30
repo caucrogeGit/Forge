@@ -93,7 +93,7 @@ class TestStarterJsonContract:
 
     @pytest.mark.parametrize(
         "alias",
-        ["welcome-iot", "welcome_iot", "bonjour-iot", "bonjour_iot", "iot", "15"],
+        ["welcome-iot", "welcome_iot", "bonjour-iot", "bonjour_iot", "iot", "12"],
     )
     def test_alias_resolvable(self, alias):
         resolved = resolve(alias)

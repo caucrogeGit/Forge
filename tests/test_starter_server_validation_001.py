@@ -2,7 +2,7 @@
 
 Contrat public minimum du starter palier 9 — Validation serveur :
 
-- starter.json déclare `server-validation` (id, slot 13,
+- starter.json déclare `server-validation` (id, slot 10,
   requires_db false) ;
 - routes.py.snippet déclare `GET /server-validation` ET
   `POST /server-validation` ;
@@ -45,7 +45,7 @@ STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 def test_starter_resolves_with_id_and_slot():
     meta = resolve("server-validation")
     assert meta["id"] == "server-validation"
-    assert meta["number"] == 13
+    assert meta["number"] == 10
     assert meta.get("kind") == "skeleton"
     assert meta.get("requires_db") is False
     assert meta.get("status") == "available"

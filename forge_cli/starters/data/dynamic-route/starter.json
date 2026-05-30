@@ -1,13 +1,13 @@
 {
   "id": "dynamic-route",
-  "number": 10,
+  "number": 7,
   "name": "Route dynamique",
   "kind": "skeleton",
   "aliases": [
     "dynamic-route",
     "dynamic_route",
     "route-param",
-    "10"
+    "7"
   ],
   "description": "Route dynamique : palier 4 de la progression pédagogique officielle, après Première vue HTML. Une route `/dynamic-route/articles/{id}` qui apprend à lire un paramètre de route avec `request.route_param(...)`. Aucune vue HTML, aucune base de données.",
   "status": "available",

@@ -1,9 +1,16 @@
 {
   "id": "welcome-iot",
-  "number": 15,
+  "number": 12,
   "name": "Bonjour IoT",
   "kind": "skeleton",
-  "aliases": ["welcome-iot", "welcome_iot", "bonjour-iot", "bonjour_iot", "iot", "15"],
+  "aliases": [
+    "welcome-iot",
+    "welcome_iot",
+    "bonjour-iot",
+    "bonjour_iot",
+    "iot",
+    "12"
+  ],
   "description": "Bonjour IoT : premier contact avec le module opt-in forge-mvc-iot. Quatre routes (`/welcome-iot`, `/welcome-iot/inspect`, `/welcome-iot/events`, `/welcome-iot/device/{site}/{device_id}`), un contrôleur typé `Request -> Response`. Fonctionne sans broker MQTT, sans subscriber lancé, sans table créée — les routes événements signalent pédagogiquement quand la table iot_events n'est pas encore disponible. Inspecte la configuration IoT avec mot de passe masqué.",
   "status": "available",
   "requires_db": false,

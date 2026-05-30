@@ -9,7 +9,6 @@ Stratégie :
 
 Starters testés :
   1  contact-simple    — CRUD simple, une entité
-  3  carnet-contacts   — Application, plusieurs entités, relations
   Cas invalide         — starter introuvable
 """
 from __future__ import annotations
@@ -108,9 +107,6 @@ class TestStarterRegistry:
     def test_starter_1_est_crud(self):
         assert resolve("1").get("kind", "crud") == "crud"
 
-    def test_starter_3_est_application(self):
-        assert resolve("3")["kind"] == "application"
-
     def test_starter_inconnu_leve_exception(self):
         with pytest.raises(StarterNotFound):
             resolve("99")
@@ -129,7 +125,7 @@ class TestStarterList:
         cmd_starter_list()
         out = capsys.readouterr().out
         assert "Contacts" in out
-        assert "Carnet de contacts" in out
+        assert "Utilisateurs / authentification" in out
 
     def test_affiche_disponible(self, capsys):
         cmd_starter_list()
@@ -181,85 +177,6 @@ class TestStarter1Crud:
     def test_routes_injected(self):
         routes = (self.root / "mvc" / "routes.py").read_text(encoding="utf-8")
         assert "/contacts" in routes
-
-    def test_project_check_no_failures(self):
-        results = run_project_check(self.root, _FORGE_VERSION)
-        failures = [r for r in results if r.status == "fail"]
-        assert failures == [], f"project:check FAIL : {[r.detail for r in failures]}"
-
-    def test_project_audit_no_failures(self):
-        results = run_project_audit(self.root, _FORGE_VERSION)
-        failures = [r for r in results if r.status == "fail"]
-        assert failures == [], f"project:audit FAIL : {[r.detail for r in failures]}"
-
-
-# ── Starter 3 — carnet-contacts (application, plusieurs entités) ──────────────
-
-class TestStarter3Application:
-    @pytest.fixture(autouse=True)
-    def _build(self, starter_project):
-        self.root = starter_project
-        _build_starter("3")
-
-    def test_entity_ville_dir_exists(self):
-        assert (self.root / "mvc" / "entities" / "ville").is_dir()
-
-    def test_entity_contact_dir_exists(self):
-        assert (self.root / "mvc" / "entities" / "contact").is_dir()
-
-    def test_entity_ville_json_valid(self):
-        path = self.root / "mvc" / "entities" / "ville" / "ville.json"
-        data = json.loads(path.read_text(encoding="utf-8"))
-        assert data.get("name") == "Ville"
-        assert data.get("schema_version") == "1.0"
-
-    def test_entity_contact_json_valid(self):
-        path = self.root / "mvc" / "entities" / "contact" / "contact.json"
-        data = json.loads(path.read_text(encoding="utf-8"))
-        assert data.get("name") == "Contact"
-        assert data.get("schema_version") == "1.0"
-
-    def test_relations_json_exists(self):
-        assert (self.root / "mvc" / "entities" / "relations.json").exists()
-
-    def test_relations_json_valid(self):
-        path = self.root / "mvc" / "entities" / "relations.json"
-        data = json.loads(path.read_text(encoding="utf-8"))
-        assert "relations" in data
-
-    def test_ville_sql_exists(self):
-        assert (self.root / "mvc" / "entities" / "ville" / "ville.sql").exists()
-
-    def test_contact_sql_exists(self):
-        assert (self.root / "mvc" / "entities" / "contact" / "contact.sql").exists()
-
-    def test_controller_ville_exists(self):
-        assert (self.root / "mvc" / "controllers" / "ville_controller.py").exists()
-
-    def test_controller_contact_exists(self):
-        assert (self.root / "mvc" / "controllers" / "contact_controller.py").exists()
-
-    def test_model_ville_exists(self):
-        assert (self.root / "mvc" / "models" / "ville_model.py").exists()
-
-    def test_model_contact_exists(self):
-        assert (self.root / "mvc" / "models" / "contact_model.py").exists()
-
-    def test_views_contact_exist(self):
-        views = self.root / "mvc" / "views" / "contact"
-        assert (views / "index.html").exists()
-        assert (views / "form.html").exists()
-        assert (views / "show.html").exists()
-
-    def test_views_ville_exist(self):
-        assert (self.root / "mvc" / "views" / "ville" / "index.html").exists()
-
-    def test_layout_exists(self):
-        assert (self.root / "mvc" / "views" / "layouts" / "app.html").exists()
-
-    def test_routes_injected(self):
-        routes = (self.root / "mvc" / "routes.py").read_text(encoding="utf-8")
-        assert "/villes" in routes or "/contacts" in routes
 
     def test_project_check_no_failures(self):
         results = run_project_check(self.root, _FORGE_VERSION)

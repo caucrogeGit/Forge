@@ -2,7 +2,7 @@
 
 Contrat public minimum du starter palier 10 — Première base SQL :
 
-- starter.json déclare `first-sql` (id, slot 14, requires_db **true**) ;
+- starter.json déclare `first-sql` (id, slot 11, requires_db **true**) ;
 - routes.py.snippet déclare `GET /first-sql` ;
 - contrôleur présent + imports Request / Response / BaseController +
   `core.database.db.fetch_one` ;
@@ -48,7 +48,7 @@ MIGRATION_FILENAME_RE = re.compile(r"^(\d{14})_([a-z0-9_]+)\.sql$")
 def test_starter_resolves_with_id_and_slot():
     meta = resolve("first-sql")
     assert meta["id"] == "first-sql"
-    assert meta["number"] == 14
+    assert meta["number"] == 11
     assert meta.get("kind") == "skeleton"
     assert meta.get("status") == "available"
 

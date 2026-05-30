@@ -2,7 +2,7 @@
 
 Contrat public minimum du starter palier 8 — Premier formulaire POST :
 
-- starter.json déclare `form-post` (id, slot 12, requires_db false) ;
+- starter.json déclare `form-post` (id, slot 9, requires_db false) ;
 - routes.py.snippet déclare `GET /form-post` ET `POST /form-post` ;
 - contrôleur présent + imports Request / Response / BaseController ;
 - index() utilise `BaseController.render("form_post/index.html", ...)`
@@ -43,7 +43,7 @@ STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 def test_starter_resolves_with_id_and_slot():
     meta = resolve("form-post")
     assert meta["id"] == "form-post"
-    assert meta["number"] == 12
+    assert meta["number"] == 9
     assert meta.get("kind") == "skeleton"
     assert meta.get("requires_db") is False
     assert meta.get("status") == "available"

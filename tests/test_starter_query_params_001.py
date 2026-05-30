@@ -3,8 +3,8 @@
 Contrat public du starter 8 — Paramètres d'URL (palier 2 de la
 progression officielle) :
 
-- enregistré avec id "query-params" et number 8 ;
-- aliases (`query-params`, `query_params`, `params`, `8`) ;
+- enregistré avec id "query-params" et number 5 ;
+- aliases (`query-params`, `query_params`, `params`, `5`) ;
 - kind "skeleton", requires_db False ;
 - exactement 2 routes dans le snippet (index + hello) ;
 - contrôleur livré avec exactement deux méthodes typées
@@ -43,8 +43,8 @@ class TestQueryParamsStarterMetadata:
     def test_id_est_query_params(self):
         assert resolve("query-params")["id"] == "query-params"
 
-    def test_number_est_8(self):
-        assert resolve("query-params")["number"] == 8
+    def test_number_est_5(self):
+        assert resolve("query-params")["number"] == 5
 
     def test_kind_est_skeleton(self):
         assert resolve("query-params")["kind"] == "skeleton"
@@ -55,7 +55,7 @@ class TestQueryParamsStarterMetadata:
     def test_status_est_available(self):
         assert resolve("query-params").get("status") == "available"
 
-    @pytest.mark.parametrize("alias", ["query_params", "params", "8"])
+    @pytest.mark.parametrize("alias", ["query_params", "params", "5"])
     def test_resolvable_par_alias(self, alias: str):
         assert resolve(alias)["id"] == "query-params"
 
@@ -207,12 +207,12 @@ class TestQueryParamsStarterDryRun:
     """forge starter:build 8 --dry-run s'exécute sans erreur."""
 
     def test_dry_run_fonctionne(self, capsys):
-        cmd_starter_build(["8", "--dry-run"])
+        cmd_starter_build(["5", "--dry-run"])
         output = capsys.readouterr().out
         assert "query-params" in output.lower() or "query_params" in output.lower()
 
     def test_dry_run_affiche_les_deux_routes(self, capsys):
-        cmd_starter_build(["8", "--dry-run"])
+        cmd_starter_build(["5", "--dry-run"])
         output = capsys.readouterr().out
         assert "/query-params" in output
         assert "/query-params/hello" in output
@@ -220,7 +220,7 @@ class TestQueryParamsStarterDryRun:
     def test_dry_run_n_implique_pas_db(self, capsys):
         # Le starter est requires_db: false donc le dry-run ne doit pas
         # mentionner d'opération DB
-        cmd_starter_build(["8", "--dry-run"])
+        cmd_starter_build(["5", "--dry-run"])
         output = capsys.readouterr().out.lower()
         # Pas de migration / db:init mentionnés
         assert "migration" not in output

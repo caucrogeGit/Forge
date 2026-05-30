@@ -1,1 +1,0 @@
-{{ trans('starter.cs.mail.visitor.subject') }}

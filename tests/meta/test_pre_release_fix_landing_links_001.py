@@ -24,8 +24,6 @@ BROKEN_URLS = [
 FIXED_URLS = [
     "starters/contact-simple/",
     "starters/utilisateurs-auth/",
-    "starters/carnet-contacts/",
-    "starters/suivi-comportement-eleves/",
     "roadmap/forge-roadmap/",
 ]
 
@@ -85,11 +83,7 @@ class TestStarterLinksCount:
         content = LANDING_SOURCE.read_text(encoding="utf-8")
         # Les dossiers starters ont perdu leur préfixe numérique
         # (01-…→…) : on vérifie les 4 slugs des cartes Niveau 1→4.
-        matches = re.findall(
-            r"starters/(?:contact-simple|utilisateurs-auth|"
-            r"carnet-contacts|suivi-comportement-eleves)/",
-            content,
-        )
+        matches = re.findall(r"starters/[a-z][a-z0-9-]+/", content)
         unique_starters = set(matches)
         assert len(unique_starters) >= 4, (
             f"Les 4 liens starters devraient être présents, "

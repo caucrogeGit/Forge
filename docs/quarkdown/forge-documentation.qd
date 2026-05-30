@@ -60,6 +60,4 @@
   .include {../reference.md}
   .include {../starters/contact-simple/index.md}
   .include {../starters/utilisateurs-auth/index.md}
-  .include {../starters/carnet-contacts/index.md}
-  .include {../starters/suivi-comportement-eleves/index.md}
 }}

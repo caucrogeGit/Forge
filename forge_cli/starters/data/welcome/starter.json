@@ -1,6 +1,6 @@
 {
   "id": "welcome",
-  "number": 7,
+  "number": 4,
   "name": "Bonjour Forge",
   "kind": "skeleton",
   "aliases": [
@@ -8,7 +8,7 @@
     "bienvenue",
     "bonjour",
     "bonjour-forge",
-    "7"
+    "4"
   ],
   "description": "Bonjour Forge : premier contact minimal avec Forge. Une route (`/welcome`), un contrôleur avec `Response.text(...)`, aucune vue HTML, aucune base de données. La lecture d'un paramètre d'URL est introduite au palier suivant (`query-params`).",
   "status": "available",

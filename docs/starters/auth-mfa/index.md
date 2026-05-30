@@ -94,7 +94,7 @@ Voir [Reconstruction](rebuild.md) pour les étapes détaillées.
 ## Limites du starter
 
 - Ne fournit pas de page de setup MFA (provisionnement QR code, codes de récupération)
-- Ne démontre pas RBAC (voir [Communes & Séjours](../communes-sejours/index.md))
+- Ne démontre pas RBAC (voir [Communes & Séjours (archive)](../old/communes-sejours/index.md))
 - Ne démontre pas OIDC (retiré du core en ADR-004)
 - Ne démontre pas WebAuthn / passkeys (planifié post-3.0)
 - Le secret TOTP est chiffré au repos (Fernet, `FORGE_MFA_SECRET_KEY`) — `forge-mvc-mfa` reste au statut Alpha (passage Alpha → Beta à venir)

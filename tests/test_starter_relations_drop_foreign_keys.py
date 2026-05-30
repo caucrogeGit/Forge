@@ -57,7 +57,7 @@ def test_drop_lit_cle_from_canonique(tmp_path):
     ])
 
     with _mock_mariadb_stack(tmp_path, fetchone_result=("fk_heberg_commune",)) as (conn, cur, cfg):
-        drop_foreign_keys(_make_meta("communes-sejours"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)
 
     select_calls = [c for c in cur.execute.call_args_list if "information_schema" in str(c)]
     assert len(select_calls) == 1
@@ -72,7 +72,7 @@ def test_drop_lit_cle_foreign_key_canonique(tmp_path):
     ])
 
     with _mock_mariadb_stack(tmp_path, fetchone_result=None) as (conn, cur, cfg):
-        drop_foreign_keys(_make_meta("communes-sejours"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)
 
     select_calls = [c for c in cur.execute.call_args_list if "information_schema" in str(c)]
     assert len(select_calls) == 1
@@ -89,7 +89,7 @@ def test_drop_canonique_deux_relations(tmp_path):
     ])
 
     with _mock_mariadb_stack(tmp_path, fetchone_result=None) as (conn, cur, cfg):
-        drop_foreign_keys(_make_meta("suivi-comportement-eleves"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)
 
     select_calls = [c for c in cur.execute.call_args_list if "information_schema" in str(c)]
     assert len(select_calls) == 2
@@ -103,7 +103,7 @@ def test_drop_canonique_fk_presente_executes_alter(tmp_path):
     ])
 
     with _mock_mariadb_stack(tmp_path, fetchone_result=("fk_heberg_commune",)) as (conn, cur, cfg):
-        drop_foreign_keys(_make_meta("communes-sejours"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)
 
     alter_calls = [c for c in cur.execute.call_args_list if "ALTER TABLE" in str(c)]
     assert len(alter_calls) == 1
@@ -118,7 +118,7 @@ def test_drop_canonique_fk_absente_pas_de_alter(tmp_path):
     ])
 
     with _mock_mariadb_stack(tmp_path, fetchone_result=None) as (conn, cur, cfg):
-        drop_foreign_keys(_make_meta("communes-sejours"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)
 
     alter_calls = [c for c in cur.execute.call_args_list if "ALTER TABLE" in str(c)]
     assert alter_calls == []
@@ -167,7 +167,7 @@ def test_drop_relation_sans_from_ignoree(tmp_path):
     ])
 
     with _mock_mariadb_stack(tmp_path) as (conn, cur, cfg):
-        drop_foreign_keys(_make_meta("communes-sejours"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)
 
     select_calls = [c for c in cur.execute.call_args_list if "information_schema" in str(c)]
     assert select_calls == []
@@ -180,7 +180,7 @@ def test_drop_relation_sans_foreign_key_ignoree(tmp_path):
     ])
 
     with _mock_mariadb_stack(tmp_path) as (conn, cur, cfg):
-        drop_foreign_keys(_make_meta("communes-sejours"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)
 
     select_calls = [c for c in cur.execute.call_args_list if "information_schema" in str(c)]
     assert select_calls == []
@@ -214,10 +214,10 @@ def test_drop_sans_connexion_ne_leve_pas(tmp_path):
         patch.dict(sys.modules, {"mariadb": mock_mariadb}),
         patch("forge_cli.entities.db_apply.load_db_apply_config", return_value=MagicMock()),
     ):
-        drop_foreign_keys(_make_meta("communes-sejours"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)
 
 
 def test_drop_sans_relations_data_path_ne_leve_pas(tmp_path):
     """Si relations_data_path retourne None, la fonction retourne silencieusement."""
     with patch("forge_cli.starters.relations.relations_data_path", return_value=None):
-        drop_foreign_keys(_make_meta("communes-sejours"), tmp_path)
+        drop_foreign_keys(_make_meta("relations-demo"), tmp_path)

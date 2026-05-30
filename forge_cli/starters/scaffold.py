@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import shutil
 from pathlib import Path
 
@@ -30,20 +29,8 @@ def _is_adoptable(meta: dict, path: Path, root: Path) -> bool:
     """
     rel = path.relative_to(root).as_posix()
 
-    # relations.json vide du squelette → adoptable par les starters relationnels
-    if meta.get("id") in ("carnet-contacts", "suivi-comportement-eleves") and rel == "mvc/entities/relations.json":
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except ValueError:
-            return False
-        return (
-            isinstance(data, dict)
-            and data.get("relations") == []
-            and (data.get("format_version") == 1 or data.get("schema_version") == "1.0")
-        )
-
-    # Fichiers auth du squelette → adoptables par utilisateurs-auth et suivi-comportement-eleves
-    if meta.get("id") not in ("utilisateurs-auth", "suivi-comportement-eleves") or not path.is_file():
+    # Fichiers auth du squelette → adoptables par utilisateurs-auth
+    if meta.get("id") not in ("utilisateurs-auth",) or not path.is_file():
         return False
     content = path.read_text(encoding="utf-8")
     if rel == "mvc/controllers/auth_controller.py":

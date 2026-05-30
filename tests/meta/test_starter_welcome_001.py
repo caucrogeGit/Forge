@@ -2,7 +2,7 @@
 
 Contrat public du starter 7 — Bonjour Forge (version minimale) :
 
-- registered avec id "welcome" et number 7 ;
+- registered avec id "welcome" et number 4 ;
 - alias historiques (`welcome`, `bienvenue`, `7`) + nouveaux
   (`bonjour`, `bonjour-forge`) ;
 - kind "skeleton", requires_db false ;
@@ -61,8 +61,8 @@ class TestWelcomeStarterMetadata:
     def test_id_est_welcome(self):
         assert resolve("welcome")["id"] == "welcome"
 
-    def test_number_est_7(self):
-        assert resolve("welcome")["number"] == 7
+    def test_number_est_4(self):
+        assert resolve("welcome")["number"] == 4
 
     def test_kind_est_skeleton(self):
         assert resolve("welcome")["kind"] == "skeleton"
@@ -263,13 +263,13 @@ class TestWelcomeStarterDryRun:
     """forge starter:build 7 --dry-run s'exécute sans erreur."""
 
     def test_dry_run_fonctionne(self, capsys):
-        cmd_starter_build(["7", "--dry-run"])
+        cmd_starter_build(["4", "--dry-run"])
         output = capsys.readouterr().out
         assert "welcome" in output.lower() or "bienvenue" in output.lower()
 
     def test_dry_run_affiche_la_route(self, capsys):
         # welcome = une seule route (palier 1, une responsabilité).
-        cmd_starter_build(["7", "--dry-run"])
+        cmd_starter_build(["4", "--dry-run"])
         output = capsys.readouterr().out
         assert "/welcome" in output
         assert "/welcome/greet" not in output

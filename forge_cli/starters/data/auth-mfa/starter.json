@@ -1,9 +1,13 @@
 {
   "id": "auth-mfa",
-  "number": 6,
+  "number": 3,
   "name": "Auth MFA (TOTP)",
   "kind": "skeleton",
-  "aliases": ["auth-mfa", "mfa", "6"],
+  "aliases": [
+    "auth-mfa",
+    "mfa",
+    "3"
+  ],
   "description": "Contrôleurs Auth + MFA (TOTP) sans stubs — nécessite forge-mvc-mfa",
   "status": "available",
   "requires_db": false,

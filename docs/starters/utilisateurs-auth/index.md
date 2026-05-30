@@ -503,7 +503,7 @@ Le fichier complet de reconstruction est disponible dans [starters/utilisateurs-
 
 ## Prochain starter
 
-Prochain starter : **Carnet de contacts** — comprendre les relations
-entre entités (`many_to_one`, JOIN SQL).
+Prochain starter : **Auth MFA** — ajouter un challenge TOTP au flux de
+connexion avec le module opt-in `forge-mvc-mfa`.
 
-[Prochain starter : Carnet de contacts](../carnet-contacts/index.md)
+[Prochain starter : Auth MFA](../auth-mfa/index.md)

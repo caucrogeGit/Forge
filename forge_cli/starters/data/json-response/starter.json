@@ -1,9 +1,13 @@
 {
   "id": "json-response",
-  "number": 16,
+  "number": 13,
   "name": "Réponse JSON",
   "kind": "skeleton",
-  "aliases": ["json-response", "json", "16"],
+  "aliases": [
+    "json-response",
+    "json",
+    "13"
+  ],
   "description": "Réponse JSON : palier de la progression pédagogique — retourner des données structurées avec `Response.json(...)` (en-tête `application/json`), sans vue HTML ni base de données.",
   "status": "available",
   "requires_db": false,

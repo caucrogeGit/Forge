@@ -2,7 +2,7 @@
 
 Contrat public minimum du starter palier 4 — Route dynamique :
 
-- starter.json déclare `dynamic-route` (id, slot 10, requires_db false) ;
+- starter.json déclare `dynamic-route` (id, slot 7, requires_db false) ;
 - routes.py.snippet déclare `/dynamic-route/articles/{id}` ;
 - contrôleur présent + imports Request / Response / BaseController ;
 - contrôleur utilise `request.route_param("id", default="inconnu")` ;
@@ -38,7 +38,7 @@ STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 def test_starter_resolves_with_id_and_slot():
     meta = resolve("dynamic-route")
     assert meta["id"] == "dynamic-route"
-    assert meta["number"] == 10
+    assert meta["number"] == 7
     assert meta.get("kind") == "skeleton"
     assert meta.get("requires_db") is False
     assert meta.get("status") == "available"

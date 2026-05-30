@@ -127,20 +127,18 @@ nav:
       - Utilisateurs / Auth:
           - Présentation: starters/utilisateurs-auth/index.md
           - Reconstruction: starters/utilisateurs-auth/rebuild.md
-      - Carnet de contacts:
-          - Présentation: starters/carnet-contacts/index.md
-          - Reconstruction: starters/carnet-contacts/rebuild.md
-      - Suivi pédagogique:
-          - Présentation: starters/suivi-comportement-eleves/index.md
-          - Reconstruction: starters/suivi-comportement-eleves/rebuild.md
-      - Communes & Séjours:
-          - Présentation: starters/communes-sejours/index.md
-          - Reconstruction: starters/communes-sejours/rebuild.md
       - Auth MFA (Pre-Alpha):
           - Présentation: starters/auth-mfa/index.md
           - Reconstruction: starters/auth-mfa/rebuild.md
       - Bonjour IoT:
           - Présentation: starters/welcome-iot/index.md
+      - Anciennes applications (archive):
+          - Carnet de contacts: starters/old/carnet-contacts/index.md
+          - Carnet de contacts — reconstruction: starters/old/carnet-contacts/rebuild.md
+          - Suivi pédagogique: starters/old/suivi-comportement-eleves/index.md
+          - Suivi pédagogique — reconstruction: starters/old/suivi-comportement-eleves/rebuild.md
+          - Communes & Séjours: starters/old/communes-sejours/index.md
+          - Communes & Séjours — reconstruction: starters/old/communes-sejours/rebuild.md
 
   - Déploiement:
       - Guide de déploiement: deployment/deployment.md

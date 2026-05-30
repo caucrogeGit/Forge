@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 import sys
-import json
 
 import pytest
 
 from forge_cli.starters import cmd_starter_build, cmd_starter_list
-from forge_cli.entities.model import build_model
-from forge_cli.entities.relations import validate_relations_definition
-from forge_cli.starters.scaffold import check_existing as _check_existing, force_clean_application as _force_clean_application
+from forge_cli.starters.scaffold import check_existing as _check_existing
 from forge_cli.starters.route_ops import remove_legacy_auth_block as _remove_legacy_auth_routes
 from forge_cli.starters.route_ops import replace_home_route as _replace_home_route
 from forge_cli.starters.registry import all_starters, resolve
@@ -83,14 +80,6 @@ def test_alias_utilisateurs_auth_resolvent_le_meme_starter():
         "utilisateurs-auth",
         "utilisateurs-auth",
     ]
-
-
-def test_alias_carnet_contacts_resolvent_le_meme_starter():
-    ids = [
-        resolve(identifier)["id"]
-        for identifier in ("3", "carnet", "carnet-contacts")
-    ]
-    assert ids == ["carnet-contacts", "carnet-contacts", "carnet-contacts"]
 
 
 @pytest.mark.parametrize("identifier", ["2", "auth", "utilisateurs-auth"])
@@ -193,244 +182,11 @@ def test_script_create_auth_user_configure_le_projet():
     assert "hash_password(PASSWORD)" in script
 
 
-@pytest.mark.parametrize("identifier", ["3", "carnet", "carnet-contacts"])
-def test_starter_build_carnet_dry_run_fonctionne(identifier, capsys):
-    cmd_starter_build([identifier, "--dry-run"])
-    output = capsys.readouterr().out
-    assert "Carnet de contacts" in output
-    assert "mvc/entities/ville/" in output
-    assert "mvc/entities/contact/" in output
-    assert "mvc/entities/relations.json" in output
-    assert "mvc/entities/relations.sql" in output
-    assert "scripts/seed_villes.py" in output
-    assert "routes.py.snippet" in output
-    assert "GET    /contacts" in output
-    assert "GET    /villes" in output
-    assert "Aucun fichier écrit" in output
-
-
-def test_starter_build_carnet_public_refuse(capsys):
-    with pytest.raises(SystemExit) as exc:
-        cmd_starter_build(["3", "--public"])
-
-    assert exc.value.code == 1
-    output = capsys.readouterr().out
-    assert "--public n'est pas applicable" in output
-
-
-def test_starter_carnet_refuse_relations_existantes_sans_force(tmp_path):
-    meta = resolve("3")
-    relations = tmp_path / "mvc" / "entities" / "relations.json"
-    relations.parent.mkdir(parents=True)
-    relations.write_text(
-        json.dumps(
-            {
-                "schema_version": "1.0",
-                "relations": [
-                    {
-                        "type": "many_to_one",
-                        "from": "Contact",
-                        "to": "Ville",
-                        "name": "ville",
-                        "foreign_key": "ville_id",
-                        "nullable": True,
-                        "on_delete": "SET NULL",
-                    }
-                ],
-            }
-        ),
-        encoding="utf-8",
-    )
-
-    assert "mvc/entities/relations.json" in _check_existing(meta, tmp_path)
-
-
-def test_starter_carnet_adopte_relations_vides_du_squelette(tmp_path):
-    meta = resolve("3")
-    relations = tmp_path / "mvc" / "entities" / "relations.json"
-    relations.parent.mkdir(parents=True)
-    relations.write_text('{"schema_version": "1.0", "relations": []}\n', encoding="utf-8")
-
-    assert _check_existing(meta, tmp_path) == []
-
-
-def test_starter_carnet_force_preserve_fichiers_manuels_entite(tmp_path):
-    meta = resolve("3")
-    contact_dir = tmp_path / "mvc" / "entities" / "contact"
-    contact_dir.mkdir(parents=True)
-    (contact_dir / "contact.json").write_text("{}\n", encoding="utf-8")
-    (contact_dir / "contact.sql").write_text("-- sql\n", encoding="utf-8")
-    (contact_dir / "contact_base.py").write_text("# base\n", encoding="utf-8")
-    (contact_dir / "contact.py").write_text("# manuel\n", encoding="utf-8")
-    (contact_dir / "__init__.py").write_text("# init manuel\n", encoding="utf-8")
-
-    _force_clean_application(meta, tmp_path)
-
-    assert not (contact_dir / "contact.json").exists()
-    assert not (contact_dir / "contact.sql").exists()
-    assert not (contact_dir / "contact_base.py").exists()
-    assert (contact_dir / "contact.py").read_text(encoding="utf-8") == "# manuel\n"
-    assert (contact_dir / "__init__.py").read_text(encoding="utf-8") == "# init manuel\n"
-
-
-def test_starter_carnet_relations_json_valide(tmp_path):
-    meta = resolve("3")
-    entities_root = tmp_path / "mvc" / "entities"
-    for entity in ("ville", "contact"):
-        entity_dir = entities_root / entity
-        entity_dir.mkdir(parents=True)
-        source = meta["_dir"] / "entities" / f"{entity}.json"
-        (entity_dir / f"{entity}.json").write_text(
-            source.read_text(encoding="utf-8"),
-            encoding="utf-8",
-        )
-
-    relations_data = json.loads((meta["_dir"] / "relations.json").read_text(encoding="utf-8"))
-    relations = validate_relations_definition(
-        relations_data,
-        source=str(meta["_dir"] / "relations.json"),
-        entities_root=entities_root,
-    )
-
-    assert len(relations) == 1
-    relation = relations[0]
-    assert relation.from_entity == "Contact"
-    assert relation.from_column == "ville_id"
-    assert relation.to_entity == "Ville"
-    assert relation.to_column == "Id"
-    assert relation.on_delete == "SET NULL"
-
-
-def test_starter_carnet_build_model_genere_fk(tmp_path):
-    meta = resolve("3")
-    entities_root = tmp_path / "mvc" / "entities"
-    for entity in ("ville", "contact"):
-        entity_dir = entities_root / entity
-        entity_dir.mkdir(parents=True)
-        source = meta["_dir"] / "entities" / f"{entity}.json"
-        (entity_dir / f"{entity}.json").write_text(
-            source.read_text(encoding="utf-8"),
-            encoding="utf-8",
-        )
-    (entities_root / "relations.json").write_text(
-        (meta["_dir"] / "relations.json").read_text(encoding="utf-8"),
-        encoding="utf-8",
-    )
-
-    build_model(entities_root)
-
-    assert "FOREIGN KEY (ville_id)" in (entities_root / "relations.sql").read_text(encoding="utf-8")
-    assert "REFERENCES ville (Id)" in (entities_root / "relations.sql").read_text(encoding="utf-8")
-
-
-def test_script_seed_villes_configure_le_projet():
-    script = (
-        resolve("3")["_dir"]
-        / "files"
-        / "scripts"
-        / "seed_villes.py"
-    ).read_text(encoding="utf-8")
-    assert "sys.path.insert(0, str(PROJECT_ROOT))" in script
-    assert "forge.configure(" in script
-    assert "Dreux" in script
-
-
 def test_starter_build_refuse_un_identifiant_inconnu(capsys):
     with pytest.raises(SystemExit) as exc:
         cmd_starter_build(["99", "--dry-run"])
 
     assert exc.value.code == 1
-
-
-def test_alias_suivi_resolvent_le_meme_starter():
-    ids = [
-        resolve(identifier)["id"]
-        for identifier in ("4", "suivi", "suivi-comportement-eleves")
-    ]
-    assert ids == [
-        "suivi-comportement-eleves",
-        "suivi-comportement-eleves",
-        "suivi-comportement-eleves",
-    ]
-
-
-@pytest.mark.parametrize("identifier", ["4", "suivi", "suivi-comportement-eleves"])
-def test_starter_build_suivi_dry_run_fonctionne(identifier, capsys):
-    cmd_starter_build([identifier, "--dry-run"])
-    output = capsys.readouterr().out
-    assert "Suivi pédagogique" in output
-    assert "mvc/entities/eleve/" in output
-    assert "mvc/entities/cours/" in output
-    assert "mvc/entities/observation_cours/" in output
-    assert "mvc/entities/relations.json" in output
-    assert "mvc/entities/relations.sql" in output
-    assert "scripts/create_auth_user.py" in output
-    assert "scripts/seed_suivi.py" in output
-    assert "Aucun fichier écrit" in output
-
-
-def test_starter_build_suivi_dry_run_annonce_routes(capsys):
-    cmd_starter_build(["4", "--dry-run"])
-    output = capsys.readouterr().out
-    assert "GET    /login" in output
-    assert "POST   /login" in output
-    assert "POST   /logout" in output
-    assert "GET    /suivi" in output
-    assert "GET    /eleves" in output
-    assert "GET    /cours" in output
-    assert "GET    /observations/new" in output
-    assert "POST   /observations" in output
-    assert "GET    /observations/{id}" in output
-    assert "GET    /observations/{id}/edit" in output
-    assert "POST   /observations/{id}" in output
-
-
-def test_starter_suivi_logout_pas_dans_groupe_public():
-    snippet_path = (
-        resolve("4")["_dir"] / "routes.py.snippet"
-    )
-    snippet = snippet_path.read_text(encoding="utf-8")
-    in_public_block = False
-    for line in snippet.splitlines():
-        if 'public=True' in line:
-            in_public_block = True
-        if in_public_block and '"/logout"' in line:
-            raise AssertionError("/logout est dans un bloc public=True")
-        if in_public_block and line.strip() == "":
-            in_public_block = False
-
-
-def test_starter_build_suivi_public_refuse(capsys):
-    with pytest.raises(SystemExit) as exc:
-        cmd_starter_build(["4", "--public"])
-
-    assert exc.value.code == 1
-    output = capsys.readouterr().out
-    assert "--public n'est pas applicable" in output
-
-
-def test_script_create_auth_user_suivi_configure_le_projet():
-    script = (
-        resolve("4")["_dir"]
-        / "files"
-        / "scripts"
-        / "create_auth_user.py"
-    ).read_text(encoding="utf-8")
-    assert "sys.path.insert(0, str(PROJECT_ROOT))" in script
-    assert "forge.configure(" in script
-    assert "hash_password(PASSWORD)" in script
-
-
-def test_script_seed_suivi_configure_le_projet():
-    script = (
-        resolve("4")["_dir"]
-        / "files"
-        / "scripts"
-        / "seed_suivi.py"
-    ).read_text(encoding="utf-8")
-    assert "sys.path.insert(0, str(PROJECT_ROOT))" in script
-    assert "forge.configure(" in script
-    assert "observation_cours" in script
 
 
 def test_entrypoint_starter_list_accessible(monkeypatch, capsys):
@@ -439,7 +195,8 @@ def test_entrypoint_starter_list_accessible(monkeypatch, capsys):
     forge.main()
     output, _ = capsys.readouterr()
     assert "Starter apps Forge" in output
-    assert "Suivi pédagogique" in output
+    assert "Contacts" in output
+    assert "Auth MFA" in output
 
 
 # ── replace_home_route ────────────────────────────────────────────────────────
@@ -528,14 +285,6 @@ def test_starter_1_a_home_route_contacts():
     assert resolve("1").get("home_route") == "/contacts"
 
 
-def test_starter_3_a_home_route_contacts():
-    assert resolve("3").get("home_route") == "/contacts"
-
-
-def test_starter_4_a_home_route_suivi():
-    assert resolve("4").get("home_route") == "/suivi"
-
-
 def test_starter_2_sans_home_route():
     hr = resolve("2").get("home_route", "/")
     assert hr in ("/", None)
@@ -550,20 +299,6 @@ def test_dry_run_starter_1_annonce_home_route(capsys):
     assert "/contacts" in output
 
 
-def test_dry_run_starter_3_annonce_home_route(capsys):
-    cmd_starter_build(["3", "--dry-run"])
-    output = capsys.readouterr().out
-    assert "Route d'accueil" in output
-    assert "/contacts" in output
-
-
-def test_dry_run_starter_4_annonce_home_route(capsys):
-    cmd_starter_build(["4", "--dry-run"])
-    output = capsys.readouterr().out
-    assert "Route d'accueil" in output
-    assert "/suivi" in output
-
-
 def test_dry_run_starter_2_sans_home_route(capsys):
     cmd_starter_build(["2", "--dry-run"])
     output = capsys.readouterr().out
@@ -571,15 +306,6 @@ def test_dry_run_starter_2_sans_home_route(capsys):
 
 
 # ── STARTER-LEGACY-AUDIT-001 : tests documentaires ────────────────────────────
-
-def test_starters_historiques_toujours_listes():
-    """Les starters 1 à 4 sont toujours listés par forge starter:list."""
-    slugs = {s["id"] for s in all_starters()}
-    assert "contact-simple" in slugs
-    assert "utilisateurs-auth" in slugs
-    assert "carnet-contacts" in slugs
-    assert "suivi-comportement-eleves" in slugs
-
 
 def test_document_audit_starter_legacy_existe():
     """docs/history/audits/starter-legacy-audit-001.md doit exister."""
@@ -627,15 +353,6 @@ def test_document_decision_mentionne_les_cinq_starters():
     assert "Communes" in content
 
 
-def test_starters_historiques_toujours_generables_apres_decision():
-    """Les starters 1 à 4 restent listés après les décisions (non supprimés)."""
-    slugs = {s["id"] for s in all_starters()}
-    assert "contact-simple" in slugs
-    assert "utilisateurs-auth" in slugs
-    assert "carnet-contacts" in slugs
-    assert "suivi-comportement-eleves" in slugs
-
-
 def test_starter_2_utilise_api_auth_moderne():
     """La page starter-02 indique que le starter utilise les API Auth/User modernes."""
     import pathlib
@@ -643,14 +360,6 @@ def test_starter_2_utilise_api_auth_moderne():
     content = (root / "docs" / "starters" / "utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
     assert "core.auth" in content
     assert "login_user" in content or "login_required" in content
-
-
-def test_avertissement_dans_starter_4():
-    """La page starter-app-04 contient un avertissement sur son statut historique."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
-    assert "historique" in content or "legacy" in content
 
 
 # ── STARTER-PROFILES-001 : tests documentaires ─────────────────────────────
@@ -692,32 +401,7 @@ def test_starter_1_mentionne_profil_recommande():
     assert "profil" in content.lower()
 
 
-def test_starter_3_mentionne_profil_recommande():
-    """La page starter-app-03 mentionne un profil recommandé."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
-    assert "standard" in content
-    assert "profil" in content.lower()
-
-
 # ── STARTER-CS-REPLACE-001 : tests documentaires ───────────────────────────
-
-def test_starter_5_mentionne_demonstrateur_avance_principal():
-    """La page starter-app-05 mentionne 'démonstrateur avancé principal'."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "communes-sejours" / "index.md").read_text(encoding="utf-8")
-    assert "démonstrateur avancé principal" in content
-
-
-def test_starter_4_ne_se_presente_plus_comme_vitrine_technique():
-    """La page starter-app-04 ne dit plus 'vitrine technique de Forge'."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
-    assert "vitrine technique de Forge" not in content
-
 
 def test_roadmap_marque_cs_replace_001_termine():
     """La roadmap Forge marque STARTER-CS-REPLACE-001 comme terminé."""
@@ -837,38 +521,11 @@ def test_starters_index_existe():
     assert (root / "docs" / "starters" / "index.md").exists()
 
 
-def test_communes_sejours_index_existe():
-    """docs/starters/communes-sejours/index.md existe."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    assert (root / "docs" / "starters" / "communes-sejours" / "index.md").exists()
-
-
 def test_starter_app_05_absent_a_la_racine():
     """docs/starter-app-05-communes-sejours.md n'est plus à la racine de docs/."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     assert not (root / "docs" / "starter-app-05-communes-sejours.md").exists()
-
-
-def test_mkdocs_reference_nouveau_chemin_communes_sejours():
-    """mkdocs.yml référence le nouveau chemin starters/communes-sejours/index.md."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "mkdocs.yml").read_text(encoding="utf-8")
-    assert "starters/communes-sejours/index.md" in content
-    assert "starter-app-05-communes-sejours.md" not in content
-
-
-def test_starters_historiques_dans_docs_starters():
-    """Les starters 1 à 4 ont chacun un index.md dans leur sous-dossier."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    starters_dir = root / "docs" / "starters"
-    assert (starters_dir / "contact-simple" / "index.md").exists()
-    assert (starters_dir / "utilisateurs-auth" / "index.md").exists()
-    assert (starters_dir / "carnet-contacts" / "index.md").exists()
-    assert (starters_dir / "suivi-comportement-eleves" / "index.md").exists()
 
 
 # ── DOC-STARTERS-STRUCTURE-002 : tests documentaires ───────────────────────
@@ -885,15 +542,29 @@ def test_fichiers_plats_starters_absents():
 
 
 def test_chaque_starter_a_un_index_md():
-    """Chaque starter 1 à 5 dispose d'un index.md dans son sous-dossier."""
+    """Chaque starter autonome restant dispose d'un index.md dans son sous-dossier.
+
+    Les paliers de découverte (`welcome`, `query-params`, …) sont documentés
+    dans `docs/starters/welcome/<id>.md` ; les starters autonomes ont chacun
+    leur propre sous-dossier avec un `index.md`. Les anciennes applications
+    `carnet-contacts`, `suivi-comportement-eleves` et `communes-sejours` ne
+    sont plus des starters actifs (archivées sous `docs/starters/old/`).
+    """
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     s = root / "docs" / "starters"
-    assert (s / "contact-simple" / "index.md").exists()
-    assert (s / "utilisateurs-auth" / "index.md").exists()
-    assert (s / "carnet-contacts" / "index.md").exists()
-    assert (s / "suivi-comportement-eleves" / "index.md").exists()
-    assert (s / "communes-sejours" / "index.md").exists()
+    for slug in (
+        "contact-simple",
+        "utilisateurs-auth",
+        "auth-mfa",
+        "welcome-iot",
+        "premier-crud",
+    ):
+        assert (s / slug / "index.md").exists(), f"docs/starters/{slug}/index.md manquant"
+    # Les 3 applications retirées ne sont plus des starters actifs.
+    assert not (s / "carnet-contacts").exists()
+    assert not (s / "suivi-comportement-eleves").exists()
+    assert not (s / "communes-sejours").exists()
 
 
 def test_mkdocs_ne_reference_plus_les_fichiers_plats():
@@ -1088,48 +759,6 @@ def test_roadmap_contacts_refresh_termine():
 
 # ── STARTER-CARNET-REFRESH-001 : tests documentaires ────────────────────────
 
-def test_starter_3_doc_existe():
-    """Les fichiers index.md et rebuild.md du starter Carnet existent."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    s = root / "docs" / "starters" / "carnet-contacts"
-    assert (s / "index.md").exists()
-    assert (s / "rebuild.md").exists()
-
-
-def test_starter_3_est_officiel_relationnel():
-    """La doc du starter Carnet le présente comme starter officiel relationnel."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
-    assert "relationnel" in content
-    assert "officiel" in content or "Starter Forge" in content
-
-
-def test_starter_3_mentionne_many_to_one():
-    """La doc du starter Carnet mentionne la relation many_to_one."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
-    assert "many_to_one" in content
-
-
-def test_starter_3_doc_url_pointe_nouvelle_structure():
-    """Le starter.json du starter Carnet pointe vers la nouvelle URL docs."""
-    from forge_cli.starters.registry import resolve
-    meta = resolve("3")
-    assert "starter-app-03" not in meta.get("doc_url", "")
-    assert "starters/carnet-contacts" in meta.get("doc_url", "")
-
-
-def test_starter_3_pas_demonstrateur_avance():
-    """Le starter Carnet n'est pas présenté comme démonstrateur avancé principal."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
-    assert "démonstrateur avancé principal" not in content
-
-
 def test_roadmap_carnet_refresh_termine():
     """La roadmap marque STARTER-CARNET-REFRESH-001 comme terminé."""
     import pathlib
@@ -1140,59 +769,6 @@ def test_roadmap_carnet_refresh_termine():
 
 
 # ── STARTER-SUIVI-LEGACY-001 : tests documentaires ──────────────────────────
-
-def test_starter_4_doc_existe():
-    """Les fichiers index.md et rebuild.md du starter Suivi pédagogique existent."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    s = root / "docs" / "starters" / "suivi-comportement-eleves"
-    assert (s / "index.md").exists()
-    assert (s / "rebuild.md").exists()
-
-
-def test_starter_4_doc_mentionne_historique():
-    """La doc du starter Suivi pédagogique mentionne son statut historique."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
-    assert "historique" in content or "legacy" in content
-
-
-def test_starter_4_doc_pas_vitrine_principale():
-    """La doc du starter Suivi précise qu'il n'est plus le démonstrateur avancé principal."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
-    # Le texte doit préciser que c'est historique / legacy, pas la vitrine courante
-    assert "historique" in content or "legacy" in content
-    # S'il mentionne "démonstrateur avancé principal", c'est pour dire qu'il ne l'est plus
-    if "démonstrateur avancé principal" in content:
-        assert "n'est plus" in content or "plus le démonstrateur" in content
-
-
-def test_starter_4_doc_url_pointe_nouvelle_structure():
-    """Le starter.json du starter Suivi pointe vers la nouvelle URL docs."""
-    from forge_cli.starters.registry import resolve
-    meta = resolve("4")
-    assert "starter-app-04" not in meta.get("doc_url", "")
-    assert "starters/suivi-comportement-eleves" in meta.get("doc_url", "")
-
-
-def test_starters_index_starter_4_historique():
-    """L'index des starters indique le statut historique/legacy du starter 4."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-    assert "historique" in content or "legacy" in content
-
-
-def test_profiles_starter_4_non_profil_officiel():
-    """docs/features/profiles.md ne recommande pas le starter 4 comme profil officiel principal."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
-    assert "Suivi pédagogique" not in content or "legacy" in content or "historique" in content or "non recommandé" in content
-
 
 def test_roadmap_suivi_legacy_termine():
     """La roadmap marque STARTER-SUIVI-LEGACY-001 comme terminé."""
@@ -1206,25 +782,39 @@ def test_roadmap_suivi_legacy_termine():
 # ── STARTER-DOC-INDEX-001 : tests documentaires ─────────────────────────────
 
 def test_starters_index_contient_tableau_synthese():
-    """docs/starters/index.md contient un tableau de synthèse avec les 5 starters."""
+    """docs/starters/index.md contient un tableau de synthèse des starters actifs.
+
+    Les 3 anciennes applications (Carnet de contacts, Suivi pédagogique,
+    Communes / Séjours) ont été retirées du catalogue ; le tableau ne liste
+    plus que les starters restants.
+    """
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
     assert "Tableau de synthèse" in content or "tableau de synthèse" in content.lower()
     assert "Contacts" in content
     assert "Utilisateurs" in content
-    assert "Carnet de contacts" in content
-    assert "Suivi pédagogique" in content
-    assert "Communes" in content
+    assert "Auth MFA" in content
+    # Les 3 applications retirées ne sont plus dans le catalogue.
+    assert "Carnet de contacts" not in content
+    assert "Suivi pédagogique" not in content
+    assert "Communes" not in content
 
 
 def test_starters_index_contient_statuts_officiels():
-    """docs/starters/index.md liste les statuts des 5 starters."""
+    """docs/starters/index.md liste les statuts des starters actifs restants.
+
+    Le catalogue ne contient plus d'application « legacy / historique » depuis
+    le retrait des 3 anciennes applications ; il décrit le statut officiel des
+    starters restants (officiel simple, auth moderne, démonstrateur MFA, …).
+    """
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
     assert "officiel" in content.lower()
-    assert "legacy" in content.lower() or "historique" in content.lower()
+    # Statuts décrits dans le tableau de synthèse / la section « Statut officiel ».
+    assert "Auth MFA" in content
+    assert "Contacts" in content
 
 
 def test_starters_index_mentionne_profils_associes():
@@ -1242,14 +832,6 @@ def test_starters_index_contient_section_difference_profil_starter():
     content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
     assert "profil" in content.lower() and "starter" in content.lower()
     assert "forge new" in content or "forge starter:build" in content
-
-
-def test_starters_index_marque_starter4_legacy():
-    """docs/starters/index.md indique clairement que le starter 4 est legacy/historique."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-    assert "legacy" in content.lower() or "historique" in content.lower()
 
 
 def test_starters_index_contient_liens_rebuild():

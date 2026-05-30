@@ -1,9 +1,13 @@
 {
   "id": "premier-crud",
-  "number": 19,
+  "number": 16,
   "name": "Premier CRUD",
   "kind": "skeleton",
-  "aliases": ["premier-crud", "crud", "19"],
+  "aliases": [
+    "premier-crud",
+    "crud",
+    "16"
+  ],
   "description": "Premier CRUD : capstone des fondamentaux — créer, lister, modifier et supprimer des lignes dans la table `first_sql_messages` avec du SQL visible (`fetch_all`/`fetch_one`/`insert`/`execute`), en réutilisant le formulaire+CSRF des paliers précédents. Aucune notion métier, aucun ORM.",
   "status": "available",
   "requires_db": true,

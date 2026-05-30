@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from unittest.mock import patch
 
@@ -82,24 +81,6 @@ def test_starter_2_reference_core_auth():
     assert "core.auth" in content
 
 
-def test_starter_3_est_officiel_relationnel():
-    """Starter 3 — Carnet de contacts est décrit comme starter relationnel."""
-    content = (ROOT / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
-    assert "relation" in content.lower() or "many_to_one" in content.lower()
-
-
-def test_starter_4_est_marque_legacy():
-    """Starter 4 — Suivi pédagogique est documenté comme legacy ou historique."""
-    content = (ROOT / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
-    assert "legacy" in content.lower() or "historique" in content.lower()
-
-
-def test_starter_5_est_demonstrateur_avance():
-    """Starter 5 — Communes & Séjours est le démonstrateur avancé principal."""
-    content = (ROOT / "docs" / "starters" / "communes-sejours" / "index.md").read_text(encoding="utf-8")
-    assert "démonstrateur" in content.lower() or "demonstrateur" in content.lower()
-
-
 # ── doc_url cohérence ─────────────────────────────────────────────────────────
 
 def test_starter_2_doc_url_pointe_nouvelle_structure():
@@ -107,13 +88,6 @@ def test_starter_2_doc_url_pointe_nouvelle_structure():
     meta = resolve("2")
     assert "starter-app-02" not in meta.get("doc_url", "")
     assert "starters/utilisateurs-auth" in meta.get("doc_url", "")
-
-
-def test_starter_5_doc_url_pointe_nouvelle_structure():
-    """Starter 5 — doc_url pointe vers starters/communes-sejours/."""
-    meta = resolve("5")
-    assert "starter-app-05" not in meta.get("doc_url", "")
-    assert "starters/communes-sejours" in meta.get("doc_url", "")
 
 
 def test_tous_les_starters_ont_un_doc_url():
@@ -135,59 +109,59 @@ def test_tous_les_doc_url_utilisent_nouvelle_structure():
 # ── Documentation des starters ────────────────────────────────────────────────
 
 def test_chaque_starter_a_un_index_md():
-    """Chaque starter a un index.md dans docs/starters/."""
-    attendus = [
+    """Chaque starter actif a une doc de présentation dans docs/starters/.
+
+    Réorganisation des starters : les 3 applications (carnet-contacts,
+    suivi-comportement-eleves, communes-sejours) ne sont plus des starters
+    actifs (archivées sous docs/starters/old/). Les paliers welcome sont
+    regroupés à plat dans docs/starters/welcome/<id>.md ; les autres starters
+    ont leur propre docs/starters/<id>/index.md."""
+    # Paliers welcome regroupés à plat (DOCS-STARTERS-PROGRESSION-FOLDER-001).
+    paliers_welcome = [
+        "welcome",
+        "query-params",
+        "first-html-view",
+        "dynamic-route",
+        "request-debug",
+        "form-post",
+        "server-validation",
+        "first-sql",
+        "json-response",
+        "csrf",
+        "first-sql-write",
+    ]
+    for dossier in paliers_welcome:
+        index = ROOT / "docs" / "starters" / "welcome" / f"{dossier}.md"
+        assert index.exists(), f"doc de palier welcome absente pour {dossier}"
+
+    # Starters autonomes avec leur propre dossier docs/starters/<id>/index.md.
+    starters_autonomes = [
         "contact-simple",
         "utilisateurs-auth",
-        "carnet-contacts",
-        "suivi-comportement-eleves",
-        "communes-sejours",
-        "welcome",
+        "auth-mfa",
+        "welcome-iot",
+        "premier-crud",
     ]
-    for dossier in attendus:
-        # DOCS-STARTERS-PROGRESSION-FOLDER-001 — welcome est regroupé à plat
-        # dans docs/starters/welcome/welcome.md.
-        if dossier == "welcome":
-            index = ROOT / "docs" / "starters" / "welcome" / "welcome.md"
-        else:
-            index = ROOT / "docs" / "starters" / dossier / "index.md"
+    for dossier in starters_autonomes:
+        index = ROOT / "docs" / "starters" / dossier / "index.md"
         assert index.exists(), f"doc de présentation absente pour {dossier}"
 
 
-def test_starters_1_a_4_ont_un_rebuild_md():
-    """Les starters 1 à 4 ont un rebuild.md."""
+def test_starters_avec_rebuild_md():
+    """Les starters autonomes scaffoldés (contact-simple, utilisateurs-auth,
+    auth-mfa) ont un rebuild.md.
+
+    Réorganisation des starters : carnet-contacts et suivi-comportement-eleves
+    ne sont plus des starters actifs (archivés sous docs/starters/old/) ; seuls
+    les starters restants munis d'un guide de reconstruction sont vérifiés."""
     dossiers = [
         "contact-simple",
         "utilisateurs-auth",
-        "carnet-contacts",
-        "suivi-comportement-eleves",
+        "auth-mfa",
     ]
     for dossier in dossiers:
         rebuild = ROOT / "docs" / "starters" / dossier / "rebuild.md"
         assert rebuild.exists(), f"rebuild.md absent pour {dossier}"
-
-
-def test_communes_sejours_a_un_rebuild_md():
-    """docs/starters/communes-sejours/rebuild.md existe."""
-    assert (ROOT / "docs" / "starters" / "communes-sejours" / "rebuild.md").exists()
-
-
-def test_communes_sejours_rebuild_md_contient_starter_build():
-    """docs/starters/communes-sejours/rebuild.md mentionne 'forge starter:build 5'."""
-    content = (ROOT / "docs" / "starters" / "communes-sejours" / "rebuild.md").read_text(encoding="utf-8")
-    assert "starter:build 5" in content
-
-
-def test_communes_sejours_rebuild_md_mentionne_limites():
-    """docs/starters/communes-sejours/rebuild.md documente les limites."""
-    content = (ROOT / "docs" / "starters" / "communes-sejours" / "rebuild.md").read_text(encoding="utf-8")
-    assert "limite" in content.lower() or "démonstrateur" in content.lower()
-
-
-def test_starters_index_contient_lien_rebuild_communes_sejours():
-    """docs/starters/index.md contient un lien rebuild.md pour Communes & Séjours."""
-    content = (ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-    assert "communes-sejours/rebuild.md" in content
 
 
 # ── Profils recommandés ───────────────────────────────────────────────────────
@@ -202,12 +176,6 @@ def test_starter_2_profil_standard():
     """L'index des starters associe Utilisateurs/Auth au profil standard."""
     content = (ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
     assert "standard" in content
-
-
-def test_starter_5_profil_standard():
-    """L'index des starters associe Communes & Séjours au profil standard."""
-    idx = (ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-    assert "standard" in idx
 
 
 # ── Génération des starters ───────────────────────────────────────────────────
@@ -237,33 +205,7 @@ def test_starter_1_dry_run_fonctionne(capsys):
     assert "contact" in output.lower()
 
 
-def test_starter_3_dry_run_fonctionne(capsys):
-    """forge starter:build 3 --dry-run s'exécute sans erreur."""
-    cmd_starter_build(["3", "--dry-run"])
-    output = capsys.readouterr().out
-    assert "carnet" in output.lower() or "contact" in output.lower()
-
-
-def test_starter_5_dry_run_fonctionne(capsys):
-    """forge starter:build 5 --dry-run s'exécute sans erreur."""
-    cmd_starter_build(["5", "--dry-run"])
-    output = capsys.readouterr().out
-    assert "communes" in output.lower()
-
-
 # ── Communes & Séjours — séparation core / métier ─────────────────────────────
-
-def test_communes_sejours_kind_est_skeleton():
-    """Starter 5 a le kind 'skeleton' (pas de logique CRUD générée)."""
-    meta = resolve("5")
-    assert meta["kind"] == "skeleton"
-
-
-def test_communes_sejours_require_db_false():
-    """Starter 5 fonctionne sans base de données (requires_db = False)."""
-    meta = resolve("5")
-    assert meta.get("requires_db") is False
-
 
 def test_core_ne_reference_pas_communes_sejours():
     """core/ ne contient aucune référence à 'communes' ou 'sejour'."""
@@ -283,115 +225,7 @@ def test_forge_cli_ne_reference_pas_communes_hors_starters():
         assert "demande_sejour" not in content, f"Référence métier hors starters dans {f}"
 
 
-def test_communes_sejours_controller_importe_core():
-    """Le contrôleur Communes & Séjours importe depuis core/, pas depuis forge_cli."""
-    ctrl = (
-        ROOT
-        / "forge_cli" / "starters" / "data" / "communes-sejours"
-        / "files" / "mvc" / "controllers" / "communes_sejours_controller.py"
-    )
-    content = ctrl.read_text(encoding="utf-8")
-    assert "from core." in content
-    assert "from forge_cli" not in content
-
-
-def test_communes_sejours_controller_utilise_trans():
-    """Le contrôleur Communes & Séjours utilise trans() depuis core.i18n."""
-    ctrl = (
-        ROOT
-        / "forge_cli" / "starters" / "data" / "communes-sejours"
-        / "files" / "mvc" / "controllers" / "communes_sejours_controller.py"
-    )
-    content = ctrl.read_text(encoding="utf-8")
-    assert "from core.i18n import trans" in content
-
-
-def test_communes_sejours_i18n_utilise_prefixe_starter_cs():
-    """Les clés i18n de Communes & Séjours utilisent le préfixe 'starter.cs'."""
-    fr_json = (
-        ROOT / "forge_cli" / "starters" / "data" / "communes-sejours" / "files" / "translations" / "fr.json"
-    )
-    data = json.loads(fr_json.read_text(encoding="utf-8"))
-    starter_cs_keys = [k for k in data if k.startswith("starter.cs")]
-    assert len(starter_cs_keys) > 0, "Aucune clé starter.cs.* dans fr.json"
-
-
-def test_communes_sejours_i18n_evite_termes_interdits():
-    """Les clés i18n de Communes & Séjours n'utilisent pas les termes interdits (commune, sejour...)."""
-    fr_json = (
-        ROOT / "forge_cli" / "starters" / "data" / "communes-sejours" / "files" / "translations" / "fr.json"
-    )
-    data = json.loads(fr_json.read_text(encoding="utf-8"))
-    for key in data:
-        for term in ("commune", "sejour", "hebergement", "reservation"):
-            assert term not in key.lower(), (
-                f"Clé i18n {key!r} contient le terme interdit {term!r}"
-            )
-
-
-# ── Fichiers essentiels de Communes & Séjours ─────────────────────────────────
-
-@pytest.mark.parametrize("rel_path", [
-    "mvc/controllers/communes_sejours_controller.py",
-    "mvc/forms/demande_sejour_form.py",
-    "mvc/views/public/communes_sejours/home.html",
-    "mvc/views/public/communes_sejours/hebergements_index.html",
-    "mvc/views/public/communes_sejours/hebergements_show.html",
-    "mvc/mail/templates/communes_sejours/demande_visiteur_subject.txt",
-    "mvc/mail/templates/communes_sejours/demande_proprietaire_subject.txt",
-    "translations/fr.json",
-    "seed/communes.json",
-])
-def test_communes_sejours_fichier_essentiel_packaged(rel_path):
-    """Les fichiers essentiels de Communes & Séjours sont présents dans le paquet starter."""
-    data_dir = ROOT / "forge_cli" / "starters" / "data" / "communes-sejours" / "files"
-    assert (data_dir / rel_path).exists(), f"Fichier absent : {rel_path}"
-
-
-def test_communes_sejours_entites_definies():
-    """Les 4 entités de Communes & Séjours sont définies dans les fichiers packagés."""
-    entities_root = ROOT / "forge_cli" / "starters" / "data" / "communes-sejours" / "files" / "mvc" / "entities"
-    for entity in ("commune", "proprietaire", "hebergement", "demande_sejour"):
-        assert (entities_root / entity).is_dir(), f"Entité {entity} absente"
-
-
-def test_communes_sejours_relations_json_existe():
-    """relations.json est défini dans le paquet starter de Communes & Séjours."""
-    rel_path = (
-        ROOT / "forge_cli" / "starters" / "data" / "communes-sejours"
-        / "files" / "mvc" / "entities" / "relations.json"
-    )
-    assert rel_path.exists()
-
-
-# ── Limites métier documentées ────────────────────────────────────────────────
-
-def test_communes_sejours_doc_mentionne_pas_reservation_confirmee():
-    """docs/starters/communes-sejours/index.md ne promet pas une réservation confirmée."""
-    content = (ROOT / "docs" / "starters" / "communes-sejours" / "index.md").read_text(encoding="utf-8")
-    assert "réservation confirmée" not in content.lower() or "non" in content.lower()
-
-
-def test_communes_sejours_doc_mentionne_pas_paiement():
-    """docs/starters/communes-sejours/index.md ne promet pas de paiement intégré."""
-    content = (ROOT / "docs" / "starters" / "communes-sejours" / "index.md").read_text(encoding="utf-8")
-    assert "paiement en ligne" not in content.lower() or "non livré" in content.lower()
-
-
-def test_communes_sejours_doc_liste_limites():
-    """docs/starters/communes-sejours/index.md documente une section de limites."""
-    content = (ROOT / "docs" / "starters" / "communes-sejours" / "index.md").read_text(encoding="utf-8")
-    assert "n'est pas livré" in content.lower() or "ce qui n'est pas" in content.lower()
-
-
 # ── Séparation Forge Design ───────────────────────────────────────────────────
-
-def test_communes_sejours_doc_ne_mentionne_pas_forge_design():
-    """docs/starters/communes-sejours/index.md ne promeut pas Forge Design."""
-    content = (ROOT / "docs" / "starters" / "communes-sejours" / "index.md").read_text(encoding="utf-8")
-    assert "forge-design" not in content.lower()
-    assert "éditeur graphique" not in content.lower()
-
 
 def test_forge_design_roadmap_non_modifie():
     """docs/forge-design-roadmap.md existe et n'est pas modifié."""

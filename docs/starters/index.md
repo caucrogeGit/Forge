@@ -27,10 +27,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Premier CRUD](premier-crud/index.md) | Capstone fondamentaux (avec BDD) | `minimal` / `standard` | Premier starter autonome après la progression — CRUD complet à SQL visible (`SELECT`/`INSERT`/`UPDATE`/`DELETE`) sur l'entité neutre `message`, aucun métier, aucun ORM |
 | [1 — Contacts](contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — synthèse du CRUD métier ; suppose les 11 paliers de découverte + le starter Premier CRUD acquis |
 | [2 — Utilisateurs / Auth](utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
-| [3 — Carnet de contacts](carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
-| [4 — Suivi pédagogique](suivi-comportement-eleves/index.md) | Historique / legacy | Aucun profil principal | Consulter un exemple métier historique, non recommandé comme base moderne |
-| [5 — Communes & Séjours](communes-sejours/index.md) | Démonstrateur avancé principal | `standard` | Voir une application démonstratrice couvrant les briques modernes de Forge |
-| [6 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
+| [3 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 | [Bonjour IoT](welcome-iot/index.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-iot`, `/welcome-iot/inspect`, `/welcome-iot/events`, `/welcome-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
 
 ## Progression recommandée
@@ -67,8 +64,8 @@ Une fois ces **11 paliers** acquis, vous avez terminé le starter de
 découverte *Bonjour Forge*. Le premier **starter autonome** à enchaîner
 est [Premier CRUD](premier-crud/index.md) — un CRUD complet à SQL visible
 sur une entité neutre (`message`), livré par `STARTER-PREMIER-CRUD-001`.
-Viennent ensuite les exemples métier : Contacts, Utilisateurs / Auth,
-Carnet de contacts…
+Viennent ensuite les exemples : Contacts, Utilisateurs / Auth, puis le
+starter opt-in Auth MFA.
 
 !!! warning "Saut Bonjour Forge → Contacts CRUD"
     Sauter directement de `welcome` à `contact-simple` fait rencontrer
@@ -150,17 +147,6 @@ starter.
 
 [Présentation](contact-simple/index.md) · [Reconstruction](contact-simple/rebuild.md)
 
-### Carnet de contacts
-
-Le starter officiel relationnel de Forge. Deux entités (`Ville` et `Contact`), une relation `many_to_one`, un `LEFT JOIN` SQL visible.
-
-Profil recommandé : `standard`.
-
-- idéal pour comprendre les relations entre entités ;
-- montre `relations.json`, la clé étrangère et la requête JOIN.
-
-[Présentation](carnet-contacts/index.md) · [Reconstruction](carnet-contacts/rebuild.md)
-
 ## Starter Auth minimal moderne
 
 ### Utilisateurs / Auth
@@ -177,34 +163,6 @@ Profil recommandé : `standard`.
     Ce starter ne démontre pas MFA, OIDC, RBAC avancé, reset password complet ou administration utilisateurs.
 
 [Présentation](utilisateurs-auth/index.md) · [Reconstruction](utilisateurs-auth/rebuild.md)
-
-## Démonstrateur historique
-
-### Suivi pédagogique
-
-Un exemple pédagogique historique conservé comme référence. Il montre une application métier plus riche : plusieurs entités, relations, seed et un flux d'authentification ancien.
-
-!!! warning "Statut legacy"
-    Ce starter n'est plus recommandé comme base pour un nouveau projet. Son implémentation auth est antérieure au socle `core.auth`. Il reste disponible comme trace pédagogique.
-
-[Présentation](suivi-comportement-eleves/index.md) · [Reconstruction](suivi-comportement-eleves/rebuild.md)
-
-## Démonstrateur avancé principal
-
-### Communes & Séjours
-
-Le démonstrateur avancé principal de Forge. Il couvre les briques modernes du framework dans une application cohérente.
-
-Ce starter démontre :
-
-- entités et relations ;
-- pages publiques (`make:public-page`, `make:public-list`, `make:public-show`, `make:public-form`, `make:public-contact`) ;
-- formulaire de contact avec mail ;
-- internationalisation (i18n) ;
-- seed JSON ;
-- médias et fichiers.
-
-[Présentation](communes-sejours/index.md) · [Reconstruction](communes-sejours/rebuild.md)
 
 ## Démonstrateur MFA (Alpha)
 
@@ -284,8 +242,7 @@ Les profils et les starters sont indépendants :
 
 - un profil ne remplace pas un starter ;
 - un starter ne modifie pas le profil du projet ;
-- un starter peut illustrer un ou plusieurs profils ;
-- Communes & Séjours est une vitrine avancée, pas un profil.
+- un starter peut illustrer un ou plusieurs profils.
 
 Pour choisir un profil : [Profils de projet](../features/profiles.md).
 
@@ -295,18 +252,15 @@ Pour choisir un profil : [Profils de projet](../features/profiles.md).
 forge new mon-projet --starter welcome       # Bienvenue (sans BDD) — via forge new
 forge starter:build 1        # Contacts
 forge starter:build 2        # Utilisateurs / Auth
-forge starter:build 3        # Carnet de contacts
-forge starter:build 4        # Suivi pédagogique
-forge starter:build 5        # Communes & Séjours
-forge starter:build 6        # Auth MFA (Alpha)
-forge starter:build 7        # Bienvenue dans Forge (sans BDD)
+forge starter:build 3        # Auth MFA (Alpha)
+forge starter:build 4        # Bienvenue dans Forge (sans BDD)
 ```
 
 Pour le starter pédagogique `query-params` (palier 2 de la progression),
 voir la page dédiée [Paramètres d'URL](welcome/query-params.md) — il
 s'applique par son identifiant public, pas par un numéro.
 
-Les alias `contacts`, `auth`, `carnet`, `suivi`, `communes-sejours`, `query-params` et leurs variantes sont également supportés.
+Les alias `contacts`, `auth`, `query-params` et leurs variantes sont également supportés.
 
 `forge starter:list` affiche la liste complète depuis la CLI.
 
@@ -329,9 +283,6 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 |---|---|---|
 | Contacts | [Présentation](contact-simple/index.md) | [rebuild.md](contact-simple/rebuild.md) |
 | Utilisateurs / Auth | [Présentation](utilisateurs-auth/index.md) | [rebuild.md](utilisateurs-auth/rebuild.md) |
-| Carnet de contacts | [Présentation](carnet-contacts/index.md) | [rebuild.md](carnet-contacts/rebuild.md) |
-| Suivi pédagogique | [Présentation](suivi-comportement-eleves/index.md) | [rebuild.md](suivi-comportement-eleves/rebuild.md) |
-| Communes & Séjours | [Présentation](communes-sejours/index.md) | [rebuild.md](communes-sejours/rebuild.md) |
 | Auth MFA | [Présentation](auth-mfa/index.md) | [rebuild.md](auth-mfa/rebuild.md) |
 
 ## Statut officiel des starters
@@ -340,7 +291,4 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 |---|---|
 | 1 — Contacts | Starter officiel simple |
 | 2 — Utilisateurs / Auth | Auth minimale moderne (`core.auth`) |
-| 3 — Carnet de contacts | Starter officiel relationnel |
-| 4 — Suivi pédagogique | Exemple pédagogique historique / legacy |
-| 5 — Communes & Séjours | Démonstrateur avancé principal |
-| 6 — Auth MFA | Démonstrateur MFA (Alpha) |
+| 3 — Auth MFA | Démonstrateur MFA (Alpha) |

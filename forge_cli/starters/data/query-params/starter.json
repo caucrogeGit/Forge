@@ -1,13 +1,13 @@
 {
   "id": "query-params",
-  "number": 8,
+  "number": 5,
   "name": "Paramètres d'URL",
   "kind": "skeleton",
   "aliases": [
     "query-params",
     "query_params",
     "params",
-    "8"
+    "5"
   ],
   "description": "Paramètres d'URL : palier 2 de la progression pédagogique officielle, après Bonjour Forge. Deux routes (`/query-params`, `/query-params/hello`) qui apprennent à lire une valeur d'URL avec `request.param(...)`. Aucune vue HTML, aucune base de données.",
   "status": "available",

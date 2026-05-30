@@ -160,9 +160,6 @@ forge new <NomProjet> --profile <profil>
 |---|---|
 | `contact-simple` | CRUD simple de contacts |
 | `utilisateurs-auth` | Login, sessions, routes protégées, CSRF |
-| `carnet-contacts` | Carnet relationnel avec relations SQL |
-| `suivi-comportement-eleves` | Auth, dashboard, entités liées |
-| `communes-sejours` | Pages publiques, formulaire, mail |
 | `auth-mfa` | Auth + MFA TOTP (nécessite forge-mvc-mfa) |
 
 **Exemple :**

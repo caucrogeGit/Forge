@@ -93,15 +93,15 @@ class TestStartersIndexUpdated:
 
     def test_starter_6_in_synthesis_table(self):
         text = STARTERS_INDEX.read_text(encoding="utf-8")
-        assert "6 — Auth MFA" in text or "[6 —" in text, (
-            "docs/starters/index.md tableau de synthèse doit lister le starter 6."
+        assert "3 — Auth MFA" in text or "[3 —" in text, (
+            "docs/starters/index.md tableau de synthèse doit lister Auth MFA."
         )
 
     def test_starter_6_in_generation_block(self):
         text = STARTERS_INDEX.read_text(encoding="utf-8")
-        assert "starter:build 6" in text, (
+        assert "starter:build 3" in text, (
             "docs/starters/index.md doit documenter "
-            "'forge starter:build 6' dans la section génération."
+            "'forge starter:build 3' (Auth MFA) dans la section génération."
         )
 
     def test_starter_6_link_to_index(self):

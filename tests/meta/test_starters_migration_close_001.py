@@ -30,8 +30,7 @@ def test_audit_mentionne_cloture_terminee():
 
 def test_audit_mentionne_starters_migres():
     content = _audit()
-    for starter in ("contact-simple", "utilisateurs-auth", "carnet-contacts",
-                    "suivi-comportement-eleves", "communes-sejours"):
+    for starter in ("contact-simple", "utilisateurs-auth"):
         assert starter in content, f"Starter {starter!r} absent de l'audit"
 
 
@@ -87,9 +86,6 @@ LEGACY_KEYS = [
 MIGRATED_STARTERS = [
     "contact-simple",
     "utilisateurs-auth",
-    "carnet-contacts",
-    "suivi-comportement-eleves",
-    "communes-sejours",
 ]
 
 
@@ -171,6 +167,6 @@ def test_tous_fichiers_entite_sont_canoniques():
             if "schema_version" in data or "name" in data:
                 canonical.append(p)
 
-    assert len(canonical) >= 12, (
-        f"Moins de 12 fichiers entité canoniques trouvés ({len(canonical)})"
+    assert len(canonical) >= 2, (
+        f"Moins de 2 fichiers entité canoniques trouvés ({len(canonical)})"
     )

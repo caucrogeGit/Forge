@@ -2,7 +2,7 @@
 
 Contrat public minimum du starter palier 3 — Première vue HTML :
 
-- starter.json déclare `first-html-view` (id, slot 9, requires_db false) ;
+- starter.json déclare `first-html-view` (id, slot 6, requires_db false) ;
 - routes.py.snippet déclare `/first-html-view` ;
 - contrôleur présent + imports Request / Response / BaseController ;
 - contrôleur appelle `BaseController.render("first_html_view/index.html", request=request)` ;
@@ -41,7 +41,7 @@ STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 def test_starter_resolves_with_id_and_slot():
     meta = resolve("first-html-view")
     assert meta["id"] == "first-html-view"
-    assert meta["number"] == 9
+    assert meta["number"] == 6
     assert meta.get("kind") == "skeleton"
     assert meta.get("requires_db") is False
     assert meta.get("status") == "available"

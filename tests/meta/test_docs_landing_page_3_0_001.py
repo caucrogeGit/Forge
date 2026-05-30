@@ -273,9 +273,6 @@ class TestStartersSection:
         "starters/welcome/",
         "starters/contact-simple/",
         "starters/utilisateurs-auth/",
-        "starters/carnet-contacts/",
-        "starters/suivi-comportement-eleves/",
-        "starters/communes-sejours/",
         "starters/auth-mfa/",
     ])
     def test_all_starter_urls_present(self, starter_url):
