@@ -361,18 +361,36 @@ class TestSupervisorLifecycle:
 # ── 5. Boucle run() : intégration ────────────────────────────────────────────
 
 
-class TestRunLoop:
-    """`DevReloader.run()` réagit aux changements et propre proprement à la fin."""
+def _ki_after(n):
+    """`sleep` factice qui lève KeyboardInterrupt au n-ième appel.
 
-    def test_run_termine_si_subprocess_meurt(self, tmp_path):
+    Sert à borner la boucle `run()` dans les tests : depuis
+    DEV-SERVER-CRASH-RESILIENCE-001, `run()` ne s'arrête plus à la mort du
+    subprocess (il relance) — seul Ctrl+C (KeyboardInterrupt) la termine.
+    """
+    state = {"calls": 0}
+
+    def _sleep(_delay):
+        state["calls"] += 1
+        if state["calls"] >= n:
+            raise KeyboardInterrupt
+
+    return _sleep
+
+
+class TestRunLoop:
+    """`DevReloader.run()` relance le serveur et se termine proprement sur Ctrl+C."""
+
+    def test_run_respawne_si_subprocess_meurt(self, tmp_path):
+        # DEV-SERVER-CRASH-RESILIENCE-001 — un crash ne stoppe plus forge run :
+        # le superviseur relance, et ne propage pas le code de crash.
         root = _make_project(tmp_path)
         spawned: list[FakeProcess] = []
 
         def spawn() -> FakeProcess:
             proc = FakeProcess()
             spawned.append(proc)
-            # Process meurt immédiatement (poll renverra son returncode).
-            proc.alive = False
+            proc.alive = False  # meurt aussitôt (crash)
             proc.returncode = 42
             return proc
 
@@ -381,33 +399,29 @@ class TestRunLoop:
             poll_interval=0.0,
             spawn_fn=spawn,
             log_fn=lambda _msg: None,
+            sleep_fn=_ki_after(2),
+            respawn_backoff=0.0,
         )
         code = reloader.run()
-        assert code == 42
-        assert len(spawned) == 1
+        assert code == 0, "run() ne s'arrête que sur Ctrl+C, pas sur un crash."
+        assert len(spawned) >= 2, "Le serveur mort doit être relancé."
 
     def test_run_redemarre_sur_changement_puis_arret(self, tmp_path):
         root = _make_project(tmp_path)
         spawned: list[FakeProcess] = []
-        snapshots = [
-            {"a": 1.0},  # initial
-            {"a": 2.0},  # 1er tick — change
-            {"a": 2.0},  # 2e tick — process mort, on sort
-        ]
-        snap_iter = iter(snapshots)
+        snap_iter = iter([{"a": 1.0}, {"a": 2.0}])  # initial, puis change
 
         def spawn() -> FakeProcess:
             proc = FakeProcess()
+            proc.alive = True  # vit (pas de crash)
             spawned.append(proc)
-            # Le premier subprocess vit ; le second meurt aussitôt pour
-            # faire sortir la boucle proprement.
-            if len(spawned) == 2:
-                proc.alive = False
-                proc.returncode = 0
             return proc
 
         def fake_snapshot(_root: Path) -> dict[str, float]:
-            return next(snap_iter)
+            try:
+                return next(snap_iter)
+            except StopIteration:
+                return {"a": 2.0}
 
         reloader = DevReloader(
             root,
@@ -415,6 +429,7 @@ class TestRunLoop:
             spawn_fn=spawn,
             log_fn=lambda _msg: None,
             snapshot_fn=fake_snapshot,
+            sleep_fn=_ki_after(2),
         )
         code = reloader.run()
         assert code == 0
@@ -428,8 +443,7 @@ class TestRunLoop:
 
         def spawn() -> FakeProcess:
             proc = FakeProcess()
-            proc.alive = False
-            proc.returncode = 0
+            proc.alive = True
             return proc
 
         reloader = DevReloader(
@@ -437,11 +451,76 @@ class TestRunLoop:
             poll_interval=0.0,
             spawn_fn=spawn,
             log_fn=logs.append,
+            sleep_fn=_ki_after(1),
         )
         reloader.run()
         joined = "\n".join(logs)
         assert "Serveur Forge démarré" in joined
         assert "Surveillance active" in joined
+
+    def test_run_cesse_le_respawn_apres_crashes_repetes(self, tmp_path):
+        # Garde anti-boucle : après max_fast_crashes crashes rapides, on
+        # cesse de respawner et on attend une modification de fichier.
+        root = _make_project(tmp_path)
+        spawned: list[FakeProcess] = []
+        logs: list[str] = []
+
+        def spawn() -> FakeProcess:
+            proc = FakeProcess()
+            proc.alive = False  # crash immédiat à chaque tentative
+            proc.returncode = 1
+            spawned.append(proc)
+            return proc
+
+        reloader = DevReloader(
+            root,
+            poll_interval=0.0,
+            spawn_fn=spawn,
+            log_fn=logs.append,
+            sleep_fn=_ki_after(10),
+            respawn_backoff=0.0,
+            max_fast_crashes=3,
+        )
+        reloader.run()
+        # 1 démarrage initial + 3 relances ; le 4e crash déclenche le garde.
+        assert len(spawned) == 1 + 3
+        assert any("Échecs répétés" in m for m in logs)
+
+    def test_run_relance_apres_garde_sur_modification(self, tmp_path):
+        # Après être passé en attente (crashes répétés), une modification de
+        # fichier relance proprement le serveur.
+        root = _make_project(tmp_path)
+        spawned: list[FakeProcess] = []
+        logs: list[str] = []
+        calls = {"n": 0}
+
+        def spawn() -> FakeProcess:
+            proc = FakeProcess()
+            proc.alive = False
+            proc.returncode = 1
+            spawned.append(proc)
+            return proc
+
+        def fake_snapshot(_root: Path) -> dict[str, float]:
+            calls["n"] += 1
+            # Inchangé pendant les crashes, puis changement au 6e appel.
+            return {"a": 1.0} if calls["n"] <= 5 else {"a": 2.0}
+
+        reloader = DevReloader(
+            root,
+            poll_interval=0.0,
+            spawn_fn=spawn,
+            log_fn=logs.append,
+            snapshot_fn=fake_snapshot,
+            sleep_fn=_ki_after(6),
+            respawn_backoff=0.0,
+            max_fast_crashes=2,
+        )
+        reloader.run()
+        assert any("Échecs répétés" in m for m in logs)
+        assert any("Changement détecté" in m for m in logs), (
+            "Une modification après le garde doit relancer le serveur."
+        )
 
 
 # ── 6. Intégration `forge run` ───────────────────────────────────────────────

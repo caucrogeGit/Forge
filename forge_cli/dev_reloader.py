@@ -1,6 +1,8 @@
 """Superviseur de développement Forge avec autoreload par redémarrage de processus.
 
-Ticket : DEV-SERVER-AUTORELOAD-001.
+Tickets :
+    DEV-SERVER-AUTORELOAD-001       — autoreload sur changement de fichier.
+    DEV-SERVER-CRASH-RESILIENCE-001 — `forge run` survit aux crashes de l'app.
 
 Architecture :
     forge run (APP_ENV=dev)
@@ -10,6 +12,11 @@ Architecture :
             → si changement détecté :
                 → terminate(subprocess) + wait
                 → respawn
+            → si le subprocess meurt (crash, erreur fatale) :
+                → relance automatique ; après plusieurs crashes rapides,
+                  attend une modification de fichier (pas de boucle de crash).
+                  `forge run` ne s'arrête que sur Ctrl+C — une erreur ne tue
+                  jamais le serveur de dév.
 
 Volontairement simple :
     - polling stat() (pas d'inotify, pas de watchfiles, pas de watchdog) ;
@@ -149,6 +156,10 @@ class DevReloader:
         log_fn: Callable[[str], None] | None = None,
         spawn_fn: Callable[[], "subprocess.Popen[bytes]"] | None = None,
         snapshot_fn: Callable[[Path], dict[str, float]] | None = None,
+        sleep_fn: Callable[[float], None] | None = None,
+        healthy_uptime: float = 3.0,
+        max_fast_crashes: int = 3,
+        respawn_backoff: float = 1.0,
     ) -> None:
         self.root = root
         self.poll_interval = poll_interval
@@ -159,6 +170,17 @@ class DevReloader:
             spawn_fn or self._default_spawn
         )
         self._snapshot: Callable[[Path], dict[str, float]] = snapshot_fn or snapshot
+        self._sleep: Callable[[float], None] = sleep_fn or time.sleep
+        # Résilience aux crashes (DEV-SERVER-CRASH-RESILIENCE-001) :
+        #   - healthy_uptime   : durée (s) au-delà de laquelle un processus est
+        #     « sain » ; en deçà, sa mort compte comme crash rapide ;
+        #   - max_fast_crashes : nb de crashes rapides consécutifs tolérés avant
+        #     d'arrêter le respawn auto et d'attendre une modification ;
+        #   - respawn_backoff  : pause (s) avant un respawn après crash rapide.
+        self.healthy_uptime = healthy_uptime
+        self.max_fast_crashes = max_fast_crashes
+        self.respawn_backoff = respawn_backoff
+        self._spawn_time: float = 0.0
         self.process: "subprocess.Popen[bytes] | None" = None
 
     @staticmethod
@@ -173,6 +195,7 @@ class DevReloader:
     def start(self) -> None:
         """Spawn le subprocess applicatif."""
         self.process = self._spawn()
+        self._spawn_time = time.monotonic()
 
     def stop(self, timeout: float = 5.0) -> None:
         """Arrête le subprocess actif : SIGTERM (terminate), puis kill en
@@ -204,29 +227,70 @@ class DevReloader:
     # ── Boucle principale ───────────────────────────────────────────────────
 
     def run(self) -> int:
-        """Boucle de surveillance. Retourne le code de sortie final.
+        """Boucle de surveillance — garde `forge run` vivant.
 
-        Termine quand :
-            - le subprocess applicatif meurt de lui-même → propage son code ;
-            - KeyboardInterrupt → arrête proprement le subprocess, retour 0.
+        Le superviseur ne s'arrête QUE sur KeyboardInterrupt (Ctrl+C) : une
+        erreur applicative ne doit jamais arrêter le serveur de dév
+        (DEV-SERVER-CRASH-RESILIENCE-001).
+
+        Comportement :
+            - changement de fichier → redémarrage propre (réarme le compteur
+              de crashes) ;
+            - mort inattendue du subprocess → relance automatique ;
+            - crashes rapides répétés (> max_fast_crashes) → on cesse le
+              respawn en boucle et on attend une modification de fichier pour
+              relancer (l'erreur reste lisible dans le terminal) ;
+            - KeyboardInterrupt → arrêt propre, retour 0.
         """
         self.log("Serveur Forge démarré.")
         self.log(f"Surveillance active : {self._watched_summary()}")
 
         self.start()
         snap = self._snapshot(self.root)
+        fast_crashes = 0
+        awaiting_change = False
 
         try:
             while True:
-                time.sleep(self.poll_interval)
-                if self.process is None or self.process.poll() is not None:
-                    return (self.process.returncode if self.process else 0) or 0
+                self._sleep(self.poll_interval)
 
+                # 1) Un changement de fichier relance toujours (et réarme).
                 new_snap = self._snapshot(self.root)
                 changes = diff_snapshots(snap, new_snap)
                 if changes:
                     snap = new_snap
+                    fast_crashes = 0
+                    awaiting_change = False
                     self.restart(self._format_reason(changes))
+                    continue
+
+                # 2) En attente d'une correction : on idle sans respawner.
+                if awaiting_change:
+                    continue
+
+                # 3) Le subprocess a-t-il disparu ? On le relance.
+                if self.process is None or self.process.poll() is not None:
+                    code = self.process.returncode if self.process else 0
+                    uptime = time.monotonic() - self._spawn_time
+                    self.log(f"Le serveur s'est arrêté (code {code}).")
+
+                    fast_crashes = (
+                        fast_crashes + 1 if uptime < self.healthy_uptime else 0
+                    )
+                    if fast_crashes > self.max_fast_crashes:
+                        awaiting_change = True
+                        self.log(
+                            "Échecs répétés au démarrage — le serveur reste "
+                            "arrêté. Corrigez l'erreur ci-dessus puis "
+                            "enregistrez un fichier pour relancer."
+                        )
+                        continue
+
+                    if fast_crashes and self.respawn_backoff:
+                        self._sleep(self.respawn_backoff)
+                    self.log("Redémarrage automatique du serveur...")
+                    self.start()
+                    self.log("Serveur relancé.")
         except KeyboardInterrupt:
             self.log("Interruption (Ctrl+C). Arrêt du serveur...")
         finally:
