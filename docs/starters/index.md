@@ -24,8 +24,8 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Premier formulaire POST](welcome/form-post.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 6 de la progression — afficher un formulaire HTML minimal (avec CSRF), envoyer un POST, lire la valeur avec `request.form("name", ...)`, aucune base de données |
 | [Validation serveur](welcome/server-validation.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
 | [Première base SQL](welcome/first-sql.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
-| [Premier CRUD](premier-crud/index.md) | Capstone fondamentaux (avec BDD) | `minimal` / `standard` | Premier starter autonome après la progression — CRUD complet à SQL visible (`SELECT`/`INSERT`/`UPDATE`/`DELETE`) sur l'entité neutre `message`, aucun métier, aucun ORM |
-| [1 — Contacts](contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — synthèse du CRUD métier ; suppose les 11 paliers de découverte + le starter Premier CRUD acquis |
+| [First CRUD](crud/first-crud.md) | Capstone fondamentaux (avec BDD) | `minimal` / `standard` | Premier starter autonome après la progression — CRUD complet à SQL visible (`SELECT`/`INSERT`/`UPDATE`/`DELETE`) sur l'entité neutre `message`, aucun métier, aucun ORM |
+| [1 — Contacts](contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — synthèse du CRUD métier ; suppose les 11 paliers de découverte + le starter First CRUD acquis |
 | [2 — Auth (API cœur)](core-auth/users-core-auth.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Auth MFA](optin-mfa/welcome-optin-mfa.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 | [Bonjour IoT](optin-iot/welcome-optin-iot.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-optin-iot`, `/welcome-optin-iot/inspect`, `/welcome-optin-iot/events`, `/welcome-optin-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
@@ -62,7 +62,7 @@ d'aborder le CRUD sereinement. La progression officielle est :
 
 Une fois ces **11 paliers** acquis, vous avez terminé le starter de
 découverte *Bonjour Forge*. Le premier **starter autonome** à enchaîner
-est [Premier CRUD](premier-crud/index.md) — un CRUD complet à SQL visible
+est [First CRUD](crud/first-crud.md) — un CRUD complet à SQL visible
 sur une entité neutre (`message`), livré par `STARTER-PREMIER-CRUD-001`.
 Viennent ensuite les exemples : Contacts, Auth (API cœur), puis le
 starter opt-in Auth MFA.
@@ -77,7 +77,7 @@ starter opt-in Auth MFA.
 Le tableau de synthèse plus haut reste utile comme catalogue exhaustif
 des starters disponibles aujourd'hui, mais l'ordre d'apprentissage
 recommandé est celui des 11 paliers ci-dessus, suivi des starters
-autonomes (Premier CRUD, puis les exemples métier).
+autonomes (First CRUD, puis les exemples métier).
 
 ## Starter d'entrée (sans base de données)
 
@@ -110,21 +110,21 @@ forge starter:build 7
 
 ## Premier starter autonome (avec base de données)
 
-### Premier CRUD
+### First CRUD
 
 Le capstone des fondamentaux : un CRUD complet (créer, lister, modifier,
 supprimer) à **SQL visible**, sur une entité **neutre** (`message`, table
 `first_sql_messages`). Premier starter autonome après les 11 paliers de
 découverte.
 
-Profil recommandé : `minimal` ou `standard`. Identifiant : `premier-crud`
-(alias `crud` / `19`).
+Profil recommandé : `minimal` ou `standard`. Identifiant : `first-crud`
+(alias `crud` / `16`).
 
 - prolonge directement les paliers « Première base SQL » et « Écrire en base » ;
 - les quatre opérations SQL en clair : `SELECT`, `INSERT`, `UPDATE`, `DELETE` ;
 - aucune notion métier, aucun ORM, aucune authentification.
 
-[Présentation](premier-crud/index.md)
+[Vue d'ensemble du sujet](crud/index.md) · [Présentation](crud/first-crud.md)
 
 ## Starters officiels simples
 
@@ -137,7 +137,7 @@ Profil recommandé : `minimal` ou `standard`.
 - **starter autonome avancé** — synthèse du CRUD métier ;
 - aucune relation, aucune authentification ;
 - suppose acquis les **11 paliers de découverte** puis le starter
-  [Premier CRUD](premier-crud/index.md) (routes, contrôleurs, vues HTML,
+  [First CRUD](crud/first-crud.md) (routes, contrôleurs, vues HTML,
   paramètres d'URL, route dynamique, formulaires POST avec CSRF,
   validation serveur, migrations SQL, CRUD à SQL visible).
 

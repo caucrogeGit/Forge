@@ -559,9 +559,13 @@ def test_chaque_starter_a_un_index_md():
         "core-auth",
         "optin-mfa",
         "optin-iot",
-        "premier-crud",
+        "crud",
     ):
         assert (s / slug / "index.md").exists(), f"docs/starters/{slug}/index.md manquant"
+    # Starter CRUD regroupé sous le dossier-sujet crud/.
+    assert (s / "crud" / "first-crud.md").exists(), (
+        "docs/starters/crud/first-crud.md manquant"
+    )
     # Starter IoT regroupé sous le dossier-sujet optin-iot/.
     assert (s / "optin-iot" / "welcome-optin-iot.md").exists(), (
         "docs/starters/optin-iot/welcome-optin-iot.md manquant"

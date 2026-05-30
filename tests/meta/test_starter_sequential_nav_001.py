@@ -3,7 +3,7 @@
 Verrouille la navigation pédagogique séquentielle entre pages de
 starters. Chaque page pointe vers le palier suivant via un lien
 ``../<slug>/`` (ou ``../<slug>/index.md``) dans une section
-« Après ce starter ». Le starter autonome Premier CRUD clôt la
+« Après ce starter ». Le starter autonome First CRUD clôt la
 chaîne et renvoie vers la vue d'ensemble.
 
 Vérifie aussi :
@@ -42,16 +42,22 @@ SEQUENTIAL_CHAIN: dict[str, str] = {
     "form-post": "server-validation",
     "server-validation": "first-sql",
     "first-sql": "first-sql-write",
-    "first-sql-write": "premier-crud",
+    "first-sql-write": "first-crud",
 }
 
-# Pages pédagogiques (paliers 1→11). premier-crud et contact-simple sont
+# Pages pédagogiques (paliers 1→11). first-crud et contact-simple sont
 # exclus : ce sont des starters autonomes (dossier propre), qui peuvent
 # garder des étiquettes historiques ("Starter 1").
 PEDAGOGICAL_PAGES = list(SEQUENTIAL_CHAIN.keys())
 
 # Starters autonomes rendus dans leur propre dossier docs/starters/<slug>/.
-STANDALONE_STARTERS = ["premier-crud", "contact-simple"]
+STANDALONE_STARTERS = ["first-crud", "contact-simple"]
+
+# Certains starters autonomes sont regroupés sous un dossier-sujet :
+# leur page n'est pas <slug>/index.md mais <sujet>/<page>.md.
+TOPIC_DOC_PATHS: dict[str, str] = {
+    "first-crud": "crud/first-crud.md",
+}
 
 # Toutes les pages starters concernées par la règle stricte
 # d'absence des commandes de création.
@@ -70,6 +76,8 @@ def _doc_path(slug: str) -> Path:
     # (welcome → first-sql) sont regroupés à plat dans
     # docs/starters/welcome/<slug>.md. contact-simple garde son
     # dossier historique.
+    if slug in TOPIC_DOC_PATHS:
+        return STARTERS_DOCS / TOPIC_DOC_PATHS[slug]
     if slug in STANDALONE_STARTERS:
         return STARTERS_DOCS / slug / "index.md"
     return STARTERS_DOCS / "welcome" / f"{slug}.md"
@@ -88,7 +96,10 @@ class TestSequentialChain:
         # palier suivant est un fichier frère « target.md » ; le dernier
         # palier (first-sql) pointe vers contact-simple resté dans son
         # dossier (« ../contact-simple/ »).
-        if target in STANDALONE_STARTERS:
+        if target in TOPIC_DOC_PATHS:
+            # Lien vers la page sous dossier-sujet (« ../crud/first-crud.md »).
+            link_variants = (f"../{TOPIC_DOC_PATHS[target]}",)
+        elif target in STANDALONE_STARTERS:
             link_variants = (f"../{target}/", f"../{target}/index.md")
         else:
             link_variants = (f"{target}.md", f"{target}/")
@@ -100,17 +111,17 @@ class TestSequentialChain:
     def test_last_palier_points_to_premier_crud(self):
         # Le dernier palier de la progression de découverte est
         # first-sql-write (écriture en base) ; sa section « Après ce
-        # starter » pointe vers le premier starter autonome, premier-crud.
+        # starter » pointe vers le premier starter autonome, first-crud.
         content = _doc_path("first-sql-write").read_text(encoding="utf-8")
-        assert "../premier-crud/" in content
+        assert "../crud/first-crud.md" in content
 
     def test_premier_crud_returns_to_overview(self):
-        # premier-crud clôt la chaîne pédagogique et renvoie vers ../
-        content = _doc_path("premier-crud").read_text(encoding="utf-8")
+        # first-crud clôt la chaîne pédagogique et renvoie vers ../
+        content = _doc_path("first-crud").read_text(encoding="utf-8")
         # On cherche un lien retour explicite vers la vue d'ensemble
         # des starters (`../index.md` ou `../`).
         assert "../index.md" in content or "(../)" in content, (
-            "docs/starters/premier-crud/index.md doit comporter "
+            "docs/starters/crud/first-crud.md doit comporter "
             "un lien retour vers la vue d'ensemble des starters."
         )
 

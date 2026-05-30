@@ -137,11 +137,20 @@ def test_chaque_starter_a_un_index_md():
     # Starters autonomes avec leur propre dossier docs/starters/<id>/index.md.
     starters_autonomes = [
         "contact-simple",
-        "premier-crud",
     ]
     for dossier in starters_autonomes:
         index = ROOT / "docs" / "starters" / dossier / "index.md"
         assert index.exists(), f"doc de présentation absente pour {dossier}"
+
+    # Le starter CRUD est regroupé sous le dossier-sujet crud/ :
+    # un index.md (vue d'ensemble) + la page first-crud.md.
+    crud = ROOT / "docs" / "starters" / "crud"
+    assert (crud / "index.md").exists(), (
+        "vue d'ensemble absente pour crud"
+    )
+    assert (crud / "first-crud.md").exists(), (
+        "page first-crud absente pour crud"
+    )
 
     # Le starter Auth est regroupé sous le dossier-sujet core-auth/ :
     # un index.md (vue d'ensemble) + la page users-core-auth.md.

@@ -1,4 +1,4 @@
-# Premier CRUD
+# First CRUD
 
 Objectif : réaliser un **CRUD complet** (créer, lire, modifier, supprimer)
 sur une table unique, avec du **SQL visible** et aucun ORM.
@@ -184,7 +184,7 @@ class MessagesController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Premier CRUD — Forge</title>
+  <title>First CRUD — Forge</title>
 </head>
 <body>
   <h1>Messages</h1>

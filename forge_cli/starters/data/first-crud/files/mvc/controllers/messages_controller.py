@@ -1,4 +1,4 @@
-"""Starter Premier CRUD — capstone des fondamentaux.
+"""Starter First CRUD — capstone des fondamentaux.
 
 Ticket : STARTER-PREMIER-CRUD-001.
 

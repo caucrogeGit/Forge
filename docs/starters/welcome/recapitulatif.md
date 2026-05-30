@@ -2,7 +2,7 @@
 
 Récapitulatif des **11 paliers** de la progression pédagogique et des
 API Forge introduites à chaque étape. À garder sous la main avant
-d'aborder le premier CRUD complet (`premier-crud`).
+d'aborder le premier CRUD complet (`first-crud`).
 
 ## Les 11 paliers
 
@@ -61,7 +61,7 @@ concaténation de valeurs. **Forge garde le SQL visible.**
 ## Et ensuite
 
 Une fois ces 11 paliers acquis, enchaînez les **starters autonomes** par
-ordre de complexité : d'abord le [Premier CRUD](../premier-crud/index.md)
+ordre de complexité : d'abord le [First CRUD](../crud/first-crud.md)
 (CRUD complet à SQL visible, entité neutre), puis les exemples métier
 depuis la [vue d'ensemble](../index.md) :
 Contacts → Utilisateurs/Auth → Carnet de contacts → …

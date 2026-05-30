@@ -33,4 +33,4 @@ validation et SQL en lecture/écriture. Il vous manque une seule chose
 pour une vraie application : **structurer ces opérations en un CRUD
 complet**.
 
-[Prochain starter : Premier CRUD](../premier-crud/index.md)
+[Prochain starter : First CRUD](../crud/first-crud.md)

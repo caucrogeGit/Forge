@@ -120,7 +120,9 @@ nav:
           - Écrire en base: starters/welcome/first-sql-write.md
           - Bilan du starter: starters/welcome/bilan.md
           - Aide-mémoire: starters/welcome/recapitulatif.md
-      - Premier CRUD: starters/premier-crud/index.md
+      - CRUD:
+          - Vue d'ensemble: starters/crud/index.md
+          - First CRUD: starters/crud/first-crud.md
       - Contacts:
           - Présentation: starters/contact-simple/index.md
           - Reconstruction: starters/contact-simple/rebuild.md

@@ -22,7 +22,7 @@ après [Première base SQL](first-sql.md).
 
 Aucune entité JSON.
 Aucun CRUD complet (lecture/mise à jour/suppression) — c'est l'objet du
-**starter suivant** (Premier CRUD).
+**starter suivant** (First CRUD).
 
 ## Prérequis
 
@@ -150,4 +150,4 @@ lister, modifier, supprimer) sur une entité neutre.
 
 [Bilan du starter Bonjour Forge](bilan.md)
 
-[Prochain starter : Premier CRUD](../premier-crud/index.md)
+[Prochain starter : First CRUD](../crud/first-crud.md)

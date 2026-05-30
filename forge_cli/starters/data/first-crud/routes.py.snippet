@@ -1,4 +1,4 @@
-# forge-starter:premier-crud:start
+# forge-starter:first-crud:start
 from mvc.controllers.messages_controller import MessagesController
 
 with router.group("", public=True) as pub:
@@ -7,4 +7,4 @@ with router.group("", public=True) as pub:
     pub.add("GET",  "/messages/{id}/edit",   MessagesController.edit,    name="messages_edit")
     pub.add("POST", "/messages/{id}",        MessagesController.update,  name="messages_update")
     pub.add("POST", "/messages/{id}/delete", MessagesController.destroy, name="messages_destroy")
-# forge-starter:premier-crud:end
+# forge-starter:first-crud:end

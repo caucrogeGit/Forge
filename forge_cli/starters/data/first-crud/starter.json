@@ -1,0 +1,24 @@
+{
+  "id": "first-crud",
+  "number": 16,
+  "name": "First CRUD",
+  "kind": "skeleton",
+  "aliases": [
+    "first-crud",
+    "first_crud",
+    "crud",
+    "16"
+  ],
+  "description": "First CRUD : capstone des fondamentaux — créer, lister, modifier et supprimer des lignes dans la table `first_sql_messages` avec du SQL visible (`fetch_all`/`fetch_one`/`insert`/`execute`), en réutilisant le formulaire+CSRF des paliers précédents. Aucune notion métier, aucun ORM.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/messages",
+  "routes_marker": "first-crud",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/messages",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/crud/first-crud/",
+  "check_paths": [
+    "mvc/controllers/messages_controller.py"
+  ]
+}

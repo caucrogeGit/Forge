@@ -62,17 +62,17 @@ class TestProgressionAfterReposition:
         # Plus de 12e palier : le CRUD est un starter autonome, pas un palier.
         assert "12. **" not in self.content, (
             "La progression ne doit plus comporter de palier 12 : le CRUD "
-            "est désormais le starter autonome `premier-crud`."
+            "est désormais le starter autonome `first-crud`."
         )
 
     def test_apres_progression_premier_crud(self):
-        # Après les 11 paliers, le premier starter autonome est Premier CRUD.
-        assert "premier-crud/index.md" in self.content, (
+        # Après les 11 paliers, le premier starter autonome est First CRUD.
+        assert "crud/first-crud.md" in self.content, (
             "La progression doit pointer vers le starter autonome "
-            "`premier-crud` après le palier 11."
+            "`first-crud` après le palier 11."
         )
         assert "STARTER-PREMIER-CRUD-001" in self.content, (
-            "Le starter Premier CRUD (STARTER-PREMIER-CRUD-001) doit être "
+            "Le starter First CRUD (STARTER-PREMIER-CRUD-001) doit être "
             "cité comme premier starter autonome après la progression."
         )
 

@@ -22,11 +22,11 @@
 | Palier « concept » (explication + formulaire illustratif) | [csrf.md](../starters/welcome/csrf.md) |
 | Palier SQL visible (lecture / écriture) | [first-sql.md](../starters/welcome/first-sql.md), [first-sql-write.md](../starters/welcome/first-sql-write.md) |
 | Dernier palier → bilan + prochain starter | [first-sql-write.md](../starters/welcome/first-sql-write.md) |
-| Starter autonome (CRUD complet, neutre) | [premier-crud](../starters/premier-crud/index.md) |
+| Starter autonome (CRUD complet, neutre) | [first-crud](../starters/crud/first-crud.md) |
 | Page bilan / aide-mémoire de fin | [bilan.md](../starters/welcome/bilan.md), [recapitulatif.md](../starters/welcome/recapitulatif.md) |
 
 Côté code (non liés ici car hors `docs/`) :
-`forge_cli/starters/data/welcome/` et `forge_cli/starters/data/premier-crud/`.
+`forge_cli/starters/data/welcome/` et `forge_cli/starters/data/first-crud/`.
 
 ---
 
@@ -211,7 +211,7 @@ Passez au palier suivant : **<Nom>** — <ce qu'on y apprend>.
 
 ### `starter.json`
 
-Modèle (skeleton), aligné sur `welcome` / `premier-crud` :
+Modèle (skeleton), aligné sur `welcome` / `first-crud` :
 
 ```json
 {
@@ -264,7 +264,7 @@ with router.group("", public=True) as pub:
     - `request.route_param("k")` → segment d'URL (`/x/{k}`) ;
     - `request.form("k", default=…)` → corps d'un POST.
 - **Pas de redirection** dans l'API `Response` : après une écriture
-  (`POST`), on **relit la base et on ré-affiche** (cf. `premier-crud`), en
+  (`POST`), on **relit la base et on ré-affiche** (cf. `first-crud`), en
   notant que dans une vraie app on ferait un *POST-Redirect-GET*.
 - Validation **avant** écriture ; refus → `Response.text(..., status=422)`.
 
