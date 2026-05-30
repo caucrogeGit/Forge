@@ -53,12 +53,12 @@ python -m venv .venv
 source .venv/bin/activate          # Linux / macOS
 # ou : .venv\Scripts\activate      # Windows
 
-# Installer le core + les outils de dev + les 4 modules opt-in
+# Installer le core + les outils de dev + les 6 modules opt-in
 pip install -e .
 pip install -r requirements-dev.txt
 
-# Vérifier : les 4 modules opt-in sont importables
-python -c "import forge_mvc_mfa, forge_mvc_rbac, forge_mvc_workflow, forge_mvc_stats; print('OK')"
+# Vérifier : les 6 modules opt-in sont importables
+python -c "import forge_mvc_mfa, forge_mvc_rbac, forge_mvc_workflow, forge_mvc_stats, forge_mvc_media, forge_mvc_iot; print('OK')"
 
 # Lancer la suite complète
 pytest
@@ -100,7 +100,7 @@ python -m pytest tests/ -q
 forge check:model
 python -m mkdocs build --strict
 python -m pip install -e . --no-deps             # rafraîchit l'entry point forge
-python -m pip install -r requirements-dev.txt   # garantit que les 4 modules opt-in sont à jour
+python -m pip install -r requirements-dev.txt   # garantit que les 6 modules opt-in sont à jour
 ```
 
 Pour lancer uniquement les tests fonctionnels du framework (plus rapide) :

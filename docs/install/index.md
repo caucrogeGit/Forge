@@ -59,15 +59,16 @@ python -m pip install -r requirements-dev.txt
 ```
 
 `pip install -e .` installe le core en mode éditable.
-`requirements-dev.txt` installe ensuite les 4 modules opt-in
+`requirements-dev.txt` installe ensuite les 6 modules opt-in
 (également en éditable) et les outils de développement. Voir
 [Installation depuis GitHub](github.md) pour les détails.
 
 ## Contrat d'installation des opt-ins
 
-Depuis `1.0.0-beta.9`, le core `forge-mvc` et les cinq opt-ins officiels
+Le core `forge-mvc` et les six opt-ins officiels
 (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
-`forge-mvc-media`) sont publiés sur PyPI.
+`forge-mvc-media`, `forge-mvc-iot`) sont publiés sur PyPI (les cinq premiers
+depuis `1.0.0-beta.9`, `forge-mvc-iot` depuis `1.0.0-beta.12`).
 
 Installation directe d'un opt-in (méthode recommandée — disponible pour tous) :
 
@@ -107,7 +108,7 @@ python -m pip install -e .
 python -m pip install -r requirements-dev.txt
 ```
 
-`requirements-dev.txt` installe les cinq opt-ins en mode éditable.
+`requirements-dev.txt` installe les six opt-ins en mode éditable.
 
 ---
 
