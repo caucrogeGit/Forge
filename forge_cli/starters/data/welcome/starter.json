@@ -3,8 +3,14 @@
   "number": 7,
   "name": "Bonjour Forge",
   "kind": "skeleton",
-  "aliases": ["welcome", "bienvenue", "bonjour", "bonjour-forge", "7"],
-  "description": "Starter 7 — Bonjour Forge : premier contact minimal avec Forge. Deux routes (`/welcome`, `/welcome/greet`), un contrôleur avec `Response.text(...)` et `request.param(...)`, aucune vue HTML, aucune base de données.",
+  "aliases": [
+    "welcome",
+    "bienvenue",
+    "bonjour",
+    "bonjour-forge",
+    "7"
+  ],
+  "description": "Bonjour Forge : premier contact minimal avec Forge. Une route (`/welcome`), un contrôleur avec `Response.text(...)`, aucune vue HTML, aucune base de données. La lecture d'un paramètre d'URL est introduite au palier suivant (`query-params`).",
   "status": "available",
   "requires_db": false,
   "supports_public": true,
@@ -12,7 +18,7 @@
   "routes_marker": "welcome",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/welcome",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome/welcome/",
   "check_paths": [
     "mvc/controllers/welcome_controller.py"
   ]

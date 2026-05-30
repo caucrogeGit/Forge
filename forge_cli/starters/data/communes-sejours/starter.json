@@ -4,7 +4,7 @@
   "name": "Communes & Séjours",
   "kind": "skeleton",
   "aliases": ["5", "communes-sejours", "communes"],
-  "description": "Starter 5 — Démonstrateur avancé Forge (pages publiques + formulaire + notifications mail)",
+  "description": "Démonstrateur avancé Forge (pages publiques + formulaire + notifications mail)",
   "status": "available",
   "requires_db": false,
   "routes_marker": "communes-sejours",

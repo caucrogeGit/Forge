@@ -4,7 +4,7 @@
   "name": "Auth MFA (TOTP)",
   "kind": "skeleton",
   "aliases": ["auth-mfa", "mfa", "6"],
-  "description": "Starter 6 — Contrôleurs Auth + MFA (TOTP) sans stubs — nécessite forge-mvc-mfa",
+  "description": "Contrôleurs Auth + MFA (TOTP) sans stubs — nécessite forge-mvc-mfa",
   "status": "available",
   "requires_db": false,
   "supports_public": false,

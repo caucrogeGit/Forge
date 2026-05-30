@@ -6,7 +6,7 @@
   "entity": "Utilisateur",
   "entity_json": "entities/utilisateur.json",
   "aliases": ["utilisateurs-auth", "utilisateurs", "auth", "2"],
-  "description": "Starter 2 — Login, sessions, routes protégées, CSRF",
+  "description": "Login, sessions, routes protégées, CSRF",
   "status": "available",
   "requires_db": true,
   "supports_public": false,
@@ -14,7 +14,7 @@
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/login",
   "test_command": "python scripts/create_auth_user.py",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/02-utilisateurs-auth/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/utilisateurs-auth/",
   "check_paths": [
     "mvc/entities/utilisateur",
     "mvc/controllers/auth_controller.py",

@@ -1,0 +1,6 @@
+# forge-starter:csrf:start
+from mvc.controllers.csrf_controller import CsrfController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/csrf", CsrfController.index, name="csrf_index")
+# forge-starter:csrf:end

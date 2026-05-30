@@ -4,12 +4,12 @@
   "name": "Contacts",
   "entity": "Contact",
   "aliases": ["contacts", "1"],
-  "description": "Starter 1 — CRUD simple de contacts",
+  "description": "CRUD simple de contacts",
   "status": "available",
   "requires_db": true,
   "home_route": "/contacts",
   "routes_marker": "contact-simple",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/01-contact-simple/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/contact-simple/",
   "routes": {
     "prefix": "/contacts",
     "actions": [

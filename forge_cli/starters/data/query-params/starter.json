@@ -3,8 +3,13 @@
   "number": 8,
   "name": "Paramètres d'URL",
   "kind": "skeleton",
-  "aliases": ["query-params", "query_params", "params", "8"],
-  "description": "Starter 8 — Paramètres d'URL : palier 2 de la progression pédagogique officielle, après Bonjour Forge. Deux routes (`/query-params`, `/query-params/hello`) qui apprennent à lire une valeur d'URL avec `request.param(...)`. Aucune vue HTML, aucune base de données.",
+  "aliases": [
+    "query-params",
+    "query_params",
+    "params",
+    "8"
+  ],
+  "description": "Paramètres d'URL : palier 2 de la progression pédagogique officielle, après Bonjour Forge. Deux routes (`/query-params`, `/query-params/hello`) qui apprennent à lire une valeur d'URL avec `request.param(...)`. Aucune vue HTML, aucune base de données.",
   "status": "available",
   "requires_db": false,
   "supports_public": true,
@@ -12,7 +17,7 @@
   "routes_marker": "query-params",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/query-params",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/query-params/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome/query-params/",
   "check_paths": [
     "mvc/controllers/query_params_controller.py"
   ]

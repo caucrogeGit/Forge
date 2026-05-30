@@ -1,0 +1,7 @@
+# forge-starter:first-sql-write:start
+from mvc.controllers.first_sql_write_controller import FirstSqlWriteController
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/first-sql-write", FirstSqlWriteController.index,  name="first_sql_write_index")
+    pub.add("POST", "/first-sql-write", FirstSqlWriteController.submit, name="first_sql_write_submit")
+# forge-starter:first-sql-write:end

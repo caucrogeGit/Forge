@@ -1,0 +1,6 @@
+# forge-starter:json-response:start
+from mvc.controllers.json_response_controller import JsonResponseController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/json-response", JsonResponseController.index, name="json_response_index")
+# forge-starter:json-response:end
