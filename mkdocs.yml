@@ -218,6 +218,7 @@ nav:
           - Roadmap Forge: roadmap/forge-roadmap.md
           - Forge Design: roadmap/forge-design-roadmap.md
           - Tests terrain Forge: roadmap/forge-field-test-roadmap.md
+          - Réorganisation des starters: roadmap/starter-reorg-roadmap.md
       - Historique:
           - Roadmap Forge 1.5.0→2.0: history/forge-roadmap-history-2.0.md
           - Charte documentaire v1: history/charte-v1.md
