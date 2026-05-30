@@ -221,8 +221,9 @@ class TestStateSectionRefonte:
         )
 
     def test_state_mentions_modules_count(self):
-        assert "4 modules officiels" in self.source, (
-            "La landing devrait mentionner les 4 modules officiels"
+        # Six opt-ins officiels depuis beta.12 (cf. test_optins_count_consistency).
+        assert "6 modules officiels" in self.source, (
+            "La landing devrait mentionner les 6 modules officiels opt-in"
         )
 
     def test_state_no_obsolete_phases(self):
