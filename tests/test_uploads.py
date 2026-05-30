@@ -150,20 +150,24 @@ def test_media_path_to_storage_path_refuse_traversal(tmp_path):
 def test_save_upload_ecrit_dans_la_categorie_configuree(tmp_path):
     forge.configure(
         upload_root=str(tmp_path / "uploads"),
-        upload_max_size=100,
+        upload_max_size=100_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
     )
 
-    saved = save_upload(_file(), category="images")
+    # SEC-UPLOAD-IMAGE-VERIFY-002 : la catégorie images vérifie le contenu,
+    # on fournit donc une vraie image.
+    image = _image_file()
+    data = image.content
+    saved = save_upload(image, category="images")
 
     assert saved.category == "images"
     assert saved.filename.endswith(".png")
     assert saved.path == f"images/{saved.filename}"
     assert not saved.path.startswith("/")
     assert saved.variants == {}
-    assert saved.size == 3
-    assert (tmp_path / "uploads" / "images" / saved.filename).read_bytes() == b"abc"
+    assert saved.size == len(data)
+    assert (tmp_path / "uploads" / "images" / saved.filename).read_bytes() == data
 
 
 def test_save_upload_image_sans_variants_ne_genere_pas_de_variantes(tmp_path):
@@ -254,7 +258,7 @@ def test_save_upload_variants_refuse_fichier_non_image(tmp_path):
         upload_allowed_mime_types=["image/png"],
     )
 
-    with pytest.raises(UploadStorageError, match="non reconnu"):
+    with pytest.raises(UploadStorageError, match="n'est pas une image valide"):
         save_upload(_file("fake.png", b"not an image", "image/png"), category="images", variants=True)
 
 
@@ -266,7 +270,7 @@ def test_save_upload_variants_refuse_svg(tmp_path):
         upload_allowed_mime_types=["image/svg+xml"],
     )
 
-    with pytest.raises(UploadStorageError, match="non supporte"):
+    with pytest.raises(UploadStorageError, match="n'est pas une image valide"):
         save_upload(
             _file("icone.svg", b"<svg></svg>", "image/svg+xml"),
             category="images",
@@ -274,16 +278,46 @@ def test_save_upload_variants_refuse_svg(tmp_path):
         )
 
 
+def test_save_upload_images_refuse_contenu_falsifie_sans_ecrire(tmp_path):
+    """SEC-UPLOAD-IMAGE-VERIFY-002 — contenu non-image en catégorie images.
+
+    Extension + MIME d'image valides mais contenu falsifié : rejet AVANT
+    écriture disque, que les variantes soient demandées ou non. Aucun
+    fichier ne doit subsister sur le disque.
+    """
+    forge.configure(
+        upload_root=str(tmp_path / "uploads"),
+        upload_max_size=100_000,
+        upload_allowed_extensions=["png"],
+        upload_allowed_mime_types=["image/png"],
+    )
+    images_dir = tmp_path / "uploads" / "images"
+
+    for variants in (False, True):
+        fake = _file("photo.png", b"%PDF-1.4 ceci n'est pas une image", "image/png")
+        with pytest.raises(UploadStorageError, match="n'est pas une image valide"):
+            save_upload(fake, category="images", variants=variants)
+        written = (
+            [p for p in images_dir.glob("*") if p.is_file()]
+            if images_dir.exists()
+            else []
+        )
+        assert not written, (
+            f"un fichier a été écrit malgré un contenu invalide "
+            f"(variants={variants}) : {written}"
+        )
+
+
 def test_save_upload_evite_ecrasement(tmp_path):
     forge.configure(
         upload_root=str(tmp_path / "uploads"),
-        upload_max_size=100,
+        upload_max_size=100_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
     )
 
-    first = save_upload(_file(content=b"one"), category="images")
-    second = save_upload(_file(content=b"two"), category="images")
+    first = save_upload(_image_file(), category="images")
+    second = save_upload(_image_file(), category="images")
 
     assert first.filename != second.filename
 
@@ -291,11 +325,11 @@ def test_save_upload_evite_ecrasement(tmp_path):
 def test_delete_upload_supprime_sous_upload_root(tmp_path):
     forge.configure(
         upload_root=str(tmp_path / "uploads"),
-        upload_max_size=100,
+        upload_max_size=100_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
     )
-    saved = save_upload(_file(), category="images")
+    saved = save_upload(_image_file(), category="images")
 
     assert delete_upload(saved.path) is True
     assert delete_upload(saved.path) is False

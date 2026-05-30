@@ -47,21 +47,36 @@ class MediaRecord:
     is_main: bool = True
 
 
-def _verify_image_content(data: bytes) -> None:
-    """Vérifie que ``data`` est une image décodable par Pillow.
+_VERIFIABLE_IMAGE_FORMATS: frozenset[str] = frozenset({"JPEG", "PNG", "WEBP"})
 
-    SEC-UPLOAD-IMAGE-VERIFY-001 — défense contre un fichier non-image
+
+def verify_image_content(data: bytes) -> None:
+    """Vérifie que ``data`` est bien une image raster d'un format autorisé.
+
+    SEC-UPLOAD-IMAGE-VERIFY-001 / 002 — défense contre un fichier non-image
     présenté avec une extension/MIME d'image (Content-Type falsifiable).
-    ``Image.verify()`` invalide l'objet après usage : on l'appelle sur
-    une instance jetable ouverte depuis les octets en mémoire.
+    Helper partagé : appelé par ``save_image`` et par ``save_upload``
+    (catégorie ``images``) AVANT toute écriture disque.
+
+    On s'appuie sur ``Image.open`` (identification du format par en-tête) plutôt
+    que sur ``Image.verify`` : ce dernier vérifie l'intégrité CRC et rejette des
+    images réelles mais légèrement malformées (faux positifs). Ici l'objectif
+    est de distinguer une vraie image d'un fichier déguisé (PDF, script, SVG…) ;
+    l'identification du format suffit, complétée par une liste blanche alignée
+    sur ``ALLOWED_IMAGE_MIME_TYPES``.
     """
     try:
         with Image.open(io.BytesIO(data)) as probe:
-            probe.verify()
+            image_format = probe.format
     except (UnidentifiedImageError, OSError, SyntaxError, ValueError) as exc:
         raise UploadStorageError(
             "Le fichier fourni n'est pas une image valide."
         ) from exc
+    if image_format not in _VERIFIABLE_IMAGE_FORMATS:
+        raise UploadStorageError(
+            "Le fichier fourni n'est pas une image valide "
+            f"(format détecté : {image_format})."
+        )
 
 
 def save_image(
@@ -97,7 +112,7 @@ def save_image(
     # sur des métadonnées déclaratives (extension + Content-Type fournis
     # par le client). On vérifie ici que le contenu est réellement une
     # image décodable AVANT de l'écrire sur le disque (charte §7).
-    _verify_image_content(data)
+    verify_image_content(data)
 
     root = upload_root()
     saved_path = storage.save_bytes(

@@ -68,6 +68,15 @@ def save_upload(file, category: str = "documents", *, variants: bool = False) ->
         allowed_mime_types=_cfg("upload_allowed_mime_types"),
         max_size=int(_cfg("upload_max_size")),
     )
+    if category == "images":
+        # SEC-UPLOAD-IMAGE-VERIFY-002 — la validation ci-dessus ne porte que
+        # sur des métadonnées déclaratives (extension + Content-Type). Pour la
+        # catégorie images on vérifie que le contenu est une vraie image
+        # AVANT toute écriture disque (cohérent avec save_image). C'est le
+        # flux utilisé par le CRUD généré : save_upload(..., "images", ...).
+        from core.uploads.image import verify_image_content
+
+        verify_image_content(data)
     root = upload_root()
     saved_path = storage.save_bytes(
         data,
