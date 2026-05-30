@@ -4,9 +4,10 @@ Vérifie que les guides d'installation officiels respectent l'ordre canonique :
   python -m pip install -e .
   python -m pip install -r requirements-dev.txt
 
-Si l'ordre est inversé, pip peut chercher forge-mvc==<version> sur PyPI
-(déclaré comme dépendance des opt-in) et échouer puisque Forge n'est
-pas publié sur PyPI en série 3.x.
+Si l'ordre est inversé, pip peut résoudre forge-mvc==<version> depuis PyPI
+(déclaré comme dépendance des opt-in) au lieu du checkout local : en mode dev
+on veut le core depuis les sources (`-e .`), et la version publiée étant une
+bêta (`1.0.0-beta.x`) elle exigerait `--pre`. D'où l'ordre canonique.
 
 Périmètre : guides qui s'adressent au contributeur/développeur (mode dev),
 pas les guides utilisateur final (qui ne devraient pas avoir besoin de
@@ -62,8 +63,8 @@ def test_dev_guides_install_core_before_requirements_dev():
 
 def test_no_pypi_install_in_dev_guides():
     """Aucun guide dev ne doit proposer 'pip install forge-mvc[...]' (PyPI)
-    sans avertissement source-only explicite. Forge n'est pas publié sur
-    PyPI en série 3.x."""
+    sans avertissement explicite : en mode dev on installe le core depuis
+    les sources (`-e .`), pas depuis la bêta PyPI (qui exigerait `--pre`)."""
     offenders: list[str] = []
     for guide in DEV_GUIDES:
         if not guide.exists():
