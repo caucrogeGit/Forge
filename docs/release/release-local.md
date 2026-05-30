@@ -175,7 +175,7 @@ forge doctor
 forge starter:list
 ```
 
-`forge starter:list` doit afficher les 15 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
+`forge starter:list` doit afficher les 19 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
 
 ---
 
@@ -200,6 +200,10 @@ forge starter:build 12 --force --dry-run
 forge starter:build 13 --force --dry-run
 forge starter:build 14 --force --dry-run
 forge starter:build 15 --force --dry-run
+forge starter:build 16 --force --dry-run
+forge starter:build 17 --force --dry-run
+forge starter:build 18 --force --dry-run
+forge starter:build 19 --force --dry-run
 ```
 
 !!! note "Ce que --dry-run valide"
@@ -239,7 +243,7 @@ DB_APP_PWD=mot_de_passe_applicatif
 !!! note "Erreur db:apply sans db:init"
     Le message `Connexion MariaDB applicative impossible. Lancez d'abord forge db:init` est **normal** si `db:init` n'a pas été exécuté. Ce n'est pas un bug du starter.
 
-### Starter 1 — Contacts
+### Contacts
 
 ```bash
 cd ~/Projets
@@ -259,7 +263,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 - créer un contact via `/contacts/new` ;
 - vérifier que la fiche apparaît dans la liste.
 
-### Starter 2 — Utilisateurs / authentification
+### Utilisateurs / authentification
 
 ```bash
 cd ~/Projets
@@ -298,7 +302,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 - se connecter avec `admin` / `secret123` ;
 - vérifier l'accès à `/dashboard` (route protégée).
 
-### Starter 3 — Carnet de contacts
+### Carnet de contacts
 
 ```bash
 cd ~/Projets
@@ -329,7 +333,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 - vérifier `/villes` (liste, peuplée si seed lancé) ;
 - créer un contact et lui associer une ville.
 
-### Starter 4 — Suivi pédagogique
+### Suivi pédagogique
 
 ```bash
 cd ~/Projets
@@ -364,7 +368,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 - vérifier la liste des élèves `/eleves` ;
 - vérifier la liste des cours `/cours`.
 
-### Starter 5 — Communes & Séjours
+### Communes & Séjours
 
 Démonstrateur avancé : pages publiques, formulaire de demande, notifications mail.
 
@@ -391,7 +395,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 - vérifier le formulaire de demande de séjour ;
 - si la configuration mail est présente, vérifier la notification.
 
-### Starter 6 — Auth MFA (TOTP)
+### Auth MFA (TOTP)
 
 **Prérequis** : `forge-mvc-mfa` installé (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`, statut Alpha).
 
@@ -491,8 +495,8 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 |---|---|
 | `python -m build` | wheel créée dans `dist/` |
 | `forge --version` | `Forge {{forge_version}}` |
-| `forge starter:list` | 15 starters affichés |
-| `forge starter:build N --dry-run` | plan affiché sans erreur (×14) |
+| `forge starter:list` | 19 starters affichés |
+| `forge starter:build N --dry-run` | plan affiché sans erreur (×19) |
 | `forge db:init` + `starter:build 1` | CRUD contacts fonctionnel |
 | `forge db:init` + `starter:build 2` | login `admin` / `secret123` → `/dashboard` |
 | `forge db:init` + `starter:build 3` | contacts + villes, seed optionnel |

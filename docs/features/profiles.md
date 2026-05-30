@@ -203,12 +203,12 @@ Un profil cible une **base technique** ; un starter fournit un **exemple d'appli
 
 | Besoin | Profil recommandé | Starter recommandé |
 |---|---|---|
-| Projet très simple, pédagogique | `minimal` | Starter 1 — Contacts |
-| Projet classique | `standard` | Starter 1 — Contacts ou Starter 3 — Carnet de contacts |
-| Projet avec relation many_to_one | `standard` | Starter 3 — Carnet de contacts |
-| Projet avec authentification (moderne) | `standard` | Starter 2 — Utilisateurs/Auth |
-| Démonstrateur avancé, pages publiques | `standard` | Starter 5 — Communes & Séjours |
-| Démonstrateur historique / legacy | — | Starter 4 — Suivi pédagogique (non recommandé pour un nouveau projet) |
+| Projet très simple, pédagogique | `minimal` | Contacts |
+| Projet classique | `standard` | Contacts ou Carnet de contacts |
+| Projet avec relation many_to_one | `standard` | Carnet de contacts |
+| Projet avec authentification (moderne) | `standard` | Utilisateurs/Auth |
+| Démonstrateur avancé, pages publiques | `standard` | Communes & Séjours |
+| Démonstrateur historique / legacy | — | Suivi pédagogique (non recommandé pour un nouveau projet) |
 
 Les statuts des starters ont été formalisés dans `STARTER-LEGACY-AUDIT-001` et `STARTER-LEGACY-DECISION-001`. Le ticket `STARTER-CS-REPLACE-001` confirme Communes & Séjours comme démonstrateur avancé principal.
 

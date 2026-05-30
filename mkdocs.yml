@@ -107,26 +107,32 @@ nav:
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Progression pédagogique:
-          - Bonjour Forge: starters/progression/welcome.md
-          - Paramètres d'URL: starters/progression/query-params.md
-          - Première vue HTML: starters/progression/first-html-view.md
-          - Route dynamique: starters/progression/dynamic-route.md
-          - Inspecter une requête: starters/progression/request-debug.md
-          - Premier formulaire POST: starters/progression/form-post.md
-          - Validation serveur: starters/progression/server-validation.md
-          - Première base SQL: starters/progression/first-sql.md
+          - Bonjour Forge: starters/welcome/welcome.md
+          - Paramètres d'URL: starters/welcome/query-params.md
+          - Première vue HTML: starters/welcome/first-html-view.md
+          - Route dynamique: starters/welcome/dynamic-route.md
+          - Inspecter une requête: starters/welcome/request-debug.md
+          - Réponse JSON: starters/welcome/json-response.md
+          - Le jeton CSRF: starters/welcome/csrf.md
+          - Premier formulaire POST: starters/welcome/form-post.md
+          - Validation serveur: starters/welcome/server-validation.md
+          - Première base SQL: starters/welcome/first-sql.md
+          - Écrire en base: starters/welcome/first-sql-write.md
+          - Bilan du starter: starters/welcome/bilan.md
+          - Aide-mémoire: starters/welcome/recapitulatif.md
+      - Premier CRUD: starters/premier-crud/index.md
       - Contacts:
-          - Présentation: starters/01-contact-simple/index.md
-          - Reconstruction: starters/01-contact-simple/rebuild.md
+          - Présentation: starters/contact-simple/index.md
+          - Reconstruction: starters/contact-simple/rebuild.md
       - Utilisateurs / Auth:
-          - Présentation: starters/02-utilisateurs-auth/index.md
-          - Reconstruction: starters/02-utilisateurs-auth/rebuild.md
+          - Présentation: starters/utilisateurs-auth/index.md
+          - Reconstruction: starters/utilisateurs-auth/rebuild.md
       - Carnet de contacts:
-          - Présentation: starters/03-carnet-contacts/index.md
-          - Reconstruction: starters/03-carnet-contacts/rebuild.md
+          - Présentation: starters/carnet-contacts/index.md
+          - Reconstruction: starters/carnet-contacts/rebuild.md
       - Suivi pédagogique:
-          - Présentation: starters/04-suivi-comportement-eleves/index.md
-          - Reconstruction: starters/04-suivi-comportement-eleves/rebuild.md
+          - Présentation: starters/suivi-comportement-eleves/index.md
+          - Reconstruction: starters/suivi-comportement-eleves/rebuild.md
       - Communes & Séjours:
           - Présentation: starters/communes-sejours/index.md
           - Reconstruction: starters/communes-sejours/rebuild.md
