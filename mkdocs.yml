@@ -230,6 +230,7 @@ nav:
       - Pour contribuer:
           - Vue d'ensemble: philosophy/contributing.md
           - Conventions de travail: contributing/conventions.md
+          - Modèle de starter (référence welcome): contributing/starter-welcome-model.md
           - Dépôt canonique et récupération: contributing/canonical-repo.md
       - Audits:
           - Tracker des constats: history/audits/findings-tracker.md
