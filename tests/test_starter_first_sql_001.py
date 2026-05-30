@@ -36,7 +36,7 @@ STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "first-sql"
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "first_sql_controller.py"
 MIGRATIONS_DIR = FILES_DIR / "mvc" / "migrations"
-DOC = PROJECT_ROOT / "docs" / "starters" / "first-sql" / "index.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "progression" / "first-sql.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 MIGRATION_FILENAME_RE = re.compile(r"^(\d{14})_([a-z0-9_]+)\.sql$")

@@ -107,4 +107,4 @@ avec :
 request.param("name", default="Forge")
 ```
 
-[Continuer avec Paramètres d'URL](../query-params/index.md)
+[Continuer avec Paramètres d'URL](query-params.md)

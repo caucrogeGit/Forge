@@ -4,7 +4,7 @@ Objectif : rendre une page HTML avec `BaseController.render(...)`.
 
 Palier 3 de la
 [progression officielle des starters](../index.md#progression-recommandee),
-après [Paramètres d'URL](../query-params/index.md).
+après [Paramètres d'URL](query-params.md).
 
 ## Ce que ce starter montre
 
@@ -113,4 +113,4 @@ Vous y apprendrez à lire un paramètre de route avec :
 request.route_param("id", default="inconnu")
 ```
 
-[Continuer avec Route dynamique](../dynamic-route/index.md)
+[Continuer avec Route dynamique](dynamic-route.md)

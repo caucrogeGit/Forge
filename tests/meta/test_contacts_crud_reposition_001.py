@@ -141,9 +141,12 @@ class TestContactsDocReposition:
             "La page Contacts doit pointer vers Bonjour Forge pour le "
             "premier contact avec Forge."
         )
-        assert "../welcome/index.md" in self.content or "welcome/index.md" in self.content, (
+        assert (
+            "../progression/welcome.md" in self.content
+            or "progression/welcome.md" in self.content
+        ), (
             "La page Contacts doit lier explicitement vers la doc "
-            "`welcome/index.md`."
+            "`progression/welcome.md`."
         )
 
 

@@ -338,4 +338,4 @@ class TestLiensInternes:
 
     def test_lien_vers_starter_welcome(self):
         text = _text()
-        assert "../starters/welcome/index.md" in text
+        assert "../starters/progression/welcome.md" in text

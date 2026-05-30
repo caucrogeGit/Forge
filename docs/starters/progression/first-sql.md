@@ -4,7 +4,7 @@ Objectif : lire une donnée depuis MariaDB avec du SQL visible.
 
 Palier 8 de la
 [progression officielle des starters](../index.md#progression-recommandee),
-après [Validation serveur](../server-validation/index.md). C'est le
+après [Validation serveur](server-validation.md). C'est le
 **dernier palier avant le CRUD Contacts**.
 
 ## Ce que ce starter montre

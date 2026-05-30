@@ -145,8 +145,13 @@ def test_chaque_starter_a_un_index_md():
         "welcome",
     ]
     for dossier in attendus:
-        index = ROOT / "docs" / "starters" / dossier / "index.md"
-        assert index.exists(), f"index.md absent pour {dossier}"
+        # DOCS-STARTERS-PROGRESSION-FOLDER-001 — welcome est regroupé à plat
+        # dans docs/starters/progression/welcome.md.
+        if dossier == "welcome":
+            index = ROOT / "docs" / "starters" / "progression" / "welcome.md"
+        else:
+            index = ROOT / "docs" / "starters" / dossier / "index.md"
+        assert index.exists(), f"doc de présentation absente pour {dossier}"
 
 
 def test_starters_1_a_4_ont_un_rebuild_md():

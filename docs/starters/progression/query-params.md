@@ -6,7 +6,7 @@ Ce starter est identifié par `query-params` dans la CLI Forge
 (aliases `query_params` / `params`). Il représente le **palier 2** de
 la
 [progression officielle des starters](../index.md#progression-recommandee),
-juste après [Bonjour Forge](../welcome/index.md).
+juste après [Bonjour Forge](welcome.md).
 
 ## Ce que ce starter installe
 
@@ -118,4 +118,4 @@ Vous y apprendrez à rendre une page HTML avec :
 BaseController.render(...)
 ```
 
-[Continuer avec Première vue HTML](../first-html-view/index.md)
+[Continuer avec Première vue HTML](first-html-view.md)

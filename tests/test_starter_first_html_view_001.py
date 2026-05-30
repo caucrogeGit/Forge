@@ -31,7 +31,7 @@ STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "first-html-vie
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "first_html_view_controller.py"
 VIEW = FILES_DIR / "mvc" / "views" / "first_html_view" / "index.html"
-DOC = PROJECT_ROOT / "docs" / "starters" / "first-html-view" / "index.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "progression" / "first-html-view.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 

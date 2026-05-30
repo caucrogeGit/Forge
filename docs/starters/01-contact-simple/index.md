@@ -100,7 +100,7 @@ Une fois que `forge --version` s'affiche correctement, revenez ici pour construi
     Voir [Profils de projet](../../features/profiles.md) pour choisir le bon
     profil au moment de `forge new`. Pour le **premier** contact
     avec Forge, démarrer plutôt par
-    [Bonjour Forge](../welcome/index.md) (palier 1, sans BDD).
+    [Bonjour Forge](../progression/welcome.md) (palier 1, sans BDD).
 
 ## 1. Présentation rapide
 

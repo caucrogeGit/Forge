@@ -5,7 +5,7 @@ formulaire.
 
 Palier 7 de la
 [progression officielle des starters](../index.md#progression-recommandee),
-après [Premier formulaire POST](../form-post/index.md).
+après [Premier formulaire POST](form-post.md).
 
 ## Ce que ce starter montre
 
@@ -100,4 +100,4 @@ from core.database.db import fetch_one
 row = fetch_one("SELECT content FROM first_sql_messages ORDER BY id LIMIT 1")
 ```
 
-[Continuer avec Première base SQL](../first-sql/index.md)
+[Continuer avec Première base SQL](first-sql.md)

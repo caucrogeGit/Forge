@@ -16,14 +16,14 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 | Starter | Statut | Profil associé | Usage recommandé |
 |---|---|---|---|
-| [Bonjour Forge — premier pas](welcome/index.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact minimal avec Forge — `Response.text(...)` et `request.param(...)`, deux routes, aucune vue HTML, aucune base de données |
-| [Paramètres d'URL](query-params/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 2 de la progression — lire une valeur d'URL avec `request.param("name", default=...)`, deux routes, aucune vue HTML, aucune base de données |
-| [Première vue HTML](first-html-view/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 3 de la progression — rendre une page HTML avec `BaseController.render(...)`, une route, une vue, aucune base de données |
-| [Route dynamique](dynamic-route/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 4 de la progression — lire un paramètre de route avec `request.route_param("id")`, une route `/dynamic-route/articles/{id}`, aucune vue HTML, aucune base de données |
-| [Inspecter une requête](request-debug/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 5 de la progression — explorer `request.data` avec `Response.debug(...)`, une route `/request-debug`, aucune vue HTML, aucune base de données |
-| [Premier formulaire POST](form-post/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 6 de la progression — afficher un formulaire HTML minimal (avec CSRF), envoyer un POST, lire la valeur avec `request.form("name", ...)`, aucune base de données |
-| [Validation serveur](server-validation/index.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
-| [Première base SQL](first-sql/index.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
+| [Bonjour Forge — premier pas](progression/welcome.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact minimal avec Forge — `Response.text(...)` et `request.param(...)`, deux routes, aucune vue HTML, aucune base de données |
+| [Paramètres d'URL](progression/query-params.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 2 de la progression — lire une valeur d'URL avec `request.param("name", default=...)`, deux routes, aucune vue HTML, aucune base de données |
+| [Première vue HTML](progression/first-html-view.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 3 de la progression — rendre une page HTML avec `BaseController.render(...)`, une route, une vue, aucune base de données |
+| [Route dynamique](progression/dynamic-route.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 4 de la progression — lire un paramètre de route avec `request.route_param("id")`, une route `/dynamic-route/articles/{id}`, aucune vue HTML, aucune base de données |
+| [Inspecter une requête](progression/request-debug.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 5 de la progression — explorer `request.data` avec `Response.debug(...)`, une route `/request-debug`, aucune vue HTML, aucune base de données |
+| [Premier formulaire POST](progression/form-post.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 6 de la progression — afficher un formulaire HTML minimal (avec CSRF), envoyer un POST, lire la valeur avec `request.form("name", ...)`, aucune base de données |
+| [Validation serveur](progression/server-validation.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
+| [Première base SQL](progression/first-sql.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
 | [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | **Palier 9** de la progression — synthèse avancée du CRUD officiel ; suppose les 8 paliers précédents acquis |
 | [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
@@ -98,7 +98,7 @@ forge new mon-projet --starter welcome
 forge starter:build 7
 ```
 
-[Présentation](welcome/index.md)
+[Présentation](progression/welcome.md)
 
 ## Starters officiels simples
 
@@ -115,7 +115,7 @@ Profil recommandé : `minimal` ou `standard`.
   formulaires POST avec CSRF, validation serveur, migrations SQL).
 
 Pour le **premier** contact avec Forge, démarrer par
-[Bonjour Forge](welcome/index.md) (palier 1, sans BDD), pas par ce
+[Bonjour Forge](progression/welcome.md) (palier 1, sans BDD), pas par ce
 starter.
 
 [Présentation](01-contact-simple/index.md) · [Reconstruction](01-contact-simple/rebuild.md)
@@ -273,7 +273,7 @@ forge starter:build 7        # Bienvenue dans Forge (sans BDD)
 ```
 
 Pour le starter pédagogique `query-params` (palier 2 de la progression),
-voir la page dédiée [Paramètres d'URL](query-params/index.md) — il
+voir la page dédiée [Paramètres d'URL](progression/query-params.md) — il
 s'applique par son identifiant public, pas par un numéro.
 
 Les alias `contacts`, `auth`, `carnet`, `suivi`, `communes-sejours`, `query-params` et leurs variantes sont également supportés.

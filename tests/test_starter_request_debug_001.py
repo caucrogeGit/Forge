@@ -28,7 +28,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "request-debug"
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "request_debug_controller.py"
-DOC = PROJECT_ROOT / "docs" / "starters" / "request-debug" / "index.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "progression" / "request-debug.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 

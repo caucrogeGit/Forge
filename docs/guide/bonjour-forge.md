@@ -7,7 +7,7 @@ HTTP et une réponse texte. Sans base de données. Sans entité. Sans
 template Jinja2. Sans CRUD.
 
 Ce parcours suit l'ordre pédagogique du starter d'entrée
-[Bonjour Forge](../starters/welcome/index.md) :
+[Bonjour Forge](../starters/progression/welcome.md) :
 
 ```text
 forge run → route → contrôleur → Request → Response.text(...)
@@ -176,7 +176,7 @@ Une fois ce premier contact assimilé :
 | Parcours guidé avec MariaDB | [Guide de démarrage](guide.md) |
 | Première application complète | [Application complète](app-complete-tutorial.md) |
 | Catalogue des starters | [Vue d'ensemble des starters](../starters/index.md) |
-| Détails du starter `welcome` | [Bonjour Forge — starter](../starters/welcome/index.md) |
+| Détails du starter `welcome` | [Bonjour Forge — starter](../starters/progression/welcome.md) |
 | Référence HTTP complète | [Convention HTTP inspectable](../reference/http.md) |
 | Toutes les commandes CLI | [Commandes CLI](../reference/cli-commands.md) |
 

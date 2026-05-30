@@ -59,7 +59,13 @@ FORBIDDEN_COMMANDS = [
 
 
 def _doc_path(slug: str) -> Path:
-    return STARTERS_DOCS / slug / "index.md"
+    # DOCS-STARTERS-PROGRESSION-FOLDER-001 — les paliers pédagogiques
+    # (welcome → first-sql) sont regroupés à plat dans
+    # docs/starters/progression/<slug>.md. 01-contact-simple garde son
+    # dossier historique.
+    if slug == "01-contact-simple":
+        return STARTERS_DOCS / slug / "index.md"
+    return STARTERS_DOCS / "progression" / f"{slug}.md"
 
 
 # ── Chaînage séquentiel : chaque page pointe vers la suivante ─────────────────
@@ -71,12 +77,17 @@ class TestSequentialChain:
     def test_page_points_to_next_palier(self, source: str, target: str):
         page = _doc_path(source)
         content = page.read_text(encoding="utf-8")
-        # On accepte les deux formats : ../target/  ou  ../target/index.md
-        link_variants = (f"../{target}/", f"../{target}/index.md")
+        # DOCS-STARTERS-PROGRESSION-FOLDER-001 — au sein de progression/, le
+        # palier suivant est un fichier frère « target.md » ; le dernier
+        # palier (first-sql) pointe vers 01-contact-simple resté dans son
+        # dossier (« ../01-contact-simple/ »).
+        if target == "01-contact-simple":
+            link_variants = (f"../{target}/", f"../{target}/index.md")
+        else:
+            link_variants = (f"{target}.md", f"{target}/")
         assert any(v in content for v in link_variants), (
-            f"docs/starters/{source}/index.md doit contenir un lien "
-            f"vers le palier suivant : « ../{target}/ » "
-            f"(STARTER-SEQUENTIAL-NAV-001)."
+            f"{page} doit contenir un lien vers le palier suivant "
+            f"« {link_variants[0]} » (STARTER-SEQUENTIAL-NAV-001)."
         )
 
     def test_first_sql_points_to_contacts_crud(self):

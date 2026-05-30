@@ -5,7 +5,7 @@ Objectif : afficher la structure d'une requête avec `request.data` et
 
 Palier 5 de la
 [progression officielle des starters](../index.md#progression-recommandee),
-après [Route dynamique](../dynamic-route/index.md).
+après [Route dynamique](dynamic-route.md).
 
 ## Ce que ce starter montre
 
@@ -89,4 +89,4 @@ et à lire la valeur reçue côté serveur avec :
 request.form("name", default="Forge")
 ```
 
-[Continuer avec Premier formulaire POST](../form-post/index.md)
+[Continuer avec Premier formulaire POST](form-post.md)

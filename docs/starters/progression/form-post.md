@@ -5,7 +5,7 @@ côté contrôleur.
 
 Palier 6 de la
 [progression officielle des starters](../index.md#progression-recommandee),
-après [Inspecter une requête](../request-debug/index.md).
+après [Inspecter une requête](request-debug.md).
 
 ## Ce que ce starter montre
 
@@ -125,4 +125,4 @@ explicite :
 return Response.text("Le prénom est obligatoire", status=422)
 ```
 
-[Continuer avec Validation serveur](../server-validation/index.md)
+[Continuer avec Validation serveur](server-validation.md)

@@ -106,22 +106,15 @@ nav:
       - Créer un starter: philosophy/starter-author-guide.md
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
-      - Bienvenue dans Forge:
-          - Présentation: starters/welcome/index.md
-      - Paramètres d'URL:
-          - Présentation: starters/query-params/index.md
-      - Première vue HTML:
-          - Présentation: starters/first-html-view/index.md
-      - Route dynamique:
-          - Présentation: starters/dynamic-route/index.md
-      - Inspecter une requête:
-          - Présentation: starters/request-debug/index.md
-      - Premier formulaire POST:
-          - Présentation: starters/form-post/index.md
-      - Validation serveur:
-          - Présentation: starters/server-validation/index.md
-      - Première base SQL:
-          - Présentation: starters/first-sql/index.md
+      - Progression pédagogique:
+          - Bonjour Forge: starters/progression/welcome.md
+          - Paramètres d'URL: starters/progression/query-params.md
+          - Première vue HTML: starters/progression/first-html-view.md
+          - Route dynamique: starters/progression/dynamic-route.md
+          - Inspecter une requête: starters/progression/request-debug.md
+          - Premier formulaire POST: starters/progression/form-post.md
+          - Validation serveur: starters/progression/server-validation.md
+          - Première base SQL: starters/progression/first-sql.md
       - Contacts:
           - Présentation: starters/01-contact-simple/index.md
           - Reconstruction: starters/01-contact-simple/rebuild.md

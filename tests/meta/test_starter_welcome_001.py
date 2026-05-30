@@ -30,7 +30,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "welcome"
 FILES_DIR = STARTER_DIR / "files"
-DOC_DIR = PROJECT_ROOT / "docs" / "starters" / "welcome"
+DOC_DIR = PROJECT_ROOT / "docs" / "starters" / "progression"
 
 _RETIRED_METHODS = (
     "inspect",
@@ -190,10 +190,10 @@ class TestWelcomeStarterDoc:
         assert DOC_DIR.is_dir()
 
     def test_index_md_existe(self):
-        assert (DOC_DIR / "index.md").exists()
+        assert (DOC_DIR / "welcome.md").exists()
 
     def test_index_md_titre_est_bonjour_forge(self):
-        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        content = (DOC_DIR / "welcome.md").read_text(encoding="utf-8")
         assert content.startswith("# Bonjour Forge")
 
     # Assertions retirées par STARTER-SEQUENTIAL-NAV-001 :
@@ -206,21 +206,21 @@ class TestWelcomeStarterDoc:
     # docs/starters/*/index.md.
 
     def test_index_md_documente_les_deux_routes(self):
-        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        content = (DOC_DIR / "welcome.md").read_text(encoding="utf-8")
         assert "/welcome" in content
         assert "/welcome/greet" in content
 
     def test_index_md_documente_response_text(self):
-        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        content = (DOC_DIR / "welcome.md").read_text(encoding="utf-8")
         assert 'Response.text("Bonjour Forge")' in content
 
     def test_index_md_documente_request_param(self):
-        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        content = (DOC_DIR / "welcome.md").read_text(encoding="utf-8")
         assert 'request.param("name", default="Forge")' in content
 
     def test_index_md_courte(self):
         """La doc minimale tient en moins de 150 lignes (objectif ~80-120)."""
-        lines = (DOC_DIR / "index.md").read_text(encoding="utf-8").splitlines()
+        lines = (DOC_DIR / "welcome.md").read_text(encoding="utf-8").splitlines()
         assert len(lines) <= 150, (
             f"La doc starter minimal doit rester courte ; {len(lines)} lignes trouvées."
         )
@@ -237,7 +237,7 @@ class TestWelcomeStarterDoc:
     ])
     def test_index_md_ne_contient_pas_les_notions_repoussees(self, noise: str):
         """Notions volontairement repoussées à de futurs starters dédiés."""
-        content = (DOC_DIR / "index.md").read_text(encoding="utf-8")
+        content = (DOC_DIR / "welcome.md").read_text(encoding="utf-8")
         assert noise not in content, (
             f"`{noise}` ne doit pas apparaître dans le starter minimal "
             "(repoussé à un futur starter dédié)."
@@ -249,7 +249,7 @@ class TestWelcomeStarterDocNavigation:
 
     def test_mkdocs_yml_reference_welcome(self):
         content = (PROJECT_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
-        assert "starters/welcome/index.md" in content
+        assert "starters/progression/welcome.md" in content
 
     def test_starters_index_mentionne_bonjour_forge(self):
         content = (PROJECT_ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")

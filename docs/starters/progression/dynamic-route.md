@@ -4,7 +4,7 @@ Objectif : lire une partie variable de l'URL avec `request.route_param(...)`.
 
 Palier 4 de la
 [progression officielle des starters](../index.md#progression-recommandee),
-après [Première vue HTML](../first-html-view/index.md).
+après [Première vue HTML](first-html-view.md).
 
 ## Ce que ce starter montre
 
@@ -118,4 +118,4 @@ Vous y apprendrez à explorer la structure d'une requête avec :
 Response.debug(request.data)
 ```
 
-[Continuer avec Inspecter une requête](../request-debug/index.md)
+[Continuer avec Inspecter une requête](request-debug.md)
