@@ -143,9 +143,10 @@ class TestRoutesStarter:
 
     def test_routes_welcome_listees(self):
         text = _text()
-        # Le starter minimal expose deux routes texte : /welcome et /welcome/greet.
+        # Le starter minimal expose une seule route texte : /welcome.
+        # (request.param / /welcome/greet appartiennent au palier query-params.)
         assert "/welcome" in text
-        assert "/welcome/greet" in text
+        assert "/welcome/greet" not in text
 
     def test_routes_retirees_absentes(self):
         """STARTER-BONJOUR-FORGE-MINIMAL-001 : les routes /inspect, /cycle,
@@ -338,4 +339,4 @@ class TestLiensInternes:
 
     def test_lien_vers_starter_welcome(self):
         text = _text()
-        assert "../starters/progression/welcome.md" in text
+        assert "../starters/welcome/welcome.md" in text

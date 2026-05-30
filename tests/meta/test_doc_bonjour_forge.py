@@ -115,7 +115,7 @@ class TestNotionsRepoussees:
 class TestLiens:
     def test_lien_vers_starter_welcome(self):
         text = _text()
-        assert "starters/progression/welcome.md" in text
+        assert "starters/welcome/welcome.md" in text
 
     def test_lien_vers_getting_started(self):
         text = _text()

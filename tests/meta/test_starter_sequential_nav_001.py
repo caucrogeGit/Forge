@@ -3,8 +3,8 @@
 Verrouille la navigation pédagogique séquentielle entre pages de
 starters. Chaque page pointe vers le palier suivant via un lien
 ``../<slug>/`` (ou ``../<slug>/index.md``) dans une section
-« Après ce starter ». La page Contacts CRUD clôt la chaîne et
-renvoie vers la vue d'ensemble.
+« Après ce starter ». Le starter autonome Premier CRUD clôt la
+chaîne et renvoie vers la vue d'ensemble.
 
 Vérifie aussi :
 
@@ -13,7 +13,7 @@ Vérifie aussi :
   ``forge new mon-projet``, ``cd mon-projet``,
   ``source .venv/bin/activate``) ;
 - absence des étiquettes par numéro (Starter 7…14) dans les pages
-  pédagogiques (welcome → first-sql). 01-contact-simple peut garder
+  pédagogiques (welcome → first-sql). contact-simple peut garder
   son numéro historique « 1 » (pas dans la plage 7–14 protégée).
 """
 
@@ -36,19 +36,26 @@ SEQUENTIAL_CHAIN: dict[str, str] = {
     "query-params": "first-html-view",
     "first-html-view": "dynamic-route",
     "dynamic-route": "request-debug",
-    "request-debug": "form-post",
+    "request-debug": "json-response",
+    "json-response": "csrf",
+    "csrf": "form-post",
     "form-post": "server-validation",
     "server-validation": "first-sql",
-    "first-sql": "01-contact-simple",
+    "first-sql": "first-sql-write",
+    "first-sql-write": "premier-crud",
 }
 
-# Pages pédagogiques (paliers 1→8). 01-contact-simple est exclu :
-# elle peut garder des étiquettes historiques propres ("Starter 1").
+# Pages pédagogiques (paliers 1→11). premier-crud et contact-simple sont
+# exclus : ce sont des starters autonomes (dossier propre), qui peuvent
+# garder des étiquettes historiques ("Starter 1").
 PEDAGOGICAL_PAGES = list(SEQUENTIAL_CHAIN.keys())
+
+# Starters autonomes rendus dans leur propre dossier docs/starters/<slug>/.
+STANDALONE_STARTERS = ["premier-crud", "contact-simple"]
 
 # Toutes les pages starters concernées par la règle stricte
 # d'absence des commandes de création.
-ALL_STARTER_PAGES = PEDAGOGICAL_PAGES + ["01-contact-simple"]
+ALL_STARTER_PAGES = PEDAGOGICAL_PAGES + STANDALONE_STARTERS
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",
@@ -61,11 +68,11 @@ FORBIDDEN_COMMANDS = [
 def _doc_path(slug: str) -> Path:
     # DOCS-STARTERS-PROGRESSION-FOLDER-001 — les paliers pédagogiques
     # (welcome → first-sql) sont regroupés à plat dans
-    # docs/starters/progression/<slug>.md. 01-contact-simple garde son
+    # docs/starters/welcome/<slug>.md. contact-simple garde son
     # dossier historique.
-    if slug == "01-contact-simple":
+    if slug in STANDALONE_STARTERS:
         return STARTERS_DOCS / slug / "index.md"
-    return STARTERS_DOCS / "progression" / f"{slug}.md"
+    return STARTERS_DOCS / "welcome" / f"{slug}.md"
 
 
 # ── Chaînage séquentiel : chaque page pointe vers la suivante ─────────────────
@@ -77,11 +84,11 @@ class TestSequentialChain:
     def test_page_points_to_next_palier(self, source: str, target: str):
         page = _doc_path(source)
         content = page.read_text(encoding="utf-8")
-        # DOCS-STARTERS-PROGRESSION-FOLDER-001 — au sein de progression/, le
+        # DOCS-STARTERS-PROGRESSION-FOLDER-001 — au sein de welcome/, le
         # palier suivant est un fichier frère « target.md » ; le dernier
-        # palier (first-sql) pointe vers 01-contact-simple resté dans son
-        # dossier (« ../01-contact-simple/ »).
-        if target == "01-contact-simple":
+        # palier (first-sql) pointe vers contact-simple resté dans son
+        # dossier (« ../contact-simple/ »).
+        if target in STANDALONE_STARTERS:
             link_variants = (f"../{target}/", f"../{target}/index.md")
         else:
             link_variants = (f"{target}.md", f"{target}/")
@@ -90,19 +97,20 @@ class TestSequentialChain:
             f"« {link_variants[0]} » (STARTER-SEQUENTIAL-NAV-001)."
         )
 
-    def test_first_sql_points_to_contacts_crud(self):
-        # Cas spécifique mentionné dans le ticket : first-sql →
-        # 01-contact-simple (cf. SEQUENTIAL_CHAIN, redondant mais explicite).
-        content = _doc_path("first-sql").read_text(encoding="utf-8")
-        assert "../01-contact-simple/" in content
+    def test_last_palier_points_to_premier_crud(self):
+        # Le dernier palier de la progression de découverte est
+        # first-sql-write (écriture en base) ; sa section « Après ce
+        # starter » pointe vers le premier starter autonome, premier-crud.
+        content = _doc_path("first-sql-write").read_text(encoding="utf-8")
+        assert "../premier-crud/" in content
 
-    def test_contacts_crud_returns_to_overview(self):
-        # 01-contact-simple clôt la progression et renvoie vers ../
-        content = _doc_path("01-contact-simple").read_text(encoding="utf-8")
+    def test_premier_crud_returns_to_overview(self):
+        # premier-crud clôt la chaîne pédagogique et renvoie vers ../
+        content = _doc_path("premier-crud").read_text(encoding="utf-8")
         # On cherche un lien retour explicite vers la vue d'ensemble
         # des starters (`../index.md` ou `../`).
         assert "../index.md" in content or "(../)" in content, (
-            "docs/starters/01-contact-simple/index.md doit comporter "
+            "docs/starters/premier-crud/index.md doit comporter "
             "un lien retour vers la vue d'ensemble des starters."
         )
 

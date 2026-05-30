@@ -28,7 +28,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "dynamic-route"
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "dynamic_route_controller.py"
-DOC = PROJECT_ROOT / "docs" / "starters" / "progression" / "dynamic-route.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "welcome" / "dynamic-route.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 

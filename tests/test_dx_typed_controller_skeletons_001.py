@@ -126,7 +126,7 @@ class TestWelcomeController:
     def test_imports_typage_response(self):
         assert _has_response_import(WELCOME.read_text(encoding="utf-8"))
 
-    @pytest.mark.parametrize("method", ["index", "greet"])
+    @pytest.mark.parametrize("method", ["index"])
     def test_methode_annotee_request(self, method):
         source = WELCOME.read_text(encoding="utf-8")
         for cls_name, node in _iter_action_methods(source):
@@ -137,7 +137,7 @@ class TestWelcomeController:
                 return
         pytest.fail(f"Méthode {method} introuvable dans WelcomeController.")
 
-    @pytest.mark.parametrize("method", ["index", "greet"])
+    @pytest.mark.parametrize("method", ["index"])
     def test_methode_annotee_response(self, method):
         source = WELCOME.read_text(encoding="utf-8")
         for cls_name, node in _iter_action_methods(source):

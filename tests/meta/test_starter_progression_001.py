@@ -5,7 +5,7 @@ Verrouille la progression pédagogique officielle des starters Forge :
 - `docs/starters/index.md` doit présenter la section
   « Progression recommandée » avec les 9 paliers et les codes
   des tickets futurs ;
-- `docs/starters/progression/welcome.md` ne doit plus recommander
+- `docs/starters/welcome/welcome.md` ne doit plus recommander
   directement le starter Contacts CRUD comme étape immédiate ;
 - `docs/guide/bonjour-forge.md` doit afficher l'avertissement
   « Ne sautez pas directement vers le CRUD Contacts » ;
@@ -28,7 +28,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
-STARTER_WELCOME = PROJECT_ROOT / "docs" / "starters" / "progression" / "welcome.md"
+STARTER_WELCOME = PROJECT_ROOT / "docs" / "starters" / "welcome" / "welcome.md"
 BONJOUR_FORGE = PROJECT_ROOT / "docs" / "guide" / "bonjour-forge.md"
 GETTING_STARTED = PROJECT_ROOT / "docs" / "guide" / "getting-started.md"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
@@ -55,12 +55,14 @@ class TestProgressionSectionInStartersIndex:
         "Première vue HTML",
         "Route dynamique",
         "Inspecter une requête",
+        "Réponse JSON",
+        "Le jeton CSRF",
         "Premier formulaire POST",
         "Validation serveur",
         "Première base SQL",
-        "Premier CRUD",
+        "Écrire en base",
     ])
-    def test_9_steps_listed(self, step_label):
+    def test_steps_listed(self, step_label):
         assert step_label in self.content, (
             f"La progression doit lister le palier « {step_label} »."
         )
@@ -73,11 +75,13 @@ class TestProgressionSectionInStartersIndex:
         # STARTER-FORM-POST-001 livré → voir test_palier_6_livre.
         # STARTER-SERVER-VALIDATION-001 livré → voir test_palier_7_livre.
         # STARTER-FIRST-SQL-001 livré → voir test_palier_8_livre.
-        "STARTER-CONTACTS-CRUD-REPOSITION-001",
+        # Après la progression (11 paliers), le premier starter autonome
+        # est Premier CRUD (STARTER-PREMIER-CRUD-001).
+        "STARTER-PREMIER-CRUD-001",
     ])
     def test_future_ticket_codes_listed(self, ticket_code):
         assert ticket_code in self.content, (
-            f"Le ticket futur {ticket_code} doit être inscrit comme "
+            f"Le ticket {ticket_code} doit être inscrit comme "
             "trajectoire dans la progression."
         )
 
@@ -170,12 +174,12 @@ class TestProgressionSectionInStartersIndex:
         )
         text = self.content
         idx_palier5 = text.find("5. **Inspecter une requête**")
-        idx_palier6 = text.find("6. **Premier formulaire POST**")
+        idx_palier6 = text.find("6. **Réponse JSON**")
         assert idx_palier5 != -1, (
             "Item « 5. **Inspecter une requête** » introuvable dans la progression."
         )
         assert idx_palier6 != -1, (
-            "Item « 6. **Premier formulaire POST** » introuvable dans la progression."
+            "Item « 6. **Réponse JSON** » introuvable dans la progression."
         )
         palier5_block = text[idx_palier5:idx_palier6]
         assert "livré" in palier5_block, (
@@ -186,79 +190,60 @@ class TestProgressionSectionInStartersIndex:
             "Le palier 5 doit mentionner le starter `request-debug`."
         )
 
-    def test_palier_6_form_post_marque_livre(self):
-        # STARTER-FORM-POST-001 livré : palier 6 doit l'indiquer
-        # explicitement avec la mention « livré ».
-        assert "STARTER-FORM-POST-001" in self.content, (
-            "STARTER-FORM-POST-001 doit rester référencé dans la "
-            "progression (palier 6)."
-        )
+    def _palier_block(self, start_label: str, end_label: str) -> str:
         text = self.content
-        idx_palier6 = text.find("6. **Premier formulaire POST**")
-        idx_palier7 = text.find("7. **Validation serveur**")
-        assert idx_palier6 != -1, (
-            "Item « 6. **Premier formulaire POST** » introuvable dans la progression."
-        )
-        assert idx_palier7 != -1, (
-            "Item « 7. **Validation serveur** » introuvable dans la progression."
-        )
-        palier6_block = text[idx_palier6:idx_palier7]
-        assert "livré" in palier6_block, (
-            "Le palier 6 (Premier formulaire POST) doit être marqué « livré » "
-            "depuis STARTER-FORM-POST-001."
-        )
-        assert "form-post" in palier6_block, (
-            "Le palier 6 doit mentionner le starter `form-post`."
+        a = text.find(start_label)
+        b = text.find(end_label)
+        assert a != -1, f"Item « {start_label} » introuvable dans la progression."
+        assert b != -1, f"Item « {end_label} » introuvable dans la progression."
+        return text[a:b]
+
+    def test_palier_6_json_response_marque_livre(self):
+        assert "STARTER-JSON-RESPONSE-001" in self.content
+        block = self._palier_block("6. **Réponse JSON**", "7. **Le jeton CSRF**")
+        assert "livré" in block and "json-response" in block, (
+            "Le palier 6 (Réponse JSON) doit être marqué « livré » et "
+            "mentionner le starter `json-response`."
         )
 
-    def test_palier_7_server_validation_marque_livre(self):
-        # STARTER-SERVER-VALIDATION-001 livré : palier 7 doit
-        # l'indiquer explicitement avec la mention « livré ».
-        assert "STARTER-SERVER-VALIDATION-001" in self.content, (
-            "STARTER-SERVER-VALIDATION-001 doit rester référencé dans "
-            "la progression (palier 7)."
-        )
-        text = self.content
-        idx_palier7 = text.find("7. **Validation serveur**")
-        idx_palier8 = text.find("8. **Première base SQL**")
-        assert idx_palier7 != -1, (
-            "Item « 7. **Validation serveur** » introuvable dans la progression."
-        )
-        assert idx_palier8 != -1, (
-            "Item « 8. **Première base SQL** » introuvable dans la progression."
-        )
-        palier7_block = text[idx_palier7:idx_palier8]
-        assert "livré" in palier7_block, (
-            "Le palier 7 (Validation serveur) doit être marqué « livré » "
-            "depuis STARTER-SERVER-VALIDATION-001."
-        )
-        assert "server-validation" in palier7_block, (
-            "Le palier 7 doit mentionner le starter `server-validation`."
+    def test_palier_7_csrf_marque_livre(self):
+        assert "STARTER-CSRF-001" in self.content
+        block = self._palier_block("7. **Le jeton CSRF**", "8. **Premier formulaire POST**")
+        assert "livré" in block and "csrf" in block, (
+            "Le palier 7 (Le jeton CSRF) doit être marqué « livré » et "
+            "mentionner le starter `csrf`."
         )
 
-    def test_palier_8_first_sql_marque_livre(self):
-        # STARTER-FIRST-SQL-001 livré : palier 8 doit l'indiquer
-        # explicitement avec la mention « livré ».
-        assert "STARTER-FIRST-SQL-001" in self.content, (
-            "STARTER-FIRST-SQL-001 doit rester référencé dans la "
-            "progression (palier 8)."
+    def test_palier_8_form_post_marque_livre(self):
+        assert "STARTER-FORM-POST-001" in self.content
+        block = self._palier_block("8. **Premier formulaire POST**", "9. **Validation serveur**")
+        assert "livré" in block and "form-post" in block, (
+            "Le palier 8 (Premier formulaire POST) doit être « livré » et "
+            "mentionner le starter `form-post`."
         )
-        text = self.content
-        idx_palier8 = text.find("8. **Première base SQL**")
-        idx_palier9 = text.find("9. **Premier CRUD**")
-        assert idx_palier8 != -1, (
-            "Item « 8. **Première base SQL** » introuvable dans la progression."
+
+    def test_palier_9_server_validation_marque_livre(self):
+        assert "STARTER-SERVER-VALIDATION-001" in self.content
+        block = self._palier_block("9. **Validation serveur**", "10. **Première base SQL**")
+        assert "livré" in block and "server-validation" in block, (
+            "Le palier 9 (Validation serveur) doit être « livré » et "
+            "mentionner le starter `server-validation`."
         )
-        assert idx_palier9 != -1, (
-            "Item « 9. **Premier CRUD** » introuvable dans la progression."
+
+    def test_palier_10_first_sql_marque_livre(self):
+        assert "STARTER-FIRST-SQL-001" in self.content
+        block = self._palier_block("10. **Première base SQL**", "11. **Écrire en base**")
+        assert "livré" in block and "first-sql" in block, (
+            "Le palier 10 (Première base SQL) doit être « livré » et "
+            "mentionner le starter `first-sql`."
         )
-        palier8_block = text[idx_palier8:idx_palier9]
-        assert "livré" in palier8_block, (
-            "Le palier 8 (Première base SQL) doit être marqué « livré » "
-            "depuis STARTER-FIRST-SQL-001."
-        )
-        assert "first-sql" in palier8_block, (
-            "Le palier 8 doit mentionner le starter `first-sql`."
+
+    def test_palier_11_first_sql_write_marque_livre(self):
+        assert "STARTER-FIRST-SQL-WRITE-001" in self.content
+        block = self._palier_block("11. **Écrire en base**", "Une fois ces")
+        assert "livré" in block and "first-sql-write" in block, (
+            "Le palier 11 (Écrire en base) doit être « livré » et "
+            "mentionner le starter `first-sql-write`."
         )
 
     def test_warning_admonition_present(self):
@@ -273,7 +258,7 @@ class TestProgressionSectionInStartersIndex:
         )
 
 
-# ── docs/starters/progression/welcome.md : ne renvoie plus directement vers CRUD ────
+# ── docs/starters/welcome/welcome.md : ne renvoie plus directement vers CRUD ────
 
 
 class TestWelcomeStarterRedirectsToProgression:
@@ -403,7 +388,7 @@ class TestFutureStartersNotYetCreated:
         # server-validation retiré : livré par STARTER-SERVER-VALIDATION-001 (palier 7).
         # first-sql retiré : livré par STARTER-FIRST-SQL-001 (palier 8).
         # Plus aucun starter pédagogique « non créé » dans la progression :
-        # le palier 9 est Contacts CRUD (déjà livré comme `01-contact-simple`,
+        # le palier 9 est Contacts CRUD (déjà livré comme `contact-simple`,
         # à repositionner via CONTACTS-CRUD-REPOSITION-001).
     ])
     def test_future_starter_not_created(self, future_starter_slug):

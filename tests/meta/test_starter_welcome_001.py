@@ -6,12 +6,13 @@ Contrat public du starter 7 — Bonjour Forge (version minimale) :
 - alias historiques (`welcome`, `bienvenue`, `7`) + nouveaux
   (`bonjour`, `bonjour-forge`) ;
 - kind "skeleton", requires_db false ;
-- exactement 2 routes dans le snippet (index + greet) — toutes les
-  routes supplémentaires de la version précédente (`/inspect`, `/cycle`,
-  `/request`, `/response`, `/routing`, `/404-demo`) sont retirées ;
-- contrôleur livré avec exactement deux méthodes typées
+- exactement 1 route dans le snippet (`index`) — toutes les routes
+  supplémentaires des versions précédentes (`/welcome/greet`, `/inspect`,
+  `/cycle`, `/request`, `/response`, `/routing`, `/404-demo`) sont
+  retirées ;
+- contrôleur livré avec exactement une méthode typée
   `request: Request -> Response` ;
-- aucune vue HTML — `index` et `greet` retournent `Response.text(...)` ;
+- aucune vue HTML — `index` retourne `Response.text(...)` ;
 - doc présente, courte et alignée sur le contrat minimal ;
 - --dry-run fonctionnel.
 """
@@ -30,9 +31,10 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "welcome"
 FILES_DIR = STARTER_DIR / "files"
-DOC_DIR = PROJECT_ROOT / "docs" / "starters" / "progression"
+DOC_DIR = PROJECT_ROOT / "docs" / "starters" / "welcome"
 
 _RETIRED_METHODS = (
+    "greet",
     "inspect",
     "cycle",
     "request_example",
@@ -88,22 +90,22 @@ class TestWelcomeStarterMetadata:
 
 
 class TestWelcomeStarterRoutes:
-    """Le snippet contient exactement 2 routes (STARTER-BONJOUR-FORGE-MINIMAL-001)."""
+    """Le snippet contient exactement 1 route (STARTER-BONJOUR-FORGE-MINIMAL-001)."""
 
     def test_snippet_existe(self):
         assert (STARTER_DIR / "routes.py.snippet").exists()
 
-    def test_exactement_deux_routes(self):
+    def test_exactement_une_route(self):
         snippet = (STARTER_DIR / "routes.py.snippet").read_text(encoding="utf-8")
         parsed = routes_from_snippet(snippet)
-        assert len(parsed) == 2, (
-            f"Attendu 2 routes dans le snippet welcome minimal, trouvé {len(parsed)} : {parsed}"
+        assert len(parsed) == 1, (
+            f"Attendu 1 route dans le snippet welcome minimal, trouvé {len(parsed)} : {parsed}"
         )
 
-    def test_routes_index_et_greet_presentes(self):
+    def test_route_index_presente(self):
         snippet = (STARTER_DIR / "routes.py.snippet").read_text(encoding="utf-8")
         paths = {path for _method, path in routes_from_snippet(snippet)}
-        assert paths == {"/welcome", "/welcome/greet"}
+        assert paths == {"/welcome"}
 
     def test_aucune_route_retiree(self):
         snippet = (STARTER_DIR / "routes.py.snippet").read_text(encoding="utf-8")
@@ -140,7 +142,7 @@ class TestWelcomeStarterFiles:
         ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
         assert "BaseController" in ctrl.read_text(encoding="utf-8")
 
-    @pytest.mark.parametrize("method", ["index", "greet"])
+    @pytest.mark.parametrize("method", ["index"])
     def test_methode_presente(self, method: str):
         ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
         content = ctrl.read_text(encoding="utf-8")
@@ -158,9 +160,11 @@ class TestWelcomeStarterFiles:
         ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
         assert 'Response.text("Bonjour Forge")' in ctrl.read_text(encoding="utf-8")
 
-    def test_greet_utilise_request_param(self):
+    def test_controleur_ne_lit_aucun_parametre_url(self):
+        # Palier 1 = une seule responsabilité : request.param appartient au
+        # palier 2 (query-params).
         ctrl = FILES_DIR / "mvc" / "controllers" / "welcome_controller.py"
-        assert 'request.param("name", default="Forge")' in ctrl.read_text(encoding="utf-8")
+        assert "request.param" not in ctrl.read_text(encoding="utf-8")
 
     def test_dossier_views_welcome_absent(self):
         path = FILES_DIR / "mvc" / "views" / "welcome"
@@ -205,18 +209,17 @@ class TestWelcomeStarterDoc:
     # qui assert l'ABSENCE de ces patterns sur toutes les pages
     # docs/starters/*/index.md.
 
-    def test_index_md_documente_les_deux_routes(self):
+    def test_index_md_documente_la_route(self):
         content = (DOC_DIR / "welcome.md").read_text(encoding="utf-8")
         assert "/welcome" in content
-        assert "/welcome/greet" in content
+        assert "/welcome/greet" not in content, (
+            "Palier 1 ne doit plus documenter /welcome/greet — la lecture "
+            "d'un paramètre d'URL est la responsabilité du palier query-params."
+        )
 
     def test_index_md_documente_response_text(self):
         content = (DOC_DIR / "welcome.md").read_text(encoding="utf-8")
         assert 'Response.text("Bonjour Forge")' in content
-
-    def test_index_md_documente_request_param(self):
-        content = (DOC_DIR / "welcome.md").read_text(encoding="utf-8")
-        assert 'request.param("name", default="Forge")' in content
 
     def test_index_md_courte(self):
         """La doc minimale tient en moins de 150 lignes (objectif ~80-120)."""
@@ -249,7 +252,7 @@ class TestWelcomeStarterDocNavigation:
 
     def test_mkdocs_yml_reference_welcome(self):
         content = (PROJECT_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
-        assert "starters/progression/welcome.md" in content
+        assert "starters/welcome/welcome.md" in content
 
     def test_starters_index_mentionne_bonjour_forge(self):
         content = (PROJECT_ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
@@ -264,8 +267,9 @@ class TestWelcomeStarterDryRun:
         output = capsys.readouterr().out
         assert "welcome" in output.lower() or "bienvenue" in output.lower()
 
-    def test_dry_run_affiche_les_deux_routes(self, capsys):
+    def test_dry_run_affiche_la_route(self, capsys):
+        # welcome = une seule route (palier 1, une responsabilité).
         cmd_starter_build(["7", "--dry-run"])
         output = capsys.readouterr().out
         assert "/welcome" in output
-        assert "/welcome/greet" in output
+        assert "/welcome/greet" not in output

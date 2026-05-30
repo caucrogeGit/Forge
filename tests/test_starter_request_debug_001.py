@@ -28,7 +28,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "request-debug"
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "request_debug_controller.py"
-DOC = PROJECT_ROOT / "docs" / "starters" / "progression" / "request-debug.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "welcome" / "request-debug.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 
@@ -130,9 +130,9 @@ def test_progression_marks_palier_5_as_delivered():
     text = STARTERS_INDEX.read_text(encoding="utf-8")
     assert "STARTER-REQUEST-DEBUG-001" in text
     idx_palier5 = text.find("5. **Inspecter une requête**")
-    idx_palier6 = text.find("6. **Premier formulaire POST**")
+    idx_palier6 = text.find("6. **Réponse JSON**")
     assert idx_palier5 != -1, "Item « 5. **Inspecter une requête** » introuvable."
-    assert idx_palier6 != -1, "Item « 6. **Premier formulaire POST** » introuvable."
+    assert idx_palier6 != -1, "Item « 6. **Réponse JSON** » introuvable."
     palier5_block = text[idx_palier5:idx_palier6]
     assert "livré" in palier5_block, (
         "Le palier 5 (Inspecter une requête) doit être marqué « livré » "

@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FORM-POST-001 (test proportionné, ~15 cas).
 
-Contrat public minimum du starter palier 6 — Premier formulaire POST :
+Contrat public minimum du starter palier 8 — Premier formulaire POST :
 
 - starter.json déclare `form-post` (id, slot 12, requires_db false) ;
 - routes.py.snippet déclare `GET /form-post` ET `POST /form-post` ;
@@ -13,7 +13,7 @@ Contrat public minimum du starter palier 6 — Premier formulaire POST :
   et `input name="name"` et le champ caché `csrf_token` ;
 - aucun fichier SQL, migration, entité ;
 - documentation présente, sans aucun des patterns interdits ;
-- la progression officielle marque le palier 6 livré.
+- la progression officielle marque le palier 8 livré.
 
 Ne couvre PAS : moteur CSRF, moteur de templates, routeur, suite méta
 complète — déjà couverts ailleurs.
@@ -33,7 +33,7 @@ STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "form-post"
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "form_post_controller.py"
 VIEW = FILES_DIR / "mvc" / "views" / "form_post" / "index.html"
-DOC = PROJECT_ROOT / "docs" / "starters" / "progression" / "form-post.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "welcome" / "form-post.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 
@@ -154,27 +154,27 @@ def test_doc_does_not_contain_forbidden_pattern(forbidden: str):
     )
 
 
-def test_doc_mentions_palier_6_and_form_concepts():
+def test_doc_mentions_palier_8_and_form_concepts():
     content = DOC.read_text(encoding="utf-8")
-    assert "palier 6" in content.lower() or "Palier 6" in content
+    assert "palier 8" in content.lower() or "Palier 8" in content
     assert 'request.form(' in content
     assert "csrf_token" in content
     assert "/form-post" in content
 
 
-# ── Progression officielle : palier 6 livré ───────────────────────────────────
+# ── Progression officielle : palier 8 livré ───────────────────────────────────
 
 
-def test_progression_marks_palier_6_as_delivered():
+def test_progression_marks_palier_8_as_delivered():
     text = STARTERS_INDEX.read_text(encoding="utf-8")
     assert "STARTER-FORM-POST-001" in text
-    idx_palier6 = text.find("6. **Premier formulaire POST**")
-    idx_palier7 = text.find("7. **Validation serveur**")
-    assert idx_palier6 != -1, "Item « 6. **Premier formulaire POST** » introuvable."
-    assert idx_palier7 != -1, "Item « 7. **Validation serveur** » introuvable."
-    palier6_block = text[idx_palier6:idx_palier7]
-    assert "livré" in palier6_block, (
-        "Le palier 6 (Premier formulaire POST) doit être marqué « livré » "
+    idx_palier8 = text.find("8. **Premier formulaire POST**")
+    idx_palier9 = text.find("9. **Validation serveur**")
+    assert idx_palier8 != -1, "Item « 8. **Premier formulaire POST** » introuvable."
+    assert idx_palier9 != -1, "Item « 9. **Validation serveur** » introuvable."
+    palier8_block = text[idx_palier8:idx_palier9]
+    assert "livré" in palier8_block, (
+        "Le palier 8 (Premier formulaire POST) doit être marqué « livré » "
         "dans docs/starters/index.md après STARTER-FORM-POST-001."
     )
-    assert "form-post" in palier6_block
+    assert "form-post" in palier8_block

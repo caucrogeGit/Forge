@@ -5,13 +5,13 @@ contact minimal :
 
   1. Le starter est nommé « Bonjour Forge » (libellé public conservé).
   2. Le contrôleur livré importe `Request` et `Response`.
-  3. Les méthodes `index` et `greet` sont annotées
-     `request: Request -> Response`.
+  3. La méthode `index` est annotée `request: Request -> Response`.
   4. `index` retourne `Response.text("Bonjour Forge")` — aucun template.
-  5. `greet` lit `request.param("name", default="Forge")` et retourne
-     `Response.text(f"Bonjour {name}")`.
+  5. Palier 1 = une seule responsabilité (réponse texte) : la lecture
+     d'un paramètre d'URL (`request.param`) appartient au palier suivant
+     (`query-params`), pas ici.
   6. Le contrôleur n'expose AUCUNE autre méthode publique (pas de
-     `inspect`, `cycle`, `request_example`, `response_example`,
+     `greet`, `inspect`, `cycle`, `request_example`, `response_example`,
      `routing_example`, `not_found_demo`).
   7. Les vues HTML précédemment livrées sont retirées définitivement.
   8. Les anciens alias (`welcome`, `bienvenue`, `7`) restent
@@ -38,8 +38,9 @@ _STARTER_DIR = _REPO_ROOT / "forge_cli" / "starters" / "data" / "welcome"
 _CONTROLLER = _STARTER_DIR / "files" / "mvc" / "controllers" / "welcome_controller.py"
 _VIEWS_DIR = _STARTER_DIR / "files" / "mvc" / "views" / "welcome"
 _STARTER_JSON = _STARTER_DIR / "starter.json"
-_DOC = _REPO_ROOT / "docs" / "starters" / "progression" / "welcome.md"
+_DOC = _REPO_ROOT / "docs" / "starters" / "welcome" / "welcome.md"
 _RETIRED_METHODS = (
+    "greet",
     "inspect",
     "cycle",
     "request_example",
@@ -102,9 +103,9 @@ class TestControllerImports:
 
 
 class TestControllerSignatures:
-    """Les deux actions publiques sont typées `request: Request -> Response`."""
+    """L'action publique `index` est typée `request: Request -> Response`."""
 
-    @pytest.mark.parametrize("method", ["index", "greet"])
+    @pytest.mark.parametrize("method", ["index"])
     def test_signature_typee(self, method):
         content = _CONTROLLER.read_text(encoding="utf-8")
         assert f"def {method}(request: Request) -> Response:" in content
@@ -152,40 +153,29 @@ class TestIndexReturnsResponseText:
             manager.template_manager._renderer = original
 
 
-# ── 5. `greet` lit request.param et retourne Response.text ───────────────────
+# ── 5. `request.param` (palier 2) absent du palier 1 ─────────────────────────
 
 
-class TestGreetUsesRequestParam:
-    def test_greet_documente_request_param(self):
+class TestNoUrlParamInWelcome:
+    """Palier 1 = une seule responsabilité (réponse texte). La lecture
+    d'un paramètre d'URL appartient au palier 2 (`query-params`)."""
+
+    def test_controleur_ne_lit_aucun_parametre_url(self):
         content = _CONTROLLER.read_text(encoding="utf-8")
-        assert 'request.param("name", default="Forge")' in content
-
-    def _load(self):
-        import importlib.util
-        spec = importlib.util.spec_from_file_location(
-            "_welcome_controller_greet_minimal", _CONTROLLER,
+        assert "request.param" not in content, (
+            "Le starter welcome (palier 1) ne doit pas utiliser request.param "
+            "— c'est la responsabilité du palier query-params."
         )
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
 
-    def test_greet_repond_avec_le_nom_par_defaut(self):
-        module = self._load()
-        response = module.WelcomeController.greet(FakeRequest("GET", "/welcome/greet"))
-        assert response.body == b"Bonjour Forge"
-        assert response.content_type == "text/plain; charset=utf-8"
-
-    def test_greet_repond_avec_le_nom_fourni(self):
-        module = self._load()
-        request = FakeRequest("GET", "/welcome/greet", params={"name": "Roger"})
-        response = module.WelcomeController.greet(request)
-        assert response.body == b"Bonjour Roger"
+    def test_pas_de_methode_greet(self):
+        content = _CONTROLLER.read_text(encoding="utf-8")
+        assert "def greet" not in content
 
 
-# ── 6. Le contrôleur n'expose que index et greet ─────────────────────────────
+# ── 6. Le contrôleur n'expose que index ──────────────────────────────────────
 
 
-class TestControllerHasOnlyIndexAndGreet:
+class TestControllerHasOnlyIndex:
     def _public_methods(self) -> set[str]:
         tree = ast.parse(_CONTROLLER.read_text(encoding="utf-8"))
         names: set[str] = set()
@@ -199,9 +189,10 @@ class TestControllerHasOnlyIndexAndGreet:
                     names.add(node.name)
         return names
 
-    def test_exactement_index_et_greet(self):
-        assert self._public_methods() == {"index", "greet"}, (
-            "Le contrat minimal n'expose que `index` et `greet`."
+    def test_exactement_index(self):
+        assert self._public_methods() == {"index"}, (
+            "Le contrat minimal n'expose que `index` (palier 1 = une seule "
+            "responsabilité : réponse texte)."
         )
 
     @pytest.mark.parametrize("method", _RETIRED_METHODS)
@@ -232,10 +223,9 @@ class TestRetiredViewsStayGone:
 
 
 class TestRoutesSnippetCoherent:
-    def test_snippet_appelle_exactement_index_et_greet(self):
+    def test_snippet_appelle_exactement_index(self):
         snippet = (_STARTER_DIR / "routes.py.snippet").read_text(encoding="utf-8")
         assert "WelcomeController.index" in snippet
-        assert "WelcomeController.greet" in snippet
         for method in _RETIRED_METHODS:
             assert f"WelcomeController.{method}" not in snippet, (
                 f"Le snippet ne doit plus référencer `WelcomeController.{method}`."

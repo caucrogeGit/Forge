@@ -70,7 +70,7 @@ def test_starter_list_affiche_tous_les_starters(capsys):
 
 def test_starter_1_est_officiel_simple():
     """Starter 1 — Contacts est décrit comme starter simple."""
-    content = (ROOT / "docs" / "starters" / "01-contact-simple" / "index.md").read_text(encoding="utf-8")
+    content = (ROOT / "docs" / "starters" / "contact-simple" / "index.md").read_text(encoding="utf-8")
     assert "simple" in content.lower() or "officiel" in content.lower()
 
 
@@ -84,13 +84,13 @@ def test_starter_2_reference_core_auth():
 
 def test_starter_3_est_officiel_relationnel():
     """Starter 3 — Carnet de contacts est décrit comme starter relationnel."""
-    content = (ROOT / "docs" / "starters" / "03-carnet-contacts" / "index.md").read_text(encoding="utf-8")
+    content = (ROOT / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
     assert "relation" in content.lower() or "many_to_one" in content.lower()
 
 
 def test_starter_4_est_marque_legacy():
     """Starter 4 — Suivi pédagogique est documenté comme legacy ou historique."""
-    content = (ROOT / "docs" / "starters" / "04-suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
+    content = (ROOT / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
     assert "legacy" in content.lower() or "historique" in content.lower()
 
 
@@ -103,10 +103,10 @@ def test_starter_5_est_demonstrateur_avance():
 # ── doc_url cohérence ─────────────────────────────────────────────────────────
 
 def test_starter_2_doc_url_pointe_nouvelle_structure():
-    """Starter 2 — doc_url pointe vers starters/02-utilisateurs-auth/."""
+    """Starter 2 — doc_url pointe vers starters/utilisateurs-auth/."""
     meta = resolve("2")
     assert "starter-app-02" not in meta.get("doc_url", "")
-    assert "starters/02-utilisateurs-auth" in meta.get("doc_url", "")
+    assert "starters/utilisateurs-auth" in meta.get("doc_url", "")
 
 
 def test_starter_5_doc_url_pointe_nouvelle_structure():
@@ -137,18 +137,18 @@ def test_tous_les_doc_url_utilisent_nouvelle_structure():
 def test_chaque_starter_a_un_index_md():
     """Chaque starter a un index.md dans docs/starters/."""
     attendus = [
-        "01-contact-simple",
-        "02-utilisateurs-auth",
-        "03-carnet-contacts",
-        "04-suivi-comportement-eleves",
+        "contact-simple",
+        "utilisateurs-auth",
+        "carnet-contacts",
+        "suivi-comportement-eleves",
         "communes-sejours",
         "welcome",
     ]
     for dossier in attendus:
         # DOCS-STARTERS-PROGRESSION-FOLDER-001 — welcome est regroupé à plat
-        # dans docs/starters/progression/welcome.md.
+        # dans docs/starters/welcome/welcome.md.
         if dossier == "welcome":
-            index = ROOT / "docs" / "starters" / "progression" / "welcome.md"
+            index = ROOT / "docs" / "starters" / "welcome" / "welcome.md"
         else:
             index = ROOT / "docs" / "starters" / dossier / "index.md"
         assert index.exists(), f"doc de présentation absente pour {dossier}"
@@ -157,10 +157,10 @@ def test_chaque_starter_a_un_index_md():
 def test_starters_1_a_4_ont_un_rebuild_md():
     """Les starters 1 à 4 ont un rebuild.md."""
     dossiers = [
-        "01-contact-simple",
-        "02-utilisateurs-auth",
-        "03-carnet-contacts",
-        "04-suivi-comportement-eleves",
+        "contact-simple",
+        "utilisateurs-auth",
+        "carnet-contacts",
+        "suivi-comportement-eleves",
     ]
     for dossier in dossiers:
         rebuild = ROOT / "docs" / "starters" / dossier / "rebuild.md"

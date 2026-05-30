@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FIRST-SQL-001 (test proportionné, ~16 cas).
 
-Contrat public minimum du starter palier 8 — Première base SQL :
+Contrat public minimum du starter palier 10 — Première base SQL :
 
 - starter.json déclare `first-sql` (id, slot 14, requires_db **true**) ;
 - routes.py.snippet déclare `GET /first-sql` ;
@@ -15,7 +15,7 @@ Contrat public minimum du starter palier 8 — Première base SQL :
 - aucun fichier d'entité JSON, aucun CRUD généré (pas de
   `*_form.py`, `*_model.py`) ;
 - documentation présente, sans aucun des patterns interdits ;
-- la progression officielle marque le palier 8 livré.
+- la progression officielle marque le palier 10 livré.
 
 Ne couvre PAS : connexion MariaDB réelle, moteur de migration, ORM,
 suite méta complète.
@@ -36,7 +36,7 @@ STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "first-sql"
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "first_sql_controller.py"
 MIGRATIONS_DIR = FILES_DIR / "mvc" / "migrations"
-DOC = PROJECT_ROOT / "docs" / "starters" / "progression" / "first-sql.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "welcome" / "first-sql.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 MIGRATION_FILENAME_RE = re.compile(r"^(\d{14})_([a-z0-9_]+)\.sql$")
@@ -201,9 +201,9 @@ def test_doc_does_not_contain_forbidden_pattern(forbidden: str):
     )
 
 
-def test_doc_mentions_palier_8_and_concepts():
+def test_doc_mentions_palier_10_and_concepts():
     content = DOC.read_text(encoding="utf-8")
-    assert "palier 8" in content.lower() or "Palier 8" in content
+    assert "palier 10" in content.lower() or "Palier 10" in content
     assert "fetch_one" in content
     assert "first_sql_messages" in content
     assert "Bonjour SQL" in content
@@ -211,16 +211,16 @@ def test_doc_mentions_palier_8_and_concepts():
     assert "/first-sql" in content
 
 
-# ── Progression officielle : palier 8 livré ───────────────────────────────────
+# ── Progression officielle : palier 10 livré ──────────────────────────────────
 
 
-def test_progression_marks_palier_8_as_delivered():
+def test_progression_marks_palier_10_as_delivered():
     text = STARTERS_INDEX.read_text(encoding="utf-8")
     assert "STARTER-FIRST-SQL-001" in text
-    idx_palier8 = text.find("8. **Première base SQL**")
-    idx_palier9 = text.find("9. **Premier CRUD**")
-    assert idx_palier8 != -1
-    assert idx_palier9 != -1
-    palier8_block = text[idx_palier8:idx_palier9]
-    assert "livré" in palier8_block
-    assert "first-sql" in palier8_block
+    idx_palier10 = text.find("10. **Première base SQL**")
+    idx_palier11 = text.find("11. **Écrire en base**")
+    assert idx_palier10 != -1
+    assert idx_palier11 != -1
+    palier10_block = text[idx_palier10:idx_palier11]
+    assert "livré" in palier10_block
+    assert "first-sql" in palier10_block

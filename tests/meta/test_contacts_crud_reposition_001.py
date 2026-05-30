@@ -1,11 +1,11 @@
 """Tests documentaires — STARTER-CONTACTS-CRUD-REPOSITION-001.
 
 Verrouille le repositionnement pédagogique du starter
-`01-contact-simple` (Contacts CRUD) comme palier 9 — synthèse
+`contact-simple` (Contacts CRUD) comme palier 12 — synthèse
 avancée — de la progression officielle des starters.
 
 - la progression officielle contient bien 9 paliers ;
-- Contacts CRUD est marqué comme palier 9 dans la progression ;
+- Contacts CRUD est marqué comme palier 12 dans la progression ;
 - Contacts CRUD est décrit comme avancé / synthèse, pas comme
   étape immédiate après Bonjour Forge ;
 - la page du starter Contacts liste les prérequis pédagogiques ;
@@ -25,15 +25,15 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-CONTACT_DOC = PROJECT_ROOT / "docs" / "starters" / "01-contact-simple" / "index.md"
+CONTACT_DOC = PROJECT_ROOT / "docs" / "starters" / "contact-simple" / "index.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 
 
 def _extract_contacts_section(text: str) -> str:
-    """Extrait la section « Starter 1 — Contacts » du catalogue
+    """Extrait la section « Contacts » du catalogue
     `docs/starters/index.md` (entre son header et le header suivant)."""
-    start_marker = "### Starter 1 — Contacts"
+    start_marker = "### Contacts"
     idx = text.find(start_marker)
     if idx == -1:
         return ""
@@ -53,32 +53,27 @@ class TestProgressionAfterReposition:
     def _load(self):
         self.content = STARTERS_INDEX.read_text(encoding="utf-8")
 
-    def test_progression_contient_les_9_paliers(self):
-        # Chaque palier numéroté `N. **...**` doit être présent.
-        for n in range(1, 10):
+    def test_progression_contient_les_11_paliers(self):
+        # Chaque palier numéroté `N. **...**` doit être présent (1→11).
+        for n in range(1, 12):
             assert f"{n}. **" in self.content, (
                 f"Palier {n} introuvable dans la progression."
             )
+        # Plus de 12e palier : le CRUD est un starter autonome, pas un palier.
+        assert "12. **" not in self.content, (
+            "La progression ne doit plus comporter de palier 12 : le CRUD "
+            "est désormais le starter autonome `premier-crud`."
+        )
 
-    def test_palier_9_est_contacts_crud(self):
-        idx_palier9 = self.content.find("9. **Premier CRUD**")
-        assert idx_palier9 != -1, (
-            "Item « 9. **Premier CRUD** » introuvable dans la progression."
+    def test_apres_progression_premier_crud(self):
+        # Après les 11 paliers, le premier starter autonome est Premier CRUD.
+        assert "premier-crud/index.md" in self.content, (
+            "La progression doit pointer vers le starter autonome "
+            "`premier-crud` après le palier 11."
         )
-        # On délimite le bloc palier 9 jusqu'à la prochaine section `##`
-        rest = self.content[idx_palier9:]
-        next_section_idx = rest.find("\n##")
-        if next_section_idx == -1:
-            palier9_block = rest
-        else:
-            palier9_block = rest[:next_section_idx]
-        assert "01-contact-simple" in palier9_block, (
-            "Le palier 9 doit référencer le starter `01-contact-simple`."
-        )
-        # Le palier 9 doit être marqué « livré »
-        assert "livré" in palier9_block, (
-            "Le palier 9 (Contacts CRUD) doit être marqué « livré » "
-            "après STARTER-CONTACTS-CRUD-REPOSITION-001."
+        assert "STARTER-PREMIER-CRUD-001" in self.content, (
+            "Le starter Premier CRUD (STARTER-PREMIER-CRUD-001) doit être "
+            "cité comme premier starter autonome après la progression."
         )
 
 
@@ -91,12 +86,16 @@ class TestContactsDocReposition:
     def _load(self):
         self.content = CONTACT_DOC.read_text(encoding="utf-8")
 
-    def test_badge_en_tete_palier_9(self):
-        # L'en-tête (badge) doit présenter Contacts comme Palier 9
-        # avancé, pas comme Niveau 1 débutant.
-        assert "Palier 9" in self.content, (
-            "La page Contacts doit afficher « Palier 9 » dans son "
-            "en-tête (STARTER-CONTACTS-CRUD-REPOSITION-001)."
+    def test_badge_starter_autonome_avance(self):
+        # L'en-tête (badge) présente Contacts comme starter autonome
+        # avancé (plus de « Palier 12 », plus de « Niveau 1 débutant »).
+        assert "Palier 12" not in self.content, (
+            "Le badge Contacts ne doit plus afficher « Palier 12 » : "
+            "Contacts est un starter autonome avancé, pas un palier."
+        )
+        assert "autonome avancé" in self.content, (
+            "Le badge Contacts doit présenter un « starter autonome "
+            "avancé »."
         )
 
     def test_mention_synthese_avancee(self):
@@ -142,11 +141,11 @@ class TestContactsDocReposition:
             "premier contact avec Forge."
         )
         assert (
-            "../progression/welcome.md" in self.content
-            or "progression/welcome.md" in self.content
+            "../welcome/welcome.md" in self.content
+            or "welcome/welcome.md" in self.content
         ), (
             "La page Contacts doit lier explicitement vers la doc "
-            "`progression/welcome.md`."
+            "`welcome/welcome.md`."
         )
 
 
@@ -160,11 +159,11 @@ class TestStartersCatalogContactsSection:
         self.content = STARTERS_INDEX.read_text(encoding="utf-8")
         self.section = _extract_contacts_section(self.content)
 
-    def test_section_contacts_repositionnee_palier_9(self):
-        assert self.section, "Section « Starter 1 — Contacts » introuvable."
-        assert "palier 9" in self.section.lower(), (
-            "La section catalogue de Contacts doit mentionner "
-            "« palier 9 »."
+    def test_section_contacts_repositionnee_avance(self):
+        assert self.section, "Section « Contacts » introuvable."
+        assert "avancé" in self.section.lower(), (
+            "La section catalogue de Contacts doit présenter le starter "
+            "comme « autonome avancé »."
         )
 
     @pytest.mark.parametrize("forbidden_in_section", [

@@ -1,6 +1,6 @@
 """Garde-fou STARTER-SERVER-VALIDATION-001 (test proportionné, ~16 cas).
 
-Contrat public minimum du starter palier 7 — Validation serveur :
+Contrat public minimum du starter palier 9 — Validation serveur :
 
 - starter.json déclare `server-validation` (id, slot 13,
   requires_db false) ;
@@ -18,7 +18,7 @@ Contrat public minimum du starter palier 7 — Validation serveur :
   `csrf_token`, pas de Tailwind/JS/réaffichage dynamique ;
 - aucun fichier SQL, migration, entité ;
 - documentation présente, sans aucun des patterns interdits ;
-- la progression officielle marque le palier 7 livré.
+- la progression officielle marque le palier 9 livré.
 """
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "server-validat
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "server_validation_controller.py"
 VIEW = FILES_DIR / "mvc" / "views" / "server_validation" / "index.html"
-DOC = PROJECT_ROOT / "docs" / "starters" / "progression" / "server-validation.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "welcome" / "server-validation.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 
@@ -163,25 +163,25 @@ def test_doc_does_not_contain_forbidden_pattern(forbidden: str):
     )
 
 
-def test_doc_mentions_palier_7_and_concepts():
+def test_doc_mentions_palier_9_and_concepts():
     content = DOC.read_text(encoding="utf-8")
-    assert "palier 7" in content.lower() or "Palier 7" in content
+    assert "palier 9" in content.lower() or "Palier 9" in content
     assert "422" in content
     assert "request.form" in content
     assert "/server-validation" in content
     assert "Le prénom est obligatoire" in content
 
 
-# ── Progression officielle : palier 7 livré ───────────────────────────────────
+# ── Progression officielle : palier 9 livré ───────────────────────────────────
 
 
-def test_progression_marks_palier_7_as_delivered():
+def test_progression_marks_palier_9_as_delivered():
     text = STARTERS_INDEX.read_text(encoding="utf-8")
     assert "STARTER-SERVER-VALIDATION-001" in text
-    idx_palier7 = text.find("7. **Validation serveur**")
-    idx_palier8 = text.find("8. **Première base SQL**")
-    assert idx_palier7 != -1
-    assert idx_palier8 != -1
-    palier7_block = text[idx_palier7:idx_palier8]
-    assert "livré" in palier7_block
-    assert "server-validation" in palier7_block
+    idx_palier9 = text.find("9. **Validation serveur**")
+    idx_palier10 = text.find("10. **Première base SQL**")
+    assert idx_palier9 != -1
+    assert idx_palier10 != -1
+    palier9_block = text[idx_palier9:idx_palier10]
+    assert "livré" in palier9_block
+    assert "server-validation" in palier9_block

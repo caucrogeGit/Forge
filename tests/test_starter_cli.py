@@ -640,7 +640,7 @@ def test_starter_2_utilise_api_auth_moderne():
     """La page starter-02 indique que le starter utilise les API Auth/User modernes."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "02-utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
     assert "core.auth" in content
     assert "login_user" in content or "login_required" in content
 
@@ -649,7 +649,7 @@ def test_avertissement_dans_starter_4():
     """La page starter-app-04 contient un avertissement sur son statut historique."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "04-suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
     assert "historique" in content or "legacy" in content
 
 
@@ -687,7 +687,7 @@ def test_starter_1_mentionne_profil_recommande():
     """La page starter-app-01 mentionne un profil recommandé."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "01-contact-simple" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "contact-simple" / "index.md").read_text(encoding="utf-8")
     assert "minimal" in content or "standard" in content
     assert "profil" in content.lower()
 
@@ -696,7 +696,7 @@ def test_starter_3_mentionne_profil_recommande():
     """La page starter-app-03 mentionne un profil recommandé."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "03-carnet-contacts" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
     assert "standard" in content
     assert "profil" in content.lower()
 
@@ -715,7 +715,7 @@ def test_starter_4_ne_se_presente_plus_comme_vitrine_technique():
     """La page starter-app-04 ne dit plus 'vitrine technique de Forge'."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "04-suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
     assert "vitrine technique de Forge" not in content
 
 
@@ -865,10 +865,10 @@ def test_starters_historiques_dans_docs_starters():
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     starters_dir = root / "docs" / "starters"
-    assert (starters_dir / "01-contact-simple" / "index.md").exists()
-    assert (starters_dir / "02-utilisateurs-auth" / "index.md").exists()
-    assert (starters_dir / "03-carnet-contacts" / "index.md").exists()
-    assert (starters_dir / "04-suivi-comportement-eleves" / "index.md").exists()
+    assert (starters_dir / "contact-simple" / "index.md").exists()
+    assert (starters_dir / "utilisateurs-auth" / "index.md").exists()
+    assert (starters_dir / "carnet-contacts" / "index.md").exists()
+    assert (starters_dir / "suivi-comportement-eleves" / "index.md").exists()
 
 
 # ── DOC-STARTERS-STRUCTURE-002 : tests documentaires ───────────────────────
@@ -879,9 +879,9 @@ def test_fichiers_plats_starters_absents():
     root = pathlib.Path(__file__).resolve().parent.parent
     starters_dir = root / "docs" / "starters"
     assert not (starters_dir / "starter-app-01-contacts.md").exists()
-    assert not (starters_dir / "starter-app-02-utilisateurs-auth.md").exists()
-    assert not (starters_dir / "starter-app-03-carnet-contacts.md").exists()
-    assert not (starters_dir / "starter-app-04-suivi-comportement-eleves.md").exists()
+    assert not (starters_dir / "starter-app-utilisateurs-auth.md").exists()
+    assert not (starters_dir / "starter-app-carnet-contacts.md").exists()
+    assert not (starters_dir / "starter-app-suivi-comportement-eleves.md").exists()
 
 
 def test_chaque_starter_a_un_index_md():
@@ -889,10 +889,10 @@ def test_chaque_starter_a_un_index_md():
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     s = root / "docs" / "starters"
-    assert (s / "01-contact-simple" / "index.md").exists()
-    assert (s / "02-utilisateurs-auth" / "index.md").exists()
-    assert (s / "03-carnet-contacts" / "index.md").exists()
-    assert (s / "04-suivi-comportement-eleves" / "index.md").exists()
+    assert (s / "contact-simple" / "index.md").exists()
+    assert (s / "utilisateurs-auth" / "index.md").exists()
+    assert (s / "carnet-contacts" / "index.md").exists()
+    assert (s / "suivi-comportement-eleves" / "index.md").exists()
     assert (s / "communes-sejours" / "index.md").exists()
 
 
@@ -902,9 +902,9 @@ def test_mkdocs_ne_reference_plus_les_fichiers_plats():
     root = pathlib.Path(__file__).resolve().parent.parent
     content = (root / "mkdocs.yml").read_text(encoding="utf-8")
     assert "starter-app-01-contacts.md" not in content
-    assert "starter-app-02-utilisateurs-auth.md" not in content
-    assert "starter-app-03-carnet-contacts.md" not in content
-    assert "starter-app-04-suivi-comportement-eleves.md" not in content
+    assert "starter-app-utilisateurs-auth.md" not in content
+    assert "starter-app-carnet-contacts.md" not in content
+    assert "starter-app-suivi-comportement-eleves.md" not in content
 
 
 # ── STARTER-AUTH-MODERNIZE-001 : tests documentaires ────────────────────────
@@ -978,7 +978,7 @@ def test_starter_2_doc_mentionne_limites():
     """La doc du starter 2 mentionne explicitement les limites (MFA, OIDC, etc.)."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "02-utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
     assert "MFA" in content
     assert "OIDC" in content
 
@@ -987,7 +987,7 @@ def test_starter_2_doc_indique_auth_moderne():
     """La doc du starter 2 indique qu'il utilise les API Auth/User modernes."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "02-utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "utilisateurs-auth" / "index.md").read_text(encoding="utf-8")
     assert "core.auth" in content
     assert "login_user" in content
 
@@ -1027,7 +1027,7 @@ def test_starter_1_doc_existe():
     """Les fichiers index.md et rebuild.md du starter Contacts existent."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    s = root / "docs" / "starters" / "01-contact-simple"
+    s = root / "docs" / "starters" / "contact-simple"
     assert (s / "index.md").exists()
     assert (s / "rebuild.md").exists()
 
@@ -1036,16 +1036,19 @@ def test_starter_1_est_officiel_simple():
     """La doc du starter Contacts le présente comme starter officiel simple."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "01-contact-simple" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "contact-simple" / "index.md").read_text(encoding="utf-8")
     assert "officiel" in content or "Starter Forge" in content
-    assert "Auth" not in content or "aucune authentification" in content or "Aucune authentification" in content
+    # Le renvoi « Prochain starter : Utilisateurs / Auth » (section « Après ce
+    # starter ») est une navigation, pas une fonctionnalité du starter Contacts.
+    body = content.split("## Après ce starter")[0]
+    assert "Auth" not in body or "aucune authentification" in body.lower()
 
 
 def test_starter_1_associe_profils_minimal_standard():
     """La doc du starter Contacts mentionne les profils minimal et standard."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "01-contact-simple" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "contact-simple" / "index.md").read_text(encoding="utf-8")
     assert "minimal" in content
     assert "standard" in content
 
@@ -1055,7 +1058,7 @@ def test_starter_1_doc_url_pointe_nouvelle_structure():
     from forge_cli.starters.registry import resolve
     meta = resolve("1")
     assert "starter-app-01" not in meta.get("doc_url", "")
-    assert "starters/01-contact-simple" in meta.get("doc_url", "")
+    assert "starters/contact-simple" in meta.get("doc_url", "")
 
 
 def test_starters_index_starter_2_non_a_moderniser():
@@ -1089,7 +1092,7 @@ def test_starter_3_doc_existe():
     """Les fichiers index.md et rebuild.md du starter Carnet existent."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    s = root / "docs" / "starters" / "03-carnet-contacts"
+    s = root / "docs" / "starters" / "carnet-contacts"
     assert (s / "index.md").exists()
     assert (s / "rebuild.md").exists()
 
@@ -1098,7 +1101,7 @@ def test_starter_3_est_officiel_relationnel():
     """La doc du starter Carnet le présente comme starter officiel relationnel."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "03-carnet-contacts" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
     assert "relationnel" in content
     assert "officiel" in content or "Starter Forge" in content
 
@@ -1107,7 +1110,7 @@ def test_starter_3_mentionne_many_to_one():
     """La doc du starter Carnet mentionne la relation many_to_one."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "03-carnet-contacts" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
     assert "many_to_one" in content
 
 
@@ -1116,14 +1119,14 @@ def test_starter_3_doc_url_pointe_nouvelle_structure():
     from forge_cli.starters.registry import resolve
     meta = resolve("3")
     assert "starter-app-03" not in meta.get("doc_url", "")
-    assert "starters/03-carnet-contacts" in meta.get("doc_url", "")
+    assert "starters/carnet-contacts" in meta.get("doc_url", "")
 
 
 def test_starter_3_pas_demonstrateur_avance():
     """Le starter Carnet n'est pas présenté comme démonstrateur avancé principal."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "03-carnet-contacts" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "carnet-contacts" / "index.md").read_text(encoding="utf-8")
     assert "démonstrateur avancé principal" not in content
 
 
@@ -1142,7 +1145,7 @@ def test_starter_4_doc_existe():
     """Les fichiers index.md et rebuild.md du starter Suivi pédagogique existent."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    s = root / "docs" / "starters" / "04-suivi-comportement-eleves"
+    s = root / "docs" / "starters" / "suivi-comportement-eleves"
     assert (s / "index.md").exists()
     assert (s / "rebuild.md").exists()
 
@@ -1151,7 +1154,7 @@ def test_starter_4_doc_mentionne_historique():
     """La doc du starter Suivi pédagogique mentionne son statut historique."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "04-suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
     assert "historique" in content or "legacy" in content
 
 
@@ -1159,7 +1162,7 @@ def test_starter_4_doc_pas_vitrine_principale():
     """La doc du starter Suivi précise qu'il n'est plus le démonstrateur avancé principal."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "04-suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "suivi-comportement-eleves" / "index.md").read_text(encoding="utf-8")
     # Le texte doit préciser que c'est historique / legacy, pas la vitrine courante
     assert "historique" in content or "legacy" in content
     # S'il mentionne "démonstrateur avancé principal", c'est pour dire qu'il ne l'est plus
@@ -1172,7 +1175,7 @@ def test_starter_4_doc_url_pointe_nouvelle_structure():
     from forge_cli.starters.registry import resolve
     meta = resolve("4")
     assert "starter-app-04" not in meta.get("doc_url", "")
-    assert "starters/04-suivi-comportement-eleves" in meta.get("doc_url", "")
+    assert "starters/suivi-comportement-eleves" in meta.get("doc_url", "")
 
 
 def test_starters_index_starter_4_historique():

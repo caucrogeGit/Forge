@@ -270,10 +270,10 @@ class TestStartersSection:
 
     @pytest.mark.parametrize("starter_url", [
         "starters/welcome/",
-        "starters/01-contact-simple/",
-        "starters/02-utilisateurs-auth/",
-        "starters/03-carnet-contacts/",
-        "starters/04-suivi-comportement-eleves/",
+        "starters/contact-simple/",
+        "starters/utilisateurs-auth/",
+        "starters/carnet-contacts/",
+        "starters/suivi-comportement-eleves/",
         "starters/communes-sejours/",
         "starters/auth-mfa/",
     ])

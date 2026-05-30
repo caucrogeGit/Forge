@@ -15,17 +15,17 @@ LANDING_GENERATED = PROJECT_ROOT / "docs" / "index.html"
 # URLs cassées identifiées par l'audit pré-release-3.0-audit-001
 BROKEN_URLS = [
     "starter-app-01-contacts",
-    "starter-app-02-utilisateurs-auth",
-    "starter-app-03-carnet-contacts",
-    "starter-app-04-suivi-comportement-eleves",
+    "starter-app-utilisateurs-auth",
+    "starter-app-carnet-contacts",
+    "starter-app-suivi-comportement-eleves",
 ]
 
 # URLs corrigées attendues
 FIXED_URLS = [
-    "starters/01-contact-simple/",
-    "starters/02-utilisateurs-auth/",
-    "starters/03-carnet-contacts/",
-    "starters/04-suivi-comportement-eleves/",
+    "starters/contact-simple/",
+    "starters/utilisateurs-auth/",
+    "starters/carnet-contacts/",
+    "starters/suivi-comportement-eleves/",
     "roadmap/forge-roadmap/",
 ]
 
@@ -83,7 +83,13 @@ class TestStarterLinksCount:
 
     def test_four_starter_links(self):
         content = LANDING_SOURCE.read_text(encoding="utf-8")
-        matches = re.findall(r"starters/0[1-4]-[a-z-]+/", content)
+        # Les dossiers starters ont perdu leur préfixe numérique
+        # (01-…→…) : on vérifie les 4 slugs des cartes Niveau 1→4.
+        matches = re.findall(
+            r"starters/(?:contact-simple|utilisateurs-auth|"
+            r"carnet-contacts|suivi-comportement-eleves)/",
+            content,
+        )
         unique_starters = set(matches)
         assert len(unique_starters) >= 4, (
             f"Les 4 liens starters devraient être présents, "
