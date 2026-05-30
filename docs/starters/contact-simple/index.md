@@ -1,27 +1,31 @@
-# Starter 1 — Contacts
+# Contacts
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 <div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 55%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
-  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Palier 9 (avancé)</p>
+  <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Starter autonome avancé</p>
   <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">Application Contacts</h2>
-  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Synthèse avancée et point d'arrivée de la <a href="../index.md#progression-recommandee">progression officielle des starters</a> : une seule entité <code>Contact</code>, un CRUD généré, puis un câblage manuel des routes. Ce starter officiel reste le CRUD le plus simple, mais il assemble toutes les briques vues aux paliers 1 à 8.</p>
+  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Synthèse avancée à aborder après la <a href="../index.md#progression-recommandee">progression de découverte</a> et le starter <a href="../premier-crud/index.md">Premier CRUD</a> : une seule entité <code>Contact</code>, un CRUD généré, puis un câblage manuel des routes. Ce starter officiel reste le CRUD le plus simple, mais il assemble toutes les briques vues aux 11 paliers de découverte.</p>
 </div>
 
-!!! warning "Palier 9 — synthèse avancée"
+!!! warning "Synthèse avancée — starter autonome"
     Ce starter est une **synthèse avancée**, pas une étape immédiate
-    après Bonjour Forge. Avant de l'aborder, il est recommandé
-    d'avoir compris :
+    après Bonjour Forge. Avant de l'aborder, il est recommandé d'avoir
+    suivi les **11 paliers de découverte** puis le starter
+    [Premier CRUD](../premier-crud/index.md), c'est-à-dire de maîtriser :
 
-    - les routes (palier 1 — `Bonjour Forge`) ;
-    - les contrôleurs et `Response.text(...)` (palier 1) ;
+    - les routes et `Response.text(...)` (palier 1 — `Bonjour Forge`) ;
     - les paramètres d'URL avec `request.param(...)` (palier 2 — `query-params`) ;
     - le rendu HTML avec `BaseController.render(...)` (palier 3 — `first-html-view`) ;
     - les routes dynamiques `/{id}` avec `request.route_param(...)` (palier 4 — `dynamic-route`) ;
     - l'inspection de la requête (palier 5 — `request-debug`) ;
-    - les formulaires POST avec CSRF (palier 6 — `form-post`) ;
-    - la validation serveur minimale (palier 7 — `server-validation`) ;
-    - les migrations SQL et `core.database.db.fetch_one` (palier 8 — `first-sql`).
+    - la réponse JSON (palier 6 — `json-response`) ;
+    - la protection CSRF des formulaires (palier 7 — `csrf`) ;
+    - les formulaires POST (palier 8 — `form-post`) ;
+    - la validation serveur minimale (palier 9 — `server-validation`) ;
+    - le SQL visible en lecture avec `core.database.db.fetch_one` (palier 10 — `first-sql`) ;
+    - l'écriture en base avec `core.database.db.insert` (palier 11 — `first-sql-write`) ;
+    - le CRUD complet à SQL visible (starter `premier-crud`).
 
     Voir la
     [Progression recommandée des starters](../index.md#progression-recommandee)
@@ -34,7 +38,8 @@
     ---
 
     Construire une petite application CRUD pour gérer des contacts —
-    synthèse avancée des paliers 1 à 8 de la progression officielle.
+    synthèse avancée des 11 paliers de découverte et du starter
+    Premier CRUD.
 
 -   **Niveau**
 
@@ -100,7 +105,7 @@ Une fois que `forge --version` s'affiche correctement, revenez ici pour construi
     Voir [Profils de projet](../../features/profiles.md) pour choisir le bon
     profil au moment de `forge new`. Pour le **premier** contact
     avec Forge, démarrer plutôt par
-    [Bonjour Forge](../progression/welcome.md) (palier 1, sans BDD).
+    [Bonjour Forge](../welcome/welcome.md) (palier 1, sans BDD).
 
 ## 1. Présentation rapide
 
@@ -939,5 +944,10 @@ Ce starter clôt la progression pédagogique de base.
 Il rassemble les notions vues dans les paliers précédents : routes,
 contrôleurs, vues, formulaires, validation serveur, SQL et
 migrations.
+
+Prochain starter : **Utilisateurs / Auth** — comprendre une
+authentification minimale moderne avec `core.auth`.
+
+[Prochain starter : Utilisateurs / Auth](../utilisateurs-auth/index.md)
 
 [Revenir à la vue d'ensemble des starters](../index.md)

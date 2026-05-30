@@ -315,3 +315,10 @@ Ces évolutions sont hors périmètre de la Phase 8 mais envisageables dans des 
 - seed insérable via `forge db:seed` si une commande officielle est créée ;
 - nouvelles langues (en.json, etc.) ;
 - starter comme base de départ pour un vrai projet commercial.
+
+## Prochain starter
+
+Prochain starter : **Auth MFA** — ajouter un challenge TOTP au flux de
+connexion avec `forge-mvc-mfa`.
+
+[Prochain starter : Auth MFA](../auth-mfa/index.md)

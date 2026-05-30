@@ -1,4 +1,4 @@
-# Starter 2 — Utilisateurs / authentification
+# Utilisateurs / authentification
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -485,7 +485,7 @@ https://localhost:8000/login
 
 ## Reconstruction
 
-Le fichier complet de reconstruction est disponible dans [starters/02-utilisateurs-auth/rebuild.md](rebuild.md).
+Le fichier complet de reconstruction est disponible dans [starters/utilisateurs-auth/rebuild.md](rebuild.md).
 
 ---
 
@@ -500,3 +500,10 @@ Le fichier complet de reconstruction est disponible dans [starters/02-utilisateu
 | `mariadb: command not found` | client MariaDB absent | `sudo apt install mariadb-client` |
 | erreur de compilation Python | outils de build absents | `sudo apt install build-essential pkg-config libmariadb-dev` |
 | erreur certificat HTTPS | `openssl` absent | `sudo apt install openssl` |
+
+## Prochain starter
+
+Prochain starter : **Carnet de contacts** — comprendre les relations
+entre entités (`many_to_one`, JOIN SQL).
+
+[Prochain starter : Carnet de contacts](../carnet-contacts/index.md)

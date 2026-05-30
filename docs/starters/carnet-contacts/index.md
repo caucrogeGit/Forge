@@ -1,4 +1,4 @@
-# Starter 3 — Carnet de contacts
+# Carnet de contacts
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -312,7 +312,7 @@ Le many-to-many explicite avec `Groupe` et `ContactGroupe` reste une évolution 
 
 ## Reconstruction
 
-Le fichier court de reconstruction est disponible dans [starters/03-carnet-contacts/rebuild.md](rebuild.md).
+Le fichier court de reconstruction est disponible dans [starters/carnet-contacts/rebuild.md](rebuild.md).
 
 ---
 
@@ -327,3 +327,10 @@ Le fichier court de reconstruction est disponible dans [starters/03-carnet-conta
 | `mariadb: command not found` | client MariaDB absent | `sudo apt install mariadb-client` |
 | erreur de compilation Python | outils de build absents | `sudo apt install build-essential pkg-config libmariadb-dev` |
 | erreur certificat HTTPS | `openssl` absent | `sudo apt install openssl` |
+
+## Prochain starter
+
+Prochain starter : **Suivi pédagogique** — un exemple métier plus
+complet (consultation d'observations d'élèves).
+
+[Prochain starter : Suivi pédagogique](../suivi-comportement-eleves/index.md)

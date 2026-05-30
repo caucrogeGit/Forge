@@ -16,18 +16,19 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 | Starter | Statut | Profil associé | Usage recommandé |
 |---|---|---|---|
-| [Bonjour Forge — premier pas](progression/welcome.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact minimal avec Forge — `Response.text(...)` et `request.param(...)`, deux routes, aucune vue HTML, aucune base de données |
-| [Paramètres d'URL](progression/query-params.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 2 de la progression — lire une valeur d'URL avec `request.param("name", default=...)`, deux routes, aucune vue HTML, aucune base de données |
-| [Première vue HTML](progression/first-html-view.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 3 de la progression — rendre une page HTML avec `BaseController.render(...)`, une route, une vue, aucune base de données |
-| [Route dynamique](progression/dynamic-route.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 4 de la progression — lire un paramètre de route avec `request.route_param("id")`, une route `/dynamic-route/articles/{id}`, aucune vue HTML, aucune base de données |
-| [Inspecter une requête](progression/request-debug.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 5 de la progression — explorer `request.data` avec `Response.debug(...)`, une route `/request-debug`, aucune vue HTML, aucune base de données |
-| [Premier formulaire POST](progression/form-post.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 6 de la progression — afficher un formulaire HTML minimal (avec CSRF), envoyer un POST, lire la valeur avec `request.form("name", ...)`, aucune base de données |
-| [Validation serveur](progression/server-validation.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
-| [Première base SQL](progression/first-sql.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
-| [1 — Contacts](01-contact-simple/index.md) | Officiel simple | `minimal` / `standard` | **Palier 9** de la progression — synthèse avancée du CRUD officiel ; suppose les 8 paliers précédents acquis |
-| [2 — Utilisateurs / Auth](02-utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
-| [3 — Carnet de contacts](03-carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
-| [4 — Suivi pédagogique](04-suivi-comportement-eleves/index.md) | Historique / legacy | Aucun profil principal | Consulter un exemple métier historique, non recommandé comme base moderne |
+| [Bonjour Forge — premier pas](welcome/welcome.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact minimal avec Forge — `Response.text(...)` et `request.param(...)`, deux routes, aucune vue HTML, aucune base de données |
+| [Paramètres d'URL](welcome/query-params.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 2 de la progression — lire une valeur d'URL avec `request.param("name", default=...)`, deux routes, aucune vue HTML, aucune base de données |
+| [Première vue HTML](welcome/first-html-view.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 3 de la progression — rendre une page HTML avec `BaseController.render(...)`, une route, une vue, aucune base de données |
+| [Route dynamique](welcome/dynamic-route.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 4 de la progression — lire un paramètre de route avec `request.route_param("id")`, une route `/dynamic-route/articles/{id}`, aucune vue HTML, aucune base de données |
+| [Inspecter une requête](welcome/request-debug.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 5 de la progression — explorer `request.data` avec `Response.debug(...)`, une route `/request-debug`, aucune vue HTML, aucune base de données |
+| [Premier formulaire POST](welcome/form-post.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 6 de la progression — afficher un formulaire HTML minimal (avec CSRF), envoyer un POST, lire la valeur avec `request.form("name", ...)`, aucune base de données |
+| [Validation serveur](welcome/server-validation.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
+| [Première base SQL](welcome/first-sql.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
+| [Premier CRUD](premier-crud/index.md) | Capstone fondamentaux (avec BDD) | `minimal` / `standard` | Premier starter autonome après la progression — CRUD complet à SQL visible (`SELECT`/`INSERT`/`UPDATE`/`DELETE`) sur l'entité neutre `message`, aucun métier, aucun ORM |
+| [1 — Contacts](contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — synthèse du CRUD métier ; suppose les 11 paliers de découverte + le starter Premier CRUD acquis |
+| [2 — Utilisateurs / Auth](utilisateurs-auth/index.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
+| [3 — Carnet de contacts](carnet-contacts/index.md) | Officiel relationnel | `standard` | Comprendre les relations entre entités (`many_to_one`, JOIN SQL) |
+| [4 — Suivi pédagogique](suivi-comportement-eleves/index.md) | Historique / legacy | Aucun profil principal | Consulter un exemple métier historique, non recommandé comme base moderne |
 | [5 — Communes & Séjours](communes-sejours/index.md) | Démonstrateur avancé principal | `standard` | Voir une application démonstratrice couvrant les briques modernes de Forge |
 | [6 — Auth MFA](auth-mfa/index.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 | [Bonjour IoT](welcome-iot/index.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-iot`, `/welcome-iot/inspect`, `/welcome-iot/events`, `/welcome-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
@@ -49,27 +50,37 @@ d'aborder le CRUD sereinement. La progression officielle est :
    *(livré — starter `dynamic-route`, ticket `STARTER-DYNAMIC-ROUTE-001`)*
 5. **Inspecter une requête** — explorer `request.data` avec `Response.debug(...)` en développement.
    *(livré — starter `request-debug`, ticket `STARTER-REQUEST-DEBUG-001`)*
-6. **Premier formulaire POST** — envoyer des données depuis un formulaire HTML.
+6. **Réponse JSON** — retourner des données structurées avec `Response.json(...)`.
+   *(livré — starter `json-response`, ticket `STARTER-JSON-RESPONSE-001`)*
+7. **Le jeton CSRF** — comprendre la protection CSRF des formulaires.
+   *(livré — starter `csrf`, ticket `STARTER-CSRF-001`)*
+8. **Premier formulaire POST** — envoyer des données depuis un formulaire HTML.
    *(livré — starter `form-post`, ticket `STARTER-FORM-POST-001`)*
-7. **Validation serveur** — refuser ou accepter les données reçues.
+9. **Validation serveur** — refuser ou accepter les données reçues.
    *(livré — starter `server-validation`, ticket `STARTER-SERVER-VALIDATION-001`)*
-8. **Première base SQL** — comprendre MariaDB, les migrations et le SQL visible.
+10. **Première base SQL** — lire une donnée : MariaDB, migrations et SQL visible.
    *(livré — starter `first-sql`, ticket `STARTER-FIRST-SQL-001`)*
-9. **Premier CRUD** — utiliser le starter Contacts quand les bases précédentes sont acquises.
-   *(livré — starter `01-contact-simple` ; synthèse avancée, repositionnement pédagogique formalisé par `STARTER-CONTACTS-CRUD-REPOSITION-001`)*
+11. **Écrire en base** — insérer une ligne depuis un formulaire avec `db.insert(...)`.
+   *(livré — starter `first-sql-write`, ticket `STARTER-FIRST-SQL-WRITE-001`)*
+
+Une fois ces **11 paliers** acquis, vous avez terminé le starter de
+découverte *Bonjour Forge*. Le premier **starter autonome** à enchaîner
+est [Premier CRUD](premier-crud/index.md) — un CRUD complet à SQL visible
+sur une entité neutre (`message`), livré par `STARTER-PREMIER-CRUD-001`.
+Viennent ensuite les exemples métier : Contacts, Utilisateurs / Auth,
+Carnet de contacts…
 
 !!! warning "Saut Bonjour Forge → Contacts CRUD"
-    Tant que les starters 2 à 8 ne sont pas livrés, un utilisateur qui
-    enchaîne directement `welcome` → `01-contact-simple` rencontre
-    plusieurs notions (vue Jinja2, route dynamique, formulaire,
-    validation, SQL, migrations) sans transition. Le ticket
-    `STARTER-ROADMAP-PROGRESSION-001` formalise cette dette
-    pédagogique ; les tickets `STARTER-*-001` listés ci-dessus la
-    soldent étape par étape.
+    Sauter directement de `welcome` à `contact-simple` fait rencontrer
+    plusieurs notions (vue, route dynamique, JSON, CSRF, formulaire,
+    validation, SQL en lecture et écriture) sans transition. La
+    progression ci-dessus solde cette dette pédagogique : suivez les
+    paliers dans l'ordre (ticket `STARTER-ROADMAP-PROGRESSION-001`).
 
 Le tableau de synthèse plus haut reste utile comme catalogue exhaustif
 des starters disponibles aujourd'hui, mais l'ordre d'apprentissage
-recommandé est celui des 9 paliers ci-dessus.
+recommandé est celui des 11 paliers ci-dessus, suivi des starters
+autonomes (Premier CRUD, puis les exemples métier).
 
 ## Starter d'entrée (sans base de données)
 
@@ -98,29 +109,48 @@ forge new mon-projet --starter welcome
 forge starter:build 7
 ```
 
-[Présentation](progression/welcome.md)
+[Présentation](welcome/welcome.md)
+
+## Premier starter autonome (avec base de données)
+
+### Premier CRUD
+
+Le capstone des fondamentaux : un CRUD complet (créer, lister, modifier,
+supprimer) à **SQL visible**, sur une entité **neutre** (`message`, table
+`first_sql_messages`). Premier starter autonome après les 11 paliers de
+découverte.
+
+Profil recommandé : `minimal` ou `standard`. Identifiant : `premier-crud`
+(alias `crud` / `19`).
+
+- prolonge directement les paliers « Première base SQL » et « Écrire en base » ;
+- les quatre opérations SQL en clair : `SELECT`, `INSERT`, `UPDATE`, `DELETE` ;
+- aucune notion métier, aucun ORM, aucune authentification.
+
+[Présentation](premier-crud/index.md)
 
 ## Starters officiels simples
 
-### Starter 1 — Contacts
+### Contacts
 
 Le starter officiel simple de Forge. Une seule entité `Contact`, un CRUD généré, des routes câblées manuellement.
 
 Profil recommandé : `minimal` ou `standard`.
 
-- **palier 9** de la progression pédagogique officielle — synthèse avancée ;
+- **starter autonome avancé** — synthèse du CRUD métier ;
 - aucune relation, aucune authentification ;
-- suppose acquis les 8 paliers pédagogiques précédents
-  (routes, contrôleurs, vues HTML, paramètres d'URL, route dynamique,
-  formulaires POST avec CSRF, validation serveur, migrations SQL).
+- suppose acquis les **11 paliers de découverte** puis le starter
+  [Premier CRUD](premier-crud/index.md) (routes, contrôleurs, vues HTML,
+  paramètres d'URL, route dynamique, formulaires POST avec CSRF,
+  validation serveur, migrations SQL, CRUD à SQL visible).
 
 Pour le **premier** contact avec Forge, démarrer par
-[Bonjour Forge](progression/welcome.md) (palier 1, sans BDD), pas par ce
+[Bonjour Forge](welcome/welcome.md) (palier 1, sans BDD), pas par ce
 starter.
 
-[Présentation](01-contact-simple/index.md) · [Reconstruction](01-contact-simple/rebuild.md)
+[Présentation](contact-simple/index.md) · [Reconstruction](contact-simple/rebuild.md)
 
-### Starter 3 — Carnet de contacts
+### Carnet de contacts
 
 Le starter officiel relationnel de Forge. Deux entités (`Ville` et `Contact`), une relation `many_to_one`, un `LEFT JOIN` SQL visible.
 
@@ -129,11 +159,11 @@ Profil recommandé : `standard`.
 - idéal pour comprendre les relations entre entités ;
 - montre `relations.json`, la clé étrangère et la requête JOIN.
 
-[Présentation](03-carnet-contacts/index.md) · [Reconstruction](03-carnet-contacts/rebuild.md)
+[Présentation](carnet-contacts/index.md) · [Reconstruction](carnet-contacts/rebuild.md)
 
 ## Starter Auth minimal moderne
 
-### Starter 2 — Utilisateurs / Auth
+### Utilisateurs / Auth
 
 Un exemple d'authentification minimale alignée sur le socle `core.auth` de Forge.
 
@@ -146,22 +176,22 @@ Profil recommandé : `standard`.
 !!! info "Limites du starter 2"
     Ce starter ne démontre pas MFA, OIDC, RBAC avancé, reset password complet ou administration utilisateurs.
 
-[Présentation](02-utilisateurs-auth/index.md) · [Reconstruction](02-utilisateurs-auth/rebuild.md)
+[Présentation](utilisateurs-auth/index.md) · [Reconstruction](utilisateurs-auth/rebuild.md)
 
 ## Démonstrateur historique
 
-### Starter 4 — Suivi pédagogique
+### Suivi pédagogique
 
 Un exemple pédagogique historique conservé comme référence. Il montre une application métier plus riche : plusieurs entités, relations, seed et un flux d'authentification ancien.
 
 !!! warning "Statut legacy"
     Ce starter n'est plus recommandé comme base pour un nouveau projet. Son implémentation auth est antérieure au socle `core.auth`. Il reste disponible comme trace pédagogique.
 
-[Présentation](04-suivi-comportement-eleves/index.md) · [Reconstruction](04-suivi-comportement-eleves/rebuild.md)
+[Présentation](suivi-comportement-eleves/index.md) · [Reconstruction](suivi-comportement-eleves/rebuild.md)
 
 ## Démonstrateur avancé principal
 
-### Starter 5 — Communes & Séjours
+### Communes & Séjours
 
 Le démonstrateur avancé principal de Forge. Il couvre les briques modernes du framework dans une application cohérente.
 
@@ -178,7 +208,7 @@ Ce starter démontre :
 
 ## Démonstrateur MFA (Alpha)
 
-### Starter 6 — Auth MFA
+### Auth MFA
 
 Un skeleton d'authentification multi-facteurs TOTP basé sur le module opt-in
 `forge-mvc-mfa`. Remplace deux contrôleurs dans un projet déjà initialisé avec
@@ -273,7 +303,7 @@ forge starter:build 7        # Bienvenue dans Forge (sans BDD)
 ```
 
 Pour le starter pédagogique `query-params` (palier 2 de la progression),
-voir la page dédiée [Paramètres d'URL](progression/query-params.md) — il
+voir la page dédiée [Paramètres d'URL](welcome/query-params.md) — il
 s'applique par son identifiant public, pas par un numéro.
 
 Les alias `contacts`, `auth`, `carnet`, `suivi`, `communes-sejours`, `query-params` et leurs variantes sont également supportés.
@@ -297,10 +327,10 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 
 | Starter | Présentation | Reconstruction |
 |---|---|---|
-| Contacts | [Présentation](01-contact-simple/index.md) | [rebuild.md](01-contact-simple/rebuild.md) |
-| Utilisateurs / Auth | [Présentation](02-utilisateurs-auth/index.md) | [rebuild.md](02-utilisateurs-auth/rebuild.md) |
-| Carnet de contacts | [Présentation](03-carnet-contacts/index.md) | [rebuild.md](03-carnet-contacts/rebuild.md) |
-| Suivi pédagogique | [Présentation](04-suivi-comportement-eleves/index.md) | [rebuild.md](04-suivi-comportement-eleves/rebuild.md) |
+| Contacts | [Présentation](contact-simple/index.md) | [rebuild.md](contact-simple/rebuild.md) |
+| Utilisateurs / Auth | [Présentation](utilisateurs-auth/index.md) | [rebuild.md](utilisateurs-auth/rebuild.md) |
+| Carnet de contacts | [Présentation](carnet-contacts/index.md) | [rebuild.md](carnet-contacts/rebuild.md) |
+| Suivi pédagogique | [Présentation](suivi-comportement-eleves/index.md) | [rebuild.md](suivi-comportement-eleves/rebuild.md) |
 | Communes & Séjours | [Présentation](communes-sejours/index.md) | [rebuild.md](communes-sejours/rebuild.md) |
 | Auth MFA | [Présentation](auth-mfa/index.md) | [rebuild.md](auth-mfa/rebuild.md) |
 

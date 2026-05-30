@@ -1,4 +1,4 @@
-# Starter 4 — Suivi pédagogique
+# Suivi pédagogique
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -440,7 +440,7 @@ Une future application `Suivi Classe` pourrait être construite en partant du st
 
 ## Reconstruction
 
-Le fichier de reconstruction pas à pas est disponible dans [starters/04-suivi-comportement-eleves/rebuild.md](rebuild.md).
+Le fichier de reconstruction pas à pas est disponible dans [starters/suivi-comportement-eleves/rebuild.md](rebuild.md).
 
 ---
 
@@ -455,3 +455,10 @@ Le fichier de reconstruction pas à pas est disponible dans [starters/04-suivi-c
 | `mariadb: command not found` | client MariaDB absent | `sudo apt install mariadb-client` |
 | erreur de compilation Python | outils de build absents | `sudo apt install build-essential pkg-config libmariadb-dev` |
 | erreur certificat HTTPS | `openssl` absent | `sudo apt install openssl` |
+
+## Prochain starter
+
+Prochain starter : **Communes & Séjours** — l'application démonstratrice
+avancée couvrant les briques modernes de Forge.
+
+[Prochain starter : Communes & Séjours](../communes-sejours/index.md)

@@ -1,4 +1,4 @@
-# Starter 6 — Auth MFA (TOTP)
+# Auth MFA (TOTP)
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -102,3 +102,10 @@ Voir [Reconstruction](rebuild.md) pour les étapes détaillées.
 
 Pour le détail technique du flux et l'API complète :
 [Documentation de référence MFA](../../reference/auth-mfa.md).
+
+## Après ce starter
+
+Vous avez parcouru tous les starters officiels, par ordre de complexité
+croissante.
+
+[Revenir à la vue d'ensemble des starters](../index.md)
