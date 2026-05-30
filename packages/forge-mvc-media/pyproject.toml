@@ -27,7 +27,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"
-Documentation = "https://caucrogegit.github.io/Forge/"
+Documentation = "https://forgemvc.com/docs/forge/"
 
 [tool.setuptools.packages.find]
 where = ["."]
