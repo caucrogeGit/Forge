@@ -735,6 +735,20 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "opt-in:remove":
+        from forge_cli.optins.remove import main as optin_remove_main
+        rc = optin_remove_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
+    if command == "opt-in:disable":
+        from forge_cli.optins.disable import main as optin_disable_main
+        rc = optin_disable_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command in ("deploy:init", "deploy:check"):
         deploy_main(args)
         return

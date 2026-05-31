@@ -1256,6 +1256,20 @@ Opt-ins officiels : `mfa`, `rbac`, `workflow`, `stats`, `media`, `iot`.
 
 </details>
 
+<details markdown="1" id="forge-opt-inremove">
+<summary><code>forge opt-in:remove</code> - Affiche la commande de désinstallation du package d'un opt-in officiel</summary>
+
+Axe présence (−), miroir d'`opt-in:install`. Affiche la commande de
+désinstallation du **package** (`pip uninstall …` ou `pipx uninject …`).
+**N'exécute rien.** Pour seulement débrancher sans désinstaller, voir
+`opt-in:disable`.
+
+```bash
+forge opt-in:remove iot
+```
+
+</details>
+
 <details markdown="1" id="forge-opt-inenable">
 <summary><code>forge opt-in:enable</code> - Branche un opt-in dans le projet (optins/) — dry-run par défaut</summary>
 
@@ -1269,6 +1283,23 @@ forge opt-in:enable iot --apply     # crée réellement optins/iot/
 
 **Dry-run par défaut** : sans `--apply`, rien n'est écrit. Le paquet doit être
 présent — voir `forge opt-in:install`.
+
+</details>
+
+<details markdown="1" id="forge-opt-indisable">
+<summary><code>forge opt-in:disable</code> - Débranche un opt-in du projet (retire optins/) — dry-run par défaut</summary>
+
+Axe activation (−), inverse exact d'`opt-in:enable`. Retire la couche
+`optins/<name>/` et débranche `register_optins(router)` de `mvc/routes.py`.
+**Laisse le package installé** (voir `opt-in:remove`).
+
+```bash
+forge opt-in:disable iot            # dry-run : montre ce qui serait retiré
+forge opt-in:disable iot --apply    # retire optins/iot/ et débranche
+```
+
+**Garde §9** : un fichier `optins/` modifié à la main est conservé, jamais
+supprimé en silence. Limité à `iot` jusqu'à l'adaptateur (ticket 4).
 
 </details>
 

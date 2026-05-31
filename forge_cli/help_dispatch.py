@@ -115,7 +115,9 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "iot:listen":       "Écoute le broker MQTT et insère les mesures reçues dans iot_events.",
     # Opt-ins (branchement projet)
     "opt-in:install":   "Affiche la commande d'installation du package d'un opt-in officiel.",
+    "opt-in:remove":    "Affiche la commande de désinstallation du package d'un opt-in officiel.",
     "opt-in:enable":    "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
+    "opt-in:disable":   "Débranche un opt-in du projet (retire optins/) ; dry-run par défaut, --apply pour écrire.",
     "opt-in:list":      "Affiche les opt-ins officiels et leur état (lecture seule).",
     "optin:enable":     "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
     "optin:list":       "Affiche l'état local des opt-ins connus (lecture seule).",
@@ -368,6 +370,39 @@ Description:
 
 Code de sortie:
   0 toujours (lecture seule).
+""",
+    "opt-in:remove": """\
+Usage:
+  forge opt-in:remove <name>           # affiche la commande de désinstallation
+
+Description:
+  Axe présence (−), miroir d'`opt-in:install`. Affiche la commande de
+  désinstallation du **package** d'un opt-in officiel (`pip uninstall …`,
+  ou `pipx uninject forge-mvc …`). **N'exécute rien.**
+
+  Pour seulement *débrancher* l'opt-in du projet sans désinstaller le
+  package, utiliser `opt-in:disable`.
+
+Code de sortie:
+  0 succès (commande affichée) ; 2 opt-in inconnu ou nom manquant.
+""",
+    "opt-in:disable": """\
+Usage:
+  forge opt-in:disable <name>          # dry-run (n'écrit rien)
+  forge opt-in:disable iot --apply     # retire optins/iot/ et débranche
+
+Description:
+  Axe activation (−), inverse exact d'`opt-in:enable`. Retire la couche de
+  câblage `optins/<name>/` et débranche `register_optins(router)` de
+  `mvc/routes.py`. **Laisse le package installé** (voir `opt-in:remove`).
+
+Comportement:
+  - **dry-run par défaut** : sans `--apply`, affiche ce qui serait retiré ;
+  - **garde §9** : un fichier `optins/` modifié à la main est **conservé** ;
+  - limité à `iot` jusqu'à l'adaptateur 3-formes (ticket 4).
+
+Code de sortie:
+  0 succès (ou déjà débranché) ; 2 opt-in non supporté ou nom manquant.
 """,
     "optin:enable": """\
 Usage:

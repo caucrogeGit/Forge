@@ -217,6 +217,29 @@ brouillerait les deux intentions. Écarté (D9).
 
 ---
 
+## Amendements
+
+### A1 — Câblage opt-in : pattern registre, pas marqueurs (palier 3b)
+
+D2/D4 décrivaient `opt-in:enable` comme « injection marqueurs + register_optins ».
+L'implémentation (palier 3b) a révélé que la couche `optins/` existante utilise
+**uniquement le pattern registre** : un seul point d'injection dans
+`mvc/routes.py` (`register_optins(router)`) qui délègue à `optins/registry.py`,
+puis à chaque opt-in. C'est un design **plus propre** que des marqueurs par
+opt-in (un seul appel dans `routes.py`, aucun bloc par brique) et
+`optin:enable --apply` l'auto-injecte déjà.
+
+**Décision retenue** : conserver le pattern registre pour le câblage des opt-ins.
+Les marqueurs `# forge-starter:<id>` restent réservés aux **starters** et aux
+**modules locaux** (qui injectent un bloc de routes). `opt-in:enable` n'utilise
+pas de marqueurs ; `opt-in:disable` est l'inverse exact d'`enable` (retire la
+couche `optins/<name>/` et l'appel `register_optins` si plus aucun opt-in actif).
+
+`opt-in:enable`/`disable` restent limités à `iot` jusqu'à l'adaptateur 3-formes
+(ticket 4), qui généralise le câblage aux six opt-ins.
+
+---
+
 ## Liens
 
 - Charte : principes §3 (magie cachée), §8 (noyau minimal, briques opt-in),
