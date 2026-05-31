@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [1.0.0-beta.13] — non publié
+## [1.0.0-beta.13] — 2026-05-31
 
 > Dernière beta **fonctionnelle** (consolidation post-beta.12 : 65 commits).
 > Roadmap : [`docs/roadmap/beta13-roadmap.md`](docs/roadmap/beta13-roadmap.md).

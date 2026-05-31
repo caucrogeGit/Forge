@@ -5,7 +5,7 @@ Les briques génériques (upload sécurisé, validation, storage, images, rate l
 restent dans core/uploads/ et ne nécessitent pas ce module opt-in.
 """
 
-__version__ = "1.0.0b12"
+__version__ = "1.0.0b13"
 
 from forge_mvc_media.media_repository import (
     attach_media_to_entity,

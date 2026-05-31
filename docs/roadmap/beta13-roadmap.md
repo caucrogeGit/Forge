@@ -86,12 +86,17 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 
 ## Phase 5 — Clôture & release ⛓️ tout vert
 
-| Ticket | Type | Objet |
+| Ticket | État | Objet |
 |---|---|---|
-| `BETA13-CLOSING-AUDIT-001` | 📋 | Batterie complète : `pytest` 0 échec + `ruff` + `compileall` + `mkdocs --strict` + `git diff --check` + `sync:landing --check` + cohérence version. |
-| `BETA13-BUMP-001` | 🔧 | Bump **7 versions** b12→b13 (racine + `forge.py` + 6 packages), **lockstep des pins Alpha `==`**, CHANGELOG b13 final. |
-| `RELEASE-BETA13-001` | 🔨 | Tag `v1.0.0-beta.13`, build, publication PyPI (`--pre`), sync landing. |
-| `BETA13-POST-PUBLISH-VERIFY-001` | 📋 | Vérif PyPI publique + install propre. |
+| `BETA13-CLOSING-AUDIT-001` | ✅ vert | Batterie complète : `pytest` **16587 passed / 0 échec** + `ruff` + `compileall` + `mkdocs --strict` + `git diff --check` + `sync:landing --check`. |
+| `BETA13-BUMP-001` | ✅ livré | Bump b12→b13 sur **23 fichiers** (7 `pyproject.toml` + `forge.py` + `app.py` + `core/__init__.py` + 6 `__init__.py` opt-in + `package.json`/`package-lock.json` + CHANGELOG daté + roadmap + landing resync), **pins Alpha `==1.0.0b13`** (media, mfa). Cohérence vérifiée (`tests/meta/` **6955 passed**, `forge --version` = `Forge 1.0.0b13`). |
+| `RELEASE-BETA13-001` | ⏸️ en attente | Tag `v1.0.0-beta.13`, build, publication PyPI (`--pre`), sync landing publique. **Action irréversible/sortante — sur autorisation explicite uniquement.** |
+| `BETA13-POST-PUBLISH-VERIFY-001` | ⏸️ en attente | Vérif PyPI publique + install propre. |
+
+> **Seuil de release** : le bump est finalisé et toute la cohérence est verte.
+> Le tag git et la publication PyPI (étape `RELEASE-BETA13-001`) ne sont **pas**
+> réalisés — ils relèvent d'une décision explicite (publication = action
+> publique et irréversible).
 
 ---
 

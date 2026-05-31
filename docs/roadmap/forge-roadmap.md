@@ -7,17 +7,25 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> La version publique actuelle est **Forge 1.0.0-beta.12**.
+> Version en cours de finalisation : **Forge 1.0.0-beta.13** (bump effectué le
+> 2026-05-31). Dernière version publiée sur PyPI : **Forge 1.0.0-beta.12**.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.12
+## État actuel — Forge 1.0.0-beta.13
 
-**Tag courant : `v1.0.0-beta.12` (2026-05-29)**
+**Tag courant : `v1.0.0-beta.13`** — bump finalisé le 2026-05-31 ; le tag git et la
+publication PyPI sont l'étape de release séparée (à venir).
 
-Précédent : v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.12 publiée (core + 6 opt-ins, dont `forge-mvc-iot` au statut Alpha). Séquence beta.12 close : publication du module IoT (subscriber MQTT, stockage `iot_events`, API HTTP JSON en lecture seule, CLI `iot:*`), six opt-ins synchronisés sur PyPI, audits pré/post-publication validés GO. (Phase B10 — beta.11, core + 5 opt-ins — close auparavant ; détail dans la section `## Phase B10` et le journal ci-dessous.)**
+**Statut : v1.0.0-beta.13 — *dernière beta fonctionnelle*, version bumpée et
+finalisée (slugs auto-générés type `slug`, gel du contrat public `opt-in:*` /
+`module:*` et des 16 starters, production-readiness : check sécurité-prod du
+doctor, dry-run des migrations, checklist de déploiement, pipeline slug validé
+bout-en-bout sur MariaDB). Tag git et publication PyPI non encore réalisés.
+Roadmap dédiée : [`beta13-roadmap.md`](beta13-roadmap.md). (Séquence beta.12
+publiée auparavant : core + 6 opt-ins dont `forge-mvc-iot` Alpha.)**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)

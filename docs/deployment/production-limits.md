@@ -1,9 +1,9 @@
-# Limites de production — Forge 1.0.0-beta.12
+# Limites de production — Forge 1.0.0-beta.13
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Cette page synthétise les limites de production connues de Forge à la veille de
-`1.0.0-beta.12`. Elle complète les pages
+`1.0.0-beta.13`. Elle complète les pages
 [Guide de déploiement](deployment.md),
 [Déploiement WSGI minimal](wsgi-deployment.md) et
 [Sécurité en production](production-security.md).

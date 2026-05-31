@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-iot"
-version = "1.0.0b12"
+version = "1.0.0b13"
 description = "Forge IoT — module opt-in pour la réception et l'exposition de données IoT : subscriber MQTT, stockage iot_events, API HTTP JSON en lecture seule et commandes CLI forge iot:*."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
