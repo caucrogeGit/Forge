@@ -1236,6 +1236,54 @@ Commandes de **branchement local** des opt-ins dans un projet
 Elles ne déplacent ni n'installent les paquets ; elles câblent l'opt-in
 dans le projet, de façon explicite.
 
+Depuis [ADR-016](../adr/016-opt-in-unification.md), les noms canoniques sont
+préfixés `opt-in:`. Les anciennes commandes `optin:*` (sans tiret) coexistent
+temporairement et seront retirées au palier 3c.
+
+<details markdown="1" id="forge-opt-ininstall">
+<summary><code>forge opt-in:install</code> - Affiche la commande d'installation du package d'un opt-in officiel</summary>
+
+Affiche la commande d'installation du **package** d'un opt-in officiel
+(`pip install --pre forge-mvc-<name>`, ou `pipx inject forge-mvc …` si Forge
+tourne depuis pipx). **N'exécute rien** : la présence du package reste un
+geste explicite de l'utilisateur (ADR-016).
+
+```bash
+forge opt-in:install iot            # affiche la commande pour forge-mvc-iot
+```
+
+Opt-ins officiels : `mfa`, `rbac`, `workflow`, `stats`, `media`, `iot`.
+
+</details>
+
+<details markdown="1" id="forge-opt-inenable">
+<summary><code>forge opt-in:enable</code> - Branche un opt-in dans le projet (optins/) — dry-run par défaut</summary>
+
+Nom canonique du branchement (ADR-016). Crée la couche `optins/` qui branche
+un opt-in dans le projet courant.
+
+```bash
+forge opt-in:enable iot             # dry-run : montre ce qui serait créé
+forge opt-in:enable iot --apply     # crée réellement optins/iot/
+```
+
+**Dry-run par défaut** : sans `--apply`, rien n'est écrit. Le paquet doit être
+présent — voir `forge opt-in:install`.
+
+</details>
+
+<details markdown="1" id="forge-opt-inlist">
+<summary><code>forge opt-in:list</code> - Affiche les opt-ins officiels et leur état (lecture seule)</summary>
+
+Nom canonique de la liste (ADR-016). Affiche les opt-ins officiels et leur
+état local. **Commande lecture seule.**
+
+```bash
+forge opt-in:list
+```
+
+</details>
+
 <details markdown="1" id="forge-optinenable">
 <summary><code>forge optin:enable</code> - Branche un opt-in dans le projet (optins/) — dry-run par défaut</summary>
 

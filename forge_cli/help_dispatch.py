@@ -114,6 +114,9 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "iot:simulate":     "Publie des mesures MQTT factices conformes au contrat (sans capteur).",
     "iot:listen":       "Écoute le broker MQTT et insère les mesures reçues dans iot_events.",
     # Opt-ins (branchement projet)
+    "opt-in:install":   "Affiche la commande d'installation du package d'un opt-in officiel.",
+    "opt-in:enable":    "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
+    "opt-in:list":      "Affiche les opt-ins officiels et leur état (lecture seule).",
     "optin:enable":     "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
     "optin:list":       "Affiche l'état local des opt-ins connus (lecture seule).",
     # Documentation
@@ -313,6 +316,58 @@ Limites (hors périmètre):
 Code de sortie:
   0 arrêt normal (Ctrl+C) ; 1 configuration invalide, connexion MQTT
   impossible, ou échec d'insertion en base.
+""",
+    "opt-in:install": """\
+Usage:
+  forge opt-in:install <name>          # affiche la commande d'installation
+
+Description:
+  Affiche la commande d'installation du **package** d'un opt-in officiel
+  (`pip install --pre forge-mvc-<name>`, ou `pipx inject forge-mvc …` si
+  Forge tourne depuis pipx). La commande **n'exécute rien** : la présence
+  du package reste un geste explicite de l'utilisateur (ADR-016).
+
+  Opt-ins officiels : mfa, rbac, workflow, stats, media, iot.
+
+  Une fois le package présent, brancher l'opt-in avec :
+  `forge opt-in:enable <name>`.
+
+Code de sortie:
+  0 succès (commande affichée) ; 2 opt-in inconnu ou nom manquant.
+""",
+    "opt-in:enable": """\
+Usage:
+  forge opt-in:enable <name>           # dry-run (n'écrit rien)
+  forge opt-in:enable iot --apply      # crée réellement optins/iot/
+
+Description:
+  Nom canonique du branchement d'un opt-in (ADR-016). Branche un opt-in
+  **localement** dans le projet courant en créant la couche `optins/`
+  (registre explicite + dossier de l'opt-in). Le branchement reste
+  explicite : `mvc/routes.py` appelle `register_optins(router)` →
+  `optins/registry.py` → `optins/<name>/routes.py`. Aucune découverte
+  automatique.
+
+  Le package de l'opt-in doit être présent : voir `forge opt-in:install`.
+
+Comportement:
+  - **dry-run par défaut** : sans `--apply`, affiche ce qui serait créé ;
+  - `--apply` : crée les fichiers absents ; idempotent.
+
+Code de sortie:
+  0 succès ; 2 opt-in inconnu ou nom manquant ; 1 package absent ou conflit.
+""",
+    "opt-in:list": """\
+Usage:
+  forge opt-in:list
+
+Description:
+  Nom canonique de la liste des opt-ins (ADR-016). Affiche les opt-ins
+  officiels et leur état local dans un projet Forge. **Commande lecture
+  seule** : ne crée, ne modifie et n'installe rien.
+
+Code de sortie:
+  0 toujours (lecture seule).
 """,
     "optin:enable": """\
 Usage:

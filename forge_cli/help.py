@@ -88,6 +88,9 @@ IoT (module opt-in forge-mvc-iot)
   iot:listen          Écoute le broker MQTT et insère les mesures reçues dans iot_events.
 
 Opt-ins (branchement projet)
+  opt-in:install      Affiche la commande d'installation du package d'un opt-in officiel.
+  opt-in:enable       Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.
+  opt-in:list         Affiche les opt-ins officiels et leur état (lecture seule).
   optin:enable        Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.
   optin:list          Affiche l'état local des opt-ins connus (lecture seule).
 

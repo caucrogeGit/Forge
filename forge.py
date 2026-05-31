@@ -712,6 +712,29 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    # Famille canonique opt-in:* (OPTIN-CLI-VERBS-001, ADR-016 3a).
+    # Coexiste avec optin:enable / optin:list jusqu'à leur suppression (3c).
+    if command == "opt-in:install":
+        from forge_cli.optins.install import main as optin_install_main
+        rc = optin_install_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
+    if command == "opt-in:enable":
+        from forge_cli.optins.enable import main as optin_enable_main
+        rc = optin_enable_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
+    if command == "opt-in:list":
+        from forge_cli.optins.list import main as optin_list_main
+        rc = optin_list_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command in ("deploy:init", "deploy:check"):
         deploy_main(args)
         return
