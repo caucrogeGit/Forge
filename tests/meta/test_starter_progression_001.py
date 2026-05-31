@@ -250,11 +250,11 @@ class TestProgressionSectionInStartersIndex:
         # Le saut welcome → CRUD est explicitement mis en garde
         assert "!!! warning" in self.content, (
             "Une admonition !!! warning doit signaler le saut "
-            "welcome → Contacts CRUD."
+            "welcome → First CRUD (généré)."
         )
-        assert "Saut Bonjour Forge → Contacts CRUD" in self.content, (
+        assert "Saut Bonjour Forge → First CRUD (généré)" in self.content, (
             "L'admonition warning doit nommer explicitement le saut "
-            "« Bonjour Forge → Contacts CRUD »."
+            "« Bonjour Forge → First CRUD (généré) »."
         )
 
 

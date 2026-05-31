@@ -271,7 +271,7 @@ class TestStartersSection:
 
     @pytest.mark.parametrize("starter_url", [
         "starters/welcome/",
-        "starters/contact-simple/",
+        "starters/crud/first-crud-generated/",
         "starters/core-auth/users-core-auth/",
         "starters/optin-mfa/welcome-optin-mfa/",
     ])

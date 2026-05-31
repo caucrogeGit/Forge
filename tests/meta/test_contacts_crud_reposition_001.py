@@ -1,17 +1,20 @@
-"""Tests documentaires — STARTER-CONTACTS-CRUD-REPOSITION-001.
+"""Tests documentaires — repositionnement du starter CRUD généré.
 
-Verrouille le repositionnement pédagogique du starter
-`contact-simple` (Contacts CRUD) comme palier 12 — synthèse
-avancée — de la progression officielle des starters.
+Verrouille le positionnement pédagogique du starter
+`first-crud-generated` (CRUD **généré**, entité neutre `Message`) comme
+starter **autonome avancé** — synthèse avancée — et non comme palier
+débutant de la progression officielle des starters.
 
-- la progression officielle contient bien 9 paliers ;
-- Contacts CRUD est marqué comme palier 12 dans la progression ;
-- Contacts CRUD est décrit comme avancé / synthèse, pas comme
+Le starter n'est plus « Contacts métier » : c'est le pendant *généré* de
+`first-crud` (à la main), sans aucune notion métier.
+
+- la progression officielle contient bien 11 paliers ;
+- le CRUD n'est pas un palier mais un starter autonome ;
+- la page du starter est décrite comme avancée / synthèse, pas comme
   étape immédiate après Bonjour Forge ;
-- la page du starter Contacts liste les prérequis pédagogiques ;
-- les anciennes étiquettes débutant/premier-parcours sont retirées
-  comme **étiquettes du starter Contacts** (les mentions historiques
-  dans d'autres contextes restent autorisées).
+- la page liste les prérequis pédagogiques ;
+- aucune étiquette débutant/premier-parcours comme étiquette du starter
+  (les mentions historiques dans d'autres contextes restent autorisées) ;
 - la roadmap mentionne STARTER-CONTACTS-CRUD-REPOSITION-001 livré.
 """
 
@@ -25,15 +28,15 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-CONTACT_DOC = PROJECT_ROOT / "docs" / "starters" / "contact-simple" / "index.md"
+CONTACT_DOC = PROJECT_ROOT / "docs" / "starters" / "crud" / "first-crud-generated.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 
 
 def _extract_contacts_section(text: str) -> str:
-    """Extrait la section « Contacts » du catalogue
+    """Extrait la section « First CRUD (généré) » du catalogue
     `docs/starters/index.md` (entre son header et le header suivant)."""
-    start_marker = "### Contacts"
+    start_marker = "### First CRUD (généré)"
     idx = text.find(start_marker)
     if idx == -1:
         return ""

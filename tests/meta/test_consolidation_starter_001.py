@@ -68,8 +68,8 @@ def test_starter_list_affiche_tous_les_starters(capsys):
 # ── Statuts documentaires ─────────────────────────────────────────────────────
 
 def test_starter_1_est_officiel_simple():
-    """Starter 1 — Contacts est décrit comme starter simple."""
-    content = (ROOT / "docs" / "starters" / "contact-simple" / "index.md").read_text(encoding="utf-8")
+    """Starter 1 — First CRUD (généré) est décrit comme starter simple."""
+    content = (ROOT / "docs" / "starters" / "crud" / "first-crud-generated.md").read_text(encoding="utf-8")
     assert "simple" in content.lower() or "officiel" in content.lower()
 
 
@@ -134,22 +134,18 @@ def test_chaque_starter_a_un_index_md():
         index = ROOT / "docs" / "starters" / "welcome" / f"{dossier}.md"
         assert index.exists(), f"doc de palier welcome absente pour {dossier}"
 
-    # Starters autonomes avec leur propre dossier docs/starters/<id>/index.md.
-    starters_autonomes = [
-        "contact-simple",
-    ]
-    for dossier in starters_autonomes:
-        index = ROOT / "docs" / "starters" / dossier / "index.md"
-        assert index.exists(), f"doc de présentation absente pour {dossier}"
-
-    # Le starter CRUD est regroupé sous le dossier-sujet crud/ :
-    # un index.md (vue d'ensemble) + la page first-crud.md.
+    # Les starters CRUD sont regroupés sous le dossier-sujet crud/ :
+    # un index.md (vue d'ensemble) + les pages first-crud.md (à la main)
+    # et first-crud-generated.md (généré, entité neutre).
     crud = ROOT / "docs" / "starters" / "crud"
     assert (crud / "index.md").exists(), (
         "vue d'ensemble absente pour crud"
     )
     assert (crud / "first-crud.md").exists(), (
         "page first-crud absente pour crud"
+    )
+    assert (crud / "first-crud-generated.md").exists(), (
+        "page first-crud-generated absente pour crud"
     )
 
     # Le starter Auth est regroupé sous le dossier-sujet core-auth/ :
@@ -184,20 +180,21 @@ def test_chaque_starter_a_un_index_md():
 
 
 def test_starters_avec_rebuild_md():
-    """Les starters autonomes scaffoldés (contact-simple, users-core-auth)
+    """Les starters autonomes scaffoldés (first-crud-generated, users-core-auth)
     ont un guide de reconstruction.
 
     Réorganisation des starters : carnet-contacts et suivi-comportement-eleves
     ne sont plus des starters actifs (archivés sous docs/starters/old/) ; seuls
     les starters restants munis d'un guide de reconstruction sont vérifiés. Le
     starter MFA a son guide sous optin-mfa/welcome-optin-mfa-rebuild.md ; le
-    starter Auth a le sien sous core-auth/users-core-auth-rebuild.md."""
-    dossiers = [
-        "contact-simple",
-    ]
-    for dossier in dossiers:
-        rebuild = ROOT / "docs" / "starters" / dossier / "rebuild.md"
-        assert rebuild.exists(), f"rebuild.md absent pour {dossier}"
+    starter Auth a le sien sous core-auth/users-core-auth-rebuild.md ; le starter
+    CRUD généré a le sien sous crud/first-crud-generated-rebuild.md."""
+    rebuild_generated = (
+        ROOT / "docs" / "starters" / "crud" / "first-crud-generated-rebuild.md"
+    )
+    assert rebuild_generated.exists(), (
+        "first-crud-generated-rebuild.md absent pour crud"
+    )
 
     core_auth_rebuild = ROOT / "docs" / "starters" / "core-auth" / "users-core-auth-rebuild.md"
     assert core_auth_rebuild.exists(), "guide de reconstruction absent pour core-auth"
@@ -245,7 +242,7 @@ def test_starter_1_dry_run_fonctionne(capsys):
     """forge starter:build 1 --dry-run s'exécute sans erreur."""
     cmd_starter_build(["1", "--dry-run"])
     output = capsys.readouterr().out
-    assert "contact" in output.lower()
+    assert "message" in output.lower() or "/messages" in output
 
 
 # ── Communes & Séjours — séparation core / métier ─────────────────────────────

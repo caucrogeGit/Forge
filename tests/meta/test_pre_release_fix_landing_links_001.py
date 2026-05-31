@@ -22,7 +22,7 @@ BROKEN_URLS = [
 
 # URLs corrigées attendues
 FIXED_URLS = [
-    "starters/contact-simple/",
+    "starters/crud/first-crud-generated/",
     "starters/core-auth/users-core-auth/",
     "roadmap/forge-roadmap/",
 ]

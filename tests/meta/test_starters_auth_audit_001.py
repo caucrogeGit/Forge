@@ -58,8 +58,8 @@ def test_starter_users_core_auth_controller_utilise_verify_password():
 # ── Starters sans auth ne contiennent rien de legacy ────────────────────────
 
 def test_starters_sans_auth_ne_contiennent_pas_hashing():
-    """Le starter contact-simple (sans auth) n'a pas de legacy hashing."""
-    for name in ("contact-simple",):
+    """Le starter first-crud-generated (sans auth) n'a pas de legacy hashing."""
+    for name in ("first-crud-generated",):
         for py_file in (STARTERS_DIR / name).rglob("*.py"):
             content = py_file.read_text(encoding="utf-8")
             assert "hacher_mot_de_passe" not in content

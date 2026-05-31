@@ -111,10 +111,10 @@ def test_package_data_couvre_les_python_des_starters():
 # ── Fichiers starters sur disque ──────────────────────────────────────────────
 
 def test_starter1_fichiers_sur_disque():
-    """Starter 1 (contact-simple) : JSON uniquement, pas de files/."""
-    root = ROOT / "forge_cli" / "starters" / "data" / "contact-simple"
-    for rel in ("starter.json", "contact.json"):
-        assert (root / rel).exists(), f"Manquant : contact-simple/{rel}"
+    """Starter 1 (first-crud-generated) : JSON uniquement, pas de files/."""
+    root = ROOT / "forge_cli" / "starters" / "data" / "first-crud-generated"
+    for rel in ("starter.json", "message.json"):
+        assert (root / rel).exists(), f"Manquant : first-crud-generated/{rel}"
 
 
 def test_starter2_fichiers_sur_disque():
@@ -140,8 +140,8 @@ def test_package_data_couvre_tous_types_fichiers_starters():
 
     representative = [
         # Starter 1
-        "starters/data/contact-simple/starter.json",
-        "starters/data/contact-simple/contact.json",
+        "starters/data/first-crud-generated/starter.json",
+        "starters/data/first-crud-generated/message.json",
         # Starter 2
         "starters/data/users-core-auth/starter.json",
         "starters/data/users-core-auth/routes.py.snippet",

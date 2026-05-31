@@ -32,7 +32,7 @@ def all_starters() -> list[dict]:
 
 
 def resolve(identifier: str) -> dict:
-    """Résout 1, 'contacts', 'contact-simple' → metadata dict."""
+    """Résout 1, 'first-crud-generated', 'first_crud_generated' → metadata dict."""
     for s in all_starters():
         if str(s.get("number")) == identifier:
             return s

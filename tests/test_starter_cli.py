@@ -55,9 +55,16 @@ def test_starter_list_contient_niveau_mot_cle(capsys):
     assert "disponible" in output
 
 
-def test_alias_contacts_resolvent_le_meme_starter():
-    ids = [resolve(identifier)["id"] for identifier in ("1", "contacts", "contact-simple")]
-    assert ids == ["contact-simple", "contact-simple", "contact-simple"]
+def test_alias_first_crud_generated_resolvent_le_meme_starter():
+    ids = [
+        resolve(identifier)["id"]
+        for identifier in ("1", "first-crud-generated", "first_crud_generated")
+    ]
+    assert ids == [
+        "first-crud-generated",
+        "first-crud-generated",
+        "first-crud-generated",
+    ]
 
 
 def test_les_5_starters_sont_disponibles():
@@ -196,7 +203,7 @@ def test_entrypoint_starter_list_accessible(monkeypatch, capsys):
     forge.main()
     output, _ = capsys.readouterr()
     assert "Starter apps Forge" in output
-    assert "Contacts" in output
+    assert "First CRUD (généré)" in output
     assert "Auth MFA" in output
 
 
@@ -282,8 +289,8 @@ def test_replace_home_route_sans_handler_landing_sans_effet(tmp_path):
 
 # ── home_route dans les starters ─────────────────────────────────────────────
 
-def test_starter_1_a_home_route_contacts():
-    assert resolve("1").get("home_route") == "/contacts"
+def test_starter_1_a_home_route_messages():
+    assert resolve("1").get("home_route") == "/messages"
 
 
 def test_starter_2_sans_home_route():
@@ -297,7 +304,7 @@ def test_dry_run_starter_1_annonce_home_route(capsys):
     cmd_starter_build(["1", "--dry-run"])
     output = capsys.readouterr().out
     assert "Route d'accueil" in output
-    assert "/contacts" in output
+    assert "/messages" in output
 
 
 def test_dry_run_starter_2_sans_home_route(capsys):
@@ -394,10 +401,10 @@ def test_profiles_md_ne_mentionne_plus_audit_comme_futur():
 
 
 def test_starter_1_mentionne_profil_recommande():
-    """La page starter-app-01 mentionne un profil recommandé."""
+    """La page du starter 1 mentionne un profil recommandé."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "contact-simple" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "crud" / "first-crud-generated.md").read_text(encoding="utf-8")
     assert "minimal" in content or "standard" in content
     assert "profil" in content.lower()
 
@@ -555,16 +562,18 @@ def test_chaque_starter_a_un_index_md():
     root = pathlib.Path(__file__).resolve().parent.parent
     s = root / "docs" / "starters"
     for slug in (
-        "contact-simple",
         "core-auth",
         "optin-mfa",
         "optin-iot",
         "crud",
     ):
         assert (s / slug / "index.md").exists(), f"docs/starters/{slug}/index.md manquant"
-    # Starter CRUD regroupé sous le dossier-sujet crud/.
+    # Starters CRUD regroupés sous le dossier-sujet crud/ (à la main + généré).
     assert (s / "crud" / "first-crud.md").exists(), (
         "docs/starters/crud/first-crud.md manquant"
+    )
+    assert (s / "crud" / "first-crud-generated.md").exists(), (
+        "docs/starters/crud/first-crud-generated.md manquant"
     )
     # Starter IoT regroupé sous le dossier-sujet optin-iot/.
     assert (s / "optin-iot" / "welcome-optin-iot.md").exists(), (
@@ -694,7 +703,7 @@ def test_starters_1_3_4_5_non_modifies_par_auth_modernize():
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     starters_dir = root / "forge_cli" / "starters" / "data"
-    intacts = ["contact-simple", "carnet-contacts", "communes-sejours"]
+    intacts = ["first-crud-generated", "carnet-contacts", "communes-sejours"]
     for slug in intacts:
         for path in (starters_dir / slug).rglob("*.py"):
             if "__pycache__" in path.parts:
@@ -708,41 +717,41 @@ def test_starters_1_3_4_5_non_modifies_par_auth_modernize():
 # ── STARTER-CONTACTS-REFRESH-001 : tests documentaires ──────────────────────
 
 def test_starter_1_doc_existe():
-    """Les fichiers index.md et rebuild.md du starter Contacts existent."""
+    """Les fichiers de présentation et de reconstruction du starter 1 existent."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    s = root / "docs" / "starters" / "contact-simple"
-    assert (s / "index.md").exists()
-    assert (s / "rebuild.md").exists()
+    s = root / "docs" / "starters" / "crud"
+    assert (s / "first-crud-generated.md").exists()
+    assert (s / "first-crud-generated-rebuild.md").exists()
 
 
 def test_starter_1_est_officiel_simple():
-    """La doc du starter Contacts le présente comme starter officiel simple."""
+    """La doc du starter 1 le présente comme starter officiel simple."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "contact-simple" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "crud" / "first-crud-generated.md").read_text(encoding="utf-8")
     assert "officiel" in content or "Starter Forge" in content
-    # Le renvoi « Prochain starter : Utilisateurs / Auth » (section « Après ce
-    # starter ») est une navigation, pas une fonctionnalité du starter Contacts.
+    # Le renvoi « Prochain starter : Auth » (section « Après ce starter ») est
+    # une navigation, pas une fonctionnalité du starter CRUD généré.
     body = content.split("## Après ce starter")[0]
     assert "Auth" not in body or "aucune authentification" in body.lower()
 
 
 def test_starter_1_associe_profils_minimal_standard():
-    """La doc du starter Contacts mentionne les profils minimal et standard."""
+    """La doc du starter 1 mentionne les profils minimal et standard."""
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "contact-simple" / "index.md").read_text(encoding="utf-8")
+    content = (root / "docs" / "starters" / "crud" / "first-crud-generated.md").read_text(encoding="utf-8")
     assert "minimal" in content
     assert "standard" in content
 
 
 def test_starter_1_doc_url_pointe_nouvelle_structure():
-    """Le starter.json du starter Contacts pointe vers la nouvelle URL docs."""
+    """Le starter.json du starter 1 pointe vers la nouvelle URL docs."""
     from forge_cli.starters.registry import resolve
     meta = resolve("1")
     assert "starter-app-01" not in meta.get("doc_url", "")
-    assert "starters/contact-simple" in meta.get("doc_url", "")
+    assert "starters/crud/first-crud-generated" in meta.get("doc_url", "")
 
 
 def test_starters_index_starter_2_non_a_moderniser():
@@ -805,7 +814,7 @@ def test_starters_index_contient_tableau_synthese():
     root = pathlib.Path(__file__).resolve().parent.parent
     content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
     assert "Tableau de synthèse" in content or "tableau de synthèse" in content.lower()
-    assert "Contacts" in content
+    assert "First CRUD (généré)" in content
     assert "Auth (API cœur)" in content
     assert "Auth MFA" in content
     # Les 3 applications retirées ne sont plus dans le catalogue.
@@ -827,7 +836,7 @@ def test_starters_index_contient_statuts_officiels():
     assert "officiel" in content.lower()
     # Statuts décrits dans le tableau de synthèse / la section « Statut officiel ».
     assert "Auth MFA" in content
-    assert "Contacts" in content
+    assert "First CRUD (généré)" in content
 
 
 def test_starters_index_mentionne_profils_associes():

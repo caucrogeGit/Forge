@@ -25,7 +25,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Validation serveur](welcome/server-validation.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
 | [Première base SQL](welcome/first-sql.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
 | [First CRUD](crud/first-crud.md) | Capstone fondamentaux (avec BDD) | `minimal` / `standard` | Premier starter autonome après la progression — CRUD complet à SQL visible (`SELECT`/`INSERT`/`UPDATE`/`DELETE`) sur l'entité neutre `message`, aucun métier, aucun ORM |
-| [1 — Contacts](contact-simple/index.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — synthèse du CRUD métier ; suppose les 11 paliers de découverte + le starter First CRUD acquis |
+| [1 — First CRUD (généré)](crud/first-crud-generated.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — CRUD **généré** via `make:crud` sur l'entité neutre `message` ; pendant échafaudé de First CRUD (à la main), suppose les 11 paliers de découverte + le starter First CRUD acquis |
 | [2 — Auth (API cœur)](core-auth/users-core-auth.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Auth MFA](optin-mfa/welcome-optin-mfa.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 | [Bonjour IoT](optin-iot/welcome-optin-iot.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-optin-iot`, `/welcome-optin-iot/inspect`, `/welcome-optin-iot/events`, `/welcome-optin-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
@@ -34,7 +34,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 
 Le starter `Bonjour Forge` est volontairement minimal (deux routes texte,
 zéro vue HTML, zéro base de données). **Ne sautez pas directement au
-starter Contacts CRUD** : plusieurs notions intermédiaires permettent
+starter First CRUD (généré)** : plusieurs notions intermédiaires permettent
 d'aborder le CRUD sereinement. La progression officielle est :
 
 1. **Bonjour Forge** — afficher une réponse texte avec `Response.text(...)`.
@@ -64,11 +64,11 @@ Une fois ces **11 paliers** acquis, vous avez terminé le starter de
 découverte *Bonjour Forge*. Le premier **starter autonome** à enchaîner
 est [First CRUD](crud/first-crud.md) — un CRUD complet à SQL visible
 sur une entité neutre (`message`), livré par `STARTER-PREMIER-CRUD-001`.
-Viennent ensuite les exemples : Contacts, Auth (API cœur), puis le
+Viennent ensuite les exemples : First CRUD (généré), Auth (API cœur), puis le
 starter opt-in Auth MFA.
 
-!!! warning "Saut Bonjour Forge → Contacts CRUD"
-    Sauter directement de `welcome` à `contact-simple` fait rencontrer
+!!! warning "Saut Bonjour Forge → First CRUD (généré)"
+    Sauter directement de `welcome` à `first-crud-generated` fait rencontrer
     plusieurs notions (vue, route dynamique, JSON, CSRF, formulaire,
     validation, SQL en lecture et écriture) sans transition. La
     progression ci-dessus solde cette dette pédagogique : suivez les
@@ -128,14 +128,14 @@ Profil recommandé : `minimal` ou `standard`. Identifiant : `first-crud`
 
 ## Starters officiels simples
 
-### Contacts
+### First CRUD (généré)
 
-Le starter officiel simple de Forge. Une seule entité `Contact`, un CRUD généré, des routes câblées manuellement.
+Le starter officiel simple de Forge. Une entité **neutre** `Message`, un CRUD **généré** via `make:crud`, des routes câblées manuellement. C'est le pendant échafaudé du starter [First CRUD](crud/first-crud.md) (écrit à la main).
 
 Profil recommandé : `minimal` ou `standard`.
 
-- **starter autonome avancé** — synthèse du CRUD métier ;
-- aucune relation, aucune authentification ;
+- **starter autonome avancé** — synthèse du CRUD généré, entité neutre ;
+- aucune relation, aucune authentification, aucune notion métier ;
 - suppose acquis les **11 paliers de découverte** puis le starter
   [First CRUD](crud/first-crud.md) (routes, contrôleurs, vues HTML,
   paramètres d'URL, route dynamique, formulaires POST avec CSRF,
@@ -145,7 +145,7 @@ Pour le **premier** contact avec Forge, démarrer par
 [Bonjour Forge](welcome/welcome.md) (palier 1, sans BDD), pas par ce
 starter.
 
-[Présentation](contact-simple/index.md) · [Reconstruction](contact-simple/rebuild.md)
+[Présentation](crud/first-crud-generated.md) · [Reconstruction](crud/first-crud-generated-rebuild.md)
 
 ## Starter Auth minimal moderne
 
@@ -254,7 +254,7 @@ Pour choisir un profil : [Profils de projet](../features/profiles.md).
 
 ```bash
 forge new mon-projet --starter welcome       # Bienvenue (sans BDD) — via forge new
-forge starter:build 1        # Contacts
+forge starter:build 1        # First CRUD (généré)
 forge starter:build 2        # Auth (API cœur)
 forge starter:build 3        # Auth MFA (Alpha)
 forge starter:build 4        # Bienvenue dans Forge (sans BDD)
@@ -264,7 +264,7 @@ Pour le starter pédagogique `query-params` (palier 2 de la progression),
 voir la page dédiée [Paramètres d'URL](welcome/query-params.md) — il
 s'applique par son identifiant public, pas par un numéro.
 
-Les alias `contacts`, `auth`, `query-params` et leurs variantes sont également supportés.
+Les alias `first-crud-generated`, `auth`, `query-params` et leurs variantes sont également supportés.
 
 `forge starter:list` affiche la liste complète depuis la CLI.
 
@@ -285,7 +285,7 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 
 | Starter | Présentation | Reconstruction |
 |---|---|---|
-| Contacts | [Présentation](contact-simple/index.md) | [rebuild.md](contact-simple/rebuild.md) |
+| First CRUD (généré) | [Présentation](crud/first-crud-generated.md) | [rebuild.md](crud/first-crud-generated-rebuild.md) |
 | Auth (API cœur) | [Présentation](core-auth/users-core-auth.md) | [rebuild.md](core-auth/users-core-auth-rebuild.md) |
 | Auth MFA | [Présentation](optin-mfa/welcome-optin-mfa.md) | [rebuild.md](optin-mfa/welcome-optin-mfa-rebuild.md) |
 
@@ -293,6 +293,6 @@ Chaque page de starter liste les commandes exactes, le modèle de données et le
 
 | Starter | Statut |
 |---|---|
-| 1 — Contacts | Starter officiel simple |
+| 1 — First CRUD (généré) | Starter officiel simple |
 | 2 — Auth (API cœur) | Auth minimale moderne (`core.auth`) |
 | 3 — Auth MFA | Démonstrateur MFA (Alpha) |

@@ -11,13 +11,18 @@ couche d'abstraction ni magie cachée. L'entité manipulée est **neutre**
 
 ## Parcours
 
-| Niveau | Starter | Objectif |
-|--------|---------|----------|
-| Capstone fondamentaux | [First CRUD — `first-crud`](first-crud.md) | Le CRUD complet écrit à la main : `fetch_all` / `fetch_one` / `insert` / `execute`, lecture d'un `{id}` de chemin, formulaire + CSRF des paliers précédents. SQL visible, aucun ORM. |
+Le sujet CRUD propose **deux starters sur la même entité neutre `message`**,
+qui montrent **deux méthodes** pour obtenir le même CRUD — la paire
+didactique « à la main » / « généré » :
 
-Un seul niveau pour l'instant. Un second starter **`first-crud-generated`**
-— même CRUD, mais échafaudé par génération — rejoindra ce sujet
-prochainement (à venir).
+| Méthode | Starter | Objectif |
+|--------|---------|----------|
+| À la main | [First CRUD — `first-crud`](first-crud.md) | Le CRUD complet **écrit à la main** : `fetch_all` / `fetch_one` / `insert` / `execute`, lecture d'un `{id}` de chemin, formulaire + CSRF des paliers précédents. SQL visible, aucun ORM. |
+| Généré | [First CRUD (généré) — `first-crud-generated`](first-crud-generated.md) | Le même CRUD, mais **échafaudé par génération** : un manifeste d'entité canonique puis `forge make:crud` produit contrôleur, modèle SQL, formulaire et vues. Routes câblées manuellement. SQL visible, aucun ORM. |
+
+Les deux portent sur une entité **neutre** (`message`), sans notion métier :
+le premier montre comment **on écrit** un CRUD, le second comment Forge le
+**génère** depuis un manifeste.
 
 ## Pour aller plus loin
 

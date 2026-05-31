@@ -123,9 +123,8 @@ nav:
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md
-      - Contacts:
-          - Présentation: starters/contact-simple/index.md
-          - Reconstruction: starters/contact-simple/rebuild.md
+          - First CRUD (généré): starters/crud/first-crud-generated.md
+          - First CRUD (généré) — reconstruction: starters/crud/first-crud-generated-rebuild.md
       - Auth (API cœur):
           - Vue d'ensemble: starters/core-auth/index.md
           - Auth minimal moderne: starters/core-auth/users-core-auth.md

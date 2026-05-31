@@ -158,7 +158,7 @@ forge new <NomProjet> --profile <profil>
 
 | Profil | Description |
 |---|---|
-| `contact-simple` | CRUD simple de contacts |
+| `first-crud-generated` | CRUD généré sur une entité neutre |
 | `utilisateurs-auth` | Login, sessions, routes protégées, CSRF |
 | `auth-mfa` | Auth + MFA TOTP (nécessite forge-mvc-mfa) |
 

@@ -1,18 +1,18 @@
-# Contacts
+# First CRUD (généré)
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 <div style="border:1px solid #FED7AA;background:linear-gradient(135deg,#FFF7ED 0%,#FFFFFF 55%,#F8FAFC 100%);border-radius:18px;padding:1.5rem 1.6rem;margin:1rem 0 1.5rem 0;">
   <p style="margin:0 0 .35rem 0;font-size:.85rem;font-weight:700;color:#EA580C;text-transform:uppercase;letter-spacing:.08em;">Starter Forge · Starter autonome avancé</p>
-  <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">Application Contacts</h2>
-  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Synthèse avancée à aborder après la <a href="../index.md#progression-recommandee">progression de découverte</a> et le starter <a href="../crud/first-crud.md">First CRUD</a> : une seule entité <code>Contact</code>, un CRUD généré, puis un câblage manuel des routes. Ce starter officiel reste le CRUD le plus simple, mais il assemble toutes les briques vues aux 11 paliers de découverte.</p>
+  <h2 style="margin:.1rem 0 .45rem 0;font-size:2rem;line-height:1.15;color:#0F172A;">First CRUD (généré)</h2>
+  <p style="margin:0;color:#334155;font-size:1.05rem;max-width:880px;">Le pendant <strong>généré</strong> du starter <a href="first-crud.md">First CRUD</a> (écrit à la main) : un CRUD complet échafaudé par <code>forge make:crud</code> depuis un manifeste d'entité <strong>neutre</strong> <code>Message</code>, puis un câblage manuel des routes. Même entité neutre, deux méthodes — la paire didactique du sujet CRUD.</p>
 </div>
 
 !!! warning "Synthèse avancée — starter autonome"
     Ce starter est une **synthèse avancée**, pas une étape immédiate
     après Bonjour Forge. Avant de l'aborder, il est recommandé d'avoir
     suivi les **11 paliers de découverte** puis le starter
-    [First CRUD](../crud/first-crud.md), c'est-à-dire de maîtriser :
+    [First CRUD](first-crud.md), c'est-à-dire de maîtriser :
 
     - les routes et `Response.text(...)` (palier 1 — `Bonjour Forge`) ;
     - les paramètres d'URL avec `request.param(...)` (palier 2 — `query-params`) ;
@@ -25,7 +25,7 @@
     - la validation serveur minimale (palier 9 — `server-validation`) ;
     - le SQL visible en lecture avec `core.database.db.fetch_one` (palier 10 — `first-sql`) ;
     - l'écriture en base avec `core.database.db.insert` (palier 11 — `first-sql-write`) ;
-    - le CRUD complet à SQL visible (starter `first-crud`).
+    - le CRUD complet à SQL visible écrit à la main (starter `first-crud`).
 
     Voir la
     [Progression recommandée des starters](../index.md#progression-recommandee)
@@ -37,17 +37,16 @@
 
     ---
 
-    Construire une petite application CRUD pour gérer des contacts —
-    synthèse avancée des 11 paliers de découverte et du starter
-    First CRUD.
+    Voir Forge **générer** un CRUD complet depuis un manifeste d'entité
+    neutre `Message` — le pendant échafaudé de `first-crud` écrit à la main.
 
 -   **Niveau**
 
     ---
 
     Avancé. Ce starter assemble toutes les briques vues aux paliers
-    pédagogiques précédents (routes, contrôleurs, vues HTML,
-    formulaires POST avec CSRF, validation serveur, migrations SQL).
+    pédagogiques précédents (entité canonique, modèle SQL généré,
+    contrôleur, formulaire, vues HTML, routes).
 
 -   **Temps estimé**
 
@@ -59,12 +58,13 @@
 
     ---
 
-    Liste, création, détail, modification, suppression et messages flash.
+    Liste, création, détail, modification, suppression et messages flash,
+    le tout produit par `forge make:crud`.
 
 </div>
 
 !!! abstract "Ce que ce starter doit faire comprendre"
-    Le but n'est pas seulement d'obtenir une page `/contacts` fonctionnelle. Ce starter sert surtout à voir les pièces réelles utilisées par Forge : le JSON canonique, le SQL généré, la classe Python générée, le contrôleur, le formulaire, le modèle SQL, les templates Jinja et les routes ajoutées manuellement.
+    Le but n'est pas seulement d'obtenir une page `/messages` fonctionnelle. Ce starter sert surtout à voir le **mécanisme de génération** : à partir d'un seul manifeste canonique, Forge produit le SQL, la classe Python, le contrôleur, le formulaire, le modèle SQL et les templates Jinja, puis le développeur câble les routes manuellement.
 
 ---
 
@@ -111,7 +111,7 @@ Une fois que `forge --version` s'affiche correctement, revenez ici pour construi
 
 ### 1.1 Objectif
 
-Construire une petite application de gestion de contacts avec :
+Voir Forge **générer** un CRUD complet sur une entité neutre `Message` :
 
 - une liste simple, enrichissable ensuite ;
 - une page de création ;
@@ -120,16 +120,16 @@ Construire une petite application de gestion de contacts avec :
 - une suppression en `POST` ;
 - des messages flash après création, modification ou suppression.
 
-Le starter sert à comprendre le flux Forge minimal : JSON canonique, SQL visible, modèle Python généré, CRUD MVC explicite et routes copiées manuellement.
+Le starter sert à comprendre le flux de **génération** Forge : manifeste canonique, SQL visible, modèle Python généré, CRUD MVC échafaudé puis routes copiées manuellement.
 
 ### 1.2 Parcours général
 
 ```mermaid
 flowchart TD
-    A([Navigateur]) -->|"GET /contacts, POST /contacts…"| B["mvc/routes.py"]
-    B --> C[ContactController]
-    C -->|"lit et valide"| D[ContactForm]
-    C -->|"lit / écrit"| E[contact_model.py]
+    A([Navigateur]) -->|"GET /messages, POST /messages…"| B["mvc/routes.py"]
+    B --> C[MessageController]
+    C -->|"lit et valide"| D[MessageForm]
+    C -->|"lit / écrit"| E[message_model.py]
     E --> F[(MariaDB)]
     C -->|"rend"| G[Vue Jinja2]
     G --> H([HTML affiché])
@@ -145,7 +145,7 @@ flowchart TD
 Les deux méthodes arrivent au même résultat : un projet Forge local avec un environnement Python actif et une commande `forge` utilisable.
 
 !!! tip "Si vous avez suivi la Partie 1"
-    `forge` est déjà installé via `pipx install forge-mvc`. Dans l'onglet "Installation automatique" ci-dessous, ignorez la ligne `pipx install ...` et commencez directement par `forge new Contacts`.
+    `forge` est déjà installé via `pipx install forge-mvc`. Dans l'onglet "Installation automatique" ci-dessous, ignorez la ligne `pipx install ...` et commencez directement par `forge new MonProjet`.
 
 !!! note "Installation Forge"
     Cette page suppose que vous êtes **déjà** dans un projet Forge
@@ -162,7 +162,7 @@ Les deux méthodes arrivent au même résultat : un projet Forge local avec un e
 
 ```mermaid
 flowchart LR
-    A1["Méthode A<br/>pipx install"] --> A2["forge new Contacts"] --> P["Projet Forge prêt"]
+    A1["Méthode A<br/>pipx install"] --> A2["forge new MonProjet"] --> P["Projet Forge prêt"]
     B1["Méthode B<br/>git clone"] --> B2["python -m venv .venv"] --> B3["pip install -r requirements.txt<br/>pip install -e ."] --> P
 ```
 
@@ -181,7 +181,7 @@ flowchart LR
     ---
 
     ```text
-    Contacts/
+    MonProjet/
     ├── app.py
     ├── env/dev
     ├── mvc/
@@ -208,7 +208,7 @@ En développement local, on peut utiliser temporairement un compte administrateu
     `DB_ADMIN_LOGIN` prépare la base avec `forge db:init`.
     `DB_APP_LOGIN` est utilisé ensuite par l'application pendant son fonctionnement normal.
 
-Exemple pour une application nommée `Contacts` :
+Exemple de configuration :
 
 ```env
 DB_ADMIN_HOST=localhost
@@ -216,12 +216,12 @@ DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=root
 DB_ADMIN_PWD=<mot_de_passe_root_mariadb>
 
-DB_NAME=contacts
+DB_NAME=first_crud_generated
 
 DB_APP_HOST=localhost
 DB_APP_PORT=3306
-DB_APP_LOGIN=contacts_app
-DB_APP_PWD=ContactsApp_2026!
+DB_APP_LOGIN=app_user
+DB_APP_PWD=AppUser_2026!
 ```
 
 !!! note "Compte administrateur MariaDB"
@@ -267,9 +267,9 @@ Cette commande crée la base de données du projet, l'utilisateur applicatif et 
 
 ---
 
-## 4. Développement de l'application
+## 4. Génération de l'application
 
-Cette section détaille pas à pas ce que Forge produit pour ce
+Cette section détaille pas à pas ce que Forge **génère** pour ce
 starter — chaque artefact (entité, modèle, contrôleur, formulaire,
 vues, routes) est expliqué dans l'ordre où vous le rencontrez en
 développement.
@@ -278,17 +278,17 @@ développement.
 
 <div class="grid cards" markdown>
 
--   **Modèle canonique**
+-   **Manifeste canonique**
 
     ---
 
-    Créer une entité avec `forge make:entity`, puis compléter `contact.json`.
+    Créer une entité avec `forge make:entity`, puis compléter `message.json`.
 
 -   **Génération contrôlée**
 
     ---
 
-    Prévisualiser avec `--dry-run`, puis générer `contact.sql` et `contact_base.py`.
+    Prévisualiser avec `--dry-run`, puis générer `message.sql` et `message_base.py`.
 
 -   **Base de données**
 
@@ -296,23 +296,23 @@ développement.
 
     Appliquer le SQL avec `forge db:apply` sur une base de développement.
 
--   **CRUD explicite**
+-   **CRUD généré**
 
     ---
 
-    Générer contrôleur, modèle SQL, formulaire et templates avec `forge make:crud Contact`.
+    Générer contrôleur, modèle SQL, formulaire et templates avec `forge make:crud Message`.
 
 </div>
 
-### 4.2 Parcours de développement
+### 4.2 Parcours de génération
 
 ```mermaid
 flowchart TD
-    A["forge make:entity"] --> B["édition de contact.json"]
+    A["forge make:entity"] --> B["édition de message.json"]
     B --> C["forge check:model"]
     C --> D["forge build:model --dry-run"]
     D --> E["forge build:model"]
-    E --> F["contact.sql + contact_base.py"]
+    E --> F["message.sql + message_base.py"]
     F --> G["forge db:apply"]
     G --> H["forge make:crud --dry-run"]
     H --> I["forge make:crud"]
@@ -331,25 +331,25 @@ flowchart TD
 
 | Route | Méthode | Rôle |
 |---|---:|---|
-| `/contacts` | `GET` | Liste des contacts |
-| `/contacts/new` | `GET` | Formulaire de création |
-| `/contacts` | `POST` | Création d'un contact |
-| `/contacts/{id}` | `GET` | Détail d'un contact |
-| `/contacts/{id}/edit` | `GET` | Formulaire de modification |
-| `/contacts/{id}` | `POST` | Mise à jour d'un contact |
-| `/contacts/{id}/delete` | `POST` | Suppression d'un contact |
+| `/messages` | `GET` | Liste des messages |
+| `/messages/new` | `GET` | Formulaire de création |
+| `/messages` | `POST` | Création d'un message |
+| `/messages/{id}` | `GET` | Détail d'un message |
+| `/messages/{id}/edit` | `GET` | Formulaire de modification |
+| `/messages/{id}` | `POST` | Mise à jour d'un message |
+| `/messages/{id}/delete` | `POST` | Suppression d'un message |
 
 !!! warning "Ordre des routes"
-    `/contacts/new` doit rester déclaré avant `/contacts/{id}` dans les routes afin d'éviter que `new` soit interprété comme un identifiant.
+    `/messages/new` doit rester déclaré avant `/messages/{id}` dans les routes afin d'éviter que `new` soit interprété comme un identifiant.
 
 ### 5.2 Schéma de navigation
 
 ```mermaid
 flowchart TD
-    A["/contacts<br/>liste"] -->|"Nouveau contact"| B["/contacts/new<br/>formulaire de création"]
-    A -->|"Voir"| C["/contacts/{id}<br/>détail"]
-    A -->|"Modifier"| D["/contacts/{id}/edit<br/>formulaire de modification"]
-    C -->|"Supprimer en POST"| E["/contacts/{id}/delete"]
+    A["/messages<br/>liste"] -->|"Nouveau message"| B["/messages/new<br/>formulaire de création"]
+    A -->|"Voir"| C["/messages/{id}<br/>détail"]
+    A -->|"Modifier"| D["/messages/{id}/edit<br/>formulaire de modification"]
+    C -->|"Supprimer en POST"| E["/messages/{id}/delete"]
 ```
 
 ---
@@ -384,74 +384,47 @@ Le starter utilise une charte volontairement simple. Les couleurs ci-dessous cor
 Fichier à modifier :
 
 ```text
-mvc/entities/contact/contact.json
+mvc/entities/message/message.json
 ```
 
 ```json
 {
-  "format_version": 1,
-  "entity": "Contact",
-  "table": "contact",
-  "description": "Contacts — starter niveau 1",
+  "schema_version": "1.0",
+  "name": "Message",
+  "table": "message",
+  "description": "Entité neutre — starter first-crud-generated (CRUD généré)",
   "fields": [
     {
-      "name": "id",
-      "sql_type": "INT",
-      "primary_key": true,
-      "auto_increment": true
-    },
-    {
-      "name": "nom",
-      "sql_type": "VARCHAR(80)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 80
-      }
-    },
-    {
-      "name": "prenom",
-      "sql_type": "VARCHAR(80)",
-      "constraints": {
-        "not_empty": true,
-        "max_length": 80
-      }
-    },
-    {
-      "name": "email",
-      "sql_type": "VARCHAR(120)",
-      "unique": true,
-      "constraints": {
-        "not_empty": true,
-        "max_length": 120
-      }
-    },
-    {
-      "name": "telephone",
-      "sql_type": "VARCHAR(20)",
-      "nullable": true,
-      "constraints": {
-        "max_length": 20
-      }
+      "name": "content",
+      "type": "string",
+      "max_length": 255,
+      "nullable": false
     }
-  ]
+  ],
+  "options": {
+    "timestamps": false,
+    "soft_delete": false
+  }
 }
 ```
+
+!!! note "Champ `id` implicite"
+    La clé primaire `id` (entière, auto-incrémentée) est ajoutée
+    automatiquement par `forge build:model`. Le manifeste ne déclare que
+    les champs métier — ici un unique champ neutre `content`.
 
 ### 7.2 Ce que Forge génère depuis ce JSON
 
 ```mermaid
 flowchart TD
-    A["contact.json<br/>source canonique"] --> B["forge build:model"]
-    B --> C["contact.sql<br/>structure SQL visible"]
-    B --> D["contact_base.py<br/>classe Python régénérable"]
-    A -.-> E["contact.py<br/>logique métier manuelle préservée"]
+    A["message.json<br/>source canonique"] --> B["forge build:model"]
+    B --> C["message.sql<br/>structure SQL visible"]
+    B --> D["message_base.py<br/>classe Python régénérable"]
+    A -.-> E["message.py<br/>logique métier manuelle préservée"]
 ```
 
-!!! warning "Contrainte unique sur l'email"
-    La contrainte `unique: true` empêche deux contacts d'utiliser le même email. Dans ce starter, cette contrainte est principalement portée par la base MariaDB. Si un doublon est saisi, la base peut refuser l'insertion ou la mise à jour.
-
 !!! tip "Règle de modification"
-    On modifie le JSON et le fichier métier manuel `contact.py`. On évite de modifier directement les fichiers régénérables comme `contact.sql` et `contact_base.py`.
+    On modifie le JSON et le fichier manuel `message.py`. On évite de modifier directement les fichiers régénérables comme `message.sql` et `message_base.py`.
 
 ---
 
@@ -463,30 +436,30 @@ flowchart TD
 
     | Étape | Commande | Produit ou vérifie |
     |---:|---|---|
-    | 1 | `forge make:entity Contact --no-input` | Structure de l'entité |
-    | 2 | Modifier `contact.json` | Modèle canonique complet |
+    | 1 | `forge make:entity Message --no-input` | Structure de l'entité |
+    | 2 | Modifier `message.json` | Manifeste canonique complet |
     | 3 | `forge check:model` | Cohérence des JSON |
     | 4 | `forge build:model --dry-run` | Prévisualisation du modèle généré |
-    | 5 | `forge build:model` | `contact.sql` et `contact_base.py` |
+    | 5 | `forge build:model` | `message.sql` et `message_base.py` |
     | 6 | `forge db:apply` | Table SQL dans MariaDB |
-    | 7 | `forge make:crud Contact --dry-run` | Prévisualisation du CRUD |
-    | 8 | `forge make:crud Contact` | Contrôleur, modèle SQL, formulaire et vues |
+    | 7 | `forge make:crud Message --dry-run` | Prévisualisation du CRUD |
+    | 8 | `forge make:crud Message` | Contrôleur, modèle SQL, formulaire et vues |
 
     ### make:entity
 
     ```bash
-    forge make:entity Contact --no-input
+    forge make:entity Message --no-input
     ```
 
-    Crée la structure de départ. Le fichier manuel `contact.py` n'est pas écrasé lors des régénérations.
+    Crée la structure de départ. Le fichier manuel `message.py` n'est pas écrasé lors des régénérations.
 
     ```text
-    mvc/entities/contact/
+    mvc/entities/message/
     ├── __init__.py
-    ├── contact.json
-    ├── contact.sql
-    ├── contact_base.py
-    └── contact.py
+    ├── message.json
+    ├── message.sql
+    ├── message_base.py
+    └── message.py
     ```
 
     ### check:model et build:model
@@ -494,25 +467,21 @@ flowchart TD
     ```bash
     forge check:model               # vérifie sans écrire
     forge build:model --dry-run     # prévisualise
-    forge build:model               # génère contact.sql et contact_base.py
+    forge build:model               # génère message.sql et message_base.py
     ```
 
     SQL produit :
 
     ```sql
-    CREATE TABLE IF NOT EXISTS contact (
+    CREATE TABLE IF NOT EXISTS message (
         Id INT NOT NULL AUTO_INCREMENT,
-        Nom VARCHAR(80) NOT NULL,
-        Prenom VARCHAR(80) NOT NULL,
-        Email VARCHAR(120) NOT NULL,
-        UNIQUE KEY uk_contact_email (Email),
-        Telephone VARCHAR(20) NULL,
+        Content VARCHAR(255) NOT NULL,
         PRIMARY KEY (Id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ```
 
     !!! danger "Fichier régénérable"
-        `contact_base.py` est régénérable — ne pas y écrire de logique métier. La logique va dans `contact.py`.
+        `message_base.py` est régénérable — ne pas y écrire de logique métier. La logique va dans `message.py`.
 
     ### db:apply
 
@@ -520,42 +489,42 @@ flowchart TD
     forge db:apply
     ```
 
-    Applique `contact.sql` sur la base MariaDB configurée dans `env/dev`.
+    Applique `message.sql` sur la base MariaDB configurée dans `env/dev`.
 
     ### make:crud
 
     === "Prévisualiser"
 
         ```bash
-        forge make:crud Contact --dry-run
+        forge make:crud Message --dry-run
         ```
 
     === "Générer"
 
         ```bash
-        forge make:crud Contact
+        forge make:crud Message
         ```
 
     ```mermaid
     flowchart TD
-        A["forge make:crud Contact"] --> B["contact_controller.py"]
-        A --> C["contact_model.py"]
-        A --> D["contact_form.py"]
-        A --> E["views/contact/*.html"]
+        A["forge make:crud Message"] --> B["message_controller.py"]
+        A --> C["message_model.py"]
+        A --> D["message_form.py"]
+        A --> E["views/message/*.html"]
         B --> B1["reçoit les requêtes<br/>et choisit la réponse"]
         C --> C1["contient les requêtes<br/>SQL explicites"]
         D --> D1["lit et valide<br/>les données du formulaire"]
         E --> E1["affiche la liste,<br/>le formulaire et le détail"]
     ```
 
-    Requêtes SQL générées dans `contact_model.py` :
+    Requêtes SQL générées dans `message_model.py` :
 
     ```python
-    SELECT_ALL   = "SELECT * FROM contact ORDER BY Id"
-    SELECT_BY_ID = "SELECT * FROM contact WHERE Id = ?"
-    INSERT       = "INSERT INTO contact (Nom, Prenom, Email, Telephone) VALUES (?, ?, ?, ?)"
-    UPDATE       = "UPDATE contact SET Nom = ?, Prenom = ?, Email = ?, Telephone = ? WHERE Id = ?"
-    DELETE       = "DELETE FROM contact WHERE Id = ?"
+    SELECT_ALL   = "SELECT * FROM message ORDER BY Id"
+    SELECT_BY_ID = "SELECT * FROM message WHERE Id = ?"
+    INSERT       = "INSERT INTO message (Content) VALUES (?)"
+    UPDATE       = "UPDATE message SET Content = ? WHERE Id = ?"
+    DELETE       = "DELETE FROM message WHERE Id = ?"
     ```
 
     !!! note "Responsabilité du développeur"
@@ -566,19 +535,19 @@ flowchart TD
     Copier dans `mvc/routes.py` après la génération du CRUD :
 
     ```python
-    from mvc.controllers.contact_controller import ContactController
+    from mvc.controllers.message_controller import MessageController
 
     # Routes protégées par défaut.
     # Pour un test local sans authentification :
-    # with router.group("/contacts", public=True, csrf=False) as g:
-    with router.group("/contacts") as g:
-        g.add("GET",  "",              ContactController.index,   name="contact_index")
-        g.add("GET",  "/new",          ContactController.new,     name="contact_new")
-        g.add("POST", "",              ContactController.create,  name="contact_create")
-        g.add("GET",  "/{id}",         ContactController.show,    name="contact_show")
-        g.add("GET",  "/{id}/edit",    ContactController.edit,    name="contact_edit")
-        g.add("POST", "/{id}",         ContactController.update,  name="contact_update")
-        g.add("POST", "/{id}/delete",  ContactController.destroy, name="contact_destroy")
+    # with router.group("/messages", public=True, csrf=False) as g:
+    with router.group("/messages") as g:
+        g.add("GET",  "",              MessageController.index,   name="message_index")
+        g.add("GET",  "/new",          MessageController.new,     name="message_new")
+        g.add("POST", "",              MessageController.create,  name="message_create")
+        g.add("GET",  "/{id}",         MessageController.show,    name="message_show")
+        g.add("GET",  "/{id}/edit",    MessageController.edit,    name="message_edit")
+        g.add("POST", "/{id}",         MessageController.update,  name="message_update")
+        g.add("POST", "/{id}/delete",  MessageController.destroy, name="message_destroy")
     ```
 
     !!! warning "À ne pas inverser"
@@ -590,23 +559,23 @@ flowchart TD
 
     | Fichier | Nature | Rôle |
     |---|---|---|
-    | `mvc/entities/contact/contact.json` | Canonique | Source à modifier |
-    | `mvc/entities/contact/contact.sql` | Généré | SQL de création de la table |
-    | `mvc/entities/contact/contact_base.py` | Généré | Classe de base régénérable |
-    | `mvc/entities/contact/contact.py` | Manuel | Extension métier préservée |
-    | `mvc/entities/contact/__init__.py` | Manuel | Initialisation du module |
+    | `mvc/entities/message/message.json` | Canonique | Source à modifier |
+    | `mvc/entities/message/message.sql` | Généré | SQL de création de la table |
+    | `mvc/entities/message/message_base.py` | Généré | Classe de base régénérable |
+    | `mvc/entities/message/message.py` | Manuel | Extension métier préservée |
+    | `mvc/entities/message/__init__.py` | Manuel | Initialisation du module |
 
     ### Fichiers CRUD créés s'ils sont absents
 
     | Fichier | Rôle |
     |---|---|
-    | `mvc/controllers/contact_controller.py` | Contrôleur HTTP du CRUD |
-    | `mvc/models/contact_model.py` | Requêtes SQL explicites |
-    | `mvc/forms/contact_form.py` | Formulaire et validation |
+    | `mvc/controllers/message_controller.py` | Contrôleur HTTP du CRUD |
+    | `mvc/models/message_model.py` | Requêtes SQL explicites |
+    | `mvc/forms/message_form.py` | Formulaire et validation |
     | `mvc/views/layouts/app.html` | Layout commun |
-    | `mvc/views/contact/index.html` | Liste des contacts |
-    | `mvc/views/contact/show.html` | Détail d'un contact |
-    | `mvc/views/contact/form.html` | Création et modification |
+    | `mvc/views/message/index.html` | Liste des messages |
+    | `mvc/views/message/show.html` | Détail d'un message |
+    | `mvc/views/message/form.html` | Création et modification |
     | `mvc/routes.py` | Fichier à modifier manuellement |
 
     ### Arborescence
@@ -614,26 +583,26 @@ flowchart TD
     ```text
     mvc/
     ├── entities/
-    │   └── contact/
-    │       ├── contact.json        # source canonique
-    │       ├── contact.sql         # SQL généré
-    │       ├── contact_base.py     # classe générée
-    │       ├── contact.py          # classe métier manuelle
+    │   └── message/
+    │       ├── message.json        # source canonique
+    │       ├── message.sql         # SQL généré
+    │       ├── message_base.py     # classe générée
+    │       ├── message.py          # classe métier manuelle
     │       └── __init__.py
     │
     ├── controllers/
-    │   └── contact_controller.py   # logique HTTP du CRUD
+    │   └── message_controller.py   # logique HTTP du CRUD
     │
     ├── models/
-    │   └── contact_model.py        # requêtes SQL explicites
+    │   └── message_model.py        # requêtes SQL explicites
     │
     ├── forms/
-    │   └── contact_form.py         # validation du formulaire
+    │   └── message_form.py         # validation du formulaire
     │
     ├── views/
     │   ├── layouts/
     │   │   └── app.html            # layout commun
-    │   └── contact/
+    │   └── message/
     │       ├── index.html          # liste
     │       ├── form.html           # création / modification
     │       └── show.html           # détail
@@ -645,50 +614,50 @@ flowchart TD
 
     | Classe | Origine | Rôle |
     |---|---|---|
-    | `ContactBase` | Générée depuis le JSON | Propriétés, validations simples, conversion dictionnaire |
-    | `Contact` | Manuelle | Logique métier spécifique |
-    | `ContactForm` | Générée par le CRUD | Lecture et validation du formulaire |
-    | `ContactController` | Généré par le CRUD | Actions `index`, `new`, `create`, `show`, `edit`, `update`, `destroy` |
+    | `MessageBase` | Générée depuis le JSON | Propriétés, validations simples, conversion dictionnaire |
+    | `Message` | Manuelle | Logique métier spécifique |
+    | `MessageForm` | Générée par le CRUD | Lecture et validation du formulaire |
+    | `MessageController` | Généré par le CRUD | Actions `index`, `new`, `create`, `show`, `edit`, `update`, `destroy` |
     | `BaseController` | Core Forge | Rendu HTML, redirections, flash, erreurs de validation |
 
-    ### Cycle d'une création de contact
+    ### Cycle d'une création de message
 
     ```mermaid
     flowchart TD
-        A([Navigateur]) -->|"POST /contacts"| B["mvc/routes.py"]
-        B --> C["ContactController.create(request)"]
-        C --> D["ContactForm.from_request(request)"]
+        A([Navigateur]) -->|"POST /messages"| B["mvc/routes.py"]
+        B --> C["MessageController.create(request)"]
+        C --> D["MessageForm.from_request(request)"]
         D --> E{"form.is_valid()"}
-        E -->|non| F["contact/form.html\navec les erreurs"]
-        E -->|oui| G["add_contact(form.cleaned_data)"]
+        E -->|non| F["message/form.html\navec les erreurs"]
+        E -->|oui| G["add_message(form.cleaned_data)"]
         G --> H[(MariaDB)]
-        H --> I["redirect_with_flash → /contacts"]
+        H --> I["redirect_with_flash → /messages"]
     ```
 
     ### Exemple — création
 
     ```python
-    form = ContactForm.from_request(request)
+    form = MessageForm.from_request(request)
 
     if not form.is_valid():
         return BaseController.validation_error(
-            "contact/form.html",
-            context={"form": form, "action": "/contacts", "titre": "Nouveau contact"},
+            "message/form.html",
+            context={"form": form, "action": "/messages", "titre": "Nouveau message"},
             request=request,
         )
 
-    add_contact(form.cleaned_data)
-    return BaseController.redirect_with_flash(request, "/contacts", "Contact créé.")
+    add_message(form.cleaned_data)
+    return BaseController.redirect_with_flash(request, "/messages", "Message créé.")
     ```
 
     ### Fonctions SQL du modèle
 
     ```python
-    get_contacts()
-    get_contact_by_id(id)
-    add_contact(data)
-    update_contact(id, data)
-    delete_contact(id)
+    get_messages()
+    get_message_by_id(id)
+    add_message(data)
+    update_message(id, data)
+    delete_message(id)
     ```
 
     !!! tip "À retenir"
@@ -700,9 +669,9 @@ flowchart TD
 
     ```text
     mvc/views/layouts/app.html
-    mvc/views/contact/index.html
-    mvc/views/contact/form.html
-    mvc/views/contact/show.html
+    mvc/views/message/index.html
+    mvc/views/message/form.html
+    mvc/views/message/show.html
     ```
 
     ### Héritage Jinja2
@@ -710,9 +679,9 @@ flowchart TD
     ```mermaid
     flowchart TD
         A["layouts/app.html"] --> D["block content"]
-        E["contact/index.html"] --> D
-        F["contact/form.html"] --> D
-        G["contact/show.html"] --> D
+        E["message/index.html"] --> D
+        F["message/form.html"] --> D
+        G["message/show.html"] --> D
     ```
 
     ### index.html — liste
@@ -721,21 +690,20 @@ flowchart TD
     {% extends "layouts/app.html" %}
 
     {% block content %}
-    <h1>Contacts</h1>
-    <a href="/contacts/new">Nouveau contact</a>
+    <h1>Messages</h1>
+    <a href="/messages/new">Nouveau message</a>
 
-    {% for contact in contacts %}
+    {% for message in messages %}
         <article>
-            <h2>{{ contact.Nom }} {{ contact.Prenom }}</h2>
-            <p>{{ contact.Email }}</p>
-            <a href="/contacts/{{ contact.Id }}">Voir</a>
-            <a href="/contacts/{{ contact.Id }}/edit">Modifier</a>
+            <h2>{{ message.Content }}</h2>
+            <a href="/messages/{{ message.Id }}">Voir</a>
+            <a href="/messages/{{ message.Id }}/edit">Modifier</a>
         </article>
     {% endfor %}
     {% endblock %}
     ```
 
-    Les noms `contact.Nom`, `contact.Prenom`… correspondent aux colonnes SQL retournées par `cursor(dictionary=True)`.
+    Les noms `message.Content`… correspondent aux colonnes SQL retournées par `cursor(dictionary=True)`.
 
     ### form.html — création et modification
 
@@ -748,24 +716,15 @@ flowchart TD
     <form method="post" action="{{ action }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
-        <label>Nom</label>
-        <input type="text" name="nom" value="{{ form.value('nom') }}">
-
-        <label>Prénom</label>
-        <input type="text" name="prenom" value="{{ form.value('prenom') }}">
-
-        <label>Email</label>
-        <input type="email" name="email" value="{{ form.value('email') }}">
-
-        <label>Téléphone</label>
-        <input type="text" name="telephone" value="{{ form.value('telephone') }}">
+        <label>Contenu</label>
+        <input type="text" name="content" value="{{ form.value('content') }}">
 
         <button type="submit">Enregistrer</button>
     </form>
     {% endblock %}
     ```
 
-    Les noms de champs (`nom`, `prenom`…) sont les noms Python du JSON canonique. Les colonnes SQL (`Nom`, `Prenom`…) s'utilisent dans les vues de liste et de détail.
+    Le nom de champ (`content`) est le nom Python du JSON canonique. La colonne SQL (`Content`) s'utilise dans les vues de liste et de détail.
 
     ### show.html — détail
 
@@ -773,14 +732,13 @@ flowchart TD
     {% extends "layouts/app.html" %}
 
     {% block content %}
-    <h1>{{ contact.Nom }} {{ contact.Prenom }}</h1>
+    <h1>Message #{{ message.Id }}</h1>
 
-    <p>Email : {{ contact.Email }}</p>
-    <p>Téléphone : {{ contact.Telephone }}</p>
+    <p>Contenu : {{ message.Content }}</p>
 
-    <a href="/contacts/{{ contact.Id }}/edit">Modifier</a>
+    <a href="/messages/{{ message.Id }}/edit">Modifier</a>
 
-    <form method="post" action="/contacts/{{ contact.Id }}/delete">
+    <form method="post" action="/messages/{{ message.Id }}/delete">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit">Supprimer</button>
     </form>
@@ -799,15 +757,15 @@ flowchart TD
 | Étape | Action | Résultat attendu |
 |---:|---|---|
 | 1 | Lancer `python app.py` | Serveur HTTPS local lancé |
-| 2 | Ouvrir `/contacts` | Liste affichée |
-| 3 | Cliquer sur "Nouveau contact" | Formulaire affiché |
+| 2 | Ouvrir `/messages` | Liste affichée |
+| 3 | Cliquer sur "Nouveau message" | Formulaire affiché |
 | 4 | Soumettre le formulaire vide | Erreurs visibles |
-| 5 | Créer un contact valide | Retour à la liste |
+| 5 | Créer un message valide | Retour à la liste |
 | 6 | Vérifier le message flash | Message de succès affiché |
-| 7 | Ouvrir le détail du contact | Détail affiché |
-| 8 | Modifier le contact | Données mises à jour |
-| 9 | Supprimer le contact | Suppression effectuée |
-| 10 | Revenir à la liste | Contact supprimé absent |
+| 7 | Ouvrir le détail du message | Détail affiché |
+| 8 | Modifier le message | Données mises à jour |
+| 9 | Supprimer le message | Suppression effectuée |
+| 10 | Revenir à la liste | Message supprimé absent |
 
 ### 13.2 Limites du starter
 
@@ -817,7 +775,7 @@ flowchart TD
     - Pas de pagination générée automatiquement.
     - Pas de validation métier au-delà des contraintes simples.
     - Pas de relation : ce starter est volontairement mono-entité.
-    - Pas d'ORM : les requêtes SQL restent visibles dans `mvc/models/contact_model.py`.
+    - Pas d'ORM : les requêtes SQL restent visibles dans `mvc/models/message_model.py`.
 
 ---
 
@@ -831,7 +789,7 @@ La vérification finale sert à contrôler trois choses : l'environnement Forge,
 flowchart TD
     A["forge doctor"] --> B["environnement du projet OK"]
     B --> C["forge routes:list"]
-    C --> D["routes /contacts présentes"]
+    C --> D["routes /messages présentes"]
     D --> E["python app.py"]
     E --> F["serveur HTTPS local lancé"]
     F --> G["navigateur"]
@@ -855,17 +813,17 @@ forge routes:list
 Les routes suivantes doivent apparaître ou être équivalentes selon l'affichage de Forge :
 
 ```text
-GET   /contacts
-GET   /contacts/new
-POST  /contacts
-GET   /contacts/{id}
-GET   /contacts/{id}/edit
-POST  /contacts/{id}
-POST  /contacts/{id}/delete
+GET   /messages
+GET   /messages/new
+POST  /messages
+GET   /messages/{id}
+GET   /messages/{id}/edit
+POST  /messages/{id}
+POST  /messages/{id}/delete
 ```
 
 !!! warning "Erreur classique"
-    Si `/contacts/new` n'apparaît pas avant `/contacts/{id}`, il faut vérifier l'ordre des routes dans `mvc/routes.py`.
+    Si `/messages/new` n'apparaît pas avant `/messages/{id}`, il faut vérifier l'ordre des routes dans `mvc/routes.py`.
 
 ### 14.4 Lancer le serveur local
 
@@ -876,36 +834,35 @@ python app.py
 Ouvrir ensuite dans le navigateur :
 
 ```text
-https://localhost:8000/contacts
+https://localhost:8000/messages
 ```
 
 ### 14.5 Scénario de recette
 
 ```text
-1. Ouvrir /contacts
-2. Cliquer sur "Nouveau contact"
+1. Ouvrir /messages
+2. Cliquer sur "Nouveau message"
 3. Soumettre le formulaire vide
 4. Vérifier l'affichage des erreurs
-5. Créer un contact valide
+5. Créer un message valide
 6. Vérifier le retour à la liste
 7. Vérifier le message flash
-8. Ouvrir le détail du contact
-9. Modifier le contact
-10. Supprimer le contact
-11. Vérifier que le contact supprimé n'apparaît plus dans la liste
+8. Ouvrir le détail du message
+9. Modifier le message
+10. Supprimer le message
+11. Vérifier que le message supprimé n'apparaît plus dans la liste
 ```
 
 ### 14.6 Erreurs fréquentes
 
 | Symptôme | Cause probable | Fichier ou commande à vérifier |
 |---|---|---|
-| `/contacts` affiche une erreur 404 | Routes non copiées | `mvc/routes.py` |
-| `/contacts/new` est interprété comme un identifiant | Ordre des routes incorrect | Placer `/new` avant `/{id}` |
+| `/messages` affiche une erreur 404 | Routes non copiées | `mvc/routes.py` |
+| `/messages/new` est interprété comme un identifiant | Ordre des routes incorrect | Placer `/new` avant `/{id}` |
 | Erreur de connexion MariaDB | Variables incorrectes | `env/dev` |
-| Table `contact` absente | SQL non appliqué | `forge db:apply` |
-| Erreur sur `contact.Nom` dans la vue | Colonnes SQL différentes | `contact.sql`, `contact_model.py`, template Jinja |
-| Formulaire sans protection CSRF | Champ caché absent | `contact/form.html` |
-| Doublon email refusé | Contrainte `unique: true` | Vérifier la donnée saisie |
+| Table `message` absente | SQL non appliqué | `forge db:apply` |
+| Erreur sur `message.Content` dans la vue | Colonnes SQL différentes | `message.sql`, `message_model.py`, template Jinja |
+| Formulaire sans protection CSRF | Champ caché absent | `message/form.html` |
 
 ---
 
@@ -914,7 +871,7 @@ https://localhost:8000/contacts
 La procédure complète de reconstruction du starter (étapes
 détaillées, alias disponibles, options `--dry-run` / `--public` /
 `--init-db` / `--force`) est documentée dans le fichier
-[Reconstruction du starter Contacts](rebuild.md), pour ne pas
+[Reconstruction du starter First CRUD (généré)](first-crud-generated-rebuild.md), pour ne pas
 mélanger « ce que ce starter fait » (cette page) et « comment le
 régénérer en CLI » (rebuild).
 
@@ -939,7 +896,9 @@ La référence CLI globale est dans
 
 ## Après ce starter
 
-Ce starter clôt la progression pédagogique de base.
+Ce starter montre la **génération** d'un CRUD complet — le pendant
+échafaudé du starter [First CRUD](first-crud.md) écrit à la main, sur la
+même entité neutre `Message`.
 
 Il rassemble les notions vues dans les paliers précédents : routes,
 contrôleurs, vues, formulaires, validation serveur, SQL et

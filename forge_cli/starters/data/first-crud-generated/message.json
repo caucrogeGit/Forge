@@ -1,0 +1,19 @@
+{
+  "$schema": "../../../../schemas/entity.schema.json",
+  "schema_version": "1.0",
+  "name": "Message",
+  "table": "message",
+  "description": "Entité neutre — starter first-crud-generated (CRUD généré)",
+  "fields": [
+    {
+      "name": "content",
+      "type": "string",
+      "max_length": 255,
+      "nullable": false
+    }
+  ],
+  "options": {
+    "timestamps": false,
+    "soft_delete": false
+  }
+}

@@ -8,7 +8,7 @@ Stratégie :
   - Les builds sont rapides (< 0.05 s), fixtures function-scoped acceptables.
 
 Starters testés :
-  1  contact-simple    — CRUD simple, une entité
+  1  first-crud-generated  — CRUD généré, entité neutre Message
   Cas invalide         — starter introuvable
 """
 from __future__ import annotations
@@ -124,7 +124,7 @@ class TestStarterList:
     def test_affiche_noms(self, capsys):
         cmd_starter_list()
         out = capsys.readouterr().out
-        assert "Contacts" in out
+        assert "First CRUD (généré)" in out
         assert "Utilisateurs / authentification" in out
 
     def test_affiche_disponible(self, capsys):
@@ -138,7 +138,7 @@ class TestStarterList:
         assert exc_info.value.code == 1
 
 
-# ── Starter 1 — contact-simple (CRUD) ────────────────────────────────────────
+# ── Starter 1 — first-crud-generated (CRUD généré, entité neutre) ─────────────
 
 class TestStarter1Crud:
     @pytest.fixture(autouse=True)
@@ -147,36 +147,36 @@ class TestStarter1Crud:
         _build_starter("1")
 
     def test_entity_dir_exists(self):
-        assert (self.root / "mvc" / "entities" / "contact").is_dir()
+        assert (self.root / "mvc" / "entities" / "message").is_dir()
 
     def test_entity_json_valid(self):
-        path = self.root / "mvc" / "entities" / "contact" / "contact.json"
+        path = self.root / "mvc" / "entities" / "message" / "message.json"
         assert path.exists()
         data = json.loads(path.read_text(encoding="utf-8"))
-        assert data.get("name") == "Contact"
+        assert data.get("name") == "Message"
         assert data.get("schema_version") == "1.0"
 
     def test_entity_sql_exists(self):
-        assert (self.root / "mvc" / "entities" / "contact" / "contact.sql").exists()
+        assert (self.root / "mvc" / "entities" / "message" / "message.sql").exists()
 
     def test_controller_exists(self):
-        assert (self.root / "mvc" / "controllers" / "contact_controller.py").exists()
+        assert (self.root / "mvc" / "controllers" / "message_controller.py").exists()
 
     def test_model_exists(self):
-        assert (self.root / "mvc" / "models" / "contact_model.py").exists()
+        assert (self.root / "mvc" / "models" / "message_model.py").exists()
 
     def test_form_exists(self):
-        assert (self.root / "mvc" / "forms" / "contact_form.py").exists()
+        assert (self.root / "mvc" / "forms" / "message_form.py").exists()
 
     def test_views_exist(self):
-        views = self.root / "mvc" / "views" / "contact"
+        views = self.root / "mvc" / "views" / "message"
         assert (views / "index.html").exists()
         assert (views / "show.html").exists()
         assert (views / "form.html").exists()
 
     def test_routes_injected(self):
         routes = (self.root / "mvc" / "routes.py").read_text(encoding="utf-8")
-        assert "/contacts" in routes
+        assert "/messages" in routes
 
     def test_project_check_no_failures(self):
         results = run_project_check(self.root, _FORGE_VERSION)

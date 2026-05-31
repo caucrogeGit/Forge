@@ -13,7 +13,7 @@ Vérifie aussi :
   ``forge new mon-projet``, ``cd mon-projet``,
   ``source .venv/bin/activate``) ;
 - absence des étiquettes par numéro (Starter 7…14) dans les pages
-  pédagogiques (welcome → first-sql). contact-simple peut garder
+  pédagogiques (welcome → first-sql). first-crud-generated peut garder
   son numéro historique « 1 » (pas dans la plage 7–14 protégée).
 """
 
@@ -45,18 +45,19 @@ SEQUENTIAL_CHAIN: dict[str, str] = {
     "first-sql-write": "first-crud",
 }
 
-# Pages pédagogiques (paliers 1→11). first-crud et contact-simple sont
-# exclus : ce sont des starters autonomes (dossier propre), qui peuvent
-# garder des étiquettes historiques ("Starter 1").
+# Pages pédagogiques (paliers 1→11). first-crud et first-crud-generated
+# sont exclus : ce sont des starters autonomes (dossier-sujet crud/), qui
+# peuvent garder des étiquettes historiques ("Starter 1").
 PEDAGOGICAL_PAGES = list(SEQUENTIAL_CHAIN.keys())
 
-# Starters autonomes rendus dans leur propre dossier docs/starters/<slug>/.
-STANDALONE_STARTERS = ["first-crud", "contact-simple"]
+# Starters autonomes du sujet CRUD (à la main + généré).
+STANDALONE_STARTERS = ["first-crud", "first-crud-generated"]
 
-# Certains starters autonomes sont regroupés sous un dossier-sujet :
-# leur page n'est pas <slug>/index.md mais <sujet>/<page>.md.
+# Les starters autonomes du sujet CRUD sont regroupés sous le dossier-sujet
+# crud/ : leur page n'est pas <slug>/index.md mais crud/<page>.md.
 TOPIC_DOC_PATHS: dict[str, str] = {
     "first-crud": "crud/first-crud.md",
+    "first-crud-generated": "crud/first-crud-generated.md",
 }
 
 # Toutes les pages starters concernées par la règle stricte
@@ -74,8 +75,8 @@ FORBIDDEN_COMMANDS = [
 def _doc_path(slug: str) -> Path:
     # DOCS-STARTERS-PROGRESSION-FOLDER-001 — les paliers pédagogiques
     # (welcome → first-sql) sont regroupés à plat dans
-    # docs/starters/welcome/<slug>.md. contact-simple garde son
-    # dossier historique.
+    # docs/starters/welcome/<slug>.md. Les starters CRUD autonomes vivent
+    # sous le dossier-sujet crud/ (voir TOPIC_DOC_PATHS).
     if slug in TOPIC_DOC_PATHS:
         return STARTERS_DOCS / TOPIC_DOC_PATHS[slug]
     if slug in STANDALONE_STARTERS:
@@ -94,8 +95,8 @@ class TestSequentialChain:
         content = page.read_text(encoding="utf-8")
         # DOCS-STARTERS-PROGRESSION-FOLDER-001 — au sein de welcome/, le
         # palier suivant est un fichier frère « target.md » ; le dernier
-        # palier (first-sql) pointe vers contact-simple resté dans son
-        # dossier (« ../contact-simple/ »).
+        # palier (first-sql-write) pointe vers le starter autonome
+        # first-crud sous le dossier-sujet crud/ (« ../crud/first-crud.md »).
         if target in TOPIC_DOC_PATHS:
             # Lien vers la page sous dossier-sujet (« ../crud/first-crud.md »).
             link_variants = (f"../{TOPIC_DOC_PATHS[target]}",)
