@@ -1,4 +1,4 @@
-"""Commande ``forge optin:list`` — OPTINS-CLI-LIST-001.
+"""Commande ``forge opt-in:list`` — OPTINS-CLI-LIST-001 (renommée OPTIN-CLI-REMOVE-LEGACY-001).
 
 Affiche l'**état local** des opt-ins connus dans un projet Forge.
 Commande **strictement lecture seule** : elle ne crée, ne modifie et
@@ -86,7 +86,7 @@ def _print_iot(info: dict[str, object]) -> None:
     print(f"  iot       {state}")
 
     if state == STATE_ABSENT:
-        print("            conseil   : forge optin:enable iot --apply")
+        print("            conseil   : forge opt-in:enable iot --apply")
         return
 
     print("            structure : optins/iot/")
@@ -103,7 +103,7 @@ def _print_iot(info: dict[str, object]) -> None:
             "            routes    : register_optins(router) absent "
             "de mvc/routes.py"
         )
-        print("            conseil   : forge optin:enable iot --apply")
+        print("            conseil   : forge opt-in:enable iot --apply")
 
 
 def list_optins(*, project_root: Path) -> int:
@@ -117,7 +117,7 @@ def list_optins(*, project_root: Path) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Point d'entrée appelé par ``forge.py`` pour ``forge optin:list``.
+    """Point d'entrée appelé par ``forge.py`` pour ``forge opt-in:list``.
 
     Aucune option pour ce ticket (``--help`` est intercepté en amont par
     le dispatcher central). Lecture seule.

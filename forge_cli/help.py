@@ -93,8 +93,6 @@ Opt-ins (branchement projet)
   opt-in:enable       Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.
   opt-in:disable      Débranche un opt-in du projet (retire optins/) ; dry-run par défaut, --apply pour écrire.
   opt-in:list         Affiche les opt-ins officiels et leur état (lecture seule).
-  optin:enable        Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.
-  optin:list          Affiche l'état local des opt-ins connus (lecture seule).
 
 Documentation
   docs:pdf            Génère un PDF depuis la documentation.

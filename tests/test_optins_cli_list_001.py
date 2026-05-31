@@ -1,8 +1,8 @@
 """Tests — OPTINS-CLI-LIST-001.
 
-Vérifie la commande **lecture seule** `forge optin:list` :
+Vérifie la commande **lecture seule** `forge opt-in:list` :
 
-- `--help` fonctionne ; `forge help` liste `optin:list` ;
+- `--help` fonctionne ; `forge help` liste `opt-in:list` ;
 - projet sans opt-ins → `iot absent` ;
 - `optins/iot/` présent mais `mvc/routes.py` non branché → `partiel` ;
 - `optins/iot/` + `register_optins(router)` → `activé` ;
@@ -108,7 +108,7 @@ class TestOutput:
         assert rc == 0
         assert "Forge opt-ins" in out
         assert "iot       absent" in out
-        assert "forge optin:enable iot --apply" in out
+        assert "forge opt-in:enable iot --apply" in out
         assert "Aucune modification effectuée." in out
 
     def test_partial_output(self, tmp_path, capsys):
@@ -200,18 +200,18 @@ class TestScopeGuards:
 class TestCliRegistration:
     def test_forge_py_dispatches_optin_list(self):
         text = (_REPO_ROOT / "forge.py").read_text(encoding="utf-8")
-        assert 'command == "optin:list"' in text
+        assert 'command == "opt-in:list"' in text
 
     def test_help_py_lists_optin_list(self):
-        assert "optin:list" in HELP_FILE.read_text(encoding="utf-8")
+        assert "opt-in:list" in HELP_FILE.read_text(encoding="utf-8")
 
     def test_help_renders(self):
         result = subprocess.run(
-            [sys.executable, str(FORGE_PY), "optin:list", "--help"],
+            [sys.executable, str(FORGE_PY), "opt-in:list", "--help"],
             capture_output=True, text=True, timeout=30,
         )
         assert result.returncode == 0
-        assert "optin:list" in result.stdout
+        assert "opt-in:list" in result.stdout
         assert "lecture seule" in result.stdout.lower()
 
     def test_forge_help_lists_optin_list(self):
@@ -219,4 +219,4 @@ class TestCliRegistration:
             [sys.executable, str(FORGE_PY), "help"],
             capture_output=True, text=True, timeout=30,
         )
-        assert "optin:list" in result.stdout
+        assert "opt-in:list" in result.stdout

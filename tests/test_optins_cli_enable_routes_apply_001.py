@@ -1,7 +1,7 @@
 """Tests — OPTINS-CLI-ENABLE-ROUTES-APPLY-001.
 
 Vérifie le branchement **prudent** de `mvc/routes.py` par
-`forge optin:enable iot --apply` :
+`forge opt-in:enable iot --apply` :
 
 - dry-run n'écrit pas dans `mvc/routes.py` ;
 - `--apply` ajoute l'import `optins.registry` + l'appel

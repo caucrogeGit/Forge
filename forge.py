@@ -698,22 +698,9 @@ def main() -> None:
             sys.exit(rc)
         return
 
-    if command == "optin:enable":
-        from forge_cli.optins.enable import main as optin_enable_main
-        rc = optin_enable_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "optin:list":
-        from forge_cli.optins.list import main as optin_list_main
-        rc = optin_list_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    # Famille canonique opt-in:* (OPTIN-CLI-VERBS-001, ADR-016 3a).
-    # Coexiste avec optin:enable / optin:list jusqu'à leur suppression (3c).
+    # Famille canonique opt-in:* (ADR-016). Les anciennes commandes
+    # optin:enable / optin:list ont été retirées (OPTIN-CLI-REMOVE-LEGACY-001) ;
+    # les moteurs forge_cli/optins/{enable,list}.py restent utilisés ici.
     if command == "opt-in:install":
         from forge_cli.optins.install import main as optin_install_main
         rc = optin_install_main(args[1:])

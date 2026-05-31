@@ -94,9 +94,10 @@ class TestDispatchAndHelp:
         assert "opt-in:install" in HELP_TEXTS_RICH
 
 
-# ── Coexistence : les anciennes commandes restent (suppression = 3c) ─────────
+# ── Legacy retiré (OPTIN-CLI-REMOVE-LEGACY-001, palier 3c) ───────────────────
 
-class TestLegacyStillPresent:
+class TestLegacyRemoved:
     @pytest.mark.parametrize("command", ["optin:enable", "optin:list"])
-    def test_legacy_optin_commands_still_routed(self, command):
-        assert f'command == "{command}"' in FORGE_PY
+    def test_legacy_optin_commands_removed(self, command):
+        # Rupture franche pré-1.0 : les anciens noms ne sont plus dispatchés.
+        assert f'command == "{command}"' not in FORGE_PY

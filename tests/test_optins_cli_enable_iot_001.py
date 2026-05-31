@@ -1,6 +1,6 @@
 """Tests — OPTINS-CLI-ENABLE-IOT-001.
 
-Vérifie la commande `forge optin:enable iot` :
+Vérifie la commande `forge opt-in:enable iot` :
 
 - dry-run par défaut (n'écrit rien) ;
 - `--apply` crée la couche `optins/` (registry + iot/) ;
@@ -249,22 +249,22 @@ class TestScopeGuards:
 class TestCliRegistration:
     def test_forge_py_dispatches_optin_enable(self):
         text = (_REPO_ROOT / "forge.py").read_text(encoding="utf-8")
-        assert 'command == "optin:enable"' in text
+        assert 'command == "opt-in:enable"' in text
 
     def test_help_py_lists_optin_enable(self):
-        assert "optin:enable" in HELP_FILE.read_text(encoding="utf-8")
+        assert "opt-in:enable" in HELP_FILE.read_text(encoding="utf-8")
 
     def test_help_renders(self):
         result = subprocess.run(
-            [sys.executable, str(FORGE_PY), "optin:enable", "--help"],
+            [sys.executable, str(FORGE_PY), "opt-in:enable", "--help"],
             capture_output=True, text=True, timeout=30,
         )
         assert result.returncode == 0
-        assert "optin:enable" in result.stdout
+        assert "opt-in:enable" in result.stdout
 
     def test_forge_help_lists_optin_enable(self):
         result = subprocess.run(
             [sys.executable, str(FORGE_PY), "help"],
             capture_output=True, text=True, timeout=30,
         )
-        assert "optin:enable" in result.stdout
+        assert "opt-in:enable" in result.stdout

@@ -2,5 +2,5 @@
 
 Voir docs/architecture/optins-project-structure.md (contrat) et
 docs/architecture/optins-cli-enable-audit.md (conception de la commande
-`forge optin:enable`).
+`forge opt-in:enable`).
 """

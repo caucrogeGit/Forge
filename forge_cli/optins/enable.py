@@ -1,4 +1,4 @@
-"""Commande ``forge optin:enable <name>`` — OPTINS-CLI-ENABLE-IOT-001.
+"""Commande ``forge opt-in:enable <name>`` — OPTINS-CLI-ENABLE-IOT-001 (renommée OPTIN-CLI-REMOVE-LEGACY-001).
 
 Branche **localement** un opt-in dans le projet courant en créant la
 couche ``optins/`` documentée par
@@ -162,7 +162,7 @@ forge iot:init          # copie *_create_iot_events.sql vers mvc/migrations/
 forge migration:apply   # applique la migration (crée la table iot_events)
 ```
 
-Ce dossier sert de **repère** : `forge optin:enable iot` n'applique
+Ce dossier sert de **repère** : `forge opt-in:enable iot` n'applique
 aucune migration automatiquement. Le SQL reste visible et appliqué
 explicitement.
 """
@@ -362,9 +362,9 @@ def enable_optin(
 
 
 def main(args: list[str] | None = None) -> int:
-    """Point d'entrée appelé par ``forge.py`` pour ``forge optin:enable``.
+    """Point d'entrée appelé par ``forge.py`` pour ``forge opt-in:enable``.
 
-    Usage : ``forge optin:enable <name> [--apply | --dry-run]``. Le
+    Usage : ``forge opt-in:enable <name> [--apply | --dry-run]``. Le
     dry-run est le **comportement par défaut**.
     """
     if args is None:
@@ -379,7 +379,7 @@ def main(args: list[str] | None = None) -> int:
 
     if not positionals:
         print(f"{STATUS_ERROR} nom d'opt-in manquant.")
-        print("Usage : forge optin:enable <name> [--apply]")
+        print("Usage : forge opt-in:enable <name> [--apply]")
         print(f"Opt-ins disponibles : {', '.join(sorted(SUPPORTED_OPTINS))}")
         return 2
 

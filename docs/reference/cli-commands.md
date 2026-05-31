@@ -1237,8 +1237,8 @@ Elles ne déplacent ni n'installent les paquets ; elles câblent l'opt-in
 dans le projet, de façon explicite.
 
 Depuis [ADR-016](../adr/016-opt-in-unification.md), les noms canoniques sont
-préfixés `opt-in:`. Les anciennes commandes `optin:*` (sans tiret) coexistent
-temporairement et seront retirées au palier 3c.
+préfixés `opt-in:`. Les anciennes commandes `optin:*` (sans tiret) ont été
+retirées (palier 3c).
 
 <details markdown="1" id="forge-opt-ininstall">
 <summary><code>forge opt-in:install</code> - Affiche la commande d'installation du package d'un opt-in officiel</summary>
@@ -1312,68 +1312,6 @@ Nom canonique de la liste (ADR-016). Affiche les opt-ins officiels et leur
 ```bash
 forge opt-in:list
 ```
-
-</details>
-
-<details markdown="1" id="forge-optinenable">
-<summary><code>forge optin:enable</code> - Branche un opt-in dans le projet (optins/) — dry-run par défaut</summary>
-
-Crée la couche `optins/` qui branche un opt-in dans le projet courant.
-Premier opt-in supporté : `iot` (paquet `forge-mvc-iot`).
-
-```bash
-forge optin:enable iot              # dry-run : montre ce qui serait créé
-forge optin:enable iot --apply      # crée réellement optins/iot/
-forge optin:enable iot --dry-run    # dry-run explicite
-```
-
-**Dry-run par défaut** : sans `--apply`, rien n'est écrit. `--apply` crée
-les fichiers absents (`optins/__init__.py`, `optins/registry.py`,
-`optins/iot/__init__.py`, `optins/iot/routes.py`, `optins/iot/README.md`,
-`optins/iot/migrations/README.md`). La commande est **idempotente** : un
-fichier déjà présent et identique → `[OK] déjà présent` ; présent mais
-différent → `[WARN]`, **aucune écriture**.
-
-**Branchement `mvc/routes.py`** (depuis `OPTINS-CLI-ENABLE-ROUTES-APPLY-001`) :
-avec `--apply`, la commande peut brancher `mvc/routes.py` **uniquement si
-sa structure est reconnue** (présence de `router = Router()`) — elle
-ajoute alors l'import `from optins.registry import register_optins` et
-l'appel `register_optins(router)`. Si le fichier a déjà l'appel → `[OK]
-déjà branché` (idempotent, pas de doublon). Si la structure est
-**ambiguë** (ou le fichier absent) → `[WARN]` + **aucune modification**,
-l'instruction manuelle est affichée. En dry-run, le branchement est
-seulement annoncé. Pas de marqueurs, pas de découverte automatique.
-
-Le branchement reste **explicite**, sans découverte automatique ; Forge
-Core ne dépend pas des opt-ins. Le paquet doit être installé
-(`pip install --pre forge-mvc-iot`), sinon `[ERREUR]` + exit 1. Voir
-[structure des opt-ins](../architecture/optins-project-structure.md) et
-l'[audit `forge optin:enable`](../architecture/optins-cli-enable-audit.md).
-
-</details>
-
-<details markdown="1" id="forge-optinlist">
-<summary><code>forge optin:list</code> - Affiche l'état local des opt-ins connus (lecture seule)</summary>
-
-Affiche l'état local des opt-ins connus dans un projet Forge.
-**Commande lecture seule : elle ne crée, ne modifie et n'installe rien.**
-
-```bash
-forge optin:list
-```
-
-Elle inspecte seulement le texte de quelques fichiers du projet
-(`optins/iot/routes.py`, `optins/registry.py`, `mvc/routes.py`) — sans
-importer `forge_mvc_iot`, sans découverte automatique. États détectés
-pour `iot` :
-
-- `absent` : `optins/iot/` n'existe pas ;
-- `partiel` : `optins/iot/` présent, mais `register_optins(router)` absent
-  de `mvc/routes.py` (conseil : `forge optin:enable iot --apply`) ;
-- `activé` : `optins/iot/` présent **et** `register_optins(router)` présent.
-
-Complément lecture seule de [`forge optin:enable`](#forge-optinenable).
-Seul l'opt-in `iot` est analysé dans cette version.
 
 </details>
 

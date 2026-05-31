@@ -119,8 +119,6 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "opt-in:enable":    "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
     "opt-in:disable":   "Débranche un opt-in du projet (retire optins/) ; dry-run par défaut, --apply pour écrire.",
     "opt-in:list":      "Affiche les opt-ins officiels et leur état (lecture seule).",
-    "optin:enable":     "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
-    "optin:list":       "Affiche l'état local des opt-ins connus (lecture seule).",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
     # Internationalisation
@@ -403,65 +401,6 @@ Comportement:
 
 Code de sortie:
   0 succès (ou déjà débranché) ; 2 opt-in non supporté ou nom manquant.
-""",
-    "optin:enable": """\
-Usage:
-  forge optin:enable <name>            # dry-run (n'écrit rien)
-  forge optin:enable iot               # aperçu pour l'opt-in IoT
-  forge optin:enable iot --apply       # crée réellement optins/iot/
-  forge optin:enable iot --dry-run     # dry-run explicite
-
-Description:
-  Branche un opt-in **localement** dans le projet courant en créant la
-  couche `optins/` (registre explicite + dossier de l'opt-in). Premier
-  opt-in supporté : `iot` (paquet `forge-mvc-iot`).
-
-  Le branchement reste **explicite** : `mvc/routes.py` appelle
-  `register_optins(router)` → `optins/registry.py` → `optins/iot/routes.py`
-  → `register_iot_routes(router)`. Aucune découverte automatique.
-
-Comportement:
-  - **dry-run par défaut** : sans `--apply`, affiche ce qui serait créé,
-    n'écrit rien.
-  - `--apply` : crée les fichiers absents (`optins/__init__.py`,
-    `optins/registry.py`, `optins/iot/__init__.py`, `optins/iot/routes.py`,
-    `optins/iot/README.md`, `optins/iot/migrations/README.md`).
-  - **idempotent** : un fichier déjà présent et identique → `[OK] déjà
-    présent` ; présent mais différent → `[WARN]`, **aucune écriture**.
-
-Important:
-  - la commande **ne modifie pas** `mvc/routes.py` dans cette version :
-    elle affiche l'instruction à ajouter manuellement.
-  - le paquet de l'opt-in doit être installé (`pip install --pre
-    forge-mvc-iot`), sinon `[ERREUR]` + exit 1.
-
-Code de sortie:
-  0 succès (création, idempotent ou dry-run) ; 2 opt-in inconnu ou nom
-  manquant ; 1 paquet absent, ou (avec `--apply`) conflit de fichier.
-""",
-    "optin:list": """\
-Usage:
-  forge optin:list
-
-Description:
-  Affiche l'état local des opt-ins connus dans un projet Forge.
-  **Commande lecture seule** : elle ne crée, ne modifie et n'installe
-  rien. Elle inspecte seulement le texte de quelques fichiers du projet
-  (`optins/iot/routes.py`, `optins/registry.py`, `mvc/routes.py`).
-
-États détectés pour `iot`:
-  - absent   : `optins/iot/` n'existe pas ;
-  - partiel  : `optins/iot/` présent, mais `register_optins(router)`
-               absent de `mvc/routes.py` ;
-  - activé   : `optins/iot/` présent + `register_optins(router)` présent.
-
-Important:
-  - n'importe pas `forge_mvc_iot` ni aucun paquet opt-in ;
-  - pas de découverte automatique, pas de scan des paquets installés ;
-  - seul l'opt-in `iot` est analysé dans cette version.
-
-Code de sortie:
-  0 toujours (lecture seule).
 """,
     "update": """\
 Usage:
