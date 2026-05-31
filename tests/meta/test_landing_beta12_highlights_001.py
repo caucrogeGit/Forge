@@ -48,8 +48,8 @@ HIGHLIGHTS = [
     "forge iot:listen",
     "forge iot:simulate",
     "optins/",
-    "forge optin:enable iot",
-    "forge optin:list",
+    "forge opt-in:enable iot",
+    "forge opt-in:list",
     "welcome-optin-iot",
     "0 échec",
 ]

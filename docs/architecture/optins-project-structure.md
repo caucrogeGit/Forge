@@ -1,5 +1,12 @@
 # Structure des opt-ins dans un projet Forge
 
+!!! note "Renommage CLI (ADR-016)"
+    La famille de commandes est désormais `forge opt-in:install/remove/enable/disable/list`
+    (avec tiret). Les mentions `optin:` ci-dessous conservent le **nom d'époque**
+    des tickets livrés ; la commande actuelle est `forge opt-in:enable`. Voir le
+    [glossaire opt-in](../reference/vocabulaire-opt-in.md) et
+    [ADR-016](../adr/016-opt-in-unification.md).
+
 > Ticket : `OPTINS-PROJECT-STRUCTURE-001`. Ce document **pose le contrat**
 > d'une convention de branchement local des opt-ins dans une application
 > Forge générée. Il est **architecture + documentation uniquement** :

@@ -1,5 +1,12 @@
 # Audit `forge optin:enable`
 
+!!! note "Renommage CLI (ADR-016)"
+    La commande s'appelle désormais **`forge opt-in:enable`** (avec tiret), au
+    sein de la famille `forge opt-in:install/remove/enable/disable/list`. Ce
+    document de **conception** conserve le nom d'époque `optin:enable`. Voir le
+    [glossaire opt-in](../reference/vocabulaire-opt-in.md) et
+    [ADR-016](../adr/016-opt-in-unification.md).
+
 > Ticket : `OPTINS-CLI-ENABLE-AUDIT-001`. **Audit de conception** — ce
 > document **cadre** la future commande `forge optin:enable` sans
 > l'implémenter. Aucun code fonctionnel n'est ajouté : pas de
