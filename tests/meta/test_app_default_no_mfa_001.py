@@ -46,9 +46,25 @@ class TestMfaAvailableExported:
         content = (PROJECT_ROOT / "mvc/controllers/auth_controller.py").read_text(encoding="utf-8")
         assert "def mfa_available" in content
 
-    def test_routes_imports_mfa_available(self):
+    def test_neutral_routes_has_no_mfa_reference(self):
+        """Le squelette neutre ne référence plus MFA (SKELETON-ROUTES-NEUTRAL-001).
+
+        Le câblage /login/mfa est relocalisé dans le starter welcome-optin-mfa ;
+        `mvc/routes.py` livré par défaut n'a aucune trace de MFA (§3, §8).
+        """
         content = (PROJECT_ROOT / "mvc/routes.py").read_text(encoding="utf-8")
-        assert "mfa_available" in content
+        assert "mfa" not in content.lower(), (
+            "Le squelette neutre ne doit plus référencer MFA : "
+            "le câblage vit dans welcome-optin-mfa/routes.py.snippet."
+        )
+
+    def test_mfa_wiring_lives_in_welcome_optin_mfa_snippet(self):
+        """Le câblage MFA (garde + routes) est porté par le starter welcome-optin-mfa."""
+        snippet = (PROJECT_ROOT
+                   / "forge_cli/starters/data/welcome-optin-mfa/routes.py.snippet"
+                   ).read_text(encoding="utf-8")
+        assert "mfa_available" in snippet
+        assert "/login/mfa" in snippet
 
 
 class TestMfaGuardInControllers:
@@ -63,9 +79,12 @@ class TestMfaGuardInControllers:
         assert "_MFA_AVAILABLE" in content
         assert "_mfa_unavailable_redirect" in content
 
-    def test_routes_mfa_routes_conditional(self):
-        content = (PROJECT_ROOT / "mvc/routes.py").read_text(encoding="utf-8")
-        assert "if mfa_available():" in content
+    def test_mfa_routes_conditional_in_snippet(self):
+        """Le garde `if mfa_available():` vit désormais dans le snippet welcome-optin-mfa."""
+        snippet = (PROJECT_ROOT
+                   / "forge_cli/starters/data/welcome-optin-mfa/routes.py.snippet"
+                   ).read_text(encoding="utf-8")
+        assert "if mfa_available():" in snippet
 
 
 class TestConftestMfaImportProtected:

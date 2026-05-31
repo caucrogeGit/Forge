@@ -163,9 +163,16 @@ class TestConstanteAuthNoStorePaths:
 class TestCacheControlLogin:
     """La page login retourne Cache-Control: no-store."""
 
-    def test_login_retourne_200_ou_302(self, srv):
+    def test_login_resout_200_302_ou_404_opt_in(self, srv):
+        """/login est désormais opt-in (SKELETON-ROUTES-NEUTRAL-001).
+
+        Sur le squelette neutre, /login renvoie 404 ; avec le starter
+        users-core-auth installé, 200/302. Dans tous les cas, la protection
+        no-store doit s'appliquer (vérifiée par les tests suivants) : le
+        middleware protège le chemin sensible indépendamment du handler.
+        """
         resp = _get(f"{srv}/login")
-        assert resp.status in (200, 302)
+        assert resp.status in (200, 302, 404)
 
     def test_login_cache_control_present(self, srv):
         hdrs = _hdrs(srv, "/login")

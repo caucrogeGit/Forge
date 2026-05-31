@@ -1,4 +1,11 @@
 # forge-starter:welcome-optin-mfa:start
-# Auth MFA — les routes /login/mfa sont câblées par le squelette Forge via mfa_available().
-# Ce starter remplace les contrôleurs stub par les versions complètes (forge-mvc-mfa requis).
+# Auth MFA — ce starter câble les routes /login/mfa (forge-mvc-mfa requis) et
+# remplace les contrôleurs stub par les versions complètes.
+from mvc.controllers.auth_controller import mfa_available
+
+if mfa_available():
+    from mvc.controllers.mfa_challenge_controller import MfaChallengeController
+    with router.group("", public=True) as pub:
+        pub.add("GET",  "/login/mfa", MfaChallengeController.form,   name="mfa_challenge_form")
+        pub.add("POST", "/login/mfa", MfaChallengeController.verify, name="mfa_challenge_verify")
 # forge-starter:welcome-optin-mfa:end
