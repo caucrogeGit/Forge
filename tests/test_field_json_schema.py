@@ -28,11 +28,11 @@ PROJECT_ROOT = Path(__file__).parent.parent
 SCHEMA_PATH = PROJECT_ROOT / "schemas" / "field.schema.json"
 
 _ALLOWED_TYPES = frozenset({
-    "string", "text", "integer", "big_integer", "float",
+    "string", "slug", "text", "integer", "big_integer", "float",
     "decimal", "boolean", "date", "datetime", "email", "password", "json",
 })
 
-_FORBIDDEN_TYPES = frozenset({"file", "image", "money", "uuid", "slug", "enum", "relation"})
+_FORBIDDEN_TYPES = frozenset({"file", "image", "money", "uuid", "enum", "relation"})
 
 _FORM_WIDGETS = frozenset({
     "input", "textarea", "select", "checkbox", "radio",

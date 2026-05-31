@@ -16,6 +16,7 @@
       "type": "string",
       "enum": [
         "string",
+        "slug",
         "text",
         "integer",
         "big_integer",

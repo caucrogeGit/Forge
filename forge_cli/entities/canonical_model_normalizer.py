@@ -34,8 +34,12 @@ _SIMPLE_TYPE_MAP: dict[str, tuple[str, str]] = {
     "datetime":    ("DATETIME",      "datetime"),
     "email":       ("VARCHAR(255)",  "str"),
     "password":    ("VARCHAR(255)",  "str"),
+    "slug":        ("VARCHAR(180)",  "str"),
     "json":        ("LONGTEXT",      "str"),
 }
+
+# Longueur de colonne d'un slug URL (ADR-017 D3) — alignée avec SlugField.
+_SLUG_MAX_LENGTH = 180
 
 
 class CanonicalNormalizationError(ValueError):
@@ -130,6 +134,11 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
         "constraints": constraints,
         "unique": bool(field.get("unique", False)),
     }
+
+    # Type slug : widget SlugField + longueur de colonne (ADR-017).
+    if forge_type == "slug":
+        normalized["form"] = {"field": "slug"}
+        normalized["constraints"]["max_length"] = _SLUG_MAX_LENGTH
 
     if "default" in field:
         normalized["default"] = field["default"]
