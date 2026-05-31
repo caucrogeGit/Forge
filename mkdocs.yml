@@ -58,6 +58,7 @@ nav:
       - Tables pivot many-to-many: entities/pivots-many-to-many.md
       - Pivot advanced: entities/pivot-advanced.md
       - Types Forge vers MariaDB: entities/types-forge-mariadb.md
+      - Slugs: entities/slugs.md
       - Valider les contrats JSON: entities/entity-validate.md
       - Autocomplétion VS Code: entities/vscode-json-schema.md
       - Limites des contrats JSON: entities/limites-contrats-json.md

@@ -15,6 +15,7 @@ Dans les JSON canoniques Forge, les champs utilisent des **types Forge**, pas de
 | Type Forge | SQL MariaDB | Python | Notes |
 |---|---|---|---|
 | `string` | `VARCHAR(n)` | `str` | n = `max_length` (défaut 255) |
+| `slug` | `VARCHAR(180)` | `str` | identifiant URL ; widget `SlugField` ; voir [Slugs](slugs.md) |
 | `text` | `TEXT` | `str` | |
 | `integer` | `INT` | `int` | |
 | `big_integer` | `BIGINT` | `int` | |
