@@ -54,8 +54,7 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
     spec = SUPPORTED_OPTINS.get(name)
     if spec is None:
         print(f"{STATUS_ERROR} opt-in non débranchable : {name}")
-        print(f"Opt-ins supportés : {', '.join(sorted(SUPPORTED_OPTINS))}")
-        print(f"{STATUS_INFO} Les autres opt-ins arriveront avec l'adaptateur (ticket 4).")
+        print(f"Opt-ins câblables (kind route) : {', '.join(sorted(SUPPORTED_OPTINS))}")
         return 2
 
     files = list(spec["files"])

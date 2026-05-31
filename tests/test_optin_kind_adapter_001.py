@@ -40,6 +40,22 @@ class TestKindClassification:
         routes = [o for o in OFFICIAL_OPTINS.values() if o.kind == KIND_ROUTE]
         assert [o.name for o in routes] == ["iot"]
 
+    def test_every_route_kind_has_enable_template(self):
+        """Garde-fou anti-drift (OPTIN-AUDIT-FIX-001, F1).
+
+        Tout opt-in de kind ``route`` doit avoir un template dans
+        ``SUPPORTED_OPTINS`` ; sinon ``opt-in:enable`` planterait (main délègue
+        au moteur route pour ces opt-ins). Empêche d'ajouter un futur opt-in
+        routier au catalogue sans son câblage.
+        """
+        from forge_cli.optins.enable import SUPPORTED_OPTINS
+
+        route_optins = {n for n, o in OFFICIAL_OPTINS.items() if o.kind == KIND_ROUTE}
+        missing = route_optins - set(SUPPORTED_OPTINS)
+        assert not missing, (
+            f"Opt-ins kind=route sans template d'enable (SUPPORTED_OPTINS) : {missing}"
+        )
+
 
 # ── enable kind-aware (library/crosscutting = guidance, n'écrit rien) ────────
 

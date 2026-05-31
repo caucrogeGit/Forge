@@ -300,7 +300,7 @@ def enable_optin(
     if spec is None:
         print(f"{STATUS_ERROR} opt-in inconnu : {name}")
         available = ", ".join(sorted(SUPPORTED_OPTINS))
-        print(f"Opt-ins disponibles : {available}")
+        print(f"Opt-ins câblables (kind route) : {available}")
         return 2
 
     print(f"Forge opt-in enable — {name}")
