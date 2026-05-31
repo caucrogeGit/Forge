@@ -32,6 +32,7 @@ et que les uploads sont **bornés** (`UPLOAD_MAX_SIZE`) et **restreints**
 - [ ] `APP_ENV=prod`.
 - [ ] Compte DB **applicatif** (`DB_APP_*`) distinct du compte **admin**
       (`DB_ADMIN_*`), avec privilèges minimaux.
+      → [Configurer les comptes MariaDB d'un projet](../install/mariadb-comptes.md).
 - [ ] `SSL_CERTFILE` / `SSL_KEYFILE` configurés (ou TLS terminé par le reverse
       proxy — voir §4).
 - [ ] Limites d'upload : `UPLOAD_MAX_SIZE`, `UPLOAD_ALLOWED_EXTENSIONS`,

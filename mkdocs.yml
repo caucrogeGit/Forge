@@ -39,6 +39,7 @@ nav:
           - Windows (résumé court): install/windows.md
       - Environnement:
           - Préparer MariaDB: install/mariadb.md
+          - Comptes MariaDB d'un projet: install/mariadb-comptes.md
           - Production: install/production.md
 
   - Premiers pas:
