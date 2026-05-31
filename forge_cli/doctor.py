@@ -373,6 +373,41 @@ def check_mfa_dependency(root: Path) -> CheckResult:
     )
 
 
+def check_prod_security(root: Path, config) -> CheckResult:
+    """Garde-fous **statiques** de sécurité production (PROD-DOCTOR-001).
+
+    Vérifie ce qui est contrôlable sans démarrer l'app : séparation des
+    privilèges base de données (l'app ne doit pas tourner avec le compte
+    admin) et bornage des uploads. Les avertissements *runtime* (session
+    mémoire en ``APP_ENV=prod``) restent émis par ``core.prod_warnings`` au
+    démarrage — ce check ne les remplace pas.
+    """
+    if config is None:
+        return CheckResult("skip", "Sécurité prod", "configuration non disponible")
+
+    risks: list[str] = []
+
+    app_login = getattr(config, "DB_APP_LOGIN", "")
+    admin_login = getattr(config, "DB_ADMIN_LOGIN", "")
+    if app_login and admin_login and app_login == admin_login:
+        risks.append("l'app utilise le compte DB admin (séparer DB_APP_LOGIN de DB_ADMIN_LOGIN)")
+
+    try:
+        max_size = int(getattr(config, "UPLOAD_MAX_SIZE", 0) or 0)
+    except (TypeError, ValueError):
+        max_size = 0
+    if max_size <= 0:
+        risks.append("UPLOAD_MAX_SIZE non borné")
+
+    exts = str(getattr(config, "UPLOAD_ALLOWED_EXTENSIONS", "") or "").strip()
+    if not exts:
+        risks.append("UPLOAD_ALLOWED_EXTENSIONS vide (extensions non restreintes)")
+
+    if risks:
+        return CheckResult("warn", "Sécurité prod", " ; ".join(risks))
+    return CheckResult("ok", "Sécurité prod", "privilèges DB séparés, uploads bornés et restreints")
+
+
 def run_all(root: Path, version: str) -> list[CheckResult]:
     """Exécute tous les checks dans l'ordre et retourne la liste des résultats."""
     config = load_project_config(root)
@@ -389,6 +424,7 @@ def run_all(root: Path, version: str) -> list[CheckResult]:
         lambda: check_ssl(root, config),
         lambda: check_node(),
         lambda: check_db(root, config),
+        lambda: check_prod_security(root, config),
     ]
     results: list[CheckResult] = []
     for fn in checks:
