@@ -603,7 +603,7 @@ def test_cli_apply_prints_executed_files(monkeypatch, capsys):
     monkeypatch.setattr(
         migrations,
         "apply_pending_migrations",
-        lambda: [
+        lambda *a, **k: [
             MigrationFile(
                 version="20260502193000",
                 name="create_contacts",
@@ -623,7 +623,7 @@ def test_cli_apply_prints_executed_files(monkeypatch, capsys):
 
 
 def test_cli_apply_prints_no_migration_message(monkeypatch, capsys):
-    monkeypatch.setattr(migrations, "apply_pending_migrations", lambda: [])
+    monkeypatch.setattr(migrations, "apply_pending_migrations", lambda *a, **k: [])
 
     migrations.main(["migration:apply"])
 

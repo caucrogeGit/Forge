@@ -235,6 +235,7 @@ def apply_pending_migrations(
     migrations_dir: Path = MIGRATIONS_DIR,
     *,
     db=None,
+    dry_run: bool = False,
 ) -> list[MigrationFile]:
     connection = db or _connect_db()
     should_close = db is None
@@ -251,8 +252,11 @@ def apply_pending_migrations(
             for migration in sorted(local_migrations, key=lambda item: item.version)
             if migration.version in pending_versions
         ]
-        applied: list[MigrationFile] = []
+        # dry-run : on retourne ce qui SERAIT appliqué sans rien exécuter.
+        if dry_run:
+            return pending
 
+        applied: list[MigrationFile] = []
         for migration in pending:
             _apply_one_migration(connection, migration)
             applied.append(migration)
@@ -442,8 +446,11 @@ def main(argv: list[str] | None = None) -> None:
         print("Usage : forge migration:make <nom> --from-diff <Entite>")
         print("Usage : forge migration:diff --entity <Entite>")
         raise SystemExit(1)
-    if args[0] in {"migration:status", "migration:apply"} and len(args) != 1:
+    if args[0] == "migration:status" and len(args) != 1:
         print(f"Usage : forge {args[0]}")
+        raise SystemExit(1)
+    if args[0] == "migration:apply" and args[1:] not in ([], ["--dry-run"], ["--help"]):
+        print("Usage : forge migration:apply [--dry-run]")
         raise SystemExit(1)
     if args[0] == "migration:make" and not _is_valid_make_args(args):
         print("Usage : forge migration:make <nom>")
@@ -490,7 +497,7 @@ def main(argv: list[str] | None = None) -> None:
         if args[0] == "migration:status":
             _run_status_command()
         elif args[0] == "migration:apply":
-            _run_apply_command()
+            _run_apply_command(args)
         elif args[0] == "migration:make":
             _run_make_command(args)
         else:
@@ -522,15 +529,29 @@ def _run_status_command() -> None:
     _print_status_table(report.statuses)
 
 
-def _run_apply_command() -> None:
-    applied = apply_pending_migrations()
+def _run_apply_command(args: list[str]) -> None:
+    dry_run = "--dry-run" in args
+    result = apply_pending_migrations(dry_run=dry_run)
+
+    if dry_run:
+        if not result:
+            print("[DRY-RUN] Aucune migration à appliquer.")
+            return
+        print(f"[DRY-RUN] {len(result)} migration(s) seraient appliquées (rien n'est écrit) :")
+        for migration in result:
+            print(f"  • {migration.filename}")
+            sql = migration.path.read_text(encoding="utf-8").strip()
+            print("      " + sql.replace("\n", "\n      "))
+        print("[DRY-RUN] Relance sans --dry-run pour appliquer réellement.")
+        return
+
     print("[OK] Application des migrations.")
-    if not applied:
+    if not result:
         print("Aucune migration à appliquer.")
         return
-    for migration in applied:
+    for migration in result:
         print(f"[EXECUTE] {migration.filename}")
-    print(f"[OK] {len(applied)} migration(s) appliquée(s).")
+    print(f"[OK] {len(result)} migration(s) appliquée(s).")
 
 
 def _run_make_command(args: list[str]) -> None:
