@@ -32,6 +32,7 @@ EXPECTED_MODULES = {
 }
 
 _SECTION_PATTERNS = [
+    r"##\s+Opt-ins officiels",  # vocabulaire canonique (OPTIN-VOCAB-001, ADR-016)
     r"##\s+Modules officiels",
     r"##\s+Modules opt-in",
     r"##\s+Optional modules",

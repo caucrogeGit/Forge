@@ -28,7 +28,7 @@ Forge IoT doit rester :
 | Brique | Type | Statut |
 |--------|------|--------|
 | Forge Core (`forge-mvc`) | Framework MVC HTTP générique | existe |
-| `forge-mvc-iot` | Module officiel opt-in (futur) | à créer |
+| `forge-mvc-iot` | Opt-in officiel (futur) | à créer |
 | Mosquitto | Broker MQTT local recommandé | externe |
 | Broker MQTT cloud | Alternative possible (HiveMQ, EMQX, AWS IoT, …) | externe, non prioritaire |
 | Forge Design IoT | Interface de lecture (futur) | à créer |

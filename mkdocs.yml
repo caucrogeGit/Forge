@@ -70,8 +70,9 @@ nav:
       - Index: reference/reference.md
       - Commandes CLI: reference/cli-commands.md
       - API Forge complète: reference/api.md
+      - Vocabulaire opt-in: reference/vocabulaire-opt-in.md
       - Convention HTTP inspectable: reference/http.md
-      - Modules officiels:
+      - Opt-ins officiels:
           - Workflow: reference/workflow.md
           - Statistiques: reference/stats.md
           - Modules Forge: reference/modules.md

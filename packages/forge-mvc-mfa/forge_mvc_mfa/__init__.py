@@ -1,6 +1,6 @@
 """forge-mvc-mfa — Module MFA pour Forge : TOTP, codes de recuperation, anti-replay, rate-limit.
 
-Module officiel Forge distribue separement depuis Forge 2.4.0.
+Opt-in officiel Forge distribue separement depuis Forge 2.4.0.
 Voir packages/forge-mvc-mfa/README.md pour la documentation.
 """
 from forge_mvc_mfa.secret_crypto import (

@@ -103,8 +103,8 @@ class TestApiDocSeparatesGenericFromApplicative:
 
     def test_api_md_modules_lists_forge_mvc_media(self):
         text = API_DOC.read_text(encoding="utf-8")
-        assert "forge-mvc-media" in text[text.find("Modules officiels"):], (
-            "La section Modules officiels doit inclure forge-mvc-media."
+        assert "forge-mvc-media" in text[text.find("Opt-ins officiels"):], (
+            "La section Opt-ins officiels doit inclure forge-mvc-media."
         )
 
 

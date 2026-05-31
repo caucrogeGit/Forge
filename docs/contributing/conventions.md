@@ -208,7 +208,7 @@ Origine : Découvert dans l'écosystème Forge (sessions, rate-limit).
 
 ### C.2 — Convention `register_<module>_routes(router)`
 
-Les modules officiels Forge exposent une **fonction d'enregistrement**
+Les opt-ins Forge exposent une **fonction d'enregistrement**
 plutôt qu'un objet `router` à importer puis attacher :
 
 ```python

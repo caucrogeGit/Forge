@@ -66,7 +66,7 @@ flowchart LR
 - [CRUD enrichi et relations](crud.md) — relations avancées entre entités
 - [Pages publiques](pages-publiques.md) — génération de pages génériques
 
-### Modules officiels
+### Opt-ins officiels
 
 - [Workflow](workflow.md) — statuts et transitions (`forge-mvc-workflow`)
 - [Statistiques](stats.md) — tracking d'événements (`forge-mvc-stats`)
@@ -85,20 +85,20 @@ flowchart LR
 
 ---
 
-## Modules officiels
+## Opt-ins officiels
 
-Les modules suivants sont distribués séparément du core :
+Les opt-ins suivants sont distribués séparément du core :
 
-| Module | Paquet PyPI | README |
+| Opt-in | Paquet PyPI | README |
 |---|---|---|
 | MFA | `forge-mvc-mfa` | `packages/forge-mvc-mfa/README.md` |
 | RBAC | `forge-mvc-rbac` | `packages/forge-mvc-rbac/README.md` |
 | Workflow | `forge-mvc-workflow` | `packages/forge-mvc-workflow/README.md` |
 | Statistiques | `forge-mvc-stats` | `packages/forge-mvc-stats/README.md` |
 
-Les pages de référence ci-dessus documentent l'API publique de ces modules
+Les pages de référence ci-dessus documentent l'API publique de ces opt-ins
 pour mémoire. Pour l'installation, l'usage applicatif et les exemples,
-voir le README de chaque module.
+voir le README de chaque opt-in.
 
 ---
 

@@ -95,14 +95,14 @@ class HomeController:
 - Générateurs prudents : Forge ne réécrit pas votre code
 - Documentation officielle complète
 - Sécurité web par défaut (CSRF, Argon2id, headers, autoescape)
-- Noyau minimal, modules opt-in
+- Noyau minimal, opt-ins
 - Python 3.12+, dépendances explicites
 
 ---
 
-## Modules officiels opt-in
+## Opt-ins officiels
 
-| Module | Rôle |
+| Opt-in | Rôle |
 |--------|------|
 | [`forge-mvc-rbac`](https://pypi.org/project/forge-mvc-rbac/) | Rôles et permissions déclaratives |
 | [`forge-mvc-workflow`](https://pypi.org/project/forge-mvc-workflow/) | Cycles de vie applicatifs (statuts, transitions) |
@@ -111,7 +111,7 @@ class HomeController:
 | [`forge-mvc-media`](https://pypi.org/project/forge-mvc-media/) | Gestion applicative des médias |
 | [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) — **Alpha** |
 
-Chaque module reste optionnel : le core Forge ne dépend d'aucun d'eux.
+Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Installez-les à la demande, par exemple `pip install --pre forge-mvc-rbac`.
 `forge-mvc-iot` est au statut **Alpha** : il s'installe **explicitement et
 séparément** (`pip install --pre forge-mvc-iot`) et n'est **pas** inclus dans

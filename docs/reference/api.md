@@ -3010,17 +3010,17 @@ Documentation complète : [RBAC — Contrôle d'accès](../features/rbac.md).
 
 ---
 
-## Modules officiels (opt-in)
+## Opt-ins officiels
 
-Forge sépare le **core minimal** des **modules officiels** distribués
+Forge sépare le **core minimal** des **opt-ins officiels** distribués
 séparément. Le core couvre les primitives générales (HTTP, routing, sessions,
-mots de passe Argon2id, CSRF, uploads, SQL explicite). Les modules officiels
+mots de passe Argon2id, CSRF, uploads, SQL explicite). Les opt-ins officiels
 ajoutent des fonctionnalités spécialisées installables via les extras pip.
 
-Chaque module est livré comme paquet PyPI distinct sous le namespace
+Chaque opt-in est livré comme package PyPI distinct sous le namespace
 `forge-mvc-*` et expose son API depuis le namespace Python `forge_mvc_*`.
 
-| Module | Package PyPI | Extra pip | Documentation détaillée |
+| Opt-in | Package PyPI | Extra pip | Documentation détaillée |
 |---|---|---|---|
 | MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa.md](auth-mfa.md) |
 | RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../features/rbac.md) |

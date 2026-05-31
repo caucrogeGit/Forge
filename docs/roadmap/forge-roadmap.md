@@ -22,7 +22,7 @@ Précédent : v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-bet
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
 > et Forge 2.0.2 (cohérence documentaire). La Phase 14 (refonte vers 3.0) a reconstruit
-> le cœur minimal, extrait les modules officiels (`forge-mvc-mfa`, `forge-mvc-rbac`,
+> le cœur minimal, extrait les opt-ins officiels (`forge-mvc-mfa`, `forge-mvc-rbac`,
 > `forge-mvc-workflow`, `forge-mvc-stats`) et migré l'API publique en anglais (ADR-003),
 > aboutissant à Forge 2.10.0 puis à la release candidate 3.0.0rc1, puis au tag stable v3.0.0.
 > Voir le [journal d'avancement détaillé](../history/forge-roadmap-history-2.0.md).

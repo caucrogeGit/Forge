@@ -177,6 +177,7 @@ class TestNoUnexpectedSubfiles:
             "reference-schema.md",
             "api-json.md",
             "runtime-errors-schema.md",
+            "vocabulaire-opt-in.md",  # glossaire canonique (OPTIN-VOCAB-001, ADR-016)
         }
         actual = {f.name for f in REFERENCE_DIR.glob("*.md")}
         unexpected = actual - expected
