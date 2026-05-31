@@ -22,3 +22,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-013](013-nullable-required-contract-policy.md) | Politique nullable / required des contrats |
 | [ADR-014](014-rbac-contract-location.md) | Emplacement du contrat RBAC |
 | [ADR-015](015-dev-tls-handshake-per-thread.md) | Handshake TLS par thread (dev-server) |
+| [ADR-016](016-opt-in-unification.md) | Unification du modèle opt-in : concept unique, cycle install/enable à 4 verbes |
