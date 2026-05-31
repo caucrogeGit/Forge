@@ -107,3 +107,49 @@ Phase 4 (dogfood) = **vrai go/no-go** avant clôture.
 Suffixe slug auto, `slug_history`/redirections 301, sitemap, recherche avancée,
 pagination avancée, admin, multi-SGBD, Docker officiel, monitoring, ORM, SPA,
 marketplace.
+
+---
+
+## Annexe — Carte d'implémentation `SLUG-SQL-CRUD-001`
+
+> Investigation faite ; design figé ; **implémentation reportée** (effort
+> dédié). À reprendre idéalement **avec MariaDB** pour valider le CRUD généré,
+> ou via la Phase 4 (dogfood). Cette carte évite de refaire l'investigation.
+
+### Décisions figées
+
+- Le slug est **généré depuis un champ source** (ex. `titre`), pas saisi.
+- Slug **stable à l'édition** (généré une fois à la création ; changer le titre
+  ne change pas l'URL → pas de redirection 301, reportée post-1.0).
+- Doublon d'unicité → **erreur claire** (« ce slug existe déjà »), **pas** de
+  suffixe auto `-2/-3` (ADR-017 D4).
+
+### Constat clé du pipeline
+
+Forge a un pipeline d'entité **multi-couches** : JSON utilisateur (`type`) →
+**normaliseur** → forme canonique (`sql_type` / `form.field`) → générateurs.
+`slug` existe au niveau *form normalisé* (`SUPPORTED_FORM_FIELD_VALUES`) mais
+**pas** comme `type` utilisateur (l'enum `type` de `field.schema.json` ne le
+contient pas). Le SQL est déjà géré (`build_entity_sql` produit `UNIQUE KEY`
+depuis `unique: true`).
+
+### Changements par couche
+
+| Couche | Fichier(s) | Changement |
+|---|---|---|
+| Schéma (×2 à synchroniser) | `schemas/field.schema.json` **et** `forge_cli/schemas/field.schema.json` | ajouter `slug` à l'enum `type` ; ajouter la propriété `source` (string) |
+| Normaliseur | `forge_cli/entities/canonical_model_normalizer.py` | `type:slug` → `sql_type:VARCHAR(180)`, `form.field:slug` ; propager `source` |
+| Validation | `forge_cli/entities/validation.py` | `source` dans `ALLOWED_FIELD_KEYS` ; règle sémantique : `source` réfère un champ texte existant de l'entité |
+| Form | `forge_cli/entities/crud/form_builder.py` | exclure du formulaire un champ slug porteur de `source` (auto-généré) |
+| Contrôleur | `forge_cli/entities/crud/controller_builder.py` | à la création : `data = dict(form.cleaned_data); data["<slug>"] = slugify(data["<source>"])` (via `core.slug`) avant `add_…(data)` ; envelopper l'INSERT pour capter l'erreur d'unicité → message clair |
+| Modèle | `forge_cli/entities/crud/model_builder.py` | **exclure** le champ slug auto de l'`UPDATE` (stable à l'édition) ; le garder dans l'`INSERT` |
+
+### Garde-fous / validation
+
+- Tests **structurels** façon `test_make_crud` : le contrôleur généré contient
+  `slugify(`, le slug est absent du formulaire, l'INSERT a la colonne slug,
+  l'`UPDATE` ne l'a pas, le `try/except` de doublon est présent.
+- `compileall` du CRUD généré (échantillon) pour attraper toute erreur de
+  syntaxe.
+- **Validation runtime (DB)** : déférée au dogfood Phase 4 (les e2e MariaDB
+  sont gated par la disponibilité d'une base).
