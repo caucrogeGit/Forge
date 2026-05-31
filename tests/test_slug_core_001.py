@@ -91,3 +91,10 @@ class TestSingleSource:
         # slugify_migration_name (snake_case, filenames) reste distinct (ADR-017 D1).
         src = (PROJECT_ROOT / "forge_cli" / "entities" / "migrations.py").read_text(encoding="utf-8")
         assert "def slugify_migration_name" in src
+
+    def test_slugfield_delegates_to_core_slug(self):
+        # SLUG-VALIDATION-001 : SlugField valide via core.slug, sans regex locale.
+        src = (PROJECT_ROOT / "core" / "forms" / "fields.py").read_text(encoding="utf-8")
+        assert "from core.slug import is_valid_slug" in src
+        assert "is_valid_slug(value" in src
+        assert "_SLUG_RE" not in src

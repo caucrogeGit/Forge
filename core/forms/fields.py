@@ -5,6 +5,7 @@ import re
 from decimal import Decimal, InvalidOperation
 
 from core.forms.exceptions import ValidationError
+from core.slug import is_valid_slug
 from core.uploads.exceptions import UploadError
 from core.uploads.validators import validate_extension, validate_mime_type, validate_size
 
@@ -456,17 +457,16 @@ class RelationField(ChoiceField):
         self.target_label_field = target_label_field
 
 
-_SLUG_RE = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
-
-
 class SlugField(StringField):
     def __init__(self, **kwargs):
         kwargs.setdefault("max_length", 120)
         super().__init__(**kwargs)
 
     def validate(self, value: str) -> None:
+        # Vide / longueur / min sont gérés par StringField.validate ;
+        # le format URL-slug est délégué au module canonique (ADR-017, §11).
         super().validate(value)
-        if not _SLUG_RE.fullmatch(value):
+        if not is_valid_slug(value, max_length=self.max_length):
             raise ValidationError(
                 f"Le champ {self.display_label} doit contenir uniquement des lettres"
                 " minuscules, des chiffres et des tirets, sans tiret au debut ou a la fin."
