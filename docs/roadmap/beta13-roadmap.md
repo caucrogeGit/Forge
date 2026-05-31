@@ -71,11 +71,18 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 > ajoute le check sécurité-prod du doctor, le dry-run des migrations, et la
 > documentation de déploiement.
 
-## Phase 4 — Field test *(dogfooding)* ⛓️ après 2+3
+## Phase 4 — Field test *(dogfooding)* ⛓️ après 2+3 — ✅ **complète**
 
-| Ticket | Type | Objet |
+| Ticket | État | Objet |
 |---|---|---|
-| `BETA13-DOGFOOD-001` | 🔨 | Construire une vraie petite app (BTS CIEL : catalogue à slugs + page IoT) avec Forge tel quel. **Vrai go/no-go.** |
+| `BETA13-DOGFOOD-001` | ✅ livré | Pipeline slug validé **bout-en-bout contre une vraie MariaDB**, sous forme reproductible : `tests/test_e2e_slug_mariadb.py` (gated `FORGE_E2E_MARIADB`). |
+
+> **Forme retenue** : plutôt qu'une app jetable, un **test e2e committé** qui
+> rejoue le pipeline réel — entité `Article` (`title` + `slug` auto depuis
+> `title`) → `build_entity_sql` → `apply_model_sql` sur la base → introspection
+> (`Slug VARCHAR(180)` + `UNIQUE`) → runtime `slugify()`→INSERT→lecture par slug
+> → **rejet du doublon** par la contrainte d'unicité. 7/7 verts sur MariaDB ;
+> SKIPPED proprement sans la base. C'est le **go** : le slug fonctionne en réel.
 
 ## Phase 5 — Clôture & release ⛓️ tout vert
 
