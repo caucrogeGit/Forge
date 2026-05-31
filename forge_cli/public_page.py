@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import forge_cli.output as out
+from core.slug import slugify
 
 
 TEMPLATE_DIR = Path("mvc/views/public")
@@ -38,22 +39,16 @@ class MakePublicPageResult:
 
 
 def _slugify(name: str) -> str:
+    """Valide un nom de page et le réduit à une URL slug.
+
+    Rejette explicitement les chemins (sécurité ``make:public-page`` : on ne
+    crée pas une page à partir de ``../admin``), puis délègue la transformation
+    au module URL-slug canonique ``core.slug`` (ADR-017, §11).
+    """
     value = name.strip()
-    if not value:
-        raise ValueError("Nom de page vide.")
     if any(part in value for part in ("/", "\\", "..")):
         raise ValueError("Nom de page invalide : les chemins ne sont pas autorisés.")
-    if value.startswith("-") or value.endswith("-"):
-        raise ValueError("Nom de page invalide : le tiret ne peut pas être en bordure.")
-
-    value = value.replace("_", "-")
-    value = re.sub(r"([a-z0-9])([A-Z])", r"\1-\2", value)
-    value = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1-\2", value)
-    value = value.lower()
-
-    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", value):
-        raise ValueError("Nom de page invalide : utilisez lettres, chiffres et tirets.")
-    return value
+    return slugify(value)
 
 
 def build_public_page_spec(name: str) -> PublicPageSpec:
