@@ -7,6 +7,7 @@ from forge_cli.entities.crud.utils import (
     _FORM_FIELD_CLASS_MAP,
     _FORM_FIELD_STR_CONSTRAINTS,
     _humanize,
+    _is_generated,
     _media_form_fields,
     _non_pk_fields,
     _relation_by_field,
@@ -138,12 +139,13 @@ def build_form(
 ) -> tuple[str, list[str]]:
     """Retourne (code_python, liste_avertissements)."""
     entity = definition["entity"]
-    non_pk = _non_pk_fields(definition)
+    # Les champs auto-générés (slug avec source) sont absents du formulaire.
+    form_fields = [f for f in _non_pk_fields(definition) if not _is_generated(f)]
     relations_by_field = _relation_by_field(relations)
     warnings: list[str] = []
     field_lines: list[str] = []
 
-    for f in non_pk:
+    for f in form_fields:
         code, warn = _form_field_code(f, relations_by_field)
         if warn:
             warnings.append(warn)
@@ -158,7 +160,7 @@ def build_form(
         cls = "ImageField" if entry["field"] == "image" else "FileField"
         field_lines.append(f'    {mname} = {cls}(label="{mlabel}", required={mrequired})')
 
-    imports = _form_imports(non_pk, relations, media_entries=media_entries)
+    imports = _form_imports(form_fields, relations, media_entries=media_entries)
     lines: list[str] = [
         f"from core.forms import Form, {imports}",
         "",

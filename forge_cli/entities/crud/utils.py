@@ -30,6 +30,16 @@ def _non_pk_fields(definition: dict) -> list[dict]:
     return [f for f in definition["fields"] if not f.get("primary_key")]
 
 
+def _is_generated(field: dict) -> bool:
+    """Champ auto-généré depuis un champ source (slug avec ``source``).
+
+    Exclu du formulaire et de l'``UPDATE`` (stable à l'édition) mais conservé
+    dans l'``INSERT`` — le contrôleur le calcule via ``core.slug.slugify`` à la
+    création (ADR-017, SLUG-SQL-CRUD-001).
+    """
+    return bool(field.get("source"))
+
+
 _FORM_FIELD_CLASS_MAP: dict[str, str] = {
     "string":   "StringField",
     "email":    "EmailField",

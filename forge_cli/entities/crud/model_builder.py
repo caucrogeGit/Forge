@@ -8,6 +8,7 @@ from forge_cli.entities.crud.context import (
 )
 from forge_cli.entities.crud.utils import (
     _filter_fields,
+    _is_generated,
     _non_pk_fields,
     _pk_field,
     _text_search_fields,
@@ -47,9 +48,12 @@ def build_model(
     else:
         new_insert_exec = "execute(INSERT)"
 
-    if non_pk:
-        update_set = ", ".join(f'{f["column"]} = ?' for f in non_pk)
-        update_values = ", ".join(f'data["{f["name"]}"]' for f in non_pk)
+    # Un champ auto-généré (slug avec source) est stable à l'édition :
+    # exclu de l'UPDATE (ADR-017 D4), mais conservé dans l'INSERT.
+    update_fields = [f for f in non_pk if not _is_generated(f)]
+    if update_fields:
+        update_set = ", ".join(f'{f["column"]} = ?' for f in update_fields)
+        update_values = ", ".join(f'data["{f["name"]}"]' for f in update_fields)
         update_constant = f'"UPDATE {table} SET {update_set} WHERE {pk_col} = ?"'
         update_exec = f"execute(UPDATE, ({update_values}, {pk_name}))"
     else:

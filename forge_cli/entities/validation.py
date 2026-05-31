@@ -24,6 +24,7 @@ ALLOWED_FIELD_KEYS = {
     "unique",
     "form",
     "list",
+    "source",
 }
 ALLOWED_FORM_KEYS = {"field"}
 SUPPORTED_FORM_FIELD_VALUES = {
@@ -502,6 +503,8 @@ def _normalize_field_data(
         normalized_field["form"] = dict(field["form"])
     if "list" in field and isinstance(field.get("list"), dict):
         normalized_field["list"] = dict(field["list"])
+    if "source" in field and isinstance(field.get("source"), str):
+        normalized_field["source"] = field["source"]
     return normalized_field
 
 
@@ -564,6 +567,20 @@ def _validate_entity_local_consistency(data: dict[str, Any], issues: list[Entity
     elif len(primary_key_indexes) > 1:
         indexes = ", ".join(f"fields[{index}]" for index in primary_key_indexes)
         _add_issue(issues, "fields", f"une seule cle primaire est autorisee (trouvees: {indexes})")
+
+    # Slug auto-généré : `source` doit référer un champ existant (et non lui-même).
+    for index, field in enumerate(fields):
+        if not isinstance(field, dict):
+            continue
+        src = field.get("source")
+        if src is None:
+            continue
+        if src not in field_names:
+            _add_issue(issues, f"fields[{index}].source",
+                       f"reference un champ inexistant : {src!r}")
+        elif src == field.get("name"):
+            _add_issue(issues, f"fields[{index}].source",
+                       "ne peut pas se referencer lui-meme")
 
     media = data.get("media")
     if isinstance(media, list):

@@ -10,6 +10,7 @@ from forge_cli.entities.crud.utils import (
     _filter_fields,
     _humanize,
     _is_bool_sql,
+    _is_generated,
     _media_form_fields,
     _non_pk_fields,
     _pk_field,
@@ -35,6 +36,8 @@ def build_controller(
     pk_name = pk["name"]
     pk_col = pk["column"]
     non_pk = _non_pk_fields(definition)
+    # Champs slug auto-générés : (nom, champ source) — calculés à la création.
+    generated_fields = [(f["name"], f["source"]) for f in non_pk if _is_generated(f)]
     allowed_sort_keys = [f["name"] for f in non_pk] + [pk_name]
     allowed_sort_keys_repr = "{" + ", ".join(f'"{key}"' for key in allowed_sort_keys) + "}"
     choice_relations = _unique_choice_relations(relations)
@@ -73,6 +76,8 @@ def build_controller(
         "from core.http.request import Request",
         "from core.http.response import Response",
     ]
+    if generated_fields:
+        lines.append("from core.slug import slugify")
     if _rbac:
         lines.append("from forge_mvc_rbac import require_permission")
     lines += [
@@ -369,6 +374,12 @@ def build_controller(
         "                },",
         "                request=request)",
     ]
+    # Slug auto-généré depuis son champ source (stable ensuite ; ADR-017).
+    for _gen_name, _gen_source in generated_fields:
+        create_lines.append(
+            f'        form.cleaned_data["{_gen_name}"] = '
+            f'slugify(form.cleaned_data["{_gen_source}"])'
+        )
     if ctrl_media_entries:
         for entry in ctrl_media_entries:
             if not entry.get("multiple", False):

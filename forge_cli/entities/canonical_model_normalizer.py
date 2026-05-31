@@ -139,6 +139,10 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
     if forge_type == "slug":
         normalized["form"] = {"field": "slug"}
         normalized["constraints"]["max_length"] = _SLUG_MAX_LENGTH
+        # Slug auto-généré depuis un champ source (étape B) : propagé tel quel,
+        # consommé par le générateur CRUD (form exclu, slugify à la création).
+        if "source" in field:
+            normalized["source"] = field["source"]
 
     if "default" in field:
         normalized["default"] = field["default"]

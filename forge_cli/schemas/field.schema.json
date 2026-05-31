@@ -62,6 +62,10 @@
       "minimum": 1,
       "maximum": 10000
     },
+    "source": {
+      "description": "Champ source d'un slug auto-généré (type slug). Le slug est généré depuis ce champ, absent du formulaire, et reste stable à l'édition.",
+      "$ref": "common.schema.json#/$defs/fieldName"
+    },
     "min": {
       "description": "Valeur minimale pour les types numériques.",
       "type": "number"
