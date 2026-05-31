@@ -148,8 +148,26 @@ depuis `unique: true`).
 
 - Tests **structurels** façon `test_make_crud` : le contrôleur généré contient
   `slugify(`, le slug est absent du formulaire, l'INSERT a la colonne slug,
-  l'`UPDATE` ne l'a pas, le `try/except` de doublon est présent.
+  l'`UPDATE` ne l'a pas.
 - `compileall` du CRUD généré (échantillon) pour attraper toute erreur de
   syntaxe.
 - **Validation runtime (DB)** : déférée au dogfood Phase 4 (les e2e MariaDB
   sont gated par la disponibilité d'une base).
+
+### Avancement & inconnues résolues (investigation)
+
+- ✅ **Commit A livré** (`af09e7a`) : `type: slug` → `VARCHAR(180)` + `SlugField`
+  (saisie manuelle validée). Le type slug est **utilisable dès maintenant**.
+- **Commit B** (auto-génération depuis `source`) — ~6 fichiers : schémas ×2
+  (`source`), normaliseur (propage `source`), `validation.py` (`source` dans
+  `ALLOWED_FIELD_KEYS` + règle « réfère un champ texte existant »),
+  `crud/utils.py` (helper `_is_generated(f)` = a un `source` ; **`_non_pk_fields`
+  est partagé** form/model → l'exclusion doit être ciblée), `form_builder`
+  (exclure le champ généré), `controller_builder`
+  (`_data["slug"] = slugify(_data[source])` avant `add_…`), `model_builder`
+  (exclure le slug généré de l'`UPDATE`).
+- **Doublon** : la contrainte `UNIQUE` **garantit déjà** zéro slug dupliqué.
+  Le *message d'erreur clair* (catch `DoublonError`) est une **lacune générale
+  du générateur** (le CRUD généré ne wrappe l'INSERT pour **aucun** champ
+  unique aujourd'hui) → sous-chantier séparé `CRUD-DUP-HANDLING-001`, pas
+  slug-spécifique.
