@@ -148,6 +148,7 @@ nav:
           - Communes & Séjours — reconstruction: starters/old/communes-sejours/rebuild.md
 
   - Déploiement:
+      - Checklist de production: deployment/production-checklist.md
       - Guide de déploiement: deployment/deployment.md
       - Déploiement WSGI minimal: deployment/wsgi-deployment.md
       - Limites de production: deployment/production-limits.md
