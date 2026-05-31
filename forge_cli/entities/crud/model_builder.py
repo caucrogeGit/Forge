@@ -35,6 +35,8 @@ def build_model(
     pk_name = pk["name"]
     non_pk = _non_pk_fields(definition)
     auto_inc = pk.get("auto_increment", False)
+    # Champs slug → lookup get_<snake>_by_<slug>() pour le routing public (ADR-017).
+    slug_fields = [f for f in definition["fields"] if (f.get("form") or {}).get("field") == "slug"]
 
     insert_fields = non_pk if auto_inc else definition["fields"]
     insert_cols = ", ".join(f["column"] for f in insert_fields)
@@ -255,4 +257,21 @@ def build_model(
             "        for target_id in selected_ids:",
             f'            execute("INSERT INTO {relation.pivot_table} ({relation.source_key}, {relation.target_key}) VALUES (?, ?)", ({pk_name}, target_id), tx=tx)',
         ])
+
+    # Lookup par slug : inséré juste après get_<snake>_by_id (routing public).
+    if slug_fields:
+        anchor = f"    return fetch_one(SELECT_BY_ID, ({pk_name},))"
+        pos = lines.index(anchor) + 1
+        block: list[str] = []
+        for sf in slug_fields:
+            sname = sf["name"]
+            scol = sf["column"]
+            block += [
+                "",
+                "",
+                f"def get_{snake}_by_{sname}({sname}):",
+                f'    return fetch_one("SELECT * FROM {table} WHERE {scol} = ?", ({sname},))',
+            ]
+        lines[pos:pos] = block
+
     return "\n".join(lines)
