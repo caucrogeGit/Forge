@@ -1,0 +1,109 @@
+# Roadmap — `1.0.0-beta.13`
+
+> **Thème** : *dernière beta fonctionnelle* — slugs, gel du contrat public,
+> production-readiness. **Finalité** : `RELEASE-BETA13-001`.
+>
+> **Principe directeur** : finir et **figer** ce qui existe ; une seule vraie
+> feature (slugs). beta.14 sera la beta de *stabilisation* (doc + field-fixes,
+> **zéro feature**) — jalon séparé, hors de cette roadmap.
+
+---
+
+## État de l'existant (`BETA13-EXISTING-AUDIT-001`)
+
+Beaucoup de « net-new » supposé est en réalité **déjà présent, partiel**. Cet
+audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋 auditer/documenter.
+
+| Domaine | Existe déjà | Manque | Verdict |
+|---|---|---|---|
+| **slug (type)** | type `slug` dans le contrat d'entité (`forge_cli/entities/validation.py`) + `SlugField` CRUD + `_slugify` (validateur **strict**, rejette les accents) + `slugify_migration_name` | vrai `slugify` (translittération accents), `find_by_slug`, routing public `{slug}`, gestion d'unicité ; **3 fonctions slug à consolider (§11)** | 🔧 + 🔨 |
+| **forge doctor** | 11 checks (db, env, ssl, migrations, structure, modules…) | checks **prod-sécurité** (debug off, cookies sécurisés, session non-mémoire, secret présent, perms `storage/`) | 🔧 étendre |
+| **/health** | documenté (`GET /health → {"status":"ok"}`) | vérifier l'implémentation réelle + option `--db` | 📋 + 🔧 |
+| **migrations** | `migration:status/apply/make/diff` | **pas de dry-run/confirm/garde-env trouvés** sur `apply` | 🔨 durcir (réel) |
+| **erreurs prod** | gating dev/prod **existe** (`DX-RENDER-ERROR-001`, `core/http/helpers.py`) | request-id, masquage secrets, audit 403/404/500 | 🔧 compléter |
+| **forge update** | commande existante (détection pipx) | finalisation (pip/pipx/source, jamais d'écrasement projet) | 🔧 finaliser |
+| **uploads** | durci récemment (`SEC-UPLOAD-IMAGE-VERIFY-001/002`) | audit final (traversal, MIME, taille configurable) | 📋 auditer |
+
+> **Conclusion** : b13 = *auditer → consolider → durcir → geler*. Seuls
+> **slug-routing** et **migration-safety** sont du vrai « construire ».
+
+---
+
+## Phase 0 — Mise à niveau *(immédiat, dé-risque tout)*
+
+| Ticket | Type | Objet |
+|---|---|---|
+| `BETA13-EXISTING-AUDIT-001` | 📋 | Cet audit (table ci-dessus). **Fait dans ce document.** |
+| `CHANGELOG-DELTA-B12-B13-001` | 📋 | Section `beta.13` documentant les 65 commits post-beta.12. |
+
+## Phase 1 — Gel du contrat public *(cheap, arrête la valse de renommages)*
+
+| Ticket | Type | Objet · ⛓️ |
+|---|---|---|
+| `CLI-PUBLIC-CONTRACT-FREEZE-001` | 📋 | Commandes publiques vs internes ; **verrouiller `opt-in:*` (enable/disable réels = route-only, final) ET `module:*` (public-stable, A2)** ; codes de sortie ; `forge help` ↔ `cli-commands.md`. |
+| `STARTERS-FINAL-CONTRACT-001` | 📋 | Figer les 16 starters (noms, ordre, routes, fichiers). |
+| `DOCS-LINKS-FINAL-AUDIT-001` | 📋 | `mkdocs --strict` + audit liens/ancres après la réorg docs. |
+
+## Phase 2 — Slugs *(la seule vraie feature)* ⛓️ après Phase 0
+
+| Ticket | Type | Objet |
+|---|---|---|
+| `ADR-017-SLUG-TYPE` | 🔨 | ADR : sémantique du type `slug` dans le contrat d'entité (lien ADR-013, §10). |
+| `SLUG-CORE-001` | 🔧 | **Consolider** les fonctions slug en un seul `core/slug.py` canonique. **stdlib seul** (`unicodedata` NFKD). |
+| `SLUG-VALIDATION-001` | 🔧 | `is_valid_slug` officiel, **path-safe**, message stable. |
+| `SLUG-SQL-CRUD-001` | 🔧 | `VARCHAR(180) NOT NULL` + `UNIQUE` ; CRUD : slug depuis champ source, **rejet des doublons** (suffixe auto → post-1.0). |
+| `SLUG-ROUTING-001` | 🔨 | `find_by_slug` + route publique `/{ressource}/{slug}`. |
+| `SLUG-DOCS-001` | 📋 | Usage, génération, unicité, route publique, limites. |
+
+## Phase 3 — Production readiness *(surtout durcir/documenter)* ∥ Phase 2
+
+| Ticket | Type | Objet |
+|---|---|---|
+| `PROD-DOCTOR-001` | 🔧 | Étendre `forge doctor` : checks prod-sécurité. |
+| `MIGRATION-SAFETY-FINAL-001` | 🔨 | `migration:apply` : dry-run, SQL affiché, refus si env ambigu, journal, erreur si déjà appliquée. |
+| `ERRORS-PROD-FINAL-001` | 🔧 | Page d'erreur sobre, pas de stacktrace HTML prod, request-id, masquage secrets, 403/404/500. |
+| `HEALTHCHECK-FINAL-001` | 🔧 | Finaliser `/health` + option `--db`. |
+| `FORGE-UPDATE-FINAL-001` | 🔧 | Finaliser `forge update`. |
+| `PRODUCTION-CHECKLIST-DOCS-001` | 📋 | `docs/deployment/production-checklist.md`. |
+
+## Phase 4 — Field test *(dogfooding)* ⛓️ après 2+3
+
+| Ticket | Type | Objet |
+|---|---|---|
+| `BETA13-DOGFOOD-001` | 🔨 | Construire une vraie petite app (BTS CIEL : catalogue à slugs + page IoT) avec Forge tel quel. **Vrai go/no-go.** |
+
+## Phase 5 — Clôture & release ⛓️ tout vert
+
+| Ticket | Type | Objet |
+|---|---|---|
+| `BETA13-CLOSING-AUDIT-001` | 📋 | Batterie complète : `pytest` 0 échec + `ruff` + `compileall` + `mkdocs --strict` + `git diff --check` + `sync:landing --check` + cohérence version. |
+| `BETA13-BUMP-001` | 🔧 | Bump **7 versions** b12→b13 (racine + `forge.py` + 6 packages), **lockstep des pins Alpha `==`**, CHANGELOG b13 final. |
+| `RELEASE-BETA13-001` | 🔨 | Tag `v1.0.0-beta.13`, build, publication PyPI (`--pre`), sync landing. |
+| `BETA13-POST-PUBLISH-VERIFY-001` | 📋 | Vérif PyPI publique + install propre. |
+
+---
+
+## Chemin critique
+
+```
+Phase 0 ─┬─▶ Phase 1 (gel) ─────────────────┐
+         └─▶ Phase 2 (slugs) ──┐            ├─▶ Phase 5 (clôture → release)
+            Phase 3 (prod) ─────┴─▶ Phase 4 ─┘
+                                  (dogfood)
+```
+
+Phases 1 et 3 **parallélisables** avec la 2. Phase 0 débloque tout.
+Phase 4 (dogfood) = **vrai go/no-go** avant clôture.
+
+## Définition de « beta.13 prête »
+
+1. 16 starters + contrat CLI (`opt-in:*`/`module:*`) **gelés et documentés**.
+2. Slugs complets (type + slugify canonique + validation + SQL/CRUD + routing public + doc) et **une app réelle construite avec**.
+3. Production : doctor/migrations/erreurs/health/update **durcis + checklist déploiement**.
+4. `BETA13-CLOSING-AUDIT-001` **vert**, versions bumpées b13, CHANGELOG complet.
+
+## Hors périmètre b13 (→ post-1.0)
+
+Suffixe slug auto, `slug_history`/redirections 301, sitemap, recherche avancée,
+pagination avancée, admin, multi-SGBD, Docker officiel, monitoring, ORM, SPA,
+marketplace.

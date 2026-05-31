@@ -1,6 +1,51 @@
 # Changelog
 
 
+## [1.0.0-beta.13] — non publié
+
+> Dernière beta **fonctionnelle** (consolidation post-beta.12 : 65 commits).
+> Roadmap : [`docs/roadmap/beta13-roadmap.md`](docs/roadmap/beta13-roadmap.md).
+
+### Unification du modèle opt-in (ADR-016)
+
+- Famille de commandes canonique **`forge opt-in:install / remove / enable /
+  disable / list`** (à tiret). `opt-in:install`/`remove` affichent la commande
+  pip/pipx sans rien exécuter ; `enable`/`disable` sont *kind-aware* (câblage
+  réel pour les opt-ins routiers — iot ; informatif pour bibliothèques et
+  transversaux). Anciennes commandes `optin:enable` / `optin:list` **retirées**
+  (rupture assumée pré-1.0, sans alias).
+- **Squelette neutre** : `mvc/routes.py` livré par défaut n'expose plus que
+  `GET /` → landing ; auth, MFA et le starter `welcome` ne sont plus
+  pré-câblés (relocalisés dans leurs starters/opt-ins).
+- Vocabulaire unifié : « module officiel » → **« opt-in »** (glossaire
+  `docs/reference/vocabulaire-opt-in.md`) ; « package » = véhicule de
+  distribution. Le système `module:*` (module **local**) reste distinct
+  (cycle de vie d'auteur — ADR-016 A2).
+
+### Refonte des starters
+
+- **16 starters** renumérotés de façon contiguë (1→16), noms normalisés
+  (convention `welcome-optin-<module>`, `users-core-auth`, `first-crud`…).
+  Progression pédagogique « welcome » en 11 paliers. Les 3 applications métier
+  lourdes sont archivées hors du système starter.
+
+### Robustesse & production
+
+- **`forge run` survit aux crashes** de l'application (relance automatique +
+  garde anti-boucle après crashes rapides répétés).
+- Sécurité uploads : vérification du **contenu réel des images** avant écriture.
+
+### Packaging & documentation
+
+- Cadrage Alpha de `forge-mvc-iot` (installation séparée, exclu de
+  `forge-mvc[all]`) ; couverture de pinning étendue à `media` et `iot`.
+- Distribution : exclusion des tests du sdist, exclusion du bytecode des
+  artefacts.
+- Réorganisation de la documentation (`docs/guide/`, `features/`,
+  `philosophy/`, `reference/`, `release/`, `deployment/`), index des ADR,
+  URLs harmonisées vers `forgemvc.com`.
+
+
 ## [1.0.0-beta.12] — 2026-05-29
 
 ### Forge IoT — nouveau module opt-in `forge-mvc-iot`

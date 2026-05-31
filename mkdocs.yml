@@ -220,6 +220,7 @@ nav:
   - Projet:
       - Roadmap:
           - Roadmap Forge: roadmap/forge-roadmap.md
+          - Beta 13 (dernière beta fonctionnelle): roadmap/beta13-roadmap.md
           - Forge Design: roadmap/forge-design-roadmap.md
           - Tests terrain Forge: roadmap/forge-field-test-roadmap.md
           - Réorganisation des starters: roadmap/starter-reorg-roadmap.md
