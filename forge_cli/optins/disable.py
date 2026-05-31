@@ -96,7 +96,12 @@ def main(args: list[str] | None = None) -> int:
     """Kind-aware (OPTIN-KIND-ADAPTER-001) : kind ``route`` (iot) → débranchement
     réel ; ``library`` / ``crosscutting`` → conseil de retrait (rien à écrire).
     """
-    from forge_cli.optins.catalog import KIND_ROUTE, OFFICIAL_OPTINS, optin_names
+    from forge_cli.optins.catalog import (
+        KIND_ROUTE,
+        LOCAL_MODULE_HINT,
+        OFFICIAL_OPTINS,
+        optin_names,
+    )
 
     if args is None:
         args = []
@@ -113,6 +118,7 @@ def main(args: list[str] | None = None) -> int:
     if optin is None:
         print(f"{STATUS_ERROR} opt-in inconnu : {name}")
         print(f"Opt-ins officiels : {', '.join(optin_names())}")
+        print(LOCAL_MODULE_HINT)
         return 2
 
     if optin.kind == KIND_ROUTE:

@@ -238,6 +238,35 @@ couche `optins/<name>/` et l'appel `register_optins` si plus aucun opt-in actif)
 `opt-in:enable`/`disable` restent limités à `iot` jusqu'à l'adaptateur 3-formes
 (ticket 4), qui généralise le câblage aux six opt-ins.
 
+### A2 — Le système `module:*` local reste distinct (ticket 4b)
+
+D5 prévoyait de fusionner les moteurs `module:*` et `optin:*`. L'implémentation
+(palier 4b) a révélé que le système de **module local** a un cycle de vie
+d'**auteur** fondamentalement différent du modèle opt-in à 4 verbes :
+
+- `module:install` — **déclare** le module dans `forge_modules.json` ;
+- `module:files` — **copie** les fichiers dans l'application ;
+- `module:routes` — **génère** un fichier `mvc/routes_<module>.py` séparé à
+  copier (« Forge affiche », ne touche jamais `mvc/routes.py`) ;
+- `module:remove` — retire ce que Forge peut prouver avoir installé.
+
+Ce *déclarer → copier → générer-des-routes* (on **fabrique** sa brique) ne
+mappe pas 1:1 sur *install affiche / enable câble / disable débranche* (on
+**consomme** une brique officielle). Forcer la fusion reviendrait à redéfinir
+un sous-système testé et à migrer ~40 tests pour un seul nom de commande unifié.
+
+**Décision retenue** : **ne pas fusionner**. Le système `module:*` reste l'outil
+du workflow d'auteur de **module local** ; la famille `opt-in:*` couvre les
+**opt-ins officiels** (catalogue `forge_cli/optins/catalog.py`). Conceptuellement,
+un module local **est** un « opt-in de source locale » (vocabulaire unifié,
+[glossaire](../reference/vocabulaire-opt-in.md)), mais il garde ses commandes
+propres car son cycle de vie diffère. Quand un nom inconnu est passé à
+`opt-in:*`, la commande **oriente** vers `forge module:install`.
+
+Cet amendement **clôt** la trajectoire ADR-016 : la surface opt-in officielle
+est unifiée (`install`/`remove`/`enable`/`disable`/`list`), kind-aware, sans
+commandes legacy.
+
 ---
 
 ## Liens

@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 import sys
 
-from forge_cli.optins.catalog import OFFICIAL_OPTINS, optin_names
+from forge_cli.optins.catalog import LOCAL_MODULE_HINT, OFFICIAL_OPTINS, optin_names
 
 
 def _is_pipx_install() -> bool:
@@ -22,7 +22,8 @@ def _is_pipx_install() -> bool:
 def _usage() -> str:
     return (
         "Usage : forge opt-in:remove <name>\n"
-        f"Opt-ins officiels : {', '.join(optin_names())}"
+        f"Opt-ins officiels : {', '.join(optin_names())}\n"
+        f"{LOCAL_MODULE_HINT}"
     )
 
 

@@ -65,3 +65,10 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
 def optin_names() -> list[str]:
     """Identifiants courts des opt-ins officiels, triés."""
     return sorted(OFFICIAL_OPTINS)
+
+
+# La famille opt-in:* ne gère que les opt-ins officiels. Un module local que
+# le développeur écrit lui-même reste géré par module:* (ADR-016 A2).
+LOCAL_MODULE_HINT = (
+    "Pour un module local que vous écrivez vous-même, voir : forge module:install"
+)

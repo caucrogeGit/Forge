@@ -56,6 +56,15 @@ applicative que le développeur **écrit lui-même** dans son projet, par
 opposition à une brique officielle qu'il **consomme**. Dans le modèle ADR-016,
 un module local est un opt-in de **source locale**.
 
+Il garde toutefois ses **commandes propres** — `forge module:install` /
+`module:files` / `module:routes` / `module:remove` — et **non** la famille
+`opt-in:*` ([ADR-016, amendement A2](../adr/016-opt-in-unification.md)) :
+son cycle de vie d'**auteur** (déclarer → copier → générer des routes à coller)
+diffère de celui d'un opt-in officiel qu'on *consomme* (`install` affiche /
+`enable` câble / `disable` débranche). La famille `opt-in:*` ne gère que les
+opt-ins **officiels** du catalogue ; sur un nom inconnu, elle oriente vers
+`forge module:install`.
+
 Le mot « module » ne désigne **plus** les briques officielles (on dit
 « opt-in »). Il reste aussi, hors de ce périmètre, son sens Python habituel
 (un fichier `.py` importable).
