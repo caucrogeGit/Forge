@@ -182,6 +182,7 @@ nav:
           - ADR-014 Contrat RBAC séparé: adr/014-rbac-contract-location.md
           - ADR-015 Handshake TLS par thread (dev): adr/015-dev-tls-handshake-per-thread.md
           - ADR-016 Unification opt-in: adr/016-opt-in-unification.md
+          - ADR-017 Type slug: adr/017-slug-type.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
