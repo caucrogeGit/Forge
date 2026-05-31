@@ -55,16 +55,21 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 | `SLUG-ROUTING-001` | 🔨 | `find_by_slug` + route publique `/{ressource}/{slug}`. |
 | `SLUG-DOCS-001` | 📋 | Usage, génération, unicité, route publique, limites. |
 
-## Phase 3 — Production readiness *(surtout durcir/documenter)* ∥ Phase 2
+## Phase 3 — Production readiness *(surtout durcir/documenter)* — ✅ **complète**
 
-| Ticket | Type | Objet |
+| Ticket | État | Objet |
 |---|---|---|
-| `PROD-DOCTOR-001` | 🔧 | Étendre `forge doctor` : checks prod-sécurité. |
-| `MIGRATION-SAFETY-FINAL-001` | 🔨 | `migration:apply` : dry-run, SQL affiché, refus si env ambigu, journal, erreur si déjà appliquée. |
-| `ERRORS-PROD-FINAL-001` | 🔧 | Page d'erreur sobre, pas de stacktrace HTML prod, request-id, masquage secrets, 403/404/500. |
-| `HEALTHCHECK-FINAL-001` | 🔧 | Finaliser `/health` + option `--db`. |
-| `FORGE-UPDATE-FINAL-001` | 🔧 | Finaliser `forge update`. |
-| `PRODUCTION-CHECKLIST-DOCS-001` | 📋 | `docs/deployment/production-checklist.md`. |
+| `PROD-DOCTOR-001` | ✅ livré | check `Sécurité prod` dans `forge doctor` (séparation DB admin/app, uploads bornés). |
+| `MIGRATION-SAFETY-FINAL-001` | ✅ livré | `migration:apply --dry-run` (aperçu + SQL sans appliquer). Suivi/checksums/journal déjà présents. |
+| `PRODUCTION-CHECKLIST-DOCS-001` | ✅ livré | `docs/deployment/production-checklist.md` + guide comptes MariaDB. |
+| `ERRORS-PROD-FINAL-001` | ✅ déjà présent | pages d'erreur sobres 400/403/404/413/422/429/500 + handlers ; stacktrace **jamais** en HTML, détails en logs (`_log_runtime_error`). |
+| `HEALTHCHECK-FINAL-001` | ✅ déjà présent | `GET /health → {"status":"ok"}` (`app.py`) + `test_health_endpoint_001`. |
+| `FORGE-UPDATE-FINAL-001` | ✅ déjà présent | `forge update --check/--dry-run/--pre` + détection pipx + `test_forge_update_command_001`. |
+
+> **Audit de clôture Phase 3** : les trois derniers tickets étaient **déjà
+> implémentés et testés** dans Forge (vérifiés, pas re-développés). La Phase 3
+> ajoute le check sécurité-prod du doctor, le dry-run des migrations, et la
+> documentation de déploiement.
 
 ## Phase 4 — Field test *(dogfooding)* ⛓️ après 2+3
 
