@@ -303,10 +303,11 @@ class TestInsertRead:
     def test_insert_contact(self):
         conn = _direct_connect()
         try:
-            pk = _get_pk_column(conn, "contact")
             cursor = conn.cursor()
             try:
-                cursor.execute(f"INSERT INTO `contact` (`{pk}`) VALUES (NULL)")
+                # Contact (make:entity --no-input) a un champ `title` requis :
+                # l'INSERT doit le fournir, l'Id s'auto-incrémente.
+                cursor.execute("INSERT INTO `contact` (`Title`) VALUES ('Contact e2e')")
                 conn.commit()
                 inserted_id = cursor.lastrowid
             finally:
@@ -321,7 +322,11 @@ class TestInsertRead:
             pk = _get_pk_column(conn, "contact")
             cursor = conn.cursor()
             try:
-                cursor.execute(f"SELECT `{pk}` FROM `contact` LIMIT 1")
+                cursor.execute("INSERT INTO `contact` (`Title`) VALUES ('Lecture e2e')")
+                conn.commit()
+                cursor.execute(
+                    f"SELECT `{pk}` FROM `contact` WHERE `Title` = 'Lecture e2e' LIMIT 1"
+                )
                 row = cursor.fetchone()
             finally:
                 cursor.close()
