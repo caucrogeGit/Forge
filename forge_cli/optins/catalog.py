@@ -13,38 +13,50 @@ from __future__ import annotations
 from typing import NamedTuple
 
 
+# Les trois formes d'intégration d'un opt-in dans une application (ADR-016 D8) :
+#   - "route"        : la brique possède ses routes (register_*_routes) →
+#                      câblage projet via la couche optins/ ;
+#   - "library"      : bibliothèque pure → on importe et on appelle, rien à
+#                      brancher côté projet ;
+#   - "crosscutting" : se greffe dans un flux existant (décorateurs, starter).
+KIND_ROUTE = "route"
+KIND_LIBRARY = "library"
+KIND_CROSSCUTTING = "crosscutting"
+
+
 class OptIn(NamedTuple):
     """Une brique opt-in officielle."""
 
     name: str            # identifiant court (mfa, rbac, …)
     package_dist: str    # nom de distribution PyPI (forge-mvc-…)
     package_import: str  # namespace Python importable (forge_mvc_…)
+    kind: str            # forme d'intégration : route | library | crosscutting
     summary: str         # description d'une ligne
 
 
 OFFICIAL_OPTINS: dict[str, OptIn] = {
     "mfa": OptIn(
-        "mfa", "forge-mvc-mfa", "forge_mvc_mfa",
+        "mfa", "forge-mvc-mfa", "forge_mvc_mfa", KIND_CROSSCUTTING,
         "Authentification multi-facteurs (TOTP, codes de récupération).",
     ),
     "rbac": OptIn(
-        "rbac", "forge-mvc-rbac", "forge_mvc_rbac",
+        "rbac", "forge-mvc-rbac", "forge_mvc_rbac", KIND_CROSSCUTTING,
         "Contrôle d'accès par rôles et permissions déclaratives.",
     ),
     "workflow": OptIn(
-        "workflow", "forge-mvc-workflow", "forge_mvc_workflow",
+        "workflow", "forge-mvc-workflow", "forge_mvc_workflow", KIND_LIBRARY,
         "Statuts et transitions applicatives.",
     ),
     "stats": OptIn(
-        "stats", "forge-mvc-stats", "forge_mvc_stats",
+        "stats", "forge-mvc-stats", "forge_mvc_stats", KIND_LIBRARY,
         "Agrégats et compteurs d'événements.",
     ),
     "media": OptIn(
-        "media", "forge-mvc-media", "forge_mvc_media",
+        "media", "forge-mvc-media", "forge_mvc_media", KIND_LIBRARY,
         "Gestion applicative des médias.",
     ),
     "iot": OptIn(
-        "iot", "forge-mvc-iot", "forge_mvc_iot",
+        "iot", "forge-mvc-iot", "forge_mvc_iot", KIND_ROUTE,
         "Réception/exposition de données IoT (MQTT, stockage, API HTTP).",
     ),
 }

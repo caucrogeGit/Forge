@@ -106,11 +106,35 @@ def _print_iot(info: dict[str, object]) -> None:
         print("            conseil   : forge opt-in:enable iot --apply")
 
 
+def _print_other_optins() -> None:
+    """Liste les opt-ins non-routiers avec leur kind (OPTIN-KIND-ADAPTER-001).
+
+    Lecture seule, aucun import de paquet opt-in : on ne lit que le catalogue
+    statique (forge_cli), pas les paquets ``forge_mvc_*``.
+    """
+    from forge_cli.optins.catalog import (
+        KIND_CROSSCUTTING,
+        KIND_LIBRARY,
+        KIND_ROUTE,
+        OFFICIAL_OPTINS,
+    )
+
+    labels = {KIND_LIBRARY: "bibliothèque", KIND_CROSSCUTTING: "transversal"}
+    for opt in OFFICIAL_OPTINS.values():
+        if opt.kind == KIND_ROUTE:
+            continue  # iot est détaillé à part
+        label = labels.get(opt.kind, opt.kind)
+        print(f"  {opt.name:<9} {label}")
+        print(f"            conseil   : forge opt-in:enable {opt.name}")
+
+
 def list_optins(*, project_root: Path) -> int:
     """Affiche l'état des opt-ins connus. Toujours ``0`` (lecture seule)."""
     print("Forge opt-ins")
     print("")
     _print_iot(detect_iot_state(project_root))
+    print("")
+    _print_other_optins()
     print("")
     print("Aucune modification effectuée.")
     return 0

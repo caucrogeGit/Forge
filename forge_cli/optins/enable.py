@@ -364,24 +364,34 @@ def enable_optin(
 def main(args: list[str] | None = None) -> int:
     """Point d'entrée appelé par ``forge.py`` pour ``forge opt-in:enable``.
 
-    Usage : ``forge opt-in:enable <name> [--apply | --dry-run]``. Le
-    dry-run est le **comportement par défaut**.
+    Kind-aware (OPTIN-KIND-ADAPTER-001) : un opt-in de kind ``route`` (iot)
+    est câblé via la couche ``optins/`` ; les ``library`` / ``crosscutting``
+    n'écrivent rien et affichent un conseil d'utilisation.
     """
+    from forge_cli.optins.catalog import KIND_ROUTE, OFFICIAL_OPTINS, optin_names
+
     if args is None:
         args = []
 
     apply = "--apply" in args
-    # ``--dry-run`` est explicite mais redondant avec le défaut ; il est
-    # accepté et l'emporte jamais sur l'absence de --apply.
-    positionals = [
-        a for a in args if not a.startswith("-")
-    ]
+    positionals = [a for a in args if not a.startswith("-")]
 
     if not positionals:
         print(f"{STATUS_ERROR} nom d'opt-in manquant.")
         print("Usage : forge opt-in:enable <name> [--apply]")
-        print(f"Opt-ins disponibles : {', '.join(sorted(SUPPORTED_OPTINS))}")
+        print(f"Opt-ins officiels : {', '.join(optin_names())}")
         return 2
 
     name = positionals[0]
-    return enable_optin(name, apply=apply, project_root=Path.cwd())
+    optin = OFFICIAL_OPTINS.get(name)
+    if optin is None:
+        print(f"{STATUS_ERROR} opt-in inconnu : {name}")
+        print(f"Opt-ins officiels : {', '.join(optin_names())}")
+        return 2
+
+    if optin.kind == KIND_ROUTE:
+        return enable_optin(name, apply=apply, project_root=Path.cwd())
+
+    from forge_cli.optins.guidance import enable_guidance
+    print(enable_guidance(optin))
+    return 0
