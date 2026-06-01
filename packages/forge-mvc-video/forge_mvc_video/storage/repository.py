@@ -60,6 +60,9 @@ _MARK_READY_SQL = (
     "error_message = NULL, updated_at = %s WHERE id = %s"
 )
 _SELECT_RECENT_SQL = "SELECT * FROM videos ORDER BY id DESC LIMIT %s"
+_SELECT_BY_STATUS_SQL = (
+    "SELECT * FROM videos WHERE status = %s ORDER BY id ASC LIMIT %s"
+)
 
 
 class DbAdapter(Protocol):
@@ -166,3 +169,6 @@ class VideoRepository:
 
     def list_recent(self, limit: int = 50) -> list[dict]:
         return self._db.fetch_all(_SELECT_RECENT_SQL, (int(limit),))
+
+    def list_by_status(self, status: str, limit: int = 100) -> list[dict]:
+        return self._db.fetch_all(_SELECT_BY_STATUS_SQL, (status, int(limit)))

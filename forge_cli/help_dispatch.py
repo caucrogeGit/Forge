@@ -116,6 +116,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Vidéo
     "video:doctor":     "Diagnostic du module vidéo (package, config, présence ffmpeg/ffprobe).",
     "video:init":       "Copie la migration vidéo vers mvc/migrations/ (idempotent, sans appliquer).",
+    "video:process":    "Traite une vidéo (probe + poster + MP4) : <id> ou --pending.",
     # Opt-ins (branchement projet)
     "opt-in:install":   "Affiche la commande d'installation du package d'un opt-in officiel.",
     "opt-in:remove":    "Affiche la commande de désinstallation du package d'un opt-in officiel.",
@@ -357,6 +358,26 @@ Comportement:
 Code de sortie:
   0 succès (y compris idempotent) ; 1 si le dossier `mvc/` est absent
   (pas un projet Forge).
+""",
+    "video:process": """\
+Usage:
+  forge video:process <id>        # traite une vidéo
+  forge video:process --pending   # traite toutes les vidéos `uploaded`
+
+Description:
+  Worker de traitement : sonde la source (ffprobe), génère un poster et
+  transcode en MP4 H.264/AAC (ffmpeg), puis passe la vidéo en `ready`. Le
+  travail lourd se fait ici, jamais pendant une requête HTTP.
+
+Comportement:
+  - ffmpeg/ffprobe requis (vérifier avec `forge video:doctor`) ;
+  - une vidéo dont le traitement échoue passe en `failed` (avec message),
+    sans interrompre les autres en mode `--pending` ;
+  - les sorties partielles d'un échec sont nettoyées.
+
+Code de sortie:
+  0 si tout est traité ; 1 si au moins une vidéo a échoué ou est introuvable ;
+  2 en cas d'usage invalide (id manquant ou non numérique).
 """,
     "opt-in:install": """\
 Usage:

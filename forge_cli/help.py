@@ -90,6 +90,7 @@ IoT (module opt-in forge-mvc-iot)
 Vidéo (module opt-in forge-mvc-video)
   video:doctor        Diagnostic statique du module vidéo (package, config, ffmpeg/ffprobe).
   video:init          Copie la migration vidéo du package vers mvc/migrations/ (idempotent, sans appliquer).
+  video:process       Traite une vidéo (probe + poster + transcodage MP4) : <id> ou --pending.
 
 Opt-ins (branchement projet)
   opt-in:install      Affiche la commande d'installation du package d'un opt-in officiel.

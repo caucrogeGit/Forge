@@ -1268,6 +1268,26 @@ Code de sortie `1` si le dossier `mvc/` est absent (pas un projet Forge).
 
 </details>
 
+<details markdown="1" id="forge-videoprocess">
+<summary><code>forge video:process</code> - Traite une vidéo (probe + poster + transcodage MP4)</summary>
+
+Worker de traitement : sonde la source (`ffprobe`), génère un poster et
+transcode en **MP4 H.264/AAC** (`ffmpeg`), puis passe la vidéo en `ready`. Le
+travail lourd se fait ici, **jamais pendant une requête HTTP** (modèle
+worker CLI → base).
+
+```bash
+forge video:process <id>        # traite une vidéo
+forge video:process --pending   # traite toutes les vidéos `uploaded`
+```
+
+`ffmpeg`/`ffprobe` sont requis (vérifier avec `forge video:doctor`). Une vidéo
+dont le traitement échoue passe en `failed` (avec message) sans interrompre
+les autres. Code de sortie `1` si au moins une vidéo échoue ou est introuvable,
+`2` en cas d'usage invalide.
+
+</details>
+
 ## Opt-ins (branchement projet)
 
 Commandes de **branchement local** des opt-ins dans un projet
