@@ -711,6 +711,19 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "video:init":
+        try:
+            from forge_mvc_video.cli.init import main as video_init_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-video non installé.",
+                hint="installe le module opt-in : pip install forge-mvc-video",
+            )
+        rc = video_init_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     # Famille canonique opt-in:* (ADR-016). Les anciennes commandes
     # optin:enable / optin:list ont été retirées (OPTIN-CLI-REMOVE-LEGACY-001) ;
     # les moteurs forge_cli/optins/{enable,list}.py restent utilisés ici.

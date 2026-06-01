@@ -1250,6 +1250,24 @@ absent du PATH).
 
 </details>
 
+<details markdown="1" id="forge-videoinit">
+<summary><code>forge video:init</code> - Copie la migration vidéo vers mvc/migrations/ (idempotent, sans appliquer)</summary>
+
+Copie la migration SQL packagée (`*_create_videos.sql`) du module
+`forge-mvc-video` vers `mvc/migrations/` du projet. **N'exécute aucun SQL** et
+ne touche à aucune base : prépare seulement le fichier.
+
+```bash
+forge video:init          # copie la migration
+forge migration:apply     # crée ensuite la table videos
+```
+
+Idempotent (une migration déjà copiée à l'identique est laissée telle quelle)
+et sans écrasement silencieux (un fichier existant qui diffère → `WARN`).
+Code de sortie `1` si le dossier `mvc/` est absent (pas un projet Forge).
+
+</details>
+
 ## Opt-ins (branchement projet)
 
 Commandes de **branchement local** des opt-ins dans un projet

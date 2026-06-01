@@ -115,6 +115,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "iot:listen":       "Écoute le broker MQTT et insère les mesures reçues dans iot_events.",
     # Vidéo
     "video:doctor":     "Diagnostic du module vidéo (package, config, présence ffmpeg/ffprobe).",
+    "video:init":       "Copie la migration vidéo vers mvc/migrations/ (idempotent, sans appliquer).",
     # Opt-ins (branchement projet)
     "opt-in:install":   "Affiche la commande d'installation du package d'un opt-in officiel.",
     "opt-in:remove":    "Affiche la commande de désinstallation du package d'un opt-in officiel.",
@@ -337,6 +338,25 @@ Vérifications:
 Code de sortie:
   0 si tout est OK ; 1 si une vérification échoue (ex. ffmpeg/ffprobe
   absent du PATH — requis pour le transcodage).
+""",
+    "video:init": """\
+Usage:
+  forge video:init          # copie la migration vidéo vers mvc/migrations/
+
+Description:
+  Copie la migration SQL packagée (`*_create_videos.sql`) du module
+  `forge-mvc-video` vers `mvc/migrations/` du projet. N'exécute aucun SQL,
+  ne touche à aucune base : prépare seulement le fichier.
+
+Comportement:
+  - idempotent : une migration déjà copiée à l'identique est laissée telle quelle ;
+  - jamais d'écrasement silencieux : un fichier existant qui diffère → WARN,
+    aucune modification ;
+  - suggère ensuite `forge migration:apply` pour créer la table `videos`.
+
+Code de sortie:
+  0 succès (y compris idempotent) ; 1 si le dossier `mvc/` est absent
+  (pas un projet Forge).
 """,
     "opt-in:install": """\
 Usage:
