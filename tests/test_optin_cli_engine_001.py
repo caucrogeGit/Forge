@@ -23,10 +23,18 @@ ALL = ["mfa", "rbac", "workflow", "stats", "media", "iot"]
 
 def _setup_enabled_iot(root: Path) -> Path:
     """Recrée l'état produit par `enable iot`, sans dépendre du package."""
-    for rel, content in SUPPORTED_OPTINS["iot"]["files"]:
+    from forge_cli.optins.enable import (
+        _REGISTRY,
+        _SHARED_FILES,
+        _register_in_registry,
+    )
+
+    for rel, content in (*_SHARED_FILES, *SUPPORTED_OPTINS["iot"]["files"]):
         p = root / rel
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(content, encoding="utf-8")
+    registry, _ = _register_in_registry(_REGISTRY, "iot")
+    (root / "optins" / "registry.py").write_text(registry, encoding="utf-8")
     routes = root / "mvc" / "routes.py"
     routes.parent.mkdir(parents=True, exist_ok=True)
     routes.write_text(

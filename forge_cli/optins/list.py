@@ -119,10 +119,14 @@ def _print_other_optins() -> None:
         OFFICIAL_OPTINS,
     )
 
-    labels = {KIND_LIBRARY: "bibliothèque", KIND_CROSSCUTTING: "transversal"}
+    labels = {
+        KIND_LIBRARY: "bibliothèque",
+        KIND_CROSSCUTTING: "transversal",
+        KIND_ROUTE: "branchement projet",
+    }
     for opt in OFFICIAL_OPTINS.values():
-        if opt.kind == KIND_ROUTE:
-            continue  # iot est détaillé à part
+        if opt.name == "iot":
+            continue  # iot est détaillé à part (état projet détecté ci-dessus)
         label = labels.get(opt.kind, opt.kind)
         print(f"  {opt.name:<9} {label}")
         print(f"            conseil   : forge opt-in:enable {opt.name}")

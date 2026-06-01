@@ -36,9 +36,9 @@ class TestKindClassification:
     def test_crosscutting(self, name):
         assert OFFICIAL_OPTINS[name].kind == KIND_CROSSCUTTING
 
-    def test_exactly_one_route_kind(self):
+    def test_route_kind_optins(self):
         routes = [o for o in OFFICIAL_OPTINS.values() if o.kind == KIND_ROUTE]
-        assert [o.name for o in routes] == ["iot"]
+        assert sorted(o.name for o in routes) == ["iot", "video"]
 
     def test_every_route_kind_has_enable_template(self):
         """Garde-fou anti-drift (OPTIN-AUDIT-FIX-001, F1).

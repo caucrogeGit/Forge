@@ -22,10 +22,12 @@ FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
 # ── Catalogue canonique ──────────────────────────────────────────────────────
 
 class TestCatalog:
-    def test_six_official_optins(self):
-        assert optin_names() == ["iot", "media", "mfa", "rbac", "stats", "workflow"]
+    def test_seven_official_optins(self):
+        assert optin_names() == [
+            "iot", "media", "mfa", "rbac", "stats", "video", "workflow",
+        ]
 
-    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "media", "iot"])
+    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "media", "iot", "video"])
     def test_dist_and_import_naming(self, name):
         optin = OFFICIAL_OPTINS[name]
         assert optin.package_dist == f"forge-mvc-{name}"

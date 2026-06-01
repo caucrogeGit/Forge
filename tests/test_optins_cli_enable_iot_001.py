@@ -239,8 +239,10 @@ class TestScopeGuards:
                 offenders.append(py.relative_to(_REPO_ROOT))
         assert not offenders, offenders
 
-    def test_only_iot_supported(self):
-        assert set(SUPPORTED_OPTINS) == {"iot"}
+    def test_route_optins_supported(self):
+        # Depuis OPTIN-KIND-ADAPTER généralisé (video) : les opt-ins routiers
+        # câblables sont iot et video.
+        assert set(SUPPORTED_OPTINS) == {"iot", "video"}
 
 
 # ── Enregistrement CLI ───────────────────────────────────────────────────────
