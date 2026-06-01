@@ -25,6 +25,7 @@ Contrat strict (audit ``OPTINS-CLI-ENABLE-AUDIT-001``) :
 from __future__ import annotations
 
 import importlib.util
+import re
 from collections.abc import Callable
 from pathlib import Path
 
@@ -62,7 +63,13 @@ automatique. Contrat : docs/architecture/optins-project-structure.md.
 """
 '''
 
-_REGISTRY = '''\
+# Ancres d'insertion dans optins/registry.py (génériques, multi-opt-in).
+# `forge opt-in:enable <name>` insère une ligne d'import sous la 1re ancre et
+# une ligne d'appel sous la 2de ; `disable` les retire. Aucune découverte.
+_REG_IMPORT_ANCHOR = "# >>> opt-in imports (gérés par forge opt-in:enable / disable)"
+_REG_CALL_ANCHOR = "    # >>> opt-in calls (gérés par forge opt-in:enable / disable)"
+
+_REGISTRY = f'''\
 """Registre explicite des opt-ins branchés dans ce projet.
 
 Pas de découverte automatique : chaque opt-in actif est importé et appelé
@@ -75,12 +82,13 @@ explicitement dans `register_optins`. Appelé depuis `mvc/routes.py` :
 
 from __future__ import annotations
 
+{_REG_IMPORT_ANCHOR}
+
 
 def register_optins(router) -> None:
     """Branche les routes des opt-ins activés dans ce projet."""
-    from optins.iot.routes import register as register_iot
-
-    register_iot(router)
+{_REG_CALL_ANCHOR}
+    return None
 '''
 
 _IOT_INIT = '''\
@@ -170,13 +178,81 @@ explicitement.
 
 # Liste ordonnée (chemin relatif au projet, contenu). L'ordre fixe la
 # sortie de la commande.
-_IOT_FILES: tuple[tuple[str, str], ...] = (
+# Fichiers PARTAGÉS (communs à tous les opt-ins routiers), gérés à part de
+# la boucle write-if-new : optins/__init__.py et la registry générique.
+_SHARED_FILES: tuple[tuple[str, str], ...] = (
     ("optins/__init__.py", _OPTINS_INIT),
-    ("optins/registry.py", _REGISTRY),
+)
+_REGISTRY_REL = "optins/registry.py"
+
+# Fichiers PROPRES à un opt-in (optins/<name>/…). La registry n'y est plus.
+_IOT_FILES: tuple[tuple[str, str], ...] = (
     ("optins/iot/__init__.py", _IOT_INIT),
     ("optins/iot/routes.py", _IOT_ROUTES),
     ("optins/iot/README.md", _IOT_README),
     ("optins/iot/migrations/README.md", _IOT_MIGRATIONS_README),
+)
+
+
+# ── Contenu généré pour l'opt-in Vidéo ──────────────────────────────────────
+
+_VIDEO_INIT = '''\
+"""Branchement local de l'opt-in Forge Video (paquet `forge-mvc-video`).
+
+Câblage uniquement : voir `routes.py` et `README.md`. Le code métier vit
+dans le paquet ; la doc complète reste officielle (docs/video/).
+"""
+'''
+
+_VIDEO_ROUTES = '''\
+"""Branchement local de l'opt-in Forge Video.
+
+Délègue à l'API publique du paquet `forge-mvc-video` — ce fichier ne fait
+que le câblage. Appelé par `optins/registry.py`.
+"""
+
+from __future__ import annotations
+
+from forge_mvc_video import register_video_routes
+
+
+def register(router) -> None:
+    """Expose les routes vidéo (lecture en streaming, etc.)."""
+    register_video_routes(router)
+'''
+
+_VIDEO_README = """\
+# Opt-in Forge Video
+
+Ce dossier branche **localement** l'opt-in Forge Video dans ce projet. Le
+code métier vit dans le paquet `forge-mvc-video` ; ici, uniquement le
+câblage (voir `routes.py`).
+
+Le branchement est **explicite** : `mvc/routes.py` appelle
+`register_optins(router)` → `optins/registry.py` → `optins/video/routes.py`.
+Aucune découverte automatique.
+
+## Paquet requis
+
+```bash
+pip install --pre forge-mvc-video
+```
+
+## Commandes utiles
+
+```bash
+forge video:doctor
+```
+
+## Documentation complète
+
+<https://forgemvc.com/docs/forge/video/>
+"""
+
+_VIDEO_FILES: tuple[tuple[str, str], ...] = (
+    ("optins/video/__init__.py", _VIDEO_INIT),
+    ("optins/video/routes.py", _VIDEO_ROUTES),
+    ("optins/video/README.md", _VIDEO_README),
 )
 
 
@@ -185,6 +261,11 @@ SUPPORTED_OPTINS: dict[str, dict] = {
         "package_dist": "forge-mvc-iot",
         "package_import": "forge_mvc_iot",
         "files": _IOT_FILES,
+    },
+    "video": {
+        "package_dist": "forge-mvc-video",
+        "package_import": "forge_mvc_video",
+        "files": _VIDEO_FILES,
     },
 }
 
@@ -281,6 +362,89 @@ def _branch_routes(routes_path: Path, *, apply: bool) -> None:
     print(f"{STATUS_OK} {_ROUTES_REL} branché (import + {_ROUTES_CALL})")
 
 
+# ── Registre projet : insertion idempotente d'un opt-in (multi-opt-in) ───────
+
+def _registry_import_line(name: str) -> str:
+    return f"from optins.{name}.routes import register as register_{name}"
+
+
+def _registry_call_line(name: str) -> str:
+    return f"    register_{name}(router)"
+
+
+def _register_in_registry(content: str, name: str) -> tuple[str, str]:
+    """Insère l'import + l'appel de ``name`` dans le contenu de la registry.
+
+    Retourne ``(nouveau_contenu, statut)`` avec ``statut`` ∈ {``"inserted"``,
+    ``"already"``, ``"unrecognized"``}. Idempotent ; ne touche que les deux
+    lignes sous les ancres (jamais d'autre code).
+    """
+    import_line = _registry_import_line(name)
+    call_line = _registry_call_line(name)
+    if import_line in content and call_line in content:
+        return content, "already"
+    if _REG_IMPORT_ANCHOR not in content or _REG_CALL_ANCHOR not in content:
+        return content, "unrecognized"
+    new = content
+    if import_line not in new:
+        new = new.replace(_REG_IMPORT_ANCHOR, _REG_IMPORT_ANCHOR + "\n" + import_line, 1)
+    if call_line not in new:
+        new = new.replace(_REG_CALL_ANCHOR, _REG_CALL_ANCHOR + "\n" + call_line, 1)
+    return new, "inserted"
+
+
+def _ensure_registry_registration(project_root: Path, name: str, *, apply: bool) -> bool:
+    """Crée ``optins/registry.py`` (générique) si absent, puis y branche ``name``.
+
+    Retourne ``True`` si le branchement est OK (créé / inséré / déjà présent),
+    ``False`` si la registry existe mais n'est **pas reconnue** (ancres absentes,
+    fichier divergent) — l'appelant traite ça comme un conflit bloquant.
+    """
+    registry_path = project_root / _REGISTRY_REL
+    created = not registry_path.exists()
+    base = _REGISTRY if created else registry_path.read_text(encoding="utf-8")
+    new_content, status = _register_in_registry(base, name)
+
+    if status == "already":
+        print(f"{STATUS_OK} {_REGISTRY_REL} : {name} déjà branché")
+        return True
+    if status == "unrecognized":
+        print(f"{STATUS_WARN} {_REGISTRY_REL} existe mais n'est pas reconnu "
+              f"(ancres absentes) — aucune modification. Ajoute manuellement "
+              f"l'import et l'appel de {name}.")
+        return False
+
+    if not apply:
+        verb = "serait créé + " if created else ""
+        print(f"{STATUS_DRYRUN} {_REGISTRY_REL} {verb}{name} branché")
+        return True
+
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    registry_path.write_text(new_content, encoding="utf-8")
+    suffix = "créé + " if created else ""
+    print(f"{STATUS_OK} {_REGISTRY_REL} {suffix}{name} branché")
+    return True
+
+
+def _unregister_from_registry(content: str, name: str) -> str:
+    """Retire l'import + l'appel de ``name`` de la registry (idempotent)."""
+    targets = {_registry_import_line(name), _registry_call_line(name)}
+    kept = [
+        ln for ln in content.splitlines(keepends=True)
+        if ln.rstrip("\n") not in targets
+    ]
+    return "".join(kept)
+
+
+def _registry_has_registrations(content: str) -> bool:
+    """Vrai s'il reste au moins un opt-in branché (ligne d'import de routes)."""
+    return re.search(
+        r"^from optins\.[a-z0-9_]+\.routes import register as ",
+        content,
+        re.MULTILINE,
+    ) is not None
+
+
 def enable_optin(
     name: str,
     *,
@@ -318,7 +482,8 @@ def enable_optin(
         return 1
 
     conflict = False
-    for rel, content in spec["files"]:
+    # Fichiers partagés (optins/__init__.py) + propres à l'opt-in (write-if-new).
+    for rel, content in (*_SHARED_FILES, *spec["files"]):
         target = project_root / rel
         encoded = content.encode("utf-8")
 
@@ -341,6 +506,11 @@ def enable_optin(
             print(f"{STATUS_OK} {rel} créé")
         else:
             print(f"{STATUS_DRYRUN} {rel} serait créé")
+
+    # Registre partagé : créer (générique) si absent puis brancher cet opt-in.
+    # Une registry existante non reconnue (divergente) bloque (conflit).
+    if not _ensure_registry_registration(project_root, name, apply=apply):
+        conflict = True
 
     print("")
     _branch_routes(project_root / "mvc" / "routes.py", apply=apply)

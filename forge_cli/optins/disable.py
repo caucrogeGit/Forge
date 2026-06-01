@@ -22,6 +22,13 @@ from forge_cli.optins.enable import (
     STATUS_OK,
     STATUS_WARN,
     SUPPORTED_OPTINS,
+    _OPTINS_INIT,
+    _REGISTRY,
+    _REGISTRY_REL,
+    _registry_call_line,
+    _registry_has_registrations,
+    _registry_import_line,
+    _unregister_from_registry,
 )
 
 _ROUTES_REL = "mvc/routes.py"
@@ -59,11 +66,25 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
 
     files = list(spec["files"])
     optin_dir = project_root / "optins" / name
-    present = optin_dir.exists() or any((project_root / rel).exists() for rel, _ in files)
+    registry_path = project_root / _REGISTRY_REL
+    registry_content = (
+        registry_path.read_text(encoding="utf-8") if registry_path.exists() else ""
+    )
+    is_registered = (
+        _registry_import_line(name) in registry_content
+        or _registry_call_line(name) in registry_content
+    )
+    present = (
+        optin_dir.exists()
+        or is_registered
+        or any((project_root / rel).exists() for rel, _ in files)
+    )
     if not present:
         print(f"{STATUS_OK} opt-in {name} déjà débranché (aucune couche optins/{name}/).")
         return 0
 
+    # 1. Fichiers propres à l'opt-in (write-if-new : un fichier modifié à la
+    #    main est conservé, jamais supprimé en silence).
     for rel, expected in files:
         target = project_root / rel
         if not target.exists():
@@ -77,10 +98,52 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
         else:
             print(f"{STATUS_DRYRUN} {rel} serait supprimé")
 
-    _unbranch_routes(project_root / _ROUTES_REL, apply=apply)
+    # 2. Dé-référencer l'opt-in de la registry partagée.
+    new_registry = (
+        _unregister_from_registry(registry_content, name) if registry_content else ""
+    )
+    others_remain = _registry_has_registrations(new_registry)
+    # Démontage complet seulement si plus aucun opt-in ET registry générique
+    # (un fichier modifié à la main n'est pas démonté agressivement).
+    full_teardown = (
+        registry_content != "" and not others_remain and new_registry == _REGISTRY
+    )
 
+    if registry_content and new_registry != registry_content:
+        if full_teardown:
+            if apply:
+                registry_path.unlink()
+                print(f"{STATUS_OK} {_REGISTRY_REL} supprimé (plus d'opt-in branché)")
+            else:
+                print(f"{STATUS_DRYRUN} {_REGISTRY_REL} serait supprimé")
+        else:
+            if apply:
+                registry_path.write_text(new_registry, encoding="utf-8")
+                print(f"{STATUS_OK} {_REGISTRY_REL} : {name} débranché")
+            else:
+                print(f"{STATUS_DRYRUN} {name} serait débranché de {_REGISTRY_REL}")
+
+    # 3. Câblage partagé (optins/__init__.py + mvc/routes.py) : retiré seulement
+    #    en démontage complet ; sinon conservé pour les autres opt-ins.
+    if full_teardown:
+        init_path = project_root / "optins" / "__init__.py"
+        if init_path.exists() and init_path.read_text(encoding="utf-8") == _OPTINS_INIT:
+            if apply:
+                init_path.unlink()
+                print(f"{STATUS_OK} optins/__init__.py supprimé")
+            else:
+                print(f"{STATUS_DRYRUN} optins/__init__.py serait supprimé")
+        _unbranch_routes(project_root / _ROUTES_REL, apply=apply)
+    elif others_remain:
+        print(f"{STATUS_INFO} D'autres opt-ins restent branchés — "
+              f"{_REGISTRY_REL} et {_ROUTES_REL} conservés.")
+
+    # 4. Répertoires vides.
     if apply:
-        for d in (optin_dir / "migrations", optin_dir, project_root / "optins"):
+        dirs = [optin_dir / "migrations", optin_dir]
+        if full_teardown:
+            dirs.append(project_root / "optins")
+        for d in dirs:
             if d.is_dir() and not any(d.iterdir()):
                 d.rmdir()
                 print(f"{STATUS_OK} {d.relative_to(project_root)}/ retiré (vide)")

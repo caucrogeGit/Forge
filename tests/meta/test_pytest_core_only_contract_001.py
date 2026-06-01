@@ -66,6 +66,10 @@ OPTIN_MODULES: dict[str, set[str]] = {
     # `paho-mqtt` n'est jamais importé au top-level des tests (clients
     # injectés / import paresseux), donc pas de dépendance d'extra à lister.
     "forge_mvc_iot": set(),
+    # forge-mvc-video : opt-in. Ses tests gardent l'import via
+    # pytest.importorskip("forge_mvc_video"). ffmpeg/ffprobe ne sont jamais
+    # importés (binaires système, runners injectés), donc pas d'extra à lister.
+    "forge_mvc_video": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

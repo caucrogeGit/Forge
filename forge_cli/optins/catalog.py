@@ -59,6 +59,10 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
         "iot", "forge-mvc-iot", "forge_mvc_iot", KIND_ROUTE,
         "Réception/exposition de données IoT (MQTT, stockage, API HTTP).",
     ),
+    "video": OptIn(
+        "video", "forge-mvc-video", "forge_mvc_video", KIND_ROUTE,
+        "Upload, transcodage MP4 et lecture vidéo en streaming (HTTP Range).",
+    ),
 }
 
 

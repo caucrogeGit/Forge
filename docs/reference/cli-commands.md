@@ -1229,6 +1229,65 @@ forge iot:listen                                       # 6. écouter et stocker 
 forge iot:simulate --profile temperature --count 3 --interval 1   # 7. publier (autre terminal)
 ```
 
+## Vidéo (opt-in `forge-mvc-video`)
+
+<details markdown="1" id="forge-videodoctor">
+<summary><code>forge video:doctor</code> - Diagnostic du module vidéo (statique : package, config, ffmpeg/ffprobe)</summary>
+
+Diagnostic du module opt-in `forge-mvc-video`. **Statique** : ne lance aucun
+`ffmpeg`, n'ouvre aucun fichier vidéo et ne touche à aucune base.
+
+```bash
+forge video:doctor        # diagnostic statique du module vidéo
+```
+
+Vérifie que le package `forge-mvc-video` est importable (et sa version), que
+la configuration `load_video_config()` (`FORGE_VIDEO_*`) est chargeable, que
+les binaires `ffprobe` (validation + métadonnées) et `ffmpeg` (transcodage
+MP4) sont présents dans le PATH, et que `register_video_routes` est exposée.
+Code de sortie `1` si une vérification échoue (par ex. `ffmpeg`/`ffprobe`
+absent du PATH).
+
+</details>
+
+<details markdown="1" id="forge-videoinit">
+<summary><code>forge video:init</code> - Copie la migration vidéo vers mvc/migrations/ (idempotent, sans appliquer)</summary>
+
+Copie la migration SQL packagée (`*_create_videos.sql`) du module
+`forge-mvc-video` vers `mvc/migrations/` du projet. **N'exécute aucun SQL** et
+ne touche à aucune base : prépare seulement le fichier.
+
+```bash
+forge video:init          # copie la migration
+forge migration:apply     # crée ensuite la table videos
+```
+
+Idempotent (une migration déjà copiée à l'identique est laissée telle quelle)
+et sans écrasement silencieux (un fichier existant qui diffère → `WARN`).
+Code de sortie `1` si le dossier `mvc/` est absent (pas un projet Forge).
+
+</details>
+
+<details markdown="1" id="forge-videoprocess">
+<summary><code>forge video:process</code> - Traite une vidéo (probe + poster + transcodage MP4)</summary>
+
+Worker de traitement : sonde la source (`ffprobe`), génère un poster et
+transcode en **MP4 H.264/AAC** (`ffmpeg`), puis passe la vidéo en `ready`. Le
+travail lourd se fait ici, **jamais pendant une requête HTTP** (modèle
+worker CLI → base).
+
+```bash
+forge video:process <id>        # traite une vidéo
+forge video:process --pending   # traite toutes les vidéos `uploaded`
+```
+
+`ffmpeg`/`ffprobe` sont requis (vérifier avec `forge video:doctor`). Une vidéo
+dont le traitement échoue passe en `failed` (avec message) sans interrompre
+les autres. Code de sortie `1` si au moins une vidéo échoue ou est introuvable,
+`2` en cas d'usage invalide.
+
+</details>
+
 ## Opt-ins (branchement projet)
 
 Commandes de **branchement local** des opt-ins dans un projet
