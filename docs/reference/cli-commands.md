@@ -1229,6 +1229,27 @@ forge iot:listen                                       # 6. écouter et stocker 
 forge iot:simulate --profile temperature --count 3 --interval 1   # 7. publier (autre terminal)
 ```
 
+## Vidéo (opt-in `forge-mvc-video`)
+
+<details markdown="1" id="forge-videodoctor">
+<summary><code>forge video:doctor</code> - Diagnostic du module vidéo (statique : package, config, ffmpeg/ffprobe)</summary>
+
+Diagnostic du module opt-in `forge-mvc-video`. **Statique** : ne lance aucun
+`ffmpeg`, n'ouvre aucun fichier vidéo et ne touche à aucune base.
+
+```bash
+forge video:doctor        # diagnostic statique du module vidéo
+```
+
+Vérifie que le package `forge-mvc-video` est importable (et sa version), que
+la configuration `load_video_config()` (`FORGE_VIDEO_*`) est chargeable, que
+les binaires `ffprobe` (validation + métadonnées) et `ffmpeg` (transcodage
+MP4) sont présents dans le PATH, et que `register_video_routes` est exposée.
+Code de sortie `1` si une vérification échoue (par ex. `ffmpeg`/`ffprobe`
+absent du PATH).
+
+</details>
+
 ## Opt-ins (branchement projet)
 
 Commandes de **branchement local** des opt-ins dans un projet

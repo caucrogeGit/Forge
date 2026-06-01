@@ -113,6 +113,8 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "iot:init":         "Copie la migration IoT vers mvc/migrations/ (idempotent, sans appliquer).",
     "iot:simulate":     "Publie des mesures MQTT factices conformes au contrat (sans capteur).",
     "iot:listen":       "Écoute le broker MQTT et insère les mesures reçues dans iot_events.",
+    # Vidéo
+    "video:doctor":     "Diagnostic du module vidéo (package, config, présence ffmpeg/ffprobe).",
     # Opt-ins (branchement projet)
     "opt-in:install":   "Affiche la commande d'installation du package d'un opt-in officiel.",
     "opt-in:remove":    "Affiche la commande de désinstallation du package d'un opt-in officiel.",
@@ -316,6 +318,25 @@ Limites (hors périmètre):
 Code de sortie:
   0 arrêt normal (Ctrl+C) ; 1 configuration invalide, connexion MQTT
   impossible, ou échec d'insertion en base.
+""",
+    "video:doctor": """\
+Usage:
+  forge video:doctor        # diagnostic statique du module vidéo
+
+Description:
+  Diagnostic du module opt-in `forge-mvc-video`. Statique : ne lance aucun
+  ffmpeg, n'ouvre aucun fichier vidéo, ne touche à aucune base.
+
+Vérifications:
+  - package `forge-mvc-video` importable (et version) ;
+  - configuration `load_video_config()` chargeable (FORGE_VIDEO_*) ;
+  - binaire `ffprobe` présent dans le PATH (validation + métadonnées) ;
+  - binaire `ffmpeg` présent dans le PATH (transcodage MP4) ;
+  - fonction `register_video_routes` exposée pour brancher les routes.
+
+Code de sortie:
+  0 si tout est OK ; 1 si une vérification échoue (ex. ffmpeg/ffprobe
+  absent du PATH — requis pour le transcodage).
 """,
     "opt-in:install": """\
 Usage:

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc-video"
+version = "1.0.0b13"
+description = "Forge Video — module opt-in pour l'upload, le transcodage MP4 (H.264/AAC) et la lecture vidéo en streaming (HTTP Range). Worker CLI forge video:*."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+authors = [
+    { name = "Roger Lequette" },
+]
+license = "LicenseRef-Forge-Proprietary"
+keywords = ["python", "mvc", "forge", "video", "ffmpeg", "mp4"]
+dependencies = [
+    "forge-mvc>=1.0.0b5,<2",
+]
+# NB : FFmpeg/ffprobe sont des binaires SYSTÈME, pas des dépendances pip.
+# Le module se branche quand même sans eux (mode serveur de médias), mais
+# `forge video:doctor` signale leur absence ; le transcodage les exige.
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://forgemvc.com/docs/forge/video/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forge_mvc_video*"]
+
+[tool.setuptools.package-data]
+forge_mvc_video = [
+    "migrations/*.sql",
+]

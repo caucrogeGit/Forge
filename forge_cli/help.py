@@ -87,6 +87,9 @@ IoT (module opt-in forge-mvc-iot)
   iot:simulate        Publie des mesures MQTT factices conformes au contrat (sans capteur).
   iot:listen          Écoute le broker MQTT et insère les mesures reçues dans iot_events.
 
+Vidéo (module opt-in forge-mvc-video)
+  video:doctor        Diagnostic statique du module vidéo (package, config, ffmpeg/ffprobe).
+
 Opt-ins (branchement projet)
   opt-in:install      Affiche la commande d'installation du package d'un opt-in officiel.
   opt-in:remove       Affiche la commande de désinstallation du package d'un opt-in officiel.
