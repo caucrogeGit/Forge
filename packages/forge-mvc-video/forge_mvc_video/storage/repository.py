@@ -51,6 +51,10 @@ _UPDATE_STATUS_SQL = (
     "UPDATE videos SET status = %s, error_message = %s, updated_at = %s "
     "WHERE id = %s"
 )
+_UPDATE_METADATA_SQL = (
+    "UPDATE videos SET duration_seconds = %s, width = %s, height = %s, "
+    "updated_at = %s WHERE id = %s"
+)
 _SELECT_RECENT_SQL = "SELECT * FROM videos ORDER BY id DESC LIMIT %s"
 
 
@@ -125,6 +129,21 @@ class VideoRepository:
             )
         self._db.execute(
             _UPDATE_STATUS_SQL, (status, error_message, now or _utcnow(), video_id)
+        )
+
+    def update_metadata(
+        self,
+        video_id: int,
+        *,
+        duration_seconds: int | None,
+        width: int | None,
+        height: int | None,
+        now: datetime | None = None,
+    ) -> None:
+        """Écrit les métadonnées extraites par ffprobe (durée, dimensions)."""
+        self._db.execute(
+            _UPDATE_METADATA_SQL,
+            (duration_seconds, width, height, now or _utcnow(), video_id),
         )
 
     def list_recent(self, limit: int = 50) -> list[dict]:
