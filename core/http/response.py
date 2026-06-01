@@ -30,6 +30,24 @@ def _is_sensitive_response_header(name: str) -> bool:
     return str(name).lower() in _SENSITIVE_RESPONSE_HEADERS
 
 
+def _iter_file_range(path, start: int, length: int, chunk_size: int):
+    """Émet le contenu de `path`, à partir de `start`, sur `length` octets.
+
+    Streaming par tranches : le fichier n'est jamais chargé entièrement en
+    mémoire. Le descripteur est refermé à l'épuisement du générateur (fin
+    d'itération WSGI).
+    """
+    with open(path, "rb") as handle:
+        handle.seek(start)
+        remaining = length
+        while remaining > 0:
+            chunk = handle.read(min(chunk_size, remaining))
+            if not chunk:
+                break
+            remaining -= len(chunk)
+            yield chunk
+
+
 class Response:
     """Encapsule une réponse HTTP à envoyer au navigateur.
 
@@ -60,6 +78,12 @@ class Response:
         else:
             self.body = body
         self.headers = headers if headers is not None else {}
+        # Corps en streaming (cf. CORE-HTTP-FILE-RANGE-001). Quand `stream`
+        # n'est pas None, la couche WSGI émet cet itérable de `bytes` au lieu
+        # de `body`, et `content_length` (octets) sert au `Content-Length`.
+        # Les réponses ordinaires (text/html/json) gardent stream = None.
+        self.stream: "Any | None" = None
+        self.content_length: int | None = None
 
     # ── Constructeurs nommés ────────────────────────────────────────────────
 
@@ -127,6 +151,65 @@ class Response:
         from core.http.debug_dumper import render_debug_html
 
         return cls.html(render_debug_html(obj), status=status)
+
+    @classmethod
+    def file(
+        cls,
+        path,
+        request=None,
+        *,
+        content_type: str | None = None,
+        download_name: str | None = None,
+        chunk_size: int = 65536,
+    ) -> "Response":
+        """Sert un fichier en streaming, avec support HTTP Range (CORE-HTTP-FILE-RANGE-001).
+
+        Lit l'en-tête ``Range`` de `request` (si fourni) et :
+          - sans Range → ``200`` en streaming complet ;
+          - Range valide → ``206 Partial Content`` + ``Content-Range`` ;
+          - Range hors limites → ``416 Range Not Satisfiable``.
+
+        Le corps n'est jamais chargé en mémoire : il est émis par tranches de
+        `chunk_size` octets. ``Accept-Ranges: bytes`` est toujours posé.
+        Laisse remonter ``FileNotFoundError`` si le chemin n'existe pas — au
+        contrôleur de répondre 404 (Forge n'invente pas de page d'erreur ici).
+        """
+        import mimetypes
+        from pathlib import Path
+
+        from core.http.byte_range import parse_byte_range
+
+        file_path = Path(path)
+        size = file_path.stat().st_size
+        ctype = (
+            content_type
+            or mimetypes.guess_type(file_path.name)[0]
+            or "application/octet-stream"
+        )
+
+        headers: dict[str, str] = {"Accept-Ranges": "bytes"}
+        if download_name:
+            headers["Content-Disposition"] = f'attachment; filename="{download_name}"'
+
+        range_header = request.header("Range") if request is not None else None
+        spec = parse_byte_range(range_header, size)
+
+        if spec is not None and not spec.satisfiable:
+            headers["Content-Range"] = f"bytes */{size}"
+            return cls(status=416, body=b"", content_type=ctype, headers=headers)
+
+        if spec is None:
+            start, length, status = 0, size, 200
+        else:
+            start = spec.start
+            length = spec.end - spec.start + 1
+            status = 206
+            headers["Content-Range"] = f"bytes {spec.start}-{spec.end}/{size}"
+
+        response = cls(status=status, body=b"", content_type=ctype, headers=headers)
+        response.stream = _iter_file_range(file_path, start, length, chunk_size)
+        response.content_length = length
+        return response
 
     # ── Vue d'inspection ────────────────────────────────────────────────────
 
