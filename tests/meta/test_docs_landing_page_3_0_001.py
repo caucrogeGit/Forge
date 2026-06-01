@@ -232,9 +232,11 @@ class TestStateSectionRefonte:
         )
 
     def test_trajectoire_section(self):
-        # "Après 3.0" remplacé par "Trajectoire 1.0" (LANDING-CARDS-LINKS-ORDER-001)
-        assert "Trajectoire 1.0" in self.source, (
-            "La landing devrait avoir un bloc 'Trajectoire 1.0' (roadmap)"
+        # Label "Trajectoire 1.0" retiré lors de la refonte visuelle de la landing
+        # (cards de positionnement simplifiées). La trajectoire reste exposée via la
+        # carte "Stabilisation bêta" et son lien roadmap.
+        assert "roadmap" in self.source.lower(), (
+            "La landing devrait surfacer la roadmap (trajectoire 1.0)"
         )
 
     def test_trajectoire_mentions_stabilization(self):
@@ -248,7 +250,13 @@ class TestStateSectionRefonte:
 
 
 class TestStartersSection:
-    """La section starters affiche les 7 starters (LANDING-STARTERS-RESTORE-001)."""
+    """La section starters met en avant le starter `welcome` comme porte d'entrée.
+
+    Refonte visuelle de la landing : les cartes Niveau 1/2/3 (first-crud,
+    users-core-auth, MFA) ont été retirées au profit d'une seule carte
+    `welcome` + une explication de ce qu'est un starter. La liste complète
+    des 16 starters reste dans la documentation.
+    """
 
     def setup_method(self):
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
@@ -271,14 +279,12 @@ class TestStartersSection:
 
     @pytest.mark.parametrize("starter_url", [
         "starters/welcome/",
-        "starters/crud/first-crud-generated/",
-        "starters/core-auth/users-core-auth/",
-        "starters/optin-mfa/welcome-optin-mfa/",
     ])
     def test_all_starter_urls_present(self, starter_url):
+        # Landing simplifiée : seule la carte `welcome` subsiste ; les autres
+        # starters sont accessibles via la documentation.
         assert starter_url in self.source, (
-            f"La landing doit contenir le lien vers {starter_url} "
-            "(LANDING-STARTERS-RESTORE-001)"
+            f"La landing doit contenir le lien vers {starter_url}"
         )
 
 

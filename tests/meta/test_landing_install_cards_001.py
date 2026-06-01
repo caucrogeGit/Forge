@@ -182,8 +182,10 @@ class TestCardPipxUser:
 
     def test_commande_pipx_canonique(self):
         text = _src()
-        # La commande recommandée doit apparaître textuellement.
-        assert 'pipx install --pip-args="--pre" forge-mvc' in text
+        # Le parcours pipx est décrit en prose depuis la refonte de la card :
+        # le paquet officiel `forge-mvc` et le flag `--pre` restent mentionnés.
+        assert "forge-mvc" in text
+        assert "--pre" in text
 
     def test_paquet_correct_forge_mvc(self):
         text = _src()
@@ -223,20 +225,25 @@ class TestCardCoreDev:
         assert "Développement du core" in text
 
     def test_5_validations_canoniques_listees(self):
-        """La card doit montrer les 5 validations canoniques avant commit
-        (pytest, compileall, ruff, mkdocs --strict, git diff --check)."""
+        """La card doit citer les 5 validations canoniques avant commit.
+
+        Depuis la refonte, la card décrit les validations en prose : on
+        vérifie la présence des 5 outils (pytest, compileall, ruff,
+        mkdocs --strict, git diff --check) plutôt que la ligne de commande
+        complète.
+        """
         text = _src()
         idx = text.find('data-install-card="core-dev"')
         end = text.find('data-install-card="production"')
         card_block = text[idx:end]
         for cmd in [
-            "python -m pytest",
-            "python -m compileall -q .",
-            "ruff check .",
+            "pytest",
+            "compileall",
+            "ruff check",
             "mkdocs build --strict",
             "git diff --check",
         ]:
-            assert cmd in card_block, f"Commande manquante : {cmd}"
+            assert cmd in card_block, f"Validation manquante : {cmd}"
 
     def test_installation_editable_pas_pipx(self):
         """La note doit préciser que l'installation est éditable, pas

@@ -20,10 +20,10 @@ BROKEN_URLS = [
     "starter-app-suivi-comportement-eleves",
 ]
 
-# URLs corrigées attendues
+# URLs corrigées attendues (landing simplifiée : seule la carte `welcome`
+# subsiste côté starters ; les autres sont accessibles via la documentation).
 FIXED_URLS = [
-    "starters/crud/first-crud-generated/",
-    "starters/core-auth/users-core-auth/",
+    "starters/welcome/",
     "roadmap/forge-roadmap/",
 ]
 
@@ -77,16 +77,18 @@ class TestFixedURLsPresent:
 
 
 class TestStarterLinksCount:
-    """Les 4 liens starters sont toujours présents (libellés inchangés)."""
+    """La section starters met en avant au moins le starter `welcome`.
 
-    def test_four_starter_links(self):
+    Refonte landing : les cartes Niveau 1/2/3 ont été retirées au profit
+    d'une seule carte `welcome` + un renvoi à la documentation.
+    """
+
+    def test_at_least_one_starter_link(self):
         content = LANDING_SOURCE.read_text(encoding="utf-8")
-        # Les dossiers starters ont perdu leur préfixe numérique
-        # (01-…→…) : on vérifie les 4 slugs des cartes Niveau 1→4.
         matches = re.findall(r"starters/[a-z][a-z0-9-]+/", content)
         unique_starters = set(matches)
-        assert len(unique_starters) >= 4, (
-            f"Les 4 liens starters devraient être présents, "
+        assert len(unique_starters) >= 1, (
+            f"Au moins un lien starter devrait être présent, "
             f"trouvé {len(unique_starters)} : {unique_starters}"
         )
 
