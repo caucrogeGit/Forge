@@ -71,12 +71,13 @@ def test_doctor_checks_structure():
 
     results = run_all()
     names = [r.name for r in results]
-    assert names == ["package", "config", "ffprobe", "ffmpeg", "routes"]
+    assert names == ["package", "config", "migration", "ffprobe", "ffmpeg", "routes"]
     assert all(isinstance(r, CheckResult) for r in results)
     # Les checks indépendants de l'environnement sont OK quoi qu'il arrive.
     by_name = {r.name: r for r in results}
     assert by_name["package"].status == "ok"
     assert by_name["config"].status == "ok"
+    assert by_name["migration"].status == "ok"
     assert by_name["routes"].status == "ok"
     # ffmpeg/ffprobe : ok si présents, fail sinon — jamais autre chose.
     assert by_name["ffmpeg"].status in ("ok", "fail")

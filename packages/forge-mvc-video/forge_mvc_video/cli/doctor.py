@@ -23,6 +23,7 @@ __all__ = [
     "CheckResult",
     "check_package_importable",
     "check_config_loadable",
+    "check_migration_present",
     "check_ffprobe_present",
     "check_ffmpeg_present",
     "check_routes_registrable",
@@ -69,6 +70,27 @@ def check_config_loadable() -> CheckResult:
     )
 
 
+def check_migration_present() -> CheckResult:
+    """Vérifie la présence du fichier ``*_create_videos.sql`` packagé.
+
+    Lecture via ``importlib.resources`` — fonctionne en install éditable, en
+    wheel et en sdist (``[tool.setuptools.package-data]`` embarque les ``.sql``).
+    """
+    try:
+        from importlib import resources
+
+        anchor = resources.files("forge_mvc_video") / "migrations"
+        candidates = sorted(
+            entry.name for entry in anchor.iterdir()
+            if entry.name.endswith("_create_videos.sql")
+        )
+    except (ImportError, ModuleNotFoundError, FileNotFoundError) as exc:  # pragma: no cover
+        return CheckResult("fail", "migration", f"ressources illisibles : {exc}")
+    if not candidates:
+        return CheckResult("fail", "migration", "*_create_videos.sql introuvable dans le package")
+    return CheckResult("ok", "migration", candidates[0])
+
+
 def _check_binary(name: str, bin_value: str, purpose: str) -> CheckResult:
     path = shutil.which(bin_value)
     if path is None:
@@ -110,6 +132,7 @@ def run_all() -> list[CheckResult]:
     return [
         check_package_importable(),
         check_config_loadable(),
+        check_migration_present(),
         check_ffprobe_present(),
         check_ffmpeg_present(),
         check_routes_registrable(),
