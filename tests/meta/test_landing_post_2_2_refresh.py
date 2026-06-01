@@ -84,8 +84,9 @@ class TestBriquesCore:
         assert "forge-mvc-rbac" in _src()
 
     def test_auth_user(self):
-        # Section starter Auth (API cœur) remplace l'ancienne carte Auth/User
-        assert "users-core-auth" in _src()
+        # Refonte landing : la carte de fonctionnalité « Auth/User » représente
+        # l'authentification (la carte starter users-core-auth a été retirée).
+        assert "Auth/User" in _src()
 
     def test_securite(self):
         assert "Sécurité" in _src() or "sécurité" in _src()
@@ -105,8 +106,10 @@ class TestApportsRecents:
         assert "CSRF" in src or "headers" in src or "audit" in src
 
     def test_auth_user_detail(self):
+        # Refonte landing : l'auth avancée est représentée par le module
+        # forge-mvc-mfa (authentification multi-facteurs / TOTP).
         src = _src()
-        assert "MFA" in src or "argon2" in src or "login" in src
+        assert "TOTP" in src or "multi-facteurs" in src or "forge-mvc-mfa" in src
 
     def test_modules_opt_in_mentionne(self):
         # Les modules opt-in remplacent les briques API JSON / Médias / Mail

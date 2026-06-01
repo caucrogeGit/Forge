@@ -1,15 +1,16 @@
-"""Garde-fou LANDING-BETA12-HIGHLIGHTS-001.
+"""Garde-fou LANDING-BETA12-HIGHLIGHTS-001 (adapté à la refonte landing).
 
-Vérifie que la landing canonique (`mvc/views/landing/index.html`) met en
-avant les apports de Forge `1.0.0-beta.12` : bloc Forge IoT, opt-ins
-explicites, installation core-autonome / IoT-opt-in, et preuve qualité
-(« suite complète à 0 échec »).
+À l'origine, ce garde-fou vérifiait les apports beta.12 (bloc Forge IoT,
+opt-ins explicites, preuve « suite complète à 0 échec », liens profonds
+vers la doc IoT et les audits). La refonte visuelle de la landing a
+relabelisé la section en « Nouveautés 1.0.0-beta.13 » et simplifié les
+panneaux : suppression des liens profonds IoT/audits, de « Mosquitto » et
+de la preuve « 0 échec ».
 
-Contrôle aussi que :
-- `docs/index.html` (généré par `forge sync:landing`) est synchronisé ;
-- les pages doc cibles (IoT + opt-ins + audits) existent ;
-- la landing ne présente plus `1.0.0-beta.11` comme version active ;
-- la roadmap mentionne le ticket.
+Ce fichier conserve les garde-fous encore valides : présence de la section,
+panneaux Forge IoT et opt-ins, commandes `iot:*` / `opt-in:*`, installation
+core-autonome vs IoT opt-in, absence de découverte magique, synchronisation
+de `docs/index.html`, absence de version beta.11, ticket roadmap.
 
 Test documentaire : il lit du texte, il n'exécute aucun service.
 """
@@ -34,15 +35,13 @@ def _src() -> str:
 
 
 # ---------------------------------------------------------------------------
-# Contenu beta.12 attendu dans la landing
+# Contenu IoT / opt-ins encore mis en avant après la refonte
 # ---------------------------------------------------------------------------
 
 HIGHLIGHTS = [
-    "1.0.0-beta.12",
     "forge-mvc-iot",
     "Forge IoT",
     "MQTT",
-    "Mosquitto",
     "iot_events",
     "forge iot:doctor",
     "forge iot:listen",
@@ -51,7 +50,6 @@ HIGHLIGHTS = [
     "forge opt-in:enable iot",
     "forge opt-in:list",
     "welcome-optin-iot",
-    "0 échec",
 ]
 
 
@@ -59,13 +57,12 @@ class TestHighlightsPresent:
     @pytest.mark.parametrize("needle", HIGHLIGHTS)
     def test_landing_mentions(self, needle: str):
         assert needle in _src(), (
-            f"La landing doit mettre en avant {needle!r} (beta.12)."
+            f"La landing doit mettre en avant {needle!r} (IoT / opt-ins)."
         )
 
-    def test_section_beta12_presente(self):
-        text = _src()
-        assert 'id="beta12"' in text, (
-            "Une section dédiée aux nouveautés beta.12 (id='beta12') est attendue."
+    def test_section_nouveautes_presente(self):
+        assert 'id="beta13"' in _src(), (
+            "Une section dédiée aux nouveautés (id='beta13') est attendue."
         )
 
     def test_core_reste_autonome(self):
@@ -78,48 +75,6 @@ class TestHighlightsPresent:
     def test_pas_de_decouverte_magique(self):
         normalized = " ".join(_src().split()).lower()
         assert "pas de découverte magique" in normalized
-
-
-# ---------------------------------------------------------------------------
-# Liens vers la doc — cibles existantes
-# ---------------------------------------------------------------------------
-
-IOT_LINKS = [
-    ("iot/architecture/", "iot/architecture.md"),
-    ("iot/mosquitto-local/", "iot/mosquitto-local.md"),
-    ("iot/doctor/", "iot/doctor.md"),
-    ("iot/listen-command/", "iot/listen-command.md"),
-    ("iot/simulator/", "iot/simulator.md"),
-    ("iot/esp32-example/", "iot/esp32-example.md"),
-    ("iot/bts-ciel/", "iot/bts-ciel.md"),
-]
-
-OPTINS_LINKS = [
-    ("architecture/optins-project-structure/", "architecture/optins-project-structure.md"),
-    ("architecture/optins-cli-enable-audit/", "architecture/optins-cli-enable-audit.md"),
-    ("reference/cli-commands/", "reference/cli-commands.md"),
-    ("starters/optin-iot/welcome-optin-iot/", "starters/optin-iot/welcome-optin-iot.md"),
-]
-
-AUDIT_LINKS = [
-    ("history/audits/audit-pre-release-beta12/", "history/audits/audit-pre-release-beta12.md"),
-    ("history/audits/audit-beta12-post-publish/", "history/audits/audit-beta12-post-publish.md"),
-]
-
-ALL_LINKS = IOT_LINKS + OPTINS_LINKS + AUDIT_LINKS
-
-
-class TestDocLinks:
-    @pytest.mark.parametrize("href_fragment,target", ALL_LINKS, ids=lambda v: str(v))
-    def test_lien_present_et_cible_existe(self, href_fragment: str, target: str):
-        # Le lien (URL absolue forgemvc.com/docs/forge/...) doit figurer.
-        assert href_fragment in _src(), (
-            f"Lien manquant dans la landing : .../{href_fragment}"
-        )
-        # La page doc canonique doit exister (pas de lien cassé).
-        assert (DOCS / target).exists(), (
-            f"Page doc cible absente : docs/{target}"
-        )
 
 
 # ---------------------------------------------------------------------------
@@ -139,9 +94,9 @@ class TestSync:
             "lancez `forge sync:landing`."
         )
 
-    def test_docs_index_reflete_beta12(self):
+    def test_docs_index_reflete_section(self):
         docs = DOCS_LANDING.read_text(encoding="utf-8")
-        assert 'id="beta12"' in docs
+        assert 'id="beta13"' in docs
         assert "forge-mvc-iot" in docs
 
 
