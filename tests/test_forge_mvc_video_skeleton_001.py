@@ -27,11 +27,23 @@ def test_package_importable_et_versionne():
     assert hasattr(mod, "register_video_routes")
 
 
-def test_register_video_routes_retourne_le_router():
+def test_register_video_routes_chainable():
+    # Depuis VIDEO-PLAYBACK-RANGE-001, register_video_routes enregistre une
+    # vraie route (testée en détail dans test_video_playback_range_001) ; on
+    # vérifie ici qu'elle est appelable et retourne le router (chaînable).
     from forge_mvc_video import register_video_routes
 
-    sentinel = object()
-    assert register_video_routes(sentinel) is sentinel  # chaînable, no-op au squelette
+    class _Router:
+        def __init__(self):
+            self.added = 0
+
+        def add(self, *a, **k):
+            self.added += 1
+            return self
+
+    router = _Router()
+    assert register_video_routes(router) is router
+    assert router.added >= 1
 
 
 # ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ __all__ = [
     "ENV_STORAGE_ROOT",
     "ENV_MAX_UPLOAD_MB",
     "ENV_MAX_DURATION_SECONDS",
+    "ENV_API_TOKEN",
     "VideoConfig",
     "load_video_config",
 ]
@@ -38,6 +39,7 @@ ENV_FFPROBE_BIN = "FORGE_VIDEO_FFPROBE_BIN"
 ENV_STORAGE_ROOT = "FORGE_VIDEO_STORAGE_ROOT"
 ENV_MAX_UPLOAD_MB = "FORGE_VIDEO_MAX_UPLOAD_MB"
 ENV_MAX_DURATION_SECONDS = "FORGE_VIDEO_MAX_DURATION_SECONDS"
+ENV_API_TOKEN = "FORGE_VIDEO_API_TOKEN"
 
 
 @dataclass(frozen=True)
@@ -49,6 +51,10 @@ class VideoConfig:
     storage_root: str = DEFAULT_STORAGE_ROOT
     max_upload_mb: int = DEFAULT_MAX_UPLOAD_MB
     max_duration_seconds: int = DEFAULT_MAX_DURATION_SECONDS
+    # Protection optionnelle des routes de lecture : si défini, un en-tête
+    # ``Authorization: Bearer <token>`` est exigé ; sinon les routes sont
+    # ouvertes (mode local/pédagogique). None = pas de token.
+    api_token: str | None = None
 
 
 def _int(source: Mapping[str, str], key: str, default: int) -> int:
@@ -73,4 +79,5 @@ def load_video_config(source: Mapping[str, str] | None = None) -> VideoConfig:
         max_duration_seconds=_int(
             env, ENV_MAX_DURATION_SECONDS, DEFAULT_MAX_DURATION_SECONDS
         ),
+        api_token=env.get(ENV_API_TOKEN) or None,
     )
