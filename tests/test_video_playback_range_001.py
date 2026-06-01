@@ -4,6 +4,10 @@ Aucune base réelle (repository factice) ; le fichier est écrit dans tmp_path.
 """
 from __future__ import annotations
 
+import pytest
+
+pytest.importorskip("forge_mvc_video")
+
 from forge_mvc_video.config import VideoConfig, load_video_config
 from forge_mvc_video.http import (
     ROUTE_PLAYBACK,

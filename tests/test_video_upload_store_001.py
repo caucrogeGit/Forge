@@ -6,6 +6,7 @@ Le stockage écrit dans ``tmp_path``. Aucun ffmpeg/ffprobe lancé.
 from __future__ import annotations
 
 import pytest
+pytest.importorskip("forge_mvc_video")
 
 from forge_mvc_video.config import load_video_config
 from forge_mvc_video.ingest import VideoIngestError, ingest_video

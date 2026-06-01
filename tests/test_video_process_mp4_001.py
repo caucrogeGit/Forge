@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
+pytest.importorskip("forge_mvc_video")
 
 from forge_mvc_video.config import VideoConfig
 from forge_mvc_video.probe import VideoMetadata, VideoProbeError

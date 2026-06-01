@@ -5,6 +5,10 @@ injectée. On teste le parsing, le routage <id>/--pending, les codes retour.
 """
 from __future__ import annotations
 
+import pytest
+
+pytest.importorskip("forge_mvc_video")
+
 from forge_mvc_video.cli.process import run_process
 from forge_mvc_video.process import VideoProcessError
 from forge_mvc_video.storage.repository import VideoRepository

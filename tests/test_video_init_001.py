@@ -8,6 +8,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("forge_mvc_video")
+
 from forge_mvc_video.cli.init import (
     init_video_migrations,
     iter_video_migration_resources,

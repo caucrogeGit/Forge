@@ -6,6 +6,7 @@ un runner factice. Garde-fous de sécurité : args en liste, faststart présent.
 from __future__ import annotations
 
 import pytest
+pytest.importorskip("forge_mvc_video")
 
 from forge_mvc_video.transcode import (
     DEFAULT_POSTER_TIMEOUT,
