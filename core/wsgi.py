@@ -123,7 +123,18 @@ def _response_to_wsgi(
     la main. HSTS est conditionné à `is_https=True` (cf
     `WSGI-SECURITY-HEADERS-001`).
     """
-    body = response.body if response.body is not None else b""
+    # Corps : soit un itérable de streaming (Response.file → Range/206,
+    # CORE-HTTP-FILE-RANGE-001), soit le `body` bytes habituel. Dans le cas
+    # streaming, `Content-Length` vient de `response.content_length` (taille de
+    # la tranche servie), pas de `len(body)`.
+    stream = getattr(response, "stream", None)
+    if stream is not None:
+        body_iter: Iterable[bytes] = stream
+        content_length = getattr(response, "content_length", None) or 0
+    else:
+        body = response.body if response.body is not None else b""
+        body_iter = [body]
+        content_length = len(body)
 
     # On part des headers applicatifs, on superpose les défauts de sécurité,
     # puis on construit la liste WSGI finale. Content-Type / Content-Length
@@ -141,12 +152,12 @@ def _response_to_wsgi(
 
     headers: list[tuple[str, str]] = [
         ("Content-Type", response.content_type),
-        ("Content-Length", str(len(body))),
+        ("Content-Length", str(content_length)),
     ]
     for key, value in headers_dict.items():
         headers.append((key, value))
     start_response(_format_status(response.status), headers)
-    return [body]
+    return body_iter
 
 
 def create_wsgi_app(application):
