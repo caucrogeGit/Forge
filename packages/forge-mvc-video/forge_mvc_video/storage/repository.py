@@ -55,6 +55,10 @@ _UPDATE_METADATA_SQL = (
     "UPDATE videos SET duration_seconds = %s, width = %s, height = %s, "
     "updated_at = %s WHERE id = %s"
 )
+_MARK_READY_SQL = (
+    "UPDATE videos SET status = %s, mp4_path = %s, poster_path = %s, "
+    "error_message = NULL, updated_at = %s WHERE id = %s"
+)
 _SELECT_RECENT_SQL = "SELECT * FROM videos ORDER BY id DESC LIMIT %s"
 
 
@@ -144,6 +148,20 @@ class VideoRepository:
         self._db.execute(
             _UPDATE_METADATA_SQL,
             (duration_seconds, width, height, now or _utcnow(), video_id),
+        )
+
+    def mark_ready(
+        self,
+        video_id: int,
+        *,
+        mp4_path: str,
+        poster_path: str | None,
+        now: datetime | None = None,
+    ) -> None:
+        """Passe la vidéo en ``ready`` avec ses chemins de sortie (efface l'erreur)."""
+        self._db.execute(
+            _MARK_READY_SQL,
+            (STATUS_READY, mp4_path, poster_path, now or _utcnow(), video_id),
         )
 
     def list_recent(self, limit: int = 50) -> list[dict]:

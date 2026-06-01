@@ -17,6 +17,8 @@ __all__ = [
     "ALLOWED_EXTENSIONS",
     "safe_extension",
     "original_relpath",
+    "mp4_relpath",
+    "poster_relpath",
     "store_original",
 ]
 
@@ -29,10 +31,23 @@ def safe_extension(filename: str) -> str:
     return Path(filename or "").suffix.lower()
 
 
+def _partition(now: datetime | None) -> datetime:
+    return now or datetime.now(UTC).replace(tzinfo=None)
+
+
 def original_relpath(uuid: str, ext: str, *, now: datetime | None = None) -> str:
     """Chemin relatif de la source, partitionné par date, uuid-based."""
-    dt = now or datetime.now(UTC).replace(tzinfo=None)
-    return f"originals/{dt:%Y/%m}/{uuid}/source{ext}"
+    return f"originals/{_partition(now):%Y/%m}/{uuid}/source{ext}"
+
+
+def mp4_relpath(uuid: str, *, now: datetime | None = None) -> str:
+    """Chemin relatif du MP4 transcodé (uuid-based)."""
+    return f"mp4/{_partition(now):%Y/%m}/{uuid}/video.mp4"
+
+
+def poster_relpath(uuid: str, *, now: datetime | None = None) -> str:
+    """Chemin relatif du poster JPG (uuid-based)."""
+    return f"posters/{_partition(now):%Y/%m}/{uuid}/poster.jpg"
 
 
 def store_original(
