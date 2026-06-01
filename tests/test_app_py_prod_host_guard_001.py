@@ -193,13 +193,21 @@ class TestWsgiPathNotBlocked:
 
 
 @pytest.fixture
-def env_prod_with_public_host(tmp_path):
-    """Backup `env/prod`, écrit un fichier qui pose `APP_HOST=0.0.0.0`,
-    yield, puis restaure systématiquement (même si le test échoue)."""
+def env_prod_with_public_host():
+    """Pose `APP_HOST=0.0.0.0` dans `env/prod`, yield, puis restaure.
+
+    `env/prod` est gitignoré : sur un checkout propre (CI), il est absent. On
+    le synthétise alors à partir de `env/example` (toujours commité, donc
+    présent partout) — qui contient toutes les clés que `config.py` lit à
+    l'import — et on le supprime au teardown. Le test reste ainsi autonome,
+    sans dépendre d'un `env/prod` local ni laisser de trace sur le tree.
+    """
     env_prod_file = _REPO_ROOT / "env" / "prod"
-    backup_path = tmp_path / "env-prod.backup"
-    original = env_prod_file.read_text(encoding="utf-8")
-    backup_path.write_text(original, encoding="utf-8")
+    existed = env_prod_file.exists()
+    if existed:
+        original = env_prod_file.read_text(encoding="utf-8")
+    else:
+        original = (_REPO_ROOT / "env" / "example").read_text(encoding="utf-8")
     try:
         # Réécriture : on retire la ligne APP_HOST existante et on injecte 0.0.0.0.
         new_lines = [
@@ -210,8 +218,12 @@ def env_prod_with_public_host(tmp_path):
         env_prod_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
         yield
     finally:
-        # Restauration inconditionnelle.
-        env_prod_file.write_text(original, encoding="utf-8")
+        # Restauration inconditionnelle : restaurer le contenu si le fichier
+        # préexistait, sinon le supprimer (checkout propre / CI).
+        if existed:
+            env_prod_file.write_text(original, encoding="utf-8")
+        else:
+            env_prod_file.unlink(missing_ok=True)
 
 
 class TestEndToEndAppPyRefusesToStart:
