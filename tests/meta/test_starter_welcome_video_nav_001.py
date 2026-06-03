@@ -44,9 +44,13 @@ class TestDebutantChain:
         page = VIDEO / "debutant" / "video-welcome.md"
         assert "(video-list.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # video-list est (pour l'instant) le dernier palier débutant.
+    def test_video_list_points_to_video_detail(self):
         page = VIDEO / "debutant" / "video-list.md"
+        assert "(video-detail.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # video-detail est (pour l'instant) le dernier palier débutant.
+        page = VIDEO / "debutant" / "video-detail.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_debutant_bilan_points_to_recapitulatif(self):

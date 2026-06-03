@@ -81,6 +81,6 @@ class VideoListController(BaseController):
 
 ## Après ce starter
 
-Vous savez lister les vidéos. Faites le point dans le bilan du niveau.
+Vous savez lister les vidéos. La suite : afficher le détail d'une vidéo.
 
-[Bilan du niveau débutant](bilan.md)
+[Le détail d'une vidéo](video-detail.md)

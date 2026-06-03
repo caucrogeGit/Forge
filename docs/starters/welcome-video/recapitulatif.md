@@ -13,6 +13,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 |---|--------|------------------|---------|
 | 1 | [Bonjour Forge Vidéo](debutant/video-welcome.md) | Vérifier le module, inspecter la config (secret masqué) | `load_video_config` |
 | 2 | [Lister les vidéos](debutant/video-list.md) | Lire les dernières vidéos, rester pédagogique si la table manque | `VideoRepository.list_recent` |
+| 3 | [Le détail d'une vidéo](debutant/video-detail.md) | Cibler une vidéo par UUID (trouvée / `404` / `503`) | `get_by_uuid` |
 
 ## Configuration (`forge_mvc_video.config`)
 
@@ -28,3 +29,4 @@ Un secret (token) est **toujours masqué** quand la config est sérialisée.
 |---------|-------|
 | `VideoRepository()` | Accès aux vidéos enregistrées (utilise `core.database.db` par défaut) |
 | `repo.list_recent(limit=…)` | Dernières vidéos, ordre du plus récent |
+| `repo.get_by_uuid(uuid)` | Une vidéo précise (ou `None`) |

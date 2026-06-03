@@ -163,6 +163,7 @@ nav:
           - Débutant:
               - Bonjour Forge Vidéo: starters/welcome-video/debutant/video-welcome.md
               - Lister les vidéos: starters/welcome-video/debutant/video-list.md
+              - Le détail d'une vidéo: starters/welcome-video/debutant/video-detail.md
               - Bilan débutant: starters/welcome-video/debutant/bilan.md
           - Aide-mémoire: starters/welcome-video/recapitulatif.md
       - CRUD:

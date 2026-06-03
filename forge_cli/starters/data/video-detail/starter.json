@@ -1,0 +1,23 @@
+{
+  "id": "video-detail",
+  "number": 42,
+  "name": "Le détail d'une vidéo",
+  "kind": "skeleton",
+  "aliases": [
+    "video-detail",
+    "video_detail",
+    "42"
+  ],
+  "description": "Le détail d'une vidéo : dernier palier du niveau débutant de welcome-video. Une route paramétrée `/video-detail/{uuid}` lit une vidéo précise via `VideoRepository.get_by_uuid` et la renvoie en JSON (404 si inconnue, 503 si la table manque). Lecture seule, aucun ffmpeg.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/video-detail/{uuid}",
+  "routes_marker": "video-detail",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/video-detail/00000000-0000-0000-0000-000000000000",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-video/debutant/video-detail/",
+  "check_paths": [
+    "mvc/controllers/video_detail_controller.py"
+  ]
+}
