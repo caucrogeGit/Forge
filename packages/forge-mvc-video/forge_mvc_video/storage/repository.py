@@ -63,6 +63,8 @@ _SELECT_RECENT_SQL = "SELECT * FROM videos ORDER BY id DESC LIMIT %s"
 _SELECT_BY_STATUS_SQL = (
     "SELECT * FROM videos WHERE status = %s ORDER BY id ASC LIMIT %s"
 )
+_DELETE_SQL = "DELETE FROM videos WHERE id = %s"
+_SELECT_ALL_PATHS_SQL = "SELECT original_path, mp4_path, poster_path FROM videos"
 
 
 class DbAdapter(Protocol):
@@ -172,3 +174,21 @@ class VideoRepository:
 
     def list_by_status(self, status: str, limit: int = 100) -> list[dict]:
         return self._db.fetch_all(_SELECT_BY_STATUS_SQL, (status, int(limit)))
+
+    def delete(self, video_id: int) -> None:
+        """Supprime une ligne ``videos`` (utilisé par ``video:cleanup``)."""
+        self._db.execute(_DELETE_SQL, (int(video_id),))
+
+    def all_relpaths(self) -> set[str]:
+        """Tous les chemins relatifs référencés (original/mp4/poster).
+
+        Sert au garbage-collector ``video:cleanup --orphan-files`` : un fichier
+        du stockage absent de cet ensemble est considéré orphelin.
+        """
+        paths: set[str] = set()
+        for row in self._db.fetch_all(_SELECT_ALL_PATHS_SQL, ()):
+            for key in ("original_path", "mp4_path", "poster_path"):
+                value = row.get(key)
+                if value:
+                    paths.add(value)
+        return paths

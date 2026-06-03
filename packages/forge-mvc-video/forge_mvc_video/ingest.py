@@ -34,13 +34,14 @@ def ingest_video(
     data: bytes,
     filename: str,
     *,
+    title: str | None = None,
     config: VideoConfig | None = None,
     repository: VideoRepository | None = None,
     now: datetime | None = None,
 ) -> dict:
     """Valide, stocke et enregistre une vidéo source.
 
-    Retourne un dict ``{id, uuid, original_path, size_bytes, status}``.
+    Retourne un dict ``{id, uuid, title, original_path, size_bytes, status}``.
     Lève ``VideoIngestError`` si l'upload est refusé.
     """
     cfg = config or load_video_config()
@@ -70,8 +71,10 @@ def ingest_video(
     )
     mime_type = mimetypes.guess_type(filename)[0]
 
+    clean_title = title.strip() if title and title.strip() else None
     video_id = repo.insert_uploaded(
         uuid=video_uuid,
+        title=clean_title,
         original_path=original_path,
         size_bytes=size,
         mime_type=mime_type,
@@ -80,6 +83,7 @@ def ingest_video(
     return {
         "id": video_id,
         "uuid": video_uuid,
+        "title": clean_title,
         "original_path": original_path,
         "size_bytes": size,
         "status": "uploaded",

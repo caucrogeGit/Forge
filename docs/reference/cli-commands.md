@@ -1272,6 +1272,24 @@ Code de sortie `1` si le dossier `mvc/` est absent (pas un projet Forge).
 
 </details>
 
+<details markdown="1" id="forge-videoupload">
+<summary><code>forge video:upload</code> - Upload une vidéo source (valide, stocke, statut <code>uploaded</code>)</summary>
+
+Entrée d'upload officielle : valide (taille, extension), stocke la source à un
+emplacement **uuid-based** (anti-traversal) et insère une ligne `videos` au
+statut `uploaded`. N'exécute **aucun** `ffmpeg` — relancer `forge video:process`
+ensuite pour générer le MP4 et le poster.
+
+```bash
+forge video:upload film.mp4
+forge video:upload film.mp4 --title "Conférence 2026"
+```
+
+Code de sortie `1` si l'upload est refusé (taille, extension, fichier vide),
+`2` si le fichier est manquant ou introuvable.
+
+</details>
+
 <details markdown="1" id="forge-videoprocess">
 <summary><code>forge video:process</code> - Traite une vidéo (probe + poster + transcodage MP4)</summary>
 
@@ -1289,6 +1307,28 @@ forge video:process --pending   # traite toutes les vidéos `uploaded`
 dont le traitement échoue passe en `failed` (avec message) sans interrompre
 les autres. Code de sortie `1` si au moins une vidéo échoue ou est introuvable,
 `2` en cas d'usage invalide.
+
+</details>
+
+<details markdown="1" id="forge-videocleanup">
+<summary><code>forge video:cleanup</code> - Purge les vidéos <code>failed</code> et les fichiers orphelins (dry-run par défaut)</summary>
+
+Purge sûre du module vidéo. **dry-run par défaut** : liste ce qui *serait*
+supprimé sans rien toucher ; `--apply` exécute réellement.
+
+```bash
+forge video:cleanup --failed                  # dry-run : vidéos failed
+forge video:cleanup --orphan-files            # dry-run : fichiers non référencés
+forge video:cleanup --failed --apply          # supprime réellement
+```
+
+- `--failed` — supprime les vidéos en statut `failed` (ligne `videos` + fichiers
+  original/mp4/poster) ;
+- `--orphan-files` — supprime les fichiers du stockage non référencés en base ;
+- `--apply` — exécute les suppressions (sinon dry-run).
+
+Aucune suppression hors de `storage_root` (anti-traversal). Code de sortie `2`
+si aucune cible (`--failed` / `--orphan-files`) n'est fournie.
 
 </details>
 
