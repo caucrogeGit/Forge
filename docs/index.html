@@ -116,7 +116,7 @@
     <div class="text-center mb-16">
       <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-beta.13</div>
       <h2 class="text-4xl font-bold tracking-tight mb-0">
-        Forge IoT et opt-ins explicites.
+        Forge IoT, Forge Video et opt-ins explicites.
       </h2>
     </div>
 
@@ -135,6 +135,23 @@
           <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:init</code> — migration <code class="text-xs">iot_events</code></li>
           <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:listen</code> — subscriber MQTT résilient</li>
           <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:simulate</code> — capteurs simulés</li>
+        </ul>
+      </div>
+
+      <!-- Bloc Forge Video -->
+      <div class="landing-panel rounded-xl p-8 border border-white/10">
+        <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Video <span class="text-xs">(Beta)</span></h3>
+        <p class="text-white/60 text-sm leading-relaxed mb-5">
+          Module opt-in pour l'<strong class="text-[#E8651A]">upload</strong>, le
+          <strong class="text-[#E8651A]">transcodage MP4</strong> (H.264/AAC) et la
+          <strong class="text-[#E8651A]">lecture en streaming</strong> (HTTP Range).
+          Le transcodage se fait dans un worker CLI, jamais pendant une requête.
+        </p>
+        <ul class="text-white/60 text-sm leading-relaxed space-y-2 mb-6">
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:upload</code> — entrée d'upload officielle</li>
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:process</code> — worker transcodage MP4 + poster</li>
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:cleanup</code> — purge (dry-run par défaut)</li>
+          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:doctor</code> — diagnostic vidéo</li>
         </ul>
       </div>
 
@@ -159,8 +176,9 @@
       <ul class="text-white/60 text-sm leading-relaxed space-y-2">
         <li class="landing-accent-text"># Forge Core reste autonome</li>
         <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">pip install --pre forge-mvc</code></li>
-        <li class="landing-accent-text pt-3"># Forge IoT s'installe seulement si le projet en a besoin</li>
+        <li class="landing-accent-text pt-3"># Forge IoT / Forge Video s'installent seulement si le projet en a besoin</li>
         <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">pip install --pre forge-mvc-iot</code></li>
+        <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">pip install --pre forge-mvc-video</code></li>
       </ul>
     </div>
 
@@ -268,7 +286,7 @@
           <p class="text-white">
             Une installation <strong class="text-[#E8651A]">éditable</strong> depuis les
             sources (pas via <code class="text-xs text-[#E8651A]">pipx</code>), qui inclut le
-            runtime, les outils et les <strong class="text-[#E8651A]">6 modules opt-in</strong>
+            runtime, les outils et les <strong class="text-[#E8651A]">7 modules opt-in</strong>
             du monorepo.
           </p>
           <p class="text-white">
@@ -809,8 +827,8 @@ router = Router()
         <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Forge 1.0.0-beta.13</h3>
         <p class="text-white/60 text-sm leading-relaxed mb-5">
           Forge marque l'ouverture du code source en lecture, étude et usage éducatif.
-          Core minimal, 6 modules officiels opt-in, type slug auto-généré, contrat
-          public et 16 starters figés avant la 1.0, charte philosophique stable.
+          Core minimal, 7 modules officiels opt-in, type slug auto-généré, contrat
+          public et 17 starters figés avant la 1.0, charte philosophique stable.
         </p>
         <a href="https://forgemvc.com/docs/forge/roadmap/forge-roadmap/"
            target="_blank" rel="noopener noreferrer"

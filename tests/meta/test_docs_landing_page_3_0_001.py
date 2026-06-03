@@ -221,9 +221,9 @@ class TestStateSectionRefonte:
         )
 
     def test_state_mentions_modules_count(self):
-        # Six opt-ins officiels depuis beta.12 (cf. test_optins_count_consistency).
-        assert "6 modules officiels" in self.source, (
-            "La landing devrait mentionner les 6 modules officiels opt-in"
+        # Sept opt-ins officiels depuis beta.13 (ajout de forge-mvc-video, Beta).
+        assert "7 modules officiels" in self.source, (
+            "La landing devrait mentionner les 7 modules officiels opt-in"
         )
 
     def test_state_no_obsolete_phases(self):
