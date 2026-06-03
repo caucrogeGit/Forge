@@ -1125,7 +1125,7 @@ Limites:
 
     "migration:apply": """\
 Usage:
-  forge migration:apply
+  forge migration:apply [--dry-run]
 
 Description:
   Applique sur la base configurée toutes les migrations SQL en statut
@@ -1157,6 +1157,9 @@ Prérequis:
   - mvc/migrations/ contenant au moins un fichier PENDING.
 
 Options:
+  --dry-run     Liste les migrations PENDING et imprime leur SQL SANS rien
+                appliquer ni écrire en base ; relancer sans --dry-run pour
+                appliquer réellement.
   -h, --help    Affiche cette aide sans exécuter la commande.
 
 Limites:

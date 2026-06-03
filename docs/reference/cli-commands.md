@@ -600,8 +600,12 @@ forge migration:status
 Applique les migrations SQL en attente dans `mvc/migrations/`.
 
 ```bash
-forge migration:apply
+forge migration:apply              # applique réellement en base
+forge migration:apply --dry-run    # liste + imprime le SQL, sans rien écrire
 ```
+
+`--dry-run` affiche les migrations PENDING et leur SQL **sans rien appliquer
+ni écrire en base** ; relancer sans `--dry-run` pour appliquer réellement.
 
 </details>
 
