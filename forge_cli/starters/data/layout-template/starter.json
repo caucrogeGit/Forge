@@ -1,0 +1,26 @@
+{
+  "id": "layout-template",
+  "number": 21,
+  "name": "Héritage de gabarit",
+  "kind": "skeleton",
+  "aliases": [
+    "layout-template",
+    "layout_template",
+    "layout",
+    "21"
+  ],
+  "description": "Héritage de gabarit : palier 4 du niveau intermédiaire. Une route `GET /layout-template` rend une page qui hérite d'un gabarit partagé via `{% extends %}` + `{% block %}`, au lieu de répéter le document HTML complet. Aucune base de données, aucune écriture.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/layout-template",
+  "routes_marker": "layout-template",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/layout-template",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/intermediaire/layout-template/",
+  "check_paths": [
+    "mvc/controllers/layout_template_controller.py",
+    "mvc/views/layout_template/index.html",
+    "mvc/views/layouts/starter_layout.html"
+  ]
+}

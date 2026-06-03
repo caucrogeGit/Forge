@@ -11,9 +11,10 @@ débutant) à une petite application pilotée par les données.
 | 1 — [Lister des enregistrements](list-records.md) | Lire **plusieurs** lignes avec `fetch_all` et les itérer dans une vue (`{% for %}`). |
 | 2 — [Rechercher / filtrer](filter-list.md) | Filtrer une liste avec `request.param` + `WHERE … LIKE ?` paramétré. |
 | 3 — [Paginer une liste](pagination.md) | `LIMIT ? OFFSET ?` + `COUNT(*)`, liens précédent/suivant. |
+| 4 — [Héritage de gabarit](layout-template.md) | Factoriser l'enveloppe HTML avec `{% extends %}` + `{% block %}`. |
 
-*(Le niveau intermédiaire s'enrichira des paliers suivants : héritage de
-gabarit, mise à jour, suppression, sessions, messages flash.)*
+*(Le niveau intermédiaire s'enrichira des paliers suivants : mise à jour,
+suppression, sessions, messages flash.)*
 
 ## Et ensuite
 

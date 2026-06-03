@@ -128,7 +128,7 @@ class PaginationController(BaseController):
 
 ## Après ce starter
 
-C'est, pour l'instant, le dernier palier disponible du **niveau intermédiaire**.
-Faites le point dans le bilan du niveau.
+Passez au palier suivant : **Héritage de gabarit** — factoriser l'enveloppe
+HTML commune avec `{% extends %}`.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Continuer avec Héritage de gabarit](layout-template.md)
