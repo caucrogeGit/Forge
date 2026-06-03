@@ -1,0 +1,25 @@
+{
+  "id": "session-state",
+  "number": 24,
+  "name": "Mémoriser un état en session",
+  "kind": "skeleton",
+  "aliases": [
+    "session-state",
+    "session_state",
+    "session",
+    "24"
+  ],
+  "description": "Mémoriser un état en session : palier 7 du niveau intermédiaire. Une route `GET /session-state` mémorise un compteur de visites entre requêtes via le store de session (`core.sessions.manager` + `core.security.session`), avec un cookie `session_id` durci. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/session-state",
+  "routes_marker": "session-state",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/session-state",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/intermediaire/session-state/",
+  "check_paths": [
+    "mvc/controllers/session_state_controller.py",
+    "mvc/views/session_state/index.html"
+  ]
+}

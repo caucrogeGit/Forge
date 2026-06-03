@@ -1,0 +1,6 @@
+# forge-starter:session-state:start
+from mvc.controllers.session_state_controller import SessionStateController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/session-state", SessionStateController.index, name="session_state_index")
+# forge-starter:session-state:end

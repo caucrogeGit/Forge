@@ -105,7 +105,7 @@ class DeleteRecordController(BaseController):
 
 ## Après ce starter
 
-C'est, pour l'instant, le dernier palier disponible du **niveau intermédiaire**.
-Faites le point dans le bilan du niveau.
+Passez au palier suivant : **Mémoriser un état en session** — garder un état
+côté serveur entre les requêtes.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Continuer avec Mémoriser un état en session](session-state.md)

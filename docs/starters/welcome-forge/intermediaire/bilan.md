@@ -14,9 +14,9 @@ débutant) à une petite application pilotée par les données.
 | 4 — [Héritage de gabarit](layout-template.md) | Factoriser l'enveloppe HTML avec `{% extends %}` + `{% block %}`. |
 | 5 — [Modifier un enregistrement](update-record.md) | Formulaire pré-rempli + `UPDATE … WHERE id = ?` (POST + CSRF). |
 | 6 — [Supprimer un enregistrement](delete-record.md) | Action destructive `POST` + CSRF + `DELETE … WHERE id = ?`. |
+| 7 — [Mémoriser un état en session](session-state.md) | Garder un état entre requêtes via le store de session + cookie durci. |
 
-*(Le niveau intermédiaire s'enrichira des paliers suivants : sessions, messages
-flash.)*
+*(Le niveau intermédiaire se terminera par : messages flash.)*
 
 ## Et ensuite
 

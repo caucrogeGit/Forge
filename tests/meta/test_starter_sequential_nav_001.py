@@ -135,7 +135,7 @@ class TestSequentialChain:
 
     def test_intermediaire_last_palier_points_to_level_bilan(self):
         # Dernier palier intermédiaire disponible → bilan du niveau.
-        page = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "delete-record.md"
+        page = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "session-state.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_intermediaire_bilan_points_to_recapitulatif(self):
