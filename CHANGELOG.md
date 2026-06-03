@@ -75,7 +75,12 @@
 - `tools/release-validate.sh` : correction d'un bug `set -e` qui masquait
   silencieusement un échec d'audit ; l'audit `pip-audit` des dépendances de dev
   distingue désormais une **vulnérabilité** (bloquante) d'une **résolution
-  impossible avant publication** (œuf-poule, non bloquante).
+  impossible avant publication** (œuf-poule, non bloquante) ; nouveau mode
+  opt-in **`--with-packages`** qui build les 8 distributions + `twine check` en
+  local (RELEASE-VALIDATE-PACKAGES-001).
+- Documentation du contrat CLI : `forge migration:apply --dry-run` documenté
+  dans l'aide intégrée et `docs/reference/cli-commands.md`
+  (DOCS-MIGRATION-DRY-RUN-001).
 - Cadrage Alpha de `forge-mvc-iot` (installation séparée, exclu de
   `forge-mvc[all]`).
 - Distribution : exclusion des tests du sdist, exclusion du bytecode des

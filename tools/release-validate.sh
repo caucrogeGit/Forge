@@ -59,7 +59,18 @@ if [ "${1:-}" = "--convert" ]; then
     esac
 fi
 
-VERSION="${1:-}"
+# RELEASE-VALIDATE-PACKAGES-001 — `--with-packages` (opt-in) ajoute le build
+# des 8 distributions + twine check. Hors flag, comportement inchangé (on ne
+# rallonge pas chaque run ; la CI build aussi de son côté).
+WITH_PACKAGES=false
+_ARGS=()
+for _arg in "$@"; do
+    case "$_arg" in
+        --with-packages) WITH_PACKAGES=true ;;
+        *) _ARGS+=("$_arg") ;;
+    esac
+done
+VERSION="${_ARGS[0]:-}"
 PUBLIC_VERSION=""
 PEP440_VERSION=""
 ERRORS=0
@@ -84,6 +95,9 @@ if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
 fi
 
 echo "=== Validation pré-release Forge ${VERSION:-<version non fournie>} ==="
+if $WITH_PACKAGES; then
+    echo "Mode : --with-packages (build des 8 distributions + twine check)"
+fi
 echo ""
 
 # ── 1. Version fournie ────────────────────────────────────────────────────────
@@ -287,6 +301,42 @@ if [ -n "$PUBLIC_VERSION" ]; then
         _warn "Tag v$PUBLIC_VERSION existe déjà (re-release ?)"
     else
         _ok "Tag v$PUBLIC_VERSION absent — prêt à créer"
+    fi
+fi
+
+# ── 13. Build & twine des 8 distributions (opt-in : --with-packages) ─────────
+# RELEASE-VALIDATE-PACKAGES-001 — preuve LOCALE que core + 7 opt-ins se
+# construisent et passent twine check (pas seulement « la CI le fait »).
+# Exécuté après le contrôle git propre : les artefacts dist/ sont gitignorés.
+if $WITH_PACKAGES; then
+    echo ""
+    echo "--- Build des distributions (core + 7 opt-ins) ---"
+    rm -rf dist build ./*.egg-info
+    for _p in packages/*/; do rm -rf "${_p}dist" "${_p}build" "${_p}"*.egg-info; done 2>/dev/null || true
+    BUILD_OK=true
+    if ! "$PYTHON_BIN" -m build --no-isolation >/tmp/relval_build_core.log 2>&1; then
+        _fail "build core : échec"
+        tail -8 /tmp/relval_build_core.log | sed 's/^/         /' || true
+        BUILD_OK=false
+    fi
+    for _pkg in packages/forge-mvc-mfa packages/forge-mvc-rbac packages/forge-mvc-workflow \
+                packages/forge-mvc-stats packages/forge-mvc-media packages/forge-mvc-iot \
+                packages/forge-mvc-video; do
+        if ! "$PYTHON_BIN" -m build --no-isolation "$_pkg" >/tmp/relval_build_pkg.log 2>&1; then
+            _fail "build $_pkg : échec"
+            tail -8 /tmp/relval_build_pkg.log | sed 's/^/         /' || true
+            BUILD_OK=false
+        fi
+    done
+    if $BUILD_OK; then
+        _ok "Build : 8 distributions construites (core + 7 opt-ins)"
+        echo "--- twine check des artefacts ---"
+        if "$PYTHON_BIN" -m twine check dist/* packages/*/dist/* >/tmp/relval_twine.log 2>&1; then
+            _ok "twine check : tous les artefacts valides"
+        else
+            _fail "twine check : artefact(s) invalide(s)"
+            tail -20 /tmp/relval_twine.log | sed 's/^/         /' || true
+        fi
     fi
 fi
 
