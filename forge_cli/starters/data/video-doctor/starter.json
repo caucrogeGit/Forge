@@ -1,0 +1,23 @@
+{
+  "id": "video-doctor",
+  "number": 48,
+  "name": "Diagnostiquer le module Vidéo",
+  "kind": "skeleton",
+  "aliases": [
+    "video-doctor",
+    "video_doctor",
+    "48"
+  ],
+  "description": "Diagnostiquer le module Vidéo : dernier palier du niveau avancé de welcome-video. Une route exécute les vérifications non invasives du diagnostic Forge Vidéo (paquet, config, migration, présence de ffprobe et ffmpeg) et renvoie leur statut en JSON. Le diagnostic complet (base) reste la commande `forge video:doctor`. Sans base.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/video-doctor",
+  "routes_marker": "video-doctor",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/video-doctor",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-video/avance/video-doctor/",
+  "check_paths": [
+    "mvc/controllers/video_doctor_controller.py"
+  ]
+}

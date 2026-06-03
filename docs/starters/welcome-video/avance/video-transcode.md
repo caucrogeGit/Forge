@@ -95,6 +95,7 @@ class VideoTranscodeController(BaseController):
 
 ## Après ce starter
 
-Vous savez transcoder. Faites le point dans le bilan du niveau.
+Vous savez transcoder. Dernier palier : diagnostiquer le module quand quelque
+chose cloche.
 
-[Bilan du niveau avancé](bilan.md)
+[Diagnostiquer le module Vidéo](video-doctor.md)

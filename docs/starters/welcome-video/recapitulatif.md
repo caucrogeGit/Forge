@@ -29,6 +29,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 |---|--------|------------------|---------|
 | 1 | [Sonder une vidéo](avance/video-probe.md) | Extraire les métadonnées d'une source (ffprobe) | `probe_video` |
 | 2 | [Transcoder une vidéo](avance/video-transcode.md) | Worker de transcodage MP4 (ffmpeg) | `forge video:process`, `process_video` |
+| 3 | [Diagnostiquer le module Vidéo](avance/video-doctor.md) | Vérifier la santé du module (dont ffprobe/ffmpeg) | `forge video:doctor`, contrôles non invasifs |
 
 ## Configuration (`forge_mvc_video.config`)
 
@@ -60,3 +61,5 @@ Un secret (token) est **toujours masqué** quand la config est sérialisée.
 |---------|-------|
 | `probe_video(path, config=…)` | Sonder une source (ffprobe) → métadonnées |
 | `forge video:process <id>` / `--pending` (`process_video`) | Worker : transcoder en MP4 (ffmpeg), avancer le statut |
+| `forge video:doctor` | Diagnostic complet (paquet, config, migration, ffprobe, ffmpeg, `--db`) |
+| `check_package_importable` / `check_config_loadable` / `check_migration_present` / `check_ffprobe_present` / `check_ffmpeg_present` | Contrôles de diagnostic non invasifs, réutilisables en app |

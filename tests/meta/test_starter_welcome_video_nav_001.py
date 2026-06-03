@@ -92,9 +92,13 @@ class TestAvanceChain:
         page = VIDEO / "avance" / "video-probe.md"
         assert "(video-transcode.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # video-transcode est (pour l'instant) le dernier palier avancé.
+    def test_video_transcode_points_to_video_doctor(self):
         page = VIDEO / "avance" / "video-transcode.md"
+        assert "(video-doctor.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # video-doctor est le dernier palier avancé (et de toute la progression).
+        page = VIDEO / "avance" / "video-doctor.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_bilan_points_to_recapitulatif(self):

@@ -10,8 +10,10 @@ transcodage ffmpeg, et diagnostic du module.
 |--------|--------------------|
 | 1 — [Sonder une vidéo](video-probe.md) | Extraire les métadonnées d'un fichier via `probe_video` (ffprobe, lecture seule). |
 | 2 — [Transcoder une vidéo](video-transcode.md) | Lancer le worker `forge video:process` (`process_video`, ffmpeg) : `uploaded → ready`. |
+| 3 — [Diagnostiquer le module Vidéo](video-doctor.md) | Vérifier la santé du module, dont la présence de ffprobe/ffmpeg (`forge video:doctor`). |
 
-Vous savez maintenant inspecter une source et la transcoder en MP4 via le worker.
+Vous savez maintenant inspecter une source, la transcoder en MP4 via le worker et
+diagnostiquer le module en exploitation.
 
 ## Et ensuite
 
