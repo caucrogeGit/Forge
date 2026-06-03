@@ -113,7 +113,7 @@ class UpdateRecordController(BaseController):
 
 ## Après ce starter
 
-C'est, pour l'instant, le dernier palier disponible du **niveau intermédiaire**.
-Faites le point dans le bilan du niveau.
+Passez au palier suivant : **Supprimer un enregistrement** — l'action
+destructive sécurisée par CSRF.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Continuer avec Supprimer un enregistrement](delete-record.md)

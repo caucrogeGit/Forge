@@ -13,9 +13,10 @@ débutant) à une petite application pilotée par les données.
 | 3 — [Paginer une liste](pagination.md) | `LIMIT ? OFFSET ?` + `COUNT(*)`, liens précédent/suivant. |
 | 4 — [Héritage de gabarit](layout-template.md) | Factoriser l'enveloppe HTML avec `{% extends %}` + `{% block %}`. |
 | 5 — [Modifier un enregistrement](update-record.md) | Formulaire pré-rempli + `UPDATE … WHERE id = ?` (POST + CSRF). |
+| 6 — [Supprimer un enregistrement](delete-record.md) | Action destructive `POST` + CSRF + `DELETE … WHERE id = ?`. |
 
-*(Le niveau intermédiaire s'enrichira des paliers suivants : suppression,
-sessions, messages flash.)*
+*(Le niveau intermédiaire s'enrichira des paliers suivants : sessions, messages
+flash.)*
 
 ## Et ensuite
 

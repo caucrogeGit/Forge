@@ -130,6 +130,7 @@ nav:
               - Paginer une liste: starters/welcome-forge/intermediaire/pagination.md
               - Héritage de gabarit: starters/welcome-forge/intermediaire/layout-template.md
               - Modifier un enregistrement: starters/welcome-forge/intermediaire/update-record.md
+              - Supprimer un enregistrement: starters/welcome-forge/intermediaire/delete-record.md
               - Bilan intermédiaire: starters/welcome-forge/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:

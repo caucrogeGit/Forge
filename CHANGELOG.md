@@ -24,7 +24,7 @@
 
 ### Refonte des starters
 
-- **22 starters** renumérotés de façon contiguë (1→22), noms normalisés
+- **23 starters** renumérotés de façon contiguë (1→23), noms normalisés
   (convention `welcome-optin-<module>`, `users-core-auth`, `first-crud`…).
   Progression pédagogique « welcome » en 11 paliers. Les 3 applications métier
   lourdes sont archivées hors du système starter. Le 17ᵉ,

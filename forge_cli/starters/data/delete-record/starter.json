@@ -1,0 +1,26 @@
+{
+  "id": "delete-record",
+  "number": 23,
+  "name": "Supprimer un enregistrement",
+  "kind": "skeleton",
+  "aliases": [
+    "delete-record",
+    "delete_record",
+    "delete",
+    "23"
+  ],
+  "description": "Supprimer un enregistrement : palier 6 du niveau intermédiaire. Une liste avec un bouton de suppression par ligne ; la suppression passe par un POST protégé par CSRF et `core.database.db.execute(\"DELETE … WHERE id = ?\")`. Après écriture, on relit et on ré-affiche.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/delete-record",
+  "routes_marker": "delete-record",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/delete-record",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/intermediaire/delete-record/",
+  "check_paths": [
+    "mvc/controllers/delete_record_controller.py",
+    "mvc/views/delete_record/index.html",
+    "mvc/migrations/20260601134000_seed_delete_record_messages.sql"
+  ]
+}
