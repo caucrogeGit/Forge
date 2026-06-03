@@ -110,7 +110,7 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-beta.13 — Forge IoT & opt-ins explicites -->
+<!-- Nouveautés 1.0.0-beta.13 : Forge IoT, Forge Video & opt-ins explicites -->
 <section id="beta13" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
@@ -130,11 +130,11 @@
           <code class="text-xs">iot_events</code>, relue via une API HTTP JSON.
           Le core reste autonome.
         </p>
-        <ul class="text-white/60 text-sm leading-relaxed space-y-2 mb-6">
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:doctor</code> — diagnostic IoT</li>
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:init</code> — migration <code class="text-xs">iot_events</code></li>
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:listen</code> — subscriber MQTT résilient</li>
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:simulate</code> — capteurs simulés</li>
+        <ul class="text-white/60 text-sm leading-relaxed space-y-3 mb-6">
+          <li><span class="block landing-accent-text"># Diagnostic du module IoT</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:doctor</code></li>
+          <li><span class="block landing-accent-text"># Copie la migration de la table iot_events</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:init</code></li>
+          <li><span class="block landing-accent-text"># Subscriber MQTT résilient</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:listen</code></li>
+          <li><span class="block landing-accent-text"># Capteurs simulés pour tester sans matériel</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:simulate</code></li>
         </ul>
       </div>
 
@@ -147,11 +147,11 @@
           <strong class="text-[#E8651A]">lecture en streaming</strong> (HTTP Range).
           Le transcodage se fait dans un worker CLI, jamais pendant une requête.
         </p>
-        <ul class="text-white/60 text-sm leading-relaxed space-y-2 mb-6">
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:upload</code> — entrée d'upload officielle</li>
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:process</code> — worker transcodage MP4 + poster</li>
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:cleanup</code> — purge (dry-run par défaut)</li>
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:doctor</code> — diagnostic vidéo</li>
+        <ul class="text-white/60 text-sm leading-relaxed space-y-3 mb-6">
+          <li><span class="block landing-accent-text"># Entrée d'upload officielle d'une vidéo</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:upload</code></li>
+          <li><span class="block landing-accent-text"># Worker de transcodage MP4 + poster</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:process</code></li>
+          <li><span class="block landing-accent-text"># Purge des vidéos en échec et fichiers orphelins (dry-run par défaut)</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:cleanup</code></li>
+          <li><span class="block landing-accent-text"># Diagnostic du module vidéo</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:doctor</code></li>
         </ul>
       </div>
 
@@ -164,9 +164,9 @@
           via un registre visible. Le starter
           <code class="text-xs">welcome-optin-iot</code> montre le parcours complet.
         </p>
-        <ul class="text-white/60 text-sm leading-relaxed space-y-2 mb-6">
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge opt-in:enable iot</code> — branche l'opt-in (dry-run par défaut)</li>
-          <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge opt-in:list</code> — état des opt-ins (lecture seule)</li>
+        <ul class="text-white/60 text-sm leading-relaxed space-y-3 mb-6">
+          <li><span class="block landing-accent-text"># Branche l'opt-in dans le projet (dry-run par défaut)</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge opt-in:enable iot</code></li>
+          <li><span class="block landing-accent-text"># État des opt-ins, en lecture seule</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge opt-in:list</code></li>
         </ul>
       </div>
     </div>
