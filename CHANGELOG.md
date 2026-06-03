@@ -1,9 +1,9 @@
 # Changelog
 
 
-## [1.0.0-beta.13] — 2026-05-31
+## [1.0.0-beta.13] — 2026-06-03
 
-> Dernière beta **fonctionnelle** (consolidation post-beta.12 : 65 commits).
+> Dernière beta **fonctionnelle** (consolidation post-beta.12).
 > Roadmap : [`docs/roadmap/beta13-roadmap.md`](docs/roadmap/beta13-roadmap.md).
 
 ### Unification du modèle opt-in (ADR-016)
@@ -29,18 +29,55 @@
   Progression pédagogique « welcome » en 11 paliers. Les 3 applications métier
   lourdes sont archivées hors du système starter.
 
+### Slugs canoniques (feature phare)
+
+- **Type de slug canonique** (`core/slug.py`) : `slugify` déterministe,
+  `is_valid_slug` (contrat de validation unique), génération depuis une colonne
+  `source`. Une seule façon officielle de produire un slug (principe 11).
+- **SQL/CRUD auto-généré** prenant en charge le slug (colonne, index unique,
+  lookup `get_<entité>_by_slug`) et **routing public par slug**.
+- **Documentation** dédiée et **une application réelle construite avec** (Phase
+  dogfood) pour valider le parcours de bout en bout.
+
+### Forge Video — nouvel opt-in `forge-mvc-video`
+
+- Opt-in **`forge-mvc-video`** (Alpha) : upload et stockage de vidéos,
+  extraction de métadonnées (`ffprobe`), **transcodage MP4 (H.264/AAC)**,
+  génération de poster, **lecture en streaming HTTP Range**.
+- Commandes CLI `forge video:doctor` (diagnostic config/package/FFmpeg),
+  `video:init` (migration `videos`), `video:process` (worker de transcodage).
+- FFmpeg/ffprobe traités comme **binaires système** (pas de dépendance pip) ;
+  le module se branche sans eux (mode serveur de médias), `video:doctor`
+  signale leur absence. Publié sur PyPI avec les autres distributions.
+
 ### Robustesse & production
 
 - **`forge run` survit aux crashes** de l'application (relance automatique +
   garde anti-boucle après crashes rapides répétés).
 - Sécurité uploads : vérification du **contenu réel des images** avant écriture.
+- **Production-readiness** : `forge doctor` durci, `forge migration:apply
+  --dry-run`, endpoint de *health*, `forge update` robuste, et **checklist de
+  déploiement** documentée.
+- **Dogfood MariaDB** : parcours réel exécuté sur MariaDB (go/no-go de clôture)
+  validant slugs + CRUD généré.
 
 ### Packaging & documentation
 
+- **Dépendance `forge-mvc` des opt-ins unifiée** à `>=1.0.0b13,<2` sur les sept
+  opt-ins (fin de la cohabitation `==1.0.0b13` / `>=1.0.0b5` — une seule
+  politique de borne, principe 11).
+- `requirements-dev.txt` installe désormais **`forge-mvc-video` en éditable** :
+  sa suite de tests n'est plus silencieusement skippée (`importorskip`) en CI.
+- `tools/release-validate.sh` : correction d'un bug `set -e` qui masquait
+  silencieusement un échec d'audit ; l'audit `pip-audit` des dépendances de dev
+  distingue désormais une **vulnérabilité** (bloquante) d'une **résolution
+  impossible avant publication** (œuf-poule, non bloquante).
 - Cadrage Alpha de `forge-mvc-iot` (installation séparée, exclu de
-  `forge-mvc[all]`) ; couverture de pinning étendue à `media` et `iot`.
+  `forge-mvc[all]`).
 - Distribution : exclusion des tests du sdist, exclusion du bytecode des
-  artefacts.
+  artefacts ; build CI étendu à `forge-mvc-iot` et `forge-mvc-video`.
+- `BETA13-CLOSING-AUDIT-001` **vert**, versions bumpées **b13** sur le core et
+  les sept opt-ins.
 - Réorganisation de la documentation (`docs/guide/`, `features/`,
   `philosophy/`, `reference/`, `release/`, `deployment/`), index des ADR,
   URLs harmonisées vers `forgemvc.com`.
