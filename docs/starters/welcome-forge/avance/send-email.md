@@ -119,7 +119,7 @@ class SendEmailController(BaseController):
 
 ## Après ce starter
 
-Vous savez composer et envoyer un email. Faites le point dans le bilan du
-niveau.
+Vous savez composer et envoyer un email. La suite : exposer une API JSON
+protégée.
 
-[Bilan du niveau avancé](bilan.md)
+[API JSON protégée](json-api.md)

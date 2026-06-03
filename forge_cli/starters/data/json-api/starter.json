@@ -1,0 +1,25 @@
+{
+  "id": "json-api",
+  "number": 29,
+  "name": "API JSON protégée",
+  "kind": "skeleton",
+  "aliases": [
+    "json-api",
+    "json_api",
+    "api",
+    "29"
+  ],
+  "description": "API JSON protégée : palier 4 du niveau avancé. Une route renvoie des données en JSON (`Response.json`) mais uniquement si la requête présente un jeton `Authorization: Bearer …` valide, lu via `request.header(...)`. Sinon elle répond `401` en JSON. Les données proviennent de la table `first_sql_messages`.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/json-api",
+  "routes_marker": "json-api",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/json-api",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/avance/json-api/",
+  "check_paths": [
+    "mvc/controllers/json_api_controller.py",
+    "mvc/migrations/20260601150000_seed_json_api_messages.sql"
+  ]
+}

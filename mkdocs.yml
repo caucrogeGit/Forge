@@ -138,6 +138,7 @@ nav:
               - Relations entre tables: starters/welcome-forge/avance/relations.md
               - Téléverser un fichier: starters/welcome-forge/avance/file-upload.md
               - Envoyer un email: starters/welcome-forge/avance/send-email.md
+              - API JSON protégée: starters/welcome-forge/avance/json-api.md
               - Bilan avancé: starters/welcome-forge/avance/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:

@@ -1,0 +1,6 @@
+# forge-starter:json-api:start
+from mvc.controllers.json_api_controller import JsonApiController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/json-api", JsonApiController.index, name="json_api_index")
+# forge-starter:json-api:end
