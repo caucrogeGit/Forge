@@ -221,19 +221,27 @@ if ! "$PYTHON_BIN" -m pip_audit --version >/dev/null 2>&1; then
     _fail "pip-audit non installé dans $PYTHON_BIN — requis pour la validation release."
     echo "         Installer : $PYTHON_BIN -m pip install 'pip-audit>=2.0'"
 else
-    PIP_AUDIT_RT_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements.txt 2>&1); PIP_AUDIT_RT_EXIT=$?; true
-    if [ $PIP_AUDIT_RT_EXIT -eq 0 ]; then
+    # RELEASE-VALIDATE-SETE-FIX-001 : la command-substitution est placée
+    # DANS la condition du `if` (exemptée de `set -e`). L'ancien motif
+    # `VAR=$(cmd); EXIT=$?; true` ne protégeait PAS l'assignation : un
+    # pip-audit en échec tuait le script avant d'afficher le _fail.
+    if PIP_AUDIT_RT_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements.txt 2>&1); then
         _ok "pip-audit (requirements.txt) : aucune vulnérabilité"
     else
         _fail "pip-audit (requirements.txt) : vulnérabilités détectées"
-        echo "$PIP_AUDIT_RT_OUT" | head -20 | sed 's/^/         /'
+        printf '%s\n' "$PIP_AUDIT_RT_OUT" | head -20 | sed 's/^/         /' || true
     fi
-    PIP_AUDIT_DEV_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements-dev.txt 2>&1); PIP_AUDIT_DEV_EXIT=$?; true
-    if [ $PIP_AUDIT_DEV_EXIT -eq 0 ]; then
+    if PIP_AUDIT_DEV_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements-dev.txt 2>&1); then
         _ok "pip-audit (requirements-dev.txt) : aucune vulnérabilité"
+    elif printf '%s' "$PIP_AUDIT_DEV_OUT" | grep -qiE 'No matching distribution found for forge-mvc|Could not find a version that satisfies the requirement forge-mvc'; then
+        # Œuf-poule pré-release : requirements-dev.txt installe les opt-ins
+        # locaux en éditable, qui dépendent de forge-mvc>=<version> pas encore
+        # publié sur PyPI. La résolution échoue — ce n'est PAS une CVE.
+        # L'audit dev redevient effectif après publication de forge-mvc.
+        _warn "pip-audit (requirements-dev.txt) : différé — opt-ins locaux exigent forge-mvc non encore publié (œuf-poule pré-release) ; relancer après publication PyPI"
     else
         _fail "pip-audit (requirements-dev.txt) : vulnérabilités détectées"
-        echo "$PIP_AUDIT_DEV_OUT" | head -20 | sed 's/^/         /'
+        printf '%s\n' "$PIP_AUDIT_DEV_OUT" | head -20 | sed 's/^/         /' || true
     fi
 fi
 
@@ -248,12 +256,11 @@ elif ! command -v npm >/dev/null 2>&1; then
     _fail "npm non installé — requis pour la validation release Node."
     echo "         Installer Node.js / npm puis relancer."
 else
-    NPM_AUDIT_OUT=$(npm audit --omit=dev 2>&1); NPM_AUDIT_EXIT=$?; true
-    if [ $NPM_AUDIT_EXIT -eq 0 ]; then
+    if NPM_AUDIT_OUT=$(npm audit --omit=dev 2>&1); then
         _ok "npm audit (--omit=dev) : aucune vulnérabilité"
     else
         _fail "npm audit (--omit=dev) : vulnérabilités détectées"
-        echo "$NPM_AUDIT_OUT" | head -20 | sed 's/^/         /'
+        printf '%s\n' "$NPM_AUDIT_OUT" | head -20 | sed 's/^/         /' || true
     fi
 fi
 
