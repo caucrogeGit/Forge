@@ -122,7 +122,7 @@ nav:
           - Validation serveur: starters/welcome-forge/debutant/server-validation.md
           - Première base SQL: starters/welcome-forge/debutant/first-sql.md
           - Écrire en base: starters/welcome-forge/debutant/first-sql-write.md
-          - Bilan du starter: starters/welcome-forge/bilan.md
+          - Bilan du starter: starters/welcome-forge/debutant/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md

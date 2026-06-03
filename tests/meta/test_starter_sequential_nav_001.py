@@ -1,10 +1,11 @@
 """Tests documentaires — STARTER-SEQUENTIAL-NAV-001.
 
 Verrouille la navigation pédagogique séquentielle entre pages de
-starters. Chaque page pointe vers le palier suivant via un lien
-``../<slug>/`` (ou ``../<slug>/index.md``) dans une section
-« Après ce starter ». Le starter autonome First CRUD clôt la
-chaîne et renvoie vers la vue d'ensemble.
+starters. Chaque palier pointe vers le suivant (fichier frère
+``<slug>.md`` au sein du dossier de niveau). Le **dernier palier** d'un
+niveau pointe vers le **bilan du niveau** (``bilan.md``, page sœur), et
+ce bilan renvoie au premier palier du niveau suivant s'il existe, sinon
+au ``recapitulatif.md`` à la racine du starter (STARTERS-DOC-LEVELS).
 
 Vérifie aussi :
 
@@ -42,13 +43,15 @@ SEQUENTIAL_CHAIN: dict[str, str] = {
     "form-post": "server-validation",
     "server-validation": "first-sql",
     "first-sql": "first-sql-write",
-    "first-sql-write": "first-crud",
 }
 
-# Pages pédagogiques (paliers 1→11). first-crud et first-crud-generated
-# sont exclus : ce sont des starters autonomes (dossier-sujet crud/), qui
-# peuvent garder des étiquettes historiques ("Starter 1").
-PEDAGOGICAL_PAGES = list(SEQUENTIAL_CHAIN.keys())
+# Pages pédagogiques (paliers 1→11). `first-sql-write` est le dernier palier
+# du niveau : il n'a pas de palier suivant dans le chaînage (il pointe vers le
+# bilan du niveau), mais reste une page pédagogique à part entière.
+# first-crud et first-crud-generated sont exclus : ce sont des starters
+# autonomes (dossier-sujet crud/), qui peuvent garder des étiquettes
+# historiques ("Starter 1").
+PEDAGOGICAL_PAGES = list(SEQUENTIAL_CHAIN.keys()) + ["first-sql-write"]
 
 # Starters autonomes du sujet CRUD (à la main + généré).
 STANDALONE_STARTERS = ["first-crud", "first-crud-generated"]
@@ -109,12 +112,26 @@ class TestSequentialChain:
             f"« {link_variants[0]} » (STARTER-SEQUENTIAL-NAV-001)."
         )
 
-    def test_last_palier_points_to_premier_crud(self):
-        # Le dernier palier de la progression de découverte est
-        # first-sql-write (écriture en base) ; sa section « Après ce
-        # starter » pointe vers le premier starter autonome, first-crud.
+    def test_last_palier_points_to_level_bilan(self):
+        # STARTERS-DOC-LEVELS — le dernier palier d'un niveau pointe vers le
+        # bilan DU NIVEAU (page sœur dans le dossier du niveau), pas vers un
+        # starter autonome.
         content = _doc_path("first-sql-write").read_text(encoding="utf-8")
-        assert "../crud/first-crud.md" in content
+        assert "(bilan.md)" in content, (
+            "Le dernier palier (first-sql-write) doit pointer vers le bilan "
+            "du niveau (`bilan.md`) — STARTERS-DOC-LEVELS."
+        )
+
+    def test_level_bilan_points_to_recapitulatif(self):
+        # Le bilan du niveau renvoie au premier palier du niveau suivant s'il
+        # existe ; sinon (cas actuel : pas encore de niveau intermédiaire) au
+        # récapitulatif à la racine du starter.
+        bilan = STARTERS_DOCS / "welcome-forge" / "debutant" / "bilan.md"
+        content = bilan.read_text(encoding="utf-8")
+        assert "../recapitulatif.md" in content, (
+            "Le bilan du niveau débutant doit renvoyer au récapitulatif "
+            "(`../recapitulatif.md`) tant qu'il n'y a pas de niveau suivant."
+        )
 
     def test_premier_crud_returns_to_overview(self):
         # first-crud clôt la chaîne pédagogique et renvoie vers ../

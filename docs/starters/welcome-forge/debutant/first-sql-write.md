@@ -142,12 +142,8 @@ class FirstSqlWriteController(BaseController):
 
 ## Après ce starter
 
-C'est le **dernier palier** du starter de découverte *Bonjour Forge*.
-Vous savez maintenant **lire et écrire** en base. Faites le point sur
-tout ce que vous avez validé, puis enchaînez sur le premier starter
-autonome : le **CRUD complet**, qui structure ces opérations (créer,
-lister, modifier, supprimer) sur une entité neutre.
+C'est le **dernier palier** du niveau **débutant** du starter de découverte
+*Bonjour Forge*. Vous savez maintenant **lire et écrire** en base. Faites le
+point sur tout ce que vous avez validé dans le bilan du niveau.
 
-[Bilan du starter Bonjour Forge](../bilan.md)
-
-[Prochain starter : First CRUD](../../crud/first-crud.md)
+[Bilan du niveau débutant](bilan.md)
