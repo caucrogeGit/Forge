@@ -46,7 +46,7 @@ Voir [Politique de release](../release/release-policy.md#publication-pypi).
 | `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Alpha** — publié PyPI depuis `1.0.0-beta.9` |
 | `forge-mvc-media` | Brique media — helpers applicatifs upload | **Alpha** — publié PyPI depuis `1.0.0-beta.9` (API encore bêta, voir [Limites](../deployment/production-limits.md)) |
 | `forge-mvc-iot` | Brique IoT — subscriber MQTT, stockage `iot_events`, API HTTP | **Alpha** — publié PyPI depuis `1.0.0-beta.12` |
-| `forge-mvc-video` | Brique vidéo — upload, transcodage MP4, lecture HTTP Range | **Alpha** — publié PyPI depuis `1.0.0-beta.13` |
+| `forge-mvc-video` | Brique vidéo — upload, transcodage MP4, lecture HTTP Range | **Beta** — publié PyPI depuis `1.0.0-beta.13` |
 
 Pour installer Forge avec toutes les briques opt-in :
 

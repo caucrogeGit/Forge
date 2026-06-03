@@ -204,6 +204,9 @@ nav:
       - Exemple ESP32: iot/esp32-example.md
       - Évaluation Arduino R4: iot/arduino-r4-assessment.md
 
+  - Vidéo (opt-in):
+      - Parcours complet: video/parcours.md
+
   - Tests terrain:
       - Vue d'ensemble: testing/index.md
       - État des parcours: testing/field-test-status.md

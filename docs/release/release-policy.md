@@ -152,7 +152,7 @@ chaque package publiable :
 | `forge-mvc-mfa` | `3 - Alpha` | Secret TOTP chiffré au repos (Fernet, `MFA-PYPI-READY-001`) — publié sur PyPI depuis `1.0.0-beta.9`, passage Alpha → Beta à venir |
 | `forge-mvc-media` | `3 - Alpha` | API applicative encore bêta — publié sur PyPI depuis `1.0.0-beta.9` (voir `production-limits.md`) |
 | `forge-mvc-iot` | `3 - Alpha` | Module IoT opt-in (MQTT → `iot_events` → API HTTP) — publié sur PyPI depuis `1.0.0-beta.12`, API encore en stabilisation |
-| `forge-mvc-video` | `3 - Alpha` | Module vidéo opt-in (upload, transcodage MP4 H.264/AAC, lecture en streaming HTTP Range, commandes `video:doctor`/`video:init`/`video:process`) — publié sur PyPI depuis `1.0.0-beta.13`, API encore en stabilisation |
+| `forge-mvc-video` | `4 - Beta` | Module vidéo opt-in : chaîne complète `video:upload` → `video:process` → lecture HTTP Range, + `video:cleanup` ; transcodage MP4 H.264/AAC. Publié sur PyPI depuis `1.0.0-beta.13` |
 
 Critères de passage Beta → Stable d'un module opt-in :
 

@@ -20,7 +20,7 @@ dependencies = [
 # Le module se branche quand même sans eux (mode serveur de médias), mais
 # `forge video:doctor` signale leur absence ; le transcodage les exige.
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",

@@ -41,11 +41,14 @@
 
 ### Forge Video — nouvel opt-in `forge-mvc-video`
 
-- Opt-in **`forge-mvc-video`** (Alpha) : upload et stockage de vidéos,
-  extraction de métadonnées (`ffprobe`), **transcodage MP4 (H.264/AAC)**,
-  génération de poster, **lecture en streaming HTTP Range**.
-- Commandes CLI `forge video:doctor` (diagnostic config/package/FFmpeg),
-  `video:init` (migration `videos`), `video:process` (worker de transcodage).
+- Opt-in **`forge-mvc-video`** (**Beta**) : chaîne complète upload → traitement
+  → lecture. Stockage uuid-based, extraction de métadonnées (`ffprobe`),
+  **transcodage MP4 (H.264/AAC)**, génération de poster, **lecture en streaming
+  HTTP Range**.
+- Commandes CLI : `video:doctor` (diagnostic), `video:init` (migration `videos`),
+  **`video:upload <fichier> [--title]`** (entrée d'upload officielle),
+  `video:process` (worker de transcodage), **`video:cleanup`** (purge des vidéos
+  `failed` / fichiers orphelins, dry-run par défaut, anti-traversal).
 - FFmpeg/ffprobe traités comme **binaires système** (pas de dépendance pip) ;
   le module se branche sans eux (mode serveur de médias), `video:doctor`
   signale leur absence. Publié sur PyPI avec les autres distributions.

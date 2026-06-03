@@ -22,7 +22,7 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-mfa":      "Development Status :: 3 - Alpha",
     "forge-mvc-media":    "Development Status :: 3 - Alpha",
     "forge-mvc-iot":      "Development Status :: 3 - Alpha",
-    "forge-mvc-video":    "Development Status :: 3 - Alpha",
+    "forge-mvc-video":    "Development Status :: 4 - Beta",
 }
 
 
