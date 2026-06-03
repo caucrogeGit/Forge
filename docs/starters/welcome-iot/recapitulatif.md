@@ -23,6 +23,12 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 | 2 | [Exposer l'API IoT](intermediaire/iot-api.md) | Brancher l'API HTTP JSON officielle (lecture seule, Bearer optionnel) | `register_iot_routes` |
 | 3 | [Tableau de bord IoT](intermediaire/iot-dashboard.md) | Afficher les événements dans une page HTML | `list_recent` + `render` |
 
+## Niveau avancé — temps réel & exploitation (vrai broker)
+
+| # | Palier | Ce qu'on apprend | API-clé |
+|---|--------|------------------|---------|
+| 1 | [Valider un message IoT](avance/iot-contract.md) | Le contrat des messages réels | `parse_message`, `ContractError` |
+
 ## Configuration (`forge_mvc_iot.config`)
 
 | Élément | Usage |

@@ -1,0 +1,7 @@
+# forge-starter:iot-contract:start
+from mvc.controllers.iot_contract_controller import IotContractController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/iot-contract", IotContractController.index, name="iot_contract_index")
+    pub.add("POST", "/iot-contract", IotContractController.validate, name="iot_contract_validate")
+# forge-starter:iot-contract:end

@@ -153,6 +153,9 @@ nav:
               - Exposer l'API IoT: starters/welcome-iot/intermediaire/iot-api.md
               - Tableau de bord IoT: starters/welcome-iot/intermediaire/iot-dashboard.md
               - Bilan intermédiaire: starters/welcome-iot/intermediaire/bilan.md
+          - Avancé:
+              - Valider un message IoT: starters/welcome-iot/avance/iot-contract.md
+              - Bilan avancé: starters/welcome-iot/avance/bilan.md
           - Aide-mémoire: starters/welcome-iot/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md

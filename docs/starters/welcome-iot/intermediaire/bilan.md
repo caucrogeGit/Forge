@@ -18,7 +18,7 @@ MQTT.
 
 ## Et ensuite
 
-Le récapitulatif rassemble toutes les API IoT de la progression sur une seule
-page.
+Place au **niveau avancé** : on bascule vers le réel — contrat des messages,
+subscriber MQTT branché sur un vrai broker, diagnostic du module.
 
-[Récapitulatif de la progression IoT](../recapitulatif.md)
+[Niveau avancé : Valider un message IoT](../avance/iot-contract.md)
