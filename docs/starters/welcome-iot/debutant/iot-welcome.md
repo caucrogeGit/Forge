@@ -88,6 +88,6 @@ class IotWelcomeController(BaseController):
 
 ## Après ce starter
 
-Premier contact établi. Faites le point dans le bilan du niveau.
+Premier contact établi. La suite : lire les événements déjà stockés.
 
-[Bilan du niveau débutant](bilan.md)
+[Lire les événements IoT](iot-events.md)

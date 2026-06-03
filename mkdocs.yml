@@ -145,6 +145,7 @@ nav:
       - Progression IoT (welcome-iot):
           - Débutant:
               - Bonjour Forge IoT: starters/welcome-iot/debutant/iot-welcome.md
+              - Lire les événements IoT: starters/welcome-iot/debutant/iot-events.md
               - Bilan débutant: starters/welcome-iot/debutant/bilan.md
           - Aide-mémoire: starters/welcome-iot/recapitulatif.md
       - CRUD:
