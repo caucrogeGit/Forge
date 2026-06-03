@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Téléverser une vidéo — Forge</title>
+</head>
+<body>
+  <h1>Téléverser une vidéo</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  <form method="post" action="/video-upload" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Titre <input type="text" name="title"></label>
+    <label>Fichier vidéo <input type="file" name="video" required></label>
+    <button type="submit">Téléverser</button>
+  </form>
+
+  <h2>Vidéos enregistrées</h2>
+  {% if videos %}
+  <ul>
+    {% for v in videos %}
+    <li>{{ v.title or v.uuid }} — <em>{{ v.status }}</em></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Aucune vidéo pour l'instant.</p>
+  {% endif %}
+</body>
+</html>

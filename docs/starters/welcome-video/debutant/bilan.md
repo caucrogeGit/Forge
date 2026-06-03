@@ -17,7 +17,7 @@ enregistrées — liste comme détail unitaire.
 
 ## Et ensuite
 
-Le récapitulatif rassemble toutes les API vidéo de la progression sur une seule
-page.
+Place au **niveau intermédiaire** : téléverser une vidéo, la servir en streaming
+et suivre son cycle de vie.
 
-[Récapitulatif de la progression Vidéo](../recapitulatif.md)
+[Niveau intermédiaire : Téléverser une vidéo](../intermediaire/video-upload.md)

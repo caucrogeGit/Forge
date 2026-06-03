@@ -1,0 +1,25 @@
+{
+  "id": "video-upload",
+  "number": 43,
+  "name": "Téléverser une vidéo",
+  "kind": "skeleton",
+  "aliases": [
+    "video-upload",
+    "video_upload",
+    "43"
+  ],
+  "description": "Téléverser une vidéo : premier palier du niveau intermédiaire de welcome-video. Un formulaire envoie un fichier vidéo ; `ingest_video` le valide (taille, conteneur déclaré), le stocke sous un UUID et insère une ligne `videos` au statut `uploaded` via `VideoRepository.insert_uploaded` — le tout SANS ffmpeg (le transcodage est un worker séparé).",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/video-upload",
+  "routes_marker": "video-upload",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/video-upload",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-video/intermediaire/video-upload/",
+  "check_paths": [
+    "mvc/controllers/video_upload_controller.py",
+    "mvc/views/video_upload/index.html",
+    "mvc/migrations/20260601200000_create_videos.sql"
+  ]
+}

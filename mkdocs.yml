@@ -165,6 +165,9 @@ nav:
               - Lister les vidéos: starters/welcome-video/debutant/video-list.md
               - Le détail d'une vidéo: starters/welcome-video/debutant/video-detail.md
               - Bilan débutant: starters/welcome-video/debutant/bilan.md
+          - Intermédiaire:
+              - Téléverser une vidéo: starters/welcome-video/intermediaire/video-upload.md
+              - Bilan intermédiaire: starters/welcome-video/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-video/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
