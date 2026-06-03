@@ -127,7 +127,7 @@ class ListRecordsController(BaseController):
 
 ## Après ce starter
 
-C'est, pour l'instant, le dernier palier disponible du **niveau intermédiaire**.
-Faites le point dans le bilan du niveau.
+Passez au palier suivant : **Rechercher / filtrer une liste** — filtrer la
+liste selon un mot-clé saisi par l'utilisateur.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Continuer avec Rechercher / filtrer](filter-list.md)

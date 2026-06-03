@@ -9,10 +9,10 @@ débutant) à une petite application pilotée par les données.
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1 — [Lister des enregistrements](list-records.md) | Lire **plusieurs** lignes avec `fetch_all` et les itérer dans une vue (`{% for %}`). |
+| 2 — [Rechercher / filtrer](filter-list.md) | Filtrer une liste avec `request.param` + `WHERE … LIKE ?` paramétré. |
 
-*(Le niveau intermédiaire s'enrichira des paliers suivants : recherche,
-pagination, héritage de gabarit, mise à jour, suppression, sessions, messages
-flash.)*
+*(Le niveau intermédiaire s'enrichira des paliers suivants : pagination,
+héritage de gabarit, mise à jour, suppression, sessions, messages flash.)*
 
 ## Et ensuite
 

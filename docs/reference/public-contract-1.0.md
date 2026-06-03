@@ -58,19 +58,20 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 18)
+## 4. Starters 1.0 (gelés — 19)
 
-La liste pédagogique est **figée** : 18 starters, numérotés de 1 à 18,
+La liste pédagogique est **figée** : 19 starters, numérotés de 1 à 19,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
-(`welcome-optin-<module>`, `users-core-auth`, `first-*`…). Le 18ᵉ,
-`list-records`, ouvre le **niveau intermédiaire** de la progression
-`welcome-forge`.
+(`welcome-optin-<module>`, `users-core-auth`, `first-*`…). La progression
+`welcome-forge` est organisée par niveau ; le **niveau intermédiaire**
+(`list-records`, `filter-list`, …) prolonge le niveau débutant.
 
 ```
-csrf, dynamic-route, first-crud, first-crud-generated, first-html-view,
-first-sql, first-sql-write, form-post, json-response, query-params,
-request-debug, server-validation, users-core-auth, welcome,
-welcome-optin-iot, welcome-optin-mfa
+csrf, dynamic-route, filter-list, first-crud, first-crud-generated,
+first-html-view, first-sql, first-sql-write, form-post, json-response,
+list-records, query-params, request-debug, server-validation,
+users-core-auth, welcome, welcome-optin-iot, welcome-optin-mfa,
+welcome-optin-video
 ```
 
 Les anciennes applications métier lourdes ont été **archivées hors du système

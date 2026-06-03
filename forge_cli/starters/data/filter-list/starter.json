@@ -1,0 +1,26 @@
+{
+  "id": "filter-list",
+  "number": 19,
+  "name": "Rechercher / filtrer une liste",
+  "kind": "skeleton",
+  "aliases": [
+    "filter-list",
+    "filter_list",
+    "filter",
+    "19"
+  ],
+  "description": "Rechercher / filtrer une liste : palier 2 du niveau intermédiaire. Une route `GET /filter-list` lit un mot-clé avec `request.param(\"q\")` et filtre la table avec une clause SQL `WHERE content LIKE ?` paramétrée. Combine les paramètres d'URL (niveau débutant) et le SQL. Aucune écriture, aucun CRUD complet.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/filter-list",
+  "routes_marker": "filter-list",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/filter-list",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/intermediaire/filter-list/",
+  "check_paths": [
+    "mvc/controllers/filter_list_controller.py",
+    "mvc/views/filter_list/index.html",
+    "mvc/migrations/20260601131000_seed_filter_list_messages.sql"
+  ]
+}
