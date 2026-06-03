@@ -9,8 +9,10 @@ petite chaîne **alimenter → servir → suivre**, toujours sans transcodage.
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1 — [Téléverser une vidéo](video-upload.md) | Ingérer un fichier (`ingest_video`), stockage sous UUID + ligne `videos` au statut `uploaded`, **sans ffmpeg**. |
+| 2 — [Lire une vidéo](video-playback.md) | Brancher la lecture officielle (`register_video_routes`), `GET /videos/{uuid}` en streaming Range. |
 
-Vous savez maintenant enregistrer une vidéo dans le module, sans transcodage.
+Vous savez maintenant enregistrer une vidéo et la servir en streaming, sans
+transcodage.
 
 ## Et ensuite
 

@@ -167,6 +167,7 @@ nav:
               - Bilan débutant: starters/welcome-video/debutant/bilan.md
           - Intermédiaire:
               - Téléverser une vidéo: starters/welcome-video/intermediaire/video-upload.md
+              - Lire une vidéo: starters/welcome-video/intermediaire/video-playback.md
               - Bilan intermédiaire: starters/welcome-video/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-video/recapitulatif.md
       - CRUD:

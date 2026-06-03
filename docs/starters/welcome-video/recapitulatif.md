@@ -20,6 +20,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Téléverser une vidéo](intermediaire/video-upload.md) | Ingérer un fichier sans ffmpeg (statut `uploaded`) | `ingest_video`, `insert_uploaded` |
+| 2 | [Lire une vidéo](intermediaire/video-playback.md) | Servir une vidéo en streaming Range | `register_video_routes` |
 
 ## Configuration (`forge_mvc_video.config`)
 
@@ -37,3 +38,9 @@ Un secret (token) est **toujours masqué** quand la config est sérialisée.
 | `repo.list_recent(limit=…)` | Dernières vidéos, ordre du plus récent |
 | `repo.get_by_uuid(uuid)` | Une vidéo précise (ou `None`) |
 | `ingest_video(data, filename, title=…)` | Valider, stocker (UUID) et enregistrer une vidéo (sans ffmpeg) |
+
+## Lecture HTTP officielle (`forge_mvc_video`)
+
+| Élément | Usage |
+|---------|-------|
+| `register_video_routes(router)` | Brancher `GET /videos/{uuid}` (streaming Range) |

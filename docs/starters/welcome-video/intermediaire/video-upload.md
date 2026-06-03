@@ -99,6 +99,6 @@ class VideoUploadController(BaseController):
 
 ## Après ce starter
 
-Vous savez enregistrer une vidéo. Faites le point dans le bilan du niveau.
+Vous savez enregistrer une vidéo. La suite : la **servir** en streaming.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Lire une vidéo](video-playback.md)
