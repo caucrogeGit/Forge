@@ -1,0 +1,25 @@
+{
+  "id": "relations",
+  "number": 26,
+  "name": "Relations entre tables",
+  "kind": "skeleton",
+  "aliases": [
+    "relations",
+    "relation",
+    "26"
+  ],
+  "description": "Relations entre tables : premier palier du niveau avancé. Deux tables liées par une clé étrangère (`categories` et `articles`) ; la lecture combine les deux avec une jointure SQL `JOIN` visible, via `core.database.db.fetch_all`. Aucune écriture, aucun ORM.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/relations",
+  "routes_marker": "relations",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/relations",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/avance/relations/",
+  "check_paths": [
+    "mvc/controllers/relations_controller.py",
+    "mvc/views/relations/index.html",
+    "mvc/migrations/20260601140000_create_relations_tables.sql"
+  ]
+}

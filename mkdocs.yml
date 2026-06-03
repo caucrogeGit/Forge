@@ -134,6 +134,9 @@ nav:
               - Mémoriser un état en session: starters/welcome-forge/intermediaire/session-state.md
               - Messages flash: starters/welcome-forge/intermediaire/flash-messages.md
               - Bilan intermédiaire: starters/welcome-forge/intermediaire/bilan.md
+          - Avancé:
+              - Relations entre tables: starters/welcome-forge/avance/relations.md
+              - Bilan avancé: starters/welcome-forge/avance/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md

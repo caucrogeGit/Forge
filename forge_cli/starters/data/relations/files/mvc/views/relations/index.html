@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Relations entre tables — Forge</title>
+</head>
+<body>
+  <h1>Articles et leurs catégories</h1>
+
+  {% if articles %}
+  <ul>
+    {% for a in articles %}
+    <li>#{{ a.id }} — {{ a.title }} <em>({{ a.category }})</em></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Aucun article.</p>
+  {% endif %}
+</body>
+</html>

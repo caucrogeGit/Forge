@@ -138,10 +138,21 @@ class TestSequentialChain:
         page = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "flash-messages.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
-    def test_intermediaire_bilan_points_to_recapitulatif(self):
-        # Pas encore de niveau avancé → le bilan intermédiaire renvoie au
-        # récapitulatif à la racine du starter.
+    def test_intermediaire_bilan_points_to_next_level(self):
+        # Le niveau avancé existe : le bilan intermédiaire renvoie à son
+        # premier palier (`../avance/relations.md`), pas au récapitulatif.
         bilan = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "bilan.md"
+        assert "../avance/relations.md" in bilan.read_text(encoding="utf-8")
+
+    def test_avance_last_palier_points_to_level_bilan(self):
+        # Dernier palier avancé disponible → bilan du niveau.
+        page = STARTERS_DOCS / "welcome-forge" / "avance" / "relations.md"
+        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+
+    def test_avance_bilan_points_to_recapitulatif(self):
+        # Dernier niveau → le bilan avancé renvoie au récapitulatif à la
+        # racine du starter.
+        bilan = STARTERS_DOCS / "welcome-forge" / "avance" / "bilan.md"
         assert "../recapitulatif.md" in bilan.read_text(encoding="utf-8")
 
     def test_premier_crud_returns_to_overview(self):

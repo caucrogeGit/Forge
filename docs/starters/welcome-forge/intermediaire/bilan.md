@@ -23,8 +23,7 @@ de session et retour utilisateur.
 
 ## Et ensuite
 
-Le **niveau avancé** arrivera prochainement. En attendant, le récapitulatif
-rassemble toutes les API de la progression sur une seule page et vous oriente
-vers les starters autonomes (à commencer par le CRUD complet).
+Place au **niveau avancé** : données reliées, upload de fichiers, envoi
+d'emails, API JSON et écritures transactionnelles.
 
-[Récapitulatif de la progression](../recapitulatif.md)
+[Niveau avancé : Relations entre tables](../avance/relations.md)
