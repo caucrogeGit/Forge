@@ -159,6 +159,11 @@ nav:
               - Diagnostiquer le module IoT: starters/welcome-iot/avance/iot-doctor.md
               - Bilan avancé: starters/welcome-iot/avance/bilan.md
           - Aide-mémoire: starters/welcome-iot/recapitulatif.md
+      - Progression Vidéo (welcome-video):
+          - Débutant:
+              - Bonjour Forge Vidéo: starters/welcome-video/debutant/video-welcome.md
+              - Bilan débutant: starters/welcome-video/debutant/bilan.md
+          - Aide-mémoire: starters/welcome-video/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md
