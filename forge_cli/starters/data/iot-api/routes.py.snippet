@@ -1,0 +1,10 @@
+# forge-starter:iot-api:start
+# Branche l'API HTTP JSON officielle de Forge IoT (lecture seule) :
+#   GET /api/iot/events
+#   GET /api/iot/events/{site}/{device_id}
+#   GET /api/iot/devices/{site}/{device_id}/count
+# Le code métier vit dans le paquet forge-mvc-iot ; on ne fait que le brancher.
+from forge_mvc_iot import register_iot_routes
+
+register_iot_routes(router)
+# forge-starter:iot-api:end

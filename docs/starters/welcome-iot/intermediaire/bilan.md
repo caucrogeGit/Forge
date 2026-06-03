@@ -9,8 +9,10 @@ petite chaîne **alimenter → exposer → afficher**, toujours en simulation lo
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1 — [Simuler une mesure IoT](iot-simulate.md) | Composer, valider (`parse_message`) et insérer (`IotEventRepository.insert`) une mesure **sans broker**. |
+| 2 — [Exposer l'API IoT](iot-api.md) | Brancher l'API HTTP JSON officielle (`register_iot_routes`), trois routes en lecture seule, Bearer optionnel. |
 
-Vous savez maintenant alimenter `iot_events` en local, sans infrastructure MQTT.
+Vous savez maintenant alimenter `iot_events` en local et exposer ces données via
+l'API officielle, sans infrastructure MQTT.
 
 ## Et ensuite
 

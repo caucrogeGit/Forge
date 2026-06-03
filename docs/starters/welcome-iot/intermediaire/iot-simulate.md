@@ -94,7 +94,7 @@ class IotSimulateController(BaseController):
 
 ## Après ce starter
 
-Vous savez alimenter les données en local. Faites le point dans le bilan du
-niveau.
+Vous savez alimenter les données en local. La suite : exposer l'API HTTP JSON
+officielle.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Exposer l'API IoT](iot-api.md)

@@ -20,6 +20,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Simuler une mesure IoT](intermediaire/iot-simulate.md) | Composer, valider et insérer une mesure sans broker | `build_payload`, `parse_message`, `IotEventRepository.insert` |
+| 2 | [Exposer l'API IoT](intermediaire/iot-api.md) | Brancher l'API HTTP JSON officielle (lecture seule, Bearer optionnel) | `register_iot_routes` |
 
 ## Configuration (`forge_mvc_iot.config`)
 
@@ -46,3 +47,10 @@ sérialisée.
 |---------|-------|
 | `build_topic(site, device_id)` / `build_payload(...)` | Composer un topic et un payload conformes |
 | `parse_message(topic, payload)` | Valider → `Measurement` (lève `ContractError` sinon) |
+
+## API HTTP officielle (`forge_mvc_iot`)
+
+| Élément | Usage |
+|---------|-------|
+| `register_iot_routes(router)` | Brancher l'API JSON officielle (3 routes lecture seule) |
+| `FORGE_IOT_API_TOKEN` | Si défini, exige `Authorization: Bearer <token>` |
