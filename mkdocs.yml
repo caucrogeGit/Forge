@@ -241,6 +241,7 @@ nav:
           - ADR-015 Handshake TLS par thread (dev): adr/015-dev-tls-handshake-per-thread.md
           - ADR-016 Unification opt-in: adr/016-opt-in-unification.md
           - ADR-017 Type slug: adr/017-slug-type.md
+          - ADR-018 Module images: adr/018-image-module-extraction.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
