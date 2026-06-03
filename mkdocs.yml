@@ -142,6 +142,11 @@ nav:
               - Écritures transactionnelles: starters/welcome-forge/avance/db-transaction.md
               - Bilan avancé: starters/welcome-forge/avance/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
+      - Progression IoT (welcome-iot):
+          - Débutant:
+              - Bonjour Forge IoT: starters/welcome-iot/debutant/iot-welcome.md
+              - Bilan débutant: starters/welcome-iot/debutant/bilan.md
+          - Aide-mémoire: starters/welcome-iot/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md

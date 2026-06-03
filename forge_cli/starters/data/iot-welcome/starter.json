@@ -1,0 +1,23 @@
+{
+  "id": "iot-welcome",
+  "number": 31,
+  "name": "Bonjour Forge IoT",
+  "kind": "skeleton",
+  "aliases": [
+    "iot-welcome",
+    "iot_welcome",
+    "31"
+  ],
+  "description": "Bonjour Forge IoT : premier palier du niveau débutant de la progression welcome-iot. Premier contact avec le module opt-in forge-mvc-iot : une route texte et une route qui inspecte la configuration MQTT via `load_iot_config`, mot de passe masqué. Aucun broker, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/iot-welcome",
+  "routes_marker": "iot-welcome",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/iot-welcome",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-iot/debutant/iot-welcome/",
+  "check_paths": [
+    "mvc/controllers/iot_welcome_controller.py"
+  ]
+}

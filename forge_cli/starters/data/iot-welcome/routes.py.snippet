@@ -1,0 +1,7 @@
+# forge-starter:iot-welcome:start
+from mvc.controllers.iot_welcome_controller import IotWelcomeController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/iot-welcome", IotWelcomeController.index, name="iot_welcome_index")
+    pub.add("GET", "/iot-welcome/inspect", IotWelcomeController.inspect, name="iot_welcome_inspect")
+# forge-starter:iot-welcome:end
