@@ -1,0 +1,23 @@
+{
+  "id": "iot-device",
+  "number": 33,
+  "name": "Les événements d'un capteur",
+  "kind": "skeleton",
+  "aliases": [
+    "iot-device",
+    "iot_device",
+    "33"
+  ],
+  "description": "Les événements d'un capteur : dernier palier du niveau débutant de welcome-iot. Une route paramétrée `/iot-device/{site}/{device_id}` lit les événements d'un capteur précis via `IotEventRepository.find_by_device` et leur nombre via `count_by_device`. Réponse 503 pédagogique si la table `iot_events` manque. Lecture seule, aucun broker.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/iot-device/{site}/{device_id}",
+  "routes_marker": "iot-device",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/iot-device/atelier/capteur-1",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-iot/debutant/iot-device/",
+  "check_paths": [
+    "mvc/controllers/iot_device_controller.py"
+  ]
+}

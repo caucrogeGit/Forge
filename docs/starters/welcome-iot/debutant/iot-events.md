@@ -84,7 +84,7 @@ class IotEventsController(BaseController):
 
 ## Après ce starter
 
-Vous savez lire le flux global des événements. Faites le point dans le bilan du
-niveau.
+Vous savez lire le flux global des événements. La suite : cibler un capteur
+précis.
 
-[Bilan du niveau débutant](bilan.md)
+[Les événements d'un capteur](iot-device.md)

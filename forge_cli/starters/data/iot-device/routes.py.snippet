@@ -1,0 +1,6 @@
+# forge-starter:iot-device:start
+from mvc.controllers.iot_device_controller import IotDeviceController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/iot-device/{site}/{device_id}", IotDeviceController.index, name="iot_device_index")
+# forge-starter:iot-device:end

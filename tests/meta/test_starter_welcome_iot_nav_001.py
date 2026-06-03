@@ -45,9 +45,13 @@ class TestDebutantChain:
         page = IOT / "debutant" / "iot-welcome.md"
         assert "(iot-events.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # iot-events est (pour l'instant) le dernier palier débutant.
+    def test_iot_events_points_to_iot_device(self):
         page = IOT / "debutant" / "iot-events.md"
+        assert "(iot-device.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # iot-device est (pour l'instant) le dernier palier débutant.
+        page = IOT / "debutant" / "iot-device.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_debutant_bilan_points_to_recapitulatif(self):

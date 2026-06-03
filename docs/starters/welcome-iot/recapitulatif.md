@@ -13,6 +13,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 |---|--------|------------------|---------|
 | 1 | [Bonjour Forge IoT](debutant/iot-welcome.md) | Vérifier le module, inspecter la config (secret masqué) | `load_iot_config` |
 | 2 | [Lire les événements IoT](debutant/iot-events.md) | Lire les derniers événements, rester pédagogique si la table manque | `IotEventRepository.list_recent` |
+| 3 | [Les événements d'un capteur](debutant/iot-device.md) | Cibler un capteur et compter ses événements | `find_by_device`, `count_by_device` |
 
 ## Configuration (`forge_mvc_iot.config`)
 
@@ -29,3 +30,5 @@ sérialisée.
 |---------|-------|
 | `IotEventRepository()` | Accès aux événements stockés (utilise `core.database.db` par défaut) |
 | `repo.list_recent(limit=…)` | Derniers événements, ordre du plus récent |
+| `repo.find_by_device(site, device_id, limit=…)` | Événements d'un capteur précis |
+| `repo.count_by_device(site, device_id)` | Nombre d'événements d'un capteur |
