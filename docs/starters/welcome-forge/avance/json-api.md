@@ -92,6 +92,7 @@ class JsonApiController(BaseController):
 
 ## Après ce starter
 
-Vous savez exposer une API protégée. Faites le point dans le bilan du niveau.
+Vous savez exposer une API protégée. Dernier palier : écrire plusieurs lignes de
+façon atomique.
 
-[Bilan du niveau avancé](bilan.md)
+[Écritures transactionnelles](db-transaction.md)

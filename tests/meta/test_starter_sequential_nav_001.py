@@ -159,9 +159,14 @@ class TestSequentialChain:
         page = STARTERS_DOCS / "welcome-forge" / "avance" / "send-email.md"
         assert "(json-api.md)" in page.read_text(encoding="utf-8")
 
+    def test_avance_json_api_points_to_db_transaction(self):
+        # Palier 4 avancé → palier 5 (db-transaction).
+        page = STARTERS_DOCS / "welcome-forge" / "avance" / "json-api.md"
+        assert "(db-transaction.md)" in page.read_text(encoding="utf-8")
+
     def test_avance_last_palier_points_to_level_bilan(self):
         # Dernier palier avancé disponible → bilan du niveau.
-        page = STARTERS_DOCS / "welcome-forge" / "avance" / "json-api.md"
+        page = STARTERS_DOCS / "welcome-forge" / "avance" / "db-transaction.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_bilan_points_to_recapitulatif(self):
