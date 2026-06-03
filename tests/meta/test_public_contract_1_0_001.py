@@ -58,6 +58,7 @@ class TestStartersFrozen:
         "first-html-view", "first-sql", "first-sql-write", "form-post",
         "json-response", "query-params", "request-debug", "server-validation",
         "users-core-auth", "welcome", "welcome-optin-iot", "welcome-optin-mfa",
+        "welcome-optin-video",
     }
 
     def test_starter_set_is_frozen(self):
@@ -70,8 +71,8 @@ class TestStartersFrozen:
             f"Mettre à jour public-contract-1.0.md si le changement est voulu."
         )
 
-    def test_exactly_sixteen(self):
-        assert len(self.FROZEN) == 16
+    def test_exactly_seventeen(self):
+        assert len(self.FROZEN) == 17
 
 
 # ── Le contrat est documenté ─────────────────────────────────────────────────
@@ -82,7 +83,7 @@ class TestContractDocumented:
 
     @pytest.mark.parametrize("needle", [
         "opt-in:install", "opt-in:disable", "module:install",
-        "16 starters", "mkdocs build --strict",
+        "17 starters", "mkdocs build --strict",
     ])
     def test_contract_mentions(self, needle):
         assert needle in CONTRACT.read_text(encoding="utf-8")

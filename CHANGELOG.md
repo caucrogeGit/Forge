@@ -24,10 +24,11 @@
 
 ### Refonte des starters
 
-- **16 starters** renumérotés de façon contiguë (1→16), noms normalisés
+- **17 starters** renumérotés de façon contiguë (1→17), noms normalisés
   (convention `welcome-optin-<module>`, `users-core-auth`, `first-crud`…).
   Progression pédagogique « welcome » en 11 paliers. Les 3 applications métier
-  lourdes sont archivées hors du système starter.
+  lourdes sont archivées hors du système starter. Le 17ᵉ,
+  `welcome-optin-video`, accompagne le passage de `forge-mvc-video` en Beta.
 
 ### Slugs canoniques (feature phare)
 

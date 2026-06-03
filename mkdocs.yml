@@ -140,6 +140,9 @@ nav:
       - IoT (opt-in):
           - Vue d'ensemble: starters/optin-iot/index.md
           - Bonjour IoT: starters/optin-iot/welcome-optin-iot.md
+      - Vidéo (opt-in):
+          - Vue d'ensemble: starters/optin-video/index.md
+          - Bonjour Vidéo: starters/optin-video/welcome-optin-video.md
       - Anciennes applications (archive):
           - Carnet de contacts: starters/old/carnet-contacts/index.md
           - Carnet de contacts — reconstruction: starters/old/carnet-contacts/rebuild.md

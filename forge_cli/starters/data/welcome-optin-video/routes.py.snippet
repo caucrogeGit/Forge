@@ -1,0 +1,16 @@
+# forge-starter:welcome-optin-video:start
+from mvc.controllers.welcome_optin_video_controller import WelcomeVideoController
+from optins.registry import register_optins
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/welcome-optin-video",          WelcomeVideoController.index,    name="welcome_optin_video_index")
+    pub.add("GET", "/welcome-optin-video/inspect",  WelcomeVideoController.inspect,  name="welcome_optin_video_inspect")
+    pub.add("GET", "/welcome-optin-video/list",     WelcomeVideoController.list,     name="welcome_optin_video_list")
+
+# Branchement local des opt-ins — explicite, sans découverte automatique.
+# register_optins() est défini dans optins/registry.py et délègue à
+# optins/video/routes.py, qui appelle register_video_routes(router) (route de
+# lecture officielle GET /videos/{uuid}, streaming HTTP Range). Le parcours
+# pédagogique /welcome-optin-video/* ci-dessus reste indépendant.
+register_optins(router)
+# forge-starter:welcome-optin-video:end

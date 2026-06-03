@@ -58,11 +58,12 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 16)
+## 4. Starters 1.0 (gelés — 17)
 
-La liste pédagogique est **figée** : 16 starters, numérotés de 1 à 16,
+La liste pédagogique est **figée** : 17 starters, numérotés de 1 à 17,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
-(`welcome-optin-<module>`, `users-core-auth`, `first-*`…).
+(`welcome-optin-<module>`, `users-core-auth`, `first-*`…). Le 17ᵉ,
+`welcome-optin-video`, accompagne le passage de `forge-mvc-video` en Beta.
 
 ```
 csrf, dynamic-route, first-crud, first-crud-generated, first-html-view,

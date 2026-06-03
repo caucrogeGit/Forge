@@ -84,9 +84,9 @@ _FRAMEWORK_ROOTS = frozenset({
     "core",
     "forge_mvc_mfa", "forge_mvc_rbac", "forge_mvc_workflow",
     "forge_mvc_stats", "forge_mvc_media",
-    # forge-mvc-iot : paquet opt-in framework au même titre que ses frères
-    # ci-dessus (oublié à l'ajout du chantier IoT).
-    "forge_mvc_iot",
+    # forge-mvc-iot / forge-mvc-video : paquets opt-in framework au même titre
+    # que leurs frères ci-dessus.
+    "forge_mvc_iot", "forge_mvc_video",
     "forge_cli",
     # `integrations/` est dans le repo Forge (Jinja2 renderer, etc.).
     "integrations",

@@ -29,6 +29,7 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [2 — Auth (API cœur)](core-auth/users-core-auth.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
 | [3 — Auth MFA](optin-mfa/welcome-optin-mfa.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
 | [Bonjour IoT](optin-iot/welcome-optin-iot.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-optin-iot`, `/welcome-optin-iot/inspect`, `/welcome-optin-iot/events`, `/welcome-optin-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
+| [Bonjour Vidéo](optin-video/welcome-optin-video.md) | Entrée vidéo sans ffmpeg | Aucun (fonctionne sans db:init ni ffmpeg) | Premier contact avec le module opt-in `forge-mvc-video` — trois routes (`/welcome-optin-video`, `/welcome-optin-video/inspect`, `/welcome-optin-video/list`) + lecture officielle `GET /videos/{uuid}`, inspect masque le token, liste pédagogique des vidéos |
 
 ## Progression recommandée
 
@@ -227,6 +228,31 @@ vérifier que le package, la configuration, la migration et l'API HTTP
 sont en place.
 
 [Présentation](optin-iot/welcome-optin-iot.md)
+
+### Bonjour Vidéo
+
+Premier contact avec le module opt-in `forge-mvc-video`. Fonctionne
+**sans ffmpeg** et **sans table créée** — la route `list` détecte et
+signale pédagogiquement quand la table `videos` n'est pas encore
+disponible (HTTP 503 avec message clair, pas une trace technique).
+
+Aucun profil requis. Identifiant : `welcome-optin-video` (alias
+`bonjour-video` / `video` / `17`).
+
+- `GET /welcome-optin-video` → `Response.text("Bonjour Forge Video")` ;
+- `GET /welcome-optin-video/inspect` → JSON de la configuration vidéo,
+  token masqué (`"***"` ou `null`) ;
+- `GET /welcome-optin-video/list` → dernières vidéos via
+  `VideoRepository.list_recent`, ou message `video_storage_not_ready`
+  si la table n'existe pas ;
+- en parallèle, la lecture officielle `GET /videos/{uuid}` (streaming
+  HTTP Range) est branchée via `register_video_routes(router)`.
+
+Aucun `ffmpeg` n'est lancé par le starter. Avant de traiter une vidéo,
+lancer `forge video:doctor` pour vérifier package, configuration,
+migration et binaires.
+
+[Présentation](optin-video/welcome-optin-video.md)
 
 ## Différence entre profil et starter
 
