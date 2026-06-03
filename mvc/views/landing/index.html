@@ -105,13 +105,13 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-beta.13 : Forge IoT, Forge Video & opt-ins explicites -->
+<!-- Nouveautés 1.0.0-beta.13 : Forge IoT & Forge Video -->
 <section id="beta13" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
       <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-beta.13</div>
       <h2 class="text-4xl font-bold tracking-tight mb-0">
-        Forge IoT, Forge Video et opt-ins explicites.
+        Forge IoT et Forge Video.
       </h2>
     </div>
 
@@ -122,7 +122,7 @@
         <p class="text-white/60 text-sm leading-relaxed mb-5">
           Module opt-in pour recevoir, stocker et exposer des données de
           capteurs : un subscriber MQTT alimente la table
-          <code class="text-xs">iot_events</code>, relue via une API HTTP JSON.
+          <code class="text-xs text-[#E8651A]">iot_events</code>, relue via une API HTTP JSON.<br>
           Le core reste autonome.
         </p>
         <ul class="text-white/60 text-sm leading-relaxed space-y-3 mb-6">
@@ -135,11 +135,11 @@
 
       <!-- Bloc Forge Video -->
       <div class="landing-panel rounded-xl p-8 border border-white/10">
-        <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Video <span class="text-xs">(Beta)</span></h3>
+        <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Video</h3>
         <p class="text-white/60 text-sm leading-relaxed mb-5">
           Module opt-in pour l'<strong class="text-[#E8651A]">upload</strong>, le
           <strong class="text-[#E8651A]">transcodage MP4</strong> (H.264/AAC) et la
-          <strong class="text-[#E8651A]">lecture en streaming</strong> (HTTP Range).
+          <strong class="text-[#E8651A]">lecture en streaming</strong> (HTTP Range).<br>
           Le transcodage se fait dans un worker CLI, jamais pendant une requête.
         </p>
         <ul class="text-white/60 text-sm leading-relaxed space-y-3 mb-6">
@@ -149,32 +149,6 @@
           <li><span class="block landing-accent-text"># Diagnostic du module vidéo</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:doctor</code></li>
         </ul>
       </div>
-
-      <!-- Bloc Opt-ins explicites -->
-      <div class="landing-panel rounded-xl p-8 border border-white/10">
-        <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Opt-ins explicites</h3>
-        <p class="text-white/60 text-sm leading-relaxed mb-5">
-          Pas de découverte magique : les opt-ins sont branchés
-          explicitement dans le projet, sous <code class="text-xs">optins/</code>,
-          via un registre visible. Le starter
-          <code class="text-xs">welcome-optin-iot</code> montre le parcours complet.
-        </p>
-        <ul class="text-white/60 text-sm leading-relaxed space-y-3 mb-6">
-          <li><span class="block landing-accent-text"># Branche l'opt-in dans le projet (dry-run par défaut)</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge opt-in:enable iot</code></li>
-          <li><span class="block landing-accent-text"># État des opt-ins, en lecture seule</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge opt-in:list</code></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Installation : core autonome, IoT opt-in -->
-    <div class="landing-panel rounded-xl border border-white/10 mt-5 p-8">
-      <ul class="text-white/60 text-sm leading-relaxed space-y-2">
-        <li class="landing-accent-text"># Forge Core reste autonome</li>
-        <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">pip install --pre forge-mvc</code></li>
-        <li class="landing-accent-text pt-3"># Forge IoT / Forge Video s'installent seulement si le projet en a besoin</li>
-        <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">pip install --pre forge-mvc-iot</code></li>
-        <li><span class="landing-accent-text mr-2">$</span><code class="text-xs">pip install --pre forge-mvc-video</code></li>
-      </ul>
     </div>
 
   </div>

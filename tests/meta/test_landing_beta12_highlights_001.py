@@ -7,10 +7,15 @@ relabelisé la section en « Nouveautés 1.0.0-beta.13 » et simplifié les
 panneaux : suppression des liens profonds IoT/audits, de « Mosquitto » et
 de la preuve « 0 échec ».
 
+Mise à jour beta.13 : la section ne contient plus que les panneaux **Forge
+IoT** et **Forge Video** (la carte « opt-ins explicites » et le snippet
+d'installation in-section ont été retirés ; le récit opt-in/installation
+reste présent dans la carte « CLI Forge » et la section Installation).
+
 Ce fichier conserve les garde-fous encore valides : présence de la section,
-panneaux Forge IoT et opt-ins, commandes `iot:*` / `opt-in:*`, installation
-core-autonome vs IoT opt-in, absence de découverte magique, synchronisation
-de `docs/index.html`, absence de version beta.11, ticket roadmap.
+panneaux Forge IoT et Forge Video, commandes `iot:*` / `video:*`, core
+présenté comme autonome, synchronisation de `docs/index.html`, absence de
+version beta.11, ticket roadmap.
 
 Test documentaire : il lit du texte, il n'exécute aucun service.
 """
@@ -39,17 +44,15 @@ def _src() -> str:
 # ---------------------------------------------------------------------------
 
 HIGHLIGHTS = [
-    "forge-mvc-iot",
     "Forge IoT",
     "MQTT",
     "iot_events",
     "forge iot:doctor",
     "forge iot:listen",
     "forge iot:simulate",
-    "optins/",
-    "forge opt-in:enable iot",
-    "forge opt-in:list",
-    "welcome-optin-iot",
+    "Forge Video",
+    "forge video:upload",
+    "forge video:process",
 ]
 
 
@@ -66,15 +69,9 @@ class TestHighlightsPresent:
         )
 
     def test_core_reste_autonome(self):
-        """Le core doit rester présenté comme installable seul, IoT en opt-in."""
+        """Le core doit rester présenté comme autonome (carte Forge IoT)."""
         normalized = " ".join(_src().split())
-        assert "pip install --pre forge-mvc" in normalized
-        assert "pip install --pre forge-mvc-iot" in normalized
         assert "autonome" in normalized
-
-    def test_pas_de_decouverte_magique(self):
-        normalized = " ".join(_src().split()).lower()
-        assert "pas de découverte magique" in normalized
 
 
 # ---------------------------------------------------------------------------
@@ -97,7 +94,8 @@ class TestSync:
     def test_docs_index_reflete_section(self):
         docs = DOCS_LANDING.read_text(encoding="utf-8")
         assert 'id="beta13"' in docs
-        assert "forge-mvc-iot" in docs
+        assert "Forge IoT" in docs
+        assert "Forge Video" in docs
 
 
 # ---------------------------------------------------------------------------
