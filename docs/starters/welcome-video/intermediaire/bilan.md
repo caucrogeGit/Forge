@@ -10,9 +10,10 @@ petite chaîne **alimenter → servir → suivre**, toujours sans transcodage.
 |--------|--------------------|
 | 1 — [Téléverser une vidéo](video-upload.md) | Ingérer un fichier (`ingest_video`), stockage sous UUID + ligne `videos` au statut `uploaded`, **sans ffmpeg**. |
 | 2 — [Lire une vidéo](video-playback.md) | Brancher la lecture officielle (`register_video_routes`), `GET /videos/{uuid}` en streaming Range. |
+| 3 — [Suivre l'état d'une vidéo](video-status.md) | Observer le cycle de vie par statut (`list_by_status`) : `uploaded → processing → ready`. |
 
-Vous savez maintenant enregistrer une vidéo et la servir en streaming, sans
-transcodage.
+Vous savez maintenant enregistrer une vidéo, la servir en streaming et suivre son
+cycle de vie, sans transcodage.
 
 ## Et ensuite
 

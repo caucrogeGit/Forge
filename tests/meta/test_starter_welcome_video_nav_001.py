@@ -68,9 +68,13 @@ class TestIntermediaireChain:
         page = VIDEO / "intermediaire" / "video-upload.md"
         assert "(video-playback.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # video-playback est (pour l'instant) le dernier palier intermédiaire.
+    def test_video_playback_points_to_video_status(self):
         page = VIDEO / "intermediaire" / "video-playback.md"
+        assert "(video-status.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # video-status est (pour l'instant) le dernier palier intermédiaire.
+        page = VIDEO / "intermediaire" / "video-status.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_intermediaire_bilan_points_to_recapitulatif(self):

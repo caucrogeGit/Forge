@@ -21,6 +21,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 |---|--------|------------------|---------|
 | 1 | [Téléverser une vidéo](intermediaire/video-upload.md) | Ingérer un fichier sans ffmpeg (statut `uploaded`) | `ingest_video`, `insert_uploaded` |
 | 2 | [Lire une vidéo](intermediaire/video-playback.md) | Servir une vidéo en streaming Range | `register_video_routes` |
+| 3 | [Suivre l'état d'une vidéo](intermediaire/video-status.md) | Observer le cycle de vie par statut | `list_by_status` |
 
 ## Configuration (`forge_mvc_video.config`)
 
@@ -37,6 +38,7 @@ Un secret (token) est **toujours masqué** quand la config est sérialisée.
 | `VideoRepository()` | Accès aux vidéos enregistrées (utilise `core.database.db` par défaut) |
 | `repo.list_recent(limit=…)` | Dernières vidéos, ordre du plus récent |
 | `repo.get_by_uuid(uuid)` | Une vidéo précise (ou `None`) |
+| `repo.list_by_status(status, limit=…)` | Vidéos d'un statut du cycle de vie |
 | `ingest_video(data, filename, title=…)` | Valider, stocker (UUID) et enregistrer une vidéo (sans ffmpeg) |
 
 ## Lecture HTTP officielle (`forge_mvc_video`)

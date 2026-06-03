@@ -70,6 +70,6 @@ register_video_routes(router)
 
 ## Après ce starter
 
-Vous savez servir une vidéo. Faites le point dans le bilan du niveau.
+Vous savez servir une vidéo. La suite : suivre son **cycle de vie**.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Suivre l'état d'une vidéo](video-status.md)

@@ -168,6 +168,7 @@ nav:
           - Intermédiaire:
               - Téléverser une vidéo: starters/welcome-video/intermediaire/video-upload.md
               - Lire une vidéo: starters/welcome-video/intermediaire/video-playback.md
+              - Suivre l'état d'une vidéo: starters/welcome-video/intermediaire/video-status.md
               - Bilan intermédiaire: starters/welcome-video/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-video/recapitulatif.md
       - CRUD:
