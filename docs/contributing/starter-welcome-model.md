@@ -17,11 +17,11 @@
 
 | Besoin | Fichier(s) de référence |
 |--------|-------------------------|
-| Palier minimal (1 route, réponse texte) | [welcome.md](../starters/welcome-forge/welcome.md) |
-| Palier avec vue HTML + formulaire | [form-post.md](../starters/welcome-forge/form-post.md) |
-| Palier « concept » (explication + formulaire illustratif) | [csrf.md](../starters/welcome-forge/csrf.md) |
-| Palier SQL visible (lecture / écriture) | [first-sql.md](../starters/welcome-forge/first-sql.md), [first-sql-write.md](../starters/welcome-forge/first-sql-write.md) |
-| Dernier palier → bilan + prochain starter | [first-sql-write.md](../starters/welcome-forge/first-sql-write.md) |
+| Palier minimal (1 route, réponse texte) | [welcome.md](../starters/welcome-forge/debutant/welcome.md) |
+| Palier avec vue HTML + formulaire | [form-post.md](../starters/welcome-forge/debutant/form-post.md) |
+| Palier « concept » (explication + formulaire illustratif) | [csrf.md](../starters/welcome-forge/debutant/csrf.md) |
+| Palier SQL visible (lecture / écriture) | [first-sql.md](../starters/welcome-forge/debutant/first-sql.md), [first-sql-write.md](../starters/welcome-forge/debutant/first-sql-write.md) |
+| Dernier palier → bilan + prochain starter | [first-sql-write.md](../starters/welcome-forge/debutant/first-sql-write.md) |
 | Starter autonome (CRUD complet, neutre) | [first-crud](../starters/crud/first-crud.md) |
 | Page bilan / aide-mémoire de fin | [bilan.md](../starters/welcome-forge/bilan.md), [recapitulatif.md](../starters/welcome-forge/recapitulatif.md) |
 

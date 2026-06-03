@@ -16,7 +16,7 @@
   "routes_marker": "first-sql-write",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/first-sql-write",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/first-sql-write/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/debutant/first-sql-write/",
   "check_paths": [
     "mvc/controllers/first_sql_write_controller.py"
   ]

@@ -8,7 +8,7 @@ valider une donnée côté serveur, refuser une valeur vide et répondre
 avec un statut `422 Unprocessable Entity` plutôt qu'un `200` trompeur.
 
 Palier 9 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Premier formulaire POST](form-post.md).
 
 *Prérequis : savoir afficher et traiter un formulaire POST (palier 8).*
@@ -30,9 +30,9 @@ Aucun système complet de validation.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire le champ envoyé avec `request.form(...)`. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte, succès ou erreur (`status=422`). | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
+| `Request` | Lire le champ envoyé avec `request.form(...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte, succès ou erreur (`status=422`). | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Tester
 

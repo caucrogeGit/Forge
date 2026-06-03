@@ -81,7 +81,7 @@ def _doc_path(slug: str) -> Path:
         return STARTERS_DOCS / TOPIC_DOC_PATHS[slug]
     if slug in STANDALONE_STARTERS:
         return STARTERS_DOCS / slug / "index.md"
-    return STARTERS_DOCS / "welcome-forge" / f"{slug}.md"
+    return STARTERS_DOCS / "welcome-forge" / "debutant" / f"{slug}.md"
 
 
 # ── Chaînage séquentiel : chaque page pointe vers la suivante ─────────────────

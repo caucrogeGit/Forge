@@ -8,7 +8,7 @@ attendu via un champ caché généré par `BaseController.csrf_token(...)`.
 Le traitement du POST viendra au palier suivant.
 
 Palier 7 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Réponse JSON](json-response.md).
 
 ## Ce que ce starter montre
@@ -43,9 +43,9 @@ de POST valide.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Reçue par la méthode du contrôleur. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Renvoie la page rendue. | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | `render(...)` + `csrf_token(...)`. | [BaseController](../../reference/api.md#coremvccontroller) |
+| `Request` | Reçue par la méthode du contrôleur. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Renvoie la page rendue. | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | `render(...)` + `csrf_token(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Tester
 

@@ -9,7 +9,7 @@ formulaire protégé par CSRF, la validation serveur, et une requête SQL
 `INSERT` visible. C'est le **dernier palier avant le CRUD complet**.
 
 Palier 11 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Première base SQL](first-sql.md).
 
 ## Ce que ce starter montre
@@ -40,10 +40,10 @@ forge run
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire la valeur soumise avec `request.form(...)`. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Réponse `422` ou confirmation texte. | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | `render(...)` + `csrf_token(...)`. | [BaseController](../../reference/api.md#coremvccontroller) |
-| `core.database.db.insert` | Exécuter l'`INSERT` paramétré. | [Migrations SQL](../../features/migrations.md) |
+| `Request` | Lire la valeur soumise avec `request.form(...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Réponse `422` ou confirmation texte. | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | `render(...)` + `csrf_token(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
+| `core.database.db.insert` | Exécuter l'`INSERT` paramétré. | [Migrations SQL](../../../features/migrations.md) |
 
 ## Tester
 
@@ -148,6 +148,6 @@ tout ce que vous avez validé, puis enchaînez sur le premier starter
 autonome : le **CRUD complet**, qui structure ces opérations (créer,
 lister, modifier, supprimer) sur une entité neutre.
 
-[Bilan du starter Bonjour Forge](bilan.md)
+[Bilan du starter Bonjour Forge](../bilan.md)
 
-[Prochain starter : First CRUD](../crud/first-crud.md)
+[Prochain starter : First CRUD](../../crud/first-crud.md)

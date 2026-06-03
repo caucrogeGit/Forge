@@ -10,7 +10,7 @@ valeur par défaut quand le paramètre est absent — sans exception ni
 Ce starter est identifié par `query-params` dans la CLI Forge
 (aliases `query_params` / `params`). Il représente le **palier 2** de
 la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 juste après [Bonjour Forge](welcome.md).
 
 ## Ce que ce starter installe
@@ -25,9 +25,9 @@ juste après [Bonjour Forge](welcome.md).
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire un paramètre de *query string* avec `request.param(...)`. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
+| `Request` | Lire un paramètre de *query string* avec `request.param(...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Exemple
 

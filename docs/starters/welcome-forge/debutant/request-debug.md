@@ -9,7 +9,7 @@ l'afficher en développement avec `Response.debug(...)` — un outil de
 débogage qui refuse de s'exécuter en production.
 
 Palier 5 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Route dynamique](dynamic-route.md).
 
 ## Ce que ce starter montre
@@ -28,8 +28,8 @@ Aucun CRUD.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Source de `request.data`, vue globale et stable de la requête. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Rendu de debug avec `Response.debug(...)` (refusé en `prod`). | [Response](../../reference/http.md#4-response-reference) |
+| `Request` | Source de `request.data`, vue globale et stable de la requête. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Rendu de debug avec `Response.debug(...)` (refusé en `prod`). | [Response](../../../reference/http.md#4-response-reference) |
 
 ## Tester
 

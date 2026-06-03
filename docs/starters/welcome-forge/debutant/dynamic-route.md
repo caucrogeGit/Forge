@@ -7,7 +7,7 @@ variable (`/dynamic-route/articles/{id}`) et lire ce segment côté
 contrôleur avec `request.route_param("id")`.
 
 Palier 4 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Première vue HTML](first-html-view.md).
 
 ## Ce que ce starter montre
@@ -26,10 +26,10 @@ Aucun CRUD.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire la partie variable de l'URL avec `request.route_param(...)`. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
-| Routage | Déclarer le segment dynamique `{id}` dans `mvc/routes.py`. | [Routage](../../reference/api.md#corehttprouter) |
+| `Request` | Lire la partie variable de l'URL avec `request.route_param(...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
+| Routage | Déclarer le segment dynamique `{id}` dans `mvc/routes.py`. | [Routage](../../../reference/api.md#corehttprouter) |
 
 ## Tester
 

@@ -31,7 +31,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "welcome"
 FILES_DIR = STARTER_DIR / "files"
-DOC_DIR = PROJECT_ROOT / "docs" / "starters" / "welcome-forge"
+DOC_DIR = PROJECT_ROOT / "docs" / "starters" / "welcome-forge" / "debutant"
 
 _RETIRED_METHODS = (
     "greet",
@@ -252,7 +252,7 @@ class TestWelcomeStarterDocNavigation:
 
     def test_mkdocs_yml_reference_welcome(self):
         content = (PROJECT_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
-        assert "starters/welcome-forge/welcome.md" in content
+        assert "starters/welcome-forge/debutant/welcome.md" in content
 
     def test_starters_index_mentionne_bonjour_forge(self):
         content = (PROJECT_ROOT / "docs" / "starters" / "index.md").read_text(encoding="utf-8")

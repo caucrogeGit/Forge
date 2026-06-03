@@ -8,7 +8,7 @@ versionnée et lisible, puis lire une donnée depuis MariaDB avec
 génération cachée.
 
 Palier 10 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Validation serveur](server-validation.md).
 
 ## Ce que ce starter montre
@@ -29,9 +29,9 @@ Aucune jointure.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Reçue par la méthode du contrôleur. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
+| `Request` | Reçue par la méthode du contrôleur. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Tester
 

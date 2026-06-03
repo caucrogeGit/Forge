@@ -38,7 +38,7 @@ _STARTER_DIR = _REPO_ROOT / "forge_cli" / "starters" / "data" / "welcome"
 _CONTROLLER = _STARTER_DIR / "files" / "mvc" / "controllers" / "welcome_controller.py"
 _VIEWS_DIR = _STARTER_DIR / "files" / "mvc" / "views" / "welcome"
 _STARTER_JSON = _STARTER_DIR / "starter.json"
-_DOC = _REPO_ROOT / "docs" / "starters" / "welcome-forge" / "welcome.md"
+_DOC = _REPO_ROOT / "docs" / "starters" / "welcome-forge" / "debutant" / "welcome.md"
 _RETIRED_METHODS = (
     "greet",
     "inspect",

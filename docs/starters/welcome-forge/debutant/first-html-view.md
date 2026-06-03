@@ -7,7 +7,7 @@ template Jinja2 avec `BaseController.render(...)`, et comprendre où Forge
 va chercher la vue dans `mvc/views/`.
 
 Palier 3 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Paramètres d'URL](query-params.md).
 
 ## Ce que ce starter montre
@@ -21,9 +21,9 @@ après [Paramètres d'URL](query-params.md).
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Reçue par la méthode et transmise à `render(...)`. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Retournée par le contrôleur (produite ici via `render`). | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | Fournit le helper `render(...)` qui rend la vue HTML. | [BaseController](../../reference/api.md#coremvccontroller) |
+| `Request` | Reçue par la méthode et transmise à `render(...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Retournée par le contrôleur (produite ici via `render`). | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | Fournit le helper `render(...)` qui rend la vue HTML. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Tester
 

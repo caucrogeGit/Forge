@@ -17,7 +17,7 @@
   "routes_marker": "request-debug",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/request-debug",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/request-debug/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/debutant/request-debug/",
   "check_paths": [
     "mvc/controllers/request_debug_controller.py"
   ]

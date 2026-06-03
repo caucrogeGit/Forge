@@ -35,7 +35,7 @@ STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "server-validat
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "server_validation_controller.py"
 VIEW = FILES_DIR / "mvc" / "views" / "server_validation" / "index.html"
-DOC = PROJECT_ROOT / "docs" / "starters" / "welcome-forge" / "server-validation.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "welcome-forge" / "debutant" / "server-validation.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 

@@ -111,17 +111,17 @@ nav:
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Progression pédagogique:
-          - Bonjour Forge: starters/welcome-forge/welcome.md
-          - Paramètres d'URL: starters/welcome-forge/query-params.md
-          - Première vue HTML: starters/welcome-forge/first-html-view.md
-          - Route dynamique: starters/welcome-forge/dynamic-route.md
-          - Inspecter une requête: starters/welcome-forge/request-debug.md
-          - Réponse JSON: starters/welcome-forge/json-response.md
-          - Le jeton CSRF: starters/welcome-forge/csrf.md
-          - Premier formulaire POST: starters/welcome-forge/form-post.md
-          - Validation serveur: starters/welcome-forge/server-validation.md
-          - Première base SQL: starters/welcome-forge/first-sql.md
-          - Écrire en base: starters/welcome-forge/first-sql-write.md
+          - Bonjour Forge: starters/welcome-forge/debutant/welcome.md
+          - Paramètres d'URL: starters/welcome-forge/debutant/query-params.md
+          - Première vue HTML: starters/welcome-forge/debutant/first-html-view.md
+          - Route dynamique: starters/welcome-forge/debutant/dynamic-route.md
+          - Inspecter une requête: starters/welcome-forge/debutant/request-debug.md
+          - Réponse JSON: starters/welcome-forge/debutant/json-response.md
+          - Le jeton CSRF: starters/welcome-forge/debutant/csrf.md
+          - Premier formulaire POST: starters/welcome-forge/debutant/form-post.md
+          - Validation serveur: starters/welcome-forge/debutant/server-validation.md
+          - Première base SQL: starters/welcome-forge/debutant/first-sql.md
+          - Écrire en base: starters/welcome-forge/debutant/first-sql-write.md
           - Bilan du starter: starters/welcome-forge/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:

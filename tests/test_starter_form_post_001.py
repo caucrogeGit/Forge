@@ -33,7 +33,7 @@ STARTER_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data" / "form-post"
 FILES_DIR = STARTER_DIR / "files"
 CONTROLLER = FILES_DIR / "mvc" / "controllers" / "form_post_controller.py"
 VIEW = FILES_DIR / "mvc" / "views" / "form_post" / "index.html"
-DOC = PROJECT_ROOT / "docs" / "starters" / "welcome-forge" / "form-post.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "welcome-forge" / "debutant" / "form-post.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 
 

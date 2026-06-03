@@ -9,17 +9,17 @@ quel projet Forge.
 
 | Palier | Compétence validée |
 |--------|--------------------|
-| 1 — [Bonjour Forge](welcome.md) | Le cycle requête → contrôleur → réponse ; `Response.text(...)`. |
-| 2 — [Paramètres d'URL](query-params.md) | Lire la *query string* avec `request.param("k", default=...)`. |
-| 3 — [Première vue HTML](first-html-view.md) | Rendre un template avec `BaseController.render(...)`. |
-| 4 — [Route dynamique](dynamic-route.md) | Lire un segment d'URL avec `request.route_param("id")`. |
-| 5 — [Inspecter une requête](request-debug.md) | Explorer la requête en dev (`request.data`, `Response.debug(...)`). |
-| 6 — [Réponse JSON](json-response.md) | Renvoyer des données structurées avec `Response.json({...})`. |
-| 7 — [Le jeton CSRF](csrf.md) | Protéger les formulaires (`BaseController.csrf_token(...)`). |
-| 8 — [Premier formulaire POST](form-post.md) | Traiter un POST et lire `request.form("k", default=...)`. |
-| 9 — [Validation serveur](server-validation.md) | Refuser une valeur invalide avec un statut `422`. |
-| 10 — [Première base SQL](first-sql.md) | Lire en base avec du SQL visible (`fetch_one`). |
-| 11 — [Écrire en base](first-sql-write.md) | Insérer une ligne avec `insert(...)`. |
+| 1 — [Bonjour Forge](debutant/welcome.md) | Le cycle requête → contrôleur → réponse ; `Response.text(...)`. |
+| 2 — [Paramètres d'URL](debutant/query-params.md) | Lire la *query string* avec `request.param("k", default=...)`. |
+| 3 — [Première vue HTML](debutant/first-html-view.md) | Rendre un template avec `BaseController.render(...)`. |
+| 4 — [Route dynamique](debutant/dynamic-route.md) | Lire un segment d'URL avec `request.route_param("id")`. |
+| 5 — [Inspecter une requête](debutant/request-debug.md) | Explorer la requête en dev (`request.data`, `Response.debug(...)`). |
+| 6 — [Réponse JSON](debutant/json-response.md) | Renvoyer des données structurées avec `Response.json({...})`. |
+| 7 — [Le jeton CSRF](debutant/csrf.md) | Protéger les formulaires (`BaseController.csrf_token(...)`). |
+| 8 — [Premier formulaire POST](debutant/form-post.md) | Traiter un POST et lire `request.form("k", default=...)`. |
+| 9 — [Validation serveur](debutant/server-validation.md) | Refuser une valeur invalide avec un statut `422`. |
+| 10 — [Première base SQL](debutant/first-sql.md) | Lire en base avec du SQL visible (`fetch_one`). |
+| 11 — [Écrire en base](debutant/first-sql-write.md) | Insérer une ligne avec `insert(...)`. |
 
 ## À garder sous la main
 

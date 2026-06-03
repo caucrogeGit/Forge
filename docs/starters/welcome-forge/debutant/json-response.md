@@ -7,7 +7,7 @@ Objectif : retourner des données structurées avec `Response.json(...)`.
 base d'une API consommée par un front, un script ou Forge Design.
 
 Palier 6 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Inspecter une requête](request-debug.md).
 
 ## Ce que ce starter montre
@@ -24,9 +24,9 @@ Aucun formulaire.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Reçue par la méthode du contrôleur. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse JSON avec `Response.json(...)`. | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
+| `Request` | Reçue par la méthode du contrôleur. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse JSON avec `Response.json(...)`. | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Tester
 

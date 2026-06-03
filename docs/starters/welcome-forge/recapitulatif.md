@@ -8,17 +8,17 @@ d'aborder le premier CRUD complet (`first-crud`).
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge](welcome.md) | Premier contrôleur, une route, réponse texte | `Response.text(...)` |
-| 2 | [Paramètres d'URL](query-params.md) | Lire la query string | `request.param("name", default=...)` |
-| 3 | [Première vue HTML](first-html-view.md) | Rendre un template | `BaseController.render(...)` |
-| 4 | [Route dynamique](dynamic-route.md) | Segment variable d'URL | `request.route_param("id")` |
-| 5 | [Inspecter une requête](request-debug.md) | Explorer la requête en dev | `request.data`, `Response.debug(...)` |
-| 6 | [Réponse JSON](json-response.md) | Données structurées (API) | `Response.json({...})` |
-| 7 | [Le jeton CSRF](csrf.md) | Protéger les formulaires | `BaseController.csrf_token(request)` |
-| 8 | [Premier formulaire POST](form-post.md) | Traiter un POST | `request.form("name", default=...)` |
-| 9 | [Validation serveur](server-validation.md) | Refuser une valeur invalide | `Response.text(..., status=422)` |
-| 10 | [Première base SQL](first-sql.md) | Lire en base, SQL visible | `core.database.db.fetch_one(...)` |
-| 11 | [Écrire en base](first-sql-write.md) | Insérer une ligne | `core.database.db.insert(...)` |
+| 1 | [Bonjour Forge](debutant/welcome.md) | Premier contrôleur, une route, réponse texte | `Response.text(...)` |
+| 2 | [Paramètres d'URL](debutant/query-params.md) | Lire la query string | `request.param("name", default=...)` |
+| 3 | [Première vue HTML](debutant/first-html-view.md) | Rendre un template | `BaseController.render(...)` |
+| 4 | [Route dynamique](debutant/dynamic-route.md) | Segment variable d'URL | `request.route_param("id")` |
+| 5 | [Inspecter une requête](debutant/request-debug.md) | Explorer la requête en dev | `request.data`, `Response.debug(...)` |
+| 6 | [Réponse JSON](debutant/json-response.md) | Données structurées (API) | `Response.json({...})` |
+| 7 | [Le jeton CSRF](debutant/csrf.md) | Protéger les formulaires | `BaseController.csrf_token(request)` |
+| 8 | [Premier formulaire POST](debutant/form-post.md) | Traiter un POST | `request.form("name", default=...)` |
+| 9 | [Validation serveur](debutant/server-validation.md) | Refuser une valeur invalide | `Response.text(..., status=422)` |
+| 10 | [Première base SQL](debutant/first-sql.md) | Lire en base, SQL visible | `core.database.db.fetch_one(...)` |
+| 11 | [Écrire en base](debutant/first-sql-write.md) | Insérer une ligne | `core.database.db.insert(...)` |
 
 ## Réponses (`core.http.response.Response`)
 

@@ -15,7 +15,7 @@
   "routes_marker": "csrf",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/csrf",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/csrf/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/debutant/csrf/",
   "check_paths": [
     "mvc/controllers/csrf_controller.py"
   ]

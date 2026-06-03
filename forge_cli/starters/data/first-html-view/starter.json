@@ -17,7 +17,7 @@
   "routes_marker": "first-html-view",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/first-html-view",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/first-html-view/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/debutant/first-html-view/",
   "check_paths": [
     "mvc/controllers/first_html_view_controller.py",
     "mvc/views/first_html_view/index.html"

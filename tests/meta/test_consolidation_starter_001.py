@@ -131,7 +131,7 @@ def test_chaque_starter_a_un_index_md():
         "first-sql-write",
     ]
     for dossier in paliers_welcome:
-        index = ROOT / "docs" / "starters" / "welcome-forge" / f"{dossier}.md"
+        index = ROOT / "docs" / "starters" / "welcome-forge" / "debutant" / f"{dossier}.md"
         assert index.exists(), f"doc de palier welcome absente pour {dossier}"
 
     # Les starters CRUD sont regroupés sous le dossier-sujet crud/ :

@@ -9,7 +9,7 @@ le corps de la requête avec `request.form("name", ...)` (et non dans
 l'URL).
 
 Palier 8 de la
-[progression officielle des starters](../index.md#progression-recommandee),
+[progression officielle des starters](../../index.md#progression-recommandee),
 après [Le jeton CSRF](csrf.md).
 
 *Prérequis : comprendre le jeton CSRF (palier 7).*
@@ -30,9 +30,9 @@ Aucun CRUD.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire les champs envoyés avec `request.form(...)`. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | Fournit `render(...)` pour la vue et `csrf_token(...)` pour le jeton CSRF. | [BaseController](../../reference/api.md#coremvccontroller) |
+| `Request` | Lire les champs envoyés avec `request.form(...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | Fournit `render(...)` pour la vue et `csrf_token(...)` pour le jeton CSRF. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Tester
 

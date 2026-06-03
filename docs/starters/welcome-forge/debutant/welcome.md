@@ -21,9 +21,9 @@ Identifiant : `welcome` (alias `bienvenue` / `bonjour` / `bonjour-forge`).
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Reçue par chaque méthode du contrôleur. | [Request](../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [BaseController](../../reference/api.md#coremvccontroller) |
+| `Request` | Reçue par chaque méthode du contrôleur. | [Request](../../../reference/http.md#3-request-reference) |
+| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
+| `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Les routes
 
