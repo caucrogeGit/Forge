@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Transcoder une vidéo — Forge</title>
+</head>
+<body>
+  <h1>Transcoder une vidéo</h1>
+
+  <p>Binaire ffmpeg configuré : <code>{{ ffmpeg_bin }}</code></p>
+
+  <h2>Vidéos en attente de transcodage</h2>
+  {% if pending %}
+  <ul>
+    {% for v in pending %}
+    <li>#{{ v.id }} — {{ v.title or v.uuid }} <em>({{ v.status }})</em></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Aucune vidéo au statut <code>uploaded</code>.</p>
+  {% endif %}
+
+  <h2>Lancer le transcodage</h2>
+  <p>Le transcodage est un <strong>worker CLI</strong> (jamais une requête HTTP) :</p>
+  <pre>forge video:process &lt;id&gt;        # une vidéo
+forge video:process --pending   # toutes les vidéos uploaded</pre>
+  <p>
+    Le worker fait avancer le statut <code>uploaded → processing → ready</code>.
+    Les vidéos prêtes se lisent via <code>GET /videos/{uuid}</code>.
+  </p>
+</body>
+</html>

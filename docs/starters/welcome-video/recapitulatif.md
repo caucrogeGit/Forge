@@ -28,6 +28,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Sonder une vidéo](avance/video-probe.md) | Extraire les métadonnées d'une source (ffprobe) | `probe_video` |
+| 2 | [Transcoder une vidéo](avance/video-transcode.md) | Worker de transcodage MP4 (ffmpeg) | `forge video:process`, `process_video` |
 
 ## Configuration (`forge_mvc_video.config`)
 
@@ -58,3 +59,4 @@ Un secret (token) est **toujours masqué** quand la config est sérialisée.
 | Élément | Usage |
 |---------|-------|
 | `probe_video(path, config=…)` | Sonder une source (ffprobe) → métadonnées |
+| `forge video:process <id>` / `--pending` (`process_video`) | Worker : transcoder en MP4 (ffmpeg), avancer le statut |

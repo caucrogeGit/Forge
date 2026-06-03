@@ -91,6 +91,6 @@ class VideoProbeController(BaseController):
 
 ## Après ce starter
 
-Vous savez inspecter une source. Faites le point dans le bilan du niveau.
+Vous savez inspecter une source. La suite : la **transcoder** en MP4.
 
-[Bilan du niveau avancé](bilan.md)
+[Transcoder une vidéo](video-transcode.md)

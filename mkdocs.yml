@@ -172,6 +172,7 @@ nav:
               - Bilan intermédiaire: starters/welcome-video/intermediaire/bilan.md
           - Avancé:
               - Sonder une vidéo: starters/welcome-video/avance/video-probe.md
+              - Transcoder une vidéo: starters/welcome-video/avance/video-transcode.md
               - Bilan avancé: starters/welcome-video/avance/bilan.md
           - Aide-mémoire: starters/welcome-video/recapitulatif.md
       - CRUD:

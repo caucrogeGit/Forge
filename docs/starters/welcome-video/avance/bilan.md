@@ -9,8 +9,9 @@ transcodage ffmpeg, et diagnostic du module.
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1 — [Sonder une vidéo](video-probe.md) | Extraire les métadonnées d'un fichier via `probe_video` (ffprobe, lecture seule). |
+| 2 — [Transcoder une vidéo](video-transcode.md) | Lancer le worker `forge video:process` (`process_video`, ffmpeg) : `uploaded → ready`. |
 
-Vous savez maintenant inspecter une source vidéo avant de la transformer.
+Vous savez maintenant inspecter une source et la transcoder en MP4 via le worker.
 
 ## Et ensuite
 

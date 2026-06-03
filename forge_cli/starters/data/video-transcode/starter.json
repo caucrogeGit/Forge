@@ -1,0 +1,25 @@
+{
+  "id": "video-transcode",
+  "number": 47,
+  "name": "Transcoder une vidéo",
+  "kind": "skeleton",
+  "aliases": [
+    "video-transcode",
+    "video_transcode",
+    "47"
+  ],
+  "description": "Transcoder une vidéo : palier 2 du niveau avancé de welcome-video. Le vrai transcodage : `forge video:process` lance un worker qui sonde, génère un poster et transcode en MP4 via ffmpeg (`process_video`), faisant avancer le statut uploaded → processing → ready. Une route liste les vidéos en attente et la config ffmpeg. Le transcodage lourd reste un worker CLI, jamais une requête HTTP. ffmpeg requis.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/video-transcode",
+  "routes_marker": "video-transcode",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/video-transcode",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-video/avance/video-transcode/",
+  "check_paths": [
+    "mvc/controllers/video_transcode_controller.py",
+    "mvc/views/video_transcode/index.html",
+    "mvc/migrations/20260601240000_create_videos.sql"
+  ]
+}

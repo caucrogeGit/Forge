@@ -88,9 +88,13 @@ class TestIntermediaireChain:
 
 class TestAvanceChain:
 
-    def test_last_palier_points_to_level_bilan(self):
-        # video-probe est (pour l'instant) le dernier palier avancé.
+    def test_video_probe_points_to_video_transcode(self):
         page = VIDEO / "avance" / "video-probe.md"
+        assert "(video-transcode.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # video-transcode est (pour l'instant) le dernier palier avancé.
+        page = VIDEO / "avance" / "video-transcode.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_bilan_points_to_recapitulatif(self):

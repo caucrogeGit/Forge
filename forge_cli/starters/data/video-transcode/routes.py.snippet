@@ -1,0 +1,6 @@
+# forge-starter:video-transcode:start
+from mvc.controllers.video_transcode_controller import VideoTranscodeController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/video-transcode", VideoTranscodeController.index, name="video_transcode_index")
+# forge-starter:video-transcode:end
