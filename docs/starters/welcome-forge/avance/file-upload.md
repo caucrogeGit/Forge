@@ -117,7 +117,6 @@ class FileUploadController(BaseController):
 
 ## Après ce starter
 
-Vous savez recevoir et stocker un fichier. Faites le point dans le bilan du
-niveau.
+Vous savez recevoir et stocker un fichier. La suite : envoyer un email.
 
-[Bilan du niveau avancé](bilan.md)
+[Envoyer un email](send-email.md)

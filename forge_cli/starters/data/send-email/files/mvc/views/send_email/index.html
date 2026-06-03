@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Envoyer un email — Forge</title>
+</head>
+<body>
+  <h1>Envoyer un email</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  {% if sent %}
+  <p data-level="success">
+    Email envoyé à <strong>{{ recipient }}</strong>
+    (affiché dans la console du serveur).
+  </p>
+  {% endif %}
+
+  <form method="post" action="/send-email">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Destinataire <input type="email" name="recipient" required></label>
+    <label>Message <textarea name="message" required></textarea></label>
+    <button type="submit">Envoyer</button>
+  </form>
+</body>
+</html>
