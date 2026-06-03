@@ -139,6 +139,12 @@ media = save_image(
 
 La taille maximale est lue depuis `UPLOAD_MAX_SIZE` (défaut : 5 Mo).
 
+**Protection anti-décompression-bomb** : la **surface en pixels** d'une image
+est plafonnée par `upload_max_image_pixels` (défaut : 24 000 000, soit ~6000×4000).
+Le contrôle porte sur les dimensions lues dans l'en-tête, *avant* tout décodage
+ou écriture disque : un fichier léger se décompressant en une image démesurée
+(qui épuiserait la mémoire) est rejeté immédiatement.
+
 **Dépendance** : Pillow (`>=10.0,<13`) est requis pour la génération des variantes d'images. Il est déclaré dans `requirements.txt` et `pyproject.toml`.
 
 ---

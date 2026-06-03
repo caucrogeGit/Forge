@@ -55,6 +55,10 @@
 - **`forge run` survit aux crashes** de l'application (relance automatique +
   garde anti-boucle après crashes rapides répétés).
 - Sécurité uploads : vérification du **contenu réel des images** avant écriture.
+- Sécurité uploads : **plafond anti-décompression-bomb** sur les images
+  (`upload_max_image_pixels`, défaut 24 Mpx) — la surface est contrôlée dès
+  l'en-tête, avant décodage/écriture, et `DecompressionBombError` est désormais
+  capturé proprement à la génération des variantes (SEC-UPLOAD-DECOMPRESSION-BOMB-001).
 - **Production-readiness** : `forge doctor` durci, `forge migration:apply
   --dry-run`, endpoint de *health*, `forge update` robuste, et **checklist de
   déploiement** documentée.

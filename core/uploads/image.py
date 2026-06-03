@@ -50,6 +50,23 @@ class MediaRecord:
 _VERIFIABLE_IMAGE_FORMATS: frozenset[str] = frozenset({"JPEG", "PNG", "WEBP"})
 
 
+def _ensure_within_pixel_budget(width: int, height: int) -> None:
+    """Rejette une image dont la surface dépasse ``upload_max_image_pixels``.
+
+    SEC-UPLOAD-DECOMPRESSION-BOMB-001 — le contrôle porte sur les dimensions
+    lues dans l'EN-TÊTE (``Image.open`` n'a pas encore décodé les pixels) : une
+    « décompression-bomb » (fichier léger se décompressant en une image
+    démesurée) est refusée AVANT tout décodage et toute écriture disque, à coût
+    mémoire négligeable. Le plafond est configurable par projet.
+    """
+    max_pixels = int(_cfg("upload_max_image_pixels"))
+    if width * height > max_pixels:
+        raise UploadStorageError(
+            f"Image trop volumineuse ({width}×{height} pixels) ; "
+            f"plafond autorisé : {max_pixels} pixels."
+        )
+
+
 def verify_image_content(data: bytes) -> None:
     """Vérifie que ``data`` est bien une image raster d'un format autorisé.
 
@@ -68,10 +85,14 @@ def verify_image_content(data: bytes) -> None:
     try:
         with Image.open(io.BytesIO(data)) as probe:
             image_format = probe.format
+            width, height = probe.size
     except (UnidentifiedImageError, OSError, SyntaxError, ValueError) as exc:
         raise UploadStorageError(
             "Le fichier fourni n'est pas une image valide."
         ) from exc
+    # SEC-UPLOAD-DECOMPRESSION-BOMB-001 — rejet des images démesurées avant
+    # toute écriture disque ou décodage de variantes.
+    _ensure_within_pixel_budget(width, height)
     if image_format not in _VERIFIABLE_IMAGE_FORMATS:
         raise UploadStorageError(
             "Le fichier fourni n'est pas une image valide "
@@ -190,13 +211,21 @@ def generate_image_variants(path: str | Path, *, root: str | Path | None = None)
 
     try:
         with Image.open(original) as image:
+            _ensure_within_pixel_budget(image.width, image.height)
             image.verify()
         with Image.open(original) as image:
+            _ensure_within_pixel_budget(image.width, image.height)
             for variant, size in IMAGE_VARIANT_SIZES.items():
                 target = physical_paths[variant]
                 _write_resized_image(image, target, size)
     except UnidentifiedImageError as exc:
         raise UploadStorageError("Fichier source non reconnu comme image compatible.") from exc
+    except Image.DecompressionBombError as exc:
+        # Défense en profondeur : backstop de Pillow si une image démesurée
+        # atteignait malgré tout le décodage (SEC-UPLOAD-DECOMPRESSION-BOMB-001).
+        raise UploadStorageError(
+            "Image source trop volumineuse (protection décompression-bomb)."
+        ) from exc
     except OSError as exc:
         raise UploadStorageError(f"Impossible de generer les variantes image : {exc}") from exc
 

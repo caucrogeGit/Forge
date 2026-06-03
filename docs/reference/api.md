@@ -24,6 +24,7 @@ Chaque entrée ci-dessous est repliée par défaut. Ouvrez uniquement la partie 
 | `sql_dir` | `mvc/models/sql` | Dossier des requêtes SQL |
 | `upload_root` | `storage/uploads` | Racine des uploads |
 | `upload_max_size` | `5242880` | Taille maximale d'un fichier |
+| `upload_max_image_pixels` | `24000000` | Surface max d'une image (anti-décompression-bomb) |
 | `upload_allowed_extensions` | `["jpg", "jpeg", "png", "webp", "pdf"]` | Extensions autorisées |
 | `upload_allowed_mime_types` | `["image/jpeg", "image/png", "image/webp", "application/pdf"]` | MIME autorisés |
 | `mail_host` | `""` | Hôte SMTP |

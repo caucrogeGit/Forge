@@ -32,6 +32,9 @@ _cfg = {
     # Uploads
     "upload_root": os.path.join(_PROJECT_ROOT, "storage", "uploads"),
     "upload_max_size": 5 * 1024 * 1024,
+    # Plafond anti-décompression-bomb : surface max d'une image (en pixels)
+    # acceptée à l'upload, avant tout décodage (SEC-UPLOAD-DECOMPRESSION-BOMB-001).
+    "upload_max_image_pixels": 24_000_000,
     "upload_allowed_extensions": ["jpg", "jpeg", "png", "webp", "pdf"],
     "upload_allowed_mime_types": [
         "image/jpeg",
