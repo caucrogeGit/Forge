@@ -1,0 +1,8 @@
+# forge-starter:update-record:start
+from mvc.controllers.update_record_controller import UpdateRecordController
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/update-record",            UpdateRecordController.index,  name="update_record_index")
+    pub.add("GET",  "/update-record/{id}/edit",  UpdateRecordController.edit,   name="update_record_edit")
+    pub.add("POST", "/update-record/{id}",       UpdateRecordController.update, name="update_record_update")
+# forge-starter:update-record:end

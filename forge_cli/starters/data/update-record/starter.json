@@ -1,0 +1,27 @@
+{
+  "id": "update-record",
+  "number": 22,
+  "name": "Modifier un enregistrement",
+  "kind": "skeleton",
+  "aliases": [
+    "update-record",
+    "update_record",
+    "update",
+    "22"
+  ],
+  "description": "Modifier un enregistrement : palier 5 du niveau intermédiaire. Trois routes (liste, formulaire pré-rempli, POST de mise à jour) ; le formulaire est chargé avec `fetch_one` puis enregistré avec `core.database.db.execute(\"UPDATE … WHERE id = ?\")`, POST protégé par CSRF. Après écriture, on relit et on ré-affiche.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/update-record",
+  "routes_marker": "update-record",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/update-record",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/intermediaire/update-record/",
+  "check_paths": [
+    "mvc/controllers/update_record_controller.py",
+    "mvc/views/update_record/index.html",
+    "mvc/views/update_record/edit.html",
+    "mvc/migrations/20260601133000_seed_update_record_messages.sql"
+  ]
+}

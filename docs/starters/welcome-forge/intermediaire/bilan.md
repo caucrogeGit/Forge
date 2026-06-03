@@ -12,9 +12,10 @@ débutant) à une petite application pilotée par les données.
 | 2 — [Rechercher / filtrer](filter-list.md) | Filtrer une liste avec `request.param` + `WHERE … LIKE ?` paramétré. |
 | 3 — [Paginer une liste](pagination.md) | `LIMIT ? OFFSET ?` + `COUNT(*)`, liens précédent/suivant. |
 | 4 — [Héritage de gabarit](layout-template.md) | Factoriser l'enveloppe HTML avec `{% extends %}` + `{% block %}`. |
+| 5 — [Modifier un enregistrement](update-record.md) | Formulaire pré-rempli + `UPDATE … WHERE id = ?` (POST + CSRF). |
 
-*(Le niveau intermédiaire s'enrichira des paliers suivants : mise à jour,
-suppression, sessions, messages flash.)*
+*(Le niveau intermédiaire s'enrichira des paliers suivants : suppression,
+sessions, messages flash.)*
 
 ## Et ensuite
 

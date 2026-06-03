@@ -87,7 +87,7 @@ Ouvrez `https://localhost:8000/layout-template` → la page affiche son contenu
 
 ## Après ce starter
 
-C'est, pour l'instant, le dernier palier disponible du **niveau intermédiaire**.
-Faites le point dans le bilan du niveau.
+Passez au palier suivant : **Modifier un enregistrement** — éditer une ligne
+existante via un formulaire pré-rempli.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Continuer avec Modifier un enregistrement](update-record.md)

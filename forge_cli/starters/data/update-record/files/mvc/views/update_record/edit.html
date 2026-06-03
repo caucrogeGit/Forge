@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Éditer le message #{{ message.id }} — Forge</title>
+</head>
+<body>
+  <h1>Éditer le message #{{ message.id }}</h1>
+
+  {% if updated %}<p><strong>Message mis à jour.</strong></p>{% endif %}
+
+  <form method="post" action="/update-record/{{ message.id }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="text" name="content" value="{{ message.content }}">
+    <button type="submit">Enregistrer</button>
+  </form>
+
+  <p><a href="/update-record">← Retour à la liste</a></p>
+</body>
+</html>

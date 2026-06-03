@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Modifier un enregistrement — Forge</title>
+</head>
+<body>
+  <h1>Messages</h1>
+
+  <ul>
+    {% for m in messages %}
+    <li>#{{ m.id }} — {{ m.content }} — <a href="/update-record/{{ m.id }}/edit">éditer</a></li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
