@@ -16,7 +16,7 @@ Forge 1.x garantit la stabilité de son interface publique : commandes CLI docum
 
 Le contrat couvre également :
 
-- Les modules opt-in extraits (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` — Beta ; `forge-mvc-mfa` — Alpha).
+- Les modules opt-in extraits (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` — Beta ; `forge-mvc-mfa`, `forge-mvc-media`, `forge-mvc-iot`, `forge-mvc-video` — Alpha).
 - Le mécanisme de plugins pour étendre le contexte Jinja (`core.mvc.controller.register_jinja_context_provider`).
 - L'absence de dépendance nominale du core sur les modules opt-in.
 
@@ -89,6 +89,8 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 | Pages publiques (`make:public-*`) | Disponible, interface stable, comportement peut s'affiner |
 | Backends de session FileStore / MariaDbStore | Disponible, API stable, options de configuration susceptibles d'évoluer |
 | `forge-mvc-mfa` (Alpha) | Secret TOTP chiffré au repos via Fernet (`FORGE_MFA_SECRET_KEY`). Publié sur PyPI depuis `1.0.0-beta.9`. Passage Alpha → Beta à venir. |
+| `forge-mvc-iot` (Alpha) | Subscriber MQTT, stockage `iot_events`, API HTTP en lecture seule. Publié sur PyPI depuis `1.0.0-beta.12`. API en stabilisation. |
+| `forge-mvc-video` (Alpha) | Upload, transcodage MP4 (H.264/AAC), lecture en streaming HTTP Range. Publié sur PyPI depuis `1.0.0-beta.13`. API en stabilisation. |
 | OIDC | Retiré du core (ADR-004). Si réintroduit via `forge-mvc-oidc`, sera expérimental jusqu'à Beta confirmée. |
 
 ---

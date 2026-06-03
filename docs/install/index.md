@@ -45,6 +45,8 @@ Voir [Politique de release](../release/release-policy.md#publication-pypi).
 | `forge-mvc-stats` | Brique statistiques — agrégations | Bêta — publié PyPI |
 | `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Alpha** — publié PyPI depuis `1.0.0-beta.9` |
 | `forge-mvc-media` | Brique media — helpers applicatifs upload | **Alpha** — publié PyPI depuis `1.0.0-beta.9` (API encore bêta, voir [Limites](../deployment/production-limits.md)) |
+| `forge-mvc-iot` | Brique IoT — subscriber MQTT, stockage `iot_events`, API HTTP | **Alpha** — publié PyPI depuis `1.0.0-beta.12` |
+| `forge-mvc-video` | Brique vidéo — upload, transcodage MP4, lecture HTTP Range | **Alpha** — publié PyPI depuis `1.0.0-beta.13` |
 
 Pour installer Forge avec toutes les briques opt-in :
 
@@ -59,16 +61,17 @@ python -m pip install -r requirements-dev.txt
 ```
 
 `pip install -e .` installe le core en mode éditable.
-`requirements-dev.txt` installe ensuite les 6 modules opt-in
+`requirements-dev.txt` installe ensuite les 7 modules opt-in
 (également en éditable) et les outils de développement. Voir
 [Installation depuis GitHub](github.md) pour les détails.
 
 ## Contrat d'installation des opt-ins
 
-Le core `forge-mvc` et les six opt-ins officiels
+Le core `forge-mvc` et les sept opt-ins officiels
 (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
-`forge-mvc-media`, `forge-mvc-iot`) sont publiés sur PyPI (les cinq premiers
-depuis `1.0.0-beta.9`, `forge-mvc-iot` depuis `1.0.0-beta.12`).
+`forge-mvc-media`, `forge-mvc-iot`, `forge-mvc-video`) sont publiés sur PyPI
+(les cinq premiers depuis `1.0.0-beta.9`, `forge-mvc-iot` depuis
+`1.0.0-beta.12`, `forge-mvc-video` depuis `1.0.0-beta.13`).
 
 Installation directe d'un opt-in (méthode recommandée — disponible pour tous) :
 
@@ -78,6 +81,8 @@ pip install --pre forge-mvc-workflow
 pip install --pre forge-mvc-stats
 pip install --pre forge-mvc-mfa
 pip install --pre forge-mvc-media
+pip install --pre forge-mvc-iot
+pip install --pre forge-mvc-video
 ```
 
 Le core fournit également les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`,
@@ -108,7 +113,7 @@ python -m pip install -e .
 python -m pip install -r requirements-dev.txt
 ```
 
-`requirements-dev.txt` installe les six opt-ins en mode éditable.
+`requirements-dev.txt` installe les sept opt-ins en mode éditable.
 
 ---
 

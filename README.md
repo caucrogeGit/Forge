@@ -110,12 +110,15 @@ class HomeController:
 | [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) |
 | [`forge-mvc-media`](https://pypi.org/project/forge-mvc-media/) | Gestion applicative des médias |
 | [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) — **Alpha** |
+| [`forge-mvc-video`](https://pypi.org/project/forge-mvc-video/) | Upload, transcodage MP4 (H.264/AAC) et lecture en streaming HTTP Range — **Alpha** |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Installez-les à la demande, par exemple `pip install --pre forge-mvc-rbac`.
-`forge-mvc-iot` est au statut **Alpha** : il s'installe **explicitement et
-séparément** (`pip install --pre forge-mvc-iot`) et n'est **pas** inclus dans
-l'extra `forge-mvc[all]` (dépendance MQTT `paho-mqtt`, maturité Alpha).
+`forge-mvc-iot` et `forge-mvc-video` sont au statut **Alpha** : ils s'installent
+**explicitement et séparément** (`pip install --pre forge-mvc-iot`,
+`pip install --pre forge-mvc-video`) et ne sont **pas** inclus dans l'extra
+`forge-mvc[all]` (dépendance MQTT `paho-mqtt` pour IoT ; binaire système FFmpeg
+pour Video ; maturité Alpha).
 
 ---
 
@@ -128,7 +131,7 @@ Toute la documentation est publiée sur
 - Référence de la CLI `forge`
 - Entités, modèles, SQL et migrations
 - Formulaires, validation, CSRF, sessions
-- Modules opt-in (RBAC, workflow, stats, MFA, media, IoT)
+- Modules opt-in (RBAC, workflow, stats, MFA, media, IoT, Video)
 - ADR et charte philosophique
 
 ---

@@ -119,6 +119,12 @@ Phase 4 (dogfood) = **vrai go/no-go** avant clôture.
 3. Production : doctor/migrations/erreurs/health/update **durcis + checklist déploiement**.
 4. `BETA13-CLOSING-AUDIT-001` **vert**, versions bumpées b13, CHANGELOG complet.
 
+> **Note — opt-in `forge-mvc-video` livré en parallèle.** Hors de la
+> définition initiale ci-dessus, l'opt-in `forge-mvc-video` v1 (upload,
+> transcodage MP4 H.264/AAC, lecture HTTP Range, commandes `video:*`) a été
+> développé et mergé sur `main` pendant ce cycle, puis publié avec les autres
+> distributions en `1.0.0-beta.13`. Audit de clôture : `audit-video-closing.md`.
+
 ## Hors périmètre b13 (→ post-1.0)
 
 Suffixe slug auto, `slug_history`/redirections 301, sitemap, recherche avancée,
