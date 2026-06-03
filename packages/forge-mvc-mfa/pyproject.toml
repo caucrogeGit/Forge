@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "mfa", "totp"]
 dependencies = [
-    "forge-mvc==1.0.0b13",
+    "forge-mvc>=1.0.0b13,<2",
     "pyotp>=2.9,<3",
     "cryptography>=46.0.7,<47",
 ]

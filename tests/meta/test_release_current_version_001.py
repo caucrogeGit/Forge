@@ -11,7 +11,8 @@ racine) est cohérente partout :
   ÉTAT COURANT (pas juste une mention historique)
 - Tag git vN.Y.Z existe localement (skip si pas créé)
 - forge --version retourne la bonne version (skip si forge pas dans le PATH)
-- Dépendances internes forge-mvc==N.Y.Z des opt-in pointent vers la version courante
+- Dépendances internes forge-mvc>=N.Y.Z des opt-in pointent vers la version courante
+  (politique unifiée OPTIN-DEPS-PIN-B13-001 : `forge-mvc>=<version>,<2` partout)
 
 Remplace les anciens tests test_release_3_0_0_stable_001 et
 test_release_3_0_2_patch_stable_001 qui codaient la version en dur
@@ -68,6 +69,7 @@ class TestAllVersionsBumped:
         "forge-mvc-mfa", "forge-mvc-rbac",
         "forge-mvc-workflow", "forge-mvc-stats",
         "forge-mvc-media", "forge-mvc-iot",
+        "forge-mvc-video",
     ])
     def test_optin_module_version(self, module: str):
         expected = _current_version()
@@ -79,24 +81,29 @@ class TestAllVersionsBumped:
         )
 
     def test_optin_mfa_forge_mvc_dependency_pinned(self):
-        """forge-mvc-mfa épingle forge-mvc==<version courante> (non publiable — pinning strict)."""
+        """forge-mvc-mfa déclare forge-mvc>=<version courante> (politique unifiée
+        OPTIN-DEPS-PIN-B13-001 — plancher aligné sur la version racine)."""
         expected = _current_version()
         path = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "pyproject.toml"
         data = tomllib.loads(path.read_text(encoding="utf-8"))
         deps = data.get("project", {}).get("dependencies", []) or []
-        forge_mvc_deps = [d for d in deps if "forge-mvc==" in d]
+        forge_mvc_deps = [
+            d for d in deps if d.startswith("forge-mvc") and "forge-mvc-" not in d
+        ]
         assert forge_mvc_deps, "forge-mvc-mfa ne déclare pas forge-mvc dans dependencies"
         for dep in forge_mvc_deps:
             assert expected in dep, (
-                f"forge-mvc-mfa : dépendance {dep!r} pas alignée sur forge-mvc=={expected}"
+                f"forge-mvc-mfa : dépendance {dep!r} pas alignée sur "
+                f"forge-mvc>={expected}"
             )
 
     @pytest.mark.parametrize("module", [
         "forge-mvc-rbac", "forge-mvc-workflow", "forge-mvc-stats",
-        "forge-mvc-iot",
+        "forge-mvc-iot", "forge-mvc-media", "forge-mvc-video",
     ])
     def test_publishable_optin_forge_mvc_dependency_declared(self, module: str):
-        """rbac/workflow/stats/iot déclarent forge-mvc (forme relachee acceptee apres OPTIN-PYPI-PUBLISH-PREPARE-001)."""
+        """Les opt-ins publiables déclarent forge-mvc avec le plancher unifié
+        `>=<version>,<2` (OPTIN-DEPS-PIN-B13-001)."""
         path = PROJECT_ROOT / "packages" / module / "pyproject.toml"
         data = tomllib.loads(path.read_text(encoding="utf-8"))
         deps = data.get("project", {}).get("dependencies", []) or []

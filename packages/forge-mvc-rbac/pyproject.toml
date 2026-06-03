@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "rbac", "permissions"]
 dependencies = [
-    "forge-mvc>=1.0.0b5,<2",
+    "forge-mvc>=1.0.0b13,<2",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

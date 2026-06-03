@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "iot", "mqtt"]
 dependencies = [
-    "forge-mvc>=1.0.0b5,<2",
+    "forge-mvc>=1.0.0b13,<2",
     "paho-mqtt>=2.1,<3",
 ]
 classifiers = [

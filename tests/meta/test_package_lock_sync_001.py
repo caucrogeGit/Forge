@@ -1,15 +1,15 @@
 """Garde-fou PACKAGE-LOCK-SYNC-001 (option B).
 
-Vérifie que les 7 pyproject.toml sont cohérents entre eux :
+Vérifie que les 8 pyproject.toml sont cohérents entre eux :
 1. requires-python aligné (>=3.12 pour tous — ADR-006)
-2. Les 6 modules opt-in déclarent forge-mvc comme dépendance directe
-3. La version épinglée de forge-mvc dans les modules opt-in correspond
-   à la version actuelle de forge-mvc (pin strict `==` ; les pins relâchés
-   `>=…,<2` des opt-ins publiables — rbac/workflow/stats/iot — sont ignorés
-   par TestVersionAlignment, leur version propre étant vérifiée ailleurs)
+2. Les 7 modules opt-in déclarent forge-mvc comme dépendance directe
+3. Le plancher de version forge-mvc des opt-ins (`>=X.Y.Z,<2`) correspond
+   à la version actuelle de forge-mvc — politique unifiée
+   OPTIN-DEPS-PIN-B13-001 (`>=1.0.0b13,<2` sur les sept opt-ins ; fin de la
+   cohabitation `==1.0.0b13` / `>=1.0.0b5`).
 
 Extension PKG-OPTINS-PINNING-POLICY-001 : media et iot, ajoutés après
-l'audit F24, sont désormais couverts par OPTIN_MODULES.
+l'audit F24, puis video (beta.13), sont couverts par OPTIN_MODULES.
 
 Origine : audit F24 — les 4 modules opt-in (mfa, rbac, workflow, stats)
 ne déclaraient aucune dépendance vers forge-mvc. Conséquence : pip install
@@ -42,6 +42,7 @@ OPTIN_MODULES = [
     "forge-mvc-stats",
     "forge-mvc-media",
     "forge-mvc-iot",
+    "forge-mvc-video",
 ]
 
 
@@ -101,28 +102,31 @@ class TestOptinModulesDeclareForgeMvc:
 
 
 class TestVersionAlignment:
-    """La version forge-mvc épinglée dans les modules opt-in correspond
-    à la version réelle de forge-mvc."""
+    """Le plancher de version forge-mvc des modules opt-in (`>=X.Y.Z,<2`)
+    correspond à la version réelle de forge-mvc — politique unifiée
+    OPTIN-DEPS-PIN-B13-001. Garde actif : un bump de release qui oublie un
+    opt-in est détecté ici."""
 
     @pytest.mark.parametrize("module", OPTIN_MODULES)
     def test_pinned_version_matches_root(self, module: str):
         root_version = _get_version(ROOT_PYPROJECT)
         path = PROJECT_ROOT / "packages" / module / "pyproject.toml"
         deps = _get_dependencies(path)
-        forge_mvc_deps = [d for d in deps if "forge-mvc" in d and "==" in d]
-        if not forge_mvc_deps:
-            pytest.skip(f"{module} ne déclare pas forge-mvc avec ==")
+        forge_mvc_deps = [d for d in deps if "forge-mvc" in d]
+        assert forge_mvc_deps, (
+            f"{module}/pyproject.toml ne déclare pas forge-mvc."
+        )
         for dep in forge_mvc_deps:
-            match = re.match(r"forge-mvc==([\d.]+(?:(?:a|b|rc)\d+)?)", dep)
+            match = re.search(r"forge-mvc(?:==|>=)([\d.]+(?:(?:a|b|rc)\d+)?)", dep)
             assert match, (
                 f"{module}/pyproject.toml : dépendance forge-mvc mal formée : "
-                f"{dep!r}. Format attendu : 'forge-mvc==X.Y.Z[a/b/rcN]'"
+                f"{dep!r}. Format attendu : 'forge-mvc>=X.Y.Z[a/b/rcN],<2'"
             )
             pinned_version = match.group(1)
             assert pinned_version == root_version, (
-                f"{module}/pyproject.toml épingle forge-mvc=={pinned_version} "
+                f"{module}/pyproject.toml épingle forge-mvc {pinned_version} "
                 f"mais la version racine actuelle est {root_version}. "
-                f"Cycle de release manqué — bumper le module aussi."
+                f"Cycle de release manqué — bumper le plancher du module aussi."
             )
 
 
