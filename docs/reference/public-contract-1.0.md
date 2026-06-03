@@ -58,9 +58,9 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 40)
+## 4. Starters 1.0 (gelés — 41)
 
-La liste pédagogique est **figée** : 40 starters, numérotés de 1 à 40,
+La liste pédagogique est **figée** : 41 starters, numérotés de 1 à 41,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
 (`welcome-optin-<module>`, `users-core-auth`, `first-*`…). La progression
 `welcome-forge` est organisée par niveau ; le **niveau avancé** (`relations`, …)
@@ -78,7 +78,7 @@ json-api, json-response,
 layout-template,
 send-email,
 list-records, pagination, query-params, relations, request-debug, server-validation, session-state, update-record,
-users-core-auth, video-welcome, welcome, welcome-optin-iot, welcome-optin-mfa,
+users-core-auth, video-list, video-welcome, welcome, welcome-optin-iot, welcome-optin-mfa,
 welcome-optin-video
 ```
 

@@ -40,9 +40,13 @@ def _pages() -> list[Path]:
 
 class TestDebutantChain:
 
-    def test_last_palier_points_to_level_bilan(self):
-        # video-welcome est (pour l'instant) le dernier palier débutant.
+    def test_video_welcome_points_to_video_list(self):
         page = VIDEO / "debutant" / "video-welcome.md"
+        assert "(video-list.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # video-list est (pour l'instant) le dernier palier débutant.
+        page = VIDEO / "debutant" / "video-list.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_debutant_bilan_points_to_recapitulatif(self):

@@ -12,6 +12,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Bonjour Forge Vidéo](debutant/video-welcome.md) | Vérifier le module, inspecter la config (secret masqué) | `load_video_config` |
+| 2 | [Lister les vidéos](debutant/video-list.md) | Lire les dernières vidéos, rester pédagogique si la table manque | `VideoRepository.list_recent` |
 
 ## Configuration (`forge_mvc_video.config`)
 
@@ -20,3 +21,10 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 | `load_video_config()` | Lire la configuration vidéo (binaires ffmpeg/ffprobe, racine de stockage, limites, token API) |
 
 Un secret (token) est **toujours masqué** quand la config est sérialisée.
+
+## Stockage (`forge_mvc_video.storage.repository`)
+
+| Élément | Usage |
+|---------|-------|
+| `VideoRepository()` | Accès aux vidéos enregistrées (utilise `core.database.db` par défaut) |
+| `repo.list_recent(limit=…)` | Dernières vidéos, ordre du plus récent |

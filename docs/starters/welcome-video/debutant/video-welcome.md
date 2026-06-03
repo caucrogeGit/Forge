@@ -88,6 +88,6 @@ class VideoWelcomeController(BaseController):
 
 ## Après ce starter
 
-Premier contact établi. Faites le point dans le bilan du niveau.
+Premier contact établi. La suite : lister les vidéos déjà enregistrées.
 
-[Bilan du niveau débutant](bilan.md)
+[Lister les vidéos](video-list.md)
