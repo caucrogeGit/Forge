@@ -151,6 +151,7 @@ nav:
           - Intermédiaire:
               - Simuler une mesure IoT: starters/welcome-iot/intermediaire/iot-simulate.md
               - Exposer l'API IoT: starters/welcome-iot/intermediaire/iot-api.md
+              - Tableau de bord IoT: starters/welcome-iot/intermediaire/iot-dashboard.md
               - Bilan intermédiaire: starters/welcome-iot/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-iot/recapitulatif.md
       - CRUD:

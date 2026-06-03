@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tableau de bord IoT — Forge</title>
+</head>
+<body>
+  <h1>Tableau de bord IoT</h1>
+
+  {% if events %}
+  <table>
+    <thead>
+      <tr><th>Site</th><th>Capteur</th><th>Type</th><th>Valeur</th><th>Unité</th><th>Horodatage</th></tr>
+    </thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td>{{ e.site }}</td>
+        <td>{{ e.device_id }}</td>
+        <td>{{ e.kind }}</td>
+        <td>{{ e.value }}</td>
+        <td>{{ e.unit }}</td>
+        <td>{{ e.timestamp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Aucun événement à afficher. Injectez des mesures (palier <em>Simuler une mesure IoT</em>).</p>
+  {% endif %}
+</body>
+</html>

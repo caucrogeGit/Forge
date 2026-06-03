@@ -1,0 +1,25 @@
+{
+  "id": "iot-dashboard",
+  "number": 36,
+  "name": "Tableau de bord IoT",
+  "kind": "skeleton",
+  "aliases": [
+    "iot-dashboard",
+    "iot_dashboard",
+    "36"
+  ],
+  "description": "Tableau de bord IoT : dernier palier du niveau intermédiaire de welcome-iot. Une vue HTML affiche les derniers événements lus via `IotEventRepository.list_recent`, dans un tableau. C'est la lecture pédagogique côté humain, après l'API JSON côté machine.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/iot-dashboard",
+  "routes_marker": "iot-dashboard",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/iot-dashboard",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-iot/intermediaire/iot-dashboard/",
+  "check_paths": [
+    "mvc/controllers/iot_dashboard_controller.py",
+    "mvc/views/iot_dashboard/index.html",
+    "mvc/migrations/20260601190000_create_iot_events.sql"
+  ]
+}

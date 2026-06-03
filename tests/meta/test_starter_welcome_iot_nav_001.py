@@ -69,9 +69,13 @@ class TestIntermediaireChain:
         page = IOT / "intermediaire" / "iot-simulate.md"
         assert "(iot-api.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # iot-api est (pour l'instant) le dernier palier intermédiaire.
+    def test_iot_api_points_to_iot_dashboard(self):
         page = IOT / "intermediaire" / "iot-api.md"
+        assert "(iot-dashboard.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # iot-dashboard est (pour l'instant) le dernier palier intermédiaire.
+        page = IOT / "intermediaire" / "iot-dashboard.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_intermediaire_bilan_points_to_recapitulatif(self):

@@ -75,6 +75,7 @@ register_iot_routes(router)
 
 ## Après ce starter
 
-Vous savez exposer l'API officielle. Faites le point dans le bilan du niveau.
+Vous savez exposer l'API officielle. La suite : afficher les événements dans une
+vraie page.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Tableau de bord IoT](iot-dashboard.md)
