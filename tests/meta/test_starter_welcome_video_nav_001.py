@@ -77,10 +77,25 @@ class TestIntermediaireChain:
         page = VIDEO / "intermediaire" / "video-status.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
-    def test_intermediaire_bilan_points_to_recapitulatif(self):
-        # Pas encore de niveau avancé → le bilan intermédiaire renvoie au
-        # récapitulatif à la racine du starter.
+    def test_intermediaire_bilan_points_to_next_level(self):
+        # Le niveau avancé existe → le bilan intermédiaire renvoie à son
+        # premier palier.
         bilan = VIDEO / "intermediaire" / "bilan.md"
+        assert "../avance/video-probe.md" in bilan.read_text(encoding="utf-8")
+
+
+# ── Niveau avancé ─────────────────────────────────────────────────────────────
+
+class TestAvanceChain:
+
+    def test_last_palier_points_to_level_bilan(self):
+        # video-probe est (pour l'instant) le dernier palier avancé.
+        page = VIDEO / "avance" / "video-probe.md"
+        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+
+    def test_avance_bilan_points_to_recapitulatif(self):
+        # Dernier niveau → le bilan avancé renvoie au récapitulatif.
+        bilan = VIDEO / "avance" / "bilan.md"
         assert "../recapitulatif.md" in bilan.read_text(encoding="utf-8")
 
 

@@ -23,6 +23,12 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 | 2 | [Lire une vidéo](intermediaire/video-playback.md) | Servir une vidéo en streaming Range | `register_video_routes` |
 | 3 | [Suivre l'état d'une vidéo](intermediaire/video-status.md) | Observer le cycle de vie par statut | `list_by_status` |
 
+## Niveau avancé — transcodage réel (ffmpeg requis)
+
+| # | Palier | Ce qu'on apprend | API-clé |
+|---|--------|------------------|---------|
+| 1 | [Sonder une vidéo](avance/video-probe.md) | Extraire les métadonnées d'une source (ffprobe) | `probe_video` |
+
 ## Configuration (`forge_mvc_video.config`)
 
 | Élément | Usage |
@@ -46,3 +52,9 @@ Un secret (token) est **toujours masqué** quand la config est sérialisée.
 | Élément | Usage |
 |---------|-------|
 | `register_video_routes(router)` | Brancher `GET /videos/{uuid}` (streaming Range) |
+
+## Transcodage & diagnostic (ffmpeg)
+
+| Élément | Usage |
+|---------|-------|
+| `probe_video(path, config=…)` | Sonder une source (ffprobe) → métadonnées |

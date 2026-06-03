@@ -1,0 +1,24 @@
+{
+  "id": "video-probe",
+  "number": 46,
+  "name": "Sonder une vidéo",
+  "kind": "skeleton",
+  "aliases": [
+    "video-probe",
+    "video_probe",
+    "46"
+  ],
+  "description": "Sonder une vidéo : premier palier du niveau avancé de welcome-video. On bascule vers le réel : `probe_video` lance ffprobe (lecture seule) sur le fichier d'une vidéo uploadée et en extrait les métadonnées (durée, dimensions, codecs, conteneur). Nécessite ffprobe installé. Réponse 502 si la sonde échoue.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/video-probe/{uuid}",
+  "routes_marker": "video-probe",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/video-probe/00000000-0000-0000-0000-000000000000",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-video/avance/video-probe/",
+  "check_paths": [
+    "mvc/controllers/video_probe_controller.py",
+    "mvc/migrations/20260601230000_create_videos.sql"
+  ]
+}

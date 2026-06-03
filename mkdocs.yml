@@ -170,6 +170,9 @@ nav:
               - Lire une vidéo: starters/welcome-video/intermediaire/video-playback.md
               - Suivre l'état d'une vidéo: starters/welcome-video/intermediaire/video-status.md
               - Bilan intermédiaire: starters/welcome-video/intermediaire/bilan.md
+          - Avancé:
+              - Sonder une vidéo: starters/welcome-video/avance/video-probe.md
+              - Bilan avancé: starters/welcome-video/avance/bilan.md
           - Aide-mémoire: starters/welcome-video/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md

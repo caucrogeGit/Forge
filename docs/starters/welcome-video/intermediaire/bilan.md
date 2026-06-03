@@ -17,7 +17,7 @@ cycle de vie, sans transcodage.
 
 ## Et ensuite
 
-Le récapitulatif rassemble toutes les API vidéo de la progression sur une seule
-page.
+Place au **niveau avancé** : on bascule vers le réel — sonde ffprobe, transcodage
+ffmpeg, diagnostic du module.
 
-[Récapitulatif de la progression Vidéo](../recapitulatif.md)
+[Niveau avancé : Sonder une vidéo](../avance/video-probe.md)
