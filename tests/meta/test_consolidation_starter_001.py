@@ -114,7 +114,7 @@ def test_chaque_starter_a_un_index_md():
     Réorganisation des starters : les 3 applications (carnet-contacts,
     suivi-comportement-eleves, communes-sejours) ne sont plus des starters
     actifs (archivées sous docs/starters/old/). Les paliers welcome sont
-    regroupés à plat dans docs/starters/welcome/<id>.md ; les autres starters
+    regroupés à plat dans docs/starters/welcome-forge/<id>.md ; les autres starters
     ont leur propre docs/starters/<id>/index.md."""
     # Paliers welcome regroupés à plat (DOCS-STARTERS-PROGRESSION-FOLDER-001).
     paliers_welcome = [
@@ -131,7 +131,7 @@ def test_chaque_starter_a_un_index_md():
         "first-sql-write",
     ]
     for dossier in paliers_welcome:
-        index = ROOT / "docs" / "starters" / "welcome" / f"{dossier}.md"
+        index = ROOT / "docs" / "starters" / "welcome-forge" / f"{dossier}.md"
         assert index.exists(), f"doc de palier welcome absente pour {dossier}"
 
     # Les starters CRUD sont regroupés sous le dossier-sujet crud/ :

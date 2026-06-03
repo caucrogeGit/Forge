@@ -469,7 +469,7 @@ Depuis Windows, ouvrir le navigateur sur :
 
 Si une route renvoie 404, vérifier que le starter `welcome` a bien
 été appliqué : `cat mvc/routes.py | grep welcome`. Détails dans
-[Bonjour Forge — starter](../starters/welcome/welcome.md).
+[Bonjour Forge — starter](../starters/welcome-forge/welcome.md).
 
 ---
 

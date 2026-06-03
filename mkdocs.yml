@@ -111,19 +111,19 @@ nav:
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Progression pédagogique:
-          - Bonjour Forge: starters/welcome/welcome.md
-          - Paramètres d'URL: starters/welcome/query-params.md
-          - Première vue HTML: starters/welcome/first-html-view.md
-          - Route dynamique: starters/welcome/dynamic-route.md
-          - Inspecter une requête: starters/welcome/request-debug.md
-          - Réponse JSON: starters/welcome/json-response.md
-          - Le jeton CSRF: starters/welcome/csrf.md
-          - Premier formulaire POST: starters/welcome/form-post.md
-          - Validation serveur: starters/welcome/server-validation.md
-          - Première base SQL: starters/welcome/first-sql.md
-          - Écrire en base: starters/welcome/first-sql-write.md
-          - Bilan du starter: starters/welcome/bilan.md
-          - Aide-mémoire: starters/welcome/recapitulatif.md
+          - Bonjour Forge: starters/welcome-forge/welcome.md
+          - Paramètres d'URL: starters/welcome-forge/query-params.md
+          - Première vue HTML: starters/welcome-forge/first-html-view.md
+          - Route dynamique: starters/welcome-forge/dynamic-route.md
+          - Inspecter une requête: starters/welcome-forge/request-debug.md
+          - Réponse JSON: starters/welcome-forge/json-response.md
+          - Le jeton CSRF: starters/welcome-forge/csrf.md
+          - Premier formulaire POST: starters/welcome-forge/form-post.md
+          - Validation serveur: starters/welcome-forge/server-validation.md
+          - Première base SQL: starters/welcome-forge/first-sql.md
+          - Écrire en base: starters/welcome-forge/first-sql-write.md
+          - Bilan du starter: starters/welcome-forge/bilan.md
+          - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md

@@ -553,7 +553,7 @@ def test_chaque_starter_a_un_index_md():
     """Chaque starter autonome restant dispose d'un index.md dans son sous-dossier.
 
     Les paliers de découverte (`welcome`, `query-params`, …) sont documentés
-    dans `docs/starters/welcome/<id>.md` ; les starters autonomes ont chacun
+    dans `docs/starters/welcome-forge/<id>.md` ; les starters autonomes ont chacun
     leur propre sous-dossier avec un `index.md`. Les anciennes applications
     `carnet-contacts`, `suivi-comportement-eleves` et `communes-sejours` ne
     sont plus des starters actifs (archivées sous `docs/starters/old/`).

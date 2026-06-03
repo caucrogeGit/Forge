@@ -265,8 +265,8 @@ class TestStartersSection:
         assert 'id="starters"' in self.source
 
     def test_premier_pas_link_pointe_vers_welcome(self):
-        assert "starters/welcome/" in self.source, (
-            "La carte Premier pas doit pointer vers starters/welcome/ "
+        assert "starters/welcome-forge/" in self.source, (
+            "La carte Premier pas doit pointer vers starters/welcome-forge/ "
             "(LANDING-STARTERS-RESTORE-001)"
         )
 
@@ -278,7 +278,7 @@ class TestStartersSection:
         )
 
     @pytest.mark.parametrize("starter_url", [
-        "starters/welcome/",
+        "starters/welcome-forge/",
     ])
     def test_all_starter_urls_present(self, starter_url):
         # Landing simplifiée : seule la carte `welcome` subsiste ; les autres

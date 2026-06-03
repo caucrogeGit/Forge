@@ -17,13 +17,13 @@
 
 | Besoin | Fichier(s) de référence |
 |--------|-------------------------|
-| Palier minimal (1 route, réponse texte) | [welcome.md](../starters/welcome/welcome.md) |
-| Palier avec vue HTML + formulaire | [form-post.md](../starters/welcome/form-post.md) |
-| Palier « concept » (explication + formulaire illustratif) | [csrf.md](../starters/welcome/csrf.md) |
-| Palier SQL visible (lecture / écriture) | [first-sql.md](../starters/welcome/first-sql.md), [first-sql-write.md](../starters/welcome/first-sql-write.md) |
-| Dernier palier → bilan + prochain starter | [first-sql-write.md](../starters/welcome/first-sql-write.md) |
+| Palier minimal (1 route, réponse texte) | [welcome.md](../starters/welcome-forge/welcome.md) |
+| Palier avec vue HTML + formulaire | [form-post.md](../starters/welcome-forge/form-post.md) |
+| Palier « concept » (explication + formulaire illustratif) | [csrf.md](../starters/welcome-forge/csrf.md) |
+| Palier SQL visible (lecture / écriture) | [first-sql.md](../starters/welcome-forge/first-sql.md), [first-sql-write.md](../starters/welcome-forge/first-sql-write.md) |
+| Dernier palier → bilan + prochain starter | [first-sql-write.md](../starters/welcome-forge/first-sql-write.md) |
 | Starter autonome (CRUD complet, neutre) | [first-crud](../starters/crud/first-crud.md) |
-| Page bilan / aide-mémoire de fin | [bilan.md](../starters/welcome/bilan.md), [recapitulatif.md](../starters/welcome/recapitulatif.md) |
+| Page bilan / aide-mémoire de fin | [bilan.md](../starters/welcome-forge/bilan.md), [recapitulatif.md](../starters/welcome-forge/recapitulatif.md) |
 
 Côté code (non liés ici car hors `docs/`) :
 `forge_cli/starters/data/welcome/` et `forge_cli/starters/data/first-crud/`.
@@ -86,7 +86,7 @@ API non encore introduite, c'est le signe qu'il manque un palier intermédiaire
 
 ## 2. Anatomie d'une page de palier (formalisme)
 
-Une page de palier vit dans `docs/starters/welcome/<id>.md` et suit
+Une page de palier vit dans `docs/starters/welcome-forge/<id>.md` et suit
 **toujours** cet ordre de sections :
 
 ````markdown
@@ -228,7 +228,7 @@ Modèle (skeleton), aligné sur `welcome` / `first-crud` :
   "routes_marker": "<id>",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/<route>",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome/<id>/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/<id>/",
   "check_paths": ["mvc/controllers/<x>_controller.py"]
 }
 ```
@@ -236,7 +236,7 @@ Modèle (skeleton), aligné sur `welcome` / `first-crud` :
 - **`number` contiguë** : l'ensemble des starters est numéroté `1..N` sans
   trou (invariant vérifié par `tests/test_starter_cli.py`). Ajouter un starter
   = prendre le numéro suivant.
-- `doc_url` pointe vers le slug réel : `/starters/welcome/<id>/` pour un palier
+- `doc_url` pointe vers le slug réel : `/starters/welcome-forge/<id>/` pour un palier
   de la progression welcome, `/starters/<id>/` pour un starter autonome.
 
 ### `routes.py.snippet`
@@ -287,7 +287,7 @@ with router.group("", public=True) as pub:
   **autonomes avancés**, après la progression.
 - **Dossier = id** : `docs/starters/<id>/` (sans préfixe numérique). Le dossier
   qui regroupe les paliers d'un starter porte le **nom du starter**
-  (`docs/starters/welcome/`).
+  (`docs/starters/welcome-forge/`).
 - **Périmètre explicite** : chaque palier déclare ce qu'il ne fait pas
   (principe 8 — noyau minimal, briques opt-in).
 - **Sécurité par défaut** (principe 7) : CSRF sur les POST, validation serveur,
@@ -333,7 +333,7 @@ est un guide, pas un contrat verrouillé par test.
    numérotation.
 3. **Data** : `starter.json` + `routes.py.snippet` (marqueurs) +
    `files/mvc/...` (contrôleur SQL visible, vue HTML complète).
-4. **Doc** : page `docs/starters/welcome/<id>.md` suivant l'anatomie §2 ;
+4. **Doc** : page `docs/starters/welcome-forge/<id>.md` suivant l'anatomie §2 ;
    chaîner depuis le palier précédent et vers le suivant (§3).
 5. **Nav + index** : ajouter à `mkdocs.yml` et à la progression de
    `docs/starters/index.md` (« livré — ticket … »).

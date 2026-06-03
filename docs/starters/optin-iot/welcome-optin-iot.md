@@ -74,7 +74,7 @@ Bonjour Forge IoT
 ```
 
 C'est le premier contact équivalent à `/welcome` du starter
-[Bonjour Forge](../welcome/welcome.md), mais ciblé sur l'écosystème IoT.
+[Bonjour Forge](../welcome-forge/welcome.md), mais ciblé sur l'écosystème IoT.
 
 ### Inspection de la configuration — `/welcome-optin-iot/inspect`
 

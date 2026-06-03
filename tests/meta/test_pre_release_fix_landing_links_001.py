@@ -23,7 +23,7 @@ BROKEN_URLS = [
 # URLs corrigées attendues (landing simplifiée : seule la carte `welcome`
 # subsiste côté starters ; les autres sont accessibles via la documentation).
 FIXED_URLS = [
-    "starters/welcome/",
+    "starters/welcome-forge/",
     "roadmap/forge-roadmap/",
 ]
 

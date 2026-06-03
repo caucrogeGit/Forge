@@ -17,7 +17,7 @@
   "routes_marker": "server-validation",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/server-validation",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome/server-validation/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/server-validation/",
   "check_paths": [
     "mvc/controllers/server_validation_controller.py",
     "mvc/views/server_validation/index.html"

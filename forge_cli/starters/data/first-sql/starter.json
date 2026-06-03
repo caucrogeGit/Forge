@@ -17,7 +17,7 @@
   "routes_marker": "first-sql",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/first-sql",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome/first-sql/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/first-sql/",
   "check_paths": [
     "mvc/controllers/first_sql_controller.py",
     "mvc/migrations/20260527120000_create_first_sql_messages.sql"

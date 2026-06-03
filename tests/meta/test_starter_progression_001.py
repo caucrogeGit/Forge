@@ -5,7 +5,7 @@ Verrouille la progression pédagogique officielle des starters Forge :
 - `docs/starters/index.md` doit présenter la section
   « Progression recommandée » avec les 9 paliers et les codes
   des tickets futurs ;
-- `docs/starters/welcome/welcome.md` ne doit plus recommander
+- `docs/starters/welcome-forge/welcome.md` ne doit plus recommander
   directement le starter Contacts CRUD comme étape immédiate ;
 - `docs/guide/bonjour-forge.md` doit afficher l'avertissement
   « Ne sautez pas directement vers le CRUD Contacts » ;
@@ -28,7 +28,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
-STARTER_WELCOME = PROJECT_ROOT / "docs" / "starters" / "welcome" / "welcome.md"
+STARTER_WELCOME = PROJECT_ROOT / "docs" / "starters" / "welcome-forge" / "welcome.md"
 BONJOUR_FORGE = PROJECT_ROOT / "docs" / "guide" / "bonjour-forge.md"
 GETTING_STARTED = PROJECT_ROOT / "docs" / "guide" / "getting-started.md"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
@@ -258,7 +258,7 @@ class TestProgressionSectionInStartersIndex:
         )
 
 
-# ── docs/starters/welcome/welcome.md : ne renvoie plus directement vers CRUD ────
+# ── docs/starters/welcome-forge/welcome.md : ne renvoie plus directement vers CRUD ────
 
 
 class TestWelcomeStarterRedirectsToProgression:

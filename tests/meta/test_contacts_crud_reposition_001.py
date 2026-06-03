@@ -144,11 +144,11 @@ class TestContactsDocReposition:
             "premier contact avec Forge."
         )
         assert (
-            "../welcome/welcome.md" in self.content
-            or "welcome/welcome.md" in self.content
+            "../welcome-forge/welcome.md" in self.content
+            or "welcome-forge/welcome.md" in self.content
         ), (
             "La page Contacts doit lier explicitement vers la doc "
-            "`welcome/welcome.md`."
+            "`welcome-forge/welcome.md`."
         )
 
 

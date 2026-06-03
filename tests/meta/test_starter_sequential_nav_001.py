@@ -75,13 +75,13 @@ FORBIDDEN_COMMANDS = [
 def _doc_path(slug: str) -> Path:
     # DOCS-STARTERS-PROGRESSION-FOLDER-001 — les paliers pédagogiques
     # (welcome → first-sql) sont regroupés à plat dans
-    # docs/starters/welcome/<slug>.md. Les starters CRUD autonomes vivent
+    # docs/starters/welcome-forge/<slug>.md. Les starters CRUD autonomes vivent
     # sous le dossier-sujet crud/ (voir TOPIC_DOC_PATHS).
     if slug in TOPIC_DOC_PATHS:
         return STARTERS_DOCS / TOPIC_DOC_PATHS[slug]
     if slug in STANDALONE_STARTERS:
         return STARTERS_DOCS / slug / "index.md"
-    return STARTERS_DOCS / "welcome" / f"{slug}.md"
+    return STARTERS_DOCS / "welcome-forge" / f"{slug}.md"
 
 
 # ── Chaînage séquentiel : chaque page pointe vers la suivante ─────────────────

@@ -1,7 +1,7 @@
 """Tests documentaires — STARTER-QUERY-PARAMS-001.
 
 Verrouille le contrat documentaire de la page
-`docs/starters/welcome/query-params.md` : elle doit présenter le palier 2
+`docs/starters/welcome-forge/query-params.md` : elle doit présenter le palier 2
 de la progression officielle (Paramètres d'URL) avec un parcours
 pédagogique minimal — `request.param(...)`, deux routes, aucune vue
 HTML, aucune base de données.
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-DOC = PROJECT_ROOT / "docs" / "starters" / "welcome" / "query-params.md"
+DOC = PROJECT_ROOT / "docs" / "starters" / "welcome-forge" / "query-params.md"
 STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 MKDOCS = PROJECT_ROOT / "mkdocs.yml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
@@ -36,7 +36,7 @@ def _text() -> str:
 class TestQueryParamsDocExistence:
 
     def test_doc_existe(self):
-        assert DOC.exists(), "docs/starters/welcome/query-params.md doit exister"
+        assert DOC.exists(), "docs/starters/welcome-forge/query-params.md doit exister"
 
     def test_doc_non_vide(self):
         assert len(_text()) > 500
@@ -141,7 +141,7 @@ class TestQueryParamsDocIntegration:
 
     def test_starters_index_lit_le_starter_dans_la_table(self):
         text = STARTERS_INDEX.read_text(encoding="utf-8")
-        assert "[Paramètres d'URL](welcome/query-params.md)" in text, (
+        assert "[Paramètres d'URL](welcome-forge/query-params.md)" in text, (
             "docs/starters/index.md doit lister Paramètres d'URL dans "
             "le tableau de synthèse."
         )
@@ -155,7 +155,7 @@ class TestQueryParamsDocIntegration:
 
     def test_mkdocs_nav_inclut_query_params(self):
         text = MKDOCS.read_text(encoding="utf-8")
-        assert "starters/welcome/query-params.md" in text, (
+        assert "starters/welcome-forge/query-params.md" in text, (
             "mkdocs.yml doit lister la page dans la nav."
         )
 

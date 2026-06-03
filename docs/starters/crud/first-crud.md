@@ -10,7 +10,7 @@ ré-afficher une liste à jour après chaque écriture — le tout sur une entit
 **neutre** (`message`), sans notion métier.
 
 Premier **starter autonome** après la progression de découverte
-[Bonjour Forge](../welcome/welcome.md) : il prolonge directement les
+[Bonjour Forge](../welcome-forge/welcome.md) : il prolonge directement les
 paliers « Première base SQL » et « Écrire en base » en passant d'une seule
 écriture à un cycle CRUD entier.
 

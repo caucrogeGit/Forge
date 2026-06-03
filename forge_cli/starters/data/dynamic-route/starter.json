@@ -17,7 +17,7 @@
   "routes_marker": "dynamic-route",
   "routes_snippet": "routes.py.snippet",
   "open_url": "https://localhost:8000/dynamic-route/articles/42",
-  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome/dynamic-route/",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/dynamic-route/",
   "check_paths": [
     "mvc/controllers/dynamic_route_controller.py"
   ]
