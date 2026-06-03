@@ -46,24 +46,26 @@ Repository = "https://github.com/caucrogeGit/Forge"
 Documentation = "https://forgemvc.com/docs/forge/"
 Issues = "https://github.com/caucrogeGit/Forge/issues"
 
-# Extras préparés pour publication coordonnée beta.5 → à aligner beta.6 dans PYPI-OPTINS-001
-# (OPTIN-PYPI-PUBLISH-PREPARE-001, OPTIN-PYPI-PUBLISH-001, VERSION-SYNC-OPTIN-EXTRAS-001).
-# forge-mvc-media, forge-mvc-mfa et forge-mvc-iot sont exclus de [all] :
-#   media = source-only après Phase 11
-#   mfa   = Alpha (SEC-MFA-SECRET-ENCRYPTION-001 livré) ; exclu de [all]
-#   iot   = Alpha + dépendance MQTT (paho-mqtt) ; s'installe directement
-#           (pip install forge-mvc-iot) ou via l'opt-in projet `forge optin:enable iot`.
-# Donc `forge-mvc[all]` ≠ « tous les modules publiés » : il cible le socle
-# stable rbac/workflow/stats sans tirer de dépendances Alpha/MQTT.
+# Extras de raccourci vers les opt-ins publiables stables (rbac/workflow/stats).
+# Pins alignés sur la version courante : forge-mvc-<nom>>=1.0.0b13,<2
+# (politique unifiée OPTIN-DEPS-PIN-B13-001).
+# Exclus de [all] : forge-mvc-mfa, forge-mvc-media, forge-mvc-iot, forge-mvc-video
+#   media = API applicative encore Alpha
+#   mfa   = Alpha (secret TOTP chiffré au repos)
+#   iot   = Alpha + dépendance MQTT (paho-mqtt)
+#   video = Alpha + binaire système FFmpeg
+# Ces quatre opt-ins s'installent explicitement (pip install --pre forge-mvc-<nom>).
+# Donc `forge-mvc[all]` ≠ « tous les opt-ins publiés » : il cible le socle
+# stable rbac/workflow/stats sans tirer de dépendances Alpha/MQTT/FFmpeg.
 
 [project.optional-dependencies]
-rbac = ["forge-mvc-rbac>=1.0.0b5,<2"]
-workflow = ["forge-mvc-workflow>=1.0.0b5,<2"]
-stats = ["forge-mvc-stats>=1.0.0b5,<2"]
+rbac = ["forge-mvc-rbac>=1.0.0b13,<2"]
+workflow = ["forge-mvc-workflow>=1.0.0b13,<2"]
+stats = ["forge-mvc-stats>=1.0.0b13,<2"]
 all = [
-    "forge-mvc-rbac>=1.0.0b5,<2",
-    "forge-mvc-workflow>=1.0.0b5,<2",
-    "forge-mvc-stats>=1.0.0b5,<2",
+    "forge-mvc-rbac>=1.0.0b13,<2",
+    "forge-mvc-workflow>=1.0.0b13,<2",
+    "forge-mvc-stats>=1.0.0b13,<2",
 ]
 
 [project.scripts]

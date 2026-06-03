@@ -49,29 +49,30 @@ class TestMfaNotInAll:
 
 
 class TestMfaAvailableViaExplicitExtra:
-    """forge-mvc-mfa est en mode source-only (extras PyPI temporairement désactivés).
+    """forge-mvc-mfa reste hors des extras du pyproject racine.
 
-    Les extras [mfa], [rbac], [workflow], [stats], [all] ont été retirés du
-    pyproject.toml racine en 1.0.0b1 car les modules opt-in ne sont pas encore
-    sur PyPI. Réintroduction prévue dans une version ultérieure (OPTIN-PYPI-PUBLISH-001).
+    Les extras publiables [rbac]/[workflow]/[stats]/[all] sont présents et
+    pointent vers les opt-ins publiés sur PyPI (politique unifiée
+    OPTIN-DEPS-PIN-B13-001). forge-mvc-mfa en est volontairement exclu (Alpha)
+    — cf. ``test_mfa_excluded_from_root_all``.
     """
 
     def test_mfa_extra_intentionally_absent(self):
-        """L'extra [mfa] doit rester absent — forge-mvc-mfa n'est pas publiable (Pre-Alpha)."""
+        """L'extra [mfa] doit rester absent — forge-mvc-mfa est exclu des extras (Alpha)."""
         extras = _read_extras(ROOT_PYPROJECT)
         assert "mfa" not in extras, (
             "L'extra [mfa] est présent dans pyproject.toml — il doit être absent "
-            "(forge-mvc-mfa est Pre-Alpha, SEC-MFA-SECRET-ENCRYPTION-001 requis). "
-            "Voir OPTIN-PYPI-PUBLISH-001."
+            "(forge-mvc-mfa est Alpha, exclu des extras et de [all])."
         )
 
-    def test_optin_publish_ticket_documented_in_pyproject(self):
-        """La suppression des extras est tracée dans pyproject.toml."""
-        text = ROOT_PYPROJECT.read_text(encoding="utf-8")
-        assert "OPTIN-PYPI-PUBLISH-001" in text, (
-            "pyproject.toml doit mentionner OPTIN-PYPI-PUBLISH-001 pour tracer "
-            "la réintroduction prévue des extras en 3.1."
-        )
+    def test_publishable_extras_present(self):
+        """Les extras publiables (rbac/workflow/stats/all) sont déclarés —
+        réintroduction effectuée, les opt-ins sont publiés sur PyPI."""
+        extras = _read_extras(ROOT_PYPROJECT)
+        for name in ("rbac", "workflow", "stats", "all"):
+            assert name in extras, (
+                f"L'extra [{name}] doit être déclaré dans pyproject.toml racine."
+            )
 
 
 class TestMfaStatusDocumented:

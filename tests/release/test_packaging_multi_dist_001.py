@@ -145,12 +145,17 @@ class TestForgeMvcPackage:
                 f"L'extra [{extra}] ne doit pas etre present — package non publiable."
             )
 
-    def test_optin_publish_documented_in_pyproject(self):
-        """Le ticket de publication coordonnee est trace dans le pyproject."""
-        text = ROOT_PYPROJECT.read_text(encoding="utf-8")
-        assert "OPTIN-PYPI-PUBLISH-001" in text, (
-            "pyproject.toml doit tracer OPTIN-PYPI-PUBLISH-001."
-        )
+    def test_publishable_extras_pin_current_version(self):
+        """Les extras publiables épinglent forge-mvc-<nom> sur la version
+        courante avec la borne unifiée (OPTIN-DEPS-PIN-B13-001)."""
+        data = self._load()
+        opts = data["project"].get("optional-dependencies", {})
+        for extra in ("rbac", "workflow", "stats"):
+            deps = opts.get(extra, [])
+            assert any(VERSION in d and ">=" in d for d in deps), (
+                f"L'extra [{extra}] doit épingler la version courante "
+                f"{VERSION} (forme >=...,<2)."
+            )
 
     def test_has_forge_entrypoint(self):
         data = self._load()
@@ -202,10 +207,17 @@ class TestRootPyprojectUpdated:
             "(extras rbac/workflow/stats/all — VERSION-SYNC-OPTIN-EXTRAS-001)."
         )
 
-    def test_optin_publish_ticket_in_pyproject_comment(self):
-        """OPTIN-PYPI-PUBLISH-001 doit etre trace dans le pyproject."""
-        text = ROOT_PYPROJECT.read_text(encoding="utf-8")
-        assert "OPTIN-PYPI-PUBLISH-001" in text
+    def test_all_extra_excludes_alpha_optins(self):
+        """[all] ne tire que rbac/workflow/stats — mfa/media/iot/video exclus
+        (Alpha et/ou dépendances spéciales : MQTT, FFmpeg)."""
+        data = self._load()
+        all_deps = data["project"].get("optional-dependencies", {}).get("all", [])
+        for excluded in (
+            "forge-mvc-mfa", "forge-mvc-media", "forge-mvc-iot", "forge-mvc-video",
+        ):
+            assert not any(excluded in d for d in all_deps), (
+                f"{excluded} ne doit pas être dans l'extra [all]."
+            )
 
     def test_requires_python_312(self):
         data = self._load()
