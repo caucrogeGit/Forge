@@ -1,0 +1,23 @@
+# Bilan — niveau intermédiaire
+
+Récapitulatif des compétences acquises au **niveau intermédiaire** du starter
+*Bonjour Forge*. Ce niveau fait passer des opérations unitaires (niveau
+débutant) à une petite application pilotée par les données.
+
+## Ce que vous avez validé
+
+| Palier | Compétence acquise |
+|--------|--------------------|
+| 1 — [Lister des enregistrements](list-records.md) | Lire **plusieurs** lignes avec `fetch_all` et les itérer dans une vue (`{% for %}`). |
+
+*(Le niveau intermédiaire s'enrichira des paliers suivants : recherche,
+pagination, héritage de gabarit, mise à jour, suppression, sessions, messages
+flash.)*
+
+## Et ensuite
+
+Le **niveau avancé** arrivera prochainement. En attendant, le récapitulatif
+rassemble toutes les API de la progression sur une seule page et vous oriente
+vers les starters autonomes (à commencer par le CRUD complet).
+
+[Récapitulatif de la progression](../recapitulatif.md)

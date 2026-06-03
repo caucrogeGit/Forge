@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Lister des enregistrements — Forge</title>
+</head>
+<body>
+  <h1>Messages</h1>
+
+  {% if messages %}
+  <ul>
+    {% for m in messages %}
+    <li>#{{ m.id }} — {{ m.content }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Aucun message en base.</p>
+  {% endif %}
+</body>
+</html>

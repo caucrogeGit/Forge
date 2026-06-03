@@ -29,9 +29,8 @@ API (réponses, requête, base de données, sécurité) sur une seule page.
 ## Et ensuite
 
 Vous avez terminé le **niveau débutant** : HTTP, vues, formulaires protégés,
-validation et SQL en lecture/écriture. Le **niveau intermédiaire** arrivera
-prochainement. En attendant, le récapitulatif rassemble toutes les API de la
-progression sur une seule page et vous oriente vers les starters autonomes
-(à commencer par le CRUD complet).
+validation et SQL en lecture/écriture. Place au **niveau intermédiaire** :
+listes, recherche, pagination, gabarits, mise à jour/suppression, sessions et
+messages flash.
 
-[Récapitulatif de la progression](../recapitulatif.md)
+[Niveau intermédiaire : Lister des enregistrements](../intermediaire/list-records.md)

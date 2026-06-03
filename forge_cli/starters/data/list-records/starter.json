@@ -1,0 +1,26 @@
+{
+  "id": "list-records",
+  "number": 18,
+  "name": "Lister des enregistrements",
+  "kind": "skeleton",
+  "aliases": [
+    "list-records",
+    "list_records",
+    "list",
+    "18"
+  ],
+  "description": "Lister des enregistrements : premier palier du niveau intermédiaire. Une route `GET /list-records` lit PLUSIEURS lignes avec `core.database.db.fetch_all` et les affiche dans une vue HTML avec une boucle Jinja. Prolonge le palier débutant Première base SQL (lecture d'une seule ligne). Aucun CRUD complet, aucune entité JSON.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/list-records",
+  "routes_marker": "list-records",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/list-records",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/intermediaire/list-records/",
+  "check_paths": [
+    "mvc/controllers/list_records_controller.py",
+    "mvc/views/list_records/index.html",
+    "mvc/migrations/20260601130000_seed_list_records_messages.sql"
+  ]
+}

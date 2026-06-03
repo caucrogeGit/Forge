@@ -122,16 +122,27 @@ class TestSequentialChain:
             "du niveau (`bilan.md`) — STARTERS-DOC-LEVELS."
         )
 
-    def test_level_bilan_points_to_recapitulatif(self):
-        # Le bilan du niveau renvoie au premier palier du niveau suivant s'il
-        # existe ; sinon (cas actuel : pas encore de niveau intermédiaire) au
-        # récapitulatif à la racine du starter.
+    def test_debutant_bilan_points_to_next_level(self):
+        # Le niveau intermédiaire existe : le bilan débutant renvoie à son
+        # premier palier (`../intermediaire/list-records.md`), pas au
+        # récapitulatif.
         bilan = STARTERS_DOCS / "welcome-forge" / "debutant" / "bilan.md"
         content = bilan.read_text(encoding="utf-8")
-        assert "../recapitulatif.md" in content, (
-            "Le bilan du niveau débutant doit renvoyer au récapitulatif "
-            "(`../recapitulatif.md`) tant qu'il n'y a pas de niveau suivant."
+        assert "../intermediaire/list-records.md" in content, (
+            "Le bilan débutant doit renvoyer au premier palier du niveau "
+            "intermédiaire (next-level wiring) — STARTERS-DOC-LEVELS."
         )
+
+    def test_intermediaire_last_palier_points_to_level_bilan(self):
+        # Dernier palier intermédiaire disponible → bilan du niveau.
+        page = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "list-records.md"
+        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+
+    def test_intermediaire_bilan_points_to_recapitulatif(self):
+        # Pas encore de niveau avancé → le bilan intermédiaire renvoie au
+        # récapitulatif à la racine du starter.
+        bilan = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "bilan.md"
+        assert "../recapitulatif.md" in bilan.read_text(encoding="utf-8")
 
     def test_premier_crud_returns_to_overview(self):
         # first-crud clôt la chaîne pédagogique et renvoie vers ../
