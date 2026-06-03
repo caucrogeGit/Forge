@@ -148,6 +148,9 @@ nav:
               - Lire les événements IoT: starters/welcome-iot/debutant/iot-events.md
               - Les événements d'un capteur: starters/welcome-iot/debutant/iot-device.md
               - Bilan débutant: starters/welcome-iot/debutant/bilan.md
+          - Intermédiaire:
+              - Simuler une mesure IoT: starters/welcome-iot/intermediaire/iot-simulate.md
+              - Bilan intermédiaire: starters/welcome-iot/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-iot/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md

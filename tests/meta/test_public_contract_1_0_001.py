@@ -60,7 +60,7 @@ class TestStartersFrozen:
         "users-core-auth", "welcome", "welcome-optin-iot", "welcome-optin-mfa",
         "welcome-optin-video", "list-records", "filter-list", "pagination", "layout-template", "update-record", "delete-record", "session-state", "flash-messages",
         "relations", "file-upload", "send-email", "json-api", "db-transaction",
-        "iot-welcome", "iot-events", "iot-device",
+        "iot-welcome", "iot-events", "iot-device", "iot-simulate",
     }
 
     def test_starter_set_is_frozen(self):
@@ -74,7 +74,7 @@ class TestStartersFrozen:
         )
 
     def test_frozen_count(self):
-        assert len(self.FROZEN) == 33
+        assert len(self.FROZEN) == 34
 
 
 # ── Le contrat est documenté ─────────────────────────────────────────────────
@@ -85,7 +85,7 @@ class TestContractDocumented:
 
     @pytest.mark.parametrize("needle", [
         "opt-in:install", "opt-in:disable", "module:install",
-        "33 starters", "mkdocs build --strict",
+        "34 starters", "mkdocs build --strict",
     ])
     def test_contract_mentions(self, needle):
         assert needle in CONTRACT.read_text(encoding="utf-8")

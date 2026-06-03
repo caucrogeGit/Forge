@@ -54,10 +54,26 @@ class TestDebutantChain:
         page = IOT / "debutant" / "iot-device.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
-    def test_debutant_bilan_points_to_recapitulatif(self):
-        # Pas encore de niveau intermédiaire → le bilan débutant renvoie au
-        # récapitulatif à la racine du starter.
+    def test_debutant_bilan_points_to_next_level(self):
+        # Le niveau intermédiaire existe → le bilan débutant renvoie à son
+        # premier palier.
         bilan = IOT / "debutant" / "bilan.md"
+        assert "../intermediaire/iot-simulate.md" in bilan.read_text(encoding="utf-8")
+
+
+# ── Niveau intermédiaire ──────────────────────────────────────────────────────
+
+class TestIntermediaireChain:
+
+    def test_last_palier_points_to_level_bilan(self):
+        # iot-simulate est (pour l'instant) le dernier palier intermédiaire.
+        page = IOT / "intermediaire" / "iot-simulate.md"
+        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+
+    def test_intermediaire_bilan_points_to_recapitulatif(self):
+        # Pas encore de niveau avancé → le bilan intermédiaire renvoie au
+        # récapitulatif à la racine du starter.
+        bilan = IOT / "intermediaire" / "bilan.md"
         assert "../recapitulatif.md" in bilan.read_text(encoding="utf-8")
 
 

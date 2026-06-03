@@ -1,0 +1,25 @@
+{
+  "id": "iot-simulate",
+  "number": 34,
+  "name": "Simuler une mesure IoT",
+  "kind": "skeleton",
+  "aliases": [
+    "iot-simulate",
+    "iot_simulate",
+    "34"
+  ],
+  "description": "Simuler une mesure IoT : premier palier du niveau intermédiaire de welcome-iot. Un formulaire compose une mesure, validée contre le contrat IoT (`build_payload` + `parse_message`) puis insérée dans `iot_events` via `IotEventRepository.insert` — le tout SANS broker MQTT. C'est la boucle complète alimenter → relire en local.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/iot-simulate",
+  "routes_marker": "iot-simulate",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/iot-simulate",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-iot/intermediaire/iot-simulate/",
+  "check_paths": [
+    "mvc/controllers/iot_simulate_controller.py",
+    "mvc/views/iot_simulate/index.html",
+    "mvc/migrations/20260601170000_create_iot_events.sql"
+  ]
+}

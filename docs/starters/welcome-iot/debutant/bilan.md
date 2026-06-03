@@ -17,7 +17,7 @@ Vous savez maintenant inspecter la configuration du module et lire les
 
 ## Et ensuite
 
-Le récapitulatif rassemble toutes les API IoT de la progression sur une seule
-page.
+Place au **niveau intermédiaire** : alimenter les données en simulation, exposer
+l'API JSON et afficher un tableau de bord.
 
-[Récapitulatif de la progression IoT](../recapitulatif.md)
+[Niveau intermédiaire : Simuler une mesure IoT](../intermediaire/iot-simulate.md)
