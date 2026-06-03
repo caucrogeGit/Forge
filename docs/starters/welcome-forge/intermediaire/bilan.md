@@ -15,8 +15,11 @@ débutant) à une petite application pilotée par les données.
 | 5 — [Modifier un enregistrement](update-record.md) | Formulaire pré-rempli + `UPDATE … WHERE id = ?` (POST + CSRF). |
 | 6 — [Supprimer un enregistrement](delete-record.md) | Action destructive `POST` + CSRF + `DELETE … WHERE id = ?`. |
 | 7 — [Mémoriser un état en session](session-state.md) | Garder un état entre requêtes via le store de session + cookie durci. |
+| 8 — [Messages flash](flash-messages.md) | Confirmer une action one-shot (`set_flash`/`get_flash`), motif POST-Redirect-GET. |
 
-*(Le niveau intermédiaire se terminera par : messages flash.)*
+Vous savez maintenant construire à la main une petite application liste /
+recherche / pagination / édition / suppression, avec gabarits factorisés, état
+de session et retour utilisateur.
 
 ## Et ensuite
 

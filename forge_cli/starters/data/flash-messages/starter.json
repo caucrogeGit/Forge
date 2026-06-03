@@ -1,0 +1,25 @@
+{
+  "id": "flash-messages",
+  "number": 25,
+  "name": "Messages flash",
+  "kind": "skeleton",
+  "aliases": [
+    "flash-messages",
+    "flash_messages",
+    "flash",
+    "25"
+  ],
+  "description": "Messages flash : dernier palier du niveau intermédiaire. Après une action POST, on confirme via un message flash one-shot (`set_flash` / `get_flash`) affiché à la requête suivante, selon le motif POST-Redirect-GET. Combine session, CSRF et redirection. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/flash-messages",
+  "routes_marker": "flash-messages",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/flash-messages",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-forge/intermediaire/flash-messages/",
+  "check_paths": [
+    "mvc/controllers/flash_messages_controller.py",
+    "mvc/views/flash_messages/index.html"
+  ]
+}

@@ -132,6 +132,7 @@ nav:
               - Modifier un enregistrement: starters/welcome-forge/intermediaire/update-record.md
               - Supprimer un enregistrement: starters/welcome-forge/intermediaire/delete-record.md
               - Mémoriser un état en session: starters/welcome-forge/intermediaire/session-state.md
+              - Messages flash: starters/welcome-forge/intermediaire/flash-messages.md
               - Bilan intermédiaire: starters/welcome-forge/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:

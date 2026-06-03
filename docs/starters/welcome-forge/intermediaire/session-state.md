@@ -89,7 +89,7 @@ class SessionStateController(BaseController):
 
 ## Après ce starter
 
-C'est, pour l'instant, le dernier palier disponible du **niveau intermédiaire**.
-Faites le point dans le bilan du niveau.
+Passez au dernier palier du niveau : **Messages flash** — confirmer une action
+par un message one-shot.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Continuer avec Messages flash](flash-messages.md)

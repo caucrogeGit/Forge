@@ -1,0 +1,7 @@
+# forge-starter:flash-messages:start
+from mvc.controllers.flash_messages_controller import FlashMessagesController
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/flash-messages",         FlashMessagesController.index,  name="flash_messages_index")
+    pub.add("POST", "/flash-messages/action",  FlashMessagesController.action, name="flash_messages_action")
+# forge-starter:flash-messages:end
