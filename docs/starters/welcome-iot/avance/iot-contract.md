@@ -86,6 +86,6 @@ class IotContractController(BaseController):
 
 ## Après ce starter
 
-Vous connaissez le contrat. Faites le point dans le bilan du niveau.
+Vous connaissez le contrat. La suite : recevoir ces messages d'un **vrai broker**.
 
-[Bilan du niveau avancé](bilan.md)
+[Le subscriber MQTT](iot-subscriber.md)

@@ -155,6 +155,7 @@ nav:
               - Bilan intermédiaire: starters/welcome-iot/intermediaire/bilan.md
           - Avancé:
               - Valider un message IoT: starters/welcome-iot/avance/iot-contract.md
+              - Le subscriber MQTT: starters/welcome-iot/avance/iot-subscriber.md
               - Bilan avancé: starters/welcome-iot/avance/bilan.md
           - Aide-mémoire: starters/welcome-iot/recapitulatif.md
       - CRUD:

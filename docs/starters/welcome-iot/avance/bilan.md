@@ -9,8 +9,10 @@ subscriber MQTT branché sur un vrai broker, et diagnostic du module.
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1 — [Valider un message IoT](iot-contract.md) | Comprendre et appliquer le contrat des messages (`parse_message`, `ContractError`). |
+| 2 — [Le subscriber MQTT](iot-subscriber.md) | Recevoir d'un vrai broker via `forge iot:listen` (`MqttSubscriber` : valider puis stocker). |
 
-Vous savez maintenant ce qu'un message réel doit respecter avant d'être accepté.
+Vous savez maintenant ce qu'un message réel doit respecter et comment le recevoir
+d'un vrai broker.
 
 ## Et ensuite
 

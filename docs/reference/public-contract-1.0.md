@@ -58,9 +58,9 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 37)
+## 4. Starters 1.0 (gelés — 38)
 
-La liste pédagogique est **figée** : 37 starters, numérotés de 1 à 37,
+La liste pédagogique est **figée** : 38 starters, numérotés de 1 à 38,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
 (`welcome-optin-<module>`, `users-core-auth`, `first-*`…). La progression
 `welcome-forge` est organisée par niveau ; le **niveau avancé** (`relations`, …)
@@ -71,7 +71,8 @@ au-dessus du niveau débutant. Une seconde progression, `welcome-iot`
 ```
 csrf, db-transaction, delete-record, dynamic-route, file-upload, filter-list, first-crud, first-crud-generated,
 first-html-view, first-sql, first-sql-write, flash-messages, form-post,
-iot-api, iot-contract, iot-dashboard, iot-device, iot-events, iot-simulate, iot-welcome,
+iot-api, iot-contract, iot-dashboard, iot-device, iot-events, iot-simulate,
+iot-subscriber, iot-welcome,
 json-api, json-response,
 layout-template,
 send-email,

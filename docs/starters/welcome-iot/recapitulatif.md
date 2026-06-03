@@ -28,6 +28,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Valider un message IoT](avance/iot-contract.md) | Le contrat des messages réels | `parse_message`, `ContractError` |
+| 2 | [Le subscriber MQTT](avance/iot-subscriber.md) | Recevoir d'un vrai broker en temps réel | `forge iot:listen`, `MqttSubscriber` |
 
 ## Configuration (`forge_mvc_iot.config`)
 
