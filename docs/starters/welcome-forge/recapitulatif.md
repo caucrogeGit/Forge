@@ -1,10 +1,10 @@
 # Aide-mémoire de la progression
 
-Récapitulatif des **11 paliers** de la progression pédagogique et des
-API Forge introduites à chaque étape. À garder sous la main avant
-d'aborder le premier CRUD complet (`first-crud`).
+Récapitulatif des **24 paliers** de la progression *Bonjour Forge*, répartis en
+trois niveaux, et des API Forge introduites à chaque étape. À garder sous la main
+avant d'aborder les starters autonomes (à commencer par `first-crud`).
 
-## Les 11 paliers
+## Niveau débutant — 11 paliers
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -20,15 +20,39 @@ d'aborder le premier CRUD complet (`first-crud`).
 | 10 | [Première base SQL](debutant/first-sql.md) | Lire en base, SQL visible | `core.database.db.fetch_one(...)` |
 | 11 | [Écrire en base](debutant/first-sql-write.md) | Insérer une ligne | `core.database.db.insert(...)` |
 
+## Niveau intermédiaire — 8 paliers
+
+| # | Palier | Ce qu'on apprend | API-clé |
+|---|--------|------------------|---------|
+| 1 | [Lister des enregistrements](intermediaire/list-records.md) | Lire plusieurs lignes et les itérer | `fetch_all(...)`, `{% for %}` |
+| 2 | [Rechercher / filtrer](intermediaire/filter-list.md) | Filtrer une liste | `request.param("q")` + `WHERE … LIKE ?` |
+| 3 | [Paginer une liste](intermediaire/pagination.md) | Découper une liste en pages | `LIMIT ? OFFSET ?`, `COUNT(*)` |
+| 4 | [Héritage de gabarit](intermediaire/layout-template.md) | Factoriser l'enveloppe HTML | `{% extends %}`, `{% block %}` |
+| 5 | [Modifier un enregistrement](intermediaire/update-record.md) | Formulaire pré-rempli + mise à jour | `execute("UPDATE … WHERE id = ?")` |
+| 6 | [Supprimer un enregistrement](intermediaire/delete-record.md) | Action destructive sûre | `execute("DELETE … WHERE id = ?")` + CSRF |
+| 7 | [Mémoriser un état en session](intermediaire/session-state.md) | Garder un état entre requêtes | `get_session_store()`, cookie durci |
+| 8 | [Messages flash](intermediaire/flash-messages.md) | Retour one-shot après action | `set_flash` / `get_flash`, POST-Redirect-GET |
+
+## Niveau avancé — 5 paliers
+
+| # | Palier | Ce qu'on apprend | API-clé |
+|---|--------|------------------|---------|
+| 1 | [Relations entre tables](avance/relations.md) | Deux tables liées, lecture jointe | `FOREIGN KEY`, `SELECT … JOIN …` |
+| 2 | [Téléverser un fichier](avance/file-upload.md) | Recevoir et stocker un fichier | `request.file(...)`, `save_upload(...)` |
+| 3 | [Envoyer un email](avance/send-email.md) | Composer et envoyer un email | `MailMessage`, `Mailer`, `ConsoleTransport` |
+| 4 | [API JSON protégée](avance/json-api.md) | Exposer du JSON derrière un jeton | `Response.json`, `request.header("Authorization")` |
+| 5 | [Écritures transactionnelles](avance/db-transaction.md) | Plusieurs écritures atomiques | `with transaction() as tx:`, `insert(..., tx=tx)` |
+
 ## Réponses (`core.http.response.Response`)
 
 | Méthode | Usage |
 |---------|-------|
 | `Response.text(body, status=200)` | Réponse `text/plain` |
 | `Response.html(body)` | Réponse HTML brute |
-| `Response.json(obj)` | Réponse `application/json` |
+| `Response.json(obj, status=200)` | Réponse `application/json` (données **et** code HTTP) |
 | `Response.debug(obj)` | Page de debug (dev uniquement, `404` en prod) |
 | `BaseController.render(template, request=..., context=...)` | Rendu d'un template Jinja2 |
+| `BaseController.redirect(url)` | Redirection (motif POST-Redirect-GET) |
 
 ## Lecture de la requête (`core.http.request.Request`)
 
@@ -37,31 +61,49 @@ d'aborder le premier CRUD complet (`first-crud`).
 | `request.param("k", default=...)` | Query string (`?k=...`) |
 | `request.route_param("k")` | Segment de route (`/x/{k}`) |
 | `request.form("k", default=...)` | Corps d'un formulaire POST |
+| `request.file("k")` | Fichier reçu (`multipart/form-data`) |
+| `request.header("Name", default=...)` | En-tête HTTP (`Authorization`…) |
 | `request.data` | Vue globale (méthode, chemin, headers, body…) |
 
-## Base de données (`core.database.db`)
+## Base de données (`core.database`)
 
 | Fonction | Usage |
 |----------|-------|
-| `fetch_one(sql, params)` | Première ligne (`dict`) ou `None` |
-| `fetch_all(sql, params)` | Liste de lignes |
-| `insert(sql, params)` | Insertion (paramétrée) |
-| `execute(sql, params)` | Écriture générique |
+| `db.fetch_one(sql, params)` | Première ligne (`dict`) ou `None` |
+| `db.fetch_all(sql, params)` | Liste de lignes |
+| `db.insert(sql, params)` | Insertion (paramétrée) |
+| `db.execute(sql, params)` | Écriture générique |
+| `with transaction() as tx:` + `db.insert(..., tx=tx)` | Écritures **atomiques** (commit / rollback) |
 
 Les requêtes restent **paramétrées** (placeholders `?`) — jamais de
-concaténation de valeurs. **Forge garde le SQL visible.**
+concaténation de valeurs. **Forge garde le SQL visible.** Les relations
+s'écrivent à la main (`JOIN`), sans ORM.
+
+## Sessions & flash (`core.security.session`, `core.sessions.manager`)
+
+| Fonction | Usage |
+|----------|-------|
+| `get_session_store()` | Store de session (mémoire par défaut) |
+| `get_session_id(request)` / `get_session(session_id)` | Identifier / lire la session |
+| `set_flash(request, message)` / `get_flash(session_id)` | Message one-shot (lu **et** supprimé) |
+
+Cookie de session **durci** : `HttpOnly; SameSite=Strict; Secure`.
+
+## Fichiers & email
+
+| Fonction | Usage |
+|----------|-------|
+| `core.uploads.save_upload(file, category)` | Valider (extension, MIME, taille) puis stocker un fichier |
+| `core.mail.MailMessage(...)` | Décrire un email (sujet, destinataire, corps) |
+| `core.mail.Mailer(transport).send(message)` | Envoyer ; `ConsoleTransport` en dev (aucun SMTP) |
 
 ## Sécurité
 
 - **CSRF** : champ caché `csrf_token` exigé sur chaque POST, vérifié
-  automatiquement par le middleware (palier 7).
-- **Validation serveur** : ne jamais faire confiance au client ; valider
-  avant d'utiliser ou d'écrire (palier 9).
-
-## Et ensuite
-
-Une fois ces 11 paliers acquis, enchaînez les **starters autonomes** par
-ordre de complexité : d'abord le [First CRUD](../crud/first-crud.md)
-(CRUD complet à SQL visible, entité neutre), puis les exemples métier
-depuis la [vue d'ensemble](../index.md) :
-First CRUD (généré) → Utilisateurs/Auth → …
+  automatiquement (palier débutant 7).
+- **Validation serveur** : ne jamais faire confiance au client ; valider avant
+  d'utiliser ou d'écrire (palier débutant 9).
+- **Uploads** : `save_upload` contrôle extension, type MIME et taille **avant**
+  toute écriture disque (palier avancé 2).
+- **API** : vérifier l'autorisation (`Bearer`) **avant** de produire la donnée ;
+  un refus renvoie `401` (palier avancé 4).
