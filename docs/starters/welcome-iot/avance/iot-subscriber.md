@@ -91,6 +91,7 @@ class IotSubscriberController(BaseController):
 
 ## Après ce starter
 
-Vous recevez les vraies données. Faites le point dans le bilan du niveau.
+Vous recevez les vraies données. Dernier palier : diagnostiquer le module quand
+quelque chose cloche.
 
-[Bilan du niveau avancé](bilan.md)
+[Diagnostiquer le module IoT](iot-doctor.md)

@@ -1,0 +1,23 @@
+{
+  "id": "iot-doctor",
+  "number": 39,
+  "name": "Diagnostiquer le module IoT",
+  "kind": "skeleton",
+  "aliases": [
+    "iot-doctor",
+    "iot_doctor",
+    "39"
+  ],
+  "description": "Diagnostiquer le module IoT : dernier palier du niveau avancé de welcome-iot. Une route exécute les vérifications non invasives du diagnostic Forge IoT (paquet importable, configuration chargeable, API HTTP enregistrable) et renvoie leur statut en JSON. Le diagnostic complet (base, broker) reste la commande `forge iot:doctor`. Sans base, sans broker.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/iot-doctor",
+  "routes_marker": "iot-doctor",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/iot-doctor",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-iot/avance/iot-doctor/",
+  "check_paths": [
+    "mvc/controllers/iot_doctor_controller.py"
+  ]
+}

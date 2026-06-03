@@ -29,6 +29,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 |---|--------|------------------|---------|
 | 1 | [Valider un message IoT](avance/iot-contract.md) | Le contrat des messages réels | `parse_message`, `ContractError` |
 | 2 | [Le subscriber MQTT](avance/iot-subscriber.md) | Recevoir d'un vrai broker en temps réel | `forge iot:listen`, `MqttSubscriber` |
+| 3 | [Diagnostiquer le module IoT](avance/iot-doctor.md) | Vérifier la santé du module | `forge iot:doctor`, contrôles non invasifs |
 
 ## Configuration (`forge_mvc_iot.config`)
 
@@ -62,3 +63,11 @@ sérialisée.
 |---------|-------|
 | `register_iot_routes(router)` | Brancher l'API JSON officielle (3 routes lecture seule) |
 | `FORGE_IOT_API_TOKEN` | Si défini, exige `Authorization: Bearer <token>` |
+
+## Subscriber & diagnostic
+
+| Élément | Usage |
+|---------|-------|
+| `forge iot:listen` (`MqttSubscriber`) | Recevoir d'un vrai broker : valider puis stocker |
+| `forge iot:doctor` | Diagnostic complet (paquet, config, API, `--db`, `--mqtt`) |
+| `check_package_importable` / `check_config_loadable` / `check_http_api_registrable` | Contrôles de diagnostic non invasifs, réutilisables en app |

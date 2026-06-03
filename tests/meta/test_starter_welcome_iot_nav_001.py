@@ -93,9 +93,13 @@ class TestAvanceChain:
         page = IOT / "avance" / "iot-contract.md"
         assert "(iot-subscriber.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # iot-subscriber est (pour l'instant) le dernier palier avancé.
+    def test_iot_subscriber_points_to_iot_doctor(self):
         page = IOT / "avance" / "iot-subscriber.md"
+        assert "(iot-doctor.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # iot-doctor est le dernier palier avancé (et de toute la progression).
+        page = IOT / "avance" / "iot-doctor.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_bilan_points_to_recapitulatif(self):

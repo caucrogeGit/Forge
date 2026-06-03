@@ -156,6 +156,7 @@ nav:
           - Avancé:
               - Valider un message IoT: starters/welcome-iot/avance/iot-contract.md
               - Le subscriber MQTT: starters/welcome-iot/avance/iot-subscriber.md
+              - Diagnostiquer le module IoT: starters/welcome-iot/avance/iot-doctor.md
               - Bilan avancé: starters/welcome-iot/avance/bilan.md
           - Aide-mémoire: starters/welcome-iot/recapitulatif.md
       - CRUD:
