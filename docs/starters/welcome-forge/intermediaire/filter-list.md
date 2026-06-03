@@ -117,7 +117,7 @@ class FilterListController(BaseController):
 
 ## Après ce starter
 
-C'est, pour l'instant, le dernier palier disponible du **niveau intermédiaire**.
-Faites le point dans le bilan du niveau.
+Passez au palier suivant : **Paginer une liste** — n'afficher qu'une tranche
+des lignes à la fois.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Continuer avec Paginer une liste](pagination.md)

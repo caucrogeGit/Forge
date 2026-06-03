@@ -127,6 +127,7 @@ nav:
           - Intermédiaire:
               - Lister des enregistrements: starters/welcome-forge/intermediaire/list-records.md
               - Rechercher / filtrer: starters/welcome-forge/intermediaire/filter-list.md
+              - Paginer une liste: starters/welcome-forge/intermediaire/pagination.md
               - Bilan intermédiaire: starters/welcome-forge/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:
