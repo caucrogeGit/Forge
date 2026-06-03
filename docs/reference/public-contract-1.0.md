@@ -58,9 +58,9 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 26)
+## 4. Starters 1.0 (gelés — 27)
 
-La liste pédagogique est **figée** : 26 starters, numérotés de 1 à 26,
+La liste pédagogique est **figée** : 27 starters, numérotés de 1 à 27,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
 (`welcome-optin-<module>`, `users-core-auth`, `first-*`…). La progression
 `welcome-forge` est organisée par niveau ; le **niveau avancé** (`relations`, …)
@@ -68,7 +68,7 @@ prolonge le niveau intermédiaire (`list-records`, `filter-list`, …), lui-mêm
 au-dessus du niveau débutant.
 
 ```
-csrf, delete-record, dynamic-route, filter-list, first-crud, first-crud-generated,
+csrf, delete-record, dynamic-route, file-upload, filter-list, first-crud, first-crud-generated,
 first-html-view, first-sql, first-sql-write, flash-messages, form-post,
 json-response,
 layout-template,

@@ -10,9 +10,10 @@ atomiques.
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1 — [Relations entre tables](relations.md) | Relier deux tables par une clé étrangère et les lire avec un `JOIN` SQL visible. |
+| 2 — [Téléverser un fichier](file-upload.md) | Recevoir un fichier (`multipart`), le récupérer avec `request.file` et le stocker via `save_upload` (validé). |
 
-Vous savez maintenant relier vos données sur plusieurs tables sans ORM, le SQL
-restant explicite.
+Vous savez maintenant relier vos données sur plusieurs tables sans ORM et
+recevoir des fichiers en toute sécurité, le SQL restant explicite.
 
 ## Et ensuite
 

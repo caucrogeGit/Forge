@@ -136,6 +136,7 @@ nav:
               - Bilan intermédiaire: starters/welcome-forge/intermediaire/bilan.md
           - Avancé:
               - Relations entre tables: starters/welcome-forge/avance/relations.md
+              - Téléverser un fichier: starters/welcome-forge/avance/file-upload.md
               - Bilan avancé: starters/welcome-forge/avance/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - CRUD:

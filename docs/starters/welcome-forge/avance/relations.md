@@ -126,7 +126,7 @@ class RelationsController(BaseController):
 
 ## Après ce starter
 
-Premier palier du niveau avancé terminé. Faites le point dans le bilan du
-niveau.
+Premier palier du niveau avancé terminé. La suite : recevoir un fichier de
+l'utilisateur.
 
-[Bilan du niveau avancé](bilan.md)
+[Téléverser un fichier](file-upload.md)

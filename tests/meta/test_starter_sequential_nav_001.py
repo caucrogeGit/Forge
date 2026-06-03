@@ -144,9 +144,14 @@ class TestSequentialChain:
         bilan = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "bilan.md"
         assert "../avance/relations.md" in bilan.read_text(encoding="utf-8")
 
+    def test_avance_relations_points_to_file_upload(self):
+        # Palier 1 avancé → palier 2 (file-upload).
+        page = STARTERS_DOCS / "welcome-forge" / "avance" / "relations.md"
+        assert "(file-upload.md)" in page.read_text(encoding="utf-8")
+
     def test_avance_last_palier_points_to_level_bilan(self):
         # Dernier palier avancé disponible → bilan du niveau.
-        page = STARTERS_DOCS / "welcome-forge" / "avance" / "relations.md"
+        page = STARTERS_DOCS / "welcome-forge" / "avance" / "file-upload.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_bilan_points_to_recapitulatif(self):
