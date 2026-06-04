@@ -73,6 +73,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "iot:doctor", "iot:init", "iot:simulate", "iot:listen",
     # Vidéo (module opt-in forge-mvc-video)
     "video:doctor", "video:init", "video:upload", "video:process", "video:cleanup",
+    # Audio (module opt-in forge-mvc-audio)
+    "audio:doctor",
     # Opt-ins (branchement projet)
     "opt-in:install", "opt-in:remove", "opt-in:enable", "opt-in:disable", "opt-in:list",
     # Documentation

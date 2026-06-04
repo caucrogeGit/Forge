@@ -119,6 +119,8 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "video:upload":     "Upload une vidéo source : <fichier> [--title]  (statut uploaded).",
     "video:process":    "Traite une vidéo (probe + poster + MP4) : <id> ou --pending.",
     "video:cleanup":    "Purge vidéos failed / fichiers orphelins (dry-run par défaut, --apply).",
+    # Audio
+    "audio:doctor":     "Diagnostic du module audio (package, config, présence ffmpeg/ffprobe).",
     # Opt-ins (branchement projet)
     "opt-in:install":   "Affiche la commande d'installation du package d'un opt-in officiel.",
     "opt-in:remove":    "Affiche la commande de désinstallation du package d'un opt-in officiel.",
@@ -341,6 +343,25 @@ Vérifications:
 Code de sortie:
   0 si tout est OK ; 1 si une vérification échoue (ex. ffmpeg/ffprobe
   absent du PATH — requis pour le transcodage).
+""",
+    "audio:doctor": """\
+Usage:
+  forge audio:doctor        # diagnostic statique du module audio
+
+Description:
+  Diagnostic du module opt-in `forge-mvc-audio`. Statique : ne lance aucun
+  ffmpeg, n'ouvre aucun fichier audio, ne touche à aucune base (il n'y en a pas).
+
+Vérifications:
+  - package `forge-mvc-audio` importable (et version) ;
+  - configuration `load_audio_config()` chargeable (FORGE_AUDIO_*) ;
+  - binaire `ffprobe` présent dans le PATH (validation + métadonnées) ;
+  - binaire `ffmpeg` présent dans le PATH (transcodage MP3) ;
+  - fonction `register_audio_routes` exposée pour brancher les routes.
+
+Code de sortie:
+  0 si tout est OK ; 1 si une vérification échoue (ex. ffmpeg/ffprobe
+  absent du PATH — requis pour le sondage et le transcodage).
 """,
     "video:init": """\
 Usage:

@@ -22,12 +22,12 @@ FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
 # ── Catalogue canonique ──────────────────────────────────────────────────────
 
 class TestCatalog:
-    def test_seven_official_optins(self):
+    def test_official_optins(self):
         assert optin_names() == [
-            "iot", "media", "mfa", "rbac", "stats", "video", "workflow",
+            "audio", "iot", "media", "mfa", "rbac", "stats", "video", "workflow",
         ]
 
-    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "media", "iot", "video"])
+    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "media", "iot", "video", "audio"])
     def test_dist_and_import_naming(self, name):
         optin = OFFICIAL_OPTINS[name]
         assert optin.package_dist == f"forge-mvc-{name}"
@@ -38,7 +38,7 @@ class TestCatalog:
 # ── opt-in:install (affichage, n'exécute rien) ───────────────────────────────
 
 class TestOptInInstall:
-    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "media", "iot"])
+    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "media", "iot", "video", "audio"])
     def test_install_shows_package_and_succeeds(self, name, capsys):
         rc = install.main([name])
         out = capsys.readouterr().out

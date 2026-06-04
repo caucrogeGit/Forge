@@ -94,6 +94,9 @@ Vidéo (module opt-in forge-mvc-video)
   video:process       Traite une vidéo (probe + poster + transcodage MP4) : <id> ou --pending.
   video:cleanup       Purge les vidéos failed / fichiers orphelins (dry-run par défaut, --apply).
 
+Audio (module opt-in forge-mvc-audio)
+  audio:doctor        Diagnostic statique du module audio (package, config, ffmpeg/ffprobe).
+
 Opt-ins (branchement projet)
   opt-in:install      Affiche la commande d'installation du package d'un opt-in officiel.
   opt-in:remove       Affiche la commande de désinstallation du package d'un opt-in officiel.

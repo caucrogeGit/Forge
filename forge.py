@@ -698,6 +698,19 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "audio:doctor":
+        try:
+            from forge_mvc_audio.cli.doctor import main as audio_doctor_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-audio non installé.",
+                hint="installe le module opt-in : pip install forge-mvc-audio",
+            )
+        rc = audio_doctor_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command == "video:doctor":
         try:
             from forge_mvc_video.cli.doctor import main as video_doctor_main

@@ -38,7 +38,7 @@ class TestKindClassification:
 
     def test_route_kind_optins(self):
         routes = [o for o in OFFICIAL_OPTINS.values() if o.kind == KIND_ROUTE]
-        assert sorted(o.name for o in routes) == ["iot", "video"]
+        assert sorted(o.name for o in routes) == ["audio", "iot", "video"]
 
     def test_every_route_kind_has_enable_template(self):
         """Garde-fou anti-drift (OPTIN-AUDIT-FIX-001, F1).

@@ -82,6 +82,10 @@ OPTIN_MODULES: dict[str, set[str]] = {
     # pytest.importorskip("forge_mvc_video"). ffmpeg/ffprobe ne sont jamais
     # importés (binaires système, runners injectés), donc pas d'extra à lister.
     "forge_mvc_video": set(),
+    # forge-mvc-audio : opt-in. Ses tests gardent l'import via
+    # pytest.importorskip("forge_mvc_audio"). ffmpeg/ffprobe ne sont jamais
+    # importés (binaires système, runners injectés), donc pas d'extra à lister.
+    "forge_mvc_audio": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

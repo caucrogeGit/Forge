@@ -1332,6 +1332,27 @@ si aucune cible (`--failed` / `--orphan-files`) n'est fournie.
 
 </details>
 
+## Audio (opt-in `forge-mvc-audio`)
+
+<details markdown="1" id="forge-audiodoctor">
+<summary><code>forge audio:doctor</code> - Diagnostic du module audio (statique : package, config, ffmpeg/ffprobe)</summary>
+
+Diagnostic du module opt-in `forge-mvc-audio`. **Statique** : ne lance aucun
+`ffmpeg`, n'ouvre aucun fichier audio et ne touche à aucune base (le module est
+**sans état**).
+
+```bash
+forge audio:doctor        # diagnostic statique du module audio
+```
+
+Vérifie que le package `forge-mvc-audio` est importable (et sa version), que la
+configuration `load_audio_config()` (`FORGE_AUDIO_*`) est chargeable, que les
+binaires `ffprobe` (sondage/métadonnées) et `ffmpeg` (transcodage MP3) sont
+présents dans le PATH, et que `register_audio_routes` est exposée. Code de
+sortie `0` si tout est OK, `1` si une vérification échoue.
+
+</details>
+
 ## Opt-ins (branchement projet)
 
 Commandes de **branchement local** des opt-ins dans un projet

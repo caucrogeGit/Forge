@@ -240,9 +240,9 @@ class TestScopeGuards:
         assert not offenders, offenders
 
     def test_route_optins_supported(self):
-        # Depuis OPTIN-KIND-ADAPTER généralisé (video) : les opt-ins routiers
-        # câblables sont iot et video.
-        assert set(SUPPORTED_OPTINS) == {"iot", "video"}
+        # Opt-ins routiers câblables (OPTIN-KIND-ADAPTER généralisé) : iot,
+        # video et audio (forge-mvc-audio, AUDIO-MODULE-001).
+        assert set(SUPPORTED_OPTINS) == {"iot", "video", "audio"}
 
 
 # ── Enregistrement CLI ───────────────────────────────────────────────────────

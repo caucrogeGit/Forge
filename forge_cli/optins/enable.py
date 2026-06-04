@@ -256,6 +256,66 @@ _VIDEO_FILES: tuple[tuple[str, str], ...] = (
 )
 
 
+_AUDIO_INIT = '''\
+"""Branchement local de l'opt-in Forge Audio (paquet `forge-mvc-audio`).
+
+Câblage uniquement : voir `routes.py` et `README.md`. Le code métier vit
+dans le paquet ; la doc complète reste officielle (docs/audio/).
+"""
+'''
+
+_AUDIO_ROUTES = '''\
+"""Branchement local de l'opt-in Forge Audio.
+
+Délègue à l'API publique du paquet `forge-mvc-audio` — ce fichier ne fait
+que le câblage. Appelé par `optins/registry.py`.
+"""
+
+from __future__ import annotations
+
+from forge_mvc_audio import register_audio_routes
+
+
+def register(router) -> None:
+    """Expose les routes audio (lecture en streaming, etc.)."""
+    register_audio_routes(router)
+'''
+
+_AUDIO_README = """\
+# Opt-in Forge Audio
+
+Ce dossier branche **localement** l'opt-in Forge Audio dans ce projet. Le
+code métier vit dans le paquet `forge-mvc-audio` ; ici, uniquement le
+câblage (voir `routes.py`).
+
+Le branchement est **explicite** : `mvc/routes.py` appelle
+`register_optins(router)` → `optins/registry.py` → `optins/audio/routes.py`.
+Aucune découverte automatique.
+
+## Paquet requis
+
+```bash
+pip install --pre forge-mvc-audio
+```
+
+## Commandes utiles
+
+```bash
+forge audio:doctor
+```
+
+## Documentation complète
+
+<https://forgemvc.com/docs/forge/audio/>
+"""
+
+_AUDIO_FILES: tuple[tuple[str, str], ...] = (
+    ("optins/audio/__init__.py", _AUDIO_INIT),
+    ("optins/audio/routes.py", _AUDIO_ROUTES),
+    ("optins/audio/README.md", _AUDIO_README),
+)
+
+
 SUPPORTED_OPTINS: dict[str, dict] = {
     "iot": {
         "package_dist": "forge-mvc-iot",
@@ -266,6 +326,11 @@ SUPPORTED_OPTINS: dict[str, dict] = {
         "package_dist": "forge-mvc-video",
         "package_import": "forge_mvc_video",
         "files": _VIDEO_FILES,
+    },
+    "audio": {
+        "package_dist": "forge-mvc-audio",
+        "package_import": "forge_mvc_audio",
+        "files": _AUDIO_FILES,
     },
 }
 

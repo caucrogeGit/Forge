@@ -63,6 +63,10 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
         "video", "forge-mvc-video", "forge_mvc_video", KIND_ROUTE,
         "Upload, transcodage MP4 et lecture vidéo en streaming (HTTP Range).",
     ),
+    "audio": OptIn(
+        "audio", "forge-mvc-audio", "forge_mvc_audio", KIND_ROUTE,
+        "Upload, sondage, transcodage MP3 et lecture audio en streaming (HTTP Range).",
+    ),
 }
 
 
