@@ -161,7 +161,7 @@ Règles à respecter lors de toute modification :
 - **Préserver les fichiers utilisateur** — les fichiers générés marqués comme préservés ne doivent jamais être écrasés sans `--force` explicite.
 - **Ne pas casser les générateurs** — `make:entity`, `make:crud`, `sync:entity` doivent continuer à fonctionner.
 - **Ne pas changer une convention stable** — un changement de convention (nommage, structure JSON, format de fichier) sans ticket de dépréciation est une rupture de contrat.
-- **Ne pas ajouter de dépendance sans nécessité** — les dépendances runtime du core sont limitées à `mariadb`, `jinja2`, `python-dotenv`, `Pillow`, `argon2-cffi`. Les dépendances des modules opt-in (ex. `pyotp` pour MFA) ne font pas partie du core.
+- **Ne pas ajouter de dépendance sans nécessité** — les dépendances runtime du core sont limitées à `mariadb`, `jinja2`, `python-dotenv`, `argon2-cffi`, `jsonschema`. Les dépendances des modules opt-in (ex. `pyotp` pour MFA, `Pillow` pour `forge-mvc-images`) ne font pas partie du core.
 - **Ne pas modifier la version** — la version dans `pyproject.toml` / `forge.py` / `core/__init__.py` n'est modifiée que par un ticket release dédié.
 - **Ne pas créer de tag manuellement** — les tags de version sont créés en suivant la [Procédure de release](../release/release.md).
 

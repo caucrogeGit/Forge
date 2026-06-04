@@ -77,8 +77,9 @@ python -m pip install -r requirements-dev.txt
 
 `requirements-dev.txt` fait deux choses simultanément :
 
-1. inclut `requirements.txt` (les 5 dépendances runtime `mariadb`,
-   `python-dotenv`, `jinja2`, `Pillow`, `argon2-cffi`) ;
+1. inclut `requirements.txt` (les dépendances runtime du core : `mariadb`,
+   `python-dotenv`, `jinja2`, `argon2-cffi`, `jsonschema` — Pillow a quitté le
+   core, il est désormais déclaré par l'opt-in `forge-mvc-images`, ADR-018) ;
 2. installe les outils de développement (`pytest`, `build`,
    `setuptools`, `twine`, `mkdocs`, `mkdocs-material`,
    `pymdown-extensions`, `pip-audit`, `ruff`) ;

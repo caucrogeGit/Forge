@@ -14,7 +14,8 @@ de tests), voir les sources canoniques — section 8.
 
 Forge est un framework web Python **explicite, pédagogique, testable et durable**.
 Il conserve un runtime Python volontairement limité : MariaDB, python-dotenv,
-Jinja2, Pillow, Argon2, jsonschema (PyOTP côté opt-in MFA).
+Jinja2, Argon2, jsonschema (PyOTP côté opt-in MFA ; Pillow côté opt-in images —
+ADR-018).
 
 **Type** : framework MVC Python, distribué en plusieurs paquets PyPI :
 
@@ -23,8 +24,10 @@ Jinja2, Pillow, Argon2, jsonschema (PyOTP côté opt-in MFA).
 - `forge-mvc-rbac` (contrôle d'accès basé sur les rôles)
 - `forge-mvc-workflow` (transitions de statut)
 - `forge-mvc-stats` (agrégats statistiques)
-- `forge-mvc-media` (gestion applicative des médias)
+- `forge-mvc-images` (traitement et gestion applicative des images — Pillow ; ADR-018)
+- `forge-mvc-media` (shim transitoire vers `forge-mvc-images`, en cours de retrait — ADR-018)
 - `forge-mvc-iot` (réception/exposition de données IoT via MQTT)
+- `forge-mvc-video` (upload, transcodage MP4 et lecture vidéo en streaming)
 
 **Python** : 3.12+ minimum (ADR-006).
 
@@ -87,8 +90,10 @@ d'utilisateurs externes ni de code applicatif externe à protéger.
 - `forge-mvc-rbac` — permissions déclaratives, contrôle par rôle
 - `forge-mvc-workflow` — états, transitions, historique
 - `forge-mvc-stats` — agrégats, compteurs, fenêtres temporelles
-- `forge-mvc-media` — gestion applicative des médias (extraite du core)
+- `forge-mvc-images` — traitement d'image (Pillow, extrait du core) + couche applicative médias (repository, galerie, couverture) ; ADR-018
+- `forge-mvc-media` — shim transitoire réexportant `forge-mvc-images` (retrait au ticket `REMOVE-MEDIA-PKG`, ADR-018)
 - `forge-mvc-iot` — subscriber MQTT, stockage `iot_events`, API HTTP JSON, CLI `iot:*`
+- `forge-mvc-video` — upload, transcodage MP4 (H.264/AAC), lecture HTTP Range, CLI `video:*`
 
 **Hors scope Forge** (à charge de l'application) :
 
@@ -255,9 +260,10 @@ Les conventions opérationnelles de Forge sont consolidées dans
 - **D. Documentation** : MkDocs strict + liens hors `docs/`,
   `docs/history/` comme mémoire brute, section « Historique » dans la nav
 
-Note sur `packages/` : 6 sous-dossiers maintenus (`forge-mvc-mfa`,
-`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-media`,
-`forge-mvc-iot`), chacun avec son propre `pyproject.toml`. Le `pyproject.toml` racine est la source de vérité
+Note sur `packages/` : 8 sous-dossiers maintenus (`forge-mvc-mfa`,
+`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-images`,
+`forge-mvc-media` — shim transitoire ADR-018, `forge-mvc-iot`, `forge-mvc-video`),
+chacun avec son propre `pyproject.toml`. Le `pyproject.toml` racine est la source de vérité
 pour `forge-mvc` (résolu en T2 + T2b — consolidation bêta 1.0).
 
 ---

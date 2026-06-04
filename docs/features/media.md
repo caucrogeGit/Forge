@@ -145,7 +145,7 @@ Le contrôle porte sur les dimensions lues dans l'en-tête, *avant* tout décoda
 ou écriture disque : un fichier léger se décompressant en une image démesurée
 (qui épuiserait la mémoire) est rejeté immédiatement.
 
-**Dépendance** : Pillow (`>=10.0,<13`) est requis pour la génération des variantes d'images. Il est déclaré dans `requirements.txt` et `pyproject.toml`.
+**Dépendance** : Pillow (`>=10.0,<13`) est requis pour la génération des variantes d'images. Depuis l'ADR-018 (`CORE-DROP-PILLOW-001`), il est déclaré par l'opt-in `forge-mvc-images` (et non plus par le core).
 
 ---
 

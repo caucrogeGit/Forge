@@ -109,16 +109,16 @@ Ces dépendances sont installées automatiquement avec Forge via `pip` ou `pipx`
 | `mariadb` | ==1.1.14 | Connecteur MariaDB |
 | `jinja2` | ==3.1.6 | Moteur de templates |
 | `python-dotenv` | ==1.2.2 | Chargement `.env` |
-| `Pillow` | >=10.0,<13 | Traitement d'images (module média) |
 | `argon2-cffi` | >=25.1,<26 | Hachage de mots de passe (Auth/User) |
 
 **Philosophie :** Forge vise un minimum de dépendances runtime. Les trois
-dépendances fondamentales sont `mariadb`, `jinja2` et `python-dotenv`.
-`Pillow` n'est utilisée que par le module média ; `argon2-cffi` n'est
-utilisée que pour le hachage des mots de passe (Auth/User). Toutes sont
-installées par défaut. Les dépendances spécifiques aux modules opt-in
-(`pyotp` pour MFA notamment) ne sont installées que via le bon extra
-— voir « Dépendances optionnelles » ci-dessous.
+dépendances fondamentales sont `mariadb`, `jinja2` et `python-dotenv` ;
+`argon2-cffi` n'est utilisée que pour le hachage des mots de passe
+(Auth/User). Toutes sont installées par défaut. Les dépendances spécifiques
+aux modules opt-in ne sont installées que via le bon extra ou le paquet opt-in
+— `pyotp` pour MFA, **`Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`**
+(traitement d'images, retiré du core par l'ADR-018) — voir « Dépendances
+optionnelles » ci-dessous.
 
 ---
 
@@ -255,8 +255,9 @@ de la CI automatique sur push.
 
 - Les versions fixes (`mariadb==1.1.14`, `jinja2==3.1.6`, `python-dotenv==1.2.2`)
   sont mises à jour délibérément après audit de compatibilité.
-- Les versions bornées (`Pillow>=10.0,<13`, `argon2-cffi>=25.1,<26`)
-  suivent les nouvelles releases mineures compatibles.
+- Les versions bornées (`argon2-cffi>=25.1,<26` pour le core ;
+  `Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`) suivent les nouvelles
+  releases mineures compatibles.
 - Les dépendances d'extras (ex. `pyotp>=2.9,<3` pour `[mfa]`) suivent
   la même politique, vérifiée dans le `pyproject.toml` du package opt-in
   correspondant.
