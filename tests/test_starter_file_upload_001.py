@@ -53,7 +53,8 @@ def test_snippet_routes():
 
 def test_controller_uploads_api_and_no_db():
     text = CONTROLLER.read_text(encoding="utf-8")
-    assert "from core.uploads import UploadError, save_upload" in text
+    # FILES-CLI-RENAME-001 (ADR-019) : l'upload est un opt-in (forge-mvc-files).
+    assert "from forge_mvc_files import UploadError, save_upload" in text
     assert 'request.file("document")' in text
     assert "save_upload(" in text
     assert "csrf_token" in text

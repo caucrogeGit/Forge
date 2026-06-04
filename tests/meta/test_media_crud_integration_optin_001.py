@@ -133,11 +133,16 @@ class TestGeneratorsMentionForgeImagesOptIn:
             "public_list.py ne doit plus cibler forge_mvc_media (shim transitoire)."
         )
 
-    def test_controller_builder_still_uses_core_uploads_for_save_upload(self):
+    def test_controller_builder_uses_forge_mvc_files_for_save_upload(self):
+        # FILES-CLI-RENAME-001 (ADR-019) : l'upload générique (fichiers) vient
+        # désormais de forge-mvc-files, plus du core.
         text = CONTROLLER_BUILDER.read_text(encoding="utf-8")
-        assert "core.uploads import save_upload" in text, (
-            "controller_builder.py doit encore importer save_upload depuis core.uploads "
-            "(primitive générique, pas un helper applicatif)."
+        assert "forge_mvc_files import save_upload" in text, (
+            "controller_builder.py doit générer 'from forge_mvc_files import "
+            "save_upload' pour les champs fichier (upload extrait du core)."
+        )
+        assert "core.uploads import save_upload" not in text, (
+            "controller_builder.py ne doit plus importer save_upload depuis core.uploads."
         )
 
 

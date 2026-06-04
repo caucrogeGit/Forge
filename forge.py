@@ -26,7 +26,8 @@ from forge_cli.public_list import main as public_list_main
 from forge_cli.public_page import main as public_page_main
 from forge_cli.public_show import main as public_show_main
 from forge_cli.sync_landing import main as sync_landing_main
-from forge_cli.uploads import main as upload_main
+# FILES-CLI-RENAME-001 (ADR-019) : forge_cli.uploads importé en lazy dans la
+# branche upload:init/media:init (dépend de l'opt-in forge-mvc-files).
 from forge_cli.front import main as front_main
 from forge_cli.auth import main as auth_main
 from forge_cli.mail import main as mail_main
@@ -613,6 +614,16 @@ def main() -> None:
         return
 
     if command in ("upload:init", "media:init"):
+        # FILES-CLI-RENAME-001 (ADR-019) : import lazy — l'upload est un opt-in
+        # (forge-mvc-files). Le core CLI ne le tire qu'à l'invocation de la
+        # commande, et échoue proprement si l'opt-in n'est pas installé.
+        try:
+            from forge_cli.uploads import main as upload_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-files non installé.",
+                hint="installe l'opt-in upload : pip install forge-mvc-files",
+            )
         upload_main(args)
         return
 

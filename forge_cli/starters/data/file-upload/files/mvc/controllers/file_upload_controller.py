@@ -4,9 +4,10 @@ Ticket : STARTER-FILE-UPLOAD-001.
 
 Recevoir un fichier de l'utilisateur est un classique des applications web. Le
 formulaire est en ``multipart/form-data`` ; le contrôleur récupère le fichier
-avec ``request.file(...)`` puis le confie à ``core.uploads.save_upload``, qui
+avec ``request.file(...)`` puis le confie à ``forge_mvc_files.save_upload``, qui
 **valide** (extension, type MIME, taille) avant d'écrire sur le disque. Forge ne
-fait jamais confiance aveuglément au fichier reçu.
+fait jamais confiance aveuglément au fichier reçu. L'upload est un **opt-in**
+(``pip install forge-mvc-files``, ADR-019).
 
   ``index``  — `GET  /file-upload` : affiche le formulaire d'upload (CSRF).
   ``upload`` — `POST /file-upload` : enregistre le fichier reçu et affiche son
@@ -17,7 +18,7 @@ Aucune base de données : le fichier est stocké sur le disque, pas en base.
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
-from core.uploads import UploadError, save_upload
+from forge_mvc_files import UploadError, save_upload
 
 
 class FileUploadController(BaseController):

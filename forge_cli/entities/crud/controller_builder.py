@@ -118,7 +118,8 @@ def build_controller(
         _has_image = any(e.get("field") == "image" for e in ctrl_media_entries)
         _has_doc   = any(e.get("field") != "image" for e in ctrl_media_entries)
         if _has_doc:
-            lines.append("from core.uploads import save_upload")
+            # FILES-CLI-RENAME-001 (ADR-019) : upload générique = forge-mvc-files.
+            lines.append("from forge_mvc_files import save_upload")
         _img_helpers = ["attach_media_to_entity", "delete_media"]
         if _has_single:
             _img_helpers.append("get_cover_media")

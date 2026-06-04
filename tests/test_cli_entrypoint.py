@@ -84,13 +84,17 @@ def test_dispatch_sync_landing_transmet_check(monkeypatch):
 
 
 def test_dispatch_upload_init(monkeypatch):
+    # FILES-CLI-RENAME-001 (ADR-019) : forge_cli.uploads est importé en lazy
+    # dans la branche (l'upload est un opt-in). On patche la vraie cible.
+    import forge_cli.uploads as _uploads
+
     captured = {}
 
     def fake_upload_main(args):
         captured["args"] = args
 
     monkeypatch.setattr(sys, "argv", ["forge", "upload:init"])
-    monkeypatch.setattr(forge, "upload_main", fake_upload_main)
+    monkeypatch.setattr(_uploads, "main", fake_upload_main)
 
     forge.main()
 
