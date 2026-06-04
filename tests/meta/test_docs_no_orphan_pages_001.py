@@ -27,6 +27,9 @@ EXCLUDED_DIRS: set[str] = {"history", "audits"}
 NAVLESS_FILES: set[str] = {
     # Brouillon roadmap Contrats JSON Schema — prévu post-Phase 12, pas encore publié.
     "docs/roadmap/roadmap-forge-contrats-json-schema.md",
+    # Spec d'exécution du ticket 7 (REMOVE-MEDIA-PKG, ADR-018) — brouillon en
+    # attente de la publication PyPI de forge-mvc-images. Hors-nav volontairement.
+    "docs/roadmap/ticket-remove-media-pkg.md",
 }
 
 
