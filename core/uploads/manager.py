@@ -53,6 +53,26 @@ def upload_root() -> Path:
     return Path(str(_cfg("upload_root")))
 
 
+def _require_image_processing(name: str):
+    """Résout un helper de traitement d'image depuis l'opt-in forge-mvc-images.
+
+    IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image (Pillow) a été
+    extrait du core vers ``forge-mvc-images``. Le core garde l'upload brut
+    générique et **délègue** le chemin image-aware (``save_upload(category=
+    "images")``, génération de variantes) à l'opt-in s'il est installé. Si le
+    module est absent, l'erreur est explicite plutôt qu'un ``ImportError`` brut
+    (charte §7 — sécuriser/échouer clairement).
+    """
+    try:
+        import forge_mvc_images
+    except ImportError as exc:  # pragma: no cover - dépend de l'environnement
+        raise UploadStorageError(
+            "Le traitement d'image requiert l'opt-in forge-mvc-images "
+            "(pip install forge-mvc-images)."
+        ) from exc
+    return getattr(forge_mvc_images, name)
+
+
 def save_upload(file, category: str = "documents", *, variants: bool = False) -> SavedUpload:
     if file is None:
         raise UploadStorageError("Aucun fichier reçu.")
@@ -74,8 +94,10 @@ def save_upload(file, category: str = "documents", *, variants: bool = False) ->
         # catégorie images on vérifie que le contenu est une vraie image
         # AVANT toute écriture disque (cohérent avec save_image). C'est le
         # flux utilisé par le CRUD généré : save_upload(..., "images", ...).
-        from core.uploads.image import verify_image_content
-
+        # IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image vit
+        # désormais dans l'opt-in forge-mvc-images ; le core lui délègue le
+        # chemin image-aware (lock + delegate).
+        verify_image_content = _require_image_processing("verify_image_content")
         verify_image_content(data)
     root = upload_root()
     saved_path = storage.save_bytes(
@@ -88,8 +110,7 @@ def save_upload(file, category: str = "documents", *, variants: bool = False) ->
     normalized_path = storage.normalize_media_path(relative_path)
     variant_paths: dict[str, str] = {}
     if variants:
-        from core.uploads.image import generate_image_variants
-
+        generate_image_variants = _require_image_processing("generate_image_variants")
         generated = generate_image_variants(normalized_path, root=root)
         variant_paths = {
             "medium": generated["medium"],
@@ -118,8 +139,9 @@ def delete_media_file(path: str, *, root: str | Path | None = None, variants: bo
     relative_path = storage.normalize_media_path(path)
     paths = {"original": relative_path}
     if variants:
-        from core.uploads.image import image_variant_relative_paths
-
+        image_variant_relative_paths = _require_image_processing(
+            "image_variant_relative_paths"
+        )
         paths = image_variant_relative_paths(relative_path)
 
     return {

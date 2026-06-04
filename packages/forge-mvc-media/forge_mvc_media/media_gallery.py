@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from pathlib import PurePosixPath
 
-from core.uploads.image import ALLOWED_IMAGE_EXTENSIONS, image_variant_relative_paths
+# IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image a quitté le core
+# pour l'opt-in forge-mvc-images. La galerie applicative en dépend désormais.
+from forge_mvc_images import ALLOWED_IMAGE_EXTENSIONS, image_variant_relative_paths
 from core.uploads.storage import normalize_media_path
 from forge_mvc_media.media_repository import list_media_for_entity
 

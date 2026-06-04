@@ -15,13 +15,14 @@ from types import SimpleNamespace
 
 import pytest
 pytest.importorskip("forge_mvc_media")
+pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
 import core.forge
-from core.uploads import (
-    image_variant_paths,
-    save_upload,
-)
+from core.uploads import save_upload
+
+# IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image vit dans l'opt-in.
+from forge_mvc_images import image_variant_paths
 from forge_mvc_media.media_repository import (
     attach_media_to_entity,
     create_media_record,

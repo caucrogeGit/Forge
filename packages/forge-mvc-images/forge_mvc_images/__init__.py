@@ -12,12 +12,34 @@ suppression sèche, pas d'alias). Il deviendra l'unique propriétaire de :
   ``IMAGES-MOVE-APPLICATIVE-001``) : repository SQL, galerie, couverture,
   ``alt_text``.
 
-À ce stade (``IMAGES-PKG-SCAFFOLD-001``), le paquet est un **squelette** : la
-dépendance Pillow est déclarée mais aucune logique n'a encore été déplacée.
-Le core conserve l'upload brut générique (``core/uploads``) jusqu'aux tickets
-de déplacement. Voir ``docs/adr/018-image-module-extraction.md``.
+Depuis ``IMAGES-MOVE-PROCESSING-001``, le **traitement d'image** est déplacé ici
+(``processing``) : Pillow a quitté le core. La couche applicative (repository,
+galerie) sera rapatriée par ``IMAGES-MOVE-APPLICATIVE-001``. Voir
+``docs/adr/018-image-module-extraction.md``.
 """
 
 __version__ = "1.0.0b13"
 
-__all__: list[str] = []
+from forge_mvc_images.processing import (
+    ALLOWED_IMAGE_EXTENSIONS,
+    ALLOWED_IMAGE_MIME_TYPES,
+    IMAGE_VARIANT_SIZES,
+    MediaRecord,
+    generate_image_variants,
+    image_variant_paths,
+    image_variant_relative_paths,
+    save_image,
+    verify_image_content,
+)
+
+__all__ = [
+    "ALLOWED_IMAGE_EXTENSIONS",
+    "ALLOWED_IMAGE_MIME_TYPES",
+    "IMAGE_VARIANT_SIZES",
+    "MediaRecord",
+    "generate_image_variants",
+    "image_variant_paths",
+    "image_variant_relative_paths",
+    "save_image",
+    "verify_image_content",
+]

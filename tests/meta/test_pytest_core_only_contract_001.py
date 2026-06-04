@@ -61,6 +61,10 @@ OPTIN_MODULES: dict[str, set[str]] = {
     "forge_mvc_workflow": set(),
     "forge_mvc_stats": set(),
     "forge_mvc_media": set(),
+    # forge-mvc-images : opt-in propriétaire du traitement d'image (Pillow)
+    # depuis IMAGES-MOVE-PROCESSING-001 (ADR-018). Pillow reste déclaré dans
+    # CORE_DEPS jusqu'à CORE-DROP-PILLOW-001 — pas d'extra à lister ici.
+    "forge_mvc_images": set(),
     # forge-mvc-iot : opt-in au même titre que ses frères. Ses tests
     # gardent l'import via pytest.importorskip("forge_mvc_iot").
     # `paho-mqtt` n'est jamais importé au top-level des tests (clients

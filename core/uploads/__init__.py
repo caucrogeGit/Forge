@@ -5,16 +5,11 @@ from core.uploads.exceptions import (
     UploadStorageError,
     UploadTooLargeError,
 )
-from core.uploads.image import (
-    ALLOWED_IMAGE_EXTENSIONS,
-    ALLOWED_IMAGE_MIME_TYPES,
-    IMAGE_VARIANT_SIZES,
-    MediaRecord,
-    generate_image_variants,
-    image_variant_relative_paths,
-    image_variant_paths,
-    save_image,
-)
+# IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image (save_image,
+# variantes, verify_image_content, constantes ALLOWED_IMAGE_*, MediaRecord) a
+# quitté le core pour l'opt-in forge-mvc-images. Le core n'en réexporte plus
+# rien ; importer depuis `forge_mvc_images`. save_upload reste générique et
+# délègue le chemin image-aware à l'opt-in (manager._require_image_processing).
 from core.uploads.manager import (
     SavedUpload,
     delete_media_file,
@@ -51,14 +46,6 @@ except ImportError:
     pass
 
 __all__ = [
-    "ALLOWED_IMAGE_EXTENSIONS",
-    "ALLOWED_IMAGE_MIME_TYPES",
-    "IMAGE_VARIANT_SIZES",
-    "MediaRecord",
-    "ALLOWED_IMAGE_EXTENSIONS",
-    "ALLOWED_IMAGE_MIME_TYPES",
-    "IMAGE_VARIANT_SIZES",
-    "MediaRecord",
     "SavedUpload",
     "UploadError",
     "UploadInvalidExtensionError",
@@ -67,14 +54,10 @@ __all__ = [
     "UploadTooLargeError",
     "delete_media_file",
     "delete_upload",
-    "generate_image_variants",
     "get_upload_path",
-    "image_variant_relative_paths",
-    "image_variant_paths",
     "is_safe_media_path",
     "media_path_to_storage_path",
     "normalize_media_path",
-    "save_image",
     "save_upload",
     "serve_media_file",
 ]

@@ -134,15 +134,30 @@ class TestForgeCoreIndependence:
                     f"référencer forge-mvc-images (vu : {dep!r})."
                 )
 
-    def test_no_core_module_imports_forge_mvc_images(self):
-        offenders: list[Path] = []
+    def test_no_core_module_hard_imports_forge_mvc_images(self):
+        # IMAGES-MOVE-PROCESSING-001 (ADR-018) : le core DÉLÈGUE désormais le
+        # chemin image-aware à forge_mvc_images, mais uniquement en import
+        # *lazy* (à l'intérieur d'une fonction). Aucun fichier core/ ne doit
+        # importer forge_mvc_images au niveau module : le core reste importable
+        # et utilisable sans l'opt-in (charte principe 8 — noyau minimal).
+        offenders: list[str] = []
         for py in CORE_DIR.rglob("*.py"):
-            text = py.read_text(encoding="utf-8", errors="replace")
-            if "forge_mvc_images" in text:
-                offenders.append(py.relative_to(PROJECT_ROOT))
+            for lineno, line in enumerate(
+                py.read_text(encoding="utf-8", errors="replace").splitlines(), 1
+            ):
+                stripped = line.lstrip()
+                if stripped.startswith("#"):
+                    continue
+                # Un import top-level n'est pas indenté ; le delegate lazy l'est.
+                is_top_level = line == stripped
+                if is_top_level and (
+                    stripped.startswith("import forge_mvc_images")
+                    or stripped.startswith("from forge_mvc_images")
+                ):
+                    offenders.append(f"{py.relative_to(PROJECT_ROOT)}:{lineno}")
         assert not offenders, (
-            "Aucun fichier sous core/ ne doit importer ou mentionner "
-            f"forge_mvc_images. Fichiers fautifs : {offenders}"
+            "Aucun fichier sous core/ ne doit importer forge_mvc_images au "
+            f"niveau module (delegate lazy uniquement). Fautifs : {offenders}"
         )
 
 
@@ -169,7 +184,7 @@ class TestReadme:
 
 
 class TestModuleImportable:
-    """Le paquet est importable sans effet de bord (squelette pur)."""
+    """Le paquet est importable et expose un ``__version__`` synchronisé."""
 
     def test_import_root(self):
         import forge_mvc_images  # noqa: F401
@@ -180,13 +195,4 @@ class TestModuleImportable:
         assert isinstance(forge_mvc_images.__version__, str)
         assert forge_mvc_images.__version__ == _CURRENT_VERSION, (
             "forge_mvc_images.__version__ doit être synchronisé avec le core."
-        )
-
-    def test_scaffold_has_no_public_api_yet(self):
-        # Périmètre du ticket : aucune logique déplacée à ce stade.
-        import forge_mvc_images
-
-        assert forge_mvc_images.__all__ == [], (
-            "Au stade scaffold, forge_mvc_images ne doit exposer aucune API "
-            "(les déplacements relèvent des tickets IMAGES-MOVE-*)."
         )

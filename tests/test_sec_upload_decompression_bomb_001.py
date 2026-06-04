@@ -12,11 +12,13 @@ import io
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
 import core.forge as forge
 from core.uploads.exceptions import UploadStorageError
-from core.uploads.image import (
+# IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image vit dans l'opt-in.
+from forge_mvc_images import (
     ALLOWED_IMAGE_EXTENSIONS,
     generate_image_variants,
     save_image,

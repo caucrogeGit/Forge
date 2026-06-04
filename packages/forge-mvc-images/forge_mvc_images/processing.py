@@ -1,4 +1,14 @@
-"""Service image générique Forge — upload, variantes, liaison entité."""
+"""Traitement d'image Forge — validation de contenu, upload, variantes.
+
+Déplacé du core (``core/uploads/image.py``) vers l'opt-in ``forge-mvc-images``
+par ``IMAGES-MOVE-PROCESSING-001`` (ADR-018). Pillow devient une dépendance de
+ce module et quitte le runtime du core (principe 8 — noyau minimal).
+
+Le module s'appuie sur les briques d'upload **génériques** restées dans le core
+(``core.uploads`` : storage, validators, exceptions, ``_read_upload``,
+``upload_root``). Le core conserve l'upload brut ; ``forge-mvc-images`` fournit
+le chemin image-aware (validation de contenu + écriture + variantes).
+"""
 
 from __future__ import annotations
 
@@ -72,8 +82,9 @@ def verify_image_content(data: bytes) -> None:
 
     SEC-UPLOAD-IMAGE-VERIFY-001 / 002 — défense contre un fichier non-image
     présenté avec une extension/MIME d'image (Content-Type falsifiable).
-    Helper partagé : appelé par ``save_image`` et par ``save_upload``
-    (catégorie ``images``) AVANT toute écriture disque.
+    Helper partagé : appelé par ``save_image`` et par le chemin image-aware de
+    ``core.uploads.save_upload`` (catégorie ``images``) AVANT toute écriture
+    disque.
 
     On s'appuie sur ``Image.open`` (identification du format par en-tête) plutôt
     que sur ``Image.verify`` : ce dernier vérifie l'intégrité CRC et rejette des

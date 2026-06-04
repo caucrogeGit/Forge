@@ -84,6 +84,8 @@ _FRAMEWORK_ROOTS = frozenset({
     "core",
     "forge_mvc_mfa", "forge_mvc_rbac", "forge_mvc_workflow",
     "forge_mvc_stats", "forge_mvc_media",
+    # forge-mvc-images : opt-in propriétaire du traitement d'image (ADR-018).
+    "forge_mvc_images",
     # forge-mvc-iot / forge-mvc-video : paquets opt-in framework au même titre
     # que leurs frères ci-dessus.
     "forge_mvc_iot", "forge_mvc_video",

@@ -99,7 +99,7 @@ La commande est idempotente : elle peut être relancée sans risque.
 ## Uploader une image
 
 ```python
-from core.uploads.image import save_image
+from forge_mvc_images import save_image
 
 media = save_image(
     request.files["photo"],
@@ -162,7 +162,7 @@ Le service prévoit trois variantes par image :
 Générer les variantes :
 
 ```python
-from core.uploads.image import generate_image_variants
+from forge_mvc_images import generate_image_variants
 
 variants = generate_image_variants(media.path)
 # variants["original"]  → "images/photo.png"
