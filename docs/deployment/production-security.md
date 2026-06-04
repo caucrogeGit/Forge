@@ -246,7 +246,7 @@ la politique de log appartient à l'application.
 Une protection anti-bruteforce est active sur `/login` via `core.auth.rate_limit`.
 Les paramètres de seuil sont configurables dans l'application.
 
-Une protection anti-abus est active sur les routes d'upload via `core.uploads.rate_limit`.
+Une protection anti-abus est active sur les routes d'upload via `forge_mvc_files.rate_limit`.
 Par défaut : 10 uploads par IP par fenêtre glissante de 60 secondes.
 Les compteurs sont **isolés** des compteurs de connexion.
 
@@ -352,12 +352,12 @@ depuis `storage/uploads/`.
 
 ### Rate limiting upload
 
-`core.uploads.rate_limit` implémente une fenêtre glissante en mémoire, thread-safe.
+`forge_mvc_files.rate_limit` implémente une fenêtre glissante en mémoire, thread-safe.
 
 Usage minimal dans un contrôleur :
 
 ```python
-from core.uploads.rate_limit import is_upload_rate_limited, record_upload_attempt
+from forge_mvc_files.rate_limit import is_upload_rate_limited, record_upload_attempt
 
 def upload_avatar(request):
     if is_upload_rate_limited(request.ip):
@@ -592,7 +592,7 @@ Sécurité applicative
 [ ] RBAC : routes protégées par décorateurs serveur (@require_permission)
 [ ] Auth audit : handler de log configuré (forge.auth.audit)
 [ ] Rate limiting login actif
-[ ] Rate limiting upload actif (core.uploads.rate_limit)
+[ ] Rate limiting upload actif (forge_mvc_files.rate_limit)
 
 Fichiers et stockage
 ─────────────────────

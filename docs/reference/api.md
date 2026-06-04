@@ -1087,7 +1087,13 @@ Voir aussi : [Front et CSS](../features/front.md).
 </details>
 
 <details markdown="1" id="coreuploads">
-<summary><code>core.uploads</code> - Uploads et stockage</summary>
+<summary><code>forge_mvc_files</code> - Uploads et stockage (opt-in)</summary>
+
+> **ADR-019** : l'upload générique a été **extrait du core** vers l'opt-in
+> `forge-mvc-files` (`pip install forge-mvc-files`). Importer depuis
+> `forge_mvc_files`. La **validation pure** de fichier (extension/MIME/taille,
+> `UploadError`) reste dans le core (`core.forms.upload_validation` /
+> `upload_exceptions`).
 
 ### Gestionnaire
 
@@ -1131,7 +1137,7 @@ Voir aussi : [Front et CSS](../features/front.md).
 ### Exemple
 
 ```python
-from core.uploads.manager import save_upload
+from forge_mvc_files import save_upload
 
 def upload_avatar(request):
     file = request.files.get("avatar")
@@ -1168,7 +1174,7 @@ ne génère que le fichier original. L'option est réservée à `category="image
 Supprimer un fichier média :
 
 ```python
-from core.uploads import delete_media_file
+from forge_mvc_files import delete_media_file
 
 delete_media_file("images/photo.png", variants=True)
 # {
@@ -1284,11 +1290,12 @@ Ce qui reste hors périmètre :
 
 ### Rate limiting upload (SECURITY-UPLOAD-RATE-LIMIT-001)
 
-`core.uploads.rate_limit` fournit une fenêtre glissante en mémoire, thread-safe,
-distincte du rate limiting de connexion (`core.security.hashing`).
+`forge_mvc_files.rate_limit` (opt-in, ADR-019) fournit une fenêtre glissante en
+mémoire, thread-safe, distincte du rate limiting de connexion
+(`core.security.hashing`).
 
 ```python
-from core.uploads.rate_limit import is_upload_rate_limited, record_upload_attempt
+from forge_mvc_files.rate_limit import is_upload_rate_limited, record_upload_attempt
 
 def upload_avatar(request):
     if is_upload_rate_limited(request.ip):
@@ -2971,7 +2978,7 @@ Quand une entité déclare des médias, `make:crud` génère :
 - **Formulaire** : un `ImageField` ou `FileField` par entrée `media`, avec label et `required` issus de la déclaration.
 - **Vue formulaire** : `enctype="multipart/form-data"` sur le `<form>`, `<input type="file">` avec `accept="image/*"` pour les images.
 - **Contrôleur `create`** :
-  - Import de `save_upload` depuis `core.uploads` (primitive générique, fichiers non-image) et de `save_image_upload`, `attach_media_to_entity`, `delete_media`, `list_media_for_entity` depuis `forge_mvc_images` (chemin image-aware + helpers applicatifs).
+  - Import de `save_upload` depuis `forge_mvc_files` (upload générique, fichiers non-image — opt-in, ADR-019) et de `save_image_upload`, `attach_media_to_entity`, `delete_media`, `list_media_for_entity` depuis `forge_mvc_images` (chemin image-aware + helpers applicatifs).
   - Exclusion des clés média de `form.cleaned_data` avant l'insert SQL.
   - Capture de l'identifiant créé (`cursor.lastrowid`).
   - Pour chaque média soumis : `save_image_upload(file, "images", variants=...)` (image) ou `save_upload(file, "documents")` (fichier), puis `attach_media_to_entity(saved, entity_name=..., entity_id=created_id, role=..., position=0)`.

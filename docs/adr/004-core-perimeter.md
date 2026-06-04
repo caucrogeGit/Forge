@@ -12,6 +12,10 @@ Forge a grandi organiquement. Le `core/` contient aujourd'hui :
 
 - Les primitives générales du framework (HTTP, routing, templating, DB, sessions,
   forms, uploads, mail, sécurité de base) — **légitimes dans le core/**.
+  > **Amendement ADR-019** : l'**upload générique** (`core/uploads/` : écriture,
+  > storage, service de fichiers, rate-limit) a depuis été **extrait** vers
+  > l'opt-in `forge-mvc-files`. Seule la **validation pure** de fichier reste
+  > dans le core (`core/forms`), car `FileField` en dépend. Voir ADR-019.
 - Des modules spécialisés qui répondent à des besoins avancés ou métier :
   - `core/auth/mfa.py` — MFA TOTP et codes de récupération
   - `core/auth/experimental/oidc.py` — socle OIDC partiel
@@ -58,8 +62,8 @@ Ce qui reste dans `core/` après extraction :
 - `core/templating/` — contrat Renderer, template_manager
 - `core/database/` — db (fetch_one, fetch_all, execute, insert)
 - `core/sessions/` — SessionStore contractuel + 3 implémentations
-- `core/forms/` — Form, Field, validation
-- `core/uploads/` — sécurité fichiers, rate-limit uploads
+- `core/forms/` — Form, Field, validation (dont la validation de fichier, ADR-019)
+- ~~`core/uploads/`~~ — **extrait vers `forge-mvc-files`** (ADR-019) ; ne reste que des shims transitoires jusqu'à `CORE-DROP-UPLOADS-001`
 - `core/mail/` — transports, templates mail
 - `core/auth/` (primitives) — password, session, user (sans MFA, RBAC fin)
 - `core/security/` — CSRF, CSP, headers, hashing

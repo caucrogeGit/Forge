@@ -95,7 +95,7 @@ Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis 
 ## Service de fichiers — défense symlinks (UPLOADS-SYMLINK-DEFENSE-001)
 
 Les fichiers publics servis par Forge (route `/static/...` par `app.py`, route
-`/media/...` via [`core.uploads.serve_media_file`](https://github.com/caucrogeGit/Forge/blob/main/core/uploads/manager.py))
+`/media/...` via [`forge_mvc_files.serve_media_file`](https://github.com/caucrogeGit/Forge/blob/main/packages/forge-mvc-files/forge_mvc_files/manager.py))
 **ne doivent pas traverser de symlinks**. Les chemins sont résolus via
 `os.path.realpath()` / `Path.resolve()` puis vérifiés par `os.path.commonpath()` :
 toute cible résolue hors de la racine autorisée (`static/`, `storage/uploads/`)

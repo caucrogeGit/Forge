@@ -34,7 +34,7 @@ flowchart TD
     Project --> Forms["core.forms"]
     Project --> Security["core.security"]
     Project --> Database["core.database"]
-    Project --> Uploads["core.uploads"]
+    Project --> Uploads["forge-mvc-files (opt-in)"]
     Project --> Entities["mvc/entities"]
 
     App --> Router

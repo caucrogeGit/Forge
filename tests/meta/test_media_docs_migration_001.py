@@ -83,16 +83,16 @@ class TestApiDocSeparatesGenericFromApplicative:
 
     def test_api_md_core_uploads_section_does_not_list_applicative_helpers(self):
         text = API_DOC.read_text(encoding="utf-8")
-        # La table Gestionnaire core.uploads ne doit plus lister les helpers applicatifs
-        # Vérification : attach_media_to_entity ne doit pas apparaître dans
-        # le contexte "core.uploads" comme API principale (table Gestionnaire)
-        core_section_start = text.find('<summary><code>core.uploads</code>')
+        # FILES-DOCS-PERIMETER-001 (ADR-019) : la section upload est désormais
+        # `forge_mvc_files` (opt-in). Elle ne doit pas lister les helpers
+        # applicatifs (attach_media_to_entity).
+        core_section_start = text.find('<summary><code>forge_mvc_files</code>')
         core_section_end = text.find('</details>', core_section_start)
         assert core_section_start != -1
         core_section = text[core_section_start:core_section_end]
         assert "attach_media_to_entity" not in core_section, (
-            "La section core.uploads dans api.md ne doit plus lister attach_media_to_entity "
-            "comme API principale de core.uploads."
+            "La section forge_mvc_files dans api.md ne doit plus lister "
+            "attach_media_to_entity comme API principale d'upload."
         )
 
     def test_api_md_crud_section_uses_forge_mvc_media(self):
@@ -164,12 +164,13 @@ class TestCorePrimitivesStillDocumented:
         )
 
     def test_api_md_core_uploads_has_save_upload(self):
+        # FILES-DOCS-PERIMETER-001 (ADR-019) : la section upload est `forge_mvc_files`.
         text = API_DOC.read_text(encoding="utf-8")
-        core_section_start = text.find('<summary><code>core.uploads</code>')
+        core_section_start = text.find('<summary><code>forge_mvc_files</code>')
         core_section_end = text.find('</details>', core_section_start)
         core_section = text[core_section_start:core_section_end]
         assert "save_upload" in core_section, (
-            "La section core.uploads dans api.md doit toujours documenter save_upload."
+            "La section forge_mvc_files dans api.md doit toujours documenter save_upload."
         )
 
 

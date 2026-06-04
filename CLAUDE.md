@@ -24,10 +24,12 @@ ADR-018).
 - `forge-mvc-rbac` (contrôle d'accès basé sur les rôles)
 - `forge-mvc-workflow` (transitions de statut)
 - `forge-mvc-stats` (agrégats statistiques)
+- `forge-mvc-files` (upload générique : écriture sécurisée, storage, service de fichiers — extrait du core, ADR-019)
 - `forge-mvc-images` (traitement et gestion applicative des images — Pillow ; ADR-018)
 - `forge-mvc-media` (shim transitoire vers `forge-mvc-images`, en cours de retrait — ADR-018)
 - `forge-mvc-iot` (réception/exposition de données IoT via MQTT)
 - `forge-mvc-video` (upload, transcodage MP4 et lecture vidéo en streaming)
+- `forge-mvc-audio` (upload, sondage, transcodage MP3 et lecture audio en streaming — sans état)
 
 **Python** : 3.12+ minimum (ADR-006).
 
@@ -90,10 +92,12 @@ d'utilisateurs externes ni de code applicatif externe à protéger.
 - `forge-mvc-rbac` — permissions déclaratives, contrôle par rôle
 - `forge-mvc-workflow` — états, transitions, historique
 - `forge-mvc-stats` — agrégats, compteurs, fenêtres temporelles
-- `forge-mvc-images` — traitement d'image (Pillow, extrait du core) + couche applicative médias (repository, galerie, couverture) ; ADR-018
+- `forge-mvc-files` — upload générique extrait du core (ADR-019) : `save_upload`, storage anti-traversal, `serve_media_file` (HTTP Range), rate-limit. La **validation** pure (extension/MIME/taille) reste dans le core (`core/forms`)
+- `forge-mvc-images` — traitement d'image (Pillow, extrait du core) + couche applicative médias (repository, galerie, couverture) ; dépend de `forge-mvc-files` ; ADR-018
 - `forge-mvc-media` — shim transitoire réexportant `forge-mvc-images` (retrait au ticket `REMOVE-MEDIA-PKG`, ADR-018)
 - `forge-mvc-iot` — subscriber MQTT, stockage `iot_events`, API HTTP JSON, CLI `iot:*`
 - `forge-mvc-video` — upload, transcodage MP4 (H.264/AAC), lecture HTTP Range, CLI `video:*`
+- `forge-mvc-audio` — upload, sondage (`ffprobe`), transcodage MP3 (`ffmpeg`), lecture HTTP Range, CLI `audio:doctor` ; sans état
 
 **Hors scope Forge** (à charge de l'application) :
 
@@ -260,9 +264,10 @@ Les conventions opérationnelles de Forge sont consolidées dans
 - **D. Documentation** : MkDocs strict + liens hors `docs/`,
   `docs/history/` comme mémoire brute, section « Historique » dans la nav
 
-Note sur `packages/` : 8 sous-dossiers maintenus (`forge-mvc-mfa`,
-`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-images`,
-`forge-mvc-media` — shim transitoire ADR-018, `forge-mvc-iot`, `forge-mvc-video`),
+Note sur `packages/` : 10 sous-dossiers maintenus (`forge-mvc-mfa`,
+`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-files`,
+`forge-mvc-images`, `forge-mvc-media` — shim transitoire ADR-018, `forge-mvc-iot`,
+`forge-mvc-video`, `forge-mvc-audio`),
 chacun avec son propre `pyproject.toml`. Le `pyproject.toml` racine est la source de vérité
 pour `forge-mvc` (résolu en T2 + T2b — consolidation bêta 1.0).
 

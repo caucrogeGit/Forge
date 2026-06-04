@@ -16,14 +16,14 @@
     Le module reste opt-in : le core Forge ne dépend pas de
     `forge-mvc-media`.
 
-Forge sépare les primitives génériques d'upload (`core/uploads/`) des helpers
-applicatifs médias (`forge_mvc_media`). Le core est installé avec Forge ; les
-helpers applicatifs sont fournis par le module opt-in `forge-mvc-media`,
-publié sur PyPI depuis `1.0.0-beta.9` (API encore bêta).
+Forge sépare l'**upload générique** (opt-in `forge-mvc-files`, ADR-019) des
+helpers applicatifs médias (`forge_mvc_media`). L'upload (écriture, storage,
+service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure
+(extension/MIME/taille) reste dans le core (`core.forms`).
 
-## Frontière core / opt-in média
+## Frontière upload / opt-in média
 
-**`core.uploads` — primitives génériques** (toujours disponibles) :
+**`forge_mvc_files` — upload générique** (opt-in, ADR-019) :
 
 - `save_upload` — sauvegarde sécurisée d'un fichier
 - `save_image`, `generate_image_variants` — traitement Pillow
@@ -207,7 +207,7 @@ Pour supprimer un fichier média stocké sous `storage/uploads/`, utiliser
 `delete_media_file` avec un chemin relatif :
 
 ```python
-from core.uploads import delete_media_file
+from forge_mvc_files import delete_media_file
 
 delete_media_file("images/photo.png")
 # {"images/photo.png": True}
@@ -290,7 +290,7 @@ des fichiers :
 
 ```python
 from forge_mvc_media import delete_media, delete_media_record
-from core.uploads import delete_media_file
+from forge_mvc_files import delete_media_file
 
 delete_media_record(media_id)          # supprime seulement la ligne SQL
 delete_media_file("images/photo.png")  # supprime seulement le fichier
@@ -456,7 +456,7 @@ contrôleur média ou upload CRUD n'est généré dans cette étape.
 Pour les fichiers non-images, utiliser `save_upload` :
 
 ```python
-from core.uploads import save_upload
+from forge_mvc_files import save_upload
 
 saved = save_upload(request.files["document"], category="documents")
 ```
@@ -691,8 +691,9 @@ Avec l'entité ci-dessous, `make:crud` génère la chaîne complète.
 
 ## Garanties de sécurité
 
-Les garanties suivantes sont assurées par `core/uploads/storage.py` et s'appliquent
-à l'ensemble du module `forge-mvc-media` qui délègue toutes les opérations sur les chemins à ce core.
+Les garanties suivantes sont assurées par le storage de `forge-mvc-files`
+(`forge_mvc_files/storage.py`, ADR-019) et s'appliquent à l'ensemble du module
+`forge-mvc-media`/`forge-mvc-images` qui délègue toutes les opérations sur les chemins.
 
 | Menace | Garantie | Mécanisme |
 |---|---|---|
@@ -704,7 +705,7 @@ Les garanties suivantes sont assurées par `core/uploads/storage.py` et s'appliq
 | **Chemins relatifs hors racine** | Bloqué | `os.path.commonpath` vérifie que la cible reste sous `storage/uploads/` |
 | **Stockage absolu** | Impossible | `normalize_media_path` retourne toujours un chemin relatif |
 | **Suppression accidentelle** | Opt-in uniquement | `delete_media(id, delete_files=False)` par défaut — la suppression fichier est explicite |
-| **Validation MIME/extension** | Présente | `core/uploads/validators.py` valide contre des listes d'extensions et MIME autorisées |
+| **Validation MIME/extension** | Présente | `core/forms/upload_validation.py` (reste dans le core, ADR-019) valide contre des listes d'extensions et MIME autorisées |
 | **Exposition hors racine** | Impossible | La route `/media/...` refuse tout chemin sortant de `storage/uploads/` |
 | **Double slash / normpath** | Nettoyé | `//` réduits avant normalisation |
 

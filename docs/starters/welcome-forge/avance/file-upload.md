@@ -5,7 +5,7 @@ toute sécurité.
 
 **Ce que vous allez apprendre :** un formulaire `multipart/form-data`, la
 récupération du fichier reçu avec `request.file(...)`, et son stockage par
-`core.uploads.save_upload`. Cette fonction **valide** le fichier (extension,
+`forge_mvc_files.save_upload`. Cette fonction **valide** le fichier (extension,
 type MIME, taille) **avant** d'écrire sur le disque : Forge ne fait jamais
 confiance aveuglément à ce que l'utilisateur envoie.
 
@@ -17,7 +17,7 @@ après [Relations entre tables](relations.md).
 
 - un formulaire HTML en **`multipart/form-data`** ;
 - la récupération du fichier reçu avec `request.file("document")` ;
-- le stockage validé via `core.uploads.save_upload` ;
+- le stockage validé via `forge_mvc_files.save_upload` ;
 - l'affichage du nom et de la taille du fichier enregistré, ou de l'erreur si le
   fichier est refusé.
 
@@ -28,7 +28,7 @@ Aucune base de données : le fichier est stocké sur le disque, pas en base.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `request.file` | Récupérer le fichier reçu (`UploadedFile`). | [Request](../../../reference/api.md#corehttp) |
-| `core.uploads.save_upload` | Valider puis stocker le fichier sur le disque. | [Uploads](../../../reference/api.md#coreuploads) |
+| `forge_mvc_files.save_upload` | Valider puis stocker le fichier sur le disque. | [Uploads](../../../reference/api.md#coreuploads) |
 | `BaseController.csrf_token` | Protéger le formulaire d'envoi. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
 ## Tester
@@ -45,7 +45,7 @@ fichier d'un type non autorisé déclenche un message d'erreur clair.
 
 ```python
 # mvc/controllers/file_upload_controller.py
-from core.uploads import UploadError, save_upload
+from forge_mvc_files import UploadError, save_upload
 
 
 class FileUploadController(BaseController):
