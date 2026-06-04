@@ -133,11 +133,13 @@ class TestVersionAlignment:
 class TestNoUnnecessaryDuplication:
     """Les modules opt-in ne dupliquent pas les dépendances exclusives du core."""
 
+    # CORE-DROP-PILLOW-001 (ADR-018) : Pillow n'est plus exclusif au core — il
+    # est désormais déclaré par l'opt-in forge-mvc-images. Le retirer d'ici évite
+    # de signaler forge-mvc-images comme « dupliquant » une dépendance du core.
     CORE_ONLY_DEPS = {
         "mariadb",
         "python-dotenv",
         "jinja2",
-        "Pillow",
         "argon2-cffi",
     }
 

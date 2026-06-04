@@ -158,39 +158,38 @@ def test_package_data_couvre_tous_types_fichiers_starters():
 
 # ── Dépendances déclarées ─────────────────────────────────────────────────────
 
-def test_pillow_dans_pyproject():
+# CORE-DROP-PILLOW-001 (ADR-018) : Pillow a quitté le core (le traitement
+# d'image vit dans l'opt-in forge-mvc-images). Les garde-fous « Pillow présent »
+# sont INVERSÉS : le core ne doit plus déclarer Pillow.
+
+def test_pillow_absent_du_pyproject_core():
     data = _load_pyproject()
     deps = data["project"]["dependencies"]
     pillow_deps = [d for d in deps if d.lower().startswith("pillow")]
-    assert pillow_deps, "Pillow absent des dependencies dans pyproject.toml"
-    assert any(">=" in d for d in pillow_deps), (
-        "Pillow doit avoir une contrainte de version minimale dans pyproject.toml"
+    assert not pillow_deps, (
+        "Pillow ne doit plus figurer dans les dependencies du core "
+        f"(déplacé vers forge-mvc-images, CORE-DROP-PILLOW-001) : {pillow_deps}"
     )
 
 
-def test_pillow_dans_requirements_txt():
+def test_pillow_absent_du_requirements_txt():
     reqs = (ROOT / "requirements.txt").read_text(encoding="utf-8")
     lines = [l.strip() for l in reqs.splitlines() if l.strip() and not l.startswith("#")]
     pillow_lines = [l for l in lines if l.lower().startswith("pillow")]
-    assert pillow_lines, "Pillow absent de requirements.txt"
-
-
-def test_pillow_contrainte_coherente():
-    """pyproject.toml et requirements.txt doivent déclarer la même contrainte Pillow."""
-    data = _load_pyproject()
-    deps = data["project"]["dependencies"]
-    pyproject_pillow = next(d for d in deps if d.lower().startswith("pillow"))
-
-    reqs = (ROOT / "requirements.txt").read_text(encoding="utf-8")
-    req_pillow = next(
-        l.strip() for l in reqs.splitlines()
-        if l.strip().lower().startswith("pillow")
+    assert not pillow_lines, (
+        f"Pillow ne doit plus figurer dans requirements.txt du core : {pillow_lines}"
     )
 
-    assert pyproject_pillow == req_pillow, (
-        f"Contrainte Pillow incohérente :\n"
-        f"  pyproject.toml : {pyproject_pillow}\n"
-        f"  requirements.txt : {req_pillow}"
+
+def test_pillow_declare_par_forge_mvc_images():
+    """Pillow est désormais une dépendance de l'opt-in forge-mvc-images."""
+    import tomllib
+
+    img_pyproject = ROOT / "packages" / "forge-mvc-images" / "pyproject.toml"
+    data = tomllib.loads(img_pyproject.read_text(encoding="utf-8"))
+    deps = data["project"]["dependencies"]
+    assert any(d.lower().startswith("pillow") for d in deps), (
+        "forge-mvc-images doit déclarer Pillow dans ses dependencies."
     )
 
 
@@ -229,9 +228,9 @@ def test_argon2_cffi_contrainte_coherente():
 
 # ── Importabilité directe ─────────────────────────────────────────────────────
 
-def test_pil_importable():
-    """Pillow (PIL) doit être importable — dépendance runtime obligatoire."""
-    from PIL import Image  # noqa: F401
+# CORE-DROP-PILLOW-001 : `test_pil_importable` retiré — Pillow n'est plus une
+# dépendance runtime obligatoire du core (importabilité garantie par l'opt-in
+# forge-mvc-images, pas par le noyau).
 
 
 def test_argon2_importable():

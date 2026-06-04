@@ -22,10 +22,15 @@ Pourquoi AST plutôt que grep textuel :
     par ``try/except ImportError`` à l'intérieur d'une fonction sont OK
     sans guard, ils ne cassent pas la collecte.
 
-Pillow (`PIL`) n'est PAS dans cette liste : c'est une dépendance runtime
-du core Forge (`pyproject.toml`), pas un opt-in. Les tests qui en
-dépendent — ex. `tests/test_uploads*.py`, `tests/test_media_route.py` —
-testent `core/uploads/` (core), pas le module opt-in `forge-mvc-media`.
+Pillow (`PIL`) n'est PAS dans cette liste, par choix pragmatique : depuis
+CORE-DROP-PILLOW-001 (ADR-018), Pillow est une dépendance de l'opt-in
+`forge-mvc-images`, mais il reste présent dans l'environnement de test (le
+paquet est installé en mode source). On ne l'ajoute donc pas au garde-fou
+d'importorskip pour ne pas cascader des `importorskip` dans les tests qui
+construisent simplement des images de fixture (`tests/test_uploads*.py`,
+`tests/test_media_route.py`). Les tests du traitement d'image proprement dit
+(`test_uploads_image.py`, `test_sec_upload_decompression_bomb_001.py`) gardent
+eux explicitement `importorskip("forge_mvc_images")`.
 """
 from __future__ import annotations
 

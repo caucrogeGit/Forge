@@ -29,7 +29,14 @@ CORE_DEPS = {
     "mariadb",
     "dotenv",       # python-dotenv
     "jinja2",
-    "PIL",          # Pillow
+    # CORE-DROP-PILLOW-001 (ADR-018) : Pillow a quitté les dépendances DÉCLARÉES
+    # du core (pyproject/requirements) au profit de l'opt-in forge-mvc-images.
+    # On garde néanmoins "PIL" comme module *disponible en environnement de
+    # test* : dans le monorepo, forge-mvc-images (donc Pillow) est toujours sur
+    # le sys.path via conftest.py. PIL n'est donc pas un module opt-in
+    # susceptible d'être absent pendant `pytest` ; les tests qui construisent
+    # des fixtures image peuvent l'importer sans importorskip.
+    "PIL",
     "argon2",       # argon2-cffi
     "markupsafe",   # dépendance Jinja2
     "yaml",         # PyYAML
@@ -62,8 +69,9 @@ OPTIN_MODULES: dict[str, set[str]] = {
     "forge_mvc_stats": set(),
     "forge_mvc_media": set(),
     # forge-mvc-images : opt-in propriétaire du traitement d'image (Pillow)
-    # depuis IMAGES-MOVE-PROCESSING-001 (ADR-018). Pillow reste déclaré dans
-    # CORE_DEPS jusqu'à CORE-DROP-PILLOW-001 — pas d'extra à lister ici.
+    # depuis IMAGES-MOVE-PROCESSING-001 (ADR-018). Pillow reste classé comme
+    # module disponible en test (CORE_DEPS ci-dessus, cf. CORE-DROP-PILLOW-001) ;
+    # pas d'extra à lister ici.
     "forge_mvc_images": set(),
     # forge-mvc-iot : opt-in au même titre que ses frères. Ses tests
     # gardent l'import via pytest.importorskip("forge_mvc_iot").

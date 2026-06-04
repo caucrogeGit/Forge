@@ -154,11 +154,12 @@ class TestRequirementsAreCorePure:
     CORE_PYPROJECT_PATH = PROJECT_ROOT / "pyproject.toml"
     MFA_PYPROJECT_PATH = PROJECT_ROOT / "packages/forge-mvc-mfa/pyproject.toml"
 
+    # CORE-DROP-PILLOW-001 (ADR-018) : Pillow a quitté le core (opt-in
+    # forge-mvc-images) ; il ne fait plus partie des dépendances core attendues.
     EXPECTED_CORE = {
         "mariadb",
         "python-dotenv",
         "jinja2",
-        "Pillow",
         "argon2-cffi",
     }
     MODULE_ONLY = {
