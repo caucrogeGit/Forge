@@ -28,15 +28,16 @@ Limite MIME sniffing :
 from __future__ import annotations
 
 import pytest
+pytest.importorskip("forge_mvc_files")
 
 import core.forge as forge
-from core.uploads.exceptions import (
+from core.forms.upload_exceptions import (
     UploadInvalidExtensionError,
     UploadInvalidMimeTypeError,
     UploadStorageError,
     UploadTooLargeError,
 )
-from core.uploads.storage import (
+from forge_mvc_files.storage import (
     delete_file,
     normalize_media_path,
     safe_category,
@@ -44,13 +45,13 @@ from core.uploads.storage import (
     generate_unique_filename,
     media_path_to_storage_path,
 )
-from core.uploads.validators import (
+from core.forms.upload_validation import (
     validate_extension,
     validate_mime_type,
     validate_size,
     validate_upload_metadata,
 )
-from core.uploads.manager import (
+from forge_mvc_files.manager import (
     save_upload,
     serve_media_file,
     delete_media_file,

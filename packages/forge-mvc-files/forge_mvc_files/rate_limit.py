@@ -6,7 +6,7 @@ compteurs de connexion.
 
 Usage dans un contrôleur :
 
-    from core.uploads.rate_limit import is_upload_rate_limited, record_upload_attempt
+    from forge_mvc_files.rate_limit import is_upload_rate_limited, record_upload_attempt
 
     def upload_avatar(request):
         if is_upload_rate_limited(request.ip):

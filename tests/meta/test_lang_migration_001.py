@@ -80,15 +80,15 @@ class TestNewApiAvailable:
     # core.uploads.rate_limit
 
     def test_upload_rate_limit_window_constant(self):
-        from core.uploads.rate_limit import UPLOAD_RATE_LIMIT_WINDOW
+        from forge_mvc_files.rate_limit import UPLOAD_RATE_LIMIT_WINDOW
         assert isinstance(UPLOAD_RATE_LIMIT_WINDOW, int)
 
     def test_is_upload_rate_limited_callable(self):
-        from core.uploads.rate_limit import is_upload_rate_limited
+        from forge_mvc_files.rate_limit import is_upload_rate_limited
         assert callable(is_upload_rate_limited)
 
     def test_record_upload_attempt_callable(self):
-        from core.uploads.rate_limit import record_upload_attempt
+        from forge_mvc_files.rate_limit import record_upload_attempt
         assert callable(record_upload_attempt)
 
     # mvc.models.auth_model
@@ -114,9 +114,9 @@ _OLD_SYMBOLS = [
     ("core.security.hashing",  "verifier_mot_de_passe"),
     ("core.security.hashing",  "enregistrer_tentative"),
     ("core.security.hashing",  "est_limite"),
-    ("core.uploads.rate_limit", "UPLOAD_FENETRE_SECONDES"),
-    ("core.uploads.rate_limit", "est_limite_upload"),
-    ("core.uploads.rate_limit", "enregistrer_upload"),
+    ("forge_mvc_files.rate_limit", "UPLOAD_FENETRE_SECONDES"),
+    ("forge_mvc_files.rate_limit", "est_limite_upload"),
+    ("forge_mvc_files.rate_limit", "enregistrer_upload"),
 ]
 
 

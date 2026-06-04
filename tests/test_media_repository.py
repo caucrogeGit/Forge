@@ -1,10 +1,11 @@
 import pytest
+pytest.importorskip("forge_mvc_files")
 pytest.importorskip("forge_mvc_media")
 
 from types import SimpleNamespace
 
-from core.uploads.exceptions import UploadStorageError
-from core.uploads.storage import normalize_media_path
+from core.forms.upload_exceptions import UploadStorageError
+from forge_mvc_files.storage import normalize_media_path
 from forge_mvc_media.media_repository import (
     attach_media_to_entity,
     create_media_record,

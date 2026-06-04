@@ -131,7 +131,8 @@ from core.http.request import Request, RequestEntityTooLarge
 from core.http.response import Response
 from core.http.helpers import html as _html
 from core.application import Application
-from core.uploads import serve_media_file
+# CORE-DROP-UPLOADS-001 (ADR-019) : le service de fichiers est un opt-in
+# (forge-mvc-files). Import lazy dans le handler /media (l'app démarre sans).
 from integrations.jinja2.renderer import Jinja2Renderer
 from core.templating.manager import template_manager
 
@@ -293,6 +294,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._send_response(_html("errors/404.html", 404))
 
     def _serve_media(self, path: str) -> None:
+        try:
+            from forge_mvc_files import serve_media_file
+        except ImportError:
+            self._send_response(Response(404, b"Not found", "text/plain; charset=utf-8"))
+            return
         relative_path = path.removeprefix("/media/")
         self._send_response(serve_media_file(relative_path))
 

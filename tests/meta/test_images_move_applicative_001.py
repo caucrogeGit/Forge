@@ -104,17 +104,16 @@ class TestMediaIsTransitionalShim:
 
 
 class TestCoreReexportsFromImages:
-    """Le core réexporte l'API applicative depuis forge_mvc_images (try-import)."""
+    """L'API applicative s'importe depuis forge_mvc_images (plus via le core)."""
 
-    def test_core_uploads_init_references_images_not_media(self):
-        text = (PROJECT_ROOT / "core" / "uploads" / "__init__.py").read_text(
-            encoding="utf-8"
-        )
-        # Le try-import applicatif cible désormais forge_mvc_images.
-        assert "from forge_mvc_images import" in text
-        # Plus aucun import (même indenté) de forge_mvc_media dans le core.
-        for line in text.splitlines():
-            assert "forge_mvc_media" not in line, (
-                "core/uploads/__init__.py ne doit plus référencer forge_mvc_media "
-                f"(ligne : {line!r})."
-            )
+    def test_core_uploads_removed_no_reexport(self):
+        # CORE-DROP-UPLOADS-001 (ADR-019) : core/uploads a été supprimé ; il n'y
+        # a plus de réexport applicatif dans le core. Les apps importent
+        # directement depuis forge_mvc_images.
+        assert not (PROJECT_ROOT / "core" / "uploads").exists()
+
+    def test_applicative_api_lives_in_images(self):
+        import forge_mvc_images
+
+        for name in ("attach_media_to_entity", "get_media_gallery", "delete_media"):
+            assert hasattr(forge_mvc_images, name)

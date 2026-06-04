@@ -1,7 +1,7 @@
 import pytest
 pytest.importorskip("forge_mvc_media")
 
-from core.uploads.exceptions import UploadStorageError
+from core.forms.upload_exceptions import UploadStorageError
 from forge_mvc_media.media_gallery import get_cover_media, get_media_gallery, media_url
 
 

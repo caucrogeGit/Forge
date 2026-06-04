@@ -14,7 +14,6 @@ reste dans le core mais quitte ``core/uploads/`` (qui partira vers
 """
 from __future__ import annotations
 
-import inspect
 from pathlib import Path
 
 import pytest
@@ -88,28 +87,32 @@ class TestFieldsDecoupledFromUploads:
         assert validate_extension("photo.PNG", ["png"]) == "png"
 
 
-class TestUploadsModulesAreShims:
-    @pytest.mark.parametrize("shim", [SHIM_VALIDATORS, SHIM_EXCEPTIONS])
-    def test_is_reexport_shim(self, shim):
-        text = shim.read_text(encoding="utf-8")
-        assert "core.forms.upload_" in text, f"{shim.name} doit réexporter core.forms."
-        # Pas de logique propre (les fonctions ne sont pas (re)définies ici).
-        assert "def validate_extension" not in text or shim is None
+class TestUploadsModulesRemoved:
+    """CORE-DROP-UPLOADS-001 (ADR-019) : les shims core/uploads ont disparu.
 
-    def test_shim_and_core_resolve_same_objects(self):
+    La validation (validators + exceptions) vit dans core/forms ; le reste est
+    parti vers forge-mvc-files. ``core.uploads`` n'existe plus.
+    """
+
+    @pytest.mark.parametrize("shim", [SHIM_VALIDATORS, SHIM_EXCEPTIONS])
+    def test_shim_file_absent(self, shim):
+        assert not shim.exists(), (
+            f"{shim} doit avoir été supprimé (CORE-DROP-UPLOADS-001)."
+        )
+
+    def test_core_uploads_not_importable(self):
+        import importlib
+
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("core.uploads.validators")
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("core.uploads.exceptions")
+
+    def test_validation_still_resolves_from_core_forms(self):
         import core.forms.upload_validation as new_v
         import core.forms.upload_exceptions as new_e
-        import core.uploads.validators as shim_v
-        import core.uploads.exceptions as shim_e
 
         for name in _VALIDATORS:
-            assert getattr(shim_v, name) is getattr(new_v, name)
+            assert callable(getattr(new_v, name))
         for name in _EXCEPTIONS:
-            assert getattr(shim_e, name) is getattr(new_e, name)
-
-    def test_validators_shim_has_no_real_logic(self):
-        # Le shim ne (re)définit aucune fonction : il importe seulement.
-        import core.uploads.validators as shim_v
-
-        src = inspect.getsource(shim_v)
-        assert "def validate_extension" not in src
+            assert issubclass(getattr(new_e, name), Exception)

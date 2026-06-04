@@ -28,8 +28,8 @@ from core.application import Application
 from core.http.request import Request
 from core.http.response import Response
 from core.http.router import Router
-from core.uploads.exceptions import UploadError
-from core.uploads.manager import save_upload
+from core.forms.upload_exceptions import UploadError
+from forge_mvc_files.manager import save_upload
 
 # ---------------------------------------------------------------------------
 # Helpers (partagés avec test_e2e_upload_http.py)

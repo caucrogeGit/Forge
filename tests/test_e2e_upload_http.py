@@ -34,14 +34,15 @@ import json
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_files")
 
 import core.forge as forge
 from core.application import Application
 from core.http.request import Request, UploadedFile
 from core.http.response import Response
 from core.http.router import Router
-from core.uploads.exceptions import UploadError
-from core.uploads.manager import save_upload
+from core.forms.upload_exceptions import UploadError
+from forge_mvc_files.manager import save_upload
 from tests.fake_request import FakeRequest
 
 # ---------------------------------------------------------------------------

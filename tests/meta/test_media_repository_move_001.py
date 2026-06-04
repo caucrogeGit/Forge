@@ -87,17 +87,22 @@ class TestCoreFilesAbsent:
 
 class TestCoreDoesNotDependOnOptIn:
 
-    def test_core_init_does_not_unconditionally_import_forge_mvc_media(self):
-        text = (PROJECT_ROOT / "core" / "uploads" / "__init__.py").read_text(encoding="utf-8")
-        for line in text.splitlines():
-            # Les imports indentés (try/except) sont autorisés — seuls les imports
-            # directs non indentés constitueraient une dépendance dure.
-            if line.startswith("from forge_mvc_media") or line.startswith("import forge_mvc_media"):
-                raise AssertionError(
-                    "core/uploads/__init__.py ne doit pas importer forge_mvc_media "
-                    "directement (sans try/except). "
-                    "Les re-exports conditionnels (try/except, indentés) sont autorisés."
-                )
+    def test_core_does_not_unconditionally_import_forge_mvc_media(self):
+        # CORE-DROP-UPLOADS-001 (ADR-019) : core/uploads supprimé. On vérifie que
+        # AUCUN module du core n'importe forge_mvc_media au niveau module.
+        core_dir = PROJECT_ROOT / "core"
+        offenders = []
+        for py in core_dir.rglob("*.py"):
+            if "__pycache__" in str(py):
+                continue
+            for lineno, line in enumerate(
+                py.read_text(encoding="utf-8", errors="replace").splitlines(), 1
+            ):
+                if line.startswith(("from forge_mvc_media", "import forge_mvc_media")):
+                    offenders.append(f"{py.relative_to(PROJECT_ROOT)}:{lineno}")
+        assert not offenders, (
+            f"Le core ne doit pas importer forge_mvc_media : {offenders}"
+        )
 
     def test_root_pyproject_does_not_depend_on_forge_mvc_media(self):
         lines = ROOT_PYPROJECT.read_text(encoding="utf-8").splitlines()

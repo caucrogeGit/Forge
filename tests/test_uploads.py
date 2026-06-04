@@ -2,29 +2,30 @@ from io import BytesIO
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_files")
 pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
 import core.forge as forge
-from core.uploads.exceptions import (
+from core.forms.upload_exceptions import (
     UploadInvalidExtensionError,
     UploadInvalidMimeTypeError,
     UploadStorageError,
     UploadTooLargeError,
 )
-from core.uploads.manager import delete_media_file, delete_upload, get_upload_path, save_upload
+from forge_mvc_files.manager import delete_media_file, delete_upload, get_upload_path, save_upload
 
 # CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : save_upload est purement générique ;
 # le chemin image-aware (vérification + variantes) appartient à forge-mvc-images.
 from forge_mvc_images import save_image_upload
-from core.uploads.storage import (
+from forge_mvc_files.storage import (
     ensure_upload_dirs,
     is_safe_media_path,
     media_path_to_storage_path,
     normalize_media_path,
     secure_filename,
 )
-from core.uploads.validators import validate_upload_metadata
+from core.forms.upload_validation import validate_upload_metadata
 from forge_cli.uploads import init_upload_storage
 
 
@@ -434,7 +435,7 @@ def test_delete_media_file_refuse_symlink_vers_hors_uploads(tmp_path):
 
 
 def test_delete_media_file_est_exporte_dans_api_publique():
-    from core.uploads import delete_media_file as exported_delete_media_file
+    from forge_mvc_files import delete_media_file as exported_delete_media_file
 
     assert exported_delete_media_file is delete_media_file
 

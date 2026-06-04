@@ -1,10 +1,11 @@
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_files")
 pytest.importorskip("forge_mvc_media")
 
-from core.uploads import SavedUpload
-from core.uploads.exceptions import UploadStorageError
+from forge_mvc_files import SavedUpload
+from core.forms.upload_exceptions import UploadStorageError
 from forge_mvc_media.media_gallery import get_cover_media, get_media_gallery
 from forge_mvc_media.media_repository import attach_media_to_entity
 from tests.test_media_repository import FakeMediaDb

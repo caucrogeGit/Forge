@@ -37,16 +37,15 @@ Depuis `MEDIA-REPOSITORY-MOVE-001`, le package contient :
 - `media_gallery` — galerie, couverture, URL des médias par entité :
   `get_media_gallery`, `get_cover_media`, `media_url`
 
-## Ce qui reste dans le core (définitif)
+## Briques génériques d'upload (extraites du core — ADR-018/019)
 
-Les briques génériques restent dans `core/uploads/` et ne bougent pas :
+Les briques génériques d'upload ont été **extraites du core** :
 
-- `exceptions.py` — hiérarchie UploadError
-- `validators.py` — validation extension, MIME type, taille
-- `storage.py` — filesystem, protection anti-traversal
-- `manager.py` — SavedUpload, save_upload, serve_media_file
-- `image.py` — save_image, generate_image_variants (Pillow)
-- `rate_limit.py` — rate limiting in-memory
+- traitement d'image (`save_image`, variantes, Pillow) → `forge-mvc-images` (ADR-018) ;
+- upload générique (`SavedUpload`, `save_upload`, `serve_media_file`, storage,
+  rate-limit) → `forge-mvc-files` (ADR-019) ;
+- la **validation pure** (extension/MIME/taille + `UploadError`) reste dans le
+  core (`core.forms.upload_validation` / `upload_exceptions`).
 
 ## Note sur les générateurs CLI
 
@@ -55,7 +54,7 @@ applicatifs (`forge make:crud --media`, `forge make:public:list`, `forge make:pu
 ciblent `forge_mvc_media` pour les helpers applicatifs :
 
 ```python
-from core.uploads import save_upload  # générique — reste dans core
+from forge_mvc_files import save_upload  # upload générique (opt-in, ADR-019)
 from forge_mvc_media import (
     attach_media_to_entity,
     delete_media,

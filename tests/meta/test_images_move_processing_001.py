@@ -68,23 +68,13 @@ class TestImageRemovedFromCore:
             f"image vit dans forge-mvc-images. Fautifs : {offenders}"
         )
 
-    def test_core_uploads_no_longer_exports_image_api(self):
-        import core.uploads as uploads
+    def test_core_uploads_module_removed(self):
+        # CORE-DROP-UPLOADS-001 (ADR-019) : core.uploads a entièrement disparu
+        # (l'API image ne peut donc plus en venir, a fortiori).
+        import importlib
 
-        leaked = [name for name in PROCESSING_API if name in uploads.__all__]
-        assert not leaked, (
-            "core.uploads ne doit plus réexporter l'API image "
-            f"(retirée par IMAGES-MOVE-PROCESSING-001) : {leaked}"
-        )
-
-    @pytest.mark.parametrize("name", PROCESSING_API)
-    def test_core_uploads_image_attr_absent(self, name: str):
-        import core.uploads as uploads
-
-        assert not hasattr(uploads, name), (
-            f"core.uploads ne doit plus exposer '{name}' (déplacé dans "
-            "forge_mvc_images)."
-        )
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("core.uploads")
 
 
 class TestProcessingApiInOptin:
@@ -116,7 +106,8 @@ class TestSaveUploadIsGeneric:
     def test_save_upload_signature_has_no_variants(self):
         import inspect as _inspect
 
-        from core.uploads.manager import save_upload
+        # CORE-DROP-UPLOADS-001 : save_upload vit dans forge_mvc_files.
+        from forge_mvc_files.manager import save_upload
 
         params = _inspect.signature(save_upload).parameters
         assert "variants" not in params, (
@@ -125,7 +116,7 @@ class TestSaveUploadIsGeneric:
         )
 
     def test_save_upload_source_has_no_image_branch(self):
-        from core.uploads import manager
+        from forge_mvc_files import manager
 
         src = inspect.getsource(manager.save_upload)
         assert 'category == "images"' not in src, (
@@ -134,12 +125,12 @@ class TestSaveUploadIsGeneric:
 
     def test_manager_still_has_delegate_helper_for_delete(self):
         # Le delegate lazy subsiste pour delete_media_file(variants=True).
-        from core.uploads import manager
+        from forge_mvc_files import manager
 
         assert hasattr(manager, "_require_image_processing")
 
     def test_delegate_resolves_processing_functions(self):
-        from core.uploads.manager import _require_image_processing
+        from forge_mvc_files.manager import _require_image_processing
 
         for name in (
             "verify_image_content",
@@ -151,7 +142,7 @@ class TestSaveUploadIsGeneric:
             assert callable(resolved), f"{name} doit être résoluble via le delegate."
 
     def test_manager_source_has_no_core_image_import(self):
-        from core.uploads import manager
+        from forge_mvc_files import manager
 
         source = inspect.getsource(manager)
         assert "core.uploads.image" not in source, (

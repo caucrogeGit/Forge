@@ -2,7 +2,9 @@ import json
 import shutil
 from pathlib import Path
 
-from core.uploads.storage import normalize_media_path
+import pytest
+pytest.importorskip("forge_mvc_files")
+from forge_mvc_files.storage import normalize_media_path
 from forge_cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
 from forge_cli.entities.make_entity import build_entity_base, build_entity_sql
 from forge_cli.entities.model import build_model

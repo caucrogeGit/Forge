@@ -59,42 +59,28 @@ class TestRealCodeInForgeFiles:
         assert hasattr(forge_mvc_files, name)
 
 
-class TestCoreUploadsAreShims:
-    @pytest.mark.parametrize("mod", ["manager.py", "storage.py", "rate_limit.py"])
-    def test_is_reexport_shim(self, mod):
-        text = (CORE_UPLOADS / mod).read_text(encoding="utf-8")
-        assert "forge_mvc_files" in text, f"{mod} doit réexporter forge_mvc_files."
+class TestCoreUploadsRemoved:
+    """CORE-DROP-UPLOADS-001 (ADR-019) : core/uploads supprimé du core."""
 
-    def test_no_io_logic_left_in_core_shims(self):
-        # Les shims ne (re)définissent aucune fonction d'I/O.
-        for mod in ("manager.py", "storage.py", "rate_limit.py"):
-            text = (CORE_UPLOADS / mod).read_text(encoding="utf-8")
-            assert "def save_upload" not in text
-            assert "def save_bytes" not in text
+    def test_core_uploads_dir_absent(self):
+        # Plus aucun module Python sous core/uploads/.
+        assert not list(CORE_UPLOADS.glob("*.py")), (
+            "core/uploads/ ne doit plus contenir de module (extrait vers "
+            "forge-mvc-files)."
+        )
 
-    def test_shim_and_files_resolve_same_objects(self):
-        import core.uploads.manager as shim_m
-        import core.uploads.storage as shim_s
-        import forge_mvc_files.manager as files_m
-        import forge_mvc_files.storage as files_s
+    def test_core_uploads_not_importable(self):
+        import importlib
 
-        assert shim_m.save_upload is files_m.save_upload
-        assert shim_m.serve_media_file is files_m.serve_media_file
-        assert shim_s.save_bytes is files_s.save_bytes
-
-    def test_core_uploads_init_still_works(self):
-        # Le shim de paquet réexporte toujours l'API (transparent).
-        from core.uploads import save_upload, serve_media_file  # noqa: F401
-        import forge_mvc_files
-
-        assert save_upload is forge_mvc_files.save_upload
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("core.uploads")
 
 
 class TestPipelineLeftCore:
-    def test_manager_source_in_files_not_core(self):
-        import core.uploads.manager as shim
+    def test_manager_source_in_files(self):
+        import forge_mvc_files.manager as files_m
 
-        # save_upload re-exporté : sa source réelle est dans forge_mvc_files.
-        src_file = inspect.getsourcefile(shim.save_upload)
+        src_file = inspect.getsourcefile(files_m.save_upload)
         assert "forge_mvc_files" in src_file
+        assert "core/uploads" not in src_file
         assert "core/uploads" not in src_file

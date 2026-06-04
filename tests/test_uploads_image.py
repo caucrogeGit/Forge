@@ -6,7 +6,7 @@ pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
 import core.forge as forge
-from core.uploads.exceptions import (
+from core.forms.upload_exceptions import (
     UploadInvalidExtensionError,
     UploadStorageError,
     UploadTooLargeError,

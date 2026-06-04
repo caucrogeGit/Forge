@@ -1,8 +1,9 @@
 import pytest
+pytest.importorskip("forge_mvc_files")
 pytest.importorskip("forge_mvc_media")
 
-from core.uploads import delete_media_file
-from core.uploads.exceptions import UploadStorageError
+from forge_mvc_files import delete_media_file
+from core.forms.upload_exceptions import UploadStorageError
 from forge_mvc_media.media_repository import (
     attach_media_to_entity,
     create_media_record,

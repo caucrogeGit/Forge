@@ -2,13 +2,14 @@ from io import BytesIO
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_files")
 pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
 import app
 import core.forge as forge
 from core.http.response import Response
-from core.uploads import delete_media_file, serve_media_file
+from forge_mvc_files import delete_media_file, serve_media_file
 
 # CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : chemin image-aware côté opt-in.
 from forge_mvc_images import save_image_upload
@@ -138,7 +139,11 @@ def test_serve_media_file_refuse_symlink_sortant_de_uploads(tmp_path):
 
 
 def test_request_handler_route_media_delegue_au_service(monkeypatch):
-    monkeypatch.setattr(app, "serve_media_file", lambda path: Response(200, path, "text/plain"))
+    # CORE-DROP-UPLOADS-001 (ADR-019) : _serve_media importe serve_media_file en
+    # lazy depuis forge_mvc_files (opt-in) — on patche la vraie cible.
+    import forge_mvc_files
+    monkeypatch.setattr(forge_mvc_files, "serve_media_file",
+                        lambda path: Response(200, path, "text/plain"))
 
     handler = _MediaHandler()
     app.RequestHandler._serve_media(handler, "/media/images/photo.png")
@@ -149,7 +154,7 @@ def test_request_handler_route_media_delegue_au_service(monkeypatch):
 
 
 def test_serve_media_file_est_exporte_dans_api_publique():
-    from core.uploads import serve_media_file as exported_serve_media_file
+    from forge_mvc_files import serve_media_file as exported_serve_media_file
 
     assert exported_serve_media_file is serve_media_file
 

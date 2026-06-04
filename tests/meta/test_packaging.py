@@ -46,7 +46,9 @@ def test_pyproject_inclut_core_et_sous_packages():
     data = _load_pyproject()
     patterns = data["tool"]["setuptools"]["packages"]["find"]["include"]
     assert any(fnmatch.fnmatch("core", p) for p in patterns)
-    assert any(fnmatch.fnmatch("core.uploads", p) for p in patterns)
+    # CORE-DROP-UPLOADS-001 (ADR-019) : core.uploads a été supprimé (upload
+    # extrait vers forge-mvc-files). On vérifie un autre sous-package du core.
+    assert any(fnmatch.fnmatch("core.forms", p) for p in patterns)
 
 
 def test_pyproject_exclut_tests_et_mvc_applicatif():
@@ -60,13 +62,13 @@ def test_pyproject_exclut_tests_et_mvc_applicatif():
 
 # ── Packages découverts ───────────────────────────────────────────────────────
 
-def test_find_packages_couvre_core_uploads():
+def test_find_packages_core_uploads_absent():
+    # CORE-DROP-UPLOADS-001 (ADR-019) : core.uploads supprimé du core.
     data = _load_pyproject()
     patterns = data["tool"]["setuptools"]["packages"]["find"]["include"]
     found = _simulate_find_packages(patterns)
-    assert "core.uploads" in found, (
-        "core.uploads introuvable avec les patterns find_packages actuels — "
-        "vérifier que core/uploads/__init__.py existe."
+    assert "core.uploads" not in found, (
+        "core.uploads doit avoir été supprimé (upload extrait vers forge-mvc-files)."
     )
 
 
@@ -78,7 +80,7 @@ def test_find_packages_couvre_tous_les_sous_packages_core():
     expected = {
         "core", "core.database", "core.forms", "core.http",
         "core.mvc", "core.mvc.controller", "core.mvc.model", "core.mvc.view",
-        "core.security", "core.templating", "core.validation", "core.uploads",
+        "core.security", "core.templating", "core.validation",
     }
     missing = expected - found
     assert not missing, f"Packages manquants dans le packaging : {missing}"
@@ -238,9 +240,17 @@ def test_argon2_importable():
     from argon2 import PasswordHasher  # noqa: F401
 
 
-def test_core_uploads_importable():
-    """Protection régression : core.uploads doit toujours s'importer."""
-    from core.uploads.manager import save_upload  # noqa: F401
-    from core.uploads.exceptions import UploadStorageError  # noqa: F401
-    from core.uploads.validators import validate_upload_metadata  # noqa: F401
-    from core.uploads.storage import ensure_upload_dirs  # noqa: F401
+def test_core_uploads_removed():
+    """CORE-DROP-UPLOADS-001 (ADR-019) : core.uploads a été supprimé.
+
+    Le pipeline d'upload vit dans forge-mvc-files ; la validation pure reste
+    dans le core (core.forms). Aucun import ``core.uploads`` ne doit subsister.
+    """
+    import importlib
+
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("core.uploads")
+
+    # La validation pure reste dans le core.
+    from core.forms.upload_validation import validate_upload_metadata  # noqa: F401
+    from core.forms.upload_exceptions import UploadStorageError  # noqa: F401
