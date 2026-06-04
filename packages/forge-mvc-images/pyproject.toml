@@ -16,6 +16,9 @@ keywords = ["python", "mvc", "forge", "images", "pillow", "uploads", "gallery"]
 dependencies = [
     "forge-mvc>=1.0.0b13,<2",
     "Pillow>=10.0,<13",
+    # FILES-IMAGES-REPOINT-001 (ADR-019) : le traitement d'image réutilise le
+    # pipeline d'upload générique, désormais détenu par forge-mvc-files.
+    "forge-mvc-files>=1.0.0b13,<2",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",

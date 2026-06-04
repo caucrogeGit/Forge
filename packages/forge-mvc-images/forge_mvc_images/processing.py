@@ -20,15 +20,18 @@ from types import SimpleNamespace
 from PIL import Image, UnidentifiedImageError
 
 from core.forge import get as _cfg
-from core.uploads import storage
-from core.uploads.exceptions import UploadStorageError
-from core.uploads.manager import (
+
+# FILES-IMAGES-REPOINT-001 (ADR-019) : le pipeline d'upload vit dans
+# forge-mvc-files (dépendance déclarée) ; la validation pure reste dans le core.
+from core.forms.upload_exceptions import UploadStorageError
+from core.forms.upload_validation import validate_upload_metadata
+from forge_mvc_files import storage
+from forge_mvc_files.manager import (
     SavedUpload,
     _read_upload,
     save_upload as _core_save_upload,
     upload_root,
 )
-from core.uploads.validators import validate_upload_metadata
 
 
 ALLOWED_IMAGE_EXTENSIONS: frozenset[str] = frozenset({"jpg", "jpeg", "png", "webp"})

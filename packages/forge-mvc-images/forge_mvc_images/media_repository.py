@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from pathlib import PurePosixPath
 
-from core.uploads.storage import normalize_media_path
+# FILES-IMAGES-REPOINT-001 (ADR-019) : storage d'upload dans forge-mvc-files.
+from forge_mvc_files.storage import normalize_media_path
 
 
 _SELECT_COLUMNS = """
@@ -168,7 +169,7 @@ def delete_media(
 
     deleted_files = {}
     if delete_files:
-        from core.uploads.manager import delete_media_file
+        from forge_mvc_files import delete_media_file
 
         deleted_files = delete_media_file(media["path"], root=root, variants=variants)
 

@@ -10,7 +10,9 @@ from forge_mvc_images.processing import (
     image_variant_relative_paths,
 )
 from forge_mvc_images.media_repository import list_media_for_entity
-from core.uploads.storage import normalize_media_path
+
+# FILES-IMAGES-REPOINT-001 (ADR-019) : storage d'upload dans forge-mvc-files.
+from forge_mvc_files.storage import normalize_media_path
 
 
 def media_url(path: str) -> str:
