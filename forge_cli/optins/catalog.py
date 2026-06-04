@@ -51,9 +51,9 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
         "stats", "forge-mvc-stats", "forge_mvc_stats", KIND_LIBRARY,
         "Agrégats et compteurs d'événements.",
     ),
-    "media": OptIn(
-        "media", "forge-mvc-media", "forge_mvc_media", KIND_LIBRARY,
-        "Gestion applicative des médias.",
+    "images": OptIn(
+        "images", "forge-mvc-images", "forge_mvc_images", KIND_LIBRARY,
+        "Traitement d'image (Pillow) + gestion applicative des médias (galerie, couverture).",
     ),
     "files": OptIn(
         "files", "forge-mvc-files", "forge_mvc_files", KIND_LIBRARY,

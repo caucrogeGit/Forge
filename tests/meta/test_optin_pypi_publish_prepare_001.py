@@ -33,7 +33,6 @@ _PUBLISHABLE = [
 
 _ALPHA_PREPARED = [
     "forge-mvc-mfa",
-    "forge-mvc-media",
 ]
 
 
@@ -125,7 +124,6 @@ class TestRootPyprojectNoMandatoryOptinDeps:
         "forge-mvc-rbac",
         "forge-mvc-workflow",
         "forge-mvc-stats",
-        "forge-mvc-media",
         "forge-mvc-mfa",
     ])
     def test_root_pyproject_no_mandatory_dep_on_optin(self, pkg):

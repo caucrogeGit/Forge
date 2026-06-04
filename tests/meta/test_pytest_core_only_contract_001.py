@@ -67,7 +67,6 @@ OPTIN_MODULES: dict[str, set[str]] = {
     "forge_mvc_rbac": set(),
     "forge_mvc_workflow": set(),
     "forge_mvc_stats": set(),
-    "forge_mvc_media": set(),
     # forge-mvc-images : opt-in propriétaire du traitement d'image (Pillow)
     # depuis IMAGES-MOVE-PROCESSING-001 (ADR-018). Pillow reste classé comme
     # module disponible en test (CORE_DEPS ci-dessus, cf. CORE-DROP-PILLOW-001) ;

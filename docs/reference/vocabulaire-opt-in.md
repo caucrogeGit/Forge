@@ -18,7 +18,7 @@ Trois mots, trois référents distincts, **zéro recouvrement** :
 Le **concept central**. Un opt-in est une capacité optionnelle, séparée du
 noyau minimal (principe §8). Forge en distribue six officiels :
 `forge-mvc-mfa`, `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`,
-`forge-mvc-media`, `forge-mvc-iot`.
+`forge-mvc-images`, `forge-mvc-iot`.
 
 Un opt-in a une **source** :
 

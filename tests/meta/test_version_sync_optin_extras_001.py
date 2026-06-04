@@ -25,7 +25,8 @@ ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 INSTALL_DOC = PROJECT_ROOT / "docs" / "install" / "index.md"
 
 _PUBLISHABLE_EXTRAS = ["rbac", "workflow", "stats"]
-_FORBIDDEN_EXTRAS = ["media", "mfa"]
+# REMOVE-MEDIA-PKG : forge-mvc-media supprimé (remplacé par forge-mvc-images).
+_FORBIDDEN_EXTRAS = ["mfa"]
 
 
 def _root_data() -> dict:
@@ -162,7 +163,7 @@ class TestCoreNoDependsOnOptins:
         )
 
 
-@pytest.mark.parametrize("pkg", ["forge-mvc-mfa", "forge-mvc-media"])
+@pytest.mark.parametrize("pkg", ["forge-mvc-mfa"])
 class TestAlphaPreparedClassifier:
     def test_no_private_classifier(self, pkg):
         """forge-mvc-mfa et forge-mvc-media ont retiré 'Private :: Do Not Upload' (requalifiés Alpha)."""

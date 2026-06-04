@@ -27,7 +27,6 @@ CORE_REPO_SHIM = PROJECT_ROOT / "core" / "uploads" / "media_repository.py"
 CORE_GALLERY_SHIM = PROJECT_ROOT / "core" / "uploads" / "media_gallery.py"
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
-README = PROJECT_ROOT / "packages" / "forge-mvc-media" / "README.md"
 
 # Helpers applicatifs qui doivent désormais être importés depuis forge_mvc_images
 _APPLICATIVE_HELPERS = [
@@ -176,23 +175,9 @@ class TestNoDependencyOnOptIn:
 
 
 class TestReadmeAndRoadmap:
-
-    def test_readme_mentions_crud_integration_ticket(self):
-        text = README.read_text(encoding="utf-8")
-        assert "MEDIA-CRUD-INTEGRATION-OPTIN-001" in text, (
-            "Le README de forge-mvc-media doit mentionner MEDIA-CRUD-INTEGRATION-OPTIN-001."
-        )
-
-    def test_readme_marks_crud_integration_as_livre(self):
-        text = README.read_text(encoding="utf-8")
-        # La dernière occurrence est celle de la table des tickets (source canonique)
-        idx = text.rfind("MEDIA-CRUD-INTEGRATION-OPTIN-001")
-        assert idx != -1
-        bloc = text[idx:idx + 120]
-        assert "livré" in bloc, (
-            "MEDIA-CRUD-INTEGRATION-OPTIN-001 doit être marqué 'livré' dans le README "
-            "(vérifier la table 'Tickets de référence')."
-        )
+    # REMOVE-MEDIA-PKG : le README de forge-mvc-media a été supprimé avec le
+    # paquet ; les tests qui le lisaient sont retirés. La roadmap reste la
+    # source canonique de l'historique des tickets.
 
     def test_roadmap_mentions_crud_integration_ticket(self):
         text = ROADMAP.read_text(encoding="utf-8")

@@ -234,7 +234,7 @@ l'ordre de la définition :
 - Fichiers multiples (`multiple: true`, `field: file`) → liste de liens.
 
 Les helpers réutilisés sont `get_cover_media` (éléments uniques) et
-`list_media_for_entity` (galeries), issus de `forge_mvc_media`. Aucun upload,
+`list_media_for_entity` (galeries), issus de `forge_mvc_images`. Aucun upload,
 aucune suppression, aucun formulaire ni aucun carrousel JavaScript n'est généré
 côté public.
 

@@ -5,13 +5,12 @@ galerie/couverture) depuis ``forge-mvc-media`` vers ``forge-mvc-images`` :
 
 - ``forge_mvc_images`` contient désormais ``media_repository`` (logique SQL) et
   ``media_gallery`` (galerie/couverture) et expose toute l'API applicative ;
-- ``forge-mvc-media`` ne garde que des **shims transitoires** qui réexportent
-  depuis ``forge_mvc_images`` (supprimés au ticket ``REMOVE-MEDIA-PKG-001``) ;
-- le shim reste fonctionnel : ``forge_mvc_media.X is forge_mvc_images.X``.
+- ``forge-mvc-media`` a été entièrement supprimé au ticket
+  ``REMOVE-MEDIA-PKG-001`` : plus de paquet, plus de shim, plus d'import
+  ``forge_mvc_media`` possible (voir ``TestMediaPackageRemoved``).
 
-Le shim garde la suite verte (les ~10 tests média fonctionnels et les
-générateurs CRUD continuent d'importer ``forge_mvc_media`` jusqu'aux tickets
-de rename CLI/docs).
+Les tests média fonctionnels et les générateurs CRUD importent désormais
+``forge_mvc_images``.
 """
 
 from __future__ import annotations
@@ -73,34 +72,20 @@ class TestApplicativeCodeInImages:
         assert not missing, f"forge_mvc_images.__all__ doit lister : {missing}"
 
 
-class TestMediaIsTransitionalShim:
-    """forge-mvc-media ne garde que des shims réexportant forge_mvc_images."""
+class TestMediaPackageRemoved:
+    """REMOVE-MEDIA-PKG : forge-mvc-media supprimé (remplacé par forge-mvc-images)."""
 
-    def test_no_sql_logic_left_in_media(self):
-        for mod in ("media_repository.py", "media_gallery.py"):
-            text = (MEDIA_PKG / mod).read_text(encoding="utf-8")
-            assert "forge_mvc_images" in text, (
-                f"{mod} doit réexporter depuis forge_mvc_images (shim)."
-            )
-            assert "INSERT INTO media" not in text, (
-                f"{mod} ne doit plus contenir la logique SQL (déplacée)."
-            )
-
-    @pytest.mark.parametrize("name", APPLICATIVE_API)
-    def test_shim_reexports_same_object(self, name: str):
-        import forge_mvc_images
-        import forge_mvc_media
-
-        assert getattr(forge_mvc_media, name) is getattr(forge_mvc_images, name), (
-            f"forge_mvc_media.{name} doit être le même objet que "
-            f"forge_mvc_images.{name} (shim transparent)."
+    def test_media_package_dir_absent(self):
+        assert not MEDIA_PKG.exists(), (
+            "packages/forge-mvc-media doit avoir été supprimé "
+            "(remplacé par forge-mvc-images)."
         )
 
-    def test_submodule_path_still_importable(self):
-        # Les imports `from forge_mvc_media.media_repository import ...` utilisés
-        # par le code généré et les tests existants restent valides.
-        from forge_mvc_media.media_repository import create_media_record  # noqa: F401
-        from forge_mvc_media.media_gallery import get_media_gallery  # noqa: F401
+    def test_forge_mvc_media_not_importable(self):
+        import importlib
+
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("forge_mvc_media")
 
 
 class TestCoreReexportsFromImages:

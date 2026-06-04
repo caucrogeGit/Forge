@@ -141,7 +141,7 @@ class TestOptInSection:
 
         # Les cinq opt-ins officiels doivent être mentionnés au moins par leur paquet.
         for pkg in ("forge-mvc-rbac", "forge-mvc-workflow", "forge-mvc-stats",
-                    "forge-mvc-mfa", "forge-mvc-media"):
+                    "forge-mvc-mfa", "forge-mvc-images"):
             assert pkg in section, (
                 f"La section Modules opt-in doit mentionner `{pkg}`."
             )

@@ -18,7 +18,7 @@ from forge_cli.optins.enable import SUPPORTED_OPTINS
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
 
-ALL = ["mfa", "rbac", "workflow", "stats", "media", "iot"]
+ALL = ["mfa", "rbac", "workflow", "stats", "images", "iot"]
 
 
 def _setup_enabled_iot(root: Path) -> Path:

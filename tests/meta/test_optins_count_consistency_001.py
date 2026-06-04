@@ -47,7 +47,7 @@ EXPECTED_OPTINS = [
     "forge-mvc-rbac",
     "forge-mvc-workflow",
     "forge-mvc-stats",
-    "forge-mvc-media",
+    "forge-mvc-images",
     "forge-mvc-iot",
 ]
 

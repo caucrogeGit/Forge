@@ -1,8 +1,8 @@
 """Garde-fou TESTS-OPTIN-IMPORTORSKIP-001.
 
 Forge Core doit rester autonome. Les opt-ins officiels
-(`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
-`forge-mvc-media`) ainsi que leurs dépendances directes (`pyotp` pour MFA)
+(`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`)
+leurs dépendances ainsi que leurs dépendances directes (`pyotp` pour MFA)
 peuvent être absents d'un environnement core-only — `pytest` doit alors
 ignorer proprement les tests qui en dépendent au lieu de produire une
 erreur de collecte.
@@ -49,7 +49,6 @@ _OPTIN_MODULES: frozenset[str] = frozenset({
     "forge_mvc_workflow",
     "forge_mvc_stats",
     "forge_mvc_mfa",
-    "forge_mvc_media",
     "pyotp",       # dépendance directe de forge-mvc-mfa (TOTP)
 })
 

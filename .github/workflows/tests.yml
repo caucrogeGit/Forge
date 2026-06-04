@@ -44,7 +44,7 @@ jobs:
 
       - name: Build optional distributions
         run: |
-          for pkg in packages/forge-mvc-mfa packages/forge-mvc-rbac packages/forge-mvc-workflow packages/forge-mvc-stats packages/forge-mvc-media packages/forge-mvc-images packages/forge-mvc-files packages/forge-mvc-iot packages/forge-mvc-video packages/forge-mvc-audio; do
+          for pkg in packages/forge-mvc-mfa packages/forge-mvc-rbac packages/forge-mvc-workflow packages/forge-mvc-stats packages/forge-mvc-images packages/forge-mvc-files packages/forge-mvc-iot packages/forge-mvc-video packages/forge-mvc-audio; do
             python -m build --no-isolation "$pkg"
           done
 

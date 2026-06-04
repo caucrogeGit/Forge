@@ -18,7 +18,7 @@ from forge_cli.optins.catalog import (
 )
 from forge_cli.optins.guidance import disable_guidance, enable_guidance
 
-LIBRARY = ["workflow", "stats", "media"]
+LIBRARY = ["workflow", "stats", "images", "files"]
 CROSSCUTTING = ["mfa", "rbac"]
 
 

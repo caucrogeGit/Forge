@@ -1087,7 +1087,7 @@ n'apparaissent pas dans `forge --help`).
 | Workflow — statuts, transitions | `forge-mvc-workflow` | aucune commande CLI dédiée — usage applicatif |
 | Stats — agrégats et événements | `forge-mvc-stats` | aucune commande CLI dédiée — usage applicatif |
 | MFA — TOTP, codes de récupération | `forge-mvc-mfa` | aucune commande CLI dédiée — voir profil `auth-mfa` dans [`forge new`](#forge-new) |
-| Media — helpers applicatifs upload | `forge-mvc-media` | aucune commande CLI dédiée — usage applicatif |
+| Media — helpers applicatifs upload | `forge-mvc-images` | aucune commande CLI dédiée — usage applicatif |
 | IoT — ingestion MQTT → SQL | `forge-mvc-iot` | [`iot:doctor`](#forge-iotdoctor), [`iot:init`](#forge-iotinit), [`iot:listen`](#forge-iotlisten), [`iot:simulate`](#forge-iotsimulate) |
 
 Installation type (depuis `1.0.0-beta.9`, tous publiés sur PyPI) :
@@ -1097,8 +1097,10 @@ pip install --pre forge-mvc-rbac
 pip install --pre forge-mvc-workflow
 pip install --pre forge-mvc-stats
 pip install --pre forge-mvc-mfa
-pip install --pre forge-mvc-media
 pip install --pre forge-mvc-iot
+
+# forge-mvc-images n'est pas encore publié : depuis les sources
+pip install -e packages/forge-mvc-images/
 ```
 
 Voir [Installation — Contrat d'installation des opt-ins](../install/index.md#contrat-dinstallation-des-opt-ins).

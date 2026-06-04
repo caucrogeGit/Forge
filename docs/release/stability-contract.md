@@ -16,7 +16,7 @@ Forge 1.x garantit la stabilité de son interface publique : commandes CLI docum
 
 Le contrat couvre également :
 
-- Les modules opt-in extraits (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-video` — Beta ; `forge-mvc-mfa`, `forge-mvc-media`, `forge-mvc-iot` — Alpha).
+- Les modules opt-in extraits (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-video` — Beta ; `forge-mvc-mfa`, `forge-mvc-images`, `forge-mvc-iot` — Alpha).
 - Le mécanisme de plugins pour étendre le contexte Jinja (`core.mvc.controller.register_jinja_context_provider`).
 - L'absence de dépendance nominale du core sur les modules opt-in.
 

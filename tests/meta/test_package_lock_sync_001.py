@@ -40,9 +40,11 @@ OPTIN_MODULES = [
     "forge-mvc-rbac",
     "forge-mvc-workflow",
     "forge-mvc-stats",
-    "forge-mvc-media",
+    "forge-mvc-images",
+    "forge-mvc-files",
     "forge-mvc-iot",
     "forge-mvc-video",
+    "forge-mvc-audio",
 ]
 
 
@@ -92,7 +94,7 @@ class TestOptinModulesDeclareForgeMvc:
     def test_optin_has_forge_mvc_dependency(self, module: str):
         path = PROJECT_ROOT / "packages" / module / "pyproject.toml"
         deps = _get_dependencies(path)
-        forge_mvc_deps = [d for d in deps if "forge-mvc" in d]
+        forge_mvc_deps = [d for d in deps if re.match(r"forge-mvc(?:[><=~!]|$)", d.strip())]
         assert forge_mvc_deps, (
             f"{module}/pyproject.toml ne déclare pas forge-mvc dans ses "
             f"dependencies. Sans cette déclaration, 'pip install {module}' "
@@ -112,7 +114,7 @@ class TestVersionAlignment:
         root_version = _get_version(ROOT_PYPROJECT)
         path = PROJECT_ROOT / "packages" / module / "pyproject.toml"
         deps = _get_dependencies(path)
-        forge_mvc_deps = [d for d in deps if "forge-mvc" in d]
+        forge_mvc_deps = [d for d in deps if re.match(r"forge-mvc(?:[><=~!]|$)", d.strip())]
         assert forge_mvc_deps, (
             f"{module}/pyproject.toml ne déclare pas forge-mvc."
         )

@@ -1204,7 +1204,7 @@ la bibliothèque standard `mimetypes`, avec fallback `application/octet-stream`.
 Créer et lister des métadonnées `Media` :
 
 ```python
-from forge_mvc_media import create_media_record, list_media_for_entity
+from forge_mvc_images import create_media_record, list_media_for_entity
 
 media_id = create_media_record(
     entity_name="hebergement",
@@ -1227,7 +1227,7 @@ par `role`, et trie par `position ASC`, puis `id ASC`.
 Supprimer un média complet :
 
 ```python
-from forge_mvc_media import delete_media
+from forge_mvc_images import delete_media
 
 result = delete_media(
     media_id,
@@ -1244,7 +1244,7 @@ accidentelle.
 Récupérer une galerie ordonnée :
 
 ```python
-from forge_mvc_media import get_media_gallery
+from forge_mvc_images import get_media_gallery
 
 gallery = get_media_gallery("hebergement", 12)
 ```
@@ -1257,7 +1257,7 @@ Forge ne génère pas de galerie HTML dans cette API.
 Récupérer l'image de couverture :
 
 ```python
-from forge_mvc_media import get_cover_media
+from forge_mvc_images import get_cover_media
 
 cover = get_cover_media("hebergement", 12)
 ```
@@ -1376,25 +1376,25 @@ directement le système de fichiers. Exemple : `Media.path = "images/photo.png"`
 devient `/media/images/photo.png`. Les variantes sont accessibles si elles
 existent, par exemple `/media/images/medium/photo.png`.
 
-Les métadonnées SQL sont manipulées avec l'API `forge_mvc_media` :
+Les métadonnées SQL sont manipulées avec l'API `forge_mvc_images` :
 `create_media_record()`, `get_media_record()`, `list_media_for_entity()` et
 `delete_media_record()`. La suppression SQL ne supprime pas les fichiers physiques ;
 utiliser `delete_media_file()` (core) séparément lorsque c'est voulu.
 
-`attach_media_to_entity()` (dans `forge_mvc_media`) relie un `SavedUpload` à une
+`attach_media_to_entity()` (dans `forge_mvc_images`) relie un `SavedUpload` à une
 entité métier en créant une ligne `media`. Elle ne déplace pas le fichier, ne
 régénère pas les variantes et ne déclenche aucune suppression automatique.
 
-`delete_media(media_id, delete_files=True, variants=True)` (dans `forge_mvc_media`)
+`delete_media(media_id, delete_files=True, variants=True)` (dans `forge_mvc_images`)
 supprime d'abord les fichiers demandés, puis la ligne SQL. Si le chemin stocké est
 dangereux, la suppression est refusée et la ligne SQL n'est pas supprimée silencieusement.
 
-`get_media_gallery("hebergement", 12)` (dans `forge_mvc_media`) retourne les médias
+`get_media_gallery("hebergement", 12)` (dans `forge_mvc_images`) retourne les médias
 `role="gallery"` triés par `position`, puis `id`, avec les URLs locales `/media/...`.
 Les images reçoivent aussi les URLs `medium` et `thumbnail` ; les documents non-image
 n'ont pas de variantes inventées.
 
-`get_cover_media("hebergement", 12)` (dans `forge_mvc_media`) retourne le premier
+`get_cover_media("hebergement", 12)` (dans `forge_mvc_images`) retourne le premier
 média `role="cover"` trié par `position`, puis `id`. Le fallback vers la galerie est
 optionnel via `fallback_to_gallery=True` et reste une aide de lecture, sans génération
 HTML ni modification des enregistrements.
@@ -1424,18 +1424,18 @@ Les variantes d'images (`thumbnail`, `medium`), l'intégration `FileField` / `Im
 
 </details>
 
-<details markdown="1" id="forgemvcmedia">
-<summary><code>forge_mvc_media</code> - Helpers applicatifs médias (opt-in)</summary>
+<details markdown="1" id="forgemvcimages">
+<summary><code>forge_mvc_images</code> - Helpers applicatifs médias (opt-in)</summary>
 
-`forge_mvc_media` est un module opt-in (`forge-mvc-media`) qui fournit les
-helpers applicatifs liés à la table `media`. Il est publié sur PyPI depuis
-`1.0.0-beta.9` :
+`forge_mvc_images` est un module opt-in (`forge-mvc-images`) qui fournit les
+helpers applicatifs liés à la table `media`. Il n'est pas encore publié sur
+PyPI (cible release beta.13) — installation depuis les sources :
 
 ```bash
-pip install --pre forge-mvc-media
+pip install -e packages/forge-mvc-images/
 ```
 
-Le module reste opt-in : le core Forge ne dépend pas de `forge-mvc-media`.
+Le module reste opt-in : le core Forge ne dépend pas de `forge-mvc-images`.
 L'API applicative reste bêta — voir [Limites](../deployment/production-limits.md).
 
 Les nouveaux fichiers générés par `forge make:crud --media` importent depuis ce module.
@@ -1465,7 +1465,7 @@ Les nouveaux fichiers générés par `forge make:crud --media` importent depuis 
 
 Les anciens imports `from core.uploads import attach_media_to_entity` ne sont
 plus supportés depuis `MEDIA-SHIMS-REMOVE-001`. L'import correct est
-`from forge_mvc_media import ...`.
+`from forge_mvc_images import ...`.
 
 </details>
 
@@ -2169,7 +2169,7 @@ aucune colonne supplémentaire.
 | `field: file`, `multiple: true` | liste de liens |
 
 Le contrôleur appelle `get_cover_media` pour les éléments uniques et
-`list_media_for_entity` pour les galeries. Les imports `forge_mvc_media` sont
+`list_media_for_entity` pour les galeries. Les imports `forge_mvc_images` sont
 ajoutés automatiquement pour les helpers applicatifs. La génération est non destructive : un
 contrôleur existant est complété, jamais écrasé.
 
@@ -3036,12 +3036,13 @@ Chaque opt-in est livré comme package PyPI distinct sous le namespace
 | RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../features/rbac.md) |
 | Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow.md](workflow.md) |
 | Statistiques | `forge-mvc-stats` | `[stats]` | [stats.md](stats.md) |
-| Médias applicatifs | `forge-mvc-media` | — (installer directement) | [media.md](../features/media.md) |
+| Médias applicatifs | `forge-mvc-images` | — (installer directement) | [media.md](../features/media.md) |
 
-Tous les opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`.
-`forge-mvc[mfa]` et `forge-mvc[media]` ne sont pas définis comme extras du
-core — installer les paquets directement avec `pip install --pre forge-mvc-mfa`
-ou `pip install --pre forge-mvc-media`.
+La plupart des opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`
+(`forge-mvc-images` cible la release beta.13). `forge-mvc[mfa]` et
+`forge-mvc[images]` ne sont pas définis comme extras du core — installer les
+paquets directement avec `pip install --pre forge-mvc-mfa`, ou depuis les
+sources avec `pip install -e packages/forge-mvc-images/`.
 
 ### MFA — `forge-mvc-mfa`
 
@@ -3088,15 +3089,15 @@ calculés à la demande.
 
 Référence détaillée : [stats.md](stats.md).
 
-### Médias applicatifs — `forge-mvc-media`
+### Médias applicatifs — `forge-mvc-images`
 
 Repository, galerie et helpers applicatifs liés à la table `media`.
 
 ```bash
-pip install --pre forge-mvc-media
+pip install -e packages/forge-mvc-images/
 ```
 
-> Publié sur PyPI depuis `1.0.0-beta.9` (API encore bêta — voir
+> Pas encore publié sur PyPI (cible release beta.13 — API encore bêta, voir
 > [Limites](../deployment/production-limits.md)). Les générateurs `make:crud --media` et
 > `make:public:list` importent depuis ce module.
 > Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).

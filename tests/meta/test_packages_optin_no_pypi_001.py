@@ -20,7 +20,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 _ALPHA_PREPARED = [
     "forge-mvc-mfa",
-    "forge-mvc-media",
 ]
 
 _ALL_OPTIN_PACKAGES = [
@@ -28,7 +27,6 @@ _ALL_OPTIN_PACKAGES = [
     "forge-mvc-rbac",
     "forge-mvc-workflow",
     "forge-mvc-stats",
-    "forge-mvc-media",
 ]
 
 

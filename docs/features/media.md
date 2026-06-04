@@ -2,22 +2,18 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-!!! info "Statut : opt-in officiel publié sur PyPI, API encore bêta"
-    `forge-mvc-media` est publié sur PyPI depuis `1.0.0-beta.9`. L'API
-    applicative reste bêta — voir [Limites](../deployment/production-limits.md) avant
-    déploiement en production.
-
-    Installation :
-
-    ```bash
-    pip install --pre forge-mvc-media
-    ```
+!!! info "Statut : opt-in officiel, non encore publié sur PyPI, API encore bêta"
+    `forge-mvc-images` (qui détient la couche applicative média) n'est pas
+    encore publié sur PyPI (cible release beta.13). L'API applicative reste
+    bêta — voir [Limites](../deployment/production-limits.md) avant déploiement
+    en production. Installation depuis les sources : voir
+    [section ci-dessous](#installation-depuis-les-sources).
 
     Le module reste opt-in : le core Forge ne dépend pas de
-    `forge-mvc-media`.
+    `forge-mvc-images`.
 
 Forge sépare l'**upload générique** (opt-in `forge-mvc-files`, ADR-019) des
-helpers applicatifs médias (`forge_mvc_media`). L'upload (écriture, storage,
+helpers applicatifs médias (`forge_mvc_images`). L'upload (écriture, storage,
 service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure
 (extension/MIME/taille) reste dans le core (`core.forms`).
 
@@ -33,23 +29,23 @@ service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure
 - validation MIME, stockage contrôlé, protection path traversal
 - rate limiting upload
 
-**`forge_mvc_media` — helpers applicatifs** (opt-in `forge-mvc-media`) :
+**`forge_mvc_images` — helpers applicatifs** (opt-in `forge-mvc-images`) :
 
 - `attach_media_to_entity`, `create_media_record`, `get_media_record`
 - `list_media_for_entity`, `update_media_alt_text`, `update_media_position`
 - `delete_media`, `delete_media_record`
 - `get_media_gallery`, `get_cover_media`, `media_url`
 
-Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus supportés depuis `MEDIA-SHIMS-REMOVE-001`. Les fichiers `core/uploads/media_repository.py` et `core/uploads/media_gallery.py` ont été supprimés. Utiliser `from forge_mvc_media import ...`.
+Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus supportés depuis `MEDIA-SHIMS-REMOVE-001`. Les fichiers `core/uploads/media_repository.py` et `core/uploads/media_gallery.py` ont été supprimés. Utiliser `from forge_mvc_images import ...`.
 
 ## Installation depuis les sources
 
-`forge-mvc-media` n'étant pas sur PyPI, l'installation se fait depuis le dépôt Forge :
+`forge-mvc-images` n'étant pas sur PyPI, l'installation se fait depuis le dépôt Forge :
 
 ```bash
 git clone https://github.com/caucrogeGit/Forge.git
 cd Forge
-pip install -e packages/forge-mvc-media/
+pip install -e packages/forge-mvc-images/
 ```
 
 L'option `-e` permet des modifications locales sans réinstallation.
@@ -265,7 +261,7 @@ stocké à une entité applicative. Elle ne contient pas de logique métier :
 `entity_name` indique le type d'entité liée, `entity_id` son identifiant.
 
 ```python
-from forge_mvc_media import create_media_record, list_media_for_entity
+from forge_mvc_images import create_media_record, list_media_for_entity
 
 media_id = create_media_record(
     entity_name="hebergement",
@@ -289,7 +285,7 @@ La suppression des métadonnées SQL est volontairement séparée de la suppress
 des fichiers :
 
 ```python
-from forge_mvc_media import delete_media, delete_media_record
+from forge_mvc_images import delete_media, delete_media_record
 from forge_mvc_files import delete_media_file
 
 delete_media_record(media_id)          # supprime seulement la ligne SQL
@@ -380,7 +376,7 @@ Forge ne génère pas de galerie HTML dans cette étape : l'API retourne des
 dictionnaires simples, prêts à être utilisés par l'application.
 
 ```python
-from forge_mvc_media import get_media_gallery
+from forge_mvc_images import get_media_gallery
 
 gallery = get_media_gallery("hebergement", 12)
 ```
@@ -418,7 +414,7 @@ Elle sert de couverture pour une carte, une fiche ou une future page publique,
 sans imposer de logique métier.
 
 ```python
-from forge_mvc_media import get_cover_media
+from forge_mvc_images import get_cover_media
 
 cover = get_cover_media("hebergement", 12)
 
@@ -693,7 +689,7 @@ Avec l'entité ci-dessous, `make:crud` génère la chaîne complète.
 
 Les garanties suivantes sont assurées par le storage de `forge-mvc-files`
 (`forge_mvc_files/storage.py`, ADR-019) et s'appliquent à l'ensemble du module
-`forge-mvc-media`/`forge-mvc-images` qui délègue toutes les opérations sur les chemins.
+`forge-mvc-images` qui délègue toutes les opérations sur les chemins.
 
 | Menace | Garantie | Mécanisme |
 |---|---|---|

@@ -200,7 +200,7 @@ class TestOptins:
             "forge-mvc-rbac",
             "forge-mvc-workflow",
             "forge-mvc-stats",
-            "forge-mvc-media",
+            "forge-mvc-images",
         ]:
             assert module in text, f"Module opt-in manquant : {module}"
 

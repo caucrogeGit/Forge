@@ -137,10 +137,11 @@ pas installées par défaut. Elles sont tirées via les extras du package
 
 ### Installation
 
-!!! info "Tous les opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`"
+!!! info "La plupart des opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`"
     `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) ainsi que
-    `forge-mvc-mfa` (Alpha) et `forge-mvc-media` (Bêta — API encore bêta) sont
-    publiés sur PyPI et synchronisés avec le core.
+    `forge-mvc-mfa` (Alpha) sont publiés sur PyPI et synchronisés avec le core.
+    `forge-mvc-images` (Bêta — API encore bêta) cible la release beta.13 et
+    s'installe pour l'instant depuis les sources.
 
     Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
 
@@ -152,8 +153,10 @@ pip install --pre forge-mvc \
                   forge-mvc-rbac \
                   forge-mvc-workflow \
                   forge-mvc-stats \
-                  forge-mvc-mfa \
-                  forge-mvc-media
+                  forge-mvc-mfa
+
+# forge-mvc-images n'est pas encore publié : depuis les sources
+pip install -e packages/forge-mvc-images/
 
 # Mode éditable depuis les sources (contribution Forge)
 git clone --branch {{forge_tag}} https://github.com/caucrogeGit/Forge.git

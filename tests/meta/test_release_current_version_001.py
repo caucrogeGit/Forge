@@ -68,8 +68,8 @@ class TestAllVersionsBumped:
     @pytest.mark.parametrize("module", [
         "forge-mvc-mfa", "forge-mvc-rbac",
         "forge-mvc-workflow", "forge-mvc-stats",
-        "forge-mvc-media", "forge-mvc-iot",
-        "forge-mvc-video",
+        "forge-mvc-images", "forge-mvc-files",
+        "forge-mvc-iot", "forge-mvc-video", "forge-mvc-audio",
     ])
     def test_optin_module_version(self, module: str):
         expected = _current_version()
@@ -99,7 +99,7 @@ class TestAllVersionsBumped:
 
     @pytest.mark.parametrize("module", [
         "forge-mvc-rbac", "forge-mvc-workflow", "forge-mvc-stats",
-        "forge-mvc-iot", "forge-mvc-media", "forge-mvc-video",
+        "forge-mvc-images", "forge-mvc-iot", "forge-mvc-video",
     ])
     def test_publishable_optin_forge_mvc_dependency_declared(self, module: str):
         """Les opt-ins publiables déclarent forge-mvc avec le plancher unifié
