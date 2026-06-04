@@ -1,8 +1,11 @@
-"""Forge MVC Media — module opt-in pour la gestion applicative des médias.
+"""Forge MVC Media — shim transitoire vers forge-mvc-images.
 
-Contient le repository SQL et les helpers de galerie extraits depuis core/uploads/.
-Les briques génériques (upload sécurisé, validation, storage, images, rate limit)
-restent dans core/uploads/ et ne nécessitent pas ce module opt-in.
+IMAGES-MOVE-APPLICATIVE-001 (ADR-018) : le repository SQL et les helpers de
+galerie ont été rapatriés dans ``forge_mvc_images`` (unique propriétaire de tout
+l'image). Ce paquet ne fait plus que réexporter cette API pour préserver les
+imports ``from forge_mvc_media import ...`` pendant la migration ; il sera
+**supprimé** au ticket ``REMOVE-MEDIA-PKG-001``. Nouveau code : importer depuis
+``forge_mvc_images``.
 """
 
 __version__ = "1.0.0b13"

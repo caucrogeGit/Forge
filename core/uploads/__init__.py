@@ -24,23 +24,22 @@ from core.uploads.storage import (
     normalize_media_path,
 )
 
-# Re-exports opt-in — fonctions applicatives médias (MEDIA-SHIMS-REMOVE-001).
-# Disponibles si forge-mvc-media est installé, silencieux sinon.
+# Re-exports opt-in — fonctions applicatives médias. Détenues par
+# forge-mvc-images depuis IMAGES-MOVE-APPLICATIVE-001 (ADR-018). Disponibles si
+# l'opt-in est installé, silencieux sinon (le core ne dépend pas de l'opt-in).
 try:
-    from forge_mvc_media.media_repository import (  # noqa: F401
+    from forge_mvc_images import (  # noqa: F401
         attach_media_to_entity,
         create_media_record,
         delete_media,
         delete_media_record,
-        get_media_record,
-        list_media_for_entity,
-        update_media_alt_text,
-        update_media_position,
-    )
-    from forge_mvc_media.media_gallery import (  # noqa: F401
         get_cover_media,
         get_media_gallery,
+        get_media_record,
+        list_media_for_entity,
         media_url,
+        update_media_alt_text,
+        update_media_position,
     )
 except ImportError:
     pass

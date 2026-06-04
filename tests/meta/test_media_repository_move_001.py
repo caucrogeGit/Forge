@@ -17,34 +17,56 @@ CORE_REPO = PROJECT_ROOT / "core" / "uploads" / "media_repository.py"
 CORE_GALLERY = PROJECT_ROOT / "core" / "uploads" / "media_gallery.py"
 OPT_REPO = PROJECT_ROOT / "packages" / "forge-mvc-media" / "forge_mvc_media" / "media_repository.py"
 OPT_GALLERY = PROJECT_ROOT / "packages" / "forge-mvc-media" / "forge_mvc_media" / "media_gallery.py"
+# IMAGES-MOVE-APPLICATIVE-001 (ADR-018) : le vrai code applicatif a été rapatrié
+# dans forge_mvc_images ; forge_mvc_media n'en garde que des shims transitoires.
+IMG_REPO = PROJECT_ROOT / "packages" / "forge-mvc-images" / "forge_mvc_images" / "media_repository.py"
+IMG_GALLERY = PROJECT_ROOT / "packages" / "forge-mvc-images" / "forge_mvc_images" / "media_gallery.py"
 README = PROJECT_ROOT / "packages" / "forge-mvc-media" / "README.md"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 
 
 class TestOptInContainsMovedCode:
+    """Le code applicatif vit désormais dans forge_mvc_images (ADR-018).
 
-    def test_media_repository_in_forge_mvc_media(self):
-        assert OPT_REPO.exists(), (
-            "forge_mvc_media/media_repository.py doit exister dans le package opt-in."
+    IMAGES-MOVE-APPLICATIVE-001 a rapatrié repository + galerie depuis
+    forge-mvc-media vers forge-mvc-images. forge-mvc-media ne garde que des
+    shims transitoires (supprimés au ticket REMOVE-MEDIA-PKG-001).
+    """
+
+    def test_media_repository_in_forge_mvc_images(self):
+        assert IMG_REPO.exists(), (
+            "forge_mvc_images/media_repository.py doit exister (code rapatrié)."
         )
 
-    def test_media_gallery_in_forge_mvc_media(self):
-        assert OPT_GALLERY.exists(), (
-            "forge_mvc_media/media_gallery.py doit exister dans le package opt-in."
+    def test_media_gallery_in_forge_mvc_images(self):
+        assert IMG_GALLERY.exists(), (
+            "forge_mvc_images/media_gallery.py doit exister (code rapatrié)."
         )
 
     def test_media_repository_has_sql_logic(self):
-        text = OPT_REPO.read_text(encoding="utf-8")
+        text = IMG_REPO.read_text(encoding="utf-8")
         assert "INSERT INTO media" in text, (
-            "forge_mvc_media/media_repository.py doit contenir la logique SQL."
+            "forge_mvc_images/media_repository.py doit contenir la logique SQL."
         )
 
     def test_media_gallery_has_gallery_logic(self):
-        text = OPT_GALLERY.read_text(encoding="utf-8")
-        assert "get_media_gallery" in text, (
-            "forge_mvc_media/media_gallery.py doit contenir la logique de galerie."
+        text = IMG_GALLERY.read_text(encoding="utf-8")
+        assert "def get_media_gallery" in text, (
+            "forge_mvc_images/media_gallery.py doit contenir la logique de galerie."
         )
+
+    def test_forge_mvc_media_files_are_shims(self):
+        # Les fichiers forge_mvc_media subsistent comme shims transitoires :
+        # ils réexportent depuis forge_mvc_images, sans logique propre.
+        for shim in (OPT_REPO, OPT_GALLERY):
+            text = shim.read_text(encoding="utf-8")
+            assert "forge_mvc_images" in text, (
+                f"{shim.name} doit réexporter depuis forge_mvc_images (shim)."
+            )
+            assert "INSERT INTO media" not in text, (
+                f"{shim.name} ne doit plus contenir de logique SQL (déplacée)."
+            )
 
 
 class TestCoreFilesAbsent:

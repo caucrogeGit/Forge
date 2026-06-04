@@ -12,10 +12,12 @@ suppression sèche, pas d'alias). Il deviendra l'unique propriétaire de :
   ``IMAGES-MOVE-APPLICATIVE-001``) : repository SQL, galerie, couverture,
   ``alt_text``.
 
-Depuis ``IMAGES-MOVE-PROCESSING-001``, le **traitement d'image** est déplacé ici
-(``processing``) : Pillow a quitté le core. La couche applicative (repository,
-galerie) sera rapatriée par ``IMAGES-MOVE-APPLICATIVE-001``. Voir
-``docs/adr/018-image-module-extraction.md``.
+Depuis ``IMAGES-MOVE-PROCESSING-001`` le **traitement d'image** vit ici
+(``processing``) ; depuis ``IMAGES-MOVE-APPLICATIVE-001`` la **couche médias
+applicative** (``media_repository``, ``media_gallery``) y est rapatriée :
+``forge_mvc_images`` est désormais l'unique propriétaire de tout l'image.
+``forge-mvc-media`` n'est plus qu'un shim transitoire (supprimé au ticket
+``REMOVE-MEDIA-PKG-001``). Voir ``docs/adr/018-image-module-extraction.md``.
 """
 
 __version__ = "1.0.0b13"
@@ -31,8 +33,24 @@ from forge_mvc_images.processing import (
     save_image,
     verify_image_content,
 )
+from forge_mvc_images.media_repository import (
+    attach_media_to_entity,
+    create_media_record,
+    delete_media,
+    delete_media_record,
+    get_media_record,
+    list_media_for_entity,
+    update_media_alt_text,
+    update_media_position,
+)
+from forge_mvc_images.media_gallery import (
+    get_cover_media,
+    get_media_gallery,
+    media_url,
+)
 
 __all__ = [
+    # Traitement d'image (IMAGES-MOVE-PROCESSING-001)
     "ALLOWED_IMAGE_EXTENSIONS",
     "ALLOWED_IMAGE_MIME_TYPES",
     "IMAGE_VARIANT_SIZES",
@@ -42,4 +60,16 @@ __all__ = [
     "image_variant_relative_paths",
     "save_image",
     "verify_image_content",
+    # Couche médias applicative (IMAGES-MOVE-APPLICATIVE-001)
+    "attach_media_to_entity",
+    "create_media_record",
+    "delete_media",
+    "delete_media_record",
+    "get_cover_media",
+    "get_media_gallery",
+    "get_media_record",
+    "list_media_for_entity",
+    "media_url",
+    "update_media_alt_text",
+    "update_media_position",
 ]
