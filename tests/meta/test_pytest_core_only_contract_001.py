@@ -86,6 +86,9 @@ OPTIN_MODULES: dict[str, set[str]] = {
     # pytest.importorskip("forge_mvc_audio"). ffmpeg/ffprobe ne sont jamais
     # importés (binaires système, runners injectés), donc pas d'extra à lister.
     "forge_mvc_audio": set(),
+    # forge-mvc-files : opt-in propriétaire de l'upload générique (ADR-019).
+    # Squelette à ce stade ; ses tests gardent l'import via importorskip.
+    "forge_mvc_files": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

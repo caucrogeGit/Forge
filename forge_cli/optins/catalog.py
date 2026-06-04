@@ -55,6 +55,10 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
         "media", "forge-mvc-media", "forge_mvc_media", KIND_LIBRARY,
         "Gestion applicative des médias.",
     ),
+    "files": OptIn(
+        "files", "forge-mvc-files", "forge_mvc_files", KIND_LIBRARY,
+        "Upload générique : écriture sécurisée, storage, service de fichiers, rate-limit.",
+    ),
     "iot": OptIn(
         "iot", "forge-mvc-iot", "forge_mvc_iot", KIND_ROUTE,
         "Réception/exposition de données IoT (MQTT, stockage, API HTTP).",

@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc-files"
+version = "1.0.0b13"
+description = "Forge Files — module opt-in propriétaire de l'upload générique : écriture sécurisée, storage anti-traversal, service de fichiers, rate-limit. Extrait du core (ADR-019)."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+authors = [
+    { name = "Roger Lequette" },
+]
+license = "LicenseRef-Forge-Proprietary"
+keywords = ["python", "mvc", "forge", "files", "upload", "storage"]
+dependencies = [
+    "forge-mvc>=1.0.0b13,<2",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://forgemvc.com/docs/forge/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forge_mvc_files*"]
