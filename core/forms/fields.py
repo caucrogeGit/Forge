@@ -6,8 +6,15 @@ from decimal import Decimal, InvalidOperation
 
 from core.forms.exceptions import ValidationError
 from core.slug import is_valid_slug
-from core.uploads.exceptions import UploadError
-from core.uploads.validators import validate_extension, validate_mime_type, validate_size
+
+# FILES-VALIDATORS-KEEP-001 (ADR-019) : la validation de fichier (pure) reste
+# dans le core mais hors de core/uploads/ (qui part vers forge-mvc-files).
+from core.forms.upload_exceptions import UploadError
+from core.forms.upload_validation import (
+    validate_extension,
+    validate_mime_type,
+    validate_size,
+)
 
 
 EMPTY_VALUES = (None, "")

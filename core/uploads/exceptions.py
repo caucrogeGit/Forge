@@ -1,18 +1,26 @@
-class UploadError(Exception):
-    """Erreur de base pour le service d'upload Forge."""
+"""Shim transitoire — exceptions d'upload relocalisées dans core/forms.
 
+FILES-VALIDATORS-KEEP-001 (ADR-019) : la hiérarchie ``UploadError`` reste dans
+le core mais a été déplacée vers ``core.forms.upload_exceptions`` (hors de
+``core/uploads/``, qui partira vers ``forge-mvc-files``). Ce module réexporte
+pour ne pas casser les imports ``from core.uploads.exceptions import ...``
+pendant la migration ; il sera supprimé avec ``core/uploads/`` au ticket
+``CORE-DROP-UPLOADS-001``. Nouveau code : importer depuis
+``core.forms.upload_exceptions``.
+"""
 
-class UploadTooLargeError(UploadError):
-    """Le fichier depasse la taille maximale autorisee."""
+from core.forms.upload_exceptions import (
+    UploadError,
+    UploadInvalidExtensionError,
+    UploadInvalidMimeTypeError,
+    UploadStorageError,
+    UploadTooLargeError,
+)
 
-
-class UploadInvalidExtensionError(UploadError):
-    """L'extension du fichier n'est pas autorisee."""
-
-
-class UploadInvalidMimeTypeError(UploadError):
-    """Le type MIME du fichier n'est pas autorise."""
-
-
-class UploadStorageError(UploadError):
-    """Le fichier ne peut pas etre ecrit ou supprime proprement."""
+__all__ = [
+    "UploadError",
+    "UploadInvalidExtensionError",
+    "UploadInvalidMimeTypeError",
+    "UploadStorageError",
+    "UploadTooLargeError",
+]

@@ -1,77 +1,31 @@
-from __future__ import annotations
+"""Shim transitoire — validators d'upload relocalisés dans core/forms.
 
-from pathlib import Path
+FILES-VALIDATORS-KEEP-001 (ADR-019) : les validators **purs**
+(``validate_extension``/``mime_type``/``size``, ``validate_upload_metadata``…)
+restent dans le core mais ont été déplacés vers ``core.forms.upload_validation``
+(hors de ``core/uploads/``, qui partira vers ``forge-mvc-files``). Ce module
+réexporte pour ne pas casser les imports ``from core.uploads.validators import
+...`` pendant la migration ; il sera supprimé avec ``core/uploads/`` au ticket
+``CORE-DROP-UPLOADS-001``. Nouveau code : importer depuis
+``core.forms.upload_validation``.
+"""
 
-from core.uploads.exceptions import (
-    UploadInvalidExtensionError,
-    UploadInvalidMimeTypeError,
-    UploadStorageError,
-    UploadTooLargeError,
+from core.forms.upload_validation import (
+    filename_extension,
+    normalize_extensions,
+    validate_extension,
+    validate_filename,
+    validate_mime_type,
+    validate_size,
+    validate_upload_metadata,
 )
 
-
-def normalize_extensions(extensions) -> set[str]:
-    """Retourne les extensions autorisees sous forme normalisee, sans point."""
-    return {
-        str(ext).strip().lower().lstrip(".")
-        for ext in (extensions or [])
-        if str(ext).strip()
-    }
-
-
-def filename_extension(filename: str) -> str:
-    return Path(filename).suffix.lower().lstrip(".")
-
-
-def validate_filename(filename: str | None) -> str:
-    filename = (filename or "").strip()
-    if not filename:
-        raise UploadStorageError("Nom de fichier vide.")
-    return filename
-
-
-def validate_extension(filename: str, allowed_extensions) -> str:
-    allowed = normalize_extensions(allowed_extensions)
-    extension = filename_extension(filename)
-    if not extension or extension not in allowed:
-        raise UploadInvalidExtensionError(
-            f"Extension non autorisee : {extension or '<aucune>'}."
-        )
-    return extension
-
-
-def validate_size(size: int, max_size: int) -> None:
-    if size < 0:
-        raise UploadStorageError("Taille de fichier invalide.")
-    if size > int(max_size):
-        raise UploadTooLargeError(
-            f"Fichier trop volumineux : {size} octets, maximum {int(max_size)}."
-        )
-
-
-def validate_mime_type(mime_type: str | None, allowed_mime_types) -> None:
-    allowed = {str(m).strip().lower() for m in (allowed_mime_types or []) if str(m).strip()}
-    if not allowed:
-        return
-    if not mime_type:
-        raise UploadInvalidMimeTypeError("Type MIME absent — fichier refusé.")
-    normalized = mime_type.split(";", 1)[0].strip().lower()
-    if normalized not in allowed:
-        raise UploadInvalidMimeTypeError(f"Type MIME non autorise : {normalized}.")
-
-
-def validate_upload_metadata(
-    *,
-    filename: str | None,
-    size: int,
-    mime_type: str | None,
-    allowed_extensions,
-    allowed_mime_types,
-    max_size: int,
-) -> str:
-    """Valide les metadonnees d'un fichier et retourne son extension normalisee."""
-    safe_name = validate_filename(filename)
-    extension = validate_extension(safe_name, allowed_extensions)
-    validate_size(size, max_size)
-    validate_mime_type(mime_type, allowed_mime_types)
-    return extension
+__all__ = [
+    "filename_extension",
+    "normalize_extensions",
+    "validate_extension",
+    "validate_filename",
+    "validate_mime_type",
+    "validate_size",
+    "validate_upload_metadata",
+]
