@@ -63,8 +63,17 @@ def clear_rate_limits():
 
 @pytest.fixture(autouse=True)
 def clear_upload_rate_limits():
-    """Vide le compteur d'uploads entre chaque test."""
-    from core.uploads import rate_limit as _rl
+    """Vide le compteur d'uploads entre chaque test.
+
+    FILES-MOVE-PIPELINE-001 (ADR-019) : le rate-limit d'upload vit désormais dans
+    forge_mvc_files (paquet opt-in résolu par le conftest racine). On vide le
+    compteur du **vrai** module ; absent → no-op (core sans l'opt-in installé).
+    """
+    try:
+        from forge_mvc_files import rate_limit as _rl
+    except ImportError:
+        yield
+        return
     _rl._compteurs.clear()
     yield
     _rl._compteurs.clear()

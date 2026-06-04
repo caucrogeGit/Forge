@@ -19,7 +19,11 @@ from types import SimpleNamespace
 import pytest
 
 import core.forge as forge
-import core.uploads.rate_limit as _rl
+pytest.importorskip("forge_mvc_files")
+# FILES-MOVE-PIPELINE-001 (ADR-019) : le rate-limit d'upload vit dans l'opt-in.
+# On importe le VRAI module (et non le shim core) pour que les monkeypatch des
+# constantes soient pris en compte par les fonctions.
+import forge_mvc_files.rate_limit as _rl
 from core.application import Application
 from core.http.request import Request
 from core.http.response import Response

@@ -22,5 +22,8 @@ ruff>=0.4
 -e ./packages/forge-mvc-workflow
 -e ./packages/forge-mvc-stats
 -e ./packages/forge-mvc-media
+-e ./packages/forge-mvc-images
+-e ./packages/forge-mvc-files
 -e ./packages/forge-mvc-iot
 -e ./packages/forge-mvc-video
+-e ./packages/forge-mvc-audio

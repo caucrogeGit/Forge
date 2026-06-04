@@ -68,8 +68,13 @@ class TestCoreIndependence:
             assert "forge-mvc-files" not in dep
 
     def test_no_core_module_hard_imports_files(self):
+        # FILES-MOVE-PIPELINE-001 : les shims transitoires de core/uploads/
+        # réexportent forge_mvc_files (et sont supprimés au ticket 7). Le core
+        # PROPRE (hors ces shims) ne doit pas en dépendre (ADR-004).
         offenders = []
         for py in CORE_DIR.rglob("*.py"):
+            if py.parent.name == "uploads":
+                continue  # shims transitoires autorisés
             for lineno, line in enumerate(
                 py.read_text(encoding="utf-8", errors="replace").splitlines(), 1
             ):
@@ -81,7 +86,7 @@ class TestCoreIndependence:
                     or stripped.startswith("from forge_mvc_files")
                 ):
                     offenders.append(f"{py.relative_to(PROJECT_ROOT)}:{lineno}")
-        assert not offenders, f"core/ importe forge_mvc_files au niveau module : {offenders}"
+        assert not offenders, f"core/ (hors shims uploads) importe forge_mvc_files : {offenders}"
 
 
 class TestOptinRegistration:
@@ -99,11 +104,3 @@ class TestModuleImportable:
         import forge_mvc_files
 
         assert forge_mvc_files.__version__ == _CURRENT_VERSION
-
-    def test_scaffold_has_no_logic_yet(self):
-        import forge_mvc_files
-
-        assert forge_mvc_files.__all__ == [], (
-            "Au stade scaffold, forge_mvc_files n'expose aucune API "
-            "(le pipeline est déplacé par FILES-MOVE-PIPELINE-001)."
-        )
