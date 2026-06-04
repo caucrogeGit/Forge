@@ -2,12 +2,16 @@ from io import BytesIO
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
 import app
 import core.forge as forge
 from core.http.response import Response
-from core.uploads import delete_media_file, save_upload, serve_media_file
+from core.uploads import delete_media_file, serve_media_file
+
+# CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : chemin image-aware côté opt-in.
+from forge_mvc_images import save_image_upload
 
 
 def _image_file(filename="photo.png", *, size=(2000, 1000), content_type="image/png"):
@@ -150,7 +154,7 @@ def test_serve_media_file_est_exporte_dans_api_publique():
     assert exported_serve_media_file is serve_media_file
 
 
-def test_save_upload_variants_et_delete_media_file_restent_compatibles(tmp_path):
+def test_save_image_upload_variants_et_delete_media_file_restent_compatibles(tmp_path):
     forge.configure(
         upload_root=str(tmp_path / "uploads"),
         upload_max_size=10_000,
@@ -158,7 +162,7 @@ def test_save_upload_variants_et_delete_media_file_restent_compatibles(tmp_path)
         upload_allowed_mime_types=["image/png"],
     )
 
-    saved = save_upload(_image_file(), category="images", variants=True)
+    saved = save_image_upload(_image_file(), category="images", variants=True)
     response = serve_media_file(saved.variants["medium"], root=tmp_path / "uploads")
     deleted = delete_media_file(saved.path, root=tmp_path / "uploads", variants=True)
 

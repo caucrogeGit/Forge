@@ -89,8 +89,22 @@ class TestGeneratorsMentionForgeImagesOptIn:
 
     def test_controller_builder_imports_attach_from_forge_mvc_images(self):
         text = CONTROLLER_BUILDER.read_text(encoding="utf-8")
-        assert "forge_mvc_images import attach_media_to_entity" in text, (
-            "controller_builder.py n'importe pas attach_media_to_entity depuis forge_mvc_images."
+        # CORE-SAVEUPLOAD-GENERIC-CLEANUP : l'import forge_mvc_images est désormais
+        # construit dynamiquement (`"from forge_mvc_images import " + ", ".join(...)`).
+        assert "from forge_mvc_images import " in text, (
+            "controller_builder.py doit générer un import depuis forge_mvc_images."
+        )
+        assert '"attach_media_to_entity"' in text, (
+            "controller_builder.py doit inclure attach_media_to_entity dans les helpers importés."
+        )
+
+    def test_controller_builder_generates_save_image_upload_for_images(self):
+        # Les champs image passent par forge_mvc_images.save_image_upload
+        # (et non le save_upload générique du core).
+        text = CONTROLLER_BUILDER.read_text(encoding="utf-8")
+        assert "save_image_upload" in text, (
+            "controller_builder.py doit générer des appels save_image_upload "
+            "pour les champs image (CORE-SAVEUPLOAD-GENERIC-CLEANUP)."
         )
 
     def test_controller_builder_no_longer_targets_forge_mvc_media(self):

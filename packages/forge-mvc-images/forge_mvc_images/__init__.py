@@ -31,6 +31,7 @@ from forge_mvc_images.processing import (
     image_variant_paths,
     image_variant_relative_paths,
     save_image,
+    save_image_upload,
     verify_image_content,
 )
 from forge_mvc_images.media_repository import (
@@ -59,6 +60,7 @@ __all__ = [
     "image_variant_paths",
     "image_variant_relative_paths",
     "save_image",
+    "save_image_upload",
     "verify_image_content",
     # Couche médias applicative (IMAGES-MOVE-APPLICATIVE-001)
     "attach_media_to_entity",

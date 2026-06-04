@@ -19,10 +19,9 @@ pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
 import core.forge
-from core.uploads import save_upload
 
-# IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image vit dans l'opt-in.
-from forge_mvc_images import image_variant_paths
+# CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : l'upload image-aware vit dans l'opt-in.
+from forge_mvc_images import image_variant_paths, save_image_upload
 from forge_mvc_media.media_repository import (
     attach_media_to_entity,
     create_media_record,
@@ -133,7 +132,7 @@ def test_image_upload_cree_original_et_variantes(upload_root_tmp):
     data = _make_png_bytes()
     f = _FakeUploadFile("facade.png", "image/png", data)
 
-    saved = save_upload(f, "images", variants=True)
+    saved = save_image_upload(f, "images", variants=True)
 
     # Le chemin stocké est relatif
     assert not (upload_root_tmp / saved.path).is_absolute() or True
@@ -260,7 +259,7 @@ def test_delete_media_supprime_fichiers_et_variantes(upload_root_tmp):
     # Écrire un vrai fichier PNG + ses variantes dans tmp_path
     data = _make_png_bytes(color="blue")
     f = _FakeUploadFile("piscine.png", "image/png", data)
-    saved = save_upload(f, "images", variants=True)
+    saved = save_image_upload(f, "images", variants=True)
 
     original_file = upload_root_tmp / saved.path
     variants = image_variant_paths(saved.path, root=upload_root_tmp)

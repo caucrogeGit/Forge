@@ -1095,7 +1095,8 @@ Voir aussi : [Front et CSS](../features/front.md).
 |---|---|
 | `SavedUpload` | Résultat d'un upload sauvegardé. |
 | `upload_root()` | Racine des fichiers uploadés. |
-| `save_upload(file, category="documents", variants=False)` | Valide puis sauvegarde un fichier. |
+| `save_upload(file, category="documents")` | Valide puis sauvegarde un fichier (générique, sans traitement image). |
+| `save_image_upload(file, category="images", variants=True)` | Upload image-aware (opt-in `forge-mvc-images`) : vérifie le contenu et génère les variantes. |
 | `delete_media_file(path, variants=False)` | Supprime un fichier média relatif, et ses variantes si demandé. |
 | `serve_media_file(path)` | Retourne une réponse HTTP pour un fichier média relatif sûr. |
 | `delete_upload(path_or_saved_upload)` | Supprime un fichier. |
@@ -1145,10 +1146,11 @@ def upload_avatar(request):
     })
 ```
 
-Pour une image, les variantes restent optionnelles :
+Pour une image, le chemin image-aware (vérification + variantes) est fourni par
+l'opt-in `forge-mvc-images` (`from forge_mvc_images import save_image_upload`) :
 
 ```python
-saved = save_upload(file, category="images", variants=True)
+saved = save_image_upload(file, category="images", variants=True)
 
 saved.path
 # "images/photo.png"
@@ -1352,10 +1354,10 @@ et `webp`. Les chemins retournés restent relatifs à `storage/uploads`.
 
 L'intégration CRUD complète (formulaires, upload, remplacement, suppression, preview) est disponible via la clé `"media"` dans `entity.json` — voir la section *Génération CRUD media* ci-dessous. Les galeries `multiple=true` et les permissions média restent à venir.
 
-Dans le flux d'upload générique, `save_upload(file, category="images",
-variants=True)` génère `medium` et `thumbnail` explicitement. Le chemin
-`saved.path` reste celui de l'original ; `saved.variants` contient uniquement
-les variantes redimensionnées.
+Dans le flux image-aware, `save_image_upload(file, category="images",
+variants=True)` (opt-in `forge-mvc-images`) génère `medium` et `thumbnail`
+explicitement. Le chemin `saved.path` reste celui de l'original ;
+`saved.variants` contient uniquement les variantes redimensionnées.
 
 `delete_media_file("images/photo.png", variants=True)` supprime l'original et
 les variantes fichier si elles existent. Une variante absente retourne `False`
@@ -2969,10 +2971,10 @@ Quand une entité déclare des médias, `make:crud` génère :
 - **Formulaire** : un `ImageField` ou `FileField` par entrée `media`, avec label et `required` issus de la déclaration.
 - **Vue formulaire** : `enctype="multipart/form-data"` sur le `<form>`, `<input type="file">` avec `accept="image/*"` pour les images.
 - **Contrôleur `create`** :
-  - Import de `save_upload` depuis `core.uploads` (primitive générique) et `attach_media_to_entity`, `delete_media`, `list_media_for_entity` depuis `forge_mvc_media` (helpers applicatifs).
+  - Import de `save_upload` depuis `core.uploads` (primitive générique, fichiers non-image) et de `save_image_upload`, `attach_media_to_entity`, `delete_media`, `list_media_for_entity` depuis `forge_mvc_images` (chemin image-aware + helpers applicatifs).
   - Exclusion des clés média de `form.cleaned_data` avant l'insert SQL.
   - Capture de l'identifiant créé (`cursor.lastrowid`).
-  - Pour chaque média soumis : `save_upload(file, category, variants=...)` puis `attach_media_to_entity(saved, entity_name=..., entity_id=created_id, role=..., position=0)`.
+  - Pour chaque média soumis : `save_image_upload(file, "images", variants=...)` (image) ou `save_upload(file, "documents")` (fichier), puis `attach_media_to_entity(saved, entity_name=..., entity_id=created_id, role=..., position=0)`.
 - **Contrôleur `update`** (pour `multiple=false`) :
   - Si un nouveau fichier est soumis : `list_media_for_entity` pour trouver l'ancien, `delete_media(..., delete_files=True)` pour le supprimer, puis `save_upload` + `attach_media_to_entity` pour attacher le nouveau.
   - Si `_delete_media_<name>` est coché (sans nouveau fichier) : `delete_media` uniquement, pas d'upload.

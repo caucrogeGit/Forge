@@ -175,13 +175,14 @@ Les variantes conservent les proportions :
 - `thumbnail` : maximum `300 x 300`
 - `medium` : maximum `1280 x 1280`
 
-`save_upload` peut aussi déclencher ces variantes explicitement pour la
-catégorie `images` :
+Le chemin d'upload **image-aware** (vérification du contenu + variantes) est
+fourni par l'opt-in `forge-mvc-images` via `save_image_upload` (ADR-018,
+`CORE-SAVEUPLOAD-GENERIC-CLEANUP`) :
 
 ```python
-from core.uploads import save_upload
+from forge_mvc_images import save_image_upload
 
-saved = save_upload(request.files["photo"], category="images", variants=True)
+saved = save_image_upload(request.files["photo"], category="images", variants=True)
 
 saved.path
 # "images/photo.png"
@@ -193,9 +194,10 @@ saved.variants
 # }
 ```
 
-Par défaut, `save_upload(file, category="images")` ne génère pas de variantes.
-`saved.path` reste toujours le chemin relatif de l'original. `variants=True`
-est refusé pour les catégories non-images.
+Avec `variants=False`, `save_image_upload` vérifie le contenu et écrit
+l'original sans générer de variantes. Le `save_upload` du core, lui, est
+**purement générique** : il écrit le fichier dans la catégorie demandée sans
+vérification image ni variantes.
 
 ---
 
@@ -313,10 +315,9 @@ Pour relier un fichier déjà uploadé à une entité, utiliser
 `attach_media_to_entity` :
 
 ```python
-from core.uploads import save_upload
-from forge_mvc_media import attach_media_to_entity
+from forge_mvc_images import save_image_upload, attach_media_to_entity
 
-saved = save_upload(file, category="images", variants=True)
+saved = save_image_upload(file, category="images", variants=True)
 
 media_id = attach_media_to_entity(
     saved,
@@ -328,7 +329,7 @@ media_id = attach_media_to_entity(
 )
 ```
 
-`save_upload()` stocke le fichier et ses variantes éventuelles.
+`save_image_upload()` stocke le fichier et ses variantes éventuelles.
 `attach_media_to_entity()` crée seulement la ligne `Media` correspondante. Elle
 ne crée pas de fichier, ne supprime rien et ne modifie pas les variantes.
 
@@ -568,7 +569,7 @@ for _did in _photos_del_ids:
 # 3. Upload de chaque fichier soumis
 for _photos_f in _photos_files:
     if getattr(_photos_f, "filename", ""):
-        _saved_photos = save_upload(_photos_f, "images", variants=False)
+        _saved_photos = save_image_upload(_photos_f, "images", variants=False)
         attach_media_to_entity(_saved_photos, entity_name="article", entity_id=id,
                                role="gallery", position=0)
 ```
@@ -644,8 +645,8 @@ Avec l'entité ci-dessous, `make:crud` génère la chaîne complète.
 **Contrôleur `create`** :
 - Exclut `cover` et `brochure` de l'insert SQL.
 - Capture `cursor.lastrowid` pour obtenir l'id créé.
-- Si `cover` soumis : `save_upload(file, "images", variants=True)` → `attach_media_to_entity(saved, entity_name="hebergement", entity_id=id, role="cover", position=0)`.
-- Si `brochure` soumis : `save_upload(file, "documents", variants=False)` → `attach_media_to_entity(...)`.
+- Si `cover` soumis (image) : `save_image_upload(file, "images", variants=True)` → `attach_media_to_entity(saved, entity_name="hebergement", entity_id=id, role="cover", position=0)`.
+- Si `brochure` soumis (fichier) : `save_upload(file, "documents")` → `attach_media_to_entity(...)`.
 
 **Contrôleur `edit/update`** :
 - Charge `cover_media = get_cover_media("hebergement", id, role="cover")` et `brochure_media = get_cover_media("hebergement", id, role="brochure")`.

@@ -269,6 +269,7 @@ def _build_env(monkeypatch, definition, gallery_entries=None):
     upload_mod = _mod("core.uploads", save_upload=_save_upload)
     forge_media_mod = _mod(
         "forge_mvc_images",
+        save_image_upload=_save_upload,
         attach_media_to_entity=_attach,
         list_media_for_entity=_list_media,
         delete_media=_delete_media,

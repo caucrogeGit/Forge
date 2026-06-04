@@ -262,6 +262,7 @@ def _build_env(monkeypatch, definition, media_entries=None):
     )
     forge_media_mod = _mod(
         "forge_mvc_images",
+        save_image_upload=lambda *a, **kw: SimpleNamespace(path="images/x.png", mime_type="image/png"),
         attach_media_to_entity=lambda *a, **kw: None,
         list_media_for_entity=_list_media,
         delete_media=_delete_media,

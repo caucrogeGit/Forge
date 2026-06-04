@@ -57,10 +57,12 @@ def _require_image_processing(name: str):
     """Résout un helper de traitement d'image depuis l'opt-in forge-mvc-images.
 
     IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image (Pillow) a été
-    extrait du core vers ``forge-mvc-images``. Le core garde l'upload brut
-    générique et **délègue** le chemin image-aware (``save_upload(category=
-    "images")``, génération de variantes) à l'opt-in s'il est installé. Si le
-    module est absent, l'erreur est explicite plutôt qu'un ``ImportError`` brut
+    extrait du core vers ``forge-mvc-images``. Depuis
+    CORE-SAVEUPLOAD-GENERIC-CLEANUP, ``save_upload`` est purement générique ; il
+    ne reste qu'un seul appelant de ce delegate dans le core :
+    ``delete_media_file(variants=True)``, qui a besoin des chemins de variantes
+    (``image_variant_relative_paths``) pour supprimer les fichiers dérivés. Si
+    l'opt-in est absent, l'erreur est explicite plutôt qu'un ``ImportError`` brut
     (charte §7 — sécuriser/échouer clairement).
     """
     try:
@@ -73,11 +75,17 @@ def _require_image_processing(name: str):
     return getattr(forge_mvc_images, name)
 
 
-def save_upload(file, category: str = "documents", *, variants: bool = False) -> SavedUpload:
+def save_upload(file, category: str = "documents") -> SavedUpload:
+    """Upload brut **générique** : valide, écrit, retourne un SavedUpload.
+
+    CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : ``save_upload`` ne connaît plus
+    rien des images (ni vérification de contenu, ni variantes). Le chemin
+    image-aware (vérification + variantes) appartient à l'opt-in
+    ``forge-mvc-images`` (``save_image_upload``), qui s'appuie lui-même sur cette
+    primitive générique. ``variants`` renvoyé est toujours vide ici.
+    """
     if file is None:
         raise UploadStorageError("Aucun fichier reçu.")
-    if variants and category != "images":
-        raise UploadStorageError("Les variantes image sont autorisees uniquement pour category='images'.")
 
     filename, mime_type, data = _read_upload(file)
     validate_upload_metadata(
@@ -88,17 +96,6 @@ def save_upload(file, category: str = "documents", *, variants: bool = False) ->
         allowed_mime_types=_cfg("upload_allowed_mime_types"),
         max_size=int(_cfg("upload_max_size")),
     )
-    if category == "images":
-        # SEC-UPLOAD-IMAGE-VERIFY-002 — la validation ci-dessus ne porte que
-        # sur des métadonnées déclaratives (extension + Content-Type). Pour la
-        # catégorie images on vérifie que le contenu est une vraie image
-        # AVANT toute écriture disque (cohérent avec save_image). C'est le
-        # flux utilisé par le CRUD généré : save_upload(..., "images", ...).
-        # IMAGES-MOVE-PROCESSING-001 (ADR-018) : le traitement d'image vit
-        # désormais dans l'opt-in forge-mvc-images ; le core lui délègue le
-        # chemin image-aware (lock + delegate).
-        verify_image_content = _require_image_processing("verify_image_content")
-        verify_image_content(data)
     root = upload_root()
     saved_path = storage.save_bytes(
         data,
@@ -108,14 +105,6 @@ def save_upload(file, category: str = "documents", *, variants: bool = False) ->
     )
     relative_path = saved_path.relative_to(root.resolve()).as_posix()
     normalized_path = storage.normalize_media_path(relative_path)
-    variant_paths: dict[str, str] = {}
-    if variants:
-        generate_image_variants = _require_image_processing("generate_image_variants")
-        generated = generate_image_variants(normalized_path, root=root)
-        variant_paths = {
-            "medium": generated["medium"],
-            "thumbnail": generated["thumbnail"],
-        }
 
     return SavedUpload(
         filename=saved_path.name,
@@ -124,7 +113,7 @@ def save_upload(file, category: str = "documents", *, variants: bool = False) ->
         category=category,
         size=len(data),
         mime_type=mime_type,
-        variants=variant_paths,
+        variants={},
     )
 
 

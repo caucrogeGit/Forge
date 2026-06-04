@@ -10,14 +10,13 @@ Vérifie le déplacement du traitement d'image du core vers l'opt-in
   ``generate_image_variants``, ``verify_image_content``, constantes
   ``ALLOWED_IMAGE_*``, ``IMAGE_VARIANT_SIZES``, ``MediaRecord``) ;
 - ``forge_mvc_images`` expose désormais toute cette API ;
-- ``core.uploads.save_upload`` reste générique : il **délègue** le chemin
-  image-aware à l'opt-in en import *lazy* (``_require_image_processing``), sans
-  réintroduire d'import dur de ``core.uploads.image``.
+- ``core.uploads`` ne réintroduit pas d'import dur de ``core.uploads.image``.
 
-Le delegate transitoire garde la suite verte : ``save_upload(category="images",
-variants=True)`` continue de fonctionner (tests fonctionnels dans
-``tests/test_uploads.py``). Le passage de ``save_upload`` à 100 % générique
-relèvera d'un ticket de nettoyage ultérieur (après le rename des générateurs).
+Depuis CORE-SAVEUPLOAD-GENERIC-CLEANUP, ``save_upload`` est **purement
+générique** (plus aucune branche image) ; le chemin image-aware appartient à
+``forge_mvc_images.save_image_upload``. Le delegate lazy
+(``_require_image_processing``) ne sert plus qu'à ``delete_media_file
+(variants=True)`` (suppression des fichiers de variantes).
 """
 
 from __future__ import annotations
@@ -111,16 +110,33 @@ class TestProcessingApiInOptin:
         )
 
 
-class TestSaveUploadDelegates:
-    """save_upload garde la branche image mais la délègue à l'opt-in."""
+class TestSaveUploadIsGeneric:
+    """CORE-SAVEUPLOAD-GENERIC-CLEANUP : save_upload n'a plus rien d'image-aware."""
 
-    def test_manager_has_lazy_delegate_helper(self):
+    def test_save_upload_signature_has_no_variants(self):
+        import inspect as _inspect
+
+        from core.uploads.manager import save_upload
+
+        params = _inspect.signature(save_upload).parameters
+        assert "variants" not in params, (
+            "save_upload ne doit plus exposer de paramètre `variants` "
+            "(chemin image-aware déplacé dans forge_mvc_images.save_image_upload)."
+        )
+
+    def test_save_upload_source_has_no_image_branch(self):
         from core.uploads import manager
 
-        assert hasattr(manager, "_require_image_processing"), (
-            "core.uploads.manager doit fournir _require_image_processing "
-            "(lock + delegate vers forge_mvc_images)."
+        src = inspect.getsource(manager.save_upload)
+        assert 'category == "images"' not in src, (
+            "save_upload ne doit plus contenir de branche spécifique aux images."
         )
+
+    def test_manager_still_has_delegate_helper_for_delete(self):
+        # Le delegate lazy subsiste pour delete_media_file(variants=True).
+        from core.uploads import manager
+
+        assert hasattr(manager, "_require_image_processing")
 
     def test_delegate_resolves_processing_functions(self):
         from core.uploads.manager import _require_image_processing
@@ -129,6 +145,7 @@ class TestSaveUploadDelegates:
             "verify_image_content",
             "generate_image_variants",
             "image_variant_relative_paths",
+            "save_image_upload",
         ):
             resolved = _require_image_processing(name)
             assert callable(resolved), f"{name} doit être résoluble via le delegate."

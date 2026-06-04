@@ -18,6 +18,19 @@ from forge_cli.entities.crud.utils import (
     _to_snake,
 )
 from forge_cli.entities.crud.context import _with_permission
+
+
+def _media_upload_call(mfield: str, var: str, variants) -> str:
+    """Expression d'upload générée pour un champ média.
+
+    CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : les champs **image** passent par
+    le chemin image-aware de l'opt-in (`save_image_upload`, vérification de
+    contenu + variantes) ; les autres fichiers utilisent le `save_upload`
+    **générique** du core.
+    """
+    if mfield == "image":
+        return f'save_image_upload({var}, "images", variants={variants})'
+    return f'save_upload({var}, "documents")'
 from forge_cli.entities.crud.relations_loader import (
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,
@@ -99,21 +112,22 @@ def build_controller(
     if ctrl_media_entries:
         _has_single   = any(not e.get("multiple", False) for e in ctrl_media_entries)
         _has_multiple = any(e.get("multiple", False) for e in ctrl_media_entries)
-        if _has_single and _has_multiple:
+        # CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : les champs image passent
+        # par forge_mvc_images.save_image_upload (vérification + variantes) ; les
+        # autres fichiers par le save_upload générique du core.
+        _has_image = any(e.get("field") == "image" for e in ctrl_media_entries)
+        _has_doc   = any(e.get("field") != "image" for e in ctrl_media_entries)
+        if _has_doc:
             lines.append("from core.uploads import save_upload")
-            lines.append(
-                "from forge_mvc_images import attach_media_to_entity, delete_media, get_cover_media, list_media_for_entity, update_media_alt_text, update_media_position"
-            )
-        elif _has_single:
-            lines.append("from core.uploads import save_upload")
-            lines.append(
-                "from forge_mvc_images import attach_media_to_entity, delete_media, get_cover_media, list_media_for_entity, update_media_alt_text"
-            )
-        else:
-            lines.append("from core.uploads import save_upload")
-            lines.append(
-                "from forge_mvc_images import attach_media_to_entity, delete_media, list_media_for_entity, update_media_alt_text, update_media_position"
-            )
+        _img_helpers = ["attach_media_to_entity", "delete_media"]
+        if _has_single:
+            _img_helpers.append("get_cover_media")
+        _img_helpers += ["list_media_for_entity", "update_media_alt_text"]
+        if _has_multiple:
+            _img_helpers.append("update_media_position")
+        if _has_image:
+            _img_helpers.append("save_image_upload")
+        lines.append("from forge_mvc_images import " + ", ".join(_img_helpers))
     lines.extend([
         "",
         "",
@@ -417,7 +431,6 @@ def build_controller(
             mname = entry["name"]
             mrole = entry["role"]
             mfield = entry["field"]
-            category = "images" if mfield == "image" else "documents"
             variants = entry.get("variants", False)
             _is_multiple = entry.get("multiple", False)
             _alt_key = f"_media_alt_{mname}_new" if _is_multiple else f"_media_alt_{mname}"
@@ -426,7 +439,7 @@ def build_controller(
                     f'        _{mname}_alt = (request.body.get("{_alt_key}", [None])[0] or None)',
                     f'        for _{mname}_f in _{mname}_files:',
                     f'            if getattr(_{mname}_f, "filename", ""):',
-                    f'                _saved_{mname} = save_upload(_{mname}_f, "{category}", variants={variants})',
+                    f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_f", variants)}',
                     f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id=created_id, role="{mrole}", position=0, alt_text=_{mname}_alt)',
                 ]
             else:
@@ -434,7 +447,7 @@ def build_controller(
                     f'        _{mname}_alt = (request.body.get("{_alt_key}", [None])[0] or None)',
                     f'        _{mname}_file = form.cleaned_data.get("{mname}")',
                     f'        if _{mname}_file and getattr(_{mname}_file, "filename", ""):',
-                    f'            _saved_{mname} = save_upload(_{mname}_file, "{category}", variants={variants})',
+                    f'            _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_file", variants)}',
                     f'            attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id=created_id, role="{mrole}", position=0, alt_text=_{mname}_alt)',
                 ]
     else:
@@ -650,7 +663,6 @@ def build_controller(
             mname = entry["name"]
             mrole = entry["role"]
             mfield = entry["field"]
-            category = "images" if mfield == "image" else "documents"
             variants = entry.get("variants", False)
             del_variants = mfield == "image"
             update_lines += [
@@ -662,7 +674,7 @@ def build_controller(
                 f'            for _old in list_media_for_entity("{snake}", {pk_name}, role="{mrole}"):',
                 f'                delete_media(_old["id"], delete_files=True, variants={del_variants})',
                 f'            if _{mname}_has_file:',
-                f'                _saved_{mname} = save_upload(_{mname}_file, "{category}", variants={variants})',
+                f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_file", variants)}',
                 f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id={pk_name}, role="{mrole}", position=0, alt_text=_{mname}_alt)',
                 '        else:',
                 f'            for _existing_{mname} in list_media_for_entity("{snake}", {pk_name}, role="{mrole}"):',
@@ -674,7 +686,6 @@ def build_controller(
             mname = entry["name"]
             mrole = entry["role"]
             mfield = entry["field"]
-            category = "images" if mfield == "image" else "documents"
             variants = entry.get("variants", False)
             update_lines += [
                 f'        _{mname}_del_ids = request.body.get("_delete_media_{mname}", [])',
@@ -702,7 +713,7 @@ def build_controller(
                 f'        _{mname}_alt_new = (request.body.get("_media_alt_{mname}_new", [None])[0] or None)',
                 f'        for _{mname}_f in _{mname}_files:',
                 f'            if getattr(_{mname}_f, "filename", ""):',
-                f'                _saved_{mname} = save_upload(_{mname}_f, "{category}", variants={variants})',
+                f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_f", variants)}',
                 f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id={pk_name}, role="{mrole}", position=0, alt_text=_{mname}_alt_new)',
             ]
     else:

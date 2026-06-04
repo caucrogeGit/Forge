@@ -13,15 +13,21 @@ le chemin image-aware (validation de contenu + écriture + variantes).
 from __future__ import annotations
 
 import io
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
+from types import SimpleNamespace
 
 from PIL import Image, UnidentifiedImageError
 
 from core.forge import get as _cfg
 from core.uploads import storage
 from core.uploads.exceptions import UploadStorageError
-from core.uploads.manager import _read_upload, upload_root
+from core.uploads.manager import (
+    SavedUpload,
+    _read_upload,
+    save_upload as _core_save_upload,
+    upload_root,
+)
 from core.uploads.validators import validate_upload_metadata
 
 
@@ -250,3 +256,41 @@ def _write_resized_image(image: Image.Image, target: Path, max_size: tuple[int, 
     if target.suffix.lower() in {".jpg", ".jpeg"} and variant.mode not in {"RGB", "L"}:
         variant = variant.convert("RGB")
     variant.save(target)
+
+
+def save_image_upload(file, category: str = "images", *, variants: bool = True) -> SavedUpload:
+    """Chemin d'upload **image-aware** : vérifie le contenu, écrit, génère les variantes.
+
+    CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : ``core.uploads.save_upload`` est
+    désormais purement générique (aucune connaissance des images). Ce point
+    d'entrée appartient à ``forge-mvc-images`` ; c'est lui que génèrent les CRUD
+    pour les champs image. Il :
+
+    1. vérifie que le contenu est une vraie image AVANT toute écriture disque
+       (``verify_image_content`` — SEC-UPLOAD-IMAGE-VERIFY, garde anti-bombe) ;
+    2. écrit le fichier via le ``save_upload`` **générique** du core ;
+    3. génère, si demandé, les variantes ``medium`` / ``thumbnail``.
+
+    Retourne le même ``SavedUpload`` que ``core.uploads.save_upload`` (avec le
+    dictionnaire ``variants`` renseigné si ``variants=True``).
+    """
+    if file is None:
+        raise UploadStorageError("Aucun fichier reçu.")
+
+    filename, mime_type, data = _read_upload(file)
+    # SEC-UPLOAD-IMAGE-VERIFY — contenu réellement décodable AVANT écriture.
+    verify_image_content(data)
+
+    raw = SimpleNamespace(filename=filename, content=data, content_type=mime_type)
+    saved = _core_save_upload(raw, category)
+
+    if variants:
+        generated = generate_image_variants(saved.path)
+        saved = replace(
+            saved,
+            variants={
+                "medium": generated["medium"],
+                "thumbnail": generated["thumbnail"],
+            },
+        )
+    return saved

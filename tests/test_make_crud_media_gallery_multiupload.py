@@ -202,7 +202,7 @@ class TestMultiuploadGeneration:
         code = build_controller(_article_with_gallery())
         create_lines = _lines_in_method(code, "create")
         validate_idx = next((i for i, l in enumerate(create_lines) if 'form.fields["photos"].validate' in l), None)
-        save_idx = next((i for i, l in enumerate(create_lines) if "save_upload" in l), None)
+        save_idx = next((i for i, l in enumerate(create_lines) if "save_image_upload" in l), None)
         assert validate_idx is not None, "form.fields validation absent de create()"
         assert save_idx is not None
         assert validate_idx < save_idx
@@ -211,7 +211,7 @@ class TestMultiuploadGeneration:
         code = build_controller(_article_with_gallery())
         update_lines = _lines_in_method(code, "update")
         validate_idx = next((i for i, l in enumerate(update_lines) if 'form.fields["photos"].validate' in l), None)
-        save_idx = next((i for i, l in enumerate(update_lines) if "save_upload" in l), None)
+        save_idx = next((i for i, l in enumerate(update_lines) if "save_image_upload" in l), None)
         assert validate_idx is not None, "form.fields validation absent de update()"
         assert save_idx is not None
         assert validate_idx < save_idx
@@ -357,6 +357,7 @@ def _build_env(monkeypatch, definition, gallery_entries=None):
     upload_mod = _mod("core.uploads", save_upload=_save_upload)
     forge_media_mod = _mod(
         "forge_mvc_images",
+        save_image_upload=_save_upload,
         attach_media_to_entity=_attach,
         list_media_for_entity=_list_media,
         delete_media=_delete_media,

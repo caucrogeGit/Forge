@@ -2,6 +2,7 @@ from io import BytesIO
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
 import core.forge as forge
@@ -12,6 +13,10 @@ from core.uploads.exceptions import (
     UploadTooLargeError,
 )
 from core.uploads.manager import delete_media_file, delete_upload, get_upload_path, save_upload
+
+# CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : save_upload est purement générique ;
+# le chemin image-aware (vérification + variantes) appartient à forge-mvc-images.
+from forge_mvc_images import save_image_upload
 from core.uploads.storage import (
     ensure_upload_dirs,
     is_safe_media_path,
@@ -155,8 +160,9 @@ def test_save_upload_ecrit_dans_la_categorie_configuree(tmp_path):
         upload_allowed_mime_types=["image/png"],
     )
 
-    # SEC-UPLOAD-IMAGE-VERIFY-002 : la catégorie images vérifie le contenu,
-    # on fournit donc une vraie image.
+    # save_upload est générique (CORE-SAVEUPLOAD-GENERIC-CLEANUP) : il écrit
+    # dans la catégorie demandée sans vérifier le contenu image. On fournit une
+    # vraie image pour rester réaliste.
     image = _image_file()
     data = image.content
     saved = save_upload(image, category="images")
@@ -194,7 +200,7 @@ def test_save_upload_image_avec_variants_genere_medium_et_thumbnail(tmp_path):
         upload_allowed_mime_types=["image/png"],
     )
 
-    saved = save_upload(_image_file(), category="images", variants=True)
+    saved = save_image_upload(_image_file(), category="images", variants=True)
 
     assert saved.path == f"images/{saved.filename}"
     assert saved.variants == {
@@ -213,7 +219,7 @@ def test_save_upload_image_variants_conservent_les_proportions(tmp_path):
         upload_allowed_mime_types=["image/png"],
     )
 
-    saved = save_upload(_image_file(size=(2000, 1000)), category="images", variants=True)
+    saved = save_image_upload(_image_file(size=(2000, 1000)), category="images", variants=True)
 
     with Image.open(tmp_path / "uploads" / saved.variants["medium"]) as medium:
         assert medium.size == (1280, 640)
@@ -229,7 +235,7 @@ def test_save_upload_image_variants_retourne_chemins_relatifs_surs(tmp_path):
         upload_allowed_mime_types=["image/png"],
     )
 
-    saved = save_upload(_image_file(), category="images", variants=True)
+    saved = save_image_upload(_image_file(), category="images", variants=True)
 
     assert not saved.path.startswith("/")
     assert ".." not in saved.path
@@ -238,19 +244,13 @@ def test_save_upload_image_variants_retourne_chemins_relatifs_surs(tmp_path):
         assert ".." not in relative_path
 
 
-def test_save_upload_variants_refuse_categorie_non_image(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
-        upload_max_size=10_000,
-        upload_allowed_extensions=["png"],
-        upload_allowed_mime_types=["image/png"],
-    )
-
-    with pytest.raises(UploadStorageError, match="category='images'"):
-        save_upload(_image_file(), category="documents", variants=True)
+# CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : `test_save_upload_variants_refuse_categorie_non_image`
+# retiré — save_upload n'a plus de paramètre `variants` ni de notion d'image ;
+# la garde « variantes réservées aux images » n'a plus lieu d'être (save_image_upload
+# est toujours image).
 
 
-def test_save_upload_variants_refuse_fichier_non_image(tmp_path):
+def test_save_image_upload_refuse_fichier_non_image(tmp_path):
     forge.configure(
         upload_root=str(tmp_path / "uploads"),
         upload_max_size=10_000,
@@ -259,10 +259,10 @@ def test_save_upload_variants_refuse_fichier_non_image(tmp_path):
     )
 
     with pytest.raises(UploadStorageError, match="n'est pas une image valide"):
-        save_upload(_file("fake.png", b"not an image", "image/png"), category="images", variants=True)
+        save_image_upload(_file("fake.png", b"not an image", "image/png"), category="images", variants=True)
 
 
-def test_save_upload_variants_refuse_svg(tmp_path):
+def test_save_image_upload_refuse_svg(tmp_path):
     forge.configure(
         upload_root=str(tmp_path / "uploads"),
         upload_max_size=10_000,
@@ -271,14 +271,14 @@ def test_save_upload_variants_refuse_svg(tmp_path):
     )
 
     with pytest.raises(UploadStorageError, match="n'est pas une image valide"):
-        save_upload(
+        save_image_upload(
             _file("icone.svg", b"<svg></svg>", "image/svg+xml"),
             category="images",
             variants=True,
         )
 
 
-def test_save_upload_images_refuse_contenu_falsifie_sans_ecrire(tmp_path):
+def test_save_image_upload_refuse_contenu_falsifie_sans_ecrire(tmp_path):
     """SEC-UPLOAD-IMAGE-VERIFY-002 — contenu non-image en catégorie images.
 
     Extension + MIME d'image valides mais contenu falsifié : rejet AVANT
@@ -296,7 +296,7 @@ def test_save_upload_images_refuse_contenu_falsifie_sans_ecrire(tmp_path):
     for variants in (False, True):
         fake = _file("photo.png", b"%PDF-1.4 ceci n'est pas une image", "image/png")
         with pytest.raises(UploadStorageError, match="n'est pas une image valide"):
-            save_upload(fake, category="images", variants=variants)
+            save_image_upload(fake, category="images", variants=variants)
         written = (
             [p for p in images_dir.glob("*") if p.is_file()]
             if images_dir.exists()

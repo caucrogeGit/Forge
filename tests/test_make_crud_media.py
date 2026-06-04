@@ -292,10 +292,12 @@ class TestBuildControllerCreateMedia:
         assert "attach_media_to_entity" not in code
 
     def test_avec_media_import_upload(self):
+        # CORE-SAVEUPLOAD-GENERIC-CLEANUP : entité image-only → le chemin
+        # image-aware vient de forge_mvc_images (save_image_upload), pas du core.
         entity = _entity(media=[_media_image()])
         code = build_controller(entity)
-        assert "from core.uploads import" in code
-        assert "save_upload" in code
+        assert "from forge_mvc_images import" in code
+        assert "save_image_upload" in code
         assert "attach_media_to_entity" in code
         assert "delete_media" in code
         assert "list_media_for_entity" in code
@@ -325,10 +327,10 @@ class TestBuildControllerCreateMedia:
         assert '"cover"' in code
         assert '"brochure"' in code
 
-    def test_save_upload_image_category_images(self):
+    def test_save_image_upload_image_category_images(self):
         entity = _entity(media=[_media_image(name="cover")])
         code = build_controller(entity)
-        assert 'save_upload(_cover_file, "images"' in code
+        assert 'save_image_upload(_cover_file, "images"' in code
 
     def test_save_upload_file_category_documents(self):
         entity = _entity(media=[_media_file(name="brochure")])
@@ -345,10 +347,14 @@ class TestBuildControllerCreateMedia:
         code = build_controller(entity)
         assert "variants=True" in code
 
-    def test_save_upload_file_variants_toujours_false(self):
+    def test_save_upload_file_sans_variants(self):
+        # CORE-SAVEUPLOAD-GENERIC-CLEANUP : un fichier non-image passe par le
+        # save_upload générique du core, sans paramètre variants.
         entity = _entity(media=[_media_file(name="brochure")])
         code = build_controller(entity)
-        assert "variants=False" in code
+        # Le ")" juste après "documents" prouve l'absence de paramètre variants
+        # sur l'upload générique (delete_media garde son propre variants=).
+        assert 'save_upload(_brochure_file, "documents")' in code
 
     def test_attach_media_entity_name(self):
         entity = _entity(media=[_media_image(name="cover", role="cover")])
@@ -379,8 +385,12 @@ class TestBuildControllerCreateMedia:
     def test_deux_media_deux_blocs_upload(self):
         entity = _entity(media=[_media_image(name="cover"), _media_file(name="brochure")])
         code = build_controller(entity)
-        # 2 médias × 2 méthodes (create + update) = 4 appels chacun
-        assert code.count("save_upload(") == 4
+        # CORE-SAVEUPLOAD-GENERIC-CLEANUP : l'image (cover) passe par
+        # save_image_upload, le fichier (brochure) par save_upload générique.
+        # 1 média image × 2 méthodes (create + update) = 2 save_image_upload ;
+        # 1 média fichier × 2 méthodes = 2 save_upload.
+        assert code.count("save_image_upload(") == 2
+        assert code.count("save_upload(") == 2
         assert code.count("attach_media_to_entity(") == 4
 
     def test_pas_de_code_destroy_media(self):
@@ -426,7 +436,7 @@ class TestBuildControllerUpdateMedia:
     def test_update_image_save_upload_category_images(self):
         entity = _entity(media=[_media_image(name="cover")])
         code = build_controller(entity)
-        assert 'save_upload(_cover_file, "images"' in code
+        assert 'save_image_upload(_cover_file, "images"' in code
 
     def test_update_file_save_upload_category_documents(self):
         entity = _entity(media=[_media_file(name="brochure")])
@@ -495,8 +505,10 @@ class TestBuildControllerUpdateMedia:
         code = build_controller(entity)
         # 2 médias × 2 branches (if + else) dans update + 1 dans destroy = 5 appels
         assert code.count("list_media_for_entity(") == 5
-        # 2 médias × 2 méthodes (create + update) = 4 appels chacun
-        assert code.count("save_upload(") == 4
+        # CORE-SAVEUPLOAD-GENERIC-CLEANUP : image → save_image_upload (×2),
+        # fichier → save_upload générique (×2).
+        assert code.count("save_image_upload(") == 2
+        assert code.count("save_upload(") == 2
         assert code.count("attach_media_to_entity(") == 4
 
     def test_update_multiple_true_pas_de_logique_galerie(self):
@@ -944,7 +956,7 @@ class TestChaineCompleteMediaV2:
 
     def test_create_save_upload_images(self):
         code = build_controller(_entity_complet())
-        assert 'save_upload(_cover_file, "images"' in code
+        assert 'save_image_upload(_cover_file, "images"' in code
 
     def test_create_save_upload_documents(self):
         code = build_controller(_entity_complet())
