@@ -162,7 +162,7 @@ def _media_import_line(spec: PublicListSpec) -> str | None:
             funcs.add("get_cover_media")
     if not funcs:
         return None
-    return f"from forge_mvc_media import {', '.join(sorted(funcs))}"
+    return f"from forge_mvc_images import {', '.join(sorted(funcs))}"
 
 
 def _list_select_columns(spec: PublicListSpec) -> str:
@@ -230,7 +230,7 @@ def build_public_list_controller(spec: PublicListSpec) -> str:
         "from core.mvc.controller.base_controller import BaseController\n",
     ]
     if cover is not None:
-        parts.append("from forge_mvc_media import get_cover_media\n")
+        parts.append("from forge_mvc_images import get_cover_media\n")
     parts += [
         "\n",
         "\n",

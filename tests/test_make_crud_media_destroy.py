@@ -261,7 +261,7 @@ def _build_env(monkeypatch, definition, media_entries=None):
         save_upload=lambda *a, **kw: SimpleNamespace(path="images/x.png", mime_type="image/png"),
     )
     forge_media_mod = _mod(
-        "forge_mvc_media",
+        "forge_mvc_images",
         attach_media_to_entity=lambda *a, **kw: None,
         list_media_for_entity=_list_media,
         delete_media=_delete_media,
@@ -279,7 +279,7 @@ def _build_env(monkeypatch, definition, media_entries=None):
     monkeypatch.setitem(sys.modules, "mvc.helpers.flash",   flash_mod)
     monkeypatch.setitem(sys.modules, "core.mvc.controller", ctrl_mod)
     monkeypatch.setitem(sys.modules, "core.uploads",        upload_mod)
-    monkeypatch.setitem(sys.modules, "forge_mvc_media",     forge_media_mod)
+    monkeypatch.setitem(sys.modules, "forge_mvc_images",     forge_media_mod)
 
     ctrl_code = build_controller(definition)
     ctrl_ns: dict = {}

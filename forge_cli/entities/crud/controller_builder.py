@@ -102,17 +102,17 @@ def build_controller(
         if _has_single and _has_multiple:
             lines.append("from core.uploads import save_upload")
             lines.append(
-                "from forge_mvc_media import attach_media_to_entity, delete_media, get_cover_media, list_media_for_entity, update_media_alt_text, update_media_position"
+                "from forge_mvc_images import attach_media_to_entity, delete_media, get_cover_media, list_media_for_entity, update_media_alt_text, update_media_position"
             )
         elif _has_single:
             lines.append("from core.uploads import save_upload")
             lines.append(
-                "from forge_mvc_media import attach_media_to_entity, delete_media, get_cover_media, list_media_for_entity, update_media_alt_text"
+                "from forge_mvc_images import attach_media_to_entity, delete_media, get_cover_media, list_media_for_entity, update_media_alt_text"
             )
         else:
             lines.append("from core.uploads import save_upload")
             lines.append(
-                "from forge_mvc_media import attach_media_to_entity, delete_media, list_media_for_entity, update_media_alt_text, update_media_position"
+                "from forge_mvc_images import attach_media_to_entity, delete_media, list_media_for_entity, update_media_alt_text, update_media_position"
             )
     lines.extend([
         "",

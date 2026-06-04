@@ -1,8 +1,12 @@
 """Garde-fou MEDIA-CRUD-INTEGRATION-OPTIN-001.
 
 Vérifie que les générateurs CRUD et pages publiques n'émettent plus d'imports
-applicatifs média depuis core.uploads, et ciblent désormais forge_mvc_media
-pour les helpers applicatifs.
+applicatifs média depuis core.uploads, et ciblent l'opt-in pour les helpers
+applicatifs.
+
+Depuis CLI-CRUD-IMAGES-RENAME-001 (ADR-018), cet opt-in est `forge_mvc_images`
+(propriétaire de tout l'image) ; `forge_mvc_media` n'est plus qu'un shim
+transitoire. Les générateurs émettent donc `from forge_mvc_images import ...`.
 
 Ne bloque pas les imports core.uploads pour les primitives génériques
 (save_upload, delete_media_file, serve_media_file…).
@@ -25,7 +29,7 @@ ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 README = PROJECT_ROOT / "packages" / "forge-mvc-media" / "README.md"
 
-# Helpers applicatifs qui doivent désormais être importés depuis forge_mvc_media
+# Helpers applicatifs qui doivent désormais être importés depuis forge_mvc_images
 _APPLICATIVE_HELPERS = [
     "attach_media_to_entity",
     "list_media_for_entity",
@@ -44,7 +48,7 @@ class TestGeneratorsCrudNoApplicativeImportFromCore:
         for helper in _APPLICATIVE_HELPERS:
             assert f"core.uploads import {helper}" not in text, (
                 f"controller_builder.py génère encore 'from core.uploads import {helper}'. "
-                "Les helpers applicatifs doivent venir de forge_mvc_media."
+                "Les helpers applicatifs doivent venir de forge_mvc_images."
             )
 
     def test_controller_builder_no_single_line_core_uploads_with_attach(self):
@@ -58,44 +62,61 @@ class TestGeneratorsCrudNoApplicativeImportFromCore:
         text = PUBLIC_LIST.read_text(encoding="utf-8")
         assert "core.uploads import get_cover_media" not in text, (
             "public_list.py génère encore 'from core.uploads import get_cover_media'. "
-            "Les helpers applicatifs doivent venir de forge_mvc_media."
+            "Les helpers applicatifs doivent venir de forge_mvc_images."
         )
 
     def test_public_list_no_core_uploads_list_media_for_entity(self):
         text = PUBLIC_LIST.read_text(encoding="utf-8")
         assert "core.uploads import list_media_for_entity" not in text, (
             "public_list.py génère encore 'from core.uploads import list_media_for_entity'. "
-            "Les helpers applicatifs doivent venir de forge_mvc_media."
+            "Les helpers applicatifs doivent venir de forge_mvc_images."
         )
 
 
-class TestGeneratorsMentionForgeMediaOptIn:
-    """Les générateurs ciblent forge_mvc_media pour les helpers applicatifs."""
+class TestGeneratorsMentionForgeImagesOptIn:
+    """Les générateurs ciblent forge_mvc_images pour les helpers applicatifs.
 
-    def test_controller_builder_mentions_forge_mvc_media(self):
+    CLI-CRUD-IMAGES-RENAME-001 (ADR-018) : les helpers applicatifs proviennent
+    désormais de forge_mvc_images (et non plus de forge_mvc_media, devenu shim).
+    """
+
+    def test_controller_builder_mentions_forge_mvc_images(self):
         text = CONTROLLER_BUILDER.read_text(encoding="utf-8")
-        assert "forge_mvc_media" in text, (
-            "controller_builder.py ne mentionne pas forge_mvc_media. "
-            "Les helpers applicatifs CRUD doivent être importés depuis forge_mvc_media."
+        assert "forge_mvc_images" in text, (
+            "controller_builder.py ne mentionne pas forge_mvc_images. "
+            "Les helpers applicatifs CRUD doivent être importés depuis forge_mvc_images."
         )
 
-    def test_controller_builder_imports_attach_from_forge_mvc_media(self):
+    def test_controller_builder_imports_attach_from_forge_mvc_images(self):
         text = CONTROLLER_BUILDER.read_text(encoding="utf-8")
-        assert "forge_mvc_media import attach_media_to_entity" in text, (
-            "controller_builder.py n'importe pas attach_media_to_entity depuis forge_mvc_media."
+        assert "forge_mvc_images import attach_media_to_entity" in text, (
+            "controller_builder.py n'importe pas attach_media_to_entity depuis forge_mvc_images."
         )
 
-    def test_public_list_mentions_forge_mvc_media(self):
-        text = PUBLIC_LIST.read_text(encoding="utf-8")
-        assert "forge_mvc_media" in text, (
-            "public_list.py ne mentionne pas forge_mvc_media. "
-            "Les helpers applicatifs publics doivent être importés depuis forge_mvc_media."
+    def test_controller_builder_no_longer_targets_forge_mvc_media(self):
+        text = CONTROLLER_BUILDER.read_text(encoding="utf-8")
+        assert "forge_mvc_media" not in text, (
+            "controller_builder.py ne doit plus cibler forge_mvc_media "
+            "(shim transitoire) ; importer depuis forge_mvc_images."
         )
 
-    def test_public_list_imports_get_cover_from_forge_mvc_media(self):
+    def test_public_list_mentions_forge_mvc_images(self):
         text = PUBLIC_LIST.read_text(encoding="utf-8")
-        assert "forge_mvc_media import get_cover_media" in text, (
-            "public_list.py n'importe pas get_cover_media depuis forge_mvc_media."
+        assert "forge_mvc_images" in text, (
+            "public_list.py ne mentionne pas forge_mvc_images. "
+            "Les helpers applicatifs publics doivent être importés depuis forge_mvc_images."
+        )
+
+    def test_public_list_imports_get_cover_from_forge_mvc_images(self):
+        text = PUBLIC_LIST.read_text(encoding="utf-8")
+        assert "forge_mvc_images import get_cover_media" in text, (
+            "public_list.py n'importe pas get_cover_media depuis forge_mvc_images."
+        )
+
+    def test_public_list_no_longer_targets_forge_mvc_media(self):
+        text = PUBLIC_LIST.read_text(encoding="utf-8")
+        assert "forge_mvc_media" not in text, (
+            "public_list.py ne doit plus cibler forge_mvc_media (shim transitoire)."
         )
 
     def test_controller_builder_still_uses_core_uploads_for_save_upload(self):
