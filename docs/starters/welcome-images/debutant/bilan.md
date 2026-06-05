@@ -18,8 +18,7 @@ déclinaisons sont organisées sur le disque.
 
 ## Et ensuite
 
-Les niveaux **intermédiaire** (couche médias en base : rattacher, galerie,
-accessibilité) et **avancé** (couverture, suppression, sécurité) viendront
-compléter la progression.
+Place au niveau **intermédiaire** : faire entrer les images en base — les
+rattacher à une entité, afficher la galerie, gérer accessibilité et ordre.
 
-[Aide-mémoire de la progression Images](../recapitulatif.md)
+[Niveau intermédiaire : Rattacher une image à une entité](../intermediaire/image-attach.md)

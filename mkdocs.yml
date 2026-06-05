@@ -186,6 +186,11 @@ nav:
               - Téléverser une image: starters/welcome-images/debutant/image-upload.md
               - Miniatures et variantes: starters/welcome-images/debutant/image-variants.md
               - Bilan débutant: starters/welcome-images/debutant/bilan.md
+          - Intermédiaire:
+              - Rattacher une image à une entité: starters/welcome-images/intermediaire/image-attach.md
+              - Afficher la galerie: starters/welcome-images/intermediaire/image-gallery.md
+              - Texte alternatif et ordre: starters/welcome-images/intermediaire/image-alt-order.md
+              - Bilan intermédiaire: starters/welcome-images/intermediaire/bilan.md
           - Aide-mémoire: starters/welcome-images/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md

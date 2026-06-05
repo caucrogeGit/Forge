@@ -17,5 +17,13 @@ module opt-in `forge-mvc-images` introduites à chaque étape.
 | 2 | [Téléverser une image](debutant/image-upload.md) | Vérifier le contenu avant d'écrire, générer les variantes | `save_image_upload` |
 | 3 | [Miniatures et variantes](debutant/image-variants.md) | Dériver les chemins des variantes et leurs URL | `image_variant_relative_paths`, `media_url` |
 
-Les niveaux **intermédiaire** (couche médias en base) et **avancé** (couverture,
-suppression, sécurité) compléteront cette aide-mémoire au fil de leur livraison.
+## Niveau intermédiaire — couche médias en base
+
+| # | Palier | Ce qu'on apprend | API-clé |
+|---|--------|------------------|---------|
+| 1 | [Rattacher une image à une entité](intermediaire/image-attach.md) | Créer une ligne `media` reliée à une entité | `attach_media_to_entity` |
+| 2 | [Afficher la galerie](intermediaire/image-gallery.md) | Lire et afficher les images d'une entité avec variantes | `get_media_gallery` |
+| 3 | [Texte alternatif et ordre](intermediaire/image-alt-order.md) | Éditer accessibilité et ordre d'affichage | `update_media_alt_text`, `update_media_position` |
+
+Le niveau **avancé** (couverture, suppression, sécurité) complétera cette
+aide-mémoire à sa livraison.

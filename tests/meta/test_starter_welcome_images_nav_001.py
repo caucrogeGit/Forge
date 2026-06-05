@@ -52,14 +52,38 @@ class TestDebutantChain:
         assert "(image-variants.md)" in page.read_text(encoding="utf-8")
 
     def test_last_palier_points_to_level_bilan(self):
-        # image-variants est (pour l'instant) le dernier palier débutant.
+        # image-variants est le dernier palier débutant.
         page = IMAGES / "debutant" / "image-variants.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
-    def test_debutant_bilan_points_to_recapitulatif(self):
-        # Le niveau débutant est le dernier livré (jalon 1) → le bilan renvoie
-        # au récapitulatif. À repointer vers l'intermédiaire au jalon 2.
+    def test_debutant_bilan_points_to_next_level(self):
+        # Le niveau intermédiaire existe (jalon 2) → le bilan débutant renvoie
+        # à son premier palier.
         bilan = IMAGES / "debutant" / "bilan.md"
+        assert "../intermediaire/image-attach.md" in bilan.read_text(encoding="utf-8")
+
+
+# ── Niveau intermédiaire ──────────────────────────────────────────────────────
+
+class TestIntermediaireChain:
+
+    def test_image_attach_points_to_image_gallery(self):
+        page = IMAGES / "intermediaire" / "image-attach.md"
+        assert "(image-gallery.md)" in page.read_text(encoding="utf-8")
+
+    def test_image_gallery_points_to_image_alt_order(self):
+        page = IMAGES / "intermediaire" / "image-gallery.md"
+        assert "(image-alt-order.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # image-alt-order est (pour l'instant) le dernier palier intermédiaire.
+        page = IMAGES / "intermediaire" / "image-alt-order.md"
+        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+
+    def test_intermediaire_bilan_points_to_recapitulatif(self):
+        # L'intermédiaire est le dernier niveau livré (jalon 2) → renvoi au
+        # récapitulatif. À repointer vers l'avancé au jalon 3.
+        bilan = IMAGES / "intermediaire" / "bilan.md"
         assert "../recapitulatif.md" in bilan.read_text(encoding="utf-8")
 
 

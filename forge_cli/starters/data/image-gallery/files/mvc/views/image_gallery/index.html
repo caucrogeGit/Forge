@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Galerie d'images — Forge</title>
+</head>
+<body>
+  <h1>Galerie d'images</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  {% if items %}
+  <ul>
+    {% for item in items %}
+    <li>
+      <img src="{{ item.thumbnail_url or item.url }}" alt="{{ item.alt_text or '' }}">
+      <code>{{ item.path }}</code>
+      {% if item.alt_text %}<em>{{ item.alt_text }}</em>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% elif not error %}
+  <p>Aucune image dans la galerie pour l'instant. Téléversez-en une via le palier
+  « Rattacher une image à une entité ».</p>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "id": "image-gallery",
+  "number": 53,
+  "name": "Afficher la galerie",
+  "kind": "skeleton",
+  "aliases": [
+    "image-gallery",
+    "image_gallery",
+    "53"
+  ],
+  "description": "Afficher la galerie : palier 2 du niveau intermédiaire de la progression welcome-images. Lit les images rattachées à une entité de démo (get_media_gallery) et les affiche avec leurs variantes (miniatures). La table media est créée par la migration livrée avec le starter ; si elle manque, la page reste pédagogique.",
+  "status": "available",
+  "requires_db": true,
+  "supports_public": true,
+  "home_route": "/image-gallery",
+  "routes_marker": "image-gallery",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/image-gallery",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-images/intermediaire/image-gallery/",
+  "check_paths": [
+    "mvc/controllers/image_gallery_controller.py",
+    "mvc/views/image_gallery/index.html"
+  ]
+}
