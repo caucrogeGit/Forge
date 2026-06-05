@@ -111,6 +111,7 @@ nav:
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Progression pédagogique:
+          - Installation: starters/welcome-forge/installation.md
           - Débutant:
               - Bonjour Forge: starters/welcome-forge/debutant/welcome.md
               - Paramètres d'URL: starters/welcome-forge/debutant/query-params.md
@@ -143,6 +144,7 @@ nav:
               - Bilan avancé: starters/welcome-forge/avance/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
       - Progression IoT (welcome-iot):
+          - Installation: starters/welcome-iot/installation.md
           - Débutant:
               - Bonjour Forge IoT: starters/welcome-iot/debutant/iot-welcome.md
               - Lire les événements IoT: starters/welcome-iot/debutant/iot-events.md
@@ -160,6 +162,7 @@ nav:
               - Bilan avancé: starters/welcome-iot/avance/bilan.md
           - Aide-mémoire: starters/welcome-iot/recapitulatif.md
       - Progression Vidéo (welcome-video):
+          - Installation: starters/welcome-video/installation.md
           - Débutant:
               - Bonjour Forge Vidéo: starters/welcome-video/debutant/video-welcome.md
               - Lister les vidéos: starters/welcome-video/debutant/video-list.md

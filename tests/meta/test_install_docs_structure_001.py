@@ -216,8 +216,14 @@ class TestMkdocsNav:
             "installation-github.md",
             "installation-windows.md",
         ):
-            assert old not in text, (
-                f"mkdocs.yml ne doit plus référencer {old}."
+            # STARTERS-WELCOME-INSTALL-001 — on ne vise que les anciennes pages
+            # d'install À PLAT (racine de docs/), jamais précédées d'un « / ».
+            # Les préambules de parcours `starters/welcome-*/installation.md`
+            # portent le même nom de fichier mais sous un sous-dossier (précédés
+            # d'un « / ») et restent autorisés.
+            flat = re.search(rf"(?<!/){re.escape(old)}", text)
+            assert flat is None, (
+                f"mkdocs.yml ne doit plus référencer la page plate {old}."
             )
 
 

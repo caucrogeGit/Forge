@@ -33,7 +33,11 @@ FORBIDDEN_COMMANDS = [
 
 
 def _pages() -> list[Path]:
-    return list(VIDEO.rglob("*.md"))
+    # STARTERS-WELCOME-INSTALL-001 — `installation.md` est le préambule
+    # d'installation, seule page du parcours autorisée à porter les commandes
+    # de création/build (elle crée justement le projet). Exemptée de l'hygiène
+    # « pas de commande de création » ci-dessous.
+    return [p for p in VIDEO.rglob("*.md") if p.name != "installation.md"]
 
 
 # ── Niveau débutant ───────────────────────────────────────────────────────────
