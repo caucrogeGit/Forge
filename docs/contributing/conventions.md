@@ -22,6 +22,10 @@ Total : 18 patterns documentés.
 Chaque pattern présente son énoncé court, le contexte d'apparition (ticket
 d'origine) et un exemple ou une règle pratique.
 
+Une **annexe « Glossaire »** (en fin de page) fixe le vocabulaire canonique
+de Forge — quel mot pour quel objet — et n'entre pas dans le décompte des
+18 patterns.
+
 ---
 
 ## A. Audit avant action
@@ -328,6 +332,31 @@ clairement comme historiques.
 ```
 
 Origine : `DOCS-CONSOLIDATE-ROADMAPS-001`.
+
+---
+
+## Glossaire — vocabulaire canonique
+
+Forge emploie plusieurs mots proches (`module`, `package`, `opt-in`,
+`extension`). Ils ne sont **pas** interchangeables : chacun désigne une
+facette précise. Cette annexe fixe l'usage. Un audit (juin 2026) a montré
+que la confusion supposée entre ces termes était en réalité faible — d'où le
+choix de **clarifier par le vocabulaire plutôt que de renommer du code** (un
+renommage toucherait le contrat public 1.0 et la charte pour un gain
+cosmétique).
+
+| Terme | Sens canonique | À ne pas confondre avec |
+|---|---|---|
+| **module opt-in** | Paquet pip officiel installé dans l'environnement (`forge-mvc-mfa`, `forge-mvc-images`…), dans `packages/`. C'est le sens de « Modules officiels » (CLAUDE.md) et « modules opt-in » (charte, Principe 8). | le « module de projet » ci-dessous |
+| **module de projet** | Brique copiée **dans un projet utilisateur** via `forge module:install` (manifeste `module.json`, registre `forge_modules.json`, dossier `modules/`). | le « module opt-in » pip |
+| **package** | Réservé à la **facette distribution PyPI** (`pip install forge-mvc-images`, `pyproject.toml`, dossier `packages/`). Ne pas l'employer pour désigner l'unité fonctionnelle — dire « module opt-in ». | — |
+| **opt-in** | **Propriété**, pas un objet : « jamais activé automatiquement » (Principes 7 et 8). Adjectif, pas synonyme de module/package. | un nom d'objet |
+| **extension** | Uniquement « **extension de fichier** » (`.png`, validation d'upload) ou une extension d'IDE tierce. **Jamais** synonyme de module/brique. | un module Forge |
+
+**Règle pratique** : quand le mot « module » seul serait ambigu, le qualifier
+— « module opt-in » (pip) ou « module de projet » (`forge module:install`).
+
+Origine : arbitrage vocabulaire (juin 2026, consolidation bêta 1.0).
 
 ---
 
