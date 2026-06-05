@@ -1,0 +1,24 @@
+{
+  "id": "mfa-replay",
+  "number": 80,
+  "name": "Anti-rejeu TOTP",
+  "kind": "skeleton",
+  "aliases": [
+    "mfa-replay",
+    "mfa_replay",
+    "80"
+  ],
+  "description": "Anti-rejeu TOTP : palier 2 du niveau avancé de la progression welcome-mfa. record_used marque une step TOTP comme consommée pour un facteur, is_replay refuse sa réutilisation : un même code n'est accepté qu'une fois dans sa fenêtre. step_for_time calcule la step courante. État en mémoire, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mfa-replay",
+  "routes_marker": "mfa-replay",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mfa-replay",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mfa/avance/mfa-replay/",
+  "check_paths": [
+    "mvc/controllers/mfa_replay_controller.py",
+    "mvc/views/mfa_replay/index.html"
+  ]
+}

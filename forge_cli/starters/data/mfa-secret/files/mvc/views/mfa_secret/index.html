@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Secret TOTP et QR — Forge</title>
+</head>
+<body>
+  <h1>Secret TOTP et QR</h1>
+
+  <p>Secret base32 (à scanner une seule fois dans l'application d'authentification) :</p>
+  <p><code>{{ secret }}</code></p>
+
+  <p>URI de provisioning <code>otpauth://</code> (ce que code un QR) :</p>
+  <p><code>{{ uri }}</code></p>
+
+  <p>Rechargez la page pour générer un nouveau secret. Un secret réel n'est montré
+  à l'utilisateur <strong>qu'une seule fois</strong>, à l'enrôlement.</p>
+</body>
+</html>

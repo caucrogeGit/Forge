@@ -1,0 +1,23 @@
+{
+  "id": "mfa-welcome",
+  "number": 73,
+  "name": "Bonjour Forge MFA",
+  "kind": "skeleton",
+  "aliases": [
+    "mfa-welcome",
+    "mfa_welcome",
+    "73"
+  ],
+  "description": "Bonjour Forge MFA : premier palier du niveau débutant de la progression welcome-mfa. Premier contact avec le module opt-in forge-mvc-mfa : une route texte et une route qui inspecte les facteurs (TOTP, recovery), les statuts et la présence de la clé de chiffrement FORGE_MFA_SECRET_KEY. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mfa-welcome",
+  "routes_marker": "mfa-welcome",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mfa-welcome",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mfa/debutant/mfa-welcome/",
+  "check_paths": [
+    "mvc/controllers/mfa_welcome_controller.py"
+  ]
+}

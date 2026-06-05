@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Revalidation (step-up) — Forge</title>
+</head>
+<body>
+  <h1>Revalidation (step-up)</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if marked %}
+  <p data-level="success">Revalidation enregistrée.</p>
+  {% endif %}
+
+  <p>MFA récente : <strong>{% if recent %}oui{% else %}non{% endif %}</strong></p>
+
+  <form method="post" action="/mfa-revalidation">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">Revalider maintenant</button>
+  </form>
+
+  <p>Une action sensible décorée par <code>require_recent_mfa</code> n'est autorisée
+  que si <code>has_recent_mfa_revalidation</code> renvoie vrai.</p>
+</body>
+</html>

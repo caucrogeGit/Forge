@@ -1,0 +1,24 @@
+{
+  "id": "mfa-enroll",
+  "number": 76,
+  "name": "Enrôler un facteur TOTP",
+  "kind": "skeleton",
+  "aliases": [
+    "mfa-enroll",
+    "mfa_enroll",
+    "76"
+  ],
+  "description": "Enrôler un facteur TOTP : palier 1 du niveau intermédiaire de la progression welcome-mfa. create_totp_factor crée un facteur pending (secret chiffré au repos), confirm_totp_factor l'active après vérification d'un code. Le facteur pending est gardé en session pour la démo ; la persistance est le job de l'application. Nécessite FORGE_MFA_SECRET_KEY.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mfa-enroll",
+  "routes_marker": "mfa-enroll",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mfa-enroll",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mfa/intermediaire/mfa-enroll/",
+  "check_paths": [
+    "mvc/controllers/mfa_enroll_controller.py",
+    "mvc/views/mfa_enroll/index.html"
+  ]
+}

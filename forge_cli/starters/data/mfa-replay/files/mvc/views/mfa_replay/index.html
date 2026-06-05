@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Anti-rejeu TOTP — Forge</title>
+</head>
+<body>
+  <h1>Anti-rejeu TOTP</h1>
+
+  <p>Step TOTP courante : <code>{{ step }}</code></p>
+  <p>Déjà consommée pour le facteur démo : <strong>{% if replayed %}oui{% else %}non{% endif %}</strong></p>
+
+  {% if accepted is defined %}
+    {% if accepted %}
+    <p data-level="success">✓ Step consommée maintenant — toute réutilisation sera refusée.</p>
+    {% else %}
+    <p data-level="error">✗ Step déjà consommée : rejeu refusé.</p>
+    {% endif %}
+  {% endif %}
+
+  <form method="post" action="/mfa-replay">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">Consommer la step courante</button>
+  </form>
+
+  <p>Cliquez deux fois dans la même fenêtre (~30 s) : la seconde est refusée.</p>
+</body>
+</html>

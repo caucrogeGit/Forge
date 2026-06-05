@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Secret chiffré au repos — Forge</title>
+</head>
+<body>
+  <h1>Secret chiffré au repos</h1>
+
+  <p>Clé <code>FORGE_MFA_SECRET_KEY</code> : <strong>{{ key_state }}</strong></p>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  {% if encrypted %}
+  <ul>
+    <li>Secret en clair : <code>{{ raw }}</code></li>
+    <li>Chiffré (stocké en base) : <code>{{ encrypted }}</code></li>
+    <li>Aller-retour déchiffré identique : <strong>{% if roundtrip_ok %}oui{% else %}non{% endif %}</strong></li>
+  </ul>
+  {% endif %}
+
+  <form method="post" action="/mfa-crypto">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Secret à chiffrer (vide = généré)
+      <input type="text" name="secret">
+    </label>
+    <button type="submit">Chiffrer puis déchiffrer</button>
+  </form>
+
+  <p>Seule la valeur préfixée <code>enc:</code> est stockée ; la clé reste hors base.</p>
+</body>
+</html>

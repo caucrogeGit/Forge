@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Enrôler un facteur TOTP — Forge</title>
+</head>
+<body>
+  <h1>Enrôler un facteur TOTP</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if confirmed %}
+  <p data-level="success">✓ Facteur TOTP confirmé et actif.</p>
+  {% endif %}
+
+  {% if secret %}
+  <p>Secret (à enregistrer une seule fois) : <code>{{ secret }}</code></p>
+  <p>URI : <code>{{ uri }}</code></p>
+  {% endif %}
+
+  <form method="post" action="/mfa-enroll">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Code de confirmation
+      <input type="text" name="code" inputmode="numeric" pattern="[0-9]*" required>
+    </label>
+    <button type="submit">Confirmer le facteur</button>
+  </form>
+
+  <p>Le facteur <em>pending</em> est gardé en session pour la démonstration. Dans une
+  vraie application, on le persiste en base (table <code>auth_mfa_factors</code>).</p>
+</body>
+</html>

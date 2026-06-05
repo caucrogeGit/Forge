@@ -58,9 +58,9 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 72)
+## 4. Starters 1.0 (gelés — 81)
 
-La liste pédagogique est **figée** : 72 starters, numérotés de 1 à 72,
+La liste pédagogique est **figée** : 81 starters, numérotés de 1 à 81,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
 (`welcome-optin-<module>`, `users-core-auth`, `first-*`…). La progression
 `welcome-forge` est organisée par niveau ; le **niveau avancé** (`relations`, …)
@@ -69,9 +69,10 @@ au-dessus du niveau débutant. Trois autres progressions par niveau couvrent les
 modules opt-in : `welcome-iot` (`iot-welcome`, …) pour `forge-mvc-iot`,
 `welcome-video` (`video-welcome`, …) pour `forge-mvc-video`, `welcome-images`
 (`images-welcome`, …) pour `forge-mvc-images`, `welcome-files`
-(`files-welcome`, …) pour `forge-mvc-files`, et `welcome-audio`
-(`audio-welcome`, …) pour `forge-mvc-audio` (audio en 2 niveaux : débutant +
-avancé, module sans état).
+(`files-welcome`, …) pour `forge-mvc-files`, `welcome-audio`
+(`audio-welcome`, …) pour `forge-mvc-audio` (2 niveaux, sans état), et
+`welcome-mfa` (`mfa-welcome`, …) pour `forge-mvc-mfa` (mécaniques TOTP, flux
+enrôlement/challenge/récupération, durcissement).
 
 ```
 audio-doctor, audio-play, audio-probe, audio-transcode, audio-upload, audio-welcome,
@@ -83,6 +84,7 @@ iot-api, iot-contract, iot-dashboard, iot-device, iot-doctor, iot-events,
 iot-simulate, iot-subscriber, iot-welcome,
 json-api, json-response,
 layout-template,
+mfa-challenge, mfa-crypto, mfa-enroll, mfa-recovery, mfa-replay, mfa-revalidation, mfa-secret, mfa-verify, mfa-welcome,
 send-email,
 list-records, pagination, query-params, relations, request-debug, server-validation, session-state, update-record,
 users-core-auth, video-detail, video-doctor, video-list, video-playback, video-probe, video-status, video-transcode, video-upload, video-welcome, welcome, welcome-optin-iot, welcome-optin-mfa,

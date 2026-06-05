@@ -1,0 +1,24 @@
+{
+  "id": "mfa-secret",
+  "number": 74,
+  "name": "Secret TOTP et QR",
+  "kind": "skeleton",
+  "aliases": [
+    "mfa-secret",
+    "mfa_secret",
+    "74"
+  ],
+  "description": "Secret TOTP et QR : palier 2 du niveau débutant de la progression welcome-mfa. generate_totp_secret produit un secret base32, totp_provisioning_uri construit l'URI otpauth:// que les applications d'authentification (Google Authenticator, etc.) lisent en QR. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mfa-secret",
+  "routes_marker": "mfa-secret",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mfa-secret",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mfa/debutant/mfa-secret/",
+  "check_paths": [
+    "mvc/controllers/mfa_secret_controller.py",
+    "mvc/views/mfa_secret/index.html"
+  ]
+}

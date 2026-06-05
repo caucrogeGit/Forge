@@ -1,0 +1,24 @@
+{
+  "id": "mfa-challenge",
+  "number": 77,
+  "name": "Challenge de connexion",
+  "kind": "skeleton",
+  "aliases": [
+    "mfa-challenge",
+    "mfa_challenge",
+    "77"
+  ],
+  "description": "Challenge de connexion : palier 2 du niveau intermédiaire de la progression welcome-mfa. start_mfa_challenge ouvre un challenge MFA temporaire en session après l'authentification primaire ; verify_mfa_challenge confronte le code (TOTP ou récupération) avec tentatives limitées. Démo en session avec utilisateur démo. Nécessite FORGE_MFA_SECRET_KEY.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mfa-challenge",
+  "routes_marker": "mfa-challenge",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mfa-challenge",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mfa/intermediaire/mfa-challenge/",
+  "check_paths": [
+    "mvc/controllers/mfa_challenge_controller.py",
+    "mvc/views/mfa_challenge/index.html"
+  ]
+}

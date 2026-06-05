@@ -1,0 +1,24 @@
+{
+  "id": "mfa-verify",
+  "number": 75,
+  "name": "Vérifier un code TOTP",
+  "kind": "skeleton",
+  "aliases": [
+    "mfa-verify",
+    "mfa_verify",
+    "75"
+  ],
+  "description": "Vérifier un code TOTP : palier 3 du niveau débutant de la progression welcome-mfa. verify_totp_code confronte un code à 6 chiffres au secret partagé, avec une fenêtre de tolérance temporelle. C'est le contrôle au cœur du TOTP. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mfa-verify",
+  "routes_marker": "mfa-verify",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mfa-verify",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mfa/debutant/mfa-verify/",
+  "check_paths": [
+    "mvc/controllers/mfa_verify_controller.py",
+    "mvc/views/mfa_verify/index.html"
+  ]
+}

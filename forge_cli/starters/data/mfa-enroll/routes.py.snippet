@@ -1,0 +1,7 @@
+# forge-starter:mfa-enroll:start
+from mvc.controllers.mfa_enroll_controller import MfaEnrollController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/mfa-enroll", MfaEnrollController.index, name="mfa_enroll_index")
+    pub.add("POST", "/mfa-enroll", MfaEnrollController.confirm, name="mfa_enroll_confirm")
+# forge-starter:mfa-enroll:end

@@ -175,7 +175,7 @@ forge doctor
 forge starter:list
 ```
 
-`forge starter:list` doit afficher les 72 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
+`forge starter:list` doit afficher les 81 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
 
 ---
 
@@ -257,6 +257,15 @@ forge starter:build 69 --force --dry-run
 forge starter:build 70 --force --dry-run
 forge starter:build 71 --force --dry-run
 forge starter:build 72 --force --dry-run
+forge starter:build 73 --force --dry-run
+forge starter:build 74 --force --dry-run
+forge starter:build 75 --force --dry-run
+forge starter:build 76 --force --dry-run
+forge starter:build 77 --force --dry-run
+forge starter:build 78 --force --dry-run
+forge starter:build 79 --force --dry-run
+forge starter:build 80 --force --dry-run
+forge starter:build 81 --force --dry-run
 ```
 
 !!! note "Ce que --dry-run valide"
@@ -548,7 +557,7 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 |---|---|
 | `python -m build` | wheel créée dans `dist/` |
 | `forge --version` | `Forge {{forge_version}}` |
-| `forge starter:list` | 72 starters affichés |
+| `forge starter:list` | 81 starters affichés |
 | `forge starter:build N --dry-run` | plan affiché sans erreur (×48) |
 | `forge db:init` + `starter:build 1` | CRUD contacts fonctionnel |
 | `forge db:init` + `starter:build 2` | login `admin` / `secret123` → `/dashboard` |

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Challenge de connexion — Forge</title>
+</head>
+<body>
+  <h1>Challenge de connexion</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if verified %}
+  <p data-level="success">✓ Challenge validé (méthode : {{ verified }}).</p>
+  {% endif %}
+
+  {% if secret %}
+  <p>Secret du facteur démo : <code>{{ secret }}</code> — générez un code dans une
+  application d'authentification.</p>
+  {% endif %}
+
+  <form method="post" action="/mfa-challenge">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Code (TOTP ou récupération)
+      <input type="text" name="code" required>
+    </label>
+    <button type="submit">Valider le challenge</button>
+  </form>
+
+  <p>Dans une vraie application, le challenge s'ouvre <strong>après</strong> le mot de
+  passe ; les facteurs proviennent de la base, pas de la session.</p>
+</body>
+</html>

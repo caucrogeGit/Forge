@@ -53,6 +53,10 @@ PARCOURS = {
         "debutant/audio-welcome.md",
         ["pip install -e packages/forge-mvc-audio/", "forge starter:build audio-welcome", "forge run"],
     ),
+    "welcome-mfa": (
+        "debutant/mfa-welcome.md",
+        ["pip install --pre forge-mvc-mfa", "forge starter:build mfa-welcome", "forge run"],
+    ),
 }
 
 

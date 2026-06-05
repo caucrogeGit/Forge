@@ -1,0 +1,6 @@
+# forge-starter:mfa-secret:start
+from mvc.controllers.mfa_secret_controller import MfaSecretController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/mfa-secret", MfaSecretController.index, name="mfa_secret_index")
+# forge-starter:mfa-secret:end

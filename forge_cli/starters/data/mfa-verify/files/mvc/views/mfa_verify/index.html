@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vérifier un code TOTP — Forge</title>
+</head>
+<body>
+  <h1>Vérifier un code TOTP</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if valid is defined and valid %}
+  <p data-level="success">✓ Code valide.</p>
+  {% elif valid is defined and not valid %}
+  <p data-level="error">✗ Code invalide ou expiré.</p>
+  {% endif %}
+
+  <form method="post" action="/mfa-verify">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Secret base32
+      <input type="text" name="secret" value="{{ secret or '' }}" required>
+    </label>
+    <label>Code à 6 chiffres
+      <input type="text" name="code" inputmode="numeric" pattern="[0-9]*" required>
+    </label>
+    <button type="submit">Vérifier</button>
+  </form>
+
+  <p>Utilisez le secret du palier précédent dans une application d'authentification,
+  puis saisissez le code affiché.</p>
+</body>
+</html>
