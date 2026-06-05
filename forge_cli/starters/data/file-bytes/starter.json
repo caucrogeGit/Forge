@@ -1,0 +1,24 @@
+{
+  "id": "file-bytes",
+  "number": 66,
+  "name": "Écrire des octets générés",
+  "kind": "skeleton",
+  "aliases": [
+    "file-bytes",
+    "file_bytes",
+    "66"
+  ],
+  "description": "Écrire des octets générés : palier 3 du niveau avancé de la progression welcome-files. save_bytes écrit un contenu produit côté serveur (rapport, export) dans la zone d'upload, avec un nom sûr, sans passer par un upload HTTP. Primitive bas niveau que les opt-ins média composent (ADR-020). Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/file-bytes",
+  "routes_marker": "file-bytes",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/file-bytes",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-files/avance/file-bytes/",
+  "check_paths": [
+    "mvc/controllers/file_bytes_controller.py",
+    "mvc/views/file_bytes/index.html"
+  ]
+}

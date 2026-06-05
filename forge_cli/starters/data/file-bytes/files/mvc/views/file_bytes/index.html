@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Écrire des octets générés — Forge</title>
+</head>
+<body>
+  <h1>Écrire des octets générés</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if generated_name %}
+  <p data-level="success">Fichier généré : <code>documents/{{ generated_name }}</code></p>
+  {% endif %}
+
+  <form method="post" action="/file-bytes">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <textarea name="content" rows="4" cols="50" placeholder="Contenu du fichier…"></textarea>
+    <br>
+    <button type="submit">Générer le fichier</button>
+  </form>
+
+  <p>Le contenu saisi est écrit par <code>save_bytes</code> sous un nom sûr, sans
+  passer par un upload : la même primitive d'écriture que <code>save_upload</code>.</p>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Valider un upload — Forge</title>
+</head>
+<body>
+  <h1>Valider un upload</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if accepted %}
+  <p data-level="success">✓ <strong>{{ accepted }}</strong> accepté (toutes les règles passent).</p>
+  {% endif %}
+  {% if rejected %}
+  <p data-level="error">✗ Rejeté — règle <strong>{{ rejected.rule }}</strong> : {{ rejected.message }}</p>
+  {% endif %}
+
+  <form method="post" action="/file-validate" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="file" name="document" required>
+    <button type="submit">Tester la validation</button>
+  </form>
+
+  <p>Essayez un <code>.exe</code> (extension), un fichier au mauvais type, ou un fichier
+  trop volumineux : chaque refus nomme sa règle.</p>
+</body>
+</html>

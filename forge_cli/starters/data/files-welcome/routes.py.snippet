@@ -1,0 +1,7 @@
+# forge-starter:files-welcome:start
+from mvc.controllers.files_welcome_controller import FilesWelcomeController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/files-welcome", FilesWelcomeController.index, name="files_welcome_index")
+    pub.add("GET", "/files-welcome/inspect", FilesWelcomeController.inspect, name="files_welcome_inspect")
+# forge-starter:files-welcome:end

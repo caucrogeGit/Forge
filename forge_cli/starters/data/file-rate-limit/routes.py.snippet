@@ -1,0 +1,7 @@
+# forge-starter:file-rate-limit:start
+from mvc.controllers.file_rate_limit_controller import FileRateLimitController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/file-rate-limit", FileRateLimitController.index, name="file_rate_limit_index")
+    pub.add("POST", "/file-rate-limit", FileRateLimitController.upload, name="file_rate_limit_upload")
+# forge-starter:file-rate-limit:end

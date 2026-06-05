@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Assainir un nom de fichier — Forge</title>
+</head>
+<body>
+  <h1>Assainir un nom de fichier</h1>
+
+  <form method="get" action="/file-safe-name">
+    <input type="text" name="name" value="{{ input }}" size="50">
+    <button type="submit">Assainir</button>
+  </form>
+
+  <p>Entrée : <code>{{ input }}</code></p>
+  {% if safe %}
+  <p data-level="success">Nom sûr : <code>{{ safe }}</code></p>
+  {% endif %}
+  {% if error %}
+  <p data-level="error">Refusé : {{ error }}</p>
+  {% endif %}
+
+  <p>Le chemin (<code>../Mon Dossier/</code>) disparaît, les caractères dangereux
+  sont remplacés : ce qui reste ne peut plus désigner qu'un fichier, jamais un
+  répertoire parent.</p>
+</body>
+</html>

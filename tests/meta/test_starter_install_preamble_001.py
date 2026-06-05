@@ -45,6 +45,10 @@ PARCOURS = {
         "debutant/images-welcome.md",
         ["pip install -e packages/forge-mvc-images/", "forge starter:build images-welcome", "forge run"],
     ),
+    "welcome-files": (
+        "debutant/files-welcome.md",
+        ["pip install -e packages/forge-mvc-files/", "forge starter:build files-welcome", "forge run"],
+    ),
 }
 
 

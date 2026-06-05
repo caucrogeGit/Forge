@@ -197,6 +197,24 @@ nav:
               - Garde de sécurité à l'upload: starters/welcome-images/avance/image-safety.md
               - Bilan avancé: starters/welcome-images/avance/bilan.md
           - Aide-mémoire: starters/welcome-images/recapitulatif.md
+      - Progression Files (welcome-files):
+          - Installation: starters/welcome-files/installation.md
+          - Débutant:
+              - Bonjour Forge Files: starters/welcome-files/debutant/files-welcome.md
+              - Stocker un document: starters/welcome-files/debutant/file-store.md
+              - Servir un fichier: starters/welcome-files/debutant/file-serve.md
+              - Bilan débutant: starters/welcome-files/debutant/bilan.md
+          - Intermédiaire:
+              - Valider un upload: starters/welcome-files/intermediaire/file-validate.md
+              - Limiter les uploads: starters/welcome-files/intermediaire/file-rate-limit.md
+              - Supprimer un fichier: starters/welcome-files/intermediaire/file-delete.md
+              - Bilan intermédiaire: starters/welcome-files/intermediaire/bilan.md
+          - Avancé:
+              - Assainir un nom de fichier: starters/welcome-files/avance/file-safe-name.md
+              - Chemin anti-traversal: starters/welcome-files/avance/file-safe-path.md
+              - Écrire des octets générés: starters/welcome-files/avance/file-bytes.md
+              - Bilan avancé: starters/welcome-files/avance/bilan.md
+          - Aide-mémoire: starters/welcome-files/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md
