@@ -18,7 +18,7 @@ l'afficher et la tenir accessible et ordonnée.
 
 ## Et ensuite
 
-Le niveau **avancé** complétera la progression : image de couverture,
-suppression propre et garde de sécurité à l'upload.
+Place au niveau **avancé** : image de couverture, suppression propre et garde de
+sécurité à l'upload.
 
-[Aide-mémoire de la progression Images](../recapitulatif.md)
+[Niveau avancé : Image de couverture](../avance/image-cover.md)

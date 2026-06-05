@@ -191,6 +191,11 @@ nav:
               - Afficher la galerie: starters/welcome-images/intermediaire/image-gallery.md
               - Texte alternatif et ordre: starters/welcome-images/intermediaire/image-alt-order.md
               - Bilan intermédiaire: starters/welcome-images/intermediaire/bilan.md
+          - Avancé:
+              - Image de couverture: starters/welcome-images/avance/image-cover.md
+              - Supprimer proprement: starters/welcome-images/avance/image-delete.md
+              - Garde de sécurité à l'upload: starters/welcome-images/avance/image-safety.md
+              - Bilan avancé: starters/welcome-images/avance/bilan.md
           - Aide-mémoire: starters/welcome-images/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md

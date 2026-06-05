@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Garde de sécurité à l'upload — Forge</title>
+</head>
+<body>
+  <h1>Garde de sécurité à l'upload</h1>
+
+  <p>Politique appliquée par <code>verify_image_content</code> :</p>
+  <ul>
+    <li>Formats acceptés : <code>{{ guard.allowed_extensions | join(', ') }}</code></li>
+    <li>Surface maximale (anti-bombe) : <code>{{ guard.max_image_pixels }}</code> pixels</li>
+  </ul>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if accepted %}
+  <p data-level="success">✓ <strong>{{ accepted }}</strong> est une image valide — acceptée.</p>
+  {% endif %}
+  {% if rejected %}
+  <p data-level="error">✗ Fichier rejeté : {{ rejected }}</p>
+  {% endif %}
+
+  <form method="post" action="/image-safety" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="file" name="image" required>
+    <button type="submit">Vérifier (sans enregistrer)</button>
+  </form>
+</body>
+</html>

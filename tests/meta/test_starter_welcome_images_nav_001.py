@@ -80,10 +80,33 @@ class TestIntermediaireChain:
         page = IMAGES / "intermediaire" / "image-alt-order.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
-    def test_intermediaire_bilan_points_to_recapitulatif(self):
-        # L'intermédiaire est le dernier niveau livré (jalon 2) → renvoi au
-        # récapitulatif. À repointer vers l'avancé au jalon 3.
+    def test_intermediaire_bilan_points_to_next_level(self):
+        # Le niveau avancé existe (jalon 3) → le bilan intermédiaire renvoie à
+        # son premier palier.
         bilan = IMAGES / "intermediaire" / "bilan.md"
+        assert "../avance/image-cover.md" in bilan.read_text(encoding="utf-8")
+
+
+# ── Niveau avancé ─────────────────────────────────────────────────────────────
+
+class TestAvanceChain:
+
+    def test_image_cover_points_to_image_delete(self):
+        page = IMAGES / "avance" / "image-cover.md"
+        assert "(image-delete.md)" in page.read_text(encoding="utf-8")
+
+    def test_image_delete_points_to_image_safety(self):
+        page = IMAGES / "avance" / "image-delete.md"
+        assert "(image-safety.md)" in page.read_text(encoding="utf-8")
+
+    def test_last_palier_points_to_level_bilan(self):
+        # image-safety est le dernier palier avancé (et de toute la progression).
+        page = IMAGES / "avance" / "image-safety.md"
+        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+
+    def test_avance_bilan_points_to_recapitulatif(self):
+        # Dernier niveau → le bilan avancé renvoie au récapitulatif.
+        bilan = IMAGES / "avance" / "bilan.md"
         assert "../recapitulatif.md" in bilan.read_text(encoding="utf-8")
 
 

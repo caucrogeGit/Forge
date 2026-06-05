@@ -25,5 +25,10 @@ module opt-in `forge-mvc-images` introduites à chaque étape.
 | 2 | [Afficher la galerie](intermediaire/image-gallery.md) | Lire et afficher les images d'une entité avec variantes | `get_media_gallery` |
 | 3 | [Texte alternatif et ordre](intermediaire/image-alt-order.md) | Éditer accessibilité et ordre d'affichage | `update_media_alt_text`, `update_media_position` |
 
-Le niveau **avancé** (couverture, suppression, sécurité) complétera cette
-aide-mémoire à sa livraison.
+## Niveau avancé — couverture, suppression, sécurité
+
+| # | Palier | Ce qu'on apprend | API-clé |
+|---|--------|------------------|---------|
+| 1 | [Image de couverture](avance/image-cover.md) | Désigner et afficher la couverture d'une entité | `get_cover_media` |
+| 2 | [Supprimer proprement](avance/image-delete.md) | Supprimer ligne + fichier + variantes en une fois | `delete_media` |
+| 3 | [Garde de sécurité à l'upload](avance/image-safety.md) | Refuser un fichier piégé ou une image-bombe | `verify_image_content`, `upload_max_image_pixels` |
