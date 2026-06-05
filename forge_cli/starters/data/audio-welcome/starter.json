@@ -1,0 +1,23 @@
+{
+  "id": "audio-welcome",
+  "number": 67,
+  "name": "Bonjour Forge Audio",
+  "kind": "skeleton",
+  "aliases": [
+    "audio-welcome",
+    "audio_welcome",
+    "67"
+  ],
+  "description": "Bonjour Forge Audio : premier palier du niveau débutant de la progression welcome-audio. Premier contact avec le module opt-in forge-mvc-audio (chaîne audio sans état). Une route texte et une route qui inspecte la configuration (stockage, limites, binaires ffprobe/ffmpeg), token masqué. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/audio-welcome",
+  "routes_marker": "audio-welcome",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/audio-welcome",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-audio/debutant/audio-welcome/",
+  "check_paths": [
+    "mvc/controllers/audio_welcome_controller.py"
+  ]
+}

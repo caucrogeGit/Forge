@@ -58,9 +58,9 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 66)
+## 4. Starters 1.0 (gelés — 72)
 
-La liste pédagogique est **figée** : 66 starters, numérotés de 1 à 66,
+La liste pédagogique est **figée** : 72 starters, numérotés de 1 à 72,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
 (`welcome-optin-<module>`, `users-core-auth`, `first-*`…). La progression
 `welcome-forge` est organisée par niveau ; le **niveau avancé** (`relations`, …)
@@ -68,11 +68,13 @@ prolonge le niveau intermédiaire (`list-records`, `filter-list`, …), lui-mêm
 au-dessus du niveau débutant. Trois autres progressions par niveau couvrent les
 modules opt-in : `welcome-iot` (`iot-welcome`, …) pour `forge-mvc-iot`,
 `welcome-video` (`video-welcome`, …) pour `forge-mvc-video`, `welcome-images`
-(`images-welcome`, …) pour `forge-mvc-images`, et `welcome-files`
-(`files-welcome`, …) pour `forge-mvc-files` (progressions complètes : débutant,
-intermédiaire, avancé).
+(`images-welcome`, …) pour `forge-mvc-images`, `welcome-files`
+(`files-welcome`, …) pour `forge-mvc-files`, et `welcome-audio`
+(`audio-welcome`, …) pour `forge-mvc-audio` (audio en 2 niveaux : débutant +
+avancé, module sans état).
 
 ```
+audio-doctor, audio-play, audio-probe, audio-transcode, audio-upload, audio-welcome,
 csrf, db-transaction, delete-record, dynamic-route, file-upload, filter-list, first-crud, first-crud-generated,
 file-bytes, file-delete, file-rate-limit, file-safe-name, file-safe-path, file-serve, file-store, file-validate, files-welcome,
 first-html-view, first-sql, first-sql-write, flash-messages, form-post,

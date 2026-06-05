@@ -70,6 +70,8 @@ class TestStartersFrozen:
         "files-welcome", "file-store", "file-serve", "file-validate",
         "file-rate-limit", "file-delete", "file-safe-name", "file-safe-path",
         "file-bytes",
+        "audio-welcome", "audio-upload", "audio-play", "audio-probe",
+        "audio-transcode", "audio-doctor",
     }
 
     def test_starter_set_is_frozen(self):
@@ -83,7 +85,7 @@ class TestStartersFrozen:
         )
 
     def test_frozen_count(self):
-        assert len(self.FROZEN) == 66
+        assert len(self.FROZEN) == 72
 
 
 # ── Le contrat est documenté ─────────────────────────────────────────────────
@@ -94,7 +96,7 @@ class TestContractDocumented:
 
     @pytest.mark.parametrize("needle", [
         "opt-in:install", "opt-in:disable", "module:install",
-        "66 starters", "mkdocs build --strict",
+        "72 starters", "mkdocs build --strict",
     ])
     def test_contract_mentions(self, needle):
         assert needle in CONTRACT.read_text(encoding="utf-8")

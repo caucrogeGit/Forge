@@ -1,0 +1,7 @@
+# forge-starter:audio-transcode:start
+from mvc.controllers.audio_transcode_controller import AudioTranscodeController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/audio-transcode", AudioTranscodeController.index, name="audio_transcode_index")
+    pub.add("POST", "/audio-transcode", AudioTranscodeController.transcode, name="audio_transcode_run")
+# forge-starter:audio-transcode:end

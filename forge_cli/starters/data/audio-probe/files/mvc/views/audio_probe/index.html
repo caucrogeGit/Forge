@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Sonder un audio — Forge</title>
+</head>
+<body>
+  <h1>Sonder un audio</h1>
+
+  <form method="get" action="/audio-probe">
+    <input type="text" name="path" value="{{ path }}" placeholder="originals/AAAA/MM/uuid/source.mp3" size="50" required>
+    <button type="submit">Sonder</button>
+  </form>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  {% if meta %}
+  <ul>
+    <li>Durée : {{ meta.duration_seconds }} s</li>
+    <li>Codec : <code>{{ meta.audio_codec }}</code></li>
+    <li>Bitrate : {{ meta.bitrate_kbps }} kbps</li>
+    <li>Fréquence : {{ meta.sample_rate_hz }} Hz</li>
+    <li>Canaux : {{ meta.channels }}</li>
+    <li>Conteneur : <code>{{ meta.container }}</code></li>
+  </ul>
+  {% endif %}
+
+  <p>Le chemin est celui renvoyé par le palier « Téléverser un audio »
+  (<code>original_path</code>), relatif au stockage audio.</p>
+</body>
+</html>

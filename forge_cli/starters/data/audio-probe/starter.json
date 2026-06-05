@@ -1,0 +1,24 @@
+{
+  "id": "audio-probe",
+  "number": 70,
+  "name": "Sonder un audio",
+  "kind": "skeleton",
+  "aliases": [
+    "audio-probe",
+    "audio_probe",
+    "70"
+  ],
+  "description": "Sonder un audio : palier 1 du niveau avancé de la progression welcome-audio. probe_audio (ffprobe, lecture seule) extrait durée, codec, bitrate, fréquence d'échantillonnage, canaux et conteneur d'un fichier audio stocké. ffprobe requis. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/audio-probe",
+  "routes_marker": "audio-probe",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/audio-probe",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-audio/avance/audio-probe/",
+  "check_paths": [
+    "mvc/controllers/audio_probe_controller.py",
+    "mvc/views/audio_probe/index.html"
+  ]
+}

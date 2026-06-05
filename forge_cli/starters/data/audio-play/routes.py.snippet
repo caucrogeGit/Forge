@@ -1,0 +1,8 @@
+# forge-starter:audio-play:start
+# Branche la route de lecture officielle de Forge Audio (streaming HTTP Range) :
+#   GET /audio/{uuid}
+# Le code métier vit dans le paquet forge-mvc-audio ; on ne fait que le brancher.
+from forge_mvc_audio import register_audio_routes
+
+register_audio_routes(router)
+# forge-starter:audio-play:end

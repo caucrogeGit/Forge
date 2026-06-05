@@ -215,6 +215,19 @@ nav:
               - Écrire des octets générés: starters/welcome-files/avance/file-bytes.md
               - Bilan avancé: starters/welcome-files/avance/bilan.md
           - Aide-mémoire: starters/welcome-files/recapitulatif.md
+      - Progression Audio (welcome-audio):
+          - Installation: starters/welcome-audio/installation.md
+          - Débutant:
+              - Bonjour Forge Audio: starters/welcome-audio/debutant/audio-welcome.md
+              - Téléverser un audio: starters/welcome-audio/debutant/audio-upload.md
+              - Lire un audio: starters/welcome-audio/debutant/audio-play.md
+              - Bilan débutant: starters/welcome-audio/debutant/bilan.md
+          - Avancé:
+              - Sonder un audio: starters/welcome-audio/avance/audio-probe.md
+              - Transcoder en MP3: starters/welcome-audio/avance/audio-transcode.md
+              - Diagnostiquer le module Audio: starters/welcome-audio/avance/audio-doctor.md
+              - Bilan avancé: starters/welcome-audio/avance/bilan.md
+          - Aide-mémoire: starters/welcome-audio/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md

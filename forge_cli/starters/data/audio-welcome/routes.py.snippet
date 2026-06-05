@@ -1,0 +1,7 @@
+# forge-starter:audio-welcome:start
+from mvc.controllers.audio_welcome_controller import AudioWelcomeController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/audio-welcome", AudioWelcomeController.index, name="audio_welcome_index")
+    pub.add("GET", "/audio-welcome/inspect", AudioWelcomeController.inspect, name="audio_welcome_inspect")
+# forge-starter:audio-welcome:end

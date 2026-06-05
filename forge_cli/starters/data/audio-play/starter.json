@@ -1,0 +1,21 @@
+{
+  "id": "audio-play",
+  "number": 69,
+  "name": "Lire un audio",
+  "kind": "skeleton",
+  "aliases": [
+    "audio-play",
+    "audio_play",
+    "69"
+  ],
+  "description": "Lire un audio : palier 3 du niveau débutant de la progression welcome-audio. Branche la route de lecture officielle de Forge Audio (register_audio_routes) : GET /audio/{uuid} sert le fichier en streaming HTTP Range. Le code métier vit dans le paquet ; on ne fait que le brancher. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/audio/{uuid}",
+  "routes_marker": "audio-play",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/audio/UUID",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-audio/debutant/audio-play/",
+  "check_paths": []
+}
