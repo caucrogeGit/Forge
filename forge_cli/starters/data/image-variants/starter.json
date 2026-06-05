@@ -1,0 +1,24 @@
+{
+  "id": "image-variants",
+  "number": 51,
+  "name": "Miniatures et variantes",
+  "kind": "skeleton",
+  "aliases": [
+    "image-variants",
+    "image_variants",
+    "51"
+  ],
+  "description": "Miniatures et variantes : palier 3 du niveau débutant de la progression welcome-images. Comprendre comment forge_mvc_images dérive les chemins des variantes (medium, thumbnail) d'une image avec image_variant_relative_paths, et construit leurs URL publiques avec media_url. Transformation de chemin pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/image-variants",
+  "routes_marker": "image-variants",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/image-variants",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-images/debutant/image-variants/",
+  "check_paths": [
+    "mvc/controllers/image_variants_controller.py",
+    "mvc/views/image_variants/index.html"
+  ]
+}

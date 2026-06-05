@@ -41,6 +41,10 @@ PARCOURS = {
         "debutant/video-welcome.md",
         ["pip install --pre forge-mvc-video", "forge starter:build video-welcome", "forge run"],
     ),
+    "welcome-images": (
+        "debutant/images-welcome.md",
+        ["pip install -e packages/forge-mvc-images/", "forge starter:build images-welcome", "forge run"],
+    ),
 }
 
 

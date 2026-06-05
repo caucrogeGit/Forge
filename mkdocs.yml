@@ -179,6 +179,14 @@ nav:
               - Diagnostiquer le module Vidéo: starters/welcome-video/avance/video-doctor.md
               - Bilan avancé: starters/welcome-video/avance/bilan.md
           - Aide-mémoire: starters/welcome-video/recapitulatif.md
+      - Progression Images (welcome-images):
+          - Installation: starters/welcome-images/installation.md
+          - Débutant:
+              - Bonjour Forge Images: starters/welcome-images/debutant/images-welcome.md
+              - Téléverser une image: starters/welcome-images/debutant/image-upload.md
+              - Miniatures et variantes: starters/welcome-images/debutant/image-variants.md
+              - Bilan débutant: starters/welcome-images/debutant/bilan.md
+          - Aide-mémoire: starters/welcome-images/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md

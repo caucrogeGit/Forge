@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Miniatures et variantes — Forge</title>
+</head>
+<body>
+  <h1>Miniatures et variantes</h1>
+
+  <p>Image de référence : <code>{{ path }}</code></p>
+
+  <table>
+    <thead>
+      <tr><th>Variante</th><th>Taille max</th><th>Chemin relatif</th><th>URL publique</th></tr>
+    </thead>
+    <tbody>
+      {% for name, info in variants.items() %}
+      <tr>
+        <td>{{ name }}</td>
+        <td>
+          {% if name in sizes %}{{ sizes[name][0] }}×{{ sizes[name][1] }}{% else %}originale{% endif %}
+        </td>
+        <td><code>{{ info.relative_path }}</code></td>
+        <td><code>{{ info.url }}</code></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p>
+    Changez l'image de référence en passant un paramètre :
+    <code>/image-variants?path=images/2026/autre.png</code>
+  </p>
+</body>
+</html>

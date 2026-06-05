@@ -1,0 +1,7 @@
+# forge-starter:image-upload:start
+from mvc.controllers.image_upload_controller import ImageUploadController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/image-upload", ImageUploadController.index, name="image_upload_index")
+    pub.add("POST", "/image-upload", ImageUploadController.upload, name="image_upload_store")
+# forge-starter:image-upload:end
