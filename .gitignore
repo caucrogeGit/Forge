@@ -35,6 +35,8 @@ storage/logs/*
 !storage/logs/.gitkeep
 storage/mail/*
 !storage/mail/.gitkeep
+# artefacts runtime ecrits sous core/ lors des tests (logs d'erreurs dev)
+core/storage/
 sample.json
 !storage/uploads/images/
 !storage/uploads/images/.gitkeep
