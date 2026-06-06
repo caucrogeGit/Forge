@@ -1,4 +1,5 @@
 import re
+from urllib.parse import quote
 
 
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
@@ -193,7 +194,10 @@ class Router:
             raise KeyError(f"Route inconnue : {name!r}")
         url = entry.pattern
         for key, value in params.items():
-            url = url.replace(f'{{{key}}}', str(value))
+            # URL-encodage du segment : un paramètre contenant /, espace, ?, #…
+            # produirait sinon une URL malformée. safe='' encode aussi '/'
+            # (un paramètre de chemin ne traverse pas de segment).
+            url = url.replace(f'{{{key}}}', quote(str(value), safe=''))
         if '{' in url:
             missing = re.findall(r'\{(\w+)\}', url)
             raise KeyError(f"Paramètres manquants pour {name!r} : {missing}")
