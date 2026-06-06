@@ -1,10 +1,11 @@
 """
-core/security/rbac.py — Modèles génériques Role et Permission, autorisation
+forge_mvc_rbac/rbac.py — Modèles génériques Role et Permission, autorisation
 
 Socle de données RBAC sans ORM.
 - Role       : rôle portant un slug unique.
 - Permission : capacité atomique identifiée par un code pointé (ex. "posts.edit").
-- require_permission : décorateur de contrôle d'accès par permission.
+- require_permission : primitive bas niveau lisant request.permissions
+  (voir le docstring du paquet pour le choix de la garde de route officielle).
 """
 
 from __future__ import annotations

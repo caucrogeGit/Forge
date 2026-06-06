@@ -1,4 +1,21 @@
-"""Forge RBAC — rôles, permissions, autorisations et helpers Jinja."""
+"""Forge RBAC — rôles, permissions, autorisations et helpers Jinja.
+
+Protéger une route par permission : il existe trois niveaux, à choisir selon la
+source des permissions (ce n'est pas trois façons de faire la même chose, mais
+trois contextes distincts) :
+
+- ``require_contract_permission`` (recommandé, déclaratif) : garde de route
+  basée sur le contrat RBAC chargé, sans base de données. C'est la voie promue
+  par le parcours welcome-rbac et la façon officielle par défaut.
+- ``require_user_permission`` / ``auth_user_can`` : résolution des permissions
+  de l'utilisateur Auth/User **connecté** depuis la base (via
+  ``user_has_permission``). À utiliser quand les permissions vivent en base.
+- ``require_permission`` / ``has_permission`` : primitive bas niveau qui lit des
+  permissions déjà chargées dans ``request.permissions`` (à peupler en amont).
+
+Toutes échouent fermé (401/403). En cas de doute, utiliser
+``require_contract_permission``.
+"""
 
 from __future__ import annotations
 
