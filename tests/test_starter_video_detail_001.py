@@ -2,7 +2,7 @@
 
 Contrat du palier 3 du niveau débutant de welcome-video — Le détail d'une vidéo :
 
-- starter.json : `video-detail`, slot 42, requires_db **false** ;
+- starter.json : `video-detail`, slot 36, requires_db **false** ;
 - snippet : GET `/video-detail/{uuid}` ;
 - contrôleur : `route_param`, `get_by_uuid`, `404` si inconnue, `503` si table
   absente ; lecture seule ;
@@ -24,17 +24,17 @@ CONTROLLER = FILES / "mvc" / "controllers" / "video_detail_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-video" / "debutant" / "video-detail.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 42"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 36"]
 
 
 def test_resolves():
     m = resolve("video-detail")
-    assert m["id"] == "video-detail" and m["number"] == 42
+    assert m["id"] == "video-detail" and m["number"] == 36
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("video-detail", "video_detail", "42"):
+    for a in ("video-detail", "video_detail", "36"):
         assert resolve(a)["id"] == "video-detail"
 
 

@@ -1,12 +1,12 @@
 {
   "id": "workflow-jinja",
-  "number": 99,
+  "number": 93,
   "name": "Helpers Workflow dans Jinja",
   "kind": "skeleton",
   "aliases": [
     "workflow-jinja",
     "workflow_jinja",
-    "99"
+    "93"
   ],
   "description": "Helpers Workflow dans Jinja : palier 3 du niveau avancé de la progression welcome-workflow. make_workflow_jinja_helpers retourne les helpers (badge, label, color, classe) prêts à injecter dans le contexte d'un template pour les utiliser directement. Transformation pure, aucune base de données.",
   "status": "available",

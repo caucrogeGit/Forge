@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILE-RATE-LIMIT-001 (test proportionné).
 
-Palier 2 intermédiaire welcome-files — Limiter les uploads : slot 62, requires_db
+Palier 2 intermédiaire welcome-files — Limiter les uploads : slot 56, requires_db
 false, routes GET/POST `/file-rate-limit`, contrôleur `is_upload_rate_limited` +
 `record_upload_attempt`, vue présente, doc sous `welcome-files/intermediaire/`.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "file_rate_limit_co
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "file_rate_limit" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "intermediaire" / "file-rate-limit.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 62"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 56"]
 
 
 def test_resolves():
     m = resolve("file-rate-limit")
-    assert m["id"] == "file-rate-limit" and m["number"] == 62
+    assert m["id"] == "file-rate-limit" and m["number"] == 56
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-rate-limit", "file_rate_limit", "62"):
+    for a in ("file-rate-limit", "file_rate_limit", "56"):
         assert resolve(a)["id"] == "file-rate-limit"
 
 

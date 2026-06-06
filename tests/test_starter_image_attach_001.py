@@ -3,7 +3,7 @@
 Contrat du palier 1 du niveau intermédiaire de welcome-images —
 Rattacher une image à une entité :
 
-- starter.json : `image-attach`, slot 52, requires_db **true** ;
+- starter.json : `image-attach`, slot 46, requires_db **true** ;
 - snippet : GET `/image-attach`, POST `/image-attach` ;
 - contrôleur : `save_image_upload` + `attach_media_to_entity`, repli pédagogique ;
 - migration `media` livrée avec le starter ; vue présente ;
@@ -27,17 +27,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "intermediaire" / "image-attach.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 52"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 46"]
 
 
 def test_resolves():
     m = resolve("image-attach")
-    assert m["id"] == "image-attach" and m["number"] == 52
+    assert m["id"] == "image-attach" and m["number"] == 46
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("image-attach", "image_attach", "52"):
+    for a in ("image-attach", "image_attach", "46"):
         assert resolve(a)["id"] == "image-attach"
 
 

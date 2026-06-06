@@ -1,12 +1,12 @@
 {
   "id": "file-validate",
-  "number": 61,
+  "number": 55,
   "name": "Valider un upload",
   "kind": "skeleton",
   "aliases": [
     "file-validate",
     "file_validate",
-    "61"
+    "55"
   ],
   "description": "Valider un upload : palier 1 du niveau intermédiaire de la progression welcome-files. Montre la taxonomie des refus de save_upload : extension interdite (UploadInvalidExtensionError), type MIME interdit (UploadInvalidMimeTypeError), trop gros (UploadTooLargeError). La validation pure reste dans le core, réexportée par files. Aucune base de données.",
   "status": "available",

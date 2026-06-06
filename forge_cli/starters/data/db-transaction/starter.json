@@ -1,13 +1,13 @@
 {
   "id": "db-transaction",
-  "number": 30,
+  "number": 24,
   "name": "Écritures transactionnelles",
   "kind": "skeleton",
   "aliases": [
     "db-transaction",
     "db_transaction",
     "transaction",
-    "30"
+    "24"
   ],
   "description": "Écritures transactionnelles : dernier palier du niveau avancé. Deux insertions sont regroupées dans un bloc `with transaction() as tx:` ; les helpers DB reçoivent `tx`. Si la seconde échoue, la première est annulée (rollback) — soit tout est écrit, soit rien. Table neutre `first_sql_messages`.",
   "status": "available",

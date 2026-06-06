@@ -1,12 +1,12 @@
 {
   "id": "rbac-role",
-  "number": 84,
+  "number": 78,
   "name": "Rôle et slug",
   "kind": "skeleton",
   "aliases": [
     "rbac-role",
     "rbac_role",
-    "84"
+    "78"
   ],
   "description": "Rôle et slug : palier 3 du niveau débutant de la progression welcome-rbac. normalize_role_slug dérive un slug stable depuis un nom de rôle, validate_role refuse les rôles invalides. Transformation pure, aucune base de données.",
   "status": "available",

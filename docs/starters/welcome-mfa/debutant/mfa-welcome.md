@@ -10,8 +10,8 @@ Premier palier du **niveau débutant** de la progression MFA
 ([vue d'ensemble des starters](../../index.md)).
 
 !!! note "Module opt-in"
-    Ce parcours décortique **chaque brique** MFA. Le flux Auth+MFA câblé de bout en
-    bout vit dans le starter `welcome-optin-mfa`. Installé via
+    Ce parcours décortique **chaque brique** MFA isolément, pour comprendre
+    chaque API avant de la câbler dans votre propre flux Auth. Installé via
     `pip install --pre forge-mvc-mfa` (palier « Installation »).
 
 ## Ce que ce starter montre
@@ -71,7 +71,7 @@ def _capabilities() -> dict:
 
 - MFA = TOTP + codes de récupération, avec un cycle de statuts explicite.
 - Les secrets sont **chiffrés au repos** (clé Fernet obligatoire pour l'enrôlement).
-- Ce parcours montre chaque brique isolée ; `welcome-optin-mfa` montre le flux câblé.
+- Ce parcours montre chaque brique isolée, à câbler ensuite dans votre flux Auth.
 
 ## Après ce starter
 

@@ -2,7 +2,7 @@
 
 Contrat du palier 3 du niveau intermédiaire de welcome-video — Suivre l'état :
 
-- starter.json : `video-status`, slot 45, requires_db **true** ;
+- starter.json : `video-status`, slot 39, requires_db **true** ;
 - snippet : GET `/video-status` ;
 - contrôleur : `list_by_status` sur le cycle de vie, réponse `503` pédagogique ;
   lecture seule (ne fait pas avancer le statut) ;
@@ -25,17 +25,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-video" / "intermediaire" / "video-status.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 45"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 39"]
 
 
 def test_resolves():
     m = resolve("video-status")
-    assert m["id"] == "video-status" and m["number"] == 45
+    assert m["id"] == "video-status" and m["number"] == 39
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("video-status", "video_status", "45"):
+    for a in ("video-status", "video_status", "39"):
         assert resolve(a)["id"] == "video-status"
 
 

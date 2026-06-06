@@ -1,12 +1,12 @@
 {
   "id": "audio-transcode",
-  "number": 71,
+  "number": 65,
   "name": "Transcoder en MP3",
   "kind": "skeleton",
   "aliases": [
     "audio-transcode",
     "audio_transcode",
-    "71"
+    "65"
   ],
   "description": "Transcoder en MP3 : palier 2 du niveau avancé de la progression welcome-audio. transcode_to_mp3 convertit un fichier audio source en MP3 standard via ffmpeg (opération synchrone). ffmpeg requis. Aucune base de données, aucun suivi de jobs.",
   "status": "available",

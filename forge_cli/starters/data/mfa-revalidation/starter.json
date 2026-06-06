@@ -1,12 +1,12 @@
 {
   "id": "mfa-revalidation",
-  "number": 79,
+  "number": 73,
   "name": "Revalidation (step-up)",
   "kind": "skeleton",
   "aliases": [
     "mfa-revalidation",
     "mfa_revalidation",
-    "79"
+    "73"
   ],
   "description": "Revalidation (step-up) : palier 1 du niveau avancé de la progression welcome-mfa. mark_mfa_revalidated et has_recent_mfa_revalidation gèrent l'exigence d'une MFA récente avant une action sensible (le décorateur require_recent_mfa s'appuie dessus). Démo en session. Aucune base de données.",
   "status": "available",

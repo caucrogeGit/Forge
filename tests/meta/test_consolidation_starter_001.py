@@ -8,7 +8,7 @@ from unittest.mock import patch
 import pytest
 
 from forge_cli.starters import cmd_starter_list, cmd_starter_build
-from forge_cli.starters.registry import all_starters, resolve
+from forge_cli.starters.registry import all_starters
 
 pytestmark = pytest.mark.meta
 
@@ -65,30 +65,7 @@ def test_starter_list_affiche_tous_les_starters(capsys):
         assert s["name"] in output
 
 
-# ── Statuts documentaires ─────────────────────────────────────────────────────
-
-def test_starter_1_est_officiel_simple():
-    """Starter 1 — First CRUD (généré) est décrit comme starter simple."""
-    content = (ROOT / "docs" / "starters" / "crud" / "first-crud-generated.md").read_text(encoding="utf-8")
-    assert "simple" in content.lower() or "officiel" in content.lower()
-
-
-def test_starter_2_reference_core_auth():
-    """Starter 2 — le contrôleur auth importe depuis core.auth."""
-    auth_ctrl = ROOT / "forge_cli" / "starters" / "data" / "users-core-auth" / "files" / "mvc" / "controllers" / "auth_controller.py"
-    assert auth_ctrl.exists()
-    content = auth_ctrl.read_text(encoding="utf-8")
-    assert "core.auth" in content
-
-
 # ── doc_url cohérence ─────────────────────────────────────────────────────────
-
-def test_starter_2_doc_url_pointe_nouvelle_structure():
-    """Starter 2 — doc_url pointe vers starters/core-auth/users-core-auth/."""
-    meta = resolve("2")
-    assert "starter-app-02" not in meta.get("doc_url", "")
-    assert "starters/core-auth/users-core-auth" in meta.get("doc_url", "")
-
 
 def test_tous_les_starters_ont_un_doc_url():
     """Tous les starters déclarent un doc_url."""
@@ -134,75 +111,6 @@ def test_chaque_starter_a_un_index_md():
         index = ROOT / "docs" / "starters" / "welcome-forge" / "debutant" / f"{dossier}.md"
         assert index.exists(), f"doc de palier welcome absente pour {dossier}"
 
-    # Les starters CRUD sont regroupés sous le dossier-sujet crud/ :
-    # un index.md (vue d'ensemble) + les pages first-crud.md (à la main)
-    # et first-crud-generated.md (généré, entité neutre).
-    crud = ROOT / "docs" / "starters" / "crud"
-    assert (crud / "index.md").exists(), (
-        "vue d'ensemble absente pour crud"
-    )
-    assert (crud / "first-crud.md").exists(), (
-        "page first-crud absente pour crud"
-    )
-    assert (crud / "first-crud-generated.md").exists(), (
-        "page first-crud-generated absente pour crud"
-    )
-
-    # Le starter Auth est regroupé sous le dossier-sujet core-auth/ :
-    # un index.md (vue d'ensemble) + la page users-core-auth.md.
-    core_auth = ROOT / "docs" / "starters" / "core-auth"
-    assert (core_auth / "index.md").exists(), (
-        "vue d'ensemble absente pour core-auth"
-    )
-    assert (core_auth / "users-core-auth.md").exists(), (
-        "page users-core-auth absente pour core-auth"
-    )
-
-    # Le starter IoT est regroupé sous le dossier-sujet optin-iot/ :
-    # un index.md (vue d'ensemble) + la page welcome-optin-iot.md.
-    optin_iot = ROOT / "docs" / "starters" / "optin-iot"
-    assert (optin_iot / "index.md").exists(), (
-        "vue d'ensemble absente pour optin-iot"
-    )
-    assert (optin_iot / "welcome-optin-iot.md").exists(), (
-        "page welcome-optin-iot absente pour optin-iot"
-    )
-
-    # Le starter MFA est regroupé sous le dossier-sujet optin-mfa/ :
-    # un index.md (vue d'ensemble) + la page welcome-optin-mfa.md.
-    optin_mfa = ROOT / "docs" / "starters" / "optin-mfa"
-    assert (optin_mfa / "index.md").exists(), (
-        "vue d'ensemble absente pour optin-mfa"
-    )
-    assert (optin_mfa / "welcome-optin-mfa.md").exists(), (
-        "page welcome-optin-mfa absente pour optin-mfa"
-    )
-
-
-def test_starters_avec_rebuild_md():
-    """Les starters autonomes scaffoldés (first-crud-generated, users-core-auth)
-    ont un guide de reconstruction.
-
-    Réorganisation des starters : carnet-contacts et suivi-comportement-eleves
-    ne sont plus des starters actifs (archivés sous docs/starters/old/) ; seuls
-    les starters restants munis d'un guide de reconstruction sont vérifiés. Le
-    starter MFA a son guide sous optin-mfa/welcome-optin-mfa-rebuild.md ; le
-    starter Auth a le sien sous core-auth/users-core-auth-rebuild.md ; le starter
-    CRUD généré a le sien sous crud/first-crud-generated-rebuild.md."""
-    rebuild_generated = (
-        ROOT / "docs" / "starters" / "crud" / "first-crud-generated-rebuild.md"
-    )
-    assert rebuild_generated.exists(), (
-        "first-crud-generated-rebuild.md absent pour crud"
-    )
-
-    core_auth_rebuild = ROOT / "docs" / "starters" / "core-auth" / "users-core-auth-rebuild.md"
-    assert core_auth_rebuild.exists(), "guide de reconstruction absent pour core-auth"
-
-    # Le guide de reconstruction MFA vit sous le dossier-sujet optin-mfa/.
-    rebuild_mfa = ROOT / "docs" / "starters" / "optin-mfa" / "welcome-optin-mfa-rebuild.md"
-    assert rebuild_mfa.exists(), "welcome-optin-mfa-rebuild.md absent pour optin-mfa"
-
 
 # ── Profils recommandés ───────────────────────────────────────────────────────
 
@@ -242,7 +150,7 @@ def test_starter_1_dry_run_fonctionne(capsys):
     """forge starter:build 1 --dry-run s'exécute sans erreur."""
     cmd_starter_build(["1", "--dry-run"])
     output = capsys.readouterr().out
-    assert "message" in output.lower() or "/messages" in output
+    assert "welcome" in output.lower() or "/welcome" in output
 
 
 # ── Communes & Séjours — séparation core / métier ─────────────────────────────

@@ -1,12 +1,12 @@
 {
   "id": "stats-event",
-  "number": 101,
+  "number": 95,
   "name": "Nom d'événement",
   "kind": "skeleton",
   "aliases": [
     "stats-event",
     "stats_event",
-    "101"
+    "95"
   ],
   "description": "Nom d'événement : palier 2 du niveau débutant de la progression welcome-stats. normalize_event_name met un nom en snake_case, validate_event_name refuse les noms invalides (caractères interdits). Transformation pure, aucune base de données.",
   "status": "available",

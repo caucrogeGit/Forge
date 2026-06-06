@@ -3,7 +3,7 @@
 Contrat du palier 3 du niveau débutant de la progression welcome-images —
 Miniatures et variantes :
 
-- starter.json : `image-variants`, slot 51, requires_db **false** ;
+- starter.json : `image-variants`, slot 45, requires_db **false** ;
 - snippet : GET `/image-variants`, GET `/image-variants/inspect` ;
 - contrôleur : `image_variant_relative_paths`, `media_url`, `IMAGE_VARIANT_SIZES`,
   pas de base de données ; vue présente ;
@@ -26,17 +26,17 @@ VIEW = FILES / "mvc" / "views" / "image_variants" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "debutant" / "image-variants.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 51"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 45"]
 
 
 def test_resolves():
     m = resolve("image-variants")
-    assert m["id"] == "image-variants" and m["number"] == 51
+    assert m["id"] == "image-variants" and m["number"] == 45
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("image-variants", "image_variants", "51"):
+    for a in ("image-variants", "image_variants", "45"):
         assert resolve(a)["id"] == "image-variants"
 
 

@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau avancé — Téléverser un fichier :
 
-- starter.json : `file-upload`, slot 27, requires_db **false** ;
+- starter.json : `file-upload`, slot 21, requires_db **false** ;
 - snippet : GET formulaire, POST upload ;
 - contrôleur : `request.file(...)`, `core.uploads.save_upload`, gestion de
   `UploadError`, CSRF ; pas de base de données ;
@@ -26,17 +26,17 @@ VIEW = FILES / "mvc" / "views" / "file_upload" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "avance" / "file-upload.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 27"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 21"]
 
 
 def test_resolves():
     m = resolve("file-upload")
-    assert m["id"] == "file-upload" and m["number"] == 27
+    assert m["id"] == "file-upload" and m["number"] == 21
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-upload", "file_upload", "upload", "27"):
+    for a in ("file-upload", "file_upload", "upload", "21"):
         assert resolve(a)["id"] == "file-upload"
 
 

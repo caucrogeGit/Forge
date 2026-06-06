@@ -1,12 +1,12 @@
 {
   "id": "rbac-check",
-  "number": 85,
+  "number": 79,
   "name": "Vérifier une permission",
   "kind": "skeleton",
   "aliases": [
     "rbac-check",
     "rbac_check",
-    "85"
+    "79"
   ],
   "description": "Vérifier une permission : palier 1 du niveau intermédiaire de la progression welcome-rbac. has_contract_permission dit si un ensemble de rôles accorde une permission selon le contrat déclaratif (livré avec le starter). Vérification pure, aucune base de données.",
   "status": "available",

@@ -1,4 +1,4 @@
-"""Garde-fou STARTER-WORKFLOW-COLOR-001 — palier 2 avancé welcome-workflow (slot 98)."""
+"""Garde-fou STARTER-WORKFLOW-COLOR-001 — palier 2 avancé welcome-workflow (slot 92)."""
 from __future__ import annotations
 
 import ast
@@ -13,17 +13,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "workflow_color_con
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "workflow_color" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-workflow" / "avance" / "workflow-color.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 98"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 92"]
 
 
 def test_resolves():
     m = resolve("workflow-color")
-    assert m["id"] == "workflow-color" and m["number"] == 98
+    assert m["id"] == "workflow-color" and m["number"] == 92
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("workflow-color", "workflow_color", "98"):
+    for a in ("workflow-color", "workflow_color", "92"):
         assert resolve(a)["id"] == "workflow-color"
 
 

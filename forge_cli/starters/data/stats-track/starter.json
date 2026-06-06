@@ -1,12 +1,12 @@
 {
   "id": "stats-track",
-  "number": 104,
+  "number": 98,
   "name": "Enregistrer un événement",
   "kind": "skeleton",
   "aliases": [
     "stats-track",
     "stats_track",
-    "104"
+    "98"
   ],
   "description": "Enregistrer un événement : palier 2 du niveau intermédiaire de la progression welcome-stats. track_event enregistre un événement via un exécuteur injectable (execute). La démo injecte un exécuteur factice ; en production on passe core.database.db.execute. Aucune base de données réelle requise.",
   "status": "available",

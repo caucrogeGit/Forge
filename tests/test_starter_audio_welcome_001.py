@@ -1,6 +1,6 @@
 """Garde-fou STARTER-AUDIO-WELCOME-001 (test proportionné).
 
-Palier 1 débutant welcome-audio — Bonjour Forge Audio : slot 67, requires_db
+Palier 1 débutant welcome-audio — Bonjour Forge Audio : slot 61, requires_db
 false, routes `/audio-welcome` + `/inspect`, contrôleur `load_audio_config`
 (token masqué), doc sous `welcome-audio/debutant/`, catalogue.
 """
@@ -17,17 +17,17 @@ STARTER_DIR = ROOT / "forge_cli" / "starters" / "data" / "audio-welcome"
 CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "audio_welcome_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-audio" / "debutant" / "audio-welcome.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 67"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 61"]
 
 
 def test_resolves():
     m = resolve("audio-welcome")
-    assert m["id"] == "audio-welcome" and m["number"] == 67
+    assert m["id"] == "audio-welcome" and m["number"] == 61
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("audio-welcome", "audio_welcome", "67"):
+    for a in ("audio-welcome", "audio_welcome", "61"):
         assert resolve(a)["id"] == "audio-welcome"
 
 

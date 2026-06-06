@@ -1,12 +1,12 @@
 {
   "id": "mfa-crypto",
-  "number": 81,
+  "number": 75,
   "name": "Secret chiffré au repos",
   "kind": "skeleton",
   "aliases": [
     "mfa-crypto",
     "mfa_crypto",
-    "81"
+    "75"
   ],
   "description": "Secret chiffré au repos : palier 3 du niveau avancé de la progression welcome-mfa. encrypt_totp_secret chiffre un secret TOTP (préfixe enc:) via FORGE_MFA_SECRET_KEY (Fernet), decrypt_totp_secret le déchiffre ; validate_mfa_secret_key_config contrôle la clé. Un secret ne doit jamais vivre en clair en base. Aucune base de données.",
   "status": "available",

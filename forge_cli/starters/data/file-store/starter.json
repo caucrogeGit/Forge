@@ -1,12 +1,12 @@
 {
   "id": "file-store",
-  "number": 59,
+  "number": 53,
   "name": "Stocker un document",
   "kind": "skeleton",
   "aliases": [
     "file-store",
     "file_store",
-    "59"
+    "53"
   ],
   "description": "Stocker un document : palier 2 du niveau débutant de la progression welcome-files. Un formulaire multipart envoie un fichier ; save_upload (catégorie documents) valide extension/MIME/taille puis écrit sur le disque et retourne un SavedUpload (nom, chemin, taille, MIME). Aucune base de données.",
   "status": "available",

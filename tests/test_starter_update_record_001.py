@@ -2,7 +2,7 @@
 
 Contrat du palier 5 du niveau intermédiaire — Modifier un enregistrement :
 
-- starter.json : `update-record`, slot 22, requires_db true ;
+- starter.json : `update-record`, slot 16, requires_db true ;
 - snippet : GET liste, GET edit, POST update ;
 - contrôleur : `fetch_one` (pré-remplissage) + `execute("UPDATE … WHERE id=?")`,
   `request.route_param("id")`, `request.form("content")`, CSRF (csrf_token),
@@ -27,17 +27,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "intermediaire" / "update-record.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 22"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 16"]
 
 
 def test_resolves():
     m = resolve("update-record")
-    assert m["id"] == "update-record" and m["number"] == 22
+    assert m["id"] == "update-record" and m["number"] == 16
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("update-record", "update_record", "update", "22"):
+    for a in ("update-record", "update_record", "update", "16"):
         assert resolve(a)["id"] == "update-record"
 
 

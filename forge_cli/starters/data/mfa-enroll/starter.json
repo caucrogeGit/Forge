@@ -1,12 +1,12 @@
 {
   "id": "mfa-enroll",
-  "number": 76,
+  "number": 70,
   "name": "Enrôler un facteur TOTP",
   "kind": "skeleton",
   "aliases": [
     "mfa-enroll",
     "mfa_enroll",
-    "76"
+    "70"
   ],
   "description": "Enrôler un facteur TOTP : palier 1 du niveau intermédiaire de la progression welcome-mfa. create_totp_factor crée un facteur pending (secret chiffré au repos), confirm_totp_factor l'active après vérification d'un code. Le facteur pending est gardé en session pour la démo ; la persistance est le job de l'application. Nécessite FORGE_MFA_SECRET_KEY.",
   "status": "available",

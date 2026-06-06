@@ -1,12 +1,12 @@
 {
   "id": "rbac-guard",
-  "number": 86,
+  "number": 80,
   "name": "Protéger une route",
   "kind": "skeleton",
   "aliases": [
     "rbac-guard",
     "rbac_guard",
-    "86"
+    "80"
   ],
   "description": "Protéger une route : palier 2 du niveau intermédiaire de la progression welcome-rbac. require_contract_permission renvoie une réponse 403 si les rôles n'accordent pas la permission requise, sinon None (la route continue). Garde de route déclarative, aucune base de données.",
   "status": "available",

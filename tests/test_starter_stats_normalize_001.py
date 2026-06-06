@@ -1,4 +1,4 @@
-"""Garde-fou STARTER-STATS-NORMALIZE-001 — palier 3 avancé welcome-stats (slot 108)."""
+"""Garde-fou STARTER-STATS-NORMALIZE-001 — palier 3 avancé welcome-stats (slot 102)."""
 from __future__ import annotations
 
 import ast
@@ -13,17 +13,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "stats_normalize_co
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "stats_normalize" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-stats" / "avance" / "stats-normalize.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 108"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 102"]
 
 
 def test_resolves():
     m = resolve("stats-normalize")
-    assert m["id"] == "stats-normalize" and m["number"] == 108
+    assert m["id"] == "stats-normalize" and m["number"] == 102
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("stats-normalize", "stats_normalize", "108"):
+    for a in ("stats-normalize", "stats_normalize", "102"):
         assert resolve(a)["id"] == "stats-normalize"
 
 

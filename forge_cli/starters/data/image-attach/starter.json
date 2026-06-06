@@ -1,12 +1,12 @@
 {
   "id": "image-attach",
-  "number": 52,
+  "number": 46,
   "name": "Rattacher une image à une entité",
   "kind": "skeleton",
   "aliases": [
     "image-attach",
     "image_attach",
-    "52"
+    "46"
   ],
   "description": "Rattacher une image à une entité : palier 1 du niveau intermédiaire de la progression welcome-images. Téléverse une image (save_image_upload) puis crée une ligne media reliée à une entité de démo (attach_media_to_entity), via la table media créée par la migration livrée avec le starter. Si la table manque, la route reste pédagogique (forge migration:apply).",
   "status": "available",

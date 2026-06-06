@@ -1,12 +1,12 @@
 {
   "id": "audio-upload",
-  "number": 68,
+  "number": 62,
   "name": "Téléverser un audio",
   "kind": "skeleton",
   "aliases": [
     "audio-upload",
     "audio_upload",
-    "68"
+    "62"
   ],
   "description": "Téléverser un audio : palier 2 du niveau débutant de la progression welcome-audio. ingest_audio valide (extension, taille) et stocke le fichier source à un emplacement uuid-based (anti-traversal), sans lancer ffprobe ni ffmpeg. Retourne uuid, chemin, taille, type. Aucune base de données.",
   "status": "available",

@@ -2,7 +2,7 @@
 
 Contrat du palier 7 du niveau intermédiaire — Mémoriser un état en session :
 
-- starter.json : `session-state`, slot 24, requires_db **false** ;
+- starter.json : `session-state`, slot 18, requires_db **false** ;
 - snippet : GET `/session-state` ;
 - contrôleur : lit/crée la session, `store.set(...)`, pose un cookie
   `session_id` durci (HttpOnly, SameSite=Strict, Secure) ;
@@ -24,17 +24,17 @@ CONTROLLER = FILES / "mvc" / "controllers" / "session_state_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "intermediaire" / "session-state.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 24"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 18"]
 
 
 def test_resolves():
     m = resolve("session-state")
-    assert m["id"] == "session-state" and m["number"] == 24
+    assert m["id"] == "session-state" and m["number"] == 18
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("session-state", "session_state", "session", "24"):
+    for a in ("session-state", "session_state", "session", "18"):
         assert resolve(a)["id"] == "session-state"
 
 

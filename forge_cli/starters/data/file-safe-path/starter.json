@@ -1,12 +1,12 @@
 {
   "id": "file-safe-path",
-  "number": 65,
+  "number": 59,
   "name": "Chemin anti-traversal",
   "kind": "skeleton",
   "aliases": [
     "file-safe-path",
     "file_safe_path",
-    "65"
+    "59"
   ],
   "description": "Chemin anti-traversal : palier 2 du niveau avancé de la progression welcome-files. is_safe_media_path dit si un chemin reste à l'intérieur de la racine d'upload, normalize_media_path le normalise (ou refuse). Primitives de sécurité que les opt-ins média composent (ADR-020). Transformation pure, aucune base de données.",
   "status": "available",

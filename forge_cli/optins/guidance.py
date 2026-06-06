@@ -31,10 +31,10 @@ def enable_guidance(optin: OptIn) -> str:
             )
         if optin.name == "mfa":
             return (
-                "Opt-in « mfa » (transversal) — s'active via le starter dédié :\n"
-                "    forge starter:build welcome-optin-mfa\n"
-                "Il câble /login/mfa et remplace les contrôleurs d'auth par les\n"
-                "versions MFA complètes."
+                "Opt-in « mfa » (transversal) — découvre-le via le parcours dédié :\n"
+                "    forge starter:build mfa-welcome\n"
+                "Le parcours welcome-mfa montre chaque brique TOTP (secret,\n"
+                "enrôlement, challenge, récupération) à câbler dans ton flux d'auth."
             )
     return f"Opt-in « {optin.name} » — voir la documentation."
 

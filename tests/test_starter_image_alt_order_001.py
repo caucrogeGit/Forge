@@ -3,7 +3,7 @@
 Contrat du palier 3 du niveau intermédiaire de welcome-images —
 Texte alternatif et ordre :
 
-- starter.json : `image-alt-order`, slot 54, requires_db **true** ;
+- starter.json : `image-alt-order`, slot 48, requires_db **true** ;
 - snippet : GET `/image-alt-order`, POST `/image-alt-order` ;
 - contrôleur : `update_media_alt_text` + `update_media_position`, repli pédagogique ;
 - migration `media` livrée avec le starter ; vue présente ;
@@ -27,17 +27,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "intermediaire" / "image-alt-order.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 54"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 48"]
 
 
 def test_resolves():
     m = resolve("image-alt-order")
-    assert m["id"] == "image-alt-order" and m["number"] == 54
+    assert m["id"] == "image-alt-order" and m["number"] == 48
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("image-alt-order", "image_alt_order", "54"):
+    for a in ("image-alt-order", "image_alt_order", "48"):
         assert resolve(a)["id"] == "image-alt-order"
 
 

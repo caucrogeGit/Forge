@@ -2,7 +2,7 @@
 
 Contrat du palier 3 du niveau intermédiaire de welcome-iot — Tableau de bord :
 
-- starter.json : `iot-dashboard`, slot 36, requires_db **true** ;
+- starter.json : `iot-dashboard`, slot 30, requires_db **true** ;
 - snippet : GET `/iot-dashboard` ;
 - contrôleur : `IotEventRepository.list_recent` + `render`, lecture seule ;
 - vue : tableau HTML des événements + état vide ;
@@ -26,17 +26,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-iot" / "intermediaire" / "iot-dashboard.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 36"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 30"]
 
 
 def test_resolves():
     m = resolve("iot-dashboard")
-    assert m["id"] == "iot-dashboard" and m["number"] == 36
+    assert m["id"] == "iot-dashboard" and m["number"] == 30
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("iot-dashboard", "iot_dashboard", "36"):
+    for a in ("iot-dashboard", "iot_dashboard", "30"):
         assert resolve(a)["id"] == "iot-dashboard"
 
 

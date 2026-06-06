@@ -1,12 +1,12 @@
 {
   "id": "workflow-color",
-  "number": 98,
+  "number": 92,
   "name": "Couleur, libellé, classe",
   "kind": "skeleton",
   "aliases": [
     "workflow-color",
     "workflow_color",
-    "98"
+    "92"
   ],
   "description": "Couleur, libellé, classe : palier 2 du niveau avancé de la progression welcome-workflow. workflow_status_color, workflow_status_label et workflow_status_badge_class exposent les pièces d'un badge (couleur, libellé, classes Tailwind) pour un affichage sur mesure. Transformation pure, aucune base de données.",
   "status": "available",

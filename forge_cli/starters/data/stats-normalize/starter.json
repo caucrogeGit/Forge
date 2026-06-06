@@ -1,12 +1,12 @@
 {
   "id": "stats-normalize",
-  "number": 108,
+  "number": 102,
   "name": "Normaliser une ligne",
   "kind": "skeleton",
   "aliases": [
     "stats-normalize",
     "stats_normalize",
-    "108"
+    "102"
   ],
   "description": "Normaliser une ligne : palier 3 du niveau avancé de la progression welcome-stats. normalize_stats_event_row transforme une ligne brute de la base (metadata en chaîne JSON) en dict propre prêt à afficher (metadata désérialisée). Transformation pure, aucune base de données.",
   "status": "available",

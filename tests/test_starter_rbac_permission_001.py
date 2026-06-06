@@ -1,4 +1,4 @@
-"""Garde-fou STARTER-RBAC-PERMISSION-001 — palier 2 débutant welcome-rbac (slot 83)."""
+"""Garde-fou STARTER-RBAC-PERMISSION-001 — palier 2 débutant welcome-rbac (slot 77)."""
 from __future__ import annotations
 
 import ast
@@ -13,17 +13,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "rbac_permission_co
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "rbac_permission" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-rbac" / "debutant" / "rbac-permission.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 83"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 77"]
 
 
 def test_resolves():
     m = resolve("rbac-permission")
-    assert m["id"] == "rbac-permission" and m["number"] == 83
+    assert m["id"] == "rbac-permission" and m["number"] == 77
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("rbac-permission", "rbac_permission", "83"):
+    for a in ("rbac-permission", "rbac_permission", "77"):
         assert resolve(a)["id"] == "rbac-permission"
 
 

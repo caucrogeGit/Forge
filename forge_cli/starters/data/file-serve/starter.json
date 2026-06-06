@@ -1,12 +1,12 @@
 {
   "id": "file-serve",
-  "number": 60,
+  "number": 54,
   "name": "Servir un fichier",
   "kind": "skeleton",
   "aliases": [
     "file-serve",
     "file_serve",
-    "60"
+    "54"
   ],
   "description": "Servir un fichier : palier 3 du niveau débutant de la progression welcome-files. serve_media_file renvoie un fichier stocké à partir de son chemin relatif, en refusant tout chemin hors de la racine d'upload (anti-traversal) et en répondant 404 si le fichier est absent. Aucune base de données.",
   "status": "available",

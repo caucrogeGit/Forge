@@ -236,7 +236,7 @@ sans exécuter le SQL) et `forge update --dry-run`.
 ## Cas Forge IoT
 
 `forge optin:enable iot` produira exactement la structure que le starter
-[`welcome-optin-iot`](../starters/optin-iot/welcome-optin-iot.md) génère déjà
+`welcome-iot` génère déjà
 (`OPTINS-IOT-PROJECT-BRIDGE-001`) :
 
 1. crée `optins/` + `optins/iot/` (write-if-new) ;

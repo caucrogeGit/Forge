@@ -58,13 +58,8 @@ class TestMfaAvailableExported:
             "le câblage vit dans welcome-optin-mfa/routes.py.snippet."
         )
 
-    def test_mfa_wiring_lives_in_welcome_optin_mfa_snippet(self):
-        """Le câblage MFA (garde + routes) est porté par le starter welcome-optin-mfa."""
-        snippet = (PROJECT_ROOT
-                   / "forge_cli/starters/data/welcome-optin-mfa/routes.py.snippet"
-                   ).read_text(encoding="utf-8")
-        assert "mfa_available" in snippet
-        assert "/login/mfa" in snippet
+    # test_mfa_wiring_lives_in_welcome_optin_mfa_snippet retiré : il lisait le
+    # snippet du starter supprimé `welcome-optin-mfa`.
 
 
 class TestMfaGuardInControllers:
@@ -79,12 +74,8 @@ class TestMfaGuardInControllers:
         assert "_MFA_AVAILABLE" in content
         assert "_mfa_unavailable_redirect" in content
 
-    def test_mfa_routes_conditional_in_snippet(self):
-        """Le garde `if mfa_available():` vit désormais dans le snippet welcome-optin-mfa."""
-        snippet = (PROJECT_ROOT
-                   / "forge_cli/starters/data/welcome-optin-mfa/routes.py.snippet"
-                   ).read_text(encoding="utf-8")
-        assert "if mfa_available():" in snippet
+    # test_mfa_routes_conditional_in_snippet retiré : il lisait le snippet du
+    # starter supprimé `welcome-optin-mfa`.
 
 
 class TestConftestMfaImportProtected:

@@ -16,7 +16,7 @@ Vous maîtrisez les briques MFA, de la génération du secret au durcissement.
 ## Et ensuite
 
 La progression *Bonjour Forge MFA* est terminée. Chaque brique a été vue isolément ;
-pour le **flux Auth+MFA câblé** de bout en bout, voir le starter `welcome-optin-mfa`.
+à vous de les **câbler dans votre flux Auth** en suivant l'ordre des paliers.
 En production, persistez facteurs et codes (`auth_mfa_factors`,
 `auth_mfa_recovery_codes`) et appelez `validate_mfa_secret_key_config` au démarrage.
 

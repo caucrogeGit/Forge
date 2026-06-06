@@ -1,12 +1,12 @@
 {
   "id": "iot-welcome",
-  "number": 31,
+  "number": 25,
   "name": "Bonjour Forge IoT",
   "kind": "skeleton",
   "aliases": [
     "iot-welcome",
     "iot_welcome",
-    "31"
+    "25"
   ],
   "description": "Bonjour Forge IoT : premier palier du niveau débutant de la progression welcome-iot. Premier contact avec le module opt-in forge-mvc-iot : une route texte et une route qui inspecte la configuration MQTT via `load_iot_config`, mot de passe masqué. Aucun broker, aucune base de données.",
   "status": "available",

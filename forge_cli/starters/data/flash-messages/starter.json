@@ -1,13 +1,13 @@
 {
   "id": "flash-messages",
-  "number": 25,
+  "number": 19,
   "name": "Messages flash",
   "kind": "skeleton",
   "aliases": [
     "flash-messages",
     "flash_messages",
     "flash",
-    "25"
+    "19"
   ],
   "description": "Messages flash : dernier palier du niveau intermédiaire. Après une action POST, on confirme via un message flash one-shot (`set_flash` / `get_flash`) affiché à la requête suivante, selon le motif POST-Redirect-GET. Combine session, CSRF et redirection. Aucune base de données.",
   "status": "available",

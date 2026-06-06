@@ -6,7 +6,7 @@ opt-in `forge-mvc-mfa` introduites à chaque étape.
 !!! note "Module opt-in"
     `forge-mvc-mfa` est **publié sur PyPI** (Alpha) : `pip install --pre forge-mvc-mfa`.
     Il exige `FORGE_MFA_SECRET_KEY` (Fernet) pour chiffrer les secrets. Ce parcours
-    montre chaque brique **isolée** ; le flux câblé vit dans `welcome-optin-mfa`.
+    montre chaque brique MFA **isolée**, pour comprendre chaque API avant de la câbler.
 
 ## Niveau débutant — mécaniques TOTP (sans état)
 

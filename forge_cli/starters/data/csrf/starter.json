@@ -1,11 +1,11 @@
 {
   "id": "csrf",
-  "number": 14,
+  "number": 10,
   "name": "Le jeton CSRF",
   "kind": "skeleton",
   "aliases": [
     "csrf",
-    "14"
+    "10"
   ],
   "description": "Le jeton CSRF : palier de la progression pédagogique — comprendre pourquoi Forge protège les formulaires (attaque CSRF) et comment fournir le jeton avec `BaseController.csrf_token(...)` dans un champ caché. Le traitement du POST est vu au palier suivant (`form-post`).",
   "status": "available",

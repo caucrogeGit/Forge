@@ -1,12 +1,12 @@
 {
   "id": "workflow-status",
-  "number": 92,
+  "number": 86,
   "name": "Nom de statut",
   "kind": "skeleton",
   "aliases": [
     "workflow-status",
     "workflow_status",
-    "92"
+    "86"
   ],
   "description": "Nom de statut : palier 2 du niveau débutant de la progression welcome-workflow. normalize_status_name met un nom en snake_case, validate_status_name refuse les noms invalides. Transformation pure, aucune base de données.",
   "status": "available",

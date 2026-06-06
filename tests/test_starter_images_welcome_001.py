@@ -3,7 +3,7 @@
 Contrat du palier 1 du niveau débutant de la progression welcome-images —
 Bonjour Forge Images :
 
-- starter.json : `images-welcome`, slot 49, requires_db **false** ;
+- starter.json : `images-welcome`, slot 43, requires_db **false** ;
 - snippet : GET `/images-welcome`, GET `/images-welcome/inspect` ;
 - contrôleur : constantes `ALLOWED_IMAGE_EXTENSIONS` / `IMAGE_VARIANT_SIZES`,
   `Response.text` + `Response.json`, pas de base de données ;
@@ -24,17 +24,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "images_welcome_con
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "debutant" / "images-welcome.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 49"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 43"]
 
 
 def test_resolves():
     m = resolve("images-welcome")
-    assert m["id"] == "images-welcome" and m["number"] == 49
+    assert m["id"] == "images-welcome" and m["number"] == 43
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("images-welcome", "images_welcome", "49"):
+    for a in ("images-welcome", "images_welcome", "43"):
         assert resolve(a)["id"] == "images-welcome"
 
 

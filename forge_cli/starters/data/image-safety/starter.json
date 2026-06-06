@@ -1,12 +1,12 @@
 {
   "id": "image-safety",
-  "number": 57,
+  "number": 51,
   "name": "Garde de sécurité à l'upload",
   "kind": "skeleton",
   "aliases": [
     "image-safety",
     "image_safety",
-    "57"
+    "51"
   ],
   "description": "Garde de sécurité à l'upload : palier 3 du niveau avancé de la progression welcome-images. Démontre la défense de forge-mvc-images contre les fichiers piégés : verify_image_content rejette un non-image déguisé et une image-bombe (au-delà de upload_max_image_pixels), sans rien écrire ni base de données.",
   "status": "available",

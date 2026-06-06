@@ -19,76 +19,9 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 STARTERS_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data"
 DEFAULT_AUTH_STARTER = STARTERS_DIR / "users-core-auth"
-MFA_STARTER = STARTERS_DIR / "welcome-optin-mfa"
 
-
-# ── Existence et structure du starter auth-mfa ────────────────────────────────
-
-class TestAuthMfaStarterExists:
-    """Le starter `auth-mfa` existe et est complet."""
-
-    def test_starter_directory_exists(self):
-        assert MFA_STARTER.is_dir(), f"{MFA_STARTER} doit exister."
-
-    def test_starter_json_present(self):
-        assert (MFA_STARTER / "starter.json").exists()
-
-    def test_mfa_challenge_controller_present(self):
-        controller = MFA_STARTER / "files" / "mvc" / "controllers" / "mfa_challenge_controller.py"
-        assert controller.exists(), (
-            "Le starter auth-mfa doit contenir mfa_challenge_controller.py."
-        )
-
-    def test_auth_controller_present(self):
-        controller = MFA_STARTER / "files" / "mvc" / "controllers" / "auth_controller.py"
-        assert controller.exists(), (
-            "Le starter auth-mfa doit contenir auth_controller.py."
-        )
-
-    def test_routes_snippet_present(self):
-        assert (MFA_STARTER / "routes.py.snippet").exists()
-
-
-# ── Contenu : pas de stubs dans le starter auth-mfa ──────────────────────────
-
-class TestAuthMfaStarterIsClean:
-    """Le starter auth-mfa ne contient pas les stubs lazy-import de A1."""
-
-    def test_mfa_challenge_controller_no_lazy_import(self):
-        controller = MFA_STARTER / "files" / "mvc" / "controllers" / "mfa_challenge_controller.py"
-        text = controller.read_text(encoding="utf-8")
-        assert "except ImportError" not in text, (
-            "mfa_challenge_controller.py du starter auth-mfa ne doit pas avoir de lazy import."
-        )
-        assert "_MFA_AVAILABLE" not in text, (
-            "mfa_challenge_controller.py du starter auth-mfa ne doit pas avoir _MFA_AVAILABLE."
-        )
-
-    def test_auth_controller_no_lazy_import(self):
-        controller = MFA_STARTER / "files" / "mvc" / "controllers" / "auth_controller.py"
-        text = controller.read_text(encoding="utf-8")
-        assert "except ImportError" not in text, (
-            "auth_controller.py du starter auth-mfa ne doit pas avoir de lazy import."
-        )
-        assert "_MFA_AVAILABLE" not in text, (
-            "auth_controller.py du starter auth-mfa ne doit pas avoir _MFA_AVAILABLE."
-        )
-
-    def test_mfa_challenge_controller_imports_forge_mvc_mfa(self):
-        controller = MFA_STARTER / "files" / "mvc" / "controllers" / "mfa_challenge_controller.py"
-        text = controller.read_text(encoding="utf-8")
-        assert "forge_mvc_mfa" in text, (
-            "mfa_challenge_controller.py du starter auth-mfa doit importer forge_mvc_mfa."
-        )
-
-    def test_requirements_if_present_includes_forge_mvc_mfa(self):
-        req = MFA_STARTER / "files" / "requirements.txt"
-        if not req.exists():
-            return
-        text = req.read_text(encoding="utf-8")
-        assert "forge-mvc-mfa" in text, (
-            f"{req} doit inclure forge-mvc-mfa comme dépendance."
-        )
+# Les classes TestAuthMfaStarterExists et TestAuthMfaStarterIsClean ont été
+# retirées : elles inspectaient le starter supprimé `welcome-optin-mfa`.
 
 
 # ── Baseline : users-core-auth n'a pas de contrôleur MFA ───────────────────

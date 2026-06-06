@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau avancé de welcome-video — Transcoder une vidéo :
 
-- starter.json : `video-transcode`, slot 47, requires_db **true** ;
+- starter.json : `video-transcode`, slot 41, requires_db **true** ;
 - snippet : GET `/video-transcode` ;
 - contrôleur : liste les vidéos `uploaded` + config ffmpeg ; ne transcode PAS
   dans la requête (worker CLI) ;
@@ -27,17 +27,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-video" / "avance" / "video-transcode.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 47"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 41"]
 
 
 def test_resolves():
     m = resolve("video-transcode")
-    assert m["id"] == "video-transcode" and m["number"] == 47
+    assert m["id"] == "video-transcode" and m["number"] == 41
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("video-transcode", "video_transcode", "47"):
+    for a in ("video-transcode", "video_transcode", "41"):
         assert resolve(a)["id"] == "video-transcode"
 
 

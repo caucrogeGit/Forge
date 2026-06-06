@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau avancé de welcome-images — Supprimer proprement :
 
-- starter.json : `image-delete`, slot 56, requires_db **true** ;
+- starter.json : `image-delete`, slot 50, requires_db **true** ;
 - snippet : GET `/image-delete`, POST `/image-delete` ;
 - contrôleur : `delete_media(delete_files=True)` + `list_media_for_entity` ;
 - migration `media` livrée avec le starter ; vue présente ;
@@ -26,17 +26,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "avance" / "image-delete.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 56"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 50"]
 
 
 def test_resolves():
     m = resolve("image-delete")
-    assert m["id"] == "image-delete" and m["number"] == 56
+    assert m["id"] == "image-delete" and m["number"] == 50
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("image-delete", "image_delete", "56"):
+    for a in ("image-delete", "image_delete", "50"):
         assert resolve(a)["id"] == "image-delete"
 
 

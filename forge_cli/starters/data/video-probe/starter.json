@@ -1,12 +1,12 @@
 {
   "id": "video-probe",
-  "number": 46,
+  "number": 40,
   "name": "Sonder une vidéo",
   "kind": "skeleton",
   "aliases": [
     "video-probe",
     "video_probe",
-    "46"
+    "40"
   ],
   "description": "Sonder une vidéo : premier palier du niveau avancé de welcome-video. On bascule vers le réel : `probe_video` lance ffprobe (lecture seule) sur le fichier d'une vidéo uploadée et en extrait les métadonnées (durée, dimensions, codecs, conteneur). Nécessite ffprobe installé. Réponse 502 si la sonde échoue.",
   "status": "available",

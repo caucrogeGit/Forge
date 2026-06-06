@@ -1,4 +1,4 @@
-"""Garde-fou STARTER-STATS-EVENT-001 — palier 2 débutant welcome-stats (slot 101)."""
+"""Garde-fou STARTER-STATS-EVENT-001 — palier 2 débutant welcome-stats (slot 95)."""
 from __future__ import annotations
 
 import ast
@@ -13,17 +13,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "stats_event_contro
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "stats_event" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-stats" / "debutant" / "stats-event.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 101"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 95"]
 
 
 def test_resolves():
     m = resolve("stats-event")
-    assert m["id"] == "stats-event" and m["number"] == 101
+    assert m["id"] == "stats-event" and m["number"] == 95
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("stats-event", "stats_event", "101"):
+    for a in ("stats-event", "stats_event", "95"):
         assert resolve(a)["id"] == "stats-event"
 
 

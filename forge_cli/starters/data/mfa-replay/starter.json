@@ -1,12 +1,12 @@
 {
   "id": "mfa-replay",
-  "number": 80,
+  "number": 74,
   "name": "Anti-rejeu TOTP",
   "kind": "skeleton",
   "aliases": [
     "mfa-replay",
     "mfa_replay",
-    "80"
+    "74"
   ],
   "description": "Anti-rejeu TOTP : palier 2 du niveau avancé de la progression welcome-mfa. record_used marque une step TOTP comme consommée pour un facteur, is_replay refuse sa réutilisation : un même code n'est accepté qu'une fois dans sa fenêtre. step_for_time calcule la step courante. État en mémoire, aucune base de données.",
   "status": "available",

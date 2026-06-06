@@ -1,12 +1,12 @@
 {
   "id": "audio-welcome",
-  "number": 67,
+  "number": 61,
   "name": "Bonjour Forge Audio",
   "kind": "skeleton",
   "aliases": [
     "audio-welcome",
     "audio_welcome",
-    "67"
+    "61"
   ],
   "description": "Bonjour Forge Audio : premier palier du niveau débutant de la progression welcome-audio. Premier contact avec le module opt-in forge-mvc-audio (chaîne audio sans état). Une route texte et une route qui inspecte la configuration (stockage, limites, binaires ffprobe/ffmpeg), token masqué. Aucune base de données.",
   "status": "available",

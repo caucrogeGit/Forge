@@ -1,12 +1,12 @@
 {
   "id": "audio-doctor",
-  "number": 72,
+  "number": 66,
   "name": "Diagnostiquer le module Audio",
   "kind": "skeleton",
   "aliases": [
     "audio-doctor",
     "audio_doctor",
-    "72"
+    "66"
   ],
   "description": "Diagnostiquer le module Audio : palier 3 du niveau avancé de la progression welcome-audio. Expose en JSON le sous-ensemble non invasif de forge audio:doctor : paquet importable, configuration chargeable, présence de ffprobe et ffmpeg, routes enregistrables. Aucune base de données.",
   "status": "available",

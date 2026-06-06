@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILE-BYTES-001 (test proportionné).
 
-Palier 3 avancé welcome-files — Écrire des octets générés : slot 66, requires_db
+Palier 3 avancé welcome-files — Écrire des octets générés : slot 60, requires_db
 false, routes GET/POST `/file-bytes`, contrôleur `save_bytes`, vue présente,
 doc sous `welcome-files/avance/`, catalogue.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "file_bytes_control
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "file_bytes" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "avance" / "file-bytes.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 66"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 60"]
 
 
 def test_resolves():
     m = resolve("file-bytes")
-    assert m["id"] == "file-bytes" and m["number"] == 66
+    assert m["id"] == "file-bytes" and m["number"] == 60
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-bytes", "file_bytes", "66"):
+    for a in ("file-bytes", "file_bytes", "60"):
         assert resolve(a)["id"] == "file-bytes"
 
 

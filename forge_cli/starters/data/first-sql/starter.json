@@ -1,13 +1,13 @@
 {
   "id": "first-sql",
-  "number": 11,
+  "number": 8,
   "name": "Première base SQL",
   "kind": "skeleton",
   "aliases": [
     "first-sql",
     "first_sql",
     "sql",
-    "11"
+    "8"
   ],
   "description": "Première base SQL : palier 10 de la progression pédagogique officielle, après Validation serveur. Une route `GET /first-sql`, une table SQL minimale créée par une migration visible, une lecture avec `core.database.db.fetch_one`. Aucun CRUD, aucune entité JSON.",
   "status": "available",

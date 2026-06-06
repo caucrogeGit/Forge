@@ -115,19 +115,13 @@ Un starter n'est pas un profil. Voir [Différence entre profil et starter](#diff
 | [Le SQL de consultation](welcome-stats/avance/stats-admin-sql.md) | Stats avancé (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau avancé palier 1 — voir le `SELECT` filtrable (`get_stats_events_admin_sql`) ; starter `stats-admin-sql` |
 | [Lister les événements](welcome-stats/avance/stats-list.md) | Stats avancé (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau avancé palier 2 — lire via `fetch_all` injecté (`list_stats_events`) ; starter `stats-list` |
 | [Normaliser une ligne](welcome-stats/avance/stats-normalize.md) | Stats avancé (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau avancé palier 3 — ligne brute → dict propre (`normalize_stats_event_row`) ; starter `stats-normalize` |
-| [First CRUD](crud/first-crud.md) | Capstone fondamentaux (avec BDD) | `minimal` / `standard` | Premier starter autonome après la progression — CRUD complet à SQL visible (`SELECT`/`INSERT`/`UPDATE`/`DELETE`) sur l'entité neutre `message`, aucun métier, aucun ORM |
-| [1 — First CRUD (généré)](crud/first-crud-generated.md) | Officiel simple | `minimal` / `standard` | Starter autonome avancé — CRUD **généré** via `make:crud` sur l'entité neutre `message` ; pendant échafaudé de First CRUD (à la main), suppose les 11 paliers de découverte + le starter First CRUD acquis |
-| [2 — Auth (API cœur)](core-auth/users-core-auth.md) | Auth minimale moderne | `standard` | Comprendre une authentification minimale avec `core.auth` |
-| [3 — Auth MFA](optin-mfa/welcome-optin-mfa.md) | Démonstrateur MFA (Alpha) | `auth-mfa` | Ajouter un challenge TOTP au flux de connexion avec `forge-mvc-mfa` (publié sur PyPI depuis `1.0.0-beta.9`) |
-| [Bonjour IoT](optin-iot/welcome-optin-iot.md) | Entrée IoT sans broker | Aucun (fonctionne sans db:init ni broker MQTT) | Premier contact avec le module opt-in `forge-mvc-iot` — quatre routes (`/welcome-optin-iot`, `/welcome-optin-iot/inspect`, `/welcome-optin-iot/events`, `/welcome-optin-iot/device/{site}/{device_id}`), inspect masque le mot de passe, lecture pédagogique des événements `iot_events` |
-| [Bonjour Vidéo](optin-video/welcome-optin-video.md) | Entrée vidéo sans ffmpeg | Aucun (fonctionne sans db:init ni ffmpeg) | Premier contact avec le module opt-in `forge-mvc-video` — trois routes (`/welcome-optin-video`, `/welcome-optin-video/inspect`, `/welcome-optin-video/list`) + lecture officielle `GET /videos/{uuid}`, inspect masque le token, liste pédagogique des vidéos |
 
 ## Progression recommandée
 
 Le starter `Bonjour Forge` est volontairement minimal (deux routes texte,
-zéro vue HTML, zéro base de données). **Ne sautez pas directement au
-starter First CRUD (généré)** : plusieurs notions intermédiaires permettent
-d'aborder le CRUD sereinement. La progression officielle est :
+zéro vue HTML, zéro base de données). **Ne sautez pas directement aux
+notions SQL** : plusieurs paliers intermédiaires permettent d'aborder
+l'accès base sereinement. La progression officielle est :
 
 1. **Bonjour Forge** — afficher une réponse texte avec `Response.text(...)`.
    *(livré — starter `welcome`)*
@@ -153,23 +147,14 @@ d'aborder le CRUD sereinement. La progression officielle est :
    *(livré — starter `first-sql-write`, ticket `STARTER-FIRST-SQL-WRITE-001`)*
 
 Une fois ces **11 paliers** acquis, vous avez terminé le starter de
-découverte *Bonjour Forge*. Le premier **starter autonome** à enchaîner
-est [First CRUD](crud/first-crud.md) — un CRUD complet à SQL visible
-sur une entité neutre (`message`), livré par `STARTER-PREMIER-CRUD-001`.
-Viennent ensuite les exemples : First CRUD (généré), Auth (API cœur), puis le
-starter opt-in Auth MFA.
-
-!!! warning "Saut Bonjour Forge → First CRUD (généré)"
-    Sauter directement de `welcome` à `first-crud-generated` fait rencontrer
-    plusieurs notions (vue, route dynamique, JSON, CSRF, formulaire,
-    validation, SQL en lecture et écriture) sans transition. La
-    progression ci-dessus solde cette dette pédagogique : suivez les
-    paliers dans l'ordre (ticket `STARTER-ROADMAP-PROGRESSION-001`).
+découverte *Bonjour Forge*. Vous pouvez ensuite explorer les progressions
+opt-in dédiées (IoT, vidéo, images, fichiers, audio, MFA, RBAC, workflow,
+stats), chacune autonome et présentée par niveau dans le catalogue ci-dessus.
 
 Le tableau de synthèse plus haut reste utile comme catalogue exhaustif
 des starters disponibles aujourd'hui, mais l'ordre d'apprentissage
-recommandé est celui des 11 paliers ci-dessus, suivi des starters
-autonomes (First CRUD, puis les exemples métier).
+recommandé est celui des 11 paliers ci-dessus, suivi des progressions
+opt-in de votre choix.
 
 ## Starter d'entrée (sans base de données)
 
@@ -200,151 +185,6 @@ forge starter:build 7
 
 [Présentation](welcome-forge/debutant/welcome.md)
 
-## Premier starter autonome (avec base de données)
-
-### First CRUD
-
-Le capstone des fondamentaux : un CRUD complet (créer, lister, modifier,
-supprimer) à **SQL visible**, sur une entité **neutre** (`message`, table
-`first_sql_messages`). Premier starter autonome après les 11 paliers de
-découverte.
-
-Profil recommandé : `minimal` ou `standard`. Identifiant : `first-crud`
-(alias `crud` / `16`).
-
-- prolonge directement les paliers « Première base SQL » et « Écrire en base » ;
-- les quatre opérations SQL en clair : `SELECT`, `INSERT`, `UPDATE`, `DELETE` ;
-- aucune notion métier, aucun ORM, aucune authentification.
-
-[Vue d'ensemble du sujet](crud/index.md) · [Présentation](crud/first-crud.md)
-
-## Starters officiels simples
-
-### First CRUD (généré)
-
-Le starter officiel simple de Forge. Une entité **neutre** `Message`, un CRUD **généré** via `make:crud`, des routes câblées manuellement. C'est le pendant échafaudé du starter [First CRUD](crud/first-crud.md) (écrit à la main).
-
-Profil recommandé : `minimal` ou `standard`.
-
-- **starter autonome avancé** — synthèse du CRUD généré, entité neutre ;
-- aucune relation, aucune authentification, aucune notion métier ;
-- suppose acquis les **11 paliers de découverte** puis le starter
-  [First CRUD](crud/first-crud.md) (routes, contrôleurs, vues HTML,
-  paramètres d'URL, route dynamique, formulaires POST avec CSRF,
-  validation serveur, migrations SQL, CRUD à SQL visible).
-
-Pour le **premier** contact avec Forge, démarrer par
-[Bonjour Forge](welcome-forge/debutant/welcome.md) (palier 1, sans BDD), pas par ce
-starter.
-
-[Présentation](crud/first-crud-generated.md) · [Reconstruction](crud/first-crud-generated-rebuild.md)
-
-## Starter Auth minimal moderne
-
-### Auth (API cœur)
-
-Un exemple d'authentification minimale alignée sur le socle `core.auth` de Forge.
-
-Profil recommandé : `standard`.
-
-- login / logout avec sessions CSRF ;
-- `@login_required`, `login_user`, `logout_user`, `verify_password` depuis `core.auth` ;
-- dashboard protégé, page profil.
-
-!!! info "Limites du starter 2"
-    Ce starter ne démontre pas MFA, OIDC, RBAC avancé, reset password complet ou administration utilisateurs.
-
-Identifiant : `users-core-auth` (starter n°2, alias `auth` / `utilisateurs-auth` / `2`).
-
-[Vue d'ensemble du sujet](core-auth/index.md) · [Présentation](core-auth/users-core-auth.md) · [Reconstruction](core-auth/users-core-auth-rebuild.md)
-
-## Démonstrateur MFA (Alpha)
-
-### Auth MFA
-
-Un skeleton d'authentification multi-facteurs TOTP basé sur le module opt-in
-`forge-mvc-mfa`. Remplace deux contrôleurs dans un projet déjà initialisé avec
-le profil `auth-mfa`.
-
-Profil recommandé : `auth-mfa`.
-
-- challenge TOTP intercalé entre password et session (`/login/mfa`) ;
-- état temporaire de challenge avec expiration 10 min ;
-- rate-limit et audit des événements MFA inclus.
-
-!!! info "Module Alpha — publié sur PyPI depuis 1.0.0-beta.9"
-    `forge-mvc-mfa` est un opt-in officiel publié sur PyPI au statut
-    **Alpha**. Le secret TOTP est **chiffré au repos** via Fernet
-    (`FORGE_MFA_SECRET_KEY` obligatoire au démarrage,
-    `SEC-MFA-SECRET-ENCRYPTION-001`). Installation :
-
-    ```bash
-    pip install --pre forge-mvc-mfa
-    ```
-
-    Le passage Alpha → Beta reste un ticket futur, voir
-    `packages/forge-mvc-mfa/README.md`.
-
-Identifiant : `welcome-optin-mfa` (starter n°3, alias `mfa` / `auth-mfa` / `3`).
-
-[Vue d'ensemble du sujet](optin-mfa/index.md) · [Présentation](optin-mfa/welcome-optin-mfa.md) · [Reconstruction](optin-mfa/welcome-optin-mfa-rebuild.md)
-
-## Démonstrateur IoT (sans broker requis)
-
-### Bonjour IoT
-
-Premier contact avec le module opt-in `forge-mvc-iot`. Fonctionne
-**sans broker MQTT** et **sans table créée** — les routes de lecture
-détectent et signalent pédagogiquement quand `iot_events` n'est pas
-encore disponible (HTTP 503 avec message clair, pas une trace
-technique).
-
-Aucun profil requis. Identifiant : `welcome-optin-iot` (alias `bonjour-iot`
-/ `iot` / `12`).
-
-- `GET /welcome-optin-iot` → `Response.text("Bonjour Forge IoT")` ;
-- `GET /welcome-optin-iot/inspect` → JSON de la configuration IoT, mot de
-  passe masqué (`"***"` ou `null`) ;
-- `GET /welcome-optin-iot/events` → derniers événements via
-  `IotEventRepository.list_recent`, ou message `iot_storage_not_ready`
-  si la table n'existe pas ;
-- `GET /welcome-optin-iot/device/{site}/{device_id}` → événements d'un
-  capteur précis ;
-- en parallèle, l'API HTTP officielle `/api/iot/...` est branchée via
-  `register_iot_routes(router)`.
-
-Aucun subscriber MQTT n'est lancé par le starter — c'est de la lecture
-seule côté HTTP. Avant de tester, lancer `forge iot:doctor` pour
-vérifier que le package, la configuration, la migration et l'API HTTP
-sont en place.
-
-[Présentation](optin-iot/welcome-optin-iot.md)
-
-### Bonjour Vidéo
-
-Premier contact avec le module opt-in `forge-mvc-video`. Fonctionne
-**sans ffmpeg** et **sans table créée** — la route `list` détecte et
-signale pédagogiquement quand la table `videos` n'est pas encore
-disponible (HTTP 503 avec message clair, pas une trace technique).
-
-Aucun profil requis. Identifiant : `welcome-optin-video` (alias
-`bonjour-video` / `video` / `17`).
-
-- `GET /welcome-optin-video` → `Response.text("Bonjour Forge Video")` ;
-- `GET /welcome-optin-video/inspect` → JSON de la configuration vidéo,
-  token masqué (`"***"` ou `null`) ;
-- `GET /welcome-optin-video/list` → dernières vidéos via
-  `VideoRepository.list_recent`, ou message `video_storage_not_ready`
-  si la table n'existe pas ;
-- en parallèle, la lecture officielle `GET /videos/{uuid}` (streaming
-  HTTP Range) est branchée via `register_video_routes(router)`.
-
-Aucun `ffmpeg` n'est lancé par le starter. Avant de traiter une vidéo,
-lancer `forge video:doctor` pour vérifier package, configuration,
-migration et binaires.
-
-[Présentation](optin-video/welcome-optin-video.md)
-
 ## Différence entre profil et starter
 
 Un **profil** définit la base technique d'un projet créé avec `forge new`. Il détermine les composants inclus dans l'environnement de départ.
@@ -371,17 +211,14 @@ Pour choisir un profil : [Profils de projet](../features/profiles.md).
 
 ```bash
 forge new mon-projet --starter welcome       # Bienvenue (sans BDD) — via forge new
-forge starter:build 1        # First CRUD (généré)
-forge starter:build 2        # Auth (API cœur)
-forge starter:build 3        # Auth MFA (Alpha)
-forge starter:build 4        # Bienvenue dans Forge (sans BDD)
+forge starter:build welcome  # Bonjour Forge (sans BDD)
 ```
 
 Pour le starter pédagogique `query-params` (palier 2 de la progression),
 voir la page dédiée [Paramètres d'URL](welcome-forge/debutant/query-params.md) — il
 s'applique par son identifiant public, pas par un numéro.
 
-Les alias `first-crud-generated`, `auth`, `query-params` et leurs variantes sont également supportés.
+Les alias publics (`query-params`, etc.) et leurs variantes sont également supportés.
 
 `forge starter:list` affiche la liste complète depuis la CLI.
 
@@ -397,19 +234,3 @@ forge starter:build 1        # remplacer 1 par le numéro souhaité
 ```
 
 Chaque page de starter liste les commandes exactes, le modèle de données et les étapes de reconstruction.
-
-## Fichiers de reconstruction
-
-| Starter | Présentation | Reconstruction |
-|---|---|---|
-| First CRUD (généré) | [Présentation](crud/first-crud-generated.md) | [rebuild.md](crud/first-crud-generated-rebuild.md) |
-| Auth (API cœur) | [Présentation](core-auth/users-core-auth.md) | [rebuild.md](core-auth/users-core-auth-rebuild.md) |
-| Auth MFA | [Présentation](optin-mfa/welcome-optin-mfa.md) | [rebuild.md](optin-mfa/welcome-optin-mfa-rebuild.md) |
-
-## Statut officiel des starters
-
-| Starter | Statut |
-|---|---|
-| 1 — First CRUD (généré) | Starter officiel simple |
-| 2 — Auth (API cœur) | Auth minimale moderne (`core.auth`) |
-| 3 — Auth MFA | Démonstrateur MFA (Alpha) |

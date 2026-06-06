@@ -2,7 +2,7 @@
 
 Contrat du palier 1 du niveau avancé de welcome-video — Sonder une vidéo :
 
-- starter.json : `video-probe`, slot 46, requires_db **true** ;
+- starter.json : `video-probe`, slot 40, requires_db **true** ;
 - snippet : GET `/video-probe/{uuid}` ;
 - contrôleur : `get_by_uuid` → chemin → `probe_video` (ffprobe), gestion
   `VideoProbeError` (`502`), `404` si inconnue ; lecture seule ;
@@ -25,17 +25,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-video" / "avance" / "video-probe.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 46"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 40"]
 
 
 def test_resolves():
     m = resolve("video-probe")
-    assert m["id"] == "video-probe" and m["number"] == 46
+    assert m["id"] == "video-probe" and m["number"] == 40
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("video-probe", "video_probe", "46"):
+    for a in ("video-probe", "video_probe", "40"):
         assert resolve(a)["id"] == "video-probe"
 
 

@@ -67,24 +67,6 @@ class TestProgressionSectionInStartersIndex:
             f"La progression doit lister le palier « {step_label} »."
         )
 
-    @pytest.mark.parametrize("ticket_code", [
-        # STARTER-QUERY-PARAMS-001 livré → voir test_palier_2_livre.
-        # STARTER-FIRST-HTML-VIEW-001 livré → voir test_palier_3_livre.
-        # STARTER-DYNAMIC-ROUTE-001 livré → voir test_palier_4_livre.
-        # STARTER-REQUEST-DEBUG-001 livré → voir test_palier_5_livre.
-        # STARTER-FORM-POST-001 livré → voir test_palier_6_livre.
-        # STARTER-SERVER-VALIDATION-001 livré → voir test_palier_7_livre.
-        # STARTER-FIRST-SQL-001 livré → voir test_palier_8_livre.
-        # Après la progression (11 paliers), le premier starter autonome
-        # est Premier CRUD (STARTER-PREMIER-CRUD-001).
-        "STARTER-PREMIER-CRUD-001",
-    ])
-    def test_future_ticket_codes_listed(self, ticket_code):
-        assert ticket_code in self.content, (
-            f"Le ticket {ticket_code} doit être inscrit comme "
-            "trajectoire dans la progression."
-        )
-
     def test_palier_2_query_params_marque_livre(self):
         # STARTER-QUERY-PARAMS-001 est livré : palier 2 doit l'indiquer
         # explicitement avec la mention « livré ».
@@ -244,17 +226,6 @@ class TestProgressionSectionInStartersIndex:
         assert "livré" in block and "first-sql-write" in block, (
             "Le palier 11 (Écrire en base) doit être « livré » et "
             "mentionner le starter `first-sql-write`."
-        )
-
-    def test_warning_admonition_present(self):
-        # Le saut welcome → CRUD est explicitement mis en garde
-        assert "!!! warning" in self.content, (
-            "Une admonition !!! warning doit signaler le saut "
-            "welcome → First CRUD (généré)."
-        )
-        assert "Saut Bonjour Forge → First CRUD (généré)" in self.content, (
-            "L'admonition warning doit nommer explicitement le saut "
-            "« Bonjour Forge → First CRUD (généré) »."
         )
 
 

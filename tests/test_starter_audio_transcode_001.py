@@ -1,6 +1,6 @@
 """Garde-fou STARTER-AUDIO-TRANSCODE-001 (test proportionné).
 
-Palier 2 avancé welcome-audio — Transcoder en MP3 : slot 71, requires_db false,
+Palier 2 avancé welcome-audio — Transcoder en MP3 : slot 65, requires_db false,
 routes GET/POST `/audio-transcode`, contrôleur `transcode_to_mp3` + `FfmpegError`,
 vue présente, doc sous `welcome-audio/avance/`, catalogue.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "audio_transcode_co
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "audio_transcode" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-audio" / "avance" / "audio-transcode.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 71"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 65"]
 
 
 def test_resolves():
     m = resolve("audio-transcode")
-    assert m["id"] == "audio-transcode" and m["number"] == 71
+    assert m["id"] == "audio-transcode" and m["number"] == 65
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("audio-transcode", "audio_transcode", "71"):
+    for a in ("audio-transcode", "audio_transcode", "65"):
         assert resolve(a)["id"] == "audio-transcode"
 
 

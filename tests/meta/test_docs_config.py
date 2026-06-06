@@ -38,11 +38,6 @@ def test_mkdocs_nav_entries_are_well_formed_and_point_to_existing_docs():
         "Concepts",
         "Positionnement",
         "Architecture des entités",
-        "First CRUD",
-        "First CRUD (généré)",
-        "Auth (API cœur)",
-        "Carnet de contacts",
-        "Suivi pédagogique",
         "API Forge complète",
         "Roadmap",
     ):

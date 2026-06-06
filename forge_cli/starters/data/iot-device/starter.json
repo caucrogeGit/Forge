@@ -1,12 +1,12 @@
 {
   "id": "iot-device",
-  "number": 33,
+  "number": 27,
   "name": "Les événements d'un capteur",
   "kind": "skeleton",
   "aliases": [
     "iot-device",
     "iot_device",
-    "33"
+    "27"
   ],
   "description": "Les événements d'un capteur : dernier palier du niveau débutant de welcome-iot. Une route paramétrée `/iot-device/{site}/{device_id}` lit les événements d'un capteur précis via `IotEventRepository.find_by_device` et leur nombre via `count_by_device`. Réponse 503 pédagogique si la table `iot_events` manque. Lecture seule, aucun broker.",
   "status": "available",

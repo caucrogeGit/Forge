@@ -1,6 +1,6 @@
 """Garde-fou STARTER-AUDIO-PROBE-001 (test proportionné).
 
-Palier 1 avancé welcome-audio — Sonder un audio : slot 70, requires_db false,
+Palier 1 avancé welcome-audio — Sonder un audio : slot 64, requires_db false,
 route `/audio-probe`, contrôleur `probe_audio` (+ repli pédagogique), vue
 présente, doc sous `welcome-audio/avance/`, catalogue.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "audio_probe_contro
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "audio_probe" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-audio" / "avance" / "audio-probe.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 70"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 64"]
 
 
 def test_resolves():
     m = resolve("audio-probe")
-    assert m["id"] == "audio-probe" and m["number"] == 70
+    assert m["id"] == "audio-probe" and m["number"] == 64
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("audio-probe", "audio_probe", "70"):
+    for a in ("audio-probe", "audio_probe", "64"):
         assert resolve(a)["id"] == "audio-probe"
 
 

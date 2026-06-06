@@ -1,13 +1,13 @@
 {
   "id": "list-records",
-  "number": 18,
+  "number": 12,
   "name": "Lister des enregistrements",
   "kind": "skeleton",
   "aliases": [
     "list-records",
     "list_records",
     "list",
-    "18"
+    "12"
   ],
   "description": "Lister des enregistrements : premier palier du niveau intermédiaire. Une route `GET /list-records` lit PLUSIEURS lignes avec `core.database.db.fetch_all` et les affiche dans une vue HTML avec une boucle Jinja. Prolonge le palier débutant Première base SQL (lecture d'une seule ligne). Aucun CRUD complet, aucune entité JSON.",
   "status": "available",

@@ -2,7 +2,7 @@
 
 Contrat du dernier palier du niveau avancé de welcome-video — Diagnostiquer :
 
-- starter.json : `video-doctor`, slot 48, requires_db **false** ;
+- starter.json : `video-doctor`, slot 42, requires_db **false** ;
 - snippet : GET `/video-doctor` ;
 - contrôleur : appelle les contrôles non invasifs de `cli.doctor` (dont
   présence ffprobe/ffmpeg), expose le statut en JSON ; ne touche pas la base ;
@@ -24,17 +24,17 @@ CONTROLLER = FILES / "mvc" / "controllers" / "video_doctor_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-video" / "avance" / "video-doctor.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 48"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 42"]
 
 
 def test_resolves():
     m = resolve("video-doctor")
-    assert m["id"] == "video-doctor" and m["number"] == 48
+    assert m["id"] == "video-doctor" and m["number"] == 42
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("video-doctor", "video_doctor", "48"):
+    for a in ("video-doctor", "video_doctor", "42"):
         assert resolve(a)["id"] == "video-doctor"
 
 

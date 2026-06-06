@@ -1,12 +1,12 @@
 {
   "id": "stats-schema",
-  "number": 102,
+  "number": 96,
   "name": "Le schéma SQL",
   "kind": "skeleton",
   "aliases": [
     "stats-schema",
     "stats_schema",
-    "102"
+    "96"
   ],
   "description": "Le schéma SQL : palier 3 du niveau débutant de la progression welcome-stats. get_stats_events_schema_sql expose le CREATE TABLE de forge_stats_events : le SQL reste visible (charte principe 5), aucun ORM. Transformation pure, aucune base de données.",
   "status": "available",

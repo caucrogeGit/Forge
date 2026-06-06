@@ -3,7 +3,7 @@
 Contrat du palier 3 du niveau avancé de welcome-images —
 Garde de sécurité à l'upload :
 
-- starter.json : `image-safety`, slot 57, requires_db **false** ;
+- starter.json : `image-safety`, slot 51, requires_db **false** ;
 - snippet : GET `/image-safety`, POST `/image-safety`, GET `/image-safety/inspect` ;
 - contrôleur : `verify_image_content` + lecture de `upload_max_image_pixels`,
   aucune écriture ni base de données ; vue présente ;
@@ -26,17 +26,17 @@ VIEW = FILES / "mvc" / "views" / "image_safety" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "avance" / "image-safety.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 57"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 51"]
 
 
 def test_resolves():
     m = resolve("image-safety")
-    assert m["id"] == "image-safety" and m["number"] == 57
+    assert m["id"] == "image-safety" and m["number"] == 51
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("image-safety", "image_safety", "57"):
+    for a in ("image-safety", "image_safety", "51"):
         assert resolve(a)["id"] == "image-safety"
 
 

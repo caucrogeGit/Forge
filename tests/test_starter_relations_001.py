@@ -2,7 +2,7 @@
 
 Contrat public minimum du palier 1 du niveau avancé — Relations entre tables :
 
-- starter.json déclare `relations` (id, slot 26, requires_db **true**) ;
+- starter.json déclare `relations` (id, slot 20, requires_db **true**) ;
 - routes.py.snippet déclare `GET /relations` ;
 - contrôleur présent + imports Request / Response / BaseController +
   `core.database.db.fetch_all` ;
@@ -40,7 +40,7 @@ FORBIDDEN = [
     "forge new mon-projet",
     "cd mon-projet",
     "source .venv/activate",
-    "Starter 26",
+    "Starter 20",
 ]
 
 
@@ -49,7 +49,7 @@ FORBIDDEN = [
 def test_resolves_with_id_and_slot():
     meta = resolve("relations")
     assert meta["id"] == "relations"
-    assert meta["number"] == 26
+    assert meta["number"] == 20
     assert meta.get("kind") == "skeleton"
     assert meta.get("status") == "available"
 
@@ -59,7 +59,7 @@ def test_requires_db_true():
 
 
 def test_aliases_resolvent():
-    for alias in ("relations", "relation", "26"):
+    for alias in ("relations", "relation", "20"):
         assert resolve(alias)["id"] == "relations"
 
 

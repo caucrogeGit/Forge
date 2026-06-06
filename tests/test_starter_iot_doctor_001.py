@@ -2,7 +2,7 @@
 
 Contrat du dernier palier du niveau avancé de welcome-iot — Diagnostiquer :
 
-- starter.json : `iot-doctor`, slot 39, requires_db **false** ;
+- starter.json : `iot-doctor`, slot 33, requires_db **false** ;
 - snippet : GET `/iot-doctor` ;
 - contrôleur : appelle les contrôles non invasifs de `cli.doctor`, expose le
   statut en JSON ; ne touche ni base ni broker ;
@@ -24,17 +24,17 @@ CONTROLLER = FILES / "mvc" / "controllers" / "iot_doctor_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-iot" / "avance" / "iot-doctor.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 39"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 33"]
 
 
 def test_resolves():
     m = resolve("iot-doctor")
-    assert m["id"] == "iot-doctor" and m["number"] == 39
+    assert m["id"] == "iot-doctor" and m["number"] == 33
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("iot-doctor", "iot_doctor", "39"):
+    for a in ("iot-doctor", "iot_doctor", "33"):
         assert resolve(a)["id"] == "iot-doctor"
 
 

@@ -8,7 +8,7 @@
 ## Objectif
 
 Boucler le parcours du starter
-[Bonjour IoT](../starters/optin-iot/welcome-optin-iot.md) : passer de la
+Bonjour IoT : passer de la
 réponse pédagogique
 
 ```json
@@ -148,4 +148,3 @@ côté dispatcher (`forge.py`).
 - [Architecture Forge IoT](architecture.md)
 - [Diagnostic — `forge iot:doctor`](doctor.md)
 - [Stockage des événements](storage-events.md)
-- [Starter Bonjour IoT](../starters/optin-iot/welcome-optin-iot.md)

@@ -1,12 +1,12 @@
 {
   "id": "file-delete",
-  "number": 63,
+  "number": 57,
   "name": "Supprimer un fichier",
   "kind": "skeleton",
   "aliases": [
     "file-delete",
     "file_delete",
-    "63"
+    "57"
   ],
   "description": "Supprimer un fichier : palier 3 du niveau intermédiaire de la progression welcome-files. delete_media_file supprime un fichier stocké à partir de son chemin relatif, en restant à l'intérieur de la racine d'upload (anti-traversal). Aucune base de données.",
   "status": "available",

@@ -2,7 +2,7 @@
 
 Récapitulatif des **24 paliers** de la progression *Bonjour Forge*, répartis en
 trois niveaux, et des API Forge introduites à chaque étape. À garder sous la main
-avant d'aborder les starters autonomes (à commencer par `first-crud`).
+avant d'aborder les progressions opt-in autonomes.
 
 ## Niveau débutant — 11 paliers
 

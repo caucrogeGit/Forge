@@ -1,12 +1,12 @@
 {
   "id": "stats-welcome",
-  "number": 100,
+  "number": 94,
   "name": "Bonjour Forge Stats",
   "kind": "skeleton",
   "aliases": [
     "stats-welcome",
     "stats_welcome",
-    "100"
+    "94"
   ],
   "description": "Bonjour Forge Stats : premier palier du niveau débutant de la progression welcome-stats. Premier contact avec le module opt-in forge-mvc-stats : crée un événement de démonstration (make_event) et inspecte la table et les colonnes des statistiques (STATS_EVENTS_TABLE, STATS_EVENTS_COLUMNS). Transformation pure, aucune base de données.",
   "status": "available",

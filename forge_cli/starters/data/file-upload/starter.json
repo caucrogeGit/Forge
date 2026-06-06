@@ -1,13 +1,13 @@
 {
   "id": "file-upload",
-  "number": 27,
+  "number": 21,
   "name": "Téléverser un fichier",
   "kind": "skeleton",
   "aliases": [
     "file-upload",
     "file_upload",
     "upload",
-    "27"
+    "21"
   ],
   "description": "Téléverser un fichier : palier 2 du niveau avancé. Un formulaire `multipart/form-data` envoie un fichier ; le contrôleur le récupère avec `request.file(...)` et le stocke via `core.uploads.save_upload`, qui valide extension, type MIME et taille avant d'écrire sur le disque. Aucune base de données.",
   "status": "available",

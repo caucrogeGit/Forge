@@ -1,12 +1,12 @@
 {
   "id": "workflow-available",
-  "number": 96,
+  "number": 90,
   "name": "Transitions disponibles",
   "kind": "skeleton",
   "aliases": [
     "workflow-available",
     "workflow_available",
-    "96"
+    "90"
   ],
   "description": "Transitions disponibles : palier 3 du niveau intermédiaire de la progression welcome-workflow. get_available_transitions liste les statuts atteignables depuis un statut courant — utile pour générer dynamiquement les boutons d'action. Transformation pure, aucune base de données.",
   "status": "available",

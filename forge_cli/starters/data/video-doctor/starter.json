@@ -1,12 +1,12 @@
 {
   "id": "video-doctor",
-  "number": 48,
+  "number": 42,
   "name": "Diagnostiquer le module Vidéo",
   "kind": "skeleton",
   "aliases": [
     "video-doctor",
     "video_doctor",
-    "48"
+    "42"
   ],
   "description": "Diagnostiquer le module Vidéo : dernier palier du niveau avancé de welcome-video. Une route exécute les vérifications non invasives du diagnostic Forge Vidéo (paquet, config, migration, présence de ffprobe et ffmpeg) et renvoie leur statut en JSON. Le diagnostic complet (base) reste la commande `forge video:doctor`. Sans base.",
   "status": "available",

@@ -74,7 +74,7 @@ class TestStarterNameKeptAsBonjourForge:
 
 
 class TestStarterAliases:
-    @pytest.mark.parametrize("alias", ["welcome", "bienvenue", "4"])
+    @pytest.mark.parametrize("alias", ["welcome", "bienvenue", "1"])
     def test_aliases_historiques_resolvent(self, alias):
         meta = resolve(alias)
         assert meta["id"] == "welcome"

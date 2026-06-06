@@ -54,11 +54,10 @@ class TestModuleFamilyFrozen:
 
 class TestStartersFrozen:
     FROZEN = {
-        "csrf", "dynamic-route", "first-crud", "first-crud-generated",
+        "csrf", "dynamic-route",
         "first-html-view", "first-sql", "first-sql-write", "form-post",
         "json-response", "query-params", "request-debug", "server-validation",
-        "users-core-auth", "welcome", "welcome-optin-iot", "welcome-optin-mfa",
-        "welcome-optin-video", "list-records", "filter-list", "pagination", "layout-template", "update-record", "delete-record", "session-state", "flash-messages",
+        "welcome", "list-records", "filter-list", "pagination", "layout-template", "update-record", "delete-record", "session-state", "flash-messages",
         "relations", "file-upload", "send-email", "json-api", "db-transaction",
         "iot-welcome", "iot-events", "iot-device", "iot-simulate", "iot-api",
         "iot-dashboard", "iot-contract", "iot-subscriber", "iot-doctor",
@@ -95,7 +94,7 @@ class TestStartersFrozen:
         )
 
     def test_frozen_count(self):
-        assert len(self.FROZEN) == 108
+        assert len(self.FROZEN) == 102
 
 
 # ── Le contrat est documenté ─────────────────────────────────────────────────
@@ -106,7 +105,7 @@ class TestContractDocumented:
 
     @pytest.mark.parametrize("needle", [
         "opt-in:install", "opt-in:disable", "module:install",
-        "108 starters", "mkdocs build --strict",
+        "102 starters", "mkdocs build --strict",
     ])
     def test_contract_mentions(self, needle):
         assert needle in CONTRACT.read_text(encoding="utf-8")

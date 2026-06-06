@@ -2,7 +2,7 @@
 
 Contrat du palier 1 du niveau intermédiaire de welcome-iot — Simuler une mesure :
 
-- starter.json : `iot-simulate`, slot 34, requires_db **true** ;
+- starter.json : `iot-simulate`, slot 28, requires_db **true** ;
 - snippet : GET formulaire, POST injection ;
 - contrôleur : `build_payload` + `parse_message` + `IotEventRepository.insert`,
   gestion `ContractError`, CSRF, redirection (PRG) ;
@@ -27,17 +27,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-iot" / "intermediaire" / "iot-simulate.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 34"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 28"]
 
 
 def test_resolves():
     m = resolve("iot-simulate")
-    assert m["id"] == "iot-simulate" and m["number"] == 34
+    assert m["id"] == "iot-simulate" and m["number"] == 28
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("iot-simulate", "iot_simulate", "34"):
+    for a in ("iot-simulate", "iot_simulate", "28"):
         assert resolve(a)["id"] == "iot-simulate"
 
 

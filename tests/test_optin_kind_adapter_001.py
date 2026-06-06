@@ -82,7 +82,7 @@ class TestEnableKindAware:
         assert enable.main(["does-not-exist"]) == 2
 
     def test_mfa_guidance_points_to_starter(self):
-        assert "welcome-optin-mfa" in enable_guidance(OFFICIAL_OPTINS["mfa"])
+        assert "mfa-welcome" in enable_guidance(OFFICIAL_OPTINS["mfa"])
 
     def test_rbac_guidance_mentions_decorators(self):
         assert "require_permission" in enable_guidance(OFFICIAL_OPTINS["rbac"])

@@ -1,6 +1,6 @@
 """Garde-fou STARTER-AUDIO-UPLOAD-001 (test proportionné).
 
-Palier 2 débutant welcome-audio — Téléverser un audio : slot 68, requires_db
+Palier 2 débutant welcome-audio — Téléverser un audio : slot 62, requires_db
 false, routes GET/POST `/audio-upload`, contrôleur `ingest_audio` +
 `AudioIngestError`, vue présente, doc sous `welcome-audio/debutant/`.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "audio_upload_contr
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "audio_upload" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-audio" / "debutant" / "audio-upload.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 68"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 62"]
 
 
 def test_resolves():
     m = resolve("audio-upload")
-    assert m["id"] == "audio-upload" and m["number"] == 68
+    assert m["id"] == "audio-upload" and m["number"] == 62
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("audio-upload", "audio_upload", "68"):
+    for a in ("audio-upload", "audio_upload", "62"):
         assert resolve(a)["id"] == "audio-upload"
 
 

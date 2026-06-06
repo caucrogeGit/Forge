@@ -2,7 +2,7 @@
 
 Contrat du palier 4 du niveau avancé — API JSON protégée :
 
-- starter.json : `json-api`, slot 29, requires_db **true** ;
+- starter.json : `json-api`, slot 23, requires_db **true** ;
 - snippet : GET `/json-api` ;
 - contrôleur : `request.header("Authorization")`, vérification d'un jeton
   Bearer, `Response.json(...)` (200 et 401), `fetch_all` ;
@@ -26,17 +26,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "avance" / "json-api.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 29"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 23"]
 
 
 def test_resolves():
     m = resolve("json-api")
-    assert m["id"] == "json-api" and m["number"] == 29
+    assert m["id"] == "json-api" and m["number"] == 23
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("json-api", "json_api", "api", "29"):
+    for a in ("json-api", "json_api", "api", "23"):
         assert resolve(a)["id"] == "json-api"
 
 

@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau intermédiaire de welcome-images — Afficher la galerie :
 
-- starter.json : `image-gallery`, slot 53, requires_db **true** ;
+- starter.json : `image-gallery`, slot 47, requires_db **true** ;
 - snippet : GET `/image-gallery` ;
 - contrôleur : `get_media_gallery`, repli pédagogique ;
 - migration `media` livrée avec le starter ; vue présente ;
@@ -26,17 +26,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "intermediaire" / "image-gallery.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 53"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 47"]
 
 
 def test_resolves():
     m = resolve("image-gallery")
-    assert m["id"] == "image-gallery" and m["number"] == 53
+    assert m["id"] == "image-gallery" and m["number"] == 47
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("image-gallery", "image_gallery", "53"):
+    for a in ("image-gallery", "image_gallery", "47"):
         assert resolve(a)["id"] == "image-gallery"
 
 

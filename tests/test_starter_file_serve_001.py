@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILE-SERVE-001 (test proportionné).
 
-Palier 3 débutant welcome-files — Servir un fichier : slot 60, requires_db false,
+Palier 3 débutant welcome-files — Servir un fichier : slot 54, requires_db false,
 routes `/file-serve` + `/file-serve/download`, contrôleur `serve_media_file`,
 vue présente, doc sous `welcome-files/debutant/`, catalogue.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "file_serve_control
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "file_serve" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "debutant" / "file-serve.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 60"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 54"]
 
 
 def test_resolves():
     m = resolve("file-serve")
-    assert m["id"] == "file-serve" and m["number"] == 60
+    assert m["id"] == "file-serve" and m["number"] == 54
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-serve", "file_serve", "60"):
+    for a in ("file-serve", "file_serve", "54"):
         assert resolve(a)["id"] == "file-serve"
 
 

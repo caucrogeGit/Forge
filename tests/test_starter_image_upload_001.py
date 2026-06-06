@@ -3,7 +3,7 @@
 Contrat du palier 2 du niveau débutant de la progression welcome-images —
 Téléverser une image :
 
-- starter.json : `image-upload`, slot 50, requires_db **false** ;
+- starter.json : `image-upload`, slot 44, requires_db **false** ;
 - snippet : GET `/image-upload`, POST `/image-upload` ;
 - contrôleur : `save_image_upload`, `request.file(...)`, gestion `UploadError`,
   pas de base de données ; vue présente ;
@@ -26,17 +26,17 @@ VIEW = FILES / "mvc" / "views" / "image_upload" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "debutant" / "image-upload.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 50"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 44"]
 
 
 def test_resolves():
     m = resolve("image-upload")
-    assert m["id"] == "image-upload" and m["number"] == 50
+    assert m["id"] == "image-upload" and m["number"] == 44
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("image-upload", "image_upload", "50"):
+    for a in ("image-upload", "image_upload", "44"):
         assert resolve(a)["id"] == "image-upload"
 
 

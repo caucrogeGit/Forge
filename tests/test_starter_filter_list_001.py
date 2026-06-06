@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau intermédiaire — Rechercher / filtrer :
 
-- starter.json : `filter-list`, slot 19, requires_db true ;
+- starter.json : `filter-list`, slot 13, requires_db true ;
 - snippet : `GET /filter-list` ;
 - contrôleur : `fetch_all` + `request.param("q")` + `WHERE content LIKE ?`
   paramétré (jamais concaténé) ;
@@ -30,17 +30,17 @@ DOC = ROOT / "docs" / "starters" / "welcome-forge" / "intermediaire" / "filter-l
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
 MIGRATION_RE = re.compile(r"^\d{14}_[a-z0-9_]+\.sql$")
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 19"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 13"]
 
 
 def test_resolves():
     m = resolve("filter-list")
-    assert m["id"] == "filter-list" and m["number"] == 19
+    assert m["id"] == "filter-list" and m["number"] == 13
     assert m.get("requires_db") is True and m.get("kind") == "skeleton"
 
 
 def test_aliases():
-    for a in ("filter-list", "filter_list", "filter", "19"):
+    for a in ("filter-list", "filter_list", "filter", "13"):
         assert resolve(a)["id"] == "filter-list"
 
 

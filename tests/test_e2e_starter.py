@@ -13,7 +13,6 @@ Starters testés :
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -22,10 +21,6 @@ from forge_cli.starters import cmd_starter_build, cmd_starter_list
 from forge_cli.starters._exceptions import StarterBuildError
 from forge_cli.starters.builder import build
 from forge_cli.starters.registry import StarterNotFound, all_starters, resolve
-from forge_cli.project_audit import run_project_audit
-from forge_cli.project_check import run_project_check
-
-_FORGE_VERSION = "2.2.0"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -104,9 +99,6 @@ class TestStarterRegistry:
     def test_tous_available(self):
         assert all(s["status"] == "available" for s in all_starters())
 
-    def test_starter_1_est_crud(self):
-        assert resolve("1").get("kind", "crud") == "crud"
-
     def test_starter_inconnu_leve_exception(self):
         with pytest.raises(StarterNotFound):
             resolve("999")
@@ -124,8 +116,8 @@ class TestStarterList:
     def test_affiche_noms(self, capsys):
         cmd_starter_list()
         out = capsys.readouterr().out
-        assert "First CRUD (généré)" in out
-        assert "Utilisateurs / authentification" in out
+        assert "Bonjour Forge" in out
+        assert "Bonjour Forge IoT" in out
 
     def test_affiche_disponible(self, capsys):
         cmd_starter_list()
@@ -136,57 +128,6 @@ class TestStarterList:
         with pytest.raises(SystemExit) as exc_info:
             cmd_starter_build(["999"])
         assert exc_info.value.code == 1
-
-
-# ── Starter 1 — first-crud-generated (CRUD généré, entité neutre) ─────────────
-
-class TestStarter1Crud:
-    @pytest.fixture(autouse=True)
-    def _build(self, starter_project):
-        self.root = starter_project
-        _build_starter("1")
-
-    def test_entity_dir_exists(self):
-        assert (self.root / "mvc" / "entities" / "message").is_dir()
-
-    def test_entity_json_valid(self):
-        path = self.root / "mvc" / "entities" / "message" / "message.json"
-        assert path.exists()
-        data = json.loads(path.read_text(encoding="utf-8"))
-        assert data.get("name") == "Message"
-        assert data.get("schema_version") == "1.0"
-
-    def test_entity_sql_exists(self):
-        assert (self.root / "mvc" / "entities" / "message" / "message.sql").exists()
-
-    def test_controller_exists(self):
-        assert (self.root / "mvc" / "controllers" / "message_controller.py").exists()
-
-    def test_model_exists(self):
-        assert (self.root / "mvc" / "models" / "message_model.py").exists()
-
-    def test_form_exists(self):
-        assert (self.root / "mvc" / "forms" / "message_form.py").exists()
-
-    def test_views_exist(self):
-        views = self.root / "mvc" / "views" / "message"
-        assert (views / "index.html").exists()
-        assert (views / "show.html").exists()
-        assert (views / "form.html").exists()
-
-    def test_routes_injected(self):
-        routes = (self.root / "mvc" / "routes.py").read_text(encoding="utf-8")
-        assert "/messages" in routes
-
-    def test_project_check_no_failures(self):
-        results = run_project_check(self.root, _FORGE_VERSION)
-        failures = [r for r in results if r.status == "fail"]
-        assert failures == [], f"project:check FAIL : {[r.detail for r in failures]}"
-
-    def test_project_audit_no_failures(self):
-        results = run_project_audit(self.root, _FORGE_VERSION)
-        failures = [r for r in results if r.status == "fail"]
-        assert failures == [], f"project:audit FAIL : {[r.detail for r in failures]}"
 
 
 # ── Cas invalide ──────────────────────────────────────────────────────────────

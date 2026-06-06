@@ -117,25 +117,3 @@ def test_authenticate_session_uses_normalize_helper():
     assert "_normalize_legacy_user(user)" in content, (
         "authenticate_session() doit déléguer à _normalize_legacy_user(user)"
     )
-
-
-# ---------------------------------------------------------------------------
-# Starters — présence légitime des champs FR (non interdite)
-# ---------------------------------------------------------------------------
-
-
-def test_starters_may_contain_utilisateur_id():
-    """Les starters peuvent légitimement contenir UtilisateurId (champs applicatifs)."""
-    starters_root = PROJECT_ROOT / "forge_cli" / "starters"
-    if not starters_root.exists():
-        pytest.skip("forge_cli/starters introuvable")
-
-    found = any(
-        "UtilisateurId" in f.read_text(encoding="utf-8")
-        for f in starters_root.rglob("*.py")
-        if "__pycache__" not in f.parts
-    )
-    assert found, (
-        "Les starters doivent toujours contenir UtilisateurId — "
-        "ce test vérifie que la présence dans les starters est normale et non interdite."
-    )

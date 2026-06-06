@@ -2,7 +2,7 @@
 
 Contrat du palier 1 du niveau avancé de welcome-images — Image de couverture :
 
-- starter.json : `image-cover`, slot 55, requires_db **true** ;
+- starter.json : `image-cover`, slot 49, requires_db **true** ;
 - snippet : GET `/image-cover`, POST `/image-cover` ;
 - contrôleur : `get_cover_media` + `attach_media_to_entity` (rôle cover) ;
 - migration `media` livrée avec le starter ; vue présente ;
@@ -26,17 +26,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-images" / "avance" / "image-cover.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 55"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 49"]
 
 
 def test_resolves():
     m = resolve("image-cover")
-    assert m["id"] == "image-cover" and m["number"] == 55
+    assert m["id"] == "image-cover" and m["number"] == 49
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("image-cover", "image_cover", "55"):
+    for a in ("image-cover", "image_cover", "49"):
         assert resolve(a)["id"] == "image-cover"
 
 

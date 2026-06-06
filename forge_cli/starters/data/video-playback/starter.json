@@ -1,12 +1,12 @@
 {
   "id": "video-playback",
-  "number": 44,
+  "number": 38,
   "name": "Lire une vidéo",
   "kind": "skeleton",
   "aliases": [
     "video-playback",
     "video_playback",
-    "44"
+    "38"
   ],
   "description": "Lire une vidéo : palier 2 du niveau intermédiaire de welcome-video. Le snippet branche la route de lecture officielle du module via `register_video_routes(router)` — `GET /videos/{uuid}` sert le fichier en streaming HTTP avec support des requêtes Range. Aucun code métier à écrire : on délègue au paquet.",
   "status": "available",

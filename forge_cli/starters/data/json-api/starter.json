@@ -1,13 +1,13 @@
 {
   "id": "json-api",
-  "number": 29,
+  "number": 23,
   "name": "API JSON protégée",
   "kind": "skeleton",
   "aliases": [
     "json-api",
     "json_api",
     "api",
-    "29"
+    "23"
   ],
   "description": "API JSON protégée : palier 4 du niveau avancé. Une route renvoie des données en JSON (`Response.json`) mais uniquement si la requête présente un jeton `Authorization: Bearer …` valide, lu via `request.header(...)`. Sinon elle répond `401` en JSON. Les données proviennent de la table `first_sql_messages`.",
   "status": "available",

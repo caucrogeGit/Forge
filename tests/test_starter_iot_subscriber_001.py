@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau avancé de welcome-iot — Le subscriber MQTT :
 
-- starter.json : `iot-subscriber`, slot 38, requires_db **false** ;
+- starter.json : `iot-subscriber`, slot 32, requires_db **false** ;
 - snippet : GET `/iot-subscriber` ;
 - contrôleur : `load_iot_config`, affiche la config broker (pas d'écoute web) ;
 - vue : mentionne `forge iot:listen` et le topic ;
@@ -25,17 +25,17 @@ VIEW = FILES / "mvc" / "views" / "iot_subscriber" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-iot" / "avance" / "iot-subscriber.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 38"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 32"]
 
 
 def test_resolves():
     m = resolve("iot-subscriber")
-    assert m["id"] == "iot-subscriber" and m["number"] == 38
+    assert m["id"] == "iot-subscriber" and m["number"] == 32
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("iot-subscriber", "iot_subscriber", "38"):
+    for a in ("iot-subscriber", "iot_subscriber", "32"):
         assert resolve(a)["id"] == "iot-subscriber"
 
 

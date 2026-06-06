@@ -1,13 +1,13 @@
 {
   "id": "first-html-view",
-  "number": 6,
+  "number": 3,
   "name": "Première vue HTML",
   "kind": "skeleton",
   "aliases": [
     "first-html-view",
     "first_html_view",
     "html-view",
-    "6"
+    "3"
   ],
   "description": "Première vue HTML : palier 3 de la progression pédagogique officielle, après Paramètres d'URL. Une route (`/first-html-view`), un contrôleur, et une vue HTML rendue avec `BaseController.render(...)`. Aucune base de données.",
   "status": "available",

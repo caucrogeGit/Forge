@@ -1,4 +1,4 @@
-"""Garde-fou STARTER-WORKFLOW-JINJA-001 — palier 3 avancé welcome-workflow (slot 99)."""
+"""Garde-fou STARTER-WORKFLOW-JINJA-001 — palier 3 avancé welcome-workflow (slot 93)."""
 from __future__ import annotations
 
 import ast
@@ -13,17 +13,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "workflow_jinja_con
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "workflow_jinja" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-workflow" / "avance" / "workflow-jinja.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 99"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 93"]
 
 
 def test_resolves():
     m = resolve("workflow-jinja")
-    assert m["id"] == "workflow-jinja" and m["number"] == 99
+    assert m["id"] == "workflow-jinja" and m["number"] == 93
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("workflow-jinja", "workflow_jinja", "99"):
+    for a in ("workflow-jinja", "workflow_jinja", "93"):
         assert resolve(a)["id"] == "workflow-jinja"
 
 

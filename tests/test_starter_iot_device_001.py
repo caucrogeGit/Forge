@@ -3,7 +3,7 @@
 Contrat du palier 3 du niveau débutant de welcome-iot — Les événements d'un
 capteur :
 
-- starter.json : `iot-device`, slot 33, requires_db **false** ;
+- starter.json : `iot-device`, slot 27, requires_db **false** ;
 - snippet : GET `/iot-device/{site}/{device_id}` ;
 - contrôleur : `route_param`, `find_by_device` + `count_by_device`, réponse
   `503` pédagogique ; lecture seule ;
@@ -25,17 +25,17 @@ CONTROLLER = FILES / "mvc" / "controllers" / "iot_device_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-iot" / "debutant" / "iot-device.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 33"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 27"]
 
 
 def test_resolves():
     m = resolve("iot-device")
-    assert m["id"] == "iot-device" and m["number"] == 33
+    assert m["id"] == "iot-device" and m["number"] == 27
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("iot-device", "iot_device", "33"):
+    for a in ("iot-device", "iot_device", "27"):
         assert resolve(a)["id"] == "iot-device"
 
 

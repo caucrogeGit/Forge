@@ -3,7 +3,7 @@
 Contrat du palier 1 du niveau débutant de la progression welcome-video —
 Bonjour Forge Vidéo :
 
-- starter.json : `video-welcome`, slot 40, requires_db **false** ;
+- starter.json : `video-welcome`, slot 34, requires_db **false** ;
 - snippet : GET `/video-welcome`, GET `/video-welcome/inspect` ;
 - contrôleur : `load_video_config`, token **masqué**, `Response.text` +
   `Response.json` ; pas de base de données ;
@@ -25,17 +25,17 @@ CONTROLLER = FILES / "mvc" / "controllers" / "video_welcome_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-video" / "debutant" / "video-welcome.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 40"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 34"]
 
 
 def test_resolves():
     m = resolve("video-welcome")
-    assert m["id"] == "video-welcome" and m["number"] == 40
+    assert m["id"] == "video-welcome" and m["number"] == 34
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("video-welcome", "video_welcome", "40"):
+    for a in ("video-welcome", "video_welcome", "34"):
         assert resolve(a)["id"] == "video-welcome"
 
 

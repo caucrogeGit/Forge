@@ -1,12 +1,12 @@
 {
   "id": "audio-probe",
-  "number": 70,
+  "number": 64,
   "name": "Sonder un audio",
   "kind": "skeleton",
   "aliases": [
     "audio-probe",
     "audio_probe",
-    "70"
+    "64"
   ],
   "description": "Sonder un audio : palier 1 du niveau avancé de la progression welcome-audio. probe_audio (ffprobe, lecture seule) extrait durée, codec, bitrate, fréquence d'échantillonnage, canaux et conteneur d'un fichier audio stocké. ffprobe requis. Aucune base de données.",
   "status": "available",

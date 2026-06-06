@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILE-SAFE-PATH-001 (test proportionné).
 
-Palier 2 avancé welcome-files — Chemin anti-traversal : slot 65, requires_db
+Palier 2 avancé welcome-files — Chemin anti-traversal : slot 59, requires_db
 false, routes `/file-safe-path` + `/inspect`, contrôleur `is_safe_media_path` +
 `normalize_media_path`, vue présente, doc sous `welcome-files/avance/`.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "file_safe_path_con
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "file_safe_path" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "avance" / "file-safe-path.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 65"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 59"]
 
 
 def test_resolves():
     m = resolve("file-safe-path")
-    assert m["id"] == "file-safe-path" and m["number"] == 65
+    assert m["id"] == "file-safe-path" and m["number"] == 59
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-safe-path", "file_safe_path", "65"):
+    for a in ("file-safe-path", "file_safe_path", "59"):
         assert resolve(a)["id"] == "file-safe-path"
 
 

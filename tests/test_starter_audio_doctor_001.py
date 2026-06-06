@@ -1,6 +1,6 @@
 """Garde-fou STARTER-AUDIO-DOCTOR-001 (test proportionné).
 
-Palier 3 avancé welcome-audio — Diagnostiquer le module Audio : slot 72,
+Palier 3 avancé welcome-audio — Diagnostiquer le module Audio : slot 66,
 requires_db false, route `/audio-doctor`, contrôleur exposant les `check_*` de
 `forge audio:doctor`, doc sous `welcome-audio/avance/`, catalogue.
 """
@@ -17,17 +17,17 @@ STARTER_DIR = ROOT / "forge_cli" / "starters" / "data" / "audio-doctor"
 CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "audio_doctor_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-audio" / "avance" / "audio-doctor.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 72"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 66"]
 
 
 def test_resolves():
     m = resolve("audio-doctor")
-    assert m["id"] == "audio-doctor" and m["number"] == 72
+    assert m["id"] == "audio-doctor" and m["number"] == 66
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("audio-doctor", "audio_doctor", "72"):
+    for a in ("audio-doctor", "audio_doctor", "66"):
         assert resolve(a)["id"] == "audio-doctor"
 
 

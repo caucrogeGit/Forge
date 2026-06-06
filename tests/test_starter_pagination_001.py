@@ -2,7 +2,7 @@
 
 Contrat du palier 3 du niveau intermédiaire — Paginer une liste :
 
-- starter.json : `pagination`, slot 20, requires_db true ;
+- starter.json : `pagination`, slot 14, requires_db true ;
 - snippet : `GET /pagination` ;
 - contrôleur : `fetch_all` + `fetch_one`, `LIMIT ? OFFSET ?` paramétré,
   `COUNT(*)`, conversion robuste du paramètre `page` ;
@@ -29,17 +29,17 @@ DOC = ROOT / "docs" / "starters" / "welcome-forge" / "intermediaire" / "paginati
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
 MIGRATION_RE = re.compile(r"^\d{14}_[a-z0-9_]+\.sql$")
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 20"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 14"]
 
 
 def test_resolves():
     m = resolve("pagination")
-    assert m["id"] == "pagination" and m["number"] == 20
+    assert m["id"] == "pagination" and m["number"] == 14
     assert m.get("requires_db") is True and m.get("kind") == "skeleton"
 
 
 def test_aliases():
-    for a in ("pagination", "paginate", "20"):
+    for a in ("pagination", "paginate", "14"):
         assert resolve(a)["id"] == "pagination"
 
 

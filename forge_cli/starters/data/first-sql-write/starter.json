@@ -1,12 +1,12 @@
 {
   "id": "first-sql-write",
-  "number": 15,
+  "number": 11,
   "name": "Écrire en base",
   "kind": "skeleton",
   "aliases": [
     "first-sql-write",
     "sql-write",
-    "15"
+    "11"
   ],
   "description": "Écrire en base : palier de la progression pédagogique — insérer une ligne depuis un formulaire avec `db.insert(...)`, en réutilisant le formulaire+CSRF et la table `first_sql_messages` du palier « Première base SQL ». Palier-pont vers le CRUD complet.",
   "status": "available",

@@ -1,12 +1,12 @@
 {
   "id": "iot-contract",
-  "number": 37,
+  "number": 31,
   "name": "Valider un message IoT",
   "kind": "skeleton",
   "aliases": [
     "iot-contract",
     "iot_contract",
-    "37"
+    "31"
   ],
   "description": "Valider un message IoT : premier palier du niveau avancé de welcome-iot. On bascule vers le réel : un message arrivant d'un vrai capteur doit respecter le contrat MQTT. Un formulaire soumet topic + payload ; `parse_message` les valide en `Measurement` ou lève une `ContractError` (avec code). C'est la même validation que le subscriber applique. Sans broker, sans base.",
   "status": "available",

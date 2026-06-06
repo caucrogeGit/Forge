@@ -1,12 +1,12 @@
 {
   "id": "video-list",
-  "number": 41,
+  "number": 35,
   "name": "Lister les vidéos",
   "kind": "skeleton",
   "aliases": [
     "video-list",
     "video_list",
-    "41"
+    "35"
   ],
   "description": "Lister les vidéos : palier 2 du niveau débutant de welcome-video. Une route lit les dernières vidéos enregistrées via `VideoRepository.list_recent` et les renvoie en JSON. Si la table `videos` n'est pas encore disponible, la route reste pédagogique (réponse 503 explicite) plutôt que de planter. Aucun ffmpeg.",
   "status": "available",

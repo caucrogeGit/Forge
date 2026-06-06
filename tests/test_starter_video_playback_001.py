@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau intermédiaire de welcome-video — Lire une vidéo :
 
-- starter.json : `video-playback`, slot 44, requires_db **true** ;
+- starter.json : `video-playback`, slot 38, requires_db **true** ;
 - snippet : branche `register_video_routes(router)` (délégation au paquet) ;
 - migration `videos` ; pas de contrôleur applicatif ;
 - documentation sous `intermediaire/`, catalogue.
@@ -21,17 +21,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-video" / "intermediaire" / "video-playback.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 44"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 38"]
 
 
 def test_resolves():
     m = resolve("video-playback")
-    assert m["id"] == "video-playback" and m["number"] == 44
+    assert m["id"] == "video-playback" and m["number"] == 38
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("video-playback", "video_playback", "44"):
+    for a in ("video-playback", "video_playback", "38"):
         assert resolve(a)["id"] == "video-playback"
 
 

@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILE-STORE-001 (test proportionné).
 
-Palier 2 débutant welcome-files — Stocker un document : slot 59, requires_db
+Palier 2 débutant welcome-files — Stocker un document : slot 53, requires_db
 false, routes GET/POST `/file-store`, contrôleur `save_upload` + `UploadError`,
 vue présente, doc sous `welcome-files/debutant/`, catalogue.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "file_store_control
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "file_store" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "debutant" / "file-store.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 59"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 53"]
 
 
 def test_resolves():
     m = resolve("file-store")
-    assert m["id"] == "file-store" and m["number"] == 59
+    assert m["id"] == "file-store" and m["number"] == 53
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-store", "file_store", "59"):
+    for a in ("file-store", "file_store", "53"):
         assert resolve(a)["id"] == "file-store"
 
 

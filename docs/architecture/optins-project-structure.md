@@ -194,9 +194,9 @@ le reste : contrat MQTT, subscriber, repository, API HTTP, CLI
 l'[architecture Forge IoT](../iot/architecture.md) et l'[audit de
 clôture IoT](../history/audits/audit-iot-closing.md).
 
-!!! example "Exemple vivant : le starter `welcome-optin-iot`"
+!!! example "Exemple vivant : le starter `welcome-iot`"
     Cette convention n'est pas que théorique : le starter
-    [`welcome-optin-iot`](../starters/optin-iot/welcome-optin-iot.md) **génère réellement**
+    `welcome-iot` **génère réellement**
     cette structure `optins/iot/` dans le projet créé
     (`OPTINS-IOT-PROJECT-BRIDGE-001`). C'est le premier opt-in officiel
     branché via `optins/registry.py`. Les autres modules (`rbac`,

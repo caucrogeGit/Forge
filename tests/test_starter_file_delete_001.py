@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILE-DELETE-001 (test proportionné).
 
-Palier 3 intermédiaire welcome-files — Supprimer un fichier : slot 63, requires_db
+Palier 3 intermédiaire welcome-files — Supprimer un fichier : slot 57, requires_db
 false, routes GET/POST `/file-delete`, contrôleur `delete_media_file`, vue
 présente, doc sous `welcome-files/intermediaire/`, catalogue.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "file_delete_contro
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "file_delete" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "intermediaire" / "file-delete.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 63"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 57"]
 
 
 def test_resolves():
     m = resolve("file-delete")
-    assert m["id"] == "file-delete" and m["number"] == 63
+    assert m["id"] == "file-delete" and m["number"] == 57
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-delete", "file_delete", "63"):
+    for a in ("file-delete", "file_delete", "57"):
         assert resolve(a)["id"] == "file-delete"
 
 

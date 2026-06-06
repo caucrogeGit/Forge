@@ -3,7 +3,7 @@
 Contrat public minimum du palier 1 du niveau intermédiaire — Lister des
 enregistrements :
 
-- starter.json déclare `list-records` (id, slot 18, requires_db **true**) ;
+- starter.json déclare `list-records` (id, slot 12, requires_db **true**) ;
 - routes.py.snippet déclare `GET /list-records` ;
 - contrôleur présent + imports Request / Response / BaseController +
   `core.database.db.fetch_all` (lecture de PLUSIEURS lignes) ;
@@ -40,7 +40,7 @@ FORBIDDEN = [
     "forge new mon-projet",
     "cd mon-projet",
     "source .venv/activate",
-    "Starter 18",
+    "Starter 12",
 ]
 
 
@@ -49,7 +49,7 @@ FORBIDDEN = [
 def test_resolves_with_id_and_slot():
     meta = resolve("list-records")
     assert meta["id"] == "list-records"
-    assert meta["number"] == 18
+    assert meta["number"] == 12
     assert meta.get("kind") == "skeleton"
     assert meta.get("status") == "available"
 
@@ -59,7 +59,7 @@ def test_requires_db_true():
 
 
 def test_aliases_resolvent():
-    for alias in ("list-records", "list_records", "list", "18"):
+    for alias in ("list-records", "list_records", "list", "12"):
         assert resolve(alias)["id"] == "list-records"
 
 

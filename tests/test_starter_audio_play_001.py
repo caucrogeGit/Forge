@@ -1,6 +1,6 @@
 """Garde-fou STARTER-AUDIO-PLAY-001 (test proportionné).
 
-Palier 3 débutant welcome-audio — Lire un audio : slot 69, requires_db false,
+Palier 3 débutant welcome-audio — Lire un audio : slot 63, requires_db false,
 snippet branchant `register_audio_routes(router)` (délégation au paquet, pas de
 contrôleur applicatif), doc sous `welcome-audio/debutant/`, catalogue.
 """
@@ -14,17 +14,17 @@ ROOT = Path(__file__).resolve().parents[1]
 STARTER_DIR = ROOT / "forge_cli" / "starters" / "data" / "audio-play"
 DOC = ROOT / "docs" / "starters" / "welcome-audio" / "debutant" / "audio-play.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 69"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 63"]
 
 
 def test_resolves():
     m = resolve("audio-play")
-    assert m["id"] == "audio-play" and m["number"] == 69
+    assert m["id"] == "audio-play" and m["number"] == 63
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("audio-play", "audio_play", "69"):
+    for a in ("audio-play", "audio_play", "63"):
         assert resolve(a)["id"] == "audio-play"
 
 

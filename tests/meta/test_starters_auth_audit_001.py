@@ -37,22 +37,9 @@ def test_no_verify_password_legacy_direct_in_login_starters():
             )
 
 
-# ── Starter 2 (users-core-auth) : déjà conforme ─────────────────────────────
-
-def test_starter_users_core_auth_utilise_hash_password():
-    """Le starter users-core-auth utilise hash_password (Argon2id) — déjà conforme."""
-    script = (
-        STARTERS_DIR / "users-core-auth" / "files" / "scripts" / "create_auth_user.py"
-    ).read_text(encoding="utf-8")
-    assert "hash_password(PASSWORD)" in script
-
-
-def test_starter_users_core_auth_controller_utilise_verify_password():
-    """Le contrôleur auth du starter users-core-auth utilise verify_password."""
-    controller = (
-        STARTERS_DIR / "users-core-auth" / "files" / "mvc" / "controllers" / "auth_controller.py"
-    ).read_text(encoding="utf-8")
-    assert "verify_password" in controller
+# Les tests test_starter_users_core_auth_utilise_hash_password et
+# test_starter_users_core_auth_controller_utilise_verify_password ont été
+# retirés : ils inspectaient le starter supprimé `users-core-auth`.
 
 
 # ── Starters sans auth ne contiennent rien de legacy ────────────────────────

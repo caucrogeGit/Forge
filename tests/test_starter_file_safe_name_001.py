@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILE-SAFE-NAME-001 (test proportionné).
 
-Palier 1 avancé welcome-files — Assainir un nom de fichier : slot 64, requires_db
+Palier 1 avancé welcome-files — Assainir un nom de fichier : slot 58, requires_db
 false, routes `/file-safe-name` + `/inspect`, contrôleur `secure_filename`, vue
 présente, doc sous `welcome-files/avance/`, catalogue.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "file_safe_name_con
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "file_safe_name" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "avance" / "file-safe-name.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 64"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 58"]
 
 
 def test_resolves():
     m = resolve("file-safe-name")
-    assert m["id"] == "file-safe-name" and m["number"] == 64
+    assert m["id"] == "file-safe-name" and m["number"] == 58
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-safe-name", "file_safe_name", "64"):
+    for a in ("file-safe-name", "file_safe_name", "58"):
         assert resolve(a)["id"] == "file-safe-name"
 
 

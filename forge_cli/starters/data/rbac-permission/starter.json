@@ -1,12 +1,12 @@
 {
   "id": "rbac-permission",
-  "number": 83,
+  "number": 77,
   "name": "Code de permission",
   "kind": "skeleton",
   "aliases": [
     "rbac-permission",
     "rbac_permission",
-    "83"
+    "77"
   ],
   "description": "Code de permission : palier 2 du niveau débutant de la progression welcome-rbac. normalize_permission_code met un code en forme pointée minuscule (article.create), validate_permission refuse les codes invalides. Transformation pure, aucune base de données.",
   "status": "available",

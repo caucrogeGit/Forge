@@ -1,12 +1,12 @@
 {
   "id": "image-gallery",
-  "number": 53,
+  "number": 47,
   "name": "Afficher la galerie",
   "kind": "skeleton",
   "aliases": [
     "image-gallery",
     "image_gallery",
-    "53"
+    "47"
   ],
   "description": "Afficher la galerie : palier 2 du niveau intermédiaire de la progression welcome-images. Lit les images rattachées à une entité de démo (get_media_gallery) et les affiche avec leurs variantes (miniatures). La table media est créée par la migration livrée avec le starter ; si elle manque, la page reste pédagogique.",
   "status": "available",

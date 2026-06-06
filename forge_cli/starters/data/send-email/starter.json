@@ -1,6 +1,6 @@
 {
   "id": "send-email",
-  "number": 28,
+  "number": 22,
   "name": "Envoyer un email",
   "kind": "skeleton",
   "aliases": [
@@ -8,7 +8,7 @@
     "send_email",
     "email",
     "mail",
-    "28"
+    "22"
   ],
   "description": "Envoyer un email : palier 3 du niveau avancé. Un formulaire saisit destinataire et message ; le contrôleur construit un `MailMessage` et l'envoie via `Mailer` sur le transport `ConsoleTransport` (affiche l'email dans la console en développement, aucun serveur SMTP requis). Aucune base de données.",
   "status": "available",

@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau débutant de welcome-iot — Lire les événements IoT :
 
-- starter.json : `iot-events`, slot 32, requires_db **false** ;
+- starter.json : `iot-events`, slot 26, requires_db **false** ;
 - snippet : GET `/iot-events` ;
 - contrôleur : `IotEventRepository.list_recent`, réponse `503` pédagogique si la
   table manque, `Response.json` ; pas d'écriture ;
@@ -24,17 +24,17 @@ CONTROLLER = FILES / "mvc" / "controllers" / "iot_events_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-iot" / "debutant" / "iot-events.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 32"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 26"]
 
 
 def test_resolves():
     m = resolve("iot-events")
-    assert m["id"] == "iot-events" and m["number"] == 32
+    assert m["id"] == "iot-events" and m["number"] == 26
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("iot-events", "iot_events", "32"):
+    for a in ("iot-events", "iot_events", "26"):
         assert resolve(a)["id"] == "iot-events"
 
 

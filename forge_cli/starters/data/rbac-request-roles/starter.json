@@ -1,12 +1,12 @@
 {
   "id": "rbac-request-roles",
-  "number": 90,
+  "number": 84,
   "name": "Rôles de la requête",
   "kind": "skeleton",
   "aliases": [
     "rbac-request-roles",
     "rbac_request_roles",
-    "90"
+    "84"
   ],
   "description": "Rôles de la requête : palier 3 du niveau avancé de la progression welcome-rbac. get_request_roles et get_request_permissions exposent les rôles et permissions de la requête courante (utilisateur connecté en session). Sans utilisateur, listes vides. Aucune base de données.",
   "status": "available",

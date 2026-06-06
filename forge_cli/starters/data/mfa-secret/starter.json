@@ -1,12 +1,12 @@
 {
   "id": "mfa-secret",
-  "number": 74,
+  "number": 68,
   "name": "Secret TOTP et QR",
   "kind": "skeleton",
   "aliases": [
     "mfa-secret",
     "mfa_secret",
-    "74"
+    "68"
   ],
   "description": "Secret TOTP et QR : palier 2 du niveau débutant de la progression welcome-mfa. generate_totp_secret produit un secret base32, totp_provisioning_uri construit l'URI otpauth:// que les applications d'authentification (Google Authenticator, etc.) lisent en QR. Transformation pure, aucune base de données.",
   "status": "available",

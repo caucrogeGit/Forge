@@ -1,12 +1,12 @@
 {
   "id": "video-status",
-  "number": 45,
+  "number": 39,
   "name": "Suivre l'état d'une vidéo",
   "kind": "skeleton",
   "aliases": [
     "video-status",
     "video_status",
-    "45"
+    "39"
   ],
   "description": "Suivre l'état d'une vidéo : dernier palier du niveau intermédiaire de welcome-video. Une route regroupe les vidéos par statut du cycle de vie (`uploaded`, `processing`, `ready`, `failed`) via `VideoRepository.list_by_status` et renvoie le tout en JSON. Réponse 503 pédagogique si la table manque. Lecture seule.",
   "status": "available",

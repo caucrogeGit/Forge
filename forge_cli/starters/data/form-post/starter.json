@@ -1,13 +1,13 @@
 {
   "id": "form-post",
-  "number": 9,
+  "number": 6,
   "name": "Premier formulaire POST",
   "kind": "skeleton",
   "aliases": [
     "form-post",
     "form_post",
     "post-form",
-    "9"
+    "6"
   ],
   "description": "Premier formulaire POST : palier 8 de la progression pédagogique officielle, après Inspecter une requête. Deux routes (`GET /form-post`, `POST /form-post`), une vue HTML minimale avec champ CSRF, un contrôleur qui lit la valeur envoyée avec `request.form(...)`. Aucune base de données, aucune validation avancée.",
   "status": "available",

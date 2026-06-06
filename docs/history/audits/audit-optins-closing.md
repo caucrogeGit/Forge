@@ -162,7 +162,7 @@ def register_optins(router):
 - [Audit `forge optin:enable`](../../architecture/optins-cli-enable-audit.md) ;
 - [Référence CLI — Opt-ins](../../reference/cli-commands.md#opt-ins-branchement-projet)
   (`optin:enable`, `optin:list`) ;
-- [Starter Bonjour IoT](../../starters/optin-iot/welcome-optin-iot.md).
+- Starter Bonjour IoT.
 
 ## Tests et validations
 

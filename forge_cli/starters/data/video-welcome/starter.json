@@ -1,12 +1,12 @@
 {
   "id": "video-welcome",
-  "number": 40,
+  "number": 34,
   "name": "Bonjour Forge Vidéo",
   "kind": "skeleton",
   "aliases": [
     "video-welcome",
     "video_welcome",
-    "40"
+    "34"
   ],
   "description": "Bonjour Forge Vidéo : premier palier du niveau débutant de la progression welcome-video. Premier contact avec le module opt-in forge-mvc-video : une route texte et une route qui inspecte la configuration vidéo via `load_video_config`, token masqué. Aucun ffmpeg, aucune base de données.",
   "status": "available",

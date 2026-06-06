@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILES-WELCOME-001 (test proportionné).
 
-Palier 1 débutant welcome-files — Bonjour Forge Files : slot 58, requires_db
+Palier 1 débutant welcome-files — Bonjour Forge Files : slot 52, requires_db
 false, routes `/files-welcome` + `/inspect`, contrôleur `upload_root` + politique
 d'upload, doc sous `welcome-files/debutant/`, catalogue.
 """
@@ -17,17 +17,17 @@ STARTER_DIR = ROOT / "forge_cli" / "starters" / "data" / "files-welcome"
 CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "files_welcome_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "debutant" / "files-welcome.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 58"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 52"]
 
 
 def test_resolves():
     m = resolve("files-welcome")
-    assert m["id"] == "files-welcome" and m["number"] == 58
+    assert m["id"] == "files-welcome" and m["number"] == 52
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("files-welcome", "files_welcome", "58"):
+    for a in ("files-welcome", "files_welcome", "52"):
         assert resolve(a)["id"] == "files-welcome"
 
 

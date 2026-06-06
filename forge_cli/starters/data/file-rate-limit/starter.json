@@ -1,12 +1,12 @@
 {
   "id": "file-rate-limit",
-  "number": 62,
+  "number": 56,
   "name": "Limiter les uploads",
   "kind": "skeleton",
   "aliases": [
     "file-rate-limit",
     "file_rate_limit",
-    "62"
+    "56"
   ],
   "description": "Limiter les uploads : palier 2 du niveau intermédiaire de la progression welcome-files. Protège une route d'upload contre les abus avec is_upload_rate_limited(request.ip) et record_upload_attempt(request.ip) : au-delà du quota par fenêtre glissante, la route répond 429. Aucune base de données.",
   "status": "available",

@@ -1,13 +1,13 @@
 {
   "id": "request-debug",
-  "number": 8,
+  "number": 5,
   "name": "Inspecter une requête",
   "kind": "skeleton",
   "aliases": [
     "request-debug",
     "request_debug",
     "debug",
-    "8"
+    "5"
   ],
   "description": "Inspecter une requête : palier 5 de la progression pédagogique officielle, après Route dynamique. Une route `/request-debug` qui apprend à explorer la requête courante avec `request.data` et `Response.debug(...)`. Aucune vue HTML, aucune base de données.",
   "status": "available",

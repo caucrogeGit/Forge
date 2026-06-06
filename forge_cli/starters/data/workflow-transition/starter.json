@@ -1,12 +1,12 @@
 {
   "id": "workflow-transition",
-  "number": 94,
+  "number": 88,
   "name": "Déclarer les transitions",
   "kind": "skeleton",
   "aliases": [
     "workflow-transition",
     "workflow_transition",
-    "94"
+    "88"
   ],
   "description": "Déclarer les transitions : palier 1 du niveau intermédiaire de la progression welcome-workflow. make_transition crée une transition from→to, validate_transitions vérifie l'ensemble contre les statuts connus. Transformation pure, aucune base de données.",
   "status": "available",

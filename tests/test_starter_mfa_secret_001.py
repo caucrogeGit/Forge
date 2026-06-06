@@ -1,4 +1,4 @@
-"""Garde-fou STARTER-MFA-SECRET-001 — palier 2 débutant welcome-mfa (slot 74)."""
+"""Garde-fou STARTER-MFA-SECRET-001 — palier 2 débutant welcome-mfa (slot 68)."""
 from __future__ import annotations
 
 import ast
@@ -13,17 +13,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "mfa_secret_control
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "mfa_secret" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-mfa" / "debutant" / "mfa-secret.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 74"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 68"]
 
 
 def test_resolves():
     m = resolve("mfa-secret")
-    assert m["id"] == "mfa-secret" and m["number"] == 74
+    assert m["id"] == "mfa-secret" and m["number"] == 68
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("mfa-secret", "mfa_secret", "74"):
+    for a in ("mfa-secret", "mfa_secret", "68"):
         assert resolve(a)["id"] == "mfa-secret"
 
 

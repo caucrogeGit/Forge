@@ -1,13 +1,13 @@
 {
   "id": "update-record",
-  "number": 22,
+  "number": 16,
   "name": "Modifier un enregistrement",
   "kind": "skeleton",
   "aliases": [
     "update-record",
     "update_record",
     "update",
-    "22"
+    "16"
   ],
   "description": "Modifier un enregistrement : palier 5 du niveau intermédiaire. Trois routes (liste, formulaire pré-rempli, POST de mise à jour) ; le formulaire est chargé avec `fetch_one` puis enregistré avec `core.database.db.execute(\"UPDATE … WHERE id = ?\")`, POST protégé par CSRF. Après écriture, on relit et on ré-affiche.",
   "status": "available",

@@ -2,7 +2,7 @@
 
 Contrat du palier 4 du niveau intermédiaire — Héritage de gabarit :
 
-- starter.json : `layout-template`, slot 21, requires_db **false** ;
+- starter.json : `layout-template`, slot 15, requires_db **false** ;
 - snippet : `GET /layout-template` ;
 - un gabarit `layouts/starter_layout.html` avec des `{% block %}` ;
 - une page qui `{% extends %}` le gabarit ;
@@ -26,12 +26,12 @@ PAGE = FILES / "mvc" / "views" / "layout_template" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "intermediaire" / "layout-template.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 21"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 15"]
 
 
 def test_resolves():
     m = resolve("layout-template")
-    assert m["id"] == "layout-template" and m["number"] == 21
+    assert m["id"] == "layout-template" and m["number"] == 15
     assert m.get("kind") == "skeleton"
 
 
@@ -40,7 +40,7 @@ def test_requires_db_false():
 
 
 def test_aliases():
-    for a in ("layout-template", "layout_template", "layout", "21"):
+    for a in ("layout-template", "layout_template", "layout", "15"):
         assert resolve(a)["id"] == "layout-template"
 
 

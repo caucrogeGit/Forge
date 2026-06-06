@@ -1,12 +1,12 @@
 {
   "id": "pagination",
-  "number": 20,
+  "number": 14,
   "name": "Paginer une liste",
   "kind": "skeleton",
   "aliases": [
     "pagination",
     "paginate",
-    "20"
+    "14"
   ],
   "description": "Paginer une liste : palier 3 du niveau intermédiaire. Une route `GET /pagination?page=N` lit la page avec `request.param(\"page\")` et n'affiche qu'une tranche via `LIMIT ? OFFSET ?`, avec un `COUNT(*)` pour calculer les liens précédent/suivant. Aucune écriture, aucun CRUD complet.",
   "status": "available",

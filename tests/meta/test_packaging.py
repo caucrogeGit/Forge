@@ -112,27 +112,9 @@ def test_package_data_couvre_les_python_des_starters():
 
 # ── Fichiers starters sur disque ──────────────────────────────────────────────
 
-def test_starter1_fichiers_sur_disque():
-    """Starter 1 (first-crud-generated) : JSON uniquement, pas de files/."""
-    root = ROOT / "forge_cli" / "starters" / "data" / "first-crud-generated"
-    for rel in ("starter.json", "message.json"):
-        assert (root / rel).exists(), f"Manquant : first-crud-generated/{rel}"
-
-
-def test_starter2_fichiers_sur_disque():
-    """Starter 2 (users-core-auth) : contrôleurs, modèles, vues, scripts."""
-    root = ROOT / "forge_cli" / "starters" / "data" / "users-core-auth"
-    for rel in (
-        "starter.json",
-        "routes.py.snippet",
-        "files/mvc/controllers/auth_controller.py",
-        "files/mvc/controllers/dashboard_controller.py",
-        "files/mvc/models/auth_model.py",
-        "files/mvc/views/auth/login.html",
-        "files/mvc/views/dashboard/index.html",
-        "files/scripts/create_auth_user.py",
-    ):
-        assert (root / rel).exists(), f"Manquant : users-core-auth/{rel}"
+# Les tests test_starter1_fichiers_sur_disque et test_starter2_fichiers_sur_disque
+# ont été retirés : ils vérifiaient la présence sur disque des starters supprimés
+# `first-crud-generated` et `users-core-auth`.
 
 
 def test_package_data_couvre_tous_types_fichiers_starters():

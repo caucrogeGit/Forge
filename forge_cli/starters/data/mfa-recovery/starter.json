@@ -1,12 +1,12 @@
 {
   "id": "mfa-recovery",
-  "number": 78,
+  "number": 72,
   "name": "Codes de récupération",
   "kind": "skeleton",
   "aliases": [
     "mfa-recovery",
     "mfa_recovery",
-    "78"
+    "72"
   ],
   "description": "Codes de récupération : palier 3 du niveau intermédiaire de la progression welcome-mfa. create_recovery_codes génère un lot de codes à usage unique (montrés une fois, stockés hachés) ; verify_recovery_code et consume_recovery_code permettent d'en utiliser un quand le TOTP est indisponible. Démo en session, aucun chiffrement requis. Aucune base de données.",
   "status": "available",

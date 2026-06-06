@@ -2,7 +2,7 @@
 
 Contrat du dernier palier du niveau avancé — Écritures transactionnelles :
 
-- starter.json : `db-transaction`, slot 30, requires_db **true** ;
+- starter.json : `db-transaction`, slot 24, requires_db **true** ;
 - snippet : GET formulaire, POST enregistrement ;
 - contrôleur : `with transaction() as tx:`, deux `insert(..., tx=tx)`, rollback
   via exception, CSRF, redirection (PRG) ;
@@ -28,17 +28,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "avance" / "db-transaction.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 30"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 24"]
 
 
 def test_resolves():
     m = resolve("db-transaction")
-    assert m["id"] == "db-transaction" and m["number"] == 30
+    assert m["id"] == "db-transaction" and m["number"] == 24
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("db-transaction", "db_transaction", "transaction", "30"):
+    for a in ("db-transaction", "db_transaction", "transaction", "24"):
         assert resolve(a)["id"] == "db-transaction"
 
 

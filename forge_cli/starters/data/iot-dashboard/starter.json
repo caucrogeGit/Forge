@@ -1,12 +1,12 @@
 {
   "id": "iot-dashboard",
-  "number": 36,
+  "number": 30,
   "name": "Tableau de bord IoT",
   "kind": "skeleton",
   "aliases": [
     "iot-dashboard",
     "iot_dashboard",
-    "36"
+    "30"
   ],
   "description": "Tableau de bord IoT : dernier palier du niveau intermédiaire de welcome-iot. Une vue HTML affiche les derniers événements lus via `IotEventRepository.list_recent`, dans un tableau. C'est la lecture pédagogique côté humain, après l'API JSON côté machine.",
   "status": "available",

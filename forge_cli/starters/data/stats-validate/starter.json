@@ -1,12 +1,12 @@
 {
   "id": "stats-validate",
-  "number": 105,
+  "number": 99,
   "name": "Valider un événement",
   "kind": "skeleton",
   "aliases": [
     "stats-validate",
     "stats_validate",
-    "105"
+    "99"
   ],
   "description": "Valider un événement : palier 3 du niveau intermédiaire de la progression welcome-stats. make_event valide à la construction et validate_event vérifie un événement existant ; un nom invalide lève StatsEventError. Transformation pure, aucune base de données.",
   "status": "available",

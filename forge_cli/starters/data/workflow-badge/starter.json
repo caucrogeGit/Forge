@@ -1,12 +1,12 @@
 {
   "id": "workflow-badge",
-  "number": 97,
+  "number": 91,
   "name": "Badge de statut",
   "kind": "skeleton",
   "aliases": [
     "workflow-badge",
     "workflow_badge",
-    "97"
+    "91"
   ],
   "description": "Badge de statut : palier 1 du niveau avancé de la progression welcome-workflow. workflow_status_badge produit un badge HTML sûr (Markup) pour un statut, prêt à afficher dans une vue. Transformation pure, aucune base de données.",
   "status": "available",

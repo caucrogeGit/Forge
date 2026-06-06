@@ -1,4 +1,4 @@
-"""Garde-fou STARTER-MFA-WELCOME-001 — palier 1 débutant welcome-mfa (slot 73)."""
+"""Garde-fou STARTER-MFA-WELCOME-001 — palier 1 débutant welcome-mfa (slot 67)."""
 from __future__ import annotations
 
 import ast
@@ -12,17 +12,17 @@ STARTER_DIR = ROOT / "forge_cli" / "starters" / "data" / "mfa-welcome"
 CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "mfa_welcome_controller.py"
 DOC = ROOT / "docs" / "starters" / "welcome-mfa" / "debutant" / "mfa-welcome.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 73"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 67"]
 
 
 def test_resolves():
     m = resolve("mfa-welcome")
-    assert m["id"] == "mfa-welcome" and m["number"] == 73
+    assert m["id"] == "mfa-welcome" and m["number"] == 67
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("mfa-welcome", "mfa_welcome", "73"):
+    for a in ("mfa-welcome", "mfa_welcome", "67"):
         assert resolve(a)["id"] == "mfa-welcome"
 
 

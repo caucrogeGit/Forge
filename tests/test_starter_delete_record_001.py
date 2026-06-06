@@ -2,7 +2,7 @@
 
 Contrat du palier 6 du niveau intermédiaire — Supprimer un enregistrement :
 
-- starter.json : `delete-record`, slot 23, requires_db true ;
+- starter.json : `delete-record`, slot 17, requires_db true ;
 - snippet : GET liste, POST suppression ;
 - contrôleur : `execute("DELETE … WHERE id = ?")` paramétré,
   `request.route_param("id")`, CSRF ; après écriture, relit + ré-affiche ;
@@ -27,17 +27,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "intermediaire" / "delete-record.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 23"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 17"]
 
 
 def test_resolves():
     m = resolve("delete-record")
-    assert m["id"] == "delete-record" and m["number"] == 23
+    assert m["id"] == "delete-record" and m["number"] == 17
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("delete-record", "delete_record", "delete", "23"):
+    for a in ("delete-record", "delete_record", "delete", "17"):
         assert resolve(a)["id"] == "delete-record"
 
 

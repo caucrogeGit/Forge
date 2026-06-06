@@ -2,7 +2,7 @@
 
 Contrat du palier 1 du niveau intermédiaire de welcome-video — Téléverser :
 
-- starter.json : `video-upload`, slot 43, requires_db **true** ;
+- starter.json : `video-upload`, slot 37, requires_db **true** ;
 - snippet : GET formulaire, POST upload ;
 - contrôleur : `request.file`, `ingest_video`, gestion `VideoIngestError`,
   CSRF, redirection (PRG) ; **aucun ffmpeg** ;
@@ -27,17 +27,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-video" / "intermediaire" / "video-upload.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 43"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 37"]
 
 
 def test_resolves():
     m = resolve("video-upload")
-    assert m["id"] == "video-upload" and m["number"] == 43
+    assert m["id"] == "video-upload" and m["number"] == 37
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("video-upload", "video_upload", "43"):
+    for a in ("video-upload", "video_upload", "37"):
         assert resolve(a)["id"] == "video-upload"
 
 

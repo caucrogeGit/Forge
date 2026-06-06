@@ -55,18 +55,6 @@ def test_starter_list_contient_niveau_mot_cle(capsys):
     assert "disponible" in output
 
 
-def test_alias_first_crud_generated_resolvent_le_meme_starter():
-    ids = [
-        resolve(identifier)["id"]
-        for identifier in ("1", "first-crud-generated", "first_crud_generated")
-    ]
-    assert ids == [
-        "first-crud-generated",
-        "first-crud-generated",
-        "first-crud-generated",
-    ]
-
-
 def test_les_5_starters_sont_disponibles():
     statuses = {starter["number"]: starter["status"] for starter in all_starters()}
     assert statuses[1] == "available"
@@ -74,49 +62,6 @@ def test_les_5_starters_sont_disponibles():
     assert statuses[3] == "available"
     assert statuses[4] == "available"
     assert statuses[5] == "available"
-
-
-def test_alias_users_core_auth_resolvent_le_meme_starter():
-    ids = [
-        resolve(identifier)["id"]
-        for identifier in ("2", "auth", "users-core-auth", "users_core_auth", "utilisateurs-auth")
-    ]
-    assert ids == [
-        "users-core-auth",
-        "users-core-auth",
-        "users-core-auth",
-        "users-core-auth",
-        "users-core-auth",
-    ]
-
-
-@pytest.mark.parametrize("identifier", ["2", "auth", "users-core-auth", "utilisateurs-auth"])
-def test_starter_build_auth_dry_run_fonctionne(identifier, capsys):
-    cmd_starter_build([identifier, "--dry-run"])
-    output = capsys.readouterr().out
-    assert "Utilisateurs / authentification" in output
-    assert "mvc/controllers/auth_controller.py" in output
-    assert "scripts/create_auth_user.py" in output
-    assert "Aucun fichier écrit" in output
-
-
-def test_starter_build_auth_dry_run_annonce_routes(capsys):
-    cmd_starter_build(["2", "--dry-run"])
-    output = capsys.readouterr().out
-    assert "GET    /login" in output
-    assert "POST   /login" in output
-    assert "GET    /dashboard" in output
-    assert "GET    /profil" in output
-    assert "POST   /logout" in output
-
-
-def test_starter_build_auth_public_refuse(capsys):
-    with pytest.raises(SystemExit) as exc:
-        cmd_starter_build(["2", "--public"])
-
-    assert exc.value.code == 1
-    output = capsys.readouterr().out
-    assert "--public n'est pas applicable" in output
 
 
 def test_starter_auth_adopte_le_scaffold_auth_historique(tmp_path):
@@ -178,18 +123,6 @@ def test_starter_auth_retire_les_routes_auth_publiques_legacy(tmp_path):
     assert '"/logout"' not in output
 
 
-def test_script_create_auth_user_configure_le_projet():
-    script = (
-        resolve("2")["_dir"]
-        / "files"
-        / "scripts"
-        / "create_auth_user.py"
-    ).read_text(encoding="utf-8")
-    assert "sys.path.insert(0, str(PROJECT_ROOT))" in script
-    assert "forge.configure(" in script
-    assert "hash_password(PASSWORD)" in script
-
-
 def test_starter_build_refuse_un_identifiant_inconnu(capsys):
     with pytest.raises(SystemExit) as exc:
         cmd_starter_build(["999", "--dry-run"])
@@ -203,8 +136,6 @@ def test_entrypoint_starter_list_accessible(monkeypatch, capsys):
     forge.main()
     output, _ = capsys.readouterr()
     assert "Starter apps Forge" in output
-    assert "First CRUD (généré)" in output
-    assert "Auth MFA" in output
 
 
 # ── replace_home_route ────────────────────────────────────────────────────────
@@ -289,23 +220,7 @@ def test_replace_home_route_sans_handler_landing_sans_effet(tmp_path):
 
 # ── home_route dans les starters ─────────────────────────────────────────────
 
-def test_starter_1_a_home_route_messages():
-    assert resolve("1").get("home_route") == "/messages"
-
-
-def test_starter_2_sans_home_route():
-    hr = resolve("2").get("home_route", "/")
-    assert hr in ("/", None)
-
-
 # ── dry-run annonce home_route ────────────────────────────────────────────────
-
-def test_dry_run_starter_1_annonce_home_route(capsys):
-    cmd_starter_build(["1", "--dry-run"])
-    output = capsys.readouterr().out
-    assert "Route d'accueil" in output
-    assert "/messages" in output
-
 
 def test_dry_run_starter_2_sans_home_route(capsys):
     cmd_starter_build(["2", "--dry-run"])
@@ -361,15 +276,6 @@ def test_document_decision_mentionne_les_cinq_starters():
     assert "Communes" in content
 
 
-def test_starter_2_utilise_api_auth_moderne():
-    """La page starter-02 indique que le starter utilise les API Auth/User modernes."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "core-auth" / "users-core-auth.md").read_text(encoding="utf-8")
-    assert "core.auth" in content
-    assert "login_user" in content or "login_required" in content
-
-
 # ── STARTER-PROFILES-001 : tests documentaires ─────────────────────────────
 
 def test_profiles_md_contient_section_profils_et_starters():
@@ -398,15 +304,6 @@ def test_profiles_md_ne_mentionne_plus_audit_comme_futur():
     # L'ancien texte indiquait que l'audit "sera" fait — il doit avoir disparu.
     assert "seront réévalués" not in content
     assert "seront audités" not in content
-
-
-def test_starter_1_mentionne_profil_recommande():
-    """La page du starter 1 mentionne un profil recommandé."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "crud" / "first-crud-generated.md").read_text(encoding="utf-8")
-    assert "minimal" in content or "standard" in content
-    assert "profil" in content.lower()
 
 
 # ── STARTER-CS-REPLACE-001 : tests documentaires ───────────────────────────
@@ -561,28 +458,6 @@ def test_chaque_starter_a_un_index_md():
     import pathlib
     root = pathlib.Path(__file__).resolve().parent.parent
     s = root / "docs" / "starters"
-    for slug in (
-        "core-auth",
-        "optin-mfa",
-        "optin-iot",
-        "crud",
-    ):
-        assert (s / slug / "index.md").exists(), f"docs/starters/{slug}/index.md manquant"
-    # Starters CRUD regroupés sous le dossier-sujet crud/ (à la main + généré).
-    assert (s / "crud" / "first-crud.md").exists(), (
-        "docs/starters/crud/first-crud.md manquant"
-    )
-    assert (s / "crud" / "first-crud-generated.md").exists(), (
-        "docs/starters/crud/first-crud-generated.md manquant"
-    )
-    # Starter IoT regroupé sous le dossier-sujet optin-iot/.
-    assert (s / "optin-iot" / "welcome-optin-iot.md").exists(), (
-        "docs/starters/optin-iot/welcome-optin-iot.md manquant"
-    )
-    # Starter MFA regroupé sous le dossier-sujet optin-mfa/.
-    assert (s / "optin-mfa" / "welcome-optin-mfa.md").exists(), (
-        "docs/starters/optin-mfa/welcome-optin-mfa.md manquant"
-    )
     # Les 3 applications retirées ne sont plus des starters actifs.
     assert not (s / "carnet-contacts").exists()
     assert not (s / "suivi-comportement-eleves").exists()
@@ -602,89 +477,6 @@ def test_mkdocs_ne_reference_plus_les_fichiers_plats():
 
 # ── STARTER-AUTH-MODERNIZE-001 : tests documentaires ────────────────────────
 
-def test_starter_2_sans_core_security_hashing():
-    """Le starter 2 n'importe plus core.security.hashing."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    starter_dir = root / "forge_cli" / "starters" / "data" / "users-core-auth"
-    for path in starter_dir.rglob("*.py"):
-        if "__pycache__" in path.parts:
-            continue
-        content = path.read_text(encoding="utf-8")
-        assert "core.security.hashing" not in content, f"{path} contient encore core.security.hashing"
-
-
-def test_starter_2_sans_authenticate_session():
-    """Le starter 2 n'utilise plus authenticate_session de core.security.session."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    starter_dir = root / "forge_cli" / "starters" / "data" / "users-core-auth"
-    for path in starter_dir.rglob("*.py"):
-        if "__pycache__" in path.parts:
-            continue
-        content = path.read_text(encoding="utf-8")
-        assert "authenticate_session" not in content, f"{path} utilise encore authenticate_session"
-
-
-def test_starter_2_importe_core_auth():
-    """Le starter 2 importe les API Auth/User modernes depuis core.auth."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    auth_ctrl = (
-        root / "forge_cli" / "starters" / "data" / "users-core-auth"
-        / "files" / "mvc" / "controllers" / "auth_controller.py"
-    )
-    content = auth_ctrl.read_text(encoding="utf-8")
-    assert "from core.auth import" in content
-    assert "login_user" in content
-    assert "logout_user" in content
-    assert "verify_password" in content
-
-
-def test_starter_2_dashboard_login_required():
-    """Le dashboard du starter 2 utilise @login_required de core.auth."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    dash_ctrl = (
-        root / "forge_cli" / "starters" / "data" / "users-core-auth"
-        / "files" / "mvc" / "controllers" / "dashboard_controller.py"
-    )
-    content = dash_ctrl.read_text(encoding="utf-8")
-    assert "login_required" in content
-    assert "from core.auth import" in content
-
-
-def test_starter_2_hash_password_dans_script():
-    """Le script create_auth_user du starter 2 utilise core.auth.hash_password."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    script = (
-        root / "forge_cli" / "starters" / "data" / "users-core-auth"
-        / "files" / "scripts" / "create_auth_user.py"
-    )
-    content = script.read_text(encoding="utf-8")
-    assert "from core.auth import hash_password" in content
-    assert "hash_password" in content
-
-
-def test_starter_2_doc_mentionne_limites():
-    """La doc du starter 2 mentionne explicitement les limites (MFA, OIDC, etc.)."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "core-auth" / "users-core-auth.md").read_text(encoding="utf-8")
-    assert "MFA" in content
-    assert "OIDC" in content
-
-
-def test_starter_2_doc_indique_auth_moderne():
-    """La doc du starter 2 indique qu'il utilise les API Auth/User modernes."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "core-auth" / "users-core-auth.md").read_text(encoding="utf-8")
-    assert "core.auth" in content
-    assert "login_user" in content
-
-
 def test_roadmap_ne_mentionne_plus_starter_auth_modernize_comme_priorite():
     """La roadmap pointe maintenant vers STARTER-CONTACTS-REFRESH-001."""
     import pathlib
@@ -694,81 +486,7 @@ def test_roadmap_ne_mentionne_plus_starter_auth_modernize_comme_priorite():
     assert "STARTER-AUTH-MODERNIZE-001" in content
 
 
-def test_starters_1_3_4_5_non_modifies_par_auth_modernize():
-    """Les starters 1, 4 et 5 ne contiennent pas d'imports core.auth.
-
-    Note : suivi-comportement-eleves (3) a été normalisé par STARTER-LANG-NORMALIZE-001
-    et contient maintenant des imports core.auth — il est retiré de cette liste.
-    """
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    starters_dir = root / "forge_cli" / "starters" / "data"
-    intacts = ["first-crud-generated", "carnet-contacts", "communes-sejours"]
-    for slug in intacts:
-        for path in (starters_dir / slug).rglob("*.py"):
-            if "__pycache__" in path.parts:
-                continue
-            content = path.read_text(encoding="utf-8")
-            assert "from core.auth import" not in content, (
-                f"{path} contient un import core.auth inattendu"
-            )
-
-
 # ── STARTER-CONTACTS-REFRESH-001 : tests documentaires ──────────────────────
-
-def test_starter_1_doc_existe():
-    """Les fichiers de présentation et de reconstruction du starter 1 existent."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    s = root / "docs" / "starters" / "crud"
-    assert (s / "first-crud-generated.md").exists()
-    assert (s / "first-crud-generated-rebuild.md").exists()
-
-
-def test_starter_1_est_officiel_simple():
-    """La doc du starter 1 le présente comme starter officiel simple."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "crud" / "first-crud-generated.md").read_text(encoding="utf-8")
-    assert "officiel" in content or "Starter Forge" in content
-    # Le renvoi « Prochain starter : Auth » (section « Après ce starter ») est
-    # une navigation, pas une fonctionnalité du starter CRUD généré.
-    body = content.split("## Après ce starter")[0]
-    assert "Auth" not in body or "aucune authentification" in body.lower()
-
-
-def test_starter_1_associe_profils_minimal_standard():
-    """La doc du starter 1 mentionne les profils minimal et standard."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "crud" / "first-crud-generated.md").read_text(encoding="utf-8")
-    assert "minimal" in content
-    assert "standard" in content
-
-
-def test_starter_1_doc_url_pointe_nouvelle_structure():
-    """Le starter.json du starter 1 pointe vers la nouvelle URL docs."""
-    from forge_cli.starters.registry import resolve
-    meta = resolve("1")
-    assert "starter-app-01" not in meta.get("doc_url", "")
-    assert "starters/crud/first-crud-generated" in meta.get("doc_url", "")
-
-
-def test_starters_index_starter_2_non_a_moderniser():
-    """L'index des starters ne dit plus que le starter 2 est à moderniser."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-    assert "à moderniser" not in content
-
-
-def test_profiles_starter_2_non_a_moderniser():
-    """docs/features/profiles.md ne dit plus que le starter 2 est à moderniser."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "features" / "profiles.md").read_text(encoding="utf-8")
-    assert "Utilisateurs/Auth (à moderniser)" not in content
-
 
 def test_roadmap_contacts_refresh_termine():
     """La roadmap marque STARTER-CONTACTS-REFRESH-001 comme terminé."""
@@ -803,42 +521,6 @@ def test_roadmap_suivi_legacy_termine():
 
 # ── STARTER-DOC-INDEX-001 : tests documentaires ─────────────────────────────
 
-def test_starters_index_contient_tableau_synthese():
-    """docs/starters/index.md contient un tableau de synthèse des starters actifs.
-
-    Les 3 anciennes applications (Carnet de contacts, Suivi pédagogique,
-    Communes / Séjours) ont été retirées du catalogue ; le tableau ne liste
-    plus que les starters restants.
-    """
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-    assert "Tableau de synthèse" in content or "tableau de synthèse" in content.lower()
-    assert "First CRUD (généré)" in content
-    assert "Auth (API cœur)" in content
-    assert "Auth MFA" in content
-    # Les 3 applications retirées ne sont plus dans le catalogue.
-    assert "Carnet de contacts" not in content
-    assert "Suivi pédagogique" not in content
-    assert "Communes" not in content
-
-
-def test_starters_index_contient_statuts_officiels():
-    """docs/starters/index.md liste les statuts des starters actifs restants.
-
-    Le catalogue ne contient plus d'application « legacy / historique » depuis
-    le retrait des 3 anciennes applications ; il décrit le statut officiel des
-    starters restants (officiel simple, auth moderne, démonstrateur MFA, …).
-    """
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-    assert "officiel" in content.lower()
-    # Statuts décrits dans le tableau de synthèse / la section « Statut officiel ».
-    assert "Auth MFA" in content
-    assert "First CRUD (généré)" in content
-
-
 def test_starters_index_mentionne_profils_associes():
     """docs/starters/index.md mentionne les profils recommandés pour les starters."""
     import pathlib
@@ -854,14 +536,6 @@ def test_starters_index_contient_section_difference_profil_starter():
     content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
     assert "profil" in content.lower() and "starter" in content.lower()
     assert "forge new" in content or "forge starter:build" in content
-
-
-def test_starters_index_contient_liens_rebuild():
-    """docs/starters/index.md référence les fichiers de reconstruction."""
-    import pathlib
-    root = pathlib.Path(__file__).resolve().parent.parent
-    content = (root / "docs" / "starters" / "index.md").read_text(encoding="utf-8")
-    assert "rebuild.md" in content
 
 
 def test_roadmap_doc_index_001_termine():

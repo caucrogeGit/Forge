@@ -2,7 +2,7 @@
 
 Contrat du palier 1 du niveau avancé de welcome-iot — Valider un message IoT :
 
-- starter.json : `iot-contract`, slot 37, requires_db **false** ;
+- starter.json : `iot-contract`, slot 31, requires_db **false** ;
 - snippet : GET formulaire, POST validation ;
 - contrôleur : `parse_message`, gestion `ContractError` (code + message), CSRF ;
   pas de base de données ;
@@ -26,17 +26,17 @@ VIEW = FILES / "mvc" / "views" / "iot_contract" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-iot" / "avance" / "iot-contract.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 37"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 31"]
 
 
 def test_resolves():
     m = resolve("iot-contract")
-    assert m["id"] == "iot-contract" and m["number"] == 37
+    assert m["id"] == "iot-contract" and m["number"] == 31
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("iot-contract", "iot_contract", "37"):
+    for a in ("iot-contract", "iot_contract", "31"):
         assert resolve(a)["id"] == "iot-contract"
 
 

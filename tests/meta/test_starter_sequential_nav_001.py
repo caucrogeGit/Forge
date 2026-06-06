@@ -48,20 +48,14 @@ SEQUENTIAL_CHAIN: dict[str, str] = {
 # Pages pédagogiques (paliers 1→11). `first-sql-write` est le dernier palier
 # du niveau : il n'a pas de palier suivant dans le chaînage (il pointe vers le
 # bilan du niveau), mais reste une page pédagogique à part entière.
-# first-crud et first-crud-generated sont exclus : ce sont des starters
-# autonomes (dossier-sujet crud/), qui peuvent garder des étiquettes
-# historiques ("Starter 1").
 PEDAGOGICAL_PAGES = list(SEQUENTIAL_CHAIN.keys()) + ["first-sql-write"]
 
-# Starters autonomes du sujet CRUD (à la main + généré).
-STANDALONE_STARTERS = ["first-crud", "first-crud-generated"]
+# Plus aucun starter autonome de sujet CRUD dans la doc : les starters
+# first-crud / first-crud-generated ont été retirés (le dossier-sujet crud/
+# n'existe plus).
+STANDALONE_STARTERS: list[str] = []
 
-# Les starters autonomes du sujet CRUD sont regroupés sous le dossier-sujet
-# crud/ : leur page n'est pas <slug>/index.md mais crud/<page>.md.
-TOPIC_DOC_PATHS: dict[str, str] = {
-    "first-crud": "crud/first-crud.md",
-    "first-crud-generated": "crud/first-crud-generated.md",
-}
+TOPIC_DOC_PATHS: dict[str, str] = {}
 
 # Toutes les pages starters concernées par la règle stricte
 # d'absence des commandes de création.
@@ -174,17 +168,6 @@ class TestSequentialChain:
         # racine du starter.
         bilan = STARTERS_DOCS / "welcome-forge" / "avance" / "bilan.md"
         assert "../recapitulatif.md" in bilan.read_text(encoding="utf-8")
-
-    def test_premier_crud_returns_to_overview(self):
-        # first-crud clôt la chaîne pédagogique et renvoie vers ../
-        content = _doc_path("first-crud").read_text(encoding="utf-8")
-        # On cherche un lien retour explicite vers la vue d'ensemble
-        # des starters (`../index.md` ou `../`).
-        assert "../index.md" in content or "(../)" in content, (
-            "docs/starters/crud/first-crud.md doit comporter "
-            "un lien retour vers la vue d'ensemble des starters."
-        )
-
 
 # ── Absence des commandes interdites sur TOUTES les pages starters ────────────
 

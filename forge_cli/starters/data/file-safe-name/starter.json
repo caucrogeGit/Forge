@@ -1,12 +1,12 @@
 {
   "id": "file-safe-name",
-  "number": 64,
+  "number": 58,
   "name": "Assainir un nom de fichier",
   "kind": "skeleton",
   "aliases": [
     "file-safe-name",
     "file_safe_name",
-    "64"
+    "58"
   ],
   "description": "Assainir un nom de fichier : palier 1 du niveau avancé de la progression welcome-files. secure_filename transforme un nom utilisateur arbitraire en nom sûr (sans chemin, sans caractères dangereux). Primitive composable que les opt-ins média réutilisent (ADR-020). Transformation pure, aucune base de données.",
   "status": "available",

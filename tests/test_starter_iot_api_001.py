@@ -2,7 +2,7 @@
 
 Contrat du palier 2 du niveau intermédiaire de welcome-iot — Exposer l'API IoT :
 
-- starter.json : `iot-api`, slot 35, requires_db **true** ;
+- starter.json : `iot-api`, slot 29, requires_db **true** ;
 - snippet : branche `register_iot_routes(router)` (délégation au paquet) ;
 - migration `iot_events` ;
 - documentation sous `intermediaire/`, catalogue.
@@ -23,17 +23,17 @@ MIGRATIONS = FILES / "mvc" / "migrations"
 DOC = ROOT / "docs" / "starters" / "welcome-iot" / "intermediaire" / "iot-api.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 35"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 29"]
 
 
 def test_resolves():
     m = resolve("iot-api")
-    assert m["id"] == "iot-api" and m["number"] == 35
+    assert m["id"] == "iot-api" and m["number"] == 29
     assert m.get("requires_db") is True
 
 
 def test_aliases():
-    for a in ("iot-api", "iot_api", "35"):
+    for a in ("iot-api", "iot_api", "29"):
         assert resolve(a)["id"] == "iot-api"
 
 

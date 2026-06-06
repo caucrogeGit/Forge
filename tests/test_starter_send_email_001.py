@@ -2,7 +2,7 @@
 
 Contrat du palier 3 du niveau avancé — Envoyer un email :
 
-- starter.json : `send-email`, slot 28, requires_db **false** ;
+- starter.json : `send-email`, slot 22, requires_db **false** ;
 - snippet : GET formulaire, POST envoi ;
 - contrôleur : `MailMessage`, `Mailer(ConsoleTransport())`, gestion de
   `MailError`, CSRF ; pas de base de données ;
@@ -26,17 +26,17 @@ VIEW = FILES / "mvc" / "views" / "send_email" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "avance" / "send-email.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 28"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 22"]
 
 
 def test_resolves():
     m = resolve("send-email")
-    assert m["id"] == "send-email" and m["number"] == 28
+    assert m["id"] == "send-email" and m["number"] == 22
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("send-email", "send_email", "email", "mail", "28"):
+    for a in ("send-email", "send_email", "email", "mail", "22"):
         assert resolve(a)["id"] == "send-email"
 
 

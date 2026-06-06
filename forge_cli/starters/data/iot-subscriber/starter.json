@@ -1,12 +1,12 @@
 {
   "id": "iot-subscriber",
-  "number": 38,
+  "number": 32,
   "name": "Le subscriber MQTT",
   "kind": "skeleton",
   "aliases": [
     "iot-subscriber",
     "iot_subscriber",
-    "38"
+    "32"
   ],
   "description": "Le subscriber MQTT : palier 2 du niveau avancé de welcome-iot. Le vrai temps réel : un broker pousse les messages, `forge iot:listen` lance un `MqttSubscriber` qui valide (`parse_message`) puis stocke (`IotEventRepository.insert`). Une route affiche la configuration broker effective (TLS comprise) avant lancement. Exécution réelle à la charge du lecteur (broker requis).",
   "status": "available",

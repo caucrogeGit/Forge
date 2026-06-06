@@ -1,12 +1,12 @@
 {
   "id": "workflow-check",
-  "number": 95,
+  "number": 89,
   "name": "Vérifier une transition",
   "kind": "skeleton",
   "aliases": [
     "workflow-check",
     "workflow_check",
-    "95"
+    "89"
   ],
   "description": "Vérifier une transition : palier 2 du niveau intermédiaire de la progression welcome-workflow. can_transition dit si le passage d'un statut à un autre est autorisé par les transitions déclarées. Transformation pure, aucune base de données.",
   "status": "available",

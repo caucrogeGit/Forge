@@ -1,12 +1,12 @@
 {
   "id": "image-cover",
-  "number": 55,
+  "number": 49,
   "name": "Image de couverture",
   "kind": "skeleton",
   "aliases": [
     "image-cover",
     "image_cover",
-    "55"
+    "49"
   ],
   "description": "Image de couverture : palier 1 du niveau avancé de la progression welcome-images. Désigne une image de couverture pour une entité (role cover) et l'affiche avec get_cover_media, repli sur la galerie si aucune couverture explicite. La table media est créée par la migration livrée avec le starter.",
   "status": "available",

@@ -2,7 +2,7 @@
 
 Contrat public minimum du starter palier 5 — Inspecter une requête :
 
-- starter.json déclare `request-debug` (id, slot 8, requires_db false) ;
+- starter.json déclare `request-debug` (id, slot 5, requires_db false) ;
 - routes.py.snippet déclare `/request-debug` ;
 - contrôleur présent + imports Request / Response / BaseController ;
 - contrôleur utilise `request.data` ;
@@ -38,7 +38,7 @@ STARTERS_INDEX = PROJECT_ROOT / "docs" / "starters" / "index.md"
 def test_starter_resolves_with_id_and_slot():
     meta = resolve("request-debug")
     assert meta["id"] == "request-debug"
-    assert meta["number"] == 8
+    assert meta["number"] == 5
     assert meta.get("kind") == "skeleton"
     assert meta.get("requires_db") is False
     assert meta.get("status") == "available"

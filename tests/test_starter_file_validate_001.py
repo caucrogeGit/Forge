@@ -1,6 +1,6 @@
 """Garde-fou STARTER-FILE-VALIDATE-001 (test proportionné).
 
-Palier 1 intermédiaire welcome-files — Valider un upload : slot 61, requires_db
+Palier 1 intermédiaire welcome-files — Valider un upload : slot 55, requires_db
 false, routes GET/POST `/file-validate`, contrôleur taxonomie `UploadError`,
 vue présente, doc sous `welcome-files/intermediaire/`, catalogue.
 """
@@ -18,17 +18,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "file_validate_cont
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "file_validate" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-files" / "intermediaire" / "file-validate.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 61"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 55"]
 
 
 def test_resolves():
     m = resolve("file-validate")
-    assert m["id"] == "file-validate" and m["number"] == 61
+    assert m["id"] == "file-validate" and m["number"] == 55
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("file-validate", "file_validate", "61"):
+    for a in ("file-validate", "file_validate", "55"):
         assert resolve(a)["id"] == "file-validate"
 
 

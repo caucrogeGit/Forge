@@ -1,13 +1,13 @@
 {
   "id": "delete-record",
-  "number": 23,
+  "number": 17,
   "name": "Supprimer un enregistrement",
   "kind": "skeleton",
   "aliases": [
     "delete-record",
     "delete_record",
     "delete",
-    "23"
+    "17"
   ],
   "description": "Supprimer un enregistrement : palier 6 du niveau intermédiaire. Une liste avec un bouton de suppression par ligne ; la suppression passe par un POST protégé par CSRF et `core.database.db.execute(\"DELETE … WHERE id = ?\")`. Après écriture, on relit et on ré-affiche.",
   "status": "available",

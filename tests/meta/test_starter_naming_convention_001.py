@@ -65,9 +65,14 @@ def test_starter_core_suit_la_convention(sid: str):
 
 
 def test_au_moins_un_starter_par_famille_conventionnee():
-    """Les familles opt-in et cœur sont bien représentées (non-régression)."""
-    assert any("optin" in i for i in _IDS), "Aucun starter opt-in détecté."
-    assert any("-core-" in i for i in _IDS), "Aucun starter d'API cœur détecté."
+    """Les familles opt-in et cœur sont bien représentées (non-régression).
+
+    Les parcours welcome par opt-in se nomment ``<module>-welcome`` ; le
+    starter cœur d'entrée se nomme ``welcome``."""
+    assert any(i.endswith("-welcome") for i in _IDS), (
+        "Aucun parcours welcome opt-in (« <module>-welcome ») détecté."
+    )
+    assert "welcome" in _IDS, "Le starter cœur « welcome » est absent."
 
 
 def test_numerotation_contigue():

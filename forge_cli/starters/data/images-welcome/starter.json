@@ -1,12 +1,12 @@
 {
   "id": "images-welcome",
-  "number": 49,
+  "number": 43,
   "name": "Bonjour Forge Images",
   "kind": "skeleton",
   "aliases": [
     "images-welcome",
     "images_welcome",
-    "49"
+    "43"
   ],
   "description": "Bonjour Forge Images : premier palier du niveau débutant de la progression welcome-images. Premier contact avec le module opt-in forge-mvc-images : une route texte et une route qui inspecte les formats d'image autorisés et les tailles de variantes (ALLOWED_IMAGE_EXTENSIONS, IMAGE_VARIANT_SIZES). Aucune base de données.",
   "status": "available",

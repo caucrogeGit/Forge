@@ -1,4 +1,4 @@
-"""Garde-fou STARTER-WORKFLOW-FIND-001 — palier 3 débutant welcome-workflow (slot 93)."""
+"""Garde-fou STARTER-WORKFLOW-FIND-001 — palier 3 débutant welcome-workflow (slot 87)."""
 from __future__ import annotations
 
 import ast
@@ -13,17 +13,17 @@ CONTROLLER = STARTER_DIR / "files" / "mvc" / "controllers" / "workflow_find_cont
 VIEW = STARTER_DIR / "files" / "mvc" / "views" / "workflow_find" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-workflow" / "debutant" / "workflow-find.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 93"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 87"]
 
 
 def test_resolves():
     m = resolve("workflow-find")
-    assert m["id"] == "workflow-find" and m["number"] == 93
+    assert m["id"] == "workflow-find" and m["number"] == 87
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("workflow-find", "workflow_find", "93"):
+    for a in ("workflow-find", "workflow_find", "87"):
         assert resolve(a)["id"] == "workflow-find"
 
 

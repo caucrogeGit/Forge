@@ -1,12 +1,12 @@
 {
   "id": "stats-admin-sql",
-  "number": 106,
+  "number": 100,
   "name": "Le SQL de consultation",
   "kind": "skeleton",
   "aliases": [
     "stats-admin-sql",
     "stats_admin_sql",
-    "106"
+    "100"
   ],
   "description": "Le SQL de consultation : palier 1 du niveau avancé de la progression welcome-stats. get_stats_events_admin_sql construit le SELECT filtrable (nom, catégorie, limite), prepare_stats_events_admin_params fournit ses paramètres. SQL visible, sans l'exécuter. Transformation pure, aucune base de données.",
   "status": "available",

@@ -26,11 +26,10 @@
 | Palier SQL visible (lecture / écriture) | [first-sql.md](../starters/welcome-forge/debutant/first-sql.md), [first-sql-write.md](../starters/welcome-forge/debutant/first-sql-write.md) |
 | Dernier palier du niveau → bilan du niveau | [first-sql-write.md](../starters/welcome-forge/debutant/first-sql-write.md) |
 | Bilan d'un niveau (dans le dossier du niveau) | [debutant/bilan.md](../starters/welcome-forge/debutant/bilan.md) |
-| Starter autonome (CRUD complet, neutre) | [first-crud](../starters/crud/first-crud.md) |
 | Page bilan / aide-mémoire de fin | [bilan.md](../starters/welcome-forge/debutant/bilan.md), [recapitulatif.md](../starters/welcome-forge/recapitulatif.md) |
 
 Côté code (non liés ici car hors `docs/`) :
-`forge_cli/starters/data/welcome/` et `forge_cli/starters/data/first-crud/`.
+`forge_cli/starters/data/welcome/`.
 
 ---
 

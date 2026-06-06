@@ -2,7 +2,7 @@
 
 Contrat du palier 8 (dernier) du niveau intermédiaire — Messages flash :
 
-- starter.json : `flash-messages`, slot 25, requires_db **false** ;
+- starter.json : `flash-messages`, slot 19, requires_db **false** ;
 - snippet : GET page, POST action ;
 - contrôleur : `set_flash` + `redirect` (POST-Redirect-GET), `get_flash`
   one-shot, cookie session durci, CSRF ;
@@ -25,17 +25,17 @@ VIEW = FILES / "mvc" / "views" / "flash_messages" / "index.html"
 DOC = ROOT / "docs" / "starters" / "welcome-forge" / "intermediaire" / "flash-messages.md"
 INDEX = ROOT / "docs" / "starters" / "index.md"
 
-FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 25"]
+FORBIDDEN = ["forge starter:build", "forge new mon-projet", "cd mon-projet", "Starter 19"]
 
 
 def test_resolves():
     m = resolve("flash-messages")
-    assert m["id"] == "flash-messages" and m["number"] == 25
+    assert m["id"] == "flash-messages" and m["number"] == 19
     assert m.get("requires_db") is False
 
 
 def test_aliases():
-    for a in ("flash-messages", "flash_messages", "flash", "25"):
+    for a in ("flash-messages", "flash_messages", "flash", "19"):
         assert resolve(a)["id"] == "flash-messages"
 
 

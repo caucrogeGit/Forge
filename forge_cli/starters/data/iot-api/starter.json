@@ -1,12 +1,12 @@
 {
   "id": "iot-api",
-  "number": 35,
+  "number": 29,
   "name": "Exposer l'API IoT",
   "kind": "skeleton",
   "aliases": [
     "iot-api",
     "iot_api",
-    "35"
+    "29"
   ],
   "description": "Exposer l'API IoT : palier 2 du niveau intermédiaire de welcome-iot. Le snippet branche l'API HTTP JSON officielle du module via `register_iot_routes(router)` — trois routes en lecture seule (`/api/iot/events`, `/api/iot/events/{site}/{device_id}`, `/api/iot/devices/{site}/{device_id}/count`), avec authentification Bearer optionnelle. Aucun code métier à écrire : on délègue au paquet.",
   "status": "available",
