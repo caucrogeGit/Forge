@@ -112,13 +112,18 @@ class TestCardLinks:
 
 
 class TestOptInModules:
-    """Les 4 modules opt-in sont présents avec leurs cartes."""
+    """Les 9 modules opt-in sont présents avec leurs cartes."""
 
     @pytest.mark.parametrize("module", [
         "forge-mvc-mfa",
         "forge-mvc-rbac",
         "forge-mvc-workflow",
         "forge-mvc-stats",
+        "forge-mvc-files",
+        "forge-mvc-images",
+        "forge-mvc-iot",
+        "forge-mvc-video",
+        "forge-mvc-audio",
     ])
     def test_module_card_present(self, module: str):
         text = LANDING.read_text(encoding="utf-8")

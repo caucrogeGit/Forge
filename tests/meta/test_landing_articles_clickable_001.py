@@ -1,6 +1,6 @@
 """Garde-fou LANDING-ARTICLES-CLICKABLE-001.
 
-Vérifie que les 21 cartes de la landing page sont wrappées dans un <a href>
+Vérifie que les 26 cartes de la landing page sont wrappées dans un <a href>
 pointant vers des URLs absolues valides de la documentation.
 """
 from __future__ import annotations
@@ -35,11 +35,16 @@ EXPECTED_DOC_PATHS = [
     "reference/api-json",
     # Nouveau beta.6 — page spécifique entity-schema
     "entities/entity-schema",
-    # Modules opt-in (4 cartes)
+    # Modules opt-in (9 cartes)
     "reference/auth-mfa",
     "features/rbac",
     "reference/workflow",
     "reference/stats",
+    "starters/welcome-files/installation",
+    "starters/welcome-images/installation",
+    "starters/welcome-iot/installation",
+    "starters/welcome-video/installation",
+    "starters/welcome-audio/installation",
 ]
 
 
@@ -48,11 +53,11 @@ class TestLandingArticlesClickable:
     def test_landing_file_exists(self):
         assert LANDING.exists()
 
-    def test_21_articles_are_wrapped_in_links(self):
+    def test_26_articles_are_wrapped_in_links(self):
         text = LANDING.read_text(encoding="utf-8")
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
-        assert len(wrapped) == 21, (
-            f"Attendu 21 cartes wrappées dans <a class=\"block group\">, "
+        assert len(wrapped) == 26, (
+            f"Attendu 26 cartes wrappées dans <a class=\"block group\">, "
             f"trouvé {len(wrapped)}."
         )
 

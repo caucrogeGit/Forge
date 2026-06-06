@@ -104,6 +104,11 @@ class TestNewElementsPresent:
         "forge-mvc-rbac",
         "forge-mvc-workflow",
         "forge-mvc-stats",
+        "forge-mvc-files",
+        "forge-mvc-images",
+        "forge-mvc-iot",
+        "forge-mvc-video",
+        "forge-mvc-audio",
     ])
     def test_all_modules_mentioned(self, module_name):
         assert module_name in self.source, (
@@ -221,9 +226,10 @@ class TestStateSectionRefonte:
         )
 
     def test_state_mentions_modules_count(self):
-        # Sept opt-ins officiels depuis beta.13 (ajout de forge-mvc-video, Beta).
-        assert "7 modules officiels" in self.source, (
-            "La landing devrait mentionner les 7 modules officiels opt-in"
+        # Neuf opt-ins officiels : mfa, rbac, workflow, stats, files, images,
+        # iot, video, audio (forge-mvc-media retiré, STARTERS-DROP-OBSOLETE-001).
+        assert "9 modules officiels" in self.source, (
+            "La landing devrait mentionner les 9 modules officiels opt-in"
         )
 
     def test_state_no_obsolete_phases(self):
