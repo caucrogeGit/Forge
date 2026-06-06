@@ -1,0 +1,23 @@
+{
+  "id": "workflow-welcome",
+  "number": 91,
+  "name": "Bonjour Forge Workflow",
+  "kind": "skeleton",
+  "aliases": [
+    "workflow-welcome",
+    "workflow_welcome",
+    "91"
+  ],
+  "description": "Bonjour Forge Workflow : premier palier du niveau débutant de la progression welcome-workflow. Premier contact avec le module opt-in forge-mvc-workflow : définit un jeu de statuts de démonstration (make_status, validate_statuses) et l'inspecte. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/workflow-welcome",
+  "routes_marker": "workflow-welcome",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/workflow-welcome",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-workflow/debutant/workflow-welcome/",
+  "check_paths": [
+    "mvc/controllers/workflow_welcome_controller.py"
+  ]
+}

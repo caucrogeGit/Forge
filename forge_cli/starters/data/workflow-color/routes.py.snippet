@@ -1,0 +1,6 @@
+# forge-starter:workflow-color:start
+from mvc.controllers.workflow_color_controller import WorkflowColorController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/workflow-color", WorkflowColorController.index, name="workflow_color_index")
+# forge-starter:workflow-color:end

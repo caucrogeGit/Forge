@@ -1,0 +1,24 @@
+{
+  "id": "workflow-badge",
+  "number": 97,
+  "name": "Badge de statut",
+  "kind": "skeleton",
+  "aliases": [
+    "workflow-badge",
+    "workflow_badge",
+    "97"
+  ],
+  "description": "Badge de statut : palier 1 du niveau avancé de la progression welcome-workflow. workflow_status_badge produit un badge HTML sûr (Markup) pour un statut, prêt à afficher dans une vue. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/workflow-badge",
+  "routes_marker": "workflow-badge",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/workflow-badge",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-workflow/avance/workflow-badge/",
+  "check_paths": [
+    "mvc/controllers/workflow_badge_controller.py",
+    "mvc/views/workflow_badge/index.html"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "workflow-check",
+  "number": 95,
+  "name": "Vérifier une transition",
+  "kind": "skeleton",
+  "aliases": [
+    "workflow-check",
+    "workflow_check",
+    "95"
+  ],
+  "description": "Vérifier une transition : palier 2 du niveau intermédiaire de la progression welcome-workflow. can_transition dit si le passage d'un statut à un autre est autorisé par les transitions déclarées. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/workflow-check",
+  "routes_marker": "workflow-check",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/workflow-check",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-workflow/intermediaire/workflow-check/",
+  "check_paths": [
+    "mvc/controllers/workflow_check_controller.py",
+    "mvc/views/workflow_check/index.html"
+  ]
+}

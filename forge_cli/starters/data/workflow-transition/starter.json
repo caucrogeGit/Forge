@@ -1,0 +1,24 @@
+{
+  "id": "workflow-transition",
+  "number": 94,
+  "name": "Déclarer les transitions",
+  "kind": "skeleton",
+  "aliases": [
+    "workflow-transition",
+    "workflow_transition",
+    "94"
+  ],
+  "description": "Déclarer les transitions : palier 1 du niveau intermédiaire de la progression welcome-workflow. make_transition crée une transition from→to, validate_transitions vérifie l'ensemble contre les statuts connus. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/workflow-transition",
+  "routes_marker": "workflow-transition",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/workflow-transition",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-workflow/intermediaire/workflow-transition/",
+  "check_paths": [
+    "mvc/controllers/workflow_transition_controller.py",
+    "mvc/views/workflow_transition/index.html"
+  ]
+}

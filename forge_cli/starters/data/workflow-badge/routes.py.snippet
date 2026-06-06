@@ -1,0 +1,6 @@
+# forge-starter:workflow-badge:start
+from mvc.controllers.workflow_badge_controller import WorkflowBadgeController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/workflow-badge", WorkflowBadgeController.index, name="workflow_badge_index")
+# forge-starter:workflow-badge:end

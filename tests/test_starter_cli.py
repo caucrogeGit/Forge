@@ -192,7 +192,7 @@ def test_script_create_auth_user_configure_le_projet():
 
 def test_starter_build_refuse_un_identifiant_inconnu(capsys):
     with pytest.raises(SystemExit) as exc:
-        cmd_starter_build(["99", "--dry-run"])
+        cmd_starter_build(["999", "--dry-run"])
 
     assert exc.value.code == 1
 

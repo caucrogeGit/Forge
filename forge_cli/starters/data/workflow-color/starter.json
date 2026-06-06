@@ -1,0 +1,24 @@
+{
+  "id": "workflow-color",
+  "number": 98,
+  "name": "Couleur, libellé, classe",
+  "kind": "skeleton",
+  "aliases": [
+    "workflow-color",
+    "workflow_color",
+    "98"
+  ],
+  "description": "Couleur, libellé, classe : palier 2 du niveau avancé de la progression welcome-workflow. workflow_status_color, workflow_status_label et workflow_status_badge_class exposent les pièces d'un badge (couleur, libellé, classes Tailwind) pour un affichage sur mesure. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/workflow-color",
+  "routes_marker": "workflow-color",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/workflow-color",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-workflow/avance/workflow-color/",
+  "check_paths": [
+    "mvc/controllers/workflow_color_controller.py",
+    "mvc/views/workflow_color/index.html"
+  ]
+}

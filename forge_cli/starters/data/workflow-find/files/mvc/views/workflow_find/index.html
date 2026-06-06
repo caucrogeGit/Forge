@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Retrouver un statut — Forge</title>
+</head>
+<body>
+  <h1>Retrouver un statut</h1>
+
+  <form method="get" action="/workflow-find">
+    <input type="text" name="name" value="{{ name }}" size="30">
+    <button type="submit">Retrouver</button>
+  </form>
+
+  {% if found %}
+  <p data-level="success">Trouvé : <code>{{ name }}</code> — « {{ label }} » (couleur {{ color }}).</p>
+  {% else %}
+  <p data-level="error">Statut <code>{{ name }}</code> introuvable dans le jeu de démo.</p>
+  {% endif %}
+
+  <p>Jeu de démo : <code>draft</code>, <code>review</code>, <code>published</code>,
+  <code>archived</code>.</p>
+</body>
+</html>

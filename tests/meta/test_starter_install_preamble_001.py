@@ -61,6 +61,10 @@ PARCOURS = {
         "debutant/rbac-welcome.md",
         ["pip install --pre forge-mvc-rbac", "forge starter:build rbac-welcome", "forge run"],
     ),
+    "welcome-workflow": (
+        "debutant/workflow-welcome.md",
+        ["pip install --pre forge-mvc-workflow", "forge starter:build workflow-welcome", "forge run"],
+    ),
 }
 
 

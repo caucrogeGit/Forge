@@ -1,0 +1,6 @@
+# forge-starter:workflow-jinja:start
+from mvc.controllers.workflow_jinja_controller import WorkflowJinjaController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/workflow-jinja", WorkflowJinjaController.index, name="workflow_jinja_index")
+# forge-starter:workflow-jinja:end

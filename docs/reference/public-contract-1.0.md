@@ -58,9 +58,9 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 90)
+## 4. Starters 1.0 (gelés — 99)
 
-La liste pédagogique est **figée** : 90 starters, numérotés de 1 à 90,
+La liste pédagogique est **figée** : 99 starters, numérotés de 1 à 99,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
 (`welcome-optin-<module>`, `users-core-auth`, `first-*`…). La progression
 `welcome-forge` est organisée par niveau ; le **niveau avancé** (`relations`, …)
@@ -71,9 +71,10 @@ modules opt-in : `welcome-iot` (`iot-welcome`, …) pour `forge-mvc-iot`,
 (`images-welcome`, …) pour `forge-mvc-images`, `welcome-files`
 (`files-welcome`, …) pour `forge-mvc-files`, `welcome-audio`
 (`audio-welcome`, …) pour `forge-mvc-audio` (2 niveaux, sans état), `welcome-mfa` (`mfa-welcome`, …) pour `forge-mvc-mfa` (mécaniques TOTP, flux
-enrôlement/challenge/récupération, durcissement), et `welcome-rbac`
+enrôlement/challenge/récupération, durcissement), `welcome-rbac`
 (`rbac-welcome`, …) pour `forge-mvc-rbac` (contrat déclaratif, vérification,
-guards, résolution par utilisateur).
+guards, résolution par utilisateur), et `welcome-workflow` (`workflow-welcome`, …)
+pour `forge-mvc-workflow` (statuts, transitions, badges — sans état).
 
 ```
 audio-doctor, audio-play, audio-probe, audio-transcode, audio-upload, audio-welcome,
@@ -91,7 +92,8 @@ list-records, pagination, query-params,
 rbac-check, rbac-guard, rbac-permission, rbac-request-roles, rbac-resolve, rbac-role, rbac-template, rbac-user-role, rbac-welcome,
 relations, request-debug, server-validation, session-state, update-record,
 users-core-auth, video-detail, video-doctor, video-list, video-playback, video-probe, video-status, video-transcode, video-upload, video-welcome, welcome, welcome-optin-iot, welcome-optin-mfa,
-welcome-optin-video
+welcome-optin-video,
+workflow-available, workflow-badge, workflow-check, workflow-color, workflow-find, workflow-jinja, workflow-status, workflow-transition, workflow-welcome
 ```
 
 Les anciennes applications métier lourdes ont été **archivées hors du système

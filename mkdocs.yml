@@ -264,6 +264,24 @@ nav:
               - Rôles de la requête: starters/welcome-rbac/avance/rbac-request-roles.md
               - Bilan avancé: starters/welcome-rbac/avance/bilan.md
           - Aide-mémoire: starters/welcome-rbac/recapitulatif.md
+      - Progression Workflow (welcome-workflow):
+          - Installation: starters/welcome-workflow/installation.md
+          - Débutant:
+              - Bonjour Forge Workflow: starters/welcome-workflow/debutant/workflow-welcome.md
+              - Nom de statut: starters/welcome-workflow/debutant/workflow-status.md
+              - Retrouver un statut: starters/welcome-workflow/debutant/workflow-find.md
+              - Bilan débutant: starters/welcome-workflow/debutant/bilan.md
+          - Intermédiaire:
+              - Déclarer les transitions: starters/welcome-workflow/intermediaire/workflow-transition.md
+              - Vérifier une transition: starters/welcome-workflow/intermediaire/workflow-check.md
+              - Transitions disponibles: starters/welcome-workflow/intermediaire/workflow-available.md
+              - Bilan intermédiaire: starters/welcome-workflow/intermediaire/bilan.md
+          - Avancé:
+              - Badge de statut: starters/welcome-workflow/avance/workflow-badge.md
+              - Couleur, libellé, classe: starters/welcome-workflow/avance/workflow-color.md
+              - Helpers Workflow dans Jinja: starters/welcome-workflow/avance/workflow-jinja.md
+              - Bilan avancé: starters/welcome-workflow/avance/bilan.md
+          - Aide-mémoire: starters/welcome-workflow/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md

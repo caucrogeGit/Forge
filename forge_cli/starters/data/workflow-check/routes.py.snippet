@@ -1,0 +1,6 @@
+# forge-starter:workflow-check:start
+from mvc.controllers.workflow_check_controller import WorkflowCheckController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/workflow-check", WorkflowCheckController.index, name="workflow_check_index")
+# forge-starter:workflow-check:end

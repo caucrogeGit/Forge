@@ -109,7 +109,7 @@ class TestStarterRegistry:
 
     def test_starter_inconnu_leve_exception(self):
         with pytest.raises(StarterNotFound):
-            resolve("99")
+            resolve("999")
 
 
 # ── starter:list ──────────────────────────────────────────────────────────────
@@ -134,7 +134,7 @@ class TestStarterList:
 
     def test_starter_inconnu_exit_1(self, capsys):
         with pytest.raises(SystemExit) as exc_info:
-            cmd_starter_build(["99"])
+            cmd_starter_build(["999"])
         assert exc_info.value.code == 1
 
 
@@ -194,7 +194,7 @@ class TestStarter1Crud:
 class TestStarterInvalid:
     def test_build_inconnu_exit_1(self, capsys):
         with pytest.raises(SystemExit) as exc_info:
-            cmd_starter_build(["99"])
+            cmd_starter_build(["999"])
         assert exc_info.value.code == 1
 
     def test_build_inconnu_message_lisible(self, capsys):

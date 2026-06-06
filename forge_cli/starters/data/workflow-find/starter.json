@@ -1,0 +1,24 @@
+{
+  "id": "workflow-find",
+  "number": 93,
+  "name": "Retrouver un statut",
+  "kind": "skeleton",
+  "aliases": [
+    "workflow-find",
+    "workflow_find",
+    "93"
+  ],
+  "description": "Retrouver un statut : palier 3 du niveau débutant de la progression welcome-workflow. find_status localise un statut par son nom dans un jeu de statuts (ou None s'il n'existe pas). Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/workflow-find",
+  "routes_marker": "workflow-find",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/workflow-find",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-workflow/debutant/workflow-find/",
+  "check_paths": [
+    "mvc/controllers/workflow_find_controller.py",
+    "mvc/views/workflow_find/index.html"
+  ]
+}

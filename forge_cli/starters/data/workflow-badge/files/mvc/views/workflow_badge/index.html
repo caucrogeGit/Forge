@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Badge de statut — Forge</title>
+</head>
+<body>
+  <h1>Badge de statut</h1>
+
+  <ul>
+    {% for name, badge in badges %}
+    <li><code>{{ name }}</code> : {{ badge }}</li>
+    {% endfor %}
+  </ul>
+
+  <p>Le badge est un <code>Markup</code> HTML sûr : <code>{{ "{{ workflow_status_badge(status) }}" }}</code>
+  s'affiche directement, sans échappement ni HTML codé à la main.</p>
+</body>
+</html>
