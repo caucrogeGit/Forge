@@ -39,7 +39,7 @@ Les rapports de sécurité peuvent concerner :
 - MFA (`forge_mvc_mfa`) — OIDC retiré du périmètre Forge ;
 - injection SQL dans les modèles ou le code généré ;
 - path traversal sur les fichiers statiques ou les uploads ;
-- validation et gestion des uploads (`core.uploads`) ;
+- validation et gestion des uploads (`forge_mvc_files` ; validation pure dans `core.forms`) ;
 - code généré par la CLI introduisant des défauts dangereux ;
 - exposition de secrets ou de données sensibles ;
 - fuite d'informations dans les messages d'erreur HTTP.

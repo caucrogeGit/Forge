@@ -29,7 +29,7 @@ Aucun broker MQTT, aucune base de données.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `forge_mvc_iot.config.load_iot_config` | Lire la configuration MQTT du module IoT. | [Forge IoT](../../../iot/architecture.md) |
-| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/api.md#corehttp) |
+| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/api.md#corehttpresponse) |
 
 ## Tester
 

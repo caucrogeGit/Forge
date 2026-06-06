@@ -137,11 +137,13 @@ pas installées par défaut. Elles sont tirées via les extras du package
 
 ### Installation
 
-!!! info "La plupart des opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`"
+!!! info "Les onze opt-ins officiels sont publiés sur PyPI"
     `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) ainsi que
-    `forge-mvc-mfa` (Alpha) sont publiés sur PyPI et synchronisés avec le core.
-    `forge-mvc-images` (Bêta — API encore bêta) cible la release beta.13 et
-    s'installe pour l'instant depuis les sources.
+    `forge-mvc-mfa` (Alpha) sont publiés sur PyPI depuis `1.0.0-beta.9` et
+    synchronisés avec le core ; `forge-mvc-iot` depuis `1.0.0-beta.12`, et
+    `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`,
+    `forge-mvc-pivot`, `forge-mvc-mail` depuis `1.0.0-beta.13`.
+    `forge-mvc-images` reste au statut Bêta (API encore bêta).
 
     Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
 
@@ -153,10 +155,14 @@ pip install --pre forge-mvc \
                   forge-mvc-rbac \
                   forge-mvc-workflow \
                   forge-mvc-stats \
-                  forge-mvc-mfa
-
-# forge-mvc-images n'est pas encore publié : depuis les sources
-pip install -e packages/forge-mvc-images/
+                  forge-mvc-mfa \
+                  forge-mvc-files \
+                  forge-mvc-images \
+                  forge-mvc-audio \
+                  forge-mvc-iot \
+                  forge-mvc-video \
+                  forge-mvc-pivot \
+                  forge-mvc-mail
 
 # Mode éditable depuis les sources (contribution Forge)
 git clone --branch {{forge_tag}} https://github.com/caucrogeGit/Forge.git

@@ -44,9 +44,13 @@ Voir [Politique de release](../release/release-policy.md#publication-pypi).
 | `forge-mvc-workflow` | Brique workflow — statuts et transitions | Bêta — publié PyPI |
 | `forge-mvc-stats` | Brique statistiques — agrégations | Bêta — publié PyPI |
 | `forge-mvc-mfa` | Brique MFA — TOTP, codes de récupération | **Alpha** — publié PyPI depuis `1.0.0-beta.9` |
-| `forge-mvc-images` | Brique media — traitement d'image (Pillow) + helpers applicatifs | **Bêta** — pas encore publié PyPI (cible release beta.13 ; API encore bêta, voir [Limites](../deployment/production-limits.md)) |
-| `forge-mvc-iot` | Brique IoT — subscriber MQTT, stockage `iot_events`, API HTTP | **Alpha** — publié PyPI depuis `1.0.0-beta.12` |
-| `forge-mvc-video` | Brique vidéo — upload, transcodage MP4, lecture HTTP Range | **Beta** — publié PyPI depuis `1.0.0-beta.13` |
+| `forge-mvc-files` | Brique upload générique (écriture sécurisée, storage, service HTTP Range) | **Alpha** : publié PyPI depuis `1.0.0-beta.13` |
+| `forge-mvc-images` | Brique images : traitement d'image (Pillow) + couche médias applicative ; dépend de `forge-mvc-files` | **Alpha** : publié PyPI depuis `1.0.0-beta.13` (API encore bêta, voir [Limites](../deployment/production-limits.md)) |
+| `forge-mvc-audio` | Brique audio (upload, sondage, transcodage MP3, lecture HTTP Range) | **Beta** : publié PyPI depuis `1.0.0-beta.13` |
+| `forge-mvc-iot` | Brique IoT (subscriber MQTT, stockage `iot_events`, API HTTP) | **Alpha** : publié PyPI depuis `1.0.0-beta.12` |
+| `forge-mvc-video` | Brique vidéo (upload, transcodage MP4, lecture HTTP Range) | **Beta** : publié PyPI depuis `1.0.0-beta.13` |
+| `forge-mvc-pivot` | Brique pivot : associations `many_to_many` enrichies + `make:pivot-crud` | **Beta** : publié PyPI depuis `1.0.0-beta.13` |
+| `forge-mvc-mail` | Brique mail (composition, transports, templates Jinja, CLI `mail:*`) | **Beta** : publié PyPI depuis `1.0.0-beta.13` |
 
 Pour installer Forge avec toutes les briques opt-in :
 
@@ -61,32 +65,33 @@ python -m pip install -r requirements-dev.txt
 ```
 
 `pip install -e .` installe le core en mode éditable.
-`requirements-dev.txt` installe ensuite les 7 modules opt-in
+`requirements-dev.txt` installe ensuite les 11 modules opt-in
 (également en éditable) et les outils de développement. Voir
 [Installation depuis GitHub](github.md) pour les détails.
 
 ## Contrat d'installation des opt-ins
 
-Le core `forge-mvc` et la plupart des opt-ins officiels
+Le core `forge-mvc` et les onze opt-ins officiels
 (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
-`forge-mvc-iot`, `forge-mvc-video`) sont publiés sur PyPI
-(les quatre premiers depuis `1.0.0-beta.9`, `forge-mvc-iot` depuis
-`1.0.0-beta.12`, `forge-mvc-video` depuis `1.0.0-beta.13`).
-`forge-mvc-images` cible la release beta.13 et s'installe pour l'instant depuis
-les sources.
+`forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-iot`,
+`forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail`) sont publiés sur PyPI
+(rbac/workflow/stats/mfa depuis `1.0.0-beta.9`, `forge-mvc-iot` depuis
+`1.0.0-beta.12`, et les six derniers depuis `1.0.0-beta.13`).
 
-Installation directe d'un opt-in (méthode recommandée — disponible pour tous) :
+Installation directe d'un opt-in (méthode recommandée, disponible pour tous) :
 
 ```bash
 pip install --pre forge-mvc-rbac
 pip install --pre forge-mvc-workflow
 pip install --pre forge-mvc-stats
 pip install --pre forge-mvc-mfa
+pip install --pre forge-mvc-files
+pip install --pre forge-mvc-images
+pip install --pre forge-mvc-audio
 pip install --pre forge-mvc-iot
 pip install --pre forge-mvc-video
-
-# forge-mvc-images n'est pas encore publié : depuis les sources
-pip install -e packages/forge-mvc-images/
+pip install --pre forge-mvc-pivot
+pip install --pre forge-mvc-mail
 ```
 
 Le core fournit également les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`,
@@ -100,12 +105,11 @@ pip install --pre "forge-mvc[stats]"
 pip install --pre "forge-mvc[all]"
 ```
 
-`forge-mvc[mfa]` et `forge-mvc[images]` ne sont pas définis comme extras du core —
-installer `forge-mvc-mfa` (PyPI) ou `forge-mvc-images` (depuis les sources)
-directement comme ci-dessus. MFA est officiellement publié au statut **Alpha**
+`forge-mvc[mfa]` et `forge-mvc[images]` ne sont pas définis comme extras du core :
+installer `forge-mvc-mfa` ou `forge-mvc-images` directement comme ci-dessus
+(tous deux publiés sur PyPI). MFA est publié au statut **Alpha**
 (secret TOTP chiffré au repos via Fernet) ; l'API de `forge-mvc-images` reste
-bêta et le paquet n'est pas encore publié — voir
-[Limites](../deployment/production-limits.md).
+bêta, voir [Limites](../deployment/production-limits.md).
 
 Pour installer en mode éditable depuis les sources (contribution Forge) :
 
@@ -118,7 +122,7 @@ python -m pip install -e .
 python -m pip install -r requirements-dev.txt
 ```
 
-`requirements-dev.txt` installe les sept opt-ins en mode éditable.
+`requirements-dev.txt` installe les onze opt-ins en mode éditable.
 
 ---
 

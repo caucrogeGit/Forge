@@ -29,7 +29,7 @@ Aucun ffmpeg, aucune base de données.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `forge_mvc_video.config.load_video_config` | Lire la configuration du module vidéo. | [Parcours vidéo](../../../video/parcours.md) |
-| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/api.md#corehttp) |
+| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/api.md#corehttpresponse) |
 
 ## Tester
 

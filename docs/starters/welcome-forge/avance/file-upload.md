@@ -27,7 +27,7 @@ Aucune base de données : le fichier est stocké sur le disque, pas en base.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `request.file` | Récupérer le fichier reçu (`UploadedFile`). | [Request](../../../reference/api.md#corehttp) |
+| `request.file` | Récupérer le fichier reçu (`UploadedFile`). | [Request](../../../reference/api.md#corehttprequest) |
 | `forge_mvc_files.save_upload` | Valider puis stocker le fichier sur le disque. | [Uploads](../../../reference/api.md#coreuploads) |
 | `BaseController.csrf_token` | Protéger le formulaire d'envoi. | [BaseController](../../../reference/api.md#coremvccontroller) |
 

@@ -5,9 +5,9 @@ module opt-in `forge-mvc-images` introduites à chaque étape.
 
 !!! note "Module opt-in"
     Toute cette progression suppose `forge-mvc-images` installé. Le paquet
-    dépend de `forge-mvc-files` et n'est pas encore publié sur PyPI : on
-    l'installe depuis les sources (palier « Installation » en tête de parcours).
-    Le cœur de Forge reste autonome.
+    dépend de `forge-mvc-files` et il est publié sur PyPI depuis `1.0.0-beta.13`
+    (`pip install --pre forge-mvc-images`, palier « Installation » en tête de
+    parcours). Le cœur de Forge reste autonome.
 
 ## Niveau débutant — traitement (sans base de données)
 

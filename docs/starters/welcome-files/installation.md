@@ -9,10 +9,10 @@ projet **déjà créé**.
     Pour l'installation détaillée du core et des autres parcours, voir
     [Installer Forge](../../install/index.md).
 
-!!! warning "Module pas encore publié sur PyPI"
-    `forge-mvc-files` n'est pas encore publié sur PyPI (cible : release beta.13).
-    On l'installe donc **depuis les sources**. Une fois publié, la commande
-    deviendra `pip install --pre forge-mvc-files`.
+!!! info "Module publié sur PyPI"
+    `forge-mvc-files` est publié sur PyPI depuis `1.0.0-beta.13`. On l'installe
+    avec `pip install --pre forge-mvc-files`. L'installation depuis les sources
+    reste possible pour le développement.
 
 ## Prérequis
 
@@ -23,13 +23,15 @@ projet **déjà créé**.
 
 ## 1. Installer le module opt-in Files
 
-`forge-mvc-files` est le pipeline d'upload générique extrait du core (ADR-019) —
+`forge-mvc-files` est le pipeline d'upload générique extrait du core (ADR-019),
 la **fondation** sur laquelle `forge-mvc-images` est bâti. Installation depuis
-les sources :
+PyPI :
 
 ```bash
-pip install -e packages/forge-mvc-files/
+pip install --pre forge-mvc-files
 ```
+
+Pour le développement depuis les sources : `pip install -e packages/forge-mvc-files/`.
 
 ## 2. Générer le projet de départ
 

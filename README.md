@@ -136,7 +136,7 @@ Toute la documentation est publiée sur
 - Référence de la CLI `forge`
 - Entités, modèles, SQL et migrations
 - Formulaires, validation, CSRF, sessions
-- Modules opt-in (RBAC, workflow, stats, MFA, media, IoT, Video)
+- Modules opt-in (RBAC, workflow, stats, MFA, files, images, audio, IoT, Video, pivot, mail)
 - ADR et charte philosophique
 
 ---

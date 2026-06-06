@@ -26,7 +26,7 @@ Aucun broker, aucune écriture.
 |-------------------|----------------------|-----------|
 | `forge_mvc_iot.storage.IotEventRepository` | Lire les événements stockés. | [Forge IoT — stockage](../../../iot/storage-events.md) |
 | `IotEventRepository.list_recent` | Derniers événements (ordre `received_at` décroissant). | [Forge IoT — stockage](../../../iot/storage-events.md) |
-| `Response.json` | Renvoyer les événements (ou l'erreur) en JSON. | [Response](../../../reference/api.md#corehttp) |
+| `Response.json` | Renvoyer les événements (ou l'erreur) en JSON. | [Response](../../../reference/api.md#corehttpresponse) |
 
 ## Tester
 

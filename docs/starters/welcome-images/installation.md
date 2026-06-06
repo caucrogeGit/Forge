@@ -9,10 +9,11 @@ projet **déjà créé**.
     Pour l'installation détaillée du core et des autres parcours, voir
     [Installer Forge](../../install/index.md).
 
-!!! warning "Module pas encore publié sur PyPI"
-    `forge-mvc-images` n'est pas encore publié sur PyPI (cible : release
-    beta.13). On l'installe donc **depuis les sources**. Une fois publié, la
-    commande deviendra `pip install --pre forge-mvc-images`.
+!!! info "Module publié sur PyPI"
+    `forge-mvc-images` est publié sur PyPI depuis `1.0.0-beta.13`. On l'installe
+    avec `pip install --pre forge-mvc-images` (sa dépendance `forge-mvc-files`
+    est tirée automatiquement). L'installation depuis les sources reste possible
+    pour le développement.
 
 ## Prérequis
 
@@ -26,8 +27,14 @@ projet **déjà créé**.
 ## 1. Installer le module opt-in Images
 
 Le cœur de Forge ne dépend pas de l'image : c'est une brique que l'on ajoute à la
-demande. `forge-mvc-images` dépend de `forge-mvc-files` (l'upload générique) ;
-on installe les deux depuis les sources du dépôt :
+demande. `forge-mvc-images` dépend de `forge-mvc-files` (l'upload générique),
+tiré automatiquement à l'installation depuis PyPI :
+
+```bash
+pip install --pre forge-mvc-images
+```
+
+Pour le développement depuis les sources du dépôt :
 
 ```bash
 pip install -e packages/forge-mvc-files/

@@ -1428,15 +1428,17 @@ Les variantes d'images (`thumbnail`, `medium`), l'intégration `FileField` / `Im
 <summary><code>forge_mvc_images</code> - Helpers applicatifs médias (opt-in)</summary>
 
 `forge_mvc_images` est un module opt-in (`forge-mvc-images`) qui fournit les
-helpers applicatifs liés à la table `media`. Il n'est pas encore publié sur
-PyPI (cible release beta.13) — installation depuis les sources :
+helpers applicatifs liés à la table `media`. Il est publié sur PyPI depuis
+`1.0.0-beta.13` :
 
 ```bash
-pip install -e packages/forge-mvc-images/
+pip install --pre forge-mvc-images
 ```
 
+Pour le développement depuis les sources : `pip install -e packages/forge-mvc-images/`.
+
 Le module reste opt-in : le core Forge ne dépend pas de `forge-mvc-images`.
-L'API applicative reste bêta — voir [Limites](../deployment/production-limits.md).
+L'API applicative reste bêta, voir [Limites](../deployment/production-limits.md).
 
 Les nouveaux fichiers générés par `forge make:crud --media` importent depuis ce module.
 
@@ -1656,7 +1658,7 @@ Les noms d'entités et de champs (`Contact`, `nom`, `email`…) **ne sont pas tr
 </details>
 
 <details markdown="1" id="coremail">
-<summary><code>core.mail</code> - Mail SMTP minimal</summary>
+<summary><code>forge_mvc_mail</code> - Mail SMTP minimal (opt-in)</summary>
 
 `forge_mvc_mail` (opt-in forge-mvc-mail) fournit une brique mail générique avec transports interchangeables, rendu de templates et journalisation optionnelle. Elle ne contient pas de logique métier.
 
@@ -1674,7 +1676,7 @@ Les noms d'entités et de champs (`Contact`, `nom`, `email`…) **ne sont pas tr
 | `MailSendError` | Erreur SMTP pendant l'envoi. `Mailer.send()` l'intercepte en `TransportResult(success=False)`. |
 
 > `SMTPMailer` (`forge_mvc_mail/smtp.py`) est conservé provisoirement pour compatibilité.
-> Le système recommandé depuis Forge 1.2 est `Mailer + SmtpTransport`.
+> Le système recommandé est `Mailer + SmtpTransport`.
 
 ### Exemple
 
@@ -1738,7 +1740,7 @@ Les fichiers générés `*_base.py` peuvent utiliser ces décorateurs. La classe
 <details markdown="1" id="forge-cli">
 <summary><code>forge</code> CLI - Commandes officielles</summary>
 
-L'interface officielle est la commande `forge`. La version actuelle est `2.5.0`.
+L'interface officielle est la commande `forge`.
 
 ### Commandes
 
@@ -3094,10 +3096,10 @@ Référence détaillée : [stats.md](stats.md).
 Repository, galerie et helpers applicatifs liés à la table `media`.
 
 ```bash
-pip install -e packages/forge-mvc-images/
+pip install --pre forge-mvc-images
 ```
 
-> Pas encore publié sur PyPI (cible release beta.13 — API encore bêta, voir
+> Publié sur PyPI depuis `1.0.0-beta.13` (API encore bêta, voir
 > [Limites](../deployment/production-limits.md)). Les générateurs `make:crud --media` et
 > `make:public:list` importent depuis ce module.
 > Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).

@@ -2,12 +2,12 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-!!! info "Statut : opt-in officiel, non encore publié sur PyPI, API encore bêta"
-    `forge-mvc-images` (qui détient la couche applicative média) n'est pas
-    encore publié sur PyPI (cible release beta.13). L'API applicative reste
-    bêta — voir [Limites](../deployment/production-limits.md) avant déploiement
-    en production. Installation depuis les sources : voir
-    [section ci-dessous](#installation-depuis-les-sources).
+!!! info "Statut : opt-in officiel, publié sur PyPI depuis `1.0.0-beta.13`, API encore bêta"
+    `forge-mvc-images` (qui détient la couche applicative média) est publié sur
+    PyPI depuis `1.0.0-beta.13` : `pip install --pre forge-mvc-images`. L'API
+    applicative reste bêta, voir [Limites](../deployment/production-limits.md)
+    avant déploiement en production. Pour le développement depuis les sources,
+    voir [section ci-dessous](#installation).
 
     Le module reste opt-in : le core Forge ne dépend pas de
     `forge-mvc-images`.
@@ -38,17 +38,21 @@ service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure
 
 Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus supportés depuis `MEDIA-SHIMS-REMOVE-001`. Les fichiers `core/uploads/media_repository.py` et `core/uploads/media_gallery.py` ont été supprimés. Utiliser `from forge_mvc_images import ...`.
 
-## Installation depuis les sources
+## Installation
 
-`forge-mvc-images` n'étant pas sur PyPI, l'installation se fait depuis le dépôt Forge :
+`forge-mvc-images` est publié sur PyPI depuis `1.0.0-beta.13` :
+
+```bash
+pip install --pre forge-mvc-images
+```
+
+Pour le développement depuis le dépôt Forge (modifications locales sans réinstallation) :
 
 ```bash
 git clone https://github.com/caucrogeGit/Forge.git
 cd Forge
 pip install -e packages/forge-mvc-images/
 ```
-
-L'option `-e` permet des modifications locales sans réinstallation.
 
 La dépendance `forge-mvc=={{forge_version}}` doit être satisfaite. Si vous travaillez depuis
 le dépôt Forge directement (sans venv isolé), le core est déjà disponible via `PYTHONPATH`.
@@ -709,10 +713,10 @@ Ces garanties couvrent le code source audité en `{{forge_version}}`. Elles ne c
 détection MIME côté serveur (repose sur le `Content-Type` déclaré par le navigateur ;
 `python-magic` est hors périmètre) ni les permissions d'accès aux médias servis.
 
-## Conditions avant publication PyPI
+## Conditions de publication PyPI (remplies)
 
-Ces conditions doivent toutes être remplies avant de retirer le classifier
-`"Private :: Do Not Upload"` et de publier sur PyPI :
+Ces conditions ont toutes été remplies avant la publication sur PyPI en
+`1.0.0-beta.13` (retrait du classifier `"Private :: Do Not Upload"`) :
 
 | Condition | Ticket | État |
 |---|---|---|
@@ -721,15 +725,7 @@ Ces conditions doivent toutes être remplies avant de retirer le classifier
 | Passage à `Development Status :: 3 - Alpha` minimum | `MEDIA-PYPI-READY-002` | livré |
 | Classifier `"Private :: Do Not Upload"` retiré | `MEDIA-PYPI-READY-002` | livré |
 
-Tant que ces conditions ne sont pas toutes validées, **ne pas relancer**
-`PYPI-PUBLISH-B7-MEDIA-001` ni aucune variante de publication PyPI pour ce module.
-
-La publication PyPI sera traitée dans `PYPI-PUBLISH-MEDIA-001`
-(ou `PYPI-PUBLISH-B8-MEDIA-001` selon la version cible au moment de la publication).
-
 ## Roadmap
 
-- `MEDIA-SHIMS-REMOVE-001` — shims de compatibilité supprimés de `core/uploads/` (livré).
-- `MEDIA-PYPI-READY-002` — requalifier en Alpha, retirer le classifier, préparer la publication PyPI.
 - Détection MIME fiable via `python-magic`.
 - Permissions et accès contrôlés aux médias.

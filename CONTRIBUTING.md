@@ -100,7 +100,7 @@ python -m pytest tests/ -q
 forge check:model
 python -m mkdocs build --strict
 python -m pip install -e . --no-deps             # rafraîchit l'entry point forge
-python -m pip install -r requirements-dev.txt   # garantit que les 6 modules opt-in sont à jour
+python -m pip install -r requirements-dev.txt   # garantit que les 11 modules opt-in sont à jour
 ```
 
 Pour lancer uniquement les tests fonctionnels du framework (plus rapide) :

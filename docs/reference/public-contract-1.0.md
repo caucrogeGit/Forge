@@ -26,12 +26,12 @@ La famille canonique de gestion des opt-ins officiels, **exactement 5 verbes** :
 | `forge opt-in:remove <name>` | présence (−) | affiche la désinstallation |
 | `forge opt-in:enable <name>` | activation (+) | câblage réel (kind `route`) / conseil (library, crosscutting) |
 | `forge opt-in:disable <name>` | activation (−) | inverse de `enable` |
-| `forge opt-in:list` | lecture | état des 7 opt-ins officiels |
+| `forge opt-in:list` | lecture | état des 11 opt-ins officiels |
 
 **Décisions finales 1.0** :
 
 - `enable`/`disable` font un **câblage réel uniquement pour le kind `route`**
-  (iot) ; pour `library` (workflow, stats, media) et `crosscutting` (mfa,
+  (iot) ; pour `library` (workflow, stats) et `crosscutting` (mfa,
   rbac), ils sont **informatifs** (ADR-016 D8 + A1). C'est le contrat 1.0, pas
   une étape intermédiaire.
 - Les anciennes commandes `optin:enable` / `optin:list` (sans tiret) sont

@@ -9,10 +9,10 @@ projet **déjà créé**.
     Pour l'installation détaillée du core, voir
     [Installer Forge](../../install/index.md).
 
-!!! warning "Module pas encore publié sur PyPI"
-    `forge-mvc-audio` n'est pas encore publié sur PyPI (cible : release beta.13).
-    On l'installe donc **depuis les sources**. Une fois publié, la commande
-    deviendra `pip install --pre forge-mvc-audio`.
+!!! info "Module publié sur PyPI"
+    `forge-mvc-audio` est publié sur PyPI depuis `1.0.0-beta.13`. On l'installe
+    avec `pip install --pre forge-mvc-audio`. L'installation depuis les sources
+    reste possible pour le développement.
 
 ## Prérequis
 
@@ -27,8 +27,10 @@ projet **déjà créé**.
 ## 1. Installer le module opt-in Audio
 
 ```bash
-pip install -e packages/forge-mvc-audio/
+pip install --pre forge-mvc-audio
 ```
+
+Pour le développement depuis les sources : `pip install -e packages/forge-mvc-audio/`.
 
 ## 2. Générer le projet de départ
 

@@ -5,10 +5,10 @@ module opt-in `forge-mvc-files` introduites à chaque étape.
 
 !!! note "Module opt-in et fondation"
     `forge-mvc-files` est l'upload générique extrait du core (ADR-019), **sans
-    état**. Il dépend de rien d'autre que le core, et n'est pas encore publié sur
-    PyPI : on l'installe depuis les sources (palier « Installation »). C'est la
-    fondation sur laquelle `forge-mvc-images` est bâti ; les futurs opt-ins média
-    composeront ses primitives (ADR-020).
+    état**. Il ne dépend de rien d'autre que le core, et il est publié sur PyPI
+    depuis `1.0.0-beta.13` (`pip install --pre forge-mvc-files`, palier
+    « Installation »). C'est la fondation sur laquelle `forge-mvc-images` est
+    bâti ; les futurs opt-ins média composeront ses primitives (ADR-020).
 
 ## Niveau débutant — inspecter, stocker, servir
 

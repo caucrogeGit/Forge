@@ -26,8 +26,8 @@ Les données proviennent de la table `first_sql_messages`.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `request.header` | Lire l'en-tête `Authorization` de la requête. | [Request](../../../reference/api.md#corehttp) |
-| `Response.json` | Renvoyer des données (ou une erreur) en JSON. | [Response](../../../reference/api.md#corehttp) |
+| `request.header` | Lire l'en-tête `Authorization` de la requête. | [Request](../../../reference/api.md#corehttprequest) |
+| `Response.json` | Renvoyer des données (ou une erreur) en JSON. | [Response](../../../reference/api.md#corehttpresponse) |
 | `core.database.db.fetch_all` | Lire les messages à exposer. | [Base de données](../../../reference/api.md#coredatabase) |
 
 ## Tester
