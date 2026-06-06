@@ -54,6 +54,6 @@ MariaDB ne garantit pas un rollback complet des DDL. Relisez les migrations SQL
 avant application ; Forge arrête au premier échec sans prétendre annuler tout ce
 que MariaDB a déjà exécuté.
 
-Le compte applicatif reste compatible avec le flux pédagogique
+En Forge 1.3.0, le compte applicatif reste compatible avec le flux pédagogique
 `db:init` puis `db:apply`. En production, utilisez un compte de migration séparé
 et un compte applicatif limité à `SELECT`, `INSERT`, `UPDATE`, `DELETE`.

@@ -21,7 +21,7 @@
     Le passage Alpha → Beta reste un ticket futur, indépendant de la
     publication PyPI déjà effectuée en `1.0.0-beta.9`.
 
-> **Module extrait** : le code MFA vit désormais dans
+> **Module extrait** : depuis Forge 2.5.0, le code MFA vit dans
 > `forge-mvc-mfa`. Voir `packages/forge-mvc-mfa/README.md` pour
 > l'installation et l'API utilisateur. Cette page documente le flux
 > de challenge MFA pour mémoire et référence rapide.

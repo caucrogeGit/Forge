@@ -1,7 +1,7 @@
 """core/mail/smtp.py — SMTPMailer legacy (conservé pour compatibilité ascendante).
 
 SMTPMailer est conservé provisoirement pour les projets et tests qui l'utilisent.
-Le système recommandé est désormais Mailer + SmtpTransport :
+Le système recommandé depuis Forge 1.2 est Mailer + SmtpTransport :
 
     from forge_mvc_mail import Mailer, MailMessage
     result = Mailer.from_config().send(message)

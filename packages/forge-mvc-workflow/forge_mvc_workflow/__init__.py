@@ -1,6 +1,6 @@
 """Forge workflow — statuts et transitions applicatives.
 
-Opt-in officiel Forge livre separement (ADR-004).
+Opt-in officiel Forge livre separement depuis Forge 2.6.0 (ADR-004).
 """
 
 from __future__ import annotations
