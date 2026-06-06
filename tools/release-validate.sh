@@ -60,8 +60,8 @@ if [ "${1:-}" = "--convert" ]; then
 fi
 
 # RELEASE-VALIDATE-PACKAGES-001 — `--with-packages` (opt-in) ajoute le build
-# des 8 distributions + twine check. Hors flag, comportement inchangé (on ne
-# rallonge pas chaque run ; la CI build aussi de son côté).
+# de toutes les distributions (core + opt-ins) + twine check. Hors flag,
+# comportement inchangé (on ne rallonge pas chaque run ; la CI build aussi).
 WITH_PACKAGES=false
 _ARGS=()
 for _arg in "$@"; do
@@ -96,7 +96,7 @@ fi
 
 echo "=== Validation pré-release Forge ${VERSION:-<version non fournie>} ==="
 if $WITH_PACKAGES; then
-    echo "Mode : --with-packages (build des 8 distributions + twine check)"
+    echo "Mode : --with-packages (build des distributions core + opt-ins + twine check)"
 fi
 echo ""
 
