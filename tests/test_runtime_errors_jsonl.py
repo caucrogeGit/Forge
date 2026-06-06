@@ -95,7 +95,8 @@ class TestJsonlCreation:
             set_jsonl_dir(None)
 
     def test_prod_mode_does_not_create_jsonl_file(self, jsonl_dir, monkeypatch):
-        monkeypatch.setenv("APP_ENV", "prod")
+        import core.forge as forge
+        monkeypatch.setitem(forge._cfg, "app_env", "prod")
         try:
             raise RuntimeError("prod error")
         except RuntimeError as exc:
@@ -412,7 +413,8 @@ class TestIntegrationDispatch:
         assert len(lines) == 2  # deux appels → deux lignes, pas quatre
 
     def test_dispatch_no_write_in_prod(self, jsonl_dir, views, monkeypatch):
-        monkeypatch.setenv("APP_ENV", "prod")
+        import core.forge as forge
+        monkeypatch.setitem(forge._cfg, "app_env", "prod")
 
         def _handler_crash(request):
             raise RuntimeError("prod error")

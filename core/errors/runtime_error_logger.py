@@ -108,7 +108,14 @@ def log_runtime_error(exc: BaseException, request=None) -> None:
     Silencieux si l'écriture échoue — ne propage aucune exception.
     N'écrit rien si APP_ENV != "dev".
     """
-    environment = os.environ.get("APP_ENV", "dev")
+    # Source de vérité alignée sur le reste du core : core.forge.get("app_env")
+    # (configuré via forge.configure). Repli sur os.environ si la config Forge
+    # n'est pas initialisée.
+    try:
+        import core.forge as forge
+        environment = forge.get("app_env")
+    except Exception:
+        environment = os.environ.get("APP_ENV", "dev")
     if environment != "dev":
         return
 

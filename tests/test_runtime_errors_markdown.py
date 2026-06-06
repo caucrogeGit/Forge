@@ -360,7 +360,8 @@ class TestIntegrationMarkdown:
         assert "Erreur" in content
 
     def test_prod_mode_no_md_file(self, jsonl_dir, monkeypatch):
-        monkeypatch.setenv("APP_ENV", "prod")
+        import core.forge as forge
+        monkeypatch.setitem(forge._cfg, "app_env", "prod")
         try:
             raise RuntimeError("prod error")
         except RuntimeError as exc:
