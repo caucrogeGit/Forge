@@ -154,7 +154,13 @@ def _response_to_wsgi(
         ("Content-Type", response.content_type),
         ("Content-Length", str(content_length)),
     ]
+    # Content-Type / Content-Length sont calculés ici : on écarte toute clé
+    # homonyme du dict applicatif (comparaison insensible à la casse) pour ne
+    # pas émettre deux fois le même en-tête.
+    _reserved = {"content-type", "content-length"}
     for key, value in headers_dict.items():
+        if key.lower() in _reserved:
+            continue
         headers.append((key, value))
     start_response(_format_status(response.status), headers)
     return body_iter
