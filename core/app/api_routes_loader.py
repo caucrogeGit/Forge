@@ -15,8 +15,14 @@ def load_api_routes(router, module_path="mvc.api_routes"):
     """
     try:
         mod = importlib.import_module(module_path)
-    except ModuleNotFoundError:
-        return
+    except ModuleNotFoundError as exc:
+        # Absent → silencieux UNIQUEMENT si c'est `module_path` lui-même (ou un
+        # de ses paquets parents) qui manque. Si `module_path` existe mais
+        # importe un module supprimé (ex. `media`, `core.uploads`), l'erreur
+        # porte le nom de cet autre module → on la remonte au lieu de la masquer.
+        if exc.name and (exc.name == module_path or module_path.startswith(exc.name + ".")):
+            return
+        raise ImportError(f"Erreur dans {module_path} : {exc}") from exc
     except Exception as exc:
         raise ImportError(f"Erreur dans {module_path} : {exc}") from exc
     if hasattr(mod, "register_api_routes"):
