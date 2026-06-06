@@ -12,9 +12,14 @@ Utilisation :
 
 Quand APP_CSP_NONCE_ENABLED=false (défaut), csp_nonce() retourne une
 chaîne vide et la CSP ne contient pas de nonce — script-src 'self' seul.
+
+Câblage par requête : poser le nonce via le gestionnaire de contexte
+`request_nonce(...)`, qui garantit sa remise à zéro en fin de requête
+(le stockage est thread-local et les threads sont réutilisés).
 """
 import secrets
 import threading
+from contextlib import contextmanager
 
 _local = threading.local()
 
@@ -34,6 +39,32 @@ def set_request_nonce(nonce: "str | None") -> None:
 def get_request_nonce() -> "str | None":
     """Retourne le nonce de la requête courante, ou None."""
     return getattr(_local, "nonce", None)
+
+
+def clear_request_nonce() -> None:
+    """Réinitialise le nonce de la requête courante."""
+    _local.nonce = None
+
+
+@contextmanager
+def request_nonce(nonce: "str | None"):
+    """Porte le nonce CSP le temps d'une requête, puis garantit sa remise à zéro.
+
+    Le stockage est thread-local et les threads sont réutilisés (serveur de
+    dev) : sans remise à zéro en fin de requête, un nonce pourrait fuiter dans
+    la CSP d'une requête suivante. Utiliser ce gestionnaire de contexte est la
+    façon officielle de poser un nonce par requête, plutôt que d'appeler
+    set_request_nonce directement.
+
+        with request_nonce(generate_nonce()) as n:
+            response.headers["Content-Security-Policy"] = build_csp_header(n)
+            ...  # rendu du template, csp_nonce() retourne n
+    """
+    set_request_nonce(nonce)
+    try:
+        yield nonce
+    finally:
+        clear_request_nonce()
 
 
 def build_csp_header(nonce: "str | None" = None) -> str:
