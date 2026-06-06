@@ -118,9 +118,9 @@ avec `forge db:apply`. Les fichiers `sql/` du dépôt source en sont la référe
 
 ## Compatibilité
 
-Disponible séparément depuis Forge 2.4.0 (ADR-004, MFA-EXTRACT-001).
-Les anciens chemins `core.auth.mfa`, `core.auth.recovery` et
-`core.auth.totp_replay` ont été retirés en Forge 3.0.
+Disponible comme paquet séparé (ADR-004, MFA-EXTRACT-001). Les anciens chemins
+`core.auth.mfa`, `core.auth.recovery` et `core.auth.totp_replay` ont été retirés
+du core lors de l'extraction.
 
 ## Limites connues
 
