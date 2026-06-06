@@ -58,9 +58,9 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 102)
+## 4. Starters 1.0 (gelés — 107)
 
-La liste pédagogique est **figée** : 102 starters, numérotés de 1 à 102,
+La liste pédagogique est **figée** : 107 starters, numérotés de 1 à 107,
 nommés selon [la convention](../philosophy/starter-author-guide.md)
 (`<module>-welcome`, `first-*`…). La progression
 `welcome-forge` est organisée par niveau ; le **niveau avancé** (`relations`, …)
@@ -76,8 +76,10 @@ enrôlement/challenge/récupération, durcissement), `welcome-rbac`
 guards, résolution par utilisateur), et `welcome-workflow` (`workflow-welcome`, …)
 pour `forge-mvc-workflow` (statuts, transitions, badges — sans état), et
 `welcome-stats` (`stats-welcome`, …) pour `forge-mvc-stats` (événements, schéma,
-tracking et consultation — SQL visible). **Les 9 opt-ins ont chacun leur
-progression `welcome-<module>`.**
+tracking et consultation — SQL visible), et `welcome-mail` (`mail-welcome`, …)
+pour `forge-mvc-mail` (composition, transports, templates, configuration,
+diagnostic). **Les 10 opt-ins dotés d'un parcours ont chacun leur progression
+`welcome-<module>`.**
 
 ```
 audio-doctor, audio-play, audio-probe, audio-transcode, audio-upload, audio-welcome,
@@ -89,8 +91,8 @@ iot-api, iot-contract, iot-dashboard, iot-device, iot-doctor, iot-events,
 iot-simulate, iot-subscriber, iot-welcome,
 json-api, json-response,
 layout-template,
+mail-config, mail-doctor, mail-message, mail-template, mail-transport, mail-welcome,
 mfa-challenge, mfa-crypto, mfa-enroll, mfa-recovery, mfa-replay, mfa-revalidation, mfa-secret, mfa-verify, mfa-welcome,
-send-email,
 list-records, pagination, query-params,
 rbac-check, rbac-guard, rbac-permission, rbac-request-roles, rbac-resolve, rbac-role, rbac-template, rbac-user-role, rbac-welcome,
 relations, request-debug, server-validation, session-state,

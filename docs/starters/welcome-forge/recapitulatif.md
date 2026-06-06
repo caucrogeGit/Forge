@@ -39,9 +39,8 @@ avant d'aborder les progressions opt-in autonomes.
 |---|--------|------------------|---------|
 | 1 | [Relations entre tables](avance/relations.md) | Deux tables liées, lecture jointe | `FOREIGN KEY`, `SELECT … JOIN …` |
 | 2 | [Téléverser un fichier](avance/file-upload.md) | Recevoir et stocker un fichier | `request.file(...)`, `save_upload(...)` |
-| 3 | [Envoyer un email](avance/send-email.md) | Composer et envoyer un email | `MailMessage`, `Mailer`, `ConsoleTransport` |
-| 4 | [API JSON protégée](avance/json-api.md) | Exposer du JSON derrière un jeton | `Response.json`, `request.header("Authorization")` |
-| 5 | [Écritures transactionnelles](avance/db-transaction.md) | Plusieurs écritures atomiques | `with transaction() as tx:`, `insert(..., tx=tx)` |
+| 3 | [API JSON protégée](avance/json-api.md) | Exposer du JSON derrière un jeton | `Response.json`, `request.header("Authorization")` |
+| 4 | [Écritures transactionnelles](avance/db-transaction.md) | Plusieurs écritures atomiques | `with transaction() as tx:`, `insert(..., tx=tx)` |
 
 ## Réponses (`core.http.response.Response`)
 

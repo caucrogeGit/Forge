@@ -138,7 +138,6 @@ nav:
           - Avancé:
               - Relations entre tables: starters/welcome-forge/avance/relations.md
               - Téléverser un fichier: starters/welcome-forge/avance/file-upload.md
-              - Envoyer un email: starters/welcome-forge/avance/send-email.md
               - API JSON protégée: starters/welcome-forge/avance/json-api.md
               - Écritures transactionnelles: starters/welcome-forge/avance/db-transaction.md
               - Bilan avancé: starters/welcome-forge/avance/bilan.md
@@ -300,6 +299,21 @@ nav:
               - Normaliser une ligne: starters/welcome-stats/avance/stats-normalize.md
               - Bilan avancé: starters/welcome-stats/avance/bilan.md
           - Aide-mémoire: starters/welcome-stats/recapitulatif.md
+      - Progression Mail (welcome-mail):
+          - Installation: starters/welcome-mail/installation.md
+          - Débutant:
+              - Bonjour Forge Mail: starters/welcome-mail/debutant/mail-welcome.md
+              - Composer un message: starters/welcome-mail/debutant/mail-message.md
+              - Bilan débutant: starters/welcome-mail/debutant/bilan.md
+          - Intermédiaire:
+              - Choisir un transport: starters/welcome-mail/intermediaire/mail-transport.md
+              - Rendre un template: starters/welcome-mail/intermediaire/mail-template.md
+              - Bilan intermédiaire: starters/welcome-mail/intermediaire/bilan.md
+          - Avancé:
+              - Configurer l'envoi: starters/welcome-mail/avance/mail-config.md
+              - Diagnostiquer le module Mail: starters/welcome-mail/avance/mail-doctor.md
+              - Bilan avancé: starters/welcome-mail/avance/bilan.md
+          - Aide-mémoire: starters/welcome-mail/recapitulatif.md
 
   - Déploiement:
       - Checklist de production: deployment/production-checklist.md

@@ -1,0 +1,24 @@
+{
+  "id": "mail-config",
+  "number": 106,
+  "name": "Configurer l'envoi",
+  "kind": "skeleton",
+  "aliases": [
+    "mail-config",
+    "mail_config",
+    "106"
+  ],
+  "description": "Configurer l'envoi : palier 1 du niveau avancé de la progression welcome-mail. Charge la configuration mail depuis l'environnement (MailConfig.from_forge) et l'inspecte ; le mot de passe n'est jamais affiché. Dégradation pédagogique si la config manque. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mail-config",
+  "routes_marker": "mail-config",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mail-config",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mail/avance/mail-config/",
+  "check_paths": [
+    "mvc/controllers/mail_config_controller.py",
+    "mvc/views/mail_config/index.html"
+  ]
+}

@@ -1,0 +1,6 @@
+# forge-starter:mail-template:start
+from mvc.controllers.mail_template_controller import MailTemplateController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/mail-template", MailTemplateController.index, name="mail_template_index")
+# forge-starter:mail-template:end

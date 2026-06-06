@@ -1,0 +1,25 @@
+{
+  "id": "mail-template",
+  "number": 105,
+  "name": "Rendre un template",
+  "kind": "skeleton",
+  "aliases": [
+    "mail-template",
+    "mail_template",
+    "105"
+  ],
+  "description": "Rendre un template : palier 2 du niveau intermédiaire de la progression welcome-mail. Utilise MailTemplateRenderer pour produire un MailMessage à partir d'un template Jinja et d'un contexte. Dégradation pédagogique si le template est absent. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mail-template",
+  "routes_marker": "mail-template",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mail-template",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mail/intermediaire/mail-template/",
+  "check_paths": [
+    "mvc/controllers/mail_template_controller.py",
+    "mvc/views/mail_template/index.html",
+    "mail_templates/welcome.txt"
+  ]
+}

@@ -28,7 +28,7 @@ est aussi disponible via `forge starter:list`.
 
 *Intermédiaire* — [Lister des enregistrements](welcome-forge/intermediaire/list-records.md) · [Rechercher / filtrer](welcome-forge/intermediaire/filter-list.md) · [Paginer une liste](welcome-forge/intermediaire/pagination.md) · [Héritage de gabarit](welcome-forge/intermediaire/layout-template.md) · [Modifier un enregistrement](welcome-forge/intermediaire/update-record.md) · [Supprimer un enregistrement](welcome-forge/intermediaire/delete-record.md) · [Mémoriser un état en session](welcome-forge/intermediaire/session-state.md) · [Messages flash](welcome-forge/intermediaire/flash-messages.md)
 
-*Avancé* — [Relations entre tables](welcome-forge/avance/relations.md) · [Téléverser un fichier](welcome-forge/avance/file-upload.md) · [Envoyer un email](welcome-forge/avance/send-email.md) · [API JSON protégée](welcome-forge/avance/json-api.md) · [Écritures transactionnelles](welcome-forge/avance/db-transaction.md)
+*Avancé* — [Relations entre tables](welcome-forge/avance/relations.md) · [Téléverser un fichier](welcome-forge/avance/file-upload.md) · [API JSON protégée](welcome-forge/avance/json-api.md) · [Écritures transactionnelles](welcome-forge/avance/db-transaction.md)
 
 ### IoT (opt-in `forge-mvc-iot`)
 
@@ -65,6 +65,10 @@ est aussi disponible via `forge starter:list`.
 ### Stats (opt-in `forge-mvc-stats`)
 
 [Bonjour Forge Stats](welcome-stats/debutant/stats-welcome.md) · [Nom d'événement](welcome-stats/debutant/stats-event.md) · [Le schéma SQL](welcome-stats/debutant/stats-schema.md) · [Le SQL d'insertion](welcome-stats/intermediaire/stats-track-sql.md) · [Enregistrer un événement](welcome-stats/intermediaire/stats-track.md) · [Valider un événement](welcome-stats/intermediaire/stats-validate.md) · [Le SQL de consultation](welcome-stats/avance/stats-admin-sql.md) · [Lister les événements](welcome-stats/avance/stats-list.md) · [Normaliser une ligne](welcome-stats/avance/stats-normalize.md)
+
+### Mail (opt-in `forge-mvc-mail`)
+
+[Bonjour Forge Mail](welcome-mail/debutant/mail-welcome.md) · [Composer un message](welcome-mail/debutant/mail-message.md) · [Choisir un transport](welcome-mail/intermediaire/mail-transport.md) · [Rendre un template](welcome-mail/intermediaire/mail-template.md) · [Configurer l'envoi](welcome-mail/avance/mail-config.md) · [Diagnostiquer le module Mail](welcome-mail/avance/mail-doctor.md)
 
 ## Progression recommandée
 

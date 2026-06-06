@@ -9,9 +9,9 @@ d'authentification**.
 d'authentification le plus courant pour une API consommée par un front
 JavaScript, un script ou un autre service.
 
-Palier 4 du **niveau avancé** de la
+Palier 3 du **niveau avancé** de la
 [progression officielle des starters](../../index.md#progression-recommandee),
-après [Envoyer un email](send-email.md).
+après [Téléverser un fichier](file-upload.md).
 
 ## Ce que ce starter montre
 

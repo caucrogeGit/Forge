@@ -69,6 +69,10 @@ PARCOURS = {
         "debutant/stats-welcome.md",
         ["pip install --pre forge-mvc-stats", "forge starter:build stats-welcome", "forge run"],
     ),
+    "welcome-mail": (
+        "debutant/mail-welcome.md",
+        ["pip install --pre forge-mvc-mail", "forge starter:build mail-welcome", "forge run"],
+    ),
 }
 
 

@@ -117,6 +117,6 @@ class FileUploadController(BaseController):
 
 ## Après ce starter
 
-Vous savez recevoir et stocker un fichier. La suite : envoyer un email.
+Vous savez recevoir et stocker un fichier. La suite : exposer une API JSON.
 
-[Envoyer un email](send-email.md)
+[API JSON protégée](json-api.md)

@@ -11,9 +11,8 @@ atomiques.
 |--------|--------------------|
 | 1 — [Relations entre tables](relations.md) | Relier deux tables par une clé étrangère et les lire avec un `JOIN` SQL visible. |
 | 2 — [Téléverser un fichier](file-upload.md) | Recevoir un fichier (`multipart`), le récupérer avec `request.file` et le stocker via `save_upload` (validé). |
-| 3 — [Envoyer un email](send-email.md) | Composer un `MailMessage` et l'envoyer via `Mailer` sur un transport (`ConsoleTransport` en dev). |
-| 4 — [API JSON protégée](json-api.md) | Renvoyer du JSON (`Response.json`) derrière un jeton `Authorization: Bearer …` lu avec `request.header`. |
-| 5 — [Écritures transactionnelles](db-transaction.md) | Grouper des écritures atomiques avec `with transaction() as tx:` (`insert(..., tx=tx)`, rollback sur erreur). |
+| 3 — [API JSON protégée](json-api.md) | Renvoyer du JSON (`Response.json`) derrière un jeton `Authorization: Bearer …` lu avec `request.header`. |
+| 4 — [Écritures transactionnelles](db-transaction.md) | Grouper des écritures atomiques avec `with transaction() as tx:` (`insert(..., tx=tx)`, rollback sur erreur). |
 
 Vous savez maintenant relier vos données sans ORM, recevoir des fichiers,
 envoyer des emails, exposer une API JSON protégée et écrire de façon atomique,

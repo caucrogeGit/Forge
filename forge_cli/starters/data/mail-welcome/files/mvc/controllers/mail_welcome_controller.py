@@ -8,8 +8,8 @@ puis on le confie à un ``Mailer`` branché sur un **transport**. En développem
 ``ConsoleTransport`` **affiche** l'email dans la console — pas besoin de serveur
 SMTP pour apprendre le flux.
 
-  ``index`` — `GET  /send-email` : affiche le formulaire (destinataire, message).
-  ``send``  — `POST /send-email` : construit le ``MailMessage`` et l'envoie via
+  ``index`` — `GET  /mail-welcome` : affiche le formulaire (destinataire, message).
+  ``send``  — `POST /mail-welcome` : construit le ``MailMessage`` et l'envoie via
               ``Mailer(ConsoleTransport())`` ; affiche le résultat.
 
 Aucune base de données.
@@ -20,13 +20,13 @@ from forge_mvc_mail import ConsoleTransport, MailError, Mailer, MailMessage
 from core.mvc.controller.base_controller import BaseController
 
 
-class SendEmailController(BaseController):
+class MailWelcomeController(BaseController):
     """Starter pédagogique : composer et envoyer un email (transport console)."""
 
     @staticmethod
     def index(request: Request) -> Response:
         return BaseController.render(
-            "send_email/index.html",
+            "mail_welcome/index.html",
             context={"csrf_token": BaseController.csrf_token(request)},
             request=request,
         )
@@ -47,10 +47,10 @@ class SendEmailController(BaseController):
         except MailError as exc:
             context["error"] = str(exc)
             return BaseController.render(
-                "send_email/index.html", context=context, request=request
+                "mail_welcome/index.html", context=context, request=request
             )
         context["sent"] = result.success
         context["recipient"] = recipient
         return BaseController.render(
-            "send_email/index.html", context=context, request=request
+            "mail_welcome/index.html", context=context, request=request
         )

@@ -18,7 +18,7 @@
   </p>
   {% endif %}
 
-  <form method="post" action="/send-email">
+  <form method="post" action="/mail-welcome">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <label>Destinataire <input type="email" name="recipient" required></label>
     <label>Message <textarea name="message" required></textarea></label>

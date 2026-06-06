@@ -1,0 +1,11 @@
+{% extends "layouts/app.html" %}
+{% block content %}
+<h1>Choisir un transport</h1>
+<p>Message envoye via <code>{{ transport_name }}</code> (transport de test) :</p>
+<ul>
+  <li>Messages captures : {{ sent_count }}</li>
+  <li>Succes : {{ success }}</li>
+  <li>Ignore : {{ skipped }}</li>
+</ul>
+<p>Autres transports disponibles : ConsoleTransport, LogTransport, NullTransport, SmtpTransport.</p>
+{% endblock %}

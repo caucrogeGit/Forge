@@ -1,0 +1,24 @@
+{
+  "id": "mail-welcome",
+  "number": 22,
+  "name": "Bonjour Forge Mail",
+  "kind": "skeleton",
+  "aliases": [
+    "mail-welcome",
+    "mail_welcome",
+    "22"
+  ],
+  "description": "Bonjour Forge Mail : premier palier du niveau débutant de la progression welcome-mail. Premier contact avec l'opt-in forge-mvc-mail : un formulaire saisit destinataire et message ; le contrôleur construit un MailMessage et l'envoie via Mailer sur le transport ConsoleTransport (affiche l'email dans la console, aucun serveur SMTP requis). Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/mail-welcome",
+  "routes_marker": "mail-welcome",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/mail-welcome",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-mail/debutant/mail-welcome/",
+  "check_paths": [
+    "mvc/controllers/mail_welcome_controller.py",
+    "mvc/views/mail_welcome/index.html"
+  ]
+}

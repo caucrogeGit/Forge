@@ -143,14 +143,10 @@ class TestSequentialChain:
         page = STARTERS_DOCS / "welcome-forge" / "avance" / "relations.md"
         assert "(file-upload.md)" in page.read_text(encoding="utf-8")
 
-    def test_avance_file_upload_points_to_send_email(self):
-        # Palier 2 avancé → palier 3 (send-email).
+    def test_avance_file_upload_points_to_json_api(self):
+        # Palier 2 avancé → palier 3 (json-api) : send-email a été relocalisé
+        # dans le parcours welcome-mail (mail-welcome), ADR-022.
         page = STARTERS_DOCS / "welcome-forge" / "avance" / "file-upload.md"
-        assert "(send-email.md)" in page.read_text(encoding="utf-8")
-
-    def test_avance_send_email_points_to_json_api(self):
-        # Palier 3 avancé → palier 4 (json-api).
-        page = STARTERS_DOCS / "welcome-forge" / "avance" / "send-email.md"
         assert "(json-api.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_json_api_points_to_db_transaction(self):

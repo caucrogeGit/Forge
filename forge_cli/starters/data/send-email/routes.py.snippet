@@ -1,7 +1,0 @@
-# forge-starter:send-email:start
-from mvc.controllers.send_email_controller import SendEmailController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/send-email", SendEmailController.index, name="send_email_index")
-    pub.add("POST", "/send-email", SendEmailController.send, name="send_email_send")
-# forge-starter:send-email:end
