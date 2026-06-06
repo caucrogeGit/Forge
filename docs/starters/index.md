@@ -8,113 +8,63 @@
 
 ## Principe
 
-Un **starter** Forge est un exemple applicatif générable avec `forge starter:build`. Il fournit un point de départ fonctionnel pour comprendre les mécaniques du framework, construire une base métier ou produire rapidement une démonstration.
+Un **starter** Forge est un exemple applicatif générable avec `forge starter:build`.
+Il fournit un point de départ fonctionnel pour comprendre une mécanique du
+framework. Un starter n'est pas un profil — voir
+[Différence entre profil et starter](#difference-entre-profil-et-starter).
 
-Un starter n'est pas un profil. Voir [Différence entre profil et starter](#difference-entre-profil-et-starter).
+Profils recommandés selon le starter : `minimal` ou `standard` pour les paliers
+avec base de données, aucun profil pour les paliers sans base.
 
-## Tableau de synthèse
+## Catalogue
 
-| Starter | Statut | Profil associé | Usage recommandé |
-|---|---|---|---|
-| [Bonjour Forge — premier pas](welcome-forge/debutant/welcome.md) | Entrée sans BDD | Aucun (fonctionne sans db:init) | Premier contact minimal avec Forge — `Response.text(...)` et `request.param(...)`, deux routes, aucune vue HTML, aucune base de données |
-| [Paramètres d'URL](welcome-forge/debutant/query-params.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 2 de la progression — lire une valeur d'URL avec `request.param("name", default=...)`, deux routes, aucune vue HTML, aucune base de données |
-| [Première vue HTML](welcome-forge/debutant/first-html-view.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 3 de la progression — rendre une page HTML avec `BaseController.render(...)`, une route, une vue, aucune base de données |
-| [Route dynamique](welcome-forge/debutant/dynamic-route.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 4 de la progression — lire un paramètre de route avec `request.route_param("id")`, une route `/dynamic-route/articles/{id}`, aucune vue HTML, aucune base de données |
-| [Inspecter une requête](welcome-forge/debutant/request-debug.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 5 de la progression — explorer `request.data` avec `Response.debug(...)`, une route `/request-debug`, aucune vue HTML, aucune base de données |
-| [Premier formulaire POST](welcome-forge/debutant/form-post.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 6 de la progression — afficher un formulaire HTML minimal (avec CSRF), envoyer un POST, lire la valeur avec `request.form("name", ...)`, aucune base de données |
-| [Validation serveur](welcome-forge/debutant/server-validation.md) | Pédagogique sans BDD | Aucun (fonctionne sans db:init) | Palier 7 de la progression — refuser une valeur vide avec `Response.text(..., status=422)`, contrôle minimum côté serveur, aucune base de données |
-| [Première base SQL](welcome-forge/debutant/first-sql.md) | Pédagogique avec BDD | `minimal` / `standard` | Palier 8 de la progression — table SQL minimale + migration visible, lecture avec `core.database.db.fetch_one`, SQL visible, aucun CRUD |
-| [Lister des enregistrements](welcome-forge/intermediaire/list-records.md) | Intermédiaire (avec BDD) | `minimal` / `standard` | Niveau **intermédiaire**, palier 1 — lire **plusieurs** lignes avec `core.database.db.fetch_all` et les afficher dans une vue avec une boucle Jinja `{% for %}` |
-| [Rechercher / filtrer](welcome-forge/intermediaire/filter-list.md) | Intermédiaire (avec BDD) | `minimal` / `standard` | Niveau **intermédiaire**, palier 2 — filtrer une liste avec `request.param("q")` et une clause SQL `WHERE content LIKE ?` paramétrée |
-| [Paginer une liste](welcome-forge/intermediaire/pagination.md) | Intermédiaire (avec BDD) | `minimal` / `standard` | Niveau **intermédiaire**, palier 3 — `LIMIT ? OFFSET ?` piloté par `request.param("page")` + `COUNT(*)`, liens précédent/suivant |
-| [Héritage de gabarit](welcome-forge/intermediaire/layout-template.md) | Intermédiaire (sans BDD) | Aucun | Niveau **intermédiaire**, palier 4 — factoriser l'enveloppe HTML avec `{% extends %}` + `{% block %}` (gabarit partagé) |
-| [Modifier un enregistrement](welcome-forge/intermediaire/update-record.md) | Intermédiaire (avec BDD) | `minimal` / `standard` | Niveau **intermédiaire**, palier 5 — formulaire pré-rempli + `core.database.db.execute("UPDATE … WHERE id = ?")`, POST protégé CSRF |
-| [Supprimer un enregistrement](welcome-forge/intermediaire/delete-record.md) | Intermédiaire (avec BDD) | `minimal` / `standard` | Niveau **intermédiaire**, palier 6 — suppression `POST` + CSRF + `core.database.db.execute("DELETE … WHERE id = ?")` |
-| [Mémoriser un état en session](welcome-forge/intermediaire/session-state.md) | Intermédiaire (sans BDD) | Aucun | Niveau **intermédiaire**, palier 7 — mémoriser un compteur entre requêtes via le store de session + cookie `session_id` durci |
-| [Messages flash](welcome-forge/intermediaire/flash-messages.md) | Intermédiaire (sans BDD) | Aucun | Niveau **intermédiaire**, palier 8 — confirmer une action via un message flash one-shot (`set_flash`/`get_flash`), motif POST-Redirect-GET |
-| [Relations entre tables](welcome-forge/avance/relations.md) | Avancé (avec BDD) | `minimal` / `standard` | Niveau **avancé**, palier 1 — deux tables liées par une clé étrangère, lecture par jointure SQL `SELECT … FROM articles JOIN categories …` via `core.database.db.fetch_all` |
-| [Téléverser un fichier](welcome-forge/avance/file-upload.md) | Avancé (sans BDD) | Aucun | Niveau **avancé**, palier 2 — formulaire `multipart/form-data`, `request.file(...)` + `forge_mvc_files.save_upload` (validation extension / MIME / taille avant écriture disque) |
-| [Envoyer un email](welcome-forge/avance/send-email.md) | Avancé (sans BDD) | Aucun | Niveau **avancé**, palier 3 — composer un `MailMessage` et l'envoyer via `Mailer` sur `ConsoleTransport` (affiché en console, aucun SMTP requis) |
-| [API JSON protégée](welcome-forge/avance/json-api.md) | Avancé (avec BDD) | `minimal` / `standard` | Niveau **avancé**, palier 4 — `Response.json` derrière un jeton `Authorization: Bearer …` lu via `request.header(...)`, réponse `401` sinon |
-| [Écritures transactionnelles](welcome-forge/avance/db-transaction.md) | Avancé (avec BDD) | `minimal` / `standard` | Niveau **avancé**, palier 5 — `with transaction() as tx:` + `insert(..., tx=tx)`, rollback atomique si une écriture échoue |
-| [Bonjour Forge IoT](welcome-iot/debutant/iot-welcome.md) | IoT débutant (opt-in, sans broker) | Aucun | Progression **welcome-iot**, niveau débutant palier 1 — premier contact avec `forge-mvc-iot` + inspection de la config MQTT (`load_iot_config`), mot de passe masqué |
-| [Lire les événements IoT](welcome-iot/debutant/iot-events.md) | IoT débutant (opt-in, sans broker) | Aucun | Progression **welcome-iot**, niveau débutant palier 2 — lire les derniers événements (`IotEventRepository.list_recent`), réponse `503` pédagogique si la table `iot_events` manque |
-| [Les événements d'un capteur](welcome-iot/debutant/iot-device.md) | IoT débutant (opt-in, sans broker) | Aucun | Progression **welcome-iot**, niveau débutant palier 3 — route paramétrée `/iot-device/{site}/{device_id}`, `find_by_device` + `count_by_device` |
-| [Simuler une mesure IoT](welcome-iot/intermediaire/iot-simulate.md) | IoT intermédiaire (opt-in, avec BDD, sans broker) | Aucun | Progression **welcome-iot**, niveau intermédiaire palier 1 — composer/valider (`parse_message`) et insérer (`IotEventRepository.insert`) une mesure sans broker |
-| [Exposer l'API IoT](welcome-iot/intermediaire/iot-api.md) | IoT intermédiaire (opt-in, avec BDD) | Aucun | Progression **welcome-iot**, niveau intermédiaire palier 2 — brancher l'API HTTP JSON officielle (`register_iot_routes`), 3 routes lecture seule, Bearer optionnel |
-| [Tableau de bord IoT](welcome-iot/intermediaire/iot-dashboard.md) | IoT intermédiaire (opt-in, avec BDD) | Aucun | Progression **welcome-iot**, niveau intermédiaire palier 3 — afficher les derniers événements dans une page HTML (`list_recent` + `render`) |
-| [Valider un message IoT](welcome-iot/avance/iot-contract.md) | IoT avancé (opt-in, sans broker) | Aucun | Progression **welcome-iot**, niveau avancé palier 1 — valider topic + payload contre le contrat (`parse_message`, `ContractError` avec code) |
-| [Le subscriber MQTT](welcome-iot/avance/iot-subscriber.md) | IoT avancé (opt-in, broker réel) | Aucun | Progression **welcome-iot**, niveau avancé palier 2 — le temps réel : `forge iot:listen` + `MqttSubscriber` (valider puis stocker), config broker affichée |
-| [Diagnostiquer le module IoT](welcome-iot/avance/iot-doctor.md) | IoT avancé (opt-in, sans broker) | Aucun | Progression **welcome-iot**, niveau avancé palier 3 — contrôles non invasifs de `forge iot:doctor` exposés en JSON (paquet, config, API) |
-| [Bonjour Forge Vidéo](welcome-video/debutant/video-welcome.md) | Vidéo débutant (opt-in, sans ffmpeg) | Aucun | Progression **welcome-video**, niveau débutant palier 1 — premier contact avec `forge-mvc-video` + inspection de la config (`load_video_config`), token masqué |
-| [Lister les vidéos](welcome-video/debutant/video-list.md) | Vidéo débutant (opt-in, sans ffmpeg) | Aucun | Progression **welcome-video**, niveau débutant palier 2 — lister les dernières vidéos (`VideoRepository.list_recent`), réponse `503` pédagogique si la table `videos` manque |
-| [Le détail d'une vidéo](welcome-video/debutant/video-detail.md) | Vidéo débutant (opt-in, sans ffmpeg) | Aucun | Progression **welcome-video**, niveau débutant palier 3 — route paramétrée `/video-detail/{uuid}`, `get_by_uuid` (`404`/`503` pédagogiques) |
-| [Téléverser une vidéo](welcome-video/intermediaire/video-upload.md) | Vidéo intermédiaire (opt-in, avec BDD, sans ffmpeg) | Aucun | Progression **welcome-video**, niveau intermédiaire palier 1 — ingérer un fichier (`ingest_video`), stockage UUID + ligne `videos` statut `uploaded`, sans transcodage |
-| [Lire une vidéo](welcome-video/intermediaire/video-playback.md) | Vidéo intermédiaire (opt-in, avec BDD) | Aucun | Progression **welcome-video**, niveau intermédiaire palier 2 — brancher la lecture officielle (`register_video_routes`), `GET /videos/{uuid}` en streaming Range |
-| [Suivre l'état d'une vidéo](welcome-video/intermediaire/video-status.md) | Vidéo intermédiaire (opt-in, avec BDD) | Aucun | Progression **welcome-video**, niveau intermédiaire palier 3 — regrouper les vidéos par statut (`list_by_status`) : `uploaded → processing → ready → failed` |
-| [Sonder une vidéo](welcome-video/avance/video-probe.md) | Vidéo avancé (opt-in, ffprobe requis) | Aucun | Progression **welcome-video**, niveau avancé palier 1 — `probe_video` (ffprobe, lecture seule) extrait durée/dimensions/codecs/conteneur d'une vidéo uploadée |
-| [Transcoder une vidéo](welcome-video/avance/video-transcode.md) | Vidéo avancé (opt-in, ffmpeg requis) | Aucun | Progression **welcome-video**, niveau avancé palier 2 — worker `forge video:process` (`process_video`, ffmpeg) : `uploaded → processing → ready`, jamais pendant une requête HTTP |
-| [Diagnostiquer le module Vidéo](welcome-video/avance/video-doctor.md) | Vidéo avancé (opt-in, sans BDD) | Aucun | Progression **welcome-video**, niveau avancé palier 3 — contrôles non invasifs de `forge video:doctor` exposés en JSON (paquet, config, migration, ffprobe, ffmpeg) |
-| [Bonjour Forge Images](welcome-images/debutant/images-welcome.md) | Images débutant (opt-in, sans BDD) | Aucun | Progression **welcome-images**, niveau débutant palier 1 — premier contact avec `forge-mvc-images`, inspection des formats acceptés et tailles de variantes (`ALLOWED_IMAGE_EXTENSIONS`, `IMAGE_VARIANT_SIZES`) ; starter `images-welcome` |
-| [Téléverser une image](welcome-images/debutant/image-upload.md) | Images débutant (opt-in, sans BDD) | Aucun | Progression **welcome-images**, niveau débutant palier 2 — vérifier le contenu avant d'écrire et générer les variantes (`save_image_upload`) ; starter `image-upload` |
-| [Miniatures et variantes](welcome-images/debutant/image-variants.md) | Images débutant (opt-in, sans BDD) | Aucun | Progression **welcome-images**, niveau débutant palier 3 — dériver les chemins de variantes et leurs URL (`image_variant_relative_paths`, `media_url`) ; starter `image-variants` |
-| [Rattacher une image à une entité](welcome-images/intermediaire/image-attach.md) | Images intermédiaire (opt-in, avec BDD) | Aucun | Progression **welcome-images**, niveau intermédiaire palier 1 — créer une ligne `media` reliée à une entité (`attach_media_to_entity`), table livrée par migration ; starter `image-attach` |
-| [Afficher la galerie](welcome-images/intermediaire/image-gallery.md) | Images intermédiaire (opt-in, avec BDD) | Aucun | Progression **welcome-images**, niveau intermédiaire palier 2 — lire et afficher les images d'une entité avec leurs variantes (`get_media_gallery`) ; starter `image-gallery` |
-| [Texte alternatif et ordre](welcome-images/intermediaire/image-alt-order.md) | Images intermédiaire (opt-in, avec BDD) | Aucun | Progression **welcome-images**, niveau intermédiaire palier 3 — éditer accessibilité et ordre (`update_media_alt_text`, `update_media_position`) ; starter `image-alt-order` |
-| [Image de couverture](welcome-images/avance/image-cover.md) | Images avancé (opt-in, avec BDD) | Aucun | Progression **welcome-images**, niveau avancé palier 1 — désigner et afficher la couverture d'une entité (`get_cover_media`, rôle `cover`) ; starter `image-cover` |
-| [Supprimer proprement](welcome-images/avance/image-delete.md) | Images avancé (opt-in, avec BDD) | Aucun | Progression **welcome-images**, niveau avancé palier 2 — supprimer ligne + fichier + variantes en une fois (`delete_media`) ; starter `image-delete` |
-| [Garde de sécurité à l'upload](welcome-images/avance/image-safety.md) | Images avancé (opt-in, sans BDD) | Aucun | Progression **welcome-images**, niveau avancé palier 3 — refuser un fichier piégé ou une image-bombe (`verify_image_content`, `upload_max_image_pixels`) ; starter `image-safety` |
-| [Bonjour Forge Files](welcome-files/debutant/files-welcome.md) | Files débutant (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau débutant palier 1 — premier contact avec `forge-mvc-files`, inspection de la racine et de la politique d'upload (`upload_root`) ; starter `files-welcome` |
-| [Stocker un document](welcome-files/debutant/file-store.md) | Files débutant (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau débutant palier 2 — valider puis écrire un fichier, lire le `SavedUpload` (`save_upload`) ; starter `file-store` |
-| [Servir un fichier](welcome-files/debutant/file-serve.md) | Files débutant (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau débutant palier 3 — relire un fichier par son chemin, anti-traversal + 404 (`serve_media_file`) ; starter `file-serve` |
-| [Valider un upload](welcome-files/intermediaire/file-validate.md) | Files intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau intermédiaire palier 1 — nommer la règle qui rejette (hiérarchie `UploadError`) ; starter `file-validate` |
-| [Limiter les uploads](welcome-files/intermediaire/file-rate-limit.md) | Files intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau intermédiaire palier 2 — rate-limit par IP (`is_upload_rate_limited`, `record_upload_attempt`) ; starter `file-rate-limit` |
-| [Supprimer un fichier](welcome-files/intermediaire/file-delete.md) | Files intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau intermédiaire palier 3 — supprimer par chemin, anti-traversal et idempotent (`delete_media_file`) ; starter `file-delete` |
-| [Assainir un nom de fichier](welcome-files/avance/file-safe-name.md) | Files avancé (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau avancé palier 1 — réduire un nom utilisateur à un nom sûr (`secure_filename`) ; starter `file-safe-name` |
-| [Chemin anti-traversal](welcome-files/avance/file-safe-path.md) | Files avancé (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau avancé palier 2 — juger/normaliser un chemin (`is_safe_media_path`, `normalize_media_path`) ; starter `file-safe-path` |
-| [Écrire des octets générés](welcome-files/avance/file-bytes.md) | Files avancé (opt-in, sans BDD) | Aucun | Progression **welcome-files**, niveau avancé palier 3 — écrire un contenu généré côté serveur (`save_bytes`) ; starter `file-bytes` |
-| [Bonjour Forge Audio](welcome-audio/debutant/audio-welcome.md) | Audio débutant (opt-in, sans BDD) | Aucun | Progression **welcome-audio**, niveau débutant palier 1 — premier contact avec `forge-mvc-audio`, inspection de la config (`load_audio_config`), token masqué ; starter `audio-welcome` |
-| [Téléverser un audio](welcome-audio/debutant/audio-upload.md) | Audio débutant (opt-in, sans BDD) | Aucun | Progression **welcome-audio**, niveau débutant palier 2 — valider et stocker un audio en uuid-based (`ingest_audio`) ; starter `audio-upload` |
-| [Lire un audio](welcome-audio/debutant/audio-play.md) | Audio débutant (opt-in, sans BDD) | Aucun | Progression **welcome-audio**, niveau débutant palier 3 — brancher la lecture streaming officielle (`register_audio_routes`) ; starter `audio-play` |
-| [Sonder un audio](welcome-audio/avance/audio-probe.md) | Audio avancé (opt-in, ffprobe requis) | Aucun | Progression **welcome-audio**, niveau avancé palier 1 — métadonnées via `ffprobe` (`probe_audio`) ; starter `audio-probe` |
-| [Transcoder en MP3](welcome-audio/avance/audio-transcode.md) | Audio avancé (opt-in, ffmpeg requis) | Aucun | Progression **welcome-audio**, niveau avancé palier 2 — conversion MP3 via `ffmpeg`, synchrone (`transcode_to_mp3`) ; starter `audio-transcode` |
-| [Diagnostiquer le module Audio](welcome-audio/avance/audio-doctor.md) | Audio avancé (opt-in, sans BDD) | Aucun | Progression **welcome-audio**, niveau avancé palier 3 — contrôles non invasifs de `forge audio:doctor` en JSON ; starter `audio-doctor` |
-| [Bonjour Forge MFA](welcome-mfa/debutant/mfa-welcome.md) | MFA débutant (opt-in, sans BDD) | Aucun | Progression **welcome-mfa**, niveau débutant palier 1 — facteurs, statuts, clé de chiffrement (`validate_mfa_secret_key_config`) ; starter `mfa-welcome` |
-| [Secret TOTP et QR](welcome-mfa/debutant/mfa-secret.md) | MFA débutant (opt-in, sans BDD) | Aucun | Progression **welcome-mfa**, niveau débutant palier 2 — secret + URI `otpauth://` (`generate_totp_secret`, `totp_provisioning_uri`) ; starter `mfa-secret` |
-| [Vérifier un code TOTP](welcome-mfa/debutant/mfa-verify.md) | MFA débutant (opt-in, sans BDD) | Aucun | Progression **welcome-mfa**, niveau débutant palier 3 — confronter code et secret (`verify_totp_code`) ; starter `mfa-verify` |
-| [Enrôler un facteur TOTP](welcome-mfa/intermediaire/mfa-enroll.md) | MFA intermédiaire (opt-in, session) | Aucun | Progression **welcome-mfa**, niveau intermédiaire palier 1 — créer pending + confirmer (`create_totp_factor`, `confirm_totp_factor`) ; starter `mfa-enroll` |
-| [Challenge de connexion](welcome-mfa/intermediaire/mfa-challenge.md) | MFA intermédiaire (opt-in, session) | Aucun | Progression **welcome-mfa**, niveau intermédiaire palier 2 — second facteur au login (`start_mfa_challenge`, `verify_mfa_challenge`) ; starter `mfa-challenge` |
-| [Codes de récupération](welcome-mfa/intermediaire/mfa-recovery.md) | MFA intermédiaire (opt-in, session) | Aucun | Progression **welcome-mfa**, niveau intermédiaire palier 3 — codes de secours à usage unique (`create_recovery_codes`, `consume_recovery_code`) ; starter `mfa-recovery` |
-| [Revalidation (step-up)](welcome-mfa/avance/mfa-revalidation.md) | MFA avancé (opt-in, session) | Aucun | Progression **welcome-mfa**, niveau avancé palier 1 — exiger une MFA récente (`mark_mfa_revalidated`, `require_recent_mfa`) ; starter `mfa-revalidation` |
-| [Anti-rejeu TOTP](welcome-mfa/avance/mfa-replay.md) | MFA avancé (opt-in, sans BDD) | Aucun | Progression **welcome-mfa**, niveau avancé palier 2 — empêcher le rejeu d'un code (`record_used`, `is_replay`) ; starter `mfa-replay` |
-| [Secret chiffré au repos](welcome-mfa/avance/mfa-crypto.md) | MFA avancé (opt-in, sans BDD) | Aucun | Progression **welcome-mfa**, niveau avancé palier 3 — chiffrer les secrets Fernet (`encrypt_totp_secret`, `decrypt_totp_secret`) ; starter `mfa-crypto` |
-| [Bonjour Forge RBAC](welcome-rbac/debutant/rbac-welcome.md) | RBAC débutant (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau débutant palier 1 — charger et inspecter le contrat déclaratif (`load_rbac_contract`) ; starter `rbac-welcome` |
-| [Code de permission](welcome-rbac/debutant/rbac-permission.md) | RBAC débutant (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau débutant palier 2 — normaliser/valider un code (`normalize_permission_code`, `validate_permission`) ; starter `rbac-permission` |
-| [Rôle et slug](welcome-rbac/debutant/rbac-role.md) | RBAC débutant (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau débutant palier 3 — dériver/valider un rôle (`normalize_role_slug`, `validate_role`) ; starter `rbac-role` |
-| [Vérifier une permission](welcome-rbac/intermediaire/rbac-check.md) | RBAC intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau intermédiaire palier 1 — rôles → permission accordée ? (`has_contract_permission`) ; starter `rbac-check` |
-| [Protéger une route](welcome-rbac/intermediaire/rbac-guard.md) | RBAC intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau intermédiaire palier 2 — garde de route 403/passage (`require_contract_permission`) ; starter `rbac-guard` |
-| [Permission dans un template](welcome-rbac/intermediaire/rbac-template.md) | RBAC intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau intermédiaire palier 3 — adapter l'UI avec `can()` (`make_can`) ; starter `rbac-template` |
-| [Associer un rôle à un utilisateur](welcome-rbac/avance/rbac-user-role.md) | RBAC avancé (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau avancé palier 1 — association user ↔ rôle (`create_auth_user_role`) ; starter `rbac-user-role` |
-| [Résoudre les permissions](welcome-rbac/avance/rbac-resolve.md) | RBAC avancé (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau avancé palier 2 — permissions effectives via `fetch_all` (`get_user_permissions`, `user_has_permission`) ; starter `rbac-resolve` |
-| [Rôles de la requête](welcome-rbac/avance/rbac-request-roles.md) | RBAC avancé (opt-in, sans BDD) | Aucun | Progression **welcome-rbac**, niveau avancé palier 3 — vue runtime du RBAC (`get_request_roles`, `get_request_permissions`) ; starter `rbac-request-roles` |
-| [Bonjour Forge Workflow](welcome-workflow/debutant/workflow-welcome.md) | Workflow débutant (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau débutant palier 1 — définir/valider un jeu de statuts (`make_status`, `validate_statuses`) ; starter `workflow-welcome` |
-| [Nom de statut](welcome-workflow/debutant/workflow-status.md) | Workflow débutant (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau débutant palier 2 — normaliser/valider un nom (`normalize_status_name`, `validate_status_name`) ; starter `workflow-status` |
-| [Retrouver un statut](welcome-workflow/debutant/workflow-find.md) | Workflow débutant (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau débutant palier 3 — localiser un statut par son nom (`find_status`) ; starter `workflow-find` |
-| [Déclarer les transitions](welcome-workflow/intermediaire/workflow-transition.md) | Workflow intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau intermédiaire palier 1 — définir les passages autorisés (`make_transition`, `validate_transitions`) ; starter `workflow-transition` |
-| [Vérifier une transition](welcome-workflow/intermediaire/workflow-check.md) | Workflow intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau intermédiaire palier 2 — tester un passage (`can_transition`) ; starter `workflow-check` |
-| [Transitions disponibles](welcome-workflow/intermediaire/workflow-available.md) | Workflow intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau intermédiaire palier 3 — lister les actions d'un statut (`get_available_transitions`) ; starter `workflow-available` |
-| [Badge de statut](welcome-workflow/avance/workflow-badge.md) | Workflow avancé (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau avancé palier 1 — badge HTML sûr (`workflow_status_badge`) ; starter `workflow-badge` |
-| [Couleur, libellé, classe](welcome-workflow/avance/workflow-color.md) | Workflow avancé (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau avancé palier 2 — pièces d'un badge (`workflow_status_color`, `workflow_status_label`, `workflow_status_badge_class`) ; starter `workflow-color` |
-| [Helpers Workflow dans Jinja](welcome-workflow/avance/workflow-jinja.md) | Workflow avancé (opt-in, sans BDD) | Aucun | Progression **welcome-workflow**, niveau avancé palier 3 — injecter les helpers (`make_workflow_jinja_helpers`) ; starter `workflow-jinja` |
-| [Bonjour Forge Stats](welcome-stats/debutant/stats-welcome.md) | Stats débutant (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau débutant palier 1 — créer un événement, inspecter table/colonnes (`make_event`, `STATS_EVENTS_TABLE`) ; starter `stats-welcome` |
-| [Nom d'événement](welcome-stats/debutant/stats-event.md) | Stats débutant (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau débutant palier 2 — normaliser/valider un nom (`normalize_event_name`, `validate_event_name`) ; starter `stats-event` |
-| [Le schéma SQL](welcome-stats/debutant/stats-schema.md) | Stats débutant (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau débutant palier 3 — lire le `CREATE TABLE` (`get_stats_events_schema_sql`) ; starter `stats-schema` |
-| [Le SQL d'insertion](welcome-stats/intermediaire/stats-track-sql.md) | Stats intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau intermédiaire palier 1 — voir l'`INSERT` et ses valeurs (`get_track_event_sql`, `prepare_track_event_values`) ; starter `stats-track-sql` |
-| [Enregistrer un événement](welcome-stats/intermediaire/stats-track.md) | Stats intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau intermédiaire palier 2 — tracker via un exécuteur injecté (`track_event`) ; starter `stats-track` |
-| [Valider un événement](welcome-stats/intermediaire/stats-validate.md) | Stats intermédiaire (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau intermédiaire palier 3 — refuser avant d'écrire (`validate_event`, `StatsEventError`) ; starter `stats-validate` |
-| [Le SQL de consultation](welcome-stats/avance/stats-admin-sql.md) | Stats avancé (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau avancé palier 1 — voir le `SELECT` filtrable (`get_stats_events_admin_sql`) ; starter `stats-admin-sql` |
-| [Lister les événements](welcome-stats/avance/stats-list.md) | Stats avancé (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau avancé palier 2 — lire via `fetch_all` injecté (`list_stats_events`) ; starter `stats-list` |
-| [Normaliser une ligne](welcome-stats/avance/stats-normalize.md) | Stats avancé (opt-in, sans BDD) | Aucun | Progression **welcome-stats**, niveau avancé palier 3 — ligne brute → dict propre (`normalize_stats_event_row`) ; starter `stats-normalize` |
+La progression cœur `welcome-forge` enseigne les fondamentaux ; chaque opt-in a
+sa propre progression `welcome-<module>` (débutant → avancé). La liste exhaustive
+est aussi disponible via `forge starter:list`.
+
+### Bonjour Forge — progression cœur (`welcome-forge`)
+
+*Débutant — 11 paliers* — [Bonjour Forge](welcome-forge/debutant/welcome.md) · [Paramètres d'URL](welcome-forge/debutant/query-params.md) · [Première vue HTML](welcome-forge/debutant/first-html-view.md) · [Route dynamique](welcome-forge/debutant/dynamic-route.md) · [Inspecter une requête](welcome-forge/debutant/request-debug.md) · [Réponse JSON](welcome-forge/debutant/json-response.md) · [Le jeton CSRF](welcome-forge/debutant/csrf.md) · [Premier formulaire POST](welcome-forge/debutant/form-post.md) · [Validation serveur](welcome-forge/debutant/server-validation.md) · [Première base SQL](welcome-forge/debutant/first-sql.md) · [Écrire en base](welcome-forge/debutant/first-sql-write.md)
+
+*Intermédiaire* — [Lister des enregistrements](welcome-forge/intermediaire/list-records.md) · [Rechercher / filtrer](welcome-forge/intermediaire/filter-list.md) · [Paginer une liste](welcome-forge/intermediaire/pagination.md) · [Héritage de gabarit](welcome-forge/intermediaire/layout-template.md) · [Modifier un enregistrement](welcome-forge/intermediaire/update-record.md) · [Supprimer un enregistrement](welcome-forge/intermediaire/delete-record.md) · [Mémoriser un état en session](welcome-forge/intermediaire/session-state.md) · [Messages flash](welcome-forge/intermediaire/flash-messages.md)
+
+*Avancé* — [Relations entre tables](welcome-forge/avance/relations.md) · [Téléverser un fichier](welcome-forge/avance/file-upload.md) · [Envoyer un email](welcome-forge/avance/send-email.md) · [API JSON protégée](welcome-forge/avance/json-api.md) · [Écritures transactionnelles](welcome-forge/avance/db-transaction.md)
+
+### IoT (opt-in `forge-mvc-iot`)
+
+[Bonjour Forge IoT](welcome-iot/debutant/iot-welcome.md) · [Lire les événements IoT](welcome-iot/debutant/iot-events.md) · [Les événements d'un capteur](welcome-iot/debutant/iot-device.md) · [Simuler une mesure IoT](welcome-iot/intermediaire/iot-simulate.md) · [Exposer l'API IoT](welcome-iot/intermediaire/iot-api.md) · [Tableau de bord IoT](welcome-iot/intermediaire/iot-dashboard.md) · [Valider un message IoT](welcome-iot/avance/iot-contract.md) · [Le subscriber MQTT](welcome-iot/avance/iot-subscriber.md) · [Diagnostiquer le module IoT](welcome-iot/avance/iot-doctor.md)
+
+### Vidéo (opt-in `forge-mvc-video`)
+
+[Bonjour Forge Vidéo](welcome-video/debutant/video-welcome.md) · [Lister les vidéos](welcome-video/debutant/video-list.md) · [Le détail d'une vidéo](welcome-video/debutant/video-detail.md) · [Téléverser une vidéo](welcome-video/intermediaire/video-upload.md) · [Lire une vidéo](welcome-video/intermediaire/video-playback.md) · [Suivre l'état d'une vidéo](welcome-video/intermediaire/video-status.md) · [Sonder une vidéo](welcome-video/avance/video-probe.md) · [Transcoder une vidéo](welcome-video/avance/video-transcode.md) · [Diagnostiquer le module Vidéo](welcome-video/avance/video-doctor.md)
+
+### Images (opt-in `forge-mvc-images`)
+
+[Bonjour Forge Images](welcome-images/debutant/images-welcome.md) · [Téléverser une image](welcome-images/debutant/image-upload.md) · [Miniatures et variantes](welcome-images/debutant/image-variants.md) · [Rattacher une image à une entité](welcome-images/intermediaire/image-attach.md) · [Afficher la galerie](welcome-images/intermediaire/image-gallery.md) · [Texte alternatif et ordre](welcome-images/intermediaire/image-alt-order.md) · [Image de couverture](welcome-images/avance/image-cover.md) · [Supprimer proprement](welcome-images/avance/image-delete.md) · [Garde de sécurité à l'upload](welcome-images/avance/image-safety.md)
+
+### Fichiers (opt-in `forge-mvc-files`)
+
+[Bonjour Forge Files](welcome-files/debutant/files-welcome.md) · [Stocker un document](welcome-files/debutant/file-store.md) · [Servir un fichier](welcome-files/debutant/file-serve.md) · [Valider un upload](welcome-files/intermediaire/file-validate.md) · [Limiter les uploads](welcome-files/intermediaire/file-rate-limit.md) · [Supprimer un fichier](welcome-files/intermediaire/file-delete.md) · [Assainir un nom de fichier](welcome-files/avance/file-safe-name.md) · [Chemin anti-traversal](welcome-files/avance/file-safe-path.md) · [Écrire des octets générés](welcome-files/avance/file-bytes.md)
+
+### Audio (opt-in `forge-mvc-audio`)
+
+[Bonjour Forge Audio](welcome-audio/debutant/audio-welcome.md) · [Téléverser un audio](welcome-audio/debutant/audio-upload.md) · [Lire un audio](welcome-audio/debutant/audio-play.md) · [Sonder un audio](welcome-audio/avance/audio-probe.md) · [Transcoder en MP3](welcome-audio/avance/audio-transcode.md) · [Diagnostiquer le module Audio](welcome-audio/avance/audio-doctor.md)
+
+### MFA (opt-in `forge-mvc-mfa`)
+
+[Bonjour Forge MFA](welcome-mfa/debutant/mfa-welcome.md) · [Secret TOTP et QR](welcome-mfa/debutant/mfa-secret.md) · [Vérifier un code TOTP](welcome-mfa/debutant/mfa-verify.md) · [Enrôler un facteur TOTP](welcome-mfa/intermediaire/mfa-enroll.md) · [Challenge de connexion](welcome-mfa/intermediaire/mfa-challenge.md) · [Codes de récupération](welcome-mfa/intermediaire/mfa-recovery.md) · [Revalidation (step-up)](welcome-mfa/avance/mfa-revalidation.md) · [Anti-rejeu TOTP](welcome-mfa/avance/mfa-replay.md) · [Secret chiffré au repos](welcome-mfa/avance/mfa-crypto.md)
+
+### RBAC (opt-in `forge-mvc-rbac`)
+
+[Bonjour Forge RBAC](welcome-rbac/debutant/rbac-welcome.md) · [Code de permission](welcome-rbac/debutant/rbac-permission.md) · [Rôle et slug](welcome-rbac/debutant/rbac-role.md) · [Vérifier une permission](welcome-rbac/intermediaire/rbac-check.md) · [Protéger une route](welcome-rbac/intermediaire/rbac-guard.md) · [Permission dans un template](welcome-rbac/intermediaire/rbac-template.md) · [Associer un rôle à un utilisateur](welcome-rbac/avance/rbac-user-role.md) · [Résoudre les permissions](welcome-rbac/avance/rbac-resolve.md) · [Rôles de la requête](welcome-rbac/avance/rbac-request-roles.md)
+
+### Workflow (opt-in `forge-mvc-workflow`)
+
+[Bonjour Forge Workflow](welcome-workflow/debutant/workflow-welcome.md) · [Nom de statut](welcome-workflow/debutant/workflow-status.md) · [Retrouver un statut](welcome-workflow/debutant/workflow-find.md) · [Déclarer les transitions](welcome-workflow/intermediaire/workflow-transition.md) · [Vérifier une transition](welcome-workflow/intermediaire/workflow-check.md) · [Transitions disponibles](welcome-workflow/intermediaire/workflow-available.md) · [Badge de statut](welcome-workflow/avance/workflow-badge.md) · [Couleur, libellé, classe](welcome-workflow/avance/workflow-color.md) · [Helpers Workflow dans Jinja](welcome-workflow/avance/workflow-jinja.md)
+
+### Stats (opt-in `forge-mvc-stats`)
+
+[Bonjour Forge Stats](welcome-stats/debutant/stats-welcome.md) · [Nom d'événement](welcome-stats/debutant/stats-event.md) · [Le schéma SQL](welcome-stats/debutant/stats-schema.md) · [Le SQL d'insertion](welcome-stats/intermediaire/stats-track-sql.md) · [Enregistrer un événement](welcome-stats/intermediaire/stats-track.md) · [Valider un événement](welcome-stats/intermediaire/stats-validate.md) · [Le SQL de consultation](welcome-stats/avance/stats-admin-sql.md) · [Lister les événements](welcome-stats/avance/stats-list.md) · [Normaliser une ligne](welcome-stats/avance/stats-normalize.md)
 
 ## Progression recommandée
 
@@ -156,81 +106,23 @@ des starters disponibles aujourd'hui, mais l'ordre d'apprentissage
 recommandé est celui des 11 paliers ci-dessus, suivi des progressions
 opt-in de votre choix.
 
-## Starter d'entrée (sans base de données)
-
-### Bonjour Forge — premier pas
-
-Le starter d'entrée minimal de Forge. Aucune base de données, aucune
-vue HTML, aucun moteur Jinja2. Deux routes texte qui montrent le
-chemin le plus court entre une requête et une réponse.
-
-Ce starter est référencé en interne comme `Bienvenue dans Forge` (alias
-historique conservé).
-
-Profil recommandé : aucun — fonctionne sans `forge db:init`.
-
-- `GET /welcome` → `Response.text("Bonjour Forge")` ;
-- `GET /welcome/greet?name=Roger` → `Response.text("Bonjour Roger")` ;
-- introduction à `request.param(key, default=...)` ;
-- déclaration des routes dans `mvc/routes.py`.
-
-**Usage :**
-
-```bash
-forge new mon-projet --starter welcome
-# alias acceptés : bonjour, bonjour-forge, bienvenue, 7
-# ou dans un projet existant :
-forge starter:build 7
-```
-
-[Présentation](welcome-forge/debutant/welcome.md)
-
 ## Différence entre profil et starter
 
-Un **profil** définit la base technique d'un projet créé avec `forge new`. Il détermine les composants inclus dans l'environnement de départ.
-
-```bash
-forge new MonProjet --profile standard
-```
-
-Un **starter** fournit un exemple applicatif générable après la création du projet.
-
-```bash
-forge starter:build 5
-```
-
-Les profils et les starters sont indépendants :
-
-- un profil ne remplace pas un starter ;
-- un starter ne modifie pas le profil du projet ;
-- un starter peut illustrer un ou plusieurs profils.
+Un **profil** définit la base technique d'un projet créé avec `forge new`
+(`forge new MonProjet --profile standard`). Un **starter** fournit un exemple
+applicatif générable *après* la création du projet. Ils sont indépendants : un
+profil ne remplace pas un starter, un starter ne modifie pas le profil, et un
+starter peut illustrer un ou plusieurs profils.
 
 Pour choisir un profil : [Profils de projet](../features/profiles.md).
 
-## Génération automatique
+## Utiliser un starter
 
 ```bash
-forge new mon-projet --starter welcome       # Bienvenue (sans BDD) — via forge new
-forge starter:build welcome  # Bonjour Forge (sans BDD)
+forge starter:list                 # catalogue complet depuis la CLI
+forge starter:build <identifiant>  # ex. : forge starter:build welcome
 ```
 
-Pour le starter pédagogique `query-params` (palier 2 de la progression),
-voir la page dédiée [Paramètres d'URL](welcome-forge/debutant/query-params.md) — il
-s'applique par son identifiant public, pas par un numéro.
-
-Les alias publics (`query-params`, etc.) et leurs variantes sont également supportés.
-
-`forge starter:list` affiche la liste complète depuis la CLI.
-
-## Démarrer un starter
-
-```bash
-forge new MonProjet
-cd MonProjet
-source .venv/bin/activate
-forge doctor
-forge db:init
-forge starter:build 1        # remplacer 1 par le numéro souhaité
-```
-
-Chaque page de starter liste les commandes exactes, le modèle de données et les étapes de reconstruction.
+Un starter se génère par son **identifiant public** (`welcome`, `query-params`,
+`iot-welcome`…), pas par un numéro. Chaque page de starter liste les commandes
+exactes, le modèle de données et les étapes de reconstruction.
