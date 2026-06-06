@@ -111,12 +111,10 @@ doivent être importées depuis `forge_mvc_mfa.mfa`.
 
 ## SQL
 
-Les tables nécessaires se trouvent dans `sql/` :
-
-- `sql/auth_mfa_factors.sql` — facteurs TOTP
-- `sql/auth_mfa_recovery_codes.sql` — codes de récupération
-
-Appliquer via `db:apply` ou directement sur la base.
+Les tables MFA (`auth_mfa_factors`, `auth_mfa_recovery_codes`) sont générées
+dans votre projet par la commande du core `forge auth:init`, puis appliquées
+avec `forge db:apply`. Les fichiers `sql/` du dépôt source en sont la référence
+(ils ne sont pas livrés dans le wheel : la DDL est embarquée par `auth:init`).
 
 ## Compatibilité
 

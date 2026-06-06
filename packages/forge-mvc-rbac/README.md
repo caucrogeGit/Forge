@@ -59,12 +59,14 @@ Template :
 
 ## SQL
 
-Deux fichiers dans `packages/forge-mvc-rbac/sql/` :
+- La table pivot `user_roles` (liaison `users` ↔ `roles`) est générée dans votre
+  projet par la commande du core `forge auth:init`, puis appliquée avec
+  `forge db:apply`.
+- Les tables `roles`, `permissions`, `role_permissions` : voir la DDL dans la
+  documentation des fonctionnalités RBAC (`docs/features/rbac.md`).
 
-- `rbac.sql` : tables `roles`, `permissions`, `role_permissions`
-- `user_roles.sql` : table pivot `user_roles` (liaison `users` ↔ `roles`)
-
-Initialisés via `forge auth:init`.
+Les fichiers `sql/` du dépôt source (`rbac.sql`, `user_roles.sql`) en sont la
+référence ; ils ne sont pas livrés dans le wheel.
 
 ## Limites
 
