@@ -58,7 +58,15 @@ def transcoded_relpath(uuid: str) -> str:
 def store_original(
     data: bytes, uuid: str, ext: str, *, storage_root: str
 ) -> str:
-    """Écrit la source à un emplacement uuid-based ; retourne le chemin relatif."""
+    """Écrit la source à un emplacement uuid-based ; retourne le chemin relatif.
+
+    L'``uuid`` est validé avant toute construction de chemin : il apparaît dans
+    l'arborescence (``originals/<uuid>/``), donc un uuid non canonique fourni par
+    l'appelant serait un vecteur de traversal à l'écriture. La symétrie avec
+    ``resolve_playable_relpath`` (qui valide en lecture) est ainsi garantie.
+    """
+    if not is_valid_uuid(uuid):
+        raise ValueError(f"uuid audio invalide (anti-traversal) : {uuid!r}")
     rel = original_relpath(uuid, ext)
     target = Path(storage_root) / rel
     target.parent.mkdir(parents=True, exist_ok=True)
