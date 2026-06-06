@@ -8,6 +8,7 @@ Le backend par défaut reste MemorySessionStore.
 from __future__ import annotations
 
 import json
+import os
 import re
 import secrets
 import threading
@@ -56,7 +57,13 @@ class FileSessionStore:
         return raw if isinstance(raw, dict) else None
 
     def _save(self, session_id: str, data: dict) -> None:
-        self._path(session_id).write_text(json.dumps(data), encoding="utf-8")
+        # Écriture atomique : on écrit un fichier temporaire dans le même dossier
+        # puis on le renomme (os.replace est atomique). Un crash en cours
+        # d'écriture ne corrompt donc jamais le fichier de session existant.
+        target = self._path(session_id)
+        tmp = target.with_name(f"{target.name}.{secrets.token_hex(4)}.tmp")
+        tmp.write_text(json.dumps(data), encoding="utf-8")
+        os.replace(tmp, target)
 
     # ── public API ──────────────────────────────────────────────────────────
 
