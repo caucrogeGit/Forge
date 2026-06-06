@@ -1,0 +1,6 @@
+# forge-starter:stats-track-sql:start
+from mvc.controllers.stats_track_sql_controller import StatsTrackSqlController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/stats-track-sql", StatsTrackSqlController.index, name="stats_track_sql_index")
+# forge-starter:stats-track-sql:end

@@ -1,0 +1,24 @@
+{
+  "id": "stats-track",
+  "number": 104,
+  "name": "Enregistrer un événement",
+  "kind": "skeleton",
+  "aliases": [
+    "stats-track",
+    "stats_track",
+    "104"
+  ],
+  "description": "Enregistrer un événement : palier 2 du niveau intermédiaire de la progression welcome-stats. track_event enregistre un événement via un exécuteur injectable (execute). La démo injecte un exécuteur factice ; en production on passe core.database.db.execute. Aucune base de données réelle requise.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/stats-track",
+  "routes_marker": "stats-track",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/stats-track",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-stats/intermediaire/stats-track/",
+  "check_paths": [
+    "mvc/controllers/stats_track_controller.py",
+    "mvc/views/stats_track/index.html"
+  ]
+}

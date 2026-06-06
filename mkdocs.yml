@@ -282,6 +282,24 @@ nav:
               - Helpers Workflow dans Jinja: starters/welcome-workflow/avance/workflow-jinja.md
               - Bilan avancé: starters/welcome-workflow/avance/bilan.md
           - Aide-mémoire: starters/welcome-workflow/recapitulatif.md
+      - Progression Stats (welcome-stats):
+          - Installation: starters/welcome-stats/installation.md
+          - Débutant:
+              - Bonjour Forge Stats: starters/welcome-stats/debutant/stats-welcome.md
+              - Nom d'événement: starters/welcome-stats/debutant/stats-event.md
+              - Le schéma SQL: starters/welcome-stats/debutant/stats-schema.md
+              - Bilan débutant: starters/welcome-stats/debutant/bilan.md
+          - Intermédiaire:
+              - Le SQL d'insertion: starters/welcome-stats/intermediaire/stats-track-sql.md
+              - Enregistrer un événement: starters/welcome-stats/intermediaire/stats-track.md
+              - Valider un événement: starters/welcome-stats/intermediaire/stats-validate.md
+              - Bilan intermédiaire: starters/welcome-stats/intermediaire/bilan.md
+          - Avancé:
+              - Le SQL de consultation: starters/welcome-stats/avance/stats-admin-sql.md
+              - Lister les événements: starters/welcome-stats/avance/stats-list.md
+              - Normaliser une ligne: starters/welcome-stats/avance/stats-normalize.md
+              - Bilan avancé: starters/welcome-stats/avance/bilan.md
+          - Aide-mémoire: starters/welcome-stats/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md

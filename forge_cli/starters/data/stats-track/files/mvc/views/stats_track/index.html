@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Enregistrer un événement — Forge</title>
+</head>
+<body>
+  <h1>Enregistrer un événement</h1>
+
+  <p data-level="success">Événement enregistré (via un exécuteur de démonstration).</p>
+
+  <p>Requête exécutée :</p>
+  <pre><code>{{ executed.sql }}</code></pre>
+  <p>Paramètres :</p>
+  <ul>
+    {% for param in executed.params %}<li><code>{{ param }}</code></li>{% endfor %}
+  </ul>
+
+  <p>En production, on passe <code>core.database.db.execute</code> à
+  <code>track_event</code> ; l'exécuteur injectable rend le code testable sans base.</p>
+</body>
+</html>

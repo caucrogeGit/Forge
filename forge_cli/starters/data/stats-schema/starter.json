@@ -1,0 +1,24 @@
+{
+  "id": "stats-schema",
+  "number": 102,
+  "name": "Le schéma SQL",
+  "kind": "skeleton",
+  "aliases": [
+    "stats-schema",
+    "stats_schema",
+    "102"
+  ],
+  "description": "Le schéma SQL : palier 3 du niveau débutant de la progression welcome-stats. get_stats_events_schema_sql expose le CREATE TABLE de forge_stats_events : le SQL reste visible (charte principe 5), aucun ORM. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/stats-schema",
+  "routes_marker": "stats-schema",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/stats-schema",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-stats/debutant/stats-schema/",
+  "check_paths": [
+    "mvc/controllers/stats_schema_controller.py",
+    "mvc/views/stats_schema/index.html"
+  ]
+}

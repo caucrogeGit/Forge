@@ -1,0 +1,24 @@
+{
+  "id": "stats-track-sql",
+  "number": 103,
+  "name": "Le SQL d'insertion",
+  "kind": "skeleton",
+  "aliases": [
+    "stats-track-sql",
+    "stats_track_sql",
+    "103"
+  ],
+  "description": "Le SQL d'insertion : palier 1 du niveau intermédiaire de la progression welcome-stats. get_track_event_sql expose l'INSERT, prepare_track_event_values fournit le tuple de paramètres d'un événement — le SQL reste visible, sans l'exécuter. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/stats-track-sql",
+  "routes_marker": "stats-track-sql",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/stats-track-sql",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-stats/intermediaire/stats-track-sql/",
+  "check_paths": [
+    "mvc/controllers/stats_track_sql_controller.py",
+    "mvc/views/stats_track_sql/index.html"
+  ]
+}

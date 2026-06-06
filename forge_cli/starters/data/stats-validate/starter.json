@@ -1,0 +1,24 @@
+{
+  "id": "stats-validate",
+  "number": 105,
+  "name": "Valider un événement",
+  "kind": "skeleton",
+  "aliases": [
+    "stats-validate",
+    "stats_validate",
+    "105"
+  ],
+  "description": "Valider un événement : palier 3 du niveau intermédiaire de la progression welcome-stats. make_event valide à la construction et validate_event vérifie un événement existant ; un nom invalide lève StatsEventError. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/stats-validate",
+  "routes_marker": "stats-validate",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/stats-validate",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-stats/intermediaire/stats-validate/",
+  "check_paths": [
+    "mvc/controllers/stats_validate_controller.py",
+    "mvc/views/stats_validate/index.html"
+  ]
+}

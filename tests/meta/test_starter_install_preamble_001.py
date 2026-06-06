@@ -65,6 +65,10 @@ PARCOURS = {
         "debutant/workflow-welcome.md",
         ["pip install --pre forge-mvc-workflow", "forge starter:build workflow-welcome", "forge run"],
     ),
+    "welcome-stats": (
+        "debutant/stats-welcome.md",
+        ["pip install --pre forge-mvc-stats", "forge starter:build stats-welcome", "forge run"],
+    ),
 }
 
 

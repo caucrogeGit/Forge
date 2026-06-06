@@ -1,0 +1,7 @@
+# forge-starter:stats-welcome:start
+from mvc.controllers.stats_welcome_controller import StatsWelcomeController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/stats-welcome", StatsWelcomeController.index, name="stats_welcome_index")
+    pub.add("GET", "/stats-welcome/inspect", StatsWelcomeController.inspect, name="stats_welcome_inspect")
+# forge-starter:stats-welcome:end

@@ -1,0 +1,24 @@
+{
+  "id": "stats-normalize",
+  "number": 108,
+  "name": "Normaliser une ligne",
+  "kind": "skeleton",
+  "aliases": [
+    "stats-normalize",
+    "stats_normalize",
+    "108"
+  ],
+  "description": "Normaliser une ligne : palier 3 du niveau avancé de la progression welcome-stats. normalize_stats_event_row transforme une ligne brute de la base (metadata en chaîne JSON) en dict propre prêt à afficher (metadata désérialisée). Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/stats-normalize",
+  "routes_marker": "stats-normalize",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/stats-normalize",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-stats/avance/stats-normalize/",
+  "check_paths": [
+    "mvc/controllers/stats_normalize_controller.py",
+    "mvc/views/stats_normalize/index.html"
+  ]
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Le SQL de consultation — Forge</title>
+</head>
+<body>
+  <h1>Le SQL de consultation</h1>
+
+  <form method="get" action="/stats-admin-sql">
+    <label>Catégorie (optionnel) <input type="text" name="category"></label>
+    <button type="submit">Construire le SELECT</button>
+  </form>
+
+  <p>Catégorie filtrée : <code>{{ category }}</code></p>
+
+  <p>Requête <code>SELECT</code> (SQL visible) :</p>
+  <pre><code>{{ sql }}</code></pre>
+  <p>Paramètres :</p>
+  <ul>{% for param in params %}<li><code>{{ param }}</code></li>{% endfor %}</ul>
+
+  <p>Le SQL s'adapte aux filtres fournis, toujours en requête paramétrée.</p>
+</body>
+</html>

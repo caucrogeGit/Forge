@@ -1,0 +1,23 @@
+{
+  "id": "stats-list",
+  "number": 107,
+  "name": "Lister les événements",
+  "kind": "skeleton",
+  "aliases": [
+    "stats-list",
+    "stats_list",
+    "107"
+  ],
+  "description": "Lister les événements : palier 2 du niveau avancé de la progression welcome-stats. list_stats_events lit les événements via un fetch_all injectable et renvoie des dicts normalisés (métadonnées désérialisées). La démo injecte un fetch_all factice. Aucune base de données réelle requise.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/stats-list",
+  "routes_marker": "stats-list",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/stats-list",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-stats/avance/stats-list/",
+  "check_paths": [
+    "mvc/controllers/stats_list_controller.py"
+  ]
+}

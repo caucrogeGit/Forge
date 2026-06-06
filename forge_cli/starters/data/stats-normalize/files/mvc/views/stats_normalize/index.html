@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Normaliser une ligne — Forge</title>
+</head>
+<body>
+  <h1>Normaliser une ligne</h1>
+
+  <p>Événement : <code>{{ name }}</code></p>
+
+  <ul>
+    <li>Métadonnées brutes (chaîne JSON, telles qu'en base) : <code>{{ raw_metadata }}</code></li>
+    <li>Métadonnées normalisées (dict, prêtes à afficher) : <code>{{ normalized_metadata }}</code></li>
+  </ul>
+
+  <p>La normalisation désérialise le JSON et valide la ligne : un JSON invalide ou une
+  colonne manquante est refusé (<code>StatsAdminError</code>).</p>
+</body>
+</html>
