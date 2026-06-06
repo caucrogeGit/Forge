@@ -24,7 +24,8 @@ BROKEN_URLS = [
 # subsiste côté starters ; les autres sont accessibles via la documentation).
 FIXED_URLS = [
     "starters/welcome-forge/",
-    "roadmap/forge-roadmap/",
+    # « roadmap/forge-roadmap/ » retiré : les cartes d'état porteuses du lien
+    # roadmap ont été supprimées de la landing.
 ]
 
 
@@ -90,15 +91,4 @@ class TestStarterLinksCount:
         assert len(unique_starters) >= 1, (
             f"Au moins un lien starter devrait être présent, "
             f"trouvé {len(unique_starters)} : {unique_starters}"
-        )
-
-
-class TestRoadmapLinkUpdated:
-    """Le lien roadmap pointe vers le slug correct."""
-
-    def test_roadmap_points_to_forge_roadmap(self):
-        content = LANDING_SOURCE.read_text(encoding="utf-8")
-        assert "roadmap/forge-roadmap/" in content, (
-            "Le lien roadmap devrait pointer vers 'roadmap/forge-roadmap/' "
-            "(la section Roadmap n'a pas d'index.md)"
         )

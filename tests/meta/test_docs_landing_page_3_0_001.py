@@ -35,7 +35,10 @@ class TestVersionBumped:
         self.generated = LANDING_GENERATED.read_text(encoding="utf-8")
         _v = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
         _sv = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _v)
-        self.version_strings = [f"v{_sv}", f"Forge {_sv}", "Python 3.12+"]
+        # « Forge {version} » retiré : portait uniquement par les cartes d'état
+        # « Forge 1.0.0-beta.13 » / « Stabilisation bêta », supprimées de la landing.
+        # La version reste exposée via « v{version} » dans le hero.
+        self.version_strings = [f"v{_sv}", "Python 3.12+"]
 
     def test_version_mentioned_in_source(self):
         for vs in self.version_strings:
@@ -125,7 +128,7 @@ class TestNewElementsPresent:
     # plus de section dédiée listant Python/MariaDB/Jinja2/HTMX/Alpine.js/
     # Tailwind avec leurs URLs documentaires. Le strip Hero garde
     # Python 3.12+ et MariaDB ; le reste est dans la grille
-    # « Construire des applications MVC sans perdre la main ».
+    # « Le core Forge fournit les briques génériques ».
 
     def test_charter_link_exists(self):
         assert "CHARTE_DOC.md" in self.source, (
@@ -214,41 +217,14 @@ class TestStateSectionRefonte:
         _v = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
         self._semver = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _v)
 
-    def test_state_mentions_current_version(self):
-        assert f"Forge {self._semver}" in self.source, (
-            f"La landing devrait mentionner Forge {self._semver}"
-        )
-
-    def test_state_mentions_source_ouverture(self):
-        assert "ouverture du code source" in self.source, (
-            "La landing devrait mentionner l'ouverture du code source "
-            "(cf. LANDING-LICENSE-WORDING-001)"
-        )
-
-    def test_state_mentions_modules_count(self):
-        # Neuf opt-ins officiels : mfa, rbac, workflow, stats, files, images,
-        # iot, video, audio (forge-mvc-media retiré, STARTERS-DROP-OBSOLETE-001).
-        assert "9 modules officiels" in self.source, (
-            "La landing devrait mentionner les 9 modules officiels opt-in"
-        )
-
     def test_state_no_obsolete_phases(self):
         assert "Phases 0 à 10" not in self.source, (
             "L'ancien texte 'Phases 0 à 10' ne devrait plus apparaître"
         )
 
-    def test_trajectoire_section(self):
-        # Label "Trajectoire 1.0" retiré lors de la refonte visuelle de la landing
-        # (cards de positionnement simplifiées). La trajectoire reste exposée via la
-        # carte "Stabilisation bêta" et son lien roadmap.
-        assert "roadmap" in self.source.lower(), (
-            "La landing devrait surfacer la roadmap (trajectoire 1.0)"
-        )
-
-    def test_trajectoire_mentions_stabilization(self):
-        assert "Stabilisation" in self.source, (
-            "La landing devrait parler de Stabilisation (roadmap)"
-        )
+    def test_no_auth_user_avancee(self):
+        # Les cartes d'état « Forge 1.0.0-beta.13 » et « Stabilisation bêta »
+        # ont été retirées de la landing ; seule la garde d'absence subsiste.
         assert "Auth/User avancée" not in self.source, (
             "La landing ne devrait plus dire 'Auth/User avancée' "
             "(MFA et RBAC sont déjà des modules)"

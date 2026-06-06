@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forge — Framework web applicatif Python</title>
+  <title>Forge : framework web applicatif Python</title>
   <link rel="stylesheet" href="./static/tailwind.css">
 </head>
 <body class="landing-code-font bg-white text-slate-900 antialiased">
@@ -105,50 +105,55 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-beta.13 : Forge IoT & Forge Video -->
+<!-- Nouveautés 1.0.0-beta.13 : opt-ins média/données + features transverses -->
 <section id="beta13" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
       <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-beta.13</div>
-      <h2 class="text-4xl font-bold tracking-tight mb-0">
-        Forge IoT et Forge Video.
-      </h2>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-5">
-      <!-- Bloc Forge IoT -->
-      <div class="landing-panel rounded-xl p-8 border border-white/10">
-        <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-2">Forge IoT</h3>
-        <p class="text-white/60 text-sm leading-relaxed mb-5">
-          Module opt-in pour recevoir, stocker et exposer des données de
-          capteurs : un subscriber MQTT alimente la table
-          <code class="text-xs text-[#E8651A]">iot_events</code>, relue via une API HTTP JSON.<br>
-          Le core reste autonome.
-        </p>
-        <ul class="text-white/60 text-sm leading-relaxed space-y-3 mb-6">
-          <li><span class="block landing-accent-text"># Diagnostic du module IoT</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:doctor</code></li>
-          <li><span class="block landing-accent-text"># Copie la migration de la table iot_events</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:init</code></li>
-          <li><span class="block landing-accent-text"># Subscriber MQTT résilient</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:listen</code></li>
-          <li><span class="block landing-accent-text"># Capteurs simulés pour tester sans matériel</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge iot:simulate</code></li>
-        </ul>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge IoT</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Opt-in pour recevoir, stocker et exposer des données de capteurs : un subscriber MQTT alimente une table d'événements, relue via une API HTTP JSON. Le cœur reste autonome.</p>
       </div>
 
-      <!-- Bloc Forge Video -->
-      <div class="landing-panel rounded-xl p-8 border border-white/10">
-        <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Video</h3>
-        <p class="text-white/60 text-sm leading-relaxed mb-5">
-          Module opt-in pour l'<strong class="text-[#E8651A]">upload</strong>, le
-          <strong class="text-[#E8651A]">transcodage MP4</strong> (H.264/AAC) et la
-          <strong class="text-[#E8651A]">lecture en streaming</strong> (HTTP Range).<br>
-          Le transcodage se fait dans un worker CLI, jamais pendant une requête.
-        </p>
-        <ul class="text-white/60 text-sm leading-relaxed space-y-3 mb-6">
-          <li><span class="block landing-accent-text"># Entrée d'upload officielle d'une vidéo</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:upload</code></li>
-          <li><span class="block landing-accent-text"># Worker de transcodage MP4 + poster</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:process</code></li>
-          <li><span class="block landing-accent-text"># Purge des vidéos en échec et fichiers orphelins (dry-run par défaut)</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:cleanup</code></li>
-          <li><span class="block landing-accent-text"># Diagnostic du module vidéo</span><span class="landing-accent-text mr-2">$</span><code class="text-xs">forge video:doctor</code></li>
-        </ul>
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Video</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Opt-in d'upload, transcodage MP4 (H.264/AAC) et lecture en streaming. Le transcodage tourne dans un worker dédié, jamais pendant une requête HTTP.</p>
       </div>
+
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Images</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Opt-in de traitement d'images : variantes et miniatures, galerie attachée à une entité, image de couverture, et une garde qui refuse les images piégées à l'upload.</p>
+      </div>
+
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Files</h3>
+        <p class="text-white/60 text-sm leading-relaxed">La brique générique d'upload : écriture sécurisée anti-traversal, stockage et service de fichiers en streaming. Le socle des opt-ins média spécialisés.</p>
+      </div>
+
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Audio</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Opt-in d'upload, sondage des métadonnées, transcodage MP3 et lecture audio en streaming. Un module sobre, sans état.</p>
+      </div>
+
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Slugs canoniques</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Des identifiants d'URL lisibles et stables, produits d'une seule façon officielle depuis une colonne source, avec CRUD et routage public par slug intégrés.</p>
+      </div>
+
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Modèle opt-in unifié</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Une seule façon d'ajouter une brique optionnelle : l'installer, l'activer, la désactiver ou la lister, avec un vocabulaire clair « opt-in ». Le cœur ne s'alourdit jamais.</p>
+      </div>
+
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Parcours welcome</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Chaque opt-in a sa progression pédagogique, du premier contact au niveau avancé, générable en un starter pour apprendre brique par brique.</p>
+      </div>
+
     </div>
 
   </div>
@@ -164,29 +169,29 @@
     </div>
 
     <div class="grid md:grid-cols-2 gap-5">
-      <!-- Card 2 — Windows + WSL -->
-      <div class="card rounded-xl border border-slate-200 p-8" data-install-card="windows-wsl">
+      <!-- Card 2 : Windows + WSL -->
+      <div class="card rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="windows-wsl">
         <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Poste Windows 10/11 pro</div>
-        <h3 class="text-xl font-semibold mb-4">Windows + WSL</h3>
-        <p class="text-sm text-white leading-relaxed mb-5">
+        <h3 class="text-xl font-semibold text-slate-900 mb-4">Windows + WSL</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-5">
           Parcours complet : WSL Ubuntu 24.04, VS Code Remote WSL, pipx,
           Node.js 20, MariaDB avec compte <code class="text-xs text-[#E8651A]">forge_admin</code>.
         </p>
-        <div class="space-y-3 text-sm text-white leading-relaxed">
-          <p class="text-white">
+        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+          <p class="text-slate-600">
             Sur un poste Windows 10/11 Pro, Forge ne s'installe pas directement
             sous Windows : tout l'environnement de développement vit dans
             <strong class="text-[#E8651A]">WSL</strong> (Windows Subsystem for Linux).
           </p>
-          <p class="text-white">
+          <p class="text-slate-600">
             On active WSL, on installe la distribution
             <strong class="text-[#E8651A]">Ubuntu 24.04</strong>, puis on travaille côté
-            Linux — Python isolé via <strong class="text-[#E8651A]">pipx</strong>,
+            Linux : Python isolé via <strong class="text-[#E8651A]">pipx</strong>,
             <strong class="text-[#E8651A]">Node.js 20</strong> pour la chaîne front
             (Tailwind), et <strong class="text-[#E8651A]">MariaDB</strong> comme base de
             données avec un compte <code class="text-xs text-[#E8651A]">forge_admin</code>.
           </p>
-          <p class="text-white">
+          <p class="text-slate-600">
             <strong class="text-[#E8651A]">VS Code</strong> se connecte à WSL via
             l'extension <em>Remote WSL</em>, et le projet reste sous
             <code class="text-xs text-[#E8651A]">~/Projets/</code> (jamais sous
@@ -201,29 +206,29 @@
         </div>
       </div>
 
-      <!-- Card 3 — Utilisateur du framework (pipx) -->
-      <div class="card rounded-xl border border-slate-200 p-8" data-install-card="pipx-user">
+      <!-- Card 3 : Utilisateur du framework (pipx) -->
+      <div class="card rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="pipx-user">
         <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Utiliser Forge pour créer une application</div>
-        <h3 class="text-xl font-semibold mb-4">Utilisateur du framework — pipx</h3>
-        <p class="text-sm text-white leading-relaxed mb-5">
+        <h3 class="text-xl font-semibold text-slate-900 mb-4">Utilisateur du framework : pipx</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-5">
           <code class="text-xs text-[#E8651A]">pipx</code> installe Forge dans un
           environnement Python isolé, distinct du système et de chaque
           projet. Parcours principal recommandé.
         </p>
-        <div class="space-y-3 text-sm text-white leading-relaxed">
-          <p class="text-white">
+        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+          <p class="text-slate-600">
             Une fois <strong class="text-[#E8651A]">pipx</strong> disponible, on installe
             le paquet officiel <code class="text-xs text-[#E8651A]">forge-mvc</code> en
-            pré-release — le flag <code class="text-xs text-[#E8651A]">--pre</code> est requis
-            tant que Forge est en bêta — puis on vérifie l'installation avec
+            pré-release (le flag <code class="text-xs text-[#E8651A]">--pre</code> est requis
+            tant que Forge est en bêta), puis on vérifie l'installation avec
             <code class="text-xs text-[#E8651A]">forge --version</code>.
           </p>
-          <p class="text-white">
+          <p class="text-slate-600">
             On génère ensuite un projet depuis un starter avec
             <code class="text-xs text-[#E8651A]">forge new</code> et on le lance avec
             <code class="text-xs text-[#E8651A]">forge run</code>.
           </p>
-          <p class="text-white">
+          <p class="text-slate-600">
             <strong class="text-[#E8651A]">Ne pas installer le paquet forge</strong> :
             c'est un projet différent, sans rapport.
           </p>
@@ -235,30 +240,30 @@
         </div>
       </div>
 
-      <!-- Card 4 — Développement du core -->
-      <div class="card rounded-xl border border-slate-200 p-8" data-install-card="core-dev">
+      <!-- Card 4 : Développement du core -->
+      <div class="card rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="core-dev">
         <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Contribuer au framework</div>
-        <h3 class="text-xl font-semibold mb-4">Développement du core</h3>
-        <p class="text-sm text-white leading-relaxed mb-5">
+        <h3 class="text-xl font-semibold text-slate-900 mb-4">Développement du core</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-5">
           Pour travailler sur Forge lui-même : cloner le dépôt, installer
           l'environnement de développement, lancer les 5 validations
           canoniques avant commit.
         </p>
-        <div class="space-y-3 text-sm text-white leading-relaxed">
-          <p class="text-white">
+        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+          <p class="text-slate-600">
             On clone le dépôt avec <code class="text-xs text-[#E8651A]">git clone</code>, on
             crée un environnement virtuel
             (<code class="text-xs text-[#E8651A]">python -m venv .venv</code>) puis on installe
             les dépendances de développement via
             <code class="text-xs text-[#E8651A]">pip install -r requirements-dev.txt</code>.
           </p>
-          <p class="text-white">
+          <p class="text-slate-600">
             Une installation <strong class="text-[#E8651A]">éditable</strong> depuis les
             sources (pas via <code class="text-xs text-[#E8651A]">pipx</code>), qui inclut le
             runtime, les outils et les <strong class="text-[#E8651A]">9 modules opt-in</strong>
             du monorepo.
           </p>
-          <p class="text-white">
+          <p class="text-slate-600">
             Avant chaque commit, on passe les <strong class="text-[#E8651A]">5 validations
             canoniques</strong> : <code class="text-xs text-[#E8651A]">pytest</code>,
             <code class="text-xs text-[#E8651A]">compileall</code>,
@@ -274,30 +279,30 @@
         </div>
       </div>
 
-      <!-- Card 5 — Production WSGI -->
-      <div class="card rounded-xl border border-slate-200 p-8" data-install-card="production">
+      <!-- Card 5 : Production WSGI -->
+      <div class="card rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="production">
         <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Déploiement encadré</div>
-        <h3 class="text-xl font-semibold mb-4">Production — WSGI + Gunicorn + reverse proxy</h3>
-        <p class="text-sm text-white leading-relaxed mb-5">
+        <h3 class="text-xl font-semibold text-slate-900 mb-4">Production : WSGI + Gunicorn + reverse proxy</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-5">
           En production publique, Forge expose son point d'entrée WSGI derrière
           Gunicorn et un reverse proxy comme Caddy ou Nginx.
           <code class="text-xs text-[#E8651A]">python app.py</code> et
           <code class="text-xs text-[#E8651A]">forge run</code> restent des outils de développement,
           pas d'exposition publique.
         </p>
-        <div class="space-y-3 text-sm text-white leading-relaxed">
-          <p class="text-white">
+        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+          <p class="text-slate-600">
             Le point d'entrée se déclare dans un fichier
             <code class="text-xs text-[#E8651A]">wsgi.py</code> qui appelle
             <code class="text-xs text-[#E8651A]">create_configured_wsgi_app()</code>.
           </p>
-          <p class="text-white">
+          <p class="text-slate-600">
             Puis on sert l'application avec <strong class="text-[#E8651A]">Gunicorn</strong>
             (<code class="text-xs text-[#E8651A]">gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000</code>),
             placé derrière un <strong class="text-[#E8651A]">reverse proxy</strong> (Caddy ou
             Nginx).
           </p>
-          <p class="text-white">
+          <p class="text-slate-600">
             À lire dans l'ordre :
             <a href="https://forgemvc.com/docs/forge/wsgi-deployment/" target="_blank" rel="noopener noreferrer" class="text-[#E8651A] font-semibold hover:underline">WSGI minimal</a>,
             <a href="https://forgemvc.com/docs/forge/production-limits/" target="_blank" rel="noopener noreferrer" class="text-[#E8651A] font-semibold hover:underline">limites de production</a>,
@@ -324,26 +329,80 @@
       <p class="text-lg text-black max-w-2xl mx-auto leading-relaxed">
         Les starters sont des projets pédagogiques pour apprendre Forge pas à pas.
       </p>
-      <p class="text-lg text-black max-w-2xl mx-auto leading-relaxed mt-3">
-        Chacun isole une notion avec du
-        code complet et commenté que l'on lit, lance et modifie pour comprendre
-        comment le framework fonctionne, avant de bâtir sa propre application.
-      </p>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-5">
-      <div class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all md:col-span-2">
-        <h3 class="text-2xl font-bold tracking-tight mb-4">
-          <a href="https://forgemvc.com/docs/forge/starters/welcome-forge/debutant/welcome/" target="_blank" rel="noopener noreferrer" class="text-[#E8651A] hover:underline">Bienvenue dans Forge</a>
-        </h3>
-        <p class="text-sm text-white/60 leading-relaxed">
-          Votre premier contact avec Forge : créer un projet, le lancer avec
-          <a href="https://forgemvc.com/docs/forge/reference/cli-commands/" target="_blank" rel="noopener noreferrer" class="text-[#E8651A] font-semibold hover:underline"><code class="text-xs">forge run</code></a>,
-          puis suivre le trajet d'une requête, de la route au contrôleur jusqu'à
-          la vue rendue.<br>
-          De quoi comprendre la boucle de développement avant d'aller plus loin.
-        </p>
-      </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-forge/debutant/welcome/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Bonjour Forge</h3>
+        <p class="text-sm text-white/60 leading-relaxed">La progression cœur : du premier affichage texte jusqu'à un CRUD complet à SQL visible, palier par palier (HTTP, vues, formulaires, base de données).</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-iot/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge IoT</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Recevoir, stocker et exposer des mesures de capteurs : configuration MQTT, lecture des événements, API HTTP JSON et subscriber temps réel.</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-video/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge Vidéo</h3>
+        <p class="text-sm text-white/60 leading-relaxed">La chaîne vidéo complète, brique par brique : upload, lecture en streaming, suivi d'état, sondage et transcodage MP4.</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-images/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge Images</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Téléverser, générer des variantes, attacher à une entité, gérer galerie et couverture, puis sécuriser l'upload contre les images piégées.</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-files/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge Fichiers</h3>
+        <p class="text-sm text-white/60 leading-relaxed">La brique d'upload générique : stockage sécurisé, service de fichiers, validation, limitation de débit et chemins anti-traversal.</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-audio/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge Audio</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Téléverser un audio, le lire en streaming, sonder ses métadonnées et le transcoder en MP3, sans état.</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-mfa/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge MFA</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Le second facteur de bout en bout : secret TOTP, enrôlement, challenge de connexion, codes de récupération et durcissement.</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-rbac/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge RBAC</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Le contrôle d'accès par rôles : contrat déclaratif, vérification de permission, garde de route, helper de gabarit et résolution par utilisateur.</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-workflow/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge Workflow</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Statuts et transitions applicatives : déclarer les passages autorisés, les vérifier, puis afficher des badges de statut.</p>
+      </article>
+      </a>
+
+      <a href="https://forgemvc.com/docs/forge/starters/welcome-stats/installation/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge Stats</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Le tracking d'événements à SQL visible : schéma, insertion, validation, consultation et normalisation des lignes.</p>
+      </article>
+      </a>
+
     </div>
   </div>
 </section>
@@ -419,16 +478,8 @@
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
       <h2 class="text-5xl sm:text-7xl font-bold tracking-tight leading-tight mb-4">
-        Construire des applications MVC sans perdre la main.
+        Le core Forge fournit les briques génériques.
       </h2>
-      <p class="muted text-lg max-w-2xl mx-auto">
-        Forge vise les applications de gestion, les back-offices, les projets pédagogiques
-        et tout projet où le code généré doit rester compréhensible et modifiable.
-      </p>
-    </div>
-
-    <div id="crud" class="mt-12 mb-10">
-      <h3 class="text-2xl font-bold tracking-tight mb-3">Le core Forge fournit les briques génériques.</h3>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -479,7 +530,7 @@
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H7a4 4 0 0 0-4 4v2a3 3 0 0 1-3 3 3 3 0 0 1 3 3v2a4 4 0 0 0 4 4h1" transform="translate(3)"/><path d="M16 3h1a4 4 0 0 1 4 4v2a3 3 0 0 0 3 3 3 3 0 0 0-3 3v2a4 4 0 0 1-4 4h-1" transform="translate(-3)"/></svg>
         </div>
         <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">Entités JSON</h3>
-        <p class="text-sm text-white/60 leading-relaxed">Une source canonique pour générer SQL, modèles et CRUD — types explicites, dont le <code class="text-xs">slug</code> auto-généré depuis un champ source.</p>
+        <p class="text-sm text-white/60 leading-relaxed">Une source canonique pour générer SQL, modèles et CRUD, avec des types explicites, dont le <code class="text-xs">slug</code> auto-généré depuis un champ source.</p>
       </article>
       </a>
 
@@ -530,16 +581,6 @@
         </div>
         <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">Auth/User</h3>
         <p class="text-sm text-white/60 leading-relaxed">Login, sessions, hachage Argon2id, vérification email et reset de mot de passe.</p>
-      </article>
-      </a>
-
-      <a href="https://forgemvc.com/docs/forge/media/" class="block group" target="_blank" rel="noopener noreferrer">
-      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
-        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
-          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-        </div>
-        <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">Médias</h3>
-        <p class="text-sm text-white/60 leading-relaxed">Uploads, images, variantes, galeries et suppression propre.</p>
       </article>
       </a>
 
@@ -720,16 +761,16 @@
     </div>
 
     <div class="grid md:grid-cols-2 gap-5">
-      <div class="landing-panel rounded-xl p-7 border border-white/10">
+      <div class="card rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
         <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Chaîne de génération</h3>
-        <div class="text-white/60 text-sm leading-relaxed space-y-2">
-          <p><span class="landing-accent-text font-semibold">1.</span> Tout part d'un fichier JSON d'entité canonique, source unique du modèle.</p>
-          <p><span class="landing-accent-text font-semibold">2.</span> La commande <code class="text-xs text-[#E8651A]">forge entity:validate</code> vérifie le contrat avant toute génération.</p>
-          <p><span class="landing-accent-text font-semibold">3.</span> Le SQL et les migrations demeurent visibles et lisibles.</p>
-          <p><span class="landing-accent-text font-semibold">4.</span> Le modèle <code class="text-xs text-[#E8651A]">*_base.py</code> est régénéré à chaque exécution.</p>
-          <p><span class="landing-accent-text font-semibold">5.</span> Le modèle manuel, lui, est toujours préservé.</p>
-          <p><span class="landing-accent-text font-semibold">6.</span> Le contrôleur, le formulaire et les vues CRUD sont ensuite échafaudés.</p>
-          <p><span class="landing-accent-text font-semibold">7.</span> Il en résulte une application MVC claire et maintenable.</p>
+        <div class="text-slate-500 text-sm leading-relaxed space-y-2">
+          <p class="text-slate-600"><span class="landing-accent-text font-semibold">1.</span> Tout part d'un fichier JSON d'entité canonique, source unique du modèle.</p>
+          <p class="text-slate-600"><span class="landing-accent-text font-semibold">2.</span> La commande <code class="text-xs text-[#E8651A]">forge entity:validate</code> vérifie le contrat avant toute génération.</p>
+          <p class="text-slate-600"><span class="landing-accent-text font-semibold">3.</span> Le SQL et les migrations demeurent visibles et lisibles.</p>
+          <p class="text-slate-600"><span class="landing-accent-text font-semibold">4.</span> Le modèle <code class="text-xs text-[#E8651A]">*_base.py</code> est régénéré à chaque exécution.</p>
+          <p class="text-slate-600"><span class="landing-accent-text font-semibold">5.</span> Le modèle manuel, lui, est toujours préservé.</p>
+          <p class="text-slate-600"><span class="landing-accent-text font-semibold">6.</span> Le contrôleur, le formulaire et les vues CRUD sont ensuite échafaudés.</p>
+          <p class="text-slate-600"><span class="landing-accent-text font-semibold">7.</span> Il en résulte une application MVC claire et maintenable.</p>
         </div>
       </div>
 
@@ -840,36 +881,11 @@ router = Router()
         </ul>
       </div>
     </div>
-
-    <div class="grid md:grid-cols-2 gap-5 mt-5">
-      <div class="landing-panel rounded-xl p-8 border border-white/10">
-        <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Forge 1.0.0-beta.13</h3>
-        <p class="text-white/60 text-sm leading-relaxed mb-5">
-          Forge marque l'ouverture du code source en lecture, étude et usage éducatif.
-          Core minimal, 9 modules officiels opt-in, type slug auto-généré, contrat
-          public et 102 starters figés avant la 1.0, charte philosophique stable.
-        </p>
-        <a href="https://forgemvc.com/docs/forge/roadmap/forge-roadmap/"
-           target="_blank" rel="noopener noreferrer"
-           class="landing-accent-text text-sm font-semibold">Lire la roadmap →</a>
-      </div>
-
-      <div class="landing-panel rounded-xl p-8 border border-white/10">
-        <h3 class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Stabilisation bêta</h3>
-        <p class="text-white/60 text-sm leading-relaxed mb-5">
-          Stabilisation continue, consolidation des APIs modules, raffinements de packaging.
-          Forge reste un framework explicite, pédagogique et durable.
-        </p>
-        <a href="https://forgemvc.com/docs/forge/roadmap/forge-roadmap/"
-           target="_blank" rel="noopener noreferrer"
-           class="landing-accent-text text-sm font-semibold">Voir la roadmap →</a>
-      </div>
-    </div>
   </div>
 </section>
 
 <!--
-  LANDING-CONTACT-NAV-FORM-001 — Décision définitive.
+  LANDING-CONTACT-NAV-FORM-001 : décision définitive.
 
   Le formulaire de contact de la landing Forge reste VOLONTAIREMENT
   statique. Il utilise `mailto:forgemvc@gmail.com` exclusivement et
@@ -894,13 +910,13 @@ router = Router()
 -->
 <section id="contact" class="py-24 px-6 sec-dark">
   <div class="max-w-3xl mx-auto text-center">
-    <h2 class="text-3xl font-bold mb-6">Contact</h2>
+    <h2 class="text-5xl sm:text-7xl font-bold tracking-tight leading-tight mb-6">Contact</h2>
 
-    <p class="muted mb-2">
+    <p class="text-white mb-2">
       Pour toute question sur Forge, retour d'usage, remontée de bug ou demande de licence.
     </p>
 
-    <p class="muted text-sm mb-8">
+    <p class="text-white text-sm mb-8">
       Roger Lequette ·
       <a href="mailto:forgemvc@gmail.com" class="landing-accent-text font-semibold">
         forgemvc@gmail.com
@@ -917,7 +933,7 @@ router = Router()
 <!-- Footer -->
 <footer class="bg-black py-10 px-8 border-t border-[#E8651A]">
   <div class="max-w-5xl mx-auto flex flex-col items-center gap-5">
-    <div class="flex flex-wrap justify-center gap-6 text-sm">
+    <div class="flex flex-wrap justify-center gap-6 text-base">
       <a href="https://forgemvc.com/docs/forge/"
          target="_blank" rel="noopener noreferrer"
          class="landing-accent-text hover:text-white transition-colors">Documentation</a>
@@ -934,10 +950,10 @@ router = Router()
          target="_blank" rel="noopener noreferrer"
          class="landing-accent-text hover:text-white transition-colors">Charte</a>
     </div>
-    <p class="text-xs landing-accent-text text-center">
-      © 2026 Roger Lequette — Tous droits réservés
+    <p class="text-sm landing-accent-text text-center">
+      © 2026 Roger Lequette. Tous droits réservés
     </p>
-    <p class="text-xs text-white/40 text-center">
+    <p class="text-sm landing-accent-text text-center">
       Forge n'est pas open source : licence propriétaire, « Source disponible ».
     </p>
   </div>

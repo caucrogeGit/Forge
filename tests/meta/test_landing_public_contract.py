@@ -30,7 +30,6 @@ EXPECTED_CARD_TITLES = [
     "Formulaires",
     "Sécurité",
     "Auth/User",
-    "Médias",
     "Mail",
     "Front léger",
     "JSON Schema",
@@ -92,7 +91,7 @@ class TestCardLinks:
         )
 
     def test_no_overly_generic_links(self):
-        """Les cartes Sécurité, Auth, Médias, Mail ne doivent pas pointer vers concepts/."""
+        """Les cartes Sécurité, Auth, Mail ne doivent pas pointer vers concepts/."""
         text = LANDING.read_text(encoding="utf-8")
         blocks = re.findall(
             r'<a\s+href="([^"]+)"\s+class="block group"[^>]*>.*?</a>',
@@ -105,7 +104,7 @@ class TestCardLinks:
                 continue
             href = href_match.group(1)
             title = title_match.group(1).strip()
-            if title in ("Sécurité", "Auth/User", "Médias", "Mail"):
+            if title in ("Sécurité", "Auth/User", "Mail"):
                 assert "concepts" not in href, (
                     f"La carte '{title}' pointe vers une page trop générique : {href}"
                 )

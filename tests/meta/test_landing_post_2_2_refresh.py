@@ -136,8 +136,10 @@ class TestApportsRecents:
 
 class TestEtatActuel:
     def test_forge_etat_actuel(self):
-        assert f"Forge {_current_semver()}" in _src(), (
-            f"'Forge {_current_semver()}' doit apparaître dans la landing page."
+        # Cartes d'état (« Forge {version} » / « Stabilisation bêta ») retirées ;
+        # la version reste exposée via « v{version} » dans le hero.
+        assert f"v{_current_semver()}" in _src(), (
+            f"'v{_current_semver()}' doit apparaître dans la landing page."
         )
 
     def test_phases_recentes_mentionnees(self):
@@ -185,10 +187,6 @@ class TestLiens:
     def test_lien_deploiement(self):
         # Lien déploiement remplace "production-security" et "api-json"
         assert "deployment" in _src() or "déploiement" in _src().lower()
-
-    def test_lien_roadmap(self):
-        # Lien roadmap remplace "release-policy"
-        assert "roadmap" in _src()
 
     def test_lien_contributing(self):
         assert "contributing" in _src() or "Contribuer" in _src()

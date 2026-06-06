@@ -13,9 +13,9 @@ d'installation in-section ont été retirés ; le récit opt-in/installation
 reste présent dans la carte « CLI Forge » et la section Installation).
 
 Ce fichier conserve les garde-fous encore valides : présence de la section,
-panneaux Forge IoT et Forge Video, commandes `iot:*` / `video:*`, core
-présenté comme autonome, synchronisation de `docs/index.html`, absence de
-version beta.11, ticket roadmap.
+panneaux Forge IoT et Forge Video, core présenté comme autonome,
+synchronisation de `docs/index.html`, absence de version beta.11, ticket
+roadmap.
 
 Test documentaire : il lit du texte, il n'exécute aucun service.
 """
@@ -43,16 +43,13 @@ def _src() -> str:
 # Contenu IoT / opt-ins encore mis en avant après la refonte
 # ---------------------------------------------------------------------------
 
+# Refonte « cartes sans code » : la section Nouveautés présente désormais les
+# opt-ins par un texte simple (sans commandes CLI ni `iot_events`). Seuls les
+# repères conceptuels restent garantis.
 HIGHLIGHTS = [
     "Forge IoT",
     "MQTT",
-    "iot_events",
-    "forge iot:doctor",
-    "forge iot:listen",
-    "forge iot:simulate",
     "Forge Video",
-    "forge video:upload",
-    "forge video:process",
 ]
 
 
