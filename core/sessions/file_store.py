@@ -62,8 +62,13 @@ class FileSessionStore:
         # d'écriture ne corrompt donc jamais le fichier de session existant.
         target = self._path(session_id)
         tmp = target.with_name(f"{target.name}.{secrets.token_hex(4)}.tmp")
-        tmp.write_text(json.dumps(data), encoding="utf-8")
-        os.replace(tmp, target)
+        try:
+            tmp.write_text(json.dumps(data), encoding="utf-8")
+            os.replace(tmp, target)
+        except OSError:
+            # En cas d'échec, ne pas laisser de fichier temporaire orphelin.
+            tmp.unlink(missing_ok=True)
+            raise
 
     # ── public API ──────────────────────────────────────────────────────────
 

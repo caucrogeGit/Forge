@@ -16,8 +16,8 @@ Depuis ``IMAGES-MOVE-PROCESSING-001`` le **traitement d'image** vit ici
 (``processing``) ; depuis ``IMAGES-MOVE-APPLICATIVE-001`` la **couche médias
 applicative** (``media_repository``, ``media_gallery``) y est rapatriée :
 ``forge_mvc_images`` est désormais l'unique propriétaire de tout l'image.
-``forge-mvc-media`` n'est plus qu'un shim transitoire (supprimé au ticket
-``REMOVE-MEDIA-PKG-001``). Voir ``docs/adr/018-image-module-extraction.md``.
+``forge-mvc-media`` a été supprimé (ticket ``REMOVE-MEDIA-PKG-001``).
+Voir ``docs/adr/018-image-module-extraction.md``.
 """
 
 __version__ = "1.0.0b13"
