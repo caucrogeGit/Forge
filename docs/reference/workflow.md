@@ -1,12 +1,12 @@
 # Workflow — Statuts et transitions
 
-> **Module extrait** : depuis Forge 2.7.0, le code workflow vit dans
+> **Module extrait** : le code workflow vit désormais dans
 > `forge-mvc-workflow`. Voir `packages/forge-mvc-workflow/README.md` pour
 > l'installation et l'API utilisateur. Cette page documente l'API publique
 > pour mémoire et référence rapide.
 
 
-`forge_mvc_workflow` est un **module officiel** Forge, distribué séparément depuis Forge 2.7.0 (ADR-004). Il modélise des états simples, des transitions explicitement autorisées et des helpers d'affichage pour les templates Jinja2. Il est indépendant de tout métier applicatif.
+`forge_mvc_workflow` est un **module officiel** Forge, distribué séparément en tant qu'opt-in (ADR-004). Il modélise des états simples, des transitions explicitement autorisées et des helpers d'affichage pour les templates Jinja2. Il est indépendant de tout métier applicatif.
 
 **Modules :**
 

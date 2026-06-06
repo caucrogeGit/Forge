@@ -26,7 +26,7 @@ permissions, après authentification.
 
 Forge distingue deux niveaux d'autorisation :
 
-**RBAC léger core** — primitives dans `core/security/` (dépréciées depuis Forge 2.x) :
+**RBAC léger core** — primitives dans `core/security/` (dépréciées puis retirées du core) :
 
 - `user_has_role(request, role)` — vérifie qu'un rôle est présent dans le champ `roles` de la session Auth/User. Ne consulte pas les tables SQL RBAC.
 - `require_role(role)` — décorateur : redirige vers `/login` si non authentifié, retourne 403 si le rôle est absent de la session.

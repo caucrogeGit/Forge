@@ -5,7 +5,7 @@ utilisateur moderne sans transformer le framework en application metier. Elle
 fournit des contrats Python, des helpers explicites et des SQL visibles que les
 projets peuvent adopter progressivement.
 
-Voir aussi : [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md) · [RBAC — Contrôle d'accès](rbac.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
+Voir aussi : [ADR-001 — Stratégie d'authentification Forge](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session Forge](../adr/002-session-strategy.md) · [RBAC — Contrôle d'accès](rbac.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
 
 Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.py`) s'appuie sur `core.auth.password.verify_password` (Argon2id) pour la vérification des mots de passe. `core.security.hashing` reste disponible en repli pour les hashes PBKDF2 existants (voir ADR-001). Les nouveaux hashes PBKDF2 legacy utilisent désormais 600 000 itérations (format versionné `pbkdf2_sha256$…`) ; les anciens hashes restent vérifiables. Lorsqu'un utilisateur legacy PBKDF2 se connecte avec succès, Forge migre automatiquement son hash vers Argon2id (`auth_model.update_password_hash`). Cette migration est transparente et ne force pas de réinitialisation du mot de passe.
 
@@ -13,7 +13,7 @@ Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.
 
 ## API officielle et compatibilité legacy
 
-Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API officielle pour les nouveaux projets est `core.auth`.
+L'API officielle pour les nouveaux projets est `core.auth`.
 
 | Domaine | API officielle — `core.auth` | Compatibilité / transversal — `core.security` |
 |---|---|---|
@@ -445,8 +445,8 @@ ecriture DB automatique.
     — le core ne dépend pas de `forge-mvc-mfa`. Voir le
     [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
 
-> **Depuis Forge 2.4.0**, le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
-> L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré en Forge 3.0.
+> Le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
+> L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré du core lors de l'extraction.
 
 Forge fournit le socle MFA par briques :
 

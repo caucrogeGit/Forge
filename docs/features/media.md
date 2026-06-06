@@ -90,7 +90,7 @@ La commande est idempotente : elle peut être relancée sans risque.
 
     ```bash
     python -m build
-    pipx install dist/forge_mvc-1.3.0-py3-none-any.whl --force
+    pipx install dist/forge_mvc-<version>-py3-none-any.whl --force
     hash -r
     ```
 
@@ -542,7 +542,7 @@ Les `fields` d'une entité correspondent à des colonnes SQL dans la table méti
 
 ### Galerie en lecture (multiple=true)
 
-Depuis Forge 1.3.0, les médias déclarés `multiple=true` peuvent être affichés en galerie et recevoir de nouveaux médias depuis le CRUD généré.
+Les médias déclarés `multiple=true` peuvent être affichés en galerie et recevoir de nouveaux médias depuis le CRUD généré.
 
 **Lecture :** `make:crud` appelle `list_media_for_entity(entity_name, entity_id, role=...)` dans `show()`, `edit()` et `update()` invalide, et transmet la liste sous la variable de contexte `{name}_media_list`. Les templates `show.html` et `form.html` affichent cette liste en lecture seule (miniatures ou liens).
 
@@ -674,14 +674,14 @@ Avec l'entité ci-dessous, `make:crud` génère la chaîne complète.
 - Upload à la création avec `save_upload` + `attach_media_to_entity`.
 - Remplacement à l'édition avec `list_media_for_entity` + `delete_media`.
 - Suppression explicite via checkbox `_delete_media_<name>`.
-- Suppression des médias liés lors du destroy de l'entité (Forge 1.3.0+).
+- Suppression des médias liés lors du destroy de l'entité.
 - Preview dans `show.html` et `form.html` avec `get_cover_media`.
 - Variantes `thumbnail`/`medium` pour les images si `variants=true`.
 - Route `/media/<chemin>` pour servir les fichiers.
 
 ### Limites actuelles
 
-- `multiple=true` : ajout append-only (multi-upload), suppression individuelle et réorganisation par position supportés (Forge 1.3.0+).
+- `multiple=true` : ajout append-only (multi-upload), suppression individuelle et réorganisation par position supportés.
 - Les médias existants ne sont pas pré-remplis dans le champ upload (comportement normal des navigateurs).
 - Pas de back-office média intégré.
 - La détection MIME repose sur le `Content-Type` déclaré par le navigateur (`python-magic` non inclus).
