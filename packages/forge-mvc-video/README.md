@@ -3,7 +3,8 @@
 Module **opt-in** Forge pour la vidéo applicative : upload contrôlé,
 transcodage **MP4 H.264/AAC** et lecture en **streaming** (HTTP Range / 206).
 
-Statut : **Alpha** — squelette (`VIDEO-ROADMAP-OPEN-001`).
+Statut : **Beta**. Upload, transcodage MP4 et lecture en streaming HTTP Range
+sont livrés ; le module cible la publication PyPI de la release beta.13.
 
 ## Principes
 

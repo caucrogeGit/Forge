@@ -9,12 +9,13 @@ pymdown-extensions>=10.0
 pip-audit>=2.0
 ruff>=0.4
 
-# Modules opt-in Forge — installés en mode éditable depuis le monorepo.
+# Modules opt-in Forge, installés en mode éditable depuis le monorepo.
 # Sans ces lignes, les tests qui importent forge_mvc_mfa, forge_mvc_rbac,
-# forge_mvc_workflow, forge_mvc_stats, forge_mvc_media, forge_mvc_iot et
-# forge_mvc_video sont silencieusement skippés (pytest.importorskip), donc
+# forge_mvc_workflow, forge_mvc_stats, forge_mvc_files, forge_mvc_images,
+# forge_mvc_audio, forge_mvc_iot, forge_mvc_video, forge_mvc_pivot et
+# forge_mvc_mail sont silencieusement skippés (pytest.importorskip), donc
 # leur suite ne s'exécute pas en CI. L'extra forge-mvc[all] ne couvre que
-# rbac/workflow/stats (mfa/media/iot/video exclus — voir pyproject.toml) :
+# rbac/workflow/stats (tous les autres opt-ins sont exclus, voir pyproject.toml) :
 # pour le dev on pointe tous les opt-ins vers le monorepo local afin
 # d'exécuter la suite complète.
 -e ./packages/forge-mvc-mfa
@@ -26,3 +27,5 @@ ruff>=0.4
 -e ./packages/forge-mvc-iot
 -e ./packages/forge-mvc-video
 -e ./packages/forge-mvc-audio
+-e ./packages/forge-mvc-pivot
+-e ./packages/forge-mvc-mail

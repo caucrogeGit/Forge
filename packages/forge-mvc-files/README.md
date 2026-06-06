@@ -13,7 +13,7 @@ supprimé du core (`CORE-DROP-UPLOADS-001`). La **validation pure** de fichier
 (extension/MIME/taille + `UploadError`) reste dans le core (`core.forms`),
 réutilisée par ce paquet.
 
-Ce paquet **n'est pas encore publié sur PyPI** (cible release beta.13).
+Ce paquet cible la publication PyPI de la release beta.13.
 
 ## Pourquoi ce module (ADR-019)
 
@@ -23,7 +23,7 @@ exister sans upload de fichiers : c'est une brique applicative, pas un
 fondement. `forge-mvc-files` devient l'**unique** propriétaire de l'upload
 générique (principes 8 « noyau minimal » et 11 « une seule façon officielle »).
 
-### Ce qui sera déplacé du core
+### Ce qui a été déplacé du core
 
 - `manager` — `save_upload`, `SavedUpload`, `serve_media_file`, `delete_upload`,
   `delete_media_file`, `get_upload_path`, `upload_root`, `_read_upload` ;

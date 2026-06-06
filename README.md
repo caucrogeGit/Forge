@@ -102,23 +102,28 @@ class HomeController:
 
 ## Opt-ins officiels
 
-| Opt-in | Rôle |
-|--------|------|
-| [`forge-mvc-rbac`](https://pypi.org/project/forge-mvc-rbac/) | Rôles et permissions déclaratives |
-| [`forge-mvc-workflow`](https://pypi.org/project/forge-mvc-workflow/) | Cycles de vie applicatifs (statuts, transitions) |
-| [`forge-mvc-stats`](https://pypi.org/project/forge-mvc-stats/) | Agrégats et compteurs d'événements |
-| [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) |
-| [`forge-mvc-media`](https://pypi.org/project/forge-mvc-media/) | Gestion applicative des médias |
-| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) — **Alpha** |
-| [`forge-mvc-video`](https://pypi.org/project/forge-mvc-video/) | Upload, transcodage MP4 (H.264/AAC) et lecture en streaming HTTP Range — **Beta** |
+| Opt-in | Rôle | Maturité |
+|--------|------|----------|
+| [`forge-mvc-rbac`](https://pypi.org/project/forge-mvc-rbac/) | Rôles et permissions déclaratives | Beta |
+| [`forge-mvc-workflow`](https://pypi.org/project/forge-mvc-workflow/) | Cycles de vie applicatifs (statuts, transitions) | Beta |
+| [`forge-mvc-stats`](https://pypi.org/project/forge-mvc-stats/) | Agrégats et compteurs d'événements | Beta |
+| [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) | Alpha |
+| [`forge-mvc-files`](https://pypi.org/project/forge-mvc-files/) | Upload générique : écriture sécurisée, storage, service de fichiers (HTTP Range) | Alpha |
+| [`forge-mvc-images`](https://pypi.org/project/forge-mvc-images/) | Traitement et gestion applicative des images (Pillow), dépend de `forge-mvc-files` | Alpha |
+| [`forge-mvc-audio`](https://pypi.org/project/forge-mvc-audio/) | Upload, sondage, transcodage MP3 et lecture en streaming HTTP Range | Beta |
+| [`forge-mvc-video`](https://pypi.org/project/forge-mvc-video/) | Upload, transcodage MP4 (H.264/AAC) et lecture en streaming HTTP Range | Beta |
+| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) | Alpha |
+| [`forge-mvc-pivot`](https://pypi.org/project/forge-mvc-pivot/) | Tables pivot avancées extraites du core | Beta |
+| [`forge-mvc-mail`](https://pypi.org/project/forge-mvc-mail/) | Envoi de courriels extrait du core | Beta |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
-Installez-les à la demande, par exemple `pip install --pre forge-mvc-rbac`.
-`forge-mvc-iot` (**Alpha**) et `forge-mvc-video` (**Beta**) s'installent
-**explicitement et séparément** (`pip install --pre forge-mvc-iot`,
-`pip install --pre forge-mvc-video`) et ne sont **pas** inclus dans l'extra
-`forge-mvc[all]` (dépendance MQTT `paho-mqtt` pour IoT ; binaire système FFmpeg
-pour Video ; maturité Alpha).
+Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus
+dans l'extra `forge-mvc[all]`. Tous les autres opt-ins (`mfa`, `files`,
+`images`, `audio`, `video`, `iot`, `pivot`, `mail`) s'installent
+**explicitement et séparément**, par exemple `pip install --pre forge-mvc-rbac`
+ou `pip install --pre forge-mvc-images`. Cette exclusion de `[all]` tient soit à
+une dépendance lourde (MQTT `paho-mqtt` pour IoT, binaire système FFmpeg pour
+Video et Audio, Pillow pour Images), soit à une maturité encore Alpha.
 
 ---
 
