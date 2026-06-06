@@ -30,7 +30,6 @@ EXPECTED_CARD_TITLES = [
     "Formulaires",
     "Sécurité",
     "Auth/User",
-    "Mail",
     "Front léger",
     "JSON Schema",
     "CLI Forge",
@@ -104,14 +103,14 @@ class TestCardLinks:
                 continue
             href = href_match.group(1)
             title = title_match.group(1).strip()
-            if title in ("Sécurité", "Auth/User", "Mail"):
+            if title in ("Sécurité", "Auth/User"):
                 assert "concepts" not in href, (
                     f"La carte '{title}' pointe vers une page trop générique : {href}"
                 )
 
 
 class TestOptInModules:
-    """Les 9 modules opt-in sont présents avec leurs cartes."""
+    """Les 11 modules opt-in sont présents avec leurs cartes."""
 
     @pytest.mark.parametrize("module", [
         "forge-mvc-mfa",
@@ -123,6 +122,8 @@ class TestOptInModules:
         "forge-mvc-iot",
         "forge-mvc-video",
         "forge-mvc-audio",
+        "forge-mvc-mail",
+        "forge-mvc-pivot",
     ])
     def test_module_card_present(self, module: str):
         text = LANDING.read_text(encoding="utf-8")

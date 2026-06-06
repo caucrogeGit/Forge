@@ -112,6 +112,8 @@ class TestNewElementsPresent:
         "forge-mvc-iot",
         "forge-mvc-video",
         "forge-mvc-audio",
+        "forge-mvc-mail",
+        "forge-mvc-pivot",
     ])
     def test_all_modules_mentioned(self, module_name):
         assert module_name in self.source, (

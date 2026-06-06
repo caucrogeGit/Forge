@@ -1,6 +1,6 @@
 """Garde-fou LANDING-ARTICLES-CLICKABLE-001.
 
-Vérifie que les 35 cartes de la landing page sont wrappées dans un <a href>
+Vérifie que les 36 cartes de la landing page sont wrappées dans un <a href>
 pointant vers des URLs absolues valides de la documentation.
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ DOCS = PROJECT_ROOT / "docs"
 BASE_URL = "https://caucrogegit.github.io/Forge/"
 
 EXPECTED_DOC_PATHS = [
-    # Core Forge (17 cartes)
+    # Core Forge (16 cartes)
     "guide/concepts",
     "features/front",
     "features/migrations",
@@ -35,7 +35,7 @@ EXPECTED_DOC_PATHS = [
     "reference/api-json",
     # Nouveau beta.6 — page spécifique entity-schema
     "entities/entity-schema",
-    # Modules opt-in (9 cartes)
+    # Modules opt-in (11 cartes)
     "reference/auth-mfa",
     "features/rbac",
     "reference/workflow",
@@ -45,6 +45,8 @@ EXPECTED_DOC_PATHS = [
     "starters/welcome-iot/installation",
     "starters/welcome-video/installation",
     "starters/welcome-audio/installation",
+    "starters/welcome-mail/installation",
+    "entities/pivot-advanced",
     # Section Starters (10 cartes de progression)
     "starters/welcome-forge/debutant/welcome",
     "starters/welcome-mfa/installation",
@@ -59,11 +61,11 @@ class TestLandingArticlesClickable:
     def test_landing_file_exists(self):
         assert LANDING.exists()
 
-    def test_35_articles_are_wrapped_in_links(self):
+    def test_36_articles_are_wrapped_in_links(self):
         text = LANDING.read_text(encoding="utf-8")
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
-        assert len(wrapped) == 35, (
-            f"Attendu 35 cartes wrappées dans <a class=\"block group\">, "
+        assert len(wrapped) == 36, (
+            f"Attendu 36 cartes wrappées dans <a class=\"block group\">, "
             f"trouvé {len(wrapped)}."
         )
 
