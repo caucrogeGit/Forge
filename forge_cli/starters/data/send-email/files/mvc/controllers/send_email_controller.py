@@ -3,7 +3,7 @@
 Ticket : STARTER-SEND-EMAIL-001.
 
 Beaucoup d'applications envoient des emails (confirmation, réinitialisation de
-mot de passe…). Forge fournit ``core.mail`` : on construit un ``MailMessage``
+mot de passe…). L'opt-in ``forge-mvc-mail`` fournit ``forge_mvc_mail`` : on construit un ``MailMessage``
 puis on le confie à un ``Mailer`` branché sur un **transport**. En développement,
 ``ConsoleTransport`` **affiche** l'email dans la console — pas besoin de serveur
 SMTP pour apprendre le flux.
@@ -16,7 +16,7 @@ Aucune base de données.
 """
 from core.http.request import Request
 from core.http.response import Response
-from core.mail import ConsoleTransport, MailError, Mailer, MailMessage
+from forge_mvc_mail import ConsoleTransport, MailError, Mailer, MailMessage
 from core.mvc.controller.base_controller import BaseController
 
 

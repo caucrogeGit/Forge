@@ -8,10 +8,11 @@ from pathlib import Path
 import pytest
 
 import core.forge as forge
-from core.mail.log import MailLogRecord, MailLogger
-from core.mail.mailer import Mailer
-from core.mail.message import MailMessage
-from core.mail.transports import FakeTransport, NullTransport
+pytest.importorskip("forge_mvc_mail")
+from forge_mvc_mail.log import MailLogRecord, MailLogger
+from forge_mvc_mail.mailer import Mailer
+from forge_mvc_mail.message import MailMessage
+from forge_mvc_mail.transports import FakeTransport, NullTransport
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -100,7 +101,7 @@ def test_is_enabled_false(log_disabled):
 
 def test_log_ne_fait_rien_si_disabled(log_disabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     record = MailLogRecord(
         message_type="", to_email="a@b.com",
         subject="s", transport="t", status="sent",
@@ -113,7 +114,7 @@ def test_log_ne_fait_rien_si_disabled(log_disabled, monkeypatch):
 
 def test_log_appelle_insert_si_enabled(log_enabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     record = MailLogRecord(
         message_type="bienvenue",
         to_email="dest@example.com",
@@ -131,7 +132,7 @@ def test_log_appelle_insert_si_enabled(log_enabled, monkeypatch):
 
 def test_log_status_failed_inclut_erreur(log_enabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     record = MailLogRecord(
         message_type="",
         to_email="a@b.com",
@@ -147,7 +148,7 @@ def test_log_status_failed_inclut_erreur(log_enabled, monkeypatch):
 def test_log_silencieux_si_db_leve_exception(log_enabled, monkeypatch):
     def _raise(sql, p):
         raise RuntimeError("DB indisponible")
-    monkeypatch.setattr("core.mail.log._db_insert", _raise)
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", _raise)
     record = MailLogRecord(
         message_type="", to_email="a@b.com",
         subject="s", transport="t", status="sent",
@@ -161,7 +162,7 @@ def test_fetch_recent_appelle_fetch_all(log_enabled, monkeypatch):
     fake_rows = [{"id": 1, "status": "sent"}]
     calls = []
     monkeypatch.setattr(
-        "core.mail.log._db_fetch_all",
+        "forge_mvc_mail.log._db_fetch_all",
         lambda sql, p: (calls.append(p), fake_rows)[1],
     )
     rows = MailLogger.fetch_recent(5)
@@ -172,7 +173,7 @@ def test_fetch_recent_appelle_fetch_all(log_enabled, monkeypatch):
 def test_fetch_recent_limite_par_defaut(log_enabled, monkeypatch):
     calls = []
     monkeypatch.setattr(
-        "core.mail.log._db_fetch_all",
+        "forge_mvc_mail.log._db_fetch_all",
         lambda sql, p: (calls.append(p), [])[1],
     )
     MailLogger.fetch_recent()
@@ -183,7 +184,7 @@ def test_fetch_recent_limite_par_defaut(log_enabled, monkeypatch):
 
 def test_mailer_log_status_sent(log_enabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     mailer = Mailer(FakeTransport())
     mailer.send(_simple_message())
     assert len(calls) == 1
@@ -192,7 +193,7 @@ def test_mailer_log_status_sent(log_enabled, monkeypatch):
 
 def test_mailer_log_status_skipped(log_enabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     mailer = Mailer(NullTransport())
     mailer.send(_simple_message())
     assert calls[0][4] == "skipped"
@@ -200,7 +201,7 @@ def test_mailer_log_status_skipped(log_enabled, monkeypatch):
 
 def test_mailer_log_metadata_kwargs(log_enabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     mailer = Mailer(FakeTransport())
     mailer.send(
         _simple_message(),
@@ -216,7 +217,7 @@ def test_mailer_log_metadata_kwargs(log_enabled, monkeypatch):
 
 def test_mailer_log_to_email_joint(log_enabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     msg = MailMessage(
         subject="Multi",
         to=["a@b.com", "c@d.com"],
@@ -229,21 +230,21 @@ def test_mailer_log_to_email_joint(log_enabled, monkeypatch):
 
 def test_mailer_log_sent_at_non_null_si_sent(log_enabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     Mailer(FakeTransport()).send(_simple_message())
     assert calls[0][9] is not None   # sent_at
 
 
 def test_mailer_log_sent_at_null_si_skipped(log_enabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     Mailer(NullTransport()).send(_simple_message())
     assert calls[0][9] is None       # sent_at
 
 
 def test_mailer_sans_log_si_disabled(log_disabled, monkeypatch):
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     Mailer(FakeTransport()).send(_simple_message())
     assert calls == []
 
@@ -257,15 +258,15 @@ def test_mailer_send_backwards_compatible(log_disabled):
 
 def test_mailer_log_status_failed_via_smtp_error(log_enabled, monkeypatch):
     """Mailer.send() intercepte MailSendError → status failed dans mail_log."""
-    from core.mail.exceptions import MailSendError
-    from core.mail.transports import BaseTransport, TransportResult
+    from forge_mvc_mail.exceptions import MailSendError
+    from forge_mvc_mail.transports import BaseTransport, TransportResult
 
     class _FailingTransport(BaseTransport):
         def send(self, message: MailMessage) -> TransportResult:
             raise MailSendError("connexion SMTP refusée")
 
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     result = Mailer(_FailingTransport()).send(_simple_message())
     assert result.success is False
     assert len(calls) == 1
@@ -290,7 +291,7 @@ def test_mailer_log_skipped_quand_mail_enabled_false(restore_forge, monkeypatch)
         mail_timeout=10,
     )
     calls = []
-    monkeypatch.setattr("core.mail.log._db_insert", lambda sql, p: calls.append(p))
+    monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     mailer = Mailer.from_config()           # doit renvoyer NullTransport
     result = mailer.send(_simple_message())
     assert result.skipped is True
@@ -303,21 +304,21 @@ def test_mailer_log_skipped_quand_mail_enabled_false(restore_forge, monkeypatch)
 
 @pytest.fixture()
 def no_env(monkeypatch):
-    monkeypatch.setattr("forge_cli.mail._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("forge_mvc_mail.cli._load_env_and_configure_forge", lambda root: None)
 
 
 def test_logs_affiche_warn_si_disabled(no_env, log_disabled, capsys):
-    from forge_cli.mail import cmd_mail_logs
+    from forge_mvc_mail.cli import cmd_mail_logs
     cmd_mail_logs([], root=Path("/tmp"))
     out, _ = capsys.readouterr()
     assert "MAIL_LOG_ENABLED" in out
 
 
 def test_logs_limite_par_defaut(no_env, log_enabled, monkeypatch, capsys):
-    from forge_cli.mail import cmd_mail_logs
+    from forge_mvc_mail.cli import cmd_mail_logs
     calls = []
     monkeypatch.setattr(
-        "core.mail.log._db_fetch_all",
+        "forge_mvc_mail.log._db_fetch_all",
         lambda sql, p: (calls.append(p), [])[1],
     )
     cmd_mail_logs([], root=Path("/tmp"))
@@ -325,10 +326,10 @@ def test_logs_limite_par_defaut(no_env, log_enabled, monkeypatch, capsys):
 
 
 def test_logs_limite_custom(no_env, log_enabled, monkeypatch):
-    from forge_cli.mail import cmd_mail_logs
+    from forge_mvc_mail.cli import cmd_mail_logs
     calls = []
     monkeypatch.setattr(
-        "core.mail.log._db_fetch_all",
+        "forge_mvc_mail.log._db_fetch_all",
         lambda sql, p: (calls.append(p), [])[1],
     )
     cmd_mail_logs(["--limit", "5"], root=Path("/tmp"))
@@ -336,7 +337,7 @@ def test_logs_limite_custom(no_env, log_enabled, monkeypatch):
 
 
 def test_logs_affiche_tableau(no_env, log_enabled, monkeypatch, capsys):
-    from forge_cli.mail import cmd_mail_logs
+    from forge_mvc_mail.cli import cmd_mail_logs
     fake_rows = [
         {
             "id": 1,
@@ -348,7 +349,7 @@ def test_logs_affiche_tableau(no_env, log_enabled, monkeypatch, capsys):
             "error_message": "",
         }
     ]
-    monkeypatch.setattr("core.mail.log._db_fetch_all", lambda sql, p: fake_rows)
+    monkeypatch.setattr("forge_mvc_mail.log._db_fetch_all", lambda sql, p: fake_rows)
     cmd_mail_logs([], root=Path("/tmp"))
     out, _ = capsys.readouterr()
     assert "dest@example.com" in out
@@ -356,13 +357,13 @@ def test_logs_affiche_tableau(no_env, log_enabled, monkeypatch, capsys):
 
 
 def test_logs_sans_valeur_limit_leve_system_exit(no_env, log_enabled):
-    from forge_cli.mail import cmd_mail_logs
+    from forge_mvc_mail.cli import cmd_mail_logs
     with pytest.raises(SystemExit):
         cmd_mail_logs(["--limit"], root=Path("/tmp"))
 
 
 def test_logs_limit_invalide_leve_system_exit(no_env, log_enabled):
-    from forge_cli.mail import cmd_mail_logs
+    from forge_mvc_mail.cli import cmd_mail_logs
     with pytest.raises(SystemExit):
         cmd_mail_logs(["--limit", "abc"], root=Path("/tmp"))
 
@@ -370,7 +371,7 @@ def test_logs_limit_invalide_leve_system_exit(no_env, log_enabled):
 # ── mail:init — crée mail_log.sql ─────────────────────────────────────────────
 
 def test_init_cree_mail_log_sql(tmp_path):
-    from forge_cli.mail import cmd_mail_init
+    from forge_mvc_mail.cli import cmd_mail_init
     cmd_mail_init([], root=tmp_path)
     sql_file = tmp_path / "mvc" / "models" / "sql" / "mail_log.sql"
     assert sql_file.exists()
@@ -380,7 +381,7 @@ def test_init_cree_mail_log_sql(tmp_path):
 
 
 def test_init_ne_pas_ecraser_mail_log_sql(tmp_path, capsys):
-    from forge_cli.mail import cmd_mail_init
+    from forge_mvc_mail.cli import cmd_mail_init
     cmd_mail_init([], root=tmp_path)
     sql_file = tmp_path / "mvc" / "models" / "sql" / "mail_log.sql"
     sql_file.write_text("MODIFIÉ", encoding="utf-8")

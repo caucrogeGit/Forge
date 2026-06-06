@@ -8,7 +8,8 @@ from pathlib import Path
 import pytest
 
 import core.forge as forge
-from forge_cli.mail import (
+pytest.importorskip("forge_mvc_mail")
+from forge_mvc_mail.cli import (
     _check_enabled,
     _check_from_address,
     _check_smtp_config,
@@ -35,7 +36,7 @@ def restore_forge():
 @pytest.fixture()
 def no_env(monkeypatch):
     """Neutralise _load_env_and_configure_forge — forge est configuré par le test."""
-    monkeypatch.setattr("forge_cli.mail._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("forge_mvc_mail.cli._load_env_and_configure_forge", lambda root: None)
 
 
 def _forge_mail(tmp_path: Path, *, transport: str = "fake", enabled: bool = True) -> None:

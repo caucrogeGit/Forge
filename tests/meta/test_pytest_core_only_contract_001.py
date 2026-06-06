@@ -92,6 +92,9 @@ OPTIN_MODULES: dict[str, set[str]] = {
     # gardent l'import via pytest.importorskip("forge_mvc_pivot") ; accès base
     # via core.database.db (import paresseux), donc pas d'extra à lister.
     "forge_mvc_pivot": set(),
+    # forge-mvc-mail : mail extrait du core (ADR-022). jinja2 est une dep
+    # core (templating), donc pas d'extra a lister ici.
+    "forge_mvc_mail": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

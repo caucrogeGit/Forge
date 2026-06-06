@@ -30,7 +30,6 @@ from forge_cli.sync_landing import main as sync_landing_main
 # branche upload:init/media:init (dépend de l'opt-in forge-mvc-files).
 from forge_cli.front import main as front_main
 from forge_cli.auth import main as auth_main
-from forge_cli.mail import main as mail_main
 from forge_cli.deploy import main as deploy_main
 from forge_cli.i18n import main as i18n_main
 from forge_cli.run import main as run_main
@@ -660,6 +659,13 @@ def main() -> None:
         return
 
     if command in ("mail:init", "mail:test", "mail:render", "mail:doctor", "mail:logs"):
+        try:
+            from forge_mvc_mail.cli import main as mail_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-mail non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-mail",
+            )
         mail_main(args)
         return
 

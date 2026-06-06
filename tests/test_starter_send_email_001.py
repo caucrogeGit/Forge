@@ -53,7 +53,7 @@ def test_snippet_routes():
 
 def test_controller_mail_api_and_no_db():
     text = CONTROLLER.read_text(encoding="utf-8")
-    assert "from core.mail import ConsoleTransport, MailError, Mailer, MailMessage" in text
+    assert "from forge_mvc_mail import ConsoleTransport, MailError, Mailer, MailMessage" in text
     assert "MailMessage(" in text
     assert "Mailer(ConsoleTransport())" in text
     assert "csrf_token" in text

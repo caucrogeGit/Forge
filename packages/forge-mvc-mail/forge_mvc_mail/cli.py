@@ -170,10 +170,10 @@ def cmd_mail_test(args: list[str], root: Path | None = None) -> None:
 
     from datetime import datetime
 
-    from core.mail.config import MailConfig
-    from core.mail.exceptions import MailConfigurationError
-    from core.mail.mailer import Mailer
-    from core.mail.message import MailMessage
+    from forge_mvc_mail.config import MailConfig
+    from forge_mvc_mail.exceptions import MailConfigurationError
+    from forge_mvc_mail.mailer import Mailer
+    from forge_mvc_mail.message import MailMessage
 
     config    = MailConfig.from_forge()
     transport = config.build_transport()
@@ -240,8 +240,8 @@ def cmd_mail_render(args: list[str], root: Path | None = None) -> None:
     _load_env_and_configure_forge(root)
 
     import core.forge as forge
-    from core.mail.exceptions import MailTemplateError
-    from core.mail.templates import MailTemplateRenderer
+    from forge_mvc_mail.exceptions import MailTemplateError
+    from forge_mvc_mail.templates import MailTemplateRenderer
 
     renderer = MailTemplateRenderer(template_dir=forge.get("mail_templates_dir"))
 
@@ -339,7 +339,7 @@ def cmd_mail_doctor(args: list[str], root: Path | None = None) -> None:
     root = root or Path.cwd()
     _load_env_and_configure_forge(root)
 
-    from core.mail.config import MailConfig
+    from forge_mvc_mail.config import MailConfig
     config = MailConfig.from_forge()
 
     checks: list[MailCheckResult] = [
@@ -396,7 +396,7 @@ def cmd_mail_logs(args: list[str], root: Path | None = None) -> None:
     root = root or Path.cwd()
     _load_env_and_configure_forge(root)
 
-    from core.mail.log import MailLogger
+    from forge_mvc_mail.log import MailLogger
 
     if not MailLogger.is_enabled():
         print(out.warn("MAIL_LOG_ENABLED=false — journalisation désactivée."))

@@ -2,8 +2,9 @@
 
 import pytest
 
-from core.mail.exceptions import MailConfigurationError, MailValidationError
-from core.mail.message import MailMessage
+pytest.importorskip("forge_mvc_mail")
+from forge_mvc_mail.exceptions import MailConfigurationError, MailValidationError
+from forge_mvc_mail.message import MailMessage
 
 
 # ── Hiérarchie des exceptions ─────────────────────────────────────────────────

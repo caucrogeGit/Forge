@@ -1039,7 +1039,7 @@ Effets:
   - charge env/dev puis instancie MailConfig depuis les variables MAIL_* ;
   - construit le transport correspondant à MAIL_TRANSPORT (smtp|log|null) ;
   - prépare un MailMessage daté avec corps texte et HTML ;
-  - délègue à core.mail.mailer.Mailer.send().
+  - délègue à forge_mvc_mail.mailer.Mailer.send().
 
 Selon la configuration:
   - MAIL_ENABLED=false ou transport null  → AUCUN envoi réel
@@ -1075,7 +1075,7 @@ Effets:
   - charge env/dev puis lit le template dans mail_templates_dir
     (par défaut mvc/mail/templates) ;
   - applique le contexte JSON s'il est fourni ;
-  - instancie core.mail.templates.MailTemplateRenderer ;
+  - instancie forge_mvc_mail.templates.MailTemplateRenderer ;
   - affiche le rendu encadré : Template, Sujet, corps texte, corps HTML ;
   - n'envoie aucun mail, ne touche ni storage/mail/ ni mail_log.
 
@@ -1129,7 +1129,7 @@ Arguments:
 Effets:
   - charge env/dev ;
   - vérifie MAIL_LOG_ENABLED (sinon avertit et sort) ;
-  - lit la table mail_log via core.mail.log.MailLogger.fetch_recent(N) ;
+  - lit la table mail_log via forge_mvc_mail.log.MailLogger.fetch_recent(N) ;
   - imprime un tableau ID / DATE / STATUS / TRANSPORT / TO / SUJET ;
   - n'écrit, ne modifie et ne purge rien.
 

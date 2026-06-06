@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from core.mail.config import MailConfig
-from core.mail.exceptions import MailSendError
-from core.mail.log import MailLogRecord, MailLogger
-from core.mail.message import MailMessage
-from core.mail.transports import BaseTransport, TransportResult
+from forge_mvc_mail.config import MailConfig
+from forge_mvc_mail.exceptions import MailSendError
+from forge_mvc_mail.log import MailLogRecord, MailLogger
+from forge_mvc_mail.message import MailMessage
+from forge_mvc_mail.transports import BaseTransport, TransportResult
 
 
 class Mailer:

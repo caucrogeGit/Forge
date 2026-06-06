@@ -3,7 +3,8 @@ import smtplib
 import pytest
 
 import core.forge as forge
-from core.mail import MailConfigurationError, MailMessage, MailSendError, SMTPMailer
+pytest.importorskip("forge_mvc_mail")
+from forge_mvc_mail import MailConfigurationError, MailMessage, MailSendError, SMTPMailer
 
 
 class FakeSMTP:

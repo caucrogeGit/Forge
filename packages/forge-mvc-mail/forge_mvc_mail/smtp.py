@@ -3,7 +3,7 @@
 SMTPMailer est conservé provisoirement pour les projets et tests qui l'utilisent.
 Le système recommandé depuis Forge 1.2 est Mailer + SmtpTransport :
 
-    from core.mail import Mailer, MailMessage
+    from forge_mvc_mail import Mailer, MailMessage
     result = Mailer.from_config().send(message)
 """
 from __future__ import annotations
@@ -12,8 +12,8 @@ from dataclasses import dataclass
 import smtplib
 
 from core.forge import get as _cfg
-from core.mail.exceptions import MailConfigurationError, MailSendError
-from core.mail.message import MailMessage
+from forge_mvc_mail.exceptions import MailConfigurationError, MailSendError
+from forge_mvc_mail.message import MailMessage
 
 
 def _as_bool(value: object) -> bool:

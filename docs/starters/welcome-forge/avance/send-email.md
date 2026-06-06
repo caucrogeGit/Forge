@@ -3,7 +3,7 @@
 Objectif : composer un email et l'**envoyer**, sans serveur SMTP en
 développement.
 
-**Ce que vous allez apprendre :** le module `core.mail`. On construit un
+**Ce que vous allez apprendre :** le module `forge_mvc_mail` (opt-in forge-mvc-mail). On construit un
 `MailMessage` (sujet, destinataire, corps) puis on le confie à un `Mailer`
 branché sur un **transport**. En développement, `ConsoleTransport` **affiche**
 l'email dans la console du serveur : vous apprenez le flux complet sans
@@ -44,7 +44,7 @@ s'affiche **dans la console du serveur**.
 
 ```python
 # mvc/controllers/send_email_controller.py
-from core.mail import ConsoleTransport, MailError, Mailer, MailMessage
+from forge_mvc_mail import ConsoleTransport, MailError, Mailer, MailMessage
 
 
 class SendEmailController(BaseController):
@@ -111,7 +111,7 @@ class SendEmailController(BaseController):
 
 ## À retenir
 
-- `core.mail` sépare le **message** (`MailMessage`) du **transport**
+- `forge_mvc_mail` (opt-in forge-mvc-mail) sépare le **message** (`MailMessage`) du **transport**
   (`ConsoleTransport`, SMTP…).
 - En développement, `ConsoleTransport` affiche l'email — aucun SMTP requis.
 - Changer de transport ne change pas le code métier : c'est l'intérêt de

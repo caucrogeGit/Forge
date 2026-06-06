@@ -9,7 +9,7 @@
 
 ## Principe d'architecture
 
-`core/mail/` est une brique générique du framework. Elle ne contient aucune logique métier, aucun template applicatif, aucun workflow et aucune queue.
+`forge_mvc_mail/` est une brique générique du framework. Elle ne contient aucune logique métier, aucun template applicatif, aucun workflow et aucune queue.
 
 Elle fournit :
 
@@ -194,7 +194,7 @@ MAIL_FROM=MonApp <noreply@mondomaine.fr>
 ### Envoi simple
 
 ```python
-from core.mail import Mailer, MailMessage
+from forge_mvc_mail import Mailer, MailMessage
 
 message = MailMessage(
     subject="Bienvenue",
@@ -207,7 +207,7 @@ result = Mailer.from_config().send(message)
 ### Envoi avec template
 
 ```python
-from core.mail import Mailer, MailTemplateRenderer
+from forge_mvc_mail import Mailer, MailTemplateRenderer
 
 renderer = MailTemplateRenderer()
 message  = renderer.render(
@@ -243,7 +243,7 @@ message = MailMessage(
 ### Tests unitaires avec `FakeTransport`
 
 ```python
-from core.mail import Mailer, FakeTransport, MailMessage
+from forge_mvc_mail import Mailer, FakeTransport, MailMessage
 
 transport = FakeTransport()
 mailer    = Mailer(transport)
@@ -343,4 +343,4 @@ Ne commitez jamais de mots de passe SMTP. `env/dev` et `env/prod` sont ignorés 
 - `MAIL_TRANSPORT=log` est le transport par défaut — les mails sont lisibles dans `storage/mail/` sans serveur SMTP.
 - `MAIL_LOG_ENABLED=false` est le défaut — pas de table SQL requise pour démarrer.
 - Le corps du mail n'est jamais stocké dans `mail_log` : seuls le sujet, le destinataire, le transport, le statut et les métadonnées métier sont enregistrés.
-- `core/mail/` ne contient aucun template applicatif — placez vos templates dans `mvc/mail/templates/`.
+- `forge_mvc_mail/` ne contient aucun template applicatif — placez vos templates dans `mvc/mail/templates/`.

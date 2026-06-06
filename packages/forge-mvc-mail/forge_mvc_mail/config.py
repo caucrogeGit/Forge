@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from core.forge import get as _cfg
-from core.mail.exceptions import MailConfigurationError
-from core.mail.transports import (
+from forge_mvc_mail.exceptions import MailConfigurationError
+from forge_mvc_mail.transports import (
     BaseTransport,
     ConsoleTransport,
     FakeTransport,

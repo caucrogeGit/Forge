@@ -1658,7 +1658,7 @@ Les noms d'entités et de champs (`Contact`, `nom`, `email`…) **ne sont pas tr
 <details markdown="1" id="coremail">
 <summary><code>core.mail</code> - Mail SMTP minimal</summary>
 
-`core.mail` fournit une brique mail générique avec transports interchangeables, rendu de templates et journalisation optionnelle. Elle ne contient pas de logique métier.
+`forge_mvc_mail` (opt-in forge-mvc-mail) fournit une brique mail générique avec transports interchangeables, rendu de templates et journalisation optionnelle. Elle ne contient pas de logique métier.
 
 ### API
 
@@ -1673,13 +1673,13 @@ Les noms d'entités et de champs (`Contact`, `nom`, `email`…) **ne sont pas tr
 | `MailConfigurationError` | Configuration incomplète ou incohérente. |
 | `MailSendError` | Erreur SMTP pendant l'envoi. `Mailer.send()` l'intercepte en `TransportResult(success=False)`. |
 
-> `SMTPMailer` (`core/mail/smtp.py`) est conservé provisoirement pour compatibilité.
+> `SMTPMailer` (`forge_mvc_mail/smtp.py`) est conservé provisoirement pour compatibilité.
 > Le système recommandé depuis Forge 1.2 est `Mailer + SmtpTransport`.
 
 ### Exemple
 
 ```python
-from core.mail import Mailer, MailMessage
+from forge_mvc_mail import Mailer, MailMessage
 
 message = MailMessage(
     subject="Bienvenue",

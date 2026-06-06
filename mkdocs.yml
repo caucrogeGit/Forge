@@ -343,6 +343,7 @@ nav:
           - ADR-019 Extraction upload: adr/019-upload-extraction.md
           - ADR-020 Primitives stockage files: adr/020-files-media-storage-primitives.md
           - ADR-021 Extraction pivot: adr/021-pivot-extraction.md
+          - ADR-022 Extraction mail: adr/022-mail-extraction.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md

@@ -26,6 +26,7 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-audio":    "Development Status :: 4 - Beta",
     "forge-mvc-files":    "Development Status :: 3 - Alpha",
     "forge-mvc-pivot":    "Development Status :: 4 - Beta",
+    "forge-mvc-mail":     "Development Status :: 4 - Beta",
 }
 
 

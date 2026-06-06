@@ -8,9 +8,10 @@ import smtplib
 import pytest
 
 import core.forge as forge
-from core.mail.exceptions import MailConfigurationError, MailSendError
-from core.mail.message import MailMessage
-from core.mail.transports import (
+pytest.importorskip("forge_mvc_mail")
+from forge_mvc_mail.exceptions import MailConfigurationError, MailSendError
+from forge_mvc_mail.message import MailMessage
+from forge_mvc_mail.transports import (
     BaseTransport,
     ConsoleTransport,
     FakeTransport,

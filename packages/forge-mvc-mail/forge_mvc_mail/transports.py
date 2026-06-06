@@ -12,8 +12,8 @@ from pathlib import Path
 from typing import TextIO
 
 from core.forge import get as _cfg
-from core.mail.exceptions import MailConfigurationError, MailSendError
-from core.mail.message import MailMessage
+from forge_mvc_mail.exceptions import MailConfigurationError, MailSendError
+from forge_mvc_mail.message import MailMessage
 
 
 def _as_bool(value: object) -> bool:

@@ -94,8 +94,8 @@ Cookie de session **durci** : `HttpOnly; SameSite=Strict; Secure`.
 | Fonction | Usage |
 |----------|-------|
 | `forge_mvc_files.save_upload(file, category)` | Valider (extension, MIME, taille) puis stocker un fichier |
-| `core.mail.MailMessage(...)` | Décrire un email (sujet, destinataire, corps) |
-| `core.mail.Mailer(transport).send(message)` | Envoyer ; `ConsoleTransport` en dev (aucun SMTP) |
+| `forge_mvc_mail.MailMessage(...)` | Décrire un email (sujet, destinataire, corps) |
+| `forge_mvc_mail.Mailer(transport).send(message)` | Envoyer ; `ConsoleTransport` en dev (aucun SMTP) |
 
 ## Sécurité
 

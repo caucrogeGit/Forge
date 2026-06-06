@@ -5,11 +5,12 @@ from __future__ import annotations
 import pytest
 
 import core.forge as forge
-from core.mail.config import MailConfig
-from core.mail.exceptions import MailConfigurationError, MailSendError
-from core.mail.mailer import Mailer
-from core.mail.message import MailMessage
-from core.mail.transports import (
+pytest.importorskip("forge_mvc_mail")
+from forge_mvc_mail.config import MailConfig
+from forge_mvc_mail.exceptions import MailConfigurationError, MailSendError
+from forge_mvc_mail.mailer import Mailer
+from forge_mvc_mail.message import MailMessage
+from forge_mvc_mail.transports import (
     BaseTransport,
     ConsoleTransport,
     FakeTransport,
@@ -210,7 +211,7 @@ def test_mailer_send_plusieurs_messages():
     assert t.sent_count == 3
 
 
-# ── Import public depuis core.mail ────────────────────────────────────────────
+# ── Import public depuis forge_mvc_mail ────────────────────────────────────────────
 
 def test_import_public_mailer_et_mail_config():
-    from core.mail import MailConfig, Mailer  # noqa: F401 — test d'import
+    from forge_mvc_mail import MailConfig, Mailer  # noqa: F401 — test d'import

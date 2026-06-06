@@ -50,6 +50,7 @@ _OPTIN_MODULES: frozenset[str] = frozenset({
     "forge_mvc_stats",
     "forge_mvc_mfa",
     "forge_mvc_pivot",   # pivot advanced extrait du core (ADR-021)
+    "forge_mvc_mail",    # mail extrait du core (ADR-022)
     "pyotp",       # dépendance directe de forge-mvc-mfa (TOTP)
 })
 

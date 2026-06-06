@@ -6,9 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from core.mail.exceptions import MailTemplateError, MailValidationError
-from core.mail.message import MailMessage
-from core.mail.templates import MailTemplateRenderer
+pytest.importorskip("forge_mvc_mail")
+from forge_mvc_mail.exceptions import MailTemplateError, MailValidationError
+from forge_mvc_mail.message import MailMessage
+from forge_mvc_mail.templates import MailTemplateRenderer
 
 
 def _w(tmp_path: Path, name: str, content: str) -> None:
@@ -166,7 +167,7 @@ def test_render_erreur_message_contient_nom_template(tmp_path):
 
 
 def test_render_mail_template_error_est_mail_configuration_error(tmp_path):
-    from core.mail.exceptions import MailConfigurationError
+    from forge_mvc_mail.exceptions import MailConfigurationError
     assert issubclass(MailTemplateError, MailConfigurationError)
 
 
@@ -216,4 +217,4 @@ def test_render_subject_pas_autoescape(tmp_path):
 # ── Import public ─────────────────────────────────────────────────────────────
 
 def test_import_public_mail_template_renderer():
-    from core.mail import MailTemplateRenderer  # noqa: F401
+    from forge_mvc_mail import MailTemplateRenderer  # noqa: F401

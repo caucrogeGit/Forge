@@ -28,3 +28,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-019](019-upload-extraction.md) | Extraction de l'upload générique hors du core : `forge-mvc-files` (proposé) |
 | [ADR-020](020-files-media-storage-primitives.md) | Périmètre de `forge-mvc-files` : primitives de stockage média génériques (proposé) |
 | [ADR-021](021-pivot-extraction.md) | Extraction de pivot advanced hors du core : `forge-mvc-pivot` (accepté) |
+| [ADR-022](022-mail-extraction.md) | Extraction de l'email hors du core : `forge-mvc-mail` (accepté) |

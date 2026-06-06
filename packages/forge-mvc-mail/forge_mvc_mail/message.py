@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from email.message import EmailMessage
 from typing import Iterable
 
-from core.mail.exceptions import MailValidationError
+from forge_mvc_mail.exceptions import MailValidationError
 
 
 _NEWLINE_RE = re.compile(r"[\r\n]")

@@ -1,17 +1,22 @@
-from core.mail.config import MailConfig
-from core.mail.log import MailLogRecord, MailLogger
-from core.mail.exceptions import (
+"""forge-mvc-mail — Envoi d'emails opt-in (extrait du core, ADR-022).
+
+Composition de messages, transports interchangeables (console, SMTP, log…),
+rendu de templates Jinja, journalisation, et CLI `mail:*`.
+"""
+from forge_mvc_mail.config import MailConfig
+from forge_mvc_mail.log import MailLogRecord, MailLogger
+from forge_mvc_mail.exceptions import (
     MailConfigurationError,
     MailError,
     MailSendError,
     MailTemplateError,
     MailValidationError,
 )
-from core.mail.mailer import Mailer
-from core.mail.message import MailMessage
-from core.mail.smtp import SMTPMailer
-from core.mail.templates import MailTemplateRenderer
-from core.mail.transports import (
+from forge_mvc_mail.mailer import Mailer
+from forge_mvc_mail.message import MailMessage
+from forge_mvc_mail.smtp import SMTPMailer
+from forge_mvc_mail.templates import MailTemplateRenderer
+from forge_mvc_mail.transports import (
     BaseTransport,
     ConsoleTransport,
     FakeTransport,
@@ -42,3 +47,5 @@ __all__ = [
     "SmtpTransport",
     "TransportResult",
 ]
+
+__version__ = "1.0.0b13"

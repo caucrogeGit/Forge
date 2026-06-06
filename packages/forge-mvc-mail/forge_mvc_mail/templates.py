@@ -8,8 +8,8 @@ from typing import Iterable
 import jinja2
 
 from core.forge import get as _cfg
-from core.mail.exceptions import MailTemplateError
-from core.mail.message import MailMessage
+from forge_mvc_mail.exceptions import MailTemplateError
+from forge_mvc_mail.message import MailMessage
 
 
 class MailTemplateRenderer:
