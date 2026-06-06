@@ -189,7 +189,23 @@ class Response:
 
         headers: dict[str, str] = {"Accept-Ranges": "bytes"}
         if download_name:
-            headers["Content-Disposition"] = f'attachment; filename="{download_name}"'
+            # Anti-injection d'en-tête : `download_name` peut venir d'un nom de
+            # fichier utilisateur. On assainit le repli ASCII (retrait des
+            # guillemets et des CR/LF) et on fournit `filename*` (RFC 6266)
+            # encodé pour l'UTF-8 et les caractères spéciaux.
+            from urllib.parse import quote
+
+            ascii_name = (
+                download_name.encode("ascii", "ignore")
+                .decode("ascii")
+                .replace('"', "")
+                .replace("\r", "")
+                .replace("\n", "")
+            ) or "download"
+            encoded = quote(download_name, safe="")
+            headers["Content-Disposition"] = (
+                f'attachment; filename="{ascii_name}"; filename*=UTF-8\'\'{encoded}'
+            )
 
         range_header = request.header("Range") if request is not None else None
         spec = parse_byte_range(range_header, size)
