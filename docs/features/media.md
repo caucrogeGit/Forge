@@ -22,15 +22,15 @@ service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure
 **`forge_mvc_files` — upload générique** (opt-in, ADR-019) :
 
 - `save_upload` — sauvegarde sécurisée d'un fichier
-- `save_image`, `generate_image_variants` — traitement Pillow
 - `serve_media_file` — route `/media/...` sécurisée
 - `delete_media_file` — suppression physique d'un fichier
 - exceptions (`UploadError`, `UploadStorageError`…)
 - validation MIME, stockage contrôlé, protection path traversal
 - rate limiting upload
 
-**`forge_mvc_images` — helpers applicatifs** (opt-in `forge-mvc-images`) :
+**`forge_mvc_images` — traitement d'image et helpers applicatifs** (opt-in `forge-mvc-images`) :
 
+- `save_image`, `save_image_upload`, `generate_image_variants`, `verify_image_content` — traitement Pillow
 - `attach_media_to_entity`, `create_media_record`, `get_media_record`
 - `list_media_for_entity`, `update_media_alt_text`, `update_media_position`
 - `delete_media`, `delete_media_record`

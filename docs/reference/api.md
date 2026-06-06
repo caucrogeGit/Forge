@@ -1109,7 +1109,7 @@ Voir aussi : [Front et CSS](../features/front.md).
 | `get_upload_path(relative_path)` | Résout un chemin d'upload. |
 | `normalize_media_path(path)` | Normalise un chemin média relatif à `storage/uploads`. |
 | `media_path_to_storage_path(path, root=...)` | Résout un chemin média relatif sous la racine d'upload. |
-| `generate_image_variants(path, root=...)` | Génère les variantes `medium` et `thumbnail` d'une image. |
+| `generate_image_variants(path, root=...)` | Génère les variantes `medium` et `thumbnail` d'une image (opt-in `forge-mvc-images`, `from forge_mvc_images import generate_image_variants`). |
 
 ### Stockage
 
