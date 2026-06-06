@@ -32,14 +32,17 @@ def _run_query(sql: str, params=(), *, tx=None, dictionary=False, fetch=None):
         cursor.execute(sql, params)
 
         if fetch == "one":
-            return cursor.fetchone()
-        if fetch == "all":
-            return cursor.fetchall()
-        if fetch == "lastrowid":
+            result = cursor.fetchone()
+        elif fetch == "all":
+            result = cursor.fetchall()
+        elif fetch == "lastrowid":
             result = cursor.lastrowid
         else:
             result = cursor.rowcount
 
+        # Commit aussi après un SELECT : sans cela, la connexion retourne au
+        # pool avec une transaction REPEATABLE READ ouverte, et l'emprunteur
+        # suivant hérite d'un snapshot figé (lectures périmées en concurrence).
         if owns_connection:
             connection.commit()
         return result
