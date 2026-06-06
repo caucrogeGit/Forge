@@ -41,9 +41,14 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-# Modules opt-in officiels Forge + leurs dépendances directes.
-# Tout ajout ici doit aller de pair avec un fichier de test qui les
-# importe en module-level — sinon ce garde-fou ne sera pas exercé.
+# Sous-ensemble CURÉ d'opt-ins (briques de type bibliothèque) dont les tests
+# importeurs au niveau module utilisent `pytest.importorskip`. Ce n'est PAS la
+# liste exhaustive des 11 opt-ins : l'exhaustivité de la couverture opt-in est
+# garantie par `tests/meta/test_pytest_core_only_contract_001.py` (OPTIN_MODULES
+# complet + fermeture sur imports inconnus). Les opt-ins à dépendances lourdes
+# (files, images, audio, iot, video) sont volontairement hors de ce garde-fou-ci.
+# Tout ajout ici doit aller de pair avec un fichier de test qui les importe en
+# module-level ET le guarde par importorskip, sinon le garde-fou n'est pas exercé.
 _OPTIN_MODULES: frozenset[str] = frozenset({
     "forge_mvc_rbac",
     "forge_mvc_workflow",
@@ -178,12 +183,14 @@ class TestAuditCoverage:
     (sinon le garde-fou serait vacuously vrai, ex. modules renommés)."""
 
     def test_audit_covers_each_optin_at_least_once(self):
-        """Au moins un fichier de test importe chaque opt-in officiel.
+        """Au moins un fichier de test importe chaque opt-in **suivi ici**.
 
-        Si un opt-in disparaît complètement de la suite, c'est un signal
-        à investiguer (régression de couverture ou retrait volontaire) —
-        retirer le module de `_OPTIN_MODULES` dans ce cas, avec un commit
-        dédié.
+        Porte sur le sous-ensemble curé `_OPTIN_MODULES`, pas sur les 11
+        opt-ins (voir la note sur `_OPTIN_MODULES` : l'exhaustivité est
+        garantie par test_pytest_core_only_contract_001). Si un opt-in suivi
+        ici disparaît de la suite, c'est un signal à investiguer (régression
+        de couverture ou retrait volontaire) — retirer le module de
+        `_OPTIN_MODULES` dans ce cas, avec un commit dédié.
         """
         all_imported: set[str] = set()
         for info in _AUDIT.values():

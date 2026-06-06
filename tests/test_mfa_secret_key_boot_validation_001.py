@@ -169,15 +169,10 @@ class TestKeyValid:
         assert result is None
 
     def test_valid_key_with_surrounding_whitespace_passes(self, monkeypatch):
-        # Les .env mal édités collent parfois un \n en fin. On strip.
+        # Les .env mal édités collent parfois des espaces ou un \n en bordure.
+        # Contrat ferme : la validation strip la clé et l'accepte (ne lève pas).
         monkeypatch.setenv(_ENV_KEY, f"  {_VALID_KEY}\n")
-        # On laisse la validation décider — si elle strip, OK ; sinon raise
-        # un Invalid (acceptable). Le test documente le comportement actuel
-        # plutôt que d'imposer un choix.
-        try:
-            validate_mfa_secret_key_config()
-        except (MfaSecretInvalidKey, MfaSecretKeyPlaceholder):
-            pytest.skip("Whitespace en bordure refusé — comportement strict.")
+        validate_mfa_secret_key_config()
 
 
 # ---------------------------------------------------------------------------
