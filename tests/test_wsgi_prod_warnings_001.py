@@ -1,8 +1,8 @@
 """Tests — WSGI-PROD-WARNINGS-001.
 
-Vérifie que `core.wsgi.create_configured_wsgi_app()` émet les warnings
+Vérifie que `core.app.wsgi.create_configured_wsgi_app()` émet les warnings
 production (`MemorySessionStore` + rate-limits mémoire en `APP_ENV=prod`)
-via `core.prod_warnings`, exactement une fois au moment de la
+via `core.app.prod_warnings`, exactement une fois au moment de la
 construction de l'application — jamais à chaque requête WSGI.
 
 `create_wsgi_app(application)` (entrée WSGI minimale, ticket
@@ -16,11 +16,11 @@ from io import BytesIO
 import pytest
 
 import core.forge as forge
-from core.application import Application
+from core.app.application import Application
 from core.http.response import Response
 from core.http.router import Router
 from core.templating.manager import template_manager
-from core.wsgi import create_configured_wsgi_app, create_wsgi_app
+from core.app.wsgi import create_configured_wsgi_app, create_wsgi_app
 
 
 WARNING_TOKEN = "AVERTISSEMENT-PROD"
@@ -61,7 +61,7 @@ def freeze_forge_config(monkeypatch):
     Sans ce gel, `apply_forge_config()` écrase `app_env` et `session_store`
     qu'on a fixés manuellement, et le warning n'est jamais déclenché.
     """
-    monkeypatch.setattr("core.app_factory.apply_forge_config", lambda: None)
+    monkeypatch.setattr("core.app.app_factory.apply_forge_config", lambda: None)
 
 
 # ── Helpers WSGI ────────────────────────────────────────────────────────────

@@ -242,7 +242,7 @@ class TestSecurite:
 
 class TestRoutesHTMLNonImpactees:
     def test_route_html_normale(self):
-        from core.application import Application
+        from core.app.application import Application
         from core.http.router import Router
 
         router = Router()
@@ -268,7 +268,7 @@ class TestRoutesHTMLNonImpactees:
 
 class TestIntegrationDispatch:
     def test_dispatch_route_protegee_sans_token(self, monkeypatch):
-        from core.application import Application
+        from core.app.application import Application
         from core.http.router import Router
 
         monkeypatch.setenv("API_TOKEN", "secret")
@@ -287,7 +287,7 @@ class TestIntegrationDispatch:
         assert body["success"] is False
 
     def test_dispatch_route_protegee_token_valide(self, monkeypatch):
-        from core.application import Application
+        from core.app.application import Application
         from core.http.router import Router
 
         monkeypatch.setenv("API_TOKEN", "secret")

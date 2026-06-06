@@ -379,7 +379,7 @@ def check_prod_security(root: Path, config) -> CheckResult:
     Vérifie ce qui est contrôlable sans démarrer l'app : séparation des
     privilèges base de données (l'app ne doit pas tourner avec le compte
     admin) et bornage des uploads. Les avertissements *runtime* (session
-    mémoire en ``APP_ENV=prod``) restent émis par ``core.prod_warnings`` au
+    mémoire en ``APP_ENV=prod``) restent émis par ``core.app.prod_warnings`` au
     démarrage — ce check ne les remplace pas.
     """
     if config is None:

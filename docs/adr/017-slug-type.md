@@ -41,12 +41,12 @@ de duplication (charte §11) si on ajoute naïvement une 4ᵉ fonction.
 ### D1 — Deux concepts distincts, nommés clairement
 
 - **URL slug** (kebab-case `-`, pour les URLs publiques) → **un seul module
-  canonique `core/slug.py`**.
+  canonique `core/http/slug.py`**.
 - **Nom de fichier de migration** (snake_case `_`) → reste
   `slugify_migration_name`, **séparé**. Ce **n'est pas** une URL slug ; un
   commentaire le précise pour éviter toute fusion future.
 
-### D2 — Module canonique `core/slug.py` (runtime, stdlib seul)
+### D2 — Module canonique `core/http/slug.py` (runtime, stdlib seul)
 
 Deux fonctions publiques, **dépendances stdlib uniquement** (`unicodedata`,
 `re`) — respect du runtime minimal (charte) :
@@ -65,7 +65,7 @@ def is_valid_slug(value: str, *, max_length: int = 180) -> bool
   `\`, `..`), correspond à `[a-z0-9]+(?:-[a-z0-9]+)*`, longueur ≤ `max_length`.
 
 Le runtime (contrôleurs/modèles générés) et le CLI (codegen) importent ce même
-module. `forge_cli/public_page._slugify` est **remplacé** par `core.slug`
+module. `forge_cli/public_page._slugify` est **remplacé** par `core.http.slug`
 (§11 : une seule implémentation URL-slug).
 
 ### D3 — Le type `slug` dans le contrat d'entité
@@ -103,7 +103,7 @@ sitemap, slugs multilingues.
 - `slugify_migration_name` est **inchangé** mais documenté comme distinct.
 - Le contrat d'entité gagne un type de premier rang `slug` → garde-fou de
   complétude (§10) : SQL, validation, CRUD, doc cohérents.
-- Nouveau module runtime `core/slug.py` testé indépendamment.
+- Nouveau module runtime `core/http/slug.py` testé indépendamment.
 
 ---
 

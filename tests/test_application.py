@@ -1,4 +1,4 @@
-from core.application import Application
+from core.app.application import Application
 from core.http.router import Router
 from core.http.response import Response
 from core.security import session as _sessions

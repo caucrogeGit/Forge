@@ -4,7 +4,7 @@ Verrouille que Forge refuse de servir tout contenu hors racine via un
 symlink, sur les deux chemins de service fichier exposés par le framework :
 
   * **Uploads / médias** — ``forge_mvc_files.serve_media_file`` (utilisé par
-    ``app.py`` pour la route ``/media/...`` et par ``core.wsgi`` pour le
+    ``app.py`` pour la route ``/media/...`` et par ``core.app.wsgi`` pour le
     chemin WSGI) ;
   * **Statics** — ``app.py::RequestHandler._serve_static`` (route
     ``/static/...``). Le test s'appuie sur la même chaîne

@@ -1,5 +1,5 @@
 """
-core/runtime_errors.py — Schéma canonique JSONL des erreurs runtime Forge.
+core/errors/runtime_errors.py — Schéma canonique JSONL des erreurs runtime Forge.
 
 Ce module définit le format officiel des événements d'erreur runtime.
 Il fournit les constantes, les fonctions de construction et de sérialisation.

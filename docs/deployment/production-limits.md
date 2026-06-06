@@ -154,8 +154,8 @@ explicitement** (cf §4).
 
 ### Garanti
 
-- entrée WSGI configurée : `core.wsgi.create_configured_wsgi_app()` ;
-- factory partagée `core.app_factory.build_application()` (même config
+- entrée WSGI configurée : `core.app.wsgi.create_configured_wsgi_app()` ;
+- factory partagée `core.app.app_factory.build_application()` (même config
   qu'`app.py`) ;
 - warnings production émis à la construction de l'application WSGI
   (`MemorySessionStore` en `APP_ENV=prod`) ;

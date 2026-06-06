@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import forge_cli.output as out
-from core.slug import slugify
+from core.http.slug import slugify
 
 
 TEMPLATE_DIR = Path("mvc/views/public")
@@ -43,7 +43,7 @@ def _slugify(name: str) -> str:
 
     Rejette explicitement les chemins (sécurité ``make:public-page`` : on ne
     crée pas une page à partir de ``../admin``), puis délègue la transformation
-    au module URL-slug canonique ``core.slug`` (ADR-017, §11).
+    au module URL-slug canonique ``core.http.slug`` (ADR-017, §11).
     """
     value = name.strip()
     if any(part in value for part in ("/", "\\", "..")):

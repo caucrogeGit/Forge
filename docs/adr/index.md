@@ -23,7 +23,7 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-014](014-rbac-contract-location.md) | Emplacement du contrat RBAC |
 | [ADR-015](015-dev-tls-handshake-per-thread.md) | Handshake TLS par thread (dev-server) |
 | [ADR-016](016-opt-in-unification.md) | Unification du modèle opt-in : concept unique, cycle install/enable à 4 verbes |
-| [ADR-017](017-slug-type.md) | Type `slug` et module URL-slug canonique (`core/slug.py`) |
+| [ADR-017](017-slug-type.md) | Type `slug` et module URL-slug canonique (`core/http/slug.py`) |
 | [ADR-018](018-image-module-extraction.md) | Extraction du traitement d'image hors du core : `forge-mvc-images` (proposé) |
 | [ADR-019](019-upload-extraction.md) | Extraction de l'upload générique hors du core : `forge-mvc-files` (proposé) |
 | [ADR-020](020-files-media-storage-primitives.md) | Périmètre de `forge-mvc-files` : primitives de stockage média génériques (proposé) |

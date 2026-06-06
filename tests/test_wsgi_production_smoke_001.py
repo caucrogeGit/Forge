@@ -2,10 +2,10 @@
 
 Smoke tests transversaux qui exercent ensemble :
 
-  - `core.wsgi.create_configured_wsgi_app()` (factory configurée) ;
-  - `core.app_factory.build_application()` (config + routes + Application) ;
+  - `core.app.wsgi.create_configured_wsgi_app()` (factory configurée) ;
+  - `core.app.app_factory.build_application()` (config + routes + Application) ;
   - `core.http.request.Request` + `resolve_client_ip()` (X-Real-IP) ;
-  - `core.prod_warnings.emit_memory_store_warning_if_needed()` (warnings prod).
+  - `core.app.prod_warnings.emit_memory_store_warning_if_needed()` (warnings prod).
 
 Les tests individuels existent déjà ; ce fichier sert de garde-fou
 d'intégration : si une brique change et casse la cohérence WSGI
@@ -21,11 +21,11 @@ from io import BytesIO
 import pytest
 
 import core.forge as forge
-from core.application import Application
+from core.app.application import Application
 from core.http.response import Response
 from core.http.router import Router
 from core.templating.manager import template_manager
-from core.wsgi import (
+from core.app.wsgi import (
     _WsgiHeaders,
     create_configured_wsgi_app,
     create_wsgi_app,
@@ -62,7 +62,7 @@ def _restore_state(monkeypatch):
     template_manager.register(_StubRenderer())
     # Empêche `build_application()` de relire `config.py` et d'écraser les
     # valeurs posées dans les tests prod.
-    monkeypatch.setattr("core.app_factory.apply_forge_config", lambda: None)
+    monkeypatch.setattr("core.app.app_factory.apply_forge_config", lambda: None)
     yield
     template_manager._renderer = prev_renderer
     forge.configure(app_env=prev_env)
@@ -257,15 +257,15 @@ class TestLegacyApiNonRegression:
     """Sanity : les imports publics WSGI restent disponibles."""
 
     def test_public_callables_importable(self):
-        from core.wsgi import (  # noqa: F401
+        from core.app.wsgi import (  # noqa: F401
             create_configured_wsgi_app,
             create_wsgi_app,
         )
-        from core.app_factory import (  # noqa: F401
+        from core.app.app_factory import (  # noqa: F401
             apply_forge_config,
             build_application,
         )
-        from core.prod_warnings import (  # noqa: F401
+        from core.app.prod_warnings import (  # noqa: F401
             emit_memory_store_warning_if_needed,
             format_memory_store_warning,
             should_warn_memory_store_in_prod,

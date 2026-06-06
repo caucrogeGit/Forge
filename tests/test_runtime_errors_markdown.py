@@ -17,14 +17,14 @@ import pathlib
 
 import pytest
 
-from core.runtime_error_markdown import (
+from core.errors.runtime_error_markdown import (
     _MD_FILENAME,
     load_error_events_from_jsonl,
     render_error_event_markdown,
     render_errors_markdown,
     write_errors_markdown,
 )
-from core.runtime_error_logger import (
+from core.errors.runtime_error_logger import (
     _JSONL_FILENAME,
     log_runtime_error,
     set_jsonl_dir,

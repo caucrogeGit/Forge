@@ -91,7 +91,7 @@ from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFI
 import core.security.csp as _csp
 from core.security.headers import apply_security_headers
 import core.forge as forge
-from core.dev_server import (
+from core.app.dev_server import (
     format_port_in_use_message,
     format_prod_host_guard_error,
     format_startup_messages,
@@ -130,7 +130,7 @@ forge.configure(
 from core.http.request import Request, RequestEntityTooLarge
 from core.http.response import Response
 from core.http.helpers import html as _html
-from core.application import Application
+from core.app.application import Application
 # CORE-DROP-UPLOADS-001 (ADR-019) : le service de fichiers est un opt-in
 # (forge-mvc-files). Import lazy dans le handler /media (l'app démarre sans).
 from integrations.jinja2.renderer import Jinja2Renderer
@@ -432,7 +432,7 @@ if __name__ == "__main__":
             "Voir ADR-002 : docs/adr/002-session-strategy.md"
         )
 
-    from core.prod_warnings import emit_memory_store_warning_if_needed
+    from core.app.prod_warnings import emit_memory_store_warning_if_needed
     emit_memory_store_warning_if_needed(APP_ENV, forge.get("session_store"), logger=logger)
 
     try:

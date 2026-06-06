@@ -57,7 +57,7 @@ Ce qui reste dans `core/` après extraction :
 
 - `core/http/` — Request, Response, helpers
 - `core/routing/` — Router, groupes, middlewares
-- `core/application.py` — pipeline + dispatch
+- `core/app/application.py` — pipeline + dispatch
 - `core/forge.py` — configuration du noyau
 - `core/templating/` — contrat Renderer, template_manager
 - `core/database/` — db (fetch_one, fetch_all, execute, insert)

@@ -6,7 +6,7 @@ import types
 
 import pytest
 
-from core.api_routes_loader import load_api_routes
+from core.app.api_routes_loader import load_api_routes
 from core.http import api_success, api_error
 from core.http.router import Router
 from core.http.response import Response
@@ -46,7 +46,7 @@ class TestAbsent:
         assert router.match("GET", "/web") is not None
 
     def test_application_sans_api_routes_demarre(self):
-        from core.application import Application
+        from core.app.application import Application
         router = _make_router()
         router.add("GET", "/web", lambda r: Response(200, "web"), public=True)
         app = Application(router, middlewares=[], api_routes_module=None)
@@ -113,7 +113,7 @@ class TestPresent:
 
 class TestApplicationApiRoutes:
     def test_api_routes_module_none_saute_le_chargement(self):
-        from core.application import Application
+        from core.app.application import Application
         router = _make_router()
         router.add("GET", "/web", lambda r: Response(200, "web"), public=True)
         app = Application(router, middlewares=[], api_routes_module=None)
@@ -122,7 +122,7 @@ class TestApplicationApiRoutes:
         assert resp.status == 200
 
     def test_api_routes_charge_via_application(self, monkeypatch):
-        from core.application import Application
+        from core.app.application import Application
         from tests.fake_request import FakeRequest
 
         router = _make_router()
@@ -144,7 +144,7 @@ class TestApplicationApiRoutes:
         assert body["data"]["ping"] == "pong"
 
     def test_application_defaut_tente_mvc_api_routes(self):
-        from core.application import Application
+        from core.app.application import Application
         router = _make_router()
         # mvc.api_routes n'existe pas dans ce projet → ne doit pas lever
         Application(router, middlewares=[])
@@ -157,7 +157,7 @@ class TestApplicationApiRoutes:
 
 class TestRouteApiConvention:
     def test_route_api_retourne_json_success(self, monkeypatch):
-        from core.application import Application
+        from core.app.application import Application
         from tests.fake_request import FakeRequest
 
         router = _make_router()
@@ -178,7 +178,7 @@ class TestRouteApiConvention:
         assert body["success"] is True
 
     def test_route_api_retourne_api_error(self, monkeypatch):
-        from core.application import Application
+        from core.app.application import Application
         from tests.fake_request import FakeRequest
 
         router = _make_router()
@@ -199,7 +199,7 @@ class TestRouteApiConvention:
         assert body["error"]["code"] == "not_found"
 
     def test_statut_201_creation(self, monkeypatch):
-        from core.application import Application
+        from core.app.application import Application
         from tests.fake_request import FakeRequest
 
         router = _make_router()
@@ -217,7 +217,7 @@ class TestRouteApiConvention:
         assert resp.status == 201
 
     def test_web_route_inchangee(self, monkeypatch):
-        from core.application import Application
+        from core.app.application import Application
         from tests.fake_request import FakeRequest
 
         router = _make_router()

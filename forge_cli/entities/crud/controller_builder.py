@@ -90,7 +90,7 @@ def build_controller(
         "from core.http.response import Response",
     ]
     if generated_fields:
-        lines.append("from core.slug import slugify")
+        lines.append("from core.http.slug import slugify")
     if _rbac:
         lines.append("from forge_mvc_rbac import require_permission")
     lines += [

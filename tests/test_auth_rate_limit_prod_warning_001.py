@@ -4,7 +4,7 @@ Verrouille le diagnostic de démarrage qui avertit lorsque Forge tourne en
 APP_ENV=prod avec un session store mémoire (et donc, par construction,
 des rate-limits mémoire — non configurables dans la série 1.0.0).
 
-Le module `core.prod_warnings` n'écrit jamais dans la configuration : il
+Le module `core.app.prod_warnings` n'écrit jamais dans la configuration : il
 se contente de produire un message (`format_memory_store_warning`) et de
 l'émettre via le logger fourni quand la condition est remplie. La
 gestion des stores ne doit pas être modifiée.
@@ -15,7 +15,7 @@ import logging
 
 import pytest
 
-from core.prod_warnings import (
+from core.app.prod_warnings import (
     PROD_ENV,
     emit_memory_store_warning_if_needed,
     format_memory_store_warning,

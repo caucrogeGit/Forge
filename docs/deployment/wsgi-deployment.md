@@ -43,14 +43,14 @@ Trois responsabilités sont séparées :
 
 ```python
 # wsgi.py
-from core.wsgi import create_configured_wsgi_app
+from core.app.wsgi import create_configured_wsgi_app
 
 application = create_configured_wsgi_app()
 ```
 
 La factory `create_configured_wsgi_app()` :
 
-- charge la même configuration que `python app.py` (via `core.app_factory.build_application`) ;
+- charge la même configuration que `python app.py` (via `core.app.app_factory.build_application`) ;
 - applique `forge.configure(...)` avec toutes les variables d'environnement
   (dont `APP_TRUSTED_PROXIES`) ;
 - enregistre le renderer Jinja2 ;

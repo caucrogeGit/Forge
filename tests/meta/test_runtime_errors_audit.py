@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pathlib
 
-from core.application import Application
+from core.app.application import Application
 from core.http.router import Router
 from core.templating.manager import template_manager
 from integrations.jinja2.renderer import Jinja2Renderer

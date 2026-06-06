@@ -20,7 +20,7 @@ storage/logs/errors.dev.jsonl
 
 Ce fichier JSONL est la **source unique de vérité** des erreurs runtime de développement.
 
-- Il est écrit par le collecteur d'erreurs (`core/runtime_error_logger.py`).
+- Il est écrit par le collecteur d'erreurs (`core/errors/runtime_error_logger.py`).
 - Il est actif uniquement en `APP_ENV=dev`.
 - Le rendu Markdown (`errors.dev.md`) est régénéré automatiquement après chaque écriture.
 - La future vue Forge Design lira ce fichier directement.
@@ -110,7 +110,7 @@ L'objet `request` ne doit jamais contenir de valeurs sensibles :
 ```json
 [
   {"file": "app.py", "line": 186, "function": "do_GET"},
-  {"file": "core/application.py", "line": 54, "function": "dispatch"},
+  {"file": "core/app/application.py", "line": 54, "function": "dispatch"},
   {"file": "mvc/controllers/user_controller.py", "line": 42, "function": "index"}
 ]
 ```
@@ -212,7 +212,7 @@ Un message est `safe_for_display: true` uniquement s'il a été explicitement co
   },
   "traceback": [
     {"file": "app.py", "line": 186, "function": "do_GET"},
-    {"file": "core/application.py", "line": 54, "function": "dispatch"},
+    {"file": "core/app/application.py", "line": 54, "function": "dispatch"},
     {"file": "mvc/controllers/user_controller.py", "line": 42, "function": "index"}
   ],
   "hint": "Vérifier la signature de la méthode du contrôleur."
@@ -223,10 +223,10 @@ Un message est `safe_for_display: true` uniquement s'il a été explicitement co
 
 ## Module Python
 
-Le module `core/runtime_errors.py` fournit les outils pour construire et sérialiser les événements :
+Le module `core/errors/runtime_errors.py` fournit les outils pour construire et sérialiser les événements :
 
 ```python
-from core.runtime_errors import (
+from core.errors.runtime_errors import (
     build_error_event,
     build_error_event_from_exc,
     serialize_event,
@@ -248,9 +248,9 @@ except RuntimeError as exc:
 
 ---
 
-## Collecteur — core/runtime_error_logger.py
+## Collecteur — core/errors/runtime_error_logger.py
 
-Le collecteur est dans `core/runtime_error_logger.py`. Il est branché sur `core/application.py`.
+Le collecteur est dans `core/errors/runtime_error_logger.py`. Il est branché sur `core/app/application.py`.
 
 **Comportement en `APP_ENV=dev` :**
 
@@ -265,7 +265,7 @@ Chaque erreur non gérée capturée par `Application.dispatch()` est enregistré
 **Comportement en `APP_ENV=prod` :** aucune écriture.
 
 ```python
-from core.runtime_error_logger import log_runtime_error
+from core.errors.runtime_error_logger import log_runtime_error
 
 # Appelé automatiquement depuis Application.dispatch()
 # Peut aussi être appelé manuellement depuis un except
@@ -277,9 +277,9 @@ except RuntimeError as exc:
 
 ---
 
-## Rendu Markdown — core/runtime_error_markdown.py
+## Rendu Markdown — core/errors/runtime_error_markdown.py
 
-Le rendu Markdown est dans `core/runtime_error_markdown.py`. Il est déclenché automatiquement après chaque écriture JSONL.
+Le rendu Markdown est dans `core/errors/runtime_error_markdown.py`. Il est déclenché automatiquement après chaque écriture JSONL.
 
 ```text
 storage/logs/errors.dev.jsonl  →  storage/logs/errors.dev.md

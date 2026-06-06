@@ -1,7 +1,7 @@
 """Tests — WSGI-SECURITY-HEADERS-001 : socle de headers de sécurité WSGI.
 
 Aligne le contrat de sécurité navigateur entre `python app.py` et le chemin
-WSGI (`core.wsgi.create_wsgi_app`). Verrouille :
+WSGI (`core.app.wsgi.create_wsgi_app`). Verrouille :
 
   * la présence des 5 headers de base (X-Frame-Options, X-Content-Type-Options,
     Referrer-Policy, Permissions-Policy, Content-Security-Policy) ;
@@ -21,11 +21,11 @@ from io import BytesIO
 
 import pytest
 
-from core.application import Application
+from core.app.application import Application
 from core.http.response import Response
 from core.http.router import Router
 from core.templating.manager import template_manager
-from core.wsgi import _response_to_wsgi, create_wsgi_app
+from core.app.wsgi import _response_to_wsgi, create_wsgi_app
 
 pytestmark = pytest.mark.usefixtures("_stub_renderer")
 
@@ -353,7 +353,7 @@ class TestHelperContract:
 
 
 class TestAppPyAndWsgiShareHelper:
-    """Garde-fou méta : `app.py` et `core/wsgi.py` importent tous les deux
+    """Garde-fou méta : `app.py` et `core/app/wsgi.py` importent tous les deux
     `apply_security_headers` depuis `core.security.headers` — pas de
     duplication silencieuse de la liste de headers."""
 
@@ -364,7 +364,7 @@ class TestAppPyAndWsgiShareHelper:
 
     def test_wsgi_imports_apply_security_headers(self):
         import pathlib
-        source = pathlib.Path("core/wsgi.py").read_text(encoding="utf-8")
+        source = pathlib.Path("core/app/wsgi.py").read_text(encoding="utf-8")
         assert "from core.security.headers import apply_security_headers" in source
 
     def test_app_py_no_longer_lists_security_headers_inline(self):

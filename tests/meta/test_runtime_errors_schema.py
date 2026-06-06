@@ -20,7 +20,7 @@ import re
 
 import pytest
 
-from core.runtime_errors import (
+from core.errors.runtime_errors import (
     CATEGORIES,
     CATEGORY_CONTROLLER,
     CATEGORY_DATABASE,

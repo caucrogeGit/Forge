@@ -1,6 +1,6 @@
 """Tests — WSGI-ENTRYPOINT-001 : callable WSGI minimal pour Forge.
 
-Vérifie que `core.wsgi.create_wsgi_app(application)` :
+Vérifie que `core.app.wsgi.create_wsgi_app(application)` :
   1. retourne un callable acceptant `(environ, start_response)` ;
   2. dispatche correctement une requête GET ;
   3. dispatche une requête POST avec body url-encoded ;
@@ -17,11 +17,11 @@ from io import BytesIO
 
 import pytest
 
-from core.application import Application
+from core.app.application import Application
 from core.http.response import Response
 from core.http.router import Router
 from core.templating.manager import template_manager
-from core.wsgi import create_wsgi_app
+from core.app.wsgi import create_wsgi_app
 
 
 class _StubRenderer:
@@ -109,7 +109,7 @@ def wsgi_app():
 
 class TestCallableShape:
     def test_module_imports(self):
-        import core.wsgi as wsgi_mod
+        import core.app.wsgi as wsgi_mod
         assert hasattr(wsgi_mod, "create_wsgi_app")
 
     def test_factory_returns_callable(self, wsgi_app):

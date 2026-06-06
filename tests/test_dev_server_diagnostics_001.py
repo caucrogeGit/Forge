@@ -3,12 +3,12 @@ Tests du ticket DEV-SERVER-DIAGNOSTICS-001.
 
 Couvre les fonctions pures de mise en forme des messages affichés par app.py
 au démarrage du serveur de développement. Les fonctions vivent dans
-core/dev_server.py pour être testables sans déclencher les effets de bord
+core/app/dev_server.py pour être testables sans déclencher les effets de bord
 d'import de app.py.
 """
 import pytest
 
-from core.dev_server import (
+from core.app.dev_server import (
     format_port_in_use_message,
     format_startup_messages,
     scheme_for,

@@ -32,7 +32,7 @@
 
 ### Slugs canoniques (feature phare)
 
-- **Type de slug canonique** (`core/slug.py`) : `slugify` déterministe,
+- **Type de slug canonique** (`core/http/slug.py`) : `slugify` déterministe,
   `is_valid_slug` (contrat de validation unique), génération depuis une colonne
   `source`. Une seule façon officielle de produire un slug (principe 11).
 - **SQL/CRUD auto-généré** prenant en charge le slug (colonne, index unique,
@@ -263,7 +263,7 @@
 
 - Phase B9 close — release de consolidation production encadrée.
 - CLI: `--help`/`-h` interceptés au dispatcher avant exécution métier (12 tickets `CLI-HELP-FLAGS-*`, série close).
-- WSGI: `core.wsgi.create_configured_wsgi_app()` — factory configurée partagée avec `app.py` via `core.app_factory.build_application()`.
+- WSGI: `core.app.wsgi.create_configured_wsgi_app()` — factory configurée partagée avec `app.py` via `core.app.app_factory.build_application()`.
 - WSGI: warnings production émis à la construction de l'application (`MemorySessionStore` en `APP_ENV=prod`).
 - HTTP: `APP_TRUSTED_PROXIES` + `resolve_client_ip()` — `X-Real-IP` honoré uniquement derrière proxy fiable, validation `ipaddress`.
 - Sessions: helpers centralisés `core.security.cookies.set_session_cookie()` / `clear_session_cookie()`, migration des contrôleurs Auth et MFA.

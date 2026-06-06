@@ -42,7 +42,7 @@ def _missing_template_response(
 
     if exc is not None:
         try:
-            from core.runtime_error_logger import log_runtime_error
+            from core.errors.runtime_error_logger import log_runtime_error
             log_runtime_error(exc)
         except Exception:  # pragma: no cover — défensif
             # Le logger JSONL est best-effort : on ne casse pas la réponse

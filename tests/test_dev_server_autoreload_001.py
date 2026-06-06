@@ -67,9 +67,9 @@ def _make_project(tmp_path: Path) -> Path:
     (mvc / "migrations" / "001_init.sql").write_text("-- noop", encoding="utf-8")
     (mvc / "routes.py").write_text("# stub\n", encoding="utf-8")
 
-    core = tmp_path / "core"
-    core.mkdir()
-    (core / "application.py").write_text("# stub\n", encoding="utf-8")
+    core_app = tmp_path / "core" / "app"
+    core_app.mkdir(parents=True)
+    (core_app / "application.py").write_text("# stub\n", encoding="utf-8")
 
     # Dossiers ignorés (peuplés pour vérifier que le watcher les saute).
     for ignored in (".venv", "__pycache__", "storage", "logs", "node_modules", ".git"):
@@ -136,7 +136,7 @@ class TestDetection:
         "app.py",
         "config.py",
         "env/dev",
-        "core/application.py",
+        "core/app/application.py",
     ])
     def test_detecte_modification(self, tmp_path, relative):
         root = _make_project(tmp_path)
@@ -249,7 +249,7 @@ class TestWatchedScope:
     def test_inclut_core_py(self, tmp_path):
         root = _make_project(tmp_path)
         paths = {str(p) for p in iter_watched_files(root)}
-        assert str(root / "core" / "application.py") in paths
+        assert str(root / "core" / "app" / "application.py") in paths
 
     def test_directories_to_watch_couvre_mvc_et_core(self):
         watched = {rel for rel, _ in DIRECTORIES_TO_WATCH}

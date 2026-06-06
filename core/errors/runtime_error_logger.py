@@ -1,5 +1,5 @@
 """
-core/runtime_error_logger.py — Collecteur d'erreurs runtime vers JSONL + Markdown.
+core/errors/runtime_error_logger.py — Collecteur d'erreurs runtime vers JSONL + Markdown.
 
 En mode APP_ENV=dev, chaque erreur non gérée interceptée par le dispatcher
 produit une ligne JSONL dans storage/logs/errors.dev.jsonl, puis régénère
@@ -17,7 +17,7 @@ import os
 import pathlib
 from urllib.parse import urlencode
 
-from core.runtime_errors import (
+from core.errors.runtime_errors import (
     CATEGORY_CONFIGURATION,
     CATEGORY_DATABASE,
     CATEGORY_RUNTIME,
@@ -133,7 +133,7 @@ def log_runtime_error(exc: BaseException, request=None) -> None:
 
         # Régénère le rendu Markdown depuis le JSONL mis à jour
         try:
-            from core.runtime_error_markdown import write_errors_markdown as _write_md
+            from core.errors.runtime_error_markdown import write_errors_markdown as _write_md
             _write_md(jsonl_path, log_dir / "errors.dev.md")
         except Exception as md_err:
             logger.warning("Impossible de mettre à jour errors.dev.md : %s", md_err)

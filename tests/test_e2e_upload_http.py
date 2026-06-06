@@ -37,7 +37,7 @@ import pytest
 pytest.importorskip("forge_mvc_files")
 
 import core.forge as forge
-from core.application import Application
+from core.app.application import Application
 from core.http.request import Request, UploadedFile
 from core.http.response import Response
 from core.http.router import Router

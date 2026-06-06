@@ -76,7 +76,7 @@ if not _DB_NAME.startswith(_SAFE_PREFIX):
 
 # ── Imports Forge (pipeline réel) ─────────────────────────────────────────────
 
-from core.slug import slugify
+from core.http.slug import slugify
 from forge_cli.entities.canonical_model_normalizer import (
     normalize_canonical_entity_for_model_build,
 )

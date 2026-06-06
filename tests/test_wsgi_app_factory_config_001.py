@@ -1,13 +1,13 @@
 """Tests — WSGI-APP-FACTORY-CONFIG-001.
 
 Verrouille la cohérence d'initialisation entre `python app.py` et
-`core.wsgi.create_configured_wsgi_app()` :
+`core.app.wsgi.create_configured_wsgi_app()` :
 
   - la factory expose un callable WSGI conforme ;
   - elle applique `forge.configure(...)` AVANT que la première requête
     ne soit dispatched (donc `trusted_proxies` est honoré en contexte
     WSGI) ;
-  - les kwargs de configuration de `core.app_factory` sont alignés sur
+  - les kwargs de configuration de `core.app.app_factory` sont alignés sur
     le `forge.configure(...)` central de `app.py` ;
   - les API antérieures (`create_wsgi_app(application)`) restent
     compatibles ;
@@ -23,12 +23,12 @@ from pathlib import Path
 import pytest
 
 import core.forge as forge
-from core.app_factory import _forge_config_kwargs, build_application
-from core.application import Application
+from core.app.app_factory import _forge_config_kwargs, build_application
+from core.app.application import Application
 from core.http.response import Response
 from core.http.router import Router
 from core.templating.manager import template_manager
-from core.wsgi import create_configured_wsgi_app, create_wsgi_app
+from core.app.wsgi import create_configured_wsgi_app, create_wsgi_app
 
 
 PROJECT_ROOT = Path(__file__).parent.parent

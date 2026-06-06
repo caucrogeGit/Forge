@@ -49,7 +49,7 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 | Ticket | Type | Objet |
 |---|---|---|
 | `ADR-017-SLUG-TYPE` | 🔨 | ADR : sémantique du type `slug` dans le contrat d'entité (lien ADR-013, §10). |
-| `SLUG-CORE-001` | 🔧 | **Consolider** les fonctions slug en un seul `core/slug.py` canonique. **stdlib seul** (`unicodedata` NFKD). |
+| `SLUG-CORE-001` | 🔧 | **Consolider** les fonctions slug en un seul `core/http/slug.py` canonique. **stdlib seul** (`unicodedata` NFKD). |
 | `SLUG-VALIDATION-001` | 🔧 | `is_valid_slug` officiel, **path-safe**, message stable. |
 | `SLUG-SQL-CRUD-001` | 🔧 | `VARCHAR(180) NOT NULL` + `UNIQUE` ; CRUD : slug depuis champ source, **rejet des doublons** (suffixe auto → post-1.0). |
 | `SLUG-ROUTING-001` | 🔨 | `find_by_slug` + route publique `/{ressource}/{slug}`. |
@@ -164,7 +164,7 @@ depuis `unique: true`).
 | Normaliseur | `forge_cli/entities/canonical_model_normalizer.py` | `type:slug` → `sql_type:VARCHAR(180)`, `form.field:slug` ; propager `source` |
 | Validation | `forge_cli/entities/validation.py` | `source` dans `ALLOWED_FIELD_KEYS` ; règle sémantique : `source` réfère un champ texte existant de l'entité |
 | Form | `forge_cli/entities/crud/form_builder.py` | exclure du formulaire un champ slug porteur de `source` (auto-généré) |
-| Contrôleur | `forge_cli/entities/crud/controller_builder.py` | à la création : `data = dict(form.cleaned_data); data["<slug>"] = slugify(data["<source>"])` (via `core.slug`) avant `add_…(data)` ; envelopper l'INSERT pour capter l'erreur d'unicité → message clair |
+| Contrôleur | `forge_cli/entities/crud/controller_builder.py` | à la création : `data = dict(form.cleaned_data); data["<slug>"] = slugify(data["<source>"])` (via `core.http.slug`) avant `add_…(data)` ; envelopper l'INSERT pour capter l'erreur d'unicité → message clair |
 | Modèle | `forge_cli/entities/crud/model_builder.py` | **exclure** le champ slug auto de l'`UPDATE` (stable à l'édition) ; le garder dans l'`INSERT` |
 
 ### Garde-fous / validation

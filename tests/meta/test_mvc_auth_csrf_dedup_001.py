@@ -23,7 +23,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 _AUTH_CTRL   = PROJECT_ROOT / "mvc" / "controllers" / "auth_controller.py"
 _MFA_CTRL    = PROJECT_ROOT / "mvc" / "controllers" / "mfa_challenge_controller.py"
-_APP         = PROJECT_ROOT / "core" / "application.py"
+_APP         = PROJECT_ROOT / "core" / "app" / "application.py"
 _ROUTES      = PROJECT_ROOT / "mvc" / "routes.py"
 
 
@@ -64,19 +64,19 @@ class TestManualCsrfCheckRemovedFromMfaController:
 
 
 class TestCsrfMiddlewareStillWired:
-    """CsrfMiddleware reste opérationnel dans core/application.py."""
+    """CsrfMiddleware reste opérationnel dans core/app/application.py."""
 
     def test_csrf_middleware_imported(self):
         text = _APP.read_text(encoding="utf-8")
         assert "CsrfMiddleware" in text, (
-            "core/application.py n'importe plus CsrfMiddleware — "
+            "core/app/application.py n'importe plus CsrfMiddleware — "
             "la protection CSRF globale serait perdue."
         )
 
     def test_csrf_middleware_instantiated(self):
         text = _APP.read_text(encoding="utf-8")
         assert "CsrfMiddleware()" in text, (
-            "core/application.py n'instancie plus CsrfMiddleware — "
+            "core/app/application.py n'instancie plus CsrfMiddleware — "
             "la protection CSRF globale serait perdue."
         )
 

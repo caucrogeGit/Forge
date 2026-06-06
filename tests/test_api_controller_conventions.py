@@ -333,7 +333,7 @@ class TestConventionControleur:
 
 class TestIntegrationDispatch:
     def test_dispatch_retourne_json_depuis_handler(self):
-        from core.application import Application
+        from core.app.application import Application
         from core.http.router import Router
         from tests.fake_request import FakeRequest
 
@@ -348,7 +348,7 @@ class TestIntegrationDispatch:
         assert body["success"] is True
 
     def test_dispatch_retourne_erreur_json(self):
-        from core.application import Application
+        from core.app.application import Application
         from core.http.router import Router
         from tests.fake_request import FakeRequest
 

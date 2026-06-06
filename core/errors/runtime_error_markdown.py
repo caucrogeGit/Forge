@@ -1,5 +1,5 @@
 """
-core/runtime_error_markdown.py — Rendu Markdown des erreurs runtime Forge.
+core/errors/runtime_error_markdown.py — Rendu Markdown des erreurs runtime Forge.
 
 Lit storage/logs/errors.dev.jsonl et génère storage/logs/errors.dev.md.
 

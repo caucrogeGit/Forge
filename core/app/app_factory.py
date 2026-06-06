@@ -1,11 +1,11 @@
-"""core/app_factory.py — Construction de l'`Application` Forge configurée.
+"""core/app/app_factory.py — Construction de l'`Application` Forge configurée.
 
 Ticket : WSGI-APP-FACTORY-CONFIG-001.
 
 Source unique d'initialisation : lit `config.py`, applique
 `forge.configure(...)`, branche le renderer Jinja2, charge les routes et
 construit l'`Application`. Réutilisée par les points d'entrée serveur de
-développement (`app.py`) et WSGI (`core.wsgi.create_configured_wsgi_app`)
+développement (`app.py`) et WSGI (`core.app.wsgi.create_configured_wsgi_app`)
 pour qu'aucune divergence de configuration ne s'installe entre les deux.
 
 Les fonctions sont idempotentes : un second appel reconfigure Forge sans
@@ -67,11 +67,11 @@ def build_application():
     """Construit l'`Application` Forge complète : config + Jinja + routes.
 
     Exécute la même séquence d'initialisation que `app.py`, sans démarrer
-    le serveur HTTP. Retourne une `core.application.Application` prête à
+    le serveur HTTP. Retourne une `core.app.application.Application` prête à
     dispatcher.
     """
     import core.forge as forge
-    from core.application import Application
+    from core.app.application import Application
     from core.templating.manager import template_manager
     from integrations.jinja2.renderer import Jinja2Renderer
     from config import APP_ROUTES_MODULE, VIEWS_DIR

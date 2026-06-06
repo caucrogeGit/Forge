@@ -6,9 +6,9 @@ en laissant fonctionner :
 
   * `python app.py` en dev / test / staging (même sur `0.0.0.0`) ;
   * `python app.py` en prod sur loopback (`127.0.0.1`, `localhost`, `::1`) ;
-  * la production WSGI (`core.wsgi.create_configured_wsgi_app`).
+  * la production WSGI (`core.app.wsgi.create_configured_wsgi_app`).
 
-Tests directs sur les fonctions pures de `core/dev_server.py` — pas besoin
+Tests directs sur les fonctions pures de `core/app/dev_server.py` — pas besoin
 de spawn un serveur. Un test E2E vérifie en plus le chemin réel via
 ``subprocess`` pour prouver que le garde fait exiter le processus avec
 un code non nul et un message clair sur stderr/stdout.
@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from core.dev_server import (
+from core.app.dev_server import (
     format_prod_host_guard_error,
     is_dangerous_public_host,
     should_block_prod_public_host,
@@ -157,11 +157,11 @@ class TestWsgiPathNotBlocked:
     `APP_HOST=0.0.0.0` dans l'environnement."""
 
     def test_wsgi_module_does_not_call_the_guard(self):
-        import core.wsgi as wsgi
+        import core.app.wsgi as wsgi
         from pathlib import Path
         source = Path(wsgi.__file__).read_text(encoding="utf-8")
         assert "should_block_prod_public_host" not in source, (
-            "core/wsgi.py ne doit PAS appeler le garde — le chemin WSGI est "
+            "core/app/wsgi.py ne doit PAS appeler le garde — le chemin WSGI est "
             "indépendant de APP_HOST (c'est Gunicorn / le reverse proxy qui "
             "décide où écouter)."
         )

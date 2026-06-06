@@ -378,7 +378,7 @@ Le décorateur s'applique directement sur la fonction handler. Il n'interfère p
 </details>
 
 <details markdown="1" id="coreapiroutesloader">
-<summary><code>core.api_routes_loader</code> - Chargement optionnel des routes API</summary>
+<summary><code>core.app.api_routes_loader</code> - Chargement optionnel des routes API</summary>
 
 ### Fonction
 
@@ -398,7 +398,7 @@ Comportement :
 ### Exemple
 
 ```python
-from core.api_routes_loader import load_api_routes
+from core.app.api_routes_loader import load_api_routes
 from core.http.router import Router
 
 router = Router()
@@ -463,7 +463,7 @@ Une route `POST`, `PUT`, `PATCH` ou `DELETE` est protégée par CSRF par défaut
 </details>
 
 <details markdown="1" id="coreapplication">
-<summary><code>core.application</code> - Dispatch applicatif</summary>
+<summary><code>core.app.application</code> - Dispatch applicatif</summary>
 
 ### Classe
 

@@ -6,7 +6,7 @@ Forge applique le même socle de headers de sécurité navigateur sur les deux
 chemins de sortie HTTP :
 
   * `python app.py` — serveur de développement (RequestHandler dans `app.py`)
-  * WSGI — adaptateur `core.wsgi._response_to_wsgi`
+  * WSGI — adaptateur `core.app.wsgi._response_to_wsgi`
 
 Le helper `apply_security_headers(headers, ...)` mute le dict de headers en
 posant les valeurs par défaut via ``setdefault`` — il n'écrase jamais un

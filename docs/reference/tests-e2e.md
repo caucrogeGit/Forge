@@ -105,7 +105,7 @@ Si aucun token attendu n'existe ou si les tokens ne correspondent pas, la répon
 
 ```python
 from core.security import session as _sessions
-from core.application import Application
+from core.app.application import Application
 from core.http.router import Router
 from tests.fake_request import FakeRequest
 

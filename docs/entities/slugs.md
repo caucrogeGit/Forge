@@ -38,7 +38,7 @@ jamais :
 
 - **Formulaire** : le champ slug est **absent** (on saisit `titre`).
 - **Création** : le contrôleur calcule `slug = slugify(titre)` via le module
-  canonique `core.slug` (accents translittérés, espaces → tirets,
+  canonique `core.http.slug` (accents translittérés, espaces → tirets,
   minuscules) : « Écrire avec Forge ! » → `ecrire-avec-forge`.
 - **Édition** : le slug est **stable** — il n'est pas régénéré quand le titre
   change (les URLs publiques ne se cassent pas). Il est exclu de l'`UPDATE`.
@@ -47,7 +47,7 @@ jamais :
 ### Sans `source` (saisie manuelle)
 
 Un champ `{"type": "slug"}` **sans** `source` est saisi à la main dans le
-formulaire et validé par `SlugField` (`core.slug.is_valid_slug` :
+formulaire et validé par `SlugField` (`core.http.slug.is_valid_slug` :
 minuscules, chiffres, tirets internes, path-safe).
 
 ---
@@ -86,4 +86,4 @@ Reportées **après 1.0** (voir ADR-017) :
 
 - [Types Forge → MariaDB](types-forge-mariadb.md)
 - [ADR-017 — Type slug et module URL-slug canonique](../adr/017-slug-type.md)
-- Module runtime : `core.slug.slugify` / `core.slug.is_valid_slug`.
+- Module runtime : `core.http.slug.slugify` / `core.http.slug.is_valid_slug`.

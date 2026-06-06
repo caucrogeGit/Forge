@@ -1,8 +1,8 @@
 import logging
-from core.api_routes_loader import load_api_routes as _load_api_routes
+from core.app.api_routes_loader import load_api_routes as _load_api_routes
 from core.http.helpers import html as _html
 from core.http.router import Router
-from core.runtime_error_logger import log_runtime_error as _log_runtime_error
+from core.errors.runtime_error_logger import log_runtime_error as _log_runtime_error
 from core.security.middleware import AuthMiddleware, CsrfMiddleware
 
 logger = logging.getLogger(__name__)

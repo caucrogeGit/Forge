@@ -1,4 +1,4 @@
-"""SLUG-CORE-001 (ADR-017) — module URL-slug canonique core/slug.py.
+"""SLUG-CORE-001 (ADR-017) — module URL-slug canonique core/http/slug.py.
 
 `slugify` transforme un texte quelconque en slug kebab-case (translittération
 des accents via stdlib) ; `is_valid_slug` valide un slug existant (path-safe).
@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from core.slug import DEFAULT_MAX_LENGTH, is_valid_slug, slugify
+from core.http.slug import DEFAULT_MAX_LENGTH, is_valid_slug, slugify
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -85,7 +85,7 @@ class TestIsValidSlug:
 class TestSingleSource:
     def test_public_page_uses_core_slug(self):
         src = (PROJECT_ROOT / "forge_cli" / "public_page.py").read_text(encoding="utf-8")
-        assert "from core.slug import slugify" in src
+        assert "from core.http.slug import slugify" in src
 
     def test_migration_slug_stays_separate(self):
         # slugify_migration_name (snake_case, filenames) reste distinct (ADR-017 D1).
@@ -93,8 +93,8 @@ class TestSingleSource:
         assert "def slugify_migration_name" in src
 
     def test_slugfield_delegates_to_core_slug(self):
-        # SLUG-VALIDATION-001 : SlugField valide via core.slug, sans regex locale.
+        # SLUG-VALIDATION-001 : SlugField valide via core.http.slug, sans regex locale.
         src = (PROJECT_ROOT / "core" / "forms" / "fields.py").read_text(encoding="utf-8")
-        assert "from core.slug import is_valid_slug" in src
+        assert "from core.http.slug import is_valid_slug" in src
         assert "is_valid_slug(value" in src
         assert "_SLUG_RE" not in src

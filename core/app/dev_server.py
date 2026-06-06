@@ -1,5 +1,5 @@
 """
-core/dev_server.py — Messages de diagnostic du serveur de développement
+core/app/dev_server.py — Messages de diagnostic du serveur de développement
 =======================================================================
 Fonctions pures de mise en forme des messages affichés par app.py au démarrage
 du serveur HTTP/HTTPS local.

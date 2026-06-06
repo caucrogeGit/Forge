@@ -83,7 +83,7 @@ def _format_prod_refusal() -> str:
         "En production, Forge s'expose via WSGI derrière un reverse proxy :\n"
         "\n"
         "  gunicorn --workers 1 --bind 127.0.0.1:8000 \\\n"
-        "      'core.wsgi:create_configured_wsgi_app()'\n"
+        "      'core.app.wsgi:create_configured_wsgi_app()'\n"
         "\n"
         "Nginx ou Caddy terminent HTTPS et reverse-proxy vers Gunicorn.\n"
         "\n"

@@ -2,7 +2,7 @@
 
 Un champ `{"type": "slug", "source": "titre"}` est exclu du formulaire et de
 l'`UPDATE` (stable à l'édition), conservé dans l'`INSERT`, et calculé par le
-contrôleur via `core.slug.slugify` à la création. La contrainte `UNIQUE`
+contrôleur via `core.http.slug.slugify` à la création. La contrainte `UNIQUE`
 garantit l'absence de doublon (le message clair est un sous-chantier séparé).
 
 Validation runtime (DB) : déférée au dogfood. Ici : structurel + compile.
@@ -75,7 +75,7 @@ class TestGeneration:
 
     def test_controller_generates_slug_from_source(self):
         ctrl = build_controller(_definition())
-        assert "from core.slug import slugify" in ctrl
+        assert "from core.http.slug import slugify" in ctrl
         assert 'form.cleaned_data["slug"] = slugify(form.cleaned_data["titre"])' in ctrl
 
     def test_generated_crud_compiles(self):
@@ -91,7 +91,7 @@ class TestGeneration:
         assert compileall.compile_dir(tmp, quiet=1)
 
     def test_no_slug_no_slugify_import(self):
-        # Une entité sans champ généré ne tire pas core.slug.
+        # Une entité sans champ généré ne tire pas core.http.slug.
         plain = {
             "schema_version": "1.0", "name": "Note", "table": "note",
             "fields": [{"name": "texte", "type": "string", "max_length": 100}],
@@ -100,4 +100,4 @@ class TestGeneration:
         d = validate_entity_definition(
             normalize_canonical_entity_for_model_build(plain), source="<test>"
         )
-        assert "from core.slug import slugify" not in build_controller(d)
+        assert "from core.http.slug import slugify" not in build_controller(d)

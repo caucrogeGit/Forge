@@ -24,7 +24,7 @@ pytest.importorskip("forge_mvc_files")
 # On importe le VRAI module (et non le shim core) pour que les monkeypatch des
 # constantes soient pris en compte par les fonctions.
 import forge_mvc_files.rate_limit as _rl
-from core.application import Application
+from core.app.application import Application
 from core.http.request import Request
 from core.http.response import Response
 from core.http.router import Router

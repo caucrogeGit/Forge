@@ -20,9 +20,9 @@ import pathlib
 
 import pytest
 
-from core.application import Application
+from core.app.application import Application
 from core.http.router import Router
-from core.runtime_error_logger import (
+from core.errors.runtime_error_logger import (
     _JSONL_FILENAME,
     _detect_category,
     log_runtime_error,
@@ -179,7 +179,7 @@ class TestJsonlContent:
         assert event["level"] == "ERROR"
 
     def test_required_fields_present(self, jsonl_dir, monkeypatch):
-        from core.runtime_errors import REQUIRED_FIELDS
+        from core.errors.runtime_errors import REQUIRED_FIELDS
         monkeypatch.setenv("APP_ENV", "dev")
         try:
             raise RuntimeError("x")

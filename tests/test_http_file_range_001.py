@@ -150,7 +150,7 @@ def test_ordinary_responses_have_no_stream():
 # ---------------------------------------------------------------------------
 
 def test_wsgi_emits_stream_with_correct_content_length(sample):
-    from core.wsgi import _response_to_wsgi
+    from core.app.wsgi import _response_to_wsgi
 
     path, data = sample
     req = _FakeRequest({"Range": "bytes=100-199"})

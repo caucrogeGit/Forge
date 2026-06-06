@@ -26,7 +26,7 @@ flowchart LR
 
     Project --> CoreConfig["core.forge"]
     Project --> Router["core.http.router"]
-    Project --> App["core.application"]
+    Project --> App["core.app.application"]
     Project --> Templates["core.templating + integrations.jinja2"]
     Project --> Controllers["core.mvc.controller"]
     Project --> Forms["core.forms"]

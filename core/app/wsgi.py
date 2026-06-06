@@ -1,10 +1,10 @@
-"""core/wsgi.py — Callables WSGI pour Forge.
+"""core/app/wsgi.py — Callables WSGI pour Forge.
 
 Tickets :
 - WSGI-ENTRYPOINT-001 : `create_wsgi_app(application)` — adaptateur minimal
   qui prend une `Application` déjà construite et retourne un callable WSGI ;
 - WSGI-APP-FACTORY-CONFIG-001 : `create_configured_wsgi_app()` — charge la
-  même configuration que `python app.py` (via `core.app_factory`) et
+  même configuration que `python app.py` (via `core.app.app_factory`) et
   retourne le callable WSGI prêt à l'emploi ;
 - WSGI-PROD-WARNINGS-001 : `create_configured_wsgi_app()` émet aussi
   les warnings production (`MemorySessionStore` en `APP_ENV=prod`) — une
@@ -12,7 +12,7 @@ Tickets :
 
 Usage typique — dans le `wsgi.py` de l'application :
 
-    from core.wsgi import create_configured_wsgi_app
+    from core.app.wsgi import create_configured_wsgi_app
 
     application = create_configured_wsgi_app()
 
@@ -195,7 +195,7 @@ def create_configured_wsgi_app(
     """Construit l'`Application` Forge configurée et retourne le callable WSGI.
 
     Source unique d'initialisation : charge la même configuration que
-    `python app.py` via `core.app_factory.build_application`, puis enveloppe
+    `python app.py` via `core.app.app_factory.build_application`, puis enveloppe
     l'application dans un adaptateur WSGI standard.
 
     Garantit que les paramètres `forge.configure(...)` (dont
@@ -204,13 +204,13 @@ def create_configured_wsgi_app(
 
     Si `emit_prod_warnings=True` (défaut), émet une seule fois — à la
     construction, pas à chaque requête — les avertissements production
-    de `core.prod_warnings` (ex. `MemorySessionStore` en `APP_ENV=prod`).
+    de `core.app.prod_warnings` (ex. `MemorySessionStore` en `APP_ENV=prod`).
     Passer `emit_prod_warnings=False` pour les tests qui ne veulent pas
     polluer le logger.
     """
     import core.forge as forge
-    from core.app_factory import build_application
-    from core.prod_warnings import emit_memory_store_warning_if_needed
+    from core.app.app_factory import build_application
+    from core.app.prod_warnings import emit_memory_store_warning_if_needed
 
     application = build_application()
     if emit_prod_warnings:
