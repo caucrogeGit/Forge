@@ -12,6 +12,8 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.meta
+
 ROOT = Path(__file__).resolve().parent.parent.parent
 PACKAGES_DIR = ROOT / "packages"
 ROOT_LICENSE = ROOT / "LICENSE"
