@@ -49,21 +49,30 @@ def authenticate_user(
 
 
 def login_user(request: Any, user: AuthUser) -> None:
-    """Stocke uniquement l'identifiant utilisateur dans la session."""
+    """Stocke l'identifiant utilisateur dans la session et le persiste.
+
+    La mutation in-place ne suffit pas : les backends FileSessionStore et
+    MariaDbSessionStore renvoient une copie désérialisée à chaque `get()`.
+    Sans `store.set()`, la connexion serait perdue sur ces backends (seul
+    MemorySessionStore renvoie une référence vivante). On persiste donc
+    explicitement, comme le font les contrôleurs starters.
+    """
     validate_auth_user_contract(user)
     session = _resolve_request_session(request)
     if session is None:
         raise AuthError("session introuvable")
 
     session[AUTH_USER_ID_SESSION_KEY] = user.id
+    _persist_request_session(request, session)
 
 
 def logout_user(request: Any) -> None:
-    """Retire l'identifiant utilisateur Auth/User de la session."""
+    """Retire l'identifiant utilisateur Auth/User de la session et persiste."""
     session = _resolve_request_session(request)
     if session is None:
         return
     session.pop(AUTH_USER_ID_SESSION_KEY, None)
+    _persist_request_session(request, session)
 
 
 def get_authenticated_user_id(request: Any) -> int | None:
@@ -152,3 +161,25 @@ def _resolve_request_session(request: Any) -> dict[str, Any] | None:
         return get_session(session_id) if session_id else None
     except Exception:
         return None
+
+
+def _persist_request_session(request: Any, data: dict[str, Any]) -> None:
+    """Réécrit la session dans le store pour les backends sans référence vivante.
+
+    Utilise `replace` (remplacement intégral) et non `set` (merge) : `data` est
+    l'état complet voulu de la session, donc `replace` persiste aussi bien
+    l'ajout d'une clé (login) que son retrait (logout) — `set` ne pourrait pas
+    supprimer une clé absente de `data`.
+
+    Sans session_id (pas de cookie), il n'y a rien à persister côté store ;
+    la mutation in-place reste valable pour un éventuel `request.session` vivant.
+    """
+    try:
+        from core.security.session import get_session_id
+        from core.sessions.manager import get_session_store
+
+        session_id = get_session_id(request)
+        if session_id:
+            get_session_store().replace(session_id, data)
+    except Exception:
+        return
