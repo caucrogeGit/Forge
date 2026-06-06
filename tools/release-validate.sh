@@ -304,32 +304,36 @@ if [ -n "$PUBLIC_VERSION" ]; then
     fi
 fi
 
-# ── 13. Build & twine des 8 distributions (opt-in : --with-packages) ─────────
-# RELEASE-VALIDATE-PACKAGES-001 — preuve LOCALE que core + 7 opt-ins se
-# construisent et passent twine check (pas seulement « la CI le fait »).
+# ── 13. Build & twine des distributions (opt-in : --with-packages) ───────────
+# RELEASE-VALIDATE-PACKAGES-001 — preuve LOCALE que le core + tous les opt-ins
+# se construisent et passent twine check (pas seulement « la CI le fait »).
+# La liste des opt-ins est dérivée de packages/*/ (pas de liste codée en dur :
+# tout nouvel opt-in est couvert automatiquement).
 # Exécuté après le contrôle git propre : les artefacts dist/ sont gitignorés.
 if $WITH_PACKAGES; then
     echo ""
-    echo "--- Build des distributions (core + 7 opt-ins) ---"
+    echo "--- Build des distributions (core + opt-ins) ---"
     rm -rf dist build ./*.egg-info
     for _p in packages/*/; do rm -rf "${_p}dist" "${_p}build" "${_p}"*.egg-info; done 2>/dev/null || true
     BUILD_OK=true
+    _dist_count=1
     if ! "$PYTHON_BIN" -m build --no-isolation >/tmp/relval_build_core.log 2>&1; then
         _fail "build core : échec"
         tail -8 /tmp/relval_build_core.log | sed 's/^/         /' || true
         BUILD_OK=false
     fi
-    for _pkg in packages/forge-mvc-mfa packages/forge-mvc-rbac packages/forge-mvc-workflow \
-                packages/forge-mvc-stats packages/forge-mvc-media packages/forge-mvc-iot \
-                packages/forge-mvc-video; do
+    for _pkg in packages/*/; do
+        [ -f "${_pkg}pyproject.toml" ] || continue
         if ! "$PYTHON_BIN" -m build --no-isolation "$_pkg" >/tmp/relval_build_pkg.log 2>&1; then
-            _fail "build $_pkg : échec"
+            _fail "build ${_pkg%/} : échec"
             tail -8 /tmp/relval_build_pkg.log | sed 's/^/         /' || true
             BUILD_OK=false
+        else
+            _dist_count=$((_dist_count + 1))
         fi
     done
     if $BUILD_OK; then
-        _ok "Build : 8 distributions construites (core + 7 opt-ins)"
+        _ok "Build : ${_dist_count} distributions construites (core + opt-ins)"
         echo "--- twine check des artefacts ---"
         if "$PYTHON_BIN" -m twine check dist/* packages/*/dist/* >/tmp/relval_twine.log 2>&1; then
             _ok "twine check : tous les artefacts valides"

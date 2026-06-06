@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [1.0.0-beta.13] — 2026-06-03
+## [1.0.0-beta.13] — 2026-06-06
 
 > Dernière beta **fonctionnelle** (consolidation post-beta.12).
 > Roadmap : [`docs/roadmap/beta13-roadmap.md`](docs/roadmap/beta13-roadmap.md).
@@ -22,13 +22,19 @@
   distribution. Le système `module:*` (module **local**) reste distinct
   (cycle de vie d'auteur — ADR-016 A2).
 
-### Refonte des starters
+### Refonte des starters — un parcours welcome par opt-in
 
-- **25 starters** renumérotés de façon contiguë (1→25), noms normalisés
-  (convention `welcome-optin-<module>`, `users-core-auth`, `first-crud`…).
-  Progression pédagogique « welcome » en 11 paliers. Les 3 applications métier
-  lourdes sont archivées hors du système starter. Le 17ᵉ,
-  `welcome-optin-video`, accompagne le passage de `forge-mvc-video` en Beta.
+- **107 starters** numérotés de façon contiguë, organisés en **parcours
+  pédagogiques par niveau** : la progression cœur `welcome-forge` (11 paliers
+  débutant → avancé) plus **un parcours `welcome-<module>` pour chacun des 10
+  opt-ins dotés d'un parcours** (iot, video, images, files, audio, mfa, rbac,
+  workflow, stats, mail). Préambule d'installation en tête de chaque parcours
+  (`pip install --pre forge-mvc-<module>` + `forge starter:build`).
+- **Nettoyage** (`STARTERS-DROP-OBSOLETE-001`) : retrait des starters obsolètes
+  (`first-crud`, `first-crud-generated`, `users-core-auth`, mono-démos
+  `welcome-optin-iot/mfa/video`) et de leurs docs ; archives métier lourdes
+  retirées. Le starter d'email a été relocalisé de `welcome-forge` vers le
+  parcours `welcome-mail` (`mail-welcome`).
 
 ### Slugs canoniques (feature phare)
 
@@ -54,6 +60,20 @@
   le module se branche sans eux (mode serveur de médias), `video:doctor`
   signale leur absence. Publié sur PyPI avec les autres distributions.
 
+### Dégraissage du core vers des opt-ins
+
+- **`forge-mvc-pivot`** (ADR-021, `PIVOT-EXTRACT-001`) : le service « pivot
+  advanced » (associations `many_to_many` enrichies) et le générateur
+  `make:pivot-crud` sont extraits du core vers un opt-in dédié.
+- **`forge-mvc-mail`** (ADR-022, `MAIL-EXTRACT-001`) : l'email (composition,
+  transports interchangeables, templates Jinja, CLI `mail:*`) est extrait du
+  core vers un opt-in, accompagné de son parcours `welcome-mail`.
+- **Réorganisation de la racine de `core/`** (`CORE-REORG-001`) : regroupement
+  en sous-paquets `core/app/` (application, factory WSGI, dev-server,
+  prod-warnings) et `core/errors/` (gestion des erreurs runtime) ; `slug`
+  rejoint `core/http/`. Racine réduite à `forge.py` + `__init__.py`, sans
+  changement de comportement (entrée Gunicorn : `core.app.wsgi:create_configured_wsgi_app`).
+
 ### Robustesse & production
 
 - **`forge run` survit aux crashes** de l'application (relance automatique +
@@ -71,8 +91,8 @@
 
 ### Packaging & documentation
 
-- **Dépendance `forge-mvc` des opt-ins unifiée** à `>=1.0.0b13,<2` sur les sept
-  opt-ins (fin de la cohabitation `==1.0.0b13` / `>=1.0.0b5` — une seule
+- **Dépendance `forge-mvc` des opt-ins unifiée** à `>=1.0.0b13,<2` sur les
+  onze opt-ins (fin de la cohabitation `==1.0.0b13` / `>=1.0.0b5` — une seule
   politique de borne, principe 11).
 - `requirements-dev.txt` installe désormais **`forge-mvc-video` en éditable** :
   sa suite de tests n'est plus silencieusement skippée (`importorskip`) en CI.
@@ -80,7 +100,7 @@
   silencieusement un échec d'audit ; l'audit `pip-audit` des dépendances de dev
   distingue désormais une **vulnérabilité** (bloquante) d'une **résolution
   impossible avant publication** (œuf-poule, non bloquante) ; nouveau mode
-  opt-in **`--with-packages`** qui build les 8 distributions + `twine check` en
+  opt-in **`--with-packages`** qui build les 12 distributions + `twine check` en
   local (RELEASE-VALIDATE-PACKAGES-001).
 - Documentation du contrat CLI : `forge migration:apply --dry-run` documenté
   dans l'aide intégrée et `docs/reference/cli-commands.md`
@@ -90,7 +110,7 @@
 - Distribution : exclusion des tests du sdist, exclusion du bytecode des
   artefacts ; build CI étendu à `forge-mvc-iot` et `forge-mvc-video`.
 - `BETA13-CLOSING-AUDIT-001` **vert**, versions bumpées **b13** sur le core et
-  les sept opt-ins.
+  les onze opt-ins.
 - Réorganisation de la documentation (`docs/guide/`, `features/`,
   `philosophy/`, `reference/`, `release/`, `deployment/`), index des ADR,
   URLs harmonisées vers `forgemvc.com`.
