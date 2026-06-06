@@ -56,7 +56,8 @@ def _unauthenticated_request() -> SimpleNamespace:
 def test_require_auth_redirects_unauthenticated():
     """require_auth redirige vers /login si la requête n'est pas authentifiée.
 
-    require_auth appelle is_authenticated() deprecated — DeprecationWarning attendu.
+    require_auth utilise désormais l'API canonique core.auth.session.is_authenticated :
+    aucun DeprecationWarning ne doit être émis (API-DECORATORS-CANONICAL-001).
     """
     from core.security.decorators import require_auth
 
@@ -64,7 +65,8 @@ def test_require_auth_redirects_unauthenticated():
     def protected(request):
         return SimpleNamespace(status=200)
 
-    with pytest.warns(DeprecationWarning, match="is_authenticated"):
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
         response = protected(_unauthenticated_request())
     assert response.status == 302
     assert response.headers["Location"] == "/login"

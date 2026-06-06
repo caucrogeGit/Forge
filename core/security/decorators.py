@@ -1,10 +1,11 @@
 from core.http.helpers import html as _html
 from core.http.response import Response
 from core.security.middleware import CsrfMiddleware as _CsrfMiddleware
-from core.security.session import (
-    is_authenticated,
-    user_has_role,
-)
+# is_authenticated : API canonique (core.auth.session), avec pont legacy intégré.
+# L'ancienne core.security.session.is_authenticated émet un DeprecationWarning à
+# chaque appel ; l'importer ici déclenchait un warning par requête protégée.
+from core.auth.session import is_authenticated
+from core.security.session import user_has_role
 
 _csrf_check = _CsrfMiddleware()
 
