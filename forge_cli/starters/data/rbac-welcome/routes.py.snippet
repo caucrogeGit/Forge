@@ -1,0 +1,7 @@
+# forge-starter:rbac-welcome:start
+from mvc.controllers.rbac_welcome_controller import RbacWelcomeController
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/rbac-welcome", RbacWelcomeController.index, name="rbac_welcome_index")
+    pub.add("GET", "/rbac-welcome/inspect", RbacWelcomeController.inspect, name="rbac_welcome_inspect")
+# forge-starter:rbac-welcome:end

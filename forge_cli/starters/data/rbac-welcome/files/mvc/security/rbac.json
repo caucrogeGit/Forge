@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "entities": {
+    "Article": {
+      "permissions": {
+        "list": "article.list",
+        "show": "article.show",
+        "create": "article.create",
+        "update": "article.update",
+        "delete": "article.delete"
+      }
+    }
+  },
+  "roles": {
+    "admin": ["article.list", "article.show", "article.create", "article.update", "article.delete"],
+    "editor": ["article.list", "article.show", "article.create", "article.update"],
+    "reader": ["article.list", "article.show"]
+  }
+}

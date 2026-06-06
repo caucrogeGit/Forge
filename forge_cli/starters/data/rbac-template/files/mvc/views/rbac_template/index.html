@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Permission dans un template — Forge</title>
+</head>
+<body>
+  <h1>Permission dans un template</h1>
+
+  <p>Valeurs calculées dans le contrôleur :</p>
+  <ul>
+    <li><code>can("article.list")</code> : <strong>{{ can_list }}</strong></li>
+    <li><code>can("article.create")</code> : <strong>{{ can_create }}</strong></li>
+  </ul>
+
+  <p>Directement dans le template, via le helper <code>can()</code> auto-enregistré :</p>
+  {% if can("article.create") %}
+  <button>Créer un article</button>
+  {% else %}
+  <p><em>Bouton « Créer » masqué (permission manquante).</em></p>
+  {% endif %}
+
+  <p>Sans utilisateur connecté, <code>can(...)</code> renvoie <code>False</code> : l'UI
+  s'adapte automatiquement aux droits.</p>
+</body>
+</html>

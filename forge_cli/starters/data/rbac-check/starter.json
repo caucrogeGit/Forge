@@ -1,0 +1,25 @@
+{
+  "id": "rbac-check",
+  "number": 85,
+  "name": "Vérifier une permission",
+  "kind": "skeleton",
+  "aliases": [
+    "rbac-check",
+    "rbac_check",
+    "85"
+  ],
+  "description": "Vérifier une permission : palier 1 du niveau intermédiaire de la progression welcome-rbac. has_contract_permission dit si un ensemble de rôles accorde une permission selon le contrat déclaratif (livré avec le starter). Vérification pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/rbac-check",
+  "routes_marker": "rbac-check",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/rbac-check",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-rbac/intermediaire/rbac-check/",
+  "check_paths": [
+    "mvc/controllers/rbac_check_controller.py",
+    "mvc/views/rbac_check/index.html",
+    "mvc/security/rbac.json"
+  ]
+}

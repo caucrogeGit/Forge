@@ -57,6 +57,10 @@ PARCOURS = {
         "debutant/mfa-welcome.md",
         ["pip install --pre forge-mvc-mfa", "forge starter:build mfa-welcome", "forge run"],
     ),
+    "welcome-rbac": (
+        "debutant/rbac-welcome.md",
+        ["pip install --pre forge-mvc-rbac", "forge starter:build rbac-welcome", "forge run"],
+    ),
 }
 
 

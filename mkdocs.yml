@@ -246,6 +246,24 @@ nav:
               - Secret chiffré au repos: starters/welcome-mfa/avance/mfa-crypto.md
               - Bilan avancé: starters/welcome-mfa/avance/bilan.md
           - Aide-mémoire: starters/welcome-mfa/recapitulatif.md
+      - Progression RBAC (welcome-rbac):
+          - Installation: starters/welcome-rbac/installation.md
+          - Débutant:
+              - Bonjour Forge RBAC: starters/welcome-rbac/debutant/rbac-welcome.md
+              - Code de permission: starters/welcome-rbac/debutant/rbac-permission.md
+              - Rôle et slug: starters/welcome-rbac/debutant/rbac-role.md
+              - Bilan débutant: starters/welcome-rbac/debutant/bilan.md
+          - Intermédiaire:
+              - Vérifier une permission: starters/welcome-rbac/intermediaire/rbac-check.md
+              - Protéger une route: starters/welcome-rbac/intermediaire/rbac-guard.md
+              - Permission dans un template: starters/welcome-rbac/intermediaire/rbac-template.md
+              - Bilan intermédiaire: starters/welcome-rbac/intermediaire/bilan.md
+          - Avancé:
+              - Associer un rôle à un utilisateur: starters/welcome-rbac/avance/rbac-user-role.md
+              - Résoudre les permissions: starters/welcome-rbac/avance/rbac-resolve.md
+              - Rôles de la requête: starters/welcome-rbac/avance/rbac-request-roles.md
+              - Bilan avancé: starters/welcome-rbac/avance/bilan.md
+          - Aide-mémoire: starters/welcome-rbac/recapitulatif.md
       - CRUD:
           - Vue d'ensemble: starters/crud/index.md
           - First CRUD: starters/crud/first-crud.md

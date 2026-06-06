@@ -1,0 +1,24 @@
+{
+  "id": "rbac-role",
+  "number": 84,
+  "name": "Rôle et slug",
+  "kind": "skeleton",
+  "aliases": [
+    "rbac-role",
+    "rbac_role",
+    "84"
+  ],
+  "description": "Rôle et slug : palier 3 du niveau débutant de la progression welcome-rbac. normalize_role_slug dérive un slug stable depuis un nom de rôle, validate_role refuse les rôles invalides. Transformation pure, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/rbac-role",
+  "routes_marker": "rbac-role",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/rbac-role",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-rbac/debutant/rbac-role/",
+  "check_paths": [
+    "mvc/controllers/rbac_role_controller.py",
+    "mvc/views/rbac_role/index.html"
+  ]
+}

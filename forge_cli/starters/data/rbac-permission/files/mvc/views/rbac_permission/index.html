@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Code de permission — Forge</title>
+</head>
+<body>
+  <h1>Code de permission</h1>
+
+  <form method="get" action="/rbac-permission">
+    <input type="text" name="code" value="{{ input }}" size="40">
+    <button type="submit">Normaliser & valider</button>
+  </form>
+
+  <ul>
+    <li>Entrée : <code>{{ input }}</code></li>
+    <li>Normalisé : <code>{{ normalized }}</code></li>
+    <li>Valide : <strong>{% if valid %}oui{% else %}non{% endif %}</strong>{% if error %} — {{ error }}{% endif %}</li>
+  </ul>
+
+  <p>La notation pointée <code>entité.action</code> (ex. <code>article.create</code>)
+  rend les permissions lisibles et cohérentes.</p>
+</body>
+</html>

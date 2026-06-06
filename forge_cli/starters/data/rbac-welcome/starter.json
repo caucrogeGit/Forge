@@ -1,0 +1,24 @@
+{
+  "id": "rbac-welcome",
+  "number": 82,
+  "name": "Bonjour Forge RBAC",
+  "kind": "skeleton",
+  "aliases": [
+    "rbac-welcome",
+    "rbac_welcome",
+    "82"
+  ],
+  "description": "Bonjour Forge RBAC : premier palier du niveau débutant de la progression welcome-rbac. Premier contact avec le module opt-in forge-mvc-rbac : charge le contrat déclaratif mvc/security/rbac.json (livré avec le starter) et inspecte rôles, permissions et entités. Aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/rbac-welcome",
+  "routes_marker": "rbac-welcome",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/rbac-welcome",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-rbac/debutant/rbac-welcome/",
+  "check_paths": [
+    "mvc/controllers/rbac_welcome_controller.py",
+    "mvc/security/rbac.json"
+  ]
+}

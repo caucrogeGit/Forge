@@ -1,0 +1,25 @@
+{
+  "id": "rbac-guard",
+  "number": 86,
+  "name": "Protéger une route",
+  "kind": "skeleton",
+  "aliases": [
+    "rbac-guard",
+    "rbac_guard",
+    "86"
+  ],
+  "description": "Protéger une route : palier 2 du niveau intermédiaire de la progression welcome-rbac. require_contract_permission renvoie une réponse 403 si les rôles n'accordent pas la permission requise, sinon None (la route continue). Garde de route déclarative, aucune base de données.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/rbac-guard",
+  "routes_marker": "rbac-guard",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/rbac-guard",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-rbac/intermediaire/rbac-guard/",
+  "check_paths": [
+    "mvc/controllers/rbac_guard_controller.py",
+    "mvc/views/rbac_guard/index.html",
+    "mvc/security/rbac.json"
+  ]
+}

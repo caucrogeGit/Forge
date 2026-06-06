@@ -1,0 +1,24 @@
+{
+  "id": "rbac-user-role",
+  "number": 88,
+  "name": "Associer un rôle à un utilisateur",
+  "kind": "skeleton",
+  "aliases": [
+    "rbac-user-role",
+    "rbac_user_role",
+    "88"
+  ],
+  "description": "Associer un rôle à un utilisateur : palier 1 du niveau avancé de la progression welcome-rbac. create_auth_user_role construit et valide une association user/role (AuthUserRole) que l'application persiste dans user_roles. Aucune base de données dans la démo.",
+  "status": "available",
+  "requires_db": false,
+  "supports_public": true,
+  "home_route": "/rbac-user-role",
+  "routes_marker": "rbac-user-role",
+  "routes_snippet": "routes.py.snippet",
+  "open_url": "https://localhost:8000/rbac-user-role",
+  "doc_url": "https://forgemvc.com/docs/forge/starters/welcome-rbac/avance/rbac-user-role/",
+  "check_paths": [
+    "mvc/controllers/rbac_user_role_controller.py",
+    "mvc/views/rbac_user_role/index.html"
+  ]
+}

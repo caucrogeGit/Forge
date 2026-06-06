@@ -74,6 +74,8 @@ class TestStartersFrozen:
         "audio-transcode", "audio-doctor",
         "mfa-welcome", "mfa-secret", "mfa-verify", "mfa-enroll", "mfa-challenge",
         "mfa-recovery", "mfa-revalidation", "mfa-replay", "mfa-crypto",
+        "rbac-welcome", "rbac-permission", "rbac-role", "rbac-check", "rbac-guard",
+        "rbac-template", "rbac-user-role", "rbac-resolve", "rbac-request-roles",
     }
 
     def test_starter_set_is_frozen(self):
@@ -87,7 +89,7 @@ class TestStartersFrozen:
         )
 
     def test_frozen_count(self):
-        assert len(self.FROZEN) == 81
+        assert len(self.FROZEN) == 90
 
 
 # ── Le contrat est documenté ─────────────────────────────────────────────────
@@ -98,7 +100,7 @@ class TestContractDocumented:
 
     @pytest.mark.parametrize("needle", [
         "opt-in:install", "opt-in:disable", "module:install",
-        "81 starters", "mkdocs build --strict",
+        "90 starters", "mkdocs build --strict",
     ])
     def test_contract_mentions(self, needle):
         assert needle in CONTRACT.read_text(encoding="utf-8")
