@@ -9,7 +9,8 @@ import sqlite3
 
 import pytest
 
-from core.pivot_advanced import (
+pytest.importorskip("forge_mvc_pivot")
+from forge_mvc_pivot import (
     PivotAdvancedService,
     PivotConstraintError,
     PivotFieldConstraint,
@@ -371,7 +372,7 @@ def test_update_by_id_leve_constraint_error_si_nullable_false_et_none(db):
 # ── Exports publics ───────────────────────────────────────────────────────────
 
 def test_exports_publics_006():
-    from core.pivot_advanced import (
+    from forge_mvc_pivot import (
         PivotAdvancedService,
         PivotConstraintError,
         PivotFieldConstraint,
@@ -387,7 +388,7 @@ def test_exports_publics_006():
 
 def test_pivot_advanced_ne_depend_pas_de_make_crud():
     import inspect
-    from core import pivot_advanced
+    import forge_mvc_pivot as pivot_advanced
     src = inspect.getsource(pivot_advanced)
     assert "make_crud" not in src
     assert "from forge_cli" not in src

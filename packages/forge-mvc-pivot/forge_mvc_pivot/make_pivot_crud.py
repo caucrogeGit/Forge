@@ -1,4 +1,4 @@
-"""forge_cli/entities/make_pivot_crud.py — Générateur de sous-CRUD Pivot advanced.
+"""forge_mvc_pivot/make_pivot_crud.py — Générateur de sous-CRUD Pivot advanced (opt-in).
 
 Commande : forge make:pivot-crud <EntitéSource> <nomRelation> [--dry-run]
 
@@ -6,7 +6,7 @@ Analyse une relation many_to_many avec pivot.fields[] et génère une structure
 dédiée minimale sans modifier make:crud.
 
 Décision : PIVOT-ADVANCED-004.
-Service runtime : core.pivot_advanced.PivotAdvancedService (PIVOT-ADVANCED-003).
+Service runtime : forge_mvc_pivot.PivotAdvancedService (PIVOT-ADVANCED-003).
 """
 
 from __future__ import annotations
@@ -182,7 +182,7 @@ Exemple de routes à ajouter :
 """
 from __future__ import annotations
 
-from core.pivot_advanced import PivotAdvancedService, PivotConstraintError, pivot_error_to_form_error
+from forge_mvc_pivot import PivotAdvancedService, PivotConstraintError, pivot_error_to_form_error
 from core.http.request import Request
 from core.http.response import Response
 

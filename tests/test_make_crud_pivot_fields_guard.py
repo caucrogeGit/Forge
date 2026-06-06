@@ -263,7 +263,7 @@ def test_error_message_mentions_make_pivot_crud(tmp_path, capsys):
 
 def test_make_pivot_crud_still_works_for_same_relation(tmp_path):
     """make:pivot-crud Article tags reste fonctionnel indépendamment du garde make:crud."""
-    from forge_cli.entities.make_pivot_crud import make_pivot_crud
+    from forge_mvc_pivot.make_pivot_crud import make_pivot_crud
 
     _setup(tmp_path, [
         {"name": "position", "type": "integer", "nullable": False},

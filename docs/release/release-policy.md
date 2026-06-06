@@ -155,6 +155,7 @@ chaque package publiable :
 | `forge-mvc-video` | `4 - Beta` | Module vidéo opt-in : chaîne complète `video:upload` → `video:process` → lecture HTTP Range, + `video:cleanup` ; transcodage MP4 H.264/AAC. Publié sur PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-audio` | `4 - Beta` | Module audio opt-in **sans état** : upload, sondage (`ffprobe`), transcodage MP3 (`ffmpeg`), lecture HTTP Range, `audio:doctor`. Pas de base de données. **Non encore publié sur PyPI** (cible release beta.13) |
 | `forge-mvc-files` | `3 - Alpha` | Upload générique extrait du core (ADR-019) : écriture sécurisée, storage anti-traversal, service de fichiers, rate-limit. **Squelette en cours d'extraction, non encore publié sur PyPI** |
+| `forge-mvc-pivot` | `4 - Beta` | Pivot advanced extrait du core (ADR-021) : associations `many_to_many` enrichies + générateur `make:pivot-crud`. **Non encore publié sur PyPI** |
 
 Critères de passage Beta → Stable d'un module opt-in :
 

@@ -15,8 +15,9 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.make_pivot_crud import make_pivot_crud
-from core.pivot_advanced import PivotAdvancedService, PivotRow
+pytest.importorskip("forge_mvc_pivot")
+from forge_mvc_pivot.make_pivot_crud import make_pivot_crud
+from forge_mvc_pivot import PivotAdvancedService, PivotRow
 
 
 # ── Fixture relations.json canonique ──────────────────────────────────────────
@@ -148,7 +149,7 @@ def test_e2e_controleur_genere_importe_pivot_advanced_service(project):
     ctrl = project / "mvc" / "controllers" / "pivot" / "article_tags_pivot_controller.py"
     text = ctrl.read_text(encoding="utf-8")
     assert "PivotAdvancedService" in text
-    assert "from core.pivot_advanced import PivotAdvancedService" in text
+    assert "from forge_mvc_pivot import PivotAdvancedService" in text
 
 
 def test_e2e_template_index_mentionne_champs_pivot(project):

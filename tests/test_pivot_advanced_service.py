@@ -7,7 +7,8 @@ from __future__ import annotations
 
 import pytest
 
-from core.pivot_advanced import PivotAdvancedService, PivotRow
+pytest.importorskip("forge_mvc_pivot")
+from forge_mvc_pivot import PivotAdvancedService, PivotRow
 
 
 # ── Fausse base de données ────────────────────────────────────────────────────
@@ -114,12 +115,12 @@ def _make_service(db: _FakePivotDB | None = None, pivot_fields=None):
 
 
 def test_import_pivot_advanced_service():
-    from core.pivot_advanced import PivotAdvancedService
+    from forge_mvc_pivot import PivotAdvancedService
     assert PivotAdvancedService is not None
 
 
 def test_import_pivot_row():
-    from core.pivot_advanced import PivotRow
+    from forge_mvc_pivot import PivotRow
     assert PivotRow is not None
 
 
@@ -318,7 +319,7 @@ def test_detach_supprime_association():
 
 
 def test_service_ne_depend_pas_de_make_crud():
-    import core.pivot_advanced as mod
+    import forge_mvc_pivot as mod
     src = mod.__file__
     text = open(src).read()
     assert "make_crud" not in text

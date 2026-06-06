@@ -185,7 +185,7 @@ visuels de votre projet.
 ### Import
 
 ```python
-from core.pivot_advanced import (
+from forge_mvc_pivot import (
     PivotAdvancedService,
     PivotFieldConstraint,
     PivotConstraintError,
@@ -193,6 +193,9 @@ from core.pivot_advanced import (
     pivot_error_to_form_error,
 )
 ```
+
+Le pivot avancé est un opt-in extrait du core (ADR-021). Installez le paquet
+avant usage : `pip install --pre forge-mvc-pivot`.
 
 ### Instanciation (sans contraintes — API simple)
 

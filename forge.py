@@ -597,7 +597,13 @@ def main() -> None:
                 "arguments manquants pour «forge make:pivot-crud».",
                 hint="indique l'entité source et le nom de la relation. Exemple : forge make:pivot-crud Article tags",
             )
-        from forge_cli.entities.make_pivot_crud import cmd_make_pivot_crud_main
+        try:
+            from forge_mvc_pivot.make_pivot_crud import cmd_make_pivot_crud_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-pivot non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-pivot",
+            )
         cmd_make_pivot_crud_main(args[1:])
         return
 

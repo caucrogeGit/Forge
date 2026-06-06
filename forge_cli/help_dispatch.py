@@ -1626,8 +1626,8 @@ Options:
 Limites:
   - ne génère pas le CRUD principal des deux entités liées (voir
     forge make:crud) ;
-  - le runtime côté Forge est dans core.pivot_advanced
-    (PIVOT-ADVANCED-003) ;
+  - le runtime vit dans l'opt-in forge-mvc-pivot (forge_mvc_pivot),
+    extrait du core (ADR-021) ; installer : pip install --pre forge-mvc-pivot ;
   - ne modifie pas mvc/routes.py — le routage du sous-CRUD pivot est
     à brancher manuellement.""",
 

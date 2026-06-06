@@ -88,6 +88,10 @@ OPTIN_MODULES: dict[str, set[str]] = {
     # forge-mvc-files : opt-in propriétaire de l'upload générique (ADR-019).
     # Squelette à ce stade ; ses tests gardent l'import via importorskip.
     "forge_mvc_files": set(),
+    # forge-mvc-pivot : pivot advanced extrait du core (ADR-021). Ses tests
+    # gardent l'import via pytest.importorskip("forge_mvc_pivot") ; accès base
+    # via core.database.db (import paresseux), donc pas d'extra à lister.
+    "forge_mvc_pivot": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}
