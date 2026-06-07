@@ -33,7 +33,7 @@ def _patch_cmd_new(monkeypatch, tmp_path):
     forge_init = _Recorder(return_value=[])
 
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
-    monkeypatch.setattr(forge, "_clone_skeleton", lambda dest, ref=None: os.makedirs(dest, exist_ok=True))
+    monkeypatch.setattr(forge, "_materialize_skeleton", lambda dest: os.makedirs(dest, exist_ok=True))
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
@@ -128,14 +128,14 @@ def test_message_contient_python_app(monkeypatch, tmp_path, capsys):
 
 
 def test_echec_commit_git_final_conserve_le_projet(monkeypatch, tmp_path, capsys):
-    def create_dest(dest, ref=None):
+    def create_dest(dest):
         os.makedirs(dest, exist_ok=True)
 
     def fail_git(dest, project_name):
         raise RuntimeError("git user.email manquant")
 
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
-    monkeypatch.setattr(forge, "_clone_skeleton", create_dest)
+    monkeypatch.setattr(forge, "_materialize_skeleton", create_dest)
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
@@ -173,14 +173,14 @@ def test_openssl_appele_avec_capture_true(monkeypatch, tmp_path):
 
 def test_openssl_echec_nettoie_dossier(monkeypatch, tmp_path):
     """Si la génération SSL échoue, cmd_new nettoie le dossier projet."""
-    def create_dest(dest, ref=None):
+    def create_dest(dest):
         os.makedirs(dest, exist_ok=True)
 
     def fail_certificates(dest):
         raise RuntimeError("openssl introuvable ou échec")
 
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
-    monkeypatch.setattr(forge, "_clone_skeleton", create_dest)
+    monkeypatch.setattr(forge, "_materialize_skeleton", create_dest)
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
@@ -191,18 +191,54 @@ def test_openssl_echec_nettoie_dossier(monkeypatch, tmp_path):
         forge.cmd_new("MonProjet")
 
 
-# ── Branche de clonage (fix main) ──────────────────────────────────────────
+# ── Matérialisation du squelette (NEW-MATERIALIZE-001, ADR-024) ─────────────
+# forge new copie le squelette embarqué au lieu de cloner le dépôt ; le flag
+# --ref (et les constantes git du clone) ont disparu.
 
-def test_clone_utilise_ref_stable_par_defaut(monkeypatch, tmp_path):
-    """Sans --ref, le clone doit utiliser la référence stable par défaut."""
-    cloned_with = {}
+def test_clone_skeleton_supprime():
+    """L'ancien clone de dépôt n'existe plus (_FORGE_DEFAULT_REF reste comme
+    métadonnée de release)."""
+    assert not hasattr(forge, "_clone_skeleton")
+    assert not hasattr(forge, "_FORGE_REPO")
 
-    def spy_clone(dest, ref=None):
-        cloned_with["ref"] = ref
+
+def test_cmd_new_sans_parametre_ref():
+    """cmd_new n'expose plus de paramètre ref."""
+    import inspect
+
+    assert "ref" not in inspect.signature(forge.cmd_new).parameters
+
+
+def test_materialize_skeleton_copie_le_squelette(monkeypatch, tmp_path):
+    """_materialize_skeleton délègue à forge_cli.skeleton.materialize."""
+    called = {}
+
+    def spy_materialize(dest):
+        called["dest"] = dest
         os.makedirs(dest, exist_ok=True)
 
+    import forge_cli.skeleton as skeleton
+    monkeypatch.setattr(skeleton, "materialize", spy_materialize)
+    forge._materialize_skeleton(str(tmp_path / "proj"))
+    assert called["dest"].endswith("proj")
+
+
+def test_cmd_new_materialise_sans_cloner(monkeypatch, tmp_path):
+    """cmd_new appelle _materialize_skeleton et ne lance aucun git clone."""
+    materialized = {}
+
+    def spy_materialize(dest):
+        materialized["dest"] = dest
+        os.makedirs(dest, exist_ok=True)
+
+    runs = []
+
+    def spy_run(args, **kwargs):
+        runs.append(args)
+        return type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
-    monkeypatch.setattr(forge, "_clone_skeleton", spy_clone)
+    monkeypatch.setattr(forge, "_materialize_skeleton", spy_materialize)
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
@@ -211,61 +247,33 @@ def test_clone_utilise_ref_stable_par_defaut(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
 
     forge.cmd_new("MonProjet")
-    assert cloned_with["ref"] is None
+
+    assert materialized["dest"].endswith("MonProjet")
+    assert not any(
+        a[:2] == ["git", "clone"] for a in runs
+    ), "forge new ne doit plus cloner de dépôt."
 
 
-def test_clone_skeleton_utilise_default_branch_si_ref_none(monkeypatch):
-    """_clone_skeleton sans ref doit passer le tag stable à git clone."""
-    git_args = {}
-
-    def spy_run(args, **kwargs):
-        if args[0] == "git":
-            git_args["branch"] = args[args.index("--branch") + 1] if "--branch" in args else None
-        return type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})()
-
-    monkeypatch.setattr(forge, "_run", spy_run)
-    forge._clone_skeleton("/tmp/fake_dest")
-
-    # Pour les stables, ref = "v" + version (ex. v2.5.0).
-    # Pour les RCs, git utilise un tiret (v3.0.0-rc1) vs PEP 440 collé (3.0.0rc1) —
-    # on vérifie que le ref commence par "v" et contient la base de version.
-    base_version = forge._FORGE_VERSION.split("rc")[0].split("a")[0].split("b")[0]
-    assert forge._FORGE_DEFAULT_REF.startswith("v")
-    assert base_version in forge._FORGE_DEFAULT_REF
-    assert git_args.get("branch") == forge._FORGE_DEFAULT_REF
-
-
-def test_clone_skeleton_accepte_ref_explicite(monkeypatch):
-    """_clone_skeleton avec ref doit passer cette ref à git clone."""
-    git_args = {}
-
-    def spy_run(args, **kwargs):
-        if args[0] == "git":
-            git_args["branch"] = args[args.index("--branch") + 1] if "--branch" in args else None
-        return type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})()
-
-    monkeypatch.setattr(forge, "_run", spy_run)
-    forge._clone_skeleton("/tmp/fake_dest", ref="main")
-
-    assert git_args.get("branch") == "main"
-
-
-def test_dispatch_ref_transmis_a_cmd_new(monkeypatch, tmp_path, capsys):
-    """forge new MonProjet --ref main doit transmettre ref='main'."""
+def test_dispatch_new_sans_ref(monkeypatch, tmp_path):
+    """forge new MonProjet appelle cmd_new sans paramètre ref."""
     received = {}
 
-    def spy_cmd_new(name, ref=None, profile="standard"):
-        received["ref"] = ref
+    def spy_cmd_new(name, profile="standard"):
+        received["name"] = name
+        received["profile"] = profile
 
-    monkeypatch.setattr(sys, "argv", ["forge", "new", "MonProjet", "--ref", "main"])
+    monkeypatch.setattr(sys, "argv", ["forge", "new", "MonProjet"])
     monkeypatch.setattr(forge, "cmd_new", spy_cmd_new)
     forge.main()
 
-    assert received["ref"] == "main"
+    assert received["name"] == "MonProjet"
 
-    assert not (tmp_path / "MonProjet").exists(), (
-        "Le dossier projet doit être supprimé après échec"
-    )
+
+def test_aide_new_ne_mentionne_plus_ref():
+    """L'aide de forge new ne propose plus --ref (flag retiré avec le clone)."""
+    from forge_cli.help_dispatch import HELP_TEXTS_RICH
+
+    assert "--ref" not in HELP_TEXTS_RICH["new"]
 
 
 def test_version_cli_affiche_version_stable(monkeypatch, capsys):

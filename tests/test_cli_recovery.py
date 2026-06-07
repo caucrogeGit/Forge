@@ -59,14 +59,6 @@ def test_forge_new_sans_arg_exemple_concret(monkeypatch, capsys):
     assert "Exemple" in err or "exemple" in err
 
 
-def test_forge_new_ref_sans_valeur_conseil(monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["forge", "new", "MonProjet", "--ref"])
-    with pytest.raises(SystemExit) as exc_info:
-        forge.main()
-    assert exc_info.value.code == 1
-    assert "Conseil :" in capsys.readouterr().err
-
-
 def test_forge_new_profile_sans_valeur_conseil(monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", ["forge", "new", "MonProjet", "--profile"])
     with pytest.raises(SystemExit) as exc_info:

@@ -44,8 +44,11 @@ from forge_cli.errors import cli_fail
 from forge_cli.help_dispatch import format_command_help, wants_help
 
 
-_FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"
 _FORGE_VERSION = "1.0.0b13"
+# Tag git de release correspondant à cette version. N'est plus utilisé pour
+# créer un projet (forge new copie un squelette embarqué, ADR-024) ; conservé
+# comme métadonnée de release, ancrée par la gouvernance de version (tests
+# release/meta de cohérence de version).
 _FORGE_DEFAULT_REF = "v1.0.0-beta.13"
 
 
@@ -103,15 +106,16 @@ def _safe_remove_git(dest: str) -> None:
 
 # ── Étapes d'initialisation ───────────────────────────────────────────────────
 
-def _clone_skeleton(dest: str, ref: str | None = None) -> None:
-    _print_step("Clonage du squelette Forge...")
-    branch = ref or _FORGE_DEFAULT_REF
-    result = _run(
-        ["git", "clone", "--branch", branch, "--depth=1", "--quiet", _FORGE_REPO, dest],
-        capture=True,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(result.stderr.strip() or "Échec du clonage Git.")
+def _materialize_skeleton(dest: str) -> None:
+    """Matérialise le squelette de projet nu (ADR-024).
+
+    Copie l'arbre curé `forge_cli/skeleton/data/` dans le projet — plus de
+    clone du dépôt. Le `core` du projet vient ensuite du paquet `forge-mvc`
+    (voir requirements.txt du squelette).
+    """
+    _print_step("Création du projet à partir du squelette Forge...")
+    from forge_cli.skeleton import materialize
+    materialize(dest)
 
 
 def _configure_env_files(dest: str, project_name: str, db_name: str) -> None:
@@ -250,7 +254,6 @@ def _warn_initial_git_failed(exc: Exception) -> None:
 
 def cmd_new(
     project_name: str,
-    ref: str | None = None,
     profile: str = DEFAULT_PROJECT_PROFILE,
 ) -> None:
     if not re.match(r"^[A-Za-z][A-Za-z0-9_-]*$", project_name):
@@ -279,7 +282,7 @@ def cmd_new(
 
     node_warnings = []
     try:
-        _clone_skeleton(dest, ref=ref)
+        _materialize_skeleton(dest)
         _configure_env_files(dest, project_name, db_name)
         _setup_python_environment(dest)
         node_warnings = _setup_node_environment(dest)
@@ -450,18 +453,8 @@ def main() -> None:
                 "argument manquant pour «forge new».",
                 hint="indique le nom du projet. Exemple : forge new GestionVentes",
             )
-        ref = None
         profile = DEFAULT_PROJECT_PROFILE
         remaining = args[2:]
-        if "--ref" in remaining:
-            idx = remaining.index("--ref")
-            if idx + 1 < len(remaining):
-                ref = remaining[idx + 1]
-            else:
-                cli_fail(
-                    "argument manquant pour «forge new».",
-                    hint="indique la branche après --ref. Exemple : forge new GestionVentes --ref main",
-                )
         if "--profile" in remaining:
             idx = remaining.index("--profile")
             if idx + 1 < len(remaining):
@@ -472,7 +465,7 @@ def main() -> None:
                     hint="indique le profil après --profile. Profils disponibles : "
                          + ", ".join(SUPPORTED_PROJECT_PROFILES),
                 )
-        cmd_new(args[1], ref=ref, profile=profile)
+        cmd_new(args[1], profile=profile)
         return
 
     if command == "run":

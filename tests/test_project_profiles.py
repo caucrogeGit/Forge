@@ -117,13 +117,13 @@ def test_cmd_new_ecrit_forge_profile_txt(tmp_path, monkeypatch):
 
     dest = tmp_path / "TestProjet"
 
-    def fake_clone(d, ref=None):
+    def fake_materialize(d):
         import pathlib
         pathlib.Path(d).mkdir(parents=True, exist_ok=True)
 
     with (
         patch.object(forge, "_require_command"),
-        patch.object(forge, "_clone_skeleton", side_effect=fake_clone),
+        patch.object(forge, "_materialize_skeleton", side_effect=fake_materialize),
         patch.object(forge, "_configure_env_files"),
         patch.object(forge, "_setup_python_environment"),
         patch.object(forge, "_setup_node_environment", return_value=[]),
@@ -147,7 +147,7 @@ def test_cmd_new_tous_profils_valides_acceptes(tmp_path, monkeypatch):
 
         with (
             patch.object(forge, "_require_command"),
-            patch.object(forge, "_clone_skeleton"),
+            patch.object(forge, "_materialize_skeleton"),
             patch.object(forge, "_configure_env_files"),
             patch.object(forge, "_setup_python_environment"),
             patch.object(forge, "_setup_node_environment", return_value=[]),
@@ -173,8 +173,8 @@ def test_dispatch_parse_profile_option():
 
     calls = []
 
-    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE, starter=None):
-        calls.append({"name": name, "ref": ref, "profile": profile})
+    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE):
+        calls.append({"name": name, "profile": profile})
 
     with (
         patch.object(forge, "cmd_new", side_effect=fake_cmd_new),
@@ -192,7 +192,7 @@ def test_dispatch_profile_defaut_si_absent():
 
     calls = []
 
-    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE, starter=None):
+    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE):
         calls.append({"profile": profile})
 
     with (
@@ -204,28 +204,10 @@ def test_dispatch_profile_defaut_si_absent():
     assert calls[0]["profile"] == DEFAULT_PROJECT_PROFILE
 
 
-def test_dispatch_profile_et_ref_simultanement():
-    forge = _import_forge()
-
-    calls = []
-
-    def fake_cmd_new(name, ref=None, profile=DEFAULT_PROJECT_PROFILE, starter=None):
-        calls.append({"ref": ref, "profile": profile})
-
-    with (
-        patch.object(forge, "cmd_new", side_effect=fake_cmd_new),
-        patch.object(sys, "argv", ["forge", "new", "MonProjet", "--ref", "main", "--profile", "dynamic"]),
-    ):
-        forge.main()
-
-    assert calls[0]["ref"] == "main"
-    assert calls[0]["profile"] == "dynamic"
-
-
 # ── PROFILE-003 : génération par profil ───────────────────────────────────────
 
-def _fake_clone(d, ref=None):
-    """Simule _clone_skeleton en créant uniquement le dossier destination."""
+def _fake_clone(d):
+    """Simule _materialize_skeleton en créant uniquement le dossier destination."""
     pathlib.Path(d).mkdir(parents=True, exist_ok=True)
 
 
@@ -234,7 +216,7 @@ def _run_cmd_new(forge, monkeypatch, tmp_path, name="Demo", **kwargs):
     monkeypatch.chdir(tmp_path)
     with (
         patch.object(forge, "_require_command"),
-        patch.object(forge, "_clone_skeleton", side_effect=_fake_clone),
+        patch.object(forge, "_materialize_skeleton", side_effect=_fake_clone),
         patch.object(forge, "_configure_env_files"),
         patch.object(forge, "_setup_python_environment"),
         patch.object(forge, "_setup_node_environment", return_value=[]),
@@ -297,31 +279,6 @@ def test_profil_invalide_avant_require_command(tmp_path, monkeypatch):
     with pytest.raises(SystemExit):
         forge.cmd_new("Demo", profile="admin")
     assert require_called == []
-
-
-def test_ref_et_profile_transmis_conjointement(tmp_path, monkeypatch):
-    """--ref et --profile sont tous deux propagés correctement à cmd_new."""
-    forge = _import_forge()
-    monkeypatch.chdir(tmp_path)
-    cloned_ref = {}
-
-    def spy_clone(d, ref=None):
-        cloned_ref["ref"] = ref
-        pathlib.Path(d).mkdir(parents=True, exist_ok=True)
-
-    with (
-        patch.object(forge, "_require_command"),
-        patch.object(forge, "_clone_skeleton", side_effect=spy_clone),
-        patch.object(forge, "_configure_env_files"),
-        patch.object(forge, "_setup_python_environment"),
-        patch.object(forge, "_setup_node_environment", return_value=[]),
-        patch.object(forge, "_generate_certificates"),
-        patch.object(forge, "_reinitialize_git"),
-    ):
-        forge.cmd_new("Demo", ref="v2.0.0", profile="dynamic")
-
-    assert cloned_ref["ref"] == "v2.0.0"
-    assert (tmp_path / "Demo" / "forge_profile.txt").read_text(encoding="utf-8").strip() == "dynamic"
 
 
 def test_comportement_historique_preserve_sans_profile(tmp_path, monkeypatch):

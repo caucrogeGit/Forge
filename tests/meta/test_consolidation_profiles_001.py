@@ -29,7 +29,7 @@ def _import_forge():
     return mod
 
 
-def _fake_clone(d, ref=None):
+def _fake_clone(d):
     pathlib.Path(d).mkdir(parents=True, exist_ok=True)
 
 
@@ -37,7 +37,7 @@ def _run_cmd_new(forge, monkeypatch, tmp_path, name="Demo", **kwargs):
     monkeypatch.chdir(tmp_path)
     with (
         patch.object(forge, "_require_command"),
-        patch.object(forge, "_clone_skeleton", side_effect=_fake_clone),
+        patch.object(forge, "_materialize_skeleton", side_effect=_fake_clone),
         patch.object(forge, "_configure_env_files"),
         patch.object(forge, "_setup_python_environment"),
         patch.object(forge, "_setup_node_environment", return_value=[]),

@@ -43,8 +43,8 @@ def _run_cmd_new(forge, monkeypatch, tmp_path, name="Demo", profile="standard"):
         patch.object(forge, "_require_command"),
         patch.object(
             forge,
-            "_clone_skeleton",
-            side_effect=lambda d, ref=None: pathlib.Path(d).mkdir(parents=True, exist_ok=True),
+            "_materialize_skeleton",
+            side_effect=lambda d: pathlib.Path(d).mkdir(parents=True, exist_ok=True),
         ),
         patch.object(forge, "_configure_env_files"),
         patch.object(forge, "_setup_python_environment"),

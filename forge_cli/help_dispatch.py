@@ -1803,39 +1803,39 @@ Limites:
 
     "new": """\
 Usage:
-  forge new <NomProjet> [--ref <branche>] [--profile <profil>]
+  forge new <NomProjet> [--profile <profil>]
 
 Description:
   Crée un nouveau projet Forge nu dans ./<NomProjet>/ à partir du
-  squelette officiel : clone Git, configuration env/, environnement
-  virtuel Python, dépendances Node et certificats SSL de développement.
-  Pour construire un starter dans le projet, voir forge starter:build.
+  squelette de projet embarqué : configuration env/, environnement
+  virtuel Python (avec forge-mvc), dépendances Node et certificats SSL
+  de développement. Pour construire un starter dans le projet, voir
+  forge starter:build.
 
 Arguments:
   <NomProjet>        Nom du projet (lettres, chiffres, _ ou -, doit
                      commencer par une lettre).
 
 Options:
-  --ref <branche>    Branche Forge à cloner (défaut : tag courant).
   --profile <id>     Profil de projet (voir SUPPORTED_PROJECT_PROFILES).
   -h, --help         Affiche cette aide sans exécuter la commande.
 
 Effets (CRÉE un dossier complet) :
   - refuse si ./<NomProjet>/ existe déjà ;
-  - git clone du squelette Forge avec --depth=1 ;
+  - copie le squelette de projet embarqué (aucun clone, aucun réseau) ;
   - configure env/example et env/dev (APP_NAME, DB_NAME, DB_APP_LOGIN) ;
-  - python -m venv .venv puis pip install -r requirements.txt ;
+  - python -m venv .venv puis pip install -r requirements.txt
+    (installe forge-mvc) ;
   - npm install + npm run build:css si package.json présent ;
   - openssl req génère cert.pem / key.pem (HTTPS local) ;
   - écrit forge_profile.txt ;
-  - réinitialise le dépôt Git (.git supprimé + git init + commit
-    initial) ;
+  - initialise un dépôt Git (git init + commit initial) ;
   - en cas d'erreur, supprime tout le dossier créé (rollback).
 
 ATTENTION:
   - cette commande crée un grand nombre de fichiers en une fois ;
   - elle EXIGE git et openssl dans le PATH ;
-  - elle suppose une connexion réseau (git clone, pip, npm) ;
+  - elle suppose une connexion réseau (pip, npm) ;
   - le commit Git initial peut échouer si user.name/user.email Git
     ne sont pas configurés (le projet reste créé, message d'aide).
 
