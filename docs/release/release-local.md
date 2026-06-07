@@ -521,13 +521,14 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ### Premier pas — Bienvenue dans Forge (sans BDD)
 
-Ce starter ne nécessite aucune base de données. Il s'applique directement via `forge new --starter welcome`.
+Ce starter ne nécessite aucune base de données. Il se construit dans le projet courant via `forge starter:build welcome`.
 
 ```bash
 cd ~/Projets
-forge new TestStarter7 --starter welcome
+forge new TestStarter7
 cd TestStarter7
 source .venv/bin/activate
+forge starter:build welcome
 python app.py
 ```
 
@@ -541,9 +542,10 @@ Palier 2 de la [progression officielle des starters](../starters/index.md#progre
 
 ```bash
 cd ~/Projets
-forge new TestStarterQueryParams --starter query-params
+forge new TestStarterQueryParams
 cd TestStarterQueryParams
 source .venv/bin/activate
+forge starter:build query-params
 python app.py
 ```
 
@@ -591,7 +593,7 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 | `forge db:init` + `starter:build 4` | auth + suivi + seed |
 | `forge db:init` + `starter:build 5` | pages publiques + formulaire séjour |
 | `forge db:init` + `starter:build 6` | auth + MFA TOTP (nécessite forge-mvc-mfa) |
-| `forge new MonProjet --starter welcome` | pages éducatives HTTP sans BDD |
+| `forge starter:build welcome` | pages éducatives HTTP sans BDD |
 | `pytest tests/test_packaging.py` | 14/14 passants |
 | `mkdocs build --strict` | 0 avertissement d'ancre |
 

@@ -139,7 +139,7 @@ class TestVersionNonFigee:
 class TestRoutesStarter:
     def test_starter_welcome_recommande(self):
         text = _text()
-        assert "--starter welcome" in text
+        assert "forge starter:build welcome" in text
 
     def test_routes_welcome_listees(self):
         text = _text()

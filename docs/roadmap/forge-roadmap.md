@@ -1494,6 +1494,19 @@ série.
 
 ---
 
+## Phase beta.13 — Consolidation du premier contact (starters)
+
+Tickets de consolidation issus du test terrain du parcours « Bonjour Forge »
+(niveau débutant). Objectif : une seule façon officielle de construire un
+starter, et des pages de palier sans commande d'installation.
+
+| Ticket | État | Rôle |
+|---|---|---|
+| `CLI-NEW-DROP-STARTER-001` | **livré** | Retire le flag `--starter` de `forge new` : la commande produit toujours un projet nu et `forge starter:build <id>` devient la seule façon officielle de construire un starter (ADR-023, charte principes 8 et 11). Suppression de `_apply_starter_to_new_project`, du parsing `--starter` et des mentions dans l'aide CLI. Garde-fous d'absence dans `tests/test_forge_new.py`. |
+| `DOC-STARTER-BUILD-ALIGN-001` | **livré** | Aligne toute la documentation sur `forge starter:build` : préambule `installation.md` (projet nu puis `forge starter:build welcome`), `README.md`, `docs/install/windows-wsl.md`, `docs/release/release-local.md`. Retrait du bloc « raccourci » de la page de palier `welcome.md` (renvoi vers `installation.md`) pour respecter STARTER-SEQUENTIAL-NAV-001. Tests méta adaptés (`test_starter_install_preamble_001`, `test_install_windows_wsl_docs_001`). |
+
+---
+
 ## Règle de mise à jour des roadmaps
 
 À partir de la séparation des roadmaps (DOC-ROADMAP-SPLIT-001) :

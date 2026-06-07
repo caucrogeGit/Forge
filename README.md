@@ -44,15 +44,17 @@ pipx install --pip-args="--pre" forge-mvc
 forge --version
 ```
 
-Créer un projet à partir du starter `welcome` :
+Créer un projet nu puis construire le starter `welcome` :
 
 ```bash
-forge new forge-demo --starter welcome
+forge new forge-demo
 cd forge-demo
 
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
+
+forge starter:build welcome
 
 cp env/example env/dev
 forge db:init

@@ -38,24 +38,32 @@ Alternatives (Linux/macOS, Windows, depuis les sources) : voir
 
 ## 2. Créer le projet de départ
 
-La progression démarre sur le starter `welcome` (Bonjour Forge). On crée le
-projet directement à partir de ce starter :
+`forge new` crée un projet Forge **nu**, sans starter :
 
 ```bash
-forge new mon-projet --starter welcome
+forge new mon-projet
 ```
 
-## 3. Lancer le projet
+## 3. Construire le starter Bonjour Forge
+
+La progression démarre sur le starter `welcome` (Bonjour Forge). On le
+construit dans le projet courant avec `forge starter:build` :
 
 ```bash
 cd mon-projet
 source .venv/bin/activate
+forge starter:build welcome
+```
+
+## 4. Lancer le projet
+
+```bash
 forge run
 ```
 
 Ouvrez `https://localhost:8000/welcome` : la page affiche **« Bonjour Forge »**.
 
-## 4. Vérifier l'installation
+## 5. Vérifier l'installation
 
 ```bash
 forge doctor

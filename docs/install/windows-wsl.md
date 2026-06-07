@@ -272,28 +272,31 @@ Détails complets : [Préparer MariaDB](mariadb.md).
 
 Pour suivre la progression pédagogique de la documentation Forge,
 ce guide cible explicitement le starter [Bonjour Forge](../guide/bonjour-forge.md).
-Créer un nouveau projet avec ce starter pré-appliqué :
+Créer un nouveau projet nu puis y construire ce starter :
 
 ```bash
 mkdir -p ~/Projets
 cd ~/Projets
 
-forge new forge-test-wsl --starter welcome
+forge new forge-test-wsl
 cd forge-test-wsl
 source .venv/bin/activate
+forge starter:build welcome
 ```
 
 `forge new` clone le squelette, prépare l'environnement virtuel
 Python `.venv`, installe les dépendances Python, génère les
 certificats SSL HTTPS de développement, compile le CSS Tailwind si
-Node.js est présent, applique le starter `welcome` (alias
-`bonjour-forge`) et initialise un dépôt Git propre.
+Node.js est présent et initialise un dépôt Git propre.
+`forge starter:build welcome` construit ensuite le starter `welcome`
+(alias `bonjour-forge`) dans le projet.
 
-!!! note "Sans `--starter welcome`"
-    `forge new MonProjet` sans option produit un squelette minimal
-    avec la route `/` (HomeController) et `/login` — pas de
-    `/welcome`. Si vous omettez le starter, n'exécutez pas les tests
-    `/welcome` plus bas ; testez `/` à la place.
+!!! note "Sans le starter `welcome`"
+    Un projet créé par `forge new MonProjet`, tant que
+    `forge starter:build welcome` n'a pas été lancé, reste un squelette
+    minimal avec la route `/` (HomeController) et `/login` — pas de
+    `/welcome`. Si vous ne construisez pas le starter, n'exécutez pas
+    les tests `/welcome` plus bas ; testez `/` à la place.
 
 ---
 

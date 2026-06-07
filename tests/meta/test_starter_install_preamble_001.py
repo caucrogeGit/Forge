@@ -31,7 +31,7 @@ MKDOCS = PROJECT_ROOT / "mkdocs.yml"
 PARCOURS = {
     "welcome-forge": (
         "debutant/welcome.md",
-        ["forge new mon-projet --starter welcome", "forge run"],
+        ["forge new mon-projet", "forge starter:build welcome", "forge run"],
     ),
     "welcome-iot": (
         "debutant/iot-welcome.md",
