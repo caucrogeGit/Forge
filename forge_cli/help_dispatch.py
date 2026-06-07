@@ -1804,13 +1804,12 @@ Limites:
     "new": """\
 Usage:
   forge new <NomProjet> [--ref <branche>] [--profile <profil>]
-                        [--starter <id>]
 
 Description:
-  Crée un nouveau projet Forge dans ./<NomProjet>/ à partir du
+  Crée un nouveau projet Forge nu dans ./<NomProjet>/ à partir du
   squelette officiel : clone Git, configuration env/, environnement
-  virtuel Python, dépendances Node, certificats SSL de développement
-  et application optionnelle d'un starter.
+  virtuel Python, dépendances Node et certificats SSL de développement.
+  Pour construire un starter dans le projet, voir forge starter:build.
 
 Arguments:
   <NomProjet>        Nom du projet (lettres, chiffres, _ ou -, doit
@@ -1819,8 +1818,6 @@ Arguments:
 Options:
   --ref <branche>    Branche Forge à cloner (défaut : tag courant).
   --profile <id>     Profil de projet (voir SUPPORTED_PROJECT_PROFILES).
-  --starter <id>     Applique un starter app après l'initialisation
-                     (voir forge starter:list pour les identifiants).
   -h, --help         Affiche cette aide sans exécuter la commande.
 
 Effets (CRÉE un dossier complet) :
@@ -1831,7 +1828,6 @@ Effets (CRÉE un dossier complet) :
   - npm install + npm run build:css si package.json présent ;
   - openssl req génère cert.pem / key.pem (HTTPS local) ;
   - écrit forge_profile.txt ;
-  - applique éventuellement le starter (fichiers + routes) ;
   - réinitialise le dépôt Git (.git supprimé + git init + commit
     initial) ;
   - en cas d'erreur, supprime tout le dossier créé (rollback).
@@ -1869,9 +1865,7 @@ Options:
 Limites:
   - lecture seule ;
   - ne télécharge rien et ne déclenche aucune génération ;
-  - pour construire un starter, voir forge starter:build <n|nom> ;
-  - pour appliquer un starter à un projet neuf, voir
-    forge new <NomProjet> --starter <id>.""",
+  - pour construire un starter, voir forge starter:build <n|nom>.""",
 
     "sync:entity": """\
 Usage:

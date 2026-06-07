@@ -254,7 +254,7 @@ def test_dispatch_ref_transmis_a_cmd_new(monkeypatch, tmp_path, capsys):
     """forge new MonProjet --ref main doit transmettre ref='main'."""
     received = {}
 
-    def spy_cmd_new(name, ref=None, profile="standard", starter=None):
+    def spy_cmd_new(name, ref=None, profile="standard"):
         received["ref"] = ref
 
     monkeypatch.setattr(sys, "argv", ["forge", "new", "MonProjet", "--ref", "main"])
@@ -426,3 +426,27 @@ def test_dossier_existant_exit(monkeypatch, tmp_path):
     (tmp_path / "ExisteDeja").mkdir()
     with pytest.raises(SystemExit):
         forge.cmd_new("ExisteDeja")
+
+
+# ── CLI-NEW-DROP-STARTER-001 (ADR-023) ───────────────────────────────────────
+# forge new produit toujours un projet nu : le flag --starter est retiré et
+# forge starter:build est la seule façon officielle de construire un starter.
+
+def test_cmd_new_sans_parametre_starter():
+    """cmd_new n'expose plus de paramètre starter."""
+    import inspect
+
+    params = inspect.signature(forge.cmd_new).parameters
+    assert "starter" not in params
+
+
+def test_apply_starter_helper_supprime():
+    """La fonction interne d'application de starter n'existe plus."""
+    assert not hasattr(forge, "_apply_starter_to_new_project")
+
+
+def test_aide_new_ne_mentionne_plus_starter():
+    """L'aide de forge new ne propose plus --starter."""
+    from forge_cli.help_dispatch import HELP_TEXTS_RICH
+
+    assert "--starter" not in HELP_TEXTS_RICH["new"]

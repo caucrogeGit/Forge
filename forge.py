@@ -248,58 +248,10 @@ def _warn_initial_git_failed(exc: Exception) -> None:
 
 # ── Commande : new ────────────────────────────────────────────────────────────
 
-def _apply_starter_to_new_project(dest: str, starter_id: str) -> None:
-    """Copie les fichiers d'un starter skeleton dans un projet neuf et injecte ses routes."""
-    from forge_cli.starters._exceptions import StarterBuildError
-    from forge_cli.starters.registry import StarterNotFound, resolve
-    from forge_cli.starters.route_ops import inject_block, read_snippet, replace_home_route
-
-    try:
-        meta = resolve(starter_id)
-    except StarterNotFound:
-        print(f"\n  Attention : starter inconnu '{starter_id}' — ignoré.")
-        return
-
-    if meta.get("status") != "available":
-        print(f"\n  Attention : starter '{starter_id}' non disponible — ignoré.")
-        return
-
-    if meta.get("requires_db"):
-        print(f"\n  Attention : le starter '{starter_id}' nécessite une base de données.")
-        print("  Lancez 'forge db:init' puis 'forge starter:build' depuis le projet.")
-        return
-
-    root = Path(dest)
-    files_dir = meta["_dir"] / "files"
-
-    if files_dir.exists():
-        for src in files_dir.rglob("*"):
-            if src.is_file() and "__pycache__" not in src.parts and src.suffix != ".pyc":
-                rel = src.relative_to(files_dir)
-                dst = root / rel
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src, dst)
-
-    routes_py = root / "mvc" / "routes.py"
-    if routes_py.exists():
-        try:
-            block = read_snippet(meta)
-        except StarterBuildError as exc:
-            print(f"\n  Attention : snippet de routes introuvable ({exc}) — routes non injectées.")
-            return
-        inject_block(routes_py, block)
-        home = meta.get("home_route")
-        if home and home != "/":
-            replace_home_route(routes_py, home)
-
-    _print_step(f"Starter '{meta['name']}' appliqué.")
-
-
 def cmd_new(
     project_name: str,
     ref: str | None = None,
     profile: str = DEFAULT_PROJECT_PROFILE,
-    starter: str | None = None,
 ) -> None:
     if not re.match(r"^[A-Za-z][A-Za-z0-9_-]*$", project_name):
         sys.exit(
@@ -333,8 +285,6 @@ def cmd_new(
         node_warnings = _setup_node_environment(dest)
         _generate_certificates(dest)
         Path(dest, "forge_profile.txt").write_text(profile + "\n", encoding="utf-8")
-        if starter:
-            _apply_starter_to_new_project(dest, starter)
 
     except Exception as exc:
         shutil.rmtree(dest, ignore_errors=True)
@@ -362,21 +312,10 @@ def cmd_new(
     print(f"    cd {project_name}")
     print(f"    {_venv_activate_hint()}")
     print("    forge doctor")
-    if not starter:
-        print("    # Ajustez env/dev si nécessaire (DB_ADMIN_PWD, DB_APP_PWD…)")
-        print("    forge db:init")
-    open_url = None
-    if starter:
-        from forge_cli.starters.registry import resolve, StarterNotFound
-        try:
-            open_url = resolve(starter).get("open_url")
-        except StarterNotFound:
-            pass
+    print("    # Ajustez env/dev si nécessaire (DB_ADMIN_PWD, DB_APP_PWD…)")
+    print("    forge db:init")
     print("    python app.py")
-    if open_url:
-        print(f"    # Ouvrir : {open_url}\n")
-    else:
-        print()
+    print()
 
 
 # ── Commande : help ───────────────────────────────────────────────────────────
@@ -533,17 +472,7 @@ def main() -> None:
                     hint="indique le profil après --profile. Profils disponibles : "
                          + ", ".join(SUPPORTED_PROJECT_PROFILES),
                 )
-        starter = None
-        if "--starter" in remaining:
-            idx = remaining.index("--starter")
-            if idx + 1 < len(remaining):
-                starter = remaining[idx + 1]
-            else:
-                cli_fail(
-                    "argument manquant pour «forge new».",
-                    hint="indique l'identifiant du starter après --starter. Exemple : forge new MonProjet --starter welcome",
-                )
-        cmd_new(args[1], ref=ref, profile=profile, starter=starter)
+        cmd_new(args[1], ref=ref, profile=profile)
         return
 
     if command == "run":
