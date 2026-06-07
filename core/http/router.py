@@ -102,7 +102,7 @@ class Router:
     Usage :
         router = Router()
 
-        router.add("GET", "/",             HomeController.index,  name="home")
+        router.add("GET", "/",             HomeController.index,  name="home_index")
         router.add("GET", "/clients/{id}", ClientController.show, name="client_show")
 
         with router.group("", public=True) as pub:

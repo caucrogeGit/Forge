@@ -75,19 +75,28 @@ Une route définit l’URL et le verbe HTTP qu’un navigateur utilise, puis
 l’associe à une action de contrôleur. C’est le lien entre l’adresse web
 et le code qui répond à la requête.
 
-Dans le fichier `mvc/routes.py`, ajoutez la route qui relie le chemin au
-contrôleur que vous venez de créer.
+Le squelette a déjà créé `mvc/routes.py`, qui instancie le routeur
+(`router = Router()`) et déclare la route d'accueil `/`. Ajoutez-y l'import de
+votre contrôleur et la route `/welcome`. Le fichier complet ressemble alors à
+ceci :
 
 ```python
 # mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
 from mvc.controllers.welcome_controller import WelcomeController
 
+router = Router()
+
 with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
     pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")
 ```
 
 ### Comprendre ce code
 
+- `router = Router()` est l'instance du routeur, déjà fournie par le squelette ;
+  vous la réutilisez sans la recréer.
 - `router.group("", public=True)` ouvre un espace de routes publiques
   (sans authentification et sans préfixe d'URL).
 - `pub.add(...)` enregistre une route avec son verbe HTTP, son chemin,
