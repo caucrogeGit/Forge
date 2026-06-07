@@ -12,9 +12,8 @@ Ce starter est identifié par `welcome` dans la CLI Forge
 (aliases `bienvenue` / `bonjour` / `bonjour-forge`).
 
 Ce guide vous montre comment créer manuellement les fichiers du starter
-pour bien comprendre le fonctionnement de Forge. Si vous préférez obtenir
-directement le résultat final sans faire l’exercice, le préambule
-d’[installation](../installation.md) construit le starter pour vous.
+pour bien comprendre le fonctionnement de Forge. Il suppose que le projet
+de départ a déjà été créé (voir le préambule d’installation du parcours).
 
 ## Fichiers déjà présents dans un projet Forge nu
 
