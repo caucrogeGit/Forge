@@ -2,7 +2,7 @@
 
 Objectif : supprimer une ligne via une action **destructive sécurisée**.
 
-**Ce que vous allez apprendre :** la dernière opération du CRUD — **supprimer**.
+**Ce que vous allez apprendre :** la dernière opération du CRUD, **supprimer**.
 Une suppression ne se fait **jamais** par un simple lien `GET` : elle passe par
 un **POST protégé par CSRF** et `core.database.db.execute("DELETE … WHERE id =
 ?")`.
@@ -73,7 +73,7 @@ class DeleteRecordController(BaseController):
 
 - La suppression est un **POST** : une action qui modifie l'état n'est jamais
   un `GET` (un lien ou un robot ne doivent pas pouvoir supprimer).
-- `execute(DELETE_ONE, (record_id,))` — l'`id` est un **paramètre lié**.
+- `execute(DELETE_ONE, (record_id,))` : l'`id` est un **paramètre lié**.
 - Après l'écriture, on **relit** (`fetch_all`) et on ré-affiche la liste.
 
 ## La vue
@@ -82,7 +82,7 @@ class DeleteRecordController(BaseController):
 <!-- mvc/views/delete_record/index.html -->
 {% for m in messages %}
 <li>
-  #{{ m.id }} — {{ m.content }}
+  #{{ m.id }} : {{ m.content }}
   <form method="post" action="/delete-record/{{ m.id }}" style="display:inline">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <button type="submit">supprimer</button>
@@ -105,7 +105,7 @@ class DeleteRecordController(BaseController):
 
 ## Après ce starter
 
-Passez au palier suivant : **Mémoriser un état en session** — garder un état
+Passez au palier suivant : **Mémoriser un état en session**, garder un état
 côté serveur entre les requêtes.
 
 [Continuer avec Mémoriser un état en session](session-state.md)

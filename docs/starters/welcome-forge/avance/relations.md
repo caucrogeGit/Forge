@@ -6,7 +6,7 @@ une jointure SQL.
 **Ce que vous allez apprendre :** relier deux tables par une **clé étrangère**
 (`articles.category_id` → `categories.id`) et les lire ensemble avec un `JOIN`
 SQL **visible**. Une vraie application relie ses données ; Forge ne masque pas
-ces relations derrière un ORM — le SQL reste sous vos yeux.
+ces relations derrière un ORM : le SQL reste sous vos yeux.
 
 Premier palier du **niveau avancé** de la
 [progression officielle des starters](../../index.md#progression-recommandee),
@@ -17,7 +17,7 @@ après le [niveau intermédiaire](../intermediaire/bilan.md).
 - deux tables liées par une **clé étrangère** (`FOREIGN KEY`) ;
 - une lecture par **jointure** `SELECT … FROM articles JOIN categories …` ;
 - l'affichage de chaque article **avec le nom de sa catégorie** ;
-- aucune écriture, aucun ORM — le SQL est explicite.
+- aucune écriture, aucun ORM : le SQL est explicite.
 
 Les deux tables sont créées et peuplées par la migration.
 
@@ -96,7 +96,7 @@ class RelationsController(BaseController):
 - Le `JOIN … ON c.id = a.category_id` **relie** chaque article à sa catégorie.
 - `c.name AS category` ramène le nom de la catégorie dans chaque ligne renvoyée :
   pas besoin d'une seconde requête.
-- Le SQL reste **lisible et explicite** — c'est tout l'esprit de Forge.
+- Le SQL reste **lisible et explicite** : c'est tout l'esprit de Forge.
 
 ## La vue
 
@@ -105,7 +105,7 @@ class RelationsController(BaseController):
 {% if articles %}
 <ul>
   {% for a in articles %}
-  <li>#{{ a.id }} — {{ a.title }} <em>({{ a.category }})</em></li>
+  <li>#{{ a.id }} : {{ a.title }} <em>({{ a.category }})</em></li>
   {% endfor %}
 </ul>
 {% else %}

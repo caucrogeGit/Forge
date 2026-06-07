@@ -62,7 +62,7 @@ Ouvrez `https://localhost:8000/layout-template` → la page affiche son contenu
 <!-- mvc/views/layout_template/index.html -->
 {% extends "layouts/starter_layout.html" %}
 
-{% block title %}{{ titre }} — Forge{% endblock %}
+{% block title %}{{ titre }} - Forge{% endblock %}
 
 {% block content %}
 <h1>{{ titre }}</h1>
@@ -87,7 +87,7 @@ Ouvrez `https://localhost:8000/layout-template` → la page affiche son contenu
 
 ## Après ce starter
 
-Passez au palier suivant : **Modifier un enregistrement** — éditer une ligne
+Passez au palier suivant : **Modifier un enregistrement**, éditer une ligne
 existante via un formulaire pré-rempli.
 
 [Continuer avec Modifier un enregistrement](update-record.md)

@@ -4,7 +4,7 @@ Récapitulatif des **24 paliers** de la progression *Bonjour Forge*, répartis e
 trois niveaux, et des API Forge introduites à chaque étape. À garder sous la main
 avant d'aborder les progressions opt-in autonomes.
 
-## Niveau débutant — 11 paliers
+## Niveau débutant (11 paliers)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -20,7 +20,7 @@ avant d'aborder les progressions opt-in autonomes.
 | 10 | [Première base SQL](debutant/first-sql.md) | Lire en base, SQL visible | `core.database.db.fetch_one(...)` |
 | 11 | [Écrire en base](debutant/first-sql-write.md) | Insérer une ligne | `core.database.db.insert(...)` |
 
-## Niveau intermédiaire — 8 paliers
+## Niveau intermédiaire (8 paliers)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -33,7 +33,7 @@ avant d'aborder les progressions opt-in autonomes.
 | 7 | [Mémoriser un état en session](intermediaire/session-state.md) | Garder un état entre requêtes | `get_session_store()`, cookie durci |
 | 8 | [Messages flash](intermediaire/flash-messages.md) | Retour one-shot après action | `set_flash` / `get_flash`, POST-Redirect-GET |
 
-## Niveau avancé — 5 paliers
+## Niveau avancé (5 paliers)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -74,7 +74,7 @@ avant d'aborder les progressions opt-in autonomes.
 | `db.execute(sql, params)` | Écriture générique |
 | `with transaction() as tx:` + `db.insert(..., tx=tx)` | Écritures **atomiques** (commit / rollback) |
 
-Les requêtes restent **paramétrées** (placeholders `?`) — jamais de
+Les requêtes restent **paramétrées** (placeholders `?`) : jamais de
 concaténation de valeurs. **Forge garde le SQL visible.** Les relations
 s'écrivent à la main (`JOIN`), sans ORM.
 

@@ -98,12 +98,12 @@ class PaginationController(BaseController):
 
 ```html
 <!-- mvc/views/pagination/index.html -->
-<h1>Messages — page {{ page }}</h1>
+<h1>Messages, page {{ page }}</h1>
 
 {% if messages %}
 <ul>
   {% for m in messages %}
-  <li>#{{ m.id }} — {{ m.content }}</li>
+  <li>#{{ m.id }} : {{ m.content }}</li>
   {% endfor %}
 </ul>
 {% endif %}
@@ -128,7 +128,7 @@ class PaginationController(BaseController):
 
 ## Après ce starter
 
-Passez au palier suivant : **Héritage de gabarit** — factoriser l'enveloppe
+Passez au palier suivant : **Héritage de gabarit**, factoriser l'enveloppe
 HTML commune avec `{% extends %}`.
 
 [Continuer avec Héritage de gabarit](layout-template.md)

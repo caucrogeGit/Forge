@@ -1,6 +1,6 @@
 # Écritures transactionnelles
 
-Objectif : regrouper plusieurs écritures pour qu'elles soient **atomiques** —
+Objectif : regrouper plusieurs écritures pour qu'elles soient **atomiques** :
 soit tout réussit, soit rien.
 
 **Ce que vous allez apprendre :** le bloc `with transaction() as tx:`. Il ouvre
@@ -39,7 +39,7 @@ forge run
 
 Ouvrez `https://localhost:8000/db-transaction`. Saisissez les **deux** messages
 et validez : les deux apparaissent. Laissez le **second vide** et validez : une
-erreur s'affiche et **aucun** des deux n'est enregistré — le premier `insert` a
+erreur s'affiche et **aucun** des deux n'est enregistré : le premier `insert` a
 été annulé par le rollback.
 
 ## Le contrôleur

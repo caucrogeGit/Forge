@@ -15,7 +15,7 @@ après [Mémoriser un état en session](session-state.md).
 ## Ce que ce starter montre
 
 - poser un message flash après une action (`BaseController.set_flash`) ;
-- **rediriger** vers la page (`BaseController.redirect`) — motif PRG ;
+- **rediriger** vers la page (`BaseController.redirect`), motif PRG ;
 - lire et afficher le flash **one-shot** (`get_flash`) à la requête suivante ;
 - combiner **session**, **CSRF** et **redirection**.
 

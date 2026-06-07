@@ -2,8 +2,8 @@
 
 Objectif : filtrer une liste selon un mot-clé saisi par l'utilisateur.
 
-**Ce que vous allez apprendre :** combiner deux notions déjà connues — les
-**paramètres d'URL** (`request.param`, niveau débutant) et le **SQL visible** —
+**Ce que vous allez apprendre :** combiner deux notions déjà connues, les
+**paramètres d'URL** (`request.param`, niveau débutant) et le **SQL visible**,
 pour construire une recherche. Le mot-clé pilote une clause `WHERE content
 LIKE ?` **paramétrée** (jamais concaténée).
 
@@ -93,7 +93,7 @@ class FilterListController(BaseController):
 {% if messages %}
 <ul>
   {% for m in messages %}
-  <li>#{{ m.id }} — {{ m.content }}</li>
+  <li>#{{ m.id }} : {{ m.content }}</li>
   {% endfor %}
 </ul>
 {% else %}
@@ -117,7 +117,7 @@ class FilterListController(BaseController):
 
 ## Après ce starter
 
-Passez au palier suivant : **Paginer une liste** — n'afficher qu'une tranche
+Passez au palier suivant : **Paginer une liste**, n'afficher qu'une tranche
 des lignes à la fois.
 
 [Continuer avec Paginer une liste](pagination.md)

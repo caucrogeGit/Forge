@@ -77,7 +77,7 @@ class JsonApiController(BaseController):
 - `request.header("Authorization")` lit l'en-tête envoyé par le client. On le
   compare à `Bearer <jeton>` : c'est la convention des API à jeton.
 - Si le jeton ne correspond pas, on renvoie **immédiatement** `Response.json(...,
-  status=401)` — on ne lit même pas la base. La sécurité vient **avant** la
+  status=401)` : on ne lit même pas la base. La sécurité vient **avant** la
   donnée.
 - Sinon, on lit les messages et on les renvoie en JSON. `fetch_all` rend des
   dictionnaires, directement sérialisables.
@@ -87,7 +87,7 @@ class JsonApiController(BaseController):
 ## À retenir
 
 - `Response.json(data, status=…)` renvoie données **et** code HTTP.
-- `request.header(...)` donne accès aux en-têtes — dont `Authorization`.
+- `request.header(...)` donne accès aux en-têtes, dont `Authorization`.
 - On vérifie l'autorisation **avant** de produire la donnée ; un refus = `401`.
 
 ## Après ce starter

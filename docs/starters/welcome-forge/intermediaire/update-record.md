@@ -17,7 +17,7 @@ après [Héritage de gabarit](layout-template.md).
   POST de mise à jour (`/update-record/{id}`) ;
 - un formulaire **pré-rempli** avec la valeur courante ;
 - `execute("UPDATE … SET content = ? WHERE id = ?")` **paramétré** ;
-- après écriture, on **relit et on ré-affiche** (pas de redirection ici — dans
+- après écriture, on **relit et on ré-affiche** (pas de redirection ici ; dans
   une vraie app, on ferait un *POST-Redirect-GET*).
 
 ## Classes Forge utilisées
@@ -81,7 +81,7 @@ class UpdateRecordController(BaseController):
 
 - `edit` **pré-remplit** le formulaire : on lit la valeur courante avec
   `fetch_one` avant d'afficher le champ.
-- `update` valide d'abord (refus `422` si vide), puis `execute(UPDATE_ONE, …)` —
+- `update` valide d'abord (refus `422` si vide), puis `execute(UPDATE_ONE, …)` :
   l'`id` et le contenu sont des **paramètres liés**.
 - Après l'écriture, on **relit** (`fetch_one`) et on ré-affiche la valeur à jour.
 
@@ -113,7 +113,7 @@ class UpdateRecordController(BaseController):
 
 ## Après ce starter
 
-Passez au palier suivant : **Supprimer un enregistrement** — l'action
+Passez au palier suivant : **Supprimer un enregistrement**, l'action
 destructive sécurisée par CSRF.
 
 [Continuer avec Supprimer un enregistrement](delete-record.md)

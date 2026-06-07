@@ -1,4 +1,4 @@
-# Bilan — niveau intermédiaire
+# Bilan : niveau intermédiaire
 
 Récapitulatif des compétences acquises au **niveau intermédiaire** du starter
 *Bonjour Forge*. Ce niveau fait passer des opérations unitaires (niveau
@@ -8,14 +8,14 @@ débutant) à une petite application pilotée par les données.
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 — [Lister des enregistrements](list-records.md) | Lire **plusieurs** lignes avec `fetch_all` et les itérer dans une vue (`{% for %}`). |
-| 2 — [Rechercher / filtrer](filter-list.md) | Filtrer une liste avec `request.param` + `WHERE … LIKE ?` paramétré. |
-| 3 — [Paginer une liste](pagination.md) | `LIMIT ? OFFSET ?` + `COUNT(*)`, liens précédent/suivant. |
-| 4 — [Héritage de gabarit](layout-template.md) | Factoriser l'enveloppe HTML avec `{% extends %}` + `{% block %}`. |
-| 5 — [Modifier un enregistrement](update-record.md) | Formulaire pré-rempli + `UPDATE … WHERE id = ?` (POST + CSRF). |
-| 6 — [Supprimer un enregistrement](delete-record.md) | Action destructive `POST` + CSRF + `DELETE … WHERE id = ?`. |
-| 7 — [Mémoriser un état en session](session-state.md) | Garder un état entre requêtes via le store de session + cookie durci. |
-| 8 — [Messages flash](flash-messages.md) | Confirmer une action one-shot (`set_flash`/`get_flash`), motif POST-Redirect-GET. |
+| 1. [Lister des enregistrements](list-records.md) | Lire **plusieurs** lignes avec `fetch_all` et les itérer dans une vue (`{% for %}`). |
+| 2. [Rechercher / filtrer](filter-list.md) | Filtrer une liste avec `request.param` + `WHERE … LIKE ?` paramétré. |
+| 3. [Paginer une liste](pagination.md) | `LIMIT ? OFFSET ?` + `COUNT(*)`, liens précédent/suivant. |
+| 4. [Héritage de gabarit](layout-template.md) | Factoriser l'enveloppe HTML avec `{% extends %}` + `{% block %}`. |
+| 5. [Modifier un enregistrement](update-record.md) | Formulaire pré-rempli + `UPDATE … WHERE id = ?` (POST + CSRF). |
+| 6. [Supprimer un enregistrement](delete-record.md) | Action destructive `POST` + CSRF + `DELETE … WHERE id = ?`. |
+| 7. [Mémoriser un état en session](session-state.md) | Garder un état entre requêtes via le store de session + cookie durci. |
+| 8. [Messages flash](flash-messages.md) | Confirmer une action one-shot (`set_flash`/`get_flash`), motif POST-Redirect-GET. |
 
 Vous savez maintenant construire à la main une petite application liste /
 recherche / pagination / édition / suppression, avec gabarits factorisés, état

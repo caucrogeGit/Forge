@@ -93,7 +93,7 @@ class ListRecordsController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Lister des enregistrements — Forge</title>
+  <title>Lister des enregistrements - Forge</title>
 </head>
 <body>
   <h1>Messages</h1>
@@ -101,7 +101,7 @@ class ListRecordsController(BaseController):
   {% if messages %}
   <ul>
     {% for m in messages %}
-    <li>#{{ m.id }} — {{ m.content }}</li>
+    <li>#{{ m.id }} : {{ m.content }}</li>
     {% endfor %}
   </ul>
   {% else %}
@@ -127,7 +127,7 @@ class ListRecordsController(BaseController):
 
 ## Après ce starter
 
-Passez au palier suivant : **Rechercher / filtrer une liste** — filtrer la
+Passez au palier suivant : **Rechercher / filtrer une liste**, filtrer la
 liste selon un mot-clé saisi par l'utilisateur.
 
 [Continuer avec Rechercher / filtrer](filter-list.md)

@@ -2,7 +2,7 @@
 
 Objectif : mémoriser un état côté serveur **entre** les requêtes.
 
-**Ce que vous allez apprendre :** une requête HTTP est *sans mémoire* — le
+**Ce que vous allez apprendre :** une requête HTTP est *sans mémoire* : le
 serveur oublie tout d'une requête à l'autre. La **session** garde un état
 rattaché à l'utilisateur via un cookie `session_id`. Ce palier compte les
 visites de la page.
@@ -89,7 +89,7 @@ class SessionStateController(BaseController):
 
 ## Après ce starter
 
-Passez au dernier palier du niveau : **Messages flash** — confirmer une action
+Passez au dernier palier du niveau : **Messages flash**, confirmer une action
 par un message one-shot.
 
 [Continuer avec Messages flash](flash-messages.md)

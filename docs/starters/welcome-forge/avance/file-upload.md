@@ -77,12 +77,12 @@ class FileUploadController(BaseController):
 ### Comprendre ce code
 
 - `request.file("document")` renvoie un `UploadedFile` (ou `None` si rien n'a été
-  envoyé) — on traite ce cas explicitement.
+  envoyé), on traite ce cas explicitement.
 - `save_upload(uploaded, "documents")` **valide** extension, type MIME et taille,
   puis écrit le fichier sous la catégorie `documents`. En cas de refus, elle lève
   une `UploadError` que l'on attrape pour afficher un message clair.
 - `SavedUpload` expose `original_name`, `size` et `path` (chemin de stockage
-  relatif) — utiles pour confirmer l'enregistrement.
+  relatif), utiles pour confirmer l'enregistrement.
 
 ## La vue
 
@@ -112,7 +112,7 @@ class FileUploadController(BaseController):
 
 - Un upload de fichier passe par un formulaire `multipart/form-data`.
 - `request.file(...)` récupère le fichier ; `save_upload` le **valide** avant de
-  l'écrire — jamais d'écriture aveugle.
+  l'écrire : jamais d'écriture aveugle.
 - Forge contrôle extension, type MIME et taille par défaut : la sécurité d'abord.
 
 ## Après ce starter
