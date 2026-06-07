@@ -32,6 +32,7 @@ nav:
       - Vue d'ensemble: install/index.md
       - Installer Forge:
           - Windows + WSL (parcours complet): install/windows-wsl.md
+          - Dépannage serveur dev (WSL2): install/wsl-dev-server.md
           - Avec pipx: install/pipx.md
           - Mode développement: install/core-dev.md
           - VM Debian vierge: install/vm-debian.md

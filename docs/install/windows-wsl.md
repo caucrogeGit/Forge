@@ -553,6 +553,12 @@ Si une route renvoie 404, vérifier que le starter `welcome` a bien
 - La bêta publique exige le flag `--pre`.
 - Solution : `pipx install --pip-args="--pre" forge-mvc`.
 
+### `forge run` : « port déjà utilisé » ou serveur qui ne répond pas
+
+- Deux pièges fréquents sous WSL2 : le serveur dev parle HTTPS (et non HTTP),
+  et un forward fantôme de VS Code peut tenir le port, invisible à `ss`/`lsof`.
+- Solution détaillée : [Dépannage du serveur de dev sous WSL2](wsl-dev-server.md).
+
 ---
 
 ## 16. Validation finale
