@@ -301,9 +301,10 @@ class TestCardProduction:
         end = text.find('</section>', idx)
         card_block = text[idx:end]
         # Les 3 guides production doivent être référencés depuis la card.
-        assert "forgemvc.com/docs/forge/wsgi-deployment/" in card_block
-        assert "forgemvc.com/docs/forge/production-limits/" in card_block
-        assert "forgemvc.com/docs/forge/deployment/" in card_block
+        # Réorg beta13 : les guides vivent sous docs/deployment/.
+        assert "forgemvc.com/docs/forge/deployment/wsgi-deployment/" in card_block
+        assert "forgemvc.com/docs/forge/deployment/production-limits/" in card_block
+        assert "forgemvc.com/docs/forge/deployment/deployment/" in card_block
 
 
 # ---------------------------------------------------------------------------
