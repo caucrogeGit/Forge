@@ -7,9 +7,7 @@ Objectif : lire une valeur passée dans l'URL avec `request.param(...)`.
 valeur par défaut quand le paramètre est absent, sans exception ni
 `None` à gérer.
 
-Ce starter est identifié par `query-params` dans la CLI Forge
-(aliases `query_params` / `params`). Il représente le **palier 2** de
-la
+Ce guide représente le **palier 2** de la
 [progression officielle des starters](../../index.md#progression-recommandee),
 juste après [Bonjour Forge](welcome.md).
 
