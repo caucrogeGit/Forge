@@ -29,3 +29,5 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-020](020-files-media-storage-primitives.md) | Périmètre de `forge-mvc-files` : primitives de stockage média génériques (proposé) |
 | [ADR-021](021-pivot-extraction.md) | Extraction de pivot advanced hors du core : `forge-mvc-pivot` (accepté) |
 | [ADR-022](022-mail-extraction.md) | Extraction de l'email hors du core : `forge-mvc-mail` (accepté) |
+| [ADR-023](023-starter-build-canonical.md) | `forge starter:build` comme seule façon de construire un starter ; `forge new` produit un projet nu (accepté) |
+| [ADR-024](024-skeleton-bootstrap.md) | Bootstrap par squelette dédié et dépendance core via pip (accepté) |
