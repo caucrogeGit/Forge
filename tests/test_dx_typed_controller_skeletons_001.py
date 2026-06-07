@@ -8,7 +8,6 @@ livrés par Forge) exposent au minimum :
   - les méthodes d'action annotées `request: Request` et `-> Response`.
 
 Couvre :
-  * starter `welcome` (Bonjour Forge) ;
   * starters CRUD livrés (`carnet-contacts`, `suivi-comportement-eleves`,
     `users-core-auth`, `auth-mfa`, `communes-sejours`) ;
   * générateur `forge make:crud` (`controller_builder.py`) ;
@@ -108,45 +107,11 @@ def _has_response_import(source: str) -> bool:
     return "core.http.response.Response" in _file_imports(source)
 
 
-# ── Welcome (Bonjour Forge) ──────────────────────────────────────────────────
-
-
-WELCOME = _STARTERS_ROOT / "welcome" / "files" / "mvc" / "controllers" / "welcome_controller.py"
-
-
-class TestWelcomeController:
-    """Le HomeController/Welcome livré importe Request, Response et est annoté."""
-
-    def test_fichier_existe(self):
-        assert WELCOME.exists()
-
-    def test_imports_typage_request(self):
-        assert _has_request_import(WELCOME.read_text(encoding="utf-8"))
-
-    def test_imports_typage_response(self):
-        assert _has_response_import(WELCOME.read_text(encoding="utf-8"))
-
-    @pytest.mark.parametrize("method", ["index"])
-    def test_methode_annotee_request(self, method):
-        source = WELCOME.read_text(encoding="utf-8")
-        for cls_name, node in _iter_action_methods(source):
-            if node.name == method:
-                assert _request_param_annotation(node) == "Request", (
-                    f"{cls_name}.{method} doit annoter request: Request"
-                )
-                return
-        pytest.fail(f"Méthode {method} introuvable dans WelcomeController.")
-
-    @pytest.mark.parametrize("method", ["index"])
-    def test_methode_annotee_response(self, method):
-        source = WELCOME.read_text(encoding="utf-8")
-        for cls_name, node in _iter_action_methods(source):
-            if node.name == method:
-                assert _return_annotation(node) == "Response", (
-                    f"{cls_name}.{method} doit retourner Response"
-                )
-                return
-        pytest.fail(f"Méthode {method} introuvable dans WelcomeController.")
+# ── Welcome : retiré (ADR-025) ───────────────────────────────────────────────
+# Le starter `welcome` (et les 10 autres paliers débutant welcome-forge) a été
+# retiré au profit d'un tutoriel continu manuel. Les contrôleurs des starters
+# survivants restent couverts génériquement par TestImportsRemainTargeted et
+# test_starter_controller_compile plus bas.
 
 
 # ── CRUD generator ───────────────────────────────────────────────────────────
@@ -373,10 +338,6 @@ class TestStarterControllersAreTyped:
 class TestImportsRemainTargeted:
     """Les imports ajoutés (Request, Response) ne sont pas dilués par des
     imports en gros (`from core.http import *`, `from core import *`)."""
-
-    def test_welcome_pas_d_import_etoile(self):
-        source = WELCOME.read_text(encoding="utf-8")
-        assert "import *" not in source
 
     @pytest.mark.parametrize("path", _starter_controller_files(),
                               ids=lambda p: p.relative_to(_STARTERS_ROOT).as_posix())

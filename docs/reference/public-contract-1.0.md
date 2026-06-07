@@ -58,14 +58,23 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 107)
+## 4. Starters 1.0 (gelés — 96)
 
-La liste pédagogique est **figée** : 107 starters, numérotés de 1 à 107,
-nommés selon [la convention](../philosophy/starter-author-guide.md)
-(`<module>-welcome`, `first-*`…). La progression
-`welcome-forge` est organisée par niveau ; le **niveau avancé** (`relations`, …)
-prolonge le niveau intermédiaire (`list-records`, `filter-list`, …), lui-même
-au-dessus du niveau débutant. Trois autres progressions par niveau couvrent les
+La liste pédagogique est **figée** : 96 starters, à numéros uniques (la
+numérotation n'est plus une plage dense `1..N` depuis ADR-025), nommés selon
+[la convention](../philosophy/starter-author-guide.md) (`<module>-welcome`,
+`first-*`…).
+
+!!! note "Niveau débutant welcome-forge : tutoriel continu (ADR-025)"
+    Les 11 paliers du **niveau débutant** de `welcome-forge` (de « Bonjour
+    Forge » à « Écrire en base ») ne sont **plus des starters buildables** :
+    ils forment un **tutoriel continu manuel** (un projet qui grandit), suivi
+    à la main. Ils ne figurent donc plus dans la liste gelée ci-dessous.
+
+La progression `welcome-forge` est organisée par niveau ; le **niveau avancé**
+(`relations`, …) prolonge le niveau intermédiaire (`list-records`,
+`filter-list`, …), lui-même au-dessus du niveau débutant (le tutoriel continu).
+Trois autres progressions par niveau couvrent les
 modules opt-in : `welcome-iot` (`iot-welcome`, …) pour `forge-mvc-iot`,
 `welcome-video` (`video-welcome`, …) pour `forge-mvc-video`, `welcome-images`
 (`images-welcome`, …) pour `forge-mvc-images`, `welcome-files`
@@ -83,22 +92,22 @@ diagnostic). **Les 10 opt-ins dotés d'un parcours ont chacun leur progression
 
 ```
 audio-doctor, audio-play, audio-probe, audio-transcode, audio-upload, audio-welcome,
-csrf, db-transaction, delete-record, dynamic-route, file-upload, filter-list,
+db-transaction, delete-record, file-upload, filter-list,
 file-bytes, file-delete, file-rate-limit, file-safe-name, file-safe-path, file-serve, file-store, file-validate, files-welcome,
-first-html-view, first-sql, first-sql-write, flash-messages, form-post,
+flash-messages,
 image-alt-order, image-attach, image-cover, image-delete, image-gallery, image-safety, image-upload, image-variants, images-welcome,
 iot-api, iot-contract, iot-dashboard, iot-device, iot-doctor, iot-events,
 iot-simulate, iot-subscriber, iot-welcome,
-json-api, json-response,
+json-api,
 layout-template,
 mail-config, mail-doctor, mail-message, mail-template, mail-transport, mail-welcome,
 mfa-challenge, mfa-crypto, mfa-enroll, mfa-recovery, mfa-replay, mfa-revalidation, mfa-secret, mfa-verify, mfa-welcome,
-list-records, pagination, query-params,
+list-records, pagination,
 rbac-check, rbac-guard, rbac-permission, rbac-request-roles, rbac-resolve, rbac-role, rbac-template, rbac-user-role, rbac-welcome,
-relations, request-debug, server-validation, session-state,
+relations, session-state,
 stats-admin-sql, stats-event, stats-list, stats-normalize, stats-schema, stats-track, stats-track-sql, stats-validate, stats-welcome,
 update-record,
-video-detail, video-doctor, video-list, video-playback, video-probe, video-status, video-transcode, video-upload, video-welcome, welcome,
+video-detail, video-doctor, video-list, video-playback, video-probe, video-status, video-transcode, video-upload, video-welcome,
 workflow-available, workflow-badge, workflow-check, workflow-color, workflow-find, workflow-jinja, workflow-status, workflow-transition, workflow-welcome
 ```
 

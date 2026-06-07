@@ -1,6 +1,32 @@
 # Changelog
 
 
+## [Non publié]
+
+> Le niveau débutant du parcours `welcome-forge` devient un tutoriel continu
+> manuel : un seul projet qui grandit, au lieu de starters indépendants par
+> palier (ADR-025).
+
+### Modifié
+
+- **welcome-forge débutant : tutoriel continu manuel** (ADR-025,
+  `STARTER-WELCOME-FORGE-DOC-CONTINUITY-001`). Les 11 paliers (de « Bonjour
+  Forge » à « Écrire en base ») se construisent désormais à la main dans un
+  seul projet qui grandit : un `WelcomeController` accumule les paliers HTTP
+  (1 à 9), puis un `MessageController` porte les paliers SQL (10 et 11), avec
+  un `mvc/routes.py` cumulatif montré à chaque étape. Pages francisées (retrait
+  des tirets cadratins). Préambule d'installation sans `forge starter:build`.
+
+### Retiré
+
+- **Les 11 starters buildables du niveau débutant welcome-forge** sont retirés
+  de `forge_cli/starters/data/` et du contrat public gelé, ramené de 107 à 96
+  starters (ADR-025, `STARTER-WELCOME-FORGE-DROP-DATA-001`). Les niveaux
+  intermédiaire et avancé, ainsi que tous les parcours opt-in, restent des
+  starters `forge starter:build`. La numérotation des starters n'est plus une
+  plage dense `1..N` (unicité seule).
+
+
 ## [1.0.0-beta.14] — 2026-06-07
 
 > Bootstrap par squelette dédié : `forge new` produit enfin un projet
