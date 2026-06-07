@@ -8,9 +8,6 @@ déclarer une route dans `mvc/routes.py`, et renvoyer une réponse texte
 avec `Response.text(...)`, sans vue HTML, sans base de données et sans
 moteur de template.
 
-Ce starter est identifié par `welcome` dans la CLI Forge
-(aliases `bienvenue` / `bonjour` / `bonjour-forge`).
-
 Ce guide vous montre comment créer manuellement les fichiers du starter
 pour bien comprendre le fonctionnement de Forge. Il suppose que le projet
 de départ a déjà été créé (voir le préambule d’installation du parcours).
@@ -22,8 +19,6 @@ nu contient déjà notamment :
 
 - `mvc/routes.py` avec la route d’accueil `/`
 - `mvc/controllers/home_controller.py`
-- `mvc/controllers/welcome_controller.py` peut déjà être présent
-- le routeur principal et la configuration de base du projet
 
 ## Ce que ce starter installe
 
@@ -34,12 +29,6 @@ nu contient déjà notamment :
 - aucune base de données
 
 ## Classes Forge utilisées
-
-Ces classes sont les notions de base utilisées dans ce starter :
-- `Request` représente la requête envoyée par le navigateur.
-- `Response` représente la réponse renvoyée au navigateur.
-- `BaseController` est la classe parente qui permet de définir un contrôleur
-  compatible avec le routeur Forge.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
@@ -53,7 +42,7 @@ Un contrôleur est une classe qui reçoit la requête, exécute la logique et
 retourne une réponse. C’est le point de contact entre le routeur et le
 code métier qui construit la réponse.
 
-Ouvrez (ou créez si nécessaire) le fichier `mvc/controllers/welcome_controller.py`
+Créez le fichier `mvc/controllers/welcome_controller.py`
 
 ```python
 # mvc/controllers/welcome_controller.py
