@@ -56,6 +56,7 @@ from forge_mvc_files.manager import (
     serve_media_file,
     delete_media_file,
 )
+from tests._malicious_samples import fake_php_shell
 
 
 # ---------------------------------------------------------------------------
@@ -238,7 +239,7 @@ class TestMimeSecurite:
         LIMITE CONNUE — corriger nécessite python-magic (hors périmètre).
         """
         _cfg_forge(tmp_path)
-        fake_php = _FakeFile("malware.jpg", b"<?php phpinfo(); ?>", "image/jpeg")
+        fake_php = _FakeFile("malware.jpg", fake_php_shell("phpinfo();"), "image/jpeg")
         saved = save_upload(fake_php, category="documents")
         assert saved.mime_type == "image/jpeg"
 

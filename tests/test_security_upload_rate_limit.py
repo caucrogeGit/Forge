@@ -28,6 +28,7 @@ from core.app.application import Application
 from core.http.request import Request
 from core.http.response import Response
 from core.http.router import Router
+from tests._malicious_samples import fake_php_shell
 from core.forms.upload_exceptions import UploadError
 from forge_mvc_files.manager import save_upload
 
@@ -260,7 +261,7 @@ class TestRateLimitEtValidationsExistantes:
     def test_extension_interdite_retourne_422(self, rate_limited_app):
         app, upload_dir = rate_limited_app
         boundary = "----RLExt"
-        body = _multipart_body(boundary, "malware.php", b"<?php echo 1; ?>",
+        body = _multipart_body(boundary, "malware.php", fake_php_shell("echo 1;"),
                                "application/x-php")
         raw_body = body
         req = Request(_http_handler(

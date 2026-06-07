@@ -43,6 +43,7 @@ from core.http.response import Response
 from core.http.router import Router
 from core.forms.upload_exceptions import UploadError
 from forge_mvc_files.manager import save_upload
+from tests._malicious_samples import fake_pe_header, fake_php_webshell
 from tests.fake_request import FakeRequest
 
 # ---------------------------------------------------------------------------
@@ -304,7 +305,7 @@ class TestDispatchExtensionInterdite:
         return UploadedFile(
             field_name="avatar",
             filename="shell.php",
-            content=b"<?php system($_GET['cmd']); ?>",
+            content=fake_php_webshell(),
             content_type="application/x-php",
         )
 
@@ -312,7 +313,7 @@ class TestDispatchExtensionInterdite:
         return UploadedFile(
             field_name="avatar",
             filename="malware.exe",
-            content=b"MZ\x90\x00",
+            content=fake_pe_header(),
             content_type="application/octet-stream",
         )
 
