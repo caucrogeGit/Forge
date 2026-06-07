@@ -1,149 +1,117 @@
 # Écrire en base
 
-Objectif : insérer une ligne en base depuis un formulaire avec
-`db.insert(...)`.
+Objectif : enregistrer une nouvelle ligne en base à partir d'un formulaire,
+avec une requête `INSERT` paramétrée.
 
-**Ce que vous allez apprendre :** **écrire** une donnée en base (et plus
-seulement la lire) en réunissant tout ce que vous avez vu : un
-formulaire protégé par CSRF, la validation serveur, et une requête SQL
-`INSERT` visible. C'est le **dernier palier avant le CRUD complet**.
+**Ce que vous allez apprendre :** insérer une donnée avec `insert(...)`,
+après avoir validé la saisie côté serveur comme au palier 9.
 
-Palier 11 de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Première base SQL](first-sql.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+`MessageController` possède déjà la méthode `index` (palier 10) qui lit la
+table `first_sql_messages`, et `mvc/routes.py` déclare la route `/first-sql`.
+L'import `insert` et la constante `INSERT_MESSAGE` sont déjà présents dans le
+contrôleur. Nous ajoutons deux méthodes, deux routes et un gabarit.
 
-- deux routes `GET` / `POST` sur `/first-sql-write`
-- un formulaire avec jeton CSRF
-- la validation serveur (refus d'un message vide → `422`)
-- une requête `INSERT` avec `db.insert(...)`
-- la réutilisation de la table `first_sql_messages` du palier précédent
+## L'ajout
 
-Aucune entité JSON.
-Aucun CRUD complet (lecture/mise à jour/suppression) — c'est l'objet du
-**starter suivant** (First CRUD).
-
-## Prérequis
-
-Ce palier suppose acquis : le formulaire + CSRF (`csrf`, `form-post`), la
-validation serveur (`server-validation`) et le SQL visible (`first-sql`).
-La table `first_sql_messages` est créée par la migration du palier
-« Première base SQL » : appliquez-la d'abord.
-
-```bash
-forge migration:apply
-forge run
-```
-
-## Classes Forge utilisées
-
-| Classe / fonction | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Lire la valeur soumise avec `request.form(...)`. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Réponse `422` ou confirmation texte. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | `render(...)` + `csrf_token(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
-| `core.database.db.insert` | Exécuter l'`INSERT` paramétré. | [Migrations SQL](../../../features/migrations.md) |
-
-## Tester
-
-Ouvrez `https://localhost:8000/first-sql-write`, saisissez un message,
-envoyez. La réponse confirme l'enregistrement. Le message inséré est
-ensuite lisible via le palier « Première base SQL »
-(`/first-sql` lit la première ligne de la même table).
-
-## Les routes
+Ajoutez ces deux méthodes à la classe `MessageController` :
 
 ```python
-# mvc/routes.py
-from mvc.controllers.first_sql_write_controller import FirstSqlWriteController
-
-with router.group("", public=True) as pub:
-    pub.add("GET",  "/first-sql-write", FirstSqlWriteController.index,  name="first_sql_write_index")
-    pub.add("POST", "/first-sql-write", FirstSqlWriteController.submit, name="first_sql_write_submit")
-```
-
-## Le contrôleur
-
-```python
-# mvc/controllers/first_sql_write_controller.py
-from core.database.db import insert
-from core.http.request import Request
-from core.http.response import Response
-from core.mvc.controller.base_controller import BaseController
-
-
-INSERT_MESSAGE = "INSERT INTO first_sql_messages (content) VALUES (?)"
-
-
-class FirstSqlWriteController(BaseController):
-
     @staticmethod
-    def index(request: Request) -> Response:
+    def create(request: Request) -> Response:
         return BaseController.render(
-            "first_sql_write/index.html",
+            "message/first_sql_write.html",
             request=request,
             context={"csrf_token": BaseController.csrf_token(request)},
         )
 
     @staticmethod
-    def submit(request: Request) -> Response:
+    def store(request: Request) -> Response:
         content = request.form("content", default="").strip()
-
         if not content:
             return Response.text("Le message est obligatoire", status=422)
-
         insert(INSERT_MESSAGE, (content,))
         return Response.text(f"Message enregistré : {content}")
 ```
 
-### Comprendre ce code
-
-- `INSERT INTO ... VALUES (?)` est une requête **paramétrée** : la valeur
-  passe par `params`, jamais concaténée dans la chaîne SQL (protection
-  contre l'injection). **Forge garde le SQL visible.**
-- `db.insert(...)` exécute l'`INSERT` et valide la transaction.
-- La validation (`if not content`) précède l'écriture : on ne stocke
-  jamais une donnée invalide.
-
-## La vue
+Créez le gabarit `mvc/views/message/first_sql_write.html` :
 
 ```html
-<!-- mvc/views/first_sql_write/index.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Écrire en base — Forge</title>
+    <meta charset="utf-8">
+    <title>Écrire en base</title>
 </head>
 <body>
-  <h1>Écrire en base</h1>
-
-  <form method="post" action="/first-sql-write">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-
-    <label for="content">Message</label>
-    <input id="content" name="content" type="text">
-
-    <button type="submit">Enregistrer</button>
-  </form>
+    <h1>Écrire en base</h1>
+    <form method="post" action="/first-sql-write">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Message : <input type="text" name="content" value=""></label>
+        <button type="submit">Enregistrer</button>
+    </form>
 </body>
 </html>
 ```
 
+Puis ajoutez les deux routes (`GET` et `POST` sur `/first-sql-write`) dans le
+groupe public de `mvc/routes.py`.
+
+## Votre mvc/routes.py à ce stade
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.welcome_controller import WelcomeController
+from mvc.controllers.message_controller import MessageController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
+    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
+    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
+    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
+    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
+    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
+    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
+    pub.add("GET",  "/csrf", WelcomeController.csrf_demo, name="csrf_index")
+    pub.add("GET",  "/form-post", WelcomeController.form, name="form_post_index")
+    pub.add("POST", "/form-post", WelcomeController.form_submit, name="form_post_submit")
+    pub.add("GET",  "/server-validation", WelcomeController.validate, name="server_validation_index")
+    pub.add("POST", "/server-validation", WelcomeController.validate_submit, name="server_validation_submit")
+    pub.add("GET",  "/first-sql", MessageController.index, name="first_sql_index")
+    pub.add("GET",  "/first-sql-write", MessageController.create, name="first_sql_write_index")
+    pub.add("POST", "/first-sql-write", MessageController.store, name="first_sql_write_submit")
+```
+
+## Comprendre ce code
+
+- `insert(INSERT_MESSAGE, (content,))` exécute la requête `INSERT ... VALUES
+  (?)` en passant la valeur séparément : le `?` est un paramètre lié, ce qui
+  protège contre l'injection SQL.
+- La saisie est validée avant l'écriture : un message vide est refusé avec un
+  statut `422`, comme au palier 9.
+- Après l'insertion, la ligne devient visible : `/first-sql` peut désormais
+  renvoyer un autre contenu si vous en avez enregistré un.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/first-sql-write` | le formulaire d'enregistrement |
+| Soumettre `Bonjour la base` | `Message enregistré : Bonjour la base` |
+| Soumettre vide | `Le message est obligatoire` (statut `422`) |
+
 ## À retenir
 
-- L'écriture en base se fait avec une requête `INSERT` **paramétrée** et
-  `db.insert(...)` — le SQL reste visible, sans ORM.
-- On valide **avant** d'écrire.
-- Avec la lecture (palier précédent) et l'écriture (ici), vous avez les
-  deux moitiés du CRUD ; le palier suivant les organise en un CRUD
-  complet.
+- `insert(requete, (valeur,))` écrit une ligne avec des paramètres liés.
+- Le `?` paramétré protège contre l'injection SQL.
+- On valide toujours la saisie avant d'écrire en base.
 
-## Après ce starter
+Vous avez parcouru les onze paliers. Place au bilan du niveau débutant.
 
-C'est le **dernier palier** du niveau **débutant** du starter de découverte
-*Bonjour Forge*. Vous savez maintenant **lire et écrire** en base. Faites le
-point sur tout ce que vous avez validé dans le bilan du niveau.
-
-[Bilan du niveau débutant](bilan.md)
+[Continuer avec le Bilan](bilan.md)

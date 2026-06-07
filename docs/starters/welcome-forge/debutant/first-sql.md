@@ -1,84 +1,57 @@
 # Première base SQL
 
-Objectif : lire une donnée depuis MariaDB avec du SQL visible.
+Objectif : lire une donnée en base de données avec du SQL visible, sans ORM.
 
-**Ce que vous allez apprendre :** créer une table via une migration SQL
-versionnée et lisible, puis lire une donnée depuis MariaDB avec
-`fetch_one(...)` et une requête `SELECT` écrite à la main — sans ORM ni
-génération cachée.
+**Ce que vous allez apprendre :** créer une table via une migration, puis la
+lire avec `fetch_one(...)` depuis un nouveau contrôleur dédié au domaine des
+messages.
 
-Palier 10 de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Validation serveur](server-validation.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+`WelcomeController` couvre les neuf premiers paliers (HTTP pur), et
+`mvc/routes.py` déclare ses treize routes jusqu'à `/server-validation`. Nous
+abordons un nouveau domaine, la base de données : selon le principe
+« nouveau domaine = nouveau contrôleur », nous créons un second contrôleur,
+`MessageController`.
 
-- une route `GET /first-sql`
-- une table SQL minimale (`first_sql_messages`)
-- une migration SQL visible
-- une requête `SELECT` brute
-- une réponse texte avec `Response.text(...)`
+## L'ajout
 
-Aucun CRUD.
-Aucune entité JSON.
-Aucun formulaire.
-Aucune validation avancée.
-Aucune jointure.
+### La migration
 
-## Classes Forge utilisées
+Créez la migration `mvc/migrations/<timestamp>_create_first_sql_messages.sql`
+(remplacez `<timestamp>` par l'horodatage généré par Forge) :
 
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Reçue par la méthode du contrôleur. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
+```sql
+CREATE TABLE IF NOT EXISTS first_sql_messages (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    content VARCHAR(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-## Tester
-
-Depuis le projet Forge déjà créé avec ce starter, appliquer
-d'abord la migration livrée puis démarrer le serveur :
-
-```bash
-forge migration:apply
-forge run
+INSERT INTO first_sql_messages (content)
+SELECT 'Bonjour SQL'
+WHERE NOT EXISTS (SELECT 1 FROM first_sql_messages);
 ```
 
-Ouvrez :
+L'`INSERT` est idempotent : il n'ajoute le message « Bonjour SQL » que si la
+table est vide, donc rejouer la migration ne crée pas de doublon. Appliquez
+la migration avec `forge migration:apply` avant de tester `/first-sql`.
 
-```
-https://localhost:8000/first-sql
-```
+### Le nouveau contrôleur
 
-Résultat attendu :
-
-```
-Message depuis la base : Bonjour SQL
-```
-
-## Les routes
+Créez le fichier `mvc/controllers/message_controller.py` :
 
 ```python
-# mvc/routes.py
-from mvc.controllers.first_sql_controller import FirstSqlController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/first-sql", FirstSqlController.index, name="first_sql_index")
-```
-
-## Le contrôleur
-
-```python
-# mvc/controllers/first_sql_controller.py
-from core.database.db import fetch_one
+# mvc/controllers/message_controller.py
+from core.database.db import fetch_one, insert
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 
-
 SELECT_FIRST_MESSAGE = "SELECT content FROM first_sql_messages ORDER BY id LIMIT 1"
+INSERT_MESSAGE = "INSERT INTO first_sql_messages (content) VALUES (?)"
 
 
-class FirstSqlController(BaseController):
+class MessageController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -87,64 +60,62 @@ class FirstSqlController(BaseController):
         return Response.text(f"Message depuis la base : {message}")
 ```
 
-### Comprendre ce code
+L'import `insert` et la constante `INSERT_MESSAGE` serviront au palier
+suivant ; ils sont déjà en place pour ne plus toucher aux imports.
 
-- La requête SQL est déclarée comme une chaîne Python lisible —
-  **Forge garde le SQL visible**, sans génération cachée par un ORM.
-- `fetch_one(...)` exécute la requête et retourne la première ligne
-  sous forme de `dict`, ou `None` si la table est vide.
-- Le contrôleur extrait la colonne `content` puis la réinjecte dans
-  une réponse texte.
-- Le cycle reste minimal : route → contrôleur → SQL → réponse. Dans une
-  vraie application, on isolerait la requête dans un module modèle.
+Puis ajoutez l'import du contrôleur et la route `/first-sql` dans
+`mvc/routes.py`.
 
-## La migration
+## Votre mvc/routes.py à ce stade
 
-```sql
--- mvc/migrations/20260527120000_create_first_sql_messages.sql
-CREATE TABLE IF NOT EXISTS first_sql_messages (
-    id      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    content VARCHAR(255)    NOT NULL,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.welcome_controller import WelcomeController
+from mvc.controllers.message_controller import MessageController
 
-INSERT INTO first_sql_messages (content)
-SELECT 'Bonjour SQL'
-WHERE NOT EXISTS (
-    SELECT 1 FROM first_sql_messages WHERE content = 'Bonjour SQL'
-);
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
+    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
+    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
+    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
+    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
+    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
+    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
+    pub.add("GET",  "/csrf", WelcomeController.csrf_demo, name="csrf_index")
+    pub.add("GET",  "/form-post", WelcomeController.form, name="form_post_index")
+    pub.add("POST", "/form-post", WelcomeController.form_submit, name="form_post_submit")
+    pub.add("GET",  "/server-validation", WelcomeController.validate, name="server_validation_index")
+    pub.add("POST", "/server-validation", WelcomeController.validate_submit, name="server_validation_submit")
+    pub.add("GET",  "/first-sql", MessageController.index, name="first_sql_index")
 ```
 
-### Comprendre ce code
+## Comprendre ce code
 
-- `CREATE TABLE IF NOT EXISTS ...` rend la migration idempotente :
-  rejouée, elle ne lève pas d'erreur si la table existe déjà.
-- `INSERT ... WHERE NOT EXISTS (...)` insère la donnée de démo une
-  seule fois — utile pour réappliquer la migration sans dupliquer.
-- Les migrations Forge sont des fichiers SQL versionnés dans
-  `mvc/migrations/` ; `forge migration:apply` les exécute dans l'ordre.
+- Le SQL reste visible : la requête `SELECT content FROM first_sql_messages
+  ORDER BY id LIMIT 1` est lisible telle quelle, sans couche d'abstraction.
+- `fetch_one(...)` renvoie une seule ligne sous forme de dictionnaire, ou
+  `None` si la table est vide ; d'où le repli `(aucun message)`.
+- Un nouveau domaine justifie un nouveau contrôleur : `MessageController` ne
+  mélange pas la logique base de données avec les démonstrations HTTP de
+  `WelcomeController`.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/first-sql` | `Message depuis la base : Bonjour SQL` |
 
 ## À retenir
 
-- **Forge garde le SQL visible** : la requête `SELECT` est une chaîne
-  Python lisible, pas une méthode magique d'ORM.
-- La migration crée la table avec `CREATE TABLE IF NOT EXISTS` et
-  insère la donnée de démo de manière idempotente.
-- Le contrôleur lit la donnée avec `fetch_one(...)` de
-  `core.database.db` — c'est l'API officielle Forge (avec aussi
-  `fetch_all`, `execute`, `insert`).
-- Le CRUD complet vient seulement au palier suivant, qui utilise les
-  mêmes briques en plus organisé.
+- Une table se crée par une migration appliquée avec `forge migration:apply`.
+- `fetch_one(...)` lit une ligne avec du SQL écrit à la main.
+- Un nouveau domaine se loge dans son propre contrôleur.
 
-## Après ce starter
-
-Vous savez **lire** une donnée en base. Passez au palier suivant :
-**Écrire en base** — insérer une ligne depuis un formulaire :
-
-```python
-from core.database.db import insert
-
-insert("INSERT INTO first_sql_messages (content) VALUES (?)", (content,))
-```
+Au palier suivant, nous écrivons à notre tour une ligne dans cette table.
 
 [Continuer avec Écrire en base](first-sql-write.md)

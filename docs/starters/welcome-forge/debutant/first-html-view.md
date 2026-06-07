@@ -1,120 +1,91 @@
 # Première vue HTML
 
-Objectif : rendre une page HTML avec `BaseController.render(...)`.
+Objectif : rendre une vraie page HTML au lieu de texte brut.
 
-**Ce que vous allez apprendre :** rendre une vraie page HTML depuis un
-template Jinja2 avec `BaseController.render(...)`, et comprendre où Forge
-va chercher la vue dans `mvc/views/`.
+**Ce que vous allez apprendre :** rendre un gabarit avec
+`BaseController.render(...)`, qui passe la requête au moteur de template et
+renvoie la page HTML.
 
-Palier 3 de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Paramètres d'URL](query-params.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+`WelcomeController` porte déjà `index`, `query_params_index` et `hello`
+(paliers 1 et 2), et `mvc/routes.py` déclare `/welcome` et les deux routes
+`/query-params`. Nous ajoutons une méthode, une route et un gabarit.
 
-- une route `/first-html-view`
-- un contrôleur `FirstHtmlViewController`
-- une vue `mvc/views/first_html_view/index.html`
-- un appel à `BaseController.render(...)`
+## L'ajout
 
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Reçue par la méthode et transmise à `render(...)`. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Retournée par le contrôleur (produite ici via `render`). | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | Fournit le helper `render(...)` qui rend la vue HTML. | [BaseController](../../../reference/api.md#coremvccontroller) |
-
-## Tester
-
-Depuis le projet Forge déjà créé avec ce starter :
-
-```bash
-forge run
-```
-
-Ouvrez :
-
-```
-https://localhost:8000/first-html-view
-```
-
-## Code essentiel
+Ajoutez cette méthode à la classe `WelcomeController` :
 
 ```python
-# mvc/routes.py
-from mvc.controllers.first_html_view_controller import FirstHtmlViewController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/first-html-view", FirstHtmlViewController.index, name="first_html_view_index")
-```
-
-### Comprendre ce code
-
-- Une seule route publique : `GET /first-html-view` →
-  `FirstHtmlViewController.index`.
-- Le `name="first_html_view_index"` permet de référencer cette URL
-  depuis un template ou une redirection sans la coder en dur.
-
-```python
-# mvc/controllers/first_html_view_controller.py
-from core.http.request import Request
-from core.http.response import Response
-from core.mvc.controller.base_controller import BaseController
-
-
-class FirstHtmlViewController(BaseController):
-    """Starter pédagogique : rendre une première vue HTML."""
-
     @staticmethod
-    def index(request: Request) -> Response:
-        return BaseController.render("first_html_view/index.html", request=request)
+    def html_view(request: Request) -> Response:
+        return BaseController.render("welcome/first_html_view.html", request=request)
 ```
 
-### Comprendre ce code
-
-- Le contrôleur ne construit plus la réponse à la main : il délègue à
-  `BaseController.render(...)` la production du HTML.
-- `render(...)` charge le template `first_html_view/index.html` depuis
-  `mvc/views/`, l'exécute via Jinja2, et retourne une `Response` HTML
-  prête à être renvoyée au navigateur.
-- Pour transmettre des données au template, on passe un `context={...}`
-  à `render(...)`. Ce starter n'en a pas besoin — la vue est statique.
-- À comparer avec `Response.text(...)` : ici, la réponse passe par un
-  fichier `.html` séparé, ce qui rend le contenu éditable sans toucher
-  au contrôleur.
+Créez le gabarit `mvc/views/welcome/first_html_view.html` :
 
 ```html
-<!-- mvc/views/first_html_view/index.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Première vue HTML — Forge</title>
+    <meta charset="utf-8">
+    <title>Première vue HTML</title>
 </head>
 <body>
-  <h1>Première vue HTML</h1>
-  <p>Cette page est rendue avec <code>BaseController.render(...)</code>.</p>
+    <h1>Première vue HTML</h1>
+    <p>
+        Cette page est rendue par <code>BaseController.render(...)</code> :
+        le contrôleur ne construit plus le texte à la main, il délègue
+        l'affichage à un gabarit.
+    </p>
 </body>
 </html>
 ```
 
-## À retenir
+Puis ajoutez la route dans le groupe public de `mvc/routes.py`.
 
-- `Response.text(...)` retourne du texte directement (paliers 1 et 2).
-- `BaseController.render(...)` rend une vue HTML.
-- La vue se trouve dans `mvc/views/`.
-- Le nom du fichier passé à `render(...)` est un chemin relatif à
-  `mvc/views/`, séparateur `/`.
-
-## Après ce starter
-
-Passez au palier suivant : **Route dynamique**.
-
-Vous y apprendrez à lire un paramètre de route avec :
+## Votre mvc/routes.py à ce stade
 
 ```python
-request.route_param("id", default="inconnu")
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.welcome_controller import WelcomeController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
+    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
+    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
+    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
 ```
+
+## Comprendre ce code
+
+- `BaseController.render("welcome/first_html_view.html", request=request)`
+  cherche le gabarit sous `mvc/views/` et le rend en HTML.
+- Le chemin du gabarit est relatif à `mvc/views/` : ici le fichier vit dans
+  `mvc/views/welcome/`.
+- Passer `request=request` permet au gabarit d'accéder au contexte de la
+  requête courante.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/first-html-view` | la page HTML « Première vue HTML » |
+
+## À retenir
+
+- `BaseController.render(...)` renvoie une page HTML rendue par le moteur de
+  template.
+- Les gabarits vivent sous `mvc/views/`.
+- Le contrôleur reste mince : il choisit le gabarit, le gabarit gère
+  l'affichage.
+
+Au palier suivant, nous lisons une valeur directement dans le chemin de
+l'URL.
 
 [Continuer avec Route dynamique](dynamic-route.md)

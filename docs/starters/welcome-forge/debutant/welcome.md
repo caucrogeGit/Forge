@@ -1,48 +1,20 @@
 # Bonjour Forge
 
-Objectif : afficher une réponse texte avec Forge et comprendre le cycle
-requête → contrôleur → réponse.
+Premier palier d'un tutoriel continu : vous allez construire à la main un
+seul projet qui grandit palier après palier. On démarre par la réponse la
+plus simple possible.
 
-**Ce que vous allez apprendre :** écrire votre premier contrôleur Forge,
-déclarer une route dans `mvc/routes.py`, et renvoyer une réponse texte
-avec `Response.text(...)`, sans vue HTML, sans base de données et sans
-moteur de template.
+**Ce que vous allez apprendre :** écrire votre premier contrôleur, déclarer
+une route et renvoyer une réponse texte avec `Response.text(...)`, sans vue
+HTML ni base de données.
 
-Ce guide vous montre comment créer manuellement les fichiers du starter
-pour bien comprendre le fonctionnement de Forge. Il suppose que le projet
-de départ a déjà été créé (voir le préambule d’installation du parcours).
+Le squelette fournit déjà `mvc/routes.py` avec `router = Router()` et la
+route d'accueil `/` (servie par `HomeController`). Nous allons greffer notre
+travail dessus.
 
-## Fichiers déjà présents dans un projet Forge nu
+## L'ajout
 
-Avant d’installer ce starter, un projet Forge généré à partir du squelette
-nu contient déjà notamment :
-
-- `mvc/routes.py` avec la route d’accueil `/`
-- `mvc/controllers/home_controller.py`
-
-## Ce que ce starter installe
-
-- une route `/welcome`
-- un contrôleur `WelcomeController` avec une méthode `index`
-- une réponse texte via `Response.text(...)`
-- aucune vue HTML
-- aucune base de données
-
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Reçoit les données de la requête. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Génère la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente de `WelcomeController`. | [BaseController](../../../reference/api.md#coremvccontroller) |
-
-## Le contrôleur
-
-Un contrôleur est une classe qui reçoit la requête, exécute la logique et
-retourne une réponse. C’est le point de contact entre le routeur et le
-code métier qui construit la réponse.
-
-Créez le fichier `mvc/controllers/welcome_controller.py`
+Créez le fichier `mvc/controllers/welcome_controller.py` :
 
 ```python
 # mvc/controllers/welcome_controller.py
@@ -58,27 +30,10 @@ class WelcomeController(BaseController):
         return Response.text("Bonjour Forge")
 ```
 
-### Comprendre ce code
+Dans `mvc/routes.py`, ajoutez l'import du contrôleur puis la route
+`/welcome` à l'intérieur du groupe public déjà présent.
 
-- `WelcomeController` hérite de `BaseController`, ce qui en fait un
-  contrôleur Forge utilisable par le routeur.
-- Chaque action reçoit un `request: Request` et doit retourner un
-  `Response`.
-- `Response.text(...)` construit une réponse `text/plain` ; aucun template
-  HTML n'est rendu ici.
-- La lecture des paramètres d'URL avec `request.param(...)` est abordée au
-  palier suivant (`query-params`).
-
-## Les routes
-
-Une route définit l’URL et le verbe HTTP qu’un navigateur utilise, puis
-l’associe à une action de contrôleur. C’est le lien entre l’adresse web
-et le code qui répond à la requête.
-
-Le squelette a déjà créé `mvc/routes.py`, qui instancie le routeur
-(`router = Router()`) et déclare la route d'accueil `/`. Ajoutez-y l'import de
-votre contrôleur et la route `/welcome`. Le fichier complet ressemble alors à
-ceci :
+## Votre mvc/routes.py à ce stade
 
 ```python
 # mvc/routes.py
@@ -93,17 +48,14 @@ with router.group("", public=True) as pub:
     pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")
 ```
 
-### Comprendre ce code
+## Comprendre ce code
 
-- `router = Router()` est l'instance du routeur, déjà fournie par le squelette ;
-  vous la réutilisez sans la recréer.
-- `router.group("", public=True)` ouvre un espace de routes publiques
-  (sans authentification et sans préfixe d'URL).
-- `pub.add(...)` enregistre une route avec son verbe HTTP, son chemin,
-  la méthode de contrôleur à exécuter et un `name=`.
-- Le nom de route permet de générer l'URL ailleurs sans la coder en dur.
-- Au démarrage, le routeur lit ce fichier et oriente chaque requête vers la
-  méthode correspondante.
+- Un contrôleur est une classe qui hérite de `BaseController` ; chaque
+  action reçoit un `request: Request` et retourne un `Response`.
+- `Response.text(...)` construit une réponse `text/plain`, sans template.
+- Le groupe `with router.group("", public=True) as pub:` regroupe les
+  routes publiques ; la protection CSRF y est active par défaut, ce qui
+  protégera nos futurs formulaires POST.
 
 ## Tester dans le navigateur
 
@@ -113,15 +65,11 @@ with router.group("", public=True) as pub:
 
 ## À retenir
 
-- Une URL est mappée à une route.
-- La route appelle une méthode du contrôleur.
+- Une URL est associée à une route, qui appelle une méthode de contrôleur.
 - La méthode reçoit `request` et retourne `Response`.
-- `Response.text(...)` renvoie du texte brut sans template.
+- `Response.text(...)` renvoie du texte brut, sans moteur de rendu.
 
-## Après ce starter
-
-Passez au palier suivant : **Paramètres d'URL**.
-Vous y apprendrez à récupérer une valeur dans l'adresse
-(`?name=...`) avec `request.param(...)`.
+Au palier suivant, votre contrôleur va lire une valeur passée dans
+l'adresse.
 
 [Continuer avec Paramètres d'URL](query-params.md)

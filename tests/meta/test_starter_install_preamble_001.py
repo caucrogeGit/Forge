@@ -30,8 +30,11 @@ MKDOCS = PROJECT_ROOT / "mkdocs.yml"
 # parcours → (premier palier de code, commandes attendues dans la page)
 PARCOURS = {
     "welcome-forge": (
+        # ADR-025 : le niveau débutant est un tutoriel continu manuel ; plus de
+        # `forge starter:build` par palier. Le préambule ne contient que la
+        # création du projet et son lancement.
         "debutant/welcome.md",
-        ["forge new mon-projet", "forge starter:build welcome", "forge run"],
+        ["forge new mon-projet", "forge run"],
     ),
     "welcome-iot": (
         "debutant/iot-welcome.md",

@@ -1,144 +1,102 @@
 # Le jeton CSRF
 
-Objectif : comprendre le jeton CSRF et le placer dans un formulaire.
+Objectif : comprendre le jeton CSRF avant d'écrire un vrai formulaire qui
+modifie des données.
 
-**Ce que vous allez apprendre :** pourquoi Forge protège les
-formulaires contre les attaques **CSRF**, et comment fournir le jeton
-attendu via un champ caché généré par `BaseController.csrf_token(...)`.
-Le traitement du POST viendra au palier suivant.
+**Ce que vous allez apprendre :** obtenir un jeton CSRF avec
+`BaseController.csrf_token(request)` et le placer dans un champ caché du
+formulaire, pour protéger les requêtes POST.
 
-Palier 7 de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Réponse JSON](json-response.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+`WelcomeController` porte déjà les méthodes des paliers 1 à 6, et
+`mvc/routes.py` déclare les routes jusqu'à `/json-response`. Nous ajoutons
+une méthode, une route et un gabarit illustratif.
 
-- une route `GET /csrf`
-- un contrôleur `CsrfController`
-- un formulaire HTML avec le champ caché `csrf_token`
-- la génération du jeton avec `BaseController.csrf_token(request)`
+## L'ajout
 
-Aucune base de données.
-Le **traitement** du POST est l'objet du palier suivant (`form-post`).
-
-## Pourquoi un jeton CSRF ?
-
-Une attaque **CSRF** (Cross-Site Request Forgery) fait exécuter une
-action à l'utilisateur **à son insu** : un site malveillant soumet un
-formulaire vers votre application en réutilisant la session de la
-victime. Pour s'en protéger, Forge exige sur chaque requête POST un
-**jeton secret** que seul votre serveur connaît :
-
-1. le serveur génère un jeton lié à la session et l'injecte dans le
-   formulaire (champ caché `csrf_token`) ;
-2. à la soumission, le middleware Forge compare le jeton reçu à celui
-   de la session — en temps constant ;
-3. s'ils ne correspondent pas (ou si le jeton est absent), la requête
-   est **refusée**.
-
-Un site tiers ne peut pas deviner ce jeton : il ne peut donc pas forger
-de POST valide.
-
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Reçue par la méthode du contrôleur. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Renvoie la page rendue. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | `render(...)` + `csrf_token(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
-
-## Tester
-
-```bash
-forge run
-```
-
-Ouvrez `https://localhost:8000/csrf` : la page affiche un formulaire.
-Inspectez le HTML (clic droit → code source) : le champ caché
-`csrf_token` contient une valeur générée par le serveur.
-
-## Les routes
+Ajoutez cette méthode à la classe `WelcomeController` :
 
 ```python
-# mvc/routes.py
-from mvc.controllers.csrf_controller import CsrfController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/csrf", CsrfController.index, name="csrf_index")
-```
-
-## Le contrôleur
-
-```python
-# mvc/controllers/csrf_controller.py
-from core.http.request import Request
-from core.http.response import Response
-from core.mvc.controller.base_controller import BaseController
-
-
-class CsrfController(BaseController):
-
     @staticmethod
-    def index(request: Request) -> Response:
+    def csrf_demo(request: Request) -> Response:
         return BaseController.render(
-            "csrf/index.html",
+            "welcome/csrf.html",
             request=request,
             context={"csrf_token": BaseController.csrf_token(request)},
         )
 ```
 
-### Comprendre ce code
-
-- `BaseController.csrf_token(request)` génère (ou réutilise) le jeton lié
-  à la session courante et le renvoie pour l'injecter dans la vue.
-- Le jeton est passé au template via `context={"csrf_token": ...}` puis
-  rendu dans un champ caché.
-- Aucune vérification ici : c'est le **middleware CSRF** de Forge qui
-  vérifie automatiquement le jeton sur les requêtes POST (palier suivant).
-
-## La vue
+Créez le gabarit `mvc/views/welcome/csrf.html` :
 
 ```html
-<!-- mvc/views/csrf/index.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Le jeton CSRF — Forge</title>
+    <meta charset="utf-8">
+    <title>Le jeton CSRF</title>
 </head>
 <body>
-  <h1>Le jeton CSRF</h1>
-
-  <!-- Formulaire illustratif : pas de soumission ici (voir form-post). -->
-  <form>
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-
-    <label for="name">Prénom</label>
-    <input id="name" name="name" type="text">
-  </form>
+    <h1>Le jeton CSRF</h1>
+    <p>
+        Le champ caché ci-dessous transporte le jeton CSRF. Il prouve que la
+        requête provient bien de cette page, et non d'un site tiers.
+    </p>
+    <form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Prénom : <input type="text" name="name"></label>
+    </form>
 </body>
 </html>
 ```
 
-### Comprendre ce code
+Ce formulaire n'a volontairement ni `method` ni `action` : il sert seulement
+à montrer où se place le champ caché. Puis ajoutez la route dans le groupe
+public de `mvc/routes.py`.
 
-- Le champ caché `csrf_token` transporte le jeton dans le corps du POST.
-- `{{ csrf_token }}` est la valeur injectée par le contrôleur.
-- Sans ce champ, Forge refuse la soumission.
+## Votre mvc/routes.py à ce stade
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.welcome_controller import WelcomeController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
+    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
+    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
+    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
+    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
+    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
+    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
+    pub.add("GET",  "/csrf", WelcomeController.csrf_demo, name="csrf_index")
+```
+
+## Comprendre ce code
+
+- `BaseController.csrf_token(request)` renvoie le jeton CSRF de la session
+  courante.
+- On le passe au gabarit via `context={"csrf_token": ...}`, puis on le place
+  dans un champ caché `name="csrf_token"`.
+- Le groupe public a la protection CSRF active : un POST sans jeton valide
+  sera refusé. Ce palier prépare donc les formulaires des paliers suivants.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/csrf` | la page avec le champ caché `csrf_token` rempli |
 
 ## À retenir
 
-- CSRF = un site tiers qui forge une requête en réutilisant votre
-  session ; le jeton secret l'empêche.
-- Le jeton se génère avec `BaseController.csrf_token(request)` et se
-  place dans un champ caché `csrf_token`.
-- Forge le vérifie automatiquement (middleware) sur chaque POST, en
-  temps constant.
+- Le jeton CSRF prouve qu'une requête vient bien de votre site.
+- `BaseController.csrf_token(request)` fournit ce jeton.
+- Il se transmet dans un champ caché `name="csrf_token"` du formulaire.
 
-## Après ce starter
-
-Passez au palier suivant : **Premier formulaire POST** — vous y
-apprendrez à **traiter** la soumission et à lire la valeur envoyée avec
-`request.form(...)`.
+Au palier suivant, nous traitons un vrai formulaire POST protégé par ce jeton.
 
 [Continuer avec Premier formulaire POST](form-post.md)

@@ -1,114 +1,72 @@
 # Inspecter une requête
 
-Objectif : afficher la structure d'une requête avec `request.data` et
-`Response.debug(...)`.
+Objectif : visualiser le contenu d'une requête pour comprendre ce que Forge
+reçoit.
 
-**Ce que vous allez apprendre :** inspecter tout ce que reçoit votre
-contrôleur (méthode, chemin, paramètres, headers) via `request.data`, et
-l'afficher en développement avec `Response.debug(...)` — un outil de
-débogage qui refuse de s'exécuter en production.
+**Ce que vous allez apprendre :** afficher les données de la requête avec
+`Response.debug(request.data)`, une aide pédagogique disponible en
+environnement de développement.
 
-Palier 5 de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Route dynamique](dynamic-route.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+`WelcomeController` porte déjà les méthodes des paliers 1 à 4, et
+`mvc/routes.py` déclare les routes correspondantes jusqu'à
+`/dynamic-route/articles/{id}`. Nous ajoutons une méthode et une route.
 
-- une route `/request-debug`
-- un contrôleur `RequestDebugController`
-- l'accès global `request.data`
-- un rendu de debug avec `Response.debug(...)`
+## L'ajout
 
-Aucune vue HTML.
-Aucune base de données.
-Aucun formulaire.
-Aucun CRUD.
-
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Source de `request.data`, vue globale et stable de la requête. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Rendu de debug avec `Response.debug(...)` (refusé en `prod`). | [Response](../../../reference/http.md#4-response-reference) |
-
-## Tester
-
-Depuis le projet Forge déjà créé avec ce starter :
-
-```bash
-forge run
-```
-
-Ouvrez :
-
-```
-https://localhost:8000/request-debug?name=Roger
-```
-
-Vous devez voir une page de debug HTML contenant les informations de la
-requête : méthode, chemin, paramètres, headers (les valeurs sensibles
-sont masquées automatiquement).
-
-## Les routes
+Ajoutez cette méthode à la classe `WelcomeController` :
 
 ```python
-# mvc/routes.py
-from mvc.controllers.request_debug_controller import RequestDebugController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/request-debug", RequestDebugController.index, name="request_debug_index")
-```
-
-## Le contrôleur
-
-```python
-# mvc/controllers/request_debug_controller.py
-from core.http.request import Request
-from core.http.response import Response
-from core.mvc.controller.base_controller import BaseController
-
-
-class RequestDebugController(BaseController):
-
     @staticmethod
-    def index(request: Request) -> Response:
+    def debug(request: Request) -> Response:
         return Response.debug(request.data)
 ```
 
-### Comprendre ce code
+Puis ajoutez la route dans le groupe public de `mvc/routes.py`.
 
-- `request.data` est une vue globale et stable de la requête : méthode,
-  chemin, paramètres, headers, body, fichiers. Les valeurs sensibles
-  (`Authorization`, `Cookie`, `password`, `csrf`…) sont automatiquement
-  remplacées par `[masked]`.
-- `Response.debug(...)` rend cette structure sous forme de page HTML
-  lisible. C'est un outil de **développement**, pas une réponse destinée
-  au public.
-- En `APP_ENV=prod`, `Response.debug(...)` retourne `404` sans aucun
-  détail — le starter reste sûr à laisser branché en dev.
-- À observer dans la sortie : le chemin, les paramètres reçus et les
-  headers. C'est ce que voit réellement votre contrôleur.
+## Votre mvc/routes.py à ce stade
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.welcome_controller import WelcomeController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
+    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
+    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
+    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
+    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
+    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
+```
+
+## Comprendre ce code
+
+- `request.data` rassemble les données utiles de la requête courante.
+- `Response.debug(...)` les présente sous forme de page HTML lisible, pensée
+  pour l'inspection pendant le développement.
+- Cette aide n'est active qu'en environnement de développement
+  (`APP_ENV=dev`) ; en production elle répond `404`, pour ne jamais exposer
+  les données d'une requête.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/request-debug` | la page de débogage (en `APP_ENV=dev`) |
+| `https://localhost:8000/request-debug?x=1&y=2` | la même page, avec les paramètres affichés |
 
 ## À retenir
 
-- `request.data` donne une vue globale et stable de la requête, avec
-  les clés sensibles (`Authorization`, `Cookie`, `password`, `csrf`…)
-  remplacées par `[masked]`.
-- `Response.debug(...)` sert à explorer un objet en développement —
-  c'est un outil de compréhension, pas un affichage public de
-  production.
-- En `APP_ENV=prod`, `Response.debug(...)` refuse et retourne `404`
-  sans aucun détail. Le starter reste donc sûr à laisser branché en
-  développement, mais n'expose rien en production.
+- `Response.debug(request.data)` est un outil d'inspection pédagogique.
+- Il n'est disponible qu'en développement ; il répond `404` en production.
+- À n'utiliser que pour comprendre, jamais comme réponse définitive.
 
-## Après ce starter
-
-Passez au palier suivant : **Réponse JSON**.
-
-Vous y apprendrez à retourner des données structurées au format JSON :
-
-```python
-return Response.json({"message": "Bonjour JSON"})
-```
+Au palier suivant, nous renvoyons des données structurées au format JSON.
 
 [Continuer avec Réponse JSON](json-response.md)

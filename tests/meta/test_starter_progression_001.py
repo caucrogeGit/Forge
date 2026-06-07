@@ -3,8 +3,7 @@
 Verrouille la progression pédagogique officielle des starters Forge :
 
 - `docs/starters/index.md` doit présenter la section
-  « Progression recommandée » avec les 9 paliers et les codes
-  des tickets futurs ;
+  « Progression recommandée » avec les 11 paliers du niveau débutant ;
 - `docs/starters/welcome-forge/debutant/welcome.md` ne doit plus recommander
   directement le starter Contacts CRUD comme étape immédiate ;
 - `docs/guide/bonjour-forge.md` doit afficher l'avertissement
@@ -12,9 +11,11 @@ Verrouille la progression pédagogique officielle des starters Forge :
 - `docs/guide/getting-started.md` doit pointer vers la progression ;
 - la roadmap mentionne `STARTER-ROADMAP-PROGRESSION-001` livré.
 
-Le ticket n'a pas créé les starters intermédiaires : les codes
-`STARTER-*-001` sont volontairement présentés comme trajectoire
-future, non comme starters disponibles aujourd'hui.
+Depuis ADR-025 (STARTER-WELCOME-FORGE-TUTORIAL-ADR-025), le niveau débutant
+est un **tutoriel continu manuel** : la progression liste les 11 paliers sans
+les présenter comme des starters buildables (`forge starter:build`). Les
+mentions « livré — starter `x` » ont donc été retirées de l'index ; seule la
+présence des libellés de paliers reste verrouillée.
 """
 
 from __future__ import annotations
@@ -67,166 +68,14 @@ class TestProgressionSectionInStartersIndex:
             f"La progression doit lister le palier « {step_label} »."
         )
 
-    def test_palier_2_query_params_marque_livre(self):
-        # STARTER-QUERY-PARAMS-001 est livré : palier 2 doit l'indiquer
-        # explicitement avec la mention « livré ».
-        # On vise l'item numéroté de la progression (« 2. **Paramètres
-        # d'URL** ») pour éviter de matcher la ligne du tableau de
-        # synthèse qui répète le même nom.
-        assert "STARTER-QUERY-PARAMS-001" in self.content, (
-            "STARTER-QUERY-PARAMS-001 doit rester référencé dans la "
-            "progression (palier 2)."
-        )
-        text = self.content
-        idx_palier2 = text.find("2. **Paramètres d'URL**")
-        idx_palier3 = text.find("3. **Première vue HTML**")
-        assert idx_palier2 != -1, (
-            "Item « 2. **Paramètres d'URL** » introuvable dans la progression."
-        )
-        assert idx_palier3 != -1, (
-            "Item « 3. **Première vue HTML** » introuvable dans la progression."
-        )
-        palier2_block = text[idx_palier2:idx_palier3]
-        assert "livré" in palier2_block, (
-            "Le palier 2 (Paramètres d'URL) doit être marqué « livré » "
-            "depuis STARTER-QUERY-PARAMS-001."
-        )
-        assert "query-params" in palier2_block, (
-            "Le palier 2 doit mentionner le starter `query-params`."
-        )
-
-    def test_palier_3_first_html_view_marque_livre(self):
-        # STARTER-FIRST-HTML-VIEW-001 livré : palier 3 doit l'indiquer
-        # explicitement avec la mention « livré ».
-        # Cf. test_palier_2 — on ancre sur l'item numéroté.
-        assert "STARTER-FIRST-HTML-VIEW-001" in self.content, (
-            "STARTER-FIRST-HTML-VIEW-001 doit rester référencé dans la "
-            "progression (palier 3)."
-        )
-        text = self.content
-        idx_palier3 = text.find("3. **Première vue HTML**")
-        idx_palier4 = text.find("4. **Route dynamique**")
-        assert idx_palier3 != -1, (
-            "Item « 3. **Première vue HTML** » introuvable dans la progression."
-        )
-        assert idx_palier4 != -1, (
-            "Item « 4. **Route dynamique** » introuvable dans la progression."
-        )
-        palier3_block = text[idx_palier3:idx_palier4]
-        assert "livré" in palier3_block, (
-            "Le palier 3 (Première vue HTML) doit être marqué « livré » "
-            "depuis STARTER-FIRST-HTML-VIEW-001."
-        )
-        assert "first-html-view" in palier3_block, (
-            "Le palier 3 doit mentionner le starter `first-html-view`."
-        )
-
-    def test_palier_4_dynamic_route_marque_livre(self):
-        # STARTER-DYNAMIC-ROUTE-001 livré : palier 4 doit l'indiquer
-        # explicitement avec la mention « livré ».
-        # Cf. test_palier_2/3 — on ancre sur l'item numéroté.
-        assert "STARTER-DYNAMIC-ROUTE-001" in self.content, (
-            "STARTER-DYNAMIC-ROUTE-001 doit rester référencé dans la "
-            "progression (palier 4)."
-        )
-        text = self.content
-        idx_palier4 = text.find("4. **Route dynamique**")
-        idx_palier5 = text.find("5. **Inspecter une requête**")
-        assert idx_palier4 != -1, (
-            "Item « 4. **Route dynamique** » introuvable dans la progression."
-        )
-        assert idx_palier5 != -1, (
-            "Item « 5. **Inspecter une requête** » introuvable dans la progression."
-        )
-        palier4_block = text[idx_palier4:idx_palier5]
-        assert "livré" in palier4_block, (
-            "Le palier 4 (Route dynamique) doit être marqué « livré » "
-            "depuis STARTER-DYNAMIC-ROUTE-001."
-        )
-        assert "dynamic-route" in palier4_block, (
-            "Le palier 4 doit mentionner le starter `dynamic-route`."
-        )
-
-    def test_palier_5_request_debug_marque_livre(self):
-        # STARTER-REQUEST-DEBUG-001 livré : palier 5 doit l'indiquer
-        # explicitement avec la mention « livré ».
-        assert "STARTER-REQUEST-DEBUG-001" in self.content, (
-            "STARTER-REQUEST-DEBUG-001 doit rester référencé dans la "
-            "progression (palier 5)."
-        )
-        text = self.content
-        idx_palier5 = text.find("5. **Inspecter une requête**")
-        idx_palier6 = text.find("6. **Réponse JSON**")
-        assert idx_palier5 != -1, (
-            "Item « 5. **Inspecter une requête** » introuvable dans la progression."
-        )
-        assert idx_palier6 != -1, (
-            "Item « 6. **Réponse JSON** » introuvable dans la progression."
-        )
-        palier5_block = text[idx_palier5:idx_palier6]
-        assert "livré" in palier5_block, (
-            "Le palier 5 (Inspecter une requête) doit être marqué « livré » "
-            "depuis STARTER-REQUEST-DEBUG-001."
-        )
-        assert "request-debug" in palier5_block, (
-            "Le palier 5 doit mentionner le starter `request-debug`."
-        )
-
-    def _palier_block(self, start_label: str, end_label: str) -> str:
-        text = self.content
-        a = text.find(start_label)
-        b = text.find(end_label)
-        assert a != -1, f"Item « {start_label} » introuvable dans la progression."
-        assert b != -1, f"Item « {end_label} » introuvable dans la progression."
-        return text[a:b]
-
-    def test_palier_6_json_response_marque_livre(self):
-        assert "STARTER-JSON-RESPONSE-001" in self.content
-        block = self._palier_block("6. **Réponse JSON**", "7. **Le jeton CSRF**")
-        assert "livré" in block and "json-response" in block, (
-            "Le palier 6 (Réponse JSON) doit être marqué « livré » et "
-            "mentionner le starter `json-response`."
-        )
-
-    def test_palier_7_csrf_marque_livre(self):
-        assert "STARTER-CSRF-001" in self.content
-        block = self._palier_block("7. **Le jeton CSRF**", "8. **Premier formulaire POST**")
-        assert "livré" in block and "csrf" in block, (
-            "Le palier 7 (Le jeton CSRF) doit être marqué « livré » et "
-            "mentionner le starter `csrf`."
-        )
-
-    def test_palier_8_form_post_marque_livre(self):
-        assert "STARTER-FORM-POST-001" in self.content
-        block = self._palier_block("8. **Premier formulaire POST**", "9. **Validation serveur**")
-        assert "livré" in block and "form-post" in block, (
-            "Le palier 8 (Premier formulaire POST) doit être « livré » et "
-            "mentionner le starter `form-post`."
-        )
-
-    def test_palier_9_server_validation_marque_livre(self):
-        assert "STARTER-SERVER-VALIDATION-001" in self.content
-        block = self._palier_block("9. **Validation serveur**", "10. **Première base SQL**")
-        assert "livré" in block and "server-validation" in block, (
-            "Le palier 9 (Validation serveur) doit être « livré » et "
-            "mentionner le starter `server-validation`."
-        )
-
-    def test_palier_10_first_sql_marque_livre(self):
-        assert "STARTER-FIRST-SQL-001" in self.content
-        block = self._palier_block("10. **Première base SQL**", "11. **Écrire en base**")
-        assert "livré" in block and "first-sql" in block, (
-            "Le palier 10 (Première base SQL) doit être « livré » et "
-            "mentionner le starter `first-sql`."
-        )
-
-    def test_palier_11_first_sql_write_marque_livre(self):
-        assert "STARTER-FIRST-SQL-WRITE-001" in self.content
-        block = self._palier_block("11. **Écrire en base**", "Une fois ces")
-        assert "livré" in block and "first-sql-write" in block, (
-            "Le palier 11 (Écrire en base) doit être « livré » et "
-            "mentionner le starter `first-sql-write`."
-        )
+    def test_les_11_paliers_numerotes(self):
+        # La progression reste numérotée 1 à 11 (ordre pédagogique stable),
+        # même si les paliers ne sont plus des starters buildables (ADR-025).
+        for n in range(1, 12):
+            assert f"{n}. **" in self.content, (
+                f"Le palier numéroté « {n}. ** » doit figurer dans la "
+                "progression de docs/starters/index.md."
+            )
 
 
 # ── docs/starters/welcome-forge/debutant/welcome.md : ne renvoie plus directement vers CRUD ────
@@ -239,8 +88,6 @@ class TestWelcomeStarterRedirectsToProgression:
         self.content = STARTER_WELCOME.read_text(encoding="utf-8")
 
     def test_no_immediate_crud_recommendation(self):
-        # La phrase « passez au Starter 1 — Contacts pour un premier
-        # CRUD complet » ne doit plus exister.
         forbidden = "passez au **Starter 1 — Contacts**"
         assert forbidden not in self.content, (
             f"La phrase « {forbidden} » suggère un saut direct vers "
@@ -249,24 +96,12 @@ class TestWelcomeStarterRedirectsToProgression:
         )
 
     def test_points_to_next_palier(self):
-        # STARTER-SEQUENTIAL-NAV-001 a remplacé le pointeur vers la
-        # progression générale par un pointeur direct vers le palier
-        # suivant (query-params). La garantie « ne pas pousser Contacts
-        # immédiatement » reste portée par
-        # `test_no_immediate_crud_recommendation` ci-dessus.
         assert "query-params.md" in self.content, (
-            "La section « Après ce starter » de welcome doit pointer "
-            "directement vers le palier suivant (query-params), pas "
-            "vers la progression générale."
+            "La section « Après ce palier » de welcome doit pointer "
+            "directement vers le palier suivant (query-params)."
         )
 
     def test_does_not_label_contacts_as_advanced_anymore(self):
-        # Avant STARTER-SEQUENTIAL-NAV-001, welcome mentionnait
-        # Contacts CRUD comme « niveau avancé » avec la commande
-        # `forge starter:build 1 --init-db`. Le nouveau contrat
-        # supprime entièrement la mention de Contacts dans welcome :
-        # la chaîne pédagogique passe par les 7 paliers intermédiaires
-        # avant d'aborder Contacts CRUD à first-sql.
         assert "Starter 1 — Contacts" not in self.content, (
             "welcome ne doit plus mentionner « Starter 1 — Contacts » "
             "directement (la progression passe par les paliers "
@@ -296,7 +131,6 @@ class TestBonjourForgeWarning:
         )
 
     def test_progression_row_in_table(self):
-        # Une ligne du tableau « Aller plus loin » mène à la progression
         assert "Progression officielle des starters" in self.content, (
             "La table « Aller plus loin » doit comporter une ligne "
             "« Progression officielle des starters »."
@@ -330,8 +164,6 @@ class TestRoadmapEntry:
         assert "STARTER-ROADMAP-PROGRESSION-001" in text, (
             "La roadmap doit mentionner STARTER-ROADMAP-PROGRESSION-001."
         )
-        # L'entrée doit être marquée « livré »
-        # (le ticket est sur sa propre ligne du tableau)
         lines = [
             line for line in text.splitlines()
             if "STARTER-ROADMAP-PROGRESSION-001" in line
@@ -339,39 +171,4 @@ class TestRoadmapEntry:
         assert any("**livré**" in line for line in lines), (
             "STARTER-ROADMAP-PROGRESSION-001 doit être marqué « livré » "
             "dans la roadmap."
-        )
-
-
-# ── Intermédiaires non créés : pas de starter:build / pyproject pour ces codes ─
-
-
-class TestFutureStartersNotYetCreated:
-    """Les starters intermédiaires sont des trajectoires futures, pas des
-    starters existants. Aucun fichier sous `forge_cli/starters/data/`
-    ne doit avoir été ajouté par ce ticket."""
-
-    @pytest.mark.parametrize("future_starter_slug", [
-        # query-params retiré : livré par STARTER-QUERY-PARAMS-001 (palier 2).
-        # first-html-view retiré : livré par STARTER-FIRST-HTML-VIEW-001 (palier 3).
-        # dynamic-route retiré : livré par STARTER-DYNAMIC-ROUTE-001 (palier 4).
-        # request-debug retiré : livré par STARTER-REQUEST-DEBUG-001 (palier 5).
-        # form-post retiré : livré par STARTER-FORM-POST-001 (palier 6).
-        # server-validation retiré : livré par STARTER-SERVER-VALIDATION-001 (palier 7).
-        # first-sql retiré : livré par STARTER-FIRST-SQL-001 (palier 8).
-        # Plus aucun starter pédagogique « non créé » dans la progression :
-        # le palier 9 est Contacts CRUD (déjà livré comme `contact-simple`,
-        # à repositionner via CONTACTS-CRUD-REPOSITION-001).
-    ])
-    def test_future_starter_not_created(self, future_starter_slug):
-        starter_dir = (
-            PROJECT_ROOT
-            / "forge_cli"
-            / "starters"
-            / "data"
-            / future_starter_slug
-        )
-        assert not starter_dir.exists(), (
-            f"Le starter '{future_starter_slug}' ne doit PAS être créé "
-            "par ce ticket — c'est un ticket futur séparé. Trouvé : "
-            f"{starter_dir}"
         )

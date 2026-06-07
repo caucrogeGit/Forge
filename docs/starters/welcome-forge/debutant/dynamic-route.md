@@ -1,125 +1,72 @@
 # Route dynamique
 
-Objectif : lire une partie variable de l'URL avec `request.route_param(...)`.
+Objectif : capturer une partie variable du chemin de l'URL, par exemple un
+identifiant d'article.
 
 **Ce que vous allez apprendre :** déclarer une route avec un segment
-variable (`/dynamic-route/articles/{id}`) et lire ce segment côté
-contrôleur avec `request.route_param("id")`.
+dynamique `{id}` et lire ce segment avec `request.route_param("id", default=...)`.
 
-Palier 4 de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Première vue HTML](first-html-view.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+`WelcomeController` porte déjà `index`, `query_params_index`, `hello` et
+`html_view` (paliers 1 à 3). Nous ajoutons une méthode et une route avec un
+segment variable.
 
-- une route `/dynamic-route/articles/{id}`
-- un contrôleur `DynamicRouteController`
-- une lecture avec `request.route_param("id")`
-- une réponse texte avec `Response.text(...)`
+## L'ajout
 
-Aucune vue HTML.
-Aucune base de données.
-Aucun formulaire.
-Aucun CRUD.
-
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Lire la partie variable de l'URL avec `request.route_param(...)`. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
-| Routage | Déclarer le segment dynamique `{id}` dans `mvc/routes.py`. | [Routage](../../../reference/api.md#corehttprouter) |
-
-## Tester
-
-Depuis le projet Forge déjà créé avec ce starter :
-
-```bash
-forge run
-```
-
-Ouvrez :
-
-```
-https://localhost:8000/dynamic-route/articles/42
-```
-
-Résultat attendu :
-
-```
-Article 42
-```
-
-Essayez d'autres valeurs : `/dynamic-route/articles/forge` retourne
-`Article forge`, `/dynamic-route/articles/3.14` retourne
-`Article 3.14`. Le segment `{id}` accepte n'importe quelle chaîne
-non vide.
-
-## Code essentiel
+Ajoutez cette méthode à la classe `WelcomeController` :
 
 ```python
-# mvc/routes.py
-from mvc.controllers.dynamic_route_controller import DynamicRouteController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/dynamic-route/articles/{id}", DynamicRouteController.show, name="dynamic_route_article_show")
-```
-
-### Comprendre ce code
-
-- Le segment `{id}` dans le motif de route est une partie *variable*
-  de l'URL : Forge capture sa valeur et la rend disponible au contrôleur.
-- Contrairement à `?id=...` (query string), le segment dynamique fait
-  partie du chemin lui-même. Cela produit des URL plus lisibles pour
-  identifier une ressource : `/articles/42` plutôt que `/articles?id=42`.
-
-```python
-# mvc/controllers/dynamic_route_controller.py
-from core.http.request import Request
-from core.http.response import Response
-from core.mvc.controller.base_controller import BaseController
-
-
-class DynamicRouteController(BaseController):
-    """Starter pédagogique : lire un paramètre de route."""
-
     @staticmethod
-    def show(request: Request) -> Response:
+    def show_article(request: Request) -> Response:
         article_id = request.route_param("id", default="inconnu")
         return Response.text(f"Article {article_id}")
 ```
 
-### Comprendre ce code
+Puis ajoutez la route avec son segment `{id}` dans le groupe public de
+`mvc/routes.py`.
 
-- `request.route_param("id", default="inconnu")` lit la valeur du
-  segment `{id}` déclaré dans la route. Le `default=` protège contre
-  une mauvaise déclaration de route.
-- Ne pas confondre :
-  - `request.param(...)` lit la *query string* (`?id=42`) ;
-  - `request.route_param(...)` lit un segment dynamique du chemin
-    (`/articles/42`).
-- Cette forme est typique pour identifier une ressource précise :
-  l'article 42, le contact 7, le produit 18.
+## Votre mvc/routes.py à ce stade
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.welcome_controller import WelcomeController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
+    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
+    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
+    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
+    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
+```
+
+## Comprendre ce code
+
+- `{id}` dans le chemin déclare un segment dynamique : il accepte n'importe
+  quelle valeur à cet endroit de l'URL.
+- `request.route_param("id", default="inconnu")` lit la valeur capturée par
+  ce segment.
+- C'est différent de `request.param(...)` du palier 2 : ici la valeur est
+  dans le chemin lui-même, pas dans la chaîne de requête après le `?`.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/dynamic-route/articles/42` | `Article 42` |
+| `https://localhost:8000/dynamic-route/articles/forge` | `Article forge` |
 
 ## À retenir
 
-- `{id}` dans la route indique une partie variable de l'URL.
-- Forge place cette valeur dans les paramètres de route.
-- Le contrôleur lit cette valeur avec `request.route_param("id")`.
-- `request.route_param(...)` est différent de `request.param(...)` :
-  - `request.param(...)` lit la *query string* (`?id=42`) ;
-  - `request.route_param(...)` lit un segment dynamique de l'URL
-    (`/articles/42`).
+- Un segment `{nom}` dans le chemin capture une valeur variable.
+- `request.route_param("nom", default=...)` lit cette valeur.
+- Segment de chemin et chaîne de requête sont deux sources distinctes.
 
-## Après ce starter
-
-Passez au palier suivant : **Inspecter une requête**.
-
-Vous y apprendrez à explorer la structure d'une requête avec :
-
-```python
-Response.debug(request.data)
-```
+Au palier suivant, nous inspectons le contenu d'une requête pour le déboguer.
 
 [Continuer avec Inspecter une requête](request-debug.md)

@@ -1,166 +1,108 @@
 # Premier formulaire POST
 
-Objectif : envoyer une valeur depuis un formulaire HTML et la lire
-côté contrôleur.
+Objectif : recevoir les données d'un formulaire envoyé en POST et les lire
+côté serveur.
 
-**Ce que vous allez apprendre :** afficher un formulaire HTML protégé
-par un jeton CSRF, le soumettre en `POST`, et lire la valeur reçue dans
-le corps de la requête avec `request.form("name", ...)` (et non dans
-l'URL).
+**Ce que vous allez apprendre :** afficher un formulaire, le soumettre en
+POST, et lire un champ avec `request.form("name", default=...)`, le POST
+étant protégé par le jeton CSRF du palier précédent.
 
-Palier 8 de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Le jeton CSRF](csrf.md).
+## Là où nous en sommes
 
-*Prérequis : comprendre le jeton CSRF (palier 7).*
+`WelcomeController` porte déjà les méthodes des paliers 1 à 7, et
+`mvc/routes.py` déclare les routes jusqu'à `/csrf`. Nous ajoutons deux
+méthodes (afficher le formulaire, traiter l'envoi), deux routes et un
+gabarit.
 
-## Ce que ce starter montre
+## L'ajout
 
-- une route `GET /form-post`
-- une route `POST /form-post`
-- une vue HTML avec un formulaire minimal
-- une méthode de contrôleur qui lit la valeur envoyée
-- une réponse texte avec `Response.text(...)`
-
-Aucune base de données.
-Aucune validation serveur avancée.
-Aucun CRUD.
-
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Lire les champs envoyés avec `request.form(...)`. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | Fournit `render(...)` pour la vue et `csrf_token(...)` pour le jeton CSRF. | [BaseController](../../../reference/api.md#coremvccontroller) |
-
-## Tester
-
-Depuis le projet Forge déjà créé avec ce starter :
-
-```bash
-forge run
-```
-
-Ouvrez :
-
-```
-https://localhost:8000/form-post
-```
-
-Saisissez `Roger`, envoyez le formulaire.
-
-Résultat attendu :
-
-```
-Bonjour Roger
-```
-
-## Les routes
+Ajoutez ces deux méthodes à la classe `WelcomeController` :
 
 ```python
-# mvc/routes.py
-from mvc.controllers.form_post_controller import FormPostController
-
-with router.group("", public=True) as pub:
-    pub.add("GET",  "/form-post", FormPostController.index,  name="form_post_index")
-    pub.add("POST", "/form-post", FormPostController.submit, name="form_post_submit")
-```
-
-## Le contrôleur
-
-```python
-# mvc/controllers/form_post_controller.py
-from core.http.request import Request
-from core.http.response import Response
-from core.mvc.controller.base_controller import BaseController
-
-
-class FormPostController(BaseController):
-
     @staticmethod
-    def index(request: Request) -> Response:
+    def form(request: Request) -> Response:
         return BaseController.render(
-            "form_post/index.html",
+            "welcome/form_post.html",
             request=request,
             context={"csrf_token": BaseController.csrf_token(request)},
         )
 
     @staticmethod
-    def submit(request: Request) -> Response:
+    def form_submit(request: Request) -> Response:
         name = request.form("name", default="Forge")
         return Response.text(f"Bonjour {name}")
 ```
 
-### Comprendre ce code
-
-- Deux méthodes pour un même chemin `/form-post`, mais des verbes HTTP
-  différents : `GET` *affiche* le formulaire, `POST` *reçoit* la
-  soumission.
-- `BaseController.csrf_token(request)` génère le jeton CSRF à injecter
-  dans la vue. Sans ce jeton, Forge refuse le `POST` (protection contre
-  les soumissions cross-site).
-- Côté `submit`, `request.form("name", default="Forge")` lit la valeur
-  envoyée dans le corps du formulaire — pas dans l'URL.
-- Une fois la donnée traitée, le contrôleur retourne une réponse. Ici un
-  simple `Response.text(...)` ; dans une vraie application on
-  redirigerait généralement vers une page de confirmation.
-
-## La vue
+Créez le gabarit `mvc/views/welcome/form_post.html` :
 
 ```html
-<!-- mvc/views/form_post/index.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Premier formulaire POST — Forge</title>
+    <meta charset="utf-8">
+    <title>Premier formulaire POST</title>
 </head>
 <body>
-  <h1>Premier formulaire POST</h1>
-
-  <form method="post" action="/form-post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-
-    <label for="name">Prénom</label>
-    <input id="name" name="name" type="text" value="Forge">
-
-    <button type="submit">Envoyer</button>
-  </form>
+    <h1>Premier formulaire POST</h1>
+    <form method="post" action="/form-post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Prénom : <input type="text" name="name" value="Forge"></label>
+        <button type="submit">Envoyer</button>
+    </form>
 </body>
 </html>
 ```
 
-### Comprendre ce code
+Puis ajoutez les deux routes (`GET` et `POST` sur `/form-post`) dans le
+groupe public de `mvc/routes.py`.
 
-- `method="post"` indique au navigateur d'envoyer les données dans le
-  corps de la requête, pas dans l'URL.
-- Le champ caché `csrf_token` transporte le jeton généré par le
-  contrôleur. Le middleware CSRF de Forge vérifie sa correspondance
-  avant d'appeler `submit`.
-- `name="name"` est la clé lue côté serveur par `request.form("name")`.
+## Votre mvc/routes.py à ce stade
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.welcome_controller import WelcomeController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
+    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
+    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
+    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
+    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
+    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
+    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
+    pub.add("GET",  "/csrf", WelcomeController.csrf_demo, name="csrf_index")
+    pub.add("GET",  "/form-post", WelcomeController.form, name="form_post_index")
+    pub.add("POST", "/form-post", WelcomeController.form_submit, name="form_post_submit")
+```
+
+## Comprendre ce code
+
+- Deux routes partagent le chemin `/form-post` : `GET` affiche le
+  formulaire, `POST` traite l'envoi.
+- `request.form("name", default="Forge")` lit un champ du corps du
+  formulaire, là où `request.param(...)` lisait la chaîne de requête.
+- Le champ caché `csrf_token` du gabarit permet au POST de passer la
+  protection CSRF du groupe public.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/form-post` | le formulaire avec le champ prénom |
+| Soumettre avec `Roger` | `Bonjour Roger` |
+| Soumettre en laissant `Forge` | `Bonjour Forge` |
 
 ## À retenir
 
-- `GET /form-post` affiche le formulaire.
-- `POST /form-post` reçoit les données.
-- Le contrôleur lit la valeur envoyée avec `request.form("name", ...)`.
-- Le champ caché `csrf_token` est exigé par Forge sur toute requête
-  POST (protection contre les soumissions cross-site). Il est
-  généré par `BaseController.csrf_token(request)` et vérifié
-  automatiquement par le middleware.
-- La validation serveur complète viendra au palier suivant
-  (palier 9).
+- `request.form(cle, default=...)` lit un champ envoyé en POST.
+- Un même chemin peut servir `GET` (afficher) et `POST` (traiter).
+- Le champ caché `csrf_token` est requis pour que le POST soit accepté.
 
-## Après ce starter
-
-Passez au palier suivant : **Validation serveur**.
-
-Vous y apprendrez à refuser une valeur vide avec un statut HTTP
-explicite :
-
-```python
-return Response.text("Le prénom est obligatoire", status=422)
-```
+Au palier suivant, nous refusons une saisie invalide côté serveur.
 
 [Continuer avec Validation serveur](server-validation.md)
