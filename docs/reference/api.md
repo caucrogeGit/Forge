@@ -1747,7 +1747,7 @@ L'interface officielle est la commande `forge`.
 | Commande | Rôle |
 |---|---|
 | `forge --version` | Affiche la version CLI. |
-| `forge new NomProjet [--ref REF]` | Crée un projet depuis le dernier tag stable. `--ref main` est explicite pour le développement. |
+| `forge new NomProjet [--profile PROFIL]` | Crée un projet nu à partir du squelette embarqué (le core vient du paquet `forge-mvc`). |
 | `forge make:entity NomEntite` | Crée le JSON canonique d'une entité. |
 | `forge make:crud NomEntite [--dry-run]` | Génère contrôleur, vues et routes CRUD, avec champs relationnels `many_to_one`, formulaires `many_to_many` côté source, affichage `many_to_many` dans list/show côté source et partials internes de liste. |
 | `forge make:public-page <nom>` | Génère une page publique simple, son template, son contrôleur et sa route dédiée. |
@@ -1928,7 +1928,6 @@ Les conseils de récupération sont présents pour les erreurs les plus fréquen
 |---|---|
 | Commande inconnue | `forge help` pour la liste des commandes |
 | Argument manquant (`new`, `make:entity`, `make:crud`, `starter:build`) | Exemple concret avec nom plausible |
-| `forge new --ref` sans valeur | Exemple avec branche |
 | `forge new --profile` sans valeur | Liste des profils disponibles |
 | `forge project:check` hors projet | `forge new <NomProjet>` pour créer un projet |
 | `forge routes:list` avec arguments en trop | Usage correct sans argument |
@@ -1940,7 +1939,6 @@ Les conseils enrichissent la sortie mais **ne corrigent jamais automatiquement**
 ```bash
 forge --version
 forge new GestionVentes
-forge new ForgeDev --ref main
 ```
 
 ```bash

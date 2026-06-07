@@ -158,7 +158,7 @@ Ces commandes et leurs options documentées sont garanties pour Forge 1.x.
 
 | Commande | Rôle |
 |---|---|
-| `forge new NomProjet [--ref REF] [--profile PROFIL]` | Crée un projet |
+| `forge new NomProjet [--profile PROFIL]` | Crée un projet |
 | `forge doctor` | Diagnostique l'environnement (tolérant, lecture seule) |
 | `forge project:check` | Contrôle strict des conventions (CI-ready) |
 | `forge project:audit` | Rapport d'audit détaillé non destructif |

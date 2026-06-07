@@ -128,17 +128,12 @@ python -m pip install -r requirements-dev.txt
 
 ## Version stable
 
-Forge {{forge_version}} utilise la référence stable `{{forge_tag}}` par défaut.
+`forge new` crée un projet nu à partir d'un squelette embarqué et y installe
+Forge depuis le paquet `forge-mvc`.
 
 ```bash
 forge --version
 forge new MonProjet
-```
-
-Pour travailler explicitement depuis la branche de développement :
-
-```bash
-forge new MonProjet --ref main
 ```
 
 ## Après installation

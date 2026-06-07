@@ -22,12 +22,6 @@ forge new MonProjet --profile dynamic
 forge new MonProjet --profile multilingual
 ```
 
-Compatibilité avec `--ref` :
-
-```bash
-forge new MonProjet --ref {{forge_tag}} --profile standard
-```
-
 Sans `--profile`, Forge utilise le profil `standard`.
 
 ---
