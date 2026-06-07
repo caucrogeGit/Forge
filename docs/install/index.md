@@ -128,8 +128,8 @@ python -m pip install -r requirements-dev.txt
 
 ## Version stable
 
-`forge new` crée un projet nu à partir d'un squelette embarqué et y installe
-Forge depuis le paquet `forge-mvc`.
+Forge {{forge_version}} crée avec `forge new` un projet nu à partir d'un
+squelette embarqué, et y installe Forge depuis le paquet `forge-mvc`.
 
 ```bash
 forge --version
