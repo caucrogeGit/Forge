@@ -4,7 +4,7 @@ Contrat du palier 2 du niveau intermédiaire — Rechercher / filtrer :
 
 - starter.json : `filter-list`, slot 13, requires_db true ;
 - snippet : `GET /filter-list` ;
-- contrôleur : `fetch_all` + `request.param("q")` + `WHERE content LIKE ?`
+- contrôleur : `fetch_all` + `request.query("q")` + `WHERE content LIKE ?`
   paramétré (jamais concaténé) ;
 - vue : formulaire de recherche en `method="get"` (pas de CSRF) ;
 - migration SQL présente ;
@@ -58,7 +58,7 @@ def test_snippet_route():
 def test_controller_param_and_parameterized_where():
     text = CONTROLLER.read_text(encoding="utf-8")
     assert "from core.database.db import fetch_all" in text
-    assert 'request.param("q"' in text
+    assert 'request.query("q"' in text
     assert "WHERE content LIKE ?" in text
     # paramètre lié, pas de concaténation du motif dans la chaîne SQL
     assert 'f"%{query}%"' in text

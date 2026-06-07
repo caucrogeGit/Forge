@@ -23,7 +23,7 @@ Lecture seule, aucun ffmpeg.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `request.route_param` | Lire l'`uuid` dans l'URL. | [Request](../../../reference/api.md#corehttprequest) |
+| `request.route` | Lire l'`uuid` dans l'URL. | [Request](../../../reference/api.md#corehttprequest) |
 | `VideoRepository.get_by_uuid` | Lire une vidéo précise (ou `None`). | [Parcours vidéo](../../../video/parcours.md) |
 
 ## Tester
@@ -47,7 +47,7 @@ class VideoDetailController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        uuid = request.route_param("uuid")
+        uuid = request.route("uuid")
         try:
             video = VideoRepository().get_by_uuid(uuid)
         except Exception:
@@ -59,7 +59,7 @@ class VideoDetailController(BaseController):
 
 ### Comprendre ce code
 
-- `uuid` vient de l'**URL** (`route_param`) : on cible la vidéo sans query string.
+- `uuid` vient de l'**URL** (`route`) : on cible la vidéo sans query string.
 - `get_by_uuid(uuid)` renvoie un dictionnaire **ou `None`** : on traduit `None` en
   `404`, jamais une page d'erreur brute.
 - L'absence de table reste un `503` pédagogique, comme au palier précédent.
@@ -68,7 +68,7 @@ class VideoDetailController(BaseController):
 
 - `get_by_uuid(uuid)` lit une vidéo précise.
 - Distinguer **trouvée / inconnue / indisponible** = `200` / `404` / `503`.
-- Une route **paramétrée** cible une ressource via `route_param`.
+- Une route **paramétrée** cible une ressource via `route`.
 
 ## Après ce starter
 

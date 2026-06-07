@@ -85,7 +85,7 @@ with router.group("", public=True) as pub:
 - Deux routes partagent le chemin `/form-post` : `GET` affiche le
   formulaire, `POST` traite l'envoi.
 - `request.form("name", default="Forge")` lit un champ du corps du
-  formulaire, là où `request.param(...)` lisait la chaîne de requête.
+  formulaire, là où `request.query(...)` lisait la chaîne de requête.
 - Le champ caché `csrf_token` du gabarit permet au POST de passer la
   protection CSRF du groupe public.
 

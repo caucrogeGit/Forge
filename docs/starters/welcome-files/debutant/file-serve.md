@@ -23,7 +23,7 @@ Troisième palier du **niveau débutant** de la progression files.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `forge_mvc_files.serve_media_file` | Servir un fichier par son chemin relatif, anti-traversal + 404. | [Médias](../../../features/media.md) |
-| `request.param(...)` | Lire le chemin demandé. | [Request](../../../reference/http.md) |
+| `request.query(...)` | Lire le chemin demandé. | [Request](../../../reference/http.md) |
 
 ## Tester
 
@@ -46,7 +46,7 @@ class FileServeController(BaseController):
 
     @staticmethod
     def download(request: Request) -> Response:
-        path = request.param("path") or ""
+        path = request.query("path") or ""
         if not path:
             return Response.text("Paramètre « path » requis.", status=400)
         # serve_media_file gère lui-même l'anti-traversal et le 404.

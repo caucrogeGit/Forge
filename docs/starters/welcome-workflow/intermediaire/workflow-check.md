@@ -45,8 +45,8 @@ class WorkflowCheckController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        from_name = request.param("from") or "draft"
-        to_name = request.param("to") or "published"
+        from_name = request.query("from") or "draft"
+        to_name = request.query("to") or "published"
         allowed = can_transition(_TRANSITIONS, from_name, to_name)
 ```
 

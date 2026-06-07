@@ -3,7 +3,7 @@
 Verrouille la convention d'inspection appliquée à `Request` et `Response` :
 
   - accesseurs nommés (`request.param`, `request.form`, `request.json`,
-    `request.file`, `request.header`, `request.route_param`) ;
+    `request.file`, `request.header`, `request.route`) ;
   - vue d'inspection `.data` stable, masquage systématique des valeurs
     sensibles (Authorization, Cookie, password, csrf, token, …) ;
   - constructeurs nommés (`Response.text`, `Response.html`,
@@ -80,17 +80,17 @@ def _handler(method="GET", path="/", headers=None, body=b"") -> SimpleNamespace:
 class TestRequestAccessors:
     def test_param_lit_la_query_string(self):
         req = Request(_handler(path="/search?q=forge&page=2"))
-        assert req.param("q") == "forge"
-        assert req.param("page") == "2"
+        assert req.query("q") == "forge"
+        assert req.query("page") == "2"
 
     def test_param_retourne_default_si_absent(self):
         req = Request(_handler(path="/search"))
-        assert req.param("missing") is None
-        assert req.param("missing", default="1") == "1"
+        assert req.query("missing") is None
+        assert req.query("missing", default="1") == "1"
 
     def test_param_renvoie_la_premiere_valeur(self):
         req = Request(_handler(path="/?tag=a&tag=b"))
-        assert req.param("tag") == "a"
+        assert req.query("tag") == "a"
 
     def test_header_lit_un_header(self):
         req = Request(_handler(headers={"User-Agent": "curl/8.0"}))
@@ -172,12 +172,12 @@ class TestRequestAccessors:
     def test_route_param_lit_les_parametres_de_route(self):
         req = Request(_handler())
         req.route_params = {"id": "42"}
-        assert req.route_param("id") == "42"
+        assert req.route("id") == "42"
 
     def test_route_param_retourne_default_si_absent(self):
         req = Request(_handler())
-        assert req.route_param("missing") is None
-        assert req.route_param("missing", default="x") == "x"
+        assert req.route("missing") is None
+        assert req.route("missing", default="x") == "x"
 
 
 # ── 2. `Request.data` — structure et stabilité ───────────────────────────────

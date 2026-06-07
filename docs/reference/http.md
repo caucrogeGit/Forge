@@ -86,12 +86,12 @@ request.route_params    # dict[str, str]
 
 | API | Lit | Retourne |
 |---|---|---|
-| `request.param(key, default=None)` | `params` | `str` ou `default` |
+| `request.query(key, default=None)` | `params` | `str` ou `default` |
 | `request.header(name, default=None)` | `headers` | `str` ou `default` (insensible à la casse) |
 | `request.form(key, default=None)` | `body` | `str` ou `default` |
 | `request.json(key, default=None)` | `json_body` | valeur JSON ou `default` |
 | `request.file(key, default=None)` | `files` | `UploadedFile` ou `default` |
-| `request.route_param(key, default=None)` | `route_params` | `str` ou `default` |
+| `request.route(key, default=None)` | `route_params` | `str` ou `default` |
 
 ### Exemple
 
@@ -101,7 +101,7 @@ from core.http.response import Response
 
 
 def search(request: Request) -> Response:
-    page = request.param("page", default="1")
+    page = request.query("page", default="1")
     accept = request.header("Accept", default="text/html")
     return Response.text(f"page={page} accept={accept}")
 
@@ -117,7 +117,7 @@ Les contrôleurs générés par Forge (`forge new`, `forge make:crud`,
 `forge make:public-contact`) importent `Request` et `Response` et annotent
 chaque action publique avec `request: Request` et `-> Response`. C'est
 suffisant pour que Pylance/VS Code fournisse l'autocomplétion sur
-`request.` (params, form, json, file, route_param, header, data) sans
+`request.` (query, form, json, file, route, header, data) sans
 import manuel.
 
 ### `Response.text` vs `BaseController.render` — quand utiliser quoi

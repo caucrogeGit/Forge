@@ -3,7 +3,7 @@
 Objectif : lire une valeur passée dans l'adresse, par exemple `?name=Roger`.
 
 **Ce que vous allez apprendre :** récupérer une valeur de la chaîne de
-requête avec `request.param("name", default=...)`, avec une valeur de repli
+requête avec `request.query("name", default=...)`, avec une valeur de repli
 quand le paramètre est absent.
 
 ## Là où nous en sommes
@@ -25,7 +25,7 @@ Ajoutez ces deux méthodes à la classe `WelcomeController` :
 
     @staticmethod
     def hello(request: Request) -> Response:
-        name = request.param("name", default="Forge")
+        name = request.query("name", default="Forge")
         return Response.text(f"Bonjour {name}")
 ```
 
@@ -52,7 +52,7 @@ with router.group("", public=True) as pub:
 
 - La chaîne de requête est la partie après le `?` : `?name=Roger` porte la
   valeur `name=Roger`.
-- `request.param("name", default="Forge")` lit cette valeur ; le second
+- `request.query("name", default="Forge")` lit cette valeur ; le second
   argument évite tout cas particulier « clé absente ».
 - La valeur retournée est toujours de type `str` ; une conversion (entier,
   date) reste à votre charge dans le contrôleur.
@@ -68,7 +68,7 @@ with router.group("", public=True) as pub:
 
 ## À retenir
 
-- `request.param(cle, default=...)` lit une valeur de la chaîne de requête.
+- `request.query(cle, default=...)` lit une valeur de la chaîne de requête.
 - `default=...` est renvoyé si la clé est absente : pas d'exception, pas de
   `None` à gérer.
 - La réponse reste un `Response.text(...)`, donc aucun template.

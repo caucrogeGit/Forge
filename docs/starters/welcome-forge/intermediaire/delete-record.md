@@ -22,7 +22,7 @@ après [Modifier un enregistrement](update-record.md).
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | `request.route_param("id")`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Request` | `request.route("id")`. | [Request](../../../reference/http.md#3-request-reference) |
 | `Response` | Produite via `render(...)`. | [Response](../../../reference/http.md#4-response-reference) |
 | `BaseController` | `render(...)` + `csrf_token(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
 | `core.database.db.execute` / `fetch_all` | Supprimer une ligne, relire la liste. | [Migrations SQL](../../../features/migrations.md) |
@@ -58,7 +58,7 @@ class DeleteRecordController(BaseController):
 
     @staticmethod
     def delete(request: Request) -> Response:
-        record_id = int(request.route_param("id"))
+        record_id = int(request.route("id"))
         execute(DELETE_ONE, (record_id,))
         messages = fetch_all(SELECT_ALL)
         return BaseController.render(

@@ -129,7 +129,7 @@ Périmètre : 1 ticket (`STARTER-BONJOUR-FORGE-001`).
 
 Contenu :
 - `forge_cli/starters/data/welcome/files/mvc/controllers/welcome_controller.py`
-  refondu autour du parcours `Response.text(...) → request.param(...) →
+  refondu autour du parcours `Response.text(...) → request.query(...) →
   Response.debug(request.data) → BaseController.render(...)`.
 - Suppression de
   `forge_cli/starters/data/welcome/files/mvc/views/welcome/index.html`.
@@ -386,7 +386,7 @@ le tag `v1.0.0-beta.11` et la publication PyPI sont portés par
 - Refonte pédagogique du starter `welcome` (STARTER-BONJOUR-FORGE-001) —
   alias `bonjour` / `bonjour-forge` / `bienvenue` / `7`. Progression :
   `index` retourne `Response.text("Bonjour Forge")`, puis
-  `/welcome/greet?name=…` (`request.param(...)`),
+  `/welcome/greet?name=…` (`request.query(...)`),
   `/welcome/inspect` (`Response.debug(request.data)`), enfin
   `/welcome/cycle` introduit `BaseController.render(...)`. Vue
   `welcome/index.html` retirée.

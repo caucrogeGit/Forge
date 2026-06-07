@@ -33,7 +33,7 @@ class RbacRoleController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        name = request.param("name") or _DEMO_NAME
+        name = request.query("name") or _DEMO_NAME
         return BaseController.render(
             "rbac_role/index.html", context=_role_view(name), request=request
         )

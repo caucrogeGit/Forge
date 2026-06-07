@@ -8,9 +8,9 @@ l'état final complet des deux contrôleurs et du fichier de routes.
 
 - Palier 1 : le cycle requête vers contrôleur vers réponse, avec
   `Response.text(...)`.
-- Palier 2 : lire la chaîne de requête avec `request.param("cle", default=...)`.
+- Palier 2 : lire la chaîne de requête avec `request.query("cle", default=...)`.
 - Palier 3 : rendre une page HTML avec `BaseController.render(...)`.
-- Palier 4 : capturer un segment de chemin avec `request.route_param("id", default=...)`.
+- Palier 4 : capturer un segment de chemin avec `request.route("id", default=...)`.
 - Palier 5 : inspecter une requête avec `Response.debug(request.data)` (en
   développement seulement).
 - Palier 6 : renvoyer des données structurées avec `Response.json({...})`.
@@ -44,7 +44,7 @@ class WelcomeController(BaseController):
 
     @staticmethod
     def hello(request: Request) -> Response:
-        name = request.param("name", default="Forge")
+        name = request.query("name", default="Forge")
         return Response.text(f"Bonjour {name}")
 
     @staticmethod
@@ -53,7 +53,7 @@ class WelcomeController(BaseController):
 
     @staticmethod
     def show_article(request: Request) -> Response:
-        article_id = request.route_param("id", default="inconnu")
+        article_id = request.route("id", default="inconnu")
         return Response.text(f"Article {article_id}")
 
     @staticmethod

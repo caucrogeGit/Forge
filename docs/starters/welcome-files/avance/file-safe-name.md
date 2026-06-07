@@ -24,7 +24,7 @@ Premier palier du **niveau avancé** de la progression files.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `forge_mvc_files.secure_filename` | Assainir un nom de fichier utilisateur. | [Médias](../../../features/media.md) |
-| `request.param(...)` | Lire le nom à assainir. | [Request](../../../reference/http.md) |
+| `request.query(...)` | Lire le nom à assainir. | [Request](../../../reference/http.md) |
 
 ## Tester
 
@@ -53,7 +53,7 @@ class FileSafeNameController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        name = request.param("name") or "../Mon Dossier/Rapport Final!.PDF"
+        name = request.query("name") or "../Mon Dossier/Rapport Final!.PDF"
         return BaseController.render("file_safe_name/index.html", context=_safe_view(name), request=request)
 ```
 

@@ -58,7 +58,7 @@ def test_controller_limit_offset_count():
     assert "from core.database.db import fetch_all, fetch_one" in text
     assert "LIMIT ? OFFSET ?" in text
     assert "COUNT(*)" in text
-    assert 'request.param("page"' in text
+    assert 'request.query("page"' in text
     assert "def index(request: Request) -> Response" in text
     tree = ast.parse(text)
     ctrl = next((c for c in tree.body if isinstance(c, ast.ClassDef)

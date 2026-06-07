@@ -54,7 +54,7 @@ class FileSafePathController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        path = request.param("path") or "../../etc/passwd"
+        path = request.query("path") or "../../etc/passwd"
         return BaseController.render("file_safe_path/index.html", context=_path_view(path), request=request)
 ```
 

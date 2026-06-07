@@ -4,7 +4,7 @@ Objectif : capturer une partie variable du chemin de l'URL, par exemple un
 identifiant d'article.
 
 **Ce que vous allez apprendre :** déclarer une route avec un segment
-dynamique `{id}` et lire ce segment avec `request.route_param("id", default=...)`.
+dynamique `{id}` et lire ce segment avec `request.route("id", default=...)`.
 
 ## Là où nous en sommes
 
@@ -19,7 +19,7 @@ Ajoutez cette méthode à la classe `WelcomeController` :
 ```python
     @staticmethod
     def show_article(request: Request) -> Response:
-        article_id = request.route_param("id", default="inconnu")
+        article_id = request.route("id", default="inconnu")
         return Response.text(f"Article {article_id}")
 ```
 
@@ -49,9 +49,9 @@ with router.group("", public=True) as pub:
 
 - `{id}` dans le chemin déclare un segment dynamique : il accepte n'importe
   quelle valeur à cet endroit de l'URL.
-- `request.route_param("id", default="inconnu")` lit la valeur capturée par
+- `request.route("id", default="inconnu")` lit la valeur capturée par
   ce segment.
-- C'est différent de `request.param(...)` du palier 2 : ici la valeur est
+- C'est différent de `request.query(...)` du palier 2 : ici la valeur est
   dans le chemin lui-même, pas dans la chaîne de requête après le `?`.
 
 ## Tester dans le navigateur
@@ -64,7 +64,7 @@ with router.group("", public=True) as pub:
 ## À retenir
 
 - Un segment `{nom}` dans le chemin capture une valeur variable.
-- `request.route_param("nom", default=...)` lit cette valeur.
+- `request.route("nom", default=...)` lit cette valeur.
 - Segment de chemin et chaîne de requête sont deux sources distinctes.
 
 Au palier suivant, nous inspectons le contenu d'une requête pour le déboguer.

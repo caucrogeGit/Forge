@@ -89,9 +89,9 @@ class WelcomeController(BaseController):
 ```
 
 Les annotations `request: Request -> Response` sont systématiques pour
-que Pylance/VS Code propose l'autocomplétion sur `request.param(...)`,
+que Pylance/VS Code propose l'autocomplétion sur `request.query(...)`,
 `request.form(...)`, `request.json(...)`, `request.file(...)`,
-`request.route_param(...)` et `request.header(...)` sans import manuel.
+`request.route(...)` et `request.header(...)` sans import manuel.
 Voir [Convention HTTP inspectable](../reference/http.md).
 
 ---
@@ -121,15 +121,15 @@ Navigateur → GET /welcome → Router → WelcomeController.index(request) → 
 
 ---
 
-## 5. Utiliser `request.param(...)`
+## 5. Utiliser `request.query(...)`
 
-`request.param("name", default="Forge")` retourne la première valeur
+`request.query("name", default="Forge")` retourne la première valeur
 du paramètre `?name=...`, ou la valeur par défaut.
 
 ```python
 @staticmethod
 def greet(request: Request) -> Response:
-    name = request.param("name", default="Forge")
+    name = request.query("name", default="Forge")
     return Response.text(f"Bonjour {name}")
 ```
 
@@ -140,11 +140,11 @@ D'autres accesseurs nommés couvrent les autres canaux d'entrée :
 
 | Accesseur | Lit | Retourne |
 |---|---|---|
-| `request.param(key, default=None)` | query string | `str` ou `default` |
+| `request.query(key, default=None)` | query string | `str` ou `default` |
 | `request.form(key, default=None)` | formulaire `application/x-www-form-urlencoded` | `str` ou `default` |
 | `request.json(key, default=None)` | body JSON | valeur JSON ou `default` |
 | `request.header(name, default=None)` | en-têtes HTTP (insensible à la casse) | `str` ou `default` |
-| `request.route_param(key, default=None)` | paramètres dynamiques (`/contacts/{id}`) | `str` ou `default` |
+| `request.route(key, default=None)` | paramètres dynamiques (`/contacts/{id}`) | `str` ou `default` |
 | `request.file(key, default=None)` | upload `multipart/form-data` | `UploadedFile` ou `default` |
 
 ---

@@ -29,7 +29,7 @@ class WorkflowFindController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        name = normalize_status_name(request.param("name") or "review")
+        name = normalize_status_name(request.query("name") or "review")
         found = find_status(_STATUSES, name)
         return BaseController.render(
             "workflow_find/index.html",

@@ -21,7 +21,7 @@ class FakeRequest:
         self._params = params or {}
         self._headers = headers or {}
 
-    def route_param(self, name):
+    def route(self, name):
         return self._params.get(name)
 
     def header(self, name, default=None):

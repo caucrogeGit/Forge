@@ -5,7 +5,7 @@ Contrat du palier 6 du niveau intermédiaire — Supprimer un enregistrement :
 - starter.json : `delete-record`, slot 17, requires_db true ;
 - snippet : GET liste, POST suppression ;
 - contrôleur : `execute("DELETE … WHERE id = ?")` paramétré,
-  `request.route_param("id")`, CSRF ; après écriture, relit + ré-affiche ;
+  `request.route("id")`, CSRF ; après écriture, relit + ré-affiche ;
 - vue : suppression par mini-formulaire POST + jeton CSRF (pas de lien GET) ;
 - migration ; doc + catalogue.
 """
@@ -52,7 +52,7 @@ def test_controller_delete():
     text = CONTROLLER.read_text(encoding="utf-8")
     assert "from core.database.db import execute, fetch_all" in text
     assert "DELETE FROM first_sql_messages WHERE id = ?" in text
-    assert 'request.route_param("id")' in text
+    assert 'request.route("id")' in text
     assert "csrf_token" in text
     tree = ast.parse(text)
     ctrl = next((c for c in tree.body if isinstance(c, ast.ClassDef)

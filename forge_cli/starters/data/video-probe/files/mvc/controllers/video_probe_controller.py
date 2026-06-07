@@ -37,7 +37,7 @@ class VideoProbeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        uuid = request.route_param("uuid")
+        uuid = request.route("uuid")
         try:
             video = VideoRepository().get_by_uuid(uuid)
         except Exception:

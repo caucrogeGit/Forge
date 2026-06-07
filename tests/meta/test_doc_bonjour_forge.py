@@ -78,7 +78,7 @@ class TestParcoursPedagogique:
         assert 'Response.text("Bonjour Forge")' in _text()
 
     def test_request_param_documente(self):
-        assert "request.param(" in _text()
+        assert "request.query(" in _text()
 
     def test_ordre_route_avant_response_text(self):
         """L'ordre des sections suit la progression pédagogique :

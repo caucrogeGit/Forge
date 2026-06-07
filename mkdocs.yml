@@ -363,6 +363,7 @@ nav:
           - ADR-023 Starter build canonique: adr/023-starter-build-canonical.md
           - ADR-024 Bootstrap squelette dédié: adr/024-skeleton-bootstrap.md
           - ADR-025 welcome-forge tutoriel continu: adr/025-welcome-forge-continuous-tutorial.md
+          - ADR-026 Accesseurs Request query/route: adr/026-request-param-naming.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md

@@ -228,8 +228,8 @@ class Request:
     # retourne la première valeur — l'attribut brut reste accessible si le
     # contrôleur a besoin de toutes les valeurs.
 
-    def param(self, key: str, default: str | None = None) -> str | None:
-        """Premier paramètre de query string pour `key`."""
+    def query(self, key: str, default: str | None = None) -> str | None:
+        """Premier paramètre de query string pour `key` (`?clé=valeur`)."""
         values = self.params.get(key)
         if not values:
             return default
@@ -268,8 +268,8 @@ class Request:
         """Fichier uploadé pour le champ `key` (`UploadedFile` ou `default`)."""
         return self.files.get(key, default)
 
-    def route_param(self, key: str, default: str | None = None) -> str | None:
-        """Paramètre dynamique de route (`/clients/{id}` → `route_param('id')`)."""
+    def route(self, key: str, default: str | None = None) -> str | None:
+        """Paramètre dynamique de route (`/clients/{id}` → `route('id')`)."""
         return self.route_params.get(key, default)
 
     # ── Vue d'inspection (.data) ────────────────────────────────────────────

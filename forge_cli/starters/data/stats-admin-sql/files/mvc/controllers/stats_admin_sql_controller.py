@@ -23,7 +23,7 @@ class StatsAdminSqlController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        category = request.param("category") or None
+        category = request.query("category") or None
         return BaseController.render(
             "stats_admin_sql/index.html",
             context={

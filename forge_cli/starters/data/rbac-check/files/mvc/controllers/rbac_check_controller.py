@@ -22,8 +22,8 @@ class RbacCheckController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        roles_raw = request.param("roles") or "reader"
-        permission = request.param("permission") or "article.create"
+        roles_raw = request.query("roles") or "reader"
+        permission = request.query("permission") or "article.create"
         roles = [r.strip() for r in roles_raw.split(",") if r.strip()]
         result = load_rbac_contract(".")
         granted = has_contract_permission(result, roles, permission)

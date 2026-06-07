@@ -44,7 +44,7 @@ class FakeRequest:
     # pour que `FakeRequest` se comporte comme `core.http.request.Request`
     # dans les tests qui exercent les contrôleurs typés.
 
-    def param(self, key, default=None):
+    def query(self, key, default=None):
         values = self.params.get(key)
         if not values:
             return default
@@ -70,7 +70,7 @@ class FakeRequest:
     def file(self, key, default=None):
         return self.files.get(key, default)
 
-    def route_param(self, key, default=None):
+    def route(self, key, default=None):
         return self.route_params.get(key, default)
 
     @property

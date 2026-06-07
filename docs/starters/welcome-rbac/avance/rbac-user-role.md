@@ -43,8 +43,8 @@ class RbacUserRoleController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        user_id = int(request.param("user_id") or 1)
-        role_id = int(request.param("role_id") or 2)
+        user_id = int(request.query("user_id") or 1)
+        role_id = int(request.query("role_id") or 2)
         association = create_auth_user_role(user_id, role_id)
         # association.user_id, association.role_id — à persister dans user_roles
 ```

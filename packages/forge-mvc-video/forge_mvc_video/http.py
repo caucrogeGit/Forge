@@ -76,7 +76,7 @@ class VideoHttpController:
         if not _is_authorized(request, self._api_token):
             return _error("unauthorized", 401)
 
-        uuid = request.route_param("uuid")
+        uuid = request.route("uuid")
         try:
             row = self._repo.get_by_uuid(uuid)
         except Exception:

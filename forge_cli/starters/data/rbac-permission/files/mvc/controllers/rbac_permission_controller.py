@@ -34,7 +34,7 @@ class RbacPermissionController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        code = request.param("code") or _DEMO_CODE
+        code = request.query("code") or _DEMO_CODE
         return BaseController.render(
             "rbac_permission/index.html", context=_permission_view(code), request=request
         )

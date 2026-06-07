@@ -9,9 +9,9 @@ avant d'aborder les progressions opt-in autonomes.
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Bonjour Forge](debutant/welcome.md) | Premier contrôleur, une route, réponse texte | `Response.text(...)` |
-| 2 | [Paramètres d'URL](debutant/query-params.md) | Lire la query string | `request.param("name", default=...)` |
+| 2 | [Paramètres d'URL](debutant/query-params.md) | Lire la query string | `request.query("name", default=...)` |
 | 3 | [Première vue HTML](debutant/first-html-view.md) | Rendre un template | `BaseController.render(...)` |
-| 4 | [Route dynamique](debutant/dynamic-route.md) | Segment variable d'URL | `request.route_param("id")` |
+| 4 | [Route dynamique](debutant/dynamic-route.md) | Segment variable d'URL | `request.route("id")` |
 | 5 | [Inspecter une requête](debutant/request-debug.md) | Explorer la requête en dev | `request.data`, `Response.debug(...)` |
 | 6 | [Réponse JSON](debutant/json-response.md) | Données structurées (API) | `Response.json({...})` |
 | 7 | [Le jeton CSRF](debutant/csrf.md) | Protéger les formulaires | `BaseController.csrf_token(request)` |
@@ -25,7 +25,7 @@ avant d'aborder les progressions opt-in autonomes.
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Lister des enregistrements](intermediaire/list-records.md) | Lire plusieurs lignes et les itérer | `fetch_all(...)`, `{% for %}` |
-| 2 | [Rechercher / filtrer](intermediaire/filter-list.md) | Filtrer une liste | `request.param("q")` + `WHERE … LIKE ?` |
+| 2 | [Rechercher / filtrer](intermediaire/filter-list.md) | Filtrer une liste | `request.query("q")` + `WHERE … LIKE ?` |
 | 3 | [Paginer une liste](intermediaire/pagination.md) | Découper une liste en pages | `LIMIT ? OFFSET ?`, `COUNT(*)` |
 | 4 | [Héritage de gabarit](intermediaire/layout-template.md) | Factoriser l'enveloppe HTML | `{% extends %}`, `{% block %}` |
 | 5 | [Modifier un enregistrement](intermediaire/update-record.md) | Formulaire pré-rempli + mise à jour | `execute("UPDATE … WHERE id = ?")` |
@@ -57,8 +57,8 @@ avant d'aborder les progressions opt-in autonomes.
 
 | Accès | Source |
 |-------|--------|
-| `request.param("k", default=...)` | Query string (`?k=...`) |
-| `request.route_param("k")` | Segment de route (`/x/{k}`) |
+| `request.query("k", default=...)` | Query string (`?k=...`) |
+| `request.route("k")` | Segment de route (`/x/{k}`) |
 | `request.form("k", default=...)` | Corps d'un formulaire POST |
 | `request.file("k")` | Fichier reçu (`multipart/form-data`) |
 | `request.header("Name", default=...)` | En-tête HTTP (`Authorization`…) |

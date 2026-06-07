@@ -35,7 +35,7 @@ class DeleteRecordController(BaseController):
 
     @staticmethod
     def delete(request: Request) -> Response:
-        record_id = int(request.route_param("id"))
+        record_id = int(request.route("id"))
         execute(DELETE_ONE, (record_id,))
         # On relit la base et on ré-affiche la liste à jour.
         messages = fetch_all(SELECT_ALL)

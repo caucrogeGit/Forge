@@ -57,7 +57,7 @@ class VideoProbeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        uuid = request.route_param("uuid")
+        uuid = request.route("uuid")
         video = VideoRepository().get_by_uuid(uuid)
         if video is None:
             return Response.json({"error": "video_not_found", "uuid": uuid}, status=404)

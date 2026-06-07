@@ -46,7 +46,7 @@ class RbacGuardController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        roles = [r.strip() for r in (request.param("roles") or "reader").split(",") if r.strip()]
+        roles = [r.strip() for r in (request.query("roles") or "reader").split(",") if r.strip()]
         result = load_rbac_contract(".")
         denied = require_contract_permission(result, roles, _REQUIRED)
         if denied is not None:

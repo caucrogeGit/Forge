@@ -50,7 +50,7 @@ class AudioProbeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        rel = request.param("path") or ""
+        rel = request.query("path") or ""
         return BaseController.render(
             "audio_probe/index.html", context=_probe_view(rel), request=request
         )

@@ -33,8 +33,8 @@ class IotDeviceController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        site = request.route_param("site")
-        device_id = request.route_param("device_id")
+        site = request.route("site")
+        device_id = request.route("device_id")
         repo = IotEventRepository()
         try:
             events = repo.find_by_device(site, device_id, limit=20)

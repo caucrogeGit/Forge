@@ -137,7 +137,7 @@ def _parse_limit(request: Any) -> int:
     - non convertible en ``int`` → ``_BadLimit`` ;
     - hors plage ``1..MAX_LIMIT`` → ``_BadLimit``.
     """
-    raw = request.param("limit", default=None)
+    raw = request.query("limit", default=None)
     if raw is None or raw == "":
         return DEFAULT_LIMIT
     try:
@@ -248,8 +248,8 @@ class IotHttpController:
     def find_by_device(self, request: Any) -> Response:
         if not _is_authorized(request, self._api_token):
             return _unauthorized_response()
-        site = request.route_param("site")
-        device_id = request.route_param("device_id")
+        site = request.route("site")
+        device_id = request.route("device_id")
         try:
             limit = _parse_limit(request)
         except _BadLimit as exc:
@@ -269,8 +269,8 @@ class IotHttpController:
     def count_by_device(self, request: Any) -> Response:
         if not _is_authorized(request, self._api_token):
             return _unauthorized_response()
-        site = request.route_param("site")
-        device_id = request.route_param("device_id")
+        site = request.route("site")
+        device_id = request.route("device_id")
         try:
             count = self._repo.count_by_device(site, device_id)
         except Exception:

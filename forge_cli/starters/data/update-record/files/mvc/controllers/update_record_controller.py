@@ -39,7 +39,7 @@ class UpdateRecordController(BaseController):
 
     @staticmethod
     def edit(request: Request) -> Response:
-        record_id = int(request.route_param("id"))
+        record_id = int(request.route("id"))
         message = fetch_one(SELECT_ONE, (record_id,))
         if message is None:
             return Response.text("Enregistrement introuvable.", status=404)
@@ -51,7 +51,7 @@ class UpdateRecordController(BaseController):
 
     @staticmethod
     def update(request: Request) -> Response:
-        record_id = int(request.route_param("id"))
+        record_id = int(request.route("id"))
         content = request.form("content", default="").strip()
         if not content:
             return Response.text("Le contenu est obligatoire.", status=422)

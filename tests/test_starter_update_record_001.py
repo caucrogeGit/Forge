@@ -5,7 +5,7 @@ Contrat du palier 5 du niveau intermédiaire — Modifier un enregistrement :
 - starter.json : `update-record`, slot 16, requires_db true ;
 - snippet : GET liste, GET edit, POST update ;
 - contrôleur : `fetch_one` (pré-remplissage) + `execute("UPDATE … WHERE id=?")`,
-  `request.route_param("id")`, `request.form("content")`, CSRF (csrf_token),
+  `request.route("id")`, `request.form("content")`, CSRF (csrf_token),
   refus 422 si vide, 404 si introuvable ;
 - vue d'édition pré-remplie avec jeton CSRF ; migration ; doc + catalogue.
 """
@@ -53,7 +53,7 @@ def test_controller_update_and_prefill():
     text = CONTROLLER.read_text(encoding="utf-8")
     assert "from core.database.db import execute, fetch_all, fetch_one" in text
     assert "UPDATE first_sql_messages SET content = ? WHERE id = ?" in text
-    assert 'request.route_param("id")' in text
+    assert 'request.route("id")' in text
     assert 'request.form("content"' in text
     assert "csrf_token" in text
     # garde-fous HTTP honnêtes

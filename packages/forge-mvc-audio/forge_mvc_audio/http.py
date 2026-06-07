@@ -70,7 +70,7 @@ class AudioHttpController:
         if not _is_authorized(request, self._api_token):
             return _error("unauthorized", 401)
 
-        uuid = request.route_param("uuid")
+        uuid = request.route("uuid")
         # Chemin retrouvé sur le disque (jamais depuis l'URL) ; uuid validé en
         # interne par resolve_playable_relpath → pas de path traversal.
         rel = resolve_playable_relpath(uuid, storage_root=self._config.storage_root)

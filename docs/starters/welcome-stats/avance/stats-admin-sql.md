@@ -38,7 +38,7 @@ Ouvrez `https://localhost:8000/stats-admin-sql?category=navigation` : le `SELECT
 # mvc/controllers/stats_admin_sql_controller.py
 from forge_mvc_stats import get_stats_events_admin_sql, prepare_stats_events_admin_params
 
-category = request.param("category") or None
+category = request.query("category") or None
 sql = get_stats_events_admin_sql(category=category, limit=20)
 params = prepare_stats_events_admin_params(category=category, limit=20)
 ```

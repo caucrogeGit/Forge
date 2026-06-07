@@ -29,7 +29,7 @@ class WorkflowAvailableController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        from_name = request.param("from") or "review"
+        from_name = request.query("from") or "review"
         available = get_available_transitions(_TRANSITIONS, from_name)
         return BaseController.render(
             "workflow_available/index.html",

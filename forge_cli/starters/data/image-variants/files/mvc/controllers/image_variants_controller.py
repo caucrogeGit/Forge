@@ -51,7 +51,7 @@ class ImageVariantsController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        path = request.param("path") or _DEMO_PATH
+        path = request.query("path") or _DEMO_PATH
         return BaseController.render(
             "image_variants/index.html",
             context=_variants_view(path),
@@ -60,5 +60,5 @@ class ImageVariantsController(BaseController):
 
     @staticmethod
     def inspect(request: Request) -> Response:
-        path = request.param("path") or _DEMO_PATH
+        path = request.query("path") or _DEMO_PATH
         return Response.json(_variants_view(path))

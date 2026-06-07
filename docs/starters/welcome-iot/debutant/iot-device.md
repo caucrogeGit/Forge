@@ -24,7 +24,7 @@ Lecture seule, aucun broker.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `request.route_param` | Lire `site` et `device_id` dans l'URL. | [Request](../../../reference/api.md#corehttprequest) |
+| `request.route` | Lire `site` et `device_id` dans l'URL. | [Request](../../../reference/api.md#corehttprequest) |
 | `IotEventRepository.find_by_device` | Événements d'un capteur (ordre du plus récent). | [Forge IoT — stockage](../../../iot/storage-events.md) |
 | `IotEventRepository.count_by_device` | Nombre d'événements d'un capteur. | [Forge IoT — stockage](../../../iot/storage-events.md) |
 
@@ -49,8 +49,8 @@ class IotDeviceController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        site = request.route_param("site")
-        device_id = request.route_param("device_id")
+        site = request.route("site")
+        device_id = request.route("device_id")
         repo = IotEventRepository()
         try:
             events = repo.find_by_device(site, device_id, limit=20)
@@ -67,7 +67,7 @@ class IotDeviceController(BaseController):
 
 ### Comprendre ce code
 
-- `site` et `device_id` viennent de l'**URL** (`route_param`) : on cible le
+- `site` et `device_id` viennent de l'**URL** (`route`) : on cible le
   capteur sans query string.
 - `find_by_device(...)` filtre les événements de ce capteur ; `count_by_device`
   donne le total — deux lectures complémentaires du même repository.
@@ -77,7 +77,7 @@ class IotDeviceController(BaseController):
 
 - `find_by_device(site, device_id)` filtre les événements d'un capteur.
 - `count_by_device(site, device_id)` en donne le nombre.
-- Une route **paramétrée** cible une ressource précise via `route_param`.
+- Une route **paramétrée** cible une ressource précise via `route`.
 
 ## Après ce starter
 

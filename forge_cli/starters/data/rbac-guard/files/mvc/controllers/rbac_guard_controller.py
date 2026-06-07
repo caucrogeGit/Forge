@@ -25,7 +25,7 @@ class RbacGuardController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        roles_raw = request.param("roles") or "reader"
+        roles_raw = request.query("roles") or "reader"
         roles = [r.strip() for r in roles_raw.split(",") if r.strip()]
         result = load_rbac_contract(".")
         context = {"roles": roles_raw, "required": _REQUIRED}

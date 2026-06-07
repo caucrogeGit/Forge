@@ -33,7 +33,7 @@ Aucune base de données.
 | `forge_mvc_images.image_variant_relative_paths` | Dériver les chemins relatifs des variantes. | [Médias](../../../features/media.md) |
 | `forge_mvc_images.media_url` | Construire l'URL publique `/media/...`. | [Médias](../../../features/media.md) |
 | `forge_mvc_images.IMAGE_VARIANT_SIZES` | Tailles max de chaque variante. | [Médias](../../../features/media.md) |
-| `request.param(...)` | Lire le chemin d'image à inspecter. | [Request](../../../reference/http.md) |
+| `request.query(...)` | Lire le chemin d'image à inspecter. | [Request](../../../reference/http.md) |
 
 ## Tester
 
@@ -74,7 +74,7 @@ class ImageVariantsController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        path = request.param("path") or _DEMO_PATH
+        path = request.query("path") or _DEMO_PATH
         return BaseController.render(
             "image_variants/index.html",
             context=_variants_view(path),
@@ -83,7 +83,7 @@ class ImageVariantsController(BaseController):
 
     @staticmethod
     def inspect(request: Request) -> Response:
-        path = request.param("path") or _DEMO_PATH
+        path = request.query("path") or _DEMO_PATH
         return Response.json(_variants_view(path))
 ```
 

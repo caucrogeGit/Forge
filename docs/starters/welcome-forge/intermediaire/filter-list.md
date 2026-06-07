@@ -14,7 +14,7 @@ après [Lister des enregistrements](list-records.md).
 ## Ce que ce starter montre
 
 - une route `GET /filter-list?q=<mot>` ;
-- la lecture du mot-clé avec `request.param("q", default="")` ;
+- la lecture du mot-clé avec `request.query("q", default="")` ;
 - une clause SQL conditionnelle `WHERE content LIKE ?` **paramétrée** ;
 - un champ de recherche (formulaire `GET`) dans la vue.
 
@@ -24,7 +24,7 @@ Aucune écriture en base. Aucune concaténation SQL. Aucun CRUD complet.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire le mot-clé avec `request.param("q", ...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Request` | Lire le mot-clé avec `request.query("q", ...)`. | [Request](../../../reference/http.md#3-request-reference) |
 | `Response` | Produite via `render(...)`. | [Response](../../../reference/http.md#4-response-reference) |
 | `BaseController` | Fournit `render(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
 | `core.database.db.fetch_all` | Lit la liste, filtrée ou non. | [Migrations SQL](../../../features/migrations.md) |
@@ -60,7 +60,7 @@ class FilterListController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        query = request.param("q", default="").strip()
+        query = request.query("q", default="").strip()
         if query:
             messages = fetch_all(SELECT_FILTERED, (f"%{query}%",))
         else:
@@ -74,7 +74,7 @@ class FilterListController(BaseController):
 
 ### Comprendre ce code
 
-- `request.param("q", default="")` lit le mot-clé dans la *query string*
+- `request.query("q", default="")` lit le mot-clé dans la *query string*
   (`?q=…`) ; vide par défaut.
 - Quand `q` est renseigné, on exécute `SELECT_FILTERED` avec le **paramètre**
   `("%q%",)` : le `?` est lié à la valeur côté pilote SQL, **jamais** inséré

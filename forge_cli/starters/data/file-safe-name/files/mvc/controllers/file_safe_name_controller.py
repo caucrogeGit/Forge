@@ -33,12 +33,12 @@ class FileSafeNameController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        name = request.param("name") or _DEMO_NAME
+        name = request.query("name") or _DEMO_NAME
         return BaseController.render(
             "file_safe_name/index.html", context=_safe_view(name), request=request
         )
 
     @staticmethod
     def inspect(request: Request) -> Response:
-        name = request.param("name") or _DEMO_NAME
+        name = request.query("name") or _DEMO_NAME
         return Response.json(_safe_view(name))

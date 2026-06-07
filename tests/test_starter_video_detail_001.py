@@ -4,7 +4,7 @@ Contrat du palier 3 du niveau débutant de welcome-video — Le détail d'une vi
 
 - starter.json : `video-detail`, slot 36, requires_db **false** ;
 - snippet : GET `/video-detail/{uuid}` ;
-- contrôleur : `route_param`, `get_by_uuid`, `404` si inconnue, `503` si table
+- contrôleur : `route`, `get_by_uuid`, `404` si inconnue, `503` si table
   absente ; lecture seule ;
 - documentation sous `welcome-video/debutant/`, catalogue.
 """
@@ -51,7 +51,7 @@ def test_snippet_route():
 def test_controller_get_by_uuid_states():
     text = CONTROLLER.read_text(encoding="utf-8")
     assert "from forge_mvc_video.storage.repository import VideoRepository" in text
-    assert 'request.route_param("uuid")' in text
+    assert 'request.route("uuid")' in text
     assert "get_by_uuid(" in text
     assert "status=404" in text
     assert "status=503" in text

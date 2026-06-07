@@ -40,7 +40,7 @@ class PaginationController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        page = _page_number(request.param("page", default="1"))
+        page = _page_number(request.query("page", default="1"))
         offset = (page - 1) * PAGE_SIZE
         messages = fetch_all(SELECT_PAGE, (PAGE_SIZE, offset))
         total = fetch_one(COUNT_ALL)["total"]

@@ -24,7 +24,7 @@ Aucune écriture. Aucun CRUD complet.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire la page avec `request.param("page", ...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Request` | Lire la page avec `request.query("page", ...)`. | [Request](../../../reference/http.md#3-request-reference) |
 | `Response` | Produite via `render(...)`. | [Response](../../../reference/http.md#4-response-reference) |
 | `BaseController` | Fournit `render(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
 | `core.database.db.fetch_all` / `fetch_one` | Lire une tranche + compter le total. | [Migrations SQL](../../../features/migrations.md) |
@@ -69,7 +69,7 @@ class PaginationController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        page = _page_number(request.param("page", default="1"))
+        page = _page_number(request.query("page", default="1"))
         offset = (page - 1) * PAGE_SIZE
         messages = fetch_all(SELECT_PAGE, (PAGE_SIZE, offset))
         total = fetch_one(COUNT_ALL)["total"]

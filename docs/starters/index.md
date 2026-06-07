@@ -79,7 +79,7 @@ directement aux notions SQL** : les paliers HTTP préparent l'accès base
 sereinement. Les 11 paliers du niveau débutant :
 
 1. **Bonjour Forge** : afficher une réponse texte avec `Response.text(...)`.
-2. **Paramètres d'URL** : lire une valeur simple avec `request.param(...)`.
+2. **Paramètres d'URL** : lire une valeur simple avec `request.query(...)`.
 3. **Première vue HTML** : rendre une page avec `BaseController.render(...)`.
 4. **Route dynamique** : lire un paramètre de route comme `/articles/{id}`.
 5. **Inspecter une requête** : explorer `request.data` avec `Response.debug(...)` en développement.

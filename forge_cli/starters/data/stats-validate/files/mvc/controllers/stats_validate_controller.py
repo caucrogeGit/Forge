@@ -33,7 +33,7 @@ class StatsValidateController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        name = request.param("name") or _DEMO_NAME
+        name = request.query("name") or _DEMO_NAME
         return BaseController.render(
             "stats_validate/index.html", context=_validate_view(name), request=request
         )

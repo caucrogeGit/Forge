@@ -24,7 +24,7 @@ après [Héritage de gabarit](layout-template.md).
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | `request.route_param("id")`, `request.form("content")`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Request` | `request.route("id")`, `request.form("content")`. | [Request](../../../reference/http.md#3-request-reference) |
 | `Response` | `render(...)`, ou `Response.text(..., status=404/422)`. | [Response](../../../reference/http.md#4-response-reference) |
 | `BaseController` | `render(...)` + `csrf_token(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
 | `core.database.db.execute` / `fetch_one` | Modifier une ligne, recharger la valeur. | [Migrations SQL](../../../features/migrations.md) |
@@ -51,7 +51,7 @@ class UpdateRecordController(BaseController):
 
     @staticmethod
     def edit(request: Request) -> Response:
-        record_id = int(request.route_param("id"))
+        record_id = int(request.route("id"))
         message = fetch_one(SELECT_ONE, (record_id,))
         if message is None:
             return Response.text("Enregistrement introuvable.", status=404)
@@ -63,7 +63,7 @@ class UpdateRecordController(BaseController):
 
     @staticmethod
     def update(request: Request) -> Response:
-        record_id = int(request.route_param("id"))
+        record_id = int(request.route("id"))
         content = request.form("content", default="").strip()
         if not content:
             return Response.text("Le contenu est obligatoire.", status=422)
@@ -108,7 +108,7 @@ class UpdateRecordController(BaseController):
 ## À retenir
 
 - Modifier = pré-remplir (`fetch_one`) + `UPDATE … WHERE id = ?` paramétré.
-- L'`id` vient de la **route** (`request.route_param("id")`).
+- L'`id` vient de la **route** (`request.route("id")`).
 - Toute écriture est en `POST` **avec CSRF**.
 
 ## Après ce starter

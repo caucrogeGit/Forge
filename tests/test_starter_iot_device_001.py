@@ -5,7 +5,7 @@ capteur :
 
 - starter.json : `iot-device`, slot 27, requires_db **false** ;
 - snippet : GET `/iot-device/{site}/{device_id}` ;
-- contrôleur : `route_param`, `find_by_device` + `count_by_device`, réponse
+- contrôleur : `route`, `find_by_device` + `count_by_device`, réponse
   `503` pédagogique ; lecture seule ;
 - documentation sous `welcome-iot/debutant/`, catalogue.
 """
@@ -52,8 +52,8 @@ def test_snippet_route():
 def test_controller_device_reads():
     text = CONTROLLER.read_text(encoding="utf-8")
     assert "from forge_mvc_iot.storage import IotEventRepository" in text
-    assert 'request.route_param("site")' in text
-    assert 'request.route_param("device_id")' in text
+    assert 'request.route("site")' in text
+    assert 'request.route("device_id")' in text
     assert "find_by_device(" in text
     assert "count_by_device(" in text
     assert "status=503" in text

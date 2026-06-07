@@ -123,9 +123,9 @@ class TestEtatFinalDansBilan:
 
     NOTIONS = [
         'Response.text("Bonjour Forge")',
-        'request.param("name"',
+        'request.query("name"',
         "BaseController.render(",
-        'request.route_param("id"',
+        'request.route("id"',
         "Response.debug(request.data)",
         "Response.json(",
         "BaseController.csrf_token(request)",

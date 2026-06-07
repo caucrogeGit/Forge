@@ -9,6 +9,14 @@
 
 ### Modifié
 
+- **Accesseurs de `Request` renommés par leur source** (ADR-026,
+  `HTTP-REQUEST-PARAM-RENAME-001`) : `request.param` devient `request.query`
+  (query string) et `request.route_param` devient `request.route` (paramètre de
+  route dynamique). Rupture franche sans alias (phase bêta pré-1.0) : tous les
+  appels sont migrés (core, starters, modules opt-in, tutoriel welcome-forge,
+  tests, doc). Les attributs `request.params` / `request.route_params` et les
+  clés de `request.data` restent inchangés. `form`, `json`, `header`, `file`
+  étaient déjà nommés par leur source et ne changent pas.
 - **welcome-forge débutant : tutoriel continu manuel** (ADR-025,
   `STARTER-WELCOME-FORGE-DOC-CONTINUITY-001`). Les 11 paliers (de « Bonjour
   Forge » à « Écrire en base ») se construisent désormais à la main dans un

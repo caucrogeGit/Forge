@@ -30,7 +30,7 @@ class FilterListController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        query = request.param("q", default="").strip()
+        query = request.query("q", default="").strip()
         if query:
             messages = fetch_all(SELECT_FILTERED, (f"%{query}%",))
         else:

@@ -30,7 +30,7 @@ class FileServeController(BaseController):
 
     @staticmethod
     def download(request: Request) -> Response:
-        path = request.param("path") or ""
+        path = request.query("path") or ""
         if not path:
             return Response.text("Paramètre « path » requis.", status=400)
         # serve_media_file gère lui-même l'anti-traversal et le 404.

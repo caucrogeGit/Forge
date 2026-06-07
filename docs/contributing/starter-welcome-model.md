@@ -94,7 +94,7 @@ Chaque palier introduit **une seule notion nouvelle**. Aucune notion qui
 appartient à un palier ultérieur ne doit apparaître avant.
 
 - Le palier 1 (`welcome`) ne montre **que** `Response.text(...)` — pas de
-  `request.param(...)` (c'est le palier 2 `query-params`).
+  `request.query(...)` (c'est le palier 2 `query-params`).
 - Le palier CSRF explique le jeton **sans** traiter le POST (c'est le palier
   `form-post`).
 - Chaque page liste explicitement **ce qu'elle ne fait pas** (« Aucune base
@@ -313,8 +313,8 @@ with router.group("", public=True) as pub:
   haut du fichier (`SELECT_ALL = "SELECT …"`), **paramétrées** (`?`), jamais
   concaténées. Pas d'ORM, pas de génération qui masque le SQL.
 - Lecture des entrées — bien distinguer :
-    - `request.param("k", default=…)` → query string (`?k=`) ;
-    - `request.route_param("k")` → segment d'URL (`/x/{k}`) ;
+    - `request.query("k", default=…)` → query string (`?k=`) ;
+    - `request.route("k")` → segment d'URL (`/x/{k}`) ;
     - `request.form("k", default=…)` → corps d'un POST.
 - **Pas de redirection** dans l'API `Response` : après une écriture
   (`POST`), on **relit la base et on ré-affiche** (cf. `first-crud`), en

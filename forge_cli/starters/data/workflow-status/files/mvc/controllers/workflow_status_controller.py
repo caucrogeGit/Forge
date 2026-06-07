@@ -33,7 +33,7 @@ class WorkflowStatusController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        raw = request.param("name") or _DEMO_NAME
+        raw = request.query("name") or _DEMO_NAME
         return BaseController.render(
             "workflow_status/index.html", context=_status_view(raw), request=request
         )
