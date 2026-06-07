@@ -53,11 +53,13 @@ class TestModuleFamilyFrozen:
 # ── Starters 1.0 (exactement 16, set figé) ───────────────────────────────────
 
 class TestStartersFrozen:
+    # ADR-025 (STARTER-WELCOME-FORGE-DROP-DATA-001) : les 11 starters du niveau
+    # débutant welcome-forge (welcome, query-params, first-html-view,
+    # dynamic-route, request-debug, json-response, csrf, form-post,
+    # server-validation, first-sql, first-sql-write) ont été retirés du gel ;
+    # ils sont devenus un tutoriel continu manuel (docs uniquement).
     FROZEN = {
-        "csrf", "dynamic-route",
-        "first-html-view", "first-sql", "first-sql-write", "form-post",
-        "json-response", "query-params", "request-debug", "server-validation",
-        "welcome", "list-records", "filter-list", "pagination", "layout-template", "update-record", "delete-record", "session-state", "flash-messages",
+        "list-records", "filter-list", "pagination", "layout-template", "update-record", "delete-record", "session-state", "flash-messages",
         "relations", "file-upload", "json-api", "db-transaction",
         "mail-welcome", "mail-message", "mail-transport", "mail-template", "mail-config", "mail-doctor",
         "iot-welcome", "iot-events", "iot-device", "iot-simulate", "iot-api",
@@ -95,7 +97,8 @@ class TestStartersFrozen:
         )
 
     def test_frozen_count(self):
-        assert len(self.FROZEN) == 107
+        # 107 - 11 (paliers débutant welcome-forge retirés, ADR-025) = 96.
+        assert len(self.FROZEN) == 96
 
 
 # ── Le contrat est documenté ─────────────────────────────────────────────────

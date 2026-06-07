@@ -65,18 +65,24 @@ def test_starter_core_suit_la_convention(sid: str):
 
 
 def test_au_moins_un_starter_par_famille_conventionnee():
-    """Les familles opt-in et cœur sont bien représentées (non-régression).
+    """Les familles opt-in sont bien représentées (non-régression).
 
-    Les parcours welcome par opt-in se nomment ``<module>-welcome`` ; le
-    starter cœur d'entrée se nomme ``welcome``."""
+    Les parcours welcome par opt-in se nomment ``<module>-welcome``. ADR-025 :
+    le starter cœur d'entrée ``welcome`` (et les 10 autres paliers débutant) a
+    été retiré au profit d'un tutoriel continu manuel ; on ne l'exige donc plus
+    comme starter buildable."""
     assert any(i.endswith("-welcome") for i in _IDS), (
         "Aucun parcours welcome opt-in (« <module>-welcome ») détecté."
     )
-    assert "welcome" in _IDS, "Le starter cœur « welcome » est absent."
 
 
-def test_numerotation_contigue():
+def test_numerotation_unique():
+    # ADR-025 : la numérotation n'est plus contiguë `1..N` après le retrait des
+    # 11 starters débutant ; on ne vérifie plus que l'unicité et la positivité.
     numbers = sorted(s["number"] for s in all_starters())
-    assert numbers == list(range(1, len(numbers) + 1)), (
-        f"Les numéros de starters doivent être contigus 1..N ; obtenu : {numbers}."
+    assert len(numbers) == len(set(numbers)), (
+        f"Numéros de starters en double : {numbers}."
+    )
+    assert all(n >= 1 for n in numbers), (
+        f"Tout numéro de starter doit être positif : {numbers}."
     )

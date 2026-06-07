@@ -89,12 +89,15 @@ class TestStarterRegistry:
             f"Au moins 8 starters attendus (progression pédagogique livrée) ; trouvé {expected}."
         )
 
-    def test_numeros_sans_trou(self):
-        """Les starters sont numérotés sans trou à partir de 1."""
+    def test_numeros_uniques(self):
+        """Les numéros de starter sont uniques et positifs.
+
+        ADR-025 : les 11 starters débutant welcome-forge ont été retirés
+        (tutoriel continu manuel) ; la numérotation n'est plus une plage dense
+        `1..N`, on ne vérifie plus que l'unicité (cf. test_consolidation)."""
         nums = sorted(s["number"] for s in all_starters())
-        assert nums == list(range(1, len(nums) + 1)), (
-            f"Numérotation avec trou : {nums}"
-        )
+        assert len(nums) == len(set(nums)), f"Numéros en double : {nums}"
+        assert all(n >= 1 for n in nums), f"Numéros non positifs : {nums}"
 
     def test_tous_available(self):
         assert all(s["status"] == "available" for s in all_starters())
@@ -147,8 +150,10 @@ class TestStarterInvalid:
     def test_build_sans_projet_exit_1(self, tmp_path, monkeypatch, capsys):
         monkeypatch.chdir(tmp_path)
         monkeypatch.setattr("forge_cli.entities.db_apply.apply_model_sql", lambda _: [])
+        # ADR-025 : le starter `welcome` (ex-numéro 1) a été retiré ; on exerce
+        # le build hors projet sur un starter survivant (`iot-welcome`).
         with pytest.raises((SystemExit, StarterBuildError)):
-            meta = resolve("1")
+            meta = resolve("iot-welcome")
             build(meta)
 
     def test_resolve_invalide_leve_starter_not_found(self):

@@ -27,10 +27,14 @@ def test_count_starters_matches_filesystem():
     assert expected >= 8
 
 
-def test_niveaux_ordonnes_sans_trou():
-    """Les starters sont numérotés sans trou à partir de 1."""
+def test_niveaux_numeros_uniques():
+    """Les numéros de starter sont uniques et positifs.
+
+    ADR-025 : les 11 starters débutant welcome-forge ont été retirés (tutoriel
+    continu manuel) ; la numérotation n'est plus une plage dense `1..N`."""
     levels = sorted(s["number"] for s in all_starters())
-    assert levels == list(range(1, len(levels) + 1))
+    assert len(levels) == len(set(levels)), f"Numéros en double : {levels}"
+    assert all(n >= 1 for n in levels), f"Numéros non positifs : {levels}"
 
 
 def test_starter_list_affiche_les_4_niveaux(capsys):
@@ -55,17 +59,21 @@ def test_starter_list_contient_niveau_mot_cle(capsys):
     assert "disponible" in output
 
 
-def test_les_5_starters_sont_disponibles():
-    statuses = {starter["number"]: starter["status"] for starter in all_starters()}
-    assert statuses[1] == "available"
-    assert statuses[2] == "available"
-    assert statuses[3] == "available"
-    assert statuses[4] == "available"
-    assert statuses[5] == "available"
+def test_starters_sont_disponibles():
+    # ADR-025 : les starters débutant (ex-numéros 1 à 11) ont été retirés ; on
+    # vérifie que tous les starters survivants sont « available ».
+    statuses = [s["status"] for s in all_starters()]
+    assert statuses, "Au moins un starter doit subsister."
+    assert all(st == "available" for st in statuses), (
+        "Tous les starters survivants doivent être disponibles."
+    )
 
 
-def test_starter_auth_adopte_le_scaffold_auth_historique(tmp_path):
-    meta = resolve("2")
+def test_starter_build_ne_signale_pas_les_fichiers_non_lies(tmp_path):
+    # ADR-025 : le starter `query-params` (ex-numéro 2) a été retiré ; on exerce
+    # _check_existing avec un starter survivant (`list-records`) sur un projet
+    # contenant des fichiers sans rapport : aucune collision attendue.
+    meta = resolve("list-records")
     (tmp_path / "mvc/controllers").mkdir(parents=True)
     (tmp_path / "mvc/models").mkdir(parents=True)
     (tmp_path / "mvc/views/auth").mkdir(parents=True)
@@ -222,10 +230,13 @@ def test_replace_home_route_sans_handler_landing_sans_effet(tmp_path):
 
 # ── dry-run annonce home_route ────────────────────────────────────────────────
 
-def test_dry_run_starter_2_sans_home_route(capsys):
-    cmd_starter_build(["2", "--dry-run"])
+def test_dry_run_starter_survivant_fonctionne(capsys):
+    # ADR-025 : query-params (ex-numéro 2) retiré ; on exerce le dry-run sur un
+    # starter survivant et on vérifie qu'aucun fichier n'est écrit.
+    cmd_starter_build(["iot-welcome", "--dry-run"])
     output = capsys.readouterr().out
-    assert "Route d'accueil" not in output
+    assert "iot-welcome" in output
+    assert "Aucun fichier écrit" in output
 
 
 # ── STARTER-LEGACY-AUDIT-001 : tests documentaires ────────────────────────────

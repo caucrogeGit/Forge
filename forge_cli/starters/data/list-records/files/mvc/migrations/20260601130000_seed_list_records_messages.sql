@@ -2,8 +2,9 @@
 -- Ticket    : STARTER-LIST-RECORDS-001
 -- Palier 1 du niveau intermédiaire : Lister des enregistrements.
 --
--- Réutilise la table neutre `first_sql_messages` (palier débutant Première
--- base SQL) et y insère PLUSIEURS lignes pour que la liste soit parlante.
+-- Réutilise la table neutre `first_sql_messages` (introduite par le tutoriel
+-- welcome-forge, palier « Première base SQL ») et y insère PLUSIEURS lignes
+-- pour que la liste soit parlante.
 -- CREATE TABLE IF NOT EXISTS + INSERT idempotents : sûrs à rejouer.
 
 CREATE TABLE IF NOT EXISTS first_sql_messages (

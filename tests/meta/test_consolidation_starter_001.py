@@ -40,14 +40,20 @@ def test_count_starters_matches_filesystem():
     )
 
 
-def test_starters_numero_sans_trou():
-    """Les starters sont numérotés sans trou à partir de 1.
-    Refactor STARTER-CONTACTS-CRUD-REPOSITION-001 — ne fige plus
-    le numéro maximal pour rester robuste aux ajouts futurs."""
+def test_starters_numero_unique():
+    """Les numéros de starter sont uniques et positifs.
+
+    ADR-025 (STARTER-WELCOME-FORGE-DROP-DATA-001) : les 11 starters du niveau
+    débutant welcome-forge ont été retirés (devenus un tutoriel continu manuel).
+    La numérotation n'est donc plus une plage dense `1..N` ; on ne vérifie plus
+    que l'unicité (pas de doublon) et la positivité, sans renuméroter les ~85
+    starters survivants (dont les tests figent un `number` précis)."""
     nums = sorted(s["number"] for s in all_starters())
-    expected_range = list(range(1, len(nums) + 1))
-    assert nums == expected_range, (
-        f"Numérotation des starters avec trou : {nums} (attendu : {expected_range})."
+    assert len(nums) == len(set(nums)), (
+        f"Numéros de starter en double : {nums}."
+    )
+    assert all(n >= 1 for n in nums), (
+        f"Tout numéro de starter doit être positif : {nums}."
     )
 
 
@@ -146,11 +152,14 @@ def test_starter_inexistant_message_mentionne_starter_list():
     assert "starter:list" in buf.getvalue()
 
 
-def test_starter_1_dry_run_fonctionne(capsys):
-    """forge starter:build 1 --dry-run s'exécute sans erreur."""
-    cmd_starter_build(["1", "--dry-run"])
+def test_starter_dry_run_fonctionne(capsys):
+    """forge starter:build <id> --dry-run s'exécute sans erreur.
+
+    ADR-025 : le starter `welcome` (ex-numéro 1) a été retiré ; on exerce le
+    dry-run sur un starter survivant stable (`iot-welcome`)."""
+    cmd_starter_build(["iot-welcome", "--dry-run"])
     output = capsys.readouterr().out
-    assert "welcome" in output.lower() or "/welcome" in output
+    assert "iot-welcome" in output.lower() or "/iot-welcome" in output
 
 
 # ── Communes & Séjours — séparation core / métier ─────────────────────────────
