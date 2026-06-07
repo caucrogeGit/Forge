@@ -13,7 +13,7 @@ HTTPS natif, Jinja2 intégré, SQL visible, générateurs prudents.
 
 ## Statut
 
-Forge **1.0.0-beta.13** — bêta publique.
+Forge **1.0.0-beta.14** — bêta publique.
 
 - Paquet PyPI : [`forge-mvc`](https://pypi.org/project/forge-mvc/)
 - Préversion PEP 440 : installation avec `--pre`

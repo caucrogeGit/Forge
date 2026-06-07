@@ -21,4 +21,4 @@ __all__ = [
     "pivot_error_to_form_error",
 ]
 
-__version__ = "1.0.0b13"
+__version__ = "1.0.0b14"

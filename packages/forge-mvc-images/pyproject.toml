@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-images"
-version = "1.0.0b13"
+version = "1.0.0b14"
 description = "Forge Images — module opt-in propriétaire de tout le traitement d'image (variantes, miniatures, validation de contenu, Pillow) et de la couche médias applicative (repository, galerie, couverture)."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,11 +14,11 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "images", "pillow", "uploads", "gallery"]
 dependencies = [
-    "forge-mvc>=1.0.0b13,<2",
+    "forge-mvc>=1.0.0b14,<2",
     "Pillow>=10.0,<13",
     # FILES-IMAGES-REPOINT-001 (ADR-019) : le traitement d'image réutilise le
     # pipeline d'upload générique, désormais détenu par forge-mvc-files.
-    "forge-mvc-files>=1.0.0b13,<2",
+    "forge-mvc-files>=1.0.0b14,<2",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",

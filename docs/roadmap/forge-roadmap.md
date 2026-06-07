@@ -12,20 +12,20 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.13
+## État actuel — Forge 1.0.0-beta.14
 
-**Tag courant : `v1.0.0-beta.13`** — bump finalisé le 2026-05-31 ; le tag git et la
-publication PyPI sont l'étape de release séparée (à venir).
+**Tag courant : `v1.0.0-beta.14`** — bootstrap par squelette dédié (ADR-024) :
+`forge new` matérialise un squelette de projet nu au lieu de cloner le dépôt ;
+le projet généré dépend de `forge-mvc`. `forge starter:build` est la seule façon
+officielle de construire un starter (ADR-023).
 
-Précédent : v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.13 — *dernière beta fonctionnelle*, version bumpée et
-finalisée (slugs auto-générés type `slug`, gel du contrat public `opt-in:*` /
-`module:*` et des 16 starters, production-readiness : check sécurité-prod du
-doctor, dry-run des migrations, checklist de déploiement, pipeline slug validé
-bout-en-bout sur MariaDB). Tag git et publication PyPI non encore réalisés.
-Roadmap dédiée : [`beta13-roadmap.md`](beta13-roadmap.md). (Séquence beta.12
-publiée auparavant : core + 6 opt-ins dont `forge-mvc-iot` Alpha.)**
+**Statut : v1.0.0-beta.14 — beta incrémentale embarquant le chantier squelette
+dédié (ADR-023 + ADR-024). `forge new` produit un projet réellement nu (plus de
+`core/`, `packages/`, `tests/`, `docs/` dans le projet). Le contenu fonctionnel
+de beta.13 (slugs `slug`, gel du contrat `opt-in:*` / `module:*`,
+production-readiness, dogfood MariaDB) reste en place.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)

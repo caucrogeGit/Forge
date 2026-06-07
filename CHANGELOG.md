@@ -1,6 +1,49 @@
 # Changelog
 
 
+## [1.0.0-beta.14] — 2026-06-07
+
+> Bootstrap par squelette dédié : `forge new` produit enfin un projet
+> réellement nu (ADR-024).
+
+### Modifié
+
+- **`forge new` matérialise un squelette de projet dédié** au lieu de cloner le
+  dépôt Forge (ADR-024, `NEW-MATERIALIZE-001`). Le projet généré ne contient
+  plus le framework (`core/`, `forge_cli/`, `packages/`, `tests/`, `docs/`) : il
+  dépend de `forge-mvc` et récupère le `core` depuis le paquet installé. Le
+  squelette curé est embarqué dans `forge_cli/skeleton/data/` et distribué en
+  package-data (`SKELETON-TREE-001`, `SKELETON-PKGDATA-001`,
+  `SKELETON-REGISTRY-001`).
+- **`forge new` ne clone plus le dépôt** : le flag `--ref`, la constante
+  `_FORGE_REPO` et la dépendance réseau/git pour les fichiers disparaissent
+  (`NEW-MATERIALIZE-001`, `NEW-CLI-CLEANUP-001`). `git` reste requis pour le
+  `git init` du projet.
+- **`forge new` produit toujours un projet nu** : le flag `--starter` est retiré ;
+  `forge starter:build` devient la seule façon officielle de construire un
+  starter (ADR-023, `CLI-NEW-DROP-STARTER-001`).
+
+### Corrigé
+
+- Alignement de la documentation sur `forge starter:build` et retrait du bloc
+  « raccourci » des pages de palier (`DOC-STARTER-BUILD-ALIGN-001`).
+- Test des liens production de la landing aligné sur la réorganisation
+  `docs/deployment/` (`LANDING-WSGI-LINK-TEST-FIX-001`).
+
+### Documentation
+
+- ADR-023 (`forge starter:build` canonique) et ADR-024 (bootstrap par squelette
+  dédié) ajoutés ; index ADR et navigation MkDocs mis à jour. Documentation
+  d'installation et de référence nettoyée des mentions `forge new --ref`.
+
+### Tests
+
+- Garde-fous ajoutés : `test_skeleton_tree_001`, `test_skeleton_pkgdata_001`,
+  `test_skeleton_registry_001`, `test_new_core_dep_001`, `test_skeleton_guard_001`
+  (squelette nu, distribution wheel/sdist, matérialisation, neutralité, projet
+  généré sans `core/`).
+
+
 ## [1.0.0-beta.13] — 2026-06-06
 
 > Dernière beta **fonctionnelle** (consolidation post-beta.12).

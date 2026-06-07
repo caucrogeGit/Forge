@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc"
-version = "1.0.0b13"
+version = "1.0.0b14"
 description = "Framework web applicatif Python minimaliste, pédagogique et extensible."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -48,7 +48,7 @@ Documentation = "https://forgemvc.com/docs/forge/"
 Issues = "https://github.com/caucrogeGit/Forge/issues"
 
 # Extras de raccourci vers les opt-ins publiables stables (rbac/workflow/stats).
-# Pins alignés sur la version courante : forge-mvc-<nom>>=1.0.0b13,<2
+# Pins alignés sur la version courante : forge-mvc-<nom>>=1.0.0b14,<2
 # (politique unifiée OPTIN-DEPS-PIN-B13-001).
 # Exclus de [all] : forge-mvc-mfa, forge-mvc-media, forge-mvc-iot, forge-mvc-video
 #   media = API applicative encore Alpha
@@ -60,13 +60,13 @@ Issues = "https://github.com/caucrogeGit/Forge/issues"
 # stable rbac/workflow/stats sans tirer de dépendances Alpha/MQTT/FFmpeg.
 
 [project.optional-dependencies]
-rbac = ["forge-mvc-rbac>=1.0.0b13,<2"]
-workflow = ["forge-mvc-workflow>=1.0.0b13,<2"]
-stats = ["forge-mvc-stats>=1.0.0b13,<2"]
+rbac = ["forge-mvc-rbac>=1.0.0b14,<2"]
+workflow = ["forge-mvc-workflow>=1.0.0b14,<2"]
+stats = ["forge-mvc-stats>=1.0.0b14,<2"]
 all = [
-    "forge-mvc-rbac>=1.0.0b13,<2",
-    "forge-mvc-workflow>=1.0.0b13,<2",
-    "forge-mvc-stats>=1.0.0b13,<2",
+    "forge-mvc-rbac>=1.0.0b14,<2",
+    "forge-mvc-workflow>=1.0.0b14,<2",
+    "forge-mvc-stats>=1.0.0b14,<2",
 ]
 
 [project.scripts]
