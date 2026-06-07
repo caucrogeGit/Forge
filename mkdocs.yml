@@ -362,6 +362,7 @@ nav:
           - ADR-022 Extraction mail: adr/022-mail-extraction.md
           - ADR-023 Starter build canonique: adr/023-starter-build-canonical.md
           - ADR-024 Bootstrap squelette dédié: adr/024-skeleton-bootstrap.md
+          - ADR-025 welcome-forge tutoriel continu: adr/025-welcome-forge-continuous-tutorial.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md

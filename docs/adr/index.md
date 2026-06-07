@@ -31,3 +31,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-022](022-mail-extraction.md) | Extraction de l'email hors du core : `forge-mvc-mail` (accepté) |
 | [ADR-023](023-starter-build-canonical.md) | `forge starter:build` comme seule façon de construire un starter ; `forge new` produit un projet nu (accepté) |
 | [ADR-024](024-skeleton-bootstrap.md) | Bootstrap par squelette dédié et dépendance core via pip (accepté) |
+| [ADR-025](025-welcome-forge-continuous-tutorial.md) | welcome-forge : tutoriel continu manuel au lieu de starters par palier (accepté) |
