@@ -2,9 +2,9 @@
 
 Objectif : lire une valeur passée dans l'URL avec `request.param(...)`.
 
-**Ce que vous allez apprendre :** récupérer une valeur de la query string
+**Ce que vous allez apprendre :** récupérer une valeur de la chaîne de requête
 (`?name=Roger`) avec `request.param("name", default=...)`, et fournir une
-valeur par défaut quand le paramètre est absent — sans exception ni
+valeur par défaut quand le paramètre est absent, sans exception ni
 `None` à gérer.
 
 Ce starter est identifié par `query-params` dans la CLI Forge
@@ -25,7 +25,7 @@ juste après [Bonjour Forge](welcome.md).
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `Request` | Lire un paramètre de *query string* avec `request.param(...)`. | [Request](../../../reference/http.md#3-request-reference) |
+| `Request` | Lire un paramètre de la *chaîne de requête* avec `request.param(...)`. | [Request](../../../reference/http.md#3-request-reference) |
 | `Response` | Construire la réponse texte avec `Response.text(...)`. | [Response](../../../reference/http.md#4-response-reference) |
 | `BaseController` | Classe parente du contrôleur. | [BaseController](../../../reference/api.md#coremvccontroller) |
 
@@ -85,13 +85,13 @@ class QueryParamsController(BaseController):
 
 ### Comprendre ce code
 
-- Un *paramètre d'URL* (ou *query string*) est la partie après le `?` :
+- Un *paramètre d'URL* (ou *chaîne de requête*) est la partie après le `?` :
   `?name=Roger` apporte la valeur `name=Roger`.
 - `request.param("name", default="Forge")` lit cette valeur. Le second
   argument évite tout cas particulier « clé absente ».
 - Le type retourné est toujours `str` ; toute conversion (int, date…)
   est à faire explicitement côté contrôleur.
-- La réponse reste un `Response.text(...)` — aucun template ici, donc
+- La réponse reste un `Response.text(...)` : aucun template ici, donc
   rien à rendre.
 
 ## Tester dans le navigateur
@@ -105,10 +105,10 @@ class QueryParamsController(BaseController):
 
 ## À retenir
 
-- `request.param(key, default=...)` lit une valeur de la *query string*
+- `request.param(key, default=...)` lit une valeur de la *chaîne de requête*
   (`?key=valeur`).
 - Le second argument `default=...` est la valeur retournée si la clé
-  est absente — pas d'exception, pas de `None` à manipuler.
+  est absente : pas d'exception, pas de `None` à manipuler.
 - Le type retourné est toujours `str` (ou la valeur de `default`).
 - Aucun template, aucun moteur de rendu : la réponse reste en
   `text/plain`.
