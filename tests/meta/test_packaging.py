@@ -99,7 +99,13 @@ def test_package_data_inclut_tous_les_fichiers_starters():
     data = _load_pyproject()
     package_data = data["tool"]["setuptools"]["package-data"]
 
-    assert package_data["forge_cli"] == ["starters/data/**/*"]
+    assert "starters/data/**/*" in package_data["forge_cli"]
+    # SKELETON-PKGDATA-001 (ADR-024) : le squelette de projet est aussi
+    # embarqué (motifs dotfiles inclus pour .gitignore et .gitkeep).
+    for pattern in ("skeleton/data/**/*", "skeleton/data/**/.*", "skeleton/data/.*"):
+        assert pattern in package_data["forge_cli"], (
+            f"package-data forge_cli doit inclure {pattern} (squelette)."
+        )
 
 
 def test_package_data_couvre_les_python_des_starters():
