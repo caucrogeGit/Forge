@@ -1,7 +1,0 @@
-# forge-starter:file-upload:start
-from mvc.controllers.file_upload_controller import FileUploadController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/file-upload", FileUploadController.index, name="file_upload_index")
-    pub.add("POST", "/file-upload", FileUploadController.upload, name="file_upload_store")
-# forge-starter:file-upload:end

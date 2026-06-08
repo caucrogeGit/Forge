@@ -6,93 +6,137 @@ soit tout réussit, soit rien.
 **Ce que vous allez apprendre :** le bloc `with transaction() as tx:`. Il ouvre
 une transaction explicite et passe `tx` aux helpers DB, qui réutilisent la
 connexion **sans jamais committer eux-mêmes**. À la sortie du bloc, Forge
-committe ; si une exception traverse le bloc, Forge **annule** (rollback). C'est
-indispensable dès que deux écritures doivent rester cohérentes.
+committe ; si une exception traverse le bloc, Forge **annule** (rollback).
 
-Dernier palier du **niveau avancé** de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [API JSON protégée](json-api.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+Le catalogue est en lecture seule. Nous ajoutons la création d'un article. Créer
+un article doit faire **deux écritures cohérentes** : insérer l'article **et**
+incrémenter le compteur `article_count` de sa catégorie. Ces deux écritures
+doivent rester atomiques, d'où la transaction.
 
-- une transaction explicite `with transaction() as tx:` ;
-- deux `insert(..., tx=tx)` dans le même bloc ;
-- un **rollback** : si le second message manque, une erreur est levée **après**
-  la première insertion → tout est annulé, rien n'est écrit ;
-- le motif POST-Redirect-GET en cas de succès.
+## L'ajout
 
-Table neutre `first_sql_messages`.
-
-## Classes Forge utilisées
-
-| Classe / fonction | Rôle dans ce starter | Référence |
-|-------------------|----------------------|-----------|
-| `core.database.transaction.transaction` | Ouvrir une transaction explicite (commit / rollback). | [Base de données](../../../reference/api.md#coredatabase) |
-| `core.database.db.insert` | Insérer une ligne **dans** la transaction (`tx=tx`). | [Base de données](../../../reference/api.md#coredatabase) |
-| `BaseController.csrf_token` / `redirect` | Protéger le POST, rediriger après succès (PRG). | [BaseController](../../../reference/api.md#coremvccontroller) |
-
-## Tester
-
-```bash
-forge run
-```
-
-Ouvrez `https://localhost:8000/db-transaction`. Saisissez les **deux** messages
-et validez : les deux apparaissent. Laissez le **second vide** et validez : une
-erreur s'affiche et **aucun** des deux n'est enregistré : le premier `insert` a
-été annulé par le rollback.
-
-## Le contrôleur
+Ajoutez les requêtes et les deux méthodes dans
+`mvc/controllers/article_controller.py` :
 
 ```python
-# mvc/controllers/db_transaction_controller.py
-from core.database.db import fetch_all, insert
+from core.database.db import execute, fetch_all
+from core.database.db import insert
 from core.database.transaction import transaction
 
+SELECT_CATEGORIES = "SELECT id, name FROM categories ORDER BY name"
+INSERT_ARTICLE = "INSERT INTO articles (title, category_id) VALUES (?, ?)"
+INCREMENT_COUNT = "UPDATE categories SET article_count = article_count + 1 WHERE id = ?"
 
-INSERT_MESSAGE = "INSERT INTO first_sql_messages (content) VALUES (?)"
 
+class ArticleController(BaseController):
 
-class DbTransactionController(BaseController):
+    # … index(...) inchangé …
+
+    @staticmethod
+    def create(request: Request) -> Response:
+        return BaseController.render(
+            "article/new.html",
+            request=request,
+            context={"categories": fetch_all(SELECT_CATEGORIES)},
+        )
 
     @staticmethod
     def store(request: Request) -> Response:
-        first = (request.form("message_a") or "").strip()
-        second = (request.form("message_b") or "").strip()
+        title = request.form("title", default="").strip()
+        category_id = request.form("category_id", default="").strip()
         try:
             with transaction() as tx:
-                insert(INSERT_MESSAGE, (first,), tx=tx)
-                if not second:
-                    # Erreur APRÈS la première insertion : le rollback l'annule.
-                    raise ValueError("Le second message est obligatoire : tout est annulé.")
-                insert(INSERT_MESSAGE, (second,), tx=tx)
+                insert(INSERT_ARTICLE, (title, category_id), tx=tx)
+                if not title:
+                    # Erreur APRÈS la première écriture : le rollback l'annule.
+                    raise ValueError("Le titre est obligatoire : tout est annulé.")
+                execute(INCREMENT_COUNT, (category_id,), tx=tx)
         except ValueError as exc:
-            return DbTransactionController._page(request, error=str(exc))
-        return BaseController.redirect("/db-transaction")
+            return BaseController.render(
+                "article/new.html",
+                status=422,
+                request=request,
+                context={"categories": fetch_all(SELECT_CATEGORIES), "error": str(exc)},
+            )
+        return BaseController.redirect("/articles", request=request, flash="Article créé.")
 ```
 
-### Comprendre ce code
+Créez la vue `mvc/views/article/new.html` :
 
-- `with transaction() as tx:` ouvre la transaction. Chaque `insert(..., tx=tx)`
-  écrit **dans** cette transaction, mais **ne committe pas**.
-- Si tout le bloc se termine sans erreur, Forge **committe** : les deux lignes
-  sont enregistrées.
-- Si une exception (ici `ValueError`) traverse le bloc, Forge **annule** : même
-  le premier `insert`, déjà exécuté, est défait. C'est l'atomicité : **tout ou
-  rien**.
-- En cas de succès, on **redirige** (POST-Redirect-GET).
+```html
+<!-- mvc/views/article/new.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Nouvel article</title></head>
+<body>
+    <h1>Nouvel article</h1>
+    {% if error %}<p><strong>{{ error }}</strong></p>{% endif %}
+    <form method="post" action="/articles">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="text" name="title" placeholder="Titre">
+        <select name="category_id">
+            {% for c in categories %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Créer</button>
+    </form>
+    <p><a href="/articles">Retour au catalogue</a></p>
+</body>
+</html>
+```
+
+Ajoutez un lien vers le formulaire dans `mvc/views/article/index.html` :
+
+```html
+<p><a href="/articles/new">Nouvel article</a></p>
+```
+
+Puis déclarez les deux routes dans `mvc/routes.py`.
+
+## Votre mvc/routes.py à ce stade
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.article_controller import ArticleController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/articles", ArticleController.index, name="articles_index")
+    pub.add("GET",  "/articles/new", ArticleController.create, name="articles_new")
+    pub.add("POST", "/articles", ArticleController.store, name="articles_store")
+```
+
+## Comprendre ce code
+
+- `with transaction() as tx:` ouvre la transaction. Chaque `insert(..., tx=tx)` ou
+  `execute(..., tx=tx)` écrit **dans** cette transaction, mais **ne committe pas**.
+- Si le bloc se termine sans erreur, Forge **committe** : l'article est créé **et**
+  le compteur incrémenté.
+- Si une exception traverse le bloc, Forge **annule** : même la première écriture,
+  déjà exécutée, est défaite. C'est l'atomicité : **tout ou rien**.
+- Ici on valide après la première écriture pour **démontrer** le rollback ; en
+  pratique on valide souvent avant d'écrire.
+
+## Tester dans le navigateur
+
+| Action | Résultat |
+|---|---|
+| Créer un article avec un titre | retour au catalogue, l'article apparaît, le compteur de sa catégorie augmente |
+| Soumettre un titre vide | erreur `422`, **aucune** écriture (l'article n'est pas créé, le compteur ne bouge pas) |
 
 ## À retenir
 
 - `with transaction() as tx:` rend un groupe d'écritures **atomique**.
-- Les helpers DB reçoivent `tx` et ne committent jamais seuls : c'est le bloc qui
-  décide.
-- Une exception dans le bloc = **rollback** : aucune écriture partielle ne
-  subsiste.
+- Les helpers DB reçoivent `tx` et ne committent jamais seuls : c'est le bloc qui décide.
+- Une exception dans le bloc, c'est un **rollback** : aucune écriture partielle ne subsiste.
 
-## Après ce starter
+Au palier suivant, nous attachons un fichier à un article.
 
-Vous avez terminé le **niveau avancé** : relations, fichiers, emails, API JSON et
-transactions. Faites le point dans le bilan du niveau.
-
-[Bilan du niveau avancé](bilan.md)
+[Continuer avec Téléverser un fichier](file-upload.md)

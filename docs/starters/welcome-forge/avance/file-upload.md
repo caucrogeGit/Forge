@@ -1,122 +1,149 @@
 # Téléverser un fichier
 
-Objectif : recevoir un fichier envoyé par l'utilisateur et le **stocker** en
-toute sécurité.
+Objectif : recevoir un fichier envoyé par l'utilisateur, le **stocker** en toute
+sécurité, et l'attacher à un article.
 
 **Ce que vous allez apprendre :** un formulaire `multipart/form-data`, la
-récupération du fichier reçu avec `request.file(...)`, et son stockage par
+récupération du fichier avec `request.file(...)`, et son stockage par
 `forge_mvc_files.save_upload`. Cette fonction **valide** le fichier (extension,
-type MIME, taille) **avant** d'écrire sur le disque : Forge ne fait jamais
-confiance aveuglément à ce que l'utilisateur envoie.
+type MIME, taille) **avant** d'écrire sur le disque.
 
-Palier 2 du **niveau avancé** de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Relations entre tables](relations.md).
+!!! info "Opt-in forge-mvc-files"
+    Ce palier utilise le module opt-in `forge-mvc-files`. Installez-le dans le
+    projet : `pip install --pre forge-mvc-files`.
 
-## Ce que ce starter montre
+## Là où nous en sommes
 
-- un formulaire HTML en **`multipart/form-data`** ;
-- la récupération du fichier reçu avec `request.file("document")` ;
-- le stockage validé via `forge_mvc_files.save_upload` ;
-- l'affichage du nom et de la taille du fichier enregistré, ou de l'erreur si le
-  fichier est refusé.
+Le catalogue sait lister et créer des articles. Nous permettons d'**attacher un
+document** à un article. Il faut d'abord ajouter une colonne `document_path` à la
+table `articles` (migration incrémentale), puis recevoir et stocker le fichier.
 
-Aucune base de données : le fichier est stocké sur le disque, pas en base.
+## L'ajout
 
-## Classes Forge utilisées
+### La migration incrémentale
 
-| Classe / fonction | Rôle dans ce starter | Référence |
-|-------------------|----------------------|-----------|
-| `request.file` | Récupérer le fichier reçu (`UploadedFile`). | [Request](../../../reference/api.md#corehttprequest) |
-| `forge_mvc_files.save_upload` | Valider puis stocker le fichier sur le disque. | [Uploads](../../../reference/api.md#coreuploads) |
-| `BaseController.csrf_token` | Protéger le formulaire d'envoi. | [BaseController](../../../reference/api.md#coremvccontroller) |
+Créez une nouvelle migration `mvc/migrations/<timestamp>_add_document_path.sql` :
 
-## Tester
-
-```bash
-forge run
+```sql
+ALTER TABLE articles ADD COLUMN document_path VARCHAR(255) NULL;
 ```
 
-Ouvrez `https://localhost:8000/file-upload`, choisissez un fichier autorisé et
-cliquez **Envoyer** : le nom et la taille du fichier enregistré s'affichent. Un
-fichier d'un type non autorisé déclenche un message d'erreur clair.
+Appliquez-la avec `forge migration:apply`.
 
-## Le contrôleur
+### Le contrôleur
+
+Complétez les imports et ajoutez les deux méthodes dans
+`mvc/controllers/article_controller.py` :
 
 ```python
-# mvc/controllers/file_upload_controller.py
+from core.database.db import execute, fetch_all, fetch_one
 from forge_mvc_files import UploadError, save_upload
 
+SELECT_ONE = "SELECT id, title FROM articles WHERE id = ?"
+SET_DOCUMENT = "UPDATE articles SET document_path = ? WHERE id = ?"
 
-class FileUploadController(BaseController):
+
+class ArticleController(BaseController):
+
+    # … index / create / store inchangés …
 
     @staticmethod
-    def index(request: Request) -> Response:
+    def attach(request: Request) -> Response:
+        article = fetch_one(SELECT_ONE, (int(request.route("id")),))
+        if article is None:
+            return Response.text("Article introuvable.", status=404)
         return BaseController.render(
-            "file_upload/index.html",
-            context={"csrf_token": BaseController.csrf_token(request)},
+            "article/attach.html",
             request=request,
+            context={"article": article},
         )
 
     @staticmethod
-    def upload(request: Request) -> Response:
+    def attach_store(request: Request) -> Response:
+        record_id = int(request.route("id"))
         uploaded = request.file("document")
-        context = {"csrf_token": BaseController.csrf_token(request)}
         if uploaded is None:
-            context["error"] = "Aucun fichier sélectionné."
-            return BaseController.render("file_upload/index.html", context=context, request=request)
+            return Response.text("Aucun fichier sélectionné.", status=422)
         try:
             saved = save_upload(uploaded, "documents")
         except UploadError as exc:
-            context["error"] = str(exc)
-            return BaseController.render("file_upload/index.html", context=context, request=request)
-        context["saved"] = saved
-        return BaseController.render("file_upload/index.html", context=context, request=request)
+            return Response.text(str(exc), status=422)
+        execute(SET_DOCUMENT, (saved.path, record_id))
+        return BaseController.redirect("/articles", request=request, flash="Document attaché.")
 ```
 
-### Comprendre ce code
-
-- `request.file("document")` renvoie un `UploadedFile` (ou `None` si rien n'a été
-  envoyé), on traite ce cas explicitement.
-- `save_upload(uploaded, "documents")` **valide** extension, type MIME et taille,
-  puis écrit le fichier sous la catégorie `documents`. En cas de refus, elle lève
-  une `UploadError` que l'on attrape pour afficher un message clair.
-- `SavedUpload` expose `original_name`, `size` et `path` (chemin de stockage
-  relatif), utiles pour confirmer l'enregistrement.
-
-## La vue
+Créez la vue `mvc/views/article/attach.html` :
 
 ```html
-<!-- mvc/views/file_upload/index.html -->
-{% if saved %}
-<p data-level="success">
-  Fichier enregistré : <strong>{{ saved.original_name }}</strong>
-  ({{ saved.size }} octets) → <code>{{ saved.path }}</code>
-</p>
-{% endif %}
-
-<form method="post" action="/file-upload" enctype="multipart/form-data">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-  <input type="file" name="document" required>
-  <button type="submit">Envoyer</button>
-</form>
+<!-- mvc/views/article/attach.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Attacher un document</title></head>
+<body>
+    <h1>Attacher un document à « {{ article.title }} »</h1>
+    <form method="post" action="/articles/{{ article.id }}/attach" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="file" name="document" required>
+        <button type="submit">Envoyer</button>
+    </form>
+    <p><a href="/articles">Retour au catalogue</a></p>
+</body>
+</html>
 ```
 
-### Comprendre ce code
+Ajoutez un lien « attacher » par article dans `mvc/views/article/index.html` :
 
-- `enctype="multipart/form-data"` est **obligatoire** pour transmettre un
-  fichier : sans lui, le navigateur n'envoie que le nom.
+```html
+<li>#{{ a.id }} : {{ a.title }} <em>({{ a.category }})</em>
+    <a href="/articles/{{ a.id }}/attach">attacher</a></li>
+```
+
+Puis déclarez les deux routes dans `mvc/routes.py`.
+
+## Votre mvc/routes.py à ce stade
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.article_controller import ArticleController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/articles", ArticleController.index, name="articles_index")
+    pub.add("GET",  "/articles/new", ArticleController.create, name="articles_new")
+    pub.add("POST", "/articles", ArticleController.store, name="articles_store")
+    pub.add("GET",  "/articles/{id}/attach", ArticleController.attach, name="articles_attach")
+    pub.add("POST", "/articles/{id}/attach", ArticleController.attach_store, name="articles_attach_store")
+```
+
+## Comprendre ce code
+
+- `enctype="multipart/form-data"` est **obligatoire** pour transmettre un fichier ;
+  sans lui, le navigateur n'envoie que le nom.
+- `request.file("document")` renvoie un `UploadedFile` (ou `None` si rien n'a été
+  envoyé), traité explicitement.
+- `save_upload(uploaded, "documents")` **valide** extension, type MIME et taille,
+  puis écrit le fichier ; en cas de refus elle lève une `UploadError`. On stocke
+  ensuite le chemin (`saved.path`) dans `articles.document_path`.
 - Le formulaire reste protégé par **CSRF**, comme tout POST.
+
+## Tester dans le navigateur
+
+| Action | Résultat |
+|---|---|
+| Attacher un fichier autorisé à un article | retour au catalogue, « Document attaché. » |
+| Envoyer un type non autorisé | erreur `422` claire, rien n'est stocké |
 
 ## À retenir
 
-- Un upload de fichier passe par un formulaire `multipart/form-data`.
+- Un upload passe par un formulaire `multipart/form-data`.
 - `request.file(...)` récupère le fichier ; `save_upload` le **valide** avant de
   l'écrire : jamais d'écriture aveugle.
 - Forge contrôle extension, type MIME et taille par défaut : la sécurité d'abord.
 
-## Après ce starter
+Au palier suivant, nous exposons le catalogue en API JSON protégée.
 
-Vous savez recevoir et stocker un fichier. La suite : exposer une API JSON.
-
-[API JSON protégée](json-api.md)
+[Continuer avec API JSON protégée](json-api.md)

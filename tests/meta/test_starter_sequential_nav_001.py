@@ -139,25 +139,24 @@ class TestSequentialChain:
         bilan = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "bilan.md"
         assert "../avance/relations.md" in bilan.read_text(encoding="utf-8")
 
-    def test_avance_relations_points_to_file_upload(self):
-        # Palier 1 avancé → palier 2 (file-upload).
+    def test_avance_relations_points_to_db_transaction(self):
+        # ADR-028, mini-projet Catalogue d'articles. Palier 1 → palier 2.
         page = STARTERS_DOCS / "welcome-forge" / "avance" / "relations.md"
+        assert "(db-transaction.md)" in page.read_text(encoding="utf-8")
+
+    def test_avance_db_transaction_points_to_file_upload(self):
+        # Palier 2 avancé → palier 3 (file-upload).
+        page = STARTERS_DOCS / "welcome-forge" / "avance" / "db-transaction.md"
         assert "(file-upload.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_file_upload_points_to_json_api(self):
-        # Palier 2 avancé → palier 3 (json-api) : send-email a été relocalisé
-        # dans le parcours welcome-mail (mail-welcome), ADR-022.
+        # Palier 3 avancé → palier 4 (json-api).
         page = STARTERS_DOCS / "welcome-forge" / "avance" / "file-upload.md"
         assert "(json-api.md)" in page.read_text(encoding="utf-8")
 
-    def test_avance_json_api_points_to_db_transaction(self):
-        # Palier 4 avancé → palier 5 (db-transaction).
-        page = STARTERS_DOCS / "welcome-forge" / "avance" / "json-api.md"
-        assert "(db-transaction.md)" in page.read_text(encoding="utf-8")
-
     def test_avance_last_palier_points_to_level_bilan(self):
-        # Dernier palier avancé disponible → bilan du niveau.
-        page = STARTERS_DOCS / "welcome-forge" / "avance" / "db-transaction.md"
+        # Dernier palier avancé (json-api) → bilan du niveau.
+        page = STARTERS_DOCS / "welcome-forge" / "avance" / "json-api.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_bilan_points_to_recapitulatif(self):

@@ -1,7 +1,0 @@
-# forge-starter:db-transaction:start
-from mvc.controllers.db_transaction_controller import DbTransactionController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/db-transaction", DbTransactionController.index, name="db_transaction_index")
-    pub.add("POST", "/db-transaction", DbTransactionController.store, name="db_transaction_store")
-# forge-starter:db-transaction:end

@@ -35,14 +35,16 @@ Un seul mini-projet, le « Carnet de notes », construit à la main palier aprè
 | 7 | [Messages flash](intermediaire/flash-messages.md) | Retour one-shot après action | `set_flash` / `get_flash`, POST-Redirect-GET |
 | 8 | [Mémoriser un état en session](intermediaire/session-state.md) | Garder un état entre requêtes | `get_session_store()`, cookie durci |
 
-## Niveau avancé (5 paliers)
+## Niveau avancé (4 paliers)
+
+Un seul mini-projet, le « Catalogue d'articles », construit à la main palier après palier.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Relations entre tables](avance/relations.md) | Deux tables liées, lecture jointe | `FOREIGN KEY`, `SELECT … JOIN …` |
-| 2 | [Téléverser un fichier](avance/file-upload.md) | Recevoir et stocker un fichier | `request.file(...)`, `save_upload(...)` |
-| 3 | [API JSON protégée](avance/json-api.md) | Exposer du JSON derrière un jeton | `Response.json`, `request.header("Authorization")` |
-| 4 | [Écritures transactionnelles](avance/db-transaction.md) | Plusieurs écritures atomiques | `with transaction() as tx:`, `insert(..., tx=tx)` |
+| 2 | [Écritures transactionnelles](avance/db-transaction.md) | Plusieurs écritures atomiques | `with transaction() as tx:`, `insert(..., tx=tx)` |
+| 3 | [Téléverser un fichier](avance/file-upload.md) | Recevoir et stocker un fichier | `request.file(...)`, `save_upload(...)` |
+| 4 | [API JSON protégée](avance/json-api.md) | Exposer du JSON derrière un jeton | `Response.json`, `request.header("Authorization")` |
 
 ## Réponses (`core.http.response.Response`)
 

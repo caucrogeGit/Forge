@@ -1,27 +1,140 @@
 # Bilan : niveau avancé
 
-Récapitulatif des compétences acquises au **niveau avancé** du starter
-*Bonjour Forge*. Ce niveau sort du CRUD pur pour aborder les préoccupations
-d'une vraie application : données reliées, fichiers, emails, API et écritures
-atomiques.
+Vous venez de construire à la main, palier après palier, un seul et même
+mini-projet : le **Catalogue d'articles**. Cette page récapitule les quatre
+notions acquises, puis montre l'état final complet du contrôleur et des routes.
 
-## Ce que vous avez validé
+## Les quatre notions acquises
 
-| Palier | Compétence acquise |
-|--------|--------------------|
-| 1. [Relations entre tables](relations.md) | Relier deux tables par une clé étrangère et les lire avec un `JOIN` SQL visible. |
-| 2. [Téléverser un fichier](file-upload.md) | Recevoir un fichier (`multipart`), le récupérer avec `request.file` et le stocker via `save_upload` (validé). |
-| 3. [API JSON protégée](json-api.md) | Renvoyer du JSON (`Response.json`) derrière un jeton `Authorization: Bearer …` lu avec `request.header`. |
-| 4. [Écritures transactionnelles](db-transaction.md) | Grouper des écritures atomiques avec `with transaction() as tx:` (`insert(..., tx=tx)`, rollback sur erreur). |
+- Palier 1 : relier deux tables par une **clé étrangère** et les lire avec un
+  `JOIN` SQL visible (`articles` joint à `categories`).
+- Palier 2 : grouper des écritures **atomiques** avec `with transaction() as tx:`
+  (créer un article et incrémenter le compteur de sa catégorie, rollback sur erreur).
+- Palier 3 : recevoir un fichier (`multipart`), le récupérer avec `request.file`,
+  le stocker via `forge_mvc_files.save_upload` (validé) et l'attacher à un article.
+- Palier 4 : exposer le catalogue en JSON (`Response.json`) derrière un jeton
+  `Authorization: Bearer …` lu avec `request.header`.
 
-Vous savez maintenant relier vos données sans ORM, recevoir des fichiers,
-envoyer des emails, exposer une API JSON protégée et écrire de façon atomique,
-le SQL restant explicite.
+## État final de mvc/controllers/article_controller.py
+
+```python
+# mvc/controllers/article_controller.py
+from core.database.db import execute, fetch_all, fetch_one, insert
+from core.database.transaction import transaction
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+from forge_mvc_files import UploadError, save_upload
+
+SELECT_ARTICLES_WITH_CATEGORY = (
+    "SELECT a.id, a.title, c.name AS category "
+    "FROM articles a "
+    "JOIN categories c ON c.id = a.category_id "
+    "ORDER BY a.id"
+)
+SELECT_CATEGORIES = "SELECT id, name FROM categories ORDER BY name"
+SELECT_ONE = "SELECT id, title FROM articles WHERE id = ?"
+INSERT_ARTICLE = "INSERT INTO articles (title, category_id) VALUES (?, ?)"
+INCREMENT_COUNT = "UPDATE categories SET article_count = article_count + 1 WHERE id = ?"
+SET_DOCUMENT = "UPDATE articles SET document_path = ? WHERE id = ?"
+API_TOKEN = "forge-demo-token"
+
+
+class ArticleController(BaseController):
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        articles = fetch_all(SELECT_ARTICLES_WITH_CATEGORY)
+        return BaseController.render(
+            "article/index.html",
+            request=request,
+            context={"articles": articles},
+        )
+
+    @staticmethod
+    def create(request: Request) -> Response:
+        return BaseController.render(
+            "article/new.html",
+            request=request,
+            context={"categories": fetch_all(SELECT_CATEGORIES)},
+        )
+
+    @staticmethod
+    def store(request: Request) -> Response:
+        title = request.form("title", default="").strip()
+        category_id = request.form("category_id", default="").strip()
+        try:
+            with transaction() as tx:
+                insert(INSERT_ARTICLE, (title, category_id), tx=tx)
+                if not title:
+                    raise ValueError("Le titre est obligatoire : tout est annulé.")
+                execute(INCREMENT_COUNT, (category_id,), tx=tx)
+        except ValueError as exc:
+            return BaseController.render(
+                "article/new.html",
+                status=422,
+                request=request,
+                context={"categories": fetch_all(SELECT_CATEGORIES), "error": str(exc)},
+            )
+        return BaseController.redirect("/articles", request=request, flash="Article créé.")
+
+    @staticmethod
+    def attach(request: Request) -> Response:
+        article = fetch_one(SELECT_ONE, (int(request.route("id")),))
+        if article is None:
+            return Response.text("Article introuvable.", status=404)
+        return BaseController.render(
+            "article/attach.html",
+            request=request,
+            context={"article": article},
+        )
+
+    @staticmethod
+    def attach_store(request: Request) -> Response:
+        record_id = int(request.route("id"))
+        uploaded = request.file("document")
+        if uploaded is None:
+            return Response.text("Aucun fichier sélectionné.", status=422)
+        try:
+            saved = save_upload(uploaded, "documents")
+        except UploadError as exc:
+            return Response.text(str(exc), status=422)
+        execute(SET_DOCUMENT, (saved.path, record_id))
+        return BaseController.redirect("/articles", request=request, flash="Document attaché.")
+
+    @staticmethod
+    def api_index(request: Request) -> Response:
+        authorization = request.header("Authorization") or ""
+        if authorization != f"Bearer {API_TOKEN}":
+            return Response.json({"error": "Jeton manquant ou invalide."}, status=401)
+        articles = fetch_all(SELECT_ARTICLES_WITH_CATEGORY)
+        return Response.json({"articles": articles})
+```
+
+## État final de mvc/routes.py
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.article_controller import ArticleController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/articles", ArticleController.index, name="articles_index")
+    pub.add("GET",  "/articles/new", ArticleController.create, name="articles_new")
+    pub.add("POST", "/articles", ArticleController.store, name="articles_store")
+    pub.add("GET",  "/articles/{id}/attach", ArticleController.attach, name="articles_attach")
+    pub.add("POST", "/articles/{id}/attach", ArticleController.attach_store, name="articles_attach_store")
+    pub.add("GET",  "/api/articles", ArticleController.api_index, name="api_articles")
+```
 
 ## Et ensuite
 
-Le **récapitulatif** rassemble toutes les API de la progression sur une seule
-page et vous oriente vers les starters autonomes (à commencer par le CRUD
-complet).
+Vous savez relier vos données sans ORM, écrire de façon atomique, recevoir des
+fichiers et exposer une API JSON protégée, le SQL restant explicite. Le
+**récapitulatif** rassemble toutes les API de la progression sur une seule page.
 
 [Récapitulatif de la progression](../recapitulatif.md)

@@ -9,7 +9,7 @@ le **core CLI n'exige plus l'upload** au démarrage :
 - ``forge.py`` n'importe **pas** ``forge_cli.uploads`` au niveau module : il le
   fait en *lazy* dans la branche ``upload:init``/``media:init`` (sinon le core
   CLI tomberait sans l'opt-in installé) ;
-- le starter ``file-upload`` importe depuis ``forge_mvc_files``.
+- un starter survivant (``file-store``) importe depuis ``forge_mvc_files``.
 """
 from __future__ import annotations
 
@@ -25,8 +25,8 @@ FORGE_PY = PROJECT_ROOT / "forge.py"
 CLI_UPLOADS = PROJECT_ROOT / "forge_cli" / "uploads.py"
 CONTROLLER_BUILDER = PROJECT_ROOT / "forge_cli" / "entities" / "crud" / "controller_builder.py"
 STARTER_CTRL = (
-    PROJECT_ROOT / "forge_cli" / "starters" / "data" / "file-upload" / "files"
-    / "mvc" / "controllers" / "file_upload_controller.py"
+    PROJECT_ROOT / "forge_cli" / "starters" / "data" / "file-store" / "files"
+    / "mvc" / "controllers" / "file_store_controller.py"
 )
 
 
