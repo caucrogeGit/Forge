@@ -107,5 +107,5 @@ def test_generation_public_page_respecte_le_contrat_et_reste_idempotente(tmp_pat
     ) == first_template
     routes = (tmp_path / "mvc" / "routes.py").read_text(encoding="utf-8")
     assert routes.count('"/accueil"') == 1
-    assert routes.count('name="public_accueil"') == 1
+    assert routes.count('name="public_pages-accueil"') == 1
     assert first_routes.count('"/accueil"') == 1

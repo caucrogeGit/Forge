@@ -55,7 +55,7 @@ def test_make_public_page_ajoute_route_publique(tmp_path):
 
     routes = _read(tmp_path, "mvc/routes.py")
     assert "from mvc.controllers.public_pages_controller import PublicPagesController" in routes
-    assert 'pub.add("GET", "/accueil", PublicPagesController.accueil, name="public_accueil")' in routes
+    assert 'pub.add("GET", "/accueil", PublicPagesController.accueil, name="public_pages-accueil")' in routes
     assert 'router.group("", public=True)' in routes
 
 
@@ -78,7 +78,7 @@ def test_make_public_page_ne_duplique_pas_route_existante(tmp_path):
 
     routes = _read(tmp_path, "mvc/routes.py")
     assert routes.count('"/accueil"') == 1
-    assert routes.count('name="public_accueil"') == 1
+    assert routes.count('name="public_pages-accueil"') == 1
 
 
 def test_make_public_page_necrase_pas_template_existant(tmp_path):
@@ -112,7 +112,7 @@ def test_make_public_page_normalise_les_noms_valides():
     assert build_public_page_spec("ma-page").slug == "ma-page"
     assert build_public_page_spec("MaPage").slug == "ma-page"
     assert build_public_page_spec("MaPage").method_name == "ma_page"
-    assert build_public_page_spec("MaPage").route_name == "public_ma_page"
+    assert build_public_page_spec("MaPage").route_name == "public_pages-ma_page"
 
 
 @pytest.mark.parametrize("name", ["../test", "/admin", "a/b", "..", "", "-", "admin/secret"])

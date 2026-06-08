@@ -68,9 +68,9 @@ def test_make_public_show_ajoute_route_publique_idempotente(tmp_path):
 
     routes = _read(tmp_path, "mvc/routes.py")
     assert "from mvc.controllers.public_hebergements_controller import PublicHebergementsController" in routes
-    assert 'pub.add("GET", "/hebergements/{id}", PublicHebergementsController.show, name="public_hebergements_show")' in routes
+    assert 'pub.add("GET", "/hebergements/{id}", PublicHebergementsController.show, name="public_hebergements-show")' in routes
     assert routes.count('"/hebergements/{id}"') == 1
-    assert routes.count('name="public_hebergements_show"') == 1
+    assert routes.count('name="public_hebergements-show"') == 1
 
 
 def test_make_public_show_necrase_pas_template_existant(tmp_path):

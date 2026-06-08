@@ -59,7 +59,7 @@ def build_public_page_spec(name: str) -> PublicPageSpec:
         source=name,
         slug=slug,
         method_name=method_name,
-        route_name=f"public_{method_name}",
+        route_name=f"public_pages-{method_name}",
         title=title,
     )
 

@@ -173,8 +173,8 @@ def test_build_public_form_spec_route_path():
     spec = build_public_form_spec(DEMANDE_JSON)
 
     assert spec.route_path == "/demandes"
-    assert spec.route_new_name == "public_demandes_new"
-    assert spec.route_create_name == "public_demandes_create"
+    assert spec.route_new_name == "public_demandes-new"
+    assert spec.route_create_name == "public_demandes-create"
 
 
 def test_build_public_form_spec_class_name():
@@ -405,8 +405,8 @@ def test_build_form_route_block_contient_get_new_et_post():
     assert '"/demandes/new"' in block
     assert '"POST"' in block
     assert '"/demandes"' in block
-    assert 'name="public_demandes_new"' in block
-    assert 'name="public_demandes_create"' in block
+    assert 'name="public_demandes-new"' in block
+    assert 'name="public_demandes-create"' in block
 
 
 # --- Intégration make_public_form ---
