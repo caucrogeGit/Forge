@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
+import traceback as _traceback
 from urllib.parse import urlencode
 
 from core.errors.runtime_errors import (
@@ -147,3 +148,37 @@ def log_runtime_error(exc: BaseException, request=None) -> None:
 
     except Exception as write_err:
         logger.warning("Impossible d'écrire dans %s : %s", _JSONL_FILENAME, write_err)
+
+
+# ── Contexte d'erreur pour la page 500 (dev uniquement) ───────────────────────
+
+def build_dev_error_context(exc: BaseException) -> dict | None:
+    """Contexte d'erreur destiné à la page `errors/500.html`, en `APP_ENV=dev`.
+
+    Retourne ``{"error": {"type", "message", "traceback"}}`` quand
+    l'environnement est explicitement ``dev``, pour que la page 500 affiche la
+    cause au développeur. Retourne ``None`` dans tous les autres cas : en prod,
+    ou si l'environnement ne peut pas être déterminé. Aucune trace n'est donc
+    jamais exposée par défaut (charte : sécuriser par défaut).
+
+    Doit être appelée depuis un bloc ``except`` actif pour que la trace
+    (``traceback.format_exc()``) corresponde à l'exception courante.
+    """
+    try:
+        import core.forge as forge
+        environment = forge.get("app_env")
+    except Exception:
+        # Boot incomplet : on ne se rabat PAS sur "dev" par défaut ici (contenu
+        # exposé en HTTP), seul un APP_ENV=dev explicite autorise l'affichage.
+        environment = os.environ.get("APP_ENV")
+
+    if environment != "dev":
+        return None
+
+    return {
+        "error": {
+            "type":      type(exc).__name__,
+            "message":   str(exc),
+            "traceback": _traceback.format_exc(),
+        }
+    }

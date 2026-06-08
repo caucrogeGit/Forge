@@ -22,6 +22,15 @@
 
 ### Ajouté
 
+- **La page 500 affiche la cause de l'erreur en mode dev** (`DX-DEV-500-ERROR-001`).
+  En `APP_ENV=dev`, lorsqu'une exception non gérée produit une réponse 500, le
+  dispatcher passe à `errors/500.html` un contexte `error` (type, message, trace
+  Python complète) construit par `build_dev_error_context()`. Le template du
+  squelette affiche ces détails dans un bloc `{% if error %}`, avec échappement
+  HTML automatique (pas d'injection). En production, `build_dev_error_context()`
+  retourne `None` : aucune trace n'est jamais exposée, la page reste la page
+  d'erreur sobre. Les projets existants ajoutent le bloc `{% if error %}` à leur
+  `mvc/views/errors/500.html` pour en bénéficier.
 - **`forge-mvc-i18n` : l'internationalisation devient un opt-in** (ADR-027,
   `I18N-EXTRACT-001`). Le translator runtime (`core/i18n/` : catalogues JSON,
   locale par défaut et fallback, cache, helper `trans()`) est extrait vers le

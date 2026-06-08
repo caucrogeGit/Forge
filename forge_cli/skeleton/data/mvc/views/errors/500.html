@@ -15,6 +15,16 @@
         <a href="/" class="mt-6 inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
             Retour à l'accueil
         </a>
+        {% if error %}
+        <div class="mt-8 max-w-3xl mx-auto text-left bg-white border border-red-200 rounded-lg shadow-sm overflow-hidden">
+            <div class="bg-red-50 px-4 py-3 border-b border-red-200">
+                <p class="text-sm font-semibold text-red-700">{{ error.type }}</p>
+                <p class="text-sm text-red-600 mt-1">{{ error.message }}</p>
+            </div>
+            <pre class="text-xs text-gray-700 p-4 overflow-x-auto whitespace-pre-wrap">{{ error.traceback }}</pre>
+            <p class="text-xs text-gray-400 px-4 pb-3">Détails affichés uniquement en mode développement (APP_ENV=dev).</p>
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>

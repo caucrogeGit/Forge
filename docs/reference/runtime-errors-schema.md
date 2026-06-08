@@ -24,7 +24,12 @@ Ce fichier JSONL est la **source unique de vérité** des erreurs runtime de dé
 - Il est actif uniquement en `APP_ENV=dev`.
 - Le rendu Markdown (`errors.dev.md`) est régénéré automatiquement après chaque écriture.
 - La future vue Forge Design lira ce fichier directement.
-- Il n'est jamais la source de réponse HTTP — les pages d'erreur restent statiques.
+- Il n'est jamais la source de réponse HTTP. La page `errors/500.html` reste
+  statique en production. En `APP_ENV=dev`, le dispatcher lui passe en plus un
+  contexte `error` (type, message, trace) construit par
+  `build_dev_error_context()`, et le template affiche la cause si le bloc
+  `{% if error %}` est présent. Aucune trace n'est exposée en production
+  (`build_dev_error_context()` retourne `None` hors dev).
 
 ---
 

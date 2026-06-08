@@ -2,7 +2,10 @@ import logging
 from core.app.api_routes_loader import load_api_routes as _load_api_routes
 from core.http.helpers import html as _html
 from core.http.router import Router
-from core.errors.runtime_error_logger import log_runtime_error as _log_runtime_error
+from core.errors.runtime_error_logger import (
+    build_dev_error_context as _dev_error_context,
+    log_runtime_error as _log_runtime_error,
+)
 from core.security.middleware import AuthMiddleware, CsrfMiddleware
 
 logger = logging.getLogger(__name__)
@@ -63,4 +66,5 @@ class Application:
         except Exception as _exc:
             logger.exception("Erreur non gérée — %s %s", request.method, request.path)
             _log_runtime_error(_exc, request)
-            return _html("errors/500.html", 500)
+            # En APP_ENV=dev, la page 500 affiche la cause ; None en prod.
+            return _html("errors/500.html", 500, _dev_error_context(_exc))
