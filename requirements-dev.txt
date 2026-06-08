@@ -29,3 +29,4 @@ ruff>=0.4
 -e ./packages/forge-mvc-audio
 -e ./packages/forge-mvc-pivot
 -e ./packages/forge-mvc-mail
+-e ./packages/forge-mvc-i18n

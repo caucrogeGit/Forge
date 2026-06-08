@@ -43,7 +43,7 @@ pytestmark = pytest.mark.meta
 
 # Sous-ensemble CURÉ d'opt-ins (briques de type bibliothèque) dont les tests
 # importeurs au niveau module utilisent `pytest.importorskip`. Ce n'est PAS la
-# liste exhaustive des 11 opt-ins : l'exhaustivité de la couverture opt-in est
+# liste exhaustive des 12 opt-ins : l'exhaustivité de la couverture opt-in est
 # garantie par `tests/meta/test_pytest_core_only_contract_001.py` (OPTIN_MODULES
 # complet + fermeture sur imports inconnus). Les opt-ins à dépendances lourdes
 # (files, images, audio, iot, video) sont volontairement hors de ce garde-fou-ci.

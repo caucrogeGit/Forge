@@ -83,11 +83,12 @@ python -m pip install -r requirements-dev.txt
 2. installe les outils de développement (`pytest`, `build`,
    `setuptools`, `twine`, `mkdocs`, `mkdocs-material`,
    `pymdown-extensions`, `pip-audit`, `ruff`) ;
-3. installe les **11 modules opt-in** Forge en mode éditable depuis
+3. installe les **12 modules opt-in** Forge en mode éditable depuis
    le monorepo (`forge-mvc-mfa`, `forge-mvc-rbac`,
    `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-files`,
    `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-iot`,
-   `forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail`).
+   `forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail`,
+   `forge-mvc-i18n`).
 
 !!! note "Sans `requirements-dev.txt`, pytest casse"
     Environ 46 fichiers de tests importent les modules opt-in
@@ -202,7 +203,7 @@ Ce mode n'est **pas** utile pour :
 
 ## 7. Travailler sur les opt-ins (packages/)
 
-Les 11 modules opt-in vivent dans `packages/` :
+Les 12 modules opt-in vivent dans `packages/` :
 
 ```text
 packages/
@@ -216,7 +217,8 @@ packages/
 ├── forge-mvc-iot/        Réception/exposition de données IoT (MQTT)
 ├── forge-mvc-video/      Upload, transcodage MP4, lecture HTTP Range
 ├── forge-mvc-pivot/      Tables pivot enrichies (many_to_many avec attributs)
-└── forge-mvc-mail/       Envoi de courriels (composition, transports, templates)
+├── forge-mvc-mail/       Envoi de courriels (composition, transports, templates)
+└── forge-mvc-i18n/       Internationalisation (catalogues JSON, trans(), fallback)
 ```
 
 Chacun a son propre `pyproject.toml`. `requirements-dev.txt` les

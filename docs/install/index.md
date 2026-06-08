@@ -51,6 +51,7 @@ Voir [Politique de release](../release/release-policy.md#publication-pypi).
 | `forge-mvc-video` | Brique vidéo (upload, transcodage MP4, lecture HTTP Range) | **Beta** : publié PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-pivot` | Brique pivot : associations `many_to_many` enrichies + `make:pivot-crud` | **Beta** : publié PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-mail` | Brique mail (composition, transports, templates Jinja, CLI `mail:*`) | **Beta** : publié PyPI depuis `1.0.0-beta.13` |
+| `forge-mvc-i18n` | Brique i18n (catalogues JSON, `trans()`, locale par défaut et fallback) | **Beta** : extrait du core en `1.0.0-beta.14` (ADR-027), publication PyPI à venir |
 
 Pour installer Forge avec toutes les briques opt-in :
 
@@ -65,18 +66,21 @@ python -m pip install -r requirements-dev.txt
 ```
 
 `pip install -e .` installe le core en mode éditable.
-`requirements-dev.txt` installe ensuite les 11 modules opt-in
+`requirements-dev.txt` installe ensuite les 12 modules opt-in
 (également en éditable) et les outils de développement. Voir
 [Installation depuis GitHub](github.md) pour les détails.
 
 ## Contrat d'installation des opt-ins
 
-Le core `forge-mvc` et les onze opt-ins officiels
+Le core `forge-mvc` et onze opt-ins officiels
 (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
 `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-iot`,
 `forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail`) sont publiés sur PyPI
 (rbac/workflow/stats/mfa depuis `1.0.0-beta.9`, `forge-mvc-iot` depuis
-`1.0.0-beta.12`, et les six derniers depuis `1.0.0-beta.13`).
+`1.0.0-beta.12`, et les six derniers depuis `1.0.0-beta.13`). Le douzième
+opt-in, `forge-mvc-i18n` (extrait du core en `1.0.0-beta.14`, ADR-027), attend
+sa première publication PyPI ; en attendant il s'installe en éditable via
+`requirements-dev.txt`.
 
 Installation directe d'un opt-in (méthode recommandée, disponible pour tous) :
 
@@ -122,7 +126,8 @@ python -m pip install -e .
 python -m pip install -r requirements-dev.txt
 ```
 
-`requirements-dev.txt` installe les onze opt-ins en mode éditable.
+`requirements-dev.txt` installe les douze opt-ins en mode éditable
+(y compris `forge-mvc-i18n`, pas encore publié sur PyPI).
 
 ---
 
