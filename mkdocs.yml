@@ -364,6 +364,7 @@ nav:
           - ADR-024 Bootstrap squelette dédié: adr/024-skeleton-bootstrap.md
           - ADR-025 welcome-forge tutoriel continu: adr/025-welcome-forge-continuous-tutorial.md
           - ADR-026 Accesseurs Request query/route: adr/026-request-param-naming.md
+          - ADR-027 Extraction i18n: adr/027-i18n-extraction.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md

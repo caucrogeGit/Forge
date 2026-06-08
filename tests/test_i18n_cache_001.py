@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import pytest
 
-from core.i18n import (
+pytest.importorskip("forge_mvc_i18n")
+
+from forge_mvc_i18n import (
     TranslationCatalogError,
     clear_translation_cache,
     load_catalog,
     trans,
 )
-from core.i18n.translator import _load_catalog_cached
+from forge_mvc_i18n.translator import _load_catalog_cached
 
 
 @pytest.fixture(autouse=True)
@@ -25,8 +27,8 @@ def reset_cache():
 
 
 def test_clear_translation_cache_est_exportee():
-    """clear_translation_cache est accessible depuis core.i18n."""
-    import core.i18n as i18n
+    """clear_translation_cache est accessible depuis forge_mvc_i18n."""
+    import forge_mvc_i18n as i18n
     assert callable(i18n.clear_translation_cache)
     assert "clear_translation_cache" in i18n.__all__
 

@@ -27,6 +27,7 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-files":    "Development Status :: 3 - Alpha",
     "forge-mvc-pivot":    "Development Status :: 4 - Beta",
     "forge-mvc-mail":     "Development Status :: 4 - Beta",
+    "forge-mvc-i18n":     "Development Status :: 4 - Beta",
 }
 
 

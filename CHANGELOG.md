@@ -7,6 +7,20 @@
 > manuel : un seul projet qui grandit, au lieu de starters indépendants par
 > palier (ADR-025).
 
+### Ajouté
+
+- **`forge-mvc-i18n` : l'internationalisation devient un opt-in** (ADR-027,
+  `I18N-EXTRACT-001`). Le translator runtime (`core/i18n/` : catalogues JSON,
+  locale par défaut et fallback, cache, helper `trans()`) est extrait vers le
+  paquet `forge-mvc-i18n`. Le noyau conserve un **repli no-op** : le renderer
+  Jinja expose toujours un global `trans` qui retourne la clé telle quelle, si
+  bien que le CRUD généré (qui appelle `{{ trans(...) }}`) rend sans erreur même
+  sans le paquet ; dès que `forge-mvc-i18n` est installé, le vrai `trans()`
+  charge les catalogues. Même pattern que `can()` pour RBAC. Les clés de
+  configuration `i18n_default_locale` / `i18n_fallback_locale` restent dans le
+  registre du noyau, et la CLI de scaffolding `i18n:init` / `i18n:check`
+  (autonome) reste dans le CLI cœur.
+
 ### Modifié
 
 - **Accesseurs de `Request` renommés par leur source** (ADR-026,

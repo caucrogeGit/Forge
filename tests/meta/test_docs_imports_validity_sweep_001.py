@@ -93,6 +93,8 @@ _FRAMEWORK_ROOTS = frozenset({
     "forge_mvc_pivot",
     # forge-mvc-mail : mail extrait du core (ADR-022).
     "forge_mvc_mail",
+    # forge-mvc-i18n : i18n extrait du core (ADR-027).
+    "forge_mvc_i18n",
     "forge_cli",
     # `integrations/` est dans le repo Forge (Jinja2 renderer, etc.).
     "integrations",

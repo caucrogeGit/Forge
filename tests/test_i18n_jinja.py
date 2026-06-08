@@ -4,10 +4,12 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("forge_mvc_i18n")
+
 import core.forge as forge
-import core.i18n as i18n
-from core.i18n import set_fallback_locale
-from integrations.jinja2.renderer import Jinja2Renderer
+import forge_mvc_i18n as i18n
+from forge_mvc_i18n import set_fallback_locale
+from integrations.jinja2.renderer import Jinja2Renderer, _default_trans
 
 
 @pytest.fixture(autouse=False)
@@ -22,9 +24,18 @@ def test_jinja_env_expose_trans(tmp_path):
     assert "trans" in r._env.globals
 
 
-def test_trans_jinja_global_est_la_fonction_core_i18n(tmp_path):
+def test_trans_jinja_global_est_la_fonction_i18n_optin(tmp_path):
+    # forge-mvc-i18n installé : le renderer remplace le repli no-op par la
+    # vraie fonction trans() du paquet.
     r = Jinja2Renderer(str(tmp_path))
     assert r._env.globals["trans"] is i18n.trans
+
+
+def test_default_trans_retourne_la_cle():
+    # Repli no-op du noyau quand forge-mvc-i18n est absent : la clé brute.
+    assert _default_trans("crud.edit") == "crud.edit"
+    assert _default_trans("common.save", locale="en") == "common.save"
+    assert _default_trans("x", locale="fr", translations_dir="/tmp") == "x"
 
 
 def test_template_trans_common_save(tmp_path):

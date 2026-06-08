@@ -95,6 +95,8 @@ OPTIN_MODULES: dict[str, set[str]] = {
     # forge-mvc-mail : mail extrait du core (ADR-022). jinja2 est une dep
     # core (templating), donc pas d'extra a lister ici.
     "forge_mvc_mail": set(),
+    # forge-mvc-i18n : i18n extrait du core (ADR-027). aucune dep tierce.
+    "forge_mvc_i18n": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

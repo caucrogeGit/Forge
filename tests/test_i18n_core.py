@@ -5,9 +5,11 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("forge_mvc_i18n")
+
 import core.forge as forge
-import core.i18n as i18n
-from core.i18n import (
+import forge_mvc_i18n as i18n
+from forge_mvc_i18n import (
     I18nError,
     TranslationCatalogError,
     get_default_locale,
@@ -24,7 +26,7 @@ from core.i18n import (
 # ---------------------------------------------------------------------------
 
 
-def test_core_i18n_is_importable():
+def test_forge_mvc_i18n_is_importable():
     assert i18n.I18nError is I18nError
     assert i18n.TranslationCatalogError is TranslationCatalogError
 

@@ -1471,10 +1471,17 @@ plus supportés depuis `MEDIA-SHIMS-REMOVE-001`. L'import correct est
 
 </details>
 
-<details markdown="1" id="corei18n">
-<summary><code>core.i18n</code> - Internationalisation</summary>
+<details markdown="1" id="forgemvci18n">
+<summary><code>forge_mvc_i18n</code> - Internationalisation (opt-in)</summary>
 
-`core.i18n` fournit une API Python minimale pour traduire des clés depuis un
+`forge-mvc-i18n` est un module **opt-in** extrait du core (ADR-027). Installez-le
+pour activer la traduction :
+
+```bash
+pip install --pre forge-mvc-i18n
+```
+
+`forge_mvc_i18n` fournit une API Python minimale pour traduire des clés depuis un
 catalogue JSON local.
 
 Le catalogue français est :
@@ -1489,7 +1496,7 @@ Il contient des clés génériques plates en notation pointée (`common.save`,
 ### Utilisation
 
 ```python
-from core.i18n import trans, load_catalog
+from forge_mvc_i18n import trans, load_catalog
 
 # Traduction d'une clé (locale fr par défaut)
 trans("common.save")                      # → "Enregistrer"
@@ -1522,8 +1529,8 @@ catalog = load_catalog("fr", translations_dir="translations")
 La langue par défaut et la langue de fallback sont toutes deux `"fr"` initialement :
 
 ```python
-from core.i18n import get_default_locale, set_default_locale
-from core.i18n import get_fallback_locale, set_fallback_locale
+from forge_mvc_i18n import get_default_locale, set_default_locale
+from forge_mvc_i18n import get_fallback_locale, set_fallback_locale
 
 get_default_locale()          # → "fr"
 get_fallback_locale()         # → "fr"
@@ -1552,14 +1559,25 @@ Le catalogue de fallback absent est ignoré silencieusement.
 
 ### Utilisation dans les templates Jinja
 
-`trans()` est disponible comme global Jinja dans tous les templates Forge et utilise la même langue par défaut :
+`trans()` est toujours disponible comme global Jinja dans tous les templates
+Forge. Le noyau expose un **repli no-op** qui retourne la clé telle quelle, pour
+que les templates générés (CRUD, pages publiques) rendent sans erreur même sans
+traduction. Dès que `forge-mvc-i18n` est installé, le renderer remplace ce repli
+par la vraie fonction `trans()` qui charge les catalogues :
 
 ```html
-{{ trans("common.save") }}           {# → Enregistrer #}
-{{ trans("validation.required") }}   {# → Ce champ est obligatoire. #}
-{{ trans("cle.inconnue") }}          {# → cle.inconnue #}
+{{ trans("common.save") }}           {# forge-mvc-i18n absent → common.save ; présent → Enregistrer #}
+{{ trans("validation.required") }}   {# présent → Ce champ est obligatoire. #}
+{{ trans("cle.inconnue") }}          {# → cle.inconnue (clé inconnue dans tous les cas) #}
 {{ trans("common.save", locale="fr") }}
 ```
+
+### Commandes CLI de scaffolding
+
+Les commandes `forge i18n:init` et `forge i18n:check` font partie du CLI du
+noyau (outillage de projet) et restent disponibles sans installer
+`forge-mvc-i18n` : elles créent et vérifient le fichier `translations/fr.json`,
+indépendamment du translator runtime.
 
 ### Commandes CLI
 

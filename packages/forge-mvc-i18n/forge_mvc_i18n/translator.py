@@ -5,7 +5,7 @@ from functools import lru_cache
 from pathlib import Path
 
 import core.forge as _forge
-from core.i18n.exceptions import I18nError, TranslationCatalogError
+from forge_mvc_i18n.exceptions import I18nError, TranslationCatalogError
 
 
 def get_default_locale() -> str:

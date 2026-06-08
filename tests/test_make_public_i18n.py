@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 
-from core.i18n import trans, load_catalog
+pytest.importorskip("forge_mvc_i18n")
+
+from forge_mvc_i18n import trans, load_catalog
 from forge_cli.public_contact import build_contact_template
 from forge_cli.public_form import build_public_form_spec, build_public_form_template
 from forge_cli.public_list import (
@@ -157,7 +160,7 @@ def test_templates_restent_utilisables_si_cle_absente(tmp_path):
     catalog_path.parent.mkdir()
     catalog_path.write_text('{}', encoding="utf-8")
 
-    from core.i18n.translator import load_catalog as _load, trans as _trans
+    from forge_mvc_i18n.translator import load_catalog as _load, trans as _trans
     catalog = _load("fr", tmp_path / "translations")
     assert "public.list.empty" not in catalog
     result = _trans("public.list.empty", translations_dir=tmp_path / "translations")
