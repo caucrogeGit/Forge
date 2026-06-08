@@ -34,3 +34,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-025](025-welcome-forge-continuous-tutorial.md) | welcome-forge : tutoriel continu manuel au lieu de starters par palier (accepté) |
 | [ADR-026](026-request-param-naming.md) | Accesseurs de Request nommés par leur source : `query` et `route` (accepté) |
 | [ADR-027](027-i18n-extraction.md) | Extraction de l'i18n vers `forge-mvc-i18n`, repli no-op conservé dans le noyau (accepté) |
+| [ADR-028](028-welcome-forge-tutorial-per-level.md) | welcome-forge : tutoriel continu manuel sur les trois niveaux, un mini-projet par niveau (accepté) |
