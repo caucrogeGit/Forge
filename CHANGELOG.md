@@ -3,9 +3,18 @@
 
 ## [Non publié]
 
-> Le niveau débutant du parcours `welcome-forge` devient un tutoriel continu
-> manuel : un seul projet qui grandit, au lieu de starters indépendants par
-> palier (ADR-025).
+(rien pour l'instant)
+
+
+## [1.0.0-beta.14] — 2026-06-08
+
+> Quatre chantiers structurants : bootstrap par squelette dédié (`forge new`
+> produit un projet nu, ADR-024), extraction de l'internationalisation en opt-in
+> (`forge-mvc-i18n`, ADR-027), convention de déclaration des routes unifiée
+> (ADR-029) et refonte du tutoriel `welcome-forge` en progression continue
+> manuelle sur les trois niveaux (ADR-025, ADR-028). Suivis d'un audit de
+> pré-publication (sécurité, générateurs, cohérence) dont les correctifs sont
+> listés ci-dessous.
 
 ### Sécurité
 
@@ -19,6 +28,20 @@
   `core.auth.password._validate_password` (rejet **avant** tout calcul Argon2,
   côté hash et verify) et dans `validate_new_password` (message d'erreur propre
   au reset). Aucun mot de passe légitime n'est affecté.
+- **Rotation de session après login rendue explicite** (`SEC-AUTH-SESSION-FIXATION-001`).
+  `login_user()` ne régénère pas l'identifiant de session et ne le peut pas seul
+  (pas d'accès à la réponse HTTP pour réémettre le cookie). Plutôt qu'une magie
+  cachée inopérante, le contrat est rendu explicite : la docstring et
+  `docs/features/auth.md` exigent désormais `regenerate_session` +
+  `set_session_cookie` juste après le login, comme l'applique le contrôleur de
+  référence. Garde-fou ajouté.
+- **Fallback d'audit sans fuite de secret** (`SEC-AUTH-AUDIT-SANITIZE-001`). En
+  cas d'échec de `safe_log_auth_event`, le repli ne journalise plus `kwargs` brut
+  (qui pouvait porter un secret) mais seulement la métadonnée sanitisée.
+- **Consommation anti-replay TOTP atomique** (`SEC-MFA-TOTP-REPLAY-ATOMIC-001`).
+  La séquence vérifier-puis-enregistrer du code TOTP passe par une primitive
+  `check_and_record` sous verrou unique : deux requêtes concurrentes portant le
+  même code valide ne peuvent plus être acceptées toutes les deux.
 
 ### Ajouté
 
@@ -45,54 +68,6 @@
 
 ### Modifié
 
-- **Convention de déclaration des routes** (ADR-029,
-  `ROUTE-CONVENTION-ADR-029`). Une route dérive désormais mécaniquement du
-  contrôleur et de la méthode visés : chemin `/<contrôleur>/<méthode>` (la
-  méthode `index` donne le chemin nu `/<contrôleur>`), nom
-  `<contrôleur>-<méthode>` (séparateur trait d'union), avec l'unique exception
-  de la racine `/` pour `HomeController.index` nommée `home-index`. Le
-  générateur `make:crud` (`ROUTE-CONVENTION-MAKECRUD-001`), le squelette
-  `forge new` (`ROUTE-CONVENTION-SKELETON-001`) et le tutoriel `welcome-forge`
-  (`ROUTE-CONVENTION-WELCOME-001`) produisent ce format. Rupture franche sans
-  alias (phase bêta pré-1.0) : elle remplace l'ancienne convention implicite de
-  `make:crud` (`<ressource>_<action>`, chemins REST pluriels) et le nom
-  `home_index` du squelette. Divergence transitoire assumée : les ~84 starters
-  opt-in et l'application interne de démonstration (`mvc/routes.py`) gardent
-  encore l'ancienne convention dans leurs snippets, leur alignement étant
-  déféré à des tickets dédiés. Page pratique : `docs/contributing/route-convention.md`.
-- **Accesseurs de `Request` renommés par leur source** (ADR-026,
-  `HTTP-REQUEST-PARAM-RENAME-001`) : `request.param` devient `request.query`
-  (query string) et `request.route_param` devient `request.route` (paramètre de
-  route dynamique). Rupture franche sans alias (phase bêta pré-1.0) : tous les
-  appels sont migrés (core, starters, modules opt-in, tutoriel welcome-forge,
-  tests, doc). Les attributs `request.params` / `request.route_params` et les
-  clés de `request.data` restent inchangés. `form`, `json`, `header`, `file`
-  étaient déjà nommés par leur source et ne changent pas.
-- **welcome-forge débutant : tutoriel continu manuel** (ADR-025,
-  `STARTER-WELCOME-FORGE-DOC-CONTINUITY-001`). Les 11 paliers (de « Bonjour
-  Forge » à « Écrire en base ») se construisent désormais à la main dans un
-  seul projet qui grandit : un `WelcomeController` accumule les paliers HTTP
-  (1 à 9), puis un `MessageController` porte les paliers SQL (10 et 11), avec
-  un `mvc/routes.py` cumulatif montré à chaque étape. Pages francisées (retrait
-  des tirets cadratins). Préambule d'installation sans `forge starter:build`.
-
-### Retiré
-
-- **Les 11 starters buildables du niveau débutant welcome-forge** sont retirés
-  de `forge_cli/starters/data/` et du contrat public gelé, ramené de 107 à 96
-  starters (ADR-025, `STARTER-WELCOME-FORGE-DROP-DATA-001`). Les niveaux
-  intermédiaire et avancé, ainsi que tous les parcours opt-in, restent des
-  starters `forge starter:build`. La numérotation des starters n'est plus une
-  plage dense `1..N` (unicité seule).
-
-
-## [1.0.0-beta.14] — 2026-06-07
-
-> Bootstrap par squelette dédié : `forge new` produit enfin un projet
-> réellement nu (ADR-024).
-
-### Modifié
-
 - **`forge new` matérialise un squelette de projet dédié** au lieu de cloner le
   dépôt Forge (ADR-024, `NEW-MATERIALIZE-001`). Le projet généré ne contient
   plus le framework (`core/`, `forge_cli/`, `packages/`, `tests/`, `docs/`) : il
@@ -107,26 +82,93 @@
 - **`forge new` produit toujours un projet nu** : le flag `--starter` est retiré ;
   `forge starter:build` devient la seule façon officielle de construire un
   starter (ADR-023, `CLI-NEW-DROP-STARTER-001`).
+- **Convention de déclaration des routes** (ADR-029,
+  `ROUTE-CONVENTION-ADR-029`). Une route dérive désormais mécaniquement du
+  contrôleur et de la méthode visés : chemin `/<contrôleur>/<méthode>` (la
+  méthode `index` donne le chemin nu `/<contrôleur>`), nom
+  `<contrôleur>-<méthode>` (séparateur trait d'union), avec l'unique exception
+  de la racine `/` pour `HomeController.index` nommée `home-index`. Le
+  générateur `make:crud` (`ROUTE-CONVENTION-MAKECRUD-001`), le squelette
+  `forge new` (`ROUTE-CONVENTION-SKELETON-001`), le tutoriel `welcome-forge`
+  (`ROUTE-CONVENTION-WELCOME-001`), les générateurs `make:public-*`
+  (`ROUTE-CONVENTION-PUBLIC-001`) et l'application de démonstration
+  (`ROUTE-CONVENTION-DOGFOOD-001`) produisent ce format. Rupture franche sans
+  alias (phase bêta pré-1.0) : elle remplace l'ancienne convention implicite de
+  `make:crud` (`<ressource>_<action>`, chemins REST pluriels) et le nom
+  `home_index` du squelette. Divergence transitoire assumée : les ~84 starters
+  opt-in gardent encore l'ancienne convention dans leurs snippets, leur
+  alignement étant déféré à des tickets dédiés. Page pratique :
+  `docs/contributing/route-convention.md`.
+- **`make:pivot-crud` génère du code exécutable** (`FIX-PIVOT-CRUD-API-001`). Le
+  sous-CRUD pivot s'appuyait sur une API runtime inexistante (`Response.render`,
+  `Response.redirect`, `app.route`) et des signatures incompatibles ; il utilise
+  désormais `BaseController.render`/`redirect`, lit les identifiants via
+  `request.route(...)` et déclare ses routes au format ADR-029.
+- **Accesseurs de `Request` renommés par leur source** (ADR-026,
+  `HTTP-REQUEST-PARAM-RENAME-001`) : `request.param` devient `request.query`
+  (query string) et `request.route_param` devient `request.route` (paramètre de
+  route dynamique). Rupture franche sans alias (phase bêta pré-1.0) : tous les
+  appels sont migrés (core, starters, modules opt-in, tutoriel welcome-forge,
+  tests, doc). Les attributs `request.params` / `request.route_params` et les
+  clés de `request.data` restent inchangés. `form`, `json`, `header`, `file`
+  étaient déjà nommés par leur source et ne changent pas.
+- **welcome-forge : tutoriel continu manuel sur les trois niveaux** (ADR-025,
+  ADR-028, `STARTER-WELCOME-FORGE-DOC-CONTINUITY-001`, `WELCOME-FORGE-AVANCE-001`).
+  Chaque niveau (débutant, intermédiaire, avancé) se construit à la main dans un
+  seul mini-projet qui grandit palier après palier, avec un `mvc/routes.py`
+  cumulatif montré à chaque étape, au lieu de starters indépendants. Pages
+  francisées (retrait des tirets cadratins). Bootstrap de session corrigé pour
+  que le jeton CSRF des formulaires ne soit plus vide (`WELCOME-FORGE-CSRF-SESSION-001`).
 
 ### Corrigé
 
+- **`make:public-form` : accesseur de champ corrigé** (`FIX-PUBLIC-FORM-POSTDATA-001`).
+  Le contrôleur généré lisait les champs via `request.post_data` (attribut
+  inexistant) et plantait à toute soumission ; il utilise désormais
+  `request.form(...)`.
+- **`make:public-*` : détection robuste du point d'injection** (`FIX-PUBLIC-ROUTES-MARKER-001`).
+  La fabrique `router = Router()` est détectée par analyse AST et non plus par
+  sous-chaîne, ce qui évite qu'un commentaire trompe le générateur et corrompe le
+  `mvc/routes.py` de l'utilisateur.
+- **Catalogue d'opt-ins complété** (`FIX-OPTIN-CATALOG-001`). `forge-mvc-mail`,
+  `forge-mvc-pivot` et `forge-mvc-i18n` sont enregistrés : `opt-in:install` ne
+  répond plus « inconnu » pour eux et `opt-in:list` les surface (12 opt-ins
+  officiels).
 - Alignement de la documentation sur `forge starter:build` et retrait du bloc
   « raccourci » des pages de palier (`DOC-STARTER-BUILD-ALIGN-001`).
 - Test des liens production de la landing aligné sur la réorganisation
   `docs/deployment/` (`LANDING-WSGI-LINK-TEST-FIX-001`).
 
+### Retiré
+
+- **Les 11 starters buildables du niveau débutant welcome-forge** sont retirés
+  de `forge_cli/starters/data/` et du contrat public gelé, ramené de 107 à 96
+  starters (ADR-025, `STARTER-WELCOME-FORGE-DROP-DATA-001`). Les niveaux
+  intermédiaire et avancé, ainsi que tous les parcours opt-in, restent des
+  starters `forge starter:build`. La numérotation des starters n'est plus une
+  plage dense `1..N` (unicité seule).
+
 ### Documentation
 
-- ADR-023 (`forge starter:build` canonique) et ADR-024 (bootstrap par squelette
-  dédié) ajoutés ; index ADR et navigation MkDocs mis à jour. Documentation
-  d'installation et de référence nettoyée des mentions `forge new --ref`.
+- ADR-023, ADR-024, ADR-025, ADR-027, ADR-028 et ADR-029 ajoutés ; ADR-030
+  (injection de routes par commande explicite et portée de la règle 4.3) au
+  statut **proposé** ; index ADR et navigation MkDocs à jour. Documentation
+  d'installation et de référence nettoyée des mentions `forge new --ref`. Resync
+  de `CLAUDE.md` (12 paquets, retrait de la mention `forge-mvc-media` supprimé,
+  table ADR étendue à 030). Section « Nouveautés » de la landing rafraîchie vers
+  beta.14.
 
 ### Tests
 
-- Garde-fous ajoutés : `test_skeleton_tree_001`, `test_skeleton_pkgdata_001`,
+- Garde-fous squelette : `test_skeleton_tree_001`, `test_skeleton_pkgdata_001`,
   `test_skeleton_registry_001`, `test_new_core_dep_001`, `test_skeleton_guard_001`
   (squelette nu, distribution wheel/sdist, matérialisation, neutralité, projet
   généré sans `core/`).
+- Garde-fous de l'audit de pré-publication : accesseurs `Request` du contrôleur
+  `make:public-form`, détection AST du marqueur de routes, catalogue d'opt-ins
+  (12, sans `media`), code généré par `make:pivot-crud`, anti-fixation de session,
+  sanitisation du fallback d'audit, consommation atomique de l'anti-replay TOTP,
+  et `csrf_token` runtime.
 
 
 ## [1.0.0-beta.13] — 2026-06-06
