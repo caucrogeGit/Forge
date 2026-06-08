@@ -14,7 +14,7 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 ## État actuel — Forge 1.0.0-beta.15
 
-**Version courante : `1.0.0-beta.15`** — internationalisation extraite en opt-in
+**Tag courant : `v1.0.0-beta.15`** — internationalisation extraite en opt-in
 (`forge-mvc-i18n`, ADR-027, avec un repli no-op du noyau), convention de
 déclaration des routes unifiée (chemin `/<contrôleur>/<méthode>`, nom
 `<contrôleur>-<méthode>` ; ADR-029) et refonte du tutoriel `welcome-forge` en
