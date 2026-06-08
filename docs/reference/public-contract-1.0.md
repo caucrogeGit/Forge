@@ -26,7 +26,7 @@ La famille canonique de gestion des opt-ins officiels, **exactement 5 verbes** :
 | `forge opt-in:remove <name>` | présence (−) | affiche la désinstallation |
 | `forge opt-in:enable <name>` | activation (+) | câblage réel (kind `route`) / conseil (library, crosscutting) |
 | `forge opt-in:disable <name>` | activation (−) | inverse de `enable` |
-| `forge opt-in:list` | lecture | état des 11 opt-ins officiels |
+| `forge opt-in:list` | lecture | état des 12 opt-ins officiels |
 
 **Décisions finales 1.0** :
 

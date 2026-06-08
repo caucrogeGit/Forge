@@ -175,7 +175,7 @@ forge doctor
 forge starter:list
 ```
 
-`forge starter:list` doit afficher les 107 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
+`forge starter:list` doit afficher les 84 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
 
 ---
 
@@ -188,110 +188,8 @@ cd ~/Projets/TestForge101
 forge starter:build 1 --force --dry-run
 forge starter:build 2 --force --dry-run
 forge starter:build 3 --force --dry-run
-forge starter:build 4 --force --dry-run
-forge starter:build 5 --force --dry-run
-forge starter:build 6 --force --dry-run
-forge starter:build 7 --force --dry-run
-forge starter:build 8 --force --dry-run
-forge starter:build 9 --force --dry-run
-forge starter:build 10 --force --dry-run
-forge starter:build 11 --force --dry-run
-forge starter:build 12 --force --dry-run
-forge starter:build 13 --force --dry-run
-forge starter:build 14 --force --dry-run
-forge starter:build 15 --force --dry-run
-forge starter:build 16 --force --dry-run
-forge starter:build 17 --force --dry-run
-forge starter:build 18 --force --dry-run
-forge starter:build 19 --force --dry-run
-forge starter:build 20 --force --dry-run
-forge starter:build 21 --force --dry-run
-forge starter:build 22 --force --dry-run
-forge starter:build 23 --force --dry-run
-forge starter:build 24 --force --dry-run
-forge starter:build 25 --force --dry-run
-forge starter:build 26 --force --dry-run
-forge starter:build 27 --force --dry-run
-forge starter:build 28 --force --dry-run
-forge starter:build 29 --force --dry-run
-forge starter:build 30 --force --dry-run
-forge starter:build 31 --force --dry-run
-forge starter:build 32 --force --dry-run
-forge starter:build 33 --force --dry-run
-forge starter:build 34 --force --dry-run
-forge starter:build 35 --force --dry-run
-forge starter:build 36 --force --dry-run
-forge starter:build 37 --force --dry-run
-forge starter:build 38 --force --dry-run
-forge starter:build 39 --force --dry-run
-forge starter:build 40 --force --dry-run
-forge starter:build 41 --force --dry-run
-forge starter:build 42 --force --dry-run
-forge starter:build 43 --force --dry-run
-forge starter:build 44 --force --dry-run
-forge starter:build 45 --force --dry-run
-forge starter:build 46 --force --dry-run
-forge starter:build 47 --force --dry-run
-forge starter:build 48 --force --dry-run
-forge starter:build 49 --force --dry-run
-forge starter:build 50 --force --dry-run
-forge starter:build 51 --force --dry-run
-forge starter:build 52 --force --dry-run
-forge starter:build 53 --force --dry-run
-forge starter:build 54 --force --dry-run
-forge starter:build 55 --force --dry-run
-forge starter:build 56 --force --dry-run
-forge starter:build 57 --force --dry-run
-forge starter:build 58 --force --dry-run
-forge starter:build 59 --force --dry-run
-forge starter:build 60 --force --dry-run
-forge starter:build 61 --force --dry-run
-forge starter:build 62 --force --dry-run
-forge starter:build 63 --force --dry-run
-forge starter:build 64 --force --dry-run
-forge starter:build 65 --force --dry-run
-forge starter:build 66 --force --dry-run
-forge starter:build 67 --force --dry-run
-forge starter:build 68 --force --dry-run
-forge starter:build 69 --force --dry-run
-forge starter:build 70 --force --dry-run
-forge starter:build 71 --force --dry-run
-forge starter:build 72 --force --dry-run
-forge starter:build 73 --force --dry-run
-forge starter:build 74 --force --dry-run
-forge starter:build 75 --force --dry-run
-forge starter:build 76 --force --dry-run
-forge starter:build 77 --force --dry-run
-forge starter:build 78 --force --dry-run
-forge starter:build 79 --force --dry-run
-forge starter:build 80 --force --dry-run
-forge starter:build 81 --force --dry-run
-forge starter:build 82 --force --dry-run
-forge starter:build 83 --force --dry-run
-forge starter:build 84 --force --dry-run
-forge starter:build 85 --force --dry-run
-forge starter:build 86 --force --dry-run
-forge starter:build 87 --force --dry-run
-forge starter:build 88 --force --dry-run
-forge starter:build 89 --force --dry-run
-forge starter:build 90 --force --dry-run
-forge starter:build 91 --force --dry-run
-forge starter:build 92 --force --dry-run
-forge starter:build 93 --force --dry-run
-forge starter:build 94 --force --dry-run
-forge starter:build 95 --force --dry-run
-forge starter:build 96 --force --dry-run
-forge starter:build 97 --force --dry-run
-forge starter:build 98 --force --dry-run
-forge starter:build 99 --force --dry-run
-forge starter:build 100 --force --dry-run
-forge starter:build 101 --force --dry-run
-forge starter:build 102 --force --dry-run
-forge starter:build 103 --force --dry-run
-forge starter:build 104 --force --dry-run
-forge starter:build 105 --force --dry-run
-forge starter:build 106 --force --dry-run
-forge starter:build 107 --force --dry-run
+# … répéter pour chacun des 84 starters affichés par `forge starter:list`.
+# Leur numéro n'est plus une plage dense 1..N (ADR-025) : se fier à la liste.
 ```
 
 !!! note "Ce que --dry-run valide"
@@ -585,7 +483,7 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 |---|---|
 | `python -m build` | wheel créée dans `dist/` |
 | `forge --version` | `Forge {{forge_version}}` |
-| `forge starter:list` | 107 starters affichés |
+| `forge starter:list` | 84 starters affichés |
 | `forge starter:build N --dry-run` | plan affiché sans erreur (×48) |
 | `forge db:init` + `starter:build 1` | CRUD contacts fonctionnel |
 | `forge db:init` + `starter:build 2` | login `admin` / `secret123` → `/dashboard` |

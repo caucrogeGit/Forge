@@ -117,13 +117,16 @@ class HomeController:
 | [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) | Alpha |
 | [`forge-mvc-pivot`](https://pypi.org/project/forge-mvc-pivot/) | Tables pivot avancées extraites du core | Beta |
 | [`forge-mvc-mail`](https://pypi.org/project/forge-mvc-mail/) | Envoi de courriels extrait du core | Beta |
+| `forge-mvc-i18n` | Internationalisation : catalogues JSON, fallback, helper `trans()` (repli no-op du noyau) | Beta (publication à venir) |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus
 dans l'extra `forge-mvc[all]`. Tous les autres opt-ins (`mfa`, `files`,
-`images`, `audio`, `video`, `iot`, `pivot`, `mail`) s'installent
+`images`, `audio`, `video`, `iot`, `pivot`, `mail`, `i18n`) s'installent
 **explicitement et séparément**, par exemple `pip install --pre forge-mvc-rbac`
-ou `pip install --pre forge-mvc-images`. Cette exclusion de `[all]` tient soit à
+ou `pip install --pre forge-mvc-images`. `forge-mvc-i18n` n'est pas encore
+publié sur PyPI ; il s'installe en éditable via `requirements-dev.txt`.
+Cette exclusion de `[all]` tient soit à
 une dépendance lourde (MQTT `paho-mqtt` pour IoT, binaire système FFmpeg pour
 Video et Audio, Pillow pour Images), soit à une maturité encore Alpha.
 
@@ -138,7 +141,7 @@ Toute la documentation est publiée sur
 - Référence de la CLI `forge`
 - Entités, modèles, SQL et migrations
 - Formulaires, validation, CSRF, sessions
-- Modules opt-in (RBAC, workflow, stats, MFA, files, images, audio, IoT, Video, pivot, mail)
+- Modules opt-in (RBAC, workflow, stats, MFA, files, images, audio, IoT, Video, pivot, mail, i18n)
 - ADR et charte philosophique
 
 ---

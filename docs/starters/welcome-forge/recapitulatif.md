@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression
 
-Récapitulatif des **24 paliers** de la progression *Bonjour Forge*, répartis en
+Récapitulatif des **23 paliers** de la progression *Bonjour Forge*, répartis en
 trois niveaux, et des API Forge introduites à chaque étape. À garder sous la main
 avant d'aborder les progressions opt-in autonomes.
 
