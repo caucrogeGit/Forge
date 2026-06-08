@@ -450,7 +450,8 @@ Description:
   Forge tourne depuis pipx). La commande **n'exécute rien** : la présence
   du package reste un geste explicite de l'utilisateur (ADR-016).
 
-  Opt-ins officiels : mfa, rbac, workflow, stats, media, iot.
+  Opt-ins officiels : audio, files, i18n, images, iot, mail, mfa, pivot,
+  rbac, stats, video, workflow.
 
   Une fois le package présent, brancher l'opt-in avec :
   `forge opt-in:enable <name>`.

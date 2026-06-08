@@ -24,15 +24,26 @@ FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
 class TestCatalog:
     def test_official_optins(self):
         assert optin_names() == [
-            "audio", "files", "images", "iot", "mfa", "rbac", "stats", "video", "workflow",
+            "audio", "files", "i18n", "images", "iot", "mail",
+            "mfa", "pivot", "rbac", "stats", "video", "workflow",
         ]
 
-    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "images", "iot", "video", "audio", "files"])
+    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "images", "iot", "video", "audio", "files", "mail", "pivot", "i18n"])
     def test_dist_and_import_naming(self, name):
         optin = OFFICIAL_OPTINS[name]
         assert optin.package_dist == f"forge-mvc-{name}"
         assert optin.package_import == f"forge_mvc_{name}"
         assert optin.summary
+
+    def test_aide_install_liste_le_catalogue_courant(self):
+        """L'aide opt-in:install doit lister chaque opt-in officiel et ne plus
+        citer le paquet `media` supprimé (ADR-018)."""
+        from forge_cli.help_dispatch import HELP_TEXTS_RICH
+
+        aide = HELP_TEXTS_RICH["opt-in:install"]
+        for name in optin_names():
+            assert name in aide, f"l'aide opt-in:install omet {name!r}"
+        assert "media" not in aide
 
 
 # ── opt-in:install (affichage, n'exécute rien) ───────────────────────────────

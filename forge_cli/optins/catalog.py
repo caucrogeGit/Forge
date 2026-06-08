@@ -71,6 +71,18 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
         "audio", "forge-mvc-audio", "forge_mvc_audio", KIND_ROUTE,
         "Upload, sondage, transcodage MP3 et lecture audio en streaming (HTTP Range).",
     ),
+    "mail": OptIn(
+        "mail", "forge-mvc-mail", "forge_mvc_mail", KIND_LIBRARY,
+        "Envoi d'emails : composition, transports interchangeables, templates Jinja, CLI mail:*.",
+    ),
+    "pivot": OptIn(
+        "pivot", "forge-mvc-pivot", "forge_mvc_pivot", KIND_LIBRARY,
+        "Tables pivot enrichies (many_to_many avec attributs) et générateur make:pivot-crud.",
+    ),
+    "i18n": OptIn(
+        "i18n", "forge-mvc-i18n", "forge_mvc_i18n", KIND_LIBRARY,
+        "Internationalisation : catalogues JSON, locale par défaut/fallback, helper trans().",
+    ),
 }
 
 
