@@ -104,23 +104,23 @@ class TestFormRechercheFiltresHTMX:
 
     def test_form_hx_get(self):
         html = build_index_view(_entity_simple())
-        assert 'hx-get="/contacts"' in html
+        assert 'hx-get="/contact"' in html
 
     def test_form_hx_target_crud_results(self):
         html = build_index_view(_entity_simple())
-        idx = html.find('hx-get="/contacts"')
+        idx = html.find('hx-get="/contact"')
         bloc = html[max(0, idx - 20): idx + 100]
         assert 'hx-target="#crud-results"' in bloc
 
     def test_form_hx_swap_innerhtml(self):
         html = build_index_view(_entity_simple())
-        idx = html.find('hx-get="/contacts"')
+        idx = html.find('hx-get="/contact"')
         bloc = html[max(0, idx - 20): idx + 100]
         assert 'hx-swap="innerHTML"' in bloc
 
     def test_form_hx_push_url(self):
         html = build_index_view(_entity_simple())
-        idx = html.find('hx-get="/contacts"')
+        idx = html.find('hx-get="/contact"')
         bloc = html[max(0, idx - 20): idx + 100]
         assert 'hx-push-url="true"' in bloc
 
@@ -140,11 +140,11 @@ class TestFormRechercheFiltresHTMX:
 class TestResetHTMX:
     def test_reset_href_absolu(self):
         html = build_index_view(_entity_simple())
-        assert 'href="/contacts"' in html
+        assert 'href="/contact"' in html
 
     def test_reset_hx_get(self):
         html = build_index_view(_entity_simple())
-        assert 'hx-get="/contacts"' in html
+        assert 'hx-get="/contact"' in html
 
     def test_reset_hx_target(self):
         html = build_index_view(_entity_simple())

@@ -100,7 +100,6 @@ from forge_cli.entities.crud.views_builder import (  # noqa: F401
 def _route_block(definition: dict) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
-    plural = snake + "s"
     ctrl = f"{entity}Controller"
 
     return "\n".join([
@@ -110,18 +109,18 @@ def _route_block(definition: dict) -> str:
         "",
         "  # Routes protégées par défaut.",
         "  # Pour un test local sans authentification :",
-        f'  # with router.group("/{plural}", public=True, csrf=False) as g:',
-        f'  with router.group("/{plural}") as g:',
-        f'      g.add("GET",  "",                     {ctrl}.index,               name="{snake}_index")',
-        f'      g.add("GET",  "/new",                 {ctrl}.new,                 name="{snake}_new")',
-        f'      g.add("POST", "",                     {ctrl}.create,              name="{snake}_create")',
-        f'      g.add("GET",  "/{{id}}",                {ctrl}.show,                name="{snake}_show")',
-        f'      g.add("GET",  "/{{id}}/edit",           {ctrl}.edit,                name="{snake}_edit")',
-        f'      g.add("POST", "/{{id}}",                {ctrl}.update,              name="{snake}_update")',
-        f'      g.add("POST", "/{{id}}/delete",         {ctrl}.destroy,             name="{snake}_destroy")',
-        f'      g.add("POST", "/bulk-delete",          {ctrl}.bulk_delete,         name="{snake}_bulk_delete")',
-        f'      g.add("POST", "/bulk-delete/confirm",  {ctrl}.bulk_delete_confirm, name="{snake}_bulk_delete_confirm")',
-        f'      g.add("GET",  "/export.csv",            {ctrl}.export_csv,          name="{snake}_export_csv")',
+        f'  # with router.group("/{snake}", public=True, csrf=False) as g:',
+        f'  with router.group("/{snake}") as g:',
+        f'      g.add("GET",  "",                       {ctrl}.index,               name="{snake}-index")',
+        f'      g.add("GET",  "/new",                   {ctrl}.new,                 name="{snake}-new")',
+        f'      g.add("POST", "/create",                {ctrl}.create,              name="{snake}-create")',
+        f'      g.add("GET",  "/show/{{id}}",             {ctrl}.show,                name="{snake}-show")',
+        f'      g.add("GET",  "/edit/{{id}}",             {ctrl}.edit,                name="{snake}-edit")',
+        f'      g.add("POST", "/update/{{id}}",           {ctrl}.update,              name="{snake}-update")',
+        f'      g.add("POST", "/destroy/{{id}}",          {ctrl}.destroy,             name="{snake}-destroy")',
+        f'      g.add("POST", "/bulk-delete",           {ctrl}.bulk_delete,         name="{snake}-bulk_delete")',
+        f'      g.add("POST", "/bulk-delete-confirm",   {ctrl}.bulk_delete_confirm, name="{snake}-bulk_delete_confirm")',
+        f'      g.add("GET",  "/export-csv",             {ctrl}.export_csv,          name="{snake}-export_csv")',
     ])
 
 

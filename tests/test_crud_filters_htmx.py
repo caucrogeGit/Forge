@@ -88,11 +88,11 @@ class TestFormHTMX:
 
     def test_form_action_fallback(self):
         html = build_index_view(_entity_with_filter())
-        assert 'action="/contacts"' in html
+        assert 'action="/contact"' in html
 
     def test_form_hx_get(self):
         html = build_index_view(_entity_with_filter())
-        assert 'hx-get="/contacts"' in html
+        assert 'hx-get="/contact"' in html
 
     def test_form_hx_target(self):
         html = build_index_view(_entity_with_filter())
@@ -108,7 +108,7 @@ class TestFormHTMX:
 
     def test_form_hx_get_sans_filtre(self):
         html = build_index_view(_entity_no_filter())
-        assert 'hx-get="/contacts"' in html
+        assert 'hx-get="/contact"' in html
 
     def test_form_inclut_input_q(self):
         html = build_index_view(_entity_with_filter())
@@ -147,12 +147,12 @@ class TestBoutonFiltrer:
 class TestLienReinitialiser:
     def test_lien_href_fallback_present(self):
         html = build_index_view(_entity_with_filter())
-        assert 'href="/contacts"' in html
+        assert 'href="/contact"' in html
 
     def test_lien_hx_get_present(self):
         html = build_index_view(_entity_with_filter())
         # Le lien reset a son propre hx-get (en plus du form)
-        assert html.count('hx-get="/contacts"') >= 1
+        assert html.count('hx-get="/contact"') >= 1
 
     def test_lien_hx_target_present(self):
         html = build_index_view(_entity_with_filter())
@@ -238,7 +238,7 @@ class TestFallbackSansHTMX:
     def test_form_valide_sans_htmx(self):
         html = build_index_view(_entity_with_filter())
         assert 'method="get"' in html
-        assert 'action="/contacts"' in html
+        assert 'action="/contact"' in html
 
     def test_pas_de_script(self):
         index = build_index_view(_entity_with_filter())

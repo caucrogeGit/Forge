@@ -94,7 +94,7 @@ def build_index_view(
         "{% endif %}{% endfor %}"
     )
     _nouveau_btn = [
-        f"    {{% with href='/{plural}/new', variant='primary', label='Nouveau {snake}' %}}",
+        f"    {{% with href='/{snake}/new', variant='primary', label='Nouveau {snake}' %}}",
         '    {% include "components/button.html" %}',
         "    {% endwith %}",
     ]
@@ -108,8 +108,8 @@ def build_index_view(
         *_nouveau_btn,
         "</div>",
         "",
-        f'<form method="get" action="/{plural}"',
-        f'      hx-get="/{plural}" hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true"',
+        f'<form method="get" action="/{snake}"',
+        f'      hx-get="/{snake}" hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true"',
         '      class="mb-4 flex gap-2 items-center flex-wrap">',
         '    <input type="search" name="q" value="{{ pagination.q }}"',
         "           placeholder=\"{{ trans('common.search') }}…\"",
@@ -149,15 +149,15 @@ def build_index_view(
         '            class="bg-gray-100 text-gray-800 text-sm px-3 py-1.5 rounded font-medium hover:bg-gray-200">',
         "        {{ trans('common.search') }}</button>",
         "    {% if pagination.q or pagination.filters %}",
-        f'    <a href="/{plural}"',
-        f'       hx-get="/{plural}" hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true"',
+        f'    <a href="/{snake}"',
+        f'       hx-get="/{snake}" hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true"',
         '       class="text-sm text-gray-500 hover:underline">Réinitialiser</a>',
         "    {% endif %}",
         "</form>",
         "",
         '<div class="mb-2">',
         (
-            f'    <a href="/{plural}/export.csv'
+            f'    <a href="/{snake}/export-csv'
             "?q={{ pagination.q | urlencode }}"
             "&amp;sort={{ pagination.sort }}"
             "&amp;direction={{ pagination.direction }}"
@@ -217,7 +217,7 @@ def build_table_partial(
     # Formulaire de suppression groupée (avant la table, référencé par form= sur les cases)
     _bulk_form_lines: list[str] = [
         '<form id="bulk-delete-form"',
-        f'      method="post" action="/{plural}/bulk-delete"',
+        f'      method="post" action="/{snake}/bulk-delete"',
         '      class="mb-3 flex items-center gap-3">',
         '    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
         '    <button type="submit"',
@@ -299,14 +299,14 @@ def build_table_partial(
             f'                <td class="px-4 py-3 text-gray-800">{{{{ _{relation.field_name}_labels | join(", ") if _{relation.field_name}_labels else "—" }}}}</td>',
         ]
     _edit_link = [
-        f'                    <a href="/{plural}/{{{{ {snake}.{pk_col} }}}}/edit"',
+        f'                    <a href="/{snake}/edit/{{{{ {snake}.{pk_col} }}}}"',
         "                       class=\"text-sm text-blue-600 hover:underline\">{{ trans('crud.edit') }}</a>",
     ]
     if edit_perm:
         _edit_link = [f"                    {{% if can('{edit_perm}') %}}"] + _edit_link + ["                    {% endif %}"]
     _delete_form = [
-        f'                    <form method="post" action="/{plural}/{{{{ {snake}.{pk_col} }}}}/delete{_list_query}"',
-        f'                          hx-post="/{plural}/{{{{ {snake}.{pk_col} }}}}/delete{_list_query}" hx-target="#crud-results" hx-swap="innerHTML" hx-confirm="{{{{ trans(\'crud.confirm_delete\') }}}}"',
+        f'                    <form method="post" action="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{_list_query}"',
+        f'                          hx-post="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{_list_query}" hx-target="#crud-results" hx-swap="innerHTML" hx-confirm="{{{{ trans(\'crud.confirm_delete\') }}}}"',
         '                          style="display:inline" onsubmit="return confirm(\'{{ trans("crud.confirm_delete") }}\')">',
         '                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
         '                        <button type="submit"',
@@ -317,7 +317,7 @@ def build_table_partial(
         _delete_form = [f"                    {{% if can('{delete_perm}') %}}"] + _delete_form + ["                    {% endif %}"]
     lines += [
         '                <td class="px-4 py-3 text-right space-x-2">',
-        f'                    <a href="/{plural}/{{{{ {snake}.{pk_col} }}}}"',
+        f'                    <a href="/{snake}/show/{{{{ {snake}.{pk_col} }}}}"',
         "                       class=\"text-sm text-blue-600 hover:underline\">{{ trans('crud.show') }}</a>",
         *_edit_link,
         *_delete_form,
@@ -392,7 +392,6 @@ def build_show_view(
 ) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
-    plural = snake + "s"
     pk = _pk_field(definition)
     pk_col = pk["column"]
     non_pk = _non_pk_fields(definition)
@@ -401,7 +400,7 @@ def build_show_view(
     delete_perm = perms.get("delete")
 
     _edit_btn = [
-        f"        {{% with href='/{plural}/{{{{ {snake}.{pk_col} }}}}/edit', variant='primary', label=trans('crud.edit') %}}",
+        f"        {{% with href='/{snake}/edit/{{{{ {snake}.{pk_col} }}}}', variant='primary', label=trans('crud.edit') %}}",
         '        {% include "components/button.html" %}',
         "        {% endwith %}",
     ]
@@ -415,7 +414,7 @@ def build_show_view(
         f'    <h1 class="text-2xl font-bold text-gray-800">Détail {snake}</h1>',
         '    <div class="space-x-2">',
         *_edit_btn,
-        f"        <a href=\"/{plural}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
+        f"        <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
         "    </div>",
         "</div>",
         "",
@@ -496,7 +495,7 @@ def build_show_view(
             ]
         lines.append("    </div>")
     _delete_form = [
-        f'<form method="post" action="/{plural}/{{{{ {snake}.{pk_col} }}}}/delete" class="mt-4" onsubmit="return confirm(\'{{{{ trans("crud.confirm_delete") }}}}\')">',
+        f'<form method="post" action="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}" class="mt-4" onsubmit="return confirm(\'{{{{ trans("crud.confirm_delete") }}}}\')">',
         '    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
         "    {% with type='submit', variant='danger', label=trans('crud.delete') %}",
         '    {% include "components/button.html" %}',
@@ -521,7 +520,6 @@ def build_form_view(
 ) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
-    plural = snake + "s"
     non_pk = _non_pk_fields(definition)
     relations_by_field = _relation_by_field(relations)
     media_entries = _media_form_fields(definition)
@@ -537,7 +535,7 @@ def build_form_view(
         "{% block content %}",
         '<div class="flex justify-between items-center mb-6">',
         '    <h1 class="text-2xl font-bold text-gray-800">{{ titre }}</h1>',
-        f"    <a href=\"/{plural}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
+        f"    <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
         "</div>",
         "",
         '{% include "partials/form_errors.html" %}',
@@ -718,7 +716,7 @@ def build_form_view(
         "            {% with type='submit', variant='primary', label=trans('common.save') %}",
         '            {% include "components/button.html" %}',
         "            {% endwith %}",
-        f"            {{% with href='/{plural}', variant='secondary', label=trans('common.cancel') %}}",
+        f"            {{% with href='/{snake}', variant='secondary', label=trans('common.cancel') %}}",
         '            {% include "components/button.html" %}',
         "            {% endwith %}",
         "        </div>",
@@ -733,7 +731,6 @@ def build_bulk_delete_confirm_view(definition: dict) -> str:
     """Génère le template de confirmation de suppression groupée."""
     entity = definition["entity"]
     snake = _to_snake(entity)
-    plural = snake + "s"
 
     lines: list[str] = [
         '{% extends "layouts/app.html" %}',
@@ -747,7 +744,7 @@ def build_bulk_delete_confirm_view(definition: dict) -> str:
         "        </p>",
         '        <p class="text-red-700 font-medium">Cette action est définitive et irréversible.</p>',
         "    </div>",
-        f'    <form method="post" action="/{plural}/bulk-delete/confirm">',
+        f'    <form method="post" action="/{snake}/bulk-delete-confirm">',
         '        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
         "        {% for id in ids %}",
         '        <input type="hidden" name="ids" value="{{ id }}">',
@@ -757,7 +754,7 @@ def build_bulk_delete_confirm_view(definition: dict) -> str:
         '                    class="bg-red-600 text-white text-sm px-4 py-2 rounded font-medium hover:bg-red-700">',
         "                Confirmer la suppression",
         "            </button>",
-        f'            <a href="/{plural}"',
+        f'            <a href="/{snake}"',
         '               class="bg-gray-100 text-gray-800 text-sm px-4 py-2 rounded font-medium hover:bg-gray-200">',
         "                Annuler",
         "            </a>",

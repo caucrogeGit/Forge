@@ -91,10 +91,10 @@ def test_index_contient_cible_resultats_formulaire_get_et_attributs_htmx():
 
     assert '<div id="crud-results">' in html
     assert '{% include "contact/_results.html" %}' in html
-    assert '<form method="get" action="/contacts"' in html
+    assert '<form method="get" action="/contact"' in html
     assert 'type="search"' in html
     assert 'name="q"' in html
-    assert 'hx-get="/contacts"' in html
+    assert 'hx-get="/contact"' in html
     assert 'hx-target="#crud-results"' in html
     assert 'hx-swap="innerHTML"' in html
     assert 'hx-push-url="true"' in html

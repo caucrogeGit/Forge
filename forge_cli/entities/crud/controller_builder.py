@@ -347,7 +347,7 @@ def build_controller(
         f'        return BaseController.render("{snake}/form.html",',
         '            context={',
         '                "form": form,',
-        f'                "action": "/{plural}",',
+        f'                "action": "/{snake}/create",',
         f'                "titre": "Nouveau {snake}",',
     ]
     for relation in many_to_many_relations or []:
@@ -379,7 +379,7 @@ def build_controller(
         f'            return BaseController.validation_error("{snake}/form.html",',
         '                context={',
         '                    "form": form,',
-        f'                    "action": "/{plural}",',
+        f'                    "action": "/{snake}/create",',
         f'                    "titre": "Nouveau {snake}",',
     ]
     for relation in many_to_many_relations or []:
@@ -412,7 +412,7 @@ def build_controller(
                 f'                    return BaseController.validation_error("{snake}/form.html",',
                 '                        context={',
                 '                            "form": form,',
-                f'                            "action": "/{plural}",',
+                f'                            "action": "/{snake}/create",',
                 f'                            "titre": "Nouveau {snake}",',
             ]
             for relation in many_to_many_relations or []:
@@ -459,7 +459,7 @@ def build_controller(
     for relation in many_to_many_relations or []:
         create_lines.append(f'        {relation.add_function}(created_id, {relation.field_name})')
     create_lines.append(
-        f'        return BaseController.redirect_with_flash(request, "/{plural}", "{entity} créé.")'
+        f'        return BaseController.redirect_with_flash(request, "/{snake}", "{entity} créé.")'
     )
     lines += _with_permission(create_lines, _rbac.get("store"))
 
@@ -535,7 +535,7 @@ def build_controller(
             if choice_options else
             f'                "form": {entity}Form(_form_data_from_{snake}({snake})),'
         ),
-        f'                "action": f"/{plural}/{{{pk_name}}}",',
+        f'                "action": f"/{snake}/update/{{{pk_name}}}",',
         f'                "titre": "Modifier {snake}",',
     ]
     for relation in many_to_many_relations or []:
@@ -590,7 +590,7 @@ def build_controller(
         f'            return BaseController.validation_error("{snake}/form.html",',
         "                context={",
         '                    "form": form,',
-        f'                    "action": f"/{plural}/{{{pk_name}}}",',
+        f'                    "action": f"/{snake}/update/{{{pk_name}}}",',
         f'                    "titre": "Modifier {snake}",',
     ]
     for relation in many_to_many_relations or []:
@@ -635,7 +635,7 @@ def build_controller(
             f'                    return BaseController.validation_error("{snake}/form.html",',
             '                        context={',
             '                            "form": form,',
-            f'                            "action": f"/{plural}/{{{pk_name}}}",',
+            f'                            "action": f"/{snake}/update/{{{pk_name}}}",',
             f'                            "titre": "Modifier {snake}",',
         ]
         for relation in many_to_many_relations or []:
@@ -723,7 +723,7 @@ def build_controller(
         update_lines.append(f'        {relation.sync_function}({pk_name}, {relation.field_name})')
     update_lines += [
         '        return BaseController.redirect_with_flash(',
-        f'            request, f"/{plural}/{{{pk_name}}}", "{entity} mis à jour.")',
+        f'            request, f"/{snake}/show/{{{pk_name}}}", "{entity} mis à jour.")',
     ]
     lines += _with_permission(update_lines, _rbac.get("update"))
 
@@ -746,7 +746,7 @@ def build_controller(
         "        if _is_hx_request(request):",
         f"            context = {entity}Controller._list_context(request)",
         f'            return BaseController.render("{snake}/_results.html", context=context, request=request)',
-        f'        return BaseController.redirect_with_flash(request, "/{plural}", "{entity} supprimé.")',
+        f'        return BaseController.redirect_with_flash(request, "/{snake}", "{entity} supprimé.")',
         "",
     ]
     lines += _with_permission(destroy_lines, _rbac.get("delete"))
@@ -758,7 +758,7 @@ def build_controller(
         "    def bulk_delete(request: Request) -> Response:",
         f"        ids = {entity}Controller._parse_bulk_ids(request)",
         "        if not ids:",
-        f'            return BaseController.redirect_with_flash(request, "/{plural}", "Aucun élément sélectionné.")',
+        f'            return BaseController.redirect_with_flash(request, "/{snake}", "Aucun élément sélectionné.")',
         f'        return BaseController.render("{snake}/bulk_delete_confirm.html",',
         '            context={"ids": ids, "count": len(ids), "flash_html": render_flash_html(request)},',
         "            request=request)",
@@ -772,11 +772,11 @@ def build_controller(
         "    def bulk_delete_confirm(request: Request) -> Response:",
         f"        ids = {entity}Controller._parse_bulk_ids(request)",
         "        if not ids:",
-        f'            return BaseController.redirect_with_flash(request, "/{plural}", "Aucun élément sélectionné.")',
+        f'            return BaseController.redirect_with_flash(request, "/{snake}", "Aucun élément sélectionné.")',
         f"        bulk_delete_{plural}(ids)",
         '        count = len(ids)',
         '        return BaseController.redirect_with_flash(',
-        f'            request, "/{plural}",',
+        f'            request, "/{snake}",',
         '            f"{count} élément(s) supprimé(s).")',
         "",
     ]

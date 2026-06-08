@@ -121,7 +121,7 @@ def test_make_crud_genere_champ_get_q_dans_index():
     assert 'type="search"' in html
     assert 'name="q"' in html
     assert 'value="{{ pagination.q }}"' in html
-    assert 'hx-get="/articles"' in html
+    assert 'hx-get="/article"' in html
     assert "<script" not in html
 
 

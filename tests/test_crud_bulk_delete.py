@@ -141,7 +141,7 @@ class TestFormulaireBulkDelete:
 
     def test_form_action_bulk_delete(self):
         html = build_table_partial(_entity_simple())
-        assert 'action="/contacts/bulk-delete"' in html
+        assert 'action="/contact/bulk-delete"' in html
 
     def test_csrf_dans_formulaire(self):
         html = build_table_partial(_entity_simple())
@@ -211,7 +211,7 @@ class TestTemplateConfirmation:
 
     def test_form_confirmation_present(self):
         html = build_bulk_delete_confirm_view(_entity_simple())
-        assert 'action="/contacts/bulk-delete/confirm"' in html
+        assert 'action="/contact/bulk-delete-confirm"' in html
 
     def test_form_method_post(self):
         html = build_bulk_delete_confirm_view(_entity_simple())
@@ -239,7 +239,7 @@ class TestTemplateConfirmation:
     def test_lien_annuler_present(self):
         html = build_bulk_delete_confirm_view(_entity_simple())
         assert "Annuler" in html
-        assert 'href="/contacts"' in html
+        assert 'href="/contact"' in html
 
     def test_message_irreversible(self):
         html = build_bulk_delete_confirm_view(_entity_simple())
@@ -265,7 +265,7 @@ class TestRoutes:
 
     def test_route_bulk_delete_confirm_presente(self):
         bloc = _route_block(_entity_simple())
-        assert "/bulk-delete/confirm" in bloc
+        assert "/bulk-delete-confirm" in bloc
 
     def test_route_bulk_delete_est_post(self):
         bloc = _route_block(_entity_simple())
@@ -437,7 +437,7 @@ class TestCompatibilite:
     def test_suppression_unitaire_toujours_presente(self):
         html = build_table_partial(_entity_simple())
         # La suppression unitaire (destroy) doit coexister avec la suppression groupée
-        assert "/delete" in html
+        assert "/destroy" in html
 
     def test_form_bulk_utilise_html5_form_attribute(self):
         # Les cases référencent le formulaire via l'attribut form= (HTML5, pas de nesting)

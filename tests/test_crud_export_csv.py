@@ -117,11 +117,11 @@ def _livre(ticket: str) -> bool:
 
 class TestRoute:
     def test_route_export_csv_presente(self):
-        assert "/export.csv" in _routes()
+        assert "/export-csv" in _routes()
 
     def test_route_export_csv_methode_get(self):
         r = _routes()
-        idx = r.find("/export.csv")
+        idx = r.find("/export-csv")
         bloc = r[max(0, idx - 30): idx + 60]
         assert "GET" in bloc
 
@@ -131,7 +131,7 @@ class TestRoute:
 
     def test_route_export_csv_nom(self):
         r = _routes()
-        assert "article_export_csv" in r
+        assert "article-export_csv" in r
 
 
 # ---------------------------------------------------------------------------
@@ -460,64 +460,64 @@ class TestExportCsvRBAC:
 
 class TestVueLienExport:
     def test_lien_export_present(self):
-        assert "export.csv" in _index_html()
+        assert "export-csv" in _index_html()
 
     def test_lien_export_href_classique(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         # le lien doit être dans un <a href="...">
         avant = h[max(0, idx - 100): idx + 20]
         assert "href" in avant
 
     def test_lien_export_pas_de_hx_get(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         bloc = h[max(0, idx - 100): idx + 300]
         assert "hx-get" not in bloc
 
     def test_lien_export_pas_de_hx_target(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         bloc = h[max(0, idx - 100): idx + 300]
         assert "hx-target" not in bloc
 
     def test_lien_export_conserve_q(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         bloc = h[idx: idx + 300]
         assert "pagination.q" in bloc
 
     def test_lien_export_conserve_sort(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         bloc = h[idx: idx + 300]
         assert "pagination.sort" in bloc
 
     def test_lien_export_conserve_direction(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         bloc = h[idx: idx + 300]
         assert "pagination.direction" in bloc
 
     def test_lien_export_conserve_filtres(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         bloc = h[idx: idx + 400]
         assert "pagination.filters" in bloc
 
     def test_lien_export_pas_de_page(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         bloc = h[idx: idx + 400]
         assert "pagination.page" not in bloc
 
     def test_lien_export_avant_crud_results(self):
         h = _index_html()
-        assert h.index("export.csv") < h.index('id="crud-results"')
+        assert h.index("export-csv") < h.index('id="crud-results"')
 
     def test_lien_export_apres_form(self):
         h = _index_html()
-        assert h.index("</form>") < h.index("export.csv")
+        assert h.index("</form>") < h.index("export-csv")
 
     def test_lien_export_texte_visible(self):
         h = _index_html()
@@ -525,7 +525,7 @@ class TestVueLienExport:
 
     def test_lien_export_encode_q(self):
         h = _index_html()
-        idx = h.find("export.csv")
+        idx = h.find("export-csv")
         bloc = h[idx: idx + 200]
         assert "urlencode" in bloc
 

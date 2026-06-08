@@ -289,7 +289,7 @@ class TestCompatibiliteHTMX:
 
     def test_formulaire_hx_get_pointe_vers_route_entite(self):
         html = build_index_view(_entity_with_statut())
-        assert 'hx-get="/contacts"' in html
+        assert 'hx-get="/contact"' in html
 
 
 # ---------------------------------------------------------------------------
@@ -299,11 +299,11 @@ class TestCompatibiliteHTMX:
 class TestLienEffacement:
     def test_lien_effacement_present_dans_vue(self):
         html = build_index_view(_entity_with_statut())
-        assert "Effacer" in html or "Réinitialiser" in html or 'href="/contacts"' in html
+        assert "Effacer" in html or "Réinitialiser" in html or 'href="/contact"' in html
 
     def test_lien_effacement_pointe_vers_racine_entite(self):
         html = build_index_view(_entity_with_statut())
-        assert 'href="/contacts"' in html
+        assert 'href="/contact"' in html
 
 
 # ---------------------------------------------------------------------------

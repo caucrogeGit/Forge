@@ -458,13 +458,13 @@ Le bloc `rbac` est **optionnel**. Sans lui, le CRUD généré est identique à a
 
 | Clé JSON | Méthode générée | Route |
 |---|---|---|
-| `index` | `index` | `GET /contacts` |
-| `show` | `show` | `GET /contacts/{id}` |
-| `create` | `new` | `GET /contacts/new` |
-| `store` | `create` | `POST /contacts` |
-| `edit` | `edit` | `GET /contacts/{id}/edit` |
-| `update` | `update` | `POST /contacts/{id}` |
-| `delete` | `destroy` | `POST /contacts/{id}/delete` |
+| `index` | `index` | `GET /contact` |
+| `show` | `show` | `GET /contact/show/{id}` |
+| `create` | `new` | `GET /contact/new` |
+| `store` | `create` | `POST /contact/create` |
+| `edit` | `edit` | `GET /contact/edit/{id}` |
+| `update` | `update` | `POST /contact/update/{id}` |
+| `delete` | `destroy` | `POST /contact/destroy/{id}` |
 
 Seules les actions déclarées dans `rbac.permissions` reçoivent un décorateur.
 
@@ -523,7 +523,7 @@ visible, c'est la route serveur qui décide.
 
 ```jinja2
 {% if can('contacts.create') %}
-{% with href='/contacts/new', variant='primary', label='Nouveau contact' %}
+{% with href='/contact/new', variant='primary', label='Nouveau contact' %}
 {% include "components/button.html" %}
 {% endwith %}
 {% endif %}

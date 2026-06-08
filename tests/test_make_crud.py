@@ -328,8 +328,8 @@ def test_new_avant_id_dans_bloc_routes(tmp_path):
 
 def test_toutes_les_routes_presentes(tmp_path):
     result = _run("Contact", tmp_path)
-    for expected in ("contact_index", "contact_new", "contact_create",
-                     "contact_show", "contact_edit", "contact_update", "contact_destroy"):
+    for expected in ("contact-index", "contact-new", "contact-create",
+                     "contact-show", "contact-edit", "contact-update", "contact-destroy"):
         assert expected in result.route_block, f"Route {expected!r} absente du bloc"
 
 

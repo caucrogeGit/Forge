@@ -44,7 +44,7 @@ CONTACT = {
 def test_formulaire_suppression_garde_fallback_html_csrf_et_action():
     html = build_table_partial(CONTACT)
 
-    assert '<form method="post" action="/contacts/{{ contact.Id }}/delete' in html
+    assert '<form method="post" action="/contact/destroy/{{ contact.Id }}' in html
     assert 'name="csrf_token" value="{{ csrf_token }}"' in html
     assert '<button type="submit"' in html
     assert "onsubmit=\"return confirm(" in html
@@ -54,7 +54,7 @@ def test_formulaire_suppression_ajoute_htmx_sur_meme_url_que_action():
     html = build_table_partial(CONTACT)
 
     action = (
-        '/contacts/{{ contact.Id }}/delete?page={{ pagination.page }}'
+        '/contact/destroy/{{ contact.Id }}?page={{ pagination.page }}'
         "{% if pagination.q %}&amp;q={{ pagination.q | urlencode }}{% endif %}"
     )
     assert f'action="{action}' in html
@@ -81,7 +81,7 @@ def test_destroy_classique_redirige_et_hx_rend_results():
     assert 'if _is_hx_request(request):' in code
     assert 'context = ContactController._list_context(request)' in code
     assert 'return BaseController.render("contact/_results.html", context=context, request=request)' in code
-    assert 'return BaseController.redirect_with_flash(request, "/contacts", "Contact supprimé.")' in code
+    assert 'return BaseController.redirect_with_flash(request, "/contact", "Contact supprimé.")' in code
 
 
 def test_destroy_hx_ne_rend_pas_index_complet():
@@ -135,7 +135,7 @@ def test_recherche_pagination_create_edit_show_hors_perimetre():
     index = build_index_view(CONTACT)
     pagination = build_pagination_partial(CONTACT)
 
-    assert 'hx-get="/contacts"' in index
+    assert 'hx-get="/contact"' in index
     assert 'hx-get="?page={{ pagination.page - 1 }}' in pagination
     assert 'hx-get="?page={{ pagination.page + 1 }}' in pagination
     assert "def new(request: Request) -> Response:" in controller

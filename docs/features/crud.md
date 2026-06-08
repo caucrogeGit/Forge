@@ -67,14 +67,14 @@ Routes à ajouter dans mvc/routes.py :
 ──────────────────────────────────────────────────────────────────────
   from mvc.controllers.contact_controller import ContactController
 
-  with router.group("/contacts") as g:
-      g.add("GET",  "",              ContactController.index,   name="contact_index")
-      g.add("GET",  "/new",          ContactController.new,     name="contact_new")
-      g.add("POST", "",              ContactController.create,  name="contact_create")
-      g.add("GET",  "/{id}",         ContactController.show,    name="contact_show")
-      g.add("GET",  "/{id}/edit",    ContactController.edit,    name="contact_edit")
-      g.add("POST", "/{id}",         ContactController.update,  name="contact_update")
-      g.add("POST", "/{id}/delete",  ContactController.destroy, name="contact_destroy")
+  with router.group("/contact") as g:
+      g.add("GET",  "",               ContactController.index,   name="contact-index")
+      g.add("GET",  "/new",           ContactController.new,     name="contact-new")
+      g.add("POST", "/create",        ContactController.create,  name="contact-create")
+      g.add("GET",  "/show/{id}",     ContactController.show,    name="contact-show")
+      g.add("GET",  "/edit/{id}",     ContactController.edit,    name="contact-edit")
+      g.add("POST", "/update/{id}",   ContactController.update,  name="contact-update")
+      g.add("POST", "/destroy/{id}",  ContactController.destroy, name="contact-destroy")
 ```
 
 Si un fichier existe déjà, il est marqué `[PRÉSERVÉ]` et non touché. Pour régénérer un fichier modifié manuellement, le supprimer avant de relancer la commande.
@@ -88,14 +88,14 @@ Les routes sont affichées par `forge make:crud` mais jamais injectées automati
 ```python
 from mvc.controllers.contact_controller import ContactController
 
-with router.group("/contacts") as g:
-    g.add("GET",  "",              ContactController.index,   name="contact_index")
-    g.add("GET",  "/new",          ContactController.new,     name="contact_new")
-    g.add("POST", "",              ContactController.create,  name="contact_create")
-    g.add("GET",  "/{id}",         ContactController.show,    name="contact_show")
-    g.add("GET",  "/{id}/edit",    ContactController.edit,    name="contact_edit")
-    g.add("POST", "/{id}",         ContactController.update,  name="contact_update")
-    g.add("POST", "/{id}/delete",  ContactController.destroy, name="contact_destroy")
+with router.group("/contact") as g:
+    g.add("GET",  "",               ContactController.index,   name="contact-index")
+    g.add("GET",  "/new",           ContactController.new,     name="contact-new")
+    g.add("POST", "/create",        ContactController.create,  name="contact-create")
+    g.add("GET",  "/show/{id}",     ContactController.show,    name="contact-show")
+    g.add("GET",  "/edit/{id}",     ContactController.edit,    name="contact-edit")
+    g.add("POST", "/update/{id}",   ContactController.update,  name="contact-update")
+    g.add("POST", "/destroy/{id}",  ContactController.destroy, name="contact-destroy")
 ```
 
 !!! warning "Ordre obligatoire"
@@ -138,12 +138,12 @@ form = ContactForm.from_request(request)
 if not form.is_valid():
     return BaseController.validation_error(
         "contact/form.html",
-        context={"form": form, "action": "/contacts", "titre": "Nouveau contact"},
+        context={"form": form, "action": "/contact", "titre": "Nouveau contact"},
         request=request,
     )
 
 add_contact(form.cleaned_data)
-return BaseController.redirect_with_flash(request, "/contacts", "Contact créé.")
+return BaseController.redirect_with_flash(request, "/contact", "Contact créé.")
 ```
 
 ### Dans un template Jinja2

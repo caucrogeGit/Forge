@@ -163,18 +163,18 @@ Le fichier `starter.json` déclare toutes les métadonnées.
   "description": "CRUD simple de produits",
   "status": "available",
   "requires_db": true,
-  "home_route": "/produits",
+  "home_route": "/produit",
   "routes_marker": "mon-starter",
   "routes": {
-    "prefix": "/produits",
+    "prefix": "/produit",
     "actions": [
-      {"method": "GET",  "path": "",             "action": "index",   "name": "produit_index"},
-      {"method": "GET",  "path": "/new",         "action": "new",     "name": "produit_new"},
-      {"method": "POST", "path": "",             "action": "create",  "name": "produit_create"},
-      {"method": "GET",  "path": "/{id}",        "action": "show",    "name": "produit_show"},
-      {"method": "GET",  "path": "/{id}/edit",   "action": "edit",    "name": "produit_edit"},
-      {"method": "POST", "path": "/{id}",        "action": "update",  "name": "produit_update"},
-      {"method": "POST", "path": "/{id}/delete", "action": "destroy", "name": "produit_destroy"}
+      {"method": "GET",  "path": "",             "action": "index",   "name": "produit-index"},
+      {"method": "GET",  "path": "/new",         "action": "new",     "name": "produit-new"},
+      {"method": "POST", "path": "/create",             "action": "create",  "name": "produit-create"},
+      {"method": "GET",  "path": "/show/{id}",        "action": "show",    "name": "produit-show"},
+      {"method": "GET",  "path": "/edit/{id}",   "action": "edit",    "name": "produit-edit"},
+      {"method": "POST", "path": "/update/{id}",        "action": "update",  "name": "produit-update"},
+      {"method": "POST", "path": "/destroy/{id}", "action": "destroy", "name": "produit-destroy"}
     ]
   },
   "check_paths": [
@@ -202,10 +202,10 @@ Le fichier `starter.json` déclare toutes les métadonnées.
   "status": "available",
   "requires_db": true,
   "supports_public": false,
-  "home_route": "/produits",
+  "home_route": "/produit",
   "routes_marker": "mon-starter-app",
   "routes_snippet": "routes.py.snippet",
-  "open_url": "https://localhost:8000/produits",
+  "open_url": "https://localhost:8000/produit",
   "check_paths": [
     "mvc/entities/categorie",
     "mvc/entities/produit",
@@ -330,14 +330,14 @@ Résultat dans `mvc/routes.py` :
 # forge-starter:mon-starter:start
 from mvc.controllers.produit_controller import ProduitController
 
-with router.group("/produits") as g:
-    g.add("GET",  "",             ProduitController.index,   name="produit_index")
-    g.add("GET",  "/new",         ProduitController.new,     name="produit_new")
-    g.add("POST", "",             ProduitController.create,  name="produit_create")
-    g.add("GET",  "/{id}",        ProduitController.show,    name="produit_show")
-    g.add("GET",  "/{id}/edit",   ProduitController.edit,    name="produit_edit")
-    g.add("POST", "/{id}",        ProduitController.update,  name="produit_update")
-    g.add("POST", "/{id}/delete", ProduitController.destroy, name="produit_destroy")
+with router.group("/produit") as g:
+    g.add("GET",  "",               ProduitController.index,   name="produit-index")
+    g.add("GET",  "/new",           ProduitController.new,     name="produit-new")
+    g.add("POST", "/create",        ProduitController.create,  name="produit-create")
+    g.add("GET",  "/show/{id}",     ProduitController.show,    name="produit-show")
+    g.add("GET",  "/edit/{id}",     ProduitController.edit,    name="produit-edit")
+    g.add("POST", "/update/{id}",   ProduitController.update,  name="produit-update")
+    g.add("POST", "/destroy/{id}",  ProduitController.destroy, name="produit-destroy")
 # forge-starter:mon-starter:end
 ```
 
@@ -353,14 +353,14 @@ from mvc.controllers.produit_controller import ProduitController
 with router.group("/categories", public=True, csrf=False) as g:
     g.add("GET", "", CategorieController.index, name="categorie_index")
 
-with router.group("/produits", public=True, csrf=False) as g:
-    g.add("GET",  "",             ProduitController.index,   name="produit_index")
-    g.add("GET",  "/new",         ProduitController.new,     name="produit_new")
-    g.add("POST", "",             ProduitController.create,  name="produit_create")
-    g.add("GET",  "/{id}",        ProduitController.show,    name="produit_show")
-    g.add("GET",  "/{id}/edit",   ProduitController.edit,    name="produit_edit")
-    g.add("POST", "/{id}",        ProduitController.update,  name="produit_update")
-    g.add("POST", "/{id}/delete", ProduitController.destroy, name="produit_destroy")
+with router.group("/produit", public=True, csrf=False) as g:
+    g.add("GET",  "",             ProduitController.index,   name="produit-index")
+    g.add("GET",  "/new",         ProduitController.new,     name="produit-new")
+    g.add("POST", "/create",             ProduitController.create,  name="produit-create")
+    g.add("GET",  "/show/{id}",        ProduitController.show,    name="produit-show")
+    g.add("GET",  "/edit/{id}",   ProduitController.edit,    name="produit-edit")
+    g.add("POST", "/update/{id}",        ProduitController.update,  name="produit-update")
+    g.add("POST", "/destroy/{id}", ProduitController.destroy, name="produit-destroy")
 # forge-starter:mon-starter-app:end
 ```
 
@@ -710,18 +710,18 @@ forge_cli/starters/data/
   "description": "CRUD simple de produits",
   "status": "available",
   "requires_db": true,
-  "home_route": "/produits",
+  "home_route": "/produit",
   "routes_marker": "mon-starter",
   "routes": {
-    "prefix": "/produits",
+    "prefix": "/produit",
     "actions": [
-      {"method": "GET",  "path": "",             "action": "index",   "name": "produit_index"},
-      {"method": "GET",  "path": "/new",         "action": "new",     "name": "produit_new"},
-      {"method": "POST", "path": "",             "action": "create",  "name": "produit_create"},
-      {"method": "GET",  "path": "/{id}",        "action": "show",    "name": "produit_show"},
-      {"method": "GET",  "path": "/{id}/edit",   "action": "edit",    "name": "produit_edit"},
-      {"method": "POST", "path": "/{id}",        "action": "update",  "name": "produit_update"},
-      {"method": "POST", "path": "/{id}/delete", "action": "destroy", "name": "produit_destroy"}
+      {"method": "GET",  "path": "",             "action": "index",   "name": "produit-index"},
+      {"method": "GET",  "path": "/new",         "action": "new",     "name": "produit-new"},
+      {"method": "POST", "path": "/create",             "action": "create",  "name": "produit-create"},
+      {"method": "GET",  "path": "/show/{id}",        "action": "show",    "name": "produit-show"},
+      {"method": "GET",  "path": "/edit/{id}",   "action": "edit",    "name": "produit-edit"},
+      {"method": "POST", "path": "/update/{id}",        "action": "update",  "name": "produit-update"},
+      {"method": "POST", "path": "/destroy/{id}", "action": "destroy", "name": "produit-destroy"}
     ]
   },
   "check_paths": [

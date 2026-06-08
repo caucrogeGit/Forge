@@ -122,7 +122,7 @@ class TestTablePartialGuard:
     def test_avec_rbac_delete_entre_guard_et_endif(self):
         html = build_table_partial(_DEFN_SIMPLE, rbac=_RBAC_FULL)
         # Trouver le formulaire de suppression unitaire par ligne (distinct de /bulk-delete)
-        idx_form = html.index("/delete")
+        idx_form = html.index("/destroy")
         # Trouver le guard {% if can %} immédiatement avant ce formulaire
         idx_if = html.rfind("{% if can('contacts.delete') %}", 0, idx_form)
         assert idx_if != -1, "Pas de guard avant le formulaire de suppression unitaire"
@@ -163,7 +163,7 @@ class TestShowViewGuard:
     def test_avec_rbac_delete_entre_guard_et_endif(self):
         html = build_show_view(_DEFN_SIMPLE, rbac=_RBAC_FULL)
         idx_if = html.index("{% if can('contacts.delete') %}")
-        idx_form = html.index("/delete", idx_if)
+        idx_form = html.index("/destroy", idx_if)
         idx_endif = html.index("{% endif %}", idx_if)
         assert idx_if < idx_form < idx_endif
 
