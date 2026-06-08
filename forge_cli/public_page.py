@@ -200,6 +200,34 @@ def _insert_import(content: str, import_line: str) -> str:
     return "".join(lines)
 
 
+def _has_router_factory(content: str) -> bool:
+    """Vrai si `content` contient une affectation module-level `router = Router(...)`.
+
+    Détection par AST plutôt que par sous-chaîne : un commentaire ou une chaîne
+    contenant « router = Router() » ne doit pas être pris pour la vraie fabrique
+    (sinon on injecte un bloc référençant un `router` inexistant, ce qui casse
+    `routes.py` à l'import), et une affectation réelle écrite différemment
+    (espaces, arguments) doit bien être reconnue.
+    """
+    try:
+        tree = ast.parse(content)
+    except SyntaxError:
+        return False
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        if not any(isinstance(t, ast.Name) and t.id == "router" for t in node.targets):
+            continue
+        call = node.value
+        if isinstance(call, ast.Call):
+            func = call.func
+            if isinstance(func, ast.Name) and func.id == "Router":
+                return True
+            if isinstance(func, ast.Attribute) and func.attr == "Router":
+                return True
+    return False
+
+
 def _route_exists(content: str, spec: PublicPageSpec) -> bool:
     route_path = f'"/{spec.slug}"'
     route_name = f'name="{spec.route_name}"'
@@ -226,7 +254,7 @@ def _ensure_route(routes_path: Path, spec: PublicPageSpec) -> tuple[bool, str | 
         routes_path.write_text(_ensure_trailing_newline(content), encoding="utf-8")
         return changed, None
 
-    if "router = Router()" not in content:
+    if not _has_router_factory(content):
         return False, f"Route à ajouter manuellement dans {routes_path.as_posix()} : GET /{spec.slug}"
 
     content = _ensure_trailing_newline(content) + build_route_block(spec)

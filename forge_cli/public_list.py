@@ -17,6 +17,7 @@ from forge_cli.public_page import (
     ROUTES_PATH,
     _ensure_routes_file,
     _ensure_trailing_newline,
+    _has_router_factory,
     _insert_import,
 )
 
@@ -548,7 +549,7 @@ def _ensure_route(routes_path: Path, spec: PublicListSpec) -> tuple[bool, str | 
         routes_path.write_text(_ensure_trailing_newline(content), encoding="utf-8")
         return changed, None
 
-    if "router = Router()" not in content:
+    if not _has_router_factory(content):
         return False, f"Route à ajouter manuellement dans {routes_path.as_posix()} : GET {spec.route_path}"
 
     routes_path.write_text(
@@ -578,7 +579,7 @@ def _ensure_show_route(routes_path: Path, spec: PublicListSpec) -> tuple[bool, s
         routes_path.write_text(_ensure_trailing_newline(content), encoding="utf-8")
         return changed, None
 
-    if "router = Router()" not in content:
+    if not _has_router_factory(content):
         return False, f"Route à ajouter manuellement dans {routes_path.as_posix()} : GET {spec.show_route_path}"
 
     routes_path.write_text(

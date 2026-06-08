@@ -4,7 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.public_page import build_public_page_spec, main, make_public_page
+from forge_cli.public_page import (
+    _has_router_factory,
+    build_public_page_spec,
+    main,
+    make_public_page,
+)
 
 
 def _prepare_project(root: Path) -> None:
@@ -114,6 +119,68 @@ def test_make_public_page_normalise_les_noms_valides():
 def test_make_public_page_refuse_les_chemins_dangereux(name):
     with pytest.raises(ValueError):
         build_public_page_spec(name)
+
+
+# --- Garde-fou B2 : détection de la fabrique `router` par AST (anti-corruption) ---
+
+
+def test_has_router_factory_detecte_affectation_reelle():
+    assert _has_router_factory("from core.http.router import Router\nrouter = Router()\n")
+
+
+def test_has_router_factory_tolere_espaces_et_arguments():
+    assert _has_router_factory("router  =  Router()\n")
+    assert _has_router_factory("router = Router(prefix='/x')\n")
+
+
+def test_has_router_factory_ignore_le_marqueur_en_commentaire():
+    # Cause racine B2 : un commentaire contenant le marqueur ne doit pas leurrer
+    # le générateur, sinon il injecte un bloc référençant un `router` inexistant.
+    content = "from core.http.router import Router\n# exemple : router = Router()\n"
+    assert not _has_router_factory(content)
+
+
+def test_has_router_factory_ignore_le_marqueur_en_chaine():
+    content = 'HELP = "router = Router()"\n'
+    assert not _has_router_factory(content)
+
+
+def test_has_router_factory_faux_si_syntaxe_invalide():
+    assert not _has_router_factory("def (:\n")
+
+
+def test_make_public_page_ninjecte_pas_si_router_seulement_en_commentaire(tmp_path):
+    """Si `routes.py` ne contient le marqueur que dans un commentaire, la route
+    n'est pas injectée (avertissement) et le fichier reste un module valide."""
+    (tmp_path / "mvc" / "views" / "layouts").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "mvc" / "views" / "layouts" / "public.html").write_text(
+        "{% block title %}{% endblock %}{% block content %}{% endblock %}\n",
+        encoding="utf-8",
+    )
+    routes_path = tmp_path / "mvc" / "routes.py"
+    routes_path.write_text(
+        "from core.http.router import Router\n"
+        "# pensez a creer : router = Router()\n",
+        encoding="utf-8",
+    )
+
+    result = make_public_page("accueil", root=tmp_path)
+
+    routes = routes_path.read_text(encoding="utf-8")
+    assert "PublicPagesController.accueil" not in routes  # pas de bloc injecté
+    assert any("à ajouter manuellement" in w for w in result.warnings)
+    compile(routes, "routes.py", "exec")  # toujours un module valide
+
+
+def test_make_public_page_routes_resultantes_compilent(tmp_path):
+    """Après injection sur un `routes.py` valide, le fichier produit compile
+    (aucune référence `router` orpheline)."""
+    _prepare_project(tmp_path)
+
+    make_public_page("accueil", root=tmp_path)
+
+    routes = _read(tmp_path, "mvc/routes.py")
+    compile(routes, "routes.py", "exec")
 
 
 def test_make_public_page_reste_independante_du_crud_admin(tmp_path):

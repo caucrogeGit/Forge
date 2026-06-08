@@ -17,6 +17,7 @@ from forge_cli.public_page import (
     ROUTES_PATH,
     _ensure_routes_file,
     _ensure_trailing_newline,
+    _has_router_factory,
     _insert_import,
 )
 from forge_cli.public_list import (
@@ -339,7 +340,7 @@ def _ensure_form_route(routes_path: Path, spec: PublicFormSpec) -> tuple[bool, s
         routes_path.write_text(_ensure_trailing_newline(content), encoding="utf-8")
         return changed, None
 
-    if "router = Router()" not in content:
+    if not _has_router_factory(content):
         return False, (
             f"Routes à ajouter manuellement dans {routes_path.as_posix()} : "
             f"GET {spec.route_path}/new et POST {spec.route_path}"
