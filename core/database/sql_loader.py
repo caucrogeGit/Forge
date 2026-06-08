@@ -1,12 +1,12 @@
 """
-core/sql_loader.py — Chargeur dynamique de modules SQL
-=======================================================
+core/database/sql_loader.py — Chargeur dynamique de modules SQL
+===============================================================
 Les sous-dossiers sql/dev/ et sql/prod/ ne sont pas des packages Python
 valides comme noms d'import direct depuis la racine du projet.
 Ce module utilise importlib pour charger le bon fichier selon APP_ENV.
 
 Usage dans un modèle :
-    from core.sql_loader import charger_queries
+    from core.database.sql_loader import charger_queries
     q = charger_queries("client_queries.py")
     cursor.execute(q.COUNT_CLIENTS)
 

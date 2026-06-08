@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-import re
-
 from forge_cli.entities.crud.context import CrudManyToOneRelation
+
+# Source unique de _to_snake (principe 11) : re-export depuis validation, qui
+# en porte la définition canonique. Les modules CRUD continuent de l'importer
+# depuis ce module (`from forge_cli.entities.crud.utils import _to_snake`).
+from forge_cli.entities.validation import _to_snake  # noqa: F401
 
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────
-
-def _to_snake(name: str) -> str:
-    value = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
-    value = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", value)
-    return value.replace("-", "_").lower()
-
 
 def _humanize(name: str) -> str:
     return name.replace("_", " ").capitalize()
