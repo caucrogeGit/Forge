@@ -9,23 +9,28 @@ POST, et lire un champ avec `request.form("name", default=...)`, le POST
 
 ## Là où nous en sommes
 
-`WelcomeController` porte déjà les méthodes des paliers 1 à 7, et
-`mvc/routes.py` déclare les routes jusqu'à `/csrf`. Nous ajoutons deux
-méthodes (afficher le formulaire, traiter l'envoi), deux routes et un
-gabarit.
+`WelcomeController` porte déjà les méthodes des paliers 1 à 7, dont le helper
+`_start_session` introduit au palier CSRF, et `mvc/routes.py` déclare les routes
+jusqu'à `/csrf`. Nous ajoutons deux méthodes (afficher le formulaire, traiter
+l'envoi), deux routes et un gabarit.
 
 ## L'ajout
 
-Ajoutez ces deux méthodes à la classe `WelcomeController` :
+Ajoutez ces deux méthodes à la classe `WelcomeController`. Comme ce formulaire
+fait un **vrai POST protégé**, `form` réutilise `_start_session` (garantir la
+session, donc un jeton non vide) et pose le cookie de session :
 
 ```python
     @staticmethod
     def form(request: Request) -> Response:
-        return BaseController.render(
+        session_id, csrf_token = WelcomeController._start_session(request)
+        response = BaseController.render(
             "welcome/form_post.html",
             request=request,
-            context={"csrf_token": BaseController.csrf_token(request)},
+            context={"csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def form_submit(request: Request) -> Response:

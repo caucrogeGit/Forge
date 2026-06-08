@@ -14,7 +14,8 @@ l'état final complet des deux contrôleurs et du fichier de routes.
 - Palier 5 : inspecter une requête avec `Response.debug(request.data)` (en
   développement seulement).
 - Palier 6 : renvoyer des données structurées avec `Response.json({...})`.
-- Palier 7 : obtenir un jeton CSRF avec `BaseController.csrf_token(request)`.
+- Palier 7 : garantir une session (le jeton CSRF y vit) avec `_start_session`
+  et `set_session_cookie`, puis transmettre le jeton dans un champ caché.
 - Palier 8 : traiter un POST et lire un champ avec `request.form("cle", default=...)`.
 - Palier 9 : valider côté serveur et refuser une saisie vide avec un statut `422`.
 - Palier 10 : lire en base avec du SQL visible (`fetch_one(...)`) via une
@@ -28,9 +29,25 @@ l'état final complet des deux contrôleurs et du fichier de routes.
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
+from core.security.cookies import set_session_cookie
+from core.security.session import get_session, get_session_id
+from core.sessions.manager import get_session_store
 
 
 class WelcomeController(BaseController):
+
+    @staticmethod
+    def _start_session(request: Request):
+        """Garantit une session active et renvoie (session_id, csrf_token).
+
+        Le jeton CSRF vit dans la session : sans session, il serait vide.
+        """
+        session_id = get_session_id(request)
+        session = get_session(session_id) if session_id else None
+        if session is None:
+            session_id = get_session_store().create()
+            session = get_session(session_id)
+        return session_id, session["csrf_token"]
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -72,19 +89,25 @@ class WelcomeController(BaseController):
 
     @staticmethod
     def csrf_demo(request: Request) -> Response:
-        return BaseController.render(
+        session_id, csrf_token = WelcomeController._start_session(request)
+        response = BaseController.render(
             "welcome/csrf.html",
             request=request,
-            context={"csrf_token": BaseController.csrf_token(request)},
+            context={"csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def form(request: Request) -> Response:
-        return BaseController.render(
+        session_id, csrf_token = WelcomeController._start_session(request)
+        response = BaseController.render(
             "welcome/form_post.html",
             request=request,
-            context={"csrf_token": BaseController.csrf_token(request)},
+            context={"csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def form_submit(request: Request) -> Response:
@@ -93,11 +116,14 @@ class WelcomeController(BaseController):
 
     @staticmethod
     def validate(request: Request) -> Response:
-        return BaseController.render(
+        session_id, csrf_token = WelcomeController._start_session(request)
+        response = BaseController.render(
             "welcome/server_validation.html",
             request=request,
-            context={"csrf_token": BaseController.csrf_token(request)},
+            context={"csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def validate_submit(request: Request) -> Response:

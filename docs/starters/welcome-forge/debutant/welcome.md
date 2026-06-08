@@ -4,6 +4,15 @@ Premier palier d'un tutoriel continu : vous allez construire à la main un
 seul projet qui grandit palier après palier. On démarre par la réponse la
 plus simple possible.
 
+!!! info "Le mini-projet du niveau débutant"
+    Chaque niveau de welcome-forge est un **mini-projet autonome** que vous
+    écrivez à la main, palier après palier. Au niveau débutant, vous partez de
+    « Bonjour Forge » (une simple réponse texte) et faites grandir le projet
+    jusqu'à **lire et écrire en base** : vues HTML, route dynamique, réponse
+    JSON, jeton CSRF, formulaire POST, validation serveur, puis SQL. Un
+    `WelcomeController` accumule les paliers HTTP, puis un `MessageController`
+    porte les paliers base de données.
+
 **Ce que vous allez apprendre :** écrire votre premier contrôleur, déclarer
 une route et renvoyer une réponse texte avec `Response.text(...)`, sans vue
 HTML ni base de données.

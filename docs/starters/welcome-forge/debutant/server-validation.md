@@ -20,11 +20,14 @@ Ajoutez ces deux méthodes à la classe `WelcomeController` :
 ```python
     @staticmethod
     def validate(request: Request) -> Response:
-        return BaseController.render(
+        session_id, csrf_token = WelcomeController._start_session(request)
+        response = BaseController.render(
             "welcome/server_validation.html",
             request=request,
-            context={"csrf_token": BaseController.csrf_token(request)},
+            context={"csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def validate_submit(request: Request) -> Response:
