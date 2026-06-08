@@ -5,6 +5,7 @@ Toutes les opérations sur le filesystem utilisent tmp_path.
 """
 from __future__ import annotations
 
+import ast
 import json
 from pathlib import Path
 
@@ -194,6 +195,54 @@ def test_make_pivot_crud_controleur_mentionne_pivot_advanced_service(tmp_path):
     ctrl = tmp_path / "mvc" / "controllers" / "pivot" / "article_tags_pivot_controller.py"
     text = ctrl.read_text(encoding="utf-8")
     assert "PivotAdvancedService" in text
+
+
+def _generate_controller_source(tmp_path: Path) -> str:
+    _write_relations(tmp_path, _RELATIONS_WITH_FIELDS)
+    make_pivot_crud(
+        "Article", "tags",
+        entities_root=tmp_path / "mvc" / "entities",
+        output_root=tmp_path,
+    )
+    ctrl = tmp_path / "mvc" / "controllers" / "pivot" / "article_tags_pivot_controller.py"
+    return ctrl.read_text(encoding="utf-8")
+
+
+def test_controleur_genere_compile(tmp_path):
+    """Le contrôleur pivot généré doit être un module Python valide."""
+    ast.parse(_generate_controller_source(tmp_path))
+
+
+def test_controleur_genere_utilise_api_runtime_reelle(tmp_path):
+    """Garde-fou : plus de `Response.render`/`Response.redirect`/`app.route`
+    (API inexistantes) ; rendu et redirection via `BaseController`."""
+    src = _generate_controller_source(tmp_path)
+    assert "Response.render" not in src
+    assert "Response.redirect" not in src
+    assert "app.route" not in src
+    assert "from core.mvc.controller import BaseController" in src
+    assert "BaseController.render(" in src
+    assert "BaseController.redirect(" in src
+
+
+def test_controleur_genere_lit_les_ids_de_route(tmp_path):
+    """Les contrôleurs ont la signature `(request)` et lisent les identifiants
+    depuis les paramètres de route, comme make:crud."""
+    src = _generate_controller_source(tmp_path)
+    assert 'request.route("source_id")' in src
+    assert 'request.route("target_id")' in src
+    # plus de signature à paramètres injectés
+    assert "def index(request: Request) -> Response:" in src
+
+
+def test_controleur_genere_nomme_les_routes_adr029(tmp_path):
+    """L'exemple de routes suit la convention ADR-029 (<contrôleur>-<méthode>)
+    et l'API canonique router.group().add(...)."""
+    src = _generate_controller_source(tmp_path)
+    assert 'name="article_tags_pivot-index"' in src
+    assert 'name="article_tags_pivot-remove"' in src
+    assert "router.group(" in src
+    assert "g.add(" in src
 
 
 # ── dry-run ───────────────────────────────────────────────────────────────────

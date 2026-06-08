@@ -163,28 +163,26 @@ def _build_controller(rel: ResolvedPivotRelation) -> str:
 Sous-CRUD Pivot advanced pour {rel.from_entity}.{rel.relation_name}.
 Généré par forge make:pivot-crud {rel.from_entity} {rel.relation_name}.
 
-Ce contrôleur est opt-in — les routes sont à déclarer manuellement
-dans mvc/routes.py.
+Ce contrôleur est opt-in — les routes (imbriquées sous la source) sont à
+déclarer manuellement dans mvc/routes.py. Noms de routes au format ADR-029
+(<contrôleur>-<méthode>) ; les identifiants sont lus depuis les paramètres
+de route « source_id » et « target_id ».
 
 Exemple de routes à ajouter :
-    app.route("GET",  "/{src_snake}s/{{id}}/{rel.relation_name}",
-              controller.index)
-    app.route("GET",  "/{src_snake}s/{{id}}/{rel.relation_name}/add",
-              controller.add_form)
-    app.route("POST", "/{src_snake}s/{{id}}/{rel.relation_name}/add",
-              controller.add)
-    app.route("GET",  "/{src_snake}s/{{id}}/{rel.relation_name}/{{target_id}}/edit",
-              controller.edit_form)
-    app.route("POST", "/{src_snake}s/{{id}}/{rel.relation_name}/{{target_id}}/edit",
-              controller.edit)
-    app.route("POST", "/{src_snake}s/{{id}}/{rel.relation_name}/{{target_id}}/remove",
-              controller.remove)
+    with router.group("") as g:
+        g.add("GET",  "/{src_snake}s/{{source_id}}/{rel.relation_name}", controller.index, name="{src_snake}_{rel.relation_name}_pivot-index")
+        g.add("GET",  "/{src_snake}s/{{source_id}}/{rel.relation_name}/add", controller.add_form, name="{src_snake}_{rel.relation_name}_pivot-add_form")
+        g.add("POST", "/{src_snake}s/{{source_id}}/{rel.relation_name}/add", controller.add, name="{src_snake}_{rel.relation_name}_pivot-add")
+        g.add("GET",  "/{src_snake}s/{{source_id}}/{rel.relation_name}/{{target_id}}/edit", controller.edit_form, name="{src_snake}_{rel.relation_name}_pivot-edit_form")
+        g.add("POST", "/{src_snake}s/{{source_id}}/{rel.relation_name}/{{target_id}}/edit", controller.edit, name="{src_snake}_{rel.relation_name}_pivot-edit")
+        g.add("POST", "/{src_snake}s/{{source_id}}/{rel.relation_name}/{{target_id}}/remove", controller.remove, name="{src_snake}_{rel.relation_name}_pivot-remove")
 """
 from __future__ import annotations
 
 from forge_mvc_pivot import PivotAdvancedService, PivotConstraintError, pivot_error_to_form_error
 from core.http.request import Request
 from core.http.response import Response
+from core.mvc.controller import BaseController
 
 _SERVICE = PivotAdvancedService(
     table={rel.pivot_table!r},
@@ -200,27 +198,30 @@ _TEMPLATE_FORM  = "pivot/{src_snake}_{rel.relation_name}/form.html"
 class {rel.from_entity}{rel.relation_name.capitalize()}PivotController:
 
     @staticmethod
-    def index(request: Request, {src_snake}_id: int) -> Response:
+    def index(request: Request) -> Response:
         """Liste les associations {rel.pivot_table}."""
+        {src_snake}_id = int(request.route("source_id"))
         rows = _SERVICE.list_for_source({src_snake}_id)
-        return Response.render(_TEMPLATE_INDEX, {{
+        return BaseController.render(_TEMPLATE_INDEX, context={{
             "{src_snake}_id": {src_snake}_id,
             "rows": rows,
-        }})
+        }}, request=request)
 
     @staticmethod
-    def add_form(request: Request, {src_snake}_id: int) -> Response:
+    def add_form(request: Request) -> Response:
         """Formulaire d'ajout d'une association."""
-        return Response.render(_TEMPLATE_FORM, {{
+        {src_snake}_id = int(request.route("source_id"))
+        return BaseController.render(_TEMPLATE_FORM, context={{
             "{src_snake}_id": {src_snake}_id,
             "row": None,
             "action": f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}/add",
             "error": None,
-        }})
+        }}, request=request)
 
     @staticmethod
-    def add(request: Request, {src_snake}_id: int) -> Response:
+    def add(request: Request) -> Response:
         """Crée une nouvelle association."""
+        {src_snake}_id = int(request.route("source_id"))
         {tgt_snake}_id = int(request.form("{rel.to_key}"))
         pivot_data = {{
             field: request.form(field)
@@ -229,32 +230,36 @@ class {rel.from_entity}{rel.relation_name.capitalize()}PivotController:
         }}
         try:
             _SERVICE.attach({src_snake}_id, {tgt_snake}_id, pivot_data)
-            return Response.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}")
+            return BaseController.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}", request=request)
         except Exception as exc:
             error = pivot_error_to_form_error(exc)
-            return Response.render(_TEMPLATE_FORM, {{
+            return BaseController.render(_TEMPLATE_FORM, context={{
                 "{src_snake}_id": {src_snake}_id,
                 "row": None,
                 "action": f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}/add",
                 "error": error,
-            }})
+            }}, request=request)
 
     @staticmethod
-    def edit_form(request: Request, {src_snake}_id: int, {tgt_snake}_id: int) -> Response:
+    def edit_form(request: Request) -> Response:
         """Formulaire de modification d'une association."""
+        {src_snake}_id = int(request.route("source_id"))
+        {tgt_snake}_id = int(request.route("target_id"))
         row = _SERVICE.get({src_snake}_id, {tgt_snake}_id)
         if row is None:
-            return Response.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}")
-        return Response.render(_TEMPLATE_FORM, {{
+            return BaseController.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}", request=request)
+        return BaseController.render(_TEMPLATE_FORM, context={{
             "{src_snake}_id": {src_snake}_id,
             "row": row,
             "action": f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}/{{{tgt_snake}_id}}/edit",
             "error": None,
-        }})
+        }}, request=request)
 
     @staticmethod
-    def edit(request: Request, {src_snake}_id: int, {tgt_snake}_id: int) -> Response:
+    def edit(request: Request) -> Response:
         """Modifie les attributs pivot d'une association."""
+        {src_snake}_id = int(request.route("source_id"))
+        {tgt_snake}_id = int(request.route("target_id"))
         pivot_data = {{
             field: request.form(field)
             for field in {fields_repr}
@@ -262,22 +267,24 @@ class {rel.from_entity}{rel.relation_name.capitalize()}PivotController:
         }}
         try:
             _SERVICE.update({src_snake}_id, {tgt_snake}_id, pivot_data)
-            return Response.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}")
+            return BaseController.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}", request=request)
         except Exception as exc:
             error = pivot_error_to_form_error(exc)
             row = _SERVICE.get({src_snake}_id, {tgt_snake}_id)
-            return Response.render(_TEMPLATE_FORM, {{
+            return BaseController.render(_TEMPLATE_FORM, context={{
                 "{src_snake}_id": {src_snake}_id,
                 "row": row,
                 "action": f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}/{{{tgt_snake}_id}}/edit",
                 "error": error,
-            }})
+            }}, request=request)
 
     @staticmethod
-    def remove(request: Request, {src_snake}_id: int, {tgt_snake}_id: int) -> Response:
+    def remove(request: Request) -> Response:
         """Supprime une association."""
+        {src_snake}_id = int(request.route("source_id"))
+        {tgt_snake}_id = int(request.route("target_id"))
         _SERVICE.detach({src_snake}_id, {tgt_snake}_id)
-        return Response.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}")
+        return BaseController.redirect(f"/{src_snake}s/{{{src_snake}_id}}/{rel.relation_name}", request=request)
 
 
 controller = {rel.from_entity}{rel.relation_name.capitalize()}PivotController()
@@ -467,12 +474,16 @@ def cmd_make_pivot_crud_main(args: list[str]) -> None:
             print()
             print(out.ok(f"Pivot advanced généré pour {source_entity}.{relation_name}"))
             print()
+            ctrl_ref = f"{src_snake}_{relation_name}_ctrl"
+            name_prefix = f"{src_snake}_{relation_name}_pivot"
+            base = f"/{src_snake}s/{{source_id}}/{relation_name}"
             print("Routes à ajouter dans mvc/routes.py :")
             print(f'    # Pivot {source_entity}.{relation_name}')
-            print(f'    from mvc.controllers.pivot.{src_snake}_{relation_name}_pivot_controller import controller as {src_snake}_{relation_name}_ctrl')
-            print(f'    app.route("GET",  "/{src_snake}s/{{id}}/{relation_name}", {src_snake}_{relation_name}_ctrl.index)')
-            print(f'    app.route("GET",  "/{src_snake}s/{{id}}/{relation_name}/add", {src_snake}_{relation_name}_ctrl.add_form)')
-            print(f'    app.route("POST", "/{src_snake}s/{{id}}/{relation_name}/add", {src_snake}_{relation_name}_ctrl.add)')
-            print(f'    app.route("GET",  "/{src_snake}s/{{id}}/{relation_name}/{{target_id}}/edit", {src_snake}_{relation_name}_ctrl.edit_form)')
-            print(f'    app.route("POST", "/{src_snake}s/{{id}}/{relation_name}/{{target_id}}/edit", {src_snake}_{relation_name}_ctrl.edit)')
-            print(f'    app.route("POST", "/{src_snake}s/{{id}}/{relation_name}/{{target_id}}/remove", {src_snake}_{relation_name}_ctrl.remove)')
+            print(f'    from mvc.controllers.pivot.{src_snake}_{relation_name}_pivot_controller import controller as {ctrl_ref}')
+            print('    with router.group("") as g:')
+            print(f'        g.add("GET",  "{base}", {ctrl_ref}.index, name="{name_prefix}-index")')
+            print(f'        g.add("GET",  "{base}/add", {ctrl_ref}.add_form, name="{name_prefix}-add_form")')
+            print(f'        g.add("POST", "{base}/add", {ctrl_ref}.add, name="{name_prefix}-add")')
+            print(f'        g.add("GET",  "{base}/{{target_id}}/edit", {ctrl_ref}.edit_form, name="{name_prefix}-edit_form")')
+            print(f'        g.add("POST", "{base}/{{target_id}}/edit", {ctrl_ref}.edit, name="{name_prefix}-edit")')
+            print(f'        g.add("POST", "{base}/{{target_id}}/remove", {ctrl_ref}.remove, name="{name_prefix}-remove")')
