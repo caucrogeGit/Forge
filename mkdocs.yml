@@ -367,6 +367,7 @@ nav:
           - ADR-026 Accesseurs Request query/route: adr/026-request-param-naming.md
           - ADR-027 Extraction i18n: adr/027-i18n-extraction.md
           - ADR-028 welcome-forge tutoriel par niveau: adr/028-welcome-forge-tutorial-per-level.md
+          - ADR-029 Convention de route: adr/029-route-naming-convention.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
@@ -425,6 +426,7 @@ nav:
       - Pour contribuer:
           - Vue d'ensemble: philosophy/contributing.md
           - Conventions de travail: contributing/conventions.md
+          - Convention de route: contributing/route-convention.md
           - Modèle de starter (référence welcome): contributing/starter-welcome-model.md
           - Dépôt canonique et récupération: contributing/canonical-repo.md
       - Audits:

@@ -35,3 +35,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-026](026-request-param-naming.md) | Accesseurs de Request nommés par leur source : `query` et `route` (accepté) |
 | [ADR-027](027-i18n-extraction.md) | Extraction de l'i18n vers `forge-mvc-i18n`, repli no-op conservé dans le noyau (accepté) |
 | [ADR-028](028-welcome-forge-tutorial-per-level.md) | welcome-forge : tutoriel continu manuel sur les trois niveaux, un mini-projet par niveau (accepté) |
+| [ADR-029](029-route-naming-convention.md) | Convention de route : chemin `/contrôleur/méthode` (index nu), nom `contrôleur-méthode` (accepté) |
