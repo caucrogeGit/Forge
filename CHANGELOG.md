@@ -45,6 +45,21 @@
 
 ### Modifié
 
+- **Convention de déclaration des routes** (ADR-029,
+  `ROUTE-CONVENTION-ADR-029`). Une route dérive désormais mécaniquement du
+  contrôleur et de la méthode visés : chemin `/<contrôleur>/<méthode>` (la
+  méthode `index` donne le chemin nu `/<contrôleur>`), nom
+  `<contrôleur>-<méthode>` (séparateur trait d'union), avec l'unique exception
+  de la racine `/` pour `HomeController.index` nommée `home-index`. Le
+  générateur `make:crud` (`ROUTE-CONVENTION-MAKECRUD-001`), le squelette
+  `forge new` (`ROUTE-CONVENTION-SKELETON-001`) et le tutoriel `welcome-forge`
+  (`ROUTE-CONVENTION-WELCOME-001`) produisent ce format. Rupture franche sans
+  alias (phase bêta pré-1.0) : elle remplace l'ancienne convention implicite de
+  `make:crud` (`<ressource>_<action>`, chemins REST pluriels) et le nom
+  `home_index` du squelette. Divergence transitoire assumée : les ~84 starters
+  opt-in et l'application interne de démonstration (`mvc/routes.py`) gardent
+  encore l'ancienne convention dans leurs snippets, leur alignement étant
+  déféré à des tickets dédiés. Page pratique : `docs/contributing/route-convention.md`.
 - **Accesseurs de `Request` renommés par leur source** (ADR-026,
   `HTTP-REQUEST-PARAM-RENAME-001`) : `request.param` devient `request.query`
   (query string) et `request.route_param` devient `request.route` (paramètre de
