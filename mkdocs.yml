@@ -368,6 +368,7 @@ nav:
           - ADR-027 Extraction i18n: adr/027-i18n-extraction.md
           - ADR-028 welcome-forge tutoriel par niveau: adr/028-welcome-forge-tutorial-per-level.md
           - ADR-029 Convention de route: adr/029-route-naming-convention.md
+          - ADR-030 Injection de routes explicite: adr/030-explicit-route-injection.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
