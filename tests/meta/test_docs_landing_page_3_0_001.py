@@ -92,9 +92,13 @@ class TestNewElementsPresent:
             "Forge est sous licence propriétaire / source disponible, pas open source (cf. LICENSE)"
         )
 
-    def test_positioning_phrase_present(self):
-        assert "Forge génère un MVC CRUD explicite" in self.source, (
-            "La phrase de positionnement CRUD doit apparaître dans la landing (LANDING-BETA6-MENU-001)"
+    def test_positioning_phrase_removed(self):
+        # Retrait volontaire (LANDING-CRUD-PHRASE-REMOVE-001) : la phrase de
+        # positionnement « Forge génère un MVC CRUD explicite à partir d'un
+        # modèle JSON visible » a été supprimée du Hero de la landing.
+        assert "Forge génère un MVC CRUD explicite" not in self.source, (
+            "La phrase de positionnement CRUD doit être absente de la landing "
+            "(retirée par LANDING-CRUD-PHRASE-REMOVE-001)"
         )
 
     # Section FAQ : SUPPRIMÉE VOLONTAIREMENT

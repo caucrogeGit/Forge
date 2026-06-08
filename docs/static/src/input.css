@@ -2,6 +2,7 @@
 
 @source "../../mvc/views/landing/index.html";
 @source "../../docs/index.html";
+@source "../../mvc/views/errors";
 
 @layer components {
   .tab-active {
