@@ -50,8 +50,8 @@ Issues = "https://github.com/caucrogeGit/Forge/issues"
 # Extras de raccourci vers les opt-ins publiables stables (rbac/workflow/stats).
 # Pins alignés sur la version courante : forge-mvc-<nom>>=1.0.0b14,<2
 # (politique unifiée OPTIN-DEPS-PIN-B13-001).
-# Exclus de [all] : forge-mvc-mfa, forge-mvc-media, forge-mvc-iot, forge-mvc-video
-#   media = API applicative encore Alpha
+# Exclus de [all] : forge-mvc-mfa, forge-mvc-images, forge-mvc-iot, forge-mvc-video
+#   images = traitement d'image (Pillow), API applicative encore Alpha
 #   mfa   = Alpha (secret TOTP chiffré au repos)
 #   iot   = Alpha + dépendance MQTT (paho-mqtt)
 #   video = Alpha + binaire système FFmpeg

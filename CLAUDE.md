@@ -25,11 +25,13 @@ ADR-018).
 - `forge-mvc-workflow` (transitions de statut)
 - `forge-mvc-stats` (agrégats statistiques)
 - `forge-mvc-files` (upload générique : écriture sécurisée, storage, service de fichiers — extrait du core, ADR-019)
-- `forge-mvc-images` (traitement et gestion applicative des images — Pillow ; ADR-018)
-- `forge-mvc-media` (shim transitoire vers `forge-mvc-images`, en cours de retrait — ADR-018)
+- `forge-mvc-images` (traitement et gestion applicative des images, Pillow ; ADR-018 ; porte un shim de compatibilité réexportant l'ancien `forge-mvc-media`, supprimé)
 - `forge-mvc-iot` (réception/exposition de données IoT via MQTT)
 - `forge-mvc-video` (upload, transcodage MP4 et lecture vidéo en streaming)
-- `forge-mvc-audio` (upload, sondage, transcodage MP3 et lecture audio en streaming — sans état)
+- `forge-mvc-audio` (upload, sondage, transcodage MP3 et lecture audio en streaming, sans état)
+- `forge-mvc-mail` (envoi d'emails, transports interchangeables ; extrait du core, ADR-022)
+- `forge-mvc-pivot` (tables pivot enrichies `many_to_many` ; extrait du core, ADR-021)
+- `forge-mvc-i18n` (internationalisation par catalogues JSON, helper `trans()` ; extrait du core, ADR-027)
 
 **Python** : 3.12+ minimum (ADR-006).
 
@@ -122,10 +124,12 @@ d'utilisateurs externes ni de code applicatif externe à protéger.
 - `forge-mvc-stats` — agrégats, compteurs, fenêtres temporelles
 - `forge-mvc-files` — upload générique extrait du core (ADR-019) : `save_upload`, storage anti-traversal, `serve_media_file` (HTTP Range), rate-limit. La **validation** pure (extension/MIME/taille) reste dans le core (`core/forms`)
 - `forge-mvc-images` — traitement d'image (Pillow, extrait du core) + couche applicative médias (repository, galerie, couverture) ; dépend de `forge-mvc-files` ; ADR-018
-- `forge-mvc-media` — shim transitoire réexportant `forge-mvc-images` (retrait au ticket `REMOVE-MEDIA-PKG`, ADR-018)
 - `forge-mvc-iot` — subscriber MQTT, stockage `iot_events`, API HTTP JSON, CLI `iot:*`
 - `forge-mvc-video` — upload, transcodage MP4 (H.264/AAC), lecture HTTP Range, CLI `video:*`
 - `forge-mvc-audio` — upload, sondage (`ffprobe`), transcodage MP3 (`ffmpeg`), lecture HTTP Range, CLI `audio:doctor` ; sans état
+- `forge-mvc-mail` : envoi d'emails, transports interchangeables (console, SMTP, log), templates Jinja, CLI `mail:*` ; extrait du core (ADR-022)
+- `forge-mvc-pivot` : tables pivot enrichies (`many_to_many` avec attributs), `make:pivot-crud` ; extrait du core (ADR-021)
+- `forge-mvc-i18n` : internationalisation par catalogues JSON, locale et fallback, helper `trans()`, repli no-op du noyau ; extrait du core (ADR-027)
 
 **Hors scope Forge** (à charge de l'application) :
 
@@ -159,6 +163,21 @@ structurante.
 | ADR-013 | `013-nullable-required-contract-policy.md` | Politique nullable / required des contrats |
 | ADR-014 | `014-rbac-contract-location.md` | Emplacement du contrat RBAC |
 | ADR-015 | `015-dev-tls-handshake-per-thread.md` | Handshake TLS par thread (dev-server) |
+| ADR-016 | `016-opt-in-unification.md` | Unification du modèle opt-in (cycle install/enable, 4 verbes) |
+| ADR-017 | `017-slug-type.md` | Type `slug` et module URL-slug canonique |
+| ADR-018 | `018-image-module-extraction.md` | Extraction du traitement d'image : `forge-mvc-images` |
+| ADR-019 | `019-upload-extraction.md` | Extraction de l'upload générique : `forge-mvc-files` |
+| ADR-020 | `020-files-media-storage-primitives.md` | Périmètre de `forge-mvc-files` (primitives de stockage) |
+| ADR-021 | `021-pivot-extraction.md` | Extraction de pivot advanced : `forge-mvc-pivot` |
+| ADR-022 | `022-mail-extraction.md` | Extraction de l'email : `forge-mvc-mail` |
+| ADR-023 | `023-starter-build-canonical.md` | `starter:build` canonique ; `forge new` produit un projet nu |
+| ADR-024 | `024-skeleton-bootstrap.md` | Bootstrap par squelette dédié, dépendance core via pip |
+| ADR-025 | `025-welcome-forge-continuous-tutorial.md` | welcome-forge : tutoriel continu manuel |
+| ADR-026 | `026-request-param-naming.md` | Accesseurs de `Request` nommés par leur source (`query`, `route`) |
+| ADR-027 | `027-i18n-extraction.md` | Extraction de l'i18n : `forge-mvc-i18n`, repli no-op du noyau |
+| ADR-028 | `028-welcome-forge-tutorial-per-level.md` | welcome-forge : un mini-projet par niveau |
+| ADR-029 | `029-route-naming-convention.md` | Convention de route : chemin `/contrôleur/méthode`, nom `contrôleur-méthode` |
+| ADR-030 | `030-explicit-route-injection.md` | Injection de routes par commande explicite et portée de la règle 4.3 (proposé) |
 
 Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format existant.
 
@@ -292,12 +311,14 @@ Les conventions opérationnelles de Forge sont consolidées dans
 - **D. Documentation** : MkDocs strict + liens hors `docs/`,
   `docs/history/` comme mémoire brute, section « Historique » dans la nav
 
-Note sur `packages/` : 10 sous-dossiers maintenus (`forge-mvc-mfa`,
+Note sur `packages/` : 12 sous-dossiers maintenus (`forge-mvc-mfa`,
 `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-files`,
-`forge-mvc-images`, `forge-mvc-media` — shim transitoire ADR-018, `forge-mvc-iot`,
-`forge-mvc-video`, `forge-mvc-audio`),
-chacun avec son propre `pyproject.toml`. Le `pyproject.toml` racine est la source de vérité
-pour `forge-mvc` (résolu en T2 + T2b — consolidation bêta 1.0).
+`forge-mvc-images`, `forge-mvc-iot`, `forge-mvc-video`, `forge-mvc-audio`,
+`forge-mvc-mail` (ADR-022), `forge-mvc-pivot` (ADR-021), `forge-mvc-i18n` (ADR-027)),
+chacun avec son propre `pyproject.toml`. Le paquet `forge-mvc-media` a été
+supprimé ; son shim de compatibilité est réexporté par `forge-mvc-images`
+(ADR-018). Le `pyproject.toml` racine est la source de vérité pour `forge-mvc`
+(résolu en T2 + T2b, consolidation bêta 1.0).
 
 ---
 
