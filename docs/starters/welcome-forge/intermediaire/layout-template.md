@@ -77,8 +77,8 @@ from mvc.controllers.note_controller import NoteController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET", "/notes", NoteController.index, name="notes_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET", "/note", NoteController.index, name="note-index")
 ```
 
 ## Comprendre ce code
@@ -94,7 +94,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/notes` | la liste, désormais entourée de l'en-tête et du pied du gabarit |
+| `https://localhost:8000/note` | la liste, désormais entourée de l'en-tête et du pied du gabarit |
 
 ## À retenir
 

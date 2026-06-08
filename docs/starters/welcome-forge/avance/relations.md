@@ -123,7 +123,7 @@ Créez la vue `mvc/views/article/index.html` :
 </html>
 ```
 
-Puis ajoutez l'import du contrôleur et la route `/articles` dans `mvc/routes.py`.
+Puis ajoutez l'import du contrôleur et la route `/article` dans `mvc/routes.py`.
 
 ## Votre mvc/routes.py à ce stade
 
@@ -136,8 +136,8 @@ from mvc.controllers.article_controller import ArticleController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET", "/articles", ArticleController.index, name="articles_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET", "/article", ArticleController.index, name="article-index")
 ```
 
 ## Comprendre ce code
@@ -152,7 +152,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/articles` | l'article de départ avec sa catégorie entre parenthèses |
+| `https://localhost:8000/article` | l'article de départ avec sa catégorie entre parenthèses |
 
 ## À retenir
 

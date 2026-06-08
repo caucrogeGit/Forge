@@ -53,13 +53,13 @@ class NoteController(BaseController):
         if not content:
             return Response.text("Le contenu est obligatoire.", status=422)
         execute(UPDATE_ONE, (content, record_id))
-        return BaseController.redirect("/notes", request=request, flash="Note mise à jour.")
+        return BaseController.redirect("/note", request=request, flash="Note mise à jour.")
 
     @staticmethod
     def delete(request: Request) -> Response:
         record_id = int(request.route("id"))
         execute(DELETE_ONE, (record_id,))
-        return BaseController.redirect("/notes", request=request, flash="Note supprimée.")
+        return BaseController.redirect("/note", request=request, flash="Note supprimée.")
 ```
 
 Affichez le flash en tête du bloc `content` de `mvc/views/note/index.html` :
@@ -83,16 +83,16 @@ from mvc.controllers.note_controller import NoteController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/notes", NoteController.index, name="notes_index")
-    pub.add("GET",  "/notes/{id}/edit", NoteController.edit, name="notes_edit")
-    pub.add("POST", "/notes/{id}/edit", NoteController.update, name="notes_update")
-    pub.add("POST", "/notes/{id}/delete", NoteController.delete, name="notes_delete")
+    pub.add("GET",  "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/note", NoteController.index, name="note-index")
+    pub.add("GET",  "/note/edit/{id}", NoteController.edit, name="note-edit")
+    pub.add("POST", "/note/update/{id}", NoteController.update, name="note-update")
+    pub.add("POST", "/note/delete/{id}", NoteController.delete, name="note-delete")
 ```
 
 ## Comprendre ce code
 
-- `BaseController.redirect("/notes", request=request, flash="…")` **pose** le
+- `BaseController.redirect("/note", request=request, flash="…")` **pose** le
   message dans la session puis renvoie une redirection : c'est le **P**OST puis le
   **R**edirect du motif POST-Redirect-GET.
 - Au **G**ET suivant, `get_flash(get_session_id(request))` lit le message **et le

@@ -53,8 +53,8 @@ from mvc.controllers.welcome_controller import WelcomeController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET", "/welcome", WelcomeController.index, name="welcome_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET", "/welcome", WelcomeController.index, name="welcome-index")
 ```
 
 ## Comprendre ce code

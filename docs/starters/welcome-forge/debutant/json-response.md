@@ -9,7 +9,7 @@ texte.
 ## Là où nous en sommes
 
 `WelcomeController` porte déjà les méthodes des paliers 1 à 5, et
-`mvc/routes.py` déclare les routes jusqu'à `/request-debug`. Nous ajoutons
+`mvc/routes.py` déclare les routes jusqu'à `/welcome/debug`. Nous ajoutons
 une méthode et une route.
 
 ## L'ajout
@@ -18,7 +18,7 @@ Ajoutez cette méthode à la classe `WelcomeController` :
 
 ```python
     @staticmethod
-    def json_demo(request: Request) -> Response:
+    def json(request: Request) -> Response:
         return Response.json(
             {
                 "framework": "Forge",
@@ -41,14 +41,14 @@ from mvc.controllers.welcome_controller import WelcomeController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
-    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
-    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
-    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
-    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
-    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
-    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
+    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+    pub.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+    pub.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
 ```
 
 ## Comprendre ce code
@@ -64,7 +64,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/json-response` | le document JSON `{"framework": "Forge", ...}` |
+| `https://localhost:8000/welcome/json` | le document JSON `{"framework": "Forge", ...}` |
 
 ## À retenir
 

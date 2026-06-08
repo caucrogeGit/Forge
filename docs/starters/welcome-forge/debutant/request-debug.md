@@ -11,7 +11,7 @@ environnement de développement.
 
 `WelcomeController` porte déjà les méthodes des paliers 1 à 4, et
 `mvc/routes.py` déclare les routes correspondantes jusqu'à
-`/dynamic-route/articles/{id}`. Nous ajoutons une méthode et une route.
+`/welcome/article/{id}`. Nous ajoutons une méthode et une route.
 
 ## L'ajout
 
@@ -36,13 +36,13 @@ from mvc.controllers.welcome_controller import WelcomeController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
-    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
-    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
-    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
-    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
-    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
+    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+    pub.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
 ```
 
 ## Comprendre ce code
@@ -58,8 +58,8 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/request-debug` | la page de débogage (en `APP_ENV=dev`) |
-| `https://localhost:8000/request-debug?x=1&y=2` | la même page, avec les paramètres affichés |
+| `https://localhost:8000/welcome/debug` | la page de débogage (en `APP_ENV=dev`) |
+| `https://localhost:8000/welcome/debug?x=1&y=2` | la même page, avec les paramètres affichés |
 
 ## À retenir
 

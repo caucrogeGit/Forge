@@ -117,7 +117,7 @@ class TestEtatFinalDansBilan:
     MARKERS = [
         "class NoteController",
         "def index", "def edit", "def update", "def delete",
-        "notes_index", "notes_edit", "notes_update", "notes_delete",
+        "note-index", "note-edit", "note-update", "note-delete",
     ]
 
     @pytest.mark.parametrize("marker", MARKERS)

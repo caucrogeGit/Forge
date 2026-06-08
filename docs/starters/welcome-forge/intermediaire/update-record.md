@@ -92,13 +92,13 @@ Créez la vue `mvc/views/note/edit.html` :
 
 {% if updated %}<p><strong>Note mise à jour.</strong></p>{% endif %}
 
-<form method="post" action="/notes/{{ note.id }}/edit">
+<form method="post" action="/note/update/{{ note.id }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="text" name="content" value="{{ note.content }}">
     <button type="submit">Enregistrer</button>
 </form>
 
-<p><a href="/notes">Retour à la liste</a></p>
+<p><a href="/note">Retour à la liste</a></p>
 {% endblock %}
 ```
 
@@ -107,7 +107,7 @@ Ajoutez aussi un lien « éditer » sur chaque note de la liste, dans
 
 ```html
 <li>#{{ note.id }} : {{ note.content }}
-    <a href="/notes/{{ note.id }}/edit">éditer</a></li>
+    <a href="/note/edit/{{ note.id }}">éditer</a></li>
 ```
 
 Puis déclarez les deux routes dans `mvc/routes.py`.
@@ -123,10 +123,10 @@ from mvc.controllers.note_controller import NoteController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/notes", NoteController.index, name="notes_index")
-    pub.add("GET",  "/notes/{id}/edit", NoteController.edit, name="notes_edit")
-    pub.add("POST", "/notes/{id}/edit", NoteController.update, name="notes_update")
+    pub.add("GET",  "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/note", NoteController.index, name="note-index")
+    pub.add("GET",  "/note/edit/{id}", NoteController.edit, name="note-edit")
+    pub.add("POST", "/note/update/{id}", NoteController.update, name="note-update")
 ```
 
 ## Comprendre ce code
@@ -144,7 +144,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/notes` | la liste, avec un lien « éditer » par note |
+| `https://localhost:8000/note` | la liste, avec un lien « éditer » par note |
 | Éditer une note, changer le texte, Enregistrer | « Note mise à jour. » |
 | Soumettre vide | `Le contenu est obligatoire.` (statut `422`) |
 

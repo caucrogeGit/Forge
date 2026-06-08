@@ -104,7 +104,7 @@ Créez la vue `mvc/views/note/index.html` :
 </html>
 ```
 
-Puis ajoutez l'import du contrôleur et la route `/notes` dans `mvc/routes.py`.
+Puis ajoutez l'import du contrôleur et la route `/note` dans `mvc/routes.py`.
 
 ## Votre mvc/routes.py à ce stade
 
@@ -117,8 +117,8 @@ from mvc.controllers.note_controller import NoteController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET", "/notes", NoteController.index, name="notes_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET", "/note", NoteController.index, name="note-index")
 ```
 
 ## Comprendre ce code
@@ -135,7 +135,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/notes` | la liste des trois notes de départ |
+| `https://localhost:8000/note` | la liste des trois notes de départ |
 
 ## À retenir
 

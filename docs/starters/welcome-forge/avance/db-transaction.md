@@ -78,7 +78,7 @@ class ArticleController(BaseController):
                 request=request,
                 context={"categories": fetch_all(SELECT_CATEGORIES), "error": str(exc)},
             )
-        return BaseController.redirect("/articles", request=request, flash="Article créé.")
+        return BaseController.redirect("/article", request=request, flash="Article créé.")
 ```
 
 Créez la vue `mvc/views/article/new.html` :
@@ -91,7 +91,7 @@ Créez la vue `mvc/views/article/new.html` :
 <body>
     <h1>Nouvel article</h1>
     {% if error %}<p><strong>{{ error }}</strong></p>{% endif %}
-    <form method="post" action="/articles">
+    <form method="post" action="/article/store">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <input type="text" name="title" placeholder="Titre">
         <select name="category_id">
@@ -101,7 +101,7 @@ Créez la vue `mvc/views/article/new.html` :
         </select>
         <button type="submit">Créer</button>
     </form>
-    <p><a href="/articles">Retour au catalogue</a></p>
+    <p><a href="/article">Retour au catalogue</a></p>
 </body>
 </html>
 ```
@@ -109,7 +109,7 @@ Créez la vue `mvc/views/article/new.html` :
 Ajoutez un lien vers le formulaire dans `mvc/views/article/index.html` :
 
 ```html
-<p><a href="/articles/new">Nouvel article</a></p>
+<p><a href="/article/create">Nouvel article</a></p>
 ```
 
 Puis déclarez les deux routes dans `mvc/routes.py`.
@@ -125,10 +125,10 @@ from mvc.controllers.article_controller import ArticleController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/articles", ArticleController.index, name="articles_index")
-    pub.add("GET",  "/articles/new", ArticleController.create, name="articles_new")
-    pub.add("POST", "/articles", ArticleController.store, name="articles_store")
+    pub.add("GET",  "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/article", ArticleController.index, name="article-index")
+    pub.add("GET",  "/article/create", ArticleController.create, name="article-create")
+    pub.add("POST", "/article/store", ArticleController.store, name="article-store")
 ```
 
 ## Comprendre ce code

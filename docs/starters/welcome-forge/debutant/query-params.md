@@ -18,9 +18,9 @@ Ajoutez ces deux méthodes à la classe `WelcomeController` :
 
 ```python
     @staticmethod
-    def query_params_index(request: Request) -> Response:
+    def query_params(request: Request) -> Response:
         return Response.text(
-            "Ajoutez ?name=Roger à l'URL, puis ouvrez /query-params/hello?name=Roger"
+            "Ajoutez ?name=Roger à l'URL, puis ouvrez /welcome/hello?name=Roger"
         )
 
     @staticmethod
@@ -42,10 +42,10 @@ from mvc.controllers.welcome_controller import WelcomeController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
-    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
-    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
+    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
 ```
 
 ## Comprendre ce code
@@ -61,10 +61,10 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/query-params` | message d'aide |
-| `https://localhost:8000/query-params/hello` | `Bonjour Forge` |
-| `https://localhost:8000/query-params/hello?name=Roger` | `Bonjour Roger` |
-| `https://localhost:8000/query-params/hello?name=Alice` | `Bonjour Alice` |
+| `https://localhost:8000/welcome/query-params` | message d'aide |
+| `https://localhost:8000/welcome/hello` | `Bonjour Forge` |
+| `https://localhost:8000/welcome/hello?name=Roger` | `Bonjour Roger` |
+| `https://localhost:8000/welcome/hello?name=Alice` | `Bonjour Alice` |
 
 ## À retenir
 

@@ -12,7 +12,7 @@ savoir s'il existe une page suivante.
 `NoteController.index` lit la liste, filtrée par `q` quand il est présent. Nous
 allons le faire évoluer pour qu'il combine ce filtre avec une **pagination** : la
 même page liste lit aussi un numéro de page et n'affiche qu'une tranche. La route
-`/notes` ne change toujours pas.
+`/note` ne change toujours pas.
 
 ## L'ajout
 
@@ -68,14 +68,14 @@ Ajoutez la navigation sous la liste, dans le bloc `content` de
 
 ```html
 <nav>
-    {% if has_prev %}<a href="/notes?q={{ q }}&page={{ page - 1 }}">← Précédent</a>{% endif %}
-    {% if has_next %}<a href="/notes?q={{ q }}&page={{ page + 1 }}">Suivant →</a>{% endif %}
+    {% if has_prev %}<a href="/note?q={{ q }}&page={{ page - 1 }}">← Précédent</a>{% endif %}
+    {% if has_next %}<a href="/note?q={{ q }}&page={{ page + 1 }}">Suivant →</a>{% endif %}
 </nav>
 ```
 
 ## Votre mvc/routes.py à ce stade
 
-Inchangé : la pagination passe par la *query string* `?page=N` sur `/notes`.
+Inchangé : la pagination passe par la *query string* `?page=N` sur `/note`.
 
 ```python
 # mvc/routes.py
@@ -86,8 +86,8 @@ from mvc.controllers.note_controller import NoteController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET", "/notes", NoteController.index, name="notes_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET", "/note", NoteController.index, name="note-index")
 ```
 
 ## Comprendre ce code
@@ -105,7 +105,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/notes` | la première tranche + un lien Suivant si besoin |
+| `https://localhost:8000/note` | la première tranche + un lien Suivant si besoin |
 | `?page=2` | la tranche suivante |
 
 ## À retenir

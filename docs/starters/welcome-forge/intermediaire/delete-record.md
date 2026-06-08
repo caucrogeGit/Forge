@@ -49,7 +49,7 @@ class NoteController(BaseController):
     def delete(request: Request) -> Response:
         record_id = int(request.route("id"))
         execute(DELETE_ONE, (record_id,))
-        return BaseController.redirect("/notes")
+        return BaseController.redirect("/note")
 ```
 
 Dans `mvc/views/note/index.html`, ajoutez le bouton de suppression à côté du lien
@@ -57,8 +57,8 @@ Dans `mvc/views/note/index.html`, ajoutez le bouton de suppression à côté du 
 
 ```html
 <li>#{{ note.id }} : {{ note.content }}
-    <a href="/notes/{{ note.id }}/edit">éditer</a>
-    <form method="post" action="/notes/{{ note.id }}/delete" style="display:inline">
+    <a href="/note/edit/{{ note.id }}">éditer</a>
+    <form method="post" action="/note/delete/{{ note.id }}" style="display:inline">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit">supprimer</button>
     </form>
@@ -78,11 +78,11 @@ from mvc.controllers.note_controller import NoteController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/notes", NoteController.index, name="notes_index")
-    pub.add("GET",  "/notes/{id}/edit", NoteController.edit, name="notes_edit")
-    pub.add("POST", "/notes/{id}/edit", NoteController.update, name="notes_update")
-    pub.add("POST", "/notes/{id}/delete", NoteController.delete, name="notes_delete")
+    pub.add("GET",  "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/note", NoteController.index, name="note-index")
+    pub.add("GET",  "/note/edit/{id}", NoteController.edit, name="note-edit")
+    pub.add("POST", "/note/update/{id}", NoteController.update, name="note-update")
+    pub.add("POST", "/note/delete/{id}", NoteController.delete, name="note-delete")
 ```
 
 ## Comprendre ce code
@@ -90,16 +90,16 @@ with router.group("", public=True) as pub:
 - La suppression est un **POST** : une action qui modifie l'état n'est jamais un
   `GET` (un lien ou un robot ne doivent pas pouvoir supprimer).
 - Chaque ligne porte son **propre mini-formulaire** `POST` vers
-  `/notes/{id}/delete` avec le **jeton CSRF**.
+  `/note/delete/{id}` avec le **jeton CSRF**.
 - `execute(DELETE_ONE, (record_id,))` : l'`id` est un **paramètre lié**.
-- Après l'écriture, `redirect("/notes")` renvoie vers la liste : le navigateur
+- Après l'écriture, `redirect("/note")` renvoie vers la liste : le navigateur
   recharge l'état réel par un `GET` (motif POST-Redirect-GET).
 
 ## Tester dans le navigateur
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/notes` | la liste, avec « éditer » et « supprimer » par note |
+| `https://localhost:8000/note` | la liste, avec « éditer » et « supprimer » par note |
 | Cliquer « supprimer » | la note disparaît, la liste se recharge |
 
 ## À retenir

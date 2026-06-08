@@ -10,7 +10,7 @@ vide.
 ## Là où nous en sommes
 
 `WelcomeController` porte déjà les méthodes des paliers 1 à 8, et
-`mvc/routes.py` déclare les routes jusqu'à `/form-post`. Nous ajoutons deux
+`mvc/routes.py` déclare les routes jusqu'à `/welcome/form`. Nous ajoutons deux
 méthodes, deux routes et un gabarit.
 
 ## L'ajout
@@ -48,7 +48,7 @@ Créez le gabarit `mvc/views/welcome/server_validation.html` :
 </head>
 <body>
     <h1>Validation serveur</h1>
-    <form method="post" action="/server-validation">
+    <form method="post" action="/welcome/validate-submit">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <label>Prénom : <input type="text" name="name" value=""></label>
         <button type="submit">Envoyer</button>
@@ -57,7 +57,7 @@ Créez le gabarit `mvc/views/welcome/server_validation.html` :
 </html>
 ```
 
-Puis ajoutez les deux routes (`GET` et `POST` sur `/server-validation`) dans
+Puis ajoutez les deux routes (`GET` et `POST` sur `/welcome/validate`) dans
 le groupe public de `mvc/routes.py`.
 
 ## Votre mvc/routes.py à ce stade
@@ -71,19 +71,19 @@ from mvc.controllers.welcome_controller import WelcomeController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
-    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
-    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
-    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
-    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
-    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
-    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
-    pub.add("GET",  "/csrf", WelcomeController.csrf_demo, name="csrf_index")
-    pub.add("GET",  "/form-post", WelcomeController.form, name="form_post_index")
-    pub.add("POST", "/form-post", WelcomeController.form_submit, name="form_post_submit")
-    pub.add("GET",  "/server-validation", WelcomeController.validate, name="server_validation_index")
-    pub.add("POST", "/server-validation", WelcomeController.validate_submit, name="server_validation_submit")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
+    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+    pub.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+    pub.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+    pub.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
+    pub.add("GET",  "/welcome/form", WelcomeController.form, name="welcome-form")
+    pub.add("POST", "/welcome/form-submit", WelcomeController.form_submit, name="welcome-form_submit")
+    pub.add("GET",  "/welcome/validate", WelcomeController.validate, name="welcome-validate")
+    pub.add("POST", "/welcome/validate-submit", WelcomeController.validate_submit, name="welcome-validate_submit")
 ```
 
 ## Comprendre ce code
@@ -98,7 +98,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/server-validation` | le formulaire avec un champ prénom vide |
+| `https://localhost:8000/welcome/validate` | le formulaire avec un champ prénom vide |
 | Soumettre avec `Roger` | `Bonjour Roger` |
 | Soumettre vide ou avec des espaces | `Le prénom est obligatoire` (statut `422`) |
 

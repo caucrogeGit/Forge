@@ -92,7 +92,7 @@ class ArticleController(BaseController):
                 request=request,
                 context={"categories": fetch_all(SELECT_CATEGORIES), "error": str(exc)},
             )
-        return BaseController.redirect("/articles", request=request, flash="Article créé.")
+        return BaseController.redirect("/article", request=request, flash="Article créé.")
 
     @staticmethod
     def attach(request: Request) -> Response:
@@ -119,7 +119,7 @@ class ArticleController(BaseController):
         except UploadError as exc:
             return Response.text(str(exc), status=422)
         execute(SET_DOCUMENT, (saved.path, record_id))
-        return BaseController.redirect("/articles", request=request, flash="Document attaché.")
+        return BaseController.redirect("/article", request=request, flash="Document attaché.")
 
     @staticmethod
     def api_index(request: Request) -> Response:
@@ -141,13 +141,13 @@ from mvc.controllers.article_controller import ArticleController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/articles", ArticleController.index, name="articles_index")
-    pub.add("GET",  "/articles/new", ArticleController.create, name="articles_new")
-    pub.add("POST", "/articles", ArticleController.store, name="articles_store")
-    pub.add("GET",  "/articles/{id}/attach", ArticleController.attach, name="articles_attach")
-    pub.add("POST", "/articles/{id}/attach", ArticleController.attach_store, name="articles_attach_store")
-    pub.add("GET",  "/api/articles", ArticleController.api_index, name="api_articles")
+    pub.add("GET",  "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/article", ArticleController.index, name="article-index")
+    pub.add("GET",  "/article/create", ArticleController.create, name="article-create")
+    pub.add("POST", "/article/store", ArticleController.store, name="article-store")
+    pub.add("GET",  "/article/attach/{id}", ArticleController.attach, name="article-attach")
+    pub.add("POST", "/article/attach-store/{id}", ArticleController.attach_store, name="article-attach_store")
+    pub.add("GET",  "/article/api-index", ArticleController.api_index, name="article-api_index")
 ```
 
 ## Et ensuite

@@ -10,7 +10,7 @@ pilote une clause `WHERE content LIKE ?` **paramétrée**, jamais concaténée.
 
 `NoteController.index` lit toute la table avec `SELECT_ALL`. Nous allons le faire
 évoluer pour qu'il lise un mot-clé dans l'URL et filtre la liste quand il est
-présent. La route `/notes` ne change pas : la recherche passe par la *query
+présent. La route `/note` ne change pas : la recherche passe par la *query
 string* (`?q=…`).
 
 ## L'ajout
@@ -49,7 +49,7 @@ juste avant la liste :
 {% block content %}
 <h1>Mes notes</h1>
 
-<form method="get" action="/notes">
+<form method="get" action="/note">
     <input type="text" name="q" value="{{ q }}" placeholder="Rechercher…">
     <button type="submit">Rechercher</button>
 </form>
@@ -68,7 +68,7 @@ juste avant la liste :
 
 ## Votre mvc/routes.py à ce stade
 
-Inchangé : la recherche réutilise la route `/notes` via la *query string*.
+Inchangé : la recherche réutilise la route `/note` via la *query string*.
 
 ```python
 # mvc/routes.py
@@ -79,8 +79,8 @@ from mvc.controllers.note_controller import NoteController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET", "/notes", NoteController.index, name="notes_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET", "/note", NoteController.index, name="note-index")
 ```
 
 ## Comprendre ce code
@@ -98,7 +98,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/notes` | la liste complète |
+| `https://localhost:8000/note` | la liste complète |
 | Saisir `Première` puis Rechercher | seules les notes contenant « Première » |
 
 ## À retenir

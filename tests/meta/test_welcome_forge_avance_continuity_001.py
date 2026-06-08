@@ -116,7 +116,7 @@ class TestEtatFinalDansBilan:
         "class ArticleController",
         "def index", "def create", "def store", "def attach",
         "def attach_store", "def api_index",
-        "articles_index", "articles_store", "articles_attach", "api_articles",
+        "article-index", "article-store", "article-attach", "article-api_index",
     ]
 
     @pytest.mark.parametrize("marker", MARKERS)

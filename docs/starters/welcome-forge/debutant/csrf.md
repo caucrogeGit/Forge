@@ -11,7 +11,7 @@ session** pour obtenir un jeton non vide, puis le placer dans un champ caché.
 ## Là où nous en sommes
 
 `WelcomeController` porte déjà les méthodes des paliers 1 à 6, et `mvc/routes.py`
-déclare les routes jusqu'à `/json-response`. Nous abordons la sécurité des
+déclare les routes jusqu'à `/welcome/json`. Nous abordons la sécurité des
 formulaires : pour cela, il faut une **session** (on approfondira la session au
 niveau intermédiaire ; ici on s'en sert juste pour porter le jeton CSRF).
 
@@ -31,7 +31,7 @@ from core.security.session import get_session, get_session_id
 from core.sessions.manager import get_session_store
 ```
 
-Ajoutez un petit helper et la méthode `csrf_demo` à la classe `WelcomeController` :
+Ajoutez un petit helper et la méthode `csrf` à la classe `WelcomeController` :
 
 ```python
     @staticmethod
@@ -48,7 +48,7 @@ Ajoutez un petit helper et la méthode `csrf_demo` à la classe `WelcomeControll
         return session_id, session["csrf_token"]
 
     @staticmethod
-    def csrf_demo(request: Request) -> Response:
+    def csrf(request: Request) -> Response:
         session_id, csrf_token = WelcomeController._start_session(request)
         response = BaseController.render(
             "welcome/csrf.html",
@@ -97,15 +97,15 @@ from mvc.controllers.welcome_controller import WelcomeController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
-    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
-    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
-    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
-    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
-    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
-    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
-    pub.add("GET",  "/csrf", WelcomeController.csrf_demo, name="csrf_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
+    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+    pub.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+    pub.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+    pub.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
 ```
 
 ## Comprendre ce code
@@ -126,7 +126,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/csrf` | la page, le champ caché `csrf_token` désormais **rempli** (inspecter la source) |
+| `https://localhost:8000/welcome/csrf` | la page, le champ caché `csrf_token` désormais **rempli** (inspecter la source) |
 
 ## À retenir
 

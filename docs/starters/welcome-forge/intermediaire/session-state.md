@@ -73,11 +73,11 @@ from mvc.controllers.note_controller import NoteController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/notes", NoteController.index, name="notes_index")
-    pub.add("GET",  "/notes/{id}/edit", NoteController.edit, name="notes_edit")
-    pub.add("POST", "/notes/{id}/edit", NoteController.update, name="notes_update")
-    pub.add("POST", "/notes/{id}/delete", NoteController.delete, name="notes_delete")
+    pub.add("GET",  "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/note", NoteController.index, name="note-index")
+    pub.add("GET",  "/note/edit/{id}", NoteController.edit, name="note-edit")
+    pub.add("POST", "/note/update/{id}", NoteController.update, name="note-update")
+    pub.add("POST", "/note/delete/{id}", NoteController.delete, name="note-delete")
 ```
 
 ## Comprendre ce code
@@ -94,7 +94,7 @@ with router.group("", public=True) as pub:
 
 | Action | Résultat |
 |---|---|
-| Ouvrir `https://localhost:8000/notes` et recharger | « Vous avez consulté cette liste N fois. », N augmente |
+| Ouvrir `https://localhost:8000/note` et recharger | « Vous avez consulté cette liste N fois. », N augmente |
 
 ## À retenir
 

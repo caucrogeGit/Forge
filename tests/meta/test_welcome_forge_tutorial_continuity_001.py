@@ -35,17 +35,17 @@ PALIERS = [
 
 # Route emblématique attendue dans le bloc cumulatif de chaque palier.
 ROUTE_NAME = {
-    "welcome": "welcome_index",
-    "query-params": "query_params_hello",
-    "first-html-view": "first_html_view_index",
-    "dynamic-route": "dynamic_route_article_show",
-    "request-debug": "request_debug_index",
-    "json-response": "json_response_index",
-    "csrf": "csrf_index",
-    "form-post": "form_post_submit",
-    "server-validation": "server_validation_submit",
-    "first-sql": "first_sql_index",
-    "first-sql-write": "first_sql_write_submit",
+    "welcome": "welcome-index",
+    "query-params": "welcome-hello",
+    "first-html-view": "welcome-html",
+    "dynamic-route": "welcome-article",
+    "request-debug": "welcome-debug",
+    "json-response": "welcome-json",
+    "csrf": "welcome-csrf",
+    "form-post": "welcome-form_submit",
+    "server-validation": "welcome-validate_submit",
+    "first-sql": "message-index",
+    "first-sql-write": "message-store",
 }
 
 CODE_BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)

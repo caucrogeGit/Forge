@@ -35,7 +35,7 @@ class ArticleController(BaseController):
         return Response.json({"articles": articles})
 ```
 
-Puis déclarez la route `/api/articles` dans `mvc/routes.py`.
+Puis déclarez la route `/article/api-index` dans `mvc/routes.py`.
 
 ## Votre mvc/routes.py à ce stade
 
@@ -48,13 +48,13 @@ from mvc.controllers.article_controller import ArticleController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/articles", ArticleController.index, name="articles_index")
-    pub.add("GET",  "/articles/new", ArticleController.create, name="articles_new")
-    pub.add("POST", "/articles", ArticleController.store, name="articles_store")
-    pub.add("GET",  "/articles/{id}/attach", ArticleController.attach, name="articles_attach")
-    pub.add("POST", "/articles/{id}/attach", ArticleController.attach_store, name="articles_attach_store")
-    pub.add("GET",  "/api/articles", ArticleController.api_index, name="api_articles")
+    pub.add("GET",  "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/article", ArticleController.index, name="article-index")
+    pub.add("GET",  "/article/create", ArticleController.create, name="article-create")
+    pub.add("POST", "/article/store", ArticleController.store, name="article-store")
+    pub.add("GET",  "/article/attach/{id}", ArticleController.attach, name="article-attach")
+    pub.add("POST", "/article/attach-store/{id}", ArticleController.attach_store, name="article-attach_store")
+    pub.add("GET",  "/article/api-index", ArticleController.api_index, name="article-api_index")
 ```
 
 ## Comprendre ce code
@@ -74,14 +74,14 @@ with router.group("", public=True) as pub:
 Sans jeton, la requête est refusée :
 
 ```bash
-curl -k https://localhost:8000/api/articles
+curl -k https://localhost:8000/article/api-index
 # {"error": "Jeton manquant ou invalide."}  (HTTP 401)
 ```
 
 Avec le jeton de démonstration, l'API renvoie les données :
 
 ```bash
-curl -k -H "Authorization: Bearer forge-demo-token" https://localhost:8000/api/articles
+curl -k -H "Authorization: Bearer forge-demo-token" https://localhost:8000/article/api-index
 # {"articles": [{"id": 1, "title": "…", "category": "…"}, …]}
 ```
 

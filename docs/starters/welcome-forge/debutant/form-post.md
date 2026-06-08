@@ -11,7 +11,7 @@ POST, et lire un champ avec `request.form("name", default=...)`, le POST
 
 `WelcomeController` porte déjà les méthodes des paliers 1 à 7, dont le helper
 `_start_session` introduit au palier CSRF, et `mvc/routes.py` déclare les routes
-jusqu'à `/csrf`. Nous ajoutons deux méthodes (afficher le formulaire, traiter
+jusqu'à `/welcome/csrf`. Nous ajoutons deux méthodes (afficher le formulaire, traiter
 l'envoi), deux routes et un gabarit.
 
 ## L'ajout
@@ -49,7 +49,7 @@ Créez le gabarit `mvc/views/welcome/form_post.html` :
 </head>
 <body>
     <h1>Premier formulaire POST</h1>
-    <form method="post" action="/form-post">
+    <form method="post" action="/welcome/form-submit">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <label>Prénom : <input type="text" name="name" value="Forge"></label>
         <button type="submit">Envoyer</button>
@@ -58,7 +58,7 @@ Créez le gabarit `mvc/views/welcome/form_post.html` :
 </html>
 ```
 
-Puis ajoutez les deux routes (`GET` et `POST` sur `/form-post`) dans le
+Puis ajoutez les deux routes (`GET` et `POST` sur `/welcome/form`) dans le
 groupe public de `mvc/routes.py`.
 
 ## Votre mvc/routes.py à ce stade
@@ -72,22 +72,22 @@ from mvc.controllers.welcome_controller import WelcomeController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
-    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
-    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
-    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
-    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
-    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
-    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
-    pub.add("GET",  "/csrf", WelcomeController.csrf_demo, name="csrf_index")
-    pub.add("GET",  "/form-post", WelcomeController.form, name="form_post_index")
-    pub.add("POST", "/form-post", WelcomeController.form_submit, name="form_post_submit")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
+    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+    pub.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+    pub.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+    pub.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
+    pub.add("GET",  "/welcome/form", WelcomeController.form, name="welcome-form")
+    pub.add("POST", "/welcome/form-submit", WelcomeController.form_submit, name="welcome-form_submit")
 ```
 
 ## Comprendre ce code
 
-- Deux routes partagent le chemin `/form-post` : `GET` affiche le
+- Deux routes partagent le chemin `/welcome/form` : `GET` affiche le
   formulaire, `POST` traite l'envoi.
 - `request.form("name", default="Forge")` lit un champ du corps du
   formulaire, là où `request.query(...)` lisait la chaîne de requête.
@@ -98,7 +98,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/form-post` | le formulaire avec le champ prénom |
+| `https://localhost:8000/welcome/form` | le formulaire avec le champ prénom |
 | Soumettre avec `Roger` | `Bonjour Roger` |
 | Soumettre en laissant `Forge` | `Bonjour Forge` |
 

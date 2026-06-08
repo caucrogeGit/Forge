@@ -54,9 +54,9 @@ class WelcomeController(BaseController):
         return Response.text("Bonjour Forge")
 
     @staticmethod
-    def query_params_index(request: Request) -> Response:
+    def query_params(request: Request) -> Response:
         return Response.text(
-            "Ajoutez ?name=Roger à l'URL, puis ouvrez /query-params/hello?name=Roger"
+            "Ajoutez ?name=Roger à l'URL, puis ouvrez /welcome/hello?name=Roger"
         )
 
     @staticmethod
@@ -65,11 +65,11 @@ class WelcomeController(BaseController):
         return Response.text(f"Bonjour {name}")
 
     @staticmethod
-    def html_view(request: Request) -> Response:
+    def html(request: Request) -> Response:
         return BaseController.render("welcome/first_html_view.html", request=request)
 
     @staticmethod
-    def show_article(request: Request) -> Response:
+    def article(request: Request) -> Response:
         article_id = request.route("id", default="inconnu")
         return Response.text(f"Article {article_id}")
 
@@ -78,7 +78,7 @@ class WelcomeController(BaseController):
         return Response.debug(request.data)
 
     @staticmethod
-    def json_demo(request: Request) -> Response:
+    def json(request: Request) -> Response:
         return Response.json(
             {
                 "framework": "Forge",
@@ -88,7 +88,7 @@ class WelcomeController(BaseController):
         )
 
     @staticmethod
-    def csrf_demo(request: Request) -> Response:
+    def csrf(request: Request) -> Response:
         session_id, csrf_token = WelcomeController._start_session(request)
         response = BaseController.render(
             "welcome/csrf.html",
@@ -183,22 +183,22 @@ from mvc.controllers.message_controller import MessageController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
-    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
-    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
-    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
-    pub.add("GET",  "/dynamic-route/articles/{id}", WelcomeController.show_article, name="dynamic_route_article_show")
-    pub.add("GET",  "/request-debug", WelcomeController.debug, name="request_debug_index")
-    pub.add("GET",  "/json-response", WelcomeController.json_demo, name="json_response_index")
-    pub.add("GET",  "/csrf", WelcomeController.csrf_demo, name="csrf_index")
-    pub.add("GET",  "/form-post", WelcomeController.form, name="form_post_index")
-    pub.add("POST", "/form-post", WelcomeController.form_submit, name="form_post_submit")
-    pub.add("GET",  "/server-validation", WelcomeController.validate, name="server_validation_index")
-    pub.add("POST", "/server-validation", WelcomeController.validate_submit, name="server_validation_submit")
-    pub.add("GET",  "/first-sql", MessageController.index, name="first_sql_index")
-    pub.add("GET",  "/first-sql-write", MessageController.create, name="first_sql_write_index")
-    pub.add("POST", "/first-sql-write", MessageController.store, name="first_sql_write_submit")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
+    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+    pub.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+    pub.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+    pub.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
+    pub.add("GET",  "/welcome/form", WelcomeController.form, name="welcome-form")
+    pub.add("POST", "/welcome/form-submit", WelcomeController.form_submit, name="welcome-form_submit")
+    pub.add("GET",  "/welcome/validate", WelcomeController.validate, name="welcome-validate")
+    pub.add("POST", "/welcome/validate-submit", WelcomeController.validate_submit, name="welcome-validate_submit")
+    pub.add("GET",  "/message", MessageController.index, name="message-index")
+    pub.add("GET",  "/message/create", MessageController.create, name="message-create")
+    pub.add("POST", "/message/store", MessageController.store, name="message-store")
 ```
 
 ## Et ensuite

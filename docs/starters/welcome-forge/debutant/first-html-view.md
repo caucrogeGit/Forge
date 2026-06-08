@@ -8,9 +8,9 @@ renvoie la page HTML.
 
 ## Là où nous en sommes
 
-`WelcomeController` porte déjà `index`, `query_params_index` et `hello`
+`WelcomeController` porte déjà `index`, `query_params` et `hello`
 (paliers 1 et 2), et `mvc/routes.py` déclare `/welcome` et les deux routes
-`/query-params`. Nous ajoutons une méthode, une route et un gabarit.
+`/welcome/query-params`. Nous ajoutons une méthode, une route et un gabarit.
 
 ## L'ajout
 
@@ -18,7 +18,7 @@ Ajoutez cette méthode à la classe `WelcomeController` :
 
 ```python
     @staticmethod
-    def html_view(request: Request) -> Response:
+    def html(request: Request) -> Response:
         return BaseController.render("welcome/first_html_view.html", request=request)
 ```
 
@@ -55,11 +55,11 @@ from mvc.controllers.welcome_controller import WelcomeController
 router = Router()
 
 with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home_index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome_index")
-    pub.add("GET",  "/query-params", WelcomeController.query_params_index, name="query_params_index")
-    pub.add("GET",  "/query-params/hello", WelcomeController.hello, name="query_params_hello")
-    pub.add("GET",  "/first-html-view", WelcomeController.html_view, name="first_html_view_index")
+    pub.add("GET", "/", HomeController.index, name="home-index")
+    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
+    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
 ```
 
 ## Comprendre ce code
@@ -75,7 +75,7 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/first-html-view` | la page HTML « Première vue HTML » |
+| `https://localhost:8000/welcome/html` | la page HTML « Première vue HTML » |
 
 ## À retenir
 
