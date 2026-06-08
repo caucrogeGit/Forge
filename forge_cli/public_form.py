@@ -198,7 +198,7 @@ def build_public_form_create_method(spec: PublicFormSpec) -> str:
         "        errors = {}\n",
         "        form_data = {}\n",
         "        for _field in FORM_FIELDS:\n",
-        '            _raw = request.post_data.get(_field["name"], "")\n',
+        '            _raw = request.form(_field["name"], "")\n',
         '            form_data[_field["name"]] = _raw\n',
         '            if _field["required"] and not str(_raw).strip():\n',
         '                errors[_field["name"]] = f\'{_field["label"]} est requis.\'\n',

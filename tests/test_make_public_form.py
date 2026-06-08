@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import ast
 import json
 from pathlib import Path
+
+from core.http.request import Request
 
 
 from forge_cli.public_form import (
@@ -261,6 +264,50 @@ def test_form_controller_gere_checkbox():
 
     assert '"checkbox"' in method
     assert "1 if _raw else 0" in method
+
+
+def _request_attrs_used(source: str) -> set[str]:
+    """Collecte les accesseurs `request.<x>` utilisés dans un source généré."""
+    used: set[str] = set()
+    for node in ast.walk(ast.parse(source)):
+        if (
+            isinstance(node, ast.Attribute)
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "request"
+        ):
+            used.add(node.attr)
+    return used
+
+
+def test_form_controller_compile_sans_erreur():
+    """Le contrôleur généré doit au minimum compiler (garde anti-syntaxe)."""
+    for definition in (DEMANDE_JSON, BOOL_JSON):
+        spec = build_public_form_spec(definition)
+        compile(build_public_form_controller(spec), "<generated>", "exec")
+
+
+def test_form_controller_n_utilise_que_des_accesseurs_request_reels():
+    """Garde-fou B1 : tout `request.<x>` du contrôleur généré doit exister
+    réellement sur `Request` (post_data, supprimé, aurait été détecté ici)."""
+    request_api = set(dir(Request))
+    for definition in (DEMANDE_JSON, BOOL_JSON):
+        spec = build_public_form_spec(definition)
+        used = _request_attrs_used(build_public_form_controller(spec))
+        assert used, "le contrôleur généré devrait lire au moins un champ de requête"
+        unknown = used - request_api
+        assert not unknown, (
+            f"accesseur(s) Request inexistant(s) dans le contrôleur généré : {unknown}"
+        )
+
+
+def test_form_controller_lit_les_champs_via_request_form():
+    """Le contrôleur lit les champs via l'accesseur canonique `request.form`,
+    jamais via un attribut `post_data` (inexistant)."""
+    spec = build_public_form_spec(DEMANDE_JSON)
+    controller = build_public_form_controller(spec)
+
+    assert "request.form(" in controller
+    assert "post_data" not in controller
 
 
 def test_form_controller_redirect_vers_new_apres_succes():
