@@ -102,15 +102,17 @@ class Router:
     Usage :
         router = Router()
 
-        router.add("GET", "/",             HomeController.index,  name="home_index")
-        router.add("GET", "/clients/{id}", ClientController.show, name="client_show")
+        # Convention de route (ADR-029) : chemin /<contrôleur>/<méthode>
+        # (index = chemin nu), nom <contrôleur>-<méthode>. Racine / exceptée.
+        router.add("GET", "/",                  HomeController.index, name="home-index")
+        router.add("GET", "/client/show/{id}",  ClientController.show, name="client-show")
 
         with router.group("", public=True) as pub:
-            pub.add("GET",  "/login", LoginController.form, name="login_form")
-            pub.add("POST", "/login", LoginController.login)
+            pub.add("GET",  "/login/form", LoginController.form, name="login-form")
+            pub.add("POST", "/login/login", LoginController.login, name="login-login")
 
         # Dans l'application :
-        result = router.resolve("GET", "/clients/42")
+        result = router.resolve("GET", "/client/show/42")
         # → (ClientController.show, {"id": "42"})
 
         url = router.url_for("client_show", id=42)

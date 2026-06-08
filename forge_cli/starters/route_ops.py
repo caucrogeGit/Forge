@@ -91,7 +91,7 @@ def inject_block(routes_py: Path, block: str) -> None:
 def replace_home_route(routes_py: Path, home_route: str) -> None:
     """Remplace GET / → HomeController.index par une redirection vers home_route.
 
-    La route nommée "home_index" est conservée mais son handler devient une lambda
+    La route nommée "home-index" est conservée mais son handler devient une lambda
     qui émet un 302. L'import HomeController est retiré s'il n'est plus utilisé.
     Idempotent : sans effet si le handler n'est plus HomeController.index.
     """
@@ -99,7 +99,7 @@ def replace_home_route(routes_py: Path, home_route: str) -> None:
         return
     content = routes_py.read_text(encoding="utf-8")
 
-    old_handler = 'pub.add("GET", "/", HomeController.index, name="home_index")'
+    old_handler = 'pub.add("GET", "/", HomeController.index, name="home-index")'
     if old_handler not in content:
         return
 
@@ -110,7 +110,7 @@ def replace_home_route(routes_py: Path, home_route: str) -> None:
     new_handler = (
         f'pub.add("GET", "/", '
         f'lambda req: BaseController.redirect("{home_route}"), '
-        f'name="home_index")'
+        f'name="home-index")'
     )
     content = content.replace(old_handler, new_handler)
 

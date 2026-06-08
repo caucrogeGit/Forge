@@ -116,7 +116,7 @@ def test_starter_auth_retire_les_routes_auth_publiques_legacy(tmp_path):
         "from mvc.controllers.home_controller import HomeController\n\n"
         "router = Router()\n\n"
         'with router.group("", public=True) as pub:\n'
-        '    pub.add("GET", "/", HomeController.index, name="home_index")\n\n'
+        '    pub.add("GET", "/", HomeController.index, name="home-index")\n\n'
         'with router.group("", public=True) as pub:\n'
         '    pub.add("GET",  "/login",  AuthController.login_form, name="login_form")\n'
         '    pub.add("POST", "/login",  AuthController.login,      name="login")\n'
@@ -127,7 +127,7 @@ def test_starter_auth_retire_les_routes_auth_publiques_legacy(tmp_path):
     _remove_legacy_auth_routes(routes_py)
     output = routes_py.read_text(encoding="utf-8")
     assert "AuthController" not in output
-    assert 'pub.add("GET", "/", HomeController.index, name="home_index")' in output
+    assert 'pub.add("GET", "/", HomeController.index, name="home-index")' in output
     assert '"/login"' not in output
     assert '"/logout"' not in output
 
@@ -155,7 +155,7 @@ _SKELETON_ROUTES = (
     "from mvc.controllers.home_controller import HomeController\n\n"
     "router = Router()\n\n"
     'with router.group("", public=True) as pub:\n'
-    '    pub.add("GET", "/", HomeController.index, name="home_index")\n'
+    '    pub.add("GET", "/", HomeController.index, name="home-index")\n'
 )
 
 
@@ -168,7 +168,7 @@ def test_replace_home_route_remplace_handler_landing(tmp_path):
 
     assert "HomeController.index" not in content
     assert 'BaseController.redirect("/contacts")' in content
-    assert 'name="home_index"' in content
+    assert 'name="home-index"' in content
 
 
 def test_replace_home_route_ajoute_import_base_controller(tmp_path):
