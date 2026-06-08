@@ -15,12 +15,15 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("forge_mvc_i18n")
-
 import core.forge as forge
-import forge_mvc_i18n as i18n
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+# Note : pas d'`importorskip` au niveau module. Les assertions sur l'arbre
+# source et sur le noyau (absence de core/i18n, repli no-op, clés de config,
+# pyproject du paquet) doivent valoir même en environnement core-only, où le
+# paquet forge-mvc-i18n n'est pas installé. Seuls les tests qui importent
+# réellement le paquet le gardent par un `importorskip` local.
 
 
 # --- Absence dans le core -----------------------------------------------------
@@ -47,6 +50,7 @@ def test_renderer_n_importe_pas_i18n_au_niveau_module():
 
 
 def test_forge_mvc_i18n_expose_l_api_publique():
+    i18n = pytest.importorskip("forge_mvc_i18n")
     for name in (
         "I18nError",
         "TranslationCatalogError",
@@ -63,11 +67,13 @@ def test_forge_mvc_i18n_expose_l_api_publique():
 
 
 def test_forge_mvc_i18n_a_une_version():
+    i18n = pytest.importorskip("forge_mvc_i18n")
     assert isinstance(i18n.__version__, str)
     assert i18n.__version__
 
 
 def test_trans_fonctionne_depuis_le_paquet():
+    i18n = pytest.importorskip("forge_mvc_i18n")
     assert i18n.trans("common.save") == "Enregistrer"
     assert i18n.trans("cle.absente.partout") == "cle.absente.partout"
 
