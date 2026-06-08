@@ -27,14 +27,12 @@ class NoteController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        # … lecture de q, page, notes, flash inchangée …
+        # … lecture de q, page, notes inchangée …
 
+        session_id, csrf_token = NoteController._start_session(request)
+        flash = get_flash(session_id)
         store = get_session_store()
-        session_id = get_session_id(request)
-        session = get_session(session_id) if session_id else None
-        if not session:
-            session_id = store.create()
-            session = get_session(session_id)
+        session = get_session(session_id)
         visits = int(session.get("visits", 0)) + 1
         store.set(session_id, {"visits": visits})
 
@@ -47,13 +45,12 @@ class NoteController(BaseController):
                 "page": page,
                 "has_prev": page > 1,
                 "has_next": page * PAGE_SIZE < total,
+                "csrf_token": csrf_token,
                 "flash": flash,
                 "visits": visits,
             },
         )
-        response.headers["Set-Cookie"] = (
-            f"session_id={session_id}; Path=/; HttpOnly; SameSite=Strict; Secure"
-        )
+        set_session_cookie(response, session_id)
         return response
 ```
 

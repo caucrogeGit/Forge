@@ -21,9 +21,11 @@ Ajoutez les requêtes et les deux méthodes dans
 `mvc/controllers/article_controller.py` :
 
 ```python
-from core.database.db import execute, fetch_all
-from core.database.db import insert
+from core.database.db import execute, fetch_all, insert
 from core.database.transaction import transaction
+from core.security.cookies import set_session_cookie
+from core.security.session import get_session, get_session_id
+from core.sessions.manager import get_session_store
 
 SELECT_CATEGORIES = "SELECT id, name FROM categories ORDER BY name"
 INSERT_ARTICLE = "INSERT INTO articles (title, category_id) VALUES (?, ?)"
@@ -35,12 +37,28 @@ class ArticleController(BaseController):
     # … index(...) inchangé …
 
     @staticmethod
+    def _start_session(request: Request):
+        """Garantit une session active et renvoie (session_id, csrf_token).
+
+        Le jeton CSRF vit dans la session : sans session, il serait vide.
+        """
+        session_id = get_session_id(request)
+        session = get_session(session_id) if session_id else None
+        if session is None:
+            session_id = get_session_store().create()
+            session = get_session(session_id)
+        return session_id, session["csrf_token"]
+
+    @staticmethod
     def create(request: Request) -> Response:
-        return BaseController.render(
+        session_id, csrf_token = ArticleController._start_session(request)
+        response = BaseController.render(
             "article/new.html",
             request=request,
-            context={"categories": fetch_all(SELECT_CATEGORIES)},
+            context={"categories": fetch_all(SELECT_CATEGORIES), "csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def store(request: Request) -> Response:

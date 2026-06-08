@@ -30,6 +30,7 @@ from core.database.db import execute, fetch_all, fetch_one
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
+from core.security.cookies import set_session_cookie
 from core.security.session import get_flash, get_session, get_session_id
 from core.sessions.manager import get_session_store
 
@@ -53,6 +54,16 @@ def _page_number(raw: str) -> int:
 class NoteController(BaseController):
 
     @staticmethod
+    def _start_session(request: Request):
+        """Garantit une session active et renvoie (session_id, csrf_token)."""
+        session_id = get_session_id(request)
+        session = get_session(session_id) if session_id else None
+        if session is None:
+            session_id = get_session_store().create()
+            session = get_session(session_id)
+        return session_id, session["csrf_token"]
+
+    @staticmethod
     def index(request: Request) -> Response:
         q = request.query("q", default="").strip()
         page = _page_number(request.query("page", default="1"))
@@ -64,14 +75,10 @@ class NoteController(BaseController):
             SELECT_BASE + where + " ORDER BY id LIMIT ? OFFSET ?",
             params + (PAGE_SIZE, offset),
         )
-        flash = get_flash(get_session_id(request))
-
+        session_id, csrf_token = NoteController._start_session(request)
+        flash = get_flash(session_id)
         store = get_session_store()
-        session_id = get_session_id(request)
-        session = get_session(session_id) if session_id else None
-        if not session:
-            session_id = store.create()
-            session = get_session(session_id)
+        session = get_session(session_id)
         visits = int(session.get("visits", 0)) + 1
         store.set(session_id, {"visits": visits})
 
@@ -84,13 +91,12 @@ class NoteController(BaseController):
                 "page": page,
                 "has_prev": page > 1,
                 "has_next": page * PAGE_SIZE < total,
+                "csrf_token": csrf_token,
                 "flash": flash,
                 "visits": visits,
             },
         )
-        response.headers["Set-Cookie"] = (
-            f"session_id={session_id}; Path=/; HttpOnly; SameSite=Strict; Secure"
-        )
+        set_session_cookie(response, session_id)
         return response
 
     @staticmethod
@@ -99,11 +105,14 @@ class NoteController(BaseController):
         note = fetch_one(SELECT_ONE, (record_id,))
         if note is None:
             return Response.text("Note introuvable.", status=404)
-        return BaseController.render(
+        session_id, csrf_token = NoteController._start_session(request)
+        response = BaseController.render(
             "note/edit.html",
             request=request,
-            context={"note": note, "csrf_token": BaseController.csrf_token(request)},
+            context={"note": note, "csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def update(request: Request) -> Response:

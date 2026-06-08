@@ -52,11 +52,14 @@ class ArticleController(BaseController):
         article = fetch_one(SELECT_ONE, (int(request.route("id")),))
         if article is None:
             return Response.text("Article introuvable.", status=404)
-        return BaseController.render(
+        session_id, csrf_token = ArticleController._start_session(request)
+        response = BaseController.render(
             "article/attach.html",
             request=request,
-            context={"article": article},
+            context={"article": article, "csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def attach_store(request: Request) -> Response:

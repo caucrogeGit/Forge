@@ -17,7 +17,8 @@ fournir un **jeton CSRF**.
 ## L'ajout
 
 Ajoutez la requête et la méthode `delete` dans `mvc/controllers/note_controller.py`,
-et complétez le contexte de `index` avec le jeton CSRF :
+et faites garantir la session par `index`, car la liste porte désormais des
+formulaires de suppression (le jeton CSRF doit donc être non vide) :
 
 ```python
 DELETE_ONE = "DELETE FROM notes WHERE id = ?"
@@ -28,7 +29,8 @@ class NoteController(BaseController):
     @staticmethod
     def index(request: Request) -> Response:
         # … lecture de q, page, notes inchangée …
-        return BaseController.render(
+        session_id, csrf_token = NoteController._start_session(request)
+        response = BaseController.render(
             "note/index.html",
             request=request,
             context={
@@ -37,9 +39,11 @@ class NoteController(BaseController):
                 "page": page,
                 "has_prev": page > 1,
                 "has_next": page * PAGE_SIZE < total,
-                "csrf_token": BaseController.csrf_token(request),
+                "csrf_token": csrf_token,
             },
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def delete(request: Request) -> Response:

@@ -16,11 +16,17 @@ formulaire, une route POST, du CSRF), donc deux nouvelles méthodes sur
 
 ## L'ajout
 
-Complétez les imports et ajoutez les deux requêtes plus les deux méthodes dans
-`mvc/controllers/note_controller.py` :
+Complétez les imports et ajoutez le helper de session, les deux requêtes et les
+deux méthodes dans `mvc/controllers/note_controller.py`. Le jeton CSRF vit dans
+la session : sans session active il serait vide et le POST serait refusé. Le
+helper `_start_session` garantit une session (comme au palier CSRF du niveau
+débutant) :
 
 ```python
 from core.database.db import execute, fetch_all, fetch_one
+from core.security.cookies import set_session_cookie
+from core.security.session import get_session, get_session_id
+from core.sessions.manager import get_session_store
 
 SELECT_ONE = "SELECT id, content FROM notes WHERE id = ?"
 UPDATE_ONE = "UPDATE notes SET content = ? WHERE id = ?"
@@ -31,16 +37,29 @@ class NoteController(BaseController):
     # … index(...) inchangé …
 
     @staticmethod
+    def _start_session(request: Request):
+        """Garantit une session active et renvoie (session_id, csrf_token)."""
+        session_id = get_session_id(request)
+        session = get_session(session_id) if session_id else None
+        if session is None:
+            session_id = get_session_store().create()
+            session = get_session(session_id)
+        return session_id, session["csrf_token"]
+
+    @staticmethod
     def edit(request: Request) -> Response:
         record_id = int(request.route("id"))
         note = fetch_one(SELECT_ONE, (record_id,))
         if note is None:
             return Response.text("Note introuvable.", status=404)
-        return BaseController.render(
+        session_id, csrf_token = NoteController._start_session(request)
+        response = BaseController.render(
             "note/edit.html",
             request=request,
-            context={"note": note, "csrf_token": BaseController.csrf_token(request)},
+            context={"note": note, "csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def update(request: Request) -> Response:

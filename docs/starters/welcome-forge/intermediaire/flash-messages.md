@@ -20,7 +20,7 @@ Dans `mvc/controllers/note_controller.py`, faites poser un flash par `update` et
 `delete` au moment de rediriger, et lisez le flash dans `index`.
 
 ```python
-from core.security.session import get_flash, get_session_id
+from core.security.session import get_flash, get_session, get_session_id
 
 
 class NoteController(BaseController):
@@ -28,8 +28,9 @@ class NoteController(BaseController):
     @staticmethod
     def index(request: Request) -> Response:
         # … lecture de q, page, notes inchangée …
-        flash = get_flash(get_session_id(request))  # one-shot : disparaît à la lecture
-        return BaseController.render(
+        session_id, csrf_token = NoteController._start_session(request)
+        flash = get_flash(session_id)  # one-shot : disparaît à la lecture
+        response = BaseController.render(
             "note/index.html",
             request=request,
             context={
@@ -38,9 +39,12 @@ class NoteController(BaseController):
                 "page": page,
                 "has_prev": page > 1,
                 "has_next": page * PAGE_SIZE < total,
+                "csrf_token": csrf_token,
                 "flash": flash,
             },
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def update(request: Request) -> Response:

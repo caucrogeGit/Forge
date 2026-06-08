@@ -24,6 +24,9 @@ from core.database.transaction import transaction
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
+from core.security.cookies import set_session_cookie
+from core.security.session import get_session, get_session_id
+from core.sessions.manager import get_session_store
 from forge_mvc_files import UploadError, save_upload
 
 SELECT_ARTICLES_WITH_CATEGORY = (
@@ -43,6 +46,16 @@ API_TOKEN = "forge-demo-token"
 class ArticleController(BaseController):
 
     @staticmethod
+    def _start_session(request: Request):
+        """Garantit une session active et renvoie (session_id, csrf_token)."""
+        session_id = get_session_id(request)
+        session = get_session(session_id) if session_id else None
+        if session is None:
+            session_id = get_session_store().create()
+            session = get_session(session_id)
+        return session_id, session["csrf_token"]
+
+    @staticmethod
     def index(request: Request) -> Response:
         articles = fetch_all(SELECT_ARTICLES_WITH_CATEGORY)
         return BaseController.render(
@@ -53,11 +66,14 @@ class ArticleController(BaseController):
 
     @staticmethod
     def create(request: Request) -> Response:
-        return BaseController.render(
+        session_id, csrf_token = ArticleController._start_session(request)
+        response = BaseController.render(
             "article/new.html",
             request=request,
-            context={"categories": fetch_all(SELECT_CATEGORIES)},
+            context={"categories": fetch_all(SELECT_CATEGORIES), "csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def store(request: Request) -> Response:
@@ -83,11 +99,14 @@ class ArticleController(BaseController):
         article = fetch_one(SELECT_ONE, (int(request.route("id")),))
         if article is None:
             return Response.text("Article introuvable.", status=404)
-        return BaseController.render(
+        session_id, csrf_token = ArticleController._start_session(request)
+        response = BaseController.render(
             "article/attach.html",
             request=request,
-            context={"article": article},
+            context={"article": article, "csrf_token": csrf_token},
         )
+        set_session_cookie(response, session_id)
+        return response
 
     @staticmethod
     def attach_store(request: Request) -> Response:
