@@ -130,13 +130,13 @@ class TestOptInModules:
         assert module in text, f"Module opt-in '{module}' manquant dans la landing."
 
     def test_modules_description_wording(self):
-        """Le bloc « Modules officiels opt-in » a son chapeau actualisé
-        (LANDING-PUBLIC-CONTRACT-REALIGN-001) — il mentionne l'installation
-        séparée selon l'état de disponibilité, pas l'ancien wording
-        « publication PyPI est progressive »."""
+        """Le bloc des modules opt-in a son chapeau actualisé
+        (LANDING-MODULES-WORDING-001) — « Forge fournit des modules officiels
+        opt-in installables séparément », sans la mention « selon leur état de
+        disponibilité »."""
         text = LANDING.read_text(encoding="utf-8")
-        assert "Modules officiels opt-in" in text, (
-            "Le bloc des modules opt-in doit conserver son titre canonique."
+        assert "Forge fournit des modules officiels opt-in" in text, (
+            "Le bloc des modules opt-in doit porter son chapeau canonique."
         )
         assert "installables séparément" in text, (
             "Le bloc des modules opt-in doit indiquer qu'ils s'installent séparément."
