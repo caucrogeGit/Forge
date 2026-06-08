@@ -7,13 +7,14 @@ relabelisé la section en « Nouveautés 1.0.0-beta.13 » et simplifié les
 panneaux : suppression des liens profonds IoT/audits, de « Mosquitto » et
 de la preuve « 0 échec ».
 
-Mise à jour beta.13 : la section ne contient plus que les panneaux **Forge
-IoT** et **Forge Video** (la carte « opt-ins explicites » et le snippet
-d'installation in-section ont été retirés ; le récit opt-in/installation
-reste présent dans la carte « CLI Forge » et la section Installation).
+Mise à jour beta.14 : la section est relabelisée « Nouveautés 1.0.0-beta.14 »
+(id `beta14`) et présente les nouveautés récentes : **Forge i18n** (12e opt-in),
+**welcome-forge refondu** (tutoriels continus), **Convention de route** (ADR-029)
+et **Squelette dédié** (ADR-024). Les anciennes cartes média (IoT, Video, Images,
+Files, Audio) sont retirées de la vitrine.
 
 Ce fichier conserve les garde-fous encore valides : présence de la section,
-panneaux Forge IoT et Forge Video, core présenté comme autonome,
+panneaux des nouveautés courantes, core présenté comme autonome,
 synchronisation de `docs/index.html`, absence de version beta.11, ticket
 roadmap.
 
@@ -47,9 +48,10 @@ def _src() -> str:
 # opt-ins par un texte simple (sans commandes CLI ni `iot_events`). Seuls les
 # repères conceptuels restent garantis.
 HIGHLIGHTS = [
-    "Forge IoT",
-    "MQTT",
-    "Forge Video",
+    "Forge i18n",
+    "welcome-forge refondu",
+    "Convention de route",
+    "Squelette dédié",
 ]
 
 
@@ -61,12 +63,12 @@ class TestHighlightsPresent:
         )
 
     def test_section_nouveautes_presente(self):
-        assert 'id="beta13"' in _src(), (
-            "Une section dédiée aux nouveautés (id='beta13') est attendue."
+        assert 'id="beta14"' in _src(), (
+            "Une section dédiée aux nouveautés (id='beta14') est attendue."
         )
 
     def test_core_reste_autonome(self):
-        """Le core doit rester présenté comme autonome (carte Forge IoT)."""
+        """Le core doit rester présenté comme autonome (carte Forge i18n)."""
         normalized = " ".join(_src().split())
         assert "autonome" in normalized
 
@@ -90,9 +92,9 @@ class TestSync:
 
     def test_docs_index_reflete_section(self):
         docs = DOCS_LANDING.read_text(encoding="utf-8")
-        assert 'id="beta13"' in docs
-        assert "Forge IoT" in docs
-        assert "Forge Video" in docs
+        assert 'id="beta14"' in docs
+        assert "Forge i18n" in docs
+        assert "Convention de route" in docs
 
 
 # ---------------------------------------------------------------------------

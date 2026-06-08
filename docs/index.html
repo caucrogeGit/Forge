@@ -105,53 +105,33 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-beta.13 : opt-ins média/données + features transverses -->
-<section id="beta13" class="py-24 px-6 sec-light">
+<!-- Nouveautés 1.0.0-beta.14 : i18n opt-in, welcome-forge refondu, convention de route, squelette dédié -->
+<section id="beta14" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
-      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-beta.13</div>
+      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-beta.14</div>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge IoT</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Opt-in pour recevoir, stocker et exposer des données de capteurs : un subscriber MQTT alimente une table d'événements, relue via une API HTTP JSON. Le cœur reste autonome.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge i18n</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Le douzième opt-in : traduction par catalogues JSON, locale par défaut et fallback, helper trans() pour les templates. Extrait du cœur pour qu'il reste autonome ; un repli no-op garde le CRUD généré fonctionnel sans le module.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Video</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Opt-in d'upload, transcodage MP4 (H.264/AAC) et lecture en streaming. Le transcodage tourne dans un worker dédié, jamais pendant une requête HTTP.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">welcome-forge refondu</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Les trois niveaux d'apprentissage deviennent des tutoriels continus manuels : un mini-projet par niveau (Carnet de notes, Catalogue d'articles), écrit à la main palier après palier, sans génération automatique.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Images</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Opt-in de traitement d'images : variantes et miniatures, galerie attachée à une entité, image de couverture, et une garde qui refuse les images piégées à l'upload.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Convention de route</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Une route se déduit du contrôleur et de la méthode : chemin /contrôleur/méthode (index nu), nom contrôleur-méthode. Prévisible et lisible, appliquée au squelette, au parcours welcome et au CRUD généré.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Files</h3>
-        <p class="text-white/60 text-sm leading-relaxed">La brique générique d'upload : écriture sécurisée anti-traversal, stockage et service de fichiers en streaming. Le socle des opt-ins média spécialisés.</p>
-      </div>
-
-      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge Audio</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Opt-in d'upload, sondage des métadonnées, transcodage MP3 et lecture audio en streaming. Un module sobre, sans état.</p>
-      </div>
-
-      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Slugs canoniques</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Des identifiants d'URL lisibles et stables, produits d'une seule façon officielle depuis une colonne source, avec CRUD et routage public par slug intégrés.</p>
-      </div>
-
-      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Modèle opt-in unifié</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Une seule façon d'ajouter une brique optionnelle : l'installer, l'activer, la désactiver ou la lister, avec un vocabulaire clair « opt-in ». Le cœur ne s'alourdit jamais.</p>
-      </div>
-
-      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Parcours welcome</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Chaque opt-in a sa progression pédagogique, du premier contact au niveau avancé, générable en un starter pour apprendre brique par brique.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Squelette dédié</h3>
+        <p class="text-white/60 text-sm leading-relaxed">forge new produit un projet nu, matérialisé depuis un squelette embarqué : pas de clone du dépôt, un point de départ minimal et neutre que vous faites grandir.</p>
       </div>
 
     </div>
