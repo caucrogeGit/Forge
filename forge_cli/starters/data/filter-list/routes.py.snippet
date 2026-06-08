@@ -1,6 +1,0 @@
-# forge-starter:filter-list:start
-from mvc.controllers.filter_list_controller import FilterListController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/filter-list", FilterListController.index, name="filter_list_index")
-# forge-starter:filter-list:end

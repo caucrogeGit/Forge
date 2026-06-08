@@ -130,13 +130,13 @@ nav:
               - Bilan débutant: starters/welcome-forge/debutant/bilan.md
           - Intermédiaire:
               - Lister des enregistrements: starters/welcome-forge/intermediaire/list-records.md
+              - Héritage de gabarit: starters/welcome-forge/intermediaire/layout-template.md
               - Rechercher / filtrer: starters/welcome-forge/intermediaire/filter-list.md
               - Paginer une liste: starters/welcome-forge/intermediaire/pagination.md
-              - Héritage de gabarit: starters/welcome-forge/intermediaire/layout-template.md
               - Modifier un enregistrement: starters/welcome-forge/intermediaire/update-record.md
               - Supprimer un enregistrement: starters/welcome-forge/intermediaire/delete-record.md
-              - Mémoriser un état en session: starters/welcome-forge/intermediaire/session-state.md
               - Messages flash: starters/welcome-forge/intermediaire/flash-messages.md
+              - Mémoriser un état en session: starters/welcome-forge/intermediaire/session-state.md
               - Bilan intermédiaire: starters/welcome-forge/intermediaire/bilan.md
           - Avancé:
               - Relations entre tables: starters/welcome-forge/avance/relations.md

@@ -1,118 +1,116 @@
 # Messages flash
 
-Objectif : confirmer une action par un message qui s'affiche **une fois**, à la
-requête suivante.
+Objectif : confirmer une action par un message qui s'affiche **une seule fois**,
+à la requête suivante.
 
-**Ce que vous allez apprendre :** le motif **POST-Redirect-GET**. Une action
-`POST` pose un **message flash** (`set_flash`) et **redirige** ; la page cible
-lit le flash (`get_flash`, qui le supprime aussitôt) et l'affiche. C'est la
-bonne façon de donner un retour après une écriture.
+**Ce que vous allez apprendre :** le motif **POST-Redirect-GET** complet. Une
+action `POST` pose un **message flash** puis **redirige** ; la page cible lit le
+flash (`get_flash`, qui le supprime aussitôt) et l'affiche.
 
-Dernier palier du **niveau intermédiaire** de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Mémoriser un état en session](session-state.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+La modification ré-affiche la page d'édition, et la suppression redirige sans
+confirmation. Nous donnons à ces deux écritures un vrai retour utilisateur : un
+message de confirmation **one-shot**, posé avant la redirection et affiché sur la
+liste.
 
-- poser un message flash après une action (`BaseController.set_flash`) ;
-- **rediriger** vers la page (`BaseController.redirect`), motif PRG ;
-- lire et afficher le flash **one-shot** (`get_flash`) à la requête suivante ;
-- combiner **session**, **CSRF** et **redirection**.
+## L'ajout
 
-Aucune base de données.
-
-## Classes Forge utilisées
-
-| Classe / fonction | Rôle dans ce starter | Référence |
-|-------------------|----------------------|-----------|
-| `BaseController.set_flash` / `redirect` | Poser un flash puis rediriger (PRG). | [BaseController](../../../reference/api.md#coremvccontroller) |
-| `get_flash` | Lire et supprimer le flash (one-shot). | [Sessions](../../../reference/sessions.md) |
-| `BaseController.csrf_token` | Protéger l'action POST. | [BaseController](../../../reference/api.md#coremvccontroller) |
-
-## Tester
-
-```bash
-forge run
-```
-
-Ouvrez `https://localhost:8000/flash-messages`, cliquez **Faire une action** →
-un message de confirmation s'affiche. Rechargez → il a disparu (one-shot).
-
-## Le contrôleur
+Dans `mvc/controllers/note_controller.py`, faites poser un flash par `update` et
+`delete` au moment de rediriger, et lisez le flash dans `index`.
 
 ```python
-# mvc/controllers/flash_messages_controller.py
-from core.security.session import get_flash, get_session, get_session_id
-from core.sessions.manager import get_session_store
+from core.security.session import get_flash, get_session_id
 
 
-class FlashMessagesController(BaseController):
+class NoteController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        store = get_session_store()
-        session_id = get_session_id(request)
-        session = get_session(session_id) if session_id else None
-        if not session:
-            session_id = store.create()
-            session = get_session(session_id)
-
-        flash = get_flash(session_id)  # one-shot : le message disparaît
-        response = BaseController.render(
-            "flash_messages/index.html",
-            context={"flash": flash, "csrf_token": BaseController.csrf_token(request)},
+        # … lecture de q, page, notes inchangée …
+        flash = get_flash(get_session_id(request))  # one-shot : disparaît à la lecture
+        return BaseController.render(
+            "note/index.html",
             request=request,
+            context={
+                "notes": notes,
+                "q": q,
+                "page": page,
+                "has_prev": page > 1,
+                "has_next": page * PAGE_SIZE < total,
+                "flash": flash,
+            },
         )
-        response.headers["Set-Cookie"] = (
-            f"session_id={session_id}; Path=/; HttpOnly; SameSite=Strict; Secure"
-        )
-        return response
 
     @staticmethod
-    def action(request: Request) -> Response:
-        BaseController.set_flash(request, "Action effectuée avec succès !")
-        return BaseController.redirect("/flash-messages")
+    def update(request: Request) -> Response:
+        record_id = int(request.route("id"))
+        content = request.form("content", default="").strip()
+        if not content:
+            return Response.text("Le contenu est obligatoire.", status=422)
+        execute(UPDATE_ONE, (content, record_id))
+        return BaseController.redirect("/notes", request=request, flash="Note mise à jour.")
+
+    @staticmethod
+    def delete(request: Request) -> Response:
+        record_id = int(request.route("id"))
+        execute(DELETE_ONE, (record_id,))
+        return BaseController.redirect("/notes", request=request, flash="Note supprimée.")
 ```
 
-### Comprendre ce code
-
-- `action` (POST) **pose** le flash dans la session puis **redirige** vers
-  `/flash-messages` : c'est le **POST-Redirect-GET**. On ne réaffiche jamais une
-  page directement après un POST (sinon un rechargement re-soumet le formulaire).
-- `index` lit le flash avec `get_flash`, qui le **renvoie et le supprime** : le
-  message ne s'affiche donc qu'**une seule fois**.
-- La session doit exister pour porter le flash : on la garantit comme au palier
-  *Mémoriser un état en session*.
-
-## La vue
+Affichez le flash en tête du bloc `content` de `mvc/views/note/index.html` :
 
 ```html
-<!-- mvc/views/flash_messages/index.html -->
 {% if flash %}
-<p data-level="{{ flash.level }}"><strong>{{ flash.message }}</strong></p>
+<p><strong>{{ flash.message }}</strong></p>
 {% endif %}
-
-<form method="post" action="/flash-messages/action">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-  <button type="submit">Faire une action</button>
-</form>
 ```
 
-### Comprendre ce code
+## Votre mvc/routes.py à ce stade
 
-- Le bloc `{% if flash %}` n'affiche le message que s'il y en a un.
-- L'action est un `POST` **protégé par CSRF**.
+Inchangé : le flash réutilise les routes existantes (aucune route nouvelle).
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.note_controller import NoteController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET",  "/", HomeController.index, name="home_index")
+    pub.add("GET",  "/notes", NoteController.index, name="notes_index")
+    pub.add("GET",  "/notes/{id}/edit", NoteController.edit, name="notes_edit")
+    pub.add("POST", "/notes/{id}/edit", NoteController.update, name="notes_update")
+    pub.add("POST", "/notes/{id}/delete", NoteController.delete, name="notes_delete")
+```
+
+## Comprendre ce code
+
+- `BaseController.redirect("/notes", request=request, flash="…")` **pose** le
+  message dans la session puis renvoie une redirection : c'est le **P**OST puis le
+  **R**edirect du motif POST-Redirect-GET.
+- Au **G**ET suivant, `get_flash(get_session_id(request))` lit le message **et le
+  supprime** : il ne s'affichera donc qu'une fois, même si on recharge la page.
+- `update` ne ré-affiche plus la page d'édition : il redirige vers la liste, état
+  réel et partageable.
+
+## Tester dans le navigateur
+
+| Action | Résultat |
+|---|---|
+| Modifier une note | retour à la liste avec « Note mise à jour. » |
+| Recharger la liste | le message a disparu (one-shot) |
+| Supprimer une note | retour à la liste avec « Note supprimée. » |
 
 ## À retenir
 
-- Flash = retour utilisateur **one-shot** après une action.
-- Motif **POST-Redirect-GET** : poser le flash, rediriger, l'afficher au GET.
-- `get_flash` **lit et supprime** : le message ne réapparaît pas au rechargement.
+- POST-Redirect-GET : on **redirige** après une écriture, jamais on ne ré-affiche
+  directement le POST.
+- Un flash est **one-shot** : `get_flash` le lit et le supprime.
+- Le flash combine **session** (stockage) et **redirection**.
 
-## Après ce starter
+Au palier suivant, nous mémorisons un état serveur entre les requêtes avec la session.
 
-Vous avez terminé le **niveau intermédiaire** : listes, recherche, pagination,
-gabarits, mise à jour, suppression, sessions et messages flash. Faites le point
-dans le bilan du niveau.
-
-[Bilan du niveau intermédiaire](bilan.md)
+[Continuer avec Mémoriser un état en session](session-state.md)

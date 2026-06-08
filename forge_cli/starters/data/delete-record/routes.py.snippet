@@ -1,7 +1,0 @@
-# forge-starter:delete-record:start
-from mvc.controllers.delete_record_controller import DeleteRecordController
-
-with router.group("", public=True) as pub:
-    pub.add("GET",  "/delete-record",        DeleteRecordController.index,  name="delete_record_index")
-    pub.add("POST", "/delete-record/{id}",   DeleteRecordController.delete, name="delete_record_delete")
-# forge-starter:delete-record:end

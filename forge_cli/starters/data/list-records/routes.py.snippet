@@ -1,6 +1,0 @@
-# forge-starter:list-records:start
-from mvc.controllers.list_records_controller import ListRecordsController
-
-with router.group("", public=True) as pub:
-    pub.add("GET", "/list-records", ListRecordsController.index, name="list_records_index")
-# forge-starter:list-records:end

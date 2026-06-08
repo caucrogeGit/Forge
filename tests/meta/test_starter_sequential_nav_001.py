@@ -128,8 +128,9 @@ class TestSequentialChain:
         )
 
     def test_intermediaire_last_palier_points_to_level_bilan(self):
-        # Dernier palier intermédiaire disponible → bilan du niveau.
-        page = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "flash-messages.md"
+        # Dernier palier intermédiaire (ADR-028, mini-projet Carnet de notes) →
+        # bilan du niveau. Le dernier palier est désormais session-state.
+        page = STARTERS_DOCS / "welcome-forge" / "intermediaire" / "session-state.md"
         assert "(bilan.md)" in page.read_text(encoding="utf-8")
 
     def test_intermediaire_bilan_points_to_next_level(self):

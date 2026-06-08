@@ -2,132 +2,148 @@
 
 Objectif : lire **plusieurs** lignes en base et les afficher dans une vue.
 
-**Ce que vous allez apprendre :** au palier débutant *Première base SQL*, vous
-avez lu **une** ligne avec `fetch_one`. Ici vous lisez **toute la table** avec
+**Ce que vous allez apprendre :** lire toute une table avec
 `core.database.db.fetch_all`, qui retourne une **liste** de dictionnaires, puis
-vous l'itérez dans la vue avec une boucle Jinja `{% for %}`.
+l'itérer dans la vue avec une boucle Jinja `{% for %}`.
 
-Premier palier du **niveau intermédiaire** de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Écrire en base](../debutant/first-sql-write.md) (dernier palier du niveau
-débutant).
+!!! info "Un mini-projet autonome"
+    Le niveau intermédiaire est un **tutoriel continu** : vous construisez à la
+    main un seul petit projet, le « Carnet de notes », qui grandit palier après
+    palier. C'est un projet **indépendant** du niveau débutant, pas besoin de
+    l'avoir suivi. Comme au débutant, vous écrivez le code vous-même, à la main,
+    sans génération automatique.
 
-## Ce que ce starter montre
+## Démarrer le niveau
 
-- une route `GET /list-records` qui lit **plusieurs** lignes ;
-- `core.database.db.fetch_all` (liste de lignes) au lieu de `fetch_one` ;
-- une vue HTML qui **boucle** sur les lignes avec `{% for m in messages %}`.
-
-Aucune écriture en base. Aucun formulaire. Aucun CRUD complet. Aucune entité JSON.
-
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Reçue par la méthode du contrôleur. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Produite ici via `render(...)`. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | Fournit `render(...)` pour la vue. | [BaseController](../../../reference/api.md#coremvccontroller) |
-| `core.database.db.fetch_all` | Lit **plusieurs** lignes (liste de dicts). | [Migrations SQL](../../../features/migrations.md) |
-
-## Tester
-
-La table neutre `first_sql_messages` est créée et peuplée par la migration
-livrée avec ce starter :
+Créez un projet neuf et placez-vous dedans :
 
 ```bash
-forge migration:apply
-forge run
+forge new carnet-de-notes
+cd carnet-de-notes
 ```
 
-Ouvrez `https://localhost:8000/list-records` → la liste des messages s'affiche.
+Une base MariaDB est nécessaire dès ce palier. Voir
+[Préparer MariaDB](../../../install/mariadb.md) si ce n'est pas déjà fait.
 
-## Les routes
+## L'ajout
 
-```python
-# mvc/routes.py
-from mvc.controllers.list_records_controller import ListRecordsController
+### La migration
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/list-records", ListRecordsController.index, name="list_records_index")
+Créez la migration `mvc/migrations/<timestamp>_create_notes.sql` (remplacez
+`<timestamp>` par l'horodatage généré par Forge) :
+
+```sql
+CREATE TABLE IF NOT EXISTS notes (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    content VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO notes (content)
+SELECT seed.content FROM (
+    SELECT 'Première note' AS content
+    UNION ALL SELECT 'Deuxième note'
+    UNION ALL SELECT 'Troisième note'
+) AS seed
+WHERE NOT EXISTS (SELECT 1 FROM notes);
 ```
 
-## Le contrôleur
+L'`INSERT` est idempotent : il ne pose les notes de départ que si la table est
+vide, donc rejouer la migration ne crée pas de doublon. Appliquez la migration
+avec `forge migration:apply` avant de tester.
+
+### Le contrôleur
+
+Créez le fichier `mvc/controllers/note_controller.py` :
 
 ```python
-# mvc/controllers/list_records_controller.py
+# mvc/controllers/note_controller.py
 from core.database.db import fetch_all
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 
+SELECT_ALL = "SELECT id, content FROM notes ORDER BY id"
 
-SELECT_ALL_MESSAGES = "SELECT id, content FROM first_sql_messages ORDER BY id"
 
-
-class ListRecordsController(BaseController):
+class NoteController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        messages = fetch_all(SELECT_ALL_MESSAGES)
+        notes = fetch_all(SELECT_ALL)
         return BaseController.render(
-            "list_records/index.html",
-            context={"messages": messages},
+            "note/index.html",
             request=request,
+            context={"notes": notes},
         )
 ```
 
-### Comprendre ce code
-
-- `fetch_all(SELECT_ALL_MESSAGES)` exécute le `SELECT` et retourne une **liste**
-  de dictionnaires (une entrée par ligne), là où `fetch_one` ne renvoyait qu'un
-  seul dictionnaire (ou `None`).
-- Le SQL reste une **constante de module** lisible et paramétrable (principe
-  « SQL visible »).
-- La liste est passée à la vue dans le **contexte** (`{"messages": messages}`).
-
-## La vue
+Créez la vue `mvc/views/note/index.html` :
 
 ```html
-<!-- mvc/views/list_records/index.html -->
+<!-- mvc/views/note/index.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Lister des enregistrements - Forge</title>
+    <meta charset="utf-8">
+    <title>Carnet de notes</title>
 </head>
 <body>
-  <h1>Messages</h1>
+    <h1>Mes notes</h1>
 
-  {% if messages %}
-  <ul>
-    {% for m in messages %}
-    <li>#{{ m.id }} : {{ m.content }}</li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p>Aucun message en base.</p>
-  {% endif %}
+    {% if notes %}
+    <ul>
+        {% for note in notes %}
+        <li>#{{ note.id }} : {{ note.content }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucune note en base.</p>
+    {% endif %}
 </body>
 </html>
 ```
 
-### Comprendre ce code
+Puis ajoutez l'import du contrôleur et la route `/notes` dans `mvc/routes.py`.
 
-- `{% for m in messages %}` itère la liste reçue du contrôleur ; chaque `m` est
-  un dictionnaire dont on lit `m.id` et `m.content`.
-- `{% if messages %}` gère proprement le cas d'une table vide.
-- Pas encore de gabarit partagé (`{% extends %}`) : c'est le palier *Héritage de
-  gabarit* qui l'introduira ; ici la page reste un document HTML complet.
+## Votre mvc/routes.py à ce stade
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.note_controller import NoteController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET", "/notes", NoteController.index, name="notes_index")
+```
+
+## Comprendre ce code
+
+- `fetch_all(SELECT_ALL)` exécute le `SELECT` et retourne une **liste** de
+  dictionnaires, une entrée par ligne (là où `fetch_one` ne renvoie qu'une
+  ligne ou `None`).
+- Le SQL reste visible : `SELECT id, content FROM notes ORDER BY id` se lit tel
+  quel, sans ORM, comme une **constante de module**.
+- La vue **boucle** sur la liste avec `{% for note in notes %}` et gère le cas
+  d'une table vide avec `{% if notes %}`.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/notes` | la liste des trois notes de départ |
 
 ## À retenir
 
-- `fetch_all` renvoie **une liste** ; `fetch_one` renvoie **une ligne**.
+- `fetch_all` renvoie **une liste** de lignes ; `fetch_one` renvoie **une** ligne.
+- Une table se crée par une migration appliquée avec `forge migration:apply`.
 - Une vue affiche une collection avec `{% for %}` ; pensez au cas **vide**.
-- Le SQL reste visible et paramétré, jamais concaténé.
 
-## Après ce starter
+Au palier suivant, nous factorisons l'enveloppe HTML de cette page dans un
+gabarit partagé.
 
-Passez au palier suivant : **Rechercher / filtrer une liste**, filtrer la
-liste selon un mot-clé saisi par l'utilisateur.
-
-[Continuer avec Rechercher / filtrer](filter-list.md)
+[Continuer avec Héritage de gabarit](layout-template.md)

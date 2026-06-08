@@ -7,87 +7,101 @@ Objectif : factoriser l'enveloppe HTML commune (en-tête, pied, `<head>`) dans u
 `{% extends %}` et n'y injecter que son contenu via des `{% block %}`. C'est le
 principe DRY appliqué aux templates Jinja.
 
-Palier 4 du **niveau intermédiaire** de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Paginer une liste](pagination.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+Le Carnet de notes a une page liste `note/index.html`, écrite comme un document
+HTML complet au palier précédent. Nous allons en extraire l'enveloppe dans un
+gabarit, car les pages que nous ajouterons ensuite (édition, suppression)
+partageront la même structure. Aucun changement de contrôleur ni de route à ce
+palier.
 
-- un **gabarit** `layouts/starter_layout.html` avec des `{% block %}` ;
-- une page qui l'`{% extends %}` et ne définit que son contenu ;
-- la fin des documents HTML complets dupliqués page après page.
+## L'ajout
 
-Aucune base de données. Aucune écriture.
+### Le gabarit
 
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Reçue par la méthode du contrôleur. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Produite via `render(...)`. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | Fournit `render(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
-
-## Tester
-
-```bash
-forge run
-```
-
-Ouvrez `https://localhost:8000/layout-template` → la page affiche son contenu
-**dans** l'en-tête et le pied définis par le gabarit partagé.
-
-## Le gabarit
+Créez le gabarit `mvc/views/note/_layout.html` :
 
 ```html
-<!-- mvc/views/layouts/starter_layout.html -->
+<!-- mvc/views/note/_layout.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>{% block title %}Forge{% endblock %}</title>
+    <meta charset="utf-8">
+    <title>{% block title %}Carnet de notes{% endblock %}</title>
 </head>
 <body>
-  <header><strong>Mon application Forge</strong></header>
-  <main>
-    {% block content %}{% endblock %}
-  </main>
-  <footer><small>Pied de page commun à toutes les pages.</small></footer>
+    <header><strong>Carnet de notes</strong></header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer><small>Pied de page commun à toutes les pages.</small></footer>
 </body>
 </html>
 ```
 
-## La page
+### La page qui hérite
+
+Remplacez le contenu de `mvc/views/note/index.html` par sa version héritée :
 
 ```html
-<!-- mvc/views/layout_template/index.html -->
-{% extends "layouts/starter_layout.html" %}
+<!-- mvc/views/note/index.html -->
+{% extends "note/_layout.html" %}
 
-{% block title %}{{ titre }} - Forge{% endblock %}
+{% block title %}Mes notes{% endblock %}
 
 {% block content %}
-<h1>{{ titre }}</h1>
-<p>Cette page ne contient que son contenu propre.</p>
+<h1>Mes notes</h1>
+
+{% if notes %}
+<ul>
+    {% for note in notes %}
+    <li>#{{ note.id }} : {{ note.content }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Aucune note en base.</p>
+{% endif %}
 {% endblock %}
 ```
 
-### Comprendre ce code
+## Votre mvc/routes.py à ce stade
 
-- `{% extends "layouts/starter_layout.html" %}` déclare que la page **hérite**
-  du gabarit ; elle n'écrit plus `<html>`, `<head>` ni `<body>`.
+Inchangé depuis le palier précédent : la factorisation ne touche que les vues.
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.note_controller import NoteController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET", "/notes", NoteController.index, name="notes_index")
+```
+
+## Comprendre ce code
+
+- `{% extends "note/_layout.html" %}` déclare que la page **hérite** du gabarit ;
+  elle n'écrit plus `<html>`, `<head>` ni `<body>`.
 - Chaque `{% block X %}…{% endblock %}` de la page **remplit** le bloc de même
   nom déclaré dans le gabarit (`title`, `content`).
-- Le gabarit reste **un seul fichier** : modifier l'en-tête ou le pied le
-  change pour toutes les pages qui en héritent.
+- Le gabarit reste **un seul fichier** : modifier l'en-tête ou le pied le change
+  pour toutes les pages qui en héritent.
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/notes` | la liste, désormais entourée de l'en-tête et du pied du gabarit |
 
 ## À retenir
 
 - `{% extends %}` + `{% block %}` = factoriser l'enveloppe HTML.
 - Le gabarit définit la structure et des blocs ; la page remplit les blocs.
-- Une seule source pour l'en-tête/pied → cohérence et maintenance simples.
+- Une seule source pour l'en-tête et le pied, donc cohérence et maintenance simples.
 
-## Après ce starter
+Au palier suivant, nous ajoutons une recherche par mot-clé sur la liste.
 
-Passez au palier suivant : **Modifier un enregistrement**, éditer une ligne
-existante via un formulaire pré-rempli.
-
-[Continuer avec Modifier un enregistrement](update-record.md)
+[Continuer avec Rechercher / filtrer](filter-list.md)

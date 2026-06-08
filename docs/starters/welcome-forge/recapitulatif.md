@@ -22,16 +22,18 @@ avant d'aborder les progressions opt-in autonomes.
 
 ## Niveau intermédiaire (8 paliers)
 
+Un seul mini-projet, le « Carnet de notes », construit à la main palier après palier.
+
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
 | 1 | [Lister des enregistrements](intermediaire/list-records.md) | Lire plusieurs lignes et les itérer | `fetch_all(...)`, `{% for %}` |
-| 2 | [Rechercher / filtrer](intermediaire/filter-list.md) | Filtrer une liste | `request.query("q")` + `WHERE … LIKE ?` |
-| 3 | [Paginer une liste](intermediaire/pagination.md) | Découper une liste en pages | `LIMIT ? OFFSET ?`, `COUNT(*)` |
-| 4 | [Héritage de gabarit](intermediaire/layout-template.md) | Factoriser l'enveloppe HTML | `{% extends %}`, `{% block %}` |
+| 2 | [Héritage de gabarit](intermediaire/layout-template.md) | Factoriser l'enveloppe HTML | `{% extends %}`, `{% block %}` |
+| 3 | [Rechercher / filtrer](intermediaire/filter-list.md) | Filtrer une liste | `request.query("q")` + `WHERE … LIKE ?` |
+| 4 | [Paginer une liste](intermediaire/pagination.md) | Découper une liste en pages | `LIMIT ? OFFSET ?`, `COUNT(*)` |
 | 5 | [Modifier un enregistrement](intermediaire/update-record.md) | Formulaire pré-rempli + mise à jour | `execute("UPDATE … WHERE id = ?")` |
 | 6 | [Supprimer un enregistrement](intermediaire/delete-record.md) | Action destructive sûre | `execute("DELETE … WHERE id = ?")` + CSRF |
-| 7 | [Mémoriser un état en session](intermediaire/session-state.md) | Garder un état entre requêtes | `get_session_store()`, cookie durci |
-| 8 | [Messages flash](intermediaire/flash-messages.md) | Retour one-shot après action | `set_flash` / `get_flash`, POST-Redirect-GET |
+| 7 | [Messages flash](intermediaire/flash-messages.md) | Retour one-shot après action | `set_flash` / `get_flash`, POST-Redirect-GET |
+| 8 | [Mémoriser un état en session](intermediaire/session-state.md) | Garder un état entre requêtes | `get_session_store()`, cookie durci |
 
 ## Niveau avancé (5 paliers)
 

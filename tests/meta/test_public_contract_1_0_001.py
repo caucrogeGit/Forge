@@ -54,12 +54,13 @@ class TestModuleFamilyFrozen:
 
 class TestStartersFrozen:
     # ADR-025 (STARTER-WELCOME-FORGE-DROP-DATA-001) : les 11 starters du niveau
-    # débutant welcome-forge (welcome, query-params, first-html-view,
-    # dynamic-route, request-debug, json-response, csrf, form-post,
-    # server-validation, first-sql, first-sql-write) ont été retirés du gel ;
-    # ils sont devenus un tutoriel continu manuel (docs uniquement).
+    # débutant welcome-forge ont été retirés du gel (tutoriel continu manuel).
+    # ADR-028 (WELCOME-FORGE-LEVELS-ADR-028) : les 8 starters du niveau
+    # intermédiaire welcome-forge (list-records, layout-template, filter-list,
+    # pagination, update-record, delete-record, flash-messages, session-state)
+    # ont été retirés à leur tour ; le niveau intermédiaire est devenu un
+    # mini-projet « Carnet de notes » en tutoriel continu manuel (docs uniquement).
     FROZEN = {
-        "list-records", "filter-list", "pagination", "layout-template", "update-record", "delete-record", "session-state", "flash-messages",
         "relations", "file-upload", "json-api", "db-transaction",
         "mail-welcome", "mail-message", "mail-transport", "mail-template", "mail-config", "mail-doctor",
         "iot-welcome", "iot-events", "iot-device", "iot-simulate", "iot-api",
@@ -97,8 +98,9 @@ class TestStartersFrozen:
         )
 
     def test_frozen_count(self):
-        # 107 - 11 (paliers débutant welcome-forge retirés, ADR-025) = 96.
-        assert len(self.FROZEN) == 96
+        # 107 - 11 (paliers débutant welcome-forge retirés, ADR-025) = 96,
+        # puis 96 - 8 (paliers intermédiaire welcome-forge retirés, ADR-028) = 88.
+        assert len(self.FROZEN) == 88
 
 
 # ── Le contrat est documenté ─────────────────────────────────────────────────
@@ -109,7 +111,7 @@ class TestContractDocumented:
 
     @pytest.mark.parametrize("needle", [
         "opt-in:install", "opt-in:disable", "module:install",
-        "96 starters", "mkdocs build --strict",
+        "88 starters", "mkdocs build --strict",
     ])
     def test_contract_mentions(self, needle):
         assert needle in CONTRACT.read_text(encoding="utf-8")

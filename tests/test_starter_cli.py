@@ -70,10 +70,11 @@ def test_starters_sont_disponibles():
 
 
 def test_starter_build_ne_signale_pas_les_fichiers_non_lies(tmp_path):
-    # ADR-025 : le starter `query-params` (ex-numéro 2) a été retiré ; on exerce
-    # _check_existing avec un starter survivant (`list-records`) sur un projet
-    # contenant des fichiers sans rapport : aucune collision attendue.
-    meta = resolve("list-records")
+    # ADR-025/ADR-028 : les paliers débutant et intermédiaire welcome-forge ont
+    # été retirés ; on exerce _check_existing avec un starter survivant
+    # (`relations`, premier palier avancé) sur un projet contenant des fichiers
+    # sans rapport : aucune collision attendue.
+    meta = resolve("relations")
     (tmp_path / "mvc/controllers").mkdir(parents=True)
     (tmp_path / "mvc/models").mkdir(parents=True)
     (tmp_path / "mvc/views/auth").mkdir(parents=True)

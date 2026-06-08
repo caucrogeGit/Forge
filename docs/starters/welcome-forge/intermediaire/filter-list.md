@@ -1,123 +1,112 @@
 # Rechercher / filtrer une liste
 
-Objectif : filtrer une liste selon un mot-clé saisi par l'utilisateur.
+Objectif : filtrer la liste selon un mot-clé saisi par l'utilisateur.
 
-**Ce que vous allez apprendre :** combiner deux notions déjà connues, les
-**paramètres d'URL** (`request.param`, niveau débutant) et le **SQL visible**,
-pour construire une recherche. Le mot-clé pilote une clause `WHERE content
-LIKE ?` **paramétrée** (jamais concaténée).
+**Ce que vous allez apprendre :** combiner un **paramètre d'URL**
+(`request.query`) et le **SQL visible** pour construire une recherche. Le mot-clé
+pilote une clause `WHERE content LIKE ?` **paramétrée**, jamais concaténée.
 
-Palier 2 du **niveau intermédiaire** de la
-[progression officielle des starters](../../index.md#progression-recommandee),
-après [Lister des enregistrements](list-records.md).
+## Là où nous en sommes
 
-## Ce que ce starter montre
+`NoteController.index` lit toute la table avec `SELECT_ALL`. Nous allons le faire
+évoluer pour qu'il lise un mot-clé dans l'URL et filtre la liste quand il est
+présent. La route `/notes` ne change pas : la recherche passe par la *query
+string* (`?q=…`).
 
-- une route `GET /filter-list?q=<mot>` ;
-- la lecture du mot-clé avec `request.query("q", default="")` ;
-- une clause SQL conditionnelle `WHERE content LIKE ?` **paramétrée** ;
-- un champ de recherche (formulaire `GET`) dans la vue.
+## L'ajout
 
-Aucune écriture en base. Aucune concaténation SQL. Aucun CRUD complet.
-
-## Classes Forge utilisées
-
-| Classe | Rôle dans ce starter | Référence |
-|--------|----------------------|-----------|
-| `Request` | Lire le mot-clé avec `request.query("q", ...)`. | [Request](../../../reference/http.md#3-request-reference) |
-| `Response` | Produite via `render(...)`. | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | Fournit `render(...)`. | [BaseController](../../../reference/api.md#coremvccontroller) |
-| `core.database.db.fetch_all` | Lit la liste, filtrée ou non. | [Migrations SQL](../../../features/migrations.md) |
-
-## Tester
-
-```bash
-forge migration:apply
-forge run
-```
-
-Ouvrez `https://localhost:8000/filter-list` puis saisissez un mot dans le champ
-de recherche → la liste ne montre que les messages correspondants.
-
-## Le contrôleur
+Faites évoluer `mvc/controllers/note_controller.py` : ajoutez la requête filtrée
+et lisez le mot-clé dans `index`.
 
 ```python
-# mvc/controllers/filter_list_controller.py
-from core.database.db import fetch_all
-from core.http.request import Request
-from core.http.response import Response
-from core.mvc.controller.base_controller import BaseController
-
-
-SELECT_ALL = "SELECT id, content FROM first_sql_messages ORDER BY id"
+SELECT_ALL = "SELECT id, content FROM notes ORDER BY id"
 SELECT_FILTERED = (
-    "SELECT id, content FROM first_sql_messages "
+    "SELECT id, content FROM notes "
     "WHERE content LIKE ? ORDER BY id"
 )
 
 
-class FilterListController(BaseController):
+class NoteController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        query = request.query("q", default="").strip()
-        if query:
-            messages = fetch_all(SELECT_FILTERED, (f"%{query}%",))
+        q = request.query("q", default="").strip()
+        if q:
+            notes = fetch_all(SELECT_FILTERED, (f"%{q}%",))
         else:
-            messages = fetch_all(SELECT_ALL)
+            notes = fetch_all(SELECT_ALL)
         return BaseController.render(
-            "filter_list/index.html",
-            context={"messages": messages, "q": query},
+            "note/index.html",
             request=request,
+            context={"notes": notes, "q": q},
         )
 ```
 
-### Comprendre ce code
-
-- `request.query("q", default="")` lit le mot-clé dans la *query string*
-  (`?q=…`) ; vide par défaut.
-- Quand `q` est renseigné, on exécute `SELECT_FILTERED` avec le **paramètre**
-  `("%q%",)` : le `?` est lié à la valeur côté pilote SQL, **jamais** inséré
-  dans la chaîne. C'est la protection contre l'injection SQL.
-- Sans `q`, on retombe sur la liste complète (`SELECT_ALL`).
-
-## La vue
+Ajoutez le champ de recherche dans le bloc `content` de `mvc/views/note/index.html`,
+juste avant la liste :
 
 ```html
-<!-- mvc/views/filter_list/index.html -->
-<form method="get" action="/filter-list">
-  <input type="text" name="q" value="{{ q }}" placeholder="Rechercher…">
-  <button type="submit">Rechercher</button>
+{% block content %}
+<h1>Mes notes</h1>
+
+<form method="get" action="/notes">
+    <input type="text" name="q" value="{{ q }}" placeholder="Rechercher…">
+    <button type="submit">Rechercher</button>
 </form>
 
-{% if messages %}
+{% if notes %}
 <ul>
-  {% for m in messages %}
-  <li>#{{ m.id }} : {{ m.content }}</li>
-  {% endfor %}
+    {% for note in notes %}
+    <li>#{{ note.id }} : {{ note.content }}</li>
+    {% endfor %}
 </ul>
 {% else %}
-<p>Aucun message ne correspond.</p>
+<p>Aucune note ne correspond.</p>
 {% endif %}
+{% endblock %}
 ```
 
-### Comprendre ce code
+## Votre mvc/routes.py à ce stade
 
+Inchangé : la recherche réutilise la route `/notes` via la *query string*.
+
+```python
+# mvc/routes.py
+from core.http.router import Router
+from mvc.controllers.home_controller import HomeController
+from mvc.controllers.note_controller import NoteController
+
+router = Router()
+
+with router.group("", public=True) as pub:
+    pub.add("GET", "/", HomeController.index, name="home_index")
+    pub.add("GET", "/notes", NoteController.index, name="notes_index")
+```
+
+## Comprendre ce code
+
+- `request.query("q", default="")` lit le mot-clé dans la *query string*
+  (`?q=…`), vide par défaut.
+- Quand `q` est renseigné, on exécute `SELECT_FILTERED` avec le **paramètre**
+  `("%q%",)` : le `?` est lié à la valeur côté pilote SQL, **jamais** inséré dans
+  la chaîne. C'est la protection contre l'injection SQL.
 - Le formulaire est en `method="get"` : la recherche se reflète dans l'URL
-  (`?q=…`), partageable et rechargeable. Pas de `POST`, donc **pas de CSRF**
-  ici (le CSRF protège les écritures).
-- `value="{{ q }}"` réaffiche le mot-clé courant dans le champ.
+  (`?q=…`), partageable et rechargeable. Pas de `POST`, donc **pas de CSRF** ici
+  (le CSRF protège les écritures, que nous verrons plus loin).
+
+## Tester dans le navigateur
+
+| URL | Résultat |
+|---|---|
+| `https://localhost:8000/notes` | la liste complète |
+| Saisir `Première` puis Rechercher | seules les notes contenant « Première » |
 
 ## À retenir
 
-- Une recherche = un paramètre d'URL + une clause SQL **paramétrée**.
-- `LIKE ?` avec `("%mot%",)` : le motif est une **valeur liée**, pas une
-  concaténation.
+- Une recherche, c'est un paramètre d'URL plus une clause SQL **paramétrée**.
+- `LIKE ?` avec `("%mot%",)` : le motif est une **valeur liée**, pas une concaténation.
 - Un formulaire de recherche est en `GET` (idempotent, partageable).
 
-## Après ce starter
-
-Passez au palier suivant : **Paginer une liste**, n'afficher qu'une tranche
-des lignes à la fois.
+Au palier suivant, nous paginons la liste pour n'en afficher qu'une tranche.
 
 [Continuer avec Paginer une liste](pagination.md)
