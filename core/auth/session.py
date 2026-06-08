@@ -56,6 +56,20 @@ def login_user(request: Any, user: AuthUser) -> None:
     Sans `store.set()`, la connexion serait perdue sur ces backends (seul
     MemorySessionStore renvoie une référence vivante). On persiste donc
     explicitement, comme le font les contrôleurs starters.
+
+    Sécurité (fixation de session) : `login_user` n'effectue PAS la rotation
+    de l'identifiant de session. Pour fermer le vecteur de fixation de session,
+    l'appelant DOIT, juste après l'authentification réussie, régénérer
+    l'identifiant de session et réémettre le cookie correspondant ::
+
+        login_user(request, user)
+        nouvel_id = regenerate_session(get_session_id(request))
+        set_session_cookie(response, nouvel_id)
+
+    `login_user` ne peut pas s'en charger seul : il n'a pas accès à la réponse
+    HTTP, donc ne peut pas réémettre le cookie. Le contrôleur de référence
+    `mvc/controllers/auth_controller.py` applique ce flux ; voir aussi
+    docs/features/auth.md (section « fixation de session »).
     """
     validate_auth_user_contract(user)
     session = _resolve_request_session(request)

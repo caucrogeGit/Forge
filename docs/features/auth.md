@@ -1203,6 +1203,27 @@ login_user(request, user)
 return redirect("/dashboard")
 ```
 
+> ⚠️ Fixation de session : `login_user` ne régénère pas l'identifiant de
+> session. Pour fermer le vecteur de fixation, l'application doit, juste après
+> une authentification réussie, régénérer l'identifiant de session et réémettre
+> le cookie :
+>
+> ```python
+> from core.auth import login_user
+> from core.security.session import get_session_id, regenerate_session
+> from core.security.cookies import set_session_cookie
+>
+> login_user(request, user)
+> nouvel_id = regenerate_session(get_session_id(request))
+> set_session_cookie(response, nouvel_id)
+> ```
+>
+> `login_user` ne peut pas le faire seul : il n'a pas accès à la réponse HTTP,
+> donc ne peut pas réémettre le cookie. Le contrôleur de référence
+> `mvc/controllers/auth_controller.py` applique ce flux (login, puis
+> `regenerate`, puis `set_session_cookie`). Le même geste s'applique à l'issue
+> de l'étape MFA ci-dessous.
+
 L'application peut ensuite mettre a jour `users.last_login_at`, stocker un audit
 `login.success`, ou enregistrer une tentative rate limit reussie si elle le
 souhaite.
