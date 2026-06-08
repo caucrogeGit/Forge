@@ -103,6 +103,32 @@ class TestSafeLogAuthEventFailure:
                 safe_log_auth_event("mfa.rate_limited", user_id=42)
         assert any(record.exc_info is not None for record in caplog.records)
 
+    def test_fallback_ne_fuit_pas_la_metadata_sensible(self, caplog):
+        """SEC-AUTH-AUDIT-SANITIZE-001 : sur echec, le warning ne doit jamais
+        contenir une valeur de metadata sensible (le fallback journalisait
+        auparavant kwargs brut)."""
+        with patch("core.auth.audit.log_auth_event", side_effect=RuntimeError("DB down")):
+            with caplog.at_level(logging.WARNING, logger="forge.auth.audit"):
+                safe_log_auth_event(
+                    "login.failed",
+                    user_id=7,
+                    metadata={"password": "SECRET-PLAINTEXT", "reason": "bad_credentials"},
+                )
+        blob = "\n".join(record.getMessage() for record in caplog.records)
+        assert "SECRET-PLAINTEXT" not in blob
+        assert "password" not in blob
+        # la metadata non sensible reste utile au diagnostic
+        assert "bad_credentials" in blob
+
+    def test_fallback_ne_leve_pas_sur_metadata_non_dict(self, caplog):
+        """Le handler d'erreur doit rester robuste meme si metadata n'est pas un
+        dict (sanitize_auth_audit_metadata leverait sinon)."""
+        with patch("core.auth.audit.log_auth_event", side_effect=RuntimeError("boom")):
+            with caplog.at_level(logging.WARNING, logger="forge.auth.audit"):
+                result = safe_log_auth_event("login.failed", metadata="pas-un-dict")
+        assert result is False
+        assert any("Audit event lost" in r.getMessage() for r in caplog.records)
+
     def test_real_validation_error_is_caught(self):
         """Sans mock : event_type vide lève InvalidAuthAuditEventError, captée par safe_."""
         result = safe_log_auth_event("")

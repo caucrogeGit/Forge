@@ -289,10 +289,19 @@ def safe_log_auth_event(*args: Any, **kwargs: Any) -> bool:
         with _audit_failure_lock:
             _audit_failure_count += 1
         event_name = args[0] if args else kwargs.get("event_type", "<unknown>")
+        # Ne jamais journaliser kwargs brut : il peut porter des secrets
+        # (metadata sensible, ou un kwargs parasite ayant fait echouer l'appel).
+        # On ne consigne que la metadata sanitisee, et seulement si c'est un dict.
+        raw_metadata = kwargs.get("metadata")
+        safe_metadata = (
+            sanitize_auth_audit_metadata(raw_metadata)
+            if isinstance(raw_metadata, dict)
+            else None
+        )
         _audit_logger.warning(
             "Audit event lost: failed to record %r (metadata=%r)",
             event_name,
-            kwargs,
+            safe_metadata,
             exc_info=True,
         )
         return False
