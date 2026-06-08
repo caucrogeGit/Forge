@@ -42,6 +42,7 @@ nav:
           - Préparer MariaDB: install/mariadb.md
           - Comptes MariaDB d'un projet: install/mariadb-comptes.md
           - Configurer VS Code (auto-import): install/vscode.md
+          - Environnement VS Code (extensions et config): install/vscode-environnement.md
           - Production: install/production.md
 
   - Premiers pas:

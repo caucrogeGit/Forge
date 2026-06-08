@@ -4,6 +4,11 @@ VS Code peut utiliser les schémas JSON Forge pour aider à remplir les fichiers
 d'entités et de relations. Cette aide est optionnelle : Forge ne dépend pas de
 VS Code pour valider un projet.
 
+!!! tip "Vue d'ensemble"
+    Le `.vscode/settings.json` versionné par le projet associe déjà ces schémas.
+    Voir [Environnement VS Code de Forge](../install/vscode-environnement.md)
+    pour la liste complète des extensions et de la configuration.
+
 ---
 
 ## Principe

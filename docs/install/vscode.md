@@ -13,6 +13,10 @@ framework Forge (paquet `core`, fourni par `forge-mvc`) dans un projet Forge nu.
 Cette aide est optionnelle : Forge ne dépend pas de VS Code. Elle améliore
 seulement le confort d'écriture des contrôleurs et des classes applicatives.
 
+!!! tip "Vue d'ensemble"
+    Pour la liste complète des extensions et de la configuration VS Code du
+    projet, voir [Environnement VS Code de Forge](vscode-environnement.md).
+
 ---
 
 ## Prérequis
