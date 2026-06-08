@@ -124,6 +124,7 @@ class TestOptInModules:
         "forge-mvc-audio",
         "forge-mvc-mail",
         "forge-mvc-pivot",
+        "forge-mvc-i18n",
     ])
     def test_module_card_present(self, module: str):
         text = LANDING.read_text(encoding="utf-8")

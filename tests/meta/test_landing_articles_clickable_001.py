@@ -61,11 +61,11 @@ class TestLandingArticlesClickable:
     def test_landing_file_exists(self):
         assert LANDING.exists()
 
-    def test_36_articles_are_wrapped_in_links(self):
+    def test_37_articles_are_wrapped_in_links(self):
         text = LANDING.read_text(encoding="utf-8")
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
-        assert len(wrapped) == 36, (
-            f"Attendu 36 cartes wrappées dans <a class=\"block group\">, "
+        assert len(wrapped) == 37, (
+            f"Attendu 37 cartes wrappées dans <a class=\"block group\">, "
             f"trouvé {len(wrapped)}."
         )
 
