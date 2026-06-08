@@ -620,8 +620,12 @@ def verify_mfa_challenge(
                     continue
                 raw_secret = decrypt_totp_secret(factor.totp_secret)
                 if verify_totp_code(raw_secret, code, now=now):
-                    if factor.id is not None:
-                        _replay.record_used(factor.id, current_step)
+                    if factor.id is not None and not _replay.check_and_record(
+                        factor.id, current_step
+                    ):
+                        # Course anti-replay perdue : code déjà consommé par
+                        # une requête concurrente sur la même step.
+                        continue
                     updated_factor = AuthMfaFactor(
                         id=factor.id,
                         user_id=factor.user_id,
@@ -872,8 +876,12 @@ def verify_mfa_revalidation(
                     continue
                 raw_secret = decrypt_totp_secret(factor.totp_secret)
                 if verify_totp_code(raw_secret, code, now=now):
-                    if factor.id is not None:
-                        _replay.record_used(factor.id, current_step)
+                    if factor.id is not None and not _replay.check_and_record(
+                        factor.id, current_step
+                    ):
+                        # Course anti-replay perdue : code déjà consommé par
+                        # une requête concurrente sur la même step.
+                        continue
                     updated_factor = AuthMfaFactor(
                         id=factor.id,
                         user_id=factor.user_id,

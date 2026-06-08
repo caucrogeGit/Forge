@@ -35,6 +35,7 @@ from forge_mvc_mfa import (
 )
 from forge_mvc_mfa.totp_replay import (
     _TOTP_PERIOD_SECONDS,
+    check_and_record,
     is_replay,
     purge_all,
     purge_old,
@@ -51,6 +52,38 @@ def reset_replay():
     purge_all()
     yield
     purge_all()
+
+
+# --- check_and_record : consommation atomique (SEC-MFA-TOTP-REPLAY-ATOMIC-001) ---
+
+
+def test_check_and_record_premiere_consommation_reussit():
+    assert check_and_record(10, _STEP_NOW) is True
+    # la step est désormais enregistrée
+    assert is_replay(10, _STEP_NOW) is True
+
+
+def test_check_and_record_deuxieme_consommation_meme_step_echoue():
+    assert check_and_record(10, _STEP_NOW) is True
+    assert check_and_record(10, _STEP_NOW) is False  # rejeu : course perdue
+
+
+def test_check_and_record_step_plus_recente_reussit_step_passee_echoue():
+    assert check_and_record(10, _STEP_NOW) is True
+    assert check_and_record(10, _STEP_NOW + 1) is True
+    assert check_and_record(10, _STEP_NOW) is False
+    assert check_and_record(10, _STEP_NOW - 5) is False
+
+
+def test_check_and_record_facteurs_independants():
+    assert check_and_record(10, _STEP_NOW) is True
+    assert check_and_record(11, _STEP_NOW) is True  # autre facteur, pas un rejeu
+
+
+def test_check_and_record_factor_id_invalide_ne_bloque_pas():
+    # non traçable : ne bloque pas, cohérent avec is_replay/record_used
+    assert check_and_record(0, _STEP_NOW) is True
+    assert check_and_record(-1, _STEP_NOW) is True
 
 
 class FakeRequest:

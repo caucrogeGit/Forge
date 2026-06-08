@@ -54,6 +54,33 @@ def record_used(factor_id: int, step: int) -> None:
             _do_purge_old(time.time())
 
 
+def check_and_record(factor_id: int, step: int) -> bool:
+    """Vérifie et enregistre la step de façon **atomique** (un seul verrou).
+
+    Retourne True si la step n'avait pas encore été consommée pour ce facteur
+    (elle est alors enregistrée), False s'il s'agit d'un rejeu. Ferme la fenêtre
+    de course entre `is_replay()` (avant la vérification du code) et
+    `record_used()` (après) : deux requêtes concurrentes portant le même code
+    valide ne peuvent plus être acceptées toutes les deux.
+
+    Un `factor_id` invalide n'est pas traçable : on renvoie True (ne bloque
+    pas), cohérent avec `is_replay()`/`record_used()`.
+    """
+    global _record_count
+    if not isinstance(factor_id, int) or isinstance(factor_id, bool) or factor_id <= 0:
+        return True
+    with _lock:
+        last = _used_steps.get(factor_id)
+        if last is not None and step <= last:
+            return False
+        _used_steps[factor_id] = step
+        _record_count += 1
+        if _record_count >= _PURGE_EVERY_N_RECORDS:
+            _record_count = 0
+            _do_purge_old(time.time())
+        return True
+
+
 def purge_old(now_seconds: float | None = None) -> int:
     """Supprime les entrées dont la step est antérieure à 24h dans le passé.
 
