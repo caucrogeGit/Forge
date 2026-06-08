@@ -16,6 +16,6 @@ from __future__ import annotations
 
 from forge_mvc_video.http import register_video_routes
 
-__version__ = "1.0.0b14"
+__version__ = "1.0.0b15"
 
 __all__ = ["register_video_routes"]

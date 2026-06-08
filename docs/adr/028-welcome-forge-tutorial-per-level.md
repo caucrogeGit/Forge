@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.14 (ticket `WELCOME-FORGE-LEVELS-ADR-028`).
+Accepté — Forge 1.0.0-beta.15 (ticket `WELCOME-FORGE-LEVELS-ADR-028`).
 
 Généralise [ADR-025](025-welcome-forge-continuous-tutorial.md) (qui ne couvrait
 que le niveau débutant) et amende sa décision D3.

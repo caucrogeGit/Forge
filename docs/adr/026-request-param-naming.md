@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.14 (ticket `HTTP-REQUEST-PARAM-RENAME-001`).
+Accepté — Forge 1.0.0-beta.15 (ticket `HTTP-REQUEST-PARAM-RENAME-001`).
 
 ---
 

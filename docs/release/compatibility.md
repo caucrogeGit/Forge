@@ -144,7 +144,7 @@ pas installées par défaut. Elles sont tirées via les extras du package
     `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`,
     `forge-mvc-pivot`, `forge-mvc-mail` depuis `1.0.0-beta.13`.
     `forge-mvc-images` reste au statut Bêta (API encore bêta). Le douzième
-    opt-in, `forge-mvc-i18n` (extrait du core en `1.0.0-beta.14`, ADR-027),
+    opt-in, `forge-mvc-i18n` (extrait du core en `1.0.0-beta.15`, ADR-027),
     attend sa première publication PyPI.
 
     Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.

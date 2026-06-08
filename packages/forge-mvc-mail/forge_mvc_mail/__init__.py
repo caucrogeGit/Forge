@@ -48,4 +48,4 @@ __all__ = [
     "TransportResult",
 ]
 
-__version__ = "1.0.0b14"
+__version__ = "1.0.0b15"

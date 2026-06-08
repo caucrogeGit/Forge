@@ -12,20 +12,23 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.14
+## État actuel — Forge 1.0.0-beta.15
 
-**Tag courant : `v1.0.0-beta.14`** — bootstrap par squelette dédié (ADR-024) :
-`forge new` matérialise un squelette de projet nu au lieu de cloner le dépôt ;
-le projet généré dépend de `forge-mvc`. `forge starter:build` est la seule façon
-officielle de construire un starter (ADR-023).
+**Version courante : `1.0.0-beta.15`** — internationalisation extraite en opt-in
+(`forge-mvc-i18n`, ADR-027, avec un repli no-op du noyau), convention de
+déclaration des routes unifiée (chemin `/<contrôleur>/<méthode>`, nom
+`<contrôleur>-<méthode>` ; ADR-029) et refonte du tutoriel `welcome-forge` en
+progression continue manuelle sur les trois niveaux (ADR-025, ADR-028). Suivis
+d'un audit de pré-publication (sécurité, générateurs, cohérence).
 
-Précédent : v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.14 — beta incrémentale embarquant le chantier squelette
-dédié (ADR-023 + ADR-024). `forge new` produit un projet réellement nu (plus de
-`core/`, `packages/`, `tests/`, `docs/` dans le projet). Le contenu fonctionnel
-de beta.13 (slugs `slug`, gel du contrat `opt-in:*` / `module:*`,
-production-readiness, dogfood MariaDB) reste en place.**
+**Statut : v1.0.0-beta.15 — beta incrémentale embarquant l'extraction i18n
+(ADR-027), la convention de route ADR-029 et la refonte `welcome-forge`
+(ADR-025/028), plus les correctifs de l'audit de pré-publication. Le chantier
+squelette dédié (ADR-023 + ADR-024) de beta.14 et le contenu fonctionnel de
+beta.13 (slugs `slug`, gel du contrat `opt-in:*` / `module:*`,
+production-readiness, dogfood MariaDB) restent en place.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)

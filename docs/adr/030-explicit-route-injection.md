@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposé — Forge 1.0.0-beta.14 (ticket `ADR-EXPLICIT-ROUTE-INJECTION-001`).
+Proposé — Forge 1.0.0-beta.15 (ticket `ADR-EXPLICIT-ROUTE-INJECTION-001`).
 
 Précise la portée de la règle de génération 4.3 de la charte v2 (« le fichier
 principal de routes applicatives `mvc/routes.py` reste sous le contrôle explicite

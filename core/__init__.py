@@ -1,2 +1,2 @@
-__version__ = "1.0.0b14"
+__version__ = "1.0.0b15"
 __framework__ = "Forge"

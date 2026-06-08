@@ -415,7 +415,7 @@ reste manuelle et délibérée.
 | `forge-mvc-iot` | ✅ Publié sur PyPI depuis `1.0.0-beta.12`, version alignée avec le core | `pip install --pre forge-mvc-iot` |
 | `forge-mvc-pivot` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-pivot` |
 | `forge-mvc-mail` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-mail` |
-| `forge-mvc-i18n` | ⏳ Pas encore publié sur PyPI (extrait du core après `1.0.0-beta.14`, ADR-027) | `pip install --pre forge-mvc-i18n` (à la publication) |
+| `forge-mvc-i18n` | ⏳ Pas encore publié sur PyPI (extrait du core en `1.0.0-beta.15`, ADR-027) | `pip install --pre forge-mvc-i18n` (à la publication) |
 
 ### Règles de version
 
@@ -470,7 +470,7 @@ Les onze opt-ins officiels sont publiés sur PyPI :
 - `forge-mvc-iot` (Alpha) : publication en `1.0.0-beta.12` ;
 - `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`,
   `forge-mvc-pivot`, `forge-mvc-mail` : publication en `1.0.0-beta.13` ;
-- `forge-mvc-i18n` (Bêta) : extrait du core après `1.0.0-beta.14` (ADR-027),
+- `forge-mvc-i18n` (Bêta) : extrait du core en `1.0.0-beta.15` (ADR-027),
   publication PyPI à venir.
 
 Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et
@@ -489,7 +489,7 @@ Avant leur publication PyPI, les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` 
 ### Opt-ins publiés et synchronisés
 
 Douze opt-ins officiels existent ; onze sont publiés sur PyPI avec une version
-synchronisée avec le core. `forge-mvc-i18n`, extrait après `1.0.0-beta.14`, attend
+synchronisée avec le core. `forge-mvc-i18n`, extrait en `1.0.0-beta.15`, attend
 sa première publication :
 
 | Package | Publication | Statut | Prérequis |
@@ -505,7 +505,7 @@ sa première publication :
 | `forge-mvc-video` | PyPI depuis `1.0.0-beta.13` | Bêta | `ffmpeg` requis ; transcodage MP4 H.264/AAC |
 | `forge-mvc-pivot` | PyPI depuis `1.0.0-beta.13` | Bêta | Associations `many_to_many` enrichies + `make:pivot-crud` |
 | `forge-mvc-mail` | PyPI depuis `1.0.0-beta.13` | Bêta | Transports interchangeables (console, SMTP, log) |
-| `forge-mvc-i18n` | Publication à venir (extrait après `1.0.0-beta.14`) | Bêta | Catalogues JSON, fallback, cache, helper `trans()` ; repli no-op du noyau |
+| `forge-mvc-i18n` | Publication à venir (extrait en `1.0.0-beta.15`) | Bêta | Catalogues JSON, fallback, cache, helper `trans()` ; repli no-op du noyau |
 
 La publication est strictement synchronisée : core et opt-ins portent la même version.
 

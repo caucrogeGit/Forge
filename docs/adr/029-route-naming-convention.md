@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.14 (ticket `ROUTE-CONVENTION-ADR-029`).
+Accepté — Forge 1.0.0-beta.15 (ticket `ROUTE-CONVENTION-ADR-029`).
 
 Remplace la convention implicite jusqu'ici portée par le générateur `make:crud`
 (`<ressource>_<action>`, chemins REST) et le ticket

@@ -6,10 +6,9 @@
 (rien pour l'instant)
 
 
-## [1.0.0-beta.14] — 2026-06-08
+## [1.0.0-beta.15] — 2026-06-08
 
-> Quatre chantiers structurants : bootstrap par squelette dédié (`forge new`
-> produit un projet nu, ADR-024), extraction de l'internationalisation en opt-in
+> Trois chantiers structurants : extraction de l'internationalisation en opt-in
 > (`forge-mvc-i18n`, ADR-027), convention de déclaration des routes unifiée
 > (ADR-029) et refonte du tutoriel `welcome-forge` en progression continue
 > manuelle sur les trois niveaux (ADR-025, ADR-028). Suivis d'un audit de
@@ -68,20 +67,6 @@
 
 ### Modifié
 
-- **`forge new` matérialise un squelette de projet dédié** au lieu de cloner le
-  dépôt Forge (ADR-024, `NEW-MATERIALIZE-001`). Le projet généré ne contient
-  plus le framework (`core/`, `forge_cli/`, `packages/`, `tests/`, `docs/`) : il
-  dépend de `forge-mvc` et récupère le `core` depuis le paquet installé. Le
-  squelette curé est embarqué dans `forge_cli/skeleton/data/` et distribué en
-  package-data (`SKELETON-TREE-001`, `SKELETON-PKGDATA-001`,
-  `SKELETON-REGISTRY-001`).
-- **`forge new` ne clone plus le dépôt** : le flag `--ref`, la constante
-  `_FORGE_REPO` et la dépendance réseau/git pour les fichiers disparaissent
-  (`NEW-MATERIALIZE-001`, `NEW-CLI-CLEANUP-001`). `git` reste requis pour le
-  `git init` du projet.
-- **`forge new` produit toujours un projet nu** : le flag `--starter` est retiré ;
-  `forge starter:build` devient la seule façon officielle de construire un
-  starter (ADR-023, `CLI-NEW-DROP-STARTER-001`).
 - **Convention de déclaration des routes** (ADR-029,
   `ROUTE-CONVENTION-ADR-029`). Une route dérive désormais mécaniquement du
   contrôleur et de la méthode visés : chemin `/<contrôleur>/<méthode>` (la
@@ -134,10 +119,6 @@
   `forge-mvc-pivot` et `forge-mvc-i18n` sont enregistrés : `opt-in:install` ne
   répond plus « inconnu » pour eux et `opt-in:list` les surface (12 opt-ins
   officiels).
-- Alignement de la documentation sur `forge starter:build` et retrait du bloc
-  « raccourci » des pages de palier (`DOC-STARTER-BUILD-ALIGN-001`).
-- Test des liens production de la landing aligné sur la réorganisation
-  `docs/deployment/` (`LANDING-WSGI-LINK-TEST-FIX-001`).
 
 ### Retiré
 
@@ -150,25 +131,62 @@
 
 ### Documentation
 
-- ADR-023, ADR-024, ADR-025, ADR-027, ADR-028 et ADR-029 ajoutés ; ADR-030
-  (injection de routes par commande explicite et portée de la règle 4.3) au
-  statut **proposé** ; index ADR et navigation MkDocs à jour. Documentation
-  d'installation et de référence nettoyée des mentions `forge new --ref`. Resync
-  de `CLAUDE.md` (12 paquets, retrait de la mention `forge-mvc-media` supprimé,
-  table ADR étendue à 030). Section « Nouveautés » de la landing rafraîchie vers
-  beta.14.
+- ADR-025, ADR-027, ADR-028 et ADR-029 ajoutés ; ADR-030 (injection de routes
+  par commande explicite et portée de la règle 4.3) au statut **proposé** ;
+  index ADR et navigation MkDocs à jour. Resync de `CLAUDE.md` (12 paquets,
+  retrait de la mention `forge-mvc-media` supprimé, table ADR étendue à 030).
+  Section « Nouveautés » de la landing rafraîchie vers beta.15.
 
 ### Tests
 
-- Garde-fous squelette : `test_skeleton_tree_001`, `test_skeleton_pkgdata_001`,
-  `test_skeleton_registry_001`, `test_new_core_dep_001`, `test_skeleton_guard_001`
-  (squelette nu, distribution wheel/sdist, matérialisation, neutralité, projet
-  généré sans `core/`).
 - Garde-fous de l'audit de pré-publication : accesseurs `Request` du contrôleur
   `make:public-form`, détection AST du marqueur de routes, catalogue d'opt-ins
   (12, sans `media`), code généré par `make:pivot-crud`, anti-fixation de session,
   sanitisation du fallback d'audit, consommation atomique de l'anti-replay TOTP,
   et `csrf_token` runtime.
+
+
+## [1.0.0-beta.14] — 2026-06-07
+
+> Bootstrap par squelette dédié : `forge new` produit enfin un projet
+> réellement nu (ADR-024).
+
+### Modifié
+
+- **`forge new` matérialise un squelette de projet dédié** au lieu de cloner le
+  dépôt Forge (ADR-024, `NEW-MATERIALIZE-001`). Le projet généré ne contient
+  plus le framework (`core/`, `forge_cli/`, `packages/`, `tests/`, `docs/`) : il
+  dépend de `forge-mvc` et récupère le `core` depuis le paquet installé. Le
+  squelette curé est embarqué dans `forge_cli/skeleton/data/` et distribué en
+  package-data (`SKELETON-TREE-001`, `SKELETON-PKGDATA-001`,
+  `SKELETON-REGISTRY-001`).
+- **`forge new` ne clone plus le dépôt** : le flag `--ref`, la constante
+  `_FORGE_REPO` et la dépendance réseau/git pour les fichiers disparaissent
+  (`NEW-MATERIALIZE-001`, `NEW-CLI-CLEANUP-001`). `git` reste requis pour le
+  `git init` du projet.
+- **`forge new` produit toujours un projet nu** : le flag `--starter` est retiré ;
+  `forge starter:build` devient la seule façon officielle de construire un
+  starter (ADR-023, `CLI-NEW-DROP-STARTER-001`).
+
+### Corrigé
+
+- Alignement de la documentation sur `forge starter:build` et retrait du bloc
+  « raccourci » des pages de palier (`DOC-STARTER-BUILD-ALIGN-001`).
+- Test des liens production de la landing aligné sur la réorganisation
+  `docs/deployment/` (`LANDING-WSGI-LINK-TEST-FIX-001`).
+
+### Documentation
+
+- ADR-023 (`forge starter:build` canonique) et ADR-024 (bootstrap par squelette
+  dédié) ajoutés ; index ADR et navigation MkDocs mis à jour. Documentation
+  d'installation et de référence nettoyée des mentions `forge new --ref`.
+
+### Tests
+
+- Garde-fous ajoutés : `test_skeleton_tree_001`, `test_skeleton_pkgdata_001`,
+  `test_skeleton_registry_001`, `test_new_core_dep_001`, `test_skeleton_guard_001`
+  (squelette nu, distribution wheel/sdist, matérialisation, neutralité, projet
+  généré sans `core/`).
 
 
 ## [1.0.0-beta.13] — 2026-06-06

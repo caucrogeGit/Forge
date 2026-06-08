@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.14 (ticket `STARTER-WELCOME-FORGE-TUTORIAL-ADR-025`).
+Accepté — Forge 1.0.0-beta.15 (ticket `STARTER-WELCOME-FORGE-TUTORIAL-ADR-025`).
 
 ---
 

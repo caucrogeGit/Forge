@@ -7,8 +7,8 @@ relabelisé la section en « Nouveautés 1.0.0-beta.13 » et simplifié les
 panneaux : suppression des liens profonds IoT/audits, de « Mosquitto » et
 de la preuve « 0 échec ».
 
-Mise à jour beta.14 : la section est relabelisée « Nouveautés 1.0.0-beta.14 »
-(id `beta14`) et présente les nouveautés récentes : **Forge i18n** (12e opt-in),
+Mise à jour beta.15 : la section est relabelisée « Nouveautés 1.0.0-beta.15 »
+(id `beta15`) et présente les nouveautés récentes : **Forge i18n** (12e opt-in),
 **welcome-forge refondu** (tutoriels continus), **Convention de route** (ADR-029)
 et **Squelette dédié** (ADR-024). Les anciennes cartes média (IoT, Video, Images,
 Files, Audio) sont retirées de la vitrine.
@@ -63,8 +63,8 @@ class TestHighlightsPresent:
         )
 
     def test_section_nouveautes_presente(self):
-        assert 'id="beta14"' in _src(), (
-            "Une section dédiée aux nouveautés (id='beta14') est attendue."
+        assert 'id="beta15"' in _src(), (
+            "Une section dédiée aux nouveautés (id='beta15') est attendue."
         )
 
     def test_core_reste_autonome(self):
@@ -92,7 +92,7 @@ class TestSync:
 
     def test_docs_index_reflete_section(self):
         docs = DOCS_LANDING.read_text(encoding="utf-8")
-        assert 'id="beta14"' in docs
+        assert 'id="beta15"' in docs
         assert "Forge i18n" in docs
         assert "Convention de route" in docs
 
