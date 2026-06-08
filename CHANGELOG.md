@@ -7,6 +7,19 @@
 > manuel : un seul projet qui grandit, au lieu de starters indépendants par
 > palier (ADR-025).
 
+### Sécurité
+
+- **Borne haute de longueur de mot de passe** (`SEC-AUTH-PASSWORD-MAXLEN-001`).
+  L'authentification imposait un minimum (8 caractères au reset) sans maximum :
+  un mot de passe de plusieurs Mo envoyé à Argon2 (`hash_password` à
+  l'inscription/reset, `verify_password` au login non authentifié) ouvrait un
+  vecteur de déni de service, Argon2 pré-hachant l'entrée entière avant la
+  partie mémoire-dure. Un plafond `_MAX_PASSWORD_LENGTH = 128` (OWASP ASVS exige
+  d'autoriser au moins 64 caractères) est désormais appliqué dans
+  `core.auth.password._validate_password` (rejet **avant** tout calcul Argon2,
+  côté hash et verify) et dans `validate_new_password` (message d'erreur propre
+  au reset). Aucun mot de passe légitime n'est affecté.
+
 ### Ajouté
 
 - **`forge-mvc-i18n` : l'internationalisation devient un opt-in** (ADR-027,

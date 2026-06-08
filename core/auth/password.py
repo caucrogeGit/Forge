@@ -14,10 +14,21 @@ _PASSWORD_HASHER = PasswordHasher(
     parallelism=1,
 )
 
+# Borne haute de longueur de mot de passe (SEC-AUTH-PASSWORD-MAXLEN-001).
+# Argon2 pre-hache l'entree entiere (cout lineaire en longueur) avant la partie
+# memoire-dure : sans plafond, un mot de passe de plusieurs Mo envoye a hash() ou
+# verify() (login non authentifie) ouvre un vecteur de deni de service. 128 est
+# largement au-dessus de tout mot de passe legitime (OWASP ASVS exige >= 64).
+_MAX_PASSWORD_LENGTH = 128
+
 
 def _validate_password(password: str) -> None:
     if not isinstance(password, str) or not password:
         raise AuthError("password doit etre une chaine non vide")
+    if len(password) > _MAX_PASSWORD_LENGTH:
+        raise AuthError(
+            f"password ne doit pas depasser {_MAX_PASSWORD_LENGTH} caracteres"
+        )
 
 
 def _validate_password_hash(password_hash: str) -> None:

@@ -165,6 +165,8 @@ def validate_new_password(password: str) -> None:
 
     Leve InvalidNewPasswordError si le mot de passe est invalide.
     """
+    from core.auth.password import _MAX_PASSWORD_LENGTH
+
     if not isinstance(password, str):
         raise InvalidNewPasswordError("le nouveau mot de passe doit etre une chaine")
     if not password:
@@ -172,6 +174,10 @@ def validate_new_password(password: str) -> None:
     if len(password) < _MIN_PASSWORD_LENGTH:
         raise InvalidNewPasswordError(
             f"le nouveau mot de passe doit contenir au moins {_MIN_PASSWORD_LENGTH} caracteres"
+        )
+    if len(password) > _MAX_PASSWORD_LENGTH:
+        raise InvalidNewPasswordError(
+            f"le nouveau mot de passe ne doit pas depasser {_MAX_PASSWORD_LENGTH} caracteres"
         )
 
 
