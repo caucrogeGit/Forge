@@ -88,6 +88,12 @@ nav:
       - Sécurité et sessions:
           - Audit Auth: reference/audit-auth.md
           - Sessions: reference/sessions.md
+      - Objets HTTP:
+          - L'objet Request: reference/http/request.md
+          - L'objet Response: reference/http/response.md
+          - Le cookie HTTP: reference/http/cookie.md
+          - La session HTTP: reference/http/session.md
+          - La protection CSRF: reference/http/csrf.md
       - Outils:
           - Profils de projet: reference/profils.md
           - Tests E2E: reference/tests-e2e.md
