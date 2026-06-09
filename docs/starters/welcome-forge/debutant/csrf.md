@@ -1,15 +1,14 @@
 # Le jeton CSRF
 
-**Objectif** : comprendre le jeton CSRF avant d'écrire un vrai formulaire qui
-modifie des données.
+**Objectif**{ .intro-label } : comprendre le jeton CSRF avant d'écrire un vrai formulaire qui modifie des données.
 
-**Ce que vous allez apprendre :** après les paliers de lecture (texte, vue HTML,
-route dynamique, réponse JSON), vous abordez la **sécurité des formulaires**. Le
-jeton CSRF vit dans la **session** : sans session active, il reste vide et tout
-envoi protégé serait refusé. Vous allez donc garantir une session pour obtenir un
-jeton non vide, puis le placer dans un champ caché.
+**Ce que vous allez apprendre :**{ .intro-label } après les paliers de lecture (texte, vue HTML, route dynamique, réponse JSON), vous abordez la **sécurité des formulaires**.
 
-??? note "Documentation utile"
+Le jeton CSRF vit dans la **session** : sans session active, il reste vide et tout envoi protégé serait refusé.
+
+Vous allez donc garantir une session pour obtenir un jeton non vide, puis le placer dans un champ caché.
+
+??? note "Documentations"
     Pour bien comprendre ce palier :
 
     | Document | Ce qu'il apporte |
@@ -20,7 +19,7 @@ jeton non vide, puis le placer dans un champ caché.
     | [L'objet Request](../../../reference/http/request.md) | d'où le serveur lit le jeton envoyé |
     | [L'objet Response](../../../reference/http/response.md) | où l'on pose le cookie de session |
 
-??? note "L'ajout"
+??? note "Contrôleurs"
     Complétez d'abord les imports en tête de `mvc/controllers/welcome_controller.py` :
 
     ```python
@@ -38,8 +37,7 @@ jeton non vide, puis le placer dans un champ caché.
     | | `get_session(session_id)` | Renvoie les données de la session (dont le `csrf_token`), ou `None` si elle est absente ou expirée. |
     | `core.sessions.manager` | `get_session_store()` | Renvoie le magasin de sessions actif. `.create()` y crée une session neuve (avec un `csrf_token`) et renvoie son identifiant. |
 
-    Ajoutez une méthode privée `_start_session` et la méthode `csrf` à la classe
-    `WelcomeController` :
+    Ajoutez une méthode privée `_start_session` et la méthode `csrf` à la classe `WelcomeController` :
 
     ```python
         @staticmethod
@@ -67,6 +65,29 @@ jeton non vide, puis le placer dans un champ caché.
             return response
     ```
 
+??? note "Routes"
+    Ajoutez la route `/welcome/csrf` dans le groupe public de `mvc/routes.py` :
+
+    ```python
+    # mvc/routes.py
+    from core.http.router import Router
+    from mvc.controllers.home_controller import HomeController
+    from mvc.controllers.welcome_controller import WelcomeController
+
+    router = Router()
+
+    with router.group("", public=True) as public:
+        public.add("GET", "/", HomeController.index, name="home-index")
+        public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+        public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+        public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+        public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+        public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+        public.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+        public.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
+    ```
+
+??? note "Vues"
     Créez le gabarit `mvc/views/welcome/csrf.html` :
 
     ```html
@@ -90,62 +111,9 @@ jeton non vide, puis le placer dans un champ caché.
     </html>
     ```
 
-    Ce formulaire n'a volontairement ni `method` ni `action` : il sert seulement à
-    montrer où se place le champ caché, désormais **rempli**. Puis ajoutez la route
-    dans le groupe public de `mvc/routes.py`.
+    Ce formulaire n'a volontairement ni `method` ni `action` : il sert seulement à montrer où se place le champ caché, désormais **rempli**.
 
-??? note "Votre mvc/routes.py à ce stade"
-    ```python
-    # mvc/routes.py
-    from core.http.router import Router
-    from mvc.controllers.home_controller import HomeController
-    from mvc.controllers.welcome_controller import WelcomeController
-
-    router = Router()
-
-    with router.group("", public=True) as public:
-        public.add("GET", "/", HomeController.index, name="home-index")
-        public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
-        public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
-        public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
-        public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
-        public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
-        public.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
-        public.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
-    ```
-
-??? note "Comprendre ce code"
-    - `_start_session` lit la session du cookie ; s'il n'y en a pas, il en **crée**
-      une avec `get_session_store().create()`. Une session neuve contient déjà un
-      `csrf_token` généré aléatoirement.
-    - On passe ce jeton au gabarit **explicitement** : `render(request=…)` ne peut
-      pas le déduire seul ici, car la session vient d'être créée et son cookie n'est
-      pas encore dans la requête.
-    - `set_session_cookie(response, session_id)` pose le cookie `session_id`
-      (durci : `HttpOnly`, `SameSite=Strict`, `Secure`) : aux requêtes suivantes, la
-      session sera retrouvée et le jeton vérifié côté serveur.
-    - Le groupe public a la protection CSRF active : un POST sans jeton valide est
-      refusé (`403`). Ce palier prépare donc les formulaires des paliers suivants.
-
-    ??? tip "Optionnel : simplifier avec une classe façade"
-        Ces trois imports reviennent dès qu'on manipule la session. Si vous voulez
-        simplifier, **vous** pouvez les regrouper dans une **classe façade** de votre
-        application, sous `mvc/helpers/`, et n'écrire qu'un seul import :
-
-        ```python
-        from mvc.helpers import Session
-
-        session_id = Session.current_id(request)     # au lieu de get_session_id(request)
-        ...
-        Session.set_cookie(response, session_id)     # au lieu de set_session_cookie(...)
-        ```
-
-        Forge ne l'ajoute pas au framework : le noyau reste minimal et explicite,
-        l'ergonomie est à votre main. Un parcours dédié vous montre comment construire
-        ces façades pas à pas (`Session`, `Cookies`, `Flash`) :
-        [Construire vos façades helper](../../welcome-helpers/installation.md).
-
-??? note "Tester dans le navigateur"
+??? note "Tests"
     | URL | Résultat |
     |---|---|
     | `https://localhost:8000/welcome/csrf` | la page, le champ caché `csrf_token` désormais **rempli** (inspecter la source) |
@@ -155,6 +123,21 @@ jeton non vide, puis le placer dans un champ caché.
     - On garantit une session (`get_session_store().create()`) et on pose son cookie
       avec `set_session_cookie`, sinon le POST serait refusé.
     - Le jeton se transmet dans un champ caché `name="csrf_token"` du formulaire.
+
+??? tip "Astuces"
+    Ces trois imports reviennent dès qu'on manipule la session.
+    Si vous voulez simplifier, **vous** pouvez les regrouper dans une **classe façade** de votre application, sous `mvc/helpers/`, et n'écrire qu'un seul import :
+
+    ```python
+    from mvc.helpers import Session
+
+    session_id = Session.current_id(request)     # au lieu de get_session_id(request)
+    ...
+    Session.set_cookie(response, session_id)     # au lieu de set_session_cookie(...)
+    ```
+
+    Forge ne l'ajoute pas au framework : le noyau reste minimal et explicite, l'ergonomie est à votre main.
+    Un parcours dédié vous montre comment construire ces façades pas à pas (`Session`, `Cookies`, `Flash`) : [Construire vos façades helper](../../welcome-helpers/installation.md).
 
 Au palier suivant, nous traitons un vrai formulaire POST protégé par ce jeton.
 
