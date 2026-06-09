@@ -9,8 +9,8 @@ POST, et lire un champ avec `request.form("name", default=...)`, le POST
 
 ## Là où nous en sommes
 
-`WelcomeController` porte déjà les méthodes des paliers 1 à 7, dont le helper
-`_start_session` introduit au palier CSRF, et `mvc/routes.py` déclare les routes
+`WelcomeController` porte déjà les méthodes des paliers 1 à 7, dont la méthode
+privée `_start_session` introduite au palier CSRF, et `mvc/routes.py` déclare les routes
 jusqu'à `/welcome/csrf`. Nous ajoutons deux méthodes (afficher le formulaire, traiter
 l'envoi), deux routes et un gabarit.
 
