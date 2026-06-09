@@ -46,3 +46,10 @@
   border-radius: 0.2rem;
   padding: 0.05em 0.35em;
 }
+
+/* DOCS-INTRO-LABEL-001 — Libellés d'intro des paliers (« Objectif »,
+   « Ce que vous allez apprendre ») en orange.
+   À appliquer via attr_list : **Objectif**{ .intro-label } */
+.md-typeset .intro-label {
+  color: #c2410c;
+}
