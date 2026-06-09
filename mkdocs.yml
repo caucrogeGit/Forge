@@ -145,6 +145,14 @@ nav:
               - API JSON protégée: starters/welcome-forge/avance/json-api.md
               - Bilan avancé: starters/welcome-forge/avance/bilan.md
           - Aide-mémoire: starters/welcome-forge/recapitulatif.md
+      - Progression façades helper (welcome-helpers):
+          - Préambule: starters/welcome-helpers/installation.md
+          - La base Facade: starters/welcome-helpers/facade-base.md
+          - La façade Session: starters/welcome-helpers/session.md
+          - La façade Cookies: starters/welcome-helpers/cookies.md
+          - La façade Flash: starters/welcome-helpers/flash.md
+          - Imports et usage: starters/welcome-helpers/imports-usage.md
+          - Bilan: starters/welcome-helpers/bilan.md
       - Progression IoT (welcome-iot):
           - Installation: starters/welcome-iot/installation.md
           - Débutant:
