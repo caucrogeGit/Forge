@@ -1,9 +1,5 @@
 # Bonjour Forge
 
-Premier palier d'un tutoriel continu : vous allez construire à la main un
-seul projet qui grandit palier après palier. On démarre par la réponse la
-plus simple possible.
-
 !!! info "Le mini-projet du niveau débutant"
     Chaque niveau de welcome-forge est un **mini-projet autonome** que vous
     écrivez à la main, palier après palier. Au niveau débutant, vous partez de
@@ -52,9 +48,9 @@ from mvc.controllers.welcome_controller import WelcomeController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home-index")
-    pub.add("GET", "/welcome", WelcomeController.index, name="welcome-index")
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home-index")
+    public.add("GET", "/welcome", WelcomeController.index, name="welcome-index")
 ```
 
 ## Comprendre ce code
@@ -62,7 +58,7 @@ with router.group("", public=True) as pub:
 - Un contrôleur est une classe qui hérite de `BaseController` ; chaque
   action reçoit un `request: Request` et retourne un `Response`.
 - `Response.text(...)` construit une réponse `text/plain`, sans template.
-- Le groupe `with router.group("", public=True) as pub:` regroupe les
+- Le groupe `with router.group("", public=True) as public:` regroupe les
   routes publiques ; la protection CSRF y est active par défaut, ce qui
   protégera nos futurs formulaires POST.
 

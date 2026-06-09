@@ -77,21 +77,20 @@ from mvc.controllers.message_controller import MessageController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home-index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
-    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
-    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
-    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
-    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
-    pub.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
-    pub.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
-    pub.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
-    pub.add("GET",  "/welcome/form", WelcomeController.form, name="welcome-form")
-    pub.add("POST", "/welcome/form-submit", WelcomeController.form_submit, name="welcome-form_submit")
-    pub.add("GET",  "/welcome/validate", WelcomeController.validate, name="welcome-validate")
-    pub.add("POST", "/welcome/validate-submit", WelcomeController.validate_submit, name="welcome-validate_submit")
-    pub.add("GET",  "/message", MessageController.index, name="message-index")
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home-index")
+    public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+    public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+    public.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+    public.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
+    public.add("GET",  "/welcome/form", WelcomeController.form, name="welcome-form")
+    public.add("POST", "/welcome/form-submit", WelcomeController.form_submit, name="welcome-form_submit")
+    public.add("GET",  "/welcome/validate", WelcomeController.validate, name="welcome-validate")
+    public.add("POST", "/welcome/validate-submit", WelcomeController.validate_submit, name="welcome-validate_submit")
+    public.add("GET",  "/message", MessageController.index, name="message-index")
 ```
 
 ## Comprendre ce code

@@ -9,27 +9,22 @@ quand le paramètre est absent.
 ## Là où nous en sommes
 
 Votre `WelcomeController` possède déjà la méthode `index` (palier 1), et
-`mvc/routes.py` déclare la route `/welcome`. Nous y ajoutons deux méthodes
-et deux routes.
+`mvc/routes.py` déclare la route `/welcome`. Nous y ajoutons une méthode
+et une route.
 
 ## L'ajout
 
-Ajoutez ces deux méthodes à la classe `WelcomeController` :
+Ajoutez cette méthode à la classe `WelcomeController` :
 
 ```python
-    @staticmethod
-    def query_params(request: Request) -> Response:
-        return Response.text(
-            "Ajoutez ?name=Roger à l'URL, puis ouvrez /welcome/hello?name=Roger"
-        )
-
+    # Ajoutez ?name=Roger à l'URL, puis ouvrez /welcome/hello?name=Roger
     @staticmethod
     def hello(request: Request) -> Response:
         name = request.query("name", default="Forge")
         return Response.text(f"Bonjour {name}")
 ```
 
-Puis ajoutez les deux routes dans le groupe public de `mvc/routes.py`.
+Puis ajoutez la route dans le groupe public de `mvc/routes.py`.
 
 ## Votre mvc/routes.py à ce stade
 
@@ -41,11 +36,10 @@ from mvc.controllers.welcome_controller import WelcomeController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home-index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
-    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
-    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home-index")
+    public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
 ```
 
 ## Comprendre ce code
@@ -61,7 +55,6 @@ with router.group("", public=True) as pub:
 
 | URL | Résultat |
 |---|---|
-| `https://localhost:8000/welcome/query-params` | message d'aide |
 | `https://localhost:8000/welcome/hello` | `Bonjour Forge` |
 | `https://localhost:8000/welcome/hello?name=Roger` | `Bonjour Roger` |
 | `https://localhost:8000/welcome/hello?name=Alice` | `Bonjour Alice` |

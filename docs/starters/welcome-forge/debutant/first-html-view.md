@@ -8,9 +8,9 @@ renvoie la page HTML.
 
 ## Là où nous en sommes
 
-`WelcomeController` porte déjà `index`, `query_params` et `hello`
-(paliers 1 et 2), et `mvc/routes.py` déclare `/welcome` et les deux routes
-`/welcome/query-params`. Nous ajoutons une méthode, une route et un gabarit.
+`WelcomeController` porte déjà `index` et `hello` (paliers 1 et 2), et
+`mvc/routes.py` déclare `/welcome` et la route `/welcome/hello`. Nous
+ajoutons une méthode, une route et un gabarit.
 
 ## L'ajout
 
@@ -19,10 +19,10 @@ Ajoutez cette méthode à la classe `WelcomeController` :
 ```python
     @staticmethod
     def html(request: Request) -> Response:
-        return BaseController.render("welcome/first_html_view.html", request=request)
+        return BaseController.render("welcome/first.html", request=request)
 ```
 
-Créez le gabarit `mvc/views/welcome/first_html_view.html` :
+Créez le gabarit `mvc/views/welcome/first.html` :
 
 ```html
 <!DOCTYPE html>
@@ -54,17 +54,16 @@ from mvc.controllers.welcome_controller import WelcomeController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home-index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
-    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
-    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
-    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home-index")
+    public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
 ```
 
 ## Comprendre ce code
 
-- `BaseController.render("welcome/first_html_view.html", request=request)`
+- `BaseController.render("welcome/first.html", request=request)`
   cherche le gabarit sous `mvc/views/` et le rend en HTML.
 - Le chemin du gabarit est relatif à `mvc/views/` : ici le fichier vit dans
   `mvc/views/welcome/`.

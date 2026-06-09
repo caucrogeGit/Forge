@@ -8,9 +8,8 @@ dynamique `{id}` et lire ce segment avec `request.route("id", default=...)`.
 
 ## Là où nous en sommes
 
-`WelcomeController` porte déjà `index`, `query_params`, `hello` et
-`html` (paliers 1 à 3). Nous ajoutons une méthode et une route avec un
-segment variable.
+`WelcomeController` porte déjà `index`, `hello` et `html` (paliers 1 à 3).
+Nous ajoutons une méthode et une route avec un segment variable.
 
 ## L'ajout
 
@@ -36,13 +35,12 @@ from mvc.controllers.welcome_controller import WelcomeController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home-index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
-    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
-    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
-    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
-    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home-index")
+    public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
 ```
 
 ## Comprendre ce code

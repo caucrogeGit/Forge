@@ -96,16 +96,15 @@ from mvc.controllers.welcome_controller import WelcomeController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home-index")
-    pub.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
-    pub.add("GET",  "/welcome/query-params", WelcomeController.query_params, name="welcome-query_params")
-    pub.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
-    pub.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
-    pub.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
-    pub.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
-    pub.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
-    pub.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home-index")
+    public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+    public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+    public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+    public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+    public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+    public.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+    public.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
 ```
 
 ## Comprendre ce code

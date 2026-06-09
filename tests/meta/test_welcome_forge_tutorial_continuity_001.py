@@ -115,7 +115,7 @@ class TestContinuiteCumulative:
     def test_bloc_groupe_cumulatif(self, slug):
         assert 'router.group("", public=True)' in _read(slug), (
             f"{slug}.md doit montrer le groupe public cumulatif "
-            '`with router.group("", public=True) as pub:`.'
+            '`with router.group("", public=True) as public:`.'
         )
 
 
