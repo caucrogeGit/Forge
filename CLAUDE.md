@@ -438,3 +438,9 @@ Attendu :
 - donner le code retour si disponible ;
 - en cas d’échec, afficher l’erreur complète ;
 - si une commande est trop longue pour l’outil, demander à l’utilisateur de la lancer et de coller le résultat.
+
+### Gestion des phrases
+- Phrases : rédiger **une phrase par ligne** dans la source Markdown. Après le
+  point final d'une phrase, la phrase suivante commence sur une nouvelle ligne.
+  Cela n'affecte pas le rendu (Markdown regroupe les lignes d'un même
+  paragraphe) mais facilite la relecture et les diffs.
