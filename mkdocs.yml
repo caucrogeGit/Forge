@@ -334,6 +334,7 @@ nav:
       - Guide de migration: features/migration-guide.md
       - Politique LTS: release/lts-policy.md
       - Contrat de stabilité: release/stability-contract.md
+      - Numéros de version brûlés: release/burned-version-numbers.md
 
   - Philosophie:
       - Charte v2: philosophy/charter.md

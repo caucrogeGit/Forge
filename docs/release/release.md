@@ -143,6 +143,11 @@ grep -rn "x\.y\.z\|vx\.y\.z" pyproject.toml forge.py core/__init__.py README.md 
 
 Adapter `x.y.z` et `vx.y.z` à la version cible (ex. `2\.0\.2` et `v2\.0\.2`).
 
+> **Numéros brûlés** : avant de figer la version cible, vérifier qu'elle
+> n'est pas dans la liste des [numéros de version brûlés](burned-version-numbers.md).
+> Les versions `1.0.1` et `1.1.0` ont été supprimées de PyPI et ne pourront
+> jamais être republiées : ne pas les bumper ni les taguer.
+
 ---
 
 ## CHANGELOG
