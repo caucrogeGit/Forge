@@ -65,8 +65,15 @@ def _is_pipx_install() -> bool:
 
 
 def _build_pip_command(pre: bool) -> list[str]:
-    """Construit la commande pip à exécuter (liste pour subprocess)."""
-    cmd = [sys.executable, "-m", "pip", "install", "--upgrade"]
+    """Construit la commande pip à exécuter (liste pour subprocess).
+
+    ``--disable-pip-version-check`` supprime la notice pip
+    « A new release of pip is available » : elle concerne pip lui-même,
+    pas Forge, et s'affiche juste avant « Version installée après »,
+    ce qui prête à confusion dans la sortie de ``forge update``.
+    """
+    cmd = [sys.executable, "-m", "pip", "install", "--upgrade",
+           "--disable-pip-version-check"]
     if pre:
         cmd.append("--pre")
     cmd.append(PACKAGE)
