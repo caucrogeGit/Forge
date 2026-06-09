@@ -15,11 +15,12 @@ déclare les routes jusqu'à `/welcome/json`. Nous abordons la sécurité des
 formulaires : pour cela, il faut une **session** (on approfondira la session au
 niveau intermédiaire ; ici on s'en sert juste pour porter le jeton CSRF).
 
-!!! warning "Pourquoi le jeton était vide"
-    Le jeton CSRF est généré et stocké **dans la session**, à sa création. Tant
-    qu'aucune session n'existe (aucun cookie `session_id`), `csrf_token(request)`
-    retourne `""`. Il faut donc **créer une session** et **poser son cookie** sur
-    la réponse pour que le champ caché soit rempli et que le POST passe.
+!!! warning "Pourquoi le CSRF fonctionne en duo avec la session"
+    Le jeton CSRF est généré et stocké **dans la session**, dès sa création :
+    CSRF et session fonctionnent en duo. Tant qu'aucune session n'existe (aucun
+    cookie `session_id`), `csrf_token(request)` retourne `""`. Il faut donc
+    **créer une session** et **poser son cookie** sur la réponse pour que le
+    champ caché soit rempli et que le POST passe.
 
 ## L'ajout
 
