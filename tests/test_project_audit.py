@@ -183,10 +183,19 @@ def test_audit_entities_sans_base_py(tmp_path):
 
 
 def test_audit_entities_relations_invalide(tmp_path):
-    (tmp_path / "mvc" / "entities").mkdir(parents=True)
+    _add_entity(tmp_path, "contact")
     _write(tmp_path / "mvc" / "entities" / "relations.json", "not json")
     results = audit_project_entities(tmp_path)
     assert any(r.status == "fail" and "relations.json" in r.detail for r in results)
+
+
+def test_audit_entities_nu_sans_relations(tmp_path):
+    """Projet nu (ADR-024) : mvc/entities/ existe, aucune entité, pas de
+    relations.json. Aucun FAIL attendu, relations.json naît avec make:entity."""
+    (tmp_path / "mvc" / "entities").mkdir(parents=True)
+    results = audit_project_entities(tmp_path)
+    assert not any(r.status == "fail" for r in results)
+    assert any(r.status == "info" and "aucune" in r.detail for r in results)
 
 
 # ── audit_project_routes ──────────────────────────────────────────────────────

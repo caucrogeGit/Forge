@@ -113,6 +113,18 @@ def audit_project_entities(root: Path) -> list[AuditResult]:
         results.append(AuditResult("fail", family, "mvc/entities/ absent"))
         return results
 
+    entity_dirs = sorted(
+        p for p in entities_root.iterdir()
+        if p.is_dir() and not p.name.startswith("__")
+    )
+
+    # relations.json naît avec make:entity / make:relation : un projet nu
+    # (squelette ADR-024, aucune entité) n'a pas à l'avoir. On ne l'audite
+    # que lorsqu'il existe au moins une entité.
+    if not entity_dirs:
+        results.append(AuditResult("info", family, "aucune entité déclarée"))
+        return results
+
     relations = entities_root / "relations.json"
     if not relations.exists():
         results.append(AuditResult("fail", family, "relations.json absent"))
@@ -122,15 +134,6 @@ def audit_project_entities(root: Path) -> list[AuditResult]:
             results.append(AuditResult("ok", family, "relations.json valide"))
         except Exception as exc:  # noqa: BLE001
             results.append(AuditResult("fail", family, f"relations.json invalide : {exc}"))
-
-    entity_dirs = sorted(
-        p for p in entities_root.iterdir()
-        if p.is_dir() and not p.name.startswith("__")
-    )
-
-    if not entity_dirs:
-        results.append(AuditResult("info", family, "aucune entité déclarée"))
-        return results
 
     results.append(AuditResult("ok", family, f"{len(entity_dirs)} entité(s) déclarée(s)"))
 

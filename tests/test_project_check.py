@@ -125,8 +125,20 @@ def test_check_project_entities_pas_de_dossier(tmp_path):
     assert "mvc/entities/" in r.detail
 
 
-def test_check_project_entities_pas_de_relations(tmp_path):
+def test_check_project_entities_nu_sans_relations(tmp_path):
+    """Projet nu (ADR-024) : mvc/entities/ existe, aucune entité, pas de
+    relations.json. Ce n'est pas une erreur, relations.json naît avec
+    make:entity / make:relation."""
     (tmp_path / "mvc" / "entities").mkdir(parents=True)
+    r = check_project_entities(tmp_path)
+    assert r.status == "ok"
+    assert "aucune" in r.detail
+
+
+def test_check_project_entities_pas_de_relations_avec_entite(tmp_path):
+    """En présence d'une entité, relations.json devient obligatoire."""
+    d = tmp_path / "mvc" / "entities"
+    (d / "contact").mkdir(parents=True)
     r = check_project_entities(tmp_path)
     assert r.status == "fail"
     assert "relations.json" in r.detail
@@ -134,7 +146,7 @@ def test_check_project_entities_pas_de_relations(tmp_path):
 
 def test_check_project_entities_relations_invalide(tmp_path):
     d = tmp_path / "mvc" / "entities"
-    d.mkdir(parents=True)
+    (d / "contact").mkdir(parents=True)
     _write(d / "relations.json", "not json")
     r = check_project_entities(tmp_path)
     assert r.status == "fail"

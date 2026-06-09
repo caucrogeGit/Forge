@@ -113,12 +113,17 @@ def check_env(root: Path) -> CheckResult:
 
 
 def check_mvc_structure(root: Path) -> CheckResult:
-    """Vérifie la structure MVC minimale attendue par Forge."""
+    """Vérifie la structure MVC minimale attendue par Forge.
+
+    ``mvc/entities/relations.json`` n'est PAS exigé ici : le squelette
+    nu produit par ``forge new`` (ADR-024) ne le crée pas, il naît avec
+    ``make:entity`` / ``make:relation``. Sa présence et sa validité sont
+    couvertes par ``check_model_entities`` dès qu'il existe des entités.
+    """
     required = [
         (root / "mvc",                                 "mvc/"),
         (root / "mvc" / "routes.py",                  "mvc/routes.py"),
         (root / "mvc" / "entities",                    "mvc/entities/"),
-        (root / "mvc" / "entities" / "relations.json", "mvc/entities/relations.json"),
         (root / "mvc" / "views",                       "mvc/views/"),
         (root / "mvc" / "controllers",                 "mvc/controllers/"),
     ]

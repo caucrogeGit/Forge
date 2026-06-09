@@ -196,6 +196,22 @@ def test_check_mvc_structure_ok(tmp_path):
     assert r.status == "ok"
 
 
+def test_check_mvc_structure_ok_sans_relations_json(tmp_path):
+    """Le squelette nu (ADR-024) n'a pas relations.json : ne doit pas FAIL.
+
+    relations.json naît avec make:entity / make:relation ; son absence à la
+    création du projet ne doit pas être signalée comme une erreur de structure.
+    """
+    mvc = tmp_path / "mvc"
+    (mvc / "entities").mkdir(parents=True)
+    (mvc / "views").mkdir()
+    (mvc / "controllers").mkdir()
+    (mvc / "routes.py").write_text("", encoding="utf-8")
+    assert not (mvc / "entities" / "relations.json").exists()
+    r = check_mvc_structure(tmp_path)
+    assert r.status == "ok"
+
+
 def test_check_mvc_structure_sans_views_et_controllers(tmp_path):
     """mvc/views/ et mvc/controllers/ sont requis."""
     mvc = tmp_path / "mvc"

@@ -58,6 +58,16 @@ def check_project_entities(root: Path) -> CheckResult:
     if not entities_root.exists():
         return CheckResult("fail", "Entités", "mvc/entities/ absent")
 
+    entity_dirs = sorted(
+        p for p in entities_root.iterdir()
+        if p.is_dir() and not p.name.startswith("__")
+    )
+    # relations.json naît avec make:entity / make:relation : un projet nu
+    # (squelette ADR-024, aucune entité) n'a pas à l'avoir. On ne l'exige
+    # que lorsqu'il existe au moins une entité.
+    if not entity_dirs:
+        return CheckResult("ok", "Entités", "aucune entité déclarée")
+
     relations_file = entities_root / "relations.json"
     if not relations_file.exists():
         return CheckResult("fail", "Entités",
@@ -68,13 +78,6 @@ def check_project_entities(root: Path) -> CheckResult:
     except Exception as exc:  # noqa: BLE001
         return CheckResult("fail", "Entités",
                            f"relations.json invalide : {exc} — corrige la syntaxe JSON")
-
-    entity_dirs = sorted(
-        p for p in entities_root.iterdir()
-        if p.is_dir() and not p.name.startswith("__")
-    )
-    if not entity_dirs:
-        return CheckResult("ok", "Entités", "aucune entité déclarée")
 
     for entity_dir in entity_dirs:
         json_file = entity_dir / f"{entity_dir.name}.json"
