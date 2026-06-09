@@ -116,9 +116,9 @@ from mvc.controllers.note_controller import NoteController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home-index")
-    pub.add("GET", "/note", NoteController.index, name="note-index")
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home-index")
+    public.add("GET", "/note", NoteController.index, name="note-index")
 ```
 
 ## Comprendre ce code

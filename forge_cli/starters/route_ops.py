@@ -99,7 +99,7 @@ def replace_home_route(routes_py: Path, home_route: str) -> None:
         return
     content = routes_py.read_text(encoding="utf-8")
 
-    old_handler = 'pub.add("GET", "/", HomeController.index, name="home-index")'
+    old_handler = 'public.add("GET", "/", HomeController.index, name="home-index")'
     if old_handler not in content:
         return
 
@@ -108,7 +108,7 @@ def replace_home_route(routes_py: Path, home_route: str) -> None:
         content = bc_import + "\n" + content
 
     new_handler = (
-        f'pub.add("GET", "/", '
+        f'public.add("GET", "/", '
         f'lambda req: BaseController.redirect("{home_route}"), '
         f'name="home-index")'
     )
@@ -127,10 +127,10 @@ def remove_legacy_auth_block(routes_py: Path) -> None:
         return
     content = routes_py.read_text(encoding="utf-8")
     legacy = (
-        '\nwith router.group("", public=True) as pub:\n'
-        '    pub.add("GET",  "/login",  AuthController.login_form, name="login_form")\n'
-        '    pub.add("POST", "/login",  AuthController.login,      name="login")\n'
-        '    pub.add("POST", "/logout", AuthController.logout,     name="logout")\n'
+        '\nwith router.group("", public=True) as public:\n'
+        '    public.add("GET",  "/login",  AuthController.login_form, name="login_form")\n'
+        '    public.add("POST", "/login",  AuthController.login,      name="login")\n'
+        '    public.add("POST", "/logout", AuthController.logout,     name="logout")\n'
     )
     if legacy not in content:
         return

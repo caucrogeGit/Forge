@@ -1,6 +1,6 @@
 # forge-starter:audio-probe:start
 from mvc.controllers.audio_probe_controller import AudioProbeController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/audio-probe", AudioProbeController.index, name="audio_probe_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/audio-probe", AudioProbeController.index, name="audio_probe_index")
 # forge-starter:audio-probe:end

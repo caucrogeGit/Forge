@@ -47,14 +47,14 @@ from mvc.controllers.article_controller import ArticleController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home-index")
-    pub.add("GET",  "/article", ArticleController.index, name="article-index")
-    pub.add("GET",  "/article/create", ArticleController.create, name="article-create")
-    pub.add("POST", "/article/store", ArticleController.store, name="article-store")
-    pub.add("GET",  "/article/attach/{id}", ArticleController.attach, name="article-attach")
-    pub.add("POST", "/article/attach-store/{id}", ArticleController.attach_store, name="article-attach_store")
-    pub.add("GET",  "/article/api-index", ArticleController.api_index, name="article-api_index")
+with router.group("", public=True) as public:
+    public.add("GET",  "/", HomeController.index, name="home-index")
+    public.add("GET",  "/article", ArticleController.index, name="article-index")
+    public.add("GET",  "/article/create", ArticleController.create, name="article-create")
+    public.add("POST", "/article/store", ArticleController.store, name="article-store")
+    public.add("GET",  "/article/attach/{id}", ArticleController.attach, name="article-attach")
+    public.add("POST", "/article/attach-store/{id}", ArticleController.attach_store, name="article-attach_store")
+    public.add("GET",  "/article/api-index", ArticleController.api_index, name="article-api_index")
 ```
 
 ## Comprendre ce code

@@ -1,7 +1,7 @@
 # forge-starter:iot-simulate:start
 from mvc.controllers.iot_simulate_controller import IotSimulateController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/iot-simulate", IotSimulateController.index, name="iot_simulate_index")
-    pub.add("POST", "/iot-simulate", IotSimulateController.simulate, name="iot_simulate_store")
+with router.group("", public=True) as public:
+    public.add("GET", "/iot-simulate", IotSimulateController.index, name="iot_simulate_index")
+    public.add("POST", "/iot-simulate", IotSimulateController.simulate, name="iot_simulate_store")
 # forge-starter:iot-simulate:end

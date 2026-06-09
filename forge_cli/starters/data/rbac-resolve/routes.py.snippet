@@ -1,6 +1,6 @@
 # forge-starter:rbac-resolve:start
 from mvc.controllers.rbac_resolve_controller import RbacResolveController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/rbac-resolve", RbacResolveController.index, name="rbac_resolve_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-resolve", RbacResolveController.index, name="rbac_resolve_index")
 # forge-starter:rbac-resolve:end

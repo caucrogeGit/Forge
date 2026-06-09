@@ -99,9 +99,9 @@ def test_chemin_absent(rel):
 
 def test_routes_neutres():
     content = (SKELETON / "mvc" / "routes.py").read_text(encoding="utf-8")
-    assert 'pub.add("GET", "/", HomeController.index' in content
+    assert 'public.add("GET", "/", HomeController.index' in content
     # Aucune autre route pré-câblée.
-    assert content.count("pub.add(") == 1, "Le squelette ne câble que la route /."
+    assert content.count("public.add(") == 1, "Le squelette ne câble que la route /."
 
 
 def test_home_controller_rend_home_neutre():

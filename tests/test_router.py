@@ -12,10 +12,10 @@ def router():
     r.add("GET",  "/",             _ha, name="home")
     r.add("GET",  "/clients/{id}", _hb, name="client_show")
     r.add("POST", "/clients",      _hb, name="client_create")
-    with r.group("", public=True) as pub:
-        pub.add("GET",  "/login",  _ha, name="login")
-        pub.add("POST", "/login",  _ha)
-        pub.add("GET",  "/logout", _ha, name="logout")
+    with r.group("", public=True) as public:
+        public.add("GET",  "/login",  _ha, name="login")
+        public.add("POST", "/login",  _ha)
+        public.add("GET",  "/logout", _ha, name="logout")
     return r
 
 

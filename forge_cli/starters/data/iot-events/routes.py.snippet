@@ -1,6 +1,6 @@
 # forge-starter:iot-events:start
 from mvc.controllers.iot_events_controller import IotEventsController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/iot-events", IotEventsController.index, name="iot_events_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/iot-events", IotEventsController.index, name="iot_events_index")
 # forge-starter:iot-events:end

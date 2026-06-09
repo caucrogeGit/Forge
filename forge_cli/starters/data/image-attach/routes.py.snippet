@@ -1,7 +1,7 @@
 # forge-starter:image-attach:start
 from mvc.controllers.image_attach_controller import ImageAttachController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/image-attach", ImageAttachController.index, name="image_attach_index")
-    pub.add("POST", "/image-attach", ImageAttachController.attach, name="image_attach_store")
+with router.group("", public=True) as public:
+    public.add("GET", "/image-attach", ImageAttachController.index, name="image_attach_index")
+    public.add("POST", "/image-attach", ImageAttachController.attach, name="image_attach_store")
 # forge-starter:image-attach:end

@@ -1,6 +1,6 @@
 # forge-starter:stats-admin-sql:start
 from mvc.controllers.stats_admin_sql_controller import StatsAdminSqlController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/stats-admin-sql", StatsAdminSqlController.index, name="stats_admin_sql_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-admin-sql", StatsAdminSqlController.index, name="stats_admin_sql_index")
 # forge-starter:stats-admin-sql:end

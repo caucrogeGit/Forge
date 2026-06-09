@@ -1,7 +1,7 @@
 # forge-starter:mfa-revalidation:start
 from mvc.controllers.mfa_revalidation_controller import MfaRevalidationController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/mfa-revalidation", MfaRevalidationController.index, name="mfa_revalidation_index")
-    pub.add("POST", "/mfa-revalidation", MfaRevalidationController.revalidate, name="mfa_revalidation_mark")
+with router.group("", public=True) as public:
+    public.add("GET", "/mfa-revalidation", MfaRevalidationController.index, name="mfa_revalidation_index")
+    public.add("POST", "/mfa-revalidation", MfaRevalidationController.revalidate, name="mfa_revalidation_mark")
 # forge-starter:mfa-revalidation:end

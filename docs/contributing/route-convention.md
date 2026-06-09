@@ -32,14 +32,14 @@ Une route vise toujours une **méthode d'un contrôleur**. On en tire deux jeton
 ## Exemples
 
 ```python
-with router.group("", public=True) as pub:
+with router.group("", public=True) as public:
     # index : chemin = nom du contrôleur seul
-    pub.add("GET",  "/welcome",               WelcomeController.index,        name="welcome-index")
+    public.add("GET",  "/welcome",               WelcomeController.index,        name="welcome-index")
     # autre méthode : contrôleur / méthode
-    pub.add("GET",  "/welcome/query-params",  WelcomeController.query_params, name="welcome-query_params")
+    public.add("GET",  "/welcome/query-params",  WelcomeController.query_params, name="welcome-query_params")
     # méthode avec paramètre de route
-    pub.add("GET",  "/note/edit/{id}",        NoteController.edit,            name="note-edit")
-    pub.add("POST", "/note/delete/{id}",      NoteController.delete,          name="note-delete")
+    public.add("GET",  "/note/edit/{id}",        NoteController.edit,            name="note-edit")
+    public.add("POST", "/note/delete/{id}",      NoteController.delete,          name="note-delete")
 ```
 
 | Contrôleur.méthode | Chemin | `name=` |
@@ -65,7 +65,7 @@ donc mappé sur `/` (et non `/home`), nommé `home-index`. C'est la **seule**
 exception.
 
 ```python
-pub.add("GET", "/", HomeController.index, name="home-index")
+public.add("GET", "/", HomeController.index, name="home-index")
 ```
 
 ## Portée

@@ -1,6 +1,6 @@
 # forge-starter:iot-dashboard:start
 from mvc.controllers.iot_dashboard_controller import IotDashboardController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/iot-dashboard", IotDashboardController.index, name="iot_dashboard_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/iot-dashboard", IotDashboardController.index, name="iot_dashboard_index")
 # forge-starter:iot-dashboard:end

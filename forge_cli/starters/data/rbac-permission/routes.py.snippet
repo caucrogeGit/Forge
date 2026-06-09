@@ -1,6 +1,6 @@
 # forge-starter:rbac-permission:start
 from mvc.controllers.rbac_permission_controller import RbacPermissionController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/rbac-permission", RbacPermissionController.index, name="rbac_permission_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-permission", RbacPermissionController.index, name="rbac_permission_index")
 # forge-starter:rbac-permission:end

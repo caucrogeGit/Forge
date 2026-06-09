@@ -1,6 +1,6 @@
 # forge-starter:rbac-template:start
 from mvc.controllers.rbac_template_controller import RbacTemplateController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/rbac-template", RbacTemplateController.index, name="rbac_template_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-template", RbacTemplateController.index, name="rbac_template_index")
 # forge-starter:rbac-template:end

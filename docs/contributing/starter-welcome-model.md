@@ -300,8 +300,8 @@ Toujours encadré par les marqueurs `# forge-starter:<id>:start|:end` :
 # forge-starter:<id>:start
 from mvc.controllers.<x>_controller import <X>Controller
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/<route>", <X>Controller.index, name="<x>_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/<route>", <X>Controller.index, name="<x>_index")
 # forge-starter:<id>:end
 ```
 

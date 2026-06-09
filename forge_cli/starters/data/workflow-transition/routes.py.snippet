@@ -1,6 +1,6 @@
 # forge-starter:workflow-transition:start
 from mvc.controllers.workflow_transition_controller import WorkflowTransitionController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/workflow-transition", WorkflowTransitionController.index, name="workflow_transition_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-transition", WorkflowTransitionController.index, name="workflow_transition_index")
 # forge-starter:workflow-transition:end

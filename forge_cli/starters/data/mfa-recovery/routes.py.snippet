@@ -1,7 +1,7 @@
 # forge-starter:mfa-recovery:start
 from mvc.controllers.mfa_recovery_controller import MfaRecoveryController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/mfa-recovery", MfaRecoveryController.index, name="mfa_recovery_index")
-    pub.add("POST", "/mfa-recovery", MfaRecoveryController.consume, name="mfa_recovery_consume")
+with router.group("", public=True) as public:
+    public.add("GET", "/mfa-recovery", MfaRecoveryController.index, name="mfa_recovery_index")
+    public.add("POST", "/mfa-recovery", MfaRecoveryController.consume, name="mfa_recovery_consume")
 # forge-starter:mfa-recovery:end

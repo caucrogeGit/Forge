@@ -1,7 +1,7 @@
 # forge-starter:image-cover:start
 from mvc.controllers.image_cover_controller import ImageCoverController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/image-cover", ImageCoverController.index, name="image_cover_index")
-    pub.add("POST", "/image-cover", ImageCoverController.set_cover, name="image_cover_set")
+with router.group("", public=True) as public:
+    public.add("GET", "/image-cover", ImageCoverController.index, name="image_cover_index")
+    public.add("POST", "/image-cover", ImageCoverController.set_cover, name="image_cover_set")
 # forge-starter:image-cover:end

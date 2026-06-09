@@ -1,7 +1,7 @@
 # forge-starter:file-serve:start
 from mvc.controllers.file_serve_controller import FileServeController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/file-serve", FileServeController.index, name="file_serve_index")
-    pub.add("GET", "/file-serve/download", FileServeController.download, name="file_serve_download")
+with router.group("", public=True) as public:
+    public.add("GET", "/file-serve", FileServeController.index, name="file_serve_index")
+    public.add("GET", "/file-serve/download", FileServeController.download, name="file_serve_download")
 # forge-starter:file-serve:end

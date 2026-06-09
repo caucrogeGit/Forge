@@ -88,13 +88,13 @@ class TestApplyBranchesRecognizedRoutes:
     def test_existing_routes_preserved(self, tmp_path):
         original = _RECOGNIZED_ROUTES + (
             "\n"
-            'with router.group("", public=True) as pub:\n'
-            '    pub.add("GET", "/", Home.index, name="home")\n'
+            'with router.group("", public=True) as public:\n'
+            '    public.add("GET", "/", Home.index, name="home")\n'
         )
         routes = _write_routes(tmp_path, original)
         enable_optin("iot", apply=True, project_root=tmp_path, package_check=_PKG_OK)
         content = routes.read_text(encoding="utf-8")
-        assert 'pub.add("GET", "/", Home.index, name="home")' in content
+        assert 'public.add("GET", "/", Home.index, name="home")' in content
         assert _CALL in content
 
 

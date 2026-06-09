@@ -1,6 +1,6 @@
 # forge-starter:stats-track:start
 from mvc.controllers.stats_track_controller import StatsTrackController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/stats-track", StatsTrackController.index, name="stats_track_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-track", StatsTrackController.index, name="stats_track_index")
 # forge-starter:stats-track:end

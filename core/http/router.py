@@ -107,9 +107,9 @@ class Router:
         router.add("GET", "/",                  HomeController.index, name="home-index")
         router.add("GET", "/client/show/{id}",  ClientController.show, name="client-show")
 
-        with router.group("", public=True) as pub:
-            pub.add("GET",  "/login/form", LoginController.form, name="login-form")
-            pub.add("POST", "/login/login", LoginController.login, name="login-login")
+        with router.group("", public=True) as public:
+            public.add("GET",  "/login/form", LoginController.form, name="login-form")
+            public.add("POST", "/login/login", LoginController.login, name="login-login")
 
         # Dans l'application :
         result = router.resolve("GET", "/client/show/42")

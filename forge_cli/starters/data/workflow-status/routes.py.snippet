@@ -1,6 +1,6 @@
 # forge-starter:workflow-status:start
 from mvc.controllers.workflow_status_controller import WorkflowStatusController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/workflow-status", WorkflowStatusController.index, name="workflow_status_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-status", WorkflowStatusController.index, name="workflow_status_index")
 # forge-starter:workflow-status:end

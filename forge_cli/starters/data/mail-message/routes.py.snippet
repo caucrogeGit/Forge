@@ -1,6 +1,6 @@
 # forge-starter:mail-message:start
 from mvc.controllers.mail_message_controller import MailMessageController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/mail-message", MailMessageController.index, name="mail_message_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/mail-message", MailMessageController.index, name="mail_message_index")
 # forge-starter:mail-message:end

@@ -148,8 +148,8 @@ from mvc.controllers.home_controller import HomeController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/", HomeController.index, name="home")
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home")
 ```
 
 Auth, MFA et le starter `welcome` ne sont plus pré-câblés : ils s'ajoutent par

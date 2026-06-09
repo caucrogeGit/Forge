@@ -1,6 +1,6 @@
 # forge-starter:workflow-find:start
 from mvc.controllers.workflow_find_controller import WorkflowFindController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/workflow-find", WorkflowFindController.index, name="workflow_find_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-find", WorkflowFindController.index, name="workflow_find_index")
 # forge-starter:workflow-find:end

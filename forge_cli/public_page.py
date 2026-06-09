@@ -237,8 +237,8 @@ def _route_exists(content: str, spec: PublicPageSpec) -> bool:
 def build_route_block(spec: PublicPageSpec) -> str:
     return (
         "\n"
-        "with router.group(\"\", public=True) as pub:\n"
-        f'    pub.add("GET", "/{spec.slug}", PublicPagesController.{spec.method_name}, '
+        "with router.group(\"\", public=True) as public:\n"
+        f'    public.add("GET", "/{spec.slug}", PublicPagesController.{spec.method_name}, '
         f'name="{spec.route_name}")\n'
     )
 

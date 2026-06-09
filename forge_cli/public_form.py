@@ -323,9 +323,9 @@ def _form_route_exists(content: str, spec: PublicFormSpec) -> bool:
 def build_form_route_block(spec: PublicFormSpec) -> str:
     return (
         "\n"
-        "with router.group(\"\", public=True) as pub:\n"
-        f'    pub.add("GET", "{spec.route_path}/new", {spec.class_name}.new, name="{spec.route_new_name}")\n'
-        f'    pub.add("POST", "{spec.route_path}", {spec.class_name}.create, name="{spec.route_create_name}")\n'
+        "with router.group(\"\", public=True) as public:\n"
+        f'    public.add("GET", "{spec.route_path}/new", {spec.class_name}.new, name="{spec.route_new_name}")\n'
+        f'    public.add("POST", "{spec.route_path}", {spec.class_name}.create, name="{spec.route_create_name}")\n'
     )
 
 

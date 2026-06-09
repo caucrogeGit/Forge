@@ -1,7 +1,7 @@
 # forge-starter:mail-welcome:start
 from mvc.controllers.mail_welcome_controller import MailWelcomeController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/mail-welcome", MailWelcomeController.index, name="mail_welcome_index")
-    pub.add("POST", "/mail-welcome", MailWelcomeController.send, name="mail_welcome_send")
+with router.group("", public=True) as public:
+    public.add("GET", "/mail-welcome", MailWelcomeController.index, name="mail_welcome_index")
+    public.add("POST", "/mail-welcome", MailWelcomeController.send, name="mail_welcome_send")
 # forge-starter:mail-welcome:end

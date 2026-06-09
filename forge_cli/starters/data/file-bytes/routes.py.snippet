@@ -1,7 +1,7 @@
 # forge-starter:file-bytes:start
 from mvc.controllers.file_bytes_controller import FileBytesController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/file-bytes", FileBytesController.index, name="file_bytes_index")
-    pub.add("POST", "/file-bytes", FileBytesController.generate, name="file_bytes_generate")
+with router.group("", public=True) as public:
+    public.add("GET", "/file-bytes", FileBytesController.index, name="file_bytes_index")
+    public.add("POST", "/file-bytes", FileBytesController.generate, name="file_bytes_generate")
 # forge-starter:file-bytes:end

@@ -59,8 +59,8 @@ Le modèle généré expose un lookup `get_<entité>_by_<slug>()`. La route rest
 
 ```python
 # mvc/routes.py
-with router.group("", public=True) as pub:
-    pub.add("GET", "/articles/{slug}", ArticleController.show_public, name="article_public")
+with router.group("", public=True) as public:
+    public.add("GET", "/articles/{slug}", ArticleController.show_public, name="article_public")
 ```
 
 ```python

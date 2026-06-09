@@ -1,6 +1,6 @@
 # forge-starter:mail-doctor:start
 from mvc.controllers.mail_doctor_controller import MailDoctorController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/mail-doctor", MailDoctorController.index, name="mail_doctor_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/mail-doctor", MailDoctorController.index, name="mail_doctor_index")
 # forge-starter:mail-doctor:end

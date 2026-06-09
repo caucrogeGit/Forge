@@ -115,19 +115,19 @@ def test_starter_auth_retire_les_routes_auth_publiques_legacy(tmp_path):
         "from mvc.controllers.auth_controller import AuthController\n"
         "from mvc.controllers.home_controller import HomeController\n\n"
         "router = Router()\n\n"
-        'with router.group("", public=True) as pub:\n'
-        '    pub.add("GET", "/", HomeController.index, name="home-index")\n\n'
-        'with router.group("", public=True) as pub:\n'
-        '    pub.add("GET",  "/login",  AuthController.login_form, name="login_form")\n'
-        '    pub.add("POST", "/login",  AuthController.login,      name="login")\n'
-        '    pub.add("POST", "/logout", AuthController.logout,     name="logout")\n',
+        'with router.group("", public=True) as public:\n'
+        '    public.add("GET", "/", HomeController.index, name="home-index")\n\n'
+        'with router.group("", public=True) as public:\n'
+        '    public.add("GET",  "/login",  AuthController.login_form, name="login_form")\n'
+        '    public.add("POST", "/login",  AuthController.login,      name="login")\n'
+        '    public.add("POST", "/logout", AuthController.logout,     name="logout")\n',
         encoding="utf-8",
     )
 
     _remove_legacy_auth_routes(routes_py)
     output = routes_py.read_text(encoding="utf-8")
     assert "AuthController" not in output
-    assert 'pub.add("GET", "/", HomeController.index, name="home-index")' in output
+    assert 'public.add("GET", "/", HomeController.index, name="home-index")' in output
     assert '"/login"' not in output
     assert '"/logout"' not in output
 
@@ -154,8 +154,8 @@ _SKELETON_ROUTES = (
     "from mvc.controllers.auth_controller import AuthController\n"
     "from mvc.controllers.home_controller import HomeController\n\n"
     "router = Router()\n\n"
-    'with router.group("", public=True) as pub:\n'
-    '    pub.add("GET", "/", HomeController.index, name="home-index")\n'
+    'with router.group("", public=True) as public:\n'
+    '    public.add("GET", "/", HomeController.index, name="home-index")\n'
 )
 
 

@@ -122,7 +122,7 @@ def test_make_public_list_ajoute_route_publique_idempotente(tmp_path):
 
     routes = _read(tmp_path, "mvc/routes.py")
     assert "from mvc.controllers.public_hebergements_controller import PublicHebergementsController" in routes
-    assert 'pub.add("GET", "/hebergements", PublicHebergementsController.index, name="public_hebergements-index")' in routes
+    assert 'public.add("GET", "/hebergements", PublicHebergementsController.index, name="public_hebergements-index")' in routes
     assert routes.count('"/hebergements"') == 1
     assert routes.count('name="public_hebergements-index"') == 1
 

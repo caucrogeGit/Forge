@@ -1,7 +1,7 @@
 # forge-starter:video-upload:start
 from mvc.controllers.video_upload_controller import VideoUploadController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/video-upload", VideoUploadController.index, name="video_upload_index")
-    pub.add("POST", "/video-upload", VideoUploadController.upload, name="video_upload_store")
+with router.group("", public=True) as public:
+    public.add("GET", "/video-upload", VideoUploadController.index, name="video_upload_index")
+    public.add("POST", "/video-upload", VideoUploadController.upload, name="video_upload_store")
 # forge-starter:video-upload:end

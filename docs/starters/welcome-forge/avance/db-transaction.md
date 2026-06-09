@@ -124,11 +124,11 @@ from mvc.controllers.article_controller import ArticleController
 
 router = Router()
 
-with router.group("", public=True) as pub:
-    pub.add("GET",  "/", HomeController.index, name="home-index")
-    pub.add("GET",  "/article", ArticleController.index, name="article-index")
-    pub.add("GET",  "/article/create", ArticleController.create, name="article-create")
-    pub.add("POST", "/article/store", ArticleController.store, name="article-store")
+with router.group("", public=True) as public:
+    public.add("GET",  "/", HomeController.index, name="home-index")
+    public.add("GET",  "/article", ArticleController.index, name="article-index")
+    public.add("GET",  "/article/create", ArticleController.create, name="article-create")
+    public.add("POST", "/article/store", ArticleController.store, name="article-store")
 ```
 
 ## Comprendre ce code

@@ -1,6 +1,6 @@
 # forge-starter:video-status:start
 from mvc.controllers.video_status_controller import VideoStatusController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/video-status", VideoStatusController.index, name="video_status_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/video-status", VideoStatusController.index, name="video_status_index")
 # forge-starter:video-status:end

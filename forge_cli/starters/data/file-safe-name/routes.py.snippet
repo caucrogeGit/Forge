@@ -1,7 +1,7 @@
 # forge-starter:file-safe-name:start
 from mvc.controllers.file_safe_name_controller import FileSafeNameController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/file-safe-name", FileSafeNameController.index, name="file_safe_name_index")
-    pub.add("GET", "/file-safe-name/inspect", FileSafeNameController.inspect, name="file_safe_name_inspect")
+with router.group("", public=True) as public:
+    public.add("GET", "/file-safe-name", FileSafeNameController.index, name="file_safe_name_index")
+    public.add("GET", "/file-safe-name/inspect", FileSafeNameController.inspect, name="file_safe_name_inspect")
 # forge-starter:file-safe-name:end

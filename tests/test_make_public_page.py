@@ -26,8 +26,8 @@ def _prepare_project(root: Path) -> None:
         "\n"
         "router = Router()\n"
         "\n"
-        "with router.group(\"\", public=True) as pub:\n"
-        "    pub.add(\"GET\", \"/\", HomeController.index, name=\"home\")\n",
+        "with router.group(\"\", public=True) as public:\n"
+        "    public.add(\"GET\", \"/\", HomeController.index, name=\"home\")\n",
         encoding="utf-8",
     )
 
@@ -55,7 +55,7 @@ def test_make_public_page_ajoute_route_publique(tmp_path):
 
     routes = _read(tmp_path, "mvc/routes.py")
     assert "from mvc.controllers.public_pages_controller import PublicPagesController" in routes
-    assert 'pub.add("GET", "/accueil", PublicPagesController.accueil, name="public_pages-accueil")' in routes
+    assert 'public.add("GET", "/accueil", PublicPagesController.accueil, name="public_pages-accueil")' in routes
     assert 'router.group("", public=True)' in routes
 
 

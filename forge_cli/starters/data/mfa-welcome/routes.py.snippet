@@ -1,7 +1,7 @@
 # forge-starter:mfa-welcome:start
 from mvc.controllers.mfa_welcome_controller import MfaWelcomeController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/mfa-welcome", MfaWelcomeController.index, name="mfa_welcome_index")
-    pub.add("GET", "/mfa-welcome/inspect", MfaWelcomeController.inspect, name="mfa_welcome_inspect")
+with router.group("", public=True) as public:
+    public.add("GET", "/mfa-welcome", MfaWelcomeController.index, name="mfa_welcome_index")
+    public.add("GET", "/mfa-welcome/inspect", MfaWelcomeController.inspect, name="mfa_welcome_inspect")
 # forge-starter:mfa-welcome:end

@@ -1,7 +1,7 @@
 # forge-starter:workflow-welcome:start
 from mvc.controllers.workflow_welcome_controller import WorkflowWelcomeController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/workflow-welcome", WorkflowWelcomeController.index, name="workflow_welcome_index")
-    pub.add("GET", "/workflow-welcome/inspect", WorkflowWelcomeController.inspect, name="workflow_welcome_inspect")
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-welcome", WorkflowWelcomeController.index, name="workflow_welcome_index")
+    public.add("GET", "/workflow-welcome/inspect", WorkflowWelcomeController.inspect, name="workflow_welcome_inspect")
 # forge-starter:workflow-welcome:end

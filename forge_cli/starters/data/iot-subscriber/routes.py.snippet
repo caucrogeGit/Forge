@@ -1,6 +1,6 @@
 # forge-starter:iot-subscriber:start
 from mvc.controllers.iot_subscriber_controller import IotSubscriberController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/iot-subscriber", IotSubscriberController.index, name="iot_subscriber_index")
+with router.group("", public=True) as public:
+    public.add("GET", "/iot-subscriber", IotSubscriberController.index, name="iot_subscriber_index")
 # forge-starter:iot-subscriber:end

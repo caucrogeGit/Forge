@@ -521,8 +521,8 @@ def _route_exists(content: str, spec: PublicListSpec) -> bool:
 def build_route_block(spec: PublicListSpec) -> str:
     return (
         "\n"
-        "with router.group(\"\", public=True) as pub:\n"
-        f'    pub.add("GET", "{spec.route_path}", {spec.class_name}.index, '
+        "with router.group(\"\", public=True) as public:\n"
+        f'    public.add("GET", "{spec.route_path}", {spec.class_name}.index, '
         f'name="{spec.route_name}")\n'
     )
 
@@ -530,8 +530,8 @@ def build_route_block(spec: PublicListSpec) -> str:
 def build_show_route_block(spec: PublicListSpec) -> str:
     return (
         "\n"
-        "with router.group(\"\", public=True) as pub:\n"
-        f'    pub.add("GET", "{spec.show_route_path}", {spec.class_name}.show, '
+        "with router.group(\"\", public=True) as public:\n"
+        f'    public.add("GET", "{spec.show_route_path}", {spec.class_name}.show, '
         f'name="{spec.show_route_name}")\n'
     )
 

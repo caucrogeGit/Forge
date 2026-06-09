@@ -1,7 +1,7 @@
 # forge-starter:mfa-replay:start
 from mvc.controllers.mfa_replay_controller import MfaReplayController
 
-with router.group("", public=True) as pub:
-    pub.add("GET", "/mfa-replay", MfaReplayController.index, name="mfa_replay_index")
-    pub.add("POST", "/mfa-replay", MfaReplayController.use, name="mfa_replay_use")
+with router.group("", public=True) as public:
+    public.add("GET", "/mfa-replay", MfaReplayController.index, name="mfa_replay_index")
+    public.add("POST", "/mfa-replay", MfaReplayController.use, name="mfa_replay_use")
 # forge-starter:mfa-replay:end
