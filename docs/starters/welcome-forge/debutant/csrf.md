@@ -147,52 +147,23 @@ with router.group("", public=True) as public:
 - Le groupe public a la protection CSRF active : un POST sans jeton valide est
   refusé (`403`). Ce palier prépare donc les formulaires des paliers suivants.
 
-???+ tip "Optionnel : regrouper ces imports dans un helper applicatif"
+???+ tip "Optionnel : simplifier avec une classe façade"
     Ces trois imports reviennent dès qu'on manipule la session. Si vous voulez
-    simplifier, **vous** pouvez les regrouper dans un helper de votre application,
-    sous `mvc/helpers/`. Forge ne l'ajoute pas au framework : le noyau reste
-    minimal et explicite, l'ergonomie est à votre main.
-
-    Créez `mvc/helpers/session.py` :
+    simplifier, **vous** pouvez les regrouper dans une **classe façade** de votre
+    application, sous `mvc/helpers/`, et n'écrire qu'un seul import :
 
     ```python
-    # mvc/helpers/session.py
-    """Façade de confort pour la session non-auth (helper applicatif)."""
-    from core.security.cookies import set_session_cookie as _set_cookie
-    from core.security.session import get_session_id as _get_id
-    from core.sessions.manager import get_session_store as _store
+    from mvc.helpers import Session
 
-
-    def new() -> str:
-        return _store().create()
-
-    def current_id(request) -> str | None:
-        return _get_id(request)
-
-    def get(session_id: str) -> dict | None:
-        return _store().get(session_id)
-
-    def set_cookie(response, session_id, *, max_age=None) -> None:
-        _set_cookie(response, session_id, max_age=max_age)
+    session_id = Session.current_id(request)     # au lieu de get_session_id(request)
+    ...
+    Session.set_cookie(response, session_id)     # au lieu de set_session_cookie(...)
     ```
 
-    Le helper `_start_session` du contrôleur devient alors, avec un seul import :
-
-    ```python
-    from mvc.helpers import session
-
-        @staticmethod
-        def _start_session(request: Request):
-            session_id = session.current_id(request)
-            data = session.get(session_id) if session_id else None
-            if data is None:
-                session_id = session.new()
-                data = session.get(session_id)
-            return session_id, data["csrf_token"]
-    ```
-
-    C'est **votre** code : libre à vous de l'étendre (écriture en session, autres
-    helpers…) sans rien attendre du framework.
+    Forge ne l'ajoute pas au framework : le noyau reste minimal et explicite,
+    l'ergonomie est à votre main. Un parcours dédié vous montre comment construire
+    ces façades pas à pas (`Session`, `Cookies`, `Flash`) :
+    [Construire vos façades helper](../../welcome-helpers/installation.md).
 
 ## Tester dans le navigateur
 
