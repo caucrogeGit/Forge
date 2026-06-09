@@ -32,6 +32,31 @@ from core.security.session import get_session, get_session_id
 from core.sessions.manager import get_session_store
 ```
 
+Ces quatre fonctions viennent de trois modules du noyau. Les voici regroupées
+par module, comme on documenterait les méthodes d'une classe :
+
+`core.security.cookies` : poser le cookie de session sur la réponse.
+
+- `set_session_cookie(response, session_id)` : écrit l'en-tête `Set-Cookie` de la
+  session sur la réponse, durci par défaut (`__Host-`, `Secure`, `HttpOnly`,
+  `SameSite=Strict`). C'est ce qui permet au navigateur de renvoyer la session à
+  la requête suivante.
+
+`core.security.session` : lire la session côté requête.
+
+- `get_session_id(request) -> str | None` : extrait et valide l'identifiant de
+  session depuis le cookie de la requête ; renvoie `None` si le cookie est absent
+  ou mal formé.
+- `get_session(session_id) -> dict | None` : renvoie les données de la session
+  (dont le `csrf_token`), ou `None` si elle n'existe pas ou a expiré.
+
+`core.sessions.manager` : accéder au magasin de sessions.
+
+- `get_session_store()` : renvoie le magasin de sessions actif (mémoire par
+  défaut, fichier ou MariaDB selon la configuration). On appelle ensuite
+  `.create()` dessus pour créer une session neuve et obtenir son identifiant ;
+  une session neuve contient déjà un `csrf_token`.
+
 Ajoutez un petit helper et la méthode `csrf` à la classe `WelcomeController` :
 
 ```python
@@ -121,6 +146,53 @@ with router.group("", public=True) as public:
   session sera retrouvée et le jeton vérifié côté serveur.
 - Le groupe public a la protection CSRF active : un POST sans jeton valide est
   refusé (`403`). Ce palier prépare donc les formulaires des paliers suivants.
+
+???+ tip "Optionnel : regrouper ces imports dans un helper applicatif"
+    Ces trois imports reviennent dès qu'on manipule la session. Si vous voulez
+    simplifier, **vous** pouvez les regrouper dans un helper de votre application,
+    sous `mvc/helpers/`. Forge ne l'ajoute pas au framework : le noyau reste
+    minimal et explicite, l'ergonomie est à votre main.
+
+    Créez `mvc/helpers/session.py` :
+
+    ```python
+    # mvc/helpers/session.py
+    """Façade de confort pour la session non-auth (helper applicatif)."""
+    from core.security.cookies import set_session_cookie as _set_cookie
+    from core.security.session import get_session_id as _get_id
+    from core.sessions.manager import get_session_store as _store
+
+
+    def new() -> str:
+        return _store().create()
+
+    def current_id(request) -> str | None:
+        return _get_id(request)
+
+    def get(session_id: str) -> dict | None:
+        return _store().get(session_id)
+
+    def set_cookie(response, session_id, *, max_age=None) -> None:
+        _set_cookie(response, session_id, max_age=max_age)
+    ```
+
+    Le helper `_start_session` du contrôleur devient alors, avec un seul import :
+
+    ```python
+    from mvc.helpers import session
+
+        @staticmethod
+        def _start_session(request: Request):
+            session_id = session.current_id(request)
+            data = session.get(session_id) if session_id else None
+            if data is None:
+                session_id = session.new()
+                data = session.get(session_id)
+            return session_id, data["csrf_token"]
+    ```
+
+    C'est **votre** code : libre à vous de l'étendre (écriture en session, autres
+    helpers…) sans rien attendre du framework.
 
 ## Tester dans le navigateur
 
