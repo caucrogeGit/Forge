@@ -44,6 +44,36 @@ L'objet `Request` rassemble les informations de la requête :
 | `files` | `dict` | les fichiers téléversés (objets `UploadedFile`) |
 | `ip` | `str` | l'adresse du client |
 
+### La surcharge de méthode (`method` et `original_method`)
+
+Un formulaire HTML ne sait émettre que deux verbes : `GET` et `POST`.
+Impossible, depuis un `<form>` de navigateur, d'envoyer directement un `PUT`, un `PATCH` ou un `DELETE`, alors qu'une API REST veut justement distinguer ces verbes.
+
+La **surcharge de méthode** contourne cette limite : on envoie un vrai `POST`, et on glisse dans le corps un champ caché `_method` qui porte le verbe voulu.
+
+```html
+<form method="post" action="/article/42">
+    <input type="hidden" name="_method" value="DELETE">
+    <button type="submit">Supprimer</button>
+</form>
+```
+
+Forge applique cette surcharge avant le routage, puis expose les deux verbes côte à côte :
+
+| Attribut | Pour la requête ci-dessus | Répond à la question |
+|---|---|---|
+| `original_method` | `POST` | qu'a **réellement envoyé** le client, sur le fil ? |
+| `method` | `DELETE` | quel verbe est **effectif**, et sert à choisir la route ? |
+
+Le mécanisme suit trois règles strictes :
+
+- la surcharge ne s'applique **que** si la requête est un `POST` ; un `GET` n'est jamais réinterprété, pour qu'un simple lien ou un robot ne puisse pas déclencher une écriture ;
+- seuls `PUT`, `PATCH` et `DELETE` sont des cibles acceptées ; toute autre valeur de `_method` est ignorée et `method` reste `POST` ;
+- `original_method` est **figé** : il garde la trace du verbe reçu, utile pour la journalisation et pour vérifier qu'une requête est bien arrivée en `POST` (donc protégée par CSRF) avant d'avoir été réinterprétée.
+
+La surcharge est une **alternative** : le tutoriel welcome-forge supprime un enregistrement par une vraie route `POST /note/delete/{id}`, sans `_method`.
+Le champ `_method` n'est utile que si vous préférez exposer une route `DELETE /article/{id}` desservie depuis un formulaire HTML.
+
 ## 4. Lire la requête : les accesseurs
 
 Plutôt que de fouiller ces attributs à la main, on lit la requête avec des méthodes **nommées d'après leur source** : on sait ainsi d'où vient la donnée.
