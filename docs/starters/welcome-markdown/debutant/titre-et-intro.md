@@ -25,7 +25,7 @@ Les titres de niveau 2 et 3 alimentent le sommaire de droite, chacun avec une an
 ## Les paragraphes
 
 Une ligne vide sépare deux paragraphes.
-Dans la source, on écrit **une phrase par ligne** : le rendu regroupe les lignes d'un même paragraphe, mais les différences de version restent lisibles.
+Dans la source, on écrit **une phrase par ligne** : grâce à l'extension `nl2br`, chaque phrase apparaît sur sa propre ligne au rendu, et les différences de version restent lisibles.
 
 ~~~md
 Forge est un framework web Python.
