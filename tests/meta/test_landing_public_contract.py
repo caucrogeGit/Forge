@@ -79,14 +79,14 @@ class TestCardTitles:
 
 
 class TestCardLinks:
-    """Les liens des cartes sont absolus et non génériques."""
+    """Les liens des cartes sont racine-relatifs (/docs/forge/…) et non génériques."""
 
-    def test_all_card_links_absolute(self):
+    def test_all_card_links_root_relative(self):
         text = LANDING.read_text(encoding="utf-8")
         hrefs = re.findall(r'<a\s+href="([^"]+)"\s+class="block group"', text)
-        relative = [h for h in hrefs if not h.startswith("http")]
-        assert not relative, (
-            f"Liens relatifs trouvés dans les cartes (causeraient des 404) : {relative}"
+        invalid = [h for h in hrefs if not (h.startswith("/docs/forge/") or h.startswith("http"))]
+        assert not invalid, (
+            f"Liens de carte non conformes (attendu /docs/forge/… ou http) : {invalid}"
         )
 
     def test_no_overly_generic_links(self):

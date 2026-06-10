@@ -164,7 +164,7 @@ class TestCardWindowsWsl:
 
     def test_lien_cible(self):
         text = _src()
-        assert "forgemvc.com/docs/forge/install/windows-wsl/" in text
+        assert "/docs/forge/install/windows-wsl/" in text
 
 
 # ---------------------------------------------------------------------------
@@ -208,7 +208,7 @@ class TestCardPipxUser:
 
     def test_lien_cible(self):
         text = _src()
-        assert "forgemvc.com/docs/forge/install/pipx/" in text
+        assert "/docs/forge/install/pipx/" in text
 
 
 # ---------------------------------------------------------------------------
@@ -263,7 +263,7 @@ class TestCardCoreDev:
         end = text.find('data-install-card="production"')
         card_block = text[idx:end]
         assert "landing-accent-bg" in card_block
-        assert "forgemvc.com/docs/forge/install/core-dev/" in card_block
+        assert "/docs/forge/install/core-dev/" in card_block
 
 
 # ---------------------------------------------------------------------------
@@ -302,9 +302,9 @@ class TestCardProduction:
         card_block = text[idx:end]
         # Les 3 guides production doivent être référencés depuis la card.
         # Réorg beta13 : les guides vivent sous docs/deployment/.
-        assert "forgemvc.com/docs/forge/deployment/wsgi-deployment/" in card_block
-        assert "forgemvc.com/docs/forge/deployment/production-limits/" in card_block
-        assert "forgemvc.com/docs/forge/deployment/deployment/" in card_block
+        assert "/docs/forge/deployment/wsgi-deployment/" in card_block
+        assert "/docs/forge/deployment/production-limits/" in card_block
+        assert "/docs/forge/deployment/deployment/" in card_block
 
 
 # ---------------------------------------------------------------------------

@@ -83,12 +83,14 @@ class TestLandingArticlesClickable:
             f"{len(missing)} carte(s) sans group-hover:landing-accent-text sur le <h3>."
         )
 
-    def test_all_links_are_absolute(self):
+    def test_all_card_links_root_relative(self):
+        # Les cartes pointent vers la doc en liens racine-relatifs (/docs/forge/…),
+        # valides sur le site publié ; les liens externes restent en http(s).
         text = LANDING.read_text(encoding="utf-8")
         hrefs = re.findall(r'<a\s+href="([^"]+)"\s+class="block group"', text)
-        relative = [h for h in hrefs if not h.startswith("http")]
-        assert not relative, (
-            f"Liens relatifs trouvés (causent des 404) : {relative}"
+        invalid = [h for h in hrefs if not (h.startswith("/docs/forge/") or h.startswith("http"))]
+        assert not invalid, (
+            f"Liens de carte non conformes (attendu /docs/forge/… ou http) : {invalid}"
         )
 
     @pytest.mark.parametrize("doc_path", sorted(set(EXPECTED_DOC_PATHS)))
