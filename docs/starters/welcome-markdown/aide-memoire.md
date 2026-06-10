@@ -242,3 +242,8 @@ Le parcours qui construit tout cela, palier après palier :
 - [Niveau débutant](debutant/titre-et-intro.md) : structure de base.
 - [Niveau intermédiaire](intermediaire/tableaux.md) : enrichir la page.
 - [Niveau avancé](avance/onglets.md) : finition professionnelle.
+
+Mettre en place Markdown dans un projet :
+
+- [Installer Markdown et ses extensions](installation.md#installer-markdown-et-ses-extensions) : paquets et configuration `mkdocs.yml`.
+- [Lancer le serveur de prévisualisation](installation.md#lancer-le-serveur-de-previsualisation) : `mkdocs serve` et `mkdocs build --strict`.
