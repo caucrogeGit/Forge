@@ -4,6 +4,8 @@
 
 **Ce que vous allez apprendre :** rien de neuf, c'est la synthèse. La première partie récapitule la **syntaxe** ; la seconde nomme les **signes**.
 
+Pour voir chaque entrée en action, ouvrez la page des [exemples](exemples.md).
+
 # Partie 1 : la syntaxe
 
 ## Bases
