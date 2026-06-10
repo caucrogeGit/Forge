@@ -97,7 +97,6 @@ nav:
           - La protection CSRF: reference/http/csrf.md
       - Markdown:
           - Aide-mémoire: reference/markdown/aide-memoire.md
-          - Exemples: reference/markdown/exemples.md
       - Outils:
           - Profils de projet: reference/profils.md
           - Tests E2E: reference/tests-e2e.md
