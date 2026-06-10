@@ -195,7 +195,7 @@ Ces éléments occupent plusieurs lignes : **dépliez** pour voir la source et l
 
     Rendu (cliquez pour agrandir) :
 
-    ![Logo de Forge](../../static/forge-logo.png)
+    ![Logo de Forge](../static/forge-logo.png)
 
     Au clic, l'image s'ouvre en grand dans une surimpression (plugin `mkdocs-glightbox`).
 
