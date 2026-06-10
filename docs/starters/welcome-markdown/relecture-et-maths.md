@@ -63,4 +63,4 @@ $$
     Les formules ci-dessus sont donc rendues visuellement, et non laissées en texte brut.
     Le script n'agit que sur les éléments de classe `arithmatex` produits par `arithmatex` : le reste du texte n'est jamais réinterprété.
 
-[Continuer avec l'Aide-mémoire](recapitulatif.md)
+[Continuer avec l'Aide-mémoire](aide-memoire.md)

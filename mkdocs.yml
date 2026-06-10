@@ -340,7 +340,7 @@ nav:
           - Texte enrichi: starters/welcome-markdown/texte-enrichi.md
           - Notes, abréviations, attributs: starters/welcome-markdown/notes-abreviations-attributs.md
           - Relecture et maths: starters/welcome-markdown/relecture-et-maths.md
-          - Aide-mémoire: starters/welcome-markdown/recapitulatif.md
+          - Aide-mémoire: starters/welcome-markdown/aide-memoire.md
 
   - Déploiement:
       - Checklist de production: deployment/production-checklist.md
