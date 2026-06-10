@@ -123,9 +123,31 @@ extra_javascript:
 - `extra.css` porte les styles maison, par exemple la classe `.intro-label`.
 - `mathjax.js` configure le rendu des formules (`arithmatex`), complété par la bibliothèque MathJax.
 
-!!! note "Construire et prévisualiser"
-    `mkdocs serve` lance un aperçu local rechargé à chaque modification.
-    `mkdocs build --strict` compile le site et **échoue au moindre lien cassé** : c'est le contrôle utilisé pour toute la documentation Forge.
+## Lancer le serveur de prévisualisation
+
+Pendant la rédaction, lancez le serveur local de MkDocs : il sert la documentation et la **recharge** à chaque enregistrement.
+
+```bash
+mkdocs serve
+```
+
+Ouvrez ensuite http://127.0.0.1:8000 dans votre navigateur : chaque sauvegarde d'un fichier `.md` met la page à jour automatiquement.
+
+!!! warning "Port déjà utilisé"
+    Par défaut, MkDocs écoute sur le port 8000, comme le serveur de développement de Forge (`forge serve`).
+    Si les deux tournent en même temps, donnez un autre port à MkDocs :
+
+    ```bash
+    mkdocs serve -a 127.0.0.1:8001
+    ```
+
+Pour produire le site final (les fichiers HTML, dans `site/`) et contrôler la documentation :
+
+```bash
+mkdocs build --strict
+```
+
+L'option `--strict` transforme le moindre avertissement (lien mort, page absente de la navigation) en **erreur** : c'est le contrôle utilisé pour toute la documentation Forge.
 
 ## Les trois niveaux
 
