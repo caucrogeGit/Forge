@@ -1,7 +1,7 @@
 """Garde-fou LANDING-ARTICLES-CLICKABLE-001.
 
-Vérifie que les 36 cartes de la landing page sont wrappées dans un <a href>
-pointant vers des URLs absolues valides de la documentation.
+Vérifie que les 40 cartes de la landing page sont wrappées dans un <a href>
+pointant vers des URLs valides de la documentation.
 """
 from __future__ import annotations
 
@@ -47,12 +47,14 @@ EXPECTED_DOC_PATHS = [
     "starters/welcome-audio/installation",
     "starters/welcome-mail/installation",
     "entities/pivot-advanced",
-    # Section Starters (10 cartes de progression)
+    # Section Starters (13 cartes de progression)
     "starters/welcome-forge/debutant/welcome",
     "starters/welcome-mfa/installation",
     "starters/welcome-rbac/installation",
     "starters/welcome-workflow/installation",
     "starters/welcome-stats/installation",
+    "starters/welcome-helpers/installation",
+    "starters/welcome-markdown/installation",
 ]
 
 
@@ -61,11 +63,11 @@ class TestLandingArticlesClickable:
     def test_landing_file_exists(self):
         assert LANDING.exists()
 
-    def test_37_articles_are_wrapped_in_links(self):
+    def test_40_articles_are_wrapped_in_links(self):
         text = LANDING.read_text(encoding="utf-8")
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
-        assert len(wrapped) == 37, (
-            f"Attendu 37 cartes wrappées dans <a class=\"block group\">, "
+        assert len(wrapped) == 40, (
+            f"Attendu 40 cartes wrappées dans <a class=\"block group\">, "
             f"trouvé {len(wrapped)}."
         )
 
