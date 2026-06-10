@@ -113,6 +113,45 @@ La distinction est importante : la documentation Forge **proscrit le tiret cadra
     C'est un abus : le vrai dièse est le signe musical `♯`.
     Le nom correct de `#` est **croisillon** (ou *hash* en informatique).
 
+## Séquences de signes en Markdown
+
+Certains signes prennent un sens une fois **répétés ou combinés**.
+Voici comment nommer et lire ces séquences.
+
+| Séquence | Nom | Sens en Markdown |
+|---|---|---|
+| `#` … `######` | croisillons | titres de niveau 1 à 6 |
+| `**texte**` | double astérisque | gras |
+| `_texte_` | tiret bas | italique |
+| `***texte***` | triple astérisque | gras italique |
+| `` `code` `` | accents graves | code en ligne |
+| ```` ``` ```` | clôture de code (trois accents graves) | bloc de code |
+| `>` | chevron | citation |
+| `- ` / `* ` / `+ ` | tiret, astérisque, plus | puce de liste |
+| `- [ ]` / `- [x]` | tiret crochets | case à cocher |
+| `---` | trois tirets | règle horizontale |
+| `!!!` | triple point d'exclamation | admonition (encadré) |
+| `???` | triple point d'interrogation | admonition dépliable, repliée |
+| `???+` | triple point d'interrogation plus | admonition dépliable, dépliée |
+| `=== "Onglet"` | triple signe égal | onglet de contenu |
+| `==texte==` | double signe égal | surlignage |
+| `~~texte~~` | double tilde | barré |
+| `~texte~` | tilde | indice |
+| `^texte^` | accent circonflexe | exposant |
+| `^^texte^^` | double accent circonflexe | texte inséré |
+| `++ctrl+c++` | doubles plus | touches clavier |
+| `[texte](cible)` | crochets et parenthèses | lien |
+| `![alt](source)` | exclamation, crochets, parenthèses | image |
+| `[^1]` | crochets et accent circonflexe | appel de note de bas de page |
+| `*[SIGLE]:` | astérisque et crochets | définition d'abréviation |
+| `{ .classe }` | accolades | attribut en ligne (`attr_list`) |
+| `{++ajout++}` `{--retrait--}` | accolades de relecture | annotations `critic` |
+| `--8<--` | ciseaux | inclusion de fichier (`snippets`) |
+| `$formule$` / `$$bloc$$` | dollars | formule mathématique (`arithmatex`) |
+| `[[Page]]` | doubles crochets | lien wiki |
+| `:nom:` | deux-points | émoji ou icône |
+| `\` | barre oblique inverse | échappement du signe suivant |
+
 ## Voir aussi
 
 - [Texte enrichi](texte-enrichi.md) : où plusieurs de ces signes (`==`, `^`, `~`, `++`) prennent un sens en Markdown.
