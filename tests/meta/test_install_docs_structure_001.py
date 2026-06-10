@@ -145,11 +145,18 @@ class TestNoBrokenInternalLinks:
         for md in PROJECT_ROOT.glob("docs/**/*.md"):
             if self._is_historical(md):
                 continue
+            rel = md.relative_to(PROJECT_ROOT).as_posix()
+            # Les préambules des parcours welcome-* s'appellent légitimement
+            # `installation.md` (STARTERS-WELCOME-INSTALL-001). Ce contrôle vise
+            # l'ancien `docs/install/installation.md`, pas ces préambules : on
+            # exclut donc les starters.
+            if rel.startswith("docs/starters/"):
+                continue
             text = md.read_text(encoding="utf-8")
             # Ignore mentions de `install/index.md` (le nouveau chemin).
             stripped = text.replace("install/index.md", "")
             if self._OLD_INSTALLATION_MD.search(stripped):
-                offenders.append(md.relative_to(PROJECT_ROOT).as_posix())
+                offenders.append(rel)
         assert not offenders, (
             "Fichiers actifs pointant encore vers installation.md :\n  - "
             + "\n  - ".join(offenders)
