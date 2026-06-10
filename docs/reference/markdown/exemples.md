@@ -105,6 +105,18 @@ L'exemple montre un usage courant du signe.
 
 Rendu : deux sous-titres qui apparaissent dans le sommaire de la page.
 
+## Image
+
+~~~md
+![Logo de Forge](../../static/forge-logo.png)
+~~~
+
+Rendu :
+
+![Logo de Forge](../../static/forge-logo.png)
+
+Le chemin est relatif à la page ; le texte alternatif décrit l'image et s'affiche si elle manque.
+
 ## Citation et règle horizontale
 
 ~~~md
