@@ -1,50 +1,45 @@
-# Préambule : le Markdown de la documentation Forge
+# Préambule : apprendre Markdown en documentant Forge
 
-**Objectif**{ .intro-label } : disposer d'une vitrine complète de toute la syntaxe Markdown disponible dans la documentation Forge.
+**Objectif** : apprendre Markdown et toutes les extensions de la documentation Forge, en construisant une vraie page de documentation.
 
-**Ce que vous allez apprendre :**{ .intro-label } chaque page montre la **source** Markdown puis son **rendu**, pour que vous puissiez copier la syntaxe et voir immédiatement l'effet.
+**Ce que vous allez apprendre :** la syntaxe Markdown, palier après palier, en rédigeant vous-même un document qui grandit du simple titre à la page de référence complète.
 
-!!! info "À quoi sert cette progression"
-    Contrairement aux autres `welcome-*`, cette progression ne construit pas un projet Forge.
-    C'est un **catalogue de référence** : elle démontre toutes les extensions Markdown activées dans `mkdocs.yml`, telles qu'elles s'affichent dans cette documentation.
+!!! info "Le mini-projet du parcours"
+    Comme les autres progressions `welcome-*`, ce parcours suit un **fil rouge** unique.
+    Ici, vous rédigez à la main une seule page de documentation : **« Prise en main de Forge »**, dans un fichier `prise-en-main.md`.
 
-    Gardez-la sous la main quand vous rédigez un guide, un palier de tutoriel ou une page de référence.
+    Elle part d'un titre et d'un paragraphe, puis s'enrichit à chaque palier : listes, tableaux, encadrés, code, onglets, diagrammes, notes.
+    À la fin, vous obtenez une page de documentation complète, et vous maîtrisez tout le Markdown de Forge.
 
-## La convention « source puis rendu »
+## Comment lire ce parcours
 
-Dans chaque page, la syntaxe est présentée d'abord dans un bloc de code (la **source**), puis suivie de son **rendu** réel.
-
-Par exemple, la source suivante :
+Chaque palier présente d'abord la **source** Markdown dans un bloc de code, puis son **rendu** réel.
+Vous reproduisez ensuite la syntaxe dans votre fichier `prise-en-main.md`, section après section.
 
 ~~~md
 Un mot en **gras**, un autre en _italique_.
 ~~~
 
-produit ce rendu :
+Rendu :
 
 Un mot en **gras**, un autre en _italique_.
 
-## Style d'écriture attendu
+## Le style d'écriture attendu
 
-La documentation Forge suit une typographie française stricte (directive §2.1) :
+La documentation Forge suit une typographie française stricte (directive §2.1) :
 
-- une **phrase par ligne** dans la source Markdown ;
-- des **espaces insécables** avant `: ; ? !` et autour des guillemets « » ;
-- **pas** de tiret cadratin ; on préfère la virgule, le point-virgule ou les deux-points.
+- une **phrase par ligne** dans la source Markdown ;
+- des **espaces insécables** avant `: ; ? !` et autour des guillemets « » ;
+- **pas** de tiret cadratin ; on préfère la virgule, le point-virgule ou les deux-points.
 
-Le Markdown regroupe les lignes d'un même paragraphe au rendu : écrire une phrase par ligne ne change donc rien à l'affichage, mais facilite la relecture et les différences de version.
+## Les trois niveaux
 
-## Les familles d'extensions
+| Niveau | Ce que vous construisez | Markdown abordé |
+|---|---|---|
+| [Débutant](debutant/titre-et-intro.md) | le squelette de la page | titres, texte, listes, citations, liens |
+| [Intermédiaire](intermediaire/tableaux.md) | une page riche | tableaux, définitions, encadrés, blocs dépliables, code |
+| [Avancé](avance/onglets.md) | une page de niveau professionnel | onglets, diagrammes, texte enrichi, notes, relecture, maths |
 
-| Page | Ce qu'elle couvre |
-|---|---|
-| [Les bases](bases.md) | titres, emphase, listes, citations, liens, images |
-| [Tableaux et définitions](tableaux-et-definitions.md) | tableaux alignés, listes de définition |
-| [Admonitions et onglets](admonitions-et-onglets.md) | encadrés, blocs dépliables, onglets |
-| [Code et diagrammes](code-et-diagrammes.md) | coloration, blocs imbriqués, Mermaid, inclusions |
-| [Texte enrichi](texte-enrichi.md) | surlignage, exposants, touches clavier, émojis, symboles |
-| [Notes, abréviations, attributs](notes-abreviations-attributs.md) | notes de bas de page, abréviations, classes, liens automatiques |
-| [Relecture et maths](relecture-et-maths.md) | annotations de relecture, formules mathématiques |
-| [Aide-mémoire](aide-memoire.md) | toute la syntaxe et le nom des signes sur une seule page |
+À tout moment, gardez l'[Aide-mémoire](aide-memoire.md) sous la main : il récapitule toute la syntaxe et le nom de chaque signe sur une seule page.
 
-[Commencer avec Les bases](bases.md)
+[Commencer le niveau débutant](debutant/titre-et-intro.md)

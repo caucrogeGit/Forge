@@ -333,13 +333,27 @@ nav:
           - Aide-mémoire: starters/welcome-mail/recapitulatif.md
       - Progression Markdown (welcome-markdown):
           - Préambule: starters/welcome-markdown/installation.md
-          - Les bases: starters/welcome-markdown/bases.md
-          - Tableaux et définitions: starters/welcome-markdown/tableaux-et-definitions.md
-          - Admonitions et onglets: starters/welcome-markdown/admonitions-et-onglets.md
-          - Code et diagrammes: starters/welcome-markdown/code-et-diagrammes.md
-          - Texte enrichi: starters/welcome-markdown/texte-enrichi.md
-          - Notes, abréviations, attributs: starters/welcome-markdown/notes-abreviations-attributs.md
-          - Relecture et maths: starters/welcome-markdown/relecture-et-maths.md
+          - Débutant:
+              - Titre et introduction: starters/welcome-markdown/debutant/titre-et-intro.md
+              - La mise en forme du texte: starters/welcome-markdown/debutant/mise-en-forme.md
+              - Les listes: starters/welcome-markdown/debutant/listes.md
+              - Citations et séparateurs: starters/welcome-markdown/debutant/citations-et-separations.md
+              - Liens et images: starters/welcome-markdown/debutant/liens-et-images.md
+              - Bilan débutant: starters/welcome-markdown/debutant/bilan.md
+          - Intermédiaire:
+              - Présenter des données en tableau: starters/welcome-markdown/intermediaire/tableaux.md
+              - Définir des termes: starters/welcome-markdown/intermediaire/definitions.md
+              - Mettre en avant avec les admonitions: starters/welcome-markdown/intermediaire/admonitions.md
+              - Replier le détail: starters/welcome-markdown/intermediaire/blocs-depliables.md
+              - Montrer du code: starters/welcome-markdown/intermediaire/code.md
+              - Bilan intermédiaire: starters/welcome-markdown/intermediaire/bilan.md
+          - Avancé:
+              - Offrir des variantes avec les onglets: starters/welcome-markdown/avance/onglets.md
+              - Diagrammes et inclusions: starters/welcome-markdown/avance/diagrammes-et-inclusions.md
+              - Le texte enrichi: starters/welcome-markdown/avance/texte-enrichi.md
+              - Notes, abréviations et attributs: starters/welcome-markdown/avance/notes-et-attributs.md
+              - Relecture et maths: starters/welcome-markdown/avance/relecture-et-maths.md
+              - Bilan avancé: starters/welcome-markdown/avance/bilan.md
           - Aide-mémoire: starters/welcome-markdown/aide-memoire.md
 
   - Déploiement:
