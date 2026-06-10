@@ -8,7 +8,8 @@ Votre page « Prise en main de Forge » a désormais une finition **professionne
 - Palier 2 : diagrammes Mermaid et inclusions de fichiers (`--8<--`).
 - Palier 3 : texte enrichi (surlignage, exposant, indice, touches, symboles, icônes, progression).
 - Palier 4 : notes de bas de page, abréviations, attributs `attr_list`.
-- Palier 5 : annotations de relecture `critic` et formules `arithmatex`.
+- Palier 5 : infobulles (`content.tooltips`) et lightbox d'image (`mkdocs-glightbox`).
+- Palier 6 : annotations de relecture `critic` et formules `arithmatex`.
 
 ## Ce que vous savez faire
 

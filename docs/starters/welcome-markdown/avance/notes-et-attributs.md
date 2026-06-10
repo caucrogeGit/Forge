@@ -73,4 +73,4 @@ Déclarez les abréviations en bas de `prise-en-main.md`, et donnez un libellé 
 - Abréviation : `*[SIGLE]: signification` ; infobulle au survol.
 - `attr_list` ajoute classes et attributs, par exemple `{ .intro-label }`.
 
-[Continuer avec Relecture et maths](relecture-et-maths.md)
+[Continuer avec Infobulles et agrandissement d'image](infobulles-et-images.md)

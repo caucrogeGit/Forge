@@ -123,6 +123,23 @@ extra_javascript:
 - `extra.css` porte les styles maison, par exemple la classe `.intro-label`.
 - `mathjax.js` configure le rendu des formules (`arithmatex`), complété par la bibliothèque MathJax.
 
+### Plugins et fonctionnalités du thème
+
+Deux effets interactifs ne viennent pas des extensions, mais d'un **plugin** et d'une **fonctionnalité du thème** :
+
+- la **lightbox** d'image (agrandissement au clic) est fournie par le plugin `mkdocs-glightbox`, ajouté à `requirements-docs.txt` et déclaré sous `plugins` ;
+- les **infobulles** au survol viennent de la fonctionnalité Material `content.tooltips`, déclarée sous `theme.features`.
+
+```yaml
+theme:
+  features:
+    - content.tooltips   # infobulles au survol
+
+plugins:
+  - search
+  - glightbox            # lightbox d'image
+```
+
 ## Lancer le serveur de prévisualisation
 
 Pendant la rédaction, lancez le serveur local de MkDocs : il sert la documentation et la **recharge** à chaque enregistrement.

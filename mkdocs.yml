@@ -17,6 +17,7 @@ theme:
     - navigation.sections
     - navigation.top
     - content.code.copy
+    - content.tooltips
     - search.suggest
     - search.highlight
     - search.share
@@ -355,6 +356,7 @@ nav:
               - Diagrammes et inclusions: starters/welcome-markdown/avance/diagrammes-et-inclusions.md
               - Le texte enrichi: starters/welcome-markdown/avance/texte-enrichi.md
               - Notes, abréviations et attributs: starters/welcome-markdown/avance/notes-et-attributs.md
+              - Infobulles et agrandissement d'image: starters/welcome-markdown/avance/infobulles-et-images.md
               - Relecture et maths: starters/welcome-markdown/avance/relecture-et-maths.md
               - Bilan avancé: starters/welcome-markdown/avance/bilan.md
 
@@ -551,6 +553,7 @@ plugins:
   - search:
       lang: fr
       separator: '[\s\-\.:\_/]+'
+  - glightbox
 
 docs_dir: docs
 site_dir: site

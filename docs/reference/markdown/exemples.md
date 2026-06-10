@@ -39,6 +39,8 @@ Les éléments **en bloc** (titres, encadrés, code, onglets…) sont montrés e
 | `[texte](cible)` | [Python](https://www.python.org) |
 | `https://… (auto)` | https://www.python.org |
 | `**texte**{ .classe }` | **Objectif**{ .intro-label } |
+| `[texte](#){ title="…" }` | [survolez-moi](#){ title="exemple d'infobulle" } |
+| `**mot**{ title="…" }` | **mot**{ title="infobulle au survol" } |
 | `texte[^clé]` | une affirmation[^ex] |
 | `{++ajout++}` | {++ajout++} |
 | `{--retrait--}` | {--retrait--} |
@@ -116,6 +118,7 @@ Rendu :
 ![Logo de Forge](../../static/forge-logo.png)
 
 Le chemin est relatif à la page ; le texte alternatif décrit l'image et s'affiche si elle manque.
+**Cliquez sur l'image** : elle s'ouvre en grand dans une surimpression (lightbox, plugin `mkdocs-glightbox`), sans syntaxe particulière.
 
 ## Citation et règle horizontale
 

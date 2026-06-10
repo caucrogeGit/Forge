@@ -70,8 +70,12 @@ Pour voir chaque entrée en action, ouvrez la page des [exemples](exemples.md).
 | `texte[^clé]` + `[^clé]: …` | note de bas de page |
 | `*[SIGLE]: signification` | abréviation avec infobulle |
 | `**texte**{ .classe }` | classe, identifiant ou attribut |
+| `**texte**{ title="…" }` | infobulle (tooltip) au survol |
 | URL ou email en clair | lien automatique |
 | `[[NomDePage]]` | lien wiki |
+
+Deux effets « pop-up » viennent de la configuration, pas du Markdown : les **infobulles** au survol (fonctionnalité Material `content.tooltips`, sur les abréviations et l'attribut `title`) et la **lightbox** qui agrandit toute image de contenu au clic (plugin `mkdocs-glightbox`).
+Voir la page des [exemples](exemples.md) pour le rendu.
 
 ## Relecture et maths
 
