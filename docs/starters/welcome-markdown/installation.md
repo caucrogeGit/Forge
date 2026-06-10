@@ -45,7 +45,6 @@ Le Markdown regroupe les lignes d'un même paragraphe au rendu : écrire une ph
 | [Texte enrichi](texte-enrichi.md) | surlignage, exposants, touches clavier, émojis, symboles |
 | [Notes, abréviations, attributs](notes-abreviations-attributs.md) | notes de bas de page, abréviations, classes, liens automatiques |
 | [Relecture et maths](relecture-et-maths.md) | annotations de relecture, formules mathématiques |
-| [Glossaire des signes](glossaire-des-signes.md) | le nom français de chaque signe |
-| [Aide-mémoire](recapitulatif.md) | toute la syntaxe sur une seule page |
+| [Aide-mémoire](recapitulatif.md) | toute la syntaxe et le nom des signes sur une seule page |
 
 [Commencer avec Les bases](bases.md)
