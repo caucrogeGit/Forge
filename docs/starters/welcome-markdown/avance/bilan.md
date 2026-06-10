@@ -18,7 +18,7 @@ C'est exactement la matière de toute la documentation que vous lisez.
 
 ## La référence à garder
 
-L'[Aide-mémoire](../aide-memoire.md) récapitule sur une seule page **toute** la syntaxe et le **nom** de chaque signe.
+L'[Aide-mémoire](../../../reference/markdown/aide-memoire.md) récapitule sur une seule page **toute** la syntaxe et le **nom** de chaque signe.
 Gardez-le ouvert quand vous rédigez.
 
 ## Et ensuite

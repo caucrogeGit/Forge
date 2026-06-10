@@ -94,6 +94,8 @@ nav:
           - Le cookie HTTP: reference/http/cookie.md
           - La session HTTP: reference/http/session.md
           - La protection CSRF: reference/http/csrf.md
+      - Markdown:
+          - Aide-mémoire: reference/markdown/aide-memoire.md
       - Outils:
           - Profils de projet: reference/profils.md
           - Tests E2E: reference/tests-e2e.md
@@ -354,7 +356,6 @@ nav:
               - Notes, abréviations et attributs: starters/welcome-markdown/avance/notes-et-attributs.md
               - Relecture et maths: starters/welcome-markdown/avance/relecture-et-maths.md
               - Bilan avancé: starters/welcome-markdown/avance/bilan.md
-          - Aide-mémoire: starters/welcome-markdown/aide-memoire.md
 
   - Déploiement:
       - Checklist de production: deployment/production-checklist.md

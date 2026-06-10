@@ -14,13 +14,13 @@ Un lien associe un libellé entre crochets à une cible entre parenthèses.
 Pour une page de la documentation, pointez vers le **fichier** `.md` : MkDocs vérifie ces liens au build `--strict`.
 
 ~~~md
-Voir l'[aide-mémoire Markdown](../aide-memoire.md).
+Voir l'[aide-mémoire Markdown](../../../reference/markdown/aide-memoire.md).
 Le site officiel de [Python](https://www.python.org).
 ~~~
 
 Rendu :
 
-Voir l'[aide-mémoire Markdown](../aide-memoire.md).
+Voir l'[aide-mémoire Markdown](../../../reference/markdown/aide-memoire.md).
 Le site officiel de [Python](https://www.python.org).
 
 ## Liens automatiques
