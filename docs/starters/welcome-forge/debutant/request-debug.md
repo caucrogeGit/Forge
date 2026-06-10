@@ -1,70 +1,67 @@
 # Inspecter une requête
 
-Objectif : visualiser le contenu d'une requête pour comprendre ce que Forge
-reçoit.
+**Objectif**{ .intro-label } : visualiser le contenu d'une requête pour comprendre ce que Forge reçoit.
 
-**Ce que vous allez apprendre :** afficher les données de la requête avec
-`Response.debug(request.data)`, une aide pédagogique disponible en
-environnement de développement.
+**Ce que vous allez apprendre :**{ .intro-label } afficher les données de la requête avec `Response.debug(request.data)`, une aide pédagogique disponible en environnement de développement.
 
-## Là où nous en sommes
+`WelcomeController` porte déjà les méthodes des paliers précédents, et `mvc/routes.py` déclare les routes correspondantes jusqu'à `/welcome/article/{id}`.
 
-`WelcomeController` porte déjà les méthodes des paliers 1 à 4, et
-`mvc/routes.py` déclare les routes correspondantes jusqu'à
-`/welcome/article/{id}`. Nous ajoutons une méthode et une route.
+Nous ajoutons une méthode et une route.
 
-## L'ajout
+??? note "Documentations"
+    Pour bien comprendre ce palier :
 
-Ajoutez cette méthode à la classe `WelcomeController` :
+    | Document | Ce qu'il apporte |
+    |---|---|
+    | [L'objet Request](../../../reference/http/request.md) | ce que regroupe `request.data` |
+    | [L'objet Response](../../../reference/http/response.md) | la réponse, ici la page de débogage `Response.debug(...)` |
 
-```python
-    @staticmethod
-    def debug(request: Request) -> Response:
-        return Response.debug(request.data)
-```
+??? note "Contrôleurs"
+    Ajoutez cette méthode à la classe `WelcomeController` :
 
-Puis ajoutez la route dans le groupe public de `mvc/routes.py`.
+    ```python
+        @staticmethod
+        def debug(request: Request) -> Response:
+            return Response.debug(request.data)
+    ```
 
-## Votre mvc/routes.py à ce stade
+    | Élément | Rôle |
+    |---|---|
+    | `request.data` | Rassemble les données utiles de la requête courante. |
+    | `Response.debug(...)` | Présente ces données sous forme de page HTML lisible, pensée pour l'inspection pendant le développement. |
 
-```python
-# mvc/routes.py
-from core.http.router import Router
-from mvc.controllers.home_controller import HomeController
-from mvc.controllers.welcome_controller import WelcomeController
+    Cette aide n'est active qu'en environnement de développement (`APP_ENV=dev`) ; en production elle répond `404`, pour ne jamais exposer les données d'une requête.
 
-router = Router()
+??? note "Routes"
+    Ajoutez la route dans le groupe public de `mvc/routes.py` :
 
-with router.group("", public=True) as public:
-    public.add("GET", "/", HomeController.index, name="home-index")
-    public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
-    public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
-    public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
-    public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
-    public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
-```
+    ```python
+    # mvc/routes.py
+    from core.http.router import Router
+    from mvc.controllers.home_controller import HomeController
+    from mvc.controllers.welcome_controller import WelcomeController
 
-## Comprendre ce code
+    router = Router()
 
-- `request.data` rassemble les données utiles de la requête courante.
-- `Response.debug(...)` les présente sous forme de page HTML lisible, pensée
-  pour l'inspection pendant le développement.
-- Cette aide n'est active qu'en environnement de développement
-  (`APP_ENV=dev`) ; en production elle répond `404`, pour ne jamais exposer
-  les données d'une requête.
+    with router.group("", public=True) as public:
+        public.add("GET", "/", HomeController.index, name="home-index")
+        public.add("GET",  "/welcome", WelcomeController.index, name="welcome-index")
+        public.add("GET",  "/welcome/hello", WelcomeController.hello, name="welcome-hello")
+        public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
+        public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
+        public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
+    ```
 
-## Tester dans le navigateur
+??? note "Tests"
+    | URL | Résultat |
+    |---|---|
+    | `https://localhost:8000/welcome/debug` | la page de débogage (en `APP_ENV=dev`) |
+    | `https://localhost:8000/welcome/debug?x=1&y=2` | la même page, avec les paramètres affichés |
 
-| URL | Résultat |
-|---|---|
-| `https://localhost:8000/welcome/debug` | la page de débogage (en `APP_ENV=dev`) |
-| `https://localhost:8000/welcome/debug?x=1&y=2` | la même page, avec les paramètres affichés |
-
-## À retenir
-
-- `Response.debug(request.data)` est un outil d'inspection pédagogique.
-- Il n'est disponible qu'en développement ; il répond `404` en production.
-- À n'utiliser que pour comprendre, jamais comme réponse définitive.
+??? note "À retenir"
+    - `Response.debug(request.data)` est un outil d'inspection pédagogique.
+    - Il n'est disponible qu'en développement ; il répond `404` en production.
+    - À n'utiliser que pour comprendre, jamais comme réponse définitive.
 
 Au palier suivant, nous renvoyons des données structurées au format JSON.
 

@@ -1,106 +1,109 @@
 # Mémoriser un état en session
 
-Objectif : mémoriser un état côté serveur **entre** les requêtes.
+**Objectif**{ .intro-label } : mémoriser un état côté serveur **entre** les requêtes.
 
-**Ce que vous allez apprendre :** une requête HTTP est *sans mémoire* : le serveur
-oublie tout d'une requête à l'autre. La **session** garde un état rattaché à
-l'utilisateur via un cookie `session_id`. Ce palier compte les visites de la liste.
+**Ce que vous allez apprendre :**{ .intro-label } une requête HTTP est *sans mémoire* : le serveur oublie tout d'une requête à l'autre. La **session** garde un état rattaché à l'utilisateur via un cookie `session_id`. Ce palier compte les visites de la liste.
 
-## Là où nous en sommes
+Le flash du palier précédent stockait déjà un message dans la session.
 
-Le flash du palier précédent stockait déjà un message dans la session. Nous y
-écrivons maintenant **notre propre** état : un compteur de visites, lu et
-incrémenté à chaque affichage de la liste.
+Nous y écrivons maintenant **notre propre** état : un compteur de visites, lu et incrémenté à chaque affichage de la liste.
 
-## L'ajout
+??? note "Documentations"
+    Pour bien comprendre ce palier :
 
-Complétez les imports et faites évoluer `index` dans
-`mvc/controllers/note_controller.py` pour lire, incrémenter et réécrire le
-compteur, puis poser un cookie de session durci :
+    | Document | Ce qu'il apporte |
+    |---|---|
+    | [La session HTTP](../../../reference/http/session.md) | lire, créer et écrire un état de session |
+    | [Le cookie HTTP](../../../reference/http/cookie.md) | les attributs durcis du cookie `session_id` |
 
-```python
-from core.security.session import get_flash, get_session, get_session_id
-from core.sessions.manager import get_session_store
+??? note "Contrôleurs"
+    Complétez les imports et faites évoluer `index` dans `mvc/controllers/note_controller.py` pour lire, incrémenter et réécrire le compteur, puis poser un cookie de session durci :
+
+    ```python
+    from core.security.session import get_flash, get_session, get_session_id
+    from core.sessions.manager import get_session_store
 
 
-class NoteController(BaseController):
+    class NoteController(BaseController):
 
-    @staticmethod
-    def index(request: Request) -> Response:
-        # … lecture de q, page, notes inchangée …
+        @staticmethod
+        def index(request: Request) -> Response:
+            # … lecture de q, page, notes inchangée …
 
-        session_id, csrf_token = NoteController._start_session(request)
-        flash = get_flash(session_id)
-        store = get_session_store()
-        session = get_session(session_id)
-        visits = int(session.get("visits", 0)) + 1
-        store.set(session_id, {"visits": visits})
+            session_id, csrf_token = NoteController._start_session(request)
+            flash = get_flash(session_id)
+            store = get_session_store()
+            session = get_session(session_id)
+            visits = int(session.get("visits", 0)) + 1
+            store.set(session_id, {"visits": visits})
 
-        response = BaseController.render(
-            "note/index.html",
-            request=request,
-            context={
-                "notes": notes,
-                "q": q,
-                "page": page,
-                "has_prev": page > 1,
-                "has_next": page * PAGE_SIZE < total,
-                "csrf_token": csrf_token,
-                "flash": flash,
-                "visits": visits,
-            },
-        )
-        set_session_cookie(response, session_id)
-        return response
-```
+            response = BaseController.render(
+                "note/index.html",
+                request=request,
+                context={
+                    "notes": notes,
+                    "q": q,
+                    "page": page,
+                    "has_prev": page > 1,
+                    "has_next": page * PAGE_SIZE < total,
+                    "csrf_token": csrf_token,
+                    "flash": flash,
+                    "visits": visits,
+                },
+            )
+            set_session_cookie(response, session_id)
+            return response
+    ```
 
-Affichez le compteur dans le bloc `content` de `mvc/views/note/index.html` :
+    | Élément | Rôle |
+    |---|---|
+    | `get_session_id` / `get_session` | Lit le cookie, puis renvoie le dictionnaire de session (ou `None`). |
+    | `store.create()` | Crée une session s'il n'en existe pas encore (via `_start_session`). |
+    | `store.set(session_id, {"visits": visits})` | **Fusionne** la nouvelle valeur sans écraser le reste (csrf, flash). |
+    | `set_session_cookie(...)` | Pose un cookie durci : `HttpOnly`, `SameSite=Strict`, `Secure` (HTTPS uniquement). |
 
-```html
-<p><small>Vous avez consulté cette liste {{ visits }} fois.</small></p>
-```
+??? note "Vues"
+    Affichez le compteur dans le bloc `content` de `mvc/views/note/index.html` :
 
-## Votre mvc/routes.py à ce stade
+    ```html
+    <p><small>Vous avez consulté cette liste {{ visits }} fois.</small></p>
+    ```
 
-Inchangé : le compteur vit dans la session, pas dans une route nouvelle.
+??? note "Routes"
+    Inchangé : le compteur vit dans la session, pas dans une route nouvelle.
 
-```python
-# mvc/routes.py
-from core.http.router import Router
-from mvc.controllers.home_controller import HomeController
-from mvc.controllers.note_controller import NoteController
+    ```python
+    # mvc/routes.py
+    from core.http.router import Router
+    from mvc.controllers.home_controller import HomeController
+    from mvc.controllers.note_controller import NoteController
 
-router = Router()
+    router = Router()
 
-with router.group("", public=True) as public:
-    public.add("GET",  "/", HomeController.index, name="home-index")
-    public.add("GET",  "/note", NoteController.index, name="note-index")
-    public.add("GET",  "/note/edit/{id}", NoteController.edit, name="note-edit")
-    public.add("POST", "/note/update/{id}", NoteController.update, name="note-update")
-    public.add("POST", "/note/delete/{id}", NoteController.delete, name="note-delete")
-```
+    with router.group("", public=True) as public:
+        public.add("GET",  "/", HomeController.index, name="home-index")
+        public.add("GET",  "/note", NoteController.index, name="note-index")
+        public.add("GET",  "/note/edit/{id}", NoteController.edit, name="note-edit")
+        public.add("POST", "/note/update/{id}", NoteController.update, name="note-update")
+        public.add("POST", "/note/delete/{id}", NoteController.delete, name="note-delete")
+    ```
 
-## Comprendre ce code
+??? note "Tests"
+    | Action | Résultat |
+    |---|---|
+    | Ouvrir `https://localhost:8000/note` et recharger | « Vous avez consulté cette liste N fois. », N augmente |
 
-- `get_session_id(request)` lit le cookie ; `get_session(session_id)` renvoie le
-  dictionnaire de session (ou `None`).
-- S'il n'y a pas encore de session, on en **crée** une (`store.create()`).
-- `store.set(session_id, {"visits": visits})` **fusionne** la nouvelle valeur
-  dans la session, sans écraser le reste (csrf, flash).
-- Le cookie `session_id` est posé avec des attributs **durcis** : `HttpOnly`
-  (pas accessible en JS), `SameSite=Strict`, `Secure` (HTTPS uniquement).
+??? note "À retenir"
+    - HTTP est sans mémoire ; la **session** garde un état entre requêtes.
+    - Lire, créer, écrire : `get_session`, `store.create()`, `store.set(...)`.
+    - Le cookie de session est toujours **durci** (`HttpOnly`, `SameSite`, `Secure`).
 
-## Tester dans le navigateur
+??? tip "Astuces"
+    Lire et fusionner un état de session (`get_session`, `store.set`, `set_session_cookie`) revient à chaque palier qui mémorise quelque chose.
+    Une **façade** `Session` de votre application, sous `mvc/helpers/`, regrouperait ces appels.
 
-| Action | Résultat |
-|---|---|
-| Ouvrir `https://localhost:8000/note` et recharger | « Vous avez consulté cette liste N fois. », N augmente |
-
-## À retenir
-
-- HTTP est sans mémoire ; la **session** garde un état entre requêtes.
-- Lire, créer, écrire : `get_session`, `store.create()`, `store.set(...)`.
-- Le cookie de session est toujours **durci** (`HttpOnly`, `SameSite`, `Secure`).
+    Forge ne l'ajoute pas au framework : le noyau reste minimal et explicite, l'ergonomie est à votre main.
+    Un parcours dédié vous montre comment construire ces façades pas à pas (`Session`, `Cookies`, `Flash`) : [Construire vos façades helper](../../welcome-helpers/installation.md).
 
 Vous avez parcouru les huit paliers du niveau intermédiaire. Place au bilan.
 
