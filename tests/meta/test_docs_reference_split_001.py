@@ -179,6 +179,7 @@ class TestNoUnexpectedSubfiles:
             "runtime-errors-schema.md",
             "vocabulaire-opt-in.md",  # glossaire canonique (OPTIN-VOCAB-001, ADR-016)
             "public-contract-1.0.md",  # gel surface publique (CLI-PUBLIC-CONTRACT-FREEZE-001)
+            "markdown.md",  # aide-mémoire Markdown (DOCS-MARKDOWN-FLATTEN-001)
         }
         actual = {f.name for f in REFERENCE_DIR.glob("*.md")}
         unexpected = actual - expected
