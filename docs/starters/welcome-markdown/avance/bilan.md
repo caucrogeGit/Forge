@@ -16,11 +16,6 @@ Vous savez écrire une page de documentation Forge **complète** : structurée, 
 
 C'est exactement la matière de toute la documentation que vous lisez.
 
-## La référence à garder
-
-L'[Aide-mémoire](../../../reference/markdown/aide-memoire.md) récapitule sur une seule page **toute** la syntaxe et le **nom** de chaque signe.
-Gardez-le ouvert quand vous rédigez.
-
 ## Et ensuite
 
 Appliquez ce que vous avez appris : relisez une page existante de la documentation Forge, repérez les syntaxes employées, et proposez une amélioration.

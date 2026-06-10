@@ -157,6 +157,4 @@ L'option `--strict` transforme le moindre avertissement (lien mort, page absente
 | [Intermédiaire](intermediaire/tableaux.md) | une page riche | tableaux, définitions, encadrés, blocs dépliables, code |
 | [Avancé](avance/onglets.md) | une page de niveau professionnel | onglets, diagrammes, texte enrichi, notes, relecture, maths |
 
-À tout moment, gardez l'[Aide-mémoire](../../reference/markdown/aide-memoire.md) sous la main : il récapitule toute la syntaxe et le nom de chaque signe sur une seule page.
-
 [Commencer le niveau débutant](debutant/titre-et-intro.md)
