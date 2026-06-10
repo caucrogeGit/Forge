@@ -32,6 +32,101 @@ La documentation Forge suit une typographie française stricte (directive §2.1)
 - des **espaces insécables** avant `: ; ? !` et autour des guillemets « » ;
 - **pas** de tiret cadratin ; on préfère la virgule, le point-virgule ou les deux-points.
 
+## Installer Markdown et ses extensions
+
+Markdown n'est pas un outil que l'on installe seul.
+Dans la documentation Forge, il est rendu par **MkDocs** et le thème **Material** ; les extensions viennent du paquet **pymdown-extensions** (quelques-unes sont fournies directement par Markdown).
+
+Trois paquets suffisent. Le dépôt les déclare dans `requirements-docs.txt` :
+
+```text
+mkdocs>=1.6
+mkdocs-material>=9.7
+pymdown-extensions>=10.0
+```
+
+Installez-les dans votre environnement :
+
+```bash
+pip install -r requirements-docs.txt
+# ou directement :
+pip install "mkdocs>=1.6" "mkdocs-material>=9.7" "pymdown-extensions>=10.0"
+```
+
+### Activer les extensions
+
+Une extension installée n'agit que si elle est **déclarée** dans `mkdocs.yml`, sous la clé `markdown_extensions`.
+Voici la configuration de Forge, à recopier :
+
+```yaml
+markdown_extensions:
+  - admonition          # encadrés !!!
+  - attr_list           # attributs en ligne { .classe }
+  - def_list            # listes de définition
+  - footnotes           # notes de bas de page
+  - md_in_html          # Markdown dans du HTML
+  - tables              # tableaux
+  - toc:                # sommaire + ancres
+      permalink: true
+  - pymdownx.details    # blocs dépliables ???
+  - pymdownx.highlight:  # coloration des blocs de code
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences:  # blocs imbriqués + fence mermaid
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite  # code en ligne coloré
+  - pymdownx.snippets      # inclusion de fichiers --8<--
+  - pymdownx.tabbed:       # onglets ===
+      alternate_style: true
+  - pymdownx.tasklist:     # cases à cocher
+      custom_checkbox: true
+  - pymdownx.mark          # ==surlignage==
+  - pymdownx.caret         # ^exposant^, ^^inséré^^
+  - pymdownx.tilde         # ~indice~, ~~barré~~
+  - pymdownx.keys          # touches ++ctrl+c++
+  - pymdownx.magiclink     # liens automatiques
+  - pymdownx.emoji:        # icônes :material-...: et émojis
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.smartsymbols  # (c), -->, +/- ...
+  - pymdownx.critic        # annotations de relecture
+  - pymdownx.arithmatex:   # formules mathématiques
+      generic: true
+  - pymdownx.progressbar   # barres de progression
+  - pymdownx.betterem      # emphase plus fine
+  - abbr                   # abréviations *[SIGLE]:
+  - sane_lists             # règles de listes strictes
+  - meta                   # métadonnées de page
+  - wikilinks              # liens [[Page]]
+  - legacy_attrs           # compatibilité d'attributs
+```
+
+Les extensions sans préfixe (`admonition`, `attr_list`, `tables`, `abbr`…) sont fournies par **Markdown** lui-même ; celles en `pymdownx.*` viennent de **pymdown-extensions** ; l'index d'émojis `material.extensions.emoji` vient du thème **Material**.
+
+### Le CSS et le JavaScript d'appoint
+
+Quelques fonctionnalités ont besoin d'un fichier compagnon, déclaré lui aussi dans `mkdocs.yml` :
+
+```yaml
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+```
+
+- `extra.css` porte les styles maison, par exemple la classe `.intro-label`.
+- `mathjax.js` configure le rendu des formules (`arithmatex`), complété par la bibliothèque MathJax.
+
+!!! note "Construire et prévisualiser"
+    `mkdocs serve` lance un aperçu local rechargé à chaque modification.
+    `mkdocs build --strict` compile le site et **échoue au moindre lien cassé** : c'est le contrôle utilisé pour toute la documentation Forge.
+
 ## Les trois niveaux
 
 | Niveau | Ce que vous construisez | Markdown abordé |
