@@ -52,7 +52,9 @@ Type=simple
 # Adapter User à l'utilisateur système qui exécutera l'application
 User=www-data
 WorkingDirectory={project_dir}
-ExecStart={project_dir}/.venv/bin/python {project_dir}/app.py --env prod
+# Serveur WSGI de production : Gunicorn sert le callable `application` de wsgi.py.
+# Ajuster --workers selon le nombre de cœurs (règle simple : 2 × cœurs + 1).
+ExecStart={project_dir}/.venv/bin/gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000
 Restart=always
 RestartSec=5
 EnvironmentFile={project_dir}/env/prod
@@ -60,6 +62,25 @@ EnvironmentFile={project_dir}/env/prod
 [Install]
 WantedBy=multi-user.target
 """
+
+
+def _wsgi_py() -> str:
+    return '''\
+"""Point d'entrée WSGI de production.
+
+Servi par un serveur WSGI (Gunicorn recommandé) placé derrière un reverse
+proxy qui termine HTTPS :
+
+    gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000
+
+`create_configured_wsgi_app()` charge la même configuration que
+`python app.py` (voir `core.app.wsgi`). Le serveur de développement
+(`forge run` / `app.py`) n'est pas destiné à l'exposition publique.
+"""
+from core.app.wsgi import create_configured_wsgi_app
+
+application = create_configured_wsgi_app()
+'''
 
 
 def _readme_deploy() -> str:
@@ -72,28 +93,34 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
 
 | Fichier | Rôle |
 |---------|------|
+| `../wsgi.py` (racine du projet) | Point d'entrée WSGI servi par Gunicorn |
 | `nginx/forge-app.conf` | Configuration Nginx (reverse proxy) |
-| `systemd/forge-app.service` | Unité systemd (daemon applicatif) |
+| `systemd/forge-app.service` | Unité systemd (daemon Gunicorn) |
 
 ## Étapes d'installation
 
-1. Créer `env/prod` avec les variables de production (voir `docs/deployment/deployment.md`).
+1. Installer le serveur WSGI dans l'environnement virtuel :
+   ```
+   .venv/bin/pip install gunicorn
+   ```
+2. Créer `env/prod` avec les variables de production (voir `docs/deployment/deployment.md`).
    En production derrière Nginx, Forge écoute en HTTP local (`APP_SSL_ENABLED=false`).
-2. Adapter `systemd/forge-app.service` : remplacer `User=www-data` si nécessaire.
-3. Copier `nginx/forge-app.conf` dans `/etc/nginx/sites-available/`.
-4. Activer le site Nginx :
+3. Adapter `systemd/forge-app.service` : remplacer `User=www-data` si nécessaire
+   et ajuster `--workers` selon le nombre de cœurs (règle simple : 2 × cœurs + 1).
+4. Copier `nginx/forge-app.conf` dans `/etc/nginx/sites-available/`.
+5. Activer le site Nginx :
    ```
    sudo ln -s /etc/nginx/sites-available/forge-app.conf /etc/nginx/sites-enabled/
    sudo nginx -t && sudo systemctl reload nginx
    ```
-5. Copier `systemd/forge-app.service` dans `/etc/systemd/system/`.
-6. Activer le service :
+6. Copier `systemd/forge-app.service` dans `/etc/systemd/system/`.
+7. Activer le service :
    ```
    sudo systemctl daemon-reload
    sudo systemctl enable forge-app
    sudo systemctl start forge-app
    ```
-7. Vérifier : `forge deploy:check`
+8. Vérifier : `forge deploy:check`
 
 > Ces fichiers sont des modèles. Adaptez-les à votre infrastructure.
 """
@@ -159,6 +186,7 @@ def cmd_deploy_init(root: Path | None = None) -> None:
 
     upload_mb = _upload_max_mb(root)
     files = {
+        root / "wsgi.py": _wsgi_py(),
         root / "deploy" / "nginx" / "forge-app.conf": _nginx_conf(upload_mb),
         root / "deploy" / "systemd" / "forge-app.service": _systemd_service(root),
         root / "deploy" / "README_DEPLOY.md": _readme_deploy(),
@@ -297,6 +325,27 @@ def _check_results(root: Path) -> list[_Result]:
         results.append(_Result("ok", "Module jinja2", "importable"))
     except ImportError:
         results.append(_Result("error", "Module jinja2", "non installé — pip install jinja2"))
+
+    # serveur WSGI Gunicorn (externe, prod uniquement — avertissement, pas erreur)
+    try:
+        import gunicorn  # noqa: F401
+        results.append(_Result("ok", "Serveur WSGI gunicorn", "importable"))
+    except ImportError:
+        results.append(_Result(
+            "warn",
+            "Serveur WSGI gunicorn",
+            "absent — installer en production : .venv/bin/pip install gunicorn",
+        ))
+
+    # point d'entrée wsgi.py
+    if (root / "wsgi.py").exists():
+        results.append(_Result("ok", "Fichier wsgi.py", "présent"))
+    else:
+        results.append(_Result(
+            "warn",
+            "Fichier wsgi.py",
+            "absent — lancer forge deploy:init",
+        ))
 
     # fichiers deploy/
     for rel in (

@@ -81,10 +81,32 @@ def test_systemd_contient_environment_file(tmp_path):
     assert "env/prod" in service
 
 
-def test_systemd_lance_app_en_mode_prod(tmp_path):
+def test_systemd_lance_gunicorn(tmp_path):
+    # DEPLOY-GUNICORN-UNIT-001 — le chemin de production officiel est Gunicorn + WSGI ;
+    # l'unit systemd lance gunicorn sur le callable `application` de wsgi.py, plus
+    # `app.py --env prod` (serveur de développement, non destiné à l'exposition publique).
     cmd_deploy_init(tmp_path)
     service = (tmp_path / "deploy" / "systemd" / "forge-app.service").read_text(encoding="utf-8")
-    assert "app.py --env prod" in service
+    assert "gunicorn wsgi:application" in service
+    assert "--bind 127.0.0.1:8000" in service
+    assert "app.py --env prod" not in service
+
+
+def test_deploy_init_cree_wsgi_py(tmp_path):
+    cmd_deploy_init(tmp_path)
+    wsgi = tmp_path / "wsgi.py"
+    assert wsgi.exists()
+    content = wsgi.read_text(encoding="utf-8")
+    assert "from core.app.wsgi import create_configured_wsgi_app" in content
+    assert "application = create_configured_wsgi_app()" in content
+
+
+def test_deploy_check_signale_wsgi_py_apres_init(tmp_path):
+    cmd_deploy_init(tmp_path)
+    results = _check_results(tmp_path)
+    wsgi_result = next((r for r in results if r.label == "Fichier wsgi.py"), None)
+    assert wsgi_result is not None
+    assert wsgi_result.status == "ok"
 
 
 def test_systemd_working_directory_pointe_vers_root(tmp_path):
