@@ -19,9 +19,22 @@
 ```bash
 sudo apt update
 sudo apt install -y python3 python3-venv python3-pip pipx git openssl
+sudo apt install -y libmariadb-dev build-essential python3-dev
 pipx ensurepath
 exec $SHELL -l
 ```
+
+!!! warning "Dépendance native MariaDB"
+
+    Le paquet Python `mariadb` est compilé depuis les sources et a besoin de l'outil `mariadb_config`.
+    Cet outil est fourni par `libmariadb-dev` ; `build-essential` et `python3-dev` couvrent la compilation de la roue.
+    Sans eux, `pipx install` échoue avec `mariadb_config not found` lors du build de `mariadb`.
+
+    Vérifier que l'outil est trouvable :
+
+    ```bash
+    mariadb_config --version
+    ```
 
 ## Installer Forge
 
