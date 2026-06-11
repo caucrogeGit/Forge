@@ -154,6 +154,13 @@
   .sec-light .card { background-color: #ffffff; border: 1px solid #e2e8f0; }
   .sec-dark  .card { background-color: #0d0f14; border: 1px solid rgba(255, 255, 255, 0.1); }
 
+  /* Piège : ces règles colorent directement chaque p / li d'une carte selon
+     la section (.sec-light / .sec-dark). Or les cartes d'installation sont en
+     fait blanches (l'utilitaire Tailwind `bg-white` l'emporte sur ces composants).
+     Dans une carte .sec-dark, tout p / li SANS couleur explicite hérite alors
+     du blanc translucide ci-dessous -> texte blanc invisible sur fond blanc.
+     Régle : tout texte ajouté dans une carte doit porter sa propre couleur
+     (`text-black`, `text-slate-*`), y compris les <li> de sous-listes. */
   .sec-light .card :is(p, li) { color: #475569; }
   .sec-dark  .card :is(p, li) { color: rgba(255, 255, 255, 0.65); }
 

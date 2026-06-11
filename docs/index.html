@@ -149,152 +149,92 @@
     </div>
 
     <div class="grid md:grid-cols-2 gap-5">
-      <!-- Card 2 : Windows + WSL -->
-      <div class="card rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="windows-wsl">
-        <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Poste Windows 10/11 pro</div>
-        <h3 class="text-xl font-semibold text-slate-900 mb-4">Windows + WSL</h3>
-        <p class="text-sm text-slate-500 leading-relaxed mb-5">
-          Parcours complet : WSL Ubuntu 24.04, VS Code Remote WSL, pipx,
-          Node.js 20, MariaDB avec compte <code class="text-xs text-[#E8651A]">forge_admin</code>.
+      <!-- Card 2 : Poste Linux (procédure de référence, à gauche) -->
+      <div class="card relative rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="pipx-user">
+        <a href="/docs/forge/install/pipx/" target="_blank" rel="noopener noreferrer"
+           class="absolute inset-0" aria-label="Installer Forge sur un poste Linux"></a>
+        <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Poste Linux</div>
+        <p class="text-base text-black leading-relaxed mb-6">
+          Installez Forge en quelques minutes sur <strong class="text-[#E8651A]">Debian</strong>,
+          <strong class="text-[#E8651A]">Ubuntu</strong> ou <strong class="text-[#E8651A]">Linux Mint</strong>.
         </p>
-        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
-          <p class="text-slate-600">
-            Sur un poste Windows 10/11 Pro, Forge ne s'installe pas directement
-            sous Windows : tout l'environnement de développement vit dans
-            <strong class="text-[#E8651A]">WSL</strong> (Windows Subsystem for Linux).
-          </p>
-          <p class="text-slate-600">
-            On active WSL, on installe la distribution
-            <strong class="text-[#E8651A]">Ubuntu 24.04</strong>, puis on travaille côté
-            Linux : Python isolé via <strong class="text-[#E8651A]">pipx</strong>,
-            <strong class="text-[#E8651A]">Node.js 20</strong> pour la chaîne front
-            (Tailwind), et <strong class="text-[#E8651A]">MariaDB</strong> comme base de
-            données avec un compte <code class="text-xs text-[#E8651A]">forge_admin</code>.
-          </p>
-          <p class="text-slate-600">
-            <strong class="text-[#E8651A]">VS Code</strong> se connecte à WSL via
-            l'extension <em>Remote WSL</em>, et le projet reste sous
-            <code class="text-xs text-[#E8651A]">~/Projets/</code> (jamais sous
-            <code class="text-xs text-[#E8651A]">/mnt/c/</code>) pour de bonnes
-            performances. Le guide ci-dessous détaille chaque étape.
-          </p>
-        </div>
-        <div class="mt-5 flex gap-3">
-          <a href="/docs/forge/install/windows-wsl/"
-             target="_blank" rel="noopener noreferrer"
-             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Guide Windows + WSL</a>
-        </div>
+        <ol class="space-y-4 text-base text-black leading-relaxed">
+          <li class="flex gap-3">
+            <span class="flex-none inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E8651A]/10 text-xs font-bold text-[#E8651A]">1</span>
+            <span class="text-black"><strong class="text-[#E8651A]">Installation propre</strong> avec
+            <code class="text-xs font-bold text-slate-900 bg-slate-100 rounded px-1.5 py-0.5">pipx</code>, sans modifier le Python système.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="flex-none inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E8651A]/10 text-xs font-bold text-[#E8651A]">2</span>
+            <span class="text-black"><strong class="text-[#E8651A]">Projet prêt à lancer</strong> avec
+            <code class="text-xs font-bold text-slate-900 bg-slate-100 rounded px-1.5 py-0.5">forge new</code>.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="flex-none inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E8651A]/10 text-xs font-bold text-[#E8651A]">3</span>
+            <div class="text-black">
+              <strong class="text-[#E8651A]">Modules à la demande</strong> :
+              <ul class="mt-2 ml-5 grid grid-cols-2 gap-x-4 gap-y-1.5">
+                <li class="flex items-center gap-2 text-black">
+                  <svg aria-hidden="true" class="flex-none text-[#E8651A]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                  images
+                </li>
+                <li class="flex items-center gap-2 text-black">
+                  <svg aria-hidden="true" class="flex-none text-[#E8651A]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  mail
+                </li>
+                <li class="flex items-center gap-2 text-black">
+                  <svg aria-hidden="true" class="flex-none text-[#E8651A]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z"/><path d="m9 12 2 2 4-4"/></svg>
+                  authentification
+                </li>
+                <li class="flex items-center gap-2 text-black">
+                  <svg aria-hidden="true" class="flex-none text-[#E8651A]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+                  IoT
+                </li>
+                <li class="flex items-center gap-2 text-black">
+                  <svg aria-hidden="true" class="flex-none text-[#E8651A]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+                  API
+                </li>
+                <li class="flex items-center gap-2">
+                  <a href="#modules"
+                     class="relative z-10 inline-flex items-center gap-2 font-semibold text-[#E8651A] hover:underline">
+                    <svg aria-hidden="true" class="flex-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                    opt-in disponibles
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ol>
       </div>
 
-      <!-- Card 3 : Utilisateur du framework (pipx) -->
-      <div class="card rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="pipx-user">
-        <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Utiliser Forge pour créer une application</div>
-        <h3 class="text-xl font-semibold text-slate-900 mb-4">Utilisateur du framework : pipx</h3>
-        <p class="text-sm text-slate-500 leading-relaxed mb-5">
-          <code class="text-xs text-[#E8651A]">pipx</code> installe Forge dans un
-          environnement Python isolé, distinct du système et de chaque
-          projet. Parcours principal recommandé.
+      <!-- Card 3 : Poste Windows 10/11 + WSL (préparation, puis procédure Linux ; à droite) -->
+      <a href="/docs/forge/install/windows-wsl/"
+         target="_blank" rel="noopener noreferrer"
+         class="card block rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="windows-wsl">
+        <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Poste Windows 10/11 + WSL</div>
+        <p class="text-base text-black leading-relaxed mb-6">
+          Développez avec Forge sous Windows grâce à <strong class="text-[#E8651A]">WSL</strong>
+          et <strong class="text-[#E8651A]">Ubuntu 24.04</strong>.
         </p>
-        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
-          <p class="text-slate-600">
-            Une fois <strong class="text-[#E8651A]">pipx</strong> disponible, on installe
-            le paquet officiel <code class="text-xs text-[#E8651A]">forge-mvc</code> en
-            pré-release (le flag <code class="text-xs text-[#E8651A]">--pre</code> est requis
-            tant que Forge est en bêta), puis on vérifie l'installation avec
-            <code class="text-xs text-[#E8651A]">forge --version</code>.
-          </p>
-          <p class="text-slate-600">
-            On génère ensuite un projet depuis un starter avec
-            <code class="text-xs text-[#E8651A]">forge new</code> et on le lance avec
-            <code class="text-xs text-[#E8651A]">forge run</code>.
-          </p>
-          <p class="text-slate-600">
-            <strong class="text-[#E8651A]">Ne pas installer le paquet forge</strong> :
-            c'est un projet différent, sans rapport.
-          </p>
-        </div>
-        <div class="mt-5 flex gap-3">
-          <a href="/docs/forge/install/pipx/"
-             target="_blank" rel="noopener noreferrer"
-             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Installation avec pipx</a>
-        </div>
-      </div>
+        <ol class="space-y-4 text-base text-black leading-relaxed">
+          <li class="flex gap-3">
+            <span class="flex-none inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E8651A]/10 text-xs font-bold text-[#E8651A]">1</span>
+            <span class="text-black"><strong class="text-[#E8651A]">Linux dans Windows</strong>, directement,
+            sans machine virtuelle complète.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="flex-none inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E8651A]/10 text-xs font-bold text-[#E8651A]">2</span>
+            <span class="text-black"><strong class="text-[#E8651A]">Environnement isolé</strong> dans Ubuntu,
+            adapté à Forge.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="flex-none inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#E8651A]/10 text-xs font-bold text-[#E8651A]">3</span>
+            <span class="text-black"><strong class="text-[#E8651A]">Une fois WSL prêt</strong>,
+            suivez la procédure du <strong class="text-[#E8651A]">poste Linux</strong> pour installer Forge et créer votre projet.</span>
+          </li>
+        </ol>
+      </a>
 
-      <!-- Card 4 : Développement du core -->
-      <div class="card rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="core-dev">
-        <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Contribuer au framework</div>
-        <h3 class="text-xl font-semibold text-slate-900 mb-4">Développement du core</h3>
-        <p class="text-sm text-slate-500 leading-relaxed mb-5">
-          Pour travailler sur Forge lui-même : cloner le dépôt, installer
-          l'environnement de développement, lancer les 5 validations
-          canoniques avant commit.
-        </p>
-        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
-          <p class="text-slate-600">
-            On clone le dépôt avec <code class="text-xs text-[#E8651A]">git clone</code>, on
-            crée un environnement virtuel
-            (<code class="text-xs text-[#E8651A]">python -m venv .venv</code>) puis on installe
-            les dépendances de développement via
-            <code class="text-xs text-[#E8651A]">pip install -r requirements-dev.txt</code>.
-          </p>
-          <p class="text-slate-600">
-            Une installation <strong class="text-[#E8651A]">éditable</strong> depuis les
-            sources (pas via <code class="text-xs text-[#E8651A]">pipx</code>), qui inclut le
-            runtime, les outils et les <strong class="text-[#E8651A]">12 modules opt-in</strong>
-            du monorepo.
-          </p>
-          <p class="text-slate-600">
-            Avant chaque commit, on passe les <strong class="text-[#E8651A]">5 validations
-            canoniques</strong> : <code class="text-xs text-[#E8651A]">pytest</code>,
-            <code class="text-xs text-[#E8651A]">compileall</code>,
-            <code class="text-xs text-[#E8651A]">ruff check</code>,
-            <code class="text-xs text-[#E8651A]">mkdocs build --strict</code> et
-            <code class="text-xs text-[#E8651A]">git diff --check</code>.
-          </p>
-        </div>
-        <div class="mt-5 flex gap-3">
-          <a href="/docs/forge/install/core-dev/"
-             target="_blank" rel="noopener noreferrer"
-             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Mode développement core</a>
-        </div>
-      </div>
-
-      <!-- Card 5 : Production WSGI -->
-      <div class="card rounded-xl border border-slate-200 bg-white p-8 hover:border-[#E8651A]/40 hover:shadow-md transition-all" data-install-card="production">
-        <div class="text-2xl font-bold tracking-tight text-[#E8651A] mb-4">Déploiement encadré</div>
-        <h3 class="text-xl font-semibold text-slate-900 mb-4">Production : WSGI + Gunicorn + reverse proxy</h3>
-        <p class="text-sm text-slate-500 leading-relaxed mb-5">
-          En production publique, Forge expose son point d'entrée WSGI derrière
-          Gunicorn et un reverse proxy comme Caddy ou Nginx.
-          <code class="text-xs text-[#E8651A]">python app.py</code> et
-          <code class="text-xs text-[#E8651A]">forge run</code> restent des outils de développement,
-          pas d'exposition publique.
-        </p>
-        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
-          <p class="text-slate-600">
-            Le point d'entrée se déclare dans un fichier
-            <code class="text-xs text-[#E8651A]">wsgi.py</code> qui appelle
-            <code class="text-xs text-[#E8651A]">create_configured_wsgi_app()</code>.
-          </p>
-          <p class="text-slate-600">
-            Puis on sert l'application avec <strong class="text-[#E8651A]">Gunicorn</strong>
-            (<code class="text-xs text-[#E8651A]">gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000</code>),
-            placé derrière un <strong class="text-[#E8651A]">reverse proxy</strong> (Caddy ou
-            Nginx).
-          </p>
-          <p class="text-slate-600">
-            À lire dans l'ordre :
-            <a href="/docs/forge/deployment/wsgi-deployment/" target="_blank" rel="noopener noreferrer" class="text-[#E8651A] font-semibold hover:underline">WSGI minimal</a>,
-            <a href="/docs/forge/deployment/production-limits/" target="_blank" rel="noopener noreferrer" class="text-[#E8651A] font-semibold hover:underline">limites de production</a>,
-            puis le <a href="/docs/forge/deployment/deployment/" target="_blank" rel="noopener noreferrer" class="text-[#E8651A] font-semibold hover:underline">guide de déploiement</a> complet.
-          </p>
-        </div>
-        <div class="mt-5 flex gap-3">
-          <a href="/docs/forge/install/production/"
-             target="_blank" rel="noopener noreferrer"
-             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Parcours production</a>
-        </div>
-      </div>
     </div>
   </div>
 </section>
