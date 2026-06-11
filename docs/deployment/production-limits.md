@@ -1,15 +1,16 @@
-# Limites de production — Forge 1.0.0-beta.13
+# Limites de production
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Cette page synthétise les limites de production connues de Forge à la veille de
-`1.0.0-beta.13`. Elle complète les pages
+Cette page synthétise les limites de production connues de Forge pour la série
+`1.0`. Elle complète les pages
+[Mise en production pas à pas](mise-en-production.md),
 [Guide de déploiement](deployment.md),
 [Déploiement WSGI minimal](wsgi-deployment.md) et
 [Sécurité en production](production-security.md).
 
-!!! warning "Forge beta.9 n'est pas une plateforme de production clé en main"
-    La série Phase B9 a livré l'entrée WSGI configurée, la résolution
+!!! warning "Forge 1.0 n'est pas une plateforme de production clé en main"
+    La série 1.0 a livré l'entrée WSGI configurée, la résolution
     sécurisée de `X-Real-IP`, et les avertissements production au démarrage.
     **Forge ne prétend pas encore fournir** une orchestration multi-worker
     distribuée, des sessions partagées, ni un guide d'exploitation haute
@@ -32,7 +33,7 @@ Cette page synthétise les limites de production connues de Forge à la veille d
 
 ## 2. Tableau synthétique
 
-| Domaine | État beta.9 | Recommandation |
+| Domaine | État 1.0 | Recommandation |
 |---|---|---|
 | Serveur HTTP direct | Développement uniquement | Ne pas exposer `python app.py` publiquement |
 | WSGI | Chemin recommandé | Utiliser `create_configured_wsgi_app()` |
@@ -150,7 +151,7 @@ explicitement** (cf §4).
 
 ---
 
-## 8. Ce que Forge beta.9 garantit / ne garantit pas
+## 8. Ce que Forge 1.0 garantit / ne garantit pas
 
 ### Garanti
 
@@ -163,11 +164,12 @@ explicitement** (cf §4).
 - smoke tests WSGI transversaux (factory + warnings + IP client) ;
 - helpers de cookie de session centralisés
   (`set_session_cookie`, `clear_session_cookie`) ;
-- comparaison constant-time pour le token Bearer API.
+- comparaison constant-time pour le token Bearer API ;
+- `wsgi.py` et unit systemd Gunicorn générés par `forge deploy:init`, avec un
+  parcours documenté : [Mise en production pas à pas](mise-en-production.md).
 
 ### Non garanti — à cadrer côté infrastructure ou tickets futurs
 
-- orchestration `systemd` officielle ;
 - rate-limit distribué (Redis / autre backend) ;
 - session store distribué cloud-native ;
 - support complet `X-Forwarded-For` (chaînes de proxies) ;

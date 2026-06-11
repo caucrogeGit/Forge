@@ -98,7 +98,7 @@ si une erreur bloquante est détectée.
 
 ```bash
 cp env/example env/prod
-chmod 640 env/prod
+chmod 600 env/prod
 ```
 
 Éditez `env/prod` avec les valeurs de production :
@@ -114,11 +114,13 @@ DB_APP_PORT=3306
 DB_APP_LOGIN=mon_app_user
 DB_APP_PWD=<mot_de_passe_fort>
 
-# Base admin (uniquement pour db:init / db:apply)
-DB_ADMIN_HOST=localhost
+# Base admin : laissée vide dans env/prod.
+# Les secrets DB_ADMIN_* (provisioning db:init / db:apply) vivent dans
+# env/db-admin.local, non commité — voir production-security.md.
+DB_ADMIN_HOST=
 DB_ADMIN_PORT=3306
-DB_ADMIN_LOGIN=root
-DB_ADMIN_PWD=<mot_de_passe_root>
+DB_ADMIN_LOGIN=
+DB_ADMIN_PWD=
 
 # Serveur
 APP_HOST=127.0.0.1
@@ -134,8 +136,8 @@ UPLOAD_MAX_SIZE=5242880     # 5 Mo
 
 - `env/prod` ne doit **jamais** être versionné dans Git
 - Vérifiez que `.gitignore` contient `env/prod`
-- Permissions : `640` (propriétaire = utilisateur applicatif, groupe = www-data ou équivalent)
-- Les credentials admin (`DB_ADMIN_*`) servent uniquement lors des migrations — les supprimer de `env/prod` après `db:init` si vous n'en avez plus besoin
+- Permissions : `600` (lisible uniquement par l'utilisateur applicatif)
+- Les credentials admin (`DB_ADMIN_*`) ne vivent **pas** dans `env/prod` mais dans `env/db-admin.local` (non commité, ignoré via `env/*.local`) ; ils ne servent qu'au provisioning (`db:init`, `db:apply`). Politique `ENV-PROD-DB-ADMIN-SECRETS-POLICY-001`, voir [production-security.md](production-security.md)
 
 ---
 
@@ -157,16 +159,23 @@ d'autres bases.
 
 ### Initialiser les tables
 
+Le provisioning (`db:init`, `db:apply`) a besoin des identifiants admin.
+Ceux-ci vivent dans `env/db-admin.local` (non commité), pas dans `env/prod`.
+Chargez-les le temps de la commande :
+
 ```bash
+# Charger les secrets admin (env/db-admin.local) pour le provisioning
+export $(grep -v '^#' env/db-admin.local | xargs)
 forge db:init
 ```
 
 N'exécutez `forge db:init` **qu'une seule fois** par environnement. Cette
 commande crée les tables depuis les fichiers `.sql` des entités.
 
-Pour les migrations ultérieures :
+Pour les migrations ultérieures (mêmes secrets admin chargés au préalable) :
 
 ```bash
+export $(grep -v '^#' env/db-admin.local | xargs)
 # Toujours sauvegarder avant
 mysqldump -u root -p mon_app_db > backup_avant_migration_$(date +%Y%m%d).sql
 forge db:apply
@@ -193,8 +202,9 @@ Type=simple
 User=forge
 Group=forge
 WorkingDirectory=/srv/forge/mon_app
-ExecStart=/srv/forge/mon_app/.venv/bin/python /srv/forge/mon_app/app.py --env prod
-Restart=on-failure
+# Serveur WSGI de production : Gunicorn sert le callable `application` de wsgi.py.
+ExecStart=/srv/forge/mon_app/.venv/bin/gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000
+Restart=always
 RestartSec=5
 EnvironmentFile=/srv/forge/mon_app/env/prod
 

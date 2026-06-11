@@ -359,6 +359,7 @@ nav:
               - Bilan avancé: starters/welcome-markdown/avance/bilan.md
 
   - Déploiement:
+      - Mise en production pas à pas: deployment/mise-en-production.md
       - Checklist de production: deployment/production-checklist.md
       - Guide de déploiement: deployment/deployment.md
       - Déploiement WSGI minimal: deployment/wsgi-deployment.md

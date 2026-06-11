@@ -152,7 +152,7 @@ Type=simple
 # Adapter User à l'utilisateur système qui exécutera l'application
 User=www-data
 WorkingDirectory=/chemin/vers/projet
-ExecStart=/chemin/vers/projet/.venv/bin/python /chemin/vers/projet/app.py --env prod
+ExecStart=/chemin/vers/projet/.venv/bin/gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000
 Restart=always
 RestartSec=5
 EnvironmentFile=/chemin/vers/projet/env/prod
@@ -163,7 +163,9 @@ WantedBy=multi-user.target
 
 **Adapter avant installation :**
 
+- Installer le serveur WSGI dans l'environnement virtuel : `.venv/bin/pip install gunicorn`.
 - Remplacer `User=www-data` par l'utilisateur système approprié.
+- Ajuster `--workers` selon le nombre de cœurs (règle simple : 2 × cœurs + 1).
 - Les chemins `WorkingDirectory`, `ExecStart` et `EnvironmentFile` sont générés automatiquement avec le chemin absolu du projet au moment de `forge deploy:init`.
 
 **Installation sur le serveur :**
@@ -197,10 +199,14 @@ DB_APP_PORT=3306
 DB_APP_LOGIN=utilisateur_app
 DB_APP_PWD=mot_de_passe_fort
 
-DB_ADMIN_HOST=localhost
+# Compte admin : laissé vide dans env/prod.
+# Les secrets DB_ADMIN_* (provisioning db:init / db:apply) vivent dans
+# env/db-admin.local, non commité — voir production-security.md
+# (ENV-PROD-DB-ADMIN-SECRETS-POLICY-001).
+DB_ADMIN_HOST=
 DB_ADMIN_PORT=3306
-DB_ADMIN_LOGIN=root
-DB_ADMIN_PWD=<mot_de_passe_root_mariadb>
+DB_ADMIN_LOGIN=
+DB_ADMIN_PWD=
 
 SSL_CERTFILE=cert.pem
 SSL_KEYFILE=key.pem
@@ -257,37 +263,35 @@ Forge utilise par défaut `MemorySessionStore` — sessions en mémoire processu
 Pour activer le backend fichier :
 
 ```python
+import core.forge as forge
 from core.sessions.file_store import FileSessionStore
-from core.sessions import manager as session_manager
 
-session_manager._default_store = FileSessionStore(sessions_dir="storage/sessions")
+forge.configure(session_store=FileSessionStore(sessions_dir="storage/sessions"))
 ```
 
 Pour activer le backend MariaDB (table `forge_sessions` requise — voir `mvc/models/sql/forge_sessions.sql`) :
 
 ```python
+import core.forge as forge
 from core.sessions.mariadb_store import MariaDbSessionStore
-from core.sessions import manager as session_manager
 
-session_manager._default_store = MariaDbSessionStore()
+forge.configure(session_store=MariaDbSessionStore())
 ```
 
-Le backend MariaDB prépare les déploiements multi-processus (plusieurs processus Forge sur la même base). Il **ne rend pas Forge automatiquement scalable horizontalement** — la configuration du load balancer et de la base reste à charge du déploiement.
+Cet appel se place au point d'entrée, avant la construction de l'application : `wsgi.py` en production, `app.py` en développement. Voir [Mise en production pas à pas](mise-en-production.md).
 
-**Modes supportés :**
+Le backend MariaDB partage les sessions entre tous les workers Gunicorn (et entre plusieurs processus Forge sur la même base). C'est lui qui rend possible le chemin de production officiel (Gunicorn multi-worker). Il **ne rend pas Forge automatiquement scalable horizontalement** : la configuration du load balancer et de la base reste à charge du déploiement.
 
-- développement local mono-processus ;
-- production mono-processus derrière Nginx.
+**Avec le store par défaut `MemorySessionStore` :**
 
-**Modes non supportés sans backend de session partagé :**
+- chaque worker garde ses sessions en mémoire ;
+- le multi-worker n'est donc pas utilisable (déconnexions aléatoires) ;
+- les sessions sont perdues à chaque redémarrage du service.
 
-- Gunicorn/uWSGI multi-worker ;
-- plusieurs instances du processus Forge ;
-- plusieurs serveurs derrière un load balancer ;
-- scaling horizontal ;
-- conservation des sessions après redémarrage du service.
+**Avec `MariaDbSessionStore` (recommandé en production) :**
 
-Si vous déployez Forge en production, le processus doit rester **unique**. En cas de redémarrage, toutes les sessions actives sont perdues et les utilisateurs doivent se reconnecter.
+- les sessions sont partagées entre workers et survivent au redémarrage ;
+- Gunicorn multi-worker est pleinement supporté.
 
 Voir aussi [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md).
 
@@ -342,10 +346,10 @@ curl -s http://127.0.0.1:8000/health
 
 ---
 
-## 11. Autres limites actuelles
+## 13. Autres limites actuelles
 
 - **Pas de déploiement automatique** — Forge génère les fichiers de configuration, l'installation sur le serveur reste manuelle.
 - **Pas de HTTPS automatique** — configurer Nginx pour terminer TLS (Let's Encrypt + Certbot recommandé).
 - **Pas de Docker** — non prévu pour l'instant.
-- **Un seul processus Python** — le serveur Forge est mono-processus. Voir section 9 pour les implications sur les sessions.
+- **Sessions à partager en multi-worker** — Gunicorn multi-worker exige le store partagé `MariaDbSessionStore`. Voir section 9.
 - **Nginx uniquement documenté** — Apache httpd est également un reverse proxy valide mais non documenté ici.

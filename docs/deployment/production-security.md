@@ -103,6 +103,14 @@ Les headers suivants sont émis sur **toutes** les réponses HTTP (200, 302, 404
 | `Content-Security-Policy` | voir ci-dessous | Politique de contenu |
 | `Cache-Control` | `no-store` sur routes auth | Interdit la mise en cache des pages sensibles |
 
+!!! note "HSTS et reverse proxy"
+    Le tableau décrit le comportement quand Forge termine lui-même TLS
+    (serveur de développement HTTPS, `APP_SSL_ENABLED=true`).
+    Dans le déploiement de production officiel (Gunicorn derrière un reverse proxy),
+    Forge écoute en HTTP local : `wsgi.url_scheme` vaut `http`, donc Forge ne pose
+    **pas** `Strict-Transport-Security`, et c'est le reverse proxy qui l'ajoute.
+    Voir [Déploiement WSGI minimal](wsgi-deployment.md#41-headers-de-securite-et-hsts).
+
 ### Content-Security-Policy
 
 CSP par défaut (sans nonce) :
