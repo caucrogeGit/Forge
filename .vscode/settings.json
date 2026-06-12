@@ -1,4 +1,24 @@
 {
+  "sqltools.connections": [
+    {
+      "name": "Forge Dev (forge_app)",
+      "driver": "MariaDB",
+      "server": "localhost",
+      "port": 3306,
+      "database": "forge_db",
+      "username": "forge_app",
+      "password": "${env:FORGE_DB_APP_PWD}"
+    },
+    {
+      "name": "Forge Dev (forge_admin)",
+      "driver": "MariaDB",
+      "server": "localhost",
+      "port": 3306,
+      "database": "forge_db",
+      "username": "forge_admin",
+      "password": "${env:FORGE_DB_ADMIN_PWD}"
+    }
+  ],
   "json.schemas": [
     {
       "fileMatch": [

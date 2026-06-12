@@ -1,6 +1,6 @@
 # L'objet Request dans Forge
 
-Ce document explique ce qu'est une **requête** HTTP, comment Forge la représente avec l'objet `Request`, ce qu'il contient et comment on le lit dans un contrôleur.
+Ce document explique ce qu'est une requête HTTP, comment Forge la représente avec l'objet `Request`, ce qu'il contient et comment on le lit dans un contrôleur.
 
 ## 1. Qu'est-ce qu'une requête ?
 
@@ -13,6 +13,9 @@ Cette requête transporte tout ce que le serveur a besoin de savoir pour répond
 - parfois un **corps** (les champs d'un formulaire, un document JSON…).
 
 Le serveur lit la requête, puis renvoie une réponse.
+
+??? note "Voir l'illustration"
+    ![illustration d'une requête](imgs/requete.png){ width="60%" .center }
 
 ## 2. La requête dans Forge
 

@@ -440,7 +440,7 @@ Attendu :
 - si une commande est trop longue pour l’outil, demander à l’utilisateur de la lancer et de coller le résultat.
 
 ### Gestion des phrases
-- Phrases : rédiger **une phrase par ligne** dans la source Markdown. Après le
+- Phrases : rédiger une phrase par ligne dans la source Markdown. Après le
   point final d'une phrase, la phrase suivante commence sur une nouvelle ligne.
-  Cela n'affecte pas le rendu (Markdown regroupe les lignes d'un même
-  paragraphe) mais facilite la relecture et les diffs.
+  L'extension nl2br est activée : chaque retour de ligne simple devient un saut
+  de ligne au rendu, donc une phrase par ligne s'affiche ligne à ligne.

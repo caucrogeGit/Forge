@@ -53,3 +53,10 @@
 .md-typeset .intro-label {
   color: #c2410c;
 }
+
+/* DOCS-IMG-CENTER-001 — Centrer une image standalone marquée { .center }.
+   L'image étant enveloppée par glightbox dans un <a> inline, on centre le
+   paragraphe qui la contient (couvre aussi le cas sans lightbox). */
+.md-typeset p:has(img.center) {
+  text-align: center;
+}
