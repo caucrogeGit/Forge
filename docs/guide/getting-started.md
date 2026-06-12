@@ -14,13 +14,13 @@ Choisissez le chemin adapté à votre contexte :
 | Contexte | Documentation |
 |---|---|
 | Machine ou VM Debian vierge | [Installation VM Debian](../install/vm-debian.md) |
-| Outil CLI isolé (recommandé) | [Installation avec pipx](../install/pipx.md) |
+| Outil CLI isolé (recommandé) | [Poste Linux (pipx)](../install/poste-linux.md) |
 | Version spécifique depuis un tag | [Installation depuis GitHub](../install/github.md) |
 | Préparer la base de données MariaDB | [Préparer MariaDB](../install/mariadb.md) |
 | Contribuer au framework Forge | [Mode développement](../install/core-dev.md) |
 | Développeur Windows 11 (via WSL2) | [Installation Windows](../install/windows.md) — résumé court, ou [Windows + WSL (parcours complet)](../install/windows-wsl.md) pour le pas-à-pas |
 
-Vue d'ensemble des packages et méthodes : [install/index.md](../install/index.md).
+Liste des paquets opt-in et méthodes d'installation : [Contrat d'installation des opt-ins](../install/opt-ins.md).
 
 Forge se lance de trois façons équivalentes :
 

@@ -1,19 +1,20 @@
-"""Tests — LANDING-INSTALL-CARDS-001 (réaligné par LANDING-PUBLIC-CONTRACT-REALIGN-001).
+"""Tests — LANDING-INSTALL-CARDS-001.
 
 Verrouille le contrat de la section « Installer Forge selon votre usage »
-de la landing canonique (`mvc/views/landing/index.html`) après réalignement
-en 4 cards toutes au même design (pas de col-span-2, pas de card spéciale) :
+de la landing canonique (`mvc/views/landing/index.html`).
 
-  1. Windows + WSL          → docs/install/windows-wsl.md
-  2. Utilisateur — pipx     → docs/install/pipx.md
-  3. Développement du core  → docs/install/core-dev.md
-  4. Production WSGI        → docs/install/production.md
-                              (entrée vers wsgi-deployment / production-limits / deployment)
+Depuis la refonte des cartes, la section ne contient plus que **2 cartes**,
+au même design, qui orientent par contexte de poste :
 
-Décision de suppression assumée :
-- La 5e card historique « Bonjour Forge » a été retirée de la section
-  Installation. Le starter `welcome` reste affiché plus bas dans
-  « Starters progressifs » (carte « Bienvenue dans Forge »).
+  1. Poste Linux                 → docs/install/poste-linux.md   (data-install-card="pipx-user")
+  2. Poste Windows 10/11 + WSL   → docs/install/windows-wsl.md   (data-install-card="windows-wsl")
+
+Décisions assumées :
+- Les anciennes cartes « Développement du core » et « Production WSGI » ont
+  été retirées de la section Installation : la landing oriente par poste, et
+  la carte Windows renvoie elle-même vers la procédure du poste Linux.
+- Les cartes sont volontairement légères (orientation, pas de procédure
+  détaillée) : le détail vit dans les pages d'installation.
 
 `docs/index.html` est généré par `forge sync:landing` — on contrôle la
 synchronisation côté tests.
@@ -34,13 +35,8 @@ ROADMAP = Path("docs/roadmap/forge-roadmap.md")
 
 # Pages cibles attendues — toutes doivent exister sous docs/.
 EXPECTED_TARGETS = [
+    Path("docs/install/poste-linux.md"),
     Path("docs/install/windows-wsl.md"),
-    Path("docs/install/pipx.md"),
-    Path("docs/install/core-dev.md"),
-    Path("docs/install/production.md"),
-    Path("docs/deployment/wsgi-deployment.md"),
-    Path("docs/deployment/production-limits.md"),
-    Path("docs/deployment/deployment.md"),
 ]
 
 
@@ -64,12 +60,11 @@ class TestSync:
     def test_docs_index_existe(self):
         assert DOCS_LANDING.exists()
 
-    def test_docs_index_pointe_vers_nouvelle_install(self):
+    def test_docs_index_pointe_vers_install(self):
         """docs/index.html, généré par `forge sync:landing`, doit refléter
-        les nouveaux chemins install/."""
+        les chemins install/ des 2 cartes."""
         docs = _docs()
-        assert "install/pipx/" in docs
-        assert "install/core-dev/" in docs
+        assert "install/poste-linux/" in docs
         assert "install/windows-wsl/" in docs
 
 
@@ -83,43 +78,79 @@ class TestInstallationSection:
         assert 'id="installation"' in _src()
 
     def test_titre_section(self):
-        assert "Installer Forge selon votre usage" in _src()
+        assert "Installer Forge." in _src()
 
-    def test_grille_4_cards(self):
+    def test_grille_2_cards(self):
         text = _src()
-        # 4 cards, identifiables par data-install-card="..."
+        # 2 cards, identifiables par data-install-card="...", dans l'ordre source.
         cards = re.findall(r'data-install-card="([^"]+)"', text)
         assert cards == [
-            "windows-wsl",
             "pipx-user",
-            "core-dev",
-            "production",
+            "windows-wsl",
         ], f"Cards installation incorrectes ou désordonnées : {cards}"
 
     def test_aucune_card_install_en_col_span_2(self):
-        """Toutes les cards doivent suivre le même design — aucune ne doit
-        utiliser md:col-span-2 (la card Production n'est pas spéciale)."""
+        """Les 2 cards doivent suivre le même design — aucune ne doit
+        utiliser md:col-span-2."""
         text = _src()
         for marker in (
-            'data-install-card="windows-wsl"',
             'data-install-card="pipx-user"',
-            'data-install-card="core-dev"',
-            'data-install-card="production"',
+            'data-install-card="windows-wsl"',
         ):
             idx = text.find(marker)
-            # On extrait les classes du <div> qui contient ce marker.
-            div_start = text.rfind("<div ", 0, idx)
+            div_start = text.rfind("<", 0, idx)
             div_end = text.find(">", idx)
-            div_tag = text[div_start:div_end]
-            assert "md:col-span-2" not in div_tag, (
+            tag = text[div_start:div_end]
+            assert "md:col-span-2" not in tag, (
                 f"La card {marker} utilise md:col-span-2 — toutes les cards "
                 "d'installation doivent avoir le même design."
             )
 
 
 # ---------------------------------------------------------------------------
-# Card 1 — Windows + WSL
+# Card 1 — Poste Linux (pipx)
 # ---------------------------------------------------------------------------
+
+
+def _pipx_card() -> str:
+    text = _src()
+    idx = text.find('data-install-card="pipx-user"')
+    end = text.find('data-install-card="windows-wsl"')
+    return text[idx:end]
+
+
+class TestCardPosteLinux:
+    def test_card_presente(self):
+        assert 'data-install-card="pipx-user"' in _src()
+
+    def test_titre(self):
+        assert "Poste Linux" in _pipx_card()
+
+    def test_distributions_supportees(self):
+        block = _pipx_card()
+        assert "Debian" in block
+        assert "Ubuntu" in block
+        assert "Linux Mint" in block
+
+    def test_valorise_pipx_et_forge_new(self):
+        block = _pipx_card()
+        assert "pipx" in block
+        assert "forge new" in block
+
+    def test_lien_cible(self):
+        assert "/docs/forge/install/poste-linux/" in _pipx_card()
+
+
+# ---------------------------------------------------------------------------
+# Card 2 — Poste Windows 10/11 + WSL
+# ---------------------------------------------------------------------------
+
+
+def _wsl_card() -> str:
+    text = _src()
+    idx = text.find('data-install-card="windows-wsl"')
+    end = text.find("</section>", idx)
+    return text[idx:end]
 
 
 class TestCardWindowsWsl:
@@ -127,184 +158,20 @@ class TestCardWindowsWsl:
         assert 'data-install-card="windows-wsl"' in _src()
 
     def test_titre(self):
-        assert "Windows + WSL" in _src()
+        assert "Poste Windows 10/11 + WSL" in _src()
 
     def test_valorise_wsl_ubuntu_24_04(self):
-        text = _src()
-        assert "Ubuntu-24.04" in text or "Ubuntu 24.04" in text
+        block = _wsl_card()
+        assert "WSL" in block
+        assert "Ubuntu 24.04" in block
 
-    def test_valorise_pipx(self):
-        text = _src()
-        idx = text.find('data-install-card="windows-wsl"')
-        end = text.find('data-install-card="pipx-user"')
-        card_block = text[idx:end]
-        assert "pipx" in card_block
-
-    def test_valorise_forge_admin(self):
-        text = _src()
-        idx = text.find('data-install-card="windows-wsl"')
-        end = text.find('data-install-card="pipx-user"')
-        card_block = text[idx:end]
-        assert "forge_admin" in card_block
-
-    def test_valorise_node_20(self):
-        text = _src()
-        idx = text.find('data-install-card="windows-wsl"')
-        end = text.find('data-install-card="pipx-user"')
-        card_block = text[idx:end]
-        assert "nodejs" in card_block or "Node.js 20" in card_block
-
-    def test_avertit_contre_mnt_c(self):
-        text = _src()
-        idx = text.find('data-install-card="windows-wsl"')
-        end = text.find('data-install-card="pipx-user"')
-        card_block = text[idx:end]
-        assert "/mnt/c" in card_block
-        assert "~/Projets" in card_block
+    def test_renvoie_vers_procedure_poste_linux(self):
+        # La carte Windows oriente vers la procédure du poste Linux.
+        block = _wsl_card()
+        assert "poste Linux" in block
 
     def test_lien_cible(self):
-        text = _src()
-        assert "/docs/forge/install/windows-wsl/" in text
-
-
-# ---------------------------------------------------------------------------
-# Card 2 — Utilisateur du framework (pipx)
-# ---------------------------------------------------------------------------
-
-
-class TestCardPipxUser:
-    def test_card_presente(self):
-        assert 'data-install-card="pipx-user"' in _src()
-
-    def test_titre_mentionne_pipx(self):
-        text = _src()
-        assert "Utilisateur du framework" in text and "pipx" in text
-
-    def test_commande_pipx_canonique(self):
-        text = _src()
-        # Le parcours pipx est décrit en prose depuis la refonte de la card :
-        # le paquet officiel `forge-mvc` et le flag `--pre` restent mentionnés.
-        assert "forge-mvc" in text
-        assert "--pre" in text
-
-    def test_paquet_correct_forge_mvc(self):
-        text = _src()
-        idx = text.find('data-install-card="pipx-user"')
-        end = text.find('data-install-card="core-dev"')
-        card_block = text[idx:end]
-        assert "forge-mvc" in card_block
-
-    def test_avertit_de_ne_pas_installer_paquet_forge(self):
-        text = _src()
-        idx = text.find('data-install-card="pipx-user"')
-        end = text.find('data-install-card="core-dev"')
-        card_block = text[idx:end]
-        normalized = " ".join(card_block.split())
-        # Avertissement explicite contre le mauvais paquet.
-        assert (
-            "Ne pas installer le paquet" in normalized
-            or "ne pas installer le paquet" in normalized.lower()
-        )
-
-    def test_lien_cible(self):
-        text = _src()
-        assert "/docs/forge/install/pipx/" in text
-
-
-# ---------------------------------------------------------------------------
-# Card 3 — Développement du core (après INSTALL-CORE-DEV-DOCS-AUDIT-001)
-# ---------------------------------------------------------------------------
-
-
-class TestCardCoreDev:
-    def test_card_presente(self):
-        assert 'data-install-card="core-dev"' in _src()
-
-    def test_titre(self):
-        text = _src()
-        assert "Développement du core" in text
-
-    def test_5_validations_canoniques_listees(self):
-        """La card doit citer les 5 validations canoniques avant commit.
-
-        Depuis la refonte, la card décrit les validations en prose : on
-        vérifie la présence des 5 outils (pytest, compileall, ruff,
-        mkdocs --strict, git diff --check) plutôt que la ligne de commande
-        complète.
-        """
-        text = _src()
-        idx = text.find('data-install-card="core-dev"')
-        end = text.find('data-install-card="production"')
-        card_block = text[idx:end]
-        for cmd in [
-            "pytest",
-            "compileall",
-            "ruff check",
-            "mkdocs build --strict",
-            "git diff --check",
-        ]:
-            assert cmd in card_block, f"Validation manquante : {cmd}"
-
-    def test_installation_editable_pas_pipx(self):
-        """La note doit préciser que l'installation est éditable, pas
-        via pipx."""
-        text = _src()
-        idx = text.find('data-install-card="core-dev"')
-        end = text.find('data-install-card="production"')
-        card_block = text[idx:end]
-        normalized = " ".join(card_block.split())
-        assert "éditable" in normalized
-        assert "pipx" in normalized
-
-    def test_lien_principal_avec_accent(self):
-        """Le CTA est en accent (comme les autres cards)."""
-        text = _src()
-        idx = text.find('data-install-card="core-dev"')
-        end = text.find('data-install-card="production"')
-        card_block = text[idx:end]
-        assert "landing-accent-bg" in card_block
-        assert "/docs/forge/install/core-dev/" in card_block
-
-
-# ---------------------------------------------------------------------------
-# Card 4 — Production WSGI
-# ---------------------------------------------------------------------------
-
-
-class TestCardProduction:
-    def test_card_presente(self):
-        assert 'data-install-card="production"' in _src()
-
-    def test_titre_production_wsgi(self):
-        text = _src()
-        assert "Production" in text and "WSGI" in text
-        assert "Gunicorn" in text and "reverse proxy" in text
-
-    def test_warn_no_python_app_py_production(self):
-        text = _src()
-        idx = text.find('data-install-card="production"')
-        end = text.find('</section>', idx)
-        card_block = text[idx:end]
-        normalized = " ".join(card_block.split())
-        # La card doit explicitement écarter python app.py / forge run
-        # comme parcours de production publique.
-        assert "python app.py" in card_block
-        assert "forge run" in card_block
-        assert (
-            "pas d'exposition publique" in normalized
-            or "outils de développement" in normalized
-        )
-
-    def test_liens_production_complets(self):
-        text = _src()
-        idx = text.find('data-install-card="production"')
-        end = text.find('</section>', idx)
-        card_block = text[idx:end]
-        # Les 3 guides production doivent être référencés depuis la card.
-        # Réorg beta13 : les guides vivent sous docs/deployment/.
-        assert "/docs/forge/deployment/wsgi-deployment/" in card_block
-        assert "/docs/forge/deployment/production-limits/" in card_block
-        assert "/docs/forge/deployment/deployment/" in card_block
+        assert "/docs/forge/install/windows-wsl/" in _src()
 
 
 # ---------------------------------------------------------------------------

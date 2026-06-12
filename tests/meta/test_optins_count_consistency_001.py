@@ -26,7 +26,7 @@ CURRENT_STATE_DOCS = [
     "README.md",
     "CONTRIBUTING.md",
     "CHARTE_DOC.md",
-    "docs/install/index.md",
+    "docs/install/opt-ins.md",
     "docs/install/core-dev.md",
     "docs/release/release-policy.md",
 ]

@@ -22,7 +22,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
-INSTALL_DOC = PROJECT_ROOT / "docs" / "install" / "index.md"
+INSTALL_DOC = PROJECT_ROOT / "docs" / "install" / "opt-ins.md"
 
 _PUBLISHABLE_EXTRAS = ["rbac", "workflow", "stats"]
 # REMOVE-MEDIA-PKG : forge-mvc-media supprimé (remplacé par forge-mvc-images).
@@ -196,13 +196,13 @@ class TestDocumentationExtrasCoherence:
     def test_install_doc_no_media_available_claim(self):
         text = INSTALL_DOC.read_text(encoding="utf-8")
         assert "forge-mvc[media]" not in text or self._has_unavailable_hint(text), (
-            "install/index.md ne doit pas presenter forge-mvc[media] comme disponible "
+            "install/opt-ins.md ne doit pas presenter forge-mvc[media] comme disponible "
             "(les paquets s'installent directement via `pip install --pre forge-mvc-media`)."
         )
 
     def test_install_doc_no_mfa_available_claim(self):
         text = INSTALL_DOC.read_text(encoding="utf-8")
         assert "forge-mvc[mfa]" not in text or self._has_unavailable_hint(text), (
-            "install/index.md ne doit pas presenter forge-mvc[mfa] comme disponible "
+            "install/opt-ins.md ne doit pas presenter forge-mvc[mfa] comme disponible "
             "(les paquets s'installent directement via `pip install --pre forge-mvc-mfa`)."
         )

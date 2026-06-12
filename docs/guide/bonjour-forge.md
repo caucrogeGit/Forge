@@ -16,7 +16,7 @@ forge run → route → contrôleur → Request → Response.text(...)
 !!! tip "Forge n'est pas encore installé ?"
     Commencez par le parcours d'installation :
     [VM Debian vierge](../install/vm-debian.md),
-    [pipx](../install/pipx.md),
+    [poste Linux (pipx)](../install/poste-linux.md),
     [depuis GitHub](../install/github.md),
     [Windows + WSL (parcours complet)](../install/windows-wsl.md).
 

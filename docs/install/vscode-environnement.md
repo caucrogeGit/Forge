@@ -163,4 +163,3 @@ optionnels et propres au confort de chacun :
 | Auto-import des classes `core` (Python + Pylance) | [Configurer VS Code pour l'auto-import](vscode.md) |
 | Schémas JSON des entités et relations | [Autocomplétion VS Code avec les schémas JSON](../entities/vscode-json-schema.md) |
 | Outils CLI du projet (ruff, mkdocs, pytest) | [Mode développement](core-dev.md) |
-| Vue d'ensemble de l'installation | [Installation](index.md) |

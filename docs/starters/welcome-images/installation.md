@@ -7,7 +7,7 @@ projet **déjà créé**.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core et des autres parcours, voir
-    [Installer Forge](../../install/index.md).
+    [Installer Forge](../../install/poste-linux.md).
 
 !!! info "Module publié sur PyPI"
     `forge-mvc-images` est publié sur PyPI depuis `1.0.0-beta.13`. On l'installe
@@ -18,7 +18,7 @@ projet **déjà créé**.
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Si ce n'est pas encore fait, suivre
-  d'abord [Installer Forge](../../install/index.md).
+  d'abord [Installer Forge](../../install/poste-linux.md).
 - **Python 3.12+**.
 - Les premiers paliers (premier contact, dérivation des variantes) fonctionnent
   **sans base de données**. La couche médias en base n'intervient qu'au niveau

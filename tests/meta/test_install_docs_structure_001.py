@@ -30,9 +30,9 @@ LANDING_SRC = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
 DOCS_INDEX_HTML = PROJECT_ROOT / "docs" / "index.html"
 
 EXPECTED_FILES = [
-    "index.md",
+    "opt-ins.md",
     "windows-wsl.md",
-    "pipx.md",
+    "poste-linux.md",
     "core-dev.md",
     "mariadb.md",
     "vm-debian.md",
@@ -67,21 +67,20 @@ class TestInstallDirExists:
         assert path.exists(), f"docs/install/{name} doit exister."
 
 
-class TestIndexIsAiguillage:
-    def test_index_titre_explicite(self):
-        text = (INSTALL_DIR / "index.md").read_text(encoding="utf-8")
-        assert text.startswith("# Installer Forge")
+class TestIndexRemoved:
+    """L'aiguillage `index.md` a été supprimé : la landing publique route
+    directement vers les pages d'installation (poste-linux, windows-wsl,
+    core-dev), et `opt-ins.md` porte le contrat d'installation des opt-ins."""
 
-    def test_index_distingue_utilisateur_et_core(self):
-        text = (INSTALL_DIR / "index.md").read_text(encoding="utf-8")
-        assert "Utilisateur du framework" in text
-        assert "Développeur du core" in text
+    def test_index_md_absent(self):
+        assert not (INSTALL_DIR / "index.md").exists(), (
+            "docs/install/index.md doit rester supprimé : la landing fait "
+            "l'aiguillage, opt-ins.md porte le contrat opt-ins."
+        )
 
-    def test_index_liste_les_parcours(self):
-        text = (INSTALL_DIR / "index.md").read_text(encoding="utf-8")
-        for link in ("windows-wsl.md", "pipx.md", "core-dev.md",
-                     "mariadb.md", "production.md"):
-            assert link in text, f"docs/install/index.md doit lier vers {link}."
+    def test_optins_page_porte_le_contrat(self):
+        first = (INSTALL_DIR / "opt-ins.md").read_text(encoding="utf-8").splitlines()[0]
+        assert "Contrat" in first and "opt-ins" in first
 
 
 class TestProductionPage:
@@ -166,8 +165,7 @@ class TestNoBrokenInternalLinks:
 class TestLandingPointsToNewPaths:
     def test_landing_source_uses_new_install_paths(self):
         text = LANDING_SRC.read_text(encoding="utf-8")
-        assert "install/pipx/" in text
-        assert "install/core-dev/" in text
+        assert "install/poste-linux/" in text
         assert "install/windows-wsl/" in text
 
     def test_landing_source_does_not_reference_old_paths(self):
@@ -190,8 +188,7 @@ class TestLandingPointsToNewPaths:
         if not DOCS_INDEX_HTML.exists():
             pytest.skip("docs/index.html absent — lancer `forge sync:landing`.")
         text = DOCS_INDEX_HTML.read_text(encoding="utf-8")
-        assert "install/pipx/" in text
-        assert "install/core-dev/" in text
+        assert "install/poste-linux/" in text
         assert "install/windows-wsl/" in text
 
 
@@ -203,9 +200,9 @@ class TestMkdocsNav:
     def test_nav_references_all_install_pages(self):
         text = MKDOCS.read_text(encoding="utf-8")
         for entry in (
-            "install/index.md",
+            "install/opt-ins.md",
             "install/windows-wsl.md",
-            "install/pipx.md",
+            "install/poste-linux.md",
             "install/core-dev.md",
             "install/mariadb.md",
             "install/production.md",

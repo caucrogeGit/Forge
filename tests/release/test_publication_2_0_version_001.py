@@ -123,8 +123,8 @@ def test_docs_reference_mentionne_version_courante():
 
 
 def test_docs_installation_mentionne_version_courante():
-    """docs/install/index.md mentionne la version courante ou son placeholder."""
-    content = (ROOT / "docs" / "install" / "index.md").read_text(encoding="utf-8")
+    """docs/install/poste-linux.md mentionne la version courante ou son placeholder."""
+    content = (ROOT / "docs" / "install" / "poste-linux.md").read_text(encoding="utf-8")
     assert _EXPECTED in content or "{{forge_version}}" in content
 
 

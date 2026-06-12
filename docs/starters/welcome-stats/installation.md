@@ -5,12 +5,12 @@ départ. C'est la **seule page du parcours** qui contient des commandes de créa
 tous les paliers suivants supposent le projet **déjà créé**.
 
 !!! info "Référence complète"
-    Pour l'installation détaillée du core, voir [Installer Forge](../../install/index.md).
+    Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
 
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
-  [Installer Forge](../../install/index.md).
+  [Installer Forge](../../install/poste-linux.md).
 - **Python 3.12+**.
 - Aucune base de données pour ce parcours : les opérations sur la base sont démontrées
   via un **exécuteur injecté** de démonstration. Une vraie application crée la table

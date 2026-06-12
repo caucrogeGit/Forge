@@ -8,7 +8,7 @@ Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir
 
 !!! tip "Forge n'est pas encore installé ?"
     Commencez par le parcours adapté dans le menu Installation :
-    [VM Debian vierge](../install/vm-debian.md), [pipx](../install/pipx.md),
+    [VM Debian vierge](../install/vm-debian.md), [poste Linux (pipx)](../install/poste-linux.md),
     [GitHub](../install/github.md), [mode développement](../install/core-dev.md)
     ou [préparation MariaDB](../install/mariadb.md).
 

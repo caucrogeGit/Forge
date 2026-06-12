@@ -23,4 +23,3 @@ Le contenu détaillé reste dans les pages dédiées — ne pas dupliquer ici.
 
 - [Déploiement avancé](../deployment/deploy-advanced.md) — scénarios étendus.
 - [Sécurité en production](../deployment/production-security.md) — durcissement et audit.
-- [Installation — vue d'ensemble](index.md) — retour à l'aiguillage.

@@ -246,9 +246,9 @@ class TestLiensAnnexes:
         assert "adr/" in text
 
     def test_lien_pipx_pour_utilisateur(self):
-        """La page renvoie vers la page pipx pour l'autre parcours."""
+        """La page renvoie vers la page poste Linux pour l'autre parcours."""
         text = _text()
-        assert "pipx.md" in text
+        assert "poste-linux.md" in text
 
     def test_lien_install_windows_wsl(self):
         text = _text()

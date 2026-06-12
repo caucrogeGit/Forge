@@ -58,9 +58,9 @@ class TestSectionOrder:
     def test_installation_before_cards(self):
         text = LANDING.read_text(encoding="utf-8")
         pos_install = text.find('id="installation"')
-        pos_cards   = text.find("Le core Forge")
+        pos_cards   = text.find("Modules officiels installables séparément")
         assert pos_install != -1, "Section installation introuvable (id='installation')"
-        assert pos_cards   != -1, "Section 'Le core Forge' introuvable"
+        assert pos_cards   != -1, "Section des modules officiels introuvable"
         assert pos_install < pos_cards, (
             "La section Installation doit apparaître avant la section des cartes. "
             f"(positions : installation={pos_install}, cartes={pos_cards})"
@@ -131,12 +131,10 @@ class TestOptInModules:
         assert module in text, f"Module opt-in '{module}' manquant dans la landing."
 
     def test_modules_description_wording(self):
-        """Le bloc des modules opt-in a son chapeau actualisé
-        (LANDING-MODULES-WORDING-001) — « Forge fournit des modules officiels
-        opt-in installables séparément », sans la mention « selon leur état de
-        disponibilité »."""
+        """Le bloc des modules opt-in porte son chapeau canonique
+        « Modules officiels installables séparément. »."""
         text = LANDING.read_text(encoding="utf-8")
-        assert "Forge fournit des modules officiels opt-in" in text, (
+        assert "Modules officiels installables séparément" in text, (
             "Le bloc des modules opt-in doit porter son chapeau canonique."
         )
         assert "installables séparément" in text, (

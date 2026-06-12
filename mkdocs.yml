@@ -30,11 +30,10 @@ nav:
   - Accueil: index.html
 
   - Installation:
-      - Vue d'ensemble: install/index.md
       - Installer Forge:
           - Windows + WSL (parcours complet): install/windows-wsl.md
           - Dépannage serveur dev (WSL2): install/wsl-dev-server.md
-          - Avec pipx: install/pipx.md
+          - Poste Linux (pipx): install/poste-linux.md
           - Mode développement: install/core-dev.md
           - VM Debian vierge: install/vm-debian.md
           - Depuis GitHub: install/github.md
@@ -42,6 +41,7 @@ nav:
       - Environnement:
           - Préparer MariaDB: install/mariadb.md
           - Comptes MariaDB d'un projet: install/mariadb-comptes.md
+          - Contrat d'installation des opt-ins: install/opt-ins.md
           - Configurer VS Code (auto-import): install/vscode.md
           - Environnement VS Code (extensions et config): install/vscode-environnement.md
           - Production: install/production.md

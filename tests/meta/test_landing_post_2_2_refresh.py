@@ -188,8 +188,9 @@ class TestLiens:
         # Lien déploiement remplace "production-security" et "api-json"
         assert "deployment" in _src() or "déploiement" in _src().lower()
 
-    def test_lien_contributing(self):
-        assert "contributing" in _src() or "Contribuer" in _src()
+    # La landing n'expose plus de lien « Contribuer »/contributing depuis la
+    # refonte des cartes (page d'entrée orientée usage, pas contribution).
+    # Garde-fou retiré volontairement : voir LANDING-INSTALL-CARDS-001.
 
     def test_lien_github(self):
         assert "github.com/caucrogeGit/Forge" in _src()

@@ -32,7 +32,7 @@ class TestGettingStartedExists:
         """Le fichier référence les modes d'installation principaux."""
         text = GETTING_STARTED.read_text(encoding="utf-8")
         required = [
-            "install/index.md",
+            "install/poste-linux.md",
             "install/github.md",
         ]
         missing = [r for r in required if r not in text]

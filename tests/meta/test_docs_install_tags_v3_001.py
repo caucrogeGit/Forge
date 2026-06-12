@@ -17,9 +17,9 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 INSTALL_GUIDES = [
     PROJECT_ROOT / "docs" / "guide" / "guide.md",
-    PROJECT_ROOT / "docs" / "install" / "index.md",
+    PROJECT_ROOT / "docs" / "install" / "opt-ins.md",
     PROJECT_ROOT / "docs" / "install" / "github.md",
-    PROJECT_ROOT / "docs" / "install" / "pipx.md",
+    PROJECT_ROOT / "docs" / "install" / "poste-linux.md",
     PROJECT_ROOT / "docs" / "install" / "vm-debian.md",
     PROJECT_ROOT / "docs" / "install" / "mariadb.md",
     PROJECT_ROOT / "docs" / "install" / "core-dev.md",

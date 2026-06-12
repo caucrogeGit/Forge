@@ -3073,7 +3073,7 @@ pip install --pre forge-mvc-mfa
 
 > Publié sur PyPI depuis `1.0.0-beta.9` au statut **Alpha**. MFA reste opt-in :
 > le core Forge ne dépend pas de `forge-mvc-mfa`.
-> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/opt-ins.md).
 
 Référence détaillée : [auth-mfa.md](auth-mfa.md).
 
@@ -3083,7 +3083,7 @@ Rôles, permissions, décorateur `@require_permission`, helpers Jinja
 `has_permission()` et politique d'attribution.
 
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
-> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/opt-ins.md).
 
 Référence détaillée : [rbac.md](../features/rbac.md).
 
@@ -3093,7 +3093,7 @@ Référence détaillée : [rbac.md](../features/rbac.md).
 fonctions de validation, helpers Jinja2. Aucun callback automatique.
 
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
-> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/opt-ins.md).
 
 Référence détaillée : [workflow.md](workflow.md).
 
@@ -3103,7 +3103,7 @@ Collecte d'événements métier, schéma SQL associé, agrégats et indicateurs
 calculés à la demande.
 
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
-> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/opt-ins.md).
 
 Référence détaillée : [stats.md](stats.md).
 
@@ -3118,7 +3118,7 @@ pip install --pre forge-mvc-images
 > Publié sur PyPI depuis `1.0.0-beta.13` (API encore bêta, voir
 > [Limites](../deployment/production-limits.md)). Les générateurs `make:crud --media` et
 > `make:public:list` importent depuis ce module.
-> Voir [contrat d'installation](../install/index.md#contrat-dinstallation-des-opt-ins).
+> Voir [contrat d'installation](../install/opt-ins.md).
 
 Référence détaillée : [media.md](../features/media.md).
 

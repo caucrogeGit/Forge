@@ -8,7 +8,7 @@ concentrent sur le code, que vous écrivez vous-même au fil des paliers.
 !!! info "Référence complète"
     Cette page suffit pour démarrer la progression. Pour les parcours
     spécifiques (Windows + WSL, VM Debian, base MariaDB, mode contributeur),
-    voir le guide d'installation complet : [Installer Forge](../../install/index.md).
+    voir le guide d'installation complet : [Installer Forge](../../install/poste-linux.md).
 
 ## Prérequis
 
@@ -32,9 +32,8 @@ Vérifier :
 forge --version
 ```
 
-Alternatives (Linux/macOS, Windows, depuis les sources) : voir
-[Installation avec pipx](../../install/pipx.md) et
-[Installer Forge](../../install/index.md).
+Alternatives : [Poste Linux (pipx)](../../install/poste-linux.md),
+[Windows + WSL](../../install/windows-wsl.md) ou [depuis GitHub](../../install/github.md).
 
 ## 2. Créer le projet de départ
 
