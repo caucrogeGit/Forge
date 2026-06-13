@@ -51,7 +51,6 @@ def _isolate_upload_env(monkeypatch):
     sans cette isolation un plafond bas fuirait vers les autres tests d'upload.
     """
     for key in (
-        "UPLOAD_ROOT",
         "UPLOAD_ALLOWED_EXTENSIONS",
         "UPLOAD_ALLOWED_MIME_TYPES",
         "UPLOAD_MAX_IMAGE_PIXELS",

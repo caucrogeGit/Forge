@@ -20,6 +20,14 @@ def configure_forge_kernel(tmp_path_factory):
         db_password  = "",
         db_pool_size = 1,
     )
+    # ADR-032 : UPLOAD_ROOT est lu depuis l'environnement par forge-mvc-files.
+    # Filet de sécurité : un défaut de session pointant vers un tmp, pour qu'aucun
+    # test ne puisse écrire dans le storage réel du dépôt même sans isolation propre.
+    # pytest.MonkeyPatch() (et non os.environ direct) pour bénéficier du teardown.
+    mp = pytest.MonkeyPatch()
+    mp.setenv("UPLOAD_ROOT", str(tmp_path_factory.mktemp("uploads")))
+    yield
+    mp.undo()
 
 
 @pytest.fixture(autouse=True)

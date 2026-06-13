@@ -99,7 +99,6 @@ def _multipart_body(boundary: str, filename: str, content: bytes,
 def _isolate_upload_env(monkeypatch):
     """ADR-032 : vide les variables d'upload extraites du core avant chaque test."""
     for key in (
-        "UPLOAD_ROOT",
         "UPLOAD_ALLOWED_EXTENSIONS",
         "UPLOAD_ALLOWED_MIME_TYPES",
         "UPLOAD_MAX_IMAGE_PIXELS",

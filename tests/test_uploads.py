@@ -18,7 +18,6 @@ from core.forms.upload_exceptions import (
 # autorisés ne sont plus dans le registre core.forge ; l'opt-in files les lit
 # depuis l'environnement. Seul upload_max_size reste détenu par le noyau.
 _UPLOAD_ENV_KEYS = (
-    "UPLOAD_ROOT",
     "UPLOAD_ALLOWED_EXTENSIONS",
     "UPLOAD_ALLOWED_MIME_TYPES",
     "UPLOAD_MAX_IMAGE_PIXELS",
