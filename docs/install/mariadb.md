@@ -101,26 +101,33 @@ Si cette commande affiche une version, la dépendance native MariaDB est prête.
 
 ---
 
-## Préparer les comptes du projet
+## Créer les comptes du projet (obligatoire)
 
-Forge distingue deux niveaux d’accès à la base :
-
-* un compte d’administration du projet ;
-* un compte applicatif utilisé par l’application.
-
-Cette séparation évite d’utiliser `root` comme compte applicatif et limite les droits utilisés par l’application au quotidien.
-
-Le détail complet de cette configuration est donné dans la page :
-
-[Configurer les comptes MariaDB d’un projet Forge](mariadb-comptes.md)
-
-Pour un projet de développement, le principe recommandé est le suivant :
+Forge sépare trois niveaux d’accès à la base :
 
 ```text
-root         → administration locale du serveur MariaDB
+root         → administration locale du serveur MariaDB (avec sudo)
 forge_admin  → création et migration de la base du projet
 forge_app    → accès applicatif en lecture/écriture
 ```
+
+Cette séparation évite d’utiliser `root` comme compte applicatif et limite les droits utilisés par l’application au quotidien.
+
+!!! warning "Étape indispensable avant `forge db:init`"
+    `forge db:init` se connecte en tant que `forge_admin` : ce compte doit déjà exister dans MariaDB.
+    Il n’est **pas** créé automatiquement par Forge.
+    Sans lui, `forge db:init` s’arrête sur :
+    `[ERREUR] Connexion MariaDB admin impossible. Vérifiez DB_ADMIN_* dans env/dev.`
+
+Créez donc les comptes **maintenant**, avant de configurer le projet et d’initialiser la base.
+
+Suivez la section « Création complète depuis `root` » de la page dédiée, puis revenez ici :
+
+[Configurer les comptes MariaDB d’un projet Forge](mariadb-comptes.md)
+
+Notez les mots de passe choisis pour `forge_admin` et `forge_app`.
+
+Ils devront être reportés à l’identique dans `env/dev` à l’étape suivante.
 
 ---
 
@@ -138,7 +145,7 @@ Exemple de configuration :
 DB_ADMIN_LOGIN=forge_admin
 DB_ADMIN_PWD=<mot_de_passe_admin_du_projet>
 
-DB_NAME=mon_projet
+DB_NAME=forge_db
 DB_APP_LOGIN=forge_app
 DB_APP_PWD=<mot_de_passe_applicatif>
 ```
@@ -146,6 +153,10 @@ DB_APP_PWD=<mot_de_passe_applicatif>
 Les mots de passe doivent être propres au poste ou au projet.
 
 Ils ne doivent pas être committés dans Git.
+
+Remplacez `forge_db` par le nom de votre projet (la même valeur que dans le `CREATE DATABASE`).
+
+Les valeurs `DB_ADMIN_PWD` et `DB_APP_PWD` doivent correspondre exactement aux mots de passe définis lors de la création des comptes.
 
 ---
 
@@ -168,6 +179,13 @@ Initialiser la base :
 ```bash
 forge db:init
 ```
+
+!!! warning "Si `forge db:init` échoue sur « Connexion MariaDB admin impossible »"
+    Forge n’a pas pu se connecter avec `forge_admin`. Causes fréquentes :
+
+    * le compte `forge_admin` n’existe pas encore dans MariaDB (voir « Créer les comptes du projet » plus haut) ;
+    * le mot de passe `DB_ADMIN_PWD` de `env/dev` ne correspond pas à celui du `CREATE USER 'forge_admin'` ;
+    * `DB_ADMIN_HOST` ou `DB_ADMIN_PORT` ne pointent pas vers le serveur MariaDB local.
 
 Appliquer les migrations disponibles :
 
