@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import io
+import os
 import smtplib
 
 import pytest
 
-import core.forge as forge
 pytest.importorskip("forge_mvc_mail")
 from forge_mvc_mail.exceptions import MailConfigurationError, MailSendError
 from forge_mvc_mail.message import MailMessage
@@ -307,25 +307,28 @@ class FailingSMTP(FakeSMTP):
         raise smtplib.SMTPException("boom")
 
 
+@pytest.fixture(autouse=True)
+def _clean_mail_env(monkeypatch):
+    """Supprime toute variable MAIL_* du shell avant chaque test."""
+    for key in list(os.environ):
+        if key.startswith("MAIL_"):
+            monkeypatch.delenv(key, raising=False)
+
+
 @pytest.fixture()
 def smtp_config(monkeypatch):
-    snapshot = dict(forge._cfg)
     FakeSMTP.instances = []
     monkeypatch.setattr(smtplib, "SMTP", FakeSMTP)
     monkeypatch.setattr(smtplib, "SMTP_SSL", FakeSMTP)
-    forge.configure(
-        mail_host="smtp.example.test",
-        mail_port=2525,
-        mail_username="",
-        mail_password="",
-        mail_from="default@example.test",
-        mail_use_tls=False,
-        mail_use_ssl=False,
-        mail_timeout=3,
-    )
+    monkeypatch.setenv("MAIL_HOST", "smtp.example.test")
+    monkeypatch.setenv("MAIL_PORT", "2525")
+    monkeypatch.setenv("MAIL_USERNAME", "")
+    monkeypatch.setenv("MAIL_PASSWORD", "")
+    monkeypatch.setenv("MAIL_FROM", "default@example.test")
+    monkeypatch.setenv("MAIL_USE_TLS", "false")
+    monkeypatch.setenv("MAIL_USE_SSL", "false")
+    monkeypatch.setenv("MAIL_TIMEOUT", "3")
     yield
-    forge._cfg.clear()
-    forge._cfg.update(snapshot)
 
 
 def test_smtp_envoie_message(smtp_config):
@@ -373,8 +376,8 @@ def test_smtp_erreur_smtplib_devient_mail_send_error(monkeypatch, smtp_config):
         SmtpTransport.from_config().send(_msg())
 
 
-def test_smtp_starttls_si_use_tls(smtp_config):
-    forge.configure(mail_use_tls=True)
+def test_smtp_starttls_si_use_tls(smtp_config, monkeypatch):
+    monkeypatch.setenv("MAIL_USE_TLS", "true")
     SmtpTransport.from_config().send(_msg())
     assert FakeSMTP.instances[0].started_tls is True
 
@@ -386,14 +389,15 @@ def test_smtp_ssl_utilise_smtp_ssl(monkeypatch, smtp_config):
         instances: list = []
     monkeypatch.setattr(smtplib, "SMTP", PlainSMTP)
     monkeypatch.setattr(smtplib, "SMTP_SSL", SecureSMTP)
-    forge.configure(mail_use_ssl=True)
+    monkeypatch.setenv("MAIL_USE_SSL", "true")
     SmtpTransport.from_config().send(_msg())
     assert len(PlainSMTP.instances) == 0
     assert len(SecureSMTP.instances) == 1
 
 
-def test_smtp_login_si_username(smtp_config):
-    forge.configure(mail_username="roger", mail_password="secret")
+def test_smtp_login_si_username(smtp_config, monkeypatch):
+    monkeypatch.setenv("MAIL_USERNAME", "roger")
+    monkeypatch.setenv("MAIL_PASSWORD", "secret")
     SmtpTransport.from_config().send(_msg())
     assert FakeSMTP.instances[0].login_args == ("roger", "secret")
 

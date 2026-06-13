@@ -37,7 +37,7 @@ load_dotenv(f"env/{APP_ENV}", override=True) # surcharge avec l'environnement ch
 
 DB_ADMIN_HOST  = os.getenv("DB_ADMIN_HOST", "localhost")
 DB_ADMIN_PORT  = int(os.getenv("DB_ADMIN_PORT", 3306))
-DB_ADMIN_LOGIN = os.getenv("DB_ADMIN_LOGIN", "root")
+DB_ADMIN_LOGIN = os.getenv("DB_ADMIN_LOGIN", "forge_admin")
 DB_ADMIN_PWD   = os.getenv("DB_ADMIN_PWD", "")
 
 DB_NAME        = os.getenv("DB_NAME", "forge_db")
@@ -46,7 +46,7 @@ DB_COLLATION   = os.getenv("DB_COLLATION", "utf8mb4_unicode_ci")
 
 DB_APP_HOST    = os.getenv("DB_APP_HOST", "localhost")
 DB_APP_PORT    = int(os.getenv("DB_APP_PORT", 3306))
-DB_APP_LOGIN   = os.getenv("DB_APP_LOGIN", "forge")
+DB_APP_LOGIN   = os.getenv("DB_APP_LOGIN", "forge_app")
 DB_APP_PWD     = os.getenv("DB_APP_PWD", "")
 DB_POOL_SIZE   = int(os.getenv("DB_POOL_SIZE", 5))
 
@@ -77,32 +77,9 @@ UPLOAD_ALLOWED_MIME_TYPES = [
     if item.strip()
 ]
 
-MAIL_HOST      = os.getenv("MAIL_HOST", "")
-MAIL_PORT      = int(os.getenv("MAIL_PORT", 587))
-MAIL_USERNAME  = os.getenv("MAIL_USERNAME", "")
-MAIL_PASSWORD  = os.getenv("MAIL_PASSWORD", "")
-_MAIL_FROM_ADDRESS = os.getenv("MAIL_FROM_ADDRESS", "noreply@localhost")
-_MAIL_FROM_NAME    = os.getenv("MAIL_FROM_NAME", "Forge")
-MAIL_FROM = (
-    os.getenv("MAIL_FROM")
-    or (f"{_MAIL_FROM_NAME} <{_MAIL_FROM_ADDRESS}>" if _MAIL_FROM_NAME else _MAIL_FROM_ADDRESS)
-)
-MAIL_USE_TLS   = os.getenv("MAIL_USE_TLS", "false").strip().lower() in {
-    "1", "true", "yes", "on"
-}
-MAIL_USE_SSL   = os.getenv("MAIL_USE_SSL", "false").strip().lower() in {
-    "1", "true", "yes", "on"
-}
-MAIL_TIMEOUT   = float(os.getenv("MAIL_TIMEOUT", 10))
-MAIL_ENABLED   = os.getenv("MAIL_ENABLED", "true").strip().lower() in {
-    "1", "true", "yes", "on"
-}
-MAIL_TRANSPORT     = os.getenv("MAIL_TRANSPORT", "log")
-MAIL_LOG_DIR       = os.getenv("MAIL_LOG_DIR", "storage/mail")
-MAIL_TEMPLATES_DIR = os.getenv("MAIL_TEMPLATES_DIR", "mvc/mail/templates")
-MAIL_LOG_ENABLED   = os.getenv("MAIL_LOG_ENABLED", "false").strip().lower() in {
-    "1", "true", "yes", "on"
-}
+# Mail : aucune configuration ici. Le mail est un opt-in (forge-mvc-mail,
+# ADR-031) qui lit ses variables MAIL_* directement depuis l'environnement.
+# Installez forge-mvc-mail et ajoutez le bloc MAIL_* à env/dev pour l'activer.
 
 APP_HOST          = os.getenv("APP_HOST", "127.0.0.1")
 APP_PORT          = int(os.getenv("APP_PORT", 8000))

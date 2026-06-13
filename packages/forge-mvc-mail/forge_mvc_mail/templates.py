@@ -7,7 +7,7 @@ from typing import Iterable
 
 import jinja2
 
-from core.forge import get as _cfg
+from forge_mvc_mail.config import mail_templates_dir
 from forge_mvc_mail.exceptions import MailTemplateError
 from forge_mvc_mail.message import MailMessage
 
@@ -28,7 +28,7 @@ class MailTemplateRenderer:
 
     def __init__(self, template_dir: str | Path | None = None) -> None:
         if template_dir is None:
-            template_dir = _cfg("mail_templates_dir")
+            template_dir = mail_templates_dir()
         self._dir = Path(template_dir)
         self._env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(str(self._dir)),

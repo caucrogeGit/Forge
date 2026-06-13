@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import os
+
 import pytest
 
-import core.forge as forge
 pytest.importorskip("forge_mvc_mail")
 from forge_mvc_mail.config import MailConfig
 from forge_mvc_mail.exceptions import MailConfigurationError, MailSendError
@@ -25,100 +26,111 @@ def _msg(subject: str = "Test", to: str = "dest@example.test", body_text: str = 
     return MailMessage(subject=subject, to=to, body_text=body_text)
 
 
-@pytest.fixture()
-def restore_forge():
-    snapshot = dict(forge._cfg)
-    yield
-    forge._cfg.clear()
-    forge._cfg.update(snapshot)
+@pytest.fixture(autouse=True)
+def _clean_mail_env(monkeypatch):
+    """Supprime toute variable MAIL_* du shell avant chaque test."""
+    for key in list(os.environ):
+        if key.startswith("MAIL_"):
+            monkeypatch.delenv(key, raising=False)
 
 
-# ── MailConfig.from_forge ─────────────────────────────────────────────────────
+# ── MailConfig.from_env ───────────────────────────────────────────────────────
 
-def test_mail_config_lit_enabled(restore_forge):
-    forge.configure(mail_enabled=True)
-    assert MailConfig.from_forge().enabled is True
-
-
-def test_mail_config_lit_enabled_false(restore_forge):
-    forge.configure(mail_enabled=False)
-    assert MailConfig.from_forge().enabled is False
+def test_mail_config_lit_enabled(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    assert MailConfig.from_env().enabled is True
 
 
-def test_mail_config_lit_transport(restore_forge):
-    forge.configure(mail_transport="console")
-    assert MailConfig.from_forge().transport_name == "console"
+def test_mail_config_lit_enabled_false(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "false")
+    assert MailConfig.from_env().enabled is False
 
 
-def test_mail_config_transport_normalise_en_minuscules(restore_forge):
-    forge.configure(mail_transport="SMTP")
-    assert MailConfig.from_forge().transport_name == "smtp"
+def test_mail_config_lit_transport(monkeypatch):
+    monkeypatch.setenv("MAIL_TRANSPORT", "console")
+    assert MailConfig.from_env().transport_name == "console"
 
 
-def test_mail_config_lit_from_email(restore_forge):
-    forge.configure(mail_from="expediteur@example.test")
-    assert MailConfig.from_forge().from_email == "expediteur@example.test"
+def test_mail_config_transport_normalise_en_minuscules(monkeypatch):
+    monkeypatch.setenv("MAIL_TRANSPORT", "SMTP")
+    assert MailConfig.from_env().transport_name == "smtp"
+
+
+def test_mail_config_lit_from_email(monkeypatch):
+    monkeypatch.setenv("MAIL_FROM", "expediteur@example.test")
+    assert MailConfig.from_env().from_email == "expediteur@example.test"
 
 
 def test_mail_config_transport_par_defaut_nest_pas_smtp():
-    cfg = MailConfig.from_forge()
+    cfg = MailConfig.from_env()
     assert cfg.transport_name != "smtp"
 
 
 # ── MailConfig.build_transport ────────────────────────────────────────────────
 
-def test_build_transport_null(restore_forge):
-    forge.configure(mail_enabled=True, mail_transport="null")
-    assert isinstance(MailConfig.from_forge().build_transport(), NullTransport)
+def test_build_transport_null(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "null")
+    assert isinstance(MailConfig.from_env().build_transport(), NullTransport)
 
 
-def test_build_transport_fake(restore_forge):
-    forge.configure(mail_enabled=True, mail_transport="fake")
-    assert isinstance(MailConfig.from_forge().build_transport(), FakeTransport)
+def test_build_transport_fake(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "fake")
+    assert isinstance(MailConfig.from_env().build_transport(), FakeTransport)
 
 
-def test_build_transport_console(restore_forge):
-    forge.configure(mail_enabled=True, mail_transport="console")
-    assert isinstance(MailConfig.from_forge().build_transport(), ConsoleTransport)
+def test_build_transport_console(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "console")
+    assert isinstance(MailConfig.from_env().build_transport(), ConsoleTransport)
 
 
-def test_build_transport_log(restore_forge):
-    forge.configure(mail_enabled=True, mail_transport="log")
-    assert isinstance(MailConfig.from_forge().build_transport(), LogTransport)
+def test_build_transport_log(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "log")
+    assert isinstance(MailConfig.from_env().build_transport(), LogTransport)
 
 
-def test_build_transport_smtp(restore_forge):
-    forge.configure(mail_enabled=True, mail_transport="smtp")
-    assert isinstance(MailConfig.from_forge().build_transport(), SmtpTransport)
+def test_build_transport_smtp(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "smtp")
+    assert isinstance(MailConfig.from_env().build_transport(), SmtpTransport)
 
 
-def test_build_transport_log_transmet_log_dir(restore_forge, tmp_path):
-    forge.configure(mail_enabled=True, mail_transport="log", mail_log_dir=str(tmp_path))
-    transport = MailConfig.from_forge().build_transport()
+def test_build_transport_log_transmet_log_dir(monkeypatch, tmp_path):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "log")
+    monkeypatch.setenv("MAIL_LOG_DIR", str(tmp_path))
+    transport = MailConfig.from_env().build_transport()
     assert isinstance(transport, LogTransport)
     assert str(tmp_path) in str(transport.log_dir)
 
 
-def test_build_transport_enabled_false_retourne_null_malgre_smtp(restore_forge):
-    forge.configure(mail_enabled=False, mail_transport="smtp")
-    assert isinstance(MailConfig.from_forge().build_transport(), NullTransport)
+def test_build_transport_enabled_false_retourne_null_malgre_smtp(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "false")
+    monkeypatch.setenv("MAIL_TRANSPORT", "smtp")
+    assert isinstance(MailConfig.from_env().build_transport(), NullTransport)
 
 
-def test_build_transport_enabled_false_retourne_null_malgre_console(restore_forge):
-    forge.configure(mail_enabled=False, mail_transport="console")
-    assert isinstance(MailConfig.from_forge().build_transport(), NullTransport)
+def test_build_transport_enabled_false_retourne_null_malgre_console(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "false")
+    monkeypatch.setenv("MAIL_TRANSPORT", "console")
+    assert isinstance(MailConfig.from_env().build_transport(), NullTransport)
 
 
-def test_build_transport_inconnu_leve_erreur(restore_forge):
-    forge.configure(mail_enabled=True, mail_transport="pigeon")
+def test_build_transport_inconnu_leve_erreur(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "pigeon")
     with pytest.raises(MailConfigurationError, match="pigeon"):
-        MailConfig.from_forge().build_transport()
+        MailConfig.from_env().build_transport()
 
 
-def test_build_transport_inconnu_liste_valeurs_valides(restore_forge):
-    forge.configure(mail_enabled=True, mail_transport="telepathe")
+def test_build_transport_inconnu_liste_valeurs_valides(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "telepathe")
     with pytest.raises(MailConfigurationError, match="smtp"):
-        MailConfig.from_forge().build_transport()
+        MailConfig.from_env().build_transport()
 
 
 # ── Mailer — construction ─────────────────────────────────────────────────────
@@ -128,23 +140,25 @@ def test_mailer_transport_accessible():
     assert Mailer(t).transport is t
 
 
-def test_mailer_from_config_retourne_mailer(restore_forge):
-    forge.configure(mail_enabled=False)
+def test_mailer_from_config_retourne_mailer(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "false")
     assert isinstance(Mailer.from_config(), Mailer)
 
 
-def test_mailer_from_config_enabled_false_utilise_null(restore_forge):
-    forge.configure(mail_enabled=False, mail_transport="smtp")
+def test_mailer_from_config_enabled_false_utilise_null(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "false")
+    monkeypatch.setenv("MAIL_TRANSPORT", "smtp")
     assert isinstance(Mailer.from_config().transport, NullTransport)
 
 
-def test_mailer_from_config_transport_par_defaut_nest_pas_smtp(restore_forge):
-    forge.configure(mail_enabled=True)
+def test_mailer_from_config_transport_par_defaut_nest_pas_smtp(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
     assert not isinstance(Mailer.from_config().transport, SmtpTransport)
 
 
-def test_mailer_from_config_null(restore_forge):
-    forge.configure(mail_enabled=True, mail_transport="null")
+def test_mailer_from_config_null(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "null")
     assert isinstance(Mailer.from_config().transport, NullTransport)
 
 

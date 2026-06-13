@@ -9,7 +9,6 @@ forge mail:doctor — vérifie la configuration mail
 from __future__ import annotations
 
 import json
-import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -72,47 +71,16 @@ def _write_if_new(path: Path, content: str) -> None:
 
 
 def _load_env_and_configure_forge(root: Path) -> None:
-    """Charge config.py (side-effect dotenv) puis configure le registre Forge."""
+    """Charge config.py (side-effect dotenv : peuple os.environ).
+
+    ADR-031 : le mail ne passe plus par le registre `core.forge`. Charger
+    l'environnement suffit ; `MailConfig.from_env()` le lit directement.
+    """
     from forge_cli.project_config import ProjectConfigError, load_project_config
     try:
         load_project_config(root)
     except ProjectConfigError as exc:
         sys.exit(f"Erreur : {exc}")
-    _configure_forge_from_env()
-
-
-def _configure_forge_from_env() -> None:
-    """Lit os.environ et configure le registre Forge pour le mail."""
-    import core.forge as forge
-
-    def _b(key: str, default: bool = False) -> bool:
-        v = os.getenv(key)
-        if v is None:
-            return default
-        return v.strip().lower() in {"1", "true", "yes", "on"}
-
-    forge.configure(
-        mail_enabled=_b("MAIL_ENABLED"),
-        mail_transport=os.getenv("MAIL_TRANSPORT", "log"),
-        mail_from=(
-            os.getenv("MAIL_FROM")
-            or (
-                f"{os.getenv('MAIL_FROM_NAME', 'Forge')} <{os.getenv('MAIL_FROM_ADDRESS', 'noreply@localhost')}>"
-                if os.getenv("MAIL_FROM_NAME", "Forge")
-                else os.getenv("MAIL_FROM_ADDRESS", "noreply@localhost")
-            )
-        ),
-        mail_host=os.getenv("MAIL_HOST", ""),
-        mail_port=int(os.getenv("MAIL_PORT") or "587"),
-        mail_username=os.getenv("MAIL_USERNAME", ""),
-        mail_password=os.getenv("MAIL_PASSWORD", ""),
-        mail_use_tls=_b("MAIL_USE_TLS"),
-        mail_use_ssl=_b("MAIL_USE_SSL"),
-        mail_timeout=float(os.getenv("MAIL_TIMEOUT") or "10"),
-        mail_log_dir=os.getenv("MAIL_LOG_DIR", "storage/mail"),
-        mail_templates_dir=os.getenv("MAIL_TEMPLATES_DIR", "mvc/mail/templates"),
-        mail_log_enabled=_b("MAIL_LOG_ENABLED"),
-    )
 
 
 # ── mail:init ─────────────────────────────────────────────────────────────────
@@ -175,7 +143,7 @@ def cmd_mail_test(args: list[str], root: Path | None = None) -> None:
     from forge_mvc_mail.mailer import Mailer
     from forge_mvc_mail.message import MailMessage
 
-    config    = MailConfig.from_forge()
+    config    = MailConfig.from_env()
     transport = config.build_transport()
     mailer    = Mailer(transport)
 
@@ -239,11 +207,10 @@ def cmd_mail_render(args: list[str], root: Path | None = None) -> None:
     root = root or Path.cwd()
     _load_env_and_configure_forge(root)
 
-    import core.forge as forge
     from forge_mvc_mail.exceptions import MailTemplateError
     from forge_mvc_mail.templates import MailTemplateRenderer
 
-    renderer = MailTemplateRenderer(template_dir=forge.get("mail_templates_dir"))
+    renderer = MailTemplateRenderer()
 
     try:
         msg = renderer.render(template_name, context, to="preview@localhost")
@@ -339,8 +306,8 @@ def cmd_mail_doctor(args: list[str], root: Path | None = None) -> None:
     root = root or Path.cwd()
     _load_env_and_configure_forge(root)
 
-    from forge_mvc_mail.config import MailConfig
-    config = MailConfig.from_forge()
+    from forge_mvc_mail.config import MailConfig, mail_log_enabled
+    config = MailConfig.from_env()
 
     checks: list[MailCheckResult] = [
         _check_enabled(config.enabled, config.transport_name),
@@ -352,8 +319,7 @@ def cmd_mail_doctor(args: list[str], root: Path | None = None) -> None:
     if config.transport_name == "smtp":
         checks.extend(_check_smtp_config(config.host, config.port))
 
-    import core.forge as forge
-    if forge.get("mail_log_enabled"):
+    if mail_log_enabled():
         checks.append(MailCheckResult(
             "ok",
             "MAIL_LOG_ENABLED",

@@ -42,20 +42,9 @@ _cfg = {
         "image/webp",
         "application/pdf",
     ],
-    # Mail SMTP
-    "mail_host": "",
-    "mail_port": 587,
-    "mail_username": "",
-    "mail_password": "",
-    "mail_from": "",
-    "mail_use_tls": False,
-    "mail_use_ssl": False,
-    "mail_timeout": 10,
-    "mail_enabled": True,
-    "mail_transport": "log",
-    "mail_log_dir": "storage/mail",
-    "mail_templates_dir": "mvc/mail/templates",
-    "mail_log_enabled": False,
+    # Mail : aucun slot ici. Le mail est un opt-in (forge-mvc-mail, ADR-022)
+    # qui lit sa configuration directement depuis l'environnement (ADR-031).
+    # Le noyau ne connaît pas le mail.
     # Base de données
     "db_host":     "localhost",
     "db_port":     3306,
@@ -81,7 +70,7 @@ _cfg = {
     "trusted_proxies": frozenset(),
 }
 
-_PATH_KEYS = {"views_dir", "sql_dir", "upload_root", "mail_log_dir", "mail_templates_dir"}
+_PATH_KEYS = {"views_dir", "sql_dir", "upload_root"}
 
 
 def configure(**kwargs: object) -> None:

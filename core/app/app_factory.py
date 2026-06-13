@@ -45,35 +45,7 @@ def _forge_config_kwargs() -> dict[str, Any]:
         db_pool_size=DB_POOL_SIZE,
         trusted_proxies=APP_TRUSTED_PROXIES,
     )
-    kwargs.update(_optional_mail_kwargs())
     return kwargs
-
-
-def _optional_mail_kwargs() -> dict[str, Any]:
-    """Config mail lue depuis `config.py`, mais seulement si elle existe.
-
-    Le mail est un opt-in (`forge-mvc-mail`, ADR-022) : le core ne doit pas
-    exiger un bloc `MAIL_*` dans `config.py`. Une application minimale sans
-    ce bloc se construit normalement et s'appuie sur les valeurs par défaut
-    inertes de `core.forge` (sur lesquelles `forge-mvc-mail` se rabat).
-    """
-    try:
-        from config import (
-            MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD,
-            MAIL_FROM, MAIL_USE_TLS, MAIL_USE_SSL, MAIL_TIMEOUT, MAIL_ENABLED,
-            MAIL_TRANSPORT, MAIL_LOG_DIR, MAIL_TEMPLATES_DIR, MAIL_LOG_ENABLED,
-        )
-    except ImportError:
-        return {}
-    return dict(
-        mail_host=MAIL_HOST, mail_port=MAIL_PORT,
-        mail_username=MAIL_USERNAME, mail_password=MAIL_PASSWORD,
-        mail_from=MAIL_FROM, mail_use_tls=MAIL_USE_TLS,
-        mail_use_ssl=MAIL_USE_SSL, mail_timeout=MAIL_TIMEOUT,
-        mail_enabled=MAIL_ENABLED, mail_transport=MAIL_TRANSPORT,
-        mail_log_dir=MAIL_LOG_DIR, mail_templates_dir=MAIL_TEMPLATES_DIR,
-        mail_log_enabled=MAIL_LOG_ENABLED,
-    )
 
 
 def apply_forge_config() -> None:

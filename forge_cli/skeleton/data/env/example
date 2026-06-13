@@ -38,31 +38,6 @@ UPLOAD_MAX_SIZE=5242880
 UPLOAD_ALLOWED_EXTENSIONS=jpg,jpeg,png,webp,pdf
 UPLOAD_ALLOWED_MIME_TYPES=image/jpeg,image/png,image/webp,application/pdf
 
-# Mail
-# En développement, Forge n'envoie pas de vrais mails par défaut.
-# MAIL_ENABLED=false force NullTransport — aucune connexion SMTP n'est tentée.
-# MAIL_TRANSPORT=log écrit les messages dans storage/mail/ (fichiers .eml).
-# Pour activer l'envoi réel, définissez ces variables dans env/dev (non commité).
-MAIL_ENABLED=false
-MAIL_TRANSPORT=log
-# Expéditeur — MAIL_FROM est prioritaire. Si vide, composé de MAIL_FROM_NAME + MAIL_FROM_ADDRESS.
-MAIL_FROM=
-MAIL_FROM_ADDRESS=noreply@localhost
-MAIL_FROM_NAME=Forge
-# Serveur SMTP (requis si MAIL_TRANSPORT=smtp)
-MAIL_HOST=
-MAIL_PORT=587
-MAIL_USERNAME=
-MAIL_PASSWORD=
-MAIL_USE_TLS=false
-MAIL_USE_SSL=false
-MAIL_TIMEOUT=10
-# Chemins
-MAIL_LOG_DIR=storage/mail
-MAIL_TEMPLATES_DIR=mvc/mail/templates
-# Journalisation SQL (nécessite forge db:apply pour créer la table mail_log)
-MAIL_LOG_ENABLED=false
-
 # Serveur
 APP_HOST=127.0.0.1
 APP_PORT=8000

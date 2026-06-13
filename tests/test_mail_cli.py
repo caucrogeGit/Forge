@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
 
-import core.forge as forge
 pytest.importorskip("forge_mvc_mail")
 from forge_mvc_mail.cli import (
     _check_enabled,
@@ -25,35 +25,39 @@ from forge_mvc_mail.cli import (
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
-@pytest.fixture()
-def restore_forge():
-    snapshot = dict(forge._cfg)
-    yield
-    forge._cfg.clear()
-    forge._cfg.update(snapshot)
+@pytest.fixture(autouse=True)
+def _clean_mail_env(monkeypatch):
+    """Supprime toute variable MAIL_* du shell avant chaque test."""
+    for key in list(os.environ):
+        if key.startswith("MAIL_"):
+            monkeypatch.delenv(key, raising=False)
 
 
 @pytest.fixture()
 def no_env(monkeypatch):
-    """Neutralise _load_env_and_configure_forge — forge est configuré par le test."""
+    """Neutralise _load_env_and_configure_forge — l'environnement est posé par le test."""
     monkeypatch.setattr("forge_mvc_mail.cli._load_env_and_configure_forge", lambda root: None)
 
 
-def _forge_mail(tmp_path: Path, *, transport: str = "fake", enabled: bool = True) -> None:
-    forge.configure(
-        mail_enabled=enabled,
-        mail_transport=transport,
-        mail_from="from@x.test",
-        mail_host="smtp.x.test",
-        mail_port=587,
-        mail_username="",
-        mail_password="",
-        mail_use_tls=False,
-        mail_use_ssl=False,
-        mail_timeout=10,
-        mail_log_dir=str(tmp_path / "mail"),
-        mail_templates_dir=str(tmp_path / "templates"),
-    )
+def _forge_mail(
+    monkeypatch,
+    tmp_path: Path,
+    *,
+    transport: str = "fake",
+    enabled: bool = True,
+) -> None:
+    monkeypatch.setenv("MAIL_ENABLED", "true" if enabled else "false")
+    monkeypatch.setenv("MAIL_TRANSPORT", transport)
+    monkeypatch.setenv("MAIL_FROM", "from@x.test")
+    monkeypatch.setenv("MAIL_HOST", "smtp.x.test")
+    monkeypatch.setenv("MAIL_PORT", "587")
+    monkeypatch.setenv("MAIL_USERNAME", "")
+    monkeypatch.setenv("MAIL_PASSWORD", "")
+    monkeypatch.setenv("MAIL_USE_TLS", "false")
+    monkeypatch.setenv("MAIL_USE_SSL", "false")
+    monkeypatch.setenv("MAIL_TIMEOUT", "10")
+    monkeypatch.setenv("MAIL_LOG_DIR", str(tmp_path / "mail"))
+    monkeypatch.setenv("MAIL_TEMPLATES_DIR", str(tmp_path / "templates"))
 
 
 def _make_templates(tmp_path: Path, name: str = "bienvenue") -> Path:
@@ -134,47 +138,47 @@ def test_init_affiche_ok_et_cree(tmp_path, capsys):
 
 # ── mail:test ─────────────────────────────────────────────────────────────────
 
-def test_test_sans_to_leve_system_exit(no_env, restore_forge, tmp_path):
+def test_test_sans_to_leve_system_exit(no_env, monkeypatch, tmp_path):
     with pytest.raises(SystemExit):
         cmd_mail_test([], root=tmp_path)
 
 
-def test_test_to_sans_valeur_leve_system_exit(no_env, restore_forge, tmp_path):
+def test_test_to_sans_valeur_leve_system_exit(no_env, monkeypatch, tmp_path):
     with pytest.raises(SystemExit):
         cmd_mail_test(["--to"], root=tmp_path)
 
 
-def test_test_null_transport_affiche_warn(no_env, restore_forge, tmp_path, capsys):
-    _forge_mail(tmp_path, transport="null", enabled=False)
+def test_test_null_transport_affiche_warn(no_env, monkeypatch, tmp_path, capsys):
+    _forge_mail(monkeypatch, tmp_path, transport="null", enabled=False)
     cmd_mail_test(["--to", "x@x.test"], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "WARN" in stdout
 
 
-def test_test_fake_transport_affiche_ok(no_env, restore_forge, tmp_path, capsys):
-    _forge_mail(tmp_path, transport="fake", enabled=True)
+def test_test_fake_transport_affiche_ok(no_env, monkeypatch, tmp_path, capsys):
+    _forge_mail(monkeypatch, tmp_path, transport="fake", enabled=True)
     cmd_mail_test(["--to", "x@x.test"], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "OK" in stdout
 
 
-def test_test_affiche_nom_transport(no_env, restore_forge, tmp_path, capsys):
-    _forge_mail(tmp_path, transport="fake", enabled=True)
+def test_test_affiche_nom_transport(no_env, monkeypatch, tmp_path, capsys):
+    _forge_mail(monkeypatch, tmp_path, transport="fake", enabled=True)
     cmd_mail_test(["--to", "x@x.test"], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "FakeTransport" in stdout
 
 
-def test_test_log_transport_cree_fichier(no_env, restore_forge, tmp_path, capsys):
+def test_test_log_transport_cree_fichier(no_env, monkeypatch, tmp_path, capsys):
     log_dir = tmp_path / "mail"
-    _forge_mail(tmp_path, transport="log", enabled=True)
-    forge.configure(mail_log_dir=str(log_dir))
+    _forge_mail(monkeypatch, tmp_path, transport="log", enabled=True)
+    monkeypatch.setenv("MAIL_LOG_DIR", str(log_dir))
     cmd_mail_test(["--to", "x@x.test"], root=tmp_path)
     assert len(list(log_dir.glob("*.eml"))) == 1
 
 
-def test_test_mail_enabled_false_affiche_warn_pas_erreur(no_env, restore_forge, tmp_path, capsys):
-    _forge_mail(tmp_path, transport="smtp", enabled=False)
+def test_test_mail_enabled_false_affiche_warn_pas_erreur(no_env, monkeypatch, tmp_path, capsys):
+    _forge_mail(monkeypatch, tmp_path, transport="smtp", enabled=False)
     cmd_mail_test(["--to", "x@x.test"], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "WARN" in stdout
@@ -182,24 +186,24 @@ def test_test_mail_enabled_false_affiche_warn_pas_erreur(no_env, restore_forge, 
 
 # ── mail:render ───────────────────────────────────────────────────────────────
 
-def test_render_sans_args_leve_system_exit(no_env, restore_forge, tmp_path):
+def test_render_sans_args_leve_system_exit(no_env, monkeypatch, tmp_path):
     with pytest.raises(SystemExit):
         cmd_mail_render([], root=tmp_path)
 
 
-def test_render_affiche_subject_interpole(no_env, restore_forge, tmp_path, capsys):
+def test_render_affiche_subject_interpole(no_env, monkeypatch, tmp_path, capsys):
     tpl = _make_templates(tmp_path)
-    _forge_mail(tmp_path)
-    forge.configure(mail_templates_dir=str(tpl))
+    _forge_mail(monkeypatch, tmp_path)
+    monkeypatch.setenv("MAIL_TEMPLATES_DIR", str(tpl))
     cmd_mail_render(["bienvenue"], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "Sujet" in stdout
 
 
-def test_render_context_json_interpole(no_env, restore_forge, tmp_path, capsys):
+def test_render_context_json_interpole(no_env, monkeypatch, tmp_path, capsys):
     tpl = _make_templates(tmp_path)
-    _forge_mail(tmp_path)
-    forge.configure(mail_templates_dir=str(tpl))
+    _forge_mail(monkeypatch, tmp_path)
+    monkeypatch.setenv("MAIL_TEMPLATES_DIR", str(tpl))
     ctx = tmp_path / "ctx.json"
     ctx.write_text('{"prenom": "Alice"}', encoding="utf-8")
     cmd_mail_render(["bienvenue", "--context", str(ctx)], root=tmp_path)
@@ -207,8 +211,8 @@ def test_render_context_json_interpole(no_env, restore_forge, tmp_path, capsys):
     assert "Alice" in stdout
 
 
-def test_render_context_fichier_manquant_leve_system_exit(no_env, restore_forge, tmp_path):
-    _forge_mail(tmp_path)
+def test_render_context_fichier_manquant_leve_system_exit(no_env, monkeypatch, tmp_path):
+    _forge_mail(monkeypatch, tmp_path)
     with pytest.raises(SystemExit):
         cmd_mail_render(
             ["bienvenue", "--context", str(tmp_path / "inexistant.json")],
@@ -216,37 +220,37 @@ def test_render_context_fichier_manquant_leve_system_exit(no_env, restore_forge,
         )
 
 
-def test_render_context_json_invalide_leve_system_exit(no_env, restore_forge, tmp_path):
-    _forge_mail(tmp_path)
+def test_render_context_json_invalide_leve_system_exit(no_env, monkeypatch, tmp_path):
+    _forge_mail(monkeypatch, tmp_path)
     bad = tmp_path / "bad.json"
     bad.write_text("{ pas du json", encoding="utf-8")
     with pytest.raises(SystemExit):
         cmd_mail_render(["bienvenue", "--context", str(bad)], root=tmp_path)
 
 
-def test_render_template_manquant_leve_system_exit(no_env, restore_forge, tmp_path):
+def test_render_template_manquant_leve_system_exit(no_env, monkeypatch, tmp_path):
     tpl = tmp_path / "templates"
     tpl.mkdir()
-    _forge_mail(tmp_path)
-    forge.configure(mail_templates_dir=str(tpl))
+    _forge_mail(monkeypatch, tmp_path)
+    monkeypatch.setenv("MAIL_TEMPLATES_DIR", str(tpl))
     with pytest.raises(SystemExit):
         cmd_mail_render(["fantome"], root=tmp_path)
 
 
-def test_render_sans_html_naffiche_pas_balise_html(no_env, restore_forge, tmp_path, capsys):
+def test_render_sans_html_naffiche_pas_balise_html(no_env, monkeypatch, tmp_path, capsys):
     tpl = _make_templates(tmp_path)
-    _forge_mail(tmp_path)
-    forge.configure(mail_templates_dir=str(tpl))
+    _forge_mail(monkeypatch, tmp_path)
+    monkeypatch.setenv("MAIL_TEMPLATES_DIR", str(tpl))
     cmd_mail_render(["bienvenue"], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "[HTML]" not in stdout
 
 
-def test_render_avec_html_affiche_section_html(no_env, restore_forge, tmp_path, capsys):
+def test_render_avec_html_affiche_section_html(no_env, monkeypatch, tmp_path, capsys):
     tpl = _make_templates(tmp_path)
     (tpl / "bienvenue_html.html").write_text("<p>{{ prenom }}</p>", encoding="utf-8")
-    _forge_mail(tmp_path)
-    forge.configure(mail_templates_dir=str(tpl))
+    _forge_mail(monkeypatch, tmp_path)
+    monkeypatch.setenv("MAIL_TEMPLATES_DIR", str(tpl))
     cmd_mail_render(["bienvenue"], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "[HTML]" in stdout
@@ -326,41 +330,42 @@ def test_check_smtp_config_host_absent():
 
 # ── mail:doctor — intégration ─────────────────────────────────────────────────
 
-def test_doctor_passe_avec_config_valide(no_env, restore_forge, tmp_path, capsys):
+def test_doctor_passe_avec_config_valide(no_env, monkeypatch, tmp_path, capsys):
     (tmp_path / "mvc" / "mail" / "templates").mkdir(parents=True)
-    _forge_mail(tmp_path, transport="log", enabled=True)
+    _forge_mail(monkeypatch, tmp_path, transport="log", enabled=True)
     cmd_mail_doctor([], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "mail:doctor" in stdout
     assert "0 erreur" in stdout
 
 
-def test_doctor_fail_si_transport_invalide(no_env, restore_forge, tmp_path):
-    _forge_mail(tmp_path, transport="pigeon", enabled=True)
+def test_doctor_fail_si_transport_invalide(no_env, monkeypatch, tmp_path):
+    _forge_mail(monkeypatch, tmp_path, transport="pigeon", enabled=True)
     with pytest.raises(SystemExit):
         cmd_mail_doctor([], root=tmp_path)
 
 
-def test_doctor_affiche_warn_mail_disabled(no_env, restore_forge, tmp_path, capsys):
-    _forge_mail(tmp_path, transport="log", enabled=False)
+def test_doctor_affiche_warn_mail_disabled(no_env, monkeypatch, tmp_path, capsys):
+    _forge_mail(monkeypatch, tmp_path, transport="log", enabled=False)
     cmd_mail_doctor([], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "WARN" in stdout
 
 
-def test_doctor_smtp_verifie_host(no_env, restore_forge, tmp_path, capsys):
-    _forge_mail(tmp_path, transport="smtp", enabled=True)
-    forge.configure(mail_host="")
+def test_doctor_smtp_verifie_host(no_env, monkeypatch, tmp_path, capsys):
+    _forge_mail(monkeypatch, tmp_path, transport="smtp", enabled=True)
+    monkeypatch.setenv("MAIL_HOST", "")
     with pytest.raises(SystemExit):
         cmd_mail_doctor([], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "MAIL_HOST" in stdout
 
 
-def test_doctor_smtp_ok_si_host_present(no_env, restore_forge, tmp_path, capsys):
+def test_doctor_smtp_ok_si_host_present(no_env, monkeypatch, tmp_path, capsys):
     (tmp_path / "mvc" / "mail" / "templates").mkdir(parents=True)
-    _forge_mail(tmp_path, transport="smtp", enabled=True)
-    forge.configure(mail_host="smtp.x.test", mail_from="from@x.test")
+    _forge_mail(monkeypatch, tmp_path, transport="smtp", enabled=True)
+    monkeypatch.setenv("MAIL_HOST", "smtp.x.test")
+    monkeypatch.setenv("MAIL_FROM", "from@x.test")
     cmd_mail_doctor([], root=tmp_path)
     stdout, _ = capsys.readouterr()
     assert "MAIL_HOST" in stdout

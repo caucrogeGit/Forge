@@ -1,8 +1,8 @@
+import os
 import smtplib
 
 import pytest
 
-import core.forge as forge
 pytest.importorskip("forge_mvc_mail")
 from forge_mvc_mail import MailConfigurationError, MailMessage, MailSendError, SMTPMailer
 
@@ -42,24 +42,22 @@ class FailingSMTP(FakeSMTP):
 
 @pytest.fixture(autouse=True)
 def _mail_config(monkeypatch):
-    snapshot = dict(forge._cfg)
+    for key in list(os.environ):
+        if key.startswith("MAIL_"):
+            monkeypatch.delenv(key, raising=False)
     FakeSMTP.instances = []
     monkeypatch.setattr(smtplib, "SMTP", FakeSMTP)
     monkeypatch.setattr(smtplib, "SMTP_SSL", FakeSMTP)
-    forge.configure(
-        mail_host="smtp.example.test",
-        mail_port=2525,
-        mail_username="",
-        mail_password="",
-        mail_from="default@example.test",
-        mail_use_tls=False,
-        mail_use_ssl=False,
-        mail_timeout=3,
-        mail_enabled=True,
-    )
+    monkeypatch.setenv("MAIL_HOST", "smtp.example.test")
+    monkeypatch.setenv("MAIL_PORT", "2525")
+    monkeypatch.setenv("MAIL_USERNAME", "")
+    monkeypatch.setenv("MAIL_PASSWORD", "")
+    monkeypatch.setenv("MAIL_FROM", "default@example.test")
+    monkeypatch.setenv("MAIL_USE_TLS", "false")
+    monkeypatch.setenv("MAIL_USE_SSL", "false")
+    monkeypatch.setenv("MAIL_TIMEOUT", "3")
+    monkeypatch.setenv("MAIL_ENABLED", "true")
     yield
-    forge._cfg.clear()
-    forge._cfg.update(snapshot)
 
 
 def test_creation_message_texte_seul():
@@ -134,8 +132,8 @@ def test_from_email_par_defaut_depuis_config():
     assert sent_message["From"] == "default@example.test"
 
 
-def test_erreur_claire_si_aucun_from_email():
-    forge.configure(mail_from="")
+def test_erreur_claire_si_aucun_from_email(monkeypatch):
+    monkeypatch.setenv("MAIL_FROM", "")
     message = MailMessage(subject="Test", to="a@example.test", body_text="Bonjour")
     mailer = SMTPMailer.from_config()
 
@@ -143,8 +141,8 @@ def test_erreur_claire_si_aucun_from_email():
         mailer.send(message)
 
 
-def test_starttls_appele_si_mail_use_tls_true():
-    forge.configure(mail_use_tls=True)
+def test_starttls_appele_si_mail_use_tls_true(monkeypatch):
+    monkeypatch.setenv("MAIL_USE_TLS", "true")
     message = MailMessage(subject="Test", to="a@example.test", body_text="Bonjour")
 
     SMTPMailer.from_config().send(message)
@@ -152,8 +150,9 @@ def test_starttls_appele_si_mail_use_tls_true():
     assert FakeSMTP.instances[0].started_tls is True
 
 
-def test_booleens_config_acceptent_chaines_false():
-    forge.configure(mail_use_tls="false", mail_enabled="false")
+def test_booleens_config_acceptent_chaines_false(monkeypatch):
+    monkeypatch.setenv("MAIL_USE_TLS", "false")
+    monkeypatch.setenv("MAIL_ENABLED", "false")
 
     mailer = SMTPMailer.from_config()
 
@@ -161,8 +160,8 @@ def test_booleens_config_acceptent_chaines_false():
     assert mailer.enabled is False
 
 
-def test_mail_enabled_false_leve_erreur_explicite():
-    forge.configure(mail_enabled=False)
+def test_mail_enabled_false_leve_erreur_explicite(monkeypatch):
+    monkeypatch.setenv("MAIL_ENABLED", "false")
     message = MailMessage(subject="Test", to="a@example.test", body_text="Bonjour")
 
     with pytest.raises(MailConfigurationError, match="MAIL_ENABLED=false"):
@@ -180,7 +179,7 @@ def test_smtp_ssl_utilise_si_mail_use_ssl_true(monkeypatch):
     SecureSMTP.instances = []
     monkeypatch.setattr(smtplib, "SMTP", PlainSMTP)
     monkeypatch.setattr(smtplib, "SMTP_SSL", SecureSMTP)
-    forge.configure(mail_use_ssl=True)
+    monkeypatch.setenv("MAIL_USE_SSL", "true")
     message = MailMessage(subject="Test", to="a@example.test", body_text="Bonjour")
 
     SMTPMailer.from_config().send(message)
@@ -189,8 +188,9 @@ def test_smtp_ssl_utilise_si_mail_use_ssl_true(monkeypatch):
     assert len(SecureSMTP.instances) == 1
 
 
-def test_login_appele_si_mail_username_fourni():
-    forge.configure(mail_username="roger", mail_password="secret")
+def test_login_appele_si_mail_username_fourni(monkeypatch):
+    monkeypatch.setenv("MAIL_USERNAME", "roger")
+    monkeypatch.setenv("MAIL_PASSWORD", "secret")
     message = MailMessage(subject="Test", to="a@example.test", body_text="Bonjour")
 
     SMTPMailer.from_config().send(message)
@@ -230,8 +230,8 @@ def test_bcc_dans_enveloppe_mais_pas_dans_headers_visibles():
     assert "Bcc" not in sent_message
 
 
-def test_erreur_claire_si_mail_host_absent():
-    forge.configure(mail_host="")
+def test_erreur_claire_si_mail_host_absent(monkeypatch):
+    monkeypatch.setenv("MAIL_HOST", "")
     message = MailMessage(subject="Test", to="a@example.test", body_text="Bonjour")
 
     with pytest.raises(MailConfigurationError, match="MAIL_HOST"):

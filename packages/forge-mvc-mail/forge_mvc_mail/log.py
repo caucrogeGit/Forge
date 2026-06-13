@@ -63,8 +63,8 @@ class MailLogger:
 
     @staticmethod
     def is_enabled() -> bool:
-        import core.forge as forge
-        return bool(forge.get("mail_log_enabled"))
+        from forge_mvc_mail.config import mail_log_enabled
+        return mail_log_enabled()
 
     @classmethod
     def log(cls, record: MailLogRecord) -> None:

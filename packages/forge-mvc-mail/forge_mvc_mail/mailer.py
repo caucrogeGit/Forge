@@ -32,7 +32,7 @@ class Mailer:
 
     @classmethod
     def from_config(cls) -> Mailer:
-        return cls(MailConfig.from_forge().build_transport())
+        return cls(MailConfig.from_env().build_transport())
 
     @property
     def transport(self) -> BaseTransport:

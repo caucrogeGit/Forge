@@ -2,8 +2,10 @@
 
 > **En développement, Forge n'envoie pas de vrais mails par défaut.**
 >
-> `MAIL_ENABLED=false` et `MAIL_TRANSPORT=log` sont les valeurs par défaut de `env/example`.
-> Aucune connexion SMTP n'est tentée tant que vous ne les changez pas explicitement dans `env/dev`.
+> En l'absence de variables `MAIL_*` dans l'environnement, `MAIL_ENABLED` vaut `false`
+> et le transport `log` est utilisé, donc aucune connexion SMTP n'est tentée.
+> Le mail est un opt-in (ADR-031), le squelette nu ne pré-câble pas `MAIL_*`,
+> et vous ajoutez le bloc à `env/dev` pour configurer l'envoi.
 
 ---
 
@@ -144,6 +146,10 @@ Si `MAIL_LOG_ENABLED=false`, la commande affiche un avertissement et ne tente au
 ## Configuration
 
 ### Variables d'environnement
+
+Le mail est un opt-in (`forge-mvc-mail`, ADR-031), lu directement depuis l'environnement sans passer par le noyau.
+Le squelette nu ne fournit plus ces variables, ajoutez le bloc `MAIL_*` à `env/dev`.
+Les défauts ci-dessous s'appliquent quand une variable est absente.
 
 | Variable | Défaut | Rôle |
 |---|---|---|

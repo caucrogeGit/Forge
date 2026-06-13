@@ -1,10 +1,16 @@
-"""Lecture de la configuration mail depuis le registre Forge."""
+"""Lecture de la configuration mail depuis l'environnement.
+
+ADR-031 : `forge-mvc-mail` possède sa configuration de bout en bout. Elle est
+lue directement depuis l'environnement (`os.environ`, peuplé par le `config.py`
+du projet via `load_dotenv`), sans passer par le registre du noyau `core.forge`.
+Le core ne connaît plus le mail.
+"""
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 
-from core.forge import get as _cfg
 from forge_mvc_mail.exceptions import MailConfigurationError
 from forge_mvc_mail.transports import (
     BaseTransport,
@@ -18,15 +24,39 @@ from forge_mvc_mail.transports import (
 _VALID_TRANSPORTS = frozenset({"null", "fake", "console", "log", "smtp"})
 
 
-def _as_bool(value: object) -> bool:
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on"}
-    return bool(value)
+def _env_bool(key: str, default: bool = False) -> bool:
+    value = os.getenv(key)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _resolve_from_email() -> str:
+    """Expéditeur effectif : MAIL_FROM prioritaire, sinon MAIL_FROM_NAME + ADDRESS."""
+    explicit = os.getenv("MAIL_FROM")
+    if explicit:
+        return explicit
+    name = os.getenv("MAIL_FROM_NAME", "Forge")
+    address = os.getenv("MAIL_FROM_ADDRESS", "noreply@localhost")
+    return f"{name} <{address}>" if name else address
+
+
+def mail_templates_dir() -> str:
+    """Dossier des templates mail, lu depuis l'environnement."""
+    return os.getenv("MAIL_TEMPLATES_DIR", "mvc/mail/templates")
+
+
+def mail_log_enabled() -> bool:
+    """Journalisation SQL des envois, lue depuis l'environnement."""
+    return _env_bool("MAIL_LOG_ENABLED")
 
 
 @dataclass(frozen=True)
 class MailConfig:
-    """Configuration mail complète, lue depuis le registre Forge."""
+    """Configuration mail complète, lue depuis l'environnement.
+
+    `MAIL_ENABLED` absent vaut `False` : zéro envoi accidentel par défaut.
+    """
 
     enabled: bool
     transport_name: str
@@ -41,19 +71,19 @@ class MailConfig:
     timeout: float
 
     @classmethod
-    def from_forge(cls) -> MailConfig:
+    def from_env(cls) -> MailConfig:
         return cls(
-            enabled=_as_bool(_cfg("mail_enabled")),
-            transport_name=str(_cfg("mail_transport") or "log").lower().strip(),
-            from_email=str(_cfg("mail_from") or ""),
-            log_dir=str(_cfg("mail_log_dir") or "storage/mail"),
-            host=str(_cfg("mail_host") or ""),
-            port=int(_cfg("mail_port") or 587),
-            username=str(_cfg("mail_username") or ""),
-            password=str(_cfg("mail_password") or ""),
-            use_tls=_as_bool(_cfg("mail_use_tls")),
-            use_ssl=_as_bool(_cfg("mail_use_ssl")),
-            timeout=float(_cfg("mail_timeout") or 10),
+            enabled=_env_bool("MAIL_ENABLED"),
+            transport_name=(os.getenv("MAIL_TRANSPORT") or "log").lower().strip(),
+            from_email=_resolve_from_email(),
+            log_dir=os.getenv("MAIL_LOG_DIR", "storage/mail"),
+            host=os.getenv("MAIL_HOST", ""),
+            port=int(os.getenv("MAIL_PORT") or 587),
+            username=os.getenv("MAIL_USERNAME", ""),
+            password=os.getenv("MAIL_PASSWORD", ""),
+            use_tls=_env_bool("MAIL_USE_TLS"),
+            use_ssl=_env_bool("MAIL_USE_SSL"),
+            timeout=float(os.getenv("MAIL_TIMEOUT") or 10),
         )
 
     def build_transport(self) -> BaseTransport:

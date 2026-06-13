@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
-import core.forge as forge
 pytest.importorskip("forge_mvc_mail")
 from forge_mvc_mail.log import MailLogRecord, MailLogger
 from forge_mvc_mail.mailer import Mailer
@@ -17,22 +17,22 @@ from forge_mvc_mail.transports import FakeTransport, NullTransport
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
-@pytest.fixture()
-def restore_forge():
-    snapshot = dict(forge._cfg)
-    yield
-    forge._cfg.clear()
-    forge._cfg.update(snapshot)
+@pytest.fixture(autouse=True)
+def _clean_mail_env(monkeypatch):
+    """Supprime toute variable MAIL_* du shell avant chaque test."""
+    for key in list(os.environ):
+        if key.startswith("MAIL_"):
+            monkeypatch.delenv(key, raising=False)
 
 
 @pytest.fixture()
-def log_enabled(restore_forge):
-    forge.configure(mail_log_enabled=True)
+def log_enabled(monkeypatch):
+    monkeypatch.setenv("MAIL_LOG_ENABLED", "true")
 
 
 @pytest.fixture()
-def log_disabled(restore_forge):
-    forge.configure(mail_log_enabled=False)
+def log_disabled(monkeypatch):
+    monkeypatch.setenv("MAIL_LOG_ENABLED", "false")
 
 
 def _simple_message() -> MailMessage:
@@ -275,21 +275,19 @@ def test_mailer_log_status_failed_via_smtp_error(log_enabled, monkeypatch):
     assert calls[0][9] is None            # sent_at
 
 
-def test_mailer_log_skipped_quand_mail_enabled_false(restore_forge, monkeypatch):
+def test_mailer_log_skipped_quand_mail_enabled_false(monkeypatch):
     """MAIL_ENABLED=false + MAIL_LOG_ENABLED=true → status skipped dans mail_log."""
-    forge.configure(
-        mail_enabled=False,
-        mail_log_enabled=True,
-        mail_transport="fake",
-        mail_from="from@x.test",
-        mail_host="",
-        mail_port=587,
-        mail_username="",
-        mail_password="",
-        mail_use_tls=False,
-        mail_use_ssl=False,
-        mail_timeout=10,
-    )
+    monkeypatch.setenv("MAIL_ENABLED", "false")
+    monkeypatch.setenv("MAIL_LOG_ENABLED", "true")
+    monkeypatch.setenv("MAIL_TRANSPORT", "fake")
+    monkeypatch.setenv("MAIL_FROM", "from@x.test")
+    monkeypatch.setenv("MAIL_HOST", "")
+    monkeypatch.setenv("MAIL_PORT", "587")
+    monkeypatch.setenv("MAIL_USERNAME", "")
+    monkeypatch.setenv("MAIL_PASSWORD", "")
+    monkeypatch.setenv("MAIL_USE_TLS", "false")
+    monkeypatch.setenv("MAIL_USE_SSL", "false")
+    monkeypatch.setenv("MAIL_TIMEOUT", "10")
     calls = []
     monkeypatch.setattr("forge_mvc_mail.log._db_insert", lambda sql, p: calls.append(p))
     mailer = Mailer.from_config()           # doit renvoyer NullTransport

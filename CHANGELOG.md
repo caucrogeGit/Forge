@@ -5,6 +5,17 @@
 
 ### Modifié
 
+- **Découplage complet du mail hors du core** (`MAIL-DECOUPLE-CORE-001`,
+  ADR-031). Le noyau ne connaît plus le mail : les slots `mail_*` sont retirés
+  de `core.forge` (et `core.forge.configure()` les refuse désormais),
+  `_optional_mail_kwargs()` disparaît de `core.app.app_factory`, et le squelette
+  nu ne pré-câble plus la plomberie `MAIL_*` (`env/example`, `config.py`,
+  `app.py`). `forge-mvc-mail` lit toute sa configuration directement depuis
+  l'environnement (`MailConfig.from_env()`), sans passer par le registre du
+  noyau. Le défaut de `MAIL_ENABLED` absent devient `false` (zéro envoi
+  accidentel). Rupture interne pré-1.0 de `core.forge.configure` (sans alias).
+  Pour activer le mail : installer `forge-mvc-mail` et ajouter le bloc `MAIL_*`
+  à `env/dev`.
 - **`forge doctor` : MFA et RBAC recadrés en gardes-fous de sécurité**
   (`DOCTOR-SECURITY-OPTIN-001`). Le check MFA portait le libellé « opt-in »,
   ce qui laissait croire à un inventaire des briques optionnelles et invitait

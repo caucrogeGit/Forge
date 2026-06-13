@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import smtplib
 import sys
 import uuid
@@ -11,7 +12,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import TextIO
 
-from core.forge import get as _cfg
 from forge_mvc_mail.exceptions import MailConfigurationError, MailSendError
 from forge_mvc_mail.message import MailMessage
 
@@ -140,14 +140,14 @@ class SmtpTransport(BaseTransport):
     @classmethod
     def from_config(cls) -> SmtpTransport:
         return cls(
-            host=str(_cfg("mail_host") or ""),
-            port=int(_cfg("mail_port") or 587),
-            username=str(_cfg("mail_username") or ""),
-            password=str(_cfg("mail_password") or ""),
-            from_email=str(_cfg("mail_from") or ""),
-            use_tls=_as_bool(_cfg("mail_use_tls")),
-            use_ssl=_as_bool(_cfg("mail_use_ssl")),
-            timeout=float(_cfg("mail_timeout") or 10),
+            host=os.getenv("MAIL_HOST", ""),
+            port=int(os.getenv("MAIL_PORT") or 587),
+            username=os.getenv("MAIL_USERNAME", ""),
+            password=os.getenv("MAIL_PASSWORD", ""),
+            from_email=os.getenv("MAIL_FROM", ""),
+            use_tls=_as_bool(os.getenv("MAIL_USE_TLS")),
+            use_ssl=_as_bool(os.getenv("MAIL_USE_SSL")),
+            timeout=float(os.getenv("MAIL_TIMEOUT") or 10),
         )
 
     def send(self, message: MailMessage) -> TransportResult:
