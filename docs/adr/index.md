@@ -39,3 +39,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-030](030-explicit-route-injection.md) | Injection de routes dans `mvc/routes.py` par commande explicite et portée de la règle 4.3 (proposé) |
 | [ADR-031](031-mail-core-decoupling.md) | Découplage complet du mail hors de `core.forge` ; `forge-mvc-mail` lit sa config depuis l'environnement (accepté) |
 | [ADR-032](032-upload-config-perimeter.md) | Périmètre de la config upload : seul `upload_max_size` est du core, le reste va aux opt-ins files/images (accepté) |
+| [ADR-033](033-migrations-admin-credentials.md) | `forge db:apply` applique les migrations avec `DB_ADMIN_*` (et non `DB_APP_*`) : `forge_app` reste DML strict (accepté) |
