@@ -17,6 +17,10 @@ _MFA_IMPORT_RE = re.compile(
     re.MULTILINE,
 )
 _MFA_ROUTE_KEYWORDS = ("mfa", "totp")
+_RBAC_IMPORT_RE = re.compile(
+    r"^\s*(import|from)\s+forge_mvc_rbac\b",
+    re.MULTILINE,
+)
 
 
 @dataclass
@@ -360,21 +364,80 @@ def check_mfa_dependency(root: Path) -> CheckResult:
     """
     indicators = _detect_mfa_indicators(root)
     if not indicators:
-        return CheckResult("skip", "MFA (opt-in)", "aucun indice MFA dans ce projet")
+        return CheckResult("skip", "MFA (sécurité)", "aucun indice MFA dans ce projet")
 
     mfa_available = importlib.util.find_spec("forge_mvc_mfa") is not None
     if mfa_available:
         return CheckResult(
-            "ok", "MFA (opt-in)",
+            "ok", "MFA (sécurité)",
             f"forge_mvc_mfa disponible — {len(indicators)} indice(s) MFA détecté(s)",
         )
 
     return CheckResult(
-        "warn", "MFA (opt-in)",
+        "warn", "MFA (sécurité)",
         f"forge_mvc_mfa non disponible — {len(indicators)} indice(s) MFA détecté(s) "
         f"({indicators[0]}) — "
         "MFA est une brique opt-in/source-only, non incluse dans forge-mvc core ; "
         "installez les dépendances du module MFA ou désactivez le flux MFA",
+    )
+
+
+def _detect_rbac_indicators(root: Path) -> list[str]:
+    """Retourne les indices d'usage RBAC détectés dans le projet (lecture seule).
+
+    Contrairement à MFA, on n'utilise PAS la détection par mot-clé de nom de
+    fichier : les starters welcome-rbac emploient « rbac » dans leurs noms pour
+    des transformations pures qui n'importent pas le module, ce qui produirait
+    des faux positifs. On ne retient que des signaux non ambigus : le contrat
+    canonique ``mvc/security/rbac.json`` (ADR-014) et un import effectif de
+    ``forge_mvc_rbac``.
+    """
+    indicators: list[str] = []
+
+    contract = root / "mvc" / "security" / "rbac.json"
+    if contract.exists():
+        indicators.append(f"contrat : {contract.relative_to(root)}")
+
+    mvc_dir = root / "mvc"
+    if mvc_dir.exists():
+        for py_file in mvc_dir.rglob("*.py"):
+            try:
+                src = py_file.read_text(encoding="utf-8")
+                if _RBAC_IMPORT_RE.search(src):
+                    indicators.append(f"import RBAC dans {py_file.relative_to(root)}")
+                    break
+            except (OSError, UnicodeDecodeError):
+                pass
+
+    return indicators
+
+
+def check_rbac_dependency(root: Path) -> CheckResult:
+    """Détecte un usage RBAC dans le projet et vérifie que forge-mvc-rbac est disponible.
+
+    Garde-fou *fail-open* symétrique à ``check_mfa_dependency`` : un contrôle
+    d'accès déclaré (contrat ``mvc/security/rbac.json`` ou import
+    ``forge_mvc_rbac``) sans la brique qui l'applique laisse les routes
+    ouvertes. RBAC est une brique opt-in/source-only — elle ne fait pas partie
+    du runtime forge-mvc core. Émet un WARN non bloquant.
+    """
+    indicators = _detect_rbac_indicators(root)
+    if not indicators:
+        return CheckResult("skip", "RBAC (sécurité)", "aucun indice RBAC dans ce projet")
+
+    rbac_available = importlib.util.find_spec("forge_mvc_rbac") is not None
+    if rbac_available:
+        return CheckResult(
+            "ok", "RBAC (sécurité)",
+            f"forge_mvc_rbac disponible — {len(indicators)} indice(s) RBAC détecté(s)",
+        )
+
+    return CheckResult(
+        "warn", "RBAC (sécurité)",
+        f"forge_mvc_rbac non disponible — {len(indicators)} indice(s) RBAC détecté(s) "
+        f"({indicators[0]}) — "
+        "RBAC est une brique opt-in/source-only, non incluse dans forge-mvc core ; "
+        "installez les dépendances du module RBAC ou retirez les gardes RBAC",
     )
 
 
@@ -426,6 +489,7 @@ def run_all(root: Path, version: str) -> list[CheckResult]:
         lambda: check_templates(root),
         lambda: check_modules(root),
         lambda: check_mfa_dependency(root),
+        lambda: check_rbac_dependency(root),
         lambda: check_ssl(root, config),
         lambda: check_node(),
         lambda: check_db(root, config),
