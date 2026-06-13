@@ -146,8 +146,9 @@ def check_model_entities(root: Path) -> CheckResult:
         if p.is_dir() and not p.name.startswith("__")
     ]
     if not entity_dirs:
-        return CheckResult("warn", "Entités",
-                           "Aucune entité détectée dans mvc/entities/ — crée une entité avec forge make:entity <Nom>")
+        return CheckResult("skip", "Entités",
+                           "aucune entité — état nominal d'un projet vierge ; "
+                           "crée-en une avec forge make:entity <Nom>")
 
     try:
         from forge_cli.entities.model import ModelValidationError, check_model
