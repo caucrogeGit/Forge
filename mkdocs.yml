@@ -412,6 +412,7 @@ nav:
           - ADR-029 Convention de route: adr/029-route-naming-convention.md
           - ADR-030 Injection de routes explicite: adr/030-explicit-route-injection.md
           - ADR-031 Découplage mail complet: adr/031-mail-core-decoupling.md
+          - ADR-032 Périmètre config upload: adr/032-upload-config-perimeter.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md

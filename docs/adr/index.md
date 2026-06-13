@@ -37,3 +37,5 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-028](028-welcome-forge-tutorial-per-level.md) | welcome-forge : tutoriel continu manuel sur les trois niveaux, un mini-projet par niveau (accepté) |
 | [ADR-029](029-route-naming-convention.md) | Convention de route : chemin `/contrôleur/méthode` (index nu), nom `contrôleur-méthode` (accepté) |
 | [ADR-030](030-explicit-route-injection.md) | Injection de routes dans `mvc/routes.py` par commande explicite et portée de la règle 4.3 (proposé) |
+| [ADR-031](031-mail-core-decoupling.md) | Découplage complet du mail hors de `core.forge` ; `forge-mvc-mail` lit sa config depuis l'environnement (accepté) |
+| [ADR-032](032-upload-config-perimeter.md) | Périmètre de la config upload : seul `upload_max_size` est du core, le reste va aux opt-ins files/images (accepté) |
