@@ -374,7 +374,7 @@ def load_table_columns(
                 cursor.execute(SELECT_TABLE_COLUMNS_SQL, (db_name, table))
             except Exception as exc:
                 raise MigrationError(
-                    "Lecture du schéma MariaDB impossible. Vérifiez DB_APP_* / DB_NAME dans env/dev."
+                    "Lecture du schéma MariaDB impossible. Vérifiez DB_ADMIN_* / DB_NAME dans env/dev."
                 ) from exc
             rows = cursor.fetchall()
         finally:
@@ -888,19 +888,22 @@ def _connect_db():
         )
     except Exception as exc:
         raise MigrationError(
-            "Connexion MariaDB applicative impossible. "
-            "Vérifiez DB_APP_* / DB_NAME dans env/dev."
+            "Connexion MariaDB admin impossible. "
+            "Vérifiez DB_ADMIN_* / DB_NAME dans env/dev."
         ) from exc
 
 
 def load_migration_db_config() -> MigrationDbConfig:
     config = load_project_config()
 
+    # ADR-033 : les migrations sont des changements de structure ; elles
+    # utilisent le compte d'administration du projet (DB_ADMIN_*), pas le compte
+    # runtime DB_APP_* qui reste en DML strict.
     return MigrationDbConfig(
-        host=config.DB_APP_HOST,
-        port=config.DB_APP_PORT,
-        login=config.DB_APP_LOGIN,
-        password=config.DB_APP_PWD,
+        host=config.DB_ADMIN_HOST,
+        port=config.DB_ADMIN_PORT,
+        login=config.DB_ADMIN_LOGIN,
+        password=config.DB_ADMIN_PWD,
         database=config.DB_NAME,
     )
 

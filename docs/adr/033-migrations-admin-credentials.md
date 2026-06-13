@@ -102,8 +102,11 @@ de `DB_APP_*`) et `DB_NAME`. `forge_admin` détient déjà
    `DB_APP_*`).
 2. `migrations.py` : `_connect_db()` utilise `DB_ADMIN_HOST/PORT/LOGIN/PWD` ;
    adapter les messages d'erreur (`DB_ADMIN_*`).
-3. `env/example` (squelette + dogfood) : retirer la ligne commentée
-   `DB_APP_PRIVILEGES=...` (le runtime n'a plus besoin de DDL).
+3. `db_init.py` : `DEFAULT_APP_PRIVILEGES` resserré au DML (le provisioning
+   n'accorde plus `CREATE/ALTER/DROP/INDEX/REFERENCES` à `forge_app` par défaut ;
+   un override explicite via `DB_APP_PRIVILEGES` reste possible). `env/example`
+   (squelette + dogfood) : retirer la ligne commentée `DB_APP_PRIVILEGES=...`
+   (le runtime n'a plus besoin de DDL).
 4. `docs/install/mariadb-comptes.md` : préciser que `forge_admin` applique les
    migrations ; confirmer `forge_app` en DML strict (déjà le cas) ; retirer
    toute suggestion d'élargir `forge_app` au DDL.

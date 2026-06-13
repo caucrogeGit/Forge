@@ -219,6 +219,9 @@ Cette table permet à Forge de savoir quelles migrations SQL ont déjà été ap
 
 Applique les migrations SQL du projet.
 
+Comme `db:init`, cette commande modifie la structure : elle se connecte en `forge_admin` (`DB_ADMIN_*`), pas avec le compte applicatif.
+Le compte `forge_app` reste donc en lecture/écriture de données uniquement (`SELECT/INSERT/UPDATE/DELETE`).
+
 Les fichiers de migration sont lus dans :
 
 ```text

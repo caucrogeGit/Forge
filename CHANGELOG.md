@@ -5,6 +5,16 @@
 
 ### Modifié
 
+- **Les migrations s'appliquent avec le compte d'administration** (`DB-APPLY-ADMIN-CREDS-001`,
+  ADR-033). `forge db:apply` et `forge migration:status` modifient la structure
+  de la base : ils se connectent désormais en `DB_ADMIN_*` (`forge_admin`), et
+  non plus avec le compte applicatif `DB_APP_*`. Cela corrige un défaut
+  fonctionnel (en suivant `mariadb-comptes.md`, qui n'accorde que le DML à
+  `forge_app`, `forge db:apply` échouait sur `CREATE command denied`) et aligne
+  le code sur la doctrine : `forge_admin` pour le provisioning et les migrations,
+  `forge_app` pour le runtime en DML strict. En conséquence, `forge db:init`
+  n'accorde plus `CREATE/ALTER/DROP/INDEX/REFERENCES` à `forge_app` par défaut
+  (un override `DB_APP_PRIVILEGES` reste possible).
 - **Périmètre de la configuration upload resserré sur le core**
   (`UPLOAD-CONFIG-DECOUPLE-001`, ADR-032). Seul `upload_max_size` reste un
   réglage du noyau (il borne le corps des requêtes multipart dans

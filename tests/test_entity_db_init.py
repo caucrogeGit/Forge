@@ -225,7 +225,7 @@ def test_db_init_creates_missing_database_and_app_user(monkeypatch):
         "CREATE DATABASE `gestion_ventes` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
         "SELECT Host FROM mysql.user WHERE User = 'forge_app' ORDER BY Host",
         "CREATE USER 'forge_app'@'localhost' IDENTIFIED BY 'secret'",
-        "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES ON `gestion_ventes`.* TO 'forge_app'@'localhost'",
+        "GRANT SELECT, INSERT, UPDATE, DELETE ON `gestion_ventes`.* TO 'forge_app'@'localhost'",
         "USE `gestion_ventes`",
         FORGE_MIGRATIONS_SQL,
         "FLUSH PRIVILEGES",
@@ -234,7 +234,7 @@ def test_db_init_creates_missing_database_and_app_user(monkeypatch):
     assert actions == [
         "Base gestion_ventes créée.",
         "Utilisateur applicatif forge_app@localhost créé.",
-        "Privilèges appliqués sur gestion_ventes à forge_app@localhost (SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES).",
+        "Privilèges appliqués sur gestion_ventes à forge_app@localhost (SELECT, INSERT, UPDATE, DELETE).",
         "Table forge_migrations prête.",
     ]
 
@@ -274,7 +274,7 @@ def test_db_init_reports_existing_database_and_user_then_reapplies_privileges(mo
     assert executed == [
         "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'gestion_ventes'",
         "SELECT Host FROM mysql.user WHERE User = 'forge_app' ORDER BY Host",
-        "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES ON `gestion_ventes`.* TO 'forge_app'@'localhost'",
+        "GRANT SELECT, INSERT, UPDATE, DELETE ON `gestion_ventes`.* TO 'forge_app'@'localhost'",
         "USE `gestion_ventes`",
         FORGE_MIGRATIONS_SQL,
         "FLUSH PRIVILEGES",
@@ -284,7 +284,7 @@ def test_db_init_reports_existing_database_and_user_then_reapplies_privileges(mo
         "Base gestion_ventes déjà présente.",
         "Utilisateur applicatif forge_app@localhost déjà présent.",
         "Vérification manuelle nécessaire : le mot de passe et l'état de forge_app@localhost ne sont pas modifiés par forge db:init.",
-        "Privilèges appliqués sur gestion_ventes à forge_app@localhost (SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES).",
+        "Privilèges appliqués sur gestion_ventes à forge_app@localhost (SELECT, INSERT, UPDATE, DELETE).",
         "Table forge_migrations prête.",
     ]
 

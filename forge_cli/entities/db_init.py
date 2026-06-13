@@ -6,18 +6,21 @@ from dataclasses import dataclass
 
 from forge_cli.project_config import ProjectConfigError, load_project_config
 
+# ADR-033 : le compte applicatif (forge_app) est un compte runtime à privilèges
+# minimaux (DML). Les migrations (DDL) utilisent DB_ADMIN_*, donc forge_app n'a
+# plus besoin de CREATE/ALTER/DROP. Défaut resserré sur le DML.
 DEFAULT_APP_PRIVILEGES = (
     "SELECT",
     "INSERT",
     "UPDATE",
     "DELETE",
-    "CREATE",
-    "ALTER",
-    "DROP",
-    "INDEX",
-    "REFERENCES",
 )
-_ALLOWED_APP_PRIVILEGES = frozenset(DEFAULT_APP_PRIVILEGES)
+# Un override explicite via DB_APP_PRIVILEGES peut encore demander du DDL
+# (escape hatch avancé), mais ce n'est plus accordé par défaut.
+_ALLOWED_APP_PRIVILEGES = frozenset({
+    "SELECT", "INSERT", "UPDATE", "DELETE",
+    "CREATE", "ALTER", "DROP", "INDEX", "REFERENCES",
+})
 FORGE_MIGRATIONS_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS forge_migrations (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
