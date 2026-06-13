@@ -347,65 +347,66 @@ def _make_env_dir(tmp_path):
 
 def test_env_dev_contient_db_app_login_projet(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
-    assert "DB_APP_LOGIN=test_forge_new_app" in dev
+    # ADR-034 : sans suffixe _app (fin de ligne exacte pour exclure ..._app)
+    assert "DB_APP_LOGIN=test_forge_new\n" in dev
 
 
 def test_env_dev_ne_contient_pas_root_comme_app_login(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "DB_APP_LOGIN=root" not in dev
 
 
 def test_env_dev_contient_db_admin_login(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "DB_ADMIN_LOGIN=" in dev
 
 
 def test_env_dev_contient_db_app_host(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "DB_APP_HOST=" in dev
 
 
 def test_env_dev_contient_db_app_port(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "DB_APP_PORT=" in dev
 
 
 def test_env_dev_contient_ssl_certfile(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "SSL_CERTFILE=" in dev
 
 
 def test_env_dev_contient_ssl_keyfile(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "SSL_KEYFILE=" in dev
 
 
 def test_env_dev_app_name_correct(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "APP_NAME=TestForgeNew" in dev
 
 
 def test_env_dev_db_name_correct(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new_db")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
-    assert "DB_NAME=test_forge_new_db" in dev
+    assert "DB_NAME=test_forge_new\n" in dev  # ADR-034 : sans suffixe _db
 
 
 # ── Message final — mention env/dev (V1.4.2) ─────────────────────────────────

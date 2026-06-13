@@ -144,7 +144,7 @@ def _configure_env_files(dest: str, project_name: str, db_name: str) -> None:
     with open(example_path, "w", encoding="utf-8") as file:
         file.write(content)
 
-    app_login = _to_snake(project_name) + "_app"
+    app_login = _to_snake(project_name)  # ADR-034 : sans suffixe _app
     dev_content = re.sub(
         r"^DB_APP_LOGIN=.*$",
         f"DB_APP_LOGIN={app_login}",
@@ -276,7 +276,7 @@ def cmd_new(
     if os.path.exists(dest):
         sys.exit(f"Erreur : le dossier '{dest}' existe déjà.")
 
-    db_name = _to_snake(project_name) + "_db"
+    db_name = _to_snake(project_name)  # ADR-034 : sans suffixe _db
 
     print(f"\nForge {_FORGE_VERSION} — nouveau projet : {project_name} [profil : {profile}]\n")
 

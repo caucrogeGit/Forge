@@ -5,6 +5,12 @@
 
 ### Modifié
 
+- **Identifiants DB générés sans suffixes** (`NEW-DB-NAMING-NO-SUFFIX-001`,
+  ADR-034). `forge new <nom>` génère `DB_NAME` et `DB_APP_LOGIN` à partir du nom
+  **normalisé** du projet, sans suffixe `_db` / `_app` (ex. `forge new blog` →
+  `DB_NAME=blog`, `DB_APP_LOGIN=blog` ; `forge new welcome-forge` →
+  `DB_NAME=welcome_forge`). `APP_NAME` garde le nom humain (tirets, casse),
+  `DB_ADMIN_LOGIN` reste `forge_admin`.
 - **Les migrations s'appliquent avec le compte d'administration** (`DB-APPLY-ADMIN-CREDS-001`,
   ADR-033). `forge db:apply` et `forge migration:status` modifient la structure
   de la base : ils se connectent désormais en `DB_ADMIN_*` (`forge_admin`), et
