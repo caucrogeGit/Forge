@@ -21,7 +21,9 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 MKDOCS_YML = PROJECT_ROOT / "mkdocs.yml"
 DOCS_DIR = PROJECT_ROOT / "docs"
 
-EXCLUDED_DIRS: set[str] = {"history", "audits"}
+# Dossiers d'archives ou d'assets sans pages de navigation.
+# logos/ : sources et exports PNG des logos Forge, pas des pages de documentation.
+EXCLUDED_DIRS: set[str] = {"history", "audits", "logos"}
 
 # Fichiers .md intentionnellement hors-nav (à documenter si on en ajoute).
 NAVLESS_FILES: set[str] = {
