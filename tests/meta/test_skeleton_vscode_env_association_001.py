@@ -14,7 +14,10 @@ Vérifie que :
 """
 from __future__ import annotations
 
+import glob
 import json
+import os
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -51,4 +54,29 @@ def test_skeleton_vscode_is_materialized_by_forge_new():
     assert ".vscode/settings.json" in rel, (
         "iter_skeleton_files() doit inclure .vscode/settings.json pour que "
         "forge new le copie dans le projet généré"
+    )
+
+
+def test_pyproject_package_data_includes_dot_dir_files():
+    """Le wheel doit embarquer les fichiers situés DANS un dossier dot du
+    squelette (ex. .vscode/settings.json).
+
+    Les globs `**/*` ne descendent pas dans les dossiers cachés, d'où le
+    besoin d'un glob package-data dédié (ex. `skeleton/data/.*/**/*`). Ce test
+    vérifie l'effet, pas la formulation exacte : au moins un pattern de
+    package-data['forge_cli'] doit matcher le fichier cible.
+    """
+    pyproject = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    patterns = pyproject["tool"]["setuptools"]["package-data"]["forge_cli"]
+    pkg_dir = PROJECT_ROOT / "forge_cli"
+    target = "skeleton/data/.vscode/settings.json"
+
+    matched = any(
+        target in {p.replace(os.sep, "/") for p in glob.glob(pat, root_dir=pkg_dir, recursive=True)}
+        for pat in patterns
+    )
+    assert matched, (
+        "package-data['forge_cli'] doit contenir un glob couvrant les fichiers "
+        "dans les dossiers dot du squelette (ex. 'skeleton/data/.*/**/*'), sinon "
+        ".vscode/settings.json est exclu du wheel et forge new ne le matérialise pas."
     )

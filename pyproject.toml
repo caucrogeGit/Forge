@@ -86,6 +86,7 @@ include = ["core*", "forge_cli*", "integrations*"]
     "skeleton/data/**/*",
     "skeleton/data/**/.*",
     "skeleton/data/.*",
+    "skeleton/data/.*/**/*",   # fichiers DANS les dossiers dot (.vscode/…),
 ]
 
 [tool.setuptools.exclude-package-data]
