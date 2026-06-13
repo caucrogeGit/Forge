@@ -233,10 +233,13 @@ def test_check_model_entities_no_dir(tmp_path):
 
 
 def test_check_model_entities_vide(tmp_path):
+    # Projet vierge (ADR-024) : aucune entité est l'état nominal, pas une anomalie.
+    # SKIP plutôt que WARN (FIX-DOCTOR-ENTITIES-SKELETON-001).
     (tmp_path / "mvc" / "entities").mkdir(parents=True)
     r = check_model_entities(tmp_path)
-    assert r.status == "warn"
+    assert r.status == "skip"
     assert "entité" in r.detail.lower()
+    assert "make:entity" in r.detail
 
 
 def test_check_model_entities_ok(tmp_path):
