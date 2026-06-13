@@ -158,7 +158,7 @@ Tout fichier uploadé transite par la chaîne : `validate_upload_metadata()` →
 
 ### Racine contrôlée
 
-La racine absolue `storage/uploads/` est définie par `UPLOAD_ROOT` dans `config.py`. Tout accès au système de fichiers (lecture, écriture, suppression) passe par `os.path.commonpath()` pour vérifier le confinement. Les chemins persistés en base sont **toujours relatifs** à cette racine.
+La racine de stockage (défaut `storage/uploads/`) est lue depuis la variable d'environnement `UPLOAD_ROOT` par l'opt-in `forge-mvc-files` (ADR-032). Tout accès au système de fichiers (lecture, écriture, suppression) passe par `os.path.commonpath()` pour vérifier le confinement. Les chemins persistés en base sont **toujours relatifs** à cette racine.
 
 ### Anti-path-traversal (`normalize_media_path`)
 

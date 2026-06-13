@@ -22,20 +22,7 @@ Chaque entrée ci-dessous est repliée par défaut. Ouvrez uniquement la partie 
 | `app_env` | `"dev"` | Environnement actif |
 | `views_dir` | `mvc/views` | Dossier des templates |
 | `sql_dir` | `mvc/models/sql` | Dossier des requêtes SQL |
-| `upload_root` | `storage/uploads` | Racine des uploads |
-| `upload_max_size` | `5242880` | Taille maximale d'un fichier |
-| `upload_max_image_pixels` | `24000000` | Surface max d'une image (anti-décompression-bomb) |
-| `upload_allowed_extensions` | `["jpg", "jpeg", "png", "webp", "pdf"]` | Extensions autorisées |
-| `upload_allowed_mime_types` | `["image/jpeg", "image/png", "image/webp", "application/pdf"]` | MIME autorisés |
-| `mail_host` | `""` | Hôte SMTP |
-| `mail_port` | `587` | Port SMTP |
-| `mail_username` | `""` | Utilisateur SMTP |
-| `mail_password` | `""` | Mot de passe SMTP |
-| `mail_from` | `""` | Expéditeur par défaut |
-| `mail_use_tls` | `False` | Active `STARTTLS` |
-| `mail_use_ssl` | `False` | Utilise `SMTP_SSL` |
-| `mail_timeout` | `10` | Timeout SMTP en secondes |
-| `mail_enabled` | `True` | Active ou désactive l'envoi réel |
+| `upload_max_size` | `5242880` | Plafond du corps multipart (borne HTTP du noyau) |
 | `db_host` | `"localhost"` | Hôte MariaDB |
 | `db_port` | `3306` | Port MariaDB |
 | `db_name` | `"forge_db"` | Nom de la base |
@@ -46,7 +33,14 @@ Chaque entrée ci-dessous est repliée par défaut. Ouvrez uniquement la partie 
 | `css_hidden` | `"hidden"` | Classe pagination masquée |
 | `router` | `None` | Routeur actif pour `url_for()` |
 
-Les chemins relatifs `views_dir`, `sql_dir` et `upload_root` sont résolus depuis la racine du projet.
+Les chemins relatifs `views_dir` et `sql_dir` sont résolus depuis la racine du projet.
+
+Le noyau ne déclare plus la configuration du mail (ADR-031) ni la config de
+stockage/validation d'upload (`upload_root`, `upload_allowed_extensions`,
+`upload_allowed_mime_types`, `upload_max_image_pixels` ; ADR-032). Ces réglages
+appartiennent aux opt-ins `forge-mvc-mail`, `forge-mvc-files` et `forge-mvc-images`,
+qui les lisent directement depuis l'environnement. Seul `upload_max_size` reste
+dans le registre, car le noyau l'utilise pour borner les requêtes multipart.
 
 ### Exemple
 
