@@ -37,7 +37,7 @@ load_dotenv(f"env/{APP_ENV}", override=True) # surcharge avec l'environnement ch
 
 DB_ADMIN_HOST  = os.getenv("DB_ADMIN_HOST", "localhost")
 DB_ADMIN_PORT  = int(os.getenv("DB_ADMIN_PORT", 3306))
-DB_ADMIN_LOGIN = os.getenv("DB_ADMIN_LOGIN", "root")
+DB_ADMIN_LOGIN = os.getenv("DB_ADMIN_LOGIN", "forge_admin")
 DB_ADMIN_PWD   = os.getenv("DB_ADMIN_PWD", "")
 
 DB_NAME        = os.getenv("DB_NAME", "forge_db")
@@ -46,7 +46,7 @@ DB_COLLATION   = os.getenv("DB_COLLATION", "utf8mb4_unicode_ci")
 
 DB_APP_HOST    = os.getenv("DB_APP_HOST", "localhost")
 DB_APP_PORT    = int(os.getenv("DB_APP_PORT", 3306))
-DB_APP_LOGIN   = os.getenv("DB_APP_LOGIN", "forge")
+DB_APP_LOGIN   = os.getenv("DB_APP_LOGIN", "forge_app")
 DB_APP_PWD     = os.getenv("DB_APP_PWD", "")
 DB_POOL_SIZE   = int(os.getenv("DB_POOL_SIZE", 5))
 
