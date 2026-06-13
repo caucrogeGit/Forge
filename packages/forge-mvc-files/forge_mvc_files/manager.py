@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import mimetypes
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -53,8 +54,19 @@ def _read_upload(file) -> tuple[str, str | None, bytes]:
     return filename, mime_type, bytes(data)
 
 
+# ADR-032 : la config de stockage et de validation d'upload appartient à
+# l'opt-in files, lue directement depuis l'environnement. Seul `upload_max_size`
+# reste détenu par le noyau (borne le corps multipart dans core/http/request.py).
+_DEFAULT_EXTENSIONS = "jpg,jpeg,png,webp,pdf"
+_DEFAULT_MIME_TYPES = "image/jpeg,image/png,image/webp,application/pdf"
+
+
+def _env_list(key: str, default: str) -> list[str]:
+    return [item.strip() for item in os.getenv(key, default).split(",") if item.strip()]
+
+
 def upload_root() -> Path:
-    return Path(str(_cfg("upload_root")))
+    return Path(os.getenv("UPLOAD_ROOT", "storage/uploads"))
 
 
 def _require_image_processing(name: str):
@@ -96,8 +108,8 @@ def save_upload(file, category: str = "documents") -> SavedUpload:
         filename=filename,
         size=len(data),
         mime_type=mime_type,
-        allowed_extensions=_cfg("upload_allowed_extensions"),
-        allowed_mime_types=_cfg("upload_allowed_mime_types"),
+        allowed_extensions=_env_list("UPLOAD_ALLOWED_EXTENSIONS", _DEFAULT_EXTENSIONS),
+        allowed_mime_types=_env_list("UPLOAD_ALLOWED_MIME_TYPES", _DEFAULT_MIME_TYPES),
         max_size=int(_cfg("upload_max_size")),
     )
     root = upload_root()

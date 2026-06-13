@@ -17,8 +17,6 @@ import pytest
 pytest.importorskip("forge_mvc_images")
 from PIL import Image
 
-import core.forge
-
 # CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : l'upload image-aware vit dans l'opt-in.
 from forge_mvc_images import image_variant_paths, save_image_upload
 from forge_mvc_images.media_repository import (
@@ -117,10 +115,25 @@ class FakeMediaDb:
 
 # ── Fixture storage temporaire ─────────────────────────────────────────────────
 
+@pytest.fixture(autouse=True)
+def _isolate_upload_env(monkeypatch):
+    """ADR-032 : vide les variables d'upload extraites du core avant chaque test."""
+    for key in (
+        "UPLOAD_ROOT",
+        "UPLOAD_ALLOWED_EXTENSIONS",
+        "UPLOAD_ALLOWED_MIME_TYPES",
+        "UPLOAD_MAX_IMAGE_PIXELS",
+    ):
+        monkeypatch.delenv(key, raising=False)
+
+
 @pytest.fixture()
 def upload_root_tmp(tmp_path, monkeypatch):
-    """Redirige upload_root vers tmp_path pour la durée du test."""
-    monkeypatch.setitem(core.forge._cfg, "upload_root", str(tmp_path))
+    """Redirige upload_root vers tmp_path pour la durée du test.
+
+    ADR-032 : upload_root est lu depuis l'environnement par l'opt-in files.
+    """
+    monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path))
     return tmp_path
 
 

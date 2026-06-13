@@ -15,7 +15,8 @@ en scène** sans rien écrire :
 Aucune base de données : c'est un palier de **diagnostic** (images est une brique
 bibliothèque, sans CLI ``images:doctor``).
 """
-from core.forge import get as get_config
+import os
+
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
@@ -28,7 +29,7 @@ def _guard_policy() -> dict:
     """Décrit la politique de sécurité appliquée aux uploads d'image."""
     return {
         "allowed_extensions": sorted(ALLOWED_IMAGE_EXTENSIONS),
-        "max_image_pixels": int(get_config("upload_max_image_pixels")),
+        "max_image_pixels": int(os.getenv("UPLOAD_MAX_IMAGE_PIXELS", "24000000")),
     }
 
 

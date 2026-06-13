@@ -13,6 +13,37 @@ from core.forms.upload_exceptions import (
     UploadStorageError,
     UploadTooLargeError,
 )
+
+# ADR-032 (UPLOAD-CONFIG-DECOUPLE-001) : upload_root, extensions et types MIME
+# autorisés ne sont plus dans le registre core.forge ; l'opt-in files les lit
+# depuis l'environnement. Seul upload_max_size reste détenu par le noyau.
+_UPLOAD_ENV_KEYS = (
+    "UPLOAD_ROOT",
+    "UPLOAD_ALLOWED_EXTENSIONS",
+    "UPLOAD_ALLOWED_MIME_TYPES",
+    "UPLOAD_MAX_IMAGE_PIXELS",
+)
+
+
+@pytest.fixture(autouse=True)
+def _isolate_upload_env(monkeypatch):
+    """Vide les variables d'upload avant chaque test (elles ont des défauts
+    côté opt-in) ; chaque test pose ensuite ce dont il a besoin."""
+    for key in _UPLOAD_ENV_KEYS:
+        monkeypatch.delenv(key, raising=False)
+
+
+def _configure_uploads(monkeypatch, *, upload_root, upload_max_size=None,
+                       upload_allowed_extensions=None, upload_allowed_mime_types=None):
+    """Pose la config d'upload : env pour les clés extraites (ADR-032),
+    registre core.forge pour upload_max_size (resté dans le noyau)."""
+    monkeypatch.setenv("UPLOAD_ROOT", str(upload_root))
+    if upload_allowed_extensions is not None:
+        monkeypatch.setenv("UPLOAD_ALLOWED_EXTENSIONS", ",".join(upload_allowed_extensions))
+    if upload_allowed_mime_types is not None:
+        monkeypatch.setenv("UPLOAD_ALLOWED_MIME_TYPES", ",".join(upload_allowed_mime_types))
+    if upload_max_size is not None:
+        forge.configure(upload_max_size=upload_max_size)
 from forge_mvc_files.manager import delete_media_file, delete_upload, get_upload_path, save_upload
 
 # CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : save_upload est purement générique ;
@@ -153,9 +184,10 @@ def test_media_path_to_storage_path_refuse_traversal(tmp_path):
         media_path_to_storage_path("images/../../secret.txt", root=tmp_path / "uploads")
 
 
-def test_save_upload_ecrit_dans_la_categorie_configuree(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_upload_ecrit_dans_la_categorie_configuree(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=100_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -177,9 +209,10 @@ def test_save_upload_ecrit_dans_la_categorie_configuree(tmp_path):
     assert (tmp_path / "uploads" / "images" / saved.filename).read_bytes() == data
 
 
-def test_save_upload_image_sans_variants_ne_genere_pas_de_variantes(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_upload_image_sans_variants_ne_genere_pas_de_variantes(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=10_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -193,9 +226,10 @@ def test_save_upload_image_sans_variants_ne_genere_pas_de_variantes(tmp_path):
     assert not (tmp_path / "uploads" / "images" / "thumbnail" / saved.filename).exists()
 
 
-def test_save_upload_image_avec_variants_genere_medium_et_thumbnail(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_upload_image_avec_variants_genere_medium_et_thumbnail(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=10_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -212,9 +246,10 @@ def test_save_upload_image_avec_variants_genere_medium_et_thumbnail(tmp_path):
     assert (tmp_path / "uploads" / saved.variants["thumbnail"]).exists()
 
 
-def test_save_upload_image_variants_conservent_les_proportions(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_upload_image_variants_conservent_les_proportions(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=10_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -228,9 +263,10 @@ def test_save_upload_image_variants_conservent_les_proportions(tmp_path):
         assert thumbnail.size == (300, 150)
 
 
-def test_save_upload_image_variants_retourne_chemins_relatifs_surs(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_upload_image_variants_retourne_chemins_relatifs_surs(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=10_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -251,9 +287,10 @@ def test_save_upload_image_variants_retourne_chemins_relatifs_surs(tmp_path):
 # est toujours image).
 
 
-def test_save_image_upload_refuse_fichier_non_image(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_image_upload_refuse_fichier_non_image(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=10_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -263,9 +300,10 @@ def test_save_image_upload_refuse_fichier_non_image(tmp_path):
         save_image_upload(_file("fake.png", b"not an image", "image/png"), category="images", variants=True)
 
 
-def test_save_image_upload_refuse_svg(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_image_upload_refuse_svg(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=10_000,
         upload_allowed_extensions=["svg"],
         upload_allowed_mime_types=["image/svg+xml"],
@@ -279,15 +317,16 @@ def test_save_image_upload_refuse_svg(tmp_path):
         )
 
 
-def test_save_image_upload_refuse_contenu_falsifie_sans_ecrire(tmp_path):
+def test_save_image_upload_refuse_contenu_falsifie_sans_ecrire(tmp_path, monkeypatch):
     """SEC-UPLOAD-IMAGE-VERIFY-002 — contenu non-image en catégorie images.
 
     Extension + MIME d'image valides mais contenu falsifié : rejet AVANT
     écriture disque, que les variantes soient demandées ou non. Aucun
     fichier ne doit subsister sur le disque.
     """
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=100_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -309,9 +348,10 @@ def test_save_image_upload_refuse_contenu_falsifie_sans_ecrire(tmp_path):
         )
 
 
-def test_save_upload_evite_ecrasement(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_upload_evite_ecrasement(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=100_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -323,9 +363,10 @@ def test_save_upload_evite_ecrasement(tmp_path):
     assert first.filename != second.filename
 
 
-def test_delete_upload_supprime_sous_upload_root(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_delete_upload_supprime_sous_upload_root(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=100_000,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -440,8 +481,8 @@ def test_delete_media_file_est_exporte_dans_api_publique():
     assert exported_delete_media_file is delete_media_file
 
 
-def test_delete_upload_refuse_path_traversal(tmp_path):
-    forge.configure(upload_root=str(tmp_path / "uploads"))
+def test_delete_upload_refuse_path_traversal(tmp_path, monkeypatch):
+    monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
     outside = tmp_path / "secret.txt"
     outside.write_text("secret", encoding="utf-8")
 
@@ -449,8 +490,8 @@ def test_delete_upload_refuse_path_traversal(tmp_path):
         delete_upload(outside)
 
 
-def test_get_upload_path_reste_dans_la_categorie(tmp_path):
-    forge.configure(upload_root=str(tmp_path / "uploads"))
+def test_get_upload_path_reste_dans_la_categorie(tmp_path, monkeypatch):
+    monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
     path = get_upload_path("doc.pdf", "documents")
 
     assert path == tmp_path / "uploads" / "documents" / "doc.pdf"
@@ -473,9 +514,10 @@ def test_ensure_upload_dirs_refuse_categorie_invalide(tmp_path):
 
 # ── Corrections main ────────────────────────────────────────────────────────
 
-def test_save_upload_none_leve_storage_error(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
+def test_save_upload_none_leve_storage_error(tmp_path, monkeypatch):
+    _configure_uploads(
+        monkeypatch,
+        upload_root=tmp_path / "uploads",
         upload_max_size=100,
         upload_allowed_extensions=["png"],
         upload_allowed_mime_types=["image/png"],
@@ -508,14 +550,18 @@ def test_validate_mime_absent_avec_liste_vide_est_accepte():
     assert extension == "png"
 
 
-def test_upload_root_est_absolu():
-    import os
-    import config
-    assert os.path.isabs(config.UPLOAD_ROOT)
+def test_upload_root_est_absolu(tmp_path, monkeypatch):
+    # ADR-032 : upload_root est lu depuis l'environnement par l'opt-in files
+    # (config.UPLOAD_ROOT n'existe plus). Le stockage résout toujours la racine
+    # en chemin absolu : un chemin sauvegardé pointe sous une racine absolue.
+    monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
+    from forge_mvc_files.manager import upload_root
+
+    assert upload_root().resolve().is_absolute()
 
 
-def test_get_upload_path_neutralise_traversal_dans_nom(tmp_path):
-    forge.configure(upload_root=str(tmp_path / "uploads"))
+def test_get_upload_path_neutralise_traversal_dans_nom(tmp_path, monkeypatch):
+    monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
     path = get_upload_path("../evil.pdf", "documents")
     assert path.name == "evil.pdf"
     assert str(path).startswith(str(tmp_path / "uploads"))

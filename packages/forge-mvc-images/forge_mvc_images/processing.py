@@ -13,6 +13,7 @@ le chemin image-aware (validation de contenu + écriture + variantes).
 from __future__ import annotations
 
 import io
+import os
 from dataclasses import dataclass, replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -78,7 +79,9 @@ def _ensure_within_pixel_budget(width: int, height: int) -> None:
     démesurée) est refusée AVANT tout décodage et toute écriture disque, à coût
     mémoire négligeable. Le plafond est configurable par projet.
     """
-    max_pixels = int(_cfg("upload_max_image_pixels"))
+    # ADR-032 : plafond anti-bombe lu depuis l'environnement, propriété de
+    # l'opt-in images (le core ne déclare plus ce slot).
+    max_pixels = int(os.getenv("UPLOAD_MAX_IMAGE_PIXELS", "24000000"))
     if width * height > max_pixels:
         raise UploadStorageError(
             f"Image trop volumineuse ({width}×{height} pixels) ; "

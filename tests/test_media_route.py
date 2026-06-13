@@ -15,6 +15,18 @@ from forge_mvc_files import delete_media_file, serve_media_file
 from forge_mvc_images import save_image_upload
 
 
+@pytest.fixture(autouse=True)
+def _isolate_upload_env(monkeypatch):
+    """ADR-032 : vide les variables d'upload extraites du core avant chaque test."""
+    for key in (
+        "UPLOAD_ROOT",
+        "UPLOAD_ALLOWED_EXTENSIONS",
+        "UPLOAD_ALLOWED_MIME_TYPES",
+        "UPLOAD_MAX_IMAGE_PIXELS",
+    ):
+        monkeypatch.delenv(key, raising=False)
+
+
 def _image_file(filename="photo.png", *, size=(2000, 1000), content_type="image/png"):
     buffer = BytesIO()
     image = Image.new("RGB", size, color=(80, 130, 210))
@@ -159,13 +171,13 @@ def test_serve_media_file_est_exporte_dans_api_publique():
     assert exported_serve_media_file is serve_media_file
 
 
-def test_save_image_upload_variants_et_delete_media_file_restent_compatibles(tmp_path):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
-        upload_max_size=10_000,
-        upload_allowed_extensions=["png"],
-        upload_allowed_mime_types=["image/png"],
-    )
+def test_save_image_upload_variants_et_delete_media_file_restent_compatibles(tmp_path, monkeypatch):
+    # ADR-032 : upload_root, extensions et types MIME lus depuis l'environnement ;
+    # seul upload_max_size reste détenu par le noyau.
+    monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
+    monkeypatch.setenv("UPLOAD_ALLOWED_EXTENSIONS", "png")
+    monkeypatch.setenv("UPLOAD_ALLOWED_MIME_TYPES", "image/png")
+    forge.configure(upload_max_size=10_000)
 
     saved = save_image_upload(_image_file(), category="images", variants=True)
     response = serve_media_file(saved.variants["medium"], root=tmp_path / "uploads")

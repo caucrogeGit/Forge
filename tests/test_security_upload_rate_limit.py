@@ -94,6 +94,18 @@ def _make_request(ip="10.0.0.1", body=None, filename="photo.png"):
 # Fixtures
 # ---------------------------------------------------------------------------
 
+@pytest.fixture(autouse=True)
+def _isolate_upload_env(monkeypatch):
+    """ADR-032 : vide les variables d'upload extraites du core avant chaque test."""
+    for key in (
+        "UPLOAD_ROOT",
+        "UPLOAD_ALLOWED_EXTENSIONS",
+        "UPLOAD_ALLOWED_MIME_TYPES",
+        "UPLOAD_MAX_IMAGE_PIXELS",
+    ):
+        monkeypatch.delenv(key, raising=False)
+
+
 @pytest.fixture()
 def low_limit(monkeypatch):
     """Réduit la limite à 3 uploads par fenêtre pour les tests."""
@@ -101,17 +113,17 @@ def low_limit(monkeypatch):
 
 
 @pytest.fixture()
-def rate_limited_app(tmp_path, low_limit):
+def rate_limited_app(tmp_path, low_limit, monkeypatch):
     """Application.dispatch() avec handler upload protégé par rate limiting."""
     upload_dir = tmp_path / "uploads"
     upload_dir.mkdir()
 
-    forge.configure(
-        upload_root=str(upload_dir),
-        upload_max_size=512,
-        upload_allowed_extensions=["png", "jpg", "pdf"],
-        upload_allowed_mime_types=["image/png", "image/jpeg", "application/pdf"],
-    )
+    # ADR-032 : upload_root, extensions et types MIME lus depuis l'environnement
+    # par l'opt-in files ; seul upload_max_size reste détenu par le noyau.
+    monkeypatch.setenv("UPLOAD_ROOT", str(upload_dir))
+    monkeypatch.setenv("UPLOAD_ALLOWED_EXTENSIONS", "png,jpg,pdf")
+    monkeypatch.setenv("UPLOAD_ALLOWED_MIME_TYPES", "image/png,image/jpeg,application/pdf")
+    forge.configure(upload_max_size=512)
 
     def _handler(request):
         if _rl.is_upload_rate_limited(request.ip):

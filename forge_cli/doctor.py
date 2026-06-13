@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import re
 import shutil
 import sys
@@ -468,13 +469,17 @@ def check_prod_security(root: Path, config) -> CheckResult:
     if max_size <= 0:
         risks.append("UPLOAD_MAX_SIZE non borné")
 
-    exts = str(getattr(config, "UPLOAD_ALLOWED_EXTENSIONS", "") or "").strip()
-    if not exts:
-        risks.append("UPLOAD_ALLOWED_EXTENSIONS vide (extensions non restreintes)")
+    # Restriction des extensions : relève de l'opt-in forge-mvc-files (ADR-032),
+    # qui restreint par défaut. On n'avertit que s'il est installé ET que la liste
+    # a été explicitement vidée dans l'environnement.
+    if importlib.util.find_spec("forge_mvc_files") is not None:
+        raw_exts = os.getenv("UPLOAD_ALLOWED_EXTENSIONS")
+        if raw_exts is not None and not raw_exts.strip():
+            risks.append("UPLOAD_ALLOWED_EXTENSIONS vide (extensions non restreintes)")
 
     if risks:
         return CheckResult("warn", "Sécurité prod", " ; ".join(risks))
-    return CheckResult("ok", "Sécurité prod", "privilèges DB séparés, uploads bornés et restreints")
+    return CheckResult("ok", "Sécurité prod", "privilèges DB séparés et uploads bornés")
 
 
 def run_all(root: Path, version: str) -> list[CheckResult]:

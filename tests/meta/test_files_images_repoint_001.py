@@ -68,19 +68,19 @@ class TestValidationStillFromCore:
 
 
 class TestFunctional:
-    def test_save_image_upload_still_works(self, tmp_path):
+    def test_save_image_upload_still_works(self, tmp_path, monkeypatch):
         import core.forge as forge
         from types import SimpleNamespace
         from io import BytesIO
         from PIL import Image
         from forge_mvc_images import save_image_upload
 
-        forge.configure(
-            upload_root=str(tmp_path / "uploads"),
-            upload_max_size=1_000_000,
-            upload_allowed_extensions=["png"],
-            upload_allowed_mime_types=["image/png"],
-        )
+        # ADR-032 : upload_root, extensions et types MIME lus depuis
+        # l'environnement ; seul upload_max_size reste détenu par le noyau.
+        monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
+        monkeypatch.setenv("UPLOAD_ALLOWED_EXTENSIONS", "png")
+        monkeypatch.setenv("UPLOAD_ALLOWED_MIME_TYPES", "image/png")
+        forge.configure(upload_max_size=1_000_000)
         buf = BytesIO()
         Image.new("RGB", (40, 20), (10, 20, 30)).save(buf, format="PNG")
         f = SimpleNamespace(filename="x.png", content=buf.getvalue(), content_type="image/png")

@@ -61,21 +61,10 @@ APP_ROUTES_MODULE = os.getenv("APP_ROUTES_MODULE", "mvc.routes")
 VIEWS_DIR         = os.getenv("VIEWS_DIR",         "mvc/views")
 SQL_DIR           = os.getenv("SQL_DIR",           "mvc/models/sql")
 
-UPLOAD_ROOT       = os.path.abspath(os.getenv("UPLOAD_ROOT", "storage/uploads"))
+# Upload : le noyau ne garde que le plafond de corps multipart (ADR-032).
+# UPLOAD_ROOT, UPLOAD_ALLOWED_EXTENSIONS, UPLOAD_ALLOWED_MIME_TYPES sont lues par
+# l'opt-in forge-mvc-files depuis l'environnement ; ajoutez-les à env/dev au besoin.
 UPLOAD_MAX_SIZE   = int(os.getenv("UPLOAD_MAX_SIZE", 5 * 1024 * 1024))
-UPLOAD_ALLOWED_EXTENSIONS = [
-    item.strip().lower().lstrip(".")
-    for item in os.getenv("UPLOAD_ALLOWED_EXTENSIONS", "jpg,jpeg,png,webp,pdf").split(",")
-    if item.strip()
-]
-UPLOAD_ALLOWED_MIME_TYPES = [
-    item.strip().lower()
-    for item in os.getenv(
-        "UPLOAD_ALLOWED_MIME_TYPES",
-        "image/jpeg,image/png,image/webp,application/pdf",
-    ).split(",")
-    if item.strip()
-]
 
 # Mail : aucune configuration ici. Le mail est un opt-in (forge-mvc-mail,
 # ADR-031) qui lit ses variables MAIL_* directement depuis l'environnement.

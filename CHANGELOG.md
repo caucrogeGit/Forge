@@ -5,6 +5,18 @@
 
 ### Modifié
 
+- **Périmètre de la configuration upload resserré sur le core**
+  (`UPLOAD-CONFIG-DECOUPLE-001`, ADR-032). Seul `upload_max_size` reste un
+  réglage du noyau (il borne le corps des requêtes multipart dans
+  `core/http/request.py`, avant tout opt-in). Les quatre autres clés quittent
+  `core.forge` et le squelette nu : `upload_root`, `upload_allowed_extensions`,
+  `upload_allowed_mime_types` sont lues depuis l'environnement par
+  `forge-mvc-files`, et `upload_max_image_pixels` par `forge-mvc-images` (qui
+  devient ainsi réellement configurable via `UPLOAD_MAX_IMAGE_PIXELS`). Le
+  `FileField` du core prenait déjà ses listes en paramètres, il ne dépendait pas
+  du registre. `forge doctor` conditionne désormais son contrôle d'extensions
+  restreintes à la présence de `forge-mvc-files`. Rupture interne pré-1.0 de
+  `core.forge.configure` (retrait des quatre kwargs).
 - **Découplage complet du mail hors du core** (`MAIL-DECOUPLE-CORE-001`,
   ADR-031). Le noyau ne connaît plus le mail : les slots `mail_*` sont retirés
   de `core.forge` (et `core.forge.configure()` les refuse désormais),

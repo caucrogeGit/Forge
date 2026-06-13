@@ -32,11 +32,9 @@ DB_APP_PWD=
 DB_POOL_SIZE=5
 # DB_APP_PRIVILEGES=SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER,DROP,INDEX,REFERENCES
 
-# Uploads
-UPLOAD_ROOT=storage/uploads
+# Upload (le noyau ne garde que le plafond de corps multipart, ADR-032 ;
+# UPLOAD_ROOT/ALLOWED_* sont lues par l'opt-in forge-mvc-files)
 UPLOAD_MAX_SIZE=5242880
-UPLOAD_ALLOWED_EXTENSIONS=jpg,jpeg,png,webp,pdf
-UPLOAD_ALLOWED_MIME_TYPES=image/jpeg,image/png,image/webp,application/pdf
 
 # Serveur
 APP_HOST=127.0.0.1

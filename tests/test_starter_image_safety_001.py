@@ -55,7 +55,9 @@ def test_snippet_routes():
 def test_controller_verifies_no_db():
     text = CONTROLLER.read_text(encoding="utf-8")
     assert "verify_image_content" in text
-    assert "upload_max_image_pixels" in text
+    # ADR-032 : le plafond anti-bombe est lu depuis l'environnement
+    # (UPLOAD_MAX_IMAGE_PIXELS), le core ne déclare plus ce slot.
+    assert "UPLOAD_MAX_IMAGE_PIXELS" in text
     assert "core.database" not in text
     tree = ast.parse(text)
     ctrl = next((c for c in tree.body if isinstance(c, ast.ClassDef)

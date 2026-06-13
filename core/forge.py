@@ -29,19 +29,12 @@ _cfg = {
     # Vues et SQL
     "views_dir":   os.path.join(_PROJECT_ROOT, "mvc", "views"),
     "sql_dir":     os.path.join(_PROJECT_ROOT, "mvc", "models", "sql"),
-    # Uploads
-    "upload_root": os.path.join(_PROJECT_ROOT, "storage", "uploads"),
+    # Uploads — seul le plafond de corps multipart est du noyau (ADR-032) :
+    # core/http/request.py le lit pour borner la requête, avant tout opt-in.
+    # Le reste (racine de stockage, extensions/MIME autorisés, plafond pixels
+    # anti-bombe) appartient aux opt-ins forge-mvc-files / forge-mvc-images,
+    # qui lisent leur config depuis l'environnement.
     "upload_max_size": 5 * 1024 * 1024,
-    # Plafond anti-décompression-bomb : surface max d'une image (en pixels)
-    # acceptée à l'upload, avant tout décodage (SEC-UPLOAD-DECOMPRESSION-BOMB-001).
-    "upload_max_image_pixels": 24_000_000,
-    "upload_allowed_extensions": ["jpg", "jpeg", "png", "webp", "pdf"],
-    "upload_allowed_mime_types": [
-        "image/jpeg",
-        "image/png",
-        "image/webp",
-        "application/pdf",
-    ],
     # Mail : aucun slot ici. Le mail est un opt-in (forge-mvc-mail, ADR-022)
     # qui lit sa configuration directement depuis l'environnement (ADR-031).
     # Le noyau ne connaît pas le mail.
@@ -70,7 +63,7 @@ _cfg = {
     "trusted_proxies": frozenset(),
 }
 
-_PATH_KEYS = {"views_dir", "sql_dir", "upload_root"}
+_PATH_KEYS = {"views_dir", "sql_dir"}
 
 
 def configure(**kwargs: object) -> None:

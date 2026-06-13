@@ -28,8 +28,7 @@ def _forge_config_kwargs() -> dict[str, Any]:
     """
     from config import (
         APP_NAME, APP_ENV, VIEWS_DIR, SQL_DIR,
-        UPLOAD_ROOT, UPLOAD_MAX_SIZE,
-        UPLOAD_ALLOWED_EXTENSIONS, UPLOAD_ALLOWED_MIME_TYPES,
+        UPLOAD_MAX_SIZE,
         DB_APP_HOST, DB_APP_PORT, DB_NAME, DB_APP_LOGIN, DB_APP_PWD,
         DB_POOL_SIZE,
         APP_TRUSTED_PROXIES,
@@ -37,9 +36,7 @@ def _forge_config_kwargs() -> dict[str, Any]:
     kwargs = dict(
         app_name=APP_NAME, app_env=APP_ENV,
         views_dir=VIEWS_DIR, sql_dir=SQL_DIR,
-        upload_root=UPLOAD_ROOT, upload_max_size=UPLOAD_MAX_SIZE,
-        upload_allowed_extensions=UPLOAD_ALLOWED_EXTENSIONS,
-        upload_allowed_mime_types=UPLOAD_ALLOWED_MIME_TYPES,
+        upload_max_size=UPLOAD_MAX_SIZE,
         db_host=DB_APP_HOST, db_port=DB_APP_PORT, db_name=DB_NAME,
         db_user=DB_APP_LOGIN, db_password=DB_APP_PWD,
         db_pool_size=DB_POOL_SIZE,

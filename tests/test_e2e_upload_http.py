@@ -95,8 +95,20 @@ def _multipart_body(boundary: str, filename: str, content: bytes,
 # Fixture : Application minimale avec route d'upload de test
 # ---------------------------------------------------------------------------
 
+@pytest.fixture(autouse=True)
+def _isolate_upload_env(monkeypatch):
+    """ADR-032 : vide les variables d'upload extraites du core avant chaque test."""
+    for key in (
+        "UPLOAD_ROOT",
+        "UPLOAD_ALLOWED_EXTENSIONS",
+        "UPLOAD_ALLOWED_MIME_TYPES",
+        "UPLOAD_MAX_IMAGE_PIXELS",
+    ):
+        monkeypatch.delenv(key, raising=False)
+
+
 @pytest.fixture()
-def upload_app(tmp_path):
+def upload_app(tmp_path, monkeypatch):
     """
     Application.dispatch() avec une route POST /test/upload (public, sans CSRF).
     Stockage dans tmp_path/uploads. Retourne (app, upload_dir).
@@ -104,12 +116,12 @@ def upload_app(tmp_path):
     upload_dir = tmp_path / "uploads"
     upload_dir.mkdir()
 
-    forge.configure(
-        upload_root=str(upload_dir),
-        upload_max_size=512,          # 512 octets pour garder les tests rapides
-        upload_allowed_extensions=["png", "jpg", "pdf"],
-        upload_allowed_mime_types=["image/png", "image/jpeg", "application/pdf"],
-    )
+    # ADR-032 : upload_root, extensions et types MIME lus depuis l'environnement
+    # par l'opt-in files ; seul upload_max_size reste détenu par le noyau.
+    monkeypatch.setenv("UPLOAD_ROOT", str(upload_dir))
+    monkeypatch.setenv("UPLOAD_ALLOWED_EXTENSIONS", "png,jpg,pdf")
+    monkeypatch.setenv("UPLOAD_ALLOWED_MIME_TYPES", "image/png,image/jpeg,application/pdf")
+    forge.configure(upload_max_size=512)  # 512 octets pour garder les tests rapides
 
     def _upload_handler(request):
         file = request.files.get("avatar")

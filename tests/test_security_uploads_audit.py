@@ -70,13 +70,25 @@ class _FakeFile:
         self.content_type = content_type
 
 
-def _cfg_forge(tmp_path, *, ext=("jpg", "jpeg", "png", "pdf"), mime=("image/jpeg", "image/png", "application/pdf"), max_size=5_000_000):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
-        upload_max_size=max_size,
-        upload_allowed_extensions=list(ext),
-        upload_allowed_mime_types=list(mime),
-    )
+@pytest.fixture(autouse=True)
+def _isolate_upload_env(monkeypatch):
+    """ADR-032 : vide les variables d'upload extraites du core avant chaque test."""
+    for key in (
+        "UPLOAD_ROOT",
+        "UPLOAD_ALLOWED_EXTENSIONS",
+        "UPLOAD_ALLOWED_MIME_TYPES",
+        "UPLOAD_MAX_IMAGE_PIXELS",
+    ):
+        monkeypatch.delenv(key, raising=False)
+
+
+def _cfg_forge(tmp_path, monkeypatch, *, ext=("jpg", "jpeg", "png", "pdf"), mime=("image/jpeg", "image/png", "application/pdf"), max_size=5_000_000):
+    # ADR-032 : upload_root, extensions et types MIME lus depuis l'environnement ;
+    # seul upload_max_size reste détenu par le noyau.
+    monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
+    monkeypatch.setenv("UPLOAD_ALLOWED_EXTENSIONS", ",".join(ext))
+    monkeypatch.setenv("UPLOAD_ALLOWED_MIME_TYPES", ",".join(mime))
+    forge.configure(upload_max_size=max_size)
 
 
 # ---------------------------------------------------------------------------
@@ -231,14 +243,14 @@ class TestMimeSecurite:
         with pytest.raises(UploadInvalidMimeTypeError):
             validate_mime_type("text/html", ["image/png"])
 
-    def test_limite_mime_spoofing_non_detecte(self, tmp_path):
+    def test_limite_mime_spoofing_non_detecte(self, tmp_path, monkeypatch):
         """
         Forge valide le Content-Type client, pas la signature binaire du fichier.
         Un fichier PHP avec content_type=image/jpeg et extension .jpg est accepté
         si image/jpeg et jpg sont dans la liste blanche.
         LIMITE CONNUE — corriger nécessite python-magic (hors périmètre).
         """
-        _cfg_forge(tmp_path)
+        _cfg_forge(tmp_path, monkeypatch)
         fake_php = _FakeFile("malware.jpg", fake_php_shell("phpinfo();"), "image/jpeg")
         saved = save_upload(fake_php, category="documents")
         assert saved.mime_type == "image/jpeg"
@@ -351,23 +363,23 @@ class TestNomFichierSecurite:
 class TestCheminStocke:
     """SavedUpload.path est toujours relatif, jamais absolu."""
 
-    def test_save_upload_retourne_chemin_relatif(self, tmp_path):
-        _cfg_forge(tmp_path)
+    def test_save_upload_retourne_chemin_relatif(self, tmp_path, monkeypatch):
+        _cfg_forge(tmp_path, monkeypatch)
         f = _FakeFile("photo.jpg", b"x" * 100, "image/jpeg")
         saved = save_upload(f, category="documents")
         assert not saved.path.startswith("/")
         assert not saved.path.startswith("storage/")
 
-    def test_save_upload_path_contient_uuid_pour_eviter_collision(self, tmp_path):
-        _cfg_forge(tmp_path)
+    def test_save_upload_path_contient_uuid_pour_eviter_collision(self, tmp_path, monkeypatch):
+        _cfg_forge(tmp_path, monkeypatch)
         f1 = _FakeFile("photo.jpg", b"premier", "image/jpeg")
         f2 = _FakeFile("photo.jpg", b"second", "image/jpeg")
         s1 = save_upload(f1, category="documents")
         s2 = save_upload(f2, category="documents")
         assert s1.path != s2.path
 
-    def test_save_upload_path_est_valide_pour_serve(self, tmp_path):
-        _cfg_forge(tmp_path)
+    def test_save_upload_path_est_valide_pour_serve(self, tmp_path, monkeypatch):
+        _cfg_forge(tmp_path, monkeypatch)
         f = _FakeFile("photo.jpg", b"x" * 100, "image/jpeg")
         saved = save_upload(f, category="documents")
         response = serve_media_file(saved.path, root=tmp_path / "uploads")
@@ -465,10 +477,14 @@ class TestServeMediaSecurite:
 class TestIsolationUploads:
     """La racine uploads est isolée du reste du filesystem."""
 
-    def test_upload_root_est_absolu(self):
-        import os
-        import config
-        assert os.path.isabs(config.UPLOAD_ROOT)
+    def test_upload_root_est_absolu(self, tmp_path, monkeypatch):
+        # ADR-032 : upload_root est lu depuis l'environnement par l'opt-in files
+        # (config.UPLOAD_ROOT n'existe plus). La racine de stockage est résolue
+        # en chemin absolu côté forge-mvc-files.
+        monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
+        from forge_mvc_files.manager import upload_root
+
+        assert upload_root().resolve().is_absolute()
 
     def test_validate_upload_metadata_complet_valide(self):
         ext = validate_upload_metadata(

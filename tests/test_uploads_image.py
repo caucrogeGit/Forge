@@ -42,13 +42,24 @@ def _img(filename="photo.jpg", content=None, content_type="image/jpeg"):
     return SimpleNamespace(filename=filename, content=content, content_type=content_type)
 
 
-def _cfg(tmp_path, max_size=100_000):
-    forge.configure(
-        upload_root=str(tmp_path / "uploads"),
-        upload_max_size=max_size,
-        upload_allowed_extensions=list(ALLOWED_IMAGE_EXTENSIONS),
-        upload_allowed_mime_types=["image/jpeg", "image/png", "image/webp"],
-    )
+@pytest.fixture(autouse=True)
+def _isolate_upload_env(monkeypatch):
+    """ADR-032 : vide les variables d'upload extraites du core avant chaque test."""
+    for key in (
+        "UPLOAD_ROOT",
+        "UPLOAD_ALLOWED_EXTENSIONS",
+        "UPLOAD_ALLOWED_MIME_TYPES",
+        "UPLOAD_MAX_IMAGE_PIXELS",
+    ):
+        monkeypatch.delenv(key, raising=False)
+
+
+def _cfg(tmp_path, monkeypatch, max_size=100_000):
+    # ADR-032 : upload_root, extensions et types MIME lus depuis l'environnement.
+    monkeypatch.setenv("UPLOAD_ROOT", str(tmp_path / "uploads"))
+    monkeypatch.setenv("UPLOAD_ALLOWED_EXTENSIONS", ",".join(ALLOWED_IMAGE_EXTENSIONS))
+    monkeypatch.setenv("UPLOAD_ALLOWED_MIME_TYPES", "image/jpeg,image/png,image/webp")
+    forge.configure(upload_max_size=max_size)
 
 
 def _write_image(path, *, size=(2000, 1000), fmt="PNG"):
@@ -59,54 +70,54 @@ def _write_image(path, *, size=(2000, 1000), fmt="PNG"):
 
 # ── Validation extension ─────────────────────────────────────────────────────
 
-def test_save_image_accepte_extensions_valides(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_accepte_extensions_valides(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     for ext, mime in [("jpg", "image/jpeg"), ("png", "image/png"), ("webp", "image/webp")]:
         record = save_image(_img(f"photo.{ext}", content_type=mime))
         assert record.filename.endswith(f".{ext}")
 
 
-def test_save_image_refuse_extension_non_image(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_refuse_extension_non_image(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     with pytest.raises(UploadInvalidExtensionError):
         save_image(_img("facture.pdf", content_type="application/pdf"))
 
 
-def test_save_image_refuse_extension_executable(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_refuse_extension_executable(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     with pytest.raises(UploadInvalidExtensionError):
         save_image(_img("shell.php", content_type="application/x-php"))
 
 
-def test_save_image_refuse_svg(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_refuse_svg(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     with pytest.raises(UploadInvalidExtensionError):
         save_image(_img("icone.svg", content_type="image/svg+xml"))
 
 
-def test_save_image_refuse_gif(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_refuse_gif(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     with pytest.raises(UploadInvalidExtensionError):
         save_image(_img("animation.gif", content_type="image/gif"))
 
 
 # ── Validation taille ────────────────────────────────────────────────────────
 
-def test_save_image_refuse_fichier_trop_lourd(tmp_path):
-    _cfg(tmp_path, max_size=5)
+def test_save_image_refuse_fichier_trop_lourd(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch, max_size=5)
     with pytest.raises(UploadTooLargeError):
         save_image(_img(content=b"x" * 6))
 
 
 # ── Validation contenu (SEC-UPLOAD-IMAGE-VERIFY-001) ─────────────────────────
 
-def test_save_image_refuse_contenu_non_image(tmp_path):
+def test_save_image_refuse_contenu_non_image(tmp_path, monkeypatch):
     """Extension + MIME d'image valides mais contenu falsifié → rejet.
 
     Le Content-Type est fourni par le client (falsifiable) : un fichier
     non-image déguisé en .jpg image/jpeg doit être rejeté AVANT écriture.
     """
-    _cfg(tmp_path)
+    _cfg(tmp_path, monkeypatch)
     fake = _img(
         "photo.jpg",
         content=b"%PDF-1.4 ceci n'est pas une image",
@@ -123,8 +134,8 @@ def test_save_image_refuse_contenu_non_image(tmp_path):
 
 # ── Nom dangereux ─────────────────────────────────────────────────────────────
 
-def test_save_image_neutralise_nom_dangereux(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_neutralise_nom_dangereux(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     record = save_image(_img("../../../evil.jpg"))
     assert ".." not in record.filename
     assert record.filename.endswith(".jpg")
@@ -133,15 +144,15 @@ def test_save_image_neutralise_nom_dangereux(tmp_path):
 
 # ── Dossier de stockage ──────────────────────────────────────────────────────
 
-def test_save_image_stocke_dans_dossier_images_par_defaut(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_stocke_dans_dossier_images_par_defaut(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     record = save_image(_img())
     assert record.category == "images"
     assert (tmp_path / "uploads" / "images" / record.filename).exists()
 
 
-def test_save_image_remplit_media_record(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_remplit_media_record(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     record = save_image(
         _img("portrait.jpg"),
         entity_name="Personne",
@@ -160,32 +171,32 @@ def test_save_image_remplit_media_record(tmp_path):
     assert record.mime_type == "image/jpeg"
 
 
-def test_save_image_stocke_chemin_relatif(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_stocke_chemin_relatif(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     record = save_image(_img())
     from pathlib import Path
     assert not Path(record.path).is_absolute(), f"chemin absolu inattendu : {record.path!r}"
     assert record.path.startswith("images/"), f"chemin inattendu : {record.path!r}"
 
 
-def test_save_image_chemin_reconstituable_depuis_root(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_chemin_reconstituable_depuis_root(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     record = save_image(_img())
     root = tmp_path / "uploads"
     full = (root / record.path).resolve()
     assert full.exists(), f"fichier introuvable via root + chemin relatif : {full}"
 
 
-def test_save_image_none_leve_storage_error(tmp_path):
-    _cfg(tmp_path)
+def test_save_image_none_leve_storage_error(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     with pytest.raises(UploadStorageError, match="Aucun fichier reçu"):
         save_image(None)
 
 
 # ── Variantes ────────────────────────────────────────────────────────────────
 
-def test_image_variant_paths_retourne_trois_variantes(tmp_path):
-    _cfg(tmp_path)
+def test_image_variant_paths_retourne_trois_variantes(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
     record = save_image(_img())
     root = tmp_path / "uploads"
     variants = image_variant_paths(record.path, root=root)
