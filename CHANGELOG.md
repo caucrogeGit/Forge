@@ -3,7 +3,33 @@
 
 ## [Non publié]
 
-(rien pour l'instant)
+### Modifié
+
+- **`forge doctor` : MFA et RBAC recadrés en gardes-fous de sécurité**
+  (`DOCTOR-SECURITY-OPTIN-001`). Le check MFA portait le libellé « opt-in »,
+  ce qui laissait croire à un inventaire des briques optionnelles et invitait
+  la question « pourquoi seulement MFA ». En réalité ce check est un garde-fou
+  *fail-open* : du code MFA présent sans la brique qui l'applique laisse le flux
+  ouvert. Le libellé devient « MFA (sécurité) » et un garde-fou symétrique est
+  ajouté pour RBAC (« RBAC (sécurité) ») : il détecte un contrôle d'accès
+  déclaré (contrat `mvc/security/rbac.json`, ADR-014, ou import
+  `forge_mvc_rbac`) sans `forge-mvc-rbac` disponible, et émet un avertissement
+  non bloquant. La détection RBAC s'appuie uniquement sur des signaux non
+  ambigus (contrat, import effectif), jamais sur un mot-clé de nom de fichier,
+  pour éviter les faux positifs des starters `welcome-rbac`.
+
+### Corrigé
+
+- **`forge doctor` : l'absence d'entité n'est plus un avertissement sur un
+  projet vierge** (`FIX-DOCTOR-ENTITIES-SKELETON-001`). Un projet nu issu de
+  `forge new` (ADR-024) n'a légitimement aucune entité : c'est l'état nominal,
+  pas une anomalie. Le check « Entités » passe de `WARN` à `SKIP` (neutre, ne
+  compte plus dans le total des avertissements), tout en conservant le conseil
+  `forge make:entity`.
+- **Resynchronisation du CSS de la landing** (`FIX-LANDING-CSS-RESYNC-001`).
+  `docs/static/tailwind.css` avait dérivé de sa source `static/tailwind.css`
+  (42 octets d'écart) ; `forge sync:landing` réaligne la copie, rétablissant les
+  garde-fous de synchronisation.
 
 
 ## [1.0.0-beta.15] — 2026-06-08
