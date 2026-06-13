@@ -44,7 +44,7 @@ saisie :
     }
   ],
   "files.associations": {
-    "env/*": "properties"
+    "**/env/*": "properties"
   }
 }
 ```
@@ -62,9 +62,14 @@ extension. Le détail de cette intégration, et la méthode alternative par clé
 
 ### Association des fichiers `env/*`
 
-L'entrée `files.associations` indique à VS Code de traiter les fichiers `env/*` (donc `env/dev`, `env/prod`, `env/example`, `env/*.local`) comme du langage `properties`.
+L'entrée `files.associations` indique à VS Code de traiter les fichiers du dossier `env/` (donc `env/dev`, `env/prod`, `env/example`, `env/*.local`) comme du langage `properties`.
+Le motif `**/env/*` est volontairement ancré avec `**/`, car VS Code confronte un motif contenant `/` au chemin du fichier ; un motif nu comme `env/*` ne matche pas de façon fiable selon les versions.
 VS Code colore alors le format `KEY=VALUE` et les commentaires `#`, sans renommer ces fichiers en `.env` et sans dépendre d'une extension dédiée.
 Le squelette produit par `forge new` embarque la même association, pour que chaque nouveau projet en bénéficie sans configuration.
+
+!!! note "L'association s'applique à l'ouverture du fichier"
+    Après modification de `files.associations`, rechargez la fenêtre (« Developer: Reload Window ») ou rouvrez le fichier.
+    Le mode de langage affiché en bas à droite doit indiquer **Properties**.
 
 !!! warning "Validation partielle"
     VS Code ne remplace pas `forge entity:validate`. Les règles sémantiques de

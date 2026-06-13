@@ -42,9 +42,9 @@ def test_skeleton_vscode_associates_env_to_properties():
     data = json.loads(SKELETON_VSCODE.read_text(encoding="utf-8"))
     assoc = data.get("files.associations")
     assert isinstance(assoc, dict), "files.associations doit être un objet au niveau racine"
-    assert assoc.get("env/*") == "properties", (
-        "env/* doit être associé au langage intégré 'properties' "
-        "(pas de dépendance à une extension dotenv)"
+    assert assoc.get("**/env/*") == "properties", (
+        "**/env/* doit être associé au langage intégré 'properties' "
+        "(motif ancré pour matcher le chemin ; pas de dépendance à une extension dotenv)"
     )
 
 
