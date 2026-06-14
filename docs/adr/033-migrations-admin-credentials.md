@@ -128,6 +128,24 @@ git diff --check
 
 ---
 
+## Suivi (ticket `DB-APPLY-ADMIN-CREDS-FIX-001`)
+
+La première mise en œuvre (`DB-APPLY-ADMIN-CREDS-001`) a corrigé la chaîne
+`migrations.py` (`migration:apply`, `migration:status`, lecture de schéma), mais
+**pas** la commande `forge db:apply` elle-même, qui passe par un code distinct
+(`forge_cli/entities/db_apply.py`, application du SQL des entités). Ce chemin
+continuait de se connecter en `DB_APP_*` et échouait donc sur le `CREATE TABLE`
+des entités dès que `forge_app` était resserré au DML.
+
+Le ticket `DB-APPLY-ADMIN-CREDS-FIX-001` aligne `db_apply.py` sur la même
+décision : `load_db_apply_config()` lit `DB_ADMIN_*` + `DB_NAME`, et le message
+d'erreur renvoie « Vérifiez `DB_ADMIN_*` / `DB_NAME` ». Les deux commandes qui
+appliquent du DDL (`db:apply` pour les entités, `migration:apply` pour les
+migrations) utilisent désormais le compte d'administration, conformément au
+titre et à la décision de cet ADR.
+
+---
+
 ## Alternatives rejetées
 
 **Garder `db:apply` sur `DB_APP_*` et accorder le DDL à `forge_app`.** C'est

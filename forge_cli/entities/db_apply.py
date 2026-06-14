@@ -135,20 +135,23 @@ def _connect_db():
         )
     except Exception as exc:
         raise DbApplyError(
-            "Connexion MariaDB applicative impossible. "
+            "Connexion MariaDB d'administration impossible. "
             "La base du projet n'est peut-être pas préparée. Lancez d'abord `forge db:init` "
-            "ou vérifiez DB_APP_* / DB_NAME dans env/dev."
+            "ou vérifiez DB_ADMIN_* / DB_NAME dans env/dev."
         ) from exc
 
 
 def load_db_apply_config() -> DbApplyConfig:
     config = load_project_config()
 
+    # ADR-033 : le SQL des entités crée et modifie des tables (DDL) ; db:apply
+    # utilise donc le compte d'administration du projet (DB_ADMIN_*), comme
+    # migration:apply, et non le compte runtime DB_APP_* resté en DML strict.
     return DbApplyConfig(
-        host=config.DB_APP_HOST,
-        port=config.DB_APP_PORT,
-        login=config.DB_APP_LOGIN,
-        password=config.DB_APP_PWD,
+        host=config.DB_ADMIN_HOST,
+        port=config.DB_ADMIN_PORT,
+        login=config.DB_ADMIN_LOGIN,
+        password=config.DB_ADMIN_PWD,
         database=config.DB_NAME,
     )
 

@@ -91,10 +91,6 @@ def _install_fake_modules(monkeypatch, connection: FakeConnection):
         DB_ADMIN_PORT=3307,
         DB_ADMIN_LOGIN="admin",
         DB_ADMIN_PWD="admin-secret",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
-        DB_APP_LOGIN="forge_app",
-        DB_APP_PWD="secret",
         DB_NAME="forge_db",
     )
     captured_kwargs: dict[str, object] = {}
@@ -114,10 +110,10 @@ def _patch_db_apply_config(monkeypatch, fake_config: types.SimpleNamespace) -> N
         db_apply,
         "load_db_apply_config",
         lambda: db_apply.DbApplyConfig(
-            host=fake_config.DB_APP_HOST,
-            port=fake_config.DB_APP_PORT,
-            login=fake_config.DB_APP_LOGIN,
-            password=fake_config.DB_APP_PWD,
+            host=fake_config.DB_ADMIN_HOST,
+            port=fake_config.DB_ADMIN_PORT,
+            login=fake_config.DB_ADMIN_LOGIN,
+            password=fake_config.DB_ADMIN_PWD,
             database=fake_config.DB_NAME,
         ),
     )
@@ -127,10 +123,10 @@ def _write_config(path: Path, fake_config: types.SimpleNamespace) -> None:
     path.write_text(
         "\n".join(
             [
-                f"DB_APP_HOST={fake_config.DB_APP_HOST!r}",
-                f"DB_APP_PORT={fake_config.DB_APP_PORT!r}",
-                f"DB_APP_LOGIN={fake_config.DB_APP_LOGIN!r}",
-                f"DB_APP_PWD={fake_config.DB_APP_PWD!r}",
+                f"DB_ADMIN_HOST={fake_config.DB_ADMIN_HOST!r}",
+                f"DB_ADMIN_PORT={fake_config.DB_ADMIN_PORT!r}",
+                f"DB_ADMIN_LOGIN={fake_config.DB_ADMIN_LOGIN!r}",
+                f"DB_ADMIN_PWD={fake_config.DB_ADMIN_PWD!r}",
                 f"DB_NAME={fake_config.DB_NAME!r}",
                 "",
             ]
@@ -183,10 +179,10 @@ def test_apply_model_sql_executes_entities_then_relations_and_empty_relations_is
     ]
     assert connection.committed is True
     assert captured_kwargs == {
-        "host": "localhost",
-        "port": 3306,
-        "user": "forge_app",
-        "password": "secret",
+        "host": "admin-host",
+        "port": 3307,
+        "user": "admin",
+        "password": "admin-secret",
         "database": "forge_db",
     }
 
@@ -207,12 +203,14 @@ def test_apply_model_sql_rolls_back_on_first_sql_error(tmp_path: Path, monkeypat
     assert connection.rolled_back is True
 
 
-def test_load_db_apply_config_uses_app_credentials(monkeypatch, tmp_path):
+def test_load_db_apply_config_uses_admin_credentials(monkeypatch, tmp_path):
+    # ADR-033 : db:apply applique du DDL (SQL des entités) et se connecte donc
+    # en DB_ADMIN_*, comme migration:apply, pas en DB_APP_* (DML strict).
     fake_config = types.SimpleNamespace(
-        DB_APP_HOST="app-host",
-        DB_APP_PORT=3310,
-        DB_APP_LOGIN="app-user",
-        DB_APP_PWD="app-pwd",
+        DB_ADMIN_HOST="admin-host",
+        DB_ADMIN_PORT=3310,
+        DB_ADMIN_LOGIN="admin-user",
+        DB_ADMIN_PWD="admin-pwd",
         DB_NAME="app-db",
     )
     _write_config(tmp_path / "config.py", fake_config)
@@ -220,19 +218,19 @@ def test_load_db_apply_config_uses_app_credentials(monkeypatch, tmp_path):
 
     cfg = load_db_apply_config()
 
-    assert cfg.host == "app-host"
+    assert cfg.host == "admin-host"
     assert cfg.port == 3310
-    assert cfg.login == "app-user"
-    assert cfg.password == "app-pwd"
+    assert cfg.login == "admin-user"
+    assert cfg.password == "admin-pwd"
     assert cfg.database == "app-db"
 
 
 def test_load_db_apply_config_uses_current_working_directory(monkeypatch, tmp_path):
     fake_config = types.SimpleNamespace(
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
-        DB_APP_LOGIN="forge_app",
-        DB_APP_PWD="secret",
+        DB_ADMIN_HOST="localhost",
+        DB_ADMIN_PORT=3306,
+        DB_ADMIN_LOGIN="forge_admin",
+        DB_ADMIN_PWD="secret",
         DB_NAME="cwd_apply_db",
     )
     _write_config(tmp_path / "config.py", fake_config)
@@ -260,10 +258,10 @@ def test_apply_model_sql_reports_missing_database_preparation(tmp_path: Path, mo
     _write_relations(root, {"schema_version": "1.0", "relations": []}, "")
 
     fake_config = types.SimpleNamespace(
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
-        DB_APP_LOGIN="forge_app",
-        DB_APP_PWD="secret",
+        DB_ADMIN_HOST="localhost",
+        DB_ADMIN_PORT=3306,
+        DB_ADMIN_LOGIN="forge_admin",
+        DB_ADMIN_PWD="secret",
         DB_NAME="forge_db",
     )
 
