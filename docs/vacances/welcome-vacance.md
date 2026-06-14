@@ -128,7 +128,7 @@ Vous comparerez plusieurs modes réseau de VirtualBox :
 * le réseau interne ;
 * le réseau privé hôte, si ce mode est disponible.
 
-[Ouvrir le palier 3 : Tester les modes réseau VirtualBox](palier-3/index.md)
+[Non encore disponible]
 
 ---
 

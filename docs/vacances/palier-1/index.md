@@ -41,6 +41,10 @@ Exemples :
 
 Dans une salle informatique, les postes fixes sont souvent reliés avec un câble Ethernet RJ45. Cette liaison est généralement plus stable qu’une liaison Wi-Fi.
 
+<p>
+  <img src="images/reseau-local.png" alt="Le réseau local" width="60%">
+</p>
+
 ## 2. Le rôle du câble Ethernet RJ45
 
 Le câble Ethernet RJ45 sert à relier physiquement un équipement au réseau.
@@ -59,9 +63,15 @@ Il ne donne pas une adresse IP.
 Il ne configure pas le réseau.
 Il permet seulement au signal de passer entre deux équipements.
 
+
+
 ## 3. Connexion physique et configuration logique
 
 Pour qu’une machine communique sur un réseau, deux conditions sont nécessaires.
+
+!<p>
+  <img src="images/reseau-physique-logique.png" alt="Connexion physique et configuration logique" width="60%">
+</p>
 
 ## 3.1 La connexion physique
 
@@ -136,6 +146,10 @@ Les couleurs des fils sont :
 
 Chaque fil doit être placé au bon endroit dans le connecteur RJ45.
 
+<p>
+  <img src="images/constitution-cable-ethernet.png" alt="Constitution d’un câble Ethernet" width="60%">
+</p>
+
 ## 5. Pourquoi les fils sont torsadés
 
 Dans un câble réseau, les fils sont regroupés par paires.
@@ -175,6 +189,10 @@ Un câble peut sembler correct à l’œil, mais ne pas fonctionner si un fil n�
 
 C’est pour cela que le testeur RJ45 est indispensable.
 
+<p>
+  <img src="images/connecteur-rj45-vue-face.png" alt="Le connecteur RJ45" width="60%">
+</p>
+
 ## 7. La norme T568B
 
 Pour fabriquer un câble RJ45, on ne place pas les fils au hasard.
@@ -202,6 +220,10 @@ Pendant l’activité, gardez toujours le connecteur dans le même sens que celu
 
 Si vous inversez le sens du connecteur, vous risquez d’inverser l’ordre des fils.
 
+<p>
+  <img src="images/norme-t568b.png" alt="La norme T568B" width="60%">
+</p>
+
 ## 8. Le câble droit
 
 Un câble droit est un câble dont les deux extrémités sont câblées de la même manière.
@@ -215,16 +237,9 @@ Cela signifie :
 
 Dans un câble droit, chaque broche arrive au même numéro de l’autre côté.
 
-| Côté A | Côté B |
-| -----: | -----: |
-|      1 |      1 |
-|      2 |      2 |
-|      3 |      3 |
-|      4 |      4 |
-|      5 |      5 |
-|      6 |      6 |
-|      7 |      7 |
-|      8 |      8 |
+<p>
+  <img src="images/cable-droit-t568b.png" alt="Le câble droit" width="60%">
+</p>
 
 Un câble droit est utilisé pour relier des équipements différents.
 
@@ -236,29 +251,8 @@ Exemples :
 * serveur et switch ;
 * switch et routeur.
 
-## 9. Le câble croisé
 
-Un câble croisé utilise deux normes différentes aux deux extrémités.
-
-Exemple :
-
-* une extrémité en T568A ;
-* une extrémité en T568B.
-
-Dans ce cas, certaines paires sont croisées.
-
-Le câble croisé servait surtout à relier directement deux équipements du même type, par exemple deux anciens ordinateurs ou deux anciens switchs.
-
-Dans ce palier, vous ne fabriquez pas un câble croisé.
-
-Vous fabriquez un câble droit.
-
-| Type de câble | Extrémité A | Extrémité B |
-| ------------- | ----------- | ----------- |
-| Câble droit   | T568B       | T568B       |
-| Câble croisé  | T568A       | T568B       |
-
-## 10. Le matériel nécessaire
+## 9. Le matériel nécessaire
 
 Pour fabriquer un câble droit, il faut :
 
@@ -274,7 +268,7 @@ Le testeur est obligatoire.
 
 Un câble non testé ne doit pas être considéré comme conforme.
 
-## 11. Méthode générale de fabrication
+## 10. Méthode générale de fabrication
 
 La fabrication d’un câble RJ45 doit être faite calmement.
 
@@ -293,7 +287,7 @@ Les étapes importantes sont :
 9. refaire la même chose à l’autre extrémité ;
 10. tester le câble.
 
-## 12. Points de contrôle avant sertissage
+## 11. Points de contrôle avant sertissage
 
 Avant de sertir, il faut vérifier plusieurs points.
 
@@ -312,7 +306,7 @@ Il faut retirer les fils, les remettre correctement, puis vérifier à nouveau.
 
 Une fois le connecteur serti, il ne peut pas être démonté proprement.
 
-## 13. Le testeur RJ45
+## 12. Le testeur RJ45
 
 Le testeur RJ45 permet de vérifier la continuité et l’ordre des fils.
 
@@ -327,20 +321,13 @@ Le testeur allume ensuite les numéros des broches.
 
 Pour un câble droit conforme, le résultat attendu est le suivant.
 
-| Côté A | Côté B |
-| -----: | -----: |
-|      1 |      1 |
-|      2 |      2 |
-|      3 |      3 |
-|      4 |      4 |
-|      5 |      5 |
-|      6 |      6 |
-|      7 |      7 |
-|      8 |      8 |
+<p>
+  <img src="images/testeur-rj45.png" alt="Le testeur RJ45" width="60%">
+</p>
 
 Si les numéros ne correspondent pas, le câble n’est pas conforme.
 
-## 14. Interpréter les résultats du testeur
+## 13. Interpréter les résultats du testeur
 
 | Résultat observé                         | Cause possible                                         |
 | ---------------------------------------- | ------------------------------------------------------ |
@@ -354,7 +341,11 @@ Le testeur ne vérifie pas si le câble est beau.
 
 Il vérifie si les fils sont correctement reliés.
 
-## 15. Erreurs fréquentes
+## 14. Erreurs fréquentes
+
+<p>
+  <img src="images/erreurs-cablage-rj45.png" alt="Erreurs fréquentes" width="60%">
+</p>
 
 ## 15.1 Fils inversés
 
@@ -418,19 +409,18 @@ Un câble Ethernet RJ45 sert à établir une liaison physique entre une machine 
 
 Il contient 8 fils organisés en 4 paires torsadées.
 
-Pour fabriquer un câble droit en norme T568B, il faut utiliser l’ordre suivant aux deux extrémités :
-
-| Broche | Couleur      |
-| -----: | ------------ |
-|      1 | Blanc-orange |
-|      2 | Orange       |
-|      3 | Blanc-vert   |
-|      4 | Bleu         |
-|      5 | Blanc-bleu   |
-|      6 | Vert         |
-|      7 | Blanc-marron |
-|      8 | Marron       |
-
 Un câble droit T568B utilise la norme T568B aux deux extrémités.
 
 Le câble est conforme seulement si le testeur indique une correspondance correcte de la broche 1 à la broche 8.
+
+---
+
+!!! info Activité à réaliser
+
+    Vous avez maintenant les informations nécessaires pour passer à la partie pratique.
+
+    Téléchargez le document d’activité, puis suivez les étapes demandées pour fabriquer et tester votre câble Ethernet droit en norme T568B.<br>
+    Remplir le QCM.<br>
+    [Télécharger l’activité : fabriquer et tester un câble Ethernet droit T568B](activite-cable-droit-t568b.pdf)
+
+    Pendant l’activité, vous devrez revenir dans ce dossier technique chaque fois que vous aurez besoin d’une information.
