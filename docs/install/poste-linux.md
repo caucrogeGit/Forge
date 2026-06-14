@@ -183,6 +183,7 @@ env/dev
 ```
 
 Ce fichier contient les valeurs réelles de votre projet.
+Ne déduisez pas les noms MariaDB d'un exemple : lisez-les directement dans `env/dev`, en particulier `DB_NAME`, `DB_APP_LOGIN` et `DB_ADMIN_LOGIN`.
 Forge déduit `DB_NAME` et `DB_APP_LOGIN` du nom du projet, normalisé en snake_case (les tirets deviennent des underscores).
 `APP_NAME` conserve le nom lisible que vous avez choisi.
 
@@ -263,7 +264,15 @@ Choisissez l'une des deux options.
 1. Créez un nouveau dépôt vide sur GitHub.
 2. N'ajoutez ni README, ni `.gitignore`, ni licence si votre projet local en contient déjà.
 3. Copiez l'URL SSH ou HTTPS du dépôt.
-4. Associez le dépôt local et poussez :
+4. Vérifiez qu'aucun remote `origin` n'existe déjà :
+
+```bash
+git remote -v
+```
+
+Si un remote `origin` est déjà présent, ne le recréez pas : vérifiez son URL avec `git remote -v`.
+
+5. Associez le dépôt local et poussez :
 
 ```bash
 git remote add origin git@github.com:UTILISATEUR/NOM_DU_DEPOT.git
@@ -365,6 +374,8 @@ CREATE USER IF NOT EXISTS 'NOM_PROJET'@'localhost'
 
 GRANT CREATE USER ON *.* TO 'forge_admin'@'localhost';
 
+GRANT SELECT ON mysql.user TO 'forge_admin'@'localhost';
+
 GRANT CREATE, ALTER, DROP, INDEX, REFERENCES,
       SELECT, INSERT, UPDATE, DELETE
 ON `NOM_PROJET`.* TO 'forge_admin'@'localhost'
@@ -386,6 +397,7 @@ Précisions :
 
 * `mot_de_passe_admin_local` doit correspondre à `DB_ADMIN_PWD` d'`env/dev`.
 * `mot_de_passe_app_local` doit correspondre à `DB_APP_PWD` d'`env/dev`.
+* `GRANT SELECT ON mysql.user` est nécessaire car `forge db:init` vérifie les hôtes existants du compte applicatif (`SELECT Host FROM mysql.user`) avant de le créer ou de le réutiliser.
 * Si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` ``.
 * Un utilisateur MariaDB contenant un tiret doit rester entre quotes SQL : `'mon-projet'@'localhost'`.
 
@@ -501,13 +513,12 @@ Dans le projet Forge :
 
 ```bash
 forge doctor
-forge db:init
-forge db:apply
 forge migration:status
 forge run
 ```
 
 Si ces commandes passent, le projet est installé et fonctionnel.
+Les étapes 15 et 16 (`forge db:init`, `forge db:apply`) restent les commandes qui préparent réellement la base ; elles n'ont pas à être relancées ici.
 
 ---
 
