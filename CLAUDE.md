@@ -393,10 +393,15 @@ CLAUDE.md
 .claude/hooks/**
 pyproject.toml
 .env  /  .env.*  /  **/.env  /  **/.env.*
-env/*    — fichiers d'environnement Forge (env/dev, env/test, env/prod,
-           env/*.local) ; protégés même quand le fichier n'existe pas
-           encore (le check passe avant la règle 1 « write-if-new »)
 ```
+
+**Note (déblocage `env/*`, ticket `HOOK-ENV-UNBLOCK-001`)** : les fichiers
+d'environnement Forge `env/dev`, `env/test`, `env/prod` et `env/*.local` ne sont
+**plus** bloqués par le hook ; les agents peuvent les écrire. La protection
+contre la fuite de secrets repose désormais sur `.gitignore` (`env/dev`,
+`env/prod`, `env/test`, `env/*.local` sont ignorés ; seul le gabarit
+`env/example`, sans secret, est versionné). Les dotfiles `.env` / `.env.*`
+restent protégés par la règle 3.
 
 **Zone code-utilisateur bloquée (règle 4) :**
 

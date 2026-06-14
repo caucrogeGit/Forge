@@ -83,31 +83,6 @@ FILE_PATH="$PARSER_OUTPUT"
 # Outil sans file_path (ex. Bash, Read) → pas de vérification à faire
 [[ -z "${FILE_PATH:-}" ]] && exit 0
 
-# ── Règle 0b — fichiers d'environnement Forge (env/*) ────────────────────────
-#
-# HOOK-ENV-FORGE-PATTERN-001 — Les fichiers `env/dev`, `env/test`,
-# `env/prod` et leurs variantes `*.local` peuvent contenir des secrets
-# (`DB_ADMIN_PWD`, `DB_APP_PWD`, clés applicatives…). Ils sont protégés
-# au même titre que `.env`. Cette règle s'applique AVANT la règle 1
-# (write-if-new) pour bloquer même la création initiale d'un fichier
-# `env/prod.local` par un agent (sinon write-if-new l'autoriserait).
-#
-# Le test porte sur `$FILE_PATH` direct (pas sur `$REL_PATH`) pour
-# couvrir aussi les paths absolus hors du REPO_ROOT, ce qui est le cas
-# quand le hook tourne sur un repo Forge installé à un autre endroit.
-# Les pages de documentation qui MENTIONNENT « env/dev » dans leur
-# contenu (par ex. `docs/install/windows-wsl.md`) restent modifiables :
-# seuls les CHEMINS sous `env/` sont concernés.
-
-case "$FILE_PATH" in
-  env/*|./env/*|*/env/*)
-    echo "FORGE §9 — fichier d'environnement Forge protégé : '$FILE_PATH'" >&2
-    echo "Règle : env/* contient potentiellement des secrets (mots de passe DB, clés…)." >&2
-    echo "Action : modifier manuellement ; créer un ticket dédié si un agent doit y toucher." >&2
-    exit 2
-    ;;
-esac
-
 # ── Règle 1 — write-if-new : fichier inexistant → toujours autorisé ──────────
 
 [[ ! -e "$FILE_PATH" ]] && exit 0
@@ -150,15 +125,6 @@ block_user_zone() {
 # à jour par les agents (Claude Code, Codex, etc.) lorsqu'un ticket
 # le demande explicitement. Les autres entrées (charte, CLAUDE.md,
 # settings du hook, pyproject, fichiers .env) restent protégées.
-#
-# Note (HOOK-ENV-FORGE-PATTERN-001) : les fichiers `env/*` (Forge
-# utilise `env/dev`, `env/test`, `env/prod`, et leurs variantes
-# `*.local`) sont des fichiers d'environnement applicatif et peuvent
-# contenir des secrets (mots de passe MariaDB, clés applicatives, etc.).
-# Ils sont protégés au même titre que les `.env` classiques. Les pages
-# de documentation qui mentionnent textuellement « env/dev » (par
-# exemple `docs/install/windows-wsl.md`) restent modifiables car le
-# pattern ne matche QUE les chemins ciblés, pas le contenu des fichiers.
 
 case "$REL_PATH" in
   "charte_philosophique_forge_v2.md"|\
