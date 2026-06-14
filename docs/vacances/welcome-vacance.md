@@ -20,13 +20,16 @@ Vous allez avancer à votre rythme, à partir de documents techniques et d’act
 Le but n’est pas d’aller le plus vite possible.
 Le but est de comprendre, de manipuler, de tester, puis de corriger votre travail lorsque c’est nécessaire.
 
-Chaque palier contient deux parties :
+Chaque palier se déroule en trois étapes :
 
 1. **Un dossier technique**
-   Il présente les connaissances nécessaires pour réussir l’activité.
+   Il présente les connaissances nécessaires pour réussir le QCM et l’activité.
 
-2. **Une activité pratique**
-   Elle permet d’utiliser directement les informations du dossier technique.
+2. **Un QCM**
+   Vous le remplissez à partir du dossier technique. Vous ne passez à l’activité que lorsque votre QCM est validé à 100 %.
+
+3. **Une activité pratique**
+   Une fois le QCM validé, elle permet d’utiliser directement les informations du dossier technique.
 
 ---
 
