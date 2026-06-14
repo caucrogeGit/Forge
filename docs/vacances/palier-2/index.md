@@ -753,8 +753,15 @@ Les machines virtuelles doivent être nommées clairement, configurées propreme
 ---
 
 !!! info "Activité à réaliser"
-    Vous avez maintenant les informations nécessaires pour passer à la partie pratique.<br>
-    Téléchargez l’activité et le QCM, réalisez les étapes demandées pour installer deux machines virtuelles avec VirtualBox, puis remplissez le QCM.<br>
-    [Télécharger l’activité : installer deux machines virtuelles avec VirtualBox](activite-machines-virtuelles-virtualbox.pdf)<br>
-    [Télécharger le QCM du palier 2](qcm-palier-2-machines-virtuelles.pdf)<br>
+
+    Vous avez maintenant les informations nécessaires pour passer à la partie pratique.
+
+    Important : vous commencez par le QCM. Vous ne démarrez l’activité que lorsque votre QCM est validé à 100 %.
+
+    Marche à suivre :
+
+    1. [Télécharger le QCM du palier 2](qcm-palier-2-machines-virtuelles.pdf), puis répondez à toutes les questions.
+    2. Faites valider votre QCM. Tant qu’il n’est pas correct à 100 %, vous ne passez pas à l’activité.
+    3. Une fois le QCM validé à 100 %, [télécharger l’activité : installer deux machines virtuelles avec VirtualBox](activite-machines-virtuelles-virtualbox.pdf) et réalisez les étapes demandées.
+
     Pendant l’activité, vous devrez revenir dans ce dossier technique chaque fois que vous aurez besoin d’une information.
