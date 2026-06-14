@@ -2,11 +2,11 @@
 APP_NAME=Forge
 APP_ROUTES_MODULE=mvc.routes
 
-# Administration MariaDB globale.
+# Administration MariaDB du projet.
 # Politique Forge (ENV-PROD-DB-ADMIN-SECRETS-POLICY-001) :
-#   - DB_ADMIN_* est RÉSERVÉ aux commandes CLI de provisioning
-#     (forge db:init, création BDD/utilisateur/grants). Le runtime
-#     applicatif Forge n'utilise QUE DB_APP_*.
+#   - DB_ADMIN_* est réservé aux commandes CLI de provisioning
+#     (forge db:init : création base, utilisateur, privilèges). Le runtime
+#     applicatif n'utilise que DB_APP_*.
 #   - En PRODUCTION : ne JAMAIS stocker un mot de passe root/admin réel
 #     dans env/prod. Utiliser un fichier local non commité comme
 #     env/db-admin.local (ignoré par .gitignore via env/*.local) ou
