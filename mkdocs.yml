@@ -33,7 +33,7 @@ nav:
       - Installer Forge:
           - Windows + WSL (parcours complet): install/windows-wsl.md
           - Dépannage serveur dev (WSL2): install/wsl-dev-server.md
-          - Poste Linux (pipx): install/poste-linux.md
+          - Poste Linux (parcours complet): install/poste-linux.md
           - Mode développement: install/core-dev.md
           - VM Debian vierge: install/vm-debian.md
           - Depuis GitHub: install/github.md

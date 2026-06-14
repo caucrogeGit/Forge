@@ -29,7 +29,7 @@ def test_mkdocs_nav_entries_are_well_formed_and_point_to_existing_docs():
         "Référence",
         "Projet",
         "Vue d'ensemble",
-        "Poste Linux (pipx)",
+        "Poste Linux (parcours complet)",
         "Depuis GitHub",
         "Mode développement",
         "Préparer MariaDB",

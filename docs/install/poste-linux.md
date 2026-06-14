@@ -1,40 +1,67 @@
-# Installation sur Debian, Ubuntu et leurs dérivées
+# Installer un nouveau projet Forge sur Linux
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Cette page explique comment installer Forge sur un poste de développement utilisant Debian, Ubuntu, Linux Mint ou une distribution compatible avec `apt`.
+Cette page décrit le parcours complet pour créer un nouveau projet Forge sur un poste Linux.
+Elle part d'un poste propre et va jusqu'à un projet fonctionnel relié à MariaDB et versionné sur GitHub.
 
-Pour les autres distributions Linux, le principe reste le même, mais les noms des paquets système peuvent changer.
+Elle vise Debian, Ubuntu, Linux Mint et les distributions compatibles avec `apt`.
+Pour les autres distributions, le principe reste le même, seuls les noms de paquets système changent.
 
 ---
 
 ## Objectif
 
-À la fin de cette installation, le poste doit permettre de lancer la commande globale :
+Aller d'un poste Linux propre à un projet Forge qui démarre en développement.
 
-```bash
-forge
-```
+À la fin de ce parcours, vous disposez :
 
-Puis de créer un projet Forge avec :
-
-```bash
-forge new MonProjet
-```
-
-Forge est installé avec `pipx`, afin de garder la commande `forge` isolée du Python système.
+* des outils système nécessaires ;
+* de Forge installé avec `pipx` ;
+* d'un nouveau projet Forge créé ;
+* d'un dépôt Git local versionné et poussé sur GitHub ;
+* de MariaDB installé avec les comptes du projet ;
+* d'`env/dev` configuré et cohérent avec MariaDB ;
+* de la base initialisée et des migrations appliquées ;
+* du serveur de développement lancé.
 
 ---
 
-## Prérequis système
+## Ce que cette page installe
 
-Mettre à jour les paquets du système :
+Le parcours est linéaire.
+Suivez les sections dans l'ordre.
+
+| Domaine | Étapes |
+|---|---|
+| Système | mise à jour, paquets, `pipx`, Forge |
+| Projet | `forge new`, lecture d'`env/dev`, Git local, GitHub |
+| Base de données | MariaDB, comptes du projet, `env/dev`, `db:init`, migrations |
+| Démarrage | `forge doctor`, `forge run` |
+
+Les pages [Préparer MariaDB](mariadb.md) et [Comptes MariaDB d'un projet](mariadb-comptes.md) restent des références pour approfondir ou dépanner.
+Vous n'avez pas besoin d'y aller pour terminer une installation standard.
+
+---
+
+## Prérequis
+
+* Un poste Linux à jour, avec un accès `sudo`.
+* Une connexion réseau.
+* Un compte GitHub si vous souhaitez héberger le dépôt distant.
+
+---
+
+## 1. Mettre à jour le système
 
 ```bash
 sudo apt update
+sudo apt upgrade -y
 ```
 
-Installer les outils nécessaires :
+---
+
+## 2. Installer les paquets nécessaires
 
 ```bash
 sudo apt install -y \
@@ -46,17 +73,31 @@ sudo apt install -y \
   openssl \
   build-essential \
   python3-dev \
-  libmariadb-dev
+  libmariadb-dev \
+  pkg-config
 ```
 
-Activer le chemin de `pipx` :
+Le paquet `libmariadb-dev` fournit `mariadb_config`, requis par le connecteur Python `mariadb`.
+Vérifiez sa présence :
+
+```bash
+mariadb_config --version
+```
+
+Si cette commande échoue, l'installation de Forge peut échouer avec une erreur du type `mariadb_config not found`.
+
+---
+
+## 3. Activer pipx
+
+`pipx` installe la commande `forge` dans un environnement isolé du Python système.
 
 ```bash
 pipx ensurepath
 exec $SHELL -l
 ```
 
-Vérifier que `pipx` est disponible :
+Vérifiez que `pipx` répond :
 
 ```bash
 pipx --version
@@ -64,122 +105,380 @@ pipx --version
 
 ---
 
-## Pourquoi `libmariadb-dev` est nécessaire ?
+## 4. Installer Forge
 
-Forge utilise MariaDB comme base de données principale.
-
-Le connecteur Python `mariadb` peut nécessiter une compilation native lors de l’installation. Pour cela, l’outil `mariadb_config` doit être disponible sur le système.
-
-Il est fourni par le paquet :
-
-```text
-libmariadb-dev
-```
-
-Vérifier sa présence :
-
-```bash
-mariadb_config --version
-```
-
-Si cette commande échoue, l’installation de Forge peut échouer avec une erreur du type :
-
-```text
-mariadb_config not found
-```
-
----
-
-## Installer Forge
-
-Forge est publié sur PyPI sous la version :
+Forge est publié sur PyPI sous la version :
 
 ```text
 {{forge_version}}
 ```
 
-Comme il s’agit d’une version bêta, l’option `--pre` doit être transmise à `pip`.
-
-Installer Forge avec `pipx` :
+Comme il s'agit d'une version bêta, l'option `--pre` est transmise à `pip` :
 
 ```bash
 pipx install --pip-args="--pre" forge-mvc
 ```
 
-Vérifier l’installation :
+Vérifiez l'installation :
 
 ```bash
 forge --version
 ```
 
-La commande doit afficher une version de Forge.
-
----
-
-## Mettre à jour Forge plus tard
-
-Pour mettre à jour Forge vers une nouvelle version bêta publiée sur PyPI :
+Pour mettre à jour Forge plus tard :
 
 ```bash
 pipx upgrade --pip-args="--pre" forge-mvc
-forge --version
 ```
 
 ---
 
-## Configurer Git
+## 5. Configurer Git sur le poste
 
-`forge new` initialise un dépôt Git pour le projet et crée un commit initial.
-Git doit donc connaître votre identité, sinon ce commit échoue.
+Cette configuration identifie l'auteur des commits sur la machine.
+Elle est globale et ne concerne pas encore un projet précis.
 
-Configurer une identité Git, une fois par machine :
+`forge new` crée un commit initial : Git doit donc connaître votre identité, sinon ce commit échoue.
 
 ```bash
-git config --global user.name "Prénom Nom"
-git config --global user.email "vous@example.com"
+git config --global user.name "Votre Nom"
+git config --global user.email "votre.email@example.com"
 git config --global init.defaultBranch main
 ```
 
-Vérifier que Git est configuré :
+Vérifiez :
 
 ```bash
-git config --global user.name
-git config --global user.email
+git config --global --list
 ```
 
 ---
 
-## Créer un nouveau projet Forge
+## 6. Créer un nouveau projet Forge
 
-Créer un projet vide :
-
-```bash
-forge new MonProjet
-```
-
-Entrer dans le dossier du projet :
+Choisissez un nom de projet.
+Remplacez `NOM_PROJET` par votre nom réel, par exemple `boutique`, `blog`, `welcome-forge` ou `gestion-stock`.
 
 ```bash
-cd MonProjet
+forge new NOM_PROJET
+cd NOM_PROJET
 ```
 
-Activer l’environnement Python du projet :
+`forge new` prépare un projet complet : squelette, environnement Python, certificat de développement, puis un dépôt Git avec un commit initial.
+
+Activez l'environnement Python du projet :
 
 ```bash
 source .venv/bin/activate
 ```
 
-Vérifier l’état du projet :
+---
+
+## 7. Lire le fichier env/dev généré
+
+`forge new` a généré le fichier de configuration de développement :
+
+```text
+env/dev
+```
+
+Ce fichier contient les valeurs réelles de votre projet.
+Forge déduit `DB_NAME` et `DB_APP_LOGIN` du nom du projet, normalisé en snake_case (les tirets deviennent des underscores).
+`APP_NAME` conserve le nom lisible que vous avez choisi.
+
+Exemple générique, juste après la création :
+
+```env
+APP_NAME=NOM_PROJET
+APP_ROUTES_MODULE=mvc.routes
+
+DB_ADMIN_HOST=localhost
+DB_ADMIN_PORT=3306
+DB_ADMIN_LOGIN=forge_admin
+DB_ADMIN_PWD=
+
+DB_NAME=NOM_PROJET
+DB_CHARSET=utf8mb4
+DB_COLLATION=utf8mb4_unicode_ci
+
+DB_APP_HOST=localhost
+DB_APP_PORT=3306
+DB_APP_LOGIN=NOM_PROJET
+DB_APP_PWD=
+DB_POOL_SIZE=5
+```
+
+Points importants :
+
+* `DB_ADMIN_LOGIN` est le compte d'administration utilisé par les commandes CLI de provisioning.
+* `DB_ADMIN_PWD` est vide au départ et doit être complété.
+* `DB_NAME` dépend du nom du projet généré.
+* `DB_APP_LOGIN` dépend du nom du projet généré.
+* `DB_APP_PWD` est vide au départ et doit être complété.
+* Les comptes MariaDB créés plus loin doivent correspondre exactement à ce fichier.
+
+```text
+Ne copiez pas un nom de projet d'exemple sans vérifier votre propre env/dev.
+```
+
+---
+
+## 8. Vérifier le dépôt Git local du projet
+
+`forge new` initialise en général le dépôt Git et crée un premier commit.
+Vérifiez d'abord l'état :
+
+```bash
+git status
+git log --oneline -5
+```
+
+```text
+Selon la version de Forge et le starter utilisé, le dépôt Git peut déjà être initialisé.
+Vérifiez d'abord avec git status.
+```
+
+Si aucun dépôt n'est initialisé, ou si aucun commit n'a été créé, faites-le vous-même :
+
+```bash
+git init
+git add .
+git commit -m "Initialisation du projet Forge"
+```
+
+Ne refaites pas de commit initial si Forge en a déjà créé un.
+
+---
+
+## 9. Créer ou associer un dépôt GitHub
+
+Le dépôt Git local et le dépôt GitHub sont deux choses distinctes.
+Le dépôt local vit dans votre projet.
+Le dépôt GitHub est le dépôt distant qui héberge votre code.
+
+Choisissez l'une des deux options.
+
+### Option A — Avec l'interface GitHub
+
+1. Créez un nouveau dépôt vide sur GitHub.
+2. N'ajoutez ni README, ni `.gitignore`, ni licence si votre projet local en contient déjà.
+3. Copiez l'URL SSH ou HTTPS du dépôt.
+4. Associez le dépôt local et poussez :
+
+```bash
+git remote add origin git@github.com:UTILISATEUR/NOM_DU_DEPOT.git
+git branch -M main
+git push -u origin main
+```
+
+Remplacez `UTILISATEUR` et `NOM_DU_DEPOT` par vos valeurs réelles.
+
+### Option B — Avec GitHub CLI, si installé
+
+GitHub CLI (`gh`) n'est pas obligatoire.
+Cette option suppose que `gh` est installé et authentifié.
+
+```bash
+gh repo create NOM_DU_DEPOT --private --source=. --remote=origin --push
+```
+
+Pour un dépôt public :
+
+```bash
+gh repo create NOM_DU_DEPOT --public --source=. --remote=origin --push
+```
+
+---
+
+## 10. Installer et démarrer MariaDB
+
+```bash
+sudo apt install -y \
+  mariadb-server \
+  mariadb-client
+```
+
+Démarrez MariaDB et activez-le au démarrage de la machine :
+
+```bash
+sudo systemctl enable --now mariadb
+```
+
+Vérifiez que le service est actif :
+
+```bash
+systemctl status mariadb --no-pager
+```
+
+---
+
+## 11. Vérifier l'accès administrateur MariaDB local
+
+Sur Debian, Ubuntu et leurs dérivées, l'administration locale se fait avec le compte système `root`, via `sudo`.
+
+```bash
+sudo mariadb
+```
+
+Vous devez obtenir une invite :
+
+```text
+MariaDB [(none)]>
+```
+
+Gardez cette console ouverte pour l'étape suivante.
+
+Le compte `root` MariaDB sert uniquement à l'administration locale via `sudo mariadb`.
+Il ne sert pas à faire tourner l'application.
+
+---
+
+## 12. Créer la base et les comptes MariaDB du projet
+
+Forge sépare trois niveaux d'accès :
+
+```text
+root         → administration locale du serveur (avec sudo)
+forge_admin  → préparation de la base et application des migrations
+DB_APP_LOGIN → accès applicatif au runtime, en lecture/écriture
+```
+
+`forge db:init` se connecte avec le compte indiqué dans `DB_ADMIN_LOGIN`.
+Ce compte doit déjà exister : Forge ne le crée pas.
+Le compte recommandé est `forge_admin`.
+
+Dans un projet généré, `DB_APP_LOGIN` reprend le nom du projet.
+
+Depuis la console ouverte à l'étape précédente, exécutez cet exemple générique.
+Remplacez `NOM_PROJET` par la valeur réelle de `DB_NAME` et de `DB_APP_LOGIN` lues dans `env/dev`.
+
+```sql
+CREATE DATABASE IF NOT EXISTS `NOM_PROJET`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+CREATE USER IF NOT EXISTS 'forge_admin'@'localhost'
+  IDENTIFIED BY 'mot_de_passe_admin_local';
+
+CREATE USER IF NOT EXISTS 'NOM_PROJET'@'localhost'
+  IDENTIFIED BY 'mot_de_passe_app_local';
+
+GRANT CREATE USER ON *.* TO 'forge_admin'@'localhost';
+
+GRANT CREATE, ALTER, DROP, INDEX, REFERENCES,
+      SELECT, INSERT, UPDATE, DELETE
+ON `NOM_PROJET`.* TO 'forge_admin'@'localhost'
+WITH GRANT OPTION;
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON `NOM_PROJET`.* TO 'NOM_PROJET'@'localhost';
+
+FLUSH PRIVILEGES;
+```
+
+Quittez ensuite la console :
+
+```sql
+exit;
+```
+
+Précisions :
+
+* `mot_de_passe_admin_local` doit correspondre à `DB_ADMIN_PWD` d'`env/dev`.
+* `mot_de_passe_app_local` doit correspondre à `DB_APP_PWD` d'`env/dev`.
+* Si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` ``.
+* Un utilisateur MariaDB contenant un tiret doit rester entre quotes SQL : `'mon-projet'@'localhost'`.
+
+Pour la justification des droits et leur vérification, voir [Comptes MariaDB d'un projet](mariadb-comptes.md).
+
+---
+
+## 13. Compléter env/dev
+
+Renseignez maintenant les mots de passe dans `env/dev`, à l'identique des comptes créés.
+
+Exemple générique, cohérent avec les commandes SQL ci-dessus :
+
+```env
+DB_ADMIN_HOST=localhost
+DB_ADMIN_PORT=3306
+DB_ADMIN_LOGIN=forge_admin
+DB_ADMIN_PWD=mot_de_passe_admin_local
+
+DB_NAME=NOM_PROJET
+DB_CHARSET=utf8mb4
+DB_COLLATION=utf8mb4_unicode_ci
+
+DB_APP_HOST=localhost
+DB_APP_PORT=3306
+DB_APP_LOGIN=NOM_PROJET
+DB_APP_PWD=mot_de_passe_app_local
+DB_POOL_SIZE=5
+```
+
+`NOM_PROJET` n'est pas une valeur à garder telle quelle.
+Remplacez-la par les valeurs réelles générées dans votre projet.
+Les mots de passe d'`env/dev` doivent correspondre exactement à ceux définis dans MariaDB.
+
+---
+
+## 14. Vérifier le projet avec forge doctor
 
 ```bash
 forge doctor
 ```
 
+Cette commande diagnostique le projet et signale les points à corriger avant l'initialisation.
+
 ---
 
-## Lancer le serveur de développement
+## 15. Initialiser la base avec forge db:init
 
-Depuis le dossier du projet :
+```bash
+forge db:init
+```
+
+Cette commande prépare la base du projet et crée la table technique `forge_migrations`, qui mémorise les migrations déjà appliquées.
+
+Si la commande s'arrête sur :
+
+```text
+[ERREUR] Connexion MariaDB admin impossible. Vérifiez DB_ADMIN_* dans env/dev.
+```
+
+Forge n'a pas pu se connecter avec le compte indiqué dans `DB_ADMIN_LOGIN`.
+À vérifier :
+
+* le compte existe dans MariaDB ;
+* le mot de passe correspond à `DB_ADMIN_PWD` ;
+* `DB_ADMIN_HOST` est correct, généralement `localhost` ;
+* `DB_ADMIN_PORT` est correct, généralement `3306` ;
+* le compte a été créé avec le même hôte que celui utilisé par Forge ;
+* `DB_ADMIN_PWD` n'est pas resté vide dans `env/dev`.
+
+Sur Debian, Ubuntu et leurs dérivées, le compte `root` MariaDB utilise souvent l'authentification `unix_socket`, ce qui peut échouer en connexion TCP.
+Le parcours recommandé reste donc de créer un compte `forge_admin`.
+
+---
+
+## 16. Appliquer les migrations
+
+```bash
+forge db:apply
+```
+
+Cette commande applique le SQL du projet sur la base.
+Comme `db:init`, elle modifie la structure : elle se connecte avec `DB_ADMIN_*`, pas avec le compte applicatif.
+
+Vérifiez l'état des migrations :
+
+```bash
+forge migration:status
+```
+
+---
+
+## 17. Lancer le serveur de développement
 
 ```bash
 forge run
@@ -189,30 +488,34 @@ Par défaut, `forge run` démarre le projet en mode développement.
 
 ---
 
-## Résultat attendu
+## 18. Vérification finale
 
-Après installation, l’environnement doit être dans cet état :
+Sur le poste :
 
-| Commande | Résultat attendu |
-| -------- | ---------------- |
-| `forge --version` | affiche la version de Forge |
-| `forge help` | liste les commandes disponibles |
-| `forge doctor` | diagnostic du projet sans erreur bloquante |
-| `forge run` | démarre le serveur de développement |
+```bash
+mariadb_config --version
+systemctl status mariadb --no-pager
+```
 
-Les deux dernières commandes se lancent depuis le dossier d’un projet Forge.
+Dans le projet Forge :
+
+```bash
+forge doctor
+forge db:init
+forge db:apply
+forge migration:status
+forge run
+```
+
+Si ces commandes passent, le projet est installé et fonctionnel.
 
 ---
 
-## Poursuivre la configuration
+## Poursuivre
 
-Pour compléter l’environnement selon votre besoin, poursuivez avec les pages suivantes :
-
-* [Configurer MariaDB](mariadb.md) : installer MariaDB Server, créer un utilisateur applicatif et préparer la base du projet.
-* [Installer les opt-ins Forge](opt-ins.md) : ajouter les extensions officielles comme IoT, RBAC, MFA, Images, Stats ou Workflow.
-* [Préparer un déploiement en production](production.md) : comprendre les prérequis serveur, WSGI, reverse proxy et limites de production.
-* [Installer depuis GitHub](github.md) : travailler depuis le dépôt source de Forge pour contribuer ou développer le framework.
-* [Développer le cœur de Forge](core-dev.md) : préparer un environnement local pour modifier Forge lui-même.
-
-Cette page constitue donc le point d’entrée Linux.
-Les autres pages permettent d’aller progressivement vers une installation complète, un projet connecté à MariaDB, ou un environnement de contribution.
+* [Préparer MariaDB](mariadb.md) : installation détaillée et dépannage de MariaDB.
+* [Comptes MariaDB d'un projet](mariadb-comptes.md) : séparation des comptes, droits et vérifications.
+* [Migrations SQL](../features/migrations.md) : cycle complet des migrations Forge.
+* [Installer les opt-ins Forge](opt-ins.md) : ajouter les extensions officielles.
+* [Préparer un déploiement en production](production.md) : prérequis serveur, WSGI et reverse proxy.
+* [Installer Forge depuis les sources GitHub](github.md) : travailler depuis le dépôt source pour contribuer.
