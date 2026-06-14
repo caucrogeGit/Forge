@@ -29,8 +29,12 @@ theme:
 nav:
   - Accueil: index.html
 
-  # TEMP welcome-vacance (2TNE CIEL) - retirer cette ligne et docs/vacances/ le 2026-06-28, sans lien avec Forge
-  - Welcome Vacance (2TNE CIEL): vacances/welcome-vacance.md
+  # TEMP welcome-vacance (2TNE CIEL) - retirer ce bloc et docs/vacances/ le 2026-06-28, sans lien avec Forge
+  - Welcome Vacance (2TNE CIEL):
+      - Vue d'ensemble: vacances/welcome-vacance.md
+      - Palier 1 - Câble T568B: vacances/palier-1-cable-t568b.md
+      - Palier 2 - Machines virtuelles: vacances/palier-2-machines-virtuelles.md
+      - Palier 3 - Réseau VirtualBox: vacances/palier-3-reseau-virtualbox.md
 
   - Installation:
       - Installer Forge:
