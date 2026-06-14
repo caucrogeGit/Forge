@@ -1,8 +1,8 @@
-# Installer et créer un projet Forge sur Linux
+# Installer Forge sur Linux et créer un projet
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Cette page couvre l'installation d'un poste Linux et la création d'un projet Forge fonctionnel, relié à MariaDB et versionné sur GitHub.
+Cette page décrit le parcours complet pour préparer un poste Linux puis créer un nouveau projet Forge.
 
 Elle vise Debian, Ubuntu, Linux Mint et les distributions compatibles avec `apt`.
 Pour les autres distributions, le principe reste le même, seuls les noms de paquets système changent.
@@ -11,15 +11,16 @@ Pour les autres distributions, le principe reste le même, seuls les noms de paq
 
 ## Objectif
 
-Aller d'un poste Linux propre à un projet Forge qui démarre en développement.
+Aller d'un poste Linux propre à un projet Forge qui démarre en développement avec MariaDB.
 
 À la fin de ce parcours, vous disposez :
 
 * des outils système nécessaires ;
 * de Forge installé avec `pipx` ;
+* de Git configuré sur le poste ;
+* de MariaDB installé et démarré ;
 * d'un nouveau projet Forge créé ;
 * d'un dépôt Git local versionné et poussé sur GitHub ;
-* de MariaDB installé avec les comptes du projet ;
 * d'`env/dev` configuré et cohérent avec MariaDB ;
 * de la base initialisée et des migrations appliquées ;
 * du serveur de développement lancé.
@@ -36,11 +37,19 @@ Elle se fait une seule fois sur une machine neuve.
 La seconde crée et configure un projet Forge.
 Elle se refait pour chaque nouveau projet.
 
-La préparation du poste se fait une seule fois par machine.
+Si Forge, Git, `pipx` et MariaDB sont déjà installés sur votre poste, vous pouvez aller directement à la partie **Créer et configurer un projet Forge**.
 
-La création et la configuration du projet se refont à chaque nouveau projet Forge.
+---
 
-Si Forge, Git, pipx et MariaDB sont déjà installés sur votre poste, vous pouvez aller directement à la partie « Créer et configurer un projet Forge ».
+## Ce que cette page installe
+
+| Partie | Domaine | À refaire ? |
+|---|---|---|
+| Préparer le poste Linux | système, `pipx`, Forge, Git global, MariaDB Server | une fois par machine |
+| Créer et configurer un projet Forge | `forge new`, `env/dev`, Git local, GitHub, base MariaDB, migrations, `forge run` | à chaque nouveau projet |
+
+Les pages [Préparer MariaDB](mariadb.md) et [Comptes MariaDB d'un projet](mariadb-comptes.md) restent des références pour approfondir ou dépanner.
+Vous n'avez pas besoin d'y aller pour terminer une installation standard.
 
 ---
 
@@ -54,7 +63,8 @@ Si Forge, Git, pipx et MariaDB sont déjà installés sur votre poste, vous pouv
 
 ## Partie 1 — Préparer le poste Linux
 
-Ces étapes se font une seule fois par machine.
+Cette partie prépare la machine.
+Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manque.
 
 ### 1. Mettre à jour le système
 
@@ -62,6 +72,8 @@ Ces étapes se font une seule fois par machine.
 sudo apt update
 sudo apt upgrade -y
 ```
+
+---
 
 ### 2. Installer les paquets nécessaires
 
@@ -88,6 +100,8 @@ mariadb_config --version
 
 Si cette commande échoue, l'installation de Forge peut échouer avec une erreur du type `mariadb_config not found`.
 
+---
+
 ### 3. Activer pipx
 
 `pipx` installe la commande `forge` dans un environnement isolé du Python système.
@@ -102,6 +116,8 @@ Vérifiez que `pipx` répond :
 ```bash
 pipx --version
 ```
+
+---
 
 ### 4. Installer Forge
 
@@ -129,6 +145,8 @@ Pour mettre à jour Forge plus tard :
 pipx upgrade --pip-args="--pre" forge-mvc
 ```
 
+---
+
 ### 5. Configurer Git sur le poste
 
 Cette configuration identifie l'auteur des commits sur la machine.
@@ -148,7 +166,12 @@ Vérifiez :
 git config --global --list
 ```
 
+---
+
 ### 6. Installer et démarrer MariaDB
+
+MariaDB Server appartient à la préparation du poste.
+Il n'a pas besoin d'être réinstallé à chaque projet.
 
 ```bash
 sudo apt install -y \
@@ -168,9 +191,11 @@ Vérifiez que le service est actif :
 systemctl status mariadb --no-pager
 ```
 
+---
+
 ### 7. Vérifier l'accès administrateur MariaDB local
 
-Sur Debian, Ubuntu et leurs dérivées, l'administration locale se fait avec le compte système `root`, via `sudo`.
+Sur Debian, Ubuntu et leurs dérivées, l'administration locale se fait souvent avec le compte système `root`, via `sudo`.
 
 ```bash
 sudo mariadb
@@ -191,23 +216,29 @@ exit;
 Le compte `root` MariaDB sert uniquement à l'administration locale via `sudo mariadb`.
 Il ne sert pas à faire tourner l'application.
 
+---
+
 ### 8. Vérifier que le poste est prêt
 
-Vérifiez que les outils principaux répondent.
+Sur le poste, ces commandes doivent répondre :
 
 ```bash
 forge --version
+pipx --version
+git --version
 mariadb_config --version
 systemctl status mariadb --no-pager
 ```
 
-Si ces commandes répondent, le poste est prêt pour créer des projets Forge.
+Si ces commandes fonctionnent, le poste est prêt pour créer des projets Forge.
 
 ---
 
 ## Partie 2 — Créer et configurer un projet Forge
 
-Ces étapes se refont pour chaque nouveau projet.
+Cette partie se refait pour chaque nouveau projet Forge.
+
+Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` et MariaDB sont installés.
 
 ### 9. Créer un nouveau projet Forge
 
@@ -216,18 +247,20 @@ Remplacez `NOM_PROJET` par votre nom réel, par exemple `boutique`, `blog`, `wel
 
 ```bash
 forge new NOM_PROJET
+cd NOM_PROJET
 ```
 
 `forge new` prépare un projet complet : squelette, environnement Python, certificat de développement, puis un dépôt Git avec un commit initial.
 
-### 10. Entrer dans le projet
+Activez l'environnement Python du projet :
 
 ```bash
-cd NOM_PROJET
 source .venv/bin/activate
 ```
 
-### 11. Lire le fichier env/dev généré
+---
+
+### 10. Lire le fichier env/dev généré
 
 `forge new` a généré le fichier de configuration de développement :
 
@@ -240,9 +273,9 @@ Ce fichier contient les valeurs réelles de votre projet.
 Ne déduisez pas les noms MariaDB à partir d'un exemple.
 Lisez directement les valeurs générées dans `env/dev`, en particulier :
 
-* `DB_NAME`
-* `DB_APP_LOGIN`
-* `DB_ADMIN_LOGIN`
+* `DB_NAME` ;
+* `DB_APP_LOGIN` ;
+* `DB_ADMIN_LOGIN`.
 
 Ces valeurs dépendent du projet créé par `forge new` et doivent être reprises exactement dans les commandes MariaDB.
 
@@ -274,8 +307,8 @@ Points importants :
 
 * `DB_ADMIN_LOGIN` est le compte d'administration utilisé par les commandes CLI de provisioning.
 * `DB_ADMIN_PWD` est vide au départ et doit être complété.
-* `DB_NAME` dépend du nom du projet généré.
-* `DB_APP_LOGIN` dépend du nom du projet généré.
+* `DB_NAME` dépend du projet généré.
+* `DB_APP_LOGIN` peut reprendre le nom du projet, mais la valeur exacte à utiliser est celle présente dans `env/dev`.
 * `DB_APP_PWD` est vide au départ et doit être complété.
 * Les comptes MariaDB créés plus loin doivent correspondre exactement à ce fichier.
 
@@ -283,7 +316,9 @@ Points importants :
 Ne copiez pas un nom de projet d'exemple sans vérifier votre propre env/dev.
 ```
 
-### 12. Vérifier le dépôt Git local
+---
+
+### 11. Vérifier le dépôt Git local du projet
 
 `forge new` initialise en général le dépôt Git et crée un premier commit.
 Vérifiez d'abord l'état :
@@ -293,10 +328,8 @@ git status
 git log --oneline -5
 ```
 
-```text
 Selon la version de Forge et le starter utilisé, le dépôt Git peut déjà être initialisé.
-Vérifiez d'abord avec git status.
-```
+Vérifiez d'abord avec `git status`.
 
 Si aucun dépôt n'est initialisé, ou si aucun commit n'a été créé, faites-le vous-même :
 
@@ -308,7 +341,9 @@ git commit -m "Initialisation du projet Forge"
 
 Ne refaites pas de commit initial si Forge en a déjà créé un.
 
-### 13. Associer le projet à GitHub
+---
+
+### 12. Créer ou associer un dépôt GitHub
 
 Le dépôt Git local et le dépôt GitHub sont deux choses distinctes.
 Le dépôt local vit dans votre projet.
@@ -354,14 +389,25 @@ Pour un dépôt public :
 gh repo create NOM_DU_DEPOT --public --source=. --remote=origin --push
 ```
 
-### 14. Créer la base et les comptes MariaDB du projet
+---
+
+### 13. Créer la base et les comptes MariaDB du projet
+
+Cette étape appartient au projet.
+Elle se refait pour chaque nouveau projet Forge, car chaque projet a sa base et son compte applicatif.
+
+Ouvrez une console MariaDB administrateur :
+
+```bash
+sudo mariadb
+```
 
 Forge sépare trois niveaux d'accès :
 
 ```text
-root         → administration locale du serveur (avec sudo)
-forge_admin  → préparation de la base et application des migrations
-DB_APP_LOGIN → accès applicatif au runtime, en lecture/écriture
+root                   → administration locale du serveur, avec sudo
+forge_admin            → préparation de la base et application des migrations
+NOM_UTILISATEUR_APP    → accès applicatif au runtime, en lecture/écriture
 ```
 
 `forge db:init` se connecte avec le compte indiqué dans `DB_ADMIN_LOGIN`.
@@ -371,19 +417,14 @@ Le compte recommandé est `forge_admin`.
 Dans un projet généré, `DB_APP_LOGIN` peut reprendre le nom du projet.
 La valeur exacte à utiliser est celle présente dans `env/dev`.
 
-Ouvrez une console MariaDB administrateur :
-
-```bash
-sudo mariadb
-```
-
-Exécutez ensuite cet exemple générique.
 Remplacez :
 
 * `NOM_BASE` par la valeur réelle de `DB_NAME` ;
 * `NOM_UTILISATEUR_APP` par la valeur réelle de `DB_APP_LOGIN` ;
 * `mot_de_passe_admin_local` par le mot de passe choisi pour `DB_ADMIN_PWD` ;
 * `mot_de_passe_app_local` par le mot de passe choisi pour `DB_APP_PWD`.
+
+Exécutez ensuite les commandes SQL suivantes :
 
 ```sql
 CREATE DATABASE IF NOT EXISTS `NOM_BASE`
@@ -418,11 +459,13 @@ exit;
 Précisions :
 
 * Si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` ``.
-* Un utilisateur MariaDB contenant un tiret doit rester entre quotes SQL : `'mon-projet'@'localhost'`.
+* Si `DB_APP_LOGIN` contient un tiret, gardez les quotes SQL : `'mon-projet'@'localhost'`.
 
 Pour la justification des droits et leur vérification, voir [Comptes MariaDB d'un projet](mariadb-comptes.md).
 
-### 15. Compléter env/dev
+---
+
+### 14. Compléter env/dev
 
 Renseignez maintenant les mots de passe dans `env/dev`, à l'identique des comptes créés.
 
@@ -446,10 +489,13 @@ DB_POOL_SIZE=5
 ```
 
 `NOM_BASE` et `NOM_UTILISATEUR_APP` ne sont pas des valeurs à garder telles quelles.
-Remplacez-les par les valeurs réelles générées dans votre projet (`DB_NAME` et `DB_APP_LOGIN`).
+Ils doivent être remplacés par les valeurs présentes dans votre propre fichier `env/dev`.
+
 Les mots de passe d'`env/dev` doivent correspondre exactement à ceux définis dans MariaDB.
 
-### 16. Vérifier le projet avec forge doctor
+---
+
+### 15. Vérifier le projet avec forge doctor
 
 ```bash
 forge doctor
@@ -457,7 +503,9 @@ forge doctor
 
 Cette commande diagnostique le projet et signale les points à corriger avant l'initialisation.
 
-### 17. Initialiser la base avec forge db:init
+---
+
+### 16. Initialiser la base avec forge db:init
 
 ```bash
 forge db:init
@@ -484,7 +532,9 @@ Forge n'a pas pu se connecter avec le compte indiqué dans `DB_ADMIN_LOGIN`.
 Sur Debian, Ubuntu et leurs dérivées, le compte `root` MariaDB utilise souvent l'authentification `unix_socket`, ce qui peut échouer en connexion TCP.
 Le parcours recommandé reste donc de créer un compte `forge_admin`.
 
-### 18. Appliquer les migrations
+---
+
+### 17. Appliquer les migrations
 
 ```bash
 forge db:apply
@@ -499,7 +549,9 @@ Vérifiez l'état des migrations :
 forge migration:status
 ```
 
-### 19. Lancer le serveur de développement
+---
+
+### 18. Lancer le serveur de développement
 
 ```bash
 forge run
@@ -507,7 +559,9 @@ forge run
 
 Par défaut, `forge run` démarre le projet en mode développement.
 
-### 20. Vérifier le projet final
+---
+
+### 19. Vérification finale du projet
 
 Dans le projet Forge :
 
@@ -518,7 +572,7 @@ forge run
 ```
 
 Si ces commandes passent, le projet est installé et fonctionnel.
-Les étapes 17 et 18 (`forge db:init`, `forge db:apply`) restent les commandes qui préparent réellement la base ; elles n'ont pas à être relancées ici.
+Les étapes 16 et 17 (`forge db:init`, `forge db:apply`) restent les commandes qui préparent réellement la base ; elles n'ont pas à être relancées ici comme simples vérifications.
 
 ---
 
