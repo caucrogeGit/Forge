@@ -1,9 +1,8 @@
-# Installer un nouveau projet Forge sur Linux
+# Installer et créer un projet Forge sur Linux
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Cette page décrit le parcours complet pour créer un nouveau projet Forge sur un poste Linux.
-Elle part d'un poste propre et va jusqu'à un projet fonctionnel relié à MariaDB et versionné sur GitHub.
+Cette page couvre l'installation d'un poste Linux et la création d'un projet Forge fonctionnel, relié à MariaDB et versionné sur GitHub.
 
 Elle vise Debian, Ubuntu, Linux Mint et les distributions compatibles avec `apt`.
 Pour les autres distributions, le principe reste le même, seuls les noms de paquets système changent.
@@ -27,20 +26,21 @@ Aller d'un poste Linux propre à un projet Forge qui démarre en développement.
 
 ---
 
-## Ce que cette page installe
+## Vue d'ensemble
 
-Le parcours est linéaire.
-Suivez les sections dans l'ordre.
+Cette page est organisée en deux parties.
 
-| Domaine | Étapes |
-|---|---|
-| Système | mise à jour, paquets, `pipx`, Forge |
-| Projet | `forge new`, lecture d'`env/dev`, Git local, GitHub |
-| Base de données | MariaDB, comptes du projet, `env/dev`, `db:init`, migrations |
-| Démarrage | `forge doctor`, `forge run` |
+La première prépare le poste Linux.
+Elle se fait une seule fois sur une machine neuve.
 
-Les pages [Préparer MariaDB](mariadb.md) et [Comptes MariaDB d'un projet](mariadb-comptes.md) restent des références pour approfondir ou dépanner.
-Vous n'avez pas besoin d'y aller pour terminer une installation standard.
+La seconde crée et configure un projet Forge.
+Elle se refait pour chaque nouveau projet.
+
+La préparation du poste se fait une seule fois par machine.
+
+La création et la configuration du projet se refont à chaque nouveau projet Forge.
+
+Si Forge, Git, pipx et MariaDB sont déjà installés sur votre poste, vous pouvez aller directement à la partie « Créer et configurer un projet Forge ».
 
 ---
 
@@ -52,16 +52,18 @@ Vous n'avez pas besoin d'y aller pour terminer une installation standard.
 
 ---
 
-## 1. Mettre à jour le système
+## Partie 1 — Préparer le poste Linux
+
+Ces étapes se font une seule fois par machine.
+
+### 1. Mettre à jour le système
 
 ```bash
 sudo apt update
 sudo apt upgrade -y
 ```
 
----
-
-## 2. Installer les paquets nécessaires
+### 2. Installer les paquets nécessaires
 
 ```bash
 sudo apt install -y \
@@ -86,9 +88,7 @@ mariadb_config --version
 
 Si cette commande échoue, l'installation de Forge peut échouer avec une erreur du type `mariadb_config not found`.
 
----
-
-## 3. Activer pipx
+### 3. Activer pipx
 
 `pipx` installe la commande `forge` dans un environnement isolé du Python système.
 
@@ -103,9 +103,7 @@ Vérifiez que `pipx` répond :
 pipx --version
 ```
 
----
-
-## 4. Installer Forge
+### 4. Installer Forge
 
 Forge est publié sur PyPI sous la version :
 
@@ -131,9 +129,7 @@ Pour mettre à jour Forge plus tard :
 pipx upgrade --pip-args="--pre" forge-mvc
 ```
 
----
-
-## 5. Configurer Git sur le poste
+### 5. Configurer Git sur le poste
 
 Cette configuration identifie l'auteur des commits sur la machine.
 Elle est globale et ne concerne pas encore un projet précis.
@@ -152,29 +148,86 @@ Vérifiez :
 git config --global --list
 ```
 
+### 6. Installer et démarrer MariaDB
+
+```bash
+sudo apt install -y \
+  mariadb-server \
+  mariadb-client
+```
+
+Démarrez MariaDB et activez-le au démarrage de la machine :
+
+```bash
+sudo systemctl enable --now mariadb
+```
+
+Vérifiez que le service est actif :
+
+```bash
+systemctl status mariadb --no-pager
+```
+
+### 7. Vérifier l'accès administrateur MariaDB local
+
+Sur Debian, Ubuntu et leurs dérivées, l'administration locale se fait avec le compte système `root`, via `sudo`.
+
+```bash
+sudo mariadb
+```
+
+Vous devez obtenir une invite :
+
+```text
+MariaDB [(none)]>
+```
+
+Quittez ensuite la console :
+
+```sql
+exit;
+```
+
+Le compte `root` MariaDB sert uniquement à l'administration locale via `sudo mariadb`.
+Il ne sert pas à faire tourner l'application.
+
+### 8. Vérifier que le poste est prêt
+
+Vérifiez que les outils principaux répondent.
+
+```bash
+forge --version
+mariadb_config --version
+systemctl status mariadb --no-pager
+```
+
+Si ces commandes répondent, le poste est prêt pour créer des projets Forge.
+
 ---
 
-## 6. Créer un nouveau projet Forge
+## Partie 2 — Créer et configurer un projet Forge
+
+Ces étapes se refont pour chaque nouveau projet.
+
+### 9. Créer un nouveau projet Forge
 
 Choisissez un nom de projet.
 Remplacez `NOM_PROJET` par votre nom réel, par exemple `boutique`, `blog`, `welcome-forge` ou `gestion-stock`.
 
 ```bash
 forge new NOM_PROJET
-cd NOM_PROJET
 ```
 
 `forge new` prépare un projet complet : squelette, environnement Python, certificat de développement, puis un dépôt Git avec un commit initial.
 
-Activez l'environnement Python du projet :
+### 10. Entrer dans le projet
 
 ```bash
+cd NOM_PROJET
 source .venv/bin/activate
 ```
 
----
-
-## 7. Lire le fichier env/dev généré
+### 11. Lire le fichier env/dev généré
 
 `forge new` a généré le fichier de configuration de développement :
 
@@ -230,9 +283,7 @@ Points importants :
 Ne copiez pas un nom de projet d'exemple sans vérifier votre propre env/dev.
 ```
 
----
-
-## 8. Vérifier le dépôt Git local du projet
+### 12. Vérifier le dépôt Git local
 
 `forge new` initialise en général le dépôt Git et crée un premier commit.
 Vérifiez d'abord l'état :
@@ -257,9 +308,7 @@ git commit -m "Initialisation du projet Forge"
 
 Ne refaites pas de commit initial si Forge en a déjà créé un.
 
----
-
-## 9. Créer ou associer un dépôt GitHub
+### 13. Associer le projet à GitHub
 
 Le dépôt Git local et le dépôt GitHub sont deux choses distinctes.
 Le dépôt local vit dans votre projet.
@@ -267,7 +316,7 @@ Le dépôt GitHub est le dépôt distant qui héberge votre code.
 
 Choisissez l'une des deux options.
 
-### Option A — Avec l'interface GitHub
+#### Option A — Avec l'interface GitHub
 
 1. Créez un nouveau dépôt vide sur GitHub.
 2. N'ajoutez ni README, ni `.gitignore`, ni licence si votre projet local en contient déjà.
@@ -290,7 +339,7 @@ git push -u origin main
 
 Remplacez `UTILISATEUR` et `NOM_DU_DEPOT` par vos valeurs réelles.
 
-### Option B — Avec GitHub CLI, si installé
+#### Option B — Avec GitHub CLI, si installé
 
 GitHub CLI (`gh`) n'est pas obligatoire.
 Cette option suppose que `gh` est installé et authentifié.
@@ -305,52 +354,7 @@ Pour un dépôt public :
 gh repo create NOM_DU_DEPOT --public --source=. --remote=origin --push
 ```
 
----
-
-## 10. Installer et démarrer MariaDB
-
-```bash
-sudo apt install -y \
-  mariadb-server \
-  mariadb-client
-```
-
-Démarrez MariaDB et activez-le au démarrage de la machine :
-
-```bash
-sudo systemctl enable --now mariadb
-```
-
-Vérifiez que le service est actif :
-
-```bash
-systemctl status mariadb --no-pager
-```
-
----
-
-## 11. Vérifier l'accès administrateur MariaDB local
-
-Sur Debian, Ubuntu et leurs dérivées, l'administration locale se fait avec le compte système `root`, via `sudo`.
-
-```bash
-sudo mariadb
-```
-
-Vous devez obtenir une invite :
-
-```text
-MariaDB [(none)]>
-```
-
-Gardez cette console ouverte pour l'étape suivante.
-
-Le compte `root` MariaDB sert uniquement à l'administration locale via `sudo mariadb`.
-Il ne sert pas à faire tourner l'application.
-
----
-
-## 12. Créer la base et les comptes MariaDB du projet
+### 14. Créer la base et les comptes MariaDB du projet
 
 Forge sépare trois niveaux d'accès :
 
@@ -367,7 +371,13 @@ Le compte recommandé est `forge_admin`.
 Dans un projet généré, `DB_APP_LOGIN` peut reprendre le nom du projet.
 La valeur exacte à utiliser est celle présente dans `env/dev`.
 
-Depuis la console ouverte à l'étape précédente, exécutez cet exemple générique.
+Ouvrez une console MariaDB administrateur :
+
+```bash
+sudo mariadb
+```
+
+Exécutez ensuite cet exemple générique.
 Remplacez :
 
 * `NOM_BASE` par la valeur réelle de `DB_NAME` ;
@@ -412,9 +422,7 @@ Précisions :
 
 Pour la justification des droits et leur vérification, voir [Comptes MariaDB d'un projet](mariadb-comptes.md).
 
----
-
-## 13. Compléter env/dev
+### 15. Compléter env/dev
 
 Renseignez maintenant les mots de passe dans `env/dev`, à l'identique des comptes créés.
 
@@ -441,9 +449,7 @@ DB_POOL_SIZE=5
 Remplacez-les par les valeurs réelles générées dans votre projet (`DB_NAME` et `DB_APP_LOGIN`).
 Les mots de passe d'`env/dev` doivent correspondre exactement à ceux définis dans MariaDB.
 
----
-
-## 14. Vérifier le projet avec forge doctor
+### 16. Vérifier le projet avec forge doctor
 
 ```bash
 forge doctor
@@ -451,9 +457,7 @@ forge doctor
 
 Cette commande diagnostique le projet et signale les points à corriger avant l'initialisation.
 
----
-
-## 15. Initialiser la base avec forge db:init
+### 17. Initialiser la base avec forge db:init
 
 ```bash
 forge db:init
@@ -480,9 +484,7 @@ Forge n'a pas pu se connecter avec le compte indiqué dans `DB_ADMIN_LOGIN`.
 Sur Debian, Ubuntu et leurs dérivées, le compte `root` MariaDB utilise souvent l'authentification `unix_socket`, ce qui peut échouer en connexion TCP.
 Le parcours recommandé reste donc de créer un compte `forge_admin`.
 
----
-
-## 16. Appliquer les migrations
+### 18. Appliquer les migrations
 
 ```bash
 forge db:apply
@@ -497,9 +499,7 @@ Vérifiez l'état des migrations :
 forge migration:status
 ```
 
----
-
-## 17. Lancer le serveur de développement
+### 19. Lancer le serveur de développement
 
 ```bash
 forge run
@@ -507,16 +507,7 @@ forge run
 
 Par défaut, `forge run` démarre le projet en mode développement.
 
----
-
-## 18. Vérification finale
-
-Sur le poste :
-
-```bash
-mariadb_config --version
-systemctl status mariadb --no-pager
-```
+### 20. Vérifier le projet final
 
 Dans le projet Forge :
 
@@ -527,7 +518,7 @@ forge run
 ```
 
 Si ces commandes passent, le projet est installé et fonctionnel.
-Les étapes 15 et 16 (`forge db:init`, `forge db:apply`) restent les commandes qui préparent réellement la base ; elles n'ont pas à être relancées ici.
+Les étapes 17 et 18 (`forge db:init`, `forge db:apply`) restent les commandes qui préparent réellement la base ; elles n'ont pas à être relancées ici.
 
 ---
 
