@@ -374,8 +374,6 @@ CREATE USER IF NOT EXISTS 'NOM_PROJET'@'localhost'
 
 GRANT CREATE USER ON *.* TO 'forge_admin'@'localhost';
 
-GRANT SELECT ON mysql.user TO 'forge_admin'@'localhost';
-
 GRANT CREATE, ALTER, DROP, INDEX, REFERENCES,
       SELECT, INSERT, UPDATE, DELETE
 ON `NOM_PROJET`.* TO 'forge_admin'@'localhost'
@@ -397,7 +395,6 @@ Précisions :
 
 * `mot_de_passe_admin_local` doit correspondre à `DB_ADMIN_PWD` d'`env/dev`.
 * `mot_de_passe_app_local` doit correspondre à `DB_APP_PWD` d'`env/dev`.
-* `GRANT SELECT ON mysql.user` est nécessaire car `forge db:init` vérifie les hôtes existants du compte applicatif (`SELECT Host FROM mysql.user`) avant de le créer ou de le réutiliser.
 * Si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` ``.
 * Un utilisateur MariaDB contenant un tiret doit rester entre quotes SQL : `'mon-projet'@'localhost'`.
 

@@ -114,9 +114,20 @@ def init_project_database() -> list[str]:
                 )
                 actions.append(f"Base {cfg.db_name} créée.")
 
-            user_hosts = _load_user_hosts(cursor, cfg.app_login)
+            user_hosts = _try_load_user_hosts(cursor, cfg.app_login)
             target_user = f"{cfg.app_login}@{cfg.app_host}"
-            if not user_hosts:
+            if user_hosts is None:
+                cursor.execute(
+                    f"CREATE USER IF NOT EXISTS {_quote_user(cfg.app_login, cfg.app_host)} "
+                    f"IDENTIFIED BY {_quote_string(cfg.app_password)}"
+                )
+                actions.append(f"Utilisateur applicatif {target_user} créé ou déjà présent.")
+                actions.append(
+                    "Information : le compte d'administration n'a pas le droit SELECT sur "
+                    "mysql.user ; la détection multi-hôte de l'utilisateur applicatif a été "
+                    "ignorée (forge db:init n'exige pas ce privilège)."
+                )
+            elif not user_hosts:
                 cursor.execute(
                     f"CREATE USER {_quote_user(cfg.app_login, cfg.app_host)} "
                     f"IDENTIFIED BY {_quote_string(cfg.app_password)}"
@@ -233,6 +244,30 @@ def _load_user_hosts(cursor, login: str) -> list[str]:
     )
     rows = cursor.fetchall()
     return [row[0] for row in rows]
+
+
+# Errnos MariaDB d'un refus d'accès à la lecture de mysql.user
+# (1044 DBACCESS_DENIED, 1045 ACCESS_DENIED, 1142 TABLEACCESS_DENIED).
+_PERMISSION_DENIED_ERRNOS = frozenset({1044, 1045, 1142})
+
+
+def _try_load_user_hosts(cursor, login: str) -> list[str] | None:
+    """Hôtes connus de ``login``, ou ``None`` si la lecture de ``mysql.user``
+    est refusée.
+
+    forge db:init lit mysql.user pour décider entre créer, réutiliser ou
+    refuser le compte applicatif. Un compte d'administration minimal (par
+    exemple forge_admin sans SELECT sur mysql.user) n'a pas ce droit : on
+    bascule alors en mode dégradé (CREATE USER IF NOT EXISTS) plutôt que
+    d'exiger un privilège global supplémentaire. Toute autre erreur est
+    propagée.
+    """
+    try:
+        return _load_user_hosts(cursor, login)
+    except Exception as exc:
+        if getattr(exc, "errno", None) in _PERMISSION_DENIED_ERRNOS:
+            return None
+        raise
 
 
 def _create_forge_migrations_table(cursor, db_name: str) -> None:

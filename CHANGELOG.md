@@ -59,6 +59,22 @@
 
 ### Corrigé
 
+- **`forge db:init` ne dépend plus d'un droit de lecture sur `mysql.user`**
+  (`DB-INIT-MYSQL-USER-GRANT-001`). Pour décider entre créer, réutiliser ou
+  refuser le compte applicatif, `db:init` lisait `mysql.user`, ce qui exige le
+  privilège `SELECT` sur cette table. Le compte `forge_admin` recommandé
+  (`mariadb-comptes.md`) ne l'a pas : `db:init` échouait avec
+  `DB_ADMIN_LOGIN=forge_admin`, défaut resté invisible tant que l'admin était
+  `root`. La commande bascule désormais en mode dégradé quand la lecture de
+  `mysql.user` est refusée : elle crée le compte applicatif avec
+  `CREATE USER IF NOT EXISTS` et signale que la détection multi-hôte a été
+  ignorée, au lieu d'échouer. Aucun privilège supplémentaire n'est requis ;
+  `forge_admin` reste minimal.
+- **`forge db:apply` applique le SQL des entités en `DB_ADMIN_*`**
+  (`DB-APPLY-ADMIN-CREDS-FIX-001`). La commande `db:apply` (SQL des entités,
+  donc DDL) se connectait encore en `DB_APP_*` alors que `forge_app` est en DML
+  strict depuis ADR-033 ; elle échouait sur `CREATE TABLE`. Elle utilise
+  désormais `DB_ADMIN_*`, comme `migration:apply`.
 - **`forge doctor` : l'absence d'entité n'est plus un avertissement sur un
   projet vierge** (`FIX-DOCTOR-ENTITIES-SKELETON-001`). Un projet nu issu de
   `forge new` (ADR-024) n'a légitimement aucune entité : c'est l'état nominal,

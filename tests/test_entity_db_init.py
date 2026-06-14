@@ -10,6 +10,10 @@ from forge_cli.entities.db_init import DbInitError, init_project_database, load_
 FORGE_MIGRATIONS_SQL = db_init.FORGE_MIGRATIONS_TABLE_SQL
 
 
+class _FakeMariadbError(Exception):
+    """Erreur MariaDB simulée portant un attribut ``errno`` (comme le driver)."""
+
+
 class FakeCursor:
     def __init__(self, state: dict[str, object], executed: list[str], fail_on: str | None = None):
         self.state = state
@@ -20,6 +24,10 @@ class FakeCursor:
     def execute(self, statement: str):
         if self.fail_on and self.fail_on in statement:
             raise RuntimeError("boom")
+        if self.state.get("deny_mysql_user") and "FROM mysql.user" in statement:
+            error = _FakeMariadbError("SELECT command denied for table 'user'")
+            error.errno = 1142
+            raise error
         self.executed.append(statement)
         if "FROM INFORMATION_SCHEMA.SCHEMATA" in statement:
             db_name = self.state["db_name"]
@@ -237,6 +245,63 @@ def test_db_init_creates_missing_database_and_app_user(monkeypatch):
         "Privilèges appliqués sur gestion_ventes à forge_app@localhost (SELECT, INSERT, UPDATE, DELETE).",
         "Table forge_migrations prête.",
     ]
+
+
+def test_db_init_degrades_when_mysql_user_read_denied(monkeypatch):
+    """DB-INIT-MYSQL-USER-GRANT-001 — repli si la lecture de mysql.user est refusée.
+
+    Un compte d'administration minimal (forge_admin sans SELECT sur mysql.user)
+    ne peut pas lire les hôtes du compte applicatif. db:init ne doit pas échouer :
+    il bascule sur CREATE USER IF NOT EXISTS et signale le mode dégradé.
+    """
+    executed: list[str] = []
+    state = {
+        "db_name": "gestion_ventes",
+        "db_exists": False,
+        "user_hosts": [],
+        "app_host": "localhost",
+        "deny_mysql_user": True,
+    }
+    connection = FakeConnection(state, executed)
+    fake_config = types.SimpleNamespace(
+        DB_ADMIN_HOST="admin-host",
+        DB_ADMIN_PORT=3307,
+        DB_ADMIN_LOGIN="forge_admin",
+        DB_ADMIN_PWD="admin-pwd",
+        DB_NAME="gestion_ventes",
+        DB_CHARSET="utf8mb4",
+        DB_COLLATION="utf8mb4_unicode_ci",
+        DB_APP_HOST="localhost",
+        DB_APP_PORT=3306,
+        DB_APP_LOGIN="forge_app",
+        DB_APP_PWD="secret",
+    )
+
+    def connect(**kwargs):
+        return connection
+
+    fake_mariadb = types.SimpleNamespace(connect=connect)
+    _patch_db_init_config(monkeypatch, fake_config)
+    monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
+
+    actions = init_project_database()
+
+    # Le SELECT sur mysql.user a été tenté puis refusé : il n'est pas exécuté.
+    assert not any("FROM mysql.user" in s for s in executed)
+    # Repli : CREATE USER IF NOT EXISTS au lieu de CREATE USER nu.
+    assert (
+        "CREATE USER IF NOT EXISTS 'forge_app'@'localhost' IDENTIFIED BY 'secret'"
+        in executed
+    )
+    # Les privilèges applicatifs et la table de migrations sont quand même posés.
+    assert (
+        "GRANT SELECT, INSERT, UPDATE, DELETE ON `gestion_ventes`.* TO 'forge_app'@'localhost'"
+        in executed
+    )
+    assert connection.committed is True
+    # Une action signale explicitement le mode dégradé.
+    assert any("mysql.user" in a and "ignorée" in a for a in actions)
+    assert any("créé ou déjà présent" in a for a in actions)
 
 
 def test_db_init_reports_existing_database_and_user_then_reapplies_privileges(monkeypatch):
