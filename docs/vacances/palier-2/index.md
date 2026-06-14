@@ -5,7 +5,7 @@ A SUPPRIMER le 2026-06-28 (voir docs/vacances/welcome-vacance.md).
 
 # Palier 2 - Installer deux machines virtuelles avec VirtualBox
 
-[Welcome Vacance](welcome-vacance.md) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Welcome Vacance](../welcome-vacance.md) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 !!! warning "Page temporaire, sans lien avec Forge"
     Support provisoire pour la classe de seconde TNE CIEL, retiré le 28 juin 2026.
