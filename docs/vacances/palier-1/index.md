@@ -419,8 +419,8 @@ Le câble est conforme seulement si le testeur indique une correspondance correc
 
     Vous avez maintenant les informations nécessaires pour passer à la partie pratique.
 
-    Téléchargez le document d’activité, puis suivez les étapes demandées pour fabriquer et tester votre câble Ethernet droit en norme T568B.<br>
-    Remplir le QCM.<br>
-    [Télécharger l’activité : fabriquer et tester un câble Ethernet droit T568B](activite-cable-droit-t568b.pdf)
+    Téléchargez l’activité et le QCM, réalisez les étapes demandées pour fabriquer et tester votre câble Ethernet droit en norme T568B, puis remplissez le QCM.<br>
+    [Télécharger l’activité : fabriquer et tester un câble Ethernet droit T568B](activite-cable-droit-t568b.pdf)<br>
+    [Télécharger le QCM du palier 1](qcm-palier-1-cable-t568b.pdf)
 
     Pendant l’activité, vous devrez revenir dans ce dossier technique chaque fois que vous aurez besoin d’une information.
