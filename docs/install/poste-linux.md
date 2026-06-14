@@ -183,9 +183,17 @@ env/dev
 ```
 
 Ce fichier contient les valeurs réelles de votre projet.
-Ne déduisez pas les noms MariaDB d'un exemple : lisez-les directement dans `env/dev`, en particulier `DB_NAME`, `DB_APP_LOGIN` et `DB_ADMIN_LOGIN`.
-Forge déduit `DB_NAME` et `DB_APP_LOGIN` du nom du projet, normalisé en snake_case (les tirets deviennent des underscores).
-`APP_NAME` conserve le nom lisible que vous avez choisi.
+
+Ne déduisez pas les noms MariaDB à partir d'un exemple.
+Lisez directement les valeurs générées dans `env/dev`, en particulier :
+
+* `DB_NAME`
+* `DB_APP_LOGIN`
+* `DB_ADMIN_LOGIN`
+
+Ces valeurs dépendent du projet créé par `forge new` et doivent être reprises exactement dans les commandes MariaDB.
+
+`APP_NAME` indique le nom applicatif du projet.
 
 Exemple générique, juste après la création :
 
@@ -198,13 +206,13 @@ DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=forge_admin
 DB_ADMIN_PWD=
 
-DB_NAME=NOM_PROJET
+DB_NAME=NOM_BASE
 DB_CHARSET=utf8mb4
 DB_COLLATION=utf8mb4_unicode_ci
 
 DB_APP_HOST=localhost
 DB_APP_PORT=3306
-DB_APP_LOGIN=NOM_PROJET
+DB_APP_LOGIN=NOM_UTILISATEUR_APP
 DB_APP_PWD=
 DB_POOL_SIZE=5
 ```
@@ -356,31 +364,37 @@ DB_APP_LOGIN → accès applicatif au runtime, en lecture/écriture
 Ce compte doit déjà exister : Forge ne le crée pas.
 Le compte recommandé est `forge_admin`.
 
-Dans un projet généré, `DB_APP_LOGIN` reprend le nom du projet.
+Dans un projet généré, `DB_APP_LOGIN` peut reprendre le nom du projet.
+La valeur exacte à utiliser est celle présente dans `env/dev`.
 
 Depuis la console ouverte à l'étape précédente, exécutez cet exemple générique.
-Remplacez `NOM_PROJET` par la valeur réelle de `DB_NAME` et de `DB_APP_LOGIN` lues dans `env/dev`.
+Remplacez :
+
+* `NOM_BASE` par la valeur réelle de `DB_NAME` ;
+* `NOM_UTILISATEUR_APP` par la valeur réelle de `DB_APP_LOGIN` ;
+* `mot_de_passe_admin_local` par le mot de passe choisi pour `DB_ADMIN_PWD` ;
+* `mot_de_passe_app_local` par le mot de passe choisi pour `DB_APP_PWD`.
 
 ```sql
-CREATE DATABASE IF NOT EXISTS `NOM_PROJET`
+CREATE DATABASE IF NOT EXISTS `NOM_BASE`
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
 CREATE USER IF NOT EXISTS 'forge_admin'@'localhost'
   IDENTIFIED BY 'mot_de_passe_admin_local';
 
-CREATE USER IF NOT EXISTS 'NOM_PROJET'@'localhost'
+CREATE USER IF NOT EXISTS 'NOM_UTILISATEUR_APP'@'localhost'
   IDENTIFIED BY 'mot_de_passe_app_local';
 
 GRANT CREATE USER ON *.* TO 'forge_admin'@'localhost';
 
 GRANT CREATE, ALTER, DROP, INDEX, REFERENCES,
       SELECT, INSERT, UPDATE, DELETE
-ON `NOM_PROJET`.* TO 'forge_admin'@'localhost'
+ON `NOM_BASE`.* TO 'forge_admin'@'localhost'
 WITH GRANT OPTION;
 
 GRANT SELECT, INSERT, UPDATE, DELETE
-ON `NOM_PROJET`.* TO 'NOM_PROJET'@'localhost';
+ON `NOM_BASE`.* TO 'NOM_UTILISATEUR_APP'@'localhost';
 
 FLUSH PRIVILEGES;
 ```
@@ -393,8 +407,6 @@ exit;
 
 Précisions :
 
-* `mot_de_passe_admin_local` doit correspondre à `DB_ADMIN_PWD` d'`env/dev`.
-* `mot_de_passe_app_local` doit correspondre à `DB_APP_PWD` d'`env/dev`.
 * Si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` ``.
 * Un utilisateur MariaDB contenant un tiret doit rester entre quotes SQL : `'mon-projet'@'localhost'`.
 
@@ -414,19 +426,19 @@ DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=forge_admin
 DB_ADMIN_PWD=mot_de_passe_admin_local
 
-DB_NAME=NOM_PROJET
+DB_NAME=NOM_BASE
 DB_CHARSET=utf8mb4
 DB_COLLATION=utf8mb4_unicode_ci
 
 DB_APP_HOST=localhost
 DB_APP_PORT=3306
-DB_APP_LOGIN=NOM_PROJET
+DB_APP_LOGIN=NOM_UTILISATEUR_APP
 DB_APP_PWD=mot_de_passe_app_local
 DB_POOL_SIZE=5
 ```
 
-`NOM_PROJET` n'est pas une valeur à garder telle quelle.
-Remplacez-la par les valeurs réelles générées dans votre projet.
+`NOM_BASE` et `NOM_UTILISATEUR_APP` ne sont pas des valeurs à garder telles quelles.
+Remplacez-les par les valeurs réelles générées dans votre projet (`DB_NAME` et `DB_APP_LOGIN`).
 Les mots de passe d'`env/dev` doivent correspondre exactement à ceux définis dans MariaDB.
 
 ---
