@@ -1,8 +1,26 @@
 # Logos Forge
 
-Ce paquet contient :
+Ce dossier contient les logos Forge déclinés en plusieurs tailles carrées, au format PNG transparent.
 
-- `originaux/` : les logos issus du ZIP d'origine fourni dans la conversation ;
-- `assets_generes/` : variantes et éléments générés pendant le travail graphique, dont le serveur Forge et les logos isolés.
+Chaque sous-dossier correspond à une taille :
 
-Note : certains fichiers générés avec un damier visible ne sont pas de vrais PNG transparents. Pour les prochaines illustrations Forge, la convention retenue est d'utiliser un fond de détourage uniforme et différenciant, avec indication de la couleur utilisée.
+- `1024x1024/`
+- `512x512/`
+- `256x256/`
+- `128x128/`
+- `64x64/`
+- `32x32/`
+- `16x16/`
+
+Chaque taille contient les mêmes logos :
+
+- `forge-1` à `forge-7` : variantes du logo principal ;
+- `forge-bandeau-1` et `forge-bandeau-2` : versions en bandeau ;
+- `serveur-forge` : illustration du serveur Forge.
+
+Les fichiers sont nommés `<logo>-<taille>.png`, par exemple `forge-1-512.png`.
+
+Tous les fichiers sont de vrais PNG transparents : canal alpha présent et fond réellement transparent.
+Ils sont générés à partir des exports Canva transparents, puis redimensionnés avec ImageMagick en toile carrée stricte (sortie `PNG32:`, fond `none`).
+
+La méthode complète est décrite dans la documentation, section « Outils », page « ImageMagick (logos transparents) ».
