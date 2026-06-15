@@ -7,6 +7,9 @@ Accepté — Forge 1.0.0-beta.15 (ticket `WELCOME-FORGE-LEVELS-ADR-028`).
 Généralise [ADR-025](025-welcome-forge-continuous-tutorial.md) (qui ne couvrait
 que le niveau débutant) et amende sa décision D3.
 
+Amendé le 2026-06-15 (`DOCS-WELCOME-FORGE-INDEX-001`) : le point d'entrée du
+parcours devient `index.md`, voir la section « Amendement » plus bas.
+
 ---
 
 ## Date
@@ -143,6 +146,38 @@ question des opt-ins est rouverte ensuite (D5).
 
 ---
 
+## Amendement (2026-06-15, `DOCS-WELCOME-FORGE-INDEX-001`)
+
+Cet amendement révise le point d'entrée fixé par **D4**.
+
+**Constat.** welcome-forge n'est pas un parcours opt-in : il n'installe aucune
+brique, il s'appuie sur le cœur de Forge déjà présent dès qu'un projet existe.
+Son ancien préambule `installation.md` réinstallait pourtant Forge et créait le
+projet, en doublon avec les guides d'installation (`poste-linux.md`,
+`windows-wsl.md`, `github.md`).
+Cette duplication contredit le principe 11 (une seule façon officielle de faire
+chaque chose) : Forge s'installe à un seul endroit, le guide d'installation.
+
+**Décision.**
+
+1. Le point d'entrée du parcours devient `index.md` (et non plus
+   `installation.md`).
+   `index.md` présente le parcours, pose comme **prérequis** un projet Forge
+   déjà créé via un guide d'installation, et propose une **vérification**
+   (`forge --version`, `forge doctor`) plutôt qu'une réinstallation.
+2. La page `installation.md` de welcome-forge est **supprimée** : la création du
+   projet n'appartient pas au parcours.
+3. **Convention de point d'entrée des starters** : un starter **opt-in** garde
+   une page `installation.md` (il installe réellement une brique) ; un starter
+   **hors opt-in** a une page `index.md` (présentation et vérification, le projet
+   étant un prérequis).
+   welcome-forge est aujourd'hui le seul starter hors opt-in.
+
+Le reste de l'ADR (tutoriel continu manuel, un mini-projet par niveau, D1 à D5)
+est inchangé.
+
+---
+
 ## Référence
 
 - ADR généralisé : [ADR-025](025-welcome-forge-continuous-tutorial.md)
@@ -153,7 +188,8 @@ question des opt-ins est rouverte ensuite (D5).
   (cet ADR), puis conversion du niveau intermédiaire, conversion du niveau
   avancé, et clôture (recapitulatif, index, contrat gelé, garde-fous transverses).
 - Code et docs concernés : `docs/starters/welcome-forge/intermediaire/`,
-  `docs/starters/welcome-forge/avance/`, `docs/starters/welcome-forge/installation.md`,
+  `docs/starters/welcome-forge/avance/`, `docs/starters/welcome-forge/index.md`
+  (point d'entrée depuis l'amendement du 2026-06-15),
   `docs/starters/welcome-forge/recapitulatif.md`, `docs/starters/index.md`,
   `forge_cli/starters/data/` (paliers intermédiaires et avancés).
 - Charte : `CHARTE_DOC.md` (principes 1, 2, 3, 4, 11 ; règle A).

@@ -129,7 +129,7 @@ nav:
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Progression pédagogique:
-          - Installation: starters/welcome-forge/installation.md
+          - Présentation: starters/welcome-forge/index.md
           - Débutant:
               - Bonjour Forge: starters/welcome-forge/debutant/welcome.md
               - Paramètres d'URL: starters/welcome-forge/debutant/query-params.md

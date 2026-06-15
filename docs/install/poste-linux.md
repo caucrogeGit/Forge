@@ -1,6 +1,6 @@
 # Installer Forge sur Linux et créer un projet
 
-[Accueil](../index.html)
+[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Cette page décrit le parcours complet pour préparer un poste Linux puis créer un nouveau projet Forge.
 
@@ -58,8 +58,6 @@ Vous n'avez pas besoin d'y aller pour terminer une installation standard.
 * Un poste Linux à jour, avec un accès `sudo`.
 * Une connexion réseau.
 * Un compte GitHub si vous souhaitez héberger le dépôt distant.
-
----
 
 ## Mode de lecture
 
@@ -127,8 +125,7 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     ---
 
     !!! success "Validation attendue"
-        `mariadb_config --version` répond.
-        Si ce n'est pas le cas, le connecteur Python MariaDB risque d'échouer.
+        `mariadb_config --version` répond. Si ce n'est pas le cas, le connecteur Python MariaDB risque d'échouer.
 
 ??? info "3. Activer pipx"
     **Objectif :** Rendre la commande `pipx` disponible dans le terminal courant.
@@ -190,8 +187,7 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     **Objectif :** Configurer l'identité Git globale du poste avant la création des commits.
 
     !!! warning "Attention"
-        `forge new` peut créer un commit initial.
-        Si Git n'a pas d'identité configurée, ce commit peut échouer.
+        `forge new` peut créer un commit initial. Si Git n'a pas d'identité configurée, ce commit peut échouer.
 
     Cette configuration identifie l'auteur des commits sur la machine.
     Elle est globale et ne concerne pas encore un projet précis.
@@ -327,8 +323,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     **Objectif :** Lire les valeurs réelles générées dans `env/dev` avant toute création de base ou de compte MariaDB.
 
     !!! warning "Attention"
-        Ne recopiez pas les valeurs d'un ancien projet.
-        Chaque projet Forge peut avoir ses propres noms de base et de comptes.
+        Ne recopiez pas les valeurs d'un ancien projet. Chaque projet Forge peut avoir ses propres noms de base et de comptes.
 
     `forge new` a généré le fichier de configuration de développement :
 
@@ -380,8 +375,9 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     * `DB_APP_PWD` est vide au départ et doit être complété.
     * Les comptes MariaDB créés plus loin doivent correspondre exactement à ce fichier.
 
-    !!! warning "À retenir"
-        Ne copiez pas un nom de projet d'exemple sans vérifier votre propre `env/dev`.
+    ```text
+    Ne copiez pas un nom de projet d'exemple sans vérifier votre propre env/dev.
+    ```
 
     ---
 
@@ -424,8 +420,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     **Objectif :** Publier le dépôt Git local du projet sur GitHub sans quitter la procédure principale.
 
     !!! warning "Attention"
-        Le dépôt GitHub doit être vide au moment du premier push.
-        Un README, un `.gitignore` ou une licence créés sur GitHub peuvent provoquer une divergence d'historique.
+        Le dépôt GitHub doit être vide au moment du premier push. Un README, un `.gitignore` ou une licence créés sur GitHub peuvent provoquer une divergence d'historique.
 
     Cette étape associe le dépôt Git local du projet Forge à un dépôt GitHub distant.
 
@@ -457,8 +452,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
         Si Git indique que le dossier n'est pas encore un dépôt, revenez à l'étape précédente pour initialiser le dépôt local avant de continuer.
 
-        Cette étape ne recrée pas le dépôt Git local.
-        Elle vérifie simplement qu'il est prêt à être relié à GitHub.
+        Cette étape ne recrée pas le dépôt Git local. Elle vérifie simplement qu'il est prêt à être relié à GitHub.
 
     ??? note "4.2 Choisir le protocole GitHub"
         GitHub peut être utilisé avec deux protocoles.
@@ -472,9 +466,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
         La suite de cette procédure utilise donc SSH comme chemin principal.
 
-        Si vous choisissez HTTPS, utilisez l'URL HTTPS du dépôt à la place de l'URL SSH.
-        GitHub ne s'authentifie pas avec le mot de passe du compte pour les opérations Git en HTTPS.
-        Il faut utiliser un jeton d'accès personnel lorsque Git demande le mot de passe.
+        Si vous choisissez HTTPS, utilisez l'URL HTTPS du dépôt à la place de l'URL SSH. GitHub ne s'authentifie pas avec le mot de passe du compte pour les opérations Git en HTTPS. Il faut utiliser un jeton d'accès personnel lorsque Git demande le mot de passe.
 
     ??? note "4.3 Vérifier l'authentification SSH GitHub"
         Avant de pousser le projet, GitHub doit reconnaître la machine depuis laquelle vous travaillez.
@@ -549,8 +541,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
         Le dépôt GitHub doit être vide.
 
-        Si GitHub crée un README ou une licence, il crée aussi un commit distant.
-        Ce commit peut bloquer le premier push car l'historique distant et l'historique local ne sont pas les mêmes.
+        Si GitHub crée un README ou une licence, il crée aussi un commit distant. Ce commit peut bloquer le premier push car l'historique distant et l'historique local ne sont pas les mêmes.
 
         Après création du dépôt, copiez l'URL SSH :
 
@@ -655,8 +646,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
             Pour `Username`, indiquez votre nom d'utilisateur GitHub.
 
-            Pour `Password`, n'indiquez pas le mot de passe du compte GitHub.
-            Utilisez un jeton d'accès personnel GitHub.
+            Pour `Password`, n'indiquez pas le mot de passe du compte GitHub. Utilisez un jeton d'accès personnel GitHub.
 
             Si l'authentification échoue, vérifiez :
 
@@ -787,49 +777,93 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
         Le projet est maintenant publié sur GitHub.
 
-    ---
+        ---
 
     !!! success "Validation attendue"
         Le dépôt local est relié à GitHub, `origin` pointe vers le bon dépôt et `main` suit `origin/main`.
 
-??? info "5. Créer la base et les comptes MariaDB du projet"
-    **Objectif :** Créer la base MariaDB du projet et les comptes nécessaires au fonctionnement local.
+??? info "5. Compléter env/dev"
+    **Objectif :** Renseigner la configuration MariaDB du projet avant de créer la base et les comptes.
 
     !!! warning "Attention"
-        Remplacez toujours `NOM_BASE`, `NOM_UTILISATEUR_APP` et les mots de passe par les valeurs réelles du projet.
+        `env/dev` contient des secrets de développement. Il ne doit pas être publié tel quel si votre projet le considère comme local.
 
     Cette étape appartient au projet.
-    Elle se refait pour chaque nouveau projet Forge, car chaque projet a sa base et son compte applicatif.
+    Elle se refait pour chaque nouveau projet Forge, car chaque projet possède sa propre base et son propre compte applicatif.
 
-    Ouvrez une console MariaDB administrateur :
+    Ouvrez le fichier `env/dev` :
 
     ```bash
-    sudo mariadb
+    nano env/dev
     ```
+
+    Complétez ou vérifiez les variables MariaDB suivantes :
+
+    ```env
+    DB_ADMIN_HOST=localhost
+    DB_ADMIN_PORT=3306
+    DB_ADMIN_LOGIN=forge_admin
+    DB_ADMIN_PWD=mot_de_passe_admin_local
+
+    DB_NAME=NOM_BASE
+    DB_CHARSET=utf8mb4
+    DB_COLLATION=utf8mb4_unicode_ci
+
+    DB_APP_HOST=localhost
+    DB_APP_PORT=3306
+    DB_APP_LOGIN=NOM_UTILISATEUR_APP
+    DB_APP_PWD=mot_de_passe_app_local
+    DB_POOL_SIZE=5
+    ```
+
+    Remplacez :
+
+    * `NOM_BASE` par le nom réel de la base du projet ;
+    * `NOM_UTILISATEUR_APP` par le nom réel du compte applicatif ;
+    * `mot_de_passe_admin_local` par le mot de passe local du compte `forge_admin` ;
+    * `mot_de_passe_app_local` par le mot de passe local du compte applicatif.
+
+    Le nom de la base et le nom du compte applicatif peuvent reprendre le nom du projet, à condition de rester cohérents dans toute la procédure.
+
+    À partir de maintenant, les valeurs de `env/dev` sont la référence.
+    L'étape suivante crée la base et les comptes MariaDB à partir de ces valeurs.
+
+    ---
+
+    !!! success "Validation attendue"
+        `env/dev` contient les valeurs définitives de `DB_NAME`, `DB_ADMIN_LOGIN`, `DB_ADMIN_PWD`, `DB_APP_LOGIN` et `DB_APP_PWD`.
+
+??? info "6. Créer la base et les comptes MariaDB du projet"
+    **Objectif :** Créer dans MariaDB la base et les comptes déclarés dans `env/dev`.
+
+    !!! warning "Attention"
+        Les valeurs utilisées dans MariaDB doivent correspondre exactement aux valeurs renseignées dans `env/dev`.
 
     Forge sépare trois niveaux d'accès :
 
     ```text
-    root                   → administration locale du serveur, avec sudo
-    forge_admin            → préparation de la base et application des migrations
-    NOM_UTILISATEUR_APP    → accès applicatif au runtime, en lecture/écriture
+    root                -> administration locale du serveur, avec sudo
+    forge_admin         -> préparation de la base et application des migrations
+    DB_APP_LOGIN        -> accès applicatif au runtime, en lecture/écriture
     ```
 
     `forge db:init` se connecte avec le compte indiqué dans `DB_ADMIN_LOGIN`.
     Ce compte doit déjà exister : Forge ne le crée pas.
     Le compte recommandé est `forge_admin`.
 
-    Dans un projet généré, `DB_APP_LOGIN` peut reprendre le nom du projet.
-    La valeur exacte à utiliser est celle présente dans `env/dev`.
+    Relisez d'abord les valeurs du projet :
 
-    Remplacez :
+    ```bash
+    grep -E '^(DB_NAME|DB_ADMIN_LOGIN|DB_APP_LOGIN)=' env/dev
+    ```
 
-    * `NOM_BASE` par la valeur réelle de `DB_NAME` ;
-    * `NOM_UTILISATEUR_APP` par la valeur réelle de `DB_APP_LOGIN` ;
-    * `mot_de_passe_admin_local` par le mot de passe choisi pour `DB_ADMIN_PWD` ;
-    * `mot_de_passe_app_local` par le mot de passe choisi pour `DB_APP_PWD`.
+    Ouvrez ensuite une console MariaDB administrateur :
 
-    Exécutez ensuite les commandes SQL suivantes :
+    ```bash
+    sudo mariadb
+    ```
+
+    Exécutez les commandes SQL suivantes en remplaçant les valeurs par celles de `env/dev` :
 
     ```sql
     CREATE DATABASE IF NOT EXISTS `NOM_BASE`
@@ -863,53 +897,17 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
     Précisions :
 
-    * Si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` ``.
-    * Si `DB_APP_LOGIN` contient un tiret, gardez les quotes SQL : `'mon-projet'@'localhost'`.
-
-    Pour la justification des droits et leur vérification, voir [Comptes MariaDB d'un projet](mariadb-comptes.md).
-
-    ---
-
-    !!! success "Validation attendue"
-        La base, le compte `forge_admin` et le compte applicatif existent dans MariaDB.
-
-??? info "6. Compléter env/dev"
-    **Objectif :** Compléter `env/dev` avec les mots de passe MariaDB réellement créés.
-
-    !!! warning "Attention"
-        `env/dev` contient des secrets de développement.
-        Il ne doit pas être publié tel quel si votre projet le considère comme local.
-
-    Renseignez maintenant les mots de passe dans `env/dev`, à l'identique des comptes créés.
-
-    Exemple générique, cohérent avec les commandes SQL ci-dessus :
-
-    ```env
-    DB_ADMIN_HOST=localhost
-    DB_ADMIN_PORT=3306
-    DB_ADMIN_LOGIN=forge_admin
-    DB_ADMIN_PWD=mot_de_passe_admin_local
-
-    DB_NAME=NOM_BASE
-    DB_CHARSET=utf8mb4
-    DB_COLLATION=utf8mb4_unicode_ci
-
-    DB_APP_HOST=localhost
-    DB_APP_PORT=3306
-    DB_APP_LOGIN=NOM_UTILISATEUR_APP
-    DB_APP_PWD=mot_de_passe_app_local
-    DB_POOL_SIZE=5
-    ```
-
-    `NOM_BASE` et `NOM_UTILISATEUR_APP` ne sont pas des valeurs à garder telles quelles.
-    Ils doivent être remplacés par les valeurs présentes dans votre propre fichier `env/dev`.
-
-    Les mots de passe d'`env/dev` doivent correspondre exactement à ceux définis dans MariaDB.
+    * `NOM_BASE` doit reprendre exactement la valeur de `DB_NAME` ;
+    * `NOM_UTILISATEUR_APP` doit reprendre exactement la valeur de `DB_APP_LOGIN` ;
+    * `mot_de_passe_admin_local` doit reprendre exactement la valeur de `DB_ADMIN_PWD` ;
+    * `mot_de_passe_app_local` doit reprendre exactement la valeur de `DB_APP_PWD` ;
+    * si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` `` ;
+    * si `DB_APP_LOGIN` contient un tiret, gardez les quotes SQL : `'mon-projet'@'localhost'`.
 
     ---
 
     !!! success "Validation attendue"
-        Les mots de passe renseignés dans `env/dev` correspondent exactement aux mots de passe créés dans MariaDB.
+        La base, le compte `forge_admin` et le compte applicatif existent dans MariaDB, avec les mêmes valeurs que celles déclarées dans `env/dev`.
 
 ??? info "7. Vérifier le projet avec forge doctor"
     **Objectif :** Diagnostiquer le projet avec `forge doctor` avant l'initialisation de la base.
@@ -929,8 +927,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     **Objectif :** Initialiser la base Forge et préparer la table technique des migrations.
 
     !!! warning "Attention"
-        Sur Debian, Ubuntu et dérivées, le compte `root` MariaDB utilise souvent `unix_socket`.
-        Le compte recommandé pour Forge reste `forge_admin`.
+        Sur Debian, Ubuntu et dérivées, le compte `root` MariaDB utilise souvent `unix_socket`. Le compte recommandé pour Forge reste `forge_admin`.
 
     ```bash
     forge db:init
@@ -962,65 +959,110 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     !!! success "Validation attendue"
         `forge db:init` se termine sans erreur et la table technique des migrations est prête.
 
-??? info "9. Appliquer les migrations"
-    **Objectif :** Appliquer les migrations SQL du projet et vérifier leur état.
+??? info "9. Lancer le serveur de développement"
+    Objectif : démarrer le serveur Forge en mode développement et ouvrir le projet dans le navigateur.
+
+    Avant de lancer le serveur, vérifiez le port configuré dans `env/dev`.
 
     ```bash
-    forge db:apply
+    grep -E "^APP_PORT=" env/dev
     ```
 
-    Cette commande applique le SQL du projet sur la base.
-    Comme `db:init`, elle modifie la structure : elle se connecte avec `DB_ADMIN_*`, pas avec le compte applicatif.
+    Exemple attendu :
 
-    Vérifiez l'état des migrations :
-
-    ```bash
-    forge migration:status
+    ```text
+    APP_PORT=8000
     ```
 
-    ---
+    Le serveur de développement utilisera ce port au démarrage.
 
-    !!! success "Validation attendue"
-        `forge migration:status` affiche l'état attendu des migrations.
+    Si le port est déjà utilisé par une autre application, modifiez la valeur dans `env/dev`, par exemple :
 
-??? info "10. Lancer le serveur de développement"
-    **Objectif :** Démarrer le serveur de développement Forge.
+    ```env
+    APP_PORT=8001
+    ```
+
+    Lancez ensuite le serveur :
 
     ```bash
     forge run
     ```
 
-    Par défaut, `forge run` démarre le projet en mode développement.
+    Ouvrez le projet dans le navigateur en utilisant le port configuré :
 
-    ---
-
-    !!! success "Validation attendue"
-        `forge run` démarre le serveur de développement.
-
-??? info "11. Vérification finale du projet"
-    **Objectif :** Contrôler que le projet est installé, configuré et fonctionnel.
-
-    Dans le projet Forge :
-
-    ```bash
-    forge doctor
-    forge migration:status
-    forge run
+    ```text
+    http://127.0.0.1:8000
     ```
 
-    Si ces commandes passent, le projet est installé et fonctionnel.
-    Les étapes 8 et 9 (`forge db:init`, `forge db:apply`) restent les commandes qui préparent réellement la base ; elles n'ont pas à être relancées ici comme simples vérifications.
+    Si vous avez modifié `APP_PORT`, adaptez l'adresse.
 
-    ---
+    Exemple :
+
+    ```text
+    http://127.0.0.1:8001
+    ```
 
     !!! success "Validation attendue"
-        `forge doctor`, `forge migration:status` et `forge run` confirment que le projet est exploitable.
+        La page d'accueil du projet Forge doit s'afficher dans le navigateur.
+
+        Le port utilisé dans l'URL doit correspondre à la valeur configurée dans `env/dev`.
+
+    ??? failure "En cas d'erreur : le port est déjà utilisé"
+        Si le terminal indique que le port est déjà utilisé, choisissez un autre port dans `env/dev`.
+
+        Exemple :
+
+        ```env
+        APP_PORT=8001
+        ```
+
+        Relancez ensuite le serveur :
+
+        ```bash
+        forge run
+        ```
+
+        Ouvrez enfin l'adresse correspondante dans le navigateur :
+
+        ```text
+        http://127.0.0.1:8001
+        ```
+
+!!! success "Validation finale"
+    Le projet Forge est correctement installé si :
+
+    * le serveur démarre avec `forge run` ;
+    * le port utilisé correspond à la valeur `APP_PORT` configurée dans `env/dev` ;
+    * la page d'accueil du projet s'affiche dans le navigateur ;
+    * aucune erreur bloquante n'apparaît dans le terminal.
+
+    Le projet est maintenant prêt pour le développement.
 
 ## Poursuivre
 
-* [Préparer MariaDB](mariadb.md) : installation détaillée et dépannage de MariaDB.
-* [Comptes MariaDB d'un projet](mariadb-comptes.md) : séparation des comptes, droits et vérifications.
-* [Migrations SQL](../features/migrations.md) : cycle complet des migrations Forge.
-* [Installer les opt-ins Forge](opt-ins.md) : ajouter les extensions officielles.
-* [Préparer un déploiement en production](production.md) : prérequis serveur, WSGI et reverse proxy.
-* [Installer Forge depuis les sources GitHub](github.md) : travailler depuis le dépôt source pour contribuer.
+Votre projet Forge est maintenant installé, configuré et lancé.
+
+La suite logique est de suivre le parcours du starter **Welcome Forge**.
+Il sert à prendre en main un projet Forge réel, étape par étape, sans partir directement dans les sujets avancés.
+
+Vous y verrez notamment :
+
+* l'organisation d'un projet Forge ;
+* le rôle des routes ;
+* le rôle des contrôleurs ;
+* le rôle des vues ;
+* l'utilisation de `forge run` ;
+* les premières modifications à réaliser dans le projet.
+
+Commencer le parcours : [Welcome Forge](../starters/welcome-forge/index.md)
+
+## Approfondir 
+
+Après le parcours Welcome Forge, vous pourrez revenir vers les pages techniques selon vos besoins :
+
+* [Préparer MariaDB](mariadb.md) : installation détaillée et dépannage.
+* [Comptes MariaDB d'un projet](mariadb-comptes.md) : comptes, droits et vérifications.
+* [Migrations SQL](../features/migrations.md) : cycle des migrations Forge.
+* [Installer les opt-ins Forge](opt-ins.md) : extensions officielles du framework.
+* [Préparer un déploiement en production](production.md) : serveur, WSGI et reverse proxy.
+* [Installer Forge depuis les sources GitHub](github.md) : contribuer ou travailler depuis le dépôt source.
