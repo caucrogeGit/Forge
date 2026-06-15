@@ -121,6 +121,7 @@ nav:
   - Outils:
       - Génération PDF: features/pdf.md
       - Module média: features/media.md
+      - ImageMagick (logos transparents): features/imagemagick-logos.md
 
   - Modules et starters:
       - Vue d'ensemble des starters: starters/index.md
