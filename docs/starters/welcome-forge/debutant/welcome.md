@@ -15,6 +15,10 @@ Il se poursuit ensuite avec un `MessageController`, qui introduit les formulaire
 
 À la fin du niveau débutant, vous aurez construit un mini-projet complet, simple mais réel, capable d'afficher des pages, de recevoir des données utilisateur, de les valider et de les enregistrer en base.
 
+Pour ce premier palier, le cycle d'une requête `/welcome` se résume ainsi :
+
+![Cycle d'une requête /welcome : le navigateur envoie GET /welcome, la route mène au WelcomeController, qui retourne Response.text("Bonjour Forge"), renvoyée en 200 OK](welcome.png)
+
 ??? note "Documentation utile"
     Pour bien comprendre ce palier :
 
@@ -86,13 +90,15 @@ Il se poursuit ensuite avec un `MessageController`, qui introduit les formulaire
     Bonjour Forge
     ```
 
-??? note "À retenir"
-    - Une URL est associée à une route.
-    - Une route appelle une action de contrôleur.
-    - Une action reçoit un objet `Request`.
-    - Une action retourne un objet `Response`.
-    - `Response.text(...)` renvoie du texte brut, sans vue HTML.
 
-Au palier suivant, votre contrôleur va lire une valeur passée dans l'adresse.
+## À retenir
+- Une URL est associée à une route.
+- Une route appelle une action de contrôleur.
+- Une action reçoit un objet `Request`.
+- Une action retourne un objet `Response`.
+- `Response.text(...)` renvoie du texte brut, sans vue HTML.
+
+## Palier suivant
+Votre contrôleur va lire une valeur passée dans l'adresse.
 
 [Continuer avec Paramètres d'URL](query-params.md)
