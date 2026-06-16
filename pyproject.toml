@@ -87,6 +87,8 @@ include = ["core*", "forge_cli*", "integrations*"]
     "skeleton/data/.*",
     "skeleton/data/.*/**/*",   # fichiers DANS les dossiers dot (.vscode/…),
 ]
+# PEP 561 : expose les types du cœur aux projets utilisateurs (ADR-036).
+"core" = ["py.typed"]
 
 [tool.setuptools.exclude-package-data]
 # PKG-WHEEL-NO-PYC-001 — exclusion globale du bytecode compilé : avec
@@ -102,6 +104,14 @@ include = ["core*", "forge_cli*", "integrations*"]
     "skeleton/data/**/*.pyc",
     "skeleton/data/**/*.pyo",
 ]
+
+[tool.pyright]
+# ADR-036 — typage statique du cœur vérifié en CI. Périmètre actuel du cliquet :
+# core/ (à 0 erreur en mode basic). integrations/ et les opt-ins suivront,
+# chacun passant ensuite en strict (`# pyright: strict`) module par module.
+include = ["core"]
+typeCheckingMode = "basic"
+pythonVersion = "3.12"
 
 [tool.ruff]
 target-version = "py312"

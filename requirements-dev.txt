@@ -8,6 +8,7 @@ mkdocs-material>=9.7
 pymdown-extensions>=10.0
 pip-audit>=2.0
 ruff>=0.4
+pyright>=1.1.400
 
 # Modules opt-in Forge, installés en mode éditable depuis le monorepo.
 # Sans ces lignes, les tests qui importent forge_mvc_mfa, forge_mvc_rbac,

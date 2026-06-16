@@ -36,6 +36,9 @@ jobs:
       - name: Ruff
         run: ruff check .
 
+      - name: Type check (pyright)
+        run: pyright
+
       - name: Run tests
         run: python -m pytest
 

@@ -5,6 +5,16 @@
 
 ### Ajouté
 
+- **Typage statique du cœur vérifié en CI (pyright) + `py.typed`**
+  (`ADR-036`, `CORE-TYPING-PYRIGHT-BASELINE-001`). `core/` passe désormais
+  **pyright en mode basic à 0 erreur** (41 corrigées : annotations correctes —
+  `Response.__init__`, `html()`, `core.forge.get -> Any`, `db.fetch_one/execute`,
+  `is_valid_slug` — et gardes de type — `get_session`, `sql_loader`, parsing
+  multipart). Le cœur **expose ses types** via `core/py.typed` (PEP 561, inclus
+  au wheel) : un projet `forge new` bénéficie de l'autocomplétion et de la
+  vérification du cœur. Une étape `pyright` est ajoutée à la CI. Cliquet à venir
+  (ADR-036) : `integrations` et les opt-ins, puis passage `strict` module par
+  module ; à terme, l'override `reportUnknown*` du squelette devient inutile.
 - **DX VS Code dès `forge new` : schémas JSON cœur et auto-import des classes**
   (`SKELETON-VSCODE-DX-001`). Le squelette embarque désormais les schémas
   **cœur** (`schemas/` : entity, field, common, relations, pivot) et un
