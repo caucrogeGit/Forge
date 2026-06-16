@@ -36,11 +36,26 @@ Ouvrez `https://localhost:8000/stats-track-sql` : l'`INSERT` et ses valeurs.
 
 ```python
 # mvc/controllers/stats_track_sql_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_stats import get_track_event_sql, make_event, prepare_track_event_values
 
-event = make_event("page_view", "Vue de page", "navigation", {"path": "/"})
-sql = get_track_event_sql()
-values = prepare_track_event_values(event)   # ('page_view', 'Vue de page', 'navigation', '{"path": "/"}')
+
+class StatsTrackSqlController(BaseController):
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        event = make_event("page_view", "Vue de page", "navigation", {"path": "/"})
+        return BaseController.render(
+            "stats_track_sql/index.html",
+            context={
+                "sql": get_track_event_sql(),
+                "values": list(prepare_track_event_values(event)),
+            },
+            request=request,
+        )
 ```
 
 ### Comprendre ce code
@@ -48,6 +63,45 @@ values = prepare_track_event_values(event)   # ('page_view', 'Vue de page', 'nav
 - Le SQL est **paramétré** (`?`) : les valeurs ne sont jamais concaténées (anti-injection).
 - Les **métadonnées** (dict) sont sérialisées en JSON pour tenir dans une colonne texte.
 - Voir le SQL avant de l'exécuter rend le comportement transparent (SQL visible).
+
+## La vue
+
+```html
+<!-- mvc/views/stats_track_sql/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Le SQL d'insertion — Forge</title>
+</head>
+<body>
+  <h1>Le SQL d'insertion</h1>
+
+  <p>Requête <code>INSERT</code> paramétrée (SQL visible) :</p>
+  <pre><code>{{ sql }}</code></pre>
+
+  <p>Valeurs pour l'événement de démo :</p>
+  <ul>
+    {% for value in values %}<li><code>{{ value }}</code></li>{% endfor %}
+  </ul>
+
+  <p>Les <code>?</code> sont des paramètres liés (anti-injection) ; les métadonnées
+  sont sérialisées en JSON.</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et la route dans le groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.stats_track_sql_controller import StatsTrackSqlController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-track-sql", StatsTrackSqlController.index, name="stats_track_sql_index")
+```
 
 ## À retenir
 

@@ -36,6 +36,10 @@ Ouvrez `https://localhost:8000/stats-track` : la requête capturée par l'exécu
 
 ```python
 # mvc/controllers/stats_track_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_stats import make_event, track_event
 
 
@@ -44,12 +48,17 @@ class StatsTrackController(BaseController):
     @staticmethod
     def index(request: Request) -> Response:
         captured = []
+
         def _demo_execute(sql, params):
             captured.append({"sql": sql, "params": list(params)})
             return 1
+
         event = make_event("page_view", "Vue de page", "navigation", {"path": "/"})
         track_event(_demo_execute, event)
         # en production : track_event(core.database.db.execute, event)
+        return BaseController.render(
+            "stats_track/index.html", context={"executed": captured[0]}, request=request
+        )
 ```
 
 ### Comprendre ce code
@@ -58,6 +67,46 @@ class StatsTrackController(BaseController):
   MariaDB, branché en une ligne en production.
 - Le même motif que la résolution RBAC (`fetch_all` injecté) : le code métier reste pur.
 - En production : `track_event(core.database.db.execute, event)`.
+
+## La vue
+
+```html
+<!-- mvc/views/stats_track/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Enregistrer un événement — Forge</title>
+</head>
+<body>
+  <h1>Enregistrer un événement</h1>
+
+  <p data-level="success">Événement enregistré (via un exécuteur de démonstration).</p>
+
+  <p>Requête exécutée :</p>
+  <pre><code>{{ executed.sql }}</code></pre>
+  <p>Paramètres :</p>
+  <ul>
+    {% for param in executed.params %}<li><code>{{ param }}</code></li>{% endfor %}
+  </ul>
+
+  <p>En production, on passe <code>core.database.db.execute</code> à
+  <code>track_event</code> ; l'exécuteur injectable rend le code testable sans base.</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et la route dans le groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.stats_track_controller import StatsTrackController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-track", StatsTrackController.index, name="stats_track_index")
+```
 
 ## À retenir
 

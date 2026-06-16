@@ -37,14 +37,23 @@ Ouvrez `https://localhost:8000/stats-list` : les événements de démo en JSON.
 
 ```python
 # mvc/controllers/stats_list_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_stats import list_stats_events
 
-_DEMO_ROWS = [{"id": 1, "name": "page_view", "label": "Vue de page", "category": "navigation",
-               "metadata": '{"path": "/"}', "created_at": "2026-01-01T10:00:00"}]
+# Lignes que renverrait la base (metadata est une chaîne JSON, comme en SQL).
+_DEMO_ROWS = [
+    {"id": 1, "name": "page_view", "label": "Vue de page", "category": "navigation",
+     "metadata": '{"path": "/"}', "created_at": "2026-01-01T10:00:00"},
+    {"id": 2, "name": "user_signup", "label": "Inscription", "category": "auth",
+     "metadata": "{}", "created_at": "2026-01-01T11:00:00"},
+]
 
 
 def _demo_fetch_all(sql, params):
-    return _DEMO_ROWS   # au lieu d'interroger la base
+    return _DEMO_ROWS
 
 
 class StatsListController(BaseController):
@@ -62,6 +71,18 @@ class StatsListController(BaseController):
 - Les **métadonnées** reviennent en **dict** (désérialisées du JSON stocké) — prêtes à
   l'usage, sans retraitement côté appelant.
 - En production : `list_stats_events(core.database.db.fetch_all, ...)`.
+
+## La route
+
+Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et la route dans le groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.stats_list_controller import StatsListController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-list", StatsListController.index, name="stats_list_index")
+```
 
 ## À retenir
 

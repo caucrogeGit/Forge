@@ -38,10 +38,18 @@ Ouvrez `https://localhost:8000/stats-welcome` puis `/stats-welcome/inspect`.
 
 ```python
 # mvc/controllers/stats_welcome_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_stats import STATS_EVENTS_COLUMNS, STATS_EVENTS_TABLE, make_event
 
 
 class StatsWelcomeController(BaseController):
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return Response.text("Bonjour Forge Stats")
 
     @staticmethod
     def inspect(request: Request) -> Response:
@@ -49,7 +57,12 @@ class StatsWelcomeController(BaseController):
         return Response.json({
             "table": STATS_EVENTS_TABLE,
             "columns": list(STATS_EVENTS_COLUMNS),
-            "demo_event": {"name": event.name, "category": event.category, "metadata": event.metadata},
+            "demo_event": {
+                "name": event.name,
+                "label": event.label,
+                "category": event.category,
+                "metadata": event.metadata,
+            },
         })
 ```
 
@@ -60,6 +73,19 @@ class StatsWelcomeController(BaseController):
 - Le stockage est explicite (`STATS_EVENTS_TABLE`, colonnes) : Forge Stats est à
   **SQL visible**, sans ORM.
 - `make_event` valide à la construction (le nom doit être valide).
+
+## La route
+
+Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et les routes dans le groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.stats_welcome_controller import StatsWelcomeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-welcome", StatsWelcomeController.index, name="stats_welcome_index")
+    public.add("GET", "/stats-welcome/inspect", StatsWelcomeController.inspect, name="stats_welcome_inspect")
+```
 
 ## À retenir
 

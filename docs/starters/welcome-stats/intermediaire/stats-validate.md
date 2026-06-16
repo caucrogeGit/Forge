@@ -38,7 +38,13 @@ Ouvrez `https://localhost:8000/stats-validate?name=page_view` (valide) puis
 
 ```python
 # mvc/controllers/stats_validate_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_stats import StatsEventError, make_event, validate_event
+
+_DEMO_NAME = "page_view"
 
 
 def _validate_view(name: str) -> dict:
@@ -48,6 +54,16 @@ def _validate_view(name: str) -> dict:
         return {"input": name, "valid": True, "name": event.name, "error": None}
     except StatsEventError as exc:
         return {"input": name, "valid": False, "name": None, "error": str(exc)}
+
+
+class StatsValidateController(BaseController):
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        name = request.query("name") or _DEMO_NAME
+        return BaseController.render(
+            "stats_validate/index.html", context=_validate_view(name), request=request
+        )
 ```
 
 ### Comprendre ce code
@@ -57,6 +73,48 @@ def _validate_view(name: str) -> dict:
 - `validate_event` permet de re-vérifier un événement reçu d'ailleurs (désérialisé,
   par exemple).
 - Refuser tôt = pas de données invalides en base.
+
+## La vue
+
+```html
+<!-- mvc/views/stats_validate/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Valider un événement — Forge</title>
+</head>
+<body>
+  <h1>Valider un événement</h1>
+
+  <form method="get" action="/stats-validate">
+    <input type="text" name="name" value="{{ input }}" size="40">
+    <button type="submit">Construire & valider</button>
+  </form>
+
+  {% if valid %}
+  <p data-level="success">✓ Événement valide : <code>{{ name }}</code>.</p>
+  {% else %}
+  <p data-level="error">✗ Refusé : {{ error }}</p>
+  {% endif %}
+
+  <p>Essayez <code>page_view</code> (valide) puis <code>page.view</code> (refusé avant
+  toute écriture).</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et la route dans le groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.stats_validate_controller import StatsValidateController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-validate", StatsValidateController.index, name="stats_validate_index")
+```
 
 ## À retenir
 

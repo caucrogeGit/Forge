@@ -35,13 +35,37 @@ Ouvrez `https://localhost:8000/stats-normalize` : la ligne brute et sa version n
 
 ```python
 # mvc/controllers/stats_normalize_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_stats import normalize_stats_event_row
 
-_RAW_ROW = {"id": 1, "name": "page_view", "label": "Vue de page", "category": "navigation",
-            "metadata": '{"path": "/", "ref": "home"}', "created_at": "2026-01-01T10:00:00"}
+_RAW_ROW = {
+    "id": 1,
+    "name": "page_view",
+    "label": "Vue de page",
+    "category": "navigation",
+    "metadata": '{"path": "/", "ref": "home"}',
+    "created_at": "2026-01-01T10:00:00",
+}
 
-normalized = normalize_stats_event_row(dict(_RAW_ROW))
-# normalized["metadata"] est un dict, plus une chaîne
+
+class StatsNormalizeController(BaseController):
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        normalized = normalize_stats_event_row(dict(_RAW_ROW))
+        # normalized["metadata"] est un dict, plus une chaîne
+        return BaseController.render(
+            "stats_normalize/index.html",
+            context={
+                "raw_metadata": _RAW_ROW["metadata"],
+                "normalized_metadata": normalized["metadata"],
+                "name": normalized["name"],
+            },
+            request=request,
+        )
 ```
 
 ### Comprendre ce code
@@ -51,6 +75,44 @@ normalized = normalize_stats_event_row(dict(_RAW_ROW))
 - La validation **refuse** une ligne incomplète ou un JSON invalide (`StatsAdminError`)
   plutôt que de propager des données douteuses.
 - Le résultat est directement utilisable dans une vue ou une API.
+
+## La vue
+
+```html
+<!-- mvc/views/stats_normalize/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Normaliser une ligne — Forge</title>
+</head>
+<body>
+  <h1>Normaliser une ligne</h1>
+
+  <p>Événement : <code>{{ name }}</code></p>
+
+  <ul>
+    <li>Métadonnées brutes (chaîne JSON, telles qu'en base) : <code>{{ raw_metadata }}</code></li>
+    <li>Métadonnées normalisées (dict, prêtes à afficher) : <code>{{ normalized_metadata }}</code></li>
+  </ul>
+
+  <p>La normalisation désérialise le JSON et valide la ligne : un JSON invalide ou une
+  colonne manquante est refusé (<code>StatsAdminError</code>).</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et la route dans le groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.stats_normalize_controller import StatsNormalizeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-normalize", StatsNormalizeController.index, name="stats_normalize_index")
+```
 
 ## À retenir
 

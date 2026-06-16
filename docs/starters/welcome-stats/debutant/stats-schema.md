@@ -37,6 +37,10 @@ Ouvrez `https://localhost:8000/stats-schema` : le `CREATE TABLE` exact s'affiche
 
 ```python
 # mvc/controllers/stats_schema_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_stats import STATS_EVENTS_COLUMNS, STATS_EVENTS_TABLE, get_stats_events_schema_sql
 
 
@@ -44,11 +48,15 @@ class StatsSchemaController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return BaseController.render("stats_schema/index.html", context={
-            "table": STATS_EVENTS_TABLE,
-            "columns": list(STATS_EVENTS_COLUMNS),
-            "schema_sql": get_stats_events_schema_sql(),
-        }, request=request)
+        return BaseController.render(
+            "stats_schema/index.html",
+            context={
+                "table": STATS_EVENTS_TABLE,
+                "columns": list(STATS_EVENTS_COLUMNS),
+                "schema_sql": get_stats_events_schema_sql(),
+            },
+            request=request,
+        )
 ```
 
 ### Comprendre ce code
@@ -57,6 +65,41 @@ class StatsSchemaController(BaseController):
   (charte principe 5, « garder SQL visible »).
 - Exposer le SQL plutôt qu'un ORM rend le comportement auditable et prévisible.
 - L'application applique ce `CREATE TABLE` une fois (migration), puis Forge Stats y écrit.
+
+## La vue
+
+```html
+<!-- mvc/views/stats_schema/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Le schéma SQL — Forge</title>
+</head>
+<body>
+  <h1>Le schéma SQL</h1>
+
+  <p>Table : <code>{{ table }}</code> — colonnes : <code>{{ columns | join(', ') }}</code></p>
+
+  <p>Le <code>CREATE TABLE</code> exact (SQL visible, aucun ORM) :</p>
+  <pre><code>{{ schema_sql }}</code></pre>
+
+  <p>Vous lisez le schéma réel : Forge ne cache rien derrière un ORM (charte principe 5).</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et la route dans le groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.stats_schema_controller import StatsSchemaController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/stats-schema", StatsSchemaController.index, name="stats_schema_index")
+```
 
 ## À retenir
 
