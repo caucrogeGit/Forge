@@ -1,6 +1,6 @@
 # Vérifier un code TOTP
 
-Objectif : confronter un **code à 6 chiffres** au secret partagé — le contrôle au
+Objectif : confronter un **code à 6 chiffres** au secret partagé, le contrôle au
 cœur du TOTP.
 
 **Ce que vous allez apprendre :** `verify_totp_code(secret, code)` vérifie le code
@@ -38,21 +38,87 @@ le code calculé par votre application d'authentification).
 
 ```python
 # mvc/controllers/mfa_verify_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_mfa import verify_totp_code
 
 
 class MfaVerifyController(BaseController):
+    """Starter pédagogique : vérifier un code TOTP contre un secret."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return BaseController.render(
+            "mfa_verify/index.html",
+            context={"csrf_token": BaseController.csrf_token(request)},
+            request=request,
+        )
 
     @staticmethod
     def check(request: Request) -> Response:
         secret = (request.form("secret") or "").strip()
         code = (request.form("code") or "").strip()
         context = {"csrf_token": BaseController.csrf_token(request), "secret": secret}
+        if not secret or not code:
+            context["error"] = "Renseignez le secret et le code."
+            return BaseController.render("mfa_verify/index.html", context=context, request=request)
         try:
             context["valid"] = bool(verify_totp_code(secret, code))
         except Exception as exc:
             context["error"] = f"Secret invalide : {exc}"
         return BaseController.render("mfa_verify/index.html", context=context, request=request)
+```
+
+## La vue
+
+```html
+<!-- mvc/views/mfa_verify/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vérifier un code TOTP - Forge</title>
+</head>
+<body>
+  <h1>Vérifier un code TOTP</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if valid is defined and valid %}
+  <p data-level="success">✓ Code valide.</p>
+  {% elif valid is defined and not valid %}
+  <p data-level="error">✗ Code invalide ou expiré.</p>
+  {% endif %}
+
+  <form method="post" action="/mfa-verify">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Secret base32
+      <input type="text" name="secret" value="{{ secret or '' }}" required>
+    </label>
+    <label>Code à 6 chiffres
+      <input type="text" name="code" inputmode="numeric" pattern="[0-9]*" required>
+    </label>
+    <button type="submit">Vérifier</button>
+  </form>
+
+  <p>Utilisez le secret du palier précédent dans une application d'authentification,
+  puis saisissez le code affiché.</p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.mfa_verify_controller import MfaVerifyController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/mfa-verify", MfaVerifyController.index, name="mfa_verify_index")
+    public.add("POST", "/mfa-verify", MfaVerifyController.check, name="mfa_verify_check")
 ```
 
 ### Comprendre ce code

@@ -36,19 +36,125 @@ forge run
 Ouvrez `https://localhost:8000/mfa-recovery` : un lot de codes s'affiche ; saisissez-en
 un pour le consommer.
 
-## Le contrôleur (extrait)
+## Le contrôleur
 
 ```python
 # mvc/controllers/mfa_recovery_controller.py
-from forge_mvc_mfa import AuthMfaRecoveryCode, consume_recovery_code, create_recovery_codes, verify_recovery_code
+import dataclasses
 
-setup = create_recovery_codes(_DEMO_USER_ID)   # setup.raw_codes (affichés), setup.code_records (stockés)
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+from core.security.session import get_session, get_session_id
+from core.sessions.manager import get_session_store
 
-for data in records:
-    record = AuthMfaRecoveryCode(**data)
-    if verify_recovery_code(code, record.code_hash):
-        consume_recovery_code(code, record)
-        break
+from forge_mvc_mfa import (
+    AuthMfaRecoveryCode,
+    consume_recovery_code,
+    create_recovery_codes,
+    verify_recovery_code,
+)
+
+_DEMO_USER_ID = 1
+_SESSION_KEY = "mfa_recovery_records"
+_COOKIE = "session_id={sid}; Path=/; HttpOnly; SameSite=Strict; Secure"
+
+
+def _ensure_session(request):
+    store = get_session_store()
+    sid = get_session_id(request)
+    session = get_session(sid) if sid else None
+    if not session:
+        sid = store.create()
+        session = get_session(sid)
+    return store, sid, session
+
+
+def _render(request, sid, context):
+    response = BaseController.render("mfa_recovery/index.html", context=context, request=request)
+    response.headers["Set-Cookie"] = _COOKIE.format(sid=sid)
+    return response
+
+
+class MfaRecoveryController(BaseController):
+    """Starter pédagogique : générer et consommer des codes de récupération."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        store, sid, session = _ensure_session(request)
+        setup = create_recovery_codes(_DEMO_USER_ID)
+        store.set(sid, {**session, _SESSION_KEY: [dataclasses.asdict(r) for r in setup.code_records]})
+        return _render(request, sid, {
+            "csrf_token": BaseController.csrf_token(request),
+            "codes": list(setup.raw_codes),
+        })
+
+    @staticmethod
+    def consume(request: Request) -> Response:
+        store, sid, session = _ensure_session(request)
+        context = {"csrf_token": BaseController.csrf_token(request)}
+        records = (session or {}).get(_SESSION_KEY) or []
+        code = (request.form("code") or "").strip()
+        for data in records:
+            record = AuthMfaRecoveryCode(**data)
+            if verify_recovery_code(code, record.code_hash):
+                consumed = consume_recovery_code(code, record)
+                context["consumed"] = consumed is not None
+                break
+        else:
+            context["consumed"] = False
+        return _render(request, sid, context)
+```
+
+## La vue
+
+```html
+<!-- mvc/views/mfa_recovery/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Codes de récupération - Forge</title>
+</head>
+<body>
+  <h1>Codes de récupération</h1>
+
+  {% if codes %}
+  <p>Codes générés (à conserver hors ligne, montrés <strong>une seule fois</strong>) :</p>
+  <ul>
+    {% for code in codes %}<li><code>{{ code }}</code></li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if consumed is defined and consumed %}
+  <p data-level="success">✓ Code de récupération consommé (usage unique).</p>
+  {% elif consumed is defined and not consumed %}
+  <p data-level="error">✗ Code inconnu ou déjà utilisé.</p>
+  {% endif %}
+
+  <form method="post" action="/mfa-recovery">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Code de récupération
+      <input type="text" name="code" required>
+    </label>
+    <button type="submit">Consommer</button>
+  </form>
+
+  <p>Les codes sont stockés <strong>hachés</strong> (jamais en clair). En production,
+  on les persiste dans <code>auth_mfa_recovery_codes</code>.</p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.mfa_recovery_controller import MfaRecoveryController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/mfa-recovery", MfaRecoveryController.index, name="mfa_recovery_index")
+    public.add("POST", "/mfa-recovery", MfaRecoveryController.consume, name="mfa_recovery_consume")
 ```
 
 ### Comprendre ce code

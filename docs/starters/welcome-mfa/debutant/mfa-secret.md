@@ -39,16 +39,60 @@ Rechargez pour en générer un nouveau.
 
 ```python
 # mvc/controllers/mfa_secret_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_mfa import generate_totp_secret, totp_provisioning_uri
 
 
 class MfaSecretController(BaseController):
+    """Starter pédagogique : générer un secret TOTP et son URI de provisioning."""
 
     @staticmethod
     def index(request: Request) -> Response:
         secret = generate_totp_secret()
         uri = totp_provisioning_uri(secret, account_name="demo@forge.example", issuer_name="Forge Demo")
-        return BaseController.render("mfa_secret/index.html", context={"secret": secret, "uri": uri}, request=request)
+        return BaseController.render(
+            "mfa_secret/index.html",
+            context={"secret": secret, "uri": uri},
+            request=request,
+        )
+```
+
+## La vue
+
+```html
+<!-- mvc/views/mfa_secret/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Secret TOTP et QR - Forge</title>
+</head>
+<body>
+  <h1>Secret TOTP et QR</h1>
+
+  <p>Secret base32 (à scanner une seule fois dans l'application d'authentification) :</p>
+  <p><code>{{ secret }}</code></p>
+
+  <p>URI de provisioning <code>otpauth://</code> (ce que code un QR) :</p>
+  <p><code>{{ uri }}</code></p>
+
+  <p>Rechargez la page pour générer un nouveau secret. Un secret réel n'est montré
+  à l'utilisateur <strong>qu'une seule fois</strong>, à l'enrôlement.</p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.mfa_secret_controller import MfaSecretController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/mfa-secret", MfaSecretController.index, name="mfa_secret_index")
 ```
 
 ### Comprendre ce code

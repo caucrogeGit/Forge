@@ -35,17 +35,98 @@ forge run
 Ouvrez `https://localhost:8000/mfa-replay` et cliquez deux fois dans la même fenêtre
 (~30 s) : la seconde est refusée.
 
-## Le contrôleur (extrait)
+## Le contrôleur
 
 ```python
 # mvc/controllers/mfa_replay_controller.py
 import time
+
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_mfa import is_replay, record_used, step_for_time
 
-step = step_for_time(time.time())
-if not is_replay(_FACTOR_ID, step):
-    record_used(_FACTOR_ID, step)   # première utilisation acceptée
-# is_replay(_FACTOR_ID, step) renvoie désormais True
+_FACTOR_ID = 1
+
+
+class MfaReplayController(BaseController):
+    """Starter pédagogique : empêcher le rejeu d'un code TOTP."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        step = step_for_time(time.time())
+        return BaseController.render(
+            "mfa_replay/index.html",
+            context={
+                "csrf_token": BaseController.csrf_token(request),
+                "step": step,
+                "replayed": is_replay(_FACTOR_ID, step),
+            },
+            request=request,
+        )
+
+    @staticmethod
+    def use(request: Request) -> Response:
+        step = step_for_time(time.time())
+        already = is_replay(_FACTOR_ID, step)
+        if not already:
+            record_used(_FACTOR_ID, step)
+        return BaseController.render(
+            "mfa_replay/index.html",
+            context={
+                "csrf_token": BaseController.csrf_token(request),
+                "step": step,
+                "accepted": not already,
+                "replayed": is_replay(_FACTOR_ID, step),
+            },
+            request=request,
+        )
+```
+
+## La vue
+
+```html
+<!-- mvc/views/mfa_replay/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Anti-rejeu TOTP - Forge</title>
+</head>
+<body>
+  <h1>Anti-rejeu TOTP</h1>
+
+  <p>Step TOTP courante : <code>{{ step }}</code></p>
+  <p>Déjà consommée pour le facteur démo : <strong>{% if replayed %}oui{% else %}non{% endif %}</strong></p>
+
+  {% if accepted is defined %}
+    {% if accepted %}
+    <p data-level="success">✓ Step consommée maintenant - toute réutilisation sera refusée.</p>
+    {% else %}
+    <p data-level="error">✗ Step déjà consommée : rejeu refusé.</p>
+    {% endif %}
+  {% endif %}
+
+  <form method="post" action="/mfa-replay">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">Consommer la step courante</button>
+  </form>
+
+  <p>Cliquez deux fois dans la même fenêtre (~30 s) : la seconde est refusée.</p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.mfa_replay_controller import MfaReplayController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/mfa-replay", MfaReplayController.index, name="mfa_replay_index")
+    public.add("POST", "/mfa-replay", MfaReplayController.use, name="mfa_replay_use")
 ```
 
 ### Comprendre ce code
@@ -60,7 +141,7 @@ if not is_replay(_FACTOR_ID, step):
 
 - Un code TOTP ne doit être accepté **qu'une fois** dans sa fenêtre.
 - `record_used` + `is_replay` portent cette garde, par facteur et par step.
-- `verify_totp_code` à lui seul ne protège pas du rejeu — d'où cette brique.
+- `verify_totp_code` à lui seul ne protège pas du rejeu : d'où cette brique.
 
 ## Après ce starter
 
