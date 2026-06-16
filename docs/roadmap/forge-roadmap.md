@@ -74,6 +74,30 @@ Pour l'état détaillé du Scénario C, voir
 
 ---
 
+## Consolidation terrain — journal des retours de tests terrain (post-b16)
+
+Journal des incidents et manques remontés par l'**usage réel** d'un projet
+`forge new` (tests terrain, ADR-009), avec leur correctif.
+Ce ne sont pas des fonctionnalités mais de la **consolidation bêta** : ce que
+livre `forge new` doit bien se comporter sans correctif manuel côté projet.
+Le cycle **b17** accumule ces correctifs sous `## [Non publié]` du `CHANGELOG.md`
+jusqu'au tag b17.
+La cible est le **squelette** (et son miroir racine, anti-dérive ADR-024) ; un
+détail d'erreur n'est exposé qu'en `dev`, jamais en production.
+
+| Date | Symptôme terrain | Solution | Ticket |
+|---|---|---|---|
+| 2026-06-16 | La page 500 n'affiche jamais le détail de l'exception, même en `dev` | `app.py` passe un contexte (type / message / traceback) au template, en `dev` uniquement (`_error_context()`) ; `None` en prod | `SKELETON-500-ERROR-CONTEXT-001` |
+| 2026-06-16 | Pages 404 et 413 sans information utile en `dev` | Détail `dev` (chemin demandé, taille reçue) via `_dev_error()` ; `None` en prod | `SKELETON-ERROR-PAGES-DEV-DETAIL-001` |
+| 2026-06-16 | Projet généré sans validation/autocomplétion JSON ni auto-import VS Code | Schémas cœur + `.vscode/settings.json` (json.schemas + auto-import Pylance) embarqués dans le squelette | `SKELETON-VSCODE-DX-001` |
+| 2026-06-16 | Le squelette nu embarquait le schéma opt-in `rbac.json` | Retrait du schéma et de l'association RBAC du squelette nu (principe 8) | `SKELETON-VSCODE-DX-RBAC-OPTIN-001` |
+| 2026-06-16 | Comment valider `rbac.json` (opt-in) dans VS Code | `forge opt-in:enable rbac` affiche la marche à suivre (schéma + association), sans éditer `settings.json` (principe 9) | `OPTIN-RBAC-SCHEMA-GUIDANCE-001` |
+
+> Pour ajouter une entrée : une ligne par retour terrain (symptôme observé →
+> solution livrée → ticket), la plus récente en haut.
+
+---
+
 ## Phase 0 — Baseline d'audit (post-1.0.0-beta.1)
 
 **Objectif** : figer officiellement la baseline d'audit avant toute correction
