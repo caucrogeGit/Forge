@@ -1,3 +1,6 @@
+# pyright: strict
+from typing import Any
+
 from core.forge import get as _cfg
 
 
@@ -11,7 +14,7 @@ class Pagination:
         context    = {"lignes": ..., **pagination.context}
     """
 
-    def __init__(self, request, total, par_page):
+    def __init__(self, request: Any, total: int, par_page: int) -> None:
         self.total    = max(int(total or 0), 0)
         self.par_page = max(int(par_page or 1), 1)
         self.nb_pages = -(-self.total // self.par_page) if self.total else 1
@@ -21,7 +24,7 @@ class Pagination:
         self.pages    = self.nb_pages
 
     @staticmethod
-    def _extraire_page(request, nb_pages):
+    def _extraire_page(request: Any, nb_pages: int) -> int:
         try:
             page = int(request.params.get("page", [1])[0])
         except (ValueError, TypeError):
@@ -29,7 +32,7 @@ class Pagination:
         return min(max(page, 1), nb_pages)
 
     @property
-    def context(self):
+    def context(self) -> dict[str, Any]:
         """Retourne le dict prêt à injecter dans le template."""
         payload = self.to_dict()
         return {
@@ -62,7 +65,7 @@ class Pagination:
     def next_page(self) -> int | None:
         return self.page + 1 if self.has_next else None
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         return {
             "page"     : self.page,
             "nb_pages" : self.nb_pages,

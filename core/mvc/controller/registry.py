@@ -1,3 +1,4 @@
+# pyright: strict
 """Registre de fournisseurs de contexte Jinja — pattern push (charte principe 8).
 
 Les modules opt-in (forge-mvc-rbac, etc.) s'enregistrent eux-mêmes via
@@ -7,6 +8,12 @@ sans nommer nominalement aucun module opt-in.
 from __future__ import annotations
 
 from typing import Any, Callable
+
+__all__ = [
+    "register_jinja_context_provider",
+    "iter_jinja_context_providers",
+    "_clear_for_tests",
+]
 
 _providers: list[Callable[[Any], dict[str, Any]]] = []
 

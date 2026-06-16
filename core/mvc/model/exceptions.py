@@ -1,3 +1,4 @@
+# pyright: strict
 class DoublonError(Exception):
     """
     Levée par un model quand une contrainte d'unicité est violée.

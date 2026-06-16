@@ -1,3 +1,4 @@
+# pyright: strict
 from .base_controller import BaseController
 from .registry import _clear_for_tests, iter_jinja_context_providers, register_jinja_context_provider
 

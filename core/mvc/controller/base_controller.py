@@ -1,9 +1,17 @@
+# pyright: strict
+from __future__ import annotations
+
 import json as _json
+from typing import TYPE_CHECKING, Any
+
 from core.forge import get as _cfg
 from core.http.helpers import html as _html
 from core.http.response import Response
 from core.templating.manager import template_manager
 from core.security.session import get_session_id, get_session, set_flash, get_user
+
+if TYPE_CHECKING:
+    from core.http.request import Request
 
 
 class BaseController:
@@ -26,7 +34,7 @@ class BaseController:
     """
 
     @staticmethod
-    def render(template, status=200, context=None, base="layouts/base.html", *, request=None, raw=False):
+    def render(template: str, status: int = 200, context: dict[str, Any] | None = None, base: str = "layouts/base.html", *, request: Request | None = None, raw: bool = False) -> Response:
         if not raw and request is not None:
             ctx = dict(context) if context else {}
             if "csrf_token" not in ctx:
@@ -38,19 +46,19 @@ class BaseController:
         return _html(template, status, context, raw=raw)
 
     @staticmethod
-    def redirect(location, *, request=None, flash=None, level="success"):
+    def redirect(location: str, *, request: Request | None = None, flash: str | None = None, level: str = "success") -> Response:
         if request is not None and flash:
             BaseController.set_flash(request, flash, level)
         return Response(302, headers={"Location": location})
 
     @staticmethod
-    def redirect_with_flash(request, location, message, level="success"):
+    def redirect_with_flash(request: Request, location: str, message: str, level: str = "success") -> Response:
         """Flux POST-Redirect-GET : message flash puis redirection."""
         BaseController.set_flash(request, message, level)
         return BaseController.redirect(location)
 
     @staticmethod
-    def redirect_to_route(name, *, request=None, flash=None, level="success", **params):
+    def redirect_to_route(name: str, *, request: Request | None = None, flash: str | None = None, level: str = "success", **params: Any) -> Response:
         router = _cfg("router")
         if router is None:
             raise RuntimeError("Aucun routeur actif pour redirect_to_route().")
@@ -62,71 +70,71 @@ class BaseController:
         )
 
     @staticmethod
-    def not_found():
+    def not_found() -> Response:
         return _html("errors/404.html", 404)
 
     @staticmethod
-    def bad_request(context=None):
+    def bad_request(context: dict[str, Any] | None = None) -> Response:
         return _html("errors/400.html", 400, context)
 
     @staticmethod
-    def forbidden(context=None):
+    def forbidden(context: dict[str, Any] | None = None) -> Response:
         return _html("errors/403.html", 403, context)
 
     @staticmethod
-    def validation_error(template="errors/422.html", context=None, *, request=None):
+    def validation_error(template: str = "errors/422.html", context: dict[str, Any] | None = None, *, request: Request | None = None) -> Response:
         return BaseController.render(template, 422, context, request=request)
 
     @staticmethod
-    def server_error(context=None):
+    def server_error(context: dict[str, Any] | None = None) -> Response:
         return _html("errors/500.html", 500, context)
 
     @staticmethod
-    def set_flash(request, message, level="success"):
+    def set_flash(request: Request, message: str, level: str = "success") -> None:
         set_flash(get_session_id(request), message, level)
 
     @staticmethod
-    def csrf_token(request):
+    def csrf_token(request: Request) -> str:
         """Retourne le token CSRF de la session courante."""
         session_id = get_session_id(request)
         session    = get_session(session_id)
         return session.get("csrf_token", "") if session else ""
 
     @staticmethod
-    def current_user(request):
+    def current_user(request: Request) -> dict[str, Any] | None:
         """Retourne l'utilisateur courant stocké en session."""
         return get_user(request)
 
     @staticmethod
-    def include(partial, context=None):
+    def include(partial: str, context: dict[str, Any] | None = None) -> str:
         """Charge et retourne le HTML d'un partial Jinja2."""
         return template_manager.render(partial, context or {})
 
     @staticmethod
-    def json(data, status=200):
+    def json(data: Any, status: int = 200) -> Response:
         """Génère une réponse JSON."""
         return Response(status, _json.dumps(data, ensure_ascii=False),
                         "application/json; charset=utf-8")
 
     @staticmethod
-    def body(request):
+    def body(request: Request) -> dict[str, str]:
         """Extrait les données du formulaire POST sous forme de dict plat."""
         return {k: v[0] for k, v in request.body.items()}
 
     @staticmethod
-    def json_body(request):
+    def json_body(request: Request) -> Any:
         """Retourne le body JSON parsé (dict). Vide si Content-Type != application/json."""
         return request.json_body
 
     @staticmethod
-    def render_form(template, request, data, status=200, erreurs=""):
+    def render_form(template: str, request: Request, data: dict[str, Any], status: int = 200, erreurs: str = "") -> Response:
         """Raccourci : render + form_context en une seule ligne."""
         return BaseController.render(template, status,
                                      context=BaseController.form_context(request, data, erreurs),
                                      request=request)
 
     @staticmethod
-    def form_context(request, data, erreurs=""):
+    def form_context(request: Request, data: dict[str, Any], erreurs: str = "") -> dict[str, Any]:
         """
         Construit le contexte commun à tout formulaire (add/edit).
 

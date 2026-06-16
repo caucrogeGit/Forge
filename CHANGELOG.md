@@ -31,6 +31,16 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/mvc` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-MVC-001`). Passés en strict : `controller/base_controller.py`,
+  `controller/registry.py`, `controller/__init__.py`, `model/validator.py`,
+  `model/exceptions.py`, `view/pagination.py`. `BaseController` type toutes ses
+  méthodes statiques (`request: Request` sous `TYPE_CHECKING`, `context`,
+  retours `Response`/`str`/`dict[str, Any]`). `Validator` et `Pagination`
+  reçoivent leurs annotations (`list[str]`, `dict[str, Any]`, retours fluent
+  `-> "Validator"`). `registry.py` déclare un `__all__` qui officialise son
+  helper de test `_clear_for_tests` (réexporté), corrigeant `reportPrivateUsage`
+  et `reportUnusedFunction`. Pyright reste à 0 erreur sur le paquet.
 - **Cliquet strict sur `core/validation` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-VALIDATION-001`). Passés en strict : `decorators.py`,
   `exceptions.py`, `__init__.py`. Le module était déjà entièrement annoté
