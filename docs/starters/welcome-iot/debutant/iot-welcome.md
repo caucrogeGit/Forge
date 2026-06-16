@@ -43,12 +43,19 @@ renvoie la configuration MQTT en JSON, le mot de passe remplacé par `***`.
 
 ## Le contrôleur
 
+Créez le fichier ci-dessous, complet et copiable tel quel.
+
 ```python
 # mvc/controllers/iot_welcome_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_iot.config import load_iot_config
 
 
 def _config_to_safe_dict(cfg) -> dict:
+    """Sérialise la config IoT en dict JSON, mot de passe masqué."""
     return {
         "mqtt_host": cfg.mqtt_host,
         "mqtt_port": cfg.mqtt_port,
@@ -60,6 +67,7 @@ def _config_to_safe_dict(cfg) -> dict:
 
 
 class IotWelcomeController(BaseController):
+    """Starter pédagogique : premier contact avec Forge IoT."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -78,6 +86,19 @@ class IotWelcomeController(BaseController):
   **explicite**.
 - On ne renvoie **jamais** le mot de passe : `"***" if cfg.mqtt_password else
   None`. Une config exposée masque toujours ses secrets.
+
+## La route
+
+Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.iot_welcome_controller import IotWelcomeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/iot-welcome", IotWelcomeController.index, name="iot_welcome_index")
+    public.add("GET", "/iot-welcome/inspect", IotWelcomeController.inspect, name="iot_welcome_inspect")
+```
 
 ## À retenir
 

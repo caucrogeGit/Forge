@@ -50,12 +50,19 @@ l'[API JSON](../intermediaire/iot-api.md).
 
 ## Le contrôleur
 
+Créez le fichier ci-dessous, complet et copiable tel quel.
+
 ```python
 # mvc/controllers/iot_subscriber_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_iot.config import load_iot_config
 
 
 class IotSubscriberController(BaseController):
+    """Starter pédagogique : visualiser la config broker avant `iot:listen`."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -81,6 +88,53 @@ class IotSubscriberController(BaseController):
   unique, qu'on simule ou qu'on reçoive pour de vrai.
 - En TLS, `load_iot_config` expose `mqtt_tls_enabled` et le fichier CA : la
   connexion sécurisée est explicite, jamais devinée.
+
+## La vue
+
+Créez le gabarit ci-dessous : il récapitule la configuration de connexion et
+rappelle la commande d'écoute.
+
+```html
+<!-- mvc/views/iot_subscriber/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Le subscriber MQTT — Forge</title>
+</head>
+<body>
+  <h1>Le subscriber MQTT</h1>
+
+  <h2>Configuration de connexion</h2>
+  <ul>
+    <li>Broker : <code>{{ broker }}</code></li>
+    <li>Topic : <code>{{ topic }}</code></li>
+    <li>TLS : {% if tls_enabled %}activé{% else %}désactivé{% endif %}</li>
+  </ul>
+
+  <h2>Recevoir de vrais messages</h2>
+  <p>Avec un broker MQTT démarré et atteignable, lancez le subscriber :</p>
+  <pre>forge iot:listen</pre>
+  <p>
+    Chaque message reçu est validé contre le contrat puis stocké dans
+    <code>iot_events</code>. Consultez-les ensuite via le tableau de bord ou
+    l'API JSON.
+  </p>
+</body>
+</html>
+```
+
+## La route
+
+Déclarez la route dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.iot_subscriber_controller import IotSubscriberController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/iot-subscriber", IotSubscriberController.index, name="iot_subscriber_index")
+```
 
 ## À retenir
 

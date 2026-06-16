@@ -40,12 +40,29 @@ donne le `site`, le `device_id`, le `count` et la liste `events` de ce capteur
 
 ## Le contrôleur
 
+Créez le fichier ci-dessous, complet et copiable tel quel.
+
 ```python
 # mvc/controllers/iot_device_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_iot.storage import IotEventRepository
 
 
+_STORAGE_NOT_READY = {
+    "error": "iot_storage_not_ready",
+    "message": (
+        "La table iot_events n'est pas encore disponible. "
+        "Applique la migration Forge IoT (forge iot:init) avant de lire "
+        "les événements."
+    ),
+}
+
+
 class IotDeviceController(BaseController):
+    """Starter pédagogique : lire les événements d'un capteur précis."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -72,6 +89,19 @@ class IotDeviceController(BaseController):
 - `find_by_device(...)` filtre les événements de ce capteur ; `count_by_device`
   donne le total — deux lectures complémentaires du même repository.
 - Comme au palier précédent, l'absence de table devient un `503` pédagogique.
+
+## La route
+
+Déclarez la route paramétrée dans `mvc/routes.py`, à l'intérieur du groupe
+public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.iot_device_controller import IotDeviceController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/iot-device/{site}/{device_id}", IotDeviceController.index, name="iot_device_index")
+```
 
 ## À retenir
 

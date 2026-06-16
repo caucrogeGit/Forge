@@ -46,14 +46,21 @@ curl -k https://localhost:8000/api/iot/devices/atelier/capteur-1/count
 Si `FORGE_IOT_API_TOKEN` est défini, ajoutez l'en-tête
 `Authorization: Bearer <token>` ; sinon l'API reste ouverte (mode local).
 
-## Le branchement
+## La route
+
+Ce palier n'a **pas** de contrôleur à créer : le code métier des trois routes
+vit dans le paquet opt-in `forge-mvc-iot`. Votre application se contente de le
+**brancher** via `register_iot_routes(router)`, ajouté dans `mvc/routes.py`.
 
 ```python
-# mvc/routes.py (extrait inséré par le starter)
+# mvc/routes.py
 from forge_mvc_iot import register_iot_routes
 
 register_iot_routes(router)
 ```
+
+L'appel se place au niveau du module de routes (il enregistre lui-même ses
+chemins sous `/api/iot/…`), pas dans le groupe `public`.
 
 ### Comprendre ce code
 
@@ -66,6 +73,33 @@ register_iot_routes(router)
   sinon `401`.
 - L'API est en **lecture seule** : elle expose les événements, elle n'en crée
   pas. L'écriture passe par le subscriber (ou la simulation).
+
+## La migration
+
+L'API officielle lit la table `iot_events`. Créez le fichier de migration
+ci-dessous (le nom commence par un horodatage), puis appliquez-le avec
+`forge db:init`.
+
+```sql
+-- mvc/migrations/20260601180000_create_iot_events.sql
+CREATE TABLE IF NOT EXISTS iot_events (
+    id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    site          VARCHAR(64)     NOT NULL,
+    device_id     VARCHAR(64)     NOT NULL,
+    kind          VARCHAR(64)     NOT NULL,
+    value         DOUBLE          NOT NULL,
+    unit          VARCHAR(32)     NOT NULL,
+    timestamp     VARCHAR(40)     NOT NULL,
+    metadata_json TEXT            NULL,
+    received_at   DATETIME(6)     NOT NULL,
+    PRIMARY KEY (id),
+    INDEX idx_iot_events_site_device (site, device_id),
+    INDEX idx_iot_events_received_at (received_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+`CREATE TABLE IF NOT EXISTS` rend la migration idempotente : elle est sûre même
+si le palier de simulation a déjà créé la table.
 
 ## À retenir
 

@@ -41,19 +41,29 @@ liste des événements.
 
 ## Le contrôleur
 
+Créez le fichier ci-dessous, complet et copiable tel quel.
+
 ```python
 # mvc/controllers/iot_events_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_iot.storage import IotEventRepository
 
 
 _STORAGE_NOT_READY = {
     "error": "iot_storage_not_ready",
-    "message": "La table iot_events n'est pas encore disponible. "
-               "Applique la migration Forge IoT (forge iot:init)…",
+    "message": (
+        "La table iot_events n'est pas encore disponible. "
+        "Applique la migration Forge IoT (forge iot:init) avant de lire "
+        "les événements."
+    ),
 }
 
 
 class IotEventsController(BaseController):
+    """Starter pédagogique : lire les derniers événements IoT stockés."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -61,6 +71,7 @@ class IotEventsController(BaseController):
         try:
             events = repo.list_recent(limit=20)
         except Exception:
+            # Table absente, base inaccessible… on reste pédagogique.
             return Response.json(_STORAGE_NOT_READY, status=503)
         return Response.json({"events": events})
 ```
@@ -74,6 +85,18 @@ class IotEventsController(BaseController):
 - Le `try/except` **ne masque pas un bug** : il traduit l'absence de table en
   réponse `503` pédagogique. Un starter de découverte ne doit jamais planter
   parce que l'infrastructure n'est pas encore montée.
+
+## La route
+
+Déclarez la route dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.iot_events_controller import IotEventsController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/iot-events", IotEventsController.index, name="iot_events_index")
+```
 
 ## À retenir
 
