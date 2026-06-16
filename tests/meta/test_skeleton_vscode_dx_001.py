@@ -3,10 +3,12 @@
 Le squelette (`forge new`, ADR-024) embarque, dans son `.vscode/settings.json`,
 de quoi offrir une bonne DX VS Code dès la création du projet :
 
-- les **associations de schémas JSON** (`json.schemas`) pour valider et
-  autocompléter `mvc/entities/*/*.json`, `mvc/entities/relations.json` et
-  `mvc/security/rbac.json`, en pointant vers un dossier `schemas/` embarqué à la
-  racine du projet (URL relatives `./schemas/*.schema.json`) ;
+- les **associations de schémas JSON** (`json.schemas`) **cœur** pour valider et
+  autocompléter `mvc/entities/*/*.json` et `mvc/entities/relations.json`, en
+  pointant vers un dossier `schemas/` embarqué à la racine du projet (URL
+  relatives `./schemas/*.schema.json`). Les schémas opt-in (ex. `rbac.json` →
+  `forge-mvc-rbac`) ne sont **pas** dans le squelette nu : c'est au câble de
+  l'opt-in de les introduire (principe 8) ;
 - l'**auto-import des classes** (Pylance) via
   `python.analysis.autoImportCompletions` et l'indexation du paquet `core`.
 
@@ -30,8 +32,19 @@ SKELETON_DATA = PROJECT_ROOT / "forge_cli" / "skeleton" / "data"
 SKELETON_VSCODE = SKELETON_DATA / ".vscode" / "settings.json"
 SKELETON_SCHEMAS = SKELETON_DATA / "schemas"
 
-# Schémas référencés par json.schemas (et leurs dépendances $ref minimales).
-REFERENCED_SCHEMAS = ["entity.schema.json", "relations.schema.json", "rbac.schema.json"]
+# Schémas cœur associés par json.schemas dans le squelette NU. RBAC est un
+# opt-in (forge-mvc-rbac) : ni rbac.schema.json ni son fileMatch ne doivent
+# figurer dans le squelette nu (principe 8). C'est au câble de l'opt-in de
+# l'introduire.
+REFERENCED_SCHEMAS = ["entity.schema.json", "relations.schema.json"]
+
+# Schémas cœur embarqués : entity + relations et leurs dépendances $ref
+# (field, common ; pivot car relations.schema.json référence pivot.schema.json
+# pour les relations many_to_many).
+SHIPPED_SCHEMAS = [
+    "entity.schema.json", "field.schema.json", "common.schema.json",
+    "relations.schema.json", "pivot.schema.json",
+]
 
 
 def _settings() -> dict:
@@ -76,13 +89,25 @@ def test_json_schemas_referencent_les_trois_contrats():
 
 # ── Schémas embarqués par le squelette ────────────────────────────────────────
 
-def test_squelette_embarque_les_schemas():
+def test_squelette_embarque_les_schemas_coeur():
     assert SKELETON_SCHEMAS.is_dir(), (
         "Le squelette doit embarquer un dossier schemas/ pour que les json.schemas "
         "résolvent dans un projet généré."
     )
-    for name in REFERENCED_SCHEMAS:
+    for name in SHIPPED_SCHEMAS:
         assert (SKELETON_SCHEMAS / name).is_file(), f"schemas/{name} manquant dans le squelette."
+
+
+def test_squelette_nu_sans_schema_opt_in():
+    """Principe 8 : le squelette nu ne porte aucun schéma ni association opt-in."""
+    assert not (SKELETON_SCHEMAS / "rbac.schema.json").exists(), (
+        "rbac.schema.json (opt-in forge-mvc-rbac) ne doit pas figurer dans le "
+        "squelette nu : c'est au câble de l'opt-in de l'introduire."
+    )
+    urls = {entry.get("url") for entry in _settings().get("json.schemas", [])}
+    fmatches = {fm for entry in _settings().get("json.schemas", []) for fm in entry.get("fileMatch", [])}
+    assert "./schemas/rbac.schema.json" not in urls, "Pas d'association rbac dans le squelette nu."
+    assert "/mvc/security/rbac.json" not in fmatches, "Pas de fileMatch rbac.json dans le squelette nu."
 
 
 def test_schemas_embarques_sont_du_json_valide():

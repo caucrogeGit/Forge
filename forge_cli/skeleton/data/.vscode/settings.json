@@ -17,12 +17,6 @@
         "/mvc/entities/*/*.json"
       ],
       "url": "./schemas/entity.schema.json"
-    },
-    {
-      "fileMatch": [
-        "/mvc/security/rbac.json"
-      ],
-      "url": "./schemas/rbac.schema.json"
     }
   ],
   "files.associations": {

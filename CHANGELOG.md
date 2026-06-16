@@ -5,15 +5,17 @@
 
 ### Ajouté
 
-- **DX VS Code dès `forge new` : schémas JSON et auto-import des classes**
-  (`SKELETON-VSCODE-DX-001`). Le squelette embarque désormais un dossier
-  `schemas/` et un `.vscode/settings.json` qui associe les schémas aux fichiers
-  de contrat (`mvc/entities/*/*.json`, `mvc/entities/relations.json`,
-  `mvc/security/rbac.json`) et active l'auto-import des classes Pylance
-  (`python.analysis.autoImportCompletions`, indexation du paquet `core`). Un
-  projet généré bénéficie ainsi de la validation/autocomplétion JSON et des
-  imports automatiques sans configuration manuelle. L'association `env/*` au
-  langage `properties` est conservée.
+- **DX VS Code dès `forge new` : schémas JSON cœur et auto-import des classes**
+  (`SKELETON-VSCODE-DX-001`). Le squelette embarque désormais les schémas
+  **cœur** (`schemas/` : entity, field, common, relations, pivot) et un
+  `.vscode/settings.json` qui associe les schémas aux fichiers de contrat cœur
+  (`mvc/entities/*/*.json`, `mvc/entities/relations.json`) et active l'auto-import
+  des classes Pylance (`python.analysis.autoImportCompletions`, indexation du
+  paquet `core`). Un projet généré bénéficie ainsi de la validation/autocomplétion
+  JSON et des imports automatiques sans configuration manuelle. Conformément au
+  principe 8, les schémas opt-in (ex. `rbac.json` → `forge-mvc-rbac`) ne sont
+  **pas** dans le squelette nu. L'association `env/*` au langage `properties`
+  est conservée.
 
 
 ## [1.0.0-beta.16] — 2026-06-16
