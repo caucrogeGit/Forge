@@ -69,6 +69,18 @@ class Response:
     """
 
     def __init__(self, status=200, body=b"", content_type=_HTML_CONTENT_TYPE, headers=None):
+        # Validation au plus tôt (au moment de la construction, donc dans le
+        # frame du contrôleur appelant) : un `status` non entier provoquait
+        # sinon une erreur différée et cryptique au moment de l'envoi
+        # (`%d format: a real number is required, not str`), sans pointer le
+        # contrôleur fautif. Le 1er argument positionnel est le STATUS.
+        if not isinstance(status, int) or isinstance(status, bool):
+            raise TypeError(
+                f"Response.status doit être un entier HTTP, reçu "
+                f"{type(status).__name__} {status!r}. Le 1er argument positionnel "
+                f"de Response() est le STATUS, pas le corps : avez-vous écrit "
+                f'Response("...") au lieu de Response.text("...") ?'
+            )
         self.status = status
         self.content_type = content_type
         if isinstance(body, str):

@@ -87,6 +87,7 @@ détail d'erreur n'est exposé qu'en `dev`, jamais en production.
 
 | Date | Symptôme terrain | Solution | Ticket |
 |---|---|---|---|
+| 2026-06-16 | Erreur 500 cryptique (`%d format…`) qui ne pointe pas le contrôleur fautif quand on écrit `Response("texte")` au lieu de `Response.text("texte")` | `Response.__init__` valide le `status` à la construction → `TypeError` actionnable levé dans le frame du contrôleur (visible dans le traceback), tous chemins d'envoi | `CORE-RESPONSE-STATUS-TYPE-001` |
 | 2026-06-16 | La page 500 n'affiche jamais le détail de l'exception, même en `dev` | `app.py` passe un contexte (type / message / traceback) au template, en `dev` uniquement (`_error_context()`) ; `None` en prod | `SKELETON-500-ERROR-CONTEXT-001` |
 | 2026-06-16 | Pages 404 et 413 sans information utile en `dev` | Détail `dev` (chemin demandé, taille reçue) via `_dev_error()` ; `None` en prod | `SKELETON-ERROR-PAGES-DEV-DETAIL-001` |
 | 2026-06-16 | Projet généré sans validation/autocomplétion JSON ni auto-import VS Code | Schémas cœur + `.vscode/settings.json` (json.schemas + auto-import Pylance) embarqués dans le squelette | `SKELETON-VSCODE-DX-001` |

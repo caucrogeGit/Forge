@@ -46,6 +46,16 @@
   en production (aucune fuite de traceback) ; les deux rendus de la 500 (GET et
   requêtes dynamiques) passent désormais ce contexte. Aligné aussi sur le `app.py`
   racine (anti-dérive ADR-024).
+- **`Response` valide le type du `status` à la construction**
+  (`CORE-RESPONSE-STATUS-TYPE-001`). `Response("du texte")` plaçait silencieusement
+  une chaîne dans `status` (le 1er argument positionnel est le STATUS), puis
+  provoquait une erreur **différée** et cryptique à l'envoi
+  (`%d format: a real number is required, not str`) sans jamais pointer le
+  contrôleur fautif. `Response.__init__` lève désormais un `TypeError` explicite
+  **au moment de la construction** — donc dans le frame du contrôleur, qui
+  apparaît dans le traceback — avec un message orientant vers `Response.text(...)`.
+  Couvre tous les chemins d'envoi (serveur de dev et WSGI). Durcissement interne
+  pré-1.0.
 
 
 ## [1.0.0-beta.16] — 2026-06-16
