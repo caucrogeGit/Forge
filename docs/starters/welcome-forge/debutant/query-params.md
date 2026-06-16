@@ -8,6 +8,9 @@ Votre `WelcomeController` possède déjà la méthode `index` (palier précéden
 
 Nous y ajoutons une méthode et une route.
 
+??? note "Voir l'illustration"
+    ![](query-params.png){ width="60%" }
+
 ??? note "Documentations"
     Pour bien comprendre ce palier :
 

@@ -15,9 +15,8 @@ Il se poursuit ensuite avec un `MessageController`, qui introduit les formulaire
 
 À la fin du niveau débutant, vous aurez construit un mini-projet complet, simple mais réel, capable d'afficher des pages, de recevoir des données utilisateur, de les valider et de les enregistrer en base.
 
-Pour ce premier palier, le cycle d'une requête `/welcome` se résume ainsi :
-
-![Cycle d'une requête /welcome : le navigateur envoie GET /welcome, la route mène au WelcomeController, qui retourne Response.text("Bonjour Forge"), renvoyée en 200 OK](welcome.png)
+??? note "Voir l'illustration"
+    ![](welcome.png){ width="60%" }
 
 ??? note "Documentation utile"
     Pour bien comprendre ce palier :
