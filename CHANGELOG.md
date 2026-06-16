@@ -10,7 +10,8 @@
   **pyright en mode basic à 0 erreur** (41 corrigées : annotations correctes —
   `Response.__init__`, `html()`, `core.forge.get -> Any`, `db.fetch_one/execute`,
   `is_valid_slug` — et gardes de type — `get_session`, `sql_loader`, parsing
-  multipart). Le cœur **expose ses types** via `core/py.typed` (PEP 561, inclus
+  multipart). Le gate est en mode **`standard`** (0 erreur). Le cœur **expose ses
+  types** via `core/py.typed` (PEP 561, inclus
   au wheel) : un projet `forge new` bénéficie de l'autocomplétion et de la
   vérification du cœur. Une étape `pyright` est ajoutée à la CI. Cliquet à venir
   (ADR-036) : `integrations` et les opt-ins, puis passage `strict` module par

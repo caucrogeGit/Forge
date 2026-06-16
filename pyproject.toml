@@ -107,10 +107,11 @@ include = ["core*", "forge_cli*", "integrations*"]
 
 [tool.pyright]
 # ADR-036 — typage statique du cœur vérifié en CI. Périmètre actuel du cliquet :
-# core/ (à 0 erreur en mode basic). integrations/ et les opt-ins suivront,
-# chacun passant ensuite en strict (`# pyright: strict`) module par module.
+# core/ à 0 erreur en mode "standard". Étapes suivantes du cliquet : strict
+# par fichier (`# pyright: strict`, en commençant par core/http), puis
+# integrations/ et les opt-ins.
 include = ["core"]
-typeCheckingMode = "basic"
+typeCheckingMode = "standard"
 pythonVersion = "3.12"
 
 [tool.ruff]
