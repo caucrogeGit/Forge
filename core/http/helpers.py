@@ -1,6 +1,8 @@
+# pyright: strict
 import json as _json
 import logging
 import os
+from typing import Any
 from core.forge import get as _cfg
 from core.http.response import Response
 from core.templating.errors import (
@@ -57,11 +59,11 @@ def _missing_template_response(
     return Response(500, body, content_type=_TEXT_CONTENT_TYPE)
 
 
-def html(template: str, status: int = 200, context: "dict | None" = None, *, raw: bool = False) -> Response:
+def html(template: str, status: int = 200, context: "dict[str, Any] | None" = None, *, raw: bool = False) -> Response:
     # Le 2e argument positionnel est le STATUS, pas le contexte. Sans cette
     # garde, `render(template, {...})` (réflexe d'autres frameworks) mettait un
     # dict dans `status` et provoquait une erreur différée et obscure.
-    if not isinstance(status, int) or isinstance(status, bool):
+    if not isinstance(status, int) or isinstance(status, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError(
             "Le 2e argument positionnel de html()/render() est le STATUS HTTP "
             f"(entier), pas le contexte ; reçu {type(status).__name__} {status!r}. "
@@ -86,7 +88,7 @@ def html(template: str, status: int = 200, context: "dict | None" = None, *, raw
     return Response(status, body)
 
 
-def json_response(data, status: int = 200) -> Response:
+def json_response(data: Any, status: int = 200) -> Response:
     try:
         body = _json.dumps(data, ensure_ascii=False)
     except TypeError as exc:
@@ -94,15 +96,15 @@ def json_response(data, status: int = 200) -> Response:
     return Response(status, body, _JSON_CONTENT_TYPE)
 
 
-def api_success(data=None, status: int = 200, meta=None) -> Response:
-    payload = {"success": True, "data": data}
+def api_success(data: Any = None, status: int = 200, meta: "dict[str, Any] | None" = None) -> Response:
+    payload: "dict[str, Any]" = {"success": True, "data": data}
     if meta is not None:
         payload["meta"] = meta
     return json_response(payload, status)
 
 
-def api_error(message: str, status: int = 400, code: str = "error", details=None) -> Response:
-    error = {"code": code, "message": message}
+def api_error(message: str, status: int = 400, code: str = "error", details: Any = None) -> Response:
+    error: "dict[str, Any]" = {"code": code, "message": message}
     if details is not None:
         error["details"] = details
     return json_response({"success": False, "error": error}, status)

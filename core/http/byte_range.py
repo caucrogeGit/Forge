@@ -1,3 +1,4 @@
+# pyright: strict
 """Parsing d'un en-tête HTTP ``Range`` — `core.http.byte_range`.
 
 Ticket : CORE-HTTP-FILE-RANGE-001.

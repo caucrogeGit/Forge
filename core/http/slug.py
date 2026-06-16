@@ -1,3 +1,4 @@
+# pyright: strict
 """Module URL-slug canonique de Forge.
 
 Ticket : SLUG-CORE-001 (ADR-017).

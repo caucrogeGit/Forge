@@ -99,7 +99,7 @@ def _ensure_log_dir(log_dir: pathlib.Path) -> bool:
 
 # ── Point d'entrée public ─────────────────────────────────────────────────────
 
-def log_runtime_error(exc: BaseException, request=None) -> None:
+def log_runtime_error(exc: BaseException, request: "object | None" = None) -> None:
     """
     Enregistre une erreur runtime dans storage/logs/errors.dev.jsonl.
 

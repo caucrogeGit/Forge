@@ -16,11 +16,13 @@
   vérification du cœur. Une étape `pyright` est ajoutée à la CI. Cliquet à venir
   (ADR-036) : `integrations` et les opt-ins, puis passage `strict` module par
   module ; à terme, l'override `reportUnknown*` du squelette devient inutile.
-- **Cliquet strict : `core/http/response.py` en `# pyright: strict`**
-  (`CORE-TYPING-STRICT-HTTP-001`). Premier fichier de la surface publique passé
-  en strict (28 corrections : annotations de paramètres et de conteneurs,
-  suppressions ciblées `reportUnnecessaryIsInstance` sur les gardes runtime
-  volontaires). Les autres fichiers de `core/http` suivront, puis l'override
+- **Cliquet strict sur `core/http` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-HTTP-001`). Passés en strict : `response.py`,
+  `helpers.py`, `slug.py`, `byte_range.py` (annotations de paramètres et de
+  conteneurs ; au passage `template_manager.render` et `log_runtime_error` sont
+  typés à la source ; suppressions ciblées `reportUnnecessaryIsInstance` sur les
+  gardes runtime volontaires). Restent `router.py` et `request.py` (plus
+  volumineux) ; une fois la surface publique entièrement stricte, l'override
   `reportUnknown*` du squelette pourra être retiré.
 - **DX VS Code dès `forge new` : schémas JSON cœur et auto-import des classes**
   (`SKELETON-VSCODE-DX-001`). Le squelette embarque désormais les schémas
