@@ -8,10 +8,13 @@ panneaux : suppression des liens profonds IoT/audits, de « Mosquitto » et
 de la preuve « 0 échec ».
 
 Mise à jour beta.16 : la section est relabelisée « Nouveautés 1.0.0-beta.16 »
-(id `beta16`) et présente : **Forge i18n** (12e opt-in), **Parcours réalisés à
-la main** (ADR-035, retrait de la génération de starters), **Convention de
-route** (ADR-029) et **Squelette dédié** (ADR-024). Les anciennes cartes média
-(IoT, Video, Images, Files, Audio) sont retirées de la vitrine.
+(id `beta16`) et met l'accent sur les nouveautés **de la beta.16** : **Parcours
+réalisés à la main** (ADR-035, retrait de la génération de starters),
+**Déploiement en production** (Gunicorn / WSGI via `deploy:init`), **Cœur encore
+allégé** (mail et config upload sortis du noyau, ADR-031/032) et **Comptes de
+base de données clarifiés** (provisioning en `forge_admin`, ADR-033/034). Les
+nouveautés de beta.15 (i18n, convention de route, squelette dédié) et les
+anciennes cartes média sont retirées de la vitrine.
 
 Ce fichier conserve les garde-fous encore valides : présence de la section,
 panneaux des nouveautés courantes, core présenté comme autonome,
@@ -48,10 +51,10 @@ def _src() -> str:
 # opt-ins par un texte simple (sans commandes CLI ni `iot_events`). Seuls les
 # repères conceptuels restent garantis.
 HIGHLIGHTS = [
-    "Forge i18n",
     "Parcours réalisés à la main",
-    "Convention de route",
-    "Squelette dédié",
+    "Déploiement en production",
+    "Cœur encore allégé",
+    "Comptes de base de données clarifiés",
 ]
 
 
@@ -93,8 +96,8 @@ class TestSync:
     def test_docs_index_reflete_section(self):
         docs = DOCS_LANDING.read_text(encoding="utf-8")
         assert 'id="beta16"' in docs
-        assert "Forge i18n" in docs
-        assert "Convention de route" in docs
+        assert "Parcours réalisés à la main" in docs
+        assert "Déploiement en production" in docs
 
 
 # ---------------------------------------------------------------------------

@@ -105,7 +105,7 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-beta.16 : parcours réalisés à la main (génération retirée), i18n opt-in, convention de route, squelette dédié -->
+<!-- Nouveautés 1.0.0-beta.16 : parcours réalisés à la main (ADR-035), déploiement Gunicorn, cœur allégé (mail + upload, ADR-031/032), comptes DB clarifiés (ADR-033/034) -->
 <section id="beta16" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
@@ -115,23 +115,23 @@
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Forge i18n</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Le douzième opt-in : traduction par catalogues JSON, locale par défaut et fallback, helper trans() pour les templates. Extrait du cœur pour qu'il reste autonome ; un repli no-op garde le CRUD généré fonctionnel sans le module.</p>
-      </div>
-
-      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
         <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Parcours réalisés à la main</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Tous les parcours welcome deviennent des tutoriels manuels suivis depuis la documentation : chaque palier montre le contrôleur, la vue et la route à écrire soi-même. La génération automatique est retirée (les commandes forge starter:build et forge starter:list disparaissent), fidèle au principe « pas d'écriture invisible dans le code utilisateur ».</p>
+        <p class="text-white/60 text-sm leading-relaxed">Tous les parcours welcome deviennent des tutoriels manuels suivis depuis la documentation : chaque palier montre le contrôleur, la vue et la route à écrire soi-même. La génération automatique est retirée (les commandes forge starter:build et forge starter:list disparaissent), fidèle au principe « pas d'écriture invisible dans le code utilisateur » (ADR-035).</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Convention de route</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Une route se déduit du contrôleur et de la méthode : chemin /contrôleur/méthode (index nu), nom contrôleur-méthode. Prévisible et lisible, appliquée au squelette, au parcours welcome et au CRUD généré.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Déploiement en production</h3>
+        <p class="text-white/60 text-sm leading-relaxed">forge deploy:init génère le chemin de production officiel : un wsgi.py et une unité systemd qui sert l'application avec Gunicorn. En développement, python app.py ; en production, Gunicorn derrière systemd.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Squelette dédié</h3>
-        <p class="text-white/60 text-sm leading-relaxed">forge new produit un projet nu, matérialisé depuis un squelette embarqué : pas de clone du dépôt, un point de départ minimal et neutre que vous faites grandir.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Cœur encore allégé</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Le mail et la configuration des uploads quittent le noyau : ils sont lus depuis l'environnement par les opt-ins forge-mvc-mail, forge-mvc-files et forge-mvc-images. Le cœur reste minimal et autonome, il ne dépend plus d'eux (ADR-031, ADR-032).</p>
+      </div>
+
+      <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Comptes de base de données clarifiés</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Le provisioning et les migrations s'exécutent avec forge_admin, le runtime applicatif reste en forge_app (DML strict) (ADR-033). forge new génère des identifiants de base sans suffixes _db / _app (ADR-034).</p>
       </div>
 
     </div>
