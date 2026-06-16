@@ -38,21 +38,90 @@ Stockez un fichier, puis supprimez-le via son chemin sur
 
 ```python
 # mvc/controllers/file_delete_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import delete_media_file
 
 
 class FileDeleteController(BaseController):
+    """Starter pédagogique : supprimer un fichier stocké, sans faille de chemin."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return BaseController.render(
+            "file_delete/index.html",
+            context={"csrf_token": BaseController.csrf_token(request)},
+            request=request,
+        )
 
     @staticmethod
     def delete(request: Request) -> Response:
         path = request.form("path")
         context = {"csrf_token": BaseController.csrf_token(request)}
-        result = delete_media_file(path)
+        if not path:
+            context["error"] = "Indiquez le chemin du fichier à supprimer."
+            return BaseController.render(
+                "file_delete/index.html", context=context, request=request
+            )
+        try:
+            result = delete_media_file(path)
+        except Exception:
+            context["error"] = "Chemin invalide ou hors de la racine d'upload."
+            return BaseController.render(
+                "file_delete/index.html", context=context, request=request
+            )
         if result.get("original"):
             context["deleted"] = path
         else:
             context["not_found"] = path
-        return BaseController.render("file_delete/index.html", context=context, request=request)
+        return BaseController.render(
+            "file_delete/index.html", context=context, request=request
+        )
+```
+
+## La vue
+
+```html
+<!-- mvc/views/file_delete/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Supprimer un fichier — Forge</title>
+</head>
+<body>
+  <h1>Supprimer un fichier</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if deleted %}
+  <p data-level="success">Supprimé : <code>{{ deleted }}</code></p>
+  {% endif %}
+  {% if not_found %}
+  <p data-level="error">Aucun fichier à <code>{{ not_found }}</code> (déjà absent ?).</p>
+  {% endif %}
+
+  <form method="post" action="/file-delete">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="text" name="path" placeholder="documents/..." required>
+    <button type="submit">Supprimer</button>
+  </form>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.file_delete_controller import FileDeleteController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/file-delete", FileDeleteController.index, name="file_delete_index")
+    public.add("POST", "/file-delete", FileDeleteController.delete, name="file_delete_remove")
 ```
 
 ### Comprendre ce code

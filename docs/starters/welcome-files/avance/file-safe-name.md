@@ -39,7 +39,13 @@ Ouvrez `https://localhost:8000/file-safe-name` et essayez
 
 ```python
 # mvc/controllers/file_safe_name_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import UploadError, secure_filename
+
+_DEMO_NAME = "../Mon Dossier/Rapport Final!.PDF"
 
 
 def _safe_view(name: str) -> dict:
@@ -50,11 +56,63 @@ def _safe_view(name: str) -> dict:
 
 
 class FileSafeNameController(BaseController):
+    """Starter pédagogique : assainir un nom de fichier utilisateur."""
 
     @staticmethod
     def index(request: Request) -> Response:
-        name = request.query("name") or "../Mon Dossier/Rapport Final!.PDF"
-        return BaseController.render("file_safe_name/index.html", context=_safe_view(name), request=request)
+        name = request.query("name") or _DEMO_NAME
+        return BaseController.render(
+            "file_safe_name/index.html", context=_safe_view(name), request=request
+        )
+
+    @staticmethod
+    def inspect(request: Request) -> Response:
+        name = request.query("name") or _DEMO_NAME
+        return Response.json(_safe_view(name))
+```
+
+## La vue
+
+```html
+<!-- mvc/views/file_safe_name/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Assainir un nom de fichier — Forge</title>
+</head>
+<body>
+  <h1>Assainir un nom de fichier</h1>
+
+  <form method="get" action="/file-safe-name">
+    <input type="text" name="name" value="{{ input }}" size="50">
+    <button type="submit">Assainir</button>
+  </form>
+
+  <p>Entrée : <code>{{ input }}</code></p>
+  {% if safe %}
+  <p data-level="success">Nom sûr : <code>{{ safe }}</code></p>
+  {% endif %}
+  {% if error %}
+  <p data-level="error">Refusé : {{ error }}</p>
+  {% endif %}
+
+  <p>Le chemin (<code>../Mon Dossier/</code>) disparaît, les caractères dangereux
+  sont remplacés : ce qui reste ne peut plus désigner qu'un fichier, jamais un
+  répertoire parent.</p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.file_safe_name_controller import FileSafeNameController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/file-safe-name", FileSafeNameController.index, name="file_safe_name_index")
+    public.add("GET", "/file-safe-name/inspect", FileSafeNameController.inspect, name="file_safe_name_inspect")
 ```
 
 ### Comprendre ce code

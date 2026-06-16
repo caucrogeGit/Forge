@@ -39,10 +39,21 @@ refusé (`404`).
 
 ```python
 # mvc/controllers/file_serve_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import serve_media_file
 
 
 class FileServeController(BaseController):
+    """Starter pédagogique : servir un fichier stocké, sans faille de chemin."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return BaseController.render(
+            "file_serve/index.html", context={}, request=request
+        )
 
     @staticmethod
     def download(request: Request) -> Response:
@@ -51,6 +62,50 @@ class FileServeController(BaseController):
             return Response.text("Paramètre « path » requis.", status=400)
         # serve_media_file gère lui-même l'anti-traversal et le 404.
         return serve_media_file(path)
+```
+
+## La vue
+
+```html
+<!-- mvc/views/file_serve/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Servir un fichier — Forge</title>
+</head>
+<body>
+  <h1>Servir un fichier</h1>
+
+  <p>
+    Indiquez le <strong>chemin relatif</strong> d'un fichier stocké (celui
+    renvoyé par le palier « Stocker un document », p. ex.
+    <code>documents/mon-fichier-abcd.pdf</code>).
+  </p>
+
+  <form method="get" action="/file-serve/download">
+    <input type="text" name="path" placeholder="documents/..." required>
+    <button type="submit">Télécharger</button>
+  </form>
+
+  <p>
+    Un chemin qui tente de sortir de la racine d'upload (p. ex.
+    <code>../secret</code>) est <strong>refusé</strong> : <code>serve_media_file</code>
+    protège contre la traversée de répertoire et répond <code>404</code>.
+  </p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.file_serve_controller import FileServeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/file-serve", FileServeController.index, name="file_serve_index")
+    public.add("GET", "/file-serve/download", FileServeController.download, name="file_serve_download")
 ```
 
 ### Comprendre ce code

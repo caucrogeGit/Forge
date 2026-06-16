@@ -45,10 +45,15 @@ Ouvrez `https://localhost:8000/files-welcome` (« Bonjour Forge Files »), puis
 ```python
 # mvc/controllers/files_welcome_controller.py
 from core.forge import get as get_config
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import upload_root
 
 
 def _capabilities() -> dict:
+    """Décrit où et quoi forge-mvc-files accepte de stocker."""
     return {
         "upload_root": str(upload_root()),
         "allowed_extensions": sorted(get_config("upload_allowed_extensions")),
@@ -58,6 +63,7 @@ def _capabilities() -> dict:
 
 
 class FilesWelcomeController(BaseController):
+    """Starter pédagogique : premier contact avec Forge Files."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -66,6 +72,17 @@ class FilesWelcomeController(BaseController):
     @staticmethod
     def inspect(request: Request) -> Response:
         return Response.json(_capabilities())
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.files_welcome_controller import FilesWelcomeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/files-welcome", FilesWelcomeController.index, name="files_welcome_index")
+    public.add("GET", "/files-welcome/inspect", FilesWelcomeController.inspect, name="files_welcome_inspect")
 ```
 
 ### Comprendre ce code

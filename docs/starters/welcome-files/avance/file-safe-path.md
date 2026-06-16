@@ -39,7 +39,13 @@ et `../../etc/passwd` (refusé).
 
 ```python
 # mvc/controllers/file_safe_path_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import UploadError, is_safe_media_path, normalize_media_path
+
+_DEMO_PATH = "../../etc/passwd"
 
 
 def _path_view(path: str) -> dict:
@@ -47,15 +53,69 @@ def _path_view(path: str) -> dict:
         normalized = normalize_media_path(path)
     except UploadError:
         normalized = None
-    return {"input": path, "is_safe": bool(is_safe_media_path(path)), "normalized": normalized}
+    return {
+        "input": path,
+        "is_safe": bool(is_safe_media_path(path)),
+        "normalized": normalized,
+    }
 
 
 class FileSafePathController(BaseController):
+    """Starter pédagogique : juger la sûreté d'un chemin de fichier."""
 
     @staticmethod
     def index(request: Request) -> Response:
-        path = request.query("path") or "../../etc/passwd"
-        return BaseController.render("file_safe_path/index.html", context=_path_view(path), request=request)
+        path = request.query("path") or _DEMO_PATH
+        return BaseController.render(
+            "file_safe_path/index.html", context=_path_view(path), request=request
+        )
+
+    @staticmethod
+    def inspect(request: Request) -> Response:
+        path = request.query("path") or _DEMO_PATH
+        return Response.json(_path_view(path))
+```
+
+## La vue
+
+```html
+<!-- mvc/views/file_safe_path/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Chemin anti-traversal — Forge</title>
+</head>
+<body>
+  <h1>Chemin anti-traversal</h1>
+
+  <form method="get" action="/file-safe-path">
+    <input type="text" name="path" value="{{ input }}" size="50">
+    <button type="submit">Vérifier</button>
+  </form>
+
+  <p>Chemin : <code>{{ input }}</code></p>
+  <ul>
+    <li>Sûr (reste dans la racine d'upload) : <strong>{% if is_safe %}oui{% else %}non{% endif %}</strong></li>
+    <li>Normalisé : {% if normalized %}<code>{{ normalized }}</code>{% else %}<em>refusé</em>{% endif %}</li>
+  </ul>
+
+  <p>Essayez <code>documents/a.pdf</code> (sûr) puis <code>../../etc/passwd</code>
+  (refusé) : c'est cette garde qui empêche de servir ou supprimer un fichier hors
+  de la zone d'upload.</p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.file_safe_path_controller import FileSafePathController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/file-safe-path", FileSafePathController.index, name="file_safe_path_index")
+    public.add("GET", "/file-safe-path/inspect", FileSafePathController.inspect, name="file_safe_path_inspect")
 ```
 
 ### Comprendre ce code

@@ -40,18 +40,39 @@ fichier mal typé, ou un fichier trop gros : chaque refus nomme sa règle.
 
 ```python
 # mvc/controllers/file_validate_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import (
-    UploadError, UploadInvalidExtensionError,
-    UploadInvalidMimeTypeError, UploadTooLargeError, save_upload,
+    UploadError,
+    UploadInvalidExtensionError,
+    UploadInvalidMimeTypeError,
+    UploadTooLargeError,
+    save_upload,
 )
 
 
 class FileValidateController(BaseController):
+    """Starter pédagogique : comprendre la taxonomie des refus d'upload."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return BaseController.render(
+            "file_validate/index.html",
+            context={"csrf_token": BaseController.csrf_token(request)},
+            request=request,
+        )
 
     @staticmethod
     def check(request: Request) -> Response:
         uploaded = request.file("document")
         context = {"csrf_token": BaseController.csrf_token(request)}
+        if uploaded is None:
+            context["error"] = "Aucun fichier sélectionné."
+            return BaseController.render(
+                "file_validate/index.html", context=context, request=request
+            )
         try:
             saved = save_upload(uploaded, "documents")
         except UploadInvalidExtensionError as exc:
@@ -64,7 +85,55 @@ class FileValidateController(BaseController):
             context["rejected"] = {"rule": "autre", "message": str(exc)}
         else:
             context["accepted"] = saved.original_name
-        return BaseController.render("file_validate/index.html", context=context, request=request)
+        return BaseController.render(
+            "file_validate/index.html", context=context, request=request
+        )
+```
+
+## La vue
+
+```html
+<!-- mvc/views/file_validate/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Valider un upload — Forge</title>
+</head>
+<body>
+  <h1>Valider un upload</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if accepted %}
+  <p data-level="success">✓ <strong>{{ accepted }}</strong> accepté (toutes les règles passent).</p>
+  {% endif %}
+  {% if rejected %}
+  <p data-level="error">✗ Rejeté — règle <strong>{{ rejected.rule }}</strong> : {{ rejected.message }}</p>
+  {% endif %}
+
+  <form method="post" action="/file-validate" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="file" name="document" required>
+    <button type="submit">Tester la validation</button>
+  </form>
+
+  <p>Essayez un <code>.exe</code> (extension), un fichier au mauvais type, ou un fichier
+  trop volumineux : chaque refus nomme sa règle.</p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.file_validate_controller import FileValidateController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/file-validate", FileValidateController.index, name="file_validate_index")
+    public.add("POST", "/file-validate", FileValidateController.check, name="file_validate_check")
 ```
 
 ### Comprendre ce code

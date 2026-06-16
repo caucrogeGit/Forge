@@ -39,19 +39,102 @@ d'une minute : la route bascule en `429`.
 
 ```python
 # mvc/controllers/file_rate_limit_controller.py
-from forge_mvc_files import is_upload_rate_limited, record_upload_attempt, save_upload, UploadError
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
+from forge_mvc_files import (
+    UploadError,
+    is_upload_rate_limited,
+    record_upload_attempt,
+    save_upload,
+)
 
 
 class FileRateLimitController(BaseController):
+    """Starter pédagogique : protéger une route d'upload par rate-limit."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return BaseController.render(
+            "file_rate_limit/index.html",
+            context={"csrf_token": BaseController.csrf_token(request)},
+            request=request,
+        )
 
     @staticmethod
     def upload(request: Request) -> Response:
         context = {"csrf_token": BaseController.csrf_token(request)}
         if is_upload_rate_limited(request.ip):
             context["rate_limited"] = True
-            return BaseController.render("file_rate_limit/index.html", context=context, request=request, status=429)
+            return BaseController.render(
+                "file_rate_limit/index.html", context=context, request=request, status=429
+            )
         record_upload_attempt(request.ip)
-        # … puis save_upload normal
+        uploaded = request.file("document")
+        if uploaded is None:
+            context["error"] = "Aucun fichier sélectionné."
+            return BaseController.render(
+                "file_rate_limit/index.html", context=context, request=request
+            )
+        try:
+            saved = save_upload(uploaded, "documents")
+        except UploadError as exc:
+            context["error"] = str(exc)
+            return BaseController.render(
+                "file_rate_limit/index.html", context=context, request=request
+            )
+        context["saved"] = saved
+        return BaseController.render(
+            "file_rate_limit/index.html", context=context, request=request
+        )
+```
+
+## La vue
+
+```html
+<!-- mvc/views/file_rate_limit/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Limiter les uploads — Forge</title>
+</head>
+<body>
+  <h1>Limiter les uploads</h1>
+
+  <p>Quota : <strong>10 uploads par minute et par IP</strong> (fenêtre glissante, en mémoire).</p>
+
+  {% if rate_limited %}
+  <p data-level="error"><strong>429 — Trop d'uploads.</strong> Réessayez dans un instant.</p>
+  {% endif %}
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if saved %}
+  <p data-level="success">Fichier stocké : <code>{{ saved.path }}</code></p>
+  {% endif %}
+
+  <form method="post" action="/file-rate-limit" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="file" name="document" required>
+    <button type="submit">Envoyer</button>
+  </form>
+
+  <p>Envoyez plus de 10 fois en moins d'une minute : la route bascule en <code>429</code>.</p>
+</body>
+</html>
+```
+
+## La route
+
+```python
+# mvc/routes.py
+from mvc.controllers.file_rate_limit_controller import FileRateLimitController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/file-rate-limit", FileRateLimitController.index, name="file_rate_limit_index")
+    public.add("POST", "/file-rate-limit", FileRateLimitController.upload, name="file_rate_limit_upload")
 ```
 
 ### Comprendre ce code
