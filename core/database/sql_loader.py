@@ -62,6 +62,8 @@ def charger_queries(nom_fichier: str):
             return entry["module"]
 
         spec   = importlib.util.spec_from_file_location(nom_fichier[:-3], chemin)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Module SQL illisible : {chemin}")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         _cache[chemin] = {"mtime_ns": stat.st_mtime_ns, "size": stat.st_size, "module": module}

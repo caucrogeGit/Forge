@@ -25,8 +25,10 @@ def create_session() -> str:
     return _get_store().create()
 
 
-def get_session(session_id: str) -> dict | None:
+def get_session(session_id: str | None) -> dict | None:
     """Retourne les données de la session ou None si inexistante ou expirée."""
+    if session_id is None:
+        return None
     return _get_store().get(session_id)
 
 
