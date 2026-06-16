@@ -1,3 +1,4 @@
+# pyright: strict
 """core/app/prod_warnings.py — Avertissements de démarrage liés à la production.
 
 Ticket : AUTH-RATE-LIMIT-PROD-WARNING-001.

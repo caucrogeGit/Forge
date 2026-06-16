@@ -31,6 +31,21 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/app` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-APP-001`). Passés en strict : `application.py`,
+  `app_factory.py`, `wsgi.py`, `dev_server.py`, `prod_warnings.py`,
+  `api_routes_loader.py`, `__init__.py`. `Application.dispatch` type
+  `request: Request -> Response` ; l'adaptateur WSGI type ses callables
+  (`environ: dict[str, Any]`, `start_response: Callable[..., Any]`, retours
+  `Iterable[bytes]`). `load_api_routes` appelle `register_api_routes` via
+  `getattr` (le `ModuleType` n'expose pas l'attribut statiquement) ;
+  `build_application` annote son retour `Application` (importé sous
+  `TYPE_CHECKING`). Le check d'idempotence `template_manager._renderer is None`
+  porte un `# pyright: ignore[reportPrivateUsage]`. La comparaison morte
+  `response.body is not None` est retirée (`Response.body` est toujours
+  `bytes` — règle A). **À ce stade, `pyright core/` passe à 0 erreur sur
+  l'ensemble du cœur** ; seul `core/http/debug_dumper.py` reste hors strict à
+  dessein (introspection d'objets arbitraires).
 - **Cliquet strict sur `core/modules` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-MODULES-001`). Passés en strict : `manifest.py`,
   `discovery.py`, `registry.py`, `files.py`, `routes.py`, `remove.py`,

@@ -1,3 +1,4 @@
+# pyright: strict
 """core/app/app_factory.py — Construction de l'`Application` Forge configurée.
 
 Ticket : WSGI-APP-FACTORY-CONFIG-001.
@@ -16,7 +17,10 @@ n'est déjà enregistré).
 from __future__ import annotations
 
 import importlib
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from core.app.application import Application
 
 
 def _forge_config_kwargs() -> dict[str, Any]:
@@ -51,7 +55,7 @@ def apply_forge_config() -> None:
     forge.configure(**_forge_config_kwargs())
 
 
-def build_application():
+def build_application() -> "Application":
     """Construit l'`Application` Forge complète : config + Jinja + routes.
 
     Exécute la même séquence d'initialisation que `app.py`, sans démarrer
@@ -65,7 +69,7 @@ def build_application():
     from config import APP_ROUTES_MODULE, VIEWS_DIR
 
     apply_forge_config()
-    if template_manager._renderer is None:
+    if template_manager._renderer is None:  # pyright: ignore[reportPrivateUsage]  # check d'idempotence du branchement renderer
         template_manager.register(Jinja2Renderer(VIEWS_DIR))
     routes_mod = importlib.import_module(APP_ROUTES_MODULE)
     forge.configure(router=routes_mod.router)

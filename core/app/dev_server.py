@@ -1,3 +1,4 @@
+# pyright: strict
 """
 core/app/dev_server.py — Messages de diagnostic du serveur de développement
 =======================================================================

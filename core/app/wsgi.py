@@ -1,3 +1,4 @@
+# pyright: strict
 """core/app/wsgi.py — Callables WSGI pour Forge.
 
 Tickets :
@@ -31,8 +32,9 @@ Périmètre :
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from io import BytesIO
-from typing import Iterable
+from typing import Any, Iterable
 
 from core.http.request import Request
 from core.http.response import Response
@@ -65,7 +67,7 @@ class _WsgiHeaders:
     interface suffit, pas besoin de mimer `http.client.HTTPMessage` au complet.
     """
 
-    def __init__(self, environ: dict):
+    def __init__(self, environ: dict[str, Any]) -> None:
         normalized: dict[str, str] = {}
         if "CONTENT_TYPE" in environ:
             normalized["content-type"] = environ["CONTENT_TYPE"]
@@ -87,7 +89,7 @@ class _WsgiHandlerStub:
     `path`, `command`, `headers`, `client_address`, `rfile`.
     """
 
-    def __init__(self, environ: dict):
+    def __init__(self, environ: dict[str, Any]) -> None:
         path = environ.get("PATH_INFO", "/") or "/"
         qs = environ.get("QUERY_STRING", "") or ""
         self.path = f"{path}?{qs}" if qs else path
@@ -111,7 +113,7 @@ def _format_status(code: int) -> str:
 
 def _response_to_wsgi(
     response: Response,
-    start_response,
+    start_response: Callable[..., Any],
     *,
     is_https: bool = False,
 ) -> Iterable[bytes]:
@@ -132,7 +134,7 @@ def _response_to_wsgi(
         body_iter: Iterable[bytes] = stream
         content_length = getattr(response, "content_length", None) or 0
     else:
-        body = response.body if response.body is not None else b""
+        body = response.body
         body_iter = [body]
         content_length = len(body)
 
@@ -166,13 +168,13 @@ def _response_to_wsgi(
     return body_iter
 
 
-def create_wsgi_app(application):
+def create_wsgi_app(application: Any) -> Callable[[dict[str, Any], Callable[..., Any]], Iterable[bytes]]:
     """Retourne un callable WSGI qui dispatche via l'`Application` Forge fournie.
 
     `application` doit exposer `dispatch(request) -> Response`.
     """
 
-    def app(environ, start_response):
+    def app(environ: dict[str, Any], start_response: Callable[..., Any]) -> Iterable[bytes]:
         is_https = environ.get("wsgi.url_scheme") == "https"
         handler = _WsgiHandlerStub(environ)
         try:
@@ -197,7 +199,7 @@ def create_configured_wsgi_app(
     *,
     emit_prod_warnings: bool = True,
     logger: logging.Logger | None = None,
-):
+) -> Callable[[dict[str, Any], Callable[..., Any]], Iterable[bytes]]:
     """Construit l'`Application` Forge configurée et retourne le callable WSGI.
 
     Source unique d'initialisation : charge la même configuration que

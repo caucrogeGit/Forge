@@ -1,4 +1,9 @@
+# pyright: strict
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING, Any
+
 from core.app.api_routes_loader import load_api_routes as _load_api_routes
 from core.http.helpers import html as _html
 from core.http.router import Router
@@ -7,6 +12,10 @@ from core.errors.runtime_error_logger import (
     log_runtime_error as _log_runtime_error,
 )
 from core.security.middleware import AuthMiddleware, CsrfMiddleware
+
+if TYPE_CHECKING:
+    from core.http.request import Request
+    from core.http.response import Response
 
 logger = logging.getLogger(__name__)
 
@@ -33,15 +42,15 @@ class Application:
     le fichier existe. Passer api_routes_module=None pour désactiver ce chargement.
     """
 
-    def __init__(self, router: Router, middlewares=None, login_url: str = "/login",
-                 csrf_middleware=None, *, api_routes_module: str | None = "mvc.api_routes"):
+    def __init__(self, router: Router, middlewares: list[Any] | None = None, login_url: str = "/login",
+                 csrf_middleware: Any = None, *, api_routes_module: str | None = "mvc.api_routes") -> None:
         self._router      = router
         self._middlewares = middlewares if middlewares is not None else [AuthMiddleware(login_url)]
         self._csrf        = csrf_middleware if csrf_middleware is not None else CsrfMiddleware()
         if api_routes_module:
             _load_api_routes(router, api_routes_module)
 
-    def dispatch(self, request):
+    def dispatch(self, request: Request) -> Response:
         try:
             result = self._router.match(request.method, request.path)
             if result is None:
