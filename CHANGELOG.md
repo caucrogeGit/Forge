@@ -69,6 +69,14 @@
   provoquait une erreur différée. Le funnel `core.http.helpers.html()` — utilisé
   par `BaseController.render()` et les helpers d'erreur — lève désormais un
   `TypeError` explicite orientant vers `context=...`. Durcissement interne pré-1.0.
+- **Squelette : bruit Pylance en mode strict neutralisé**
+  (`SKELETON-VSCODE-STRICT-NOISE-001`). Le cœur Forge étant partiellement typé,
+  le mode strict de Pylance/Pyright noyait l'utilisateur sous des
+  `reportUnknown*` sur les symboles du framework (ex. `Response.text`). Le
+  `.vscode/settings.json` du squelette passe désormais la famille `reportUnknown*`
+  (`MemberType`, `VariableType`, `ArgumentType`, `ParameterType`, `LambdaType`) à
+  `none` via `diagnosticSeverityOverrides` : le mode strict reste utile sur le
+  code de l'utilisateur, sans le bruit du framework.
 
 ### Documentation
 

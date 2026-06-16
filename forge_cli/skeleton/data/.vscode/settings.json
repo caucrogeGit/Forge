@@ -5,6 +5,13 @@
   "python.analysis.packageIndexDepths": [
     { "name": "core", "depth": 4, "includeAllSymbols": true }
   ],
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportUnknownMemberType": "none",
+    "reportUnknownVariableType": "none",
+    "reportUnknownArgumentType": "none",
+    "reportUnknownParameterType": "none",
+    "reportUnknownLambdaType": "none"
+  },
   "json.schemas": [
     {
       "fileMatch": [

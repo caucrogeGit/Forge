@@ -120,3 +120,20 @@ def test_schemas_embarques_sont_du_json_valide():
 def test_settings_conserve_association_env():
     data = _settings()
     assert data.get("files.associations", {}).get("**/env/*") == "properties"
+
+
+# ── Bruit Pylance en mode strict (SKELETON-VSCODE-STRICT-NOISE-001) ──────────
+
+def test_settings_neutralise_la_famille_reportunknown():
+    """Cœur Forge partiellement typé : en mode strict, la famille reportUnknown*
+    génère du bruit sur ses symboles (ex. Response.text). Le squelette la
+    neutralise pour garder un mode strict utilisable sur le code de l'utilisateur."""
+    overrides = _settings().get("python.analysis.diagnosticSeverityOverrides", {})
+    for rule in (
+        "reportUnknownMemberType",
+        "reportUnknownVariableType",
+        "reportUnknownArgumentType",
+        "reportUnknownParameterType",
+        "reportUnknownLambdaType",
+    ):
+        assert overrides.get(rule) == "none", f"{rule} doit être neutralisé (cœur partiellement typé)."

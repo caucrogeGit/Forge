@@ -87,6 +87,7 @@ détail d'erreur n'est exposé qu'en `dev`, jamais en production.
 
 | Date | Symptôme terrain | Solution | Ticket |
 |---|---|---|---|
+| 2026-06-16 | En mode strict, Pylance noie l'utilisateur sous des `reportUnknown*` sur les symboles du cœur (partiellement typé, ex. `Response.text`) | Le `.vscode/settings.json` du squelette passe la famille `reportUnknown*` à `none` (`diagnosticSeverityOverrides`) ; le strict reste utile sur le code utilisateur | `SKELETON-VSCODE-STRICT-NOISE-001` |
 | 2026-06-16 | Audit (suite) : `render("tpl", {...})` (réflexe Flask/Django, 2e arg = contexte) mettait un dict dans `status` → erreur différée | Le funnel `html()` (utilisé par `render()` et les helpers d'erreur) valide le `status` et oriente vers `context=...` | `CORE-RENDER-STATUS-TYPE-001` |
 | 2026-06-16 | Audit du même type de bug : un handler de route non appelable cassait au dispatch (erreur différée), sans pointer `routes.py` | `RouteEntry` valide le handler comme appelable **à l'enregistrement** → `TypeError` actionnable à l'import de `routes.py` | `CORE-ROUTE-HANDLER-CALLABLE-001` |
 | 2026-06-16 | Erreur 500 cryptique (`%d format…`) qui ne pointe pas le contrôleur fautif quand on écrit `Response("texte")` au lieu de `Response.text("texte")` | `Response.__init__` valide le `status` à la construction → `TypeError` actionnable levé dans le frame du contrôleur (visible dans le traceback), tous chemins d'envoi | `CORE-RESPONSE-STATUS-TYPE-001` |
