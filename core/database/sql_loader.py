@@ -1,3 +1,4 @@
+# pyright: strict
 """
 core/database/sql_loader.py — Chargeur dynamique de modules SQL
 ===============================================================
@@ -21,14 +22,16 @@ Cache thread-safe :
 import importlib.util
 import os
 import threading
+from types import ModuleType
+from typing import Any
 
 from core.forge import get as _cfg
 
 _lock:  threading.RLock = threading.RLock()
-_cache: dict[str, dict] = {}
+_cache: dict[str, dict[str, Any]] = {}
 
 
-def charger_queries(nom_fichier: str):
+def charger_queries(nom_fichier: str) -> ModuleType:
     """
     Charge et retourne un module de requêtes SQL depuis {SQL_DIR}/{APP_ENV}/.
 
@@ -70,7 +73,7 @@ def charger_queries(nom_fichier: str):
         return module
 
 
-def _vider_cache() -> None:
+def _vider_cache() -> None:  # pyright: ignore[reportUnusedFunction]  # appelé par les tests
     """Vide intégralement le cache — usage réservé aux tests."""
     with _lock:
         _cache.clear()

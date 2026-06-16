@@ -1,35 +1,39 @@
+# pyright: strict
+from collections.abc import Sequence
 from typing import Any
 
 from core.database.connection import get_connection, close_connection
+from core.database.transaction import Transaction
 
 
-def fetch_one(sql: str, params=(), *, tx=None) -> "dict | None":
+def fetch_one(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = None) -> "dict[str, Any] | None":
     """Exécute un SELECT explicite et retourne une ligne."""
     return _run_query(sql, params, tx=tx, dictionary=True, fetch="one")
 
 
-def fetch_all(sql: str, params=(), *, tx=None) -> "list[dict]":
+def fetch_all(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = None) -> "list[dict[str, Any]]":
     """Exécute un SELECT explicite et retourne toutes les lignes."""
     return _run_query(sql, params, tx=tx, dictionary=True, fetch="all")
 
 
-def execute(sql: str, params=(), *, tx=None) -> int:
+def execute(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = None) -> int:
     """Exécute une requête explicite et retourne rowcount."""
     return _run_query(sql, params, tx=tx, dictionary=False, fetch=None)
 
 
-def insert(sql: str, params=(), *, tx=None) -> int:
+def insert(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = None) -> int:
     """Exécute une insertion explicite et retourne lastrowid."""
     return _run_query(sql, params, tx=tx, dictionary=False, fetch="lastrowid")
 
 
-def _run_query(sql: str, params=(), *, tx=None, dictionary=False, fetch=None) -> Any:
-    connection = None
-    cursor = None
+def _run_query(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = None,
+               dictionary: bool = False, fetch: "str | None" = None) -> Any:
+    connection: Any = None
+    cursor: Any = None
     owns_connection = tx is None
 
     try:
-        connection = get_connection() if owns_connection else tx.connection
+        connection = get_connection() if tx is None else tx.connection
         cursor = connection.cursor(dictionary=dictionary)
         cursor.execute(sql, params)
 

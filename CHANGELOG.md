@@ -17,7 +17,7 @@
   (ADR-036) : `integrations` et les opt-ins, puis passage `strict` module par
   module ; à terme, l'override `reportUnknown*` du squelette devient inutile.
 - **Cliquet strict sur `core/http` (`# pyright: strict`)**
-  (`CORE-TYPING-STRICT-HTTP-001`). Passés en strict : `response.py`,
+  (`CORE-TYPING-STRICT-HTTP-001`). Passé en strict :
   tout le paquet `core/http` : `response.py`, `helpers.py`, `slug.py`,
   `byte_range.py`, `router.py`, `request.py` et `__init__.py` (annotations de
   paramètres et de conteneurs ; au passage `template_manager.render` et
@@ -31,6 +31,16 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/database` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-DB-001`). Passés en strict : `connection.py`, `db.py`,
+  `transaction.py`, `sql_loader.py`. Le pilote `mariadb` ne fournit pas de stubs
+  de types : `connection.py` accepte explicitement cette absence
+  (`reportMissingTypeStubs=false`, dépendance externe) et aliase le module en
+  `Any` localement pour ses accès membres (`ConnectionPool`, `PoolError`) ; les
+  connexions et curseurs sont typés `Any` (objets de frontière du pilote). Les
+  helpers `fetch_one`/`fetch_all`/`execute`/`insert` exposent des signatures
+  complètes (`params: Sequence[Any]`, `tx: Transaction | None`, retours
+  `dict[str, Any] | None` / `list[dict[str, Any]]` / `int`).
 - **DX VS Code dès `forge new` : schémas JSON cœur et auto-import des classes**
   (`SKELETON-VSCODE-DX-001`). Le squelette embarque désormais les schémas
   **cœur** (`schemas/` : entity, field, common, relations, pivot) et un

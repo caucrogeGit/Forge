@@ -1,4 +1,7 @@
+# pyright: strict
+from collections.abc import Generator
 from contextlib import contextmanager
+from typing import Any
 
 from core.database.connection import get_connection, close_connection
 
@@ -6,15 +9,17 @@ from core.database.connection import get_connection, close_connection
 class Transaction:
     """Transaction explicite autour d'une connexion MariaDB."""
 
-    def __init__(self, connection):
+    connection: Any
+
+    def __init__(self, connection: Any) -> None:
         self.connection = connection
 
-    def cursor(self, *, dictionary=False):
+    def cursor(self, *, dictionary: bool = False) -> Any:
         return self.connection.cursor(dictionary=dictionary)
 
 
 @contextmanager
-def transaction():
+def transaction() -> Generator["Transaction", None, None]:
     """
     Ouvre une transaction explicite.
 
