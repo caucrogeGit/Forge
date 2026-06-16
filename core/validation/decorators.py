@@ -1,3 +1,4 @@
+# pyright: strict
 """Decorateurs de validation V1 pour les proprietes d'entite."""
 
 from __future__ import annotations
@@ -30,7 +31,7 @@ def _is_nullable(func: Setter) -> bool:
 def typed(expected_type: type) -> Callable[[Setter], Setter]:
     """Valide le type Python sans transformation implicite."""
 
-    if not isinstance(expected_type, type):
+    if not isinstance(expected_type, type):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError("typed() attend un type Python.")
 
     def decorator(func: Setter) -> Setter:

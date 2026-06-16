@@ -31,6 +31,13 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/validation` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-VALIDATION-001`). Passés en strict : `decorators.py`,
+  `exceptions.py`, `__init__.py`. Le module était déjà entièrement annoté
+  (`Setter = Callable[..., Any]`) ; seule la garde runtime volontaire de
+  `typed()` (validation de l'argument `expected_type`) porte un
+  `# pyright: ignore[reportUnnecessaryIsInstance]`. Pyright reste à 0 erreur sur
+  le paquet.
 - **Cliquet strict sur `core/forms` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-FORMS-001`). Passés en strict : `exceptions.py`,
   `upload_exceptions.py`, `upload_validation.py`, `fields.py` (454 l.,

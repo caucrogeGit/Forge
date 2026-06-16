@@ -1,3 +1,4 @@
+# pyright: strict
 """Validation V1 pour les entites Forge."""
 
 from .decorators import (
