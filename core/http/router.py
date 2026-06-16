@@ -20,6 +20,17 @@ class RouteEntry:
 
     def __init__(self, method, pattern: str, handler, *, name=None,
                  public=False, csrf=True, api=False):
+        # Validation à l'enregistrement (donc dans le frame de mvc/routes.py).
+        # Un handler non appelable ne casserait sinon qu'au dispatch
+        # (`route.handler(request)`), erreur différée pointant le routeur et
+        # non la ligne de routes.py fautive.
+        if not callable(handler):
+            raise TypeError(
+                f"Le handler de la route {method!r} {pattern!r} doit être "
+                f"appelable (méthode ou fonction de contrôleur), reçu "
+                f"{type(handler).__name__} {handler!r}. "
+                f'Exemple : router.add("GET", "/", HomeController.index).'
+            )
         self.method   = method.upper() if isinstance(method, str) else [m.upper() for m in method]
         self.pattern  = pattern
         self.handler  = handler

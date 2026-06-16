@@ -56,6 +56,13 @@
   apparaît dans le traceback — avec un message orientant vers `Response.text(...)`.
   Couvre tous les chemins d'envoi (serveur de dev et WSGI). Durcissement interne
   pré-1.0.
+- **Le handler d'une route est validé comme appelable à l'enregistrement**
+  (`CORE-ROUTE-HANDLER-CALLABLE-001`). Même classe d'erreur différée :
+  `router.add("GET", "/", X)` avec `X` non appelable ne cassait qu'au dispatch
+  (`route.handler(request)`), traceback pointant le routeur et non la ligne de
+  `mvc/routes.py` fautive. La route lève désormais un `TypeError` explicite **à
+  l'enregistrement** (import de `routes.py`), avec un exemple correct
+  (`router.add("GET", "/", HomeController.index)`). Durcissement interne pré-1.0.
 
 
 ## [1.0.0-beta.16] — 2026-06-16
