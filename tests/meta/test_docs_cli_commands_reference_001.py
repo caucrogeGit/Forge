@@ -54,8 +54,6 @@ class TestCoreCommandsDocumented:
         "forge mail:test",
         "forge module:list",
         "forge module:install",
-        "forge starter:list",
-        "forge starter:build",
         "forge upload:init",
         "forge js:init",
         "forge deploy:init",

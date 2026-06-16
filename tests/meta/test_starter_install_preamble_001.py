@@ -1,7 +1,7 @@
 """Tests documentaires — STARTERS-WELCOME-INSTALL-001.
 
 Verrouille le préambule « Installation » placé en tête de chaque parcours
-welcome (welcome-forge / welcome-iot / welcome-video) :
+opt-in welcome (welcome-iot, welcome-mail…) :
 
 - la page `installation.md` existe à la racine du parcours ;
 - elle est exposée dans la navigation MkDocs **avant** le niveau débutant ;
@@ -10,9 +10,10 @@ welcome (welcome-forge / welcome-iot / welcome-video) :
   préambule serait vidé de sa substance au fil des éditions) — pattern
   « présence des concepts clés » (conventions C.4).
 
-C'est la seule page du parcours autorisée à contenir des commandes de création
-(`forge new`, `forge starter:build`) : les tests de nav exemptent
-`installation.md` de l'hygiène « pas de commande de création » des paliers.
+ADR-035 : les parcours se réalisent à la main, il n'y a plus de
+`forge starter:build`. Le préambule installe l'opt-in et crée le projet
+(`forge new`). Le parcours cœur welcome-forge n'a pas de préambule
+(entrée par index.md, ADR-028).
 """
 from __future__ import annotations
 
@@ -28,53 +29,48 @@ STARTERS = PROJECT_ROOT / "docs" / "starters"
 MKDOCS = PROJECT_ROOT / "mkdocs.yml"
 
 # parcours → (premier palier de code, commandes attendues dans la page)
+# ADR-035 : plus de `forge starter:build` ; le préambule installe l'opt-in
+# et crée le projet (`forge new`). welcome-forge n'a pas de préambule.
 PARCOURS = {
-    "welcome-forge": (
-        # ADR-025 : le niveau débutant est un tutoriel continu manuel ; plus de
-        # `forge starter:build` par palier. Le préambule ne contient que la
-        # création du projet et son lancement.
-        "debutant/welcome.md",
-        ["forge new mon-projet", "forge run"],
-    ),
     "welcome-iot": (
         "debutant/iot-welcome.md",
-        ["pip install --pre forge-mvc-iot", "forge starter:build iot-welcome", "forge run"],
+        ["pip install --pre forge-mvc-iot", "forge new"],
     ),
     "welcome-video": (
         "debutant/video-welcome.md",
-        ["pip install --pre forge-mvc-video", "forge starter:build video-welcome", "forge run"],
+        ["pip install --pre forge-mvc-video", "forge new"],
     ),
     "welcome-images": (
         "debutant/images-welcome.md",
-        ["pip install -e packages/forge-mvc-images/", "forge starter:build images-welcome", "forge run"],
+        ["pip install -e packages/forge-mvc-images/", "forge new"],
     ),
     "welcome-files": (
         "debutant/files-welcome.md",
-        ["pip install -e packages/forge-mvc-files/", "forge starter:build files-welcome", "forge run"],
+        ["pip install -e packages/forge-mvc-files/", "forge new"],
     ),
     "welcome-audio": (
         "debutant/audio-welcome.md",
-        ["pip install -e packages/forge-mvc-audio/", "forge starter:build audio-welcome", "forge run"],
+        ["pip install -e packages/forge-mvc-audio/", "forge new"],
     ),
     "welcome-mfa": (
         "debutant/mfa-welcome.md",
-        ["pip install --pre forge-mvc-mfa", "forge starter:build mfa-welcome", "forge run"],
+        ["pip install --pre forge-mvc-mfa", "forge new"],
     ),
     "welcome-rbac": (
         "debutant/rbac-welcome.md",
-        ["pip install --pre forge-mvc-rbac", "forge starter:build rbac-welcome", "forge run"],
+        ["pip install --pre forge-mvc-rbac", "forge new"],
     ),
     "welcome-workflow": (
         "debutant/workflow-welcome.md",
-        ["pip install --pre forge-mvc-workflow", "forge starter:build workflow-welcome", "forge run"],
+        ["pip install --pre forge-mvc-workflow", "forge new"],
     ),
     "welcome-stats": (
         "debutant/stats-welcome.md",
-        ["pip install --pre forge-mvc-stats", "forge starter:build stats-welcome", "forge run"],
+        ["pip install --pre forge-mvc-stats", "forge new"],
     ),
     "welcome-mail": (
         "debutant/mail-welcome.md",
-        ["pip install --pre forge-mvc-mail", "forge starter:build mail-welcome", "forge run"],
+        ["pip install --pre forge-mvc-mail", "forge new"],
     ),
 }
 

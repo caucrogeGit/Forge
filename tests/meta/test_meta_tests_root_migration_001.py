@@ -88,7 +88,6 @@ class TestMovedFilesInMeta:
         "test_doc_deploy_advanced.py",
         "test_doc_module_author.py",
         "test_docs_config.py",
-        "test_doc_starter_author.py",
         "test_doc_structure.py",
         "test_roadmap_unified.py",
         "test_license_metadata.py",

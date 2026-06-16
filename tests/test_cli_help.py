@@ -65,12 +65,6 @@ def test_build_help_contient_commandes_pages_publiques():
     assert "make:public-contact" in text
 
 
-def test_build_help_contient_starters():
-    text = build_help("2.2.0")
-    assert "starter:list" in text
-    assert "starter:build" in text
-
-
 def test_build_help_contient_exemples():
     text = build_help("2.2.0")
     assert "Exemples" in text

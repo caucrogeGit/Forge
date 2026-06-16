@@ -327,7 +327,3 @@ class TestRoadmap:
                     f"DOC-MODULE-AUTHOR-001 non marqué comme livré : {line}"
                 )
                 break
-
-    def test_prochaine_priorite_doc_starter_author(self):
-        text = ROADMAP.read_text(encoding="utf-8")
-        assert "DOC-STARTER-AUTHOR-001" in text

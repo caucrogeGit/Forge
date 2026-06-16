@@ -117,30 +117,3 @@ class TestDbApplyHelp:
             f"forge db:apply --help ne contient pas d'indication d'usage. "
             f"Sortie : {output[:300]!r}"
         )
-
-
-class TestStarterBuildHelp:
-    """forge starter:build --help ne doit pas traiter --help comme un identifiant."""
-
-    def test_exits_zero(self):
-        result = _run_forge(["starter:build", "--help"])
-        assert result.returncode == 0, (
-            f"forge starter:build --help a retourné exit {result.returncode}. "
-            f"Stdout: {result.stdout[:200]!r}"
-        )
-
-    def test_no_starter_not_found_error(self):
-        result = _run_forge(["starter:build", "--help"])
-        output = result.stdout + result.stderr
-        assert "introuvable" not in output.lower(), (
-            f"forge starter:build --help a traité --help comme un identifiant. "
-            f"Sortie : {output[:300]!r}"
-        )
-
-    def test_output_contains_usage(self):
-        result = _run_forge(["starter:build", "--help"])
-        output = result.stdout + result.stderr
-        assert "usage" in output.lower() or "forge starter:build" in output.lower(), (
-            f"forge starter:build --help ne contient pas d'indication d'usage. "
-            f"Sortie : {output[:300]!r}"
-        )

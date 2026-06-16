@@ -50,60 +50,6 @@ class TestModuleFamilyFrozen:
         )
 
 
-# ── Starters 1.0 (exactement 16, set figé) ───────────────────────────────────
-
-class TestStartersFrozen:
-    # ADR-025 (STARTER-WELCOME-FORGE-DROP-DATA-001) : les 11 starters du niveau
-    # débutant welcome-forge ont été retirés du gel (tutoriel continu manuel).
-    # ADR-028 (WELCOME-FORGE-LEVELS-ADR-028) : les 8 starters du niveau
-    # intermédiaire (list-records, layout-template, filter-list, pagination,
-    # update-record, delete-record, flash-messages, session-state) PUIS les 4
-    # starters du niveau avancé (relations, db-transaction, file-upload,
-    # json-api) ont été retirés à leur tour ; chaque niveau welcome-forge est
-    # devenu un mini-projet en tutoriel continu manuel (intermédiaire « Carnet de
-    # notes », avancé « Catalogue d'articles ») — docs uniquement.
-    FROZEN = {
-        "mail-welcome", "mail-message", "mail-transport", "mail-template", "mail-config", "mail-doctor",
-        "iot-welcome", "iot-events", "iot-device", "iot-simulate", "iot-api",
-        "iot-dashboard", "iot-contract", "iot-subscriber", "iot-doctor",
-        "video-welcome", "video-list", "video-detail", "video-upload", "video-playback",
-        "video-status", "video-probe", "video-transcode", "video-doctor",
-        "images-welcome", "image-upload", "image-variants",
-        "image-attach", "image-gallery", "image-alt-order",
-        "image-cover", "image-delete", "image-safety",
-        "files-welcome", "file-store", "file-serve", "file-validate",
-        "file-rate-limit", "file-delete", "file-safe-name", "file-safe-path",
-        "file-bytes",
-        "audio-welcome", "audio-upload", "audio-play", "audio-probe",
-        "audio-transcode", "audio-doctor",
-        "mfa-welcome", "mfa-secret", "mfa-verify", "mfa-enroll", "mfa-challenge",
-        "mfa-recovery", "mfa-revalidation", "mfa-replay", "mfa-crypto",
-        "rbac-welcome", "rbac-permission", "rbac-role", "rbac-check", "rbac-guard",
-        "rbac-template", "rbac-user-role", "rbac-resolve", "rbac-request-roles",
-        "workflow-welcome", "workflow-status", "workflow-find", "workflow-transition",
-        "workflow-check", "workflow-available", "workflow-badge", "workflow-color",
-        "workflow-jinja",
-        "stats-welcome", "stats-event", "stats-schema", "stats-track-sql",
-        "stats-track", "stats-validate", "stats-admin-sql", "stats-list",
-        "stats-normalize",
-    }
-
-    def test_starter_set_is_frozen(self):
-        from forge_cli.starters.registry import all_starters
-        ids = {s["id"] for s in all_starters()}
-        assert ids == self.FROZEN, (
-            f"Liste des starters 1.0 dérivée.\n"
-            f"  Ajoutés : {sorted(ids - self.FROZEN)}\n"
-            f"  Retirés : {sorted(self.FROZEN - ids)}\n"
-            f"Mettre à jour public-contract-1.0.md si le changement est voulu."
-        )
-
-    def test_frozen_count(self):
-        # 107 - 11 (débutant, ADR-025) = 96 ; - 8 (intermédiaire, ADR-028) = 88 ;
-        # - 4 (avancé welcome-forge retirés, ADR-028) = 84.
-        assert len(self.FROZEN) == 84
-
-
 # ── Le contrat est documenté ─────────────────────────────────────────────────
 
 class TestContractDocumented:
@@ -112,7 +58,7 @@ class TestContractDocumented:
 
     @pytest.mark.parametrize("needle", [
         "opt-in:install", "opt-in:disable", "module:install",
-        "84 starters", "mkdocs build --strict",
+        "mkdocs build --strict",
     ])
     def test_contract_mentions(self, needle):
         assert needle in CONTRACT.read_text(encoding="utf-8")

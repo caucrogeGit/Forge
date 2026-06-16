@@ -38,7 +38,6 @@ FORGE_PY = PROJECT_ROOT / "forge.py"
 
 REMAINING_COMMANDS = [
     "new",
-    "starter:list",
     "sync:entity",
     "sync:relations",
     "sync:landing",
@@ -60,7 +59,6 @@ WRITING_COMMANDS = [
 
 # Commandes de contrôle/lecture seule (audit confirmé).
 READ_ONLY_COMMANDS = [
-    "starter:list",
     "i18n:check",
     "deploy:check",
 ]
@@ -69,7 +67,6 @@ READ_ONLY_COMMANDS = [
 # Mot-clé propre à chaque commande (au moins un doit apparaître dans l'aide).
 COMMAND_KEYWORDS = {
     "new":            ["projet", "project"],
-    "starter:list":   ["starter"],
     "sync:entity":    ["entity", "entité", "entite"],
     "sync:relations": ["relations"],
     "sync:landing":   ["landing"],
@@ -99,7 +96,7 @@ SIDE_EFFECT_MARKERS = [
     "Étapes suivantes",
     "Landing synchronisée",
     "Landing désynchronisée",
-    "Starter apps Forge",
+    "Progressions Forge",
     "Dossier translations présent",
     "Catalogue ",
 ]

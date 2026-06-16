@@ -111,26 +111,6 @@ def test_forge_make_crud_sans_arg_exemple_avec_nom(monkeypatch, capsys):
     assert "Contact" in err or "Exemple" in err
 
 
-# ── forge starter:build — argument manquant ───────────────────────────────────
-
-def test_forge_starter_build_sans_arg_conseil(monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["forge", "starter:build"])
-    with pytest.raises(SystemExit) as exc_info:
-        forge.main()
-    assert exc_info.value.code == 1
-    err = capsys.readouterr().err
-    assert "Erreur :" in err
-    assert "Conseil :" in err
-
-
-def test_forge_starter_build_conseil_mentionne_starter_list(monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["forge", "starter:build"])
-    with pytest.raises(SystemExit):
-        forge.main()
-    err = capsys.readouterr().err
-    assert "starter:list" in err
-
-
 # ── forge routes:list — trop d'arguments ──────────────────────────────────────
 
 def test_forge_routes_list_trop_args_conseil(monkeypatch, capsys):
@@ -166,7 +146,7 @@ def test_project_check_hors_projet_code_sortie_1(monkeypatch, tmp_path, capsys):
 
 def test_codes_sortie_erreurs_restent_a_1(monkeypatch, capsys):
     """Les conseils de récupération ne changent pas le code de sortie."""
-    for command in (["new"], ["make:entity"], ["make:crud"], ["starter:build"]):
+    for command in (["new"], ["make:entity"], ["make:crud"]):
         monkeypatch.setattr(sys, "argv", ["forge"] + command)
         with pytest.raises(SystemExit) as exc_info:
             forge.main()

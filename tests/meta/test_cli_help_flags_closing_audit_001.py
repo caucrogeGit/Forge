@@ -59,8 +59,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "schema:list", "schema:doctor",
     # RBAC
     "rbac:validate", "rbac:audit",
-    # Starters et modules
-    "starter:list", "starter:build",
+    # Modules
     "module:list", "module:install", "module:files", "module:routes",
     # Auth
     "auth:init", "auth:doctor", "auth:status", "auth:list-sql",
@@ -111,7 +110,6 @@ NATIVE_MANUAL_COMMANDS: frozenset[str] = frozenset({
     "make:relation",
     "db:apply",
     "migration:make",
-    "starter:build",
     "module:list",
     "module:install",
     "module:files",

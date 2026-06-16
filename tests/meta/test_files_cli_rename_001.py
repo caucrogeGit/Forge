@@ -8,8 +8,7 @@ le **core CLI n'exige plus l'upload** au démarrage :
 - ``forge_cli/uploads.py`` importe ``forge_mvc_files`` (opt-in) ;
 - ``forge.py`` n'importe **pas** ``forge_cli.uploads`` au niveau module : il le
   fait en *lazy* dans la branche ``upload:init``/``media:init`` (sinon le core
-  CLI tomberait sans l'opt-in installé) ;
-- un starter survivant (``file-store``) importe depuis ``forge_mvc_files``.
+  CLI tomberait sans l'opt-in installé).
 """
 from __future__ import annotations
 
@@ -24,10 +23,6 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 FORGE_PY = PROJECT_ROOT / "forge.py"
 CLI_UPLOADS = PROJECT_ROOT / "forge_cli" / "uploads.py"
 CONTROLLER_BUILDER = PROJECT_ROOT / "forge_cli" / "entities" / "crud" / "controller_builder.py"
-STARTER_CTRL = (
-    PROJECT_ROOT / "forge_cli" / "starters" / "data" / "file-store" / "files"
-    / "mvc" / "controllers" / "file_store_controller.py"
-)
 
 
 def test_controller_builder_generates_forge_mvc_files_upload():
@@ -40,15 +35,6 @@ def test_cli_uploads_imports_forge_mvc_files():
     text = CLI_UPLOADS.read_text(encoding="utf-8")
     assert "forge_mvc_files" in text
     assert "core.uploads" not in text
-
-
-def test_starter_imports_forge_mvc_files():
-    text = STARTER_CTRL.read_text(encoding="utf-8")
-    assert "from forge_mvc_files import" in text
-    for line in text.splitlines():
-        stripped = line.lstrip()
-        if stripped.startswith(("import ", "from ")):
-            assert "core.uploads" not in stripped
 
 
 def test_forge_py_does_not_import_cli_uploads_at_module_level():
