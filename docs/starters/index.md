@@ -8,9 +8,9 @@
 
 ## Principe
 
-Un **starter** Forge est un exemple applicatif générable avec `forge starter:build`.
-Il fournit un point de départ fonctionnel pour comprendre une mécanique du
-framework. Un starter n'est pas un profil — voir
+Un **starter** Forge est un parcours d'apprentissage que l'on réalise à la main en suivant la documentation.
+Chaque palier montre le contrôleur, la vue et la route à créer pour comprendre une mécanique du framework.
+Un starter n'est pas un profil, voir
 [Différence entre profil et starter](#difference-entre-profil-et-starter).
 
 Profils recommandés selon le starter : `minimal` ou `standard` pour les paliers
@@ -19,8 +19,7 @@ avec base de données, aucun profil pour les paliers sans base.
 ## Catalogue
 
 La progression cœur `welcome-forge` enseigne les fondamentaux ; chaque opt-in a
-sa propre progression `welcome-<module>` (débutant → avancé). La liste exhaustive
-est aussi disponible via `forge starter:list`.
+sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### Bonjour Forge : progression cœur (`welcome-forge`)
 
@@ -115,17 +114,10 @@ Pour choisir un profil : [Profils de projet](../features/profiles.md).
 
 ## Utiliser un starter
 
-```bash
-forge starter:list                 # catalogue complet depuis la CLI
-forge starter:build <identifiant>  # ex. : forge starter:build iot-welcome
-```
+Un starter se suit **à la main**, palier par palier.
+Pour une progression opt-in, commencez par sa page d'installation (installer le module, disposer d'un projet Forge), puis enchaînez les paliers.
+Chaque palier indique le contrôleur, la vue et la route à créer dans le projet.
 
-Un starter se génère par son **identifiant public** (`iot-welcome`,
-`mfa-welcome`, `rbac-welcome`…), pas par un numéro. Chaque page de starter liste
-les commandes exactes, le modèle de données et les étapes de reconstruction.
-
-!!! note "Le parcours débutant Bonjour Forge ne se génère plus par `starter:build`"
-    Le niveau débutant de `welcome-forge` est désormais un **tutoriel continu**
-    que l'on suit à la main (voir la progression ci-dessus). Les commandes
-    `forge starter:build` concernent les progressions opt-in et les autres
-    starters, pas les 11 paliers débutant.
+!!! note "Les starters ne se génèrent pas"
+    Forge ne génère pas les starters et n'écrit jamais dans votre `mvc/routes.py`.
+    Vous créez vous-même chaque fichier et ajoutez chaque route, en suivant la documentation du palier (voir [ADR-035](../adr/035-starters-manual-not-generated.md)).
