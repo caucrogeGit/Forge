@@ -1,9 +1,11 @@
+# pyright: strict
 import copy
 import datetime
 import html
 import re
+from collections.abc import Callable
 from decimal import Decimal, InvalidOperation
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 from core.forms.exceptions import ValidationError
 from core.http.slug import is_valid_slug
@@ -17,6 +19,9 @@ from core.forms.upload_validation import (
     validate_size,
 )
 
+if TYPE_CHECKING:
+    from core.forms.form import Form
+
 
 EMPTY_VALUES = (None, "")
 
@@ -25,14 +30,14 @@ class Field:
     """Champ de formulaire Forge : lecture, conversion et validation locale."""
 
     def __init__(self, *, label: str | None = None, required: bool = True,
-                 default=None, validators=None):
+                 default: Any = None, validators: "list[Callable[[Any], Any]] | None" = None) -> None:
         self.name = ""
         self.label = label
         self.required = required
         self.default = default
         self.validators = list(validators or [])
 
-    def clone(self):
+    def clone(self) -> "Field":
         cloned = copy.copy(self)
         cloned.validators = list(self.validators)
         return cloned
@@ -41,7 +46,7 @@ class Field:
     def display_label(self) -> str:
         return self.label or self.name.replace("_", " ").capitalize()
 
-    def clean(self, raw_value, *, form=None):
+    def clean(self, raw_value: Any, *, form: "Form | None" = None) -> Any:
         value = self._first(raw_value)
         if self._is_empty(value):
             if self.required:
@@ -53,45 +58,46 @@ class Field:
         self.run_validators(value)
         return value
 
-    def to_python(self, value):
+    def to_python(self, value: Any) -> Any:
         return value
 
-    def validate(self, value) -> None:
+    def validate(self, value: Any) -> None:
         return None
 
-    def run_validators(self, value) -> None:
+    def run_validators(self, value: Any) -> None:
         for validator in self.validators:
             result = validator(value)
             if isinstance(result, str) and result:
                 raise ValidationError(result)
             if isinstance(result, list) and result:
-                raise ValidationError(result)
+                raise ValidationError(cast("list[str]", result))
 
     @staticmethod
-    def _first(value):
+    def _first(value: Any) -> Any:
         if isinstance(value, list):
-            return value[0] if value else None
+            items = cast("list[Any]", value)
+            return items[0] if items else None
         return value
 
     @staticmethod
-    def _is_empty(value) -> bool:
+    def _is_empty(value: Any) -> bool:
         return value in EMPTY_VALUES
 
 
 class StringField(Field):
     def __init__(self, *, min_length: int | None = None, max_length: int | None = None,
-                 pattern: str | None = None, strip: bool = True, **kwargs):
+                 pattern: str | None = None, strip: bool = True, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.min_length = min_length
         self.max_length = max_length
         self.pattern = re.compile(pattern) if pattern else None
         self.strip = strip
 
-    def to_python(self, value) -> str:
+    def to_python(self, value: Any) -> str:
         value = str(value)
         return value.strip() if self.strip else value
 
-    def validate(self, value) -> None:
+    def validate(self, value: Any) -> None:
         if self.min_length is not None and len(value) < self.min_length:
             raise ValidationError(
                 f"Le champ {self.display_label} doit contenir au moins {self.min_length} caracteres."
@@ -106,18 +112,18 @@ class StringField(Field):
 
 class IntegerField(Field):
     def __init__(self, *, min_value: int | None = None, max_value: int | None = None,
-                 **kwargs):
+                 **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.min_value = min_value
         self.max_value = max_value
 
-    def to_python(self, value) -> int:
+    def to_python(self, value: Any) -> int:
         try:
             return int(str(value))
         except (TypeError, ValueError):
             raise ValidationError(f"Le champ {self.display_label} doit etre un entier.")
 
-    def validate(self, value) -> None:
+    def validate(self, value: Any) -> None:
         if self.min_value is not None and value < self.min_value:
             raise ValidationError(
                 f"Le champ {self.display_label} doit etre superieur ou egal a {self.min_value}."
@@ -130,18 +136,18 @@ class IntegerField(Field):
 
 class DecimalField(Field):
     def __init__(self, *, min_value: Decimal | int | str | None = None,
-                 max_value: Decimal | int | str | None = None, **kwargs):
+                 max_value: Decimal | int | str | None = None, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.min_value = Decimal(str(min_value)) if min_value is not None else None
         self.max_value = Decimal(str(max_value)) if max_value is not None else None
 
-    def to_python(self, value) -> Decimal:
+    def to_python(self, value: Any) -> Decimal:
         try:
             return Decimal(str(value).replace(",", "."))
         except (InvalidOperation, ValueError):
             raise ValidationError(f"Le champ {self.display_label} doit etre un nombre.")
 
-    def validate(self, value) -> None:
+    def validate(self, value: Any) -> None:
         if self.min_value is not None and value < self.min_value:
             raise ValidationError(
                 f"Le champ {self.display_label} doit etre superieur ou egal a {self.min_value}."
@@ -156,12 +162,12 @@ class BooleanField(Field):
     TRUE_VALUES = {"1", "true", "on", "yes", "oui"}
     FALSE_VALUES = {"0", "false", "off", "no", "non"}
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         kwargs.setdefault("required", False)
         kwargs.setdefault("default", False)
         super().__init__(**kwargs)
 
-    def to_python(self, value) -> bool:
+    def to_python(self, value: Any) -> bool:
         if isinstance(value, bool):
             return value
         normalized = str(value).strip().lower()
@@ -180,15 +186,15 @@ class ChoiceField(Field):
     jamais les chercher lui-meme.
     """
 
-    def __init__(self, *, choices=None, choices_key: str | None = None,
-                 coerce=None, empty_value=None, **kwargs):
+    def __init__(self, *, choices: Any = None, choices_key: str | None = None,
+                 coerce: Any = None, empty_value: Any = None, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.choices = choices
         self.choices_key = choices_key
         self.coerce = coerce
         self.empty_value = empty_value
 
-    def clean(self, raw_value, *, form=None):
+    def clean(self, raw_value: Any, *, form: "Form | None" = None) -> Any:
         value = self._first(raw_value)
         if self._is_empty(value):
             if self.required:
@@ -205,7 +211,7 @@ class ChoiceField(Field):
         self.run_validators(converted)
         return converted
 
-    def _coerce_value(self, value, allowed_values):
+    def _coerce_value(self, value: Any, allowed_values: Any) -> Any:
         coerce = self.coerce or self._infer_coerce(allowed_values)
         if coerce is None:
             return value
@@ -217,17 +223,17 @@ class ChoiceField(Field):
             raise ValidationError(f"Le champ {self.display_label} contient un choix invalide.")
 
     @staticmethod
-    def _infer_coerce(allowed_values):
+    def _infer_coerce(allowed_values: Any) -> Any:
         if not allowed_values:
             return None
-        first = next(iter(allowed_values))
+        first: Any = next(iter(allowed_values))
         if isinstance(first, bool):
             return None
         if isinstance(first, int):
             return int
-        return type(first)
+        return cast("type[Any]", type(first))
 
-    def _resolve_choices(self, form):
+    def _resolve_choices(self, form: "Form | None") -> Any:
         source = self.choices
         if isinstance(source, str):
             return self._option(form, source, required=True)
@@ -244,18 +250,18 @@ class ChoiceField(Field):
         return None
 
     @staticmethod
-    def _choice_values(choices) -> list:
+    def _choice_values(choices: Any) -> list[Any]:
         if isinstance(choices, dict):
-            return list(choices.keys())
-        values = []
+            return list(cast("dict[Any, Any]", choices).keys())
+        values: list[Any] = []
         for item in choices:
             if isinstance(item, tuple | list) and item:
-                values.append(item[0])
+                values.append(cast("tuple[Any, ...] | list[Any]", item)[0])
             else:
                 values.append(item)
         return values
 
-    def _option(self, form, name: str, *, required: bool):
+    def _option(self, form: "Form | None", name: str, *, required: bool) -> Any:
         if form is not None and name in form.options:
             value = form.options[name]
             return value() if callable(value) else value
@@ -274,13 +280,13 @@ class RelatedIdsField(Field):
     le formulaire via options, ou directement au constructeur.
     """
 
-    def __init__(self, *, allowed_ids=None, allowed_ids_key: str | None = None, **kwargs):
+    def __init__(self, *, allowed_ids: Any = None, allowed_ids_key: str | None = None, **kwargs: Any) -> None:
         kwargs.setdefault("required", False)
         super().__init__(**kwargs)
         self.allowed_ids = allowed_ids
         self.allowed_ids_key = allowed_ids_key
 
-    def clean(self, raw_value, *, form=None):
+    def clean(self, raw_value: Any, *, form: "Form | None" = None) -> Any:
         values = self._values(raw_value)
         if not values:
             if self.required:
@@ -301,20 +307,21 @@ class RelatedIdsField(Field):
         self.run_validators(ids)
         return ids
 
-    def _values(self, raw_value) -> list:
+    def _values(self, raw_value: Any) -> list[Any]:
         if raw_value is None:
             return []
+        values: list[Any]
         if isinstance(raw_value, list):
-            values = raw_value
+            values = cast("list[Any]", raw_value)
         elif isinstance(raw_value, tuple | set):
-            values = list(raw_value)
+            values = list(cast("tuple[Any, ...] | set[Any]", raw_value))
         else:
             values = [raw_value]
         return [value for value in values if value not in EMPTY_VALUES]
 
-    def _to_unique_ints(self, values) -> list[int]:
-        result = []
-        seen = set()
+    def _to_unique_ints(self, values: Any) -> list[int]:
+        result: list[int] = []
+        seen: set[int] = set()
         for value in values:
             if isinstance(value, bool):
                 raise ValidationError(f"Le champ {self.display_label} doit contenir des entiers.")
@@ -327,7 +334,7 @@ class RelatedIdsField(Field):
                 result.append(identifier)
         return result
 
-    def _resolve_allowed_ids(self, form) -> Any:
+    def _resolve_allowed_ids(self, form: "Form | None") -> Any:
         source = self.allowed_ids
         if isinstance(source, str):
             return self._option(form, source, required=True)
@@ -344,7 +351,7 @@ class RelatedIdsField(Field):
                 return found
         return None
 
-    def _option(self, form, name: str, *, required: bool):
+    def _option(self, form: "Form | None", name: str, *, required: bool) -> Any:
         if form is not None and name in form.options:
             value = form.options[name]
             return value() if callable(value) else value
@@ -359,7 +366,7 @@ _EMAIL_RE = re.compile(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$')
 
 
 class EmailField(StringField):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         kwargs.setdefault("max_length", 254)
         super().__init__(**kwargs)
 
@@ -387,7 +394,7 @@ _URL_RE = re.compile(r'^https?://\S+\.\S+$', re.IGNORECASE)
 
 
 class UrlField(StringField):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         kwargs.setdefault("max_length", 2048)
         super().__init__(**kwargs)
 
@@ -400,7 +407,7 @@ class UrlField(StringField):
 
 
 class TextAreaField(StringField):
-    def __init__(self, *, rows: int | None = None, **kwargs):
+    def __init__(self, *, rows: int | None = None, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.rows = rows
 
@@ -421,7 +428,7 @@ _DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 
 
 class DateField(Field):
-    def to_python(self, value) -> datetime.date:
+    def to_python(self, value: Any) -> datetime.date:
         s = str(value).strip()
         if not _DATE_RE.fullmatch(s):
             raise ValidationError(
@@ -440,7 +447,7 @@ _DATETIME_FMTS = ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M")
 
 
 class DateTimeField(Field):
-    def to_python(self, value) -> datetime.datetime:
+    def to_python(self, value: Any) -> datetime.datetime:
         s = str(value).strip()
         if not _DATETIME_RE.fullmatch(s):
             raise ValidationError(
@@ -459,14 +466,14 @@ class DateTimeField(Field):
 class RelationField(ChoiceField):
     """Champ de relation many_to_one — clé étrangère validée par liste de choix."""
 
-    def __init__(self, *, target: str = "", target_label_field: str = "", **kwargs):
+    def __init__(self, *, target: str = "", target_label_field: str = "", **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.target = target
         self.target_label_field = target_label_field
 
 
 class SlugField(StringField):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         kwargs.setdefault("max_length", 120)
         super().__init__(**kwargs)
 
@@ -483,17 +490,17 @@ class SlugField(StringField):
 
 class FileField(Field):
     def __init__(self, *,
-                 allowed_extensions=None,
+                 allowed_extensions: Any = None,
                  max_size: int | None = None,
-                 allowed_mime_types=None,
-                 **kwargs):
+                 allowed_mime_types: Any = None,
+                 **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.allowed_extensions = allowed_extensions
         self.max_size = max_size
         self.allowed_mime_types = allowed_mime_types
 
     @staticmethod
-    def _is_empty(value) -> bool:
+    def _is_empty(value: Any) -> bool:
         if value is None or value == "":
             return True
         filename = getattr(value, "filename", None)
@@ -502,10 +509,10 @@ class FileField(Field):
         size = getattr(value, "size", None)
         return size is not None and size == 0
 
-    def to_python(self, value):
+    def to_python(self, value: Any) -> Any:
         return value
 
-    def validate(self, value) -> None:
+    def validate(self, value: Any) -> None:
         filename = getattr(value, "filename", "")
         size = getattr(value, "size", 0)
         mime_type = getattr(value, "content_type", None)
@@ -541,9 +548,9 @@ _IMAGE_DEFAULT_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"]
 
 class ImageField(FileField):
     def __init__(self, *,
-                 allowed_extensions=None,
-                 allowed_mime_types=None,
-                 **kwargs):
+                 allowed_extensions: Any = None,
+                 allowed_mime_types: Any = None,
+                 **kwargs: Any) -> None:
         super().__init__(
             allowed_extensions=(
                 allowed_extensions if allowed_extensions is not None

@@ -1,3 +1,4 @@
+# pyright: strict
 """Hiérarchie d'exceptions de validation de fichier — reste dans le core.
 
 FILES-VALIDATORS-KEEP-001 (ADR-019) : déplacée hors de ``core/uploads/`` (qui

@@ -1,3 +1,4 @@
+# pyright: strict
 from core.forms.exceptions import ValidationError
 from core.forms.fields import (
     BooleanField,

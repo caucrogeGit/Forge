@@ -1,3 +1,6 @@
+# pyright: strict
+from typing import Any, cast
+
 from core.forms.exceptions import ValidationError
 from core.forms.fields import Field
 
@@ -8,10 +11,10 @@ NON_FIELD_ERRORS = "__all__"
 class FormMeta(type):
     """Collecte les Field declares sur la classe de formulaire."""
 
-    def __new__(mcls, name, bases, attrs):
-        declared = {}
+    def __new__(mcls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> type:
+        declared: dict[str, Field] = {}
         for base in bases:
-            declared.update(getattr(base, "declared_fields", {}))
+            declared.update(cast("dict[str, Field]", getattr(base, "declared_fields", {})))
 
         for attr_name, value in list(attrs.items()):
             if isinstance(value, Field):
@@ -33,17 +36,17 @@ class Form(metaclass=FormMeta):
 
     declared_fields: dict[str, Field] = {}
 
-    def __init__(self, data=None, **options):
-        self.raw_data = data or {}
+    def __init__(self, data: Any = None, **options: Any) -> None:
+        self.raw_data: dict[str, Any] = data or {}
         self.data = self._flatten(self.raw_data)
         self.options = dict(options)
         self.fields = self._clone_fields()
-        self.cleaned_data = {}
-        self._errors = {}
+        self.cleaned_data: dict[str, Any] = {}
+        self._errors: dict[str, list[str]] = {}
         self._is_bound = data is not None
 
     @classmethod
-    def from_request(cls, request, **options):
+    def from_request(cls, request: Any, **options: Any) -> "Form":
         data = dict(getattr(request, "body", {}) or {})
         files = getattr(request, "files", {}) or {}
         for name, uploaded_file in files.items():
@@ -65,10 +68,10 @@ class Form(metaclass=FormMeta):
     def field_errors(self, name: str) -> list[str]:
         return list(self._errors.get(name, []))
 
-    def value(self, name: str, default=""):
+    def value(self, name: str, default: Any = "") -> Any:
         return self.data.get(name, default)
 
-    def error(self, name: str, default="") -> str:
+    def error(self, name: str, default: str = "") -> str:
         errors = self.field_errors(name)
         return errors[0] if errors else default
 
@@ -104,14 +107,14 @@ class Form(metaclass=FormMeta):
             return
 
         if isinstance(extra_data, dict):
-            self.cleaned_data.update(extra_data)
+            self.cleaned_data.update(cast("dict[str, Any]", extra_data))
 
-    def clean(self):
+    def clean(self) -> Any:
         """Point d'extension pour les validations entre champs."""
         return None
 
     @property
-    def context(self) -> dict:
+    def context(self) -> dict[str, Any]:
         return {
             "data": dict(self.data),
             "errors": self.errors,
@@ -119,18 +122,19 @@ class Form(metaclass=FormMeta):
         }
 
     @staticmethod
-    def _flatten(data) -> dict:
-        flattened = {}
+    def _flatten(data: Any) -> dict[str, Any]:
+        flattened: dict[str, Any] = {}
         for key, value in data.items():
             if isinstance(value, list):
-                flattened[key] = value if len(value) > 1 else value[0] if value else ""
+                items = cast("list[Any]", value)
+                flattened[key] = items if len(items) > 1 else (items[0] if items else "")
             else:
                 flattened[key] = value
         return flattened
 
     @classmethod
     def _clone_fields(cls) -> dict[str, Field]:
-        fields = {}
+        fields: dict[str, Field] = {}
         for name, field in cls.declared_fields.items():
             clone = field.clone()
             clone.name = name

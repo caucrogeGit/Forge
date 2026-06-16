@@ -31,6 +31,19 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/forms` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-FORMS-001`). Passés en strict : `exceptions.py`,
+  `upload_exceptions.py`, `upload_validation.py`, `fields.py` (454 l.,
+  hiérarchie de champs), `form.py`, `__init__.py`. Les surfaces dynamiques des
+  champs (`value`, `raw_value`, `default`, `validators`, `choices`, `coerce`,
+  `form`) sont annotées (`Any`, `Callable[[Any], Any]`, `Form` sous
+  `TYPE_CHECKING` pour casser le cycle `form` ↔ `fields`) ; les conteneurs
+  reçoivent leur type (`list[Any]`, `dict[str, Any]`, `set[int]`). Les `cast`
+  ciblés couvrent les narrowings `isinstance` qui retombaient en
+  `list[Unknown]`/`dict[Unknown]` (messages de validateurs, `_first`,
+  `_choice_values`, `_values`, aplatissement de `Form`, collecte de
+  `FormMeta`). La validation d'upload pure (`upload_validation`) type ses
+  itérables (`Iterable[Any] | None`). Pyright reste à 0 erreur sur le paquet.
 - **Cliquet strict sur `core/auth` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-AUTH-001`). Passés en strict : les 10 modules du paquet
   (`exceptions.py`, `password.py`, `user.py`, `email.py`, `tokens.py`,

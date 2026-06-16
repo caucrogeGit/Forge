@@ -1,3 +1,4 @@
+# pyright: strict
 """Validation **pure** des métadonnées de fichier — reste dans le core.
 
 FILES-VALIDATORS-KEEP-001 (ADR-019) : déplacée hors de ``core/uploads/`` (qui
@@ -11,7 +12,9 @@ qui **réutilise** ces validators (il dépend du core).
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
+from typing import Any
 
 from core.forms.upload_exceptions import (
     UploadInvalidExtensionError,
@@ -21,7 +24,7 @@ from core.forms.upload_exceptions import (
 )
 
 
-def normalize_extensions(extensions) -> set[str]:
+def normalize_extensions(extensions: Iterable[Any] | None) -> set[str]:
     """Retourne les extensions autorisees sous forme normalisee, sans point."""
     return {
         str(ext).strip().lower().lstrip(".")
@@ -41,7 +44,7 @@ def validate_filename(filename: str | None) -> str:
     return filename
 
 
-def validate_extension(filename: str, allowed_extensions) -> str:
+def validate_extension(filename: str, allowed_extensions: Iterable[Any] | None) -> str:
     allowed = normalize_extensions(allowed_extensions)
     extension = filename_extension(filename)
     if not extension or extension not in allowed:
@@ -60,7 +63,7 @@ def validate_size(size: int, max_size: int) -> None:
         )
 
 
-def validate_mime_type(mime_type: str | None, allowed_mime_types) -> None:
+def validate_mime_type(mime_type: str | None, allowed_mime_types: Iterable[Any] | None) -> None:
     allowed = {str(m).strip().lower() for m in (allowed_mime_types or []) if str(m).strip()}
     if not allowed:
         return
@@ -76,8 +79,8 @@ def validate_upload_metadata(
     filename: str | None,
     size: int,
     mime_type: str | None,
-    allowed_extensions,
-    allowed_mime_types,
+    allowed_extensions: Iterable[Any] | None,
+    allowed_mime_types: Iterable[Any] | None,
     max_size: int,
 ) -> str:
     """Valide les metadonnees d'un fichier et retourne son extension normalisee."""
