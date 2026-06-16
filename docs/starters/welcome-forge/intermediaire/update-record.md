@@ -41,15 +41,14 @@ C'est un nouveau besoin (un formulaire, une route POST, du CSRF), donc deux nouv
         def _start_session(request: Request):
             """Garantit une session active et renvoie (session_id, csrf_token)."""
             session_id = get_session_id(request)
-            session = get_session(session_id) if session_id else None
-            if session is None:
+            if session_id is None or get_session(session_id) is None:
                 session_id = get_session_store().create()
-                session = get_session(session_id)
-            return session_id, session["csrf_token"]
+            session = get_session(session_id) or {}
+            return session_id, session.get("csrf_token", "")
 
         @staticmethod
         def edit(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             note = fetch_one(SELECT_ONE, (record_id,))
             if note is None:
                 return Response.text("Note introuvable.", status=404)
@@ -64,7 +63,7 @@ C'est un nouveau besoin (un formulaire, une route POST, du CSRF), donc deux nouv
 
         @staticmethod
         def update(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             content = request.form("content", default="").strip()
             if not content:
                 return Response.text("Le contenu est obligatoire.", status=422)

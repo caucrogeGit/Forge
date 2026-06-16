@@ -49,11 +49,10 @@ Cette page récapitule les huit notions acquises, puis montre l'état final comp
         def _start_session(request: Request):
             """Garantit une session active et renvoie (session_id, csrf_token)."""
             session_id = get_session_id(request)
-            session = get_session(session_id) if session_id else None
-            if session is None:
+            if session_id is None or get_session(session_id) is None:
                 session_id = get_session_store().create()
-                session = get_session(session_id)
-            return session_id, session["csrf_token"]
+            session = get_session(session_id) or {}
+            return session_id, session.get("csrf_token", "")
 
         @staticmethod
         def index(request: Request) -> Response:
@@ -61,7 +60,8 @@ Cette page récapitule les huit notions acquises, puis montre l'état final comp
             page = _page_number(request.query("page", default="1"))
             where = WHERE_FILTER if q else ""
             params = (f"%{q}%",) if q else ()
-            total = fetch_one(COUNT_BASE + where, params)["total"]
+            count_row = fetch_one(COUNT_BASE + where, params)
+            total = count_row["total"] if count_row else 0
             offset = (page - 1) * PAGE_SIZE
             notes = fetch_all(
                 SELECT_BASE + where + " ORDER BY id LIMIT ? OFFSET ?",
@@ -70,7 +70,7 @@ Cette page récapitule les huit notions acquises, puis montre l'état final comp
             session_id, csrf_token = NoteController._start_session(request)
             flash = get_flash(session_id)
             store = get_session_store()
-            session = get_session(session_id)
+            session = get_session(session_id) or {}
             visits = int(session.get("visits", 0)) + 1
             store.set(session_id, {"visits": visits})
 
@@ -93,7 +93,7 @@ Cette page récapitule les huit notions acquises, puis montre l'état final comp
 
         @staticmethod
         def edit(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             note = fetch_one(SELECT_ONE, (record_id,))
             if note is None:
                 return Response.text("Note introuvable.", status=404)
@@ -108,7 +108,7 @@ Cette page récapitule les huit notions acquises, puis montre l'état final comp
 
         @staticmethod
         def update(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             content = request.form("content", default="").strip()
             if not content:
                 return Response.text("Le contenu est obligatoire.", status=422)
@@ -117,7 +117,7 @@ Cette page récapitule les huit notions acquises, puis montre l'état final comp
 
         @staticmethod
         def delete(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             execute(DELETE_ONE, (record_id,))
             return BaseController.redirect("/note", request=request, flash="Note supprimée.")
     ```

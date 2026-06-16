@@ -44,11 +44,10 @@ Cette page récapitule les quatre notions acquises, puis montre l'état final co
         def _start_session(request: Request):
             """Garantit une session active et renvoie (session_id, csrf_token)."""
             session_id = get_session_id(request)
-            session = get_session(session_id) if session_id else None
-            if session is None:
+            if session_id is None or get_session(session_id) is None:
                 session_id = get_session_store().create()
-                session = get_session(session_id)
-            return session_id, session["csrf_token"]
+            session = get_session(session_id) or {}
+            return session_id, session.get("csrf_token", "")
 
         @staticmethod
         def index(request: Request) -> Response:
@@ -91,7 +90,7 @@ Cette page récapitule les quatre notions acquises, puis montre l'état final co
 
         @staticmethod
         def attach(request: Request) -> Response:
-            article = fetch_one(SELECT_ONE, (int(request.route("id")),))
+            article = fetch_one(SELECT_ONE, (int(request.route("id", default="0")),))
             if article is None:
                 return Response.text("Article introuvable.", status=404)
             session_id, csrf_token = ArticleController._start_session(request)
@@ -105,7 +104,7 @@ Cette page récapitule les quatre notions acquises, puis montre l'état final co
 
         @staticmethod
         def attach_store(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             uploaded = request.file("document")
             if uploaded is None:
                 return Response.text("Aucun fichier sélectionné.", status=422)

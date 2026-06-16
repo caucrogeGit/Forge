@@ -38,11 +38,10 @@ Cette page récapitule les onze notions acquises, puis montre l'état final comp
             Le jeton CSRF vit dans la session : sans session, il serait vide.
             """
             session_id = get_session_id(request)
-            session = get_session(session_id) if session_id else None
-            if session is None:
+            if session_id is None or get_session(session_id) is None:
                 session_id = get_session_store().create()
-                session = get_session(session_id)
-            return session_id, session["csrf_token"]
+            session = get_session(session_id) or {}
+            return session_id, session.get("csrf_token", "")
 
         @staticmethod
         def index(request: Request) -> Response:
@@ -68,7 +67,7 @@ Cette page récapitule les onze notions acquises, puis montre l'état final comp
             return Response.debug(request.data)
 
         @staticmethod
-        def json(request: Request) -> Response:
+        def json_demo(request: Request) -> Response:
             return Response.json(
                 {
                     "framework": "Forge",
@@ -177,7 +176,7 @@ Cette page récapitule les onze notions acquises, puis montre l'état final comp
         public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
         public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
         public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
-        public.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+        public.add("GET",  "/welcome/json", WelcomeController.json_demo, name="welcome-json")
         public.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
         public.add("GET",  "/welcome/form", WelcomeController.form, name="welcome-form")
         public.add("POST", "/welcome/form-submit", WelcomeController.form_submit, name="welcome-form_submit")

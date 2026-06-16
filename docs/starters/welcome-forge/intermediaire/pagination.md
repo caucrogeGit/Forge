@@ -45,7 +45,8 @@ La route `/note` ne change toujours pas.
             page = _page_number(request.query("page", default="1"))
             where = WHERE_FILTER if q else ""
             params = (f"%{q}%",) if q else ()
-            total = fetch_one(COUNT_BASE + where, params)["total"]
+            count_row = fetch_one(COUNT_BASE + where, params)
+            total = count_row["total"] if count_row else 0
             offset = (page - 1) * PAGE_SIZE
             notes = fetch_all(
                 SELECT_BASE + where + " ORDER BY id LIMIT ? OFFSET ?",

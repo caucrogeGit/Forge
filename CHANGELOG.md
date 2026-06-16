@@ -5,6 +5,19 @@
 
 ### Modifié
 
+- **Tutoriel welcome-forge strict-clean** (`WELCOME-FORGE-STRICT-CLEAN-001`).
+  Le squelette démarrant désormais en `typeCheckingMode: strict`, le code des
+  3 paliers de welcome-forge est rendu propre en mode strict (16 fichiers).
+  Corrections : le helper `_start_session` ne relit plus une session
+  `dict | None` (`session_id = get_session_id(request) or create()`,
+  `get_session(...) or {}`, `session.get("csrf_token", "")`) ; `int(request.route("id"))`
+  reçoit `default="0"` (sûr grâce au nouvel overload) ; `fetch_one(...)["total"]`
+  passe par une garde `… if row else 0` ; la méthode `json` de
+  `WelcomeController` (qui masquait `BaseController.json`) est renommée
+  `json_demo` (URL `/welcome/json` inchangée). Vérifié : `pyright --strict` à
+  0 erreur sur les 3 bilans. Limite connue : le palier avancé utilise l'opt-in
+  `forge-mvc-files`, qui n'expose pas encore de `py.typed` — son usage reste
+  `Unknown` en strict tant que l'opt-in n'est pas typé (chantier séparé).
 - **Accesseurs `Request` précis en typage strict (`@overload`)**
   (`HTTP-REQUEST-ACCESSOR-OVERLOAD-001`). `request.query()`, `request.form()`,
   `request.header()` et `request.route()` exposent désormais deux surcharges :

@@ -49,7 +49,7 @@ Comme la liste portera désormais un formulaire, `index` doit lui fournir un **j
 
         @staticmethod
         def delete(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             execute(DELETE_ONE, (record_id,))
             return BaseController.redirect("/note")
     ```

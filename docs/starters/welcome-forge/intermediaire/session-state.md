@@ -33,7 +33,7 @@ Nous y écrivons maintenant **notre propre** état : un compteur de visites, lu 
             session_id, csrf_token = NoteController._start_session(request)
             flash = get_flash(session_id)
             store = get_session_store()
-            session = get_session(session_id)
+            session = get_session(session_id) or {}
             visits = int(session.get("visits", 0)) + 1
             store.set(session_id, {"visits": visits})
 

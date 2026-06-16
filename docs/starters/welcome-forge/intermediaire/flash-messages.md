@@ -48,7 +48,7 @@ Nous donnons à ces deux écritures un vrai retour utilisateur : un message de c
 
         @staticmethod
         def update(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             content = request.form("content", default="").strip()
             if not content:
                 return Response.text("Le contenu est obligatoire.", status=422)
@@ -57,7 +57,7 @@ Nous donnons à ces deux écritures un vrai retour utilisateur : un message de c
 
         @staticmethod
         def delete(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             execute(DELETE_ONE, (record_id,))
             return BaseController.redirect("/note", request=request, flash="Note supprimée.")
     ```

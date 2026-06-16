@@ -21,7 +21,7 @@ Nous ajoutons une méthode et une route.
 
     ```python
         @staticmethod
-        def json(request: Request) -> Response:
+        def json_demo(request: Request) -> Response:
             return Response.json(
                 {
                     "framework": "Forge",
@@ -56,7 +56,7 @@ Nous ajoutons une méthode et une route.
         public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
         public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
         public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
-        public.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+        public.add("GET",  "/welcome/json", WelcomeController.json_demo, name="welcome-json")
     ```
 
 ??? note "Tests"

@@ -82,7 +82,7 @@ Nous abordons un nouveau domaine, la base de données : selon le principe « nou
         public.add("GET",  "/welcome/html", WelcomeController.html, name="welcome-html")
         public.add("GET",  "/welcome/article/{id}", WelcomeController.article, name="welcome-article")
         public.add("GET",  "/welcome/debug", WelcomeController.debug, name="welcome-debug")
-        public.add("GET",  "/welcome/json", WelcomeController.json, name="welcome-json")
+        public.add("GET",  "/welcome/json", WelcomeController.json_demo, name="welcome-json")
         public.add("GET",  "/welcome/csrf", WelcomeController.csrf, name="welcome-csrf")
         public.add("GET",  "/welcome/form", WelcomeController.form, name="welcome-form")
         public.add("POST", "/welcome/form-submit", WelcomeController.form_submit, name="welcome-form_submit")

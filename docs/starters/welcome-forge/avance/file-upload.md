@@ -48,7 +48,7 @@ Il faut d'abord ajouter une colonne `document_path` à la table `articles` (migr
 
         @staticmethod
         def attach(request: Request) -> Response:
-            article = fetch_one(SELECT_ONE, (int(request.route("id")),))
+            article = fetch_one(SELECT_ONE, (int(request.route("id", default="0")),))
             if article is None:
                 return Response.text("Article introuvable.", status=404)
             session_id, csrf_token = ArticleController._start_session(request)
@@ -62,7 +62,7 @@ Il faut d'abord ajouter une colonne `document_path` à la table `articles` (migr
 
         @staticmethod
         def attach_store(request: Request) -> Response:
-            record_id = int(request.route("id"))
+            record_id = int(request.route("id", default="0"))
             uploaded = request.file("document")
             if uploaded is None:
                 return Response.text("Aucun fichier sélectionné.", status=422)
