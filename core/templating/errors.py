@@ -1,3 +1,4 @@
+# pyright: strict
 """Exceptions et formatage d'erreurs du moteur de rendu Forge.
 
 Ticket : DX-RENDER-ERROR-001.

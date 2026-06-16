@@ -1,3 +1,4 @@
+# pyright: strict
 from __future__ import annotations
 from typing import Any
 from core.templating.contracts import Renderer

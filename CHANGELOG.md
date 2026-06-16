@@ -31,6 +31,12 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/templating` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-TEMPLATING-001`). Passés en strict : `contracts.py`,
+  `manager.py`, `errors.py`. Le protocole `Renderer.render` et
+  `TemplateManager.render` typent désormais leur contexte en `dict[str, Any]`
+  (au lieu du `dict` nu). `__init__.py` est vide, donc sans marqueur. Pyright
+  reste à 0 erreur sur le paquet `core/templating`.
 - **Cliquet strict sur `core/database` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-DB-001`). Passés en strict : `connection.py`, `db.py`,
   `transaction.py`, `sql_loader.py`. Le pilote `mariadb` ne fournit pas de stubs
