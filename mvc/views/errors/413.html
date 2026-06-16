@@ -15,6 +15,10 @@
         <a href="/" class="mt-6 inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
             Retour à l'accueil
         </a>
+        {% if error %}
+        <p class="text-gray-500 text-sm mt-6">Taille reçue : <code class="text-gray-700">{{ error.received }}</code> octets.</p>
+        <p class="text-xs text-gray-400 mt-1">Détail affiché uniquement en mode développement (APP_ENV=dev).</p>
+        {% endif %}
     </div>
 </body>
 </html>

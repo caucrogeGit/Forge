@@ -166,6 +166,15 @@ def _error_context():
     }
 
 
+def _dev_error(detail: dict):
+    """Détail d'erreur passé aux pages 404 / 413, uniquement en développement.
+
+    En production (APP_ENV != "dev"), renvoie None : la page d'erreur reste
+    neutre, sans information interne (chemin demandé, taille reçue…).
+    """
+    return {"error": detail} if APP_ENV == "dev" else None
+
+
 class RequestHandler(BaseHTTPRequestHandler):
     """
     Routeur/dispatcher des requêtes HTTP.
@@ -225,8 +234,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         try:
             request = Request(self)
             self._send_response(self._dispatch(request))
-        except RequestEntityTooLarge:
-            self._send_response(_html("errors/413.html", 413))
+        except RequestEntityTooLarge as exc:
+            received = exc.args[0] if exc.args else None
+            self._send_response(_html("errors/413.html", 413, _dev_error({"received": received})))
         except Exception:
             logger.exception("Erreur %s %s", label, self.path)
             self._send_response(_html("errors/500.html", 500, _error_context()))
@@ -282,7 +292,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         if not _os.path.isfile(filepath):
-            self._send_response(_html("errors/404.html", 404))
+            self._send_response(_html("errors/404.html", 404, _dev_error({"path": path})))
             return
 
         try:
@@ -293,7 +303,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._send_response(Response(200, content, content_type,
                                          headers={"Cache-Control": STATIC_CACHE}))
         except FileNotFoundError:
-            self._send_response(_html("errors/404.html", 404))
+            self._send_response(_html("errors/404.html", 404, _dev_error({"path": path})))
 
     def _serve_media(self, path: str) -> None:
         try:

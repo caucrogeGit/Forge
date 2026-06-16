@@ -23,6 +23,13 @@
   l'association `json.schemas` à `.vscode/settings.json`. Conformément au
   principe 9, Forge **n'édite pas** le `settings.json` du projet : la guidance
   montre le bloc à coller (mode « Forge affiche »).
+- **Pages d'erreur 404 et 413 du squelette : détail en développement**
+  (`SKELETON-ERROR-PAGES-DEV-DETAIL-001`). Dans la même logique que la 500, le
+  `app.py` du squelette passe désormais un contexte aux pages 404 (chemin
+  demandé) et 413 (taille reçue), affiché **uniquement en `dev`** via le helper
+  `_dev_error()` (None en production, aucune information interne exposée). Les
+  templates `errors/404.html` et `errors/413.html` portent le bloc `{% if error %}`
+  correspondant. Appliqué au squelette et au `app.py` racine (anti-dérive ADR-024).
 
 ### Corrigé
 
