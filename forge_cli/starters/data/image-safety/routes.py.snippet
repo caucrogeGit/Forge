@@ -1,8 +1,0 @@
-# forge-starter:image-safety:start
-from mvc.controllers.image_safety_controller import ImageSafetyController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/image-safety", ImageSafetyController.index, name="image_safety_index")
-    public.add("POST", "/image-safety", ImageSafetyController.check, name="image_safety_check")
-    public.add("GET", "/image-safety/inspect", ImageSafetyController.inspect, name="image_safety_inspect")
-# forge-starter:image-safety:end

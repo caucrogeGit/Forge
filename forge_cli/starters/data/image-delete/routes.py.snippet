@@ -1,7 +1,0 @@
-# forge-starter:image-delete:start
-from mvc.controllers.image_delete_controller import ImageDeleteController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/image-delete", ImageDeleteController.index, name="image_delete_index")
-    public.add("POST", "/image-delete", ImageDeleteController.delete, name="image_delete_remove")
-# forge-starter:image-delete:end

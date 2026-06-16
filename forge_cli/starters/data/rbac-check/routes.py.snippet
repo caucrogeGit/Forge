@@ -1,6 +1,0 @@
-# forge-starter:rbac-check:start
-from mvc.controllers.rbac_check_controller import RbacCheckController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/rbac-check", RbacCheckController.index, name="rbac_check_index")
-# forge-starter:rbac-check:end

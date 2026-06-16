@@ -1,7 +1,0 @@
-# forge-starter:mfa-challenge:start
-from mvc.controllers.mfa_challenge_controller import MfaChallengeController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/mfa-challenge", MfaChallengeController.index, name="mfa_challenge_index")
-    public.add("POST", "/mfa-challenge", MfaChallengeController.verify, name="mfa_challenge_verify")
-# forge-starter:mfa-challenge:end

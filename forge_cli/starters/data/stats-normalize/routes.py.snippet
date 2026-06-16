@@ -1,6 +1,0 @@
-# forge-starter:stats-normalize:start
-from mvc.controllers.stats_normalize_controller import StatsNormalizeController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/stats-normalize", StatsNormalizeController.index, name="stats_normalize_index")
-# forge-starter:stats-normalize:end

@@ -1,6 +1,0 @@
-# forge-starter:image-gallery:start
-from mvc.controllers.image_gallery_controller import ImageGalleryController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/image-gallery", ImageGalleryController.index, name="image_gallery_index")
-# forge-starter:image-gallery:end

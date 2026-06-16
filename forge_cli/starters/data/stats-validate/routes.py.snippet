@@ -1,6 +1,0 @@
-# forge-starter:stats-validate:start
-from mvc.controllers.stats_validate_controller import StatsValidateController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/stats-validate", StatsValidateController.index, name="stats_validate_index")
-# forge-starter:stats-validate:end

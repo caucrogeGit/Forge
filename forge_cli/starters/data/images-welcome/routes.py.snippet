@@ -1,7 +1,0 @@
-# forge-starter:images-welcome:start
-from mvc.controllers.images_welcome_controller import ImagesWelcomeController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/images-welcome", ImagesWelcomeController.index, name="images_welcome_index")
-    public.add("GET", "/images-welcome/inspect", ImagesWelcomeController.inspect, name="images_welcome_inspect")
-# forge-starter:images-welcome:end

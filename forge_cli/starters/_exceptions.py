@@ -1,2 +1,0 @@
-class StarterBuildError(RuntimeError):
-    pass

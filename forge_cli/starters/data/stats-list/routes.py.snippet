@@ -1,6 +1,0 @@
-# forge-starter:stats-list:start
-from mvc.controllers.stats_list_controller import StatsListController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/stats-list", StatsListController.index, name="stats_list_index")
-# forge-starter:stats-list:end

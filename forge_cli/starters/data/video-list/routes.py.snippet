@@ -1,6 +1,0 @@
-# forge-starter:video-list:start
-from mvc.controllers.video_list_controller import VideoListController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/video-list", VideoListController.index, name="video_list_index")
-# forge-starter:video-list:end

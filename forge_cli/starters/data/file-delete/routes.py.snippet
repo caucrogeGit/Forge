@@ -1,7 +1,0 @@
-# forge-starter:file-delete:start
-from mvc.controllers.file_delete_controller import FileDeleteController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/file-delete", FileDeleteController.index, name="file_delete_index")
-    public.add("POST", "/file-delete", FileDeleteController.delete, name="file_delete_remove")
-# forge-starter:file-delete:end

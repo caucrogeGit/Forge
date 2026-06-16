@@ -1,7 +1,0 @@
-# forge-starter:file-validate:start
-from mvc.controllers.file_validate_controller import FileValidateController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/file-validate", FileValidateController.index, name="file_validate_index")
-    public.add("POST", "/file-validate", FileValidateController.check, name="file_validate_check")
-# forge-starter:file-validate:end

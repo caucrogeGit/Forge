@@ -1,6 +1,0 @@
-# forge-starter:mail-transport:start
-from mvc.controllers.mail_transport_controller import MailTransportController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/mail-transport", MailTransportController.index, name="mail_transport_index")
-# forge-starter:mail-transport:end

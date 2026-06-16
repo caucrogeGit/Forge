@@ -1,7 +1,0 @@
-# forge-starter:image-alt-order:start
-from mvc.controllers.image_alt_order_controller import ImageAltOrderController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/image-alt-order", ImageAltOrderController.index, name="image_alt_order_index")
-    public.add("POST", "/image-alt-order", ImageAltOrderController.update, name="image_alt_order_update")
-# forge-starter:image-alt-order:end

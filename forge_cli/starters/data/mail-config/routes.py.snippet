@@ -1,6 +1,0 @@
-# forge-starter:mail-config:start
-from mvc.controllers.mail_config_controller import MailConfigController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/mail-config", MailConfigController.index, name="mail_config_index")
-# forge-starter:mail-config:end

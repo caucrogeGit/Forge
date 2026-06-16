@@ -36,6 +36,6 @@ PROJECT_PROFILE_DESCRIPTIONS: dict[str, str] = {
     ),
     "auth-mfa": (
         "Projet Forge avec authentification MFA (TOTP) activée. "
-        "Même base que standard. Appliquer forge starter:build auth-mfa pour les contrôleurs MFA complets."
+        "Même base que standard. Voir la progression welcome-mfa pour construire les contrôleurs MFA à la main."
     ),
 }

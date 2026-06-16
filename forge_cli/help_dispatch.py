@@ -17,8 +17,8 @@ dans `argv`.
 Politique d'inclusion : seules les commandes **sans** support `--help` natif
 sont listées dans ce module. Les commandes argparse-iso (`auth:user:*`,
 8 cas) et celles qui font déjà un check `--help` manuel (`make:entity`,
-`make:relation`, `db:apply`, `migration:make`, `starter:build`, `module:*`,
-9 cas) restent gérées par leur propre `main()` afin d'afficher leur aide
+`make:relation`, `db:apply`, `migration:make`, `module:*`,
+8 cas) restent gérées par leur propre `main()` afin d'afficher leur aide
 détaillée — l'interception centrale ne s'applique pas à elles.
 
 Architecture en deux dictionnaires :
@@ -94,8 +94,6 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # RBAC
     "rbac:validate":    "Valide mvc/security/rbac.json avec le schéma RBAC Forge.",
     "rbac:audit":       "Audit de cohérence fonctionnelle de mvc/security/rbac.json.",
-    # Starters
-    "starter:list":     "Liste les starter apps disponibles.",
     # Auth
     "auth:init":        "Initialise les tables d'authentification.",
     "auth:doctor":      "Diagnostic du système d'authentification.",
@@ -1810,8 +1808,7 @@ Description:
   Crée un nouveau projet Forge nu dans ./<NomProjet>/ à partir du
   squelette de projet embarqué : configuration env/, environnement
   virtuel Python (avec forge-mvc), dépendances Node et certificats SSL
-  de développement. Pour construire un starter dans le projet, voir
-  forge starter:build.
+  de développement.
 
 Arguments:
   <NomProjet>        Nom du projet (lettres, chiffres, _ ou -, doit
@@ -1844,29 +1841,6 @@ Limites:
   - ne crée AUCUNE base de données (lancer forge db:init dans le
     projet créé) ;
   - ne configure pas le déploiement (voir forge deploy:init).""",
-
-    "starter:list": """\
-Usage:
-  forge starter:list
-
-Description:
-  Liste les starter apps Forge disponibles avec leur numéro,
-  identifiant, statut (disponible / à venir), description et lien
-  documentaire. Lecture seule.
-
-Effets:
-  - lit le registre des starters embarqué dans forge_cli/starters/ ;
-  - imprime numéro, nom, statut, description et URL doc de chaque
-    starter ;
-  - n'écrit aucun fichier.
-
-Options:
-  -h, --help    Affiche cette aide sans exécuter la commande.
-
-Limites:
-  - lecture seule ;
-  - ne télécharge rien et ne déclenche aucune génération ;
-  - pour construire un starter, voir forge starter:build <n|nom>.""",
 
     "sync:entity": """\
 Usage:

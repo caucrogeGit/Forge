@@ -1,7 +1,0 @@
-# forge-starter:mfa-verify:start
-from mvc.controllers.mfa_verify_controller import MfaVerifyController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/mfa-verify", MfaVerifyController.index, name="mfa_verify_index")
-    public.add("POST", "/mfa-verify", MfaVerifyController.check, name="mfa_verify_check")
-# forge-starter:mfa-verify:end

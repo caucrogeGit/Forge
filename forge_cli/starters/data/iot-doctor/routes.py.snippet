@@ -1,6 +1,0 @@
-# forge-starter:iot-doctor:start
-from mvc.controllers.iot_doctor_controller import IotDoctorController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/iot-doctor", IotDoctorController.index, name="iot_doctor_index")
-# forge-starter:iot-doctor:end

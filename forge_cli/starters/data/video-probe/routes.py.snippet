@@ -1,6 +1,0 @@
-# forge-starter:video-probe:start
-from mvc.controllers.video_probe_controller import VideoProbeController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/video-probe/{uuid}", VideoProbeController.index, name="video_probe_index")
-# forge-starter:video-probe:end

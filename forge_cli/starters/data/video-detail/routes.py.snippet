@@ -1,6 +1,0 @@
-# forge-starter:video-detail:start
-from mvc.controllers.video_detail_controller import VideoDetailController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/video-detail/{uuid}", VideoDetailController.index, name="video_detail_index")
-# forge-starter:video-detail:end

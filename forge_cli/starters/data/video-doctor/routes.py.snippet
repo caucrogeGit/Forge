@@ -1,6 +1,0 @@
-# forge-starter:video-doctor:start
-from mvc.controllers.video_doctor_controller import VideoDoctorController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/video-doctor", VideoDoctorController.index, name="video_doctor_index")
-# forge-starter:video-doctor:end

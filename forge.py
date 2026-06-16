@@ -34,7 +34,6 @@ from forge_cli.deploy import main as deploy_main
 from forge_cli.i18n import main as i18n_main
 from forge_cli.run import main as run_main
 from forge_cli.update import main as update_main
-from forge_cli.starters import main as starters_main  # noqa: E402 (package replaces starters.py)
 from forge_cli.modules import main as modules_main
 from forge_cli.project_profiles import (
     SUPPORTED_PROJECT_PROFILES,
@@ -761,18 +760,6 @@ def main() -> None:
 
     if command in ("deploy:init", "deploy:check"):
         deploy_main(args)
-        return
-
-    if command == "starter:list":
-        starters_main(args)
-        return
-    if command == "starter:build":
-        if len(args) < 2:
-            cli_fail(
-                "argument manquant pour «forge starter:build».",
-                hint="indique l'identifiant du starter. Lance forge starter:list pour voir les disponibles.",
-            )
-        starters_main(args)
         return
 
     if command in ("module:list", "module:install", "module:files", "module:routes"):

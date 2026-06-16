@@ -1,7 +1,0 @@
-# forge-starter:file-store:start
-from mvc.controllers.file_store_controller import FileStoreController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/file-store", FileStoreController.index, name="file_store_index")
-    public.add("POST", "/file-store", FileStoreController.store, name="file_store_save")
-# forge-starter:file-store:end

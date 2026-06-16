@@ -1,6 +1,0 @@
-# forge-starter:rbac-request-roles:start
-from mvc.controllers.rbac_request_roles_controller import RbacRequestRolesController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/rbac-request-roles", RbacRequestRolesController.index, name="rbac_request_roles_index")
-# forge-starter:rbac-request-roles:end

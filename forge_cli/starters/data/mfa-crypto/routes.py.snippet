@@ -1,7 +1,0 @@
-# forge-starter:mfa-crypto:start
-from mvc.controllers.mfa_crypto_controller import MfaCryptoController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/mfa-crypto", MfaCryptoController.index, name="mfa_crypto_index")
-    public.add("POST", "/mfa-crypto", MfaCryptoController.demo, name="mfa_crypto_demo")
-# forge-starter:mfa-crypto:end

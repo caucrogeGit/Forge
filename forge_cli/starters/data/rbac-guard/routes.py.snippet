@@ -1,6 +1,0 @@
-# forge-starter:rbac-guard:start
-from mvc.controllers.rbac_guard_controller import RbacGuardController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/rbac-guard", RbacGuardController.index, name="rbac_guard_index")
-# forge-starter:rbac-guard:end

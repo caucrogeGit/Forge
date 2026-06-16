@@ -1,7 +1,0 @@
-# forge-starter:audio-upload:start
-from mvc.controllers.audio_upload_controller import AudioUploadController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/audio-upload", AudioUploadController.index, name="audio_upload_index")
-    public.add("POST", "/audio-upload", AudioUploadController.upload, name="audio_upload_store")
-# forge-starter:audio-upload:end

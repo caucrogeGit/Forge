@@ -1,6 +1,0 @@
-# forge-starter:audio-doctor:start
-from mvc.controllers.audio_doctor_controller import AudioDoctorController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/audio-doctor", AudioDoctorController.index, name="audio_doctor_index")
-# forge-starter:audio-doctor:end

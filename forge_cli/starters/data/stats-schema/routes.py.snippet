@@ -1,6 +1,0 @@
-# forge-starter:stats-schema:start
-from mvc.controllers.stats_schema_controller import StatsSchemaController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/stats-schema", StatsSchemaController.index, name="stats_schema_index")
-# forge-starter:stats-schema:end

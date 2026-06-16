@@ -1,7 +1,0 @@
-# forge-starter:video-welcome:start
-from mvc.controllers.video_welcome_controller import VideoWelcomeController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/video-welcome", VideoWelcomeController.index, name="video_welcome_index")
-    public.add("GET", "/video-welcome/inspect", VideoWelcomeController.inspect, name="video_welcome_inspect")
-# forge-starter:video-welcome:end

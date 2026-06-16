@@ -1,7 +1,0 @@
-# forge-starter:file-safe-path:start
-from mvc.controllers.file_safe_path_controller import FileSafePathController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/file-safe-path", FileSafePathController.index, name="file_safe_path_index")
-    public.add("GET", "/file-safe-path/inspect", FileSafePathController.inspect, name="file_safe_path_inspect")
-# forge-starter:file-safe-path:end

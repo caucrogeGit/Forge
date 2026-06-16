@@ -1,6 +1,0 @@
-# forge-starter:stats-event:start
-from mvc.controllers.stats_event_controller import StatsEventController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/stats-event", StatsEventController.index, name="stats_event_index")
-# forge-starter:stats-event:end

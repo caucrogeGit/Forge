@@ -1,7 +1,0 @@
-# forge-starter:image-variants:start
-from mvc.controllers.image_variants_controller import ImageVariantsController
-
-with router.group("", public=True) as public:
-    public.add("GET", "/image-variants", ImageVariantsController.index, name="image_variants_index")
-    public.add("GET", "/image-variants/inspect", ImageVariantsController.inspect, name="image_variants_inspect")
-# forge-starter:image-variants:end
