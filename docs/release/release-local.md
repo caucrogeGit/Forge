@@ -172,149 +172,45 @@ forge new TestForge101
 cd TestForge101
 source .venv/bin/activate
 forge doctor
-forge starter:list
+forge --version
 ```
 
-`forge starter:list` doit afficher les 96 starters sans erreur. C'est la vérification minimale que les ressources sont bien incluses dans la wheel.
+`forge doctor` doit confirmer un socle sain et `forge --version` afficher la version installée.
+
+!!! note "Plus de génération de starter (ADR-035)"
+    Depuis ADR-035, les commandes `forge starter:list` et `forge starter:build`
+    n'existent plus.
+    Les parcours pédagogiques se réalisent **à la main**, palier après palier,
+    en suivant les progressions `welcome-<module>` de la documentation.
+    La validation locale d'une release ne repose donc plus sur la génération de
+    starters, mais sur le socle CLI, le packaging et la documentation.
 
 ---
 
-## 4. Vérifier les starters sans base de données
+## 4. Vérifier le socle CLI sans base de données
 
-`--dry-run` affiche ce que le starter produirait sans rien écrire et sans toucher MariaDB :
+Vérifier que le socle CLI répond sans toucher MariaDB :
 
 ```bash
 cd ~/Projets/TestForge101
-forge starter:build 1 --force --dry-run
-forge starter:build 2 --force --dry-run
-forge starter:build 3 --force --dry-run
-forge starter:build 4 --force --dry-run
-forge starter:build 5 --force --dry-run
-forge starter:build 6 --force --dry-run
-forge starter:build 7 --force --dry-run
-forge starter:build 8 --force --dry-run
-forge starter:build 9 --force --dry-run
-forge starter:build 10 --force --dry-run
-forge starter:build 11 --force --dry-run
-forge starter:build 12 --force --dry-run
-forge starter:build 13 --force --dry-run
-forge starter:build 14 --force --dry-run
-forge starter:build 15 --force --dry-run
-forge starter:build 16 --force --dry-run
-forge starter:build 17 --force --dry-run
-forge starter:build 18 --force --dry-run
-forge starter:build 19 --force --dry-run
-forge starter:build 20 --force --dry-run
-forge starter:build 21 --force --dry-run
-forge starter:build 22 --force --dry-run
-forge starter:build 23 --force --dry-run
-forge starter:build 24 --force --dry-run
-forge starter:build 25 --force --dry-run
-forge starter:build 26 --force --dry-run
-forge starter:build 27 --force --dry-run
-forge starter:build 28 --force --dry-run
-forge starter:build 29 --force --dry-run
-forge starter:build 30 --force --dry-run
-forge starter:build 31 --force --dry-run
-forge starter:build 32 --force --dry-run
-forge starter:build 33 --force --dry-run
-forge starter:build 34 --force --dry-run
-forge starter:build 35 --force --dry-run
-forge starter:build 36 --force --dry-run
-forge starter:build 37 --force --dry-run
-forge starter:build 38 --force --dry-run
-forge starter:build 39 --force --dry-run
-forge starter:build 40 --force --dry-run
-forge starter:build 41 --force --dry-run
-forge starter:build 42 --force --dry-run
-forge starter:build 43 --force --dry-run
-forge starter:build 44 --force --dry-run
-forge starter:build 45 --force --dry-run
-forge starter:build 46 --force --dry-run
-forge starter:build 47 --force --dry-run
-forge starter:build 48 --force --dry-run
-forge starter:build 49 --force --dry-run
-forge starter:build 50 --force --dry-run
-forge starter:build 51 --force --dry-run
-forge starter:build 52 --force --dry-run
-forge starter:build 53 --force --dry-run
-forge starter:build 54 --force --dry-run
-forge starter:build 55 --force --dry-run
-forge starter:build 56 --force --dry-run
-forge starter:build 57 --force --dry-run
-forge starter:build 58 --force --dry-run
-forge starter:build 59 --force --dry-run
-forge starter:build 60 --force --dry-run
-forge starter:build 61 --force --dry-run
-forge starter:build 62 --force --dry-run
-forge starter:build 63 --force --dry-run
-forge starter:build 64 --force --dry-run
-forge starter:build 65 --force --dry-run
-forge starter:build 66 --force --dry-run
-forge starter:build 67 --force --dry-run
-forge starter:build 68 --force --dry-run
-forge starter:build 69 --force --dry-run
-forge starter:build 70 --force --dry-run
-forge starter:build 71 --force --dry-run
-forge starter:build 72 --force --dry-run
-forge starter:build 73 --force --dry-run
-forge starter:build 74 --force --dry-run
-forge starter:build 75 --force --dry-run
-forge starter:build 76 --force --dry-run
-forge starter:build 77 --force --dry-run
-forge starter:build 78 --force --dry-run
-forge starter:build 79 --force --dry-run
-forge starter:build 80 --force --dry-run
-forge starter:build 81 --force --dry-run
-forge starter:build 82 --force --dry-run
-forge starter:build 83 --force --dry-run
-forge starter:build 84 --force --dry-run
-forge starter:build 85 --force --dry-run
-forge starter:build 86 --force --dry-run
-forge starter:build 87 --force --dry-run
-forge starter:build 88 --force --dry-run
-forge starter:build 89 --force --dry-run
-forge starter:build 90 --force --dry-run
-forge starter:build 91 --force --dry-run
-forge starter:build 92 --force --dry-run
-forge starter:build 93 --force --dry-run
-forge starter:build 94 --force --dry-run
-forge starter:build 95 --force --dry-run
-forge starter:build 96 --force --dry-run
-forge starter:build 97 --force --dry-run
-forge starter:build 98 --force --dry-run
-forge starter:build 99 --force --dry-run
-forge starter:build 100 --force --dry-run
-forge starter:build 101 --force --dry-run
-forge starter:build 102 --force --dry-run
-forge starter:build 103 --force --dry-run
-forge starter:build 104 --force --dry-run
-forge starter:build 105 --force --dry-run
-forge starter:build 106 --force --dry-run
-forge starter:build 107 --force --dry-run
+forge help
+forge routes:list
+forge make:entity --help
 ```
 
-!!! note "Ce que --dry-run valide"
-    `--dry-run` est une validation de **packaging et de chemin d'exécution CLI**. Il confirme que :
-
-    - la commande est disponible ;
-    - les ressources du starter sont trouvées dans le package installé ;
-    - la logique de génération est atteignable.
-
-    Il ne valide **pas** :
-
-    - la connexion MariaDB ;
-    - l'exécution réelle de `db:apply` ;
-    - la création effective des tables ;
-    - le fonctionnement final de l'application.
-
-    Pour une validation complète, utiliser `forge db:init` puis `forge starter:build N --force` dans un projet neuf par starter.
+Ces commandes confirment que la CLI est disponible dans le package installé et
+que les ressources du squelette sont bien incluses dans la wheel.
 
 ---
 
-## 5. Tester les starters avec base de données
+## 5. Tester un parcours pédagogique avec base de données
 
-Chaque starter doit être testé dans un **projet séparé**. Lancer plusieurs starters dans le même projet laisse les entités du starter précédent en place et fausse le test.
+Les parcours `welcome-<module>` se réalisent **à la main** (ADR-035) : il n'y a
+plus de génération automatique.
+Pour valider une release de bout en bout, dérouler au moins un parcours dans un
+projet neuf, palier après palier, en suivant la progression documentée.
+Chaque parcours doit être réalisé dans un **projet séparé** : mélanger les
+entités de plusieurs parcours dans le même projet fausse le test.
 
 ### Prérequis — renseigner `env/dev` de chaque projet
 
@@ -341,7 +237,7 @@ source .venv/bin/activate
 # éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
 forge doctor
 forge db:init
-forge starter:build 1 --force
+# réaliser le parcours « contacts » à la main (entité, CRUD, routes)
 python app.py
 ```
 
@@ -361,7 +257,7 @@ source .venv/bin/activate
 # éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
 forge doctor
 forge db:init
-forge starter:build 2 --force
+# réaliser le parcours « authentification » à la main (entité utilisateur, login, dashboard)
 ```
 
 Créer l'utilisateur de test :
@@ -400,7 +296,7 @@ source .venv/bin/activate
 # éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
 forge doctor
 forge db:init
-forge starter:build 3 --force
+# réaliser le parcours « carnet de contacts » à la main (contacts + villes)
 ```
 
 Optionnellement, injecter des villes de référence :
@@ -431,7 +327,7 @@ source .venv/bin/activate
 # éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
 forge doctor
 forge db:init
-forge starter:build 4 --force
+# réaliser le parcours « suivi pédagogique » à la main (auth + suivi + élèves + cours)
 ```
 
 Créer l'utilisateur de test et injecter les données de démonstration :
@@ -468,7 +364,7 @@ source .venv/bin/activate
 # éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
 forge doctor
 forge db:init
-forge starter:build 5 --force
+# réaliser le parcours « communes & séjours » à la main (pages publiques, formulaire, mail)
 ```
 
 Lancer l'application :
@@ -495,7 +391,7 @@ source .venv/bin/activate
 # éditer env/dev → DB_NAME, DB_ADMIN_USER, DB_ADMIN_PWD, DB_APP_USER, DB_APP_PWD
 forge doctor
 forge db:init
-forge starter:build 6 --force
+# réaliser le parcours « auth MFA » à la main (welcome-mfa : enrôlement, challenge, récupération)
 ```
 
 Créer l'utilisateur de test :
@@ -521,14 +417,14 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ### Premier pas — Bienvenue dans Forge (sans BDD)
 
-Ce starter ne nécessite aucune base de données. Il se construit dans le projet courant via `forge starter:build welcome`.
+Ce parcours ne nécessite aucune base de données. Il se réalise à la main dans le projet courant, en suivant la progression `welcome-forge`.
 
 ```bash
 cd ~/Projets
 forge new TestStarter7
 cd TestStarter7
 source .venv/bin/activate
-forge starter:build welcome
+# réaliser le parcours « welcome-forge » à la main (6 pages éducatives, sans BDD)
 python app.py
 ```
 
@@ -538,14 +434,14 @@ Dans le navigateur, ouvrir `https://localhost:8000/welcome` et naviguer entre le
 
 ### Paramètres d'URL (sans BDD)
 
-Palier 2 de la [progression officielle des starters](../starters/index.md#progression-recommandee). Aucune base de données — le starter s'applique par son identifiant public `query-params`.
+Palier 2 de la [progression officielle des starters](../starters/index.md#progression-recommandee). Aucune base de données : le parcours `query-params` se réalise à la main.
 
 ```bash
 cd ~/Projets
 forge new TestStarterQueryParams
 cd TestStarterQueryParams
 source .venv/bin/activate
-forge starter:build query-params
+# réaliser le parcours « query-params » à la main (deux routes, lecture de la query string)
 python app.py
 ```
 
@@ -585,15 +481,14 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 |---|---|
 | `python -m build` | wheel créée dans `dist/` |
 | `forge --version` | `Forge {{forge_version}}` |
-| `forge starter:list` | 96 starters affichés |
-| `forge starter:build N --dry-run` | plan affiché sans erreur (×48) |
-| `forge db:init` + `starter:build 1` | CRUD contacts fonctionnel |
-| `forge db:init` + `starter:build 2` | login `admin` / `secret123` → `/dashboard` |
-| `forge db:init` + `starter:build 3` | contacts + villes, seed optionnel |
-| `forge db:init` + `starter:build 4` | auth + suivi + seed |
-| `forge db:init` + `starter:build 5` | pages publiques + formulaire séjour |
-| `forge db:init` + `starter:build 6` | auth + MFA TOTP (nécessite forge-mvc-mfa) |
-| `forge starter:build welcome` | pages éducatives HTTP sans BDD |
+| `forge help` / `forge routes:list` | socle CLI disponible sans erreur |
+| `forge db:init` + parcours « contacts » à la main | CRUD contacts fonctionnel |
+| `forge db:init` + parcours « authentification » à la main | login `admin` / `secret123` → `/dashboard` |
+| `forge db:init` + parcours « carnet de contacts » à la main | contacts + villes, seed optionnel |
+| `forge db:init` + parcours « suivi pédagogique » à la main | auth + suivi + seed |
+| `forge db:init` + parcours « communes & séjours » à la main | pages publiques + formulaire séjour |
+| `forge db:init` + parcours « auth MFA » à la main | auth + MFA TOTP (nécessite forge-mvc-mfa) |
+| parcours « welcome-forge » à la main | pages éducatives HTTP sans BDD |
 | `pytest tests/test_packaging.py` | 14/14 passants |
 | `mkdocs build --strict` | 0 avertissement d'ancre |
 

@@ -138,10 +138,10 @@ forge new MonProjet --profile standard
 ```bash
 forge new MonProjet --profile auth-mfa
 # forge-mvc-mfa : pip install --pre forge-mvc-mfa (publié sur PyPI depuis 1.0.0-beta.9)
-forge starter:build auth-mfa
 ```
 
-`forge starter:build auth-mfa` remplace les contrôleurs stub du squelette par les versions complètes (sans try/except ni `_MFA_AVAILABLE`).
+Pour obtenir les contrôleurs auth complets, suivez la progression `welcome-mfa` et réalisez les contrôleurs MFA à la main (enrôlement, challenge, récupération).
+Vous remplacez ainsi les contrôleurs stub du squelette par les versions complètes (sans try/except ni `_MFA_AVAILABLE`).
 
 **Prérequis** : `forge-mvc-mfa` installé dans le venv. Sans ce module, les routes `/login/mfa` redirigent vers `/login` (comportement du squelette stub par défaut).
 

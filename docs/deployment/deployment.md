@@ -230,7 +230,7 @@ Une starter-app Forge est une application normale — elle se déploie exactemen
 
 **Étapes :**
 
-1. Construire la starter-app localement en suivant son guide (`forge starter:list` pour les voir toutes).
+1. Construire l'application localement en suivant le parcours de doc correspondant.
 2. Initialiser les fichiers de déploiement depuis le projet :
    ```bash
    forge deploy:init

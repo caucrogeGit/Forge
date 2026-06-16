@@ -13,8 +13,7 @@
 > pattern, suivez les checklists.
 >
 > Complète la [charte philosophique](../philosophy/charter.md) (principes 2,
-> 5, 8, 10, 11), les [conventions internes](conventions.md) et le
-> [guide de création de starter](../philosophy/starter-author-guide.md).
+> 5, 8, 10, 11) et les [conventions internes](conventions.md).
 
 ## Exemples canoniques à copier
 

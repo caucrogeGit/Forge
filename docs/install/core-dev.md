@@ -189,8 +189,8 @@ Ce mode n'est **pas** utile pour :
 
 - développer une application métier — utilisez plutôt un projet
   séparé créé avec `forge new mon-projet` ailleurs sur votre disque ;
-- vérifier un starter spécifique — utilisez
-  `forge starter:build <id>` dans un projet généré.
+- suivre un parcours pédagogique — réalisez la progression
+  `welcome-<module>` à la main dans un projet créé avec `forge new`.
 
 !!! note "Différence avec un projet généré"
     Dans un projet utilisateur Forge créé par `forge new`, `forge run`

@@ -58,12 +58,13 @@ L'ensemble des commandes dispatchées est figé par
 [`cli-commands.md`](cli-commands.md). Les codes de sortie suivent la
 convention : `0` succès, `2` usage/argument, `1` erreur d'exécution.
 
-## 4. Starters 1.0 (gelés — 84)
+## 4. Starters 1.0 (gelés)
 
-La liste pédagogique est **figée** : 84 starters, à numéros uniques (la
-numérotation n'est plus une plage dense `1..N` depuis ADR-025), nommés selon
-[la convention](../philosophy/starter-author-guide.md) (`<module>-welcome`,
-`first-*`…).
+La liste pédagogique est **figée**, à numéros uniques (la
+numérotation n'est plus une plage dense `1..N` depuis ADR-025), nommée selon
+la convention `<module>-welcome`, `first-*`….
+Depuis ADR-035, ces parcours se réalisent **à la main** : il n'existe plus de
+commande de génération de starter.
 
 !!! note "welcome-forge : trois niveaux en tutoriels continus (ADR-025, ADR-028)"
     Les trois niveaux de `welcome-forge` ne sont **plus des starters
@@ -73,8 +74,8 @@ numérotation n'est plus une plage dense `1..N` depuis ADR-025), nommés selon
     « Catalogue d'articles », ADR-028). Ils ne figurent donc plus dans la liste
     gelée ci-dessous.
 
-Les progressions par niveau qui restent des starters buildables couvrent les
-modules opt-in : `welcome-iot` (`iot-welcome`, …) pour `forge-mvc-iot`,
+Les progressions par niveau qui couvrent les
+modules opt-in sont : `welcome-iot` (`iot-welcome`, …) pour `forge-mvc-iot`,
 `welcome-video` (`video-welcome`, …) pour `forge-mvc-video`, `welcome-images`
 (`images-welcome`, …) pour `forge-mvc-images`, `welcome-files`
 (`files-welcome`, …) pour `forge-mvc-files`, `welcome-audio`

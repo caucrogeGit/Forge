@@ -24,7 +24,6 @@ flowchart TD
     CLI --> EntityGen["Génération entités"]
     CLI --> CrudGen["Génération CRUD"]
     CLI --> DbTools["db:init / db:apply"]
-    CLI --> Starters["starter:list / starter:build"]
 
     Project --> CoreConfig["core.forge"]
     Project --> Router["core.http.router"]

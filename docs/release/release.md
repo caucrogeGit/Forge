@@ -113,12 +113,11 @@ Résumé minimal :
 ```bash
 pipx install dist/forge_mvc-<version>-py3-none-any.whl --force
 forge --version
-forge starter:list
 ```
 
-`forge starter:list` doit afficher les starters sans erreur.
+`forge --version` doit afficher la version installée sans erreur.
 
-Pour les starters avec base de données, voir la procédure dans [Validation locale](release-local.md).
+Pour la validation des parcours pédagogiques, voir la procédure dans [Validation locale](release-local.md).
 
 ---
 

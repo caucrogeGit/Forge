@@ -83,7 +83,7 @@ core/          Briques génériques du framework : HTTP, sessions, sécurité, f
                Ne doit contenir aucune logique métier applicative.
 
 forge_cli/     Commandes et générateurs Forge : make:entity, make:crud, sync:entity,
-               starter:build, module:install, deploy:init, project:check...
+               module:install, deploy:init, project:check...
                Orchestre les briques core/ et génère les fichiers projet.
 
 mvc/           Squelette applicatif généré par forge new.

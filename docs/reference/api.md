@@ -1803,8 +1803,6 @@ L'interface officielle est la commande `forge`.
 | `forge routes:list` | Liste les routes de l'application. |
 | `forge deploy:init` | Prépare les fichiers de déploiement. |
 | `forge deploy:check` | Vérifie la configuration de déploiement. |
-| `forge starter:list` | Liste les starter apps. |
-| `forge starter:build` | Reconstruit une starter app. |
 | `forge module:list [--path modules]` | Liste les modules Forge locaux sans rien installer. |
 | `forge module:install <nom> [--path modules] [--dry-run]` | Enregistre déclarativement un module dans `forge_modules.json`. |
 | `forge module:files <nom> [--dry-run]` | Copie prudemment les fichiers déclarés d'un module déjà installé. |
@@ -1939,7 +1937,7 @@ Les conseils de récupération sont présents pour les erreurs les plus fréquen
 | Situation | Conseil fourni |
 |---|---|
 | Commande inconnue | `forge help` pour la liste des commandes |
-| Argument manquant (`new`, `make:entity`, `make:crud`, `starter:build`) | Exemple concret avec nom plausible |
+| Argument manquant (`new`, `make:entity`, `make:crud`) | Exemple concret avec nom plausible |
 | `forge new --profile` sans valeur | Liste des profils disponibles |
 | `forge project:check` hors projet | `forge new <NomProjet>` pour créer un projet |
 | `forge routes:list` avec arguments en trop | Usage correct sans argument |

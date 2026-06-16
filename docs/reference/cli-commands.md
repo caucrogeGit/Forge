@@ -635,28 +635,6 @@ forge migration:diff --entity <NomEntite>
 
 ## Commandes de starters et modules
 
-<details markdown="1" id="forge-starterlist">
-<summary><code>forge starter:list</code> - Liste les starter apps disponibles avec leur statut et leur URL de documentation</summary>
-
-Liste les starter apps disponibles avec leur statut et leur URL de documentation.
-
-```bash
-forge starter:list
-```
-
-</details>
-
-<details markdown="1" id="forge-starterbuild">
-<summary><code>forge starter:build</code> - Génère un starter app dans le projet courant</summary>
-
-Génère un starter app dans le projet courant.
-
-```bash
-forge starter:build <nom>
-```
-
-</details>
-
 <details markdown="1" id="forge-modulelist">
 <summary><code>forge module:list</code> - Liste les modules Forge disponibles</summary>
 
@@ -1529,8 +1507,6 @@ Toutes les commandes documentées dans cette page.
 | [`forge routes:list`](#forge-routeslist) | Projet | Core |
 | [`forge schema:doctor`](#forge-schemadoctor) | Schémas JSON | Core |
 | [`forge schema:list`](#forge-schemalist) | Schémas JSON | Core |
-| [`forge starter:build`](#forge-starterbuild) | Starters et modules | Core |
-| [`forge starter:list`](#forge-starterlist) | Starters et modules | Core |
 | [`forge sync:entity`](#forge-syncentity) | Entités | Core |
 | [`forge sync:landing`](#forge-synclanding) | Synchronisation | Core |
 | [`forge sync:relations`](#forge-syncrelations) | Entités | Core |

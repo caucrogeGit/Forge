@@ -85,7 +85,6 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 | `forge sync:landing [--check]` | Expérimental |
 | `forge check:model` | Expérimental |
 | `forge deploy:init`, `forge deploy:check` | Expérimental |
-| `forge starter:build` | Expérimental |
 | Pages publiques (`make:public-*`) | Disponible, interface stable, comportement peut s'affiner |
 | Backends de session FileStore / MariaDbStore | Disponible, API stable, options de configuration susceptibles d'évoluer |
 | `forge-mvc-mfa` (Alpha) | Secret TOTP chiffré au repos via Fernet (`FORGE_MFA_SECRET_KEY`). Publié sur PyPI depuis `1.0.0-beta.9`. Passage Alpha → Beta à venir. |
@@ -220,12 +219,11 @@ Ces commandes et leurs options documentées sont garanties pour Forge 1.x.
 | `forge media:init` | Prépare les médias |
 | `forge js:init htmx` / `alpine` | Installe HTMX ou Alpine |
 
-### Routes et starters
+### Routes
 
 | Commande | Rôle |
 |---|---|
 | `forge routes:list` | Liste les routes |
-| `forge starter:list` | Liste les starter apps |
 
 ---
 
@@ -270,7 +268,6 @@ Ces commandes sont disponibles mais leur interface peut évoluer :
 | `forge sync:landing [--check]` | Synchronisation landing |
 | `forge check:model` | Vérification cohérence modèles |
 | `forge deploy:init` / `check` | Déploiement |
-| `forge starter:build` | Reconstruction starter |
 | `forge migration:diff` | Comparaison entité / MariaDB |
 
 ---

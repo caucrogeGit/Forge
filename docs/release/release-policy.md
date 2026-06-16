@@ -132,7 +132,7 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 
 ### Expérimental — stable en usage, interface peut évoluer
 
-- `forge module:*`, `forge deploy:*`, `forge starter:build`.
+- `forge module:*`, `forge deploy:*`.
 - Backends de session `FileSessionStore`, `MariaDbSessionStore`.
 - Pages publiques (`make:public-*`).
 
@@ -293,11 +293,10 @@ Vérification minimale de la wheel installée :
 ```bash
 pipx install dist/forge_mvc-X.Y.Z-py3-none-any.whl --force
 forge --version
-forge starter:list
 ```
 
-Voir [Validation locale](release-local.md) pour la procédure complète avec
-les quatre starters.
+Voir [Validation locale](release-local.md) pour la procédure complète des
+parcours pédagogiques.
 
 ---
 

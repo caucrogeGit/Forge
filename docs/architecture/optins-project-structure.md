@@ -149,12 +149,13 @@ Ce ticket ne déplace ni ne copie aucune migration : il fixe seulement
 
 ## Starters opt-in
 
-Les **starters restent officiellement gérés par Forge CLI**
-(`forge starter:build`, profils `forge new`). Un starter opt-in (ex.
-`welcome-optin-iot`) peut, à terme, **générer** une structure `optins/<module>/`
-prête à brancher — mais la responsabilité du starter reste côté Forge
-CLI. Le dossier `optins/` est la **cible** de cette génération, pas un
-système concurrent.
+Les **starters sont des parcours d'apprentissage réalisés à la main** depuis la
+documentation (ADR-035), ils ne sont pas générés.
+Chaque progression `welcome-<module>` montre, palier par palier, le contrôleur,
+la vue et la route à créer dans le projet.
+Le dossier `optins/<module>/` reste la cible où l'opt-in se branche côté projet,
+mais c'est l'apprenant qui crée les fichiers en suivant le parcours, pas une
+commande de génération.
 
 ## Documentation locale
 

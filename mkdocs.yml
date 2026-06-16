@@ -126,7 +126,6 @@ nav:
   - Modules et starters:
       - Vue d'ensemble des starters: starters/index.md
       - Créer un module: philosophy/module-author-guide.md
-      - Créer un starter: philosophy/starter-author-guide.md
       - Structure des opt-ins (projet): architecture/optins-project-structure.md
       - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Progression pédagogique:
