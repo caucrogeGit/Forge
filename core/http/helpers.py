@@ -58,6 +58,16 @@ def _missing_template_response(
 
 
 def html(template: str, status: int = 200, context: dict = None, *, raw: bool = False) -> Response:
+    # Le 2e argument positionnel est le STATUS, pas le contexte. Sans cette
+    # garde, `render(template, {...})` (réflexe d'autres frameworks) mettait un
+    # dict dans `status` et provoquait une erreur différée et obscure.
+    if not isinstance(status, int) or isinstance(status, bool):
+        raise TypeError(
+            "Le 2e argument positionnel de html()/render() est le STATUS HTTP "
+            f"(entier), pas le contexte ; reçu {type(status).__name__} {status!r}. "
+            "Passez le contexte par mot-clé : render(template, context={...}) "
+            "ou html(template, context={...})."
+        )
     if raw:
         filepath = os.path.join(_cfg("views_dir"), template)
         try:

@@ -63,6 +63,12 @@
   `mvc/routes.py` fautive. La route lève désormais un `TypeError` explicite **à
   l'enregistrement** (import de `routes.py`), avec un exemple correct
   (`router.add("GET", "/", HomeController.index)`). Durcissement interne pré-1.0.
+- **`html()` / `render()` valident le `status` (2e argument positionnel)**
+  (`CORE-RENDER-STATUS-TYPE-001`). `render("tpl", {...})` (réflexe d'autres
+  frameworks où le 2e argument est le contexte) plaçait un dict dans `status` et
+  provoquait une erreur différée. Le funnel `core.http.helpers.html()` — utilisé
+  par `BaseController.render()` et les helpers d'erreur — lève désormais un
+  `TypeError` explicite orientant vers `context=...`. Durcissement interne pré-1.0.
 
 
 ## [1.0.0-beta.16] — 2026-06-16
