@@ -81,8 +81,10 @@ class TestEnableKindAware:
     def test_unknown_exits_2(self, capsys):
         assert enable.main(["does-not-exist"]) == 2
 
-    def test_mfa_guidance_points_to_starter(self):
-        assert "mfa-welcome" in enable_guidance(OFFICIAL_OPTINS["mfa"])
+    def test_mfa_guidance_points_to_welcome_parcours(self):
+        # ADR-035 : plus de starter:build ; la guidance renvoie au parcours
+        # manuel welcome-mfa dans la documentation.
+        assert "welcome-mfa" in enable_guidance(OFFICIAL_OPTINS["mfa"])
 
     def test_rbac_guidance_mentions_decorators(self):
         assert "require_permission" in enable_guidance(OFFICIAL_OPTINS["rbac"])
@@ -115,3 +117,30 @@ class TestListEnriched:
             assert name in out
         assert "bibliothèque" in out
         assert "transversal" in out
+
+
+# ── DX VS Code rbac (b17, SKELETON-VSCODE-DX-RBAC-OPTIN-001) ─────────────────
+
+class TestRbacSchemaGuidance:
+    """Le câble rbac (guidance, mode « Forge affiche ») explique comment valider
+    `mvc/security/rbac.json` dans VS Code : le schéma rbac n'étant pas dans le
+    squelette nu (opt-in), la guidance fournit le schéma et l'association à
+    ajouter à la main (Forge ne réécrit pas .vscode/settings.json, principe 9)."""
+
+    def test_rbac_guidance_mentionne_le_schema(self):
+        guide = enable_guidance(OFFICIAL_OPTINS["rbac"])
+        assert "rbac.schema.json" in guide
+        assert "/mvc/security/rbac.json" in guide
+        assert "json.schemas" in guide
+
+    def test_rbac_guidance_renvoie_settings_json(self):
+        guide = enable_guidance(OFFICIAL_OPTINS["rbac"])
+        assert ".vscode/settings.json" in guide
+
+    def test_aucune_guidance_ne_reference_starter_build(self):
+        """ADR-035 : la commande forge starter:build n'existe plus."""
+        for optin in OFFICIAL_OPTINS.values():
+            assert "starter:build" not in enable_guidance(optin), (
+                f"guidance enable de {optin.name} référence encore starter:build"
+            )
+            assert "starter:build" not in disable_guidance(optin)

@@ -16,6 +16,20 @@
   principe 8, les schémas opt-in (ex. `rbac.json` → `forge-mvc-rbac`) ne sont
   **pas** dans le squelette nu. L'association `env/*` au langage `properties`
   est conservée.
+- **Le câble de l'opt-in RBAC explique la validation VS Code de `rbac.json`**
+  (`OPTIN-RBAC-SCHEMA-GUIDANCE-001`). `forge opt-in:enable rbac` affiche désormais
+  comment valider `mvc/security/rbac.json` dans VS Code : copier le schéma
+  `rbac.schema.json` (fourni par forge-mvc) dans `schemas/`, puis ajouter
+  l'association `json.schemas` à `.vscode/settings.json`. Conformément au
+  principe 9, Forge **n'édite pas** le `settings.json` du projet : la guidance
+  montre le bloc à coller (mode « Forge affiche »).
+
+### Corrigé
+
+- **Guidance MFA : retrait de la référence à `forge starter:build`**
+  (`OPTIN-MFA-GUIDANCE-STARTER-BUILD-001`). `forge opt-in:enable mfa` renvoyait à
+  `forge starter:build mfa-welcome` (commande retirée, ADR-035) ; il renvoie
+  désormais au parcours manuel welcome-mfa de la documentation.
 
 
 ## [1.0.0-beta.16] — 2026-06-16
