@@ -1,3 +1,4 @@
+# pyright: strict
 """Découverte des modules Forge dans un dossier local."""
 
 from __future__ import annotations

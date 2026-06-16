@@ -1,3 +1,4 @@
+# pyright: strict
 """Registre des modules Forge installés."""
 
 from __future__ import annotations
@@ -6,7 +7,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from .manifest import ModuleManifest
 
@@ -35,7 +36,7 @@ class ModuleInstallResult:
 
 def load_installed_modules_registry(
     path: str | Path = MODULE_REGISTRY_FILE,
-) -> dict:
+) -> dict[str, Any]:
     """Charge le registre. Retourne {"installed": {}} si le fichier est absent."""
     p = Path(path)
     if not p.exists():
@@ -56,11 +57,11 @@ def load_installed_modules_registry(
         raise ModuleRegistryError(
             f"structure invalide dans {p} : 'installed' doit être un dictionnaire"
         )
-    return data
+    return cast("dict[str, Any]", data)
 
 
 def save_installed_modules_registry(
-    registry: dict,
+    registry: dict[str, Any],
     path: str | Path = MODULE_REGISTRY_FILE,
 ) -> None:
     """Écrit le registre en JSON lisible."""
@@ -74,7 +75,7 @@ def save_installed_modules_registry(
         raise ModuleRegistryError(f"impossible d'écrire {p}: {exc}") from exc
 
 
-def is_module_installed(registry: dict, name: str) -> bool:
+def is_module_installed(registry: dict[str, Any], name: str) -> bool:
     """Retourne True si le module est déjà présent dans registry['installed']."""
     return name in registry.get("installed", {})
 
@@ -82,7 +83,7 @@ def is_module_installed(registry: dict, name: str) -> bool:
 def prepare_module_installation(
     manifest: ModuleManifest,
     source_path: str | Path,
-) -> dict:
+) -> dict[str, Any]:
     """Prépare l'entrée de registre pour un module.
 
     Refuse les URL et les traversées '..' .
@@ -138,7 +139,7 @@ def install_module_manifest(
 
     entry = prepare_module_installation(manifest, source_path)
 
-    updated: dict = {
+    updated: dict[str, Any] = {
         "installed": {**registry["installed"], manifest.name: entry}
     }
 

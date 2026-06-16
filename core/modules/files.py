@@ -1,3 +1,4 @@
+# pyright: strict
 """Copie contrôlée des fichiers déclarés par un module Forge."""
 
 from __future__ import annotations
@@ -7,6 +8,7 @@ import re
 import shutil
 from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import Any
 
 from .manifest import ModuleManifest, ModuleManifestError, load_module_manifest
 from .registry import (
@@ -15,6 +17,16 @@ from .registry import (
     save_installed_modules_registry,
 )
 
+
+__all__ = [
+    "INSTALLABLE_PROVIDES",
+    "ModuleFileConflictError",
+    "ModuleFileInstallError",
+    "ModuleFileInstallResult",
+    "install_module_files",
+    "prepare_module_file_installation",
+    "_planned_file_pairs",
+]
 
 INSTALLABLE_PROVIDES: frozenset[str] = frozenset({
     "entities",
@@ -40,7 +52,7 @@ class ModuleFileInstallError(ValueError):
 class ModuleFileConflictError(ModuleFileInstallError):
     """Au moins une cible existe déjà."""
 
-    def __init__(self, conflicts: tuple[str, ...]):
+    def __init__(self, conflicts: tuple[str, ...]) -> None:
         self.conflicts = conflicts
         super().__init__("Conflit de fichiers : " + ", ".join(conflicts))
 
@@ -56,7 +68,7 @@ class ModuleFileInstallResult:
     manifest: ModuleManifest
 
 
-def _safe_relative_path(value: str, *, label: str) -> Path:
+def _safe_relative_path(value: Any, *, label: str) -> Path:
     if not isinstance(value, str) or not value.strip():
         raise ModuleFileInstallError(f"{label}: chemin manquant")
     if _URL_RE.search(value):

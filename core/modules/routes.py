@@ -1,3 +1,4 @@
+# pyright: strict
 """Génération explicite des routes de modules Forge."""
 
 from __future__ import annotations

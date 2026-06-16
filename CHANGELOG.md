@@ -31,6 +31,17 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/modules` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-MODULES-001`). Passés en strict : `manifest.py`,
+  `discovery.py`, `registry.py`, `files.py`, `routes.py`, `remove.py`,
+  `__init__.py`. Les `dict` nus du registre deviennent `dict[str, Any]` ; les
+  frontières de validation (`validate_module_manifest`, `_validate_provides`,
+  `_validate_paths`, `load_installed_modules_registry`) `cast` après la garde
+  `isinstance`. Le `default_factory=dict` du champ `ModuleManifest.paths`
+  devient `dict[str, str]` (factory typée). `_safe_relative_path` prend `Any`
+  (validateur d'entrée). `files.py` déclare un `__all__` officialisant son
+  helper `_planned_file_pairs`, réutilisé par `remove.py` (`reportPrivateUsage`).
+  Pyright reste à 0 erreur sur le paquet.
 - **Cliquet strict sur `core/errors` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-ERRORS-001`). Passés en strict : `runtime_errors.py`,
   `runtime_error_logger.py`, `runtime_error_markdown.py`, `__init__.py`. Les

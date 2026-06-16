@@ -1,3 +1,4 @@
+# pyright: strict
 """Suppression contrôlée des modules Forge."""
 
 from __future__ import annotations
@@ -6,6 +7,7 @@ import hashlib
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from .manifest import ModuleManifestError, load_module_manifest
 from .registry import (
@@ -62,7 +64,7 @@ def _safe_registry_source(source: str) -> Path:
     return path
 
 
-def _build_source_map(registry_entry: dict, module_name: str) -> dict[str, str]:
+def _build_source_map(registry_entry: dict[str, Any], module_name: str) -> dict[str, str]:
     """
     Reconstruit le mapping {target_path: source_path} depuis le manifeste source.
     Retourne {} si le dossier source est inaccessible ou le manifeste invalide.

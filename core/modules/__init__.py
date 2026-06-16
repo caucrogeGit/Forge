@@ -1,3 +1,4 @@
+# pyright: strict
 """Système de modules Forge — contrat, validation, découverte et registre."""
 
 from .manifest import (

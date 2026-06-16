@@ -1,3 +1,4 @@
+# pyright: strict
 """Contrat et validation du manifeste d'un module Forge."""
 
 from __future__ import annotations
@@ -6,7 +7,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
 _VALID_NAME_RE = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -38,7 +39,7 @@ class ModuleManifest:
     version: str
     description: str
     provides: tuple[str, ...] = field(default_factory=tuple)
-    paths: dict[str, str] = field(default_factory=dict)
+    paths: dict[str, str] = field(default_factory=dict[str, str])
 
 
 def validate_module_name(value: Any) -> str:
@@ -76,8 +77,9 @@ def _validate_provides(value: Any) -> tuple[str, ...]:
         return ()
     if not isinstance(value, (list, tuple)):
         raise ModuleManifestError("provides: doit etre une liste ou un tuple")
+    items = cast("list[Any] | tuple[Any, ...]", value)
     result: list[str] = []
-    for item in value:
+    for item in items:
         if not isinstance(item, str):
             raise ModuleManifestError(
                 f"provides: chaque valeur doit etre une chaine, trouve {item!r}"
@@ -96,8 +98,9 @@ def _validate_paths(value: Any) -> dict[str, str]:
         return {}
     if not isinstance(value, dict):
         raise ModuleManifestError("paths: doit etre un dictionnaire")
+    items = cast("dict[str, Any]", value)
     result: dict[str, str] = {}
-    for key, path in value.items():
+    for key, path in items.items():
         if not isinstance(path, str):
             raise ModuleManifestError(f"paths.{key}: la valeur doit etre une chaine")
         if _URL_RE.search(path):
@@ -117,6 +120,7 @@ def validate_module_manifest(data: Any) -> ModuleManifest:
     """Valide un dictionnaire et retourne un ModuleManifest."""
     if not isinstance(data, dict):
         raise ModuleManifestError("le manifeste doit etre un dictionnaire")
+    data = cast("dict[str, Any]", data)
 
     for key in ("name", "label", "version", "description"):
         if key not in data:
