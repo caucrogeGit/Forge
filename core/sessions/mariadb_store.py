@@ -1,3 +1,4 @@
+# pyright: strict
 """Backend MariaDB pour les sessions Forge.
 
 Stocke les sessions dans la table forge_sessions.
@@ -14,11 +15,15 @@ import re
 import secrets
 import time
 from datetime import datetime
-from typing import Callable
+from typing import Any, Callable, cast
 
 from core.sessions.memory_store import SESSION_TTL
 
 _SESSION_ID_RE = re.compile(r"^[0-9a-f]{64}$")
+
+# Signatures des accesseurs DB injectables (tests) et de leurs défauts.
+_FetchOne = Callable[[str, "tuple[Any, ...]"], "dict[str, Any] | None"]
+_Execute = Callable[[str, "tuple[Any, ...]"], int]
 
 # ── Requêtes SQL ──────────────────────────────────────────────────────────────
 
@@ -41,12 +46,12 @@ _SQL_CLEANUP = "DELETE FROM forge_sessions WHERE expire_at < NOW()"
 
 # ── Accesseurs DB par défaut (lazy — pas de connexion à l'import) ─────────────
 
-def _default_fetch_one(sql: str, params: tuple) -> dict | None:
+def _default_fetch_one(sql: str, params: "tuple[Any, ...]") -> "dict[str, Any] | None":
     from core.database.db import fetch_one
     return fetch_one(sql, params)
 
 
-def _default_execute(sql: str, params: tuple = ()) -> int:
+def _default_execute(sql: str, params: "tuple[Any, ...]" = ()) -> int:
     from core.database.db import execute
     return execute(sql, params)
 
@@ -69,8 +74,8 @@ class MariaDbSessionStore:
 
     def __init__(
         self,
-        fetch_one: Callable | None = None,
-        execute: Callable | None = None,
+        fetch_one: _FetchOne | None = None,
+        execute: _Execute | None = None,
         ttl: int = SESSION_TTL,
     ) -> None:
         self._fetch_one = fetch_one or _default_fetch_one
@@ -82,7 +87,7 @@ class MariaDbSessionStore:
     def _valid(self, session_id: str) -> bool:
         return bool(_SESSION_ID_RE.match(session_id))
 
-    def _load(self, session_id: str) -> dict | None:
+    def _load(self, session_id: str) -> dict[str, Any] | None:
         """Charge et désérialise une session non expirée. Retourne None si absente,
         expirée ou corrompue."""
         row = self._fetch_one(_SQL_SELECT, (session_id,))
@@ -93,11 +98,11 @@ class MariaDbSessionStore:
         except (json.JSONDecodeError, TypeError, ValueError, KeyError):
             self._execute(_SQL_DELETE, (session_id,))
             return None
-        return data if isinstance(data, dict) else None
+        return cast("dict[str, Any]", data) if isinstance(data, dict) else None
 
     # ── API publique ─────────────────────────────────────────────────────────
 
-    def create(self, data: dict | None = None) -> str:
+    def create(self, data: dict[str, Any] | None = None) -> str:
         """Crée une session avec la structure Forge standard et retourne son identifiant."""
         session_id = secrets.token_hex(32)
         expires_at = time.time() + self._ttl
@@ -111,13 +116,13 @@ class MariaDbSessionStore:
         self._execute(_SQL_INSERT, (session_id, json.dumps(session), _dt(expires_at)))
         return session_id
 
-    def get(self, session_id: str) -> dict | None:
+    def get(self, session_id: str) -> dict[str, Any] | None:
         """Retourne les données de session ou None si absente, expirée ou corrompue."""
         if not self._valid(session_id):
             return None
         return self._load(session_id)
 
-    def set(self, session_id: str, data: dict) -> None:
+    def set(self, session_id: str, data: dict[str, Any]) -> None:
         """Met à jour (merge) les données d'une session existante non expirée."""
         if not self._valid(session_id):
             return
@@ -127,7 +132,7 @@ class MariaDbSessionStore:
         existing.update(data)
         self._execute(_SQL_UPDATE, (json.dumps(existing), session_id))
 
-    def replace(self, session_id: str, data: dict) -> None:
+    def replace(self, session_id: str, data: dict[str, Any]) -> None:
         """Remplace intégralement les données d'une session existante (sans merge).
 
         Contrairement à set(), les clés absentes de data sont supprimées.
@@ -156,7 +161,7 @@ class MariaDbSessionStore:
         self._execute(_SQL_INSERT, (nouveau_id, json.dumps(existing), _dt(expires_at)))
         return nouveau_id
 
-    def authenticate(self, session_id: str, user_data: dict, ttl_seconds: int) -> str | None:
+    def authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None:
         """Rotation atomique : invalide l'ancienne session, crée une nouvelle authentifiée."""
         if not self._valid(session_id):
             return None
@@ -199,7 +204,7 @@ class MariaDbSessionStore:
         self._execute(_SQL_UPDATE, (json.dumps(data), session_id))
         return True
 
-    def get_flash(self, session_id: str) -> dict | None:
+    def get_flash(self, session_id: str) -> dict[str, Any] | None:
         """Lit et supprime atomiquement le message flash. Retourne None si absent."""
         if not self._valid(session_id):
             return None

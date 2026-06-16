@@ -1,3 +1,4 @@
+# pyright: strict
 """Cles de session canoniques (anglais, ADR-003) et helper de lecture.
 
 Les noms legacy (francais) sont acceptes en lecture pour ne pas invalider
@@ -18,7 +19,7 @@ _LEGACY = {
 }
 
 
-def session_get(session: dict, key: str, default: Any = None) -> Any:
+def session_get(session: dict[str, Any], key: str, default: Any = None) -> Any:
     """Lit une valeur de session avec fallback sur le nom legacy francais."""
     if key in session:
         return session[key]

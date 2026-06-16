@@ -31,6 +31,16 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/sessions` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-SESSIONS-001`). Passés en strict : `contract.py`,
+  `manager.py`, `keys.py`, `memory_store.py`, `file_store.py`,
+  `mariadb_store.py`. Les `dict` nus des signatures (contrat `SessionStore`,
+  données de session, `user_data`, flash) deviennent `dict[str, Any]`. Le
+  backend MariaDB type ses accesseurs injectables (`_FetchOne`, `_Execute` :
+  `Callable[[str, tuple[Any, ...]], …]`). Les lectures JSON de session
+  (`file_store._load`, `cleanup_expired`, `mariadb_store._load`) `cast` le
+  résultat de `json.loads` en `dict[str, Any]` après la garde `isinstance`
+  (objet de frontière `Any` par nature). Pyright reste à 0 erreur sur le paquet.
 - **Cliquet strict sur `core/templating` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-TEMPLATING-001`). Passés en strict : `contracts.py`,
   `manager.py`, `errors.py`. Le protocole `Renderer.render` et

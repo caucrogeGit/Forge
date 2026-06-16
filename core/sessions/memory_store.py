@@ -1,3 +1,4 @@
+# pyright: strict
 """Backend mémoire pour les sessions Forge (comportement par défaut)."""
 
 from __future__ import annotations
@@ -5,6 +6,7 @@ from __future__ import annotations
 import secrets
 import threading
 import time
+from typing import Any
 
 SESSION_TTL = 3600  # 1 heure en secondes
 
@@ -17,11 +19,11 @@ class MemorySessionStore:
     """
 
     def __init__(self, ttl: int = SESSION_TTL) -> None:
-        self._sessions: dict[str, dict] = {}
+        self._sessions: dict[str, dict[str, Any]] = {}
         self._lock = threading.RLock()
         self._ttl = ttl
 
-    def create(self, data: dict | None = None) -> str:
+    def create(self, data: dict[str, Any] | None = None) -> str:
         """Crée une session avec la structure Forge standard et retourne son identifiant."""
         session_id = secrets.token_hex(32)
         with self._lock:
@@ -35,7 +37,7 @@ class MemorySessionStore:
             self._cleanup()
         return session_id
 
-    def get(self, session_id: str) -> dict | None:
+    def get(self, session_id: str) -> dict[str, Any] | None:
         """Retourne les données de session ou None si absente ou expirée."""
         with self._lock:
             session = self._sessions.get(session_id)
@@ -46,13 +48,13 @@ class MemorySessionStore:
                 return None
             return session
 
-    def set(self, session_id: str, data: dict) -> None:
+    def set(self, session_id: str, data: dict[str, Any]) -> None:
         """Met à jour (merge) les données d'une session existante."""
         with self._lock:
             if session_id in self._sessions:
                 self._sessions[session_id].update(data)
 
-    def replace(self, session_id: str, data: dict) -> None:
+    def replace(self, session_id: str, data: dict[str, Any]) -> None:
         """Remplace intégralement les données d'une session existante (sans merge).
 
         Contrairement à set(), les clés absentes de data sont supprimées.
@@ -87,7 +89,7 @@ class MemorySessionStore:
             }
         return nouveau_id
 
-    def authenticate(self, session_id: str, user_data: dict, ttl_seconds: int) -> str | None:
+    def authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None:
         """Rotation atomique : invalide l'ancienne session, crée une nouvelle authentifiée."""
         nouveau_id = secrets.token_hex(32)
         with self._lock:
@@ -121,7 +123,7 @@ class MemorySessionStore:
             session["flash"] = {"message": message, "level": level}
             return True
 
-    def get_flash(self, session_id: str) -> dict | None:
+    def get_flash(self, session_id: str) -> dict[str, Any] | None:
         """Lit et supprime atomiquement le message flash. Retourne None si absent."""
         with self._lock:
             session = self._sessions.get(session_id)

@@ -1,3 +1,4 @@
+# pyright: strict
 """Gestionnaire de backend de session Forge."""
 
 from __future__ import annotations

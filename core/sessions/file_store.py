@@ -1,3 +1,4 @@
+# pyright: strict
 """Backend fichier pour les sessions Forge.
 
 Stocke chaque session dans un fichier JSON sous sessions_dir.
@@ -14,6 +15,7 @@ import secrets
 import threading
 import time
 from pathlib import Path
+from typing import Any, cast
 
 from core.sessions.memory_store import SESSION_TTL
 
@@ -47,16 +49,16 @@ class FileSessionStore:
     def _path(self, session_id: str) -> Path:
         return self._dir / f"{session_id}.json"
 
-    def _load(self, session_id: str) -> dict | None:
+    def _load(self, session_id: str) -> dict[str, Any] | None:
         """Lit le fichier de session. Retourne None si absent ou corrompu."""
         path = self._path(session_id)
         try:
             raw = json.loads(path.read_text(encoding="utf-8"))
         except (FileNotFoundError, json.JSONDecodeError, OSError, ValueError):
             return None
-        return raw if isinstance(raw, dict) else None
+        return cast("dict[str, Any]", raw) if isinstance(raw, dict) else None
 
-    def _save(self, session_id: str, data: dict) -> None:
+    def _save(self, session_id: str, data: dict[str, Any]) -> None:
         # Écriture atomique : on écrit un fichier temporaire dans le même dossier
         # puis on le renomme (os.replace est atomique). Un crash en cours
         # d'écriture ne corrompt donc jamais le fichier de session existant.
@@ -72,7 +74,7 @@ class FileSessionStore:
 
     # ── public API ──────────────────────────────────────────────────────────
 
-    def create(self, data: dict | None = None) -> str:
+    def create(self, data: dict[str, Any] | None = None) -> str:
         """Crée une session avec la structure Forge standard et retourne son identifiant."""
         session_id = secrets.token_hex(32)
         session = {
@@ -86,7 +88,7 @@ class FileSessionStore:
             self._save(session_id, session)
         return session_id
 
-    def get(self, session_id: str) -> dict | None:
+    def get(self, session_id: str) -> dict[str, Any] | None:
         """Retourne les données de session ou None si absente, expirée ou corrompue."""
         if not self._valid(session_id):
             return None
@@ -99,7 +101,7 @@ class FileSessionStore:
                 return None
             return data
 
-    def set(self, session_id: str, data: dict) -> None:
+    def set(self, session_id: str, data: dict[str, Any]) -> None:
         """Met à jour (merge) les données d'une session existante."""
         if not self._valid(session_id):
             return
@@ -110,7 +112,7 @@ class FileSessionStore:
             existing.update(data)
             self._save(session_id, existing)
 
-    def replace(self, session_id: str, data: dict) -> None:
+    def replace(self, session_id: str, data: dict[str, Any]) -> None:
         """Remplace intégralement les données d'une session existante (sans merge).
 
         Contrairement à set(), les clés absentes de data sont supprimées.
@@ -141,7 +143,7 @@ class FileSessionStore:
             self._save(nouveau_id, existing)
         return nouveau_id
 
-    def authenticate(self, session_id: str, user_data: dict, ttl_seconds: int) -> str | None:
+    def authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None:
         """Rotation atomique : invalide l'ancienne session, crée une nouvelle authentifiée."""
         if not self._valid(session_id):
             return None
@@ -185,7 +187,7 @@ class FileSessionStore:
             self._save(session_id, data)
             return True
 
-    def get_flash(self, session_id: str) -> dict | None:
+    def get_flash(self, session_id: str) -> dict[str, Any] | None:
         """Lit et supprime atomiquement le message flash. Retourne None si absent."""
         if not self._valid(session_id):
             return None
@@ -208,7 +210,11 @@ class FileSessionStore:
                     continue
                 try:
                     raw = json.loads(path.read_text(encoding="utf-8"))
-                    expired = not isinstance(raw, dict) or now > raw.get("expires_at", raw.get("expire_a", 0))
+                    if isinstance(raw, dict):
+                        data = cast("dict[str, Any]", raw)
+                        expired = now > data.get("expires_at", data.get("expire_a", 0))
+                    else:
+                        expired = True
                 except (json.JSONDecodeError, OSError, ValueError):
                     expired = True
                 if expired:
