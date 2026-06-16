@@ -1,3 +1,4 @@
+# pyright: strict
 """Réponse HTTP — `core.http.response`.
 
 `Response` est volontairement minimal : pas de helpers métier, pas de
@@ -8,6 +9,8 @@ API-INSPECTABLE-OBJECTS-CONVENTION-001 (constructeurs nommés, `.data` sûr).
 from __future__ import annotations
 
 import json as _json
+from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 
@@ -30,7 +33,7 @@ def _is_sensitive_response_header(name: str) -> bool:
     return str(name).lower() in _SENSITIVE_RESPONSE_HEADERS
 
 
-def _iter_file_range(path, start: int, length: int, chunk_size: int):
+def _iter_file_range(path: "str | Path", start: int, length: int, chunk_size: int) -> "Iterator[bytes]":
     """Émet le contenu de `path`, à partir de `start`, sur `length` octets.
 
     Streaming par tranches : le fichier n'est jamais chargé entièrement en
@@ -76,7 +79,7 @@ class Response:
         # sinon une erreur différée et cryptique au moment de l'envoi
         # (`%d format: a real number is required, not str`), sans pointer le
         # contrôleur fautif. Le 1er argument positionnel est le STATUS.
-        if not isinstance(status, int) or isinstance(status, bool):
+        if not isinstance(status, int) or isinstance(status, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
             raise TypeError(
                 f"Response.status doit être un entier HTTP, reçu "
                 f"{type(status).__name__} {status!r}. Le 1er argument positionnel "
@@ -102,12 +105,12 @@ class Response:
     # ── Constructeurs nommés ────────────────────────────────────────────────
 
     @classmethod
-    def text(cls, body: str, status: int = 200, headers: dict | None = None) -> "Response":
+    def text(cls, body: str, status: int = 200, headers: "dict[str, str] | None" = None) -> "Response":
         """Réponse `text/plain; charset=utf-8`."""
         return cls(status=status, body=body, content_type=_TEXT_CONTENT_TYPE, headers=headers)
 
     @classmethod
-    def html(cls, body: str, status: int = 200, headers: dict | None = None) -> "Response":
+    def html(cls, body: str, status: int = 200, headers: "dict[str, str] | None" = None) -> "Response":
         """Réponse `text/html; charset=utf-8`. Le rendu Jinja2 reste à la
         charge du contrôleur (voir `core.http.helpers.html`)."""
         return cls(status=status, body=body, content_type=_HTML_CONTENT_TYPE, headers=headers)
@@ -117,7 +120,7 @@ class Response:
         cls,
         data: Any,
         status: int = 200,
-        headers: dict | None = None,
+        headers: "dict[str, str] | None" = None,
     ) -> "Response":
         """Réponse `application/json; charset=utf-8` sérialisée via
         `json.dumps(..., ensure_ascii=False)`.
@@ -169,8 +172,8 @@ class Response:
     @classmethod
     def file(
         cls,
-        path,
-        request=None,
+        path: "str | Path",
+        request: Any = None,
         *,
         content_type: str | None = None,
         download_name: str | None = None,
@@ -250,7 +253,7 @@ class Response:
         Ne renvoie jamais les valeurs : ce sont typiquement des tokens de
         session. La liste est vide si aucun cookie n'est posé.
         """
-        raw = self.headers.get("Set-Cookie") if isinstance(self.headers, dict) else None
+        raw = self.headers.get("Set-Cookie") if isinstance(self.headers, dict) else None  # pyright: ignore[reportUnnecessaryIsInstance]
         if not raw:
             return []
         if isinstance(raw, list):
@@ -265,7 +268,7 @@ class Response:
         return names
 
     @property
-    def data(self) -> dict:
+    def data(self) -> "dict[str, Any]":
         """Représentation publique stable, sûre à afficher en debug.
 
         N'inclut pas le corps brut (potentiellement HTML rendu, donc
@@ -273,7 +276,7 @@ class Response:
         sensibles (`Set-Cookie`, `Authorization`) sont masquées.
         """
         masked_headers: dict[str, Any] = {}
-        if isinstance(self.headers, dict):
+        if isinstance(self.headers, dict):  # pyright: ignore[reportUnnecessaryIsInstance]
             for key, value in self.headers.items():
                 if _is_sensitive_response_header(key):
                     masked_headers[key] = "[masked]"
