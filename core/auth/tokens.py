@@ -1,3 +1,4 @@
+# pyright: strict
 """Jetons Auth generiques a usage limite pour Forge."""
 
 from __future__ import annotations
@@ -6,7 +7,7 @@ import hashlib
 import secrets
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, cast
 
 from core.auth.exceptions import AuthError
 
@@ -34,14 +35,14 @@ class AuthToken:
 
 def generate_auth_token(nbytes: int = 32) -> str:
     """Genere un token URL-safe cryptographiquement sur."""
-    if not isinstance(nbytes, int) or isinstance(nbytes, bool) or nbytes <= 0:
+    if not isinstance(nbytes, int) or isinstance(nbytes, bool) or nbytes <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("nbytes doit etre un entier strictement positif")
     return secrets.token_urlsafe(nbytes)
 
 
 def hash_auth_token(token: str) -> str:
     """Retourne le SHA-256 hexadecimal du token brut."""
-    if not isinstance(token, str) or not token:
+    if not isinstance(token, str) or not token:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("token doit etre une chaine non vide")
     return hashlib.sha256(token.encode()).hexdigest()
 
@@ -49,9 +50,9 @@ def hash_auth_token(token: str) -> str:
 def verify_auth_token(token: str, token_hash: str) -> bool:
     """Retourne True si le token brut correspond au hash stocke."""
     try:
-        if not isinstance(token, str) or not token:
+        if not isinstance(token, str) or not token:  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
-        if not isinstance(token_hash, str) or not token_hash:
+        if not isinstance(token_hash, str) or not token_hash:  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
         expected = hash_auth_token(token)
         return secrets.compare_digest(expected, token_hash)
@@ -167,6 +168,7 @@ def normalize_auth_token(data: Any) -> AuthToken:
 
     validate_auth_token_contract(data)
 
+    data = cast("dict[str, Any]", data)
     return AuthToken(
         user_id=data["user_id"],
         purpose=data["purpose"].strip(),

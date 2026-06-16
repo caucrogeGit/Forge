@@ -1,6 +1,9 @@
+# pyright: strict
 """Hachage et verification des mots de passe Auth/User."""
 
 from __future__ import annotations
+
+from typing import Any
 
 from argon2 import PasswordHasher
 from argon2.exceptions import Argon2Error, InvalidHashError, VerificationError, VerifyMismatchError
@@ -22,7 +25,7 @@ _PASSWORD_HASHER = PasswordHasher(
 _MAX_PASSWORD_LENGTH = 128
 
 
-def _validate_password(password: str) -> None:
+def _validate_password(password: Any) -> None:
     if not isinstance(password, str) or not password:
         raise AuthError("password doit etre une chaine non vide")
     if len(password) > _MAX_PASSWORD_LENGTH:
@@ -31,7 +34,7 @@ def _validate_password(password: str) -> None:
         )
 
 
-def _validate_password_hash(password_hash: str) -> None:
+def _validate_password_hash(password_hash: Any) -> None:
     if not isinstance(password_hash, str) or not password_hash:
         raise AuthError("password_hash doit etre une chaine non vide")
 

@@ -1,3 +1,4 @@
+# pyright: strict
 """Module Auth Forge — contrat utilisateur minimal, jetons, email, reset, audit Auth/User et rate limit Auth/User.
 
 Note : MFA extrait dans le module `forge-mvc-mfa` depuis Forge 2.4.0 (ADR-004).

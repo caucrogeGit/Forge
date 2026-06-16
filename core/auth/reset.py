@@ -1,3 +1,4 @@
+# pyright: strict
 """Demande et reinitialisation de mot de passe pour Auth/User."""
 
 from __future__ import annotations
@@ -50,10 +51,10 @@ def create_password_reset_token(
     Le token brut est transmis une seule fois a l'application pour construire
     un lien de reset. Seul token_hash doit etre stocke cote serveur.
     """
-    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise AuthError("user_id doit etre un entier strictement positif")
 
-    if not isinstance(minutes, int) or isinstance(minutes, bool) or minutes <= 0:
+    if not isinstance(minutes, int) or isinstance(minutes, bool) or minutes <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise AuthError("minutes doit etre un entier strictement positif")
 
     base = now if now is not None else datetime.now(tz=timezone.utc)
@@ -85,7 +86,7 @@ def verify_password_reset_token(
     token_record.
     """
     try:
-        if not isinstance(token, str) or not token:
+        if not isinstance(token, str) or not token:  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
 
         if isinstance(token_record, dict):
@@ -165,9 +166,9 @@ def validate_new_password(password: str) -> None:
 
     Leve InvalidNewPasswordError si le mot de passe est invalide.
     """
-    from core.auth.password import _MAX_PASSWORD_LENGTH
+    from core.auth.password import _MAX_PASSWORD_LENGTH  # pyright: ignore[reportPrivateUsage]
 
-    if not isinstance(password, str):
+    if not isinstance(password, str):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise InvalidNewPasswordError("le nouveau mot de passe doit etre une chaine")
     if not password:
         raise InvalidNewPasswordError("le nouveau mot de passe ne peut pas etre vide")

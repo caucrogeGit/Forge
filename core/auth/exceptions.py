@@ -1,3 +1,4 @@
+# pyright: strict
 """Exceptions Auth Forge."""
 
 from __future__ import annotations

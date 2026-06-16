@@ -31,6 +31,20 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/auth` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-AUTH-001`). Passés en strict : les 10 modules du paquet
+  (`exceptions.py`, `password.py`, `user.py`, `email.py`, `tokens.py`,
+  `session.py`, `reset.py`, `audit.py`, `rate_limit.py`, `__init__.py`). Les
+  frontières de validation (`normalize_*`, `validate_*_contract`,
+  `sanitize_auth_audit_metadata`) `cast` en `dict[str, Any]` après la garde
+  `isinstance` ; les dicts littéraux de branche sont annotés `dict[str, Any]`
+  pour ne pas faire fuiter un type de valeur précis dans les constructions de
+  dataclasses. Les validateurs privés (`_validate_password*`) prennent `Any`
+  (leur rôle est justement de valider l'entrée). Les gardes runtime volontaires
+  sur les API publiques typées (entrées non fiables : `user_id`, `token`,
+  `email`, `password`) portent des `# pyright: ignore[reportUnnecessaryIsInstance]`
+  ciblés (même précédent que `core/http`). `login_required` type ses
+  `Callable[..., Any]`. Pyright reste à 0 erreur sur le paquet.
 - **Cliquet strict sur `core/security` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-SECURITY-001`). Passés en strict : `api_auth.py`,
   `cookies.py`, `csp.py`, `decorators.py`, `hashing.py`, `headers.py`,

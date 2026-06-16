@@ -1,3 +1,4 @@
+# pyright: strict
 """Protection anti-bruteforce Auth/User minimale.
 
 Ce module represente des tentatives d'actions sensibles et calcule une decision
@@ -16,7 +17,7 @@ import threading
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from math import ceil
-from typing import Any
+from typing import Any, cast
 
 from core.auth.exceptions import (
     InvalidAuthRateLimitAttemptError,
@@ -105,7 +106,7 @@ def _normalize_optional_text(value: Any, field_name: str) -> str | None:
 def validate_auth_rate_limit_attempt_contract(data: Any) -> AuthRateLimitAttempt:
     """Valide et retourne une tentative Auth/User normalisee."""
     if isinstance(data, AuthRateLimitAttempt):
-        raw = {
+        raw: dict[str, Any] = {
             "id": data.id,
             "action": data.action,
             "key": data.key,
@@ -115,7 +116,7 @@ def validate_auth_rate_limit_attempt_contract(data: Any) -> AuthRateLimitAttempt
             "created_at": data.created_at,
         }
     elif isinstance(data, dict):
-        raw = data
+        raw = cast("dict[str, Any]", data)
     else:
         raise InvalidAuthRateLimitAttemptError(
             "les donnees rate limit doivent etre un AuthRateLimitAttempt ou un dict"
@@ -175,7 +176,7 @@ def validate_auth_rate_limit_rule_contract(data: Any) -> AuthRateLimitRule:
             "window_seconds": data.window_seconds,
         }
     elif isinstance(data, dict):
-        raw = data
+        raw = cast("dict[str, Any]", data)
     else:
         raise InvalidAuthRateLimitRuleError(
             "les donnees regle rate limit doivent etre un AuthRateLimitRule ou un dict"

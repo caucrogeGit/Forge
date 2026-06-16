@@ -1,3 +1,4 @@
+# pyright: strict
 """Journalisation Auth/User generique — contrat et emission.
 
 Ce module fournit deux briques :
@@ -20,7 +21,7 @@ import logging as _logging
 import threading as _threading
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from core.auth.exceptions import InvalidAuthAuditEventError
 
@@ -122,15 +123,16 @@ def _normalize_optional_text(value: Any, field_name: str) -> str | None:
     return value.strip()
 
 
-def sanitize_auth_audit_metadata(metadata: dict | None) -> dict | None:
+def sanitize_auth_audit_metadata(metadata: Any) -> dict[str, Any] | None:
     """Retourne une copie de metadata sans cles sensibles connues."""
     if metadata is None:
         return None
     if not isinstance(metadata, dict):
         raise InvalidAuthAuditEventError("metadata doit etre None ou un dict")
 
-    sanitized = {}
-    for key, value in metadata.items():
+    items = cast("dict[Any, Any]", metadata)
+    sanitized: dict[str, Any] = {}
+    for key, value in items.items():
         if isinstance(key, str) and key.lower() in AUTH_AUDIT_SENSITIVE_METADATA_KEYS:
             continue
         sanitized[key] = value
@@ -145,7 +147,7 @@ def validate_auth_audit_event_contract(data: Any) -> AuthAuditEvent:
     couvrir leurs propres actions sensibles.
     """
     if isinstance(data, AuthAuditEvent):
-        raw = {
+        raw: dict[str, Any] = {
             "id": data.id,
             "event_type": data.event_type,
             "user_id": data.user_id,
@@ -156,7 +158,7 @@ def validate_auth_audit_event_contract(data: Any) -> AuthAuditEvent:
             "created_at": data.created_at,
         }
     elif isinstance(data, dict):
-        raw = data
+        raw = cast("dict[str, Any]", data)
     else:
         raise InvalidAuthAuditEventError(
             "les donnees audit auth doivent etre un AuthAuditEvent ou un dict"
@@ -211,7 +213,7 @@ def create_auth_audit_event(
     actor_user_id: int | None = None,
     ip_address: str | None = None,
     user_agent: str | None = None,
-    metadata: dict | None = None,
+    metadata: dict[str, Any] | None = None,
     created_at: datetime | None = None,
 ) -> AuthAuditEvent:
     """Construit un evenement audit Auth/User sans effet de bord."""
@@ -240,7 +242,7 @@ def log_auth_event(
     user_id: int | None = None,
     ip_address: str | None = None,
     user_agent: str | None = None,
-    metadata: dict | None = None,
+    metadata: dict[str, Any] | None = None,
 ) -> None:
     """Journalise un evenement d'audit auth via le logger forge.auth.audit.
 

@@ -1,9 +1,10 @@
+# pyright: strict
 """Contrat utilisateur minimal Forge."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from core.auth.exceptions import InvalidAuthUserError
 
@@ -56,6 +57,7 @@ def validate_auth_user_contract(data: Any) -> None:
     if missing:
         raise InvalidAuthUserError(f"champs obligatoires manquants : {', '.join(missing)}")
 
+    data = cast("dict[str, Any]", data)
     _validate_fields(
         data["id"],
         data["email"],
@@ -75,6 +77,7 @@ def normalize_auth_user(data: Any) -> AuthUser:
 
     validate_auth_user_contract(data)
 
+    data = cast("dict[str, Any]", data)
     return AuthUser(
         id=data["id"],
         email=data["email"].strip(),

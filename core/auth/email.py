@@ -1,3 +1,4 @@
+# pyright: strict
 """Verification d'adresse email pour Auth/User."""
 
 from __future__ import annotations
@@ -31,10 +32,10 @@ def create_email_verification_token(
     Le token brut est transmis une seule fois a l'application pour construire
     un lien de verification. Seul token_hash doit etre stocke cote serveur.
     """
-    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise AuthError("user_id doit etre un entier strictement positif")
 
-    if not isinstance(minutes, int) or isinstance(minutes, bool) or minutes <= 0:
+    if not isinstance(minutes, int) or isinstance(minutes, bool) or minutes <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise AuthError("minutes doit etre un entier strictement positif")
 
     base = now if now is not None else datetime.now(tz=timezone.utc)
@@ -66,7 +67,7 @@ def verify_email_verification_token(
     token_record.
     """
     try:
-        if not isinstance(token, str) or not token:
+        if not isinstance(token, str) or not token:  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
 
         if isinstance(token_record, dict):

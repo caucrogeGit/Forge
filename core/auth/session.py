@@ -1,10 +1,11 @@
+# pyright: strict
 """Session utilisateur minimale pour Auth/User."""
 
 from __future__ import annotations
 
 from collections.abc import Callable
 from functools import wraps
-from typing import Any
+from typing import Any, cast
 
 from core.auth.exceptions import AuthError, InvalidAuthUserError
 from core.auth.password import verify_password
@@ -21,9 +22,9 @@ def authenticate_user(
     user_loader: Callable[[str], Any],
 ) -> AuthUser | None:
     """Authentifie un email/mot de passe via un loader applicatif."""
-    if not isinstance(email, str) or not email.strip():
+    if not isinstance(email, str) or not email.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
         return None
-    if not isinstance(password, str) or not password:
+    if not isinstance(password, str) or not password:  # pyright: ignore[reportUnnecessaryIsInstance]
         return None
     if not callable(user_loader):
         raise AuthError("user_loader doit etre callable")
@@ -105,7 +106,7 @@ def get_authenticated_user_id(request: Any) -> int | None:
     if session_get(session, SESSION_KEY_AUTHENTICATED, False):
         legacy_user = session_get(session, SESSION_KEY_USER)
         if isinstance(legacy_user, dict):
-            legacy_id = legacy_user.get("id")
+            legacy_id = cast("dict[str, Any]", legacy_user).get("id")
             if isinstance(legacy_id, int) and not isinstance(legacy_id, bool) and legacy_id > 0:
                 return legacy_id
 
@@ -144,12 +145,16 @@ def is_authenticated(request: Any) -> bool:
     return get_authenticated_user_id(request) is not None
 
 
-def login_required(func: Callable | None = None, *, redirect_to: str | None = None):
+def login_required(
+    func: Callable[..., Any] | None = None,
+    *,
+    redirect_to: str | None = None,
+) -> Any:
     """Protege une fonction controleur avec la session Auth/User minimale."""
 
-    def decorator(wrapped: Callable):
+    def decorator(wrapped: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(wrapped)
-        def wrapper(request: Any, *args: Any, **kwargs: Any):
+        def wrapper(request: Any, *args: Any, **kwargs: Any) -> Any:
             if is_authenticated(request):
                 return wrapped(request, *args, **kwargs)
             if redirect_to:
@@ -166,7 +171,7 @@ def login_required(func: Callable | None = None, *, redirect_to: str | None = No
 def _resolve_request_session(request: Any) -> dict[str, Any] | None:
     session = getattr(request, "session", None)
     if isinstance(session, dict):
-        return session
+        return cast("dict[str, Any]", session)
 
     try:
         from core.security.session import get_session, get_session_id
