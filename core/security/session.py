@@ -1,8 +1,15 @@
+# pyright: strict
+from __future__ import annotations
+
 import re
 import warnings
+from typing import TYPE_CHECKING, Any
 
 from core.sessions.keys import SESSION_KEY_AUTHENTICATED, SESSION_KEY_USER, session_get
 from core.sessions.manager import get_session_store as _get_store
+
+if TYPE_CHECKING:
+    from core.http.request import Request
 
 _SESSION_ID_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -25,7 +32,7 @@ def create_session() -> str:
     return _get_store().create()
 
 
-def get_session(session_id: str | None) -> dict | None:
+def get_session(session_id: str | None) -> dict[str, Any] | None:
     """Retourne les données de la session ou None si inexistante ou expirée."""
     if session_id is None:
         return None
@@ -42,7 +49,7 @@ def regenerate_session(old_session_id: str) -> str:
     return _get_store().regenerate(old_session_id)
 
 
-def _normalize_legacy_user(user: dict) -> dict:
+def _normalize_legacy_user(user: dict[str, Any]) -> dict[str, Any]:
     """Normalise un dict utilisateur quelconque en structure interne générique.
 
     Priorité des clés en entrée : génériques EN > legacy FR > legacy PascalCase.
@@ -73,7 +80,7 @@ def _normalize_legacy_user(user: dict) -> dict:
     }
 
 
-def authenticate_session(session_id: str, user: dict) -> str | None:
+def authenticate_session(session_id: str, user: dict[str, Any]) -> str | None:
     """
     Marque une session comme authentifiée et y stocke l'utilisateur courant.
 
@@ -90,7 +97,7 @@ def authenticate_session(session_id: str, user: dict) -> str | None:
     return _get_store().authenticate(session_id, user_data, SESSION_DURATION)
 
 
-def get_session_id(request) -> str | None:
+def get_session_id(request: Request) -> str | None:
     """Extrait et valide l'identifiant de session depuis le cookie de la requête.
 
     Retourne None si le cookie est absent ou si le format est invalide
@@ -108,7 +115,7 @@ def get_session_id(request) -> str | None:
     return None
 
 
-def is_authenticated(request) -> bool:
+def is_authenticated(request: Request) -> bool:
     """
     Retourne True si la requête provient d'un utilisateur authentifié.
     Repousse l'expiration de la session à chaque requête valide.
@@ -141,7 +148,7 @@ def is_authenticated(request) -> bool:
     return False
 
 
-def get_user(request) -> dict | None:
+def get_user(request: Request) -> dict[str, Any] | None:
     """Retourne l'utilisateur courant depuis la session si authentifié."""
     warnings.warn(
         "core.security.session.get_user() is deprecated; "
@@ -158,7 +165,7 @@ def get_user(request) -> dict | None:
     return session_get(session, SESSION_KEY_USER)
 
 
-def user_has_role(request, role: str) -> bool:
+def user_has_role(request: Request, role: str) -> bool:
     """Retourne True si l'utilisateur courant possède le rôle demandé."""
     session_id = get_session_id(request)
     if not session_id:
@@ -179,7 +186,7 @@ def set_flash(session_id: str | None, message: str, level: str = "success") -> N
     _get_store().set_flash(session_id, message, level)
 
 
-def get_flash(session_id: str | None) -> dict | None:
+def get_flash(session_id: str | None) -> dict[str, Any] | None:
     """Retourne et supprime le message flash de la session."""
     if not session_id:
         return None

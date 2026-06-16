@@ -31,6 +31,19 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/security` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-SECURITY-001`). Passés en strict : `api_auth.py`,
+  `cookies.py`, `csp.py`, `decorators.py`, `hashing.py`, `headers.py`,
+  `middleware.py`, `session.py`. Les paramètres `request`, `response` et `func`
+  sont typés (`Request`, `Response`, alias `Handler` de `core/http/router`,
+  importés sous `TYPE_CHECKING` pour éviter tout cycle) ; les `dict` nus
+  deviennent `dict[str, Any]` / `dict[str, str]`. `csp.request_nonce` adopte
+  `Generator[str | None, None, None]` (l'annotation `Iterator` est dépréciée
+  avec `@contextmanager`). `hashing.py` déclare un `__all__` explicite pour ses
+  réexports de `core.auth.rate_limit`. `middleware._extract_token` retire une
+  garde `isinstance` morte (le contrat `Request.body: dict[str, list[str]]`
+  garantit déjà une liste — règle A : retirer la cause). Pyright reste à
+  0 erreur sur le paquet.
 - **Cliquet strict sur `core/sessions` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-SESSIONS-001`). Passés en strict : `contract.py`,
   `manager.py`, `keys.py`, `memory_store.py`, `file_store.py`,

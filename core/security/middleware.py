@@ -1,9 +1,16 @@
+# pyright: strict
+from __future__ import annotations
+
 import hmac as _hmac
+from typing import TYPE_CHECKING
 
 from core.auth.session import is_authenticated as _is_authenticated
 from core.http.response import Response
 from core.http.helpers import html as _html
 from core.security.session import get_session_id, get_session
+
+if TYPE_CHECKING:
+    from core.http.request import Request
 
 
 class AuthMiddleware:
@@ -18,10 +25,10 @@ class AuthMiddleware:
             return denied
     """
 
-    def __init__(self, login_url: str = "/login"):
+    def __init__(self, login_url: str = "/login") -> None:
         self._login_url = login_url
 
-    def check(self, request) -> Response | None:
+    def check(self, request: Request) -> Response | None:
         if not _is_authenticated(request):
             return Response(302, headers={"Location": self._login_url})
         return None
@@ -35,11 +42,11 @@ class CsrfMiddleware:
     reste portée par RouteEntry.csrf et par la méthode HTTP.
     """
 
-    def __init__(self, field_name: str = "csrf_token", header_name: str = "X-CSRF-Token"):
+    def __init__(self, field_name: str = "csrf_token", header_name: str = "X-CSRF-Token") -> None:
         self._field_name = field_name
         self._header_name = header_name
 
-    def check(self, request) -> Response | None:
+    def check(self, request: Request) -> Response | None:
         session_id = get_session_id(request)
         session = get_session(session_id) if session_id else None
         expected = session.get("csrf_token") if session else None
@@ -51,13 +58,9 @@ class CsrfMiddleware:
             return _html("errors/403.html", 403)
         return None
 
-    def _extract_token(self, request) -> str | None:
-        value = request.body.get(self._field_name, [None])
-        if isinstance(value, list):
-            token = value[0] if value else None
-        else:
-            token = value
-
+    def _extract_token(self, request: Request) -> str | None:
+        values = request.body.get(self._field_name)
+        token = values[0] if values else None
         if token:
             return token
 

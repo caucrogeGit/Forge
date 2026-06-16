@@ -1,3 +1,4 @@
+# pyright: strict
 """core/security/cookies.py — Helpers de cookies de session Forge.
 
 Ticket : SECURITY-SESSION-COOKIE-HELPER-001.
@@ -18,7 +19,12 @@ nouvelle API.
 """
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from core.security.session import SESSION_COOKIE_NAME
+
+if TYPE_CHECKING:
+    from core.http.response import Response
 
 _VALID_SAME_SITE = ("Strict", "Lax", "None")
 
@@ -61,7 +67,7 @@ def _build_cookie(
 
 
 def set_session_cookie(
-    response,
+    response: Response,
     session_id: str,
     *,
     secure: bool = True,
@@ -101,7 +107,7 @@ def set_session_cookie(
 
 
 def clear_session_cookie(
-    response,
+    response: Response,
     *,
     secure: bool = True,
     same_site: str = "Strict",

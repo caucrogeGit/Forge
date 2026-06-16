@@ -1,3 +1,4 @@
+# pyright: strict
 """core/security/headers.py — Helper centralisé des headers HTTP de sécurité.
 
 Ticket : WSGI-SECURITY-HEADERS-001.
@@ -46,7 +47,7 @@ _CSP_NAME = "Content-Security-Policy"
 
 
 def apply_security_headers(
-    headers: dict,
+    headers: dict[str, str],
     *,
     include_hsts: bool,
     csp: str | None = None,

@@ -1,3 +1,9 @@
+# pyright: strict
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import TYPE_CHECKING
+
 from core.http.helpers import html as _html
 from core.http.response import Response
 from core.security.middleware import CsrfMiddleware as _CsrfMiddleware
@@ -7,10 +13,14 @@ from core.security.middleware import CsrfMiddleware as _CsrfMiddleware
 from core.auth.session import is_authenticated
 from core.security.session import user_has_role
 
+if TYPE_CHECKING:
+    from core.http.request import Request
+    from core.http.router import Handler
+
 _csrf_check = _CsrfMiddleware()
 
 
-def require_auth(func):
+def require_auth(func: Handler) -> Handler:
     """
     Redirige vers /login si l'utilisateur n'est pas authentifié.
 
@@ -19,14 +29,14 @@ def require_auth(func):
         @require_auth
         def list(request): ...
     """
-    def wrapper(request):
+    def wrapper(request: Request) -> Response:
         if not is_authenticated(request):
             return Response(302, headers={"Location": "/login"})
         return func(request)
     return wrapper
 
 
-def require_csrf(func):
+def require_csrf(func: Handler) -> Handler:
     """
     Retourne une 403 si le token CSRF du formulaire ne correspond pas à la session.
     Délègue à CsrfMiddleware pour garantir une comparaison constant-time.
@@ -38,7 +48,7 @@ def require_csrf(func):
         @require_csrf
         def add(request): ...
     """
-    def wrapper(request):
+    def wrapper(request: Request) -> Response:
         denied = _csrf_check.check(request)
         if denied is not None:
             return denied
@@ -46,7 +56,7 @@ def require_csrf(func):
     return wrapper
 
 
-def require_role(role):
+def require_role(role: str) -> "Callable[[Handler], Handler]":
     """
     Redirige vers /login si non authentifié, retourne 403 si rôle absent.
 
@@ -56,8 +66,8 @@ def require_role(role):
         @require_role("admin")
         def dashboard(request): ...
     """
-    def decorator(func):
-        def wrapper(request):
+    def decorator(func: Handler) -> Handler:
+        def wrapper(request: Request) -> Response:
             if not is_authenticated(request):
                 return Response(302, headers={"Location": "/login"})
             if not user_has_role(request, role):

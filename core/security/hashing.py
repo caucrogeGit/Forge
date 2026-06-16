@@ -1,3 +1,4 @@
+# pyright: strict
 """
 core/security/hashing.py — Vérification PBKDF2 (module legacy, lecture seule)
 ==============================================================================
@@ -91,3 +92,13 @@ from core.auth.rate_limit import (  # noqa: E402
     LOGIN_MAX_ATTEMPTS as MAX_ATTEMPTS,           # noqa: F401
     LOGIN_RATE_LIMIT_WINDOW as RATE_LIMIT_WINDOW, # noqa: F401
 )
+
+# Re-exports explicites (compat imports auth_controller, tests, starters).
+__all__ = [
+    "verify_password_legacy",
+    "pbkdf2_needs_rehash",
+    "record_attempt",
+    "is_rate_limited",
+    "MAX_ATTEMPTS",
+    "RATE_LIMIT_WINDOW",
+]

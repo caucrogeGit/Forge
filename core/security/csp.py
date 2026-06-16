@@ -1,3 +1,4 @@
+# pyright: strict
 """
 core/security/csp.py — Nonce CSP par requête
 =============================================
@@ -19,6 +20,7 @@ Câblage par requête : poser le nonce via le gestionnaire de contexte
 """
 import secrets
 import threading
+from collections.abc import Generator
 from contextlib import contextmanager
 
 _local = threading.local()
@@ -47,7 +49,7 @@ def clear_request_nonce() -> None:
 
 
 @contextmanager
-def request_nonce(nonce: "str | None"):
+def request_nonce(nonce: "str | None") -> "Generator[str | None, None, None]":
     """Porte le nonce CSP le temps d'une requête, puis garantit sa remise à zéro.
 
     Le stockage est thread-local et les threads sont réutilisés (serveur de
