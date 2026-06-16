@@ -1,9 +1,20 @@
+# pyright: strict
+from __future__ import annotations
+
 import re
+from collections.abc import Callable
+from typing import Any
 from urllib.parse import quote
 
 
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
+
+# Handler de route : reçoit la requête, retourne une réponse. Volontairement
+# large (`Callable[..., Any]`) pour ne pas coupler le routeur aux types
+# Request/Response (évite un import circulaire) ; le contrat précis est vérifié
+# à l'usage côté Application.
+Handler = Callable[..., Any]
 
 
 class RouteEntry:
@@ -18,8 +29,9 @@ class RouteEntry:
 
     _PARAM = re.compile(r'\{(\w+)\}')
 
-    def __init__(self, method, pattern: str, handler, *, name=None,
-                 public=False, csrf=True, api=False):
+    def __init__(self, method: str | list[str], pattern: str, handler: Handler,
+                 *, name: str | None = None, public: bool = False,
+                 csrf: bool = True, api: bool = False) -> None:
         # Validation à l'enregistrement (donc dans le frame de mvc/routes.py).
         # Un handler non appelable ne casserait sinon qu'au dispatch
         # (`route.handler(request)`), erreur différée pointant le routeur et
@@ -41,8 +53,8 @@ class RouteEntry:
         self.regex    = self._compile(pattern)
 
     @classmethod
-    def _compile(cls, pattern: str) -> re.Pattern:
-        parts = []
+    def _compile(cls, pattern: str) -> re.Pattern[str]:
+        parts: list[str] = []
         for segment in pattern.split('/'):
             m = re.fullmatch(r'\{(\w+)\}', segment)
             if m:
@@ -65,7 +77,7 @@ class RouteEntry:
     def requires_csrf(self, method: str) -> bool:
         return self.csrf and method.upper() in UNSAFE_METHODS
 
-    def match(self, path: str) -> dict | None:
+    def match(self, path: str) -> dict[str, Any] | None:
         """Retourne les paramètres capturés ou None si la route ne correspond pas."""
         m = self.regex.match(path)
         return m.groupdict() if m else None
@@ -89,8 +101,9 @@ class RouteGroup:
         self._csrf = csrf
         self._api = api
 
-    def add(self, method, pattern: str, handler, *, name=None,
-            public=None, csrf=None, api=None):
+    def add(self, method: str | list[str], pattern: str, handler: Handler, *,
+            name: str | None = None, public: bool | None = None,
+            csrf: bool | None = None, api: bool | None = None) -> RouteGroup:
         is_public = public if public is not None else self._public
         csrf_enabled = csrf if csrf is not None else self._csrf
         is_api = api if api is not None else self._api
@@ -99,10 +112,10 @@ class RouteGroup:
                          csrf=csrf_enabled, api=is_api)
         return self
 
-    def __enter__(self):
+    def __enter__(self) -> RouteGroup:
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *args: object) -> None:
         pass
 
 
@@ -134,8 +147,9 @@ class Router:
         self._entries: list[RouteEntry] = []
         self._named:   dict[str, RouteEntry] = {}
 
-    def add(self, method, pattern: str, handler, *, name=None,
-            public=False, csrf=True, api=False):
+    def add(self, method: str | list[str], pattern: str, handler: Handler, *,
+            name: str | None = None, public: bool = False, csrf: bool = True,
+            api: bool = False) -> Router:
         """Enregistre une route. Retourne self pour le chaînage."""
         entry = RouteEntry(method, pattern, handler, name=name,
                            public=public, csrf=csrf, api=api)
@@ -151,7 +165,7 @@ class Router:
         """Retourne un groupe de routes partageant un préfixe."""
         return RouteGroup(self, prefix, public=public, csrf=csrf, api=api)
 
-    def match(self, method: str, path: str) -> tuple[RouteEntry, dict] | None:
+    def match(self, method: str, path: str) -> tuple[RouteEntry, dict[str, Any]] | None:
         """
         Trouve l'entrée de route correspondante.
 
@@ -167,7 +181,7 @@ class Router:
                 return entry, params
         return None
 
-    def resolve(self, method: str, path: str) -> tuple | None:
+    def resolve(self, method: str, path: str) -> tuple[Handler, dict[str, Any]] | None:
         """
         Trouve la route correspondante.
 
@@ -194,7 +208,7 @@ class Router:
         """Retourne les routes dans l'ordre de déclaration."""
         return list(self._entries)
 
-    def url_for(self, name: str, **params) -> str:
+    def url_for(self, name: str, **params: Any) -> str:
         """
         Génère l'URL d'une route nommée en substituant les paramètres.
 
