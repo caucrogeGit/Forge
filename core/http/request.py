@@ -1,5 +1,6 @@
 import ipaddress
 import json as _json
+from typing import cast
 from collections.abc import Iterable
 from dataclasses import dataclass
 from email.parser import BytesParser
@@ -334,10 +335,12 @@ class Request:
             if part.get_content_disposition() != "form-data":
                 continue
             name = part.get_param("name", header="content-disposition")
-            if not name:
+            if not name or not isinstance(name, str):
                 continue
             filename = part.get_filename()
-            payload = part.get_payload(decode=True) or b""
+            # get_payload(decode=True) renvoie des bytes ; les stubs email étant
+            # imprécis (surcharges), on fixe le type pour le typage statique.
+            payload = cast(bytes, part.get_payload(decode=True) or b"")
             if filename is not None:
                 files[name] = UploadedFile(
                     field_name=name,

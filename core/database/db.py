@@ -1,27 +1,29 @@
+from typing import Any
+
 from core.database.connection import get_connection, close_connection
 
 
-def fetch_one(sql: str, params=(), *, tx=None):
+def fetch_one(sql: str, params=(), *, tx=None) -> "dict | None":
     """Exécute un SELECT explicite et retourne une ligne."""
     return _run_query(sql, params, tx=tx, dictionary=True, fetch="one")
 
 
-def fetch_all(sql: str, params=(), *, tx=None):
+def fetch_all(sql: str, params=(), *, tx=None) -> "list[dict]":
     """Exécute un SELECT explicite et retourne toutes les lignes."""
     return _run_query(sql, params, tx=tx, dictionary=True, fetch="all")
 
 
-def execute(sql: str, params=(), *, tx=None):
+def execute(sql: str, params=(), *, tx=None) -> int:
     """Exécute une requête explicite et retourne rowcount."""
     return _run_query(sql, params, tx=tx, dictionary=False, fetch=None)
 
 
-def insert(sql: str, params=(), *, tx=None):
+def insert(sql: str, params=(), *, tx=None) -> int:
     """Exécute une insertion explicite et retourne lastrowid."""
     return _run_query(sql, params, tx=tx, dictionary=False, fetch="lastrowid")
 
 
-def _run_query(sql: str, params=(), *, tx=None, dictionary=False, fetch=None):
+def _run_query(sql: str, params=(), *, tx=None, dictionary=False, fetch=None) -> Any:
     connection = None
     cursor = None
     owns_connection = tx is None

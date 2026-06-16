@@ -65,7 +65,7 @@ class AuthRateLimitDecision:
     retry_after_seconds: int | None = None
 
 
-def normalize_rate_limit_key(value: str) -> str:
+def normalize_rate_limit_key(value: object) -> str:
     """Normalise une cle de limitation stable."""
     if not isinstance(value, str):
         raise InvalidAuthRateLimitAttemptError("key doit etre une chaine non vide")

@@ -61,14 +61,15 @@ def slugify(text: str, *, max_length: int = DEFAULT_MAX_LENGTH) -> str:
     return value
 
 
-def is_valid_slug(value: str, *, max_length: int = DEFAULT_MAX_LENGTH) -> bool:
+def is_valid_slug(value: str, *, max_length: "int | None" = DEFAULT_MAX_LENGTH) -> bool:
     """Vrai si ``value`` est une URL slug valide et **path-safe**.
 
-    Rejette : vide, longueur > ``max_length``, présence de `/`, `\\` ou `..`,
-    et tout ce qui n'est pas du kebab-case strict `[a-z0-9]+(?:-[a-z0-9]+)*`
-    (donc majuscules, accents, espaces, tirets de bordure ou doublés → invalides).
+    Rejette : vide, longueur > ``max_length`` (si défini), présence de `/`, `\\`
+    ou `..`, et tout ce qui n'est pas du kebab-case strict
+    `[a-z0-9]+(?:-[a-z0-9]+)*` (majuscules, accents, espaces, tirets de bordure
+    ou doublés → invalides). ``max_length=None`` lève la borne de longueur.
     """
-    if not value or len(value) > max_length:
+    if not value or (max_length is not None and len(value) > max_length):
         return False
     if any(part in value for part in ("/", "\\", "..")):
         return False

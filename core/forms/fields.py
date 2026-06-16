@@ -3,6 +3,7 @@ import datetime
 import html
 import re
 from decimal import Decimal, InvalidOperation
+from typing import Any
 
 from core.forms.exceptions import ValidationError
 from core.http.slug import is_valid_slug
@@ -326,7 +327,7 @@ class RelatedIdsField(Field):
                 result.append(identifier)
         return result
 
-    def _resolve_allowed_ids(self, form):
+    def _resolve_allowed_ids(self, form) -> Any:
         source = self.allowed_ids
         if isinstance(source, str):
             return self._option(form, source, required=True)
