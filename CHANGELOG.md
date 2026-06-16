@@ -57,6 +57,25 @@
   ambigus (contrat, import effectif), jamais sur un mot-clé de nom de fichier,
   pour éviter les faux positifs des starters `welcome-rbac`.
 
+### Retiré
+
+- **Génération de starters retirée, parcours réalisés à la main**
+  (`ADR-STARTERS-MANUAL-001`, ADR-035). Suppression des commandes
+  `forge starter:list` et `forge starter:build`, et de tout le sous-système de
+  génération (`forge_cli/starters/` : registre, builder, scaffold, injection de
+  routes, et les fichiers de données embarqués). Les parcours pédagogiques
+  `welcome-*` deviennent des **tutoriels manuels** suivis depuis la
+  documentation : chaque palier indique le contrôleur, la vue et la route à
+  créer soi-même, sur le modèle de `welcome-forge`. Conséquence directe : Forge
+  n'écrit plus jamais dans `mvc/routes.py` pour un starter (principes 3 et 9).
+  Le guide d'auteur de starters (`docs/philosophy/starter-author-guide.md`) est
+  supprimé. Cet ADR **supersède l'ADR-023** (`starter:build` comme façon
+  canonique) et **clôt le volet `starter:build` de l'ADR-030** (l'injection de
+  routes par cette commande devient sans objet). La page d'accueil du squelette
+  (`forge new`) ne propose plus `starter:build` : elle présente désormais les
+  parcours opt-in en grille avec leurs icônes. Rupture pré-1.0 assumée, sans
+  alias ni guide de migration externe.
+
 ### Corrigé
 
 - **`forge db:init` ne dépend plus d'un droit de lecture sur `mysql.user`**
