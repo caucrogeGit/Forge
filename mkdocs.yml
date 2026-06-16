@@ -423,6 +423,7 @@ nav:
           - ADR-032 Périmètre config upload: adr/032-upload-config-perimeter.md
           - ADR-033 Migrations en DB_ADMIN: adr/033-migrations-admin-credentials.md
           - ADR-034 Nommage DB généré sans suffixes: adr/034-generated-db-identifier-naming.md
+          - ADR-035 Parcours manuels, retrait génération: adr/035-starters-manual-not-generated.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
