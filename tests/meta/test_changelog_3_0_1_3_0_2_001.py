@@ -135,7 +135,7 @@ class TestSectionOrder:
         assert sections, "Aucune section ## trouvée"
         first_section_pos = text.index("## [")
         # Accepter 1.0.0-beta.12 (ou supérieur) comme première section
-        for candidate in ["## [Non publié]", "## [1.0.0-beta.14]", "## [1.0.0-beta.13]", "## [1.0.0-beta.12]", "## [1.0.0-beta.11]", "## [1.0.0-beta.10]", "## [1.0.0-beta.9]", "## [1.0.0-beta.8]", "## [1.0.0-beta.7]", "## [1.0.0-beta.6]", "## [1.0.0-beta.5]", "## [1.0.0-beta.4]"]:
+        for candidate in ["## [Non publié]", "## [1.0.0-beta.16]", "## [1.0.0-beta.15]", "## [1.0.0-beta.14]", "## [1.0.0-beta.13]", "## [1.0.0-beta.12]", "## [1.0.0-beta.11]", "## [1.0.0-beta.10]", "## [1.0.0-beta.9]", "## [1.0.0-beta.8]", "## [1.0.0-beta.7]", "## [1.0.0-beta.6]", "## [1.0.0-beta.5]", "## [1.0.0-beta.4]"]:
             if candidate in text:
                 pos_candidate = text.index(candidate)
                 if first_section_pos == pos_candidate:
