@@ -122,12 +122,14 @@ def test_settings_conserve_association_env():
     assert data.get("files.associations", {}).get("**/env/*") == "properties"
 
 
-# ── Bruit Pylance en mode strict (SKELETON-VSCODE-STRICT-NOISE-001) ──────────
+# ── Override reportUnknown* retiré (SKELETON-VSCODE-STRICT-NOISE-REMOVE-001) ──
 
-def test_settings_neutralise_la_famille_reportunknown():
-    """Cœur Forge partiellement typé : en mode strict, la famille reportUnknown*
-    génère du bruit sur ses symboles (ex. Response.text). Le squelette la
-    neutralise pour garder un mode strict utilisable sur le code de l'utilisateur."""
+def test_settings_ne_neutralise_plus_la_famille_reportunknown():
+    """Le cœur Forge est désormais entièrement strict (cliquet ADR-036 terminé,
+    `pyright core/` à 0 erreur). La famille reportUnknown* ne génère donc plus de
+    bruit sur les symboles du cœur, et le squelette ne la neutralise plus : un
+    projet généré bénéficie d'un mode strict complet, y compris sur l'interop
+    avec le cœur typé. Garde-fou d'absence."""
     overrides = _settings().get("python.analysis.diagnosticSeverityOverrides", {})
     for rule in (
         "reportUnknownMemberType",
@@ -136,4 +138,6 @@ def test_settings_neutralise_la_famille_reportunknown():
         "reportUnknownParameterType",
         "reportUnknownLambdaType",
     ):
-        assert overrides.get(rule) == "none", f"{rule} doit être neutralisé (cœur partiellement typé)."
+        assert rule not in overrides, (
+            f"{rule} ne doit plus être neutralisé : le cœur est entièrement strict (ADR-036)."
+        )

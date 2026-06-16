@@ -3,6 +3,19 @@
 
 ## [Non publié]
 
+### Modifié
+
+- **Retrait de l'override `reportUnknown*` du squelette (payoff ADR-036)**
+  (`SKELETON-VSCODE-STRICT-NOISE-REMOVE-001`). Le cliquet `# pyright: strict` est
+  terminé sur tout le cœur (`pyright core/` à 0 erreur), donc le cœur n'émet plus
+  de `reportUnknown*` sur ses symboles via `py.typed`. Le bloc
+  `python.analysis.diagnosticSeverityOverrides` qui neutralisait les cinq règles
+  `reportUnknown*` est retiré de `forge_cli/skeleton/data/.vscode/settings.json` :
+  un projet `forge new` bénéficie désormais d'un mode strict **complet**, y
+  compris sur l'interopérabilité avec le cœur typé. La mitigation provisoire
+  `SKELETON-VSCODE-STRICT-NOISE-001` est ainsi remplacée par le traitement de la
+  cause (règle A). Le garde-fou du squelette devient un test d'absence.
+
 ### Ajouté
 
 - **Typage statique du cœur vérifié en CI (pyright) + `py.typed`**
