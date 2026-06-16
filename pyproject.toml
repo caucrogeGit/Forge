@@ -82,7 +82,6 @@ include = ["core*", "forge_cli*", "integrations*"]
 
 [tool.setuptools.package-data]
 "forge_cli" = [
-    "starters/data/**/*",
     "skeleton/data/**/*",
     "skeleton/data/**/.*",
     "skeleton/data/.*",
@@ -99,9 +98,6 @@ include = ["core*", "forge_cli*", "integrations*"]
     "**/*.pyo",
 ]
 "forge_cli" = [
-    "starters/data/**/__pycache__/*",
-    "starters/data/**/*.pyc",
-    "starters/data/**/*.pyo",
     "skeleton/data/**/__pycache__/*",
     "skeleton/data/**/*.pyc",
     "skeleton/data/**/*.pyo",

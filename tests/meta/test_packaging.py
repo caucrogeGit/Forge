@@ -95,54 +95,16 @@ def test_find_packages_couvre_forge_cli_et_integrations():
         assert pkg in found, f"{pkg} absent du packaging."
 
 
-def test_package_data_inclut_tous_les_fichiers_starters():
+def test_package_data_inclut_le_squelette():
     data = _load_pyproject()
     package_data = data["tool"]["setuptools"]["package-data"]
 
-    assert "starters/data/**/*" in package_data["forge_cli"]
-    # SKELETON-PKGDATA-001 (ADR-024) : le squelette de projet est aussi
-    # embarqué (motifs dotfiles inclus pour .gitignore et .gitkeep).
+    # SKELETON-PKGDATA-001 (ADR-024) : le squelette de projet est embarqué
+    # (motifs dotfiles inclus pour .gitignore et .gitkeep).
+    # ADR-035 : plus de starters/data (génération de starters retirée).
     for pattern in ("skeleton/data/**/*", "skeleton/data/**/.*", "skeleton/data/.*"):
         assert pattern in package_data["forge_cli"], (
             f"package-data forge_cli doit inclure {pattern} (squelette)."
-        )
-
-
-def test_package_data_couvre_les_python_des_starters():
-    data = _load_pyproject()
-    patterns = data["tool"]["setuptools"]["package-data"]["forge_cli"]
-    starter_file = "starters/data/users-core-auth/files/mvc/controllers/auth_controller.py"
-
-    assert any(fnmatch.fnmatch(starter_file, pattern) for pattern in patterns)
-
-
-# ── Fichiers starters sur disque ──────────────────────────────────────────────
-
-# Les tests test_starter1_fichiers_sur_disque et test_starter2_fichiers_sur_disque
-# ont été retirés : ils vérifiaient la présence sur disque des starters supprimés
-# `first-crud-generated` et `users-core-auth`.
-
-
-def test_package_data_couvre_tous_types_fichiers_starters():
-    """Le glob starters/data/**/* couvre .py, .json, .html et .snippet de tous les starters."""
-    data = _load_pyproject()
-    patterns = data["tool"]["setuptools"]["package-data"]["forge_cli"]
-
-    representative = [
-        # Starter 1
-        "starters/data/first-crud-generated/starter.json",
-        "starters/data/first-crud-generated/message.json",
-        # Starter 2
-        "starters/data/users-core-auth/starter.json",
-        "starters/data/users-core-auth/routes.py.snippet",
-        "starters/data/users-core-auth/files/mvc/controllers/auth_controller.py",
-        "starters/data/users-core-auth/files/mvc/views/auth/login.html",
-        "starters/data/users-core-auth/files/scripts/create_auth_user.py",
-    ]
-
-    for path in representative:
-        assert any(fnmatch.fnmatch(path, p) for p in patterns), (
-            f"Non couvert par package-data : {path}"
         )
 
 

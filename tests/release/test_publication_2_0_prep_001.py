@@ -95,12 +95,6 @@ def test_pyproject_toml_inclut_forge_cli():
     assert "forge_cli" in content
 
 
-def test_pyproject_toml_inclut_starters_data():
-    """pyproject.toml inclut les données starters dans le wheel."""
-    content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert "starters/data" in content
-
-
 def test_pyproject_toml_declare_script_forge():
     """pyproject.toml déclare le script CLI forge."""
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
