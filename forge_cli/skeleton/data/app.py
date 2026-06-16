@@ -76,6 +76,7 @@ import logging
 import mimetypes
 import socket
 import ssl
+import traceback
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import importlib
 from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFILE,
@@ -144,6 +145,27 @@ def _is_safe_static_path(static_dir: str, filepath: str) -> bool:
         return False
 
 
+def _error_context():
+    """Contexte de la page 500 : détail de l'exception en cours.
+
+    Uniquement en développement (APP_ENV == "dev") : type, message et traceback
+    de l'exception sont passés au template `errors/500.html` (bloc `{% if error %}`).
+    En production, renvoie None — aucune fuite de traceback côté client.
+    """
+    if APP_ENV != "dev":
+        return None
+    exc_type, exc, _tb = _sys.exc_info()
+    if exc is None:
+        return None
+    return {
+        "error": {
+            "type": exc_type.__name__ if exc_type else "Exception",
+            "message": str(exc),
+            "traceback": traceback.format_exc(),
+        }
+    }
+
+
 class RequestHandler(BaseHTTPRequestHandler):
     """
     Routeur/dispatcher des requêtes HTTP.
@@ -180,7 +202,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._send_response(self._dispatch(request))
         except Exception:
             logger.exception("Erreur GET %s", self.path)
-            self._send_response(_html("errors/500.html", 500))
+            self._send_response(_html("errors/500.html", 500, _error_context()))
 
     def do_POST(self):
         """Traite les requêtes HTTP POST."""
@@ -207,7 +229,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._send_response(_html("errors/413.html", 413))
         except Exception:
             logger.exception("Erreur %s %s", label, self.path)
-            self._send_response(_html("errors/500.html", 500))
+            self._send_response(_html("errors/500.html", 500, _error_context()))
 
     def _dispatch(self, request) -> Response:
         """Délègue le routage et le contrôle d'accès à l'Application."""

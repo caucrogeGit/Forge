@@ -30,6 +30,15 @@
   (`OPTIN-MFA-GUIDANCE-STARTER-BUILD-001`). `forge opt-in:enable mfa` renvoyait à
   `forge starter:build mfa-welcome` (commande retirée, ADR-035) ; il renvoie
   désormais au parcours manuel welcome-mfa de la documentation.
+- **Page 500 du squelette : détail de l'exception affiché en développement**
+  (`SKELETON-500-ERROR-CONTEXT-001`). Le `app.py` du squelette rendait
+  `errors/500.html` **sans contexte**, donc le bloc `{% if error %}` restait
+  toujours faux et le détail (type, message, traceback) n'apparaissait jamais,
+  même en `dev`. Ajout d'un helper `_error_context()` qui ne fournit le détail
+  qu'en `dev` (`APP_ENV == "dev"`, via `sys.exc_info()` et `traceback`) et `None`
+  en production (aucune fuite de traceback) ; les deux rendus de la 500 (GET et
+  requêtes dynamiques) passent désormais ce contexte. Aligné aussi sur le `app.py`
+  racine (anti-dérive ADR-024).
 
 
 ## [1.0.0-beta.16] — 2026-06-16
