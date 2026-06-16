@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "schemas": {
+    "common": "./common.schema.json",
+    "field": "./field.schema.json",
+    "entity": "./entity.schema.json",
+    "pivot": "./pivot.schema.json",
+    "relations": "./relations.schema.json",
+    "rbac": "./rbac.schema.json"
+  }
+}
