@@ -122,6 +122,15 @@ def test_settings_conserve_association_env():
     assert data.get("files.associations", {}).get("**/env/*") == "properties"
 
 
+# ── Mode strict par défaut (SKELETON-VSCODE-STRICT-DEFAULT-001) ──────────────
+
+def test_settings_active_le_mode_strict():
+    """Le cœur Forge est entièrement strict (cliquet ADR-036) et le code généré
+    du squelette est strict-clean : un projet `forge new` démarre directement en
+    `typeCheckingMode: strict`, sans bruit `reportUnknown*` sur le cœur typé."""
+    assert _settings().get("python.analysis.typeCheckingMode") == "strict"
+
+
 # ── Override reportUnknown* retiré (SKELETON-VSCODE-STRICT-NOISE-REMOVE-001) ──
 
 def test_settings_ne_neutralise_plus_la_famille_reportunknown():

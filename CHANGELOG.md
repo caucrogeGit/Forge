@@ -5,16 +5,25 @@
 
 ### Modifié
 
-- **Retrait de l'override `reportUnknown*` du squelette (payoff ADR-036)**
-  (`SKELETON-VSCODE-STRICT-NOISE-REMOVE-001`). Le cliquet `# pyright: strict` est
-  terminé sur tout le cœur (`pyright core/` à 0 erreur), donc le cœur n'émet plus
-  de `reportUnknown*` sur ses symboles via `py.typed`. Le bloc
-  `python.analysis.diagnosticSeverityOverrides` qui neutralisait les cinq règles
-  `reportUnknown*` est retiré de `forge_cli/skeleton/data/.vscode/settings.json` :
-  un projet `forge new` bénéficie désormais d'un mode strict **complet**, y
-  compris sur l'interopérabilité avec le cœur typé. La mitigation provisoire
-  `SKELETON-VSCODE-STRICT-NOISE-001` est ainsi remplacée par le traitement de la
-  cause (règle A). Le garde-fou du squelette devient un test d'absence.
+- **Squelette `forge new` en mode strict par défaut (payoff ADR-036)**
+  (`SKELETON-VSCODE-STRICT-DEFAULT-001`, `SKELETON-VSCODE-STRICT-NOISE-REMOVE-001`).
+  Le cliquet `# pyright: strict` étant terminé sur tout le cœur (`pyright core/`
+  à 0 erreur), le cœur n'émet plus de `reportUnknown*` sur ses symboles via
+  `py.typed`. Trois changements dans `forge_cli/skeleton/data` :
+  1. l'override `python.analysis.diagnosticSeverityOverrides` (qui neutralisait
+     les cinq règles `reportUnknown*`) est **retiré** du `.vscode/settings.json` —
+     la mitigation provisoire `SKELETON-VSCODE-STRICT-NOISE-001` est remplacée
+     par le traitement de la cause (règle A) ;
+  2. le `.vscode/settings.json` active désormais
+     `python.analysis.typeCheckingMode: "strict"` : un projet généré démarre en
+     mode strict complet ;
+  3. le code généré `app.py` est rendu strict-clean (annotations de
+     `_error_context`, `_dev_error`, `_dispatch`, `log_message`, `get_request`,
+     `process_request_thread` ; l'import lazy de l'opt-in `forge-mvc-files` porte
+     un ignore ciblé, absent d'un squelette nu). `app.py` racine est synchronisé
+     à l'identique (anti-dérive ADR-024). Vérifié : `pyright --strict` à 0 erreur
+     sur le squelette. Les garde-fous du squelette deviennent des tests
+     d'absence (override) et de présence (`typeCheckingMode`).
 
 ### Ajouté
 

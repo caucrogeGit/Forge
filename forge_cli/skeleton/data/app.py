@@ -64,6 +64,7 @@ import argparse as _argparse
 import errno as _errno
 import os as _os
 import sys as _sys
+from typing import Any, cast
 
 # ── Détection de l'environnement avant tout import de config ──────────────────
 # L'argument --env est parsé ici, point d'entrée unique de la CLI.
@@ -145,7 +146,7 @@ def _is_safe_static_path(static_dir: str, filepath: str) -> bool:
         return False
 
 
-def _error_context():
+def _error_context() -> "dict[str, Any] | None":
     """Contexte de la page 500 : détail de l'exception en cours.
 
     Uniquement en développement (APP_ENV == "dev") : type, message et traceback
@@ -166,7 +167,7 @@ def _error_context():
     }
 
 
-def _dev_error(detail: dict):
+def _dev_error(detail: "dict[str, Any]") -> "dict[str, Any] | None":
     """Détail d'erreur passé aux pages 404 / 413, uniquement en développement.
 
     En production (APP_ENV != "dev"), renvoie None : la page d'erreur reste
@@ -241,7 +242,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             logger.exception("Erreur %s %s", label, self.path)
             self._send_response(_html("errors/500.html", 500, _error_context()))
 
-    def _dispatch(self, request) -> Response:
+    def _dispatch(self, request: Request) -> Response:
         """Délègue le routage et le contrôle d'accès à l'Application."""
         if APP_CSP_NONCE_ENABLED:
             _csp.set_request_nonce(_csp.generate_nonce())
@@ -307,14 +308,16 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _serve_media(self, path: str) -> None:
         try:
-            from forge_mvc_files import serve_media_file
+            # Opt-in forge-mvc-files : absent d'un squelette nu, chargé en lazy.
+            from forge_mvc_files import serve_media_file  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
         except ImportError:
             self._send_response(Response(404, b"Not found", "text/plain; charset=utf-8"))
             return
         relative_path = path.removeprefix("/media/")
-        self._send_response(serve_media_file(relative_path))
+        media_response = cast(Response, serve_media_file(relative_path))
+        self._send_response(media_response)
 
-    def log_message(self, format, *args):
+    def log_message(self, format: str, *args: Any) -> None:
         """Affiche chaque requête reçue dans le terminal avec l'adresse IP du client."""
         logger.info("[%s] %s", self.address_string(), format % args)
 
@@ -365,12 +368,12 @@ class TLSThreadingHTTPServer(ThreadingHTTPServer):
     """
     ssl_context: ssl.SSLContext | None = None
 
-    def get_request(self):
+    def get_request(self) -> "tuple[socket.socket, Any]":
         # accept() retourne un socket TCP brut, sans TLS.
         # Le wrap se fera dans process_request_thread (= thread du client).
         return self.socket.accept()
 
-    def process_request_thread(self, request, client_address):
+    def process_request_thread(self, request: Any, client_address: Any) -> None:
         # Cette méthode s'exécute dans le thread lancé par ThreadingMixIn,
         # donc le handshake TLS ne bloque jamais la boucle d'accept.
         if self.ssl_context is not None:
