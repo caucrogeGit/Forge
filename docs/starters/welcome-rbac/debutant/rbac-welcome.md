@@ -38,8 +38,14 @@ Ouvrez `https://localhost:8000/rbac-welcome` puis `/rbac-welcome/inspect`.
 
 ## Le contrôleur
 
+Créez le contrôleur `mvc/controllers/rbac_welcome_controller.py` :
+
 ```python
 # mvc/controllers/rbac_welcome_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_rbac import get_contract_permissions, load_rbac_contract
 
 
@@ -52,6 +58,18 @@ def _inspect() -> dict:
         "entities_count": result.entities_count,
         "admin_permissions": sorted(get_contract_permissions(result, ["admin"])),
     }
+
+
+class RbacWelcomeController(BaseController):
+    """Starter pédagogique : premier contact avec Forge RBAC."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return Response.text("Bonjour Forge RBAC")
+
+    @staticmethod
+    def inspect(request: Request) -> Response:
+        return Response.json(_inspect())
 ```
 
 ### Comprendre ce code
@@ -62,6 +80,48 @@ def _inspect() -> dict:
   résultat (existence, validité, comptes).
 - `get_contract_permissions(result, ["admin"])` agrège les permissions de tous les
   rôles donnés.
+
+## Le contrat
+
+Créez le contrat de démonstration `mvc/security/rbac.json` :
+
+```json
+{
+  "schema_version": "1.0",
+  "entities": {
+    "Article": {
+      "permissions": {
+        "list": "article.list",
+        "show": "article.show",
+        "create": "article.create",
+        "update": "article.update",
+        "delete": "article.delete"
+      }
+    }
+  },
+  "roles": {
+    "admin": ["article.list", "article.show", "article.create", "article.update", "article.delete"],
+    "editor": ["article.list", "article.show", "article.create", "article.update"],
+    "reader": ["article.list", "article.show"]
+  }
+}
+```
+
+Ce contrat sert tout le parcours : il déclare une entité `Article`, ses permissions,
+et trois rôles (`admin`, `editor`, `reader`) avec les permissions accordées à chacun.
+
+## La route
+
+Ajoutez l'import et les deux routes dans le groupe public de `mvc/routes.py` :
+
+```python
+# mvc/routes.py
+from mvc.controllers.rbac_welcome_controller import RbacWelcomeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-welcome", RbacWelcomeController.index, name="rbac_welcome_index")
+    public.add("GET", "/rbac-welcome/inspect", RbacWelcomeController.inspect, name="rbac_welcome_inspect")
+```
 
 ## À retenir
 

@@ -35,9 +35,17 @@ Ouvrez `https://localhost:8000/rbac-role?name=Éditeur en chef` → slug
 
 ## Le contrôleur
 
+Créez le contrôleur `mvc/controllers/rbac_role_controller.py` :
+
 ```python
 # mvc/controllers/rbac_role_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_rbac import RbacValidationError, normalize_role_slug, validate_role
+
+_DEMO_NAME = "Éditeur en chef"
 
 
 def _role_view(name: str) -> dict:
@@ -47,6 +55,17 @@ def _role_view(name: str) -> dict:
         return {"name": name, "slug": slug, "valid": True, "error": None}
     except RbacValidationError as exc:
         return {"name": name, "slug": slug, "valid": False, "error": str(exc)}
+
+
+class RbacRoleController(BaseController):
+    """Starter pédagogique : dériver et valider un rôle (nom + slug)."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        name = request.query("name") or _DEMO_NAME
+        return BaseController.render(
+            "rbac_role/index.html", context=_role_view(name), request=request
+        )
 ```
 
 ### Comprendre ce code
@@ -55,6 +74,49 @@ def _role_view(name: str) -> dict:
   d'affichage évolue.
 - Séparer nom et slug évite de coder en dur des libellés dans les comparaisons.
 - `validate_role` garantit un couple nom/slug cohérent.
+
+## La vue
+
+Créez la vue `mvc/views/rbac_role/index.html` :
+
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rôle et slug - Forge</title>
+</head>
+<body>
+  <h1>Rôle et slug</h1>
+
+  <form method="get" action="/rbac-role">
+    <input type="text" name="name" value="{{ name }}" size="40">
+    <button type="submit">Dériver le slug</button>
+  </form>
+
+  <ul>
+    <li>Nom : <code>{{ name }}</code></li>
+    <li>Slug : <code>{{ slug }}</code></li>
+    <li>Valide : <strong>{% if valid %}oui{% else %}non{% endif %}</strong>{% if error %} - {{ error }}{% endif %}</li>
+  </ul>
+
+  <p>Le <strong>slug</strong> est l'identifiant stable du rôle ; le <strong>nom</strong>
+  est l'affichage. Un rôle accorde des permissions via le contrat RBAC.</p>
+</body>
+</html>
+```
+
+## La route
+
+Ajoutez l'import et la route dans le groupe public de `mvc/routes.py` :
+
+```python
+# mvc/routes.py
+from mvc.controllers.rbac_role_controller import RbacRoleController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-role", RbacRoleController.index, name="rbac_role_index")
+```
 
 ## À retenir
 

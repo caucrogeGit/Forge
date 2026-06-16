@@ -37,26 +37,37 @@ deux vérifications, en JSON.
 
 ## Le contrôleur
 
+Créez le contrôleur `mvc/controllers/rbac_resolve_controller.py` :
+
 ```python
 # mvc/controllers/rbac_resolve_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_rbac import get_user_permissions, user_has_permission
 
+_DEMO_USER_ID = 1
+# Lignes que renverrait la base pour les permissions de l'utilisateur démo.
 _DEMO_ROWS = [{"code": "article.list"}, {"code": "article.show"}, {"code": "article.create"}]
 
 
 def _demo_fetch_all(sql, params=()):
-    return _DEMO_ROWS   # au lieu d'interroger la base
+    """fetch_all de démonstration : renvoie des permissions fixes (au lieu de la base)."""
+    return _DEMO_ROWS
 
 
 class RbacResolveController(BaseController):
+    """Starter pédagogique : résoudre les permissions effectives d'un utilisateur."""
 
     @staticmethod
     def index(request: Request) -> Response:
-        perms = get_user_permissions(1, fetch_all=_demo_fetch_all)
+        perms = get_user_permissions(_DEMO_USER_ID, fetch_all=_demo_fetch_all)
         return Response.json({
+            "user_id": _DEMO_USER_ID,
             "permissions": list(perms),
-            "can_create": user_has_permission(1, "article.create", fetch_all=_demo_fetch_all),
-            "can_delete": user_has_permission(1, "article.delete", fetch_all=_demo_fetch_all),
+            "can_create": user_has_permission(_DEMO_USER_ID, "article.create", fetch_all=_demo_fetch_all),
+            "can_delete": user_has_permission(_DEMO_USER_ID, "article.delete", fetch_all=_demo_fetch_all),
         })
 ```
 
@@ -67,6 +78,19 @@ class RbacResolveController(BaseController):
 - `user_has_permission` s'appuie sur `get_user_permissions` : un seul endroit de
   vérité.
 - Par défaut (sans `fetch_all` ni accès), **aucune permission** : sécurisé par défaut.
+
+## La route
+
+Ce palier renvoie du JSON directement (`Response.json`), il n'a donc pas de vue.
+Ajoutez l'import et la route dans le groupe public de `mvc/routes.py` :
+
+```python
+# mvc/routes.py
+from mvc.controllers.rbac_resolve_controller import RbacResolveController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-resolve", RbacResolveController.index, name="rbac_resolve_index")
+```
 
 ## À retenir
 

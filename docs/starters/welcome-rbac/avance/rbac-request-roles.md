@@ -37,12 +37,19 @@ Ouvrez `https://localhost:8000/rbac-request-roles` : sans utilisateur connecté,
 
 ## Le contrôleur
 
+Créez le contrôleur `mvc/controllers/rbac_request_roles_controller.py` :
+
 ```python
 # mvc/controllers/rbac_request_roles_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_rbac import get_request_permissions, get_request_roles
 
 
 class RbacRequestRolesController(BaseController):
+    """Starter pédagogique : inspecter rôles et permissions de la requête courante."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -59,6 +66,19 @@ class RbacRequestRolesController(BaseController):
 - `get_request_permissions` combine ces rôles avec le contrat pour donner les
   permissions effectives de la requête.
 - Listes vides sans utilisateur : **aucun droit par défaut**.
+
+## La route
+
+Ce palier renvoie du JSON directement (`Response.json`), il n'a donc pas de vue.
+Ajoutez l'import et la route dans le groupe public de `mvc/routes.py` :
+
+```python
+# mvc/routes.py
+from mvc.controllers.rbac_request_roles_controller import RbacRequestRolesController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-request-roles", RbacRequestRolesController.index, name="rbac_request_roles_index")
+```
 
 ## À retenir
 

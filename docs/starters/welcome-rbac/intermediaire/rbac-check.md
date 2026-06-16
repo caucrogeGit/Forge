@@ -35,21 +35,32 @@ Ouvrez `https://localhost:8000/rbac-check?roles=reader&permission=article.create
 
 ## Le contrôleur
 
+Créez le contrôleur `mvc/controllers/rbac_check_controller.py` :
+
 ```python
 # mvc/controllers/rbac_check_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_rbac import has_contract_permission, load_rbac_contract
 
 
 class RbacCheckController(BaseController):
+    """Starter pédagogique : vérifier une permission contractuelle pour des rôles."""
 
     @staticmethod
     def index(request: Request) -> Response:
-        roles = [r.strip() for r in (request.query("roles") or "reader").split(",") if r.strip()]
+        roles_raw = request.query("roles") or "reader"
         permission = request.query("permission") or "article.create"
+        roles = [r.strip() for r in roles_raw.split(",") if r.strip()]
         result = load_rbac_contract(".")
         granted = has_contract_permission(result, roles, permission)
-        return BaseController.render("rbac_check/index.html",
-            context={"roles": ",".join(roles), "permission": permission, "granted": granted}, request=request)
+        return BaseController.render(
+            "rbac_check/index.html",
+            context={"roles": roles_raw, "permission": permission, "granted": granted},
+            request=request,
+        )
 ```
 
 ### Comprendre ce code
@@ -59,6 +70,80 @@ class RbacCheckController(BaseController):
 - Un utilisateur peut cumuler plusieurs rôles : `has_contract_permission` agrège.
 - C'est la brique que `require_contract_permission` (guard) et `can()` (template)
   utilisent.
+
+## Le contrat
+
+Ce palier s'appuie sur le contrat `mvc/security/rbac.json` introduit au palier
+« Bonjour Forge RBAC ». Si vous démarrez ici, créez-le :
+
+```json
+{
+  "schema_version": "1.0",
+  "entities": {
+    "Article": {
+      "permissions": {
+        "list": "article.list",
+        "show": "article.show",
+        "create": "article.create",
+        "update": "article.update",
+        "delete": "article.delete"
+      }
+    }
+  },
+  "roles": {
+    "admin": ["article.list", "article.show", "article.create", "article.update", "article.delete"],
+    "editor": ["article.list", "article.show", "article.create", "article.update"],
+    "reader": ["article.list", "article.show"]
+  }
+}
+```
+
+## La vue
+
+Créez la vue `mvc/views/rbac_check/index.html` :
+
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vérifier une permission - Forge</title>
+</head>
+<body>
+  <h1>Vérifier une permission</h1>
+
+  <form method="get" action="/rbac-check">
+    <label>Rôles (séparés par des virgules)
+      <input type="text" name="roles" value="{{ roles }}">
+    </label>
+    <label>Permission
+      <input type="text" name="permission" value="{{ permission }}">
+    </label>
+    <button type="submit">Vérifier</button>
+  </form>
+
+  <p>
+    Rôles <code>{{ roles }}</code> + permission <code>{{ permission }}</code> →
+    <strong>{% if granted %}accordée{% else %}refusée{% endif %}</strong>
+  </p>
+
+  <p>Essayez <code>reader</code> puis <code>editor</code> avec
+  <code>article.create</code> : seul <code>editor</code> l'accorde.</p>
+</body>
+</html>
+```
+
+## La route
+
+Ajoutez l'import et la route dans le groupe public de `mvc/routes.py` :
+
+```python
+# mvc/routes.py
+from mvc.controllers.rbac_check_controller import RbacCheckController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-check", RbacCheckController.index, name="rbac_check_index")
+```
 
 ## À retenir
 

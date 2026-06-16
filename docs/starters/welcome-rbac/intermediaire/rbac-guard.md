@@ -35,23 +35,34 @@ Ouvrez `https://localhost:8000/rbac-guard?roles=reader` (403) puis `?roles=edito
 
 ## Le contrôleur
 
+Créez le contrôleur `mvc/controllers/rbac_guard_controller.py` :
+
 ```python
 # mvc/controllers/rbac_guard_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_rbac import load_rbac_contract, require_contract_permission
 
 _REQUIRED = "article.create"
 
 
 class RbacGuardController(BaseController):
+    """Starter pédagogique : protéger une route par une permission contractuelle."""
 
     @staticmethod
     def index(request: Request) -> Response:
-        roles = [r.strip() for r in (request.query("roles") or "reader").split(",") if r.strip()]
+        roles_raw = request.query("roles") or "reader"
+        roles = [r.strip() for r in roles_raw.split(",") if r.strip()]
         result = load_rbac_contract(".")
+        context = {"roles": roles_raw, "required": _REQUIRED}
         denied = require_contract_permission(result, roles, _REQUIRED)
         if denied is not None:
-            return denied  # réponse 403 prête à renvoyer
-        # … la route continue (ressource protégée)
+            context["denied"] = True
+            return BaseController.render("rbac_guard/index.html", context=context, request=request, status=403)
+        context["allowed"] = True
+        return BaseController.render("rbac_guard/index.html", context=context, request=request)
 ```
 
 ### Comprendre ce code
@@ -61,6 +72,75 @@ class RbacGuardController(BaseController):
 - En production, les **rôles viennent de l'utilisateur connecté**, pas de l'URL —
   ici on les passe en paramètre pour la démonstration.
 - La permission requise est déclarée **une fois**, en tête de l'action.
+
+## Le contrat
+
+Ce palier réutilise le contrat `mvc/security/rbac.json` introduit au palier
+« Bonjour Forge RBAC ». Si vous démarrez ici, créez-le :
+
+```json
+{
+  "schema_version": "1.0",
+  "entities": {
+    "Article": {
+      "permissions": {
+        "list": "article.list",
+        "show": "article.show",
+        "create": "article.create",
+        "update": "article.update",
+        "delete": "article.delete"
+      }
+    }
+  },
+  "roles": {
+    "admin": ["article.list", "article.show", "article.create", "article.update", "article.delete"],
+    "editor": ["article.list", "article.show", "article.create", "article.update"],
+    "reader": ["article.list", "article.show"]
+  }
+}
+```
+
+## La vue
+
+Créez la vue `mvc/views/rbac_guard/index.html` :
+
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Protéger une route - Forge</title>
+</head>
+<body>
+  <h1>Protéger une route</h1>
+
+  <p>Ressource protégée - permission requise : <code>{{ required }}</code></p>
+  <p>Rôles présentés : <code>{{ roles }}</code></p>
+
+  {% if allowed %}
+  <p data-level="success">✓ Accès autorisé : la route continue.</p>
+  {% endif %}
+  {% if denied %}
+  <p data-level="error">✗ 403 - permission refusée pour ces rôles.</p>
+  {% endif %}
+
+  <p>Essayez <code>?roles=reader</code> (403) puis <code>?roles=editor</code> (autorisé).
+  En production, les rôles viennent de l'utilisateur connecté, pas de l'URL.</p>
+</body>
+</html>
+```
+
+## La route
+
+Ajoutez l'import et la route dans le groupe public de `mvc/routes.py` :
+
+```python
+# mvc/routes.py
+from mvc.controllers.rbac_guard_controller import RbacGuardController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/rbac-guard", RbacGuardController.index, name="rbac_guard_index")
+```
 
 ## À retenir
 
