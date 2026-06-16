@@ -38,16 +38,42 @@ Ouvrez `https://localhost:8000/workflow-color` : libellé, couleur et classes pa
 
 ```python
 # mvc/controllers/workflow_color_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_workflow import (
-    workflow_status_badge_class, workflow_status_color, workflow_status_label,
+    make_status,
+    workflow_status_badge_class,
+    workflow_status_color,
+    workflow_status_label,
 )
 
-rows = [{
-    "name": s.name,
-    "label": workflow_status_label(s),
-    "color": workflow_status_color(s),
-    "css": workflow_status_badge_class(s),
-} for s in _STATUSES]
+_STATUSES = [
+    make_status("draft", "Brouillon", "gray", is_initial=True),
+    make_status("review", "En revue", "yellow"),
+    make_status("published", "Publié", "green"),
+    make_status("archived", "Archivé", "red", is_final=True),
+]
+
+
+class WorkflowColorController(BaseController):
+    """Starter pédagogique : accéder aux pièces d'un badge de statut."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        rows = [
+            {
+                "name": s.name,
+                "label": workflow_status_label(s),
+                "color": workflow_status_color(s),
+                "css": workflow_status_badge_class(s),
+            }
+            for s in _STATUSES
+        ]
+        return BaseController.render(
+            "workflow_color/index.html", context={"rows": rows}, request=request
+        )
 ```
 
 ### Comprendre ce code
@@ -56,6 +82,51 @@ rows = [{
   spécifique).
 - Ils sont **tolérants** : une couleur inconnue retombe sur le gris, un `None` est géré.
 - Accepter une chaîne **ou** un statut les rend utilisables même sans objet complet.
+
+## La vue
+
+```html
+<!-- mvc/views/workflow_color/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Couleur, libellé, classe — Forge</title>
+</head>
+<body>
+  <h1>Couleur, libellé, classe</h1>
+
+  <table>
+    <thead><tr><th>Statut</th><th>Libellé</th><th>Couleur</th><th>Classes</th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><code>{{ row.name }}</code></td>
+        <td>{{ row.label }}</td>
+        <td>{{ row.color }}</td>
+        <td><code>{{ row.css }}</code></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p>Ces pièces servent quand le badge tout fait ne suffit pas (intégration design
+  spécifique). Une couleur inconnue retombe sur le gris.</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans le groupe public de `mvc/routes.py`, ajoutez l'import et la route :
+
+```python
+# mvc/routes.py
+from mvc.controllers.workflow_color_controller import WorkflowColorController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-color", WorkflowColorController.index, name="workflow_color_index")
+```
 
 ## À retenir
 

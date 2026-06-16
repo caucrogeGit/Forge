@@ -30,20 +30,70 @@ forge run
 
 Ouvrez `https://localhost:8000/workflow-badge` : un badge coloré par statut.
 
-## Le contrôleur et la vue
+## Le contrôleur
 
 ```python
 # mvc/controllers/workflow_badge_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_workflow import make_status, workflow_status_badge
 
-badges = [(s.name, workflow_status_badge(s)) for s in _STATUSES]
+_STATUSES = [
+    make_status("draft", "Brouillon", "gray", is_initial=True),
+    make_status("review", "En revue", "yellow"),
+    make_status("published", "Publié", "green"),
+    make_status("archived", "Archivé", "red", is_final=True),
+]
+
+
+class WorkflowBadgeController(BaseController):
+    """Starter pédagogique : afficher un badge HTML de statut."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        badges = [(s.name, workflow_status_badge(s)) for s in _STATUSES]
+        return BaseController.render(
+            "workflow_badge/index.html", context={"badges": badges}, request=request
+        )
 ```
 
-```jinja
-{# La vue affiche le badge directement : c'est un Markup sûr #}
-{% for name, badge in badges %}
-<li>{{ name }} : {{ badge }}</li>
-{% endfor %}
+## La vue
+
+```html
+<!-- mvc/views/workflow_badge/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Badge de statut — Forge</title>
+</head>
+<body>
+  <h1>Badge de statut</h1>
+
+  <ul>
+    {% for name, badge in badges %}
+    <li><code>{{ name }}</code> : {{ badge }}</li>
+    {% endfor %}
+  </ul>
+
+  <p>Le badge est un <code>Markup</code> HTML sûr : <code>{{ "{{ workflow_status_badge(status) }}" }}</code>
+  s'affiche directement, sans échappement ni HTML codé à la main.</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans le groupe public de `mvc/routes.py`, ajoutez l'import et la route :
+
+```python
+# mvc/routes.py
+from mvc.controllers.workflow_badge_controller import WorkflowBadgeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-badge", WorkflowBadgeController.index, name="workflow_badge_index")
 ```
 
 ### Comprendre ce code

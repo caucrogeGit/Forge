@@ -32,26 +32,68 @@ forge run
 Ouvrez `https://localhost:8000/workflow-jinja` : badge, libellé, couleur et classes
 calculés dans le template.
 
-## Le contrôleur et la vue
+## Le contrôleur
 
 ```python
 # mvc/controllers/workflow_jinja_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_workflow import make_status, make_workflow_jinja_helpers
+
+_DEMO_STATUS = make_status("review", "En revue", "yellow")
 
 
 class WorkflowJinjaController(BaseController):
+    """Starter pédagogique : injecter les helpers Workflow dans un template."""
 
     @staticmethod
     def index(request: Request) -> Response:
         context = {"status": _DEMO_STATUS}
-        context.update(make_workflow_jinja_helpers())   # injecte les helpers
-        return BaseController.render("workflow_jinja/index.html", context=context, request=request)
+        context.update(make_workflow_jinja_helpers())
+        return BaseController.render(
+            "workflow_jinja/index.html", context=context, request=request
+        )
 ```
 
-```jinja
-{# Les helpers injectés sont appelables dans le template #}
-<li>Badge : {{ workflow_status_badge(status) }}</li>
-<li>Libellé : {{ workflow_status_label(status) }}</li>
+## La vue
+
+```html
+<!-- mvc/views/workflow_jinja/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Helpers Workflow dans Jinja — Forge</title>
+</head>
+<body>
+  <h1>Helpers Workflow dans Jinja</h1>
+
+  <p>Helpers injectés dans le contexte, utilisés directement dans le template :</p>
+  <ul>
+    <li>Badge : {{ workflow_status_badge(status) }}</li>
+    <li>Libellé : {{ workflow_status_label(status) }}</li>
+    <li>Couleur : {{ workflow_status_color(status) }}</li>
+    <li>Classes : <code>{{ workflow_status_badge_class(status) }}</code></li>
+  </ul>
+
+  <p>Les helpers de <code>forge-mvc-workflow</code> ne sont pas auto-enregistrés : on
+  les ajoute au contexte (ou à l'environnement Jinja) explicitement.</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans le groupe public de `mvc/routes.py`, ajoutez l'import et la route :
+
+```python
+# mvc/routes.py
+from mvc.controllers.workflow_jinja_controller import WorkflowJinjaController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-jinja", WorkflowJinjaController.index, name="workflow_jinja_index")
 ```
 
 ### Comprendre ce code

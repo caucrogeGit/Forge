@@ -36,7 +36,13 @@ Ouvrez `https://localhost:8000/workflow-status?name=En Revue` → `en_revue`.
 
 ```python
 # mvc/controllers/workflow_status_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_workflow import WorkflowStatusError, normalize_status_name, validate_status_name
+
+_DEMO_NAME = "En Revue"
 
 
 def _status_view(raw: str) -> dict:
@@ -46,6 +52,17 @@ def _status_view(raw: str) -> dict:
         return {"input": raw, "normalized": normalized, "valid": True, "error": None}
     except WorkflowStatusError as exc:
         return {"input": raw, "normalized": normalized, "valid": False, "error": str(exc)}
+
+
+class WorkflowStatusController(BaseController):
+    """Starter pédagogique : normaliser et valider un nom de statut."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        raw = request.query("name") or _DEMO_NAME
+        return BaseController.render(
+            "workflow_status/index.html", context=_status_view(raw), request=request
+        )
 ```
 
 ### Comprendre ce code
@@ -54,6 +71,48 @@ def _status_view(raw: str) -> dict:
   `en_revue`).
 - Le nom est stable et machine-friendly ; le libellé reste libre pour l'affichage.
 - `validate_status_name` lève `WorkflowStatusError` sur un nom vide ou mal formé.
+
+## La vue
+
+```html
+<!-- mvc/views/workflow_status/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Nom de statut — Forge</title>
+</head>
+<body>
+  <h1>Nom de statut</h1>
+
+  <form method="get" action="/workflow-status">
+    <input type="text" name="name" value="{{ input }}" size="40">
+    <button type="submit">Normaliser & valider</button>
+  </form>
+
+  <ul>
+    <li>Entrée : <code>{{ input }}</code></li>
+    <li>Normalisé : <code>{{ normalized }}</code></li>
+    <li>Valide : <strong>{% if valid %}oui{% else %}non{% endif %}</strong>{% if error %} — {{ error }}{% endif %}</li>
+  </ul>
+
+  <p>Le nom <code>snake_case</code> est l'identifiant stable du statut ; le libellé
+  est l'affichage.</p>
+</body>
+</html>
+```
+
+## La route
+
+Dans le groupe public de `mvc/routes.py`, ajoutez l'import et la route :
+
+```python
+# mvc/routes.py
+from mvc.controllers.workflow_status_controller import WorkflowStatusController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-status", WorkflowStatusController.index, name="workflow_status_index")
+```
 
 ## À retenir
 

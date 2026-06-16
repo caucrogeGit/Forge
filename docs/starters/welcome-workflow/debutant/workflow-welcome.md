@@ -39,16 +39,46 @@ Ouvrez `https://localhost:8000/workflow-welcome` puis `/workflow-welcome/inspect
 
 ```python
 # mvc/controllers/workflow_welcome_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_workflow import make_status, validate_statuses
 
 
 def _demo_statuses():
+    """Workflow de publication de démonstration."""
     return validate_statuses([
         make_status("draft", "Brouillon", "gray", is_initial=True),
         make_status("review", "En revue", "yellow"),
         make_status("published", "Publié", "green"),
         make_status("archived", "Archivé", "red", is_final=True),
     ])
+
+
+class WorkflowWelcomeController(BaseController):
+    """Starter pédagogique : premier contact avec Forge Workflow."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return Response.text("Bonjour Forge Workflow")
+
+    @staticmethod
+    def inspect(request: Request) -> Response:
+        statuses = _demo_statuses()
+        return Response.json({
+            "count": len(statuses),
+            "statuses": [
+                {
+                    "name": s.name,
+                    "label": s.label,
+                    "color": s.color,
+                    "is_initial": s.is_initial,
+                    "is_final": s.is_final,
+                }
+                for s in statuses
+            ],
+        })
 ```
 
 ### Comprendre ce code
@@ -59,6 +89,19 @@ def _demo_statuses():
   pour l'affichage.
 - Le module est **sans état** : il décrit la machine, l'application stocke le statut
   courant de ses objets.
+
+## La route
+
+Dans le groupe public de `mvc/routes.py`, ajoutez l'import et les deux routes :
+
+```python
+# mvc/routes.py
+from mvc.controllers.workflow_welcome_controller import WorkflowWelcomeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/workflow-welcome", WorkflowWelcomeController.index, name="workflow_welcome_index")
+    public.add("GET", "/workflow-welcome/inspect", WorkflowWelcomeController.inspect, name="workflow_welcome_inspect")
+```
 
 ## À retenir
 
