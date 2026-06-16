@@ -70,6 +70,17 @@
   par `BaseController.render()` et les helpers d'erreur — lève désormais un
   `TypeError` explicite orientant vers `context=...`. Durcissement interne pré-1.0.
 
+### Documentation
+
+- **Convention « validation précoce des arguments critiques » + registre**
+  (`CORE-EARLY-VALIDATION-CONTRACT-001`). Pattern `C.6` ajouté à
+  `docs/contributing/conventions.md` : les entrées publiques du cœur appelées par
+  le code applicatif valident tôt leurs arguments positionnels critiques
+  (anti-erreur-différée), sans sur-valider (principe 8). Le contrat est verrouillé
+  par un test méta `tests/meta/test_core_early_validation_contract_001.py` qui
+  recense les entrées couvertes (Response, html/render, route) — registre à
+  étendre à chaque nouvelle entrée.
+
 
 ## [1.0.0-beta.16] — 2026-06-16
 

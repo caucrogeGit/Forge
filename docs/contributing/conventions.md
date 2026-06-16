@@ -14,17 +14,17 @@ Quatre sections thématiques :
 
 - **A. Audit avant action** — 5 patterns
 - **B. Tests : conventions et patterns** — 6 patterns
-- **C. Code : architecture** — 5 patterns
+- **C. Code : architecture** — 6 patterns
 - **D. Documentation : structure** — 3 patterns
 
-Total : 18 patterns documentés.
+Total : 19 patterns documentés.
 
 Chaque pattern présente son énoncé court, le contexte d'apparition (ticket
 d'origine) et un exemple ou une règle pratique.
 
 Une **annexe « Glossaire »** (en fin de page) fixe le vocabulaire canonique
 de Forge — quel mot pour quel objet — et n'entre pas dans le décompte des
-18 patterns.
+19 patterns.
 
 ---
 
@@ -279,6 +279,37 @@ grep -r "est_limite" core/ mvc/ tests/ | grep -v "est_limite_upload"
 ```
 
 Origine : `LANG-MIGRATION-001`.
+
+---
+
+### C.6 — Validation précoce des arguments critiques (anti-erreur-différée)
+
+Une entrée publique du cœur appelée par le code applicatif (contrôleur,
+`mvc/routes.py`, boot) doit **valider tôt** ses arguments positionnels critiques,
+avec un `TypeError` au message **actionnable**, plutôt que de laisser passer une
+valeur invalide qui ne casse que plus loin.
+
+Motivation : l'**erreur différée**. Une valeur fautive fabriquée à un endroit
+(ex. `Response("texte")` : le 1er argument positionnel est le `status`) mais
+consommée ailleurs (l'envoi de la réponse) produit un traceback qui pointe le
+**point de consommation**, pas le code fautif. Valider au moment de la
+construction/enregistrement remet l'erreur dans le frame de l'appelant.
+
+Entrées du cœur couvertes (le message nomme le bon usage) :
+
+| Entrée | Argument validé | Ticket |
+|---|---|---|
+| `Response(status, …)` | `status` entier | `CORE-RESPONSE-STATUS-TYPE-001` |
+| `html()` / `BaseController.render()` | `status` entier (2e positionnel ≠ contexte) | `CORE-RENDER-STATUS-TYPE-001` |
+| `router.add(…, handler)` | `handler` appelable (à l'enregistrement) | `CORE-ROUTE-HANDLER-CALLABLE-001` |
+
+Critère pour appliquer (et **ne pas** sur-valider, principe 8) : entrée publique,
+appelée par le code applicatif, dont un argument positionnel critique mal typé
+provoque une erreur **différée**. Le contrat est verrouillé par le test méta
+`tests/meta/test_core_early_validation_contract_001.py` — y ajouter une ligne
+quand on couvre une nouvelle entrée.
+
+Origine : retours de tests terrain (ADR-009), cycle b17.
 
 ---
 
