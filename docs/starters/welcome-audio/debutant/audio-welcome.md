@@ -41,10 +41,15 @@ Ouvrez `https://localhost:8000/audio-welcome` (« Bonjour Forge Audio »), puis
 
 ```python
 # mvc/controllers/audio_welcome_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_audio import load_audio_config
 
 
 def _config_to_safe_dict(cfg) -> dict:
+    """Sérialise la config audio, token masqué."""
     return {
         "storage_root": cfg.storage_root,
         "max_upload_mb": cfg.max_upload_mb,
@@ -56,6 +61,7 @@ def _config_to_safe_dict(cfg) -> dict:
 
 
 class AudioWelcomeController(BaseController):
+    """Starter pédagogique : premier contact avec Forge Audio."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -72,6 +78,19 @@ class AudioWelcomeController(BaseController):
   taille et durée maximales, binaires utilisés.
 - On **masque** toujours le token (`"***"`) : une config exposée ne révèle jamais
   ses secrets.
+
+## La route
+
+Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.audio_welcome_controller import AudioWelcomeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/audio-welcome", AudioWelcomeController.index, name="audio_welcome_index")
+    public.add("GET", "/audio-welcome/inspect", AudioWelcomeController.inspect, name="audio_welcome_inspect")
+```
 
 ## À retenir
 

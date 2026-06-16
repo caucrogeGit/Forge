@@ -37,25 +37,41 @@ contrôle en JSON. La présence de `ffprobe`/`ffmpeg` y apparaît.
 
 ```python
 # mvc/controllers/audio_doctor_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_audio.cli.doctor import (
-    check_config_loadable, check_ffmpeg_present, check_ffprobe_present,
-    check_package_importable, check_routes_registrable,
+    check_config_loadable,
+    check_ffmpeg_present,
+    check_ffprobe_present,
+    check_package_importable,
+    check_routes_registrable,
 )
 
+# Contrôles sûrs : aucun ne touche de fichier ni de réseau.
 _SAFE_CHECKS = (
-    check_package_importable, check_config_loadable,
-    check_ffprobe_present, check_ffmpeg_present, check_routes_registrable,
+    check_package_importable,
+    check_config_loadable,
+    check_ffprobe_present,
+    check_ffmpeg_present,
+    check_routes_registrable,
 )
 
 
 class AudioDoctorController(BaseController):
+    """Starter pédagogique : diagnostic Audio non invasif exposé en JSON."""
 
     @staticmethod
     def index(request: Request) -> Response:
         checks = []
         for check in _SAFE_CHECKS:
             result = check()
-            checks.append({"status": result.status, "name": result.name, "detail": result.detail})
+            checks.append({
+                "status": result.status,
+                "name": result.name,
+                "detail": result.detail,
+            })
         return Response.json({"checks": checks})
 ```
 
@@ -66,6 +82,18 @@ class AudioDoctorController(BaseController):
 - Tous les contrôles retenus sont **sûrs** : aucun ne touche un fichier, le réseau
   ou une base. Un diagnostic ne doit jamais avoir d'effet de bord.
 - La commande `forge audio:doctor` reste le diagnostic complet en ligne de commande.
+
+## La route
+
+Déclarez la route dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.audio_doctor_controller import AudioDoctorController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/audio-doctor", AudioDoctorController.index, name="audio_doctor_index")
+```
 
 ## À retenir
 

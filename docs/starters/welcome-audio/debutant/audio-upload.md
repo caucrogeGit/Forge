@@ -42,10 +42,23 @@ les paliers avancés (sonder, transcoder).
 
 ```python
 # mvc/controllers/audio_upload_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_audio import AudioIngestError, ingest_audio
 
 
 class AudioUploadController(BaseController):
+    """Starter pédagogique : ingérer un fichier audio source."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return BaseController.render(
+            "audio_upload/index.html",
+            context={"csrf_token": BaseController.csrf_token(request)},
+            request=request,
+        )
 
     @staticmethod
     def upload(request: Request) -> Response:
@@ -53,14 +66,20 @@ class AudioUploadController(BaseController):
         context = {"csrf_token": BaseController.csrf_token(request)}
         if uploaded is None:
             context["error"] = "Aucun fichier audio sélectionné."
-            return BaseController.render("audio_upload/index.html", context=context, request=request)
+            return BaseController.render(
+                "audio_upload/index.html", context=context, request=request
+            )
         try:
             result = ingest_audio(uploaded.content, uploaded.filename or "audio")
         except AudioIngestError as exc:
             context["error"] = str(exc)
-            return BaseController.render("audio_upload/index.html", context=context, request=request)
+            return BaseController.render(
+                "audio_upload/index.html", context=context, request=request
+            )
         context["result"] = result
-        return BaseController.render("audio_upload/index.html", context=context, request=request)
+        return BaseController.render(
+            "audio_upload/index.html", context=context, request=request
+        )
 ```
 
 ### Comprendre ce code
@@ -71,6 +90,56 @@ class AudioUploadController(BaseController):
   construction (modèle propre à audio/video, distinct du modèle « nom assaini » de
   `forge-mvc-files`).
 - Aucun `ffprobe`/`ffmpeg` : l'ingestion ne fait que valider et stocker.
+
+## La vue
+
+```html
+<!-- mvc/views/audio_upload/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Téléverser un audio — Forge</title>
+</head>
+<body>
+  <h1>Téléverser un audio</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  {% if result %}
+  <p data-level="success">Audio ingéré :</p>
+  <ul>
+    <li>UUID : <code>{{ result.uuid }}</code></li>
+    <li>Chemin source : <code>{{ result.original_path }}</code></li>
+    <li>Taille : {{ result.size_bytes }} octets</li>
+    <li>Type MIME : <code>{{ result.mime_type }}</code></li>
+  </ul>
+  <p>Écoute possible (une fois la lecture branchée) : <code>/audio/{{ result.uuid }}</code></p>
+  {% endif %}
+
+  <form method="post" action="/audio-upload" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="file" name="audio" accept="audio/*" required>
+    <button type="submit">Téléverser</button>
+  </form>
+</body>
+</html>
+```
+
+## La route
+
+Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.audio_upload_controller import AudioUploadController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/audio-upload", AudioUploadController.index, name="audio_upload_index")
+    public.add("POST", "/audio-upload", AudioUploadController.upload, name="audio_upload_store")
+```
 
 ## À retenir
 
