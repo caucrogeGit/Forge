@@ -50,6 +50,10 @@ renvoie les formats acceptés et les tailles de variantes en JSON.
 
 ```python
 # mvc/controllers/images_welcome_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_images import (
     ALLOWED_IMAGE_EXTENSIONS,
     ALLOWED_IMAGE_MIME_TYPES,
@@ -58,6 +62,7 @@ from forge_mvc_images import (
 
 
 def _capabilities() -> dict:
+    """Décrit ce que forge-mvc-images sait accepter et produire."""
     return {
         "allowed_extensions": sorted(ALLOWED_IMAGE_EXTENSIONS),
         "allowed_mime_types": sorted(ALLOWED_IMAGE_MIME_TYPES),
@@ -68,6 +73,7 @@ def _capabilities() -> dict:
 
 
 class ImagesWelcomeController(BaseController):
+    """Starter pédagogique : premier contact avec Forge Images."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -86,6 +92,19 @@ class ImagesWelcomeController(BaseController):
 - `IMAGE_VARIANT_SIZES` décrit les déclinaisons que le module génère
   automatiquement à l'upload : `medium` (1280×1280) et `thumbnail` (300×300).
 - Les `frozenset` sont triés (`sorted(...)`) pour une sortie JSON stable.
+
+## La route
+
+Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.images_welcome_controller import ImagesWelcomeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/images-welcome", ImagesWelcomeController.index, name="images_welcome_index")
+    public.add("GET", "/images-welcome/inspect", ImagesWelcomeController.inspect, name="images_welcome_inspect")
+```
 
 ## À retenir
 

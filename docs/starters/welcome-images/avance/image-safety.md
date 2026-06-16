@@ -28,7 +28,8 @@ Troisième palier du **niveau avancé** de la progression images.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `forge_mvc_images.verify_image_content` | Vérifier qu'un contenu est une vraie image autorisée. | [Médias](../../../features/media.md) |
-| `core.forge.get` | Lire `upload_max_image_pixels` (budget anti-bombe). | [Configuration](../../../reference/api.md) |
+| `forge_mvc_images.ALLOWED_IMAGE_EXTENSIONS` | Liste blanche des formats acceptés, affichée dans la politique. | [Médias](../../../features/media.md) |
+| `os.getenv("UPLOAD_MAX_IMAGE_PIXELS")` | Lire le budget anti-bombe (surface maximale en pixels). | [Configuration](../../../reference/api.md) |
 
 ## Tester
 
@@ -44,31 +45,117 @@ sur le **contenu**, pas sur l'extension.
 
 ```python
 # mvc/controllers/image_safety_controller.py
-from core.forge import get as get_config
+import os
+
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import UploadError
 from forge_mvc_images import ALLOWED_IMAGE_EXTENSIONS, verify_image_content
 
 
+def _guard_policy() -> dict:
+    """Décrit la politique de sécurité appliquée aux uploads d'image."""
+    return {
+        "allowed_extensions": sorted(ALLOWED_IMAGE_EXTENSIONS),
+        "max_image_pixels": int(os.getenv("UPLOAD_MAX_IMAGE_PIXELS", "24000000")),
+    }
+
+
 class ImageSafetyController(BaseController):
+    """Starter pédagogique : démontrer la garde de sécurité à l'upload."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return BaseController.render(
+            "image_safety/index.html",
+            context={"csrf_token": BaseController.csrf_token(request), "guard": _guard_policy()},
+            request=request,
+        )
 
     @staticmethod
     def check(request: Request) -> Response:
         uploaded = request.file("image")
+        context = {"csrf_token": BaseController.csrf_token(request), "guard": _guard_policy()}
+        if uploaded is None:
+            context["error"] = "Aucun fichier sélectionné."
+            return BaseController.render("image_safety/index.html", context=context, request=request)
         try:
             verify_image_content(uploaded.content)
         except UploadError as exc:
-            # rejeté : contenu non-image, format interdit, ou image trop grande
-            ...
-        # accepté : c'est bien une image valide, rien n'a été écrit
+            context["rejected"] = str(exc)
+            return BaseController.render("image_safety/index.html", context=context, request=request)
+        context["accepted"] = uploaded.filename or "image"
+        return BaseController.render("image_safety/index.html", context=context, request=request)
+
+    @staticmethod
+    def inspect(request: Request) -> Response:
+        return Response.json(_guard_policy())
 ```
 
 ### Comprendre ce code
 
 - La garde décide sur le **contenu binaire**, pas sur l'extension ni le
   `Content-Type` (tous deux falsifiables).
-- Le budget `upload_max_image_pixels` (24 Mpx par défaut) rejette une image
-  démesurée **avant** tout décodage coûteux — c'est la défense anti-bombe.
+- Le budget `UPLOAD_MAX_IMAGE_PIXELS` (24 Mpx par défaut, lu depuis
+  l'environnement) rejette une image démesurée **avant** tout décodage coûteux,
+  c'est la défense anti-bombe.
 - On ne fait que vérifier : aucun fichier n'est écrit. Idéal pour un diagnostic.
+
+## La vue
+
+Le contrôleur rend `image_safety/index.html` : créez ce fichier.
+
+```html
+<!-- mvc/views/image_safety/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Garde de sécurité à l'upload — Forge</title>
+</head>
+<body>
+  <h1>Garde de sécurité à l'upload</h1>
+
+  <p>Politique appliquée par <code>verify_image_content</code> :</p>
+  <ul>
+    <li>Formats acceptés : <code>{{ guard.allowed_extensions | join(', ') }}</code></li>
+    <li>Surface maximale (anti-bombe) : <code>{{ guard.max_image_pixels }}</code> pixels</li>
+  </ul>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+  {% if accepted %}
+  <p data-level="success">✓ <strong>{{ accepted }}</strong> est une image valide — acceptée.</p>
+  {% endif %}
+  {% if rejected %}
+  <p data-level="error">✗ Fichier rejeté : {{ rejected }}</p>
+  {% endif %}
+
+  <form method="post" action="/image-safety" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="file" name="image" required>
+    <button type="submit">Vérifier (sans enregistrer)</button>
+  </form>
+</body>
+</html>
+```
+
+## La route
+
+Déclarez les trois routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.image_safety_controller import ImageSafetyController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/image-safety", ImageSafetyController.index, name="image_safety_index")
+    public.add("POST", "/image-safety", ImageSafetyController.check, name="image_safety_check")
+    public.add("GET", "/image-safety/inspect", ImageSafetyController.inspect, name="image_safety_inspect")
+```
 
 ## À retenir
 

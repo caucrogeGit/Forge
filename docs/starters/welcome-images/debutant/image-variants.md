@@ -49,16 +49,22 @@ d'exemple, l'originale et ses variantes avec leurs URL. Changez de chemin avec
 
 ```python
 # mvc/controllers/image_variants_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_images import (
     IMAGE_VARIANT_SIZES,
     image_variant_relative_paths,
     media_url,
 )
 
+# Chemin d'exemple : aucune image réelle n'est requise, on illustre la convention.
 _DEMO_PATH = "images/2026/photo.jpg"
 
 
 def _variants_view(path: str) -> dict:
+    """Décrit l'originale et ses variantes (chemin relatif + URL publique)."""
     relative = image_variant_relative_paths(path)
     return {
         "path": path,
@@ -71,6 +77,7 @@ def _variants_view(path: str) -> dict:
 
 
 class ImageVariantsController(BaseController):
+    """Starter pédagogique : comprendre la dérivation des variantes d'image."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -98,6 +105,62 @@ class ImageVariantsController(BaseController):
   sans rien téléverser.
 - `media_url(rel)` préfixe le chemin relatif par `/media/` pour obtenir l'URL
   servie publiquement.
+
+## La vue
+
+Le contrôleur rend `image_variants/index.html` : créez ce fichier.
+
+```html
+<!-- mvc/views/image_variants/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Miniatures et variantes — Forge</title>
+</head>
+<body>
+  <h1>Miniatures et variantes</h1>
+
+  <p>Image de référence : <code>{{ path }}</code></p>
+
+  <table>
+    <thead>
+      <tr><th>Variante</th><th>Taille max</th><th>Chemin relatif</th><th>URL publique</th></tr>
+    </thead>
+    <tbody>
+      {% for name, info in variants.items() %}
+      <tr>
+        <td>{{ name }}</td>
+        <td>
+          {% if name in sizes %}{{ sizes[name][0] }}×{{ sizes[name][1] }}{% else %}originale{% endif %}
+        </td>
+        <td><code>{{ info.relative_path }}</code></td>
+        <td><code>{{ info.url }}</code></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p>
+    Changez l'image de référence en passant un paramètre :
+    <code>/image-variants?path=images/2026/autre.png</code>
+  </p>
+</body>
+</html>
+```
+
+## La route
+
+Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.image_variants_controller import ImageVariantsController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/image-variants", ImageVariantsController.index, name="image_variants_index")
+    public.add("GET", "/image-variants/inspect", ImageVariantsController.inspect, name="image_variants_inspect")
+```
 
 ## À retenir
 

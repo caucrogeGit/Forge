@@ -47,14 +47,34 @@ confirme la création de la ligne `media` avec son identifiant.
 
 ```python
 # mvc/controllers/image_attach_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import UploadError
 from forge_mvc_images import attach_media_to_entity, save_image_upload
 
+# Entité de démo neutre : la table `media` n'impose aucune clé étrangère, on
+# illustre le rattachement sans dépendre d'une entité métier réelle.
 _ENTITY_NAME = "gallery-demo"
 _ENTITY_ID = 1
 
+_TABLE_NOT_READY = (
+    "La table media n'est pas encore disponible. Applique la migration livrée "
+    "avec le starter : forge migration:apply."
+)
+
 
 class ImageAttachController(BaseController):
+    """Starter pédagogique : relier une image uploadée à une entité en base."""
+
+    @staticmethod
+    def index(request: Request) -> Response:
+        return BaseController.render(
+            "image_attach/index.html",
+            context={"csrf_token": BaseController.csrf_token(request)},
+            request=request,
+        )
 
     @staticmethod
     def attach(request: Request) -> Response:
@@ -62,18 +82,34 @@ class ImageAttachController(BaseController):
         context = {"csrf_token": BaseController.csrf_token(request)}
         if uploaded is None:
             context["error"] = "Aucune image sélectionnée."
-            return BaseController.render("image_attach/index.html", context=context, request=request)
+            return BaseController.render(
+                "image_attach/index.html", context=context, request=request
+            )
         try:
             saved = save_image_upload(uploaded, "images")
         except UploadError as exc:
             context["error"] = str(exc)
-            return BaseController.render("image_attach/index.html", context=context, request=request)
-        media_id = attach_media_to_entity(
-            saved, entity_name=_ENTITY_NAME, entity_id=_ENTITY_ID, role="gallery"
-        )
+            return BaseController.render(
+                "image_attach/index.html", context=context, request=request
+            )
+        try:
+            media_id = attach_media_to_entity(
+                saved,
+                entity_name=_ENTITY_NAME,
+                entity_id=_ENTITY_ID,
+                role="gallery",
+            )
+        except Exception:
+            # Table absente, base inaccessible… — on reste pédagogique.
+            context["error"] = _TABLE_NOT_READY
+            return BaseController.render(
+                "image_attach/index.html", context=context, request=request
+            )
         context["saved"] = saved
         context["media_id"] = media_id
-        return BaseController.render("image_attach/index.html", context=context, request=request)
+        return BaseController.render(
+            "image_attach/index.html", context=context, request=request
+        )
 ```
 
 ### Comprendre ce code
@@ -85,6 +121,77 @@ class ImageAttachController(BaseController):
   une galerie et une couverture.
 - L'upload précède toujours le rattachement : on n'enregistre en base qu'un
   fichier déjà vérifié et écrit.
+
+## La vue
+
+Le contrôleur rend `image_attach/index.html` : créez ce fichier.
+
+```html
+<!-- mvc/views/image_attach/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rattacher une image à une entité — Forge</title>
+</head>
+<body>
+  <h1>Rattacher une image à une entité</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  {% if media_id %}
+  <p data-level="success">
+    Image <strong>{{ saved.original_name }}</strong> rattachée à l'entité de démo
+    sous l'identifiant média <code>#{{ media_id }}</code> (rôle <code>gallery</code>).
+  </p>
+  {% endif %}
+
+  <form method="post" action="/image-attach" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">Téléverser et rattacher</button>
+  </form>
+</body>
+</html>
+```
+
+## La migration
+
+Ce palier introduit la table `media`. Créez le fichier de migration suivant sous
+`mvc/migrations/`, puis appliquez-le avec `forge migration:apply`.
+
+```sql
+-- mvc/migrations/20260605100000_create_media.sql
+CREATE TABLE IF NOT EXISTS media (
+    Id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    EntityName VARCHAR(100) NOT NULL,
+    EntityId INT NOT NULL,
+    Path VARCHAR(500) NOT NULL,
+    OriginalName VARCHAR(255) NOT NULL,
+    MimeType VARCHAR(120) NOT NULL,
+    Size INT NOT NULL,
+    Role VARCHAR(50) NOT NULL DEFAULT 'default',
+    Position INT NOT NULL DEFAULT 0,
+    AltText VARCHAR(255) NULL,
+    CreatedAt DATETIME NOT NULL,
+    PRIMARY KEY (Id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+## La route
+
+Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.image_attach_controller import ImageAttachController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/image-attach", ImageAttachController.index, name="image_attach_index")
+    public.add("POST", "/image-attach", ImageAttachController.attach, name="image_attach_store")
+```
 
 ## À retenir
 

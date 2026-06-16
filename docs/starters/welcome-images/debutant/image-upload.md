@@ -50,11 +50,16 @@ message d'erreur.
 
 ```python
 # mvc/controllers/image_upload_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_files import UploadError
 from forge_mvc_images import save_image_upload
 
 
 class ImageUploadController(BaseController):
+    """Starter pédagogique : recevoir, vérifier et décliner une image en variantes."""
 
     @staticmethod
     def index(request: Request) -> Response:
@@ -97,6 +102,59 @@ class ImageUploadController(BaseController):
   `UploadError` — un seul `except` suffit à les présenter proprement.
 - `saved.variants` est un dictionnaire `{"medium": ..., "thumbnail": ...}` des
   chemins générés.
+
+## La vue
+
+Le contrôleur rend `image_upload/index.html` : créez ce fichier.
+
+```html
+<!-- mvc/views/image_upload/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Téléverser une image — Forge</title>
+</head>
+<body>
+  <h1>Téléverser une image</h1>
+
+  {% if error %}
+  <p data-level="error"><strong>{{ error }}</strong></p>
+  {% endif %}
+
+  {% if saved %}
+  <p data-level="success">
+    Image enregistrée : <strong>{{ saved.original_name }}</strong>
+    ({{ saved.size }} octets) → <code>{{ saved.path }}</code>
+  </p>
+  <ul>
+    {% for name, variant_path in saved.variants.items() %}
+    <li>Variante <strong>{{ name }}</strong> : <code>{{ variant_path }}</code></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <form method="post" action="/image-upload" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">Envoyer</button>
+  </form>
+</body>
+</html>
+```
+
+## La route
+
+Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+
+```python
+# mvc/routes.py
+from mvc.controllers.image_upload_controller import ImageUploadController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/image-upload", ImageUploadController.index, name="image_upload_index")
+    public.add("POST", "/image-upload", ImageUploadController.upload, name="image_upload_store")
+```
 
 ## À retenir
 
