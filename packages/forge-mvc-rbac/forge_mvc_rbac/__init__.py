@@ -73,7 +73,7 @@ from forge_mvc_rbac.user_rbac import (
     validate_user_role_user_id,
 )
 
-__version__ = "1.0.0b15"
+__version__ = "1.0.0b16"
 
 # Auto-enregistrement dans le registre de contexte Jinja de core.
 try:

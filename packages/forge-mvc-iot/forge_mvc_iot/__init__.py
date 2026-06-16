@@ -19,6 +19,6 @@ from __future__ import annotations
 
 from forge_mvc_iot.http import register_iot_routes
 
-__version__ = "1.0.0b15"
+__version__ = "1.0.0b16"
 
 __all__ = ["register_iot_routes"]

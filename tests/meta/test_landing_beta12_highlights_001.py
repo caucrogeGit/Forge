@@ -7,11 +7,11 @@ relabelisé la section en « Nouveautés 1.0.0-beta.13 » et simplifié les
 panneaux : suppression des liens profonds IoT/audits, de « Mosquitto » et
 de la preuve « 0 échec ».
 
-Mise à jour beta.15 : la section est relabelisée « Nouveautés 1.0.0-beta.15 »
-(id `beta15`) et présente les nouveautés récentes : **Forge i18n** (12e opt-in),
-**welcome-forge refondu** (tutoriels continus), **Convention de route** (ADR-029)
-et **Squelette dédié** (ADR-024). Les anciennes cartes média (IoT, Video, Images,
-Files, Audio) sont retirées de la vitrine.
+Mise à jour beta.16 : la section est relabelisée « Nouveautés 1.0.0-beta.16 »
+(id `beta16`) et présente : **Forge i18n** (12e opt-in), **Parcours réalisés à
+la main** (ADR-035, retrait de la génération de starters), **Convention de
+route** (ADR-029) et **Squelette dédié** (ADR-024). Les anciennes cartes média
+(IoT, Video, Images, Files, Audio) sont retirées de la vitrine.
 
 Ce fichier conserve les garde-fous encore valides : présence de la section,
 panneaux des nouveautés courantes, core présenté comme autonome,
@@ -49,7 +49,7 @@ def _src() -> str:
 # repères conceptuels restent garantis.
 HIGHLIGHTS = [
     "Forge i18n",
-    "welcome-forge refondu",
+    "Parcours réalisés à la main",
     "Convention de route",
     "Squelette dédié",
 ]
@@ -63,8 +63,8 @@ class TestHighlightsPresent:
         )
 
     def test_section_nouveautes_presente(self):
-        assert 'id="beta15"' in _src(), (
-            "Une section dédiée aux nouveautés (id='beta15') est attendue."
+        assert 'id="beta16"' in _src(), (
+            "Une section dédiée aux nouveautés (id='beta16') est attendue."
         )
 
     def test_core_reste_autonome(self):
@@ -92,7 +92,7 @@ class TestSync:
 
     def test_docs_index_reflete_section(self):
         docs = DOCS_LANDING.read_text(encoding="utf-8")
-        assert 'id="beta15"' in docs
+        assert 'id="beta16"' in docs
         assert "Forge i18n" in docs
         assert "Convention de route" in docs
 

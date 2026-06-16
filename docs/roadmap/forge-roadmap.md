@@ -12,23 +12,22 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.15
+## État actuel — Forge 1.0.0-beta.16
 
-**Tag courant : `v1.0.0-beta.15`** — internationalisation extraite en opt-in
-(`forge-mvc-i18n`, ADR-027, avec un repli no-op du noyau), convention de
-déclaration des routes unifiée (chemin `/<contrôleur>/<méthode>`, nom
-`<contrôleur>-<méthode>` ; ADR-029) et refonte du tutoriel `welcome-forge` en
-progression continue manuelle sur les trois niveaux (ADR-025, ADR-028). Suivis
-d'un audit de pré-publication (sécurité, générateurs, cohérence).
+**Tag courant : `v1.0.0-beta.16`** — retrait de la génération de starters
+(ADR-035) : les commandes `forge starter:build` et `forge starter:list` ainsi
+que tout le sous-système de génération (`forge_cli/starters/`) sont supprimés.
+Les parcours `welcome-*` deviennent des tutoriels manuels suivis depuis la
+documentation (chaque palier indique le contrôleur, la vue et la route à créer
+soi-même), sur le modèle de `welcome-forge`. Forge n'écrit donc plus jamais dans
+`mvc/routes.py` côté starters (principes 3 et 9). ADR-035 supersède l'ADR-023.
 
-Précédent : v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.15 — beta incrémentale embarquant l'extraction i18n
-(ADR-027), la convention de route ADR-029 et la refonte `welcome-forge`
-(ADR-025/028), plus les correctifs de l'audit de pré-publication. Le chantier
-squelette dédié (ADR-023 + ADR-024) de beta.14 et le contenu fonctionnel de
-beta.13 (slugs `slug`, gel du contrat `opt-in:*` / `module:*`,
-production-readiness, dogfood MariaDB) restent en place.**
+**Statut : v1.0.0-beta.16 — beta incrémentale retirant la génération de starters
+au profit de parcours réalisés à la main (ADR-035). L'extraction i18n (ADR-027),
+la convention de route (ADR-029), la refonte `welcome-forge` (ADR-025/028) de
+beta.15 et le squelette dédié (ADR-023/024) de beta.14 restent en place.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)

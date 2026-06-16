@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.15 (ticket `ADR-STARTERS-MANUAL-001`).
+Accepté — Forge 1.0.0-beta.16 (ticket `ADR-STARTERS-MANUAL-001`).
 
 Supersède l'ADR-023 (`forge starter:build` comme façon canonique de construire un
 starter) et clôt le volet `starter:build` laissé ouvert par l'ADR-030.
