@@ -5,6 +5,16 @@
 
 ### Modifié
 
+- **Accesseurs `Request` précis en typage strict (`@overload`)**
+  (`HTTP-REQUEST-ACCESSOR-OVERLOAD-001`). `request.query()`, `request.form()`,
+  `request.header()` et `request.route()` exposent désormais deux surcharges :
+  avec un `default` de type `str`, le retour est `str` (jamais `None`) ; sans
+  `default` (ou `default=None`), le retour reste `str | None`. Conséquence : le
+  code idiomatique d'un débutant — `request.form("name", default="").strip()` ou
+  `int(request.route("id", default="0"))` — est **sûr en mode strict** sans
+  garde manuelle. Changement purement typage (implémentation runtime inchangée,
+  rétro-compatible). Bénéficie à tout code applicatif, dont le tutoriel
+  welcome-forge.
 - **Squelette `forge new` en mode strict par défaut (payoff ADR-036)**
   (`SKELETON-VSCODE-STRICT-DEFAULT-001`, `SKELETON-VSCODE-STRICT-NOISE-REMOVE-001`).
   Le cliquet `# pyright: strict` étant terminé sur tout le cœur (`pyright core/`

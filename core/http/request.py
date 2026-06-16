@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import ipaddress
 import json as _json
-from typing import Any, cast
+from typing import Any, cast, overload
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from email.parser import BytesParser
@@ -244,13 +244,25 @@ class Request:
     # retourne la première valeur — l'attribut brut reste accessible si le
     # contrôleur a besoin de toutes les valeurs.
 
+    @overload
+    def query(self, key: str, default: str) -> str: ...
+    @overload
+    def query(self, key: str, default: None = None) -> str | None: ...
     def query(self, key: str, default: str | None = None) -> str | None:
-        """Premier paramètre de query string pour `key` (`?clé=valeur`)."""
+        """Premier paramètre de query string pour `key` (`?clé=valeur`).
+
+        Avec un `default` de type `str`, le retour est `str` (jamais `None`) —
+        `request.query("x", default="").strip()` est donc sûr en typage strict.
+        """
         values = self.params.get(key)
         if not values:
             return default
         return values[0]
 
+    @overload
+    def header(self, name: str, default: str) -> str: ...
+    @overload
+    def header(self, name: str, default: None = None) -> str | None: ...
     def header(self, name: str, default: str | None = None) -> str | None:
         """Header HTTP (recherche insensible à la casse, via HTTPMessage)."""
         if self.headers is None:
@@ -258,9 +270,16 @@ class Request:
         value = self.headers.get(name)
         return value if value is not None else default
 
+    @overload
+    def form(self, key: str, default: str) -> str: ...
+    @overload
+    def form(self, key: str, default: None = None) -> str | None: ...
     def form(self, key: str, default: str | None = None) -> str | None:
         """Premier champ de formulaire (`application/x-www-form-urlencoded`
-        ou `multipart/form-data`) pour `key`."""
+        ou `multipart/form-data`) pour `key`.
+
+        Avec un `default` de type `str`, le retour est `str` (jamais `None`).
+        """
         values = self.body.get(key)
         if not values:
             return default
@@ -283,8 +302,16 @@ class Request:
         """Fichier uploadé pour le champ `key` (`UploadedFile` ou `default`)."""
         return self.files.get(key, default)
 
+    @overload
+    def route(self, key: str, default: str) -> str: ...
+    @overload
+    def route(self, key: str, default: None = None) -> str | None: ...
     def route(self, key: str, default: str | None = None) -> str | None:
-        """Paramètre dynamique de route (`/clients/{id}` → `route('id')`)."""
+        """Paramètre dynamique de route (`/clients/{id}` → `route('id')`).
+
+        Avec un `default` de type `str`, le retour est `str` (jamais `None`) :
+        `int(request.route("id", default="0"))` est sûr en typage strict.
+        """
         return self.route_params.get(key, default)
 
     # ── Vue d'inspection (.data) ────────────────────────────────────────────
