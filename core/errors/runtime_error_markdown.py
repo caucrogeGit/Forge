@@ -1,3 +1,4 @@
+# pyright: strict
 """
 core/errors/runtime_error_markdown.py — Rendu Markdown des erreurs runtime Forge.
 
@@ -15,6 +16,7 @@ from __future__ import annotations
 import json
 import pathlib
 from datetime import datetime
+from typing import Any
 
 _MD_FILENAME  = "errors.dev.md"
 _HEADER_LINES = (
@@ -27,7 +29,7 @@ _HEADER_LINES = (
 
 # ── Lecture du JSONL ───────────────────────────────────────────────────────────
 
-def load_error_events_from_jsonl(path: pathlib.Path) -> list[dict]:
+def load_error_events_from_jsonl(path: pathlib.Path) -> list[dict[str, Any]]:
     """
     Charge les événements depuis un fichier JSONL.
 
@@ -38,7 +40,7 @@ def load_error_events_from_jsonl(path: pathlib.Path) -> list[dict]:
     """
     if not path.exists():
         return []
-    events: list[dict] = []
+    events: list[dict[str, Any]] = []
     for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         stripped = line.strip()
         if not stripped:
@@ -52,7 +54,7 @@ def load_error_events_from_jsonl(path: pathlib.Path) -> list[dict]:
 
 # ── Rendu d'un événement ───────────────────────────────────────────────────────
 
-def render_error_event_markdown(event: dict) -> str:
+def render_error_event_markdown(event: dict[str, Any]) -> str:
     """Rend un événement d'erreur en Markdown. Gère les lignes invalides."""
     if "_invalid_line" in event:
         num = event["_invalid_line"]
@@ -139,7 +141,7 @@ def render_error_event_markdown(event: dict) -> str:
 
 # ── Rendu de la liste complète ────────────────────────────────────────────────
 
-def render_errors_markdown(events: list[dict]) -> str:
+def render_errors_markdown(events: list[dict[str, Any]]) -> str:
     """Génère le contenu Markdown complet depuis une liste d'événements."""
     now = datetime.now().isoformat(timespec="seconds")
     valid = [e for e in events if "_invalid_line" not in e]

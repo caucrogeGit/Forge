@@ -31,6 +31,17 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/errors` (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-ERRORS-001`). Passés en strict : `runtime_errors.py`,
+  `runtime_error_logger.py`, `runtime_error_markdown.py`, `__init__.py`. Les
+  `dict` nus deviennent `dict[str, Any]` (événements d'erreur, requête sûre,
+  contexte page 500), `_extract_traceback` type son `exc_info: Any`. La variable
+  d'override de répertoire de logs `_JSONL_DIR_OVERRIDE` est renommée
+  `_jsonl_dir_override` : elle est mutable, donc son nom majuscule trompait
+  pyright (`reportConstantRedefinition`) — règle A. Le helper de test
+  `_sensitive_keys_exposed` (consommé par `tests/meta`) porte un
+  `# pyright: ignore[reportUnusedFunction]` commenté. Pyright reste à 0 erreur
+  sur le paquet.
 - **Cliquet strict sur `core/mvc` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-MVC-001`). Passés en strict : `controller/base_controller.py`,
   `controller/registry.py`, `controller/__init__.py`, `model/validator.py`,

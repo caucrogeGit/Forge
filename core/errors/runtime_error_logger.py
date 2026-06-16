@@ -1,3 +1,4 @@
+# pyright: strict
 """
 core/errors/runtime_error_logger.py — Collecteur d'erreurs runtime vers JSONL + Markdown.
 
@@ -16,6 +17,7 @@ import logging
 import os
 import pathlib
 import traceback as _traceback
+from typing import Any
 from urllib.parse import urlencode
 
 from core.errors.runtime_errors import (
@@ -31,20 +33,20 @@ from core.errors.runtime_errors import (
 logger = logging.getLogger(__name__)
 
 _JSONL_FILENAME = "errors.dev.jsonl"
-_JSONL_DIR_OVERRIDE: pathlib.Path | None = None
+_jsonl_dir_override: pathlib.Path | None = None
 
 
 # ── Configuration du chemin (surchargeable pour les tests) ────────────────────
 
 def set_jsonl_dir(path: pathlib.Path | None) -> None:
     """Surcharge le répertoire de logs JSONL. Passer None pour restaurer le défaut."""
-    global _JSONL_DIR_OVERRIDE
-    _JSONL_DIR_OVERRIDE = path
+    global _jsonl_dir_override
+    _jsonl_dir_override = path
 
 
 def _resolve_jsonl_dir() -> pathlib.Path:
-    if _JSONL_DIR_OVERRIDE is not None:
-        return _JSONL_DIR_OVERRIDE
+    if _jsonl_dir_override is not None:
+        return _jsonl_dir_override
     return pathlib.Path(__file__).parent.parent / "storage" / "logs"
 
 
@@ -67,7 +69,7 @@ def _detect_category(exc: BaseException) -> str:
 
 # ── Extraction de la requête ──────────────────────────────────────────────────
 
-def _extract_safe_request(request) -> dict | None:
+def _extract_safe_request(request: Any) -> dict[str, Any] | None:
     """Extrait les informations sûres d'un objet Request Forge."""
     if request is None:
         return None
@@ -152,7 +154,7 @@ def log_runtime_error(exc: BaseException, request: "object | None" = None) -> No
 
 # ── Contexte d'erreur pour la page 500 (dev uniquement) ───────────────────────
 
-def build_dev_error_context(exc: BaseException) -> dict | None:
+def build_dev_error_context(exc: BaseException) -> dict[str, Any] | None:
     """Contexte d'erreur destiné à la page `errors/500.html`, en `APP_ENV=dev`.
 
     Retourne ``{"error": {"type", "message", "traceback"}}`` quand

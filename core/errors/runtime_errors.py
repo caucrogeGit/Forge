@@ -1,3 +1,4 @@
+# pyright: strict
 """
 core/errors/runtime_errors.py — Schéma canonique JSONL des erreurs runtime Forge.
 
@@ -86,7 +87,7 @@ def _generate_id() -> str:
 
 # ── Extraction de la pile d'appels ────────────────────────────────────────────
 
-def _extract_traceback(exc_info=None) -> list[dict[str, Any]]:
+def _extract_traceback(exc_info: Any = None) -> list[dict[str, Any]]:
     """Extrait une pile simplifiée depuis exc_info ou le contexte courant."""
     if exc_info is None:
         exc_info = sys.exc_info()
@@ -237,7 +238,7 @@ def validate_event(event: dict[str, Any]) -> None:
 
 # ── Accès aux clés sensibles (pour tests et filtrage externe) ────────────────
 
-def _sensitive_keys_exposed() -> frozenset[str]:
+def _sensitive_keys_exposed() -> frozenset[str]:  # pyright: ignore[reportUnusedFunction]  # consommé par tests/meta
     """Retourne l'ensemble des clés considérées sensibles par ce module."""
     return _SENSITIVE_KEYS
 
