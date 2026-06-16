@@ -31,6 +31,15 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Cliquet strict sur `core/forge.py` + clôture du cœur (`# pyright: strict`)**
+  (`CORE-TYPING-STRICT-FORGE-001`). `core/forge.py` annote son registre
+  hétérogène `_cfg: dict[str, Any]` (frontière de config dynamique assumée, déjà
+  documentée sur `get()`). Les `__init__` racine (`core/__init__.py`) et
+  `core/sessions/__init__.py` reçoivent aussi le marqueur. **Le cliquet ADR-036
+  est terminé : `pyright core/` passe à 0 erreur en mode strict sur l'ensemble
+  du cœur**, seul `core/http/debug_dumper.py` reste hors strict à dessein
+  (introspection d'objets arbitraires, `Any` par nature). L'override
+  `reportUnknown*` du squelette peut désormais être retiré (ticket de suivi).
 - **Cliquet strict sur `core/app` (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-APP-001`). Passés en strict : `application.py`,
   `app_factory.py`, `wsgi.py`, `dev_server.py`, `prod_warnings.py`,

@@ -1,3 +1,4 @@
+# pyright: strict
 """
 core/forge.py — Registre de configuration du noyau Forge
 =========================================================
@@ -23,7 +24,7 @@ from typing import Any
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-_cfg = {
+_cfg: dict[str, Any] = {
     # Application
     "app_name":    "Forge",
     "app_env":     "dev",

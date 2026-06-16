@@ -1,3 +1,4 @@
+# pyright: strict
 """Backends de session Forge.
 
 Le backend par défaut est MemorySessionStore (mono-processus).
