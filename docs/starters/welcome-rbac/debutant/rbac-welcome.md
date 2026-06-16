@@ -110,6 +110,24 @@ Créez le contrat de démonstration `mvc/security/rbac.json` :
 Ce contrat sert tout le parcours : il déclare une entité `Article`, ses permissions,
 et trois rôles (`admin`, `editor`, `reader`) avec les permissions accordées à chacun.
 
+!!! tip "Valider `rbac.json` dans VS Code (optionnel)"
+    RBAC est un opt-in : son schéma n'est pas livré par le squelette nu.
+    `forge-mvc` le fournit, voici comment activer la validation et l'autocomplétion de `mvc/security/rbac.json`.
+
+    Copiez le schéma dans `schemas/` du projet :
+
+    ```bash
+    python -c "import forge_cli, pathlib, shutil; shutil.copy(pathlib.Path(forge_cli.__file__).parent / 'schemas' / 'rbac.schema.json', 'schemas/rbac.schema.json')"
+    ```
+
+    Puis ajoutez l'association dans `.vscode/settings.json`, dans le tableau `json.schemas` existant :
+
+    ```json
+    { "fileMatch": ["/mvc/security/rbac.json"], "url": "./schemas/rbac.schema.json" }
+    ```
+
+    `forge opt-in:enable rbac` rappelle aussi ces étapes.
+
 ## La route
 
 Ajoutez l'import et les deux routes dans le groupe public de `mvc/routes.py` :
