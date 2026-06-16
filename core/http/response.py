@@ -68,7 +68,9 @@ class Response:
           posés (jamais les valeurs).
     """
 
-    def __init__(self, status=200, body=b"", content_type=_HTML_CONTENT_TYPE, headers=None):
+    def __init__(self, status: int = 200, body: "str | bytes | None" = b"",
+                 content_type: str = _HTML_CONTENT_TYPE,
+                 headers: "dict[str, str] | None" = None):
         # Validation au plus tôt (au moment de la construction, donc dans le
         # frame du contrôleur appelant) : un `status` non entier provoquait
         # sinon une erreur différée et cryptique au moment de l'envoi

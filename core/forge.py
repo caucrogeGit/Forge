@@ -19,6 +19,7 @@ Store de session configurable (SESSIONS-CONFIGURABLE-STORE-001) :
     Passer None réinitialise au MemorySessionStore par défaut.
 """
 import os
+from typing import Any
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -95,8 +96,14 @@ def _apply_session_store(store: object) -> None:
     set_session_store(store)
 
 
-def get(key: str) -> object:
-    """Retourne une valeur de configuration du noyau."""
+def get(key: str) -> Any:
+    """Retourne une valeur de configuration du noyau.
+
+    Type de retour `Any` (et non `object`) : le registre est **hétérogène**
+    (str, int, bool, chemins, store de session…). C'est la frontière de config
+    dynamique assumée ; un typage par clé (overloads / settings typé) pourra
+    l'affiner ultérieurement (ADR-036, cliquet).
+    """
     try:
         return _cfg[key]
     except KeyError:
