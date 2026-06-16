@@ -42,13 +42,20 @@ enregistrées (niveau intermédiaire), elle renvoie la liste.
 
 ```python
 # mvc/controllers/video_list_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_video.storage.repository import VideoRepository
 
 
 _STORAGE_NOT_READY = {
     "error": "video_storage_not_ready",
-    "message": "La table videos n'est pas encore disponible. "
-               "Applique la migration Forge Vidéo (forge video:init)…",
+    "message": (
+        "La table videos n'est pas encore disponible. "
+        "Applique la migration Forge Vidéo (forge video:init) avant de "
+        "lister les vidéos."
+    ),
 }
 
 
@@ -59,6 +66,7 @@ class VideoListController(BaseController):
         try:
             videos = VideoRepository().list_recent(limit=20)
         except Exception:
+            # Table absente, base inaccessible… — on reste pédagogique.
             return Response.json(_STORAGE_NOT_READY, status=503)
         return Response.json({"videos": videos})
 ```
@@ -72,6 +80,18 @@ class VideoListController(BaseController):
 - Le `try/except` **ne masque pas un bug** : il traduit l'absence de table en
   réponse `503` pédagogique. Un starter de découverte ne doit jamais planter
   parce que l'infrastructure n'est pas encore montée.
+
+## La route
+
+Ajoutez la route dans le groupe public de `mvc/routes.py`.
+
+```python
+# mvc/routes.py
+from mvc.controllers.video_list_controller import VideoListController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/video-list", VideoListController.index, name="video_list_index")
+```
 
 ## À retenir
 

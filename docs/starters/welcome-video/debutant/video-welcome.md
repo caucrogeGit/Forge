@@ -45,10 +45,15 @@ renvoie la configuration en JSON, le token remplacé par `***`.
 
 ```python
 # mvc/controllers/video_welcome_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_video.config import load_video_config
 
 
 def _config_to_safe_dict(cfg) -> dict:
+    """Sérialise la config vidéo en dict JSON, token masqué."""
     return {
         "ffmpeg_bin": cfg.ffmpeg_bin,
         "ffprobe_bin": cfg.ffprobe_bin,
@@ -78,6 +83,19 @@ class VideoWelcomeController(BaseController):
   comme le reste de la config Forge, elle est **explicite**.
 - On ne renvoie **jamais** le token : `"***" if cfg.api_token else None`. Une
   config exposée masque toujours ses secrets.
+
+## La route
+
+Ajoutez les deux routes dans le groupe public de `mvc/routes.py`.
+
+```python
+# mvc/routes.py
+from mvc.controllers.video_welcome_controller import VideoWelcomeController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/video-welcome", VideoWelcomeController.index, name="video_welcome_index")
+    public.add("GET", "/video-welcome/inspect", VideoWelcomeController.inspect, name="video_welcome_inspect")
+```
 
 ## À retenir
 

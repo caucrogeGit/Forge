@@ -52,6 +52,10 @@ forge video:doctor --db     # + vérifie la table videos
 
 ```python
 # mvc/controllers/video_doctor_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_video.cli.doctor import (
     check_config_loadable,
     check_ffmpeg_present,
@@ -61,9 +65,14 @@ from forge_mvc_video.cli.doctor import (
 )
 
 
+# Vérifications sûres : aucune ne touche la base. Les contrôles ffprobe/ffmpeg
+# se contentent de localiser les binaires (essentiels au transcodage).
 _SAFE_CHECKS = (
-    check_package_importable, check_config_loadable, check_migration_present,
-    check_ffprobe_present, check_ffmpeg_present,
+    check_package_importable,
+    check_config_loadable,
+    check_migration_present,
+    check_ffprobe_present,
+    check_ffmpeg_present,
 )
 
 
@@ -74,7 +83,11 @@ class VideoDoctorController(BaseController):
         checks = []
         for check in _SAFE_CHECKS:
             result = check()
-            checks.append({"status": result.status, "name": result.name, "detail": result.detail})
+            checks.append({
+                "status": result.status,
+                "name": result.name,
+                "detail": result.detail,
+            })
         healthy = all(c["status"] == "ok" for c in checks)
         return Response.json({"healthy": healthy, "checks": checks})
 ```
@@ -87,6 +100,18 @@ class VideoDoctorController(BaseController):
   tels quels.
 - Pour le contrôle **invasif** (table `videos`), on délègue à la CLI
   `forge video:doctor --db`.
+
+## La route
+
+Ajoutez la route dans le groupe public de `mvc/routes.py`.
+
+```python
+# mvc/routes.py
+from mvc.controllers.video_doctor_controller import VideoDoctorController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/video-doctor", VideoDoctorController.index, name="video_doctor_index")
+```
 
 ## À retenir
 

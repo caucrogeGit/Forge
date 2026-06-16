@@ -40,7 +40,21 @@ enregistrée : la réponse JSON donne ses métadonnées. Un UUID inconnu renvoie
 
 ```python
 # mvc/controllers/video_detail_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_video.storage.repository import VideoRepository
+
+
+_STORAGE_NOT_READY = {
+    "error": "video_storage_not_ready",
+    "message": (
+        "La table videos n'est pas encore disponible. "
+        "Applique la migration Forge Vidéo (forge video:init) avant de lire "
+        "une vidéo."
+    ),
+}
 
 
 class VideoDetailController(BaseController):
@@ -53,7 +67,9 @@ class VideoDetailController(BaseController):
         except Exception:
             return Response.json(_STORAGE_NOT_READY, status=503)
         if video is None:
-            return Response.json({"error": "video_not_found", "uuid": uuid}, status=404)
+            return Response.json(
+                {"error": "video_not_found", "uuid": uuid}, status=404
+            )
         return Response.json({"video": video})
 ```
 
@@ -63,6 +79,18 @@ class VideoDetailController(BaseController):
 - `get_by_uuid(uuid)` renvoie un dictionnaire **ou `None`** : on traduit `None` en
   `404`, jamais une page d'erreur brute.
 - L'absence de table reste un `503` pédagogique, comme au palier précédent.
+
+## La route
+
+Ajoutez la route paramétrée dans le groupe public de `mvc/routes.py`.
+
+```python
+# mvc/routes.py
+from mvc.controllers.video_detail_controller import VideoDetailController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/video-detail/{uuid}", VideoDetailController.index, name="video_detail_index")
+```
 
 ## À retenir
 

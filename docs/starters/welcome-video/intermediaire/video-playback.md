@@ -17,7 +17,9 @@ Palier 2 du **niveau intermédiaire** de la progression vidéo, après
 - la route `GET /videos/{uuid}` en **streaming Range** ;
 - aucun contrôleur à écrire : on délègue au paquet.
 
-La table `videos` est garantie par la migration livrée.
+Aucun contrôleur à créer ici : la lecture vient entièrement du paquet
+`forge-mvc-video`, branché par `register_video_routes`. La table `videos` est
+garantie par la migration fournie plus bas.
 
 ## Classes Forge utilisées
 
@@ -42,10 +44,13 @@ https://localhost:8000/videos/<uuid>
 Le fichier est servi en streaming ; un lecteur vidéo peut se positionner grâce au
 support des requêtes **Range**.
 
-## Le branchement
+## La route
+
+Branchez la route de lecture officielle dans `mvc/routes.py`. Le code métier
+vit dans le paquet `forge-mvc-video` ; on ne fait que le brancher.
 
 ```python
-# mvc/routes.py (extrait inséré par le starter)
+# mvc/routes.py
 from forge_mvc_video import register_video_routes
 
 register_video_routes(router)
@@ -61,6 +66,36 @@ register_video_routes(router)
   vidéo charge progressivement et se positionne sans tout télécharger.
 - La route sert le fichier référencé par la ligne `videos` — l'UUID, jamais le
   nom de fichier d'origine.
+
+## La migration
+
+La route de lecture sert les fichiers référencés par la table `videos`. Créez
+donc cette table si elle n'existe pas déjà. `CREATE TABLE IF NOT EXISTS` reste
+sûr même si le palier upload l'a déjà créée.
+
+```sql
+-- mvc/migrations/20260601210000_create_videos.sql
+CREATE TABLE IF NOT EXISTS videos (
+    id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    uuid             CHAR(36)        NOT NULL,
+    title            VARCHAR(255)    NULL,
+    original_path    VARCHAR(500)    NOT NULL,
+    mp4_path         VARCHAR(500)    NULL,
+    poster_path      VARCHAR(500)    NULL,
+    mime_type        VARCHAR(120)    NULL,
+    size_bytes       BIGINT UNSIGNED NOT NULL,
+    duration_seconds INT UNSIGNED    NULL,
+    width            INT UNSIGNED    NULL,
+    height           INT UNSIGNED    NULL,
+    status           VARCHAR(30)     NOT NULL,
+    error_message    TEXT            NULL,
+    created_at       DATETIME(6)     NOT NULL,
+    updated_at       DATETIME(6)     NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_videos_uuid (uuid),
+    INDEX idx_videos_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
 
 ## À retenir
 

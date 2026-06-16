@@ -17,7 +17,7 @@ Dernier palier du **niveau intermédiaire** de la progression vidéo, après
 - une réponse JSON `{ "by_status": { … } }` ;
 - la **réponse `503` pédagogique** si la table n'existe pas encore.
 
-Lecture seule. La table `videos` est garantie par la migration livrée.
+Lecture seule. La table `videos` est garantie par la migration fournie plus bas.
 
 ## Classes Forge utilisées
 
@@ -41,10 +41,24 @@ elles restent au statut `uploaded`.
 
 ```python
 # mvc/controllers/video_status_controller.py
+from core.http.request import Request
+from core.http.response import Response
+from core.mvc.controller.base_controller import BaseController
+
 from forge_mvc_video.storage.repository import VideoRepository
 
 
+# Cycle de vie d'une vidéo dans le module Forge Vidéo.
 _STATUSES = ("uploaded", "processing", "ready", "failed")
+
+_STORAGE_NOT_READY = {
+    "error": "video_storage_not_ready",
+    "message": (
+        "La table videos n'est pas encore disponible. "
+        "Applique la migration Forge Vidéo (forge video:init) avant de "
+        "suivre les statuts."
+    ),
+}
 
 
 class VideoStatusController(BaseController):
@@ -53,7 +67,10 @@ class VideoStatusController(BaseController):
     def index(request: Request) -> Response:
         repo = VideoRepository()
         try:
-            by_status = {s: repo.list_by_status(s, limit=20) for s in _STATUSES}
+            by_status = {
+                status: repo.list_by_status(status, limit=20)
+                for status in _STATUSES
+            }
         except Exception:
             return Response.json(_STORAGE_NOT_READY, status=503)
         return Response.json({"by_status": by_status})
@@ -67,6 +84,47 @@ class VideoStatusController(BaseController):
   `ready` est le rôle du worker de transcodage (`forge video:process`, niveau
   avancé), jamais d'une requête HTTP.
 - L'absence de table reste un `503` pédagogique.
+
+## La migration
+
+Créez la table `videos` si elle n'existe pas déjà, pour observer le cycle de
+vie par statut. `CREATE TABLE IF NOT EXISTS` reste idempotent.
+
+```sql
+-- mvc/migrations/20260601220000_create_videos.sql
+CREATE TABLE IF NOT EXISTS videos (
+    id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    uuid             CHAR(36)        NOT NULL,
+    title            VARCHAR(255)    NULL,
+    original_path    VARCHAR(500)    NOT NULL,
+    mp4_path         VARCHAR(500)    NULL,
+    poster_path      VARCHAR(500)    NULL,
+    mime_type        VARCHAR(120)    NULL,
+    size_bytes       BIGINT UNSIGNED NOT NULL,
+    duration_seconds INT UNSIGNED    NULL,
+    width            INT UNSIGNED    NULL,
+    height           INT UNSIGNED    NULL,
+    status           VARCHAR(30)     NOT NULL,
+    error_message    TEXT            NULL,
+    created_at       DATETIME(6)     NOT NULL,
+    updated_at       DATETIME(6)     NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_videos_uuid (uuid),
+    INDEX idx_videos_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+## La route
+
+Ajoutez la route dans le groupe public de `mvc/routes.py`.
+
+```python
+# mvc/routes.py
+from mvc.controllers.video_status_controller import VideoStatusController
+
+with router.group("", public=True) as public:
+    public.add("GET", "/video-status", VideoStatusController.index, name="video_status_index")
+```
 
 ## À retenir
 
