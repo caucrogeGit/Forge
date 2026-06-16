@@ -1,7 +1,10 @@
+# pyright: strict
+from __future__ import annotations
+
 import ipaddress
 import json as _json
-from typing import cast
-from collections.abc import Iterable
+from typing import Any, cast
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from email.parser import BytesParser
 from email.policy import default as _email_policy
@@ -60,10 +63,10 @@ def _is_sensitive_header(name: str) -> bool:
 
 
 def _mask_mapping(
-    mapping,
+    mapping: Any,
     *,
-    sensitive_check,
-):
+    sensitive_check: Callable[[str], bool],
+) -> dict[str, Any]:
     """Retourne une copie de `mapping` avec les valeurs sensibles masquées.
 
     Accepte les `dict`, `HTTPMessage` ou tout objet itérable type
@@ -71,11 +74,12 @@ def _mask_mapping(
     """
     if mapping is None:
         return {}
+    items: Iterable[tuple[Any, Any]]
     if hasattr(mapping, "items"):
         items = mapping.items()
     else:
         items = list(mapping)
-    masked: dict = {}
+    masked: dict[str, Any] = {}
     for key, value in items:
         if sensitive_check(key):
             masked[key] = MASKED_VALUE
@@ -84,7 +88,7 @@ def _mask_mapping(
     return masked
 
 
-def resolve_client_ip(remote_addr: str, headers, trusted_proxies: Iterable[str]) -> str:
+def resolve_client_ip(remote_addr: str, headers: Any, trusted_proxies: Iterable[str]) -> str:
     """Résout l'IP client en honorant `X-Real-IP` uniquement derrière proxy fiable.
 
     Règle de sécurité (HTTP-TRUSTED-PROXY-IP-001) : `X-Real-IP` est utilisé
@@ -98,7 +102,7 @@ def resolve_client_ip(remote_addr: str, headers, trusted_proxies: Iterable[str])
     trusted = frozenset(trusted_proxies or ())
     if not trusted or remote_addr not in trusted:
         return remote_addr
-    forwarded = (headers.get("X-Real-IP", "") or "").strip()
+    forwarded: str = (headers.get("X-Real-IP", "") or "").strip()
     if not forwarded:
         return remote_addr
     try:
@@ -126,7 +130,7 @@ class UploadedFile:
         return len(self.content)
 
     @property
-    def stream(self):
+    def stream(self) -> BytesIO:
         return BytesIO(self.content)
 
     def read(self) -> bytes:
@@ -156,8 +160,23 @@ class Request:
         body            (dict) : données du formulaire, format parse_qs (vide pour GET)
         json_body       (dict) : données JSON du body (vide si Content-Type != application/json)
     """
-    def __init__(self, handler):
-        parsed        = urlparse(handler.path)
+
+    # Contrat d'attributs. `headers` et `json_body` restent `Any` : ce sont des
+    # objets de frontière (HTTPMessage du serveur, JSON arbitraire) dont le type
+    # précis n'apporte rien au typage interne.
+    original_method: str
+    method: str
+    path: str
+    headers: Any
+    params: dict[str, list[str]]
+    body: dict[str, list[str]]
+    json_body: Any
+    files: dict[str, UploadedFile]
+    route_params: dict[str, str]
+    ip: str
+
+    def __init__(self, handler: Any) -> None:
+        parsed        = urlparse(cast(str, handler.path))
         self.original_method = handler.command
         self.method   = handler.command
         self.path     = parsed.path
@@ -172,7 +191,7 @@ class Request:
         self.route_params = {}  # injecté par Application.dispatch() pour les routes dynamiques
 
         if self.method in BODY_METHODS:
-            content_type = handler.headers.get("Content-Type", "")
+            content_type: str = handler.headers.get("Content-Type", "")
             try:
                 content_length = int(handler.headers.get("Content-Length", 0))
             except (ValueError, TypeError):
@@ -180,7 +199,7 @@ class Request:
             if content_length > _request_size_limit(content_type):
                 raise RequestEntityTooLarge(content_length)
             content_length = max(0, content_length)
-            raw = handler.rfile.read(content_length) if content_length else b""
+            raw: bytes = handler.rfile.read(content_length) if content_length else b""
 
             if "application/json" in content_type:
                 try:
@@ -208,16 +227,12 @@ class Request:
         if self.original_method.upper() != "POST":
             return
 
-        raw_method = self.body.get("_method", [None])
-        if isinstance(raw_method, list):
-            override = raw_method[0] if raw_method else None
-        else:
-            override = raw_method
-
+        raw_method = self.body.get("_method")
+        override = raw_method[0] if raw_method else None
         if not override:
             return
 
-        override = str(override).upper()
+        override = override.upper()
         if override in METHOD_OVERRIDE_TARGETS:
             self.method = override
 
@@ -249,11 +264,9 @@ class Request:
         values = self.body.get(key)
         if not values:
             return default
-        if isinstance(values, list):
-            return values[0] if values else default
-        return values
+        return values[0]
 
-    def json(self, key: str, default=None):
+    def json(self, key: str, default: Any = None) -> Any:
         """Champ JSON (`application/json`) pour `key`. Renvoie `default` si
         le body JSON est vide ou si la clé est absente.
 
@@ -261,11 +274,12 @@ class Request:
         body JSON racine de type liste) — retourne `default` dans ce cas.
         """
         body = self.json_body
-        if not isinstance(body, dict):
-            return default
-        return body.get(key, default)
+        if isinstance(body, dict):
+            mapping = cast("dict[str, Any]", body)
+            return mapping.get(key, default)
+        return default
 
-    def file(self, key: str, default: "UploadedFile | None" = None):
+    def file(self, key: str, default: "UploadedFile | None" = None) -> "UploadedFile | None":
         """Fichier uploadé pour le champ `key` (`UploadedFile` ou `default`)."""
         return self.files.get(key, default)
 
@@ -276,7 +290,7 @@ class Request:
     # ── Vue d'inspection (.data) ────────────────────────────────────────────
 
     @property
-    def data(self) -> dict:
+    def data(self) -> dict[str, Any]:
         """Représentation publique stable de la requête, sûre à afficher.
 
         Toute clé/header sensible (Authorization, Cookie, password, csrf…)
@@ -287,13 +301,13 @@ class Request:
         Elle ne reflète pas le format wire ; ce n'est pas une sérialisation
         canonique de la requête.
         """
-        headers_dict = {}
+        headers_dict: dict[str, Any] = {}
         if self.headers is not None:
             for key in self.headers.keys():
                 value = self.headers.get(key)
                 headers_dict[key] = MASKED_VALUE if _is_sensitive_header(key) else value
 
-        files_meta: dict[str, dict] = {}
+        files_meta: dict[str, dict[str, Any]] = {}
         for field_name, upload in self.files.items():
             files_meta[field_name] = {
                 "filename": upload.filename,
@@ -318,7 +332,9 @@ class Request:
         return f"<Request {self.method} {self.path}>"
 
     @staticmethod
-    def _parse_multipart(content_type: str, raw: bytes):
+    def _parse_multipart(
+        content_type: str, raw: bytes
+    ) -> tuple[dict[str, list[str]], dict[str, UploadedFile]]:
         body: dict[str, list[str]] = {}
         files: dict[str, UploadedFile] = {}
         header = (
