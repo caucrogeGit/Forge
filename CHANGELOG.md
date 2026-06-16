@@ -3,6 +3,27 @@
 
 ## [1.0.0-beta.16] — 2026-06-16
 
+### Ajouté
+
+- **Chemin de production Gunicorn / WSGI généré par `forge deploy:init`**
+  (`DEPLOY-GUNICORN-UNIT-001`). `forge deploy:init` matérialise le chemin de
+  mise en production officiel : un `wsgi.py` à la racine du projet (exposant
+  `application = create_configured_wsgi_app()`, même configuration que
+  `python app.py`) et une unité `systemd/forge-app.service` lançant Gunicorn
+  (`gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000`,
+  `After=mariadb.service`). Doctrine : `python app.py` en développement,
+  Gunicorn derrière systemd en production. La documentation est complétée d'un
+  parcours de mise en production et de la réconciliation des pages
+  `docs/deployment/` (`DEPLOY-PARCOURS-DOC-001`).
+- **Association `env/*` au langage `properties` dans VS Code**
+  (`SKELETON-VSCODE-ENV-ASSOCIATION-001`). Le squelette associe les fichiers
+  `env/dev`, `env/prod`, `env/test` (motif `**/env/*`) au langage `properties`
+  pour la coloration et l'édition dans VS Code ; les fichiers des dossiers dot
+  du squelette (`.vscode/…`) sont désormais inclus dans le wheel.
+- **Rendu HTML de `Response.debug` en grille repliable**
+  (`DX-DEBUG-DUMP-RENDER-002`). La sortie de `Response.debug(...)` s'affiche en
+  grille avec des sections repliables, plus lisible pour inspecter une requête.
+
 ### Modifié
 
 - **Identifiants DB générés sans suffixes** (`NEW-DB-NAMING-NO-SUFFIX-001`,
@@ -56,6 +77,16 @@
   non bloquant. La détection RBAC s'appuie uniquement sur des signaux non
   ambigus (contrat, import effectif), jamais sur un mot-clé de nom de fichier,
   pour éviter les faux positifs des starters `welcome-rbac`.
+- **Page d'accueil du squelette refondue** (`SKELETON-HOME-LOGO-001`,
+  `SKELETON-HOME-NO-STARTER-BUILD-001`, `SKELETON-HOME-STARTERS-GRID-001`). La
+  page servie par un projet `forge new` adopte le logo bandeau et un texte aux
+  conventions françaises, ne propose plus `forge starter:build` (commande
+  retirée, ADR-035) et présente les parcours opt-in en grille avec leurs icônes
+  dédiées, chacun pointant vers son installation dans la documentation.
+- **Binding du groupe public renommé `pub` → `public`**
+  (`ROUTES-PUBLIC-BINDING-RENAME-001`). Dans le `mvc/routes.py` généré, le nom
+  de liaison du groupe de routes publiques devient `public` (au lieu de `pub`),
+  plus explicite et cohérent avec la documentation.
 
 ### Retiré
 
@@ -104,6 +135,20 @@
   `docs/static/tailwind.css` avait dérivé de sa source `static/tailwind.css`
   (42 octets d'écart) ; `forge sync:landing` réaligne la copie, rétablissant les
   garde-fous de synchronisation.
+- **`forge doctor` n'exige plus `relations.json` sur un projet nu**
+  (`FIX-DOCTOR-SKELETON-RELATIONS-001`). Un projet fraîchement créé, sans
+  relations déclarées, ne déclenche plus d'anomalie sur l'absence de
+  `mvc/entities/relations.json`.
+- **`forge update` masque la notice pip** (`FIX-UPDATE-PIP-NOTICE-001`). La
+  notice de mise à jour de pip n'apparaît plus dans la sortie de `forge update`,
+  qui reste lisible.
+- **Identifiants DB du squelette alignés sur `forge_admin` / `forge_app`**
+  (`SKELETON-ENV-DB-LOGINS-ALIGN-001`). Les gabarits d'environnement du squelette
+  utilisent les identifiants canoniques (`forge_admin` pour l'administration,
+  `forge_app` pour le runtime), en cohérence avec la doctrine des comptes MariaDB.
+- **Rebuild du CSS Tailwind après la restructuration de la landing**
+  (`LANDING-CSS-REBUILD-001`). Le CSS de la landing est régénéré pour refléter
+  les classes introduites par la refonte visuelle.
 
 
 ## [1.0.0-beta.15] — 2026-06-08
