@@ -53,6 +53,11 @@
   auth) n'est pas strict : `py.typed` couvrant tout le paquet `core`, ces
   modules génèreraient sinon du bruit en mode strict. Il sera retiré quand le
   cliquet aura couvert le cœur entier.
+- **Garde-fou d'absence du cliquet strict** (`CORE-TYPING-STRICT-GUARD-001`).
+  `tests/test_core_typing_strict_guard_001.py` verrouille l'acquis : tout fichier
+  `.py` non vide de `core/` doit porter `# pyright: strict`, à la seule exception
+  documentée de `core/http/debug_dumper.py`. Empêche une régression silencieuse
+  (nouveau fichier du cœur sans marqueur, ou exemption non maîtrisée).
 - **Cliquet strict sur `core/forge.py` + clôture du cœur (`# pyright: strict`)**
   (`CORE-TYPING-STRICT-FORGE-001`). `core/forge.py` annote son registre
   hétérogène `_cfg: dict[str, Any]` (frontière de config dynamique assumée, déjà
