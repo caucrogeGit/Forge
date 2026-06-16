@@ -61,7 +61,7 @@ def test_static_directory_retourne_404_pas_500(monkeypatch, tmp_path):
     static_dir = tmp_path / "static"
     static_dir.mkdir()
     monkeypatch.setattr(app, "STATIC_DIR", str(static_dir))
-    monkeypatch.setattr(app, "_html", lambda template, status: Response(status, template))
+    monkeypatch.setattr(app, "_html", lambda template, status, context=None: Response(status, template))
 
     handler = _StaticHandler()
     app.RequestHandler._serve_static(handler, "/static/")

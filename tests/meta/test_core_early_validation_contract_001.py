@@ -18,6 +18,8 @@ from core.http.response import Response
 from core.http.router import Router
 from core.mvc.controller.base_controller import BaseController
 
+pytestmark = pytest.mark.meta
+
 
 def _response_status_str():
     Response("texte au lieu du status")
