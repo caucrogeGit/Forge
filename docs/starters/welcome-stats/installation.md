@@ -1,8 +1,8 @@
-# Installation — Progression « Bonjour Forge Stats »
+# Installation : Progression « Bonjour Forge Stats »
 
-Ce préambule installe le module **opt-in** `forge-mvc-stats` et génère le projet de
-départ. C'est la **seule page du parcours** qui contient des commandes de création :
-tous les paliers suivants supposent le projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-stats` dans un projet
+Forge existant. La progression se réalise ensuite **à la main** : chaque palier
+décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
@@ -24,24 +24,21 @@ tous les paliers suivants supposent le projet **déjà créé**.
 pip install --pre forge-mvc-stats
 ```
 
-## 2. Générer le projet de départ
+## 2. Disposer d'un projet Forge
+
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-forge starter:build stats-welcome
+forge new mon-projet-stats
 ```
 
-## 3. Lancer le projet
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au
+fil des paliers.
 
-```bash
-source .venv/bin/activate
-forge run
-```
-
-Ouvrez `https://localhost:8000/stats-welcome` : la page affiche
-**« Bonjour Forge Stats »**. `/stats-welcome/inspect` montre la table, les colonnes et
-un événement de démo.
-
-## 4. Vérifier l'installation
+## 3. Vérifier l'installation
 
 ```bash
 forge doctor
@@ -50,5 +47,8 @@ forge doctor
 `forge doctor` détecte la dépendance Stats.
 
 ## Après l'installation
+
+Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
+contrôleur, la vue et la route `/stats-welcome`.
 
 [Continuer avec Bonjour Forge Stats](debutant/stats-welcome.md)

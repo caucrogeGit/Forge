@@ -1,9 +1,8 @@
-# Installation — Progression « Bonjour Forge Images »
+# Installation : Progression « Bonjour Forge Images »
 
-Ce préambule installe le module **opt-in** `forge-mvc-images` et génère le projet
-de départ de la progression images. C'est la **seule page du parcours** qui
-contient des commandes de création : tous les paliers suivants supposent le
-projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-images` dans un projet
+Forge existant. La progression images se réalise ensuite **à la main** : chaque
+palier décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core et des autres parcours, voir
@@ -41,26 +40,21 @@ pip install -e packages/forge-mvc-files/
 pip install -e packages/forge-mvc-images/
 ```
 
-## 2. Générer le projet de départ
+## 2. Disposer d'un projet Forge
 
-La progression démarre sur le starter `images-welcome` (Bonjour Forge Images) :
-
-```bash
-forge starter:build images-welcome
-```
-
-## 3. Lancer le projet
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-source .venv/bin/activate
-forge run
+forge new mon-projet-images
 ```
 
-Ouvrez `https://localhost:8000/images-welcome` : la page affiche
-**« Bonjour Forge Images »**. La route `/images-welcome/inspect` renvoie en JSON
-les formats acceptés et les tailles de variantes.
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au
+fil des paliers.
 
-## 4. Vérifier l'installation
+## 3. Vérifier l'installation
 
 `forge-mvc-images` est une brique **bibliothèque** (pas de CLI dédiée). On
 vérifie qu'elle est bien vue par Forge avec :
@@ -73,6 +67,7 @@ Le module `images` doit apparaître comme installé.
 
 ## Après l'installation
 
-Le module répond : vous pouvez attaquer le premier palier de code.
+Le module répond : vous pouvez attaquer le premier palier de code, où vous
+créerez vous-même le contrôleur, la vue et la route `/images-welcome`.
 
 [Continuer avec Bonjour Forge Images](debutant/images-welcome.md)

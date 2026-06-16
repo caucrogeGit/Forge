@@ -1,9 +1,8 @@
-# Installation — Progression « Bonjour Forge Vidéo »
+# Installation : Progression « Bonjour Forge Vidéo »
 
-Ce préambule installe le module **opt-in** `forge-mvc-video` et génère le projet
-de départ de la progression vidéo. C'est la **seule page du parcours** qui
-contient des commandes de création : tous les paliers suivants supposent le
-projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-video` dans un projet
+Forge existant. La progression vidéo se réalise ensuite **à la main** : chaque
+palier décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core et des autres parcours, voir
@@ -34,26 +33,21 @@ pip install --pre forge-mvc-video
 forge opt-in:install video
 ```
 
-## 2. Générer le projet de départ
+## 2. Disposer d'un projet Forge
 
-La progression démarre sur le starter `video-welcome` (Bonjour Forge Vidéo) :
-
-```bash
-forge starter:build video-welcome
-```
-
-## 3. Lancer le projet
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-source .venv/bin/activate
-forge run
+forge new mon-projet-video
 ```
 
-Ouvrez `https://localhost:8000/video-welcome` : la page affiche
-**« Bonjour Forge Vidéo »**. La route `/video-welcome/inspect` renvoie la
-configuration vidéo en JSON, token masqué.
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au
+fil des paliers.
 
-## 4. Vérifier l'installation
+## 3. Vérifier l'installation
 
 ```bash
 forge video:doctor
@@ -64,6 +58,7 @@ configuration, migration, présence de `ffprobe`/`ffmpeg`), sans rien transcoder
 
 ## Après l'installation
 
-Le module répond : vous pouvez attaquer le premier palier de code.
+Le module répond : vous pouvez attaquer le premier palier de code, où vous
+créerez vous-même le contrôleur, la vue et la route `/video-welcome`.
 
 [Continuer avec Bonjour Forge Vidéo](debutant/video-welcome.md)

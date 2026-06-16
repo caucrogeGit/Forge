@@ -1,8 +1,8 @@
-# Installation — Progression « Bonjour Forge RBAC »
+# Installation : Progression « Bonjour Forge RBAC »
 
-Ce préambule installe le module **opt-in** `forge-mvc-rbac` et génère le projet de
-départ. C'est la **seule page du parcours** qui contient des commandes de création :
-tous les paliers suivants supposent le projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-rbac` dans un projet Forge
+existant. La progression se réalise ensuite **à la main** : chaque palier décrit
+les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
@@ -25,25 +25,22 @@ tous les paliers suivants supposent le projet **déjà créé**.
 pip install --pre forge-mvc-rbac
 ```
 
-## 2. Générer le projet de départ
+## 2. Disposer d'un projet Forge
 
-Le starter `rbac-welcome` livre un contrat `mvc/security/rbac.json` de démonstration :
-
-```bash
-forge starter:build rbac-welcome
-```
-
-## 3. Lancer le projet
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-source .venv/bin/activate
-forge run
+forge new mon-projet-rbac
 ```
 
-Ouvrez `https://localhost:8000/rbac-welcome` : la page affiche **« Bonjour Forge RBAC »**.
-`/rbac-welcome/inspect` montre le contrat chargé (rôles, permissions, entités).
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours, dont le contrat
+`mvc/security/rbac.json` de démonstration, se créent à la main au fil des
+paliers.
 
-## 4. Vérifier l'installation
+## 3. Vérifier l'installation
 
 ```bash
 forge doctor
@@ -52,5 +49,8 @@ forge doctor
 `forge doctor` détecte la dépendance RBAC et le contrat.
 
 ## Après l'installation
+
+Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
+contrat, le contrôleur, la vue et la route `/rbac-welcome`.
 
 [Continuer avec Bonjour Forge RBAC](debutant/rbac-welcome.md)

@@ -1,8 +1,8 @@
-# Installation — Progression « Bonjour Forge MFA »
+# Installation : Progression « Bonjour Forge MFA »
 
-Ce préambule installe le module **opt-in** `forge-mvc-mfa` et génère le projet de
-départ. C'est la **seule page du parcours** qui contient des commandes de création :
-tous les paliers suivants supposent le projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-mfa` dans un projet Forge
+existant. La progression se réalise ensuite **à la main** : chaque palier décrit
+les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
@@ -37,23 +37,21 @@ Puis renseignez-la dans la configuration Forge (fichier `env/dev`) :
 `FORGE_MFA_SECRET_KEY=<clé générée>`. Sans elle, les paliers d'enrôlement et de
 chiffrement restent pédagogiques (message explicite) mais ne chiffrent rien.
 
-## 3. Générer le projet de départ
+## 3. Disposer d'un projet Forge
+
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-forge starter:build mfa-welcome
+forge new mon-projet-mfa
 ```
 
-## 4. Lancer le projet
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au
+fil des paliers.
 
-```bash
-source .venv/bin/activate
-forge run
-```
-
-Ouvrez `https://localhost:8000/mfa-welcome` : la page affiche **« Bonjour Forge MFA »**.
-`/mfa-welcome/inspect` indique facteurs, statuts et état de la clé.
-
-## 5. Vérifier l'installation
+## 4. Vérifier l'installation
 
 ```bash
 forge doctor
@@ -62,5 +60,8 @@ forge doctor
 `forge doctor` détecte la dépendance MFA et la configuration de la clé.
 
 ## Après l'installation
+
+Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
+contrôleur, la vue et la route `/mfa-welcome`.
 
 [Continuer avec Bonjour Forge MFA](debutant/mfa-welcome.md)

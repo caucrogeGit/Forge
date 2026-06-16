@@ -1,9 +1,8 @@
-# Installation — Progression « Bonjour Forge IoT »
+# Installation : Progression « Bonjour Forge IoT »
 
-Ce préambule installe le module **opt-in** `forge-mvc-iot` et génère le projet
-de départ de la progression IoT. C'est la **seule page du parcours** qui
-contient des commandes de création : tous les paliers suivants supposent le
-projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-iot` dans un projet Forge
+existant. La progression IoT se réalise ensuite **à la main** : chaque palier
+décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core et des autres parcours, voir
@@ -35,26 +34,21 @@ pip install --pre forge-mvc-iot
 forge opt-in:install iot
 ```
 
-## 2. Générer le projet de départ
+## 2. Disposer d'un projet Forge
 
-La progression démarre sur le starter `iot-welcome` (Bonjour Forge IoT) :
-
-```bash
-forge starter:build iot-welcome
-```
-
-## 3. Lancer le projet
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-source .venv/bin/activate
-forge run
+forge new mon-projet-iot
 ```
 
-Ouvrez `https://localhost:8000/iot-welcome` : la page affiche
-**« Bonjour Forge IoT »**. La route `/iot-welcome/inspect` renvoie la
-configuration MQTT en JSON, mot de passe masqué.
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au
+fil des paliers.
 
-## 4. Vérifier l'installation
+## 3. Vérifier l'installation
 
 ```bash
 forge iot:doctor
@@ -65,6 +59,7 @@ forge iot:doctor
 
 ## Après l'installation
 
-Le module répond : vous pouvez attaquer le premier palier de code.
+Le module répond : vous pouvez attaquer le premier palier de code, où vous
+créerez vous-même le contrôleur, la vue et la route `/iot-welcome`.
 
 [Continuer avec Bonjour Forge IoT](debutant/iot-welcome.md)

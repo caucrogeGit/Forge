@@ -1,9 +1,8 @@
-# Installation — Progression « Bonjour Forge Audio »
+# Installation : Progression « Bonjour Forge Audio »
 
-Ce préambule installe le module **opt-in** `forge-mvc-audio` et génère le projet
-de départ de la progression audio. C'est la **seule page du parcours** qui
-contient des commandes de création : tous les paliers suivants supposent le
-projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-audio` dans un projet
+Forge existant. La progression audio se réalise ensuite **à la main** : chaque
+palier décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir
@@ -32,26 +31,21 @@ pip install --pre forge-mvc-audio
 
 Pour le développement depuis les sources : `pip install -e packages/forge-mvc-audio/`.
 
-## 2. Générer le projet de départ
+## 2. Disposer d'un projet Forge
 
-La progression démarre sur le starter `audio-welcome` (Bonjour Forge Audio) :
-
-```bash
-forge starter:build audio-welcome
-```
-
-## 3. Lancer le projet
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-source .venv/bin/activate
-forge run
+forge new mon-projet-audio
 ```
 
-Ouvrez `https://localhost:8000/audio-welcome` : la page affiche
-**« Bonjour Forge Audio »**. La route `/audio-welcome/inspect` renvoie la
-configuration audio en JSON (token masqué).
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au
+fil des paliers.
 
-## 4. Vérifier l'installation
+## 3. Vérifier l'installation
 
 Contrairement à files/images, Audio fournit une **commande de diagnostic** :
 
@@ -62,5 +56,8 @@ forge audio:doctor
 Elle contrôle le paquet, la configuration et la présence de `ffprobe`/`ffmpeg`.
 
 ## Après l'installation
+
+Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
+contrôleur, la vue et la route `/audio-welcome`.
 
 [Continuer avec Bonjour Forge Audio](debutant/audio-welcome.md)

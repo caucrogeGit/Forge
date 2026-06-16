@@ -1,8 +1,8 @@
-# Installation — Progression « Bonjour Forge Workflow »
+# Installation : Progression « Bonjour Forge Workflow »
 
-Ce préambule installe le module **opt-in** `forge-mvc-workflow` et génère le projet
-de départ. C'est la **seule page du parcours** qui contient des commandes de
-création : tous les paliers suivants supposent le projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-workflow` dans un projet
+Forge existant. La progression se réalise ensuite **à la main** : chaque palier
+décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
@@ -12,7 +12,7 @@ création : tous les paliers suivants supposent le projet **déjà créé**.
 - **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
   [Installer Forge](../../install/poste-linux.md).
 - **Python 3.12+**.
-- Aucune base de données : `forge-mvc-workflow` est **sans état** — il fournit des
+- Aucune base de données : `forge-mvc-workflow` est **sans état**, il fournit des
   fonctions pures (statuts, transitions, badges). L'application décide où stocker le
   statut courant de ses objets.
 
@@ -24,24 +24,21 @@ création : tous les paliers suivants supposent le projet **déjà créé**.
 pip install --pre forge-mvc-workflow
 ```
 
-## 2. Générer le projet de départ
+## 2. Disposer d'un projet Forge
+
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-forge starter:build workflow-welcome
+forge new mon-projet-workflow
 ```
 
-## 3. Lancer le projet
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au
+fil des paliers.
 
-```bash
-source .venv/bin/activate
-forge run
-```
-
-Ouvrez `https://localhost:8000/workflow-welcome` : la page affiche
-**« Bonjour Forge Workflow »**. `/workflow-welcome/inspect` montre le jeu de statuts
-de démonstration.
-
-## 4. Vérifier l'installation
+## 3. Vérifier l'installation
 
 ```bash
 forge doctor
@@ -50,5 +47,8 @@ forge doctor
 `forge doctor` détecte la dépendance Workflow.
 
 ## Après l'installation
+
+Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
+contrôleur, la vue et la route `/workflow-welcome`.
 
 [Continuer avec Bonjour Forge Workflow](debutant/workflow-welcome.md)

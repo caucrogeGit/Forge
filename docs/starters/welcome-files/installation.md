@@ -1,9 +1,8 @@
-# Installation — Progression « Bonjour Forge Files »
+# Installation : Progression « Bonjour Forge Files »
 
-Ce préambule installe le module **opt-in** `forge-mvc-files` et génère le projet
-de départ de la progression files. C'est la **seule page du parcours** qui
-contient des commandes de création : tous les paliers suivants supposent le
-projet **déjà créé**.
+Ce préambule installe le module **opt-in** `forge-mvc-files` dans un projet
+Forge existant. La progression files se réalise ensuite **à la main** : chaque
+palier décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core et des autres parcours, voir
@@ -33,26 +32,21 @@ pip install --pre forge-mvc-files
 
 Pour le développement depuis les sources : `pip install -e packages/forge-mvc-files/`.
 
-## 2. Générer le projet de départ
+## 2. Disposer d'un projet Forge
 
-La progression démarre sur le starter `files-welcome` (Bonjour Forge Files) :
-
-```bash
-forge starter:build files-welcome
-```
-
-## 3. Lancer le projet
+La progression suppose un projet Forge déjà créé.
+Si ce n'est pas le cas, créez-en un avec :
 
 ```bash
-source .venv/bin/activate
-forge run
+forge new mon-projet-files
 ```
 
-Ouvrez `https://localhost:8000/files-welcome` : la page affiche
-**« Bonjour Forge Files »**. La route `/files-welcome/inspect` renvoie la racine
-de stockage et la politique d'upload en JSON.
+Le détail de la création d'un projet est décrit dans
+[Installer Forge](../../install/poste-linux.md).
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au
+fil des paliers.
 
-## 4. Vérifier l'installation
+## 3. Vérifier l'installation
 
 `forge-mvc-files` est une brique **bibliothèque** (pas de CLI dédiée). On vérifie
 qu'elle est bien vue par Forge avec :
@@ -64,5 +58,8 @@ forge opt-in:list
 Le module `files` doit apparaître comme installé.
 
 ## Après l'installation
+
+Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
+contrôleur, la vue et la route `/files-welcome`.
 
 [Continuer avec Bonjour Forge Files](debutant/files-welcome.md)
