@@ -3,13 +3,11 @@ PAGE TEMPORAIRE - support de cours, sans aucune relation avec le framework Forge
 A SUPPRIMER le 2026-06-28 (voir docs/vacances/welcome-vacance.md).
 -->
 
-# Palier 2 : dossier technique
+[Semaine réseau et virtualisation](../welcome-vacance.md) <a href="javascript:void(0)" onclick="window.history.back()"> / Retour</a>
 
-# Installer deux machines virtuelles avec VirtualBox
+# Palier 2 : installer deux machines virtuelles avec VirtualBox
 
-[Semaine réseau et virtualisation](../welcome-vacance.md) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
-
----
+## Dossier technique
 
 ## Objectif du dossier technique
 
@@ -25,743 +23,725 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
 * le rôle d’un disque virtuel ;
 * pourquoi il faut attribuer de la mémoire et du processeur à une machine virtuelle ;
 * pourquoi les machines virtuelles doivent utiliser des identifiants communs en classe ;
-* comment créer une machine virtuelle Windows 11 ;
-* comment créer une machine virtuelle Debian légère ;
-* pourquoi il faut créer un instantané après une installation propre.
+* comment créer une machine virtuelle Windows 11 Pro ;
+* comment créer une machine virtuelle Zorin OS.
 
----
+??? note "1. Le principe de la virtualisation"
+    La virtualisation permet de faire fonctionner un ordinateur simulé à l’intérieur d’un ordinateur réel.
 
-## 1. Le principe de la virtualisation
+    L’ordinateur réel continue d’exister normalement.  
+    La machine virtuelle fonctionne dans une fenêtre, comme si c’était un autre ordinateur.
 
-La virtualisation permet de faire fonctionner un ordinateur simulé à l’intérieur d’un ordinateur réel.
+    Dans cette situation :
 
-L’ordinateur réel continue d’exister normalement.
-La machine virtuelle fonctionne dans une fenêtre, comme si c’était un autre ordinateur.
+    * la machine réelle est le poste Debian 13 ;
+    * VirtualBox est le logiciel utilisé pour créer les machines virtuelles ;
+    * les machines virtuelles à installer sont Windows 11 Pro et Zorin OS.
 
-Dans cette situation :
+    Une machine virtuelle peut être démarrée, arrêtée, configurée, supprimée ou restaurée sans modifier directement le système principal, si le travail est fait correctement.
 
-* la machine réelle est le poste Debian 13 ;
-* VirtualBox est le logiciel utilisé pour créer les machines virtuelles ;
-* les machines virtuelles à installer sont Windows 11 et Debian léger.
+    <p align="center">
+      <img src="images/principe-virtualisation.png" alt="Le principe de la virtualisation" width="60%">
+    </p>
 
-Une machine virtuelle peut être démarrée, arrêtée, configurée, supprimée ou restaurée sans modifier directement le système principal, si le travail est fait correctement.
+??? note "2. Machine hôte et machine invitée"
+    En virtualisation, il faut distinguer deux éléments.
 
-<p>
-  <img src="images/principe-virtualisation.png" alt="Le principe de la virtualisation" width="60%">
-</p>
+    | Élément | Définition |
+    |---|---|
+    | Machine hôte | Ordinateur réel qui exécute VirtualBox |
+    | Système hôte | Système installé sur l’ordinateur réel |
+    | Machine invitée | Ordinateur simulé dans VirtualBox |
+    | Système invité | Système installé dans la machine virtuelle |
 
----
+    Dans notre cas :
 
-## 2. Machine hôte et machine invitée
+    | Rôle | Élément |
+    |---|---|
+    | Machine hôte | Poste de la salle |
+    | Système hôte | Debian 13 |
+    | Logiciel de virtualisation | VirtualBox |
+    | Machine invitée 1 | Machine virtuelle Windows 11 Pro |
+    | Machine invitée 2 | Machine virtuelle Zorin OS |
 
-En virtualisation, il faut distinguer deux éléments.
+    La machine hôte fournit les ressources.  
+    La machine invitée utilise une partie de ces ressources.
 
-| Élément         | Définition                                 |
-| --------------- | ------------------------------------------ |
-| Machine hôte    | Ordinateur réel qui exécute VirtualBox     |
-| Système hôte    | Système installé sur l’ordinateur réel     |
-| Machine invitée | Ordinateur simulé dans VirtualBox          |
-| Système invité  | Système installé dans la machine virtuelle |
+    <p align="center">
+      <img src="images/machine-hote-machine-invitee.png" alt="Machine hôte et machine invitée" width="60%">
+    </p>
 
-Dans notre cas :
+??? note "3. Le rôle de VirtualBox"
+    VirtualBox est un logiciel de virtualisation.
 
-| Rôle                       | Élément                        |
-| -------------------------- | ------------------------------ |
-| Machine hôte               | Poste de la salle              |
-| Système hôte               | Debian 13                      |
-| Logiciel de virtualisation | VirtualBox                     |
-| Machine invitée 1          | Machine virtuelle Windows 11   |
-| Machine invitée 2          | Machine virtuelle Debian léger |
+    Il permet de créer des machines virtuelles.
 
-La machine hôte fournit les ressources.
-La machine invitée utilise une partie de ces ressources.
+    Chaque machine virtuelle possède ses propres éléments simulés :
 
-<p>
-  <img src="images/machine-hote-machine-invitee.png" alt="Machine hôte et machine invitée" width="60%">
-</p>
+    * mémoire vive ;
+    * processeur ;
+    * disque dur ;
+    * carte réseau ;
+    * lecteur optique ;
+    * écran ;
+    * clavier ;
+    * souris.
 
----
+    VirtualBox ne remplace pas le système Debian 13.  
+    Il fonctionne au-dessus de Debian 13.
 
-## 3. Le rôle de VirtualBox
+    Debian 13 reste le système principal du poste.
 
-VirtualBox est un logiciel de virtualisation.
+??? note "4. Les ressources d’une machine virtuelle"
+    Une machine virtuelle utilise une partie des ressources de la machine réelle.
 
-Il permet de créer des machines virtuelles.
+    Ces ressources ne sont pas illimitées.
 
-Chaque machine virtuelle possède ses propres éléments simulés :
+    Si une machine virtuelle reçoit trop de mémoire ou trop de processeur, le poste Debian 13 peut devenir lent.
 
-* mémoire vive ;
-* processeur ;
-* disque dur ;
-* carte réseau ;
-* lecteur optique ;
-* écran ;
-* clavier ;
-* souris.
+    Il faut donc choisir des valeurs adaptées.
 
-VirtualBox ne remplace pas le système Debian 13.
-Il fonctionne au-dessus de Debian 13.
+    | Ressource | Rôle |
+    |---|---|
+    | Mémoire vive | Permet au système invité de fonctionner |
+    | Processeur | Permet d’exécuter les instructions |
+    | Disque virtuel | Stocke le système invité et ses fichiers |
+    | Carte réseau virtuelle | Permet à la machine virtuelle de communiquer |
+    | Lecteur ISO | Permet de démarrer l’installation du système invité |
 
-Debian 13 reste le système principal du poste.
+    Une machine virtuelle doit avoir assez de ressources pour fonctionner, mais pas au point de bloquer la machine hôte.
 
----
+    <p align="center">
+      <img src="images/ressources-machine-virtuelle.png" alt="Les ressources d'une machine virtuelle" width="60%">
+    </p>
 
-## 4. Les ressources d’une machine virtuelle
+    ### 4.1 La mémoire vive
 
-Une machine virtuelle utilise une partie des ressources de la machine réelle.
+    La mémoire vive est souvent appelée RAM.
 
-Ces ressources ne sont pas illimitées.
+    Quand on donne de la mémoire vive à une machine virtuelle, cette mémoire est prise sur celle de la machine hôte.
 
-Si une machine virtuelle reçoit trop de mémoire ou trop de processeur, le poste Debian 13 peut devenir lent.
+    Exemple :
 
-Il faut donc choisir des valeurs adaptées.
+    * le poste Debian 13 possède une certaine quantité de mémoire ;
+    * une partie est utilisée par Debian 13 ;
+    * une autre partie peut être attribuée à la machine virtuelle.
 
-| Ressource              | Rôle                                                |
-| ---------------------- | --------------------------------------------------- |
-| Mémoire vive           | Permet au système invité de fonctionner             |
-| Processeur             | Permet d’exécuter les instructions                  |
-| Disque virtuel         | Stocke le système invité et ses fichiers            |
-| Carte réseau virtuelle | Permet à la machine virtuelle de communiquer        |
-| Lecteur ISO            | Permet de démarrer l’installation du système invité |
+    Si trop de mémoire est donnée à une machine virtuelle, Debian 13 peut ralentir fortement.
 
-Une machine virtuelle doit avoir assez de ressources pour fonctionner, mais pas au point de bloquer la machine hôte.
+    Il faut respecter les valeurs données dans ce dossier ou par le professeur.
 
-<p>
-  <img src="images/ressources-machine-virtuelle.png" alt="Les ressources d'une machine virtuelle" width="60%">
-</p>
+    ### 4.2 Le processeur
 
----
+    VirtualBox permet d’attribuer un ou plusieurs cœurs de processeur à une machine virtuelle.
 
-## 5. La mémoire vive
+    Plus une machine virtuelle reçoit de cœurs, plus elle peut être réactive.
 
-La mémoire vive est souvent appelée RAM.
+    Mais la machine hôte doit toujours garder assez de ressources pour fonctionner correctement.
 
-Quand on donne de la mémoire vive à une machine virtuelle, cette mémoire est prise sur celle de la machine hôte.
+    Il ne faut donc pas attribuer tous les cœurs disponibles à une machine virtuelle.
 
-Exemple :
+    ### 4.3 Le disque virtuel
 
-* le poste Debian 13 possède une certaine quantité de mémoire ;
-* une partie est utilisée par Debian 13 ;
-* une autre partie peut être attribuée à la machine virtuelle.
+    Une machine virtuelle utilise un disque virtuel.
 
-Si trop de mémoire est donnée à une machine virtuelle, Debian 13 peut ralentir fortement.
+    Ce disque n’est pas un disque physique séparé.  
+    C’est un fichier stocké sur la machine hôte.
 
-Il faut respecter les valeurs données dans ce dossier ou par le professeur.
+    Pour la machine virtuelle, ce fichier se comporte comme un vrai disque dur.
 
----
+    Le disque virtuel contient :
 
-## 6. Le processeur
+    * le système installé ;
+    * les programmes ;
+    * les fichiers ;
+    * les paramètres de la machine virtuelle.
 
-VirtualBox permet d’attribuer un ou plusieurs cœurs de processeur à une machine virtuelle.
+    Il faut choisir une taille suffisante, mais raisonnable.
 
-Plus une machine virtuelle reçoit de cœurs, plus elle peut être réactive.
+    ### 4.4 L’image ISO
 
-Mais la machine hôte doit toujours garder assez de ressources pour fonctionner correctement.
+    Une image ISO est un fichier qui contient le programme d’installation d’un système d’exploitation.
 
-Il ne faut donc pas attribuer tous les cœurs disponibles à une machine virtuelle.
+    Elle joue le même rôle qu’un DVD ou qu’une clé USB d’installation.
 
----
+    Dans VirtualBox, on peut utiliser une image ISO pour installer un système dans une machine virtuelle.
 
-## 7. Le disque virtuel
+    Pour ce palier, les images ISO nécessaires seront fournies ou indiquées par le professeur.
 
-Une machine virtuelle utilise un disque virtuel.
+    Il ne faut pas télécharger une image ISO au hasard.  
+    Il faut utiliser l’image demandée pour l’activité.
 
-Ce disque n’est pas un disque physique séparé.
-C’est un fichier stocké sur la machine hôte.
+    <p align="center">
+      <img src="images/image-iso-installation.png" alt="L'image ISO" width="60%">
+    </p>
 
-Pour la machine virtuelle, ce fichier se comporte comme un vrai disque dur.
+??? note "5. Images ISO à utiliser"
+    Les images ISO doivent être téléchargées depuis une source fiable indiquée par le professeur.
 
-Le disque virtuel contient :
+    Pour cette activité, l’ISO Windows se télécharge depuis le guide Le Crabe Info, et l’ISO Zorin OS depuis le site officiel zorin.com.
 
-* le système installé ;
-* les programmes ;
-* les fichiers ;
-* les paramètres de la machine virtuelle.
+    Il ne faut pas utiliser une image ISO trouvée au hasard sur Internet.
 
-Il faut choisir une taille suffisante, mais raisonnable.
+    ### 5.1 ISO Windows 11
 
----
+    Lien direct vers le guide de téléchargement :
 
-## 8. L’image ISO
+    [Télécharger l’ISO Windows 11 avec le guide Le Crabe Info](https://lecrabeinfo.net/guides/telecharger-iso-windows-11/)
 
-Une image ISO est un fichier qui contient le programme d’installation d’un système d’exploitation.
+    Sur cette page, suivre la procédure permettant de télécharger l’image disque ISO de Windows 11 pour les appareils x64.
 
-Elle joue le même rôle qu’un DVD ou qu’une clé USB d’installation.
+    Choisir l’image : **Windows 11 25H2 x64**.
 
-Dans VirtualBox, on peut utiliser une image ISO pour installer un système dans une machine virtuelle.
+    Cette ISO est une ISO multi-édition.
 
-Pour ce palier, les images ISO nécessaires seront fournies ou indiquées par le professeur.
+    Pour cette activité, il faudra choisir l’édition **Windows 11 Pro** pendant l’installation, lorsque l’installateur le demande.
 
-Il ne faut pas télécharger une image ISO au hasard.
-Il faut utiliser l’image demandée pour l’activité.
+    Ne pas télécharger une autre image ISO sans consigne du professeur.
 
-<p>
-  <img src="images/image-iso-installation.png" alt="L'image ISO" width="60%">
-</p>
+    ### 5.2 ISO Zorin OS
 
----
+    Lien de téléchargement officiel :
 
-## 9. Images ISO à utiliser
+    [Télécharger Zorin OS sur zorin.com](https://zorin.com/os/download/)
 
-Les images ISO doivent être téléchargées depuis les sites officiels.
+    Sur le site, télécharger la dernière version de Zorin OS en 64 bits.
 
-Il ne faut pas utiliser une image ISO trouvée au hasard sur Internet.
+    Choisir de préférence l’édition Lite, plus légère et adaptée à une machine virtuelle, si elle est proposée.  
+    Sinon, prendre l’édition Core.
 
-### 9.1 ISO Windows 11
+    Il ne faut pas prendre la version 32 bits.
 
-Lien officiel Microsoft :
+    ### 5.3 Règle à respecter
 
-[Télécharger l’ISO Windows 11 depuis le site officiel Microsoft](https://www.microsoft.com/software-download/windows11)
+    Les images ISO utilisées en classe doivent être celles indiquées par le professeur.
 
-Sur cette page, il faut chercher la partie correspondant à l’image disque ISO de Windows 11 pour les appareils x64.
+    Si l’image ISO est déjà présente sur le poste, il ne faut pas en télécharger une autre sans consigne.
 
-L’ISO proposée par Microsoft est une ISO multi-édition.
+    Si l’image ISO est absente, il faut demander au professeur quel fichier utiliser.
 
-Pour obtenir Windows 11 Famille, il faudra choisir l’édition correspondante pendant l’installation, si l’installateur le propose.
+??? note "6. Identifiants à utiliser pour les machines virtuelles"
+    Pour cette activité, les machines virtuelles doivent utiliser des identifiants communs.
 
-### 9.2 ISO Debian légère
+    Cela permet au professeur d’ouvrir rapidement une machine virtuelle si une vérification ou une correction est nécessaire.
 
-Lien officiel Debian pour l’image netinst :
+    Ces identifiants sont utilisés uniquement pour les machines virtuelles de classe.
 
-[Télécharger Debian netinst depuis le site officiel Debian](https://www.debian.org/download.fr.html)
+    Ils ne doivent jamais être utilisés pour un compte personnel, un compte de l’établissement ou un service accessible sur Internet.
 
-L’image netinst est légère.
+    | Élément | Valeur à utiliser |
+    |---|---|
+    | Nom d’utilisateur | tne |
+    | Mot de passe | Tne2026! |
+    | Indice de mot de passe Windows | classe |
 
-Elle installe le système à partir d’une petite image ISO, puis télécharge les éléments nécessaires pendant l’installation.
+    Pour Zorin OS, si l’installation demande un nom complet et un nom d’ordinateur, utiliser :
 
-Pendant l’installation, il faudra choisir un environnement léger si un environnement graphique est demandé.
+    | Élément | Valeur à utiliser |
+    |---|---|
+    | Nom complet | Utilisateur TNE |
+    | Nom de l’ordinateur | zorin-tne |
+    | Nom d’utilisateur | tne |
+    | Mot de passe | Tne2026! |
 
-Choix conseillés :
+    Si l’installation de Windows demande obligatoirement un compte Microsoft, ne pas utiliser de compte personnel.
 
-* LXQt ;
-* Xfce.
+    Dans ce cas, il faut appeler le professeur.
 
-### 9.3 Alternative : image Debian live légère
+??? note "7. Vue d’ensemble de l’installation des deux machines virtuelles"
+    Les deux chapitres suivants détaillent l’installation de la machine virtuelle Windows 11 Pro, puis de la machine virtuelle Zorin OS.
 
-Lien officiel Debian pour les images live :
+    Les paramètres à renseigner et les étapes d’installation suivent les mêmes principes pour les deux machines.
 
-[Consulter les images live Debian officielles](https://www.debian.org/CD/live/)
+    Les deux schémas ci-dessous servent de repère pour ces deux chapitres.
 
-Une image live permet de démarrer Debian sans installation immédiate, puis d’installer le système depuis cette image.
+    <p align="center">
+      <img src="images/parametres-vm-windows-zorin.png" alt="Paramètres complets des machines virtuelles" width="60%">
+    </p>
 
-Pour une machine virtuelle légère, choisir de préférence une version avec :
+    <p align="center">
+      <img src="images/procedure-installation-vm.png" alt="Procédure générale d'installation d'une machine virtuelle" width="60%">
+    </p>
 
-* Xfce ;
-* LXDE ;
-* LXQt si disponible.
+??? note "8. La machine virtuelle Windows 11 Pro"
+    La première machine virtuelle à installer sera une machine virtuelle Windows 11 Pro.
 
-### 9.4 Règle à respecter
+    Elle servira à observer le fonctionnement d’un système Windows dans VirtualBox.
 
-Les images ISO utilisées en classe doivent être celles indiquées par le professeur.
+    Cette machine virtuelle devra être créée avec les paramètres indiqués dans ce dossier.
 
-Si l’image ISO est déjà présente sur le poste, il ne faut pas en télécharger une autre sans consigne.
+    Les points importants à vérifier sont :
 
-Si l’image ISO est absente, il faut demander au professeur quel fichier utiliser.
+    * le nom de la machine virtuelle ;
+    * le type de système ;
+    * l’image ISO utilisée ;
+    * la mémoire attribuée ;
+    * le nombre de cœurs processeur ;
+    * la taille du disque virtuel ;
+    * le démarrage correct de l’installation ;
+    * la création du compte utilisateur ;
+    * l’arrêt propre de la machine virtuelle après installation ;
+    * la création d’un instantané.
 
----
+    Windows 11 peut demander une configuration plus stricte qu’une distribution Linux.
 
-## 10. Identifiants à utiliser pour les machines virtuelles
+    Il faut donc suivre les consignes et ne pas modifier les paramètres au hasard.
 
-Pour cette activité, les machines virtuelles doivent utiliser des identifiants communs.
+    ### 8.1 Paramètres complets
 
-Cela permet au professeur d’ouvrir rapidement une machine virtuelle si une vérification ou une correction est nécessaire.
+    Utiliser les paramètres suivants, sauf consigne différente du professeur.
 
-Ces identifiants sont utilisés uniquement pour les machines virtuelles de classe.
+    | Paramètre | Valeur à utiliser |
+    |---|---|
+    | Nom de la machine virtuelle | VM-Windows-11-Pro |
+    | Type | Microsoft Windows |
+    | Version | Windows 11 64 bits |
+    | Image ISO | ISO Windows 11 fournie ou indiquée |
+    | Édition à installer | Windows 11 Pro |
+    | Mémoire vive | 4 Go |
+    | Processeur | 2 cœurs |
+    | Disque virtuel | 64 Go |
+    | Type de disque | VDI |
+    | Stockage | Allocation dynamique |
+    | Carte réseau | NAT pendant l’installation |
+    | EFI | Activé |
+    | TPM | Activé si disponible |
+    | Secure Boot | Activé si disponible |
+    | Mémoire vidéo | 128 Mo si disponible |
 
-Ils ne doivent jamais être utilisés pour un compte personnel, un compte de l’établissement ou un service accessible sur Internet.
+    Windows 11 demande plus de ressources qu’une distribution Linux légère.
 
-| Élément                        | Valeur à utiliser |
-| ------------------------------ | ----------------- |
-| Nom d’utilisateur              | tne               |
-| Mot de passe                   | Tne2026!          |
-| Indice de mot de passe Windows | classe            |
+    Si le poste devient lent, il faut fermer les applications inutiles et prévenir le professeur.
 
-Pour Debian, si l’installation demande un nom complet, utiliser :
+    ### 8.2 Créer la machine virtuelle
 
-| Élément                                 | Valeur à utiliser |
-| --------------------------------------- | ----------------- |
-| Nom complet                             | Utilisateur TNE   |
-| Nom d’utilisateur                       | tne               |
-| Mot de passe                            | Tne2026!          |
-| Mot de passe administrateur, si demandé | Tne2026!          |
+    Dans VirtualBox :
 
-Si l’installation de Windows demande obligatoirement un compte Microsoft, ne pas utiliser de compte personnel.
+    1. créer une nouvelle machine virtuelle ;
+    2. nommer la machine : VM-Windows-11-Pro ;
+    3. choisir le type : Microsoft Windows ;
+    4. choisir la version : Windows 11 64 bits ;
+    5. sélectionner l’image ISO Windows 11 ;
+    6. attribuer la mémoire vive demandée ;
+    7. attribuer le nombre de processeurs demandé ;
+    8. créer le disque virtuel ;
+    9. vérifier les paramètres ;
+    10. démarrer la machine virtuelle.
 
-Dans ce cas, il faut appeler le professeur.
+    Le nom d’une machine virtuelle doit être clair : il permet de savoir immédiatement à quoi correspond la machine.
 
----
+    Ici, la machine s’appelle VM-Windows-11-Pro.
 
-## 11. La machine virtuelle Windows 11
+    Évitez les noms vagues comme test, machine, truc ou nouvelle VM.
 
-La première machine virtuelle à installer sera une machine virtuelle Windows 11.
+    ### 8.3 Lancer l’installation
 
-Elle servira à observer le fonctionnement d’un système Windows dans VirtualBox.
+    Au démarrage de la machine virtuelle :
 
-Cette machine virtuelle devra être créée avec les paramètres indiqués dans ce dossier.
+    1. attendre le lancement de l’installateur Windows ;
+    2. choisir la langue demandée ;
+    3. choisir le clavier adapté ;
+    4. lancer l’installation ;
+    5. choisir l’édition Windows 11 Pro lorsque l’installateur le demande ;
+    6. accepter les conditions si elles sont demandées ;
+    7. choisir une installation personnalisée si l’installateur le demande ;
+    8. sélectionner le disque virtuel vide ;
+    9. lancer l’installation ;
+    10. attendre les redémarrages automatiques.
 
-Les points importants à vérifier sont :
+    Pendant l’installation, il ne faut pas éteindre brutalement la machine virtuelle.
 
-* le nom de la machine virtuelle ;
-* le type de système ;
-* l’image ISO utilisée ;
-* la mémoire attribuée ;
-* le nombre de cœurs processeur ;
-* la taille du disque virtuel ;
-* le démarrage correct de l’installation ;
-* la création du compte utilisateur ;
-* l’arrêt propre de la machine virtuelle après installation ;
-* la création d’un instantané.
+    ### 8.4 Créer le compte utilisateur
 
-Windows 11 peut demander une configuration plus stricte qu’une distribution Linux.
+    Lorsque l’installateur demande comment configurer l’appareil, choisir : Configurer pour une utilisation personnelle.
 
-Il faut donc suivre les consignes et ne pas modifier les paramètres au hasard.
+    Windows 11 Pro essaie ensuite d’imposer un compte Microsoft.
 
----
+    Pour cette activité, il faut un compte local.
 
-## 12. Paramètres complets pour la machine virtuelle Windows 11
+    Pour l’obtenir, sur l’écran « Ajoutez votre compte Microsoft » :
 
-Utiliser les paramètres suivants, sauf consigne différente du professeur.
+    1. appuyer sur Maj + F10 pour ouvrir l’invite de commandes ;
+    2. taper la commande suivante, puis valider avec Entrée :
 
-| Paramètre                   | Valeur à utiliser                  |
-| --------------------------- | ---------------------------------- |
-| Nom de la machine virtuelle | VM-Windows-11                      |
-| Type                        | Microsoft Windows                  |
-| Version                     | Windows 11 64 bits                 |
-| Image ISO                   | ISO Windows 11 fournie ou indiquée |
-| Mémoire vive                | 4 Go minimum                       |
-| Processeur                  | 2 cœurs                            |
-| Disque virtuel              | 64 Go                              |
-| Type de disque              | VDI                                |
-| Stockage                    | Allocation dynamique               |
-| Carte réseau                | NAT pendant l’installation         |
-| EFI                         | Activé                             |
-| TPM                         | Activé si disponible               |
-| Secure Boot                 | Activé si disponible               |
-| Mémoire vidéo               | 128 Mo si disponible               |
+    ```cmd
+    start ms-cxh:localonly
+    ```
 
-Windows 11 demande plus de ressources qu’une distribution Linux légère.
+    3. dans la fenêtre « Créer un compte local » qui s’ouvre, créer le compte avec les informations imposées.
 
-Si le poste devient lent, il faut fermer les applications inutiles et prévenir le professeur.
+    | Élément | Valeur |
+    |---|---|
+    | Nom d’utilisateur | tne |
+    | Mot de passe | Tne2026! |
+    | Indice de mot de passe | classe |
 
----
+    Si la commande ne fonctionne pas : couper la connexion réseau de la machine virtuelle dans le menu Périphériques, puis Réseau, décocher « Connecter la carte réseau », créer le compte local, puis reconnecter la carte réseau.
 
-## 13. Procédure d’installation de Windows 11 dans VirtualBox
+    En cas de doute, appeler le professeur.
 
-### 13.1 Créer la machine virtuelle
+    ### 8.5 Terminer l’installation
 
-Dans VirtualBox :
+    Après la création du compte :
 
-1. créer une nouvelle machine virtuelle ;
-2. nommer la machine : VM-Windows-11 ;
-3. choisir le type : Microsoft Windows ;
-4. choisir la version : Windows 11 64 bits ;
-5. sélectionner l’image ISO Windows 11 ;
-6. attribuer la mémoire vive demandée ;
-7. attribuer le nombre de processeurs demandé ;
-8. créer le disque virtuel ;
-9. vérifier les paramètres ;
-10. démarrer la machine virtuelle.
+    1. attendre l’arrivée sur le bureau Windows ;
+    2. vérifier que la session s’ouvre avec le compte demandé ;
+    3. mettre Windows à jour : Démarrer, Paramètres, Windows Update, Rechercher des mises à jour, puis installer les mises à jour proposées ;
+    4. redémarrer si Windows le demande, et relancer une recherche jusqu’à ce qu’il n’y ait plus de mise à jour ;
+    5. arrêter proprement Windows ;
+    6. revenir dans VirtualBox.
 
-### 13.2 Lancer l’installation
+    Une fois la machine installée, à jour et arrêtée proprement, il faut créer un instantané de cet état propre.
 
-Au démarrage de la machine virtuelle :
+    Cette étape est décrite dans le chapitre « L’instantané ».
 
-1. attendre le lancement de l’installateur Windows ;
-2. choisir la langue demandée ;
-3. choisir le clavier adapté ;
-4. lancer l’installation ;
-5. choisir l’édition demandée si l’installateur le propose ;
-6. accepter les conditions si elles sont demandées ;
-7. choisir une installation personnalisée si l’installateur le demande ;
-8. sélectionner le disque virtuel vide ;
-9. lancer l’installation ;
-10. attendre les redémarrages automatiques.
+    La machine virtuelle Windows 11 Pro est prête lorsque :
 
-Pendant l’installation, il ne faut pas éteindre brutalement la machine virtuelle.
+    * elle démarre correctement ;
+    * le compte demandé fonctionne ;
+    * le système est à jour ;
+    * l’arrêt se fait correctement ;
+    * l’instantané Installation propre existe.
 
-### 13.3 Créer le compte utilisateur
+??? note "9. La machine virtuelle Linux"
+    La deuxième machine virtuelle à installer sera une machine virtuelle avec Zorin OS.
 
-Lorsque Windows demande la création du compte, utiliser les informations imposées pour l’activité.
+    Zorin OS est une distribution Linux conviviale, basée sur Ubuntu.
 
-| Élément                | Valeur   |
-| ---------------------- | -------- |
-| Nom d’utilisateur      | tne      |
-| Mot de passe           | Tne2026! |
-| Indice de mot de passe | classe   |
+    Elle servira à comparer le fonctionnement d’un système Linux avec celui de Windows 11 dans VirtualBox.
 
-Si Windows demande un compte Microsoft et ne propose pas de compte local, ne pas utiliser de compte personnel.
+    Cette machine virtuelle devra aussi être créée avec les paramètres indiqués dans ce dossier.
 
-Il faut appeler le professeur.
+    Les points importants à vérifier sont :
 
-### 13.4 Terminer l’installation
+    * le nom de la machine virtuelle ;
+    * le type de système ;
+    * l’image ISO utilisée ;
+    * la mémoire attribuée ;
+    * le nombre de cœurs processeur ;
+    * la taille du disque virtuel ;
+    * le démarrage correct de l’installation ;
+    * la création du compte utilisateur ;
+    * l’arrêt propre de la machine virtuelle après installation ;
+    * la création d’un instantané.
 
-Après la création du compte :
+    On utilise l’édition Zorin OS Lite, avec bureau XFCE, afin de pouvoir travailler confortablement dans une machine virtuelle.
 
-1. attendre l’arrivée sur le bureau Windows ;
-2. vérifier que la session s’ouvre avec le compte demandé ;
-3. arrêter proprement Windows ;
-4. revenir dans VirtualBox ;
-5. créer un instantané nommé : Installation propre.
+    ### 9.1 Paramètres complets
 
-La machine virtuelle Windows 11 est prête lorsque :
+    Utiliser les paramètres suivants, sauf consigne différente du professeur.
 
-* elle démarre correctement ;
-* le compte demandé fonctionne ;
-* l’arrêt se fait correctement ;
-* l’instantané Installation propre existe.
+    | Paramètre | Valeur à utiliser |
+    |---|---|
+    | Nom de la machine virtuelle | VM-Zorin |
+    | Type | Linux |
+    | Version | Ubuntu 64 bits |
+    | Image ISO | ISO Zorin OS Lite 64 bits téléchargée |
+    | Mémoire vive | 4 Go |
+    | Processeur | 2 cœurs |
+    | Disque virtuel | 30 Go |
+    | Type de disque | VDI |
+    | Stockage | Allocation dynamique |
+    | Carte réseau | NAT pendant l’installation |
+    | Mémoire vidéo | 128 Mo |
+    | Édition conseillée | Zorin OS Lite |
 
-<p>
-  <img src="images/procedure-installation-vm.png" alt="Procédure générale d'installation d'une machine virtuelle" width="60%">
-</p>
+    Comme Zorin OS est basé sur Ubuntu, on choisit le type Ubuntu 64 bits dans VirtualBox.
 
----
+    ### 9.2 Créer la machine virtuelle
 
-## 14. La machine virtuelle Debian légère
+    Dans VirtualBox :
 
-La deuxième machine virtuelle à installer sera une machine virtuelle avec Debian léger.
+    1. créer une nouvelle machine virtuelle ;
+    2. nommer la machine : VM-Zorin ;
+    3. choisir le type : Linux ;
+    4. choisir la version : Ubuntu 64 bits ;
+    5. sélectionner l’image ISO Zorin OS ;
+    6. attribuer la mémoire vive demandée ;
+    7. attribuer le nombre de processeurs demandé ;
+    8. créer le disque virtuel ;
+    9. vérifier les paramètres ;
+    10. démarrer la machine virtuelle.
 
-Elle servira à comparer le fonctionnement d’un système Linux avec celui de Windows 11 dans VirtualBox.
+    Comme pour la machine Windows, donnez un nom clair : ici VM-Zorin.
 
-Cette machine virtuelle devra aussi être créée avec les paramètres indiqués dans ce dossier.
+    Évitez les noms vagues comme test, machine ou truc.
 
-Les points importants à vérifier sont :
+    ### 9.3 Lancer l’installation
 
-* le nom de la machine virtuelle ;
-* le type de système ;
-* l’image ISO utilisée ;
-* la mémoire attribuée ;
-* le nombre de cœurs processeur ;
-* la taille du disque virtuel ;
-* le démarrage correct de l’installation ;
-* la création du compte utilisateur ;
-* l’arrêt propre de la machine virtuelle après installation ;
-* la création d’un instantané.
+    Au démarrage de la machine virtuelle :
 
-Une machine virtuelle Debian légère demande généralement moins de ressources qu’une machine virtuelle Windows 11.
+    1. laisser Zorin OS démarrer ;
+    2. choisir « Try or Install Zorin OS » si un menu apparaît ;
+    3. attendre le chargement du bureau Zorin en session live ;
+    4. lancer « Installer Zorin OS » depuis l’icône présente sur le bureau ;
+    5. choisir la langue : Français ;
+    6. choisir la disposition du clavier : Français ;
+    7. au choix des logiciels, prendre « Installation minimale » pour une machine légère ;
+    8. cocher « Télécharger les mises à jour pendant l’installation » si le réseau le permet.
 
-Elle permet de faire des tests rapidement.
+    ### 9.4 Choisir le type d’installation
 
----
+    Pour cette activité, choisir : Effacer le disque et installer Zorin OS.
 
-## 15. Paramètres complets pour la machine virtuelle Debian légère
+    Attention : cela concerne uniquement le disque virtuel de la machine virtuelle.
 
-Utiliser les paramètres suivants, sauf consigne différente du professeur.
+    Cela ne doit pas effacer le disque réel de la machine hôte.
 
-| Paramètre                         | Valeur à utiliser              |
-| --------------------------------- | ------------------------------ |
-| Nom de la machine virtuelle       | VM-Debian-Leger                |
-| Type                              | Linux                          |
-| Version                           | Debian 64 bits                 |
-| Image ISO                         | ISO Debian fournie ou indiquée |
-| Mémoire vive                      | 2 Go                           |
-| Processeur                        | 1 ou 2 cœurs                   |
-| Disque virtuel                    | 20 Go à 30 Go                  |
-| Type de disque                    | VDI                            |
-| Stockage                          | Allocation dynamique           |
-| Carte réseau                      | NAT pendant l’installation     |
-| Mémoire vidéo                     | 64 Mo à 128 Mo                 |
-| Environnement graphique conseillé | Xfce ou LXQt                   |
+    Lancer ensuite l’installation, puis choisir le fuseau horaire si l’installateur le demande.
 
-Debian léger demande moins de ressources que Windows 11.
+    ### 9.5 Créer le compte utilisateur
 
-Il est donc plus adapté aux tests rapides et aux manipulations réseau.
+    Lorsque l’installateur demande les identifiants, utiliser les valeurs imposées.
 
-<p>
-  <img src="images/parametres-vm-windows-debian.png" alt="Paramètres complets des machines virtuelles" width="60%">
-</p>
+    | Élément | Valeur |
+    |---|---|
+    | Nom complet | Utilisateur TNE |
+    | Nom de l’ordinateur | zorin-tne |
+    | Nom d’utilisateur | tne |
+    | Mot de passe | Tne2026! |
 
----
+    Zorin OS, comme Ubuntu, utilise un seul compte qui dispose des droits d’administration.
 
-## 16. Procédure d’installation de Debian léger dans VirtualBox
+    Il n’y a pas de mot de passe administrateur séparé.
 
-### 16.1 Créer la machine virtuelle
+    Choisir « Demander mon mot de passe pour ouvrir une session ».
 
-Dans VirtualBox :
+    Il faut écrire le mot de passe avec attention.
 
-1. créer une nouvelle machine virtuelle ;
-2. nommer la machine : VM-Debian-Leger ;
-3. choisir le type : Linux ;
-4. choisir la version : Debian 64 bits ;
-5. sélectionner l’image ISO Debian ;
-6. attribuer la mémoire vive demandée ;
-7. attribuer le nombre de processeurs demandé ;
-8. créer le disque virtuel ;
-9. vérifier les paramètres ;
-10. démarrer la machine virtuelle.
+    Une erreur dans le mot de passe empêchera l’ouverture de session.
 
-### 16.2 Lancer l’installation
+    ### 9.6 Terminer l’installation
 
-Au démarrage de la machine virtuelle :
+    À la fin de l’installation :
 
-1. choisir l’installation graphique ou l’installation classique selon la consigne du professeur ;
-2. choisir la langue ;
-3. choisir le pays ;
-4. choisir le clavier ;
-5. laisser l’installateur détecter le matériel virtuel ;
-6. configurer le nom de la machine si demandé.
+    1. attendre la fin de la copie des fichiers ;
+    2. cliquer sur « Redémarrer maintenant » ;
+    3. retirer le support d’installation si l’installateur le demande, puis appuyer sur Entrée ;
+    4. ouvrir la session avec le compte tne ;
+    5. vérifier que le bureau s’affiche correctement ;
+    6. mettre le système à jour ;
+    7. arrêter proprement Zorin OS ;
+    8. revenir dans VirtualBox.
 
-Nom conseillé pour la machine Debian :
+    Pour mettre Zorin OS à jour, ouvrir un terminal et lancer les commandes suivantes, en saisissant le mot de passe du compte tne :
 
-| Élément        | Valeur     |
-| -------------- | ---------- |
-| Nom de machine | debian-tne |
+    ```bash
+    sudo apt update
+    sudo apt upgrade
+    ```
 
-### 16.3 Créer les comptes
+    On peut aussi passer par l’outil graphique « Mise à jour de logiciels » si Zorin OS le propose.
 
-Lorsque l’installateur demande les identifiants, utiliser les valeurs imposées.
+    Comme pour la machine Windows, il faut ensuite créer un instantané de cet état propre.
 
-| Élément                                 | Valeur          |
-| --------------------------------------- | --------------- |
-| Nom complet                             | Utilisateur TNE |
-| Nom d’utilisateur                       | tne             |
-| Mot de passe utilisateur                | Tne2026!        |
-| Mot de passe administrateur, si demandé | Tne2026!        |
+    Cette étape est décrite dans le chapitre « L’instantané ».
 
-Il faut écrire le mot de passe avec attention.
+    La machine virtuelle Zorin OS est prête lorsque :
 
-Une erreur dans le mot de passe empêchera l’ouverture de session.
+    * elle démarre correctement ;
+    * le compte demandé fonctionne ;
+    * le système est à jour ;
+    * l’arrêt se fait correctement ;
+    * l’instantané Installation propre existe.
 
-### 16.4 Partitionner le disque virtuel
+??? note "10. Les additions invitées"
+    Les additions invitées sont des pilotes et des outils à installer à l’intérieur de chaque machine virtuelle.
 
-Pour cette activité, utiliser le choix simple proposé par l’installateur.
+    Elles améliorent nettement le confort d’utilisation :
 
-Choix conseillé :
+    * ajustement automatique de la résolution et passage en plein écran ;
+    * pointeur de souris fluide, sans capture du clavier ;
+    * presse-papiers partagé entre la machine hôte et la machine virtuelle ;
+    * dossiers partagés entre l’hôte et l’invité.
 
-* utiliser tout le disque ;
-* partitionnement assisté ;
-* tous les fichiers dans une seule partition.
+    Sans les additions invitées, l’affichage reste souvent en petite résolution et la souris est moins fluide.
 
-Attention : cela concerne uniquement le disque virtuel de la machine virtuelle.
+    Les additions invitées s’installent une fois le système installé, séparément dans chaque machine virtuelle.
 
-Cela ne doit pas effacer le disque réel de la machine hôte.
+    ### 10.1 Additions invitées sur Windows 11
 
-### 16.5 Choisir les logiciels
+    1. démarrer la machine virtuelle Windows et ouvrir la session tne ;
+    2. dans le menu de la fenêtre VirtualBox : Périphériques, puis Insérer l’image CD des Additions invitées ;
+    3. dans Windows, ouvrir l’Explorateur de fichiers, puis le lecteur CD « VirtualBox Guest Additions » ;
+    4. lancer VBoxWindowsAdditions.exe et suivre l’assistant ;
+    5. redémarrer Windows à la fin de l’installation.
 
-Si l’installateur demande les logiciels à installer, choisir une configuration légère.
+    Après le redémarrage, la fenêtre de la machine virtuelle peut se redimensionner et passer en plein écran.
 
-Choix conseillés :
+    ### 10.2 Additions invitées sur Zorin OS
 
-* environnement de bureau Xfce ou LXQt ;
-* utilitaires usuels du système ;
-* serveur SSH uniquement si le professeur le demande.
+    Zorin OS a besoin des outils de compilation pour construire les additions invitées.
 
-Éviter les environnements trop lourds si le professeur demande une machine légère.
+    Ouvrir un terminal et installer les paquets nécessaires :
 
-### 16.6 Terminer l’installation
+    ```bash
+    sudo apt update
+    sudo apt install build-essential dkms linux-headers-$(uname -r)
+    ```
 
-À la fin de l’installation :
+    Dans le menu de la fenêtre VirtualBox : Périphériques, puis Insérer l’image CD des Additions invitées.
 
-1. terminer l’installation ;
-2. redémarrer la machine virtuelle ;
-3. ouvrir la session avec le compte tne ;
-4. vérifier que le bureau s’affiche correctement ;
-5. arrêter proprement Debian ;
-6. revenir dans VirtualBox ;
-7. créer un instantané nommé : Installation propre.
+    Monter le CD et lancer l’installateur :
 
-La machine virtuelle Debian est prête lorsque :
+    ```bash
+    sudo mkdir -p /mnt/cdrom
+    sudo mount /dev/cdrom /mnt/cdrom
+    cd /mnt/cdrom
+    sudo sh ./VBoxLinuxAdditions.run
+    sudo reboot
+    ```
 
-* elle démarre correctement ;
-* le compte demandé fonctionne ;
-* l’arrêt se fait correctement ;
-* l’instantané Installation propre existe.
+    Après le redémarrage, l’affichage s’ajuste automatiquement à la taille de la fenêtre.
 
----
+??? note "11. Démarrer et arrêter une machine virtuelle"
+    Une machine virtuelle doit être arrêtée correctement.
 
-## 17. Nommer correctement les machines virtuelles
+    Il ne faut pas fermer brutalement la fenêtre de la machine virtuelle sans comprendre ce que l’on fait.
 
-Le nom d’une machine virtuelle doit être clair.
+    Pour arrêter correctement une machine virtuelle, il faut utiliser l’arrêt du système invité.
 
-Un bon nom permet de savoir immédiatement à quoi correspond la machine.
+    Exemples :
 
-Exemples de noms clairs :
+    * dans Windows 11 : menu démarrer, puis arrêt ;
+    * dans Zorin OS : menu d’arrêt ou commande adaptée.
 
-| Machine virtuelle | Exemple de nom  |
-| ----------------- | --------------- |
-| Windows 11        | VM-Windows-11   |
-| Debian léger      | VM-Debian-Leger |
+    Si la machine virtuelle est arrêtée brutalement, le système invité peut être endommagé.
 
-Un nom trop vague est à éviter.
+??? note "12. L’instantané"
+    Un instantané est une sauvegarde de l’état d’une machine virtuelle à un moment précis.
 
-Exemples de noms à éviter :
+    Le mot anglais souvent utilisé dans VirtualBox est “snapshot”.
 
-* test ;
-* machine ;
-* truc ;
-* nouvelle VM ;
-* windows final vrai.
+    Dans ce dossier, on utilise le mot français : instantané.
 
-Un nom propre permet de retrouver facilement la machine virtuelle dans VirtualBox.
+    Un instantané permet de revenir à un état précédent.
 
----
+    Exemple :
 
-## 18. Démarrer et arrêter une machine virtuelle
+    1. la machine virtuelle vient d’être installée proprement ;
+    2. un instantané est créé ;
+    3. une erreur est faite plus tard ;
+    4. l’instantané permet de revenir à un état propre.
 
-Une machine virtuelle doit être arrêtée correctement.
+    L’instantané est très utile en apprentissage.
 
-Il ne faut pas fermer brutalement la fenêtre de la machine virtuelle sans comprendre ce que l’on fait.
+    Il permet de faire des essais sans tout recommencer depuis le début.
 
-Pour arrêter correctement une machine virtuelle, il faut utiliser l’arrêt du système invité.
+    <p align="center">
+      <img src="images/instantane-machine-virtuelle.png" alt="L'instantané d'une machine virtuelle" width="60%">
+    </p>
 
-Exemples :
+    Il faut créer un instantané lorsque la machine virtuelle est dans un état propre et stable.
 
-* dans Windows 11 : menu démarrer, puis arrêt ;
-* dans Debian : menu d’arrêt ou commande adaptée.
+    Dans cette activité, l’instantané doit être créé après l’installation correcte du système invité.
 
-Si la machine virtuelle est arrêtée brutalement, le système invité peut être endommagé.
+    L’instantané doit avoir un nom clair.
 
----
+    | Machine virtuelle | Nom de l’instantané |
+    |---|---|
+    | Windows 11 Pro | Installation propre |
+    | Zorin OS | Installation propre |
 
-## 19. L’instantané
+    Un nom clair permet de savoir à quel moment on peut revenir.
 
-Un instantané est une sauvegarde de l’état d’une machine virtuelle à un moment précis.
+??? note "13. Les erreurs fréquentes"
+    <p align="center">
+      <img src="images/erreurs-virtualbox.png" alt="Les erreurs fréquentes dans VirtualBox" width="60%">
+    </p>
 
-Le mot anglais souvent utilisé dans VirtualBox est “snapshot”.
+    ### 13.1 Donner trop de mémoire à une machine virtuelle
 
-Dans ce dossier, on utilise le mot français : instantané.
+    Si la machine virtuelle reçoit trop de mémoire, la machine hôte peut devenir lente.
 
-Un instantané permet de revenir à un état précédent.
+    Il faut respecter la valeur demandée dans ce dossier ou par le professeur.
 
-Exemple :
+    ### 13.2 Choisir le mauvais type de système
 
-1. la machine virtuelle vient d’être installée proprement ;
-2. un instantané est créé ;
-3. une erreur est faite plus tard ;
-4. l’instantané permet de revenir à l’état propre.
+    VirtualBox demande le type de système à installer.
 
-L’instantané est très utile en apprentissage.
+    Si le mauvais type est choisi, l’installation peut être plus difficile ou mal configurée.
 
-Il permet de faire des essais sans tout recommencer depuis le début.
+    Il faut choisir le type correspondant au système invité.
 
-<p>
-  <img src="images/instantane-machine-virtuelle.png" alt="L'instantané d'une machine virtuelle" width="60%">
-</p>
+    ### 13.3 Utiliser la mauvaise image ISO
 
----
+    Une mauvaise image ISO peut empêcher l’installation.
 
-## 20. Quand créer un instantané
+    Il faut utiliser l’image indiquée par le professeur.
 
-Il faut créer un instantané lorsque la machine virtuelle est dans un état propre et stable.
+    ### 13.4 Créer un disque virtuel trop petit
 
-Dans cette activité, l’instantané doit être créé après l’installation correcte du système invité.
+    Si le disque virtuel est trop petit, l’installation peut échouer ou manquer d’espace rapidement.
 
-L’instantané doit avoir un nom clair.
+    Il faut respecter la taille demandée dans ce dossier ou par le professeur.
 
-| Machine virtuelle | Nom de l’instantané |
-| ----------------- | ------------------- |
-| Windows 11        | Installation propre |
-| Debian léger      | Installation propre |
+    ### 13.5 Éteindre brutalement la machine virtuelle
 
-Un nom clair permet de savoir à quel moment on peut revenir.
+    Une fermeture brutale peut provoquer des erreurs dans le système invité.
 
----
+    Il faut arrêter proprement la machine virtuelle.
 
-## 21. Les erreurs fréquentes
+    ### 13.6 Oublier de créer l’instantané
 
-### 21.1 Donner trop de mémoire à une machine virtuelle
+    Si aucun instantané n’est créé après une installation propre, il sera plus difficile de revenir en arrière en cas d’erreur.
 
-Si la machine virtuelle reçoit trop de mémoire, la machine hôte peut devenir lente.
+    L’instantané fait partie du travail demandé.
 
-Il faut respecter la valeur demandée dans ce dossier ou par le professeur.
+    ### 13.7 Utiliser un identifiant personnel
 
-### 21.2 Choisir le mauvais type de système
+    Il ne faut pas utiliser d’identifiant personnel dans les machines virtuelles de cette activité.
 
-VirtualBox demande le type de système à installer.
+    Les machines virtuelles doivent utiliser les identifiants communs de classe.
 
-Si le mauvais type est choisi, l’installation peut être plus difficile ou mal configurée.
+??? note "14. Vérification finale avant le palier 3"
+    Avant de passer au palier 3, les deux machines virtuelles doivent être prêtes.
 
-Il faut choisir le type correspondant au système invité.
+    | Vérification | Windows 11 Pro | Zorin OS |
+    |---|---|---|
+    | La machine virtuelle existe | Oui | Oui |
+    | Elle démarre correctement | Oui | Oui |
+    | Le compte tne fonctionne | Oui | Oui |
+    | Le mot de passe commun fonctionne | Oui | Oui |
+    | Le système est à jour | Oui | Oui |
+    | La machine s’arrête proprement | Oui | Oui |
+    | L’instantané Installation propre existe | Oui | Oui |
 
-### 21.3 Utiliser la mauvaise image ISO
+    Le palier 2 est terminé lorsque les deux machines virtuelles sont installées, accessibles avec les identifiants demandés et sauvegardées par un instantané.
 
-Une mauvaise image ISO peut empêcher l’installation.
+??? note "15. Ce qu’il faut retenir"
+    VirtualBox permet de créer des machines virtuelles.
 
-Il faut utiliser l’image indiquée par le professeur.
+    La machine hôte est le poste réel sous Debian 13.
 
-### 21.4 Créer un disque virtuel trop petit
+    La machine invitée est la machine virtuelle créée dans VirtualBox.
 
-Si le disque virtuel est trop petit, l’installation peut échouer ou manquer d’espace rapidement.
+    Une machine virtuelle utilise des ressources de la machine hôte :
 
-Il faut respecter la taille demandée dans ce dossier ou par le professeur.
+    * mémoire vive ;
+    * processeur ;
+    * disque ;
+    * carte réseau virtuelle.
 
-### 21.5 Éteindre brutalement la machine virtuelle
+    Une image ISO sert à installer un système d’exploitation.
 
-Une fermeture brutale peut provoquer des erreurs dans le système invité.
+    Un disque virtuel contient le système invité et ses fichiers.
 
-Il faut arrêter proprement la machine virtuelle.
+    Les machines virtuelles de classe utilisent des identifiants communs afin que le professeur puisse les vérifier.
 
-### 21.6 Oublier de créer l’instantané
+    Un instantané permet de revenir à un état propre.
 
-Si aucun instantané n’est créé après une installation propre, il sera plus difficile de revenir en arrière en cas d’erreur.
+    Les machines virtuelles doivent être nommées clairement, configurées proprement et arrêtées correctement.
 
-L’instantané fait partie du travail demandé.
-
-### 21.7 Utiliser un identifiant personnel
-
-Il ne faut pas utiliser d’identifiant personnel dans les machines virtuelles de cette activité.
-
-Les machines virtuelles doivent utiliser les identifiants communs de classe.
-
----
-
-## 22. Vérification finale avant le palier 3
-
-Avant de passer au palier 3, les deux machines virtuelles doivent être prêtes.
-
-| Vérification                            | Windows 11 | Debian léger |
-| --------------------------------------- | ---------- | ------------ |
-| La machine virtuelle existe             | Oui        | Oui          |
-| Elle démarre correctement               | Oui        | Oui          |
-| Le compte tne fonctionne                | Oui        | Oui          |
-| Le mot de passe commun fonctionne       | Oui        | Oui          |
-| La machine s’arrête proprement          | Oui        | Oui          |
-| L’instantané Installation propre existe | Oui        | Oui          |
-
-Le palier 2 est terminé lorsque les deux machines virtuelles sont installées, accessibles avec les identifiants demandés et sauvegardées par un instantané.
-
----
-
-## 23. Ce qu’il faut retenir
-
-VirtualBox permet de créer des machines virtuelles.
-
-La machine hôte est le poste réel sous Debian 13.
-
-La machine invitée est la machine virtuelle créée dans VirtualBox.
-
-Une machine virtuelle utilise des ressources de la machine hôte :
-
-* mémoire vive ;
-* processeur ;
-* disque ;
-* carte réseau virtuelle.
-
-Une image ISO sert à installer un système d’exploitation.
-
-Un disque virtuel contient le système invité et ses fichiers.
-
-Les machines virtuelles de classe utilisent des identifiants communs afin que le professeur puisse les vérifier.
-
-Un instantané permet de revenir à un état propre.
-
-Les machines virtuelles doivent être nommées clairement, configurées proprement et arrêtées correctement.
-
-<p>
-  <img src="images/erreurs-virtualbox.png" alt="Les erreurs fréquentes dans VirtualBox" width="60%">
-</p>
-
----
-
-!!! info "Activité à réaliser"
-
+??? info "Activité à réaliser"
     Vous avez maintenant les informations nécessaires pour passer à la partie pratique.
 
     Important : vous commencez par le QCM. Vous ne démarrez l’activité que lorsque votre QCM est validé à 100 %.
 
     Marche à suivre :
 
-    1. [Télécharger le QCM du palier 2](qcm-palier-2-machines-virtuelles.pdf), puis répondez à toutes les questions.
+    1. [Télécharger le QCM du palier 2](QCM%20du%20palier%202-1.pdf), puis répondez à toutes les questions.
     2. Faites valider votre QCM. Tant qu’il n’est pas correct à 100 %, vous ne passez pas à l’activité.
-    3. Une fois le QCM validé à 100 %, [télécharger l’activité : installer deux machines virtuelles avec VirtualBox](activite-machines-virtuelles-virtualbox.pdf) et réalisez les étapes demandées.
+    3. Une fois le QCM validé à 100 %, [télécharger l’activité : installer deux machines virtuelles avec VirtualBox](Activit%C3%A9%20du%20palier%202%20-%20installer%20deux%20machines%20virtuelles%20avec%20VirtualBox.pdf) et réalisez les étapes demandées.
 
     Pendant l’activité, vous devrez revenir dans ce dossier technique chaque fois que vous aurez besoin d’une information.
