@@ -1,3 +1,4 @@
+# pyright: strict
 """Extraction de métadonnées audio via ffprobe.
 
 ``probe_audio`` lance ``ffprobe`` (lecture seule) sur une source et en extrait
@@ -16,6 +17,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any, cast
 
 from forge_mvc_audio.config import AudioConfig, load_audio_config
 
@@ -68,7 +70,17 @@ def _default_runner(ffprobe_bin: str, path: str) -> str:
     return result.stdout
 
 
-def _int_or_none(value) -> int | None:
+def _as_dict(value: object) -> dict[str, Any]:
+    """Vue typée d'une valeur JSON décodée si c'est un objet, sinon ``{}``."""
+    return cast("dict[str, Any]", value) if isinstance(value, dict) else {}
+
+
+def _as_list(value: object) -> list[Any]:
+    """Vue typée d'une valeur JSON décodée si c'est un tableau, sinon ``[]``."""
+    return cast("list[Any]", value) if isinstance(value, list) else []
+
+
+def _int_or_none(value: Any) -> int | None:
     if value is None or str(value).strip() == "":
         return None
     try:
@@ -77,16 +89,20 @@ def _int_or_none(value) -> int | None:
         return None
 
 
-def parse_probe_json(payload: str | dict) -> AudioMetadata:
+def parse_probe_json(payload: str | dict[str, Any]) -> AudioMetadata:
     """Parse la sortie ffprobe (``-print_format json``) en ``AudioMetadata``.
 
     Lève ``AudioProbeError`` si la sortie est illisible ou sans flux audio.
     """
-    data = json.loads(payload) if isinstance(payload, str) else payload
-    streams = data.get("streams", []) if isinstance(data, dict) else []
-    fmt = data.get("format", {}) if isinstance(data, dict) else {}
+    raw: object = json.loads(payload) if isinstance(payload, str) else payload
+    data = _as_dict(raw)
+    streams = _as_list(data.get("streams"))
+    fmt = _as_dict(data.get("format"))
 
-    audio = next((s for s in streams if s.get("codec_type") == "audio"), None)
+    audio = next(
+        (sd for s in streams if (sd := _as_dict(s)).get("codec_type") == "audio"),
+        None,
+    )
     if audio is None:
         raise AudioProbeError("aucun flux audio détecté")
 

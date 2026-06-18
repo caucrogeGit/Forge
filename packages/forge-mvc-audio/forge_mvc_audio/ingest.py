@@ -1,3 +1,4 @@
+# pyright: strict
 """Ingestion d'un fichier audio — sans état (aucune base de données).
 
 ``ingest_audio`` valide (taille, extension), stocke la source à un emplacement
@@ -11,6 +12,7 @@ Validation **basique** ici (taille + extension) ; la validation profonde par
 from __future__ import annotations
 
 import mimetypes
+from typing import Any
 from uuid import uuid4
 
 from forge_mvc_audio.config import AudioConfig, load_audio_config
@@ -34,7 +36,7 @@ def ingest_audio(
     title: str | None = None,
     config: AudioConfig | None = None,
     uuid: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Valide et stocke un fichier audio source.
 
     Retourne un dict ``{uuid, title, original_path, size_bytes, mime_type}``.

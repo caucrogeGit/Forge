@@ -35,3 +35,6 @@ Documentation = "https://forgemvc.com/docs/forge/audio/"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["forge_mvc_audio*"]
+
+[tool.setuptools.package-data]
+"forge_mvc_audio" = ["py.typed"]
