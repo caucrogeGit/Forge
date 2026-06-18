@@ -1,3 +1,4 @@
+# pyright: strict
 """forge_mvc_pivot/service.py — Service de persistance pour tables pivot avec attributs (opt-in extrait du core, ADR-021).
 
 Permet de gérer les associations many_to_many enrichies (pivot.fields[]) sans
@@ -13,10 +14,18 @@ UX future : PIVOT-ADVANCED-004 (commande/générateur dédié).
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field as dc_field
-from typing import Callable
+from typing import Any
 
 _IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+# Frontière base : les accesseurs DB injectables partagent la signature des
+# helpers de ``core.database.db`` (paramètres positionnels SQL + tuple).
+_Params = tuple[Any, ...]
+_FetchOne = Callable[[str, _Params], "dict[str, Any] | None"]
+_FetchAll = Callable[[str, _Params], "list[dict[str, Any]]"]
+_Execute = Callable[[str, _Params], int]
 
 
 def _safe_identifier(name: str, label: str) -> str:
@@ -36,7 +45,7 @@ class PivotRow:
     """Représente une ligne de table pivot avec ses attributs."""
     source_id: int | str
     target_id: int | str
-    pivot_data: dict = dc_field(default_factory=dict)
+    pivot_data: dict[str, Any] = dc_field(default_factory=dict[str, Any])
 
 
 # ── Erreur UX ─────────────────────────────────────────────────────────────────
@@ -115,22 +124,22 @@ def pivot_error_to_form_error(error: Exception) -> PivotFormError:
 
 # ── Accesseurs DB par défaut (lazy — pas de connexion à l'import) ─────────────
 
-def _default_fetch_one(sql: str, params: tuple) -> dict | None:
+def _default_fetch_one(sql: str, params: _Params) -> dict[str, Any] | None:
     from core.database.db import fetch_one
     return fetch_one(sql, params)
 
 
-def _default_fetch_all(sql: str, params: tuple) -> list[dict]:
+def _default_fetch_all(sql: str, params: _Params) -> list[dict[str, Any]]:
     from core.database.db import fetch_all
     return fetch_all(sql, params) or []
 
 
-def _default_execute(sql: str, params: tuple) -> int:
+def _default_execute(sql: str, params: _Params) -> int:
     from core.database.db import execute
     return execute(sql, params)
 
 
-def _default_insert(sql: str, params: tuple) -> int:
+def _default_insert(sql: str, params: _Params) -> int:
     from core.database.db import insert
     return insert(sql, params)
 
@@ -166,10 +175,10 @@ class PivotAdvancedService:
         pivot_constraints: list[PivotFieldConstraint] | None = None,
         unique_pair: bool = False,
         id_field: str | None = None,
-        fetch_one: Callable | None = None,
-        fetch_all: Callable | None = None,
-        execute: Callable | None = None,
-        insert_fn: Callable | None = None,
+        fetch_one: _FetchOne | None = None,
+        fetch_all: _FetchAll | None = None,
+        execute: _Execute | None = None,
+        insert_fn: _Execute | None = None,
     ) -> None:
         self._table = _safe_identifier(table, "table")
         self._source_key = _safe_identifier(source_key, "source_key")
@@ -196,7 +205,7 @@ class PivotAdvancedService:
 
     # ── helpers internes ──────────────────────────────────────────────────────
 
-    def _check_pivot_data(self, pivot_data: dict) -> None:
+    def _check_pivot_data(self, pivot_data: dict[str, Any]) -> None:
         """Lève ValueError si pivot_data contient des clés inconnues."""
         unknown = set(pivot_data) - set(self._pivot_fields)
         if unknown:
@@ -205,7 +214,7 @@ class PivotAdvancedService:
                 f"Champs autorisés : {sorted(self._pivot_fields)}."
             )
 
-    def _enforce_attach_constraints(self, pivot_data: dict) -> None:
+    def _enforce_attach_constraints(self, pivot_data: dict[str, Any]) -> None:
         """Vérifie required et nullable lors d'un attach."""
         for field_name, constraint in self._constraints.items():
             if constraint.required and field_name not in pivot_data:
@@ -221,7 +230,7 @@ class PivotAdvancedService:
                     field=field_name,
                 )
 
-    def _enforce_update_constraints(self, pivot_data: dict) -> None:
+    def _enforce_update_constraints(self, pivot_data: dict[str, Any]) -> None:
         """Vérifie nullable lors d'un update (required non vérifié — mise à jour partielle)."""
         for field_name, constraint in self._constraints.items():
             if not constraint.nullable and field_name in pivot_data and pivot_data[field_name] is None:
@@ -231,7 +240,7 @@ class PivotAdvancedService:
                     field=field_name,
                 )
 
-    def _row_to_pivot_row(self, row: dict) -> PivotRow:
+    def _row_to_pivot_row(self, row: dict[str, Any]) -> PivotRow:
         pivot_data = {k: v for k, v in row.items()
                       if k not in (self._source_key, self._target_key)}
         return PivotRow(
@@ -261,7 +270,7 @@ class PivotAdvancedService:
         self,
         source_id: int | str,
         target_id: int | str,
-        pivot_data: dict | None = None,
+        pivot_data: dict[str, Any] | None = None,
     ) -> int:
         """Crée une association. Retourne le lastrowid.
 
@@ -294,7 +303,7 @@ class PivotAdvancedService:
         self,
         source_id: int | str,
         target_id: int | str,
-        pivot_data: dict,
+        pivot_data: dict[str, Any],
     ) -> int:
         """Modifie les attributs pivot d'une association existante. Retourne rowcount.
 
@@ -336,7 +345,7 @@ class PivotAdvancedService:
         row = self._fetch_one(sql, (pivot_id,))
         return self._row_to_pivot_row(row) if row else None
 
-    def update_by_id(self, pivot_id: int | str, pivot_data: dict) -> int:
+    def update_by_id(self, pivot_id: int | str, pivot_data: dict[str, Any]) -> int:
         """Modifie les attributs d'une ligne pivot par son id technique. Requiert id_field."""
         if not self._id_field:
             raise PivotConstraintError(

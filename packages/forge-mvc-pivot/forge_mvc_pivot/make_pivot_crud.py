@@ -1,3 +1,4 @@
+# pyright: strict
 """forge_mvc_pivot/make_pivot_crud.py — Générateur de sous-CRUD Pivot advanced (opt-in).
 
 Commande : forge make:pivot-crud <EntitéSource> <nomRelation> [--dry-run]
@@ -15,6 +16,7 @@ import json
 import re
 from dataclasses import dataclass, field as dc_field
 from pathlib import Path
+from typing import Any, cast
 
 import forge_cli.output as out
 
@@ -23,6 +25,20 @@ _SNAKE_RE = re.compile(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")
 
 def _to_snake(name: str) -> str:
     return _SNAKE_RE.sub("_", name).lower()
+
+
+def _as_dict(value: object) -> dict[str, Any] | None:
+    """Vue typée d'une valeur JSON décodée si c'est un objet, None sinon.
+
+    Isole le rétrécissement ``isinstance`` + ``cast`` à la frontière JSON
+    (``json.loads`` renvoie ``Any``) pour garder le reste strict-clean.
+    """
+    return cast("dict[str, Any]", value) if isinstance(value, dict) else None
+
+
+def _as_list(value: object) -> list[Any] | None:
+    """Vue typée d'une valeur JSON décodée si c'est un tableau, None sinon."""
+    return cast("list[Any]", value) if isinstance(value, list) else None
 
 
 # ── Données de la relation résolue ────────────────────────────────────────────
@@ -42,8 +58,8 @@ class ResolvedPivotRelation:
 
 @dataclass
 class MakePivotCrudResult:
-    created: list[Path] = dc_field(default_factory=list)
-    preserved: list[Path] = dc_field(default_factory=list)
+    created: list[Path] = dc_field(default_factory=list[Path])
+    preserved: list[Path] = dc_field(default_factory=list[Path])
     dry_run: bool = False
 
 
@@ -67,32 +83,35 @@ def resolve_pivot_relation(
         raise SystemExit(1)
 
     try:
-        raw = json.loads(relations_path.read_text(encoding="utf-8"))
+        raw = _as_dict(json.loads(relations_path.read_text(encoding="utf-8")))
     except json.JSONDecodeError as exc:
         print(out.error(f"relations.json invalide (JSON malformé) : {exc}"))
         raise SystemExit(1)
 
-    if not isinstance(raw, dict) or raw.get("schema_version") != "1.0":
+    if raw is None or raw.get("schema_version") != "1.0":
         print(out.error('relations.json invalide : schema_version "1.0" attendu.'))
         raise SystemExit(1)
 
-    relations = raw.get("relations")
-    if not isinstance(relations, list):
+    relations = _as_list(raw.get("relations"))
+    if relations is None:
         print(out.error("relations.json invalide : clé \"relations\" manquante ou invalide."))
         raise SystemExit(1)
 
-    candidates = [
-        r for r in relations
-        if isinstance(r, dict)
-        and r.get("type") == "many_to_many"
-        and r.get("from") == source_entity
-        and r.get("name") == relation_name
-    ]
+    candidates: list[dict[str, Any]] = []
+    for r in relations:
+        rd = _as_dict(r)
+        if (
+            rd is not None
+            and rd.get("type") == "many_to_many"
+            and rd.get("from") == source_entity
+            and rd.get("name") == relation_name
+        ):
+            candidates.append(rd)
 
     if not candidates:
         # Distinguer les cas d'erreur
         source_exists = any(
-            isinstance(r, dict) and r.get("from") == source_entity
+            (rd := _as_dict(r)) is not None and rd.get("from") == source_entity
             for r in relations
         )
         if not source_exists:
@@ -117,16 +136,16 @@ def resolve_pivot_relation(
         ))
         raise SystemExit(1)
 
-    pivot = rel.get("pivot")
-    if not isinstance(pivot, dict):
+    pivot = _as_dict(rel.get("pivot"))
+    if pivot is None:
         print(out.error(
             f"Relation {source_entity}.{relation_name} n'a pas de bloc pivot.\n"
             "make:pivot-crud est réservé aux pivots avec attributs."
         ))
         raise SystemExit(1)
 
-    fields = pivot.get("fields")
-    if not isinstance(fields, list) or len(fields) == 0:
+    fields = _as_list(pivot.get("fields"))
+    if fields is None or len(fields) == 0:
         print(out.error(
             f"Relation {source_entity}.{relation_name} : pivot.fields[] est absent ou vide.\n"
             "make:pivot-crud est réservé aux pivots avec attributs.\n"
@@ -134,10 +153,15 @@ def resolve_pivot_relation(
         ))
         raise SystemExit(1)
 
-    pivot_field_names = tuple(
-        f["name"] for f in fields
-        if isinstance(f, dict) and isinstance(f.get("name"), str)
-    )
+    field_names: list[str] = []
+    for f in fields:
+        fd = _as_dict(f)
+        if fd is None:
+            continue
+        name = fd.get("name")
+        if isinstance(name, str):
+            field_names.append(name)
+    pivot_field_names = tuple(field_names)
 
     return ResolvedPivotRelation(
         from_entity=source_entity,
