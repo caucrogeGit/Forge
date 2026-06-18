@@ -1,12 +1,13 @@
 <!--
 PAGE TEMPORAIRE - support de cours, sans aucune relation avec le framework Forge.
-A SUPPRIMER le 2026-06-28 : retirer tout le dossier docs/vacances/ ET le bloc de
-nav "Semaine réseau et virtualisation (2TNE CIEL)" dans mkdocs.yml.
+A SUPPRIMER le 2026-06-28 : retirer tout le dossier docs/starters-pedagogique/ ET
+le bloc de nav "Welcome Réseau (2TNE CIEL)" dans mkdocs.yml, ainsi que l'entrée
+"2TNE" de la landing.
 -->
 
 # Semaine réseau et virtualisation pour les 2TNE CIEL
 
-[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+[Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 ---
 
@@ -35,11 +36,12 @@ Chaque palier se déroule en trois étapes :
 
 ## Objectif de la semaine
 
-À la fin de cette semaine, vous aurez travaillé sur trois situations techniques :
+À la fin de cette semaine, vous aurez travaillé sur quatre situations techniques :
 
 * fabriquer et tester un câble réseau droit ;
 * installer deux machines virtuelles avec VirtualBox ;
-* tester plusieurs modes de communication réseau entre la machine hôte et les machines virtuelles.
+* tester plusieurs modes de communication réseau entre la machine hôte et les machines virtuelles ;
+* configurer un réseau interne et diagnostiquer une communication.
 
 Vous allez donc travailler comme dans un atelier technique.
 
@@ -87,11 +89,12 @@ Avant d’appeler le professeur, vous devez pouvoir expliquer :
 | -----: | -------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
 |      1 | Câble Ethernet droit | Fabriquer un câble RJ45 en norme T568B et le tester                       | Un câble droit conforme                                    |
 |      2 | Machines virtuelles  | Installer une machine virtuelle Windows 11 et une machine virtuelle Linux | Deux machines virtuelles fonctionnelles avec un instantané |
-|      3 | Réseau VirtualBox    | Tester plusieurs modes de communication réseau                            | Un tableau comparatif des communications                   |
+|      3 | Modes réseau simples | Relever les informations réseau et tester les modes NAT et accès par pont  | Un tableau de tests des deux modes                         |
+|      4 | Réseau interne       | Configurer un réseau interne et diagnostiquer une communication           | Un réseau interne fonctionnel et un diagnostic             |
 
 ---
 
-## Les trois paliers à réaliser
+## Les paliers à réaliser
 
 ### Palier 1 : Câble Ethernet droit T568B
 
@@ -116,24 +119,31 @@ Vous devrez aussi créer un **instantané** afin de pouvoir revenir à un état 
 
 ---
 
-### Palier 3 : Réseau IP et communication entre l’hôte et les machines virtuelles
+### Palier 3 : Relever les informations réseau et tester les modes simples VirtualBox
 
-Dans ce palier, vous allez tester les communications entre :
-
-* la machine hôte sous Debian 13 ;
-* la machine virtuelle Windows 11 ;
-* la machine virtuelle Linux.
-
-Vous comparerez plusieurs modes réseau de VirtualBox :
+Dans ce palier, vous allez relever les informations réseau des trois machines (hôte Debian 13, machine virtuelle Windows 11, machine virtuelle Linux), puis tester deux modes réseau simples de VirtualBox :
 
 * le mode NAT ;
-* l’accès par pont ;
-* le réseau interne ;
-* le réseau privé hôte, si ce mode est disponible.
+* l’accès par pont.
 
-Pour interpréter ces tests, vous apprendrez d’abord les bases de l’adressage IP : l’adresse IP, le masque réseau, et les commandes pour lire la configuration réseau d’une machine.
+Vous apprendrez aussi à lire la configuration réseau d’une machine (adresse IP, masque) avec les commandes utiles.
 
-[Ouvrir le palier 3 : Réseau IP et communication entre l’hôte et les machines virtuelles](palier-3/palier-3-dossier-technique-reseau-virtualbox.md)
+[Ouvrir le palier 3 : Relever les informations réseau et tester les modes simples VirtualBox](palier-3/index.md)
+
+---
+
+### Palier 4 : Configurer un réseau interne et diagnostiquer une communication
+
+Dans ce palier, vous allez configurer un réseau interne entre deux machines virtuelles, puis diagnostiquer une communication qui ne fonctionne pas.
+
+Vous allez :
+
+* attribuer des adresses IP fixes ;
+* vérifier que les deux machines sont dans le même réseau logique ;
+* tester la communication avec `ping` ;
+* diagnostiquer une panne réseau dans l’ordre.
+
+[Ouvrir le palier 4 : Configurer un réseau interne et diagnostiquer une communication](palier-4/index.md)
 
 ---
 
@@ -162,6 +172,7 @@ Les paliers doivent être réalisés dans l’ordre.
 1. Palier 1 : fabriquer et tester un câble réseau.
 2. Palier 2 : installer deux machines virtuelles.
 3. Palier 3 : tester les communications réseau.
+4. Palier 4 : configurer un réseau interne et diagnostiquer une communication.
 
 Vous ne passez au palier suivant que lorsque le palier en cours est terminé et vérifié.
 

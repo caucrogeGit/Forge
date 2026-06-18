@@ -1,9 +1,9 @@
 <!--
 PAGE TEMPORAIRE - support de cours, sans aucune relation avec le framework Forge.
-A SUPPRIMER le 2026-06-28 (voir docs/vacances/welcome-vacance.md).
+A SUPPRIMER le 2026-06-28 (voir docs/starters-pedagogique/welcome-reseau/index.md).
 -->
 
-[Semaine réseau et virtualisation](../welcome-vacance.md) <a href="javascript:void(0)" onclick="window.history.back()"> / Retour</a>
+[Semaine réseau et virtualisation](../index.md) <a href="javascript:void(0)" onclick="window.history.back()"> / Retour</a>
 
 # Palier 2 : installer deux machines virtuelles avec VirtualBox
 
@@ -41,7 +41,7 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
     Une machine virtuelle peut être démarrée, arrêtée, configurée, supprimée ou restaurée sans modifier directement le système principal, si le travail est fait correctement.
 
     <p align="center">
-      <img src="images/principe-virtualisation.png" alt="Le principe de la virtualisation" width="60%">
+      <img src="../images/principe-virtualisation.png" alt="Le principe de la virtualisation" width="60%">
     </p>
 
 ??? note "2. Machine hôte et machine invitée"
@@ -68,7 +68,7 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
     La machine invitée utilise une partie de ces ressources.
 
     <p align="center">
-      <img src="images/machine-hote-machine-invitee.png" alt="Machine hôte et machine invitée" width="60%">
+      <img src="../images/machine-hote-machine-invitee.png" alt="Machine hôte et machine invitée" width="60%">
     </p>
 
 ??? note "3. Le rôle de VirtualBox"
@@ -112,7 +112,7 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
     Une machine virtuelle doit avoir assez de ressources pour fonctionner, mais pas au point de bloquer la machine hôte.
 
     <p align="center">
-      <img src="images/ressources-machine-virtuelle.png" alt="Les ressources d'une machine virtuelle" width="60%">
+      <img src="../images/ressources-machine-virtuelle.png" alt="Les ressources d'une machine virtuelle" width="60%">
     </p>
 
     ### 4.1 La mémoire vive
@@ -173,7 +173,7 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
     Il faut utiliser l’image demandée pour l’activité.
 
     <p align="center">
-      <img src="images/image-iso-installation.png" alt="L'image ISO" width="60%">
+      <img src="../images/image-iso-installation.png" alt="L'image ISO" width="60%">
     </p>
 
 ??? note "5. Images ISO à utiliser"
@@ -256,11 +256,11 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
     Les deux schémas ci-dessous servent de repère pour ces deux chapitres.
 
     <p align="center">
-      <img src="images/parametres-vm-windows-zorin.png" alt="Paramètres complets des machines virtuelles" width="60%">
+      <img src="../images/parametres-vm-windows-zorin.png" alt="Paramètres complets des machines virtuelles" width="60%">
     </p>
 
     <p align="center">
-      <img src="images/procedure-installation-vm.png" alt="Procédure générale d'installation d'une machine virtuelle" width="60%">
+      <img src="../images/procedure-installation-vm.png" alt="Procédure générale d'installation d'une machine virtuelle" width="60%">
     </p>
 
 ??? note "8. La machine virtuelle Windows 11 Pro"
@@ -629,7 +629,7 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
     Il permet de faire des essais sans tout recommencer depuis le début.
 
     <p align="center">
-      <img src="images/instantane-machine-virtuelle.png" alt="L'instantané d'une machine virtuelle" width="60%">
+      <img src="../images/instantane-machine-virtuelle.png" alt="L'instantané d'une machine virtuelle" width="60%">
     </p>
 
     Il faut créer un instantané lorsque la machine virtuelle est dans un état propre et stable.
@@ -647,7 +647,7 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
 
 ??? note "13. Les erreurs fréquentes"
     <p align="center">
-      <img src="images/erreurs-virtualbox.png" alt="Les erreurs fréquentes dans VirtualBox" width="60%">
+      <img src="../images/erreurs-virtualbox.png" alt="Les erreurs fréquentes dans VirtualBox" width="60%">
     </p>
 
     ### 13.1 Donner trop de mémoire à une machine virtuelle
@@ -740,8 +740,8 @@ Ce dossier donne les connaissances nécessaires pour préparer et installer deux
 
     Marche à suivre :
 
-    1. [Télécharger le QCM du palier 2](QCM%20du%20palier%202-1.pdf), puis répondez à toutes les questions.
+    1. [Télécharger le QCM du palier 2](eleve/qcm-palier-2.pdf), puis répondez à toutes les questions.
     2. Faites valider votre QCM. Tant qu’il n’est pas correct à 100 %, vous ne passez pas à l’activité.
-    3. Une fois le QCM validé à 100 %, [télécharger l’activité : installer deux machines virtuelles avec VirtualBox](Activit%C3%A9%20du%20palier%202%20-%20installer%20deux%20machines%20virtuelles%20avec%20VirtualBox.pdf) et réalisez les étapes demandées.
+    3. Une fois le QCM validé à 100 %, [télécharger l’activité : installer deux machines virtuelles avec VirtualBox](eleve/activite-palier-2.pdf) et réalisez les étapes demandées.
 
     Pendant l’activité, vous devrez revenir dans ce dossier technique chaque fois que vous aurez besoin d’une information.
