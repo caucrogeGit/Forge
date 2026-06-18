@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge iot:listen`` — IOT-SUBSCRIBER-CLI-001 /
 IOT-LISTEN-RESILIENCE-001.
 
@@ -35,7 +36,10 @@ from __future__ import annotations
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from forge_mvc_iot.mqtt.contract import ContractError, Measurement
 
 __all__ = [
     "ListenStats",
@@ -193,8 +197,8 @@ class _StorageListener:
 def _default_subscriber_factory(
     *,
     config: Any,
-    on_measurement: Callable,
-    on_contract_error: Callable,
+    on_measurement: Callable[[Measurement], None],
+    on_contract_error: Callable[[ContractError, str, bytes], None],
 ) -> Any:
     """Construit un ``MqttSubscriber`` (import paresseux du subscriber).
 

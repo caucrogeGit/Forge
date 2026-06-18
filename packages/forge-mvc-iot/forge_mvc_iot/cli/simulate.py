@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge iot:simulate`` — IOT-SIMULATOR-001.
 
 Publie des mesures **factices** mais **conformes au contrat MQTT Forge
@@ -38,6 +39,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
+from forge_mvc_iot.config import IotConfig
 from forge_mvc_iot.mqtt.contract import ContractError, parse_message
 from forge_mvc_iot.mqtt.tls import configure_tls
 
@@ -275,7 +277,7 @@ def parse_args(args: list[str]) -> SimulateOptions:
 # ── Client MQTT (import paho paresseux) ──────────────────────────────────────
 
 
-def _default_client_factory(config) -> Any:
+def _default_client_factory(config: IotConfig) -> Any:
     """Construit le client ``paho-mqtt`` par défaut (import paresseux).
 
     Aligné sur ``forge_mvc_iot.mqtt.subscriber`` et le doctor : ``paho``
@@ -284,13 +286,13 @@ def _default_client_factory(config) -> Any:
     import paho.mqtt.client as mqtt  # noqa: PLC0415
 
     return mqtt.Client(
-        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,  # pyright: ignore[reportPrivateImportUsage]
         client_id=config.mqtt_client_id,
     )
 
 
 def publish_measurements(
-    config,
+    config: IotConfig,
     options: SimulateOptions,
     *,
     client_factory: Callable[..., Any] | None = None,

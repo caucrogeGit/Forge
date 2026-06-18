@@ -1,3 +1,4 @@
+# pyright: strict
 """Contrat SQL des événements IoT — IOT-STORAGE-EVENTS-001.
 
 Module **pur** : ne se connecte à aucune base de données, n'applique
@@ -16,6 +17,7 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
+from typing import Any
 
 from forge_mvc_iot.mqtt.contract import Measurement
 
@@ -113,7 +115,7 @@ def build_insert_iot_event_sql(
     measurement: Measurement,
     *,
     received_at: datetime | None = None,
-) -> tuple[str, tuple]:
+) -> tuple[str, tuple[Any, ...]]:
     """Construit la requête SQL d'insertion et son tuple de paramètres.
 
     Retourne ``(sql, params)`` directement consommable par le futur

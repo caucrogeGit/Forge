@@ -1,3 +1,4 @@
+# pyright: strict
 """Repository d'insertion des événements IoT — IOT-STORAGE-REPOSITORY-001.
 
 Premier branchement réel entre le contrat de stockage (``events.py``)
@@ -91,17 +92,17 @@ class DbAdapter(Protocol):
     dicts).
     """
 
-    def execute(self, sql: str, params: tuple) -> Any:  # pragma: no cover - protocole
+    def execute(self, sql: str, params: tuple[Any, ...]) -> Any:  # pragma: no cover - protocole
         ...
 
-    def fetch_one(self, sql: str, params: tuple) -> dict | None:  # pragma: no cover - protocole
+    def fetch_one(self, sql: str, params: tuple[Any, ...]) -> dict[str, Any] | None:  # pragma: no cover - protocole
         ...
 
-    def fetch_all(self, sql: str, params: tuple) -> list[dict]:  # pragma: no cover - protocole
+    def fetch_all(self, sql: str, params: tuple[Any, ...]) -> list[dict[str, Any]]:  # pragma: no cover - protocole
         ...
 
 
-def _default_db_adapter() -> Any:
+def _default_db_adapter() -> DbAdapter:
     """Importe paresseusement le module ``core.database.db`` de Forge.
 
     L'import est différé jusqu'à la construction du repository sans
@@ -138,10 +139,10 @@ class IotEventRepository:
       `commit` ou `rollback` manuel.
     """
 
-    def __init__(self, db_adapter: Any | None = None) -> None:
+    def __init__(self, db_adapter: DbAdapter | None = None) -> None:
         if db_adapter is None:
             db_adapter = _default_db_adapter()
-        self._db = db_adapter
+        self._db: DbAdapter = db_adapter
 
     def insert(
         self,
@@ -217,7 +218,7 @@ class IotEventRepository:
 
 
 def _validate_limit(limit: int) -> int:
-    if isinstance(limit, bool) or not isinstance(limit, int):
+    if isinstance(limit, bool) or not isinstance(limit, int):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError(
             f"limit doit être un int (vu : {type(limit).__name__})"
         )
@@ -230,7 +231,7 @@ def _validate_limit(limit: int) -> int:
     return limit
 
 
-def _row_to_event_dict(row: dict) -> dict[str, object]:
+def _row_to_event_dict(row: dict[str, Any]) -> dict[str, object]:
     """Transforme une ligne SQL brute en dict consommable.
 
     - ``metadata_json`` (string JSON ou ``None``) → ``metadata``
@@ -239,7 +240,7 @@ def _row_to_event_dict(row: dict) -> dict[str, object]:
     - Les autres colonnes sont passées telles quelles.
     """
     metadata_json = row.get("metadata_json")
-    metadata: dict | None
+    metadata: dict[str, Any] | None
     if metadata_json is None:
         metadata = None
     else:

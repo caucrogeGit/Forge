@@ -37,4 +37,5 @@ include = ["forge_mvc_iot*"]
 [tool.setuptools.package-data]
 forge_mvc_iot = [
     "migrations/*.sql",
+    "py.typed",
 ]

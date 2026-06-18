@@ -1,3 +1,4 @@
+# pyright: strict
 """Diagnostic ``forge iot:doctor`` — IOT-DOCTOR-001 / IOT-DOCTOR-DB-001 /
 IOT-DOCTOR-MQTT-001.
 
@@ -33,6 +34,12 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Literal
+
+from forge_mvc_iot.config import IotConfig
+
+# Accesseurs DB injectables (signatures de ``core.database.db``).
+_FetchOne = Callable[[str, tuple[Any, ...]], "dict[str, Any] | None"]
+_FetchAll = Callable[[str, tuple[Any, ...]], "list[dict[str, Any]]"]
 
 __all__ = [
     "CheckResult",
@@ -152,7 +159,7 @@ def check_migration_present() -> CheckResult:
 
         anchor = resources.files("forge_mvc_iot") / "migrations"
         candidates = sorted(
-            entry for entry in anchor.iterdir()
+            entry.name for entry in anchor.iterdir()
             if entry.name.endswith("_create_iot_events.sql")
         )
     except (ImportError, ModuleNotFoundError, FileNotFoundError) as exc:
@@ -174,7 +181,7 @@ def check_migration_present() -> CheckResult:
     return CheckResult(
         status="ok",
         label="migration iot_events",
-        detail=f"présente ({candidates[0].name})",
+        detail=f"présente ({candidates[0]})",
     )
 
 
@@ -230,7 +237,7 @@ def _is_table_missing_error(exc: Exception) -> bool:
     return "doesn't exist" in str(exc).lower()
 
 
-def check_database_table(fetch_one_func=None) -> CheckResult:
+def check_database_table(fetch_one_func: _FetchOne | None = None) -> CheckResult:
     """Vérifie l'accès à la table ``iot_events``.
 
     Le paramètre ``fetch_one_func`` permet l'injection en test (mock).
@@ -373,7 +380,7 @@ def _type_matches(contract: _ColumnContract, data_type: str, column_type: str) -
     return True
 
 
-def check_database_schema(*, fetch_all_func=None) -> CheckResult:
+def check_database_schema(*, fetch_all_func: _FetchAll | None = None) -> CheckResult:
     """Vérifie que le schéma réel de ``iot_events`` respecte le contrat IoT.
 
     Lit ``INFORMATION_SCHEMA.COLUMNS`` (plus propre et plus testable qu'un
@@ -486,7 +493,7 @@ def check_database_schema(*, fetch_all_func=None) -> CheckResult:
     )
 
 
-def _default_mqtt_client_factory(config) -> Any:
+def _default_mqtt_client_factory(config: IotConfig) -> Any:
     """Construit le client ``paho-mqtt`` par défaut pour le diagnostic.
 
     Import **paresseux** de ``paho`` : tant que ``check_mqtt_broker`` n'est
@@ -496,7 +503,7 @@ def _default_mqtt_client_factory(config) -> Any:
     import paho.mqtt.client as mqtt  # noqa: PLC0415
 
     return mqtt.Client(
-        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,  # pyright: ignore[reportPrivateImportUsage]
         client_id=config.mqtt_client_id,
     )
 
@@ -518,7 +525,7 @@ def _is_mqtt_auth_failure(reason_code: Any) -> bool:
 
 
 def check_mqtt_broker(
-    config,
+    config: IotConfig,
     *,
     client_factory: Callable[..., Any] | None = None,
     connect_timeout: float = _MQTT_CONNECT_TIMEOUT,
@@ -561,7 +568,9 @@ def check_mqtt_broker(
     connack = threading.Event()
     holder: dict[str, Any] = {"reason_code": None}
 
-    def _on_connect(cl, userdata, flags, reason_code, properties=None):
+    def _on_connect(
+        cl: Any, userdata: Any, flags: Any, reason_code: Any, properties: Any = None
+    ) -> None:
         holder["reason_code"] = reason_code
         connack.set()
 

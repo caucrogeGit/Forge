@@ -1,3 +1,4 @@
+# pyright: strict
 """Parsing et validation du contrat MQTT Forge IoT — IOT-MQTT-CONTRACT-001.
 
 Ce module est **pur** : il ne dépend pas de ``paho-mqtt``, il ne se
@@ -22,6 +23,7 @@ import json
 import re
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any, cast
 
 __all__ = [
     "CODE_TOPIC_PATTERN",
@@ -110,7 +112,7 @@ def parse_topic(topic: str) -> tuple[str, str]:
     return match.group(1), match.group(2)
 
 
-def parse_payload(payload: str | bytes) -> dict:
+def parse_payload(payload: str | bytes) -> dict[str, Any]:
     """Décode et parse le payload JSON. Retourne le dict brut.
 
     Lève ``ContractError(CODE_PAYLOAD_PARSE, ...)`` si :
@@ -142,10 +144,10 @@ def parse_payload(payload: str | bytes) -> dict:
             f"Le payload doit être un objet JSON "
             f"(reçu : {type(data).__name__})",
         )
-    return data
+    return cast("dict[str, Any]", data)
 
 
-def _validate_required_fields(data: dict) -> None:
+def _validate_required_fields(data: dict[str, Any]) -> None:
     for field in ("kind", "value", "unit", "timestamp"):
         if field not in data:
             raise ContractError(
@@ -154,7 +156,7 @@ def _validate_required_fields(data: dict) -> None:
             )
 
 
-def _validate_types(data: dict) -> None:
+def _validate_types(data: dict[str, Any]) -> None:
     kind = data["kind"]
     if not isinstance(kind, str):
         raise ContractError(
@@ -193,7 +195,7 @@ def _validate_types(data: dict) -> None:
                 f"metadata doit être un objet "
                 f"(reçu : {type(metadata).__name__})",
             )
-        for key, mvalue in metadata.items():
+        for key, mvalue in cast("dict[Any, Any]", metadata).items():
             if not isinstance(mvalue, str):
                 raise ContractError(
                     CODE_PAYLOAD_FIELD_TYPE,
@@ -202,7 +204,7 @@ def _validate_types(data: dict) -> None:
                 )
 
 
-def _validate_formats(data: dict) -> None:
+def _validate_formats(data: dict[str, Any]) -> None:
     kind = data["kind"]
     if not _KIND_RE.match(kind):
         raise ContractError(
@@ -245,13 +247,13 @@ def parse_message(topic: str, payload: str | bytes) -> Measurement:
     _validate_types(data)
     _validate_formats(data)
 
-    metadata = data.get("metadata")
     # On normalise l'absence et la valeur None à None pour avoir un
-    # comportement stable côté consommateur.
-    if metadata == {}:
-        metadata = {}  # garde un dict vide explicite
-    elif metadata is None:
-        metadata = None
+    # comportement stable côté consommateur ; un objet présent a déjà été
+    # validé (clés/valeurs str) par ``_validate_types``.
+    raw_metadata = data.get("metadata")
+    metadata: dict[str, str] | None = (
+        cast("dict[str, str]", raw_metadata) if isinstance(raw_metadata, dict) else None
+    )
 
     return Measurement(
         site=site,

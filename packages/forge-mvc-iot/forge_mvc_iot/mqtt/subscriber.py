@@ -1,3 +1,4 @@
+# pyright: strict
 """Subscriber MQTT Forge IoT — pont vers ``paho-mqtt``.
 
 Ce module branche le contrat documenté (``contract.py``) sur un client
@@ -49,7 +50,7 @@ def _default_client_factory(config: IotConfig) -> Any:
     import paho.mqtt.client as mqtt  # noqa: PLC0415
 
     return mqtt.Client(
-        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,  # pyright: ignore[reportPrivateImportUsage]
         client_id=config.mqtt_client_id,
     )
 
