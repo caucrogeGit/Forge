@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge video:upload`` — VIDEO-UPLOAD-CLI-001.
 
 Entrée d'upload **officielle** d'une vidéo source : lit le fichier, le valide
@@ -15,8 +16,12 @@ N'exécute aucun ffmpeg (pas de traitement en ligne) : relancer
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
+from typing import Any
 
+from forge_mvc_video.config import VideoConfig
 from forge_mvc_video.ingest import VideoIngestError, ingest_video
+from forge_mvc_video.storage.repository import VideoRepository
 
 __all__ = ["run_upload", "main"]
 
@@ -59,10 +64,10 @@ def _parse_title(args: list[str]) -> tuple[str | None, list[str]]:
 def run_upload(
     args: list[str],
     *,
-    config=None,
-    repository=None,
-    ingest_fn=None,
-    read_file=None,
+    config: VideoConfig | None = None,
+    repository: VideoRepository | None = None,
+    ingest_fn: Callable[..., dict[str, Any]] | None = None,
+    read_file: Callable[[str], bytes] | None = None,
 ) -> int:
     """Cœur testable de ``video:upload``. Briques injectables.
 

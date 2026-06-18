@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge video:cleanup`` — VIDEO-CLEANUP-001.
 
 Purge sûre de l'opt-in vidéo. **dry-run par défaut** : liste ce qui SERAIT
@@ -19,8 +20,9 @@ chemins issus de la base).
 from __future__ import annotations
 
 import os
+from collections.abc import Callable, Iterator
 
-from forge_mvc_video.config import load_video_config
+from forge_mvc_video.config import VideoConfig, load_video_config
 from forge_mvc_video.storage.repository import STATUS_FAILED, VideoRepository
 
 __all__ = ["run_cleanup", "main"]
@@ -44,7 +46,7 @@ def _safe_abspath(storage_root: str, relpath: str) -> str | None:
     return None
 
 
-def _iter_storage_files(storage_root: str):
+def _iter_storage_files(storage_root: str) -> Iterator[tuple[str, str]]:
     """Itère ``(relpath_posix, abspath)`` de tous les fichiers sous la racine."""
     root = os.path.realpath(storage_root)
     if not os.path.isdir(root):
@@ -59,9 +61,9 @@ def _iter_storage_files(storage_root: str):
 def run_cleanup(
     args: list[str],
     *,
-    config=None,
-    repository=None,
-    remove_file=None,
+    config: VideoConfig | None = None,
+    repository: VideoRepository | None = None,
+    remove_file: Callable[[str], None] | None = None,
 ) -> int:
     """Cœur testable de ``video:cleanup``. Briques injectables.
 
@@ -100,7 +102,7 @@ def run_cleanup(
 
     if do_failed:
         for row in repo.list_by_status(STATUS_FAILED):
-            video_id = row.get("id")
+            video_id = row["id"]
             for key in ("original_path", "mp4_path", "poster_path"):
                 rel = row.get(key)
                 if rel:

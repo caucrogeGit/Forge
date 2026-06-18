@@ -1,3 +1,4 @@
+# pyright: strict
 """Extraction de métadonnées vidéo via ffprobe — VIDEO-PROBE-METADATA-001.
 
 ``probe_video`` lance ``ffprobe`` (lecture seule) sur une source et en extrait
@@ -16,6 +17,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any, cast
 
 from forge_mvc_video.config import VideoConfig, load_video_config
 
@@ -68,7 +70,17 @@ def _default_runner(ffprobe_bin: str, path: str) -> str:
     return result.stdout
 
 
-def _int_or_none(value) -> int | None:
+def _as_dict(value: object) -> dict[str, Any]:
+    """Vue typée d'une valeur JSON décodée si c'est un objet, sinon ``{}``."""
+    return cast("dict[str, Any]", value) if isinstance(value, dict) else {}
+
+
+def _as_list(value: object) -> list[Any]:
+    """Vue typée d'une valeur JSON décodée si c'est un tableau, sinon ``[]``."""
+    return cast("list[Any]", value) if isinstance(value, list) else []
+
+
+def _int_or_none(value: Any) -> int | None:
     if value is None or str(value).strip() == "":
         return None
     try:
@@ -77,19 +89,26 @@ def _int_or_none(value) -> int | None:
         return None
 
 
-def parse_probe_json(payload: str | dict) -> VideoMetadata:
+def parse_probe_json(payload: str | dict[str, Any]) -> VideoMetadata:
     """Parse la sortie ffprobe (``-print_format json``) en ``VideoMetadata``.
 
     Lève ``VideoProbeError`` si la sortie est illisible ou sans flux vidéo.
     """
-    data = json.loads(payload) if isinstance(payload, str) else payload
-    streams = data.get("streams", []) if isinstance(data, dict) else []
-    fmt = data.get("format", {}) if isinstance(data, dict) else {}
+    raw: object = json.loads(payload) if isinstance(payload, str) else payload
+    data = _as_dict(raw)
+    streams = _as_list(data.get("streams"))
+    fmt = _as_dict(data.get("format"))
 
-    video = next((s for s in streams if s.get("codec_type") == "video"), None)
+    video = next(
+        (sd for s in streams if (sd := _as_dict(s)).get("codec_type") == "video"),
+        None,
+    )
     if video is None:
         raise VideoProbeError("aucun flux vidéo détecté")
-    audio = next((s for s in streams if s.get("codec_type") == "audio"), None)
+    audio = next(
+        (sd for s in streams if (sd := _as_dict(s)).get("codec_type") == "audio"),
+        None,
+    )
 
     duration = fmt.get("duration") or video.get("duration")
     return VideoMetadata(

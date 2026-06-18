@@ -39,4 +39,5 @@ include = ["forge_mvc_video*"]
 [tool.setuptools.package-data]
 forge_mvc_video = [
     "migrations/*.sql",
+    "py.typed",
 ]

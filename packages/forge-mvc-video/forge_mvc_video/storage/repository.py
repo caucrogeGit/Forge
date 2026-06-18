@@ -1,3 +1,4 @@
+# pyright: strict
 """Repository de la table ``videos`` — VIDEO-UPLOAD-STORE-001.
 
 Persistance du cycle de vie d'une vidéo (uploaded → processing →
@@ -70,20 +71,20 @@ _SELECT_ALL_PATHS_SQL = "SELECT original_path, mp4_path, poster_path FROM videos
 class DbAdapter(Protocol):
     """Interface attendue, conforme à ``core.database.db``."""
 
-    def insert(self, sql: str, params: tuple) -> int:  # pragma: no cover - protocole
+    def insert(self, sql: str, params: tuple[Any, ...]) -> int:  # pragma: no cover - protocole
         ...
 
-    def execute(self, sql: str, params: tuple) -> Any:  # pragma: no cover - protocole
+    def execute(self, sql: str, params: tuple[Any, ...]) -> Any:  # pragma: no cover - protocole
         ...
 
-    def fetch_one(self, sql: str, params: tuple) -> dict | None:  # pragma: no cover - protocole
+    def fetch_one(self, sql: str, params: tuple[Any, ...]) -> dict[str, Any] | None:  # pragma: no cover - protocole
         ...
 
-    def fetch_all(self, sql: str, params: tuple) -> list[dict]:  # pragma: no cover - protocole
+    def fetch_all(self, sql: str, params: tuple[Any, ...]) -> list[dict[str, Any]]:  # pragma: no cover - protocole
         ...
 
 
-def _default_db_adapter() -> Any:
+def _default_db_adapter() -> DbAdapter:
     """Importe paresseusement ``core.database.db`` (aucune connexion à l'import)."""
     from core.database import db
 
@@ -118,10 +119,10 @@ class VideoRepository:
             (uuid, title, original_path, size_bytes, mime_type, STATUS_UPLOADED, ts, ts),
         )
 
-    def get_by_uuid(self, uuid: str) -> dict | None:
+    def get_by_uuid(self, uuid: str) -> dict[str, Any] | None:
         return self._db.fetch_one(_SELECT_BY_UUID_SQL, (uuid,))
 
-    def get_by_id(self, video_id: int) -> dict | None:
+    def get_by_id(self, video_id: int) -> dict[str, Any] | None:
         return self._db.fetch_one(_SELECT_BY_ID_SQL, (video_id,))
 
     def update_status(
@@ -169,10 +170,10 @@ class VideoRepository:
             (STATUS_READY, mp4_path, poster_path, now or _utcnow(), video_id),
         )
 
-    def list_recent(self, limit: int = 50) -> list[dict]:
+    def list_recent(self, limit: int = 50) -> list[dict[str, Any]]:
         return self._db.fetch_all(_SELECT_RECENT_SQL, (int(limit),))
 
-    def list_by_status(self, status: str, limit: int = 100) -> list[dict]:
+    def list_by_status(self, status: str, limit: int = 100) -> list[dict[str, Any]]:
         return self._db.fetch_all(_SELECT_BY_STATUS_SQL, (status, int(limit)))
 
     def delete(self, video_id: int) -> None:

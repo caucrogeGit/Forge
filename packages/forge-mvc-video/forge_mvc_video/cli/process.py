@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge video:process`` — VIDEO-CLI-001.
 
 Déclenche le traitement (probe + poster + transcodage MP4) d'une vidéo, ou de
@@ -14,6 +15,10 @@ ffmpeg/ffprobe sont requis pour le transcodage (vérifier avec
 """
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import Any
+
+from forge_mvc_video.config import VideoConfig
 from forge_mvc_video.process import VideoProcessError, process_video
 from forge_mvc_video.storage.repository import (
     STATUS_UPLOADED,
@@ -32,8 +37,8 @@ def run_process(
     args: list[str],
     *,
     repository: VideoRepository | None = None,
-    config=None,
-    process_fn=None,
+    config: VideoConfig | None = None,
+    process_fn: Callable[..., dict[str, Any]] | None = None,
 ) -> int:
     """Cœur testable de ``video:process``. Briques injectables.
 

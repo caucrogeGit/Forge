@@ -1,3 +1,4 @@
+# pyright: strict
 """Traitement d'une vidéo (worker) — VIDEO-PROCESS-MP4-001.
 
 ``process_video`` assemble les briques : il fait avancer une vidéo
@@ -11,16 +12,23 @@ Modèle **worker CLI → base** : appelé hors requête HTTP (par
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 from forge_mvc_video.config import VideoConfig, load_video_config
-from forge_mvc_video.probe import VideoProbeError, probe_video
+from forge_mvc_video.probe import VideoMetadata, VideoProbeError, probe_video
 from forge_mvc_video.storage.files import mp4_relpath, poster_relpath
 from forge_mvc_video.storage.repository import VideoRepository
 from forge_mvc_video.transcode import FfmpegError, generate_poster, transcode_to_mp4
 
 __all__ = ["VideoProcessError", "process_video"]
+
+# Briques injectables : probe (chemin → métadonnées) et poster/transcode
+# (source, destination → effet de bord ffmpeg).
+_ProbeFn = Callable[[str], VideoMetadata]
+_OutputFn = Callable[[str, str], None]
 
 
 class VideoProcessError(Exception):
@@ -32,11 +40,11 @@ def process_video(
     *,
     config: VideoConfig | None = None,
     repository: VideoRepository | None = None,
-    probe_fn=None,
-    poster_fn=None,
-    transcode_fn=None,
+    probe_fn: _ProbeFn | None = None,
+    poster_fn: _OutputFn | None = None,
+    transcode_fn: _OutputFn | None = None,
     now: datetime | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Traite la vidéo ``video_id`` ; retourne ``{id, status, ...}``.
 
     ``status`` vaut ``ready`` ou ``failed``. Lève ``VideoProcessError`` si la
@@ -55,11 +63,11 @@ def process_video(
     root = Path(cfg.storage_root)
     original_abs = str(root / row["original_path"])
 
-    probe = probe_fn or (lambda p: probe_video(p, config=cfg))
-    poster = poster_fn or (
+    probe: _ProbeFn = probe_fn or (lambda p: probe_video(p, config=cfg))
+    poster: _OutputFn = poster_fn or (
         lambda src, dst: generate_poster(src, dst, ffmpeg_bin=cfg.ffmpeg_bin)
     )
-    transcode = transcode_fn or (
+    transcode: _OutputFn = transcode_fn or (
         lambda src, dst: transcode_to_mp4(src, dst, ffmpeg_bin=cfg.ffmpeg_bin)
     )
 

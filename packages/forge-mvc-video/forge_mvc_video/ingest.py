@@ -1,3 +1,4 @@
+# pyright: strict
 """Ingestion d'une vidéo source — VIDEO-UPLOAD-STORE-001.
 
 ``ingest_video`` : valide (taille, extension), stocke la source à un
@@ -13,6 +14,7 @@ from __future__ import annotations
 
 import mimetypes
 from datetime import UTC, datetime
+from typing import Any
 from uuid import uuid4
 
 from forge_mvc_video.config import VideoConfig, load_video_config
@@ -38,7 +40,7 @@ def ingest_video(
     config: VideoConfig | None = None,
     repository: VideoRepository | None = None,
     now: datetime | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Valide, stocke et enregistre une vidéo source.
 
     Retourne un dict ``{id, uuid, title, original_path, size_bytes, status}``.
