@@ -116,7 +116,7 @@ Vous devrez aussi créer un **instantané** afin de pouvoir revenir à un état 
 
 ---
 
-### Palier 3 : Tester les modes réseau de VirtualBox
+### Palier 3 : Réseau IP et communication entre l’hôte et les machines virtuelles
 
 Dans ce palier, vous allez tester les communications entre :
 
@@ -131,7 +131,9 @@ Vous comparerez plusieurs modes réseau de VirtualBox :
 * le réseau interne ;
 * le réseau privé hôte, si ce mode est disponible.
 
-[Non encore disponible]
+Pour interpréter ces tests, vous apprendrez d’abord les bases de l’adressage IP : l’adresse IP, le masque réseau, et les commandes pour lire la configuration réseau d’une machine.
+
+[Ouvrir le palier 3 : Réseau IP et communication entre l’hôte et les machines virtuelles](palier-3/palier-3-dossier-technique-reseau-virtualbox.md)
 
 ---
 
