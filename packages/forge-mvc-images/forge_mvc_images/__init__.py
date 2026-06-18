@@ -1,3 +1,4 @@
+# pyright: strict
 """Forge MVC Images — module opt-in propriétaire de tout l'image.
 
 Ce paquet **remplace** ``forge-mvc-media`` (ADR-018, convention pré-1.0 :

@@ -36,3 +36,6 @@ Documentation = "https://forgemvc.com/docs/forge/"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["forge_mvc_images*"]
+
+[tool.setuptools.package-data]
+"forge_mvc_images" = ["py.typed"]

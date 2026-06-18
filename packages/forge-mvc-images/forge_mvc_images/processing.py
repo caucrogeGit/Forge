@@ -1,3 +1,4 @@
+# pyright: strict
 """Traitement d'image Forge — validation de contenu, upload, variantes.
 
 Déplacé du core (``core/uploads/image.py``) vers l'opt-in ``forge-mvc-images``
@@ -17,6 +18,7 @@ import os
 from dataclasses import dataclass, replace
 from pathlib import Path
 from types import SimpleNamespace
+from typing import cast
 
 from PIL import Image, UnidentifiedImageError
 
@@ -29,7 +31,7 @@ from core.forms.upload_validation import validate_upload_metadata
 from forge_mvc_files import storage
 from forge_mvc_files.manager import (
     SavedUpload,
-    _read_upload,
+    _read_upload,  # pyright: ignore[reportPrivateUsage]
     save_upload as _core_save_upload,
     upload_root,
 )
@@ -124,7 +126,7 @@ def verify_image_content(data: bytes) -> None:
 
 
 def save_image(
-    file,
+    file: object,
     *,
     category: str = "images",
     entity_name: str | None = None,
@@ -158,10 +160,12 @@ def save_image(
     # image décodable AVANT de l'écrire sur le disque (charte §7).
     verify_image_content(data)
 
+    # validate_upload_metadata lève si le nom est absent : filename est ici un str.
+    safe_name = cast("str", filename)
     root = upload_root()
     saved_path = storage.save_bytes(
         data,
-        original_name=filename,
+        original_name=safe_name,
         category=category,
         root=root,
     )
@@ -169,7 +173,7 @@ def save_image(
 
     return MediaRecord(
         filename=saved_path.name,
-        original_name=filename,
+        original_name=safe_name,
         path=relative_path.as_posix(),
         category=category,
         size=len(data),
@@ -264,7 +268,7 @@ def _write_resized_image(image: Image.Image, target: Path, max_size: tuple[int, 
     variant.save(target)
 
 
-def save_image_upload(file, category: str = "images", *, variants: bool = True) -> SavedUpload:
+def save_image_upload(file: object, category: str = "images", *, variants: bool = True) -> SavedUpload:
     """Chemin d'upload **image-aware** : vérifie le contenu, écrit, génère les variantes.
 
     CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : ``core.uploads.save_upload`` est

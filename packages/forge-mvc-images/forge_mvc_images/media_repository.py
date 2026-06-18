@@ -1,9 +1,34 @@
+# pyright: strict
 from __future__ import annotations
 
-from pathlib import PurePosixPath
+from collections.abc import Sequence
+from pathlib import Path, PurePosixPath
+from typing import Any, Protocol
 
 # FILES-IMAGES-REPOINT-001 (ADR-019) : storage d'upload dans forge-mvc-files.
 from forge_mvc_files.storage import normalize_media_path
+
+
+class DbLike(Protocol):
+    """Frontière d'injection de la base : ``core.database.db`` (module) ou un
+    double de test. On ne déclare que les méthodes réellement utilisées ici.
+    """
+
+    def insert(self, sql: str, params: Sequence[Any] = ..., *, tx: Any = ...) -> int: ...
+    def execute(self, sql: str, params: Sequence[Any] = ..., *, tx: Any = ...) -> int: ...
+    def fetch_one(self, sql: str, params: Sequence[Any] = ..., *, tx: Any = ...) -> dict[str, Any] | None: ...
+    def fetch_all(self, sql: str, params: Sequence[Any] = ..., *, tx: Any = ...) -> list[dict[str, Any]]: ...
+
+
+class SavedUploadLike(Protocol):
+    """Objet « ressemblant à un SavedUpload » (duck-typing) attendu par
+    ``attach_media_to_entity`` : voir ``_validate_saved_upload``.
+    """
+
+    path: str
+    original_name: str
+    mime_type: str | None
+    size: int
 
 
 _SELECT_COLUMNS = """
@@ -32,7 +57,7 @@ def create_media_record(
     role: str = "default",
     position: int = 0,
     alt_text: str | None = None,
-    db=None,
+    db: DbLike | None = None,
 ) -> int:
     entity_name = _validate_entity_name(entity_name)
     entity_id = _validate_positive_int("entity_id", entity_id)
@@ -65,14 +90,14 @@ def create_media_record(
 
 
 def attach_media_to_entity(
-    saved_upload,
+    saved_upload: SavedUploadLike,
     *,
     entity_name: str,
     entity_id: int,
     role: str = "default",
     position: int | None = None,
     alt_text: str | None = None,
-    db=None,
+    db: DbLike | None = None,
 ) -> int:
     _validate_saved_upload(saved_upload)
     return create_media_record(
@@ -89,7 +114,7 @@ def attach_media_to_entity(
     )
 
 
-def get_media_record(media_id: int, *, db=None) -> dict | None:
+def get_media_record(media_id: int, *, db: DbLike | None = None) -> dict[str, Any] | None:
     media_id = _validate_positive_int("media_id", media_id)
     sql = f"""
         SELECT {_SELECT_COLUMNS}
@@ -104,8 +129,8 @@ def list_media_for_entity(
     entity_id: int,
     *,
     role: str | None = None,
-    db=None,
-) -> list[dict]:
+    db: DbLike | None = None,
+) -> list[dict[str, Any]]:
     entity_name = _validate_entity_name(entity_name)
     entity_id = _validate_positive_int("entity_id", entity_id)
 
@@ -124,7 +149,7 @@ def list_media_for_entity(
     return _db(db).fetch_all(sql, tuple(params)) or []
 
 
-def update_media_alt_text(media_id: int, alt_text: str | None, *, db=None) -> None:
+def update_media_alt_text(media_id: int, alt_text: str | None, *, db: DbLike | None = None) -> None:
     media_id = _validate_positive_int("media_id", media_id)
     if alt_text is not None:
         alt_text = alt_text.strip() or None
@@ -136,7 +161,7 @@ def update_media_alt_text(media_id: int, alt_text: str | None, *, db=None) -> No
     )
 
 
-def update_media_position(media_id: int, position: int, *, db=None) -> None:
+def update_media_position(media_id: int, position: int, *, db: DbLike | None = None) -> None:
     media_id = _validate_positive_int("media_id", media_id)
     position = _validate_non_negative_int("position", position)
     _db(db).execute(
@@ -145,7 +170,7 @@ def update_media_position(media_id: int, position: int, *, db=None) -> None:
     )
 
 
-def delete_media_record(media_id: int, *, db=None) -> bool:
+def delete_media_record(media_id: int, *, db: DbLike | None = None) -> bool:
     media_id = _validate_positive_int("media_id", media_id)
     rowcount = _db(db).execute("DELETE FROM media WHERE Id = ?", (media_id,))
     return rowcount > 0
@@ -156,9 +181,9 @@ def delete_media(
     *,
     delete_files: bool = False,
     variants: bool = True,
-    db=None,
-    root=None,
-) -> dict:
+    db: DbLike | None = None,
+    root: str | Path | None = None,
+) -> dict[str, Any]:
     media_id = _validate_positive_int("media_id", media_id)
     media = get_media_record(media_id, db=db)
     if media is None:
@@ -167,7 +192,7 @@ def delete_media(
             "deleted_files": {},
         }
 
-    deleted_files = {}
+    deleted_files: dict[str, bool] = {}
     if delete_files:
         from forge_mvc_files import delete_media_file
 
@@ -179,7 +204,7 @@ def delete_media(
     }
 
 
-def _db(db):
+def _db(db: DbLike | None) -> DbLike:
     if db is not None:
         return db
     from core.database import db as database
@@ -188,30 +213,30 @@ def _db(db):
 
 
 def _validate_entity_name(value: str) -> str:
-    if not isinstance(value, str) or not value.strip():
+    if not isinstance(value, str) or not value.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("entity_name est obligatoire.")
     return value.strip()
 
 
 def _validate_role(value: str) -> str:
-    if not isinstance(value, str) or not value.strip():
+    if not isinstance(value, str) or not value.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("role est obligatoire.")
     return value.strip()
 
 
 def _validate_positive_int(name: str, value: int) -> int:
-    if not isinstance(value, int) or value < 1:
+    if not isinstance(value, int) or value < 1:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError(f"{name} doit etre un entier positif.")
     return value
 
 
 def _validate_non_negative_int(name: str, value: int) -> int:
-    if not isinstance(value, int) or value < 0:
+    if not isinstance(value, int) or value < 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError(f"{name} doit etre un entier positif ou nul.")
     return value
 
 
-def _validate_saved_upload(value) -> None:
+def _validate_saved_upload(value: object) -> None:
     required = ("path", "original_name", "mime_type", "size")
     if value is None or any(not hasattr(value, attr) for attr in required):
         raise TypeError("saved_upload doit ressembler a un SavedUpload.")
