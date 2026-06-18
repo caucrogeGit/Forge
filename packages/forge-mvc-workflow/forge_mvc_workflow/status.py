@@ -1,3 +1,4 @@
+# pyright: strict
 """Statuts génériques de workflow pour Forge."""
 
 from __future__ import annotations
@@ -35,7 +36,7 @@ def normalize_status_name(value: str) -> str:
     Only spaces and hyphens are converted to underscores. Any other
     non-alphanumeric character causes a WorkflowStatusError.
     """
-    if not isinstance(value, str):
+    if not isinstance(value, str):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise WorkflowStatusError("Le nom de statut doit être une chaîne.")
     lowered = value.strip().lower()
     if _UNSAFE_CHARS_RE.search(lowered):
@@ -50,7 +51,7 @@ def normalize_status_name(value: str) -> str:
 
 def validate_status_name(value: str) -> str:
     """Validate and return a normalized status name, or raise WorkflowStatusError."""
-    if not isinstance(value, str):
+    if not isinstance(value, str):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise WorkflowStatusError("Le nom de statut doit être une chaîne.")
     if not value or not value.strip():
         raise WorkflowStatusError("Le nom de statut ne peut pas être vide.")
