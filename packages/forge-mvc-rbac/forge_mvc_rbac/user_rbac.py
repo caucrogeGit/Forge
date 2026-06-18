@@ -1,3 +1,4 @@
+# pyright: strict
 """Association optionnelle entre utilisateurs Auth/User et roles RBAC.
 
 Ce module ne charge aucune permission et ne modifie pas le moteur RBAC. Il
@@ -8,7 +9,7 @@ from __future__ import annotations
 
 import secrets
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from core.auth.exceptions import InvalidAuthUserError
 
@@ -79,6 +80,7 @@ def normalize_auth_user_role(data: Any) -> AuthUserRole:
 
     validate_auth_user_role_contract(data)
 
+    data = cast("dict[str, Any]", data)
     return AuthUserRole(
         user_id=data["user_id"],
         role_id=data["role_id"],

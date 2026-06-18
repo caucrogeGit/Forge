@@ -1,3 +1,4 @@
+# pyright: strict
 """Chargeur du contrat RBAC depuis mvc/security/rbac.json.
 
 Ce module charge et valide le contrat déclaratif RBAC d'un projet Forge.
@@ -14,10 +15,10 @@ from __future__ import annotations
 
 import functools
 import json
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from core.http.response import Response          # noqa: E402
 from core.security.session import get_user       # noqa: E402
@@ -49,7 +50,7 @@ class RbacContractResult:
     path: str
     roles_count: int = 0
     entities_count: int = 0
-    errors: list[RbacContractError] = field(default_factory=list)
+    errors: list[RbacContractError] = field(default_factory=list[RbacContractError])
     data: dict[str, Any] | None = None
 
 
@@ -69,14 +70,14 @@ def _find_schemas_dir() -> Path | None:
     return None
 
 
-def _build_registry(schemas_dir: Path):
+def _build_registry(schemas_dir: Path) -> Any:
     try:
         from referencing import Registry, Resource
         from referencing.jsonschema import DRAFT202012
     except ImportError:
         return None
 
-    resources = []
+    resources: list[Any] = []
     for f in schemas_dir.glob("*.json"):
         try:
             schema = json.loads(f.read_text(encoding="utf-8"))
@@ -89,12 +90,14 @@ def _build_registry(schemas_dir: Path):
             pass
 
     try:
-        return Registry().with_resources(resources)
+        # referencing.Registry est générique ; ses paramètres de type ne sont
+        # pas résolus par pyright (dépendance optionnelle). Le retour est Any.
+        return Registry().with_resources(resources)  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType, reportUnknownArgumentType]
     except Exception:
         return None
 
 
-def _make_validator(schemas_dir: Path, registry):
+def _make_validator(schemas_dir: Path, registry: Any) -> Any:
     try:
         from jsonschema import Draft202012Validator
     except ImportError:
@@ -110,25 +113,25 @@ def _make_validator(schemas_dir: Path, registry):
     return None
 
 
-def _collect_errors(validator, instance: dict) -> list[RbacContractError]:
-    errors = []
+def _collect_errors(validator: Any, instance: dict[str, Any]) -> list[RbacContractError]:
+    errors: list[RbacContractError] = []
     for error in sorted(validator.iter_errors(instance), key=lambda e: str(e.absolute_path)):
         path = "$." + ".".join(str(p) for p in error.absolute_path) if error.absolute_path else "$"
         errors.append(RbacContractError(path=path, message=error.message))
     return errors
 
 
-def _count_roles(instance: dict) -> int:
+def _count_roles(instance: dict[str, Any]) -> int:
     roles = instance.get("roles")
-    return len(roles) if isinstance(roles, dict) else 0
+    return len(cast("dict[Any, Any]", roles)) if isinstance(roles, dict) else 0
 
 
-def _count_entities(instance: dict) -> int:
+def _count_entities(instance: dict[str, Any]) -> int:
     entities = instance.get("entities")
-    return len(entities) if isinstance(entities, dict) else 0
+    return len(cast("dict[Any, Any]", entities)) if isinstance(entities, dict) else 0
 
 
-def _result_degraded(path_str: str, instance: dict) -> RbacContractResult:
+def _result_degraded(path_str: str, instance: dict[str, Any]) -> RbacContractResult:
     return RbacContractResult(
         valid=True,
         exists=True,
@@ -207,9 +210,9 @@ def get_contract_permissions(result: RbacContractResult, roles: Iterable[str]) -
 
     permissions: set[str] = set()
     for role in roles:
-        role_perms = contract_roles.get(role)
+        role_perms = cast("dict[str, Any]", contract_roles).get(role)
         if isinstance(role_perms, list):
-            for perm in role_perms:
+            for perm in cast("list[Any]", role_perms):
                 if isinstance(perm, str) and perm.strip():
                     permissions.add(perm)
     return permissions
@@ -255,7 +258,7 @@ def require_contract_permission(
 # ---------------------------------------------------------------------------
 
 
-def get_request_roles(request) -> list[str]:
+def get_request_roles(request: Any) -> list[str]:
     """Extrait les rôles de la requête/session courante.
 
     Ordre de résolution :
@@ -268,7 +271,7 @@ def get_request_roles(request) -> list[str]:
     injected = getattr(request, "roles", None)
     if injected is not None:
         if isinstance(injected, list):
-            return [r for r in injected if isinstance(r, str)]
+            return [r for r in cast("list[Any]", injected) if isinstance(r, str)]
         return []
 
     try:
@@ -279,12 +282,12 @@ def get_request_roles(request) -> list[str]:
     if utilisateur:
         roles = utilisateur.get("roles", [])
         if isinstance(roles, list):
-            return [r for r in roles if isinstance(r, str)]
+            return [r for r in cast("list[Any]", roles) if isinstance(r, str)]
     return []
 
 
 def require_contract_permission_for_request(
-    request,
+    request: Any,
     permission: str,
     project_root: str | Path = ".",
 ) -> Response | None:
@@ -310,7 +313,7 @@ def require_contract_permission_for_request(
 def contract_permission_required(
     permission: str,
     project_root: str | Path = ".",
-):
+) -> Callable[..., Any]:
     """Décorateur opt-in protégeant une action avec une permission contractuelle.
 
     Charge mvc/security/rbac.json depuis project_root et vérifie si la
@@ -321,9 +324,9 @@ def contract_permission_required(
         def delete(request, article_id):
             ...
     """
-    def decorator(func):
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
-        def wrapper(request, *args, **kwargs):
+        def wrapper(request: Any, *args: Any, **kwargs: Any) -> Any:
             response = require_contract_permission_for_request(request, permission, project_root)
             if response is not None:
                 return response

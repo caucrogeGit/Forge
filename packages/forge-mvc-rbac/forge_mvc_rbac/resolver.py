@@ -1,3 +1,4 @@
+# pyright: strict
 """Resolution backend des permissions RBAC d'un utilisateur Auth/User.
 
 Ce module fait le pont de lecture user_id -> user_roles -> roles -> permissions.
@@ -86,7 +87,7 @@ def get_user_role_ids(
 
     role_ids: set[int] = set()
     for row in _fetch_rows(fetch_all, SELECT_USER_ROLE_IDS_SQL, (user_id,)):
-        if not isinstance(row, dict) or "role_id" not in row:
+        if not isinstance(row, dict) or "role_id" not in row:  # pyright: ignore[reportUnnecessaryIsInstance]
             raise AuthUserRbacResolverError("ligne user_roles invalide")
 
         role_id = row["role_id"]
@@ -107,7 +108,7 @@ def get_user_permissions(
 
     permissions: set[str] = set()
     for row in _fetch_rows(fetch_all, SELECT_USER_PERMISSIONS_SQL, (user_id,)):
-        if not isinstance(row, dict) or "code" not in row:
+        if not isinstance(row, dict) or "code" not in row:  # pyright: ignore[reportUnnecessaryIsInstance]
             raise AuthUserRbacResolverError("ligne permission RBAC invalide")
 
         code = row["code"]
@@ -130,7 +131,7 @@ def user_has_permission(
     """Retourne True si user_id possede permission. Par defaut, aucun acces."""
     try:
         validate_user_role_user_id(user_id)
-        if not isinstance(permission, str) or not permission.strip():
+        if not isinstance(permission, str) or not permission.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
 
         normalized = normalize_permission_code(permission)

@@ -1,3 +1,4 @@
+# pyright: strict
 """Protection serveur Auth/User branchee sur les permissions RBAC."""
 
 from __future__ import annotations
@@ -43,14 +44,14 @@ def require_user_permission(
     *,
     fetch_all: FetchAll | None = None,
     permission_checker: PermissionChecker | None = None,
-):
+) -> Callable[..., Any]:
     """Protege une route avec les permissions RBAC de l'utilisateur Auth/User."""
     normalized = normalize_permission_code(permission)
     validate_permission(normalized)
 
-    def decorator(func):
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        def wrapper(request: Any, *args: Any, **kwargs: Any):
+        def wrapper(request: Any, *args: Any, **kwargs: Any) -> Any:
             user_id = get_authenticated_user_id(request)
             if user_id is None:
                 return Response(

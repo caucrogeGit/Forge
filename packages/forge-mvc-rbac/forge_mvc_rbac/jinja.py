@@ -1,3 +1,4 @@
+# pyright: strict
 """Contexte Jinja Auth/User et RBAC.
 
 Cette couche expose des informations d'affichage aux templates. Elle ne
@@ -8,7 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from core.auth.session import (
     current_user as load_current_user,
@@ -37,15 +38,16 @@ def sanitize_jinja_user(user: Any) -> AuthJinjaUser | None:
         return AuthJinjaUser(id=user.id, email=user.email, is_active=user.is_active)
 
     if isinstance(user, dict):
-        user_id = user.get("id")
+        user_dict = cast("dict[str, Any]", user)
+        user_id = user_dict.get("id")
         if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
             return None
 
-        email = user.get("email")
+        email = user_dict.get("email")
         if email is not None and not isinstance(email, str):
             email = None
 
-        is_active = user.get("is_active")
+        is_active = user_dict.get("is_active")
         if is_active is not None and not isinstance(is_active, bool):
             is_active = None
 

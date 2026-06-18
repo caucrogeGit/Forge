@@ -1,3 +1,4 @@
+# pyright: strict
 """
 forge_mvc_rbac/rbac.py — Modèles génériques Role et Permission, autorisation
 
@@ -12,7 +13,9 @@ from __future__ import annotations
 
 import functools
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any
 
 
 # ---------------------------------------------------------------------------
@@ -28,7 +31,7 @@ class Role:
     description: str | None = None
 
     @classmethod
-    def from_row(cls, row: dict) -> "Role":
+    def from_row(cls, row: dict[str, Any]) -> "Role":
         return cls(
             id=row.get("id"),
             name=row["name"],
@@ -36,7 +39,7 @@ class Role:
             description=row.get("description"),
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "name": self.name,
@@ -53,7 +56,7 @@ class Permission:
     description: str | None = None
 
     @classmethod
-    def from_row(cls, row: dict) -> "Permission":
+    def from_row(cls, row: dict[str, Any]) -> "Permission":
         return cls(
             id=row.get("id"),
             code=row["code"],
@@ -61,7 +64,7 @@ class Permission:
             description=row.get("description"),
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "code": self.code,
@@ -157,7 +160,7 @@ class PermissionDenied(Exception):
     """Levée quand une permission requise est absente."""
 
 
-def get_request_permissions(request) -> set[str]:
+def get_request_permissions(request: Any) -> set[str]:
     """
     Résout les permissions de la requête courante.
 
@@ -175,7 +178,7 @@ def get_request_permissions(request) -> set[str]:
     return set()
 
 
-def has_permission(request, permission_code: str) -> bool:
+def has_permission(request: Any, permission_code: str) -> bool:
     """Retourne True si la requête possède la permission donnée."""
     return permission_code in get_request_permissions(request)
 
@@ -195,9 +198,9 @@ def require_permission(permission_code: str):
     validate_permission(permission_code)
     normalized = normalize_permission_code(permission_code)
 
-    def decorator(func):
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
-        def wrapper(request, *args, **kwargs):
+        def wrapper(request: Any, *args: Any, **kwargs: Any) -> Any:
             if not has_permission(request, normalized):
                 return Response(403, body=f"Permission required: {normalized}".encode())
             return func(request, *args, **kwargs)
@@ -205,7 +208,7 @@ def require_permission(permission_code: str):
     return decorator
 
 
-def make_can(request):
+def make_can(request: Any) -> Callable[[str], bool]:
     """
     Retourne un callable can(code) -> bool lié à la request courante.
 
