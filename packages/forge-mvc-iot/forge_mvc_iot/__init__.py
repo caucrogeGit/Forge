@@ -1,3 +1,4 @@
+# pyright: strict
 """Forge IoT — module opt-in pour la réception et l'exposition de données IoT.
 
 L'API publique se construit ticket par ticket. À ce stade :
@@ -19,6 +20,6 @@ from __future__ import annotations
 
 from forge_mvc_iot.http import register_iot_routes
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"
 
 __all__ = ["register_iot_routes"]

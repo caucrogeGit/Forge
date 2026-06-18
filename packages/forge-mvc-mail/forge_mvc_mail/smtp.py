@@ -1,3 +1,4 @@
+# pyright: strict
 """core/mail/smtp.py — SMTPMailer legacy (conservé pour compatibilité ascendante).
 
 SMTPMailer est conservé provisoirement pour les projets et tests qui l'utilisent.

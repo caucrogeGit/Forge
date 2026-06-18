@@ -1,3 +1,4 @@
+# pyright: strict
 """Runner ffmpeg : transcodage MP4 + poster — VIDEO-FFMPEG-RUNNER-001.
 
 Construit et exécute les commandes ffmpeg du profil standard Forge Video. Les

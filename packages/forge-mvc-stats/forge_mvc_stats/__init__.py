@@ -1,3 +1,4 @@
+# pyright: strict
 """Forge stats — événements génériques, schéma SQL, tracking et consultation."""
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ from forge_mvc_stats.tracking import (
     track_event,
 )
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"
 
 __all__ = [
     "StatsEvent",

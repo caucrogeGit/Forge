@@ -1,3 +1,4 @@
+# pyright: strict
 """Stockage des événements IoT.
 
 API publique du sous-package :

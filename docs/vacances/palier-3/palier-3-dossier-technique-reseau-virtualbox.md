@@ -601,6 +601,6 @@ Ce dossier donne les connaissances nécessaires pour tester les communications r
 
     1. [Ouvrir le QCM du palier 3](qcm-palier-3-reseau-virtualbox.md), puis répondez à toutes les questions.
     2. Faites valider votre QCM. Tant qu’il n’est pas correct à 100 %, vous ne passez pas à l’activité.
-    3. Une fois le QCM validé à 100 %, [ouvrir l’activité : tester les modes réseau VirtualBox](index.md) et réalisez les étapes demandées.
+    3. Une fois le QCM validé à 100 %, [ouvrir l’activité : tester les modes réseau VirtualBox](activite-palier-3-reseau-virtualbox.md) et réalisez les étapes demandées.
 
     Pendant l’activité, vous devrez revenir dans ce dossier technique chaque fois que vous aurez besoin d’une information.

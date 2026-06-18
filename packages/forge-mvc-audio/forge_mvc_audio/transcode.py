@@ -1,3 +1,4 @@
+# pyright: strict
 """Runner ffmpeg : transcodage MP3.
 
 Construit et exécute la commande ffmpeg du profil MP3 standard Forge Audio. Le

@@ -1,3 +1,4 @@
+# pyright: strict
 """Sous-package diagnostics IoT (réservé).
 
 La commande ``forge iot:doctor`` est implémentée dans

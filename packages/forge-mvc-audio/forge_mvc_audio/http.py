@@ -1,3 +1,4 @@
+# pyright: strict
 """Lecture HTTP des fichiers audio — streaming Range, sans état.
 
 Branche une route de **lecture en streaming** sur un ``Router`` Forge :

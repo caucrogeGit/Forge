@@ -32,6 +32,14 @@ NAVLESS_FILES: set[str] = {
     # Spec d'exécution du ticket 7 (REMOVE-MEDIA-PKG, ADR-018) — brouillon en
     # attente de la publication PyPI de forge-mvc-images. Hors-nav volontairement.
     "docs/roadmap/ticket-remove-media-pkg.md",
+    # Pages TEMPORAIRES du palier 3 vacances (2TNE CIEL, sans lien avec Forge) :
+    # liées depuis vacances/palier-3/index.md et le dossier technique, mais hors
+    # nav (équivalent markdown des PDF des paliers 1/2). À retirer avec tout le
+    # dossier docs/vacances/ le 2026-06-28 (DOCS-WELCOME-VACANCE-TEMP-001).
+    "docs/vacances/palier-3/palier-3-dossier-technique-reseau-virtualbox.md",
+    "docs/vacances/palier-3/qcm-palier-3-reseau-virtualbox.md",
+    "docs/vacances/palier-3/activite-palier-3-reseau-virtualbox.md",
+    "docs/vacances/palier-3/checklist-professeur-palier-3-reseau-virtualbox.md",
 }
 
 

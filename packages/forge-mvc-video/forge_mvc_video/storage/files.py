@@ -1,3 +1,4 @@
+# pyright: strict
 """Disposition des fichiers vidéo sur disque — VIDEO-UPLOAD-STORE-001.
 
 Le stockage est **uuid-based** : le nom de fichier fourni par l'utilisateur

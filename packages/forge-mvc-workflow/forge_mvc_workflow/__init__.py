@@ -1,3 +1,4 @@
+# pyright: strict
 """Forge workflow — statuts et transitions applicatives.
 
 Opt-in officiel Forge livre separement depuis Forge 2.6.0 (ADR-004).
@@ -30,7 +31,7 @@ from forge_mvc_workflow.transitions import (
     validate_transitions,
 )
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"
 
 __all__ = [
     "WorkflowStatus",

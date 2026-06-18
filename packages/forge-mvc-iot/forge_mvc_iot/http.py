@@ -1,3 +1,4 @@
+# pyright: strict
 """API HTTP JSON de lecture des événements IoT — IOT-HTTP-API-001.
 
 Branche trois routes GET sur un ``Router`` Forge :

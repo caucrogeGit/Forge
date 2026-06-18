@@ -11,6 +11,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("forge_mvc_mfa")
+
 import forge_mvc_mfa
 
 PKG_ROOT = Path(forge_mvc_mfa.__file__).resolve().parent

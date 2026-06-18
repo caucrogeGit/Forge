@@ -1,3 +1,4 @@
+# pyright: strict
 """forge-mvc-mail — Envoi d'emails opt-in (extrait du core, ADR-022).
 
 Composition de messages, transports interchangeables (console, SMTP, log…),
@@ -48,4 +49,4 @@ __all__ = [
     "TransportResult",
 ]
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"

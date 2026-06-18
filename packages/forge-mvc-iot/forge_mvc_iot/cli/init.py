@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge iot:init`` — IOT-INIT-COMMAND-001.
 
 Copie la (les) migration(s) SQL Forge IoT embarquée(s) dans le package

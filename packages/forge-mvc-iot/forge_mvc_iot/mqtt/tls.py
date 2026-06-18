@@ -1,3 +1,4 @@
+# pyright: strict
 """Application de la configuration TLS MQTT — IOT-MQTT-TLS-CLIENTS-001.
 
 Helper **centralisé** consommé par les trois clients MQTT Forge IoT

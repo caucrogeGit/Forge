@@ -3,6 +3,9 @@
 
 ## [Non publié]
 
+
+## [1.0.0-beta.17] — 2026-06-18
+
 ### Modifié
 
 - **Tutoriel welcome-forge strict-clean** (`WELCOME-FORGE-STRICT-CLEAN-001`).
@@ -235,6 +238,30 @@
   `_dev_error()` (None en production, aucune information interne exposée). Les
   templates `errors/404.html` et `errors/413.html` portent le bloc `{% if error %}`
   correspondant. Appliqué au squelette et au `app.py` racine (anti-dérive ADR-024).
+- **Les 12 opt-ins en pyright strict + `py.typed`** (`FILES-TYPING-STRICT-001`,
+  `IMAGES-TYPING-STRICT-001`, `MAIL-TYPING-STRICT-001`, `PIVOT-TYPING-STRICT-001`,
+  `I18N-TYPING-STRICT-001`, `AUDIO-TYPING-STRICT-001`, `VIDEO-TYPING-STRICT-001`,
+  `IOT-TYPING-STRICT-001`, `WORKFLOW-TYPING-STRICT-001`, `STATS-TYPING-STRICT-001`,
+  `MFA-TYPING-STRICT-001`, `RBAC-TYPING-STRICT-001`). Le cliquet ADR-036 s'étend
+  du cœur aux 12 paquets `forge-mvc-*` : chaque module porte `# pyright: strict`
+  et chaque paquet expose `py.typed` (PEP 561, inclus au wheel via
+  `[tool.setuptools.package-data]`). Conséquence concrète : un projet qui
+  installe un opt-in bénéficie de l'autocomplétion et de la vérification de
+  types de ce module ; le palier avancé de welcome-forge, qui utilise
+  `forge-mvc-files`, devient pleinement strict-clean. Recette appliquée :
+  `dict[str, Any]` aux frontières, `Protocol` pour l'adapter base de données
+  (`core.database.db`), helpers `_as_dict`/`_as_list` pour isoler le typage du
+  JSON, `cast` et `# pyright: ignore` ciblés sur les gardes runtime volontaires
+  et les dépendances optionnelles mal typées (Pillow, paho-mqtt, referencing).
+  Chaque paquet porte un garde-fou d'absence
+  `tests/test_<pkg>_typing_strict_guard_001.py` (marqueur strict + `py.typed`).
+- **Scan pyright CI étendu aux 12 opt-ins** (`TYPING-CI-OPTINS-001`). Le bloc
+  `[tool.pyright]` du dépôt couvre désormais le cœur **et** les 12 paquets
+  `forge-mvc-*` (170 fichiers, 0 erreur en mode `standard` complété des marqueurs
+  stricts). `extraPaths` liste les sources de chaque paquet pour résoudre les
+  imports inter-paquets (images→files, video→files…), pyright ne suivant pas les
+  installs éditables PEP 660. Un vrai bug de type introduit dans un opt-in est
+  désormais attrapé en CI, en complément des garde-fous pytest.
 
 ### Corrigé
 

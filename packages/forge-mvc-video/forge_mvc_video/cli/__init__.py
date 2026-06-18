@@ -1,3 +1,4 @@
+# pyright: strict
 """Commandes CLI du module vidéo (``forge video:*``).
 
 Commandes disponibles :

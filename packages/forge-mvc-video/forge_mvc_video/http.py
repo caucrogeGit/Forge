@@ -1,3 +1,4 @@
+# pyright: strict
 """Lecture HTTP des vidéos — VIDEO-PLAYBACK-RANGE-001.
 
 Branche une route de **lecture en streaming** sur un ``Router`` Forge :

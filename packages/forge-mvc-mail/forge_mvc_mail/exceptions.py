@@ -1,3 +1,4 @@
+# pyright: strict
 class MailError(Exception):
     """Erreur de base pour le service mail Forge."""
 

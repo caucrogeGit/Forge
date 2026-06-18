@@ -1,3 +1,4 @@
+# pyright: strict
 """Migrations SQL Forge IoT — ressources du package.
 
 Ce sous-package héberge les fichiers de migration SQL versionnés du

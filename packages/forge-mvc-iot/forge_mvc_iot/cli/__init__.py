@@ -1,3 +1,4 @@
+# pyright: strict
 """Interface CLI Forge IoT.
 
 Sous-package qui regroupe les commandes branchables sur la CLI Forge

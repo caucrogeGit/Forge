@@ -1,3 +1,4 @@
+# pyright: strict
 """Configuration Forge Audio.
 
 Charge la configuration du module audio depuis un mapping (``os.environ`` par

@@ -1,3 +1,4 @@
+# pyright: strict
 """Lecture de la configuration mail depuis l'environnement.
 
 ADR-031 : `forge-mvc-mail` possède sa configuration de bout en bout. Elle est

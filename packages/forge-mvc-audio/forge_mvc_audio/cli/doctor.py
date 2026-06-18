@@ -1,3 +1,4 @@
+# pyright: strict
 """Diagnostic ``forge audio:doctor``.
 
 Diagnostic **statique** : ne lance aucun ``ffmpeg``, n'ouvre aucun fichier

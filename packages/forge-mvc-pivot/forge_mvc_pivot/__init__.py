@@ -1,3 +1,4 @@
+# pyright: strict
 """forge-mvc-pivot — Pivot advanced opt-in (extrait du core, ADR-021).
 
 Service de persistance pour tables pivot enrichies (associations many_to_many
@@ -21,4 +22,4 @@ __all__ = [
     "pivot_error_to_form_error",
 ]
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"

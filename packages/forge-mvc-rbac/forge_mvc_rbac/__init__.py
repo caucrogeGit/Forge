@@ -1,3 +1,4 @@
+# pyright: strict
 """Forge RBAC — rôles, permissions, autorisations et helpers Jinja.
 
 Protéger une route par permission : il existe trois niveaux, à choisir selon la
@@ -73,7 +74,7 @@ from forge_mvc_rbac.user_rbac import (
     validate_user_role_user_id,
 )
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"
 
 # Auto-enregistrement dans le registre de contexte Jinja de core.
 try:

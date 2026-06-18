@@ -1,3 +1,4 @@
+# pyright: strict
 """Mailer Forge — point d'entrée unique pour envoyer un mail."""
 from __future__ import annotations
 

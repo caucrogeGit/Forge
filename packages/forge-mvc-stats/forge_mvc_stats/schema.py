@@ -1,3 +1,4 @@
+# pyright: strict
 """Définition SQL générique de la table d'événements statistiques Forge."""
 
 from __future__ import annotations

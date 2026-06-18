@@ -12,22 +12,27 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 ---
 
-## État actuel — Forge 1.0.0-beta.16
+## État actuel — Forge 1.0.0-beta.17
 
-**Tag courant : `v1.0.0-beta.16`** — retrait de la génération de starters
-(ADR-035) : les commandes `forge starter:build` et `forge starter:list` ainsi
-que tout le sous-système de génération (`forge_cli/starters/`) sont supprimés.
-Les parcours `welcome-*` deviennent des tutoriels manuels suivis depuis la
-documentation (chaque palier indique le contrôleur, la vue et la route à créer
-soi-même), sur le modèle de `welcome-forge`. Forge n'écrit donc plus jamais dans
-`mvc/routes.py` côté starters (principes 3 et 9). ADR-035 supersède l'ADR-023.
+**Tag courant : `v1.0.0-beta.17`** — typage statique de bout en bout. Le cliquet
+ADR-036 s'étend du cœur aux 12 opt-ins : chaque paquet `forge-mvc-*` passe
+pyright en mode strict (`# pyright: strict` par fichier) et expose `py.typed`
+(PEP 561, inclus au wheel). Le scan pyright en CI couvre désormais le cœur **et**
+les 12 opt-ins (170 fichiers, 0 erreur). Le squelette `forge new` démarre en
+`typeCheckingMode: strict` et son code généré est strict-clean ; les accesseurs
+de `Request` (`query`/`form`/`route`/`header`) exposent des surcharges typées,
+et `Response` / l'enregistrement des routes / `html()` / `render()` valident
+leurs arguments critiques au plus tôt. Cette release embarque aussi les
+correctifs de consolidation terrain post-b16 (squelette, pages d'erreur
+détaillées en `dev`, DX VS Code).
 
-Précédent : v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.16 — beta incrémentale retirant la génération de starters
-au profit de parcours réalisés à la main (ADR-035). L'extraction i18n (ADR-027),
-la convention de route (ADR-029), la refonte `welcome-forge` (ADR-025/028) de
-beta.15 et le squelette dédié (ADR-023/024) de beta.14 restent en place.**
+**Statut : v1.0.0-beta.17 — release de typage : tout Forge (cœur + 12 opt-ins)
+passe en pyright strict et expose `py.typed`, vérifié en CI. Les acquis de
+beta.16 (parcours réalisés à la main ADR-035), beta.15 (i18n ADR-027, convention
+de route ADR-029, refonte `welcome-forge` ADR-025/028) et beta.14 (squelette
+dédié ADR-024) restent en place.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques)
@@ -80,8 +85,9 @@ Journal des incidents et manques remontés par l'**usage réel** d'un projet
 `forge new` (tests terrain, ADR-009), avec leur correctif.
 Ce ne sont pas des fonctionnalités mais de la **consolidation bêta** : ce que
 livre `forge new` doit bien se comporter sans correctif manuel côté projet.
-Le cycle **b17** accumule ces correctifs sous `## [Non publié]` du `CHANGELOG.md`
-jusqu'au tag b17.
+Le cycle **b17** a accumulé ces correctifs sous `## [Non publié]` du `CHANGELOG.md`,
+désormais publiés avec le tag `v1.0.0-beta.17` (release de typage : cœur + 12
+opt-ins en pyright strict + `py.typed`).
 La cible est le **squelette** (et son miroir racine, anti-dérive ADR-024) ; un
 détail d'erreur n'est exposé qu'en `dev`, jamais en production.
 

@@ -11,6 +11,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("forge_mvc_workflow")
+
 import forge_mvc_workflow
 
 PKG_ROOT = Path(forge_mvc_workflow.__file__).resolve().parent

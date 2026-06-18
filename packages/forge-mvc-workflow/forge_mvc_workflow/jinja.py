@@ -1,3 +1,4 @@
+# pyright: strict
 """Helpers Jinja d'affichage de statuts workflow pour Forge."""
 
 from __future__ import annotations

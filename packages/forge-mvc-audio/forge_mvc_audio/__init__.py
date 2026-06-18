@@ -1,3 +1,4 @@
+# pyright: strict
 """Forge MVC Audio — module opt-in pour la gestion audio.
 
 Chaîne audio **complète et sans état** (aucune base de données) :
@@ -21,7 +22,7 @@ explicitement. Aucune écriture dans le code utilisateur (charte §9).
 
 from __future__ import annotations
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"
 
 from forge_mvc_audio.config import AudioConfig, load_audio_config
 from forge_mvc_audio.http import register_audio_routes

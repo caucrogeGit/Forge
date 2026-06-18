@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge video:init`` — VIDEO-INIT-001.
 
 Copie la (les) migration(s) SQL Forge Video embarquée(s) dans le package

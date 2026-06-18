@@ -1,3 +1,4 @@
+# pyright: strict
 """forge-mvc-mfa — Module MFA pour Forge : TOTP, codes de recuperation, anti-replay, rate-limit.
 
 Opt-in officiel Forge distribue separement depuis Forge 2.4.0.
@@ -73,7 +74,7 @@ from forge_mvc_mfa.totp_replay import (
     step_for_time,
 )
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"
 
 __all__ = [
     # mfa — facteurs et types

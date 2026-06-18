@@ -1,3 +1,4 @@
+# pyright: strict
 """Transitions génériques de workflow pour Forge."""
 
 from __future__ import annotations

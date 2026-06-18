@@ -1,3 +1,4 @@
+# pyright: strict
 """Migrations packagées du module vidéo.
 
 Vide au stade squelette : la table ``videos`` (et sa migration) est ajoutée

@@ -1,3 +1,4 @@
+# pyright: strict
 """forge-mvc-i18n — Internationalisation opt-in (extraite du core, ADR-027).
 
 Traduction par catalogues JSON (`translations/<locale>.json`), locale par défaut
@@ -16,7 +17,7 @@ from forge_mvc_i18n.translator import (
     trans,
 )
 
-__version__ = "1.0.0b16"
+__version__ = "1.0.0b17"
 
 __all__ = [
     "I18nError",

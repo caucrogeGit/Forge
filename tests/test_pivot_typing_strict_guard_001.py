@@ -15,6 +15,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("forge_mvc_pivot")
+
 import forge_mvc_pivot
 
 PKG_ROOT = Path(forge_mvc_pivot.__file__).resolve().parent

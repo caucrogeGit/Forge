@@ -1,3 +1,4 @@
+# pyright: strict
 """Transports mail Forge — interface commune et cinq implémentations."""
 
 from __future__ import annotations

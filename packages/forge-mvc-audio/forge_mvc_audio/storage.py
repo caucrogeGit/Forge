@@ -1,3 +1,4 @@
+# pyright: strict
 """Disposition des fichiers audio sur disque — sans état.
 
 Le stockage est **uuid-based** : le nom de fichier fourni par l'utilisateur

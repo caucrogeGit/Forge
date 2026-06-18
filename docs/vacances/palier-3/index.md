@@ -133,3 +133,4 @@ Livrables :
 
     * [Dossier technique complet](palier-3-dossier-technique-reseau-virtualbox.md) : toutes les explications détaillées sur les modes réseau.
     * [QCM du palier 3](qcm-palier-3-reseau-virtualbox.md) : à valider à 100 % avant de réaliser l'activité.
+    * [Activité du palier 3](activite-palier-3-reseau-virtualbox.md) : les manipulations à réaliser une fois le QCM validé.

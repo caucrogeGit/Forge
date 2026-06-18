@@ -1,3 +1,4 @@
+# pyright: strict
 class I18nError(Exception):
     """Erreur de base pour l'internationalisation Forge."""
 

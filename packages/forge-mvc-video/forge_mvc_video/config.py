@@ -1,3 +1,4 @@
+# pyright: strict
 """Configuration Forge Video — VIDEO-ROADMAP-OPEN-001.
 
 Charge la configuration du module vidéo depuis un mapping (``os.environ``

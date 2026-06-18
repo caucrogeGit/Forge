@@ -1,3 +1,4 @@
+# pyright: strict
 """Diagnostic ``forge video:doctor`` — VIDEO-ROADMAP-OPEN-001.
 
 Diagnostic **statique** : ne lance aucun ``ffmpeg``, n'ouvre aucun fichier

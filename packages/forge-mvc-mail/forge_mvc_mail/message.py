@@ -1,3 +1,4 @@
+# pyright: strict
 """Représentation d'un message mail — aucune dépendance SMTP."""
 
 from __future__ import annotations

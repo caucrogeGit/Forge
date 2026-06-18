@@ -1,3 +1,4 @@
+# pyright: strict
 """Configuration Forge IoT — itération 1.
 
 Charge la configuration MQTT du module IoT depuis un mapping

@@ -1,3 +1,4 @@
+# pyright: strict
 """Subscriber MQTT de Forge IoT.
 
 - ``forge_mvc_iot.mqtt.subscriber.MqttSubscriber`` — abonnement au broker
