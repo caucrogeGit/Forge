@@ -7,17 +7,18 @@ relabelisé la section en « Nouveautés 1.0.0-beta.13 » et simplifié les
 panneaux : suppression des liens profonds IoT/audits, de « Mosquitto » et
 de la preuve « 0 échec ».
 
-Mise à jour beta.16 : la section est relabelisée « Nouveautés 1.0.0-beta.16 »
-(id `beta16`) et met l'accent sur les nouveautés **de la beta.16** : **Parcours
-réalisés à la main** (ADR-035, retrait de la génération de starters),
-**Déploiement en production** (Gunicorn / WSGI via `deploy:init`), **Cœur encore
-allégé** (mail et config upload sortis du noyau, ADR-031/032) et **Comptes de
-base de données clarifiés** (provisioning en `forge_admin`, ADR-033/034). Les
-nouveautés de beta.15 (i18n, convention de route, squelette dédié) et les
-anciennes cartes média sont retirées de la vitrine.
+Mise à jour beta.17 : la section est relabelisée « Nouveautés 1.0.0-beta.17 »
+(id `beta17`) et met l'accent sur les nouveautés **de la beta.17**, toutes
+autour du **typage statique** : **Typage strict de bout en bout** (cœur + 12
+opt-ins en pyright strict + `py.typed`, vérifié en CI, ADR-036), **Projets
+stricts par défaut** (`forge new` démarre en `typeCheckingMode: strict`),
+**Accesseurs de requête précis** (surcharges `@overload` de `request.form/query/
+route/header`) et **Validation précoce des arguments** (`Response`, routes,
+`html()`/`render()`). Les cartes de beta.16 (parcours manuels, Gunicorn, cœur
+allégé, comptes DB) sont retirées de la vitrine.
 
 Ce fichier conserve les garde-fous encore valides : présence de la section,
-panneaux des nouveautés courantes, core présenté comme autonome,
+panneaux des nouveautés courantes, typage strict mis en avant,
 synchronisation de `docs/index.html`, absence de version beta.11, ticket
 roadmap.
 
@@ -51,10 +52,10 @@ def _src() -> str:
 # opt-ins par un texte simple (sans commandes CLI ni `iot_events`). Seuls les
 # repères conceptuels restent garantis.
 HIGHLIGHTS = [
-    "Parcours réalisés à la main",
-    "Déploiement en production",
-    "Cœur encore allégé",
-    "Comptes de base de données clarifiés",
+    "Typage strict de bout en bout",
+    "Projets stricts par défaut",
+    "Accesseurs de requête précis",
+    "Validation précoce des arguments",
 ]
 
 
@@ -66,14 +67,15 @@ class TestHighlightsPresent:
         )
 
     def test_section_nouveautes_presente(self):
-        assert 'id="beta16"' in _src(), (
-            "Une section dédiée aux nouveautés (id='beta16') est attendue."
+        assert 'id="beta17"' in _src(), (
+            "Une section dédiée aux nouveautés (id='beta17') est attendue."
         )
 
-    def test_core_reste_autonome(self):
-        """Le core doit rester présenté comme autonome (carte Forge i18n)."""
+    def test_typage_strict_mis_en_avant(self):
+        """La beta.17 met le typage statique en avant (pyright strict + py.typed)."""
         normalized = " ".join(_src().split())
-        assert "autonome" in normalized
+        assert "strict" in normalized
+        assert "py.typed" in normalized
 
 
 # ---------------------------------------------------------------------------
@@ -95,9 +97,9 @@ class TestSync:
 
     def test_docs_index_reflete_section(self):
         docs = DOCS_LANDING.read_text(encoding="utf-8")
-        assert 'id="beta16"' in docs
-        assert "Parcours réalisés à la main" in docs
-        assert "Déploiement en production" in docs
+        assert 'id="beta17"' in docs
+        assert "Typage strict de bout en bout" in docs
+        assert "Accesseurs de requête précis" in docs
 
 
 # ---------------------------------------------------------------------------

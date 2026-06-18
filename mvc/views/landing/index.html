@@ -87,7 +87,7 @@
   </div>
 
   <div class="landing-version-strip landing-accent-text flex flex-wrap justify-center gap-2 text-sm font-medium mb-12">
-    <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-beta.16</a><span class="opacity-40">·</span>
+    <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-beta.17</a><span class="opacity-40">·</span>
     <a href="https://docs.python.org/3.12/" target="_blank" rel="noopener noreferrer" class="hover:underline">Python 3.12+</a><span class="opacity-40">·</span>
     <a href="https://mariadb.com/kb/en/" target="_blank" rel="noopener noreferrer" class="hover:underline">MariaDB 11.8</a><span class="opacity-40">·</span>
     <a href="https://nodejs.org/docs/latest-v20.x/api/" target="_blank" rel="noopener noreferrer" class="hover:underline">Node.js 20</a><span class="opacity-40">·</span>
@@ -105,33 +105,33 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-beta.16 : parcours réalisés à la main (ADR-035), déploiement Gunicorn, cœur allégé (mail + upload, ADR-031/032), comptes DB clarifiés (ADR-033/034) -->
-<section id="beta16" class="py-24 px-6 sec-light">
+<!-- Nouveautés 1.0.0-beta.17 : typage strict de bout en bout (cœur + 12 opt-ins, pyright strict + py.typed, vérifié en CI ; ADR-036), squelette strict par défaut, accesseurs Request typés (overloads), validation précoce des arguments critiques -->
+<section id="beta17" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
-      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-beta.16</div>
+      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-beta.17</div>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Parcours réalisés à la main</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Tous les parcours welcome deviennent des tutoriels manuels suivis depuis la documentation : chaque palier montre le contrôleur, la vue et la route à écrire soi-même. La génération automatique est retirée (les commandes forge starter:build et forge starter:list disparaissent), fidèle au principe « pas d'écriture invisible dans le code utilisateur » (ADR-035).</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Typage strict de bout en bout</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Du cœur aux 12 modules opt-in, tout Forge passe pyright en mode strict et expose ses types via py.typed (PEP 561). La vérification est lancée en CI. Le code de votre application bénéficie de l'autocomplétion et de la vérification de types fournies par Forge, sans configuration (ADR-036).</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Déploiement en production</h3>
-        <p class="text-white/60 text-sm leading-relaxed">forge deploy:init génère le chemin de production officiel : un wsgi.py et une unité systemd qui sert l'application avec Gunicorn. En développement, python app.py ; en production, Gunicorn derrière systemd.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Projets stricts par défaut</h3>
+        <p class="text-white/60 text-sm leading-relaxed">forge new génère un projet qui démarre directement en typeCheckingMode strict. Le code généré est propre en mode strict, et VS Code vérifie les types et auto-importe les classes du cœur dès le premier fichier écrit.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Cœur encore allégé</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Le mail et la configuration des uploads quittent le noyau : ils sont lus depuis l'environnement par les opt-ins forge-mvc-mail, forge-mvc-files et forge-mvc-images. Le cœur reste minimal et autonome, il ne dépend plus d'eux (ADR-031, ADR-032).</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Accesseurs de requête précis</h3>
+        <p class="text-white/60 text-sm leading-relaxed">request.form(), query(), route() et header() exposent des surcharges typées : avec un default texte, le retour est une chaîne, jamais None. Le code idiomatique d'un débutant comme int(request.route("id", default="0")) est sûr en mode strict, sans garde manuelle.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Comptes de base de données clarifiés</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Le provisioning et les migrations s'exécutent avec forge_admin, le runtime applicatif reste en forge_app (DML strict) (ADR-033). forge new génère des identifiants de base sans suffixes _db / _app (ADR-034).</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Validation précoce des arguments</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Response, l'enregistrement des routes et html() / render() valident leurs arguments critiques dès la construction : un statut HTTP correct, un handler réellement appelable. Les erreurs sont détectées tôt et clairement, plutôt que plus loin à l'exécution.</p>
       </div>
 
     </div>
