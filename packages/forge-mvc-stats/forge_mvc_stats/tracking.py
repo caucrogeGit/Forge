@@ -1,3 +1,4 @@
+# pyright: strict
 """Helper Python explicite de tracking statistique pour Forge."""
 
 from __future__ import annotations
@@ -31,7 +32,7 @@ def _serialize_metadata(metadata: dict[str, Any]) -> str:
 
 def prepare_track_event_values(event: StatsEvent) -> tuple[str, str, str, str]:
     """Return the SQL parameter tuple for a StatsEvent."""
-    if not isinstance(event, StatsEvent):
+    if not isinstance(event, StatsEvent):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise StatsEventError(
             f"Un StatsEvent est attendu, reçu : {type(event).__name__}."
         )
@@ -44,7 +45,7 @@ def prepare_track_event_values(event: StatsEvent) -> tuple[str, str, str, str]:
 
 
 def track_event(
-    execute: Callable,
+    execute: Callable[[str, tuple[Any, ...]], Any],
     event_or_name: StatsEvent | str,
     label: str = "",
     category: str = "general",
@@ -57,7 +58,7 @@ def track_event(
     """
     if isinstance(event_or_name, StatsEvent):
         event = validate_event(event_or_name)
-    elif isinstance(event_or_name, str):
+    elif isinstance(event_or_name, str):  # pyright: ignore[reportUnnecessaryIsInstance]
         event = make_event(
             name=event_or_name,
             label=label,

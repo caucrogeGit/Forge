@@ -1,3 +1,4 @@
+# pyright: strict
 """Événements statistiques génériques pour Forge.
 
 Les noms d'événements sont de simples chaînes snake_case définies par l'application.
@@ -26,7 +27,7 @@ class StatsEvent:
     name: str
     label: str = ""
     category: str = "general"
-    metadata: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict[str, Any])
 
     def __post_init__(self) -> None:
         validated_name = validate_event_name(self.name)
@@ -35,9 +36,9 @@ class StatsEvent:
             object.__setattr__(self, "label", validated_name)
         if not self.category:
             object.__setattr__(self, "category", "general")
-        if self.metadata is None:
+        if self.metadata is None:  # pyright: ignore[reportUnnecessaryComparison]
             object.__setattr__(self, "metadata", {})
-        if not isinstance(self.metadata, dict):
+        if not isinstance(self.metadata, dict):  # pyright: ignore[reportUnnecessaryIsInstance]
             raise StatsEventError(
                 f"metadata doit être un dictionnaire, reçu : {type(self.metadata).__name__}."
             )
@@ -49,7 +50,7 @@ def normalize_event_name(value: str) -> str:
     Spaces and hyphens are converted to underscores.
     Any other non-alphanumeric character raises StatsEventError.
     """
-    if not isinstance(value, str):
+    if not isinstance(value, str):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise StatsEventError("Le nom d'événement doit être une chaîne.")
     lowered = value.strip().lower()
     if _UNSAFE_CHARS_RE.search(lowered):
@@ -64,7 +65,7 @@ def normalize_event_name(value: str) -> str:
 
 def validate_event_name(value: str) -> str:
     """Validate and return a normalized event name, or raise StatsEventError."""
-    if not isinstance(value, str):
+    if not isinstance(value, str):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise StatsEventError("Le nom d'événement doit être une chaîne.")
     if not value or not value.strip():
         raise StatsEventError("Le nom d'événement ne peut pas être vide.")
@@ -99,7 +100,7 @@ def make_event(
 
 def validate_event(event: StatsEvent) -> StatsEvent:
     """Validate an existing StatsEvent and return it, or raise StatsEventError."""
-    if not isinstance(event, StatsEvent):
+    if not isinstance(event, StatsEvent):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise StatsEventError(
             f"Un StatsEvent est attendu, reçu : {type(event).__name__}."
         )

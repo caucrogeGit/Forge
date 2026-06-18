@@ -1,9 +1,10 @@
+# pyright: strict
 """API de consultation admin simple des événements statistiques Forge."""
 
 from __future__ import annotations
 
 import json
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, cast
 
 from .events import StatsEventError, validate_event_name
 from .schema import STATS_EVENTS_TABLE
@@ -18,7 +19,7 @@ class StatsAdminError(ValueError):
 
 
 def _validate_limit(limit: int) -> int:
-    if not isinstance(limit, int) or isinstance(limit, bool):
+    if not isinstance(limit, int) or isinstance(limit, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise StatsAdminError(
             f"limit doit être un entier, reçu : {type(limit).__name__}."
         )
@@ -51,7 +52,7 @@ def prepare_stats_events_admin_params(
     name: str | None = None,
     category: str | None = None,
     limit: int = _DEFAULT_LIMIT,
-) -> tuple:
+) -> tuple[Any, ...]:
     """Return the SQL parameter tuple for a stats events query."""
     if name is not None:
         try:
@@ -59,7 +60,7 @@ def prepare_stats_events_admin_params(
         except StatsEventError as exc:
             raise StatsAdminError(str(exc)) from exc
     if category is not None:
-        if not isinstance(category, str) or not category.strip():
+        if not isinstance(category, str) or not category.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
             raise StatsAdminError(
                 "category doit être une chaîne non vide."
             )
@@ -80,7 +81,7 @@ def normalize_stats_event_row(row: dict[str, Any]) -> dict[str, Any]:
     metadata is deserialized from JSON string to dict.
     Missing required columns or invalid JSON raises StatsAdminError.
     """
-    if not isinstance(row, dict):
+    if not isinstance(row, dict):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise StatsAdminError(
             f"Une ligne dict est attendue, reçu : {type(row).__name__}."
         )
@@ -93,7 +94,7 @@ def normalize_stats_event_row(row: dict[str, Any]) -> dict[str, Any]:
     if raw_metadata is None or raw_metadata == "":
         metadata: dict[str, Any] = {}
     elif isinstance(raw_metadata, dict):
-        metadata = raw_metadata
+        metadata = cast("dict[str, Any]", raw_metadata)
     elif isinstance(raw_metadata, str):
         try:
             parsed = json.loads(raw_metadata)
@@ -106,7 +107,7 @@ def normalize_stats_event_row(row: dict[str, Any]) -> dict[str, Any]:
                 "metadata JSON doit représenter un objet, "
                 f"reçu : {type(parsed).__name__}."
             )
-        metadata = parsed
+        metadata = cast("dict[str, Any]", parsed)
     else:
         raise StatsAdminError(
             f"metadata doit être une chaîne JSON ou None, "
@@ -123,7 +124,7 @@ def normalize_stats_event_row(row: dict[str, Any]) -> dict[str, Any]:
 
 
 def list_stats_events(
-    fetch_all: Callable[[str, tuple], Iterable[dict]],
+    fetch_all: Callable[[str, tuple[Any, ...]], Iterable[dict[str, Any]]],
     name: str | None = None,
     category: str | None = None,
     limit: int = _DEFAULT_LIMIT,
