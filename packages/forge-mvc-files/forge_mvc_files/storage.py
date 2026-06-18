@@ -1,8 +1,10 @@
+# pyright: strict
 from __future__ import annotations
 
 import os
 import posixpath
 import re
+from collections.abc import Sequence
 from pathlib import Path
 from uuid import uuid4
 
@@ -15,7 +17,10 @@ _UNSAFE_CHARS = re.compile(r"[^A-Za-z0-9._-]+")
 _URI_SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
 
-def ensure_upload_dirs(root: str | Path, categories=("images", "documents", "tmp")) -> list[Path]:
+def ensure_upload_dirs(
+    root: str | Path,
+    categories: Sequence[str] = ("images", "documents", "tmp"),
+) -> list[Path]:
     root_path = Path(root)
     created: list[Path] = []
     root_path.mkdir(parents=True, exist_ok=True)
@@ -56,7 +61,7 @@ def normalize_media_path(path: str) -> str:
     Le chemin retourne est destine a etre stocke en base, typiquement dans
     `Media.path`. Il est toujours relatif a `storage/uploads`.
     """
-    if not isinstance(path, str):
+    if not isinstance(path, str):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise UploadStorageError("Chemin media invalide.")
 
     value = path.strip()

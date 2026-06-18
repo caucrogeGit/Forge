@@ -1,3 +1,4 @@
+# pyright: strict
 """Rate limiting pour les routes d'upload (mémoire, fenêtre glissante).
 
 Même structure que core.security.hashing pour le login : dict en mémoire,

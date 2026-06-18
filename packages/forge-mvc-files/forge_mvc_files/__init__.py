@@ -1,3 +1,4 @@
+# pyright: strict
 """Forge MVC Files — module opt-in propriétaire de l'upload générique.
 
 Ce paquet détient le **pipeline d'upload générique** extrait du core (ADR-019) :
