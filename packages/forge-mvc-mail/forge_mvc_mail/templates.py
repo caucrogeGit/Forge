@@ -1,9 +1,10 @@
+# pyright: strict
 """Rendu de templates mail Jinja2 — produit un MailMessage, n'envoie rien."""
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 
 import jinja2
 
@@ -38,7 +39,7 @@ class MailTemplateRenderer:
     def render(
         self,
         template_name: str,
-        context: dict,
+        context: dict[str, Any],
         *,
         to: str | Iterable[str],
         from_email: str | None = None,
@@ -66,7 +67,7 @@ class MailTemplateRenderer:
         )
 
     def _render_required(
-        self, filename: str, context: dict, template_name: str, part: str
+        self, filename: str, context: dict[str, Any], template_name: str, part: str
     ) -> str:
         try:
             tpl = self._env.get_template(filename)
@@ -82,7 +83,7 @@ class MailTemplateRenderer:
                 f"Erreur de rendu du template {filename!r} : {exc}"
             ) from exc
 
-    def _render_optional(self, filename: str, context: dict) -> str | None:
+    def _render_optional(self, filename: str, context: dict[str, Any]) -> str | None:
         try:
             tpl = self._env.get_template(filename)
             return tpl.render(**context)

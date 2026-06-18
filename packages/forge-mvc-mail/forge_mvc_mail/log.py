@@ -1,13 +1,11 @@
+# pyright: strict
 """core/mail/log.py — Journalisation des envois de mails."""
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Literal
-
-if TYPE_CHECKING:
-    pass
+from typing import Any, Literal
 
 logger = logging.getLogger(__name__)
 
@@ -46,12 +44,12 @@ class MailLogRecord:
 
 # ── Points d'injection pour les tests ─────────────────────────────────────────
 
-def _db_insert(sql: str, params: tuple) -> None:
+def _db_insert(sql: str, params: tuple[Any, ...]) -> None:
     from core.database.db import insert
     insert(sql, params)
 
 
-def _db_fetch_all(sql: str, params: tuple) -> list[dict]:
+def _db_fetch_all(sql: str, params: tuple[Any, ...]) -> list[dict[str, Any]]:
     from core.database.db import fetch_all
     return fetch_all(sql, params) or []
 
@@ -90,5 +88,5 @@ class MailLogger:
             logger.warning("MailLogger: impossible d'écrire dans mail_log : %s", exc)
 
     @classmethod
-    def fetch_recent(cls, limit: int = 20) -> list[dict]:
+    def fetch_recent(cls, limit: int = 20) -> list[dict[str, Any]]:
         return _db_fetch_all(_SELECT_SQL, (limit,))

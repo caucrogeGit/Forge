@@ -1,3 +1,4 @@
+# pyright: strict
 """Commandes CLI mail de Forge.
 
 forge mail:init   — crée les dossiers et templates d'exemple
@@ -12,7 +13,7 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import forge_cli.output as out
 
@@ -190,7 +191,7 @@ def cmd_mail_render(args: list[str], root: Path | None = None) -> None:
         sys.exit("Usage : forge mail:render <template> [--context fichier.json]")
 
     template_name = args[0]
-    context: dict = {}
+    context: dict[str, Any] = {}
 
     if "--context" in args:
         idx = args.index("--context")
@@ -385,7 +386,7 @@ def cmd_mail_logs(args: list[str], root: Path | None = None) -> None:
     _print_logs_table(rows)
 
 
-def _print_logs_table(rows: list[dict]) -> None:
+def _print_logs_table(rows: list[dict[str, Any]]) -> None:
     _STATUS_LABELS = {"sent": "[OK]   ", "failed": "[FAIL] ", "skipped": "[SKIP] "}
     print(f"\n{'ID':<6}  {'DATE':>19}  {'STATUS':<8}  {'TRANSPORT':<12}  {'TO':<30}  SUJET")
     print("-" * 100)
