@@ -106,11 +106,40 @@ include = ["core*", "forge_cli*", "integrations*"]
 ]
 
 [tool.pyright]
-# ADR-036 — typage statique du cœur vérifié en CI. Périmètre actuel du cliquet :
-# core/ à 0 erreur en mode "standard". Étapes suivantes du cliquet : strict
-# par fichier (`# pyright: strict`, en commençant par core/http), puis
-# integrations/ et les opt-ins.
-include = ["core"]
+# ADR-036 — typage statique vérifié en CI. Le cliquet couvre désormais le cœur
+# ET les 12 opt-ins, tous `# pyright: strict` par fichier (0 erreur en mode
+# "standard" + marqueurs). `extraPaths` rend chaque paquet importable par les
+# autres (images→files, video→files, etc.) : pyright ne suit pas les installs
+# éditables PEP 660, on lui donne donc les sources directement.
+include = [
+    "core",
+    "packages/forge-mvc-audio/forge_mvc_audio",
+    "packages/forge-mvc-files/forge_mvc_files",
+    "packages/forge-mvc-i18n/forge_mvc_i18n",
+    "packages/forge-mvc-images/forge_mvc_images",
+    "packages/forge-mvc-iot/forge_mvc_iot",
+    "packages/forge-mvc-mail/forge_mvc_mail",
+    "packages/forge-mvc-mfa/forge_mvc_mfa",
+    "packages/forge-mvc-pivot/forge_mvc_pivot",
+    "packages/forge-mvc-rbac/forge_mvc_rbac",
+    "packages/forge-mvc-stats/forge_mvc_stats",
+    "packages/forge-mvc-video/forge_mvc_video",
+    "packages/forge-mvc-workflow/forge_mvc_workflow",
+]
+extraPaths = [
+    "packages/forge-mvc-audio",
+    "packages/forge-mvc-files",
+    "packages/forge-mvc-i18n",
+    "packages/forge-mvc-images",
+    "packages/forge-mvc-iot",
+    "packages/forge-mvc-mail",
+    "packages/forge-mvc-mfa",
+    "packages/forge-mvc-pivot",
+    "packages/forge-mvc-rbac",
+    "packages/forge-mvc-stats",
+    "packages/forge-mvc-video",
+    "packages/forge-mvc-workflow",
+]
 typeCheckingMode = "standard"
 pythonVersion = "3.12"
 
