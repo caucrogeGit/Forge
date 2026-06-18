@@ -1,3 +1,4 @@
+# pyright: strict
 """Anti-replay TOTP — RFC 6238 §5.2 : un code accepté ne peut pas être rejoué.
 
 Le store est in-memory process-local (thread-safe via RLock).
@@ -28,7 +29,7 @@ def step_for_time(at_seconds: float) -> int:
 
 def is_replay(factor_id: int, step: int) -> bool:
     """Retourne True si cette step a déjà été utilisée pour ce facteur."""
-    if not isinstance(factor_id, int) or isinstance(factor_id, bool) or factor_id <= 0:
+    if not isinstance(factor_id, int) or isinstance(factor_id, bool) or factor_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         return False
     with _lock:
         last = _used_steps.get(factor_id)
@@ -42,7 +43,7 @@ def record_used(factor_id: int, step: int) -> None:
     Déclenche une purge opportuniste toutes les _PURGE_EVERY_N_RECORDS opérations.
     """
     global _record_count
-    if not isinstance(factor_id, int) or isinstance(factor_id, bool) or factor_id <= 0:
+    if not isinstance(factor_id, int) or isinstance(factor_id, bool) or factor_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         return
     with _lock:
         previous = _used_steps.get(factor_id)
@@ -67,7 +68,7 @@ def check_and_record(factor_id: int, step: int) -> bool:
     pas), cohérent avec `is_replay()`/`record_used()`.
     """
     global _record_count
-    if not isinstance(factor_id, int) or isinstance(factor_id, bool) or factor_id <= 0:
+    if not isinstance(factor_id, int) or isinstance(factor_id, bool) or factor_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         return True
     with _lock:
         last = _used_steps.get(factor_id)

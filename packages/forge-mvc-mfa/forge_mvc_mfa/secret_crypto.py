@@ -1,3 +1,4 @@
+# pyright: strict
 """Chiffrement/déchiffrement des secrets TOTP stockés en base.
 
 La clé Fernet est lue depuis la variable d'environnement FORGE_MFA_SECRET_KEY.
@@ -121,7 +122,7 @@ def validate_mfa_secret_key_config() -> None:
     # Validation Fernet par construction effective. Ne logue rien.
     from cryptography.fernet import Fernet  # noqa: F401
     try:
-        Fernet(stripped.encode() if isinstance(stripped, str) else stripped)
+        Fernet(stripped.encode() if isinstance(stripped, str) else stripped)  # pyright: ignore[reportUnnecessaryIsInstance]
     except Exception:
         # Le message d'origine de `cryptography` peut contenir des fragments
         # de la clé. On le masque (`from None`) pour ne pas fuir la valeur
@@ -134,7 +135,7 @@ def validate_mfa_secret_key_config() -> None:
 
 def _get_fernet():
     """Retourne une instance Fernet initialisée depuis FORGE_MFA_SECRET_KEY."""
-    from cryptography.fernet import Fernet, InvalidToken  # noqa: F401
+    from cryptography.fernet import Fernet
 
     key = os.environ.get(_ENV_KEY)
     if not key or not key.strip():
@@ -148,7 +149,7 @@ def _get_fernet():
             + _generation_hint()
         )
     try:
-        return Fernet(key.encode() if isinstance(key, str) else key)
+        return Fernet(key.encode() if isinstance(key, str) else key)  # pyright: ignore[reportUnnecessaryIsInstance]
     except Exception:
         # Masque le message d'origine pour ne pas fuir la valeur de la clé.
         raise MfaSecretInvalidKey(
@@ -159,7 +160,7 @@ def _get_fernet():
 
 def encrypt_totp_secret(raw: str) -> str:
     """Chiffre un secret TOTP brut. Retourne la valeur préfixée "enc:..."."""
-    if not isinstance(raw, str) or not raw:
+    if not isinstance(raw, str) or not raw:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("raw doit être une chaîne non vide")
     fernet = _get_fernet()
     encrypted = fernet.encrypt(raw.encode()).decode()
@@ -168,7 +169,7 @@ def encrypt_totp_secret(raw: str) -> str:
 
 def decrypt_totp_secret(stored: str) -> str:
     """Déchiffre un secret TOTP stocké. Lève MfaSecretNotEncrypted si non préfixé."""
-    if not isinstance(stored, str) or not stored:
+    if not isinstance(stored, str) or not stored:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("stored doit être une chaîne non vide")
     if not stored.startswith(_PREFIX):
         raise MfaSecretNotEncrypted(

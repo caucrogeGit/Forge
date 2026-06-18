@@ -34,3 +34,6 @@ Documentation = "https://forgemvc.com/docs/forge/"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["forge_mvc_mfa*"]
+
+[tool.setuptools.package-data]
+"forge_mvc_mfa" = ["py.typed"]

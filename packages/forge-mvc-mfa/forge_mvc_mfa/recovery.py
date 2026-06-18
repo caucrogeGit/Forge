@@ -1,3 +1,4 @@
+# pyright: strict
 """Codes de recuperation MFA a usage unique pour Auth/User.
 
 Les codes bruts ne sont jamais stockes. Seul le hash SHA-256 du code normalise
@@ -10,7 +11,7 @@ import hashlib
 import secrets
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, cast
 
 from core.auth.exceptions import InvalidMfaRecoveryCodeError
 
@@ -76,7 +77,7 @@ def normalize_recovery_code(code: str) -> str:
 
     Refuse None, les types non-chaine et les chaines vides.
     """
-    if not isinstance(code, str):
+    if not isinstance(code, str):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise InvalidMfaRecoveryCodeError("le code de recuperation doit etre une chaine")
     code = code.strip().upper()
     if not code:
@@ -107,9 +108,9 @@ def verify_recovery_code(code: str, code_hash: str) -> bool:
     Utilise secrets.compare_digest pour eviter les attaques temporelles.
     """
     try:
-        if not isinstance(code, str) or not code.strip():
+        if not isinstance(code, str) or not code.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
-        if not isinstance(code_hash, str) or len(code_hash) != _HASH_LENGTH:
+        if not isinstance(code_hash, str) or len(code_hash) != _HASH_LENGTH:  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
         expected = hash_recovery_code(code)
         return secrets.compare_digest(expected, code_hash)
@@ -147,6 +148,7 @@ def validate_recovery_code_contract(data: Any) -> None:
             "les donnees doivent etre un AuthMfaRecoveryCode ou un dict"
         )
 
+    data = cast("dict[str, Any]", data)
     missing = sorted(k for k in ("user_id", "code_hash") if k not in data)
     if missing:
         raise InvalidMfaRecoveryCodeError(f"champs obligatoires manquants : {', '.join(missing)}")
@@ -156,10 +158,10 @@ def validate_recovery_code_contract(data: Any) -> None:
 
 def _validate_record_fields(record_id: Any, user_id: Any, code_hash: Any) -> None:
     if record_id is not None:
-        if not isinstance(record_id, int) or isinstance(record_id, bool) or record_id <= 0:
+        if not isinstance(record_id, int) or isinstance(record_id, bool) or record_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
             raise InvalidMfaRecoveryCodeError("id doit etre None ou un entier strictement positif")
 
-    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise InvalidMfaRecoveryCodeError("user_id doit etre un entier strictement positif")
 
     _validate_code_hash(code_hash)
@@ -178,6 +180,7 @@ def normalize_recovery_code_record(data: Any) -> AuthMfaRecoveryCode:
 
     validate_recovery_code_contract(data)
 
+    data = cast("dict[str, Any]", data)
     return AuthMfaRecoveryCode(
         id=data.get("id"),
         user_id=data["user_id"],
@@ -213,9 +216,9 @@ def create_recovery_codes(
     - raw_codes : a afficher une seule fois a l'utilisateur ;
     - code_records : a stocker en base (hashes uniquement, jamais de code brut).
     """
-    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise InvalidMfaRecoveryCodeError("user_id doit etre un entier strictement positif")
-    if not isinstance(count, int) or isinstance(count, bool) or count <= 0:
+    if not isinstance(count, int) or isinstance(count, bool) or count <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise InvalidMfaRecoveryCodeError("count doit etre un entier strictement positif")
 
     ts = now if now is not None else datetime.now(tz=timezone.utc)

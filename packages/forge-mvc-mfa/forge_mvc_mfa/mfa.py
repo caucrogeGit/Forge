@@ -1,11 +1,13 @@
+# pyright: strict
 """Contrat MFA generique, stockage des facteurs, TOTP, challenge connexion et revalidation."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from collections.abc import Callable
 from functools import wraps
-from typing import Any
+from typing import Any, cast
 
 import pyotp
 
@@ -75,7 +77,7 @@ def _validate_fields(
         )
 
 
-def _resolve_dict_secret(data: dict) -> Any:
+def _resolve_dict_secret(data: dict[str, Any]) -> Any:
     return data.get("totp_secret")
 
 
@@ -92,6 +94,7 @@ def validate_mfa_factor_contract(data: Any) -> None:
     if not isinstance(data, dict):
         raise InvalidMfaFactorError("les donnees MFA doivent etre un AuthMfaFactor ou un dict")
 
+    data = cast("dict[str, Any]", data)
     totp_secret = _resolve_dict_secret(data)
 
     missing = sorted(k for k in ("user_id", "factor_type", "status") if k not in data)
@@ -118,6 +121,7 @@ def normalize_mfa_factor(data: Any) -> AuthMfaFactor:
     if not isinstance(data, dict):
         raise InvalidMfaFactorError("les donnees MFA doivent etre un AuthMfaFactor ou un dict")
 
+    data = cast("dict[str, Any]", data)
     totp_secret = _resolve_dict_secret(data)
 
     missing = sorted(k for k in ("user_id", "factor_type", "status") if k not in data)
@@ -132,7 +136,7 @@ def normalize_mfa_factor(data: Any) -> AuthMfaFactor:
         id=data.get("id"),
         user_id=data["user_id"],
         factor_type=data["factor_type"],
-        totp_secret=totp_secret,
+        totp_secret=cast("str", totp_secret),
         status=data.get("status", MFA_STATUS_PENDING),
         label=data.get("label"),
         confirmed_at=data.get("confirmed_at"),
@@ -157,7 +161,7 @@ def is_mfa_factor_active(factor: Any) -> bool:
         if isinstance(factor, AuthMfaFactor):
             return factor.status == MFA_STATUS_ACTIVE
         if isinstance(factor, dict):
-            return factor.get("status") == MFA_STATUS_ACTIVE
+            return cast("dict[str, Any]", factor).get("status") == MFA_STATUS_ACTIVE
     except Exception:
         pass
     return False
@@ -214,11 +218,11 @@ def totp_provisioning_uri(
 
     Refuse secret, account_name ou issuer_name vides.
     """
-    if not isinstance(secret, str) or not secret:
+    if not isinstance(secret, str) or not secret:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("secret doit etre une chaine non vide")
-    if not isinstance(account_name, str) or not account_name:
+    if not isinstance(account_name, str) or not account_name:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("account_name doit etre une chaine non vide")
-    if not isinstance(issuer_name, str) or not issuer_name:
+    if not isinstance(issuer_name, str) or not issuer_name:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError("issuer_name doit etre une chaine non vide")
 
     totp = pyotp.TOTP(secret)
@@ -239,7 +243,7 @@ def create_totp_factor(
     - un AuthMfaFactor en statut pending pret au stockage ;
     - l'URI otpauth:// de provisioning.
     """
-    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise InvalidMfaFactorError("user_id doit etre un entier strictement positif")
 
     ts = now if now is not None else datetime.now(tz=timezone.utc)
@@ -274,17 +278,17 @@ def verify_totp_code(
     valid_window : nombre de periodes de tolerance de chaque cote de la periode courante.
     """
     try:
-        if not isinstance(secret, str) or not secret:
+        if not isinstance(secret, str) or not secret:  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
-        if not isinstance(code, str) or not code:
+        if not isinstance(code, str) or not code:  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
-        if not isinstance(valid_window, int) or isinstance(valid_window, bool) or valid_window < 0:
+        if not isinstance(valid_window, int) or isinstance(valid_window, bool) or valid_window < 0:  # pyright: ignore[reportUnnecessaryIsInstance]
             return False
 
         totp = pyotp.TOTP(secret)
         if now is not None:
             for_time = now.timestamp() if hasattr(now, "timestamp") else None
-            return totp.verify(code, valid_window=valid_window, for_time=for_time)
+            return totp.verify(code, valid_window=valid_window, for_time=for_time)  # pyright: ignore[reportArgumentType]
         return totp.verify(code, valid_window=valid_window)
     except Exception:
         return False
@@ -373,7 +377,7 @@ def _session_user_matches(request: Any, expected_user_id: int) -> bool:
     Criteres : session existante, authentifie=True, utilisateur["id"] == expected_user_id.
     Retourne False sans lever d'exception.
     """
-    if not isinstance(expected_user_id, int) or isinstance(expected_user_id, bool):
+    if not isinstance(expected_user_id, int) or isinstance(expected_user_id, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
         return False
     if expected_user_id <= 0:
         return False
@@ -382,10 +386,10 @@ def _session_user_matches(request: Any, expected_user_id: int) -> bool:
         return False
     if not _session_get(session, "authenticated"):
         return False
-    user = _session_get(session, "user") or {}
+    user: object = _session_get(session, "user") or {}
     if not isinstance(user, dict):
         return False
-    session_user_id = user.get("id")
+    session_user_id = cast("dict[str, Any]", user).get("id")
     if not isinstance(session_user_id, int) or isinstance(session_user_id, bool):
         return False
     return session_user_id == expected_user_id
@@ -394,7 +398,7 @@ def _session_user_matches(request: Any, expected_user_id: int) -> bool:
 def _resolve_mfa_session(request: Any) -> "dict[str, Any] | None":
     session = getattr(request, "session", None)
     if isinstance(session, dict):
-        return session
+        return cast("dict[str, Any]", session)
     try:
         from core.security.session import get_session_id
         from core.sessions.manager import get_session_store
@@ -419,11 +423,12 @@ def _persist_session_changes(
     """
     raw_session = getattr(request, "session", None)
     if isinstance(raw_session, dict):
+        mutable_session = cast("dict[str, Any]", raw_session)
         if set_keys:
-            raw_session.update(set_keys)
+            mutable_session.update(set_keys)
         if unset_keys:
             for k in unset_keys:
-                raw_session.pop(k, None)
+                mutable_session.pop(k, None)
         return
 
     try:
@@ -507,7 +512,7 @@ def has_pending_mfa_challenge(
     Utilise max_age_minutes (defaut 10). Accepte now pour les tests.
     Ne modifie pas la session.
     """
-    if not isinstance(max_age_minutes, int) or isinstance(max_age_minutes, bool) or max_age_minutes <= 0:
+    if not isinstance(max_age_minutes, int) or isinstance(max_age_minutes, bool) or max_age_minutes <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         return False
 
     session = _resolve_mfa_session(request)
@@ -571,7 +576,7 @@ def verify_mfa_challenge(
     from core.auth.audit import AUTH_EVENT_MFA_RATE_LIMITED
     from forge_mvc_mfa.recovery import AuthMfaRecoveryCode, consume_recovery_code, normalize_recovery_code_record
 
-    if not isinstance(code, str) or not code.strip():
+    if not isinstance(code, str) or not code.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
         return None
 
     user_id = get_mfa_challenge_user_id(request)
@@ -717,7 +722,7 @@ def mark_mfa_revalidated(
     user_id doit etre un entier strictement positif. Ne connecte pas l'utilisateur.
     Ne modifie pas la base de donnees.
     """
-    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         raise InvalidMfaFactorError("user_id doit etre un entier strictement positif")
 
     if not _session_user_matches(request, user_id):
@@ -755,7 +760,7 @@ def has_recent_mfa_revalidation(
     Verifie que la session contient une revalidation, que user_id correspond et
     que la revalidation n'est pas expiree. Ne modifie pas la session.
     """
-    if not isinstance(max_age_minutes, int) or isinstance(max_age_minutes, bool) or max_age_minutes <= 0:
+    if not isinstance(max_age_minutes, int) or isinstance(max_age_minutes, bool) or max_age_minutes <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         return False
 
     session = _resolve_mfa_session(request)
@@ -822,10 +827,10 @@ def verify_mfa_revalidation(
     from core.auth.audit import AUTH_EVENT_MFA_RATE_LIMITED
     from forge_mvc_mfa.recovery import AuthMfaRecoveryCode, consume_recovery_code, normalize_recovery_code_record
 
-    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:  # pyright: ignore[reportUnnecessaryIsInstance]
         return None
 
-    if not isinstance(code, str) or not code.strip():
+    if not isinstance(code, str) or not code.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
         return None
 
     if not _session_user_matches(request, user_id):
@@ -937,7 +942,9 @@ def verify_mfa_revalidation(
     return None
 
 
-def require_recent_mfa(func=None, *, max_age_minutes: int = 10):
+def require_recent_mfa(
+    func: Callable[..., Any] | None = None, *, max_age_minutes: int = 10
+) -> Any:
     """Protege une action sensible en verifiant qu'une revalidation MFA recente existe.
 
     Extrait user_id depuis la session auth. Retourne 403 si absente ou expiree.
@@ -946,9 +953,9 @@ def require_recent_mfa(func=None, *, max_age_minutes: int = 10):
     from core.auth.session import get_authenticated_user_id
     from core.http.response import Response
 
-    def decorator(wrapped):
+    def decorator(wrapped: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(wrapped)
-        def wrapper(request: Any, *args: Any, **kwargs: Any):
+        def wrapper(request: Any, *args: Any, **kwargs: Any) -> Any:
             uid = get_authenticated_user_id(request)
             if uid is None or not has_recent_mfa_revalidation(
                 request, uid, max_age_minutes=max_age_minutes
