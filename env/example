@@ -66,6 +66,16 @@ APP_PORT=8000
 # Dev : HTTPS local par défaut. Prod derrière Nginx : HTTP local par défaut.
 # APP_SSL_ENABLED=true
 
+# Reverse proxy de confiance (ENV-EXAMPLE-TRUSTED-PROXIES-001).
+# Liste d'IP de proxies autorisés à fournir l'en-tête X-Real-IP, séparées par
+# des virgules. Par défaut VIDE : X-Real-IP est ignoré et l'IP vue est celle de
+# la connexion directe (sécurisé, non spoofable). Derrière le Nginx fourni
+# (deploy/nginx/forge-app.conf envoie X-Real-IP), sans cette variable le
+# rate-limiting regroupe tous les clients sous l'IP du proxy. Renseigner alors
+# l'IP du proxy pour résoudre la vraie IP cliente, par ex. :
+# APP_TRUSTED_PROXIES=127.0.0.1
+APP_TRUSTED_PROXIES=
+
 # Certificats SSL (générés avec openssl, voir app.py)
 SSL_CERTFILE=cert.pem
 SSL_KEYFILE=key.pem
