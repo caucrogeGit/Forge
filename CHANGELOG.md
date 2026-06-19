@@ -18,9 +18,9 @@
   passe par une garde `… if row else 0` ; la méthode `json` de
   `WelcomeController` (qui masquait `BaseController.json`) est renommée
   `json_demo` (URL `/welcome/json` inchangée). Vérifié : `pyright --strict` à
-  0 erreur sur les 3 bilans. Limite connue : le palier avancé utilise l'opt-in
-  `forge-mvc-files`, qui n'expose pas encore de `py.typed` — son usage reste
-  `Unknown` en strict tant que l'opt-in n'est pas typé (chantier séparé).
+  0 erreur sur les 3 bilans. L'opt-in `forge-mvc-files` utilisé par le palier
+  avancé expose `py.typed` dès cette release ; son usage est donc typé en mode
+  strict.
 - **Accesseurs `Request` précis en typage strict (`@overload`)**
   (`HTTP-REQUEST-ACCESSOR-OVERLOAD-001`). `request.query()`, `request.form()`,
   `request.header()` et `request.route()` exposent désormais deux surcharges :

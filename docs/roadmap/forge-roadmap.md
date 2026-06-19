@@ -7,8 +7,8 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> Version en cours de finalisation : **Forge 1.0.0-beta.13** (bump effectué le
-> 2026-05-31). Dernière version publiée sur PyPI : **Forge 1.0.0-beta.12**.
+> Version courante : **Forge 1.0.0-beta.17** (publiée le 2026-06-18).
+> Dernière version publiée sur PyPI : **Forge 1.0.0-beta.17**.
 
 ---
 
@@ -67,9 +67,9 @@ de 3.0.2 (voir [`audit-renforce-3.0.2-001`](../history/audits/audit-renforce-3.0
 Aucune rupture d'API publique. Voir `CHANGELOG.md` section [3.0.3]
 pour le détail.
 
-Dernière validation — Forge 1.0.0-beta.4 (BETA-4-RELEASE-001) :
+Dernière validation, Forge 1.0.0-beta.17 (RELEASE-BETA17-001) :
 
-- `pytest` : **10 166 passed, 3 skipped** (post-1.0.0-beta.4) ;
+- `pytest` : **17 523 tests collectés** (suite verte) ;
 - `python -m compileall -q .` : **OK** ;
 - `mkdocs build --strict` : **OK** ;
 - `git diff --check` : **OK**.
