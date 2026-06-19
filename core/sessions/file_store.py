@@ -38,6 +38,15 @@ class FileSessionStore:
     ) -> None:
         self._dir = Path(sessions_dir).resolve()
         self._dir.mkdir(parents=True, exist_ok=True)
+        # Durcissement (SEC-SESSION-FILE-PERMS-001) : les fichiers de session
+        # contiennent l'état d'authentification, l'identité et le jeton CSRF.
+        # Le dossier ne doit être accessible que par le propriétaire (0700),
+        # y compris s'il préexistait avec des permissions plus larges.
+        # Best effort : chmod n'a pas de sémantique POSIX sur Windows.
+        try:
+            self._dir.chmod(0o700)
+        except OSError:
+            pass
         self._ttl = ttl
         self._lock = threading.RLock()
 
@@ -65,7 +74,12 @@ class FileSessionStore:
         target = self._path(session_id)
         tmp = target.with_name(f"{target.name}.{secrets.token_hex(4)}.tmp")
         try:
-            tmp.write_text(json.dumps(data), encoding="utf-8")
+            # Création directe en 0o600 (SEC-SESSION-FILE-PERMS-001) : le fichier
+            # n'est lisible que par le propriétaire dès son ouverture, sans
+            # fenêtre où il hériterait de l'umask. os.replace préserve le mode.
+            fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                handle.write(json.dumps(data))
             os.replace(tmp, target)
         except OSError:
             # En cas d'échec, ne pas laisser de fichier temporaire orphelin.
