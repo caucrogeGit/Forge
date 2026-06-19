@@ -44,22 +44,23 @@ pipx install --pip-args="--pre" forge-mvc
 forge --version
 ```
 
-Créer un projet nu puis construire le starter `welcome` :
+Créer un projet et lancer le serveur de développement :
 
 ```bash
 forge new forge-demo
 cd forge-demo
-
-python -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
-
-forge starter:build welcome
-
-cp env/example env/dev
-forge db:init
 forge run
 ```
+
+`forge new` prépare tout le projet : squelette, environnement Python avec
+`forge-mvc`, fichier `env/dev`, certificat HTTPS de développement et dépôt Git.
+Les premiers paliers tournent sans base de données ; MariaDB et `forge db:init`
+ne deviennent nécessaires qu'à partir du palier « Première base SQL ».
+
+Pour construire pas à pas votre première application, suivez le parcours cœur
+Welcome Forge :
+[forgemvc.com/docs/forge/starters/welcome-forge/](https://forgemvc.com/docs/forge/starters/welcome-forge/).
 
 La documentation complète d'installation est sur
 [forgemvc.com/docs/forge/install/](https://forgemvc.com/docs/forge/install/).
