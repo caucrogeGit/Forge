@@ -279,6 +279,16 @@ Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de st
 `1.0.0-beta.6` marque le T0 officiel des tests terrain (ADR-009).
 Un passage en stable ne peut intervenir qu'après terrain validé et RC publiée.
 
+### Trajectoire de licence (LEGAL-LICENSE-ROADMAP-001)
+
+Pendant toute la phase bêta, Forge reste sous licence propriétaire / source
+disponible (ce n'est pas un logiciel open source aujourd'hui).
+À partir de la version **1.0.0 stable**, Forge a vocation à être publié sous
+licence open source **MIT**.
+Objectif de trajectoire ancré sur le jalon 1.0.0 stable, pas sur une date ; le
+fichier `LICENSE` et `pyproject.toml` ne basculeront en MIT qu'à ce moment.
+Détail : [`docs/philosophy/licence.md`](../philosophy/licence.md).
+
 ---
 
 ## Socle livré en Forge 1.5.0

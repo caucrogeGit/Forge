@@ -106,6 +106,18 @@ def test_readme_licence_section_forbids_professional_use():
     assert "professionnel" in text.lower()
 
 
+def test_readme_announces_mit_transition():
+    """LEGAL-LICENSE-ROADMAP-001 : le README annonce explicitement la
+    trajectoire vers MIT à la 1.0.0 stable (anti-dérive — l'annonce ne doit
+    pas disparaître silencieusement). Voir docs/philosophy/licence.md."""
+    text = _README.read_text(encoding="utf-8").lower()
+    assert "mit" in text, "le README doit annoncer la cible MIT"
+    assert "1.0.0" in text, "le README doit ancrer la transition sur la 1.0.0"
+    # L'annonce reste une trajectoire, pas un état présent : la licence
+    # actuelle demeure propriétaire (couvert par test_pyproject_*).
+    assert "n'est pas open source" in text
+
+
 # ---------------------------------------------------------------------------
 # docs/philosophy/licence.md
 # ---------------------------------------------------------------------------
@@ -128,3 +140,14 @@ def test_docs_licence_mentions_written_authorization():
 def test_docs_licence_mentions_not_open_source():
     text = _DOCS_LICENCE.read_text(encoding="utf-8")
     assert "pas un logiciel open source" in text or "n'est pas open source" in text.lower()
+
+
+def test_docs_licence_announces_mit_transition():
+    """LEGAL-LICENSE-ROADMAP-001 : la page licence porte la trajectoire MIT
+    (cible MIT, ancrée sur la 1.0.0 stable). Garde-fou positif : la décision
+    reste visible et ne se dilue pas en « évolution possible » floue."""
+    text = _DOCS_LICENCE.read_text(encoding="utf-8")
+    lower = text.lower()
+    assert "mit" in lower, "la page licence doit nommer la cible MIT"
+    assert "1.0.0" in lower, "la transition doit être ancrée sur la 1.0.0 stable"
+    assert "trajectoire" in lower

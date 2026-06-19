@@ -183,6 +183,10 @@ L'usage professionnel, commercial ou institutionnel nécessite un accord
 écrit préalable de Roger Lequette. La lecture, l'étude, l'évaluation
 personnelle et l'usage éducatif non commercial sont autorisés sans accord.
 
+Forge n'est pas open source pendant sa phase bêta. À partir de la version
+1.0.0 stable, Forge a vocation à être publié sous licence open source MIT.
+Jusqu'à cette publication, la licence présente dans le dépôt fait foi.
+
 Voir [LICENSE](LICENSE) pour les conditions complètes.
 
 ---
