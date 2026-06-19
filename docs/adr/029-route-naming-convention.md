@@ -102,16 +102,22 @@ est donc mappé sur `/` (et non `/home`), avec le nom `home-index`. C'est la
 
 ## Migration (tickets de suivi)
 
-Cette convention est la cible. Sa mise en œuvre passe par des tickets dédiés,
-dans cet ordre suggéré :
+Cette convention est la cible. Sa mise en œuvre est **livrée** pour le périmètre
+retenu par le mainteneur :
 
-1. **Générateur `make:crud`** : produire chemins `/<contrôleur>/<méthode>` et
-   noms `<contrôleur>-<méthode>` (index nu, racine exceptée).
-2. **Parcours welcome-forge** (débutant, intermédiaire, avancé) : réaligner les
-   routes des trois mini-projets.
-3. **Parcours opt-in et starters restants** : réalignement.
-4. **Squelette** : `home_index` devient `home-index` (racine `/` conservée).
-5. **Garde-fous** : tests asservissant des noms de route mis à jour.
+1. **Squelette** : `home_index` devient `home-index`, racine `/` conservée.
+   Livré, `ROUTE-CONVENTION-SKELETON-001` (commit `200548c`).
+2. **Parcours welcome-forge** (débutant, intermédiaire, avancé) : routes des
+   trois mini-projets réalignées. Livré, `ROUTE-CONVENTION-WELCOME-001`
+   (commit `a5a905c`).
+3. **Générateur `make:crud`** : produit chemins `/<contrôleur>/<méthode>` et
+   noms `<contrôleur>-<méthode>` (index nu, racine exceptée). Livré,
+   `ROUTE-CONVENTION-MAKECRUD-001` (commit `7082dfd`), garde-fous mis à jour.
+4. **Parcours opt-in et starters restants** : **dé-scopé** par le mainteneur
+   (juin 2026, « pour les starters on se cantonne à welcome-forge »). Les
+   parcours opt-in gardent transitoirement leur ancienne convention de route ;
+   divergence assumée, sans incidence sur `make:crud` (aucun starter opt-in
+   ne passe par `kind=crud`).
 
 ---
 
