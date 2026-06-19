@@ -4,13 +4,15 @@ After=network.target mariadb.service
 
 [Service]
 Type=simple
-# Adapter User à l'utilisateur système qui exécutera l'application
+# Gabarit à adapter avant installation.
+# Remplacer /opt/forge par le répertoire réel de déploiement, et User par
+# l'utilisateur système dédié qui exécutera l'application.
 User=www-data
-WorkingDirectory=/home/roger/Projets/Forge
-ExecStart=/home/roger/Projets/Forge/.venv/bin/python /home/roger/Projets/Forge/app.py --env prod
+WorkingDirectory=/opt/forge
+ExecStart=/opt/forge/.venv/bin/python /opt/forge/app.py --env prod
 Restart=always
 RestartSec=5
-EnvironmentFile=/home/roger/Projets/Forge/env/prod
+EnvironmentFile=/opt/forge/env/prod
 
 [Install]
 WantedBy=multi-user.target
