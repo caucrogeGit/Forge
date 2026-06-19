@@ -423,7 +423,7 @@ Planifiez une sauvegarde automatique via cron :
 
 ```bash
 # /etc/cron.d/mon-app-backup
-0 3 * * * forge mysqldump -u root -p<pwd> mon_app_db | gzip > /backup/mon_app/db/daily_$(date +\%Y\%m\%d).sql.gz
+0 3 * * * mysqldump -u root -p<pwd> mon_app_db | gzip > /backup/mon_app/db/daily_$(date +\%Y\%m\%d).sql.gz
 ```
 
 ### Uploads
