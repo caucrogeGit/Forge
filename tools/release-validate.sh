@@ -217,8 +217,11 @@ fi
 # ── 7. MkDocs strict ─────────────────────────────────────────────────────────
 echo ""
 echo "--- MkDocs --strict ---"
-MKDOCS_OUT=$("$PYTHON_BIN" -m mkdocs build --strict --quiet 2>&1); MKDOCS_EXIT=$?; true
-if [ $MKDOCS_EXIT -eq 0 ]; then
+# RELEASE-VALIDATE-MKDOCS-SETE-FIX-001 : command-substitution placée DANS la
+# condition du `if` (exemptée de `set -e`), comme pour pip-audit plus bas.
+# L'ancien motif `VAR=$(cmd); EXIT=$?; true` ne protégeait PAS l'assignation :
+# un mkdocs en échec tuait le script avant d'afficher le _fail.
+if MKDOCS_OUT=$("$PYTHON_BIN" -m mkdocs build --strict --quiet 2>&1); then
     _ok "MkDocs build --strict : OK"
 else
     _fail "MkDocs build --strict : erreurs"
