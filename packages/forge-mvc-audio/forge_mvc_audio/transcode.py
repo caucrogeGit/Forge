@@ -38,6 +38,12 @@ class FfmpegError(Exception):
     """ffmpeg a échoué, est absent, ou a dépassé le délai."""
 
 
+def _safe_path_arg(path: str) -> str:
+    """Empêche qu'un chemin commençant par ``-`` soit lu comme une option ffmpeg
+    (MEDIA-FFMPEG-ARG-HARDENING-001). Neutre pour les chemins uuid/absolus."""
+    return f"./{path}" if path.startswith("-") else path
+
+
 def build_transcode_command(
     ffmpeg_bin: str, input_path: str, output_path: str, *, bitrate_kbps: int = 192
 ) -> list[str]:
@@ -45,11 +51,11 @@ def build_transcode_command(
     return [
         ffmpeg_bin,
         "-y",
-        "-i", input_path,
+        "-i", _safe_path_arg(input_path),
         "-vn",
         "-c:a", "libmp3lame", "-b:a", f"{bitrate_kbps}k", "-ac", "2",
         "-map_metadata", "-1",
-        output_path,
+        _safe_path_arg(output_path),
     ]
 
 

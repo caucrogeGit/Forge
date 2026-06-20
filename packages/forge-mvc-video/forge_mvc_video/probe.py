@@ -47,13 +47,16 @@ def _default_runner(ffprobe_bin: str, path: str) -> str:
     """Lance ffprobe et retourne sa sortie JSON (stdout)."""
     import subprocess
 
+    # Préfixe ./ si le chemin commence par '-' pour qu'il ne soit pas lu comme
+    # une option ffprobe (MEDIA-FFMPEG-ARG-HARDENING-001).
+    safe_path = f"./{path}" if path.startswith("-") else path
     cmd = [
         ffprobe_bin,
         "-v", "error",
         "-print_format", "json",
         "-show_format",
         "-show_streams",
-        path,
+        safe_path,
     ]
     try:
         result = subprocess.run(

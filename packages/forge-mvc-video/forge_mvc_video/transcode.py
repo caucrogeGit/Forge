@@ -45,6 +45,12 @@ class FfmpegError(Exception):
     """ffmpeg a échoué, est absent, ou a dépassé le délai."""
 
 
+def _safe_path_arg(path: str) -> str:
+    """Empêche qu'un chemin commençant par ``-`` soit lu comme une option ffmpeg
+    (MEDIA-FFMPEG-ARG-HARDENING-001). Neutre pour les chemins uuid/absolus."""
+    return f"./{path}" if path.startswith("-") else path
+
+
 def build_transcode_command(
     ffmpeg_bin: str, input_path: str, output_path: str
 ) -> list[str]:
@@ -52,13 +58,13 @@ def build_transcode_command(
     return [
         ffmpeg_bin,
         "-y",
-        "-i", input_path,
+        "-i", _safe_path_arg(input_path),
         "-c:v", "libx264", "-preset", "medium", "-crf", "23",
         "-c:a", "aac", "-b:a", "128k", "-ac", "2",
         "-vf", "scale='min(1920,iw)':-2",
         "-movflags", "+faststart",
         "-map_metadata", "-1",
-        output_path,
+        _safe_path_arg(output_path),
     ]
 
 
@@ -70,10 +76,10 @@ def build_poster_command(
         ffmpeg_bin,
         "-y",
         "-ss", str(at_seconds),  # avant -i : seek rapide
-        "-i", input_path,
+        "-i", _safe_path_arg(input_path),
         "-frames:v", "1",
         "-q:v", "3",
-        output_path,
+        _safe_path_arg(output_path),
     ]
 
 
