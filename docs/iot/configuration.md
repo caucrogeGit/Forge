@@ -1,9 +1,8 @@
 # Configuration Forge IoT
 
-> **Statut** : itération 1 — contrat de configuration sans connexion
-> broker. Aucun subscriber MQTT n'est encore instancié à partir de cet
-> objet ; voir [Architecture Forge IoT](architecture.md) et le ticket
-> `IOT-MQTT-SUBSCRIBER-001` pour la suite.
+> **Statut** : configuration **en vigueur**. Le subscriber `forge-mvc-iot`
+> est instancié à partir de cet objet (host, port, identifiants, TLS). Voir
+> [Subscriber MQTT](mqtt-subscriber.md) et [Architecture Forge IoT](architecture.md).
 
 ## Objectif
 
@@ -41,9 +40,9 @@ Le topic par défaut `forge/+/+/telemetry` utilise les wildcards MQTT
 `site`/`device_id` sous `forge/.../telemetry`. C'est l'inverse du
 contrat de publication, où `+` est interdit.
 
-## TLS MQTT (préparation)
+## TLS MQTT
 
-Deux variables préparent **MQTT over TLS** (port broker `8883` en usage
+Deux variables activent **MQTT over TLS** (port broker `8883` en usage
 réel, certificat CA) :
 
 | Variable | Rôle |
@@ -218,11 +217,10 @@ FORGE_IOT_MQTT_PASSWORD=...
 ```
 
 Aucun branchement spécial n'est nécessaire — le contrat est identique
-à un broker local. Pour un broker exposé, ajoute la
-[préparation TLS](#tls-mqtt-preparation) (`FORGE_IOT_MQTT_TLS_ENABLED`,
-`FORGE_IOT_MQTT_TLS_CA_FILE`, port `8883`). Le câblage TLS effectif des
-clients et les certificats client (mTLS) restent à venir
-(voir [Limites](#limites-iteration-1)).
+à un broker local. Pour un broker exposé, active le
+[TLS MQTT](#tls-mqtt) (`FORGE_IOT_MQTT_TLS_ENABLED`,
+`FORGE_IOT_MQTT_TLS_CA_FILE`, port `8883`). Les certificats client (mTLS)
+restent hors périmètre.
 
 ## Limites itération 1
 

@@ -1,10 +1,10 @@
 # Subscriber MQTT Forge IoT
 
-> **Statut** : implémentation initiale du subscriber, branchée sur
-> [paho-mqtt](https://pypi.org/project/paho-mqtt/). Le module produit
-> des objets `Measurement` parsés ; il **n'écrit encore rien en base**
-> et **n'expose aucune route HTTP** — ces étapes appartiennent aux
-> tickets suivants (`IOT-STORAGE-EVENTS-001`, `IOT-HTTP-API-001`).
+> **Statut** : subscriber **livré**, branché sur
+> [paho-mqtt](https://pypi.org/project/paho-mqtt/). Le module parse les
+> messages en objets `Measurement`, les **persiste** dans `iot_events`, les
+> **expose** via une API HTTP JSON, et fournit la CLI `iot:*`
+> (`doctor`/`init`/`listen`/`simulate`). Cette page décrit la couche subscriber.
 
 ## Objectif
 
@@ -253,15 +253,14 @@ politique de reconnexion personnalisée) sera abordé dans
 - **Pas d'imports paho dans `contract.py`.** La séparation est testée :
   `parse_message` reste utilisable même si paho-mqtt n'est pas installé.
 
-## Hors périmètre de ce ticket
+## Hors périmètre du module
 
-- pas de stockage SQL des mesures (futur `IOT-STORAGE-EVENTS-001`) ;
-- pas de migration ;
-- pas de route HTTP exposant les mesures (futur `IOT-HTTP-API-001`) ;
-- pas de commande `forge iot:*` (futur `IOT-DOCTOR-001`) ;
+Le module couvre l'ingestion (subscriber), le stockage `iot_events`, l'API HTTP
+JSON et la CLI `iot:*`. Restent hors périmètre :
+
 - pas de dashboard, pas de Forge Design ;
-- pas de TLS / ACL Mosquitto ;
-- pas de downlink Forge → capteur.
+- pas d'ACL Mosquitto gérée par Forge (côté broker) ;
+- pas de downlink Forge → capteur (commande descendante).
 
 Voir [Architecture Forge IoT](architecture.md#tickets-suivants) pour la
 liste complète des jalons.

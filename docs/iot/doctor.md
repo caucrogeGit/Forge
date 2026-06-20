@@ -237,7 +237,7 @@ forge iot:doctor --mqtt
 
 Sans `FORGE_IOT_MQTT_TLS_CA_FILE`, paho utilise les certificats système.
 Le chemin du CA n'apparaît jamais dans la sortie. Détails :
-[Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation).
+[Configuration — TLS MQTT](configuration.md#tls-mqtt).
 
 > **Astuce ateliers** : si Mosquitto n'est pas lancé, `forge iot:doctor
 > --mqtt` sort légitimement en `[FAIL]` avec un message clair — c'est le
@@ -338,7 +338,7 @@ Sont volontairement **hors périmètre**, y compris pour `--mqtt` :
   client (mTLS). Le **TLS est désormais pris en charge** : si
   `FORGE_IOT_MQTT_TLS_ENABLED=true`, `--mqtt` se connecte en TLS
   (`client.tls_set`, `ca_certs` = `FORGE_IOT_MQTT_TLS_CA_FILE` si fourni)
-  — voir [Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation).
+  — voir [Configuration — TLS MQTT](configuration.md#tls-mqtt).
   Sinon, la connexion reste en clair (comportement par défaut).
 
 Côté `--db` et contrôle de schéma, sont aussi **hors périmètre** :

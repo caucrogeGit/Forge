@@ -1,11 +1,9 @@
 # Stockage des événements IoT — contrat SQL
 
-> **Statut** : contrat SQL **figé**, sans branchement base de données.
-> Ce ticket (`IOT-STORAGE-EVENTS-001`) définit la table cible, l'ordre
-> canonique des colonnes, et fournit les fonctions pures qui sérialisent
-> une `Measurement` en `(sql, params)`. La migration versionnée et
-> l'insertion réelle sont traitées par les tickets suivants
-> (`IOT-STORAGE-MIGRATION-001`, `IOT-STORAGE-REPOSITORY-001`).
+> **Statut** : stockage **livré**. Le module définit la table `iot_events`,
+> l'ordre canonique des colonnes, les fonctions pures qui sérialisent une
+> `Measurement` en `(sql, params)`, et l'insertion réelle via un exécuteur
+> injecté. Cette page décrit le contrat SQL appliqué.
 
 ## Objectif
 

@@ -175,7 +175,7 @@ forge iot:simulate --profile temperature --count 3
 ```
 
 Le chemin du CA n'apparaît jamais dans la sortie. Détails :
-[Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation).
+[Configuration — TLS MQTT](configuration.md#tls-mqtt).
 
 ## Codes de sortie
 

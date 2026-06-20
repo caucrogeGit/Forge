@@ -1,11 +1,10 @@
 # Contrat MQTT Forge IoT
 
-> **Statut** : contrat **documentaire** — aucun subscriber MQTT n'existe
-> encore dans Forge. Cette page fige le format des topics et du payload
-> JSON que `forge-mvc-iot` acceptera dans son itération 1, avant
-> qu'un code de réception soit écrit (voir
-> [Architecture Forge IoT](architecture.md) et le ticket
-> `IOT-MQTT-SUBSCRIBER-001`).
+> **Statut** : contrat **en vigueur** — le subscriber `forge-mvc-iot` est
+> livré et applique ce format. Cette page fige le format des topics et du
+> payload JSON acceptés (voir
+> [Subscriber MQTT](mqtt-subscriber.md) et
+> [Architecture Forge IoT](architecture.md)).
 
 ## Objectif
 

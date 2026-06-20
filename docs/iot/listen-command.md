@@ -202,7 +202,7 @@ forge iot:listen
 
 Sans TLS (défaut), la connexion reste en clair — adapté au
 [Mosquitto local](mosquitto-local.md). Détails :
-[Configuration — TLS MQTT](configuration.md#tls-mqtt-preparation).
+[Configuration — TLS MQTT](configuration.md#tls-mqtt).
 
 ## Limites
 
@@ -212,7 +212,7 @@ pédagogie**, pas pour la production. Sont **hors périmètre** :
 - pas de daemon systemd ni de mode service ;
 - pas de file d'attente, de retry/backoff, ni de batch insert ;
 - pas de stockage multi-thread ;
-- pas de TLS ni d'authentification avancée ;
+- pas d'authentification avancée (mTLS, ACL côté broker) ;
 - ne lance pas le simulateur (voir [`forge iot:simulate`](simulator.md)) ;
 - ne modifie ni l'[API HTTP](http-api.md) ni le
   [contrat MQTT](mqtt-contract.md).
