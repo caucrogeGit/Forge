@@ -207,7 +207,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self._serve_static(request.path)
                 return
             if request.path.startswith("/media/"):
-                self._serve_media(request.path)
+                self._serve_media(request.path, request)
                 return
             self._send_response(self._dispatch(request))
         except Exception:
@@ -306,7 +306,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         except FileNotFoundError:
             self._send_response(_html("errors/404.html", 404, _dev_error({"path": path})))
 
-    def _serve_media(self, path: str) -> None:
+    def _serve_media(self, path: str, request: Any = None) -> None:
         try:
             # Opt-in forge-mvc-files : absent d'un squelette nu, chargé en lazy.
             from forge_mvc_files import serve_media_file  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
@@ -314,7 +314,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._send_response(Response(404, b"Not found", "text/plain; charset=utf-8"))
             return
         relative_path = path.removeprefix("/media/")
-        media_response = cast(Response, serve_media_file(relative_path))
+        # Propage `request` pour le support HTTP Range (FILES-SERVE-RANGE-DELEGATE-001).
+        media_response = cast(Response, serve_media_file(relative_path, request=request))
         self._send_response(media_response)
 
     def log_message(self, format: str, *args: Any) -> None:

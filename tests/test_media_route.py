@@ -41,6 +41,13 @@ class _MediaHandler:
         self.responses.append(response)
 
 
+def _read_body(response):
+    """Corps de la réponse, qu'elle soit eager (.body) ou streamée (.stream)."""
+    if getattr(response, "stream", None) is not None:
+        return b"".join(response.stream)
+    return response.body
+
+
 def test_serve_media_file_image_existante_retourne_200(tmp_path):
     root = tmp_path / "uploads"
     target = root / "images" / "photo.png"
@@ -50,7 +57,7 @@ def test_serve_media_file_image_existante_retourne_200(tmp_path):
     response = serve_media_file("images/photo.png", root=root)
 
     assert response.status == 200
-    assert response.body == b"png"
+    assert _read_body(response) == b"png"
     assert response.content_type == "image/png"
 
 
@@ -63,7 +70,7 @@ def test_serve_media_file_variante_medium_existante_retourne_200(tmp_path):
     response = serve_media_file("images/medium/photo.png", root=root)
 
     assert response.status == 200
-    assert response.body == b"medium"
+    assert _read_body(response) == b"medium"
     assert response.content_type == "image/png"
 
 
@@ -76,7 +83,7 @@ def test_serve_media_file_document_existant_retourne_200(tmp_path):
     response = serve_media_file("documents/contrat.pdf", root=root)
 
     assert response.status == 200
-    assert response.body == b"%PDF"
+    assert _read_body(response) == b"%PDF"
     assert response.content_type == "application/pdf"
 
 
@@ -154,7 +161,7 @@ def test_request_handler_route_media_delegue_au_service(monkeypatch):
     # lazy depuis forge_mvc_files (opt-in) — on patche la vraie cible.
     import forge_mvc_files
     monkeypatch.setattr(forge_mvc_files, "serve_media_file",
-                        lambda path: Response(200, path, "text/plain"))
+                        lambda path, request=None: Response(200, path, "text/plain"))
 
     handler = _MediaHandler()
     app.RequestHandler._serve_media(handler, "/media/images/photo.png")
@@ -162,6 +169,36 @@ def test_request_handler_route_media_delegue_au_service(monkeypatch):
     response = handler.responses[-1]
     assert response.status == 200
     assert response.body == b"images/photo.png"
+
+
+def test_serve_media_file_diffuse_en_streaming(tmp_path):
+    # FILES-SERVE-RANGE-DELEGATE-001 : le corps n'est pas chargé en mémoire,
+    # il est exposé en streaming (.stream non nul), pas en .body eager.
+    root = tmp_path / "uploads"
+    target = root / "documents" / "gros.bin"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"x" * 1000)
+
+    response = serve_media_file("documents/gros.bin", root=root)
+
+    assert response.status == 200
+    assert response.stream is not None
+    assert response.body == b""
+    assert b"".join(response.stream) == b"x" * 1000
+
+
+def test_serve_media_file_honore_range(tmp_path):
+    # Avec un en-tête Range, le service délègue à Response.file → 206.
+    root = tmp_path / "uploads"
+    target = root / "documents" / "data.bin"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"0123456789")
+
+    request = SimpleNamespace(header=lambda name: "bytes=2-5" if name == "Range" else None)
+    response = serve_media_file("documents/data.bin", root=root, request=request)
+
+    assert response.status == 206
+    assert b"".join(response.stream) == b"2345"
 
 
 def test_serve_media_file_est_exporte_dans_api_publique():

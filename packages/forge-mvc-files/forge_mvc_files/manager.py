@@ -1,7 +1,6 @@
 # pyright: strict
 from __future__ import annotations
 
-import mimetypes
 import os
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -165,7 +164,17 @@ def delete_media_file(path: str, *, root: str | Path | None = None, variants: bo
     }
 
 
-def serve_media_file(path: str, *, root: str | Path | None = None) -> Response:
+def serve_media_file(
+    path: str, *, root: str | Path | None = None, request: Any = None
+) -> Response:
+    """Sert un média avec streaming et support HTTP Range.
+
+    Après la résolution anti-traversal, le service est délégué à
+    ``Response.file`` (FILES-SERVE-RANGE-DELEGATE-001) : le corps n'est jamais
+    chargé en mémoire (émission par tranches), et l'en-tête ``Range`` de
+    `request` est honoré (206 / 416). Sans `request`, le fichier est servi en
+    streaming complet (200). Tout chemin invalide ou absent donne un 404.
+    """
     if root is None:
         root = upload_root()
 
@@ -174,12 +183,9 @@ def serve_media_file(path: str, *, root: str | Path | None = None) -> Response:
         target = storage.media_path_to_storage_path(relative_path, root=root)
         if not target.exists() or not target.is_file():
             return Response(404, b"Not found", "text/plain; charset=utf-8")
-        content = target.read_bytes()
+        return Response.file(target, request)
     except (OSError, UploadStorageError):
         return Response(404, b"Not found", "text/plain; charset=utf-8")
-
-    content_type = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
-    return Response(200, content, content_type)
 
 
 def get_upload_path(filename: str, category: str = "documents") -> Path:

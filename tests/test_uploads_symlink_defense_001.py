@@ -156,7 +156,9 @@ class TestUploadsSymlinkDefense:
             root=str(upload_root),
         )
         assert response.status == 200
-        assert response.body == b"normal content"
+        # Service délégué à Response.file (streaming) : corps dans .stream.
+        body = b"".join(response.stream) if response.stream is not None else response.body
+        assert body == b"normal content"
 
     def test_nonexistent_file_returns_404_unchanged(self, tmp_path):
         upload_root = tmp_path / "uploads"
