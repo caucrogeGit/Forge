@@ -20,7 +20,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import cast
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from core.forge import get as _cfg
 
@@ -261,8 +261,12 @@ def generate_image_variants(path: str | Path, *, root: str | Path | None = None)
 
 def _write_resized_image(image: Image.Image, target: Path, max_size: tuple[int, int]) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
-    variant = image.copy()
+    # Applique l'orientation EXIF (sinon miniatures parfois tournées) puis
+    # retire les métadonnées EXIF des variantes publiques : pas de fuite de
+    # géolocalisation ni d'autres tags (IMAGES-EXIF-STRIP-001).
+    variant = ImageOps.exif_transpose(image) or image.copy()
     variant.thumbnail(max_size, Image.Resampling.LANCZOS)
+    variant.info.pop("exif", None)
     if target.suffix.lower() in {".jpg", ".jpeg"} and variant.mode not in {"RGB", "L"}:
         variant = variant.convert("RGB")
     variant.save(target)
