@@ -2,12 +2,18 @@
 from __future__ import annotations
 
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, cast
 
 import core.forge as _forge
 from forge_mvc_i18n.exceptions import I18nError, TranslationCatalogError
+
+# Une locale ne sert qu'à composer un nom de fichier `<locale>.json` : on
+# interdit tout caractère de chemin (`/`, `\`, `.`, NUL) pour fermer le
+# traversal (I18N-LOCALE-TRAVERSAL-GUARD-001). Couvre fr, en-US, pt_BR.
+_LOCALE_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 
 
 def get_default_locale() -> str:
@@ -32,6 +38,10 @@ def set_fallback_locale(locale: str | None) -> None:
 
 @lru_cache(maxsize=None)
 def _load_catalog_cached(locale: str, translations_dir: str) -> dict[str, str]:
+    if not _LOCALE_RE.match(locale):
+        raise TranslationCatalogError(
+            f"Locale invalide : {locale!r} (caractères de chemin interdits)"
+        )
     path = Path(translations_dir) / f"{locale}.json"
     if not path.is_file():
         raise TranslationCatalogError(f"Catalogue introuvable : {path}")
