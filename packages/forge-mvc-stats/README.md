@@ -45,6 +45,18 @@ page_views = list_stats_events(my_fetch_all, name="page_view")
 traffic    = list_stats_events(my_fetch_all, category="traffic", limit=100)
 ```
 
+## Agrégation par comptage
+
+Compter les événements groupés par `name` ou `category` (dimension en liste
+blanche, sans injection), avec filtres optionnels et fenêtre `since` (ADR-037) :
+
+```python
+from forge_mvc_stats import count_stats_events
+
+totaux = count_stats_events(my_fetch_all, "category", since="2026-01-01T00:00:00Z")
+# [{"bucket": "traffic", "total": 128}, {"bucket": "compte", "total": 17}]
+```
+
 ## Schéma SQL
 
 ```python

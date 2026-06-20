@@ -49,7 +49,7 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
     ),
     "stats": OptIn(
         "stats", "forge-mvc-stats", "forge_mvc_stats", KIND_LIBRARY,
-        "Agrégats et compteurs d'événements.",
+        "Journal d'événements et agrégats par comptage (par nom ou catégorie).",
     ),
     "images": OptIn(
         "images", "forge-mvc-images", "forge_mvc_images", KIND_LIBRARY,

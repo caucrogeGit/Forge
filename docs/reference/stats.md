@@ -209,3 +209,30 @@ Chaque entrée retournée est un `dict` normalisé :
 | `normalize_stats_event_row(row)` | Normalise une ligne brute : désérialise `metadata` JSON, `None`/`""` → `{}`. Lève `StatsAdminError` si colonnes manquantes ou JSON invalide. |
 | `list_stats_events(fetch_all, name, category, limit)` | Orchestre la requête et retourne une liste de dicts normalisés. |
 
+### Agrégation par comptage
+
+Au-delà du journal brut, le module compte les événements groupés par une
+dimension (ADR-037).
+La dimension `group_by` est résolue par une **liste blanche** (`name` ou
+`category`) vers la colonne SQL : elle n'est jamais interpolée depuis une chaîne
+libre, donc sans injection possible.
+Les filtres `name`, `category` et `since` (timestamp ISO sur `created_at >= ?`)
+sont des paramètres liés.
+
+```python
+from forge_mvc_stats import count_stats_events
+
+# Combien d'événements par catégorie depuis le 1er janvier 2026 ?
+totaux = count_stats_events(
+    my_fetch_all, "category", since="2026-01-01T00:00:00Z"
+)
+# [{"bucket": "traffic", "total": 128}, {"bucket": "compte", "total": 17}]
+```
+
+| Fonction | Comportement |
+|---|---|
+| `get_stats_counts_sql(group_by, name, category, since)` | Retourne le SQL `SELECT <col> AS bucket, COUNT(*) AS total FROM forge_stats_events WHERE 1 = 1 [filtres] GROUP BY <col> ORDER BY total DESC, bucket ASC`. `group_by` doit valoir `name` ou `category` (liste blanche), sinon `StatsAggregateError`. |
+| `prepare_stats_counts_params(group_by, name, category, since)` | Valide et retourne le tuple de paramètres liés des filtres. |
+| `normalize_stats_count_row(row)` | Normalise une ligne en `{"bucket": ..., "total": int}`. |
+| `count_stats_events(fetch_all, group_by, name, category, since)` | Orchestre la requête et retourne la liste des comptes normalisés. |
+

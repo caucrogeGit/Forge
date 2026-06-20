@@ -10,6 +10,13 @@ from forge_mvc_stats.admin import (
     normalize_stats_event_row,
     prepare_stats_events_admin_params,
 )
+from forge_mvc_stats.aggregate import (
+    StatsAggregateError,
+    count_stats_events,
+    get_stats_counts_sql,
+    normalize_stats_count_row,
+    prepare_stats_counts_params,
+)
 from forge_mvc_stats.events import (
     StatsEvent,
     StatsEventError,
@@ -49,4 +56,9 @@ __all__ = [
     "prepare_stats_events_admin_params",
     "normalize_stats_event_row",
     "list_stats_events",
+    "StatsAggregateError",
+    "get_stats_counts_sql",
+    "prepare_stats_counts_params",
+    "normalize_stats_count_row",
+    "count_stats_events",
 ]
