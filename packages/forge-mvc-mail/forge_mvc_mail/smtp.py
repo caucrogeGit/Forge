@@ -15,6 +15,7 @@ import smtplib
 
 from forge_mvc_mail.exceptions import MailConfigurationError, MailSendError
 from forge_mvc_mail.message import MailMessage
+from forge_mvc_mail.transports import build_smtp_tls_context
 
 
 def _as_bool(value: object) -> bool:
@@ -34,9 +35,11 @@ class SMTPMailer:
     use_ssl: bool = False
     timeout: float = 10.0
     enabled: bool = True
+    verify_tls: bool = True
 
     @classmethod
     def from_config(cls) -> "SMTPMailer":
+        _verify_raw = os.getenv("MAIL_TLS_VERIFY")
         return cls(
             host=os.getenv("MAIL_HOST", ""),
             port=int(os.getenv("MAIL_PORT") or 587),
@@ -47,6 +50,7 @@ class SMTPMailer:
             use_ssl=_as_bool(os.getenv("MAIL_USE_SSL")),
             timeout=float(os.getenv("MAIL_TIMEOUT") or 10),
             enabled=_as_bool(os.getenv("MAIL_ENABLED")),
+            verify_tls=True if _verify_raw is None else _as_bool(_verify_raw),
         )
 
     def send(self, message: MailMessage) -> bool:
@@ -64,12 +68,19 @@ class SMTPMailer:
 
         email = message.as_email_message(from_email)
         recipients = message.envelope_recipients
-        smtp_class = smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
+        # Vérification de certificat activée par défaut (MAIL-TLS-CERT-VERIFY-001).
+        context = build_smtp_tls_context(self.verify_tls)
 
         try:
-            with smtp_class(self.host, self.port, timeout=self.timeout) as smtp:
+            if self.use_ssl:
+                connection = smtplib.SMTP_SSL(
+                    self.host, self.port, timeout=self.timeout, context=context
+                )
+            else:
+                connection = smtplib.SMTP(self.host, self.port, timeout=self.timeout)
+            with connection as smtp:
                 if self.use_tls and not self.use_ssl:
-                    smtp.starttls()
+                    smtp.starttls(context=context)
                 if self.username:
                     smtp.login(self.username, self.password)
                 smtp.send_message(email, from_addr=from_email, to_addrs=recipients)

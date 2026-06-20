@@ -70,6 +70,7 @@ class MailConfig:
     use_tls: bool
     use_ssl: bool
     timeout: float
+    verify_tls: bool = True
 
     @classmethod
     def from_env(cls) -> MailConfig:
@@ -85,6 +86,7 @@ class MailConfig:
             use_tls=_env_bool("MAIL_USE_TLS"),
             use_ssl=_env_bool("MAIL_USE_SSL"),
             timeout=float(os.getenv("MAIL_TIMEOUT") or 10),
+            verify_tls=_env_bool("MAIL_TLS_VERIFY", default=True),
         )
 
     def build_transport(self) -> BaseTransport:
@@ -121,4 +123,5 @@ class MailConfig:
             use_tls=self.use_tls,
             use_ssl=self.use_ssl,
             timeout=self.timeout,
+            verify_tls=self.verify_tls,
         )

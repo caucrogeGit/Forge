@@ -53,6 +53,9 @@ MAIL_USERNAME=
 MAIL_PASSWORD=
 MAIL_USE_TLS=false
 MAIL_USE_SSL=false
+# Vérification du certificat TLS du serveur SMTP (activée par défaut).
+# Ne mettre à false que pour un serveur local auto-signé en développement.
+MAIL_TLS_VERIFY=true
 MAIL_TIMEOUT=10
 # Chemins
 MAIL_LOG_DIR=storage/mail

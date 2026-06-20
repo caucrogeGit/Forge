@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import os
 import smtplib
+import ssl
 import sys
 import uuid
 from abc import ABC, abstractmethod
@@ -21,6 +22,27 @@ def _as_bool(value: object) -> bool:
     if isinstance(value, str):
         return value.strip().lower() in {"1", "true", "yes", "on"}
     return bool(value)
+
+
+def _verify_tls_from_env() -> bool:
+    """MAIL_TLS_VERIFY : vérification du certificat serveur, activée par défaut."""
+    raw = os.getenv("MAIL_TLS_VERIFY")
+    return True if raw is None else _as_bool(raw)
+
+
+def build_smtp_tls_context(verify: bool) -> ssl.SSLContext:
+    """Contexte TLS pour les connexions SMTP (MAIL-TLS-CERT-VERIFY-001).
+
+    Par défaut (`verify=True`), vérifie le certificat du serveur ET le nom
+    d'hôte : une connexion vers un serveur usurpé échoue, ce qui ferme le
+    vecteur MITM. `verify=False` (MAIL_TLS_VERIFY=false) désactive la
+    vérification — réservé au développement contre un serveur local auto-signé.
+    """
+    context = ssl.create_default_context()
+    if not verify:
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+    return context
 
 
 @dataclass(frozen=True)
@@ -137,6 +159,7 @@ class SmtpTransport(BaseTransport):
     use_tls: bool = False
     use_ssl: bool = False
     timeout: float = 10.0
+    verify_tls: bool = True
 
     @classmethod
     def from_config(cls) -> SmtpTransport:
@@ -149,6 +172,7 @@ class SmtpTransport(BaseTransport):
             use_tls=_as_bool(os.getenv("MAIL_USE_TLS")),
             use_ssl=_as_bool(os.getenv("MAIL_USE_SSL")),
             timeout=float(os.getenv("MAIL_TIMEOUT") or 10),
+            verify_tls=_verify_tls_from_env(),
         )
 
     def send(self, message: MailMessage) -> TransportResult:
@@ -162,12 +186,19 @@ class SmtpTransport(BaseTransport):
             )
 
         email = message.as_email_message(from_email)
-        smtp_class = smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
+        # Vérification de certificat activée par défaut (MAIL-TLS-CERT-VERIFY-001).
+        context = build_smtp_tls_context(self.verify_tls)
 
         try:
-            with smtp_class(self.host, self.port, timeout=self.timeout) as smtp:
+            if self.use_ssl:
+                connection = smtplib.SMTP_SSL(
+                    self.host, self.port, timeout=self.timeout, context=context
+                )
+            else:
+                connection = smtplib.SMTP(self.host, self.port, timeout=self.timeout)
+            with connection as smtp:
                 if self.use_tls and not self.use_ssl:
-                    smtp.starttls()
+                    smtp.starttls(context=context)
                 if self.username:
                     smtp.login(self.username, self.password)
                 smtp.send_message(

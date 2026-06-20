@@ -10,11 +10,13 @@ from forge_mvc_mail import MailConfigurationError, MailMessage, MailSendError, S
 class FakeSMTP:
     instances = []
 
-    def __init__(self, host, port, timeout=None):
+    def __init__(self, host, port, timeout=None, context=None):
         self.host = host
         self.port = port
         self.timeout = timeout
+        self.context = context
         self.started_tls = False
+        self.starttls_context = None
         self.login_args = None
         self.sent = []
         type(self).instances.append(self)
@@ -25,8 +27,9 @@ class FakeSMTP:
     def __exit__(self, exc_type, exc, traceback):
         return False
 
-    def starttls(self):
+    def starttls(self, context=None):
         self.started_tls = True
+        self.starttls_context = context
 
     def login(self, username, password):
         self.login_args = (username, password)

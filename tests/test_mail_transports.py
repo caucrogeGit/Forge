@@ -277,11 +277,13 @@ def test_log_idempotent_dossier_existant(tmp_path):
 class FakeSMTP:
     instances: list[FakeSMTP] = []
 
-    def __init__(self, host: str, port: int, timeout: float | None = None) -> None:
+    def __init__(self, host: str, port: int, timeout: float | None = None, context: object = None) -> None:
         self.host = host
         self.port = port
         self.timeout = timeout
+        self.context = context
         self.started_tls = False
+        self.starttls_context: object = None
         self.login_args: tuple | None = None
         self.sent: list[tuple] = []
         type(self).instances.append(self)
@@ -292,8 +294,9 @@ class FakeSMTP:
     def __exit__(self, *args: object) -> bool:
         return False
 
-    def starttls(self) -> None:
+    def starttls(self, context: object = None) -> None:
         self.started_tls = True
+        self.starttls_context = context
 
     def login(self, username: str, password: str) -> None:
         self.login_args = (username, password)
