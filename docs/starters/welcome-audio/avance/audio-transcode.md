@@ -123,7 +123,7 @@ class AudioTranscodeController(BaseController):
 
   <form method="post" action="/audio-transcode">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <input type="text" name="path" placeholder="originals/AAAA/MM/uuid/source.wav" size="50" required>
+    <input type="text" name="path" placeholder="originals/uuid/source.wav" size="50" required>
     <button type="submit">Transcoder</button>
   </form>
 

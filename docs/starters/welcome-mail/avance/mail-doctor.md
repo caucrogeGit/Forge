@@ -22,7 +22,7 @@ Utile pour valider un déploiement sans envoyer le moindre email.
         def index(request: Request) -> Response:
             checks: dict = {}
             try:
-                cfg = MailConfig.from_forge()
+                cfg = MailConfig.from_env()
                 checks["config_loaded"] = True
                 checks["enabled"] = cfg.enabled
                 checks["transport"] = cfg.transport_name

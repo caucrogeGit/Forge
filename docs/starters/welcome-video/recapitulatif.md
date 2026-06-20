@@ -61,5 +61,5 @@ Un secret (token) est **toujours masqué** quand la config est sérialisée.
 |---------|-------|
 | `probe_video(path, config=…)` | Sonder une source (ffprobe) → métadonnées |
 | `forge video:process <id>` / `--pending` (`process_video`) | Worker : transcoder en MP4 (ffmpeg), avancer le statut |
-| `forge video:doctor` | Diagnostic complet (paquet, config, migration, ffprobe, ffmpeg, `--db`) |
+| `forge video:doctor` | Diagnostic complet (paquet, config, migration, ffprobe, ffmpeg) |
 | `check_package_importable` / `check_config_loadable` / `check_migration_present` / `check_ffprobe_present` / `check_ffmpeg_present` | Contrôles de diagnostic non invasifs, réutilisables en app |

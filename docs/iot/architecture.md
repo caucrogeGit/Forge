@@ -1,9 +1,9 @@
 # Architecture Forge IoT
 
-> **Statut** : document fondateur. Aucun code IoT n'existe encore dans
-> Forge. Cette page fige le périmètre et la séparation des rôles avant
-> tout développement MQTT, dans l'esprit de la charte v2 §8 « Noyau
-> minimal, briques opt-in ».
+> **Statut** : document fondateur. L'opt-in `forge-mvc-iot` est désormais
+> **livré** (subscriber MQTT, stockage `iot_events`, API HTTP JSON, CLI
+> `iot:*`). Cette page fige le périmètre et la séparation des rôles, dans
+> l'esprit de la charte v2 §8 « Noyau minimal, briques opt-in ».
 
 ## Objectif
 
@@ -28,7 +28,7 @@ Forge IoT doit rester :
 | Brique | Type | Statut |
 |--------|------|--------|
 | Forge Core (`forge-mvc`) | Framework MVC HTTP générique | existe |
-| `forge-mvc-iot` | Opt-in officiel (futur) | à créer |
+| `forge-mvc-iot` | Opt-in officiel | livré |
 | Mosquitto | Broker MQTT local recommandé | externe |
 | Broker MQTT cloud | Alternative possible (HiveMQ, EMQX, AWS IoT, …) | externe, non prioritaire |
 | Forge Design IoT | Interface de lecture (futur) | à créer |
@@ -235,7 +235,7 @@ La suite logique de cette trajectoire IoT, dans l'ordre recommandé :
 | `IOT-PACKAGE-SCAFFOLD-001` | Création de `packages/forge-mvc-iot/` (`pyproject.toml`, `__init__.py`, structure conforme à ADR-005) |
 | `IOT-MQTT-CONTRACT-001` | Contrat de message MQTT : topics, payload JSON, champs requis |
 | `IOT-MQTT-SUBSCRIBER-001` | Subscriber `paho-mqtt`, gestion reconnexion, intégration boucle Forge |
-| `IOT-CONFIG-001` | Variables d'environnement (`IOT_BROKER_HOST`, TLS, login/mot de passe), schéma `env/example` |
+| `IOT-CONFIG-001` | Variables d'environnement (`FORGE_IOT_MQTT_HOST`, TLS, login/mot de passe), schéma `env/example` |
 | `IOT-STORAGE-EVENTS-001` | Table SQL des événements IoT, migration versionnée, modèle applicatif |
 | `IOT-HTTP-API-001` | Routes HTTP JSON Forge : liste devices, lecture événements, filtres |
 | `IOT-DOCTOR-001` | `forge iot:doctor` — vérification config broker, ping, sub test |

@@ -106,7 +106,7 @@ class AudioProbeController(BaseController):
   <h1>Sonder un audio</h1>
 
   <form method="get" action="/audio-probe">
-    <input type="text" name="path" value="{{ path }}" placeholder="originals/AAAA/MM/uuid/source.mp3" size="50" required>
+    <input type="text" name="path" value="{{ path }}" placeholder="originals/uuid/source.mp3" size="50" required>
     <button type="submit">Sonder</button>
   </form>
 

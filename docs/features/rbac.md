@@ -36,7 +36,7 @@ Ces deux fonctions conviennent aux cas les plus simples (protéger une route par
 **RBAC complet opt-in** — module `forge-mvc-rbac` :
 
 - Modèles `Role`, `Permission` (normalisation, validation)
-- Décorateur `@require_permission(...)` — résolution via tables SQL `roles`, `permissions`, `role_permissions`
+- Décorateur `@require_permission(...)` — lit les permissions injectées dans la requête ou la session (RBAC historique, sans accès base) ; la résolution SQL via `roles`, `permissions`, `role_permissions` est faite par `require_user_permission`
 - Helper Jinja `make_can` / `can(...)` — affichage conditionnel dans les templates
 - Résolution backend `get_user_permissions`, `user_has_permission`
 - Pont Auth/User vers RBAC via la table `user_roles`

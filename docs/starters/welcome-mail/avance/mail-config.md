@@ -2,7 +2,7 @@
 
 ## Niveau avancé
 
-Charger la configuration mail depuis l'environnement avec `MailConfig.from_forge` et l'inspecter.
+Charger la configuration mail depuis l'environnement avec `MailConfig.from_env` et l'inspecter.
 On lit le transport, l'hôte, le port et l'expéditeur.
 Le mot de passe n'est jamais affiché, seule sa présence est indiquée.
 
@@ -24,7 +24,7 @@ Le mot de passe n'est jamais affiché, seule sa présence est indiquée.
         def index(request: Request) -> Response:
             context = {}
             try:
-                cfg = MailConfig.from_forge()
+                cfg = MailConfig.from_env()
                 context.update({
                     "enabled": cfg.enabled,
                     "transport": cfg.transport_name,
@@ -42,7 +42,7 @@ Le mot de passe n'est jamais affiché, seule sa présence est indiquée.
 
     | Élément | Rôle |
     |---|---|
-    | `MailConfig.from_forge()` | Charge la configuration mail depuis l'environnement. |
+    | `MailConfig.from_env()` | Charge la configuration mail depuis l'environnement. |
     | `cfg.transport_name` | Nom du transport configuré. |
     | `bool(cfg.password)` | Présence d'un mot de passe, sans l'exposer. |
 
@@ -82,7 +82,7 @@ Le mot de passe n'est jamais affiché, seule sa présence est indiquée.
 ## À retenir
 - La configuration mail se charge depuis l'environnement, jamais en dur.
 - Un secret comme le mot de passe ne s'affiche pas : on montre seulement sa présence.
-- `MailConfig.from_forge` centralise la lecture de la configuration.
+- `MailConfig.from_env` centralise la lecture de la configuration.
 
 ## Palier suivant
 Vous allez exposer un diagnostic du module mail en JSON.

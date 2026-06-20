@@ -21,5 +21,5 @@ optionnelle.
 pip install --pre forge-mvc-mail
 ```
 
-Le parcours pédagogique `welcome-mail` (`forge starter:build mail-welcome`)
+Le parcours pédagogique `welcome-mail` (documentation `docs/starters/welcome-mail/`)
 montre l'usage pas à pas.

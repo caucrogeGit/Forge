@@ -45,7 +45,6 @@ Pour le diagnostic complet, en ligne de commande :
 
 ```bash
 forge video:doctor          # paquet + config + migration + ffprobe + ffmpeg
-forge video:doctor --db     # + vérifie la table videos
 ```
 
 ## Le contrôleur
@@ -98,8 +97,6 @@ class VideoDoctorController(BaseController):
   ffprobe/ffmpeg se contentent de **localiser les binaires** (pas de transcodage).
 - Chaque contrôle renvoie un `status`, un `name` et un `detail` — on les expose
   tels quels.
-- Pour le contrôle **invasif** (table `videos`), on délègue à la CLI
-  `forge video:doctor --db`.
 
 ## La route
 
