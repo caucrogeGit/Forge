@@ -143,14 +143,21 @@ def save_bytes(data: bytes, *, original_name: str, category: str, root: str | Pa
     for _ in range(20):
         filename = generate_unique_filename(original_name)
         target = directory / filename
+        # Création exclusive avec un mode déterministe 0o644 (FILES-UPLOAD-FILE-PERMS-001) :
+        # le média reste lisible (donc servable) mais jamais inscriptible par autrui, et
+        # ne dépend plus de l'umask du process (qui pourrait le rendre world-writable).
         try:
-            with target.open("xb") as file:
-                file.write(data)
-            return target
+            fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
         except FileExistsError:
             continue
         except OSError as exc:
             raise UploadStorageError(f"Impossible d'enregistrer le fichier : {exc}") from exc
+        try:
+            with os.fdopen(fd, "wb") as file:
+                file.write(data)
+        except OSError as exc:
+            raise UploadStorageError(f"Impossible d'enregistrer le fichier : {exc}") from exc
+        return target
     raise UploadStorageError("Impossible de generer un nom de fichier unique.")
 
 
