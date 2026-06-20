@@ -326,6 +326,24 @@ nav:
               - Normaliser une ligne: starters/welcome-stats/avance/stats-normalize.md
               - Bilan avancé: starters/welcome-stats/avance/bilan.md
           - Aide-mémoire: starters/welcome-stats/recapitulatif.md
+      - Progression Pivot (welcome-pivot):
+          - Installation: starters/welcome-pivot/installation.md
+          - Débutant:
+              - Bonjour Forge Pivot: starters/welcome-pivot/debutant/pivot-welcome.md
+              - Générer le sous-CRUD: starters/welcome-pivot/debutant/pivot-make.md
+              - Le schéma SQL: starters/welcome-pivot/debutant/pivot-schema.md
+              - Bilan débutant: starters/welcome-pivot/debutant/bilan.md
+          - Intermédiaire:
+              - Attacher une association: starters/welcome-pivot/intermediaire/pivot-attach.md
+              - Modifier et détacher: starters/welcome-pivot/intermediaire/pivot-update.md
+              - Lister les associations: starters/welcome-pivot/intermediaire/pivot-list.md
+              - Bilan intermédiaire: starters/welcome-pivot/intermediaire/bilan.md
+          - Avancé:
+              - Contraintes de champ: starters/welcome-pivot/avance/pivot-constraints.md
+              - Unicité de la paire: starters/welcome-pivot/avance/pivot-unique.md
+              - Erreurs de formulaire: starters/welcome-pivot/avance/pivot-form.md
+              - Bilan avancé: starters/welcome-pivot/avance/bilan.md
+          - Aide-mémoire: starters/welcome-pivot/recapitulatif.md
       - Progression Mail (welcome-mail):
           - Installation: starters/welcome-mail/installation.md
           - Débutant:
@@ -425,6 +443,7 @@ nav:
           - ADR-034 Nommage DB généré sans suffixes: adr/034-generated-db-identifier-naming.md
           - ADR-035 Parcours manuels, retrait génération: adr/035-starters-manual-not-generated.md
           - ADR-036 Typage statique du cœur en CI: adr/036-core-static-typing.md
+          - ADR-037 Agrégation par comptage (stats): adr/037-stats-aggregation.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
