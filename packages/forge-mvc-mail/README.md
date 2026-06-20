@@ -8,8 +8,7 @@ optionnelle.
 
 - `MailMessage` : composition d'un message (destinataires, sujet, texte, HTML).
 - Transports interchangeables : `ConsoleTransport` (affichage), `SmtpTransport`
-  / `SMTPMailer` (SMTP réel), `LogTransport`, `NullTransport`, `FakeTransport`
-  (tests).
+  (SMTP réel), `LogTransport`, `NullTransport`, `FakeTransport` (tests).
 - `MailTemplateRenderer` : rendu de templates d'email via Jinja2.
 - `Mailer` : orchestration envoi + journalisation (`MailLogger`).
 - `MailConfig` : configuration depuis l'environnement.

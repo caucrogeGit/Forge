@@ -1687,8 +1687,7 @@ Les noms d'entités et de champs (`Contact`, `nom`, `email`…) **ne sont pas tr
 | `MailConfigurationError` | Configuration incomplète ou incohérente. |
 | `MailSendError` | Erreur SMTP pendant l'envoi. `Mailer.send()` l'intercepte en `TransportResult(success=False)`. |
 
-> `SMTPMailer` (`forge_mvc_mail/smtp.py`) est conservé provisoirement pour compatibilité.
-> Le système recommandé est `Mailer + SmtpTransport`.
+> L'envoi SMTP réel passe par `Mailer + SmtpTransport` (voie officielle).
 
 ### Exemple
 

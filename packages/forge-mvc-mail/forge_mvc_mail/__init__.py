@@ -15,7 +15,6 @@ from forge_mvc_mail.exceptions import (
 )
 from forge_mvc_mail.mailer import Mailer
 from forge_mvc_mail.message import MailMessage
-from forge_mvc_mail.smtp import SMTPMailer
 from forge_mvc_mail.templates import MailTemplateRenderer
 from forge_mvc_mail.transports import (
     BaseTransport,
@@ -44,7 +43,6 @@ __all__ = [
     "MailValidationError",
     "Mailer",
     "NullTransport",
-    "SMTPMailer",
     "SmtpTransport",
     "TransportResult",
 ]
