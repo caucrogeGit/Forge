@@ -50,8 +50,13 @@ CODE_PAYLOAD_VALUE_FORMAT = "PAYLOAD_VALUE_FORMAT"
 
 # Topic canonique forge/{site}/{device_id}/telemetry.
 # site et device_id : slug [a-z0-9-]+ (interdits : majuscules, accents,
-# espaces, wildcards MQTT '+' / '#').
-_TOPIC_RE = re.compile(r"^forge/([a-z0-9-]+)/([a-z0-9-]+)/telemetry$")
+# espaces, wildcards MQTT '+' / '#'). Bornés à 64 caractères pour rester
+# dans VARCHAR(64) du schéma et rejeter tôt (IOT-PAYLOAD-SLUG-BOUNDS-001).
+_TOPIC_RE = re.compile(r"^forge/([a-z0-9-]{1,64})/([a-z0-9-]{1,64})/telemetry$")
+
+# Plafond de taille du payload MQTT décodé : un message volumineux ne doit pas
+# être chargé/parsé sans borne (vecteur DoS mémoire si le broker est exposé).
+MAX_PAYLOAD_BYTES = 65536
 
 # kind : slug [a-z0-9_-]+ (autorise '_' contrairement à site/device_id).
 _KIND_RE = re.compile(r"^[a-z0-9_-]+$")
@@ -121,6 +126,13 @@ def parse_payload(payload: str | bytes) -> dict[str, Any]:
     - le payload n'est pas un JSON valide ;
     - le JSON décodé n'est pas un objet (mais un tableau, un nombre, etc.).
     """
+    if len(payload) > MAX_PAYLOAD_BYTES:
+        raise ContractError(
+            CODE_PAYLOAD_PARSE,
+            f"Payload trop volumineux : {len(payload)} octets "
+            f"(maximum {MAX_PAYLOAD_BYTES})",
+        )
+
     if isinstance(payload, bytes):
         try:
             payload = payload.decode("utf-8")
