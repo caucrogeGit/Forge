@@ -344,6 +344,24 @@ nav:
               - Erreurs de formulaire: starters/welcome-pivot/avance/pivot-form.md
               - Bilan avancé: starters/welcome-pivot/avance/bilan.md
           - Aide-mémoire: starters/welcome-pivot/recapitulatif.md
+      - Progression i18n (welcome-i18n):
+          - Installation: starters/welcome-i18n/installation.md
+          - Débutant:
+              - Bonjour Forge i18n: starters/welcome-i18n/debutant/i18n-welcome.md
+              - Écrire un catalogue: starters/welcome-i18n/debutant/i18n-catalog.md
+              - Traduire une clé: starters/welcome-i18n/debutant/i18n-trans.md
+              - Bilan débutant: starters/welcome-i18n/debutant/bilan.md
+          - Intermédiaire:
+              - Locale par défaut: starters/welcome-i18n/intermediaire/i18n-locale.md
+              - Locale de secours: starters/welcome-i18n/intermediaire/i18n-fallback.md
+              - Clé manquante: starters/welcome-i18n/intermediaire/i18n-missing.md
+              - Bilan intermédiaire: starters/welcome-i18n/intermediaire/bilan.md
+          - Avancé:
+              - trans dans un template: starters/welcome-i18n/avance/i18n-jinja.md
+              - Vider le cache: starters/welcome-i18n/avance/i18n-cache.md
+              - Gérer les erreurs: starters/welcome-i18n/avance/i18n-errors.md
+              - Bilan avancé: starters/welcome-i18n/avance/bilan.md
+          - Aide-mémoire: starters/welcome-i18n/recapitulatif.md
       - Progression Mail (welcome-mail):
           - Installation: starters/welcome-mail/installation.md
           - Débutant:
