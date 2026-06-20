@@ -94,7 +94,7 @@ class MfaChallengeController(BaseController):
         if _load_factors is not None:
             factors = _load_factors(user_id)
         else:
-            from forge_mvc_mfa.model import get_active_mfa_factors
+            from mvc.models.mfa_model import get_active_mfa_factors
             factors = get_active_mfa_factors(user_id)
 
         result = verify_mfa_challenge(request, code, factors=factors)
@@ -123,7 +123,7 @@ class MfaChallengeController(BaseController):
 
 def _default_finalize(user_id: int, session_id: str | None) -> Any:
     """Finalise la connexion après validation MFA (chemin production)."""
-    from forge_mvc_mfa.model import get_user_by_id
+    from mvc.models.mfa_model import get_user_by_id
     utilisateur = get_user_by_id(user_id)
     if utilisateur is None:
         return BaseController.render("errors/403.html", 403, base=None)

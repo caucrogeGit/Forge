@@ -1,5 +1,12 @@
 # pyright: strict
-"""Accès base de données pour les facteurs MFA de l'application MVC."""
+"""Accès base de données pour les facteurs MFA de l'application MVC.
+
+Code **applicatif** (MFA-MODEL-APP-EXTRACT-001) : ce module lie le schéma de
+cette application (`utilisateur`, `UtilisateurId`, `utilisateur_role`) à l'opt-in
+`forge-mvc-mfa`. Il vit donc côté application, pas dans le paquet distribué —
+chaque projet câble ainsi ses propres tables utilisateur (charte principe 1 :
+séparer framework et application métier).
+"""
 from __future__ import annotations
 
 from typing import Any

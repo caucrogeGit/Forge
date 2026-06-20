@@ -8,7 +8,7 @@ from core.auth.audit import (
 )
 try:
     from forge_mvc_mfa import is_mfa_enabled, start_mfa_challenge
-    from forge_mvc_mfa.model import get_active_mfa_factors
+    from mvc.models.mfa_model import get_active_mfa_factors
     _MFA_AVAILABLE = True
 except ImportError:
     _MFA_AVAILABLE = False
