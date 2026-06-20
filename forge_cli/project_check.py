@@ -144,7 +144,7 @@ def check_project_routes(root: Path) -> CheckResult:
         result_to_return = CheckResult("fail", "Routes",
                                        f"impossible d'importer mvc/routes.py — {exc}. "
                                        f"Vérifie les imports ou installe la dépendance manquante "
-                                       f"(par ex. `pip install forge-mvc[mfa]` pour MFA).")
+                                       f"(par ex. `pip install --pre forge-mvc-mfa` pour MFA).")
     except Exception as exc:  # noqa: BLE001
         result_to_return = CheckResult("fail", "Routes",
                                        f"erreur au chargement de mvc/routes.py — {type(exc).__name__}: {exc}")
