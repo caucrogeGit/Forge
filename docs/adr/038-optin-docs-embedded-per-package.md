@@ -2,12 +2,14 @@
 
 ## Statut
 
-Accepté, exécution conditionnée à la validation d'un pilote, Forge 1.0.0-beta.x
-(ticket `ADR-OPTIN-DOCS-EMBED-001`).
+Accepté, Forge 1.0.0-beta.x (ticket `ADR-OPTIN-DOCS-EMBED-001`).
 
 La décision de principe est prise.
-Aucun déplacement de fichier en masse n'a lieu avant qu'un module pilote
-n'ait prouvé la chaîne de build complète, sur le modèle séquencé de l'ADR-035.
+Le module pilote `forge-mvc-stats` a prouvé la chaîne de build complète
+(ticket `OPTIN-DOCS-EMBED-STATS-001`, commit `b6f18d5` : `mkdocs build --strict`
+vert, doc montée sous `/stats/`), sur le modèle séquencé de l'ADR-035.
+La convention de slug d'URL ci-dessous est figée avant le déploiement aux
+onze autres opt-ins.
 
 ---
 
@@ -83,36 +85,94 @@ le paquet embarque et versionne sa propre doc.
 
 ---
 
+## Convention de slug d'URL (figée)
+
+Le plugin d'agrégation utilise le `site_name` du sous-`mkdocs.yml` comme
+**préfixe d'URL** : la doc d'un opt-in est montée sous `/<slug>/`.
+Le choix du slug est donc une décision de surface publique, figée ici avant le
+déploiement.
+
+Règle : le slug d'un opt-in est **le nom du paquet PyPI privé de son préfixe
+`forge-mvc-`**.
+
+| Paquet | Slug | Racine d'URL |
+|---|---|---|
+| `forge-mvc-stats` | `stats` | `/stats/…` |
+| `forge-mvc-workflow` | `workflow` | `/workflow/…` |
+| `forge-mvc-mfa` | `mfa` | `/mfa/…` |
+| `forge-mvc-rbac` | `rbac` | `/rbac/…` |
+| `forge-mvc-files` | `files` | `/files/…` |
+| `forge-mvc-images` | `images` | `/images/…` |
+| `forge-mvc-iot` | `iot` | `/iot/…` |
+| `forge-mvc-video` | `video` | `/video/…` |
+| `forge-mvc-audio` | `audio` | `/audio/…` |
+| `forge-mvc-mail` | `mail` | `/mail/…` |
+| `forge-mvc-pivot` | `pivot` | `/pivot/…` |
+| `forge-mvc-i18n` | `i18n` | `/i18n/…` |
+
+Justification :
+
+- court et lisible (`/stats/welcome/installation/` plutôt que
+  `/forge-mvc-stats/welcome/installation/`) ;
+- sans ambiguïté dans le contexte du site (le slug nomme la brique) ;
+- unique : aucun slug n'entre en collision avec un dossier de premier niveau du
+  cœur (`reference`, `features`, `guide`, `install`…). Les slugs `iot` et
+  `video` reprennent à l'identique les anciens troncs `docs/iot/` et
+  `docs/video/`, qui sont migrés dans les paquets : l'URL publique ne change pas
+  pour ces deux modules.
+
+Sous-arborescence interne d'un opt-in (figée pour l'homogénéité) :
+
+- `reference.md` : page de référence, montée en `/<slug>/reference/` ;
+- `welcome/` : parcours pédagogique, monté en `/<slug>/welcome/…`, en
+  conservant la profondeur `welcome/<niveau>/<palier>.md` pour préserver les
+  liens relatifs vers le cœur (voir « Liens relatifs » ci-dessous).
+
+Note d'implémentation : l'`!include` doit être déclaré **avec une clé**
+(`- Titre: '!include packages/<paquet>/mkdocs.yml'`).
+La forme en item nu est ignorée par le merger du plugin (les pages sont
+préfixées dans la nav mais leurs fichiers ne sont pas agrégés).
+
+---
+
 ## Pré-requis anti-casse : valider la chaîne de build, puis migrer par paliers
 
-Deux risques techniques interdisent une bascule en bloc.
+Deux risques techniques interdisaient une bascule en bloc ; le pilote `stats`
+les a levés.
 
 1. **Compatibilité du plugin d'agrégation.**
-   Le plugin n'est pas installé.
-   Il doit cohabiter avec `mkdocs-material`, le plugin `search` (langue `fr`),
-   `glightbox` et les extensions Markdown actives, et passer `mkdocs build
-   --strict`.
+   `mkdocs-monorepo-plugin` (déclaré dans `requirements-docs.txt` et
+   `requirements-dev.txt`) cohabite avec `mkdocs-material`, le plugin `search`
+   (langue `fr`), `glightbox` et les extensions Markdown actives, et passe
+   `mkdocs build --strict` (validé par le pilote, 0 avertissement).
 2. **Liens relatifs.**
    Les parcours welcome opt-in contiennent environ 361 liens relatifs `../`.
-   Une partie pointe vers le cœur (`../../reference/...`, `../../features/...`)
-   et casserait au déplacement, car l'agrégation réécrit l'arborescence au build.
-   La stratégie de liens (ancres absolues du site, ou conventions du plugin)
-   doit être tranchée et prouvée avant toute migration de masse.
+   Le pilote a montré qu'en **conservant la profondeur** d'arborescence
+   (`<slug>/welcome/<niveau>/` aussi profond que l'ancien
+   `starters/welcome-<m>/<niveau>/`), la quasi-totalité des liens sortants vers
+   le cœur restent valides sans réécriture ; seuls les liens entrants (depuis le
+   cœur vers la doc migrée) et le lien « vue d'ensemble des starters » sont à
+   recâbler.
 
 Ordre d'exécution :
 
-1. **Outiller** : ajouter la dépendance de build, brancher le plugin dans
+1. **Outiller** (fait) : dépendance de build ajoutée, plugin branché dans
    `mkdocs.yml`.
-2. **Piloter** sur un seul module simple et bien isolé (candidat :
-   `forge-mvc-workflow` ou `forge-mvc-stats`).
-   Déplacer sa doc sous `packages/<paquet>/docs/`, réécrire ses liens, et
-   vérifier `mkdocs build --strict` vert de bout en bout.
-3. **Généraliser** ensuite, un paquet par ticket, une fois le pilote validé.
+2. **Piloter** (fait) : `forge-mvc-stats` migré, `mkdocs build --strict` vert.
+3. **Généraliser** : un paquet par ticket, en appliquant la convention de slug
+   et la sous-arborescence figées ci-dessus.
 4. **Nettoyer** les pages opt-in résiduelles dans le `docs/` du cœur et les
    références croisées.
 
 Aucune suppression dans le `docs/` du cœur n'a lieu avant que le sous-arbre
 correspondant ne soit servi par l'agrégation.
+
+Dettes à généraliser pendant le déploiement :
+
+- `tests/meta/test_docs_forge_2x_sweep_001.py` ne balaie que `docs/` ; étendre
+  le balayage à `packages/*/docs/` pour que les docs migrées restent couvertes.
+- Le hub `docs/starters/index.md` pointera de plus en plus dans les arbres
+  montés ; à terme, un tronc de navigation « Opt-ins officiels » dédié.
 
 ---
 
