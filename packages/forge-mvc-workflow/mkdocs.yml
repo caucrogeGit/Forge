@@ -4,7 +4,11 @@
 site_name: workflow
 docs_dir: docs
 nav:
-  - Référence Workflow: reference.md
+  - Référence Workflow:
+      - Vue d'ensemble: reference.md
+      - Statuts (status.py): references/status.md
+      - Transitions (transitions.py): references/transitions.md
+      - Helpers Jinja (jinja.py): references/jinja.md
   - Progression Workflow:
       - Installation: welcome/installation.md
       - Débutant:
