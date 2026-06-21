@@ -77,15 +77,21 @@ optins/
 │   ├── README.md
 │   ├── migrations/
 │   └── docs/
-├── rbac/
+├── video/
 │   ├── __init__.py
 │   ├── routes.py
 │   └── README.md
-└── media/
+└── audio/
     ├── __init__.py
     ├── routes.py
     └── README.md
 ```
+
+!!! note "Seuls les opt-ins `route` apparaissent ici"
+    `optins/` ne reçoit que les opt-ins de type `route` (`iot`, `video`,
+    `audio`), qui exposent leurs propres routes HTTP. Les opt-ins `library`
+    et `crosscutting` (`mfa`, `rbac`, `workflow`…) ne se branchent pas par
+    cette couche : ils s'utilisent par import direct ou par décorateurs.
 
 Chaque sous-dossier `optins/<module>/` est le **point de branchement
 local** d'un package opt-in installé. Il reste **mince** : il référence
@@ -200,8 +206,11 @@ clôture IoT](../history/audits/audit-iot-closing.md).
     `welcome-iot` **génère réellement**
     cette structure `optins/iot/` dans le projet créé
     (`OPTINS-IOT-PROJECT-BRIDGE-001`). C'est le premier opt-in officiel
-    branché via `optins/registry.py`. Les autres modules (`rbac`,
-    `media`…) suivront le même modèle dans des tickets ultérieurs.
+    branché via `optins/registry.py`. Les opt-ins `route` `video` et `audio`
+    suivent désormais le même modèle (`forge opt-in:enable video|audio`). Les
+    opt-ins `library` (`workflow`, `stats`, `images`, `files`, `mail`,
+    `pivot`, `i18n`) et `crosscutting` (`mfa`, `rbac`) **ne** reçoivent **pas**
+    cette couche : ils s'utilisent par import direct ou par décorateurs.
 
 ## Comparaison avec les bundles Symfony
 

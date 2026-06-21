@@ -25,7 +25,12 @@
     manuelle, aucune écriture. Ce document reste la **référence de
     conception** ; voir la
     [référence CLI](../reference/cli-commands.md#opt-ins-branchement-projet).
-    Les autres opt-ins (`rbac`, `media`…) restent à venir.
+    `forge opt-in:enable` couvre désormais les **trois opt-ins de type
+    `route`** (`iot`, `video`, `audio`), seuls à posséder leurs propres routes
+    et donc à recevoir la couche `optins/`. Les opt-ins `library` (`workflow`,
+    `stats`, `images`, `files`, `mail`, `pivot`, `i18n`) et `crosscutting`
+    (`mfa`, `rbac`) ne se branchent pas par cette couche : ils s'utilisent par
+    import direct ou par décorateurs, sans câblage `optins/`.
 
 ## Objectif
 

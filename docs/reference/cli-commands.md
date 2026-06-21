@@ -1354,7 +1354,8 @@ geste explicite de l'utilisateur (ADR-016).
 forge opt-in:install iot            # affiche la commande pour forge-mvc-iot
 ```
 
-Opt-ins officiels : `mfa`, `rbac`, `workflow`, `stats`, `media`, `iot`.
+Opt-ins officiels : `mfa`, `rbac`, `workflow`, `stats`, `images`, `files`,
+`iot`, `video`, `audio`, `mail`, `pivot`, `i18n`.
 
 </details>
 
