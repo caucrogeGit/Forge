@@ -599,7 +599,7 @@ Briques livrées :
 - intégration CRUD : boutons de transition dans les vues `show` et `list` ;
 - pas de callbacks automatiques — les hooks sont à écrire dans le contrôleur.
 
-La documentation complète est dans la section [Workflow](workflow.md) de cette référence.
+La documentation complète est dans la section [Workflow](../workflow/reference.md) de cette référence.
 
 ### Statistiques — Socle livré
 

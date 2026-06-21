@@ -67,7 +67,7 @@ flowchart LR
 
 ### Opt-ins officiels
 
-- [Workflow](workflow.md) — statuts et transitions (`forge-mvc-workflow`)
+- [Workflow](../workflow/reference.md) — statuts et transitions (`forge-mvc-workflow`)
 - [Statistiques](../stats/reference.md) — tracking d'événements (`forge-mvc-stats`)
 - [Modules Forge](modules.md) — système de modules, cycle de vie, routes
 - [Auth — Challenge MFA](auth-mfa.md) — flux MFA à la connexion (`forge-mvc-mfa`)

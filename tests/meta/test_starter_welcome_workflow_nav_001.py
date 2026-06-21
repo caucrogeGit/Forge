@@ -14,7 +14,8 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-WF = PROJECT_ROOT / "docs" / "starters" / "welcome-workflow"
+# Doc embarquée par paquet depuis l'ADR-038.
+WF = PROJECT_ROOT / "packages" / "forge-mvc-workflow" / "docs" / "welcome"
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",

@@ -20,8 +20,12 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 REFERENCE_PAGES = {
-    PROJECT_ROOT / "docs" / "reference" / "workflow.md": "forge_mvc_workflow",
-    # forge-mvc-stats : doc embarquée par paquet (ADR-038).
+    # forge-mvc-workflow / forge-mvc-stats : doc embarquée par paquet (ADR-038).
+    PROJECT_ROOT
+    / "packages"
+    / "forge-mvc-workflow"
+    / "docs"
+    / "reference.md": "forge_mvc_workflow",
     PROJECT_ROOT
     / "packages"
     / "forge-mvc-stats"
@@ -50,7 +54,9 @@ def _text_no_code(md_text: str) -> str:
 
 
 _PAGES = list(REFERENCE_PAGES.items())
-_IDS = [p.name for p in REFERENCE_PAGES]
+# Id lisible et unique : plusieurs pages migrées s'appellent « reference.md »
+# (doc embarquée, ADR-038), on préfixe donc par le dossier parent.
+_IDS = [f"{p.parent.name}/{p.name}" for p in REFERENCE_PAGES]
 
 
 class TestReferencePagesNoPhantomImports:

@@ -21,6 +21,7 @@ BASE_URL = "https://caucrogegit.github.io/Forge/"
 # Opt-ins à doc embarquée par paquet (ADR-038) : alias d'URL → dossier docs source.
 MIGRATED_DOC_ROOTS = {
     "stats": PROJECT_ROOT / "packages" / "forge-mvc-stats" / "docs",
+    "workflow": PROJECT_ROOT / "packages" / "forge-mvc-workflow" / "docs",
 }
 
 
@@ -55,8 +56,8 @@ EXPECTED_DOC_PATHS = [
     # Modules opt-in (11 cartes)
     "reference/auth-mfa",
     "features/rbac",
-    "reference/workflow",
-    # forge-mvc-stats : doc embarquée par paquet (ADR-038).
+    # forge-mvc-workflow / forge-mvc-stats : doc embarquée par paquet (ADR-038).
+    "workflow/reference",
     "stats/reference",
     "starters/welcome-files/installation",
     "starters/welcome-images/installation",
@@ -69,7 +70,7 @@ EXPECTED_DOC_PATHS = [
     "starters/welcome-forge/debutant/welcome",
     "starters/welcome-mfa/installation",
     "starters/welcome-rbac/installation",
-    "starters/welcome-workflow/installation",
+    "workflow/welcome/installation",
     "stats/welcome/installation",
     "starters/welcome-helpers/installation",
     "starters/welcome-markdown/installation",

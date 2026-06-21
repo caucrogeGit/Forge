@@ -8,7 +8,7 @@ couleur, et des marqueurs `is_initial` / `is_final`. `make_status` en crée un ;
 `validate_statuses` vérifie l'ensemble (pas de doublon, au plus un statut initial).
 
 Premier palier du **niveau débutant** de la progression workflow
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-workflow` installé (palier « Installation »). Module

@@ -1,0 +1,25 @@
+# Documentation embarquée du paquet forge-mvc-workflow (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /workflow/.
+site_name: workflow
+docs_dir: docs
+nav:
+  - Référence Workflow: reference.md
+  - Progression Workflow:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Bonjour Forge Workflow: welcome/debutant/workflow-welcome.md
+          - Nom de statut: welcome/debutant/workflow-status.md
+          - Retrouver un statut: welcome/debutant/workflow-find.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Déclarer les transitions: welcome/intermediaire/workflow-transition.md
+          - Vérifier une transition: welcome/intermediaire/workflow-check.md
+          - Transitions disponibles: welcome/intermediaire/workflow-available.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Badge de statut: welcome/avance/workflow-badge.md
+          - Couleur, libellé, classe: welcome/avance/workflow-color.md
+          - Helpers Workflow dans Jinja: welcome/avance/workflow-jinja.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

@@ -41,7 +41,8 @@ class TestReferenceIndexIsLight:
         assert "](api.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
     def test_reference_md_links_to_workflow(self):
-        assert "](workflow.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
+        # forge-mvc-workflow : doc embarquée par paquet (ADR-038), lien hors dossier.
+        assert "](../workflow/reference.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
     def test_reference_md_links_to_stats(self):
         # forge-mvc-stats : doc embarquée par paquet (ADR-038), lien hors dossier.
@@ -64,8 +65,7 @@ _EXPECTED_SUBFILES = [
     "api.md",
     "cli-commands.md",
     "http.md",
-    "workflow.md",
-    # "stats.md" retiré : doc embarquée dans forge-mvc-stats (ADR-038).
+    # "workflow.md"/"stats.md" retirés : doc embarquée dans leur paquet (ADR-038).
     "auth-mfa.md",
     "crud.md",
     "pages-publiques.md",
@@ -124,10 +124,9 @@ class TestPhaseTitlesRemoved:
 
 # ── Modules extraits mentionnes ───────────────────────────────────────────────
 
-# stats.md absent : sa notice d'extraction est gardée par
+# workflow.md/stats.md absents : leur notice d'extraction est gardée par
 # test_docs_reference_modules_001 (doc embarquée, ADR-038).
 @pytest.mark.parametrize("subfile,module_pkg", [
-    ("workflow.md", "forge-mvc-workflow"),
     ("auth-mfa.md", "forge-mvc-mfa"),
 ])
 class TestExtractedModulesNoted:
@@ -147,8 +146,8 @@ class TestExtractedModulesNoted:
 @pytest.mark.parametrize("keyword,expected_subfile", [
     ("CSRF", "tests-e2e.md"),
     ("Endpoint de sant", "profils.md"),
-    ("WorkflowStatus", "workflow.md"),
-    # ("track_event", "stats.md") retiré : stats embarqué dans le paquet (ADR-038).
+    # ("WorkflowStatus","workflow.md") / ("track_event","stats.md") retirés :
+    # workflow et stats embarqués dans leur paquet (ADR-038).
     ("log_auth_event", "audit-auth.md"),
 ])
 class TestNoCriticalContentLost:
@@ -171,7 +170,7 @@ class TestNoUnexpectedSubfiles:
     def test_only_expected_subfiles(self):
         if not REFERENCE_DIR.exists():
             pytest.skip("docs/reference/ n'existe pas")
-        # _EXPECTED_SUBFILES = les 12 sous-fichiers du découpage ; on autorise
+        # _EXPECTED_SUBFILES = les 11 sous-fichiers du découpage ; on autorise
         # en plus l'index reference.md et les 3 docs de référence regroupées
         # ici par DOCS-REORG-REFERENCE-001.
         expected = set(_EXPECTED_SUBFILES) | {

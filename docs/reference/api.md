@@ -3043,7 +3043,7 @@ Chaque opt-in est livré comme package PyPI distinct sous le namespace
 |---|---|---|---|
 | MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa.md](auth-mfa.md) |
 | RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../features/rbac.md) |
-| Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow.md](workflow.md) |
+| Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow](../workflow/reference.md) |
 | Statistiques | `forge-mvc-stats` | `[stats]` | [stats](../stats/reference.md) |
 | Médias applicatifs | `forge-mvc-images` | — (installer directement) | [media.md](../features/media.md) |
 
@@ -3086,7 +3086,7 @@ fonctions de validation, helpers Jinja2. Aucun callback automatique.
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
 > Voir [contrat d'installation](../install/opt-ins.md).
 
-Référence détaillée : [workflow.md](workflow.md).
+Référence détaillée : [workflow](../workflow/reference.md).
 
 ### Statistiques — `forge-mvc-stats`
 

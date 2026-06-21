@@ -83,6 +83,11 @@ MIGRATED = {
         PROJECT_ROOT / "packages" / "forge-mvc-stats" / "mkdocs.yml",
         "welcome/",
     ),
+    "welcome-workflow": (
+        PROJECT_ROOT / "packages" / "forge-mvc-workflow" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-workflow" / "mkdocs.yml",
+        "welcome/",
+    ),
 }
 
 

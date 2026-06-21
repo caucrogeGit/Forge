@@ -59,7 +59,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### Workflow (opt-in `forge-mvc-workflow`)
 
-[Bonjour Forge Workflow](welcome-workflow/debutant/workflow-welcome.md) · [Nom de statut](welcome-workflow/debutant/workflow-status.md) · [Retrouver un statut](welcome-workflow/debutant/workflow-find.md) · [Déclarer les transitions](welcome-workflow/intermediaire/workflow-transition.md) · [Vérifier une transition](welcome-workflow/intermediaire/workflow-check.md) · [Transitions disponibles](welcome-workflow/intermediaire/workflow-available.md) · [Badge de statut](welcome-workflow/avance/workflow-badge.md) · [Couleur, libellé, classe](welcome-workflow/avance/workflow-color.md) · [Helpers Workflow dans Jinja](welcome-workflow/avance/workflow-jinja.md)
+[Bonjour Forge Workflow](../workflow/welcome/debutant/workflow-welcome.md) · [Nom de statut](../workflow/welcome/debutant/workflow-status.md) · [Retrouver un statut](../workflow/welcome/debutant/workflow-find.md) · [Déclarer les transitions](../workflow/welcome/intermediaire/workflow-transition.md) · [Vérifier une transition](../workflow/welcome/intermediaire/workflow-check.md) · [Transitions disponibles](../workflow/welcome/intermediaire/workflow-available.md) · [Badge de statut](../workflow/welcome/avance/workflow-badge.md) · [Couleur, libellé, classe](../workflow/welcome/avance/workflow-color.md) · [Helpers Workflow dans Jinja](../workflow/welcome/avance/workflow-jinja.md)
 
 ### Stats (opt-in `forge-mvc-stats`)
 
