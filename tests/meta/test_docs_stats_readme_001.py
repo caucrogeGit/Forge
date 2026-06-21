@@ -24,6 +24,8 @@ def _distributable_packages() -> list[Path]:
     return sorted(
         p for p in PACKAGES_DIR.iterdir()
         if p.is_dir() and (p / "pyproject.toml").exists()
+        # forge-mvc-testing : infra de test dev-only, non distribuée (ADR-041).
+        and p.name != "forge-mvc-testing"
     )
 
 

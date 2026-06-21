@@ -49,6 +49,9 @@ class TestPypiClassifiers:
         """Chaque pyproject.toml doit avoir le classifier prévu."""
         paths = [PROJECT_ROOT / "pyproject.toml"]
         for pkg_dir in (PROJECT_ROOT / "packages").iterdir():
+            # forge-mvc-testing : infra de test dev-only, non distribuée (ADR-041).
+            if pkg_dir.name == "forge-mvc-testing":
+                continue
             if pkg_dir.is_dir() and (pkg_dir / "pyproject.toml").exists():
                 paths.append(pkg_dir / "pyproject.toml")
 

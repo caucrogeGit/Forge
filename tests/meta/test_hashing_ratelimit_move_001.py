@@ -113,7 +113,7 @@ class TestConftestNoPrivateAccessToHashing:
 
     def test_conftest_does_not_clear_private_tentatives(self):
         """conftest.py n'appelle plus `_h._tentatives.clear()`."""
-        source = (PROJECT_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "packages" / "forge-mvc-testing" / "forge_mvc_testing" / "plugin.py").read_text(encoding="utf-8")
         forbidden_patterns = [
             r"_tentatives\.clear\b",
             r"hashing\._tentatives\b",

@@ -47,6 +47,7 @@ CORE_DEPS = {
     "forge_cli",
     "integrations",
     "tests",
+    "forge_mvc_testing",  # infra de test partagée dev-only (ADR-041)
     "tools",
     "app",      # app.py racine (fichier applicatif exemple)
     "config",   # config.py racine (configuration applicative exemple)

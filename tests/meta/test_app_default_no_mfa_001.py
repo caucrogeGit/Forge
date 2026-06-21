@@ -88,7 +88,7 @@ class TestConftestMfaImportProtected:
 
     def test_conftest_mfa_import_is_protected(self):
         """L'import forge_mvc_mfa dans conftest.py est dans un try/except ImportError."""
-        source = (PROJECT_ROOT / "tests/conftest.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "packages/forge-mvc-testing/forge_mvc_testing/plugin.py").read_text(encoding="utf-8")
         lines = source.splitlines()
 
         mfa_import_lines = []
@@ -123,7 +123,7 @@ class TestConftestMfaImportProtected:
 
     def test_conftest_uses_explicit_noop_fallback(self):
         """Le fallback définit une fonction `_purge_replay` qui retourne None."""
-        source = (PROJECT_ROOT / "tests/conftest.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "packages/forge-mvc-testing/forge_mvc_testing/plugin.py").read_text(encoding="utf-8")
         assert "except ImportError" in source, (
             "conftest.py doit utiliser `except ImportError` pour protéger l'import MFA"
         )

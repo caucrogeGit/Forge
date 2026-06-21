@@ -128,9 +128,15 @@ def _module_level_importorskip_targets(tree: ast.Module) -> set[str]:
 
 
 def _iter_test_files():
-    """Tous les fichiers `tests/**/test_*.py` (inclut `tests/meta/`)."""
-    for path in sorted(_TESTS_DIR.rglob("test_*.py")):
-        yield path
+    """Tous les `tests/**/test_*.py` ET `packages/*/tests/**/test_*.py`.
+
+    Les tests unitaires des opt-ins ont migré vers leur paquet (ADR-040) ;
+    l'audit doit les couvrir là aussi.
+    """
+    roots = [_TESTS_DIR, *sorted((_TESTS_DIR.parent / "packages").glob("*/tests"))]
+    for root in roots:
+        for path in sorted(root.rglob("test_*.py")):
+            yield path
 
 
 # ---------------------------------------------------------------------------

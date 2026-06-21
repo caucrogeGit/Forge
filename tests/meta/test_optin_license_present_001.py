@@ -19,7 +19,10 @@ PACKAGES_DIR = ROOT / "packages"
 ROOT_LICENSE = ROOT / "LICENSE"
 
 _OPTIN_DIRS = sorted(
-    p for p in PACKAGES_DIR.iterdir() if (p / "pyproject.toml").is_file()
+    p for p in PACKAGES_DIR.iterdir()
+    if (p / "pyproject.toml").is_file()
+    # forge-mvc-testing : infra de test dev-only, non distribuée (ADR-041).
+    and p.name != "forge-mvc-testing"
 )
 
 
