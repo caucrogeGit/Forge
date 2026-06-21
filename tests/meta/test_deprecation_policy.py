@@ -87,8 +87,8 @@ class TestCycleDepreciation:
         lower = policy.lower()
         assert "période" in lower or "periode" in lower or "maintenu" in lower
 
-    def test_mentionne_serie_2x(self, policy):
-        assert "2.x" in policy or "série 2" in policy.lower()
+    def test_mentionne_serie_1x(self, policy):
+        assert "1.x" in policy or "série 1" in policy.lower()
 
 
 # ---------------------------------------------------------------------------

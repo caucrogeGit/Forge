@@ -68,9 +68,9 @@ def test_mention_base_py_regenerable():
     assert "_base.py" in content
 
 
-def test_mention_forge_3x():
+def test_mention_forge_1x():
     content = CONTRACT.read_text(encoding="utf-8")
-    assert "Forge 3.x" in content
+    assert "Forge 1.x" in content
 
 
 def test_mention_mvc():

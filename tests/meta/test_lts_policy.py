@@ -130,12 +130,14 @@ class TestContenuLts:
 
 
 class TestArgumentsPour:
-    def test_forge_2_2_0_mentionne(self):
-        assert "2.2.0" in _text()
+    def test_base_serieuse_mentionnee(self):
+        # La base d'évaluation LTS est la série bêta 1.0 (purge des versions
+        # internes 2.x/3.0, DOCS-PURGE-HISTORY-001).
+        assert "Forge 1.0" in _text() or "1.0.0-beta" in _text()
 
     def test_tests_nombreux_mentionnes(self):
         text = _text()
-        assert "test" in text.lower() and ("6 722" in text or "6722" in text)
+        assert "test" in text.lower() and "suite complète" in text.lower()
 
     def test_politique_release_mentionnee(self):
         text = _text().lower()

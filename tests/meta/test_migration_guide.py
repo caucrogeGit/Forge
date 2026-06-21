@@ -174,11 +174,11 @@ class TestNiveauxMigration:
 
     def test_exemple_minor(self):
         text = _text()
-        assert "2.2.0" in text and "2.3.0" in text
+        assert "1.2.0" in text and "1.3.0" in text
 
     def test_exemple_major(self):
         text = _text()
-        assert "3.0.0" in text
+        assert "version majeure" in text.lower()
 
     def test_patch_validation_doctor(self):
         text = _text()
