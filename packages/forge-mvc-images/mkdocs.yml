@@ -10,7 +10,7 @@ nav:
       - Traitement d'image (processing.py): references/processing.md
       - Dépôt de médias (media_repository.py): references/media_repository.md
       - Galerie (media_gallery.py): references/media_gallery.md
-\1
+  - Progression Images:
       - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge Images: welcome/debutant/images-welcome.md
