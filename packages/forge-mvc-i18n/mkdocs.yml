@@ -4,6 +4,9 @@
 site_name: i18n
 docs_dir: docs
 nav:
+  - Référence (par module):
+      - Traduction (translator.py): references/translator.md
+      - Erreurs (exceptions.py): references/exceptions.md
   - Progression i18n:
       - Installation: welcome/installation.md
       - Débutant:
