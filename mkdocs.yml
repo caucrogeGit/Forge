@@ -247,21 +247,22 @@ nav:
           - ADR-036 Typage statique du cœur en CI: adr/036-core-static-typing.md
           - ADR-037 Agrégation par comptage (stats): adr/037-stats-aggregation.md
           - ADR-038 Doc opt-ins embarquée par paquet: adr/038-optin-docs-embedded-per-package.md
+          - ADR-039 Refonte IA docs (cœur): adr/039-docs-information-architecture.md
 
-  # Opt-ins à doc embarquée par paquet (ADR-038).
-  - Statistiques (opt-in): '!include packages/forge-mvc-stats/mkdocs.yml'
-  - Workflow (opt-in): '!include packages/forge-mvc-workflow/mkdocs.yml'
-  - MFA (opt-in): '!include packages/forge-mvc-mfa/mkdocs.yml'
-  - Files (opt-in): '!include packages/forge-mvc-files/mkdocs.yml'
-  - Pivot (opt-in): '!include packages/forge-mvc-pivot/mkdocs.yml'
-  - i18n (opt-in): '!include packages/forge-mvc-i18n/mkdocs.yml'
-  - Audio (opt-in): '!include packages/forge-mvc-audio/mkdocs.yml'
-  - Mail (opt-in): '!include packages/forge-mvc-mail/mkdocs.yml'
-  - Images (opt-in): '!include packages/forge-mvc-images/mkdocs.yml'
-  - IoT (opt-in): '!include packages/forge-mvc-iot/mkdocs.yml'
-
-  - Vidéo (opt-in): '!include packages/forge-mvc-video/mkdocs.yml'
-  - RBAC (opt-in): '!include packages/forge-mvc-rbac/mkdocs.yml'
+  # Opt-ins officiels à doc embarquée par paquet (ADR-038), regroupés (ADR-039).
+  - Opt-ins officiels:
+      - MFA: '!include packages/forge-mvc-mfa/mkdocs.yml'
+      - RBAC: '!include packages/forge-mvc-rbac/mkdocs.yml'
+      - Workflow: '!include packages/forge-mvc-workflow/mkdocs.yml'
+      - Statistiques: '!include packages/forge-mvc-stats/mkdocs.yml'
+      - Fichiers: '!include packages/forge-mvc-files/mkdocs.yml'
+      - Images: '!include packages/forge-mvc-images/mkdocs.yml'
+      - Audio: '!include packages/forge-mvc-audio/mkdocs.yml'
+      - Vidéo: '!include packages/forge-mvc-video/mkdocs.yml'
+      - IoT: '!include packages/forge-mvc-iot/mkdocs.yml'
+      - Mail: '!include packages/forge-mvc-mail/mkdocs.yml'
+      - Pivot: '!include packages/forge-mvc-pivot/mkdocs.yml'
+      - i18n: '!include packages/forge-mvc-i18n/mkdocs.yml'
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md

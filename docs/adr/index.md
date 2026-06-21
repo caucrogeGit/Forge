@@ -45,3 +45,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-036](036-core-static-typing.md) | Typage statique du cœur vérifié en CI (Pyright), `py.typed`, strictness par cliquet en commençant par l'API publique (accepté) |
 | [ADR-037](037-stats-aggregation.md) | Agrégation par comptage dans `forge-mvc-stats` (accepté) |
 | [ADR-038](038-optin-docs-embedded-per-package.md) | Documentation des opt-ins embarquée par paquet (`packages/<paquet>/docs/`), agrégée dans le site unique ; slug d'URL = nom sans `forge-mvc-` (accepté, pilote stats validé) |
+| [ADR-039](039-docs-information-architecture.md) | Refonte de l'architecture d'information de `docs/` (cœur) : un sujet = un emplacement canonique, tronc « Opt-ins officiels », dédoublonnages (proposé) |
