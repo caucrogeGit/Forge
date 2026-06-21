@@ -116,11 +116,8 @@ nav:
       - Module média: features/media.md
       - ImageMagick (logos transparents): features/imagemagick-logos.md
 
-  - Modules et starters:
+  - Apprendre (parcours cœur):
       - Vue d'ensemble des starters: starters/index.md
-      - Créer un module: philosophy/module-author-guide.md
-      - Structure des opt-ins (projet): architecture/optins-project-structure.md
-      - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Progression pédagogique:
           - Présentation: starters/welcome-forge/index.md
           - Débutant:
@@ -207,6 +204,10 @@ nav:
 
   - Philosophie:
       - Charte v2: philosophy/charter.md
+      - Créer et structurer un module:
+          - Créer un module: philosophy/module-author-guide.md
+          - Structure des opt-ins (projet): architecture/optins-project-structure.md
+          - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
       - Décisions d'architecture:
           - Index des ADR: adr/index.md
           - ADR-001 Authentification: adr/001-auth-strategy.md
