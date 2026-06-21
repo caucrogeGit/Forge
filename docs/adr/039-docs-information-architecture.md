@@ -2,7 +2,16 @@
 
 ## Statut
 
-Proposé, Forge 1.0.0-beta.x (ticket `ADR-DOCS-IA-001`).
+Accepté, Forge 1.0.0-beta.x (ticket `ADR-DOCS-IA-001`).
+
+Exécution (tickets `DOCS-IA-00x`) : étape 1 (tronc « Opt-ins officiels »),
+étape 2 (« Apprendre (parcours cœur) »), étape 3 (bucket « Modèle de données »)
+et étape 5 (« Guides du cœur » consolidés) faites, nav-only, `--strict` vert.
+Étape 4 (dédoublonnages) annulée après vérification : `crud` n'est pas un
+doublon, `concepts/` déjà absent (voir section Décision). Reste optionnel :
+reséquencer « Apprendre » plus haut, fusionner « Premiers pas » et « Concepts »
+en « Découvrir », déplacements physiques de fichiers pour aligner dossiers et
+buckets (faible valeur, l'IA visible est dans la nav).
 
 Fait suite à l'ADR-038 (doc des opt-ins embarquée par paquet) : une fois les
 douze opt-ins sortis de `docs/`, la structure cœur héritée laisse apparaître des
