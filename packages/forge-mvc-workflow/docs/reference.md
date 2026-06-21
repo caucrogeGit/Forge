@@ -1,4 +1,4 @@
-# Workflow — Référence
+# Workflow : référence
 
 > **Module extrait** : le code workflow vit dans `forge-mvc-workflow`.
 > Voir `packages/forge-mvc-workflow/README.md` pour l'installation et l'API utilisateur.

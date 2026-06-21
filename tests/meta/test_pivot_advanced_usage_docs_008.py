@@ -12,7 +12,10 @@ import pytest
 pytestmark = pytest.mark.meta
 
 # Doc embarquée par paquet depuis l'ADR-038 (montée sous /pivot/reference/).
-DOC_PAGE = Path("packages/forge-mvc-pivot/docs/reference.md")
+# Référence éclatée en pages par-module (DOCS-PIVOT-REFERENCE-SPLIT-001) :
+# index + references/*.md. Le contenu est vérifié sur l'ensemble agrégé.
+DOC_DIR = Path("packages/forge-mvc-pivot/docs")
+DOC_PAGE = DOC_DIR / "reference.md"
 MKDOCS = Path("mkdocs.yml")
 PIVOTS_PAGE = Path("docs/entities/pivots-many-to-many.md")
 AUDIT_001 = Path("docs/history/audits/pivot-advanced-functional-model-001.md")
@@ -21,7 +24,12 @@ AUDIT_001 = Path("docs/history/audits/pivot-advanced-functional-model-001.md")
 @pytest.fixture(scope="module")
 def doc():
     assert DOC_PAGE.exists(), f"{DOC_PAGE} introuvable"
-    return DOC_PAGE.read_text(encoding="utf-8")
+    # Agrège l'index et les pages par-module : le contenu de référence est
+    # désormais réparti (service.md, make_pivot_crud.md), pas dans un seul fichier.
+    parts = [DOC_PAGE.read_text(encoding="utf-8")]
+    refs = DOC_DIR / "references"
+    parts += [p.read_text(encoding="utf-8") for p in sorted(refs.glob("*.md"))]
+    return "\n".join(parts)
 
 
 @pytest.fixture(scope="module")

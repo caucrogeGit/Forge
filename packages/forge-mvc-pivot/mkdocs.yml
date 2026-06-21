@@ -4,7 +4,10 @@
 site_name: pivot
 docs_dir: docs
 nav:
-  - Pivot advanced (référence): reference.md
+  - Pivot advanced (référence):
+      - Vue d'ensemble: reference.md
+      - Service pivot (service.py): references/service.md
+      - Générateur de sous-CRUD (make_pivot_crud.py): references/make_pivot_crud.md
   - Progression Pivot:
       - Installation: welcome/installation.md
       - Débutant:
