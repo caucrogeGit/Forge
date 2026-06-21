@@ -44,7 +44,8 @@ class TestReferenceIndexIsLight:
         assert "](workflow.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
     def test_reference_md_links_to_stats(self):
-        assert "](stats.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
+        # forge-mvc-stats : doc embarquée par paquet (ADR-038), lien hors dossier.
+        assert "](../stats/reference.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
     def test_reference_md_links_to_modules(self):
         assert "](modules.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
@@ -64,7 +65,7 @@ _EXPECTED_SUBFILES = [
     "cli-commands.md",
     "http.md",
     "workflow.md",
-    "stats.md",
+    # "stats.md" retiré : doc embarquée dans forge-mvc-stats (ADR-038).
     "auth-mfa.md",
     "crud.md",
     "pages-publiques.md",
@@ -123,9 +124,10 @@ class TestPhaseTitlesRemoved:
 
 # ── Modules extraits mentionnes ───────────────────────────────────────────────
 
+# stats.md absent : sa notice d'extraction est gardée par
+# test_docs_reference_modules_001 (doc embarquée, ADR-038).
 @pytest.mark.parametrize("subfile,module_pkg", [
     ("workflow.md", "forge-mvc-workflow"),
-    ("stats.md", "forge-mvc-stats"),
     ("auth-mfa.md", "forge-mvc-mfa"),
 ])
 class TestExtractedModulesNoted:
@@ -146,7 +148,7 @@ class TestExtractedModulesNoted:
     ("CSRF", "tests-e2e.md"),
     ("Endpoint de sant", "profils.md"),
     ("WorkflowStatus", "workflow.md"),
-    ("track_event", "stats.md"),
+    # ("track_event", "stats.md") retiré : stats embarqué dans le paquet (ADR-038).
     ("log_auth_event", "audit-auth.md"),
 ])
 class TestNoCriticalContentLost:
@@ -169,7 +171,7 @@ class TestNoUnexpectedSubfiles:
     def test_only_expected_subfiles(self):
         if not REFERENCE_DIR.exists():
             pytest.skip("docs/reference/ n'existe pas")
-        # _EXPECTED_SUBFILES = les 13 sous-fichiers du découpage ; on autorise
+        # _EXPECTED_SUBFILES = les 12 sous-fichiers du découpage ; on autorise
         # en plus l'index reference.md et les 3 docs de référence regroupées
         # ici par DOCS-REORG-REFERENCE-001.
         expected = set(_EXPECTED_SUBFILES) | {

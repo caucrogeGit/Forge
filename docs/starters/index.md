@@ -63,7 +63,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### Stats (opt-in `forge-mvc-stats`)
 
-[Bonjour Forge Stats](welcome-stats/debutant/stats-welcome.md) · [Nom d'événement](welcome-stats/debutant/stats-event.md) · [Le schéma SQL](welcome-stats/debutant/stats-schema.md) · [Le SQL d'insertion](welcome-stats/intermediaire/stats-track-sql.md) · [Enregistrer un événement](welcome-stats/intermediaire/stats-track.md) · [Valider un événement](welcome-stats/intermediaire/stats-validate.md) · [Le SQL de consultation](welcome-stats/avance/stats-admin-sql.md) · [Lister les événements](welcome-stats/avance/stats-list.md) · [Normaliser une ligne](welcome-stats/avance/stats-normalize.md)
+[Bonjour Forge Stats](../stats/welcome/debutant/stats-welcome.md) · [Nom d'événement](../stats/welcome/debutant/stats-event.md) · [Le schéma SQL](../stats/welcome/debutant/stats-schema.md) · [Le SQL d'insertion](../stats/welcome/intermediaire/stats-track-sql.md) · [Enregistrer un événement](../stats/welcome/intermediaire/stats-track.md) · [Valider un événement](../stats/welcome/intermediaire/stats-validate.md) · [Le SQL de consultation](../stats/welcome/avance/stats-admin-sql.md) · [Lister les événements](../stats/welcome/avance/stats-list.md) · [Normaliser une ligne](../stats/welcome/avance/stats-normalize.md)
 
 ### Mail (opt-in `forge-mvc-mail`)
 

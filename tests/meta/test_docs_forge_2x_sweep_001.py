@@ -140,7 +140,8 @@ class TestHistoricalMentionsPreserved:
     @pytest.mark.parametrize("doc_path,expected_mention", [
         ("features/auth.md", "Depuis Forge 2.4.0"),
         ("reference/auth-mfa.md", "depuis Forge 2.5.0"),
-        ("reference/stats.md", "depuis Forge 2.8.0"),
+        # forge-mvc-stats : doc embarquée par paquet (ADR-038).
+        ("../packages/forge-mvc-stats/docs/reference.md", "depuis Forge 2.8.0"),
         ("reference/workflow.md", "depuis Forge 2.7.0"),
     ])
     def test_historical_extraction_mention_preserved(

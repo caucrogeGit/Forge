@@ -8,7 +8,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-stats`.
 décrivent le stockage.
 
 Premier palier du **niveau débutant** de la progression stats
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-stats` installé (palier « Installation »). Module à

@@ -89,7 +89,6 @@ nav:
       - Convention HTTP inspectable: reference/http.md
       - Opt-ins officiels:
           - Workflow: reference/workflow.md
-          - Statistiques: reference/stats.md
           - Modules Forge: reference/modules.md
           - Auth — Challenge MFA: reference/auth-mfa.md
       - CRUD et relations: reference/crud.md
@@ -308,24 +307,6 @@ nav:
               - Helpers Workflow dans Jinja: starters/welcome-workflow/avance/workflow-jinja.md
               - Bilan avancé: starters/welcome-workflow/avance/bilan.md
           - Aide-mémoire: starters/welcome-workflow/recapitulatif.md
-      - Progression Stats (welcome-stats):
-          - Installation: starters/welcome-stats/installation.md
-          - Débutant:
-              - Bonjour Forge Stats: starters/welcome-stats/debutant/stats-welcome.md
-              - Nom d'événement: starters/welcome-stats/debutant/stats-event.md
-              - Le schéma SQL: starters/welcome-stats/debutant/stats-schema.md
-              - Bilan débutant: starters/welcome-stats/debutant/bilan.md
-          - Intermédiaire:
-              - Le SQL d'insertion: starters/welcome-stats/intermediaire/stats-track-sql.md
-              - Enregistrer un événement: starters/welcome-stats/intermediaire/stats-track.md
-              - Valider un événement: starters/welcome-stats/intermediaire/stats-validate.md
-              - Bilan intermédiaire: starters/welcome-stats/intermediaire/bilan.md
-          - Avancé:
-              - Le SQL de consultation: starters/welcome-stats/avance/stats-admin-sql.md
-              - Lister les événements: starters/welcome-stats/avance/stats-list.md
-              - Normaliser une ligne: starters/welcome-stats/avance/stats-normalize.md
-              - Bilan avancé: starters/welcome-stats/avance/bilan.md
-          - Aide-mémoire: starters/welcome-stats/recapitulatif.md
       - Progression Pivot (welcome-pivot):
           - Installation: starters/welcome-pivot/installation.md
           - Débutant:
@@ -463,6 +444,9 @@ nav:
           - ADR-036 Typage statique du cœur en CI: adr/036-core-static-typing.md
           - ADR-037 Agrégation par comptage (stats): adr/037-stats-aggregation.md
           - ADR-038 Doc opt-ins embarquée par paquet: adr/038-optin-docs-embedded-per-package.md
+
+  # Opt-ins à doc embarquée par paquet (ADR-038). Pilote : forge-mvc-stats.
+  - Statistiques (opt-in): '!include packages/forge-mvc-stats/mkdocs.yml'
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
@@ -607,6 +591,7 @@ plugins:
       lang: fr
       separator: '[\s\-\.:\_/]+'
   - glightbox
+  - monorepo
 
 docs_dir: docs
 site_dir: site

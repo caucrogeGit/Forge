@@ -1,0 +1,25 @@
+# Documentation embarquée du paquet forge-mvc-stats (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /stats/.
+site_name: stats
+docs_dir: docs
+nav:
+  - Référence Statistiques: reference.md
+  - Progression Stats:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Bonjour Forge Stats: welcome/debutant/stats-welcome.md
+          - Nom d'événement: welcome/debutant/stats-event.md
+          - Le schéma SQL: welcome/debutant/stats-schema.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Le SQL d'insertion: welcome/intermediaire/stats-track-sql.md
+          - Enregistrer un événement: welcome/intermediaire/stats-track.md
+          - Valider un événement: welcome/intermediaire/stats-validate.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Le SQL de consultation: welcome/avance/stats-admin-sql.md
+          - Lister les événements: welcome/avance/stats-list.md
+          - Normaliser une ligne: welcome/avance/stats-normalize.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

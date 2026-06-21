@@ -21,7 +21,12 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 REFERENCE_PAGES = {
     PROJECT_ROOT / "docs" / "reference" / "workflow.md": "forge_mvc_workflow",
-    PROJECT_ROOT / "docs" / "reference" / "stats.md": "forge_mvc_stats",
+    # forge-mvc-stats : doc embarquée par paquet (ADR-038).
+    PROJECT_ROOT
+    / "packages"
+    / "forge-mvc-stats"
+    / "docs"
+    / "reference.md": "forge_mvc_stats",
     PROJECT_ROOT / "docs" / "reference" / "auth-mfa.md": "forge_mvc_mfa",
 }
 

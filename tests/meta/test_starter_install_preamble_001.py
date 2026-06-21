@@ -75,8 +75,35 @@ PARCOURS = {
 }
 
 
+# Parcours migrés vers une doc embarquée par paquet (ADR-038).
+# parcours → (dossier docs du parcours, mkdocs portant sa nav, préfixe de nav)
+MIGRATED = {
+    "welcome-stats": (
+        PROJECT_ROOT / "packages" / "forge-mvc-stats" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-stats" / "mkdocs.yml",
+        "welcome/",
+    ),
+}
+
+
 def _page(parcours: str) -> Path:
+    if parcours in MIGRATED:
+        return MIGRATED[parcours][0] / "installation.md"
     return STARTERS / parcours / "installation.md"
+
+
+def _nav_info(parcours: str) -> tuple[str, str, str]:
+    """Retourne (texte nav, entrée installation, entrée premier palier)."""
+    first = PARCOURS[parcours][0]
+    if parcours in MIGRATED:
+        _, nav_file, prefix = MIGRATED[parcours]
+        return (
+            nav_file.read_text(encoding="utf-8"),
+            f"{prefix}installation.md",
+            f"{prefix}{first}",
+        )
+    nav = MKDOCS.read_text(encoding="utf-8")
+    return (nav, f"starters/{parcours}/installation.md", f"starters/{parcours}/{first}")
 
 
 @pytest.mark.parametrize("parcours", list(PARCOURS))
@@ -88,9 +115,7 @@ def test_installation_page_exists(parcours: str):
 
 @pytest.mark.parametrize("parcours", list(PARCOURS))
 def test_installation_in_nav_before_debutant(parcours: str):
-    nav = MKDOCS.read_text(encoding="utf-8")
-    entry = f"starters/{parcours}/installation.md"
-    first_palier = f"starters/{parcours}/{PARCOURS[parcours][0]}"
+    nav, entry, first_palier = _nav_info(parcours)
     assert entry in nav, f"{entry} doit figurer dans la nav MkDocs."
     # Le préambule précède le premier palier de code dans la nav.
     assert nav.find(entry) < nav.find(first_palier), (

@@ -18,6 +18,23 @@ DOCS = PROJECT_ROOT / "docs"
 
 BASE_URL = "https://caucrogegit.github.io/Forge/"
 
+# Opt-ins à doc embarquée par paquet (ADR-038) : alias d'URL → dossier docs source.
+MIGRATED_DOC_ROOTS = {
+    "stats": PROJECT_ROOT / "packages" / "forge-mvc-stats" / "docs",
+}
+
+
+def _doc_source(doc_path: str) -> Path:
+    """Résout un chemin d'URL de doc vers son fichier source.
+
+    Les opt-ins migrés (ADR-038) embarquent leur doc sous
+    ``packages/<paquet>/docs/`` ; leur alias d'URL est le premier segment.
+    """
+    alias, _, rest = doc_path.partition("/")
+    if alias in MIGRATED_DOC_ROOTS and rest:
+        return MIGRATED_DOC_ROOTS[alias] / f"{rest}.md"
+    return DOCS / f"{doc_path}.md"
+
 EXPECTED_DOC_PATHS = [
     # Core Forge (16 cartes)
     "guide/concepts",
@@ -39,7 +56,8 @@ EXPECTED_DOC_PATHS = [
     "reference/auth-mfa",
     "features/rbac",
     "reference/workflow",
-    "reference/stats",
+    # forge-mvc-stats : doc embarquée par paquet (ADR-038).
+    "stats/reference",
     "starters/welcome-files/installation",
     "starters/welcome-images/installation",
     "starters/welcome-iot/installation",
@@ -52,7 +70,7 @@ EXPECTED_DOC_PATHS = [
     "starters/welcome-mfa/installation",
     "starters/welcome-rbac/installation",
     "starters/welcome-workflow/installation",
-    "starters/welcome-stats/installation",
+    "stats/welcome/installation",
     "starters/welcome-helpers/installation",
     "starters/welcome-markdown/installation",
 ]
@@ -95,7 +113,7 @@ class TestLandingArticlesClickable:
 
     @pytest.mark.parametrize("doc_path", sorted(set(EXPECTED_DOC_PATHS)))
     def test_doc_source_exists(self, doc_path):
-        md_path = DOCS / f"{doc_path}.md"
+        md_path = _doc_source(doc_path)
         assert md_path.exists(), (
             f"Page doc manquante pour '{doc_path}' : {md_path.relative_to(PROJECT_ROOT)}"
         )

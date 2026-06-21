@@ -3044,7 +3044,7 @@ Chaque opt-in est livré comme package PyPI distinct sous le namespace
 | MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa.md](auth-mfa.md) |
 | RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../features/rbac.md) |
 | Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow.md](workflow.md) |
-| Statistiques | `forge-mvc-stats` | `[stats]` | [stats.md](stats.md) |
+| Statistiques | `forge-mvc-stats` | `[stats]` | [stats](../stats/reference.md) |
 | Médias applicatifs | `forge-mvc-images` | — (installer directement) | [media.md](../features/media.md) |
 
 La plupart des opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`
@@ -3096,7 +3096,7 @@ calculés à la demande.
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
 > Voir [contrat d'installation](../install/opt-ins.md).
 
-Référence détaillée : [stats.md](stats.md).
+Référence détaillée : [stats](../stats/reference.md).
 
 ### Médias applicatifs — `forge-mvc-images`
 
