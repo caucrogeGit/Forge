@@ -64,6 +64,11 @@ nav:
   - Concepts:
       - Vue d'ensemble: guide/concepts.md
       - Positionnement: guide/positioning.md
+      - Front et CSS: features/front.md
+      - Profils de projet: features/profiles.md
+      - FAQ: guide/faq.md
+
+  - Modèle de données (entités & relations):
       - Architecture des entités: features/entity_architecture.md
       - Le JSON canonique: entities/json-canonique.md
       - Schéma des entités: entities/entity-schema.md
@@ -75,9 +80,6 @@ nav:
       - Autocomplétion VS Code: entities/vscode-json-schema.md
       - Limites des contrats JSON: entities/limites-contrats-json.md
       - Conversion depuis l'ancien format: entities/migration-legacy-vers-canonique.md
-      - Front et CSS: features/front.md
-      - Profils de projet: features/profiles.md
-      - FAQ: guide/faq.md
 
   - Référence:
       - Index: reference/reference.md
