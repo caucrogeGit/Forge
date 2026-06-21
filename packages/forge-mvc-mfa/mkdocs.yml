@@ -4,7 +4,12 @@
 site_name: mfa
 docs_dir: docs
 nav:
-  - Référence Auth MFA: reference.md
+  - Référence Auth MFA:
+      - Vue d'ensemble et sécurité: reference.md
+      - Cœur MFA (mfa.py): references/mfa.md
+      - Codes de récupération (recovery.py): references/recovery.md
+      - Chiffrement des secrets (secret_crypto.py): references/secret_crypto.md
+      - Protection anti-rejeu (totp_replay.py): references/totp_replay.md
   - Progression MFA:
       - Installation: welcome/installation.md
       - Débutant:

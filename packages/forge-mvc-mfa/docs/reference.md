@@ -79,6 +79,19 @@ Forge ne fournit pas encore dans ce flux : *remember device*, WebAuthn, SMS, ema
 
 ---
 
+## Référence par module
+
+L'API détaillée est documentée page par page, un fichier par module :
+
+| Module | Page | Contenu |
+|---|---|---|
+| `mfa.py` | [Le cœur MFA](references/mfa.md) | facteurs, TOTP, challenge, revalidation |
+| `recovery.py` | [Les codes de récupération](references/recovery.md) | génération et vérification des codes de secours |
+| `secret_crypto.py` | [Le chiffrement des secrets](references/secret_crypto.md) | chiffrement Fernet du secret TOTP, validation de la clé |
+| `totp_replay.py` | [La protection anti-rejeu](references/totp_replay.md) | refus de la réutilisation d'un code TOTP |
+
+---
+
 ## Politique de stockage des secrets MFA
 
 ### Statut actuel
