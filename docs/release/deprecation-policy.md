@@ -21,7 +21,7 @@ Chaque suppression d'un élément stable passe par un cycle explicite :
 Annonce → Maintien → Retrait
 ```
 
-Les projets en Forge 2.x ne doivent jamais se retrouver cassés après une
+Les projets en Forge 1.x ne doivent jamais se retrouver cassés après une
 mise à jour mineure.
 
 ---
@@ -90,8 +90,8 @@ prochaine version MAJOR.
 
 | Déprécié en | Maintenu jusqu'au moins | Retiré possible dès |
 |---|---|---|
-| 2.4.0 | Fin de la série 2.x | 1.0.0 stable |
-| 2.x (quelconque) | Fin de la série 2.x | 1.0.0 stable |
+| une mineure `1.x` (ex. `1.2.0`) | Fin de la série `1.x` | la prochaine version majeure |
+| une mineure `1.x` (quelconque) | Fin de la série `1.x` | la prochaine version majeure |
 
 **Exception :** une vulnérabilité de sécurité grave peut imposer un retrait
 immédiat sans respecter cette durée (voir la section Exceptions de sécurité ci-dessous).
@@ -148,7 +148,7 @@ import warnings
 
 def ancienne_fonction():
     warnings.warn(
-        "ancienne_fonction() est dépréciée depuis Forge 2.4.0. "
+        "ancienne_fonction() est dépréciée depuis Forge 1.2.0. "
         "Utiliser nouvelle_fonction() à la place. "
         "Suppression prévue à la prochaine version MAJOR.",
         DeprecationWarning,
@@ -160,7 +160,7 @@ def ancienne_fonction():
 Ajouter dans `CHANGELOG.md` et dans `docs/auth.md` ou `docs/reference.md`
 la mention de la dépréciation.
 
-### Maintien pendant la série 2.x
+### Maintien pendant la série 1.x
 
 La fonction dépréciée reste fonctionnelle. Elle délègue à la nouvelle
 implémentation ou conserve son comportement original.
@@ -283,7 +283,7 @@ Chaque retrait doit figurer sous `### Supprimé`.
 
 ## Retrait en version MAJOR
 
-Un retrait de fonctionnalité stable est réservé à une version MAJOR (1.0.0, 2.0.0…).
+Un retrait de fonctionnalité stable est réservé à une version MAJOR (`1.0.0`, puis les majeures suivantes).
 
 Avant le retrait :
 
@@ -318,16 +318,16 @@ Dans ce cas :
 
 ## Exemples
 
-### Exemple 1 — Suppression de cmd/ (CMD-LEGACY-REMOVE-001, fait en 2.10.0)
+### Exemple 1 — Suppression de cmd/ (CMD-LEGACY-REMOVE-001, fait pendant le développement pré-1.0)
 
-- **Déprécié en** : Forge 2.0 (migration vers la CLI officielle `forge`).
-- **Supprimé en** : Forge 2.10.0 / 3.0 (note pré-3.0 — suppression directe sans shim).
+- **Déprécié pendant** : le développement pré-1.0 (migration vers la CLI officielle `forge`).
+- **Supprimé pendant** : le développement pré-1.0 (suppression directe sans shim, convention pré-1.0).
 - **Alternative** : `forge make:entity`, `forge make:crud`, etc.
 - **Référence** : ticket `CMD-LEGACY-REMOVE-001`.
 
 ### Exemple 2 — Dépréciation de core.security.hashing
 
-- **Déprécié en** : Forge 2.1 (frontier API `core.auth` vs `core.security`).
+- **Déprécié pendant** : le développement pré-1.0 (frontier API `core.auth` vs `core.security`).
 - **Alternative** : `core.auth.password` (Argon2id).
 - **Maintien** : PBKDF2 reste disponible pour vérifier d'anciens hashes et
   effectuer la migration transparente.
@@ -336,7 +336,7 @@ Dans ce cas :
 
 ### Exemple 3 — Dépréciation de @require_auth (legacy decorator)
 
-- **Déprécié en** : Forge 2.x.
+- **Déprécié pendant** : le développement pré-1.0.
 - **Alternative** : `core.auth.session.login_required`.
 - **Retrait prévu** : Forge 1.x stable.
 - **Référence** : `docs/auth.md`, section "Modules core.security dépréciés".

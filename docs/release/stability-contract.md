@@ -16,7 +16,7 @@ Forge 1.x garantit la stabilité de son interface publique : commandes CLI docum
 
 Le contrat couvre également :
 
-- Les modules opt-in extraits (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-video` — Beta ; `forge-mvc-mfa`, `forge-mvc-images`, `forge-mvc-iot` — Alpha).
+- Les douze modules opt-in officiels selon leur niveau de maturité (Stable / Bêta / Alpha). La grille de maturité à jour fait foi dans [release-policy.md](release-policy.md) (source unique) ; ce contrat ne la duplique pas pour éviter toute dérive.
 - Le mécanisme de plugins pour étendre le contexte Jinja (`core.mvc.controller.register_jinja_context_provider`).
 - L'absence de dépendance nominale du core sur les modules opt-in.
 
@@ -81,7 +81,7 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 
 | Domaine | Statut |
 |---|---|
-| `forge module:*` (install, files, routes, remove) | Expérimental — interface susceptible d'évoluer |
+| `forge module:*` (list, install, files, routes) | Expérimental — interface susceptible d'évoluer |
 | `forge sync:landing [--check]` | Expérimental |
 | `forge check:model` | Expérimental |
 | `forge deploy:init`, `forge deploy:check` | Expérimental |
@@ -264,7 +264,7 @@ Ces commandes sont disponibles mais leur interface peut évoluer :
 
 | Commande | Note |
 |---|---|
-| `forge module:list` / `install` / `files` / `routes` / `remove` | Système de modules, jeune |
+| `forge module:list` / `install` / `files` / `routes` | Système de modules, jeune |
 | `forge sync:landing [--check]` | Synchronisation landing |
 | `forge check:model` | Vérification cohérence modèles |
 | `forge deploy:init` / `check` | Déploiement |
@@ -289,15 +289,20 @@ Les imports internes de `forge_cli.*` ne sont pas garantis entre versions mineur
 
 ---
 
+## Politiques désormais documentées
+
+Les garanties suivantes, autrefois en attente, sont désormais livrées :
+
+- [Politique de dépréciation](deprecation-policy.md) ;
+- [Politique de versionnement sémantique](release-policy.md) ;
+- [Matrice de compatibilité Python / MariaDB / Node](compatibility.md) ;
+- [Guide de migration entre versions majeures](../features/migration-guide.md) ;
+- [Politique LTS](lts-policy.md).
+
 ## Ce que ce contrat ne garantit pas encore
 
 Les points suivants seront traités dans des tickets dédiés :
 
-- Politique de dépréciation complète (`RELEASE-DEPRECATION-001`).
-- Politique de versionnement sémantique officielle (`RELEASE-POLICY-001`).
-- Matrice de compatibilité Python / MariaDB / Node (`RELEASE-COMPAT-001`).
-- Guide de migration entre versions majeures (`RELEASE-MIGRATION-GUIDE-001`).
-- Politique LTS (`RELEASE-LTS-001`).
 - Promesse sur l'API JSON future (`API-JSON-001` et suivants).
 - Garantie sur les modules internes non documentés.
 - Garantie sur les starters (code généré, non versionnés dans les projets utilisateur).

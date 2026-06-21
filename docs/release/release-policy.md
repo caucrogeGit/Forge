@@ -39,9 +39,9 @@ MAJOR.MINOR.PATCH
 Exemples :
 
 ```
-2.2.0   → 2.2.1   (correctif)
-2.2.0   → 2.3.0   (fonctionnalité compatible)
-2.x.y   → 3.0.0   (rupture)
+1.2.0   → 1.2.1   (correctif)
+1.2.0   → 1.3.0   (fonctionnalité compatible)
+1.x.y   → version majeure suivante   (rupture)
 ```
 
 ---
@@ -60,7 +60,7 @@ Incrémenter `PATCH` pour :
 `SECURITY-HEADERS-001` (ajout Permissions-Policy sans changement API),
 `SECURITY-COOKIES-001` (audit sans modification de l'API de session).
 
-**Règle d'or :** si un projet existant en Forge 2.x fonctionne sans modification
+**Règle d'or :** si un projet existant en Forge 1.x fonctionne sans modification
 après la mise à jour, c'est un PATCH.
 
 ---
@@ -197,8 +197,8 @@ vX.Y.Z-rc.N         # release candidate
 Exemples :
 
 ```
-v2.2.0
-v2.3.0
+v1.2.0
+v1.3.0
 v1.0.0-beta.9
 v1.0.0-beta.10
 ```
@@ -223,8 +223,8 @@ source de vérité pour construire le nom de tag depuis la version Python.
 Si une erreur est détectée après publication :
 
 - Corriger dans un nouveau commit.
-- Créer un nouveau tag de correctif (ex. `v2.2.1`).
-- Ne pas modifier le tag `v2.2.0`.
+- Créer un nouveau tag de correctif (ex. `v1.2.1`).
+- Ne pas modifier le tag `v1.2.0`.
 
 Seuls les tags locaux non poussés peuvent être corrigés. Une fois poussé,
 le tag est immuable.
@@ -372,7 +372,7 @@ Vérifications post-publication :
 | `forge-mvc-workflow` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-workflow` |
 | `forge-mvc-stats` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-stats` |
 | `forge-mvc-mfa` | ✅ Publié sur PyPI depuis `1.0.0-beta.9` — version alignée avec le core | `pip install --pre forge-mvc-mfa` (Alpha, `MFA-PYPI-READY-001`) |
-| `forge-mvc-images` | ✅ Publié sur PyPI depuis `1.0.0-beta.9` — version alignée avec le core | `pip install --pre forge-mvc-images` (Alpha, API encore bêta, `MEDIA-PYPI-READY-002`) |
+| `forge-mvc-images` | ✅ Publié sur PyPI depuis `1.0.0-beta.13` — version alignée avec le core | `pip install --pre forge-mvc-images` (Alpha, API encore bêta, `MEDIA-PYPI-READY-002`) |
 
 Tous les opt-ins officiels sont publiables directement depuis PyPI.
 
@@ -419,7 +419,7 @@ reste manuelle et délibérée.
 ### Règles de version
 
 - **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était bumped à chaque release. Les opt-ins source-only conservaient leur version interne.
-- Depuis `1.0.0-beta.9`, les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont publiés sur PyPI et strictement synchronisés avec la version du core ; `iot` les a rejoints en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`. **Les onze opt-ins officiels** sont désormais publiés et synchronisés.
+- Depuis `1.0.0-beta.9`, les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont publiés sur PyPI et strictement synchronisés avec la version du core ; `iot` les a rejoints en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`, et `i18n` (extrait en `1.0.0-beta.15`) ensuite. **Les douze opt-ins officiels** sont désormais publiés et synchronisés.
 
 ### Artefacts de build
 
@@ -447,9 +447,9 @@ Aucune automatisation ne déclenche la publication.
 ### État actuel
 
 `forge-mvc` (core) est publié sur PyPI depuis `1.0.0-beta.1`.
-Depuis `1.0.0-beta.13`, **les onze opt-ins officiels** (`forge-mvc-rbac`,
+**Les douze opt-ins officiels** (`forge-mvc-rbac`,
 `-workflow`, `-stats`, `-mfa`, `-files`, `-images`, `-audio`, `-iot`,
-`-video`, `-pivot`, `-mail`) sont publiés sur PyPI et synchronisés avec
+`-video`, `-pivot`, `-mail`, `-i18n`) sont publiés sur PyPI et synchronisés avec
 le core. Les règles applicables à chaque package restent documentées ici.
 
 Cette politique est livrée par le ticket `OPTIN-PACKAGES-PUBLICATION-POLICY-001`.
@@ -461,7 +461,7 @@ Il est le point d'entrée officiel du framework.
 
 ### Opt-ins publiés sur PyPI
 
-Les onze opt-ins officiels sont publiés sur PyPI :
+Les douze opt-ins officiels sont publiés sur PyPI :
 
 - `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) : publication
   initiale en `1.0.0-beta.5` ;
@@ -470,7 +470,7 @@ Les onze opt-ins officiels sont publiés sur PyPI :
 - `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`,
   `forge-mvc-pivot`, `forge-mvc-mail` : publication en `1.0.0-beta.13` ;
 - `forge-mvc-i18n` (Bêta) : extrait du core en `1.0.0-beta.15` (ADR-027),
-  publication PyPI à venir.
+  publié et synchronisé avec le core.
 
 Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et
 `forge-mvc[all]` sont disponibles via `pip install --pre forge-mvc[all]`.
@@ -487,9 +487,9 @@ Avant leur publication PyPI, les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` 
 
 ### Opt-ins publiés et synchronisés
 
-Douze opt-ins officiels existent ; onze sont publiés sur PyPI avec une version
-synchronisée avec le core. `forge-mvc-i18n`, extrait en `1.0.0-beta.15`, attend
-sa première publication :
+Les douze opt-ins officiels sont publiés sur PyPI avec une version
+synchronisée avec le core (`forge-mvc-i18n`, extrait en `1.0.0-beta.15`,
+complète l'ensemble) :
 
 | Package | Publication | Statut | Prérequis |
 |---|---|---|---|
@@ -533,7 +533,7 @@ PyPI : les installer directement avec `pip install --pre forge-mvc-<nom>`.
 ### Règles de version
 
 - **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était versionné à chaque release.
-- Depuis `1.0.0-beta.9`, le core et les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont strictement synchronisés sur la même version PEP 440 ; `forge-mvc-iot` a rejoint cette synchronisation en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13` (onze opt-ins au total).
+- Depuis `1.0.0-beta.9`, le core et les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont strictement synchronisés sur la même version PEP 440 ; `forge-mvc-iot` a rejoint cette synchronisation en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`, et `i18n` ensuite (douze opt-ins au total).
 
 ### Ce qui reste interdit sans ticket de release dédié
 

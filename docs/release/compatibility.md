@@ -137,15 +137,16 @@ pas installées par défaut. Elles sont tirées via les extras du package
 
 ### Installation
 
-!!! info "Onze des douze opt-ins officiels sont publiés sur PyPI"
+!!! info "Les douze opt-ins officiels sont publiés sur PyPI"
     `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) ainsi que
     `forge-mvc-mfa` (Alpha) sont publiés sur PyPI depuis `1.0.0-beta.9` et
     synchronisés avec le core ; `forge-mvc-iot` depuis `1.0.0-beta.12`, et
     `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`,
     `forge-mvc-pivot`, `forge-mvc-mail` depuis `1.0.0-beta.13`.
-    `forge-mvc-images` reste au statut Bêta (API encore bêta). Le douzième
-    opt-in, `forge-mvc-i18n` (extrait du core en `1.0.0-beta.15`, ADR-027),
-    attend sa première publication PyPI.
+    `forge-mvc-i18n` (extrait du core en `1.0.0-beta.15`, ADR-027) complète les
+    douze. La grille de maturité (Stable / Bêta / Alpha) fait foi dans
+    [release-policy.md](release-policy.md) ; `forge-mvc-images` et
+    `forge-mvc-files` y sont au statut Alpha.
 
     Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
 
@@ -287,7 +288,7 @@ pip-audit
 | Domaine | Limite |
 |---|---|
 | MariaDB 11.x | Pas de tests CI systématiques — compatible mais non garanti |
-| Python 3.14 | En CI mais version pre-release pendant la série 2.x |
+| Python 3.14 | En CI mais version pre-release pendant la série 1.x |
 | Node.js | Aucune version minimum formelle — >= 18 recommandé |
 | Tests E2E | Pas automatisés en CI — lancés manuellement avant release |
 

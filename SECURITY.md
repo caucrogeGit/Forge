@@ -148,4 +148,4 @@ Forge fournit trois backends : `MemorySessionStore` (défaut, mono-processus),
 `FileSessionStore` (persistance JSON sur disque) et `MariaDbSessionStore` (sessions
 partagées entre processus). Voir `core/sessions/` et ADR-002.
 
-Voir aussi [ADR-002 — Stratégie de session Forge 2.x](docs/adr/002-session-strategy.md).
+Voir aussi [ADR-002 — Stratégie de session](docs/adr/002-session-strategy.md).

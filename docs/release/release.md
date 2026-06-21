@@ -21,9 +21,9 @@ Garantir que chaque version publiée de Forge est :
 
 Une release est créée :
 
-- à la fin d'un sprint de la roadmap post-2.0 (ex. : v2.0.2 après sprint 2) ;
-- pour une correction critique de sécurité (release corrective, ex. v2.0.x) ;
-- pour une version de consolidation ou d'élargissement (ex. v2.1.0).
+- à la fin d'un sprint de la roadmap post-1.0 (ex. : v1.0.2 après sprint 2) ;
+- pour une correction critique de sécurité (release corrective, ex. v1.0.x) ;
+- pour une version de consolidation ou d'élargissement (ex. v1.1.0).
 
 Une release **ne mélange pas** le travail de développement en cours avec la finalisation d'un sprint.
 Si des tickets du sprint suivant sont déjà ouverts, ils restent en branche ou en liste d'attente.

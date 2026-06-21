@@ -73,7 +73,7 @@ Une LTS qui n'est pas tenue est pire que pas de LTS du tout.
 | Matrice de compatibilité | Documentée (`RELEASE-COMPAT-001`) |
 | Guide de migration | Créé (`RELEASE-MIGRATION-GUIDE-001`) |
 | Audits de sécurité | 7 audits terminés |
-| Tests | 6 722 tests (5 237 unitaires + E2E) |
+| Tests | Suite complète verte (compteur : voir la source canonique, CLAUDE.md §8) |
 | Documentation de production | Guide complet (`DEPLOY-PROD-SECURITY-DOC-001`) |
 | Contrat de stabilité | Défini (`APP-STABILITY-CONTRACT-001`) |
 | DX avancée | `forge doctor`, `project:check`, `project:audit` |
@@ -95,11 +95,11 @@ Une LTS qui n'est pas tenue est pire que pas de LTS du tout.
 
 ## Arguments pour une LTS
 
-### 1. Forge 2.2.0 est une base sérieuse
+### 1. Forge 1.0 (bêta) est une base sérieuse
 
-Forge 2.2.0 est livré, documenté et fortement testé :
+La série bêta 1.0 (`1.0.0-beta.x`) est livrée, documentée et fortement testée :
 
-- 6 722 tests verts ;
+- suite complète verte (compteur : voir la source canonique, CLAUDE.md §8) ;
 - 7 audits de sécurité terminés ;
 - CLI cohérente et documentée ;
 - structure de projet stable ;
@@ -120,10 +120,10 @@ sans préavis. Une branche LTS pourrait interdire tout retrait pendant sa durée
 La matrice de compatibilité couvre Python {{python_min}}–3.14, MariaDB 10.11+ et Node.js.
 Une LTS pourrait geler cette matrice pour toute sa durée.
 
-### 5. Des projets réels peuvent s'appuyer sur Forge 2.x
+### 5. Des projets réels peuvent s'appuyer sur Forge 1.x
 
 Le starter Communes & Séjours est un démonstrateur viable. Des projets applicatifs
-construits sur Forge 2.2.0 méritent une stabilité garantie dans le temps.
+construits sur Forge 1.0 méritent une stabilité garantie dans le temps.
 
 ---
 
@@ -131,7 +131,7 @@ construits sur Forge 2.2.0 méritent une stabilité garantie dans le temps.
 
 ### 1. L'API JSON légère n'est pas encore créée
 
-Une LTS couvrant Forge 2.x sans API JSON serait incomplète pour les usages
+Une LTS couvrant Forge 1.x sans API JSON serait incomplète pour les usages
 web modernes. L'ajout d'une API JSON après la déclaration LTS est risqué :
 elle devrait être stable dès sa création.
 
@@ -176,7 +176,7 @@ figée serait prématuré à ce stade.
 
 ### Scénario A — Pas de LTS maintenant (recommandé)
 
-Forge continue en série 2.x sans promesse LTS.
+Forge continue en série 1.x sans promesse LTS.
 
 **Avantages :**
 
@@ -191,11 +191,11 @@ Forge continue en série 2.x sans promesse LTS.
   longue durée.
 
 **Mitigation :** le [Contrat de stabilité](stability-contract.md) offre déjà
-des garanties claires sur les API publiques en 2.x, sans aller jusqu'à une LTS.
+des garanties claires sur les API publiques en 1.x, sans aller jusqu'à une LTS.
 
 ---
 
-### Scénario B — LTS candidate après Forge 2.5.0 ou 2.6.0
+### Scénario B — LTS candidate après une mineure 1.x (ex. 1.2.0 ou 1.3.0)
 
 Une version future pourrait devenir candidate LTS après :
 
@@ -203,7 +203,7 @@ Une version future pourrait devenir candidate LTS après :
 - API JSON légère stable (API-JSON-001 à API-DOC-001) ;
 - dettes de sécurité corrigées (SECURITY-CACHE-001, CRUD-RBAC-UI-001, E2E-UPLOAD-HTTP-001) ;
 - tests E2E MariaDB intégrés en CI automatique ;
-- guide de migration MAJOR 2.x → 1.0 disponible si applicable.
+- guide de migration MAJOR `1.x` → version majeure suivante disponible si applicable.
 
 **Avantages :**
 
@@ -229,7 +229,7 @@ Forge attend la stabilisation de `1.0.0` pour déclarer sa première LTS.
 **Inconvénients :**
 
 - La première version stable `1.0.0` n'a pas encore de date définie ;
-- les projets actuels sur Forge 2.x n'ont pas de garantie formelle longue durée ;
+- les projets actuels sur Forge 1.x n'ont pas de garantie formelle longue durée ;
 - délai potentiellement long.
 
 ---
@@ -353,7 +353,7 @@ La LTS candidate la plus réaliste serait une version `1.0.0` stable ou une vers
 - [Vue d'ensemble Release et compatibilité](release-and-compatibility.md)
 - [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
 - [Politique de dépréciation](deprecation-policy.md) — cycle annonce → retrait
-- [Contrat de stabilité](stability-contract.md) — garanties Forge 2.x
+- [Contrat de stabilité](stability-contract.md) — garanties Forge 1.x
 - [Matrice de compatibilité](compatibility.md) — Python, MariaDB, Node.js
 
 ---
