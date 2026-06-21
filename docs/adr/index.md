@@ -43,3 +43,5 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-034](034-generated-db-identifier-naming.md) | `forge new` génère `DB_NAME` / `DB_APP_LOGIN` à partir du nom normalisé du projet, sans suffixes `_db`/`_app` (accepté) |
 | [ADR-035](035-starters-manual-not-generated.md) | Modèle pédagogique unique : parcours réalisés à la main depuis la doc, retrait de `starter:build`/`starter:list` et de la génération (accepté) |
 | [ADR-036](036-core-static-typing.md) | Typage statique du cœur vérifié en CI (Pyright), `py.typed`, strictness par cliquet en commençant par l'API publique (accepté) |
+| [ADR-037](037-stats-aggregation.md) | Agrégation par comptage dans `forge-mvc-stats` (accepté) |
+| [ADR-038](038-optin-docs-embedded-per-package.md) | Documentation des opt-ins embarquée par paquet (`packages/<paquet>/docs/`), agrégée dans le site unique (accepté, pilote requis) |

@@ -462,6 +462,7 @@ nav:
           - ADR-035 Parcours manuels, retrait génération: adr/035-starters-manual-not-generated.md
           - ADR-036 Typage statique du cœur en CI: adr/036-core-static-typing.md
           - ADR-037 Agrégation par comptage (stats): adr/037-stats-aggregation.md
+          - ADR-038 Doc opt-ins embarquée par paquet: adr/038-optin-docs-embedded-per-package.md
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
