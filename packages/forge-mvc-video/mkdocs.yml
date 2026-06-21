@@ -6,6 +6,13 @@ site_name: video
 docs_dir: docs
 nav:
   - Parcours complet: parcours.md
+  - Référence (par module):
+      - Configuration (config.py): references/config.md
+      - Ingestion (ingest.py): references/ingest.md
+      - Sondage (probe.py): references/probe.md
+      - Transcodage MP4 (transcode.py): references/transcode.md
+      - Traitement (process.py): references/process.md
+      - Lecture HTTP (http.py): references/http.md
   - Progression Vidéo:
       - Installation: welcome/installation.md
       - Débutant:
