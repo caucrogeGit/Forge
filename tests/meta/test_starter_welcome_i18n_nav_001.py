@@ -14,7 +14,8 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-I18N = PROJECT_ROOT / "docs" / "starters" / "welcome-i18n"
+# Doc embarquée par paquet depuis l'ADR-038.
+I18N = PROJECT_ROOT / "packages" / "forge-mvc-i18n" / "docs" / "welcome"
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",

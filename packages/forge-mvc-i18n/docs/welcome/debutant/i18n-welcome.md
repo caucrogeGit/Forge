@@ -8,7 +8,7 @@ Sans catalogue ni module, le noyau dégrade en **no-op** : `trans` retourne la
 clé. Avec l'opt-in et un catalogue, `trans` retourne la traduction.
 
 Premier palier du **niveau débutant** de la progression i18n
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in — repli no-op"
     Si `forge-mvc-i18n` n'est pas installé, `trans("welcome.title")` renvoie

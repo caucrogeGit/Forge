@@ -1,0 +1,24 @@
+# Documentation embarquée du paquet forge-mvc-i18n (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /i18n/.
+site_name: i18n
+docs_dir: docs
+nav:
+  - Progression i18n:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Bonjour Forge i18n: welcome/debutant/i18n-welcome.md
+          - Écrire un catalogue: welcome/debutant/i18n-catalog.md
+          - Traduire une clé: welcome/debutant/i18n-trans.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Locale par défaut: welcome/intermediaire/i18n-locale.md
+          - Locale de secours: welcome/intermediaire/i18n-fallback.md
+          - Clé manquante: welcome/intermediaire/i18n-missing.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - trans dans un template: welcome/avance/i18n-jinja.md
+          - Vider le cache: welcome/avance/i18n-cache.md
+          - Gérer les erreurs: welcome/avance/i18n-errors.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md
