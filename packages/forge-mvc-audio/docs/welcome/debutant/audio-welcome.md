@@ -8,7 +8,7 @@ configuration** (`load_audio_config`) — stockage, limites, binaires `ffprobe`/
 — avec le **token masqué**. Aucune base de données.
 
 Premier palier du **niveau débutant** de la progression audio
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-audio` installé (palier « Installation »).

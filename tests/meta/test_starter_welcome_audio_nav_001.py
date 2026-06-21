@@ -20,7 +20,8 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-AUDIO = PROJECT_ROOT / "docs" / "starters" / "welcome-audio"
+# Doc embarquée par paquet depuis l'ADR-038.
+AUDIO = PROJECT_ROOT / "packages" / "forge-mvc-audio" / "docs" / "welcome"
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",

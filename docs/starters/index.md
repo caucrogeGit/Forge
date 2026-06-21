@@ -47,7 +47,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### Audio (opt-in `forge-mvc-audio`)
 
-[Bonjour Forge Audio](welcome-audio/debutant/audio-welcome.md) · [Téléverser un audio](welcome-audio/debutant/audio-upload.md) · [Lire un audio](welcome-audio/debutant/audio-play.md) · [Sonder un audio](welcome-audio/avance/audio-probe.md) · [Transcoder en MP3](welcome-audio/avance/audio-transcode.md) · [Diagnostiquer le module Audio](welcome-audio/avance/audio-doctor.md)
+[Bonjour Forge Audio](../audio/welcome/debutant/audio-welcome.md) · [Téléverser un audio](../audio/welcome/debutant/audio-upload.md) · [Lire un audio](../audio/welcome/debutant/audio-play.md) · [Sonder un audio](../audio/welcome/avance/audio-probe.md) · [Transcoder en MP3](../audio/welcome/avance/audio-transcode.md) · [Diagnostiquer le module Audio](../audio/welcome/avance/audio-doctor.md)
 
 ### MFA (opt-in `forge-mvc-mfa`)
 

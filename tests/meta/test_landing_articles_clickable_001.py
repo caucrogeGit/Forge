@@ -25,6 +25,7 @@ MIGRATED_DOC_ROOTS = {
     "mfa": PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "docs",
     "files": PROJECT_ROOT / "packages" / "forge-mvc-files" / "docs",
     "pivot": PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "docs",
+    "audio": PROJECT_ROOT / "packages" / "forge-mvc-audio" / "docs",
 }
 
 
@@ -66,7 +67,7 @@ EXPECTED_DOC_PATHS = [
     "starters/welcome-images/installation",
     "starters/welcome-iot/installation",
     "starters/welcome-video/installation",
-    "starters/welcome-audio/installation",
+    "audio/welcome/installation",
     "starters/welcome-mail/installation",
     "pivot/reference",
     # Section Starters (13 cartes de progression)
