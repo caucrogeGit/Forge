@@ -252,6 +252,7 @@ nav:
           - ADR-037 Agrégation par comptage (stats): adr/037-stats-aggregation.md
           - ADR-038 Doc opt-ins embarquée par paquet: adr/038-optin-docs-embedded-per-package.md
           - ADR-039 Refonte IA docs (cœur): adr/039-docs-information-architecture.md
+          - ADR-040 Tests par paquet opt-in: adr/040-per-package-test-surface.md
 
   # Opt-ins officiels à doc embarquée par paquet (ADR-038), regroupés (ADR-039).
   - Opt-ins officiels:
