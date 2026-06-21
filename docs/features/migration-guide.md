@@ -181,7 +181,7 @@ Un PATCH ne doit pas nécessiter d'intervention sur le projet existant.
 
 Un MINOR peut ajouter des fonctionnalités et de nouvelles commandes sans briser l'existant.
 
-**Exemple :** `2.2.0 → 2.3.0`
+**Exemple :** `1.2.0 → 1.3.0`
 
 ### Ce qui peut changer
 
@@ -218,14 +218,14 @@ Lire attentivement le `CHANGELOG.md` pour identifier les nouvelles dépréciatio
 
 Un MAJOR peut introduire des ruptures d'API stable. C'est le seul niveau qui autorise le retrait de fonctionnalités stables précédemment dépréciées.
 
-**Exemple :** `2.x → 3.0.0`
+**Exemple :** `1.x → version majeure suivante`
 
 ### Avant de commencer
 
 **Créer une branche de migration dans le projet applicatif :**
 
 ```bash
-git checkout -b migration/forge-3.0
+git checkout -b migration/forge-major
 ```
 
 ### Ce qui peut changer
@@ -346,7 +346,7 @@ Suppression prévue : prochaine version MAJOR.
 **API Python dépréciée :**
 
 ```python
-DeprecationWarning: ancienne_fonction() est dépréciée depuis Forge 2.4.0.
+DeprecationWarning: ancienne_fonction() est dépréciée depuis Forge 1.2.0.
 Utiliser nouvelle_fonction() à la place. Suppression prévue à la prochaine version MAJOR.
 ```
 
@@ -493,7 +493,7 @@ Après la migration :
 | Détection automatique des dépréciations | Pas d'outil de scan automatique — lecture manuelle du CHANGELOG |
 | Tests E2E starters 2, 4, 5 | Partiellement couverts — vérifier `forge project:audit` |
 | Rollback SQL automatique | Pas supporté — sauvegarde manuelle obligatoire |
-| Guide MAJOR spécifique | À créer lors de la première migration 2.x → 3.0.0 |
+| Guide MAJOR spécifique | À créer lors de la première migration `1.x` → version majeure suivante |
 
 ---
 

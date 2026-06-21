@@ -25,7 +25,7 @@ Plus :
 
 - Règles d'évolution A-D
 - Modes d'action acceptables : `Forge génère`, `Forge affiche`, `Forge lit`
-- Note pré-3.0 sur les ruptures internes
+- Note pré-1.0 sur les ruptures internes
 
 ## Document complet
 

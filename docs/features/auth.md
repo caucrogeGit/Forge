@@ -5,7 +5,7 @@ utilisateur moderne sans transformer le framework en application metier. Elle
 fournit des contrats Python, des helpers explicites et des SQL visibles que les
 projets peuvent adopter progressivement.
 
-Voir aussi : [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md) · [RBAC — Contrôle d'accès](../rbac/reference.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
+Voir aussi : [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session](../adr/002-session-strategy.md) · [RBAC — Contrôle d'accès](../rbac/reference.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
 
 Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.py`) s'appuie sur `core.auth.password.verify_password` (Argon2id) pour la vérification des mots de passe. `core.security.hashing` reste disponible en repli pour les hashes PBKDF2 existants (voir ADR-001). Les nouveaux hashes PBKDF2 legacy utilisent désormais 600 000 itérations (format versionné `pbkdf2_sha256$…`) ; les anciens hashes restent vérifiables. Lorsqu'un utilisateur legacy PBKDF2 se connecte avec succès, Forge migre automatiquement son hash vers Argon2id (`auth_model.update_password_hash`). Cette migration est transparente et ne force pas de réinitialisation du mot de passe.
 
@@ -13,7 +13,7 @@ Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.
 
 ## API officielle et compatibilité legacy
 
-Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API officielle pour les nouveaux projets est `core.auth`.
+Depuis les premières versions de Forge, et toujours dans les versions actuelles, l'API officielle pour les nouveaux projets est `core.auth`.
 
 | Domaine | API officielle — `core.auth` | Compatibilité / transversal — `core.security` |
 |---|---|---|
@@ -45,7 +45,7 @@ Les éléments suivants sont dépréciés en faveur de `core.auth` et seront sup
 - `core.security.decorators.require_auth` — remplacé par `core.auth.session.login_required` ;
 - `core.security.decorators.require_role` — remplacé par `forge_mvc_rbac.require_user_permission`.
 
-Voir [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md) pour la décision d'architecture.
+Voir [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md) pour la décision d'architecture.
 
 ---
 
@@ -446,7 +446,7 @@ ecriture DB automatique.
     [contrat d'installation](../install/opt-ins.md).
 
 > **Depuis Forge 2.4.0**, le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
-> L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré en Forge 3.0.
+> L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré pendant le développement pré-1.0.
 
 Forge fournit le socle MFA par briques :
 
@@ -735,7 +735,7 @@ par Forge.
 tierce (`authlib`, `python-keycloak`, etc.) et appelez `login_user()` apres
 validation complete de l'identite externe.
 
-Le code OIDC experimente dans les versions 2.x reste accessible via l'historique
+Le code OIDC expérimenté dans les versions internes pré-1.0 reste accessible via l'historique
 git (`git log -- core/auth/experimental/oidc.py`). Il ne sera pas reintegre
 sans un ticket dedie `OIDC-IMPLEMENT-COMPLETE-001` partant d'une page blanche.
 
@@ -1415,5 +1415,5 @@ politiques metier.
 - [RBAC — Contrôle d'accès](../rbac/reference.md) — rôles, permissions, décorateurs serveur, helper Jinja
 - [Sécurité en production](../deployment/production-security.md) — checklist déploiement, headers, CSRF, secrets
 - [Référence CLI](../reference/reference.md) — toutes les commandes `forge` avec signatures complètes
-- [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md)
-- [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md)
+- [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md)
+- [ADR-002 — Stratégie de session](../adr/002-session-strategy.md)

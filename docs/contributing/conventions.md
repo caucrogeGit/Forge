@@ -1,7 +1,7 @@
 # Conventions internes de Forge
 
 > **Document opérationnel.** Cette page consolide les patterns émergents
-> de la refonte Forge 3.0 (phase 14). Elle complète la charte philosophique
+> de la consolidation pré-1.0 (phase 14). Elle complète la charte philosophique
 > (`CHARTE_DOC.md`) et les ADR (`docs/adr/`) avec des techniques de travail
 > concrètes éprouvées sur le terrain.
 >
@@ -78,7 +78,7 @@ oublié, identifié grâce à l'historique git).
 ### A.4 — Vérifier la production interne avant suppression nette
 
 Avant toute suppression d'une API publique, vérifier que du code
-applicatif déjà déployé ne dépend pas de cette API. La note pré-3.0
+applicatif déjà déployé ne dépend pas de cette API. La note pré-1.0
 ne protège que des utilisateurs externes — le code propre du mainteneur
 peut être en production interne.
 

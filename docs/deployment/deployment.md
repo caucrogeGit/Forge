@@ -293,7 +293,7 @@ Le backend MariaDB partage les sessions entre tous les workers Gunicorn (et entr
 - les sessions sont partagées entre workers et survivent au redémarrage ;
 - Gunicorn multi-worker est pleinement supporté.
 
-Voir aussi [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md).
+Voir aussi [ADR-002 — Stratégie de session](../adr/002-session-strategy.md).
 
 ## 10. Serveur HTTPS de développement (TLS)
 
