@@ -8,7 +8,7 @@ politique** — racine de stockage (`upload_root`), extensions, types MIME et ta
 max autorisés. Aucune base de données : `forge-mvc-files` est sans état.
 
 Premier palier du **niveau débutant** de la progression files
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in et fondation"
     `forge-mvc-files` est l'upload générique extrait du core (ADR-019) ; c'est la

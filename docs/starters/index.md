@@ -43,7 +43,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### Fichiers (opt-in `forge-mvc-files`)
 
-[Bonjour Forge Files](welcome-files/debutant/files-welcome.md) · [Stocker un document](welcome-files/debutant/file-store.md) · [Servir un fichier](welcome-files/debutant/file-serve.md) · [Valider un upload](welcome-files/intermediaire/file-validate.md) · [Limiter les uploads](welcome-files/intermediaire/file-rate-limit.md) · [Supprimer un fichier](welcome-files/intermediaire/file-delete.md) · [Assainir un nom de fichier](welcome-files/avance/file-safe-name.md) · [Chemin anti-traversal](welcome-files/avance/file-safe-path.md) · [Écrire des octets générés](welcome-files/avance/file-bytes.md)
+[Bonjour Forge Files](../files/welcome/debutant/files-welcome.md) · [Stocker un document](../files/welcome/debutant/file-store.md) · [Servir un fichier](../files/welcome/debutant/file-serve.md) · [Valider un upload](../files/welcome/intermediaire/file-validate.md) · [Limiter les uploads](../files/welcome/intermediaire/file-rate-limit.md) · [Supprimer un fichier](../files/welcome/intermediaire/file-delete.md) · [Assainir un nom de fichier](../files/welcome/avance/file-safe-name.md) · [Chemin anti-traversal](../files/welcome/avance/file-safe-path.md) · [Écrire des octets générés](../files/welcome/avance/file-bytes.md)
 
 ### Audio (opt-in `forge-mvc-audio`)
 

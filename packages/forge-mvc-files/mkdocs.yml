@@ -1,0 +1,24 @@
+# Documentation embarquée du paquet forge-mvc-files (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /files/.
+site_name: files
+docs_dir: docs
+nav:
+  - Progression Files:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Bonjour Forge Files: welcome/debutant/files-welcome.md
+          - Stocker un document: welcome/debutant/file-store.md
+          - Servir un fichier: welcome/debutant/file-serve.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Valider un upload: welcome/intermediaire/file-validate.md
+          - Limiter les uploads: welcome/intermediaire/file-rate-limit.md
+          - Supprimer un fichier: welcome/intermediaire/file-delete.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Assainir un nom de fichier: welcome/avance/file-safe-name.md
+          - Chemin anti-traversal: welcome/avance/file-safe-path.md
+          - Écrire des octets générés: welcome/avance/file-bytes.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

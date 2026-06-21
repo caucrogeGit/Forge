@@ -20,7 +20,8 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-FILES = PROJECT_ROOT / "docs" / "starters" / "welcome-files"
+# Doc embarquée par paquet depuis l'ADR-038.
+FILES = PROJECT_ROOT / "packages" / "forge-mvc-files" / "docs" / "welcome"
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",

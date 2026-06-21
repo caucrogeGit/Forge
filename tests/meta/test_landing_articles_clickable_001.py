@@ -23,6 +23,7 @@ MIGRATED_DOC_ROOTS = {
     "stats": PROJECT_ROOT / "packages" / "forge-mvc-stats" / "docs",
     "workflow": PROJECT_ROOT / "packages" / "forge-mvc-workflow" / "docs",
     "mfa": PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "docs",
+    "files": PROJECT_ROOT / "packages" / "forge-mvc-files" / "docs",
 }
 
 
@@ -60,7 +61,7 @@ EXPECTED_DOC_PATHS = [
     # forge-mvc-workflow / forge-mvc-stats : doc embarquée par paquet (ADR-038).
     "workflow/reference",
     "stats/reference",
-    "starters/welcome-files/installation",
+    "files/welcome/installation",
     "starters/welcome-images/installation",
     "starters/welcome-iot/installation",
     "starters/welcome-video/installation",
