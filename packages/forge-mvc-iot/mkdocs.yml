@@ -5,6 +5,14 @@
 site_name: iot
 docs_dir: docs
 nav:
+  - Référence (par module):
+      - Configuration (config.py): references/config.md
+      - API HTTP (http.py): references/http.md
+      - Contrat MQTT (mqtt/contract.py): references/mqtt_contract.md
+      - Subscriber MQTT (mqtt/subscriber.py): references/mqtt_subscriber.md
+      - Configuration TLS (mqtt/tls.py): references/mqtt_tls.md
+      - Contrat SQL des événements (storage/events.py): references/storage_events.md
+      - Repository d'événements (storage/repository.py): references/storage_repository.md
   - Architecture Forge IoT: architecture.md
   - Contrat MQTT: mqtt-contract.md
   - Configuration: configuration.md
