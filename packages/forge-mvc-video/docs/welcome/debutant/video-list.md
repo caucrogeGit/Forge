@@ -24,8 +24,8 @@ Aucun ffmpeg, aucune écriture.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_video.storage.repository.VideoRepository` | Lire les vidéos enregistrées. | [Parcours vidéo](../../../video/parcours.md) |
-| `VideoRepository.list_recent` | Dernières vidéos (ordre décroissant). | [Parcours vidéo](../../../video/parcours.md) |
+| `forge_mvc_video.storage.repository.VideoRepository` | Lire les vidéos enregistrées. | [Parcours vidéo](../../parcours.md) |
+| `VideoRepository.list_recent` | Dernières vidéos (ordre décroissant). | [Parcours vidéo](../../parcours.md) |
 | `Response.json` | Renvoyer les vidéos (ou l'erreur) en JSON. | [Response](../../../reference/api.md#corehttpresponse) |
 
 ## Tester

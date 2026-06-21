@@ -35,7 +35,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### Vidéo (opt-in `forge-mvc-video`)
 
-[Bonjour Forge Vidéo](welcome-video/debutant/video-welcome.md) · [Lister les vidéos](welcome-video/debutant/video-list.md) · [Le détail d'une vidéo](welcome-video/debutant/video-detail.md) · [Téléverser une vidéo](welcome-video/intermediaire/video-upload.md) · [Lire une vidéo](welcome-video/intermediaire/video-playback.md) · [Suivre l'état d'une vidéo](welcome-video/intermediaire/video-status.md) · [Sonder une vidéo](welcome-video/avance/video-probe.md) · [Transcoder une vidéo](welcome-video/avance/video-transcode.md) · [Diagnostiquer le module Vidéo](welcome-video/avance/video-doctor.md)
+[Bonjour Forge Vidéo](../video/welcome/debutant/video-welcome.md) · [Lister les vidéos](../video/welcome/debutant/video-list.md) · [Le détail d'une vidéo](../video/welcome/debutant/video-detail.md) · [Téléverser une vidéo](../video/welcome/intermediaire/video-upload.md) · [Lire une vidéo](../video/welcome/intermediaire/video-playback.md) · [Suivre l'état d'une vidéo](../video/welcome/intermediaire/video-status.md) · [Sonder une vidéo](../video/welcome/avance/video-probe.md) · [Transcoder une vidéo](../video/welcome/avance/video-transcode.md) · [Diagnostiquer le module Vidéo](../video/welcome/avance/video-doctor.md)
 
 ### Images (opt-in `forge-mvc-images`)
 

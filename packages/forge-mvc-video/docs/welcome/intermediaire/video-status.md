@@ -23,7 +23,7 @@ Lecture seule. La table `videos` est garantie par la migration fournie plus bas.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `VideoRepository.list_by_status` | Lister les vidéos d'un statut donné. | [Parcours vidéo](../../../video/parcours.md) |
+| `VideoRepository.list_by_status` | Lister les vidéos d'un statut donné. | [Parcours vidéo](../../parcours.md) |
 | `Response.json` | Renvoyer les vidéos rangées par statut. | [Response](../../../reference/api.md#corehttpresponse) |
 
 ## Tester

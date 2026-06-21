@@ -1,0 +1,26 @@
+# Documentation embarquée du paquet forge-mvc-video (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /video/
+# (l'ancien tronc docs/video/ garde donc son URL ; voir ADR-038).
+site_name: video
+docs_dir: docs
+nav:
+  - Parcours complet: parcours.md
+  - Progression Vidéo:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Bonjour Forge Vidéo: welcome/debutant/video-welcome.md
+          - Lister les vidéos: welcome/debutant/video-list.md
+          - Le détail d'une vidéo: welcome/debutant/video-detail.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Téléverser une vidéo: welcome/intermediaire/video-upload.md
+          - Lire une vidéo: welcome/intermediaire/video-playback.md
+          - Suivre l'état d'une vidéo: welcome/intermediaire/video-status.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Sonder une vidéo: welcome/avance/video-probe.md
+          - Transcoder une vidéo: welcome/avance/video-transcode.md
+          - Diagnostiquer le module Vidéo: welcome/avance/video-doctor.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

@@ -31,9 +31,9 @@ La table `videos` est garantie par la migration fournie plus bas.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge video:process` (CLI) | Lancer le worker de transcodage. | [Parcours vidéo](../../../video/parcours.md) |
-| `forge_mvc_video.process.process_video` | Orchestrer sonde + poster + transcodage MP4. | [Parcours vidéo](../../../video/parcours.md) |
-| `VideoRepository.list_by_status` | Lister les vidéos `uploaded` à traiter. | [Parcours vidéo](../../../video/parcours.md) |
+| `forge video:process` (CLI) | Lancer le worker de transcodage. | [Parcours vidéo](../../parcours.md) |
+| `forge_mvc_video.process.process_video` | Orchestrer sonde + poster + transcodage MP4. | [Parcours vidéo](../../parcours.md) |
+| `VideoRepository.list_by_status` | Lister les vidéos `uploaded` à traiter. | [Parcours vidéo](../../parcours.md) |
 
 ## Tester
 

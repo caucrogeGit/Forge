@@ -25,7 +25,7 @@ garantie par la migration fournie plus bas.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_video.register_video_routes` | Brancher la route de lecture officielle sur le routeur. | [Parcours vidéo](../../../video/parcours.md) |
+| `forge_mvc_video.register_video_routes` | Brancher la route de lecture officielle sur le routeur. | [Parcours vidéo](../../parcours.md) |
 
 ## Tester
 

@@ -123,6 +123,11 @@ MIGRATED = {
         PROJECT_ROOT / "packages" / "forge-mvc-iot" / "mkdocs.yml",
         "welcome/",
     ),
+    "welcome-video": (
+        PROJECT_ROOT / "packages" / "forge-mvc-video" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-video" / "mkdocs.yml",
+        "welcome/",
+    ),
 }
 
 

@@ -28,9 +28,9 @@ La table `videos` est garantie par la migration fournie plus bas.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `VideoRepository.get_by_uuid` | Retrouver le chemin du fichier d'origine. | [Parcours vidéo](../../../video/parcours.md) |
-| `forge_mvc_video.probe.probe_video` | Lancer ffprobe et extraire les métadonnées. | [Parcours vidéo](../../../video/parcours.md) |
-| `VideoProbeError` | Sonde échouée (source illisible / non vidéo). | [Parcours vidéo](../../../video/parcours.md) |
+| `VideoRepository.get_by_uuid` | Retrouver le chemin du fichier d'origine. | [Parcours vidéo](../../parcours.md) |
+| `forge_mvc_video.probe.probe_video` | Lancer ffprobe et extraire les métadonnées. | [Parcours vidéo](../../parcours.md) |
+| `VideoProbeError` | Sonde échouée (source illisible / non vidéo). | [Parcours vidéo](../../parcours.md) |
 
 ## Tester
 

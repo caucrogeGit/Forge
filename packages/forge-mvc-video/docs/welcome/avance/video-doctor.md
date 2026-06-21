@@ -27,9 +27,9 @@ Le diagnostic **complet** (table en base) reste la commande `forge video:doctor`
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `check_package_importable` / `check_config_loadable` / `check_migration_present` | Vérifications non invasives. | [Parcours vidéo](../../../video/parcours.md) |
-| `check_ffprobe_present` / `check_ffmpeg_present` | Localiser les binaires de transcodage. | [Parcours vidéo](../../../video/parcours.md) |
-| `forge video:doctor` (CLI) | Diagnostic complet (dont la base). | [Parcours vidéo](../../../video/parcours.md) |
+| `check_package_importable` / `check_config_loadable` / `check_migration_present` | Vérifications non invasives. | [Parcours vidéo](../../parcours.md) |
+| `check_ffprobe_present` / `check_ffmpeg_present` | Localiser les binaires de transcodage. | [Parcours vidéo](../../parcours.md) |
+| `forge video:doctor` (CLI) | Diagnostic complet (dont la base). | [Parcours vidéo](../../parcours.md) |
 
 ## Tester
 

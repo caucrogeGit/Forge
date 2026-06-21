@@ -95,7 +95,7 @@ _IOT_INIT = '''\
 """Branchement local de l'opt-in Forge IoT (paquet `forge-mvc-iot`).
 
 Câblage uniquement : voir `routes.py` et `README.md`. Le code métier vit
-dans le paquet ; la doc complète reste officielle (docs/iot/).
+dans le paquet ; la doc complète reste officielle (packages/forge-mvc-iot/docs/).
 """
 '''
 
@@ -200,7 +200,7 @@ _VIDEO_INIT = '''\
 """Branchement local de l'opt-in Forge Video (paquet `forge-mvc-video`).
 
 Câblage uniquement : voir `routes.py` et `README.md`. Le code métier vit
-dans le paquet ; la doc complète reste officielle (docs/video/).
+dans le paquet ; la doc complète reste officielle (packages/forge-mvc-video/docs/).
 """
 '''
 
@@ -260,7 +260,7 @@ _AUDIO_INIT = '''\
 """Branchement local de l'opt-in Forge Audio (paquet `forge-mvc-audio`).
 
 Câblage uniquement : voir `routes.py` et `README.md`. Le code métier vit
-dans le paquet ; la doc complète reste officielle (docs/audio/).
+dans le paquet ; la doc complète reste officielle (packages/forge-mvc-audio/docs/).
 """
 '''
 
