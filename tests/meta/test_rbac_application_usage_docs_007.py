@@ -13,8 +13,8 @@ import pytest
 pytestmark = pytest.mark.meta
 
 
-_USAGE_DOC = Path(__file__).parents[2] / "docs" / "security" / "rbac-usage.md"
-_CONTRACT_DOC = Path(__file__).parents[2] / "docs" / "security" / "rbac-contract.md"
+_USAGE_DOC = Path(__file__).parents[2] / "packages" / "forge-mvc-rbac" / "docs" / "usage.md"
+_CONTRACT_DOC = Path(__file__).parents[2] / "packages" / "forge-mvc-rbac" / "docs" / "contract.md"
 _AUDIT_DOC = (
     Path(__file__).parents[2]
     / "docs" / "history" / "audits" / "rbac-module-package-audit-002.md"
@@ -44,8 +44,9 @@ def test_usage_doc_exists():
 
 
 def test_usage_doc_in_mkdocs():
+    # Doc rbac embarquée (ADR-038) : agrégée via le sous-mkdocs du paquet.
     mkdocs = _MKDOCS.read_text(encoding="utf-8")
-    assert "security/rbac-usage.md" in mkdocs
+    assert "packages/forge-mvc-rbac/mkdocs.yml" in mkdocs
 
 
 # ---------------------------------------------------------------------------

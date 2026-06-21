@@ -29,7 +29,7 @@ API_REF = PROJECT_ROOT / "docs" / "reference" / "api.md"
 # docs/reference/.
 EXPECTED_MODULES = {
     "forge-mvc-mfa":      "mfa/reference.md",
-    "forge-mvc-rbac":     "rbac.md",
+    "forge-mvc-rbac":     "rbac/reference.md",
     "forge-mvc-workflow": "workflow/reference.md",
     "forge-mvc-stats":    "stats/reference.md",
 }

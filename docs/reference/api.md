@@ -3023,7 +3023,7 @@ La clé optionnelle `"rbac"` dans `entity.json` déclare les permissions requise
 
 Actions acceptées : `index`, `show`, `create` (→ méthode `new`), `store` (→ méthode `create`), `edit`, `update`, `delete` (→ méthode `destroy`). Toute action inconnue déclenche une erreur à la génération. Sans clé `rbac`, le contrôleur est identique à celui généré sans RBAC.
 
-Documentation complète : [RBAC — Contrôle d'accès](../features/rbac.md).
+Documentation complète : [RBAC — Contrôle d'accès](../rbac/reference.md).
 
 </details>
 
@@ -3042,7 +3042,7 @@ Chaque opt-in est livré comme package PyPI distinct sous le namespace
 | Opt-in | Package PyPI | Extra pip | Documentation détaillée |
 |---|---|---|---|
 | MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa](../mfa/reference.md) |
-| RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../features/rbac.md) |
+| RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../rbac/reference.md) |
 | Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow](../workflow/reference.md) |
 | Statistiques | `forge-mvc-stats` | `[stats]` | [stats](../stats/reference.md) |
 | Médias applicatifs | `forge-mvc-images` | — (installer directement) | [media.md](../features/media.md) |
@@ -3076,7 +3076,7 @@ Rôles, permissions, décorateur `@require_permission`, helpers Jinja
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
 > Voir [contrat d'installation](../install/opt-ins.md).
 
-Référence détaillée : [rbac.md](../features/rbac.md).
+Référence détaillée : [rbac.md](../rbac/reference.md).
 
 ### Workflow — `forge-mvc-workflow`
 

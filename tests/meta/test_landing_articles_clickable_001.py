@@ -30,6 +30,7 @@ MIGRATED_DOC_ROOTS = {
     "images": PROJECT_ROOT / "packages" / "forge-mvc-images" / "docs",
     "iot": PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs",
     "video": PROJECT_ROOT / "packages" / "forge-mvc-video" / "docs",
+    "rbac": PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "docs",
 }
 
 
@@ -63,7 +64,7 @@ EXPECTED_DOC_PATHS = [
     "entities/entity-schema",
     # Modules opt-in (11 cartes)
     "mfa/reference",
-    "features/rbac",
+    "rbac/reference",
     # forge-mvc-workflow / forge-mvc-stats : doc embarquée par paquet (ADR-038).
     "workflow/reference",
     "stats/reference",
@@ -77,7 +78,7 @@ EXPECTED_DOC_PATHS = [
     # Section Starters (13 cartes de progression)
     "starters/welcome-forge/debutant/welcome",
     "mfa/welcome/installation",
-    "starters/welcome-rbac/installation",
+    "rbac/welcome/installation",
     "workflow/welcome/installation",
     "stats/welcome/installation",
     "starters/welcome-helpers/installation",

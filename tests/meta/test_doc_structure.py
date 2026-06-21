@@ -35,7 +35,7 @@ class TestPagesExistent:
         assert Path("docs/philosophy/security.md").exists()
 
     def test_rbac_existe(self):
-        assert Path("docs/features/rbac.md").exists()
+        assert Path("packages/forge-mvc-rbac/docs/reference.md").exists()
 
     def test_deployment_existe(self):
         assert Path("docs/deployment/deployment.md").exists()
@@ -143,7 +143,8 @@ class TestSecuriteNavigation:
         assert "production-security.md" in _mkdocs()
 
     def test_rbac_dans_nav(self):
-        assert "rbac.md" in _mkdocs()
+        # Doc rbac embarquée (ADR-038) : agrégée via le sous-mkdocs du paquet.
+        assert "packages/forge-mvc-rbac/mkdocs.yml" in _mkdocs()
 
     def test_auth_dans_nav(self):
         assert "auth.md" in _mkdocs()

@@ -14,7 +14,7 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-RBAC = PROJECT_ROOT / "docs" / "starters" / "welcome-rbac"
+RBAC = PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "docs" / "welcome"
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",

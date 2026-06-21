@@ -1,0 +1,27 @@
+# Documentation embarquée du paquet forge-mvc-rbac (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /rbac/.
+site_name: rbac
+docs_dir: docs
+nav:
+  - RBAC — Contrôle d'accès (référence): reference.md
+  - Contrat RBAC séparé: contract.md
+  - RBAC — Usage applicatif: usage.md
+  - Progression RBAC:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Bonjour Forge RBAC: welcome/debutant/rbac-welcome.md
+          - Code de permission: welcome/debutant/rbac-permission.md
+          - Rôle et slug: welcome/debutant/rbac-role.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Vérifier une permission: welcome/intermediaire/rbac-check.md
+          - Protéger une route: welcome/intermediaire/rbac-guard.md
+          - Permission dans un template: welcome/intermediaire/rbac-template.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Associer un rôle à un utilisateur: welcome/avance/rbac-user-role.md
+          - Résoudre les permissions: welcome/avance/rbac-resolve.md
+          - Rôles de la requête: welcome/avance/rbac-request-roles.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

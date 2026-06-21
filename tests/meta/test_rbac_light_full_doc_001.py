@@ -15,13 +15,13 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-RBAC_DOC = PROJECT_ROOT / "docs" / "features" / "rbac.md"
+RBAC_DOC = PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "docs" / "reference.md"
 SECURITY_DOC = PROJECT_ROOT / "docs" / "philosophy" / "security.md"
 CORE_ROOT = PROJECT_ROOT / "core"
 
 
 # ---------------------------------------------------------------------------
-# Documentation docs/features/rbac.md — frontière RBAC léger / RBAC complet
+# Documentation packages/forge-mvc-rbac/docs/reference.md — frontière RBAC léger / RBAC complet
 # ---------------------------------------------------------------------------
 
 class TestRbacDocDistinguishesCoreAndOptin:
@@ -29,49 +29,49 @@ class TestRbacDocDistinguishesCoreAndOptin:
     def test_rbac_doc_mentions_require_role(self):
         content = RBAC_DOC.read_text(encoding="utf-8")
         assert "require_role" in content, (
-            "docs/features/rbac.md doit mentionner require_role (primitive core légère)"
+            "packages/forge-mvc-rbac/docs/reference.md doit mentionner require_role (primitive core légère)"
         )
 
     def test_rbac_doc_mentions_user_has_role(self):
         content = RBAC_DOC.read_text(encoding="utf-8")
         assert "user_has_role" in content, (
-            "docs/features/rbac.md doit mentionner user_has_role (primitive core légère)"
+            "packages/forge-mvc-rbac/docs/reference.md doit mentionner user_has_role (primitive core légère)"
         )
 
     def test_rbac_doc_mentions_forge_mvc_rbac(self):
         content = RBAC_DOC.read_text(encoding="utf-8")
         assert "forge_mvc_rbac" in content or "forge-mvc-rbac" in content, (
-            "docs/features/rbac.md doit mentionner forge_mvc_rbac ou forge-mvc-rbac"
+            "packages/forge-mvc-rbac/docs/reference.md doit mentionner forge_mvc_rbac ou forge-mvc-rbac"
         )
 
     def test_rbac_doc_mentions_opt_in(self):
         content = RBAC_DOC.read_text(encoding="utf-8")
         assert "opt-in" in content, (
-            "docs/features/rbac.md doit qualifier forge-mvc-rbac comme opt-in"
+            "packages/forge-mvc-rbac/docs/reference.md doit qualifier forge-mvc-rbac comme opt-in"
         )
 
     def test_rbac_doc_mentions_core_light_rbac(self):
         content = RBAC_DOC.read_text(encoding="utf-8")
         assert "léger" in content or "light" in content.lower(), (
-            "docs/features/rbac.md doit mentionner le RBAC léger core"
+            "packages/forge-mvc-rbac/docs/reference.md doit mentionner le RBAC léger core"
         )
 
     def test_rbac_doc_mentions_permission_fines(self):
         content = RBAC_DOC.read_text(encoding="utf-8")
         assert "permission" in content.lower(), (
-            "docs/features/rbac.md doit mentionner les permissions fines (forge-mvc-rbac)"
+            "packages/forge-mvc-rbac/docs/reference.md doit mentionner les permissions fines (forge-mvc-rbac)"
         )
 
     def test_rbac_doc_mentions_import_boundary(self):
         content = RBAC_DOC.read_text(encoding="utf-8")
         assert "core/" in content and "forge_mvc_rbac" in content, (
-            "docs/features/rbac.md doit mentionner que core/ ne doit pas importer forge_mvc_rbac"
+            "packages/forge-mvc-rbac/docs/reference.md doit mentionner que core/ ne doit pas importer forge_mvc_rbac"
         )
 
     def test_rbac_doc_has_decision_table(self):
         content = RBAC_DOC.read_text(encoding="utf-8")
         assert "Quand utiliser" in content or "quand utiliser" in content.lower(), (
-            "docs/features/rbac.md doit contenir un tableau de décision core léger / opt-in"
+            "packages/forge-mvc-rbac/docs/reference.md doit contenir un tableau de décision core léger / opt-in"
         )
 
 

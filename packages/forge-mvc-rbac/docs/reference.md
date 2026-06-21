@@ -65,7 +65,7 @@ Le RBAC repond a la question : **qu'a le droit de faire l'utilisateur ?**
 La brique Auth/User repond a la question : **qui est connecte ?**
 
 Pour comprendre comment Auth/User fournit l'identité utilisateur (login, MFA, OIDC,
-sessions, cookies, administration CLI), voir la [documentation Auth/User](auth.md).
+sessions, cookies, administration CLI), voir la [documentation Auth/User](../features/auth.md).
 
 Auth/User fournit l'identite locale et RBAC fournit les roles et permissions.
 La table optionnelle `user_roles`, ajoutee par AUTH-USER-RBAC-001, sert de pont

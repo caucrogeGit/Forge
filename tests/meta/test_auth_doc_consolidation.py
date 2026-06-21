@@ -6,7 +6,7 @@ Vérifie que :
 - les événements d'audit sont listés ;
 - les commandes admin CLI sont documentées avec erreurs et conseils ;
 - les liens croisés vers rbac.md, production-security.md et reference.md sont présents ;
-- docs/features/rbac.md pointe vers docs/features/auth.md ;
+- packages/forge-mvc-rbac/docs/reference.md pointe vers docs/features/auth.md ;
 - docs/philosophy/security.md pointe vers docs/features/auth.md ;
 - les limites restantes sont explicitées.
 """
@@ -18,7 +18,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 AUTH_MD = pathlib.Path("docs/features/auth.md")
-RBAC_MD = pathlib.Path("docs/features/rbac.md")
+RBAC_MD = pathlib.Path("packages/forge-mvc-rbac/docs/reference.md")
 SECURITY_MD = pathlib.Path("docs/philosophy/security.md")
 PRODUCTION_MD = pathlib.Path("docs/deployment/production-security.md")
 REFERENCE_MD = pathlib.Path("docs/reference/api.md")

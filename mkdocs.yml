@@ -108,9 +108,6 @@ nav:
       - Relations entre entités: features/relations.md
       - Auth/User: features/auth.md
       - Sécurité et RBAC: philosophy/security.md
-      - RBAC — Contrôle d'accès: features/rbac.md
-      - Contrat RBAC séparé: security/rbac-contract.md
-      - RBAC — Usage applicatif: security/rbac-usage.md
       - Schéma API: reference/reference-schema.md
       - Schéma erreurs runtime: reference/runtime-errors-schema.md
 
@@ -164,24 +161,6 @@ nav:
           - La façade Flash: starters/welcome-helpers/flash.md
           - Imports et usage: starters/welcome-helpers/imports-usage.md
           - Bilan: starters/welcome-helpers/bilan.md
-      - Progression RBAC (welcome-rbac):
-          - Installation: starters/welcome-rbac/installation.md
-          - Débutant:
-              - Bonjour Forge RBAC: starters/welcome-rbac/debutant/rbac-welcome.md
-              - Code de permission: starters/welcome-rbac/debutant/rbac-permission.md
-              - Rôle et slug: starters/welcome-rbac/debutant/rbac-role.md
-              - Bilan débutant: starters/welcome-rbac/debutant/bilan.md
-          - Intermédiaire:
-              - Vérifier une permission: starters/welcome-rbac/intermediaire/rbac-check.md
-              - Protéger une route: starters/welcome-rbac/intermediaire/rbac-guard.md
-              - Permission dans un template: starters/welcome-rbac/intermediaire/rbac-template.md
-              - Bilan intermédiaire: starters/welcome-rbac/intermediaire/bilan.md
-          - Avancé:
-              - Associer un rôle à un utilisateur: starters/welcome-rbac/avance/rbac-user-role.md
-              - Résoudre les permissions: starters/welcome-rbac/avance/rbac-resolve.md
-              - Rôles de la requête: starters/welcome-rbac/avance/rbac-request-roles.md
-              - Bilan avancé: starters/welcome-rbac/avance/bilan.md
-          - Aide-mémoire: starters/welcome-rbac/recapitulatif.md
       - Progression Markdown (welcome-markdown):
           - Préambule: starters/welcome-markdown/installation.md
           - Débutant:
@@ -282,6 +261,7 @@ nav:
   - IoT (opt-in): '!include packages/forge-mvc-iot/mkdocs.yml'
 
   - Vidéo (opt-in): '!include packages/forge-mvc-video/mkdocs.yml'
+  - RBAC (opt-in): '!include packages/forge-mvc-rbac/mkdocs.yml'
 
   - Tests terrain:
       - Vue d'ensemble: testing/index.md

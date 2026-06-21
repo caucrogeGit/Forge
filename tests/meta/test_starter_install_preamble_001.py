@@ -128,6 +128,11 @@ MIGRATED = {
         PROJECT_ROOT / "packages" / "forge-mvc-video" / "mkdocs.yml",
         "welcome/",
     ),
+    "welcome-rbac": (
+        PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "mkdocs.yml",
+        "welcome/",
+    ),
 }
 
 

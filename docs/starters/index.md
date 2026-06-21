@@ -55,7 +55,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### RBAC (opt-in `forge-mvc-rbac`)
 
-[Bonjour Forge RBAC](welcome-rbac/debutant/rbac-welcome.md) · [Code de permission](welcome-rbac/debutant/rbac-permission.md) · [Rôle et slug](welcome-rbac/debutant/rbac-role.md) · [Vérifier une permission](welcome-rbac/intermediaire/rbac-check.md) · [Protéger une route](welcome-rbac/intermediaire/rbac-guard.md) · [Permission dans un template](welcome-rbac/intermediaire/rbac-template.md) · [Associer un rôle à un utilisateur](welcome-rbac/avance/rbac-user-role.md) · [Résoudre les permissions](welcome-rbac/avance/rbac-resolve.md) · [Rôles de la requête](welcome-rbac/avance/rbac-request-roles.md)
+[Bonjour Forge RBAC](../rbac/welcome/debutant/rbac-welcome.md) · [Code de permission](../rbac/welcome/debutant/rbac-permission.md) · [Rôle et slug](../rbac/welcome/debutant/rbac-role.md) · [Vérifier une permission](../rbac/welcome/intermediaire/rbac-check.md) · [Protéger une route](../rbac/welcome/intermediaire/rbac-guard.md) · [Permission dans un template](../rbac/welcome/intermediaire/rbac-template.md) · [Associer un rôle à un utilisateur](../rbac/welcome/avance/rbac-user-role.md) · [Résoudre les permissions](../rbac/welcome/avance/rbac-resolve.md) · [Rôles de la requête](../rbac/welcome/avance/rbac-request-roles.md)
 
 ### Workflow (opt-in `forge-mvc-workflow`)
 

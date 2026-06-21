@@ -15,7 +15,7 @@ pytestmark = pytest.mark.meta
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
 AUTH_MD = pathlib.Path("docs/features/auth.md")
-RBAC_MD = pathlib.Path("docs/features/rbac.md")
+RBAC_MD = pathlib.Path("packages/forge-mvc-rbac/docs/reference.md")
 
 
 def _roadmap():
@@ -99,7 +99,8 @@ class TestProchainePriorite:
 
 class TestDocumentationCoherente:
     def test_auth_md_lien_vers_rbac(self):
-        assert "rbac.md" in _auth()
+        # Référence rbac embarquée par paquet (ADR-038).
+        assert "rbac/reference.md" in _auth()
 
     def test_rbac_md_lien_vers_auth(self):
         assert "auth.md" in _rbac()

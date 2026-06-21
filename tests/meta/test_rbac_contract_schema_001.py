@@ -11,7 +11,7 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-DOC = Path("docs/security/rbac-contract.md")
+DOC = Path("packages/forge-mvc-rbac/docs/contract.md")
 
 
 def _text() -> str:

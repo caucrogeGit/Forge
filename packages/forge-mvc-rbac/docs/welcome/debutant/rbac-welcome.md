@@ -9,7 +9,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-rbac` et son
 `get_contract_permissions` liste les permissions d'un rôle.
 
 Premier palier du **niveau débutant** de la progression RBAC
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in"
     Ce starter livre un contrat de démonstration (`mvc/security/rbac.json`) et

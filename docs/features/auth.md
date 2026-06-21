@@ -5,7 +5,7 @@ utilisateur moderne sans transformer le framework en application metier. Elle
 fournit des contrats Python, des helpers explicites et des SQL visibles que les
 projets peuvent adopter progressivement.
 
-Voir aussi : [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md) · [RBAC — Contrôle d'accès](rbac.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
+Voir aussi : [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session Forge 2.x](../adr/002-session-strategy.md) · [RBAC — Contrôle d'accès](../rbac/reference.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
 
 Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.py`) s'appuie sur `core.auth.password.verify_password` (Argon2id) pour la vérification des mots de passe. `core.security.hashing` reste disponible en repli pour les hashes PBKDF2 existants (voir ADR-001). Les nouveaux hashes PBKDF2 legacy utilisent désormais 600 000 itérations (format versionné `pbkdf2_sha256$…`) ; les anciens hashes restent vérifiables. Lorsqu'un utilisateur legacy PBKDF2 se connecte avec succès, Forge migre automatiquement son hash vers Argon2id (`auth_model.update_password_hash`). Cette migration est transparente et ne force pas de réinitialisation du mot de passe.
 
@@ -802,7 +802,7 @@ Auth/User injecte par `BaseController.render(..., request=request)` ou le mode
 historique. Il ne remplace jamais une protection serveur.
 
 Pour la documentation complète des rôles, permissions, decorateurs et helpers
-Jinja, voir [RBAC — Contrôle d'accès](rbac.md).
+Jinja, voir [RBAC — Contrôle d'accès](../rbac/reference.md).
 
 ## Administration CLI
 
@@ -1412,7 +1412,7 @@ politiques metier.
 
 ## Voir aussi
 
-- [RBAC — Contrôle d'accès](rbac.md) — rôles, permissions, décorateurs serveur, helper Jinja
+- [RBAC — Contrôle d'accès](../rbac/reference.md) — rôles, permissions, décorateurs serveur, helper Jinja
 - [Sécurité en production](../deployment/production-security.md) — checklist déploiement, headers, CSRF, secrets
 - [Référence CLI](../reference/reference.md) — toutes les commandes `forge` avec signatures complètes
 - [ADR-001 — Stratégie d'authentification Forge 2.x](../adr/001-auth-strategy.md)
