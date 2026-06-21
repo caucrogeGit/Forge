@@ -47,3 +47,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-038](038-optin-docs-embedded-per-package.md) | Documentation des opt-ins embarquée par paquet (`packages/<paquet>/docs/`), agrégée dans le site unique ; slug d'URL = nom sans `forge-mvc-` (accepté, pilote stats validé) |
 | [ADR-039](039-docs-information-architecture.md) | Refonte de l'architecture d'information de `docs/` (cœur) : un sujet = un emplacement canonique, tronc « Opt-ins officiels », dédoublonnages (proposé) |
 | [ADR-040](040-per-package-test-surface.md) | Surface de test par paquet opt-in : modèle hybride (transversal à la racine, smoke + unitaire dans le paquet), `testpaths = tests packages`, `importorskip` (accepté) |
+| [ADR-041](041-shared-test-support.md) | Infrastructure de test partagée (`forge-mvc-testing` dev-only, plugin pytest + `FakeRequest`) pour rendre les tests de paquet autonomes (proposé) |
