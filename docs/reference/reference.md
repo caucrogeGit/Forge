@@ -70,7 +70,7 @@ flowchart LR
 - [Workflow](../workflow/reference.md) — statuts et transitions (`forge-mvc-workflow`)
 - [Statistiques](../stats/reference.md) — tracking d'événements (`forge-mvc-stats`)
 - [Modules Forge](modules.md) — système de modules, cycle de vie, routes
-- [Auth — Challenge MFA](auth-mfa.md) — flux MFA à la connexion (`forge-mvc-mfa`)
+- [Auth — Challenge MFA](../mfa/reference.md) — flux MFA à la connexion (`forge-mvc-mfa`)
 
 ### Sécurité et sessions
 

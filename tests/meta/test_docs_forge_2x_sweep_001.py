@@ -29,6 +29,8 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DOCS_DIR = PROJECT_ROOT / "docs"
+# Doc des opt-ins embarquée par paquet (ADR-038) : balayée aussi.
+PACKAGES_DIR = PROJECT_ROOT / "packages"
 
 EXCLUDED_PATHS = [
     "docs/history",
@@ -61,7 +63,13 @@ def _is_excluded(path: Path) -> bool:
 
 
 def _find_active_doc_files() -> list[Path]:
-    return [p for p in DOCS_DIR.rglob("*.md") if not _is_excluded(p)]
+    roots = [DOCS_DIR, *sorted(PACKAGES_DIR.glob("*/docs"))]
+    return [
+        p
+        for root in roots
+        for p in root.rglob("*.md")
+        if not _is_excluded(p)
+    ]
 
 
 class TestNoActiveForge2XInDocs:
@@ -139,7 +147,7 @@ class TestHistoricalMentionsPreserved:
 
     @pytest.mark.parametrize("doc_path,expected_mention", [
         ("features/auth.md", "Depuis Forge 2.4.0"),
-        ("reference/auth-mfa.md", "depuis Forge 2.5.0"),
+        ("../packages/forge-mvc-mfa/docs/reference.md", "depuis Forge 2.5.0"),
         # forge-mvc-stats : doc embarquée par paquet (ADR-038).
         ("../packages/forge-mvc-stats/docs/reference.md", "depuis Forge 2.8.0"),
         ("../packages/forge-mvc-workflow/docs/reference.md", "depuis Forge 2.7.0"),

@@ -89,7 +89,6 @@ nav:
       - Convention HTTP inspectable: reference/http.md
       - Opt-ins officiels:
           - Modules Forge: reference/modules.md
-          - Auth — Challenge MFA: reference/auth-mfa.md
       - CRUD et relations: reference/crud.md
       - Pages publiques: reference/pages-publiques.md
       - Sécurité et sessions:
@@ -252,24 +251,6 @@ nav:
               - Diagnostiquer le module Audio: starters/welcome-audio/avance/audio-doctor.md
               - Bilan avancé: starters/welcome-audio/avance/bilan.md
           - Aide-mémoire: starters/welcome-audio/recapitulatif.md
-      - Progression MFA (welcome-mfa):
-          - Installation: starters/welcome-mfa/installation.md
-          - Débutant:
-              - Bonjour Forge MFA: starters/welcome-mfa/debutant/mfa-welcome.md
-              - Secret TOTP et QR: starters/welcome-mfa/debutant/mfa-secret.md
-              - Vérifier un code TOTP: starters/welcome-mfa/debutant/mfa-verify.md
-              - Bilan débutant: starters/welcome-mfa/debutant/bilan.md
-          - Intermédiaire:
-              - Enrôler un facteur TOTP: starters/welcome-mfa/intermediaire/mfa-enroll.md
-              - Challenge de connexion: starters/welcome-mfa/intermediaire/mfa-challenge.md
-              - Codes de récupération: starters/welcome-mfa/intermediaire/mfa-recovery.md
-              - Bilan intermédiaire: starters/welcome-mfa/intermediaire/bilan.md
-          - Avancé:
-              - Revalidation (step-up): starters/welcome-mfa/avance/mfa-revalidation.md
-              - Anti-rejeu TOTP: starters/welcome-mfa/avance/mfa-replay.md
-              - Secret chiffré au repos: starters/welcome-mfa/avance/mfa-crypto.md
-              - Bilan avancé: starters/welcome-mfa/avance/bilan.md
-          - Aide-mémoire: starters/welcome-mfa/recapitulatif.md
       - Progression RBAC (welcome-rbac):
           - Installation: starters/welcome-rbac/installation.md
           - Débutant:
@@ -429,6 +410,7 @@ nav:
   # Opt-ins à doc embarquée par paquet (ADR-038).
   - Statistiques (opt-in): '!include packages/forge-mvc-stats/mkdocs.yml'
   - Workflow (opt-in): '!include packages/forge-mvc-workflow/mkdocs.yml'
+  - MFA (opt-in): '!include packages/forge-mvc-mfa/mkdocs.yml'
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md

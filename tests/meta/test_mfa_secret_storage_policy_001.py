@@ -24,7 +24,8 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-AUTH_MFA_REF = PROJECT_ROOT / "docs" / "reference" / "auth-mfa.md"
+# Doc embarquée par paquet depuis l'ADR-038.
+AUTH_MFA_REF = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "docs" / "reference.md"
 MFA_PYPROJECT = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "pyproject.toml"
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 CORE_DIR = PROJECT_ROOT / "core"

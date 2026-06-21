@@ -35,7 +35,8 @@ _SUBPROCESS_ENV = {
         str(p) for p in sorted(_PACKAGES_DIR.iterdir()) if p.is_dir()
     ),
 }
-AUTH_MFA_REF = PROJECT_ROOT / "docs" / "reference" / "auth-mfa.md"
+# Doc embarquée par paquet depuis l'ADR-038.
+AUTH_MFA_REF = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "docs" / "reference.md"
 AUTH_DOC = PROJECT_ROOT / "docs" / "features" / "auth.md"
 
 

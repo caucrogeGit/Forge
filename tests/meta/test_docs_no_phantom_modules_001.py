@@ -22,6 +22,8 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DOCS_DIR = PROJECT_ROOT / "docs"
+# Doc des opt-ins embarquée par paquet (ADR-038) : balayée aussi.
+PACKAGES_DIR = PROJECT_ROOT / "packages"
 
 PHANTOM_MODULES = {
     "core.security.rbac": "forge_mvc_rbac",
@@ -39,12 +41,14 @@ EXCLUDED_FILES: set[Path] = set()
 
 def _active_md_files() -> list[Path]:
     files: list[Path] = []
-    for md in DOCS_DIR.rglob("*.md"):
-        if any(part in EXCLUDED_DIRS for part in md.parts):
-            continue
-        if md in EXCLUDED_FILES:
-            continue
-        files.append(md)
+    roots = [DOCS_DIR, *sorted(PACKAGES_DIR.glob("*/docs"))]
+    for root in roots:
+        for md in root.rglob("*.md"):
+            if any(part in EXCLUDED_DIRS for part in md.parts):
+                continue
+            if md in EXCLUDED_FILES:
+                continue
+            files.append(md)
     return sorted(files)
 
 

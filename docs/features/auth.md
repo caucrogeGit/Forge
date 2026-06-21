@@ -23,7 +23,7 @@ Depuis Forge 2.x, et toujours dans les versions actuelles de Forge, l'API offici
 | RBAC | `forge_mvc_rbac` (`pip install --pre forge-mvc-rbac` — publié sur PyPI) | — |
 | CSRF | — | `core.security.middleware.CsrfMiddleware` + `require_csrf` — officiels |
 | Middleware | — | `core.security.middleware` — officiel |
-| MFA | `forge_mvc_mfa` (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`) — **Alpha**, secret TOTP chiffré au repos (voir [auth-mfa](../reference/auth-mfa.md)) | — |
+| MFA | `forge_mvc_mfa` (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`) — **Alpha**, secret TOTP chiffré au repos (voir [auth-mfa](../mfa/reference.md)) | — |
 | Tokens à usage limité | `core.auth.tokens` | — |
 | OIDC / SSO | ❌ non fourni nativement — voir [section OIDC](#oidc) | — |
 | Contrat utilisateur | `core.auth.user` | — |

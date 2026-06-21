@@ -24,11 +24,14 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 API_REF = PROJECT_ROOT / "docs" / "reference" / "api.md"
 
+# Cibles de lien dans api.md. Les opt-ins à doc embarquée (ADR-038) sont liés
+# vers leur page montée sous /<slug>/reference/ ; les autres restent dans
+# docs/reference/.
 EXPECTED_MODULES = {
-    "forge-mvc-mfa":      "auth-mfa.md",
+    "forge-mvc-mfa":      "mfa/reference.md",
     "forge-mvc-rbac":     "rbac.md",
-    "forge-mvc-workflow": "workflow.md",
-    "forge-mvc-stats":    "stats.md",
+    "forge-mvc-workflow": "workflow/reference.md",
+    "forge-mvc-stats":    "stats/reference.md",
 }
 
 _SECTION_PATTERNS = [

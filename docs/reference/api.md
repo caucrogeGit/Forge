@@ -3041,7 +3041,7 @@ Chaque opt-in est livré comme package PyPI distinct sous le namespace
 
 | Opt-in | Package PyPI | Extra pip | Documentation détaillée |
 |---|---|---|---|
-| MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa.md](auth-mfa.md) |
+| MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa](../mfa/reference.md) |
 | RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../features/rbac.md) |
 | Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow](../workflow/reference.md) |
 | Statistiques | `forge-mvc-stats` | `[stats]` | [stats](../stats/reference.md) |
@@ -3066,7 +3066,7 @@ pip install --pre forge-mvc-mfa
 > le core Forge ne dépend pas de `forge-mvc-mfa`.
 > Voir [contrat d'installation](../install/opt-ins.md).
 
-Référence détaillée : [auth-mfa.md](auth-mfa.md).
+Référence détaillée : [auth-mfa](../mfa/reference.md).
 
 ### RBAC — `forge-mvc-rbac`
 

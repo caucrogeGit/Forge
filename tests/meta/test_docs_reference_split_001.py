@@ -65,8 +65,8 @@ _EXPECTED_SUBFILES = [
     "api.md",
     "cli-commands.md",
     "http.md",
-    # "workflow.md"/"stats.md" retirés : doc embarquée dans leur paquet (ADR-038).
-    "auth-mfa.md",
+    # "workflow.md"/"stats.md"/"auth-mfa.md" retirés : doc embarquée dans
+    # leur paquet (ADR-038).
     "crud.md",
     "pages-publiques.md",
     "modules.md",
@@ -124,21 +124,9 @@ class TestPhaseTitlesRemoved:
 
 # ── Modules extraits mentionnes ───────────────────────────────────────────────
 
-# workflow.md/stats.md absents : leur notice d'extraction est gardée par
-# test_docs_reference_modules_001 (doc embarquée, ADR-038).
-@pytest.mark.parametrize("subfile,module_pkg", [
-    ("auth-mfa.md", "forge-mvc-mfa"),
-])
-class TestExtractedModulesNoted:
-
-    def test_mentions_module_extraction(self, subfile, module_pkg):
-        path = REFERENCE_DIR / subfile
-        if not path.exists():
-            pytest.skip(f"{subfile} n'existe pas")
-        content = path.read_text(encoding="utf-8")
-        assert module_pkg in content or "Module extrait" in content, (
-            f"{subfile} devrait mentionner l'extraction vers {module_pkg}"
-        )
+# Classe TestExtractedModulesNoted retirée : workflow.md/stats.md/auth-mfa.md
+# ont quitté docs/reference/ (doc embarquée par paquet, ADR-038). Leur notice
+# « Module extrait » est désormais gardée par test_docs_reference_modules_001.
 
 
 # ── Contenu critique present dans les bons fichiers ──────────────────────────
@@ -170,7 +158,7 @@ class TestNoUnexpectedSubfiles:
     def test_only_expected_subfiles(self):
         if not REFERENCE_DIR.exists():
             pytest.skip("docs/reference/ n'existe pas")
-        # _EXPECTED_SUBFILES = les 11 sous-fichiers du découpage ; on autorise
+        # _EXPECTED_SUBFILES = les 10 sous-fichiers du découpage ; on autorise
         # en plus l'index reference.md et les 3 docs de référence regroupées
         # ici par DOCS-REORG-REFERENCE-001.
         expected = set(_EXPECTED_SUBFILES) | {

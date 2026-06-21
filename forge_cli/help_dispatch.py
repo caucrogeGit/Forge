@@ -1686,7 +1686,7 @@ Effets:
       core.auth.user / session / tokens / reset / audit / rate_limit,
       forge_mvc_mfa (+ recovery), forge_mvc_rbac ;
   - émet un avertissement MFA Pre-Alpha (installée ou pas) : secret
-    TOTP stocké en clair, voir docs/reference/auth-mfa.md et
+    TOTP stocké en clair, voir packages/forge-mvc-mfa/docs/reference.md et
     SEC-MFA-SECRET-ENCRYPTION-001 ;
   - vérifie la présence des contrats publics (AuthUser, login_user,
     AuthToken, PasswordResetRequest, AuthMfaFactor,

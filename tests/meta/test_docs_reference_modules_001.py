@@ -31,7 +31,11 @@ REFERENCE_PAGES = {
     / "forge-mvc-stats"
     / "docs"
     / "reference.md": "forge_mvc_stats",
-    PROJECT_ROOT / "docs" / "reference" / "auth-mfa.md": "forge_mvc_mfa",
+    PROJECT_ROOT
+    / "packages"
+    / "forge-mvc-mfa"
+    / "docs"
+    / "reference.md": "forge_mvc_mfa",
 }
 
 DEPRECATED_PREFIXES = {
@@ -55,8 +59,8 @@ def _text_no_code(md_text: str) -> str:
 
 _PAGES = list(REFERENCE_PAGES.items())
 # Id lisible et unique : plusieurs pages migrées s'appellent « reference.md »
-# (doc embarquée, ADR-038), on préfixe donc par le dossier parent.
-_IDS = [f"{p.parent.name}/{p.name}" for p in REFERENCE_PAGES]
+# (doc embarquée, ADR-038), on identifie donc par le nom du module.
+_IDS = list(REFERENCE_PAGES.values())
 
 
 class TestReferencePagesNoPhantomImports:

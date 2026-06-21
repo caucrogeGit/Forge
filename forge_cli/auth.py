@@ -745,14 +745,14 @@ def run_auth_doctor(root: Path | None = None) -> tuple[AuthCliCheck, ...]:
             "warn",
             "forge_mvc_mfa",
             "Pre-Alpha — secret TOTP stocké en clair. "
-            "Voir docs/reference/auth-mfa.md et SEC-MFA-SECRET-ENCRYPTION-001",
+            "Voir packages/forge-mvc-mfa/docs/reference.md et SEC-MFA-SECRET-ENCRYPTION-001",
         ))
     else:
         checks.append(AuthCliCheck(
             "warn",
             "forge_mvc_mfa",
             "Opt-in non installé — module Pre-Alpha (secret TOTP en clair si activé). "
-            "Voir docs/reference/auth-mfa.md",
+            "Voir packages/forge-mvc-mfa/docs/reference.md",
         ))
 
     for module_name, attr_name in AUTH_CONTRACTS:

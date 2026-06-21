@@ -48,6 +48,14 @@ def test_mkdocs_nav_entries_are_well_formed_and_point_to_existing_docs():
             continue
         if target.startswith("http"):
             continue
+        # Doc des opt-ins embarquée par paquet (ADR-038) : l'agrégation
+        # mkdocs-monorepo référence un sous-mkdocs.yml, pas un fichier de docs/.
+        if target.startswith("!include "):
+            include = target[len("!include ") :].strip()
+            assert (ROOT / include).exists(), (
+                f"sous-mkdocs.yml d'opt-in introuvable : {include}"
+            )
+            continue
         assert (ROOT / "docs" / target).exists()
 
 

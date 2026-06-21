@@ -51,7 +51,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### MFA (opt-in `forge-mvc-mfa`)
 
-[Bonjour Forge MFA](welcome-mfa/debutant/mfa-welcome.md) · [Secret TOTP et QR](welcome-mfa/debutant/mfa-secret.md) · [Vérifier un code TOTP](welcome-mfa/debutant/mfa-verify.md) · [Enrôler un facteur TOTP](welcome-mfa/intermediaire/mfa-enroll.md) · [Challenge de connexion](welcome-mfa/intermediaire/mfa-challenge.md) · [Codes de récupération](welcome-mfa/intermediaire/mfa-recovery.md) · [Revalidation (step-up)](welcome-mfa/avance/mfa-revalidation.md) · [Anti-rejeu TOTP](welcome-mfa/avance/mfa-replay.md) · [Secret chiffré au repos](welcome-mfa/avance/mfa-crypto.md)
+[Bonjour Forge MFA](../mfa/welcome/debutant/mfa-welcome.md) · [Secret TOTP et QR](../mfa/welcome/debutant/mfa-secret.md) · [Vérifier un code TOTP](../mfa/welcome/debutant/mfa-verify.md) · [Enrôler un facteur TOTP](../mfa/welcome/intermediaire/mfa-enroll.md) · [Challenge de connexion](../mfa/welcome/intermediaire/mfa-challenge.md) · [Codes de récupération](../mfa/welcome/intermediaire/mfa-recovery.md) · [Revalidation (step-up)](../mfa/welcome/avance/mfa-revalidation.md) · [Anti-rejeu TOTP](../mfa/welcome/avance/mfa-replay.md) · [Secret chiffré au repos](../mfa/welcome/avance/mfa-crypto.md)
 
 ### RBAC (opt-in `forge-mvc-rbac`)
 

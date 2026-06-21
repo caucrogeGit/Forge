@@ -7,7 +7,7 @@ briques** : facteurs (`TOTP`, `recovery`), statuts (`pending`/`active`/`disabled
 et la présence de la clé de chiffrement `FORGE_MFA_SECRET_KEY` (sans la révéler).
 
 Premier palier du **niveau débutant** de la progression MFA
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in"
     Ce parcours décortique **chaque brique** MFA isolément, pour comprendre

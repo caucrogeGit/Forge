@@ -22,6 +22,7 @@ BASE_URL = "https://caucrogegit.github.io/Forge/"
 MIGRATED_DOC_ROOTS = {
     "stats": PROJECT_ROOT / "packages" / "forge-mvc-stats" / "docs",
     "workflow": PROJECT_ROOT / "packages" / "forge-mvc-workflow" / "docs",
+    "mfa": PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "docs",
 }
 
 
@@ -54,7 +55,7 @@ EXPECTED_DOC_PATHS = [
     # Nouveau beta.6 — page spécifique entity-schema
     "entities/entity-schema",
     # Modules opt-in (11 cartes)
-    "reference/auth-mfa",
+    "mfa/reference",
     "features/rbac",
     # forge-mvc-workflow / forge-mvc-stats : doc embarquée par paquet (ADR-038).
     "workflow/reference",
@@ -68,7 +69,7 @@ EXPECTED_DOC_PATHS = [
     "entities/pivot-advanced",
     # Section Starters (13 cartes de progression)
     "starters/welcome-forge/debutant/welcome",
-    "starters/welcome-mfa/installation",
+    "mfa/welcome/installation",
     "starters/welcome-rbac/installation",
     "workflow/welcome/installation",
     "stats/welcome/installation",
