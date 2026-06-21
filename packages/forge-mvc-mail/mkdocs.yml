@@ -4,7 +4,15 @@
 site_name: mail
 docs_dir: docs
 nav:
-  - Gestion des mails (référence): reference.md
+  - Gestion des mails (référence):
+      - Vue d'ensemble: reference.md
+      - Configuration (config.py): references/config.md
+      - Message (message.py): references/message.md
+      - Transports (transports.py): references/transports.md
+      - Mailer (mailer.py): references/mailer.md
+      - Rendu de gabarits (templates.py): references/templates.md
+      - Journal des envois (log.py): references/log.md
+      - Erreurs (exceptions.py): references/exceptions.md
   - Progression Mail:
       - Installation: welcome/installation.md
       - Débutant:

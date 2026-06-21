@@ -1,4 +1,4 @@
-# Brique mail générique — Forge 1.2
+# Brique mail générique : référence
 
 > **En développement, Forge n'envoie pas de vrais mails par défaut.**
 >
@@ -6,6 +6,24 @@
 > et le transport `log` est utilisé, donc aucune connexion SMTP n'est tentée.
 > Le mail est un opt-in (ADR-031), le squelette nu ne pré-câble pas `MAIL_*`,
 > et vous ajoutez le bloc à `env/dev` pour configurer l'envoi.
+
+---
+
+## Référence par module
+
+L'API détaillée est documentée page par page, un fichier par module :
+
+| Module | Page | Contenu |
+|---|---|---|
+| `config.py` | [La configuration](references/config.md) | `MailConfig`, variables `MAIL_*` |
+| `message.py` | [Le message](references/message.md) | `MailMessage` |
+| `transports.py` | [Les transports](references/transports.md) | console, log, SMTP, fake, null |
+| `mailer.py` | [Le mailer](references/mailer.md) | `Mailer`, envoi via transport |
+| `templates.py` | [Le rendu de gabarits](references/templates.md) | `MailTemplateRenderer` |
+| `log.py` | [Le journal des envois](references/log.md) | `mail_log`, `MailLogger` |
+| `exceptions.py` | [Les erreurs](references/exceptions.md) | `MailError` et ses sous-classes |
+
+Cette page reste l'**overview** : principe d'architecture, mise en place et bonnes pratiques.
 
 ---
 
