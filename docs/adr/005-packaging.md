@@ -12,7 +12,7 @@ Forge est actuellement distribué comme un seul package PyPI (`forge-mvc`).
 Ce modèle est simple mais crée une tension avec la décision ADR-004 d'extraire
 5 modules du `core/`.
 
-Plusieurs stratégies de packaging sont envisageables pour Forge 3.0 :
+Plusieurs stratégies de packaging sont envisageables pour Forge 1.0 :
 
 1. **Mono-package** : tout reste dans `forge-mvc`, les modules extraits
    deviennent des sous-packages optionnels dans la même wheel.
@@ -32,7 +32,7 @@ Le choix impacte directement :
 
 ## Décision
 
-**Forge 3.0 adopte un monorepo hybride avec plusieurs distributions PyPI.**
+**Forge 1.0 adopte un monorepo hybride avec plusieurs distributions PyPI.**
 
 Concrètement :
 
@@ -68,7 +68,7 @@ Concrètement :
   `forge-mvc-mfa` ou `forge-mvc-rbac` dans leurs dépendances.
 - L'outillage de release doit gérer plusieurs builds depuis le même dépôt.
 - La compatibilité entre versions de distributions doit être maintenue :
-  `forge-mvc-mfa 3.0.x` doit fonctionner avec `forge-mvc 3.0.x`.
+  `forge-mvc-mfa 1.0.x` doit fonctionner avec `forge-mvc 1.0.x`.
 
 ---
 

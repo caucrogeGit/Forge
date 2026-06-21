@@ -445,7 +445,7 @@ ecriture DB automatique.
     — le core ne dépend pas de `forge-mvc-mfa`. Voir le
     [contrat d'installation](../install/opt-ins.md).
 
-> **Depuis Forge 2.4.0**, le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
+> Le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
 > L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré pendant le développement pré-1.0.
 
 Forge fournit le socle MFA par briques :

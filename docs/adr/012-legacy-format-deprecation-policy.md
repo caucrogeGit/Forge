@@ -2,7 +2,7 @@
 
 ## Statut
 
-**Mise à jour — Forge 3.x** (ticket `LEGACY-REMOVE-004-UPDATE-DOCS-AFTER-LEGACY-REMOVAL`).
+**Mise à jour — Forge 1.x** (ticket `LEGACY-REMOVE-004-UPDATE-DOCS-AFTER-LEGACY-REMOVAL`).
 
 La décision initiale (dépréciation avec support temporaire) a été remplacée par la suppression
 effective du support legacy dans les tickets LEGACY-REMOVE-001A, 001B, 002 et 003.

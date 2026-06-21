@@ -1,10 +1,10 @@
-# ADR-002 — Stratégie de session Forge 2.x
+# ADR-002 — Stratégie de session Forge 1.x
 
-!!! warning "ADR historique — Forge 2.x"
+!!! warning "ADR historique — Forge 1.x"
 
     Cet ADR documente la stratégie de session telle qu'elle a été décidée
-    pour Forge 2.x. Son contenu est conservé pour trace décisionnelle et n'est
-    **pas** mis à jour pour refléter l'état actuel de Forge 3.0.
+    pour Forge 1.x. Son contenu est conservé pour trace décisionnelle et n'est
+    **pas** mis à jour pour refléter l'état actuel de Forge 1.0.
 
     Pour l'état actuel, consulter :
 
@@ -13,13 +13,13 @@
 
 ## Statut
 
-Acceptée (Forge 2.x — historique)
+Acceptée (Forge 1.x — historique)
 
 ---
 
 ## Contexte
 
-Forge 2.0 stocke les sessions utilisateur dans un dictionnaire Python en mémoire processus
+Forge 1.0 stocke les sessions utilisateur dans un dictionnaire Python en mémoire processus
 (`_sessions: dict = {}` dans `core/security/session.py`), protégé par un `threading.RLock`.
 
 Ce choix est explicitement assumé dans le code source :
@@ -33,7 +33,7 @@ Les deux piles de session — legacy (`core.security.session`) et moderne
 délègue la résolution de session à `core.security.session.get_session()` quand l'objet
 `request` ne porte pas directement un dict de session.
 
-En résumé : mono-processus est le mode supporté en Forge 2.x ; les autres modes nécessitent un backend de session partagé non encore implémenté.
+En résumé : mono-processus est le mode supporté en Forge 1.x ; les autres modes nécessitent un backend de session partagé non encore implémenté.
 
 Caractéristiques techniques actuelles :
 
@@ -51,33 +51,33 @@ Caractéristiques techniques actuelles :
 
 ## Décision
 
-**1. Forge 2.x utilise des sessions mémoire par défaut.**
+**1. Forge 1.x utilise des sessions mémoire par défaut.**
 
 Le backend actuel (`_sessions` dict + `RLock`) est le seul backend de session de
-Forge 2.x. Il n'est pas remplacé ni enrichi dans ce ticket.
+Forge 1.x. Il n'est pas remplacé ni enrichi dans ce ticket.
 
 **2. Le mode officiellement supporté est mono-processus.**
 
-Forge 2.x est conçu et documenté pour fonctionner avec un seul processus Python. Ce
+Forge 1.x est conçu et documenté pour fonctionner avec un seul processus Python. Ce
 choix est cohérent avec les usages cibles : développement local, pédagogie, applications
 légères, production mono-processus derrière Nginx.
 
 **3. Le déploiement derrière Nginx est supporté si Forge tourne avec un seul processus.**
 
 La configuration documentée (`systemd` + Nginx reverse proxy + un processus Python)
-est le mode de production officiel Forge 2.x. Les sessions sont persistantes tant que
+est le mode de production officiel Forge 1.x. Les sessions sont persistantes tant que
 le processus ne redémarre pas.
 
 **4. Le multi-worker n'est pas supporté sans backend de session partagé.**
 
 Lancer Forge avec plusieurs workers (Gunicorn, uWSGI, ou `--workers > 1`) crée des dicts
 `_sessions` indépendants par processus. Les sessions ne sont pas partagées entre workers.
-Ce mode n'est pas documenté ni recommandé en Forge 2.x.
+Ce mode n'est pas documenté ni recommandé en Forge 1.x.
 
 **5. Le scaling horizontal n'est pas supporté sans backend de session partagé.**
 
 Plusieurs instances Forge derrière un load balancer ne partagent pas leurs sessions.
-Ce mode n'est pas supporté en Forge 2.x sans solution tierce (Redis, etc.).
+Ce mode n'est pas supporté en Forge 1.x sans solution tierce (Redis, etc.).
 
 **6. Les sessions ne sont pas garanties après redémarrage avec le backend mémoire.**
 
@@ -139,19 +139,19 @@ horizontal complet.
 
 ## Conséquences
 
-- Tout projet Forge 2.x en production mono-processus fonctionne sans modification.
+- Tout projet Forge 1.x en production mono-processus fonctionne sans modification.
 - Les sessions sont perdues à chaque redémarrage du service ; c'est un comportement
   documenté et attendu, pas un bug.
 - Les projets nécessitant la haute disponibilité ou le scaling horizontal doivent attendre
-  Forge 2.1 ou 2.2 (ticket `SESSION-STORE-CONTRACT-001`).
+  une mineure `1.x` (ticket `SESSION-STORE-CONTRACT-001`).
 - La documentation de déploiement doit mentionner explicitement la limite des sessions
   mémoire (ticket `DEPLOY-SESSION-LIMITS-001`).
 
 ---
 
-## Mode supporté en Forge 2.x
+## Mode supporté en Forge 1.x
 
-| Mode | Statut Forge 2.x | Commentaire |
+| Mode | Statut Forge 1.x | Commentaire |
 |---|---|---|
 | Développement local mono-processus | **Supporté** | Cas standard, toutes fonctionnalités disponibles |
 | Production mono-processus derrière Nginx | **Supporté avec limites** | Sessions perdues au redémarrage du service |
@@ -172,7 +172,7 @@ horizontal complet.
 | `SESSION-FILE-STORE-001` | Fichier JSON (`FileSessionStore`) | Persistance après redémarrage, mono-machine | ✅ terminé |
 | `SESSION-MARIADB-STORE-001` | Table MariaDB (`MariaDbSessionStore`) | Persistance, sessions partagées entre processus | ✅ terminé |
 
-Redis n'est pas prévu dans la roadmap Forge 2.x. Les projets qui en ont besoin peuvent
+Redis n'est pas prévu dans la roadmap Forge 1.x. Les projets qui en ont besoin peuvent
 implémenter leur propre backend une fois le contrat défini.
 
 ---

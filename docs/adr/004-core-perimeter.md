@@ -40,7 +40,7 @@ logging-only, workflow non finalisé).
 
 ## Décision
 
-**Le `core/` de Forge 3.0 est réduit à ses primitives générales.**
+**Le `core/` de Forge 1.0 est réduit à ses primitives générales.**
 
 Les 5 modules suivants seront extraits du `core/` vers des distributions
 PyPI séparées (voir ADR-005) :

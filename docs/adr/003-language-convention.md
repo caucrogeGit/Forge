@@ -37,12 +37,12 @@ Le choix doit être acté avant la phase 14.3 pour guider les renommages.
 
 ## Décision
 
-**L'API publique de Forge 3.0 sera nommée en anglais.**
+**L'API publique de Forge 1.0 sera nommée en anglais.**
 
 Concrètement :
 
 1. Toutes les fonctions, classes et constantes exportées depuis les packages
-   `core.*` doivent avoir des noms en anglais dans Forge 3.0.
+   `core.*` doivent avoir des noms en anglais dans Forge 1.0.
 
 2. Les noms de variables internes, les commentaires et la documentation
    (docs Markdown) restent en français — langue de travail de l'équipe et
@@ -69,8 +69,8 @@ Concrètement :
 - Les aliases dépréciés (renvoyant un `DeprecationWarning`) seront maintenus
   pendant la période de transition selon la règle C de la charte.
 - Les starters et la documentation seront mis à jour en parallèle.
-- Les développeurs ayant du code Forge 2.x appelant les APIs françaises devront
-  migrer — le guide de migration `MIGRATION-GUIDE-3.0-001` les documentera.
+- Les développeurs ayant du code Forge 1.x appelant les APIs françaises devront
+  migrer — le guide de migration `MIGRATION-GUIDE-001` les documentera.
 
 ---
 

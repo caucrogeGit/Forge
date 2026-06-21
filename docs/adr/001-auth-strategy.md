@@ -1,10 +1,10 @@
-# ADR-001 — Stratégie d'authentification Forge 2.x
+# ADR-001 — Stratégie d'authentification Forge 1.x
 
-!!! warning "ADR historique — Forge 2.x"
+!!! warning "ADR historique — Forge 1.x"
 
     Cet ADR documente la stratégie d'authentification telle qu'elle a été décidée
-    pour Forge 2.x. Son contenu est conservé pour trace décisionnelle et n'est
-    **pas** mis à jour pour refléter l'état actuel de Forge 3.0.
+    pour Forge 1.x. Son contenu est conservé pour trace décisionnelle et n'est
+    **pas** mis à jour pour refléter l'état actuel de Forge 1.0.
 
     Pour l'état actuel, consulter :
 
@@ -13,11 +13,11 @@
 
     Les références à des modules `core.security.rbac`, `core.auth.mfa`, etc.
     dans cet ADR sont **historiques** (modules extraits en `forge-mvc-rbac`,
-    `forge-mvc-mfa`, etc. depuis Forge 2.5).
+    `forge-mvc-mfa`, etc. depuis Forge 1.0).
 
 ## Statut
 
-Acceptée (Forge 2.x — historique)
+Acceptée (Forge 1.x — historique)
 
 ---
 
@@ -32,7 +32,7 @@ Argon2id, `AuthUser`, sessions typées, `@login_required`, MFA TOTP, OIDC, RBAC 
 audit, rate limiting, tokens génériques, vérification email, reset mot de passe, codes de
 récupération, helpers Jinja.
 
-À la sortie de Forge 2.0.0, les deux piles coexistent :
+À la sortie de Forge 1.0, les deux piles coexistent :
 
 - `core.auth` expose l'API officielle complète pour les nouveaux projets.
 - `core.security` contient des briques fonctionnelles encore utilisées par certains
@@ -43,8 +43,8 @@ Cette coexistence crée une incohérence : des flux générés par la CLI Auth u
 Argon2id via `core.auth.password`, alors que `mvc/controllers/auth_controller.py`
 continue à appeler `core.security.hashing.verifier_mot_de_passe` (PBKDF2).
 
-En résumé : core.auth est l'API officielle Forge 2.x pour les nouveaux projets ;
-core.security est le legacy à maintenir sans le supprimer avant Forge 3.0.
+En résumé : core.auth est l'API officielle Forge 1.x pour les nouveaux projets ;
+core.security est le legacy à maintenir sans le supprimer avant Forge 1.0.
 
 Avant de corriger le code, Forge doit formaliser sa doctrine.
 
@@ -52,15 +52,15 @@ Avant de corriger le code, Forge doit formaliser sa doctrine.
 
 ## Décision
 
-**1. `core.auth` est l'API officielle d'authentification pour les nouveaux projets Forge 2.x.**
+**1. `core.auth` est l'API officielle d'authentification pour les nouveaux projets Forge 1.x.**
 
 Tout nouveau code, nouveau générateur, nouveau starter et toute nouvelle documentation
-Forge 2.x doit référencer `core.auth` et non `core.security`.
+Forge 1.x doit référencer `core.auth` et non `core.security`.
 
 **2. Argon2id est le format officiel pour les nouveaux mots de passe.**
 
 `core.auth.password.hash_password` produit des hashes Argon2id. C'est le seul format
-recommandé pour les projets Forge 2.x.
+recommandé pour les projets Forge 1.x.
 
 **3. `core.security.hashing` reste maintenu temporairement comme couche de compatibilité legacy.**
 
@@ -77,7 +77,7 @@ utilisant des hashes PBKDF2 stockés doit pouvoir continuer à les vérifier via
 
 **5. Les nouveaux projets ne doivent plus utiliser PBKDF2.**
 
-La documentation, les exemples et les générateurs de Forge 2.x ne font plus référence à
+La documentation, les exemples et les générateurs de Forge 1.x ne font plus référence à
 `hacher_mot_de_passe` ni à PBKDF2 comme choix recommandé.
 
 **6. La migration automatique PBKDF2 → Argon2id sera traitée dans un ticket séparé.**
@@ -86,10 +86,10 @@ Le ticket `AUTH-HASH-MIGRATION-001` décrira le mécanisme de rehachage transpar
 (vérifier PBKDF2, rehacher en Argon2id à la prochaine connexion réussie). Ce mécanisme
 n'est pas implémenté dans ce ticket.
 
-**7. `core.security.hashing` ne sera pas supprimé avant Forge 3.0.**
+**7. `core.security.hashing` ne sera pas supprimé avant Forge 1.0.**
 
 La suppression ou la dépréciation officielle (avec warning) de `core.security.hashing`
-est hors scope de Forge 2.x. Elle sera planifiée dans la roadmap Forge 3.0.
+est hors scope de Forge 1.x. Elle sera planifiée dans la roadmap Forge 1.0.
 
 **8. `core.security.session`, `core.security.decorators` et `core.security.rbac` restent
 maintenus sans modification.**
@@ -112,7 +112,7 @@ alignement vers `core.auth` est un chantier distinct (`AUTH-DEFAULT-ALIGN-001`,
 
 ---
 
-## Modules officiels Forge 2.x
+## Modules officiels Forge 1.x
 
 | Domaine | Module officiel | Fonctions clés |
 |---|---|---|
@@ -181,4 +181,4 @@ Pour un projet souhaitant migrer de `core.security` vers `core.auth` :
 | `SECURITY-PBKDF2-HARDENING-001` | Durcissement du code PBKDF2 legacy | si besoin, sans le supprimer |
 | `AUTH-HASH-MIGRATION-001` | Rehachage transparent PBKDF2 → Argon2id | mécanisme de migration à la connexion |
 | `AUTH-LEGACY-BOUNDARY-001` | Définir la frontière définitive legacy/moderne | préciser ce qui reste dans `core.security` |
-| `CMD-LEGACY-DEPRECATION-001` | Dépréciation officielle des commandes legacy | prépare Forge 3.0 |
+| `CMD-LEGACY-DEPRECATION-001` | Dépréciation officielle des commandes legacy | prépare Forge 1.0 |

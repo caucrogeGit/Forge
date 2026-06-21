@@ -2,7 +2,7 @@
 
 ## Statut
 
-Acceptée — Forge 2.10.0 (ticket AUTH-AUDIT-CLARIFY-ARCHITECTURE-001).
+Acceptée — Forge 1.0 (ticket AUTH-AUDIT-CLARIFY-ARCHITECTURE-001).
 
 ---
 
@@ -186,5 +186,5 @@ aux développeurs de la recréer manuellement.
 
 - `AUTH-AUDIT-CLARIFY-ARCHITECTURE-001` — ce ticket (documentation)
 - `AUTH-AUDIT-001` — implémentation initiale du contrat et du logging
-- Futur `forge-mvc-audit-sql` (post-3.x) — module optionnel officiel de persistance
+- Futur `forge-mvc-audit-sql` (post-1.0) — module optionnel officiel de persistance
   SQL, si la demande le justifie

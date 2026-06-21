@@ -143,14 +143,15 @@ class TestNoActiveForge2XAcrossDocs:
 
 
 class TestHistoricalMentionsPreserved:
-    """Les mentions historiques 'depuis Forge X.Y.Z' sont préservées."""
+    """L'extraction de chaque module reste mentionnée (sans numéro de version
+    interne 2.x, purgé : DOCS-PURGE-HISTORY-001)."""
 
     @pytest.mark.parametrize("doc_path,expected_mention", [
-        ("features/auth.md", "Depuis Forge 2.4.0"),
-        ("../packages/forge-mvc-mfa/docs/reference.md", "depuis Forge 2.5.0"),
+        ("features/auth.md", "code MFA est extrait"),
+        ("../packages/forge-mvc-mfa/docs/reference.md", "Module extrait"),
         # forge-mvc-stats : doc embarquée par paquet (ADR-038).
-        ("../packages/forge-mvc-stats/docs/reference.md", "depuis Forge 2.8.0"),
-        ("../packages/forge-mvc-workflow/docs/reference.md", "depuis Forge 2.7.0"),
+        ("../packages/forge-mvc-stats/docs/reference.md", "Module extrait"),
+        ("../packages/forge-mvc-workflow/docs/reference.md", "Module extrait"),
     ])
     def test_historical_extraction_mention_preserved(
         self, doc_path: str, expected_mention: str

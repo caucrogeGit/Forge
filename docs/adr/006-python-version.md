@@ -24,12 +24,12 @@ elle impacte :
 
 ## Décision
 
-**Forge 3.0 cible Python 3.12+ comme version minimale.**
+**Forge 1.0 cible Python 3.12+ comme version minimale.**
 
 Concrètement :
 
 1. `python_requires = ">=3.12"` dans tous les `pyproject.toml` des distributions
-   Forge 3.0.
+   Forge 1.0.
 
 2. Les nouvelles syntaxes Python 3.12 sont autorisées dans le code de Forge :
    - Syntaxe des paramètres de type génériques (`type X = ...`)
@@ -41,15 +41,15 @@ Concrètement :
 
 4. La documentation d'installation et les starters référencent Python 3.12+.
 
-5. Python 3.11 reste fonctionnel avec Forge 2.x — cette décision ne s'applique
-   qu'à Forge 3.0.
+5. Python 3.11 reste fonctionnel avec Forge 1.x — cette décision ne s'applique
+   qu'à Forge 1.0.
 
 ---
 
 ## Conséquences
 
-- Les développeurs sur Python 3.11 devront rester sur Forge 2.x ou migrer.
-- Le guide de migration `MIGRATION-GUIDE-3.0-001` documentera la contrainte
+- Les développeurs sur Python 3.11 devront rester sur Forge 1.x ou migrer.
+- Le guide de migration `MIGRATION-GUIDE-001` documentera la contrainte
   de version Python.
 - La matrice CI est simplifiée (2 versions au lieu de 3+).
 - Forge peut exploiter les améliorations de performance de Python 3.12 (meilleur
@@ -63,6 +63,6 @@ Concrètement :
 l'utilisation des nouvelles syntaxes et laisse Forge supporter une version
 Python proche de sa fin de vie.
 
-**Python 3.13+.** Trop restrictif au moment de la release de Forge 3.0 ;
+**Python 3.13+.** Trop restrictif au moment de la release de Forge 1.0 ;
 3.13 est récent et beaucoup d'environnements de production sont encore sur
 3.12.

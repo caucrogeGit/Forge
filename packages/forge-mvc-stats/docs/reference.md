@@ -1,6 +1,6 @@
 # Statistiques — Événements simples
 
-> **Module extrait** : depuis Forge 2.8.0, le code statistiques vit dans
+> **Module extrait** : le code statistiques vit dans
 > `forge-mvc-stats`. Voir `packages/forge-mvc-stats/README.md` pour
 > l'installation et l'API utilisateur. Cette page documente l'API publique
 > pour mémoire et référence rapide.

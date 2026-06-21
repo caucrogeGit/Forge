@@ -61,8 +61,8 @@ principalement `core.auth.session`.
 ### Décision ADR-001 (historique)
 
 ADR-001 a déjà établi que `core.auth` est l'API officielle pour les nouveaux
-projets Forge 2.x. ADR-010 formalise cette décision pour la série 1.0.x
-(renommée depuis 3.x) et pose le cadre de la transition.
+projets Forge 1.x. ADR-010 formalise cette décision pour la série 1.0.x
+(numérotation interne renommée) et pose le cadre de la transition.
 
 ---
 
@@ -219,5 +219,5 @@ post-audit 2026-05.
 | `AUTH-SESSION-LEGACY-DEPRECATION-001` | Warnings legacy à l'appel | Phase 4.3 |
 | `STARTER-AUTH-MODERNIZE-001` | Modernisation du starter auth | Phase 4.4 |
 | `CORE-AUTH-NO-HARDCODED-FIELDS-001` | Suppression des champs hardcodés | Phase 4.5 |
-| `ADR-001` | Décision historique Forge 2.x (référence) | Forge 2.x |
+| `ADR-001` | Décision historique Forge 1.x (référence) | Forge 1.x |
 | `AUTH-SESSION-DEDUP-001` (tracker) | Constat FND-AUTH-001 | Audit 2026-05 |

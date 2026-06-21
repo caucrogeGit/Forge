@@ -1,6 +1,6 @@
 # Contrat de stabilité Forge 1.x
 
-> **Note** : Ce document a été écrit pendant la série interne 3.x, renommée `1.x` lors de la publication PyPI. Les références à « Forge 3.x » ont été mises à jour pour refléter la série publique `1.x`.
+> **Note** : Ce document est aligné sur la trajectoire publique `1.x` (`1.0.0-beta` → `rc` → `1.0.0`).
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 

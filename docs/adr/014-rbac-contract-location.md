@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté — Forge 3.x (ticket `RBAC-CONTRACT-001-DEFINE-SEPARATE-RBAC-CONTRACT`).
+Accepté — Forge 1.x (ticket `RBAC-CONTRACT-001-DEFINE-SEPARATE-RBAC-CONTRACT`).
 
 ---
 

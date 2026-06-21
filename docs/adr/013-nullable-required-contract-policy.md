@@ -2,7 +2,7 @@
 
 ## Statut
 
-Acceptée — Forge 3.x (ticket `NULLABLE-CONTRACT-002-DECIDE-NULLABLE-REQUIRED-RULE`).
+Acceptée — Forge 1.x (ticket `NULLABLE-CONTRACT-002-DECIDE-NULLABLE-REQUIRED-RULE`).
 
 ---
 
