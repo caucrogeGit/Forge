@@ -18,7 +18,7 @@ from core.auth.user import AuthUser
 from forge_mvc_rbac.resolver import SELECT_USER_PERMISSIONS_SQL
 from forge_mvc_rbac import make_can
 from integrations.jinja2.renderer import Jinja2Renderer
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 def _authenticated_request(user_id: int = 42) -> FakeRequest:

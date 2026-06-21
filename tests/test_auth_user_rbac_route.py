@@ -10,7 +10,7 @@ import pytest
 pytest.importorskip("forge_mvc_rbac")
 
 from forge_mvc_rbac import auth_user_can, make_can, require_permission, require_user_permission
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 def _request(user_id: int | None = 7) -> FakeRequest:

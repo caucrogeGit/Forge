@@ -8,7 +8,7 @@ import pytest
 pytest.importorskip("forge_mvc_rbac")
 
 from forge_mvc_rbac import make_can
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ---------------------------------------------------------------------------

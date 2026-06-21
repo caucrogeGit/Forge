@@ -12,7 +12,7 @@ from forge_mvc_rbac import (
     has_permission,
     require_permission,
 )
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ---------------------------------------------------------------------------

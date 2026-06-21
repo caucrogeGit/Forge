@@ -26,7 +26,7 @@ from core.templating.manager import template_manager
 from integrations.jinja2.renderer import Jinja2Renderer
 from mvc.controllers.auth_controller import AuthController
 from mvc.controllers.mfa_challenge_controller import MfaChallengeController
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 _HEX = re.compile(r"^[0-9a-f]{64}$")
 

@@ -33,7 +33,7 @@ from core.http.router import Router
 from core.security import session as _sessions
 from core.templating.manager import template_manager
 from integrations.jinja2.renderer import Jinja2Renderer
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ── Helpers partagés ──────────────────────────────────────────────────────────

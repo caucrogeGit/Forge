@@ -44,7 +44,7 @@ from core.http.router import Router
 from core.forms.upload_exceptions import UploadError
 from forge_mvc_files.manager import save_upload
 from tests._malicious_samples import fake_pe_header, fake_php_webshell
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 # ---------------------------------------------------------------------------
 # Helpers

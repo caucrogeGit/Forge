@@ -335,7 +335,7 @@ class TestIntegrationDispatch:
     def test_dispatch_retourne_json_depuis_handler(self):
         from core.app.application import Application
         from core.http.router import Router
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
 
         router = Router()
         router.add("GET", "/api/status", lambda r: api_success({"ok": True}), public=True)
@@ -350,7 +350,7 @@ class TestIntegrationDispatch:
     def test_dispatch_retourne_erreur_json(self):
         from core.app.application import Application
         from core.http.router import Router
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
 
         router = Router()
         router.add("GET", "/api/missing",

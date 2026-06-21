@@ -50,7 +50,7 @@ class TestAbsent:
         router = _make_router()
         router.add("GET", "/web", lambda r: Response(200, "web"), public=True)
         app = Application(router, middlewares=[], api_routes_module=None)
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
         resp = app.dispatch(FakeRequest("GET", "/web"))
         assert resp.status == 200
 
@@ -117,13 +117,13 @@ class TestApplicationApiRoutes:
         router = _make_router()
         router.add("GET", "/web", lambda r: Response(200, "web"), public=True)
         app = Application(router, middlewares=[], api_routes_module=None)
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
         resp = app.dispatch(FakeRequest("GET", "/web"))
         assert resp.status == 200
 
     def test_api_routes_charge_via_application(self, monkeypatch):
         from core.app.application import Application
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
 
         router = _make_router()
 
@@ -158,7 +158,7 @@ class TestApplicationApiRoutes:
 class TestRouteApiConvention:
     def test_route_api_retourne_json_success(self, monkeypatch):
         from core.app.application import Application
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
 
         router = _make_router()
 
@@ -179,7 +179,7 @@ class TestRouteApiConvention:
 
     def test_route_api_retourne_api_error(self, monkeypatch):
         from core.app.application import Application
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
 
         router = _make_router()
 
@@ -200,7 +200,7 @@ class TestRouteApiConvention:
 
     def test_statut_201_creation(self, monkeypatch):
         from core.app.application import Application
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
 
         router = _make_router()
 
@@ -218,7 +218,7 @@ class TestRouteApiConvention:
 
     def test_web_route_inchangee(self, monkeypatch):
         from core.app.application import Application
-        from tests.fake_request import FakeRequest
+        from forge_mvc_testing import FakeRequest
 
         router = _make_router()
         router.add("GET", "/", lambda r: Response(200, "<h1>Accueil</h1>"), public=True)

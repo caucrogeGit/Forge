@@ -39,7 +39,7 @@ from forge_mvc_rbac import auth_user_can, require_user_permission, make_auth_jin
 from core.auth.session import AUTH_USER_ID_SESSION_KEY
 from core.http.response import Response
 from forge_mvc_rbac import has_permission, make_can, require_permission
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ---------------------------------------------------------------------------

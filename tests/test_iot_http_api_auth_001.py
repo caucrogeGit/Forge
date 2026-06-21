@@ -30,7 +30,7 @@ from forge_mvc_iot.http import (
     IotHttpController,
     register_iot_routes,
 )
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 PROJECT_ROOT = Path(__file__).parent.parent
 HTTP_FILE = (

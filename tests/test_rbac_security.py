@@ -22,7 +22,7 @@ from forge_mvc_rbac import (
     make_can,
     require_permission,
 )
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ---------------------------------------------------------------------------

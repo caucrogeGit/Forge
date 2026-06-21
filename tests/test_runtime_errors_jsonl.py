@@ -30,7 +30,7 @@ from core.errors.runtime_error_logger import (
 )
 from core.templating.manager import template_manager
 from integrations.jinja2.renderer import Jinja2Renderer
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ── Fixtures ───────────────────────────────────────────────────────────────────

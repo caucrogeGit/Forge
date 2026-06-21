@@ -17,7 +17,7 @@ from types import SimpleNamespace
 
 from forge_cli.entities.make_crud import build_controller, build_form, build_form_view
 from forge_cli.entities.validation import normalize_entity_definition
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ── Entités de référence ──────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 
 from core.forms import Form, ImageField, FileField, StringField
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 class DummyUpload:

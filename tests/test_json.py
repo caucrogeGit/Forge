@@ -2,7 +2,7 @@ import json
 import core.forge as forge
 from core.http.router import Router
 from core.mvc.controller.base_controller import BaseController
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 def _handler(_request):

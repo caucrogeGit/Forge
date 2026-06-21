@@ -23,7 +23,7 @@ import pytest
 
 from core.security import api_auth
 from core.security.api_auth import is_valid_api_token, require_api_token
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 def _req(auth_header=None):

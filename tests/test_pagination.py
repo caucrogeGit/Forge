@@ -1,5 +1,5 @@
 from core.mvc.view.pagination import Pagination
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 def test_pagination_expose_limit_offset_et_contexte_standard():

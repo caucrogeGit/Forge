@@ -24,7 +24,7 @@ from core.security.session import create_session, get_session
 from core.templating.manager import template_manager
 from integrations.jinja2.renderer import Jinja2Renderer
 from mvc.controllers.auth_controller import AuthController
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────

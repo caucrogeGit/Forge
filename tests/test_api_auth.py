@@ -9,7 +9,7 @@ from core.security.api_auth import (
 )
 from core.http import api_success
 from core.http.response import Response
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc-testing"
+version = "1.0.0b17"
+description = "Forge — infrastructure de test partagée (FakeRequest + plugin pytest), réservée au développement."
+requires-python = ">=3.12"
+authors = [
+    { name = "Roger Lequette" },
+]
+license = "LicenseRef-Forge-Proprietary"
+keywords = ["python", "mvc", "forge", "testing", "pytest"]
+dependencies = [
+    "forge-mvc>=1.0.0b17,<2",
+    "pytest>=7",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Pytest",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+# Plugin pytest auto-chargé dès que le paquet est installé (ADR-041).
+[project.entry-points.pytest11]
+forge_mvc_testing = "forge_mvc_testing.plugin"
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forge_mvc_testing*"]

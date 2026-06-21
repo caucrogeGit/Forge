@@ -16,7 +16,7 @@ from core.app.application import Application
 from core.http.router import Router
 from core.templating.manager import template_manager
 from integrations.jinja2.renderer import Jinja2Renderer
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 import pytest
 pytestmark = pytest.mark.meta

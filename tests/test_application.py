@@ -4,7 +4,7 @@ from core.http.response import Response
 from core.security import session as _sessions
 from core.templating.manager import template_manager
 from integrations.jinja2.renderer import Jinja2Renderer
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 
 def _handler_ok(request):

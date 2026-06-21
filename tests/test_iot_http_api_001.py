@@ -31,7 +31,7 @@ from forge_mvc_iot.http import (
     register_iot_routes,
 )
 from forge_mvc_iot.storage.repository import DEFAULT_LIMIT, MAX_LIMIT
-from tests.fake_request import FakeRequest
+from forge_mvc_testing import FakeRequest
 
 PROJECT_ROOT = Path(__file__).parent.parent
 IOT_PKG_DIR = PROJECT_ROOT / "packages" / "forge-mvc-iot"
