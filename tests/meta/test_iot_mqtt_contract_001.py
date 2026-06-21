@@ -27,8 +27,8 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-CONTRACT_PAGE = PROJECT_ROOT / "docs" / "iot" / "mqtt-contract.md"
-MKDOCS_YML = PROJECT_ROOT / "mkdocs.yml"
+CONTRACT_PAGE = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "mqtt-contract.md"
+MKDOCS_YML = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "mkdocs.yml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 
 REQUIRED_FIELDS = ("kind", "value", "unit", "timestamp")
@@ -62,7 +62,7 @@ class TestContractPageExists:
 class TestNavReference:
     def test_listed_in_mkdocs_yml(self):
         text = MKDOCS_YML.read_text(encoding="utf-8")
-        assert "iot/mqtt-contract.md" in text, (
+        assert "mqtt-contract.md" in text, (
             "docs/iot/mqtt-contract.md doit être référencé dans mkdocs.yml"
         )
 

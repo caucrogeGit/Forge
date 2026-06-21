@@ -23,7 +23,8 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-IOT = PROJECT_ROOT / "docs" / "starters" / "welcome-iot"
+# Doc embarquée par paquet depuis l'ADR-038.
+IOT = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "welcome"
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",

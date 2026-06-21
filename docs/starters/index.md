@@ -31,7 +31,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### IoT (opt-in `forge-mvc-iot`)
 
-[Bonjour Forge IoT](welcome-iot/debutant/iot-welcome.md) · [Lire les événements IoT](welcome-iot/debutant/iot-events.md) · [Les événements d'un capteur](welcome-iot/debutant/iot-device.md) · [Simuler une mesure IoT](welcome-iot/intermediaire/iot-simulate.md) · [Exposer l'API IoT](welcome-iot/intermediaire/iot-api.md) · [Tableau de bord IoT](welcome-iot/intermediaire/iot-dashboard.md) · [Valider un message IoT](welcome-iot/avance/iot-contract.md) · [Le subscriber MQTT](welcome-iot/avance/iot-subscriber.md) · [Diagnostiquer le module IoT](welcome-iot/avance/iot-doctor.md)
+[Bonjour Forge IoT](../iot/welcome/debutant/iot-welcome.md) · [Lire les événements IoT](../iot/welcome/debutant/iot-events.md) · [Les événements d'un capteur](../iot/welcome/debutant/iot-device.md) · [Simuler une mesure IoT](../iot/welcome/intermediaire/iot-simulate.md) · [Exposer l'API IoT](../iot/welcome/intermediaire/iot-api.md) · [Tableau de bord IoT](../iot/welcome/intermediaire/iot-dashboard.md) · [Valider un message IoT](../iot/welcome/avance/iot-contract.md) · [Le subscriber MQTT](../iot/welcome/avance/iot-subscriber.md) · [Diagnostiquer le module IoT](../iot/welcome/avance/iot-doctor.md)
 
 ### Vidéo (opt-in `forge-mvc-video`)
 

@@ -15,8 +15,8 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-PAGE = PROJECT_ROOT / "docs" / "iot" / "mosquitto-local.md"
-MKDOCS = PROJECT_ROOT / "mkdocs.yml"
+PAGE = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "mosquitto-local.md"
+MKDOCS = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "mkdocs.yml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 
 
@@ -32,7 +32,7 @@ def test_page_exists():
 
 
 def test_page_referenced_in_mkdocs():
-    assert "iot/mosquitto-local.md" in MKDOCS.read_text(encoding="utf-8"), (
+    assert "mosquitto-local.md" in MKDOCS.read_text(encoding="utf-8"), (
         "la page doit être référencée dans la nav mkdocs.yml"
     )
 

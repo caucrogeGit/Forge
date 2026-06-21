@@ -1,0 +1,40 @@
+# Documentation embarquée du paquet forge-mvc-iot (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /iot/
+# (l'ancien tronc docs/iot/ garde donc son URL ; voir ADR-038).
+site_name: iot
+docs_dir: docs
+nav:
+  - Architecture Forge IoT: architecture.md
+  - Contrat MQTT: mqtt-contract.md
+  - Configuration: configuration.md
+  - Subscriber MQTT: mqtt-subscriber.md
+  - Stockage des événements: storage-events.md
+  - API HTTP: http-api.md
+  - Diagnostic (doctor): doctor.md
+  - Initialisation (iot:init): init-command.md
+  - Simulateur (iot:simulate): simulator.md
+  - Écoute (iot:listen): listen-command.md
+  - Mosquitto local: mosquitto-local.md
+  - Smoke test local: local-smoke-test.md
+  - Pour Bac Pro / BTS CIEL: bts-ciel.md
+  - Exemple ESP32: esp32-example.md
+  - Évaluation Arduino R4: arduino-r4-assessment.md
+  - Progression IoT:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Bonjour Forge IoT: welcome/debutant/iot-welcome.md
+          - Lire les événements IoT: welcome/debutant/iot-events.md
+          - Les événements d'un capteur: welcome/debutant/iot-device.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Simuler une mesure IoT: welcome/intermediaire/iot-simulate.md
+          - Exposer l'API IoT: welcome/intermediaire/iot-api.md
+          - Tableau de bord IoT: welcome/intermediaire/iot-dashboard.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Valider un message IoT: welcome/avance/iot-contract.md
+          - Le subscriber MQTT: welcome/avance/iot-subscriber.md
+          - Diagnostiquer le module IoT: welcome/avance/iot-doctor.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

@@ -28,6 +28,7 @@ MIGRATED_DOC_ROOTS = {
     "audio": PROJECT_ROOT / "packages" / "forge-mvc-audio" / "docs",
     "mail": PROJECT_ROOT / "packages" / "forge-mvc-mail" / "docs",
     "images": PROJECT_ROOT / "packages" / "forge-mvc-images" / "docs",
+    "iot": PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs",
 }
 
 
@@ -67,7 +68,7 @@ EXPECTED_DOC_PATHS = [
     "stats/reference",
     "files/welcome/installation",
     "images/welcome/installation",
-    "starters/welcome-iot/installation",
+    "iot/welcome/installation",
     "starters/welcome-video/installation",
     "audio/welcome/installation",
     "mail/welcome/installation",

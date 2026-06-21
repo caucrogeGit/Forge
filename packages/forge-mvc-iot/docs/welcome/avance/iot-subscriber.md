@@ -27,9 +27,9 @@ Palier 2 du **niveau avancé** de la progression IoT, après
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_iot.config.load_iot_config` | Lire la configuration broker à vérifier. | [Forge IoT — configuration](../../../iot/configuration.md) |
-| `forge iot:listen` (CLI) | Lancer le `MqttSubscriber` sur le broker. | [Forge IoT — listen](../../../iot/listen-command.md) |
-| `MqttSubscriber` | Recevoir, valider et stocker chaque message. | [Forge IoT — architecture](../../../iot/architecture.md) |
+| `forge_mvc_iot.config.load_iot_config` | Lire la configuration broker à vérifier. | [Forge IoT — configuration](../../configuration.md) |
+| `forge iot:listen` (CLI) | Lancer le `MqttSubscriber` sur le broker. | [Forge IoT — listen](../../listen-command.md) |
+| `MqttSubscriber` | Recevoir, valider et stocker chaque message. | [Forge IoT — architecture](../../architecture.md) |
 
 ## Tester
 

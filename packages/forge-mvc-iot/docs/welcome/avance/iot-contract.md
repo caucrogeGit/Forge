@@ -27,8 +27,8 @@ respecter.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_iot.mqtt.contract.parse_message` | Valider topic + payload → `Measurement`. | [Forge IoT — contrat](../../../iot/storage-events.md) |
-| `ContractError` | Erreur de contrat, porte un `code` exploitable. | [Forge IoT — contrat](../../../iot/storage-events.md) |
+| `forge_mvc_iot.mqtt.contract.parse_message` | Valider topic + payload → `Measurement`. | [Forge IoT — contrat](../../storage-events.md) |
+| `ContractError` | Erreur de contrat, porte un `code` exploitable. | [Forge IoT — contrat](../../storage-events.md) |
 
 ## Tester
 

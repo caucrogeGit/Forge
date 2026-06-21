@@ -35,8 +35,8 @@ NEW_MIGRATIONS_DIR = IOT_PKG_DIR / "forge_mvc_iot" / "migrations"
 LEGACY_MIGRATIONS_DIR = IOT_PKG_DIR / "migrations"
 EXPECTED_FILENAME = "20260528120000_create_iot_events.sql"
 
-DOC_STORAGE = PROJECT_ROOT / "docs" / "iot" / "storage-events.md"
-DOC_DOCTOR = PROJECT_ROOT / "docs" / "iot" / "doctor.md"
+DOC_STORAGE = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "storage-events.md"
+DOC_DOCTOR = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "doctor.md"
 
 
 @pytest.fixture(scope="module")

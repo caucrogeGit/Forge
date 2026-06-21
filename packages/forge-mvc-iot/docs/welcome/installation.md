@@ -7,7 +7,7 @@ décrit les fichiers à créer et la route à câbler.
 !!! info "Référence complète"
     Pour l'installation détaillée du core et des autres parcours, voir
     [Installer Forge](../../install/poste-linux.md). Pour la configuration MQTT,
-    voir [Configuration IoT](../../iot/configuration.md).
+    voir [Configuration IoT](../configuration.md).
 
 ## Prérequis
 

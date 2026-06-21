@@ -26,8 +26,8 @@ Le diagnostic **complet** (table en base, connexion broker) reste la commande
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `check_package_importable` / `check_config_loadable` / `check_http_api_registrable` | Vérifications de diagnostic **non invasives**. | [Forge IoT — doctor](../../../iot/doctor.md) |
-| `forge iot:doctor` (CLI) | Diagnostic complet (avec `--db`, `--mqtt`). | [Forge IoT — doctor](../../../iot/doctor.md) |
+| `check_package_importable` / `check_config_loadable` / `check_http_api_registrable` | Vérifications de diagnostic **non invasives**. | [Forge IoT — doctor](../../doctor.md) |
+| `forge iot:doctor` (CLI) | Diagnostic complet (avec `--db`, `--mqtt`). | [Forge IoT — doctor](../../doctor.md) |
 
 ## Tester
 

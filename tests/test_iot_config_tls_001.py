@@ -36,8 +36,8 @@ from forge_mvc_iot.config import (
 )
 
 PROJECT_ROOT = Path(__file__).parent.parent
-CONFIG_DOC = PROJECT_ROOT / "docs" / "iot" / "configuration.md"
-MOSQUITTO_DOC = PROJECT_ROOT / "docs" / "iot" / "mosquitto-local.md"
+CONFIG_DOC = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "configuration.md"
+MOSQUITTO_DOC = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "mosquitto-local.md"
 
 
 # ── Défaut : TLS désactivé ───────────────────────────────────────────────────

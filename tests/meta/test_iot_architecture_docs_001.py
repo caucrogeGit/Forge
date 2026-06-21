@@ -20,8 +20,8 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-ARCHITECTURE_PAGE = PROJECT_ROOT / "docs" / "iot" / "architecture.md"
-MKDOCS_YML = PROJECT_ROOT / "mkdocs.yml"
+ARCHITECTURE_PAGE = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "architecture.md"
+MKDOCS_YML = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "mkdocs.yml"
 
 FOLLOW_UP_TICKETS = (
     "IOT-PACKAGE-SCAFFOLD-001",
@@ -52,14 +52,14 @@ class TestArchitecturePageExists:
 class TestArchitecturePageReferencedInNav:
     def test_listed_in_mkdocs_yml(self):
         text = MKDOCS_YML.read_text(encoding="utf-8")
-        assert "iot/architecture.md" in text, (
+        assert "architecture.md" in text, (
             "docs/iot/architecture.md doit être référencé dans mkdocs.yml"
         )
 
     def test_iot_section_present_in_nav(self):
         text = MKDOCS_YML.read_text(encoding="utf-8")
-        assert "IoT:" in text, (
-            "La navigation MkDocs doit contenir une section 'IoT:'"
+        assert "Progression IoT:" in text, (
+            "La navigation MkDocs doit contenir la section IoT (sous-mkdocs du paquet, ADR-038)"
         )
 
 

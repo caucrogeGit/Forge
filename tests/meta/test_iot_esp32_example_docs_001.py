@@ -15,9 +15,9 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-PAGE = PROJECT_ROOT / "docs" / "iot" / "esp32-example.md"
-SKETCH = PROJECT_ROOT / "docs" / "iot" / "examples" / "esp32_mqtt_temperature.ino"
-MKDOCS = PROJECT_ROOT / "mkdocs.yml"
+PAGE = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "esp32-example.md"
+SKETCH = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "examples" / "esp32_mqtt_temperature.ino"
+MKDOCS = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "mkdocs.yml"
 ROADMAP = PROJECT_ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 
 
@@ -43,7 +43,7 @@ def test_sketch_exists():
 
 
 def test_page_referenced_in_mkdocs():
-    assert "iot/esp32-example.md" in MKDOCS.read_text(encoding="utf-8"), (
+    assert "esp32-example.md" in MKDOCS.read_text(encoding="utf-8"), (
         "la page doit être référencée dans la nav mkdocs.yml"
     )
 

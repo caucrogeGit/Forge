@@ -26,7 +26,7 @@ La table `iot_events` est garantie par la migration livrée.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_iot.register_iot_routes` | Brancher l'API HTTP JSON officielle sur le routeur. | [Forge IoT — API HTTP](../../../iot/http-api.md) |
+| `forge_mvc_iot.register_iot_routes` | Brancher l'API HTTP JSON officielle sur le routeur. | [Forge IoT — API HTTP](../../http-api.md) |
 
 ## Tester
 

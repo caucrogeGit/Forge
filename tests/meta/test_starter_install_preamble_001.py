@@ -118,6 +118,11 @@ MIGRATED = {
         PROJECT_ROOT / "packages" / "forge-mvc-images" / "mkdocs.yml",
         "welcome/",
     ),
+    "welcome-iot": (
+        PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-iot" / "mkdocs.yml",
+        "welcome/",
+    ),
 }
 
 
