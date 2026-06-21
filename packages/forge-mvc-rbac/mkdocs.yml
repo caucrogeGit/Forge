@@ -4,9 +4,16 @@
 site_name: rbac
 docs_dir: docs
 nav:
-  - RBAC — Contrôle d'accès (référence): reference.md
+  - RBAC (référence):
+      - Vue d'ensemble: reference.md
+      - Cœur RBAC (rbac.py): references/rbac.md
+      - Contrat RBAC (contract.py): references/contract.md
+      - Autorisation Auth/User (authorization.py): references/authorization.md
+      - Résolveur de permissions (resolver.py): references/resolver.md
+      - Helpers Jinja (jinja.py): references/jinja.md
+      - Liens utilisateur/rôle (user_rbac.py): references/user_rbac.md
   - Contrat RBAC séparé: contract.md
-  - RBAC — Usage applicatif: usage.md
+  - RBAC, usage applicatif: usage.md
   - Progression RBAC:
       - Installation: welcome/installation.md
       - Débutant:

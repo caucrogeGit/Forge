@@ -22,6 +22,23 @@ permissions, après authentification.
 
 ---
 
+## Référence par module
+
+L'API détaillée est documentée page par page, un fichier par module :
+
+| Module | Page | Contenu |
+|---|---|---|
+| `rbac.py` | [Le cœur RBAC](references/rbac.md) | `Permission`, `Role`, `has_permission`, `require_permission` |
+| `contract.py` | [Le contrat RBAC](references/contract.md) | `load_rbac_contract`, permissions déclaratives `rbac.json` |
+| `authorization.py` | [L'autorisation Auth/User](references/authorization.md) | `auth_user_can`, `require_user_permission` |
+| `resolver.py` | [Le résolveur de permissions](references/resolver.md) | `get_user_permissions`, `user_has_permission` |
+| `jinja.py` | [Les helpers Jinja](references/jinja.md) | utilisateur public, helper `can()` |
+| `user_rbac.py` | [Les liens utilisateur / rôle](references/user_rbac.md) | `AuthUserRole`, validation des associations |
+
+Cette page reste la **vue d'ensemble** : modèle de sécurité, chaîne de confiance et intégration.
+
+---
+
 ## RBAC léger core ou RBAC complet opt-in ?
 
 Forge distingue deux niveaux d'autorisation :
