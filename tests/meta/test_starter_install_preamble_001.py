@@ -108,6 +108,11 @@ MIGRATED = {
         PROJECT_ROOT / "packages" / "forge-mvc-audio" / "mkdocs.yml",
         "welcome/",
     ),
+    "welcome-mail": (
+        PROJECT_ROOT / "packages" / "forge-mvc-mail" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-mail" / "mkdocs.yml",
+        "welcome/",
+    ),
 }
 
 

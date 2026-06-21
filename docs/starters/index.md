@@ -67,7 +67,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### Mail (opt-in `forge-mvc-mail`)
 
-[Bonjour Forge Mail](welcome-mail/debutant/mail-welcome.md) · [Composer un message](welcome-mail/debutant/mail-message.md) · [Choisir un transport](welcome-mail/intermediaire/mail-transport.md) · [Rendre un template](welcome-mail/intermediaire/mail-template.md) · [Configurer l'envoi](welcome-mail/avance/mail-config.md) · [Diagnostiquer le module Mail](welcome-mail/avance/mail-doctor.md)
+[Bonjour Forge Mail](../mail/welcome/debutant/mail-welcome.md) · [Composer un message](../mail/welcome/debutant/mail-message.md) · [Choisir un transport](../mail/welcome/intermediaire/mail-transport.md) · [Rendre un template](../mail/welcome/intermediaire/mail-template.md) · [Configurer l'envoi](../mail/welcome/avance/mail-config.md) · [Diagnostiquer le module Mail](../mail/welcome/avance/mail-doctor.md)
 
 ## Progression recommandée
 

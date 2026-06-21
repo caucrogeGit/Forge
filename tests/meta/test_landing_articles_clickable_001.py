@@ -26,6 +26,7 @@ MIGRATED_DOC_ROOTS = {
     "files": PROJECT_ROOT / "packages" / "forge-mvc-files" / "docs",
     "pivot": PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "docs",
     "audio": PROJECT_ROOT / "packages" / "forge-mvc-audio" / "docs",
+    "mail": PROJECT_ROOT / "packages" / "forge-mvc-mail" / "docs",
 }
 
 
@@ -51,7 +52,7 @@ EXPECTED_DOC_PATHS = [
     "philosophy/security",
     "features/auth",
     "features/media",
-    "features/mail",
+    "mail/reference",
     "reference/cli-commands",
     "deployment/deployment",
     "reference/api-json",
@@ -68,7 +69,7 @@ EXPECTED_DOC_PATHS = [
     "starters/welcome-iot/installation",
     "starters/welcome-video/installation",
     "audio/welcome/installation",
-    "starters/welcome-mail/installation",
+    "mail/welcome/installation",
     "pivot/reference",
     # Section Starters (13 cartes de progression)
     "starters/welcome-forge/debutant/welcome",

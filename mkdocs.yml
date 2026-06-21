@@ -106,7 +106,6 @@ nav:
       - API JSON légère: reference/api-json.md
       - Migrations SQL: features/migrations.md
       - Relations entre entités: features/relations.md
-      - Gestion des mails: features/mail.md
       - Auth/User: features/auth.md
       - Sécurité et RBAC: philosophy/security.md
       - RBAC — Contrôle d'accès: features/rbac.md
@@ -237,21 +236,6 @@ nav:
               - Rôles de la requête: starters/welcome-rbac/avance/rbac-request-roles.md
               - Bilan avancé: starters/welcome-rbac/avance/bilan.md
           - Aide-mémoire: starters/welcome-rbac/recapitulatif.md
-      - Progression Mail (welcome-mail):
-          - Installation: starters/welcome-mail/installation.md
-          - Débutant:
-              - Bonjour Forge Mail: starters/welcome-mail/debutant/mail-welcome.md
-              - Composer un message: starters/welcome-mail/debutant/mail-message.md
-              - Bilan débutant: starters/welcome-mail/debutant/bilan.md
-          - Intermédiaire:
-              - Choisir un transport: starters/welcome-mail/intermediaire/mail-transport.md
-              - Rendre un template: starters/welcome-mail/intermediaire/mail-template.md
-              - Bilan intermédiaire: starters/welcome-mail/intermediaire/bilan.md
-          - Avancé:
-              - Configurer l'envoi: starters/welcome-mail/avance/mail-config.md
-              - Diagnostiquer le module Mail: starters/welcome-mail/avance/mail-doctor.md
-              - Bilan avancé: starters/welcome-mail/avance/bilan.md
-          - Aide-mémoire: starters/welcome-mail/recapitulatif.md
       - Progression Markdown (welcome-markdown):
           - Préambule: starters/welcome-markdown/installation.md
           - Débutant:
@@ -347,6 +331,7 @@ nav:
   - Pivot (opt-in): '!include packages/forge-mvc-pivot/mkdocs.yml'
   - i18n (opt-in): '!include packages/forge-mvc-i18n/mkdocs.yml'
   - Audio (opt-in): '!include packages/forge-mvc-audio/mkdocs.yml'
+  - Mail (opt-in): '!include packages/forge-mvc-mail/mkdocs.yml'
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md
