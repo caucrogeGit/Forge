@@ -24,6 +24,7 @@ MIGRATED_DOC_ROOTS = {
     "workflow": PROJECT_ROOT / "packages" / "forge-mvc-workflow" / "docs",
     "mfa": PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "docs",
     "files": PROJECT_ROOT / "packages" / "forge-mvc-files" / "docs",
+    "pivot": PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "docs",
 }
 
 
@@ -67,7 +68,7 @@ EXPECTED_DOC_PATHS = [
     "starters/welcome-video/installation",
     "starters/welcome-audio/installation",
     "starters/welcome-mail/installation",
-    "entities/pivot-advanced",
+    "pivot/reference",
     # Section Starters (13 cartes de progression)
     "starters/welcome-forge/debutant/welcome",
     "mfa/welcome/installation",

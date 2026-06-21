@@ -98,6 +98,11 @@ MIGRATED = {
         PROJECT_ROOT / "packages" / "forge-mvc-files" / "mkdocs.yml",
         "welcome/",
     ),
+    "welcome-pivot": (
+        PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "mkdocs.yml",
+        "welcome/",
+    ),
 }
 
 

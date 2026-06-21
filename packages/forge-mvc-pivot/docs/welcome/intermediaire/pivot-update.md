@@ -14,8 +14,8 @@ paire `(article_id, tag_id)`.
 
 | Méthode | Rôle dans ce starter | Référence |
 |---------|----------------------|-----------|
-| `PivotAdvancedService.update(source_id, target_id, pivot_data)` | Met à jour les attributs ; retourne le nombre de lignes touchées. | [Pivot avancé](../../../entities/pivot-advanced.md) |
-| `PivotAdvancedService.detach(source_id, target_id)` | Supprime l'association ; retourne le nombre de lignes touchées. | [Pivot avancé](../../../entities/pivot-advanced.md) |
+| `PivotAdvancedService.update(source_id, target_id, pivot_data)` | Met à jour les attributs ; retourne le nombre de lignes touchées. | [Pivot avancé](../../reference.md) |
+| `PivotAdvancedService.detach(source_id, target_id)` | Supprime l'association ; retourne le nombre de lignes touchées. | [Pivot avancé](../../reference.md) |
 
 ## Le contrôleur
 

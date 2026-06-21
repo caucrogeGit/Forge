@@ -18,7 +18,7 @@ Premier palier du **niveau intermédiaire**.
 
 | Méthode | Rôle dans ce starter | Référence |
 |---------|----------------------|-----------|
-| `PivotAdvancedService.attach(source_id, target_id, pivot_data)` | Crée l'association et retourne l'id inséré. | [Pivot avancé](../../../entities/pivot-advanced.md) |
+| `PivotAdvancedService.attach(source_id, target_id, pivot_data)` | Crée l'association et retourne l'id inséré. | [Pivot avancé](../../reference.md) |
 
 ## Le contrôleur
 

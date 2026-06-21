@@ -16,8 +16,8 @@ Premier palier du **niveau avancé**.
 
 | Classe | Rôle dans ce starter | Référence |
 |--------|----------------------|-----------|
-| `PivotFieldConstraint(name, required, nullable)` | Contrainte déclarative sur un champ pivot. | [Pivot avancé](../../../entities/pivot-advanced.md) |
-| `PivotConstraintError` | Erreur de contrainte (porte `code` et `field`). | [Pivot avancé](../../../entities/pivot-advanced.md) |
+| `PivotFieldConstraint(name, required, nullable)` | Contrainte déclarative sur un champ pivot. | [Pivot avancé](../../reference.md) |
+| `PivotConstraintError` | Erreur de contrainte (porte `code` et `field`). | [Pivot avancé](../../reference.md) |
 
 ## Déclarer des contraintes
 

@@ -15,8 +15,8 @@ il lève `PivotConstraintError(code="duplicate_pair")`.
 
 | Option / méthode | Rôle dans ce starter | Référence |
 |------------------|----------------------|-----------|
-| `PivotAdvancedService(..., unique_pair=True)` | Active la vérification d'unicité avant `attach`. | [Pivot avancé](../../../entities/pivot-advanced.md) |
-| `PivotAdvancedService.get(source_id, target_id)` | Retourne l'association ou `None`. | [Pivot avancé](../../../entities/pivot-advanced.md) |
+| `PivotAdvancedService(..., unique_pair=True)` | Active la vérification d'unicité avant `attach`. | [Pivot avancé](../../reference.md) |
+| `PivotAdvancedService.get(source_id, target_id)` | Retourne l'association ou `None`. | [Pivot avancé](../../reference.md) |
 
 ## Le contrôleur
 

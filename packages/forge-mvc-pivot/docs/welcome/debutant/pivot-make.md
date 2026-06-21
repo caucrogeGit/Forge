@@ -20,7 +20,7 @@ faut `make:pivot-crud`, qui sait gérer les attributs de la relation.
 
 | Commande | Rôle dans ce starter | Référence |
 |----------|----------------------|-----------|
-| `forge make:pivot-crud` | Génère le sous-CRUD d'un pivot enrichi. | [Pivot avancé](../../../entities/pivot-advanced.md) |
+| `forge make:pivot-crud` | Génère le sous-CRUD d'un pivot enrichi. | [Pivot avancé](../../reference.md) |
 
 ## Générer (mode aperçu)
 

@@ -14,7 +14,8 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-PIVOT = PROJECT_ROOT / "docs" / "starters" / "welcome-pivot"
+# Doc embarquée par paquet depuis l'ADR-038.
+PIVOT = PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "docs" / "welcome"
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",

@@ -6,7 +6,7 @@ décrit les fichiers à créer et le code à écrire.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
-    Pour la référence du module, voir [Tables pivot enrichies](../../entities/pivot-advanced.md).
+    Pour la référence du module, voir [Tables pivot enrichies](../reference.md).
 
 ## Prérequis
 

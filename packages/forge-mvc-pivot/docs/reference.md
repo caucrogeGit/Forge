@@ -418,4 +418,4 @@ python forge.py routes:list
 - L'accès par `id_field` est optionnel et doit être configuré explicitement.
 
 Pour la documentation des tables pivot simples (sans attributs métier),
-voir [Tables pivot many-to-many](pivots-many-to-many.md).
+voir [Tables pivot many-to-many](../entities/pivots-many-to-many.md).

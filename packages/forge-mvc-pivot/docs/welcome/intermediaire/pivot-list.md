@@ -13,8 +13,8 @@ Objectif : lire toutes les associations d'un article, avec leurs attributs.
 
 | Méthode / classe | Rôle dans ce starter | Référence |
 |------------------|----------------------|-----------|
-| `PivotAdvancedService.list_for_source(source_id)` | Liste les associations d'une source. | [Pivot avancé](../../../entities/pivot-advanced.md) |
-| `PivotRow` | Ligne pivot : `source_id`, `target_id`, `pivot_data`. | [Pivot avancé](../../../entities/pivot-advanced.md) |
+| `PivotAdvancedService.list_for_source(source_id)` | Liste les associations d'une source. | [Pivot avancé](../../reference.md) |
+| `PivotRow` | Ligne pivot : `source_id`, `target_id`, `pivot_data`. | [Pivot avancé](../../reference.md) |
 
 ## Le contrôleur
 

@@ -11,7 +11,8 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-DOC_PAGE = Path("docs/entities/pivot-advanced.md")
+# Doc embarquée par paquet depuis l'ADR-038 (montée sous /pivot/reference/).
+DOC_PAGE = Path("packages/forge-mvc-pivot/docs/reference.md")
 MKDOCS = Path("mkdocs.yml")
 PIVOTS_PAGE = Path("docs/entities/pivots-many-to-many.md")
 AUDIT_001 = Path("docs/history/audits/pivot-advanced-functional-model-001.md")
@@ -169,13 +170,15 @@ def test_page_ne_dit_pas_pypi_publie(doc):
 # ── mkdocs.yml ────────────────────────────────────────────────────────────────
 
 def test_mkdocs_reference_la_page(mkdocs):
-    assert "pivot-advanced.md" in mkdocs
+    # Doc embarquée (ADR-038) : le site agrège le sous-mkdocs du paquet pivot.
+    assert "packages/forge-mvc-pivot/mkdocs.yml" in mkdocs
 
 
 # ── pivots-many-to-many.md ────────────────────────────────────────────────────
 
 def test_pivots_page_contient_lien_vers_pivot_advanced(pivots_page):
-    assert "pivot-advanced" in pivots_page
+    # Lien vers la référence pivot embarquée (ADR-038).
+    assert "../pivot/reference.md" in pivots_page
 
 
 # ── Audit ─────────────────────────────────────────────────────────────────────

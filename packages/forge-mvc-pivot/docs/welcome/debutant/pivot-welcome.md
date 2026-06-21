@@ -9,7 +9,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-pivot`.
 précisément ce que `PivotAdvancedService` rend explicite et sûr.
 
 Premier palier du **niveau débutant** de la progression pivot
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-pivot` installé (palier « Installation »). Module à
@@ -33,7 +33,7 @@ Dès que la relation **elle-même** porte une donnée, le pivot enrichi s'impose
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_pivot.PivotAdvancedService` | Service de lecture/écriture d'un pivot enrichi. | [Pivot avancé](../../../entities/pivot-advanced.md) |
+| `forge_mvc_pivot.PivotAdvancedService` | Service de lecture/écriture d'un pivot enrichi. | [Pivot avancé](../../reference.md) |
 
 ## Tester
 

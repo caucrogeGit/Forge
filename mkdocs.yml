@@ -69,7 +69,6 @@ nav:
       - Schéma des entités: entities/entity-schema.md
       - Schéma des relations: entities/relations-schema.md
       - Tables pivot many-to-many: entities/pivots-many-to-many.md
-      - Pivot advanced: entities/pivot-advanced.md
       - Types Forge vers MariaDB: entities/types-forge-mariadb.md
       - Slugs: entities/slugs.md
       - Valider les contrats JSON: entities/entity-validate.md
@@ -251,24 +250,6 @@ nav:
               - Rôles de la requête: starters/welcome-rbac/avance/rbac-request-roles.md
               - Bilan avancé: starters/welcome-rbac/avance/bilan.md
           - Aide-mémoire: starters/welcome-rbac/recapitulatif.md
-      - Progression Pivot (welcome-pivot):
-          - Installation: starters/welcome-pivot/installation.md
-          - Débutant:
-              - Bonjour Forge Pivot: starters/welcome-pivot/debutant/pivot-welcome.md
-              - Générer le sous-CRUD: starters/welcome-pivot/debutant/pivot-make.md
-              - Le schéma SQL: starters/welcome-pivot/debutant/pivot-schema.md
-              - Bilan débutant: starters/welcome-pivot/debutant/bilan.md
-          - Intermédiaire:
-              - Attacher une association: starters/welcome-pivot/intermediaire/pivot-attach.md
-              - Modifier et détacher: starters/welcome-pivot/intermediaire/pivot-update.md
-              - Lister les associations: starters/welcome-pivot/intermediaire/pivot-list.md
-              - Bilan intermédiaire: starters/welcome-pivot/intermediaire/bilan.md
-          - Avancé:
-              - Contraintes de champ: starters/welcome-pivot/avance/pivot-constraints.md
-              - Unicité de la paire: starters/welcome-pivot/avance/pivot-unique.md
-              - Erreurs de formulaire: starters/welcome-pivot/avance/pivot-form.md
-              - Bilan avancé: starters/welcome-pivot/avance/bilan.md
-          - Aide-mémoire: starters/welcome-pivot/recapitulatif.md
       - Progression i18n (welcome-i18n):
           - Installation: starters/welcome-i18n/installation.md
           - Débutant:
@@ -394,6 +375,7 @@ nav:
   - Workflow (opt-in): '!include packages/forge-mvc-workflow/mkdocs.yml'
   - MFA (opt-in): '!include packages/forge-mvc-mfa/mkdocs.yml'
   - Files (opt-in): '!include packages/forge-mvc-files/mkdocs.yml'
+  - Pivot (opt-in): '!include packages/forge-mvc-pivot/mkdocs.yml'
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md

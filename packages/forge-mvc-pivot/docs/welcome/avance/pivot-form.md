@@ -16,8 +16,8 @@ Dernier palier du **niveau avancé**.
 
 | Fonction / classe | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `pivot_error_to_form_error(error)` | Normalise une exception pivot en `PivotFormError`. | [Pivot avancé](../../../entities/pivot-advanced.md) |
-| `PivotFormError` | Erreur affichable : `code`, `message`, `field`. | [Pivot avancé](../../../entities/pivot-advanced.md) |
+| `pivot_error_to_form_error(error)` | Normalise une exception pivot en `PivotFormError`. | [Pivot avancé](../../reference.md) |
+| `PivotFormError` | Erreur affichable : `code`, `message`, `field`. | [Pivot avancé](../../reference.md) |
 
 ## Le contrôleur
 
