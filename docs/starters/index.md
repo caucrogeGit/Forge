@@ -39,7 +39,7 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### Images (opt-in `forge-mvc-images`)
 
-[Bonjour Forge Images](welcome-images/debutant/images-welcome.md) · [Téléverser une image](welcome-images/debutant/image-upload.md) · [Miniatures et variantes](welcome-images/debutant/image-variants.md) · [Rattacher une image à une entité](welcome-images/intermediaire/image-attach.md) · [Afficher la galerie](welcome-images/intermediaire/image-gallery.md) · [Texte alternatif et ordre](welcome-images/intermediaire/image-alt-order.md) · [Image de couverture](welcome-images/avance/image-cover.md) · [Supprimer proprement](welcome-images/avance/image-delete.md) · [Garde de sécurité à l'upload](welcome-images/avance/image-safety.md)
+[Bonjour Forge Images](../images/welcome/debutant/images-welcome.md) · [Téléverser une image](../images/welcome/debutant/image-upload.md) · [Miniatures et variantes](../images/welcome/debutant/image-variants.md) · [Rattacher une image à une entité](../images/welcome/intermediaire/image-attach.md) · [Afficher la galerie](../images/welcome/intermediaire/image-gallery.md) · [Texte alternatif et ordre](../images/welcome/intermediaire/image-alt-order.md) · [Image de couverture](../images/welcome/avance/image-cover.md) · [Supprimer proprement](../images/welcome/avance/image-delete.md) · [Garde de sécurité à l'upload](../images/welcome/avance/image-safety.md)
 
 ### Fichiers (opt-in `forge-mvc-files`)
 

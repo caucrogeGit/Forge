@@ -22,7 +22,8 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-IMAGES = PROJECT_ROOT / "docs" / "starters" / "welcome-images"
+# Doc embarquée par paquet depuis l'ADR-038.
+IMAGES = PROJECT_ROOT / "packages" / "forge-mvc-images" / "docs" / "welcome"
 
 FORBIDDEN_COMMANDS = [
     "forge starter:build",

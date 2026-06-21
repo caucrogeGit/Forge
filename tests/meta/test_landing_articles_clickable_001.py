@@ -27,6 +27,7 @@ MIGRATED_DOC_ROOTS = {
     "pivot": PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "docs",
     "audio": PROJECT_ROOT / "packages" / "forge-mvc-audio" / "docs",
     "mail": PROJECT_ROOT / "packages" / "forge-mvc-mail" / "docs",
+    "images": PROJECT_ROOT / "packages" / "forge-mvc-images" / "docs",
 }
 
 
@@ -65,7 +66,7 @@ EXPECTED_DOC_PATHS = [
     "workflow/reference",
     "stats/reference",
     "files/welcome/installation",
-    "starters/welcome-images/installation",
+    "images/welcome/installation",
     "starters/welcome-iot/installation",
     "starters/welcome-video/installation",
     "audio/welcome/installation",

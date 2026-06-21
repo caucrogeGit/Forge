@@ -10,7 +10,7 @@ qu'il sait traiter.
 simplement comment Forge Images est branché.
 
 Premier palier du **niveau débutant** de la progression images
-([vue d'ensemble des starters](../../index.md)).
+([vue d'ensemble des starters](../../../starters/index.md)).
 
 !!! note "Module opt-in"
     Ce starter suppose le module installé. `forge-mvc-images` dépend de

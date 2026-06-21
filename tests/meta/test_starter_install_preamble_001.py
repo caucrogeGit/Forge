@@ -113,6 +113,11 @@ MIGRATED = {
         PROJECT_ROOT / "packages" / "forge-mvc-mail" / "mkdocs.yml",
         "welcome/",
     ),
+    "welcome-images": (
+        PROJECT_ROOT / "packages" / "forge-mvc-images" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-images" / "mkdocs.yml",
+        "welcome/",
+    ),
 }
 
 

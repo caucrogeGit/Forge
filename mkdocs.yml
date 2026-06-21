@@ -200,24 +200,6 @@ nav:
               - Diagnostiquer le module Vidéo: starters/welcome-video/avance/video-doctor.md
               - Bilan avancé: starters/welcome-video/avance/bilan.md
           - Aide-mémoire: starters/welcome-video/recapitulatif.md
-      - Progression Images (welcome-images):
-          - Installation: starters/welcome-images/installation.md
-          - Débutant:
-              - Bonjour Forge Images: starters/welcome-images/debutant/images-welcome.md
-              - Téléverser une image: starters/welcome-images/debutant/image-upload.md
-              - Miniatures et variantes: starters/welcome-images/debutant/image-variants.md
-              - Bilan débutant: starters/welcome-images/debutant/bilan.md
-          - Intermédiaire:
-              - Rattacher une image à une entité: starters/welcome-images/intermediaire/image-attach.md
-              - Afficher la galerie: starters/welcome-images/intermediaire/image-gallery.md
-              - Texte alternatif et ordre: starters/welcome-images/intermediaire/image-alt-order.md
-              - Bilan intermédiaire: starters/welcome-images/intermediaire/bilan.md
-          - Avancé:
-              - Image de couverture: starters/welcome-images/avance/image-cover.md
-              - Supprimer proprement: starters/welcome-images/avance/image-delete.md
-              - Garde de sécurité à l'upload: starters/welcome-images/avance/image-safety.md
-              - Bilan avancé: starters/welcome-images/avance/bilan.md
-          - Aide-mémoire: starters/welcome-images/recapitulatif.md
       - Progression RBAC (welcome-rbac):
           - Installation: starters/welcome-rbac/installation.md
           - Débutant:
@@ -332,6 +314,7 @@ nav:
   - i18n (opt-in): '!include packages/forge-mvc-i18n/mkdocs.yml'
   - Audio (opt-in): '!include packages/forge-mvc-audio/mkdocs.yml'
   - Mail (opt-in): '!include packages/forge-mvc-mail/mkdocs.yml'
+  - Images (opt-in): '!include packages/forge-mvc-images/mkdocs.yml'
 
   - IoT:
       - Architecture Forge IoT: iot/architecture.md

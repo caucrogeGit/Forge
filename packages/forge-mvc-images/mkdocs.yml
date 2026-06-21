@@ -1,0 +1,26 @@
+# Documentation embarquée du paquet forge-mvc-images (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /images/.
+# La référence média (features/media.md) reste dans le cœur : elle est partagée
+# par files, images et audio.
+site_name: images
+docs_dir: docs
+nav:
+  - Progression Images:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Bonjour Forge Images: welcome/debutant/images-welcome.md
+          - Téléverser une image: welcome/debutant/image-upload.md
+          - Miniatures et variantes: welcome/debutant/image-variants.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Rattacher une image à une entité: welcome/intermediaire/image-attach.md
+          - Afficher la galerie: welcome/intermediaire/image-gallery.md
+          - Texte alternatif et ordre: welcome/intermediaire/image-alt-order.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Image de couverture: welcome/avance/image-cover.md
+          - Supprimer proprement: welcome/avance/image-delete.md
+          - Garde de sécurité à l'upload: welcome/avance/image-safety.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md
