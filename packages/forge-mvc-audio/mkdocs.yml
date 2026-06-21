@@ -4,6 +4,12 @@
 site_name: audio
 docs_dir: docs
 nav:
+  - Référence (par module):
+      - Configuration (config.py): references/config.md
+      - Ingestion (ingest.py): references/ingest.md
+      - Sondage (probe.py): references/probe.md
+      - Transcodage MP3 (transcode.py): references/transcode.md
+      - Lecture HTTP (http.py): references/http.md
   - Progression Audio:
       - Installation: welcome/installation.md
       - Débutant:
