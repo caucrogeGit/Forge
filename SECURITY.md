@@ -4,10 +4,12 @@
 
 | Version | Support sécurité |
 |---------|:----------------:|
-| 1.0.x   | ✅ Actif          |
-| < 1.0   | ❌ Non supporté   |
+| `1.x` — série bêta courante (`1.0.0-beta.x`) | ✅ Actif |
+| `< 1.0.0-beta.1` | ❌ Non supporté |
 
-Seule la branche `1.0.x` reçoit des corrections de sécurité.
+La série `1.x` est la seule supportée ; en phase bêta, cela correspond à la
+préversion courante `1.0.0-beta.x`. Une fois la `1.0.0` stable publiée, la ligne
+supportée sera `1.0.x`.
 
 ---
 
@@ -90,7 +92,7 @@ Configuration **non supportée** par défaut :
 - déploiement horizontal multi-machines ;
 - exposition directe de Forge sur Internet sans reverse proxy.
 
-Pour toute question de déploiement sécurisé, voir [docs/deployment.md](docs/deployment.md).
+Pour toute question de déploiement sécurisé, voir [docs/deployment/deployment.md](docs/deployment/deployment.md).
 
 ---
 
@@ -124,7 +126,7 @@ Forge suit une politique de **divulgation coordonnée** :
 1. Signalement privé par l'auteur ou la communauté.
 2. Confirmation et analyse par le mainteneur.
 3. Développement et test du correctif.
-4. Publication du correctif dans une version corrective (`1.0.x`).
+4. Publication du correctif dans la prochaine préversion bêta (`1.0.0-beta.N`) tant que la `1.0.0` stable n'est pas publiée, puis dans une version corrective `1.0.x`.
 5. Publication de l'advisory après livraison du correctif.
 
 Le délai cible entre réception du rapport et publication du correctif est de **30 jours** pour les vulnérabilités critiques.
