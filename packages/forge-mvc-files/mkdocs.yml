@@ -4,6 +4,10 @@
 site_name: files
 docs_dir: docs
 nav:
+  - Référence (par module):
+      - Upload générique (manager.py): references/manager.md
+      - Primitives de stockage (storage.py): references/storage.md
+      - Rate-limit d'upload (rate_limit.py): references/rate_limit.md
   - Progression Files:
       - Installation: welcome/installation.md
       - Débutant:
