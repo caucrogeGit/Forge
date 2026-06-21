@@ -9,29 +9,42 @@ Contrat strict (chantier opt-ins) :
 
 - **aucune écriture** (ni ``optins/``, ni ``registry.py``, ni
   ``mvc/routes.py``) ;
-- **aucun import** de ``forge_mvc_iot`` ni d'aucun paquet opt-in ;
-- **pas de discovery magique** : seul ``iot`` (le seul opt-in supporté
-  par le chantier actuel) est analysé, par lecture de fichiers connus ;
+- **aucun import** de paquet opt-in (``forge_mvc_*``) ; seul le catalogue
+  statique ``forge_cli.optins.catalog`` est lu ;
+- **pas de discovery magique** : seuls les opt-ins de type ``route``
+  (``iot``, ``video``, ``audio``) reçoivent une couche ``optins/<name>/`` ;
+  leur état projet est analysé par lecture de fichiers connus ;
 - **pas de scan global** des paquets Python installés.
 
-États distingués pour ``iot`` :
+États distingués pour chaque opt-in ``route`` :
 
-- ``absent``  : ``optins/iot/`` absent ;
-- ``partiel`` : ``optins/iot/`` présent mais ``register_optins(router)``
+- ``absent``  : ``optins/<name>/`` absent ;
+- ``partiel`` : ``optins/<name>/`` présent mais ``register_optins(router)``
   absent de ``mvc/routes.py`` ;
-- ``activé``  : ``optins/iot/`` présent **et** ``register_optins(router)``
+- ``activé``  : ``optins/<name>/`` présent **et** ``register_optins(router)``
   présent dans ``mvc/routes.py``.
+
+Les opt-ins ``library`` et ``crosscutting`` n'ont pas de couche projet :
+ils sont listés avec leur kind (sans état projet).
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
+from forge_cli.optins.catalog import (
+    KIND_CROSSCUTTING,
+    KIND_LIBRARY,
+    KIND_ROUTE,
+    OFFICIAL_OPTINS,
+)
+
 __all__ = [
     "STATE_ABSENT",
     "STATE_PARTIAL",
     "STATE_ACTIVE",
     "KNOWN_OPTINS",
+    "detect_optin_state",
     "detect_iot_state",
     "list_optins",
     "main",
@@ -41,19 +54,25 @@ STATE_ABSENT = "absent"
 STATE_PARTIAL = "partiel"
 STATE_ACTIVE = "activé"
 
-# Opt-ins que cette commande sait réellement analyser (chantier actuel).
-KNOWN_OPTINS: tuple[str, ...] = ("iot",)
+# Opt-ins de type ``route`` dont cette commande sait analyser l'état projet
+# (couche ``optins/<name>/``). Dérivé du catalogue, dans l'ordre de déclaration.
+KNOWN_OPTINS: tuple[str, ...] = tuple(
+    name for name, opt in OFFICIAL_OPTINS.items() if opt.kind == KIND_ROUTE
+)
 
 _ROUTES_CALL = "register_optins(router)"
 
 
-def detect_iot_state(project_root: Path) -> dict[str, object]:
-    """Inspecte (lecture seule) l'état de l'opt-in IoT dans le projet.
+def detect_optin_state(project_root: Path, name: str) -> dict[str, object]:
+    """Inspecte (lecture seule) l'état d'un opt-in ``route`` dans le projet.
 
     Retourne un dict avec ``state`` et quelques indicateurs de présence,
-    sans jamais importer ni écrire quoi que ce soit.
+    sans jamais importer ni écrire quoi que ce soit. Le branchement
+    ``register_optins(router)`` est partagé par tous les opt-ins (un seul
+    appel dans ``mvc/routes.py``) ; la distinction par opt-in porte sur la
+    présence de ``optins/<name>/``.
     """
-    routes_py = project_root / "optins" / "iot" / "routes.py"
+    routes_py = project_root / "optins" / name / "routes.py"
     registry_py = project_root / "optins" / "registry.py"
     mvc_routes = project_root / "mvc" / "routes.py"
 
@@ -81,15 +100,20 @@ def detect_iot_state(project_root: Path) -> dict[str, object]:
     }
 
 
-def _print_iot(info: dict[str, object]) -> None:
+def detect_iot_state(project_root: Path) -> dict[str, object]:
+    """Compat : état de l'opt-in IoT. Voir :func:`detect_optin_state`."""
+    return detect_optin_state(project_root, "iot")
+
+
+def _print_route_optin(name: str, info: dict[str, object]) -> None:
     state = info["state"]
-    print(f"  iot       {state}")
+    print(f"  {name:<9} {state}")
 
     if state == STATE_ABSENT:
-        print("            conseil   : forge opt-in:enable iot --apply")
+        print(f"            conseil   : forge opt-in:enable {name} --apply")
         return
 
-    print("            structure : optins/iot/")
+    print(f"            structure : optins/{name}/")
     if info["registry_present"]:
         print("            registry  : optins/registry.py")
 
@@ -103,7 +127,7 @@ def _print_iot(info: dict[str, object]) -> None:
             "            routes    : register_optins(router) absent "
             "de mvc/routes.py"
         )
-        print("            conseil   : forge opt-in:enable iot --apply")
+        print(f"            conseil   : forge opt-in:enable {name} --apply")
 
 
 def _print_other_optins() -> None:
@@ -112,32 +136,24 @@ def _print_other_optins() -> None:
     Lecture seule, aucun import de paquet opt-in : on ne lit que le catalogue
     statique (forge_cli), pas les paquets ``forge_mvc_*``.
     """
-    from forge_cli.optins.catalog import (
-        KIND_CROSSCUTTING,
-        KIND_LIBRARY,
-        KIND_ROUTE,
-        OFFICIAL_OPTINS,
-    )
-
     labels = {
         KIND_LIBRARY: "bibliothèque",
         KIND_CROSSCUTTING: "transversal",
-        KIND_ROUTE: "branchement projet",
     }
     for opt in OFFICIAL_OPTINS.values():
-        if opt.name == "iot":
-            continue  # iot est détaillé à part (état projet détecté ci-dessus)
+        if opt.kind == KIND_ROUTE:
+            continue  # détaillés à part (état projet détecté ci-dessus)
         label = labels.get(opt.kind, opt.kind)
         print(f"  {opt.name:<9} {label}")
-        print(f"            conseil   : forge opt-in:enable {opt.name}")
 
 
 def list_optins(*, project_root: Path) -> int:
     """Affiche l'état des opt-ins connus. Toujours ``0`` (lecture seule)."""
     print("Forge opt-ins")
     print("")
-    _print_iot(detect_iot_state(project_root))
-    print("")
+    for name in KNOWN_OPTINS:
+        _print_route_optin(name, detect_optin_state(project_root, name))
+        print("")
     _print_other_optins()
     print("")
     print("Aucune modification effectuée.")

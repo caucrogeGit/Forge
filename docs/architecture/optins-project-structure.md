@@ -271,5 +271,6 @@ Ce ticket **pose le contrat**. Ne sont **pas** faits ici :
   `mvc/routes.py` **si la structure est reconnue** (`router = Router()`),
   sinon `[WARN]` + instruction manuelle (aucune modification).
 - `OPTINS-CLI-LIST-001` (**livré**) — `forge optin:list`, commande
-  **lecture seule** qui affiche l'état local des opt-ins (`absent` /
-  `partiel` / `activé` pour `iot`), sans rien créer ni modifier.
+  **lecture seule** qui affiche l'état local des opt-ins `route` (`absent` /
+  `partiel` / `activé` pour `iot`, `video`, `audio`) et liste les opt-ins
+  `library` / `crosscutting` avec leur kind, sans rien créer ni modifier.
