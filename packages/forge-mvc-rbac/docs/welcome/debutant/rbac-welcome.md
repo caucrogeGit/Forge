@@ -9,7 +9,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-rbac` et son
 `get_contract_permissions` liste les permissions d'un rôle.
 
 Premier palier du **niveau débutant** de la progression RBAC
-([vue d'ensemble des starters](../../../starters/index.md)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce starter livre un contrat de démonstration (`mvc/security/rbac.json`) et
@@ -25,8 +25,8 @@ Premier palier du **niveau débutant** de la progression RBAC
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.load_rbac_contract` | Charger et valider `mvc/security/rbac.json`. | [RBAC](../../../reference/api.md) |
-| `forge_mvc_rbac.get_contract_permissions` | Permissions accordées à un ensemble de rôles. | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.load_rbac_contract` | Charger et valider `mvc/security/rbac.json`. | RBAC |
+| `forge_mvc_rbac.get_contract_permissions` | Permissions accordées à un ensemble de rôles. | RBAC |
 
 ## Tester
 

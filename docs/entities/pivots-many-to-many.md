@@ -239,7 +239,7 @@ Quand un pivot porte des attributs métier significatifs (`position`, `note`,
 `role`…) et que `make:crud` est insuffisant ou bloqué, consultez la
 documentation dédiée :
 
-**[Pivot advanced — tables pivot avec attributs](../pivot/reference.md)**
+**Pivot advanced — tables pivot avec attributs**
 
 Elle couvre la déclaration du contrat, la génération du sous-CRUD avec
 `make:pivot-crud`, l'utilisation de `PivotAdvancedService` et la gestion

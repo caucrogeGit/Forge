@@ -5,13 +5,13 @@ Forge existant. La progression se réalise ensuite **à la main** : chaque palie
 décrit les fichiers à créer et le code à écrire.
 
 !!! info "Référence complète"
-    Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
+    Pour l'installation détaillée du core, voir Installer Forge.
     Pour la référence du module, voir [Tables pivot enrichies](../reference.md).
 
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
-  [Installer Forge](../../install/poste-linux.md).
+  Installer Forge.
 - **Python 3.12+**.
 - Aucune base de données pour ce parcours : les opérations sur la base sont démontrées
   via un **exécuteur injecté** de démonstration. Une vraie application crée la table

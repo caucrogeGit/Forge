@@ -40,13 +40,16 @@ class TestReferenceIndexIsLight:
     def test_reference_md_links_to_api(self):
         assert "](api.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
-    def test_reference_md_links_to_workflow(self):
-        # forge-mvc-workflow : doc embarquée par paquet (ADR-038), lien hors dossier.
-        assert "](../workflow/reference.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
-
-    def test_reference_md_links_to_stats(self):
-        # forge-mvc-stats : doc embarquée par paquet (ADR-038), lien hors dossier.
-        assert "](../stats/reference.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
+    def test_reference_md_no_link_to_optins(self):
+        # ADR-042 : aucun lien transversal cœur -> opt-in. L'index de référence
+        # peut MENTIONNER les modules extraits (cf. test ci-dessous) mais ne doit
+        # plus pointer par lien vers leur doc embarquée (../<slug>/...).
+        content = REFERENCE_INDEX.read_text(encoding="utf-8")
+        for slug in ("workflow", "stats", "mfa", "rbac"):
+            assert f"](../{slug}/" not in content, (
+                f"docs/reference/reference.md ne doit plus lier l'opt-in {slug} "
+                f"(ADR-042, découplage cœur/opt-ins)."
+            )
 
     def test_reference_md_links_to_modules(self):
         assert "](modules.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")

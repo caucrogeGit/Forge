@@ -22,8 +22,8 @@ Deuxième palier du **niveau débutant** de la progression RBAC.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.normalize_permission_code` | Normaliser un code de permission. | [RBAC](../../../reference/api.md) |
-| `forge_mvc_rbac.validate_permission` | Refuser un code invalide. | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.normalize_permission_code` | Normaliser un code de permission. | RBAC |
+| `forge_mvc_rbac.validate_permission` | Refuser un code invalide. | RBAC |
 
 ## Tester
 

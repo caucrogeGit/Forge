@@ -394,8 +394,8 @@ Pour continuer, consulter la documentation dédiée à la brique installée :
 
 * [Structure des opt-ins dans un projet Forge](../architecture/optins-project-structure.md)
 * [Référence CLI : commandes `opt-in:*`](../reference/cli-commands.md#opt-ins-branchement-projet)
-* [Forge IoT](../iot/architecture.md)
-* [Configuration Forge IoT](../iot/configuration.md)
+* Forge IoT
+* Configuration Forge IoT
 * [Migrations SQL](../features/migrations.md)
 * [Préparer MariaDB](mariadb.md)
 * [Installation sur Debian, Ubuntu et leurs dérivées](poste-linux.md)

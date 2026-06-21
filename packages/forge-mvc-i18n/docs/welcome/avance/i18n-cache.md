@@ -15,7 +15,7 @@ que l'application tourne, le changement n'apparaît qu'après
 
 | Fonction | Rôle dans ce starter | Référence |
 |----------|----------------------|-----------|
-| `clear_translation_cache()` | Vide le cache des catalogues. | [Opt-ins](../../../install/opt-ins.md) |
+| `clear_translation_cache()` | Vide le cache des catalogues. | Opt-ins |
 
 ## Le contrôleur
 

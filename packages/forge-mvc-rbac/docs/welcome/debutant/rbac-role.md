@@ -21,8 +21,8 @@ Troisième palier du **niveau débutant** de la progression RBAC.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.normalize_role_slug` | Dériver un slug depuis un nom de rôle. | [RBAC](../../../reference/api.md) |
-| `forge_mvc_rbac.validate_role` | Refuser un rôle invalide. | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.normalize_role_slug` | Dériver un slug depuis un nom de rôle. | RBAC |
+| `forge_mvc_rbac.validate_role` | Refuser un rôle invalide. | RBAC |
 
 ## Tester
 

@@ -22,9 +22,9 @@ Deuxième palier du **niveau avancé** de la progression workflow.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_workflow.workflow_status_label` | Libellé d'affichage d'un statut. | [Workflow](../../../reference/api.md) |
-| `forge_mvc_workflow.workflow_status_color` | Couleur d'un statut (défaut `gray`). | [Workflow](../../../reference/api.md) |
-| `forge_mvc_workflow.workflow_status_badge_class` | Classes Tailwind d'un badge. | [Workflow](../../../reference/api.md) |
+| `forge_mvc_workflow.workflow_status_label` | Libellé d'affichage d'un statut. | Workflow |
+| `forge_mvc_workflow.workflow_status_color` | Couleur d'un statut (défaut `gray`). | Workflow |
+| `forge_mvc_workflow.workflow_status_badge_class` | Classes Tailwind d'un badge. | Workflow |
 
 ## Tester
 

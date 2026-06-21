@@ -17,7 +17,7 @@ Dernier palier du **niveau avancé**.
 
 | Élément | Rôle dans ce starter | Référence |
 |---------|----------------------|-----------|
-| `TranslationCatalogError` | Catalogue absent, JSON invalide, ou locale interdite. | [Opt-ins](../../../install/opt-ins.md) |
+| `TranslationCatalogError` | Catalogue absent, JSON invalide, ou locale interdite. | Opt-ins |
 
 ## Le contrôleur
 

@@ -23,8 +23,8 @@ Premier palier du **niveau intermédiaire** de la progression MFA.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.create_totp_factor` | Créer un facteur TOTP pending (secret chiffré). | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.confirm_totp_factor` | Activer le facteur après vérification d'un code. | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.create_totp_factor` | Créer un facteur TOTP pending (secret chiffré). | MFA |
+| `forge_mvc_mfa.confirm_totp_factor` | Activer le facteur après vérification d'un code. | MFA |
 
 ## Tester
 

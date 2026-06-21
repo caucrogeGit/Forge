@@ -9,7 +9,7 @@ de passe**. Aucun broker, aucune base : on découvre simplement comment Forge Io
 est branché.
 
 Premier palier du **niveau débutant** de la progression IoT
-([vue d'ensemble des starters](../../../starters/index.md#progression-recommandee)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce starter suppose le module installé : `forge opt-in:install iot`
@@ -29,7 +29,7 @@ Aucun broker MQTT, aucune base de données.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `forge_mvc_iot.config.load_iot_config` | Lire la configuration MQTT du module IoT. | [Forge IoT](../../architecture.md) |
-| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/api.md#corehttpresponse) |
+| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | Response |
 
 ## Tester
 

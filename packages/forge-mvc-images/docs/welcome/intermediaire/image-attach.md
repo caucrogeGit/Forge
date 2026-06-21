@@ -28,9 +28,9 @@ Premier palier du **niveau intermédiaire** de la progression images.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.save_image_upload` | Vérifier, écrire, générer les variantes. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.attach_media_to_entity` | Créer la ligne `media` reliée à l'entité. | [Médias](../../../features/media.md) |
-| `request.file(...)` | Récupérer l'image envoyée. | [Request](../../../reference/http.md) |
+| `forge_mvc_images.save_image_upload` | Vérifier, écrire, générer les variantes. | Médias |
+| `forge_mvc_images.attach_media_to_entity` | Créer la ligne `media` reliée à l'entité. | Médias |
+| `request.file(...)` | Récupérer l'image envoyée. | Request |
 
 ## Tester
 

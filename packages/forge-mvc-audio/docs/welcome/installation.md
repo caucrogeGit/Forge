@@ -6,7 +6,7 @@ palier décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir
-    [Installer Forge](../../install/poste-linux.md).
+    Installer Forge.
 
 !!! info "Module publié sur PyPI"
     `forge-mvc-audio` est publié sur PyPI depuis `1.0.0-beta.13`. On l'installe
@@ -16,7 +16,7 @@ palier décrit les fichiers à créer et la route à câbler.
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
-  [Installer Forge](../../install/poste-linux.md).
+  Installer Forge.
 - **Python 3.12+**.
 - **`ffprobe` / `ffmpeg`** (binaires système, **pas** des dépendances pip) :
   nécessaires au niveau **avancé** (sonder, transcoder). Les paliers débutant
@@ -41,7 +41,7 @@ forge new mon-projet-audio
 ```
 
 Le détail de la création d'un projet est décrit dans
-[Installer Forge](../../install/poste-linux.md).
+Installer Forge.
 Aucun starter n'est généré : les fichiers du parcours se créent à la main au
 fil des paliers.
 

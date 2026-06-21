@@ -24,8 +24,8 @@ Premier palier du **niveau intermédiaire** de la progression files.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.save_upload` | Tente l'upload (valide puis écrit). | [Médias](../../../features/media.md) |
-| `UploadInvalidExtensionError` / `…MimeTypeError` / `UploadTooLargeError` | Refus précis selon la règle. | [Médias](../../../features/media.md) |
+| `forge_mvc_files.save_upload` | Tente l'upload (valide puis écrit). | Médias |
+| `UploadInvalidExtensionError` / `…MimeTypeError` / `UploadTooLargeError` | Refus précis selon la règle. | Médias |
 
 ## Tester
 

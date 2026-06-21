@@ -24,8 +24,8 @@ Deuxième palier du **niveau intermédiaire** de la progression images.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.get_media_gallery` | Lire les médias `gallery` d'une entité, variantes incluses. | [Médias](../../../features/media.md) |
-| `BaseController.render` | Rendre la vue de la galerie. | [BaseController](../../../reference/api.md) |
+| `forge_mvc_images.get_media_gallery` | Lire les médias `gallery` d'une entité, variantes incluses. | Médias |
+| `BaseController.render` | Rendre la vue de la galerie. | BaseController |
 
 ## Tester
 

@@ -7,7 +7,7 @@ briques** : facteurs (`TOTP`, `recovery`), statuts (`pending`/`active`/`disabled
 et la présence de la clé de chiffrement `FORGE_MFA_SECRET_KEY` (sans la révéler).
 
 Premier palier du **niveau débutant** de la progression MFA
-([vue d'ensemble des starters](../../../starters/index.md)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce parcours décortique **chaque brique** MFA isolément, pour comprendre
@@ -23,8 +23,8 @@ Premier palier du **niveau débutant** de la progression MFA
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.MFA_FACTOR_TOTP` / `MFA_FACTOR_RECOVERY` | Les deux types de facteurs. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.validate_mfa_secret_key_config` | Vérifier que la clé de chiffrement est configurée. | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.MFA_FACTOR_TOTP` / `MFA_FACTOR_RECOVERY` | Les deux types de facteurs. | MFA |
+| `forge_mvc_mfa.validate_mfa_secret_key_config` | Vérifier que la clé de chiffrement est configurée. | MFA |
 
 ## Tester
 

@@ -23,7 +23,7 @@ La table `iot_events` est garantie par la migration livrée.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `IotEventRepository.list_recent` | Lire les derniers événements à afficher. | [Forge IoT — stockage](../../storage-events.md) |
-| `BaseController.render` | Rendre le tableau de bord HTML. | [BaseController](../../../reference/api.md#coremvccontroller) |
+| `BaseController.render` | Rendre le tableau de bord HTML. | BaseController |
 
 ## Tester
 

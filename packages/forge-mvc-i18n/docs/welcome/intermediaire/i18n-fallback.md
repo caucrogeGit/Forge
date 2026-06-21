@@ -14,8 +14,8 @@ présente dans le catalogue de secours, `trans` renvoie la valeur de secours.
 
 | Fonction | Rôle dans ce starter | Référence |
 |----------|----------------------|-----------|
-| `set_fallback_locale(locale)` | Déclare la locale de secours. | [Opt-ins](../../../install/opt-ins.md) |
-| `get_fallback_locale()` | Lit la locale de secours. | [Opt-ins](../../../install/opt-ins.md) |
+| `set_fallback_locale(locale)` | Déclare la locale de secours. | Opt-ins |
+| `get_fallback_locale()` | Lit la locale de secours. | Opt-ins |
 
 ## 1. Catalogues volontairement déséquilibrés
 

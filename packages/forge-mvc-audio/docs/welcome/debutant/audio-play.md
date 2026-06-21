@@ -23,7 +23,7 @@ Troisième palier du **niveau débutant** de la progression audio.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_audio.register_audio_routes` | Brancher la route de lecture (`GET /audio/{uuid}`). | [Audio](../../../features/media.md) |
+| `forge_mvc_audio.register_audio_routes` | Brancher la route de lecture (`GET /audio/{uuid}`). | Audio |
 
 ## Tester
 

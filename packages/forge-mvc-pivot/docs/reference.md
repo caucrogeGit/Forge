@@ -48,4 +48,4 @@ L'exemple fil rouge est `Article` ↔ `article_tag` ↔ `Tag`, où chaque associ
 - La synchronisation globale destructive (remplacer toutes les associations d'une source) n'est pas encore couverte : utilisez `detach` puis `attach`.
 - L'accès par `id_field` est optionnel et doit être configuré explicitement.
 
-Pour les tables pivot simples (sans attributs métier), voir [Tables pivot many-to-many](../entities/pivots-many-to-many.md).
+Pour les tables pivot simples (sans attributs métier), voir Tables pivot many-to-many.

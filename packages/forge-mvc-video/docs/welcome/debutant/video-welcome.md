@@ -9,7 +9,7 @@ token**. Aucun ffmpeg, aucune base : on découvre simplement comment Forge Vidé
 est branché.
 
 Premier palier du **niveau débutant** de la progression vidéo
-([vue d'ensemble des starters](../../../starters/index.md#progression-recommandee)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce starter suppose le module installé : `forge opt-in:install video`
@@ -29,7 +29,7 @@ Aucun ffmpeg, aucune base de données.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `forge_mvc_video.config.load_video_config` | Lire la configuration du module vidéo. | [Parcours vidéo](../../parcours.md) |
-| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/api.md#corehttpresponse) |
+| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | Response |
 
 ## Tester
 

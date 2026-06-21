@@ -22,7 +22,7 @@ Deuxième palier du **niveau intermédiaire** de la progression RBAC.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.require_contract_permission` | Garde de route (403 si refusée, None sinon). | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.require_contract_permission` | Garde de route (403 si refusée, None sinon). | RBAC |
 
 ## Tester
 

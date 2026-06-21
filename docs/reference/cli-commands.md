@@ -1135,7 +1135,7 @@ défaut** : `--db` ajoute l'accès à `iot_events` (et la conformité du
 schéma), `--mqtt` ajoute une connexion brève au broker (TLS si
 `FORGE_IOT_MQTT_TLS_ENABLED=true`).
 
-**Voir aussi :** [Diagnostic Forge IoT](../iot/doctor.md)
+**Voir aussi :** Diagnostic Forge IoT
 
 </details>
 
@@ -1156,7 +1156,7 @@ identique, ne réécrit jamais une copie modifiée).
 
 **Étape suivante :** `forge migration:apply`.
 
-**Voir aussi :** [forge iot:init](../iot/init-command.md)
+**Voir aussi :** forge iot:init
 
 </details>
 
@@ -1175,7 +1175,7 @@ production (pas de retry/backoff, pas de batch). `Ctrl+C` arrête
 proprement (déconnexion garantie) puis affiche un résumé de session
 (mesures reçues / stockées / erreurs de contrat / erreurs de stockage).
 
-**Voir aussi :** [forge iot:listen](../iot/listen-command.md)
+**Voir aussi :** forge iot:listen
 
 </details>
 
@@ -1195,7 +1195,7 @@ Options : `--profile temperature|humidity|presence|energy` (défauts prêts
 `--count` (1..1000), `--interval` (0..60 s). **Ne lance pas** le
 subscriber et **ne touche pas** la base : publie uniquement sur MQTT.
 
-**Voir aussi :** [Simulateur Forge IoT](../iot/simulator.md)
+**Voir aussi :** Simulateur Forge IoT
 
 </details>
 

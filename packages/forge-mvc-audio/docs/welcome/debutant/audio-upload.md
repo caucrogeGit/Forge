@@ -24,9 +24,9 @@ Deuxième palier du **niveau débutant** de la progression audio.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_audio.ingest_audio` | Valider et stocker un audio source (uuid-based). | [Audio](../../../features/media.md) |
-| `forge_mvc_audio.AudioIngestError` | Erreur si l'upload est refusé (extension, taille, vide). | [Audio](../../../features/media.md) |
-| `request.file(...)` | Récupérer le fichier envoyé. | [Request](../../../reference/http.md) |
+| `forge_mvc_audio.ingest_audio` | Valider et stocker un audio source (uuid-based). | Audio |
+| `forge_mvc_audio.AudioIngestError` | Erreur si l'upload est refusé (extension, taille, vide). | Audio |
+| `request.file(...)` | Récupérer le fichier envoyé. | Request |
 
 ## Tester
 

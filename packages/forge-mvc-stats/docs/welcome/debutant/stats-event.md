@@ -21,8 +21,8 @@ Deuxième palier du **niveau débutant** de la progression stats.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_stats.normalize_event_name` | Normaliser un nom d'événement. | [Stats](../../../reference/api.md) |
-| `forge_mvc_stats.validate_event_name` | Refuser un nom invalide. | [Stats](../../../reference/api.md) |
+| `forge_mvc_stats.normalize_event_name` | Normaliser un nom d'événement. | Stats |
+| `forge_mvc_stats.validate_event_name` | Refuser un nom invalide. | Stats |
 
 ## Tester
 

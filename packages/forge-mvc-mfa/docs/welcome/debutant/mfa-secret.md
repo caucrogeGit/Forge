@@ -23,8 +23,8 @@ Deuxième palier du **niveau débutant** de la progression MFA.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.generate_totp_secret` | Produire un secret TOTP base32. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.totp_provisioning_uri` | Construire l'URI `otpauth://` (QR). | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.generate_totp_secret` | Produire un secret TOTP base32. | MFA |
+| `forge_mvc_mfa.totp_provisioning_uri` | Construire l'URI `otpauth://` (QR). | MFA |
 
 ## Tester
 

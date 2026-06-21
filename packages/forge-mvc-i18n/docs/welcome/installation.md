@@ -5,13 +5,13 @@ Forge existant. La progression se réalise ensuite **à la main** : chaque palie
 décrit les fichiers à créer et le code à écrire.
 
 !!! info "Référence complète"
-    Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
-    Pour la décision d'architecture, voir [ADR-027 — Extraction i18n](../../adr/027-i18n-extraction.md).
+    Pour l'installation détaillée du core, voir Installer Forge.
+    Pour la décision d'architecture, voir ADR-027 — Extraction i18n.
 
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
-  [Installer Forge](../../install/poste-linux.md).
+  Installer Forge.
 - **Python 3.12+**.
 - Aucune base de données : l'i18n lit des **catalogues JSON** sur disque, pas la base.
 

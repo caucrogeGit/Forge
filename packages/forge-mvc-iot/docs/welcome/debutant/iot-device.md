@@ -24,7 +24,7 @@ Lecture seule, aucun broker.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `request.route` | Lire `site` et `device_id` dans l'URL. | [Request](../../../reference/api.md#corehttprequest) |
+| `request.route` | Lire `site` et `device_id` dans l'URL. | Request |
 | `IotEventRepository.find_by_device` | Événements d'un capteur (ordre du plus récent). | [Forge IoT — stockage](../../storage-events.md) |
 | `IotEventRepository.count_by_device` | Nombre d'événements d'un capteur. | [Forge IoT — stockage](../../storage-events.md) |
 

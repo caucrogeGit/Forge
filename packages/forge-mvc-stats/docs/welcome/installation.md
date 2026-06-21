@@ -5,12 +5,12 @@ Forge existant. La progression se réalise ensuite **à la main** : chaque palie
 décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
-    Pour l'installation détaillée du core, voir [Installer Forge](../../install/poste-linux.md).
+    Pour l'installation détaillée du core, voir Installer Forge.
 
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
-  [Installer Forge](../../install/poste-linux.md).
+  Installer Forge.
 - **Python 3.12+**.
 - Aucune base de données pour ce parcours : les opérations sur la base sont démontrées
   via un **exécuteur injecté** de démonstration. Une vraie application crée la table
@@ -34,7 +34,7 @@ forge new mon-projet-stats
 ```
 
 Le détail de la création d'un projet est décrit dans
-[Installer Forge](../../install/poste-linux.md).
+Installer Forge.
 Aucun starter n'est généré : les fichiers du parcours se créent à la main au
 fil des paliers.
 

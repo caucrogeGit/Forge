@@ -10,7 +10,7 @@ fichiers à créer et la route à câbler.
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
-  [Installer Forge](../../install/poste-linux.md).
+  Installer Forge.
 - **Python 3.12+**.
 
 ## 1. Installer le module opt-in Mail
@@ -29,7 +29,7 @@ forge new mon-projet-mail
 ```
 
 Le détail de la création d'un projet est décrit dans
-[Installer Forge](../../install/poste-linux.md).
+Installer Forge.
 Aucun starter n'est généré : les fichiers du parcours se créent à la main au
 fil des paliers.
 

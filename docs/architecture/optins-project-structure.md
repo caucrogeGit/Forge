@@ -198,7 +198,7 @@ def register(router):
 Le package `forge-mvc-iot` (dans `packages/forge-mvc-iot/`) fournit tout
 le reste : contrat MQTT, subscriber, repository, API HTTP, CLI
 (`forge iot:doctor`, `iot:init`, `iot:listen`, `iot:simulate`). Voir
-l'[architecture Forge IoT](../iot/architecture.md) et l'[audit de
+l'architecture Forge IoT et l'[audit de
 clôture IoT](../history/audits/audit-iot-closing.md).
 
 !!! example "Exemple vivant : le starter `welcome-iot`"

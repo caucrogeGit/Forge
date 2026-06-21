@@ -30,10 +30,10 @@ Aucune base de données : l'image et ses variantes vivent sur le disque.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.save_image_upload` | Vérifier le contenu, écrire, générer les variantes. | [Médias](../../../features/media.md) |
-| `forge_mvc_files.UploadError` | Erreur levée si l'image est refusée (format, taille, contenu). | [Médias](../../../features/media.md) |
-| `request.file(...)` | Récupérer le fichier envoyé. | [Request](../../../reference/http.md) |
-| `BaseController.render` | Rendre la vue du formulaire. | [BaseController](../../../reference/api.md) |
+| `forge_mvc_images.save_image_upload` | Vérifier le contenu, écrire, générer les variantes. | Médias |
+| `forge_mvc_files.UploadError` | Erreur levée si l'image est refusée (format, taille, contenu). | Médias |
+| `request.file(...)` | Récupérer le fichier envoyé. | Request |
+| `BaseController.render` | Rendre la vue du formulaire. | BaseController |
 
 ## Tester
 

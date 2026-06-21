@@ -21,9 +21,9 @@ Troisième palier du **niveau intermédiaire** de la progression stats.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_stats.make_event` | Construire (et valider) un événement. | [Stats](../../../reference/api.md) |
-| `forge_mvc_stats.validate_event` | Re-vérifier un événement existant. | [Stats](../../../reference/api.md) |
-| `forge_mvc_stats.StatsEventError` | Erreur si l'événement est invalide. | [Stats](../../../reference/api.md) |
+| `forge_mvc_stats.make_event` | Construire (et valider) un événement. | Stats |
+| `forge_mvc_stats.validate_event` | Re-vérifier un événement existant. | Stats |
+| `forge_mvc_stats.StatsEventError` | Erreur si l'événement est invalide. | Stats |
 
 ## Tester
 

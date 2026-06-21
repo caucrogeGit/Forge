@@ -23,8 +23,8 @@ Deuxième palier du **niveau avancé** de la progression audio.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_audio.transcode_to_mp3` | Transcoder un audio en MP3 via `ffmpeg`. | [Audio](../../../features/media.md) |
-| `forge_mvc_audio.FfmpegError` | Erreur si `ffmpeg` échoue. | [Audio](../../../features/media.md) |
+| `forge_mvc_audio.transcode_to_mp3` | Transcoder un audio en MP3 via `ffmpeg`. | Audio |
+| `forge_mvc_audio.FfmpegError` | Erreur si `ffmpeg` échoue. | Audio |
 
 ## Tester
 

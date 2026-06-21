@@ -24,8 +24,8 @@ Deuxième palier du **niveau avancé** de la progression images.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.delete_media` | Supprimer ligne + fichier + variantes. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.list_media_for_entity` | Lister les images à supprimer. | [Médias](../../../features/media.md) |
+| `forge_mvc_images.delete_media` | Supprimer ligne + fichier + variantes. | Médias |
+| `forge_mvc_images.list_media_for_entity` | Lister les images à supprimer. | Médias |
 
 ## Tester
 

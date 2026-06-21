@@ -21,8 +21,8 @@ Premier palier du **niveau avancé** de la progression stats.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_stats.get_stats_events_admin_sql` | Le `SELECT` filtrable. | [Stats](../../../reference/api.md) |
-| `forge_mvc_stats.prepare_stats_events_admin_params` | Les paramètres du `SELECT`. | [Stats](../../../reference/api.md) |
+| `forge_mvc_stats.get_stats_events_admin_sql` | Le `SELECT` filtrable. | Stats |
+| `forge_mvc_stats.prepare_stats_events_admin_params` | Les paramètres du `SELECT`. | Stats |
 
 ## Tester
 

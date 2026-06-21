@@ -22,8 +22,8 @@ Troisième palier du **niveau débutant** de la progression files.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.serve_media_file` | Servir un fichier par son chemin relatif, anti-traversal + 404. | [Médias](../../../features/media.md) |
-| `request.query(...)` | Lire le chemin demandé. | [Request](../../../reference/http.md) |
+| `forge_mvc_files.serve_media_file` | Servir un fichier par son chemin relatif, anti-traversal + 404. | Médias |
+| `request.query(...)` | Lire le chemin demandé. | Request |
 
 ## Tester
 

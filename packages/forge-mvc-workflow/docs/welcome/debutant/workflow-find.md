@@ -21,7 +21,7 @@ Troisième palier du **niveau débutant** de la progression workflow.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_workflow.find_status` | Retrouver un statut par son nom. | [Workflow](../../../reference/api.md) |
+| `forge_mvc_workflow.find_status` | Retrouver un statut par son nom. | Workflow |
 
 ## Tester
 

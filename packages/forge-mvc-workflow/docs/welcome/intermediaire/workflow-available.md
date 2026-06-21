@@ -21,7 +21,7 @@ Troisième palier du **niveau intermédiaire** de la progression workflow.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_workflow.get_available_transitions` | Lister les transitions partant d'un statut. | [Workflow](../../../reference/api.md) |
+| `forge_mvc_workflow.get_available_transitions` | Lister les transitions partant d'un statut. | Workflow |
 
 ## Tester
 

@@ -23,8 +23,8 @@ Deuxième palier du **niveau avancé** de la progression RBAC.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.get_user_permissions` | Permissions effectives d'un utilisateur (via `fetch_all`). | [RBAC](../../../reference/api.md) |
-| `forge_mvc_rbac.user_has_permission` | Test d'une permission pour un utilisateur. | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.get_user_permissions` | Permissions effectives d'un utilisateur (via `fetch_all`). | RBAC |
+| `forge_mvc_rbac.user_has_permission` | Test d'une permission pour un utilisateur. | RBAC |
 
 ## Tester
 

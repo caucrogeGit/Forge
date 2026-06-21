@@ -15,7 +15,7 @@ ce qui aide à repérer les oublis.
 
 | Fonction | Rôle dans ce starter | Référence |
 |----------|----------------------|-----------|
-| `trans(key, locale)` | Retourne la clé si elle est introuvable partout. | [Opt-ins](../../../install/opt-ins.md) |
+| `trans(key, locale)` | Retourne la clé si elle est introuvable partout. | Opt-ins |
 
 ## Le contrôleur
 

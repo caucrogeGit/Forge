@@ -250,7 +250,7 @@ sans exécuter le SQL) et `forge update --dry-run`.
    `register_optins(router)` dans `mvc/routes.py` ;
 4. rappelle `forge iot:init` + `forge migration:apply` pour la table
    `iot_events` ;
-5. renvoie vers la [doc IoT officielle](../iot/http-api.md).
+5. renvoie vers la doc IoT officielle.
 
 La commande et le starter doivent rester **cohérents** : même structure,
 même branchement explicite, mêmes fichiers. La commande est l'équivalent

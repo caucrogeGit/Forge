@@ -30,10 +30,10 @@ Aucune base de données.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.image_variant_relative_paths` | Dériver les chemins relatifs des variantes. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.media_url` | Construire l'URL publique `/media/...`. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.IMAGE_VARIANT_SIZES` | Tailles max de chaque variante. | [Médias](../../../features/media.md) |
-| `request.query(...)` | Lire le chemin d'image à inspecter. | [Request](../../../reference/http.md) |
+| `forge_mvc_images.image_variant_relative_paths` | Dériver les chemins relatifs des variantes. | Médias |
+| `forge_mvc_images.media_url` | Construire l'URL publique `/media/...`. | Médias |
+| `forge_mvc_images.IMAGE_VARIANT_SIZES` | Tailles max de chaque variante. | Médias |
+| `request.query(...)` | Lire le chemin d'image à inspecter. | Request |
 
 ## Tester
 

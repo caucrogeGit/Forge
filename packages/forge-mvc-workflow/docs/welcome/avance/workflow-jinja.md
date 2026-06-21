@@ -21,7 +21,7 @@ Troisième palier du **niveau avancé** de la progression workflow.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_workflow.make_workflow_jinja_helpers` | Helpers de statut prêts à injecter dans Jinja. | [Workflow](../../../reference/api.md) |
+| `forge_mvc_workflow.make_workflow_jinja_helpers` | Helpers de statut prêts à injecter dans Jinja. | Workflow |
 
 ## Tester
 

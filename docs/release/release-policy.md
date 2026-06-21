@@ -519,7 +519,7 @@ La publication est strictement synchronisée : core et opt-ins portent la même 
 - `FORGE_MFA_SECRET_KEY` obligatoire au démarrage.
 
 Le passage **Alpha → Beta** reste un ticket futur, indépendant de la publication
-PyPI déjà effectuée. Voir [auth-mfa](../mfa/reference.md#exigences-avant-production-ready) pour la checklist.
+PyPI déjà effectuée. Voir auth-mfa pour la checklist.
 
 ### Extras PyPI
 

@@ -21,8 +21,8 @@ Premier palier du **niveau intermédiaire** de la progression stats.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_stats.get_track_event_sql` | L'`INSERT` paramétré. | [Stats](../../../reference/api.md) |
-| `forge_mvc_stats.prepare_track_event_values` | Le tuple de valeurs d'un événement. | [Stats](../../../reference/api.md) |
+| `forge_mvc_stats.get_track_event_sql` | L'`INSERT` paramétré. | Stats |
+| `forge_mvc_stats.prepare_track_event_values` | Le tuple de valeurs d'un événement. | Stats |
 
 ## Tester
 

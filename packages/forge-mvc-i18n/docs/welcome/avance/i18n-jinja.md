@@ -17,7 +17,7 @@ Premier palier du **niveau avancé**.
 
 | Élément | Rôle dans ce starter | Référence |
 |---------|----------------------|-----------|
-| Global Jinja `trans` | Traduire dans un template. | [Opt-ins](../../../install/opt-ins.md) |
+| Global Jinja `trans` | Traduire dans un template. | Opt-ins |
 
 ## La vue
 

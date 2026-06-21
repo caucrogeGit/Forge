@@ -5,7 +5,7 @@ Il consolide les résultats des audits de sécurité réalisés lors de la Phase
 SECURITY-AUDIT-001, SECURITY-CSRF-AUDIT-001, SECURITY-AUTH-AUDIT-001,
 SECURITY-COOKIES-001, SECURITY-HEADERS-001, SECURITY-UPLOADS-AUDIT-001 et SECURITY-RBAC-AUDIT-001.
 
-Voir aussi : [Déploiement](deployment.md) · [Auth/User](../features/auth.md) · [RBAC](../rbac/reference.md) · [Médias](../features/media.md)
+Voir aussi : [Déploiement](deployment.md) · [Auth/User](../features/auth.md) · RBAC · [Médias](../features/media.md)
 
 ---
 

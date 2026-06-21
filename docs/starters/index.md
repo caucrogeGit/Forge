@@ -31,43 +31,43 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 
 ### IoT (opt-in `forge-mvc-iot`)
 
-[Bonjour Forge IoT](../iot/welcome/debutant/iot-welcome.md) · [Lire les événements IoT](../iot/welcome/debutant/iot-events.md) · [Les événements d'un capteur](../iot/welcome/debutant/iot-device.md) · [Simuler une mesure IoT](../iot/welcome/intermediaire/iot-simulate.md) · [Exposer l'API IoT](../iot/welcome/intermediaire/iot-api.md) · [Tableau de bord IoT](../iot/welcome/intermediaire/iot-dashboard.md) · [Valider un message IoT](../iot/welcome/avance/iot-contract.md) · [Le subscriber MQTT](../iot/welcome/avance/iot-subscriber.md) · [Diagnostiquer le module IoT](../iot/welcome/avance/iot-doctor.md)
+Bonjour Forge IoT · Lire les événements IoT · Les événements d'un capteur · Simuler une mesure IoT · Exposer l'API IoT · Tableau de bord IoT · Valider un message IoT · Le subscriber MQTT · Diagnostiquer le module IoT
 
 ### Vidéo (opt-in `forge-mvc-video`)
 
-[Bonjour Forge Vidéo](../video/welcome/debutant/video-welcome.md) · [Lister les vidéos](../video/welcome/debutant/video-list.md) · [Le détail d'une vidéo](../video/welcome/debutant/video-detail.md) · [Téléverser une vidéo](../video/welcome/intermediaire/video-upload.md) · [Lire une vidéo](../video/welcome/intermediaire/video-playback.md) · [Suivre l'état d'une vidéo](../video/welcome/intermediaire/video-status.md) · [Sonder une vidéo](../video/welcome/avance/video-probe.md) · [Transcoder une vidéo](../video/welcome/avance/video-transcode.md) · [Diagnostiquer le module Vidéo](../video/welcome/avance/video-doctor.md)
+Bonjour Forge Vidéo · Lister les vidéos · Le détail d'une vidéo · Téléverser une vidéo · Lire une vidéo · Suivre l'état d'une vidéo · Sonder une vidéo · Transcoder une vidéo · Diagnostiquer le module Vidéo
 
 ### Images (opt-in `forge-mvc-images`)
 
-[Bonjour Forge Images](../images/welcome/debutant/images-welcome.md) · [Téléverser une image](../images/welcome/debutant/image-upload.md) · [Miniatures et variantes](../images/welcome/debutant/image-variants.md) · [Rattacher une image à une entité](../images/welcome/intermediaire/image-attach.md) · [Afficher la galerie](../images/welcome/intermediaire/image-gallery.md) · [Texte alternatif et ordre](../images/welcome/intermediaire/image-alt-order.md) · [Image de couverture](../images/welcome/avance/image-cover.md) · [Supprimer proprement](../images/welcome/avance/image-delete.md) · [Garde de sécurité à l'upload](../images/welcome/avance/image-safety.md)
+Bonjour Forge Images · Téléverser une image · Miniatures et variantes · Rattacher une image à une entité · Afficher la galerie · Texte alternatif et ordre · Image de couverture · Supprimer proprement · Garde de sécurité à l'upload
 
 ### Fichiers (opt-in `forge-mvc-files`)
 
-[Bonjour Forge Files](../files/welcome/debutant/files-welcome.md) · [Stocker un document](../files/welcome/debutant/file-store.md) · [Servir un fichier](../files/welcome/debutant/file-serve.md) · [Valider un upload](../files/welcome/intermediaire/file-validate.md) · [Limiter les uploads](../files/welcome/intermediaire/file-rate-limit.md) · [Supprimer un fichier](../files/welcome/intermediaire/file-delete.md) · [Assainir un nom de fichier](../files/welcome/avance/file-safe-name.md) · [Chemin anti-traversal](../files/welcome/avance/file-safe-path.md) · [Écrire des octets générés](../files/welcome/avance/file-bytes.md)
+Bonjour Forge Files · Stocker un document · Servir un fichier · Valider un upload · Limiter les uploads · Supprimer un fichier · Assainir un nom de fichier · Chemin anti-traversal · Écrire des octets générés
 
 ### Audio (opt-in `forge-mvc-audio`)
 
-[Bonjour Forge Audio](../audio/welcome/debutant/audio-welcome.md) · [Téléverser un audio](../audio/welcome/debutant/audio-upload.md) · [Lire un audio](../audio/welcome/debutant/audio-play.md) · [Sonder un audio](../audio/welcome/avance/audio-probe.md) · [Transcoder en MP3](../audio/welcome/avance/audio-transcode.md) · [Diagnostiquer le module Audio](../audio/welcome/avance/audio-doctor.md)
+Bonjour Forge Audio · Téléverser un audio · Lire un audio · Sonder un audio · Transcoder en MP3 · Diagnostiquer le module Audio
 
 ### MFA (opt-in `forge-mvc-mfa`)
 
-[Bonjour Forge MFA](../mfa/welcome/debutant/mfa-welcome.md) · [Secret TOTP et QR](../mfa/welcome/debutant/mfa-secret.md) · [Vérifier un code TOTP](../mfa/welcome/debutant/mfa-verify.md) · [Enrôler un facteur TOTP](../mfa/welcome/intermediaire/mfa-enroll.md) · [Challenge de connexion](../mfa/welcome/intermediaire/mfa-challenge.md) · [Codes de récupération](../mfa/welcome/intermediaire/mfa-recovery.md) · [Revalidation (step-up)](../mfa/welcome/avance/mfa-revalidation.md) · [Anti-rejeu TOTP](../mfa/welcome/avance/mfa-replay.md) · [Secret chiffré au repos](../mfa/welcome/avance/mfa-crypto.md)
+Bonjour Forge MFA · Secret TOTP et QR · Vérifier un code TOTP · Enrôler un facteur TOTP · Challenge de connexion · Codes de récupération · Revalidation (step-up) · Anti-rejeu TOTP · Secret chiffré au repos
 
 ### RBAC (opt-in `forge-mvc-rbac`)
 
-[Bonjour Forge RBAC](../rbac/welcome/debutant/rbac-welcome.md) · [Code de permission](../rbac/welcome/debutant/rbac-permission.md) · [Rôle et slug](../rbac/welcome/debutant/rbac-role.md) · [Vérifier une permission](../rbac/welcome/intermediaire/rbac-check.md) · [Protéger une route](../rbac/welcome/intermediaire/rbac-guard.md) · [Permission dans un template](../rbac/welcome/intermediaire/rbac-template.md) · [Associer un rôle à un utilisateur](../rbac/welcome/avance/rbac-user-role.md) · [Résoudre les permissions](../rbac/welcome/avance/rbac-resolve.md) · [Rôles de la requête](../rbac/welcome/avance/rbac-request-roles.md)
+Bonjour Forge RBAC · Code de permission · Rôle et slug · Vérifier une permission · Protéger une route · Permission dans un template · Associer un rôle à un utilisateur · Résoudre les permissions · Rôles de la requête
 
 ### Workflow (opt-in `forge-mvc-workflow`)
 
-[Bonjour Forge Workflow](../workflow/welcome/debutant/workflow-welcome.md) · [Nom de statut](../workflow/welcome/debutant/workflow-status.md) · [Retrouver un statut](../workflow/welcome/debutant/workflow-find.md) · [Déclarer les transitions](../workflow/welcome/intermediaire/workflow-transition.md) · [Vérifier une transition](../workflow/welcome/intermediaire/workflow-check.md) · [Transitions disponibles](../workflow/welcome/intermediaire/workflow-available.md) · [Badge de statut](../workflow/welcome/avance/workflow-badge.md) · [Couleur, libellé, classe](../workflow/welcome/avance/workflow-color.md) · [Helpers Workflow dans Jinja](../workflow/welcome/avance/workflow-jinja.md)
+Bonjour Forge Workflow · Nom de statut · Retrouver un statut · Déclarer les transitions · Vérifier une transition · Transitions disponibles · Badge de statut · Couleur, libellé, classe · Helpers Workflow dans Jinja
 
 ### Stats (opt-in `forge-mvc-stats`)
 
-[Bonjour Forge Stats](../stats/welcome/debutant/stats-welcome.md) · [Nom d'événement](../stats/welcome/debutant/stats-event.md) · [Le schéma SQL](../stats/welcome/debutant/stats-schema.md) · [Le SQL d'insertion](../stats/welcome/intermediaire/stats-track-sql.md) · [Enregistrer un événement](../stats/welcome/intermediaire/stats-track.md) · [Valider un événement](../stats/welcome/intermediaire/stats-validate.md) · [Le SQL de consultation](../stats/welcome/avance/stats-admin-sql.md) · [Lister les événements](../stats/welcome/avance/stats-list.md) · [Normaliser une ligne](../stats/welcome/avance/stats-normalize.md)
+Bonjour Forge Stats · Nom d'événement · Le schéma SQL · Le SQL d'insertion · Enregistrer un événement · Valider un événement · Le SQL de consultation · Lister les événements · Normaliser une ligne
 
 ### Mail (opt-in `forge-mvc-mail`)
 
-[Bonjour Forge Mail](../mail/welcome/debutant/mail-welcome.md) · [Composer un message](../mail/welcome/debutant/mail-message.md) · [Choisir un transport](../mail/welcome/intermediaire/mail-transport.md) · [Rendre un template](../mail/welcome/intermediaire/mail-template.md) · [Configurer l'envoi](../mail/welcome/avance/mail-config.md) · [Diagnostiquer le module Mail](../mail/welcome/avance/mail-doctor.md)
+Bonjour Forge Mail · Composer un message · Choisir un transport · Rendre un template · Configurer l'envoi · Diagnostiquer le module Mail
 
 ## Progression recommandée
 

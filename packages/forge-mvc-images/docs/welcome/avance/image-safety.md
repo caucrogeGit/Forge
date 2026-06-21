@@ -27,9 +27,9 @@ Troisième palier du **niveau avancé** de la progression images.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.verify_image_content` | Vérifier qu'un contenu est une vraie image autorisée. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.ALLOWED_IMAGE_EXTENSIONS` | Liste blanche des formats acceptés, affichée dans la politique. | [Médias](../../../features/media.md) |
-| `os.getenv("UPLOAD_MAX_IMAGE_PIXELS")` | Lire le budget anti-bombe (surface maximale en pixels). | [Configuration](../../../reference/api.md) |
+| `forge_mvc_images.verify_image_content` | Vérifier qu'un contenu est une vraie image autorisée. | Médias |
+| `forge_mvc_images.ALLOWED_IMAGE_EXTENSIONS` | Liste blanche des formats acceptés, affichée dans la politique. | Médias |
+| `os.getenv("UPLOAD_MAX_IMAGE_PIXELS")` | Lire le budget anti-bombe (surface maximale en pixels). | Configuration |
 
 ## Tester
 

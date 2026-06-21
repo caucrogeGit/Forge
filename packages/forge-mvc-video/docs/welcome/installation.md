@@ -6,12 +6,12 @@ palier décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core et des autres parcours, voir
-    [Installer Forge](../../install/poste-linux.md).
+    Installer Forge.
 
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Si ce n'est pas encore fait, suivre
-  d'abord [Installer Forge](../../install/poste-linux.md).
+  d'abord Installer Forge.
 - **Python 3.12+**.
 - **`ffmpeg` / `ffprobe` ne sont pas nécessaires au début** : les premiers
   paliers (premier contact, liste, détail, upload) fonctionnent sans eux.
@@ -43,7 +43,7 @@ forge new mon-projet-video
 ```
 
 Le détail de la création d'un projet est décrit dans
-[Installer Forge](../../install/poste-linux.md).
+Installer Forge.
 Aucun starter n'est généré : les fichiers du parcours se créent à la main au
 fil des paliers.
 

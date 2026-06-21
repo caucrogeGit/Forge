@@ -26,7 +26,7 @@ Aucun ffmpeg, aucune écriture.
 |-------------------|----------------------|-----------|
 | `forge_mvc_video.storage.repository.VideoRepository` | Lire les vidéos enregistrées. | [Parcours vidéo](../../parcours.md) |
 | `VideoRepository.list_recent` | Dernières vidéos (ordre décroissant). | [Parcours vidéo](../../parcours.md) |
-| `Response.json` | Renvoyer les vidéos (ou l'erreur) en JSON. | [Response](../../../reference/api.md#corehttpresponse) |
+| `Response.json` | Renvoyer les vidéos (ou l'erreur) en JSON. | Response |
 
 ## Tester
 

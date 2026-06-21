@@ -23,8 +23,8 @@ Premier palier du **niveau avancé** de la progression files.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.secure_filename` | Assainir un nom de fichier utilisateur. | [Médias](../../../features/media.md) |
-| `request.query(...)` | Lire le nom à assainir. | [Request](../../../reference/http.md) |
+| `forge_mvc_files.secure_filename` | Assainir un nom de fichier utilisateur. | Médias |
+| `request.query(...)` | Lire le nom à assainir. | Request |
 
 ## Tester
 

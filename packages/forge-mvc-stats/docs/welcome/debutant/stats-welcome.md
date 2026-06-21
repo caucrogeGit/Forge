@@ -8,7 +8,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-stats`.
 décrivent le stockage.
 
 Premier palier du **niveau débutant** de la progression stats
-([vue d'ensemble des starters](../../../starters/index.md)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-stats` installé (palier « Installation »). Module à
@@ -23,8 +23,8 @@ Premier palier du **niveau débutant** de la progression stats
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_stats.make_event` | Créer un événement (nom, libellé, catégorie, métadonnées). | [Stats](../../../reference/api.md) |
-| `forge_mvc_stats.STATS_EVENTS_TABLE` / `STATS_EVENTS_COLUMNS` | Table et colonnes du stockage. | [Stats](../../../reference/api.md) |
+| `forge_mvc_stats.make_event` | Créer un événement (nom, libellé, catégorie, métadonnées). | Stats |
+| `forge_mvc_stats.STATS_EVENTS_TABLE` / `STATS_EVENTS_COLUMNS` | Table et colonnes du stockage. | Stats |
 
 ## Tester
 

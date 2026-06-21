@@ -184,9 +184,13 @@ def test_mkdocs_reference_la_page(mkdocs):
 
 # ── pivots-many-to-many.md ────────────────────────────────────────────────────
 
-def test_pivots_page_contient_lien_vers_pivot_advanced(pivots_page):
-    # Lien vers la référence pivot embarquée (ADR-038).
-    assert "../pivot/reference.md" in pivots_page
+def test_pivots_page_ne_lie_pas_l_optin_pivot(pivots_page):
+    # ADR-042 : découplage cœur/opt-ins. La page cœur peut MENTIONNER Pivot
+    # advanced mais ne doit plus pointer par lien vers sa doc embarquée.
+    assert "](../pivot/" not in pivots_page, (
+        "docs/entities/pivots-many-to-many.md ne doit plus lier l'opt-in pivot "
+        "(ADR-042)."
+    )
 
 
 # ── Audit ─────────────────────────────────────────────────────────────────────

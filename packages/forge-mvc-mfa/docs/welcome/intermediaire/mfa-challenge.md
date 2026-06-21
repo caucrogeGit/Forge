@@ -23,8 +23,8 @@ Deuxième palier du **niveau intermédiaire** de la progression MFA.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.start_mfa_challenge` | Ouvrir un challenge MFA temporaire en session. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.verify_mfa_challenge` | Vérifier un code contre le challenge. | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.start_mfa_challenge` | Ouvrir un challenge MFA temporaire en session. | MFA |
+| `forge_mvc_mfa.verify_mfa_challenge` | Vérifier un code contre le challenge. | MFA |
 
 ## Tester
 

@@ -14,7 +14,7 @@ une même route sert la page en FR ou en EN.
 
 | Fonction | Rôle dans ce starter | Référence |
 |----------|----------------------|-----------|
-| `trans(key, locale)` | Traduit une clé pour une locale donnée. | [Opt-ins](../../../install/opt-ins.md) |
+| `trans(key, locale)` | Traduit une clé pour une locale donnée. | Opt-ins |
 
 ## Le contrôleur
 

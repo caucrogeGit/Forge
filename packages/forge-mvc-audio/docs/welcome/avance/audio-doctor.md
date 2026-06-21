@@ -22,7 +22,7 @@ Troisième palier du **niveau avancé** de la progression audio.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_audio.cli.doctor.check_*` | Contrôles : paquet, config, `ffprobe`, `ffmpeg`, routes. | [Audio](../../../features/media.md) |
+| `forge_mvc_audio.cli.doctor.check_*` | Contrôles : paquet, config, `ffprobe`, `ffmpeg`, routes. | Audio |
 
 ## Tester
 

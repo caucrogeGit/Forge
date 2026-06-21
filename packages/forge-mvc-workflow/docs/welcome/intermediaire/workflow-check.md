@@ -21,7 +21,7 @@ Deuxième palier du **niveau intermédiaire** de la progression workflow.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_workflow.can_transition` | Vérifier qu'un passage est autorisé. | [Workflow](../../../reference/api.md) |
+| `forge_mvc_workflow.can_transition` | Vérifier qu'un passage est autorisé. | Workflow |
 
 ## Tester
 

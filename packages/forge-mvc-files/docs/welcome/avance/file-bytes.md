@@ -23,8 +23,8 @@ Troisième palier du **niveau avancé** de la progression files.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.save_bytes` | Écrire des octets dans la zone d'upload, nom sûr. | [Médias](../../../features/media.md) |
-| `forge_mvc_files.upload_root` | Racine de stockage cible. | [Médias](../../../features/media.md) |
+| `forge_mvc_files.save_bytes` | Écrire des octets dans la zone d'upload, nom sûr. | Médias |
+| `forge_mvc_files.upload_root` | Racine de stockage cible. | Médias |
 
 ## Tester
 

@@ -35,8 +35,8 @@ Forge IoT doit rester :
 
 Forge IoT est un **module opt-in** au même titre que `forge-mvc-rbac`,
 `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
-`forge-mvc-images`. Voir [ADR-004 — Périmètre core](../adr/004-core-perimeter.md)
-et [ADR-005 — Packaging](../adr/005-packaging.md).
+`forge-mvc-images`. Voir ADR-004 — Périmètre core
+et ADR-005 — Packaging.
 
 ## Architecture générale
 

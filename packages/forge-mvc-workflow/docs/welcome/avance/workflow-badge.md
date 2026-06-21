@@ -20,7 +20,7 @@ Premier palier du **niveau avancé** de la progression workflow.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_workflow.workflow_status_badge` | Produire un badge HTML sûr pour un statut. | [Workflow](../../../reference/api.md) |
+| `forge_mvc_workflow.workflow_status_badge` | Produire un badge HTML sûr pour un statut. | Workflow |
 
 ## Tester
 

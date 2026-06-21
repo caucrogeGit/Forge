@@ -24,7 +24,7 @@ Troisième palier du **niveau intermédiaire** de la progression RBAC.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.make_can` | Callable `can(code)` lié à la requête. | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.make_can` | Callable `can(code)` lié à la requête. | RBAC |
 
 ## Tester
 

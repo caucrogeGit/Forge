@@ -22,9 +22,9 @@ Deuxième palier du **niveau débutant** de la progression files.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.save_upload` | Valider, écrire, retourner un `SavedUpload`. | [Médias](../../../features/media.md) |
-| `forge_mvc_files.UploadError` | Erreur levée si le fichier est refusé. | [Médias](../../../features/media.md) |
-| `request.file(...)` | Récupérer le fichier envoyé. | [Request](../../../reference/http.md) |
+| `forge_mvc_files.save_upload` | Valider, écrire, retourner un `SavedUpload`. | Médias |
+| `forge_mvc_files.UploadError` | Erreur levée si le fichier est refusé. | Médias |
+| `request.file(...)` | Récupérer le fichier envoyé. | Request |
 
 ## Tester
 

@@ -25,7 +25,7 @@ La table `videos` est créée par la migration fournie plus bas. **Aucun ffmpeg.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `request.file` | Récupérer le fichier vidéo reçu. | [Request](../../../reference/api.md#corehttprequest) |
+| `request.file` | Récupérer le fichier vidéo reçu. | Request |
 | `forge_mvc_video.ingest.ingest_video` | Valider, stocker et enregistrer la vidéo (statut `uploaded`). | [Parcours vidéo](../../parcours.md) |
 | `VideoIngestError` | Upload refusé (vide, trop gros, conteneur non autorisé). | [Parcours vidéo](../../parcours.md) |
 

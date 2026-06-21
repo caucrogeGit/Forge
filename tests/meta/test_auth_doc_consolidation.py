@@ -206,9 +206,13 @@ class TestCommandesAdminDocumentees:
 # ---------------------------------------------------------------------------
 
 class TestLiensCroises:
-    def test_auth_md_lien_vers_rbac(self):
+    def test_auth_md_mentionne_rbac(self):
+        # ADR-042 : auth.md (cœur) MENTIONNE RBAC mais ne lie plus l'opt-in.
+        # L'absence de lien transversal est vérifiée par
+        # test_docs_core_optins_decoupled_001.
         a = _auth()
-        assert "rbac.md" in a or "[RBAC" in a
+        assert "RBAC" in a
+        assert "](../rbac/" not in a, "auth.md ne doit plus lier l'opt-in rbac (ADR-042)."
 
     def test_auth_md_lien_vers_production_security(self):
         a = _auth()
@@ -221,9 +225,14 @@ class TestLiensCroises:
         a = _auth()
         assert "## Voir aussi" in a
 
-    def test_rbac_md_lien_vers_auth(self):
+    def test_rbac_md_mentionne_auth(self):
+        # ADR-042 : la doc rbac (opt-in) peut MENTIONNER Auth/User mais ne lie
+        # plus le cœur. L'absence de lien est vérifiée par le garde-fou dédié.
         r = _rbac()
-        assert "auth.md" in r
+        assert "Auth" in r or "auth" in r
+        assert "](../features/auth.md" not in r, (
+            "La doc rbac ne doit plus lier le cœur auth.md (ADR-042)."
+        )
 
     def test_security_md_lien_vers_auth(self):
         s = _security()

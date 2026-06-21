@@ -23,9 +23,9 @@ Premier palier du **niveau avancé** de la progression MFA.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.mark_mfa_revalidated` | Enregistrer une revalidation MFA en session. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.has_recent_mfa_revalidation` | Dire si la revalidation est encore récente. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.require_recent_mfa` | Décorateur protégeant une action sensible. | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.mark_mfa_revalidated` | Enregistrer une revalidation MFA en session. | MFA |
+| `forge_mvc_mfa.has_recent_mfa_revalidation` | Dire si la revalidation est encore récente. | MFA |
+| `forge_mvc_mfa.require_recent_mfa` | Décorateur protégeant une action sensible. | MFA |
 
 ## Tester
 

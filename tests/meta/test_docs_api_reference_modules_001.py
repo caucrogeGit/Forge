@@ -67,16 +67,21 @@ class TestApiReferenceMentionsAllOptInModules:
         )
 
 
-class TestApiReferenceLinksToModuleDocs:
-    """Chaque module est lié vers sa page de référence."""
+class TestApiReferenceDoesNotLinkOptins:
+    """ADR-042 : api.md (cœur) MENTIONNE les opt-ins mais ne les LIE plus.
 
-    def test_each_module_has_link_to_its_doc(self):
+    Le découplage cœur/opt-ins interdit tout lien transversal. La mention des
+    4 paquets reste exigée (classe ci-dessus, principe 10), mais le lien vers
+    leur doc embarquée est retiré."""
+
+    def test_no_link_to_optin_docs(self):
         text = API_REF.read_text(encoding="utf-8")
         for pkg, ref_page in EXPECTED_MODULES.items():
-            pat = re.compile(rf"\]\([^)]*{re.escape(ref_page)}[^)]*\)")
-            assert pat.search(text), (
-                f"docs/reference/api.md ne contient pas de lien vers `{ref_page}` "
-                f"pour le module {pkg}."
+            slug = ref_page.split("/", 1)[0]
+            pat = re.compile(rf"\]\([^)]*\.\./{re.escape(slug)}/[^)]*\)")
+            assert not pat.search(text), (
+                f"docs/reference/api.md ne doit plus lier l'opt-in {pkg} "
+                f"(ADR-042, découplage cœur/opt-ins)."
             )
 
 

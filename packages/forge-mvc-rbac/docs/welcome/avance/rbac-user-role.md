@@ -22,7 +22,7 @@ Premier palier du **niveau avancé** de la progression RBAC.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.create_auth_user_role` | Construire et valider une association user/role. | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.create_auth_user_role` | Construire et valider une association user/role. | RBAC |
 
 ## Tester
 

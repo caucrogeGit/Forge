@@ -14,7 +14,7 @@ catalogue (objet JSON de chaînes), puis retourne un dict.
 
 | Fonction | Rôle dans ce starter | Référence |
 |----------|----------------------|-----------|
-| `load_catalog(locale, translations_dir="translations")` | Charge et valide un catalogue. | [Opt-ins](../../../install/opt-ins.md) |
+| `load_catalog(locale, translations_dir="translations")` | Charge et valide un catalogue. | Opt-ins |
 
 ## 1. Le catalogue français
 

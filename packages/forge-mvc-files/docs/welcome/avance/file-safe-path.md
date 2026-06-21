@@ -23,8 +23,8 @@ Deuxième palier du **niveau avancé** de la progression files.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.is_safe_media_path` | Dire si un chemin reste dans la racine d'upload. | [Médias](../../../features/media.md) |
-| `forge_mvc_files.normalize_media_path` | Normaliser un chemin sûr (ou refuser). | [Médias](../../../features/media.md) |
+| `forge_mvc_files.is_safe_media_path` | Dire si un chemin reste dans la racine d'upload. | Médias |
+| `forge_mvc_files.normalize_media_path` | Normaliser un chemin sûr (ou refuser). | Médias |
 
 ## Tester
 

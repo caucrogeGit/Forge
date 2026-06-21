@@ -8,7 +8,7 @@ politique** — racine de stockage (`upload_root`), extensions, types MIME et ta
 max autorisés. Aucune base de données : `forge-mvc-files` est sans état.
 
 Premier palier du **niveau débutant** de la progression files
-([vue d'ensemble des starters](../../../starters/index.md)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in et fondation"
     `forge-mvc-files` est l'upload générique extrait du core (ADR-019) ; c'est la
@@ -27,9 +27,9 @@ Premier palier du **niveau débutant** de la progression files
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.upload_root` | Racine de stockage des fichiers. | [Médias](../../../features/media.md) |
-| `core.forge.get` | Lire la politique d'upload (extensions, MIME, taille). | [Configuration](../../../reference/api.md) |
-| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/http.md) |
+| `forge_mvc_files.upload_root` | Racine de stockage des fichiers. | Médias |
+| `core.forge.get` | Lire la politique d'upload (extensions, MIME, taille). | Configuration |
+| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | Response |
 
 ## Tester
 

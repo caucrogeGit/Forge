@@ -21,8 +21,8 @@ Premier palier du **niveau intermédiaire** de la progression workflow.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_workflow.make_transition` | Créer une transition `from → to`. | [Workflow](../../../reference/api.md) |
-| `forge_mvc_workflow.validate_transitions` | Valider l'ensemble des transitions. | [Workflow](../../../reference/api.md) |
+| `forge_mvc_workflow.make_transition` | Créer une transition `from → to`. | Workflow |
+| `forge_mvc_workflow.validate_transitions` | Valider l'ensemble des transitions. | Workflow |
 
 ## Tester
 

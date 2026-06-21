@@ -3023,7 +3023,7 @@ La clé optionnelle `"rbac"` dans `entity.json` déclare les permissions requise
 
 Actions acceptées : `index`, `show`, `create` (→ méthode `new`), `store` (→ méthode `create`), `edit`, `update`, `delete` (→ méthode `destroy`). Toute action inconnue déclenche une erreur à la génération. Sans clé `rbac`, le contrôleur est identique à celui généré sans RBAC.
 
-Documentation complète : [RBAC — Contrôle d'accès](../rbac/reference.md).
+Documentation complète : RBAC — Contrôle d'accès.
 
 </details>
 
@@ -3041,10 +3041,10 @@ Chaque opt-in est livré comme package PyPI distinct sous le namespace
 
 | Opt-in | Package PyPI | Extra pip | Documentation détaillée |
 |---|---|---|---|
-| MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | [auth-mfa](../mfa/reference.md) |
-| RBAC | `forge-mvc-rbac` | `[rbac]` | [rbac.md](../rbac/reference.md) |
-| Workflow | `forge-mvc-workflow` | `[workflow]` | [workflow](../workflow/reference.md) |
-| Statistiques | `forge-mvc-stats` | `[stats]` | [stats](../stats/reference.md) |
+| MFA / TOTP | `forge-mvc-mfa` | — (installer directement) | auth-mfa |
+| RBAC | `forge-mvc-rbac` | `[rbac]` | rbac.md |
+| Workflow | `forge-mvc-workflow` | `[workflow]` | workflow |
+| Statistiques | `forge-mvc-stats` | `[stats]` | stats |
 | Médias applicatifs | `forge-mvc-images` | — (installer directement) | [media.md](../features/media.md) |
 
 La plupart des opt-ins officiels sont publiés sur PyPI depuis `1.0.0-beta.9`
@@ -3066,7 +3066,7 @@ pip install --pre forge-mvc-mfa
 > le core Forge ne dépend pas de `forge-mvc-mfa`.
 > Voir [contrat d'installation](../install/opt-ins.md).
 
-Référence détaillée : [auth-mfa](../mfa/reference.md).
+Référence détaillée : auth-mfa.
 
 ### RBAC — `forge-mvc-rbac`
 
@@ -3076,7 +3076,7 @@ Rôles, permissions, décorateur `@require_permission`, helpers Jinja
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
 > Voir [contrat d'installation](../install/opt-ins.md).
 
-Référence détaillée : [rbac.md](../rbac/reference.md).
+Référence détaillée : rbac.md.
 
 ### Workflow — `forge-mvc-workflow`
 
@@ -3086,7 +3086,7 @@ fonctions de validation, helpers Jinja2. Aucun callback automatique.
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
 > Voir [contrat d'installation](../install/opt-ins.md).
 
-Référence détaillée : [workflow](../workflow/reference.md).
+Référence détaillée : workflow.
 
 ### Statistiques — `forge-mvc-stats`
 
@@ -3096,7 +3096,7 @@ calculés à la demande.
 > Disponible sur PyPI depuis `1.0.0-beta.5` (publication coordonnée des opt-ins `rbac`, `workflow`, `stats`).
 > Voir [contrat d'installation](../install/opt-ins.md).
 
-Référence détaillée : [stats](../stats/reference.md).
+Référence détaillée : stats.
 
 ### Médias applicatifs — `forge-mvc-images`
 

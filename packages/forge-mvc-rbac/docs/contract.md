@@ -9,7 +9,7 @@ Le contrat RBAC Forge définit les rôles et permissions d'accès dans un projet
 Il est **séparé du schéma d'entité** (`entity.schema.json`) : le schéma d'entité
 décrit la structure de données, le contrat RBAC décrit les règles d'autorisation.
 
-Cette séparation est décidée dans [ADR-014](../adr/014-rbac-contract-location.md).
+Cette séparation est décidée dans ADR-014.
 
 ## Emplacement
 

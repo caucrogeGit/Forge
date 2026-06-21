@@ -6,7 +6,7 @@ palier décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core et des autres parcours, voir
-    [Installer Forge](../../install/poste-linux.md).
+    Installer Forge.
 
 !!! info "Module publié sur PyPI"
     `forge-mvc-images` est publié sur PyPI depuis `1.0.0-beta.13`. On l'installe
@@ -17,7 +17,7 @@ palier décrit les fichiers à créer et la route à câbler.
 ## Prérequis
 
 - **Forge installé** (core `forge-mvc`). Si ce n'est pas encore fait, suivre
-  d'abord [Installer Forge](../../install/poste-linux.md).
+  d'abord Installer Forge.
 - **Python 3.12+**.
 - Les premiers paliers (premier contact, dérivation des variantes) fonctionnent
   **sans base de données**. La couche médias en base n'intervient qu'au niveau
@@ -50,7 +50,7 @@ forge new mon-projet-images
 ```
 
 Le détail de la création d'un projet est décrit dans
-[Installer Forge](../../install/poste-linux.md).
+Installer Forge.
 Aucun starter n'est généré : les fichiers du parcours se créent à la main au
 fil des paliers.
 

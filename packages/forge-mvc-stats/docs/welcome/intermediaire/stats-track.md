@@ -22,7 +22,7 @@ Deuxième palier du **niveau intermédiaire** de la progression stats.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_stats.track_event` | Enregistrer un événement via un exécuteur. | [Stats](../../../reference/api.md) |
+| `forge_mvc_stats.track_event` | Enregistrer un événement via un exécuteur. | Stats |
 
 ## Tester
 

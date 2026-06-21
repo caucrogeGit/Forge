@@ -24,9 +24,9 @@ Troisième palier du **niveau intermédiaire** de la progression images.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.list_media_for_entity` | Lister les images à éditer. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.update_media_alt_text` | Renseigner le texte alternatif. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.update_media_position` | Fixer l'ordre d'affichage. | [Médias](../../../features/media.md) |
+| `forge_mvc_images.list_media_for_entity` | Lister les images à éditer. | Médias |
+| `forge_mvc_images.update_media_alt_text` | Renseigner le texte alternatif. | Médias |
+| `forge_mvc_images.update_media_position` | Fixer l'ordre d'affichage. | Médias |
 
 ## Tester
 

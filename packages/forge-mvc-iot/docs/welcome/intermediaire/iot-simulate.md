@@ -29,7 +29,7 @@ La table `iot_events` est créée par la migration livrée avec le starter.
 | `build_topic` / `build_payload` | Composer un topic et un payload conformes. | [Forge IoT — simulateur](../../listen-command.md) |
 | `parse_message` | Valider topic + payload → `Measurement`. | [Forge IoT — contrat](../../storage-events.md) |
 | `IotEventRepository.insert` | Écrire la mesure validée dans `iot_events`. | [Forge IoT — stockage](../../storage-events.md) |
-| `BaseController.csrf_token` / `redirect` | Protéger le POST, rediriger (PRG). | [BaseController](../../../reference/api.md#coremvccontroller) |
+| `BaseController.csrf_token` / `redirect` | Protéger le POST, rediriger (PRG). | BaseController |
 
 ## Tester
 

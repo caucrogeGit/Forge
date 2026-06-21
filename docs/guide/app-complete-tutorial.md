@@ -519,9 +519,9 @@ Ce tutoriel couvre une application simple. Il ne couvre pas :
 | Limite | Documentation |
 |---|---|
 | Auth / connexion utilisateur | [Auth/User](../features/auth.md) |
-| Rôles et permissions (RBAC) | [Sécurité et RBAC](../philosophy/security.md), [RBAC](../rbac/reference.md) |
+| Rôles et permissions (RBAC) | [Sécurité et RBAC](../philosophy/security.md), RBAC |
 | Relations `many_to_many` | [Relations entre entités](../features/relations.md) |
-| Envoi de mails | [Gestion des mails](../mail/reference.md) |
+| Envoi de mails | Gestion des mails |
 | Upload de fichiers / médias | [Module média](../features/media.md) |
 | Déploiement en production | [Déploiement](../deployment/deployment.md) |
 | Sécurité en production | [Sécurité en production](../deployment/production-security.md) |

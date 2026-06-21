@@ -23,7 +23,7 @@ Troisième palier du **niveau débutant** de la progression MFA.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.verify_totp_code` | Vérifier un code TOTP contre un secret. | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.verify_totp_code` | Vérifier un code TOTP contre un secret. | MFA |
 
 ## Tester
 

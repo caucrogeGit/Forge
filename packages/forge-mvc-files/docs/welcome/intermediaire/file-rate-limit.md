@@ -22,9 +22,9 @@ Deuxième palier du **niveau intermédiaire** de la progression files.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.is_upload_rate_limited` | Tester le quota d'uploads de l'IP. | [Médias](../../../features/media.md) |
-| `forge_mvc_files.record_upload_attempt` | Enregistrer une tentative. | [Médias](../../../features/media.md) |
-| `request.ip` | IP cliente résolue (proxies de confiance pris en compte). | [Request](../../../reference/http.md) |
+| `forge_mvc_files.is_upload_rate_limited` | Tester le quota d'uploads de l'IP. | Médias |
+| `forge_mvc_files.record_upload_attempt` | Enregistrer une tentative. | Médias |
+| `request.ip` | IP cliente résolue (proxies de confiance pris en compte). | Request |
 
 ## Tester
 

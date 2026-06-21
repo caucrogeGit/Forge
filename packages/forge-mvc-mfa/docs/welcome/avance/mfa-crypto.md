@@ -23,9 +23,9 @@ Troisième palier du **niveau avancé** de la progression MFA.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.encrypt_totp_secret` | Chiffrer un secret TOTP (Fernet). | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.decrypt_totp_secret` | Déchiffrer un secret stocké. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.validate_mfa_secret_key_config` | Contrôler la configuration de la clé. | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.encrypt_totp_secret` | Chiffrer un secret TOTP (Fernet). | MFA |
+| `forge_mvc_mfa.decrypt_totp_secret` | Déchiffrer un secret stocké. | MFA |
+| `forge_mvc_mfa.validate_mfa_secret_key_config` | Contrôler la configuration de la clé. | MFA |
 
 ## Tester
 

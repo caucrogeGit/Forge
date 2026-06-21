@@ -22,8 +22,8 @@ Troisième palier du **niveau débutant** de la progression stats.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_stats.get_stats_events_schema_sql` | Le `CREATE TABLE` de `forge_stats_events`. | [Stats](../../../reference/api.md) |
-| `forge_mvc_stats.STATS_EVENTS_COLUMNS` | Les colonnes de la table. | [Stats](../../../reference/api.md) |
+| `forge_mvc_stats.get_stats_events_schema_sql` | Le `CREATE TABLE` de `forge_stats_events`. | Stats |
+| `forge_mvc_stats.STATS_EVENTS_COLUMNS` | Les colonnes de la table. | Stats |
 
 ## Tester
 

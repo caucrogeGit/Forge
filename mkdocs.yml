@@ -37,223 +37,292 @@ nav:
       - Palier 3 - Réseau IP: starters-pedagogique/welcome-reseau/palier-3/index.md
       - Palier 4 - Réseau interne: starters-pedagogique/welcome-reseau/palier-4/index.md
 
-  - Installation:
-      - Installer Forge:
-          - Windows + WSL (parcours complet): install/windows-wsl.md
-          - Dépannage serveur dev (WSL2): install/wsl-dev-server.md
-          - Poste Linux (parcours complet): install/poste-linux.md
-          - Mode développement: install/core-dev.md
-          - VM Debian vierge: install/vm-debian.md
-          - Depuis GitHub: install/github.md
-          - Windows (résumé court): install/windows.md
-      - Environnement:
-          - Préparer MariaDB: install/mariadb.md
-          - Comptes MariaDB d'un projet: install/mariadb-comptes.md
-          - Contrat d'installation des opt-ins: install/opt-ins.md
-          - Configurer VS Code (auto-import): install/vscode.md
-          - Environnement VS Code (extensions et config): install/vscode-environnement.md
-          - Production: install/production.md
 
-  - Premiers pas:
-      - Démarrer avec Forge: guide/getting-started.md
-      - Bonjour Forge: guide/bonjour-forge.md
-      - Application complète: guide/app-complete-tutorial.md
-      - Guide de démarrage: guide/guide.md
+  - Cœur de Forge:
+    - Installation:
+        - Installer Forge:
+            - Windows + WSL (parcours complet): install/windows-wsl.md
+            - Dépannage serveur dev (WSL2): install/wsl-dev-server.md
+            - Poste Linux (parcours complet): install/poste-linux.md
+            - Mode développement: install/core-dev.md
+            - VM Debian vierge: install/vm-debian.md
+            - Depuis GitHub: install/github.md
+            - Windows (résumé court): install/windows.md
+        - Environnement:
+            - Préparer MariaDB: install/mariadb.md
+            - Comptes MariaDB d'un projet: install/mariadb-comptes.md
+            - Contrat d'installation des opt-ins: install/opt-ins.md
+            - Configurer VS Code (auto-import): install/vscode.md
+            - Environnement VS Code (extensions et config): install/vscode-environnement.md
+            - Production: install/production.md
 
-  - Concepts:
-      - Vue d'ensemble: guide/concepts.md
-      - Positionnement: guide/positioning.md
-      - FAQ: guide/faq.md
+    - Premiers pas:
+        - Démarrer avec Forge: guide/getting-started.md
+        - Bonjour Forge: guide/bonjour-forge.md
+        - Application complète: guide/app-complete-tutorial.md
+        - Guide de démarrage: guide/guide.md
 
-  - Modèle de données (entités & relations):
-      - Architecture des entités: features/entity_architecture.md
-      - Relations entre entités: features/relations.md
-      - Le JSON canonique: entities/json-canonique.md
-      - Schéma des entités: entities/entity-schema.md
-      - Schéma des relations: entities/relations-schema.md
-      - Tables pivot many-to-many: entities/pivots-many-to-many.md
-      - Types Forge vers MariaDB: entities/types-forge-mariadb.md
-      - Slugs: entities/slugs.md
-      - Valider les contrats JSON: entities/entity-validate.md
-      - Autocomplétion VS Code: entities/vscode-json-schema.md
-      - Limites des contrats JSON: entities/limites-contrats-json.md
-      - Conversion depuis l'ancien format: entities/migration-legacy-vers-canonique.md
+    - Concepts:
+        - Vue d'ensemble: guide/concepts.md
+        - Positionnement: guide/positioning.md
+        - FAQ: guide/faq.md
 
-  - Guides du cœur:
-      - Auth/User: features/auth.md
-      - Sécurité (vue d'ensemble): philosophy/security.md
-      - CRUD explicite: features/crud.md
-      - Migrations SQL: features/migrations.md
-      - Front et CSS: features/front.md
-      - Profils de projet: features/profiles.md
-      - Génération PDF: features/pdf.md
-      - Module média: features/media.md
-      - ImageMagick (logos transparents): features/imagemagick-logos.md
+    - Modèle de données (entités & relations):
+        - Architecture des entités: features/entity_architecture.md
+        - Relations entre entités: features/relations.md
+        - Le JSON canonique: entities/json-canonique.md
+        - Schéma des entités: entities/entity-schema.md
+        - Schéma des relations: entities/relations-schema.md
+        - Tables pivot many-to-many: entities/pivots-many-to-many.md
+        - Types Forge vers MariaDB: entities/types-forge-mariadb.md
+        - Slugs: entities/slugs.md
+        - Valider les contrats JSON: entities/entity-validate.md
+        - Autocomplétion VS Code: entities/vscode-json-schema.md
+        - Limites des contrats JSON: entities/limites-contrats-json.md
+        - Conversion depuis l'ancien format: entities/migration-legacy-vers-canonique.md
 
-  - Référence:
-      - Index: reference/reference.md
-      - Commandes CLI: reference/cli-commands.md
-      - API Forge complète: reference/api.md
-      - Vocabulaire opt-in: reference/vocabulaire-opt-in.md
-      - Contrat public 1.0 (gel): reference/public-contract-1.0.md
-      - Convention HTTP inspectable: reference/http.md
-      - Opt-ins officiels:
-          - Modules Forge: reference/modules.md
-      - CRUD et relations: reference/crud.md
-      - Pages publiques: reference/pages-publiques.md
-      - Sécurité et sessions:
-          - Audit Auth: reference/audit-auth.md
-          - Sessions: reference/sessions.md
-      - Objets HTTP:
-          - L'objet Request: reference/http/request.md
-          - L'objet Response: reference/http/response.md
-          - Le cookie HTTP: reference/http/cookie.md
-          - La session HTTP: reference/http/session.md
-          - La protection CSRF: reference/http/csrf.md
-      - Aide-mémoire Markdown: reference/markdown.md
-      - Outils:
-          - Profils de projet: reference/profils.md
-          - Tests E2E: reference/tests-e2e.md
-      - API JSON légère: reference/api-json.md
-      - Schéma API: reference/reference-schema.md
-      - Schéma erreurs runtime: reference/runtime-errors-schema.md
+    - Guides du cœur:
+        - Auth/User: features/auth.md
+        - Sécurité (vue d'ensemble): philosophy/security.md
+        - CRUD explicite: features/crud.md
+        - Migrations SQL: features/migrations.md
+        - Front et CSS: features/front.md
+        - Profils de projet: features/profiles.md
+        - Génération PDF: features/pdf.md
+        - Module média: features/media.md
+        - ImageMagick (logos transparents): features/imagemagick-logos.md
+
+    - Référence:
+        - Index: reference/reference.md
+        - Commandes CLI: reference/cli-commands.md
+        - API Forge complète: reference/api.md
+        - Vocabulaire opt-in: reference/vocabulaire-opt-in.md
+        - Contrat public 1.0 (gel): reference/public-contract-1.0.md
+        - Convention HTTP inspectable: reference/http.md
+        - Opt-ins officiels:
+            - Modules Forge: reference/modules.md
+        - CRUD et relations: reference/crud.md
+        - Pages publiques: reference/pages-publiques.md
+        - Sécurité et sessions:
+            - Audit Auth: reference/audit-auth.md
+            - Sessions: reference/sessions.md
+        - Objets HTTP:
+            - L'objet Request: reference/http/request.md
+            - L'objet Response: reference/http/response.md
+            - Le cookie HTTP: reference/http/cookie.md
+            - La session HTTP: reference/http/session.md
+            - La protection CSRF: reference/http/csrf.md
+        - Aide-mémoire Markdown: reference/markdown.md
+        - Outils:
+            - Profils de projet: reference/profils.md
+            - Tests E2E: reference/tests-e2e.md
+        - API JSON légère: reference/api-json.md
+        - Schéma API: reference/reference-schema.md
+        - Schéma erreurs runtime: reference/runtime-errors-schema.md
 
 
-  - Apprendre (parcours cœur):
-      - Vue d'ensemble des starters: starters/index.md
-      - Progression pédagogique:
-          - Présentation: starters/welcome-forge/index.md
-          - Débutant:
-              - Bonjour Forge: starters/welcome-forge/debutant/welcome.md
-              - Paramètres d'URL: starters/welcome-forge/debutant/query-params.md
-              - Première vue HTML: starters/welcome-forge/debutant/first-html-view.md
-              - Route dynamique: starters/welcome-forge/debutant/dynamic-route.md
-              - Inspecter une requête: starters/welcome-forge/debutant/request-debug.md
-              - Réponse JSON: starters/welcome-forge/debutant/json-response.md
-              - Le jeton CSRF: starters/welcome-forge/debutant/csrf.md
-              - Premier formulaire POST: starters/welcome-forge/debutant/form-post.md
-              - Validation serveur: starters/welcome-forge/debutant/server-validation.md
-              - Première base SQL: starters/welcome-forge/debutant/first-sql.md
-              - Écrire en base: starters/welcome-forge/debutant/first-sql-write.md
-              - Bilan débutant: starters/welcome-forge/debutant/bilan.md
-          - Intermédiaire:
-              - Lister des enregistrements: starters/welcome-forge/intermediaire/list-records.md
-              - Héritage de gabarit: starters/welcome-forge/intermediaire/layout-template.md
-              - Rechercher / filtrer: starters/welcome-forge/intermediaire/filter-list.md
-              - Paginer une liste: starters/welcome-forge/intermediaire/pagination.md
-              - Modifier un enregistrement: starters/welcome-forge/intermediaire/update-record.md
-              - Supprimer un enregistrement: starters/welcome-forge/intermediaire/delete-record.md
-              - Messages flash: starters/welcome-forge/intermediaire/flash-messages.md
-              - Mémoriser un état en session: starters/welcome-forge/intermediaire/session-state.md
-              - Bilan intermédiaire: starters/welcome-forge/intermediaire/bilan.md
-          - Avancé:
-              - Relations entre tables: starters/welcome-forge/avance/relations.md
-              - Écritures transactionnelles: starters/welcome-forge/avance/db-transaction.md
-              - Téléverser un fichier: starters/welcome-forge/avance/file-upload.md
-              - API JSON protégée: starters/welcome-forge/avance/json-api.md
-              - Bilan avancé: starters/welcome-forge/avance/bilan.md
-          - Aide-mémoire: starters/welcome-forge/recapitulatif.md
-      - Progression façades helper (welcome-helpers):
-          - Préambule: starters/welcome-helpers/installation.md
-          - La base Facade: starters/welcome-helpers/facade-base.md
-          - La façade Session: starters/welcome-helpers/session.md
-          - La façade Cookies: starters/welcome-helpers/cookies.md
-          - La façade Flash: starters/welcome-helpers/flash.md
-          - Imports et usage: starters/welcome-helpers/imports-usage.md
-          - Bilan: starters/welcome-helpers/bilan.md
-      - Progression Markdown (welcome-markdown):
-          - Préambule: starters/welcome-markdown/installation.md
-          - Débutant:
-              - Titre et introduction: starters/welcome-markdown/debutant/titre-et-intro.md
-              - La mise en forme du texte: starters/welcome-markdown/debutant/mise-en-forme.md
-              - Les listes: starters/welcome-markdown/debutant/listes.md
-              - Citations et séparateurs: starters/welcome-markdown/debutant/citations-et-separations.md
-              - Liens et images: starters/welcome-markdown/debutant/liens-et-images.md
-              - Bilan débutant: starters/welcome-markdown/debutant/bilan.md
-          - Intermédiaire:
-              - Présenter des données en tableau: starters/welcome-markdown/intermediaire/tableaux.md
-              - Définir des termes: starters/welcome-markdown/intermediaire/definitions.md
-              - Mettre en avant avec les admonitions: starters/welcome-markdown/intermediaire/admonitions.md
-              - Replier le détail: starters/welcome-markdown/intermediaire/blocs-depliables.md
-              - Montrer du code: starters/welcome-markdown/intermediaire/code.md
-              - Bilan intermédiaire: starters/welcome-markdown/intermediaire/bilan.md
-          - Avancé:
-              - Offrir des variantes avec les onglets: starters/welcome-markdown/avance/onglets.md
-              - Diagrammes et inclusions: starters/welcome-markdown/avance/diagrammes-et-inclusions.md
-              - Le texte enrichi: starters/welcome-markdown/avance/texte-enrichi.md
-              - Notes, abréviations et attributs: starters/welcome-markdown/avance/notes-et-attributs.md
-              - Infobulles et agrandissement d'image: starters/welcome-markdown/avance/infobulles-et-images.md
-              - Relecture et maths: starters/welcome-markdown/avance/relecture-et-maths.md
-              - Bilan avancé: starters/welcome-markdown/avance/bilan.md
+    - Apprendre (parcours cœur):
+        - Vue d'ensemble des starters: starters/index.md
+        - Progression pédagogique:
+            - Présentation: starters/welcome-forge/index.md
+            - Débutant:
+                - Bonjour Forge: starters/welcome-forge/debutant/welcome.md
+                - Paramètres d'URL: starters/welcome-forge/debutant/query-params.md
+                - Première vue HTML: starters/welcome-forge/debutant/first-html-view.md
+                - Route dynamique: starters/welcome-forge/debutant/dynamic-route.md
+                - Inspecter une requête: starters/welcome-forge/debutant/request-debug.md
+                - Réponse JSON: starters/welcome-forge/debutant/json-response.md
+                - Le jeton CSRF: starters/welcome-forge/debutant/csrf.md
+                - Premier formulaire POST: starters/welcome-forge/debutant/form-post.md
+                - Validation serveur: starters/welcome-forge/debutant/server-validation.md
+                - Première base SQL: starters/welcome-forge/debutant/first-sql.md
+                - Écrire en base: starters/welcome-forge/debutant/first-sql-write.md
+                - Bilan débutant: starters/welcome-forge/debutant/bilan.md
+            - Intermédiaire:
+                - Lister des enregistrements: starters/welcome-forge/intermediaire/list-records.md
+                - Héritage de gabarit: starters/welcome-forge/intermediaire/layout-template.md
+                - Rechercher / filtrer: starters/welcome-forge/intermediaire/filter-list.md
+                - Paginer une liste: starters/welcome-forge/intermediaire/pagination.md
+                - Modifier un enregistrement: starters/welcome-forge/intermediaire/update-record.md
+                - Supprimer un enregistrement: starters/welcome-forge/intermediaire/delete-record.md
+                - Messages flash: starters/welcome-forge/intermediaire/flash-messages.md
+                - Mémoriser un état en session: starters/welcome-forge/intermediaire/session-state.md
+                - Bilan intermédiaire: starters/welcome-forge/intermediaire/bilan.md
+            - Avancé:
+                - Relations entre tables: starters/welcome-forge/avance/relations.md
+                - Écritures transactionnelles: starters/welcome-forge/avance/db-transaction.md
+                - Téléverser un fichier: starters/welcome-forge/avance/file-upload.md
+                - API JSON protégée: starters/welcome-forge/avance/json-api.md
+                - Bilan avancé: starters/welcome-forge/avance/bilan.md
+            - Aide-mémoire: starters/welcome-forge/recapitulatif.md
+        - Progression façades helper (welcome-helpers):
+            - Préambule: starters/welcome-helpers/installation.md
+            - La base Facade: starters/welcome-helpers/facade-base.md
+            - La façade Session: starters/welcome-helpers/session.md
+            - La façade Cookies: starters/welcome-helpers/cookies.md
+            - La façade Flash: starters/welcome-helpers/flash.md
+            - Imports et usage: starters/welcome-helpers/imports-usage.md
+            - Bilan: starters/welcome-helpers/bilan.md
+        - Progression Markdown (welcome-markdown):
+            - Préambule: starters/welcome-markdown/installation.md
+            - Débutant:
+                - Titre et introduction: starters/welcome-markdown/debutant/titre-et-intro.md
+                - La mise en forme du texte: starters/welcome-markdown/debutant/mise-en-forme.md
+                - Les listes: starters/welcome-markdown/debutant/listes.md
+                - Citations et séparateurs: starters/welcome-markdown/debutant/citations-et-separations.md
+                - Liens et images: starters/welcome-markdown/debutant/liens-et-images.md
+                - Bilan débutant: starters/welcome-markdown/debutant/bilan.md
+            - Intermédiaire:
+                - Présenter des données en tableau: starters/welcome-markdown/intermediaire/tableaux.md
+                - Définir des termes: starters/welcome-markdown/intermediaire/definitions.md
+                - Mettre en avant avec les admonitions: starters/welcome-markdown/intermediaire/admonitions.md
+                - Replier le détail: starters/welcome-markdown/intermediaire/blocs-depliables.md
+                - Montrer du code: starters/welcome-markdown/intermediaire/code.md
+                - Bilan intermédiaire: starters/welcome-markdown/intermediaire/bilan.md
+            - Avancé:
+                - Offrir des variantes avec les onglets: starters/welcome-markdown/avance/onglets.md
+                - Diagrammes et inclusions: starters/welcome-markdown/avance/diagrammes-et-inclusions.md
+                - Le texte enrichi: starters/welcome-markdown/avance/texte-enrichi.md
+                - Notes, abréviations et attributs: starters/welcome-markdown/avance/notes-et-attributs.md
+                - Infobulles et agrandissement d'image: starters/welcome-markdown/avance/infobulles-et-images.md
+                - Relecture et maths: starters/welcome-markdown/avance/relecture-et-maths.md
+                - Bilan avancé: starters/welcome-markdown/avance/bilan.md
 
-  - Déploiement:
-      - Mise en production pas à pas: deployment/mise-en-production.md
-      - Checklist de production: deployment/production-checklist.md
-      - Guide de déploiement: deployment/deployment.md
-      - Déploiement WSGI minimal: deployment/wsgi-deployment.md
-      - Limites de production: deployment/production-limits.md
-      - Déploiement avancé: deployment/deploy-advanced.md
-      - Sécurité en production: deployment/production-security.md
+    - Déploiement:
+        - Mise en production pas à pas: deployment/mise-en-production.md
+        - Checklist de production: deployment/production-checklist.md
+        - Guide de déploiement: deployment/deployment.md
+        - Déploiement WSGI minimal: deployment/wsgi-deployment.md
+        - Limites de production: deployment/production-limits.md
+        - Déploiement avancé: deployment/deploy-advanced.md
+        - Sécurité en production: deployment/production-security.md
 
-  - Release et compatibilité:
-      - Vue d'ensemble: release/release-and-compatibility.md
-      - Politique de release: release/release-policy.md
-      - Politique de dépréciation: release/deprecation-policy.md
-      - Matrice de compatibilité: release/compatibility.md
-      - Guide de migration: features/migration-guide.md
-      - Politique LTS: release/lts-policy.md
-      - Contrat de stabilité: release/stability-contract.md
-      - Numéros de version brûlés: release/burned-version-numbers.md
+    - Release et compatibilité:
+        - Vue d'ensemble: release/release-and-compatibility.md
+        - Politique de release: release/release-policy.md
+        - Politique de dépréciation: release/deprecation-policy.md
+        - Matrice de compatibilité: release/compatibility.md
+        - Guide de migration: features/migration-guide.md
+        - Politique LTS: release/lts-policy.md
+        - Contrat de stabilité: release/stability-contract.md
+        - Numéros de version brûlés: release/burned-version-numbers.md
 
-  - Philosophie:
-      - Charte v2: philosophy/charter.md
-      - Créer et structurer un module:
-          - Créer un module: philosophy/module-author-guide.md
-          - Structure des opt-ins (projet): architecture/optins-project-structure.md
-          - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
-      - Décisions d'architecture:
-          - Index des ADR: adr/index.md
-          - ADR-001 Authentification: adr/001-auth-strategy.md
-          - ADR-002 Sessions: adr/002-session-strategy.md
-          - ADR-003 Langue API: adr/003-language-convention.md
-          - ADR-004 Périmètre core: adr/004-core-perimeter.md
-          - ADR-005 Packaging: adr/005-packaging.md
-          - ADR-006 Python 3.12+: adr/006-python-version.md
-          - ADR-007 Charte v2: adr/007-charter-v2-adoption.md
-          - ADR-008 Audit auth: adr/008-auth-audit-architecture.md
-          - ADR-009 Stabilité terrain: adr/009-stability-policy-terrain.md
-          - ADR-010 API canonique auth/session: adr/010-auth-session-canonical-api.md
-          - ADR-011 Périmètre vocabulaire audit auth: adr/011-auth-audit-vocab-perimeter.md
-          - ADR-012 Suppression format legacy: adr/012-legacy-format-deprecation-policy.md
-          - ADR-013 Politique nullable/required: adr/013-nullable-required-contract-policy.md
-          - ADR-014 Contrat RBAC séparé: adr/014-rbac-contract-location.md
-          - ADR-015 Handshake TLS par thread (dev): adr/015-dev-tls-handshake-per-thread.md
-          - ADR-016 Unification opt-in: adr/016-opt-in-unification.md
-          - ADR-017 Type slug: adr/017-slug-type.md
-          - ADR-018 Module images: adr/018-image-module-extraction.md
-          - ADR-019 Extraction upload: adr/019-upload-extraction.md
-          - ADR-020 Primitives stockage files: adr/020-files-media-storage-primitives.md
-          - ADR-021 Extraction pivot: adr/021-pivot-extraction.md
-          - ADR-022 Extraction mail: adr/022-mail-extraction.md
-          - ADR-023 Starter build canonique: adr/023-starter-build-canonical.md
-          - ADR-024 Bootstrap squelette dédié: adr/024-skeleton-bootstrap.md
-          - ADR-025 welcome-forge tutoriel continu: adr/025-welcome-forge-continuous-tutorial.md
-          - ADR-026 Accesseurs Request query/route: adr/026-request-param-naming.md
-          - ADR-027 Extraction i18n: adr/027-i18n-extraction.md
-          - ADR-028 welcome-forge tutoriel par niveau: adr/028-welcome-forge-tutorial-per-level.md
-          - ADR-029 Convention de route: adr/029-route-naming-convention.md
-          - ADR-030 Injection de routes explicite: adr/030-explicit-route-injection.md
-          - ADR-031 Découplage mail complet: adr/031-mail-core-decoupling.md
-          - ADR-032 Périmètre config upload: adr/032-upload-config-perimeter.md
-          - ADR-033 Migrations en DB_ADMIN: adr/033-migrations-admin-credentials.md
-          - ADR-034 Nommage DB généré sans suffixes: adr/034-generated-db-identifier-naming.md
-          - ADR-035 Parcours manuels, retrait génération: adr/035-starters-manual-not-generated.md
-          - ADR-036 Typage statique du cœur en CI: adr/036-core-static-typing.md
-          - ADR-037 Agrégation par comptage (stats): adr/037-stats-aggregation.md
-          - ADR-038 Doc opt-ins embarquée par paquet: adr/038-optin-docs-embedded-per-package.md
-          - ADR-039 Refonte IA docs (cœur): adr/039-docs-information-architecture.md
-          - ADR-040 Tests par paquet opt-in: adr/040-per-package-test-surface.md
-          - ADR-041 Infra de test partagée: adr/041-shared-test-support.md
+    - Philosophie:
+        - Charte v2: philosophy/charter.md
+        - Créer et structurer un module:
+            - Créer un module: philosophy/module-author-guide.md
+            - Structure des opt-ins (projet): architecture/optins-project-structure.md
+            - Audit forge optin:enable: architecture/optins-cli-enable-audit.md
+        - Décisions d'architecture:
+            - Index des ADR: adr/index.md
+            - ADR-001 Authentification: adr/001-auth-strategy.md
+            - ADR-002 Sessions: adr/002-session-strategy.md
+            - ADR-003 Langue API: adr/003-language-convention.md
+            - ADR-004 Périmètre core: adr/004-core-perimeter.md
+            - ADR-005 Packaging: adr/005-packaging.md
+            - ADR-006 Python 3.12+: adr/006-python-version.md
+            - ADR-007 Charte v2: adr/007-charter-v2-adoption.md
+            - ADR-008 Audit auth: adr/008-auth-audit-architecture.md
+            - ADR-009 Stabilité terrain: adr/009-stability-policy-terrain.md
+            - ADR-010 API canonique auth/session: adr/010-auth-session-canonical-api.md
+            - ADR-011 Périmètre vocabulaire audit auth: adr/011-auth-audit-vocab-perimeter.md
+            - ADR-012 Suppression format legacy: adr/012-legacy-format-deprecation-policy.md
+            - ADR-013 Politique nullable/required: adr/013-nullable-required-contract-policy.md
+            - ADR-014 Contrat RBAC séparé: adr/014-rbac-contract-location.md
+            - ADR-015 Handshake TLS par thread (dev): adr/015-dev-tls-handshake-per-thread.md
+            - ADR-016 Unification opt-in: adr/016-opt-in-unification.md
+            - ADR-017 Type slug: adr/017-slug-type.md
+            - ADR-018 Module images: adr/018-image-module-extraction.md
+            - ADR-019 Extraction upload: adr/019-upload-extraction.md
+            - ADR-020 Primitives stockage files: adr/020-files-media-storage-primitives.md
+            - ADR-021 Extraction pivot: adr/021-pivot-extraction.md
+            - ADR-022 Extraction mail: adr/022-mail-extraction.md
+            - ADR-023 Starter build canonique: adr/023-starter-build-canonical.md
+            - ADR-024 Bootstrap squelette dédié: adr/024-skeleton-bootstrap.md
+            - ADR-025 welcome-forge tutoriel continu: adr/025-welcome-forge-continuous-tutorial.md
+            - ADR-026 Accesseurs Request query/route: adr/026-request-param-naming.md
+            - ADR-027 Extraction i18n: adr/027-i18n-extraction.md
+            - ADR-028 welcome-forge tutoriel par niveau: adr/028-welcome-forge-tutorial-per-level.md
+            - ADR-029 Convention de route: adr/029-route-naming-convention.md
+            - ADR-030 Injection de routes explicite: adr/030-explicit-route-injection.md
+            - ADR-031 Découplage mail complet: adr/031-mail-core-decoupling.md
+            - ADR-032 Périmètre config upload: adr/032-upload-config-perimeter.md
+            - ADR-033 Migrations en DB_ADMIN: adr/033-migrations-admin-credentials.md
+            - ADR-034 Nommage DB généré sans suffixes: adr/034-generated-db-identifier-naming.md
+            - ADR-035 Parcours manuels, retrait génération: adr/035-starters-manual-not-generated.md
+            - ADR-036 Typage statique du cœur en CI: adr/036-core-static-typing.md
+            - ADR-037 Agrégation par comptage (stats): adr/037-stats-aggregation.md
+            - ADR-038 Doc opt-ins embarquée par paquet: adr/038-optin-docs-embedded-per-package.md
+            - ADR-039 Refonte IA docs (cœur): adr/039-docs-information-architecture.md
+            - ADR-040 Tests par paquet opt-in: adr/040-per-package-test-surface.md
+            - ADR-041 Infra de test partagée: adr/041-shared-test-support.md
+            - ADR-042 Découplage doc cœur/opt-ins: adr/042-doc-core-optins-decoupling.md
+
+    - Tests terrain:
+        - Vue d'ensemble: testing/index.md
+        - État des parcours: testing/field-test-status.md
+        - Outils de diagnostic: testing/field-test-debug-tools.md
+        - Charte de campagne: testing/field-test-charter.md
+        - Modèle de ticket FT: testing/field-test-ticket-template.md
+        - Modèle de retour testeur: testing/field-test-feedback-template.md
+        - Triage et stabilisation: testing/field-test-triage.md
+        - Conversion en tutoriel: testing/field-test-to-tutorial.md
+        - Tickets FT détaillés:
+            - Vue d'ensemble: testing/tickets/index.md
+            - FT-00 — Charte de campagne: testing/tickets/ft-00-test-charter-001.md
+            - FT-00 — Modèle de retour: testing/tickets/ft-00-feedback-template-001.md
+            - FT-00 — Documentation erronée: testing/tickets/ft-00-doc-error-protocol-001.md
+            - FT-00 — Outils de diagnostic: testing/tickets/ft-00-debug-tools-intro-001.md
+            - FT-01 — Installation pipx: testing/tickets/ft-01-install-pipx-001.md
+            - FT-01 — Vérifier la version: testing/tickets/ft-01-install-version-check-001.md
+
+    - Projet:
+        - Roadmap:
+            - Roadmap Forge: roadmap/forge-roadmap.md
+            - Beta 13 (dernière beta fonctionnelle): roadmap/beta13-roadmap.md
+            - Forge Design: roadmap/forge-design-roadmap.md
+            - Tests terrain Forge: roadmap/forge-field-test-roadmap.md
+            - Réorganisation des starters: roadmap/starter-reorg-roadmap.md
+        - Historique:
+            - Roadmap Forge 1.5.0→2.0: history/forge-roadmap-history-2.0.md
+            - Charte documentaire v1: history/charte-v1.md
+            - Archives post-2.0 (consolidation): history/forge_post_2_0_consolidation_roadmap.md
+            - Archives post-2.0 (tickets): history/forge-roadmap-post-2.0.md
+            - Archives UX (phases 5-10): history/forge-roadmap-ux.md
+        - Procédure de release: release/release.md
+        - Validation locale: release/release-local.md
+        - Paramètres GitHub du dépôt: project/github-repository-settings.md
+        - Pour contribuer:
+            - Vue d'ensemble: philosophy/contributing.md
+            - Conventions de travail: contributing/conventions.md
+            - Convention de route: contributing/route-convention.md
+            - Modèle de starter (référence welcome): contributing/starter-welcome-model.md
+            - Convention de création d'un palier (Welcome pédagogique): contributing/convention-creation-palier-welcome-pedagogique.md
+            - Dépôt canonique et récupération: contributing/canonical-repo.md
+        - Audits:
+            - Tracker des constats: history/audits/findings-tracker.md
+            - Baseline 2026-05-15: history/audits/audit-baseline-2026-05-15.md
+            - Pivot advanced — modèle fonctionnel: history/audits/pivot-advanced-functional-model-001.md
+            - Pivot advanced — modèle UX: history/audits/pivot-advanced-ux-model-002.md
+            - Audit final post-RBAC/Pivot: history/audits/release-audit-final-post-rbac-pivot-001.md
+            - Audit make:crud garde M2M: history/audits/field-audit-m2m-guard-001.md
+            - Audit post-corrections terrain: history/audits/release-audit-post-field-fixes-002.md
+            - Audit post-publication beta.8: history/audits/audit-post-publication-beta8.md
+            - Audit de clôture Forge IoT: history/audits/audit-iot-closing.md
+            - Audit de clôture Forge Video: history/audits/audit-video-closing.md
+            - Audit de clôture opt-ins: history/audits/audit-optins-closing.md
+            - Audit pré-release beta.12: history/audits/audit-pre-release-beta12.md
+            - Audit post-publication beta.12: history/audits/audit-beta12-post-publish.md
+            - Clôture beta.12: history/audits/audit-beta12-closing-summary.md
+            - Audits archivés: history/audits/README.md
+        - Tests terrain:
+            - Field Test App 001: history/field-tests/field-test-app-001.md
+        - Releases:
+            - 1.0.0-beta.8: history/releases/release-1.0.0-beta.8.md
+            - 1.0.0-beta.7: history/releases/release-1.0.0-beta.7.md
+            - 1.0.0-beta.6: history/releases/release-1.0.0-beta.6.md
+        - Licence: philosophy/licence.md
+
 
   # Opt-ins officiels à doc embarquée par paquet (ADR-038), regroupés (ADR-039).
   - Opt-ins officiels:
@@ -269,71 +338,6 @@ nav:
       - Mail: '!include packages/forge-mvc-mail/mkdocs.yml'
       - Pivot: '!include packages/forge-mvc-pivot/mkdocs.yml'
       - i18n: '!include packages/forge-mvc-i18n/mkdocs.yml'
-
-  - Tests terrain:
-      - Vue d'ensemble: testing/index.md
-      - État des parcours: testing/field-test-status.md
-      - Outils de diagnostic: testing/field-test-debug-tools.md
-      - Charte de campagne: testing/field-test-charter.md
-      - Modèle de ticket FT: testing/field-test-ticket-template.md
-      - Modèle de retour testeur: testing/field-test-feedback-template.md
-      - Triage et stabilisation: testing/field-test-triage.md
-      - Conversion en tutoriel: testing/field-test-to-tutorial.md
-      - Tickets FT détaillés:
-          - Vue d'ensemble: testing/tickets/index.md
-          - FT-00 — Charte de campagne: testing/tickets/ft-00-test-charter-001.md
-          - FT-00 — Modèle de retour: testing/tickets/ft-00-feedback-template-001.md
-          - FT-00 — Documentation erronée: testing/tickets/ft-00-doc-error-protocol-001.md
-          - FT-00 — Outils de diagnostic: testing/tickets/ft-00-debug-tools-intro-001.md
-          - FT-01 — Installation pipx: testing/tickets/ft-01-install-pipx-001.md
-          - FT-01 — Vérifier la version: testing/tickets/ft-01-install-version-check-001.md
-
-  - Projet:
-      - Roadmap:
-          - Roadmap Forge: roadmap/forge-roadmap.md
-          - Beta 13 (dernière beta fonctionnelle): roadmap/beta13-roadmap.md
-          - Forge Design: roadmap/forge-design-roadmap.md
-          - Tests terrain Forge: roadmap/forge-field-test-roadmap.md
-          - Réorganisation des starters: roadmap/starter-reorg-roadmap.md
-      - Historique:
-          - Roadmap Forge 1.5.0→2.0: history/forge-roadmap-history-2.0.md
-          - Charte documentaire v1: history/charte-v1.md
-          - Archives post-2.0 (consolidation): history/forge_post_2_0_consolidation_roadmap.md
-          - Archives post-2.0 (tickets): history/forge-roadmap-post-2.0.md
-          - Archives UX (phases 5-10): history/forge-roadmap-ux.md
-      - Procédure de release: release/release.md
-      - Validation locale: release/release-local.md
-      - Paramètres GitHub du dépôt: project/github-repository-settings.md
-      - Pour contribuer:
-          - Vue d'ensemble: philosophy/contributing.md
-          - Conventions de travail: contributing/conventions.md
-          - Convention de route: contributing/route-convention.md
-          - Modèle de starter (référence welcome): contributing/starter-welcome-model.md
-          - Convention de création d'un palier (Welcome pédagogique): contributing/convention-creation-palier-welcome-pedagogique.md
-          - Dépôt canonique et récupération: contributing/canonical-repo.md
-      - Audits:
-          - Tracker des constats: history/audits/findings-tracker.md
-          - Baseline 2026-05-15: history/audits/audit-baseline-2026-05-15.md
-          - Pivot advanced — modèle fonctionnel: history/audits/pivot-advanced-functional-model-001.md
-          - Pivot advanced — modèle UX: history/audits/pivot-advanced-ux-model-002.md
-          - Audit final post-RBAC/Pivot: history/audits/release-audit-final-post-rbac-pivot-001.md
-          - Audit make:crud garde M2M: history/audits/field-audit-m2m-guard-001.md
-          - Audit post-corrections terrain: history/audits/release-audit-post-field-fixes-002.md
-          - Audit post-publication beta.8: history/audits/audit-post-publication-beta8.md
-          - Audit de clôture Forge IoT: history/audits/audit-iot-closing.md
-          - Audit de clôture Forge Video: history/audits/audit-video-closing.md
-          - Audit de clôture opt-ins: history/audits/audit-optins-closing.md
-          - Audit pré-release beta.12: history/audits/audit-pre-release-beta12.md
-          - Audit post-publication beta.12: history/audits/audit-beta12-post-publish.md
-          - Clôture beta.12: history/audits/audit-beta12-closing-summary.md
-          - Audits archivés: history/audits/README.md
-      - Tests terrain:
-          - Field Test App 001: history/field-tests/field-test-app-001.md
-      - Releases:
-          - 1.0.0-beta.8: history/releases/release-1.0.0-beta.8.md
-          - 1.0.0-beta.7: history/releases/release-1.0.0-beta.7.md
-          - 1.0.0-beta.6: history/releases/release-1.0.0-beta.6.md
-      - Licence: philosophy/licence.md
 
 markdown_extensions:
   - admonition

@@ -16,8 +16,8 @@ Premier palier du **niveau intermédiaire**.
 
 | Fonction | Rôle dans ce starter | Référence |
 |----------|----------------------|-----------|
-| `set_default_locale(locale)` | Fixe la locale par défaut. | [Opt-ins](../../../install/opt-ins.md) |
-| `get_default_locale()` | Lit la locale par défaut. | [Opt-ins](../../../install/opt-ins.md) |
+| `set_default_locale(locale)` | Fixe la locale par défaut. | Opt-ins |
+| `get_default_locale()` | Lit la locale par défaut. | Opt-ins |
 
 ## Fixer la locale au démarrage
 

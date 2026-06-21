@@ -9,7 +9,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-pivot`.
 précisément ce que `PivotAdvancedService` rend explicite et sûr.
 
 Premier palier du **niveau débutant** de la progression pivot
-([vue d'ensemble des starters](../../../starters/index.md)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-pivot` installé (palier « Installation »). Module à

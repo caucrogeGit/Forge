@@ -82,7 +82,7 @@ Le RBAC repond a la question : **qu'a le droit de faire l'utilisateur ?**
 La brique Auth/User repond a la question : **qui est connecte ?**
 
 Pour comprendre comment Auth/User fournit l'identité utilisateur (login, MFA, OIDC,
-sessions, cookies, administration CLI), voir la [documentation Auth/User](../features/auth.md).
+sessions, cookies, administration CLI), voir la documentation Auth/User.
 
 Auth/User fournit l'identite locale et RBAC fournit les roles et permissions.
 La table optionnelle `user_roles`, ajoutee par AUTH-USER-RBAC-001, sert de pont
@@ -182,7 +182,7 @@ API cote Auth/User :
 
 > ℹ️ Les fonctions ci-dessous sont fournies par le module optionnel
 > `forge-mvc-rbac` (opt-in officiel publié sur PyPI depuis `1.0.0-beta.9` — voir
-> [contrat d'installation](../install/opt-ins.md)).
+> contrat d'installation).
 
 ```python
 from forge_mvc_rbac import get_user_permissions, get_user_role_ids, user_has_permission
@@ -329,7 +329,7 @@ utilisent Auth/User et la table optionnelle `user_roles` :
 
 > ℹ️ Cette section utilise des symboles fournis par le module
 > optionnel `forge-mvc-rbac` (opt-in officiel publié sur PyPI depuis `1.0.0-beta.9` — voir
-> [contrat d'installation](../install/opt-ins.md)).
+> contrat d'installation).
 
 ```python
 from forge_mvc_rbac import require_user_permission

@@ -8,7 +8,7 @@ configuration** (`load_audio_config`) — stockage, limites, binaires `ffprobe`/
 — avec le **token masqué**. Aucune base de données.
 
 Premier palier du **niveau débutant** de la progression audio
-([vue d'ensemble des starters](../../../starters/index.md)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-audio` installé (palier « Installation »).
@@ -25,8 +25,8 @@ Premier palier du **niveau débutant** de la progression audio
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_audio.load_audio_config` | Lire la configuration audio (stockage, limites, binaires). | [Audio](../../../features/media.md) |
-| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/http.md) |
+| `forge_mvc_audio.load_audio_config` | Lire la configuration audio (stockage, limites, binaires). | Audio |
+| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | Response |
 
 ## Tester
 

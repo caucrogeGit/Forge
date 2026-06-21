@@ -21,8 +21,8 @@ Premier palier du **niveau intermédiaire** de la progression RBAC.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.has_contract_permission` | Vérifier une permission pour des rôles selon le contrat. | [RBAC](../../../reference/api.md) |
-| `forge_mvc_rbac.load_rbac_contract` | Charger le contrat. | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.has_contract_permission` | Vérifier une permission pour des rôles selon le contrat. | RBAC |
+| `forge_mvc_rbac.load_rbac_contract` | Charger le contrat. | RBAC |
 
 ## Tester
 

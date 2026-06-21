@@ -23,7 +23,7 @@ Lecture seule, aucun ffmpeg.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `request.route` | Lire l'`uuid` dans l'URL. | [Request](../../../reference/api.md#corehttprequest) |
+| `request.route` | Lire l'`uuid` dans l'URL. | Request |
 | `VideoRepository.get_by_uuid` | Lire une vidéo précise (ou `None`). | [Parcours vidéo](../../parcours.md) |
 
 ## Tester

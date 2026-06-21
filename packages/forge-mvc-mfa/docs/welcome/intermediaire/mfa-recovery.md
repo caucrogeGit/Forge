@@ -23,9 +23,9 @@ Troisième palier du **niveau intermédiaire** de la progression MFA.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.create_recovery_codes` | Générer un lot de codes (bruts + records hachés). | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.verify_recovery_code` | Confronter un code à son hash. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.consume_recovery_code` | Marquer un code utilisé (usage unique). | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.create_recovery_codes` | Générer un lot de codes (bruts + records hachés). | MFA |
+| `forge_mvc_mfa.verify_recovery_code` | Confronter un code à son hash. | MFA |
+| `forge_mvc_mfa.consume_recovery_code` | Marquer un code utilisé (usage unique). | MFA |
 
 ## Tester
 

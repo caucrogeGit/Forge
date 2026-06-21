@@ -24,9 +24,9 @@ Premier palier du **niveau avancé** de la progression audio.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_audio.probe_audio` | Sonder un audio via `ffprobe`, valider durée. | [Audio](../../../features/media.md) |
-| `forge_mvc_audio.AudioMetadata` | Métadonnées retournées (durée, codec, bitrate…). | [Audio](../../../features/media.md) |
-| `forge_mvc_audio.AudioProbeError` | Erreur si durée trop longue ou flux invalide. | [Audio](../../../features/media.md) |
+| `forge_mvc_audio.probe_audio` | Sonder un audio via `ffprobe`, valider durée. | Audio |
+| `forge_mvc_audio.AudioMetadata` | Métadonnées retournées (durée, codec, bitrate…). | Audio |
+| `forge_mvc_audio.AudioProbeError` | Erreur si durée trop longue ou flux invalide. | Audio |
 
 ## Tester
 

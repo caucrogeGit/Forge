@@ -22,8 +22,8 @@ Troisième palier du **niveau intermédiaire** de la progression files.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_files.delete_media_file` | Supprimer un fichier par son chemin relatif. | [Médias](../../../features/media.md) |
-| `request.form(...)` | Lire le chemin soumis. | [Request](../../../reference/http.md) |
+| `forge_mvc_files.delete_media_file` | Supprimer un fichier par son chemin relatif. | Médias |
+| `request.form(...)` | Lire le chemin soumis. | Request |
 
 ## Tester
 

@@ -21,8 +21,8 @@ Deuxième palier du **niveau débutant** de la progression workflow.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_workflow.normalize_status_name` | Normaliser un nom de statut. | [Workflow](../../../reference/api.md) |
-| `forge_mvc_workflow.validate_status_name` | Refuser un nom invalide. | [Workflow](../../../reference/api.md) |
+| `forge_mvc_workflow.normalize_status_name` | Normaliser un nom de statut. | Workflow |
+| `forge_mvc_workflow.validate_status_name` | Refuser un nom invalide. | Workflow |
 
 ## Tester
 

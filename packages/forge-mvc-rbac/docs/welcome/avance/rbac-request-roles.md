@@ -23,8 +23,8 @@ Troisième palier du **niveau avancé** de la progression RBAC.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_rbac.get_request_roles` | Rôles de la requête/session courante. | [RBAC](../../../reference/api.md) |
-| `forge_mvc_rbac.get_request_permissions` | Permissions de la requête courante. | [RBAC](../../../reference/api.md) |
+| `forge_mvc_rbac.get_request_roles` | Rôles de la requête/session courante. | RBAC |
+| `forge_mvc_rbac.get_request_permissions` | Permissions de la requête courante. | RBAC |
 
 ## Tester
 

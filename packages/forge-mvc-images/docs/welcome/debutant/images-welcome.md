@@ -10,7 +10,7 @@ qu'il sait traiter.
 simplement comment Forge Images est branché.
 
 Premier palier du **niveau débutant** de la progression images
-([vue d'ensemble des starters](../../../starters/index.md)).
+(vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce starter suppose le module installé. `forge-mvc-images` dépend de
@@ -32,9 +32,9 @@ Aucune écriture, aucune base de données.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.ALLOWED_IMAGE_EXTENSIONS` | Formats d'image acceptés à l'upload. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.IMAGE_VARIANT_SIZES` | Tailles des variantes générées (`medium`, `thumbnail`). | [Médias](../../../features/media.md) |
-| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | [Response](../../../reference/http.md) |
+| `forge_mvc_images.ALLOWED_IMAGE_EXTENSIONS` | Formats d'image acceptés à l'upload. | Médias |
+| `forge_mvc_images.IMAGE_VARIANT_SIZES` | Tailles des variantes générées (`medium`, `thumbnail`). | Médias |
+| `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | Response |
 
 ## Tester
 

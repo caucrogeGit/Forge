@@ -22,9 +22,9 @@ Deuxième palier du **niveau avancé** de la progression MFA.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_mfa.step_for_time` | Calculer la step TOTP d'un instant. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.record_used` | Marquer une step consommée pour un facteur. | [MFA](../../../reference/api.md) |
-| `forge_mvc_mfa.is_replay` | Refuser une step déjà consommée. | [MFA](../../../reference/api.md) |
+| `forge_mvc_mfa.step_for_time` | Calculer la step TOTP d'un instant. | MFA |
+| `forge_mvc_mfa.record_used` | Marquer une step consommée pour un facteur. | MFA |
+| `forge_mvc_mfa.is_replay` | Refuser une step déjà consommée. | MFA |
 
 ## Tester
 

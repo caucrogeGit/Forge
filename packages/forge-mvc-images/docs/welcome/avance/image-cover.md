@@ -25,9 +25,9 @@ Premier palier du **niveau avancé** de la progression images.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_images.get_cover_media` | Lire la couverture d'une entité (repli galerie). | [Médias](../../../features/media.md) |
-| `forge_mvc_images.attach_media_to_entity` | Rattacher une image en rôle `cover`. | [Médias](../../../features/media.md) |
-| `forge_mvc_images.save_image_upload` | Vérifier, écrire, générer les variantes. | [Médias](../../../features/media.md) |
+| `forge_mvc_images.get_cover_media` | Lire la couverture d'une entité (repli galerie). | Médias |
+| `forge_mvc_images.attach_media_to_entity` | Rattacher une image en rôle `cover`. | Médias |
+| `forge_mvc_images.save_image_upload` | Vérifier, écrire, générer les variantes. | Médias |
 
 ## Tester
 
