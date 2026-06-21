@@ -4,7 +4,13 @@
 site_name: stats
 docs_dir: docs
 nav:
-  - Référence Statistiques: reference.md
+  - Référence Statistiques:
+      - Vue d'ensemble: reference.md
+      - Événements (events.py): references/events.md
+      - Table SQL (schema.py): references/schema.md
+      - Tracking (tracking.py): references/tracking.md
+      - Affichage admin (admin.py): references/admin.md
+      - Agrégation (aggregate.py): references/aggregate.md
   - Progression Stats:
       - Installation: welcome/installation.md
       - Débutant:
