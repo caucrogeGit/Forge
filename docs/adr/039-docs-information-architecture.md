@@ -87,13 +87,17 @@ Buckets de premier niveau visés pour la nav (cœur) :
 
 Dédoublonnages actés :
 
-- `crud` : un seul emplacement (guide du cœur) ; l'entrée `reference/crud.md`
-  est supprimée ou réduite à un renvoi.
+- `crud` : **finalement pas un doublon** (vérifié à l'exécution).
+  `features/crud.md` = guide « CRUD explicite » (génération) ;
+  `reference/crud.md` = « Relations avancées et CRUD enrichi » (référence
+  relations). Les deux sont conservés ; `reference/crud.md` est candidat au
+  bucket « Modèle de données » plutôt qu'à « Référence » (étape nav ultérieure).
 - `migrations` : fusionner `features/migrations.md` et
   `features/migration-guide.md` ; `entities/migration-legacy-vers-canonique.md`
-  rejoint « Modèle de données ».
-- `docs/concepts/` (vide) : supprimé.
-- `reference/markdown.md` : déplacé hors de la référence.
+  rejoint « Modèle de données » (fait au niveau nav, étape 3).
+- `docs/concepts/` : déjà absent du disque, rien à supprimer.
+- `reference/markdown.md` : aide-mémoire sans lien entrant ; déplacement hors
+  référence reporté (faible valeur, aucun lien à recâbler).
 
 ---
 
