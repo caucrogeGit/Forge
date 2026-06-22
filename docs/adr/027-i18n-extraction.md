@@ -54,7 +54,7 @@ casserait au rendu tout CRUD généré tant que `forge-mvc-i18n` n'est pas insta
   comme les clés `mail_*` après ADR-022 : le registre de configuration reste
   centralisé, seul le **code** migre.
 - **CLI de scaffolding conservée dans le noyau.** `forge i18n:init` et
-  `forge i18n:check` (`cli/i18n.py`) sont **autonomes** : ils créent et
+  `forge i18n:check` (`cli/assets/i18n.py`) sont **autonomes** : ils créent et
   vérifient `translations/fr.json` sans importer le translator runtime. Ils
   relèvent de l'outillage de projet du CLI cœur et restent disponibles sans
   installer `forge-mvc-i18n`. Seul le translator runtime est extrait.

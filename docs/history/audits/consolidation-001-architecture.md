@@ -270,7 +270,7 @@ Les starters 1, 3 et 4 ont été mis à jour dans la Phase 9.1. Cette correction
 
 **Alignement code ↔ doc :**
 
-- Profils dans `cli/project_profiles.py` ↔ `docs/profiles.md` : ✅ alignés.
+- Profils dans `cli/project/project_profiles.py` ↔ `docs/profiles.md` : ✅ alignés.
 - Starters dans `cli/starters/data/*/starter.json` ↔ `docs/starters/` : ✅ alignés (sauf `doc_url` starters 2 et 5).
 - Commandes CLI ↔ `docs/reference.md` : à vérifier dans CONSOLIDATION-DOC-001.
 

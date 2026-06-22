@@ -122,8 +122,8 @@ travail de découpe en commits — qui appartient explicitement à
 |---|---|
 | `core/http/debug_dumper.py` | `DX-DEBUG-DUMP-HTML-001` |
 | `core/templating/errors.py` | `DX-RENDER-ERROR-001` |
-| `cli/dev_reloader.py` | `DEV-SERVER-AUTORELOAD-001` |
-| `cli/run.py` | `FORGE-RUN-COMMAND-001` |
+| `cli/project/dev_reloader.py` | `DEV-SERVER-AUTORELOAD-001` |
+| `cli/project/run.py` | `FORGE-RUN-COMMAND-001` |
 | `tests/meta/test_doc_bonjour_forge.py` | `DX-DOCS-BONJOUR-FORGE-CLOSE-001` |
 | `tests/test_api_inspectable_objects_convention_001.py` | `API-INSPECTABLE-OBJECTS-CONVENTION-001` |
 | `tests/test_dev_server_autoreload_001.py` | `DEV-SERVER-AUTORELOAD-001` |
@@ -135,8 +135,8 @@ travail de découpe en commits — qui appartient explicitement à
 
 ### 5.2 Fichiers modifiés non commités (par ticket)
 
-- **`FORGE-RUN-COMMAND-001`** : `forge.py`, `cli/help.py`,
-  `cli/help_dispatch.py`,
+- **`FORGE-RUN-COMMAND-001`** : `forge.py`, `cli/_support/help.py`,
+  `cli/_support/help_dispatch.py`,
   `tests/meta/test_cli_help_flags_closing_audit_001.py`.
 - **`API-INSPECTABLE-OBJECTS-CONVENTION-001`** : `core/http/request.py`,
   `core/http/response.py`, `core/http/helpers.py`,
@@ -147,8 +147,8 @@ travail de découpe en commits — qui appartient explicitement à
   `Response.debug` recâblé sur `debug_dumper.render_debug_html`).
 - **`DX-TYPED-SKELETONS-001`** :
   `cli/entities/crud/controller_builder.py`,
-  `cli/public_form.py`, `cli/public_list.py`,
-  `cli/public_page.py`, tous les contrôleurs de
+  `cli/public/public_form.py`, `cli/public/public_list.py`,
+  `cli/public/public_page.py`, tous les contrôleurs de
   `cli/starters/data/*/files/mvc/controllers/*.py`,
   les ~20 tests `tests/test_make_*`, `tests/test_crud_*`,
   `tests/test_rbac_security.py`, `tests/test_runtime_errors_jsonl.py`.

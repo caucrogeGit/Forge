@@ -131,7 +131,7 @@ Catégories principales :
 | T201 | `print()` | 530 | CLI légitime — forge est un outil interactif |
 | S608 | SQL injection vector | ~30 | **Faux positifs** — f-strings avec constantes internes |
 | B904 | `raise` sans `from` | ~10 | Qualité mineure |
-| S110 | `try/except/pass` | 2 | À noter (`cli/deploy.py`) |
+| S110 | `try/except/pass` | 2 | À noter (`cli/deploy/deploy.py`) |
 
 **Violations critiques réelles** : aucune. Les S608 sont des faux positifs (interpolation
 de constantes Python dans des f-strings SQL, pas d'entrée utilisateur).

@@ -235,7 +235,7 @@ Ces commandes et leurs options documentées sont garanties pour Forge 1.x.
 |---|---|
 | `forge help` / `--help` / `-h` | Affiche l'aide groupée sur stdout, code 0. |
 | `forge` (sans argument) | Identique à `forge help`. |
-| Module source de l'aide | `cli/help.py` — `build_help(version: str)` |
+| Module source de l'aide | `cli/_support/help.py` — `build_help(version: str)` |
 
 La distinction entre `forge doctor` (tolérant) et `forge project:check` (strict) est documentée dans l'aide générale.
 

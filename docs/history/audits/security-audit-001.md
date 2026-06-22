@@ -57,7 +57,7 @@ Lecture manuelle des fichiers sources :
 | `mvc/controllers/mfa_challenge_controller.py` | Set-Cookie après MFA |
 | `core/auth/__init__.py`, `rate_limit.py`, `audit.py` | Contrats Auth/rate limit/audit |
 | `cli/entities/crud/model_builder.py` | SQL généré paramétré |
-| `cli/entities/crud/views_builder.py` + `cli/public_form.py` | CSRF dans les formulaires générés |
+| `cli/entities/crud/views_builder.py` + `cli/public/public_form.py` | CSRF dans les formulaires générés |
 | `docs/deployment.md` | Documentation déploiement |
 
 ---
@@ -108,7 +108,7 @@ Lecture manuelle des fichiers sources :
 - Retourne `_html("errors/403.html", 403)` en cas d'échec.
 - Vérifié **avant** les middlewares d'authentification dans `Application.dispatch()`.
 
-**Formulaires générés** (`cli/entities/crud/views_builder.py`, `cli/public_form.py`) :
+**Formulaires générés** (`cli/entities/crud/views_builder.py`, `cli/public/public_form.py`) :
 tous les formulaires générés incluent :
 ```html
 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

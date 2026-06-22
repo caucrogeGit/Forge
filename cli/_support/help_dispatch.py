@@ -1,5 +1,5 @@
 """
-cli/help_dispatch.py — Interception centrale de `--help` / `-h`.
+cli/_support/help_dispatch.py — Interception centrale de `--help` / `-h`.
 
 Tickets : CLI-HELP-FLAGS-DISPATCHER-001 (mécanisme),
           CLI-HELP-FLAGS-* (enrichissements par groupe),
@@ -51,7 +51,7 @@ from __future__ import annotations
 HELP_FLAGS: frozenset[str] = frozenset({"--help", "-h"})
 
 
-# Description courte par commande — une ligne, ton constant avec cli/help.py.
+# Description courte par commande — une ligne, ton constant avec cli/_support/help.py.
 # Ne contient PAS les commandes qui ont déjà un `--help` natif fonctionnel.
 # Filet de sécurité : si une commande arrive ici sans entrée riche
 # correspondante dans HELP_TEXTS_RICH, format_command_help produit un

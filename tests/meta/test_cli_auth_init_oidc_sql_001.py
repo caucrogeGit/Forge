@@ -16,19 +16,19 @@ AUTH_CLI = PROJECT_ROOT / "cli" / "auth.py"
 
 
 class TestAuthInitNoOidcSqlTemplates:
-    """AUTH_SQL_FILES dans cli/auth.py ne reference pas de SQL OIDC."""
+    """AUTH_SQL_FILES dans cli/security/auth.py ne reference pas de SQL OIDC."""
 
     def test_auth_sql_files_no_oidc_accounts(self):
         text = AUTH_CLI.read_text(encoding="utf-8")
         assert "auth_oidc_accounts" not in text, (
-            "cli/auth.py reference encore auth_oidc_accounts — "
+            "cli/security/auth.py reference encore auth_oidc_accounts — "
             "retirer la generation SQL OIDC (ADR-004)."
         )
 
     def test_auth_sql_files_no_oidc_identities(self):
         text = AUTH_CLI.read_text(encoding="utf-8")
         assert "auth_oidc_identities" not in text, (
-            "cli/auth.py reference encore auth_oidc_identities — "
+            "cli/security/auth.py reference encore auth_oidc_identities — "
             "retirer la generation SQL OIDC (ADR-004)."
         )
 

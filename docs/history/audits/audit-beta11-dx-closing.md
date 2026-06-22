@@ -104,13 +104,13 @@ Contenu :
 - `core/templating/errors.py` (nouveau) : `TemplateNotFoundError`.
 - `integrations/jinja2/renderer.py` : re-raise via l'exception
   publique.
-- `forge.py`, `cli/help.py`, `cli/help_dispatch.py` :
+- `forge.py`, `cli/_support/help.py`, `cli/_support/help_dispatch.py` :
   enregistrement de `forge run`.
-- `cli/run.py` (nouveau) : commande `forge run` officielle.
-- `cli/dev_reloader.py` (nouveau) : superviseur autoreload.
+- `cli/project/run.py` (nouveau) : commande `forge run` officielle.
+- `cli/project/dev_reloader.py` (nouveau) : superviseur autoreload.
 - `cli/entities/crud/controller_builder.py`,
-  `cli/public_form.py`, `cli/public_list.py`,
-  `cli/public_page.py` : skeletons typés.
+  `cli/public/public_form.py`, `cli/public/public_list.py`,
+  `cli/public/public_page.py` : skeletons typés.
 - 9 contrôleurs de starters (`auth-mfa`, `carnet-contacts`,
   `communes-sejours`, `suivi-comportement-eleves`, `utilisateurs-auth`)
   alignés sur la convention typée.

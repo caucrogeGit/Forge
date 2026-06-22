@@ -37,15 +37,15 @@ def _make_project(tmp_path: Path) -> Path:
     return tmp_path
 
 
-# ── Module : cli/run.py ────────────────────────────────────────────────
+# ── Module : cli/project/run.py ────────────────────────────────────────────────
 
 
 class TestRunModuleExists:
-    """Le module cli/run.py existe et expose `main`."""
+    """Le module cli/project/run.py existe et expose `main`."""
 
     def test_module_present(self):
         path = _REPO_ROOT / "cli" / "run.py"
-        assert path.exists(), "cli/run.py doit exister (FORGE-RUN-COMMAND-001)"
+        assert path.exists(), "cli/project/run.py doit exister (FORGE-RUN-COMMAND-001)"
 
     def test_main_callable(self):
         assert callable(run_module.main)
@@ -55,7 +55,7 @@ class TestRunModuleExists:
 
 
 class TestDispatchRun:
-    """`forge run` est dispatché vers cli/run.py."""
+    """`forge run` est dispatché vers cli/project/run.py."""
 
     def test_dispatch_run_appelle_run_main(self, monkeypatch):
         captured: dict[str, list[str]] = {}

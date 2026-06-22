@@ -47,7 +47,7 @@ pytest tests/test_crud_rbac_ui.py    # 22 tests passent
 - `cli/entities/crud/views_builder.py` — guards templates
 - `cli/entities/validation.py` — `ALLOWED_ROOT_KEYS`, `_validate_rbac_structure`
 - `schemas/rbac.schema.json` — contrat séparé
-- `cli/rbac_validate.py` — validation du contrat
+- `cli/security/rbac_validate.py` — validation du contrat
 - `tests/test_make_crud_rbac.py` — tests internes RBAC
 - `tests/test_crud_rbac_ui.py` — tests guards UI
 

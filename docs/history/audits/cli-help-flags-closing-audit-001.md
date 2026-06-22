@@ -50,15 +50,15 @@ Liste alphabétique. Source : `forge.py` au commit de clôture.
 | `auth:init` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `auth:list-sql` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `auth:status` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `auth:user:create` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
-| `auth:user:disable` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
-| `auth:user:enable` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
+| `auth:user:create` | AIDE_NATIVE_ARGPARSE | `cli/security/auth.py` |
+| `auth:user:disable` | AIDE_NATIVE_ARGPARSE | `cli/security/auth.py` |
+| `auth:user:enable` | AIDE_NATIVE_ARGPARSE | `cli/security/auth.py` |
 | `auth:user:list` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `auth:user:password` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
-| `auth:user:role:add` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
-| `auth:user:role:remove` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
-| `auth:user:roles` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
-| `auth:user:show` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
+| `auth:user:password` | AIDE_NATIVE_ARGPARSE | `cli/security/auth.py` |
+| `auth:user:role:add` | AIDE_NATIVE_ARGPARSE | `cli/security/auth.py` |
+| `auth:user:role:remove` | AIDE_NATIVE_ARGPARSE | `cli/security/auth.py` |
+| `auth:user:roles` | AIDE_NATIVE_ARGPARSE | `cli/security/auth.py` |
+| `auth:user:show` | AIDE_NATIVE_ARGPARSE | `cli/security/auth.py` |
 | `build:model` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `check:model` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `db:apply` | AIDE_NATIVE_MANUELLE | `forge.py` (lignes 661-666) |
@@ -90,10 +90,10 @@ Liste alphabétique. Source : `forge.py` au commit de clôture.
 | `migration:diff` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `migration:make` | AIDE_NATIVE_MANUELLE | `cli/entities/migrations.py:460` |
 | `migration:status` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `module:files` | AIDE_NATIVE_MANUELLE | `cli/modules.py` |
-| `module:install` | AIDE_NATIVE_MANUELLE | `cli/modules.py` |
-| `module:list` | AIDE_NATIVE_MANUELLE | `cli/modules.py` |
-| `module:routes` | AIDE_NATIVE_MANUELLE | `cli/modules.py` |
+| `module:files` | AIDE_NATIVE_MANUELLE | `cli/deploy/modules.py` |
+| `module:install` | AIDE_NATIVE_MANUELLE | `cli/deploy/modules.py` |
+| `module:list` | AIDE_NATIVE_MANUELLE | `cli/deploy/modules.py` |
+| `module:routes` | AIDE_NATIVE_MANUELLE | `cli/deploy/modules.py` |
 | `new` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `project:audit` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `project:check` | AIDE_RICHE | `HELP_TEXTS_RICH` |
@@ -169,10 +169,10 @@ Le dispatcher central ne les intercepte pas (absence d'entrée dans
 | `db:apply` | `forge.py:661-666` (interception au dispatcher) |
 | `migration:make` | `cli/entities/migrations.py:460-472` |
 | `starter:build` | `cli/starters/__init__.py:34-44` |
-| `module:list` | `cli/modules.py` |
-| `module:install` | `cli/modules.py` |
-| `module:files` | `cli/modules.py` |
-| `module:routes` | `cli/modules.py` |
+| `module:list` | `cli/deploy/modules.py` |
+| `module:install` | `cli/deploy/modules.py` |
+| `module:files` | `cli/deploy/modules.py` |
+| `module:routes` | `cli/deploy/modules.py` |
 
 Garde-fou runtime : `TestNativeCommandsKeepTheirHelp` vérifie que ces
 aides natives restent natives (pas écrasées par le gabarit central).
@@ -213,7 +213,7 @@ Justification :
   toute divergence future est détectée.
 - Coût mémoire/maintenance négligeable (45 chaînes d'une ligne).
 - Documenté explicitement dans le docstring de
-  `cli/help_dispatch.py` et dans un commentaire au-dessus de
+  `cli/_support/help_dispatch.py` et dans un commentaire au-dessus de
   `HELP_DESCRIPTIONS`.
 
 L'Option B (supprimer la duplication) a été écartée parce qu'elle

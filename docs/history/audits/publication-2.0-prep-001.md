@@ -25,7 +25,7 @@ Ce ticket ne publie pas Forge 2.0.
 | Packaging | Prêt | `pyproject.toml` cohérent, starters inclus, dépendances complètes |
 | forge --version | À corriger | Affiche `1.5.0` → à corriger dans `PUBLICATION-2.0-VERSION-001` |
 | Starters inclus | OK | `cli/starters/data/**/*` inclus dans le wheel |
-| Profils inclus | OK | `cli/project_profiles.py` inclus |
+| Profils inclus | OK | `cli/project/project_profiles.py` inclus |
 | Modules inclus | OK | `core/modules/` inclus |
 | Limites assumées | OK | Documentées dans CONSOLIDATION-ROADMAP-001 |
 | Forge Design séparé | OK | Aucun couplage obligatoire |
@@ -237,7 +237,7 @@ Fichiers présents dans `cli/starters/data/` :
 
 ## Profils inclus
 
-`cli/project_profiles.py` est inclus dans le wheel (package `cli*`).
+`cli/project/project_profiles.py` est inclus dans le wheel (package `cli*`).
 
 Les 4 profils officiels (`minimal`, `standard`, `dynamic`, `multilingual`) sont déclarés, testés et documentés. ✅
 
@@ -245,7 +245,7 @@ Les 4 profils officiels (`minimal`, `standard`, `dynamic`, `multilingual`) sont 
 
 ## Modules inclus
 
-`core/modules/` est inclus dans le wheel (package `core*`). Les 4 commandes `module:*` sont dans `cli/modules.py` (inclus). ✅
+`core/modules/` est inclus dans le wheel (package `core*`). Les 4 commandes `module:*` sont dans `cli/deploy/modules.py` (inclus). ✅
 
 ---
 

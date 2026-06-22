@@ -1,7 +1,7 @@
 # Audit CONSOLIDATION-PROFILES-001 — Cohérence des profils Forge
 
 **Date :** 2026-05-09
-**Périmètre :** système de profils `cli/project_profiles.py` + option `--profile` de `forge new`
+**Périmètre :** système de profils `cli/project/project_profiles.py` + option `--profile` de `forge new`
 **Ticket :** CONSOLIDATION-PROFILES-001
 
 ---
@@ -33,7 +33,7 @@ Ce ticket n'ajoute aucun profil nouveau.
 
 ## Méthode d'audit
 
-- Lecture de `cli/project_profiles.py`
+- Lecture de `cli/project/project_profiles.py`
 - Lecture des sections profils de `forge.py` (lignes 110-113, 320-356, 474-493)
 - Lecture de `docs/profiles.md` (203 lignes)
 - Lecture de `docs/starters/index.md` (164 lignes)
@@ -48,7 +48,7 @@ Ce ticket n'ajoute aucun profil nouveau.
 
 | Fichier | Lignes | Responsabilité |
 |---|---|---|
-| `cli/project_profiles.py` | 37 | Constantes : profils, défaut, descriptions |
+| `cli/project/project_profiles.py` | 37 | Constantes : profils, défaut, descriptions |
 | `forge.py` (sections profils) | ~40 | Validation, écriture `forge_profile.txt`, dispatch |
 | `docs/profiles.md` | 203 | Documentation publique des profils |
 | `docs/starters/index.md` | 164 | Relation profils / starters |
@@ -123,7 +123,7 @@ Ce ticket n'ajoute aucun profil nouveau.
 
 ## Profil par défaut
 
-- **Valeur :** `"standard"` (ligne 17 de `cli/project_profiles.py`)
+- **Valeur :** `"standard"` (ligne 17 de `cli/project/project_profiles.py`)
 - **Comportement :** si aucun `--profile` n'est fourni, `cmd_new` utilise `DEFAULT_PROJECT_PROFILE`
 - **`forge_profile.txt` :** contient `"standard\n"` dans ce cas
 - **Documentation :** `docs/profiles.md` l'indique clairement : *"C'est le profil utilisé si aucune option `--profile` n'est fournie."*
@@ -218,7 +218,7 @@ La distinction profil/starter est claire : **un profil définit la base techniqu
 
 ## Séparation Forge Design
 
-- `cli/project_profiles.py` ne contient aucune référence à Forge Design
+- `cli/project/project_profiles.py` ne contient aucune référence à Forge Design
 - `docs/profiles.md` ne promet pas d'éditeur graphique lié aux profils
 - La mention de Forge Design dans `forge_profile.txt` (section "usage futur") est une possibilité explorée, pas une promesse
 - `docs/forge-design-roadmap.md` n'a pas été modifié par ce ticket

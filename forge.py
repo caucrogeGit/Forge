@@ -438,7 +438,7 @@ def main() -> None:
 
     # Garde-fou central CLI-HELP-FLAGS-DISPATCHER-001 : intercepte --help/-h
     # avant toute exécution métier pour les commandes connues sans support
-    # --help natif (cf. cli/help_dispatch.py et l'audit
+    # --help natif (cf. cli/_support/help_dispatch.py et l'audit
     # docs/history/audits/cli-help-flags-audit-001.md).
     if wants_help(args[1:]):
         help_text = format_command_help(command)

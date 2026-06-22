@@ -194,7 +194,7 @@ Donc concrètement, tout projet créé avec le squelette par défaut hash en PBK
 
 **Scénario reproduisible :**
 
-1. Le développeur installe Forge et lance `forge auth:user:create --email a@b.fr` → `cli/auth.py` ligne 481 importe `from core.auth.password import hash_password` → le mot de passe est haché en **Argon2**.
+1. Le développeur installe Forge et lance `forge auth:user:create --email a@b.fr` → `cli/security/auth.py` ligne 481 importe `from core.auth.password import hash_password` → le mot de passe est haché en **Argon2**.
 2. Le développeur lance ensuite l'application : `mvc/controllers/auth_controller.py` ligne 5 importe `from core.security.hashing import verifier_mot_de_passe` → la vérification utilise **PBKDF2**.
 3. À la connexion : `verifier_mot_de_passe(password, hash_argon2)` essaie de parser `"<sel_hex>:<hash_hex>"` mais reçoit un hash Argon2 au format `$argon2id$...` → `ValueError` capturée → retourne `False`.
 4. **L'utilisateur ne peut jamais se connecter, sans erreur explicite.**

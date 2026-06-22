@@ -236,9 +236,9 @@ validation, audit, helpers Python, guards opt-in et limites.
 RBAC-MODULE-006 ajoute la commande `forge rbac:audit` pour auditer la cohérence
 fonctionnelle du contrat `mvc/security/rbac.json`.
 
-- Nouveau module : `cli/rbac_audit.py`
+- Nouveau module : `cli/security/rbac_audit.py`
 - Dispatch ajouté dans `forge.py` : `rbac:audit`
-- Aide mise à jour dans `cli/help.py`
+- Aide mise à jour dans `cli/_support/help.py`
 - 21 tests ajoutés dans `tests/test_rbac_audit_command.py`
 - Documentation mise à jour dans `docs/security/rbac-contract.md`
 - Codes d'avertissement : `missing_roles`, `missing_entities`, `empty_role`,

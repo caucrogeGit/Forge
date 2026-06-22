@@ -1,7 +1,7 @@
 # Audit CONSOLIDATION-MODULES-001 — Cycle complet des modules Forge
 
 **Date :** 2026-05-09
-**Périmètre :** système de modules `core/modules/` + `cli/modules.py`
+**Périmètre :** système de modules `core/modules/` + `cli/deploy/modules.py`
 **Ticket :** CONSOLIDATION-MODULES-001
 
 ---
@@ -36,7 +36,7 @@ Ce ticket n'ajoute aucune fonctionnalité module nouvelle.
 ## Méthode d'audit
 
 - Lecture complète de `core/modules/` (6 fichiers, ~901 lignes)
-- Lecture complète de `cli/modules.py` (214 lignes)
+- Lecture complète de `cli/deploy/modules.py` (214 lignes)
 - Revue des 7 fichiers de tests existants (`test_module_*.py`, ~1900 lignes)
 - Exécution des tests existants (tous verts)
 - Ajout de tests ciblés dans `tests/test_consolidation_modules_001.py`
@@ -55,7 +55,7 @@ Ce ticket n'ajoute aucune fonctionnalité module nouvelle.
 | `core/modules/files.py` | 225 | Copie contrôlée + sécurité |
 | `core/modules/routes.py` | 233 | Injection routes dans `module_routes.py` |
 | `core/modules/__init__.py` | 74 | API publique centralisée |
-| `cli/modules.py` | 214 | Interface CLI (4 commandes) |
+| `cli/deploy/modules.py` | 214 | Interface CLI (4 commandes) |
 | **Total** | **1115** | |
 
 ---

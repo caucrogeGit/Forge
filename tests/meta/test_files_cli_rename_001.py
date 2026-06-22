@@ -5,7 +5,7 @@ le **core CLI n'exige plus l'upload** au démarrage :
 
 - ``controller_builder`` génère ``from forge_mvc_files import save_upload`` pour
   les champs fichier (et plus ``core.uploads``) ;
-- ``cli/uploads.py`` importe ``forge_mvc_files`` (opt-in) ;
+- ``cli/assets/uploads.py`` importe ``forge_mvc_files`` (opt-in) ;
 - ``forge.py`` n'importe **pas** ``cli.assets.uploads`` au niveau module : il le
   fait en *lazy* dans la branche ``upload:init``/``media:init`` (sinon le core
   CLI tomberait sans l'opt-in installé).

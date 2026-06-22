@@ -138,19 +138,19 @@ class TestDoctorUsesFinspec:
     def test_doctor_uses_find_spec_for_mfa(self):
         src = DOCTOR_PY.read_text(encoding="utf-8")
         assert "find_spec" in src, (
-            "cli/doctor.py doit utiliser importlib.util.find_spec pour détecter MFA"
+            "cli/project/doctor.py doit utiliser importlib.util.find_spec pour détecter MFA"
         )
 
     def test_doctor_does_not_import_forge_mvc_mfa_at_module_level(self):
         src = DOCTOR_PY.read_text(encoding="utf-8")
         assert "import forge_mvc_mfa" not in src, (
-            "cli/doctor.py ne doit pas importer forge_mvc_mfa au niveau module"
+            "cli/project/doctor.py ne doit pas importer forge_mvc_mfa au niveau module"
         )
 
     def test_doctor_does_not_import_pyotp_at_module_level(self):
         src = DOCTOR_PY.read_text(encoding="utf-8")
         assert "import pyotp" not in src, (
-            "cli/doctor.py ne doit pas importer pyotp au niveau module"
+            "cli/project/doctor.py ne doit pas importer pyotp au niveau module"
         )
 
     def test_check_mfa_dependency_in_run_all(self):

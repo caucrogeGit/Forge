@@ -1281,7 +1281,7 @@ actuelle.
 
 ### Format de l'aide CLI
 
-`forge help`, `forge --help`, `forge -h` et `forge` (sans argument) affichent la même aide groupée par famille. L'aide est générée par `cli/help.py` (`build_help(version)`).
+`forge help`, `forge --help`, `forge -h` et `forge` (sans argument) affichent la même aide groupée par famille. L'aide est générée par `cli/_support/help.py` (`build_help(version)`).
 
 Familles présentées : Projet, Entités, Pages publiques, Base de données, Starters et modules, Auth / Sécurité, Mail, Médias et JavaScript, Déploiement.
 

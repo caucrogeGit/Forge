@@ -124,7 +124,7 @@ commande la plus complète et la mieux placée.
 ## Référence
 
 - Ticket d'implémentation CLI : `CLI-NEW-DROP-STARTER-001` (retrait du flag,
-  `forge.py`, `cli/help_dispatch.py`).
+  `forge.py`, `cli/_support/help_dispatch.py`).
 - Ticket d'alignement documentaire : `DOC-STARTER-BUILD-ALIGN-001`.
 - Code concerné : `forge.py` (`cmd_new`, dispatch `new`),
   `cli/starters/` (`forge starter:build`).

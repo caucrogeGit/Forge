@@ -160,11 +160,11 @@ cause structurelle).
   dispatcher `forge.py:660-665`.
 - `migration:make`, `starter:build` — check manuel dans le main.
 - `module:list`, `module:install`, `module:files`, `module:routes` —
-  pattern uniforme du module `cli/modules.py`.
+  pattern uniforme du module `cli/deploy/modules.py`.
 - `auth:user:create`, `auth:user:show`, `auth:user:disable`,
   `auth:user:enable`, `auth:user:password`, `auth:user:role:add`,
   `auth:user:role:remove`, `auth:user:roles` — **argparse natif**
-  dans `cli/auth.py` (8 commandes, le seul module de la CLI
+  dans `cli/security/auth.py` (8 commandes, le seul module de la CLI
   totalement aligné).
 
 ---
@@ -233,12 +233,12 @@ gérer individuellement.
 
 | Style | Modules | Conséquence |
 |---|---|---|
-| **Argparse natif** | `cli/auth.py` (8 commandes `auth:user:*`) | `--help` géré gratuitement par `argparse` |
+| **Argparse natif** | `cli/security/auth.py` (8 commandes `auth:user:*`) | `--help` géré gratuitement par `argparse` |
 | **Parseur manuel** | tous les autres modules | `--help` doit être traité explicitement ; n'arrive presque jamais en pratique |
 
-Le seul module pleinement argparse-iso est `cli/auth.py`. Tous
-les `cli/entities/*.py`, `cli/mail.py`, `cli/modules.py`,
-`cli/i18n.py`, `cli/uploads.py`, etc., utilisent un
+Le seul module pleinement argparse-iso est `cli/security/auth.py`. Tous
+les `cli/entities/*.py`, `cli/mail.py`, `cli/deploy/modules.py`,
+`cli/assets/i18n.py`, `cli/assets/uploads.py`, etc., utilisent un
 parseur maison à base de `args[0] == "..."`. Le pattern « `--help`
 explicite » a été appliqué de façon hétérogène.
 
@@ -262,8 +262,8 @@ au préalable se doter d'un mécanisme de description par commande
 
 ### Cause 5 — Les commandes « schema:* » et « rbac:* » ont un parseur strict
 
-Les modules récents `cli/schemas/*.py`, `cli/rbac_validate.py`
-et `cli/rbac_audit.py` rejettent explicitement les options
+Les modules récents `cli/schemas/*.py`, `cli/security/rbac_validate.py`
+et `cli/security/rbac_audit.py` rejettent explicitement les options
 inconnues avec « option inconnue pour `<cmd>` : ... ». C'est plus rigoureux
 que les anciens modules, mais ils ne reconnaissent pas `--help` ; le
 résultat est un message hostile au lieu d'une aide. Ces modules sont

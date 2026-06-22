@@ -1629,7 +1629,7 @@ Lister les schémas disponibles.
 - Gestion d'erreurs : registre absent, JSON invalide, clé `schemas` manquante, fichier manquant.
 - Exit 1 si le registre est illisible ou si au moins un schéma est manquant.
 - `forge.py` : dispatch `schema:list` ajouté.
-- `cli/help.py` : section "Schémas JSON" ajoutée.
+- `cli/_support/help.py` : section "Schémas JSON" ajoutée.
 - `tests/test_schema_list_command.py` (34 tests).
 
 ### Exemple
@@ -1682,7 +1682,7 @@ Optionnel mais utile avant publication.
 - **`tests/test_schema_doctor_command.py`** — 42 tests (sortie humaine, sortie `--json`,
   gestion d'erreurs, non-régression)
 - **`forge.py`** — dispatch `schema:doctor` ajouté
-- **`cli/help.py`** — section « Schémas JSON » complétée avec `schema:doctor`
+- **`cli/_support/help.py`** — section « Schémas JSON » complétée avec `schema:doctor`
 - Suite complète : 11 440 tests passent, 6 skipped, 0 régression
 
 Exemple de sortie :

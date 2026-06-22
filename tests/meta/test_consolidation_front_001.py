@@ -300,7 +300,7 @@ def test_doc_front_mentionne_build_css():
 # ── Séparation Forge Design ────────────────────────────────────────────────────
 
 def test_front_py_ne_depend_pas_forge_design():
-    """cli/front.py ne référence pas Forge Design."""
+    """cli/assets/front.py ne référence pas Forge Design."""
     content = (ROOT / "cli" / "front.py").read_text(encoding="utf-8")
     assert "forge-design" not in content.lower()
     assert "forge design" not in content.lower()

@@ -1402,7 +1402,7 @@ Phase G — consolidation pré-publication (15 tickets livrés).
   **`forge sync:landing` étendue** : la commande synchronise désormais
   `static/` (CSS, JS, images) vers `docs/static/`, en plus du HTML.
   Auparavant, seul `mvc/views/landing/index.html` → `docs/index.html`
-  était copié. Ajout de `sync_static()` dans `cli/sync_landing.py`.
+  était copié. Ajout de `sync_static()` dans `cli/assets/sync_landing.py`.
 
   **`package.json build:css` corrigé** : Tailwind v4 a déplacé le
   binaire CLI dans `@tailwindcss/cli`. Le script utilise désormais
@@ -2151,7 +2151,7 @@ Aucun impact sur les applications légitimes. La CSP passe de 6 à 8 directives.
 - `log_auth_event()` propage désormais ses exceptions au lieu de les avaler silencieusement. En particulier, un `event_type` invalide (vide, None, espaces) lève `InvalidAuthAuditEventError`, et toute défaillance interne du logger est propagée.
 - Ce changement rend effectif le mécanisme d'observabilité installé par `AUTH-AUDIT-RESILIENCE-001` : `safe_log_auth_event` peut maintenant observer des échecs réels en production, sans mock.
 - Les 7 appels directs à `log_auth_event` dans `mvc/controllers/` migrés vers `safe_log_auth_event`.
-- Les 6 blocs `try: log_auth_event(...) except: pass` dans `cli/auth.py` remplacés par `safe_log_auth_event(...)`.
+- Les 6 blocs `try: log_auth_event(...) except: pass` dans `cli/security/auth.py` remplacés par `safe_log_auth_event(...)`.
 
 **Migration :** si votre code appelait `log_auth_event` directement dans un contexte métier, remplacer par `safe_log_auth_event`. Si vous l'appelez dans un contexte administratif et souhaitez connaître l'échec, entourer d'un `try/except` explicite et documenté.
 

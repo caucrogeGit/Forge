@@ -50,7 +50,7 @@ class TestCSSSynchronized:
 
 
 class TestSyncLandingHandlesStatic:
-    """cli/sync_landing.py contient la logique de copie des assets."""
+    """cli/assets/sync_landing.py contient la logique de copie des assets."""
 
     def setup_method(self):
         self.content = SYNC_LANDING_MODULE.read_text(encoding="utf-8")
@@ -61,18 +61,18 @@ class TestSyncLandingHandlesStatic:
     ])
     def test_module_mentions_static_path(self, marker):
         assert marker in self.content, (
-            f"cli/sync_landing.py devrait référencer '{marker}' "
+            f"cli/assets/sync_landing.py devrait référencer '{marker}' "
             f"pour la copie des assets statiques"
         )
 
     def test_sync_static_function_exists(self):
         assert "def sync_static" in self.content, (
-            "cli/sync_landing.py devrait définir une fonction sync_static()"
+            "cli/assets/sync_landing.py devrait définir une fonction sync_static()"
         )
 
     def test_shutil_copy_used(self):
         assert "shutil" in self.content, (
-            "cli/sync_landing.py devrait utiliser shutil pour la copie des fichiers"
+            "cli/assets/sync_landing.py devrait utiliser shutil pour la copie des fichiers"
         )
 
 

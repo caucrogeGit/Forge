@@ -16,7 +16,7 @@ from cli.optins.catalog import LOCAL_MODULE_HINT, OFFICIAL_OPTINS, optin_names
 
 
 def _is_pipx_install() -> bool:
-    """Détecte si Forge tourne depuis un venv pipx (cf. cli/update.py)."""
+    """Détecte si Forge tourne depuis un venv pipx (cf. cli/project/update.py)."""
     norm = os.path.realpath(sys.executable).replace("\\", "/")
     return "/pipx/venvs/" in norm
 

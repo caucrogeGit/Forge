@@ -50,7 +50,7 @@ cli/entities/validation.py
 cli/entities/entity_validate.py
 cli/starters/builder.py
 cli/starters/scaffold.py
-cli/output.py
+cli/_support/output.py
 ```
 
 Commande grep :

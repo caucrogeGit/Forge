@@ -26,18 +26,18 @@ Quatre incohérences mineures sont identifiées (style des messages d'aide, alia
 | Entités | `make:entity`, `make:crud`, `make:relation`, `sync:entity`, `sync:relations`, `sync:landing` | `cli/entities/` |
 | Modèles | `build:model`, `check:model` | `cli/entities/model.py` |
 | Pages publiques | `make:public-page`, `make:public-list`, `make:public-show`, `make:public-form`, `make:public-contact` | `cli/public_*.py` |
-| Front | `js:init` (htmx / alpine / htmx-alpine) | `cli/front.py` |
-| i18n | `i18n:init`, `i18n:check` | `cli/i18n.py` |
-| Auth | `auth:init`, `auth:doctor`, `auth:status`, `auth:list-sql` | `cli/auth.py` |
-| Auth/User | `auth:user:create`, `auth:user:list`, `auth:user:show`, `auth:user:disable`, `auth:user:enable`, `auth:user:password` | `cli/auth.py` |
-| Auth/RBAC | `auth:user:role:add`, `auth:user:role:remove`, `auth:user:roles` | `cli/auth.py` |
+| Front | `js:init` (htmx / alpine / htmx-alpine) | `cli/assets/front.py` |
+| i18n | `i18n:init`, `i18n:check` | `cli/assets/i18n.py` |
+| Auth | `auth:init`, `auth:doctor`, `auth:status`, `auth:list-sql` | `cli/security/auth.py` |
+| Auth/User | `auth:user:create`, `auth:user:list`, `auth:user:show`, `auth:user:disable`, `auth:user:enable`, `auth:user:password` | `cli/security/auth.py` |
+| Auth/RBAC | `auth:user:role:add`, `auth:user:role:remove`, `auth:user:roles` | `cli/security/auth.py` |
 | Mail | `mail:init`, `mail:test`, `mail:render`, `mail:doctor`, `mail:logs` | `cli/mail.py` |
-| Modules | `module:list`, `module:install`, `module:files`, `module:routes` | `cli/modules.py` |
+| Modules | `module:list`, `module:install`, `module:files`, `module:routes` | `cli/deploy/modules.py` |
 | Starters | `starter:list`, `starter:build` | `cli/starters/__init__.py` |
-| Déploiement | `deploy:init`, `deploy:check` | `cli/deploy.py` |
+| Déploiement | `deploy:init`, `deploy:check` | `cli/deploy/deploy.py` |
 | Database | `db:init`, `db:apply` | `cli/entities/db_init.py`, `db_apply.py` |
 | Migrations | `migration:status`, `migration:apply`, `migration:make`, `migration:diff` | `cli/entities/migrations.py` |
-| Uploads / médias | `upload:init`, `media:init` | `cli/uploads.py` |
+| Uploads / médias | `upload:init`, `media:init` | `cli/assets/uploads.py` |
 | Routes | `routes:list` | `forge.py` (inline) |
 | Docs | `docs:pdf` | `cli/docs/` |
 
@@ -161,7 +161,7 @@ Message clair avec liste des valeurs valides. ✅
 
 ## Commandes Auth
 
-**13 commandes `auth:*`, toutes dans `cli/auth.py` (1134 lignes).**
+**13 commandes `auth:*`, toutes dans `cli/security/auth.py` (1134 lignes).**
 
 Structure interne : dispatcher à 14 conditions `if command ==` dans `auth_main(argv)`.
 
@@ -202,7 +202,7 @@ Structure interne : dispatcher à 14 conditions `if command ==` dans `auth_main(
 
 ## Commandes Modules
 
-**4 commandes `module:*`, dans `cli/modules.py` (214 lignes).**
+**4 commandes `module:*`, dans `cli/deploy/modules.py` (214 lignes).**
 
 | Commande | Présente | Validée | Aide |
 |----------|----------|---------|------|
@@ -269,7 +269,7 @@ Cohérence satisfaisante. `db:*` et `migration:*` sont deux namespaces distincts
 
 ## Commandes Déploiement
 
-**2 commandes `deploy:*`, dans `cli/deploy.py`.**
+**2 commandes `deploy:*`, dans `cli/deploy/deploy.py`.**
 
 | Commande | Présente | Aide |
 |----------|----------|------|

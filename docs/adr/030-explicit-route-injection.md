@@ -27,7 +27,7 @@ La règle 4.3 de la charte v2 interdit la réécriture automatique de
 
 - `forge make:public-page`, `make:public-list`, `make:public-form`,
   `make:public-show` et `make:public-contact` insèrent un import et un bloc de
-  route dans le `mvc/routes.py` existant (`cli/public_page.py`,
+  route dans le `mvc/routes.py` existant (`cli/public/public_page.py`,
   `public_list.py`, `public_form.py`, etc.).
 
 Note historique : un second injecteur, `forge starter:build`, encadrait son bloc

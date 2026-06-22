@@ -92,7 +92,7 @@ def _dispatch_literals(path: Path) -> set[str]:
     Couvre `command == "x"`, `command in ("x", "y")`, et les littéraux de type
     set `command in {"x", "y"}` (indispensable : migration:make n'apparaît que
     dans un set de forge.py). Scanné sur forge.py ET cli/**/*.py pour
-    couvrir les sous-dispatchers (module:remove est dans cli/modules.py).
+    couvrir les sous-dispatchers (module:remove est dans cli/deploy/modules.py).
     """
     literals: set[str] = set()
     tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -203,7 +203,7 @@ class TestNoObsoleteCliCommands:
                 f"la doc active :\n"
                 + "\n".join(f"  - {o}" for o in offenders)
                 + "\n\nCommandes connues : voir HELP_DESCRIPTIONS / "
-                "HELP_TEXTS_RICH (cli/help_dispatch.py) et le dispatch "
+                "HELP_TEXTS_RICH (cli/_support/help_dispatch.py) et le dispatch "
                 "de forge.py."
             )
 

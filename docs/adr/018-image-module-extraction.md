@@ -44,7 +44,7 @@ le core devrait fournir l'upload brut sûr, pas le pipeline d'images.
 - `forge_mvc_media/media_gallery.py` dépend de `core.uploads.image`
   (`ALLOWED_IMAGE_EXTENSIONS`, `image_variant_relative_paths`).
 - `make:crud` **génère** `from forge_mvc_media import ...`
-  (`cli/entities/crud/controller_builder.py`), idem `cli/public_list.py`
+  (`cli/entities/crud/controller_builder.py`), idem `cli/public/public_list.py`
   et le catalogue opt-in `cli/optins/catalog.py` (entrée « media »).
 - CI (`.github/workflows/tests.yml`), README, `docs/reference/api.md`,
   `docs/install/core-dev.md`, CONTRIBUTING.

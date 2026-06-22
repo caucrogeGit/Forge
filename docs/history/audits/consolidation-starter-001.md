@@ -214,7 +214,7 @@ Vérifications sur `core/` et `cli/` (hors `starters/data/`) :
 
 - **`core/`** : aucune référence à `communes_sejours`, `demande_sejour`, `hebergement` ou termes métier du starter 5
 - **`cli/` hors `starters/`** : aucune référence métier du starter 5
-- Exception documentée : `cli/i18n.py` contient `"sejour"` dans `_FORBIDDEN_KEY_TERMS` — c'est une *protection* qui empêche les clés i18n génériques d'utiliser des termes métier de starters
+- Exception documentée : `cli/assets/i18n.py` contient `"sejour"` dans `_FORBIDDEN_KEY_TERMS` — c'est une *protection* qui empêche les clés i18n génériques d'utiliser des termes métier de starters
 
 Le contrôleur `communes_sejours_controller.py` packagé dans `cli/starters/data/` :
 - importe exclusivement depuis `core.*` et `mvc.*` ;
@@ -247,7 +247,7 @@ La formule "démonstrateur" est explicitement répétée dans le document.
 1. **5 starters disponibles** — tous avec `status: available`, numérotés 1 à 5.
 2. **Statuts documentaires cohérents** — Contacts/Carnet officiels, Auth modernisé, Suivi legacy, Communes & Séjours démonstrateur avancé.
 3. **Séparation core/métier garantie** — aucune logique Communes & Séjours dans `core/`.
-4. **i18n protégée** — `_FORBIDDEN_KEY_TERMS` dans `cli/i18n.py` empêche les termes métier dans les clés génériques.
+4. **i18n protégée** — `_FORBIDDEN_KEY_TERMS` dans `cli/assets/i18n.py` empêche les termes métier dans les clés génériques.
 5. **Starter 5 sans DB** — fonctionne immédiatement après `forge starter:build 5` sans `db:init`.
 6. **Suite de tests robuste** — 310 tests existants sur les starters (118 + 192), 67 tests ajoutés dans ce ticket.
 7. **doc_url corrigés** — les 5 starters pointent vers la structure MkDocs actuelle.

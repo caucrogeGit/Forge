@@ -62,7 +62,7 @@ grep -RInE 'rbac|RBAC|permission|require_permission|has_permission|403' \
 ### Zones auditées
 
 - `packages/forge-mvc-rbac/forge_mvc_rbac/` — état du module existant
-- `cli/rbac_validate.py` — commande `rbac:validate`
+- `cli/security/rbac_validate.py` — commande `rbac:validate`
 - `cli/entities/crud/context.py` — helper `_with_permission` / CRUD
 - `cli/entities/make_crud.py` — branchement RBAC interne
 - `schemas/rbac.schema.json` — schéma de contrat

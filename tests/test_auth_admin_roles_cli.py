@@ -366,14 +366,14 @@ def test_aucune_interface_html():
 
 
 def test_aucune_route():
-    source = Path("cli/auth.py").read_text(encoding="utf-8")
+    source = Path("cli/security/auth.py").read_text(encoding="utf-8")
 
     assert "@route" not in source
     assert "Router" not in source
 
 
 def test_aucun_formulaire_template():
-    source = Path("cli/auth.py").read_text(encoding="utf-8")
+    source = Path("cli/security/auth.py").read_text(encoding="utf-8")
 
     assert "Form(" not in source
     assert "render(" not in source

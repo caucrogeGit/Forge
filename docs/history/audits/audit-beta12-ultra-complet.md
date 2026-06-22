@@ -864,7 +864,7 @@ Objectif : synchroniser toutes les métadonnées publiques beta.12.
 Périmètre :
 
 - `pyproject.toml` core URL documentation ;
-- `cli/help.py` URL documentation ;
+- `cli/_support/help.py` URL documentation ;
 - `README.md` core : ajouter `forge-mvc-iot` ;
 - `docs/release-policy.md` : cinq → six opt-ins ;
 - `requirements-dev.txt` : ajouter `forge-mvc-iot` ou documenter l'exclusion ;

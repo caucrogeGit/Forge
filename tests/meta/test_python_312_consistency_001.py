@@ -22,8 +22,8 @@ class TestPython312Consistency:
         Path("README.md"),
         Path("docs/release/compatibility.md"),
         Path("docs/release/release-and-compatibility.md"),
-        Path("cli/doctor.py"),
-        Path("cli/deploy.py"),
+        Path("cli/project/doctor.py"),
+        Path("cli/deploy/deploy.py"),
         Path(".github/workflows/tests.yml"),
     ]
 

@@ -228,7 +228,7 @@ class TestProjectCheckDetectsImportErrors:
 
     def test_check_project_routes_does_not_only_ast_parse(self):
         """Le code source de check_project_routes appelle importlib, pas seulement ast.parse."""
-        source = (PROJECT_ROOT / "cli/project_check.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "cli/project/project_check.py").read_text(encoding="utf-8")
         assert "importlib.import_module" in source, (
             "check_project_routes doit faire un vrai import via importlib.import_module"
         )
@@ -238,7 +238,7 @@ class TestProjectCheckDetectsImportErrors:
 
     def test_check_project_routes_handles_missing_router_attr(self):
         """Le check rejette un fichier qui n'expose pas `router`."""
-        source = (PROJECT_ROOT / "cli/project_check.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "cli/project/project_check.py").read_text(encoding="utf-8")
         assert 'hasattr(module, "router")' in source or "hasattr(module, 'router')" in source, (
             "check_project_routes doit vérifier que le module expose un attribut router"
         )
