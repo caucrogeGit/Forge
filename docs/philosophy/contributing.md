@@ -354,7 +354,7 @@ Si la fonctionnalité est couverte par un guide existant, mettez-le à jour :
 - [Relations entre entités](../features/relations.md) — nouvelle syntaxe relationnelle
 - [Auth/User](../features/auth.md) — nouvelles briques d'authentification
 - [Sécurité et RBAC](security.md) — nouveaux mécanismes de sécurité
-- [Module média](../features/media.md) — nouveaux comportements uploads
+- Module média — nouveaux comportements uploads
 
 ### Quand modifier la roadmap
 

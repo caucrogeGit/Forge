@@ -2347,7 +2347,7 @@ Les médias sont stockés dans la table `media` distincte via `media.entity_name
 | `required` | non | `bool` | `false` |
 | `label` | non | chaîne | — |
 
-**Règles** : `variants=true` est autorisé uniquement avec `field="image"`. Les doublons `name` et `role` dans une même entité sont refusés à la validation. Voir [docs/media.md](../features/media.md) pour les détails et la convention de rôles.
+**Règles** : `variants=true` est autorisé uniquement avec `field="image"`. Les doublons `name` et `role` dans une même entité sont refusés à la validation. Voir docs/media.md pour les détails et la convention de rôles.
 
 ### Génération CRUD media (`make:crud` + `media`)
 

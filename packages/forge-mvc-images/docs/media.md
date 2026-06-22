@@ -1,12 +1,10 @@
 # Module média Forge
 
-[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
-
 !!! info "Statut : opt-in officiel, publié sur PyPI depuis `1.0.0-beta.13`, API encore bêta"
     `forge-mvc-images` (qui détient la couche applicative média) est publié sur
     PyPI depuis `1.0.0-beta.13` : `pip install --pre forge-mvc-images`. L'API
-    applicative reste bêta, voir [Limites](../deployment/production-limits.md)
-    avant déploiement en production. Pour le développement depuis les sources,
+    applicative reste bêta, voir les limites de production
+    avant déploiement. Pour le développement depuis les sources,
     voir [section ci-dessous](#installation).
 
     Le module reste opt-in : le core Forge ne dépend pas de

@@ -89,7 +89,6 @@ nav:
         - Front et CSS: features/front.md
         - Profils de projet: features/profiles.md
         - Génération PDF: features/pdf.md
-        - Module média: features/media.md
         - ImageMagick (logos transparents): features/imagemagick-logos.md
 
     - Référence:

@@ -55,7 +55,6 @@ EXPECTED_DOC_PATHS = [
     "reference/crud",
     "philosophy/security",
     "features/auth",
-    "features/media",
     "mail/reference",
     "reference/cli-commands",
     "deployment/deployment",

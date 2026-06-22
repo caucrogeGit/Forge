@@ -522,11 +522,11 @@ Ce tutoriel couvre une application simple. Il ne couvre pas :
 | Rôles et permissions (RBAC) | [Sécurité et RBAC](../philosophy/security.md), RBAC |
 | Relations `many_to_many` | [Relations entre entités](../features/relations.md) |
 | Envoi de mails | Gestion des mails |
-| Upload de fichiers / médias | [Module média](../features/media.md) |
+| Upload de fichiers / médias | Module média |
 | Déploiement en production | [Déploiement](../deployment/deployment.md) |
 | Sécurité en production | [Sécurité en production](../deployment/production-security.md) |
 | API JSON légère | À venir — API-JSON-001 |
-| Pages publiques | [Outils — Génération PDF, Module média](../features/media.md) |
+| Pages publiques | Outils — Génération PDF, Module média |
 | Forge Design | Projet compagnon séparé |
 
 `forge make:relation` est interactif. Pour les projets sans terminal interactif,
