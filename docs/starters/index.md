@@ -18,8 +18,8 @@ avec base de données, aucun profil pour les paliers sans base.
 
 ## Catalogue
 
-La progression cœur `welcome-forge` enseigne les fondamentaux ; chaque opt-in a
-sa propre progression `welcome-<module>` (débutant puis avancé).
+La progression cœur `welcome-forge` enseigne les fondamentaux du framework,
+du niveau débutant au niveau avancé.
 
 ### Bonjour Forge : progression cœur (`welcome-forge`)
 
@@ -28,46 +28,6 @@ sa propre progression `welcome-<module>` (débutant puis avancé).
 *Intermédiaire, 8 paliers (tutoriel continu)* : [Lister des enregistrements](welcome-forge/intermediaire/list-records.md) · [Héritage de gabarit](welcome-forge/intermediaire/layout-template.md) · [Rechercher / filtrer](welcome-forge/intermediaire/filter-list.md) · [Paginer une liste](welcome-forge/intermediaire/pagination.md) · [Modifier un enregistrement](welcome-forge/intermediaire/update-record.md) · [Supprimer un enregistrement](welcome-forge/intermediaire/delete-record.md) · [Messages flash](welcome-forge/intermediaire/flash-messages.md) · [Mémoriser un état en session](welcome-forge/intermediaire/session-state.md)
 
 *Avancé, 4 paliers (tutoriel continu)* : [Relations entre tables](welcome-forge/avance/relations.md) · [Écritures transactionnelles](welcome-forge/avance/db-transaction.md) · [Téléverser un fichier](welcome-forge/avance/file-upload.md) · [API JSON protégée](welcome-forge/avance/json-api.md)
-
-### IoT (opt-in `forge-mvc-iot`)
-
-Bonjour Forge IoT · Lire les événements IoT · Les événements d'un capteur · Simuler une mesure IoT · Exposer l'API IoT · Tableau de bord IoT · Valider un message IoT · Le subscriber MQTT · Diagnostiquer le module IoT
-
-### Vidéo (opt-in `forge-mvc-video`)
-
-Bonjour Forge Vidéo · Lister les vidéos · Le détail d'une vidéo · Téléverser une vidéo · Lire une vidéo · Suivre l'état d'une vidéo · Sonder une vidéo · Transcoder une vidéo · Diagnostiquer le module Vidéo
-
-### Images (opt-in `forge-mvc-images`)
-
-Bonjour Forge Images · Téléverser une image · Miniatures et variantes · Rattacher une image à une entité · Afficher la galerie · Texte alternatif et ordre · Image de couverture · Supprimer proprement · Garde de sécurité à l'upload
-
-### Fichiers (opt-in `forge-mvc-files`)
-
-Bonjour Forge Files · Stocker un document · Servir un fichier · Valider un upload · Limiter les uploads · Supprimer un fichier · Assainir un nom de fichier · Chemin anti-traversal · Écrire des octets générés
-
-### Audio (opt-in `forge-mvc-audio`)
-
-Bonjour Forge Audio · Téléverser un audio · Lire un audio · Sonder un audio · Transcoder en MP3 · Diagnostiquer le module Audio
-
-### MFA (opt-in `forge-mvc-mfa`)
-
-Bonjour Forge MFA · Secret TOTP et QR · Vérifier un code TOTP · Enrôler un facteur TOTP · Challenge de connexion · Codes de récupération · Revalidation (step-up) · Anti-rejeu TOTP · Secret chiffré au repos
-
-### RBAC (opt-in `forge-mvc-rbac`)
-
-Bonjour Forge RBAC · Code de permission · Rôle et slug · Vérifier une permission · Protéger une route · Permission dans un template · Associer un rôle à un utilisateur · Résoudre les permissions · Rôles de la requête
-
-### Workflow (opt-in `forge-mvc-workflow`)
-
-Bonjour Forge Workflow · Nom de statut · Retrouver un statut · Déclarer les transitions · Vérifier une transition · Transitions disponibles · Badge de statut · Couleur, libellé, classe · Helpers Workflow dans Jinja
-
-### Stats (opt-in `forge-mvc-stats`)
-
-Bonjour Forge Stats · Nom d'événement · Le schéma SQL · Le SQL d'insertion · Enregistrer un événement · Valider un événement · Le SQL de consultation · Lister les événements · Normaliser une ligne
-
-### Mail (opt-in `forge-mvc-mail`)
-
-Bonjour Forge Mail · Composer un message · Choisir un transport · Rendre un template · Configurer l'envoi · Diagnostiquer le module Mail
 
 ## Progression recommandée
 
@@ -93,14 +53,11 @@ Après le préambule d'installation, suivez les paliers dans l'ordre depuis
 [Bonjour Forge](welcome-forge/debutant/welcome.md).
 
 Une fois ces **11 paliers** acquis, vous avez terminé le niveau débutant de
-découverte *Bonjour Forge*. Vous pouvez ensuite explorer les progressions
-opt-in dédiées (IoT, vidéo, images, fichiers, audio, MFA, RBAC, workflow,
-stats), chacune autonome et présentée par niveau dans le catalogue ci-dessus.
+découverte *Bonjour Forge*. Vous pouvez ensuite enchaîner les niveaux
+intermédiaire et avancé de la progression cœur.
 
-Le tableau de synthèse plus haut reste utile comme catalogue exhaustif
-des starters disponibles aujourd'hui, mais l'ordre d'apprentissage
-recommandé est celui des 11 paliers ci-dessus, suivi des progressions
-opt-in de votre choix.
+L'ordre d'apprentissage recommandé est celui des 11 paliers ci-dessus, puis
+les niveaux intermédiaire et avancé.
 
 ## Différence entre profil et starter
 
@@ -115,7 +72,6 @@ Pour choisir un profil : [Profils de projet](../features/profiles.md).
 ## Utiliser un starter
 
 Un starter se suit **à la main**, palier par palier.
-Pour une progression opt-in, commencez par sa page d'installation (installer le module, disposer d'un projet Forge), puis enchaînez les paliers.
 Chaque palier indique le contrôleur, la vue et la route à créer dans le projet.
 
 !!! note "Les starters ne se génèrent pas"
