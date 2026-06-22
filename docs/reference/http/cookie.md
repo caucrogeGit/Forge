@@ -78,6 +78,6 @@ response.cookies        # ex. ['__Host-session_id']
 ## 7. Voir aussi
 
 - [La session HTTP dans Forge](session.md) : l'usage principal du cookie.
-- [L'objet Request dans Forge](request.md) : d'où viennent les cookies reçus.
-- [L'objet Response dans Forge](response.md) : où se posent les cookies envoyés.
+- [L'objet Request dans Forge](../../core-http/references/request.md) : d'où viennent les cookies reçus.
+- [L'objet Response dans Forge](../../core-http/references/response.md) : où se posent les cookies envoyés.
 - [Convention d'inspection HTTP](../http.md) : le masquage des valeurs sensibles.

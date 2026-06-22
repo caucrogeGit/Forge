@@ -14,7 +14,7 @@ Nous donnons à ces deux écritures un vrai retour utilisateur : un message de c
     | Document | Ce qu'il apporte |
     |---|---|
     | [La session HTTP](../../../reference/http/session.md) | où le flash est stocké entre deux requêtes |
-    | [L'objet Response](../../../reference/http/response.md) | la redirection qui suit le POST |
+    | [L'objet Response](../../../core-http/references/response.md) | la redirection qui suit le POST |
 
 ??? note "Contrôleurs"
     Dans `mvc/controllers/note_controller.py`, faites poser un flash par `update` et `delete` au moment de rediriger, et lisez le flash dans `index`.

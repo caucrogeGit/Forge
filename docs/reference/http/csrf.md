@@ -81,6 +81,6 @@ C'est pourquoi un formulaire protégé commence toujours par **garantir une sess
 
 - [La session HTTP dans Forge](session.md) : où vit le jeton.
 - [Le cookie HTTP dans Forge](cookie.md) : comment la session est retrouvée.
-- [L'objet Request dans Forge](request.md) : d'où Forge lit le jeton envoyé.
+- [L'objet Request dans Forge](../../core-http/references/request.md) : d'où Forge lit le jeton envoyé.
 - [Le jeton CSRF](../../starters/welcome-forge/debutant/csrf.md) : la mise en
   pratique guidée.

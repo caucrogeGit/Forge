@@ -13,7 +13,7 @@ Nous ajoutons deux méthodes (afficher le formulaire, traiter l'envoi), deux rou
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Request](../../../reference/http/request.md) | l'accesseur `form(...)` pour lire les champs d'un POST |
+    | [L'objet Request](../../../core-http/references/request.md) | l'accesseur `form(...)` pour lire les champs d'un POST |
     | [La protection CSRF](../../../reference/http/csrf.md) | pourquoi le champ caché `csrf_token` est requis |
     | [La session HTTP](../../../reference/http/session.md) | où vit le jeton réutilisé par `_start_session` |
 

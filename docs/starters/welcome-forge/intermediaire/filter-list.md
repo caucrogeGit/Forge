@@ -14,7 +14,7 @@ La route `/note` ne change pas : la recherche passe par la *query string* (`?q=�
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Request](../../../reference/http/request.md) | l'accesseur `query(...)` qui lit le mot-clé |
+    | [L'objet Request](../../../core-http/references/request.md) | l'accesseur `query(...)` qui lit le mot-clé |
 
 ??? note "Contrôleurs"
     Faites évoluer `mvc/controllers/note_controller.py` : ajoutez la requête filtrée et lisez le mot-clé dans `index`.

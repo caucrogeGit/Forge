@@ -40,7 +40,7 @@ référence d'un module devrait vivre à côté de son code, comme pour les opt-
 
 4. **Formalisme unique.**
    Toute documentation, nouvelle comme migrée, suit le gabarit
-   `docs/reference/http/request.md` (titre `# … dans Forge`, mention du
+   `core/http/docs/references/request.md` (titre `# … dans Forge`, mention du
    fichier `.py` source, sections numérotées pédagogiques, tables d'API,
    exemples, « Contextes d'utilisation », « Voir aussi »).
    La directive de style francophone (CHARTE §2.1 : une phrase par ligne, pas

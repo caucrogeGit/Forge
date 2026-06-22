@@ -14,8 +14,8 @@ Nous l'exposons maintenant à des clients (front JavaScript, script, autre servi
     | Document | Ce qu'il apporte |
     |---|---|
     | [API JSON légère](../../../reference/api-json.md) | la façon canonique d'exposer du JSON dans Forge |
-    | [L'objet Request](../../../reference/http/request.md) | l'accesseur `header(...)`, dont `Authorization` |
-    | [L'objet Response](../../../reference/http/response.md) | `Response.json(data, status=…)` : données **et** code HTTP |
+    | [L'objet Request](../../../core-http/references/request.md) | l'accesseur `header(...)`, dont `Authorization` |
+    | [L'objet Response](../../../core-http/references/response.md) | `Response.json(data, status=…)` : données **et** code HTTP |
 
 ??? note "Contrôleurs"
     Ajoutez le jeton et la méthode dans `mvc/controllers/article_controller.py` :

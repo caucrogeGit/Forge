@@ -14,7 +14,7 @@ La route `/note` ne change toujours pas.
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Request](../../../reference/http/request.md) | l'accesseur `query(...)` qui lit le numéro de page |
+    | [L'objet Request](../../../core-http/references/request.md) | l'accesseur `query(...)` qui lit le numéro de page |
 
 ??? note "Contrôleurs"
     Faites évoluer `mvc/controllers/note_controller.py`.

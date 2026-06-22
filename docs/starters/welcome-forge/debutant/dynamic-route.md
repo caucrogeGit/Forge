@@ -13,8 +13,8 @@ Nous ajoutons une méthode et une route avec un segment variable.
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Request](../../../reference/http/request.md) | les accesseurs de la requête, dont `route(...)` pour les segments de chemin |
-    | [L'objet Response](../../../reference/http/response.md) | la réponse renvoyée, ici de nouveau en texte brut |
+    | [L'objet Request](../../../core-http/references/request.md) | les accesseurs de la requête, dont `route(...)` pour les segments de chemin |
+    | [L'objet Response](../../../core-http/references/response.md) | la réponse renvoyée, ici de nouveau en texte brut |
 
 ??? note "Contrôleurs"
     Ajoutez cette méthode à la classe `WelcomeController` :

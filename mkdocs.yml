@@ -105,9 +105,8 @@ nav:
         - Sécurité et sessions:
             - Audit Auth: reference/audit-auth.md
             - Sessions: reference/sessions.md
-        - Objets HTTP:
-            - L'objet Request: reference/http/request.md
-            - L'objet Response: reference/http/response.md
+        - HTTP (cœur, par module): '!include core/http/mkdocs.yml'
+        - Objets HTTP (transverses):
             - Le cookie HTTP: reference/http/cookie.md
             - La session HTTP: reference/http/session.md
             - La protection CSRF: reference/http/csrf.md

@@ -16,8 +16,8 @@ Vous allez donc garantir une session pour obtenir un jeton non vide, puis le pla
     | [La session HTTP](../../../reference/http/session.md) | où vit le jeton CSRF, et ce que contient une session |
     | [Le cookie HTTP](../../../reference/http/cookie.md) | comment la session est retrouvée d'une page à l'autre |
     | [La protection CSRF](../../../reference/http/csrf.md) | le mécanisme complet : jeton, vérification, `403` |
-    | [L'objet Request](../../../reference/http/request.md) | d'où le serveur lit le jeton envoyé |
-    | [L'objet Response](../../../reference/http/response.md) | où l'on pose le cookie de session |
+    | [L'objet Request](../../../core-http/references/request.md) | d'où le serveur lit le jeton envoyé |
+    | [L'objet Response](../../../core-http/references/response.md) | où l'on pose le cookie de session |
 
 ??? note "Contrôleurs"
     Complétez d'abord les imports en tête de `mvc/controllers/welcome_controller.py` :

@@ -16,8 +16,8 @@ Nous y ajoutons une méthode et une route.
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Request](../../../reference/http/request.md) | les accesseurs de la requête, dont `query(...)` |
-    | [L'objet Response](../../../reference/http/response.md) | la réponse renvoyée, ici encore en texte brut |
+    | [L'objet Request](../../../core-http/references/request.md) | les accesseurs de la requête, dont `query(...)` |
+    | [L'objet Response](../../../core-http/references/response.md) | la réponse renvoyée, ici encore en texte brut |
 
 ??? note "Contrôleurs"
     Ajoutez cette méthode à la classe `WelcomeController` :

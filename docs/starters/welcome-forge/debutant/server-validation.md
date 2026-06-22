@@ -13,8 +13,8 @@ Nous ajoutons deux méthodes, deux routes et un gabarit.
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Request](../../../reference/http/request.md) | l'accesseur `form(...)` pour lire la saisie |
-    | [L'objet Response](../../../reference/http/response.md) | comment fixer un statut HTTP, ici `422` |
+    | [L'objet Request](../../../core-http/references/request.md) | l'accesseur `form(...)` pour lire la saisie |
+    | [L'objet Response](../../../core-http/references/response.md) | comment fixer un statut HTTP, ici `422` |
     | [La protection CSRF](../../../reference/http/csrf.md) | le champ caché `csrf_token` toujours requis |
 
 ??? note "Contrôleurs"
