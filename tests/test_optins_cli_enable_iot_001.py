@@ -27,7 +27,7 @@ from cli.optins.enable import SUPPORTED_OPTINS, enable_optin, main
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 FORGE_PY = _REPO_ROOT / "forge.py"
-HELP_FILE = _REPO_ROOT / "cli" / "help.py"
+HELP_FILE = _REPO_ROOT / "cli" / "_support" / "help.py"
 ENABLE_FILE = _REPO_ROOT / "cli" / "optins" / "enable.py"
 CORE_DIR = _REPO_ROOT / "core"
 

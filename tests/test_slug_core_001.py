@@ -84,7 +84,7 @@ class TestIsValidSlug:
 
 class TestSingleSource:
     def test_public_page_uses_core_slug(self):
-        src = (PROJECT_ROOT / "cli" / "public_page.py").read_text(encoding="utf-8")
+        src = (PROJECT_ROOT / "cli" / "public" / "public_page.py").read_text(encoding="utf-8")
         assert "from core.http.slug import slugify" in src
 
     def test_migration_slug_stays_separate(self):

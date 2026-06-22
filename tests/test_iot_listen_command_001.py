@@ -38,7 +38,7 @@ LISTEN_FILE = (
     / "cli" / "listen.py"
 )
 CORE_DIR = PROJECT_ROOT / "core"
-HELP_FILE = PROJECT_ROOT / "cli" / "help.py"
+HELP_FILE = PROJECT_ROOT / "cli" / "_support" / "help.py"
 
 
 # ── Helpers / fakes ──────────────────────────────────────────────────────────

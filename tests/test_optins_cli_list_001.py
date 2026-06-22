@@ -30,7 +30,7 @@ from cli.optins.list import (
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 FORGE_PY = _REPO_ROOT / "forge.py"
-HELP_FILE = _REPO_ROOT / "cli" / "help.py"
+HELP_FILE = _REPO_ROOT / "cli" / "_support" / "help.py"
 LIST_FILE = _REPO_ROOT / "cli" / "optins" / "list.py"
 CORE_DIR = _REPO_ROOT / "core"
 

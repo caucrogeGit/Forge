@@ -23,7 +23,7 @@ _RBAC_CONTRACT_PATH = Path("mvc") / "security" / "rbac.json"
 
 
 def _schemas_dir() -> Path:
-    return Path(__file__).resolve().parent / "schemas"
+    return Path(__file__).resolve().parent.parent / "schemas"
 
 
 def _build_registry():

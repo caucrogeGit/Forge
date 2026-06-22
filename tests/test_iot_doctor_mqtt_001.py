@@ -46,7 +46,7 @@ DOCTOR_FILE = (
     / "cli" / "doctor.py"
 )
 CORE_DIR = PROJECT_ROOT / "core"
-HELP_DISPATCH_FILE = PROJECT_ROOT / "cli" / "help_dispatch.py"
+HELP_DISPATCH_FILE = PROJECT_ROOT / "cli" / "_support" / "help_dispatch.py"
 
 
 # ── Faux client MQTT (aucun broker, aucun paho) ─────────────────────────────

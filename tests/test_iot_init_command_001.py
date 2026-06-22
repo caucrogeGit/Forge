@@ -31,8 +31,8 @@ from forge_mvc_iot.cli.init import (
 
 PROJECT_ROOT = Path(__file__).parent.parent
 FORGE_PY = PROJECT_ROOT / "forge.py"
-HELP_FILE = PROJECT_ROOT / "cli" / "help.py"
-HELP_DISPATCH_FILE = PROJECT_ROOT / "cli" / "help_dispatch.py"
+HELP_FILE = PROJECT_ROOT / "cli" / "_support" / "help.py"
+HELP_DISPATCH_FILE = PROJECT_ROOT / "cli" / "_support" / "help_dispatch.py"
 EXPECTED_FILENAME = "20260528120000_create_iot_events.sql"
 CORE_DIR = PROJECT_ROOT / "core"
 

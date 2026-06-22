@@ -18,7 +18,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 PYPROJECT = PROJECT_ROOT / "pyproject.toml"
-DOCTOR_PY = PROJECT_ROOT / "cli" / "doctor.py"
+DOCTOR_PY = PROJECT_ROOT / "cli" / "project" / "doctor.py"
 
 
 # ---------------------------------------------------------------------------

@@ -10,7 +10,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 STATIC_SRC = PROJECT_ROOT / "static" / "tailwind.css"
 STATIC_DST = PROJECT_ROOT / "docs" / "static" / "tailwind.css"
-SYNC_LANDING_MODULE = PROJECT_ROOT / "cli" / "sync_landing.py"
+SYNC_LANDING_MODULE = PROJECT_ROOT / "cli" / "assets" / "sync_landing.py"
 PACKAGE_JSON = PROJECT_ROOT / "package.json"
 CONTRIBUTING = PROJECT_ROOT / "CONTRIBUTING.md"
 

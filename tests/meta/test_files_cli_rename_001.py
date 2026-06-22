@@ -21,7 +21,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 FORGE_PY = PROJECT_ROOT / "forge.py"
-CLI_UPLOADS = PROJECT_ROOT / "cli" / "uploads.py"
+CLI_UPLOADS = PROJECT_ROOT / "cli" / "assets" / "uploads.py"
 CONTROLLER_BUILDER = PROJECT_ROOT / "cli" / "entities" / "crud" / "controller_builder.py"
 
 

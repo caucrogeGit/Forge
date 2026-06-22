@@ -26,7 +26,7 @@ _CRUD_ACTIONS = ("list", "show", "create", "update", "delete")
 
 
 def _schemas_dir() -> Path:
-    return Path(__file__).resolve().parent / "schemas"
+    return Path(__file__).resolve().parent.parent / "schemas"
 
 
 def _build_registry():

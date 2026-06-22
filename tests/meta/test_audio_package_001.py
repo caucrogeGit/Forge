@@ -118,9 +118,9 @@ class TestApiAndCli:
         assert "forge_mvc_audio.cli.doctor" in text
 
     def test_help_mentions_audio_doctor(self):
-        help_text = (PROJECT_ROOT / "cli" / "help.py").read_text(encoding="utf-8")
+        help_text = (PROJECT_ROOT / "cli" / "_support" / "help.py").read_text(encoding="utf-8")
         assert "audio:doctor" in help_text
-        dispatch = (PROJECT_ROOT / "cli" / "help_dispatch.py").read_text(
+        dispatch = (PROJECT_ROOT / "cli" / "_support" / "help_dispatch.py").read_text(
             encoding="utf-8"
         )
         assert "audio:doctor" in dispatch

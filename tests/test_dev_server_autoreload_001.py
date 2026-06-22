@@ -638,7 +638,7 @@ class TestForgeRunIntegration:
 
 class TestModulePresence:
     def test_module_existe(self):
-        assert (_REPO_ROOT / "cli" / "dev_reloader.py").exists()
+        assert (_REPO_ROOT / "cli" / "project" / "dev_reloader.py").exists()
 
     def test_log_prefix_est_dev_reload(self):
         assert dev_reloader.LOG_PREFIX == "[DEV-RELOAD]"

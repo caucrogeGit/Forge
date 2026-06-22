@@ -638,7 +638,7 @@ class TestCsrfFormulairesGeneres:
 
     def test_public_form_contient_csrf_token(self):
         """cli/public/public_form.py génère un champ csrf_token dans les formulaires publics."""
-        source = (ROOT / "cli" / "public_form.py")
+        source = (ROOT / "cli" / "public" / "public_form.py")
         text = source.read_text(encoding="utf-8")
         assert 'name="csrf_token"' in text
 

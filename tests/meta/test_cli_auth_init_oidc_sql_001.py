@@ -12,7 +12,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-AUTH_CLI = PROJECT_ROOT / "cli" / "auth.py"
+AUTH_CLI = PROJECT_ROOT / "cli" / "security" / "auth.py"
 
 
 class TestAuthInitNoOidcSqlTemplates:

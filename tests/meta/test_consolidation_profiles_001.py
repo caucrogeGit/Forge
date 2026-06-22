@@ -239,7 +239,7 @@ def test_readme_mentionne_option_profile():
 
 def test_profiles_py_ne_depend_pas_forge_design():
     """cli/project/project_profiles.py ne référence pas Forge Design."""
-    content = (ROOT / "cli" / "project_profiles.py").read_text(encoding="utf-8")
+    content = (ROOT / "cli" / "project" / "project_profiles.py").read_text(encoding="utf-8")
     assert "forge-design" not in content.lower()
     assert "forge design" not in content.lower()
 

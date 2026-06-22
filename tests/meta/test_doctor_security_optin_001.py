@@ -20,7 +20,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-DOCTOR_PY = PROJECT_ROOT / "cli" / "doctor.py"
+DOCTOR_PY = PROJECT_ROOT / "cli" / "project" / "doctor.py"
 
 
 # ---------------------------------------------------------------------------

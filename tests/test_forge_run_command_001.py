@@ -44,7 +44,7 @@ class TestRunModuleExists:
     """Le module cli/project/run.py existe et expose `main`."""
 
     def test_module_present(self):
-        path = _REPO_ROOT / "cli" / "run.py"
+        path = _REPO_ROOT / "cli" / "project" / "run.py"
         assert path.exists(), "cli/project/run.py doit exister (FORGE-RUN-COMMAND-001)"
 
     def test_main_callable(self):
