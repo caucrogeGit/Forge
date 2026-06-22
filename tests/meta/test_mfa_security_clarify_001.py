@@ -82,18 +82,18 @@ class TestAuthMfaRefHasPreAlphaWarning:
 class TestAuthDocMfaLineUpdated:
     """docs/features/auth.md tableau modules mentionne le statut MFA et plus la dépréciation obsolète."""
 
-    def test_mfa_line_mentions_alpha_status(self):
+    def test_no_mfa_optin_line_in_core_auth(self):
+        # ADR-042 : la table API de auth.md ne référence plus le paquet MFA
+        # opt-in ; le statut Alpha de MFA est documenté dans la doc de l'opt-in.
         text = AUTH_DOC.read_text(encoding="utf-8")
         mfa_lines = [
             line for line in text.splitlines()
-            if line.startswith("|") and "MFA" in line and "forge_mvc_mfa" in line
+            if line.startswith("|") and "forge_mvc_mfa" in line
         ]
-        assert mfa_lines, "Ligne MFA introuvable dans docs/features/auth.md tableau"
-        for line in mfa_lines:
-            assert "Alpha" in line or "Pre-Alpha" in line, (
-                f"Ligne MFA dans docs/features/auth.md ne mentionne pas le statut Alpha : "
-                f"{line!r}"
-            )
+        assert not mfa_lines, (
+            f"docs/features/auth.md ne doit plus contenir de ligne de table référençant "
+            f"le paquet MFA opt-in (ADR-042) : {mfa_lines}"
+        )
 
     def test_mfa_line_no_obsolete_deprecation(self):
         """La mention 'déprécié via core.auth.mfa' a été retirée (T4)."""

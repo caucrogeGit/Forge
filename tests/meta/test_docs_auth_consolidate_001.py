@@ -62,18 +62,11 @@ class TestAuthMdNoOidcContradiction:
             "(module existant core/auth/tokens.py — tokens à usage limité)."
         )
 
-    def test_limites_section_says_oidc_not_provided(self):
-        """La section OIDC contient une phrase claire indiquant que OIDC n'est pas fourni."""
+    def test_no_oidc_api_section(self):
+        """ADR-042 : la section OIDC a été retirée du cœur (OIDC non fourni)."""
         text = AUTH_MD.read_text(encoding="utf-8")
-        patterns = [
-            r"OIDC n'est pas fourni",
-            r"OIDC.*non fourni",
-            r"not provided.*OIDC",
-        ]
-        found = any(re.search(p, text, re.IGNORECASE) for p in patterns)
-        assert found, (
-            "docs/features/auth.md doit conserver une phrase claire indiquant que OIDC "
-            "n'est pas fourni nativement par Forge 3.0 (section ## OIDC)."
+        assert "## OIDC" not in text, (
+            "docs/features/auth.md ne doit plus contenir de section OIDC (ADR-042)."
         )
 
     def test_no_link_to_nonexistent_auth_oidc(self):
@@ -90,21 +83,11 @@ class TestAuthMdNoOidcContradiction:
 
 
 class TestAuthMdMfaDeprecationConserved:
-    """Les notes de dépréciation MFA (Type 3, décision C2) sont conservées."""
+    """ADR-042 : la section MFA (opt-in) a été retirée du cœur ; les notes de
+    dépréciation MFA ne vivent plus dans auth.md."""
 
-    def test_mfa_deprecation_alias_note_present(self):
-        """La mention core.auth.mfa comme alias de dépréciation reste dans la table."""
+    def test_no_mfa_section_in_core_auth(self):
         text = AUTH_MD.read_text(encoding="utf-8")
-        assert "core.auth.mfa" in text, (
-            "docs/features/auth.md doit conserver `core.auth.mfa` (alias de dépréciation "
-            "documenté dans la table API — décision Type 3 ticket C2)."
-        )
-
-    def test_mfa_deprecation_warning_note_present(self):
-        """La note DeprecationWarning sur core.auth.mfa est conservée."""
-        text = AUTH_MD.read_text(encoding="utf-8")
-        has_warning = "DeprecationWarning" in text and "core.auth.mfa" in text
-        assert has_warning, (
-            "docs/features/auth.md doit conserver la note DeprecationWarning sur core.auth.mfa "
-            "(décision Type 3 ticket C2 — ligne ~434)."
+        assert "## MFA" not in text, (
+            "docs/features/auth.md ne doit plus contenir de section MFA (ADR-042)."
         )

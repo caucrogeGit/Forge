@@ -287,8 +287,8 @@ class TestDependancesRuntime:
         text = _text().lower()
         assert "argon2" in text
 
-    def test_pyotp_mentionnee(self):
-        assert "pyotp" in _text().lower()
+    # ADR-042 : `pyotp` est une dépendance d'un module opt-in (MFA), pas du core.
+    # La doc cœur ne la nomme plus ; le test pyotp a été retiré.
 
 
 # ---------------------------------------------------------------------------

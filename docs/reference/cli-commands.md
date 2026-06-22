@@ -952,6 +952,74 @@ ou un `rbac:validate`.
 
 </details>
 
+## Gestion des modules optionnels
+
+Forge fournit dans son **cœur** une famille de commandes pour gérer le cycle de
+vie des modules optionnels (mécanisme générique, ADR-016).
+Ces commandes ne dépendent d'aucun module particulier : elles opèrent sur un
+module désigné par son `<nom>`.
+
+<details markdown="1" id="forge-opt-ininstall">
+<summary><code>forge opt-in:install</code> - Affiche la commande d'installation du package d'un module optionnel</summary>
+
+Affiche (sans l'exécuter) la commande `pip` d'installation du package d'un module optionnel.
+
+```bash
+forge opt-in:install <nom>
+```
+
+</details>
+
+<details markdown="1" id="forge-opt-inremove">
+<summary><code>forge opt-in:remove</code> - Affiche la commande de désinstallation du package d'un module optionnel</summary>
+
+Miroir d'`opt-in:install` : affiche la commande de désinstallation du package.
+Ne débranche pas le module du projet (voir `opt-in:disable`).
+
+```bash
+forge opt-in:remove <nom>
+```
+
+</details>
+
+<details markdown="1" id="forge-opt-inenable">
+<summary><code>forge opt-in:enable</code> - Branche un module optionnel dans le projet (optins/) — dry-run par défaut</summary>
+
+Branche un module optionnel dans le projet (couche `optins/<nom>/`).
+Dry-run par défaut ; `--apply` crée réellement les fichiers.
+
+```bash
+forge opt-in:enable <nom>            # dry-run : montre ce qui serait créé
+forge opt-in:enable <nom> --apply    # crée réellement la couche projet
+```
+
+</details>
+
+<details markdown="1" id="forge-opt-indisable">
+<summary><code>forge opt-in:disable</code> - Débranche un module optionnel du projet (retire optins/) — dry-run par défaut</summary>
+
+Inverse exact d'`opt-in:enable` : retire la couche projet `optins/<nom>/`.
+Laisse le package installé (voir `opt-in:remove`).
+
+```bash
+forge opt-in:disable <nom>           # dry-run : montre ce qui serait retiré
+forge opt-in:disable <nom> --apply   # retire la couche projet
+```
+
+</details>
+
+<details markdown="1" id="forge-opt-inlist">
+<summary><code>forge opt-in:list</code> - Affiche les modules optionnels officiels et leur état (lecture seule)</summary>
+
+Liste, en lecture seule, les modules optionnels officiels et leur état
+(installé, branché).
+
+```bash
+forge opt-in:list
+```
+
+</details>
+
 ## Utilitaires
 
 <details markdown="1" id="forge-version">

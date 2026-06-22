@@ -98,21 +98,13 @@ class TestProchainePriorite:
 # ---------------------------------------------------------------------------
 
 class TestDocumentationCoherente:
-    def test_auth_md_lien_vers_rbac(self):
-        # Référence rbac embarquée par paquet (ADR-038).
-        assert "rbac/reference.md" in _auth()
-
-    def test_rbac_md_lien_vers_auth(self):
-        assert "auth.md" in _rbac()
+    # ADR-042 : auth.md (cœur) ne lie plus l'opt-in rbac, et les sections
+    # MFA / OIDC (opt-in / non fourni) ont été retirées du cœur.
+    def test_auth_md_ne_lie_pas_optin_rbac(self):
+        assert "](../rbac/" not in _auth()
 
     def test_auth_md_limites_presentes(self):
         assert "Limites restantes" in _auth()
 
     def test_auth_md_voir_aussi_present(self):
         assert "Voir aussi" in _auth()
-
-    def test_auth_md_section_mfa(self):
-        assert "## MFA" in _auth()
-
-    def test_auth_md_section_oidc(self):
-        assert "## OIDC" in _auth()

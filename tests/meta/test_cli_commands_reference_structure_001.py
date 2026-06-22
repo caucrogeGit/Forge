@@ -56,10 +56,8 @@ class TestTopLevelStructure:
             "La page doit contenir une section « Parcours rapides »."
         )
 
-    def test_has_modules_opt_in(self, doc_text):
-        assert re.search(r"^##\s+Modules opt-in", doc_text, re.MULTILINE), (
-            "La page doit contenir une section dédiée aux modules opt-in."
-        )
+    # ADR-042 : les sections de commandes opt-in ont été retirées du cœur ;
+    # cli-commands.md ne documente plus que les commandes du core.
 
     def test_has_index_alphabetique(self, doc_text):
         assert re.search(r"^##\s+Index alphab[ée]tique", doc_text, re.MULTILINE), (
@@ -83,7 +81,6 @@ class TestTopLevelStructure:
             r"^##\s+Vue d'ensemble",
             r"^##\s+Commandes essentielles",
             r"^##\s+Parcours rapides",
-            r"^##\s+Modules opt-in",
             r"^##\s+Index alphab[ée]tique",
         ]
         positions = []
@@ -130,34 +127,9 @@ class TestParcoursRapidesContent:
         )
 
 
-class TestOptInSection:
-    def test_opt_in_section_lists_packages(self, doc_text):
-        m = re.search(r"^##\s+Modules opt-in", doc_text, re.MULTILINE)
-        assert m is not None
-        # Coupe la section opt-in jusqu'à la section suivante (## ...).
-        rest = doc_text[m.end():]
-        next_h2 = re.search(r"^##\s+", rest, re.MULTILINE)
-        section = rest[: next_h2.start()] if next_h2 else rest
-
-        # Les cinq opt-ins officiels doivent être mentionnés au moins par leur paquet.
-        for pkg in ("forge-mvc-rbac", "forge-mvc-workflow", "forge-mvc-stats",
-                    "forge-mvc-mfa", "forge-mvc-images"):
-            assert pkg in section, (
-                f"La section Modules opt-in doit mentionner `{pkg}`."
-            )
-
-    def test_opt_in_section_states_optional_nature(self, doc_text):
-        """Le rappel « les opt-ins restent optionnels / le core n'en dépend pas »
-        est obligatoire — éviter qu'un lecteur croie qu'un opt-in est requis."""
-        m = re.search(r"^##\s+Modules opt-in", doc_text, re.MULTILINE)
-        rest = doc_text[m.end():]
-        next_h2 = re.search(r"^##\s+", rest, re.MULTILINE)
-        section = rest[: next_h2.start()] if next_h2 else rest
-        markers = ("optionnel", "opt-in", "ne dépend")
-        assert any(m in section.lower() for m in markers), (
-            "La section Modules opt-in doit rappeler explicitement leur "
-            "nature optionnelle (le core ne dépend d'aucun opt-in)."
-        )
+# ADR-042 : la section « Modules opt-in » a été retirée de cli-commands.md
+# (les commandes opt-in sont documentées dans leur propre espace). Les tests
+# TestOptInSection correspondants ont été supprimés.
 
 
 # ---------------------------------------------------------------------------
@@ -187,18 +159,14 @@ class TestAlphabeticalIndex:
                 f"L'index alphabétique doit lister `{cmd}`."
             )
 
-    def test_index_marks_opt_in_status(self, doc_text):
-        """Au moins une commande RBAC doit apparaître avec statut opt-in."""
+    def test_index_lists_only_core_commands(self, doc_text):
+        """ADR-042 : l'index ne liste plus de commande opt-in (rbac:/mail:/iot:…)."""
         section = self._index_section(doc_text)
-        line_rbac = next(
-            (line for line in section.splitlines()
-             if "rbac:validate" in line or "rbac:audit" in line),
-            None,
-        )
-        assert line_rbac is not None, "RBAC absent de l'index."
-        assert "Opt-in" in line_rbac or "opt-in" in line_rbac, (
-            "Les commandes RBAC doivent être marquées « Opt-in » dans l'index."
-        )
+        for cmd in ("rbac:validate", "rbac:audit", "mail:init", "iot:listen",
+                    "video:doctor", "audio:doctor", "i18n:init"):
+            assert cmd not in section, (
+                f"L'index alphabétique ne doit plus lister la commande opt-in `{cmd}` (ADR-042)."
+            )
 
 
 # ---------------------------------------------------------------------------

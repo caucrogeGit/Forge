@@ -147,7 +147,8 @@ class TestHistoricalMentionsPreserved:
     interne 2.x, purgé : DOCS-PURGE-HISTORY-001)."""
 
     @pytest.mark.parametrize("doc_path,expected_mention", [
-        ("features/auth.md", "code MFA est extrait"),
+        # ADR-042 : features/auth.md ne porte plus la mention d'extraction MFA
+        # (section MFA retirée du cœur). La mention reste dans la doc de l'opt-in.
         ("../packages/forge-mvc-mfa/docs/reference.md", "Module extrait"),
         # forge-mvc-stats : doc embarquée par paquet (ADR-038).
         ("../packages/forge-mvc-stats/docs/reference.md", "Module extrait"),

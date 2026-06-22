@@ -80,10 +80,16 @@ def _get_documented_commands() -> set[str]:
 # simplement cachées du listing --help.
 # Identifiées lors de la reconnaissance T11 (audit F23).
 KNOWN_DOCUMENTED_EXCEPTIONS: set[str] = {
-    "i18n:check",    # Fonctionne, absent de forge --help depuis LANG-MIGRATION-001
-    "i18n:init",     # Fonctionne, absent de forge --help depuis LANG-MIGRATION-001
     "sync:landing",  # Fonctionne (utilisé en interne), absent de forge --help
 }
+
+# ADR-042 : les commandes livrées par les opt-ins (documentées dans leur propre
+# espace, pas dans la référence CLI du cœur). Exclues du contrôle de couverture
+# « commande CLI absente de la doc cœur ».
+OPT_IN_CLI_NAMESPACES = (
+    "mail:", "iot:", "video:", "audio:", "i18n:",
+    "rbac:", "workflow:", "stats:", "pivot:",
+)
 
 # Commandes dans forge --help intentionnellement non documentées (rare)
 KNOWN_CLI_EXCEPTIONS: set[str] = set()
@@ -130,7 +136,10 @@ class TestCliVsDoc:
         """Toute commande dans forge --help est documentée dans cli-commands.md."""
         cli = _get_cli_commands()
         doc = _get_documented_commands()
-        missing = cli - doc - KNOWN_CLI_EXCEPTIONS
+        missing = {
+            c for c in (cli - doc - KNOWN_CLI_EXCEPTIONS)
+            if not c.startswith(OPT_IN_CLI_NAMESPACES)
+        }
         assert not missing, (
             "Commandes dans le CLI mais absentes de cli-commands.md :\n  "
             + "\n  ".join(sorted(missing))

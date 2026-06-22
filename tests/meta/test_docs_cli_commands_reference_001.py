@@ -50,8 +50,6 @@ class TestCoreCommandsDocumented:
         "forge auth:doctor",
         "forge auth:user:create",
         "forge auth:user:list",
-        "forge mail:init",
-        "forge mail:test",
         "forge module:list",
         "forge module:install",
         "forge upload:init",

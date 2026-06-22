@@ -107,13 +107,15 @@ class TestPyprojectClean:
 
 
 class TestDocsClean:
-    def test_auth_doc_has_oidc_section_as_note(self):
-        """docs/features/auth.md doit avoir ## OIDC mais comme note, pas comme API."""
+    def test_auth_doc_no_oidc_api_section(self):
+        """ADR-042 : auth.md (cœur) ne présente pas OIDC comme une API.
+
+        La section OIDC a été retirée du cœur lors du découplage ; OIDC reste
+        non fourni nativement (cf. limites de production)."""
         content = Path("docs/features/auth.md").read_text(encoding="utf-8")
-        assert "## OIDC" in content, "Section ## OIDC absente de docs/features/auth.md"
-        assert "n'est pas fourni" in content.lower() or "non fourni" in content.lower() or (
-            "supprim" in content.lower()
-        ), "La section OIDC devrait expliquer l'absence d'OIDC"
+        assert "## OIDC" not in content, (
+            "docs/features/auth.md ne doit plus contenir de section OIDC (ADR-042)."
+        )
 
     def test_changelog_mentions_oidc_removal(self):
         content = Path("CHANGELOG.md").read_text(encoding="utf-8")

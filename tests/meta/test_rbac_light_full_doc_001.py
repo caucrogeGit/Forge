@@ -93,10 +93,12 @@ class TestSecurityDocNoCoreRbacPhantom:
             + str(lines_with_rbac_py)
         )
 
-    def test_security_doc_points_to_forge_mvc_rbac(self):
+    def test_security_doc_no_optin_rbac_reference(self):
+        # ADR-042 : le guide sécurité (cœur) ne référence plus le paquet RBAC
+        # opt-in ; il mentionne un module de contrôle d'accès optionnel générique.
         content = SECURITY_DOC.read_text(encoding="utf-8")
-        assert "forge_mvc_rbac" in content or "forge-mvc-rbac" in content, (
-            "docs/philosophy/security.md doit pointer vers forge_mvc_rbac / forge-mvc-rbac"
+        assert "forge_mvc_rbac" not in content and "forge-mvc-rbac" not in content, (
+            "docs/philosophy/security.md ne doit plus référencer le paquet RBAC opt-in (ADR-042)."
         )
 
 
