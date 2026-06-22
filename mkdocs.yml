@@ -108,6 +108,7 @@ nav:
         - HTTP (cœur, par module): '!include core/http/mkdocs.yml'
         - Sécurité (cœur, par module): '!include core/security/mkdocs.yml'
         - Sessions (cœur, par module): '!include core/sessions/mkdocs.yml'
+        - Base de données (cœur, par module): '!include core/database/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md
