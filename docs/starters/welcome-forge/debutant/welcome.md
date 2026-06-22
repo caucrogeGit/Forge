@@ -23,8 +23,8 @@ Il se poursuit ensuite avec un `MessageController`, qui introduit les formulaire
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Request](../../../core-http/references/request.md) | L'objet reçu par chaque action de contrôleur. |
-    | [L'objet Response](../../../core-http/references/response.md) | Ce que renvoie une action de contrôleur. Ici, vous utilisez `Response.text(...)`. |
+    | [L'objet Request](../../../core-http/request.md) | L'objet reçu par chaque action de contrôleur. |
+    | [L'objet Response](../../../core-http/response.md) | Ce que renvoie une action de contrôleur. Ici, vous utilisez `Response.text(...)`. |
 
 ??? note "Contrôleur"
     Créez le fichier `mvc/controllers/welcome_controller.py` :

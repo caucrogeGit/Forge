@@ -13,8 +13,8 @@ Nous ajoutons une méthode et une route.
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Request](../../../core-http/references/request.md) | ce que regroupe `request.data` |
-    | [L'objet Response](../../../core-http/references/response.md) | la réponse, ici la page de débogage `Response.debug(...)` |
+    | [L'objet Request](../../../core-http/request.md) | ce que regroupe `request.data` |
+    | [L'objet Response](../../../core-http/response.md) | la réponse, ici la page de débogage `Response.debug(...)` |
 
 ??? note "Contrôleurs"
     Ajoutez cette méthode à la classe `WelcomeController` :

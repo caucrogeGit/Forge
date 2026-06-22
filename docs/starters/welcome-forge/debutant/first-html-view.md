@@ -13,8 +13,8 @@ Nous ajoutons une méthode, une route et un gabarit.
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Response](../../../core-http/references/response.md) | la réponse renvoyée, désormais produite par un gabarit |
-    | [L'objet Request](../../../core-http/references/request.md) | la requête transmise au moteur de template |
+    | [L'objet Response](../../../core-http/response.md) | la réponse renvoyée, désormais produite par un gabarit |
+    | [L'objet Request](../../../core-http/request.md) | la requête transmise au moteur de template |
 
 ??? note "Contrôleurs"
     Ajoutez cette méthode à la classe `WelcomeController` :

@@ -5,10 +5,10 @@ site_name: core-http
 docs_dir: docs
 nav:
   - Référence HTTP (par module):
-      - L'objet Request (request.py): references/request.md
-      - L'objet Response (response.py): references/response.md
-      - Helpers de réponse (helpers.py): references/helpers.md
-      - Le routeur (router.py): references/router.md
-      - En-tête Range (byte_range.py): references/byte_range.md
-      - Inspection de debug (debug_dumper.py): references/debug_dumper.md
-      - Slugs d'URL (slug.py): references/slug.md
+      - L'objet Request (request.py): request.md
+      - L'objet Response (response.py): response.md
+      - Helpers de réponse (helpers.py): helpers.md
+      - Le routeur (router.py): router.md
+      - En-tête Range (byte_range.py): byte_range.md
+      - Inspection de debug (debug_dumper.py): debug_dumper.md
+      - Slugs d'URL (slug.py): slug.md

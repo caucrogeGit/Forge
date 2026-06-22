@@ -114,5 +114,5 @@ def debug(request: Request) -> Response:
 ## 7. Voir aussi
 
 - [L'objet Response dans Forge](response.md) : l'autre moitié de l'échange HTTP.
-- [La session HTTP dans Forge](../../reference/http/session.md) : la mémoire entre deux requêtes.
-- [Convention d'inspection HTTP](../../reference/http.md) : le masquage des valeurs sensibles.
+- [La session HTTP dans Forge](../reference/http/session.md) : la mémoire entre deux requêtes.
+- [Convention d'inspection HTTP](../reference/http.md) : le masquage des valeurs sensibles.

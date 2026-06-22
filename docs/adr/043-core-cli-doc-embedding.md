@@ -24,10 +24,12 @@ référence d'un module devrait vivre à côté de son code, comme pour les opt-
    inchangé.
 
 2. **Embarquer la RÉFÉRENCE par module à côté du code.**
-   Pour chaque sous-paquet de `core/` et de `cli/`, créer un dossier
-   `docs/references/` contenant **un fichier `.md` par fichier `.py`** à API
-   publique (miroir exact de la convention opt-in `references/<module>.md`).
-   Exemple : `core/app/docs/references/<module>.md`.
+   Pour chaque sous-paquet de `core/` et de `cli/`, créer un dossier `docs/`
+   contenant **un fichier `.md` par fichier `.py`** à API publique.
+   Exemple : `core/app/docs/<module>.md` (monté sous `/core-app/<module>/`).
+   Contrairement aux opt-ins (qui ont aussi un `welcome/`), le `docs/` du cœur
+   et du CLI ne contient **que** la référence : le niveau `references/` est donc
+   inutile et omis (les fichiers sont directement à la racine de `docs/`).
    Ces docs sont agrégées au site unique par `mkdocs-monorepo` (`!include`),
    comme les opt-ins.
 
@@ -40,7 +42,7 @@ référence d'un module devrait vivre à côté de son code, comme pour les opt-
 
 4. **Formalisme unique.**
    Toute documentation, nouvelle comme migrée, suit le gabarit
-   `core/http/docs/references/request.md` (titre `# … dans Forge`, mention du
+   `core/http/docs/request.md` (titre `# … dans Forge`, mention du
    fichier `.py` source, sections numérotées pédagogiques, tables d'API,
    exemples, « Contextes d'utilisation », « Voir aussi »).
    La directive de style francophone (CHARTE §2.1 : une phrase par ligne, pas

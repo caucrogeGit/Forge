@@ -61,12 +61,12 @@ Pour rendre un **gabarit** (un fichier de vue), on n'utilise pas un constructeur
 - **Répondre du JSON** : `Response.json(...)` pour une API.
 - **Servir un fichier** : `Response.file(...)`.
 - **Poser un cookie** : on écrit dans `response.headers["Set-Cookie"]`, par
-  exemple via le cookie de session (voir [La session HTTP](../../reference/http/session.md)).
+  exemple via le cookie de session (voir [La session HTTP](../reference/http/session.md)).
 - **Inspecter** : `response.data` montre une vue masquée et sûre de la réponse.
 
 ## 6. Voir aussi
 
 - [L'objet Request dans Forge](request.md) : l'autre moitié de l'échange HTTP.
-- [La session HTTP dans Forge](../../reference/http/session.md) : poser et retrouver la session via
+- [La session HTTP dans Forge](../reference/http/session.md) : poser et retrouver la session via
   un cookie de la réponse.
-- [Convention d'inspection HTTP](../../reference/http.md) : le masquage des valeurs sensibles.
+- [Convention d'inspection HTTP](../reference/http.md) : le masquage des valeurs sensibles.

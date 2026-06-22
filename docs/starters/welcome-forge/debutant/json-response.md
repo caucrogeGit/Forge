@@ -13,8 +13,8 @@ Nous ajoutons une méthode et une route.
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [L'objet Response](../../../core-http/references/response.md) | la fabrique `Response.json(...)` et l'en-tête `Content-Type` |
-    | [L'objet Request](../../../core-http/references/request.md) | la requête reçue par l'action |
+    | [L'objet Response](../../../core-http/response.md) | la fabrique `Response.json(...)` et l'en-tête `Content-Type` |
+    | [L'objet Request](../../../core-http/request.md) | la requête reçue par l'action |
 
 ??? note "Contrôleurs"
     Ajoutez cette méthode à la classe `WelcomeController` :
