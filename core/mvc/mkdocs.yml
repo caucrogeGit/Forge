@@ -1,0 +1,10 @@
+# Documentation embarquée du sous-paquet core/mvc (ADR-043).
+site_name: core-mvc
+docs_dir: docs
+nav:
+  - Référence MVC (par module):
+      - Contrôleur de base (controller/base_controller.py): base_controller.md
+      - Registre de contexte Jinja (controller/registry.py): registry.md
+      - Pagination (view/pagination.py): pagination.md
+      - Validateur de modèle (model/validator.py): validator.md
+      - Erreur de doublon (model/exceptions.py): exceptions.md

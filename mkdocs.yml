@@ -116,6 +116,7 @@ nav:
         - Formulaires (cœur, par module): '!include core/forms/mkdocs.yml'
         - Système de modules (cœur, par module): '!include core/modules/mkdocs.yml'
         - Auth/User (cœur, par module): '!include core/auth/mkdocs.yml'
+        - MVC (cœur, par module): '!include core/mvc/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md
