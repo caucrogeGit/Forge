@@ -1,8 +1,8 @@
-# Sécurité et RBAC
+# Sécurité
 
 !!! tip "Guide production"
     Pour les bonnes pratiques de déploiement sécurisé (checklist, secrets, HTTPS,
-    cookies, headers, CSRF, RBAC, uploads, logs), voir
+    cookies, headers, CSRF, uploads, logs), voir
     **[Sécurité en production](../deployment/production-security.md)**.
 
 !!! info "Auth/User avancée"
@@ -95,7 +95,7 @@ Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis 
 ## Service de fichiers — défense symlinks (UPLOADS-SYMLINK-DEFENSE-001)
 
 Les fichiers publics servis par Forge (route `/static/...` par `app.py`, route
-`/media/...` via [`forge_mvc_files.serve_media_file`](https://github.com/caucrogeGit/Forge/blob/main/packages/forge-mvc-files/forge_mvc_files/manager.py))
+`/media/...` servie par le module d'upload optionnel)
 **ne doivent pas traverser de symlinks**. Les chemins sont résolus via
 `os.path.realpath()` / `Path.resolve()` puis vérifiés par `os.path.commonpath()` :
 toute cible résolue hors de la racine autorisée (`static/`, `storage/uploads/`)
@@ -112,47 +112,6 @@ Cette défense couvre :
 Le contrat est verrouillé par
 [`tests/test_uploads_symlink_defense_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/test_uploads_symlink_defense_001.py)
 (12 tests, dont 3 garde-fous source-level sur `app.py`).
-
----
-
-## RBAC — documentation complète
-
-La documentation complète du RBAC Forge (rôles, permissions, décorateurs,
-helper Jinja, génération CRUD, chaîne de confiance) se trouve dans
-**RBAC — Contrôle d'accès**.
-
-### Résumé rapide
-
-```python
-from forge_mvc_rbac import require_permission, has_permission, make_can
-
-# Protéger une route serveur
-@staticmethod
-@require_permission("posts.edit")
-def edit(request): ...
-
-# Vérifier une permission dans le code
-if has_permission(request, "posts.edit"):
-    ...
-
-# Helper Jinja — injecté automatiquement par BaseController.render(request=request)
-# {% if can("posts.edit") %} ... {% endif %}
-```
-
-Injecter les permissions après authentification :
-
-```python
-utilisateur = {
-    "UtilisateurId": row["id"],
-    "Login": row["login"],
-    "roles": ["admin"],
-    "permissions": ["posts.edit", "posts.delete", "users.view"],
-}
-nouveau_id = authentifier_session(session_id, utilisateur)
-```
-
----
-
 ## Store de session configurable
 
 Forge accepte un store de session explicite via :

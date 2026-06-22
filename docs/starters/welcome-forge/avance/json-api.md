@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } renvoyer du JSON avec `Response.json`, et **protéger** la route par un jeton `Authorization: Bearer …` lu via `request.header(...)`. Sans jeton valide, l'API répond `401`.
 
-Le catalogue est complet côté navigateur : lister, créer, attacher un document.
+Le catalogue est complet côté navigateur : lister et créer.
 
 Nous l'exposons maintenant à des clients (front JavaScript, script, autre service) sous forme d'**API JSON protégée**, en réutilisant la jointure du premier palier.
 
@@ -26,7 +26,7 @@ Nous l'exposons maintenant à des clients (front JavaScript, script, autre servi
 
     class ArticleController(BaseController):
 
-        # … index / create / store / attach / attach_store inchangés …
+        # … index / create / store inchangés …
 
         @staticmethod
         def api_index(request: Request) -> Response:
@@ -62,8 +62,6 @@ Nous l'exposons maintenant à des clients (front JavaScript, script, autre servi
         public.add("GET",  "/article", ArticleController.index, name="article-index")
         public.add("GET",  "/article/create", ArticleController.create, name="article-create")
         public.add("POST", "/article/store", ArticleController.store, name="article-store")
-        public.add("GET",  "/article/attach/{id}", ArticleController.attach, name="article-attach")
-        public.add("POST", "/article/attach-store/{id}", ArticleController.attach_store, name="article-attach_store")
         public.add("GET",  "/article/api-index", ArticleController.api_index, name="article-api_index")
     ```
 
@@ -87,6 +85,6 @@ Nous l'exposons maintenant à des clients (front JavaScript, script, autre servi
     - `request.header(...)` donne accès aux en-têtes, dont `Authorization`.
     - On vérifie l'autorisation **avant** de produire la donnée ; un refus, c'est `401`.
 
-Vous avez parcouru les quatre paliers du niveau avancé. Place au bilan.
+Vous avez parcouru les trois paliers du niveau avancé. Place au bilan.
 
 [Bilan du niveau avancé](bilan.md)

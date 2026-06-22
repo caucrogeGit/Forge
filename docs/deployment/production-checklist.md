@@ -17,8 +17,7 @@ forge migration:apply --dry-run # aperçu des migrations à appliquer + leur SQL
 
 `forge doctor` inclut un check **Sécurité prod** : il vérifie que l'application
 tourne avec un compte base de données **applicatif** (et non le compte admin),
-et que les uploads sont **bornés** (`UPLOAD_MAX_SIZE`). Si l'opt-in
-`forge-mvc-files` est installé, il vérifie aussi que les extensions autorisées
+et que les uploads sont **bornés** (`UPLOAD_MAX_SIZE`). Si le module d'upload optionnel est installé, il vérifie aussi que les extensions autorisées
 (`UPLOAD_ALLOWED_EXTENSIONS`) ne sont pas vides. Corrige tout `[WARN]`/`[FAIL]` avant d'exposer.
 
 - [ ] `forge doctor` ne remonte aucun `[FAIL]`.
@@ -36,8 +35,7 @@ et que les uploads sont **bornés** (`UPLOAD_MAX_SIZE`). Si l'opt-in
       → [Configurer les comptes MariaDB d'un projet](../install/mariadb-comptes.md).
 - [ ] `SSL_CERTFILE` / `SSL_KEYFILE` configurés (ou TLS terminé par le reverse
       proxy — voir §4).
-- [ ] Plafond du corps multipart : `UPLOAD_MAX_SIZE` (noyau). Si l'opt-in
-      `forge-mvc-files` est utilisé, configure aussi `UPLOAD_ALLOWED_EXTENSIONS`
+- [ ] Plafond du corps multipart : `UPLOAD_MAX_SIZE` (noyau). Si le module d'upload optionnel est utilisé, configure aussi `UPLOAD_ALLOWED_EXTENSIONS`
       et `UPLOAD_ALLOWED_MIME_TYPES` (lus depuis l'environnement, ADR-032).
 
 ## 3. Sessions

@@ -4,7 +4,7 @@ Depuis ADR-028, le niveau avancé welcome-forge est un **tutoriel continu
 manuel** : un mini-projet « Catalogue d'articles » qui grandit palier après
 palier, plus aucun starter buildable. Ce garde-fou verrouille :
 
-- les 4 paliers existent dans l'ordre pédagogique ;
+- les paliers existent dans l'ordre pédagogique ;
 - aucune page ne propose `forge starter:build` (parcours manuel) ;
 - chaque palier montre l'état cumulatif de `mvc/routes.py` (groupe public, route
   `articles_index`), et les routes apparaissent dès qu'elles sont introduites ;
@@ -27,7 +27,9 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 AVANCE = PROJECT_ROOT / "docs" / "starters" / "welcome-forge" / "avance"
 
 # Ordre pédagogique du mini-projet Catalogue d'articles.
-PALIERS = ["relations", "db-transaction", "file-upload", "json-api"]
+# ADR-042 : le palier upload (qui utilisait l'opt-in forge-mvc-files) a été
+# retiré du parcours cœur ; le mini-projet enchaîne relations -> transaction -> API JSON.
+PALIERS = ["relations", "db-transaction", "json-api"]
 
 CODE_BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)
 
@@ -86,16 +88,10 @@ class TestContinuiteCumulative:
             f"{slug}.md doit inclure la route de base `articles_index` (cumulatif)."
         )
 
-    @pytest.mark.parametrize("slug", ["db-transaction", "file-upload", "json-api"])
+    @pytest.mark.parametrize("slug", ["db-transaction", "json-api"])
     def test_routes_creation_presentes_des_palier_2(self, slug):
         assert "ArticleController.store" in _read(slug), (
             f"{slug}.md doit conserver la route de création (cumulatif)."
-        )
-
-    @pytest.mark.parametrize("slug", ["file-upload", "json-api"])
-    def test_route_attachement_presente_des_palier_3(self, slug):
-        assert "ArticleController.attach" in _read(slug), (
-            f"{slug}.md doit conserver la route d'attachement (cumulatif)."
         )
 
     def test_api_route_presente_au_dernier_palier(self):
@@ -114,9 +110,8 @@ class TestContinuiteCumulative:
 class TestEtatFinalDansBilan:
     MARKERS = [
         "class ArticleController",
-        "def index", "def create", "def store", "def attach",
-        "def attach_store", "def api_index",
-        "article-index", "article-store", "article-attach", "article-api_index",
+        "def index", "def create", "def store", "def api_index",
+        "article-index", "article-store", "article-api_index",
     ]
 
     @pytest.mark.parametrize("marker", MARKERS)

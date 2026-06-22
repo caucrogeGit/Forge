@@ -144,14 +144,10 @@ class TestSequentialChain:
         page = STARTERS_DOCS / "welcome-forge" / "avance" / "relations.md"
         assert "(db-transaction.md)" in page.read_text(encoding="utf-8")
 
-    def test_avance_db_transaction_points_to_file_upload(self):
-        # Palier 2 avancé → palier 3 (file-upload).
+    def test_avance_db_transaction_points_to_json_api(self):
+        # ADR-042 : le palier upload (opt-in forge-mvc-files) a été retiré.
+        # Palier 2 avancé → palier 3 (json-api).
         page = STARTERS_DOCS / "welcome-forge" / "avance" / "db-transaction.md"
-        assert "(file-upload.md)" in page.read_text(encoding="utf-8")
-
-    def test_avance_file_upload_points_to_json_api(self):
-        # Palier 3 avancé → palier 4 (json-api).
-        page = STARTERS_DOCS / "welcome-forge" / "avance" / "file-upload.md"
         assert "(json-api.md)" in page.read_text(encoding="utf-8")
 
     def test_avance_last_palier_points_to_level_bilan(self):

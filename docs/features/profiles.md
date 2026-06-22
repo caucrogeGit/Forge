@@ -124,12 +124,12 @@ forge new MonProjet --profile standard
 
 ## Profil `auth-mfa`
 
-**Objectif** : projet Forge avec authentification MFA (TOTP) activée via `forge-mvc-mfa`.
+**Objectif** : projet Forge avec authentification MFA (TOTP) activée via un module MFA optionnel.
 
 **Intention** :
 
 - tout le contenu du profil `standard` ;
-- `forge-mvc-mfa` installé (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`, statut Alpha) ;
+- le module MFA optionnel installé ;
 - contrôleurs auth sans stubs ni lazy imports MFA ;
 - routes `/login/mfa` toujours actives.
 
@@ -137,13 +137,12 @@ forge new MonProjet --profile standard
 
 ```bash
 forge new MonProjet --profile auth-mfa
-# forge-mvc-mfa : pip install --pre forge-mvc-mfa (publié sur PyPI depuis 1.0.0-beta.9)
 ```
 
-Pour obtenir les contrôleurs auth complets, suivez la progression `welcome-mfa` et réalisez les contrôleurs MFA à la main (enrôlement, challenge, récupération).
+Pour obtenir les contrôleurs auth complets, réalisez les contrôleurs MFA à la main (enrôlement, challenge, récupération).
 Vous remplacez ainsi les contrôleurs stub du squelette par les versions complètes (sans try/except ni `_MFA_AVAILABLE`).
 
-**Prérequis** : `forge-mvc-mfa` installé dans le venv. Sans ce module, les routes `/login/mfa` redirigent vers `/login` (comportement du squelette stub par défaut).
+**Prérequis** : le module MFA optionnel installé dans le venv. Sans ce module, les routes `/login/mfa` redirigent vers `/login` (comportement du squelette stub par défaut).
 
 ---
 
@@ -154,7 +153,7 @@ minimal
   └── standard
         ├── dynamic      (standard + intention HTMX/Alpine)
         ├── multilingual (standard + intention i18n)
-        └── auth-mfa     (standard + intention forge-mvc-mfa)
+        └── auth-mfa     (standard + intention MFA)
 ```
 
 `minimal` est la base la plus sobre. `standard` est le profil par défaut. `dynamic` ajoute l'intention front dynamique. `multilingual` ajoute l'intention i18n. `auth-mfa` ajoute l'intention MFA.

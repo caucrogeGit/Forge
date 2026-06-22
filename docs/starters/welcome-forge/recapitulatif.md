@@ -43,8 +43,7 @@ Un seul mini-projet, le « Catalogue d'articles », construit à la main palier 
 |---|--------|------------------|---------|
 | 1 | [Relations entre tables](avance/relations.md) | Deux tables liées, lecture jointe | `FOREIGN KEY`, `SELECT … JOIN …` |
 | 2 | [Écritures transactionnelles](avance/db-transaction.md) | Plusieurs écritures atomiques | `with transaction() as tx:`, `insert(..., tx=tx)` |
-| 3 | [Téléverser un fichier](avance/file-upload.md) | Recevoir et stocker un fichier | `request.file(...)`, `save_upload(...)` |
-| 4 | [API JSON protégée](avance/json-api.md) | Exposer du JSON derrière un jeton | `Response.json`, `request.header("Authorization")` |
+| 3 | [API JSON protégée](avance/json-api.md) | Exposer du JSON derrière un jeton | `Response.json`, `request.header("Authorization")` |
 
 ## Réponses (`core.http.response.Response`)
 
@@ -92,21 +91,11 @@ s'écrivent à la main (`JOIN`), sans ORM.
 
 Cookie de session **durci** : `HttpOnly; SameSite=Strict; Secure`.
 
-## Fichiers & email
-
-| Fonction | Usage |
-|----------|-------|
-| `forge_mvc_files.save_upload(file, category)` | Valider (extension, MIME, taille) puis stocker un fichier |
-| `forge_mvc_mail.MailMessage(...)` | Décrire un email (sujet, destinataire, corps) |
-| `forge_mvc_mail.Mailer(transport).send(message)` | Envoyer ; `ConsoleTransport` en dev (aucun SMTP) |
-
 ## Sécurité
 
 - **CSRF** : champ caché `csrf_token` exigé sur chaque POST, vérifié
   automatiquement (palier débutant 7).
 - **Validation serveur** : ne jamais faire confiance au client ; valider avant
   d'utiliser ou d'écrire (palier débutant 9).
-- **Uploads** : `save_upload` contrôle extension, type MIME et taille **avant**
-  toute écriture disque (palier avancé 2).
 - **API** : vérifier l'autorisation (`Bearer`) **avant** de produire la donnée ;
-  un refus renvoie `401` (palier avancé 4).
+  un refus renvoie `401` (palier avancé 3).

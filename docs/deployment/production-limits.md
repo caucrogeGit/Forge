@@ -83,7 +83,7 @@ Sélection explicite via `forge.configure(session_store=...)` ou
 ### Rate-limits
 
 - Le rate-limit login (`core.auth.rate_limit`) et le rate-limit upload
-  (`forge_mvc_files.rate_limit`) stockent leurs compteurs **en mémoire dans le
+  (module d'upload optionnel) stockent leurs compteurs **en mémoire dans le
   processus courant**. Cette implémentation n'est pas configurable dans la
   série 1.0.0.
 - En multi-worker, **les compteurs ne sont pas partagés** — la protection

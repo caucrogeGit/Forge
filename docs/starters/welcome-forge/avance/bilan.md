@@ -2,19 +2,18 @@
 
 Vous venez de construire à la main, palier après palier, un seul et même mini-projet : le **Catalogue d'articles**.
 
-Cette page récapitule les quatre notions acquises, puis montre l'état final complet du contrôleur et des routes.
+Cette page récapitule les trois notions acquises, puis montre l'état final complet du contrôleur et des routes.
 
-## Les quatre notions acquises
+## Les trois notions acquises
 
 - Palier 1 : relier deux tables par une **clé étrangère** et les lire avec un `JOIN` SQL visible (`articles` joint à `categories`).
 - Palier 2 : grouper des écritures **atomiques** avec `with transaction() as tx:` (créer un article et incrémenter le compteur de sa catégorie, rollback sur erreur).
-- Palier 3 : recevoir un fichier (`multipart`), le récupérer avec `request.file`, le stocker via `forge_mvc_files.save_upload` (validé) et l'attacher à un article.
-- Palier 4 : exposer le catalogue en JSON (`Response.json`) derrière un jeton `Authorization: Bearer …` lu avec `request.header`.
+- Palier 3 : exposer le catalogue en JSON (`Response.json`) derrière un jeton `Authorization: Bearer …` lu avec `request.header`.
 
 ??? note "État final de mvc/controllers/article_controller.py"
     ```python
     # mvc/controllers/article_controller.py
-    from core.database.db import execute, fetch_all, fetch_one, insert
+    from core.database.db import execute, fetch_all, insert
     from core.database.transaction import transaction
     from core.http.request import Request
     from core.http.response import Response
@@ -22,7 +21,6 @@ Cette page récapitule les quatre notions acquises, puis montre l'état final co
     from core.security.cookies import set_session_cookie
     from core.security.session import get_session, get_session_id
     from core.sessions.manager import get_session_store
-    from forge_mvc_files import UploadError, save_upload
 
     SELECT_ARTICLES_WITH_CATEGORY = (
         "SELECT a.id, a.title, c.name AS category "
@@ -31,10 +29,8 @@ Cette page récapitule les quatre notions acquises, puis montre l'état final co
         "ORDER BY a.id"
     )
     SELECT_CATEGORIES = "SELECT id, name FROM categories ORDER BY name"
-    SELECT_ONE = "SELECT id, title FROM articles WHERE id = ?"
     INSERT_ARTICLE = "INSERT INTO articles (title, category_id) VALUES (?, ?)"
     INCREMENT_COUNT = "UPDATE categories SET article_count = article_count + 1 WHERE id = ?"
-    SET_DOCUMENT = "UPDATE articles SET document_path = ? WHERE id = ?"
     API_TOKEN = "forge-demo-token"
 
 
@@ -89,33 +85,6 @@ Cette page récapitule les quatre notions acquises, puis montre l'état final co
             return BaseController.redirect("/article", request=request, flash="Article créé.")
 
         @staticmethod
-        def attach(request: Request) -> Response:
-            article = fetch_one(SELECT_ONE, (int(request.route("id", default="0")),))
-            if article is None:
-                return Response.text("Article introuvable.", status=404)
-            session_id, csrf_token = ArticleController._start_session(request)
-            response = BaseController.render(
-                "article/attach.html",
-                request=request,
-                context={"article": article, "csrf_token": csrf_token},
-            )
-            set_session_cookie(response, session_id)
-            return response
-
-        @staticmethod
-        def attach_store(request: Request) -> Response:
-            record_id = int(request.route("id", default="0"))
-            uploaded = request.file("document")
-            if uploaded is None:
-                return Response.text("Aucun fichier sélectionné.", status=422)
-            try:
-                saved = save_upload(uploaded, "documents")
-            except UploadError as exc:
-                return Response.text(str(exc), status=422)
-            execute(SET_DOCUMENT, (saved.path, record_id))
-            return BaseController.redirect("/article", request=request, flash="Document attaché.")
-
-        @staticmethod
         def api_index(request: Request) -> Response:
             authorization = request.header("Authorization") or ""
             if authorization != f"Bearer {API_TOKEN}":
@@ -138,14 +107,12 @@ Cette page récapitule les quatre notions acquises, puis montre l'état final co
         public.add("GET",  "/article", ArticleController.index, name="article-index")
         public.add("GET",  "/article/create", ArticleController.create, name="article-create")
         public.add("POST", "/article/store", ArticleController.store, name="article-store")
-        public.add("GET",  "/article/attach/{id}", ArticleController.attach, name="article-attach")
-        public.add("POST", "/article/attach-store/{id}", ArticleController.attach_store, name="article-attach_store")
         public.add("GET",  "/article/api-index", ArticleController.api_index, name="article-api_index")
     ```
 
 ## Et ensuite
 
-Vous savez relier vos données sans ORM, écrire de façon atomique, recevoir des fichiers et exposer une API JSON protégée, le SQL restant explicite.
+Vous savez relier vos données sans ORM, écrire de façon atomique et exposer une API JSON protégée, le SQL restant explicite.
 
 Le **récapitulatif** rassemble toutes les API de la progression sur une seule page.
 

@@ -27,7 +27,7 @@ du niveau débutant au niveau avancé.
 
 *Intermédiaire, 8 paliers (tutoriel continu)* : [Lister des enregistrements](welcome-forge/intermediaire/list-records.md) · [Héritage de gabarit](welcome-forge/intermediaire/layout-template.md) · [Rechercher / filtrer](welcome-forge/intermediaire/filter-list.md) · [Paginer une liste](welcome-forge/intermediaire/pagination.md) · [Modifier un enregistrement](welcome-forge/intermediaire/update-record.md) · [Supprimer un enregistrement](welcome-forge/intermediaire/delete-record.md) · [Messages flash](welcome-forge/intermediaire/flash-messages.md) · [Mémoriser un état en session](welcome-forge/intermediaire/session-state.md)
 
-*Avancé, 4 paliers (tutoriel continu)* : [Relations entre tables](welcome-forge/avance/relations.md) · [Écritures transactionnelles](welcome-forge/avance/db-transaction.md) · [Téléverser un fichier](welcome-forge/avance/file-upload.md) · [API JSON protégée](welcome-forge/avance/json-api.md)
+*Avancé, 3 paliers (tutoriel continu)* : [Relations entre tables](welcome-forge/avance/relations.md) · [Écritures transactionnelles](welcome-forge/avance/db-transaction.md) · [API JSON protégée](welcome-forge/avance/json-api.md)
 
 ## Progression recommandée
 

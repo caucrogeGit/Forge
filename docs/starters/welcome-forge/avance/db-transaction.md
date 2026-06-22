@@ -158,6 +158,6 @@ Ces deux écritures doivent rester atomiques, d'où la transaction.
     Forge ne l'ajoute pas au framework : le noyau reste minimal et explicite, l'ergonomie est à votre main.
     Un parcours dédié vous montre comment construire ces façades pas à pas (`Session`, `Cookies`, `Flash`) : [Construire vos façades helper](../../welcome-helpers/installation.md).
 
-Au palier suivant, nous attachons un fichier à un article.
+Au palier suivant, nous exposons le catalogue en API JSON protégée.
 
-[Continuer avec Téléverser un fichier](file-upload.md)
+[Continuer avec API JSON protégée](json-api.md)
