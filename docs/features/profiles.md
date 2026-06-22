@@ -45,7 +45,7 @@ forge new MonProjet --profile standard
 | `standard` | Application classique recommandée | `minimal` + composants standard |
 | `dynamic` | Application avec interactions front légères | `standard` + intention HTMX / Alpine.js |
 | `multilingual` | Application prête pour l'internationalisation | `standard` + intention i18n |
-| `auth-mfa` | Application avec MFA (TOTP) activé | `standard` + intention `forge-mvc-mfa` |
+| `auth-mfa` | Application avec MFA (TOTP) activé | `standard` + intention MFA |
 
 ---
 

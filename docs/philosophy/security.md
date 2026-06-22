@@ -21,7 +21,7 @@ Forge fournit les briques de sécurité suivantes dans `core/security/` :
 | Middleware | `middleware.py` | `AuthMiddleware`, `CsrfMiddleware` |
 | Nonce CSP | `csp.py` | Nonce par requête pour scripts inline contrôlés (`APP_CSP_NONCE_ENABLED`) |
 
-Le RBAC complet (`Role`, `Permission`, `@require_permission`, `make_can`…) est fourni par le module opt-in `forge-mvc-rbac` — il n'y a pas de `rbac.py` dans `core/security/`. Voir RBAC — Contrôle d'accès.
+Le RBAC complet (`Role`, `Permission`, `@require_permission`, `make_can`…) est fourni par un module de contrôle d'accès optionnel : il n'y a pas de `rbac.py` dans `core/security/`.
 
 ### TLS du serveur de développement
 

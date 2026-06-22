@@ -31,7 +31,7 @@ flowchart LR
     Project --> Forms["core.forms"]
     Project --> Security["core.security"]
     Project --> Database["core.database"]
-    Project --> Uploads["forge-mvc-files (opt-in)"]
+    Project --> Uploads["Uploads (module optionnel)"]
     Project --> Entities["mvc/entities"]
 
     App --> Router

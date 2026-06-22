@@ -8,7 +8,7 @@
 | `standard` | Application classique recommandée | `minimal` + composants | non | non |
 | `dynamic` | Interactions front légères | `standard` + intention HTMX/Alpine | oui (préparé) | non |
 | `multilingual` | Prêt pour l'internationalisation | `standard` + intention i18n | non | oui (préparé) |
-| `auth-mfa` | MFA (TOTP) activé | `standard` + intention `forge-mvc-mfa` | non | non |
+| `auth-mfa` | MFA (TOTP) activé | `standard` + intention MFA | non | non |
 
 ### Commande
 
