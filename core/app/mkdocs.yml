@@ -1,0 +1,11 @@
+# Documentation embarquée du sous-paquet core/app (ADR-043).
+site_name: core-app
+docs_dir: docs
+nav:
+  - Référence application (par module):
+      - L'application (application.py): application.md
+      - Fabrique d'application (app_factory.py): app_factory.md
+      - Callables WSGI (wsgi.py): wsgi.md
+      - Serveur de dev (dev_server.py): dev_server.md
+      - Avertissements de production (prod_warnings.py): prod_warnings.md
+      - Chargeur de routes d'API (api_routes_loader.py): api_routes_loader.md

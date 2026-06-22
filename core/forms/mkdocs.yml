@@ -1,0 +1,10 @@
+# Documentation embarquée du sous-paquet core/forms (ADR-043).
+site_name: core-forms
+docs_dir: docs
+nav:
+  - Référence formulaires (par module):
+      - Les formulaires (form.py): form.md
+      - Les champs (fields.py): fields.md
+      - Erreur de validation (exceptions.py): exceptions.md
+      - Validation d'upload (upload_validation.py): upload_validation.md
+      - Exceptions d'upload (upload_exceptions.py): upload_exceptions.md

@@ -1,0 +1,11 @@
+# Documentation embarquée du sous-paquet core/modules (ADR-043).
+site_name: core-modules
+docs_dir: docs
+nav:
+  - Référence système de modules (par module):
+      - Manifeste (manifest.py): manifest.md
+      - Découverte (discovery.py): discovery.md
+      - Registre (registry.py): registry.md
+      - Installation des fichiers (files.py): files.md
+      - Génération des routes (routes.py): routes.md
+      - Suppression (remove.py): remove.md

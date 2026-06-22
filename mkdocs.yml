@@ -112,6 +112,9 @@ nav:
         - Validation (cœur, par module): '!include core/validation/mkdocs.yml'
         - Templating (cœur, par module): '!include core/templating/mkdocs.yml'
         - Erreurs runtime (cœur, par module): '!include core/errors/mkdocs.yml'
+        - Application (cœur, par module): '!include core/app/mkdocs.yml'
+        - Formulaires (cœur, par module): '!include core/forms/mkdocs.yml'
+        - Système de modules (cœur, par module): '!include core/modules/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md
