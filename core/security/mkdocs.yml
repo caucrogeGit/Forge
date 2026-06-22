@@ -1,0 +1,16 @@
+# Documentation embarquée du sous-paquet core/security (ADR-043).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /core-security/.
+site_name: core-security
+docs_dir: docs
+nav:
+  - Référence sécurité (par module):
+      - La session (session.py): session.md
+      - Les cookies de session (cookies.py): cookies.md
+      - La protection CSRF: csrf.md
+      - Les décorateurs (decorators.py): decorators.md
+      - Les middlewares (middleware.py): middleware.md
+      - Le nonce CSP (csp.py): csp.md
+      - Les en-têtes de sécurité (headers.py): headers.md
+      - Auth d'API par jeton (api_auth.py): api_auth.md
+      - Hachage legacy (hashing.py): hashing.md

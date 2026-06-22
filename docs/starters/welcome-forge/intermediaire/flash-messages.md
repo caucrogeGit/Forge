@@ -13,7 +13,7 @@ Nous donnons à ces deux écritures un vrai retour utilisateur : un message de c
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [La session HTTP](../../../reference/http/session.md) | où le flash est stocké entre deux requêtes |
+    | [La session HTTP](../../../core-security/session.md) | où le flash est stocké entre deux requêtes |
     | [L'objet Response](../../../core-http/response.md) | la redirection qui suit le POST |
 
 ??? note "Contrôleurs"

@@ -13,9 +13,9 @@ Vous allez donc garantir une session pour obtenir un jeton non vide, puis le pla
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [La session HTTP](../../../reference/http/session.md) | où vit le jeton CSRF, et ce que contient une session |
-    | [Le cookie HTTP](../../../reference/http/cookie.md) | comment la session est retrouvée d'une page à l'autre |
-    | [La protection CSRF](../../../reference/http/csrf.md) | le mécanisme complet : jeton, vérification, `403` |
+    | [La session HTTP](../../../core-security/session.md) | où vit le jeton CSRF, et ce que contient une session |
+    | [Le cookie HTTP](../../../core-security/cookies.md) | comment la session est retrouvée d'une page à l'autre |
+    | [La protection CSRF](../../../core-security/csrf.md) | le mécanisme complet : jeton, vérification, `403` |
     | [L'objet Request](../../../core-http/request.md) | d'où le serveur lit le jeton envoyé |
     | [L'objet Response](../../../core-http/response.md) | où l'on pose le cookie de session |
 
@@ -32,7 +32,7 @@ Vous allez donc garantir une session pour obtenir un jeton non vide, puis le pla
 
     | Module | Fonction | Rôle |
     |---|---|---|
-    | `core.security.cookies` | `set_session_cookie(response, session_id)` | Place l'identifiant de session dans le cookie de la réponse, ce qui permet de retrouver la session aux requêtes suivantes (voir [La session HTTP](../../../reference/http/session.md)). |
+    | `core.security.cookies` | `set_session_cookie(response, session_id)` | Place l'identifiant de session dans le cookie de la réponse, ce qui permet de retrouver la session aux requêtes suivantes (voir [La session HTTP](../../../core-security/session.md)). |
     | `core.security.session` | `get_session_id(request)` | Extrait et valide l'identifiant de session depuis le cookie ; `None` s'il est absent ou mal formé. |
     | | `get_session(session_id)` | Renvoie les données de la session (dont le `csrf_token`), ou `None` si elle est absente ou expirée. |
     | `core.sessions.manager` | `get_session_store()` | Renvoie le magasin de sessions actif. `.create()` y crée une session neuve (avec un `csrf_token`) et renvoie son identifiant. |

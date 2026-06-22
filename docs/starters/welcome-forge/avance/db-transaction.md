@@ -15,8 +15,8 @@ Ces deux écritures doivent rester atomiques, d'où la transaction.
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [La protection CSRF](../../../reference/http/csrf.md) | le jeton requis par le formulaire de création |
-    | [La session HTTP](../../../reference/http/session.md) | où vit le jeton garanti par `_start_session` |
+    | [La protection CSRF](../../../core-security/csrf.md) | le jeton requis par le formulaire de création |
+    | [La session HTTP](../../../core-security/session.md) | où vit le jeton garanti par `_start_session` |
     | [Migrations SQL](../../../features/migrations.md) | les tables `articles` et `categories` du palier précédent |
 
 ??? note "Contrôleurs"

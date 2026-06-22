@@ -64,7 +64,7 @@ Dans un gabarit, on place le jeton dans un champ caché :
   contrôleur. Si tout est bon, votre méthode s'exécute ; sinon, le visiteur reçoit
   un `403`.
 
-Le parcours pédagogique montre ce mécanisme étape par étape : [Le jeton CSRF](../../starters/welcome-forge/debutant/csrf.md).
+Le parcours pédagogique montre ce mécanisme étape par étape : [Le jeton CSRF](../starters/welcome-forge/debutant/csrf.md).
 
 ## 6. Le duo CSRF et session
 
@@ -73,14 +73,14 @@ CSRF et session fonctionnent **ensemble** :
 - le jeton vit **dans la session** : sans session, `csrf_token` est vide et le
   POST est refusé ;
 - la session est retrouvée grâce à son **cookie** (voir
-  [Le cookie HTTP dans Forge](cookie.md)).
+  [Le cookie HTTP dans Forge](cookies.md)).
 
 C'est pourquoi un formulaire protégé commence toujours par **garantir une session** et **poser son cookie**.
 
 ## 7. Voir aussi
 
 - [La session HTTP dans Forge](session.md) : où vit le jeton.
-- [Le cookie HTTP dans Forge](cookie.md) : comment la session est retrouvée.
-- [L'objet Request dans Forge](../../core-http/request.md) : d'où Forge lit le jeton envoyé.
-- [Le jeton CSRF](../../starters/welcome-forge/debutant/csrf.md) : la mise en
+- [Le cookie HTTP dans Forge](cookies.md) : comment la session est retrouvée.
+- [L'objet Request dans Forge](../core-http/request.md) : d'où Forge lit le jeton envoyé.
+- [Le jeton CSRF](../starters/welcome-forge/debutant/csrf.md) : la mise en
   pratique guidée.

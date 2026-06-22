@@ -15,9 +15,9 @@ Comme la liste portera désormais un formulaire, `index` doit lui fournir un **j
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [La protection CSRF](../../../reference/http/csrf.md) | pourquoi chaque bouton de suppression porte un jeton |
+    | [La protection CSRF](../../../core-security/csrf.md) | pourquoi chaque bouton de suppression porte un jeton |
     | [L'objet Response](../../../core-http/response.md) | la redirection après écriture (POST-Redirect-GET) |
-    | [La session HTTP](../../../reference/http/session.md) | où vit le jeton fourni à la liste |
+    | [La session HTTP](../../../core-security/session.md) | où vit le jeton fourni à la liste |
 
 ??? note "Contrôleurs"
     Ajoutez la requête et la méthode `delete` dans `mvc/controllers/note_controller.py`, et faites garantir la session par `index`, car la liste porte désormais des formulaires de suppression (le jeton CSRF doit donc être non vide) :

@@ -15,7 +15,7 @@ Nous ajoutons deux méthodes, deux routes et un gabarit.
     | Document | Ce qu'il apporte |
     |---|---|
     | [L'objet Request](../../../core-http/request.md) | l'accesseur `form(...)` pour lire la saisie |
-    | [La protection CSRF](../../../reference/http/csrf.md) | le champ caché `csrf_token` requis pour le POST |
+    | [La protection CSRF](../../../core-security/csrf.md) | le champ caché `csrf_token` requis pour le POST |
     | [Migrations SQL](../../../features/migrations.md) | la table `first_sql_messages` créée au palier précédent |
 
 ??? note "Contrôleurs"

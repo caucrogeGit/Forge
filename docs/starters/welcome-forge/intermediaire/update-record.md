@@ -14,8 +14,8 @@ C'est un nouveau besoin (un formulaire, une route POST, du CSRF), donc deux nouv
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [La protection CSRF](../../../reference/http/csrf.md) | pourquoi le POST porte un jeton, et le `403` sinon |
-    | [La session HTTP](../../../reference/http/session.md) | où vit le jeton garanti par `_start_session` |
+    | [La protection CSRF](../../../core-security/csrf.md) | pourquoi le POST porte un jeton, et le `403` sinon |
+    | [La session HTTP](../../../core-security/session.md) | où vit le jeton garanti par `_start_session` |
     | [L'objet Request](../../../core-http/request.md) | `route(...)` pour l'`id`, `form(...)` pour la saisie |
 
 ??? note "Contrôleurs"

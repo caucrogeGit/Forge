@@ -13,8 +13,8 @@ Nous y écrivons maintenant **notre propre** état : un compteur de visites, lu 
 
     | Document | Ce qu'il apporte |
     |---|---|
-    | [La session HTTP](../../../reference/http/session.md) | lire, créer et écrire un état de session |
-    | [Le cookie HTTP](../../../reference/http/cookie.md) | les attributs durcis du cookie `session_id` |
+    | [La session HTTP](../../../core-security/session.md) | lire, créer et écrire un état de session |
+    | [Le cookie HTTP](../../../core-security/cookies.md) | les attributs durcis du cookie `session_id` |
 
 ??? note "Contrôleurs"
     Complétez les imports et faites évoluer `index` dans `mvc/controllers/note_controller.py` pour lire, incrémenter et réécrire le compteur, puis poser un cookie de session durci :
