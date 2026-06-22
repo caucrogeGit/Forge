@@ -4,7 +4,7 @@ import json
 import sys
 from pathlib import Path
 
-from cli.output import created, error, info, ok, preserved
+from cli._support.output import created, error, info, ok, preserved
 
 _FR_CATALOG: dict[str, str] = {
     "common.save": "Enregistrer",

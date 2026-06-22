@@ -20,7 +20,7 @@ from forge_mvc_rbac import (
     validate_user_role_user_id,
 )
 from core.auth.exceptions import InvalidAuthUserError
-from cli.auth import USER_ROLES_SQL, cmd_auth_init
+from cli.security.auth import USER_ROLES_SQL, cmd_auth_init
 
 
 SQL_FILE = Path("packages/forge-mvc-rbac/sql/user_roles.sql")

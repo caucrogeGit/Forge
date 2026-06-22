@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cli.auth import AUTH_MFA_FACTORS_SQL, cmd_auth_init
+from cli.security.auth import AUTH_MFA_FACTORS_SQL, cmd_auth_init
 
 
 SQL_FILE = Path("packages/forge-mvc-mfa/sql/auth_mfa_factors.sql")

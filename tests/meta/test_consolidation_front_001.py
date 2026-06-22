@@ -60,7 +60,7 @@ def test_app_js_existe_et_ne_charge_pas_htmx_alpine():
 
 def test_js_init_htmx_ajoute_dependance_npm(tmp_path):
     """forge js:init htmx ajoute htmx.org dans package.json."""
-    from cli.front import init_htmx, HTMX_PACKAGE, HTMX_VERSION
+    from cli.assets.front import init_htmx, HTMX_PACKAGE, HTMX_VERSION
     pkg_path = tmp_path / "package.json"
     pkg_path.write_text(json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8")
     (tmp_path / "mvc" / "views" / "layouts").mkdir(parents=True)
@@ -74,7 +74,7 @@ def test_js_init_htmx_ajoute_dependance_npm(tmp_path):
 
 def test_js_init_htmx_cree_dossier_vendor(tmp_path):
     """forge js:init htmx crée static/vendor/htmx/."""
-    from cli.front import init_htmx
+    from cli.assets.front import init_htmx
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8"
     )
@@ -87,7 +87,7 @@ def test_js_init_htmx_cree_dossier_vendor(tmp_path):
 
 def test_js_init_alpine_ajoute_dependance_npm(tmp_path):
     """forge js:init alpine ajoute alpinejs dans package.json."""
-    from cli.front import init_alpine, ALPINE_PACKAGE, ALPINE_VERSION
+    from cli.assets.front import init_alpine, ALPINE_PACKAGE, ALPINE_VERSION
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8"
     )
@@ -102,7 +102,7 @@ def test_js_init_alpine_ajoute_dependance_npm(tmp_path):
 
 def test_js_init_htmx_alpine_initialise_les_deux(tmp_path):
     """forge js:init htmx-alpine initialise HTMX et Alpine ensemble."""
-    from cli.front import init_htmx_alpine, HTMX_PACKAGE, ALPINE_PACKAGE
+    from cli.assets.front import init_htmx_alpine, HTMX_PACKAGE, ALPINE_PACKAGE
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8"
     )
@@ -119,7 +119,7 @@ def test_js_init_htmx_alpine_initialise_les_deux(tmp_path):
 
 def test_js_init_htmx_idempotent(tmp_path):
     """forge js:init htmx est idempotent — appels multiples sans effet de bord."""
-    from cli.front import init_htmx, HTMX_PACKAGE
+    from cli.assets.front import init_htmx, HTMX_PACKAGE
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8"
     )
@@ -135,7 +135,7 @@ def test_js_init_htmx_idempotent(tmp_path):
 
 def test_js_init_commande_inconnue_leve_sysexit():
     """forge js:init avec une commande inconnue lève SystemExit."""
-    from cli.front import main
+    from cli.assets.front import main
     with pytest.raises(SystemExit):
         main(["js:init", "react"])
 

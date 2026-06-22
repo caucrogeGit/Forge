@@ -7,14 +7,14 @@ import pytest
 pytest.importorskip("forge_mvc_i18n")
 
 from forge_mvc_i18n import trans, load_catalog
-from cli.public_contact import build_contact_template
-from cli.public_form import build_public_form_spec, build_public_form_template
-from cli.public_list import (
+from cli.public.public_contact import build_contact_template
+from cli.public.public_form import build_public_form_spec, build_public_form_template
+from cli.public.public_list import (
     build_public_list_spec,
     build_public_list_template,
     build_public_show_template,
 )
-from cli.public_page import build_public_page_spec, build_public_template
+from cli.public.public_page import build_public_page_spec, build_public_template
 from tests.test_make_public_list import _field, HEBERGEMENT_JSON
 
 
@@ -233,7 +233,7 @@ def test_cles_publiques_coherentes_avec_convention_existante():
 def test_fichiers_existants_non_ecrases(tmp_path):
     """make:public-contact ne touche pas un template existant."""
     from tests.test_make_public_page import _prepare_project
-    from cli.public_contact import make_public_contact
+    from cli.public.public_contact import make_public_contact
 
     _prepare_project(tmp_path)
     template_path = tmp_path / "mvc" / "views" / "public" / "contact.html"

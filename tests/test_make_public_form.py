@@ -7,7 +7,7 @@ from pathlib import Path
 from core.http.request import Request
 
 
-from cli.public_form import (
+from cli.public.public_form import (
     build_form_route_block,
     build_public_form_controller,
     build_public_form_create_method,
@@ -457,7 +457,7 @@ def test_make_public_form_preserve_template_existant(tmp_path):
 
 
 def test_make_public_form_apres_make_list_ajoute_methodes(tmp_path):
-    from cli.public_list import make_public_list
+    from cli.public.public_list import make_public_list
     _prepare_form_project(tmp_path, DEMANDE_JSON)
     make_public_list("Demande", output_root=tmp_path)
 

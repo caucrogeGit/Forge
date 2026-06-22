@@ -271,7 +271,7 @@ def test_dispatch_new_sans_ref(monkeypatch, tmp_path):
 
 def test_aide_new_ne_mentionne_plus_ref():
     """L'aide de forge new ne propose plus --ref (flag retiré avec le clone)."""
-    from cli.help_dispatch import HELP_TEXTS_RICH
+    from cli._support.help_dispatch import HELP_TEXTS_RICH
 
     assert "--ref" not in HELP_TEXTS_RICH["new"]
 
@@ -456,6 +456,6 @@ def test_apply_starter_helper_supprime():
 
 def test_aide_new_ne_mentionne_plus_starter():
     """L'aide de forge new ne propose plus --starter."""
-    from cli.help_dispatch import HELP_TEXTS_RICH
+    from cli._support.help_dispatch import HELP_TEXTS_RICH
 
     assert "--starter" not in HELP_TEXTS_RICH["new"]

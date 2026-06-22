@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cli.auth import AUTH_AUDIT_LOG_SQL, cmd_auth_init
+from cli.security.auth import AUTH_AUDIT_LOG_SQL, cmd_auth_init
 
 
 SQL_FILE = Path("mvc/models/sql/auth_audit_log.sql")

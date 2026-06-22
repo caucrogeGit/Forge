@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
-import cli.output as out
+import cli._support.output as out
 
 
 class _Result(NamedTuple):

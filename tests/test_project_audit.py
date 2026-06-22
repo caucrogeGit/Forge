@@ -1,4 +1,4 @@
-"""Tests unitaires pour cli.project_audit — forge project:audit."""
+"""Tests unitaires pour cli.project.project_audit — forge project:audit."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.project_audit import (
+from cli.project.project_audit import (
     AuditResult,
     audit_project_config,
     audit_project_docs,
@@ -449,9 +449,9 @@ def test_cmd_project_audit_utilise_le_cwd(monkeypatch, tmp_path):
 
     _minimal_project(tmp_path)
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr("cli.project_audit.run_project_audit", fake_run)
-    monkeypatch.setattr("cli.project_audit.print_audit_report", lambda *_: None)
-    monkeypatch.setattr("cli.project_audit.has_failures", lambda _: False)
+    monkeypatch.setattr("cli.project.project_audit.run_project_audit", fake_run)
+    monkeypatch.setattr("cli.project.project_audit.print_audit_report", lambda *_: None)
+    monkeypatch.setattr("cli.project.project_audit.has_failures", lambda _: False)
 
     forge.cmd_project_audit()
 

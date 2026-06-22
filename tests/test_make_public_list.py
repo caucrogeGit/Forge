@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.public_list import (
+from cli.public.public_list import (
     build_public_list_controller,
     build_public_list_spec,
     build_public_list_template,

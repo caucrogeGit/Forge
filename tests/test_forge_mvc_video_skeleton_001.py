@@ -109,6 +109,6 @@ def test_doctor_main_retourne_code_coherent():
 # ---------------------------------------------------------------------------
 
 def test_video_doctor_dans_aide():
-    from cli.help_dispatch import HELP_DESCRIPTIONS
+    from cli._support.help_dispatch import HELP_DESCRIPTIONS
 
     assert "video:doctor" in HELP_DESCRIPTIONS

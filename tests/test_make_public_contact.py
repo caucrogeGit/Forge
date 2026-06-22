@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from cli.public_contact import build_contact_template, make_public_contact, main
+from cli.public.public_contact import build_contact_template, make_public_contact, main
 from tests.test_make_public_page import _prepare_project, _read
 
 
@@ -164,7 +164,7 @@ def test_make_public_contact_preserve_template_existant(tmp_path):
 
 def test_make_public_contact_preserve_controleur_existant(tmp_path):
     _prepare_project(tmp_path)
-    from cli.public_page import make_public_page
+    from cli.public.public_page import make_public_page
     make_public_page("accueil", root=tmp_path)
 
     make_public_contact(root=tmp_path)

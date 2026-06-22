@@ -39,7 +39,7 @@ from cli.entities.validation import (
     EntityDefinitionError,
     validate_entity_definition,
 )
-import cli.output as out
+import cli._support.output as out
 
 # ── Re-exports from submodules (backward compatibility) ───────────────────────
 

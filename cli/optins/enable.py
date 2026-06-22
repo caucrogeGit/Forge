@@ -362,7 +362,7 @@ def _insert_import(content: str, import_line: str) -> str:
     """Insère ``import_line`` après le dernier import en tête de fichier.
 
     No-op si l'import est déjà présent (pas de doublon). Logique alignée
-    sur ``cli.public_page._insert_import``.
+    sur ``cli.public.public_page._insert_import``.
     """
     if import_line in content:
         return content

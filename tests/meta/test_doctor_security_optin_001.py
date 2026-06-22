@@ -30,12 +30,12 @@ DOCTOR_PY = PROJECT_ROOT / "cli" / "doctor.py"
 class TestSecurityLabels:
 
     def test_mfa_label_is_security_not_optin(self, tmp_path):
-        from cli.doctor import check_mfa_dependency
+        from cli.project.doctor import check_mfa_dependency
         result = check_mfa_dependency(tmp_path)
         assert result.label == "MFA (sécurité)"
 
     def test_rbac_label_is_security(self, tmp_path):
-        from cli.doctor import check_rbac_dependency
+        from cli.project.doctor import check_rbac_dependency
         result = check_rbac_dependency(tmp_path)
         assert result.label == "RBAC (sécurité)"
 
@@ -53,11 +53,11 @@ class TestSecurityLabels:
 class TestCheckRbacDependencyExposed:
 
     def test_check_rbac_dependency_importable(self):
-        from cli.doctor import check_rbac_dependency
+        from cli.project.doctor import check_rbac_dependency
         assert callable(check_rbac_dependency)
 
     def test_detect_rbac_indicators_importable(self):
-        from cli.doctor import _detect_rbac_indicators
+        from cli.project.doctor import _detect_rbac_indicators
         assert callable(_detect_rbac_indicators)
 
 
@@ -104,18 +104,18 @@ class TestDetectRbacIndicators:
 class TestCheckRbacDependency:
 
     def test_skip_when_no_rbac_indicators(self, tmp_path):
-        from cli.doctor import check_rbac_dependency
+        from cli.project.doctor import check_rbac_dependency
         result = check_rbac_dependency(tmp_path)
         assert result.status == "skip"
         assert "aucun indice RBAC" in result.detail
 
     def test_warn_when_rbac_used_but_module_absent(self, tmp_path):
-        from cli.doctor import check_rbac_dependency
+        from cli.project.doctor import check_rbac_dependency
         contract = tmp_path / "mvc" / "security" / "rbac.json"
         contract.parent.mkdir(parents=True, exist_ok=True)
         contract.write_text("{}\n", encoding="utf-8")
 
-        import cli.doctor as _doctor
+        import cli.project.doctor as _doctor
         orig = _doctor.importlib.util.find_spec
         _doctor.importlib.util.find_spec = lambda name: None
         try:
@@ -155,6 +155,6 @@ class TestDoctorWiringAndBoundary:
 
 
 def _read(name):
-    """Importe paresseusement un symbole de cli.doctor par son nom."""
-    import cli.doctor as _doctor
+    """Importe paresseusement un symbole de cli.project.doctor par son nom."""
+    import cli.project.doctor as _doctor
     return getattr(_doctor, name)

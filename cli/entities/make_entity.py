@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 from typing import Callable
 
-import cli.output as out
+import cli._support.output as out
 from cli.entities.validation import (
     EntityDefinitionError,
     normalize_entity_definition,

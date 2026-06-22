@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 
 
-from cli.deploy import (
+from cli.deploy.deploy import (
     _check_results,
     cmd_deploy_check,
     cmd_deploy_init,

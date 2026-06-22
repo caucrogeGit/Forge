@@ -1,4 +1,4 @@
-"""Tests unitaires pour cli.errors — helpers standardisés d'erreur CLI."""
+"""Tests unitaires pour cli._support.errors — helpers standardisés d'erreur CLI."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from cli.errors import cli_error, cli_fail
+from cli._support.errors import cli_error, cli_fail
 
 
 # ── cli_error ─────────────────────────────────────────────────────────────────

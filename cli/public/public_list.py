@@ -6,10 +6,10 @@ import ast
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import cli.output as out
+import cli._support.output as out
 from cli.entities.make_crud import _pk_field, _to_snake
 from cli.entities.validation import validate_entity_definition
-from cli.public_page import (
+from cli.public.public_page import (
     PUBLIC_CONTENT_BLOCK,
     PUBLIC_LAYOUT,
     PUBLIC_SCRIPTS_BLOCK,

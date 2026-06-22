@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cli.public_page import (
+from cli.public.public_page import (
     PUBLIC_CONTENT_BLOCK,
     PUBLIC_LAYOUT,
     PUBLIC_SCRIPTS_BLOCK,

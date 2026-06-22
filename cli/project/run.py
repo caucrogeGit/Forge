@@ -7,7 +7,7 @@ Tickets :
 Comportement :
     - APP_ENV=dev (défaut)
         - sans --no-reload (défaut) : superviseur DevReloader
-          (`cli.dev_reloader`) qui spawne `python app.py` et le
+          (`cli.project.dev_reloader`) qui spawne `python app.py` et le
           redémarre quand un fichier surveillé change ;
         - avec --no-reload : délègue à `scripts/dev-server.sh` (POSIX) ;
           fallback : `python app.py`.
@@ -26,7 +26,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from cli.errors import cli_fail
+from cli._support.errors import cli_fail
 
 
 _VALID_ENVS = ("dev", "prod")
@@ -110,8 +110,8 @@ def _run_dev_legacy(root: Path) -> int:
 
 def _run_dev_with_reloader(root: Path) -> int:
     """Lancement dev avec autoreload (défaut)."""
-    # Import paresseux : aucune dépendance circulaire avec cli.run.
-    from cli.dev_reloader import DevReloader
+    # Import paresseux : aucune dépendance circulaire avec cli.project.run.
+    from cli.project.dev_reloader import DevReloader
 
     reloader = DevReloader(root)
     return reloader.run()

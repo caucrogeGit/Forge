@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from cli.entities.model import ModelValidationError, check_model
-from cli.project_config import ProjectConfigError, load_project_config
+from cli.project.project_config import ProjectConfigError, load_project_config
 
 
 @dataclass(frozen=True)

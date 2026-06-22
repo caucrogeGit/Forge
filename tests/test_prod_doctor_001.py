@@ -7,8 +7,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from cli import doctor
-from cli.doctor import check_prod_security
+from cli.project import doctor
+from cli.project.doctor import check_prod_security
 
 ROOT = Path(".")
 

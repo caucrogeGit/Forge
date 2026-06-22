@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 import forge
-from cli.i18n import cmd_i18n_check, cmd_i18n_init, _FR_CATALOG
+from cli.assets.i18n import cmd_i18n_check, cmd_i18n_init, _FR_CATALOG
 
 
 # ---------------------------------------------------------------------------

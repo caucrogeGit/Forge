@@ -56,7 +56,7 @@ from forge_mvc_files.storage import (
     secure_filename,
 )
 from core.forms.upload_validation import validate_upload_metadata
-from cli.uploads import init_upload_storage
+from cli.assets.uploads import init_upload_storage
 
 
 def _file(filename="avatar.png", content=b"abc", content_type="image/png"):

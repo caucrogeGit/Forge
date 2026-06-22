@@ -116,6 +116,6 @@ class TestDispatchAndHelp:
 
     @pytest.mark.parametrize("command", ["opt-in:remove", "opt-in:disable"])
     def test_has_description_and_rich(self, command):
-        from cli.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH
+        from cli._support.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH
         assert command in HELP_DESCRIPTIONS
         assert command in HELP_TEXTS_RICH

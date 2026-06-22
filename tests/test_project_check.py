@@ -1,4 +1,4 @@
-"""Tests unitaires pour cli.project_check — forge project:check."""
+"""Tests unitaires pour cli.project.project_check — forge project:check."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from cli.doctor import CheckResult
-from cli.project_check import (
+from cli.project.doctor import CheckResult
+from cli.project.project_check import (
     check_project_config,
     check_project_entities,
     check_project_migrations,
@@ -467,9 +467,9 @@ def test_cmd_project_check_utilise_le_cwd(monkeypatch, tmp_path):
 
     _minimal_project(tmp_path)
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr("cli.project_check.run_project_check", fake_run)
-    monkeypatch.setattr("cli.project_check.print_check_report", lambda *_: None)
-    monkeypatch.setattr("cli.project_check.has_failures", lambda _: False)
+    monkeypatch.setattr("cli.project.project_check.run_project_check", fake_run)
+    monkeypatch.setattr("cli.project.project_check.print_check_report", lambda *_: None)
+    monkeypatch.setattr("cli.project.project_check.has_failures", lambda _: False)
 
     forge.cmd_project_check()
 

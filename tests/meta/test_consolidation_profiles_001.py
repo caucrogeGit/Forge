@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from cli.project_profiles import (
+from cli.project.project_profiles import (
     DEFAULT_PROJECT_PROFILE,
     PROJECT_PROFILE_DESCRIPTIONS,
     SUPPORTED_PROJECT_PROFILES,

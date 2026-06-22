@@ -19,7 +19,7 @@ from cli.entities.make_entity import (
     to_snake,
     validate_entity_name,
 )
-import cli.output as out
+import cli._support.output as out
 from cli.entities.relations import (
     EntityRelationsError,
     ValidatedCanonicalManyToManyRelation,

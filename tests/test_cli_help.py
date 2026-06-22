@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 
 import forge
-from cli.help import build_help
+from cli._support.help import build_help
 
 
 # ── build_help ────────────────────────────────────────────────────────────────

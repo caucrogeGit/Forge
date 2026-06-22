@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from cli.project_config import ProjectConfigError, load_project_config
+from cli.project.project_config import ProjectConfigError, load_project_config
 
 # ADR-033 : le compte applicatif (forge_app) est un compte runtime à privilèges
 # minimaux (DML). Les migrations (DDL) utilisent DB_ADMIN_*, donc forge_app n'a

@@ -1,7 +1,7 @@
 """Garde-fou AUTH-DOCTOR-MFA-MISSING-DEP-WARNING-001.
 
 Vérifie que :
-- check_mfa_dependency est exportée par cli.doctor.
+- check_mfa_dependency est exportée par cli.project.doctor.
 - Le message de warning mentionne MFA comme opt-in/source-only.
 - pyotp n'est pas dans les dépendances runtime du core (pyproject.toml).
 - pyotp n'est pas dans requirements*.txt du core.
@@ -28,11 +28,11 @@ DOCTOR_PY = PROJECT_ROOT / "cli" / "doctor.py"
 class TestCheckMfaDependencyExposed:
 
     def test_check_mfa_dependency_importable(self):
-        from cli.doctor import check_mfa_dependency
+        from cli.project.doctor import check_mfa_dependency
         assert callable(check_mfa_dependency)
 
     def test_detect_mfa_indicators_importable(self):
-        from cli.doctor import _detect_mfa_indicators
+        from cli.project.doctor import _detect_mfa_indicators
         assert callable(_detect_mfa_indicators)
 
 
@@ -43,7 +43,7 @@ class TestCheckMfaDependencyExposed:
 class TestDoctorMfaWarningMessage:
 
     def test_doctor_mentions_opt_in_in_warn(self, tmp_path):
-        from cli.doctor import check_mfa_dependency
+        from cli.project.doctor import check_mfa_dependency
         ctrl = tmp_path / "mvc" / "controllers" / "mfa_controller.py"
         ctrl.parent.mkdir(parents=True, exist_ok=True)
         ctrl.write_text("# mfa\n", encoding="utf-8")
@@ -57,7 +57,7 @@ class TestDoctorMfaWarningMessage:
                 return None
             return original_find(name)
 
-        import cli.doctor as _doctor
+        import cli.project.doctor as _doctor
         orig = _doctor.importlib.util.find_spec
         _doctor.importlib.util.find_spec = patched
         try:
@@ -71,12 +71,12 @@ class TestDoctorMfaWarningMessage:
         )
 
     def test_doctor_mfa_warn_mentions_forge_mvc_mfa(self, tmp_path):
-        from cli.doctor import check_mfa_dependency
+        from cli.project.doctor import check_mfa_dependency
         ctrl = tmp_path / "mvc" / "controllers" / "mfa_controller.py"
         ctrl.parent.mkdir(parents=True, exist_ok=True)
         ctrl.write_text("# mfa\n", encoding="utf-8")
 
-        import cli.doctor as _doctor
+        import cli.project.doctor as _doctor
         orig = _doctor.importlib.util.find_spec
         _doctor.importlib.util.find_spec = lambda name: None
         try:
@@ -89,12 +89,12 @@ class TestDoctorMfaWarningMessage:
         )
 
     def test_doctor_mfa_warn_is_not_fail(self, tmp_path):
-        from cli.doctor import check_mfa_dependency
+        from cli.project.doctor import check_mfa_dependency
         ctrl = tmp_path / "mvc" / "controllers" / "mfa_controller.py"
         ctrl.parent.mkdir(parents=True, exist_ok=True)
         ctrl.write_text("# mfa\n", encoding="utf-8")
 
-        import cli.doctor as _doctor
+        import cli.project.doctor as _doctor
         orig = _doctor.importlib.util.find_spec
         _doctor.importlib.util.find_spec = lambda name: None
         try:

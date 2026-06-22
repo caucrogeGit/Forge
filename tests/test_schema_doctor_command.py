@@ -442,6 +442,6 @@ def test_forge_py_dispatches_schema_doctor(capsys):
 
 
 def test_help_mentions_schema_doctor():
-    from cli.help import build_help
+    from cli._support.help import build_help
     help_text = build_help("test")
     assert "schema:doctor" in help_text

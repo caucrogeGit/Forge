@@ -20,27 +20,27 @@ from cli.entities.make_relation import main as make_relation_main
 from cli.entities.make_crud import cmd_make_crud_main
 from cli.entities.model import main as model_main
 from cli.entities.entity_validate import main as entity_validate_main
-from cli.public_contact import main as public_contact_main
-from cli.public_form import main as public_form_main
-from cli.public_list import main as public_list_main
-from cli.public_page import main as public_page_main
-from cli.public_show import main as public_show_main
-from cli.sync_landing import main as sync_landing_main
-# FILES-CLI-RENAME-001 (ADR-019) : cli.uploads importé en lazy dans la
+from cli.public.public_contact import main as public_contact_main
+from cli.public.public_form import main as public_form_main
+from cli.public.public_list import main as public_list_main
+from cli.public.public_page import main as public_page_main
+from cli.public.public_show import main as public_show_main
+from cli.assets.sync_landing import main as sync_landing_main
+# FILES-CLI-RENAME-001 (ADR-019) : cli.assets.uploads importé en lazy dans la
 # branche upload:init/media:init (dépend de l'opt-in forge-mvc-files).
-from cli.front import main as front_main
-from cli.auth import main as auth_main
-from cli.deploy import main as deploy_main
-from cli.i18n import main as i18n_main
-from cli.run import main as run_main
-from cli.update import main as update_main
-from cli.modules import main as modules_main
-from cli.project_profiles import (
+from cli.assets.front import main as front_main
+from cli.security.auth import main as auth_main
+from cli.deploy.deploy import main as deploy_main
+from cli.assets.i18n import main as i18n_main
+from cli.project.run import main as run_main
+from cli.project.update import main as update_main
+from cli.deploy.modules import main as modules_main
+from cli.project.project_profiles import (
     SUPPORTED_PROJECT_PROFILES,
     DEFAULT_PROJECT_PROFILE,
 )
-from cli.errors import cli_fail
-from cli.help_dispatch import format_command_help, wants_help
+from cli._support.errors import cli_fail
+from cli._support.help_dispatch import format_command_help, wants_help
 
 
 _FORGE_VERSION = "1.0.0b17"
@@ -323,7 +323,7 @@ def cmd_new(
 # ── Commande : help ───────────────────────────────────────────────────────────
 
 def cmd_help() -> None:
-    from cli.help import build_help
+    from cli._support.help import build_help
     print(build_help(_FORGE_VERSION))
 
 
@@ -332,7 +332,7 @@ def cmd_version() -> None:
 
 
 def cmd_doctor() -> None:
-    from cli.doctor import has_failures, print_report, run_all
+    from cli.project.doctor import has_failures, print_report, run_all
     results = run_all(Path.cwd(), _FORGE_VERSION)
     print_report(results, _FORGE_VERSION)
     if has_failures(results):
@@ -340,7 +340,7 @@ def cmd_doctor() -> None:
 
 
 def cmd_project_check() -> None:
-    from cli.project_check import has_failures, print_check_report, run_project_check
+    from cli.project.project_check import has_failures, print_check_report, run_project_check
     root = Path.cwd()
     if not (root / "app.py").exists() or not (root / "mvc").exists():
         cli_fail(
@@ -355,7 +355,7 @@ def cmd_project_check() -> None:
 
 
 def cmd_project_audit() -> None:
-    from cli.project_audit import has_failures, print_audit_report, run_project_audit
+    from cli.project.project_audit import has_failures, print_audit_report, run_project_audit
     root = Path.cwd()
     if not (root / "app.py").exists() or not (root / "mvc").exists():
         cli_fail(
@@ -371,7 +371,7 @@ def cmd_project_audit() -> None:
 
 def cmd_routes_list() -> None:
     """Affiche les routes déclarées par le module APP_ROUTES_MODULE."""
-    from cli.project_config import load_project_config, ProjectConfigError
+    from cli.project.project_config import load_project_config, ProjectConfigError
 
     project_root = Path.cwd().resolve()
     try:
@@ -544,7 +544,7 @@ def main() -> None:
         # (forge-mvc-files). Le core CLI ne le tire qu'à l'invocation de la
         # commande, et échoue proprement si l'opt-in n'est pas installé.
         try:
-            from cli.uploads import main as upload_main
+            from cli.assets.uploads import main as upload_main
         except ImportError:
             cli_fail(
                 "module forge-mvc-files non installé.",
@@ -825,12 +825,12 @@ def main() -> None:
         return
 
     if command == "rbac:validate":
-        from cli.rbac_validate import rbac_validate_main
+        from cli.security.rbac_validate import rbac_validate_main
         rbac_validate_main(args[1:])
         return
 
     if command == "rbac:audit":
-        from cli.rbac_audit import rbac_audit_main
+        from cli.security.rbac_audit import rbac_audit_main
         rbac_audit_main(args[1:])
         return
 

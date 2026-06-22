@@ -6,7 +6,7 @@ le **core CLI n'exige plus l'upload** au démarrage :
 - ``controller_builder`` génère ``from forge_mvc_files import save_upload`` pour
   les champs fichier (et plus ``core.uploads``) ;
 - ``cli/uploads.py`` importe ``forge_mvc_files`` (opt-in) ;
-- ``forge.py`` n'importe **pas** ``cli.uploads`` au niveau module : il le
+- ``forge.py`` n'importe **pas** ``cli.assets.uploads`` au niveau module : il le
   fait en *lazy* dans la branche ``upload:init``/``media:init`` (sinon le core
   CLI tomberait sans l'opt-in installé).
 """
@@ -39,12 +39,12 @@ def test_cli_uploads_imports_forge_mvc_files():
 
 def test_forge_py_does_not_import_cli_uploads_at_module_level():
     # Le core CLI ne doit pas tirer l'upload (opt-in) au chargement : l'import
-    # de cli.uploads doit être *lazy* (dans une fonction), pas top-level.
+    # de cli.assets.uploads doit être *lazy* (dans une fonction), pas top-level.
     tree = ast.parse(FORGE_PY.read_text(encoding="utf-8"))
     for node in tree.body:  # uniquement le niveau module
-        if isinstance(node, ast.ImportFrom) and node.module == "cli.uploads":
+        if isinstance(node, ast.ImportFrom) and node.module == "cli.assets.uploads":
             pytest.fail(
-                "forge.py importe cli.uploads au niveau module — doit être "
+                "forge.py importe cli.assets.uploads au niveau module — doit être "
                 "lazy (l'upload est un opt-in forge-mvc-files)."
             )
 
@@ -52,4 +52,4 @@ def test_forge_py_does_not_import_cli_uploads_at_module_level():
 def test_forge_py_lazy_imports_cli_uploads_in_branch():
     # L'import lazy existe bien quelque part (dans la branche de commande).
     text = FORGE_PY.read_text(encoding="utf-8")
-    assert "from cli.uploads import main" in text
+    assert "from cli.assets.uploads import main" in text

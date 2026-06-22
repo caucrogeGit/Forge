@@ -7,7 +7,7 @@ import json
 import re
 from pathlib import Path
 
-from cli.doctor import CheckResult
+from cli.project.doctor import CheckResult
 
 _MIGRATION_RE = re.compile(r"^\d{14}_[A-Za-z0-9_]+\.sql$")
 

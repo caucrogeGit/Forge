@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.rbac_audit import rbac_audit_main
+from cli.security.rbac_audit import rbac_audit_main
 
 
 def _write_rbac(tmp_path: Path, content: dict) -> None:
@@ -46,7 +46,7 @@ _VALID_CONTRACT = {
 
 
 def test_rbac_audit_in_help():
-    from cli.help import build_help
+    from cli._support.help import build_help
     assert "rbac:audit" in build_help("1.0.0b5")
 
 

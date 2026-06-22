@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from cli import front
+from cli.assets import front
 
 
 HTMX_CONTENT = "/* htmx local test asset */\n"

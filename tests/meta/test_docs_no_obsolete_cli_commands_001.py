@@ -29,7 +29,7 @@ from pathlib import Path
 
 import pytest
 
-from cli import help_dispatch as help_dispatch
+from cli._support import help_dispatch as help_dispatch
 
 pytestmark = pytest.mark.meta
 

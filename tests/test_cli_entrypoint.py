@@ -84,9 +84,9 @@ def test_dispatch_sync_landing_transmet_check(monkeypatch):
 
 
 def test_dispatch_upload_init(monkeypatch):
-    # FILES-CLI-RENAME-001 (ADR-019) : cli.uploads est importé en lazy
+    # FILES-CLI-RENAME-001 (ADR-019) : cli.assets.uploads est importé en lazy
     # dans la branche (l'upload est un opt-in). On patche la vraie cible.
-    import cli.uploads as _uploads
+    import cli.assets.uploads as _uploads
 
     captured = {}
 

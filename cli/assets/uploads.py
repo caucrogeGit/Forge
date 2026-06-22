@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import cli.output as out
+import cli._support.output as out
 
 # FILES-CLI-RENAME-001 (ADR-019) : l'upload est un opt-in (forge-mvc-files).
 from forge_mvc_files.storage import ensure_upload_dirs

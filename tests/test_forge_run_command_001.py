@@ -21,7 +21,7 @@ from pathlib import Path
 import pytest
 
 import forge
-from cli import run as run_module
+from cli.project import run as run_module
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -197,7 +197,7 @@ class TestProdRefusal:
 # ── Comportement dev legacy (--no-reload) ────────────────────────────────────
 #
 # Le chemin par défaut en dev passe désormais par le superviseur d'autoreload
-# (`cli.dev_reloader`, ticket DEV-SERVER-AUTORELOAD-001). Ces tests
+# (`cli.project.dev_reloader`, ticket DEV-SERVER-AUTORELOAD-001). Ces tests
 # couvrent la branche `--no-reload` qui conserve l'ancien comportement :
 # délégation à `scripts/dev-server.sh` (POSIX) ou fallback `python app.py`.
 
@@ -307,7 +307,7 @@ class TestRunHelp:
 
 class TestHelpTextMentionsRun:
     def test_build_help_contient_run(self):
-        from cli.help import build_help
+        from cli._support.help import build_help
 
         text = build_help("1.0.0")
         assert " run " in text or "\nrun\n" in text or "run " in text

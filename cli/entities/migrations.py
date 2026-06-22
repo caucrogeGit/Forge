@@ -14,7 +14,7 @@ from cli.entities.canonical_model_normalizer import normalize_canonical_entity_f
 from cli.entities.db_apply import _split_sql_statements
 from cli.entities.make_entity import _sql_default_literal, to_snake, validate_entity_name
 from cli.entities.validation import validate_entity_definition
-from cli.project_config import ProjectConfigError, load_project_config
+from cli.project.project_config import ProjectConfigError, load_project_config
 
 MIGRATIONS_DIR = Path("mvc") / "migrations"
 MIGRATION_FILENAME_RE = re.compile(r"^(\d{14})_([A-Za-z0-9_]+)\.sql$")

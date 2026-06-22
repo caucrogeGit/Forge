@@ -30,7 +30,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH
+from cli._support.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH
 
 pytestmark = pytest.mark.meta
 

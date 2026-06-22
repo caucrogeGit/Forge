@@ -38,7 +38,7 @@ class TestCatalog:
     def test_aide_install_liste_le_catalogue_courant(self):
         """L'aide opt-in:install doit lister chaque opt-in officiel et ne plus
         citer le paquet `media` supprimé (ADR-018)."""
-        from cli.help_dispatch import HELP_TEXTS_RICH
+        from cli._support.help_dispatch import HELP_TEXTS_RICH
 
         aide = HELP_TEXTS_RICH["opt-in:install"]
         for name in optin_names():
@@ -99,11 +99,11 @@ class TestDispatchAndHelp:
         "opt-in:list",
     ])
     def test_command_has_short_description(self, command):
-        from cli.help_dispatch import HELP_DESCRIPTIONS
+        from cli._support.help_dispatch import HELP_DESCRIPTIONS
         assert command in HELP_DESCRIPTIONS
 
     def test_install_has_rich_help(self):
-        from cli.help_dispatch import HELP_TEXTS_RICH
+        from cli._support.help_dispatch import HELP_TEXTS_RICH
         assert "opt-in:install" in HELP_TEXTS_RICH
 
 

@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import sys
 
-from cli import update as update_module
-from cli.help import _HELP_TEMPLATE as HELP_TEMPLATE
-from cli.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH, format_command_help
+from cli.project import update as update_module
+from cli._support.help import _HELP_TEMPLATE as HELP_TEMPLATE
+from cli._support.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH, format_command_help
 
 
 # ── Aide CLI : le dispatcher reconnaît `update` ───────────────────────────────

@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 from typing import Any, Literal
 
-import cli.output as out
+import cli._support.output as out
 
 
 _SQL_DIR = Path("mvc") / "models" / "sql"
@@ -298,7 +298,7 @@ def _import_has_attr(module_name: str, attr_name: str) -> bool:
 
 
 def _load_env_and_configure_forge(root: Path) -> None:
-    from cli.project_config import ProjectConfigError, load_project_config
+    from cli.project.project_config import ProjectConfigError, load_project_config
 
     try:
         load_project_config(root)

@@ -293,7 +293,7 @@ def main(argv: list[str] | None = None) -> int:
     """Point d'entrée appelé par ``forge.py`` pour ``forge iot:listen``.
 
     ``--help`` est intercepté en amont par le dispatcher central
-    (``cli.help_dispatch``). Retourne 1 si la configuration est
+    (``cli._support.help_dispatch``). Retourne 1 si la configuration est
     invalide, sinon délègue à ``run_listener``.
     """
     if argv is None:

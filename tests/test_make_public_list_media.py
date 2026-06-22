@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 
-from cli.public_list import (
+from cli.public.public_list import (
     PublicMediaEntry,
     build_public_list_controller,
     build_public_list_spec,

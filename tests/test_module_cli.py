@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 import forge
-from cli.modules import (
+from cli.deploy.modules import (
     cmd_module_files,
     cmd_module_install,
     cmd_module_list,

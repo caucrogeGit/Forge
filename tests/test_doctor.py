@@ -1,4 +1,4 @@
-"""Tests unitaires pour cli.doctor."""
+"""Tests unitaires pour cli.project.doctor."""
 
 import json
 import sys
@@ -6,7 +6,7 @@ import types
 from pathlib import Path
 
 
-from cli.doctor import (
+from cli.project.doctor import (
     CheckResult,
     _detect_mfa_indicators,
     check_db,
@@ -626,9 +626,9 @@ def test_forge_doctor_utilise_le_cwd(monkeypatch, tmp_path):
         return []
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr("cli.doctor.run_all", fake_run_all)
-    monkeypatch.setattr("cli.doctor.print_report", lambda _results, _version: None)
-    monkeypatch.setattr("cli.doctor.has_failures", lambda _results: False)
+    monkeypatch.setattr("cli.project.doctor.run_all", fake_run_all)
+    monkeypatch.setattr("cli.project.doctor.print_report", lambda _results, _version: None)
+    monkeypatch.setattr("cli.project.doctor.has_failures", lambda _results: False)
 
     forge.cmd_doctor()
 
@@ -695,7 +695,7 @@ class TestCheckMfaDependency:
     def test_warn_when_mfa_used_but_module_absent(self, tmp_path, monkeypatch):
         _write_mfa_controller(tmp_path)
         monkeypatch.setattr(
-            "cli.doctor.importlib.util.find_spec",
+            "cli.project.doctor.importlib.util.find_spec",
             lambda name: None,
         )
         result = check_mfa_dependency(tmp_path)
@@ -708,7 +708,7 @@ class TestCheckMfaDependency:
         import types as _types
         fake_spec = _types.SimpleNamespace()
         monkeypatch.setattr(
-            "cli.doctor.importlib.util.find_spec",
+            "cli.project.doctor.importlib.util.find_spec",
             lambda name: fake_spec if name == "forge_mvc_mfa" else None,
         )
         result = check_mfa_dependency(tmp_path)
@@ -718,7 +718,7 @@ class TestCheckMfaDependency:
     def test_warn_is_non_blocking(self, tmp_path, monkeypatch):
         _write_mfa_controller(tmp_path)
         monkeypatch.setattr(
-            "cli.doctor.importlib.util.find_spec",
+            "cli.project.doctor.importlib.util.find_spec",
             lambda name: None,
         )
         result = check_mfa_dependency(tmp_path)
@@ -727,7 +727,7 @@ class TestCheckMfaDependency:
     def test_warning_mentions_opt_in_nature(self, tmp_path, monkeypatch):
         _write_mfa_route(tmp_path)
         monkeypatch.setattr(
-            "cli.doctor.importlib.util.find_spec",
+            "cli.project.doctor.importlib.util.find_spec",
             lambda name: None,
         )
         result = check_mfa_dependency(tmp_path)

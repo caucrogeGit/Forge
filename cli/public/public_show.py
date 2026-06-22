@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cli.public_list import MakePublicShowResult, show_main
+from cli.public.public_list import MakePublicShowResult, show_main
 
 
 def main(args: list[str], *, root: Path | None = None) -> MakePublicShowResult:

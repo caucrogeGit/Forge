@@ -9,7 +9,7 @@ Chaîne audio **complète et sans état** (aucune base de données) :
 - ``ingest`` — upload validé + stockage (``ingest_audio``) ;
 - ``transcode`` — conversion MP3 via ``ffmpeg`` (``transcode_to_mp3``) ;
 - ``http`` — lecture en streaming HTTP Range (``register_audio_routes``) ;
-- ``cli.doctor`` — diagnostic ``forge audio:doctor``.
+- ``cli.project.doctor`` — diagnostic ``forge audio:doctor``.
 
 Volontairement **sobre** : pas de table SQL, pas de suivi de jobs, pas de file
 de transcodage. Les opérations sont synchrones et le service de lecture

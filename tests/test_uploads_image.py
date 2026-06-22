@@ -20,7 +20,7 @@ from forge_mvc_images import (
     image_variant_paths,
     save_image,
 )
-from cli.uploads import init_media_storage
+from cli.assets.uploads import init_media_storage
 
 
 def _real_image_bytes(content_type="image/jpeg"):

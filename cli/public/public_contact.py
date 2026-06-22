@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import cli.output as out
-from cli.public_page import (
+import cli._support.output as out
+from cli.public.public_page import (
     CONTROLLER_PATH,
     PUBLIC_CONTENT_BLOCK,
     PUBLIC_LAYOUT,

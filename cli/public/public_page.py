@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import cli.output as out
+import cli._support.output as out
 from core.http.slug import slugify
 
 

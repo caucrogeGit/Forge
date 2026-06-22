@@ -52,13 +52,13 @@ class TestAuthMfaProfileDeclared:
     """Le profil auth-mfa est déclaré dans project_profiles.py."""
 
     def test_auth_mfa_in_supported_profiles(self):
-        from cli.project_profiles import SUPPORTED_PROJECT_PROFILES
+        from cli.project.project_profiles import SUPPORTED_PROJECT_PROFILES
         assert "auth-mfa" in SUPPORTED_PROJECT_PROFILES, (
             "auth-mfa doit être dans SUPPORTED_PROJECT_PROFILES."
         )
 
     def test_auth_mfa_has_description(self):
-        from cli.project_profiles import PROJECT_PROFILE_DESCRIPTIONS
+        from cli.project.project_profiles import PROJECT_PROFILE_DESCRIPTIONS
         assert "auth-mfa" in PROJECT_PROFILE_DESCRIPTIONS, (
             "auth-mfa doit avoir une description dans PROJECT_PROFILE_DESCRIPTIONS."
         )

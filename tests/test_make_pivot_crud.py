@@ -89,7 +89,7 @@ def _write_relations(tmp_path: Path, data: dict) -> Path:
 
 
 def test_aide_mentionne_make_pivot_crud():
-    from cli.help import build_help
+    from cli._support.help import build_help
     text = build_help("test")
     assert "make:pivot-crud" in text
 

@@ -1,6 +1,6 @@
 """Tests — DEV-SERVER-AUTORELOAD-001.
 
-Verrouille le contrat du superviseur `cli.dev_reloader` :
+Verrouille le contrat du superviseur `cli.project.dev_reloader` :
 
   - détecte les modifications des fichiers pertinents (app.py, config.py,
     env/dev, mvc/**, core/**) ;
@@ -27,8 +27,8 @@ from pathlib import Path
 
 import pytest
 
-from cli import dev_reloader, run as run_module
-from cli.dev_reloader import (
+from cli.project import dev_reloader, run as run_module
+from cli.project.dev_reloader import (
     DevReloader,
     DIRECTORIES_TO_WATCH,
     IGNORED_DIR_NAMES,

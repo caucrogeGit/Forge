@@ -1,6 +1,6 @@
-"""Tests pour cli.output — formatage des tags CLI."""
+"""Tests pour cli._support.output — formatage des tags CLI."""
 
-from cli.output import (
+from cli._support.output import (
     created,
     dry_run,
     error,

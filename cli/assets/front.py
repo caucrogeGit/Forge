@@ -4,7 +4,7 @@ import json
 import shutil
 from pathlib import Path
 
-import cli.output as out
+import cli._support.output as out
 
 
 HTMX_PACKAGE = "htmx.org"

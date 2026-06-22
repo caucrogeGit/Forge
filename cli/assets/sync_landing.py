@@ -6,7 +6,7 @@ import shutil
 import sys
 from pathlib import Path
 
-import cli.output as out
+import cli._support.output as out
 
 
 SOURCE = Path("mvc") / "views" / "landing" / "index.html"
