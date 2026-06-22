@@ -1,0 +1,14 @@
+# Documentation embarquée du sous-paquet core/auth (ADR-043).
+site_name: core-auth
+docs_dir: docs
+nav:
+  - Référence Auth/User (par module):
+      - Session Auth/User (session.py): session.md
+      - Mot de passe (password.py): password.md
+      - Contrat utilisateur (user.py): user.md
+      - Jetons Auth (tokens.py): tokens.md
+      - Vérification email (email.py): email.md
+      - Réinitialisation de mot de passe (reset.py): reset.md
+      - Rate-limit Auth (rate_limit.py): rate_limit.md
+      - Audit Auth/User (audit.py): audit.md
+      - Exceptions Auth (exceptions.py): exceptions.md
