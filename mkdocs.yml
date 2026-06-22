@@ -109,6 +109,9 @@ nav:
         - Sécurité (cœur, par module): '!include core/security/mkdocs.yml'
         - Sessions (cœur, par module): '!include core/sessions/mkdocs.yml'
         - Base de données (cœur, par module): '!include core/database/mkdocs.yml'
+        - Validation (cœur, par module): '!include core/validation/mkdocs.yml'
+        - Templating (cœur, par module): '!include core/templating/mkdocs.yml'
+        - Erreurs runtime (cœur, par module): '!include core/errors/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md

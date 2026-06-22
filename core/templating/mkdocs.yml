@@ -1,0 +1,8 @@
+# Documentation embarquée du sous-paquet core/templating (ADR-043).
+site_name: core-templating
+docs_dir: docs
+nav:
+  - Référence templating (par module):
+      - Gestionnaire de gabarits (manager.py): manager.md
+      - Contrat de rendu (contracts.py): contracts.md
+      - Erreurs de gabarit (errors.py): errors.md

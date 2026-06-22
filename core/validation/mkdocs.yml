@@ -1,0 +1,7 @@
+# Documentation embarquée du sous-paquet core/validation (ADR-043).
+site_name: core-validation
+docs_dir: docs
+nav:
+  - Référence validation (par module):
+      - Décorateurs de validation (decorators.py): decorators.md
+      - Erreur de validation (exceptions.py): exceptions.md

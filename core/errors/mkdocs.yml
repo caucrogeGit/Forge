@@ -1,0 +1,8 @@
+# Documentation embarquée du sous-paquet core/errors (ADR-043).
+site_name: core-errors
+docs_dir: docs
+nav:
+  - Référence erreurs runtime (par module):
+      - Schéma des erreurs (runtime_errors.py): runtime_errors.md
+      - Collecteur d'erreurs (runtime_error_logger.py): runtime_error_logger.md
+      - Rendu Markdown (runtime_error_markdown.py): runtime_error_markdown.md
