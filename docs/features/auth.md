@@ -5,7 +5,7 @@ utilisateur moderne sans transformer le framework en application metier. Elle
 fournit des contrats Python, des helpers explicites et des SQL visibles que les
 projets peuvent adopter progressivement.
 
-Voir aussi : [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session](../adr/002-session-strategy.md) · RBAC — Contrôle d'accès · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
+Voir aussi : [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session](../adr/002-session-strategy.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
 
 Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.py`) s'appuie sur `core.auth.password.verify_password` (Argon2id) pour la vérification des mots de passe. `core.security.hashing` reste disponible en repli pour les hashes PBKDF2 existants (voir ADR-001). Les nouveaux hashes PBKDF2 legacy utilisent désormais 600 000 itérations (format versionné `pbkdf2_sha256$…`) ; les anciens hashes restent vérifiables. Lorsqu'un utilisateur legacy PBKDF2 se connecte avec succès, Forge migre automatiquement son hash vers Argon2id (`auth_model.update_password_hash`). Cette migration est transparente et ne force pas de réinitialisation du mot de passe.
 
@@ -20,12 +20,9 @@ Depuis les premières versions de Forge, et toujours dans les versions actuelles
 | Hash mot de passe | `core.auth.password` — Argon2id | `core.security.hashing` — PBKDF2 **legacy** |
 | Session Auth | `core.auth.session` (`login_user`, `login_required`…) | `core.security.session` — moteur HTTP (officiel) |
 | Décorateur login | `core.auth.session.login_required` | `core.security.decorators.require_auth` — **legacy** |
-| RBAC | `forge_mvc_rbac` (`pip install --pre forge-mvc-rbac` — publié sur PyPI) | — |
 | CSRF | — | `core.security.middleware.CsrfMiddleware` + `require_csrf` — officiels |
 | Middleware | — | `core.security.middleware` — officiel |
-| MFA | `forge_mvc_mfa` (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`) — **Alpha**, secret TOTP chiffré au repos (voir auth-mfa) | — |
 | Tokens à usage limité | `core.auth.tokens` | — |
-| OIDC / SSO | ❌ non fourni nativement — voir [section OIDC](#oidc) | — |
 | Contrat utilisateur | `core.auth.user` | — |
 | Audit / rate limit | `core.auth.audit`, `core.auth.rate_limit` | — |
 
@@ -43,7 +40,7 @@ Les éléments suivants sont dépréciés en faveur de `core.auth` et seront sup
 
 - `core.security.hashing` — PBKDF2 legacy. Reste utilisable pour vérifier d'anciens hashes et effectuer la migration transparente vers Argon2id. Les nouveaux projets doivent utiliser `core.auth.password` (Argon2id) ;
 - `core.security.decorators.require_auth` — remplacé par `core.auth.session.login_required` ;
-- `core.security.decorators.require_role` — remplacé par `forge_mvc_rbac.require_user_permission`.
+- `core.security.decorators.require_role` — déprécié ; le contrôle d'accès fin est délégué à un module de contrôle d'accès optionnel.
 
 Voir [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md) pour la décision d'architecture.
 
@@ -73,8 +70,6 @@ Les modules Auth/User disponibles couvrent aujourd'hui :
 - tokens a usage limite ;
 - verification email ;
 - reset password ;
-- MFA TOTP, recovery codes, challenge et revalidation ;
-- pont Auth/User vers RBAC ;
 - administration CLI utilisateurs ;
 - audit Auth ;
 - rate limit Auth.
@@ -427,382 +422,6 @@ API :
 `PasswordResetResult` contient `user_id`, `password_hash` et `used_at`. Il ne
 contient jamais le mot de passe clair ni le token brut. Forge ne fait aucune
 ecriture DB automatique.
-
-## MFA
-
-!!! info "forge-mvc-mfa — opt-in officiel Alpha publié sur PyPI depuis 1.0.0-beta.9"
-    Le module MFA est marqué `Development Status :: 3 - Alpha` depuis `MFA-PYPI-READY-001`.
-    Le secret TOTP est **chiffré au repos** via Fernet (`FORGE_MFA_SECRET_KEY`).
-
-    Installation :
-
-    ```bash
-    pip install --pre forge-mvc-mfa
-    ```
-
-    MFA est disponible comme module opt-in officiel `forge-mvc-mfa`, publié
-    sur PyPI depuis `1.0.0-beta.9`. Il **n'est pas intégré au core** Forge
-    — le core ne dépend pas de `forge-mvc-mfa`. Voir le
-    [contrat d'installation](../install/opt-ins.md).
-
-> Le code MFA est extrait dans le module `forge-mvc-mfa` (ADR-004, MFA-EXTRACT-001).
-> L'ancien chemin `core.auth.mfa` émettait un `DeprecationWarning` et a été retiré pendant le développement pré-1.0.
-
-Forge fournit le socle MFA par briques :
-
-- contrat et table des facteurs ;
-- TOTP ;
-- codes de recuperation ;
-- challenge MFA a la connexion ;
-- revalidation MFA pour actions sensibles.
-
-### Facteurs MFA
-
-```python
-from forge_mvc_mfa import AuthMfaFactor, normalize_mfa_factor, is_mfa_enabled
-```
-
-`AuthMfaFactor` decrit `user_id`, `factor_type`, `totp_secret`, `status`,
-`label`, `confirmed_at`, `last_used_at`, `created_at` et `updated_at`.
-
-Statuts :
-
-- `pending`
-- `active`
-- `disabled`
-
-Types :
-
-- `totp`
-- `recovery`
-
-### `auth_mfa_factors.sql`
-
-```sql
-CREATE TABLE IF NOT EXISTS auth_mfa_factors (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    factor_type VARCHAR(40) NOT NULL,
-    totp_secret VARCHAR(255) NOT NULL,
-    status VARCHAR(40) NOT NULL DEFAULT 'pending',
-    label VARCHAR(120) NULL,
-    confirmed_at DATETIME NULL,
-    last_used_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_auth_mfa_factors_user_id (user_id),
-    INDEX idx_auth_mfa_factors_user_status (user_id, status),
-    CONSTRAINT fk_auth_mfa_factors_user_id
-        FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
-
-Le champ `totp_secret` contient le secret TOTP **chiffré** dans la base
-(Fernet, clé `FORGE_MFA_SECRET_KEY`). Forge ne l'affiche jamais ni ne l'inclut
-dans un audit ou une tentative rate limit.
-
-**Exigence :** `FORGE_MFA_SECRET_KEY` doit être positionné dans l'environnement.
-Voir `SEC-MFA-SECRET-ENCRYPTION-001` pour les détails du chiffrement.
-
-### TOTP
-
-La prise en charge TOTP repose sur la dépendance Python `pyotp`.
-
-API principale :
-
-- `generate_totp_secret()`
-- `totp_provisioning_uri(secret, account_name, issuer="Forge")`
-- `create_totp_factor(user_id, secret, label=None)`
-- `confirm_totp_factor(factor, code, secret, now=None)`
-- `verify_totp_code(secret, code, now=None)`
-
-Le secret brut est necessaire pour verifier les codes. Sa persistance securisee
-reste une responsabilite applicative.
-
-### Codes de recuperation
-
-API :
-
-- `create_recovery_codes(user_id, count=10)`
-- `generate_recovery_code()`
-- `hash_recovery_code(code)`
-- `verify_recovery_code(code, code_hash)`
-- `consume_recovery_code(code, code_record, now=None)`
-
-`create_recovery_codes` retourne des codes bruts a afficher une seule fois et
-des records hashables. Les codes bruts ne doivent jamais etre stockes.
-
-### `auth_mfa_recovery_codes.sql`
-
-```sql
-CREATE TABLE IF NOT EXISTS auth_mfa_recovery_codes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    code_hash CHAR(64) NOT NULL UNIQUE,
-    used_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_auth_mfa_recovery_codes_user_id (user_id),
-    INDEX idx_auth_mfa_recovery_codes_used_at (used_at),
-    CONSTRAINT fk_auth_mfa_recovery_codes_user_id
-        FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
-
-### Challenge MFA
-
-API :
-
-- `start_mfa_challenge(request, user, now=None)`
-- `has_pending_mfa_challenge(request, max_age_minutes=10, now=None)`
-- `get_mfa_challenge_user_id(request)`
-- `verify_mfa_challenge(request, code, factors, recovery_codes=(), now=None)`
-- `clear_mfa_challenge(request)`
-- `MfaChallengeResult`
-
-Le challenge stocke seulement `user_id` et un timestamp en session. Il ne
-connecte pas l'utilisateur automatiquement.
-
-### Lockout MFA
-
-Forge applique un rate-limit sur les verifications MFA pour prevenir le brute-force
-sur les codes TOTP a 6 chiffres.
-
-| Endpoint | Limite | Fenetre |
-|---|---|---|
-| Challenge MFA (login) | 5 tentatives | 5 minutes |
-| Revalidation MFA (action sensible) | 3 tentatives | 5 minutes |
-
-Le lockout est par utilisateur (`mfa_challenge:user:<id>` ou
-`mfa_revalidation:user:<id>`). Un succes remet le compteur a zero.
-
-En cas de lockout, la reponse renvoyee est identique a un echec de code :
-le client n'apprend pas qu'il est bloque. L'evenement
-`AUTH_EVENT_MFA_RATE_LIMITED` est journalise pour permettre a l'operateur
-de detecter l'attaque.
-
-Les parametres sont configurables via les constantes dans `forge_mvc_mfa.mfa` :
-
-- `MFA_CHALLENGE_MAX_ATTEMPTS` (defaut : 5)
-- `MFA_CHALLENGE_WINDOW_SECONDS` (defaut : 300)
-- `MFA_REVALIDATION_MAX_ATTEMPTS` (defaut : 3)
-- `MFA_REVALIDATION_WINDOW_SECONDS` (defaut : 300)
-
-**Limite connue :** le store est in-memory process-local. En multi-worker
-(gunicorn, uWSGI), chaque processus a son propre compteur — un attaquant
-peut faire N_max x N_workers tentatives. Comportement identique au rate-limit
-de login (`core.security.hashing`).
-
-### Anti-replay TOTP
-
-Forge applique RFC 6238 §5.2 : un code TOTP accepte ne peut pas etre rejoue
-dans sa fenetre de validite (30 secondes).
-
-Mecanisme : pour chaque facteur TOTP, Forge memorise la derniere step TOTP
-acceptee (entier = timestamp_unix // 30). Tout code dont la step est inferieure
-ou egale a la derniere step utilisee est refuse, meme si le code est
-cryptographiquement valide.
-
-Le check et l'enregistrement se font dans `verify_mfa_challenge` et
-`verify_mfa_revalidation`. Un facteur `id=None` (non encore persiste) est
-exempt du check anti-replay.
-
-**Limites :**
-
-- **Store in-memory process-local.** En multi-worker, chaque processus a son
-  propre dict — replay theoriquement possible sur un autre worker dans la
-  fenetre de 30 s. Mitigation : `SameSite=Strict` + sticky sessions.
-- **Pas de persistance entre redemarrages.** Au redemarrage, le dict est vide.
-  Fenetre de risque < 30 s.
-- **Purge opportuniste.** Les entrees expirees (>24h) sont purgees toutes
-  les 100 enregistrements. Aucun scheduler dedie.
-
-## Challenge MFA à la connexion
-
-Le challenge MFA s'intercale entre la validation du mot de passe et l'ouverture
-de la session utilisateur complete.
-
-Comportement :
-
-- **MFA desactive** : le mot de passe correct ouvre immediatement la session.
-- **MFA active** : le mot de passe correct ne suffit pas. Forge stocke un etat
-  temporaire de challenge (`_auth_mfa_user_id`, `_auth_mfa_started_at`) et attend
-  la validation du code MFA avant d'ouvrir la session.
-- **Code invalide** : l'etat temporaire est conserve (non expire) ; aucune session
-  n'est ouverte.
-- **Challenge expire** (defaut 10 min) : l'etat est efface ; l'utilisateur doit
-  se reconnecter.
-- **Logout** : la suppression de session efface automatiquement l'etat temporaire.
-
-Forge ne fournit pas encore : *remember device*, codes de recuperation dans le
-flux de connexion principal, WebAuthn, SMS, email MFA.
-
-### Integration dans le flux MVC
-
-L'application MVC inclut un exemple complet :
-
-- `mvc/controllers/auth_controller.py` — detecte `is_mfa_enabled` apres
-  `verifier_mot_de_passe`, appelle `start_mfa_challenge` et redirige vers
-  `/login/mfa` ;
-- `mvc/controllers/mfa_challenge_controller.py` — `GET /login/mfa` verifie
-  le challenge, `POST /login/mfa` valide le code ;
-- `mvc/models/mfa_model.py` — `get_active_mfa_factors(user_id)` et
-  `get_user_by_id(user_id)` pour la persistance ;
-- `mvc/views/auth/mfa_challenge.html` — formulaire de code MFA minimal.
-
-Le controleur accepte `_load_factors` et `_finalize_login` injectables pour
-les tests sans base de donnees reelle.
-
-### Revalidation MFA
-
-API :
-
-- `require_recent_mfa(request, max_age_minutes=15, now=None)`
-- `verify_mfa_revalidation(request, code, factors, recovery_codes=(), now=None)`
-- `mark_mfa_revalidated(request, user_id, now=None)`
-- `has_recent_mfa_revalidation(request, max_age_minutes=15, now=None)`
-- `clear_mfa_revalidation(request)`
-- `MfaRevalidationResult`
-
-La revalidation sert aux actions sensibles deja authentifiees : changement de
-mot de passe, action admin, export sensible, etc.
-
-### Verification d'identite
-
-`verify_mfa_revalidation` et `mark_mfa_revalidated` exigent que :
-
-1. La session courante soit authentifiee (`authentifie=True`).
-2. L'utilisateur de la session corresponde au `user_id` passe en parametre
-   (`session["user"]["id"] == user_id`).
-
-Si l'une des conditions echoue, la fonction echoue silencieusement :
-`verify_mfa_revalidation` retourne `None`, `mark_mfa_revalidated` est un
-no-op. **Le compteur de rate-limit n'est pas incremente** — un echec
-d'identite n'est pas une tentative de code MFA, c'est une erreur d'usage.
-
-L'evenement audit `mfa.revalidation.identity_mismatch` est emis pour
-permettre la detection d'anomalies en production. Sa presence signale soit
-un bug applicatif (le controleur passe un mauvais `user_id`), soit une
-tentative deliberee.
-
-```python
-from core.auth import AUTH_EVENT_MFA_REVALIDATION_IDENTITY_MISMATCH
-from forge_mvc_mfa import verify_mfa_revalidation
-
-# La session doit etre authentifiee pour user_id=42.
-# verify_mfa_revalidation retourne None sinon, sans incrementer le rate-limit.
-result = verify_mfa_revalidation(request, user_id=42, code=code, factors=factors)
-```
-
-### Persistence de session MFA sur tous les backends
-
-Les fonctions `start_mfa_challenge`, `clear_mfa_challenge`, `mark_mfa_revalidated`
-et `clear_mfa_revalidation` persistent les changements de session via un cycle
-explicite read-modify-write garantissant la compatibilite avec tous les backends :
-
-- **`MemorySessionStore`** : `store.get()` retourne une reference vivante —
-  les mutations directes persistent naturellement.
-- **`FileSessionStore` / `MariaDbSessionStore`** : `store.get()` retourne une
-  copie deserialisee — les mutations directes sont silencieusement perdues.
-  La correction passe par `store.replace(session_id, data)` apres modification.
-
-Le helper interne `_persist_session_changes(request, *, set_keys, unset_keys)` :
-
-1. Si `request.session` est un `dict` (FakeRequest ou session directe) : mutation en place.
-2. Sinon : `store.get()` → modification → `store.replace()` pour ecriture complete.
-
-La methode `replace()` a ete ajoutee au contrat `SessionStore` et implementee
-dans les trois backends. Elle remplace integralement les donnees d'une session
-(sans merge), contrairement a `set()` qui fusionne.
-
-## OIDC
-
-OIDC n'est pas fourni par Forge. La complexite d'une implementation
-OIDC complete depasse ce qui peut etre livre dans une release publique stable.
-
-Les elements d'un flux OIDC rigoureux incluent : generation de state, nonce
-et PKCE S256 ; echange reseau du code contre les tokens au `token_endpoint` ;
-validation du JWT / ID token (signature JWKS, claims `iss`, `aud`, `exp`,
-`nonce`) ; decouverte du provider (`/.well-known/openid-configuration`) ;
-liaison compte local / identite externe. Aucune de ces parties n'est fournie
-par Forge.
-
-**Pour integrer OIDC dans une application Forge**, utilisez une bibliotheque
-tierce (`authlib`, `python-keycloak`, etc.) et appelez `login_user()` apres
-validation complete de l'identite externe.
-
-Le code OIDC expérimenté dans les versions internes pré-1.0 reste accessible via l'historique
-git (`git log -- core/auth/experimental/oidc.py`). Il ne sera pas reintegre
-sans un ticket dedie `OIDC-IMPLEMENT-COMPLETE-001` partant d'une page blanche.
-
-## Auth/User vers RBAC
-
-`user_roles` est le pont optionnel entre les utilisateurs locaux et les roles
-RBAC existants.
-
-> ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-rbac` (`pip install --pre forge-mvc-rbac` — publié sur PyPI).
-
-```python
-from forge_mvc_rbac import (
-    create_auth_user_role,
-    get_user_permissions,
-    get_user_role_ids,
-    user_has_permission,
-    require_user_permission,
-)
-```
-
-Flux de resolution :
-
-```text
-session Auth/User -> user_id -> user_roles -> roles -> role_permissions -> permissions
-```
-
-### `user_roles.sql`
-
-```sql
-CREATE TABLE IF NOT EXISTS user_roles (
-    user_id INT NOT NULL,
-    role_id INT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, role_id),
-    INDEX idx_user_roles_user_id (user_id),
-    INDEX idx_user_roles_role_id (role_id),
-    CONSTRAINT fk_user_roles_user_id
-        FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON DELETE CASCADE,
-    CONSTRAINT fk_user_roles_role_id
-        FOREIGN KEY (role_id)
-        REFERENCES roles(id)
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
-
-`require_user_permission("article.edit")` lit l'utilisateur Auth/User connecte
-et interroge le resolver `user_roles -> roles -> permissions`. Il retourne `401`
-si aucun utilisateur Auth/User n'est connecte et `403` si la permission manque.
-
-### Difference avec le RBAC historique
-
-`@require_permission(...)`, fourni par `forge_mvc_rbac`, reste le decorateur
-historique. Il lit les permissions deja presentes dans `request.permissions` ou
-dans la session RBAC historique. Il ne lit pas automatiquement `user_roles`.
-
-`require_user_permission(...)`, fourni par `core.auth`, est le decorateur serveur
-pour Auth/User + RBAC.
-
-`can(...)` dans Jinja est un helper d'affichage. Il peut utiliser le contexte
-Auth/User injecte par `BaseController.render(..., request=request)` ou le mode
-historique. Il ne remplace jamais une protection serveur.
-
-Pour la documentation complète des rôles, permissions, decorateurs et helpers
-Jinja, voir RBAC — Contrôle d'accès.
 
 ## Administration CLI
 
@@ -1189,7 +808,7 @@ automatiquement cette protection dans les flux Auth.
 
 ## Flux recommandes
 
-### Login classique sans MFA
+### Login applicatif
 
 ```python
 from core.auth import authenticate_user, login_user
@@ -1221,58 +840,11 @@ return redirect("/dashboard")
 > `login_user` ne peut pas le faire seul : il n'a pas accès à la réponse HTTP,
 > donc ne peut pas réémettre le cookie. Le contrôleur de référence
 > `mvc/controllers/auth_controller.py` applique ce flux (login, puis
-> `regenerate`, puis `set_session_cookie`). Le même geste s'applique à l'issue
-> de l'étape MFA ci-dessous.
+> `regenerate`, puis `set_session_cookie`).
 
 L'application peut ensuite mettre a jour `users.last_login_at`, stocker un audit
 `login.success`, ou enregistrer une tentative rate limit reussie si elle le
 souhaite.
-
-### Login avec MFA
-
-> ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-mfa` (`pip install --pre forge-mvc-mfa` — publié sur
-> PyPI depuis `1.0.0-beta.9`, statut Alpha).
-
-```python
-from core.auth import authenticate_user, login_user
-from forge_mvc_mfa import is_mfa_enabled, start_mfa_challenge
-
-user = authenticate_user(email, password, load_user_by_email)
-
-if user is None:
-    return invalid_credentials_response()
-
-factors = load_mfa_factors(user.id)
-
-if is_mfa_enabled(factors):
-    start_mfa_challenge(request, user)
-    return show_mfa_form()
-
-login_user(request, user)
-```
-
-Puis, dans l'etape MFA :
-
-```python
-from core.auth import login_user
-from forge_mvc_mfa import verify_mfa_challenge
-
-result = verify_mfa_challenge(
-    request,
-    code,
-    factors=load_mfa_factors(user_id),
-    recovery_codes=load_recovery_codes(user_id),
-)
-
-if result is None:
-    return invalid_mfa_response()
-
-user = load_user_by_id(result.user_id)
-login_user(request, user)
-```
-
-Forge ne persiste pas `last_used_at` ou `used_at` automatiquement.
 
 ### Reset password
 
@@ -1298,58 +870,6 @@ if verify_email_verification_token(raw_token, token_record):
     verified_at = email_verification_timestamp()
     # users.email_verified_at = verified_at
     # auth_tokens.used_at = verified_at
-```
-
-### Protection route avec `require_user_permission`
-
-> ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-rbac` (`pip install --pre forge-mvc-rbac` — publié sur PyPI).
-
-```python
-from forge_mvc_rbac import require_user_permission
-
-@require_user_permission("articles.edit")
-def edit_article(request, article_id):
-    ...
-```
-
-Pour l'affichage :
-
-```jinja2
-{% if can("articles.edit") %}
-  <a href="/articles/{{ article.id }}/edit">Modifier</a>
-{% endif %}
-```
-
-Le helper Jinja masque l'action ; le decorateur serveur protege la route.
-
-### Action sensible avec revalidation MFA
-
-> ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-mfa` (`pip install --pre forge-mvc-mfa` — publié sur
-> PyPI depuis `1.0.0-beta.9`, statut Alpha).
-
-```python
-from forge_mvc_mfa import require_recent_mfa
-
-def change_password(request):
-    if not require_recent_mfa(request):
-        return redirect("/mfa/revalidate")
-    ...
-```
-
-Puis :
-
-```python
-result = verify_mfa_revalidation(
-    request,
-    code,
-    factors=load_mfa_factors(user_id),
-    recovery_codes=load_recovery_codes(user_id),
-)
-
-if result is None:
-    return invalid_mfa_response()
 ```
 
 ### Rate limit autour d'un login applicatif
@@ -1412,7 +932,6 @@ politiques metier.
 
 ## Voir aussi
 
-- RBAC — Contrôle d'accès — rôles, permissions, décorateurs serveur, helper Jinja
 - [Sécurité en production](../deployment/production-security.md) — checklist déploiement, headers, CSRF, secrets
 - [Référence CLI](../reference/reference.md) — toutes les commandes `forge` avec signatures complètes
 - [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md)

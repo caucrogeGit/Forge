@@ -77,20 +77,15 @@ class TestSectionsPresentes:
     def test_section_cookies(self):
         assert "Cookie" in _auth() or "cookie" in _auth()
 
-    def test_section_mfa(self):
-        assert "## MFA" in _auth()
-
-    def test_section_oidc(self):
-        assert "## OIDC" in _auth()
+    # ADR-042 : les sections MFA, Challenge MFA, OIDC et Auth/User vers RBAC
+    # ont été retirées du cœur (opt-ins / fonctionnalité non fournie). auth.md
+    # ne documente plus que le cœur Auth/User.
 
     def test_section_audit(self):
         assert "Audit" in _auth()
 
     def test_section_admin_cli(self):
         assert "Administration CLI" in _auth()
-
-    def test_section_rbac(self):
-        assert "RBAC" in _auth()
 
     def test_section_limites(self):
         assert "Limites restantes" in _auth()
@@ -107,29 +102,19 @@ class TestSectionsPresentes:
 # ---------------------------------------------------------------------------
 
 class TestParcoursDocumentes:
-    def test_login_sans_mfa_documente(self):
+    def test_login_applicatif_documente(self):
         a = _auth()
-        assert "Login classique sans MFA" in a or ("login" in a.lower() and "sans MFA" in a)
+        assert "Login applicatif" in a or ("login_user" in a and "## Flux" in a)
 
-    def test_login_avec_mfa_documente(self):
-        a = _auth()
-        assert "Login avec MFA" in a
+    def test_reset_password_documente(self):
+        assert "Reset password" in _auth() or "reset" in _auth().lower()
 
-    def test_parcours_mfa_challenge_documente(self):
+    def test_auth_md_sans_reference_optin(self):
+        # ADR-042 : aucune référence de paquet opt-in dans le cœur.
+        import re
         a = _auth()
-        assert "_auth_mfa_user_id" in a or "mfa_user_id" in a or "pending" in a.lower()
-
-    def test_parcours_oidc_state_nonce_documente(self):
-        a = _auth()
-        assert "state" in a and "nonce" in a and "PKCE" in a
-
-    def test_oidc_echange_reseau_non_fourni(self):
-        a = _auth()
-        assert "echange reseau" in a.lower() or "code -> token" in a or "Limites" in a
-
-    def test_oidc_jwt_non_fourni(self):
-        a = _auth()
-        assert "JWT" in a
+        hits = sorted(set(re.findall(r"forge-mvc-(?!testing)[a-z0-9]+|forge_mvc_[a-z0-9]+", a)))
+        assert not hits, f"docs/features/auth.md ne doit plus référencer d'opt-in (ADR-042) : {hits}"
 
 
 # ---------------------------------------------------------------------------
