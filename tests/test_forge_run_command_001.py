@@ -21,7 +21,7 @@ from pathlib import Path
 import pytest
 
 import forge
-from forge_cli import run as run_module
+from cli import run as run_module
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -37,15 +37,15 @@ def _make_project(tmp_path: Path) -> Path:
     return tmp_path
 
 
-# ── Module : forge_cli/run.py ────────────────────────────────────────────────
+# ── Module : cli/run.py ────────────────────────────────────────────────
 
 
 class TestRunModuleExists:
-    """Le module forge_cli/run.py existe et expose `main`."""
+    """Le module cli/run.py existe et expose `main`."""
 
     def test_module_present(self):
-        path = _REPO_ROOT / "forge_cli" / "run.py"
-        assert path.exists(), "forge_cli/run.py doit exister (FORGE-RUN-COMMAND-001)"
+        path = _REPO_ROOT / "cli" / "run.py"
+        assert path.exists(), "cli/run.py doit exister (FORGE-RUN-COMMAND-001)"
 
     def test_main_callable(self):
         assert callable(run_module.main)
@@ -55,7 +55,7 @@ class TestRunModuleExists:
 
 
 class TestDispatchRun:
-    """`forge run` est dispatché vers forge_cli/run.py."""
+    """`forge run` est dispatché vers cli/run.py."""
 
     def test_dispatch_run_appelle_run_main(self, monkeypatch):
         captured: dict[str, list[str]] = {}
@@ -197,7 +197,7 @@ class TestProdRefusal:
 # ── Comportement dev legacy (--no-reload) ────────────────────────────────────
 #
 # Le chemin par défaut en dev passe désormais par le superviseur d'autoreload
-# (`forge_cli.dev_reloader`, ticket DEV-SERVER-AUTORELOAD-001). Ces tests
+# (`cli.dev_reloader`, ticket DEV-SERVER-AUTORELOAD-001). Ces tests
 # couvrent la branche `--no-reload` qui conserve l'ancien comportement :
 # délégation à `scripts/dev-server.sh` (POSIX) ou fallback `python app.py`.
 
@@ -307,7 +307,7 @@ class TestRunHelp:
 
 class TestHelpTextMentionsRun:
     def test_build_help_contient_run(self):
-        from forge_cli.help import build_help
+        from cli.help import build_help
 
         text = build_help("1.0.0")
         assert " run " in text or "\nrun\n" in text or "run " in text

@@ -16,8 +16,8 @@ import types
 from types import SimpleNamespace
 
 
-from forge_cli.entities.make_crud import build_controller, build_form, build_form_view
-from forge_cli.entities.validation import normalize_entity_definition
+from cli.entities.make_crud import build_controller, build_form, build_form_view
+from cli.entities.validation import normalize_entity_definition
 from forge_mvc_testing import FakeRequest
 
 

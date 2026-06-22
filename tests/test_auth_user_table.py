@@ -12,7 +12,7 @@ from core.auth import (
     normalize_auth_user,
     validate_auth_user_contract,
 )
-from forge_cli.auth import USERS_SQL, cmd_auth_init
+from cli.auth import USERS_SQL, cmd_auth_init
 
 
 SQL_FILE = Path("mvc/models/sql/users.sql")

@@ -125,7 +125,7 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 
 ### Interne — peut changer entre mineurs
 
-- Fonctions et modules internes de `forge_cli/`.
+- Fonctions et modules internes de `cli/`.
 - Fonctions préfixées `_`.
 - Contenu interne des tests Forge.
 - Format interne des sessions côté serveur.

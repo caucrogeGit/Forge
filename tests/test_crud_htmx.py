@@ -15,13 +15,13 @@ Vérifie la cohérence de l'intégration HTMX sur l'ensemble des composants :
 """
 from __future__ import annotations
 
-from forge_cli.entities.crud.views_builder import (
+from cli.entities.crud.views_builder import (
     build_index_view,
     build_table_partial,
     build_pagination_partial,
     build_results_partial,
 )
-from forge_cli.entities.validation import normalize_entity_definition
+from cli.entities.validation import normalize_entity_definition
 
 
 # ---------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from forge_cli.entities.make_crud import make_crud, _to_snake
+from cli.entities.make_crud import make_crud, _to_snake
 
 
 def _field(

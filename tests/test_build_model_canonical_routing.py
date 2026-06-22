@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.model import BuildModelResult, ModelValidationError, build_model, check_model
+from cli.entities.model import BuildModelResult, ModelValidationError, build_model, check_model
 
 pytestmark = pytest.mark.meta
 

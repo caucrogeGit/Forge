@@ -72,9 +72,9 @@ Concrètement :
 - La commande `forge starter:list` et le registre `starter.json` sont supprimés :
   sans génération, le registre n'a plus d'objet. Les parcours se découvrent par
   la navigation de la documentation.
-- Le sous-système de génération est retiré : `forge_cli/starters/builder.py`,
+- Le sous-système de génération est retiré : `cli/starters/builder.py`,
   `route_ops.py`, `scaffold.py`, le registre, ainsi que l'arborescence de données
-  `forge_cli/starters/data/`.
+  `cli/starters/data/`.
 - L'injection de routes dans `mvc/routes.py` par une commande Forge disparaît
   pour les starters. Le câblage des routes redevient un geste manuel décrit dans
   la documentation.
@@ -88,7 +88,7 @@ ligne de route à ajouter dans `mvc/routes.py`, exactement comme `welcome-forge`
 ## Pré-requis anti-casse : migration de la documentation d'abord
 
 Le code de référence des parcours opt-in n'existe aujourd'hui que dans
-`forge_cli/starters/data/` ; il est posé par `build`. **Aucune suppression n'a
+`cli/starters/data/` ; il est posé par `build`. **Aucune suppression n'a
 lieu avant que la documentation ne soit autosuffisante.** L'ordre est :
 
 1. **Rapatrier** dans les pages de doc le code manquant, depuis `data/` :

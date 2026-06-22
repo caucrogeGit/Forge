@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.model import ModelValidationError, build_model, check_model
-from forge_cli.entities.make_crud import make_crud
+from cli.entities.model import ModelValidationError, build_model, check_model
+from cli.entities.make_crud import make_crud
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

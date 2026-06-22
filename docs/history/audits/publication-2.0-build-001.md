@@ -63,10 +63,10 @@ forge doctor
 ## Contenu du wheel
 
 - **Total :** 217 entrées
-- **forge_cli/** : 116 fichiers (starters, builder, registry, scaffold…)
+- **cli/** : 116 fichiers (starters, builder, registry, scaffold…)
 - **forge.py** : inclus ✅
 - **core/** : inclus ✅
-- **forge_cli/starters/** : inclus ✅
+- **cli/starters/** : inclus ✅
 
 ### Starters inclus (5/5)
 
@@ -154,7 +154,7 @@ Les 5 starters sont accessibles depuis le wheel installé via `forge starter:lis
 - [x] Sdist généré : `forge_mvc-2.0.0.tar.gz`
 - [x] `forge.py` inclus dans le wheel
 - [x] `core/` inclus dans le wheel
-- [x] `forge_cli/` inclus dans le wheel (116 fichiers)
+- [x] `cli/` inclus dans le wheel (116 fichiers)
 - [x] Les 5 starters inclus avec leurs données
 - [x] Installation `pipx` réussie
 - [x] `forge --version` → `Forge 2.0.0`

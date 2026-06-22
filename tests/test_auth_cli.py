@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 import forge
-from forge_cli.auth import (
+from cli.auth import (
     AUTH_SQL_FILES,
     build_auth_status,
     cmd_auth_doctor,
@@ -143,7 +143,7 @@ def test_auth_doctor_affiche_un_code_de_sortie_ok_sans_db(tmp_path, capsys):
 
 
 def test_auth_doctor_echoue_si_un_contrat_obligatoire_manque(monkeypatch, tmp_path):
-    import forge_cli.auth as auth_module
+    import cli.auth as auth_module
 
     monkeypatch.setattr(auth_module, "AUTH_CONTRACTS", (("core.auth.user", "MissingContract"),))
 
@@ -205,7 +205,7 @@ def test_dispatch_forge_auth_list_sql(monkeypatch):
 
 
 def test_auth_cli_ne_contient_pas_de_commandes_admin_completes():
-    import forge_cli.auth as auth_module
+    import cli.auth as auth_module
 
     forbidden = (
         "auth:user:reset-password",

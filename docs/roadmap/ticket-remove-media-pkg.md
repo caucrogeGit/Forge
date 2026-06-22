@@ -49,7 +49,7 @@ Tant que ce n'est pas fait :
 
 ### A. Code
 
-- `forge_cli/optins/catalog.py` — entrée `"media"` → `"images"`
+- `cli/optins/catalog.py` — entrée `"media"` → `"images"`
   (`"images", "forge-mvc-images", "forge_mvc_images", KIND_LIBRARY, "…"`).
 - `packages/forge-mvc-media/` — **suppression du dossier entier** (incl.
   `forge_mvc_media/__init__.py`, `media_repository.py`, `media_gallery.py` qui

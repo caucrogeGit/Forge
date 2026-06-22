@@ -94,7 +94,7 @@ Cas légitimes de `"entity"` conservés :
 
 ### F-003 — Garde `make:crud` many-to-many côté inverse
 
-- `forge_cli/entities/crud/relations_loader.py` : le `raise ValueError` a été déplacé après
+- `cli/entities/crud/relations_loader.py` : le `raise ValueError` a été déplacé après
   le filtre `if m2m_source.lower() not in current_names: continue`.
 - Résultat :
   - `make:crud Article` : bloqué si `Article.tags` contient des `pivot.fields[]` incompatibles ✓

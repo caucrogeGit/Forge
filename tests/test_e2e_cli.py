@@ -14,10 +14,10 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.make_crud import cmd_make_crud_main
-from forge_cli.entities.make_entity import main as make_entity_main
-from forge_cli.project_audit import run_project_audit
-from forge_cli.project_check import run_project_check
+from cli.entities.make_crud import cmd_make_crud_main
+from cli.entities.make_entity import main as make_entity_main
+from cli.project_audit import run_project_audit
+from cli.project_check import run_project_check
 
 _FORGE_VERSION = "2.2.0"
 _ENTITY_NAME   = "Contact"

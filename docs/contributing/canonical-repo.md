@@ -80,7 +80,7 @@ Indicateurs qui doivent déclencher un arrêt immédiat :
 - `git remote -v` ne fait pas apparaître `caucrogeGit/Forge.git` (ou
   pointe vers un fork, un mirror ou un dépôt local) ;
 - présence d'un dossier `mvc/` **sans** les dossiers `core/`,
-  `forge_cli/`, `packages/`, `tests/`, `docs/` côte à côte (signe
+  `cli/`, `packages/`, `tests/`, `docs/` côte à côte (signe
   caractéristique d'un projet généré : seul `mvc/` est extrait).
 
 Dans tous ces cas, on n'est **pas** dans Forge canonique. Les

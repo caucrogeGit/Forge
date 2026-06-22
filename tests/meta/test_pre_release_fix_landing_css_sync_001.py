@@ -10,7 +10,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 STATIC_SRC = PROJECT_ROOT / "static" / "tailwind.css"
 STATIC_DST = PROJECT_ROOT / "docs" / "static" / "tailwind.css"
-SYNC_LANDING_MODULE = PROJECT_ROOT / "forge_cli" / "sync_landing.py"
+SYNC_LANDING_MODULE = PROJECT_ROOT / "cli" / "sync_landing.py"
 PACKAGE_JSON = PROJECT_ROOT / "package.json"
 CONTRIBUTING = PROJECT_ROOT / "CONTRIBUTING.md"
 
@@ -50,7 +50,7 @@ class TestCSSSynchronized:
 
 
 class TestSyncLandingHandlesStatic:
-    """forge_cli/sync_landing.py contient la logique de copie des assets."""
+    """cli/sync_landing.py contient la logique de copie des assets."""
 
     def setup_method(self):
         self.content = SYNC_LANDING_MODULE.read_text(encoding="utf-8")
@@ -61,18 +61,18 @@ class TestSyncLandingHandlesStatic:
     ])
     def test_module_mentions_static_path(self, marker):
         assert marker in self.content, (
-            f"forge_cli/sync_landing.py devrait référencer '{marker}' "
+            f"cli/sync_landing.py devrait référencer '{marker}' "
             f"pour la copie des assets statiques"
         )
 
     def test_sync_static_function_exists(self):
         assert "def sync_static" in self.content, (
-            "forge_cli/sync_landing.py devrait définir une fonction sync_static()"
+            "cli/sync_landing.py devrait définir une fonction sync_static()"
         )
 
     def test_shutil_copy_used(self):
         assert "shutil" in self.content, (
-            "forge_cli/sync_landing.py devrait utiliser shutil pour la copie des fichiers"
+            "cli/sync_landing.py devrait utiliser shutil pour la copie des fichiers"
         )
 
 

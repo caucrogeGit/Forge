@@ -41,7 +41,7 @@ externes dès la 3.0.
 **Bloquant A-1 — `forge` inutilisable sans `forge-mvc-rbac`**
 
 Dès que le CLI `forge` est invoqué (même `forge --version`), Python charge
-`forge_cli/entities/make_crud.py` → `forge_cli/entities/crud/controller_builder.py`
+`cli/entities/make_crud.py` → `cli/entities/crud/controller_builder.py`
 qui contient un import top-level dur :
 
 ```python
@@ -131,7 +131,7 @@ Catégories principales :
 | T201 | `print()` | 530 | CLI légitime — forge est un outil interactif |
 | S608 | SQL injection vector | ~30 | **Faux positifs** — f-strings avec constantes internes |
 | B904 | `raise` sans `from` | ~10 | Qualité mineure |
-| S110 | `try/except/pass` | 2 | À noter (`forge_cli/deploy.py`) |
+| S110 | `try/except/pass` | 2 | À noter (`cli/deploy.py`) |
 
 **Violations critiques réelles** : aucune. Les S608 sont des faux positifs (interpolation
 de constantes Python dans des f-strings SQL, pas d'entrée utilisateur).
@@ -295,7 +295,7 @@ tracké par git ni dans la nav. Il apparaît dans la liste MkDocs "pages not in 
 ### Bloquantes (à corriger avant RC)
 
 - [x] `PRE-RELEASE-FIX-RBAC-IMPORT-001` : import top-level de `forge_mvc_rbac`
-  dans `forge_cli/entities/crud/controller_builder.py` — rend `forge` inutilisable
+  dans `cli/entities/crud/controller_builder.py` — rend `forge` inutilisable
   sans `forge-mvc-rbac` installé.
 
 ### Importantes (à corriger avant release ou entre RC et release)

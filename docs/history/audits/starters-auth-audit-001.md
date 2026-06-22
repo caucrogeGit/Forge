@@ -104,7 +104,7 @@ assert "hash_password(PASSWORD)" in script
 ## Validation
 
 ```bash
-grep -rn "hacher_mot_de_passe\|verifier_mot_de_passe\|core.security.hashing" forge_cli/starters/data/
+grep -rn "hacher_mot_de_passe\|verifier_mot_de_passe\|core.security.hashing" cli/starters/data/
 # → aucune occurrence après correction
 
 pytest tests/test_starter*.py       # starters verts

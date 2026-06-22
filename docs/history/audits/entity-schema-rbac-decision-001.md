@@ -24,10 +24,10 @@ devenir une propriété officielle du schéma canonique.
 
 | Fichier | Ligne | Usage | Type |
 |---|---|---|---|
-| `forge_cli/entities/validation.py` | 55 | `ALLOWED_ROOT_KEYS` inclut `"rbac"` | Acceptation |
-| `forge_cli/entities/validation.py` | 56 | `ALLOWED_RBAC_ACTION_KEYS` défini | Validation des actions |
-| `forge_cli/entities/validation.py` | 252–280 | `_validate_rbac_structure()` | Validation structure |
-| `forge_cli/entities/validation.py` | 426–437 | `normalize_entity_definition()` — preserve `rbac` | Normalisation |
+| `cli/entities/validation.py` | 55 | `ALLOWED_ROOT_KEYS` inclut `"rbac"` | Acceptation |
+| `cli/entities/validation.py` | 56 | `ALLOWED_RBAC_ACTION_KEYS` défini | Validation des actions |
+| `cli/entities/validation.py` | 252–280 | `_validate_rbac_structure()` | Validation structure |
+| `cli/entities/validation.py` | 426–437 | `normalize_entity_definition()` — preserve `rbac` | Normalisation |
 
 **Conclusion** : le format interne valide et normalise `rbac`. Structure attendue :
 ```json
@@ -48,10 +48,10 @@ devenir une propriété officielle du schéma canonique.
 
 | Fichier | Ligne | Usage | Type |
 |---|---|---|---|
-| `forge_cli/entities/make_crud.py` | 242 | `definition.get("rbac")` | Lecture |
-| `forge_cli/entities/make_crud.py` | 246–266 | Propagation aux builders | Passage en paramètre |
-| `forge_cli/entities/crud/controller_builder.py` | 60–76 | `@require_permission` conditionnel | Génération |
-| `forge_cli/entities/crud/views_builder.py` | — | Guards `{% if can() %}` | Génération |
+| `cli/entities/make_crud.py` | 242 | `definition.get("rbac")` | Lecture |
+| `cli/entities/make_crud.py` | 246–266 | Propagation aux builders | Passage en paramètre |
+| `cli/entities/crud/controller_builder.py` | 60–76 | `@require_permission` conditionnel | Génération |
+| `cli/entities/crud/views_builder.py` | — | Guards `{% if can() %}` | Génération |
 
 **Conclusion** : `rbac` est lu depuis la définition interne et propagé à tous les
 builders. Absence de `rbac` → pas de guards (rétrocompatibilité garantie).
@@ -120,8 +120,8 @@ le normalisation pour le préserver.
 
 **Requis** :
 - Modifier `schemas/entity.schema.json` (ajouter `rbac` avec sa structure)
-- Modifier `forge_cli/entities/canonical_model_normalizer.py` (préserver `rbac`)
-- Modifier `forge_cli/entities/entity_validate.py` si nécessaire
+- Modifier `cli/entities/canonical_model_normalizer.py` (préserver `rbac`)
+- Modifier `cli/entities/entity_validate.py` si nécessaire
 - Écrire des tests canoniques pour `rbac`
 - Garantir la rétrocompatibilité (entités sans `rbac` → pas de guards)
 
@@ -178,9 +178,9 @@ Fichier `article.rbac.json` à côté de `article.json`.
 | Élément | État | Note |
 |---|---|---|
 | `schemas/entity.schema.json` | Inchangé | `rbac` absent, `additionalProperties: false` |
-| `forge_cli/entities/validation.py` | Inchangé | `rbac` dans `ALLOWED_ROOT_KEYS` |
-| `forge_cli/entities/canonical_model_normalizer.py` | Inchangé | Ne préserve pas `rbac` |
-| `forge_cli/entities/make_crud.py` | Inchangé | Lit `rbac` depuis la définition interne |
+| `cli/entities/validation.py` | Inchangé | `rbac` dans `ALLOWED_ROOT_KEYS` |
+| `cli/entities/canonical_model_normalizer.py` | Inchangé | Ne préserve pas `rbac` |
+| `cli/entities/make_crud.py` | Inchangé | Lit `rbac` depuis la définition interne |
 | Tests RBAC | 56 passent | Format interne |
 | Documentation | Inchangée | Aucune mention de `rbac` dans l'entity schema |
 
@@ -205,9 +205,9 @@ La décision Option A est ferme : `rbac` hors du schéma d'entité.
 
 | Fichier | Trace | Justification |
 |---|---|---|
-| `forge_cli/entities/validation.py` | `ALLOWED_ROOT_KEYS` inclut `rbac` | Pipeline interne actif et stable |
-| `forge_cli/entities/make_crud.py` | `definition.get("rbac")` | Lecture depuis format interne |
-| `forge_cli/entities/crud/controller_builder.py` | Guards `@require_permission` | Génération conditionnelle |
-| `forge_cli/entities/crud/views_builder.py` | Guards `{% if can() %}` | Génération conditionnelle |
+| `cli/entities/validation.py` | `ALLOWED_ROOT_KEYS` inclut `rbac` | Pipeline interne actif et stable |
+| `cli/entities/make_crud.py` | `definition.get("rbac")` | Lecture depuis format interne |
+| `cli/entities/crud/controller_builder.py` | Guards `@require_permission` | Génération conditionnelle |
+| `cli/entities/crud/views_builder.py` | Guards `{% if can() %}` | Génération conditionnelle |
 | `tests/test_make_crud_rbac.py` | 34 tests format interne | Garde-fous actifs |
 | `tests/test_crud_rbac_ui.py` | 22 tests format interne | Garde-fous actifs |

@@ -10,13 +10,13 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.relations import (
+from cli.entities.relations import (
     EntityRelationsError,
     ValidatedRelation,
     generate_relations_sql,
     validate_relations_definition,
 )
-from forge_cli.entities.model import sync_relations
+from cli.entities.model import sync_relations
 
 
 # ---------------------------------------------------------------------------

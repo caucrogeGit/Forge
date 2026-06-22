@@ -35,13 +35,13 @@ Elle relève donc d'un module opt-in, au même titre que stats ou workflow.
 
 ## Décision
 
-**`core/pivot_advanced.py` et son générateur `forge_cli/entities/make_pivot_crud.py`
+**`core/pivot_advanced.py` et son générateur `cli/entities/make_pivot_crud.py`
 sont extraits vers l'opt-in `forge-mvc-pivot`.**
 
 | Élément avant | Élément après |
 |---|---|
 | `core/pivot_advanced.py` | `forge_mvc_pivot.service` (réexporté par `forge_mvc_pivot`) |
-| `forge_cli/entities/make_pivot_crud.py` | `forge_mvc_pivot.make_pivot_crud` |
+| `cli/entities/make_pivot_crud.py` | `forge_mvc_pivot.make_pivot_crud` |
 | `from core.pivot_advanced import …` (code généré) | `from forge_mvc_pivot import …` |
 
 - La commande `forge make:pivot-crud` reste exposée par la CLI cœur, mais est
@@ -53,7 +53,7 @@ sont extraits vers l'opt-in `forge-mvc-pivot`.**
 
 **Pré-1.0 (convention bêta)** : extraction sans alias déprécié dans le core
 (pas d'utilisateurs externes à protéger). Les anciens chemins
-`core.pivot_advanced` et `forge_cli.entities.make_pivot_crud` sont supprimés.
+`core.pivot_advanced` et `cli.entities.make_pivot_crud` sont supprimés.
 
 ---
 

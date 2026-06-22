@@ -21,8 +21,8 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-CONTROLLER_BUILDER = PROJECT_ROOT / "forge_cli" / "entities" / "crud" / "controller_builder.py"
-PUBLIC_LIST = PROJECT_ROOT / "forge_cli" / "public_list.py"
+CONTROLLER_BUILDER = PROJECT_ROOT / "cli" / "entities" / "crud" / "controller_builder.py"
+PUBLIC_LIST = PROJECT_ROOT / "cli" / "public_list.py"
 CORE_REPO_SHIM = PROJECT_ROOT / "core" / "uploads" / "media_repository.py"
 CORE_GALLERY_SHIM = PROJECT_ROOT / "core" / "uploads" / "media_gallery.py"
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"

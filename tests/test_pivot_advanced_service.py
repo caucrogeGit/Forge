@@ -325,7 +325,7 @@ def test_service_ne_depend_pas_de_make_crud():
     assert "make_crud" not in text
     assert "import make_crud" not in text
     assert "CrudManyToManyRelation" not in text
-    assert "from forge_cli" not in text
+    assert "from cli" not in text
 
 
 # ── Généricité ────────────────────────────────────────────────────────────────

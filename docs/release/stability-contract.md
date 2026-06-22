@@ -64,9 +64,9 @@ Les éléments suivants sont garantis pour toute la série 1.x :
 
 Les éléments suivants peuvent changer sans notice entre versions mineures de Forge 1.x :
 
-- Fonctions et modules internes de `forge_cli/` (générateurs, parseurs, builders).
+- Fonctions et modules internes de `cli/` (générateurs, parseurs, builders).
 - Fonctions préfixées `_` dans tout le code source Forge.
-- Structure interne des générateurs (`forge_cli/entities/crud/`, `forge_cli/entities/model/`, etc.).
+- Structure interne des générateurs (`cli/entities/crud/`, `cli/entities/model/`, etc.).
 - Helpers non référencés dans `docs/reference.md`.
 - Contenu interne des tests Forge (fichiers `tests/`).
 - Modules internes non exposés dans la documentation (`core/templating/` internals, `core/forge.py` registry).
@@ -235,7 +235,7 @@ Ces commandes et leurs options documentées sont garanties pour Forge 1.x.
 |---|---|
 | `forge help` / `--help` / `-h` | Affiche l'aide groupée sur stdout, code 0. |
 | `forge` (sans argument) | Identique à `forge help`. |
-| Module source de l'aide | `forge_cli/help.py` — `build_help(version: str)` |
+| Module source de l'aide | `cli/help.py` — `build_help(version: str)` |
 
 La distinction entre `forge doctor` (tolérant) et `forge project:check` (strict) est documentée dans l'aide générale.
 
@@ -285,7 +285,7 @@ Pour tout projet généré avec Forge 1.x :
 - L'upgrade entre versions mineures de la série `1.0.x` ne requiert aucune modification du code applicatif pour les API stables.
 - L'upgrade `1.x → 2.0` peut introduire des ruptures documentées dans un guide de migration dédié.
 
-Les imports internes de `forge_cli.*` ne sont pas garantis entre versions mineures.
+Les imports internes de `cli.*` ne sont pas garantis entre versions mineures.
 
 ---
 

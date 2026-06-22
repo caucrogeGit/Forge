@@ -85,7 +85,7 @@ Les deux modules coexistent avec des responsabilités distinctes et claires :
 
 `core/auth/oidc.py` à 1011 lignes est le fichier le plus grand du core. Il reste lisible (flux OIDC bien découpé en fonctions) mais pourrait bénéficier d'un découpage interne si la complexité augmente.
 
-**Aucun TODO / FIXME / HACK identifié dans `core/` ni `forge_cli/`.**
+**Aucun TODO / FIXME / HACK identifié dans `core/` ni `cli/`.**
 
 ---
 
@@ -113,7 +113,7 @@ Les deux modules coexistent avec des responsabilités distinctes et claires :
 
 **Nommage :** uniforme (`make:{ressource}` ou `{ressource}:action`). Pas d'incohérence détectée.
 
-**Délégation :** `forge.py` délègue correctement à `forge_cli.*`. Aucune logique métier dans `forge.py`.
+**Délégation :** `forge.py` délègue correctement à `cli.*`. Aucune logique métier dans `forge.py`.
 
 **Points à vérifier dans CONSOLIDATION-CLI-001 :**
 
@@ -128,11 +128,11 @@ Les deux modules coexistent avec des responsabilités distinctes et claires :
 
 Générateurs principaux :
 
-- `make:entity` → `forge_cli/entities/make_entity.py`
-- `make:crud` → `forge_cli/entities/make_crud.py`
-- `make:relation` → `forge_cli/entities/make_relation.py`
-- `make:public-{page,list,show,form,contact}` → `forge_cli/public_*.py`
-- `sync:entity` → `forge_cli/entities/sync_entity.py`
+- `make:entity` → `cli/entities/make_entity.py`
+- `make:crud` → `cli/entities/make_crud.py`
+- `make:relation` → `cli/entities/make_relation.py`
+- `make:public-{page,list,show,form,contact}` → `cli/public_*.py`
+- `sync:entity` → `cli/entities/sync_entity.py`
 
 **Architecture des générateurs :** chaque générateur est un module indépendant. Pas de super-classe générateur commune — acceptable pour ce volume.
 
@@ -270,8 +270,8 @@ Les starters 1, 3 et 4 ont été mis à jour dans la Phase 9.1. Cette correction
 
 **Alignement code ↔ doc :**
 
-- Profils dans `forge_cli/project_profiles.py` ↔ `docs/profiles.md` : ✅ alignés.
-- Starters dans `forge_cli/starters/data/*/starter.json` ↔ `docs/starters/` : ✅ alignés (sauf `doc_url` starters 2 et 5).
+- Profils dans `cli/project_profiles.py` ↔ `docs/profiles.md` : ✅ alignés.
+- Starters dans `cli/starters/data/*/starter.json` ↔ `docs/starters/` : ✅ alignés (sauf `doc_url` starters 2 et 5).
 - Commandes CLI ↔ `docs/reference.md` : à vérifier dans CONSOLIDATION-DOC-001.
 
 **Points à vérifier dans CONSOLIDATION-DOC-001 :**

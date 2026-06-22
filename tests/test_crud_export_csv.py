@@ -5,11 +5,11 @@ import pathlib
 import pytest
 
 
-from forge_cli.entities.crud.context import CrudManyToOneRelation
-from forge_cli.entities.crud.controller_builder import build_controller
-from forge_cli.entities.crud.model_builder import build_model
-from forge_cli.entities.crud.views_builder import build_index_view
-from forge_cli.entities.make_crud import _route_block
+from cli.entities.crud.context import CrudManyToOneRelation
+from cli.entities.crud.controller_builder import build_controller
+from cli.entities.crud.model_builder import build_model
+from cli.entities.crud.views_builder import build_index_view
+from cli.entities.make_crud import _route_block
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
 

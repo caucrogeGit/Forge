@@ -74,7 +74,7 @@ class TestNoCoreWorkflowImportsRemain:
     ])
     def test_no_forbidden_imports(self, forbidden_import):
         this_file = Path(__file__).resolve()
-        roots = [Path("core"), Path("mvc"), Path("forge_cli"), Path("tests")]
+        roots = [Path("core"), Path("mvc"), Path("cli"), Path("tests")]
         offenders = []
         for root in roots:
             if not root.exists():

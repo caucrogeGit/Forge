@@ -50,7 +50,7 @@ class TestOidcImportsRemoved:
         "import forge_mvc_oidc",
     ])
     def test_no_forbidden_imports(self, forbidden_pattern):
-        roots = [Path("core"), Path("mvc"), Path("forge_cli"), Path("tests")]
+        roots = [Path("core"), Path("mvc"), Path("cli"), Path("tests")]
         this_file = Path(__file__).resolve()
         offenders = []
         for root in roots:

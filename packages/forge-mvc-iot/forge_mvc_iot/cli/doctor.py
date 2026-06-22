@@ -24,7 +24,7 @@ Vérifications statiques (toujours actives) :
 Sans ``--mqtt`` ni ``--db``, les deux checks réseau / base restent en
 ``skip`` et **rien n'est importé** côté ``paho`` ou ``core.database``.
 
-Convention alignée sur ``forge_cli.doctor`` (Forge Core) : statuts
+Convention alignée sur ``cli.doctor`` (Forge Core) : statuts
 minuscules ``ok`` / ``warn`` / ``fail`` / ``skip``, dataclass
 ``CheckResult``.
 """
@@ -80,7 +80,7 @@ Status = Literal["ok", "warn", "fail", "skip"]
 class CheckResult:
     """Résultat d'une vérification du doctor IoT.
 
-    Aligné sur ``forge_cli.doctor.CheckResult`` : statut minuscule,
+    Aligné sur ``cli.doctor.CheckResult`` : statut minuscule,
     label court, détail libre. ``lines`` permet d'afficher un
     sous-rapport multi-lignes (utilisé pour la configuration).
     """

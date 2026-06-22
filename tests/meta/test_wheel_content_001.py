@@ -25,7 +25,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-REQUIRED_PACKAGES = ["core", "forge_cli", "integrations"]
+REQUIRED_PACKAGES = ["core", "cli", "integrations"]
 
 
 def _clean_build_dirs() -> None:

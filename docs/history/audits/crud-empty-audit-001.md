@@ -16,7 +16,7 @@ Le manque restant est précis : l'état vide de liste ne distingue pas encore un
 
 ## État du code
 
-`forge_cli/entities/make_crud.py` génère un état vide directement dans `index.html` :
+`cli/entities/make_crud.py` génère un état vide directement dans `index.html` :
 
 ```jinja
 {% if contacts %}

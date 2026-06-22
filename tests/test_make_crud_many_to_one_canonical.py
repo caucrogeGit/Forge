@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.crud.relations_loader import _load_crud_many_to_one_relations
-from forge_cli.entities.make_crud import (
+from cli.entities.crud.relations_loader import _load_crud_many_to_one_relations
+from cli.entities.make_crud import (
     MakeCrudResult,
     build_controller,
     build_form,
@@ -231,7 +231,7 @@ def test_make_crud_with_canonical_m2o_generates_choices_in_controller(tmp_path):
 
 def test_legacy_m2o_still_supported(tmp_path):
     """Le format legacy many_to_one (format_version: 1) est désormais refusé."""
-    from forge_cli.entities.relations import EntityRelationsError
+    from cli.entities.relations import EntityRelationsError
     entities_root = tmp_path / "mvc" / "entities"
     contact = {
         "entity": "Contact",
@@ -282,7 +282,7 @@ def test_legacy_m2o_still_supported(tmp_path):
 
 def test_canonical_m2o_does_not_affect_many_to_many_loader(tmp_path):
     """_load_crud_many_to_many_relations retourne vide pour une relation many_to_one canonique."""
-    from forge_cli.entities.crud.relations_loader import _load_crud_many_to_many_relations
+    from cli.entities.crud.relations_loader import _load_crud_many_to_many_relations
     entities_root = _setup_entities(tmp_path)
     result = _load_crud_many_to_many_relations(_article_no_fk(), entities_root)
     assert result == []

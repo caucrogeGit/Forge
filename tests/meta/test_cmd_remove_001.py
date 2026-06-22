@@ -60,7 +60,7 @@ class TestNoCmdImportsRemain:
         roots = [
             ROOT / "core",
             ROOT / "mvc",
-            ROOT / "forge_cli",
+            ROOT / "cli",
             ROOT / "integrations",
         ]
         offenders = []

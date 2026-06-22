@@ -47,6 +47,6 @@ def test_front_documentation_mentions_application_javascript_directory():
 
 
 def test_generated_views_reference_tailwind_css():
-    make_crud = Path("forge_cli/entities/make_crud.py").read_text(encoding="utf-8")
+    make_crud = Path("cli/entities/make_crud.py").read_text(encoding="utf-8")
 
     assert "/static/tailwind.css" in make_crud

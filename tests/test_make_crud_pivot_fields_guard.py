@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.make_crud import make_crud, _to_snake
+from cli.entities.make_crud import make_crud, _to_snake
 
 
 # ── Entités de base ────────────────────────────────────────────────────────────

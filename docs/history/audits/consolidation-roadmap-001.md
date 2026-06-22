@@ -123,7 +123,7 @@ Les conditions de sortie de la Phase 9.5 sont remplies :
 - `core/modules/` : découverte, installation, fichiers, routes — cycle en 4 étapes
 - `integrations/` : Jinja2, MariaDB, SQLite
 
-### CLI (`forge_cli/`)
+### CLI (`cli/`)
 
 - `forge new` avec `--profile`
 - `make:entity`, `sync:entity`, `build:model`, `check:model`

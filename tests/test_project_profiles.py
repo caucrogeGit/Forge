@@ -8,7 +8,7 @@ import pathlib
 import pytest
 from unittest.mock import patch
 
-from forge_cli.project_profiles import (
+from cli.project_profiles import (
     DEFAULT_PROJECT_PROFILE,
     PROJECT_PROFILE_DESCRIPTIONS,
     SUPPORTED_PROJECT_PROFILES,

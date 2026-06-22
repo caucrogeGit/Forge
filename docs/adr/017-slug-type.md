@@ -20,15 +20,15 @@ partageables, SEO-friendly.
 L'audit de l'existant (`BETA13-EXISTING-AUDIT-001`) révèle un terrain
 **partiellement défriché mais incohérent** :
 
-- **`forge_cli/public_page._slugify`** — un **validateur strict** (kebab-case,
+- **`cli/public_page._slugify`** — un **validateur strict** (kebab-case,
   `[a-z0-9-]`) qui **rejette les accents** (`ValueError` sur « Écrire ») ; ce
   n'est **pas** un générateur. 1 seul usage.
-- **`forge_cli/entities/migrations.slugify_migration_name`** — un
+- **`cli/entities/migrations.slugify_migration_name`** — un
   **transformeur snake_case** (`_`) pour les **noms de fichiers de
   migration** : concept **différent** d'une URL slug (format et finalité
   distincts).
 - **type `slug`** déjà reconnu dans le contrat d'entité
-  (`forge_cli/entities/validation.py`) + `SlugField` dans le CRUD, **sans
+  (`cli/entities/validation.py`) + `SlugField` dans le CRUD, **sans
   logique de génération**.
 
 Trois objets « slug » coexistent donc, avec des contrats divergents — risque
@@ -65,7 +65,7 @@ def is_valid_slug(value: str, *, max_length: int = 180) -> bool
   `\`, `..`), correspond à `[a-z0-9]+(?:-[a-z0-9]+)*`, longueur ≤ `max_length`.
 
 Le runtime (contrôleurs/modèles générés) et le CLI (codegen) importent ce même
-module. `forge_cli/public_page._slugify` est **remplacé** par `core.http.slug`
+module. `cli/public_page._slugify` est **remplacé** par `core.http.slug`
 (§11 : une seule implémentation URL-slug).
 
 ### D3 — Le type `slug` dans le contrat d'entité

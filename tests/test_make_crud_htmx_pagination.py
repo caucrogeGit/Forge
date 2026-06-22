@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from forge_cli.entities.make_crud import (
+from cli.entities.make_crud import (
     build_controller,
     build_model,
     build_pagination_partial,

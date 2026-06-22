@@ -1,6 +1,6 @@
 import pytest
 
-from forge_cli.entities.validation import (
+from cli.entities.validation import (
     EntityDefinitionError,
     normalize_entity_definition,
     validate_entity_definition,

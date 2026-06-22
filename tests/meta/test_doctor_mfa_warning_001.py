@@ -1,7 +1,7 @@
 """Garde-fou AUTH-DOCTOR-MFA-MISSING-DEP-WARNING-001.
 
 Vérifie que :
-- check_mfa_dependency est exportée par forge_cli.doctor.
+- check_mfa_dependency est exportée par cli.doctor.
 - Le message de warning mentionne MFA comme opt-in/source-only.
 - pyotp n'est pas dans les dépendances runtime du core (pyproject.toml).
 - pyotp n'est pas dans requirements*.txt du core.
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 PYPROJECT = PROJECT_ROOT / "pyproject.toml"
-DOCTOR_PY = PROJECT_ROOT / "forge_cli" / "doctor.py"
+DOCTOR_PY = PROJECT_ROOT / "cli" / "doctor.py"
 
 
 # ---------------------------------------------------------------------------
@@ -28,11 +28,11 @@ DOCTOR_PY = PROJECT_ROOT / "forge_cli" / "doctor.py"
 class TestCheckMfaDependencyExposed:
 
     def test_check_mfa_dependency_importable(self):
-        from forge_cli.doctor import check_mfa_dependency
+        from cli.doctor import check_mfa_dependency
         assert callable(check_mfa_dependency)
 
     def test_detect_mfa_indicators_importable(self):
-        from forge_cli.doctor import _detect_mfa_indicators
+        from cli.doctor import _detect_mfa_indicators
         assert callable(_detect_mfa_indicators)
 
 
@@ -43,7 +43,7 @@ class TestCheckMfaDependencyExposed:
 class TestDoctorMfaWarningMessage:
 
     def test_doctor_mentions_opt_in_in_warn(self, tmp_path):
-        from forge_cli.doctor import check_mfa_dependency
+        from cli.doctor import check_mfa_dependency
         ctrl = tmp_path / "mvc" / "controllers" / "mfa_controller.py"
         ctrl.parent.mkdir(parents=True, exist_ok=True)
         ctrl.write_text("# mfa\n", encoding="utf-8")
@@ -57,7 +57,7 @@ class TestDoctorMfaWarningMessage:
                 return None
             return original_find(name)
 
-        import forge_cli.doctor as _doctor
+        import cli.doctor as _doctor
         orig = _doctor.importlib.util.find_spec
         _doctor.importlib.util.find_spec = patched
         try:
@@ -71,12 +71,12 @@ class TestDoctorMfaWarningMessage:
         )
 
     def test_doctor_mfa_warn_mentions_forge_mvc_mfa(self, tmp_path):
-        from forge_cli.doctor import check_mfa_dependency
+        from cli.doctor import check_mfa_dependency
         ctrl = tmp_path / "mvc" / "controllers" / "mfa_controller.py"
         ctrl.parent.mkdir(parents=True, exist_ok=True)
         ctrl.write_text("# mfa\n", encoding="utf-8")
 
-        import forge_cli.doctor as _doctor
+        import cli.doctor as _doctor
         orig = _doctor.importlib.util.find_spec
         _doctor.importlib.util.find_spec = lambda name: None
         try:
@@ -89,12 +89,12 @@ class TestDoctorMfaWarningMessage:
         )
 
     def test_doctor_mfa_warn_is_not_fail(self, tmp_path):
-        from forge_cli.doctor import check_mfa_dependency
+        from cli.doctor import check_mfa_dependency
         ctrl = tmp_path / "mvc" / "controllers" / "mfa_controller.py"
         ctrl.parent.mkdir(parents=True, exist_ok=True)
         ctrl.write_text("# mfa\n", encoding="utf-8")
 
-        import forge_cli.doctor as _doctor
+        import cli.doctor as _doctor
         orig = _doctor.importlib.util.find_spec
         _doctor.importlib.util.find_spec = lambda name: None
         try:
@@ -138,19 +138,19 @@ class TestDoctorUsesFinspec:
     def test_doctor_uses_find_spec_for_mfa(self):
         src = DOCTOR_PY.read_text(encoding="utf-8")
         assert "find_spec" in src, (
-            "forge_cli/doctor.py doit utiliser importlib.util.find_spec pour détecter MFA"
+            "cli/doctor.py doit utiliser importlib.util.find_spec pour détecter MFA"
         )
 
     def test_doctor_does_not_import_forge_mvc_mfa_at_module_level(self):
         src = DOCTOR_PY.read_text(encoding="utf-8")
         assert "import forge_mvc_mfa" not in src, (
-            "forge_cli/doctor.py ne doit pas importer forge_mvc_mfa au niveau module"
+            "cli/doctor.py ne doit pas importer forge_mvc_mfa au niveau module"
         )
 
     def test_doctor_does_not_import_pyotp_at_module_level(self):
         src = DOCTOR_PY.read_text(encoding="utf-8")
         assert "import pyotp" not in src, (
-            "forge_cli/doctor.py ne doit pas importer pyotp au niveau module"
+            "cli/doctor.py ne doit pas importer pyotp au niveau module"
         )
 
     def test_check_mfa_dependency_in_run_all(self):

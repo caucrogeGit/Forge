@@ -46,7 +46,7 @@ contrôleur, son `routes.py.snippet` et son `starter.json`, applicable par
   starter `first-sql` ne casse aucun starter survivant (dépendance purement
   narrative).
 - Le garde-fou de neutralité du squelette (`tests/test_skeleton_guard_001.py`,
-  ADR-024) interdit tout contenu welcome dans `forge_cli/skeleton/data/` : le
+  ADR-024) interdit tout contenu welcome dans `cli/skeleton/data/` : le
   tutoriel vit dans la **documentation**, pas dans le squelette.
 
 ---
@@ -61,7 +61,7 @@ contrôleur, son `routes.py.snippet` et son `starter.json`, applicable par
    SQL 10→11 (enseigne « nouveau domaine = nouveau contrôleur », charte §2). Un
    unique `mvc/routes.py` accumule toutes les routes.
 2. **D2 — Suppression des 11 starters débutant.** Les dossiers
-   `forge_cli/starters/data/<palier>/` des 11 paliers débutants sont retirés :
+   `cli/starters/data/<palier>/` des 11 paliers débutants sont retirés :
    il n'y a plus de `forge starter:build` par palier débutant.
 3. **D3 — Le reste reste buildable.** Les niveaux intermédiaire et avancé de
    welcome-forge, ainsi que tous les parcours opt-in (iot, video, images, files,
@@ -135,7 +135,7 @@ un invariant cosmétique. D5 assouplit le test à la place.
   `STARTER-WELCOME-FORGE-DOC-CONTINUITY-001`, `STARTER-WELCOME-FORGE-TESTS-PIVOT-001`,
   `STARTER-WELCOME-FORGE-DROP-DATA-001`, `STARTER-WELCOME-FORGE-CLOSE-001`.
 - Code et docs concernés : `docs/starters/welcome-forge/debutant/`,
-  `docs/starters/index.md`, `forge_cli/starters/data/` (paliers débutants),
+  `docs/starters/index.md`, `cli/starters/data/` (paliers débutants),
   `tests/meta/test_starter_progression_001.py`,
   `tests/meta/test_consolidation_starter_001.py`.
 - ADR-016 Unification opt-in : `docs/adr/016-opt-in-unification.md` (amendé).

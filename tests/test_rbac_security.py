@@ -364,7 +364,7 @@ def test_can_injection_client_ignoree():
 
 
 def test_crud_genere_decorateur_appelle_require_permission():
-    from forge_cli.entities.make_crud import build_controller
+    from cli.entities.make_crud import build_controller
 
     defn = {
         "entity": "Post", "table": "posts", "description": "",
@@ -385,7 +385,7 @@ def test_crud_genere_decorateur_appelle_require_permission():
 
 
 def test_crud_genere_sans_rbac_laisse_routes_ouvertes():
-    from forge_cli.entities.make_crud import build_controller
+    from cli.entities.make_crud import build_controller
 
     defn = {
         "entity": "Post", "table": "posts", "description": "",
@@ -400,7 +400,7 @@ def test_crud_genere_sans_rbac_laisse_routes_ouvertes():
 
 
 def test_crud_genere_protege_uniquement_actions_declarees():
-    from forge_cli.entities.make_crud import build_controller
+    from cli.entities.make_crud import build_controller
 
     defn = {
         "entity": "Post", "table": "posts", "description": "",
@@ -423,7 +423,7 @@ def test_crud_genere_protege_uniquement_actions_declarees():
 
 
 def test_crud_genere_permission_normalisee():
-    from forge_cli.entities.make_crud import build_controller
+    from cli.entities.make_crud import build_controller
 
     defn = {
         "entity": "Post", "table": "posts", "description": "",
@@ -443,7 +443,7 @@ def test_crud_genere_permission_normalisee():
 
 
 def test_crud_permission_invalide_refusee_a_la_validation():
-    from forge_cli.entities.validation import EntityDefinitionError, validate_entity_definition
+    from cli.entities.validation import EntityDefinitionError, validate_entity_definition
 
     defn = {
         "entity": "Post", "table": "posts",

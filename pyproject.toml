@@ -78,10 +78,10 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["core*", "forge_cli*", "integrations*"]
+include = ["core*", "cli*", "integrations*"]
 
 [tool.setuptools.package-data]
-"forge_cli" = [
+"cli" = [
     "skeleton/data/**/*",
     "skeleton/data/**/.*",
     "skeleton/data/.*",
@@ -99,7 +99,7 @@ include = ["core*", "forge_cli*", "integrations*"]
     "**/*.pyc",
     "**/*.pyo",
 ]
-"forge_cli" = [
+"cli" = [
     "skeleton/data/**/__pycache__/*",
     "skeleton/data/**/*.pyc",
     "skeleton/data/**/*.pyo",
@@ -146,7 +146,7 @@ pythonVersion = "3.12"
 [tool.ruff]
 target-version = "py312"
 line-length = 120
-exclude = ["cmd/", ".venv/", "site/", "packages/core", "packages/forge_cli", "packages/integrations"]
+exclude = ["cmd/", ".venv/", "site/", "packages/core", "packages/cli", "packages/integrations"]
 
 [tool.ruff.lint]
 select = ["E", "F"]

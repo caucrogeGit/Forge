@@ -228,7 +228,7 @@ Sont explicitement **hors périmètre** :
 
 - pas de lecture automatique de `env/dev` ou `.env` — c'est l'appelant
   qui charge ces fichiers en amont (par exemple via `python-dotenv` ou
-  `forge_cli.config.load_env()`) ;
+  `cli.config.load_env()`) ;
 - TLS est branché dans les clients (`IOT-MQTT-TLS-CLIENTS-001`) via
   `client.tls_set` ; restent **hors périmètre** : le certificat client
   (mTLS), la génération de certificats, `tls_insecure_set` et la

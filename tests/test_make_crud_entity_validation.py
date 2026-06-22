@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.make_crud import make_crud
+from cli.entities.make_crud import make_crud
 
 PROJECT_ROOT = Path(__file__).parent.parent
 
@@ -64,7 +64,7 @@ def _setup(tmp_path: Path, entity_data: dict, relations_data: dict | None = None
 def test_valid_project_make_crud_returns_result(tmp_path):
     entities_root = _setup(tmp_path, _VALID_CANONICAL)
     result = make_crud("Article", entities_root=entities_root, output_root=tmp_path)
-    from forge_cli.entities.make_crud import MakeCrudResult
+    from cli.entities.make_crud import MakeCrudResult
     assert isinstance(result, MakeCrudResult)
 
 
@@ -157,7 +157,7 @@ def test_invalid_relations_message_has_entity_validate(tmp_path, capsys):
 
 def test_entity_validate_still_detailed(tmp_path):
     """collect_entity_validation_results retourne les erreurs complètes."""
-    from forge_cli.entities.entity_validate import collect_entity_validation_results
+    from cli.entities.entity_validate import collect_entity_validation_results
 
     entities_root = _setup(tmp_path, _INVALID_ENTITY)
     results = collect_entity_validation_results(entities_root)

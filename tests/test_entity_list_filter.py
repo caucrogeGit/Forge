@@ -1,12 +1,12 @@
 """Tests pour la métadonnée list.filter dans les JSON d'entité et make:crud."""
 import pytest
 
-from forge_cli.entities.validation import (
+from cli.entities.validation import (
     EntityDefinitionError,
     validate_entity_definition,
     normalize_entity_definition,
 )
-from forge_cli.entities.make_crud import (
+from cli.entities.make_crud import (
     CrudManyToOneRelation,
     _filter_fields,
     _is_bool_sql,

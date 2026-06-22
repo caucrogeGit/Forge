@@ -21,7 +21,7 @@ Mais le CRUD généré recalculait sa pagination à la main alors que Forge poss
 
 Audit limité à :
 
-- `forge_cli/entities/make_crud.py` ;
+- `cli/entities/make_crud.py` ;
 - `core/mvc/view/pagination.py` ;
 - `tests/test_make_crud.py` ;
 - `tests/test_make_crud_search.py` ;

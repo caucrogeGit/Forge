@@ -24,7 +24,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-APP_PY = PROJECT_ROOT / "forge_cli" / "skeleton" / "data" / "app.py"
+APP_PY = PROJECT_ROOT / "cli" / "skeleton" / "data" / "app.py"
 
 
 def _src() -> str:
@@ -64,7 +64,7 @@ def test_plus_de_rendu_500_sans_contexte():
 
 # ── Détail dev des pages 404 / 413 (SKELETON-ERROR-PAGES-DEV-DETAIL-001) ──────
 
-ERRORS_DIR = PROJECT_ROOT / "forge_cli" / "skeleton" / "data" / "mvc" / "views" / "errors"
+ERRORS_DIR = PROJECT_ROOT / "cli" / "skeleton" / "data" / "mvc" / "views" / "errors"
 
 
 def test_helper_dev_error_gate_sur_dev():

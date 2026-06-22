@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.sync_landing import (
+from cli.sync_landing import (
     GENERATED_COMMENT,
     LandingSyncError,
     expected_docs_content,

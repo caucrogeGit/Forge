@@ -61,8 +61,8 @@ class RbacContractResult:
 
 def _find_schemas_dir() -> Path | None:
     try:
-        import forge_cli  # type: ignore[import-untyped]
-        candidate = Path(forge_cli.__file__).resolve().parent / "schemas"
+        import cli  # type: ignore[import-untyped]
+        candidate = Path(cli.__file__).resolve().parent / "schemas"
         if candidate.is_dir():
             return candidate
     except ImportError:

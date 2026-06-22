@@ -19,14 +19,14 @@ comportements mais des tests de conformité aux critères du ticket.
 """
 from __future__ import annotations
 
-from forge_cli.entities.make_crud import (
+from cli.entities.make_crud import (
     CrudManyToOneRelation,
     _filter_fields,
     build_controller,
     build_index_view,
     build_model,
 )
-from forge_cli.entities.validation import normalize_entity_definition
+from cli.entities.validation import normalize_entity_definition
 
 
 # ---------------------------------------------------------------------------
@@ -216,12 +216,12 @@ class TestSQLParametre:
 
 class TestFiltresConservésDansPagination:
     def test_filters_loop_dans_liens_pagination(self):
-        from forge_cli.entities.make_crud import build_pagination_partial
+        from cli.entities.make_crud import build_pagination_partial
         html = build_pagination_partial(_entity_with_statut())
         assert "pagination.filters.items()" in html
 
     def test_pagination_prev_conserve_filtres(self):
-        from forge_cli.entities.make_crud import build_pagination_partial
+        from cli.entities.make_crud import build_pagination_partial
         html = build_pagination_partial(_entity_with_statut())
         assert "pagination.filters.items()" in html
 
@@ -244,12 +244,12 @@ class TestFiltresConservésDansPagination:
 
 class TestFiltresConservésDansLesTris:
     def test_filters_loop_dans_liens_tri(self):
-        from forge_cli.entities.make_crud import build_table_partial
+        from cli.entities.make_crud import build_table_partial
         html = build_table_partial(_entity_with_statut())
         assert "pagination.filters.items()" in html
 
     def test_sort_link_inclut_filtre_urlencode(self):
-        from forge_cli.entities.make_crud import build_table_partial
+        from cli.entities.make_crud import build_table_partial
         html = build_table_partial(_entity_with_statut())
         assert "urlencode" in html
 

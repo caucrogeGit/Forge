@@ -34,17 +34,17 @@ Ce ticket ne modifie pas le core, les modules, les profils ou les fonctionnalit�
 
 ## Méthode d'audit
 
-- Lecture de `forge_cli/starters/__init__.py` (CLI : `starter:list`, `starter:build`)
-- Lecture de `forge_cli/starters/registry.py` (résolution par numéro ou alias)
+- Lecture de `cli/starters/__init__.py` (CLI : `starter:list`, `starter:build`)
+- Lecture de `cli/starters/registry.py` (résolution par numéro ou alias)
 - Lecture des 5 fichiers `starter.json`
 - Vérification des `doc_url` contre la structure MkDocs (`mkdocs.yml` + `site/starters/`)
 - Lecture de `docs/starters/index.md` (tableau de synthèse, statuts, profils)
 - Lecture des index et rebuild.md des starters 1 à 4
 - Vérification de l'absence de `docs/starters/communes-sejours/rebuild.md`
-- Grep de `communes_sejours`, `demande_sejour` dans `core/` et `forge_cli/` hors `starters/data/`
+- Grep de `communes_sejours`, `demande_sejour` dans `core/` et `cli/` hors `starters/data/`
 - Lecture du contrôleur packagé `communes_sejours_controller.py`
 - Vérification des clés i18n `fr.json` du starter 5
-- Vérification des fichiers packagés dans `forge_cli/starters/data/communes-sejours/files/`
+- Vérification des fichiers packagés dans `cli/starters/data/communes-sejours/files/`
 - Lecture de `docs/starters/communes-sejours/index.md`
 - Revue des tests existants (`test_starter_cli.py` : 118 tests, `test_starter_communes_sejours.py` : 192 tests)
 
@@ -54,10 +54,10 @@ Ce ticket ne modifie pas le core, les modules, les profils ou les fonctionnalit�
 
 | Fichier | Rôle |
 |---|---|
-| `forge_cli/starters/__init__.py` | CLI starter:list / starter:build |
-| `forge_cli/starters/registry.py` | Résolution des starters |
-| `forge_cli/starters/data/*/starter.json` | Métadonnées des 5 starters |
-| `forge_cli/starters/data/communes-sejours/files/` | Fichiers packagés du starter 5 |
+| `cli/starters/__init__.py` | CLI starter:list / starter:build |
+| `cli/starters/registry.py` | Résolution des starters |
+| `cli/starters/data/*/starter.json` | Métadonnées des 5 starters |
+| `cli/starters/data/communes-sejours/files/` | Fichiers packagés du starter 5 |
 | `docs/starters/index.md` | Index et tableau de synthèse |
 | `docs/starters/communes-sejours/index.md` | Présentation du démonstrateur |
 | `docs/starters/communes-sejours/rebuild.md` | Créé dans ce ticket |
@@ -210,15 +210,15 @@ Les anciennes URL `starter-app-XX` correspondaient à la structure documentaire 
 
 ## Séparation framework / application métier
 
-Vérifications sur `core/` et `forge_cli/` (hors `starters/data/`) :
+Vérifications sur `core/` et `cli/` (hors `starters/data/`) :
 
 - **`core/`** : aucune référence à `communes_sejours`, `demande_sejour`, `hebergement` ou termes métier du starter 5
-- **`forge_cli/` hors `starters/`** : aucune référence métier du starter 5
-- Exception documentée : `forge_cli/i18n.py` contient `"sejour"` dans `_FORBIDDEN_KEY_TERMS` — c'est une *protection* qui empêche les clés i18n génériques d'utiliser des termes métier de starters
+- **`cli/` hors `starters/`** : aucune référence métier du starter 5
+- Exception documentée : `cli/i18n.py` contient `"sejour"` dans `_FORBIDDEN_KEY_TERMS` — c'est une *protection* qui empêche les clés i18n génériques d'utiliser des termes métier de starters
 
-Le contrôleur `communes_sejours_controller.py` packagé dans `forge_cli/starters/data/` :
+Le contrôleur `communes_sejours_controller.py` packagé dans `cli/starters/data/` :
 - importe exclusivement depuis `core.*` et `mvc.*` ;
-- n'importe pas depuis `forge_cli.*` ;
+- n'importe pas depuis `cli.*` ;
 - utilise `trans()` depuis `core.i18n`.
 
 ---
@@ -247,7 +247,7 @@ La formule "démonstrateur" est explicitement répétée dans le document.
 1. **5 starters disponibles** — tous avec `status: available`, numérotés 1 à 5.
 2. **Statuts documentaires cohérents** — Contacts/Carnet officiels, Auth modernisé, Suivi legacy, Communes & Séjours démonstrateur avancé.
 3. **Séparation core/métier garantie** — aucune logique Communes & Séjours dans `core/`.
-4. **i18n protégée** — `_FORBIDDEN_KEY_TERMS` dans `forge_cli/i18n.py` empêche les termes métier dans les clés génériques.
+4. **i18n protégée** — `_FORBIDDEN_KEY_TERMS` dans `cli/i18n.py` empêche les termes métier dans les clés génériques.
 5. **Starter 5 sans DB** — fonctionne immédiatement après `forge starter:build 5` sans `db:init`.
 6. **Suite de tests robuste** — 310 tests existants sur les starters (118 + 192), 67 tests ajoutés dans ce ticket.
 7. **doc_url corrigés** — les 5 starters pointent vers la structure MkDocs actuelle.

@@ -18,7 +18,7 @@ convention implicite.
 
 ## État du support HTMX
 
-La commande `forge js:init htmx` existe dans `forge_cli/front.py`.
+La commande `forge js:init htmx` existe dans `cli/front.py`.
 
 Comportement observé :
 

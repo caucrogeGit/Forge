@@ -25,10 +25,10 @@ Réaliser un inventaire ciblé des doublons d'API publique dans Forge.
 ```bash
 # Détection des patterns de dépréciation, alias, compatibilité
 grep -RInE '__all__|deprecated|DeprecationWarning|legacy|canonical|alias|compat|backward' \
-  core/ forge_cli/ packages/
+  core/ cli/ packages/
 
 # Inventaire des points d'entrée publics
-find core/ forge_cli/ packages/ -name "__init__.py" | sort
+find core/ cli/ packages/ -name "__init__.py" | sort
 cat core/auth/__init__.py
 cat core/security/session.py
 cat core/security/decorators.py
@@ -73,8 +73,8 @@ grep -nE 'command\s*==\s*["\x27]' forge.py
 
 ### Limites de l'audit
 
-- L'audit couvre `core/`, `forge_cli/`, `packages/` et la documentation publique.
-- Les starters (`forge_cli/starters/data/`) ne font pas partie de l'API publique Forge — ils ne sont pas audités comme API.
+- L'audit couvre `core/`, `cli/`, `packages/` et la documentation publique.
+- Les starters (`cli/starters/data/`) ne font pas partie de l'API publique Forge — ils ne sont pas audités comme API.
 - Les fonctions privées (préfixe `_`) ne sont pas dans le périmètre.
 - L'audit est statique — il ne simule pas de projets applicatifs externes.
 

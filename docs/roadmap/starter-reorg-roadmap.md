@@ -58,7 +58,7 @@ docs/starters/
     old/                          ← applications archivées
         carnet-contacts/  communes-sejours/  suivi-comportement-eleves/
 
-forge_cli/starters/data/          ← À PLAT (inchangé), un dossier = un starter buildable
+cli/starters/data/          ← À PLAT (inchangé), un dossier = un starter buildable
     welcome-optin-iot/  welcome-optin-mfa/  users-core-auth/
     first-crud/  first-crud-generated/  welcome/  query-params/  …
 ```
@@ -66,7 +66,7 @@ forge_cli/starters/data/          ← À PLAT (inchangé), un dossier = un start
 Règles :
 - **docs groupées par sujet** : dossier `<sujet>/`, fichier = id du starter, plus un
   `index.md` de sujet (vue d'ensemble + parcours des niveaux) ;
-- **data à plat** : `forge_cli/starters/data/<id>/` ; le `doc_url` pointe vers le chemin
+- **data à plat** : `cli/starters/data/<id>/` ; le `doc_url` pointe vers le chemin
   sujet (ex. `/starters/optin-iot/welcome-optin-iot/`) ;
 - **nav** : un groupe par sujet ; chaînage entre niveaux comme les paliers `welcome`.
 
@@ -110,7 +110,7 @@ tous les renommages.*
 - `git mv docs/starters/{carnet-contacts,communes-sejours,suivi-comportement-eleves}`
   → `docs/starters/old/<id>/` **+ relink** (les pages descendent d'un niveau :
   `../index.md` → `../../index.md`, etc.).
-- Supprimer `forge_cli/starters/data/<id>/` (sortie du registry / CLI / build).
+- Supprimer `cli/starters/data/<id>/` (sortie du registry / CLI / build).
 - [`docs/starters/index.md`](../starters/index.md) : retirer des tableaux et sections,
   recâbler la chaîne « prochain starter ».
 - `mkdocs.yml` : section nav « Anciennes applications (archive) » → `old/`.

@@ -42,7 +42,7 @@ def _write_relations(entities_root: Path) -> None:
 
 def test_ensure_file_cree_si_absent(tmp_path):
     """ensure_file crée le fichier s'il n'existe pas encore."""
-    from forge_cli.entities.make_entity import ensure_file
+    from cli.entities.make_entity import ensure_file
 
     path = tmp_path / "test.py"
     created: list[Path] = []
@@ -57,7 +57,7 @@ def test_ensure_file_cree_si_absent(tmp_path):
 
 def test_ensure_file_ne_crase_pas_existant(tmp_path):
     """ensure_file ne modifie pas le contenu d'un fichier déjà présent."""
-    from forge_cli.entities.make_entity import ensure_file
+    from cli.entities.make_entity import ensure_file
 
     path = tmp_path / "test.py"
     path.write_text("# code utilisateur\n", encoding="utf-8")
@@ -72,7 +72,7 @@ def test_ensure_file_ne_crase_pas_existant(tmp_path):
 
 def test_ensure_file_signale_skip_correctement(tmp_path):
     """ensure_file ajoute à skipped (non à created) si le fichier existe."""
-    from forge_cli.entities.make_entity import ensure_file
+    from cli.entities.make_entity import ensure_file
 
     path = tmp_path / "already.py"
     path.write_text("# existant\n", encoding="utf-8")
@@ -92,7 +92,7 @@ def test_scenario_integration_sync_preserve_manuel(tmp_path):
     Le fichier .py manuel doit être préservé avec son contenu utilisateur intact.
     Les fichiers _base.py et .sql sont régénérés.
     """
-    from forge_cli.entities.model import build_model
+    from cli.entities.model import build_model
 
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _contact_json())
@@ -121,7 +121,7 @@ def test_scenario_integration_sync_preserve_manuel(tmp_path):
 
 def test_scenario_base_py_regenere_apres_sync(tmp_path):
     """_base.py est régénéré à chaque sync — son contenu est mis à jour."""
-    from forge_cli.entities.model import build_model
+    from cli.entities.model import build_model
 
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _contact_json())
@@ -138,7 +138,7 @@ def test_scenario_base_py_regenere_apres_sync(tmp_path):
 
 def test_scenario_sql_regenere_apres_sync(tmp_path):
     """contact.sql est régénéré à chaque sync — son contenu est mis à jour."""
-    from forge_cli.entities.model import build_model
+    from cli.entities.model import build_model
 
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _contact_json())
@@ -155,7 +155,7 @@ def test_scenario_sql_regenere_apres_sync(tmp_path):
 
 def test_scenario_init_preserve_apres_sync(tmp_path):
     """__init__.py manuel est préservé après re-synchronisation."""
-    from forge_cli.entities.model import build_model
+    from cli.entities.model import build_model
 
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _contact_json())
@@ -173,7 +173,7 @@ def test_scenario_init_preserve_apres_sync(tmp_path):
 
 def test_scenario_aucune_suppression_silencieuse(tmp_path):
     """Aucun fichier existant n'est supprimé silencieusement lors d'une sync."""
-    from forge_cli.entities.model import build_model
+    from cli.entities.model import build_model
 
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "contact", _contact_json())
@@ -202,7 +202,7 @@ def _make_crud_entity(tmp_path: Path) -> Path:
 
 def test_make_crud_preserve_controller_existant(tmp_path):
     """make_crud ne réécrit pas un contrôleur déjà personnalisé."""
-    from forge_cli.entities.make_crud import make_crud
+    from cli.entities.make_crud import make_crud
 
     entities_root = _make_crud_entity(tmp_path)
     ctrl = tmp_path / "mvc" / "controllers" / "contact_controller.py"
@@ -217,7 +217,7 @@ def test_make_crud_preserve_controller_existant(tmp_path):
 
 def test_make_crud_preserve_form_existant(tmp_path):
     """make_crud ne réécrit pas un formulaire déjà personnalisé."""
-    from forge_cli.entities.make_crud import make_crud
+    from cli.entities.make_crud import make_crud
 
     entities_root = _make_crud_entity(tmp_path)
     form = tmp_path / "mvc" / "forms" / "contact_form.py"

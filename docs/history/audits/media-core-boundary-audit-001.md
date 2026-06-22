@@ -18,9 +18,9 @@ Commandes exécutées :
 ls core/uploads/
 wc -l core/uploads/*.py
 grep -n "from core.database\|import database\|core\.database" core/uploads/*.py
-grep -n "from core.uploads\|import core.uploads" forge_cli/entities/crud/controller_builder.py
-grep -n "from core.uploads\|import core.uploads" forge_cli/public_list.py
-grep -rn "media_repository\|media_gallery" forge_cli/
+grep -n "from core.uploads\|import core.uploads" cli/entities/crud/controller_builder.py
+grep -n "from core.uploads\|import core.uploads" cli/public_list.py
+grep -rn "media_repository\|media_gallery" cli/
 grep -rn "from core.uploads" tests/ | wc -l
 cat core/uploads/media_repository.py
 cat core/uploads/media_gallery.py
@@ -70,7 +70,7 @@ est défini dans `mvc/entities/media/media.sql`.
 | `mvc/entities/media/media.sql` | OPTIN_MEDIA — définit la table `media` avec `EntityName`, `EntityId` |
 | `mvc/entities/media/media_base.py` | OPTIN_MEDIA — classe générée par le générateur d'entités |
 | `mvc/entities/media/media.py` | OPTIN_MEDIA — classe applicative héritant de MediaBase |
-| `forge_cli/uploads.py` | CORE_GÉNÉRIQUE — commandes `upload:init` et `media:init`, pas de SQL |
+| `cli/uploads.py` | CORE_GÉNÉRIQUE — commandes `upload:init` et `media:init`, pas de SQL |
 
 ---
 
@@ -153,7 +153,7 @@ définis par `media_repository` — son déplacement avec la gallerie est cohér
 Deux générateurs CLI produisent du code qui importe des fonctions opt-in depuis
 `core.uploads`. Ils devront être mis à jour lors de l'extraction (ticket 11.4).
 
-### `forge_cli/entities/crud/controller_builder.py`
+### `cli/entities/crud/controller_builder.py`
 
 Ligne ~98 (template `--media`) :
 
@@ -170,7 +170,7 @@ Après extraction, les fonctions `attach_media_to_entity`, `delete_media`,
 `update_media_position` viendront de `forge_mvc_media.uploads` (ou équivalent).
 `save_upload` restera dans `core.uploads`.
 
-### `forge_cli/public_list.py`
+### `cli/public_list.py`
 
 Génère des lignes comme :
 

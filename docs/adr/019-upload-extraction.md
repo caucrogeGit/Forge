@@ -49,10 +49,10 @@ façon officielle »).
   `validate_upload_metadata`, `SavedUpload`, `storage`) → dépendra de
   `forge-mvc-files` (**inversion de dépendance**).
 - **Générateurs** `make:crud` / pages publiques :
-  `forge_cli/entities/crud/controller_builder.py` émet
+  `cli/entities/crud/controller_builder.py` émet
   `from core.uploads import save_upload` (fichiers documents).
-- `forge_cli/uploads.py` (`init_upload_storage`) et `forge_cli/help_dispatch.py`.
-- Starter `forge_cli/starters/data/file-upload/…` (contrôleur d'exemple).
+- `cli/uploads.py` (`init_upload_storage`) et `cli/help_dispatch.py`.
+- Starter `cli/starters/data/file-upload/…` (contrôleur d'exemple).
 - **~34 fichiers de tests** importent `core.uploads`.
 - Docs : `docs/reference/api.md`, `reference.md`, `reference-schema.md`,
   `features/media.md`, `deployment/production-limits.md`,
@@ -137,7 +137,7 @@ depuis `forge_mvc_files`.
 4. `FILES-IMAGES-REPOINT-001` — `forge-mvc-images` dépend de `forge-mvc-files`
    (imports `core.uploads` → `forge_mvc_files`).
 5. `FILES-CLI-RENAME-001` — générateurs `make:crud`/pages publiques +
-   `forge_cli/uploads.py` + starter `file-upload` → `forge_mvc_files`.
+   `cli/uploads.py` + starter `file-upload` → `forge_mvc_files`.
 6. `FILES-DOCS-PERIMETER-001` — docs (`api.md`, `production-*`, `security.md`,
    `file-upload.md`…), **ADR-004 et CLAUDE.md §3** (mainteneur).
 7. `CORE-DROP-UPLOADS-001` — suppression de `core/uploads/`, inversion des

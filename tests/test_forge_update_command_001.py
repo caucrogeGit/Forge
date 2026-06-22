@@ -10,7 +10,7 @@ Contrat public de la commande `forge update` :
 - détection pipx : si `sys.executable` est sous `pipx/venvs/`,
   n'appelle pas `subprocess.run` mais affiche `pipx upgrade forge-mvc` ;
 - échec pip → exit code propagé non nul ;
-- `forge_cli/help.py` mentionne la commande ;
+- `cli/help.py` mentionne la commande ;
 - `HELP_TEXTS_RICH["update"]` existe et couvre les modes/options.
 
 Le test mock `subprocess.run` et `sys.executable` — aucun pip réel
@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import sys
 
-from forge_cli import update as update_module
-from forge_cli.help import _HELP_TEMPLATE as HELP_TEMPLATE
-from forge_cli.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH, format_command_help
+from cli import update as update_module
+from cli.help import _HELP_TEMPLATE as HELP_TEMPLATE
+from cli.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH, format_command_help
 
 
 # ── Aide CLI : le dispatcher reconnaît `update` ───────────────────────────────

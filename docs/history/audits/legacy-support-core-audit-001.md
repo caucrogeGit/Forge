@@ -3,7 +3,7 @@
 **Ticket** : LEGACY-POLICY-001
 **Date** : 2026-05-19
 **Auteur** : Forge (audit post-migration starters)
-**Périmètre** : `forge_cli/entities/`, `forge_cli/starters/`, `tests/`, code runtime
+**Périmètre** : `cli/entities/`, `cli/starters/`, `tests/`, code runtime
 
 ---
 
@@ -37,16 +37,16 @@ dans le core Forge n'est plus nécessaire pour les starters, mais reste présent
 ## 3. Méthode d'audit
 
 ```bash
-grep -RInE 'format_version' forge_cli core 2>/dev/null
+grep -RInE 'format_version' cli core 2>/dev/null
 grep -RInl 'format_version.*1|validate_entity_definition|normalize_entity_definition' tests/
-grep -RInE 'format_version|sql_type|python_type|...' forge_cli/starters/data 2>/dev/null
+grep -RInE 'format_version|sql_type|python_type|...' cli/starters/data 2>/dev/null
 ```
 
 ---
 
 ## 4. Chemins legacy détectés dans le core
 
-### 4.1 `forge_cli/entities/validation.py` — normaliseur legacy central
+### 4.1 `cli/entities/validation.py` — normaliseur legacy central
 
 **Rôle** : valide et normalise les entités en format legacy (format_version: 1).
 
@@ -68,7 +68,7 @@ le format interne de tout le pipeline de génération.
 
 ---
 
-### 4.2 `forge_cli/entities/canonical_model_normalizer.py` — pont canonique→legacy
+### 4.2 `cli/entities/canonical_model_normalizer.py` — pont canonique→legacy
 
 **Rôle** : convertit les entités canoniques (`schema_version: "1.0"`) vers le format interne legacy.
 
@@ -83,7 +83,7 @@ C'est grâce à ce pont que les entités canoniques fonctionnent dans le pipelin
 
 ---
 
-### 4.3 `forge_cli/entities/model.py` — `build:model`
+### 4.3 `cli/entities/model.py` — `build:model`
 
 Lignes 86-87 et 334-335 : détection canonique → appel au pont.
 
@@ -99,7 +99,7 @@ Après la détection, le reste du pipeline traite uniquement le format interne l
 
 ---
 
-### 4.4 `forge_cli/entities/make_entity.py` — générateur SQL
+### 4.4 `cli/entities/make_entity.py` — générateur SQL
 
 Lignes 364-382 : utilise `field["column"]`, `field["sql_type"]`, `field["primary_key"]`,
 `field["auto_increment"]` — clés du format interne legacy.
@@ -112,7 +112,7 @@ Ligne 68, 249, 325 : crée les **nouvelles** entités en format canonique
 
 ---
 
-### 4.5 `forge_cli/entities/relations.py` — validateur de relations
+### 4.5 `cli/entities/relations.py` — validateur de relations
 
 Ligne 159 : détection canonique → pont.
 Ligne 207 : dispatch `from/to` (canonique) vs `from_entity/to_entity` (legacy).
@@ -126,7 +126,7 @@ La structure interne `ValidatedRelation` conserve les champs `from_entity`, `to_
 
 ---
 
-### 4.6 `forge_cli/entities/make_crud.py` — générateur CRUD
+### 4.6 `cli/entities/make_crud.py` — générateur CRUD
 
 Lignes 170-171 : même pattern de détection canonique → pont.
 
@@ -135,7 +135,7 @@ Lignes 170-171 : même pattern de détection canonique → pont.
 
 ---
 
-### 4.7 `forge_cli/starters/relations.py` — `drop_foreign_keys()`
+### 4.7 `cli/starters/relations.py` — `drop_foreign_keys()`
 
 Lignes 41-42 :
 ```python
@@ -157,7 +157,7 @@ plus pour les starters canoniques. Impact limité car :
 
 ---
 
-### 4.8 `forge_cli/starters/scaffold.py` — détection relations vides
+### 4.8 `cli/starters/scaffold.py` — détection relations vides
 
 Ligne 39 :
 ```python
@@ -173,7 +173,7 @@ Détecte si un fichier `relations.json` est le template legacy vide (pour savoir
 
 ---
 
-### 4.9 `forge_cli/entities/make_relation.py` — `make:relation`
+### 4.9 `cli/entities/make_relation.py` — `make:relation`
 
 Ligne 135 :
 ```python

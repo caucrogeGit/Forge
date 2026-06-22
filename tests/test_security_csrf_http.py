@@ -606,13 +606,13 @@ class TestCsrfFormulairesGeneres:
 
     def test_views_builder_new_contient_csrf_token(self):
         """La vue 'new' générée par views_builder contient un champ csrf_token caché."""
-        source = (ROOT / "forge_cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         assert 'name="csrf_token"' in text
 
     def test_views_builder_edit_contient_csrf_token(self):
         """La vue 'edit' générée par views_builder contient un champ csrf_token caché."""
-        source = (ROOT / "forge_cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         # Plusieurs occurrences — au moins deux (new + edit)
         occurrences = text.count('name="csrf_token"')
@@ -622,7 +622,7 @@ class TestCsrfFormulairesGeneres:
 
     def test_views_builder_delete_contient_csrf_token(self):
         """La vue de suppression générée contient un champ csrf_token."""
-        source = (ROOT / "forge_cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         # Au moins 3 occurrences (new, edit, delete)
         occurrences = text.count('name="csrf_token"')
@@ -632,19 +632,19 @@ class TestCsrfFormulairesGeneres:
 
     def test_views_builder_csrf_value_templated(self):
         """Le token est injecté via {{ csrf_token }} (valeur dynamique, pas hardcodée)."""
-        source = (ROOT / "forge_cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         assert 'value="{{ csrf_token }}"' in text
 
     def test_public_form_contient_csrf_token(self):
-        """forge_cli/public_form.py génère un champ csrf_token dans les formulaires publics."""
-        source = (ROOT / "forge_cli" / "public_form.py")
+        """cli/public_form.py génère un champ csrf_token dans les formulaires publics."""
+        source = (ROOT / "cli" / "public_form.py")
         text = source.read_text(encoding="utf-8")
         assert 'name="csrf_token"' in text
 
     def test_views_builder_csrf_input_hidden(self):
         """Le champ csrf_token est de type hidden."""
-        source = (ROOT / "forge_cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         # Recherche le pattern complet input type hidden avec csrf_token
         assert re.search(r'type="hidden"[^>]*name="csrf_token"'
@@ -653,7 +653,7 @@ class TestCsrfFormulairesGeneres:
 
     def test_starter_communes_sejours_vues_csrf(self):
         """Le starter Communes & Séjours contient des champs csrf_token dans ses vues."""
-        starter_dir = ROOT / "forge_cli" / "starters" / "data" / "communes-sejours" / "files"
+        starter_dir = ROOT / "cli" / "starters" / "data" / "communes-sejours" / "files"
         if not starter_dir.exists():
             pytest.skip("Starter Communes & Séjours absent")
         views = list(starter_dir.rglob("*.html"))

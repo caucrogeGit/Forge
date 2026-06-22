@@ -86,12 +86,12 @@ def test_find_packages_couvre_tous_les_sous_packages_core():
     assert not missing, f"Packages manquants dans le packaging : {missing}"
 
 
-def test_find_packages_couvre_forge_cli_et_integrations():
+def test_find_packages_couvre_cli_et_integrations():
     data = _load_pyproject()
     patterns = data["tool"]["setuptools"]["packages"]["find"]["include"]
     found = _simulate_find_packages(patterns)
 
-    for pkg in ("forge_cli", "forge_cli.entities", "integrations", "integrations.jinja2"):
+    for pkg in ("cli", "cli.entities", "integrations", "integrations.jinja2"):
         assert pkg in found, f"{pkg} absent du packaging."
 
 
@@ -103,8 +103,8 @@ def test_package_data_inclut_le_squelette():
     # (motifs dotfiles inclus pour .gitignore et .gitkeep).
     # ADR-035 : plus de starters/data (génération de starters retirée).
     for pattern in ("skeleton/data/**/*", "skeleton/data/**/.*", "skeleton/data/.*"):
-        assert pattern in package_data["forge_cli"], (
-            f"package-data forge_cli doit inclure {pattern} (squelette)."
+        assert pattern in package_data["cli"], (
+            f"package-data cli doit inclure {pattern} (squelette)."
         )
 
 

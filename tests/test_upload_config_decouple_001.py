@@ -21,7 +21,7 @@ _MOVED_KEYS = {
     "upload_max_image_pixels",
 }
 
-_SKELETON = __import__("pathlib").Path(__file__).parent.parent / "forge_cli" / "skeleton" / "data"
+_SKELETON = __import__("pathlib").Path(__file__).parent.parent / "cli" / "skeleton" / "data"
 
 
 @pytest.mark.parametrize("key", sorted(_MOVED_KEYS))

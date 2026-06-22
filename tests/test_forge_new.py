@@ -210,14 +210,14 @@ def test_cmd_new_sans_parametre_ref():
 
 
 def test_materialize_skeleton_copie_le_squelette(monkeypatch, tmp_path):
-    """_materialize_skeleton délègue à forge_cli.skeleton.materialize."""
+    """_materialize_skeleton délègue à cli.skeleton.materialize."""
     called = {}
 
     def spy_materialize(dest):
         called["dest"] = dest
         os.makedirs(dest, exist_ok=True)
 
-    import forge_cli.skeleton as skeleton
+    import cli.skeleton as skeleton
     monkeypatch.setattr(skeleton, "materialize", spy_materialize)
     forge._materialize_skeleton(str(tmp_path / "proj"))
     assert called["dest"].endswith("proj")
@@ -271,7 +271,7 @@ def test_dispatch_new_sans_ref(monkeypatch, tmp_path):
 
 def test_aide_new_ne_mentionne_plus_ref():
     """L'aide de forge new ne propose plus --ref (flag retiré avec le clone)."""
-    from forge_cli.help_dispatch import HELP_TEXTS_RICH
+    from cli.help_dispatch import HELP_TEXTS_RICH
 
     assert "--ref" not in HELP_TEXTS_RICH["new"]
 
@@ -456,6 +456,6 @@ def test_apply_starter_helper_supprime():
 
 def test_aide_new_ne_mentionne_plus_starter():
     """L'aide de forge new ne propose plus --starter."""
-    from forge_cli.help_dispatch import HELP_TEXTS_RICH
+    from cli.help_dispatch import HELP_TEXTS_RICH
 
     assert "--starter" not in HELP_TEXTS_RICH["new"]

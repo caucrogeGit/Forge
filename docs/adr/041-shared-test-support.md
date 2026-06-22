@@ -33,7 +33,7 @@ inclus :
 Déplacés tels quels dans un paquet, ces tests perdent l'accès à ces fixtures
 (`conftest.py` racine ne s'applique qu'au sous-arbre `tests/`) et échouent en
 masse (« fixture not found »). Tentative mesurée : 100 échecs. Le filtre
-« n'importe pas `forge_cli`/`mvc` » est donc insuffisant : le vrai couplage est
+« n'importe pas `cli`/`mvc` » est donc insuffisant : le vrai couplage est
 l'infrastructure de test, pas le code applicatif.
 
 Incident à noter : `tests/conftest.py` mentionne `forge_mvc_workflow` et a été

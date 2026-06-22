@@ -10,7 +10,7 @@ Auditer la cohérence globale de la CLI Forge après CONSOLIDATION-001. Vérifie
 
 **Verdict : la CLI Forge est cohérente et exploitable.**
 
-59 commandes disponibles, toutes organisées selon une convention de nommage uniforme (`namespace:action`). Le dispatcher central dans `forge.py` délègue proprement vers les sous-modules `forge_cli.*`. Les commandes récentes (`auth:user:role:*`, `module:*`, `forge new --profile`) respectent intégralement les conventions établies.
+59 commandes disponibles, toutes organisées selon une convention de nommage uniforme (`namespace:action`). Le dispatcher central dans `forge.py` délègue proprement vers les sous-modules `cli.*`. Les commandes récentes (`auth:user:role:*`, `module:*`, `forge new --profile`) respectent intégralement les conventions établies.
 
 Quatre incohérences mineures sont identifiées (style des messages d'aide, alias non documenté, nommage `build:model` / `check:model`). Aucune n'est bloquante.
 
@@ -23,23 +23,23 @@ Quatre incohérences mineures sont identifiées (style des messages d'aide, alia
 | Famille | Commandes | Fichier délégué |
 |---------|-----------|-----------------|
 | Projet | `new`, `doctor`, `help`, `--version` | `forge.py` (inline) |
-| Entités | `make:entity`, `make:crud`, `make:relation`, `sync:entity`, `sync:relations`, `sync:landing` | `forge_cli/entities/` |
-| Modèles | `build:model`, `check:model` | `forge_cli/entities/model.py` |
-| Pages publiques | `make:public-page`, `make:public-list`, `make:public-show`, `make:public-form`, `make:public-contact` | `forge_cli/public_*.py` |
-| Front | `js:init` (htmx / alpine / htmx-alpine) | `forge_cli/front.py` |
-| i18n | `i18n:init`, `i18n:check` | `forge_cli/i18n.py` |
-| Auth | `auth:init`, `auth:doctor`, `auth:status`, `auth:list-sql` | `forge_cli/auth.py` |
-| Auth/User | `auth:user:create`, `auth:user:list`, `auth:user:show`, `auth:user:disable`, `auth:user:enable`, `auth:user:password` | `forge_cli/auth.py` |
-| Auth/RBAC | `auth:user:role:add`, `auth:user:role:remove`, `auth:user:roles` | `forge_cli/auth.py` |
-| Mail | `mail:init`, `mail:test`, `mail:render`, `mail:doctor`, `mail:logs` | `forge_cli/mail.py` |
-| Modules | `module:list`, `module:install`, `module:files`, `module:routes` | `forge_cli/modules.py` |
-| Starters | `starter:list`, `starter:build` | `forge_cli/starters/__init__.py` |
-| Déploiement | `deploy:init`, `deploy:check` | `forge_cli/deploy.py` |
-| Database | `db:init`, `db:apply` | `forge_cli/entities/db_init.py`, `db_apply.py` |
-| Migrations | `migration:status`, `migration:apply`, `migration:make`, `migration:diff` | `forge_cli/entities/migrations.py` |
-| Uploads / médias | `upload:init`, `media:init` | `forge_cli/uploads.py` |
+| Entités | `make:entity`, `make:crud`, `make:relation`, `sync:entity`, `sync:relations`, `sync:landing` | `cli/entities/` |
+| Modèles | `build:model`, `check:model` | `cli/entities/model.py` |
+| Pages publiques | `make:public-page`, `make:public-list`, `make:public-show`, `make:public-form`, `make:public-contact` | `cli/public_*.py` |
+| Front | `js:init` (htmx / alpine / htmx-alpine) | `cli/front.py` |
+| i18n | `i18n:init`, `i18n:check` | `cli/i18n.py` |
+| Auth | `auth:init`, `auth:doctor`, `auth:status`, `auth:list-sql` | `cli/auth.py` |
+| Auth/User | `auth:user:create`, `auth:user:list`, `auth:user:show`, `auth:user:disable`, `auth:user:enable`, `auth:user:password` | `cli/auth.py` |
+| Auth/RBAC | `auth:user:role:add`, `auth:user:role:remove`, `auth:user:roles` | `cli/auth.py` |
+| Mail | `mail:init`, `mail:test`, `mail:render`, `mail:doctor`, `mail:logs` | `cli/mail.py` |
+| Modules | `module:list`, `module:install`, `module:files`, `module:routes` | `cli/modules.py` |
+| Starters | `starter:list`, `starter:build` | `cli/starters/__init__.py` |
+| Déploiement | `deploy:init`, `deploy:check` | `cli/deploy.py` |
+| Database | `db:init`, `db:apply` | `cli/entities/db_init.py`, `db_apply.py` |
+| Migrations | `migration:status`, `migration:apply`, `migration:make`, `migration:diff` | `cli/entities/migrations.py` |
+| Uploads / médias | `upload:init`, `media:init` | `cli/uploads.py` |
 | Routes | `routes:list` | `forge.py` (inline) |
-| Docs | `docs:pdf` | `forge_cli/docs/` |
+| Docs | `docs:pdf` | `cli/docs/` |
 
 ---
 
@@ -161,7 +161,7 @@ Message clair avec liste des valeurs valides. ✅
 
 ## Commandes Auth
 
-**13 commandes `auth:*`, toutes dans `forge_cli/auth.py` (1134 lignes).**
+**13 commandes `auth:*`, toutes dans `cli/auth.py` (1134 lignes).**
 
 Structure interne : dispatcher à 14 conditions `if command ==` dans `auth_main(argv)`.
 
@@ -189,7 +189,7 @@ Structure interne : dispatcher à 14 conditions `if command ==` dans `auth_main(
 
 ## Commandes Starters
 
-**2 commandes `starter:*`, dans `forge_cli/starters/__init__.py`.**
+**2 commandes `starter:*`, dans `cli/starters/__init__.py`.**
 
 | Commande | Présente | Validée | Aide |
 |----------|----------|---------|------|
@@ -202,7 +202,7 @@ Structure interne : dispatcher à 14 conditions `if command ==` dans `auth_main(
 
 ## Commandes Modules
 
-**4 commandes `module:*`, dans `forge_cli/modules.py` (214 lignes).**
+**4 commandes `module:*`, dans `cli/modules.py` (214 lignes).**
 
 | Commande | Présente | Validée | Aide |
 |----------|----------|---------|------|
@@ -236,7 +236,7 @@ forge new MonProjet --profile multilingual
 
 ## Commandes Migrations / DB
 
-**6 commandes `migration:*` et `db:*`, dans `forge_cli/entities/migrations.py`.**
+**6 commandes `migration:*` et `db:*`, dans `cli/entities/migrations.py`.**
 
 | Commande | Présente | Aide |
 |----------|----------|------|
@@ -269,7 +269,7 @@ Cohérence satisfaisante. `db:*` et `migration:*` sont deux namespaces distincts
 
 ## Commandes Déploiement
 
-**2 commandes `deploy:*`, dans `forge_cli/deploy.py`.**
+**2 commandes `deploy:*`, dans `cli/deploy.py`.**
 
 | Commande | Présente | Aide |
 |----------|----------|------|

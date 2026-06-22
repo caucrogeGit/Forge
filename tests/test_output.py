@@ -1,6 +1,6 @@
-"""Tests pour forge_cli.output — formatage des tags CLI."""
+"""Tests pour cli.output — formatage des tags CLI."""
 
-from forge_cli.output import (
+from cli.output import (
     created,
     dry_run,
     error,

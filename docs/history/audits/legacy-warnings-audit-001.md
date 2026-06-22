@@ -3,7 +3,7 @@
 **Ticket** : LEGACY-WARNINGS-001-AUDIT-LEGACY-WARNINGS
 **Date** : 2026-05-19
 **Auteur** : Forge (audit pré-implémentation)
-**Périmètre** : `forge_cli/entities/`, `forge_cli/starters/`, `tests/`
+**Périmètre** : `cli/entities/`, `cli/starters/`, `tests/`
 
 ---
 
@@ -40,23 +40,23 @@ fichier `format_version: 1` ?
 Fichiers audités directement :
 
 ```
-forge_cli/entities/model.py
-forge_cli/entities/relations.py
-forge_cli/entities/make_crud.py
-forge_cli/entities/make_entity.py
-forge_cli/entities/make_relation.py
-forge_cli/entities/migrations.py
-forge_cli/entities/validation.py
-forge_cli/entities/entity_validate.py
-forge_cli/starters/builder.py
-forge_cli/starters/scaffold.py
-forge_cli/output.py
+cli/entities/model.py
+cli/entities/relations.py
+cli/entities/make_crud.py
+cli/entities/make_entity.py
+cli/entities/make_relation.py
+cli/entities/migrations.py
+cli/entities/validation.py
+cli/entities/entity_validate.py
+cli/starters/builder.py
+cli/starters/scaffold.py
+cli/output.py
 ```
 
 Commande grep :
 
 ```bash
-grep -RInE 'format_version|legacy|canonical_model_normalizer|schema_version' forge_cli/
+grep -RInE 'format_version|legacy|canonical_model_normalizer|schema_version' cli/
 ```
 
 Comptage des tests utilisant `format_version` :
@@ -70,7 +70,7 @@ find tests/ -name "*.py" | xargs grep -l 'format_version' | wc -l
 
 ## 4. Chemins legacy concernés
 
-### 4.1 `forge_cli/entities/model.py` — `build_model()` et `_load_entity_sources()`
+### 4.1 `cli/entities/model.py` — `build_model()` et `_load_entity_sources()`
 
 **Commande** : `build:model`
 
@@ -95,7 +95,7 @@ directement à `validate_entity_definition()`.
 
 ---
 
-### 4.2 `forge_cli/entities/relations.py` — `_load_relation_sources()`
+### 4.2 `cli/entities/relations.py` — `_load_relation_sources()`
 
 **Commande** : `build:model` (via la boucle des fichiers `relations.json`)
 
@@ -118,7 +118,7 @@ relations sont dans le fichier.
 
 ---
 
-### 4.3 `forge_cli/entities/make_crud.py` — `make_crud()`
+### 4.3 `cli/entities/make_crud.py` — `make_crud()`
 
 **Commande** : `make:crud`
 
@@ -139,7 +139,7 @@ CRUD peuvent déjà être nombreux (formulaire vide, etc.).
 
 ---
 
-### 4.4 `forge_cli/entities/migrations.py` — `_load_entity_for_migration()`
+### 4.4 `cli/entities/migrations.py` — `_load_entity_for_migration()`
 
 **Commandes** : `migration:diff`, `migration:make --from-diff`
 
@@ -157,7 +157,7 @@ inattendu peut bruiter les logs de migration.
 
 ---
 
-### 4.5 `forge_cli/entities/make_relation.py` — `_load_relations_json()`
+### 4.5 `cli/entities/make_relation.py` — `_load_relations_json()`
 
 **Commande** : `make:relation`
 
@@ -177,7 +177,7 @@ présent et `schema_version` absent.
 
 ---
 
-### 4.6 `forge_cli/entities/entity_validate.py` — `collect_entity_validation_results()`
+### 4.6 `cli/entities/entity_validate.py` — `collect_entity_validation_results()`
 
 **Commande** : `entity:validate`
 
@@ -344,7 +344,7 @@ entité `format_version: 1` est chargée.
 Mécanisme : `BuildModelResult.legacy_warnings` (liste de messages), affiché via `out.warn()`
 dans `main()` uniquement pour la commande `build:model`.
 
-Fichiers modifiés : `forge_cli/entities/model.py` (champ `is_legacy` sur `EntitySource`,
+Fichiers modifiés : `cli/entities/model.py` (champ `is_legacy` sur `EntitySource`,
 champ `legacy_warnings` sur `BuildModelResult`, collecte dans `build_model()`, affichage
 dans `main()`).
 

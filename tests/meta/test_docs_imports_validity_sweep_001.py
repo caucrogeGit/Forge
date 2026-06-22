@@ -18,7 +18,7 @@ Classification
 --------------
 Trois familles de modules sont distinguées :
 
-  * **Framework** — ``core.*``, ``forge_mvc_*``, ``forge_cli.*``. Tout
+  * **Framework** — ``core.*``, ``forge_mvc_*``, ``cli.*``. Tout
     import est résolu via ``importlib`` ; chaque symbole importé doit
     exister sur le module. Une faute ici échoue le test.
 
@@ -95,7 +95,7 @@ _FRAMEWORK_ROOTS = frozenset({
     "forge_mvc_mail",
     # forge-mvc-i18n : i18n extrait du core (ADR-027).
     "forge_mvc_i18n",
-    "forge_cli",
+    "cli",
     # `integrations/` est dans le repo Forge (Jinja2 renderer, etc.).
     "integrations",
     # `tests.fake_request` et autres helpers de test sont publiés comme

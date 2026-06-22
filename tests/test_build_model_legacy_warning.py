@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.model import BuildModelResult, ModelValidationError, build_model, check_model
+from cli.entities.model import BuildModelResult, ModelValidationError, build_model, check_model
 
 _LEGACY_RELATIONS = {"format_version": 1, "relations": []}
 _CANONICAL_RELATIONS = {"schema_version": "1.0", "relations": []}

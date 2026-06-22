@@ -3,7 +3,7 @@
 **Ticket** : LEGACY-REMOVE-PLAN-001-ACCELERATED-LEGACY-REMOVAL-PLAN
 **Date** : 2026-05-19
 **Auteur** : Forge (audit de suppression)
-**Périmètre** : `forge_cli/entities/`, `forge_cli/starters/`, `tests/`, `docs/`
+**Périmètre** : `cli/entities/`, `cli/starters/`, `tests/`, `docs/`
 
 ---
 
@@ -40,7 +40,7 @@ Le présent ticket est un plan. Aucune suppression n'est effectuée ici.
 ```bash
 grep -RInE 'format_version|sql_type|python_type|primary_key|auto_increment|\
 from_entity|to_entity|foreign_key_name|pivot_table|source_key|target_key|legacy' \
-  forge_cli/ tests/ docs/ 2>/dev/null
+  cli/ tests/ docs/ 2>/dev/null
 
 python forge.py schema:list
 python forge.py schema:doctor
@@ -60,7 +60,7 @@ Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
 
 ## 4. Chemins legacy restants dans le core
 
-### 4.1 `forge_cli/entities/validation.py`
+### 4.1 `cli/entities/validation.py`
 
 **Zone legacy** : entrée principale du format `format_version: 1`.
 
@@ -71,7 +71,7 @@ Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
 | 410 | `format_version` dans le dict normalisé retourné | Propagation legacy interne | LEGACY-REMOVE-001 : supprimer |
 | 509–510 | Vérification `format_version == 1` | Double entrée | LEGACY-REMOVE-001 : supprimer |
 
-### 4.2 `forge_cli/entities/model.py`
+### 4.2 `cli/entities/model.py`
 
 **Zone legacy** : détection, normalisation et warning legacy dans `build:model`.
 
@@ -82,7 +82,7 @@ Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
 | 115–120 | Génération des warnings legacy | Message dépréciation | LEGACY-REMOVE-001 : supprimer |
 | 346–356 | Branche `is_legacy` : normalisation canonique→interne | Chemin de compatibilité | LEGACY-REMOVE-001 : remplacer par erreur si `format_version` détecté |
 
-### 4.3 `forge_cli/entities/relations.py`
+### 4.3 `cli/entities/relations.py`
 
 **Zone legacy** : format legacy des relations (`format_version: 1`, `source`/`target`, `ValidatedManyToManyRelation`).
 
@@ -94,7 +94,7 @@ Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
 | 854 | `_validate_many_to_many()` | Validateur M2M legacy | LEGACY-REMOVE-002 : supprimer |
 | 174, 179 | Type hints incluant `ValidatedManyToManyRelation` | Propagation du type legacy | LEGACY-REMOVE-002 : simplifier |
 
-### 4.4 `forge_cli/entities/make_crud.py`
+### 4.4 `cli/entities/make_crud.py`
 
 **Zone legacy** : détection + warning dans `make:crud`.
 
@@ -102,7 +102,7 @@ Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
 |---|---|---|---|
 | 170–191 | Détection `is_legacy`, emission warning | Warning non bloquant | LEGACY-REMOVE-001 : remplacer par erreur bloquante |
 
-### 4.5 `forge_cli/entities/make_relation.py`
+### 4.5 `cli/entities/make_relation.py`
 
 **Zone legacy** : acceptation de `format_version` dans la racine relations.
 
@@ -110,7 +110,7 @@ Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
 |---|---|---|---|
 | 135–136 | Accepte `format_version` ou `schema_version` | Double entrée | LEGACY-REMOVE-002 : n'accepter que `schema_version: "1.0"` |
 
-### 4.6 `forge_cli/entities/crud/relations_loader.py`
+### 4.6 `cli/entities/crud/relations_loader.py`
 
 **Zone legacy** : branche `ValidatedManyToManyRelation` maintenue après CRUD-M2M-CANONICAL-001.
 
@@ -119,7 +119,7 @@ Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
 | Import | `ValidatedManyToManyRelation` importé | Type M2M legacy | LEGACY-REMOVE-002 : supprimer branche legacy |
 | ~113 | Branche `isinstance(relation, ValidatedManyToManyRelation)` | Normalisation legacy→canonique | LEGACY-REMOVE-002 : supprimer, ne garder que le canonique |
 
-### 4.7 `forge_cli/entities/migrations.py`
+### 4.7 `cli/entities/migrations.py`
 
 **Zone legacy** : lecture d'entités — vérification `schema_version == "1.0"`.
 
@@ -127,7 +127,7 @@ Résultat des commandes runtime : toutes passent (11 894 tests, 0 erreur).
 |---|---|---|---|
 | 351 | Branche `if schema_version == "1.0"` (implicitement, les autres sont legacy) | Chemin dual | LEGACY-REMOVE-001 : supprimer la branche non-canonique |
 
-### 4.8 `forge_cli/entities/canonical_model_normalizer.py` — NOTE
+### 4.8 `cli/entities/canonical_model_normalizer.py` — NOTE
 
 Ce fichier traduit les entités canoniques en représentation **interne** (avec `sql_type`,
 `python_type`, `primary_key`, `auto_increment`). Ce ne sont pas des clés du format
@@ -368,7 +368,7 @@ Purger les exemples legacy dans les tutoriels.
 
 ### LEGACY-CLOSE-001 — Clôture
 
-Grep de vérification zéro `format_version` dans `forge_cli/` (hors tests de rejet).
+Grep de vérification zéro `format_version` dans `cli/` (hors tests de rejet).
 Meta test de clôture (vérifie l'absence de format_version dans le core).
 Mise à jour `CHANGELOG.md`.
 
@@ -396,7 +396,7 @@ et un plan ticket par ticket.
 
 LEGACY-REMOVE-001A refuse les entités `format_version: 1` dans `build:model`.
 
-`forge_cli/entities/model.py` lève désormais une `ModelValidationError` si une entité JSON contient `format_version: 1`. Aucun SQL n'est généré pour cette entité. Le champ `is_legacy` sur `EntitySource` et la liste `legacy_warnings` sur `BuildModelResult` ont été supprimés.
+`cli/entities/model.py` lève désormais une `ModelValidationError` si une entité JSON contient `format_version: 1`. Aucun SQL n'est généré pour cette entité. Le champ `is_legacy` sur `EntitySource` et la liste `legacy_warnings` sur `BuildModelResult` ont été supprimés.
 
 `make:crud`, les relations legacy et les tests CRUD restent hors périmètre.
 
@@ -406,7 +406,7 @@ LEGACY-REMOVE-001A refuse les entités `format_version: 1` dans `build:model`.
 
 LEGACY-REMOVE-001B refuse les entités `format_version: 1` dans `make:crud`.
 
-`forge_cli/entities/make_crud.py` lève désormais `SystemExit(1)` avec un message explicite si une entité JSON contient `format_version: 1`. Aucun fichier CRUD n'est généré. Le warning legacy de `LEGACY-WARNINGS-004` a été retiré.
+`cli/entities/make_crud.py` lève désormais `SystemExit(1)` avec un message explicite si une entité JSON contient `format_version: 1`. Aucun fichier CRUD n'est généré. Le warning legacy de `LEGACY-WARNINGS-004` a été retiré.
 
 `build:model` a déjà été traité par LEGACY-REMOVE-001A.
 Les relations legacy restent hors périmètre et seront traitées dans LEGACY-REMOVE-002.
@@ -419,10 +419,10 @@ LEGACY-REMOVE-002 supprime le support du format `format_version: 1` dans les rel
 
 ### Fichiers modifiés (core)
 
-- **`forge_cli/entities/relations.py`** — suppression de `ValidatedManyToManyRelation`, des validateurs M2M legacy, de la génération SQL M2M legacy, et rejet explicite de `format_version` à la racine du document relations.
-- **`forge_cli/entities/crud/relations_loader.py`** — suppression de la branche `isinstance(relation, ValidatedManyToManyRelation)`.
-- **`forge_cli/entities/model.py`** — remplacement des type hints incluant `ValidatedManyToManyRelation`.
-- **`forge_cli/entities/make_relation.py`** — `_load_existing_relations_doc()` lève une erreur si `format_version` est détecté ; `_ensure_no_obvious_duplicates()` n'accepte plus les clés legacy.
+- **`cli/entities/relations.py`** — suppression de `ValidatedManyToManyRelation`, des validateurs M2M legacy, de la génération SQL M2M legacy, et rejet explicite de `format_version` à la racine du document relations.
+- **`cli/entities/crud/relations_loader.py`** — suppression de la branche `isinstance(relation, ValidatedManyToManyRelation)`.
+- **`cli/entities/model.py`** — remplacement des type hints incluant `ValidatedManyToManyRelation`.
+- **`cli/entities/make_relation.py`** — `_load_existing_relations_doc()` lève une erreur si `format_version` est détecté ; `_ensure_no_obvious_duplicates()` n'accepte plus les clés legacy.
 
 ### Fichiers de tests convertis
 
@@ -519,12 +519,12 @@ encore via le chemin interne de `validate_entity_definition` dans les deux pipel
 
 ### Changements apportés
 
-- **`forge_cli/entities/model.py`** — `_load_all_entity_sources` : après le refus
+- **`cli/entities/model.py`** — `_load_all_entity_sources` : après le refus
   `format_version: 1`, ajout d'un refus explicite pour les entités sans
   `schema_version: "1.0"`. Le message indique le fichier et pointe le guide de
   migration. La branche `else` (chemin interne) est supprimée — seul le format
   canonique est désormais accepté par `build:model` / `check:model`.
-- **`forge_cli/entities/make_crud.py`** — ajout d'un refus pour les entités sans
+- **`cli/entities/make_crud.py`** — ajout d'un refus pour les entités sans
   `schema_version: "1.0"` et sans clé `entity` (format inconnu). Les entités en
   format interne pré-normalisé (clé `entity` présente) restent acceptées pour
   la compatibilité des tests utilisant des structures internes directement.

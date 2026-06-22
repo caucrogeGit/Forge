@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities import migrations
+from cli.entities import migrations
 
 PROJECT_ROOT = Path(__file__).parent.parent
 
@@ -184,7 +184,7 @@ def test_migration_make_blank_not_guarded(tmp_path, monkeypatch):
 
 def test_entity_validate_detailed_after_013(tmp_path):
     """collect_entity_validation_results retourne les erreurs complètes."""
-    from forge_cli.entities.entity_validate import collect_entity_validation_results
+    from cli.entities.entity_validate import collect_entity_validation_results
     entities_root = _setup(tmp_path, _INVALID_ENTITY)
     results = collect_entity_validation_results(entities_root)
     if results is None:

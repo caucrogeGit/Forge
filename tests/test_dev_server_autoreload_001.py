@@ -1,6 +1,6 @@
 """Tests — DEV-SERVER-AUTORELOAD-001.
 
-Verrouille le contrat du superviseur `forge_cli.dev_reloader` :
+Verrouille le contrat du superviseur `cli.dev_reloader` :
 
   - détecte les modifications des fichiers pertinents (app.py, config.py,
     env/dev, mvc/**, core/**) ;
@@ -27,8 +27,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli import dev_reloader, run as run_module
-from forge_cli.dev_reloader import (
+from cli import dev_reloader, run as run_module
+from cli.dev_reloader import (
     DevReloader,
     DIRECTORIES_TO_WATCH,
     IGNORED_DIR_NAMES,
@@ -638,7 +638,7 @@ class TestForgeRunIntegration:
 
 class TestModulePresence:
     def test_module_existe(self):
-        assert (_REPO_ROOT / "forge_cli" / "dev_reloader.py").exists()
+        assert (_REPO_ROOT / "cli" / "dev_reloader.py").exists()
 
     def test_log_prefix_est_dev_reload(self):
         assert dev_reloader.LOG_PREFIX == "[DEV-RELOAD]"

@@ -16,7 +16,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-STARTERS = PROJECT_ROOT / "forge_cli" / "starters" / "data"
+STARTERS = PROJECT_ROOT / "cli" / "starters" / "data"
 
 # Les classes TestUsersCoreAuthReference, TestAuthMfaController et
 # TestMfaChallengeController ont été retirées : elles inspectaient les starters

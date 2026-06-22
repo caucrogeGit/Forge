@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.model import sync_entity
+from cli.entities.model import sync_entity
 
 
 def _write(path: Path, content: str) -> None:

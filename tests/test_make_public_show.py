@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from forge_cli.public_list import (
+from cli.public_list import (
     build_public_list_spec,
     build_public_show_controller,
     build_public_show_template,
@@ -10,7 +10,7 @@ from forge_cli.public_list import (
     make_public_list,
     make_public_show,
 )
-from forge_cli.public_show import main
+from cli.public_show import main
 from tests.test_make_public_list import HEBERGEMENT_JSON, _prepare_project, _read
 
 

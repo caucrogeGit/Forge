@@ -40,9 +40,9 @@ class TestMailRemovedFromCore:
     def test_no_mail_dir_in_core(self):
         assert not Path("core/mail").exists(), "core/mail/ aurait du etre supprime"
 
-    def test_no_mail_cli_in_forge_cli(self):
-        assert not Path("forge_cli/mail.py").exists(), (
-            "forge_cli/mail.py aurait du etre supprime"
+    def test_no_mail_cli_in_cli(self):
+        assert not Path("cli/mail.py").exists(), (
+            "cli/mail.py aurait du etre supprime"
         )
 
     def test_old_import_fails(self):
@@ -51,19 +51,19 @@ class TestMailRemovedFromCore:
 
     def test_old_cli_import_fails(self):
         with pytest.raises(ImportError):
-            import forge_cli.mail  # noqa: F401
+            import cli.mail  # noqa: F401
 
 
 class TestNoCoreMailImportsRemain:
     @pytest.mark.parametrize("forbidden_import", [
         "from core.mail",
         "import core.mail",
-        "from forge_cli.mail import",
-        "import forge_cli.mail",
+        "from cli.mail import",
+        "import cli.mail",
     ])
     def test_no_forbidden_imports(self, forbidden_import):
         this_file = Path(__file__).resolve()
-        roots = [Path("core"), Path("mvc"), Path("forge_cli"), Path("tests")]
+        roots = [Path("core"), Path("mvc"), Path("cli"), Path("tests")]
         offenders = []
         for root in roots:
             if not root.exists():

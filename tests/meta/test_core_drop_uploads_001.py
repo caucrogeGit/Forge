@@ -35,7 +35,7 @@ def test_no_python_file_imports_core_uploads():
     # Aucun import `core.uploads` ne doit subsister dans le code (hors docstrings
     # et fichiers de test d'absence qui le mentionnent comme chaîne).
     offenders: list[str] = []
-    for base in ("core", "forge_cli", "mvc", "integrations", "packages"):
+    for base in ("core", "cli", "mvc", "integrations", "packages"):
         root = PROJECT_ROOT / base
         if not root.exists():
             continue

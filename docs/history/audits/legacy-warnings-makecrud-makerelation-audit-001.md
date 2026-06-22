@@ -3,8 +3,8 @@
 **Ticket** : LEGACY-WARNINGS-003-AUDIT-MAKECRUD-MAKERELATION-WARNINGS
 **Date** : 2026-05-19
 **Auteur** : Forge (audit pré-implémentation)
-**Périmètre** : `forge_cli/entities/make_crud.py`, `forge_cli/entities/make_relation.py`,
-`forge_cli/entities/relations.py`
+**Périmètre** : `cli/entities/make_crud.py`, `cli/entities/make_relation.py`,
+`cli/entities/relations.py`
 
 ---
 
@@ -44,17 +44,17 @@ Ce ticket décide si `make:crud` et `make:relation` doivent être étendus.
 Fichiers audités directement :
 
 ```
-forge_cli/entities/make_crud.py
-forge_cli/entities/make_relation.py
-forge_cli/entities/relations.py  — load_entity_definitions()
-forge_cli/entities/model.py      — référence pour le mécanisme LEGACY-WARNINGS-002
+cli/entities/make_crud.py
+cli/entities/make_relation.py
+cli/entities/relations.py  — load_entity_definitions()
+cli/entities/model.py      — référence pour le mécanisme LEGACY-WARNINGS-002
 ```
 
 Commande grep ciblée :
 
 ```bash
 grep -n 'format_version|schema_version|legacy|normalize_canonical|validate_entity_definition|warning' \
-  forge_cli/entities/make_crud.py forge_cli/entities/make_relation.py forge_cli/entities/relations.py
+  cli/entities/make_crud.py cli/entities/make_relation.py cli/entities/relations.py
 ```
 
 ---
@@ -63,7 +63,7 @@ grep -n 'format_version|schema_version|legacy|normalize_canonical|validate_entit
 
 ### 4.1 Chemin de chargement
 
-`make_crud()` — `forge_cli/entities/make_crud.py`, lignes 168-175 :
+`make_crud()` — `cli/entities/make_crud.py`, lignes 168-175 :
 
 ```python
 raw = json.loads(json_path.read_text(encoding="utf-8"))

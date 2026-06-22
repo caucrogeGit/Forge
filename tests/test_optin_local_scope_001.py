@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.optins import disable, enable, install, remove
-from forge_cli.optins.catalog import LOCAL_MODULE_HINT
+from cli.optins import disable, enable, install, remove
+from cli.optins.catalog import LOCAL_MODULE_HINT
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")

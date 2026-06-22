@@ -44,7 +44,7 @@ CORE_DEPS = {
     "core",
     "mvc",
     "forge",
-    "forge_cli",
+    "cli",
     "integrations",
     "tests",
     "forge_mvc_testing",  # infra de test partagée dev-only (ADR-041)

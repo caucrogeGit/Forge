@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from forge_cli.entities.make_crud import (
+from cli.entities.make_crud import (
     CrudManyToManyRelation,
     CrudManyToOneRelation,
     build_controller,

@@ -25,7 +25,7 @@ Forge sépare deux comptes base de données :
 doit pas** recevoir `CREATE`, `ALTER`, `DROP`, `INDEX`, `REFERENCES`.
 
 Or `forge db:apply` (et `migration:status`, lecture du schéma) se connectent
-via un unique `_connect_db()` dans `forge_cli/entities/migrations.py`, qui
+via un unique `_connect_db()` dans `cli/entities/migrations.py`, qui
 utilise les identifiants **`DB_APP_*`** :
 
 ```python
@@ -133,7 +133,7 @@ git diff --check
 La première mise en œuvre (`DB-APPLY-ADMIN-CREDS-001`) a corrigé la chaîne
 `migrations.py` (`migration:apply`, `migration:status`, lecture de schéma), mais
 **pas** la commande `forge db:apply` elle-même, qui passe par un code distinct
-(`forge_cli/entities/db_apply.py`, application du SQL des entités). Ce chemin
+(`cli/entities/db_apply.py`, application du SQL des entités). Ce chemin
 continuait de se connecter en `DB_APP_*` et échouait donc sur le `CREATE TABLE`
 des entités dès que `forge_app` était resserré au DML.
 

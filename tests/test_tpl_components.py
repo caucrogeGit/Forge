@@ -92,12 +92,12 @@ def test_composants_ne_referencent_pas_les_layouts():
 
 
 def test_make_crud_utilise_uniquement_button_dans_components():
-    src = _read(Path("forge_cli/entities/make_crud.py"))
+    src = _read(Path("cli/entities/make_crud.py"))
     assert 'components/button.html' in src
 
 
 def test_make_crud_ne_reference_pas_autres_composants():
-    src = _read(Path("forge_cli/entities/make_crud.py"))
+    src = _read(Path("cli/entities/make_crud.py"))
     for name in ("alert.html", "form_field.html", "table.html", "badge.html", "pagination.html"):
         assert f"components/{name}" not in src
 
@@ -106,7 +106,7 @@ def test_make_crud_ne_reference_pas_autres_composants():
 
 
 def test_starters_ne_referencent_pas_components():
-    starters_dir = Path("forge_cli/starters/data")
+    starters_dir = Path("cli/starters/data")
     for f in starters_dir.rglob("*.html"):
         content = f.read_text(encoding="utf-8")
         assert "components/" not in content, f"{f} référence components/"

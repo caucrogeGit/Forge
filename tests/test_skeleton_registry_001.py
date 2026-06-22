@@ -1,12 +1,12 @@
 """SKELETON-REGISTRY-001 (ADR-024) — module de matérialisation du squelette.
 
-forge_cli.skeleton expose DATA_DIR, iter_skeleton_files() et materialize().
+cli.skeleton expose DATA_DIR, iter_skeleton_files() et materialize().
 Ces tests garantissent l'API et une copie fidèle (dotfiles compris, bytecode
 exclu) sans modifier la source.
 """
 from pathlib import Path
 
-import forge_cli.skeleton as skeleton
+import cli.skeleton as skeleton
 
 
 def test_data_dir_pointe_sur_data():

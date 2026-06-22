@@ -255,6 +255,7 @@ nav:
             - ADR-040 Tests par paquet opt-in: adr/040-per-package-test-surface.md
             - ADR-041 Infra de test partagée: adr/041-shared-test-support.md
             - ADR-042 Découplage doc cœur/opt-ins: adr/042-doc-core-optins-decoupling.md
+            - ADR-043 Doc embarquée cœur/CLI, renommage cli: adr/043-core-cli-doc-embedding.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

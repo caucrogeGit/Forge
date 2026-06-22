@@ -20,7 +20,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 BASE_CTRL = PROJECT_ROOT / "core" / "mvc" / "controller" / "base_controller.py"
 REGISTRY = PROJECT_ROOT / "core" / "mvc" / "controller" / "registry.py"
-CTRL_BUILDER = PROJECT_ROOT / "forge_cli" / "entities" / "crud" / "controller_builder.py"
+CTRL_BUILDER = PROJECT_ROOT / "cli" / "entities" / "crud" / "controller_builder.py"
 
 
 # ---------------------------------------------------------------------------

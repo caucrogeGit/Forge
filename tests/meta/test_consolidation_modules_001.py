@@ -429,14 +429,14 @@ def test_chemin_absolu_refuse_dans_manifest(tmp_path):
 
 def test_install_manifest_module_absent_echoue(tmp_path):
     """cmd_module_install lève SystemExit si le dossier module est absent."""
-    from forge_cli.modules import cmd_module_install
+    from cli.modules import cmd_module_install
     with pytest.raises(SystemExit):
         cmd_module_install(["absent", "--path", str(tmp_path / "modules")])
 
 
 def test_install_manifest_json_invalide_echoue(tmp_path):
     """cmd_module_install lève SystemExit si module.json est invalide."""
-    from forge_cli.modules import cmd_module_install
+    from cli.modules import cmd_module_install
     modules_root = tmp_path / "modules"
     bad_dir = modules_root / "mauvais"
     bad_dir.mkdir(parents=True)

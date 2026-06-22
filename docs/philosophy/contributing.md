@@ -82,7 +82,7 @@ core/          Briques génériques du framework : HTTP, sessions, sécurité, f
                templates, uploads, modules, authentification, base de données...
                Ne doit contenir aucune logique métier applicative.
 
-forge_cli/     Commandes et générateurs Forge : make:entity, make:crud, sync:entity,
+cli/     Commandes et générateurs Forge : make:entity, make:crud, sync:entity,
                module:install, deploy:init, project:check...
                Orchestre les briques core/ et génère les fichiers projet.
 
@@ -97,7 +97,7 @@ tests/         Suite de tests de non-régression.
                Couvre le runtime, les générateurs, les starters, les modules,
                la sécurité et la documentation.
 
-starters/      Données des starters officiels Forge (dans forge_cli/starters/data/).
+starters/      Données des starters officiels Forge (dans cli/starters/data/).
                Chaque starter inclut ses entités, ses routes et ses fichiers applicatifs.
 ```
 

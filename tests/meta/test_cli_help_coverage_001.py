@@ -60,7 +60,7 @@ def test_all_code_commands_appear_in_help():
         raise AssertionError(
             f"{len(missing)} commande(s) du code absente(s) de --help :\n"
             + "\n".join(f"  - {c}" for c in sorted(missing))
-            + "\n\nSoit ajouter dans forge_cli/help.py, soit ajouter à HIDDEN_WHITELIST."
+            + "\n\nSoit ajouter dans cli/help.py, soit ajouter à HIDDEN_WHITELIST."
         )
 
 

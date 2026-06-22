@@ -10,11 +10,11 @@ from pathlib import Path
 
 import pytest
 
-_SKELETON_ENV = Path(__file__).parent.parent / "forge_cli" / "skeleton" / "data" / "env" / "example"
+_SKELETON_ENV = Path(__file__).parent.parent / "cli" / "skeleton" / "data" / "env" / "example"
 
 
 def test_load_migration_db_config_uses_admin(monkeypatch):
-    from forge_cli.entities import migrations
+    from cli.entities import migrations
 
     fake = types.SimpleNamespace(
         DB_ADMIN_HOST="adminhost", DB_ADMIN_PORT=1,
@@ -40,7 +40,7 @@ def test_load_db_apply_config_uses_admin(monkeypatch):
     Garde-fou DB-APPLY-ADMIN-CREDS-FIX-001 : sans lui, db:apply restait en
     DB_APP_* et echouait sur CREATE TABLE des que forge_app etait DML strict.
     """
-    from forge_cli.entities import db_apply
+    from cli.entities import db_apply
 
     fake = types.SimpleNamespace(
         DB_ADMIN_HOST="adminhost", DB_ADMIN_PORT=1,
@@ -62,7 +62,7 @@ def test_load_db_apply_config_uses_admin(monkeypatch):
 
 def test_db_init_default_app_privileges_dml_only():
     """forge_app n'est plus provisionné avec du DDL par défaut (ADR-033)."""
-    from forge_cli.entities import db_init
+    from cli.entities import db_init
 
     assert set(db_init.DEFAULT_APP_PRIVILEGES) == {"SELECT", "INSERT", "UPDATE", "DELETE"}
     for ddl in ("CREATE", "ALTER", "DROP", "INDEX", "REFERENCES"):
@@ -73,7 +73,7 @@ def test_db_init_default_app_privileges_dml_only():
 
 def test_db_init_still_connects_as_admin():
     """db:init reste en DB_ADMIN_* (inchangé)."""
-    from forge_cli.entities import db_init
+    from cli.entities import db_init
 
     src = Path(db_init.__file__).read_text(encoding="utf-8")
     assert "admin_host" in src and "admin_login" in src

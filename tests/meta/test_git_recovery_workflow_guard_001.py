@@ -119,10 +119,10 @@ class TestBadRepoSignals:
         )
 
     def test_generated_project_signal_present(self):
-        # « mvc/ » seul sans core/forge_cli/packages est le signal
+        # « mvc/ » seul sans core/cli/packages est le signal
         # caractéristique d'un projet généré
         text = self.content
-        assert "mvc/" in text and "core/" in text and "forge_cli/" in text, (
+        assert "mvc/" in text and "core/" in text and "cli/" in text, (
             "Le signal « projet généré (mvc/ seul) » doit être documenté."
         )
 

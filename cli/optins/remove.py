@@ -1,0 +1,60 @@
+"""Commande ``forge opt-in:remove <name>`` — OPTIN-CLI-ENGINE-001 (ADR-016, 3b).
+
+Axe **présence** (−) : affiche la commande de désinstallation du package d'un
+opt-in officiel. Miroir exact d'``opt-in:install`` : **n'exécute rien** (la
+désinstallation reste un geste explicite de l'utilisateur). Pour *débrancher*
+sans désinstaller, voir ``opt-in:disable``.
+"""
+from __future__ import annotations
+
+import os
+import sys
+
+from cli.optins.catalog import LOCAL_MODULE_HINT, OFFICIAL_OPTINS, optin_names
+
+
+def _is_pipx_install() -> bool:
+    """Détecte si Forge tourne depuis un venv pipx (cf. cli/update.py)."""
+    norm = os.path.realpath(sys.executable).replace("\\", "/")
+    return "/pipx/venvs/" in norm
+
+
+def _usage() -> str:
+    return (
+        "Usage : forge opt-in:remove <name>\n"
+        f"Opt-ins officiels : {', '.join(optin_names())}\n"
+        f"{LOCAL_MODULE_HINT}"
+    )
+
+
+def main(args: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if args is None else args)
+
+    if argv[:1] in (["-h"], ["--help"]):
+        print(_usage())
+        return 0
+
+    if not argv:
+        print(_usage(), file=sys.stderr)
+        return 2
+
+    name = argv[0]
+    optin = OFFICIAL_OPTINS.get(name)
+    if optin is None:
+        print(f"[ERREUR] opt-in inconnu : {name!r}", file=sys.stderr)
+        print(_usage(), file=sys.stderr)
+        return 2
+
+    dist = optin.package_dist
+    print(f"Opt-in « {name} » — désinstallation du package {dist}")
+    print()
+    print("Débranche d'abord l'opt-in du projet si nécessaire :")
+    print(f"  forge opt-in:disable {name}")
+    print()
+    if _is_pipx_install():
+        print("Désinstallation (environnement pipx) :")
+        print(f"  pipx uninject forge-mvc {dist}")
+    else:
+        print("Désinstallation (environnement courant) :")
+        print(f"  {sys.executable} -m pip uninstall {dist}")
+    return 0

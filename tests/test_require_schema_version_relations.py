@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.model import ModelValidationError, build_model, sync_relations
-from forge_cli.entities.relations import EntityRelationsError, validate_relations_definition
+from cli.entities.model import ModelValidationError, build_model, sync_relations
+from cli.entities.relations import EntityRelationsError, validate_relations_definition
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

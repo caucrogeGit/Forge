@@ -60,12 +60,12 @@ pytest tests/meta/test_pivot_crud_close_001.py -q        # 9 passed (audit close
 
 ### Zones auditées
 
-- `forge_cli/entities/relations.py` — `ValidatedCanonicalManyToManyRelation`,
+- `cli/entities/relations.py` — `ValidatedCanonicalManyToManyRelation`,
   `ValidatedPivotField`, `_validate_canonical_pivot_fields`, `_generate_canonical_m2m_sql`
-- `forge_cli/entities/crud/relations_loader.py` — `_load_crud_many_to_many_relations`
+- `cli/entities/crud/relations_loader.py` — `_load_crud_many_to_many_relations`
   et le point d'élimination de `pivot_fields`
-- `forge_cli/entities/crud/model_builder.py` — génération `sync_function` (IDs seuls)
-- `forge_cli/entities/crud/views_builder.py` — `<select multiple>` sans attributs pivot
+- `cli/entities/crud/model_builder.py` — génération `sync_function` (IDs seuls)
+- `cli/entities/crud/views_builder.py` — `<select multiple>` sans attributs pivot
 - `docs/entities/pivots-many-to-many.md`
 - `docs/entities/limites-contrats-json.md`
 - `docs/history/audits/pivot-crud-audit-001.md`
@@ -121,7 +121,7 @@ Les attributs `position` et `note` sont **invisibles dans ce code généré**.
 
 ### Point d'élimination confirmé
 
-Dans `forge_cli/entities/crud/relations_loader.py`, ligne ~159 :
+Dans `cli/entities/crud/relations_loader.py`, ligne ~159 :
 
 ```python
 CrudManyToManyRelation(

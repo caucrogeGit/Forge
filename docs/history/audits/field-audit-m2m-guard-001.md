@@ -35,8 +35,8 @@ avec le même message d'erreur, alors que Tag n'est pas propriétaire du pivot.
 
 ## 3. Méthode d'audit
 
-- Lecture de `forge_cli/entities/crud/relations_loader.py`
-- Lecture de `forge_cli/entities/make_crud.py`
+- Lecture de `cli/entities/crud/relations_loader.py`
+- Lecture de `cli/entities/make_crud.py`
 - Exécution de `tests/test_make_crud_pivot_fields_guard.py` (29 tests — OK)
 - Exécution de `tests/test_make_crud_many_to_many.py` (passe)
 - Exécution de `tests/test_make_crud_many_to_many_canonical.py` (passe)
@@ -59,7 +59,7 @@ avec le même message d'erreur, alors que Tag n'est pas propriétaire du pivot.
 
 ## 5. Implémentation actuelle
 
-Fichier : `forge_cli/entities/crud/relations_loader.py`
+Fichier : `cli/entities/crud/relations_loader.py`
 Fonction : `_load_crud_many_to_many_relations`
 
 ```python
@@ -196,7 +196,7 @@ le côté `from` d'une relation many-to-many avec pivot.fields[] non-nullable.
 
 Périmètre :
 
-- Modifier `forge_cli/entities/crud/relations_loader.py`
+- Modifier `cli/entities/crud/relations_loader.py`
 - Déplacer le garde après le filtre `current_names`
 - Améliorer le message d'erreur (citer `make:pivot-crud`)
 - Ajouter un test `make:crud Tag` qui vérifie qu'il passe malgré un pivot `from=Article` non-nullable
@@ -232,4 +232,4 @@ après filtrage du côté source de la relation (`if m2m_source.lower() not in c
 - `make:pivot-crud Article tags` reste la commande dédiée pour le sous-CRUD pivot ;
 - `make:crud` reste neutre vis-à-vis du Pivot advanced généré côté `to`.
 
-Fichier modifié : `forge_cli/entities/crud/relations_loader.py`
+Fichier modifié : `cli/entities/crud/relations_loader.py`

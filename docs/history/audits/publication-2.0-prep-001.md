@@ -24,8 +24,8 @@ Ce ticket ne publie pas Forge 2.0.
 | Documentation | Prête sauf version | MkDocs strict vert, mentions `1.5.0` à corriger |
 | Packaging | Prêt | `pyproject.toml` cohérent, starters inclus, dépendances complètes |
 | forge --version | À corriger | Affiche `1.5.0` → à corriger dans `PUBLICATION-2.0-VERSION-001` |
-| Starters inclus | OK | `forge_cli/starters/data/**/*` inclus dans le wheel |
-| Profils inclus | OK | `forge_cli/project_profiles.py` inclus |
+| Starters inclus | OK | `cli/starters/data/**/*` inclus dans le wheel |
+| Profils inclus | OK | `cli/project_profiles.py` inclus |
 | Modules inclus | OK | `core/modules/` inclus |
 | Limites assumées | OK | Documentées dans CONSOLIDATION-ROADMAP-001 |
 | Forge Design séparé | OK | Aucun couplage obligatoire |
@@ -170,9 +170,9 @@ requires-python = ">=3.11"
 | `argon2-cffi>=25.1,<26` | Plage | Hash mots de passe |
 | `pyotp>=2.9,<3` | Plage | MFA TOTP |
 
-**Packages inclus :** `core*`, `forge_cli*`, `integrations*`, `forge.py` (via `py-modules`)
+**Packages inclus :** `core*`, `cli*`, `integrations*`, `forge.py` (via `py-modules`)
 
-**Package data :** `forge_cli/starters/data/**/*` (starters inclus dans le wheel)
+**Package data :** `cli/starters/data/**/*` (starters inclus dans le wheel)
 
 **Console script :** `forge = "forge:cli_entrypoint"` ✅
 
@@ -186,7 +186,7 @@ requires-python = ">=3.11"
 
 `forge new` clone le dépôt GitHub (`_FORGE_REPO = "https://github.com/caucrogeGit/Forge.git"`) avec la référence `_FORGE_DEFAULT_REF`. Les templates `mvc/`, `static/` et squelettes ne sont donc pas dans le wheel pip — ils viennent du clone GitHub. C'est une **décision architecturale assumée** qui implique que `forge new` nécessite git et un accès réseau.
 
-Les starters (`forge_cli/starters/data/`) sont eux dans le wheel — `forge starter:build` fonctionne sans réseau après l'installation pip. ✅
+Les starters (`cli/starters/data/`) sont eux dans le wheel — `forge starter:build` fonctionne sans réseau après l'installation pip. ✅
 
 ### Points à corriger dans `PUBLICATION-2.0-VERSION-001`
 
@@ -221,10 +221,10 @@ Les starters sont inclus dans le wheel via :
 
 ```toml
 [tool.setuptools.package-data]
-"forge_cli" = ["starters/data/**/*"]
+"cli" = ["starters/data/**/*"]
 ```
 
-Fichiers présents dans `forge_cli/starters/data/` :
+Fichiers présents dans `cli/starters/data/` :
 - `contact-simple/starter.json` ✅
 - `utilisateurs-auth/starter.json` ✅
 - `carnet-contacts/starter.json` ✅
@@ -237,7 +237,7 @@ Fichiers présents dans `forge_cli/starters/data/` :
 
 ## Profils inclus
 
-`forge_cli/project_profiles.py` est inclus dans le wheel (package `forge_cli*`).
+`cli/project_profiles.py` est inclus dans le wheel (package `cli*`).
 
 Les 4 profils officiels (`minimal`, `standard`, `dynamic`, `multilingual`) sont déclarés, testés et documentés. ✅
 
@@ -245,7 +245,7 @@ Les 4 profils officiels (`minimal`, `standard`, `dynamic`, `multilingual`) sont 
 
 ## Modules inclus
 
-`core/modules/` est inclus dans le wheel (package `core*`). Les 4 commandes `module:*` sont dans `forge_cli/modules.py` (inclus). ✅
+`core/modules/` est inclus dans le wheel (package `core*`). Les 4 commandes `module:*` sont dans `cli/modules.py` (inclus). ✅
 
 ---
 

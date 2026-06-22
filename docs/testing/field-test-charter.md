@@ -32,7 +32,7 @@ La campagne couvre :
 - environnement : `.env`, secrets, dev/prod ;
 - MariaDB ;
 - premier projet ;
-- architecture `core/`, `mvc/`, `forge_cli/`, `docs/`, `tests/` ;
+- architecture `core/`, `mvc/`, `cli/`, `docs/`, `tests/` ;
 - routes, contrôleurs, templates ;
 - Jinja ;
 - Tailwind ;
@@ -215,7 +215,7 @@ Exemple de classification :
 | `mvc/models/*_base.py` | généré | ne pas modifier directement |
 | `mvc/models/*.py` | manuel applicatif | modifiable |
 | `core/` | framework | ne pas modifier dans un ticket FT |
-| `forge_cli/` | CLI framework | consulter uniquement sauf ticket spécifique |
+| `cli/` | CLI framework | consulter uniquement sauf ticket spécifique |
 | `storage/` | données/logs/uploads | observer selon ticket |
 | `static/` | assets applicatifs | modifiable selon ticket |
 

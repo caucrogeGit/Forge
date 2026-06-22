@@ -17,13 +17,13 @@ Vérifie que :
 """
 from __future__ import annotations
 
-from forge_cli.entities.crud.model_builder import build_model
-from forge_cli.entities.crud.views_builder import (
+from cli.entities.crud.model_builder import build_model
+from cli.entities.crud.views_builder import (
     build_table_partial,
     build_pagination_partial,
 )
-from forge_cli.entities.crud.controller_builder import build_controller
-from forge_cli.entities.validation import normalize_entity_definition
+from cli.entities.crud.controller_builder import build_controller
+from cli.entities.validation import normalize_entity_definition
 
 
 # ---------------------------------------------------------------------------

@@ -23,7 +23,7 @@ produit pas un projet nu.
 1. **Le squelette est le dépôt entier.** `_clone_skeleton` exécute
    `git clone --branch v1.0.0-beta.13 --depth=1 https://github.com/caucrogeGit/Forge.git`.
    Le projet généré hérite donc de **tout le monorepo** : `core/`,
-   `forge_cli/`, `integrations/`, `packages/`, `tests/`, `docs/`,
+   `cli/`, `integrations/`, `packages/`, `tests/`, `docs/`,
    `mkdocs.yml`, `pyproject.toml`, et le `mvc/` de dogfooding (l'application
    de démonstration qui sert à développer Forge).
 
@@ -48,8 +48,8 @@ ni son application de démonstration.
 
 ### Faits techniques établis (audit)
 
-- Le paquet `forge-mvc` **embarque déjà** `core`, `forge_cli` et
-  `integrations` (`pyproject.toml` : `include = ["core*", "forge_cli*", "integrations*"]`).
+- Le paquet `forge-mvc` **embarque déjà** `core`, `cli` et
+  `integrations` (`pyproject.toml` : `include = ["core*", "cli*", "integrations*"]`).
   Un projet sans `core/` local fonctionne donc en important le paquet installé.
 - `app.py` surcharge `views_dir` via `forge.configure(views_dir="mvc/views")`
   (chemin relatif au répertoire de travail) : aucun couplage au chemin du
@@ -68,7 +68,7 @@ ni son application de démonstration.
 ## Décision
 
 1. **Squelette dédié et curé.** Le squelette de projet vit dans le dépôt sous
-   `forge_cli/skeleton/data/` (même modèle que `forge_cli/starters/data/`).
+   `cli/skeleton/data/` (même modèle que `cli/starters/data/`).
    Il contient un projet Forge minimal : `app.py`, `config.py`,
    `requirements.txt`, `env/example`, un `mvc/` minimal (route `/`, contrôleur
    d'accueil neutre, vue d'accueil autonome, `views/errors/*`, paquets vides
@@ -78,10 +78,10 @@ ni son application de démonstration.
 2. **Dépendance core via pip.** Le `requirements.txt` du squelette dépend de
    `forge-mvc==<version>`. Le projet généré importe `core` depuis le paquet
    installé, **pas** depuis un `core/` local. Le squelette ne contient ni
-   `core/`, ni `forge_cli/`, ni `integrations/`, ni `packages/`, ni `tests/`,
+   `core/`, ni `cli/`, ni `integrations/`, ni `packages/`, ni `tests/`,
    ni `docs/`.
 
-3. **Distribution en package-data.** L'arbre `forge_cli/skeleton/data/` est
+3. **Distribution en package-data.** L'arbre `cli/skeleton/data/` est
    déclaré en `package-data` (`pyproject.toml` + `MANIFEST.in`) afin qu'un
    `forge` installé via `pipx`/`pip` puisse matérialiser un projet **sans
    réseau ni git**. `forge new` **copie** cet arbre (`shutil.copytree`) au lieu
@@ -176,7 +176,7 @@ un `forge` pipx-installé.
   `SKELETON-PKGDATA-001`, `SKELETON-REGISTRY-001`, `NEW-MATERIALIZE-001`,
   `NEW-CORE-DEP-001`, `SKELETON-GUARD-001`, `NEW-CLI-CLEANUP-001`.
 - Code concerné : `forge.py` (`cmd_new`, `_clone_skeleton`),
-  `pyproject.toml`, `MANIFEST.in`, futur `forge_cli/skeleton/`.
+  `pyproject.toml`, `MANIFEST.in`, futur `cli/skeleton/`.
 - ADR-004 Périmètre du core : `docs/adr/004-core-perimeter.md`.
 - ADR-005 Packaging : `docs/adr/005-packaging.md`.
 - ADR-023 `forge starter:build` canonique : `docs/adr/023-starter-build-canonical.md`.

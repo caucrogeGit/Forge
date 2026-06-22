@@ -190,10 +190,10 @@ La wheel core contient :
 
 - `forge.py` ;
 - `core*` ;
-- `forge_cli*` ;
+- `cli*` ;
 - `integrations*` ;
-- les starters packagés sous `forge_cli/starters/data/**` ;
-- les schémas JSON sous `forge_cli/schemas/*.schema.json`.
+- les starters packagés sous `cli/starters/data/**` ;
+- les schémas JSON sous `cli/schemas/*.schema.json`.
 
 Point positif : les schémas utiles à la CLI sont bien packagés dans la wheel core.
 
@@ -864,7 +864,7 @@ Objectif : synchroniser toutes les métadonnées publiques beta.12.
 Périmètre :
 
 - `pyproject.toml` core URL documentation ;
-- `forge_cli/help.py` URL documentation ;
+- `cli/help.py` URL documentation ;
 - `README.md` core : ajouter `forge-mvc-iot` ;
 - `docs/release-policy.md` : cinq → six opt-ins ;
 - `requirements-dev.txt` : ajouter `forge-mvc-iot` ou documenter l'exclusion ;

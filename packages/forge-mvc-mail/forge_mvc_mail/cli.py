@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
-import forge_cli.output as out
+import cli.output as out
 
 
 _TEMPLATES_DIR = Path("mvc") / "mail" / "templates"
@@ -77,7 +77,7 @@ def _load_env_and_configure_forge(root: Path) -> None:
     ADR-031 : le mail ne passe plus par le registre `core.forge`. Charger
     l'environnement suffit ; `MailConfig.from_env()` le lit directement.
     """
-    from forge_cli.project_config import ProjectConfigError, load_project_config
+    from cli.project_config import ProjectConfigError, load_project_config
     try:
         load_project_config(root)
     except ProjectConfigError as exc:

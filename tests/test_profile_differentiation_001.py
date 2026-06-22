@@ -19,7 +19,7 @@ from unittest.mock import patch
 
 import pytest
 
-from forge_cli.project_profiles import (
+from cli.project_profiles import (
     PROJECT_PROFILE_DESCRIPTIONS,
     SUPPORTED_PROJECT_PROFILES,
 )

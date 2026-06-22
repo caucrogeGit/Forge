@@ -1,6 +1,6 @@
 """Tests PRE-RELEASE-FIX-RBAC-IMPORT-001 : imports lazy des modules optionnels.
 
-Vérifie que forge_cli, core et integrations ne contiennent aucun import
+Vérifie que cli, core et integrations ne contiennent aucun import
 top-level vers forge_mvc_rbac, forge_mvc_mfa, forge_mvc_workflow, forge_mvc_stats.
 Un import top-level dans le code framework rend la CLI inutilisable sans
 les modules optionnels (bug découvert lors de PRE-RELEASE-AUDIT-3.0-001).
@@ -25,7 +25,7 @@ _OPTIONAL_MODULES = {
 }
 
 _FRAMEWORK_ROOTS = [
-    PROJECT_ROOT / "forge_cli",
+    PROJECT_ROOT / "cli",
     PROJECT_ROOT / "core",
     PROJECT_ROOT / "integrations",
 ]
@@ -36,7 +36,7 @@ _APP_ROOTS = [
 
 
 _EXCLUDED_DIRS = {
-    PROJECT_ROOT / "forge_cli" / "starters" / "data",
+    PROJECT_ROOT / "cli" / "starters" / "data",
 }
 
 
@@ -78,13 +78,13 @@ def _top_level_optional_imports(path: Path) -> list[str]:
 class TestNoTopLevelOptionalImportsInFramework:
     """Le code framework ne contient aucun import top-level de module optionnel."""
 
-    def test_forge_cli_no_top_level_optional_imports(self):
-        files = _collect_python_files([PROJECT_ROOT / "forge_cli"])
+    def test_cli_no_top_level_optional_imports(self):
+        files = _collect_python_files([PROJECT_ROOT / "cli"])
         violations = []
         for f in files:
             violations.extend(_top_level_optional_imports(f))
         assert not violations, (
-            "forge_cli/ contient des imports top-level de modules optionnels "
+            "cli/ contient des imports top-level de modules optionnels "
             "(rompt forge sans les extras) :\n" + "\n".join(violations)
         )
 

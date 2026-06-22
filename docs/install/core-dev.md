@@ -19,7 +19,7 @@ Deux parcours **distincts**, qui ne se mélangent pas :
 | But | Créer une application avec Forge | Modifier Forge lui-même |
 | Installation | `pipx install --pip-args="--pre" forge-mvc` | `git clone` du dépôt + `pip install -e .` |
 | Point d'entrée projet | `forge new mon-app` | `cd Forge` (le dépôt cloné) |
-| Fichiers modifiés | `mvc/`, `env/`, `mvc/entities/...` | `core/`, `forge_cli/`, `tests/`, `docs/`, `packages/` |
+| Fichiers modifiés | `mvc/`, `env/`, `mvc/entities/...` | `core/`, `cli/`, `tests/`, `docs/`, `packages/` |
 | Lancement | `forge run` dans le projet généré | `python -m pytest` + outils de dev |
 | Référence | [Poste Linux (pipx)](poste-linux.md) | cette page + [Contribuer](../philosophy/contributing.md) |
 
@@ -97,7 +97,7 @@ python -m pip install -r requirements-dev.txt
     de fond reste documenté dans `requirements-dev.txt`.
 
 Une **installation éditable** signifie que toute modification dans
-`core/`, `forge_cli/` ou `packages/forge-mvc-*/` est prise en compte
+`core/`, `cli/` ou `packages/forge-mvc-*/` est prise en compte
 immédiatement, sans réinstallation. C'est la condition pour itérer
 sur le code Forge.
 
@@ -234,7 +234,7 @@ Pour publier un opt-in sur PyPI, suivre la procédure release dédiée
 
 ```text
 core/          Briques génériques du framework (HTTP, sessions, sécurité, …)
-forge_cli/    Commandes et générateurs Forge (make:entity, sync:entity, …)
+cli/    Commandes et générateurs Forge (make:entity, sync:entity, …)
 mvc/          Squelette applicatif de référence (dogfood)
 packages/      Modules opt-in officiels en mode monorepo
 tests/         Suite de tests pytest (~14 900 tests)

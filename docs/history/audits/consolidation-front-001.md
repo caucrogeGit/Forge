@@ -38,7 +38,7 @@ Ce ticket n'ajoute aucun framework front nouveau.
 
 ## Méthode d'audit
 
-- Lecture de `forge_cli/front.py` (156 lignes)
+- Lecture de `cli/front.py` (156 lignes)
 - Lecture de `package.json` (dépendances et scripts)
 - Lecture de `static/src/input.css` (86 lignes)
 - Vérification de `static/tailwind.css`
@@ -55,7 +55,7 @@ Ce ticket n'ajoute aucun framework front nouveau.
 
 | Fichier | Lignes | Responsabilité |
 |---|---|---|
-| `forge_cli/front.py` | 156 | `forge js:init htmx/alpine/htmx-alpine` |
+| `cli/front.py` | 156 | `forge js:init htmx/alpine/htmx-alpine` |
 | `package.json` | ~35 | Tailwind, scripts build:css, dépendances optionnelles |
 | `static/src/input.css` | 86 | Source Tailwind v4 + classes custom |
 | `static/tailwind.css` | ~800 | CSS compilé (non modifié manuellement) |
@@ -63,7 +63,7 @@ Ce ticket n'ajoute aucun framework front nouveau.
 | `mvc/views/layouts/base.html` | 35 | Layout de base |
 | `mvc/views/layouts/admin.html` | 35 | Layout admin |
 | `mvc/views/layouts/public.html` | 25 | Layout public |
-| `forge_cli/entities/make_crud.py` | 2242 | CRUD avec HTMX optionnel |
+| `cli/entities/make_crud.py` | 2242 | CRUD avec HTMX optionnel |
 | `integrations/jinja2/renderer.py` | ~40 | Exposition `trans()` dans Jinja2 |
 | `docs/front.md` | ~960 | Documentation complète du socle front |
 
@@ -112,7 +112,7 @@ Il **n'impose pas** HTMX ni Alpine. Chargé dans tous les layouts avec `defer`.
 
 **Statut :** optionnel, installé via `forge js:init htmx`.
 
-**Implémentation dans `forge_cli/front.py` :**
+**Implémentation dans `cli/front.py` :**
 - Dépendance npm : `htmx.org@^2.0.0` (paquet officiel)
 - Source : `node_modules/htmx.org/dist/htmx.min.js`
 - Cible : `static/vendor/htmx/htmx.min.js`
@@ -132,7 +132,7 @@ Il **n'impose pas** HTMX ni Alpine. Chargé dans tous les layouts avec `defer`.
 
 **Statut :** optionnel, installé via `forge js:init alpine`.
 
-**Implémentation dans `forge_cli/front.py` :**
+**Implémentation dans `cli/front.py` :**
 - Dépendance npm : `alpinejs@^3.14.0`
 - Source : `node_modules/alpinejs/dist/cdn.min.js`
 - Cible : `static/vendor/alpine/alpine.min.js`
@@ -241,7 +241,7 @@ La fonction `trans()` est exposée globalement dans l'environnement Jinja2 (`int
 
 ## Séparation Forge Design
 
-- `forge_cli/front.py` ne référence pas Forge Design
+- `cli/front.py` ne référence pas Forge Design
 - `docs/front.md` ne promet pas d'éditeur graphique
 - Les profils n'imposent aucune dépendance Forge Design
 - `docs/forge-design-roadmap.md` existe et n'a pas été modifié

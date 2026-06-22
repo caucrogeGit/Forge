@@ -124,8 +124,8 @@ class TestArchitecture:
     def test_mention_core(self):
         assert "core/" in _text()
 
-    def test_mention_forge_cli(self):
-        assert "forge_cli/" in _text()
+    def test_mention_cli(self):
+        assert "cli/" in _text()
 
     def test_mention_docs(self):
         assert "docs/" in _text()

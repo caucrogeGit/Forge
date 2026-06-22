@@ -104,13 +104,13 @@ Contenu :
 - `core/templating/errors.py` (nouveau) : `TemplateNotFoundError`.
 - `integrations/jinja2/renderer.py` : re-raise via l'exception
   publique.
-- `forge.py`, `forge_cli/help.py`, `forge_cli/help_dispatch.py` :
+- `forge.py`, `cli/help.py`, `cli/help_dispatch.py` :
   enregistrement de `forge run`.
-- `forge_cli/run.py` (nouveau) : commande `forge run` officielle.
-- `forge_cli/dev_reloader.py` (nouveau) : superviseur autoreload.
-- `forge_cli/entities/crud/controller_builder.py`,
-  `forge_cli/public_form.py`, `forge_cli/public_list.py`,
-  `forge_cli/public_page.py` : skeletons typés.
+- `cli/run.py` (nouveau) : commande `forge run` officielle.
+- `cli/dev_reloader.py` (nouveau) : superviseur autoreload.
+- `cli/entities/crud/controller_builder.py`,
+  `cli/public_form.py`, `cli/public_list.py`,
+  `cli/public_page.py` : skeletons typés.
 - 9 contrôleurs de starters (`auth-mfa`, `carnet-contacts`,
   `communes-sejours`, `suivi-comportement-eleves`, `utilisateurs-auth`)
   alignés sur la convention typée.
@@ -128,11 +128,11 @@ feat(starter): refonte pédagogique du starter d'entrée Bonjour Forge (STARTER-
 Périmètre : 1 ticket (`STARTER-BONJOUR-FORGE-001`).
 
 Contenu :
-- `forge_cli/starters/data/welcome/files/mvc/controllers/welcome_controller.py`
+- `cli/starters/data/welcome/files/mvc/controllers/welcome_controller.py`
   refondu autour du parcours `Response.text(...) → request.query(...) →
   Response.debug(request.data) → BaseController.render(...)`.
 - Suppression de
-  `forge_cli/starters/data/welcome/files/mvc/views/welcome/index.html`.
+  `cli/starters/data/welcome/files/mvc/views/welcome/index.html`.
 - `routes.py.snippet` et `starter.json` mis à jour.
 - `tests/test_starter_bonjour_forge_001.py` (nouveau).
 - `tests/meta/test_starter_welcome_001.py` réaligné.
@@ -358,7 +358,7 @@ le tag `v1.0.0-beta.11` et la publication PyPI sont portés par
   (FORGE-RUN-COMMAND-001) — refus du serveur intégré en `APP_ENV=prod`
   avec message WSGI clair, délégation à `scripts/dev-server.sh` ou
   `python app.py` en `dev`.
-- Superviseur d'autoreload `forge_cli.dev_reloader`
+- Superviseur d'autoreload `cli.dev_reloader`
   (DEV-SERVER-AUTORELOAD-001) — polling `stat()` sur `app.py`,
   `config.py`, `env/dev`, `mvc/**/*.{py,html,json,sql}`, `core/**/*.py`,
   stdlib uniquement. Désactivable via `--no-reload`.

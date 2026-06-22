@@ -34,8 +34,8 @@ from core.modules import (
     load_module_manifest,
     remove_module,
 )
-from forge_cli.project_audit import run_project_audit
-from forge_cli.project_check import run_project_check
+from cli.project_audit import run_project_audit
+from cli.project_check import run_project_check
 
 _FORGE_VERSION = "2.2.0"
 _MODULE_NAME = "mon_module"

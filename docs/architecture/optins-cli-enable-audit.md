@@ -10,7 +10,7 @@
 > Ticket : `OPTINS-CLI-ENABLE-AUDIT-001`. **Audit de conception** — ce
 > document **cadre** la future commande `forge optin:enable` sans
 > l'implémenter. Aucun code fonctionnel n'est ajouté : pas de
-> modification de `forge.py`, `forge_cli/`, du starter `welcome-optin-iot`, ni
+> modification de `forge.py`, `cli/`, du starter `welcome-optin-iot`, ni
 > du paquet `forge-mvc-iot`. L'implémentation fera l'objet du ticket
 > `OPTINS-CLI-ENABLE-IOT-001`, **après validation de ce contrat**.
 
@@ -262,7 +262,7 @@ Ce ticket **ne fait que cadrer**. Ne sont **pas** réalisés ici :
 
 - pas de `forge optin:enable` **fonctionnel** ;
 - pas de `forge optin:disable` ;
-- pas de modification de `forge.py` ni de `forge_cli/` ;
+- pas de modification de `forge.py` ni de `cli/` ;
 - pas de génération automatique de fichiers ;
 - pas de modification de `mvc/routes.py` ;
 - pas de modification du starter `welcome-optin-iot` ;

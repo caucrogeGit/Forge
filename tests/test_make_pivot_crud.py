@@ -89,7 +89,7 @@ def _write_relations(tmp_path: Path, data: dict) -> Path:
 
 
 def test_aide_mentionne_make_pivot_crud():
-    from forge_cli.help import build_help
+    from cli.help import build_help
     text = build_help("test")
     assert "make:pivot-crud" in text
 
@@ -313,7 +313,7 @@ def test_cmd_option_inconnue_exit_1(tmp_path, capsys):
 
 
 def test_make_crud_non_modifie():
-    from forge_cli.entities import make_crud as mc_mod
+    from cli.entities import make_crud as mc_mod
     import inspect
     src = inspect.getsource(mc_mod)
     assert "make:pivot-crud" not in src

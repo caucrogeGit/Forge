@@ -17,7 +17,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-STARTERS_DIR = PROJECT_ROOT / "forge_cli" / "starters" / "data"
+STARTERS_DIR = PROJECT_ROOT / "cli" / "starters" / "data"
 DEFAULT_AUTH_STARTER = STARTERS_DIR / "users-core-auth"
 
 # Les classes TestAuthMfaStarterExists et TestAuthMfaStarterIsClean ont été
@@ -52,13 +52,13 @@ class TestAuthMfaProfileDeclared:
     """Le profil auth-mfa est déclaré dans project_profiles.py."""
 
     def test_auth_mfa_in_supported_profiles(self):
-        from forge_cli.project_profiles import SUPPORTED_PROJECT_PROFILES
+        from cli.project_profiles import SUPPORTED_PROJECT_PROFILES
         assert "auth-mfa" in SUPPORTED_PROJECT_PROFILES, (
             "auth-mfa doit être dans SUPPORTED_PROJECT_PROFILES."
         )
 
     def test_auth_mfa_has_description(self):
-        from forge_cli.project_profiles import PROJECT_PROFILE_DESCRIPTIONS
+        from cli.project_profiles import PROJECT_PROFILE_DESCRIPTIONS
         assert "auth-mfa" in PROJECT_PROFILE_DESCRIPTIONS, (
             "auth-mfa doit avoir une description dans PROJECT_PROFILE_DESCRIPTIONS."
         )

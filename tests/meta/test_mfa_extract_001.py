@@ -263,7 +263,7 @@ class TestNoShimImportsRemain:
     @pytest.mark.parametrize("forbidden", _FORBIDDEN_SHIM_IMPORTS)
     def test_no_imports_from_shims(self, forbidden):
         roots = [
-            Path("core"), Path("mvc"), Path("forge_cli"),
+            Path("core"), Path("mvc"), Path("cli"),
             Path("tests"), Path("integrations"),
         ]
         offenders = []

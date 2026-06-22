@@ -35,7 +35,7 @@
   (`SKELETON-VSCODE-STRICT-DEFAULT-001`, `SKELETON-VSCODE-STRICT-NOISE-REMOVE-001`).
   Le cliquet `# pyright: strict` étant terminé sur tout le cœur (`pyright core/`
   à 0 erreur), le cœur n'émet plus de `reportUnknown*` sur ses symboles via
-  `py.typed`. Trois changements dans `forge_cli/skeleton/data` :
+  `py.typed`. Trois changements dans `cli/skeleton/data` :
   1. l'override `python.analysis.diagnosticSeverityOverrides` (qui neutralisait
      les cinq règles `reportUnknown*`) est **retiré** du `.vscode/settings.json` —
      la mitigation provisoire `SKELETON-VSCODE-STRICT-NOISE-001` est remplacée
@@ -414,7 +414,7 @@
 - **Génération de starters retirée, parcours réalisés à la main**
   (`ADR-STARTERS-MANUAL-001`, ADR-035). Suppression des commandes
   `forge starter:list` et `forge starter:build`, et de tout le sous-système de
-  génération (`forge_cli/starters/` : registre, builder, scaffold, injection de
+  génération (`cli/starters/` : registre, builder, scaffold, injection de
   routes, et les fichiers de données embarqués). Les parcours pédagogiques
   `welcome-*` deviennent des **tutoriels manuels** suivis depuis la
   documentation : chaque palier indique le contrôleur, la vue et la route à
@@ -589,7 +589,7 @@
 ### Retiré
 
 - **Les 11 starters buildables du niveau débutant welcome-forge** sont retirés
-  de `forge_cli/starters/data/` et du contrat public gelé, ramené de 107 à 96
+  de `cli/starters/data/` et du contrat public gelé, ramené de 107 à 96
   starters (ADR-025, `STARTER-WELCOME-FORGE-DROP-DATA-001`). Les niveaux
   intermédiaire et avancé, ainsi que tous les parcours opt-in, restent des
   starters `forge starter:build`. La numérotation des starters n'est plus une
@@ -621,9 +621,9 @@
 
 - **`forge new` matérialise un squelette de projet dédié** au lieu de cloner le
   dépôt Forge (ADR-024, `NEW-MATERIALIZE-001`). Le projet généré ne contient
-  plus le framework (`core/`, `forge_cli/`, `packages/`, `tests/`, `docs/`) : il
+  plus le framework (`core/`, `cli/`, `packages/`, `tests/`, `docs/`) : il
   dépend de `forge-mvc` et récupère le `core` depuis le paquet installé. Le
-  squelette curé est embarqué dans `forge_cli/skeleton/data/` et distribué en
+  squelette curé est embarqué dans `cli/skeleton/data/` et distribué en
   package-data (`SKELETON-TREE-001`, `SKELETON-PKGDATA-001`,
   `SKELETON-REGISTRY-001`).
 - **`forge new` ne clone plus le dépôt** : le flag `--ref`, la constante
@@ -817,7 +817,7 @@
   (FORGE-RUN-COMMAND-001) — refus du serveur intégré en `APP_ENV=prod`
   avec message WSGI clair, délégation à `scripts/dev-server.sh` ou
   `python app.py` en `dev`.
-- Superviseur d'autoreload `forge_cli.dev_reloader`
+- Superviseur d'autoreload `cli.dev_reloader`
   (DEV-SERVER-AUTORELOAD-001) — polling `stat()` sur `app.py`,
   `config.py`, `env/dev`, `mvc/**/*.{py,html,json,sql}`, `core/**/*.py`,
   stdlib uniquement. Désactivable via `--no-reload`.
@@ -1402,7 +1402,7 @@ Phase G — consolidation pré-publication (15 tickets livrés).
   **`forge sync:landing` étendue** : la commande synchronise désormais
   `static/` (CSS, JS, images) vers `docs/static/`, en plus du HTML.
   Auparavant, seul `mvc/views/landing/index.html` → `docs/index.html`
-  était copié. Ajout de `sync_static()` dans `forge_cli/sync_landing.py`.
+  était copié. Ajout de `sync_static()` dans `cli/sync_landing.py`.
 
   **`package.json build:css` corrigé** : Tailwind v4 a déplacé le
   binaire CLI dans `@tailwindcss/cli`. Le script utilise désormais
@@ -1510,7 +1510,7 @@ setuptools tracké git) contenait aussi `2.5.0` — bumped en `3.0.0rc1`.
 - `PRE-RELEASE-FIX-RBAC-IMPORT-001` : suppression des 3 imports top-level de
   modules optionnels (`forge_mvc_rbac`, `forge_mvc_workflow`) dans le code
   framework qui rendaient la CLI inutilisable sans les extras :
-  - `forge_cli/entities/crud/controller_builder.py` : import `normalize_permission_code`
+  - `cli/entities/crud/controller_builder.py` : import `normalize_permission_code`
     déplacé en lazy conditionnel (seulement si l'entité déclare des permissions RBAC)
   - `core/mvc/controller/base_controller.py` : import `make_auth_jinja_context, make_can`
     migré en `try/except ImportError` dans `render()` (dégradation gracieuse)
@@ -1536,7 +1536,7 @@ setuptools tracké git) contenait aussi `2.5.0` — bumped en `3.0.0rc1`.
 
   **Trouvailles principales** :
   - Bloquant RC : `PRE-RELEASE-FIX-RBAC-IMPORT-001` — import top-level
-    `forge_mvc_rbac` dans `forge_cli/entities/crud/controller_builder.py`
+    `forge_mvc_rbac` dans `cli/entities/crud/controller_builder.py`
     rend `forge` inutilisable sans le module optionnel
   - Important : `PRE-RELEASE-FIX-LANDING-LINKS-001` — 5 liens cassés landing
     (4 starters anciens chemins + 1 roadmap sans index)
@@ -1799,7 +1799,7 @@ A chaque connexion reussie, le hash est automatiquement remplace par Argon2id
 (mecanisme AUTH-HASH-MIGRATION-001). Suppression complete du module prevue
 quand tous les hashes auront migre (HASHING-PBKDF2-DEFINITIVE-REMOVE-001, post-3.0).
 
-**Pas de consommateurs productifs trouves** dans `core/`, `mvc/`, `forge_cli/`.
+**Pas de consommateurs productifs trouves** dans `core/`, `mvc/`, `cli/`.
 Les tests ont ete adaptes avec des helpers internes qui creent les hashes PBKDF2
 directement via `hashlib.pbkdf2_hmac`.
 
@@ -1812,7 +1812,7 @@ Suppression definitive du dossier `cmd/` (legacy depuis Forge 1.1.0).
 
 **~2 006 lignes supprimees.** Le dossier contenait des generateurs obsoletes
 (`cmd/make.py`, `cmd/mvc/`, `cmd/entities/`, `cmd/security/`, `cmd/sql/`,
-`cmd/inspect/`) tous remplaces par les commandes modernes dans `forge_cli/`.
+`cmd/inspect/`) tous remplaces par les commandes modernes dans `cli/`.
 
 **Migration :** si vous utilisiez encore `python cmd/make.py ...`,
 utilisez a la place `forge make:...` (voir `forge help`).
@@ -2151,7 +2151,7 @@ Aucun impact sur les applications légitimes. La CSP passe de 6 à 8 directives.
 - `log_auth_event()` propage désormais ses exceptions au lieu de les avaler silencieusement. En particulier, un `event_type` invalide (vide, None, espaces) lève `InvalidAuthAuditEventError`, et toute défaillance interne du logger est propagée.
 - Ce changement rend effectif le mécanisme d'observabilité installé par `AUTH-AUDIT-RESILIENCE-001` : `safe_log_auth_event` peut maintenant observer des échecs réels en production, sans mock.
 - Les 7 appels directs à `log_auth_event` dans `mvc/controllers/` migrés vers `safe_log_auth_event`.
-- Les 6 blocs `try: log_auth_event(...) except: pass` dans `forge_cli/auth.py` remplacés par `safe_log_auth_event(...)`.
+- Les 6 blocs `try: log_auth_event(...) except: pass` dans `cli/auth.py` remplacés par `safe_log_auth_event(...)`.
 
 **Migration :** si votre code appelait `log_auth_event` directement dans un contexte métier, remplacer par `safe_log_auth_event`. Si vous l'appelez dans un contexte administratif et souhaitez connaître l'échec, entourer d'un `try/except` explicite et documenté.
 
@@ -2224,7 +2224,7 @@ Aucun impact sur les applications légitimes. La CSP passe de 6 à 8 directives.
   les modèles des starters (`carnet-contacts`, `suivi-comportement-eleves`,
   `utilisateurs-auth`) utilisent désormais exclusivement `core.database.db`
   (`fetch_one`, `fetch_all`, `execute`, `insert`).
-- Le générateur CRUD (`forge_cli/entities/crud/model_builder.py`) produit
+- Le générateur CRUD (`cli/entities/crud/model_builder.py`) produit
   maintenant du code utilisant l'API canonique. Les opérations M2M multi-statement
   utilisent `transaction()` de `core.database.transaction`.
 - `core.database.connection` est documenté comme API interne dans son docstring
@@ -2322,7 +2322,7 @@ Forge 2.3.0 fige l'état post Phase 13 avant une refonte/consolidation profonde 
 
 - Dépréciation officielle du dossier legacy `cmd/` avec avertissement à l'exécution (CMD-LEGACY-DEPRECATION-001).
 - Clarification de la frontière entre `core.auth` (API officielle) et `core.security` (compat/transversal) (AUTH-LEGACY-BOUNDARY-001).
-- Découpage interne de `make_crud.py` (2396 lignes) en sous-modules `forge_cli/entities/crud/` sans changement fonctionnel (CRUD-GENERATOR-SPLIT-001).
+- Découpage interne de `make_crud.py` (2396 lignes) en sous-modules `cli/entities/crud/` sans changement fonctionnel (CRUD-GENERATOR-SPLIT-001).
 - Ajout d'un cache `lru_cache` aux catalogues de traduction i18n, avec `clear_translation_cache()` (I18N-CACHE-001).
 - Intégration de `ruff` (règles E+F) comme validation qualité Python dans la CI et la checklist de release (QUALITY-RUFF-001).
 

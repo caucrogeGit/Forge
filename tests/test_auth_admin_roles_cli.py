@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 import forge
-from forge_cli.auth import (
+from cli.auth import (
     AuthAdminCliError,
     add_auth_user_role,
     cmd_auth_user_role_add,
@@ -315,7 +315,7 @@ def test_roles_liste_les_roles_utilisateur():
 
 
 def test_roles_affiche_etat_vide(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_roles(
         ["--id", "7"],
@@ -327,7 +327,7 @@ def test_roles_affiche_etat_vide(monkeypatch, capsys):
 
 
 def test_cmd_role_add_affiche_message_idempotent(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_role_add(
         ["--id", "7", "--role", "admin"],
@@ -343,7 +343,7 @@ def test_cmd_role_add_affiche_message_idempotent(monkeypatch, capsys):
 
 
 def test_cmd_role_remove_affiche_message_absent(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_role_remove(
         ["--id", "7", "--role", "admin"],
@@ -366,14 +366,14 @@ def test_aucune_interface_html():
 
 
 def test_aucune_route():
-    source = Path("forge_cli/auth.py").read_text(encoding="utf-8")
+    source = Path("cli/auth.py").read_text(encoding="utf-8")
 
     assert "@route" not in source
     assert "Router" not in source
 
 
 def test_aucun_formulaire_template():
-    source = Path("forge_cli/auth.py").read_text(encoding="utf-8")
+    source = Path("cli/auth.py").read_text(encoding="utf-8")
 
     assert "Form(" not in source
     assert "render(" not in source

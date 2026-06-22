@@ -42,12 +42,12 @@ pytest tests/test_crud_rbac_ui.py    # 22 tests passent
 
 **Zones auditées** :
 
-- `forge_cli/entities/make_crud.py` — mécanisme RBAC actuel
-- `forge_cli/entities/crud/controller_builder.py` — génération de guards
-- `forge_cli/entities/crud/views_builder.py` — guards templates
-- `forge_cli/entities/validation.py` — `ALLOWED_ROOT_KEYS`, `_validate_rbac_structure`
+- `cli/entities/make_crud.py` — mécanisme RBAC actuel
+- `cli/entities/crud/controller_builder.py` — génération de guards
+- `cli/entities/crud/views_builder.py` — guards templates
+- `cli/entities/validation.py` — `ALLOWED_ROOT_KEYS`, `_validate_rbac_structure`
 - `schemas/rbac.schema.json` — contrat séparé
-- `forge_cli/rbac_validate.py` — validation du contrat
+- `cli/rbac_validate.py` — validation du contrat
 - `tests/test_make_crud_rbac.py` — tests internes RBAC
 - `tests/test_crud_rbac_ui.py` — tests guards UI
 

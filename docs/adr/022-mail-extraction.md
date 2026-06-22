@@ -26,13 +26,13 @@ Le module relève donc d'un opt-in, comme stats, workflow ou pivot.
 
 ## Décision
 
-**`core/mail/` et la CLI `forge_cli/mail.py` sont extraits vers l'opt-in
+**`core/mail/` et la CLI `cli/mail.py` sont extraits vers l'opt-in
 `forge-mvc-mail`.**
 
 | Avant | Après |
 |---|---|
 | `core/mail/<module>.py` | `forge_mvc_mail.<module>` (API réexportée par `forge_mvc_mail`) |
-| `forge_cli/mail.py` | `forge_mvc_mail.cli` |
+| `cli/mail.py` | `forge_mvc_mail.cli` |
 | `from core.mail import …` | `from forge_mvc_mail import …` |
 
 - La famille CLI `mail:init / test / render / doctor / logs` reste exposée par
@@ -46,7 +46,7 @@ Le module relève donc d'un opt-in, comme stats, workflow ou pivot.
   l'usage de l'email.
 
 **Pré-1.0 (convention bêta)** : extraction sans alias déprécié dans le core. Les
-anciens chemins `core.mail` et `forge_cli.mail` sont supprimés.
+anciens chemins `core.mail` et `cli.mail` sont supprimés.
 
 ---
 

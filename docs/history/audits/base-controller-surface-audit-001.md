@@ -20,7 +20,7 @@ Commandes exécutées :
 
 ```bash
 grep -RInE 'class BaseController|def |current_user|is_authenticated|get_user|get_session|session|flash|redirect|render|json|response|request|core\.security\.session|core\.auth\.session' \
-  core/mvc mvc/controllers forge_cli/starters tests docs
+  core/mvc mvc/controllers cli/starters tests docs
 
 # Lecture directe du fichier source
 cat core/mvc/controller/base_controller.py
@@ -34,7 +34,7 @@ Fichiers audités :
 - `core/security/session.py` — module importé par BaseController
 - `core/mvc/controller/registry.py` — fournisseurs de contexte Jinja
 - `mvc/controllers/` — contrôleurs générés dans l'application référence
-- `forge_cli/starters/data/*/files/mvc/controllers/` — contrôleurs des starters
+- `cli/starters/data/*/files/mvc/controllers/` — contrôleurs des starters
 
 ---
 

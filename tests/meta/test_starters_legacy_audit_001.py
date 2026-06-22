@@ -13,7 +13,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 AUDIT = pathlib.Path("docs/history/audits/starters-legacy-audit-json-schema-001.md")
-STARTERS_DIR = pathlib.Path("forge_cli/starters/data")
+STARTERS_DIR = pathlib.Path("cli/starters/data")
 
 
 def _r() -> str:

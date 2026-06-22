@@ -102,6 +102,6 @@ class TestSqlColumnName:
         assert "secret_hash" not in content
 
     def test_cli_constant_uses_totp_secret(self):
-        from forge_cli.auth import AUTH_MFA_FACTORS_SQL
+        from cli.auth import AUTH_MFA_FACTORS_SQL
         assert "totp_secret VARCHAR(255) NOT NULL" in AUTH_MFA_FACTORS_SQL
         assert "secret_hash" not in AUTH_MFA_FACTORS_SQL

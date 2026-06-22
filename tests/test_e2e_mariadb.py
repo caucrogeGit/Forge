@@ -77,8 +77,8 @@ if not _DB_NAME.startswith(_SAFE_PREFIX):
 
 # ── Imports Forge ─────────────────────────────────────────────────────────────
 
-from forge_cli.entities.db_apply import apply_model_sql
-from forge_cli.entities.make_entity import main as make_entity_main
+from cli.entities.db_apply import apply_model_sql
+from cli.entities.make_entity import main as make_entity_main
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

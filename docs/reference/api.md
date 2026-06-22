@@ -1120,7 +1120,7 @@ Les fichiers générés `*_base.py` peuvent utiliser ces décorateurs. La classe
 
 </details>
 
-<details markdown="1" id="forge-cli">
+<details markdown="1" id="cli">
 <summary><code>forge</code> CLI - Commandes officielles</summary>
 
 L'interface officielle est la commande `forge`.
@@ -1281,7 +1281,7 @@ actuelle.
 
 ### Format de l'aide CLI
 
-`forge help`, `forge --help`, `forge -h` et `forge` (sans argument) affichent la même aide groupée par famille. L'aide est générée par `forge_cli/help.py` (`build_help(version)`).
+`forge help`, `forge --help`, `forge -h` et `forge` (sans argument) affichent la même aide groupée par famille. L'aide est générée par `cli/help.py` (`build_help(version)`).
 
 Familles présentées : Projet, Entités, Pages publiques, Base de données, Starters et modules, Auth / Sécurité, Mail, Médias et JavaScript, Déploiement.
 
@@ -1336,7 +1336,7 @@ forge routes:list
 </details>
 
 <details markdown="1" id="forgeclieentities">
-<summary><code>forge_cli.entities</code> - Génération et validation des entités</summary>
+<summary><code>cli.entities</code> - Génération et validation des entités</summary>
 
 Cette partie suit la doctrine décrite dans l'[architecture des entités](../features/entity_architecture.md).
 

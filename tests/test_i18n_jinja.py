@@ -76,7 +76,7 @@ def test_aucun_catalogue_en_ou_es(tmp_path):
 
 
 def test_make_crud_utilise_trans_depuis_i18n_009():
-    src = Path("forge_cli/entities/make_crud.py").read_text(encoding="utf-8")
+    src = Path("cli/entities/make_crud.py").read_text(encoding="utf-8")
     assert "trans(" in src
 
 

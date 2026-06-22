@@ -1,11 +1,11 @@
 """Tests pour la métadonnée form.field dans les JSON d'entité et make:crud."""
 import pytest
 
-from forge_cli.entities.validation import (
+from cli.entities.validation import (
     EntityDefinitionError,
     validate_entity_definition,
 )
-from forge_cli.entities.make_crud import (
+from cli.entities.make_crud import (
     CrudManyToOneRelation,
     _form_field_code,
     _form_imports,
@@ -233,14 +233,14 @@ class TestFormFieldValeurs:
 class TestNormalisation:
 
     def test_form_present_dans_champ_normalise(self):
-        from forge_cli.entities.validation import normalize_entity_definition
+        from cli.entities.validation import normalize_entity_definition
         entity = _base_entity()
         entity["fields"][1]["form"] = {"field": "email"}
         result = normalize_entity_definition(entity, source="test.json")
         assert result["fields"][1].get("form") == {"field": "email"}
 
     def test_form_absent_pas_dans_champ_normalise(self):
-        from forge_cli.entities.validation import normalize_entity_definition
+        from cli.entities.validation import normalize_entity_definition
         result = normalize_entity_definition(_base_entity(), source="test.json")
         assert "form" not in result["fields"][1]
 

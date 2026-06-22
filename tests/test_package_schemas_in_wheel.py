@@ -14,18 +14,18 @@ import pytest
 
 DIST = Path("dist")
 EXPECTED_SCHEMAS = {
-    "forge_cli/schemas/common.schema.json",
-    "forge_cli/schemas/field.schema.json",
-    "forge_cli/schemas/entity.schema.json",
-    "forge_cli/schemas/pivot.schema.json",
-    "forge_cli/schemas/relations.schema.json",
-    "forge_cli/schemas/forge.schema.index.json",
+    "cli/schemas/common.schema.json",
+    "cli/schemas/field.schema.json",
+    "cli/schemas/entity.schema.json",
+    "cli/schemas/pivot.schema.json",
+    "cli/schemas/relations.schema.json",
+    "cli/schemas/forge.schema.index.json",
 }
 
 
 def _latest_wheel() -> Path | None:
     # Cible le paquet **core** `forge_mvc` : ce sont ses distributions qui
-    # embarquent `forge_cli/schemas/` (les opt-ins `forge_mvc_*` ne les
+    # embarquent `cli/schemas/` (les opt-ins `forge_mvc_*` ne les
     # contiennent pas). Le motif `forge_mvc-*` (tiret) exclut les opt-ins
     # `forge_mvc_<nom>` (underscore) quand `dist/` contient plusieurs
     # paquets construits ensemble lors d'une release multi-paquets.
@@ -55,7 +55,7 @@ def test_wheel_contains_registry():
         pytest.skip("Aucun wheel dans dist/")
     with zipfile.ZipFile(wheel) as z:
         names = set(z.namelist())
-    assert "forge_cli/schemas/forge.schema.index.json" in names
+    assert "cli/schemas/forge.schema.index.json" in names
 
 
 @pytest.mark.skipif(_latest_wheel() is None and not DIST.exists(), reason="dist/ absent")
@@ -105,26 +105,26 @@ def test_sdist_contains_all_schemas():
 
 
 # ---------------------------------------------------------------------------
-# forge_cli/schemas/ source
+# cli/schemas/ source
 # ---------------------------------------------------------------------------
 
 
 def test_source_schemas_dir_exists():
-    assert Path("forge_cli/schemas").is_dir()
+    assert Path("cli/schemas").is_dir()
 
 
 def test_source_registry_exists():
-    assert Path("forge_cli/schemas/forge.schema.index.json").exists()
+    assert Path("cli/schemas/forge.schema.index.json").exists()
 
 
 def test_source_all_schemas_present():
-    schemas_dir = Path("forge_cli/schemas")
+    schemas_dir = Path("cli/schemas")
     missing = []
     for expected in EXPECTED_SCHEMAS:
         fname = Path(expected).name
         if not (schemas_dir / fname).exists():
             missing.append(fname)
-    assert not missing, f"Schémas absents de forge_cli/schemas/: {missing}"
+    assert not missing, f"Schémas absents de cli/schemas/: {missing}"
 
 
 def test_manifest_in_exists():
@@ -133,11 +133,11 @@ def test_manifest_in_exists():
 
 def test_manifest_in_covers_schemas():
     content = Path("MANIFEST.in").read_text(encoding="utf-8")
-    assert "forge_cli/schemas" in content and "*.json" in content
+    assert "cli/schemas" in content and "*.json" in content
 
 
 # ---------------------------------------------------------------------------
-# Anti-dérive : schemas/ ↔ forge_cli/schemas/ doivent être identiques
+# Anti-dérive : schemas/ ↔ cli/schemas/ doivent être identiques
 # ---------------------------------------------------------------------------
 
 SCHEMA_FILENAMES = [
@@ -153,22 +153,22 @@ SCHEMA_FILENAMES = [
 
 @pytest.mark.parametrize("filename", SCHEMA_FILENAMES)
 def test_schema_copies_are_identical(filename):
-    """schemas/<f> et forge_cli/schemas/<f> doivent être strictement identiques.
+    """schemas/<f> et cli/schemas/<f> doivent être strictement identiques.
 
     Comparaison JSON normalisée pour tolérer les différences de formatage.
     """
     import json
 
     canonical = Path("schemas") / filename
-    runtime = Path("forge_cli/schemas") / filename
+    runtime = Path("cli/schemas") / filename
 
     assert canonical.exists(), f"schemas/{filename} absent"
-    assert runtime.exists(), f"forge_cli/schemas/{filename} absent"
+    assert runtime.exists(), f"cli/schemas/{filename} absent"
 
     canonical_obj = json.loads(canonical.read_text(encoding="utf-8"))
     runtime_obj = json.loads(runtime.read_text(encoding="utf-8"))
 
     assert canonical_obj == runtime_obj, (
-        f"Dérive détectée : schemas/{filename} ≠ forge_cli/schemas/{filename}\n"
+        f"Dérive détectée : schemas/{filename} ≠ cli/schemas/{filename}\n"
         "Mettre à jour les deux copies après toute modification de schéma."
     )

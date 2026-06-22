@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.public_page import (
+from cli.public_page import (
     _has_router_factory,
     build_public_page_spec,
     main,

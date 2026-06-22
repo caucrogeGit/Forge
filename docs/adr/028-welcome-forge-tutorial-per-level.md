@@ -33,7 +33,7 @@ Le parcours welcome-forge est aujourd'hui **incohérent entre ses niveaux** :
 | Niveau | Formalisme actuel |
 |---|---|
 | Débutant (12 paliers) | Tutoriel continu **manuel** (ADR-025) : un projet écrit à la main, sans `starter:build`. |
-| Intermédiaire (9 paliers) | **Starters buildables** (`forge_cli/starters/data/list-records`, `filter-list`, `pagination`…) : « Ce que ce starter montre », migrations autonomes. |
+| Intermédiaire (9 paliers) | **Starters buildables** (`cli/starters/data/list-records`, `filter-list`, `pagination`…) : « Ce que ce starter montre », migrations autonomes. |
 | Avancé (5 paliers) | **Starters buildables** (`relations`, `db-transaction`, `file-upload`, `json-api`) : même formalisme « starter ». |
 
 Un learner qui passe de débutant à intermédiaire change donc complètement de
@@ -68,7 +68,7 @@ façon officielle de faire chaque chose ») et l'esprit d'ADR-025.
    travaillée par lister/filtrer/paginer/modifier/supprimer ; avancé : son propre
    fil conducteur relationnel).
 3. **D3 — Suppression des starters buildables intermédiaire et avancé.** Les
-   dossiers `forge_cli/starters/data/<palier>/` des paliers intermédiaires (9) et
+   dossiers `cli/starters/data/<palier>/` des paliers intermédiaires (9) et
    avancés (5) de welcome-forge sont retirés. Le contrat public gelé des starters
    décroît d'autant ; les survivants ne sont **pas** renumérotés (ADR-025 D5).
 4. **D4 — Bootstrap par niveau.** Chaque niveau a son préambule de démarrage
@@ -96,7 +96,7 @@ buildables ») et **lève** son point « hors périmètre » sur ces deux niveau
 - Chaque niveau est auto-contenu : un learner peut attaquer l'intermédiaire ou
   l'avancé sans rejouer tout le débutant.
 - Le squelette (ADR-024) reste strictement neutre : le tutoriel vit dans la
-  documentation, jamais dans `forge_cli/skeleton/data/`.
+  documentation, jamais dans `cli/skeleton/data/`.
 
 ### Limites / Risques
 
@@ -191,5 +191,5 @@ est inchangé.
   `docs/starters/welcome-forge/avance/`, `docs/starters/welcome-forge/index.md`
   (point d'entrée depuis l'amendement du 2026-06-15),
   `docs/starters/welcome-forge/recapitulatif.md`, `docs/starters/index.md`,
-  `forge_cli/starters/data/` (paliers intermédiaires et avancés).
+  `cli/starters/data/` (paliers intermédiaires et avancés).
 - Charte : `CHARTE_DOC.md` (principes 1, 2, 3, 4, 11 ; règle A).

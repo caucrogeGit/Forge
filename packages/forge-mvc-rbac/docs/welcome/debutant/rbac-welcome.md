@@ -117,7 +117,7 @@ et trois rôles (`admin`, `editor`, `reader`) avec les permissions accordées à
     Copiez le schéma dans `schemas/` du projet :
 
     ```bash
-    python -c "import forge_cli, pathlib, shutil; shutil.copy(pathlib.Path(forge_cli.__file__).parent / 'schemas' / 'rbac.schema.json', 'schemas/rbac.schema.json')"
+    python -c "import cli, pathlib, shutil; shutil.copy(pathlib.Path(cli.__file__).parent / 'schemas' / 'rbac.schema.json', 'schemas/rbac.schema.json')"
     ```
 
     Puis ajoutez l'association dans `.vscode/settings.json`, dans le tableau `json.schemas` existant :

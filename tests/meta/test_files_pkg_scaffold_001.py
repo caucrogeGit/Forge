@@ -91,7 +91,7 @@ class TestCoreIndependence:
 
 class TestOptinRegistration:
     def test_in_catalog_as_library(self):
-        from forge_cli.optins.catalog import OFFICIAL_OPTINS
+        from cli.optins.catalog import OFFICIAL_OPTINS
 
         assert "files" in OFFICIAL_OPTINS
         optin = OFFICIAL_OPTINS["files"]

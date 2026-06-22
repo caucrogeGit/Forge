@@ -52,12 +52,12 @@ pytest tests/test_many_to_many_canonical_generation.py -q # 44 passed
 
 **Zones auditées** :
 
-- `forge_cli/entities/relations.py` — `ValidatedCanonicalManyToManyRelation`, `ValidatedPivotField`, `_generate_canonical_m2m_sql`, `_validate_canonical_pivot_fields`
-- `forge_cli/entities/crud/relations_loader.py` — `_load_crud_many_to_many_relations`
-- `forge_cli/entities/crud/context.py` — `CrudManyToManyRelation`
-- `forge_cli/entities/crud/model_builder.py` — `add_function` / `sync_function`
-- `forge_cli/entities/crud/views_builder.py` — génération `<select multiple>`
-- `forge_cli/entities/make_crud.py` — pipeline CRUD principal
+- `cli/entities/relations.py` — `ValidatedCanonicalManyToManyRelation`, `ValidatedPivotField`, `_generate_canonical_m2m_sql`, `_validate_canonical_pivot_fields`
+- `cli/entities/crud/relations_loader.py` — `_load_crud_many_to_many_relations`
+- `cli/entities/crud/context.py` — `CrudManyToManyRelation`
+- `cli/entities/crud/model_builder.py` — `add_function` / `sync_function`
+- `cli/entities/crud/views_builder.py` — génération `<select multiple>`
+- `cli/entities/make_crud.py` — pipeline CRUD principal
 - `docs/entities/pivots-many-to-many.md`
 - `docs/entities/relations-schema.md`
 - `docs/entities/limites-contrats-json.md`
@@ -147,7 +147,7 @@ titre que les relations legacy.
 
 **Point critique** : la conversion de `ValidatedCanonicalManyToManyRelation` vers
 `CrudManyToManyRelation` ne copie pas `pivot_fields`. Extrait de
-`forge_cli/entities/crud/relations_loader.py` (ligne ~119) :
+`cli/entities/crud/relations_loader.py` (ligne ~119) :
 
 ```python
 CrudManyToManyRelation(
@@ -383,7 +383,7 @@ PIVOT-CRUD-002 a ajouté un garde-fou dans `make:crud` contre les
 | `pivot.fields[]` avec `required: true` | **Refusé** — erreur bloquante |
 | `pivot.fields[]` avec `nullable: false` | **Refusé** — erreur bloquante |
 
-**Implémentation** : garde-fou dans `forge_cli/entities/crud/relations_loader.py`,
+**Implémentation** : garde-fou dans `cli/entities/crud/relations_loader.py`,
 fonction `_load_crud_many_to_many_relations()`. L'erreur est une `ValueError`
 capturée par `make_crud()` qui la projette en `SystemExit(1)` avec message clair.
 

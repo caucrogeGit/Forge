@@ -45,7 +45,7 @@ Fichiers inspectés dans le périmètre demandé :
 - `core/auth/` ;
 - `core/security/rbac.py` ;
 - `core/security/session.py` ;
-- `forge_cli/auth.py` ;
+- `cli/auth.py` ;
 - `forge.py` ;
 - `mvc/models/sql/` ;
 - tests liés à auth, RBAC, sécurité et CLI auth ;

@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities import migrations
-from forge_cli.entities.migrations import (
+from cli.entities import migrations
+from cli.entities.migrations import (
     ActualColumn,
     AppliedMigration,
     ExpectedColumn,

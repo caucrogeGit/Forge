@@ -46,7 +46,7 @@ générique (principes 8 « noyau minimal » et 11 « une seule façon officiell
 | `FILES-VALIDATORS-KEEP-001` | Relocaliser validators + exceptions dans le core | livré |
 | `FILES-MOVE-PIPELINE-001` | Déplacer manager + storage + rate_limit | livré |
 | `FILES-IMAGES-REPOINT-001` | forge-mvc-images dépend de forge-mvc-files | livré |
-| `FILES-CLI-RENAME-001` | Générateurs + forge_cli/uploads + starter | livré |
+| `FILES-CLI-RENAME-001` | Générateurs + cli/uploads + starter | livré |
 | `FILES-DOCS-PERIMETER-001` | Docs + ADR-004 + CLAUDE.md §3 | livré |
 | `CORE-DROP-UPLOADS-001` | Suppression de `core/uploads/` | livré |
 

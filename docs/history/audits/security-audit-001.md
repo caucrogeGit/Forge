@@ -56,8 +56,8 @@ Lecture manuelle des fichiers sources :
 | `mvc/controllers/auth_controller.py` | Login, Set-Cookie, rate limit |
 | `mvc/controllers/mfa_challenge_controller.py` | Set-Cookie après MFA |
 | `core/auth/__init__.py`, `rate_limit.py`, `audit.py` | Contrats Auth/rate limit/audit |
-| `forge_cli/entities/crud/model_builder.py` | SQL généré paramétré |
-| `forge_cli/entities/crud/views_builder.py` + `forge_cli/public_form.py` | CSRF dans les formulaires générés |
+| `cli/entities/crud/model_builder.py` | SQL généré paramétré |
+| `cli/entities/crud/views_builder.py` + `cli/public_form.py` | CSRF dans les formulaires générés |
 | `docs/deployment.md` | Documentation déploiement |
 
 ---
@@ -108,7 +108,7 @@ Lecture manuelle des fichiers sources :
 - Retourne `_html("errors/403.html", 403)` en cas d'échec.
 - Vérifié **avant** les middlewares d'authentification dans `Application.dispatch()`.
 
-**Formulaires générés** (`forge_cli/entities/crud/views_builder.py`, `forge_cli/public_form.py`) :
+**Formulaires générés** (`cli/entities/crud/views_builder.py`, `cli/public_form.py`) :
 tous les formulaires générés incluent :
 ```html
 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
@@ -282,7 +282,7 @@ default-src 'self'; style-src 'self'; script-src 'self'[{nonce}]; frame-ancestor
 
 ### État audité
 
-**`forge_cli/entities/crud/model_builder.py`** — Toutes les requêtes SQL générées utilisent des placeholders `?` :
+**`cli/entities/crud/model_builder.py`** — Toutes les requêtes SQL générées utilisent des placeholders `?` :
 
 ```python
 f'SELECT_BY_ID = "SELECT * FROM {table} WHERE {pk_col} = ?"'
@@ -293,7 +293,7 @@ f'DELETE       = "DELETE FROM {table} WHERE {pk_col} = ?"'
 
 Les appels `cursor.execute(SQL_CONSTANT, (valeur,))` — pas d'interpolation de données utilisateur.
 
-**`forge_cli/entities/relations.py`** — Construction SQL des FK :
+**`cli/entities/relations.py`** — Construction SQL des FK :
 ```python
 f"    ON DELETE {relation.on_delete}",
 f"    ON UPDATE {relation.on_update}",

@@ -89,10 +89,10 @@ def test_pyproject_toml_inclut_core():
     assert "core" in content
 
 
-def test_pyproject_toml_inclut_forge_cli():
-    """pyproject.toml inclut le package forge_cli dans le wheel."""
+def test_pyproject_toml_inclut_cli():
+    """pyproject.toml inclut le package cli dans le wheel."""
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert "forge_cli" in content
+    assert "cli" in content
 
 
 def test_pyproject_toml_declare_script_forge():

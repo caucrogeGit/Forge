@@ -28,7 +28,7 @@
 | Page bilan / aide-mémoire de fin | [bilan.md](../starters/welcome-forge/debutant/bilan.md), [recapitulatif.md](../starters/welcome-forge/recapitulatif.md) |
 
 Côté code (non liés ici car hors `docs/`) :
-`forge_cli/starters/data/welcome/`.
+`cli/starters/data/welcome/`.
 
 ---
 
@@ -71,7 +71,7 @@ Règles **non négociables** de cette organisation :
 - **Un `bilan.md` par niveau**, **dans le dossier du niveau** (pas à la racine).
 - **Un seul `recapitulatif.md`**, **à la racine** du starter, transversal aux
   niveaux.
-- **data à plat** : `forge_cli/starters/data/<id>/` (un dossier par starter
+- **data à plat** : `cli/starters/data/<id>/` (un dossier par starter
   buildable) ; le `doc_url` pointe vers le chemin-niveau
   (`/starters/<starter>/<niveau>/<id>/`).
 
@@ -257,7 +257,7 @@ puis renvoie au **premier palier du niveau suivant s'il existe**, sinon au
 
 ---
 
-## 4. Le code du starter (`forge_cli/starters/data/<id>/`)
+## 4. Le code du starter (`cli/starters/data/<id>/`)
 
 ### `starter.json`
 

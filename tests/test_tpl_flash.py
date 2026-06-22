@@ -151,7 +151,7 @@ def test_layouts_conservent_scripts_block():
 
 
 def test_make_crud_flash_html_inchange():
-    src = _read(Path("forge_cli/entities/make_crud.py"))
+    src = _read(Path("cli/entities/make_crud.py"))
     assert '"flash_html": render_flash_html(request)' in src
 
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from forge_cli.auth import AUTH_TOKENS_SQL, USERS_SQL, cmd_auth_init
+from cli.auth import AUTH_TOKENS_SQL, USERS_SQL, cmd_auth_init
 
 
 SQL_FILE = Path("mvc/models/sql/auth_tokens.sql")

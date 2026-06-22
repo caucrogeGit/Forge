@@ -12,35 +12,35 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-from forge_cli.entities.db_apply import main as db_apply_main
-from forge_cli.entities.db_init import main as db_init_main
-from forge_cli.entities.migrations import main as migrations_main
-from forge_cli.entities.make_entity import main as make_entity_main
-from forge_cli.entities.make_relation import main as make_relation_main
-from forge_cli.entities.make_crud import cmd_make_crud_main
-from forge_cli.entities.model import main as model_main
-from forge_cli.entities.entity_validate import main as entity_validate_main
-from forge_cli.public_contact import main as public_contact_main
-from forge_cli.public_form import main as public_form_main
-from forge_cli.public_list import main as public_list_main
-from forge_cli.public_page import main as public_page_main
-from forge_cli.public_show import main as public_show_main
-from forge_cli.sync_landing import main as sync_landing_main
-# FILES-CLI-RENAME-001 (ADR-019) : forge_cli.uploads importé en lazy dans la
+from cli.entities.db_apply import main as db_apply_main
+from cli.entities.db_init import main as db_init_main
+from cli.entities.migrations import main as migrations_main
+from cli.entities.make_entity import main as make_entity_main
+from cli.entities.make_relation import main as make_relation_main
+from cli.entities.make_crud import cmd_make_crud_main
+from cli.entities.model import main as model_main
+from cli.entities.entity_validate import main as entity_validate_main
+from cli.public_contact import main as public_contact_main
+from cli.public_form import main as public_form_main
+from cli.public_list import main as public_list_main
+from cli.public_page import main as public_page_main
+from cli.public_show import main as public_show_main
+from cli.sync_landing import main as sync_landing_main
+# FILES-CLI-RENAME-001 (ADR-019) : cli.uploads importé en lazy dans la
 # branche upload:init/media:init (dépend de l'opt-in forge-mvc-files).
-from forge_cli.front import main as front_main
-from forge_cli.auth import main as auth_main
-from forge_cli.deploy import main as deploy_main
-from forge_cli.i18n import main as i18n_main
-from forge_cli.run import main as run_main
-from forge_cli.update import main as update_main
-from forge_cli.modules import main as modules_main
-from forge_cli.project_profiles import (
+from cli.front import main as front_main
+from cli.auth import main as auth_main
+from cli.deploy import main as deploy_main
+from cli.i18n import main as i18n_main
+from cli.run import main as run_main
+from cli.update import main as update_main
+from cli.modules import main as modules_main
+from cli.project_profiles import (
     SUPPORTED_PROJECT_PROFILES,
     DEFAULT_PROJECT_PROFILE,
 )
-from forge_cli.errors import cli_fail
-from forge_cli.help_dispatch import format_command_help, wants_help
+from cli.errors import cli_fail
+from cli.help_dispatch import format_command_help, wants_help
 
 
 _FORGE_VERSION = "1.0.0b17"
@@ -108,12 +108,12 @@ def _safe_remove_git(dest: str) -> None:
 def _materialize_skeleton(dest: str) -> None:
     """Matérialise le squelette de projet nu (ADR-024).
 
-    Copie l'arbre curé `forge_cli/skeleton/data/` dans le projet — plus de
+    Copie l'arbre curé `cli/skeleton/data/` dans le projet — plus de
     clone du dépôt. Le `core` du projet vient ensuite du paquet `forge-mvc`
     (voir requirements.txt du squelette).
     """
     _print_step("Création du projet à partir du squelette Forge...")
-    from forge_cli.skeleton import materialize
+    from cli.skeleton import materialize
     materialize(dest)
 
 
@@ -323,7 +323,7 @@ def cmd_new(
 # ── Commande : help ───────────────────────────────────────────────────────────
 
 def cmd_help() -> None:
-    from forge_cli.help import build_help
+    from cli.help import build_help
     print(build_help(_FORGE_VERSION))
 
 
@@ -332,7 +332,7 @@ def cmd_version() -> None:
 
 
 def cmd_doctor() -> None:
-    from forge_cli.doctor import has_failures, print_report, run_all
+    from cli.doctor import has_failures, print_report, run_all
     results = run_all(Path.cwd(), _FORGE_VERSION)
     print_report(results, _FORGE_VERSION)
     if has_failures(results):
@@ -340,7 +340,7 @@ def cmd_doctor() -> None:
 
 
 def cmd_project_check() -> None:
-    from forge_cli.project_check import has_failures, print_check_report, run_project_check
+    from cli.project_check import has_failures, print_check_report, run_project_check
     root = Path.cwd()
     if not (root / "app.py").exists() or not (root / "mvc").exists():
         cli_fail(
@@ -355,7 +355,7 @@ def cmd_project_check() -> None:
 
 
 def cmd_project_audit() -> None:
-    from forge_cli.project_audit import has_failures, print_audit_report, run_project_audit
+    from cli.project_audit import has_failures, print_audit_report, run_project_audit
     root = Path.cwd()
     if not (root / "app.py").exists() or not (root / "mvc").exists():
         cli_fail(
@@ -371,7 +371,7 @@ def cmd_project_audit() -> None:
 
 def cmd_routes_list() -> None:
     """Affiche les routes déclarées par le module APP_ROUTES_MODULE."""
-    from forge_cli.project_config import load_project_config, ProjectConfigError
+    from cli.project_config import load_project_config, ProjectConfigError
 
     project_root = Path.cwd().resolve()
     try:
@@ -438,7 +438,7 @@ def main() -> None:
 
     # Garde-fou central CLI-HELP-FLAGS-DISPATCHER-001 : intercepte --help/-h
     # avant toute exécution métier pour les commandes connues sans support
-    # --help natif (cf. forge_cli/help_dispatch.py et l'audit
+    # --help natif (cf. cli/help_dispatch.py et l'audit
     # docs/history/audits/cli-help-flags-audit-001.md).
     if wants_help(args[1:]):
         help_text = format_command_help(command)
@@ -544,7 +544,7 @@ def main() -> None:
         # (forge-mvc-files). Le core CLI ne le tire qu'à l'invocation de la
         # commande, et échoue proprement si l'opt-in n'est pas installé.
         try:
-            from forge_cli.uploads import main as upload_main
+            from cli.uploads import main as upload_main
         except ImportError:
             cli_fail(
                 "module forge-mvc-files non installé.",
@@ -722,37 +722,37 @@ def main() -> None:
 
     # Famille canonique opt-in:* (ADR-016). Les anciennes commandes
     # optin:enable / optin:list ont été retirées (OPTIN-CLI-REMOVE-LEGACY-001) ;
-    # les moteurs forge_cli/optins/{enable,list}.py restent utilisés ici.
+    # les moteurs cli/optins/{enable,list}.py restent utilisés ici.
     if command == "opt-in:install":
-        from forge_cli.optins.install import main as optin_install_main
+        from cli.optins.install import main as optin_install_main
         rc = optin_install_main(args[1:])
         if rc:
             sys.exit(rc)
         return
 
     if command == "opt-in:enable":
-        from forge_cli.optins.enable import main as optin_enable_main
+        from cli.optins.enable import main as optin_enable_main
         rc = optin_enable_main(args[1:])
         if rc:
             sys.exit(rc)
         return
 
     if command == "opt-in:list":
-        from forge_cli.optins.list import main as optin_list_main
+        from cli.optins.list import main as optin_list_main
         rc = optin_list_main(args[1:])
         if rc:
             sys.exit(rc)
         return
 
     if command == "opt-in:remove":
-        from forge_cli.optins.remove import main as optin_remove_main
+        from cli.optins.remove import main as optin_remove_main
         rc = optin_remove_main(args[1:])
         if rc:
             sys.exit(rc)
         return
 
     if command == "opt-in:disable":
-        from forge_cli.optins.disable import main as optin_disable_main
+        from cli.optins.disable import main as optin_disable_main
         rc = optin_disable_main(args[1:])
         if rc:
             sys.exit(rc)
@@ -767,7 +767,7 @@ def main() -> None:
         return
 
     if command == "docs:pdf":
-        from forge_cli.docs.quarkdown import build_pdf
+        from cli.docs.quarkdown import build_pdf
         build_pdf()
         return
 
@@ -815,22 +815,22 @@ def main() -> None:
         return
 
     if command == "schema:list":
-        from forge_cli.schemas.schema_list import schema_list_main
+        from cli.schemas.schema_list import schema_list_main
         schema_list_main(args[1:])
         return
 
     if command == "schema:doctor":
-        from forge_cli.schemas.schema_doctor import schema_doctor_main
+        from cli.schemas.schema_doctor import schema_doctor_main
         schema_doctor_main(args[1:])
         return
 
     if command == "rbac:validate":
-        from forge_cli.rbac_validate import rbac_validate_main
+        from cli.rbac_validate import rbac_validate_main
         rbac_validate_main(args[1:])
         return
 
     if command == "rbac:audit":
-        from forge_cli.rbac_audit import rbac_audit_main
+        from cli.rbac_audit import rbac_audit_main
         rbac_audit_main(args[1:])
         return
 

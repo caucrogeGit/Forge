@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from forge_cli.project_profiles import (
+from cli.project_profiles import (
     DEFAULT_PROJECT_PROFILE,
     PROJECT_PROFILE_DESCRIPTIONS,
     SUPPORTED_PROJECT_PROFILES,
@@ -238,8 +238,8 @@ def test_readme_mentionne_option_profile():
 # ── Séparation Forge Design ────────────────────────────────────────────────────
 
 def test_profiles_py_ne_depend_pas_forge_design():
-    """forge_cli/project_profiles.py ne référence pas Forge Design."""
-    content = (ROOT / "forge_cli" / "project_profiles.py").read_text(encoding="utf-8")
+    """cli/project_profiles.py ne référence pas Forge Design."""
+    content = (ROOT / "cli" / "project_profiles.py").read_text(encoding="utf-8")
     assert "forge-design" not in content.lower()
     assert "forge design" not in content.lower()
 

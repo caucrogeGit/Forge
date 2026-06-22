@@ -3,7 +3,7 @@
 **Ticket** : NULLABLE-CONTRACT-001-AUDIT-NULLABLE-BEHAVIOR
 **Date** : 2026-05-19
 **Auteur** : Forge (audit post-migration legacy)
-**Périmètre** : `schemas/`, `forge_cli/entities/`, `tests/`, `docs/entities/`
+**Périmètre** : `schemas/`, `cli/entities/`, `tests/`, `docs/entities/`
 
 ---
 
@@ -45,9 +45,9 @@ Fichiers lus directement :
 ```
 schemas/field.schema.json
 schemas/pivot.schema.json
-forge_cli/entities/canonical_model_normalizer.py  — _normalize_field()
-forge_cli/entities/relations.py                   — _validate_canonical_pivot_fields()
-forge_cli/entities/make_entity.py                 — build_entity_sql()
+cli/entities/canonical_model_normalizer.py  — _normalize_field()
+cli/entities/relations.py                   — _validate_canonical_pivot_fields()
+cli/entities/make_entity.py                 — build_entity_sql()
 docs/entities/entity-schema.md
 docs/entities/types-forge-mariadb.md
 docs/entities/limites-contrats-json.md
@@ -59,7 +59,7 @@ tests/test_pivot_fields_controlled.py
 Vérification de l'identité des deux copies de `field.schema.json` :
 
 ```bash
-diff schemas/field.schema.json forge_cli/schemas/field.schema.json
+diff schemas/field.schema.json cli/schemas/field.schema.json
 # → IDENTICAL
 ```
 
@@ -269,7 +269,7 @@ un changement comportemental dans un ticket dédié, pas comme une correction do
 `NULLABLE-CONTRACT-003` aligne le normaliseur d'entité sur ADR-013 :
 `nullable` par défaut (`True`), `required` prioritaire.
 
-Fichier corrigé : `forge_cli/entities/canonical_model_normalizer.py::_normalize_field()`.
+Fichier corrigé : `cli/entities/canonical_model_normalizer.py::_normalize_field()`.
 Test mis à jour : `test_default_nullable_is_false` → `test_default_nullable_is_true`.
 3 nouveaux tests de matrice ADR-013 ajoutés.
 

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli import front
+from cli import front
 
 
 HTMX_CONTENT = "/* htmx local test asset */\n"

@@ -13,7 +13,7 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 SCHEMA_SOURCE = PROJECT_ROOT / "schemas" / "rbac.schema.json"
-SCHEMA_PACKAGED = PROJECT_ROOT / "forge_cli" / "schemas" / "rbac.schema.json"
+SCHEMA_PACKAGED = PROJECT_ROOT / "cli" / "schemas" / "rbac.schema.json"
 ENTITY_SCHEMA = PROJECT_ROOT / "schemas" / "entity.schema.json"
 
 _DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema"

@@ -123,10 +123,10 @@ class TestForgeMvcPackage:
         include = data["tool"]["setuptools"]["packages"]["find"]["include"]
         assert any("core" in p for p in include)
 
-    def test_includes_forge_cli(self):
+    def test_includes_cli(self):
         data = self._load()
         include = data["tool"]["setuptools"]["packages"]["find"]["include"]
-        assert any("forge_cli" in p for p in include)
+        assert any("cli" in p for p in include)
 
     def test_publishable_extras_declared(self):
         """Apres VERSION-SYNC-OPTIN-EXTRAS-001, les extras rbac/workflow/stats/all sont declares.

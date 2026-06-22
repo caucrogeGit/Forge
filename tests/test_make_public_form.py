@@ -7,7 +7,7 @@ from pathlib import Path
 from core.http.request import Request
 
 
-from forge_cli.public_form import (
+from cli.public_form import (
     build_form_route_block,
     build_public_form_controller,
     build_public_form_create_method,
@@ -68,7 +68,7 @@ SENSITIVE_ONLY_JSON = {
 
 def _prepare_form_project(root: Path, definition: dict) -> Path:
     snake = definition["entity"].lower()
-    from forge_cli.entities.make_crud import _to_snake
+    from cli.entities.make_crud import _to_snake
     snake = _to_snake(definition["entity"])
     entity_dir = root / "mvc" / "entities" / snake
     entity_dir.mkdir(parents=True, exist_ok=True)
@@ -457,7 +457,7 @@ def test_make_public_form_preserve_template_existant(tmp_path):
 
 
 def test_make_public_form_apres_make_list_ajoute_methodes(tmp_path):
-    from forge_cli.public_list import make_public_list
+    from cli.public_list import make_public_list
     _prepare_form_project(tmp_path, DEMANDE_JSON)
     make_public_list("Demande", output_root=tmp_path)
 

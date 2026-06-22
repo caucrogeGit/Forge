@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.model import BuildModelResult, ModelValidationError, build_model, check_model, sync_relations
+from cli.entities.model import BuildModelResult, ModelValidationError, build_model, check_model, sync_relations
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -384,7 +384,7 @@ def test_build_model_dry_run_shows_planned_writes(tmp_path: Path):
 # ── check:model preview ───────────────────────────────────────────────────────
 
 def test_check_model_preview_displays_entity_and_fields(tmp_path: Path, capsys):
-    from forge_cli.entities.model import _print_check_model_preview
+    from cli.entities.model import _print_check_model_preview
 
     entities_root = tmp_path / "mvc" / "entities"
     _write_entity(entities_root, "article", _article())
@@ -406,7 +406,7 @@ def test_check_model_preview_displays_entity_and_fields(tmp_path: Path, capsys):
 # ── sync:entity — manual file not touched ─────────────────────────────────────
 
 def test_sync_entity_does_not_touch_manual_py(tmp_path: Path):
-    from forge_cli.entities.model import sync_entity
+    from cli.entities.model import sync_entity
 
     entities_root = tmp_path / "mvc" / "entities"
     entity_dir = entities_root / "contact"

@@ -41,7 +41,7 @@ DOCTOR_FILE = (
     / "cli" / "doctor.py"
 )
 CORE_DIR = PROJECT_ROOT / "core"
-HELP_DISPATCH_FILE = PROJECT_ROOT / "forge_cli" / "help_dispatch.py"
+HELP_DISPATCH_FILE = PROJECT_ROOT / "cli" / "help_dispatch.py"
 
 
 # ── Helpers de fixture ─────────────────────────────────────────────────────

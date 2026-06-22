@@ -32,7 +32,7 @@ générateur ou une commande dédiée (PIVOT-ADVANCED-004). `make:crud` reste ne
 
 ### Contrainte structurelle confirmée
 
-`CrudManyToManyRelation` (dans `forge_cli/entities/crud/context.py`) n'a pas
+`CrudManyToManyRelation` (dans `cli/entities/crud/context.py`) n'a pas
 d'attribut `pivot_fields`. Les informations de `pivot.fields[]` sont éliminées
 dans `_load_crud_many_to_many_relations()` de `relations_loader.py` avant que
 le pipeline CRUD ne s'exécute.
@@ -60,11 +60,11 @@ pytest tests/meta/test_pivot_advanced_functional_model_001.py -q  # 17 passed
 
 ### Zones auditées
 
-- `forge_cli/entities/crud/context.py` — `CrudManyToManyRelation` (sans `pivot_fields`)
-- `forge_cli/entities/crud/views_builder.py` — `build_list_view`, `build_show_view`,
+- `cli/entities/crud/context.py` — `CrudManyToManyRelation` (sans `pivot_fields`)
+- `cli/entities/crud/views_builder.py` — `build_list_view`, `build_show_view`,
   `build_form_view` — génération UX actuelle des M2M
-- `forge_cli/entities/crud/model_builder.py` — `sync_function` (IDs seuls)
-- `forge_cli/entities/crud/relations_loader.py` — point d'élimination de `pivot_fields`
+- `cli/entities/crud/model_builder.py` — `sync_function` (IDs seuls)
+- `cli/entities/crud/relations_loader.py` — point d'élimination de `pivot_fields`
 
 ---
 

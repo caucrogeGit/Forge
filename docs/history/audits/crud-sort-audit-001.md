@@ -20,7 +20,7 @@ Le seul point corrigé est le fallback de `direction` invalide dans le contrôle
 
 Audit limité à :
 
-- `forge_cli/entities/make_crud.py` ;
+- `cli/entities/make_crud.py` ;
 - `tests/test_make_crud.py` ;
 - `tests/test_entity_list_filter.py` ;
 - `tests/test_make_crud_search.py` ;

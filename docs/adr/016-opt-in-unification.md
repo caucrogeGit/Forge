@@ -257,7 +257,7 @@ un sous-système testé et à migrer ~40 tests pour un seul nom de commande unif
 
 **Décision retenue** : **ne pas fusionner**. Le système `module:*` reste l'outil
 du workflow d'auteur de **module local** ; la famille `opt-in:*` couvre les
-**opt-ins officiels** (catalogue `forge_cli/optins/catalog.py`). Conceptuellement,
+**opt-ins officiels** (catalogue `cli/optins/catalog.py`). Conceptuellement,
 un module local **est** un « opt-in de source locale » (vocabulaire unifié,
 [glossaire](../reference/vocabulaire-opt-in.md)), mais il garde ses commandes
 propres car son cycle de vie diffère. Quand un nom inconnu est passé à

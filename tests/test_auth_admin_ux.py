@@ -13,7 +13,7 @@ import pathlib
 
 import pytest
 
-from forge_cli.auth import (
+from cli.auth import (
     AuthAdminCliError,
     cmd_auth_user_disable,
     cmd_auth_user_enable,
@@ -26,7 +26,7 @@ from forge_cli.auth import (
 # ---------------------------------------------------------------------------
 
 def _patch_env(monkeypatch):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
 
 def _fake_fetch_by_id(uid: int):
@@ -102,19 +102,19 @@ class TestConventionErreurConseil:
 
     def test_erreur_email_invalide_contient_conseil(self):
         with pytest.raises(AuthAdminCliError) as exc:
-            from forge_cli.auth import _normalize_email
+            from cli.auth import _normalize_email
             _normalize_email("pasdetat")
         assert exc.value.conseil
 
     def test_erreur_email_vide_contient_conseil(self):
         with pytest.raises(AuthAdminCliError) as exc:
-            from forge_cli.auth import _normalize_email
+            from cli.auth import _normalize_email
             _normalize_email("")
         assert exc.value.conseil
 
     def test_erreur_mot_de_passe_vide_contient_conseil(self):
         with pytest.raises(AuthAdminCliError) as exc:
-            from forge_cli.auth import _validate_password_value
+            from cli.auth import _validate_password_value
             _validate_password_value("")
         assert exc.value.conseil
 
@@ -399,7 +399,7 @@ class TestEvenementsAudit:
 
     def test_cli_disable_appelle_audit_event(self, monkeypatch, capsys):
         called = []
-        monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+        monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
         def fake_log(event_type, **kwargs):
             called.append(event_type)
@@ -417,7 +417,7 @@ class TestEvenementsAudit:
 
     def test_cli_enable_appelle_audit_event(self, monkeypatch, capsys):
         called = []
-        monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+        monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
         monkeypatch.setattr("core.auth.audit.log_auth_event", lambda event, **kw: called.append(event))
         cmd_auth_user_enable(
             ["--id", "2"],
@@ -428,7 +428,7 @@ class TestEvenementsAudit:
 
     def test_cli_password_appelle_audit_event(self, monkeypatch, capsys):
         called = []
-        monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+        monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
         monkeypatch.setattr("core.auth.audit.log_auth_event", lambda event, **kw: called.append(event))
         cmd_auth_user_password(
             ["--id", "3", "--password", "nouveauMdp99"],
@@ -439,7 +439,7 @@ class TestEvenementsAudit:
 
     def test_audit_ne_logue_pas_le_mot_de_passe(self, monkeypatch):
         logged_meta = {}
-        monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+        monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
         def capture_log(event, **kwargs):
             logged_meta.update(kwargs)

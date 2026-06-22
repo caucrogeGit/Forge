@@ -18,7 +18,7 @@ from dataclasses import dataclass, field as dc_field
 from pathlib import Path
 from typing import Any, cast
 
-import forge_cli.output as out
+import cli.output as out
 
 _SNAKE_RE = re.compile(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")
 

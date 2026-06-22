@@ -236,9 +236,9 @@ validation, audit, helpers Python, guards opt-in et limites.
 RBAC-MODULE-006 ajoute la commande `forge rbac:audit` pour auditer la cohérence
 fonctionnelle du contrat `mvc/security/rbac.json`.
 
-- Nouveau module : `forge_cli/rbac_audit.py`
+- Nouveau module : `cli/rbac_audit.py`
 - Dispatch ajouté dans `forge.py` : `rbac:audit`
-- Aide mise à jour dans `forge_cli/help.py`
+- Aide mise à jour dans `cli/help.py`
 - 21 tests ajoutés dans `tests/test_rbac_audit_command.py`
 - Documentation mise à jour dans `docs/security/rbac-contract.md`
 - Codes d'avertissement : `missing_roles`, `missing_entities`, `empty_role`,
@@ -323,7 +323,7 @@ Le bloc RBAC applicatif opt-in est clôturé après livraison de :
 | Élément | Statut |
 |---|---|
 | `mvc/security/rbac.json` | contrat RBAC applicatif (optionnel, validable) |
-| `rbac.schema.json` | présent dans les registres `schemas/` et `forge_cli/schemas/` |
+| `rbac.schema.json` | présent dans les registres `schemas/` et `cli/schemas/` |
 | `forge rbac:validate` | opérationnel — valide la structure JSON |
 | `forge rbac:audit` | opérationnel — audite la cohérence fonctionnelle |
 | `load_rbac_contract` | exporté par `forge_mvc_rbac` |
@@ -340,8 +340,8 @@ Le bloc RBAC applicatif opt-in est clôturé après livraison de :
 
 | Fichier | Trace | Justification |
 |---|---|---|
-| `forge_cli/entities/make_crud.py` | `definition.get("rbac")` | Mécanisme interne existant, indépendant du contrat séparé |
-| `forge_cli/entities/validation.py` | `ALLOWED_ROOT_KEYS` inclut `rbac` | Pipeline interne du format d'entité |
-| `forge_cli/entities/crud/controller_builder.py` | Guards `@require_permission` | Génération conditionnelle depuis le format interne |
+| `cli/entities/make_crud.py` | `definition.get("rbac")` | Mécanisme interne existant, indépendant du contrat séparé |
+| `cli/entities/validation.py` | `ALLOWED_ROOT_KEYS` inclut `rbac` | Pipeline interne du format d'entité |
+| `cli/entities/crud/controller_builder.py` | Guards `@require_permission` | Génération conditionnelle depuis le format interne |
 | `tests/test_make_crud_rbac.py` | 34 tests format interne | Garde-fous actifs pour le mécanisme A |
 | `tests/test_crud_rbac_ui.py` | 22 tests guards UI | Garde-fous actifs pour le mécanisme A |

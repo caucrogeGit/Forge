@@ -10,7 +10,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from forge_cli.entities.model import build_model
+from cli.entities.model import build_model
 
 PROJECT_ROOT = Path(__file__).parent.parent
 MEDIA_JSON = PROJECT_ROOT / "mvc" / "entities" / "media" / "media.json"

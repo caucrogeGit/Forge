@@ -54,9 +54,9 @@ class TestPivotRemovedFromCore:
             "core/pivot_advanced.py aurait du etre supprime"
         )
 
-    def test_no_make_pivot_crud_in_forge_cli(self):
-        assert not Path("forge_cli/entities/make_pivot_crud.py").exists(), (
-            "forge_cli/entities/make_pivot_crud.py aurait du etre supprime"
+    def test_no_make_pivot_crud_in_cli(self):
+        assert not Path("cli/entities/make_pivot_crud.py").exists(), (
+            "cli/entities/make_pivot_crud.py aurait du etre supprime"
         )
 
     def test_old_service_import_fails(self):
@@ -65,18 +65,18 @@ class TestPivotRemovedFromCore:
 
     def test_old_generator_import_fails(self):
         with pytest.raises(ImportError):
-            import forge_cli.entities.make_pivot_crud  # noqa: F401
+            import cli.entities.make_pivot_crud  # noqa: F401
 
 
 class TestNoCorePivotImportsRemain:
     @pytest.mark.parametrize("forbidden_import", [
         "from core.pivot_advanced",
         "import core.pivot_advanced",
-        "forge_cli.entities.make_pivot_crud",
+        "cli.entities.make_pivot_crud",
     ])
     def test_no_forbidden_imports(self, forbidden_import):
         this_file = Path(__file__).resolve()
-        roots = [Path("core"), Path("mvc"), Path("forge_cli"), Path("tests")]
+        roots = [Path("core"), Path("mvc"), Path("cli"), Path("tests")]
         offenders = []
         for root in roots:
             if not root.exists():

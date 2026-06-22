@@ -69,10 +69,10 @@ mkdocs build --strict
 - `pyproject.toml` — version, classifiers, packages
 - `forge.py` — entry points, version affichée
 - `core/pivot_advanced.py` — API Pivot advanced
-- `forge_cli/entities/make_crud.py` — neutralité
-- `forge_cli/entities/make_pivot_crud.py` — commande pivot
-- `forge_cli/entities/entity_validate.py` — validation canonique
-- `forge_cli/entities/validation.py` — code legacy validator
+- `cli/entities/make_crud.py` — neutralité
+- `cli/entities/make_pivot_crud.py` — commande pivot
+- `cli/entities/entity_validate.py` — validation canonique
+- `cli/entities/validation.py` — code legacy validator
 - `schemas/` — 7 fichiers schémas
 - `packages/` — 5 paquets opt-in
 - `docs/` — pages mkdocs

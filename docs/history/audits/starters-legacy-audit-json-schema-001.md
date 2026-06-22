@@ -3,7 +3,7 @@
 **Ticket** : STARTERS-LEGACY-001  
 **Date** : 2026-05-18  
 **Auteur** : Forge (audit automatique post-roadmap ENTITY-CONTRACT)  
-**Périmètre** : `forge_cli/starters/data/` — tous les starters distribués avec la CLI
+**Périmètre** : `cli/starters/data/` — tous les starters distribués avec la CLI
 
 **Mise à jour** : 2026-05-18 — `contact-simple` migré par STARTERS-MIGRATE-001.
 **Mise à jour** : 2026-05-18 — `utilisateurs-auth` migré par STARTERS-MIGRATE-002.
@@ -15,7 +15,7 @@
 
 ## 1. Résumé exécutif
 
-L'audit porte sur 6 starters présents dans `forge_cli/starters/data/`.
+L'audit porte sur 6 starters présents dans `cli/starters/data/`.
 **100 % des fichiers entité/relation audités utilisent le format legacy** (format_version: 1).
 Aucun starter n'a encore migré vers le format canonique (schema_version: "1.0").
 

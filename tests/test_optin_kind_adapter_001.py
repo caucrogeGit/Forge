@@ -9,14 +9,14 @@ from __future__ import annotations
 
 import pytest
 
-from forge_cli.optins import disable, enable, list as optin_list
-from forge_cli.optins.catalog import (
+from cli.optins import disable, enable, list as optin_list
+from cli.optins.catalog import (
     KIND_CROSSCUTTING,
     KIND_LIBRARY,
     KIND_ROUTE,
     OFFICIAL_OPTINS,
 )
-from forge_cli.optins.guidance import disable_guidance, enable_guidance
+from cli.optins.guidance import disable_guidance, enable_guidance
 
 LIBRARY = ["workflow", "stats", "images", "files"]
 CROSSCUTTING = ["mfa", "rbac"]
@@ -48,7 +48,7 @@ class TestKindClassification:
         au moteur route pour ces opt-ins). Empêche d'ajouter un futur opt-in
         routier au catalogue sans son câblage.
         """
-        from forge_cli.optins.enable import SUPPORTED_OPTINS
+        from cli.optins.enable import SUPPORTED_OPTINS
 
         route_optins = {n for n, o in OFFICIAL_OPTINS.items() if o.kind == KIND_ROUTE}
         missing = route_optins - set(SUPPORTED_OPTINS)

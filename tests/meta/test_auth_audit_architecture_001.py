@@ -5,7 +5,7 @@ Verifie que :
 - L'ADR-008 dit explicitement que Forge ne persiste pas en base.
 - docs/features/auth.md a une section sur l'audit.
 - Le docstring de core/auth/audit.py mentionne que la persistance est applicative.
-- core/ et forge_cli/ ne contiennent aucun INSERT INTO auth_audit_log.
+- core/ et cli/ ne contiennent aucun INSERT INTO auth_audit_log.
 """
 from __future__ import annotations
 
@@ -102,14 +102,14 @@ class TestAuditModuleDocstring:
         )
 
 
-# ── Garde-fou : aucun INSERT dans core/ ni forge_cli/ ─────────────────────────
+# ── Garde-fou : aucun INSERT dans core/ ni cli/ ─────────────────────────
 
 class TestForgeDoesNotInsertAudit:
-    """core/ et forge_cli/ ne font pas d'INSERT INTO auth_audit_log."""
+    """core/ et cli/ ne font pas d'INSERT INTO auth_audit_log."""
 
     def test_no_insert_in_core(self):
         offenders = []
-        for root in [Path("core"), Path("forge_cli")]:
+        for root in [Path("core"), Path("cli")]:
             if not root.exists():
                 continue
             for py_file in root.rglob("*.py"):
@@ -123,7 +123,7 @@ class TestForgeDoesNotInsertAudit:
                     if "INSERT" in line and "auth_audit_log" in line:
                         offenders.append(f"{py_file}: {stripped[:80]}")
         assert not offenders, (
-            "core/ ou forge_cli/ contiennent du code INSERT INTO auth_audit_log "
+            "core/ ou cli/ contiennent du code INSERT INTO auth_audit_log "
             "(contredit ADR-008, persistance applicative) :\n"
             + "\n".join(offenders)
         )

@@ -29,13 +29,13 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli import help_dispatch as help_dispatch
+from cli import help_dispatch as help_dispatch
 
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 FORGE_PY = PROJECT_ROOT / "forge.py"
-FORGE_CLI = PROJECT_ROOT / "forge_cli"
+FORGE_CLI = PROJECT_ROOT / "cli"
 
 # Pseudo-commandes acceptées sans entrée de registre (entrypoint forge.py).
 EXTRA_KNOWN = frozenset({"help"})
@@ -91,8 +91,8 @@ def _dispatch_literals(path: Path) -> set[str]:
 
     Couvre `command == "x"`, `command in ("x", "y")`, et les littéraux de type
     set `command in {"x", "y"}` (indispensable : migration:make n'apparaît que
-    dans un set de forge.py). Scanné sur forge.py ET forge_cli/**/*.py pour
-    couvrir les sous-dispatchers (module:remove est dans forge_cli/modules.py).
+    dans un set de forge.py). Scanné sur forge.py ET cli/**/*.py pour
+    couvrir les sous-dispatchers (module:remove est dans cli/modules.py).
     """
     literals: set[str] = set()
     tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -118,7 +118,7 @@ def _known_commands() -> set[str]:
     """Registre CLI canonique : union des sources de vérité du code.
 
     - registre d'aide (HELP_DESCRIPTIONS + HELP_TEXTS_RICH) ;
-    - littéraux de dispatch de forge.py et des sous-dispatchers forge_cli/ ;
+    - littéraux de dispatch de forge.py et des sous-dispatchers cli/ ;
     - pseudo-commandes de l'entrypoint (`help`).
     """
     known = set(help_dispatch.HELP_DESCRIPTIONS) | set(help_dispatch.HELP_TEXTS_RICH)
@@ -203,7 +203,7 @@ class TestNoObsoleteCliCommands:
                 f"la doc active :\n"
                 + "\n".join(f"  - {o}" for o in offenders)
                 + "\n\nCommandes connues : voir HELP_DESCRIPTIONS / "
-                "HELP_TEXTS_RICH (forge_cli/help_dispatch.py) et le dispatch "
+                "HELP_TEXTS_RICH (cli/help_dispatch.py) et le dispatch "
                 "de forge.py."
             )
 

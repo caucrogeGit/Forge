@@ -14,7 +14,7 @@ base particulière.
 | Helper Jinja | `forge_mvc_rbac` | `make_can` / `can(...)` |
 | Résolution | `forge_mvc_rbac` | `get_request_permissions`, `has_permission` |
 | Tables SQL | `mvc/models/sql/rbac.sql` | Schéma `roles`, `permissions`, `role_permissions` |
-| CRUD déclaratif | `forge_cli/entities/make_crud.py` | Injection de `@require_permission` à la génération |
+| CRUD déclaratif | `cli/entities/make_crud.py` | Injection de `@require_permission` à la génération |
 
 **Principe fondamental** : Forge fournit le mécanisme d'autorisation.
 L'application fournit l'identité de l'utilisateur et la liste de ses

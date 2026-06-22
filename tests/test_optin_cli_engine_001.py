@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.optins import disable, remove
-from forge_cli.optins.enable import SUPPORTED_OPTINS
+from cli.optins import disable, remove
+from cli.optins.enable import SUPPORTED_OPTINS
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
@@ -23,7 +23,7 @@ ALL = ["mfa", "rbac", "workflow", "stats", "images", "iot"]
 
 def _setup_enabled_iot(root: Path) -> Path:
     """Recrée l'état produit par `enable iot`, sans dépendre du package."""
-    from forge_cli.optins.enable import (
+    from cli.optins.enable import (
         _REGISTRY,
         _SHARED_FILES,
         _register_in_registry,
@@ -65,7 +65,7 @@ class TestOptInRemove:
         assert remove.main([]) == 2
 
     def test_does_not_execute(self):
-        source = (PROJECT_ROOT / "forge_cli" / "optins" / "remove.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "cli" / "optins" / "remove.py").read_text(encoding="utf-8")
         assert "subprocess" not in source and "os.system" not in source
 
 
@@ -116,6 +116,6 @@ class TestDispatchAndHelp:
 
     @pytest.mark.parametrize("command", ["opt-in:remove", "opt-in:disable"])
     def test_has_description_and_rich(self, command):
-        from forge_cli.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH
+        from cli.help_dispatch import HELP_DESCRIPTIONS, HELP_TEXTS_RICH
         assert command in HELP_DESCRIPTIONS
         assert command in HELP_TEXTS_RICH

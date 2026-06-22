@@ -1,6 +1,6 @@
 """SKELETON-TREE-001 (ADR-024) — squelette de projet dédié et nu.
 
-Le squelette curé vit dans forge_cli/skeleton/data/. Il sert de source à
+Le squelette curé vit dans cli/skeleton/data/. Il sert de source à
 `forge new` (matérialisation locale, ticket NEW-MATERIALIZE-001). Ces tests
 garantissent :
 
@@ -23,7 +23,7 @@ import pytest
 import forge
 
 REPO_ROOT = Path(forge.__file__).resolve().parent
-SKELETON = REPO_ROOT / "forge_cli" / "skeleton" / "data"
+SKELETON = REPO_ROOT / "cli" / "skeleton" / "data"
 
 
 # ── Inventaire : ce que le squelette DOIT contenir ───────────────────────────
@@ -69,7 +69,7 @@ def test_page_erreur_presente(code):
 
 FORBIDDEN_PATHS = [
     "core",
-    "forge_cli",
+    "cli",
     "integrations",
     "packages",
     "tests",

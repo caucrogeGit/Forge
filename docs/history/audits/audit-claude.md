@@ -31,7 +31,7 @@ Aucun de ces points n'est rédhibitoire, et la correction de chacun est mécaniq
 - Extraction et cartographie de l'arborescence (713 fichiers, ~6.4 Mo).
 - Lecture des fichiers structurels : `pyproject.toml`, `requirements*.txt`, `pytest.ini`, `.gitignore`, `.github/workflows/*`, `app.py`, `config.py`, `forge.py`, `README.md`, `CHANGELOG.md`.
 - Lecture systématique de `core/` (modules clés : `application`, `http/router`, `http/request`, `security/*`, `auth/*`, `database/*`, `forms/*`, `uploads/*`, `templating/*`, `workflow/*`, `i18n/*`, `modules/*`, `mvc/controller/*`).
-- Lecture comparée des starters générés (`forge_cli/starters/data/`).
+- Lecture comparée des starters générés (`cli/starters/data/`).
 - Recherches ciblées : injections SQL (f-strings, `%`, `format`), filtres `| safe` Jinja, secrets en dur, `TODO/FIXME`, doublons d'API.
 - Analyse de la couverture de tests (179 fichiers, ~51 K LOC) et de la CI.
 
@@ -45,7 +45,7 @@ Aucun de ces points n'est rédhibitoire, et la correction de chacun est mécaniq
 |---|---|
 | Fichiers Python totaux | ~190 (hors starter data) |
 | LOC `core/` | 10 675 |
-| LOC `forge_cli/` (hors starter data) | 12 375 |
+| LOC `cli/` (hors starter data) | 12 375 |
 | LOC `mvc/` (application par défaut) | 608 |
 | LOC `cmd/` (legacy explicite) | 2 006 |
 | LOC tests | 51 549 |
@@ -78,7 +78,7 @@ Le `README.md` énonce clairement la séparation `core/` (framework) vs `mvc/` (
 - **Dispatch central minimaliste.** `core/application.py` (54 lignes) est limpide : routage → CSRF → middlewares → handler. L'ordre des opérations est correct.
 - **Routeur propre.** `core/http/router.py` supporte les paramètres dynamiques nommés, les groupes, les routes nommées (`url_for`), avec une compilation regex correcte. Pas de conflits de noms (vérifiés au moment de l'enregistrement).
 - **Système de modules formellement défini** (`core/modules/`) avec manifeste, registre, découverte, injection de routes et de fichiers, tests dédiés (`test_module_*.py`).
-- **Système de starters propre** (`forge_cli/starters/data/`) — démonstrateurs complets (Communes & Séjours, Carnet de contacts, Suivi pédagogique) générables via CLI.
+- **Système de starters propre** (`cli/starters/data/`) — démonstrateurs complets (Communes & Séjours, Carnet de contacts, Suivi pédagogique) générables via CLI.
 - **Profils projet** (`minimal`, `standard`, `dynamic`, `multilingual`) permettant de calibrer le squelette généré.
 
 ### 4.2 Tensions architecturales
@@ -180,7 +180,7 @@ ITERATIONS = 260_000  # OWASP 2023 : minimum 210 000 pour PBKDF2-SHA256
 
 - `mvc/controllers/auth_controller.py` (l'auth controller par défaut du repo)
 - `cmd/security/init_users.py`, `cmd/security/hash.py`
-- `forge_cli/starters/data/suivi-comportement-eleves/files/scripts/create_auth_user.py`
+- `cli/starters/data/suivi-comportement-eleves/files/scripts/create_auth_user.py`
 
 Donc concrètement, tout projet créé avec le squelette par défaut hash en PBKDF2-260K.
 
@@ -194,7 +194,7 @@ Donc concrètement, tout projet créé avec le squelette par défaut hash en PBK
 
 **Scénario reproduisible :**
 
-1. Le développeur installe Forge et lance `forge auth:user:create --email a@b.fr` → `forge_cli/auth.py` ligne 481 importe `from core.auth.password import hash_password` → le mot de passe est haché en **Argon2**.
+1. Le développeur installe Forge et lance `forge auth:user:create --email a@b.fr` → `cli/auth.py` ligne 481 importe `from core.auth.password import hash_password` → le mot de passe est haché en **Argon2**.
 2. Le développeur lance ensuite l'application : `mvc/controllers/auth_controller.py` ligne 5 importe `from core.security.hashing import verifier_mot_de_passe` → la vérification utilise **PBKDF2**.
 3. À la connexion : `verifier_mot_de_passe(password, hash_argon2)` essaie de parser `"<sel_hex>:<hash_hex>"` mais reçoit un hash Argon2 au format `$argon2id$...` → `ValueError` capturée → retourne `False`.
 4. **L'utilisateur ne peut jamais se connecter, sans erreur explicite.**
@@ -205,7 +205,7 @@ Donc concrètement, tout projet créé avec le squelette par défaut hash en PBK
 
 ### 5.4 🔴 Génération de code CRUD potentiellement vulnérable à l'injection SQL
 
-`forge_cli/entities/make_crud.py` génère des fonctions de modèle avec ce pattern (lignes 717-727 et 752-757) :
+`cli/entities/make_crud.py` génère des fonctions de modèle avec ce pattern (lignes 717-727 et 752-757) :
 
 ```python
 for col, val in (filters or {}).items():

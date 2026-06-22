@@ -8,7 +8,7 @@ import pytest
 
 import forge
 from core.auth.password import verify_password
-from forge_cli.auth import (
+from cli.auth import (
     AuthAdminCliError,
     change_auth_user_password,
     cmd_auth_user_create,
@@ -75,7 +75,7 @@ def test_cmd_create_non_interactif_ne_sort_pas_le_mot_de_passe_ni_hash(monkeypat
         inserted["hash"] = params[1]
         return 3
 
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_create(
         ["--email", "admin@example.test", "--password", "secret123"],
@@ -92,7 +92,7 @@ def test_cmd_create_non_interactif_ne_sort_pas_le_mot_de_passe_ni_hash(monkeypat
 
 
 def test_cmd_create_prompt_masque(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
     monkeypatch.setattr("getpass.getpass", lambda prompt: "secret123")
 
     cmd_auth_user_create(
@@ -107,7 +107,7 @@ def test_cmd_create_prompt_masque(monkeypatch, capsys):
 
 
 def test_cmd_create_affiche_erreur_claire_si_db_indisponible(monkeypatch):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     def broken_fetch(sql, params):
         raise AuthAdminCliError("Base de donnees Auth/User indisponible.")
@@ -147,7 +147,7 @@ def test_list_auth_users_retourne_uniquement_des_champs_publics():
 
 
 def test_cmd_user_list_naffiche_aucun_secret(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_list(
         [],
@@ -198,7 +198,7 @@ def test_show_auth_user_exige_id_ou_email():
 
 
 def test_cmd_user_show_introuvable(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_show(["--email", "missing@example.test"], fetch_one=lambda *_: None)
 
@@ -206,7 +206,7 @@ def test_cmd_user_show_introuvable(monkeypatch, capsys):
 
 
 def test_cmd_user_show_naffiche_aucun_secret(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_show(
         ["--id", "1"],
@@ -270,7 +270,7 @@ def test_dispatch_forge_auth_user_show(monkeypatch):
 
 
 def test_auth_admin_cli_ne_depend_pas_de_librairie_externe():
-    import forge_cli.auth as auth_module
+    import cli.auth as auth_module
 
     source = Path(auth_module.__file__).read_text(encoding="utf-8")
     for term in ("sqlalchemy", "requests", "httpx"):
@@ -499,7 +499,7 @@ def test_change_password_refuse_utilisateur_inexistant():
 
 
 def test_cmd_disable_affiche_confirmation_sans_secret(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_disable(
         ["--id", "3"],
@@ -515,7 +515,7 @@ def test_cmd_disable_affiche_confirmation_sans_secret(monkeypatch, capsys):
 
 
 def test_cmd_disable_erreur_db_indisponible(monkeypatch):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     def broken_fetch(sql, params):
         raise AuthAdminCliError("Base de donnees Auth/User indisponible.")
@@ -531,7 +531,7 @@ def test_cmd_disable_erreur_db_indisponible(monkeypatch):
 
 
 def test_cmd_disable_erreur_table_absente(monkeypatch):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     def broken_fetch(sql, params):
         raise AuthAdminCliError("Table users introuvable.")
@@ -552,7 +552,7 @@ def test_cmd_disable_erreur_table_absente(monkeypatch):
 
 
 def test_cmd_enable_affiche_confirmation_sans_secret(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_enable(
         ["--id", "5"],
@@ -578,7 +578,7 @@ def test_cmd_password_non_interactif_naffiche_pas_le_mot_de_passe(monkeypatch, c
         executed["hash"] = params[0]
         return 1
 
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_password(
         ["--id", "6", "--password", "NouveauSecret99"],
@@ -593,7 +593,7 @@ def test_cmd_password_non_interactif_naffiche_pas_le_mot_de_passe(monkeypatch, c
 
 
 def test_cmd_password_prompt_masque(monkeypatch, capsys):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
     monkeypatch.setattr("getpass.getpass", lambda prompt: "MotDePassePrompt")
 
     cmd_auth_user_password(
@@ -608,7 +608,7 @@ def test_cmd_password_prompt_masque(monkeypatch, capsys):
 
 
 def test_cmd_password_refuse_mot_de_passe_vide(monkeypatch):
-    monkeypatch.setattr("forge_cli.auth._load_env_and_configure_forge", lambda root: None)
+    monkeypatch.setattr("cli.auth._load_env_and_configure_forge", lambda root: None)
 
     with pytest.raises(SystemExit):
         cmd_auth_user_password(

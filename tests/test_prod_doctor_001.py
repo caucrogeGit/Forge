@@ -7,8 +7,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from forge_cli import doctor
-from forge_cli.doctor import check_prod_security
+from cli import doctor
+from cli.doctor import check_prod_security
 
 ROOT = Path(".")
 

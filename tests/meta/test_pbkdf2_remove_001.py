@@ -99,7 +99,7 @@ class TestPbkdf2NeedsRehashKept:
 
 
 class TestNoCreationCallsRemain:
-    @pytest.mark.parametrize("root_dir", ["core", "mvc", "forge_cli", "integrations"])
+    @pytest.mark.parametrize("root_dir", ["core", "mvc", "cli", "integrations"])
     def test_no_hacher_mot_de_passe_calls(self, root_dir):
         root = ROOT / root_dir
         if not root.exists():

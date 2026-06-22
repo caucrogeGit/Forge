@@ -1,7 +1,7 @@
 """SKELETON-GUARD-001 (ADR-024) — neutralité du squelette DISTRIBUÉ.
 
 Équivalent de test_skeleton_routes_neutral_001 (qui garde le mvc/routes.py du
-dépôt) appliqué au squelette embarqué `forge_cli/skeleton/data/`, et étendu :
+dépôt) appliqué au squelette embarqué `cli/skeleton/data/`, et étendu :
 aucun fichier du squelette n'importe ni ne pré-câble un opt-in.
 
 Charte : principe 8 (noyau minimal, briques opt-in), principe 1 (séparer
@@ -13,7 +13,7 @@ import ast
 
 import pytest
 
-from forge_cli.skeleton import DATA_DIR, iter_skeleton_files
+from cli.skeleton import DATA_DIR, iter_skeleton_files
 
 ROUTES = DATA_DIR / "mvc" / "routes.py"
 HOME_CONTROLLER = DATA_DIR / "mvc" / "controllers" / "home_controller.py"

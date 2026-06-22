@@ -12,23 +12,23 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-AUTH_CLI = PROJECT_ROOT / "forge_cli" / "auth.py"
+AUTH_CLI = PROJECT_ROOT / "cli" / "auth.py"
 
 
 class TestAuthInitNoOidcSqlTemplates:
-    """AUTH_SQL_FILES dans forge_cli/auth.py ne reference pas de SQL OIDC."""
+    """AUTH_SQL_FILES dans cli/auth.py ne reference pas de SQL OIDC."""
 
     def test_auth_sql_files_no_oidc_accounts(self):
         text = AUTH_CLI.read_text(encoding="utf-8")
         assert "auth_oidc_accounts" not in text, (
-            "forge_cli/auth.py reference encore auth_oidc_accounts — "
+            "cli/auth.py reference encore auth_oidc_accounts — "
             "retirer la generation SQL OIDC (ADR-004)."
         )
 
     def test_auth_sql_files_no_oidc_identities(self):
         text = AUTH_CLI.read_text(encoding="utf-8")
         assert "auth_oidc_identities" not in text, (
-            "forge_cli/auth.py reference encore auth_oidc_identities — "
+            "cli/auth.py reference encore auth_oidc_identities — "
             "retirer la generation SQL OIDC (ADR-004)."
         )
 

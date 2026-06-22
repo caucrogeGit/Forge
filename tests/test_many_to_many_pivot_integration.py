@@ -144,7 +144,7 @@ def _run_validate(tmp_path: Path) -> subprocess.CompletedProcess:
 
 def _sync_and_read_sql(entities_root: Path, relations: dict) -> str:
     """Valide relations.json et retourne le SQL pivot généré."""
-    from forge_cli.entities.relations import generate_relations_sql, validate_relations_definition
+    from cli.entities.relations import generate_relations_sql, validate_relations_definition
     validated = validate_relations_definition(
         relations, source="test", entities_root=entities_root
     )
@@ -276,21 +276,21 @@ class TestPivotCollisionsRejected:
         }
 
     def test_id_collision_raises(self, tmp_path):
-        from forge_cli.entities.relations import EntityRelationsError
+        from cli.entities.relations import EntityRelationsError
         root = _setup_article_tag(tmp_path)
         with pytest.raises(EntityRelationsError) as exc_info:
             _sync_and_read_sql(root, self._collision_doc("id"))
         assert "nom reserve interdit" in str(exc_info.value)
 
     def test_from_key_collision_raises(self, tmp_path):
-        from forge_cli.entities.relations import EntityRelationsError
+        from cli.entities.relations import EntityRelationsError
         root = _setup_article_tag(tmp_path)
         with pytest.raises(EntityRelationsError) as exc_info:
             _sync_and_read_sql(root, self._collision_doc("article_id"))
         assert "nom reserve interdit" in str(exc_info.value)
 
     def test_to_key_collision_raises(self, tmp_path):
-        from forge_cli.entities.relations import EntityRelationsError
+        from cli.entities.relations import EntityRelationsError
         root = _setup_article_tag(tmp_path)
         with pytest.raises(EntityRelationsError) as exc_info:
             _sync_and_read_sql(root, self._collision_doc("tag_id"))
@@ -298,7 +298,7 @@ class TestPivotCollisionsRejected:
 
     def test_error_message_stable(self, tmp_path):
         """Le message d'erreur est stable et ne contient pas de trace Python."""
-        from forge_cli.entities.relations import EntityRelationsError
+        from cli.entities.relations import EntityRelationsError
         root = _setup_article_tag(tmp_path)
         with pytest.raises(EntityRelationsError) as exc_info:
             _sync_and_read_sql(root, self._collision_doc("id"))
@@ -307,7 +307,7 @@ class TestPivotCollisionsRejected:
         assert "nom reserve interdit" in err
 
     def test_error_mentions_source(self, tmp_path):
-        from forge_cli.entities.relations import EntityRelationsError
+        from cli.entities.relations import EntityRelationsError
         root = _setup_article_tag(tmp_path)
         with pytest.raises(EntityRelationsError) as exc_info:
             _sync_and_read_sql(root, self._collision_doc("id"))
@@ -427,7 +427,7 @@ class TestEntityValidateCLI:
 class TestBuildModel:
     def test_sync_relations_writes_sql_file(self, tmp_path):
         """sync_relations() écrit le fichier relations.sql."""
-        from forge_cli.entities.model import sync_relations
+        from cli.entities.model import sync_relations
         root = _setup_article_tag(tmp_path)
         _write_relations(root, _minimal_pivot_relations())
         output = sync_relations(root)
@@ -435,7 +435,7 @@ class TestBuildModel:
         assert output.name == "relations.sql"
 
     def test_sql_file_contains_create_table(self, tmp_path):
-        from forge_cli.entities.model import sync_relations
+        from cli.entities.model import sync_relations
         root = _setup_article_tag(tmp_path)
         _write_relations(root, _minimal_pivot_relations())
         output = sync_relations(root)
@@ -443,7 +443,7 @@ class TestBuildModel:
         assert "CREATE TABLE IF NOT EXISTS article_tag" in sql
 
     def test_sql_file_contains_pivot_fields(self, tmp_path):
-        from forge_cli.entities.model import sync_relations
+        from cli.entities.model import sync_relations
         root = _setup_article_tag(tmp_path)
         _write_relations(root, _pivot_with_fields_relations())
         output = sync_relations(root)
@@ -453,7 +453,7 @@ class TestBuildModel:
 
     def test_build_model_does_not_raise_with_pivot(self, tmp_path):
         """build_model() ne lève pas d'exception avec un pivot canonique."""
-        from forge_cli.entities.model import build_model
+        from cli.entities.model import build_model
         root = _setup_article_tag(tmp_path)
         _write_relations(root, _minimal_pivot_relations())
         result = build_model(root)
@@ -461,7 +461,7 @@ class TestBuildModel:
 
     def test_build_model_generates_entity_sql(self, tmp_path):
         """build_model() génère le SQL des entités Article et Tag."""
-        from forge_cli.entities.model import build_model
+        from cli.entities.model import build_model
         root = _setup_article_tag(tmp_path)
         _write_relations(root, _minimal_pivot_relations())
         build_model(root)
@@ -493,7 +493,7 @@ class TestEmptyFieldsNonRegression:
 class TestManyToOneNonRegression:
     def test_m2o_canonical_not_broken(self, tmp_path):
         """many_to_one canonique continue de fonctionner après les tickets 016/017."""
-        from forge_cli.entities.relations import ValidatedRelation, validate_relations_definition
+        from cli.entities.relations import ValidatedRelation, validate_relations_definition
         root = _entities_root(tmp_path)
         _write_entity(root, "article", _canonical_article())
         _write_entity(root, "category", _canonical_category())
@@ -557,7 +557,7 @@ class TestManyToOneNonRegression:
 class TestLegacyManyToManyNonRegression:
     def test_legacy_m2m_still_validates(self, tmp_path):
         """Le format legacy many_to_many (format_version: 1) est désormais refusé."""
-        from forge_cli.entities.relations import EntityRelationsError, validate_relations_definition
+        from cli.entities.relations import EntityRelationsError, validate_relations_definition
         root = _entities_root(tmp_path)
         _write_entity(root, "article", _canonical_article())
         _write_entity(root, "tag", _canonical_tag())
@@ -578,7 +578,7 @@ class TestLegacyManyToManyNonRegression:
 
     def test_legacy_m2m_sql_composite_pk(self, tmp_path):
         """Le format legacy (format_version: 1) est refusé avant génération SQL."""
-        from forge_cli.entities.relations import EntityRelationsError, validate_relations_definition
+        from cli.entities.relations import EntityRelationsError, validate_relations_definition
         root = _entities_root(tmp_path)
         _write_entity(root, "article", _canonical_article())
         _write_entity(root, "tag", _canonical_tag())
@@ -598,7 +598,7 @@ class TestLegacyManyToManyNonRegression:
 
     def test_legacy_and_canonical_m2o_coexist(self, tmp_path):
         """Legacy M2M et M2O canonique peuvent coexister dans le même projet."""
-        from forge_cli.entities.relations import validate_relations_definition
+        from cli.entities.relations import validate_relations_definition
         root = _entities_root(tmp_path)
         _write_entity(root, "article", _canonical_article())
         _write_entity(root, "tag", _canonical_tag())

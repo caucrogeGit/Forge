@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 
-from forge_cli.public_list import (
+from cli.public_list import (
     PublicMediaEntry,
     build_public_list_controller,
     build_public_list_spec,

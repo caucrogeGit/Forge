@@ -10,12 +10,12 @@ from __future__ import annotations
 
 import pytest
 
-from forge_cli.entities.make_crud import (
+from cli.entities.make_crud import (
     CrudManyToOneRelation,
     build_controller,
     build_model,
 )
-from forge_cli.entities.validation import normalize_entity_definition
+from cli.entities.validation import normalize_entity_definition
 
 
 # ---------------------------------------------------------------------------

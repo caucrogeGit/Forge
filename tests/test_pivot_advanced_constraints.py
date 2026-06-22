@@ -391,4 +391,4 @@ def test_pivot_advanced_ne_depend_pas_de_make_crud():
     import forge_mvc_pivot as pivot_advanced
     src = inspect.getsource(pivot_advanced)
     assert "make_crud" not in src
-    assert "from forge_cli" not in src
+    assert "from cli" not in src

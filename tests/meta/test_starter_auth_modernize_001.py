@@ -16,7 +16,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-_STARTERS_ROOT = PROJECT_ROOT / "forge_cli" / "starters" / "data"
+_STARTERS_ROOT = PROJECT_ROOT / "cli" / "starters" / "data"
 _MIDDLEWARE = PROJECT_ROOT / "core" / "security" / "middleware.py"
 _AUTH_CONTROLLER_RUNTIME = PROJECT_ROOT / "mvc" / "controllers" / "auth_controller.py"
 

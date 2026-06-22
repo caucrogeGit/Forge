@@ -56,15 +56,15 @@ pytest tests/test_rbac_validate_command.py -q
 pytest tests/test_rbac_schema_contract.py -q
 pytest tests/meta/test_rbac_contract_close_001.py -q
 grep -RInE 'rbac|RBAC|permission|require_permission|has_permission|403' \
-  forge_cli core mvc tests docs schemas README.md
+  cli core mvc tests docs schemas README.md
 ```
 
 ### Zones auditées
 
 - `packages/forge-mvc-rbac/forge_mvc_rbac/` — état du module existant
-- `forge_cli/rbac_validate.py` — commande `rbac:validate`
-- `forge_cli/entities/crud/context.py` — helper `_with_permission` / CRUD
-- `forge_cli/entities/make_crud.py` — branchement RBAC interne
+- `cli/rbac_validate.py` — commande `rbac:validate`
+- `cli/entities/crud/context.py` — helper `_with_permission` / CRUD
+- `cli/entities/make_crud.py` — branchement RBAC interne
 - `schemas/rbac.schema.json` — schéma de contrat
 - `docs/security/rbac-contract.md` — documentation du contrat
 - `docs/adr/014-rbac-contract-location.md` — décision architecturale

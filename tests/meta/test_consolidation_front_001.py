@@ -60,7 +60,7 @@ def test_app_js_existe_et_ne_charge_pas_htmx_alpine():
 
 def test_js_init_htmx_ajoute_dependance_npm(tmp_path):
     """forge js:init htmx ajoute htmx.org dans package.json."""
-    from forge_cli.front import init_htmx, HTMX_PACKAGE, HTMX_VERSION
+    from cli.front import init_htmx, HTMX_PACKAGE, HTMX_VERSION
     pkg_path = tmp_path / "package.json"
     pkg_path.write_text(json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8")
     (tmp_path / "mvc" / "views" / "layouts").mkdir(parents=True)
@@ -74,7 +74,7 @@ def test_js_init_htmx_ajoute_dependance_npm(tmp_path):
 
 def test_js_init_htmx_cree_dossier_vendor(tmp_path):
     """forge js:init htmx crée static/vendor/htmx/."""
-    from forge_cli.front import init_htmx
+    from cli.front import init_htmx
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8"
     )
@@ -87,7 +87,7 @@ def test_js_init_htmx_cree_dossier_vendor(tmp_path):
 
 def test_js_init_alpine_ajoute_dependance_npm(tmp_path):
     """forge js:init alpine ajoute alpinejs dans package.json."""
-    from forge_cli.front import init_alpine, ALPINE_PACKAGE, ALPINE_VERSION
+    from cli.front import init_alpine, ALPINE_PACKAGE, ALPINE_VERSION
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8"
     )
@@ -102,7 +102,7 @@ def test_js_init_alpine_ajoute_dependance_npm(tmp_path):
 
 def test_js_init_htmx_alpine_initialise_les_deux(tmp_path):
     """forge js:init htmx-alpine initialise HTMX et Alpine ensemble."""
-    from forge_cli.front import init_htmx_alpine, HTMX_PACKAGE, ALPINE_PACKAGE
+    from cli.front import init_htmx_alpine, HTMX_PACKAGE, ALPINE_PACKAGE
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8"
     )
@@ -119,7 +119,7 @@ def test_js_init_htmx_alpine_initialise_les_deux(tmp_path):
 
 def test_js_init_htmx_idempotent(tmp_path):
     """forge js:init htmx est idempotent — appels multiples sans effet de bord."""
-    from forge_cli.front import init_htmx, HTMX_PACKAGE
+    from cli.front import init_htmx, HTMX_PACKAGE
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {}, "dependencies": {}}, indent=2), encoding="utf-8"
     )
@@ -135,7 +135,7 @@ def test_js_init_htmx_idempotent(tmp_path):
 
 def test_js_init_commande_inconnue_leve_sysexit():
     """forge js:init avec une commande inconnue lève SystemExit."""
-    from forge_cli.front import main
+    from cli.front import main
     with pytest.raises(SystemExit):
         main(["js:init", "react"])
 
@@ -198,20 +198,20 @@ def test_layout_ne_charge_pas_alpine_automatiquement(layout_path):
 
 def test_make_crud_genere_hx_get_pour_pagination():
     """make_crud génère hx-get pour la pagination (amélioration progressive)."""
-    content = (ROOT / "forge_cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
+    content = (ROOT / "cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
     assert "hx-get" in content
 
 
 def test_make_crud_genere_hx_post_pour_suppression():
     """make_crud génère hx-post pour la suppression (pas hx-delete, compatibilité max)."""
-    content = (ROOT / "forge_cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
+    content = (ROOT / "cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
     assert "hx-post" in content
     assert "hx-delete" not in content
 
 
 def test_make_crud_genere_hx_target():
     """make_crud génère hx-target pour cibler les résultats HTMX."""
-    content = (ROOT / "forge_cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
+    content = (ROOT / "cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
     assert "hx-target" in content
 
 
@@ -226,15 +226,15 @@ def test_jinja_env_expose_trans():
 def test_generateurs_publics_utilisent_trans():
     """Les générateurs de pages publiques utilisent trans() dans les templates générés."""
     for fname in ("public_page.py", "public_form.py", "public_list.py", "public_contact.py"):
-        content = (ROOT / "forge_cli" / fname).read_text(encoding="utf-8")
+        content = (ROOT / "cli" / fname).read_text(encoding="utf-8")
         assert "trans(" in content, f"trans() absent dans {fname}"
 
 
 # ── Absence de dépendances SPA ────────────────────────────────────────────────
 
-def test_forge_cli_ne_contient_pas_react():
-    """forge_cli/ ne contient aucune référence à React."""
-    for f in (ROOT / "forge_cli").rglob("*.py"):
+def test_cli_ne_contient_pas_react():
+    """cli/ ne contient aucune référence à React."""
+    for f in (ROOT / "cli").rglob("*.py"):
         content = f.read_text(encoding="utf-8")
         assert "import React" not in content
         assert "from React" not in content
@@ -300,8 +300,8 @@ def test_doc_front_mentionne_build_css():
 # ── Séparation Forge Design ────────────────────────────────────────────────────
 
 def test_front_py_ne_depend_pas_forge_design():
-    """forge_cli/front.py ne référence pas Forge Design."""
-    content = (ROOT / "forge_cli" / "front.py").read_text(encoding="utf-8")
+    """cli/front.py ne référence pas Forge Design."""
+    content = (ROOT / "cli" / "front.py").read_text(encoding="utf-8")
     assert "forge-design" not in content.lower()
     assert "forge design" not in content.lower()
 

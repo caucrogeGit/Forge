@@ -8,7 +8,7 @@ Vérifie que le packaging CLI de Forge est cohérent :
 
 Décision G6 (option C) : forge.py reste le module unique — créer forge/
 comme package nécessiterait de supprimer forge.py et de migrer 236 imports
-de forge_cli dans les tests. Les deux modes d'invocation sont déjà
+de cli dans les tests. Les deux modes d'invocation sont déjà
 opérationnels via py-modules = ["forge"] et if __name__ == "__main__".
 """
 from __future__ import annotations

@@ -13,7 +13,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 AUDIT = Path("docs/history/audits/legacy-support-core-audit-001.md")
-STARTERS_DIR = Path("forge_cli/starters/data")
+STARTERS_DIR = Path("cli/starters/data")
 
 LEGACY_KEYS = [
     "format_version",

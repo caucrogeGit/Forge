@@ -124,9 +124,9 @@ commande la plus complète et la mieux placée.
 ## Référence
 
 - Ticket d'implémentation CLI : `CLI-NEW-DROP-STARTER-001` (retrait du flag,
-  `forge.py`, `forge_cli/help_dispatch.py`).
+  `forge.py`, `cli/help_dispatch.py`).
 - Ticket d'alignement documentaire : `DOC-STARTER-BUILD-ALIGN-001`.
 - Code concerné : `forge.py` (`cmd_new`, dispatch `new`),
-  `forge_cli/starters/` (`forge starter:build`).
+  `cli/starters/` (`forge starter:build`).
 - ADR-004 Périmètre du core : `docs/adr/004-core-perimeter.md`.
 - Charte : `CHARTE_DOC.md` (principes 8 et 11, règle A).

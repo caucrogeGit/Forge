@@ -467,7 +467,7 @@ PYENV_VERSION=3.12.13 python -m mkdocs build --strict
 Les tests de packaging vérifient :
 
 - que `pyproject.toml` utilise bien `find_packages` avec les bons patterns ;
-- que tous les sous-packages `core`, `forge_cli` et `integrations` sont couverts ;
+- que tous les sous-packages `core`, `cli` et `integrations` sont couverts ;
 - que les fichiers représentatifs de chaque starter existent sur disque ;
 - que le glob `starters/data/**/*` couvre tous les types (`.py`, `.json`, `.html`, `.snippet`).
 

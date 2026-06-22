@@ -165,7 +165,7 @@ class TestNoFrenchCallsRemain:
                 "--exclude=test_lang_migration_001.py",
                 "--exclude=test_getting_started_3_0_001.py",
                 "-E", pattern,
-                "core/", "mvc/", "forge_cli/", "tests/", "integrations/",
+                "core/", "mvc/", "cli/", "tests/", "integrations/",
             ],
             capture_output=True,
             text=True,

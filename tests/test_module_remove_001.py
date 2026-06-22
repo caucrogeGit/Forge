@@ -337,7 +337,7 @@ def test_result_dry_run_false_par_defaut(tmp_path, monkeypatch):
 def test_cli_dispatch_module_remove(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     _full_install(tmp_path)
-    from forge_cli.modules import main
+    from cli.modules import main
     main(["module:remove", "agenda"])
     out = capsys.readouterr().out
     assert "agenda" in out
@@ -347,7 +347,7 @@ def test_cli_module_remove_module_inconnu_exit_1(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     reg = tmp_path / "forge_modules.json"
     reg.write_text('{"installed": {}}', encoding="utf-8")
-    from forge_cli.modules import main
+    from cli.modules import main
     with pytest.raises(SystemExit) as exc:
         main(["module:remove", "inexistant"])
     assert exc.value.code == 1
@@ -356,14 +356,14 @@ def test_cli_module_remove_module_inconnu_exit_1(tmp_path, monkeypatch):
 def test_cli_module_remove_dry_run(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     _full_install(tmp_path)
-    from forge_cli.modules import main
+    from cli.modules import main
     main(["module:remove", "agenda", "--dry-run"])
     out = capsys.readouterr().out
     assert "simulée" in out.lower() or "Aucun fichier modifié" in out
 
 
 def test_cli_help_inclut_module_remove():
-    from forge_cli.modules import main
+    from cli.modules import main
     with pytest.raises(SystemExit) as exc:
         main([])
     assert exc.value.code == 1

@@ -16,7 +16,7 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 
 | Domaine | Existe déjà | Manque | Verdict |
 |---|---|---|---|
-| **slug (type)** | type `slug` dans le contrat d'entité (`forge_cli/entities/validation.py`) + `SlugField` CRUD + `_slugify` (validateur **strict**, rejette les accents) + `slugify_migration_name` | vrai `slugify` (translittération accents), `find_by_slug`, routing public `{slug}`, gestion d'unicité ; **3 fonctions slug à consolider (§11)** | 🔧 + 🔨 |
+| **slug (type)** | type `slug` dans le contrat d'entité (`cli/entities/validation.py`) + `SlugField` CRUD + `_slugify` (validateur **strict**, rejette les accents) + `slugify_migration_name` | vrai `slugify` (translittération accents), `find_by_slug`, routing public `{slug}`, gestion d'unicité ; **3 fonctions slug à consolider (§11)** | 🔧 + 🔨 |
 | **forge doctor** | 11 checks (db, env, ssl, migrations, structure, modules…) | checks **prod-sécurité** (debug off, cookies sécurisés, session non-mémoire, secret présent, perms `storage/`) | 🔧 étendre |
 | **/health** | documenté (`GET /health → {"status":"ok"}`) | vérifier l'implémentation réelle + option `--db` | 📋 + 🔧 |
 | **migrations** | `migration:status/apply/make/diff` | **pas de dry-run/confirm/garde-env trouvés** sur `apply` | 🔨 durcir (réel) |
@@ -160,12 +160,12 @@ depuis `unique: true`).
 
 | Couche | Fichier(s) | Changement |
 |---|---|---|
-| Schéma (×2 à synchroniser) | `schemas/field.schema.json` **et** `forge_cli/schemas/field.schema.json` | ajouter `slug` à l'enum `type` ; ajouter la propriété `source` (string) |
-| Normaliseur | `forge_cli/entities/canonical_model_normalizer.py` | `type:slug` → `sql_type:VARCHAR(180)`, `form.field:slug` ; propager `source` |
-| Validation | `forge_cli/entities/validation.py` | `source` dans `ALLOWED_FIELD_KEYS` ; règle sémantique : `source` réfère un champ texte existant de l'entité |
-| Form | `forge_cli/entities/crud/form_builder.py` | exclure du formulaire un champ slug porteur de `source` (auto-généré) |
-| Contrôleur | `forge_cli/entities/crud/controller_builder.py` | à la création : `data = dict(form.cleaned_data); data["<slug>"] = slugify(data["<source>"])` (via `core.http.slug`) avant `add_…(data)` ; envelopper l'INSERT pour capter l'erreur d'unicité → message clair |
-| Modèle | `forge_cli/entities/crud/model_builder.py` | **exclure** le champ slug auto de l'`UPDATE` (stable à l'édition) ; le garder dans l'`INSERT` |
+| Schéma (×2 à synchroniser) | `schemas/field.schema.json` **et** `cli/schemas/field.schema.json` | ajouter `slug` à l'enum `type` ; ajouter la propriété `source` (string) |
+| Normaliseur | `cli/entities/canonical_model_normalizer.py` | `type:slug` → `sql_type:VARCHAR(180)`, `form.field:slug` ; propager `source` |
+| Validation | `cli/entities/validation.py` | `source` dans `ALLOWED_FIELD_KEYS` ; règle sémantique : `source` réfère un champ texte existant de l'entité |
+| Form | `cli/entities/crud/form_builder.py` | exclure du formulaire un champ slug porteur de `source` (auto-généré) |
+| Contrôleur | `cli/entities/crud/controller_builder.py` | à la création : `data = dict(form.cleaned_data); data["<slug>"] = slugify(data["<source>"])` (via `core.http.slug`) avant `add_…(data)` ; envelopper l'INSERT pour capter l'erreur d'unicité → message clair |
+| Modèle | `cli/entities/crud/model_builder.py` | **exclure** le champ slug auto de l'`UPDATE` (stable à l'édition) ; le garder dans l'`INSERT` |
 
 ### Garde-fous / validation
 

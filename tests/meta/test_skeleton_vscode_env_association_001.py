@@ -25,7 +25,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-SKELETON_VSCODE = PROJECT_ROOT / "forge_cli" / "skeleton" / "data" / ".vscode" / "settings.json"
+SKELETON_VSCODE = PROJECT_ROOT / "cli" / "skeleton" / "data" / ".vscode" / "settings.json"
 
 
 def test_skeleton_vscode_settings_exists():
@@ -49,7 +49,7 @@ def test_skeleton_vscode_associates_env_to_properties():
 
 
 def test_skeleton_vscode_is_materialized_by_forge_new():
-    from forge_cli.skeleton import DATA_DIR, iter_skeleton_files
+    from cli.skeleton import DATA_DIR, iter_skeleton_files
     rel = {str(p.relative_to(DATA_DIR)) for p in iter_skeleton_files()}
     assert ".vscode/settings.json" in rel, (
         "iter_skeleton_files() doit inclure .vscode/settings.json pour que "
@@ -64,11 +64,11 @@ def test_pyproject_package_data_includes_dot_dir_files():
     Les globs `**/*` ne descendent pas dans les dossiers cachés, d'où le
     besoin d'un glob package-data dédié (ex. `skeleton/data/.*/**/*`). Ce test
     vérifie l'effet, pas la formulation exacte : au moins un pattern de
-    package-data['forge_cli'] doit matcher le fichier cible.
+    package-data['cli'] doit matcher le fichier cible.
     """
     pyproject = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    patterns = pyproject["tool"]["setuptools"]["package-data"]["forge_cli"]
-    pkg_dir = PROJECT_ROOT / "forge_cli"
+    patterns = pyproject["tool"]["setuptools"]["package-data"]["cli"]
+    pkg_dir = PROJECT_ROOT / "cli"
     target = "skeleton/data/.vscode/settings.json"
 
     matched = any(
@@ -76,7 +76,7 @@ def test_pyproject_package_data_includes_dot_dir_files():
         for pat in patterns
     )
     assert matched, (
-        "package-data['forge_cli'] doit contenir un glob couvrant les fichiers "
+        "package-data['cli'] doit contenir un glob couvrant les fichiers "
         "dans les dossiers dot du squelette (ex. 'skeleton/data/.*/**/*'), sinon "
         ".vscode/settings.json est exclu du wheel et forge new ne le matérialise pas."
     )

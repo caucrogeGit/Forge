@@ -646,7 +646,7 @@ Compléter JSON Schema par des contrôles que le schéma ne peut pas garantir se
 
 ### Livraison
 
-Module `forge_cli/entities/entity_semantic_validate.py` — `SemanticError` + `validate_semantic()` — 15 contrôles.
+Module `cli/entities/entity_semantic_validate.py` — `SemanticError` + `validate_semantic()` — 15 contrôles.
 Intégré dans `forge entity:validate` (Passe 2 après JSON Schema).
 41 tests dans `tests/test_entity_semantic_validation.py`.
 
@@ -692,7 +692,7 @@ Ces codes doivent pouvoir servir :
 
 ### Livraison
 
-Module `forge_cli/entities/entity_validation_errors.py` — liste centrale `ALL_CODES`.
+Module `cli/entities/entity_validation_errors.py` — liste centrale `ALL_CODES`.
 `SemanticError` porte désormais `code`, `file`, `path`, `message`, `hint`.
 Sortie humaine affiche `Code :` pour toutes les erreurs (JSON Schema + sémantiques).
 58 tests dans `tests/test_entity_validation_error_codes.py`.
@@ -833,7 +833,7 @@ Créer un traducteur interne `canonical → legacy_normalized` permettant à
 
 ### Résultat
 
-- module `forge_cli/entities/canonical_model_normalizer.py` ;
+- module `cli/entities/canonical_model_normalizer.py` ;
 - fonction `normalize_canonical_entity_for_model_build()` ;
 - mapping complet des 12 types Forge → sql_type + python_type ;
 - id technique généré automatiquement (BIGINT UNSIGNED, PK, AUTO_INCREMENT) ;
@@ -952,8 +952,8 @@ Conseil : lancez forge entity:validate pour obtenir le détail.
 
 **Fichiers modifiés :**
 
-- `forge_cli/entities/entity_validate.py` — ajout de `collect_entity_validation_results(entities_root)` : valide uniquement les entités canoniques (`schema_version: "1.0"`) ; dégradation douce si `jsonschema` absent ; retourne `dict` avec `errors`, `warnings`, `files_checked`, `files_valid`.
-- `forge_cli/entities/model.py` — ajout de `_assert_contracts_valid(entities_root)` ; appel en tête de `build_model()` avant `_validate_model_or_raise()`.
+- `cli/entities/entity_validate.py` — ajout de `collect_entity_validation_results(entities_root)` : valide uniquement les entités canoniques (`schema_version: "1.0"`) ; dégradation douce si `jsonschema` absent ; retourne `dict` avec `errors`, `warnings`, `files_checked`, `files_valid`.
+- `cli/entities/model.py` — ajout de `_assert_contracts_valid(entities_root)` ; appel en tête de `build_model()` avant `_validate_model_or_raise()`.
 - `tests/test_media_entity_canonical.py`, `tests/test_relations_entity_canonical.py` — retrait d'imports `pytest` inutilisés détectés par ruff.
 
 **Fichiers créés :**
@@ -999,7 +999,7 @@ forge.py → command == "make:crud" → cmd_make_crud_main()
 
 **Fichiers modifiés :**
 
-- `forge_cli/entities/make_crud.py` — ajout du garde `collect_entity_validation_results()` en tête de `make_crud()` ; ajout de la normalisation canonique avant `validate_entity_definition()` (même pattern que `model.py:_load_all_entity_sources`).
+- `cli/entities/make_crud.py` — ajout du garde `collect_entity_validation_results()` en tête de `make_crud()` ; ajout de la normalisation canonique avant `validate_entity_definition()` (même pattern que `model.py:_load_all_entity_sources`).
 
 **Fichiers créés :**
 
@@ -1050,7 +1050,7 @@ Aucune migration générée depuis un contrat invalide.
 
 **Fichiers modifiés :**
 
-- `forge_cli/entities/migrations.py` — ajout `normalize_canonical_entity_for_model_build` dans `load_entity_definition()` (normalisation canonical) ; ajout `_assert_migration_contracts_valid()` ; appels dans `_run_diff_command()` et `_run_make_command()` quand `from_diff is not None`.
+- `cli/entities/migrations.py` — ajout `normalize_canonical_entity_for_model_build` dans `load_entity_definition()` (normalisation canonical) ; ajout `_assert_migration_contracts_valid()` ; appels dans `_run_diff_command()` et `_run_make_command()` quand `from_diff is not None`.
 
 **Fichiers créés :**
 
@@ -1622,14 +1622,14 @@ Lister les schémas disponibles.
 
 ### Ce qui a été livré
 
-- `forge_cli/schemas/__init__.py` + `forge_cli/schemas/schema_list.py` — module `schema:list`.
+- `cli/schemas/__init__.py` + `cli/schemas/schema_list.py` — module `schema:list`.
 - Lit `schemas/forge.schema.index.json` (registre local), affiche nom, chemin et statut.
 - Sortie humaine : liste alignée avec `OK` / `MANQUANT` + total.
 - Option `--json` : sortie machine avec `valid`, `registry`, `schema_version`, `count`, `schemas[]`.
 - Gestion d'erreurs : registre absent, JSON invalide, clé `schemas` manquante, fichier manquant.
 - Exit 1 si le registre est illisible ou si au moins un schéma est manquant.
 - `forge.py` : dispatch `schema:list` ajouté.
-- `forge_cli/help.py` : section "Schémas JSON" ajoutée.
+- `cli/help.py` : section "Schémas JSON" ajoutée.
 - `tests/test_schema_list_command.py` (34 tests).
 
 ### Exemple
@@ -1677,12 +1677,12 @@ Optionnel mais utile avant publication.
 
 ### Livraison
 
-- **`forge_cli/schemas/schema_doctor.py`** — commande `schema_doctor_main()` avec 5 contrôles par schéma
+- **`cli/schemas/schema_doctor.py`** — commande `schema_doctor_main()` avec 5 contrôles par schéma
   (existence, JSON valide, `$schema` Draft 2020-12, `$id`, `$ref` locaux résolus)
 - **`tests/test_schema_doctor_command.py`** — 42 tests (sortie humaine, sortie `--json`,
   gestion d'erreurs, non-régression)
 - **`forge.py`** — dispatch `schema:doctor` ajouté
-- **`forge_cli/help.py`** — section « Schémas JSON » complétée avec `schema:doctor`
+- **`cli/help.py`** — section « Schémas JSON » complétée avec `schema:doctor`
 - Suite complète : 11 440 tests passent, 6 skipped, 0 régression
 
 Exemple de sortie :

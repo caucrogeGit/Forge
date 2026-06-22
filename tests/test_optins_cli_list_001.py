@@ -20,7 +20,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from forge_cli.optins.list import (
+from cli.optins.list import (
     STATE_ABSENT,
     STATE_ACTIVE,
     STATE_PARTIAL,
@@ -30,8 +30,8 @@ from forge_cli.optins.list import (
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 FORGE_PY = _REPO_ROOT / "forge.py"
-HELP_FILE = _REPO_ROOT / "forge_cli" / "help.py"
-LIST_FILE = _REPO_ROOT / "forge_cli" / "optins" / "list.py"
+HELP_FILE = _REPO_ROOT / "cli" / "help.py"
+LIST_FILE = _REPO_ROOT / "cli" / "optins" / "list.py"
 CORE_DIR = _REPO_ROOT / "core"
 
 _RECOGNIZED_ROUTES = (

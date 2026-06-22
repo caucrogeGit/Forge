@@ -61,7 +61,7 @@ def test_forge_config_kwargs_has_no_mail_key(monkeypatch):
 def test_skeleton_has_no_mail_plumbing():
     """Le squelette nu ne pré-câble plus le mail (env/config/app)."""
     from pathlib import Path
-    root = Path(__file__).parent.parent / "forge_cli" / "skeleton" / "data"
+    root = Path(__file__).parent.parent / "cli" / "skeleton" / "data"
     for rel in ("env/example", "config.py"):
         text = (root / rel).read_text(encoding="utf-8")
         assert "MAIL_HOST" not in text and "MAIL_ENABLED" not in text, (

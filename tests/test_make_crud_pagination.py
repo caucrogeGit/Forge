@@ -1,6 +1,6 @@
 """Tests de la pagination CRUD generee par forge make:crud."""
 
-from forge_cli.entities.make_crud import (
+from cli.entities.make_crud import (
     CrudManyToOneRelation,
     build_controller,
     build_index_view,

@@ -167,7 +167,7 @@ forge --version              # après pip install (entry point déclaré)
 
 La restructuration en package `forge/` a été évaluée (`PACKAGING-FORGE-MODULE-001`)
 et écartée : `forge.py` et `forge/` ne peuvent pas coexister, et 236 imports
-`forge_cli` dans les tests empêchent une migration sans risque.
+`cli` dans les tests empêchent une migration sans risque.
 
 ## Modifier la landing page
 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities import make_entity
+from cli.entities import make_entity
 
 
 def _configure_cli_roots(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

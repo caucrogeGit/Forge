@@ -29,7 +29,7 @@ import pytest
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-_STARTERS_ROOT = _REPO_ROOT / "forge_cli" / "starters" / "data"
+_STARTERS_ROOT = _REPO_ROOT / "cli" / "starters" / "data"
 
 
 _PUBLIC_ACTION_NAMES = {
@@ -121,7 +121,7 @@ class TestCrudGenerator:
     """`forge make:crud` produit un contrôleur typé."""
 
     def _build_controller(self) -> str:
-        from forge_cli.entities.crud.controller_builder import build_controller
+        from cli.entities.crud.controller_builder import build_controller
         definition = {
             "entity": "Contact",
             "table": "contact",
@@ -178,7 +178,7 @@ class TestPublicPageGenerator:
     """`forge make:public-page` produit un contrôleur typé."""
 
     def _build(self) -> str:
-        from forge_cli.public_page import build_controller, build_public_page_spec
+        from cli.public_page import build_controller, build_public_page_spec
         spec = build_public_page_spec("accueil")
         return build_controller(spec)
 
@@ -232,27 +232,27 @@ class TestPublicListGenerator:
     `show`."""
 
     def _spec(self):
-        from forge_cli.public_list import build_public_list_spec
+        from cli.public_list import build_public_list_spec
         return build_public_list_spec(_public_definition())
 
     def test_list_importe_request_response(self):
-        from forge_cli.public_list import build_public_list_controller
+        from cli.public_list import build_public_list_controller
         code = build_public_list_controller(self._spec())
         assert "from core.http.request import Request" in code
         assert "from core.http.response import Response" in code
 
     def test_list_index_annote(self):
-        from forge_cli.public_list import build_public_list_controller
+        from cli.public_list import build_public_list_controller
         assert "def index(request: Request) -> Response:" in build_public_list_controller(self._spec())
 
     def test_show_importe_request_response(self):
-        from forge_cli.public_list import build_public_show_controller
+        from cli.public_list import build_public_show_controller
         code = build_public_show_controller(self._spec())
         assert "from core.http.request import Request" in code
         assert "from core.http.response import Response" in code
 
     def test_show_method_annote(self):
-        from forge_cli.public_list import build_public_show_controller
+        from cli.public_list import build_public_show_controller
         assert "def show(request: Request) -> Response:" in build_public_show_controller(self._spec())
 
 
@@ -263,21 +263,21 @@ class TestPublicFormGenerator:
     """`forge make:public-form` produit `new`/`create` annotés."""
 
     def _spec(self):
-        from forge_cli.public_form import build_public_form_spec
+        from cli.public_form import build_public_form_spec
         return build_public_form_spec(_public_definition())
 
     def test_importe_request_response(self):
-        from forge_cli.public_form import build_public_form_controller
+        from cli.public_form import build_public_form_controller
         code = build_public_form_controller(self._spec())
         assert "from core.http.request import Request" in code
         assert "from core.http.response import Response" in code
 
     def test_new_annote(self):
-        from forge_cli.public_form import build_public_form_controller
+        from cli.public_form import build_public_form_controller
         assert "def new(request: Request) -> Response:" in build_public_form_controller(self._spec())
 
     def test_create_annote(self):
-        from forge_cli.public_form import build_public_form_controller
+        from cli.public_form import build_public_form_controller
         assert "def create(request: Request) -> Response:" in build_public_form_controller(self._spec())
 
 

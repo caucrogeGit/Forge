@@ -13,7 +13,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROOT = Path(__file__).resolve().parents[2]
-STARTERS_DIR = ROOT / "forge_cli" / "starters" / "data"
+STARTERS_DIR = ROOT / "cli" / "starters" / "data"
 
 
 # ── Absence de legacy dans les starters ──────────────────────────────────────

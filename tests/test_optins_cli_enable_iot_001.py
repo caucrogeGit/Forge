@@ -23,12 +23,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-from forge_cli.optins.enable import SUPPORTED_OPTINS, enable_optin, main
+from cli.optins.enable import SUPPORTED_OPTINS, enable_optin, main
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 FORGE_PY = _REPO_ROOT / "forge.py"
-HELP_FILE = _REPO_ROOT / "forge_cli" / "help.py"
-ENABLE_FILE = _REPO_ROOT / "forge_cli" / "optins" / "enable.py"
+HELP_FILE = _REPO_ROOT / "cli" / "help.py"
+ENABLE_FILE = _REPO_ROOT / "cli" / "optins" / "enable.py"
 CORE_DIR = _REPO_ROOT / "core"
 
 _PKG_OK = lambda _name: True  # noqa: E731 — paquet présent

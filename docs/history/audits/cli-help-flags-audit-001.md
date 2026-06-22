@@ -42,8 +42,8 @@ Les groupes les plus solides sont **Starters/modules** (5/6) et
    - `OTHER_ERR` : `exit != 0` sans pattern d'aide, message explicite « option inconnue », « entité introuvable », etc. ;
    - `RUNS_COMMAND` : sortie longue, exit 0, sans marqueur d'aide ;
    - `TRACEBACK` : trace Python complète.
-3. **Lecture de structure** : inspection de chaque `forge_cli/*.py` et
-   `forge_cli/entities/*.py` pour identifier le style d'arg-parsing
+3. **Lecture de structure** : inspection de chaque `cli/*.py` et
+   `cli/entities/*.py` pour identifier le style d'arg-parsing
    (manuel vs argparse) et les éventuels `if arg in {"-h", "--help"}:`.
 4. **Probe non commitée** : le script temporaire vit dans `/tmp/` ;
    il n'est pas conservé dans le dépôt (consigne du ticket).
@@ -160,11 +160,11 @@ cause structurelle).
   dispatcher `forge.py:660-665`.
 - `migration:make`, `starter:build` — check manuel dans le main.
 - `module:list`, `module:install`, `module:files`, `module:routes` —
-  pattern uniforme du module `forge_cli/modules.py`.
+  pattern uniforme du module `cli/modules.py`.
 - `auth:user:create`, `auth:user:show`, `auth:user:disable`,
   `auth:user:enable`, `auth:user:password`, `auth:user:role:add`,
   `auth:user:role:remove`, `auth:user:roles` — **argparse natif**
-  dans `forge_cli/auth.py` (8 commandes, le seul module de la CLI
+  dans `cli/auth.py` (8 commandes, le seul module de la CLI
   totalement aligné).
 
 ---
@@ -233,12 +233,12 @@ gérer individuellement.
 
 | Style | Modules | Conséquence |
 |---|---|---|
-| **Argparse natif** | `forge_cli/auth.py` (8 commandes `auth:user:*`) | `--help` géré gratuitement par `argparse` |
+| **Argparse natif** | `cli/auth.py` (8 commandes `auth:user:*`) | `--help` géré gratuitement par `argparse` |
 | **Parseur manuel** | tous les autres modules | `--help` doit être traité explicitement ; n'arrive presque jamais en pratique |
 
-Le seul module pleinement argparse-iso est `forge_cli/auth.py`. Tous
-les `forge_cli/entities/*.py`, `forge_cli/mail.py`, `forge_cli/modules.py`,
-`forge_cli/i18n.py`, `forge_cli/uploads.py`, etc., utilisent un
+Le seul module pleinement argparse-iso est `cli/auth.py`. Tous
+les `cli/entities/*.py`, `cli/mail.py`, `cli/modules.py`,
+`cli/i18n.py`, `cli/uploads.py`, etc., utilisent un
 parseur maison à base de `args[0] == "..."`. Le pattern « `--help`
 explicite » a été appliqué de façon hétérogène.
 
@@ -262,8 +262,8 @@ au préalable se doter d'un mécanisme de description par commande
 
 ### Cause 5 — Les commandes « schema:* » et « rbac:* » ont un parseur strict
 
-Les modules récents `forge_cli/schemas/*.py`, `forge_cli/rbac_validate.py`
-et `forge_cli/rbac_audit.py` rejettent explicitement les options
+Les modules récents `cli/schemas/*.py`, `cli/rbac_validate.py`
+et `cli/rbac_audit.py` rejettent explicitement les options
 inconnues avec « option inconnue pour `<cmd>` : ... ». C'est plus rigoureux
 que les anciens modules, mais ils ne reconnaissent pas `--help` ; le
 résultat est un message hostile au lieu d'une aide. Ces modules sont
@@ -382,7 +382,7 @@ régression. À traiter à la toute fin.
 
 Ce ticket n'a délibérément **pas** :
 
-- modifié `forge.py` ni aucun module `forge_cli/*` ;
+- modifié `forge.py` ni aucun module `cli/*` ;
 - migré la CLI vers `argparse` globalement ;
 - corrigé une seule commande ;
 - modifié la documentation `cli-commands.md` ;

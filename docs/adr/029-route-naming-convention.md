@@ -139,6 +139,6 @@ deux conventions parallèles (principe 11).
 ## Référence
 
 - Page de convention : [Convention de route](../contributing/route-convention.md).
-- Générateur concerné : `forge_cli/entities/make_crud.py`.
+- Générateur concerné : `cli/entities/make_crud.py`.
 - ADR-024 Bootstrap squelette dédié : [ADR-024](024-skeleton-bootstrap.md).
 - Charte : `CHARTE_DOC.md` (principe 11 ; règle C, dérogation bêta pré-1.0).

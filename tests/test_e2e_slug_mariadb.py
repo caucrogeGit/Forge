@@ -77,12 +77,12 @@ if not _DB_NAME.startswith(_SAFE_PREFIX):
 # ── Imports Forge (pipeline réel) ─────────────────────────────────────────────
 
 from core.http.slug import slugify
-from forge_cli.entities.canonical_model_normalizer import (
+from cli.entities.canonical_model_normalizer import (
     normalize_canonical_entity_for_model_build,
 )
-from forge_cli.entities.db_apply import apply_model_sql
-from forge_cli.entities.make_entity import build_entity_sql
-from forge_cli.entities.validation import validate_entity_definition
+from cli.entities.db_apply import apply_model_sql
+from cli.entities.make_entity import build_entity_sql
+from cli.entities.validation import validate_entity_definition
 
 # ── Entité de test : Article avec slug auto-généré depuis title ───────────────
 

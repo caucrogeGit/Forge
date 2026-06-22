@@ -36,7 +36,7 @@ Pour tout renommage massif d'API ou extraction modulaire, grep sur les
 **5 racines productives** :
 
 ```
-core/   mvc/   forge_cli/   tests/   integrations/
+core/   mvc/   cli/   tests/   integrations/
 ```
 
 Manquer une racine cause des call sites oubliés qui ne se révèlent

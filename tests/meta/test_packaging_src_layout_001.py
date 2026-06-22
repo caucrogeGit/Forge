@@ -4,7 +4,7 @@ Vérifie que :
 1. Le pyproject.toml racine est la seule source de vérité pour la
    publication PyPI (Approche B — consolidation T2b).
 2. La configuration setuptools du pyproject.toml racine est correcte
-   (where=["."], include core/forge_cli/integrations).
+   (where=["."], include core/cli/integrations).
 3. L'ancien véhicule packages/forge-mvc/pyproject.toml n'est pas
    revenu (garde-fou anti-régression).
 4. Les artefacts gitignorés générés par l'ancien build vehicle ne
@@ -13,7 +13,7 @@ Vérifie que :
 Origine : T2 a découvert que les wheels buildées depuis packages/forge-mvc/
 étaient vides (3.6 KB, 0 ligne de code Python). T2b consolide le
 packaging sur le pyproject.toml racine qui utilise where=["."] et
-produit une wheel valide (~900 KB, core/forge_cli/integrations inclus).
+produit une wheel valide (~900 KB, core/cli/integrations inclus).
 """
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ OLD_PYPI_PYPROJECT = PROJECT_ROOT / "packages" / "forge-mvc" / "pyproject.toml"
 # Supprimés par T2b — ne doivent jamais réapparaître dans packages/
 OLD_BUILD_ARTIFACT_PATHS = [
     "packages/core",
-    "packages/forge_cli",
+    "packages/cli",
     "packages/integrations",
     "packages/forge.py",
 ]
@@ -80,11 +80,11 @@ class TestRootPyprojectSetuptoolsConfig:
             "pyproject.toml racine : include doit contenir 'core*'."
         )
 
-    def test_packages_find_includes_forge_cli(self):
+    def test_packages_find_includes_cli(self):
         data = self._load()
         include = data["tool"]["setuptools"]["packages"]["find"]["include"]
-        assert any("forge_cli" in p for p in include), (
-            "pyproject.toml racine : include doit contenir 'forge_cli*'."
+        assert any("cli" in p for p in include), (
+            "pyproject.toml racine : include doit contenir 'cli*'."
         )
 
     def test_packages_find_includes_integrations(self):

@@ -12,11 +12,11 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.canonical_model_normalizer import (
+from cli.entities.canonical_model_normalizer import (
     normalize_canonical_entity_for_model_build,
 )
-from forge_cli.entities.crud.form_builder import build_form
-from forge_cli.entities.validation import validate_entity_definition
+from cli.entities.crud.form_builder import build_form
+from cli.entities.validation import validate_entity_definition
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -61,7 +61,7 @@ class TestCrudFormGeneration:
 class TestSchemaEnum:
     @pytest.mark.parametrize("rel", [
         "schemas/field.schema.json",
-        "forge_cli/schemas/field.schema.json",
+        "cli/schemas/field.schema.json",
     ])
     def test_slug_in_type_enum(self, rel):
         schema = json.loads((PROJECT_ROOT / rel).read_text(encoding="utf-8"))

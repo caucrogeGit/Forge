@@ -16,7 +16,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 
-from forge_cli.schemas.schema_doctor import (
+from cli.schemas.schema_doctor import (
     schema_doctor_main,
     _collect_local_refs,
 )
@@ -49,7 +49,7 @@ def _run(args: list[str]) -> tuple[str, str, int]:
 
 
 def test_module_importable():
-    from forge_cli.schemas import schema_doctor  # noqa: F401
+    from cli.schemas import schema_doctor  # noqa: F401
 
 
 def test_schema_doctor_main_callable():
@@ -244,7 +244,7 @@ def test_references_include_field_and_common():
 
 def test_missing_registry_exits_with_error(tmp_path):
     fake_registry = tmp_path / "forge.schema.index.json"
-    with patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
         _, stderr, code = _run([])
     assert code == 1
     assert "introuvable" in stderr.lower() or "erreur" in stderr.lower()
@@ -252,7 +252,7 @@ def test_missing_registry_exits_with_error(tmp_path):
 
 def test_missing_registry_json_output(tmp_path):
     fake_registry = tmp_path / "forge.schema.index.json"
-    with patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
         stdout, _, code = _run(["--json"])
     obj = json.loads(stdout)
     assert obj["valid"] is False
@@ -262,7 +262,7 @@ def test_missing_registry_json_output(tmp_path):
 def test_invalid_json_registry_exits_with_error(tmp_path):
     fake_registry = tmp_path / "forge.schema.index.json"
     fake_registry.write_text("{ not valid json }", encoding="utf-8")
-    with patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
         _, stderr, code = _run([])
     assert code == 1
     assert "invalide" in stderr.lower() or "erreur" in stderr.lower()
@@ -271,7 +271,7 @@ def test_invalid_json_registry_exits_with_error(tmp_path):
 def test_invalid_json_registry_json_output(tmp_path):
     fake_registry = tmp_path / "forge.schema.index.json"
     fake_registry.write_text("{ not valid json }", encoding="utf-8")
-    with patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
         stdout, _, code = _run(["--json"])
     obj = json.loads(stdout)
     assert obj["valid"] is False
@@ -281,7 +281,7 @@ def test_invalid_json_registry_json_output(tmp_path):
 def test_registry_without_schemas_key(tmp_path):
     fake_registry = tmp_path / "forge.schema.index.json"
     fake_registry.write_text('{"schema_version": "1.0"}', encoding="utf-8")
-    with patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry):
         _, stderr, code = _run([])
     assert code == 1
 
@@ -293,8 +293,8 @@ def test_missing_schema_file_reports_error(tmp_path):
         encoding="utf-8",
     )
     with (
-        patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
-        patch("forge_cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
+        patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
+        patch("cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
     ):
         stdout, _, code = _run([])
     assert code == 1
@@ -308,8 +308,8 @@ def test_missing_schema_file_json_output(tmp_path):
         encoding="utf-8",
     )
     with (
-        patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
-        patch("forge_cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
+        patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
+        patch("cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
     ):
         stdout, _, code = _run(["--json"])
     obj = json.loads(stdout)
@@ -328,8 +328,8 @@ def test_invalid_schema_json_content(tmp_path):
         encoding="utf-8",
     )
     with (
-        patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
-        patch("forge_cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
+        patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
+        patch("cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
     ):
         stdout, _, code = _run([])
     assert code == 1
@@ -349,8 +349,8 @@ def test_missing_dollar_schema_key(tmp_path):
         encoding="utf-8",
     )
     with (
-        patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
-        patch("forge_cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
+        patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
+        patch("cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
     ):
         stdout, _, code = _run([])
     assert code == 1
@@ -374,8 +374,8 @@ def test_dead_local_ref(tmp_path):
         encoding="utf-8",
     )
     with (
-        patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
-        patch("forge_cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
+        patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
+        patch("cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
     ):
         stdout, _, code = _run([])
     assert code == 1
@@ -399,8 +399,8 @@ def test_dead_local_ref_json_output(tmp_path):
         encoding="utf-8",
     )
     with (
-        patch("forge_cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
-        patch("forge_cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
+        patch("cli.schemas.schema_doctor._registry_path", return_value=fake_registry),
+        patch("cli.schemas.schema_doctor._schemas_dir", return_value=tmp_path),
     ):
         stdout, _, code = _run(["--json"])
     obj = json.loads(stdout)
@@ -420,12 +420,12 @@ def test_unknown_option_exits_with_error():
 
 
 def test_schema_list_not_broken():
-    from forge_cli.schemas.schema_list import schema_list_main
+    from cli.schemas.schema_list import schema_list_main
     assert callable(schema_list_main)
 
 
 def test_entity_validate_not_broken():
-    from forge_cli.entities.entity_validate import main as entity_validate_main
+    from cli.entities.entity_validate import main as entity_validate_main
     assert callable(entity_validate_main)
 
 
@@ -442,6 +442,6 @@ def test_forge_py_dispatches_schema_doctor(capsys):
 
 
 def test_help_mentions_schema_doctor():
-    from forge_cli.help import build_help
+    from cli.help import build_help
     help_text = build_help("test")
     assert "schema:doctor" in help_text

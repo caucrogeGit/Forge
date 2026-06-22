@@ -1,7 +1,7 @@
 # CONSOLIDATION-NON-OVERWRITE-001 — Audit : préservation du code utilisateur dans les générateurs
 
 **Date :** 2026-05-08
-**Périmètre :** générateurs `forge_cli/` — comportement face aux fichiers existants
+**Périmètre :** générateurs `cli/` — comportement face aux fichiers existants
 **Ticket :** CONSOLIDATION-NON-OVERWRITE-001
 
 ---
@@ -18,7 +18,7 @@ Forge utilise trois mécanismes distincts, chacun adapté à son contexte.
 
 ### 1. `ensure_file` — création unique
 
-**Définition :** `forge_cli/entities/make_entity.py:754`
+**Définition :** `cli/entities/make_entity.py:754`
 
 ```python
 def ensure_file(path: Path, content: str, created: list[Path], skipped: list[Path]) -> None:
@@ -32,7 +32,7 @@ def ensure_file(path: Path, content: str, created: list[Path], skipped: list[Pat
 
 **Comportement :** si le fichier existe, il est ajouté à `skipped` et la fonction retourne sans rien écrire. Aucune exception, aucun overwrite.
 
-**Utilisé par :** `make:entity` (9 appels), `starter:build` via `forge_cli/starters/builder.py`, `make:public-*`, `deploy:*`, `front:init`, `mail:*`.
+**Utilisé par :** `make:entity` (9 appels), `starter:build` via `cli/starters/builder.py`, `make:public-*`, `deploy:*`, `front:init`, `mail:*`.
 
 **Sites d'appel dans `make_entity.py` :**
 
@@ -51,7 +51,7 @@ def ensure_file(path: Path, content: str, created: list[Path], skipped: list[Pat
 
 ### 2. `_write_if_new` — création avec rapport
 
-**Définition :** `forge_cli/entities/make_crud.py:2239`
+**Définition :** `cli/entities/make_crud.py:2239`
 
 ```python
 def _write_if_new(path: Path, content: str, result: MakeCrudResult, dry_run: bool) -> None:
@@ -72,7 +72,7 @@ def _write_if_new(path: Path, content: str, result: MakeCrudResult, dry_run: boo
 
 ### 3. `build_model` — régénération sélective
 
-**Définition :** `forge_cli/entities/model.py:91`
+**Définition :** `cli/entities/model.py:91`
 
 ```python
 def build_model(entities_root: Path, *, dry_run: bool = False) -> BuildModelResult:
@@ -113,7 +113,7 @@ def build_model(entities_root: Path, *, dry_run: bool = False) -> BuildModelResu
 
 ### 4. `check_existing` — barrière avant starter
 
-**Définition :** `forge_cli/starters/scaffold.py:13`
+**Définition :** `cli/starters/scaffold.py:13`
 
 ```python
 def check_existing(meta: dict, root: Path) -> list[str]:

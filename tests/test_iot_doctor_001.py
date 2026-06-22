@@ -31,8 +31,8 @@ from forge_mvc_iot.cli.doctor import (
 
 PROJECT_ROOT = Path(__file__).parent.parent
 FORGE_PY = PROJECT_ROOT / "forge.py"
-HELP_FILE = PROJECT_ROOT / "forge_cli" / "help.py"
-HELP_DISPATCH_FILE = PROJECT_ROOT / "forge_cli" / "help_dispatch.py"
+HELP_FILE = PROJECT_ROOT / "cli" / "help.py"
+HELP_DISPATCH_FILE = PROJECT_ROOT / "cli" / "help_dispatch.py"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

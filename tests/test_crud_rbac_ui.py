@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import pytest
 
-from forge_cli.entities.crud.views_builder import (
+from cli.entities.crud.views_builder import (
     build_index_view,
     build_table_partial,
     build_show_view,
@@ -185,7 +185,7 @@ class TestMakeCrudRbacIntegration:
 
     def test_make_crud_passe_rbac_index(self, tmp_path):
         import json
-        from forge_cli.entities.make_crud import make_crud
+        from cli.entities.make_crud import make_crud
 
         entity_dir = tmp_path / "entities" / "contact"
         entity_dir.mkdir(parents=True)
@@ -198,7 +198,7 @@ class TestMakeCrudRbacIntegration:
 
     def test_make_crud_passe_rbac_table(self, tmp_path):
         import json
-        from forge_cli.entities.make_crud import make_crud
+        from cli.entities.make_crud import make_crud
 
         entity_dir = tmp_path / "entities" / "contact"
         entity_dir.mkdir(parents=True)
@@ -211,7 +211,7 @@ class TestMakeCrudRbacIntegration:
 
     def test_make_crud_passe_rbac_show(self, tmp_path):
         import json
-        from forge_cli.entities.make_crud import make_crud
+        from cli.entities.make_crud import make_crud
 
         entity_dir = tmp_path / "entities" / "contact"
         entity_dir.mkdir(parents=True)
@@ -224,7 +224,7 @@ class TestMakeCrudRbacIntegration:
 
     def test_make_crud_sans_rbac_pas_de_guards(self, tmp_path):
         import json
-        from forge_cli.entities.make_crud import make_crud
+        from cli.entities.make_crud import make_crud
 
         entity_dir = tmp_path / "entities" / "contact"
         entity_dir.mkdir(parents=True)

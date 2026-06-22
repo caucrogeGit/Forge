@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_cli.entities.relations import (
+from cli.entities.relations import (
     EntityRelationsError,
     ValidatedRelation,
     generate_relations_sql,

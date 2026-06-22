@@ -50,15 +50,15 @@ Liste alphabétique. Source : `forge.py` au commit de clôture.
 | `auth:init` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `auth:list-sql` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `auth:status` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `auth:user:create` | AIDE_NATIVE_ARGPARSE | `forge_cli/auth.py` |
-| `auth:user:disable` | AIDE_NATIVE_ARGPARSE | `forge_cli/auth.py` |
-| `auth:user:enable` | AIDE_NATIVE_ARGPARSE | `forge_cli/auth.py` |
+| `auth:user:create` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
+| `auth:user:disable` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
+| `auth:user:enable` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
 | `auth:user:list` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `auth:user:password` | AIDE_NATIVE_ARGPARSE | `forge_cli/auth.py` |
-| `auth:user:role:add` | AIDE_NATIVE_ARGPARSE | `forge_cli/auth.py` |
-| `auth:user:role:remove` | AIDE_NATIVE_ARGPARSE | `forge_cli/auth.py` |
-| `auth:user:roles` | AIDE_NATIVE_ARGPARSE | `forge_cli/auth.py` |
-| `auth:user:show` | AIDE_NATIVE_ARGPARSE | `forge_cli/auth.py` |
+| `auth:user:password` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
+| `auth:user:role:add` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
+| `auth:user:role:remove` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
+| `auth:user:roles` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
+| `auth:user:show` | AIDE_NATIVE_ARGPARSE | `cli/auth.py` |
 | `build:model` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `check:model` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `db:apply` | AIDE_NATIVE_MANUELLE | `forge.py` (lignes 661-666) |
@@ -77,23 +77,23 @@ Liste alphabétique. Source : `forge.py` au commit de clôture.
 | `mail:render` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `mail:test` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `make:crud` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `make:entity` | AIDE_NATIVE_MANUELLE | `forge_cli/entities/make_entity.py:289` |
+| `make:entity` | AIDE_NATIVE_MANUELLE | `cli/entities/make_entity.py:289` |
 | `make:pivot-crud` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `make:public-contact` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `make:public-form` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `make:public-list` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `make:public-page` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `make:public-show` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `make:relation` | AIDE_NATIVE_MANUELLE | `forge_cli/entities/make_relation.py` |
+| `make:relation` | AIDE_NATIVE_MANUELLE | `cli/entities/make_relation.py` |
 | `media:init` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `migration:apply` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `migration:diff` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `migration:make` | AIDE_NATIVE_MANUELLE | `forge_cli/entities/migrations.py:460` |
+| `migration:make` | AIDE_NATIVE_MANUELLE | `cli/entities/migrations.py:460` |
 | `migration:status` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `module:files` | AIDE_NATIVE_MANUELLE | `forge_cli/modules.py` |
-| `module:install` | AIDE_NATIVE_MANUELLE | `forge_cli/modules.py` |
-| `module:list` | AIDE_NATIVE_MANUELLE | `forge_cli/modules.py` |
-| `module:routes` | AIDE_NATIVE_MANUELLE | `forge_cli/modules.py` |
+| `module:files` | AIDE_NATIVE_MANUELLE | `cli/modules.py` |
+| `module:install` | AIDE_NATIVE_MANUELLE | `cli/modules.py` |
+| `module:list` | AIDE_NATIVE_MANUELLE | `cli/modules.py` |
+| `module:routes` | AIDE_NATIVE_MANUELLE | `cli/modules.py` |
 | `new` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `project:audit` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `project:check` | AIDE_RICHE | `HELP_TEXTS_RICH` |
@@ -102,7 +102,7 @@ Liste alphabétique. Source : `forge.py` au commit de clôture.
 | `routes:list` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `schema:doctor` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `schema:list` | AIDE_RICHE | `HELP_TEXTS_RICH` |
-| `starter:build` | AIDE_NATIVE_MANUELLE | `forge_cli/starters/__init__.py:34` |
+| `starter:build` | AIDE_NATIVE_MANUELLE | `cli/starters/__init__.py:34` |
 | `starter:list` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `sync:entity` | AIDE_RICHE | `HELP_TEXTS_RICH` |
 | `sync:landing` | AIDE_RICHE | `HELP_TEXTS_RICH` |
@@ -164,15 +164,15 @@ Le dispatcher central ne les intercepte pas (absence d'entrée dans
 
 | Commande | Lieu du `if "--help" in args:` |
 |---|---|
-| `make:entity` | `forge_cli/entities/make_entity.py:289` |
-| `make:relation` | `forge_cli/entities/make_relation.py` (analogue) |
+| `make:entity` | `cli/entities/make_entity.py:289` |
+| `make:relation` | `cli/entities/make_relation.py` (analogue) |
 | `db:apply` | `forge.py:661-666` (interception au dispatcher) |
-| `migration:make` | `forge_cli/entities/migrations.py:460-472` |
-| `starter:build` | `forge_cli/starters/__init__.py:34-44` |
-| `module:list` | `forge_cli/modules.py` |
-| `module:install` | `forge_cli/modules.py` |
-| `module:files` | `forge_cli/modules.py` |
-| `module:routes` | `forge_cli/modules.py` |
+| `migration:make` | `cli/entities/migrations.py:460-472` |
+| `starter:build` | `cli/starters/__init__.py:34-44` |
+| `module:list` | `cli/modules.py` |
+| `module:install` | `cli/modules.py` |
+| `module:files` | `cli/modules.py` |
+| `module:routes` | `cli/modules.py` |
 
 Garde-fou runtime : `TestNativeCommandsKeepTheirHelp` vérifie que ces
 aides natives restent natives (pas écrasées par le gabarit central).
@@ -213,7 +213,7 @@ Justification :
   toute divergence future est détectée.
 - Coût mémoire/maintenance négligeable (45 chaînes d'une ligne).
 - Documenté explicitement dans le docstring de
-  `forge_cli/help_dispatch.py` et dans un commentaire au-dessus de
+  `cli/help_dispatch.py` et dans un commentaire au-dessus de
   `HELP_DESCRIPTIONS`.
 
 L'Option B (supprimer la duplication) a été écartée parce qu'elle

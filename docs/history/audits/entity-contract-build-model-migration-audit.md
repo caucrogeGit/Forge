@@ -34,7 +34,7 @@ Les deux validations sont activement incompatibles (`entity` vs `name`, `sql_typ
 ```
 forge.py
 └─ command == "build:model"
-   └─ model_main(args)                            forge_cli/entities/model.py:main()
+   └─ model_main(args)                            cli/entities/model.py:main()
       └─ build_model(entities_root)               model.py:build_model()
          └─ _validate_model_or_raise(entities_root)
             ├─ _load_all_entity_sources()

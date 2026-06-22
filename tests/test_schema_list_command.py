@@ -17,7 +17,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 
-from forge_cli.schemas.schema_list import schema_list_main, _registry_path, _schemas_dir
+from cli.schemas.schema_list import schema_list_main, _registry_path, _schemas_dir
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -47,7 +47,7 @@ def _run(args: list[str]) -> tuple[str, str, int]:
 
 
 def test_module_importable():
-    from forge_cli.schemas import schema_list  # noqa: F401
+    from cli.schemas import schema_list  # noqa: F401
 
 
 def test_schema_list_main_callable():
@@ -192,7 +192,7 @@ def test_json_output_no_human_text():
 def test_missing_registry_exits_with_error(tmp_path):
     """Registre absent → exit 1 avec message clair."""
     fake_registry = tmp_path / "forge.schema.index.json"
-    with patch("forge_cli.schemas.schema_list._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_list._registry_path", return_value=fake_registry):
         _, stderr, code = _run([])
     assert code == 1
     assert "introuvable" in stderr.lower() or "erreur" in stderr.lower()
@@ -201,7 +201,7 @@ def test_missing_registry_exits_with_error(tmp_path):
 def test_missing_registry_json_output(tmp_path):
     """Registre absent + --json → JSON avec valid=false."""
     fake_registry = tmp_path / "forge.schema.index.json"
-    with patch("forge_cli.schemas.schema_list._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_list._registry_path", return_value=fake_registry):
         stdout, _, code = _run(["--json"])
     obj = json.loads(stdout)
     assert obj["valid"] is False
@@ -212,7 +212,7 @@ def test_invalid_json_registry_exits_with_error(tmp_path):
     """Registre JSON malformé → exit 1 avec message clair."""
     fake_registry = tmp_path / "forge.schema.index.json"
     fake_registry.write_text("{ not valid json }", encoding="utf-8")
-    with patch("forge_cli.schemas.schema_list._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_list._registry_path", return_value=fake_registry):
         _, stderr, code = _run([])
     assert code == 1
     assert "invalide" in stderr.lower() or "erreur" in stderr.lower()
@@ -222,7 +222,7 @@ def test_invalid_json_registry_json_output(tmp_path):
     """Registre JSON malformé + --json → JSON avec valid=false."""
     fake_registry = tmp_path / "forge.schema.index.json"
     fake_registry.write_text("{ not valid json }", encoding="utf-8")
-    with patch("forge_cli.schemas.schema_list._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_list._registry_path", return_value=fake_registry):
         stdout, _, code = _run(["--json"])
     obj = json.loads(stdout)
     assert obj["valid"] is False
@@ -233,7 +233,7 @@ def test_registry_without_schemas_key_exits_with_error(tmp_path):
     """Registre sans clé 'schemas' → exit 1."""
     fake_registry = tmp_path / "forge.schema.index.json"
     fake_registry.write_text('{"schema_version": "1.0"}', encoding="utf-8")
-    with patch("forge_cli.schemas.schema_list._registry_path", return_value=fake_registry):
+    with patch("cli.schemas.schema_list._registry_path", return_value=fake_registry):
         _, stderr, code = _run([])
     assert code == 1
 
@@ -246,8 +246,8 @@ def test_missing_schema_file_reports_manquant(tmp_path):
         encoding="utf-8",
     )
     with (
-        patch("forge_cli.schemas.schema_list._registry_path", return_value=fake_registry),
-        patch("forge_cli.schemas.schema_list._schemas_dir", return_value=tmp_path),
+        patch("cli.schemas.schema_list._registry_path", return_value=fake_registry),
+        patch("cli.schemas.schema_list._schemas_dir", return_value=tmp_path),
     ):
         stdout, _, code = _run([])
     assert "MANQUANT" in stdout
@@ -262,8 +262,8 @@ def test_missing_schema_file_json_output(tmp_path):
         encoding="utf-8",
     )
     with (
-        patch("forge_cli.schemas.schema_list._registry_path", return_value=fake_registry),
-        patch("forge_cli.schemas.schema_list._schemas_dir", return_value=tmp_path),
+        patch("cli.schemas.schema_list._registry_path", return_value=fake_registry),
+        patch("cli.schemas.schema_list._schemas_dir", return_value=tmp_path),
     ):
         stdout, _, code = _run(["--json"])
     obj = json.loads(stdout)
@@ -285,13 +285,13 @@ def test_unknown_option_exits_with_error():
 
 def test_entity_validate_not_broken():
     """schema:list ne doit pas casser entity:validate."""
-    from forge_cli.entities.entity_validate import main as entity_validate_main
+    from cli.entities.entity_validate import main as entity_validate_main
     assert callable(entity_validate_main)
 
 
 def test_entity_validate_still_runs(tmp_path):
     """entity:validate sur un projet vide doit terminer sans lever d'exception inattendue."""
-    from forge_cli.entities.entity_validate import main as entity_validate_main
+    from cli.entities.entity_validate import main as entity_validate_main
     entities_dir = tmp_path / "mvc" / "entities"
     entities_dir.mkdir(parents=True)
     out = StringIO()
@@ -321,6 +321,6 @@ def test_forge_py_dispatches_schema_list(capsys):
 
 def test_help_mentions_schema_list():
     """L'aide générale mentionne schema:list."""
-    from forge_cli.help import build_help
+    from cli.help import build_help
     help_text = build_help("test")
     assert "schema:list" in help_text
