@@ -1,0 +1,13 @@
+# Documentation embarquée du sous-paquet core/sessions (ADR-043).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /core-sessions/.
+site_name: core-sessions
+docs_dir: docs
+nav:
+  - Référence sessions (par module):
+      - Contrat de backend (contract.py): contract.md
+      - Gestionnaire de backend (manager.py): manager.md
+      - Backend mémoire (memory_store.py): memory_store.md
+      - Backend fichier (file_store.py): file_store.md
+      - Backend MariaDB (mariadb_store.py): mariadb_store.md
+      - Clés de session (keys.py): keys.md
