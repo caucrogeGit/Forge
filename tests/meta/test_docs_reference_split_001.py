@@ -54,12 +54,14 @@ class TestReferenceIndexIsLight:
     def test_reference_md_links_to_modules(self):
         assert "](modules.md)" in REFERENCE_INDEX.read_text(encoding="utf-8")
 
-    def test_reference_md_mentions_extracted_modules(self):
+    def test_reference_md_no_optin_package_reference(self):
+        # ADR-042 : l'index de référence du cœur ne référence plus les paquets
+        # opt-in (ni mention de `forge-mvc-<slug>`, ni lien).
         content = REFERENCE_INDEX.read_text(encoding="utf-8")
-        assert "forge-mvc-mfa" in content
-        assert "forge-mvc-rbac" in content
-        assert "forge-mvc-workflow" in content
-        assert "forge-mvc-stats" in content
+        for pkg in ("forge-mvc-mfa", "forge-mvc-rbac", "forge-mvc-workflow", "forge-mvc-stats"):
+            assert pkg not in content, (
+                f"docs/reference/reference.md ne doit plus référencer {pkg} (ADR-042)."
+            )
 
 
 # ── Les 11 sous-fichiers existent ─────────────────────────────────────────────
