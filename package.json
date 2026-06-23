@@ -3,6 +3,9 @@
   "version": "1.0.0-beta.17",
   "description": "Framework web MVC pur Python, HTTPS natif, Jinja2 intégré. Dépendances runtime explicites : MariaDB, python-dotenv et Jinja2.",
   "main": "index.js",
+  "engines": {
+    "node": ">=24.17.0"
+  },
   "scripts": {
     "build:css": "npx @tailwindcss/cli -i ./docs/static/src/input.css -o ./docs/static/tailwind.css --minify",
     "test": "python -m pytest tests/ -v"

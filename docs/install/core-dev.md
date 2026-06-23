@@ -159,12 +159,17 @@ si vous modifiez :
   utilitaires
 
 ```bash
+nvm use            # lit .nvmrc -> Node 24.17.0
 npm install
 npm run build:css
 ```
 
 Le script `build:css` est défini dans `package.json` :
 `npx @tailwindcss/cli -i ./static/src/input.css -o ./static/tailwind.css --minify`.
+
+La version de Node est **imposée** : `.nvmrc` épingle `24.17.0`, `package.json`
+déclare `engines.node >= 24.17.0`, et `.npmrc` active `engine-strict=true` —
+`npm` refuse donc de s'exécuter sous une version de Node inférieure.
 
 ---
 
