@@ -39,51 +39,52 @@ L'audit beta12 garde aussi la trace d'un `rsync` lancé **par erreur** depuis
 `~/Projets/Forge`, qui a failli écraser la VM.
 
 L'ADR-044 a fait de `docs/` (landing canonique incluse) la **source unique**
-de la documentation. L'import depuis `forge` vers `Forge-official-site` n'a
-donc plus de raison d'être : la source est déjà dans `forge`.
+de la documentation. L'import inter-dépôts n'a donc plus lieu d'être : en
+rapatriant l'outillage dans `forge`, l'import devient une simple copie
+**locale** (`docs/` → `official-site/docs/forge/` au build), sans dépôt
+intermédiaire ni dérive possible.
 
 ---
 
 ## Décision
 
-1. **Décommissionner `Forge-official-site`.** Sa fonction de publication est
-   rapatriée dans `forge`. Le dépôt séparé est abandonné (l'import
-   `import_forge_docs.py` disparaît : `forge` est la source).
+1. **Décommissionner `Forge-official-site` en rapatriant TOUTE sa machinerie
+   dans `forge`, sous `official-site/`.** Le dépôt séparé est abandonné ; son
+   outillage éprouvé est conservé tel quel : scripts (`build-site.sh`,
+   `import_forge_docs.py`, `deploy-to-forge-web.sh`,
+   `sync-forge-docs-and-deploy.sh`, validateurs `check_*`, `audit-secrets.sh`),
+   `public/` (landing servie à `/`, `robots.txt`, `sitemap.xml`), `infra/`,
+   `mkdocs.yml` du site, `Makefile`, et la mémoire d'exploitation (`docs/`
+   propre : runbook, audits `FW-*`, doc secrets).
 
-2. **forgemvc.com sert directement le site MkDocs de Forge.** Le `site/`
-   produit par `mkdocs build --strict` est servi tel quel à la racine du
-   domaine. La landing (`docs/index.html`, ADR-044) est l'accueil ; les pages
-   de doc sont servies à `/install/`, `/reference/`, etc. Il n'y a **plus
-   d'assemblage** (`build-site.sh`) ni de préfixe `/docs/`.
+2. **L'import devient local.** `import_forge_docs.py` lit désormais la doc
+   canonique du même dépôt (`../docs`, ADR-044) au lieu d'un dépôt séparé. Il
+   n'y a plus de synchronisation inter-dépôts : la dérive disparaît. Le
+   résultat de l'import (`official-site/docs/forge/`) est un **artefact de
+   build** non versionné (`.gitignore`), régénéré à chaque publication.
 
-   Conséquence : les URLs changent (la doc quitte `/docs/forge/…` pour `/…`).
-   Des **redirections** des anciennes URLs clés sont posées côté serveur
-   (Caddy/Nginx sur la VM) ; `site_url` de `mkdocs.yml` est fixé pour que le
-   `sitemap.xml` (généré par MkDocs) porte les URLs canoniques.
+3. **La structure publique de forgemvc.com est conservée.** Le site reste
+   assemblé par `build-site.sh` (landing à `/`, documentation sous `/docs/`,
+   doc Forge sous `/docs/forge/`). **Aucune rupture d'URL** : les liens
+   existants et le SEO sont préservés. `official-site/` porte son propre
+   `mkdocs.yml` et son `site_url`, indépendants du `mkdocs.yml` de `forge`
+   (qui alimente GitHub Pages).
 
-3. **Un dossier `official-site/` porte l'outillage de publication.** Il
-   contient, hors du site publié :
-   - le script de déploiement (`mkdocs build --strict` puis `rsync` de `site/`
-     vers la VM), avec staging distant, backups datés, lock et **`DRY_RUN=1`
-     par défaut** (repris de `deploy-to-forge-web.sh`) ;
-   - le `robots.txt` et tout réglage SEO non géré par MkDocs ;
-   - le runbook d'exploitation et la doc de gestion des secrets (adaptés) ;
-   - l'historique d'audits `FW-*` de forge-web, en archive brute.
+4. **`official-site/` n'est pas inclus dans le site MkDocs du framework.**
+   Le `docs_dir` de `forge` reste `docs/` ; `official-site/` est de
+   l'outillage et de la mémoire d'exploitation, exclu des scans documentaires
+   (par ex. garde-fou des versions périmées).
 
-   `official-site/` **n'est pas** inclus dans le site MkDocs (`docs_dir` reste
-   `docs/`) : c'est de l'outillage et de la mémoire d'exploitation, pas de la
-   documentation du framework.
-
-4. **Deux voies de publication.** Conformément au besoin :
-   - **Script local** `official-site/deploy.sh` : `DRY_RUN=1` par défaut,
-     confirmation explicite obligatoire pour le mode réel, jamais de cible VM
-     par défaut silencieuse (anti-récidive de l'incident beta12) ;
+5. **Deux voies de publication, `DRY_RUN=1` par défaut.**
+   - **Script local** : `bash official-site/scripts/sync-forge-docs-and-deploy.sh`
+     (dry-run par défaut ; `DRY_RUN=0` pour le réel). Import local → build →
+     validations → `rsync` vers la VM avec backup daté, staging vérifié,
+     bascule contrôlée et lock (anti-récidive de l'incident beta12).
    - **Workflow CI** `deploy-forge-web.yml` : `workflow_dispatch` manuel,
-     clé SSH en **secret CI**, `environment` GitHub protégé.
+     runner self-hosted sur le réseau de la VM (IP privée), secrets SSH.
 
-5. **Aucun secret committé.** Accès SSH, identifiants VM et clés vivent dans
-   les secrets CI ou la configuration locale ignorée par `.gitignore`, jamais
-   dans le dépôt.
+6. **Aucun secret committé.** Accès SSH, identifiants VM et clés vivent dans
+   les secrets CI ou la configuration locale ignorée par `.gitignore`.
 
 ---
 
@@ -100,9 +101,9 @@ donc plus de raison d'être : la source est déjà dans `forge`.
 
 ### Limites
 
-- **Rupture d'URL** : la doc passe de `/docs/forge/…` à `/…`. Nécessite des
-  redirections serveur pour préserver le SEO et les liens entrants ; à auditer
-  et poser au déploiement.
+- **Aucune rupture d'URL** (la structure `/docs/forge/…` est conservée), mais
+  `forge` gagne une étape d'assemblage (`build-site.sh`) et un second
+  `mkdocs.yml` (celui de `official-site/`), distincts de la build GitHub Pages.
 - `forge` gagne un dossier d'outillage d'exploitation (`official-site/`) :
   c'est du release/ops pour le site **du framework lui-même**, pas une
   application métier (cohérent avec ADR-044), mais à garder clairement cantonné.
@@ -114,15 +115,16 @@ donc plus de raison d'être : la source est déjà dans `forge`.
 
 ### A — Garder le dépôt `Forge-official-site` séparé
 
-Statu quo. Rejeté : c'est précisément l'intermédiaire (import + dérive +
-charge manuelle) que cette décision supprime.
+Statu quo. Rejeté : c'est précisément l'intermédiaire (import inter-dépôts +
+dérive + charge manuelle) que cette décision supprime.
 
-### B — Conserver la structure landing `/` + docs `/docs/`
+### B — Servir le site MkDocs de `forge` directement à la racine
 
-Reproduire l'assemblage (`build-site.sh`) dans `forge` pour garder les URLs
-actuelles. Rejeté (décision 2) : maintient une étape d'assemblage et un
-préfixe `/docs/` artificiel alors que le `site/` de MkDocs se sert directement.
-Le coût est une rupture d'URL, traitée par redirections.
+Abandonner l'assemblage et le préfixe `/docs/`, servir le `site/` de la build
+`forge` tel quel. Rejeté : casse les URLs publiques existantes (`/docs/forge/…`
+→ `/…`), impose des redirections SEO, et jette une machinerie de publication
+déjà éprouvée. Le rapatriement fidèle (décision 1) préserve l'acquis sans
+rupture.
 
 ### C — Publier uniquement via GitHub Pages
 
@@ -134,10 +136,9 @@ d'infrastructure distinct, non tranché ici.
 
 ## Hors périmètre de cet ADR
 
-- Le détail des redirections d'URL (inventaire des anciennes URLs, règles
-  Caddy/Nginx) : à traiter à l'implémentation du déploiement.
-- La configuration serveur de la VM (Caddy/Nginx, TLS) : vit sur la VM, pas
-  dans le dépôt.
+- La configuration serveur de la VM (Caddy/Nginx, TLS, racine servie) : vit
+  sur la VM, pas dans le dépôt. La structure d'URL `/docs/` étant conservée,
+  aucune redirection n'est requise.
 - Le sort de `pages.yml` (GitHub Pages) : conservé tel quel pour l'instant
   (miroir), sa coexistence avec forge-web sera réévaluée séparément.
 

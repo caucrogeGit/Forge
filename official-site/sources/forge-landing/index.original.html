@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forge — Framework web applicatif Python</title>
+  <link rel="stylesheet" href="./static/tailwind.css">
+</head>
+<body class="landing-code-font bg-white text-slate-900 antialiased">
+
+<!-- Navigation -->
+<nav class="fixed top-0 inset-x-0 z-50 bg-[#111110] border-b border-white/10 h-16 flex items-center px-8">
+  <div class="flex items-center gap-7">
+    <a href="#top" class="landing-accent-text text-sm font-semibold tracking-tight">Forge</a>
+
+    <a href="#installation" class="text-sm font-medium text-white/60 hover:text-white transition-colors">Installation</a>
+
+    <a href="#starters" class="text-sm font-medium text-white/60 hover:text-white transition-colors">Starters</a>
+
+    <!-- Dropdown Briques -->
+    <details class="landing-nav-dropdown relative">
+      <summary class="text-sm font-medium text-white/60 hover:text-white transition-colors cursor-pointer list-none flex items-center gap-1">
+        Briques
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      <div class="absolute top-full left-0 mt-2 bg-[#111110] border border-white/10 rounded-lg overflow-hidden shadow-xl min-w-[140px]">
+        <a href="#core" class="block px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors">Core</a>
+        <a href="#modules" class="block px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors">Modules</a>
+        <a href="#workflow" class="block px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors">CLI</a>
+      </div>
+    </details>
+
+    <a href="https://caucrogegit.github.io/Forge/guide/"
+       target="_blank" rel="noopener noreferrer"
+       class="text-sm font-medium text-white/60 hover:text-white transition-colors">Documentation</a>
+
+    <!-- Dropdown Projet -->
+    <details class="landing-nav-dropdown relative">
+      <summary class="text-sm font-medium text-white/60 hover:text-white transition-colors cursor-pointer list-none flex items-center gap-1">
+        Projet
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      <div class="absolute top-full left-0 mt-2 bg-[#111110] border border-white/10 rounded-lg overflow-hidden shadow-xl min-w-[140px]">
+        <a href="https://caucrogegit.github.io/Forge/roadmap/forge-roadmap/"
+           target="_blank" rel="noopener noreferrer"
+           class="block px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors">Roadmap</a>
+        <a href="https://github.com/caucrogeGit/Forge"
+           target="_blank" rel="noopener noreferrer"
+           class="block px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors">GitHub</a>
+      </div>
+    </details>
+  </div>
+
+  <!-- Barre de recherche documentation -->
+  <form action="search/" method="get" role="search" class="ml-auto flex items-center gap-2">
+    <input
+      type="search"
+      name="q"
+      placeholder="Rechercher…"
+      aria-label="Rechercher dans la documentation"
+      class="landing-search-input"
+      required
+    >
+    <button type="submit" class="landing-search-btn" aria-label="Lancer la recherche">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+      </svg>
+    </button>
+  </form>
+</nav>
+
+<!-- Hero -->
+<section id="top" class="landing-hero-bg pt-32 pb-24 px-6 text-center">
+  <div class="flex justify-center mb-10">
+    <img src="./static/img/forge-logo.png" alt="Forge" class="landing-logo-glow landing-logo-size object-contain">
+  </div>
+
+  <div class="landing-version-strip landing-accent-text flex justify-center gap-2 text-sm font-medium mb-12">
+    <span>v3.0.6</span><span class="opacity-40">·</span>
+    <span>Python 3.12+</span><span class="opacity-40">·</span>
+    <span>MariaDB</span><span class="opacity-40">·</span>
+    <span>MVC serveur</span><span class="opacity-40">·</span>
+    <span>Source disponible</span>
+  </div>
+
+  <h1 class="text-5xl sm:text-7xl font-bold leading-tight tracking-tight text-white mb-3">
+    Une forge pour les créer toutes.
+  </h1>
+  <p class="landing-accent-text text-xl sm:text-2xl font-semibold leading-tight tracking-tight mb-8">
+    Framework web applicatif Python.
+  </p>
+  <p class="text-lg text-white/55 max-w-3xl mx-auto leading-relaxed mb-12">
+    Forge permet de créer rapidement des applications web MVC structurées,
+    lisibles et maintenables, avec du SQL visible, des générateurs contrôlés,
+    un front léger et un core pédagogique sans magie cachée.
+  </p>
+
+  <div class="flex justify-center gap-5 mb-16">
+    <a href="#core" class="landing-accent-bg px-6 py-3 rounded-lg text-sm font-semibold text-white hover:opacity-90 transition-opacity">
+      Découvrir le core
+    </a>
+    <a href="https://caucrogegit.github.io/Forge/guide/"
+       target="_blank" rel="noopener noreferrer"
+       class="px-6 py-3 rounded-lg text-sm font-semibold text-white border border-white/10 hover:border-[#E8651A]/40 transition-all">
+      Lire la documentation
+    </a>
+    <a href="https://github.com/caucrogeGit/Forge"
+       target="_blank" rel="noopener noreferrer"
+       class="px-6 py-3 rounded-lg text-sm font-semibold text-white/60 border border-white/10 hover:text-white hover:border-[#E8651A]/40 transition-all">
+      Voir GitHub
+    </a>
+  </div>
+
+  <div class="landing-panel mx-auto max-w-xl text-left rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+    <div class="flex items-center gap-1.5 px-4 py-3 border-b border-white/10">
+      <span class="w-3 h-3 rounded-full bg-[#ff5f56]"></span>
+      <span class="w-3 h-3 rounded-full bg-[#ffbd2e]"></span>
+      <span class="w-3 h-3 rounded-full bg-[#27c93f]"></span>
+      <span class="ml-3 text-xs text-[#bc9898]">workflow Forge 3.0.6</span>
+    </div>
+    <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> forge doctor
+<span class="landing-accent-text">$</span> forge make:entity Contact --no-input
+<span class="text-white/35"># Décrire les champs dans mvc/entities/contact/contact.json</span>
+<span class="landing-accent-text">$</span> forge build:model --dry-run
+<span class="landing-accent-text">$</span> forge build:model
+<span class="landing-accent-text">$</span> forge db:apply
+<span class="landing-accent-text">$</span> forge make:crud Contact</pre>
+  </div>
+</section>
+
+<!-- Ce que Forge permet -->
+<section class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Construire des applications MVC sans perdre la main.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Forge vise les applications de gestion, les back-offices, les sites publics avec administration,
+        les démonstrateurs pédagogiques et les projets où le code généré doit rester compréhensible.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="rounded-xl border border-slate-200 p-8">
+        <h3 class="text-xl font-semibold mb-4">Ce que Forge fait bien</h3>
+        <ul class="text-slate-500 text-sm leading-relaxed space-y-2">
+          <li>Applications MVC serveur en Python</li>
+          <li>Back-offices simples à intermédiaires</li>
+          <li>CRUD généré, lisible et modifiable</li>
+          <li>Projets pédagogiques et prototypes propres</li>
+          <li>Applications avec SQL visible et schéma auditable</li>
+          <li>Sites publics reliés à une administration interne</li>
+        </ul>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-8">
+        <h3 class="text-xl font-semibold mb-4">Ce que Forge ne cherche pas à être</h3>
+        <ul class="text-slate-500 text-sm leading-relaxed space-y-2">
+          <li>Pas un clone de Django, Symfony, Laravel ou FastAPI</li>
+          <li>Pas un ORM complet imposé au développeur</li>
+          <li>Pas une SPA React/Vue/Svelte intégrée au core</li>
+          <li>Pas une application métier prête à vendre</li>
+          <li>Pas une boîte noire qui cache routes, SQL ou fichiers générés</li>
+          <li>Pas une plateforme SaaS multi-tenant prématurée</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Core -->
+<section id="core" class="py-24 px-6 bg-slate-50">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        L'écosystème Forge.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Un core minimal pour bâtir des applications MVC Python, et des modules
+        officiels installables séparément pour les besoins avancés.
+      </p>
+    </div>
+
+    <div class="mt-12 mb-10">
+      <h3 class="text-2xl font-bold tracking-tight mb-3">Le core Forge</h3>
+      <p class="text-slate-500 text-sm max-w-2xl">
+        Le cœur du framework fournit les briques génériques. Tout starter Forge
+        n'est qu'un démonstrateur — le moteur reste dans le core.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <a href="concepts.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16"/><path d="M4 12h10"/><path d="M4 19h16"/><path d="m16 9 3 3-3 3"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">HTTP & routing</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Requêtes, réponses, routes nommées et contrôleurs explicites.</p>
+      </article>
+      </a>
+
+      <a href="concepts.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="m4 12 8 4 8-4"/><path d="m4 17 8 4 8-4"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">MVC</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Structure claire : contrôleurs, modèles, vues, routes et formulaires.</p>
+      </article>
+      </a>
+
+      <a href="front.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Templates Jinja</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Rendu serveur lisible, layouts publics/admin et composants simples.</p>
+      </article>
+      </a>
+
+      <a href="migrations.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">SQL visible</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Fichiers SQL auditable, sans ORM opaque imposé par défaut.</p>
+      </article>
+      </a>
+
+      <a href="entity_architecture.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H7a4 4 0 0 0-4 4v2a3 3 0 0 1-3 3 3 3 0 0 1 3 3v2a4 4 0 0 0 4 4h1" transform="translate(3)"/><path d="M16 3h1a4 4 0 0 1 4 4v2a3 3 0 0 0 3 3 3 3 0 0 0-3 3v2a4 4 0 0 1-4 4h-1" transform="translate(-3)"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Entités JSON</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Une source canonique pour générer SQL, modèles et CRUD.</p>
+      </article>
+      </a>
+
+      <a href="migrations.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="6" cy="18" r="3"/><path d="M18 6a3 3 0 1 0-3 3h3v12"/><path d="M6 12h9"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Migrations</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Migrations SQL versionnées, contrôlables et lisibles.</p>
+      </article>
+      </a>
+
+      <a href="crud.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18"/><path d="M3 12h18"/><path d="M3 19h18"/><path d="M8 5v14"/><path d="M16 5v14"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">CRUD généré</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Back-office explicite, modifiable et non destructif.</p>
+      </article>
+      </a>
+
+      <a href="reference/crud.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11h6"/><path d="M9 15h6"/><path d="M17 3H7a2 2 0 0 0-2 2v16l7-3 7 3V5a2 2 0 0 0-2-2Z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Formulaires</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Champs typés, validation serveur et messages clairs.</p>
+      </article>
+      </a>
+
+      <a href="security.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Sécurité</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">CSRF, sessions, headers HTTP, cookies durcis et audit complet.</p>
+      </article>
+      </a>
+
+      <a href="auth.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Auth/User</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Login, sessions, hachage Argon2id, vérification email et reset de mot de passe.</p>
+      </article>
+      </a>
+
+      <a href="media.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Médias</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Uploads, images, variantes, galeries et suppression propre.</p>
+      </article>
+      </a>
+
+      <a href="mail.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Mail</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Transports interchangeables, templates, rendu et logs.</p>
+      </article>
+      </a>
+
+      <a href="front.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v10H4Z"/><path d="M8 21h8"/><path d="M12 15v6"/><path d="m8 9 2 2 4-4 2 2"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Front léger</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Tailwind officiel, HTMX recommandé, Alpine.js optionnel.</p>
+      </article>
+      </a>
+
+      <a href="reference/api.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">i18n</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Traductions simples côté Python et côté Jinja.</p>
+      </article>
+      </a>
+
+      <a href="reference/cli-commands.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m4 17 6-6-6-6"/><path d="M12 19h8"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">CLI Forge</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Commandes pour générer, vérifier, initialiser et diagnostiquer.</p>
+      </article>
+      </a>
+
+      <a href="deployment.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h8"/><path d="M8 17h5"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Déploiement</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Nginx, systemd, environnement prod et contrôles de déploiement.</p>
+      </article>
+      </a>
+
+      <a href="api-json.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">API JSON légère</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Endpoints JSON explicites avec auth Bearer, sans transformer Forge en moteur d'API.</p>
+      </article>
+      </a>
+    </div>
+
+    <!-- Modules officiels opt-in -->
+    <div class="mt-16 mb-10">
+      <h3 id="modules" class="text-2xl font-bold tracking-tight mb-3">Modules officiels opt-in</h3>
+      <p class="text-slate-500 text-sm max-w-2xl">
+        Distribués séparément sur PyPI. Installer un module se fait via
+        <code class="text-xs bg-slate-100 px-2 py-0.5 rounded">pip install forge-mvc-&lt;module&gt;</code>
+        ou via extras
+        <code class="text-xs bg-slate-100 px-2 py-0.5 rounded">forge-mvc[mfa]</code>.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <!-- Carte MFA -->
+      <a href="reference/auth-mfa.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><circle cx="12" cy="11" r="2"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">MFA</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Authentification multi-facteurs : TOTP, codes de récupération, challenge à la connexion. Module <code class="text-xs">forge-mvc-mfa</code>.</p>
+      </article>
+      </a>
+
+      <!-- Carte RBAC -->
+      <a href="rbac.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="15" r="4"/><path d="m10 12 8-8"/><path d="m15 7 2 2"/><path d="m17 5 2 2"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">RBAC</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Rôles, permissions fines, helpers Jinja et décorateurs <code class="text-xs">@require_permission</code>. Module <code class="text-xs">forge-mvc-rbac</code>.</p>
+      </article>
+      </a>
+
+      <!-- Carte Workflow -->
+      <a href="reference/workflow.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Workflow</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Statuts et transitions applicatives : brouillon → publié → archivé. Module <code class="text-xs">forge-mvc-workflow</code>.</p>
+      </article>
+      </a>
+
+      <!-- Carte Statistiques -->
+      <a href="reference/stats.html" class="block group">
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all group-hover:border-[#E8651A]/40 group-hover:shadow-md cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 group-hover:landing-accent-text transition-colors">Statistiques</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Tracking d'événements applicatifs génériques : page vues, clics, conversions. Module <code class="text-xs">forge-mvc-stats</code>.</p>
+      </article>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- Stack -->
+<section id="stack" class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        La stack Forge.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Forge ne réinvente pas l'écosystème Python. Il s'appuie sur des
+        standards éprouvés.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <!-- Python -->
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h12"/><path d="M9 4v7h6v3a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3"/><path d="M15 20H6"/><path d="M15 13v7h-6v-3a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v3"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Python <span class="text-slate-400 font-normal">3.12+</span></h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-4">Langage de Forge — typage moderne, performance, async natif.</p>
+        <a href="https://docs.python.org/3.12/" target="_blank" rel="noopener noreferrer" class="landing-accent-text text-xs font-semibold inline-flex items-center gap-1">
+          Documentation
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </article>
+
+      <!-- MariaDB -->
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">MariaDB <span class="text-slate-400 font-normal">11.x</span></h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-4">Moteur SQL relationnel, schéma auditable, performant.</p>
+        <a href="https://mariadb.org/" target="_blank" rel="noopener noreferrer" class="landing-accent-text text-xs font-semibold inline-flex items-center gap-1">
+          Documentation
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </article>
+
+      <!-- Jinja2 -->
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h4"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Jinja2 <span class="text-slate-400 font-normal">3.1.6</span></h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-4">Templating serveur intégré au core — rendu lisible, layouts publics et admin.</p>
+        <a href="https://jinja.palletsprojects.com/" target="_blank" rel="noopener noreferrer" class="landing-accent-text text-xs font-semibold inline-flex items-center gap-1">
+          Documentation
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </article>
+
+      <!-- HTMX -->
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">HTMX <span class="text-slate-400 font-normal">latest</span></h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-4">Interactivité progressive HTML-driven — recommandé pour les apps Forge.</p>
+        <a href="https://htmx.org/" target="_blank" rel="noopener noreferrer" class="landing-accent-text text-xs font-semibold inline-flex items-center gap-1">
+          Documentation
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </article>
+
+      <!-- Alpine.js -->
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Alpine.js <span class="text-slate-400 font-normal">latest</span></h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-4">Réactivité ultra-légère côté client — optionnel.</p>
+        <a href="https://alpinejs.dev/" target="_blank" rel="noopener noreferrer" class="landing-accent-text text-xs font-semibold inline-flex items-center gap-1">
+          Documentation
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </article>
+
+      <!-- Tailwind -->
+      <article class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6c-2.67 0-4.33 1.33-5 4 1-1.33 2.17-1.83 3.5-1.5.76.19 1.31.74 1.91 1.35.98.99 2.12 2.15 4.59 2.15 2.67 0 4.33-1.33 5-4-1 1.33-2.17 1.83-3.5 1.5-.76-.19-1.3-.74-1.91-1.35C15.61 7.16 14.47 6 12 6zm-5 6c-2.67 0-4.33 1.33-5 4 1-1.33 2.17-1.83 3.5-1.5.76.19 1.3.74 1.91 1.35.98.99 2.12 2.15 4.59 2.15 2.67 0 4.33-1.33 5-4-1 1.33-2.17 1.83-3.5 1.5-.76-.19-1.3-.74-1.91-1.35C10.61 13.16 9.47 12 7 12z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Tailwind <span class="text-slate-400 font-normal">latest</span></h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-4">Système d'utilities CSS — front officiel.</p>
+        <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" class="landing-accent-text text-xs font-semibold inline-flex items-center gap-1">
+          Documentation
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- Workflow -->
+<section id="workflow" class="bg-[#111110] py-24 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight text-white mb-4">
+        Générer sans masquer.
+      </h2>
+      <p class="text-white/50 text-lg max-w-2xl mx-auto">
+        Forge automatise les répétitions, mais les fichiers restent visibles, auditables et modifiables.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="landing-panel rounded-xl p-7 border border-white/10">
+        <h3 class="text-white font-semibold mb-4">Chaîne de génération</h3>
+        <div class="text-white/60 text-sm leading-relaxed space-y-2">
+          <p><span class="landing-accent-text font-semibold">1.</span> JSON d'entité canonique</p>
+          <p><span class="landing-accent-text font-semibold">2.</span> SQL visible et migrations</p>
+          <p><span class="landing-accent-text font-semibold">3.</span> modèle <code>*_base.py</code> régénérable</p>
+          <p><span class="landing-accent-text font-semibold">4.</span> modèle manuel préservé</p>
+          <p><span class="landing-accent-text font-semibold">5.</span> contrôleur, formulaire et vues CRUD</p>
+          <p><span class="landing-accent-text font-semibold">6.</span> application MVC maintenable</p>
+        </div>
+      </div>
+
+      <div data-tabs class="landing-panel rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+        <div class="flex border-b border-white/10 overflow-x-auto">
+          <button data-tab-btn class="px-5 py-3 text-xs border-b-2 border-transparent text-white/40 hover:text-white transition-colors">workflow</button>
+          <button data-tab-btn class="px-5 py-3 text-xs border-b-2 border-transparent text-white/40 hover:text-white transition-colors">JSON</button>
+          <button data-tab-btn class="px-5 py-3 text-xs border-b-2 border-transparent text-white/40 hover:text-white transition-colors">dry-run</button>
+        </div>
+
+        <div data-tab-panel>
+          <pre class="px-7 py-6 text-sm leading-loose overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> forge doctor
+<span class="landing-accent-text">$</span> forge make:entity Contact --no-input
+<span class="landing-accent-text">$</span> forge build:model --dry-run
+<span class="landing-accent-text">$</span> forge build:model
+<span class="landing-accent-text">$</span> forge db:apply
+<span class="landing-accent-text">$</span> forge make:crud Contact</pre>
+        </div>
+
+        <div data-tab-panel class="hidden">
+          <pre class="px-7 py-6 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]">{
+  <span class="syntax-key">"format_version"</span>: <span class="syntax-number">1</span>,
+  <span class="syntax-key">"entity"</span>: <span class="syntax-string">"Contact"</span>,
+  <span class="syntax-key">"table"</span>: <span class="syntax-string">"contact"</span>,
+  <span class="syntax-key">"fields"</span>: [
+    { <span class="syntax-key">"name"</span>: <span class="syntax-string">"id"</span>, <span class="syntax-key">"sql_type"</span>: <span class="syntax-string">"INT"</span>, <span class="syntax-key">"primary_key"</span>: <span class="syntax-number">true</span> },
+    { <span class="syntax-key">"name"</span>: <span class="syntax-string">"nom"</span>, <span class="syntax-key">"sql_type"</span>: <span class="syntax-string">"VARCHAR(80)"</span> },
+    { <span class="syntax-key">"name"</span>: <span class="syntax-string">"email"</span>, <span class="syntax-key">"sql_type"</span>: <span class="syntax-string">"VARCHAR(120)"</span> }
+  ]
+}</pre>
+        </div>
+
+        <div data-tab-panel class="hidden">
+          <pre class="px-7 py-6 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> forge build:model --dry-run
+
+[ÉCRIT]     mvc/entities/contact/contact.sql
+[ÉCRIT]     mvc/entities/contact/contact_base.py
+[PRÉSERVÉ]  mvc/entities/contact/contact.py
+
+[DRY-RUN]   Aucun fichier modifié.</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Installation -->
+<section id="installation" class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Installer Forge selon votre usage.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Deux parcours séparés : utiliser Forge pour créer une application, ou travailler sur le framework lui-même.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="rounded-xl border border-slate-200 p-8">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Créer une application avec Forge</div>
+        <h3 class="text-xl font-semibold mb-4">Parcours utilisateur du framework</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-5">
+          Pour installer la commande Forge, créer un projet et lancer le serveur de développement.
+        </p>
+        <div class="landing-panel rounded-xl overflow-hidden border border-white/10">
+          <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> pipx install forge-mvc
+<span class="landing-accent-text">$</span> forge new MonApplication
+<span class="landing-accent-text">$</span> cd MonApplication
+<span class="landing-accent-text">$</span> forge doctor
+<span class="landing-accent-text">$</span> python app.py</pre>
+        </div>
+        <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+          Pour installer les modules officiels en plus du core :
+          <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded">pipx install "forge-mvc[all]"</code>
+          (ou <code class="text-xs">[mfa]</code>, <code class="text-xs">[rbac]</code>,
+          <code class="text-xs">[workflow]</code>, <code class="text-xs">[stats]</code>).
+        </p>
+        <div class="mt-5 flex gap-3">
+          <a href="https://caucrogegit.github.io/Forge/installation/"
+             target="_blank" rel="noopener noreferrer"
+             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Guide installation</a>
+          <button data-copy="pipx install forge-mvc && forge new MonApplication" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-slate-500 hover:text-slate-900 transition-colors">Copier</button>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 p-8">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Contribuer au framework Forge</div>
+        <h3 class="text-xl font-semibold mb-4">Parcours développement du core</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-5">
+          Pour cloner le dépôt, installer l'environnement de développement et lancer les validations.
+        </p>
+        <div class="landing-panel rounded-xl overflow-hidden border border-white/10">
+          <pre class="px-6 py-5 text-sm leading-relaxed overflow-x-auto text-[#abb2bf]"><span class="landing-accent-text">$</span> git clone https://github.com/caucrogeGit/Forge.git
+<span class="landing-accent-text">$</span> cd Forge
+<span class="landing-accent-text">$</span> python -m venv .venv
+<span class="landing-accent-text">$</span> source .venv/bin/activate
+<span class="landing-accent-text">$</span> pip install -e .
+<span class="landing-accent-text">$</span> pytest
+<span class="landing-accent-text">$</span> mkdocs build --strict</pre>
+        </div>
+        <div class="mt-5 flex gap-3">
+          <a href="https://caucrogegit.github.io/Forge/installation-developpement/"
+             target="_blank" rel="noopener noreferrer"
+             class="landing-accent-bg px-4 py-2 rounded-lg text-sm font-semibold text-white">Guide développement</a>
+          <button data-copy="git clone https://github.com/caucrogeGit/Forge.git" class="landing-copy-btn text-xs px-3 py-1.5 rounded text-slate-500 hover:text-slate-900 transition-colors">Copier</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="landing-highlight-note mt-10 rounded-xl p-5 border text-sm leading-relaxed">
+      Pour la production, le déploiement est traité séparément : Nginx, systemd, variables d'environnement,
+      HTTPS et contrôles avec <code>forge deploy:check</code>.
+      <a href="https://caucrogegit.github.io/Forge/deployment/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Voir le guide de déploiement</a>.
+      Sur Windows, la voie recommandée est WSL2.
+      <a href="https://caucrogegit.github.io/Forge/installation-windows/" target="_blank" rel="noopener noreferrer" class="landing-accent-text font-semibold">Guide Windows (WSL2)</a>.
+    </div>
+  </div>
+</section>
+
+<!-- Starters -->
+<section id="starters" class="py-24 px-6 bg-slate-50">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold tracking-tight mb-4">
+        Starters et démonstrateurs.
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+        Les starters prouvent les capacités du framework. Ils ne remplacent pas le core et ne dictent pas l'architecture métier.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <a href="https://caucrogegit.github.io/Forge/starters/01-contact-simple/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 1</div>
+        <h3 class="font-semibold text-lg mb-2">Contacts</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Cycle complet d'un CRUD sur une entité : JSON, SQL, formulaire, contrôleur et vues.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/02-utilisateurs-auth/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 2</div>
+        <h3 class="font-semibold text-lg mb-2">Utilisateurs et authentification</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Application de démonstration autour des sessions, du login/logout et des routes protégées.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/03-carnet-contacts/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 3</div>
+        <h3 class="font-semibold text-lg mb-2">Carnet relationnel</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Relations explicites, clés étrangères, tables pivots visibles et requêtes SQL lisibles.</p>
+      </a>
+
+      <a href="https://caucrogegit.github.io/Forge/starters/04-suivi-comportement-eleves/"
+         target="_blank" rel="noopener noreferrer"
+         class="rounded-xl border border-slate-200 bg-white p-7 hover:border-[#E8651A]/40 hover:shadow-md transition-all">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Niveau 4</div>
+        <h3 class="font-semibold text-lg mb-2">Suivi pédagogique</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Démonstrateur plus dense : dashboard, relations, sécurité applicative et données métier.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Etat -->
+<section class="bg-[#111110] py-24 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="landing-panel rounded-xl p-8 border border-white/10">
+        <div class="text-xs landing-accent-text font-semibold mb-2">État actuel</div>
+        <h2 class="text-3xl font-bold tracking-tight text-white mb-4">Forge 3.0.6</h2>
+        <p class="text-white/60 text-sm leading-relaxed mb-5">
+          Forge 3.0 marque l'ouverture du code source en lecture, étude et usage éducatif. Core minimal
+          (HTTP, routing, sessions, templating, SQL visible, formulaires, CRUD),
+          4 modules officiels installables séparément (MFA, RBAC, Workflow, Stats),
+          charte philosophique stable et 41 tickets livrés pendant la refonte.
+        </p>
+        <a href="https://caucrogegit.github.io/Forge/roadmap/forge-roadmap/"
+           target="_blank" rel="noopener noreferrer"
+           class="landing-accent-text text-sm font-semibold">Lire la roadmap →</a>
+      </div>
+
+      <div class="landing-panel rounded-xl p-8 border border-white/10">
+        <div class="text-xs landing-accent-text font-semibold mb-2">Après 3.0</div>
+        <h2 class="text-3xl font-bold tracking-tight text-white mb-4">Stabilisation</h2>
+        <p class="text-white/60 text-sm leading-relaxed mb-5">
+          Stabilisation continue, raffinements de packaging (src layout standard),
+          consolidation des APIs modules. Forge reste un framework explicite,
+          pédagogique et durable.
+        </p>
+        <a href="https://caucrogegit.github.io/Forge/roadmap/forge-roadmap/"
+           target="_blank" rel="noopener noreferrer"
+           class="landing-accent-text text-sm font-semibold">Voir la roadmap →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Documentation -->
+<section class="bg-white py-24 px-6">
+  <div class="max-w-5xl mx-auto text-center">
+    <h2 class="text-4xl font-bold tracking-tight mb-4">
+      Documentation, guides et code source.
+    </h2>
+    <p class="text-slate-500 text-lg max-w-2xl mx-auto mb-10">
+      Forge est fortement documenté : tutoriels, guides de modules, référence CLI,
+      sécurité production, politique de release et guide de contribution.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4 mb-8">
+      <a href="https://caucrogegit.github.io/Forge/15-minutes/"
+         target="_blank" rel="noopener noreferrer"
+         class="landing-accent-bg px-5 py-2.5 rounded-lg text-sm font-semibold text-white">Tutoriel 15 min</a>
+      <a href="https://caucrogegit.github.io/Forge/app-complete-tutorial/"
+         target="_blank" rel="noopener noreferrer"
+         class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 text-slate-600 hover:border-[#E8651A]/40 hover:text-slate-900 transition-all">Application complète</a>
+      <a href="https://caucrogegit.github.io/Forge/reference/"
+         target="_blank" rel="noopener noreferrer"
+         class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 text-slate-600 hover:border-[#E8651A]/40 hover:text-slate-900 transition-all">Référence API & CLI</a>
+      <a href="https://caucrogegit.github.io/Forge/api-json/"
+         target="_blank" rel="noopener noreferrer"
+         class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 text-slate-600 hover:border-[#E8651A]/40 hover:text-slate-900 transition-all">API JSON légère</a>
+      <a href="https://caucrogegit.github.io/Forge/production-security/"
+         target="_blank" rel="noopener noreferrer"
+         class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 text-slate-600 hover:border-[#E8651A]/40 hover:text-slate-900 transition-all">Sécurité production</a>
+      <a href="https://caucrogegit.github.io/Forge/release-policy/"
+         target="_blank" rel="noopener noreferrer"
+         class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 text-slate-600 hover:border-[#E8651A]/40 hover:text-slate-900 transition-all">Release &amp; compatibilité</a>
+      <a href="https://caucrogegit.github.io/Forge/contributing/"
+         target="_blank" rel="noopener noreferrer"
+         class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 text-slate-600 hover:border-[#E8651A]/40 hover:text-slate-900 transition-all">Contribuer</a>
+      <a href="https://github.com/caucrogeGit/Forge/blob/main/CHARTE_DOC.md"
+         target="_blank" rel="noopener noreferrer"
+         class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 text-slate-600 hover:border-[#E8651A]/40 hover:text-slate-900 transition-all">Charte</a>
+      <a href="https://github.com/caucrogeGit/Forge"
+         target="_blank" rel="noopener noreferrer"
+         class="px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 text-slate-600 hover:border-[#E8651A]/40 hover:text-slate-900 transition-all">GitHub</a>
+    </div>
+    <p class="text-xs text-slate-400">Plus de 9000 tests — unitaires, documentaires, E2E, sécurité et MariaDB opt-in.</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="landing-panel py-7 px-8 border-t border-white/10 text-center text-xs text-white/30">
+  © 2026 Roger Cauchon — Tous droits réservés
+</footer>
+
+<script src="./static/js/landing.js"></script>
+</body>
+</html>

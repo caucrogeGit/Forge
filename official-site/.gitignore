@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# MkDocs / build statique
+site/
+dist/
+
+# Import local de la doc Forge (artefact de build, ADR-045 ; source = ../docs)
+docs/forge/
+
+# Caches
+.cache/
+
+# Node / front toolchain
+node_modules/
+
+# Environnements et secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+cert.pem
+key.pem
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+secrets/
+credentials/
+.envrc
+
+# Système / éditeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Local Claude/AI tooling
+.claude/

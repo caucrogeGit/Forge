@@ -1,0 +1,594 @@
+site_name: Forge
+site_description: Site officiel du framework web Python Forge
+site_author: Roger Lequette
+site_url: https://forgemvc.com/docs/
+
+repo_name: caucrogeGit/Forge-official-site
+repo_url: https://github.com/caucrogeGit/Forge-official-site
+edit_uri: ""
+
+theme:
+  name: material
+  language: fr
+  favicon: static/favicon.svg
+  logo: static/forge-logo.png
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.tooltips
+    - search.suggest
+    - search.highlight
+  palette:
+    - scheme: default
+      primary: black
+      accent: deep orange
+
+nav:
+  - Accueil: index.md
+
+  - Documentation Forge:
+      - Vue d'ensemble: forge/index.md
+
+
+      - Installation:
+          - Installer Forge:
+              - Windows + WSL (parcours complet): forge/install/windows-wsl.md
+              - Dépannage serveur dev (WSL2): forge/install/wsl-dev-server.md
+              - Poste Linux (pipx): forge/install/poste-linux.md
+              - Mode développement: forge/install/core-dev.md
+              - VM Debian vierge: forge/install/vm-debian.md
+              - Depuis GitHub: forge/install/github.md
+              - Windows (résumé court): forge/install/windows.md
+          - Environnement:
+              - Préparer MariaDB: forge/install/mariadb.md
+              - Comptes MariaDB d'un projet: forge/install/mariadb-comptes.md
+              - Contrat d'installation des opt-ins: forge/install/opt-ins.md
+              - Configurer VS Code (auto-import): forge/install/vscode.md
+              - Environnement VS Code (extensions et config): forge/install/vscode-environnement.md
+              - Production: forge/install/production.md
+
+      - Premiers pas:
+          - Démarrer avec Forge: forge/guide/getting-started.md
+          - Bonjour Forge: forge/guide/bonjour-forge.md
+          - Application complète: forge/guide/app-complete-tutorial.md
+          - Guide de démarrage: forge/guide/guide.md
+          - CRUD explicite: forge/features/crud.md
+
+      - Concepts:
+          - Vue d'ensemble: forge/guide/concepts.md
+          - Positionnement: forge/guide/positioning.md
+          - Architecture des entités: forge/features/entity_architecture.md
+          - Le JSON canonique: forge/entities/json-canonique.md
+          - Schéma des entités: forge/entities/entity-schema.md
+          - Schéma des relations: forge/entities/relations-schema.md
+          - Tables pivot many-to-many: forge/entities/pivots-many-to-many.md
+          - Pivot advanced: forge/entities/pivot-advanced.md
+          - Types Forge vers MariaDB: forge/entities/types-forge-mariadb.md
+          - Slugs: forge/entities/slugs.md
+          - Valider les contrats JSON: forge/entities/entity-validate.md
+          - Autocomplétion VS Code: forge/entities/vscode-json-schema.md
+          - Limites des contrats JSON: forge/entities/limites-contrats-json.md
+          - Conversion depuis l'ancien format: forge/entities/migration-legacy-vers-canonique.md
+          - Front et CSS: forge/features/front.md
+          - Profils de projet: forge/features/profiles.md
+          - FAQ: forge/guide/faq.md
+
+      - Référence:
+          - Index: forge/reference/reference.md
+          - Commandes CLI: forge/reference/cli-commands.md
+          - API Forge complète: forge/reference/api.md
+          - Vocabulaire opt-in: forge/reference/vocabulaire-opt-in.md
+          - Contrat public 1.0 (gel): forge/reference/public-contract-1.0.md
+          - Convention HTTP inspectable: forge/reference/http.md
+          - Opt-ins officiels:
+              - Workflow: forge/reference/workflow.md
+              - Statistiques: forge/reference/stats.md
+              - Modules Forge: forge/reference/modules.md
+              - Auth — Challenge MFA: forge/reference/auth-mfa.md
+          - CRUD et relations: forge/reference/crud.md
+          - Pages publiques: forge/reference/pages-publiques.md
+          - Sécurité et sessions:
+              - Audit Auth: forge/reference/audit-auth.md
+              - Sessions: forge/reference/sessions.md
+          - Objets HTTP:
+              - L'objet Request: forge/reference/http/request.md
+              - L'objet Response: forge/reference/http/response.md
+              - Le cookie HTTP: forge/reference/http/cookie.md
+              - La session HTTP: forge/reference/http/session.md
+              - La protection CSRF: forge/reference/http/csrf.md
+          - Aide-mémoire Markdown: forge/reference/markdown.md
+          - Outils:
+              - Profils de projet: forge/reference/profils.md
+              - Tests E2E: forge/reference/tests-e2e.md
+          - API JSON légère: forge/reference/api-json.md
+          - Migrations SQL: forge/features/migrations.md
+          - Relations entre entités: forge/features/relations.md
+          - Gestion des mails: forge/features/mail.md
+          - Auth/User: forge/features/auth.md
+          - Sécurité et RBAC: forge/philosophy/security.md
+          - RBAC — Contrôle d'accès: forge/features/rbac.md
+          - Contrat RBAC séparé: forge/security/rbac-contract.md
+          - RBAC — Usage applicatif: forge/security/rbac-usage.md
+          - Schéma API: forge/reference/reference-schema.md
+          - Schéma erreurs runtime: forge/reference/runtime-errors-schema.md
+
+      - Outils:
+          - Génération PDF: forge/features/pdf.md
+          - Module média: forge/features/media.md
+          - ImageMagick (logos transparents): forge/features/imagemagick-logos.md
+
+      - Modules et starters:
+          - Vue d'ensemble des starters: forge/starters/index.md
+          - Créer un module: forge/philosophy/module-author-guide.md
+          - Structure des opt-ins (projet): forge/architecture/optins-project-structure.md
+          - Audit forge optin:enable: forge/architecture/optins-cli-enable-audit.md
+          - Progression pédagogique:
+              - Présentation: forge/starters/welcome-forge/index.md
+              - Débutant:
+                  - Bonjour Forge: forge/starters/welcome-forge/debutant/welcome.md
+                  - Paramètres d'URL: forge/starters/welcome-forge/debutant/query-params.md
+                  - Première vue HTML: forge/starters/welcome-forge/debutant/first-html-view.md
+                  - Route dynamique: forge/starters/welcome-forge/debutant/dynamic-route.md
+                  - Inspecter une requête: forge/starters/welcome-forge/debutant/request-debug.md
+                  - Réponse JSON: forge/starters/welcome-forge/debutant/json-response.md
+                  - Le jeton CSRF: forge/starters/welcome-forge/debutant/csrf.md
+                  - Premier formulaire POST: forge/starters/welcome-forge/debutant/form-post.md
+                  - Validation serveur: forge/starters/welcome-forge/debutant/server-validation.md
+                  - Première base SQL: forge/starters/welcome-forge/debutant/first-sql.md
+                  - Écrire en base: forge/starters/welcome-forge/debutant/first-sql-write.md
+                  - Bilan débutant: forge/starters/welcome-forge/debutant/bilan.md
+              - Intermédiaire:
+                  - Lister des enregistrements: forge/starters/welcome-forge/intermediaire/list-records.md
+                  - Héritage de gabarit: forge/starters/welcome-forge/intermediaire/layout-template.md
+                  - Rechercher / filtrer: forge/starters/welcome-forge/intermediaire/filter-list.md
+                  - Paginer une liste: forge/starters/welcome-forge/intermediaire/pagination.md
+                  - Modifier un enregistrement: forge/starters/welcome-forge/intermediaire/update-record.md
+                  - Supprimer un enregistrement: forge/starters/welcome-forge/intermediaire/delete-record.md
+                  - Messages flash: forge/starters/welcome-forge/intermediaire/flash-messages.md
+                  - Mémoriser un état en session: forge/starters/welcome-forge/intermediaire/session-state.md
+                  - Bilan intermédiaire: forge/starters/welcome-forge/intermediaire/bilan.md
+              - Avancé:
+                  - Relations entre tables: forge/starters/welcome-forge/avance/relations.md
+                  - Écritures transactionnelles: forge/starters/welcome-forge/avance/db-transaction.md
+                  - Téléverser un fichier: forge/starters/welcome-forge/avance/file-upload.md
+                  - API JSON protégée: forge/starters/welcome-forge/avance/json-api.md
+                  - Bilan avancé: forge/starters/welcome-forge/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-forge/recapitulatif.md
+          - Progression façades helper (welcome-helpers):
+              - Préambule: forge/starters/welcome-helpers/installation.md
+              - La base Facade: forge/starters/welcome-helpers/facade-base.md
+              - La façade Session: forge/starters/welcome-helpers/session.md
+              - La façade Cookies: forge/starters/welcome-helpers/cookies.md
+              - La façade Flash: forge/starters/welcome-helpers/flash.md
+              - Imports et usage: forge/starters/welcome-helpers/imports-usage.md
+              - Bilan: forge/starters/welcome-helpers/bilan.md
+          - Progression IoT (welcome-iot):
+              - Installation: forge/starters/welcome-iot/installation.md
+              - Débutant:
+                  - Bonjour Forge IoT: forge/starters/welcome-iot/debutant/iot-welcome.md
+                  - Lire les événements IoT: forge/starters/welcome-iot/debutant/iot-events.md
+                  - Les événements d'un capteur: forge/starters/welcome-iot/debutant/iot-device.md
+                  - Bilan débutant: forge/starters/welcome-iot/debutant/bilan.md
+              - Intermédiaire:
+                  - Simuler une mesure IoT: forge/starters/welcome-iot/intermediaire/iot-simulate.md
+                  - Exposer l'API IoT: forge/starters/welcome-iot/intermediaire/iot-api.md
+                  - Tableau de bord IoT: forge/starters/welcome-iot/intermediaire/iot-dashboard.md
+                  - Bilan intermédiaire: forge/starters/welcome-iot/intermediaire/bilan.md
+              - Avancé:
+                  - Valider un message IoT: forge/starters/welcome-iot/avance/iot-contract.md
+                  - Le subscriber MQTT: forge/starters/welcome-iot/avance/iot-subscriber.md
+                  - Diagnostiquer le module IoT: forge/starters/welcome-iot/avance/iot-doctor.md
+                  - Bilan avancé: forge/starters/welcome-iot/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-iot/recapitulatif.md
+          - Progression Vidéo (welcome-video):
+              - Installation: forge/starters/welcome-video/installation.md
+              - Débutant:
+                  - Bonjour Forge Vidéo: forge/starters/welcome-video/debutant/video-welcome.md
+                  - Lister les vidéos: forge/starters/welcome-video/debutant/video-list.md
+                  - Le détail d'une vidéo: forge/starters/welcome-video/debutant/video-detail.md
+                  - Bilan débutant: forge/starters/welcome-video/debutant/bilan.md
+              - Intermédiaire:
+                  - Téléverser une vidéo: forge/starters/welcome-video/intermediaire/video-upload.md
+                  - Lire une vidéo: forge/starters/welcome-video/intermediaire/video-playback.md
+                  - Suivre l'état d'une vidéo: forge/starters/welcome-video/intermediaire/video-status.md
+                  - Bilan intermédiaire: forge/starters/welcome-video/intermediaire/bilan.md
+              - Avancé:
+                  - Sonder une vidéo: forge/starters/welcome-video/avance/video-probe.md
+                  - Transcoder une vidéo: forge/starters/welcome-video/avance/video-transcode.md
+                  - Diagnostiquer le module Vidéo: forge/starters/welcome-video/avance/video-doctor.md
+                  - Bilan avancé: forge/starters/welcome-video/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-video/recapitulatif.md
+          - Progression Images (welcome-images):
+              - Installation: forge/starters/welcome-images/installation.md
+              - Débutant:
+                  - Bonjour Forge Images: forge/starters/welcome-images/debutant/images-welcome.md
+                  - Téléverser une image: forge/starters/welcome-images/debutant/image-upload.md
+                  - Miniatures et variantes: forge/starters/welcome-images/debutant/image-variants.md
+                  - Bilan débutant: forge/starters/welcome-images/debutant/bilan.md
+              - Intermédiaire:
+                  - Rattacher une image à une entité: forge/starters/welcome-images/intermediaire/image-attach.md
+                  - Afficher la galerie: forge/starters/welcome-images/intermediaire/image-gallery.md
+                  - Texte alternatif et ordre: forge/starters/welcome-images/intermediaire/image-alt-order.md
+                  - Bilan intermédiaire: forge/starters/welcome-images/intermediaire/bilan.md
+              - Avancé:
+                  - Image de couverture: forge/starters/welcome-images/avance/image-cover.md
+                  - Supprimer proprement: forge/starters/welcome-images/avance/image-delete.md
+                  - Garde de sécurité à l'upload: forge/starters/welcome-images/avance/image-safety.md
+                  - Bilan avancé: forge/starters/welcome-images/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-images/recapitulatif.md
+          - Progression Files (welcome-files):
+              - Installation: forge/starters/welcome-files/installation.md
+              - Débutant:
+                  - Bonjour Forge Files: forge/starters/welcome-files/debutant/files-welcome.md
+                  - Stocker un document: forge/starters/welcome-files/debutant/file-store.md
+                  - Servir un fichier: forge/starters/welcome-files/debutant/file-serve.md
+                  - Bilan débutant: forge/starters/welcome-files/debutant/bilan.md
+              - Intermédiaire:
+                  - Valider un upload: forge/starters/welcome-files/intermediaire/file-validate.md
+                  - Limiter les uploads: forge/starters/welcome-files/intermediaire/file-rate-limit.md
+                  - Supprimer un fichier: forge/starters/welcome-files/intermediaire/file-delete.md
+                  - Bilan intermédiaire: forge/starters/welcome-files/intermediaire/bilan.md
+              - Avancé:
+                  - Assainir un nom de fichier: forge/starters/welcome-files/avance/file-safe-name.md
+                  - Chemin anti-traversal: forge/starters/welcome-files/avance/file-safe-path.md
+                  - Écrire des octets générés: forge/starters/welcome-files/avance/file-bytes.md
+                  - Bilan avancé: forge/starters/welcome-files/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-files/recapitulatif.md
+          - Progression Audio (welcome-audio):
+              - Installation: forge/starters/welcome-audio/installation.md
+              - Débutant:
+                  - Bonjour Forge Audio: forge/starters/welcome-audio/debutant/audio-welcome.md
+                  - Téléverser un audio: forge/starters/welcome-audio/debutant/audio-upload.md
+                  - Lire un audio: forge/starters/welcome-audio/debutant/audio-play.md
+                  - Bilan débutant: forge/starters/welcome-audio/debutant/bilan.md
+              - Avancé:
+                  - Sonder un audio: forge/starters/welcome-audio/avance/audio-probe.md
+                  - Transcoder en MP3: forge/starters/welcome-audio/avance/audio-transcode.md
+                  - Diagnostiquer le module Audio: forge/starters/welcome-audio/avance/audio-doctor.md
+                  - Bilan avancé: forge/starters/welcome-audio/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-audio/recapitulatif.md
+          - Progression MFA (welcome-mfa):
+              - Installation: forge/starters/welcome-mfa/installation.md
+              - Débutant:
+                  - Bonjour Forge MFA: forge/starters/welcome-mfa/debutant/mfa-welcome.md
+                  - Secret TOTP et QR: forge/starters/welcome-mfa/debutant/mfa-secret.md
+                  - Vérifier un code TOTP: forge/starters/welcome-mfa/debutant/mfa-verify.md
+                  - Bilan débutant: forge/starters/welcome-mfa/debutant/bilan.md
+              - Intermédiaire:
+                  - Enrôler un facteur TOTP: forge/starters/welcome-mfa/intermediaire/mfa-enroll.md
+                  - Challenge de connexion: forge/starters/welcome-mfa/intermediaire/mfa-challenge.md
+                  - Codes de récupération: forge/starters/welcome-mfa/intermediaire/mfa-recovery.md
+                  - Bilan intermédiaire: forge/starters/welcome-mfa/intermediaire/bilan.md
+              - Avancé:
+                  - Revalidation (step-up): forge/starters/welcome-mfa/avance/mfa-revalidation.md
+                  - Anti-rejeu TOTP: forge/starters/welcome-mfa/avance/mfa-replay.md
+                  - Secret chiffré au repos: forge/starters/welcome-mfa/avance/mfa-crypto.md
+                  - Bilan avancé: forge/starters/welcome-mfa/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-mfa/recapitulatif.md
+          - Progression RBAC (welcome-rbac):
+              - Installation: forge/starters/welcome-rbac/installation.md
+              - Débutant:
+                  - Bonjour Forge RBAC: forge/starters/welcome-rbac/debutant/rbac-welcome.md
+                  - Code de permission: forge/starters/welcome-rbac/debutant/rbac-permission.md
+                  - Rôle et slug: forge/starters/welcome-rbac/debutant/rbac-role.md
+                  - Bilan débutant: forge/starters/welcome-rbac/debutant/bilan.md
+              - Intermédiaire:
+                  - Vérifier une permission: forge/starters/welcome-rbac/intermediaire/rbac-check.md
+                  - Protéger une route: forge/starters/welcome-rbac/intermediaire/rbac-guard.md
+                  - Permission dans un template: forge/starters/welcome-rbac/intermediaire/rbac-template.md
+                  - Bilan intermédiaire: forge/starters/welcome-rbac/intermediaire/bilan.md
+              - Avancé:
+                  - Associer un rôle à un utilisateur: forge/starters/welcome-rbac/avance/rbac-user-role.md
+                  - Résoudre les permissions: forge/starters/welcome-rbac/avance/rbac-resolve.md
+                  - Rôles de la requête: forge/starters/welcome-rbac/avance/rbac-request-roles.md
+                  - Bilan avancé: forge/starters/welcome-rbac/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-rbac/recapitulatif.md
+          - Progression Workflow (welcome-workflow):
+              - Installation: forge/starters/welcome-workflow/installation.md
+              - Débutant:
+                  - Bonjour Forge Workflow: forge/starters/welcome-workflow/debutant/workflow-welcome.md
+                  - Nom de statut: forge/starters/welcome-workflow/debutant/workflow-status.md
+                  - Retrouver un statut: forge/starters/welcome-workflow/debutant/workflow-find.md
+                  - Bilan débutant: forge/starters/welcome-workflow/debutant/bilan.md
+              - Intermédiaire:
+                  - Déclarer les transitions: forge/starters/welcome-workflow/intermediaire/workflow-transition.md
+                  - Vérifier une transition: forge/starters/welcome-workflow/intermediaire/workflow-check.md
+                  - Transitions disponibles: forge/starters/welcome-workflow/intermediaire/workflow-available.md
+                  - Bilan intermédiaire: forge/starters/welcome-workflow/intermediaire/bilan.md
+              - Avancé:
+                  - Badge de statut: forge/starters/welcome-workflow/avance/workflow-badge.md
+                  - Couleur, libellé, classe: forge/starters/welcome-workflow/avance/workflow-color.md
+                  - Helpers Workflow dans Jinja: forge/starters/welcome-workflow/avance/workflow-jinja.md
+                  - Bilan avancé: forge/starters/welcome-workflow/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-workflow/recapitulatif.md
+          - Progression Stats (welcome-stats):
+              - Installation: forge/starters/welcome-stats/installation.md
+              - Débutant:
+                  - Bonjour Forge Stats: forge/starters/welcome-stats/debutant/stats-welcome.md
+                  - Nom d'événement: forge/starters/welcome-stats/debutant/stats-event.md
+                  - Le schéma SQL: forge/starters/welcome-stats/debutant/stats-schema.md
+                  - Bilan débutant: forge/starters/welcome-stats/debutant/bilan.md
+              - Intermédiaire:
+                  - Le SQL d'insertion: forge/starters/welcome-stats/intermediaire/stats-track-sql.md
+                  - Enregistrer un événement: forge/starters/welcome-stats/intermediaire/stats-track.md
+                  - Valider un événement: forge/starters/welcome-stats/intermediaire/stats-validate.md
+                  - Bilan intermédiaire: forge/starters/welcome-stats/intermediaire/bilan.md
+              - Avancé:
+                  - Le SQL de consultation: forge/starters/welcome-stats/avance/stats-admin-sql.md
+                  - Lister les événements: forge/starters/welcome-stats/avance/stats-list.md
+                  - Normaliser une ligne: forge/starters/welcome-stats/avance/stats-normalize.md
+                  - Bilan avancé: forge/starters/welcome-stats/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-stats/recapitulatif.md
+          - Progression Mail (welcome-mail):
+              - Installation: forge/starters/welcome-mail/installation.md
+              - Débutant:
+                  - Bonjour Forge Mail: forge/starters/welcome-mail/debutant/mail-welcome.md
+                  - Composer un message: forge/starters/welcome-mail/debutant/mail-message.md
+                  - Bilan débutant: forge/starters/welcome-mail/debutant/bilan.md
+              - Intermédiaire:
+                  - Choisir un transport: forge/starters/welcome-mail/intermediaire/mail-transport.md
+                  - Rendre un template: forge/starters/welcome-mail/intermediaire/mail-template.md
+                  - Bilan intermédiaire: forge/starters/welcome-mail/intermediaire/bilan.md
+              - Avancé:
+                  - Configurer l'envoi: forge/starters/welcome-mail/avance/mail-config.md
+                  - Diagnostiquer le module Mail: forge/starters/welcome-mail/avance/mail-doctor.md
+                  - Bilan avancé: forge/starters/welcome-mail/avance/bilan.md
+              - Aide-mémoire: forge/starters/welcome-mail/recapitulatif.md
+          - Progression Markdown (welcome-markdown):
+              - Préambule: forge/starters/welcome-markdown/installation.md
+              - Débutant:
+                  - Titre et introduction: forge/starters/welcome-markdown/debutant/titre-et-intro.md
+                  - La mise en forme du texte: forge/starters/welcome-markdown/debutant/mise-en-forme.md
+                  - Les listes: forge/starters/welcome-markdown/debutant/listes.md
+                  - Citations et séparateurs: forge/starters/welcome-markdown/debutant/citations-et-separations.md
+                  - Liens et images: forge/starters/welcome-markdown/debutant/liens-et-images.md
+                  - Bilan débutant: forge/starters/welcome-markdown/debutant/bilan.md
+              - Intermédiaire:
+                  - Présenter des données en tableau: forge/starters/welcome-markdown/intermediaire/tableaux.md
+                  - Définir des termes: forge/starters/welcome-markdown/intermediaire/definitions.md
+                  - Mettre en avant avec les admonitions: forge/starters/welcome-markdown/intermediaire/admonitions.md
+                  - Replier le détail: forge/starters/welcome-markdown/intermediaire/blocs-depliables.md
+                  - Montrer du code: forge/starters/welcome-markdown/intermediaire/code.md
+                  - Bilan intermédiaire: forge/starters/welcome-markdown/intermediaire/bilan.md
+              - Avancé:
+                  - Offrir des variantes avec les onglets: forge/starters/welcome-markdown/avance/onglets.md
+                  - Diagrammes et inclusions: forge/starters/welcome-markdown/avance/diagrammes-et-inclusions.md
+                  - Le texte enrichi: forge/starters/welcome-markdown/avance/texte-enrichi.md
+                  - Notes, abréviations et attributs: forge/starters/welcome-markdown/avance/notes-et-attributs.md
+                  - Infobulles et agrandissement d'image: forge/starters/welcome-markdown/avance/infobulles-et-images.md
+                  - Relecture et maths: forge/starters/welcome-markdown/avance/relecture-et-maths.md
+                  - Bilan avancé: forge/starters/welcome-markdown/avance/bilan.md
+
+      - Déploiement:
+          - Mise en production pas à pas: forge/deployment/mise-en-production.md
+          - Checklist de production: forge/deployment/production-checklist.md
+          - Guide de déploiement: forge/deployment/deployment.md
+          - Déploiement WSGI minimal: forge/deployment/wsgi-deployment.md
+          - Limites de production: forge/deployment/production-limits.md
+          - Déploiement avancé: forge/deployment/deploy-advanced.md
+          - Sécurité en production: forge/deployment/production-security.md
+
+      - Release et compatibilité:
+          - Vue d'ensemble: forge/release/release-and-compatibility.md
+          - Politique de release: forge/release/release-policy.md
+          - Politique de dépréciation: forge/release/deprecation-policy.md
+          - Matrice de compatibilité: forge/release/compatibility.md
+          - Guide de migration: forge/features/migration-guide.md
+          - Politique LTS: forge/release/lts-policy.md
+          - Contrat de stabilité: forge/release/stability-contract.md
+          - Numéros de version brûlés: forge/release/burned-version-numbers.md
+
+      - Philosophie:
+          - Charte v2: forge/philosophy/charter.md
+          - Décisions d'architecture:
+              - Index des ADR: forge/adr/index.md
+              - ADR-001 Authentification: forge/adr/001-auth-strategy.md
+              - ADR-002 Sessions: forge/adr/002-session-strategy.md
+              - ADR-003 Langue API: forge/adr/003-language-convention.md
+              - ADR-004 Périmètre core: forge/adr/004-core-perimeter.md
+              - ADR-005 Packaging: forge/adr/005-packaging.md
+              - ADR-006 Python 3.12+: forge/adr/006-python-version.md
+              - ADR-007 Charte v2: forge/adr/007-charter-v2-adoption.md
+              - ADR-008 Audit auth: forge/adr/008-auth-audit-architecture.md
+              - ADR-009 Stabilité terrain: forge/adr/009-stability-policy-terrain.md
+              - ADR-010 API canonique auth/session: forge/adr/010-auth-session-canonical-api.md
+              - ADR-011 Périmètre vocabulaire audit auth: forge/adr/011-auth-audit-vocab-perimeter.md
+              - ADR-012 Suppression format legacy: forge/adr/012-legacy-format-deprecation-policy.md
+              - ADR-013 Politique nullable/required: forge/adr/013-nullable-required-contract-policy.md
+              - ADR-014 Contrat RBAC séparé: forge/adr/014-rbac-contract-location.md
+              - ADR-015 Handshake TLS par thread (dev): forge/adr/015-dev-tls-handshake-per-thread.md
+              - ADR-016 Unification opt-in: forge/adr/016-opt-in-unification.md
+              - ADR-017 Type slug: forge/adr/017-slug-type.md
+              - ADR-018 Module images: forge/adr/018-image-module-extraction.md
+              - ADR-019 Extraction upload: forge/adr/019-upload-extraction.md
+              - ADR-020 Primitives stockage files: forge/adr/020-files-media-storage-primitives.md
+              - ADR-021 Extraction pivot: forge/adr/021-pivot-extraction.md
+              - ADR-022 Extraction mail: forge/adr/022-mail-extraction.md
+              - ADR-023 Starter build canonique: forge/adr/023-starter-build-canonical.md
+              - ADR-024 Bootstrap squelette dédié: forge/adr/024-skeleton-bootstrap.md
+              - ADR-025 welcome-forge tutoriel continu: forge/adr/025-welcome-forge-continuous-tutorial.md
+              - ADR-026 Accesseurs Request query/route: forge/adr/026-request-param-naming.md
+              - ADR-027 Extraction i18n: forge/adr/027-i18n-extraction.md
+              - ADR-028 welcome-forge tutoriel par niveau: forge/adr/028-welcome-forge-tutorial-per-level.md
+              - ADR-029 Convention de route: forge/adr/029-route-naming-convention.md
+              - ADR-030 Injection de routes explicite: forge/adr/030-explicit-route-injection.md
+              - ADR-031 Découplage mail complet: forge/adr/031-mail-core-decoupling.md
+              - ADR-032 Périmètre config upload: forge/adr/032-upload-config-perimeter.md
+              - ADR-033 Migrations en DB_ADMIN: forge/adr/033-migrations-admin-credentials.md
+              - ADR-034 Nommage DB généré sans suffixes: forge/adr/034-generated-db-identifier-naming.md
+              - ADR-035 Parcours manuels, retrait génération: forge/adr/035-starters-manual-not-generated.md
+              - ADR-036 Typage statique du cœur en CI: forge/adr/036-core-static-typing.md
+
+      - IoT:
+          - Architecture Forge IoT: forge/iot/architecture.md
+          - Contrat MQTT: forge/iot/mqtt-contract.md
+          - Configuration: forge/iot/configuration.md
+          - Subscriber MQTT: forge/iot/mqtt-subscriber.md
+          - Stockage des événements: forge/iot/storage-events.md
+          - API HTTP: forge/iot/http-api.md
+          - Diagnostic (doctor): forge/iot/doctor.md
+          - Initialisation (iot:init): forge/iot/init-command.md
+          - Simulateur (iot:simulate): forge/iot/simulator.md
+          - Écoute (iot:listen): forge/iot/listen-command.md
+          - Mosquitto local: forge/iot/mosquitto-local.md
+          - Smoke test local: forge/iot/local-smoke-test.md
+          - Pour Bac Pro / BTS CIEL: forge/iot/bts-ciel.md
+          - Exemple ESP32: forge/iot/esp32-example.md
+          - Évaluation Arduino R4: forge/iot/arduino-r4-assessment.md
+
+      - Vidéo (opt-in):
+          - Parcours complet: forge/video/parcours.md
+
+      - Tests terrain:
+          - Vue d'ensemble: forge/testing/index.md
+          - État des parcours: forge/testing/field-test-status.md
+          - Outils de diagnostic: forge/testing/field-test-debug-tools.md
+          - Charte de campagne: forge/testing/field-test-charter.md
+          - Modèle de ticket FT: forge/testing/field-test-ticket-template.md
+          - Modèle de retour testeur: forge/testing/field-test-feedback-template.md
+          - Triage et stabilisation: forge/testing/field-test-triage.md
+          - Conversion en tutoriel: forge/testing/field-test-to-tutorial.md
+          - Tickets FT détaillés:
+              - Vue d'ensemble: forge/testing/tickets/index.md
+              - FT-00 — Charte de campagne: forge/testing/tickets/ft-00-test-charter-001.md
+              - FT-00 — Modèle de retour: forge/testing/tickets/ft-00-feedback-template-001.md
+              - FT-00 — Documentation erronée: forge/testing/tickets/ft-00-doc-error-protocol-001.md
+              - FT-00 — Outils de diagnostic: forge/testing/tickets/ft-00-debug-tools-intro-001.md
+              - FT-01 — Installation pipx: forge/testing/tickets/ft-01-install-pipx-001.md
+              - FT-01 — Vérifier la version: forge/testing/tickets/ft-01-install-version-check-001.md
+
+      - Projet:
+          - Roadmap:
+              - Roadmap Forge: forge/roadmap/forge-roadmap.md
+              - Beta 13 (dernière beta fonctionnelle): forge/roadmap/beta13-roadmap.md
+              - Forge Design: forge/roadmap/forge-design-roadmap.md
+              - Tests terrain Forge: forge/roadmap/forge-field-test-roadmap.md
+              - Réorganisation des starters: forge/roadmap/starter-reorg-roadmap.md
+          - Historique:
+              - Roadmap Forge 1.5.0→2.0: forge/history/forge-roadmap-history-2.0.md
+              - Charte documentaire v1: forge/history/charte-v1.md
+              - Archives post-2.0 (consolidation): forge/history/forge_post_2_0_consolidation_roadmap.md
+              - Archives post-2.0 (tickets): forge/history/forge-roadmap-post-2.0.md
+              - Archives UX (phases 5-10): forge/history/forge-roadmap-ux.md
+          - Procédure de release: forge/release/release.md
+          - Validation locale: forge/release/release-local.md
+          - Paramètres GitHub du dépôt: forge/project/github-repository-settings.md
+          - Pour contribuer:
+              - Vue d'ensemble: forge/philosophy/contributing.md
+              - Conventions de travail: forge/contributing/conventions.md
+              - Convention de route: forge/contributing/route-convention.md
+              - Modèle de starter (référence welcome): forge/contributing/starter-welcome-model.md
+              - Convention de création d'un palier (Welcome pédagogique): forge/contributing/convention-creation-palier-welcome-pedagogique.md
+              - Dépôt canonique et récupération: forge/contributing/canonical-repo.md
+          - Audits:
+              - Tracker des constats: forge/history/audits/findings-tracker.md
+              - Baseline 2026-05-15: forge/history/audits/audit-baseline-2026-05-15.md
+              - Pivot advanced — modèle fonctionnel: forge/history/audits/pivot-advanced-functional-model-001.md
+              - Pivot advanced — modèle UX: forge/history/audits/pivot-advanced-ux-model-002.md
+              - Audit final post-RBAC/Pivot: forge/history/audits/release-audit-final-post-rbac-pivot-001.md
+              - Audit make:crud garde M2M: forge/history/audits/field-audit-m2m-guard-001.md
+              - Audit post-corrections terrain: forge/history/audits/release-audit-post-field-fixes-002.md
+              - Audit post-publication beta.8: forge/history/audits/audit-post-publication-beta8.md
+              - Audit de clôture Forge IoT: forge/history/audits/audit-iot-closing.md
+              - Audit de clôture Forge Video: forge/history/audits/audit-video-closing.md
+              - Audit de clôture opt-ins: forge/history/audits/audit-optins-closing.md
+              - Audit pré-release beta.12: forge/history/audits/audit-pre-release-beta12.md
+              - Audit post-publication beta.12: forge/history/audits/audit-beta12-post-publish.md
+              - Clôture beta.12: forge/history/audits/audit-beta12-closing-summary.md
+              - Audits archivés: forge/history/audits/README.md
+          - Tests terrain:
+              - Field Test App 001: forge/history/field-tests/field-test-app-001.md
+          - Releases:
+              - 1.0.0-beta.8: forge/history/releases/release-1.0.0-beta.8.md
+              - 1.0.0-beta.7: forge/history/releases/release-1.0.0-beta.7.md
+              - 1.0.0-beta.6: forge/history/releases/release-1.0.0-beta.6.md
+          - Licence: forge/philosophy/licence.md
+
+  # TEMP welcome-reseau (2TNE CIEL) — retirer ce bloc, la whitelist
+  # starters-pedagogique de scripts/import_forge_docs.py et
+  # docs/forge/starters-pedagogique/ le 2026-06-28, en parité avec le
+  # canonique. Sans lien avec Forge.
+  - Welcome Réseau (2TNE CIEL):
+      - Vue d'ensemble: forge/starters-pedagogique/welcome-reseau/index.md
+      - Palier 1 - Câble T568B: forge/starters-pedagogique/welcome-reseau/palier-1/index.md
+      - Palier 2 - Machines virtuelles: forge/starters-pedagogique/welcome-reseau/palier-2/index.md
+      - Palier 3 - Réseau IP: forge/starters-pedagogique/welcome-reseau/palier-3/index.md
+      - Palier 4 - Réseau interne: forge/starters-pedagogique/welcome-reseau/palier-4/index.md
+
+  - Projet Forge-official-site:
+      - Architecture générale: meta/01-architecture-generale-forge-web.md
+      - Création du dépôt: meta/02-creation-depot-forge-web.md
+      - Préparation publication: deployment-readiness.md
+      - Publication manuelle docs Forge: operations/manual-forge-docs-publication.md
+
+  - Audits:
+      - FW-AUDIT-EXISTING-001: audits/FW-AUDIT-EXISTING-001.md
+      - FW-REPO-STRUCTURE-001: audits/FW-REPO-STRUCTURE-001.md
+      - FW-MKDOCS-INIT-001: audits/FW-MKDOCS-INIT-001.md
+      - FW-DOCS-IMPORT-001: audits/FW-DOCS-IMPORT-001.md
+      - FW-LANDING-FINALIZE-001: audits/FW-LANDING-FINALIZE-001.md
+      - FW-LOCAL-QA-001: audits/FW-LOCAL-QA-001.md
+      - OFFICIAL-SITE-LOCAL-DOCS-LINKS-001: audits/OFFICIAL-SITE-LOCAL-DOCS-LINKS-001.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - nl2br
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.mark
+  - pymdownx.caret
+  - pymdownx.tilde
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.smartsymbols
+  - pymdownx.critic
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.progressbar
+  - pymdownx.betterem
+  - abbr
+  - sane_lists
+  - meta
+  - wikilinks
+  - legacy_attrs
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+  - search:
+      lang: fr
+      separator: '[\s\-\.:\_/]+'
+  - glightbox
+
+docs_dir: docs
+site_dir: site

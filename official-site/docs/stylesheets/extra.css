@@ -1,0 +1,62 @@
+/* DOCS-NAV-LOGO-SIZE-001 — Agrandir le logo Forge dans la barre MkDocs */
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 8rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.md-header {
+  min-height: 8rem;
+}
+
+.md-header__inner {
+  min-height: 8rem;
+}
+
+/* Masquer le libellé texte "Forge" à côté du logo — redondant visuellement */
+.md-header__title .md-header__topic:first-child {
+  display: none;
+}
+
+/* DOCS-CONTENT-WIDTH-001 — Élargir la zone de contenu centrale.
+   Material borne la grille contenu + table des matières à 61rem par défaut ;
+   on l'élargit pour donner plus de place au contenu des pages (starters, code). */
+.md-grid {
+  max-width: 80rem;
+}
+
+/* DOCS-ADMONITION-FONT-001 — Texte des admonitions et blocs repliables (???)
+   à la taille du corps de texte. Material les rend à 0.64rem par défaut, plus
+   petit que les 0.8rem du corps ; on aligne pour les sections repliées. */
+.md-typeset .admonition,
+.md-typeset details {
+  font-size: 0.8rem;
+}
+
+/* DOCS-INLINE-CODE-001 — Mettre en valeur le code en ligne (`...`).
+   Cible le code EN LIGNE uniquement (pas les blocs `pre`, dont la coloration
+   syntaxique reste intacte). Teinte d'accent + fine bordure pour qu'il ressorte
+   du texte. */
+.md-typeset :not(pre) > code {
+  color: #c2410c;
+  background-color: rgba(194, 65, 12, 0.08);
+  border: 1px solid rgba(194, 65, 12, 0.18);
+  border-radius: 0.2rem;
+  padding: 0.05em 0.35em;
+}
+
+/* DOCS-INTRO-LABEL-001 — Libellés d'intro des paliers (« Objectif »,
+   « Ce que vous allez apprendre ») en orange.
+   À appliquer via attr_list : **Objectif**{ .intro-label } */
+.md-typeset .intro-label {
+  color: #c2410c;
+}
+
+/* DOCS-IMG-CENTER-001 — Centrer une image standalone marquée { .center }.
+   L'image étant enveloppée par glightbox dans un <a> inline, on centre le
+   paragraphe qui la contient (couvre aussi le cas sans lightbox). */
+.md-typeset p:has(img.center) {
+  text-align: center;
+}

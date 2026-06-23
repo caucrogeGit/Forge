@@ -1,0 +1,10 @@
+Copyright (c) 2026 Roger Cauchon.
+
+This repository contains the source files, documentation publishing setup,
+landing page assets, and infrastructure notes for the official Forge website.
+
+The Forge framework itself is licensed separately in its own repository.
+Do not assume that this website repository grants additional rights on the
+Forge framework source code.
+
+All rights reserved unless explicitly stated otherwise.

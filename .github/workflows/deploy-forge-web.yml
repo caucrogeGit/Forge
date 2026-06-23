@@ -2,19 +2,21 @@ name: Deploy forgemvc.com (forge-web VM)
 
 # Publication du site officiel sur la VM forge-web (ADR-045).
 #
-# Déclenchement MANUEL uniquement (workflow_dispatch) — jamais sur push,
-# pour garder la publication sous contrôle explicite.
+# Déclenchement MANUEL uniquement (workflow_dispatch). Exécute la machinerie
+# rapatriée official-site/scripts/sync-forge-docs-and-deploy.sh :
+# import local de la doc Forge -> build du site -> validations -> rsync vers la
+# VM (backup daté, staging vérifié, bascule contrôlée).
 #
 # PRÉREQUIS RÉSEAU : la VM forge-web est sur une IP privée (LAN). Un runner
-# GitHub hébergé ne peut pas l'atteindre. Ce workflow doit donc s'exécuter sur
-# un **runner self-hosted** présent sur le réseau de la VM (label `forge-web`),
-# ou via un tunnel. À défaut de runner self-hosted, utiliser le script local
-# `official-site/deploy.sh`.
+# GitHub hébergé ne peut pas l'atteindre : ce workflow doit tourner sur un
+# **runner self-hosted** sur le réseau de la VM (label `forge-web`). À défaut,
+# utiliser le script local depuis un poste du réseau :
+#   DRY_RUN=0 bash official-site/scripts/sync-forge-docs-and-deploy.sh
 #
-# SECRETS attendus (Settings > Secrets and variables > Actions) :
-#   FORGE_WEB_SSH_KEY   : clé privée SSH autorisée sur la VM
-#   FORGE_WEB_HOST      : cible SSH, ex. roger@192.168.1.98
-#   FORGE_WEB_KNOWN_HOSTS : sortie de `ssh-keyscan <hôte>` (vérification d'hôte)
+# SECRETS attendus :
+#   FORGE_WEB_SSH_KEY     : clé privée SSH autorisée sur la VM
+#   FORGE_WEB_HOST        : cible SSH, ex. roger@192.168.1.98
+#   FORGE_WEB_KNOWN_HOSTS : sortie de `ssh-keyscan <hôte>`
 
 on:
   workflow_dispatch:
@@ -33,7 +35,6 @@ permissions:
 
 jobs:
   deploy:
-    # Runner self-hosted sur le réseau de la VM (voir prérequis réseau ci-dessus).
     runs-on: [self-hosted, forge-web]
     environment: forge-web
 
@@ -47,7 +48,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install MkDocs
-        run: pip install -r requirements-docs.txt
+        run: pip install -r official-site/requirements-docs.txt
 
       - name: Configure SSH
         run: |
@@ -55,22 +56,14 @@ jobs:
           echo "${{ secrets.FORGE_WEB_SSH_KEY }}" > ~/.ssh/forge_web_key
           chmod 600 ~/.ssh/forge_web_key
           echo "${{ secrets.FORGE_WEB_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-          cat > ~/.ssh/config <<EOF
-          Host forge-web-target
-            HostName ${FORGE_WEB_HOSTNAME}
-            User ${FORGE_WEB_USER}
-            IdentityFile ~/.ssh/forge_web_key
-          EOF
-        env:
-          FORGE_WEB_HOSTNAME: ${{ secrets.FORGE_WEB_HOST }}
-          FORGE_WEB_USER: deploy
 
-      - name: Deploy
+      - name: Sync & deploy
+        working-directory: official-site
         run: |
           DRY_RUN="${{ github.event.inputs.dry_run }}" \
-          FORGE_DEPLOY_YES=1 \
           REMOTE_HOST="${{ secrets.FORGE_WEB_HOST }}" \
-          bash official-site/deploy.sh
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/forge_web_key" \
+          bash scripts/sync-forge-docs-and-deploy.sh
 
       - name: Cleanup SSH
         if: always()

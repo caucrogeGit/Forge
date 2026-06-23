@@ -1,56 +1,58 @@
-# official-site — publication de forgemvc.com (ADR-045)
+# official-site — publication de forgemvc.com
 
-Ce dossier porte **l'outillage de publication** du site officiel
-[forgemvc.com](https://forgemvc.com). Il a remplacé le dépôt séparé
-`Forge-official-site` (décommissionné, ADR-045) : la documentation n'est plus
-importée d'un dépôt à l'autre, elle est publiée **directement depuis ce dépôt**.
+> **Intégré dans Forge (ADR-045).** Ce dossier est l'ancien dépôt
+> `Forge-official-site` rapatrié dans le dépôt `forge`. La doc n'est plus
+> importée d'un dépôt à l'autre : `import_forge_docs.py` lit désormais la doc
+> canonique **locale** (`../docs`) et `official-site/docs/forge/` est un
+> artefact de build non versionné. Publier :
+> `bash official-site/scripts/sync-forge-docs-and-deploy.sh` (DRY_RUN par
+> défaut), ou le workflow CI `.github/workflows/deploy-forge-web.yml`.
+>
+> **Statut connu (à régler avant le 1er déploiement réel post-intégration)** :
+> `scripts/build-site.sh` lance `mkdocs build --strict` ; sur les docs Forge
+> actuelles, des liens absolus `/docs/forge/…` (ex. `docs/testing/tickets/`,
+> ajoutées depuis le dernier déploiement beta12) font échouer le mode strict.
+> À traiter : corriger ces liens dans `docs/`, ajuster l'import, ou assouplir
+> le strict. Sans rapport avec la santé du dépôt `forge` (sa propre build
+> `mkdocs --strict` passe).
 
-Ce dossier **n'est pas** de la documentation du framework : il n'est pas inclus
-dans le site MkDocs (`docs_dir` reste `docs/`). C'est de l'outillage et de la
-mémoire d'exploitation.
+Site officiel du framework Forge.
 
-## Ce qui est publié
+Objectif du projet :
 
-`forgemvc.com` sert **directement** le `site/` produit par `mkdocs build` :
+- publier https://forgemvc.com ;
+- héberger la landing page publique ;
+- héberger la documentation Forge générée avec MkDocs ;
+- préparer un déploiement statique simple ;
+- garder ce projet séparé du framework Forge.
 
-- `/` — la landing (`docs/index.html`, canonique depuis l'ADR-044) ;
-- `/install/`, `/reference/`, … — les pages de documentation ;
-- `/sitemap.xml` et `/robots.txt` — générés/copiés par MkDocs.
+## Périmètre
 
-Il n'y a **plus** de préfixe `/docs/` ni d'assemblage : la source est `docs/`.
+Ce dépôt concerne uniquement Forge-official-site :
 
-## Déployer
+- landing page ;
+- documentation publique ;
+- génération statique ;
+- notes d'infrastructure ;
+- scripts de build et de déploiement.
 
-Le script construit le site (`mkdocs build --strict`) puis le pousse sur la VM
-forge-web par `rsync`, avec backup daté et bascule via un staging vérifié.
+Ce dépôt ne doit pas modifier le cœur du framework Forge.
 
-```bash
-# Aperçu sans rien écrire sur la VM (DRY_RUN=1 par défaut) :
-bash official-site/deploy.sh
+## Structure initiale
 
-# Déploiement réel (demande une confirmation interactive « DEPLOY ») :
-DRY_RUN=0 bash official-site/deploy.sh
-```
+- landing/ : source de la landing page statique ;
+- docs/ : documentation publique ou sources MkDocs ;
+- site/ : site généré, non versionné ;
+- infra/ : notes et fichiers d'infrastructure sans secrets ;
+- notes/ : notes de travail du projet ;
+- scripts/ : scripts locaux de génération ou déploiement.
 
-Sécurité (anti-incident de déploiement) : `DRY_RUN=1` par défaut, confirmation
-explicite obligatoire en mode réel, backup distant daté avant toute bascule.
-Voir aussi le workflow CI `.github/workflows/deploy-forge-web.yml` (publication
-déclenchée à la main, clé SSH en secret).
+## Décision initiale
 
-Variables surchargeables : `REMOTE_HOST`, `REMOTE_CURRENT`, `REMOTE_BACKUPS`,
-`REMOTE_STAGE`. Les accès SSH/secrets ne sont **jamais** committés.
+Le site sera statique dans un premier temps.
 
-## Redirections d'URL (rupture héritée)
+MkDocs servira à générer la documentation.
 
-L'ancien site servait la doc sous `/docs/forge/…`. Désormais elle est à la
-racine (`/…`). Des redirections `301` des anciennes URLs vers les nouvelles
-sont à poser **côté serveur** (Caddy/Nginx sur la VM) pour préserver le SEO et
-les liens entrants. Cette configuration vit sur la VM, hors dépôt.
+Le reverse proxy et HTTPS seront traités plus tard, probablement avec Caddy.
 
-## history/
-
-`history/` archive la mémoire d'exploitation héritée de `Forge-official-site`
-(runbook, audits `FW-*`, gestion des secrets, préparation au déploiement).
-Ces documents décrivent l'ancien flux (import + structure `/docs/`) et sont
-conservés **à titre d'archive** ; ils ne décrivent plus le fonctionnement
-courant, qui est celui de ce README et de l'ADR-045.
+Proxmox ne doit jamais être exposé directement au public.
