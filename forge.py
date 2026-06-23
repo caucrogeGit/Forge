@@ -154,6 +154,21 @@ def _configure_env_files(dest: str, project_name: str, db_name: str) -> None:
     with open(dev_path, "w", encoding="utf-8") as file:
         file.write(dev_content)
 
+    # env/prod : en production derrière Nginx, Forge écoute en HTTP local
+    # (le proxy termine TLS). On force donc APP_SSL_ENABLED=false.
+    prod_content, replaced = re.subn(
+        r"^#?\s*APP_SSL_ENABLED=.*$",
+        "APP_SSL_ENABLED=false",
+        dev_content,
+        flags=re.MULTILINE,
+    )
+    if replaced == 0:
+        prod_content = prod_content.rstrip("\n") + "\nAPP_SSL_ENABLED=false\n"
+
+    prod_path = os.path.join(dest, "env", "prod")
+    with open(prod_path, "w", encoding="utf-8") as file:
+        file.write(prod_content)
+
 
 def _setup_python_environment(dest: str) -> None:
     _print_step("Création de l'environnement virtuel Python...")

@@ -360,6 +360,27 @@ def test_env_dev_ne_contient_pas_root_comme_app_login(tmp_path):
     assert "DB_APP_LOGIN=root" not in dev
 
 
+def test_env_prod_est_cree(tmp_path):
+    _make_env_dir(tmp_path)
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
+    assert (tmp_path / "env" / "prod").is_file()
+
+
+def test_env_prod_contient_db_app_login_projet(tmp_path):
+    _make_env_dir(tmp_path)
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
+    prod = (tmp_path / "env" / "prod").read_text(encoding="utf-8")
+    assert "DB_APP_LOGIN=test_forge_new\n" in prod
+
+
+def test_env_prod_desactive_ssl(tmp_path):
+    # Prod derrière Nginx : Forge écoute en HTTP local, TLS terminé par le proxy.
+    _make_env_dir(tmp_path)
+    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
+    prod = (tmp_path / "env" / "prod").read_text(encoding="utf-8")
+    assert "APP_SSL_ENABLED=false" in prod
+
+
 def test_env_dev_contient_db_admin_login(tmp_path):
     _make_env_dir(tmp_path)
     forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
