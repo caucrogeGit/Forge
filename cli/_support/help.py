@@ -24,7 +24,6 @@ Entités
   entity:validate    Valide les entités et relations contre les schémas JSON.
   sync:entity        Régénère les fichiers modèles.
   sync:relations     Régénère relations.sql.
-  sync:landing       Synchronise la landing page vers docs/.
   build:model        Régénère tous les modèles Python.
   check:model        Vérifie la cohérence des modèles.
 

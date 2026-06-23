@@ -25,7 +25,6 @@ from cli.public.public_form import main as public_form_main
 from cli.public.public_list import main as public_list_main
 from cli.public.public_page import main as public_page_main
 from cli.public.public_show import main as public_show_main
-from cli.assets.sync_landing import main as sync_landing_main
 # FILES-CLI-RENAME-001 (ADR-019) : cli.assets.uploads importé en lazy dans la
 # branche upload:init/media:init (dépend de l'opt-in forge-mvc-files).
 from cli.assets.front import main as front_main
@@ -533,10 +532,6 @@ def main() -> None:
 
     if command == "sync:entity":
         model_main(args)
-        return
-
-    if command == "sync:landing":
-        sync_landing_main(args)
         return
 
     if command in ("upload:init", "media:init"):

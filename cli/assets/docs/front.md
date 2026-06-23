@@ -34,5 +34,4 @@ Les versions cibles sont figées dans le module (`HTMX_VERSION`, `ALPINE_VERSION
 
 ## 4. Voir aussi
 
-- [La commande sync:landing](sync_landing.md) : publication de la landing.
 - [Les commandes i18n](i18n.md) : catalogues de traduction.

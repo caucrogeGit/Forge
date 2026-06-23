@@ -894,22 +894,6 @@ forge deploy:check
 
 </details>
 
-## Commandes de synchronisation
-
-<details markdown="1" id="forge-synclanding">
-<summary><code>forge sync:landing</code> - Synchronise la landing page source vers docs/index.html</summary>
-
-Synchronise la landing page source vers `docs/index.html`.
-
-```bash
-forge sync:landing
-```
-
-Copie `mvc/views/landing/index.html` → `docs/index.html` et `static/` → `docs/static/`.
-À utiliser après toute modification de la landing page source.
-
-</details>
-
 ## Commandes de documentation
 
 <details markdown="1" id="forge-docspdf">
@@ -1102,7 +1086,6 @@ Toutes les commandes documentées dans cette page.
 | [`forge schema:doctor`](#forge-schemadoctor) | Schémas JSON | Core |
 | [`forge schema:list`](#forge-schemalist) | Schémas JSON | Core |
 | [`forge sync:entity`](#forge-syncentity) | Entités | Core |
-| [`forge sync:landing`](#forge-synclanding) | Synchronisation | Core |
 | [`forge sync:relations`](#forge-syncrelations) | Entités | Core |
 | [`forge upload:init`](#forge-uploadinit) | Médias et JavaScript | Core |
 | [`forge --version`](#forge-version) | Utilitaires | Core |

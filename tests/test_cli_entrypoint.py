@@ -69,20 +69,6 @@ def test_dispatch_build_model_sans_dry_run(monkeypatch):
     assert captured["args"] == ["build:model"]
 
 
-def test_dispatch_sync_landing_transmet_check(monkeypatch):
-    captured = {}
-
-    def fake_sync_landing_main(args):
-        captured["args"] = args
-
-    monkeypatch.setattr(sys, "argv", ["forge", "sync:landing", "--check"])
-    monkeypatch.setattr(forge, "sync_landing_main", fake_sync_landing_main)
-
-    forge.main()
-
-    assert captured["args"] == ["sync:landing", "--check"]
-
-
 def test_dispatch_upload_init(monkeypatch):
     # FILES-CLI-RENAME-001 (ADR-019) : cli.assets.uploads est importé en lazy
     # dans la branche (l'upload est un opt-in). On patche la vraie cible.

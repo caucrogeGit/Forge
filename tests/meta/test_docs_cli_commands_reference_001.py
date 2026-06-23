@@ -56,7 +56,6 @@ class TestCoreCommandsDocumented:
         "forge js:init",
         "forge deploy:init",
         "forge deploy:check",
-        "forge sync:landing",
         "forge --version",
         "forge --help",
     ]

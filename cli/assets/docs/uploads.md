@@ -29,4 +29,3 @@ Un fichier `.gitkeep` est posé dans chaque dossier pour le versionner vide.
 ## 4. Voir aussi
 
 - [La commande js:init](front.md) : bibliothèques front.
-- [La commande sync:landing](sync_landing.md) : publication de la landing.

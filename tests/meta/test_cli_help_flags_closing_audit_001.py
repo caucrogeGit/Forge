@@ -38,8 +38,8 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 FORGE_PY = PROJECT_ROOT / "forge.py"
 
 
-# Liste figée des 62 commandes dispatchées par forge.py au commit de
-# clôture (5c9db26 + corrections de ce ticket).
+# Liste figée des commandes dispatchées par forge.py.
+# (sync:landing retirée par ADR-044 : landing canonique dans docs/.)
 # Tirée de forge.py : un grep "if command (==|in)" donne la même liste.
 ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Projet
@@ -47,7 +47,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Entités
     "make:entity", "make:crud", "make:pivot-crud", "make:relation",
     "entity:validate",
-    "sync:entity", "sync:relations", "sync:landing",
+    "sync:entity", "sync:relations",
     "build:model", "check:model",
     # Pages publiques
     "make:public-page", "make:public-list", "make:public-show",

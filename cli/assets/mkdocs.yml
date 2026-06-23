@@ -7,5 +7,4 @@ nav:
   - Référence CLI ressources (par module):
       - Commande js:init (front.py): front.md
       - Commandes i18n (i18n.py): i18n.md
-      - Commande sync:landing (sync_landing.py): sync_landing.md
       - Commandes upload:init / media:init (uploads.py): uploads.md

@@ -1,6 +1,6 @@
 """Garde-fou CLI-HELP-FLAGS-REMAINING-MINOR-001.
 
-Ticket de clôture du chantier --help : vérifie que les 9 dernières
+Ticket de clôture du chantier --help : vérifie que les dernières
 commandes Forge encore génériques ont désormais une aide enrichie
 cohérente et n'exécutent pas leur logique métier avec --help / -h :
 
@@ -8,7 +8,6 @@ cohérente et n'exécutent pas leur logique métier avec --help / -h :
     starter:list
     sync:entity
     sync:relations
-    sync:landing
     js:init
     docs:pdf
     i18n:check
@@ -40,7 +39,6 @@ REMAINING_COMMANDS = [
     "new",
     "sync:entity",
     "sync:relations",
-    "sync:landing",
     "js:init",
     "docs:pdf",
     "i18n:check",
@@ -52,7 +50,6 @@ WRITING_COMMANDS = [
     "new",
     "sync:entity",
     "sync:relations",
-    "sync:landing",
     "js:init",
     "docs:pdf",
 ]
@@ -69,7 +66,6 @@ COMMAND_KEYWORDS = {
     "new":            ["projet", "project"],
     "sync:entity":    ["entity", "entité", "entite"],
     "sync:relations": ["relations"],
-    "sync:landing":   ["landing"],
     "js:init":        ["javascript", "js", "htmx", "alpine"],
     "docs:pdf":       ["pdf", "documentation"],
     "i18n:check":     ["traduction", "i18n", "translations"],

@@ -79,9 +79,8 @@ def _get_documented_commands() -> set[str]:
 # Ces commandes sont fonctionnelles — elles s'exécutent normalement, elles sont
 # simplement cachées du listing --help.
 # Identifiées lors de la reconnaissance T11 (audit F23).
-KNOWN_DOCUMENTED_EXCEPTIONS: set[str] = {
-    "sync:landing",  # Fonctionne (utilisé en interne), absent de forge --help
-}
+KNOWN_DOCUMENTED_EXCEPTIONS: set[str] = set()
+# (sync:landing retirée par ADR-044 : landing canonique dans docs/.)
 
 # ADR-042 : les commandes livrées par les opt-ins (documentées dans leur propre
 # espace, pas dans la référence CLI du cœur). Exclues du contrôle de couverture

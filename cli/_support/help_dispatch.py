@@ -74,7 +74,6 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "entity:validate":  "Valide les entités et relations contre les schémas JSON.",
     "sync:entity":      "Régénère les fichiers modèles d'une entité.",
     "sync:relations":   "Régénère mvc/entities/relations.sql.",
-    "sync:landing":     "Synchronise la landing page vers docs/.",
     "build:model":      "Régénère tous les modèles Python depuis leurs entités JSON.",
     "check:model":      "Vérifie la cohérence des modèles.",
     # Pages publiques
@@ -1904,40 +1903,6 @@ Limites:
   - ne traite pas les artefacts d'entité (.sql, _base.py) — voir
     forge sync:entity ou forge build:model ;
   - ne crée pas la base ni les tables — voir forge db:apply.""",
-
-    "sync:landing": """\
-Usage:
-  forge sync:landing [--check]
-
-Description:
-  Synchronise la landing du framework (mvc/views/landing/index.html
-  + static/) vers docs/index.html et docs/static/ pour la version
-  publiée sur GitHub Pages / MkDocs.
-
-Effets:
-  - mode normal :
-      * lit mvc/views/landing/index.html ;
-      * RÉGÉNÈRE docs/index.html (préfixé du commentaire « FICHIER
-        GENERE PAR forge sync:landing ») ;
-      * copie récursivement static/* vers docs/static/* ;
-  - mode --check :
-      * vérifie que docs/index.html et docs/static/ sont synchrones ;
-      * exit 0 si OK, 1 si désynchronisé ; n'écrit rien.
-
-ATTENTION:
-  - en mode normal, docs/index.html est ÉCRASÉ ;
-  - les fichiers de docs/static/ sont COPIÉS depuis static/
-    (écrasement par shutil.copy2) ;
-  - vérifier le diff Git après exécution.
-
-Options:
-  --check       Mode lecture seule : vérifie la synchronisation sans
-                rien écrire.
-  -h, --help    Affiche cette aide sans exécuter la commande.
-
-Limites:
-  - destiné au DÉPÔT Forge lui-même, pas à un projet applicatif ;
-  - ne publie rien (la publication GitHub Pages est gérée par CI).""",
 
     "js:init": """\
 Usage:
