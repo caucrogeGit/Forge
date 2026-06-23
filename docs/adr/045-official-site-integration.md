@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposé — bêta publique 1.0 (`1.0.0-beta.x`).
+Accepté — bêta publique 1.0 (`1.0.0-beta.x`).
 
 ---
 
