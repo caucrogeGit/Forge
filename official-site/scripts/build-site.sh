@@ -37,8 +37,16 @@ echo "==> Nettoyage de $DIST et $SITE"
 rm -rf "$DIST" "$SITE"
 mkdir -p "$DIST"
 
-echo "==> Copie de la landing depuis public/"
-cp -a public/. "$DIST/"
+# ADR-045 : official-site consomme la landing canonique de Forge (../docs,
+# ADR-044) au lieu d'en garder une copie. Pas de duplication : la source
+# unique de la landing est docs/index.html.
+echo "==> Landing canonique depuis ../docs (ADR-044/045)"
+cp ../docs/index.html "$DIST/index.html"
+mkdir -p "$DIST/static"
+cp -a ../docs/static/. "$DIST/static/"
+
+echo "==> SEO propre au site (robots, sitemap) depuis public/"
+cp public/robots.txt public/sitemap.xml "$DIST/" 2>/dev/null || true
 
 echo "==> Génération MkDocs (mkdocs build --strict)"
 mkdocs build --strict
