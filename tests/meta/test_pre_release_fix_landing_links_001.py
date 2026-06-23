@@ -9,7 +9,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-LANDING_SOURCE = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
+LANDING_SOURCE = PROJECT_ROOT / "docs" / "index.html"
 LANDING_GENERATED = PROJECT_ROOT / "docs" / "index.html"
 
 # URLs cassées identifiées par l'audit pré-release-3.0-audit-001
@@ -37,7 +37,7 @@ class TestBrokenURLsAbsent:
         content = LANDING_SOURCE.read_text(encoding="utf-8")
         assert broken not in content, (
             f"L'URL cassée '{broken}' devrait être supprimée de "
-            f"mvc/views/landing/index.html (corrigée vers le nouveau slug)"
+            f"docs/index.html (corrigée vers le nouveau slug)"
         )
 
     @pytest.mark.parametrize("broken", BROKEN_URLS)
@@ -65,7 +65,7 @@ class TestFixedURLsPresent:
         content = LANDING_SOURCE.read_text(encoding="utf-8")
         assert fixed in content, (
             f"L'URL corrigée '{fixed}' devrait être présente dans "
-            f"mvc/views/landing/index.html"
+            f"docs/index.html"
         )
 
     @pytest.mark.parametrize("fixed", FIXED_URLS)

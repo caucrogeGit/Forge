@@ -82,7 +82,6 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 | Domaine | Statut |
 |---|---|
 | `forge module:*` (list, install, files, routes) | Expérimental — interface susceptible d'évoluer |
-| `forge sync:landing [--check]` | Expérimental |
 | `forge check:model` | Expérimental |
 | `forge deploy:init`, `forge deploy:check` | Expérimental |
 | Pages publiques (`make:public-*`) | Disponible, interface stable, comportement peut s'affiner |
@@ -265,7 +264,6 @@ Ces commandes sont disponibles mais leur interface peut évoluer :
 | Commande | Note |
 |---|---|
 | `forge module:list` / `install` / `files` / `routes` | Système de modules, jeune |
-| `forge sync:landing [--check]` | Synchronisation landing |
 | `forge check:model` | Vérification cohérence modèles |
 | `forge deploy:init` / `check` | Déploiement |
 | `forge migration:diff` | Comparaison entité / MariaDB |

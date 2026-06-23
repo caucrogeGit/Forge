@@ -6,7 +6,7 @@ pytestmark = pytest.mark.meta
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent  # depuis tests/meta/
-LANDING_SOURCE = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
+LANDING_SOURCE = PROJECT_ROOT / "docs" / "index.html"
 LANDING_GENERATED = PROJECT_ROOT / "docs" / "index.html"
 
 
@@ -15,7 +15,7 @@ class TestSourceFileExists:
 
     def test_source_exists(self):
         assert LANDING_SOURCE.exists(), (
-            "mvc/views/landing/index.html doit exister "
+            "docs/index.html doit exister "
             "(source canonique de la landing)"
         )
 
@@ -277,25 +277,15 @@ class TestStartersSection:
 
 
 class TestSyncedToDocsIndex:
-    """docs/index.html est synchronisé avec la source."""
+    """docs/index.html est la landing canonique (ADR-044)."""
 
-    def test_sync_header_present(self):
-        content = LANDING_GENERATED.read_text(encoding="utf-8")
-        assert "FICHIER GENERE PAR forge sync:landing" in content, (
-            "docs/index.html devrait avoir l'en-tête indiquant qu'il est "
-            "généré — ajouter le commentaire ou relancer forge sync:landing"
-        )
-
-    def test_version_synced(self):
+    def test_version_present(self):
         import tomllib
         import re as _re
         _v = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
         _sv = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _v)
         tag = f"v{_sv}"
-        source = LANDING_SOURCE.read_text(encoding="utf-8")
         generated = LANDING_GENERATED.read_text(encoding="utf-8")
-        assert tag in source, f"La source landing doit mentionner {tag}."
         assert tag in generated, (
-            f"docs/index.html devrait être synchronisé (contenir {tag}). "
-            "Lancer `forge sync:landing` pour régénérer."
+            f"docs/index.html (landing canonique) devrait mentionner {tag}."
         )

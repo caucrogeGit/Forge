@@ -26,7 +26,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 INSTALL_DIR = PROJECT_ROOT / "docs" / "install"
 MKDOCS = PROJECT_ROOT / "mkdocs.yml"
-LANDING_SRC = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
+LANDING_SRC = PROJECT_ROOT / "docs" / "index.html"
 DOCS_INDEX_HTML = PROJECT_ROOT / "docs" / "index.html"
 
 EXPECTED_FILES = [

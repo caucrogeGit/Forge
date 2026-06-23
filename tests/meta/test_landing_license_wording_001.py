@@ -19,7 +19,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-LANDING_SOURCE = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
+LANDING_SOURCE = PROJECT_ROOT / "docs" / "index.html"
 LANDING_GENERATED = PROJECT_ROOT / "docs" / "index.html"
 
 _OPEN_SOURCE = re.compile(r"\bopen[\s-]source\b", re.IGNORECASE)
@@ -41,7 +41,7 @@ class TestLandingDoesNotClaimOpenSource:
         assert LANDING_SOURCE.exists(), f"{LANDING_SOURCE.relative_to(PROJECT_ROOT)} doit exister"
         hits = _problematic_lines(LANDING_SOURCE.read_text(encoding="utf-8"))
         assert not hits, (
-            "mvc/views/landing/index.html affirme 'open source' : "
+            "docs/index.html affirme 'open source' : "
             + ", ".join(f"L.{n}: {line.strip()!r}" for n, line in hits)
             + " — Forge est sous licence propriétaire / source disponible (cf. LICENSE)"
         )
@@ -59,7 +59,7 @@ class TestLandingDoesNotClaimOpenSource:
     def test_landing_uses_source_disponible_terminology(self):
         text = LANDING_SOURCE.read_text(encoding="utf-8")
         assert "source disponible" in text.lower(), (
-            "mvc/views/landing/index.html devrait utiliser 'Source disponible' "
+            "docs/index.html devrait utiliser 'Source disponible' "
             "pour décrire la nature de la licence (cohérent avec LICENSE)"
         )
 

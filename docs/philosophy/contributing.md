@@ -308,18 +308,18 @@ confondre — chacune a un rôle strict.
 | Chemin | Rôle | Suivi Git ? | Modifier à la main ? |
 |---|---|---|---|
 | `docs/` | **Source documentaire canonique** (Markdown + assets) | ✅ Oui | ✅ Oui — c'est la source à éditer |
-| `mvc/views/landing/index.html` | **Source canonique de la landing publique** | ✅ Oui | ✅ Oui — éditer ici puis synchroniser |
-| `docs/index.html` | **Landing synchronisée** depuis `mvc/views/landing/index.html` | ✅ Oui | ❌ Non — régénéré par `forge sync:landing` |
+| `docs/index.html` | **Landing canonique** publique (ADR-044) | ✅ Oui | ✅ Oui — c'est la source à éditer directement |
 | `site/` | **Artefact MkDocs** généré par `mkdocs build` | ❌ Non (ignoré par `.gitignore`) | ❌ Jamais — supprimable sans perte |
 
-La chaîne complète à suivre quand on modifie la landing :
+Depuis l'ADR-044, la landing n'est plus générée : `docs/index.html` est la
+source canonique, éditée directement. La chaîne à suivre quand on la modifie :
 
 ```bash
-# 1. Éditer la source canonique
-$EDITOR mvc/views/landing/index.html
+# 1. Éditer la landing canonique
+$EDITOR docs/index.html
 
-# 2. Synchroniser docs/index.html depuis la source canonique
-forge sync:landing
+# 2. Le CSS Tailwind compilé est servi depuis docs/static/tailwind.css
+#    (recompiler via le script build:css de package.json si des classes changent)
 
 # 3. Régénérer le site MkDocs (zéro warning autorisé)
 mkdocs build --strict

@@ -1141,7 +1141,6 @@ L'interface officielle est la commande `forge`.
 | `forge make:relation` | Assistant de création de relation. |
 | `forge sync:entity NomEntite` | Régénère `*_base.py` et SQL depuis le JSON. |
 | `forge sync:relations` | Régénère `relations.sql` depuis `relations.json`, y compris les tables pivot `many_to_many` simples ou enrichies via `pivot_fields`. |
-| `forge sync:landing [--check]` | Synchronise ou vérifie la landing. |
 | `forge upload:init` | Prépare les dossiers d'uploads. |
 | `forge media:init` | Prépare les dossiers de variantes d'images. |
 | `forge auth:init` | Crée ou préserve les SQL Auth/User optionnels. |

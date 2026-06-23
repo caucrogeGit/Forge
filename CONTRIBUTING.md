@@ -171,29 +171,26 @@ et écartée : `forge.py` et `forge/` ne peuvent pas coexister, et 236 imports
 
 ## Modifier la landing page
 
-La landing page de Forge a deux sources canoniques distinctes :
+Depuis l'ADR-044, la landing n'est plus générée : `docs/index.html` est la
+source canonique, éditée directement. Le CSS Tailwind compilé est servi
+depuis `docs/static/tailwind.css`.
 
-| Source | Cible générée |
+| Chemin | Rôle |
 |---|---|
-| `mvc/views/landing/index.html` | `docs/index.html` |
-| `static/` (CSS, JS, images) | `docs/static/` |
+| `docs/index.html` | landing canonique (éditer directement) |
+| `docs/static/` | assets servis (CSS, JS, images) |
 
-**Workflow complet de modification** :
+**Workflow de modification** :
 
 ```bash
-# 1. Éditer le HTML
-$EDITOR mvc/views/landing/index.html
+# 1. Éditer la landing canonique
+$EDITOR docs/index.html
 
-# 2. Si modification de classes Tailwind, régénérer le CSS
-npm run build:css
+# 2. Si des classes Tailwind changent, recompiler le CSS (script build:css)
 
-# 3. Synchroniser vers docs/
-forge sync:landing
+# 3. Vérifier le rendu du site
+mkdocs build --strict
 ```
-
-La commande `forge sync:landing` copie :
-- `mvc/views/landing/index.html` → `docs/index.html`
-- `static/*` → `docs/static/*` (récursif)
 
 **Vérification** : `mkdocs build --strict` doit passer sans warning. Le
 site déployé reflètera les modifications après le prochain push.

@@ -1,7 +1,7 @@
 """Tests — LANDING-INSTALL-CARDS-001.
 
 Verrouille le contrat de la section « Installer Forge selon votre usage »
-de la landing canonique (`mvc/views/landing/index.html`).
+de la landing canonique (`docs/index.html`).
 
 Depuis la refonte des cartes, la section ne contient plus que **2 cartes**,
 au même design, qui orientent par contexte de poste :
@@ -29,7 +29,7 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-LANDING = Path("mvc/views/landing/index.html")
+LANDING = Path("docs/index.html")
 DOCS_LANDING = Path("docs/index.html")
 ROADMAP = Path("docs/roadmap/forge-roadmap.md")
 

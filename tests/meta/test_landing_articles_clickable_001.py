@@ -13,7 +13,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-LANDING = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
+LANDING = PROJECT_ROOT / "docs" / "index.html"
 DOCS = PROJECT_ROOT / "docs"
 
 BASE_URL = "https://caucrogegit.github.io/Forge/"

@@ -17,7 +17,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-LANDING = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
+LANDING = PROJECT_ROOT / "docs" / "index.html"
 
 EXPECTED_CARD_TITLES = [
     "HTTP &amp; routing",

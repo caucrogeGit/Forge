@@ -120,7 +120,6 @@ frictions suivantes peuvent apparaître :
 - **Permissions** : `chmod` est ignoré silencieusement sous Windows
 - **MariaDB** : installation différente (MSI Windows vs `apt`)
 - **Tests** : certains tests dépendent du système Unix et peuvent échouer
-- **forge sync:landing** : dépend de commandes shell Unix
 
 Ces frictions ne sont pas testées ni supportées dans Forge {{forge_version}}. Les contributions
 pour le support natif Windows sont bienvenues, mais non planifiées.

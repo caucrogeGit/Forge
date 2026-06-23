@@ -16,7 +16,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-LANDING_SOURCE = PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html"
+LANDING_SOURCE = PROJECT_ROOT / "docs" / "index.html"
 LANDING_GENERATED = PROJECT_ROOT / "docs" / "index.html"
 
 

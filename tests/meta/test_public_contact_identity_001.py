@@ -3,7 +3,7 @@
 Verrouille (refondu pour RELEASE-BETA10-LANDING-CONTACT-HOTFIX-001) :
 
   * la **navigation** principale de la landing canonique
-    (``mvc/views/landing/index.html``) se termine par une entrée
+    (``docs/index.html``) se termine par une entrée
     ``Contact`` placée APRÈS l'entrée ``GitHub`` ;
   * une section ``<section id="contact">`` existe dans la landing ;
   * cette section affiche **Roger Lequette** et **forgemvc@gmail.com** ;
@@ -47,7 +47,7 @@ pytestmark = pytest.mark.meta
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_LANDING_SRC = _REPO_ROOT / "mvc" / "views" / "landing" / "index.html"
+_LANDING_SRC = _REPO_ROOT / "docs" / "index.html"
 _LANDING_PUB = _REPO_ROOT / "docs" / "index.html"
 
 
@@ -349,7 +349,7 @@ class TestNoContactRouteOrController:
             f"`mvc/routes.py` contient un pattern de route `/contact` : "
             f"{offenders}. Le contact landing reste volontairement statique "
             "(mailto:forgemvc@gmail.com) — voir commentaire HTML dans "
-            "`mvc/views/landing/index.html`."
+            "`docs/index.html`."
         )
 
     def test_no_contact_controller_in_mvc_controllers(self):

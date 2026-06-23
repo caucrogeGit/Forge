@@ -1,11 +1,10 @@
-"""Garde-fou DOCS-SITE-ARTIFACT-POLICY-001.
+"""Garde-fou DOCS-SITE-ARTIFACT-POLICY-001 (révisé ADR-044).
 
-Verrouille la politique des trois couches documentaires Forge :
+Verrouille la politique des couches documentaires Forge :
 
   * ``docs/`` — **source documentaire canonique** suivie par Git ;
-  * ``mvc/views/landing/index.html`` — source canonique de la landing ;
-  * ``docs/index.html`` — landing synchronisée depuis cette source via
-    ``forge sync:landing`` ;
+  * ``docs/index.html`` — **landing canonique**, éditée directement
+    (ADR-044 : plus de génération par ``forge sync:landing``) ;
   * ``site/`` — **artefact** généré par ``mkdocs build``, jamais
     canonique, ignoré par ``.gitignore``, supprimable sans perte.
 
@@ -13,9 +12,9 @@ Le test vérifie :
 
   1. ``.gitignore`` ignore ``site/`` (pattern explicite) ;
   2. ``docs/`` n'apparaît PAS comme entrée ignorée ;
-  3. la documentation de contribution mentionne les 4 rôles ci-dessus ;
-  4. la commande ``forge sync:landing`` est documentée comme la voie
-     officielle de synchronisation.
+  3. la documentation de contribution mentionne ces rôles ;
+  4. ``docs/index.html`` est documentée comme landing canonique éditée
+     directement.
 
 Les assertions visent la **présence des notions** plus que le texte
 exact — la doc reste réécrivable éditorialement.
@@ -121,33 +120,23 @@ class TestDocumentedPolicy:
             "par `mkdocs build` / supprimable sans perte."
         )
 
-    def test_mentions_landing_canonical_source(self, contributing_text):
-        """``mvc/views/landing/index.html`` est la source canonique de la landing."""
-        assert "mvc/views/landing/index.html" in contributing_text, (
-            "La documentation doit identifier `mvc/views/landing/index.html` "
-            "comme source canonique de la landing publique."
+    def test_mentions_landing_canonical(self, contributing_text):
+        """``docs/index.html`` est la landing canonique (ADR-044)."""
+        assert "docs/index.html" in contributing_text, (
+            "La documentation doit identifier `docs/index.html` "
+            "comme landing canonique publique."
         )
 
-    def test_mentions_docs_index_as_synchronized(self, contributing_text):
-        """``docs/index.html`` est synchronisé, pas édité à la main."""
+    def test_landing_edited_directly(self, contributing_text):
+        """``docs/index.html`` est éditée directement, pas générée (ADR-044)."""
         assert "docs/index.html" in contributing_text, (
-            "La documentation doit mentionner `docs/index.html` (landing publiée)."
+            "La documentation doit mentionner `docs/index.html` (landing canonique)."
         )
-        # Et son rôle synchronisé.
-        markers = ("synchronis", "régénér", "sync:landing")
+        markers = ("canonique", "directement", "éditer", "à la main")
         joined = contributing_text.lower()
         assert any(m in joined for m in markers), (
-            "La documentation doit indiquer que `docs/index.html` est "
-            "synchronisé / régénéré (pas édité à la main)."
-        )
-
-    def test_mentions_sync_landing_command(self, contributing_text):
-        """La commande `forge sync:landing` est documentée comme la voie
-        officielle de synchronisation."""
-        assert "forge sync:landing" in contributing_text, (
-            "La commande `forge sync:landing` doit être documentée dans le "
-            "guide contributeur — c'est la voie officielle de "
-            "régénération de `docs/index.html`."
+            "La documentation doit indiquer que `docs/index.html` est la "
+            "landing canonique éditée directement (ADR-044)."
         )
 
 

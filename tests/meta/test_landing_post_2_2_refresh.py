@@ -6,7 +6,7 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-SOURCE_PATH = pathlib.Path("mvc/views/landing/index.html")
+SOURCE_PATH = pathlib.Path("docs/index.html")
 DOCS_PATH = pathlib.Path("docs/index.html")
 
 def _current_semver() -> str:
@@ -29,14 +29,8 @@ def _docs():
 
 
 class TestSourceCanonique:
-    def test_source_existe(self):
-        assert SOURCE_PATH.exists()
-
     def test_docs_existe(self):
         assert DOCS_PATH.exists()
-
-    def test_docs_est_genere_depuis_source(self):
-        assert "FICHIER GENERE PAR forge sync:landing" in _docs()
 
 
 # ---------------------------------------------------------------------------

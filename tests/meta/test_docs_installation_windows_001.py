@@ -50,7 +50,7 @@ class TestWindowsDocReferenced:
         )
 
     def test_landing_mentions_windows(self):
-        text = (PROJECT_ROOT / "mvc" / "views" / "landing" / "index.html").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "docs" / "index.html").read_text(encoding="utf-8")
         assert "Windows" in text, (
             "La landing (source) doit mentionner Windows."
         )
