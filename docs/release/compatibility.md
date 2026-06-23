@@ -66,7 +66,7 @@ le déploiement d'un projet Forge réel.
 
 | Composant | Usage | Version |
 |---|---|---|
-| Node.js | Build CSS Tailwind uniquement | >= 18 recommandé |
+| Node.js | Build CSS Tailwind uniquement | 24.17.0 LTS recommandé |
 | npm | Gestion des dépendances front | Inclus avec Node.js |
 | Tailwind CSS | Génération de `static/tailwind.css` | ^4.2.2 |
 | @tailwindcss/cli | CLI Tailwind | ^4.2.2 |
@@ -289,7 +289,7 @@ pip-audit
 |---|---|
 | MariaDB 11.x | Pas de tests CI systématiques — compatible mais non garanti |
 | Python 3.14 | En CI mais version pre-release pendant la série 1.x |
-| Node.js | Aucune version minimum formelle — >= 18 recommandé |
+| Node.js | Aucune version minimum formelle — 24.17.0 LTS recommandé |
 | Tests E2E | Pas automatisés en CI — lancés manuellement avant release |
 
 ---

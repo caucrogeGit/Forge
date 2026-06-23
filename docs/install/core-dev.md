@@ -37,7 +37,7 @@ Deux parcours **distincts**, qui ne se mélangent pas :
 - Git, `make` (optionnel), `openssl`
 - MariaDB local — uniquement pour les tests E2E
   (`tests/test_e2e_mariadb.py`), pas pour la suite par défaut
-- Node.js 20 LTS — uniquement pour recompiler le CSS Tailwind
+- Node.js 24.17.0 LTS — uniquement pour recompiler le CSS Tailwind
   (`static/tailwind.css` est déjà commité, donc pas requis pour les
   tests ni `mkdocs build`)
 
