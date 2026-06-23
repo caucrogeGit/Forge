@@ -1,0 +1,15 @@
+# Documentation embarquée du sous-paquet cli/project (ADR-043).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /cli-project/.
+site_name: cli-project
+docs_dir: docs
+nav:
+  - Référence CLI projet (par module):
+      - Commande run (run.py): run.md
+      - Superviseur de développement (dev_reloader.py): dev_reloader.md
+      - Commande doctor (doctor.py): doctor.md
+      - Commande project:check (project_check.py): project_check.md
+      - Commande project:audit (project_audit.py): project_audit.md
+      - Chargement de configuration (project_config.py): project_config.md
+      - Profils de projet (project_profiles.py): project_profiles.md
+      - Commande update (update.py): update.md
