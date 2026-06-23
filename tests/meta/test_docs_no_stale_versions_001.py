@@ -53,6 +53,7 @@ EXCLUDED_PATHS = [
     ".claude",          # worktrees et cache d'agents
     ".venv",
     "TestForge101",     # application de test gitignorée
+    "official-site",    # outillage de publication + archives forge-web (ADR-045)
     "packages",
     "site",
     "build",
