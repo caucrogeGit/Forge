@@ -276,12 +276,12 @@ def test_no_database_access(monkeypatch):
 
 def test_users_sql_still_contains_email_verified_at():
     from pathlib import Path
-    sql = Path("mvc/models/sql/users.sql").read_text(encoding="utf-8")
+    sql = Path("tests/fixtures/app/mvc/models/sql/users.sql").read_text(encoding="utf-8")
     assert "email_verified_at DATETIME NULL" in sql
 
 
 def test_auth_tokens_sql_unchanged():
     from pathlib import Path
-    sql = Path("mvc/models/sql/auth_tokens.sql").read_text(encoding="utf-8")
+    sql = Path("tests/fixtures/app/mvc/models/sql/auth_tokens.sql").read_text(encoding="utf-8")
     assert "CREATE TABLE IF NOT EXISTS auth_tokens" in sql
     assert "token_hash CHAR(64) NOT NULL UNIQUE" in sql

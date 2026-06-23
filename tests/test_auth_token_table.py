@@ -7,7 +7,7 @@ from pathlib import Path
 from cli.security.auth import AUTH_TOKENS_SQL, USERS_SQL, cmd_auth_init
 
 
-SQL_FILE = Path("mvc/models/sql/auth_tokens.sql")
+SQL_FILE = Path("tests/fixtures/app/mvc/models/sql/auth_tokens.sql")
 
 
 def _normalized(sql: str) -> str:

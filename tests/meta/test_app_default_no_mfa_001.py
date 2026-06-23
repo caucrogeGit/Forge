@@ -32,7 +32,7 @@ class TestNoTopLevelMfaImport:
         "mvc/routes.py",
     ])
     def test_no_top_level_mfa_import(self, rel_path):
-        path = PROJECT_ROOT / rel_path
+        path = PROJECT_ROOT / "tests" / "fixtures" / "app" / rel_path
         top = _top_level_imports(path)
         assert not any("forge_mvc_mfa" in m for m in top), (
             f"{rel_path} a un import forge_mvc_mfa au niveau module : {top}"
@@ -43,7 +43,7 @@ class TestMfaAvailableExported:
     """auth_controller exporte mfa_available()."""
 
     def test_mfa_available_function_present(self):
-        content = (PROJECT_ROOT / "mvc/controllers/auth_controller.py").read_text(encoding="utf-8")
+        content = (PROJECT_ROOT / "tests/fixtures/app/mvc/controllers/auth_controller.py").read_text(encoding="utf-8")
         assert "def mfa_available" in content
 
     def test_neutral_routes_has_no_mfa_reference(self):
@@ -52,7 +52,7 @@ class TestMfaAvailableExported:
         Le câblage /login/mfa est relocalisé dans le starter welcome-optin-mfa ;
         `mvc/routes.py` livré par défaut n'a aucune trace de MFA (§3, §8).
         """
-        content = (PROJECT_ROOT / "mvc/routes.py").read_text(encoding="utf-8")
+        content = (PROJECT_ROOT / "tests/fixtures/app/mvc/routes.py").read_text(encoding="utf-8")
         assert "mfa" not in content.lower(), (
             "Le squelette neutre ne doit plus référencer MFA : "
             "le câblage vit dans welcome-optin-mfa/routes.py.snippet."
@@ -66,11 +66,11 @@ class TestMfaGuardInControllers:
     """Les contrôleurs ont les gardes _MFA_AVAILABLE."""
 
     def test_auth_controller_has_mfa_available_flag(self):
-        content = (PROJECT_ROOT / "mvc/controllers/auth_controller.py").read_text(encoding="utf-8")
+        content = (PROJECT_ROOT / "tests/fixtures/app/mvc/controllers/auth_controller.py").read_text(encoding="utf-8")
         assert "_MFA_AVAILABLE" in content
 
     def test_mfa_challenge_controller_has_guard(self):
-        content = (PROJECT_ROOT / "mvc/controllers/mfa_challenge_controller.py").read_text(encoding="utf-8")
+        content = (PROJECT_ROOT / "tests/fixtures/app/mvc/controllers/mfa_challenge_controller.py").read_text(encoding="utf-8")
         assert "_MFA_AVAILABLE" in content
         assert "_mfa_unavailable_redirect" in content
 

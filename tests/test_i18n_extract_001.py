@@ -72,7 +72,8 @@ def test_forge_mvc_i18n_a_une_version():
     assert i18n.__version__
 
 
-def test_trans_fonctionne_depuis_le_paquet():
+def test_trans_fonctionne_depuis_le_paquet(monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent / "fixtures" / "app")
     i18n = pytest.importorskip("forge_mvc_i18n")
     assert i18n.trans("common.save") == "Enregistrer"
     assert i18n.trans("cle.absente.partout") == "cle.absente.partout"

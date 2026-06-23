@@ -21,10 +21,10 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
-_AUTH_CTRL   = PROJECT_ROOT / "mvc" / "controllers" / "auth_controller.py"
-_MFA_CTRL    = PROJECT_ROOT / "mvc" / "controllers" / "mfa_challenge_controller.py"
+_AUTH_CTRL   = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "controllers" / "auth_controller.py"
+_MFA_CTRL    = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "controllers" / "mfa_challenge_controller.py"
 _APP         = PROJECT_ROOT / "core" / "app" / "application.py"
-_ROUTES      = PROJECT_ROOT / "mvc" / "routes.py"
+_ROUTES      = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "routes.py"
 
 
 class TestCsrfValidRemovedFromAuthController:

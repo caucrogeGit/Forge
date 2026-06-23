@@ -7,6 +7,16 @@ import pytest
 
 pytest.importorskip("forge_mvc_i18n")
 
+# ADR-044 : les traductions de référence vivent dans la fixture de test.
+# chdir par test via usefixtures (fixture NON autouse) : conforme au
+# garde-fou test_autouse_fixtures_audit_001 (pas de chdir en autouse).
+pytestmark = pytest.mark.usefixtures("_app_cwd")
+
+
+@pytest.fixture
+def _app_cwd(monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent / "fixtures" / "app")
+
 import core.forge as forge
 import forge_mvc_i18n as i18n
 from forge_mvc_i18n import (

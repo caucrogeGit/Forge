@@ -13,7 +13,7 @@ from pathlib import Path
 from cli.entities.model import build_model
 
 PROJECT_ROOT = Path(__file__).parent.parent
-MEDIA_JSON = PROJECT_ROOT / "mvc" / "entities" / "media" / "media.json"
+MEDIA_JSON = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "entities" / "media" / "media.json"
 
 
 # ── Structure du fichier ──────────────────────────────────────────────────────

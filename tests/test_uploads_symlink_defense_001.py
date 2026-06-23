@@ -275,7 +275,7 @@ class TestAppPyStillUsesProtectedChain:
     fait toujours les deux étapes."""
 
     def test_serve_static_uses_realpath(self):
-        src = (_REPO_ROOT / "app.py").read_text(encoding="utf-8")
+        src = (_REPO_ROOT / "tests" / "fixtures" / "app" / "app.py").read_text(encoding="utf-8")
         # _serve_static appelle `_os.path.realpath` sur le chemin construit.
         assert re.search(
             r"_os\.path\.realpath\s*\(\s*_os\.path\.join\(STATIC_DIR",
@@ -288,7 +288,7 @@ class TestAppPyStillUsesProtectedChain:
         )
 
     def test_is_safe_static_path_uses_commonpath(self):
-        src = (_REPO_ROOT / "app.py").read_text(encoding="utf-8")
+        src = (_REPO_ROOT / "tests" / "fixtures" / "app" / "app.py").read_text(encoding="utf-8")
         tree = ast.parse(src)
         # Cherche la fonction _is_safe_static_path et vérifie qu'elle
         # appelle os.path.commonpath.
@@ -303,7 +303,7 @@ class TestAppPyStillUsesProtectedChain:
 
     def test_serve_static_calls_is_safe_before_open(self):
         """Le check de sécurité doit précéder `open()` du fichier."""
-        src = (_REPO_ROOT / "app.py").read_text(encoding="utf-8")
+        src = (_REPO_ROOT / "tests" / "fixtures" / "app" / "app.py").read_text(encoding="utf-8")
         # On extrait le corps de _serve_static.
         tree = ast.parse(src)
         for node in ast.walk(tree):

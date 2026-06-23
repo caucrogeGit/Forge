@@ -17,7 +17,6 @@ suppression).
 """
 from __future__ import annotations
 
-import inspect
 from pathlib import Path
 
 import pytest
@@ -28,8 +27,8 @@ from core.security.session import SESSION_COOKIE_NAME
 
 
 PROJECT_ROOT = Path(__file__).parent.parent
-AUTH_CTRL = PROJECT_ROOT / "mvc" / "controllers" / "auth_controller.py"
-MFA_CTRL = PROJECT_ROOT / "mvc" / "controllers" / "mfa_challenge_controller.py"
+AUTH_CTRL = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "controllers" / "auth_controller.py"
+MFA_CTRL = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "controllers" / "mfa_challenge_controller.py"
 
 
 def _source(path: Path) -> str:
@@ -117,16 +116,6 @@ class TestHelpersReproduceLegacyCookie:
         assert "secure" in attrs
 
 
-# ── Sanity : les contrôleurs restent importables après migration ────────────
-
-
-class TestControllersStillImportCleanly:
-    def test_auth_controller_imports(self):
-        from mvc.controllers import auth_controller
-        assert auth_controller is not None
-        assert inspect.ismodule(auth_controller)
-
-    def test_mfa_challenge_controller_imports(self):
-        from mvc.controllers import mfa_challenge_controller
-        assert mfa_challenge_controller is not None
-        assert inspect.ismodule(mfa_challenge_controller)
+# ADR-044 : l'app de dogfooding est devenue une fixture de test ; les
+# contrôleurs ne sont plus un paquet `mvc` importable au niveau racine.
+# L'usage des helpers de cookie reste vérifié par inspection de source ci-dessus.

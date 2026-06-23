@@ -123,7 +123,9 @@ def test_template_can_sans_utilisateur_authentifie(tmp_path):
     assert r.render("t.html", {}) == "non"
 
 
-def test_template_can_coexiste_avec_trans(tmp_path):
+def test_template_can_coexiste_avec_trans(tmp_path, monkeypatch):
+    from pathlib import Path
+    monkeypatch.chdir(Path(__file__).resolve().parent / "fixtures" / "app")
     (tmp_path / "t.html").write_text(
         '{{ trans("common.save") }}{% if can("x.y") %} ok{% endif %}'
     )

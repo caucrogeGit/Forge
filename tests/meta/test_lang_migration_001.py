@@ -16,6 +16,22 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
+
+def _fixture_update_password_hash():
+    # ADR-044 : auth_model est de l'app de dogfooding, relocalisée en fixture.
+    # Elle ne dépend que de core : on la charge directement par son chemin.
+    import importlib.util
+    from pathlib import Path
+
+    path = (
+        Path(__file__).resolve().parent.parent
+        / "fixtures" / "app" / "mvc" / "models" / "auth_model.py"
+    )
+    spec = importlib.util.spec_from_file_location("_fixture_auth_model", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.update_password_hash
+
 # ── TestNewApiAvailable ────────────────────────────────────────────────────────
 
 class TestNewApiAvailable:
@@ -94,7 +110,7 @@ class TestNewApiAvailable:
     # mvc.models.auth_model
 
     def test_update_password_hash_callable(self):
-        from mvc.models.auth_model import update_password_hash
+        update_password_hash = _fixture_update_password_hash()
         assert callable(update_password_hash)
 
 
@@ -165,7 +181,7 @@ class TestNoFrenchCallsRemain:
                 "--exclude=test_lang_migration_001.py",
                 "--exclude=test_getting_started_3_0_001.py",
                 "-E", pattern,
-                "core/", "mvc/", "cli/", "tests/", "integrations/",
+                "core/", "cli/", "tests/", "integrations/",
             ],
             capture_output=True,
             text=True,
@@ -185,11 +201,11 @@ class TestUtilisateurIdParameter:
     """Le paramètre utilisateur_id a été renommé user_id dans update_password_hash."""
 
     def test_user_id_param_present(self):
-        from mvc.models.auth_model import update_password_hash
+        update_password_hash = _fixture_update_password_hash()
         sig = inspect.signature(update_password_hash)
         assert "user_id" in sig.parameters
 
     def test_utilisateur_id_param_absent(self):
-        from mvc.models.auth_model import update_password_hash
+        update_password_hash = _fixture_update_password_hash()
         sig = inspect.signature(update_password_hash)
         assert "utilisateur_id" not in sig.parameters

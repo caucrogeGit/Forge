@@ -25,10 +25,10 @@ pytestmark = pytest.mark.meta
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _GITIGNORE = _REPO_ROOT / ".gitignore"
-_ENV_EXAMPLE = _REPO_ROOT / "env" / "example"
-_ENV_PROD_LOCAL = _REPO_ROOT / "env" / "prod"  # untracked local file
+_ENV_EXAMPLE = _REPO_ROOT / "tests" / "fixtures" / "app" / "env" / "example"
+_ENV_PROD_LOCAL = _REPO_ROOT / "tests" / "fixtures" / "app" / "env" / "prod"  # untracked local file
 _PROD_SECURITY_DOC = _REPO_ROOT / "docs" / "deployment" / "production-security.md"
-_APP_PY = _REPO_ROOT / "app.py"
+_APP_PY = _REPO_ROOT / "tests" / "fixtures" / "app" / "app.py"
 
 
 # ---------------------------------------------------------------------------

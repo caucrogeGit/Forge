@@ -138,7 +138,7 @@ def test_auth_user_contract_stays_unchanged():
 
 
 def test_users_sql_stays_unchanged_for_password_ticket():
-    sql = open("mvc/models/sql/users.sql", encoding="utf-8").read()
+    sql = open("tests/fixtures/app/mvc/models/sql/users.sql", encoding="utf-8").read()
     assert "password_hash VARCHAR(255) NOT NULL" in sql
     assert "CREATE TABLE IF NOT EXISTS users" in sql
     assert "INSERT INTO users" not in sql

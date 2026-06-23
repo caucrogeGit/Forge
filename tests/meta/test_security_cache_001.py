@@ -65,19 +65,7 @@ class TestDocumentationSecurityCache:
         assert "Cache-Control" in _auth()
 
 
-class TestConstanteAppPy:
-    def test_auth_no_store_paths_existe(self):
-        from app import _AUTH_NO_STORE_PATHS
-        assert _AUTH_NO_STORE_PATHS is not None
-
-    def test_auth_no_store_paths_contient_login(self):
-        from app import _AUTH_NO_STORE_PATHS
-        assert "/login" in _AUTH_NO_STORE_PATHS
-
-    def test_auth_no_store_paths_contient_logout(self):
-        from app import _AUTH_NO_STORE_PATHS
-        assert "/logout" in _AUTH_NO_STORE_PATHS
-
-    def test_auth_no_store_paths_contient_login_mfa(self):
-        from app import _AUTH_NO_STORE_PATHS
-        assert "/login/mfa" in _AUTH_NO_STORE_PATHS
+# ADR-044 : la constante _AUTH_NO_STORE_PATHS (liste des routes sensibles
+# no-store) est du câblage applicatif, désormais hors du dépôt framework.
+# Le mécanisme Cache-Control: no-store reste couvert côté core/CRUD
+# (test_crud_export_csv, test_crud_export_audit, métas sécurité).

@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent
-RELATIONS_JSON = PROJECT_ROOT / "mvc" / "entities" / "relations.json"
+RELATIONS_JSON = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "entities" / "relations.json"
 
 
 # ── Structure du fichier ──────────────────────────────────────────────────────
@@ -71,8 +71,8 @@ def test_relations_json_has_relations_list():
 def test_entity_validate_json_valid_true():
     """entity:validate --json retourne valid: true après migration complète."""
     result = subprocess.run(
-        [sys.executable, "forge.py", "entity:validate", "--json"],
-        cwd=str(PROJECT_ROOT),
+        [sys.executable, str(PROJECT_ROOT / "forge.py"), "entity:validate", "--json"],
+        cwd=str(PROJECT_ROOT / "tests" / "fixtures" / "app"),
         capture_output=True,
         text=True,
     )
@@ -83,8 +83,8 @@ def test_entity_validate_json_valid_true():
 def test_entity_validate_json_errors_count_zero():
     """entity:validate --json retourne errors_count: 0 après migration complète."""
     result = subprocess.run(
-        [sys.executable, "forge.py", "entity:validate", "--json"],
-        cwd=str(PROJECT_ROOT),
+        [sys.executable, str(PROJECT_ROOT / "forge.py"), "entity:validate", "--json"],
+        cwd=str(PROJECT_ROOT / "tests" / "fixtures" / "app"),
         capture_output=True,
         text=True,
     )
@@ -95,8 +95,8 @@ def test_entity_validate_json_errors_count_zero():
 def test_entity_validate_json_no_relations_errors():
     """entity:validate --json ne signale aucune erreur sur relations.json."""
     result = subprocess.run(
-        [sys.executable, "forge.py", "entity:validate", "--json"],
-        cwd=str(PROJECT_ROOT),
+        [sys.executable, str(PROJECT_ROOT / "forge.py"), "entity:validate", "--json"],
+        cwd=str(PROJECT_ROOT / "tests" / "fixtures" / "app"),
         capture_output=True,
         text=True,
     )
@@ -116,7 +116,7 @@ def test_build_model_still_works_with_canonical_relations(tmp_path):
     from cli.entities.model import build_model
 
     entities_root = tmp_path / "mvc" / "entities"
-    shutil.copytree(PROJECT_ROOT / "mvc" / "entities", entities_root)
+    shutil.copytree(PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "entities", entities_root)
 
     result = build_model(entities_root)
 

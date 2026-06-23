@@ -142,7 +142,7 @@ class TestAllVersionsBumped:
 
     def test_app_py_docstring(self):
         semver = _current_semver()
-        text = (PROJECT_ROOT / "app.py").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "tests" / "fixtures" / "app" / "app.py").read_text(encoding="utf-8")
         head = "\n".join(text.splitlines()[:5])
         assert f"Forge {semver}" in head, (
             f"app.py docstring ne mentionne pas 'Forge {semver}'."

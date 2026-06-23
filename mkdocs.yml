@@ -273,6 +273,7 @@ nav:
             - ADR-041 Infra de test partagée: adr/041-shared-test-support.md
             - ADR-042 Découplage doc cœur/opt-ins: adr/042-doc-core-optins-decoupling.md
             - ADR-043 Doc embarquée cœur/CLI, renommage cli: adr/043-core-cli-doc-embedding.md
+            - ADR-044 Le dépôt ne porte que le framework: adr/044-framework-only-repo.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

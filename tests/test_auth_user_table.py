@@ -15,7 +15,7 @@ from core.auth import (
 from cli.security.auth import USERS_SQL, cmd_auth_init
 
 
-SQL_FILE = Path("mvc/models/sql/users.sql")
+SQL_FILE = Path("tests/fixtures/app/mvc/models/sql/users.sql")
 
 
 def _normalized_sql(sql: str) -> str:

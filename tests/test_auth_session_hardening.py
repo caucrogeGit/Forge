@@ -386,8 +386,9 @@ class TestCookieAttributes:
         assert "Secure" in cookie
 
     def test_auth_controller_delegue_au_helper_cookie(self):
-        import mvc.controllers.auth_controller as mod
-        source = open(mod.__file__).read()
+        from pathlib import Path
+        _ctrl = Path(__file__).resolve().parent / "fixtures" / "app" / "mvc" / "controllers" / "auth_controller.py"
+        source = _ctrl.read_text(encoding="utf-8")
         # auth_controller utilise les helpers centraux…
         assert "set_session_cookie" in source
         assert "clear_session_cookie" in source
@@ -396,8 +397,9 @@ class TestCookieAttributes:
         assert "headers['Set-Cookie']" not in source
 
     def test_mfa_controller_delegue_au_helper_cookie(self):
-        import mvc.controllers.mfa_challenge_controller as mod
-        source = open(mod.__file__).read()
+        from pathlib import Path
+        _ctrl = Path(__file__).resolve().parent / "fixtures" / "app" / "mvc" / "controllers" / "mfa_challenge_controller.py"
+        source = _ctrl.read_text(encoding="utf-8")
         assert "set_session_cookie" in source
         assert 'headers["Set-Cookie"]' not in source
         assert "headers['Set-Cookie']" not in source

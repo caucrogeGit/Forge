@@ -16,7 +16,7 @@ from core.http.response import Response
 from core.templating.manager import TemplateManager, template_manager
 from integrations.jinja2.renderer import Jinja2Renderer
 
-_VIEWS = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "mvc", "views"))
+_VIEWS = os.path.abspath(os.path.join(os.path.dirname(__file__), "fixtures", "app", "mvc", "views"))
 
 
 # ---------------------------------------------------------------------------

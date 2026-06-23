@@ -195,7 +195,7 @@ def test_template_index_affiche_messages_contextuels():
 
 
 def test_cles_i18n_contextuelles_existent():
-    catalog = json.loads(Path("translations/fr.json").read_text(encoding="utf-8"))
+    catalog = json.loads(Path("tests/fixtures/app/translations/fr.json").read_text(encoding="utf-8"))
 
     assert catalog["crud.empty_search"] == "Aucun résultat ne correspond à votre recherche."
     assert catalog["crud.empty_filters"] == "Aucun résultat ne correspond aux filtres sélectionnés."

@@ -17,6 +17,15 @@ from cli.public.public_list import (
 from cli.public.public_page import build_public_page_spec, build_public_template
 from tests.test_make_public_list import _field, HEBERGEMENT_JSON
 
+# ADR-044 : traductions de référence dans la fixture de test ; chdir par test
+# via usefixtures (NON autouse) — conforme à test_autouse_fixtures_audit_001.
+pytestmark = pytest.mark.usefixtures("_app_cwd")
+
+
+@pytest.fixture
+def _app_cwd(monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent / "fixtures" / "app")
+
 
 # --- Clés i18n présentes dans translations/fr.json ---
 

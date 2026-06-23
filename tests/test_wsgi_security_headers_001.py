@@ -359,7 +359,7 @@ class TestAppPyAndWsgiShareHelper:
 
     def test_app_py_imports_apply_security_headers(self):
         import pathlib
-        source = pathlib.Path("app.py").read_text(encoding="utf-8")
+        source = pathlib.Path("tests/fixtures/app/app.py").read_text(encoding="utf-8")
         assert "from core.security.headers import apply_security_headers" in source
 
     def test_wsgi_imports_apply_security_headers(self):
@@ -375,10 +375,24 @@ class TestAppPyAndWsgiShareHelper:
         elles vivent désormais uniquement dans `core/security/headers.py`.
         """
         import pathlib
-        source = pathlib.Path("app.py").read_text(encoding="utf-8")
+        source = pathlib.Path("tests/fixtures/app/app.py").read_text(encoding="utf-8")
         # send_header("X-Frame-Options", "DENY") -> remplacé par le helper
         assert 'send_header("X-Frame-Options"' not in source
         assert 'send_header("X-Content-Type-Options"' not in source
         assert 'send_header("Strict-Transport-Security"' not in source
         assert 'send_header("Referrer-Policy"' not in source
         assert 'send_header("Permissions-Policy"' not in source
+@pytest.fixture(autouse=True)
+def _fixture_app_project(monkeypatch):
+    """ADR-044 : expose la fixture d'application (tests/fixtures/app) comme
+    projet importable (config, mvc.routes) pour les tests core factory/WSGI."""
+    import sys
+    from pathlib import Path as _P
+
+    _app = _P(__file__).resolve().parent / "fixtures" / "app"
+    monkeypatch.syspath_prepend(str(_app))
+    monkeypatch.setenv("VIEWS_DIR", str(_app / "mvc" / "views"))
+    monkeypatch.setenv("APP_ROUTES_MODULE", "mvc.routes")
+    yield
+    for _m in [m for m in list(sys.modules) if m == "config" or m == "mvc" or m.startswith("mvc.")]:
+        sys.modules.pop(_m, None)

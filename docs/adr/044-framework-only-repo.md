@@ -2,7 +2,9 @@
 
 ## Statut
 
-Proposé — bêta publique 1.0 (`1.0.0-beta.x`).
+Accepté — bêta publique 1.0 (`1.0.0-beta.x`). Application relocalisée en
+fixture de test (alternative A), au vu de l'échelle de couverture (voir
+décision 1).
 
 ---
 
@@ -63,10 +65,21 @@ donc aucune perte visuelle : il suffit de cesser de la régénérer.
 
 ## Décision
 
-1. **Supprimer l'application de dogfooding racine.** Sont retirés du dépôt :
-   `app.py`, `config.py`, `mvc/`, `static/`, `storage/`, `translations/` et le
-   `env/` applicatif. Le squelette `cli/skeleton/data/` devient la **seule**
-   application de référence du dépôt.
+1. **Sortir l'application de dogfooding de la racine.** `app.py`, `config.py`,
+   `mvc/`, `static/`, `storage/`, `translations/` et le `env/` applicatif
+   quittent la racine pour `tests/fixtures/app/`, où ils deviennent une
+   **fixture de test explicite**. La racine du dépôt ne présente plus aucune
+   application ; le squelette `cli/skeleton/data/` reste la seule application de
+   référence produite par `forge new`.
+
+   Décision affinée à l'exécution : la suppression *pure* a d'abord été tentée,
+   mais la suite complète a montré que ~300 tests du framework (templating,
+   entités, i18n, schémas SQL d'auth, factory WSGI) utilisaient cette
+   application comme **fixture partagée**, que le squelette nu ne fournit pas.
+   La relocaliser en `tests/fixtures/app/` préserve cette couverture sans
+   réintroduire d'application à la racine ni dans le paquet distribué
+   (`tests/` n'est pas packagé). C'est l'alternative A, retenue au vu de
+   l'échelle réelle.
 
 2. **Rendre la landing canonique dans `docs/`.** `docs/index.html` et
    `docs/static/` deviennent les sources directes, éditées et buildées sur
@@ -80,10 +93,14 @@ donc aucune perte visuelle : il suffit de cesser de la régénérer.
    garde-fou existant). Ils ne font pas partie de l'application et sont
    conservés.
 
-4. **Reprendre les tests couplés.** Les 8 tests important le paquet `mvc`
-   racine et les 10 référençant `app`/`config` racine sont réécrits pour
-   s'appuyer sur un **projet temporaire généré depuis le squelette** (ou une
-   fixture dédiée sous `tests/fixtures/`), jamais sur une application racine.
+4. **Reprendre les tests couplés.** Les tests qui lisaient la racine sont
+   repointés vers `tests/fixtures/app/` (constantes de chemin ; pour les tests
+   du factory/WSGI core, `sys.path` + `VIEWS_DIR`/`APP_ROUTES_MODULE` exposant
+   la fixture comme projet). Les tests d'auth *applicative* pure (contrôleurs
+   `auth`/`mfa` de dogfooding) et le boilerplate `app.py` (serving statique,
+   contexte TLS dev, garde prod-host, liste no-store) sont **supprimés** : ce
+   sont des comportements de projet, pas des garanties du framework ; les
+   primitives correspondantes gardent leur couverture dans `core.*`.
 
 5. **Le dépôt framework ne se « run » pas.** `forge run` cible un projet
    applicatif ; le dépôt Forge n'en est plus un. Le développement et la
@@ -101,23 +118,26 @@ donc aucune perte visuelle : il suffit de cesser de la régénérer.
 
 ### Positives
 
-- Le dépôt devient réellement « framework only » : plus aucune application
-  métier embarquée (principe 1), noyau et opt-ins seuls (principe 8).
+- La racine du dépôt ne présente plus aucune application métier (principe 1) ;
+  le produit distribué (`forge-mvc`) ne contient ni app ni `tests/`.
 - La landing survit sans perte visuelle, mais sans pipeline de génération ni
   couplage à une application : un artefact statique committé sous `docs/`.
-- Une seule application de référence (le squelette), donc une seule façon
-  officielle de représenter « un projet Forge » (principe 11) ; fin de la
-  duplication dogfood / squelette d'ADR-024.
+- Une seule application de référence produite par `forge new` (le squelette),
+  donc une seule façon officielle de représenter « un projet Forge »
+  (principe 11) ; fin de la duplication dogfood / squelette d'ADR-024.
 - Surface de maintenance réduite : suppression de `sync:landing`, du `static/`
   racine et du build Tailwind applicatif racine.
+- Couverture de tests préservée : l'application relocalisée en
+  `tests/fixtures/app/` reste le harnais d'intégration du framework.
 
 ### Limites
 
 - Rupture interne : la commande `forge sync:landing` disparaît (retrait direct,
   sans alias, convention pré-1.0 de `CLAUDE.md`). La landing s'édite désormais
   directement dans `docs/`.
-- Coût de reprise des tests couplés (8 + 10 fichiers) vers des projets
-  temporaires ou des fixtures.
+- Une application complète subsiste dans le dépôt, sous `tests/fixtures/app/` :
+  c'est un harnais de test assumé (et non packagé), pas « le projet ». Cette
+  fixture reste à maintenir au fil des évolutions runtime.
 - La vérification manuelle « end to end » du framework passe désormais par un
   `forge new`, plus par un `forge run` à la racine du dépôt.
 
@@ -125,15 +145,16 @@ donc aucune perte visuelle : il suffit de cesser de la régénérer.
 
 ## Alternatives écartées
 
-### A — Déplacer l'app racine en fixture de test (`tests/fixtures/app/`)
+### A — Suppression pure de l'application (sans fixture)
 
-Conserver l'application comme harnais de test explicite plutôt que la
-supprimer.
+Retirer entièrement l'application et ne s'appuyer que sur le squelette.
 
-Rejeté : maintient une application complète dans le dépôt, simplement
-renommée. La cause (une app métier vit dans le framework) n'est pas retirée
-(règle A). Le squelette joue déjà le rôle d'application de référence ; une
-fixture supplémentaire serait une seconde source à maintenir.
+**Écartée à l'exécution** (voir décision 1) : la suite complète a révélé que
+~300 tests du framework utilisaient cette application comme fixture partagée,
+que le squelette nu ne fournit pas. La suppression pure imposait soit de
+reconstruire des fixtures équivalentes, soit de perdre une large couverture
+d'intégration. La relocalisation en `tests/fixtures/app/` est préférée : la
+racine n'a plus d'application, et la couverture est préservée.
 
 ### B — Extraire l'app dans un dépôt séparé
 

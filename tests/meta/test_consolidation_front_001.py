@@ -33,23 +33,23 @@ def test_package_json_contient_script_build_css():
 
 def test_static_src_input_css_existe():
     """static/src/input.css existe (source Tailwind)."""
-    assert (ROOT / "static" / "src" / "input.css").exists()
+    assert (ROOT / "tests" / "fixtures" / "app" / "static" / "src" / "input.css").exists()
 
 
 def test_static_tailwind_css_existe():
     """static/tailwind.css existe (CSS compilé)."""
-    assert (ROOT / "static" / "tailwind.css").exists()
+    assert (ROOT / "tests" / "fixtures" / "app" / "static" / "tailwind.css").exists()
 
 
 def test_input_css_importe_tailwind():
     """static/src/input.css commence par @import tailwindcss."""
-    content = (ROOT / "static" / "src" / "input.css").read_text(encoding="utf-8")
+    content = (ROOT / "tests" / "fixtures" / "app" / "static" / "src" / "input.css").read_text(encoding="utf-8")
     assert "tailwindcss" in content
 
 
 def test_app_js_existe_et_ne_charge_pas_htmx_alpine():
     """static/js/app.js existe et n'impose pas HTMX ou Alpine."""
-    app_js = ROOT / "static" / "js" / "app.js"
+    app_js = ROOT / "tests" / "fixtures" / "app" / "static" / "js" / "app.js"
     assert app_js.exists()
     content = app_js.read_text(encoding="utf-8").lower()
     assert "htmx" not in content
@@ -142,20 +142,20 @@ def test_js_init_commande_inconnue_leve_sysexit():
 
 def test_htmx_vendor_non_committe_par_defaut():
     """static/vendor/htmx/htmx.min.js n'est pas présent dans le dépôt (doit être installé)."""
-    assert not (ROOT / "static" / "vendor" / "htmx" / "htmx.min.js").exists()
+    assert not (ROOT / "tests" / "fixtures" / "app" / "static" / "vendor" / "htmx" / "htmx.min.js").exists()
 
 
 def test_alpine_vendor_non_committe_par_defaut():
     """static/vendor/alpine/alpine.min.js n'est pas présent dans le dépôt (doit être installé)."""
-    assert not (ROOT / "static" / "vendor" / "alpine" / "alpine.min.js").exists()
+    assert not (ROOT / "tests" / "fixtures" / "app" / "static" / "vendor" / "alpine" / "alpine.min.js").exists()
 
 
 # ── Layouts Jinja ─────────────────────────────────────────────────────────────
 
 LAYOUT_PATHS = [
-    ROOT / "mvc" / "views" / "layouts" / "base.html",
-    ROOT / "mvc" / "views" / "layouts" / "admin.html",
-    ROOT / "mvc" / "views" / "layouts" / "public.html",
+    ROOT / "tests" / "fixtures" / "app" / "mvc" / "views" / "layouts" / "base.html",
+    ROOT / "tests" / "fixtures" / "app" / "mvc" / "views" / "layouts" / "admin.html",
+    ROOT / "tests" / "fixtures" / "app" / "mvc" / "views" / "layouts" / "public.html",
 ]
 
 

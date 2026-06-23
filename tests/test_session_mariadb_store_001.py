@@ -93,23 +93,23 @@ def test_mariadb_store_implements_protocol():
 
 
 def test_sql_file_exists():
-    assert (ROOT / "mvc" / "models" / "sql" / "forge_sessions.sql").exists()
+    assert (ROOT / "tests" / "fixtures" / "app" / "mvc" / "models" / "sql" / "forge_sessions.sql").exists()
 
 
 def test_sql_file_contains_create_table():
-    sql = (ROOT / "mvc" / "models" / "sql" / "forge_sessions.sql").read_text(encoding="utf-8")
+    sql = (ROOT / "tests" / "fixtures" / "app" / "mvc" / "models" / "sql" / "forge_sessions.sql").read_text(encoding="utf-8")
     assert "CREATE TABLE" in sql
     assert "forge_sessions" in sql
 
 
 def test_sql_file_contains_session_id_primary_key():
-    sql = (ROOT / "mvc" / "models" / "sql" / "forge_sessions.sql").read_text(encoding="utf-8")
+    sql = (ROOT / "tests" / "fixtures" / "app" / "mvc" / "models" / "sql" / "forge_sessions.sql").read_text(encoding="utf-8")
     assert "session_id" in sql
     assert "PRIMARY KEY" in sql
 
 
 def test_sql_file_contains_expire_at():
-    sql = (ROOT / "mvc" / "models" / "sql" / "forge_sessions.sql").read_text(encoding="utf-8")
+    sql = (ROOT / "tests" / "fixtures" / "app" / "mvc" / "models" / "sql" / "forge_sessions.sql").read_text(encoding="utf-8")
     assert "expire_at" in sql
 
 

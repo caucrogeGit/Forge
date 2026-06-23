@@ -6,6 +6,15 @@ import pytest
 
 pytest.importorskip("forge_mvc_i18n")
 
+# ADR-044 : traductions de référence dans la fixture de test ; chdir par test
+# via usefixtures (NON autouse) — conforme à test_autouse_fixtures_audit_001.
+pytestmark = pytest.mark.usefixtures("_app_cwd")
+
+
+@pytest.fixture
+def _app_cwd(monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent / "fixtures" / "app")
+
 import core.forge as forge
 import forge_mvc_i18n as i18n
 from forge_mvc_i18n import set_fallback_locale
@@ -50,19 +59,22 @@ def test_template_trans_validation_required(tmp_path):
     assert r.render("t.html", {}) == "Ce champ est obligatoire."
 
 
-def test_template_trans_cle_inconnue_retourne_cle(tmp_path):
+def test_template_trans_cle_inconnue_retourne_cle(tmp_path, monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent / "fixtures" / "app")
     (tmp_path / "t.html").write_text('{{ trans("cle.inconnue") }}')
     r = Jinja2Renderer(str(tmp_path))
     assert r.render("t.html", {}) == "cle.inconnue"
 
 
-def test_template_trans_locale_explicite(tmp_path):
+def test_template_trans_locale_explicite(tmp_path, monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent / "fixtures" / "app")
     (tmp_path / "t.html").write_text('{{ trans("common.cancel", locale="fr") }}')
     r = Jinja2Renderer(str(tmp_path))
     assert r.render("t.html", {}) == "Annuler"
 
 
-def test_template_trans_dans_condition(tmp_path):
+def test_template_trans_dans_condition(tmp_path, monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent / "fixtures" / "app")
     (tmp_path / "t.html").write_text(
         '{% if True %}{{ trans("crud.create") }}{% endif %}'
     )
@@ -76,7 +88,7 @@ def test_aucun_catalogue_en_ou_es(tmp_path):
 
 
 def test_make_crud_utilise_trans_depuis_i18n_009():
-    src = Path("cli/entities/make_crud.py").read_text(encoding="utf-8")
+    src = (Path(__file__).resolve().parent.parent / "cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
     assert "trans(" in src
 
 

@@ -79,7 +79,6 @@ _EXPECTED_IN_META = [
     "test_pre_release_fix_pyproject_python_001.py",
     "test_pre_release_fix_landing_links_001.py",
     "test_pre_release_fix_venv_stale_001.py",
-    "test_pre_release_fix_landing_css_sync_001.py",
     "test_app_default_no_mfa_001.py",
     "test_python_312_consistency_001.py",
     "test_roadmap_3_0_consistency_001.py",

@@ -7,7 +7,7 @@ from pathlib import Path
 from cli.security.auth import AUTH_RATE_LIMIT_ATTEMPTS_SQL, cmd_auth_init
 
 
-SQL_FILE = Path("mvc/models/sql/auth_rate_limit_attempts.sql")
+SQL_FILE = Path("tests/fixtures/app/mvc/models/sql/auth_rate_limit_attempts.sql")
 
 
 def _normalized(sql: str) -> str:

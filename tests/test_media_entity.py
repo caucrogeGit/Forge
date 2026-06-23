@@ -11,7 +11,7 @@ from cli.entities.model import build_model
 from cli.entities.validation import validate_entity_definition
 
 
-MEDIA_JSON = Path("mvc/entities/media/media.json")
+MEDIA_JSON = Path("tests/fixtures/app/mvc/entities/media/media.json")
 
 
 def _media_definition() -> dict:
@@ -56,7 +56,7 @@ def test_media_path_field_is_for_normalized_relative_upload_path():
 def test_media_entity_sql_matches_generated_projection():
     definition = _normalized_definition()
     expected = build_entity_sql(definition)
-    actual = Path("mvc/entities/media/media.sql").read_text(encoding="utf-8")
+    actual = Path("tests/fixtures/app/mvc/entities/media/media.sql").read_text(encoding="utf-8")
 
     assert actual == expected
     assert "CREATE TABLE IF NOT EXISTS media" in actual
@@ -76,7 +76,7 @@ def test_media_entity_sql_matches_generated_projection():
 def test_media_entity_base_matches_generated_projection():
     definition = _normalized_definition()
     expected = build_entity_base(definition)
-    actual = Path("mvc/entities/media/media_base.py").read_text(encoding="utf-8")
+    actual = Path("tests/fixtures/app/mvc/entities/media/media_base.py").read_text(encoding="utf-8")
 
     assert actual == expected
     assert "class MediaBase" in actual
@@ -86,7 +86,7 @@ def test_media_entity_base_matches_generated_projection():
 
 def test_media_entity_build_model_writes_standard_files(tmp_path: Path):
     entities_root = tmp_path / "mvc" / "entities"
-    shutil.copytree(Path("mvc/entities"), entities_root)
+    shutil.copytree(Path("tests/fixtures/app/mvc/entities"), entities_root)
 
     result = build_model(entities_root)
 

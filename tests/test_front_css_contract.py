@@ -10,19 +10,20 @@ def test_tailwind_build_script_is_declared():
     package = json.loads(Path("package.json").read_text(encoding="utf-8"))
 
     assert package["scripts"]["build:css"] == (
-        "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/tailwind.css --minify"
+        "npx @tailwindcss/cli -i ./docs/static/src/input.css -o ./docs/static/tailwind.css --minify"
     )
     assert "tailwindcss" in package["dependencies"]
     assert "@tailwindcss/cli" in package["dependencies"]
 
 
 def test_tailwind_source_and_compiled_files_exist():
-    assert Path("static/src/input.css").is_file()
-    assert Path("static/tailwind.css").is_file()
+    # ADR-044 : le CSS canonique de la landing vit dans docs/static/.
+    assert Path("docs/static/src/input.css").is_file()
+    assert Path("docs/static/tailwind.css").is_file()
 
 
 def test_application_javascript_entrypoint_exists_without_front_frameworks():
-    app_js = Path("static/js/app.js")
+    app_js = Path("tests/fixtures/app/static/js/app.js")
 
     assert app_js.is_file()
 
@@ -32,11 +33,11 @@ def test_application_javascript_entrypoint_exists_without_front_frameworks():
 
 
 def test_htmx_vendor_file_is_not_committed_by_default():
-    assert not Path("static/vendor/htmx/htmx.min.js").exists()
+    assert not Path("tests/fixtures/app/static/vendor/htmx/htmx.min.js").exists()
 
 
 def test_alpine_vendor_file_is_not_committed_by_default():
-    assert not Path("static/vendor/alpine/alpine.min.js").exists()
+    assert not Path("tests/fixtures/app/static/vendor/alpine/alpine.min.js").exists()
 
 
 def test_front_documentation_mentions_application_javascript_directory():

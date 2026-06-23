@@ -4,7 +4,7 @@
   "description": "Framework web MVC pur Python, HTTPS natif, Jinja2 intégré. Dépendances runtime explicites : MariaDB, python-dotenv et Jinja2.",
   "main": "index.js",
   "scripts": {
-    "build:css": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/tailwind.css --minify",
+    "build:css": "npx @tailwindcss/cli -i ./docs/static/src/input.css -o ./docs/static/tailwind.css --minify",
     "test": "python -m pytest tests/ -v"
   },
   "repository": {

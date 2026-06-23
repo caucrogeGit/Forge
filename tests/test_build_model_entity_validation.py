@@ -139,7 +139,7 @@ def test_invalid_schema_no_python_traceback(tmp_path):
 def test_real_repo_build_model_succeeds():
     from cli.entities.model import build_model
 
-    entities_root = PROJECT_ROOT / "mvc" / "entities"
+    entities_root = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "entities"
     result = build_model(entities_root, dry_run=True)
 
     assert result.dry_run is True
@@ -147,8 +147,8 @@ def test_real_repo_build_model_succeeds():
 
 def test_real_repo_entity_validate_valid():
     result = subprocess.run(
-        [sys.executable, "forge.py", "entity:validate", "--json"],
-        cwd=str(PROJECT_ROOT),
+        [sys.executable, str(PROJECT_ROOT / "forge.py"), "entity:validate", "--json"],
+        cwd=str(PROJECT_ROOT / "tests" / "fixtures" / "app"),
         capture_output=True,
         text=True,
     )
@@ -178,8 +178,8 @@ def test_entity_validate_still_detailed(tmp_path):
 def test_entity_validate_json_output_unchanged():
     """Le format --json de entity:validate est inchangé après 011G."""
     result = subprocess.run(
-        [sys.executable, "forge.py", "entity:validate", "--json"],
-        cwd=str(PROJECT_ROOT),
+        [sys.executable, str(PROJECT_ROOT / "forge.py"), "entity:validate", "--json"],
+        cwd=str(PROJECT_ROOT / "tests" / "fixtures" / "app"),
         capture_output=True,
         text=True,
     )

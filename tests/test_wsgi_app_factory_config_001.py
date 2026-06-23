@@ -32,7 +32,7 @@ from core.app.wsgi import create_configured_wsgi_app, create_wsgi_app
 
 
 PROJECT_ROOT = Path(__file__).parent.parent
-APP_PY = PROJECT_ROOT / "app.py"
+APP_PY = PROJECT_ROOT / "tests" / "fixtures" / "app" / "app.py"
 
 
 # ── Helpers WSGI ────────────────────────────────────────────────────────────
@@ -242,3 +242,17 @@ class TestBuildApplication:
         build_application()
         # Le routeur doit être présent dans forge après build (utile pour url_for).
         assert forge.get("router") is not None
+@pytest.fixture(autouse=True)
+def _fixture_app_project(monkeypatch):
+    """ADR-044 : expose la fixture d'application (tests/fixtures/app) comme
+    projet importable (config, mvc.routes) pour les tests core factory/WSGI."""
+    import sys
+    from pathlib import Path as _P
+
+    _app = _P(__file__).resolve().parent / "fixtures" / "app"
+    monkeypatch.syspath_prepend(str(_app))
+    monkeypatch.setenv("VIEWS_DIR", str(_app / "mvc" / "views"))
+    monkeypatch.setenv("APP_ROUTES_MODULE", "mvc.routes")
+    yield
+    for _m in [m for m in list(sys.modules) if m == "config" or m == "mvc" or m.startswith("mvc.")]:
+        sys.modules.pop(_m, None)

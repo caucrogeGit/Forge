@@ -184,3 +184,17 @@ class TestRequestIntegration:
             headers={"X-Real-IP": "bogus"},
         ))
         assert req.ip == "127.0.0.1"
+@pytest.fixture(autouse=True)
+def _fixture_app_project(monkeypatch):
+    """ADR-044 : expose la fixture d'application (tests/fixtures/app) comme
+    projet importable (config, mvc.routes) pour les tests core factory/WSGI."""
+    import sys
+    from pathlib import Path as _P
+
+    _app = _P(__file__).resolve().parent / "fixtures" / "app"
+    monkeypatch.syspath_prepend(str(_app))
+    monkeypatch.setenv("VIEWS_DIR", str(_app / "mvc" / "views"))
+    monkeypatch.setenv("APP_ROUTES_MODULE", "mvc.routes")
+    yield
+    for _m in [m for m in list(sys.modules) if m == "config" or m == "mvc" or m.startswith("mvc.")]:
+        sys.modules.pop(_m, None)

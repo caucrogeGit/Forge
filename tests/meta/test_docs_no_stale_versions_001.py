@@ -88,7 +88,7 @@ def _find_active_md_docs() -> list[Path]:
 class TestNoStaleForgeVersionInActiveDocs:
 
     def test_no_forge_2_x_in_app_py(self):
-        text = (PROJECT_ROOT / "app.py").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "tests" / "fixtures" / "app" / "app.py").read_text(encoding="utf-8")
         match = STALE_FORGE_VERSION_PATTERN.search(text)
         assert not match, (
             f"app.py contient une mention obsolète : '{match.group()}'. "

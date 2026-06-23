@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 
-PUBLIC = Path("mvc/views/layouts/public.html")
-ADMIN = Path("mvc/views/layouts/admin.html")
-BASE = Path("mvc/views/layouts/base.html")
+PUBLIC = Path("tests/fixtures/app/mvc/views/layouts/public.html")
+ADMIN = Path("tests/fixtures/app/mvc/views/layouts/admin.html")
+BASE = Path("tests/fixtures/app/mvc/views/layouts/base.html")
 
 
 def _read(path: Path) -> str:

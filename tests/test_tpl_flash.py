@@ -6,11 +6,11 @@ from pathlib import Path
 
 
 
-ADMIN = Path("mvc/views/layouts/admin.html")
-PUBLIC = Path("mvc/views/layouts/public.html")
-BASE = Path("mvc/views/layouts/base.html")
-ALERT = Path("mvc/views/components/alert.html")
-FLASH_HELPER = Path("mvc/helpers/flash.py")
+ADMIN = Path("tests/fixtures/app/mvc/views/layouts/admin.html")
+PUBLIC = Path("tests/fixtures/app/mvc/views/layouts/public.html")
+BASE = Path("tests/fixtures/app/mvc/views/layouts/base.html")
+ALERT = Path("tests/fixtures/app/mvc/views/components/alert.html")
+FLASH_HELPER = Path("tests/fixtures/app/mvc/helpers/flash.py")
 
 
 def _read(path: Path) -> str:
@@ -157,7 +157,7 @@ def test_make_crud_flash_html_inchange():
 
 def test_aucune_cle_i18n_flash_ajoutee():
     import json
-    catalog = json.loads(Path("translations/fr.json").read_text(encoding="utf-8"))
+    catalog = json.loads(Path("tests/fixtures/app/translations/fr.json").read_text(encoding="utf-8"))
     for key in catalog:
         assert "flash" not in key.lower()
         assert "alerte" not in key.lower()

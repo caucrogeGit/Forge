@@ -13,8 +13,8 @@ from cli.public.public_page import (
 )
 
 
-PUBLIC_LAYOUT_PATH = Path("mvc/views/layouts/public.html")
-COMPONENTS_DIR = Path("mvc/views/components")
+PUBLIC_LAYOUT_PATH = Path("tests/fixtures/app/mvc/views/layouts/public.html")
+COMPONENTS_DIR = Path("tests/fixtures/app/mvc/views/components")
 
 
 def _prepare_project(root: Path) -> None:

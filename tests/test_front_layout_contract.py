@@ -6,9 +6,9 @@ from pathlib import Path
 
 
 LAYOUTS = [
-    Path("mvc/views/layouts/base.html"),
-    Path("mvc/views/layouts/public.html"),
-    Path("mvc/views/layouts/admin.html"),
+    Path("tests/fixtures/app/mvc/views/layouts/base.html"),
+    Path("tests/fixtures/app/mvc/views/layouts/public.html"),
+    Path("tests/fixtures/app/mvc/views/layouts/admin.html"),
 ]
 
 

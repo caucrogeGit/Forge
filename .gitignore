@@ -49,6 +49,16 @@ storage/uploads/images/medium/
 !storage/uploads/tmp/.gitkeep
 forge-tests-terrain-roadmap.zip
 
+# Fixture d'application de test (ADR-044) : env/storage dynamiques non versionnés
+# (seul env/example est suivi ; pas de secrets ni de contenu d'upload).
+tests/fixtures/app/env/dev
+tests/fixtures/app/env/prod
+tests/fixtures/app/env/test
+tests/fixtures/app/env/*.local
+tests/fixtures/app/storage/uploads/*
+tests/fixtures/app/storage/logs/*
+tests/fixtures/app/storage/mail/*
+
 # dossier de travail : documents a traiter (contenu ignore, dossier conserve)
 tmp/*
 !tmp/.gitkeep

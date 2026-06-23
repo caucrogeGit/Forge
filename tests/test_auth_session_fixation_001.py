@@ -19,7 +19,7 @@ from pathlib import Path
 from core.auth import session as session_mod
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-AUTH_CONTROLLER = PROJECT_ROOT / "mvc" / "controllers" / "auth_controller.py"
+AUTH_CONTROLLER = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "controllers" / "auth_controller.py"
 
 
 def test_login_user_docstring_documente_la_rotation():

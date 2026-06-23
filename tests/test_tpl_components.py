@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 
-COMPONENTS_DIR = Path("mvc/views/components")
+COMPONENTS_DIR = Path("tests/fixtures/app/mvc/views/components")
 COMPONENTS = [
     "button.html",
     "alert.html",
@@ -84,7 +84,7 @@ def test_composant_sans_alpine(name):
 
 def test_composants_ne_referencent_pas_les_layouts():
     for layout in ["base.html", "public.html", "admin.html"]:
-        content = _read(Path("mvc/views/layouts") / layout)
+        content = _read(Path("tests/fixtures/app/mvc/views/layouts") / layout)
         assert "components/" not in content
 
 

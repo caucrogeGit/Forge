@@ -133,14 +133,9 @@ def test_requirements_epingle_forge_mvc():
     )
 
 
-@pytest.mark.parametrize("name", ["app.py", "config.py"])
-def test_anti_derive_avec_racine(name):
-    """app.py / config.py du squelette restent identiques à la racine (ADR-024)."""
-    racine = (REPO_ROOT / name).read_text(encoding="utf-8")
-    squelette = (SKELETON / name).read_text(encoding="utf-8")
-    assert racine == squelette, (
-        f"{name} du squelette a dérivé de la version racine — resynchroniser."
-    )
+# ADR-044 : l'application racine de dogfooding a été retirée (relocalisée en
+# fixture de test). L'anti-dérive app.py/config.py « racine vs squelette »
+# d'ADR-024 n'a plus d'objet : le squelette est l'unique source.
 
 
 # ── Smoke test : démarrage contre un core EXTERNE (sans core/ local) ──────────

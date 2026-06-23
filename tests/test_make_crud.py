@@ -576,7 +576,7 @@ def test_vues_utilisent_block_content_coherent_avec_layout(tmp_path):
 
 def test_base_html_utilise_block_content(tmp_path):
     from pathlib import Path
-    base = Path(__file__).parent.parent / "mvc" / "views" / "layouts" / "base.html"
+    base = Path(__file__).parent / "fixtures" / "app" / "mvc" / "views" / "layouts" / "base.html"
     raw = base.read_text()
     assert "{% block content %}" in raw, "base.html doit déclarer block content"
     assert "{% block contenu %}" not in raw, "base.html ne doit plus utiliser l'ancien bloc 'contenu'"
@@ -1376,7 +1376,7 @@ def test_noms_champs_non_remplaces_par_cles_i18n():
 def test_aucune_cle_metier_dans_catalogue():
     import json
     from pathlib import Path
-    catalog = json.loads(Path("translations/fr.json").read_text(encoding="utf-8"))
+    catalog = json.loads(Path("tests/fixtures/app/translations/fr.json").read_text(encoding="utf-8"))
     forbidden = ("commune", "sejour", "hébergement", "hebergement", "reservation", "réservation")
     for key in catalog:
         assert not any(term in key.lower() for term in forbidden)
@@ -1518,7 +1518,7 @@ def test_index_etat_vide_sans_alpine():
 def test_aucune_nouvelle_cle_metier_i18n_tpl005():
     import json
     from pathlib import Path
-    catalog = json.loads(Path("translations/fr.json").read_text(encoding="utf-8"))
+    catalog = json.loads(Path("tests/fixtures/app/translations/fr.json").read_text(encoding="utf-8"))
     # crud.empty existait déjà avant TPL-005 — aucune nouvelle clé
     assert "crud.empty" in catalog  # clé existante conservée
 
@@ -1564,6 +1564,6 @@ def test_form_view_sans_onsubmit_confirm():
 def test_cle_i18n_confirm_delete_dans_catalog():
     import json
     from pathlib import Path
-    catalog = json.loads(Path("translations/fr.json").read_text(encoding="utf-8"))
+    catalog = json.loads(Path("tests/fixtures/app/translations/fr.json").read_text(encoding="utf-8"))
     assert "crud.confirm_delete" in catalog
     assert catalog["crud.confirm_delete"] == "Confirmer la suppression ?"
