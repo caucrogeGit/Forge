@@ -1,0 +1,9 @@
+# Documentation embarquée du sous-paquet cli/deploy (ADR-043).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /cli-deploy/.
+site_name: cli-deploy
+docs_dir: docs
+nav:
+  - Référence CLI déploiement (par module):
+      - Commandes deploy:* (deploy.py): deploy.md
+      - Commandes module:* (modules.py): modules.md

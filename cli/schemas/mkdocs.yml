@@ -1,0 +1,9 @@
+# Documentation embarquée du sous-paquet cli/schemas (ADR-043).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /cli-schemas/.
+site_name: cli-schemas
+docs_dir: docs
+nav:
+  - Référence CLI schémas (par module):
+      - Commande schema:list (schema_list.py): schema_list.md
+      - Commande schema:doctor (schema_doctor.py): schema_doctor.md

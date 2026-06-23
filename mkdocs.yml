@@ -118,6 +118,8 @@ nav:
         - Auth/User (cœur, par module): '!include core/auth/mkdocs.yml'
         - MVC (cœur, par module): '!include core/mvc/mkdocs.yml'
         - Support CLI (par module): '!include cli/_support/mkdocs.yml'
+        - Schémas CLI (par module): '!include cli/schemas/mkdocs.yml'
+        - Déploiement CLI (par module): '!include cli/deploy/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md
