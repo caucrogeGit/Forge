@@ -127,6 +127,7 @@ nav:
         - Pages publiques CLI (par module): '!include cli/public/mkdocs.yml'
         - Projet CLI (par module): '!include cli/project/mkdocs.yml'
         - Entités CLI (par module): '!include cli/entities/mkdocs.yml'
+        - Générateur CRUD CLI (par module): '!include cli/entities/crud/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md
