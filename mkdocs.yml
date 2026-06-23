@@ -120,6 +120,9 @@ nav:
         - Support CLI (par module): '!include cli/_support/mkdocs.yml'
         - Schémas CLI (par module): '!include cli/schemas/mkdocs.yml'
         - Déploiement CLI (par module): '!include cli/deploy/mkdocs.yml'
+        - Sécurité CLI (par module): '!include cli/security/mkdocs.yml'
+        - Ressources CLI (par module): '!include cli/assets/mkdocs.yml'
+        - Documentation CLI (par module): '!include cli/docs/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md
