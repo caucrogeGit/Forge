@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# sync-forge-docs-and-deploy.sh — OFFICIAL-SITE-DOCS-SYNC-DEPLOY-SCRIPT-001
+# sync-forge-docs-and-deploy.sh — publication forge-web (ADR-045)
 #
-# Pipeline manuel unique : importe la documentation Forge canonique,
-# reconstruit le site officiel, lance les validations, puis (en mode réel)
-# pousse le site vers la VM forge-web.
+# Pipeline manuel unique : construit le site officiel avec le mkdocs.yml
+# canonique de Forge (plus d'import : la doc a une source unique, docs/),
+# lance les validations, puis (en mode réel) pousse le site vers la VM
+# forge-web (backup daté, staging vérifié, bascule contrôlée).
 #
 # Le commit/push automatique et le déclenchement par timer systemd seront
 # traités dans des tickets séparés. Ce script reste strictement manuel.
@@ -29,14 +30,13 @@ LOCK_FILE="/tmp/forge-official-site-sync-deploy.lock"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 REMOTE_BACKUP_PATH="${REMOTE_BACKUPS}/current-${TIMESTAMP}"
 
-# Pages clés à vérifier dans staging puis dans current.
+# Pages clés à vérifier dans staging puis dans current (ADR-045 : landing à /,
+# doc Forge sous /docs/forge/).
 KEY_PAGES=(
   "index.html"
-  "docs/index.html"
   "docs/forge/index.html"
-  "docs/forge/starters/welcome-forge/debutant/query-params/index.html"
-  "docs/forge/starters/welcome-forge/debutant/server-validation/index.html"
-  "docs/forge/entities/slugs/index.html"
+  "docs/forge/reference/cli-commands/index.html"
+  "docs/forge/search/search_index.json"
 )
 
 # ── Lock anti-concurrence ─────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ echo
 
 # ── Étape 1 — Vérifier le dépôt Forge source ─────────────────────────────────
 
-echo "[1/12] Vérification du dépôt Forge source"
+echo "[1/10] Vérification du dépôt Forge source"
 
 if [[ ! -d "${FORGE_ROOT}/.git" ]]; then
   echo "ERREUR : ${FORGE_ROOT} n'est pas un dépôt git." >&2
@@ -105,7 +105,7 @@ echo "  OK ${FORGE_ROOT} sur main, propre, commit ${FORGE_COMMIT:0:12}"
 
 # ── Étape 2 — Vérifier le dépôt Forge-official-site ──────────────────────────
 
-echo "[2/12] Vérification du dépôt Forge-official-site"
+echo "[2/10] Vérification du dépôt Forge-official-site"
 
 FORGEWEB_BRANCH="$(git branch --show-current)"
 if [[ "${FORGEWEB_BRANCH}" != "main" ]]; then
@@ -130,75 +130,14 @@ fi
 FORGEWEB_COMMIT="$(git rev-parse HEAD)"
 echo "  OK ${FORGEWEB_ROOT} sur main, propre, commit ${FORGEWEB_COMMIT:0:12}"
 
-# ── Étape 3 — Import de la documentation Forge ───────────────────────────────
+# ── Étape 3 — Build du site ──────────────────────────────────────────────────
+#
+# ADR-045 : plus d'import ni de vérification de complétude. official-site
+# construit directement avec le mkdocs.yml canonique de Forge (build-site.sh),
+# qui agrège docs/ + les docs « par module » et passe --strict. La doc a une
+# source unique (docs/) — aucune copie à synchroniser ni à vérifier.
 
-echo "[3/12] Import de la documentation Forge"
-python scripts/import_forge_docs.py
-echo "  OK import terminé."
-
-# ── Étape 4 — Vérification de la complétude de l'import ──────────────────────
-
-echo "[4/12] Vérification de la complétude de l'import"
-python - "${FORGE_ROOT}/docs" "${FORGEWEB_ROOT}/docs/forge" <<'PYCHECK'
-import sys
-from pathlib import Path
-
-# Source unique de vérité pour les dossiers réellement importés : la whitelist
-# de l'import. Les dossiers canoniques NON whitelistés (assets internes type
-# docs/logos/, hors nav et non publiés) ne sont pas mirrorés — il ne faut donc
-# pas les compter comme « manquants » ici, sinon le contrôle échoue à tort.
-# cwd = racine du dépôt (le script y fait cd avant cette étape).
-sys.path.insert(0, "scripts")
-from import_forge_docs import WHITELISTED_SUBDIRS
-
-source = Path(sys.argv[1])
-dest = Path(sys.argv[2])
-
-if not source.is_dir():
-    print(f"ERREUR : source absente : {source}", file=sys.stderr)
-    sys.exit(2)
-if not dest.is_dir():
-    print(f"ERREUR : destination absente : {dest}", file=sys.stderr)
-    sys.exit(2)
-
-def in_whitelist(rel: Path) -> bool:
-    return len(rel.parts) > 1 and rel.parts[0] in WHITELISTED_SUBDIRS
-
-# On ne compare que les .md vivant sous un sous-dossier whitelisté.
-source_md = {
-    p.relative_to(source)
-    for p in source.rglob("*.md")
-    if in_whitelist(p.relative_to(source))
-}
-dest_md = {p.relative_to(dest) for p in dest.rglob("*.md")}
-
-missing = sorted(source_md - dest_md)
-extras = sorted(dest_md - source_md)
-allowed_extras = {Path("index.md")}
-unexpected_extras = [p for p in extras if p not in allowed_extras]
-
-print(f"  Source       : {len(source_md)} .md")
-print(f"  Destination  : {len(dest_md)} .md")
-print(f"  Manquants    : {len(missing)}")
-print(f"  Extras       : {len(extras)} (autorisé : index.md)")
-
-if missing:
-    print("ERREUR : fichiers .md absents de docs/forge :", file=sys.stderr)
-    for p in missing:
-        print(f"  - {p}", file=sys.stderr)
-    sys.exit(1)
-if unexpected_extras:
-    print("ERREUR : fichiers .md inattendus dans docs/forge :", file=sys.stderr)
-    for p in unexpected_extras:
-        print(f"  - {p}", file=sys.stderr)
-    sys.exit(1)
-
-print("  OK complétude vérifiée.")
-PYCHECK
-
-# ── Étape 5 — Build du site ──────────────────────────────────────────────────
-
-echo "[5/12] Build du site officiel"
+echo "[3/10] Build du site officiel (mkdocs.yml de Forge)"
 bash scripts/build-site.sh
 
 if [[ ! -f dist/index.html ]]; then
@@ -212,7 +151,7 @@ echo "  OK dist construit (${DIST_FILE_COUNT} fichiers, ${DIST_SIZE})."
 
 # ── Étape 6 — Validations ────────────────────────────────────────────────────
 
-echo "[6/12] Validations locales"
+echo "[4/10] Validations locales"
 
 echo "  - check_no_github_pages_docs.py"
 python scripts/check_no_github_pages_docs.py --quiet
@@ -238,7 +177,7 @@ echo "  OK toutes les validations passent."
 
 # ── Étape 7 — Bilan local et bascule dry-run/réel ────────────────────────────
 
-echo "[7/12] Bilan local"
+echo "[5/10] Bilan local"
 echo "  Forge source commit         : ${FORGE_COMMIT}"
 echo "  Forge-official-site commit  : ${FORGEWEB_COMMIT}"
 echo "  dist : ${DIST_FILE_COUNT} fichiers, ${DIST_SIZE}"
@@ -273,7 +212,7 @@ fi
 
 # ── À partir d'ici : mode réel ───────────────────────────────────────────────
 
-echo "[8/12] Backup distant de l'état courant"
+echo "[6/10] Backup distant de l'état courant"
 ssh "${REMOTE_HOST}" "mkdir -p '${REMOTE_BACKUPS}'"
 if ssh "${REMOTE_HOST}" "[ -d '${REMOTE_CURRENT}' ]"; then
   ssh "${REMOTE_HOST}" "cp -a '${REMOTE_CURRENT}' '${REMOTE_BACKUP_PATH}'"
@@ -285,14 +224,14 @@ fi
 
 # ── Étape 9 — Préparation et copie vers staging distant ──────────────────────
 
-echo "[9/12] Préparation du staging distant et copie"
+echo "[7/10] Préparation du staging distant et copie"
 ssh "${REMOTE_HOST}" "rm -rf '${REMOTE_STAGE}' && mkdir -p '${REMOTE_STAGE}'"
 rsync -avz --delete dist/ "${REMOTE_HOST}:${REMOTE_STAGE}/"
 echo "  OK staging peuplé : ${REMOTE_HOST}:${REMOTE_STAGE}"
 
 # ── Étape 10 — Vérification des pages clés dans le staging ───────────────────
 
-echo "[10/12] Vérification des pages clés dans le staging"
+echo "[8/10] Vérification des pages clés dans le staging"
 MISSING_KEY=0
 for p in "${KEY_PAGES[@]}"; do
   if ssh "${REMOTE_HOST}" "[ -f '${REMOTE_STAGE}/${p}' ]"; then
@@ -309,14 +248,14 @@ fi
 
 # ── Étape 11 — Bascule staging → current ─────────────────────────────────────
 
-echo "[11/12] Synchronisation staging → current"
+echo "[9/10] Synchronisation staging → current"
 ssh "${REMOTE_HOST}" "test -d '${REMOTE_CURRENT}'"
 ssh "${REMOTE_HOST}" "rsync -a --delete '${REMOTE_STAGE}/' '${REMOTE_CURRENT}/'"
 echo "  OK contenu de ${REMOTE_CURRENT} mis à jour."
 
 # ── Étape 12 — Vérification des pages clés dans current ──────────────────────
 
-echo "[12/12] Vérification des pages clés dans current"
+echo "[10/10] Vérification des pages clés dans current"
 MISSING_CURRENT=0
 for p in "${KEY_PAGES[@]}"; do
   if ssh "${REMOTE_HOST}" "[ -f '${REMOTE_CURRENT}/${p}' ]"; then

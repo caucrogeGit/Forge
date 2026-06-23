@@ -48,27 +48,28 @@ intermédiaire ni dérive possible.
 
 ## Décision
 
-1. **Décommissionner `Forge-official-site` en rapatriant TOUTE sa machinerie
-   dans `forge`, sous `official-site/`.** Le dépôt séparé est abandonné ; son
-   outillage éprouvé est conservé tel quel : scripts (`build-site.sh`,
-   `import_forge_docs.py`, `deploy-to-forge-web.sh`,
+1. **Décommissionner `Forge-official-site` ; sa fonction de publication est
+   rapatriée dans `forge`, sous `official-site/`, réduite à un tuyau.** Le
+   dépôt séparé est abandonné. `official-site/` conserve : les scripts de
+   build/déploiement (`build-site.sh`, `deploy-to-forge-web.sh`,
    `sync-forge-docs-and-deploy.sh`, validateurs `check_*`, `audit-secrets.sh`),
-   `public/` (landing servie à `/`, `robots.txt`, `sitemap.xml`), `infra/`,
-   `mkdocs.yml` du site, `Makefile`, et la mémoire d'exploitation (`docs/`
-   propre : runbook, audits `FW-*`, doc secrets).
+   `public/` (`robots.txt`, `sitemap.xml`), `infra/`, et la mémoire
+   d'exploitation (`docs/` propre : runbook, audits `FW-*`, doc secrets, en
+   archive non publiée).
 
-2. **L'import devient local.** `import_forge_docs.py` lit désormais la doc
-   canonique du même dépôt (`../docs`, ADR-044) au lieu d'un dépôt séparé. Il
-   n'y a plus de synchronisation inter-dépôts : la dérive disparaît. Le
-   résultat de l'import (`official-site/docs/forge/`) est un **artefact de
-   build** non versionné (`.gitignore`), régénéré à chaque publication.
+2. **`official-site` construit avec le `mkdocs.yml` CANONIQUE de Forge — plus
+   d'import ni de nav propre.** `build-site.sh` lance `mkdocs build --strict`
+   sur `forge/mkdocs.yml` (qui agrège déjà `docs/` + les docs « par module »
+   d'ADR-043 via `!include`, et passe `--strict`). Sont **supprimés**
+   `official-site/mkdocs.yml` et `import_forge_docs.py` : ils dupliquaient la
+   nav et la structure de Forge et **dérivaient** (nav figée pointant dans le
+   vide, docs de module manquantes). La doc a une **source unique** (`docs/`),
+   sans copie ni synchronisation.
 
-3. **La structure publique de forgemvc.com est conservée.** Le site reste
-   assemblé par `build-site.sh` (landing à `/`, documentation sous `/docs/`,
-   doc Forge sous `/docs/forge/`). **Aucune rupture d'URL** : les liens
-   existants et le SEO sont préservés. `official-site/` porte son propre
-   `mkdocs.yml` et son `site_url`, indépendants du `mkdocs.yml` de `forge`
-   (qui alimente GitHub Pages).
+3. **La structure publique de forgemvc.com est conservée.** `build-site.sh`
+   assemble la landing canonique (`docs/index.html`) à `/`, et le site MkDocs
+   de Forge sous `/docs/forge/`. **Aucune rupture d'URL** ; les docs « par
+   module » sont incluses (elles viennent du `mkdocs.yml` de Forge).
 
 4. **`official-site/` n'est pas inclus dans le site MkDocs du framework.**
    Le `docs_dir` de `forge` reste `docs/` ; `official-site/` est de
@@ -77,7 +78,7 @@ intermédiaire ni dérive possible.
 
 5. **Deux voies de publication, `DRY_RUN=1` par défaut.**
    - **Script local** : `bash official-site/scripts/sync-forge-docs-and-deploy.sh`
-     (dry-run par défaut ; `DRY_RUN=0` pour le réel). Import local → build →
+     (dry-run par défaut ; `DRY_RUN=0` pour le réel). Build (mkdocs de Forge) →
      validations → `rsync` vers la VM avec backup daté, staging vérifié,
      bascule contrôlée et lock (anti-récidive de l'incident beta12).
    - **Workflow CI** `deploy-forge-web.yml` : `workflow_dispatch` manuel,
@@ -101,9 +102,10 @@ intermédiaire ni dérive possible.
 
 ### Limites
 
-- **Aucune rupture d'URL** (la structure `/docs/forge/…` est conservée), mais
-  `forge` gagne une étape d'assemblage (`build-site.sh`) et un second
-  `mkdocs.yml` (celui de `official-site/`), distincts de la build GitHub Pages.
+- **Aucune rupture d'URL** (la structure `/docs/forge/…` est conservée), au
+  prix d'une étape d'assemblage (`build-site.sh`) qui imbrique le site MkDocs
+  de Forge sous `/docs/forge/` et pose la landing à `/`. Pas de second
+  `mkdocs.yml` : on réutilise celui de Forge.
 - `forge` gagne un dossier d'outillage d'exploitation (`official-site/`) :
   c'est du release/ops pour le site **du framework lui-même**, pas une
   application métier (cohérent avec ADR-044), mais à garder clairement cantonné.

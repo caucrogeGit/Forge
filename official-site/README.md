@@ -1,20 +1,15 @@
 # official-site — publication de forgemvc.com
 
 > **Intégré dans Forge (ADR-045).** Ce dossier est l'ancien dépôt
-> `Forge-official-site` rapatrié dans le dépôt `forge`. La doc n'est plus
-> importée d'un dépôt à l'autre : `import_forge_docs.py` lit désormais la doc
-> canonique **locale** (`../docs`) et `official-site/docs/forge/` est un
-> artefact de build non versionné. Publier :
-> `bash official-site/scripts/sync-forge-docs-and-deploy.sh` (DRY_RUN par
-> défaut), ou le workflow CI `.github/workflows/deploy-forge-web.yml`.
+> `Forge-official-site` rapatrié dans le dépôt `forge`, réduit à un **tuyau de
+> publication** : il ne porte plus de `mkdocs.yml` ni de nav propre, et
+> n'importe plus la doc. `build-site.sh` construit le site avec le
+> `mkdocs.yml` **canonique de Forge** (qui agrège `docs/` + les docs « par
+> module » via `!include` et passe `--strict`), puis assemble la landing à `/`
+> et la doc sous `/docs/forge/`. Source unique : `docs/`. Aucune duplication.
 >
-> **Statut connu (à régler avant le 1er déploiement réel post-intégration)** :
-> `scripts/build-site.sh` lance `mkdocs build --strict` ; sur les docs Forge
-> actuelles, des liens absolus `/docs/forge/…` (ex. `docs/testing/tickets/`,
-> ajoutées depuis le dernier déploiement beta12) font échouer le mode strict.
-> À traiter : corriger ces liens dans `docs/`, ajuster l'import, ou assouplir
-> le strict. Sans rapport avec la santé du dépôt `forge` (sa propre build
-> `mkdocs --strict` passe).
+> Publier : `bash official-site/scripts/sync-forge-docs-and-deploy.sh`
+> (DRY_RUN par défaut), ou le workflow CI `.github/workflows/deploy-forge-web.yml`.
 
 Site officiel du framework Forge.
 
