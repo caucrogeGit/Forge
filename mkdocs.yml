@@ -123,6 +123,8 @@ nav:
         - Sécurité CLI (par module): '!include cli/security/mkdocs.yml'
         - Ressources CLI (par module): '!include cli/assets/mkdocs.yml'
         - Documentation CLI (par module): '!include cli/docs/mkdocs.yml'
+        - Opt-ins CLI (par module): '!include cli/optins/mkdocs.yml'
+        - Pages publiques CLI (par module): '!include cli/public/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md

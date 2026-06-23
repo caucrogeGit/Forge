@@ -1,0 +1,12 @@
+# Documentation embarquée du sous-paquet cli/public (ADR-043).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /cli-public/.
+site_name: cli-public
+docs_dir: docs
+nav:
+  - Référence CLI pages publiques (par module):
+      - Commande make:public-page (public_page.py): public_page.md
+      - Commande make:public-list (public_list.py): public_list.md
+      - Commande make:public-show (public_show.py): public_show.md
+      - Commande make:public-form (public_form.py): public_form.md
+      - Commande make:public-contact (public_contact.py): public_contact.md
