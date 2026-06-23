@@ -126,6 +126,7 @@ nav:
         - Opt-ins CLI (par module): '!include cli/optins/mkdocs.yml'
         - Pages publiques CLI (par module): '!include cli/public/mkdocs.yml'
         - Projet CLI (par module): '!include cli/project/mkdocs.yml'
+        - Entités CLI (par module): '!include cli/entities/mkdocs.yml'
         - Aide-mémoire Markdown: reference/markdown.md
         - Outils:
             - Profils de projet: reference/profils.md

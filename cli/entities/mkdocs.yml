@@ -1,0 +1,20 @@
+# Documentation embarquée du sous-paquet cli/entities (ADR-043).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /cli-entities/.
+site_name: cli-entities
+docs_dir: docs
+nav:
+  - Référence CLI entités (par module):
+      - Commande make:entity (make_entity.py): make_entity.md
+      - Commande make:crud (make_crud.py): make_crud.md
+      - Commande make:relation (make_relation.py): make_relation.md
+      - Commande entity:validate (entity_validate.py): entity_validate.md
+      - Validation sémantique (entity_semantic_validate.py): entity_semantic_validate.md
+      - Codes d'erreur (entity_validation_errors.py): entity_validation_errors.md
+      - Commande db:init (db_init.py): db_init.md
+      - Commande db:apply (db_apply.py): db_apply.md
+      - Commandes migration:* (migrations.py): migrations.md
+      - Orchestration du modèle (model.py): model.md
+      - Relations globales (relations.py): relations.md
+      - Normaliseur canonique (canonical_model_normalizer.py): canonical_model_normalizer.md
+      - Validation canonique (validation.py): validation.md
