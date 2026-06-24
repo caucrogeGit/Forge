@@ -39,11 +39,36 @@ from forge_mvc_admin.registry import registry as _default_registry
 if TYPE_CHECKING:
     from core.http.request import Request
     from core.http.response import Response
+    from core.http.router import Handler
 
 __all__ = ["AdminController", "register_admin_routes"]
 
 # Nombre de lignes par page de liste.
 _PAGE_SIZE = 20
+
+
+def _permission_guard(handler: Handler, permission: str | None) -> Handler:
+    """Garde de permission RBAC **optionnelle** (ADMIN-RBAC-INTEGRATION-001).
+
+    Si `permission` est `None`, le handler est renvoyé tel quel (auth seule).
+    Sinon, la permission est vérifiée via `forge-mvc-rbac` **s'il est installé** :
+    refus en 403 quand elle manque. Si `forge-mvc-rbac` est absent, la garde
+    laisse passer (fail-open ; `forge doctor` avertit) — pas de dépendance dure.
+    """
+    if permission is None:
+        return handler
+
+    def guarded(request: Request) -> Response:
+        try:
+            from forge_mvc_rbac import require_contract_permission_for_request
+        except ImportError:
+            return handler(request)
+        denied = require_contract_permission_for_request(request, permission)
+        if denied is not None:
+            return denied
+        return handler(request)
+
+    return guarded
 
 
 class AdminController:
@@ -308,7 +333,12 @@ class AdminController:
         )
 
 
-def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None) -> None:
+def register_admin_routes(
+    router: Any,
+    *,
+    registry: AdminRegistry | None = None,
+    permission: str | None = None,
+) -> None:
     """Branche les routes du back-office sur un Router Forge.
 
     Appelée explicitement par l'application (ADR-030, principe 9). Sans argument
@@ -316,18 +346,24 @@ def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None)
 
     Les routes ne sont pas publiques : l'utilisateur doit être authentifié
     (sinon redirection vers /login).
+
+    `permission` (opt-in RBAC, ADMIN-RBAC-INTEGRATION-001) : si fournie, toutes
+    les routes admin exigent cette permission via `forge-mvc-rbac` **s'il est
+    installé** (403 sinon). Sans `forge-mvc-rbac`, la garde laisse passer (auth
+    seule, fail-open ; `forge doctor` avertit). Par défaut, aucune permission
+    n'est exigée : auth seule.
     """
     controller = AdminController(registry if registry is not None else _default_registry)
-    router.add(
-        "GET",
-        "/admin",
-        require_auth(controller.dashboard),
-        name="admin-dashboard",
-    )
+
+    def protect(handler: Handler) -> Handler:
+        # auth d'abord (redirige /login), puis permission RBAC optionnelle (403).
+        return require_auth(_permission_guard(handler, permission))
+
+    router.add("GET", "/admin", protect(controller.dashboard), name="admin-dashboard")
     router.add(
         "GET",
         "/admin/{slug}",
-        require_auth(controller.resource_list),
+        protect(controller.resource_list),
         name="admin-resource-list",
     )
     # `/new` (littéral) doit être enregistré AVANT `/{id}` : le routeur retient la
@@ -335,42 +371,42 @@ def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None)
     router.add(
         "GET",
         "/admin/{slug}/new",
-        require_auth(controller.resource_new),
+        protect(controller.resource_new),
         name="admin-resource-new",
     )
     router.add(
         "POST",
         "/admin/{slug}/new",
-        require_auth(controller.resource_create),
+        protect(controller.resource_create),
         name="admin-resource-create",
     )
     router.add(
         "GET",
         "/admin/{slug}/{id}",
-        require_auth(controller.resource_detail),
+        protect(controller.resource_detail),
         name="admin-resource-detail",
     )
     router.add(
         "GET",
         "/admin/{slug}/{id}/edit",
-        require_auth(controller.resource_edit),
+        protect(controller.resource_edit),
         name="admin-resource-edit",
     )
     router.add(
         "POST",
         "/admin/{slug}/{id}/edit",
-        require_auth(controller.resource_update),
+        protect(controller.resource_update),
         name="admin-resource-update",
     )
     router.add(
         "GET",
         "/admin/{slug}/{id}/delete",
-        require_auth(controller.resource_confirm_delete),
+        protect(controller.resource_confirm_delete),
         name="admin-resource-delete-confirm",
     )
     router.add(
         "POST",
         "/admin/{slug}/{id}/delete",
-        require_auth(controller.resource_delete),
+        protect(controller.resource_delete),
         name="admin-resource-delete",
     )

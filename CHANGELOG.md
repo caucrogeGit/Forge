@@ -98,6 +98,14 @@
   GET ne le demandent pas ; toutes redirigent un visiteur non authentifié vers
   `/login` (`@require_auth`, vérifié avec `FakeRequest`). Empêche l'ajout futur
   d'une route admin publique, sans CSRF ou sans authentification.
+- **Intégration RBAC optionnelle de Forge Admin** (`ADMIN-RBAC-INTEGRATION-001`).
+  `register_admin_routes(router, permission="admin.access")` exige une permission
+  sur toutes les routes admin (gate global). Opt-in explicite : sans le paramètre,
+  l'admin reste en authentification seule (aucun changement). Vérification via
+  `forge_mvc_rbac.require_contract_permission_for_request` importée en
+  `try/except ImportError` : 403 si la permission manque (rbac installé),
+  fail-open + avertissement `forge doctor` si `forge-mvc-rbac` est absent. Aucune
+  dépendance dure ; la garde s'ajoute par-dessus `@require_auth`.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

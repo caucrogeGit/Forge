@@ -94,6 +94,23 @@ Le tableau de bord rend un template embarqué (`admin/dashboard.html`).
 Un projet peut le surcharger en plaçant son propre `mvc/views/admin/dashboard.html`
 (l'ordre des loaders donne la priorité au projet).
 
+### Exiger une permission (RBAC, optionnel)
+
+Par défaut, l'accès au back-office demande seulement d'être authentifié.
+Un projet qui utilise `forge-mvc-rbac` peut exiger une permission sur toutes les
+routes admin, en la passant à `register_admin_routes` :
+
+```python
+register_admin_routes(router, permission="admin.access")
+```
+
+Si `forge-mvc-rbac` est installé, un utilisateur sans la permission reçoit une
+réponse 403.
+S'il n'est pas installé, l'admin reste en authentification seule et `forge doctor`
+le signale.
+Sans ce paramètre, rien ne change : l'admin reste protégé par la seule
+authentification.
+
 ## Suivre l'avancement
 
 La feuille de route de cadrage et le découpage en tickets sont décrits dans la
