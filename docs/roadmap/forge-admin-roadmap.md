@@ -343,6 +343,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-RBAC-INTEGRATION-001 | intégrer RBAC si l'opt-in est installé (opt-in explicite `register_admin_routes(permission=...)`, gate global, fail-open) | **livré** |
 | ADMIN-TEMPLATE-OVERRIDE-001 | permettre la surcharge explicite des templates (acquis via l'ordre du loader ADR-046 ; documenté + test) | **livré** |
 | ADMIN-DOCTOR-001 | ajouter `forge admin:doctor` (rapproche ressources ↔ contrats d'entité, lecture seule ; fail si déclaration cassée, warn sur écart) | **livré** |
+| ADMIN-WELCOME-001 | parcours pédagogique embarqué `welcome-admin` (3 niveaux, réalisé à la main, ADR-028/035/038) | à venir (cadré, voir §11) |
 | ADMIN-CLOSING-AUDIT-001 | clôturer la roadmap Forge Admin | à venir |
 
 L'ordre est indicatif.
@@ -394,6 +395,44 @@ Pages prévues, ajoutées avec leur ticket de fonctionnalité :
 
 Conformément à l'ADR-042, ces pages restent dans l'espace « Opt-ins officiels »
 et ne tissent pas de liens transversaux avec la documentation du cœur.
+
+### Parcours `welcome-admin` (cadrage)
+
+Comme chaque opt-in (ADR-028, ADR-035, ADR-038), Forge Admin reçoit un parcours
+pédagogique embarqué, réalisé **à la main** (aucune commande `forge new` ni
+`forge starter:build` dans les pages), sous `packages/forge-mvc-admin/docs/welcome/`.
+
+**Prérequis du parcours** : un projet Forge existant avec une entité et son CRUD
+(par exemple l'`Article` de `welcome-forge`).
+Le back-office s'administre au-dessus d'une entité ; le parcours ne crée pas
+l'entité, il l'administre.
+
+**Fil conducteur** : trois niveaux, trois étapes chacun, chaînées par un lien
+« suivant », un `bilan.md` par niveau qui pointe vers le niveau suivant, puis un
+`recapitulatif.md`. Chaque étape ajoute une fonctionnalité déjà livrée.
+
+| Niveau | Pages (chaînées) | Ce qui est appris |
+|---|---|---|
+| Installation | `installation.md` | installer `forge-mvc-admin`, `forge admin:init`, brancher `register_admin_routes` dans `optins/admin/routes.py` ; pointe vers la première étape débutant |
+| Débutant | `debutant/admin-welcome.md` → `admin-resource.md` → `admin-list.md` → `bilan.md` | voir `/admin` ; déclarer une `AdminResource` ; la liste paginée |
+| Intermédiaire | `intermediaire/admin-detail.md` → `admin-new.md` → `admin-edit.md` → `bilan.md` | la fiche ; créer (formulaire + CSRF) ; éditer |
+| Avancé | `avance/admin-delete.md` → `admin-override.md` → `admin-rbac.md` → `bilan.md` | suppression contrôlée ; surcharger un template ; exiger une permission RBAC + `admin:doctor` |
+| Récapitulatif | `recapitulatif.md` | synthèse et points clés |
+
+**Câblage** : les pages sont ajoutées à la nav du paquet
+(`packages/forge-mvc-admin/mkdocs.yml`) sous une rubrique « Progression », à
+l'image de `forge-mvc-i18n`.
+
+**Test de nav** : un garde-fou `test_starter_welcome_admin_nav_001` verrouille le
+chaînage (chaque étape lie la suivante, chaque bilan lie le niveau suivant ou le
+récapitulatif, `installation.md` lie la première étape) et l'absence des commandes
+interdites, sur le modèle des 11 parcours existants.
+
+**Style** : français, une phrase par ligne, pas de tiret cadratin, ton direct ;
+aucun lien transversal vers la documentation du cœur (ADR-042).
+
+Conséquence : `ADMIN-WELCOME-001` ajoute ces pages, la nav du paquet et le test
+de chaînage, sans toucher au code de production.
 
 ---
 
