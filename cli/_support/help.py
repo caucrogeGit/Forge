@@ -94,6 +94,10 @@ Vidéo (module opt-in forge-mvc-video)
 Audio (module opt-in forge-mvc-audio)
   audio:doctor        Diagnostic statique du module audio (package, config, ffmpeg/ffprobe).
 
+Admin (module opt-in forge-mvc-admin)
+  admin:init          Prépare la structure mvc/admin/ du back-office (write-if-new, sans écrasement).
+  admin:doctor        Vérifie la cohérence des ressources admin avec les contrats d'entité (lecture seule).
+
 Opt-ins (branchement projet)
   opt-in:install      Affiche la commande d'installation du package d'un opt-in officiel.
   opt-in:remove       Affiche la commande de désinstallation du package d'un opt-in officiel.

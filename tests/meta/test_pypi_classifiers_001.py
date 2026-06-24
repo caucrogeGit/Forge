@@ -28,6 +28,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-pivot":    "Development Status :: 4 - Beta",
     "forge-mvc-mail":     "Development Status :: 4 - Beta",
     "forge-mvc-i18n":     "Development Status :: 4 - Beta",
+    # forge-mvc-admin : opt-in en cours de construction, non publié (statut Planning).
+    "forge-mvc-admin":    "Development Status :: 1 - Planning",
 }
 
 

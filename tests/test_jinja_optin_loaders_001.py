@@ -24,14 +24,21 @@ from integrations.jinja2.renderer import Jinja2Renderer
 
 @pytest.fixture(autouse=True)
 def _isolate_registry():
-    """Isole les registres Jinja : restaure l'état réel après chaque test."""
+    """Isole les registres Jinja : restaure l'état réel après chaque test.
+
+    Les loaders d'opt-in (ex. forge-mvc-admin) sont enregistrés à l'import et
+    constituent un état de session ; on les sauvegarde puis on les restaure pour
+    ne pas les perdre pour les tests suivants.
+    """
     saved_providers = registry.iter_jinja_context_providers()
     saved_loaders = registry.iter_jinja_template_loaders()
     registry._clear_for_tests()
+    registry._clear_template_loaders_for_tests()
     for provider in saved_providers:
         registry.register_jinja_context_provider(provider)
     yield
     registry._clear_for_tests()
+    registry._clear_template_loaders_for_tests()
     for provider in saved_providers:
         registry.register_jinja_context_provider(provider)
     for loader in saved_loaders:

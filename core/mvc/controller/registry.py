@@ -16,6 +16,7 @@ __all__ = [
     "register_jinja_template_loader",
     "iter_jinja_template_loaders",
     "_clear_for_tests",
+    "_clear_template_loaders_for_tests",
 ]
 
 _providers: list[Callable[[Any], dict[str, Any]]] = []
@@ -52,6 +53,18 @@ def iter_jinja_template_loaders() -> list[Any]:
 
 
 def _clear_for_tests() -> None:
-    """Vide les registres (contexte + loaders) — usage tests uniquement."""
+    """Vide le registre des fournisseurs de contexte — usage tests uniquement.
+
+    Ne touche PAS aux loaders de templates : ceux des opt-ins sont enregistrés à
+    l'import (état de session) et seraient sinon perdus définitivement pour les
+    tests suivants. Pour isoler les loaders, voir `_clear_template_loaders_for_tests`.
+    """
     _providers.clear()
+
+
+def _clear_template_loaders_for_tests() -> None:
+    """Vide le registre des loaders de templates — usage tests uniquement.
+
+    À n'utiliser qu'avec sauvegarde/restauration, car les opt-ins enregistrent
+    leur loader à l'import et ne le réenregistrent pas."""
     _template_loaders.clear()
