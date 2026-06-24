@@ -40,7 +40,7 @@ jobs:
         run: pyright
 
       - name: Run tests
-        run: python -m pytest
+        run: python -m pytest -m "not db"
 
       - name: Build package
         run: python -m build --no-isolation
@@ -54,3 +54,49 @@ jobs:
 
       - name: Build documentation
         run: mkdocs build --strict
+
+  tests-db:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: forge_test_root
+          MARIADB_DATABASE: forge_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libmariadb-dev pkg-config
+
+      - name: Install package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install -r requirements-dev.txt
+
+      - name: Run DB integration tests (real MariaDB)
+        env:
+          FORGE_REQUIRE_DB: "1"
+          FORGE_TEST_DB_HOST: 127.0.0.1
+          FORGE_TEST_DB_PORT: "3306"
+          FORGE_TEST_DB_USER: root
+          FORGE_TEST_DB_PASSWORD: forge_test_root
+          FORGE_TEST_DB_NAME: forge_test
+        run: python -m pytest -m db -v
