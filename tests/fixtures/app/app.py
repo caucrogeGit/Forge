@@ -195,24 +195,25 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Traite les requêtes HTTP GET."""
-        try:
-            request = Request(self)
-            if request.path == "/health":
-                self._send_response(Response(200, b'{"status": "ok"}', "application/json"))
-                return
-            if request.path == "/favicon.ico":
-                self._serve_static("/static/favicon.ico")
-                return
-            if request.path.startswith("/static"):
-                self._serve_static(request.path)
-                return
-            if request.path.startswith("/media/"):
-                self._serve_media(request.path, request)
-                return
-            self._send_response(self._dispatch(request))
-        except Exception:
-            logger.exception("Erreur GET %s", self.path)
-            self._send_response(_html("errors/500.html", 500, _error_context()))
+        with _csp.request_nonce(_csp.generate_nonce() if APP_CSP_NONCE_ENABLED else None):
+            try:
+                request = Request(self)
+                if request.path == "/health":
+                    self._send_response(Response(200, b'{"status": "ok"}', "application/json"))
+                    return
+                if request.path == "/favicon.ico":
+                    self._serve_static("/static/favicon.ico")
+                    return
+                if request.path.startswith("/static"):
+                    self._serve_static(request.path)
+                    return
+                if request.path.startswith("/media/"):
+                    self._serve_media(request.path, request)
+                    return
+                self._send_response(self._dispatch(request))
+            except Exception:
+                logger.exception("Erreur GET %s", self.path)
+                self._send_response(_html("errors/500.html", 500, _error_context()))
 
     def do_POST(self):
         """Traite les requêtes HTTP POST."""
@@ -232,22 +233,24 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _handle_dynamic_request(self, label: str):
         """Traite une requête applicative non statique."""
-        try:
-            request = Request(self)
-            self._send_response(self._dispatch(request))
-        except RequestEntityTooLarge as exc:
-            received = exc.args[0] if exc.args else None
-            self._send_response(_html("errors/413.html", 413, _dev_error({"received": received})))
-        except Exception:
-            logger.exception("Erreur %s %s", label, self.path)
-            self._send_response(_html("errors/500.html", 500, _error_context()))
+        with _csp.request_nonce(_csp.generate_nonce() if APP_CSP_NONCE_ENABLED else None):
+            try:
+                request = Request(self)
+                self._send_response(self._dispatch(request))
+            except RequestEntityTooLarge as exc:
+                received = exc.args[0] if exc.args else None
+                self._send_response(_html("errors/413.html", 413, _dev_error({"received": received})))
+            except Exception:
+                logger.exception("Erreur %s %s", label, self.path)
+                self._send_response(_html("errors/500.html", 500, _error_context()))
 
     def _dispatch(self, request: Request) -> Response:
-        """Délègue le routage et le contrôle d'accès à l'Application."""
-        if APP_CSP_NONCE_ENABLED:
-            _csp.set_request_nonce(_csp.generate_nonce())
-        else:
-            _csp.set_request_nonce(None)
+        """Délègue le routage et le contrôle d'accès à l'Application.
+
+        Le nonce CSP est posé en amont par `request_nonce(...)` dans les handlers
+        (cycle de vie thread-local nettoyé en `finally`), conformément au contrat
+        de `core/security/csp.py`.
+        """
         return _app.dispatch(request)
 
     def _send_response(self, response: Response) -> None:
