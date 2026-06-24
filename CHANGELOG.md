@@ -17,6 +17,14 @@
   Page de positionnement `packages/forge-mvc-admin/docs/index.md` (convention
   ADR-038), montée sous `/admin/` dans la nav « Opt-ins officiels ». Sans lien
   transversal vers le cœur (ADR-042).
+- **Contrat de ressource admin** (`ADMIN-RESOURCE-CONTRACT-001`). Première
+  couche du châssis Forge Admin : `AdminResource` (dataclass immuable décrivant
+  l'entité, le slug, les libellés, les champs liste/formulaire ; validée à la
+  construction) et `AdminRegistry` (registre explicite, sans découverte
+  automatique — charte principe 3). Déclaration Python, pas de nouveau schéma
+  JSON : l'entité reste son contrat JSON, la ressource admin est une couche de
+  présentation au-dessus. Aucune vue ni route fournie à ce stade. Doc embarquée
+  `packages/forge-mvc-admin/docs/resources.md`.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

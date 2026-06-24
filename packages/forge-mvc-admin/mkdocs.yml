@@ -5,3 +5,4 @@ site_name: admin
 docs_dir: docs
 nav:
   - Présentation: index.md
+  - Contrat de ressource: resources.md

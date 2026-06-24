@@ -1,18 +1,29 @@
 # pyright: strict
-"""forge-mvc-admin — Opt-in de back-office applicatif Forge (scaffold).
+"""forge-mvc-admin — Opt-in de back-office applicatif Forge.
 
-Ce paquet est le point d'entrée d'un futur back-office applicatif pour les
-projets Forge (Forge Admin). Il est volontairement vide à ce stade : seuls le
-paquet installable et son contrat de version sont posés (ticket
-`ADMIN-OPTIN-PACKAGE-001`).
+Couche châssis (couche 1 de l'architecture hybride, voir la roadmap de cadrage
+section 7) : ce paquet porte le contrat d'une ressource administrable
+(`AdminResource`) et le registre explicite (`AdminRegistry`) que les vues
+consommeront. Les vues, les actions et la sécurité HTTP viendront par les
+tickets `ADMIN-*` suivants.
 
-L'API publique (châssis d'administration, registre de ressources, vues et
-actions) sera ajoutée par les tickets `ADMIN-*` suivants. Voir la roadmap de
-cadrage : `docs/roadmap/forge-admin-roadmap.md`.
+Voir `docs/roadmap/forge-admin-roadmap.md`.
 """
+from forge_mvc_admin.exceptions import (
+    AdminError,
+    AdminRegistryError,
+    AdminResourceError,
+)
+from forge_mvc_admin.registry import AdminRegistry, registry
+from forge_mvc_admin.resources import AdminResource
 
 __version__ = "1.0.0b17"
 
 __all__ = [
-    "__version__",
+    "AdminResource",
+    "AdminRegistry",
+    "registry",
+    "AdminError",
+    "AdminResourceError",
+    "AdminRegistryError",
 ]

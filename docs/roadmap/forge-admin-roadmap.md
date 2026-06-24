@@ -244,7 +244,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-OPTIN-PACKAGE-001 | créer le paquet `forge-mvc-admin` vide et installable | **livré** (scaffold : paquet installable, `__version__`, `py.typed`, smoke test) |
 | ADMIN-OPTIN-DOCS-001 | documenter le positionnement de Forge Admin | **livré** (page embarquée `packages/forge-mvc-admin/docs/index.md`, montée sous `/admin/`) |
 | ADMIN-INIT-COMMAND-001 | ajouter `forge admin:init` | à venir |
-| ADMIN-RESOURCE-CONTRACT-001 | définir le contrat d'une ressource admin | à venir |
+| ADMIN-RESOURCE-CONTRACT-001 | définir le contrat d'une ressource admin | **livré** (`AdminResource` + `AdminRegistry` dans le paquet, déclaration Python validée, registre explicite) |
 | ADMIN-DASHBOARD-MINIMAL-001 | afficher un dashboard admin minimal | à venir |
 | ADMIN-LIST-VIEW-001 | afficher une liste paginée pour une entité | à venir |
 | ADMIN-DETAIL-VIEW-001 | afficher le détail d'une entité | à venir |
