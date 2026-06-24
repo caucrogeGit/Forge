@@ -3,6 +3,18 @@
 
 ## [Non publié]
 
+### Sécurité
+
+- **`cryptography` relevé à `>=48.0.1,<49` dans `forge-mvc-mfa`.** Réponse à
+  `GHSA-537c-gmf6-5ccf` (OpenSSL lié statiquement dans les wheels `cryptography`
+  antérieures à 48.0.1). MFA n'utilise que Fernet (API stable) ; l'ancien plafond
+  `<47` qui bloquait le correctif est levé. Garde-fou `test_security_cryptography_mfa_001`
+  mis à jour.
+- **`mariadb` 1.1.14 / `PYSEC-2026-217` documenté** dans `SECURITY.md`
+  (vulnérabilités connues suivies) : avis sur le chemin `mysql_real_escape_string()`
+  + big5 + protocole texte, non emprunté par Forge (requêtes paramétrées, protocole
+  binaire) ; aucune version corrigée disponible en amont (1.1.14 est la dernière).
+
 ### Ajouté
 
 - **Parcours d'accueil `welcome-projet` dans le squelette** (ADR-048,

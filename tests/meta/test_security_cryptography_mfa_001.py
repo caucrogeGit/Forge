@@ -1,11 +1,14 @@
 """Garde-fou SECURITY-CRYPTOGRAPHY-MFA-001.
 
-Verrouille la contrainte `cryptography>=46.0.7,<47` du package opt-in MFA
+Verrouille la contrainte `cryptography>=48.0.1,<49` du package opt-in MFA
 et l'absence de `cryptography` dans les dépendances runtime du core Forge.
 
-Origine : audit post-publication 1.0.0-beta.8 — la plage `>=42,<46`
-embarquait des CVE corrigées en 46.0.7. La nouvelle borne sort de la zone
-vulnérable et plafonne sous 47 pour éviter une bascule majeure non testée.
+Origine : audit post-publication 1.0.0-beta.8 — la plage `>=42,<46` embarquait
+des CVE corrigées en 46.0.7 ; la borne avait été fixée à `>=46.0.7,<47` (sous le
+major 47 non testé). Audit ultérieur : `GHSA-537c-gmf6-5ccf` vise l'OpenSSL lié
+statiquement dans les wheels cryptography antérieures à 48.0.1, corrigé en
+48.0.1 ; le plancher passe donc à `>=48.0.1` (MFA n'utilise que Fernet, API
+stable), plafonné sous le major 49.
 
 Le core ne doit jamais embarquer `cryptography` : Fernet n'est utilisé que
 côté MFA. Si une future modification ajoute la dépendance au core, ce test
@@ -25,7 +28,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 MFA_PYPROJECT = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "pyproject.toml"
 
-REQUIRED_CONSTRAINT = "cryptography>=46.0.7,<47"
+REQUIRED_CONSTRAINT = "cryptography>=48.0.1,<49"
 
 
 def _project_dependencies(pyproject_path: Path) -> list[str]:
@@ -39,11 +42,11 @@ def _optional_dependencies(pyproject_path: Path) -> dict[str, list[str]]:
 
 
 class TestMfaCryptographyConstraint:
-    def test_mfa_pins_cryptography_to_46_0_7(self):
+    def test_mfa_pins_cryptography_secure_range(self):
         deps = _project_dependencies(MFA_PYPROJECT)
         assert REQUIRED_CONSTRAINT in deps, (
             f"forge-mvc-mfa doit déclarer `{REQUIRED_CONSTRAINT}` "
-            f"(audit beta.8 — vulnérabilités < 46.0.7). "
+            f"(GHSA-537c-gmf6-5ccf — OpenSSL des wheels cryptography < 48.0.1). "
             f"Dépendances trouvées : {deps}"
         )
 

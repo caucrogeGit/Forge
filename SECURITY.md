@@ -117,6 +117,24 @@ pip-audit -r requirements.txt
 pip-audit -r requirements-dev.txt
 ```
 
+### Vulnérabilités connues suivies
+
+- **`PYSEC-2026-217` — `mariadb` 1.1.14 (runtime).** L'avis concerne le connecteur
+  MariaDB sur un chemin précis : échappement par `mysql_real_escape_string()`,
+  protocole **texte** et jeu de caractères **big5**, qui pouvait laisser passer
+  une injection SQL.
+  **Exposition Forge : faible.** Forge n'utilise jamais `mysql_real_escape_string()` :
+  toutes les requêtes passent par des paramètres liés (`cursor.execute(sql, params)`,
+  protocole binaire), et le jeu de caractères par défaut n'est pas big5.
+  **Aucune version corrigée n'est disponible en amont** (1.1.14 est la dernière
+  publiée ; `pip-audit` ne liste aucune `fix version`). Le suivi reste ouvert :
+  le pin sera relevé dès qu'un correctif amont paraît.
+
+- **`GHSA-537c-gmf6-5ccf` — `cryptography` (opt-in MFA).** L'avis vise l'OpenSSL
+  lié statiquement dans les wheels `cryptography` antérieures à `48.0.1`. Le pin
+  de `forge-mvc-mfa` est relevé à `cryptography>=48.0.1,<49` (MFA n'utilise que
+  Fernet, API stable), ce qui embarque l'OpenSSL corrigé. **Résolu.**
+
 ---
 
 ## Divulgation responsable
