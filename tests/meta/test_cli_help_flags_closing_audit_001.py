@@ -44,6 +44,7 @@ FORGE_PY = PROJECT_ROOT / "forge.py"
 ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Projet
     "new", "run", "update", "doctor", "project:check", "project:audit", "routes:list",
+    "agents:init",
     # Entités
     "make:entity", "make:crud", "make:pivot-crud", "make:relation",
     "entity:validate",

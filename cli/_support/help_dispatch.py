@@ -68,6 +68,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "project:check":    "Contrôle strict des conventions (CI-ready).",
     "project:audit":    "Rapport d'audit détaillé non destructif.",
     "routes:list":      "Affiche les routes déclarées par l'application.",
+    "agents:init":      "Génère/rafraîchit la guidance agent IA (CLAUDE.md, AGENTS.md, ADR-001) ; --check, --force.",
     # Entités
     "make:crud":        "Génère un CRUD complet (liste, fiche, formulaires).",
     "make:pivot-crud":  "Génère un sous-CRUD dédié pour un pivot avec attributs.",
@@ -403,6 +404,26 @@ Comportement:
 
 Code de sortie:
   0 si aucun `fail` ; 1 sinon.
+""",
+    "agents:init": """\
+Usage:
+  forge agents:init           # crée la guidance agent (write-if-new)
+  forge agents:init --check   # diagnostic en lecture seule
+  forge agents:init --force   # rafraîchit CLAUDE.md et AGENTS.md
+
+Description:
+  Génère la couche de guidance agent IA d'une application Forge (ADR-047) :
+  `CLAUDE.md` et `AGENTS.md` (briefing distillé : conventions, générateurs CLI,
+  discipline ADR, validations) et l'ADR d'amorçage `docs/adr/001-adopter-forge.md`.
+
+Comportement:
+  - par défaut : write-if-new (un fichier existant n'est jamais écrasé) ;
+  - `--force` : réécrit `CLAUDE.md` et `AGENTS.md` depuis la version installée,
+    sans toucher l'ADR-001 (il appartient au projet) ;
+  - `--check` : signale les fichiers absents ou un briefing divergé.
+
+Code de sortie:
+  0 si tout est en place / à jour ; 1 si `--check` trouve un manque ou un écart.
 """,
     "video:init": """\
 Usage:

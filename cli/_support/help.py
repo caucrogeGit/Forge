@@ -15,6 +15,7 @@ Projet
   project:check      Contrôle strict des conventions (CI-ready).
   project:audit      Rapport d'audit détaillé non destructif.
   routes:list        Affiche les routes déclarées.
+  agents:init        Génère/rafraîchit la guidance agent IA (CLAUDE.md, AGENTS.md, ADR-001).
 
 Entités
   make:entity        Génère une entité JSON et son modèle Python.

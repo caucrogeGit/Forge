@@ -6,7 +6,8 @@
 ### Ajouté
 
 - **Couche de guidance agent IA dans les applications** (ADR-047,
-  `AGENTS-BRIEFING-TEMPLATE-001`, `AGENTS-SEED-ADR-001`, `AGENTS-SKELETON-EMIT-001`).
+  `AGENTS-BRIEFING-TEMPLATE-001`, `AGENTS-SEED-ADR-001`, `AGENTS-SKELETON-EMIT-001`,
+  `AGENTS-INIT-COMMAND-001`).
   `forge new` écrit désormais, en write-if-new, un briefing agent distillé
   (`CLAUDE.md` et `AGENTS.md`, même contenu : conventions Forge, générateurs CLI,
   règle write-if-new, discipline ADR, validations) et un ADR d'amorçage
@@ -14,6 +15,10 @@
   format, date tamponnée). Gabarits canoniques versionnés dans le paquet
   (`cli/agents/`). Le projet généré gagne ainsi un cadre de travail pour les
   agents IA, sans cesser d'être nu côté code métier (précision d'ADR-024).
+  La commande `forge agents:init` apporte cette couche aux applications
+  existantes : `--check` signale un briefing absent ou divergé, `--force`
+  rafraîchit `CLAUDE.md` / `AGENTS.md` depuis la version de Forge installée
+  (sans toucher l'ADR-001 du projet).
 
 - **Registre de loaders de templates Jinja pour les opt-ins** (ADR-046,
   `CORE-JINJA-OPTIN-LOADERS-001`). Le cœur expose

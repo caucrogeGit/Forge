@@ -766,6 +766,13 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "agents:init":
+        from cli.agents.cli import main as agents_init_main
+        rc = agents_init_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     # Famille canonique opt-in:* (ADR-016). Les anciennes commandes
     # optin:enable / optin:list ont été retirées (OPTIN-CLI-REMOVE-LEGACY-001) ;
     # les moteurs cli/optins/{enable,list}.py restent utilisés ici.

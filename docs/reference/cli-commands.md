@@ -894,6 +894,28 @@ forge deploy:check
 
 </details>
 
+## Commandes de guidance agent IA
+
+<details markdown="1" id="forge-agentsinit">
+<summary><code>forge agents:init</code> - Génère ou rafraîchit la guidance agent IA du projet</summary>
+
+Génère la couche de guidance agent IA d'une application Forge (ADR-047) :
+`CLAUDE.md` et `AGENTS.md` (briefing distillé) et l'ADR d'amorçage
+`docs/adr/001-adopter-forge.md`.
+
+```bash
+forge agents:init           # crée les fichiers manquants (write-if-new)
+forge agents:init --check   # diagnostic en lecture seule
+forge agents:init --force   # rafraîchit CLAUDE.md et AGENTS.md
+```
+
+Par défaut, aucun fichier existant n'est écrasé. `--force` réécrit le briefing
+(`CLAUDE.md`, `AGENTS.md`) depuis la version de Forge installée, sans toucher
+`docs/adr/001-adopter-forge.md` qui appartient au projet. `--check` signale les
+fichiers absents ou un briefing divergé (code de sortie 1).
+
+</details>
+
 ## Commandes de documentation
 
 <details markdown="1" id="forge-docspdf">
