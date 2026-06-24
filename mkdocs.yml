@@ -276,6 +276,7 @@ nav:
             - ADR-044 Le dépôt ne porte que le framework: adr/044-framework-only-repo.md
             - ADR-045 Intégrer la publication du site officiel: adr/045-official-site-integration.md
             - ADR-046 Loaders de templates Jinja pour opt-ins: adr/046-optin-jinja-template-loaders.md
+            - ADR-047 Guidance agent IA dans les apps: adr/047-app-agent-guidance-layer.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
