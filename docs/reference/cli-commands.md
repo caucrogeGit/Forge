@@ -961,12 +961,16 @@ ou un `rbac:validate`.
 
 </details>
 
-## Gestion des modules optionnels
+## Gestion des modules optionnels { #opt-ins-branchement-projet }
+
+<a id="commandes-forge-iot"></a>
 
 Forge fournit dans son **cœur** une famille de commandes pour gérer le cycle de
 vie des modules optionnels (mécanisme générique, ADR-016).
 Ces commandes ne dépendent d'aucun module particulier : elles opèrent sur un
 module désigné par son `<nom>`.
+Les commandes propres à un module (par exemple `forge iot:*`) sont documentées
+dans l'espace de ce module (ADR-042), pas ici.
 
 <details markdown="1" id="forge-opt-ininstall">
 <summary><code>forge opt-in:install</code> - Affiche la commande d'installation du package d'un module optionnel</summary>

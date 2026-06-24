@@ -61,10 +61,16 @@ CE QUE CE SCRIPT NE FAIT PAS
     - Il ne publie rien sur PyPI.
     - Il ne crée aucun tag.
     - Il ne modifie pas la version.
+    - Il n'exécute PAS l'audit des dépendances (pip-audit / npm audit) :
+      cette porte bloquante vit dans tools/release-validate.sh.
     - La publication relève du ticket BETA-2-RELEASE-001.
 
-SCRIPT COMPLÉMENTAIRE
-    Pour la vérification de cohérence de version et CHANGELOG :
+PORTE DE RELEASE CANONIQUE
+    tools/release-validate.sh <VERSION> est la validation release complète et
+    bloquante : cohérence version/CHANGELOG ET audits de dépendances (pip-audit
+    sur requirements*.txt, npm audit). release_check.sh n'est qu'un pré-vol
+    source (tests, compileall, mkdocs) ; lancer release-validate.sh avant toute
+    publication :
       bash tools/release-validate.sh <VERSION>
 
 EOF

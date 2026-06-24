@@ -242,8 +242,13 @@ else
     # DANS la condition du `if` (exemptée de `set -e`). L'ancien motif
     # `VAR=$(cmd); EXIT=$?; true` ne protégeait PAS l'assignation : un
     # pip-audit en échec tuait le script avant d'afficher le _fail.
-    if PIP_AUDIT_RT_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements.txt 2>&1); then
-        _ok "pip-audit (requirements.txt) : aucune vulnérabilité"
+    # PYSEC-2026-217 (mariadb 1.1.14) : avis sans correctif amont (1.1.14 est la
+    # dernière version ; aucune fix version). Chemin vulnérable non emprunté par
+    # Forge (requêtes paramétrées, pas de mysql_real_escape_string ni big5).
+    # Accepté et documenté dans SECURITY.md ; ignoré ici pour que le gate reste
+    # significatif (toute AUTRE CVE bloque). À retirer dès qu'un correctif paraît.
+    if PIP_AUDIT_RT_OUT=$("$PYTHON_BIN" -m pip_audit --ignore-vuln PYSEC-2026-217 -r requirements.txt 2>&1); then
+        _ok "pip-audit (requirements.txt) : aucune vulnérabilité (hors PYSEC-2026-217 accepté)"
     else
         _fail "pip-audit (requirements.txt) : vulnérabilités détectées"
         printf '%s\n' "$PIP_AUDIT_RT_OUT" | head -20 | sed 's/^/         /' || true

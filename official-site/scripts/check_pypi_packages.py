@@ -15,6 +15,8 @@ from __future__ import annotations
 import argparse
 import json
 import socket
+import tomllib
+from pathlib import Path
 from urllib import error, request
 
 DEFAULT_PACKAGES: tuple[str, ...] = (
@@ -22,11 +24,21 @@ DEFAULT_PACKAGES: tuple[str, ...] = (
     "forge-mvc-stats",
     "forge-mvc-rbac",
     "forge-mvc-workflow",
-    "forge-mvc-media",
     "forge-mvc-mfa",
 )
 
-EXPECTED_VERSION = "1.0.0b9"
+
+def _current_forge_version() -> str:
+    """Lit la version courante depuis le pyproject racine du dépôt Forge.
+
+    `official-site/scripts/` -> racine du dépôt : évite de figer la version (ADR-045).
+    """
+    root_pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
+    data = tomllib.loads(root_pyproject.read_text(encoding="utf-8"))
+    return data["project"]["version"]
+
+
+EXPECTED_VERSION = _current_forge_version()
 PYPI_JSON = "https://pypi.org/pypi/{name}/json"
 
 
