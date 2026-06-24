@@ -40,7 +40,10 @@ class TestSourceCanonique:
 
 class TestSlogan:
     def test_slogan_principal(self):
-        assert "Une forge pour les créer toutes" in _src()
+        # Repositionnement « production auditable » (ADR-049) : le slogan
+        # « Une forge pour les créer toutes » est remplacé par la proposition
+        # de valeur orientée adoption.
+        assert "Le framework Python que vous pouvez lire en entier" in _src()
 
     def test_sous_titre_framework(self):
         assert "Framework web applicatif" in _src()
