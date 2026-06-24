@@ -79,6 +79,36 @@ Pour l'état détaillé du Scénario C, voir
 
 ---
 
+## Chantiers issus de l'audit complet (2026-06-24)
+
+Audit transversal en six axes (architecture, sécurité, tests, packaging, qualité
+de code, documentation), avec preuves `file:line`.
+Verdict : base de conception saine et fidèle à la charte ; aucune vulnérabilité
+critique ou haute ; faiblesses concentrées sur la **profondeur de validation**
+(tests) et l'**onboarding**.
+Les tickets suivent « un ticket, une responsabilité » (principe 2) ; statut « à faire ».
+
+| Chantier | Ticket | Responsabilité unique | Sévérité |
+|---|---|---|---|
+| 1. Tests DB | `TEST-DB-INTEGRATION-CI-001` | Job CI avec service MariaDB et marqueur `@pytest.mark.db` (skippable en local, requis en CI) exerçant le SQL généré, `db:apply`, FK, transactions, type `slug` | Haute |
+| 2. Onboarding | `DOC-CRUD-WORKFLOW-CANONICAL-001` | Trancher un seul workflow CRUD officiel (`sync:*` + `db:init` vs `build:model` + `db:apply`), principe 11 | Haute |
+| 2. Onboarding | `DOC-ONBOARDING-TUTORIAL-FIX-001` | Réparer `app-complete-tutorial.md` (JSON canonique clé `name`, dossier snake_case, `https://`) selon le workflow canonique ; corriger l'URL `http`→`https` de `poste-linux.md` | Haute |
+| 3. Release | `PKG-VERSION-SYNC-CHECK-001` | Créer `tools/check_version_sync.py` (asserter les ~30 emplacements de version) et le brancher sans argument dans les deux scripts de release | Haute |
+| 3. Release | `PKG-OPTIN-LICENSE-FILES-001` | Déclarer `license-files = ["LICENSE"]` dans les 13 opt-ins (wheels propriétaires publiés sans texte de licence) | Haute |
+| 4. Typage | `TYPING-CLI-STRICT-001` | Mettre `cli/` sous le périmètre pyright strict (ou acter l'exception par ADR) ; `TypedDict` pour le schéma d'entité (49 `dict` nus dans les générateurs CRUD) | Moyenne |
+| 4. Gouvernance | `DOC-CHARTE-REALIGN-AUDITABLE-001` | Réaligner `CHARTE_DOC.md` et `CLAUDE.md` §1 sur « explicite, auditable, testable et durable » (le pédagogique devient bénéfice dérivé, ADR-049), au prochain tag majeur (fichiers protégés) | Moyenne |
+| 5. Sécurité | `SEC-IOT-TOKEN-PROD-001` | Refuser l'API IoT ouverte sans token en `APP_ENV=prod` (insecure default), ou warning bloquant au démarrage | Moyenne |
+| 5. Sécurité | `SEC-UPLOAD-MIME-MAGIC-001` | Valider les magic bytes pour image/PDF dans `core/forms/upload_validation.py` ; documenter que le `content_type` client ne fait pas autorité | Moyenne |
+
+Points d'hygiène de moindre sévérité relevés par l'audit, à traiter au fil de l'eau
+(pas de ticket dédié) : convention de fichier de routes incohérente
+(`core/modules/remove.py:146`), mention obsolète d'un shim `forge-mvc-media` dans
+`CLAUDE.md`, doc « six officiels » au lieu de douze (`reference/vocabulaire-opt-in.md`),
+classifiers `Development Status` hétérogènes, tirets cadratins dans les vieux guides,
+`build_controller` (824 lignes) à découper.
+
+---
+
 ## Consolidation terrain — journal des retours de tests terrain (post-b16)
 
 Journal des incidents et manques remontés par l'**usage réel** d'un projet
