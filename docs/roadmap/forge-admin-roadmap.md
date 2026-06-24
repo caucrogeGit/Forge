@@ -267,6 +267,23 @@ L'écriture (création, édition, suppression) réutilise la pile existante du c
 
 Conséquence : `ADMIN-FORM-NEW-001` ajoute `GET`/`POST /admin/<slug>/new` (formulaire + création), un template `admin/form.html` embarqué et `pk` est déjà disponible pour la redirection.
 
+### Intégration RBAC (cadrage)
+
+Le back-office est déjà protégé par l'authentification (routes non publiques, `@require_auth`).
+RBAC ajoute, par-dessus, un contrôle de **permission**, et reste un opt-in : `forge-mvc-admin` ne dépend pas de `forge-mvc-rbac`.
+
+- **Opt-in explicite par l'application** : l'admin n'exige une permission que si l'application le demande, via `register_admin_routes(router, permission="admin.access")`.
+  Sans ce paramètre (défaut), l'admin reste en auth seule, comportement actuel.
+  Conséquence voulue : installer `forge-mvc-rbac` pour une autre raison ne verrouille pas l'admin.
+- **Gate global** : une permission unique protège toutes les routes admin.
+  La granularité par ressource et action pourra venir plus tard, sans rupture.
+- **Vérification optionnelle** : si une permission est demandée, le contrôle se fait via `forge_mvc_rbac.require_contract_permission_for_request` importé en `try/except ImportError`.
+  Si `forge-mvc-rbac` est installé : refus en 403 quand la permission manque.
+  Si `forge-mvc-rbac` est absent : fail-open (auth seule) et `forge doctor` avertit (précédent symétrique à MFA, `check_rbac_dependency`).
+- **Place du contrôle** : la permission garde chaque route admin, en plus de `@require_auth` ; côté templates, le helper `can()` du cœur reste disponible pour masquer des actions.
+
+Conséquence : `ADMIN-RBAC-INTEGRATION-001` ajoute le paramètre `permission` à `register_admin_routes` et une garde de permission optionnelle, sans dépendance dure ni changement pour les projets qui ne l'activent pas.
+
 ---
 
 ## 8. Commandes futures envisagées
