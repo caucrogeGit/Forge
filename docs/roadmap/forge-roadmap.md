@@ -739,6 +739,16 @@ Règles :
 
 ---
 
+## Opt-in envisagé — Forge Admin
+
+Un futur opt-in de back-office applicatif (`forge-mvc-admin`) est en cours de cadrage.
+
+Il dispose de sa propre roadmap : [Roadmap Forge Admin](forge-admin-roadmap.md).
+
+Forge Admin sert l'application, Forge Design sert le développeur, Forge Core reste autonome.
+
+---
+
 ## Phases post-Forge 2.0 — toutes livrées
 
 Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
