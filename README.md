@@ -4,10 +4,12 @@
 [![Python](https://img.shields.io/pypi/pyversions/forge-mvc.svg)](https://pypi.org/project/forge-mvc/)
 [![License](https://img.shields.io/badge/license-Forge%20Proprietary-blue.svg)](LICENSE)
 
-*Une forge pour les créer toutes.*
+*Le framework web Python que vous pouvez lire en entier.*
 
-Forge est un framework web applicatif Python, MVC, explicite et pédagogique.
-HTTPS natif, Jinja2 intégré, SQL visible, générateurs prudents.
+Forge est un framework web applicatif Python, MVC et explicite, pour des
+applications de production dont vous comprenez et auditez chaque ligne.
+Pas de magie cachée, SQL visible, sécurisé par défaut, runtime minimal
+(cinq dépendances). HTTPS et Jinja2 intégrés.
 
 ---
 
@@ -92,6 +94,10 @@ class HomeController:
 ---
 
 ## Pourquoi Forge ?
+
+Forge fait le pari inverse de la mode : pas de magie, pas d'ORM, pas d'async
+imposé. En échange, vous obtenez une application que vous comprenez, auditez et
+maintenez des années, sécurisée par défaut et reposant sur un runtime minuscule.
 
 - MVC serveur explicite, sans magie cachée
 - SQL visible, pas d'ORM imposé
