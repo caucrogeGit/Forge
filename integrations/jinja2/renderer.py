@@ -1,7 +1,48 @@
-from jinja2 import Environment, FileSystemLoader, TemplateNotFound, select_autoescape
+from jinja2 import BaseLoader, Environment, FileSystemLoader, TemplateNotFound, select_autoescape
 from core.forge import get as _cfg
+from core.mvc.controller.registry import iter_jinja_template_loaders
 from core.security.csp import get_request_nonce as _get_nonce
 from core.templating.errors import TemplateNotFoundError
+
+
+class _OptinAwareLoader(BaseLoader):
+    """Loader composite : `mvc/views/` du projet, puis les loaders d'opt-in (ADR-046).
+
+    La liste des loaders d'opt-in est relue à CHAQUE résolution via le registre
+    du cœur (`iter_jinja_template_loaders`). L'ordre d'import des paquets n'a donc
+    aucune importance : un opt-in qui s'enregistre après la construction du
+    renderer est quand même pris en compte. Le dossier du projet vient en premier,
+    ce qui permet de surcharger un template par défaut d'un paquet en plaçant un
+    fichier de même chemin dans `mvc/views/`.
+    """
+
+    def __init__(self, views_dir: str) -> None:
+        self._project = FileSystemLoader(views_dir)
+
+    def _loaders(self):
+        return [self._project, *iter_jinja_template_loaders()]
+
+    def get_source(self, environment, template):
+        for loader in self._loaders():
+            try:
+                return loader.get_source(environment, template)
+            except TemplateNotFound:
+                continue
+        raise TemplateNotFound(template)
+
+    def list_templates(self):
+        seen = set()
+        names = []
+        for loader in self._loaders():
+            try:
+                loader_names = loader.list_templates()
+            except TypeError:
+                continue
+            for name in loader_names:
+                if name not in seen:
+                    seen.add(name)
+                    names.append(name)
+        return names
 
 
 def _csp_nonce() -> str:
@@ -24,7 +65,7 @@ class Jinja2Renderer:
     def __init__(self, views_dir: str) -> None:
         self._views_dir = views_dir
         self._env = Environment(
-            loader=FileSystemLoader(views_dir),
+            loader=_OptinAwareLoader(views_dir),
             autoescape=select_autoescape(["html"]),
         )
         self._env.globals["url_for"] = self._url_for

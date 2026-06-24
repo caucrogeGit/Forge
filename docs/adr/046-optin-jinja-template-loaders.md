@@ -2,7 +2,8 @@
 
 ## Statut
 
-Proposé — bêta publique 1.0 (`1.0.0-beta.x`).
+Accepté — bêta publique 1.0 (`1.0.0-beta.x`).
+Implémenté par `CORE-JINJA-OPTIN-LOADERS-001`.
 Cadrage de l'intégration HTTP de Forge Admin (chantier `ADMIN-*`).
 
 ---
@@ -47,12 +48,11 @@ Les autres pistes (templates copiés dans le projet par une commande, ou un `Env
 Ajouter au cœur un **registre de loaders de templates Jinja**, symétrique au registre de fournisseurs de contexte, et composer ces loaders avec un `ChoiceLoader`.
 
 1. Dans `core/mvc/controller/registry.py` : `register_jinja_template_loader(loader)` et `iter_jinja_template_loaders()`.
-2. Dans `integrations/jinja2/renderer.py` : le loader devient un `ChoiceLoader` ordonné.
+2. Dans `integrations/jinja2/renderer.py` : le loader compose, dans cet ordre, `FileSystemLoader(views_dir)` du projet puis les loaders d'opt-in.
 
-```python
-loaders = [FileSystemLoader(views_dir), *iter_jinja_template_loaders()]
-self._env = Environment(loader=ChoiceLoader(loaders), ...)
-```
+La composition est résolue **dynamiquement** : un petit loader maison relit `iter_jinja_template_loaders()` à chaque résolution de template, plutôt qu'un `ChoiceLoader` figé à la construction.
+C'est nécessaire car le renderer du squelette est construit **avant** l'import des routes et des opt-ins ; un `ChoiceLoader` statique manquerait les loaders enregistrés ensuite.
+La sémantique reste celle d'un `ChoiceLoader` (premier loader qui résout gagne), mais l'ordre d'import des paquets devient sans effet.
 
 3. Un opt-in s'enregistre lui-même, en dégradation gracieuse si le cœur n'est pas présent.
 

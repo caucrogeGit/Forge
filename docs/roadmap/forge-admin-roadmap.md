@@ -263,7 +263,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-OPTIN-DOCS-001 | documenter le positionnement de Forge Admin | **livré** (page embarquée `packages/forge-mvc-admin/docs/index.md`, montée sous `/admin/`) |
 | ADMIN-INIT-COMMAND-001 | ajouter `forge admin:init` | **livré** (commande write-if-new ; prépare `mvc/admin/__init__.py` + `resources.py`) |
 | ADMIN-RESOURCE-CONTRACT-001 | définir le contrat d'une ressource admin | **livré** (`AdminResource` + `AdminRegistry` dans le paquet, déclaration Python validée, registre explicite) |
-| CORE-JINJA-OPTIN-LOADERS-001 | registre de loaders Jinja du cœur (ADR-046) : prérequis du rendu admin | à venir (prérequis cœur) |
+| CORE-JINJA-OPTIN-LOADERS-001 | registre de loaders Jinja du cœur (ADR-046) : prérequis du rendu admin | **livré** (registre + loader dynamique projet-puis-paquet) |
 | ADMIN-DASHBOARD-MINIMAL-001 | afficher un dashboard admin minimal (dépend de CORE-JINJA-OPTIN-LOADERS-001) | à venir |
 | ADMIN-LIST-VIEW-001 | afficher une liste paginée pour une entité | à venir |
 | ADMIN-DETAIL-VIEW-001 | afficher le détail d'une entité | à venir |

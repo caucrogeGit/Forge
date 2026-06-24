@@ -5,6 +5,17 @@
 
 ### Ajouté
 
+- **Registre de loaders de templates Jinja pour les opt-ins** (ADR-046,
+  `CORE-JINJA-OPTIN-LOADERS-001`). Le cœur expose
+  `register_jinja_template_loader()` / `iter_jinja_template_loaders()`
+  (`core/mvc/controller/registry.py`), symétrique au registre de fournisseurs de
+  contexte. Le renderer (`integrations/jinja2/renderer.py`) compose le dossier
+  `mvc/views/` du projet puis les loaders d'opt-in, résolus dynamiquement à
+  chaque rendu : un opt-in peut servir ses templates embarqués, et un template du
+  projet de même chemin les surcharge (ordre projet-puis-paquet). Infrastructure
+  générale du cœur, prérequis du rendu de Forge Admin ; aucun opt-in n'est nommé
+  par le cœur.
+
 - **Paquet opt-in `forge-mvc-admin` (scaffold)** (`ADMIN-OPTIN-PACKAGE-001`).
   Premier pas de la roadmap Forge Admin : un paquet installable mais
   volontairement vide, qui pose le contrat de version (`__version__`), le
