@@ -124,7 +124,7 @@ Forge n'est pas un clone des grands frameworks. Il vise une autre approche :
 - plus de fichiers visibles ;
 - SQL compréhensible ;
 - génération contrôlée ;
-- progression pédagogique ;
+- lisibilité et auditabilité de bout en bout ;
 - séparation stricte entre framework et application métier.
 
 ---

@@ -25,7 +25,7 @@ Une contribution ne doit pas rendre Forge :
 
 ## Philosophie de contribution
 
-Forge est un framework Python explicite, pédagogique et durable.
+Forge est un framework Python explicite, auditable et durable.
 
 Quelques principes fondamentaux :
 
