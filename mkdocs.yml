@@ -279,6 +279,7 @@ nav:
             - ADR-046 Loaders de templates Jinja pour opt-ins: adr/046-optin-jinja-template-loaders.md
             - ADR-047 Guidance agent IA dans les apps: adr/047-app-agent-guidance-layer.md
             - ADR-048 Parcours welcome-projet du squelette: adr/048-skeleton-welcome-projet.md
+            - ADR-049 Repositionnement production auditable: adr/049-positioning-production-auditable.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
