@@ -21,6 +21,7 @@ pyright>=1.1.400
 # rbac/workflow/stats (tous les autres opt-ins sont exclus, voir pyproject.toml) :
 # pour le dev on pointe tous les opt-ins vers le monorepo local afin
 # d'exécuter la suite complète.
+-e ./packages/forge-mvc-admin
 -e ./packages/forge-mvc-mfa
 -e ./packages/forge-mvc-rbac
 -e ./packages/forge-mvc-workflow
