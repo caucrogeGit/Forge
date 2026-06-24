@@ -30,21 +30,18 @@ def _forge_config_kwargs() -> dict[str, Any]:
     toute évolution doit être miroitée des deux côtés (couverte par
     `tests/test_wsgi_app_factory_config_001.py::TestConfigParity`).
     """
-    from config import (
-        APP_NAME, APP_ENV, VIEWS_DIR, SQL_DIR,
-        UPLOAD_MAX_SIZE,
-        DB_APP_HOST, DB_APP_PORT, DB_NAME, DB_APP_LOGIN, DB_APP_PWD,
-        DB_POOL_SIZE,
-        APP_TRUSTED_PROXIES,
-    )
+    # `config` est le module de l'APPLICATION (présent dans un projet généré,
+    # absent du dépôt framework). Chargé dynamiquement et typé `Any` : l'analyse
+    # statique du framework ne peut pas le résoudre, et ce n'est pas son rôle.
+    config: Any = importlib.import_module("config")
     kwargs = dict(
-        app_name=APP_NAME, app_env=APP_ENV,
-        views_dir=VIEWS_DIR, sql_dir=SQL_DIR,
-        upload_max_size=UPLOAD_MAX_SIZE,
-        db_host=DB_APP_HOST, db_port=DB_APP_PORT, db_name=DB_NAME,
-        db_user=DB_APP_LOGIN, db_password=DB_APP_PWD,
-        db_pool_size=DB_POOL_SIZE,
-        trusted_proxies=APP_TRUSTED_PROXIES,
+        app_name=config.APP_NAME, app_env=config.APP_ENV,
+        views_dir=config.VIEWS_DIR, sql_dir=config.SQL_DIR,
+        upload_max_size=config.UPLOAD_MAX_SIZE,
+        db_host=config.DB_APP_HOST, db_port=config.DB_APP_PORT, db_name=config.DB_NAME,
+        db_user=config.DB_APP_LOGIN, db_password=config.DB_APP_PWD,
+        db_pool_size=config.DB_POOL_SIZE,
+        trusted_proxies=config.APP_TRUSTED_PROXIES,
     )
     return kwargs
 
@@ -66,11 +63,11 @@ def build_application() -> "Application":
     from core.app.application import Application
     from core.templating.manager import template_manager
     from integrations.jinja2.renderer import Jinja2Renderer
-    from config import APP_ROUTES_MODULE, VIEWS_DIR
+    config: Any = importlib.import_module("config")  # module applicatif (cf. _forge_config_kwargs)
 
     apply_forge_config()
     if template_manager._renderer is None:  # pyright: ignore[reportPrivateUsage]  # check d'idempotence du branchement renderer
-        template_manager.register(Jinja2Renderer(VIEWS_DIR))
-    routes_mod = importlib.import_module(APP_ROUTES_MODULE)
+        template_manager.register(Jinja2Renderer(config.VIEWS_DIR))
+    routes_mod = importlib.import_module(config.APP_ROUTES_MODULE)
     forge.configure(router=routes_mod.router)
     return Application(routes_mod.router)
