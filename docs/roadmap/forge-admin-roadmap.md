@@ -235,6 +235,23 @@ L'essentiel du stack HTTP de Forge est déjà disponible et réutilisé tel quel
 - **Templates embarqués** : le rendu de templates portés par le paquet nécessite un registre de loaders Jinja dans le cœur ([ADR-046](../adr/046-optin-jinja-template-loaders.md)).
   L'ordre du `ChoiceLoader` (projet d'abord, paquet ensuite) fournit nativement la surcharge de gabarit (`ADMIN-TEMPLATE-OVERRIDE-001`).
 
+### Accès aux données (cadrage)
+
+Le back-office lit la base par **mapping déclaré**, sans ORM ni introspection automatique (charte principes 3 et 5).
+
+- **Mapping physique dans `AdminResource`** : la ressource déclare la **table** (et la colonne de tri par défaut) en plus de l'entité et des `list_fields`.
+  Le nom de table n'est pas dérivable du nom d'entité ; il est donc explicite.
+- **SELECT contraint dans le châssis** : le paquet construit la requête de liste à partir du mapping déclaré.
+  Les identifiants (table, colonnes, colonne de tri) sont validés en **liste blanche** et ne sont jamais paramétrables ; seules les valeurs passent par des paramètres `?`.
+  C'est le précédent anti-injection de `forge-mvc-stats` (liste blanche du `group_by`).
+- **Pagination** : `LIMIT ? OFFSET ?` bornés, via `core/mvc/view/pagination.py` (`Pagination`).
+- **Connexion** : `core.database.db.fetch_all`, avec un adaptateur injectable pour les tests (précédent iot/stats).
+- **Source unique** : il n'existe pas de lecture de contrat d'entité au runtime, et on n'en ajoute pas.
+  Le futur `admin:resource <Entity>` remplira `table` et les colonnes en lisant le contrat d'entité **au temps CLI** (où la lecture de contrat existe déjà), évitant toute duplication à maintenir à la main et toute lecture de fichier à la requête.
+
+Conséquence : `AdminResource` gagnera un champ `table` (et une colonne de tri par défaut) avec le ticket `ADMIN-LIST-VIEW-001`.
+Le rapprochement entre la ressource déclarée et le contrat d'entité réel (table et colonnes existantes) relève de `admin:doctor`.
+
 ---
 
 ## 8. Commandes futures envisagées
@@ -265,7 +282,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-RESOURCE-CONTRACT-001 | définir le contrat d'une ressource admin | **livré** (`AdminResource` + `AdminRegistry` dans le paquet, déclaration Python validée, registre explicite) |
 | CORE-JINJA-OPTIN-LOADERS-001 | registre de loaders Jinja du cœur (ADR-046) : prérequis du rendu admin | **livré** (registre + loader dynamique projet-puis-paquet) |
 | ADMIN-DASHBOARD-MINIMAL-001 | afficher un dashboard admin minimal (dépend de CORE-JINJA-OPTIN-LOADERS-001) | **livré** (`register_admin_routes`, `GET /admin` non publique, template embarqué) |
-| ADMIN-LIST-VIEW-001 | afficher une liste paginée pour une entité | à venir |
+| ADMIN-LIST-VIEW-001 | afficher une liste paginée pour une entité (étend `AdminResource` avec `table` + tri par défaut ; SELECT contraint en liste blanche) | à venir |
 | ADMIN-DETAIL-VIEW-001 | afficher le détail d'une entité | à venir |
 | ADMIN-FORM-NEW-001 | créer une entité depuis l'admin | à venir |
 | ADMIN-FORM-EDIT-001 | modifier une entité depuis l'admin | à venir |
