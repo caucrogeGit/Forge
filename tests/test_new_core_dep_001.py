@@ -7,7 +7,9 @@ projet effectivement produit :
 
 - il contient le squelette applicatif (app.py, mvc/) ;
 - il ne contient NI le framework (core/, cli/, integrations/), NI les
-  paquets/tests/docs du monorepo ;
+  paquets/tests du monorepo ;
+- il a son PROPRE `docs/welcome/` (parcours d'accueil, ADR-048), à ne pas
+  confondre avec la doc du monorepo ;
 - son requirements.txt épingle forge-mvc à la version courante (le core vient
   du paquet installé, pas d'un core/ local).
 """
@@ -41,11 +43,19 @@ def test_projet_contient_le_squelette_applicatif(projet):
     assert (projet / "mvc" / "controllers" / "home_controller.py").is_file()
 
 
-@pytest.mark.parametrize("absent", ["core", "cli", "integrations", "packages", "tests", "docs"])
+@pytest.mark.parametrize("absent", ["core", "cli", "integrations", "packages", "tests"])
 def test_projet_ne_vendore_pas_le_framework(projet, absent):
     assert not (projet / absent).exists(), (
         f"Un projet nu ne doit pas embarquer {absent}/ (il vient du paquet forge-mvc)."
     )
+
+
+def test_projet_embarque_le_parcours_welcome(projet):
+    # Onboarding humain propre au projet (ADR-048), pas la doc du monorepo.
+    assert (projet / "docs" / "welcome" / "installation.md").is_file()
+    assert (projet / "docs" / "welcome" / "recapitulatif.md").is_file()
+    # ... et toujours pas de mkdocs.yml ni de doc du framework vendorée.
+    assert not (projet / "mkdocs.yml").exists()
 
 
 def test_requirements_epingle_forge_mvc(projet):
