@@ -10,5 +10,11 @@ générée par `forge new` — pas sur le framework lui-même.
 from cli.agents.briefing import render_app_briefing
 from cli.agents.emit import emit_app_agent_files
 from cli.agents.seed_adr import render_seed_adr
+from cli.agents.settings import render_app_settings
 
-__all__ = ["render_app_briefing", "render_seed_adr", "emit_app_agent_files"]
+__all__ = [
+    "render_app_briefing",
+    "render_seed_adr",
+    "render_app_settings",
+    "emit_app_agent_files",
+]

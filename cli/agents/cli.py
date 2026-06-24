@@ -40,12 +40,12 @@ def _check(root: Path) -> int:
     return 0
 
 
-def _force(root: Path) -> int:
+def _force(root: Path, *, with_settings: bool) -> int:
     briefing = render_app_briefing()
     for name in _BRIEFING_FILES:
         (root / name).write_text(briefing, encoding="utf-8")
         print(f"[OK] {name} rafraîchi.")
-    for name in emit_app_agent_files(root):
+    for name in emit_app_agent_files(root, with_settings=with_settings):
         if name not in _BRIEFING_FILES:
             print(f"[OK] créé : {name}")
     print()
@@ -53,8 +53,8 @@ def _force(root: Path) -> int:
     return 0
 
 
-def _init(root: Path) -> int:
-    created = emit_app_agent_files(root)
+def _init(root: Path, *, with_settings: bool) -> int:
+    created = emit_app_agent_files(root, with_settings=with_settings)
     if created:
         for name in created:
             print(f"[OK] créé : {name}")
@@ -67,8 +67,9 @@ def main(args: list[str] | None = None) -> int:
     """Point d'entrée appelé par `forge.py` pour `forge agents:init`."""
     args = args or []
     root = Path.cwd()
+    with_settings = "--settings" in args
     if "--check" in args:
         return _check(root)
     if "--force" in args:
-        return _force(root)
-    return _init(root)
+        return _force(root, with_settings=with_settings)
+    return _init(root, with_settings=with_settings)

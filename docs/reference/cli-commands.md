@@ -904,15 +904,18 @@ Génère la couche de guidance agent IA d'une application Forge (ADR-047) :
 `docs/adr/001-adopter-forge.md`.
 
 ```bash
-forge agents:init           # crée les fichiers manquants (write-if-new)
-forge agents:init --check   # diagnostic en lecture seule
-forge agents:init --force   # rafraîchit CLAUDE.md et AGENTS.md
+forge agents:init            # crée les fichiers manquants (write-if-new)
+forge agents:init --check    # diagnostic en lecture seule
+forge agents:init --force    # rafraîchit CLAUDE.md et AGENTS.md
+forge agents:init --settings # ajoute aussi .claude/settings.json
 ```
 
 Par défaut, aucun fichier existant n'est écrasé. `--force` réécrit le briefing
 (`CLAUDE.md`, `AGENTS.md`) depuis la version de Forge installée, sans toucher
 `docs/adr/001-adopter-forge.md` qui appartient au projet. `--check` signale les
-fichiers absents ou un briefing divergé (code de sortie 1).
+fichiers absents ou un briefing divergé (code de sortie 1). `--settings` écrit en
+plus `.claude/settings.json` (commandes pré-autorisées) ; c'est un choix opt-in,
+non généré par `forge new`.
 
 </details>
 

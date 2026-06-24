@@ -68,7 +68,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "project:check":    "Contrôle strict des conventions (CI-ready).",
     "project:audit":    "Rapport d'audit détaillé non destructif.",
     "routes:list":      "Affiche les routes déclarées par l'application.",
-    "agents:init":      "Génère/rafraîchit la guidance agent IA (CLAUDE.md, AGENTS.md, ADR-001) ; --check, --force.",
+    "agents:init":      "Génère/rafraîchit la guidance agent IA (CLAUDE.md, AGENTS.md, ADR-001) ; --check, --force, --settings.",
     # Entités
     "make:crud":        "Génère un CRUD complet (liste, fiche, formulaires).",
     "make:pivot-crud":  "Génère un sous-CRUD dédié pour un pivot avec attributs.",
@@ -407,9 +407,10 @@ Code de sortie:
 """,
     "agents:init": """\
 Usage:
-  forge agents:init           # crée la guidance agent (write-if-new)
-  forge agents:init --check   # diagnostic en lecture seule
-  forge agents:init --force   # rafraîchit CLAUDE.md et AGENTS.md
+  forge agents:init            # crée la guidance agent (write-if-new)
+  forge agents:init --check    # diagnostic en lecture seule
+  forge agents:init --force    # rafraîchit CLAUDE.md et AGENTS.md
+  forge agents:init --settings # ajoute aussi .claude/settings.json
 
 Description:
   Génère la couche de guidance agent IA d'une application Forge (ADR-047) :
@@ -420,7 +421,9 @@ Comportement:
   - par défaut : write-if-new (un fichier existant n'est jamais écrasé) ;
   - `--force` : réécrit `CLAUDE.md` et `AGENTS.md` depuis la version installée,
     sans toucher l'ADR-001 (il appartient au projet) ;
-  - `--check` : signale les fichiers absents ou un briefing divergé.
+  - `--check` : signale les fichiers absents ou un briefing divergé ;
+  - `--settings` : écrit aussi `.claude/settings.json` (commandes pré-autorisées) ;
+    opt-in, non généré par `forge new`.
 
 Code de sortie:
   0 si tout est en place / à jour ; 1 si `--check` trouve un manque ou un écart.

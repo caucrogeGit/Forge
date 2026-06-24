@@ -11,6 +11,7 @@ from pathlib import Path
 
 from cli.agents.briefing import render_app_briefing
 from cli.agents.seed_adr import render_seed_adr
+from cli.agents.settings import render_app_settings
 
 __all__ = ["emit_app_agent_files"]
 
@@ -23,10 +24,16 @@ def _write_if_new(path: Path, content: str, created: list[str], root: Path) -> N
     created.append(path.relative_to(root).as_posix())
 
 
-def emit_app_agent_files(project_root: Path, *, date: str | None = None) -> list[str]:
+def emit_app_agent_files(
+    project_root: Path,
+    *,
+    date: str | None = None,
+    with_settings: bool = False,
+) -> list[str]:
     """Écrit la couche guidance agent dans `project_root` (write-if-new).
 
-    Fichiers : `CLAUDE.md`, `AGENTS.md`, `docs/adr/001-adopter-forge.md`.
+    Fichiers : `CLAUDE.md`, `AGENTS.md`, `docs/adr/001-adopter-forge.md`, et,
+    si `with_settings`, `.claude/settings.json` (commandes pré-autorisées).
     `date` (ISO) tamponne l'ADR-001 ; par défaut, la date du jour.
     Retourne la liste des chemins créés (relatifs au projet) ; un fichier déjà
     présent n'est pas listé (ni écrasé).
@@ -42,4 +49,11 @@ def emit_app_agent_files(project_root: Path, *, date: str | None = None) -> list
         created,
         project_root,
     )
+    if with_settings:
+        _write_if_new(
+            project_root / ".claude" / "settings.json",
+            render_app_settings(),
+            created,
+            project_root,
+        )
     return created
