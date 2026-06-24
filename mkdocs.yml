@@ -88,6 +88,7 @@ nav:
         - Migrations SQL: features/migrations.md
         - Front et CSS: features/front.md
         - Profils de projet: features/profiles.md
+        - Guidance agent IA: features/agents.md
         - Génération PDF: features/pdf.md
         - ImageMagick (logos transparents): features/imagemagick-logos.md
 
