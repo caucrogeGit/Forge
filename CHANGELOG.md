@@ -43,6 +43,13 @@
   (échoue proprement si le paquet n'est pas installé) ; aide riche `--help`.
   Documentée dans l'espace de l'opt-in (ADR-042), pas dans la référence CLI du
   cœur. Aucune vue ni template à ce stade.
+- **Dashboard minimal Forge Admin** (`ADMIN-DASHBOARD-MINIMAL-001`).
+  `register_admin_routes(router)` (branchement explicite, ADR-030) ajoute la
+  route `GET /admin` (nommée `admin-dashboard`, **non publique** + `@require_auth`
+  en défense en profondeur). `AdminController.dashboard` rend le template
+  embarqué `admin/dashboard.html` listant les ressources du registre ; le paquet
+  enregistre son `PackageLoader` auprès du cœur (ADR-046), et un projet peut
+  surcharger le template via `mvc/views/admin/dashboard.html`.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

@@ -34,4 +34,4 @@ where = ["."]
 include = ["forge_mvc_admin*"]
 
 [tool.setuptools.package-data]
-"forge_mvc_admin" = ["py.typed"]
+"forge_mvc_admin" = ["py.typed", "templates/**/*.html"]

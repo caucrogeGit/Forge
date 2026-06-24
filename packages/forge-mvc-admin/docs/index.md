@@ -72,6 +72,28 @@ forge admin:init
 À ce stade du châssis, aucune vue ni template ne sont générés : ils viendront
 avec les tickets de dashboard et de rendu.
 
+## Brancher le back-office
+
+Le back-office expose ses routes via `register_admin_routes(router)`, appelé
+explicitement par l'application (jamais d'injection automatique).
+
+```python
+# optins/admin/routes.py
+from forge_mvc_admin import register_admin_routes
+
+def register(router):
+    register_admin_routes(router)
+```
+
+La première route est `GET /admin` : le **tableau de bord**, qui liste les
+ressources déclarées dans le registre.
+Elle n'est pas publique : un utilisateur non authentifié est redirigé vers la
+page de connexion.
+
+Le tableau de bord rend un template embarqué (`admin/dashboard.html`).
+Un projet peut le surcharger en plaçant son propre `mvc/views/admin/dashboard.html`
+(l'ordre des loaders donne la priorité au projet).
+
 ## Suivre l'avancement
 
 La feuille de route de cadrage et le découpage en tickets sont décrits dans la

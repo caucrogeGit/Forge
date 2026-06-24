@@ -1,0 +1,15 @@
+{% extends "admin/layout.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+  <h2>Ressources administrables</h2>
+  {% if resources %}
+    <ul>
+      {% for resource in resources %}
+        <li>{{ resource.plural_label }} <code>/admin/{{ resource.slug }}</code></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Aucune ressource déclarée.</p>
+    <p>Déclarez vos ressources dans <code>mvc/admin/resources.py</code>.</p>
+  {% endif %}
+{% endblock %}

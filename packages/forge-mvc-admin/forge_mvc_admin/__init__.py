@@ -14,6 +14,7 @@ from forge_mvc_admin.exceptions import (
     AdminRegistryError,
     AdminResourceError,
 )
+from forge_mvc_admin.http import AdminController, register_admin_routes
 from forge_mvc_admin.registry import AdminRegistry, registry
 from forge_mvc_admin.resources import AdminResource
 
@@ -23,7 +24,23 @@ __all__ = [
     "AdminResource",
     "AdminRegistry",
     "registry",
+    "AdminController",
+    "register_admin_routes",
     "AdminError",
     "AdminResourceError",
     "AdminRegistryError",
 ]
+
+# Enregistre les templates embarqués (templates/admin/…) auprès du cœur (ADR-046),
+# de sorte que `render("admin/…")` les résolve. Dégradation gracieuse si le cœur
+# ou jinja2 ne sont pas présents (ex. analyse statique du paquet hors runtime).
+try:
+    from jinja2 import PackageLoader as _PackageLoader
+
+    from core.mvc.controller.registry import (
+        register_jinja_template_loader as _register_loader,
+    )
+
+    _register_loader(_PackageLoader("forge_mvc_admin", "templates"))
+except ImportError:
+    pass
