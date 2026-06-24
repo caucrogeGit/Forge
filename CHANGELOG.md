@@ -128,6 +128,13 @@
   `admin:doctor`), chaînés par des bilans et un récapitulatif. Nav du paquet et
   garde-fou de chaînage `test_starter_welcome_admin_nav_001`. Aucun code de
   production touché.
+- **Clôture du chantier Forge Admin** (`ADMIN-CLOSING-AUDIT-001`). Tous les
+  tickets `ADMIN-*` (plus `CORE-JINJA-OPTIN-LOADERS-001` et `ADMIN-WELCOME-001`)
+  sont livrés : le back-office couvre le CRUD complet, la sécurité par défaut, le
+  RBAC optionnel, la surcharge de templates, `admin:init` / `admin:doctor` et le
+  parcours `welcome-admin`. Suite complète verte (16 298 tests) hormis un échec
+  pré-existant et hors périmètre (`test_no_old_owner_name`, identité
+  `official-site`). Bilan dans `docs/roadmap/forge-admin-roadmap.md` §14.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

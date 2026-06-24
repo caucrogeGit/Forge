@@ -344,7 +344,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-TEMPLATE-OVERRIDE-001 | permettre la surcharge explicite des templates (acquis via l'ordre du loader ADR-046 ; documenté + test) | **livré** |
 | ADMIN-DOCTOR-001 | ajouter `forge admin:doctor` (rapproche ressources ↔ contrats d'entité, lecture seule ; fail si déclaration cassée, warn sur écart) | **livré** |
 | ADMIN-WELCOME-001 | parcours pédagogique embarqué `welcome-admin` (3 niveaux, réalisé à la main, ADR-028/035/038) | **livré** (13 pages, nav paquet, test de chaînage) |
-| ADMIN-CLOSING-AUDIT-001 | clôturer la roadmap Forge Admin | à venir |
+| ADMIN-CLOSING-AUDIT-001 | clôturer la roadmap Forge Admin | **livré** (suite complète verte, bilan §14 ; 1 échec résiduel pré-existant hors périmètre) |
 
 L'ordre est indicatif.
 Les tickets de contrat et de sécurité conditionnent les tickets de vues et d'actions.
@@ -479,6 +479,30 @@ Cette roadmap de cadrage est considérée comme aboutie quand :
 
 Le travail réel est ensuite porté par les tickets `ADMIN-*`.
 La clôture finale de l'effort Forge Admin relève du ticket `ADMIN-CLOSING-AUDIT-001`.
+
+### Clôture (ADMIN-CLOSING-AUDIT-001)
+
+Tous les tickets du découpage sont livrés.
+Le paquet `forge-mvc-admin` fournit : le contrat de ressource et le registre, le
+dashboard, la liste paginée, la fiche, la création, l'édition, la suppression
+contrôlée, l'intégration RBAC optionnelle, la surcharge des templates, les
+commandes `admin:init` et `admin:doctor`, et le parcours pédagogique
+`welcome-admin`. Le rendu repose sur le registre de loaders Jinja du cœur
+(ADR-046).
+
+Les critères de clôture ci-dessus sont remplis : positionnement clair, séparation
+Core / Admin / Design explicite, découpage suivi, dépendances aux contrats et au
+CRUD explicites, sécurité posée par défaut (routes non publiques, CSRF, RBAC
+optionnel).
+
+Validation finale : suite complète **16 298 tests verts** (1 échec résiduel
+`test_no_old_owner_name`, **pré-existant et hors périmètre** : identité
+`official-site`, aucun fichier du chantier concerné), `mkdocs build --strict` OK,
+`ruff` OK, `compileall` OK, `pyright` strict 0 erreur sur le paquet.
+
+Reste hors périmètre, comme prévu : la publication PyPI (statut `1 - Planning`),
+l'annonce sur la landing, et les enrichissements futurs (granularité RBAC fine,
+filtres et recherche, widgets typés, liens liste vers fiche).
 
 ---
 
