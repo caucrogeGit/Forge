@@ -25,6 +25,13 @@
   JSON : l'entité reste son contrat JSON, la ressource admin est une couche de
   présentation au-dessus. Aucune vue ni route fournie à ce stade. Doc embarquée
   `packages/forge-mvc-admin/docs/resources.md`.
+- **Commande `forge admin:init`** (`ADMIN-INIT-COMMAND-001`). Prépare la
+  structure `mvc/admin/` d'un projet (`__init__.py` + `resources.py` où
+  l'application déclare ses ressources). Write-if-new, idempotente, sans
+  écrasement (charte §9) ; dispatch dans `forge.py` derrière un import optionnel
+  (échoue proprement si le paquet n'est pas installé) ; aide riche `--help`.
+  Documentée dans l'espace de l'opt-in (ADR-042), pas dans la référence CLI du
+  cœur. Aucune vue ni template à ce stade.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

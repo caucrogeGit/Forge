@@ -118,6 +118,8 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "video:cleanup":    "Purge vidéos failed / fichiers orphelins (dry-run par défaut, --apply).",
     # Audio
     "audio:doctor":     "Diagnostic du module audio (package, config, présence ffmpeg/ffprobe).",
+    # Admin
+    "admin:init":       "Prépare la structure mvc/admin/ du back-office (write-if-new, sans écrasement).",
     # Opt-ins (branchement projet)
     "opt-in:install":   "Affiche la commande d'installation du package d'un opt-in officiel.",
     "opt-in:remove":    "Affiche la commande de désinstallation du package d'un opt-in officiel.",
@@ -359,6 +361,28 @@ Vérifications:
 Code de sortie:
   0 si tout est OK ; 1 si une vérification échoue (ex. ffmpeg/ffprobe
   absent du PATH — requis pour le sondage et le transcodage).
+""",
+    "admin:init": """\
+Usage:
+  forge admin:init          # prépare la structure mvc/admin/ du back-office
+
+Description:
+  Crée la structure du back-office Forge Admin dans le projet courant
+  (module opt-in `forge-mvc-admin`). Génère `mvc/admin/__init__.py` et
+  `mvc/admin/resources.py`, où l'application déclare ses ressources
+  administrables.
+
+Comportement:
+  - write-if-new : un fichier absent est créé ;
+  - un fichier déjà présent à l'identique n'est pas réécrit (idempotent) ;
+  - un fichier présent au contenu différent n'est jamais écrasé (WARN) ;
+  - aucune vue ni template générés à ce stade du châssis.
+
+Prérequis:
+  - être à la racine d'un projet Forge (dossier `mvc/` attendu).
+
+Code de sortie:
+  0 si la structure est prête ; 1 si `mvc/` est absent (pas un projet Forge).
 """,
     "video:init": """\
 Usage:

@@ -56,6 +56,22 @@ pip install --pre forge-mvc-admin
 
 À ce stade, l'installation ne pose que le paquet et son contrat de version.
 
+## Commandes
+
+`forge admin:init` prépare la structure du back-office dans le projet courant.
+
+Elle crée `mvc/admin/__init__.py` et `mvc/admin/resources.py`, où l'application
+déclare ses ressources administrables.
+La commande est write-if-new : elle ne réécrit jamais un fichier existant et
+n'écrase aucun code utilisateur.
+
+```bash
+forge admin:init
+```
+
+À ce stade du châssis, aucune vue ni template ne sont générés : ils viendront
+avec les tickets de dashboard et de rendu.
+
 ## Suivre l'avancement
 
 La feuille de route de cadrage et le découpage en tickets sont décrits dans la

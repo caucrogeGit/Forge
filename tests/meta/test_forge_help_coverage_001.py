@@ -87,7 +87,7 @@ KNOWN_DOCUMENTED_EXCEPTIONS: set[str] = set()
 # « commande CLI absente de la doc cœur ».
 OPT_IN_CLI_NAMESPACES = (
     "mail:", "iot:", "video:", "audio:", "i18n:",
-    "rbac:", "workflow:", "stats:", "pivot:",
+    "rbac:", "workflow:", "stats:", "pivot:", "admin:",
 )
 
 # Commandes dans forge --help intentionnellement non documentées (rare)
