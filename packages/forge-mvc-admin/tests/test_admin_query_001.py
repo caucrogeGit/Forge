@@ -16,11 +16,13 @@ from forge_mvc_admin.query import (
     build_get_sql,
     build_insert_sql,
     build_list_sql,
+    build_update_sql,
     count_rows,
     detail_columns,
     get_row,
     insert_row,
     list_rows,
+    update_row,
 )
 
 
@@ -131,3 +133,21 @@ def test_insert_row_passe_les_valeurs_et_retourne_lastrowid():
     assert new_id == 42
     assert captured["params"] == ("Bonjour", None)
     assert captured["sql"].startswith("INSERT INTO articles")
+
+
+def test_build_update_sql():
+    sql = build_update_sql(_resource())
+    assert sql == "UPDATE articles SET title = ?, body = ? WHERE id = ? LIMIT 1"
+
+
+def test_update_row_valeurs_puis_cle():
+    captured: dict[str, Any] = {}
+
+    def fake_execute(sql: str, params: Any) -> int:
+        captured["params"] = params
+        return 1
+
+    affected = update_row(_resource(), fake_execute, values=("Bonjour", None), pk_value="5")
+    assert affected == 1
+    # valeurs des champs d'abord, clé primaire en dernier
+    assert captured["params"] == ("Bonjour", None, "5")

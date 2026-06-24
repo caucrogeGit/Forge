@@ -87,6 +87,21 @@ def test_route_new_litterale_avant_detail():
     )
 
 
+def test_register_admin_routes_edition():
+    router = Router()
+    register_admin_routes(router, registry=AdminRegistry())
+    get_edit = router.match("GET", "/admin/articles/5/edit")
+    assert get_edit is not None
+    assert get_edit[0].name == "admin-resource-edit"
+    assert get_edit[0].public is False
+    assert get_edit[1].get("slug") == "articles"
+    assert get_edit[1].get("id") == "5"
+    post_edit = router.match("POST", "/admin/articles/5/edit")
+    assert post_edit is not None
+    assert post_edit[0].name == "admin-resource-update"
+    assert post_edit[0].public is False
+
+
 def test_dashboard_template_liste_les_ressources(tmp_path: Path):
     views = tmp_path / "views"
     views.mkdir()
@@ -151,6 +166,8 @@ def test_detail_template_affiche_les_champs(tmp_path: Path):
     )
     assert "<dt>title</dt>" in html
     assert "Bonjour" in html
+    # lien vers l'édition (clé primaire = id)
+    assert "/admin/articles/5/edit" in html
 
 
 def test_form_template_affiche_les_champs_et_csrf(tmp_path: Path):

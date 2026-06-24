@@ -78,6 +78,13 @@
   avant `/{id}` (le routeur retient la première correspondance). Pas de
   validation par champ à ce stade (pas de contrat au runtime) : les contraintes
   restent celles de la base.
+- **Édition depuis Forge Admin** (`ADMIN-FORM-EDIT-001`). Routes
+  `GET /admin/<slug>/<id>/edit` (formulaire pré-rempli depuis la ligne) et
+  `POST /admin/<slug>/<id>/edit` (mise à jour), nommées, non publiques. L'`UPDATE`
+  écrit les colonnes `form_fields` (liste blanche, valeurs paramétrées via
+  `core.database.db.execute`) `WHERE <pk> = ? LIMIT 1` ; CSRF vérifié ; succès →
+  redirection vers la fiche avec flash. La fiche détail propose un lien
+  « Modifier ». Template `admin/form.html` réutilisé.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

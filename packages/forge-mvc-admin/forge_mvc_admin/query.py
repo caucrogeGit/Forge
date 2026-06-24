@@ -19,6 +19,7 @@ from forge_mvc_admin.resources import AdminResource
 FetchAll = Callable[[str, Sequence[Any]], list[dict[str, Any]]]
 FetchOne = Callable[[str, Sequence[Any]], "dict[str, Any] | None"]
 Insert = Callable[[str, Sequence[Any]], int]
+Execute = Callable[[str, Sequence[Any]], int]
 
 # Identifiant SQL sûr : minuscules, chiffres, underscores, commençant par une lettre.
 _IDENT_RE = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -98,6 +99,28 @@ def insert_row(
 ) -> int:
     """Insère une ligne (valeurs dans l'ordre de `form_fields`). Retourne lastrowid."""
     return insert(build_insert_sql(resource), tuple(values))
+
+
+def build_update_sql(resource: AdminResource) -> str:
+    """`UPDATE <table> SET <form_fields = ?> WHERE <pk> = ? LIMIT 1`."""
+    assignments = ", ".join(f"{_ident(col)} = ?" for col in resource.form_fields)
+    table = _ident(resource.table)
+    pk = _ident(resource.pk)
+    return f"UPDATE {table} SET {assignments} WHERE {pk} = ? LIMIT 1"
+
+
+def update_row(
+    resource: AdminResource,
+    execute: Execute,
+    *,
+    values: Sequence[Any],
+    pk_value: Any,
+) -> int:
+    """Met à jour la ligne `pk_value` (valeurs dans l'ordre de `form_fields`).
+
+    Retourne le nombre de lignes affectées (0 si la clé n'existe pas).
+    """
+    return execute(build_update_sql(resource), (*tuple(values), pk_value))
 
 
 def count_rows(resource: AdminResource, fetch_one: FetchOne) -> int:

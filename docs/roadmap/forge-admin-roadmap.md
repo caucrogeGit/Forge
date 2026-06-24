@@ -300,7 +300,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-LIST-VIEW-001 | afficher une liste paginée pour une entité (étend `AdminResource` avec `table` + tri par défaut ; SELECT contraint en liste blanche) | **livré** (`GET /admin/<slug>`, pagination, template embarqué) |
 | ADMIN-DETAIL-VIEW-001 | afficher le détail d'une entité (`GET /admin/<slug>/<id>`, `WHERE <pk> = ?`) | **livré** |
 | ADMIN-FORM-NEW-001 | créer une entité depuis l'admin (`GET`/`POST /admin/<slug>/new`, INSERT liste blanche, CSRF, PRG) | **livré** |
-| ADMIN-FORM-EDIT-001 | modifier une entité depuis l'admin | à venir |
+| ADMIN-FORM-EDIT-001 | modifier une entité depuis l'admin (`GET`/`POST /admin/<slug>/<id>/edit`, UPDATE liste blanche `WHERE <pk> = ?`) | **livré** |
 | ADMIN-DELETE-ACTION-001 | supprimer une entité avec garde-fous | à venir |
 | ADMIN-CSRF-SECURITY-001 | verrouiller les actions sensibles avec CSRF | à venir |
 | ADMIN-RBAC-INTEGRATION-001 | intégrer RBAC si l'opt-in est installé | à venir |

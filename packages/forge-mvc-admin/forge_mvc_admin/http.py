@@ -21,6 +21,7 @@ from core.security.decorators import require_auth
 
 from forge_mvc_admin.exceptions import AdminRegistryError
 from forge_mvc_admin.query import (
+    Execute,
     FetchAll,
     FetchOne,
     Insert,
@@ -29,6 +30,7 @@ from forge_mvc_admin.query import (
     get_row,
     insert_row,
     list_rows,
+    update_row,
 )
 from forge_mvc_admin.registry import AdminRegistry
 from forge_mvc_admin.registry import registry as _default_registry
@@ -58,11 +60,13 @@ class AdminController:
         fetch_all: FetchAll | None = None,
         fetch_one: FetchOne | None = None,
         insert: Insert | None = None,
+        execute: Execute | None = None,
     ) -> None:
         self._registry = registry
         self._fetch_all = fetch_all
         self._fetch_one = fetch_one
         self._insert = insert
+        self._execute = execute
 
     def _db(self) -> tuple[FetchAll, FetchOne]:
         fetch_all, fetch_one = self._fetch_all, self._fetch_one
@@ -77,6 +81,12 @@ class AdminController:
             return self._insert
         from core.database.db import insert as _insert
         return _insert
+
+    def _execute_fn(self) -> Execute:
+        if self._execute is not None:
+            return self._execute
+        from core.database.db import execute as _execute
+        return _execute
 
     def dashboard(self, request: Request) -> Response:
         """Tableau de bord : liste les ressources administrables déclarées."""
@@ -185,6 +195,65 @@ class AdminController:
             f"{resource.label} créé.",
         )
 
+    def resource_edit(self, request: Request) -> Response:
+        """Formulaire d'édition pré-rempli (`GET /admin/<slug>/<id>/edit`)."""
+        slug = request.route("slug")
+        pk_value = request.route("id")
+        if slug is None or pk_value is None:
+            return BaseController.not_found()
+        try:
+            resource = self._registry.get(slug)
+        except AdminRegistryError:
+            return BaseController.not_found()
+
+        _fetch_all, fetch_one = self._db()
+        row = get_row(resource, fetch_one, pk_value=pk_value)
+        if row is None:
+            return BaseController.not_found()
+        values = {
+            field: ("" if row.get(field) is None else row[field])
+            for field in resource.form_fields
+        }
+        return BaseController.render(
+            "admin/form.html",
+            context={
+                "resource": resource,
+                "fields": resource.form_fields,
+                "action": f"/admin/{resource.slug}/{pk_value}/edit",
+                "values": values,
+                "error": "",
+                "title": f"Modifier : {resource.label}",
+            },
+            request=request,
+        )
+
+    def resource_update(self, request: Request) -> Response:
+        """Mise à jour d'une ligne (`POST /admin/<slug>/<id>/edit`).
+
+        Mêmes garanties que la création : colonnes `form_fields` en liste
+        blanche, valeurs paramétrées, CSRF vérifié en amont. Succès → fiche.
+        """
+        slug = request.route("slug")
+        pk_value = request.route("id")
+        if slug is None or pk_value is None:
+            return BaseController.not_found()
+        try:
+            resource = self._registry.get(slug)
+        except AdminRegistryError:
+            return BaseController.not_found()
+
+        posted = BaseController.body(request)
+        params: list[str | None] = [
+            (value.strip() or None)
+            for value in (posted.get(field, "") for field in resource.form_fields)
+        ]
+        update_row(resource, self._execute_fn(), values=params, pk_value=pk_value)
+        return BaseController.redirect_with_flash(
+            request,
+            f"/admin/{resource.slug}/{pk_value}",
+            f"{resource.label} modifié.",
+        )
+
 
 def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None) -> None:
     """Branche les routes du back-office sur un Router Forge.
@@ -227,4 +296,16 @@ def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None)
         "/admin/{slug}/{id}",
         require_auth(controller.resource_detail),
         name="admin-resource-detail",
+    )
+    router.add(
+        "GET",
+        "/admin/{slug}/{id}/edit",
+        require_auth(controller.resource_edit),
+        name="admin-resource-edit",
+    )
+    router.add(
+        "POST",
+        "/admin/{slug}/{id}/edit",
+        require_auth(controller.resource_update),
+        name="admin-resource-update",
     )

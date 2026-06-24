@@ -75,6 +75,11 @@ jeton CSRF est vérifié. En cas de succès, redirection vers la fiche créée.
 À ce stade il n'y a pas de validation par champ (pas de contrat au runtime) :
 les contraintes restent celles de la base.
 
+L'édition (`GET`/`POST /admin/<slug>/<id>/edit`) pré-remplit le formulaire depuis
+la ligne existante puis fait un `UPDATE … WHERE <pk> = ?` (mêmes garanties que la
+création : colonnes en liste blanche, valeurs paramétrées, CSRF). La fiche détail
+propose un lien « Modifier ».
+
 ## `AdminRegistry`
 
 Le registre rassemble les ressources d'un projet.
