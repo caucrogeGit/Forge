@@ -48,3 +48,11 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-039](039-docs-information-architecture.md) | Refonte de l'architecture d'information de `docs/` (cœur) : un sujet = un emplacement canonique, tronc « Opt-ins officiels », dédoublonnages (proposé) |
 | [ADR-040](040-per-package-test-surface.md) | Surface de test par paquet opt-in : modèle hybride (transversal à la racine, smoke + unitaire dans le paquet), `testpaths = tests packages`, `importorskip` (accepté) |
 | [ADR-041](041-shared-test-support.md) | Infrastructure de test partagée (`forge-mvc-testing` dev-only, plugin pytest + `FakeRequest`) pour rendre les tests de paquet autonomes (proposé) |
+| [ADR-042](042-doc-core-optins-decoupling.md) | Découpler la documentation du cœur et celle des opt-ins (accepté) |
+| [ADR-043](043-core-cli-doc-embedding.md) | Documentation embarquée du cœur et du CLI ; renommage `forge_cli` → `cli` (accepté) |
+| [ADR-044](044-framework-only-repo.md) | Le dépôt Forge ne porte que le framework ; application racine relocalisée (accepté) |
+| [ADR-045](045-official-site-integration.md) | Intégrer la publication du site officiel dans Forge (accepté) |
+| [ADR-046](046-optin-jinja-template-loaders.md) | Registre de loaders de templates Jinja pour les opt-ins (accepté) |
+| [ADR-047](047-app-agent-guidance-layer.md) | Couche de guidance agent IA dans les applications Forge (accepté) |
+| [ADR-048](048-skeleton-welcome-projet.md) | Parcours d'accueil « welcome-projet » dans le squelette (accepté) |
+| [ADR-049](049-positioning-production-auditable.md) | Repositionnement : framework de production auditable (accepté) |
