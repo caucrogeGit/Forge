@@ -284,6 +284,26 @@ RBAC ajoute, par-dessus, un contrôle de **permission**, et reste un opt-in : `f
 
 Conséquence : `ADMIN-RBAC-INTEGRATION-001` ajoute le paramètre `permission` à `register_admin_routes` et une garde de permission optionnelle, sans dépendance dure ni changement pour les projets qui ne l'activent pas.
 
+### Vérification (admin:doctor) (cadrage)
+
+`forge admin:doctor` ferme la boucle de l'accès aux données : il rapproche les ressources déclarées du contrat d'entité réel, au temps CLI.
+
+- **Obtenir les ressources déclarées** : la commande importe le module du projet `mvc/admin/resources.py`, qui peuple le registre, puis lit `registry.all()`.
+  C'est la seule voie, les ressources étant des déclarations Python ; le précédent existe (le doctor auth importe des modules, le doctor du cœur charge `config.py` en isolation).
+  L'import se fait avec `sys.path` ajusté puis nettoyé.
+  Si `mvc/admin/resources.py` est absent : `skip` (conseiller `forge admin:init`).
+  Si l'import échoue ou qu'une `AdminResourceError` est levée : `fail` (la déclaration est cassée).
+- **Lire le contrat d'entité** : au temps CLI via `cli/entities` (les contrats `mvc/entities/<snake>/<snake>.json`, normalisés), ce qui donne le nom d'entité, la table et les **colonnes physiques** (`column`) plus la clé primaire.
+- **Rapprochements** : pour chaque ressource, retrouver l'entité par son nom, puis vérifier que la table déclarée correspond, et que `list_fields`, `form_fields`, `order_by` et `pk` désignent des colonnes physiques présentes au contrat.
+  Rappel : ces champs sont des **noms de colonnes physiques** (ils entrent tels quels dans le `SELECT`), à rapprocher des `column` du contrat.
+- **Sévérité** : `fail` uniquement quand la déclaration ne charge pas (import cassé).
+  Tout écart avec le contrat est un `warn` : le contrat peut être en retard sur la base, et l'admin interroge la table directement, donc une divergence n'est pas forcément une panne.
+  Le code de sortie est 1 seulement s'il y a un `fail`.
+- **Sortie** : lignes `[OK]`/`[WARN]`/`[FAIL]`/`[SKIP]` puis un résumé, à l'image du doctor du cœur et de `audio:doctor`.
+- **Câblage CLI** : `admin:doctor` se branche comme `admin:init` (dispatch dans `forge.py`, entrées d'aide, liste figée des commandes) ; le namespace `admin:` est déjà exclu de la référence CLI du cœur (ADR-042).
+
+Conséquence : `ADMIN-DOCTOR-001` ajoute `forge admin:doctor` (lecture seule, aucune connexion base) et son aide ; il ne lit pas la base, seulement les contrats et les déclarations.
+
 ---
 
 ## 8. Commandes futures envisagées
