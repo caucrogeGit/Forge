@@ -26,6 +26,7 @@ from forge_mvc_admin.query import (
     FetchOne,
     Insert,
     count_rows,
+    delete_row,
     detail_columns,
     get_row,
     insert_row,
@@ -254,6 +255,58 @@ class AdminController:
             f"{resource.label} modifié.",
         )
 
+    def resource_confirm_delete(self, request: Request) -> Response:
+        """Page de confirmation de suppression (`GET /admin/<slug>/<id>/delete`).
+
+        En lecture seule : ne supprime rien, affiche la ligne et un formulaire
+        POST. La suppression effective passe par `resource_delete`.
+        """
+        slug = request.route("slug")
+        pk_value = request.route("id")
+        if slug is None or pk_value is None:
+            return BaseController.not_found()
+        try:
+            resource = self._registry.get(slug)
+        except AdminRegistryError:
+            return BaseController.not_found()
+
+        _fetch_all, fetch_one = self._db()
+        row = get_row(resource, fetch_one, pk_value=pk_value)
+        if row is None:
+            return BaseController.not_found()
+        return BaseController.render(
+            "admin/delete.html",
+            context={
+                "resource": resource,
+                "columns": detail_columns(resource),
+                "row": row,
+                "action": f"/admin/{resource.slug}/{pk_value}/delete",
+            },
+            request=request,
+        )
+
+    def resource_delete(self, request: Request) -> Response:
+        """Suppression d'une ligne (`POST /admin/<slug>/<id>/delete`).
+
+        Action de mutation : toujours en POST, CSRF vérifié en amont. Succès →
+        redirection vers la liste avec flash.
+        """
+        slug = request.route("slug")
+        pk_value = request.route("id")
+        if slug is None or pk_value is None:
+            return BaseController.not_found()
+        try:
+            resource = self._registry.get(slug)
+        except AdminRegistryError:
+            return BaseController.not_found()
+
+        delete_row(resource, self._execute_fn(), pk_value=pk_value)
+        return BaseController.redirect_with_flash(
+            request,
+            f"/admin/{resource.slug}",
+            f"{resource.label} supprimé.",
+        )
+
 
 def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None) -> None:
     """Branche les routes du back-office sur un Router Forge.
@@ -308,4 +361,16 @@ def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None)
         "/admin/{slug}/{id}/edit",
         require_auth(controller.resource_update),
         name="admin-resource-update",
+    )
+    router.add(
+        "GET",
+        "/admin/{slug}/{id}/delete",
+        require_auth(controller.resource_confirm_delete),
+        name="admin-resource-delete-confirm",
+    )
+    router.add(
+        "POST",
+        "/admin/{slug}/{id}/delete",
+        require_auth(controller.resource_delete),
+        name="admin-resource-delete",
     )

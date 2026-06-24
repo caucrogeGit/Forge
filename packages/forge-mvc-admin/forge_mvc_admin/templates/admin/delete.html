@@ -1,0 +1,17 @@
+{% extends "admin/layout.html" %}
+{% block title %}Supprimer {{ resource.label }}{% endblock %}
+{% block content %}
+  <p><a href="/admin/{{ resource.slug }}/{{ row[resource.pk] }}">← Annuler</a></p>
+  <h2>Supprimer {{ resource.label }} ?</h2>
+  <p>Cette action est irréversible.</p>
+  <dl>
+    {% for column in columns %}
+      <dt>{{ column }}</dt>
+      <dd>{{ row[column] }}</dd>
+    {% endfor %}
+  </dl>
+  <form method="post" action="{{ action }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">Supprimer définitivement</button>
+  </form>
+{% endblock %}

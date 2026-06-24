@@ -85,6 +85,13 @@
   `core.database.db.execute`) `WHERE <pk> = ? LIMIT 1` ; CSRF vérifié ; succès →
   redirection vers la fiche avec flash. La fiche détail propose un lien
   « Modifier ». Template `admin/form.html` réutilisé.
+- **Suppression contrôlée depuis Forge Admin** (`ADMIN-DELETE-ACTION-001`).
+  `GET /admin/<slug>/<id>/delete` affiche une page de confirmation en lecture
+  seule ; seul `POST /admin/<slug>/<id>/delete` exécute
+  `DELETE … WHERE <pk> = ? LIMIT 1` (jamais en GET, CSRF vérifié, via
+  `core.database.db.execute`), puis redirige vers la liste avec flash. Routes
+  nommées, non publiques. Template embarqué `admin/delete.html` ; la fiche détail
+  propose un lien « Supprimer ».
 
 
 ## [1.0.0-beta.17] — 2026-06-18

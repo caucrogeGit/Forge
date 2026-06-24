@@ -9,5 +9,9 @@
       <dd>{{ row[column] }}</dd>
     {% endfor %}
   </dl>
-  <p><a href="/admin/{{ resource.slug }}/{{ row[resource.pk] }}/edit">Modifier</a></p>
+  <p>
+    <a href="/admin/{{ resource.slug }}/{{ row[resource.pk] }}/edit">Modifier</a>
+    ·
+    <a href="/admin/{{ resource.slug }}/{{ row[resource.pk] }}/delete">Supprimer</a>
+  </p>
 {% endblock %}

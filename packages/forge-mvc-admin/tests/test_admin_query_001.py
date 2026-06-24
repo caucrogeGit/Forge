@@ -13,11 +13,13 @@ pytest.importorskip("forge_mvc_admin")
 from forge_mvc_admin import AdminResource
 from forge_mvc_admin.query import (
     build_count_sql,
+    build_delete_sql,
     build_get_sql,
     build_insert_sql,
     build_list_sql,
     build_update_sql,
     count_rows,
+    delete_row,
     detail_columns,
     get_row,
     insert_row,
@@ -151,3 +153,19 @@ def test_update_row_valeurs_puis_cle():
     assert affected == 1
     # valeurs des champs d'abord, clé primaire en dernier
     assert captured["params"] == ("Bonjour", None, "5")
+
+
+def test_build_delete_sql():
+    assert build_delete_sql(_resource()) == "DELETE FROM articles WHERE id = ? LIMIT 1"
+
+
+def test_delete_row_passe_la_cle():
+    captured: dict[str, Any] = {}
+
+    def fake_execute(sql: str, params: Any) -> int:
+        captured["params"] = params
+        return 1
+
+    affected = delete_row(_resource(), fake_execute, pk_value="5")
+    assert affected == 1
+    assert captured["params"] == ("5",)

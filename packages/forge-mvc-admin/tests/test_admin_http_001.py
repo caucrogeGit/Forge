@@ -102,6 +102,19 @@ def test_register_admin_routes_edition():
     assert post_edit[0].public is False
 
 
+def test_register_admin_routes_suppression():
+    router = Router()
+    register_admin_routes(router, registry=AdminRegistry())
+    get_confirm = router.match("GET", "/admin/articles/5/delete")
+    assert get_confirm is not None
+    assert get_confirm[0].name == "admin-resource-delete-confirm"
+    assert get_confirm[0].public is False
+    post_delete = router.match("POST", "/admin/articles/5/delete")
+    assert post_delete is not None
+    assert post_delete[0].name == "admin-resource-delete"
+    assert post_delete[0].public is False
+
+
 def test_dashboard_template_liste_les_ressources(tmp_path: Path):
     views = tmp_path / "views"
     views.mkdir()
@@ -166,8 +179,29 @@ def test_detail_template_affiche_les_champs(tmp_path: Path):
     )
     assert "<dt>title</dt>" in html
     assert "Bonjour" in html
-    # lien vers l'édition (clé primaire = id)
+    # liens vers l'édition et la suppression (clé primaire = id)
     assert "/admin/articles/5/edit" in html
+    assert "/admin/articles/5/delete" in html
+
+
+def test_delete_template_confirmation(tmp_path: Path):
+    views = tmp_path / "views"
+    views.mkdir()
+    renderer = Jinja2Renderer(str(views))
+    html = renderer.render(
+        "admin/delete.html",
+        {
+            "resource": _resource(),
+            "columns": ("id", "title"),
+            "row": {"id": 5, "title": "Bonjour"},
+            "action": "/admin/articles/5/delete",
+            "csrf_token": "tok123",
+        },
+    )
+    assert "irréversible" in html
+    assert 'method="post"' in html
+    assert 'action="/admin/articles/5/delete"' in html
+    assert "tok123" in html
 
 
 def test_form_template_affiche_les_champs_et_csrf(tmp_path: Path):

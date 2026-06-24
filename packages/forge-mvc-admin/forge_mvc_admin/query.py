@@ -123,6 +123,23 @@ def update_row(
     return execute(build_update_sql(resource), (*tuple(values), pk_value))
 
 
+def build_delete_sql(resource: AdminResource) -> str:
+    """`DELETE FROM <table> WHERE <pk> = ? LIMIT 1`."""
+    table = _ident(resource.table)
+    pk = _ident(resource.pk)
+    return f"DELETE FROM {table} WHERE {pk} = ? LIMIT 1"
+
+
+def delete_row(
+    resource: AdminResource,
+    execute: Execute,
+    *,
+    pk_value: Any,
+) -> int:
+    """Supprime la ligne `pk_value`. Retourne le nombre de lignes affectées (0 si absente)."""
+    return execute(build_delete_sql(resource), (pk_value,))
+
+
 def count_rows(resource: AdminResource, fetch_one: FetchOne) -> int:
     """Nombre total de lignes de la table de la ressource."""
     row = fetch_one(build_count_sql(resource), ())
