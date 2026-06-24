@@ -22,6 +22,7 @@ def _valid() -> AdminResource:
         plural_label="Articles",
         list_fields=("title", "published_at"),
         form_fields=("title", "body"),
+        table="articles",
     )
 
 
@@ -74,3 +75,20 @@ def test_nom_de_champ_invalide(bad_field: str):
 def test_champ_en_double_refuse():
     with pytest.raises(AdminResourceError):
         dataclasses.replace(_valid(), form_fields=("title", "title"))
+
+
+@pytest.mark.parametrize("bad_table", ["Articles", "art icles", "art-icles", "1articles", ""])
+def test_table_invalide(bad_table: str):
+    with pytest.raises(AdminResourceError):
+        dataclasses.replace(_valid(), table=bad_table)
+
+
+@pytest.mark.parametrize("bad_order", ["Title", "title; DROP", "title-x"])
+def test_order_by_invalide(bad_order: str):
+    with pytest.raises(AdminResourceError):
+        dataclasses.replace(_valid(), order_by=bad_order)
+
+
+def test_order_by_vide_autorise():
+    # order_by vide est valide : le premier champ de list_fields sera utilisé.
+    assert dataclasses.replace(_valid(), order_by="").order_by == ""

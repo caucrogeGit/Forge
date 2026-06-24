@@ -1,0 +1,29 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ resource.plural_label }}{% endblock %}
+{% block content %}
+  <p><a href="/admin">← Tableau de bord</a></p>
+  <h2>{{ resource.plural_label }}</h2>
+  {% if rows %}
+    <table>
+      <thead>
+        <tr>
+          {% for column in columns %}<th>{{ column }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            {% for column in columns %}<td>{{ row[column] }}</td>{% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <nav>
+      {% if pagination.has_prev %}<a href="/admin/{{ resource.slug }}?page={{ pagination.prev_page }}">Précédent</a>{% endif %}
+      <span>Page {{ pagination.page }} / {{ pagination.nb_pages }}</span>
+      {% if pagination.has_next %}<a href="/admin/{{ resource.slug }}?page={{ pagination.next_page }}">Suivant</a>{% endif %}
+    </nav>
+  {% else %}
+    <p>Aucune ligne.</p>
+  {% endif %}
+{% endblock %}

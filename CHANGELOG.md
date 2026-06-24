@@ -50,6 +50,17 @@
   embarqué `admin/dashboard.html` listant les ressources du registre ; le paquet
   enregistre son `PackageLoader` auprès du cœur (ADR-046), et un projet peut
   surcharger le template via `mvc/views/admin/dashboard.html`.
+- **Vue liste Forge Admin** (`ADMIN-LIST-VIEW-001`). Route `GET /admin/<slug>`
+  (nommée `admin-resource-list`, non publique) affichant une liste paginée des
+  lignes d'une entité. `AdminResource` gagne `table` (table physique) et
+  `order_by` (tri par défaut). La requête est un `SELECT` contraint construit
+  dans le châssis (`query.py`) : table, colonnes et tri sont des identifiants
+  validés en liste blanche (jamais paramétrables), seules les bornes de
+  pagination passent en paramètres `?` ; pagination via `core` `Pagination` ;
+  `fetch_all`/`fetch_one` injectables (résolus paresseusement vers
+  `core.database.db`). Template embarqué `admin/list.html` (surchargeable). Ni
+  ORM ni introspection ; le rapprochement avec le contrat d'entité réel reste du
+  ressort de `admin:doctor`.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

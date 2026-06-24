@@ -38,10 +38,15 @@ class AdminResource:
         plural_label : libellé pluriel. Exemple : ``"Articles"``.
         list_fields : noms de champs affichés en liste (au moins un, snake_case).
         form_fields : noms de champs éditables en formulaire (au moins un).
+        table : nom de la table physique (snake_case). Non dérivable du nom
+            d'entité, donc déclaré explicitement. Exemple : ``"articles"``.
+        order_by : colonne de tri par défaut de la liste (snake_case). Vide par
+            défaut : le premier champ de ``list_fields`` est alors utilisé.
 
     Le contrat valide sa propre forme à la construction et lève
-    `AdminResourceError` en cas d'incohérence. Il ne vérifie pas que l'entité ou
-    les champs existent réellement : c'est le rôle d'une vérification ultérieure.
+    `AdminResourceError` en cas d'incohérence. Il ne vérifie pas que l'entité, la
+    table ou les champs existent réellement : c'est le rôle d'une vérification
+    ultérieure (`admin:doctor`).
     """
 
     entity: str
@@ -50,6 +55,8 @@ class AdminResource:
     plural_label: str
     list_fields: tuple[str, ...]
     form_fields: tuple[str, ...]
+    table: str
+    order_by: str = ""
 
     def __post_init__(self) -> None:
         if not _ENTITY_RE.match(self.entity):
@@ -67,6 +74,14 @@ class AdminResource:
             raise AdminResourceError("plural_label vide.")
         _validate_fields("list_fields", self.list_fields)
         _validate_fields("form_fields", self.form_fields)
+        if not _FIELD_RE.match(self.table):
+            raise AdminResourceError(
+                f"table invalide : {self.table!r} (snake_case attendu, ex. 'articles')."
+            )
+        if self.order_by and not _FIELD_RE.match(self.order_by):
+            raise AdminResourceError(
+                f"order_by invalide : {self.order_by!r} (snake_case attendu)."
+            )
 
 
 def _validate_fields(kind: str, names: tuple[str, ...]) -> None:

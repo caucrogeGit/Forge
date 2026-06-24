@@ -58,6 +58,7 @@ dans le registre. Adaptez l'exemple à vos entités, puis décommentez-le.
         plural_label="Articles",
         list_fields=("title", "published_at"),
         form_fields=("title", "body"),
+        table="articles",
     ))
 """
 '''

@@ -22,6 +22,7 @@ def _resource(slug: str, entity: str) -> AdminResource:
         plural_label=f"{entity}s",
         list_fields=("name",),
         form_fields=("name",),
+        table=slug.replace("-", "_"),
     )
 
 
