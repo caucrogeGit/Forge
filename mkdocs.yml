@@ -275,6 +275,7 @@ nav:
             - ADR-043 Doc embarquée cœur/CLI, renommage cli: adr/043-core-cli-doc-embedding.md
             - ADR-044 Le dépôt ne porte que le framework: adr/044-framework-only-repo.md
             - ADR-045 Intégrer la publication du site officiel: adr/045-official-site-integration.md
+            - ADR-046 Loaders de templates Jinja pour opt-ins: adr/046-optin-jinja-template-loaders.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

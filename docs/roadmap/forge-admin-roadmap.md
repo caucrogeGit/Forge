@@ -139,6 +139,11 @@ Dépendances attendues :
 - templates Jinja ;
 - conventions de fichiers générés et de fichiers manuels.
 
+Une dépendance technique a été identifiée au cadrage de l'intégration HTTP : pour
+servir des templates embarqués dans le paquet, le cœur doit exposer un registre
+de loaders Jinja ([ADR-046](../adr/046-optin-jinja-template-loaders.md)).
+C'est un prérequis du dashboard et des vues (ticket `CORE-JINJA-OPTIN-LOADERS-001`).
+
 Certains tickets Forge Admin peuvent attendre la stabilisation des contrats JSON.
 La trajectoire des contrats est suivie dans la [roadmap des contrats JSON](roadmap-forge-contrats-json-schema.md).
 
@@ -217,6 +222,19 @@ Les noms de fichiers et les frontières exactes seront validés par les tickets 
 
 Forge Admin génère des fichiers nouveaux ou affiche du code à copier, mais ne réécrit jamais silencieusement un fichier applicatif existant.
 
+### Intégration HTTP (cadrage)
+
+L'essentiel du stack HTTP de Forge est déjà disponible et réutilisé tel quel.
+
+- **Routes** : le paquet expose `register_admin_routes(router, *, registry=None)`.
+  L'application le monte explicitement (`optins/admin/routes.py` -> `optins/registry.py` -> `mvc/routes.py`), conformément à l'ADR-030 et au principe 9.
+  Aucune injection silencieuse de routes.
+- **Surface visée** : `GET /admin` (dashboard), puis `/admin/<slug>`, `/admin/<slug>/<id>`, `/admin/<slug>/new`, `/admin/<slug>/<id>/edit`, `POST /admin/<slug>/<id>/delete`, ajoutées au fil des tickets de vues.
+- **Contrôleur** : un `AdminController` dans le paquet, rendu via `BaseController.render(...)` du cœur (qui injecte déjà `csrf_token` et les fournisseurs de contexte).
+- **Sécurité acquise par défaut** : les routes admin n'activent pas `public=True`, donc l'authentification s'applique automatiquement (`/admin` jamais public) ; la protection CSRF est automatique sur les méthodes non sûres ; l'intégration RBAC reste un hook optionnel (`forge-mvc-rbac` non requis).
+- **Templates embarqués** : le rendu de templates portés par le paquet nécessite un registre de loaders Jinja dans le cœur ([ADR-046](../adr/046-optin-jinja-template-loaders.md)).
+  L'ordre du `ChoiceLoader` (projet d'abord, paquet ensuite) fournit nativement la surcharge de gabarit (`ADMIN-TEMPLATE-OVERRIDE-001`).
+
 ---
 
 ## 8. Commandes futures envisagées
@@ -245,7 +263,8 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-OPTIN-DOCS-001 | documenter le positionnement de Forge Admin | **livré** (page embarquée `packages/forge-mvc-admin/docs/index.md`, montée sous `/admin/`) |
 | ADMIN-INIT-COMMAND-001 | ajouter `forge admin:init` | **livré** (commande write-if-new ; prépare `mvc/admin/__init__.py` + `resources.py`) |
 | ADMIN-RESOURCE-CONTRACT-001 | définir le contrat d'une ressource admin | **livré** (`AdminResource` + `AdminRegistry` dans le paquet, déclaration Python validée, registre explicite) |
-| ADMIN-DASHBOARD-MINIMAL-001 | afficher un dashboard admin minimal | à venir |
+| CORE-JINJA-OPTIN-LOADERS-001 | registre de loaders Jinja du cœur (ADR-046) : prérequis du rendu admin | à venir (prérequis cœur) |
+| ADMIN-DASHBOARD-MINIMAL-001 | afficher un dashboard admin minimal (dépend de CORE-JINJA-OPTIN-LOADERS-001) | à venir |
 | ADMIN-LIST-VIEW-001 | afficher une liste paginée pour une entité | à venir |
 | ADMIN-DETAIL-VIEW-001 | afficher le détail d'une entité | à venir |
 | ADMIN-FORM-NEW-001 | créer une entité depuis l'admin | à venir |
