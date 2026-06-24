@@ -66,7 +66,7 @@ Points clés du `mkdocs.yml` créé :
 |---|---|
 | `site_name` | `Forge` |
 | `site_description` | `Site officiel du framework web Python Forge` |
-| `site_author` | `Roger Cauchon` |
+| `site_author` | `Roger Lequette` |
 | **`site_url`** | **`https://forgemvc.com/`** (jamais GitHub Pages) |
 | `repo_name` | `caucrogeGit/Forge-web` |
 | `repo_url` | `https://github.com/caucrogeGit/Forge-web` |

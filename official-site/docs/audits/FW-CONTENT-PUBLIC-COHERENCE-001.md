@@ -193,7 +193,7 @@ Les pages Forge importées conservent leurs liens internes Markdown vers `charte
 Vérifié :
 
 - `LICENSE` racine Forge-web : **« All rights reserved unless explicitly stated otherwise. »** + mention explicite « The Forge framework itself is licensed separately in its own repository. »
-- `LICENSE` racine Forge core : **« Forge — Licence propriétaire / source disponible »**, copyright Roger Cauchon, tous droits réservés
+- `LICENSE` racine Forge core : **« Forge — Licence propriétaire / source disponible »**, copyright Roger Lequette, tous droits réservés
 - `docs/forge/licence.md` (importé) : documente clairement « licence propriétaire / source disponible » de Forge
 
 **Cohérence** : OK. Aucun risque de laisser croire que Forge-web change la licence de Forge core. Aucun emploi de « open source » ni « FOSS » dans les pages publiques.
