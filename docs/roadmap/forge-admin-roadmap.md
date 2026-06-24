@@ -148,38 +148,73 @@ Si le contrat de ressource admin dépend d'un point encore mouvant du contrat d'
 
 ## 7. Architecture cible de l'opt-in
 
-L'architecture ci-dessous est indicative.
-Elle devra être validée par les tickets d'implémentation, et non reprise telle quelle.
+Forge Admin suit une architecture **hybride et explicite**.
 
-Côté paquet opt-in :
+Trois directions étaient possibles :
+
+| Option | Conséquence |
+|---|---|
+| Runtime-registry (style EasyAdmin) | peu de fichiers côté projet, mais admin opaque et customisation difficile ; en tension avec les principes 3 et 9 |
+| Génération pure (style `make:crud`) | tout explicite et possédé par le développeur, mais beaucoup de fichiers et de la duplication entre ressources |
+| Hybride (retenue) | un châssis mince réutilisable dans le paquet, des contrôleurs de ressource générés et éditables côté projet |
+
+L'option hybride est retenue parce qu'elle respecte la charte sans imposer de duplication.
+Le paquet porte ce qui est stable et partagé.
+Le projet porte ce qui est spécifique et doit rester modifiable.
+
+### Couche 1 — châssis runtime (dans le paquet)
+
+Le châssis est un runtime mince, installé avec l'opt-in et non modifié par le projet.
+Il fournit la mécanique commune : layout, navigation, helpers de rendu liste et formulaire, mapping des types Forge vers des widgets, garde-fous de sécurité.
 
 ```text
 packages/forge-mvc-admin/
 ├── pyproject.toml
 ├── forge_mvc_admin/
 │   ├── __init__.py
-│   ├── dashboard.py
-│   ├── resources.py
-│   ├── registry.py
-│   ├── fields.py
-│   ├── actions.py
-│   ├── security.py
-│   ├── templates/
+│   ├── registry.py      # registre des ressources déclarées
+│   ├── dashboard.py     # rendu du tableau de bord
+│   ├── resources.py     # base d'une ressource admin
+│   ├── fields.py        # mapping type Forge -> widget
+│   ├── actions.py       # actions standard (list/new/edit/delete)
+│   ├── security.py      # auth requise, CSRF, hook RBAC
+│   ├── templates/       # gabarits par défaut, surchargeables
 │   └── static/
 └── tests/
 ```
 
-Côté projet Forge généré :
+Le châssis reste minimal.
+Il ne contient aucune connaissance des entités d'un projet donné.
+
+### Couche 2 — contrôleurs de ressource générés (dans le projet)
+
+À l'inverse, ce qui est propre à une entité est **généré** dans le projet, à partir de son contrat JSON, puis possédé par le développeur.
 
 ```text
 mvc/admin/
-├── dashboard.py
-├── resources.py
+├── dashboard.py         # branchement du dashboard du projet
+├── resources.py         # déclaration des ressources administrables
 └── templates/
-    └── admin/
+    └── admin/           # surcharges de gabarits propres au projet
 ```
 
-Le code côté projet reste sous contrôle du développeur.
+`forge admin:resource Article` génère la déclaration de ressource et, au besoin, son contrôleur.
+Le code produit est lisible et reste éditable : il s'appuie sur le châssis mais n'est jamais regénéré par-dessus les modifications du développeur.
+
+### Répartition des responsabilités
+
+| Aspect | Châssis (paquet) | Ressource (projet) |
+|---|---|---|
+| Layout, navigation, rendu commun | oui | non |
+| Sécurité par défaut (auth, CSRF, hook RBAC) | oui | configurable |
+| Mapping type Forge -> widget | oui | surchargeable |
+| Choix des entités administrables | non | oui (explicite) |
+| Colonnes, filtres, libellés | défauts | oui |
+| Surcharge de gabarit | base | oui |
+
+Cette structure est une cible.
+Les noms de fichiers et les frontières exactes seront validés par les tickets d'implémentation.
+
 Forge Admin génère des fichiers nouveaux ou affiche du code à copier, mais ne réécrit jamais silencieusement un fichier applicatif existant.
 
 ---
