@@ -239,23 +239,23 @@ Le nommage et le périmètre exacts seront tranchés par les tickets corresponda
 Le futur travail est découpé en petits tickets, une responsabilité chacun.
 Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comme une spec complète.
 
-| Ticket | Objectif |
-|---|---|
-| ADMIN-OPTIN-PACKAGE-001 | créer le paquet `forge-mvc-admin` vide et installable |
-| ADMIN-OPTIN-DOCS-001 | documenter le positionnement de Forge Admin |
-| ADMIN-INIT-COMMAND-001 | ajouter `forge admin:init` |
-| ADMIN-RESOURCE-CONTRACT-001 | définir le contrat d'une ressource admin |
-| ADMIN-DASHBOARD-MINIMAL-001 | afficher un dashboard admin minimal |
-| ADMIN-LIST-VIEW-001 | afficher une liste paginée pour une entité |
-| ADMIN-DETAIL-VIEW-001 | afficher le détail d'une entité |
-| ADMIN-FORM-NEW-001 | créer une entité depuis l'admin |
-| ADMIN-FORM-EDIT-001 | modifier une entité depuis l'admin |
-| ADMIN-DELETE-ACTION-001 | supprimer une entité avec garde-fous |
-| ADMIN-CSRF-SECURITY-001 | verrouiller les actions sensibles avec CSRF |
-| ADMIN-RBAC-INTEGRATION-001 | intégrer RBAC si l'opt-in est installé |
-| ADMIN-TEMPLATE-OVERRIDE-001 | permettre la surcharge explicite des templates |
-| ADMIN-DOCTOR-001 | ajouter `forge admin:doctor` |
-| ADMIN-CLOSING-AUDIT-001 | clôturer la roadmap Forge Admin |
+| Ticket | Objectif | État |
+|---|---|---|
+| ADMIN-OPTIN-PACKAGE-001 | créer le paquet `forge-mvc-admin` vide et installable | **livré** (scaffold : paquet installable, `__version__`, `py.typed`, smoke test) |
+| ADMIN-OPTIN-DOCS-001 | documenter le positionnement de Forge Admin | à venir |
+| ADMIN-INIT-COMMAND-001 | ajouter `forge admin:init` | à venir |
+| ADMIN-RESOURCE-CONTRACT-001 | définir le contrat d'une ressource admin | à venir |
+| ADMIN-DASHBOARD-MINIMAL-001 | afficher un dashboard admin minimal | à venir |
+| ADMIN-LIST-VIEW-001 | afficher une liste paginée pour une entité | à venir |
+| ADMIN-DETAIL-VIEW-001 | afficher le détail d'une entité | à venir |
+| ADMIN-FORM-NEW-001 | créer une entité depuis l'admin | à venir |
+| ADMIN-FORM-EDIT-001 | modifier une entité depuis l'admin | à venir |
+| ADMIN-DELETE-ACTION-001 | supprimer une entité avec garde-fous | à venir |
+| ADMIN-CSRF-SECURITY-001 | verrouiller les actions sensibles avec CSRF | à venir |
+| ADMIN-RBAC-INTEGRATION-001 | intégrer RBAC si l'opt-in est installé | à venir |
+| ADMIN-TEMPLATE-OVERRIDE-001 | permettre la surcharge explicite des templates | à venir |
+| ADMIN-DOCTOR-001 | ajouter `forge admin:doctor` | à venir |
+| ADMIN-CLOSING-AUDIT-001 | clôturer la roadmap Forge Admin | à venir |
 
 L'ordre est indicatif.
 Les tickets de contrat et de sécurité conditionnent les tickets de vues et d'actions.

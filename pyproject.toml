@@ -113,6 +113,7 @@ include = ["core*", "cli*", "integrations*"]
 # éditables PEP 660, on lui donne donc les sources directement.
 include = [
     "core",
+    "packages/forge-mvc-admin/forge_mvc_admin",
     "packages/forge-mvc-audio/forge_mvc_audio",
     "packages/forge-mvc-files/forge_mvc_files",
     "packages/forge-mvc-i18n/forge_mvc_i18n",
@@ -127,6 +128,7 @@ include = [
     "packages/forge-mvc-workflow/forge_mvc_workflow",
 ]
 extraPaths = [
+    "packages/forge-mvc-admin",
     "packages/forge-mvc-audio",
     "packages/forge-mvc-files",
     "packages/forge-mvc-i18n",

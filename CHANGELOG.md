@@ -3,6 +3,17 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Paquet opt-in `forge-mvc-admin` (scaffold)** (`ADMIN-OPTIN-PACKAGE-001`).
+  Premier pas de la roadmap Forge Admin : un paquet installable mais
+  volontairement vide, qui pose le contrat de version (`__version__`), le
+  marqueur de typage `py.typed` (PEP 561) et un smoke test. Aucune API
+  fonctionnelle n'est encore exposée ; le châssis d'administration, le registre
+  de ressources et les vues viendront par les tickets `ADMIN-*` suivants.
+  Le paquet est ajouté au cliquet pyright (`[tool.pyright]`, ADR-036). Forge
+  Core n'en dépend pas. Voir `docs/roadmap/forge-admin-roadmap.md`.
+
 
 ## [1.0.0-beta.17] — 2026-06-18
 
