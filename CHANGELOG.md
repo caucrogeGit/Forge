@@ -92,6 +92,12 @@
   `core.database.db.execute`), puis redirige vers la liste avec flash. Routes
   nommées, non publiques. Template embarqué `admin/delete.html` ; la fiche détail
   propose un lien « Supprimer ».
+- **Garde-fou de sécurité Forge Admin** (`ADMIN-CSRF-SECURITY-001`). Test
+  verrouillant les invariants des routes du back-office : aucune route `/admin`
+  n'est publique ; toute mutation (méthode non sûre) exige le CSRF ; les routes
+  GET ne le demandent pas ; toutes redirigent un visiteur non authentifié vers
+  `/login` (`@require_auth`, vérifié avec `FakeRequest`). Empêche l'ajout futur
+  d'une route admin publique, sans CSRF ou sans authentification.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

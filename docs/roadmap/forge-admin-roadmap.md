@@ -302,7 +302,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-FORM-NEW-001 | créer une entité depuis l'admin (`GET`/`POST /admin/<slug>/new`, INSERT liste blanche, CSRF, PRG) | **livré** |
 | ADMIN-FORM-EDIT-001 | modifier une entité depuis l'admin (`GET`/`POST /admin/<slug>/<id>/edit`, UPDATE liste blanche `WHERE <pk> = ?`) | **livré** |
 | ADMIN-DELETE-ACTION-001 | supprimer une entité avec garde-fous (confirmation GET + `POST /admin/<slug>/<id>/delete`, `DELETE … WHERE <pk> = ?`) | **livré** |
-| ADMIN-CSRF-SECURITY-001 | verrouiller les actions sensibles avec CSRF | à venir |
+| ADMIN-CSRF-SECURITY-001 | verrouiller les actions sensibles avec CSRF (garde-fou : routes non publiques, mutations POST+CSRF, auth exigée) | **livré** |
 | ADMIN-RBAC-INTEGRATION-001 | intégrer RBAC si l'opt-in est installé | à venir |
 | ADMIN-TEMPLATE-OVERRIDE-001 | permettre la surcharge explicite des templates | à venir |
 | ADMIN-DOCTOR-001 | ajouter `forge admin:doctor` | à venir |
