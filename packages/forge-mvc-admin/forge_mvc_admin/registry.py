@@ -41,6 +41,11 @@ class AdminRegistry:
         """Retourne les ressources dans leur ordre d'enregistrement."""
         return tuple(self._by_slug.values())
 
+    def clear(self) -> None:
+        """Vide le registre (toutes les ressources). Utilisé par `admin:doctor`
+        pour repartir d'un état propre avant de réimporter les déclarations."""
+        self._by_slug.clear()
+
     def __contains__(self, slug: object) -> bool:
         return slug in self._by_slug
 

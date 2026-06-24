@@ -76,6 +76,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "audio:doctor",
     # Admin (module opt-in forge-mvc-admin)
     "admin:init",
+    "admin:doctor",
     # Opt-ins (branchement projet)
     "opt-in:install", "opt-in:remove", "opt-in:enable", "opt-in:disable", "opt-in:list",
     # Documentation

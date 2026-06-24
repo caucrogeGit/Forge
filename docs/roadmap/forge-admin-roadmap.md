@@ -342,7 +342,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | ADMIN-CSRF-SECURITY-001 | verrouiller les actions sensibles avec CSRF (garde-fou : routes non publiques, mutations POST+CSRF, auth exigée) | **livré** |
 | ADMIN-RBAC-INTEGRATION-001 | intégrer RBAC si l'opt-in est installé (opt-in explicite `register_admin_routes(permission=...)`, gate global, fail-open) | **livré** |
 | ADMIN-TEMPLATE-OVERRIDE-001 | permettre la surcharge explicite des templates (acquis via l'ordre du loader ADR-046 ; documenté + test) | **livré** |
-| ADMIN-DOCTOR-001 | ajouter `forge admin:doctor` | à venir |
+| ADMIN-DOCTOR-001 | ajouter `forge admin:doctor` (rapproche ressources ↔ contrats d'entité, lecture seule ; fail si déclaration cassée, warn sur écart) | **livré** |
 | ADMIN-CLOSING-AUDIT-001 | clôturer la roadmap Forge Admin | à venir |
 
 L'ordre est indicatif.

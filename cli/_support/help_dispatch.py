@@ -120,6 +120,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "audio:doctor":     "Diagnostic du module audio (package, config, présence ffmpeg/ffprobe).",
     # Admin
     "admin:init":       "Prépare la structure mvc/admin/ du back-office (write-if-new, sans écrasement).",
+    "admin:doctor":     "Vérifie la cohérence des ressources admin avec les contrats d'entité (lecture seule).",
     # Opt-ins (branchement projet)
     "opt-in:install":   "Affiche la commande d'installation du package d'un opt-in officiel.",
     "opt-in:remove":    "Affiche la commande de désinstallation du package d'un opt-in officiel.",
@@ -383,6 +384,25 @@ Prérequis:
 
 Code de sortie:
   0 si la structure est prête ; 1 si `mvc/` est absent (pas un projet Forge).
+""",
+    "admin:doctor": """\
+Usage:
+  forge admin:doctor        # rapproche les ressources admin des contrats d'entité
+
+Description:
+  Diagnostic du back-office Forge Admin (module opt-in `forge-mvc-admin`).
+  Lecture seule : importe `mvc/admin/resources.py` pour lire les ressources
+  déclarées, lit les contrats `mvc/entities/*/*.json`, et signale les écarts
+  (entité introuvable, table ou colonnes divergentes). Aucune connexion base.
+
+Comportement:
+  - `fail` seulement si `mvc/admin/resources.py` ne charge pas (déclaration cassée) ;
+  - tout écart avec un contrat est un `warn` (le contrat peut être en retard sur
+    la base, et l'admin interroge la table directement) ;
+  - `skip` si `mvc/admin/resources.py` est absent (lance `forge admin:init`).
+
+Code de sortie:
+  0 si aucun `fail` ; 1 sinon.
 """,
     "video:init": """\
 Usage:

@@ -112,6 +112,14 @@
   delete) en plaçant un fichier de même chemin sous `mvc/views/admin/`. Propriété
   acquise par l'ordre des loaders (projet d'abord, paquet ensuite, ADR-046),
   désormais couverte par un test et la doc embarquée.
+- **Commande `forge admin:doctor`** (`ADMIN-DOCTOR-001`). Rapproche les ressources
+  admin déclarées (`mvc/admin/resources.py`, importé pour peupler le registre)
+  des contrats d'entité du projet (`mvc/entities/*/*.json`, lus directement) :
+  signale entité introuvable, table ou colonnes divergentes. Lecture seule,
+  aucune connexion base. Sévérité : `fail` si la déclaration ne charge pas,
+  `warn` pour tout écart au contrat (qui peut être en retard sur la base),
+  `skip` si `mvc/admin/resources.py` est absent. Code de sortie 1 seulement sur
+  `fail`. Ferme la boucle de l'accès aux données par mapping déclaré.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

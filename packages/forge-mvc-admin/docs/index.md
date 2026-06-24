@@ -72,6 +72,19 @@ forge admin:init
 À ce stade du châssis, aucune vue ni template ne sont générés : ils viendront
 avec les tickets de dashboard et de rendu.
 
+`forge admin:doctor` vérifie la cohérence des ressources déclarées avec les
+contrats d'entité du projet (lecture seule, sans connexion base).
+
+```bash
+forge admin:doctor
+```
+
+Elle importe `mvc/admin/resources.py` pour lire les ressources, lit les contrats
+`mvc/entities/*/*.json`, et signale les écarts (entité introuvable, table ou
+colonnes divergentes).
+Un écart est un avertissement, pas une erreur : le contrat peut être en retard
+sur la base, que l'admin interroge directement.
+
 ## Brancher le back-office
 
 Le back-office expose ses routes via `register_admin_routes(router)`, appelé
