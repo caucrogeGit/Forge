@@ -294,6 +294,7 @@ def cmd_new(
     print(f"\nForge {_FORGE_VERSION} — nouveau projet : {project_name} [profil : {profile}]\n")
 
     node_warnings = []
+    agent_files: list[str] = []
     try:
         _materialize_skeleton(dest)
         _configure_env_files(dest, project_name, db_name)
@@ -301,6 +302,9 @@ def cmd_new(
         node_warnings = _setup_node_environment(dest)
         _generate_certificates(dest)
         Path(dest, "forge_profile.txt").write_text(profile + "\n", encoding="utf-8")
+        # Couche guidance agent IA (ADR-047) : CLAUDE.md, AGENTS.md, ADR-001.
+        from cli.agents import emit_app_agent_files
+        agent_files = emit_app_agent_files(Path(dest))
 
     except Exception as exc:
         shutil.rmtree(dest, ignore_errors=True)
@@ -322,6 +326,12 @@ def cmd_new(
         print("  Avertissements :")
         for warning in node_warnings:
             print(f"    - {warning}")
+        print()
+
+    if agent_files:
+        print("  Guidance agent IA (ADR-047) :")
+        for created in agent_files:
+            print(f"    - {created}")
         print()
 
     print("  Étapes suivantes :\n")
