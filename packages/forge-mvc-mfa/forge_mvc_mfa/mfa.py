@@ -226,7 +226,11 @@ def totp_provisioning_uri(
         raise ValueError("issuer_name doit etre une chaine non vide")
 
     totp = pyotp.TOTP(secret)
-    return totp.provisioning_uri(name=account_name, issuer_name=issuer_name)
+    # pyotp >= 2.10 ajoute des **kwargs non typés à provisioning_uri : le membre
+    # devient partiellement inconnu en mode strict. Le retour reste `str`.
+    return totp.provisioning_uri(  # pyright: ignore[reportUnknownMemberType]
+        name=account_name, issuer_name=issuer_name
+    )
 
 
 def create_totp_factor(
