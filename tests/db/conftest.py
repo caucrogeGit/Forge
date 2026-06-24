@@ -30,12 +30,14 @@ def _db_params() -> dict[str, object]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def real_db():
-    """Configure Forge sur la MariaDB de test et vérifie la connexion.
+    """Configure Forge sur la MariaDB de test et crée le pool UNE seule fois.
 
-    Réinitialise le pool global pour qu'il prenne la configuration de test, puis
-    le réinitialise en sortie pour ne pas fuiter vers d'autres tests.
+    Le connecteur mariadb tient un registre de pools nommés : recréer un pool de
+    même nom lève « Pool already exists ». La fixture est donc à portée session :
+    le pool est créé au premier test `db`, réutilisé par les suivants, puis fermé
+    proprement en fin de session.
     """
     import core.forge as forge
     from core.database import connection
@@ -50,17 +52,22 @@ def real_db():
         db_name=params["name"],
         db_pool_size=2,
     )
-    connection._pool = None  # forcer la ré-init du pool sur la configuration de test
 
     try:
-        probe = connection.get_connection()
+        probe = connection.get_connection()  # crée le pool nommé une fois
         connection.close_connection(probe)
     except Exception as error:  # noqa: BLE001 — toute erreur de connexion = base indisponible
-        connection._pool = None
         message = f"MariaDB de test injoignable : {error}"
         if _REQUIRE_DB:
             pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
         pytest.skip(message + " (test d'intégration sauté en local)")
 
     yield
-    connection._pool = None
+
+    pool = connection._pool
+    if pool is not None:
+        try:
+            pool.close()
+        except Exception:  # noqa: BLE001 — fermeture best-effort en fin de session
+            pass
+        connection._pool = None
