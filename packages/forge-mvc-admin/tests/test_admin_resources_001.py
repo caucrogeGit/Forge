@@ -92,3 +92,13 @@ def test_order_by_invalide(bad_order: str):
 def test_order_by_vide_autorise():
     # order_by vide est valide : le premier champ de list_fields sera utilisé.
     assert dataclasses.replace(_valid(), order_by="").order_by == ""
+
+
+def test_pk_par_defaut_id():
+    assert _valid().pk == "id"
+
+
+@pytest.mark.parametrize("bad_pk", ["Id", "article id", "article-id", ""])
+def test_pk_invalide(bad_pk: str):
+    with pytest.raises(AdminResourceError):
+        dataclasses.replace(_valid(), pk=bad_pk)

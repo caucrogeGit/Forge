@@ -54,6 +54,33 @@ def build_list_sql(resource: AdminResource) -> str:
     )
 
 
+def detail_columns(resource: AdminResource) -> tuple[str, ...]:
+    """Colonnes affichées en détail : pk, puis list_fields, puis form_fields (uniques)."""
+    ordered: list[str] = []
+    for column in (resource.pk, *resource.list_fields, *resource.form_fields):
+        if column not in ordered:
+            ordered.append(column)
+    return tuple(ordered)
+
+
+def build_get_sql(resource: AdminResource) -> str:
+    """`SELECT <colonnes> FROM <table> WHERE <pk> = ? LIMIT 1`."""
+    columns = ", ".join(_ident(col) for col in detail_columns(resource))
+    table = _ident(resource.table)
+    pk = _ident(resource.pk)
+    return f"SELECT {columns} FROM {table} WHERE {pk} = ? LIMIT 1"
+
+
+def get_row(
+    resource: AdminResource,
+    fetch_one: FetchOne,
+    *,
+    pk_value: Any,
+) -> "dict[str, Any] | None":
+    """Retourne la ligne dont la clé primaire vaut `pk_value`, ou None."""
+    return fetch_one(build_get_sql(resource), (pk_value,))
+
+
 def count_rows(resource: AdminResource, fetch_one: FetchOne) -> int:
     """Nombre total de lignes de la table de la ressource."""
     row = fetch_one(build_count_sql(resource), ())

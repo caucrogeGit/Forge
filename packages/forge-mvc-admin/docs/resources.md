@@ -35,6 +35,7 @@ réelle (existence de l'entité, des champs) relèvera d'une vérification ulté
 | `form_fields` | `tuple[str, ...]` | champs éditables en formulaire (au moins un) |
 | `table` | `str` | table physique (snake_case) ; non dérivable du nom d'entité |
 | `order_by` | `str` | colonne de tri par défaut (vide → premier `list_fields`) |
+| `pk` | `str` | colonne de clé primaire pour la vue détail (défaut `id`) |
 
 Règles de validation, sinon `AdminResourceError` :
 
@@ -42,7 +43,7 @@ Règles de validation, sinon `AdminResourceError` :
 - `slug` en minuscules, chiffres et tirets, commençant par une lettre ;
 - `label` et `plural_label` non vides ;
 - `list_fields` et `form_fields` non vides, chaque nom en snake_case, sans doublon ;
-- `table` en snake_case ; `order_by`, s'il est fourni, en snake_case.
+- `table` et `pk` en snake_case ; `order_by`, s'il est fourni, en snake_case.
 
 ```python
 from forge_mvc_admin import AdminResource
@@ -62,6 +63,10 @@ La liste (`GET /admin/<slug>`) construit un `SELECT` contraint à partir de ce
 contrat : seuls la table, les colonnes `list_fields` et la colonne de tri
 entrent dans la requête (identifiants validés en liste blanche), la pagination
 passe par des paramètres. Aucune introspection, pas d'ORM.
+
+La fiche détail (`GET /admin/<slug>/<id>`) lit une ligne par sa clé primaire
+(`WHERE <pk> = ?`, valeur paramétrée) et affiche `pk` puis `list_fields` puis
+`form_fields` (colonnes uniques).
 
 ## `AdminRegistry`
 

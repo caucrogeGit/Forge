@@ -1,0 +1,12 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ resource.label }}{% endblock %}
+{% block content %}
+  <p><a href="/admin/{{ resource.slug }}">← {{ resource.plural_label }}</a></p>
+  <h2>{{ resource.label }}</h2>
+  <dl>
+    {% for column in columns %}
+      <dt>{{ column }}</dt>
+      <dd>{{ row[column] }}</dd>
+    {% endfor %}
+  </dl>
+{% endblock %}

@@ -51,6 +51,18 @@ def test_register_admin_routes_liste_protegee():
     assert params.get("slug") == "articles"
 
 
+def test_register_admin_routes_detail_protege():
+    router = Router()
+    register_admin_routes(router, registry=AdminRegistry())
+    matched = router.match("GET", "/admin/articles/5")
+    assert matched is not None, "GET /admin/<slug>/<id> doit être enregistrée"
+    route, params = matched
+    assert route.name == "admin-resource-detail"
+    assert route.public is False
+    assert params.get("slug") == "articles"
+    assert params.get("id") == "5"
+
+
 def test_dashboard_template_liste_les_ressources(tmp_path: Path):
     views = tmp_path / "views"
     views.mkdir()
@@ -99,3 +111,19 @@ def test_list_template_etat_vide(tmp_path: Path):
         },
     )
     assert "Aucune ligne" in html
+
+
+def test_detail_template_affiche_les_champs(tmp_path: Path):
+    views = tmp_path / "views"
+    views.mkdir()
+    renderer = Jinja2Renderer(str(views))
+    html = renderer.render(
+        "admin/detail.html",
+        {
+            "resource": _resource(),
+            "columns": ("id", "title"),
+            "row": {"id": 5, "title": "Bonjour"},
+        },
+    )
+    assert "<dt>title</dt>" in html
+    assert "Bonjour" in html

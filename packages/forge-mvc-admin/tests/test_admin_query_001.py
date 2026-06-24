@@ -13,8 +13,11 @@ pytest.importorskip("forge_mvc_admin")
 from forge_mvc_admin import AdminResource
 from forge_mvc_admin.query import (
     build_count_sql,
+    build_get_sql,
     build_list_sql,
     count_rows,
+    detail_columns,
+    get_row,
     list_rows,
 )
 
@@ -75,3 +78,35 @@ def test_count_rows_zero_si_aucune_ligne():
         return None
 
     assert count_rows(_resource(), fake_fetch_one) == 0
+
+
+def test_detail_columns_unique_pk_puis_list_puis_form():
+    # pk "id" + list (title, published_at) + form (title, body) dédupliqués.
+    assert detail_columns(_resource()) == ("id", "title", "published_at", "body")
+
+
+def test_build_get_sql():
+    sql = build_get_sql(_resource())
+    assert sql == (
+        "SELECT id, title, published_at, body FROM articles "
+        "WHERE id = ? LIMIT 1"
+    )
+
+
+def test_get_row_passe_la_cle_en_parametre():
+    captured: dict[str, Any] = {}
+
+    def fake_fetch_one(sql: str, params: Any) -> dict[str, Any] | None:
+        captured["params"] = params
+        return {"id": 5, "title": "Bonjour"}
+
+    row = get_row(_resource(), fake_fetch_one, pk_value="5")
+    assert row == {"id": 5, "title": "Bonjour"}
+    assert captured["params"] == ("5",)
+
+
+def test_get_row_none_si_absent():
+    def fake_fetch_one(sql: str, params: Any) -> dict[str, Any] | None:
+        return None
+
+    assert get_row(_resource(), fake_fetch_one, pk_value="999") is None

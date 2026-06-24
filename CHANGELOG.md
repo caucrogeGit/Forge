@@ -61,6 +61,13 @@
   `core.database.db`). Template embarqué `admin/list.html` (surchargeable). Ni
   ORM ni introspection ; le rapprochement avec le contrat d'entité réel reste du
   ressort de `admin:doctor`.
+- **Vue détail Forge Admin** (`ADMIN-DETAIL-VIEW-001`). Route
+  `GET /admin/<slug>/<id>` (nommée `admin-resource-detail`, non publique)
+  affichant une ligne. `AdminResource` gagne `pk` (colonne de clé primaire,
+  défaut `id`). La requête est un `SELECT` contraint `WHERE <pk> = ? LIMIT 1`
+  (identifiants en liste blanche, clé en paramètre) ; les colonnes affichées
+  sont `pk` puis `list_fields` puis `form_fields` (uniques). 404 si la ligne est
+  absente. Template embarqué `admin/detail.html` (surchargeable).
 
 
 ## [1.0.0-beta.17] — 2026-06-18

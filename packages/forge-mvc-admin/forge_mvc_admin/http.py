@@ -20,7 +20,14 @@ from core.mvc.view.pagination import Pagination
 from core.security.decorators import require_auth
 
 from forge_mvc_admin.exceptions import AdminRegistryError
-from forge_mvc_admin.query import FetchAll, FetchOne, count_rows, list_rows
+from forge_mvc_admin.query import (
+    FetchAll,
+    FetchOne,
+    count_rows,
+    detail_columns,
+    get_row,
+    list_rows,
+)
 from forge_mvc_admin.registry import AdminRegistry
 from forge_mvc_admin.registry import registry as _default_registry
 
@@ -94,6 +101,31 @@ class AdminController:
             request=request,
         )
 
+    def resource_detail(self, request: Request) -> Response:
+        """Fiche d'une ligne d'une ressource (`GET /admin/<slug>/<id>`)."""
+        slug = request.route("slug")
+        pk_value = request.route("id")
+        if slug is None or pk_value is None:
+            return BaseController.not_found()
+        try:
+            resource = self._registry.get(slug)
+        except AdminRegistryError:
+            return BaseController.not_found()
+
+        _fetch_all, fetch_one = self._db()
+        row = get_row(resource, fetch_one, pk_value=pk_value)
+        if row is None:
+            return BaseController.not_found()
+        return BaseController.render(
+            "admin/detail.html",
+            context={
+                "resource": resource,
+                "columns": detail_columns(resource),
+                "row": row,
+            },
+            request=request,
+        )
+
 
 def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None) -> None:
     """Branche les routes du back-office sur un Router Forge.
@@ -116,4 +148,10 @@ def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None)
         "/admin/{slug}",
         require_auth(controller.resource_list),
         name="admin-resource-list",
+    )
+    router.add(
+        "GET",
+        "/admin/{slug}/{id}",
+        require_auth(controller.resource_detail),
+        name="admin-resource-detail",
     )

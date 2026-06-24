@@ -42,6 +42,8 @@ class AdminResource:
             d'entité, donc déclaré explicitement. Exemple : ``"articles"``.
         order_by : colonne de tri par défaut de la liste (snake_case). Vide par
             défaut : le premier champ de ``list_fields`` est alors utilisé.
+        pk : colonne de clé primaire (snake_case), utilisée par la vue détail
+            (``WHERE <pk> = ?``). Défaut : ``"id"``.
 
     Le contrat valide sa propre forme à la construction et lève
     `AdminResourceError` en cas d'incohérence. Il ne vérifie pas que l'entité, la
@@ -57,6 +59,7 @@ class AdminResource:
     form_fields: tuple[str, ...]
     table: str
     order_by: str = ""
+    pk: str = "id"
 
     def __post_init__(self) -> None:
         if not _ENTITY_RE.match(self.entity):
@@ -81,6 +84,10 @@ class AdminResource:
         if self.order_by and not _FIELD_RE.match(self.order_by):
             raise AdminResourceError(
                 f"order_by invalide : {self.order_by!r} (snake_case attendu)."
+            )
+        if not _FIELD_RE.match(self.pk):
+            raise AdminResourceError(
+                f"pk invalide : {self.pk!r} (snake_case attendu, ex. 'id')."
             )
 
 
