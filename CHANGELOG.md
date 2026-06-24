@@ -120,6 +120,14 @@
   `warn` pour tout écart au contrat (qui peut être en retard sur la base),
   `skip` si `mvc/admin/resources.py` est absent. Code de sortie 1 seulement sur
   `fail`. Ferme la boucle de l'accès aux données par mapping déclaré.
+- **Parcours pédagogique `welcome-admin`** (`ADMIN-WELCOME-001`). Progression
+  embarquée réalisée à la main (ADR-028/035/038) sous
+  `packages/forge-mvc-admin/docs/welcome/` : installation, puis trois niveaux de
+  trois étapes (débutant : dashboard, ressource, liste ; intermédiaire : fiche,
+  création, édition ; avancé : suppression, surcharge de template, RBAC +
+  `admin:doctor`), chaînés par des bilans et un récapitulatif. Nav du paquet et
+  garde-fou de chaînage `test_starter_welcome_admin_nav_001`. Aucun code de
+  production touché.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

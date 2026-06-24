@@ -6,3 +6,21 @@ docs_dir: docs
 nav:
   - Présentation: index.md
   - Contrat de ressource: resources.md
+  - Progression Admin:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Voir le tableau de bord: welcome/debutant/admin-welcome.md
+          - Déclarer une ressource: welcome/debutant/admin-resource.md
+          - La liste paginée: welcome/debutant/admin-list.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - La fiche détail: welcome/intermediaire/admin-detail.md
+          - Créer une ligne: welcome/intermediaire/admin-new.md
+          - Éditer une ligne: welcome/intermediaire/admin-edit.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Supprimer une ligne: welcome/avance/admin-delete.md
+          - Surcharger un template: welcome/avance/admin-override.md
+          - Exiger une permission: welcome/avance/admin-rbac.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Récapitulatif: welcome/recapitulatif.md
