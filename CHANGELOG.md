@@ -5,6 +5,17 @@
 
 ### Ajouté
 
+- **Parcours d'accueil `welcome-projet` dans le squelette** (ADR-048,
+  `WELCOME-PROJET-CONTENT-001`, `WELCOME-PROJET-NAV-001`). `forge new` embarque un
+  parcours pédagogique court dans `docs/welcome/` du projet : mise en route, puis
+  trois niveaux (débutant : entité, CRUD ; intermédiaire : page publique,
+  contrôleur/template ; avancé : opt-in, valider/livrer), chaînés par des bilans
+  et un récapitulatif. Orienté « votre projet », chaque page renvoie à
+  forgemvc.com pour approfondir (sans dupliquer `welcome-forge`). Contenu statique
+  sous `cli/skeleton/data/docs/welcome/`, garde-fou de chaînage
+  `test_skeleton_welcome_projet_nav_001`. Troisième couche « expérience » d'un
+  projet généré, avec la guidance agent (ADR-047), sans code métier (ADR-024).
+
 - **Couche de guidance agent IA dans les applications** (ADR-047,
   `AGENTS-BRIEFING-TEMPLATE-001`, `AGENTS-SEED-ADR-001`, `AGENTS-SKELETON-EMIT-001`,
   `AGENTS-INIT-COMMAND-001`).

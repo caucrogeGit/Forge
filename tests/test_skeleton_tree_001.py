@@ -50,6 +50,9 @@ REQUIRED_FILES = [
     "storage/logs/.gitkeep",
     "storage/mail/.gitkeep",
     "storage/uploads/.gitkeep",
+    # Parcours d'accueil welcome-projet (ADR-048).
+    "docs/welcome/installation.md",
+    "docs/welcome/recapitulatif.md",
 ]
 
 REQUIRED_ERROR_PAGES = ["400", "403", "404", "413", "422", "429", "500"]
@@ -73,7 +76,6 @@ FORBIDDEN_PATHS = [
     "integrations",
     "packages",
     "tests",
-    "docs",
     "mkdocs.yml",
     "pyproject.toml",
     "conftest.py",
