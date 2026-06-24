@@ -283,10 +283,21 @@ Un passage en stable ne peut intervenir qu'après terrain validé et RC publiée
 
 Pendant toute la phase bêta, Forge reste sous licence propriétaire / source
 disponible (ce n'est pas un logiciel open source aujourd'hui).
-À partir de la version **1.0.0 stable**, Forge a vocation à être publié sous
-licence open source **MIT**.
-Objectif de trajectoire ancré sur le jalon 1.0.0 stable, pas sur une date ; le
-fichier `LICENSE` et `pyproject.toml` ne basculeront en MIT qu'à ce moment.
+À partir de la version **1.0.0 stable**, Forge bascule sous licence open source
+**MIT** (`LICENSE` et `pyproject.toml` ne changent qu'à ce moment).
+
+Cette trajectoire n'est plus suspendue à un jalon indéfini.
+La bascule intervient dès que les conditions suivantes, toutes vérifiables, sont
+réunies, et au plus tard le **31 décembre 2026** :
+
+- une release candidate `1.0.0-rc1` publiée ;
+- au moins deux mois de tests terrain après la bêta consolidée (T0, ADR-009)
+  sans changement d'API publique ;
+- aucun bloquant de sécurité ouvert (un avis sans correctif amont, documenté et
+  accepté dans `SECURITY.md`, n'est pas bloquant) ;
+- suite de tests verte et portes CI au vert (pyright, pip-audit, mkdocs strict).
+
+Autrement dit : MIT dès que c'est solide, et au plus tard à la date plafond.
 Détail : [`docs/philosophy/licence.md`](../philosophy/licence.md).
 
 ---

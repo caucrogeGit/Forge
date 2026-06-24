@@ -190,8 +190,10 @@ L'usage professionnel, commercial ou institutionnel nécessite un accord
 personnelle et l'usage éducatif non commercial sont autorisés sans accord.
 
 Forge n'est pas open source pendant sa phase bêta. À partir de la version
-1.0.0 stable, Forge a vocation à être publié sous licence open source MIT.
-Jusqu'à cette publication, la licence présente dans le dépôt fait foi.
+1.0.0 stable, Forge bascule sous licence open source MIT, dès que les critères
+de stabilité sont réunis et au plus tard le 31 décembre 2026 (critères détaillés
+sur la page licence et la roadmap). Jusqu'à cette publication, la licence présente
+dans le dépôt fait foi.
 
 Voir [LICENSE](LICENSE) pour les conditions complètes.
 

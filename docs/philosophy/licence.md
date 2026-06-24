@@ -41,10 +41,19 @@ prêts.
 Pendant toute sa phase bêta, Forge reste sous licence propriétaire / source
 disponible : ce n'est pas un logiciel open source aujourd'hui.
 
-À partir de la version 1.0.0 stable, Forge a vocation à être publié sous licence
-open source MIT.
-Cette ouverture est un objectif de trajectoire, ancré sur le jalon 1.0.0 stable
-et non sur une date.
+À partir de la version 1.0.0 stable, Forge bascule sous licence open source MIT.
+Cette trajectoire n'est plus suspendue à un jalon indéfini : la bascule intervient
+dès que les conditions ci-dessous, toutes vérifiables, sont réunies, et au plus
+tard le **31 décembre 2026** :
+
+- une release candidate `1.0.0-rc1` publiée ;
+- au moins deux mois de tests terrain après la bêta consolidée (T0, ADR-009)
+  sans changement d'API publique ;
+- aucun bloquant de sécurité ouvert (un avis sans correctif amont, documenté et
+  accepté dans `SECURITY.md`, n'est pas bloquant) ;
+- suite de tests verte et portes CI au vert (pyright, pip-audit, mkdocs strict).
+
+MIT dès que c'est solide, et au plus tard à la date plafond.
 
 Jusqu'à cette publication, la licence présente dans le dépôt au moment de la
 récupération fait foi : toute version récupérée avant la 1.0.0 stable reste
