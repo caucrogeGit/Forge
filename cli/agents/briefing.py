@@ -69,6 +69,21 @@ Il ne réécrit jamais silencieusement un fichier existant.
 - Ne modifie pas un fichier généré pour contourner une limite : ajuste le
   contrat ou ajoute du code dans la couche prévue.
 
+## Méthode de travail (la discipline de Forge)
+
+Forge a été construit avec une discipline que tu gagnes à reprendre dans ton app :
+
+- **Petits incréments, une responsabilité** : avance par changements ciblés et
+  testés, pas par gros lots.
+- **Décisions structurantes = un ADR** : quand tu prends une décision
+  d'architecture, de convention ou de dépendance qui engage le projet dans la
+  durée, consigne-la dans `docs/adr/<numero>-<sujet>.md`, au format Forge
+  (Statut, Date, Contexte, Décision, Conséquences, Alternatives écartées).
+  L'ADR garde la trace du *pourquoi*, pas seulement du *quoi* ; crée le dossier
+  `docs/adr/` à la première décision.
+- **Révéler avant de corriger** : si un comportement surprend, comprends et
+  expose la cause avant de patcher le symptôme.
+
 ## À éviter
 
 - Ajouter un ORM ou une couche d'abstraction qui masque le SQL.

@@ -40,6 +40,8 @@ def test_cible_une_application_pas_le_framework():
         "write-if-new",
         "python -m pytest",
         "forgemvc.com",
+        "docs/adr/",         # discipline ADR transmise (ADR-047)
+        "ADR",
     ],
 )
 def test_conventions_cles_presentes(needle: str):
