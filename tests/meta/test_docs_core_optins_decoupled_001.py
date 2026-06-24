@@ -23,7 +23,7 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SLUGS = {
     "audio", "i18n", "files", "images", "workflow", "pivot",
-    "stats", "mfa", "rbac", "mail", "video", "iot",
+    "stats", "mfa", "rbac", "mail", "video", "iot", "admin",
 }
 # Lien markdown [texte](cible) — exclut les images ![...](...).
 LINK = re.compile(r"(?<!\!)\[[^\]]+\]\(([^)]+)\)")

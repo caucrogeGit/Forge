@@ -13,6 +13,10 @@
   de ressources et les vues viendront par les tickets `ADMIN-*` suivants.
   Le paquet est ajouté au cliquet pyright (`[tool.pyright]`, ADR-036). Forge
   Core n'en dépend pas. Voir `docs/roadmap/forge-admin-roadmap.md`.
+- **Documentation embarquée de Forge Admin** (`ADMIN-OPTIN-DOCS-001`).
+  Page de positionnement `packages/forge-mvc-admin/docs/index.md` (convention
+  ADR-038), montée sous `/admin/` dans la nav « Opt-ins officiels ». Sans lien
+  transversal vers le cœur (ADR-042).
 
 
 ## [1.0.0-beta.17] — 2026-06-18

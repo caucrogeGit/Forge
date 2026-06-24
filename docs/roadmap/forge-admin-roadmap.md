@@ -242,7 +242,7 @@ Chaque ticket reste décrit en quelques lignes ; aucun n'est détaillé ici comm
 | Ticket | Objectif | État |
 |---|---|---|
 | ADMIN-OPTIN-PACKAGE-001 | créer le paquet `forge-mvc-admin` vide et installable | **livré** (scaffold : paquet installable, `__version__`, `py.typed`, smoke test) |
-| ADMIN-OPTIN-DOCS-001 | documenter le positionnement de Forge Admin | à venir |
+| ADMIN-OPTIN-DOCS-001 | documenter le positionnement de Forge Admin | **livré** (page embarquée `packages/forge-mvc-admin/docs/index.md`, montée sous `/admin/`) |
 | ADMIN-INIT-COMMAND-001 | ajouter `forge admin:init` | à venir |
 | ADMIN-RESOURCE-CONTRACT-001 | définir le contrat d'une ressource admin | à venir |
 | ADMIN-DASHBOARD-MINIMAL-001 | afficher un dashboard admin minimal | à venir |
@@ -285,20 +285,27 @@ Un ticket qui ne peut pas les respecter est revu, pas contourné.
 
 ## 11. Documentation attendue
 
-Forge Admin recevra plus tard des pages dédiées.
+La documentation de Forge Admin est **embarquée dans le paquet** sous
+`packages/forge-mvc-admin/docs/`, conformément à l'ADR-038.
+Elle est agrégée dans le site unique au build (plugin mkdocs-monorepo) et montée
+sous le préfixe `/admin/`.
 
-Pages prévues :
+Page livrée :
 
-- `docs/admin/index.md` : présentation et positionnement ;
-- `docs/admin/install.md` : installation de l'opt-in ;
-- `docs/admin/resources.md` : déclaration des ressources administrables ;
-- `docs/admin/security.md` : sécurité et contrôle d'accès ;
-- `docs/admin/templates.md` : surcharge explicite des templates ;
-- `docs/admin/rbac.md` : intégration RBAC ;
-- `docs/admin/limits.md` : limites assumées.
+- `packages/forge-mvc-admin/docs/index.md` : présentation et positionnement
+  (ticket `ADMIN-OPTIN-DOCS-001`).
 
-Ces pages ne sont pas créées par cette roadmap.
-Elles seront produites par les tickets `ADMIN-*` au fil de l'implémentation.
+Pages prévues, ajoutées avec leur ticket de fonctionnalité :
+
+- installation de l'opt-in ;
+- déclaration des ressources administrables ;
+- sécurité et contrôle d'accès ;
+- surcharge explicite des templates ;
+- intégration RBAC ;
+- limites assumées.
+
+Conformément à l'ADR-042, ces pages restent dans l'espace « Opt-ins officiels »
+et ne tissent pas de liens transversaux avec la documentation du cœur.
 
 ---
 
