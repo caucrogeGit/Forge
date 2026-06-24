@@ -79,8 +79,9 @@ Forge a été construit avec une discipline que tu gagnes à reprendre dans ton 
   d'architecture, de convention ou de dépendance qui engage le projet dans la
   durée, consigne-la dans `docs/adr/<numero>-<sujet>.md`, au format Forge
   (Statut, Date, Contexte, Décision, Conséquences, Alternatives écartées).
-  L'ADR garde la trace du *pourquoi*, pas seulement du *quoi* ; crée le dossier
-  `docs/adr/` à la première décision.
+  L'ADR garde la trace du *pourquoi*, pas seulement du *quoi*. Un premier ADR
+  d'exemple est déjà fourni : `docs/adr/001-adopter-forge.md` ; numérote les
+  suivants `002`, `003`, etc.
 - **Révéler avant de corriger** : si un comportement surprend, comprends et
   expose la cause avant de patcher le symptôme.
 

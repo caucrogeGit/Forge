@@ -114,8 +114,11 @@ pense ; la décision retenue est de la fournir par défaut.
 
 - `AGENTS-BRIEFING-TEMPLATE-001` : rédiger le gabarit canonique du briefing
   applicatif (donnée de paquet), distillé et versionné.
-- `AGENTS-SKELETON-EMIT-001` : `forge new` écrit `CLAUDE.md` et `AGENTS.md`
-  (write-if-new) depuis le gabarit.
+- `AGENTS-SEED-ADR-001` : fournir un ADR-001 d'amorçage (« Adopter Forge et ses
+  conventions ») écrit dans `docs/adr/001-adopter-forge.md` du projet, qui acte
+  une décision réelle et sert d'exemple de format.
+- `AGENTS-SKELETON-EMIT-001` : `forge new` écrit `CLAUDE.md`, `AGENTS.md` et
+  l'ADR-001 (write-if-new) depuis les gabarits.
 - `AGENTS-INIT-COMMAND-001` : commande `forge agents:init` (génération /
   rafraîchissement) avec mode `--check`.
 - `AGENTS-SETTINGS-001` : `.claude/settings.json` applicatif optionnel
