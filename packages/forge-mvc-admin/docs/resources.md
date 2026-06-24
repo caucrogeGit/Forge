@@ -68,6 +68,13 @@ La fiche détail (`GET /admin/<slug>/<id>`) lit une ligne par sa clé primaire
 (`WHERE <pk> = ?`, valeur paramétrée) et affiche `pk` puis `list_fields` puis
 `form_fields` (colonnes uniques).
 
+La création (`GET`/`POST /admin/<slug>/new`) affiche un formulaire des
+`form_fields` puis insère une ligne : seules ces colonnes sont écrites (liste
+blanche), les valeurs sont paramétrées, une valeur vide devient `NULL`, et le
+jeton CSRF est vérifié. En cas de succès, redirection vers la fiche créée.
+À ce stade il n'y a pas de validation par champ (pas de contrat au runtime) :
+les contraintes restent celles de la base.
+
 ## `AdminRegistry`
 
 Le registre rassemble les ressources d'un projet.

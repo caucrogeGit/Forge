@@ -68,6 +68,16 @@
   (identifiants en liste blanche, clé en paramètre) ; les colonnes affichées
   sont `pk` puis `list_fields` puis `form_fields` (uniques). 404 si la ligne est
   absente. Template embarqué `admin/detail.html` (surchargeable).
+- **Création depuis Forge Admin** (`ADMIN-FORM-NEW-001`). Routes
+  `GET /admin/<slug>/new` (formulaire) et `POST /admin/<slug>/new` (création),
+  nommées, non publiques. Seules les colonnes `form_fields` sont écrites (liste
+  blanche, valeurs paramétrées via `core.database.db.insert`) ; une valeur vide
+  devient `NULL` ; le jeton CSRF est vérifié par le middleware ; succès →
+  POST-Redirect-GET vers la fiche créée avec flash. Template embarqué
+  `admin/form.html` (surchargeable). La route littérale `/new` est enregistrée
+  avant `/{id}` (le routeur retient la première correspondance). Pas de
+  validation par champ à ce stade (pas de contrat au runtime) : les contraintes
+  restent celles de la base.
 
 
 ## [1.0.0-beta.17] — 2026-06-18

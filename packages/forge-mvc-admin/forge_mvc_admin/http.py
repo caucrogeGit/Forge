@@ -23,9 +23,11 @@ from forge_mvc_admin.exceptions import AdminRegistryError
 from forge_mvc_admin.query import (
     FetchAll,
     FetchOne,
+    Insert,
     count_rows,
     detail_columns,
     get_row,
+    insert_row,
     list_rows,
 )
 from forge_mvc_admin.registry import AdminRegistry
@@ -55,10 +57,12 @@ class AdminController:
         *,
         fetch_all: FetchAll | None = None,
         fetch_one: FetchOne | None = None,
+        insert: Insert | None = None,
     ) -> None:
         self._registry = registry
         self._fetch_all = fetch_all
         self._fetch_one = fetch_one
+        self._insert = insert
 
     def _db(self) -> tuple[FetchAll, FetchOne]:
         fetch_all, fetch_one = self._fetch_all, self._fetch_one
@@ -67,6 +71,12 @@ class AdminController:
             fetch_all = fetch_all or _fa
             fetch_one = fetch_one or _fo
         return fetch_all, fetch_one
+
+    def _insert_fn(self) -> Insert:
+        if self._insert is not None:
+            return self._insert
+        from core.database.db import insert as _insert
+        return _insert
 
     def dashboard(self, request: Request) -> Response:
         """Tableau de bord : liste les ressources administrables déclarées."""
@@ -126,6 +136,55 @@ class AdminController:
             request=request,
         )
 
+    def resource_new(self, request: Request) -> Response:
+        """Formulaire de création vide (`GET /admin/<slug>/new`)."""
+        slug = request.route("slug")
+        if slug is None:
+            return BaseController.not_found()
+        try:
+            resource = self._registry.get(slug)
+        except AdminRegistryError:
+            return BaseController.not_found()
+        return BaseController.render(
+            "admin/form.html",
+            context={
+                "resource": resource,
+                "fields": resource.form_fields,
+                "action": f"/admin/{resource.slug}/new",
+                "values": {field: "" for field in resource.form_fields},
+                "error": "",
+                "title": f"Nouveau : {resource.label}",
+            },
+            request=request,
+        )
+
+    def resource_create(self, request: Request) -> Response:
+        """Création d'une ligne (`POST /admin/<slug>/new`).
+
+        Seules les colonnes `form_fields` sont écrites (liste blanche, valeurs
+        paramétrées). Une valeur vide devient `NULL`. CSRF vérifié en amont par
+        le middleware. En cas de succès, redirection vers la fiche créée.
+        """
+        slug = request.route("slug")
+        if slug is None:
+            return BaseController.not_found()
+        try:
+            resource = self._registry.get(slug)
+        except AdminRegistryError:
+            return BaseController.not_found()
+
+        posted = BaseController.body(request)
+        params: list[str | None] = [
+            (value.strip() or None)
+            for value in (posted.get(field, "") for field in resource.form_fields)
+        ]
+        new_id = insert_row(resource, self._insert_fn(), values=params)
+        return BaseController.redirect_with_flash(
+            request,
+            f"/admin/{resource.slug}/{new_id}",
+            f"{resource.label} créé.",
+        )
+
 
 def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None) -> None:
     """Branche les routes du back-office sur un Router Forge.
@@ -148,6 +207,20 @@ def register_admin_routes(router: Any, *, registry: AdminRegistry | None = None)
         "/admin/{slug}",
         require_auth(controller.resource_list),
         name="admin-resource-list",
+    )
+    # `/new` (littéral) doit être enregistré AVANT `/{id}` : le routeur retient la
+    # première route qui matche, sinon GET /admin/<slug>/new prendrait id="new".
+    router.add(
+        "GET",
+        "/admin/{slug}/new",
+        require_auth(controller.resource_new),
+        name="admin-resource-new",
+    )
+    router.add(
+        "POST",
+        "/admin/{slug}/new",
+        require_auth(controller.resource_create),
+        name="admin-resource-create",
     )
     router.add(
         "GET",

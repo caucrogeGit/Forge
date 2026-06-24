@@ -63,6 +63,30 @@ def test_register_admin_routes_detail_protege():
     assert params.get("id") == "5"
 
 
+def test_register_admin_routes_formulaire_creation():
+    router = Router()
+    register_admin_routes(router, registry=AdminRegistry())
+    get_new = router.match("GET", "/admin/articles/new")
+    assert get_new is not None
+    assert get_new[0].name == "admin-resource-new"
+    assert get_new[0].public is False
+    post_new = router.match("POST", "/admin/articles/new")
+    assert post_new is not None
+    assert post_new[0].name == "admin-resource-create"
+    assert post_new[0].public is False
+
+
+def test_route_new_litterale_avant_detail():
+    # GET /admin/<slug>/new doit matcher la route `new`, pas la route détail {id}.
+    router = Router()
+    register_admin_routes(router, registry=AdminRegistry())
+    matched = router.match("GET", "/admin/articles/new")
+    assert matched is not None
+    assert matched[0].name == "admin-resource-new", (
+        "le littéral /new doit primer sur /{id}"
+    )
+
+
 def test_dashboard_template_liste_les_ressources(tmp_path: Path):
     views = tmp_path / "views"
     views.mkdir()
@@ -127,3 +151,24 @@ def test_detail_template_affiche_les_champs(tmp_path: Path):
     )
     assert "<dt>title</dt>" in html
     assert "Bonjour" in html
+
+
+def test_form_template_affiche_les_champs_et_csrf(tmp_path: Path):
+    views = tmp_path / "views"
+    views.mkdir()
+    renderer = Jinja2Renderer(str(views))
+    html = renderer.render(
+        "admin/form.html",
+        {
+            "resource": _resource(),
+            "fields": ("title", "body"),
+            "action": "/admin/articles/new",
+            "values": {"title": "", "body": ""},
+            "error": "",
+            "title": "Nouveau : Article",
+            "csrf_token": "tok123",
+        },
+    )
+    assert 'name="title"' in html and 'name="body"' in html
+    assert 'name="csrf_token"' in html and "tok123" in html
+    assert 'method="post"' in html

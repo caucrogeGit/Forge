@@ -14,10 +14,12 @@ from forge_mvc_admin import AdminResource
 from forge_mvc_admin.query import (
     build_count_sql,
     build_get_sql,
+    build_insert_sql,
     build_list_sql,
     count_rows,
     detail_columns,
     get_row,
+    insert_row,
     list_rows,
 )
 
@@ -110,3 +112,22 @@ def test_get_row_none_si_absent():
         return None
 
     assert get_row(_resource(), fake_fetch_one, pk_value="999") is None
+
+
+def test_build_insert_sql():
+    # form_fields = (title, body)
+    assert build_insert_sql(_resource()) == "INSERT INTO articles (title, body) VALUES (?, ?)"
+
+
+def test_insert_row_passe_les_valeurs_et_retourne_lastrowid():
+    captured: dict[str, Any] = {}
+
+    def fake_insert(sql: str, params: Any) -> int:
+        captured["sql"] = sql
+        captured["params"] = params
+        return 42
+
+    new_id = insert_row(_resource(), fake_insert, values=("Bonjour", None))
+    assert new_id == 42
+    assert captured["params"] == ("Bonjour", None)
+    assert captured["sql"].startswith("INSERT INTO articles")

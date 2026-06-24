@@ -18,6 +18,7 @@ from forge_mvc_admin.resources import AdminResource
 
 FetchAll = Callable[[str, Sequence[Any]], list[dict[str, Any]]]
 FetchOne = Callable[[str, Sequence[Any]], "dict[str, Any] | None"]
+Insert = Callable[[str, Sequence[Any]], int]
 
 # Identifiant SQL sûr : minuscules, chiffres, underscores, commençant par une lettre.
 _IDENT_RE = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -79,6 +80,24 @@ def get_row(
 ) -> "dict[str, Any] | None":
     """Retourne la ligne dont la clé primaire vaut `pk_value`, ou None."""
     return fetch_one(build_get_sql(resource), (pk_value,))
+
+
+def build_insert_sql(resource: AdminResource) -> str:
+    """`INSERT INTO <table> (<form_fields>) VALUES (?, …)`."""
+    columns = [_ident(col) for col in resource.form_fields]
+    table = _ident(resource.table)
+    placeholders = ", ".join("?" for _ in columns)
+    return f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({placeholders})"
+
+
+def insert_row(
+    resource: AdminResource,
+    insert: Insert,
+    *,
+    values: Sequence[Any],
+) -> int:
+    """Insère une ligne (valeurs dans l'ordre de `form_fields`). Retourne lastrowid."""
+    return insert(build_insert_sql(resource), tuple(values))
 
 
 def count_rows(resource: AdminResource, fetch_one: FetchOne) -> int:
