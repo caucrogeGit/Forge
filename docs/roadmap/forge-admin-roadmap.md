@@ -252,6 +252,21 @@ Le back-office lit la base par **mapping déclaré**, sans ORM ni introspection 
 Conséquence : `AdminResource` gagnera un champ `table` (et une colonne de tri par défaut) avec le ticket `ADMIN-LIST-VIEW-001`.
 Le rapprochement entre la ressource déclarée et le contrat d'entité réel (table et colonnes existantes) relève de `admin:doctor`.
 
+### Écriture et formulaires (cadrage)
+
+L'écriture (création, édition, suppression) réutilise la pile existante du cœur, sans nouveau mécanisme.
+
+- **Colonnes en liste blanche** : seules les `form_fields` déclarées sont écrites (pas de mass-assignment d'une colonne arbitraire) ; les identifiants sont validés, les valeurs passent par des paramètres `?`.
+- **CSRF** : automatique. Les routes d'écriture utilisent une méthode non sûre (POST) avec `csrf=True` (défaut) ; le middleware vérifie le jeton **avant** le handler. Le formulaire embarque `csrf_token` (injecté par `BaseController.render`).
+- **Champs vides → NULL** : une valeur vide est insérée comme `NULL` (précédent `public_form`), pour ne pas casser les colonnes nullables.
+- **Écriture** : `core.database.db.insert` (retourne `lastrowid`), adaptateur injectable pour les tests.
+- **Flux POST-Redirect-GET** : en cas de succès, redirection vers la fiche de la ligne créée (`/admin/<slug>/<id>`) avec un message flash (`redirect_with_flash`).
+- **Validation** : faute de contrat au runtime, il n'y a pas de validation par champ dans cette première version.
+  Les contraintes (obligatoire, type) restent celles de la base ; une violation aboutit à la page d'erreur (cause affichée en `dev`).
+  La validation par champ et les messages d'erreur amicaux sont **différés** (ils supposent des métadonnées de type, hors de ce socle).
+
+Conséquence : `ADMIN-FORM-NEW-001` ajoute `GET`/`POST /admin/<slug>/new` (formulaire + création), un template `admin/form.html` embarqué et `pk` est déjà disponible pour la redirection.
+
 ---
 
 ## 8. Commandes futures envisagées
