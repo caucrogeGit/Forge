@@ -111,6 +111,25 @@ le signale.
 Sans ce paramètre, rien ne change : l'admin reste protégé par la seule
 authentification.
 
+## Surcharger les templates
+
+Forge Admin embarque ses templates et les rend disponibles au moteur du cœur
+(ADR-046). Un projet peut surcharger n'importe lequel en plaçant un fichier de
+même chemin sous `mvc/views/admin/` : l'ordre des loaders donne la priorité au
+projet, sans configuration.
+
+Templates surchargeables :
+
+- `admin/layout.html` : gabarit de base (en-tête, structure) ;
+- `admin/dashboard.html` : tableau de bord ;
+- `admin/list.html` : liste paginée d'une ressource ;
+- `admin/detail.html` : fiche d'une ligne ;
+- `admin/form.html` : formulaire de création et d'édition ;
+- `admin/delete.html` : page de confirmation de suppression.
+
+Par exemple, créer `mvc/views/admin/layout.html` dans le projet remplace le
+gabarit de base pour tout le back-office, sans toucher au paquet.
+
 ## Suivre l'avancement
 
 La feuille de route de cadrage et le découpage en tickets sont décrits dans la

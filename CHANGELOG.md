@@ -106,6 +106,12 @@
   `try/except ImportError` : 403 si la permission manque (rbac installé),
   fail-open + avertissement `forge doctor` si `forge-mvc-rbac` est absent. Aucune
   dépendance dure ; la garde s'ajoute par-dessus `@require_auth`.
+- **Surcharge des templates Forge Admin** (`ADMIN-TEMPLATE-OVERRIDE-001`).
+  Documente et verrouille (test) la surcharge des templates embarqués : un projet
+  remplace n'importe quel `admin/*.html` (layout, dashboard, list, detail, form,
+  delete) en plaçant un fichier de même chemin sous `mvc/views/admin/`. Propriété
+  acquise par l'ordre des loaders (projet d'abord, paquet ensuite, ADR-046),
+  désormais couverte par un test et la doc embarquée.
 
 
 ## [1.0.0-beta.17] — 2026-06-18
