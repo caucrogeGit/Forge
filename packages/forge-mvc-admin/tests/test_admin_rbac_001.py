@@ -54,11 +54,14 @@ def test_autorise_si_permission_presente(monkeypatch):
     assert guarded(_Req()) == "HANDLER"
 
 
-def test_fail_open_si_rbac_absent(monkeypatch):
-    # Simule l'absence de forge-mvc-rbac : l'import échoue, la garde laisse passer.
+def test_fail_closed_si_rbac_absent(monkeypatch):
+    # ADMIN-RBAC-FAILCLOSED-001 : permission déclarée mais forge-mvc-rbac absent
+    # -> la garde REFUSE (403), elle ne laisse plus passer silencieusement.
     monkeypatch.setitem(sys.modules, "forge_mvc_rbac", None)
     guarded = _permission_guard(_handler, "admin.access")
-    assert guarded(_Req()) == "HANDLER"
+    response = guarded(_Req())
+    assert response != "HANDLER"
+    assert getattr(response, "status", None) == 403
 
 
 def test_register_avec_permission_enregistre_les_routes():

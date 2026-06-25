@@ -13,6 +13,7 @@ middlewares.
 """
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 from core.mvc.controller.base_controller import BaseController
@@ -41,6 +42,8 @@ if TYPE_CHECKING:
     from core.http.response import Response
     from core.http.router import Handler
 
+logger = logging.getLogger(__name__)
+
 __all__ = ["AdminController", "register_admin_routes"]
 
 # Nombre de lignes par page de liste.
@@ -52,8 +55,10 @@ def _permission_guard(handler: Handler, permission: str | None) -> Handler:
 
     Si `permission` est `None`, le handler est renvoyé tel quel (auth seule).
     Sinon, la permission est vérifiée via `forge-mvc-rbac` **s'il est installé** :
-    refus en 403 quand elle manque. Si `forge-mvc-rbac` est absent, la garde
-    laisse passer (fail-open ; `forge doctor` avertit) — pas de dépendance dure.
+    refus en 403 quand elle manque. Si `forge-mvc-rbac` est absent alors qu'une
+    permission est déclarée, la garde REFUSE (fail-closed, 403 + log) : on ne peut
+    pas vérifier la permission, donc on sécurise par défaut. Sans permission
+    déclarée (`None`), l'admin reste accessible (auth seule) — pas de dépendance dure.
     """
     if permission is None:
         return handler
@@ -62,7 +67,22 @@ def _permission_guard(handler: Handler, permission: str | None) -> Handler:
         try:
             from forge_mvc_rbac import require_contract_permission_for_request
         except ImportError:
-            return handler(request)
+            # Fail-closed (ADMIN-RBAC-FAILCLOSED-001) : permission déclarée mais
+            # forge-mvc-rbac absent. On ne peut pas la vérifier -> refus (403),
+            # sécuriser par défaut (charte principe 7), plutôt que de laisser
+            # passer silencieusement.
+            from core.http.response import Response
+
+            logger.warning(
+                "Route admin protégée par la permission %r mais forge-mvc-rbac "
+                "n'est pas installé : accès refusé (403). Installez forge-mvc-rbac.",
+                permission,
+            )
+            return Response.text(
+                "Accès refusé : cette route requiert une permission mais "
+                "forge-mvc-rbac n'est pas installé.",
+                status=403,
+            )
         denied = require_contract_permission_for_request(request, permission)
         if denied is not None:
             return denied
@@ -349,7 +369,7 @@ def register_admin_routes(
 
     `permission` (opt-in RBAC, ADMIN-RBAC-INTEGRATION-001) : si fournie, toutes
     les routes admin exigent cette permission via `forge-mvc-rbac` **s'il est
-    installé** (403 sinon). Sans `forge-mvc-rbac`, la garde laisse passer (auth
+    installé** (403 sinon). Sans `forge-mvc-rbac`, une route avec permission déclarée renvoie 403 (auth
     seule, fail-open ; `forge doctor` avertit). Par défaut, aucune permission
     n'est exigée : auth seule.
     """
