@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# pyright: strict
+# pyright: reportPrivateUsage=false
+# pyright: reportUnusedFunction=false
 """
 Genere l'arborescence d'une entite Forge.
 
@@ -14,7 +17,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 import cli._support.output as out
 from cli.entities.validation import (
@@ -63,7 +66,7 @@ def validate_entity_name(name: str) -> str:
     return name[0].upper() + name[1:]
 
 
-def build_entity_json_canonical(entity_name: str, table: str | None = None) -> dict:
+def build_entity_json_canonical(entity_name: str, table: str | None = None) -> dict[str, Any]:
     return {
         "schema_version": "1.0",
         "name": entity_name,
@@ -191,7 +194,7 @@ def _prompt_forge_type(
         )
 
 
-def _build_canonical_field(*, input_fn: Callable[[str], str] | None = None) -> dict:
+def _build_canonical_field(*, input_fn: Callable[[str], str] | None = None) -> dict[str, Any]:
     field_name = _prompt_text("Nom du champ", input_fn=input_fn)
     forge_type = _prompt_forge_type("Type Forge", input_fn=input_fn)
 
@@ -216,7 +219,7 @@ def build_entity_json_interactively(
     entity_name: str | None = None,
     *,
     input_fn: Callable[[str], str] | None = None,
-) -> dict:
+) -> dict[str, Any]:
     if input_fn is None:
         input_fn = input
     if entity_name is None:
@@ -254,7 +257,7 @@ def build_entity_json_interactively(
     }
 
 
-def _render_entity_summary(entity_definition: dict) -> str:
+def _render_entity_summary(entity_definition: dict[str, Any]) -> str:
     lines = [
         f"Entité : {entity_definition['name']}",
         f"Table : {entity_definition['table']}",
@@ -305,8 +308,8 @@ def _parse_args(args: list[str]) -> tuple[str | None, bool]:
 
 
 def _write_entity_files(
-    entity_definition: dict,
-    normalized_definition: dict,
+    entity_definition: dict[str, Any],
+    normalized_definition: dict[str, Any],
     *,
     root: Path | None = None,
 ) -> tuple[str, str, list[Path], list[Path]]:
@@ -340,7 +343,7 @@ def _write_entity_files(
     return entity_name, snake, created, skipped
 
 
-def _sql_default_literal(field: dict) -> str | None:
+def _sql_default_literal(field: dict[str, Any]) -> str | None:
     if "default" not in field:
         return None
     value = field["default"]
@@ -354,7 +357,7 @@ def _sql_default_literal(field: dict) -> str | None:
     return str(value)
 
 
-def build_entity_sql(entity_definition: dict) -> str:
+def build_entity_sql(entity_definition: dict[str, Any]) -> str:
     entity_definition = normalize_entity_definition(entity_definition)
     table = entity_definition["table"]
     fields = entity_definition["fields"]
@@ -386,7 +389,7 @@ def build_entity_sql(entity_definition: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def _python_default_literal(field: dict) -> str | None:
+def _python_default_literal(field: dict[str, Any]) -> str | None:
     if "default" in field:
         python_type = field["python_type"]
         if python_type == "date":
@@ -399,7 +402,7 @@ def _python_default_literal(field: dict) -> str | None:
     return None
 
 
-def _is_required_in_init(field: dict) -> bool:
+def _is_required_in_init(field: dict[str, Any]) -> bool:
     return (
         not field["nullable"]
         and "default" not in field
@@ -407,7 +410,7 @@ def _is_required_in_init(field: dict) -> bool:
     )
 
 
-def _decorators_for_field(field: dict) -> list[str]:
+def _decorators_for_field(field: dict[str, Any]) -> list[str]:
     decorators = [f"@typed({_python_runtime_type(field['python_type'])})"]
     if field["nullable"] or field["auto_increment"]:
         decorators.append("@nullable")
@@ -437,7 +440,7 @@ def _python_runtime_type(python_type: str) -> str:
     return python_type
 
 
-def _validation_imports(fields: list[dict]) -> list[str]:
+def _validation_imports(fields: list[dict[str, Any]]) -> list[str]:
     imports = {"typed"}
     for field in fields:
         if field["nullable"] or field["auto_increment"]:
@@ -473,7 +476,7 @@ def _validation_imports(fields: list[dict]) -> list[str]:
     return [name for name in order if name in imports]
 
 
-def _datetime_imports(fields: list[dict]) -> list[str]:
+def _datetime_imports(fields: list[dict[str, Any]]) -> list[str]:
     imports: list[str] = []
     python_types = {field["python_type"] for field in fields}
     if "date" in python_types:
@@ -483,7 +486,7 @@ def _datetime_imports(fields: list[dict]) -> list[str]:
     return imports
 
 
-def _render_init_signature(fields: list[dict]) -> str:
+def _render_init_signature(fields: list[dict[str, Any]]) -> str:
     ordered_fields = sorted(fields, key=lambda field: (not _is_required_in_init(field),))
     params = ["self"]
     for field in ordered_fields:
@@ -495,14 +498,14 @@ def _render_init_signature(fields: list[dict]) -> str:
     return ", ".join(params)
 
 
-def _render_init_body(fields: list[dict]) -> str:
+def _render_init_body(fields: list[dict[str, Any]]) -> str:
     return "\n".join(
         f"        self.{field['name']} = {field['name']}"
         for field in sorted(fields, key=lambda field: (not _is_required_in_init(field),))
     )
 
 
-def _render_property(field: dict) -> str:
+def _render_property(field: dict[str, Any]) -> str:
     name = field["name"]
     decorators = _decorators_for_field(field)
     decorator_lines = "\n".join(f"    {decorator}" for decorator in decorators)
@@ -532,7 +535,7 @@ def _render_property(field: dict) -> str:
     )
 
 
-def _render_to_dict(fields: list[dict]) -> str:
+def _render_to_dict(fields: list[dict[str, Any]]) -> str:
     lines = ["    def to_dict(self) -> dict:", "        return {"]
     for field in fields:
         name = field["name"]
@@ -547,7 +550,7 @@ def _render_to_dict(fields: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def _render_from_dict(entity_name: str, fields: list[dict]) -> str:
+def _render_from_dict(entity_name: str, fields: list[dict[str, Any]]) -> str:
     lines = [
         "    @classmethod",
         f'    def from_dict(cls, data: dict) -> "{entity_name}Base":',
@@ -570,7 +573,7 @@ def _render_from_dict(entity_name: str, fields: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def _render_repr(entity_name: str, fields: list[dict]) -> str:
+def _render_repr(entity_name: str, fields: list[dict[str, Any]]) -> str:
     parts = ", ".join(f"{field['name']}={{self.{field['name']}!r}}" for field in fields)
     return (
         "    def __repr__(self) -> str:\n"
@@ -578,7 +581,7 @@ def _render_repr(entity_name: str, fields: list[dict]) -> str:
     )
 
 
-def _render_datetime_helpers(fields: list[dict]) -> str:
+def _render_datetime_helpers(fields: list[dict[str, Any]]) -> str:
     python_types = {field["python_type"] for field in fields}
     blocks: list[str] = []
 
@@ -605,7 +608,7 @@ def _render_datetime_helpers(fields: list[dict]) -> str:
     return "\n".join(blocks) + "\n"
 
 
-def build_entity_base(entity_definition: dict) -> str:
+def build_entity_base(entity_definition: dict[str, Any]) -> str:
     entity_definition = normalize_entity_definition(entity_definition)
     entity_name = entity_definition["entity"]
     fields = entity_definition["fields"]

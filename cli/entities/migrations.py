@@ -1,6 +1,9 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Statut des migrations SQL Forge."""
 
 from __future__ import annotations
+from typing import Any, cast
 
 import hashlib
 import json
@@ -165,7 +168,7 @@ def collect_migration_files(migrations_dir: Path = MIGRATIONS_DIR) -> tuple[list
     return migrations, False
 
 
-def load_applied_migrations(db=None) -> list[AppliedMigration]:
+def load_applied_migrations(db: Any = None) -> list[AppliedMigration]:
     connection = db or _connect_db()
     should_close = db is None
 
@@ -221,7 +224,7 @@ def build_migration_status(
 def get_migration_status(
     migrations_dir: Path = MIGRATIONS_DIR,
     *,
-    db=None,
+    db: Any = None,
 ) -> MigrationStatusReport:
     local_migrations, migrations_dir_missing = collect_migration_files(migrations_dir)
     applied_migrations = load_applied_migrations(db=db)
@@ -234,7 +237,7 @@ def get_migration_status(
 def apply_pending_migrations(
     migrations_dir: Path = MIGRATIONS_DIR,
     *,
-    db=None,
+    db: Any = None,
     dry_run: bool = False,
 ) -> list[MigrationFile]:
     connection = db or _connect_db()
@@ -275,7 +278,7 @@ def make_migration_file(
     from_entities: bool = False,
     from_diff: str | None = None,
     project_root: Path | None = None,
-    db=None,
+    db: Any = None,
     database: str | None = None,
 ) -> Path:
     sources = [from_entity is not None, from_entities, from_diff is not None]
@@ -319,7 +322,7 @@ def diff_entity_schema(
     entity_name: str,
     *,
     project_root: Path | None = None,
-    db=None,
+    db: Any = None,
     database: str | None = None,
 ) -> SchemaDiffReport:
     root = project_root or Path.cwd()
@@ -348,19 +351,19 @@ def entity_json_file_path(entity_name: str, *, project_root: Path | None = None)
     return path
 
 
-def load_entity_definition(entity_name: str, *, project_root: Path | None = None) -> dict:
+def load_entity_definition(entity_name: str, *, project_root: Path | None = None) -> dict[str, Any]:
     root = project_root or Path.cwd()
     json_path = entity_json_file_path(entity_name, project_root=root)
     data = json.loads(json_path.read_text(encoding="utf-8"))
-    if isinstance(data, dict) and data.get("schema_version") == "1.0":
-        data = normalize_canonical_entity_for_model_build(data)
+    if isinstance(data, dict) and cast("dict[str, Any]", data).get("schema_version") == "1.0":
+        data = normalize_canonical_entity_for_model_build(cast("dict[str, Any]", data))
     return validate_entity_definition(data, source=str(json_path))
 
 
 def load_table_columns(
     table: str,
     *,
-    db=None,
+    db: Any = None,
     database: str | None = None,
 ) -> list[ActualColumn]:
     connection = db or _connect_db()
@@ -629,7 +632,7 @@ def _ensure_migrations_can_be_applied(statuses: list[MigrationStatus]) -> None:
         )
 
 
-def _apply_one_migration(connection, migration: MigrationFile) -> None:
+def _apply_one_migration(connection: Any, migration: MigrationFile) -> None:
     sql = migration.path.read_text(encoding="utf-8")
     statements = _split_sql_statements(sql)
     start = time.perf_counter()
@@ -738,7 +741,7 @@ def _migration_file_template_from_diff(
     entity_name: str,
     project_root: Path,
     *,
-    db=None,
+    db: Any = None,
     database: str | None = None,
 ) -> str:
     sql = entity_diff_migration_sql(
@@ -766,7 +769,7 @@ def entity_diff_migration_sql(
     entity_name: str,
     *,
     project_root: Path | None = None,
-    db=None,
+    db: Any = None,
     database: str | None = None,
 ) -> str:
     root = project_root or Path.cwd()
@@ -863,7 +866,7 @@ def _quote_sql_identifier(identifier: str) -> str:
     return f"`{identifier}`"
 
 
-def _sql_column_definition(field: dict) -> str:
+def _sql_column_definition(field: dict[str, Any]) -> str:
     parts = [str(field["sql_type"])]
     parts.append("NULL" if field["nullable"] else "NOT NULL")
     if field["auto_increment"]:
@@ -875,11 +878,11 @@ def _sql_column_definition(field: dict) -> str:
 
 
 def _connect_db():
-    import mariadb
+    import mariadb  # pyright: ignore[reportMissingTypeStubs]
 
     cfg = load_migration_db_config()
     try:
-        return mariadb.connect(
+        return cast("Any", mariadb).connect(
             host=cfg.host,
             port=cfg.port,
             user=cfg.login,
@@ -908,7 +911,7 @@ def load_migration_db_config() -> MigrationDbConfig:
     )
 
 
-def _rollback_quietly(connection) -> None:
+def _rollback_quietly(connection: Any) -> None:
     try:
         connection.rollback()
     except Exception:

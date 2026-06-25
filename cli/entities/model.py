@@ -1,3 +1,5 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Orchestration du modele d'entites Forge."""
 
 from __future__ import annotations
@@ -5,7 +7,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from cli.entities.canonical_model_normalizer import (
     CanonicalNormalizationError,
@@ -83,8 +85,8 @@ def sync_entity(entities_root: Path, entity_name: str) -> tuple[Path, Path]:
         raise ValueError(f"JSON d'entite introuvable : {json_path.as_posix()}")
 
     raw_data = _read_json_file(json_path)
-    if isinstance(raw_data, dict) and raw_data.get("schema_version") == "1.0":
-        raw_data = normalize_canonical_entity_for_model_build(raw_data)
+    if isinstance(raw_data, dict) and cast("dict[str, Any]", raw_data).get("schema_version") == "1.0":
+        raw_data = normalize_canonical_entity_for_model_build(cast("dict[str, Any]", raw_data))
     definition = validate_entity_definition(raw_data, source=str(json_path))
 
     sql_path = entity_dir / f"{snake}.sql"
@@ -330,7 +332,7 @@ def _load_all_entity_sources(entities_root: Path, blocks: list[str]) -> list[Ent
         except ValueError as exc:
             blocks.append(str(exc))
             continue
-        if isinstance(raw_data, dict) and raw_data.get("format_version") == 1:
+        if isinstance(raw_data, dict) and cast("dict[str, Any]", raw_data).get("format_version") == 1:
             blocks.append(
                 f"Entité legacy refusée : {json_path.as_posix()}.\n"
                 "Le format format_version: 1 n'est plus accepté par build:model.\n"
@@ -338,7 +340,7 @@ def _load_all_entity_sources(entities_root: Path, blocks: list[str]) -> list[Ent
                 "Guide : docs/entities/migration-legacy-vers-canonique.md"
             )
             continue
-        if not isinstance(raw_data, dict) or raw_data.get("schema_version") != "1.0":
+        if not isinstance(raw_data, dict) or cast("dict[str, Any]", raw_data).get("schema_version") != "1.0":
             blocks.append(
                 f"Entité sans schema_version : {json_path.as_posix()}.\n"
                 'Ajoutez "schema_version": "1.0" à la racine du fichier JSON.\n'
@@ -346,7 +348,7 @@ def _load_all_entity_sources(entities_root: Path, blocks: list[str]) -> list[Ent
             )
             continue
         try:
-            normalized = normalize_canonical_entity_for_model_build(raw_data)
+            normalized = normalize_canonical_entity_for_model_build(cast("dict[str, Any]", raw_data))
             definition = validate_entity_definition(normalized, source=str(json_path))
         except (ValueError, EntityDefinitionError, CanonicalNormalizationError) as exc:
             blocks.append(str(exc))

@@ -135,7 +135,7 @@ def build_controller(
     lines.extend([
         "",
         "",
-        f"def _form_data_from_{snake}(record: dict[str, Any]) -> dict[str, Any]:",
+        f"def _form_data_from_{snake}(record: dict) -> dict:",
         '    """Convertit les colonnes SQL vers les noms de champs du formulaire."""',
         "    return {",
     ])

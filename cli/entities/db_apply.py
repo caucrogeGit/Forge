@@ -1,10 +1,12 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Application SQL du modele d'entites Forge."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from cli.entities.model import ModelValidationError, check_model
 from cli.project.project_config import ProjectConfigError, load_project_config
@@ -122,11 +124,11 @@ def main(argv: list[str] | None = None) -> None:
 
 
 def _connect_db():
-    import mariadb
+    import mariadb  # pyright: ignore[reportMissingTypeStubs]
 
     cfg = load_db_apply_config()
     try:
-        return mariadb.connect(
+        return cast("Any", mariadb).connect(
             host=cfg.host,
             port=cfg.port,
             user=cfg.login,

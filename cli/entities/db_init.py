@@ -1,6 +1,9 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Provisioning MariaDB du projet Forge."""
 
 from __future__ import annotations
+from typing import Any, cast
 
 from dataclasses import dataclass
 
@@ -198,10 +201,10 @@ def main(argv: list[str] | None = None) -> None:
 
 
 def _connect_admin(cfg: DbInitConfig):
-    import mariadb
+    import mariadb  # pyright: ignore[reportMissingTypeStubs]
 
     try:
-        return mariadb.connect(
+        return cast("Any", mariadb).connect(
             host=cfg.admin_host,
             port=cfg.admin_port,
             user=cfg.admin_login,
@@ -226,7 +229,7 @@ def _quote_user(login: str, host: str) -> str:
     return f"{_quote_string(login)}@{_quote_string(host)}"
 
 
-def _database_exists(cursor, db_name: str) -> bool:
+def _database_exists(cursor: Any, db_name: str) -> bool:
     cursor.execute(
         "SELECT SCHEMA_NAME "
         "FROM INFORMATION_SCHEMA.SCHEMATA "
@@ -235,7 +238,7 @@ def _database_exists(cursor, db_name: str) -> bool:
     return cursor.fetchone() is not None
 
 
-def _load_user_hosts(cursor, login: str) -> list[str]:
+def _load_user_hosts(cursor: Any, login: str) -> list[str]:
     cursor.execute(
         "SELECT Host "
         "FROM mysql.user "
@@ -251,7 +254,7 @@ def _load_user_hosts(cursor, login: str) -> list[str]:
 _PERMISSION_DENIED_ERRNOS = frozenset({1044, 1045, 1142})
 
 
-def _try_load_user_hosts(cursor, login: str) -> list[str] | None:
+def _try_load_user_hosts(cursor: Any, login: str) -> list[str] | None:
     """Hôtes connus de ``login``, ou ``None`` si la lecture de ``mysql.user``
     est refusée.
 
@@ -270,12 +273,12 @@ def _try_load_user_hosts(cursor, login: str) -> list[str] | None:
         raise
 
 
-def _create_forge_migrations_table(cursor, db_name: str) -> None:
+def _create_forge_migrations_table(cursor: Any, db_name: str) -> None:
     cursor.execute(f"USE {_quote_identifier(db_name)}")
     cursor.execute(FORGE_MIGRATIONS_TABLE_SQL)
 
 
-def _rollback_quietly(connection) -> None:
+def _rollback_quietly(connection: Any) -> None:
     try:
         connection.rollback()
     except Exception:

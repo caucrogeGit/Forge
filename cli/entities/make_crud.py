@@ -1,3 +1,6 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
+# pyright: reportUnusedImport=false
 """forge make:crud — génération scaffolding CRUD depuis une entité JSON Forge.
 
 Génère pour une entité donnée :
@@ -24,6 +27,7 @@ Patterns présents dans les vues et contrôleurs générés (via les sous-module
 """
 
 from __future__ import annotations
+from typing import Any, cast
 
 import json
 from pathlib import Path
@@ -97,7 +101,7 @@ from cli.entities.crud.views_builder import (  # noqa: F401
 )
 
 
-def _route_block(definition: dict) -> str:
+def _route_block(definition: dict[str, Any]) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
     ctrl = f"{entity}Controller"
@@ -166,23 +170,23 @@ def make_crud(
 
     try:
         raw = json.loads(json_path.read_text(encoding="utf-8"))
-        if isinstance(raw, dict) and raw.get("format_version") == 1:
+        if isinstance(raw, dict) and cast("dict[str, Any]", raw).get("format_version") == 1:
             print(out.error(
                 f"Entité legacy refusée : {entity_name}.\n"
                 "Le format format_version: 1 n'est plus accepté par make:crud.\n"
                 'Utilisez schema_version: "1.0".'
             ))
             raise SystemExit(1)
-        if not isinstance(raw, dict) or (raw.get("schema_version") != "1.0" and "entity" not in raw):
+        if not isinstance(raw, dict) or (cast("dict[str, Any]", raw).get("schema_version") != "1.0" and "entity" not in raw):
             print(out.error(
                 f"Entité sans schema_version : {entity_name}.\n"
                 'Ajoutez "schema_version": "1.0" à la racine du fichier JSON.\n'
                 "Guide : docs/entities/migration-legacy-vers-canonique.md"
             ))
             raise SystemExit(1)
-        is_legacy = raw.get("schema_version") != "1.0"
+        is_legacy = cast("dict[str, Any]", raw).get("schema_version") != "1.0"
         if not is_legacy:
-            raw = normalize_canonical_entity_for_model_build(raw)
+            raw = normalize_canonical_entity_for_model_build(cast("dict[str, Any]", raw))
         definition = validate_entity_definition(raw, source=str(json_path))
     except (json.JSONDecodeError, ValueError, CanonicalNormalizationError) as exc:
         print(out.error(str(exc)))

@@ -1,3 +1,6 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
+# pyright: reportUnusedFunction=false
 """Validation et generation des relations globales Forge."""
 
 from __future__ import annotations
@@ -6,7 +9,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from cli.entities.canonical_model_normalizer import (
     CanonicalNormalizationError,
@@ -122,8 +125,8 @@ def load_entity_definitions(entities_root: Path) -> dict[str, dict[str, Any]]:
         if json_path.name == "relations.json":
             continue
         raw_data = json.loads(json_path.read_text(encoding="utf-8"))
-        if isinstance(raw_data, dict) and raw_data.get("schema_version") == "1.0":
-            legacy_data = normalize_canonical_entity_for_model_build(raw_data)
+        if isinstance(raw_data, dict) and cast("dict[str, Any]", raw_data).get("schema_version") == "1.0":
+            legacy_data = normalize_canonical_entity_for_model_build(cast("dict[str, Any]", raw_data))
             data = validate_entity_definition(legacy_data, source=str(json_path))
         else:
             data = validate_entity_definition(raw_data, source=str(json_path))
@@ -143,13 +146,14 @@ def validate_relations_definition(
     _validate_relations_root(data, issues)
 
     validated_relations: list[ValidatedRelation | ValidatedCanonicalManyToManyRelation] = []
-    if isinstance(data, dict) and isinstance(data.get("relations"), list):
+    if isinstance(data, dict) and isinstance(cast("dict[str, Any]", data).get("relations"), list):
         seen_names: dict[str, int] = {}
         seen_fk_names: dict[str, int] = {}
-        seen_pivot_tables: dict[str, tuple[int, tuple]] = {}
-        for index, relation in enumerate(data["relations"]):
+        seen_pivot_tables: dict[str, tuple[int, tuple[Any, ...]]] = {}
+        for index, relation in enumerate(cast("dict[str, Any]", data)["relations"]):
             if not isinstance(relation, dict):
                 continue
+            relation = cast("dict[str, Any]", relation)
             rel_type = relation.get("type") if isinstance(relation.get("type"), str) else None
             if rel_type == "many_to_many":
                 if "pivot" in relation:
@@ -193,7 +197,7 @@ def validate_relations_definition(
 
 
 def generate_relations_sql(relations: list[ValidatedRelation | ValidatedCanonicalManyToManyRelation]) -> str:
-    blocks = []
+    blocks: list[str] = []
     for relation in relations:
         if isinstance(relation, ValidatedRelation):
             blocks.append(
@@ -208,7 +212,7 @@ def generate_relations_sql(relations: list[ValidatedRelation | ValidatedCanonica
                     ]
                 )
             )
-        elif isinstance(relation, ValidatedCanonicalManyToManyRelation):
+        else:
             blocks.append(_generate_canonical_m2m_sql(relation))
     if not blocks:
         return ""
@@ -309,11 +313,12 @@ def _validate_canonical_pivot_fields(
     reserved = {"id", from_key, to_key}
     result: list[ValidatedPivotField] = []
 
-    for i, field in enumerate(fields_raw):
+    for i, field in enumerate(cast("list[Any]", fields_raw)):
         field_path = f"{path}.pivot.fields[{i}]"
         if not isinstance(field, dict):
             _add_issue(issues, field_path, "doit etre un objet")
             continue
+        field = cast("dict[str, Any]", field)
 
         name = field.get("name")
         forge_type = field.get("type")
@@ -360,7 +365,7 @@ def _validate_m2m_canonical(
     index: int,
     entity_map: dict[str, dict[str, Any]],
     seen_names: dict[str, int],
-    seen_pivot_tables: dict[str, tuple[int, tuple]],
+    seen_pivot_tables: dict[str, tuple[int, tuple[Any, ...]]],
     issues: list[RelationIssue],
 ) -> ValidatedCanonicalManyToManyRelation | None:
     path = f"relations[{index}]"
@@ -399,6 +404,7 @@ def _validate_m2m_canonical(
     if not isinstance(pivot, dict):
         _add_issue(issues, f"{path}.pivot", "doit etre un objet")
         return None
+    pivot = cast("dict[str, Any]", pivot)
 
     for key in ("table", "from_key", "to_key"):
         if key not in pivot:
@@ -503,7 +509,7 @@ def _validate_relations_root(data: Any, issues: list[RelationIssue]) -> None:
         )
         return
 
-    if data.get("schema_version") != "1.0":
+    if cast("dict[str, Any]", data).get("schema_version") != "1.0":
         _add_issue(issues, "schema_version", 'doit valoir "1.0"')
 
     if "relations" not in data:
@@ -513,7 +519,7 @@ def _validate_relations_root(data: Any, issues: list[RelationIssue]) -> None:
         if not isinstance(data["relations"], list):
             _add_issue(issues, "relations", "doit etre une liste")
         else:
-            for index, relation in enumerate(data["relations"]):
+            for index, relation in enumerate(cast("dict[str, Any]", data)["relations"]):
                 if not isinstance(relation, dict):
                     _add_issue(issues, f"relations[{index}]", "doit etre un objet")
 
