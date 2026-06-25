@@ -131,7 +131,7 @@ nombre d'erreurs.
 | 2 | `TYPING-CLI-ENTITIES-VALIDATION-001` | `validation.py`, `entity_validate.py`, `entity_semantic_validate.py` | ~302 |
 | 3 | `TYPING-CLI-ENTITIES-MAKE-DB-001` | `make_entity`, `make_crud`, `relations`, `migrations`, `db_init`, `db_apply`, `model` | ~360 |
 | 4 | `TYPING-CLI-SECURITY-001` | **Fait** : `cli/security/` (auth, rbac_audit, rbac_validate) strict ; frontière jsonschema/referencing typée `Any` (+ ignore ciblé sur `Registry()`), traversée RBAC castée, `action: Callable[[], None]` | ✅ |
-| 5 | `TYPING-CLI-PUBLIC-001` | `cli/public/` (public_contact, public_pdf…) | ~117 |
+| 5 | `TYPING-CLI-PUBLIC-001` | `cli/public/` — `public_page` + `public_show` **faits** ; `public_form`/`public_list`/`public_contact` **bloqués par la fondation private/public** (helpers `_to_snake`/`_pk_field`/`_humanize`/`_insert_import` partagés avec `cli/entities` et `cli/optins`) → faire `TYPING-CLI-PRIVATE-PUBLIC-001` d'abord | ~115 restant |
 | 6 | `TYPING-CLI-PROJECT-SCHEMAS-OPTINS-001` | **Fait** : `cli/optins/` (registre public, `SUPPORTED_OPTINS` typé), `cli/project/` (config `ModuleType`, `installed: dict[str, dict[str, Any]]`, mariadb aliasé), `cli/schemas/` (loader `tuple[dict[str, Any], …]`, traversée `$ref` castée) — strict | ✅ |
 | 7 | `TYPING-CLI-ASSETS-DEPLOY-001` | **Fait** : `cli/assets/` (front, uploads, i18n), `cli/deploy/` (deploy via `find_spec`), `cli/_support/` — strict | ✅ |
 | 8 | `TYPING-FORGE-PY-001` | `forge.py` (dispatcher racine) | ~77 |
