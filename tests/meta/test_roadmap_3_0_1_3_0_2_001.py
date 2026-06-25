@@ -35,10 +35,10 @@ class TestRoadmapStructure:
         )
 
     def test_state_actual_section(self):
-        """La section 'État actuel — Forge X.Y.Z' existe."""
+        """La section 'État actuel, Forge X.Y.Z' existe."""
         text = ROADMAP.read_text(encoding="utf-8")
-        assert re.search(r"État actuel — Forge \d", text), (
-            "Section 'État actuel — Forge X.Y.Z' attendue."
+        assert re.search(r"État actuel, Forge \d", text), (
+            "Section 'État actuel, Forge X.Y.Z' attendue."
         )
 
 
@@ -75,12 +75,12 @@ class TestPostThreeZeroSectionExists:
 
 
 class TestScenarioCSectionExists:
-    """La section 'Scénario C — Consolidation 3.0.2' existe."""
+    """La section 'Scénario C, Consolidation 3.0.2' existe."""
 
     def test_section_present(self):
         text = ROADMAP.read_text(encoding="utf-8")
-        assert "## Scénario C — Consolidation 3.0.2" in text, (
-            "Section 'Scénario C — Consolidation 3.0.2' doit être ajoutée."
+        assert "## Scénario C, Consolidation 3.0.2" in text, (
+            "Section 'Scénario C, Consolidation 3.0.2' doit être ajoutée."
         )
 
     @pytest.mark.parametrize("ticket_code", [
@@ -96,7 +96,7 @@ class TestScenarioCSectionExists:
         """Les tickets clés du Scénario C sont mentionnés."""
         text = ROADMAP.read_text(encoding="utf-8")
         match = re.search(
-            r"## Scénario C — Consolidation 3\.0\.2.*?(?=\n## )",
+            r"## Scénario C, Consolidation 3\.0\.2.*?(?=\n## )",
             text, re.DOTALL,
         )
         assert match, "Section 'Scénario C' introuvable"
@@ -109,7 +109,7 @@ class TestScenarioCSectionExists:
         """T18 (CI-COMMENTS-CLEANUP-001) est documenté comme intégré dans T2b."""
         text = ROADMAP.read_text(encoding="utf-8")
         match = re.search(
-            r"## Scénario C — Consolidation 3\.0\.2.*?(?=\n## )",
+            r"## Scénario C, Consolidation 3\.0\.2.*?(?=\n## )",
             text, re.DOTALL,
         )
         if match:

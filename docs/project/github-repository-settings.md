@@ -1,4 +1,4 @@
-# GitHub — Paramètres du dépôt Forge
+# GitHub, Paramètres du dépôt Forge
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -55,7 +55,7 @@ Adapter si nécessaire selon les modules actifs ou les axes futurs du projet.
 | Ressource | URL |
 |-----------|-----|
 | Landing page et documentation | `https://forgemvc.com/docs/forge/` |
-| Tests terrain — vue d'ensemble | `https://forgemvc.com/docs/forge/testing/` |
+| Tests terrain, vue d'ensemble | `https://forgemvc.com/docs/forge/testing/` |
 | État des parcours testables | `https://forgemvc.com/docs/forge/testing/field-test-status/` |
 | Formulaire de retour testeur | `https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml` |
 

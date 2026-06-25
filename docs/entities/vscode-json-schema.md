@@ -160,7 +160,7 @@ Avec un schéma associé, VS Code peut signaler :
 
 | Cas | Exemple invalide | Exemple valide |
 |-----|-----------------|----------------|
-| Clé inconnue | `"couleur": "rouge"` dans une entité | — |
+| Clé inconnue | `"couleur": "rouge"` dans une entité |, |
 | Clé obligatoire manquante | entité sans `name` | `"name": "Article"` |
 | Type JSON invalide | `"required": "oui"` | `"required": true` |
 | Type Forge non autorisé | `"type": "VARCHAR(255)"` | `"type": "string"` |
@@ -218,8 +218,8 @@ avancées (comme `$dynamicRef` ou certains mots-clés d'annotation) peuvent êtr
 plus ou moins bien prises en compte. La validation officielle reste donc
 `forge entity:validate`.
 
-En pratique, les règles de base — types, `enum`, propriétés requises,
-`additionalProperties: false` — sont bien reconnues par les versions récentes
+En pratique, les règles de base, types, `enum`, propriétés requises,
+`additionalProperties: false`, sont bien reconnues par les versions récentes
 de VS Code.
 
 ---
@@ -283,7 +283,7 @@ détectables uniquement par le schéma (ex : clé inconnue, type incorrect).
 Si l'erreur est dans une propriété non couverte sémantiquement, elle peut
 apparaître dans VS Code mais pas dans `entity:validate`, ou inversement.
 
-Les deux outils sont complémentaires — utiliser les deux.
+Les deux outils sont complémentaires, utiliser les deux.
 
 ### Le schéma RBAC n'est pas reconnu dans VS Code
 

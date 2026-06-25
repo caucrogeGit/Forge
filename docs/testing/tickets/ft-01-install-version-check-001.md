@@ -1,4 +1,4 @@
-# FT-01-INSTALL-VERSION-CHECK-001 — Vérifier la version Forge installée
+# FT-01-INSTALL-VERSION-CHECK-001, Vérifier la version Forge installée
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -8,9 +8,9 @@
 
 | Champ | Valeur |
 |---|---|
-| Phase | FT-01 — Installation de Forge |
+| Phase | FT-01, Installation de Forge |
 | Ticket | FT-01-INSTALL-VERSION-CHECK-001 |
-| Niveau de guidage | G0 — Guidé complètement |
+| Niveau de guidage | G0, Guidé complètement |
 | Profil testeur visé | débutant Forge / développeur Python |
 | Durée indicative | courte (20 à 40 minutes) |
 | Environnement cible | tout environnement où Forge est installé |
@@ -80,7 +80,7 @@ docs/release-and-compatibility.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues et si elles permettaient de connaître la version attendue.
 
-### Verrou — documentation erronée
+### Verrou, documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 
@@ -282,7 +282,7 @@ A5 — impossible malgré aide
 
 | Question | Réponse |
 |---|---|
-| Ce ticket peut-il devenir un tutoriel ? | partiellement — la section "vérifier sa version" peut enrichir le tutoriel d'installation |
+| Ce ticket peut-il devenir un tutoriel ? | partiellement, la section "vérifier sa version" peut enrichir le tutoriel d'installation |
 | Nom proposé de la page tutoriel | fusionner avec `docs/tutorials/installer-forge-pipx.md` |
 | Menu proposé | Tutoriels > Installation > Installer Forge avec pipx |
 | Ticket FT validé par un testeur externe ? | à renseigner |
@@ -313,10 +313,10 @@ Le tutoriel ne doit pas être publié tant que ce ticket FT n'a pas été valid�
 
 À remplir après analyse du retour.
 
-- Problème reproductible : —
-- Problème framework : —
-- Problème documentation : —
-- Problème ergonomie : —
-- Hors périmètre : —
-- Ticket correctif à créer : —
-- Priorité proposée : —
+- Problème reproductible : -
+- Problème framework : -
+- Problème documentation : -
+- Problème ergonomie : -
+- Hors périmètre : -
+- Ticket correctif à créer : -
+- Priorité proposée : -

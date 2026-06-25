@@ -38,13 +38,13 @@ class TestRoadmapHeaderMatchesCurrentVersion:
 
     def test_etat_actuel_mentions_current_version(self):
         text = ROADMAP.read_text(encoding="utf-8")
-        assert re.search(r"## État actuel — Forge \d", text), (
-            "La section '## État actuel — Forge X.Y.Z' doit exister dans la roadmap."
+        assert re.search(r"## État actuel, Forge \d", text), (
+            "La section '## État actuel, Forge X.Y.Z' doit exister dans la roadmap."
         )
 
     def test_no_stale_etat_actuel_2x(self):
         text = ROADMAP.read_text(encoding="utf-8")
-        assert "État actuel — Forge 2." not in text, (
+        assert "État actuel, Forge 2." not in text, (
             "La section 'État actuel' pointe encore vers une version 2.x"
         )
 

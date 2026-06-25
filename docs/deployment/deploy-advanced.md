@@ -4,8 +4,8 @@ Ce guide couvre le déploiement complet d'une application Forge en production :
 préparation du projet, configuration serveur, cycle de mise à jour et validation.
 
 !!! tip "Guides complémentaires"
-    - [Déploiement](deployment.md) — commandes `forge deploy:init` / `forge deploy:check` et fichiers générés.
-    - [Sécurité en production](production-security.md) — cookies, headers, CSRF, RBAC, uploads, checklist sécurité complète.
+    - [Déploiement](deployment.md), commandes `forge deploy:init` / `forge deploy:check` et fichiers générés.
+    - [Sécurité en production](production-security.md), cookies, headers, CSRF, RBAC, uploads, checklist sécurité complète.
 
 ---
 
@@ -43,7 +43,7 @@ storage/uploads/
 | Nginx | Termine TLS, compresse, applique les headers de sécurité, sert les fichiers statiques optionnellement |
 | Forge (systemd) | Exécute la logique MVC, génère les réponses HTML, contrôle les accès aux uploads |
 | MariaDB | Persiste les données applicatives |
-| `storage/uploads/` | Stocke les fichiers uploadés — jamais exposé directement |
+| `storage/uploads/` | Stocke les fichiers uploadés, jamais exposé directement |
 
 ---
 
@@ -292,7 +292,7 @@ sudo nginx -t && sudo systemctl reload nginx
 
 L'en-tête `Strict-Transport-Security` indique aux navigateurs de n'utiliser
 que HTTPS pour ce domaine. Activez-le uniquement quand HTTPS est stable et
-opérationnel — retirez-le temporairement lors d'une migration de domaine.
+opérationnel, retirez-le temporairement lors d'une migration de domaine.
 
 ---
 
@@ -300,12 +300,12 @@ opérationnel — retirez-le temporairement lors d'une migration de domaine.
 
 Forge sert le dossier `static/` par défaut. En production, deux stratégies :
 
-### Stratégie A — Forge sert `static/`
+### Stratégie A, Forge sert `static/`
 
 Aucune configuration supplémentaire. Nginx relaie toutes les requêtes vers Forge.
 Convient aux projets à faible trafic.
 
-### Stratégie B — Nginx sert `static/` directement
+### Stratégie B, Nginx sert `static/` directement
 
 ```nginx
 location /static/ {
@@ -315,7 +315,7 @@ location /static/ {
 }
 ```
 
-Convient aux projets à trafic élevé — Nginx sert les fichiers statiques sans
+Convient aux projets à trafic élevé, Nginx sert les fichiers statiques sans
 passer par Python.
 
 !!! danger "Ne jamais exposer le projet brut"
@@ -369,8 +369,8 @@ sudo journalctl -u forge-app -n 100 --no-pager
 
 Forge écrit des logs de diagnostic dans `storage/logs/` :
 
-- `errors.dev.jsonl` — erreurs structurées JSON
-- `errors.dev.md` — rapport lisible
+- `errors.dev.jsonl`, erreurs structurées JSON
+- `errors.dev.md`, rapport lisible
 
 !!! warning "Logs en production"
     Ces fichiers sont conçus pour le développement. En production :
@@ -398,7 +398,7 @@ Les garanties de sécurité de Forge sont documentées dans
 - CSRF actif sur toutes les routes POST non explicitement opt-out
 - Cookies `HttpOnly`, `SameSite=Strict`, `Secure` (activé automatiquement quand `X-Forwarded-Proto: https`)
 - Headers HTTP de sécurité (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, CSP)
-- RBAC serveur — refus par défaut pour les anonymes
+- RBAC serveur, refus par défaut pour les anonymes
 - Uploads filtrés (extension, MIME, taille)
 - Secrets hors Git
 
@@ -592,18 +592,18 @@ dossier n'a pas les permissions correctes.
 
 | Limite | État |
 |---|---|
-| Sessions mémoire par défaut | `MemorySessionStore` — perdues au redémarrage. Voir backends fichier ou MariaDB dans [Déploiement](deployment.md). |
+| Sessions mémoire par défaut | `MemorySessionStore`, perdues au redémarrage. Voir backends fichier ou MariaDB dans [Déploiement](deployment.md). |
 | Pas de supervision intégrée | Utilisez systemd + Prometheus/Grafana ou équivalent externe |
 | Pas de rollback automatique | Gérez les rollbacks manuellement (git checkout + restauration DB) |
-| SQL versionné absent | Pas de migration versionnée automatique — gérez les scripts SQL manuellement |
-| Dettes de sécurité connues | `SECURITY-CACHE-001`, `CRUD-RBAC-UI-001`, `E2E-UPLOAD-HTTP-001`, `SECURITY-UPLOAD-RATE-LIMIT-001` — voir [Sécurité en production](production-security.md) |
+| SQL versionné absent | Pas de migration versionnée automatique, gérez les scripts SQL manuellement |
+| Dettes de sécurité connues | `SECURITY-CACHE-001`, `CRUD-RBAC-UI-001`, `E2E-UPLOAD-HTTP-001`, `SECURITY-UPLOAD-RATE-LIMIT-001`, voir [Sécurité en production](production-security.md) |
 
 ---
 
 ## Voir aussi
 
-- [Déploiement](deployment.md) — `forge deploy:init`, `forge deploy:check`, fichiers générés
-- [Sécurité en production](production-security.md) — checklist sécurité complète
-- [Guide de migration](../features/migration-guide.md) — cycle de mise à jour entre versions
-- [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, dépendances
-- [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
+- [Déploiement](deployment.md), `forge deploy:init`, `forge deploy:check`, fichiers générés
+- [Sécurité en production](production-security.md), checklist sécurité complète
+- [Guide de migration](../features/migration-guide.md), cycle de mise à jour entre versions
+- [Matrice de compatibilité](../release/compatibility.md), Python, MariaDB, dépendances
+- [Contrat de stabilité](../release/stability-contract.md), fichiers garantis préservés

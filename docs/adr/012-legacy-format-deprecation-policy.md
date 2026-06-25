@@ -1,8 +1,8 @@
-# ADR-012 — Politique de dépréciation et suppression du format legacy des entités Forge
+# ADR-012, Politique de dépréciation et suppression du format legacy des entités Forge
 
 ## Statut
 
-**Mise à jour — Forge 1.x** (ticket `LEGACY-REMOVE-004-UPDATE-DOCS-AFTER-LEGACY-REMOVAL`).
+**Mise à jour, Forge 1.x** (ticket `LEGACY-REMOVE-004-UPDATE-DOCS-AFTER-LEGACY-REMOVAL`).
 
 La décision initiale (dépréciation avec support temporaire) a été remplacée par la suppression
 effective du support legacy dans les tickets LEGACY-REMOVE-001A, 001B, 002 et 003.
@@ -11,7 +11,7 @@ effective du support legacy dans les tickets LEGACY-REMOVE-001A, 001B, 002 et 00
 
 ## Date
 
-2026-05-19 (initiale) — mise à jour 2026-05-19
+2026-05-19 (initiale), mise à jour 2026-05-19
 
 ---
 
@@ -32,20 +32,20 @@ Les tickets LEGACY-REMOVE-001A et 001B ont ensuite refusé les entités `format_
 dans `build:model` et `make:crud`. Le ticket LEGACY-REMOVE-002 a refusé le format legacy
 dans `relations.json`. Le ticket LEGACY-REMOVE-003 a nettoyé les fixtures de tests restantes.
 
-Aucun projet réel Forge n'était à préserver — la suppression a été faite pendant la phase
+Aucun projet réel Forge n'était à préserver, la suppression a été faite pendant la phase
 de construction du framework.
 
 ---
 
-## Décision (mise à jour — remplace la décision initiale)
+## Décision (mise à jour, remplace la décision initiale)
 
 **Le format canonique `schema_version: "1.0"` est le seul format d'entrée accepté.**
 
 Le format legacy `format_version: 1` est **refusé** :
 
-- `build:model` refuse les entités `format_version: 1` — lève `ModelValidationError`.
-- `make:crud` refuse les entités `format_version: 1` — quitte avec `SystemExit`.
-- `relations.json` avec `format_version: 1` est refusé par `validate_relations_definition` — lève `EntityRelationsError`.
+- `build:model` refuse les entités `format_version: 1`, lève `ModelValidationError`.
+- `make:crud` refuse les entités `format_version: 1`, quitte avec `SystemExit`.
+- `relations.json` avec `format_version: 1` est refusé par `validate_relations_definition`, lève `EntityRelationsError`.
 - Les clés relationnelles legacy (`from_entity`, `to_entity`, `foreign_key_name`, `pivot_table`,
   `source_key`, `target_key`) ne sont pas acceptées dans `relations.json`.
 
@@ -68,8 +68,8 @@ LEGACY-REMOVE-001A, 001B, 002 et 003.
 
 | Clé / mécanisme | Statut |
 |---|---|
-| `format_version: 1` dans les entités | **Refusé** — `build:model`, `make:crud` lèvent une erreur |
-| `format_version: 1` dans `relations.json` | **Refusé** — `validate_relations_definition` lève une erreur |
+| `format_version: 1` dans les entités | **Refusé**, `build:model`, `make:crud` lèvent une erreur |
+| `format_version: 1` dans `relations.json` | **Refusé**, `validate_relations_definition` lève une erreur |
 | `from_entity` / `to_entity` dans `relations.json` | **Refusé** |
 | `foreign_key_name` dans `relations.json` | **Refusé** |
 | `pivot_table` / `source_key` / `target_key` dans `relations.json` | **Refusé** |

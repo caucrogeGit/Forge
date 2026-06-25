@@ -80,11 +80,11 @@ sont pas étendus pour le faire.
 
 Forge fournit trois layouts dans `mvc/views/layouts/` :
 
-- `public.html` — layout sans navigation, destiné aux pages visiteurs (accueil,
+- `public.html`, layout sans navigation, destiné aux pages visiteurs (accueil,
   connexion, page d'erreur).
-- `admin.html` — layout avec barre de navigation et bouton de déconnexion,
+- `admin.html`, layout avec barre de navigation et bouton de déconnexion,
   destiné aux pages CRUD et d'administration.
-- `base.html` — layout historique conservé pour compatibilité avec les starters
+- `base.html`, layout historique conservé pour compatibilité avec les starters
   existants.
 
 Les layouts `public.html` et `admin.html` exposent un bloc de titre personnalisable :
@@ -186,7 +186,7 @@ aucun envoi de mail, aucun INSERT. Non destructif et idempotent.
 Les templates générés par les commandes publiques utilisent `{{ trans('key') }}`
 pour les chaînes génériques. Si la clé existe dans `translations/fr.json`,
 la valeur traduite est affichée. Si la clé est absente, `trans()` retourne la
-clé elle-même — la page reste fonctionnelle.
+clé elle-même, la page reste fonctionnelle.
 
 **Clés publiques ajoutées dans `translations/fr.json` :**
 
@@ -218,13 +218,13 @@ ne sont pas imposés.
 `forge make:public-list` et `forge make:public-show` intègrent automatiquement
 les médias déclarés dans la définition JSON de l'entité (clé `media`).
 
-**Liste publique** — si l'entité déclare au moins un champ `field: image`, la
+**Liste publique**, si l'entité déclare au moins un champ `field: image`, la
 liste générée affiche une colonne miniature (thumbnail) pour le premier rôle
 image trouvé. Le contrôleur enrichit chaque ligne avec `get_cover_media` après
 la requête SQL principale. Aucune image n'est ajoutée pour les entités sans
 déclaration `media` ou avec uniquement des fichiers.
 
-**Fiche publique** — la fiche affiche l'ensemble des médias déclarés, dans
+**Fiche publique**, la fiche affiche l'ensemble des médias déclarés, dans
 l'ordre de la définition :
 
 - Image unique (`multiple: false`, `field: image`) → balise `<img>` avec
@@ -272,10 +272,10 @@ destructif. Génère `mvc/views/public/{plural}/form.html` et la classe controll
 
 **Routes générées :**
 
-- `GET /{plural}/new` — affichage du formulaire vide (méthode `new`)
-- `POST /{plural}` — traitement et INSERT (méthode `create`)
+- `GET /{plural}/new`, affichage du formulaire vide (méthode `new`)
+- `POST /{plural}`, traitement et INSERT (méthode `create`)
 
-**Champs inclus** — tous les champs non sensibles de l'entité, hors clé primaire,
+**Champs inclus**, tous les champs non sensibles de l'entité, hors clé primaire,
 clés étrangères (`_id`) et champs systèmes (`created_at`, `updated_at`,
 `password*`, `token*`, `secret*`, `is_admin`, `is_active`…).
 
@@ -326,9 +326,9 @@ Les variantes de `button.html` sont `primary` (défaut), `secondary` et
 Le composant `button.html` rend un `<button>` par défaut. Si la variable
 `href` est définie, il rend un `<a href>` avec le même style. Usage recommandé :
 
-- `primary` — action principale : créer, enregistrer
-- `secondary` — action neutre : annuler, retour sous forme de bouton
-- `danger` — action destructrice : supprimer
+- `primary`, action principale : créer, enregistrer
+- `secondary`, action neutre : annuler, retour sous forme de bouton
+- `danger`, action destructrice : supprimer
 
 Les liens de navigation (`← Retour`) et les actions inline de tableau
 (Voir, Modifier, Supprimer) restent des text-links légers, non soumis au
@@ -336,10 +336,10 @@ composant.
 
 Notes sur les composants moins utilisés :
 
-- `components/form_field.html` — n'est pas branché automatiquement dans les templates `make:crud` ; les champs y sont générés en HTML inline.
-- `table.html` — non utilisé dans les vues liste générées ; celles-ci contiennent leur tableau en HTML inline.
-- `badge.html` — générique, sans logique métier ; aucun variant n'est lié à une valeur applicative.
-- `pagination.html` — composant serveur classique ; la pagination HTMX optionnelle des CRUD générés passe par leur partial `_pagination.html`.
+- `components/form_field.html`, n'est pas branché automatiquement dans les templates `make:crud` ; les champs y sont générés en HTML inline.
+- `table.html`, non utilisé dans les vues liste générées ; celles-ci contiennent leur tableau en HTML inline.
+- `badge.html`, générique, sans logique métier ; aucun variant n'est lié à une valeur applicative.
+- `pagination.html`, composant serveur classique ; la pagination HTMX optionnelle des CRUD générés passe par leur partial `_pagination.html`.
 
 ### Inclure un composant
 
@@ -399,7 +399,7 @@ depuis le contexte de la vue :
 - Les composants restent lisibles dans leur source HTML.
 - Aucun composant ne contient de logique métier.
 - Aucun composant ne charge HTMX ou Alpine.js automatiquement.
-- Les variables attendues sont explicites dans le template — aucun composant n'est opaque.
+- Les variables attendues sont explicites dans le template, aucun composant n'est opaque.
 - Les composants ne forment pas un mini-framework front.
 - Les templates générés (`make:crud`, starters) restent compréhensibles sans connaître les composants.
 - Les noms métier restent dans l'application, jamais dans les composants.
@@ -465,7 +465,7 @@ context = {
 }
 ```
 
-Les niveaux supportés sont `success`, `info`, `warning` et `error` — ils
+Les niveaux supportés sont `success`, `info`, `warning` et `error`, ils
 correspondent directement aux variants de `components/alert.html`. Le
 niveau `danger` est traité comme `error`.
 
@@ -490,7 +490,7 @@ quand la collection est vide :
 ```
 
 L'état vide utilise la clé i18n `crud.empty` ("Aucun élément à afficher.").
-Il est générique — il n'affiche pas le nom de l'entité ni ne dépend de
+Il est générique, il n'affiche pas le nom de l'entité ni ne dépend de
 logique métier. Les messages flash sont distincts des états vides : un flash
 passe par la session et `render_flash_html()`, un état vide est rendu
 directement dans le template selon l'état de la liste.
@@ -506,7 +506,7 @@ affichent une confirmation native avant soumission :
 ```
 
 La clé i18n `crud.confirm_delete` ("Confirmer la suppression ?") est injectée
-par Jinja2 au rendu. Aucune dépendance JavaScript supplémentaire n'est requise —
+par Jinja2 au rendu. Aucune dépendance JavaScript supplémentaire n'est requise,
 `window.confirm()` est natif au navigateur.
 
 ## Recompiler le CSS
@@ -957,16 +957,16 @@ Forge ne maintient pas officiellement :
 Ces outils peuvent être intégrés manuellement dans une application finale, mais
 ils ne font pas partie du chemin standard maintenu par Forge.
 
-## Statut de la phase 3 — Socle front léger
+## Statut de la phase 3, Socle front léger
 
 La phase 3 est clôturée. Les blocs suivants sont stables :
 
-- **CSS** — Tailwind compilé, fichier statique, script `build:css`.
-- **JS** — `app.js` point d'entrée, `js:init htmx/alpine` optionnels.
-- **i18n** — `trans()` Python et Jinja, catalogue `fr.json`, commandes `i18n:init` et `i18n:check`.
-- **Layouts** — `public.html`, `admin.html`, `base.html` ; flash, scripts block, Tailwind.
-- **Composants** — 6 composants Jinja dans `mvc/views/components/` ; aucun comportement dynamique.
-- **make:crud** — libellés i18n, boutons standardisés, états vides, confirmations natives.
+- **CSS**, Tailwind compilé, fichier statique, script `build:css`.
+- **JS**, `app.js` point d'entrée, `js:init htmx/alpine` optionnels.
+- **i18n**, `trans()` Python et Jinja, catalogue `fr.json`, commandes `i18n:init` et `i18n:check`.
+- **Layouts**, `public.html`, `admin.html`, `base.html` ; flash, scripts block, Tailwind.
+- **Composants**, 6 composants Jinja dans `mvc/views/components/` ; aucun comportement dynamique.
+- **make:crud**, libellés i18n, boutons standardisés, états vides, confirmations natives.
 
 Limites restantes (hors périmètre phase 3) :
 

@@ -1,4 +1,4 @@
-# Audit Auth — Journalisation des événements d'authentification
+# Audit Auth, Journalisation des événements d'authentification
 
 `log_auth_event()` est la fonction centrale pour journaliser les événements d'authentification dans Forge. Elle émet des messages via le logger Python `forge.auth.audit`, sans jamais accéder à la base de données et sans jamais propager d'exception.
 
@@ -17,12 +17,12 @@ Les champs `password`, `password_hash`, `token`, `raw_token`, `access_token`, `r
 
 `auth_controller.py` et `mfa_challenge_controller.py` appellent `log_auth_event()` sur chaque transition :
 
-- `login.success` — connexion validée
-- `login.failed` — mauvais identifiant ou mot de passe
-- `user.disabled` — tentative sur un compte désactivé
-- `logout` — déconnexion
-- `mfa.challenge.success` — code MFA valide
-- `mfa.challenge.failed` — code MFA invalide
+- `login.success`, connexion validée
+- `login.failed`, mauvais identifiant ou mot de passe
+- `user.disabled`, tentative sur un compte désactivé
+- `logout`, déconnexion
+- `mfa.challenge.success`, code MFA valide
+- `mfa.challenge.failed`, code MFA invalide
 
 ### Configuration du logger
 
@@ -38,7 +38,7 @@ logging.getLogger("forge.auth.audit").setLevel(logging.INFO)
 
 `tests/test_auth_audit_controller.py` couvre 33 cas : niveaux INFO/WARNING, absence de données sensibles dans les logs, présence de `user_id` et `ip`, comportement des contrôleurs préservé, silence en cas d'erreur interne.
 
-## Cookies de session — Attributs de sécurité
+## Cookies de session, Attributs de sécurité
 
 Tous les cookies `session_id` émis par Forge portent `HttpOnly`, `SameSite=Strict`, `Secure` et `Path=/`. Le flag `Secure` est toujours actif quelle que soit la valeur de `app_env`.
 
@@ -70,7 +70,7 @@ Le flag `Secure` est présent en dev et en prod. Forge suppose un accès HTTPS o
 
 - Nom du cookie : `session_id` (pas de préfixe `__Host-`).
 - Forge ne gère qu'un seul cookie de session par requête.
-- `SameSite=Strict` peut bloquer le cookie lors d'un accès depuis un lien externe — adaptez à `Lax` si nécessaire dans votre application.
+- `SameSite=Strict` peut bloquer le cookie lors d'un accès depuis un lien externe, adaptez à `Lax` si nécessaire dans votre application.
 
 ### Tests
 
@@ -98,7 +98,7 @@ default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; f
 ```
 
 Avec `APP_CSP_NONCE_ENABLED=true`, chaque requête reçoit un nonce unique et
-`script-src` inclut `'nonce-<valeur>'` — les scripts inline portant ce nonce
+`script-src` inclut `'nonce-<valeur>'`, les scripts inline portant ce nonce
 sont autorisés sans `unsafe-inline`.
 
 La CSP ne contient jamais `unsafe-inline` ni `unsafe-eval`.
@@ -150,7 +150,7 @@ le flag `Secure` sur les cookies).
 - Headers sur fichiers statiques : 7 tests E2E
 - Valeurs CSP et Referrer-Policy : 5 tests E2E
 
-## Uploads et médias — Sécurité
+## Uploads et médias, Sécurité
 
 ### Architecture
 
@@ -170,13 +170,13 @@ Chemins refusés :
 - Null byte : `images/\x00photo.jpg`
 - Schémas URI quelconques
 
-Les chemins encodés `%2e%2e` ne sont **pas** URL-décodés — ils sont traités comme des noms de fichiers littéraux (inaccessibles via le filesystem standard).
+Les chemins encodés `%2e%2e` ne sont **pas** URL-décodés, ils sont traités comme des noms de fichiers littéraux (inaccessibles via le filesystem standard).
 
-### Extensions — liste blanche
+### Extensions, liste blanche
 
 Par défaut : `jpg`, `jpeg`, `png`, `webp`, `pdf`. Refusées (non dans la liste) : `.php`, `.py`, `.html`, `.js`, `.svg`, `.sh`, `.exe`, `.env`, etc.
 
-La validation porte sur la **dernière extension** du fichier. `photo.php.jpg` est accepté si `.jpg` est autorisé — limite documentée. `photo.jpg.php` est refusé car `.php` n'est pas autorisé.
+La validation porte sur la **dernière extension** du fichier. `photo.php.jpg` est accepté si `.jpg` est autorisé, limite documentée. `photo.jpg.php` est refusé car `.php` n'est pas autorisé.
 
 ### MIME
 
@@ -188,7 +188,7 @@ Configurable via `UPLOAD_MAX_SIZE` (défaut : 5 Mo). Fichier vide (0 octet) acce
 
 ### Noms de fichiers
 
-`secure_filename()` retire les chemins (basename uniquement), remplace espaces et caractères spéciaux par `_`, supprime les null bytes. `generate_unique_filename()` ajoute un UUID hex — impossible de prédire ou d'écraser un fichier existant.
+`secure_filename()` retire les chemins (basename uniquement), remplace espaces et caractères spéciaux par `_`, supprime les null bytes. `generate_unique_filename()` ajoute un UUID hex, impossible de prédire ou d'écraser un fichier existant.
 
 ### Catégories
 

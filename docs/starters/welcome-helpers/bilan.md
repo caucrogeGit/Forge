@@ -8,9 +8,9 @@ bâties sur une base non instanciable, chacune centrée sur un concern.
     mvc/helpers/
     ├── __init__.py     # ré-exporte Session, Cookies, Flash
     ├── _facade.py      # base : namespace non instanciable
-    ├── session.py      # Session — le store + son cookie sécurisé
-    ├── cookies.py      # Cookies — cookies applicatifs génériques
-    └── flash.py        # Flash   — messages one-shot
+    ├── session.py      # Session : le store + son cookie sécurisé
+    ├── cookies.py      # Cookies : cookies applicatifs génériques
+    └── flash.py        # Flash : messages one-shot
 
 ## Quand utiliser quoi
 

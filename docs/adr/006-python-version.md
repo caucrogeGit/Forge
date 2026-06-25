@@ -1,4 +1,4 @@
-# ADR-006 — Version Python minimale : 3.12+
+# ADR-006, Version Python minimale : 3.12+
 
 ## Statut
 
@@ -41,7 +41,7 @@ Concrètement :
 
 4. La documentation d'installation et les starters référencent Python 3.12+.
 
-5. Python 3.11 reste fonctionnel avec Forge 1.x — cette décision ne s'applique
+5. Python 3.11 reste fonctionnel avec Forge 1.x, cette décision ne s'applique
    qu'à Forge 1.0.
 
 ---

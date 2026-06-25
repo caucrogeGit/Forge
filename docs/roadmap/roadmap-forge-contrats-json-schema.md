@@ -1,4 +1,4 @@
-# Roadmap Forge — Contrats canoniques JSON Schema
+# Roadmap Forge, Contrats canoniques JSON Schema
 
 > Roadmap autonome à ouvrir après la Phase 12 de consolidation Forge.
 >
@@ -312,9 +312,9 @@ Le couple est unique, mais la clé primaire reste id.
 
 ---
 
-# Bloc 1 — Socle des schémas JSON
+# Bloc 1, Socle des schémas JSON
 
-## ENTITY-CONTRACT-001 — Créer `schemas/common.schema.json` — **livré**
+## ENTITY-CONTRACT-001, Créer `schemas/common.schema.json`, **livré**
 
 ### Objectif
 
@@ -349,7 +349,7 @@ git diff --check
 
 ---
 
-## ENTITY-CONTRACT-002 — Créer `schemas/field.schema.json` — **livré**
+## ENTITY-CONTRACT-002, Créer `schemas/field.schema.json`, **livré**
 
 ### Objectif
 
@@ -391,7 +391,7 @@ json
 
 ---
 
-## ENTITY-CONTRACT-003 — Créer `schemas/entity.schema.json` — **livré**
+## ENTITY-CONTRACT-003, Créer `schemas/entity.schema.json`, **livré**
 
 ### Objectif
 
@@ -438,7 +438,7 @@ mvc/entities/*.json
 
 ---
 
-## ENTITY-CONTRACT-004 — Créer `schemas/pivot.schema.json` — **livré**
+## ENTITY-CONTRACT-004, Créer `schemas/pivot.schema.json`, **livré**
 
 ### Objectif
 
@@ -475,7 +475,7 @@ Créer le contrat des tables pivot `many_to_many`.
 
 ---
 
-## ENTITY-CONTRACT-005 — Créer `schemas/relations.schema.json` — **livré**
+## ENTITY-CONTRACT-005, Créer `schemas/relations.schema.json`, **livré**
 
 ### Objectif
 
@@ -537,7 +537,7 @@ many_to_many
 
 ---
 
-## ENTITY-CONTRACT-006 — Créer `schemas/forge.schema.index.json` — **livré**
+## ENTITY-CONTRACT-006, Créer `schemas/forge.schema.index.json`, **livré**
 
 ### Objectif
 
@@ -569,9 +569,9 @@ Ce registre pourra être utilisé par :
 
 ---
 
-# Bloc 2 — Validation Forge
+# Bloc 2, Validation Forge
 
-## ENTITY-CONTRACT-007 — Ajouter `forge entity:validate` — **livré**
+## ENTITY-CONTRACT-007, Ajouter `forge entity:validate`, **livré**
 
 > Dépendance `jsonschema` officialisée dans `pyproject.toml` par ENTITY-CONTRACT-007-FIX-DEPENDENCY.
 
@@ -624,7 +624,7 @@ Supprimez ce champ. Forge génère automatiquement l’identifiant technique.
 
 ---
 
-## ENTITY-CONTRACT-008 — Ajouter la validation sémantique Python ✓ livré
+## ENTITY-CONTRACT-008, Ajouter la validation sémantique Python ✓ livré
 
 ### Objectif
 
@@ -646,13 +646,13 @@ Compléter JSON Schema par des contrôles que le schéma ne peut pas garantir se
 
 ### Livraison
 
-Module `cli/entities/entity_semantic_validate.py` — `SemanticError` + `validate_semantic()` — 15 contrôles.
+Module `cli/entities/entity_semantic_validate.py`, `SemanticError` + `validate_semantic()`, 15 contrôles.
 Intégré dans `forge entity:validate` (Passe 2 après JSON Schema).
 41 tests dans `tests/test_entity_semantic_validation.py`.
 
 ---
 
-## ENTITY-CONTRACT-009 — Ajouter des codes d’erreur stables ✓ livré
+## ENTITY-CONTRACT-009, Ajouter des codes d’erreur stables ✓ livré
 
 ### Objectif
 
@@ -692,14 +692,14 @@ Ces codes doivent pouvoir servir :
 
 ### Livraison
 
-Module `cli/entities/entity_validation_errors.py` — liste centrale `ALL_CODES`.
+Module `cli/entities/entity_validation_errors.py`, liste centrale `ALL_CODES`.
 `SemanticError` porte désormais `code`, `file`, `path`, `message`, `hint`.
 Sortie humaine affiche `Code :` pour toutes les erreurs (JSON Schema + sémantiques).
 58 tests dans `tests/test_entity_validation_error_codes.py`.
 
 ---
 
-## ENTITY-CONTRACT-010 — Ajouter `forge entity:validate --json` ✓ livré
+## ENTITY-CONTRACT-010, Ajouter `forge entity:validate --json` ✓ livré
 
 ### Objectif
 
@@ -743,9 +743,9 @@ Phases : `json`, `schema`, `semantic`, `runtime`.
 
 ---
 
-# Bloc 3 — Branchement dans les générateurs
+# Bloc 3, Branchement dans les générateurs
 
-## ENTITY-CONTRACT-011 — Brancher la validation dans `forge build:model` ✓ CLÔTURÉ (011A–011G livrés)
+## ENTITY-CONTRACT-011, Brancher la validation dans `forge build:model` ✓ CLÔTURÉ (011A–011G livrés)
 
 > **Note de structure** : ENTITY-CONTRACT-011 est le ticket parent.
 > Il a été découpé en sous-tickets 011A–011G pour lever les préconditions une par une.
@@ -797,7 +797,7 @@ Brancher la validation JSON Schema avant `build:model` bloquerait :
 - Tous les tests existants de `build:model` (`test_entity_model_cli.py` utilise le format legacy)
 
 Même si la validation JSON Schema passait, la génération échouerait : `build_entity_sql`,
-`build_entity_base`, etc. lisent `sql_type`, `python_type`, `column` — absents du format canonique.
+`build_entity_base`, etc. lisent `sql_type`, `python_type`, `column`, absents du format canonique.
 
 ### Précondition requise
 
@@ -806,7 +806,7 @@ Un ticket de migration doit précéder ENTITY-CONTRACT-011. Plan détaillé dans
 
 ---
 
-## ENTITY-CONTRACT-011A — Audit migration build:model vers format canonique ✓ livré
+## ENTITY-CONTRACT-011A, Audit migration build:model vers format canonique ✓ livré
 
 ### Objectif
 
@@ -824,7 +824,7 @@ stratégie recommandée (normaliseur canonique→legacy), 6 tickets proposés.
 
 ---
 
-## ENTITY-CONTRACT-011B — Créer normalize_canonical_to_legacy() ✓ livré
+## ENTITY-CONTRACT-011B, Créer normalize_canonical_to_legacy() ✓ livré
 
 ### Objectif
 
@@ -841,13 +841,13 @@ Créer un traducteur interne `canonical → legacy_normalized` permettant à
 - indexes ignorés (non supportés par build:model) ;
 - `CanonicalNormalizationError` pour les types inconnus ou decimal sans precision/scale ;
 - string sans max_length → VARCHAR(255) par défaut (documenté) ;
-- boolean → BOOLEAN (et non TINYINT(1) — incompatible avec python_type='bool' dans _sql_family) ;
+- boolean → BOOLEAN (et non TINYINT(1), incompatible avec python_type='bool' dans _sql_family) ;
 - 72 tests dans `tests/test_build_model_canonical_normalizer.py` ;
 - dont une classe `TestLegacyCompatibility` qui passe la sortie dans validate_entity_definition().
 
 ---
 
-## ENTITY-CONTRACT-011C — Adapter build:model pour le format canonique ✓ livré
+## ENTITY-CONTRACT-011C, Adapter build:model pour le format canonique ✓ livré
 
 ### Objectif
 
@@ -866,7 +866,7 @@ Détection automatique du format (`schema_version` vs `format_version`) dans
 
 ---
 
-## ENTITY-CONTRACT-011D — Migrer tests/test_entity_model_cli.py ✓ livré
+## ENTITY-CONTRACT-011D, Migrer tests/test_entity_model_cli.py ✓ livré
 
 ### Objectif
 
@@ -889,7 +889,7 @@ end-to-end avec le nouveau format via le normaliseur.
 
 ---
 
-## ENTITY-CONTRACT-011E — Migrer mvc/entities/media/media.json ✓ livré
+## ENTITY-CONTRACT-011E, Migrer mvc/entities/media/media.json ✓ livré
 
 ### Objectif
 
@@ -907,14 +907,14 @@ le format canonique `schema_version: "1.0"`.
   dans le schéma canonique (perte documentée, conservatrice).
 - `role.default: "default"` et `position.default: 0` conservés via `default`.
 - `alt_text` conservé avec `nullable: true`.
-- `entity:validate` : `[OK] Entité Media valide.` — seul `relations.json` encore legacy.
+- `entity:validate` : `[OK] Entité Media valide.`, seul `relations.json` encore legacy.
 - `build:model --dry-run` : fonctionne via le routage canonique → normaliseur.
 - 15 tests dans `tests/test_media_entity_canonical.py` (15/15 passent).
 - Suite complète : 0 régression.
 
 ---
 
-## ENTITY-CONTRACT-011F — Migrer mvc/entities/relations.json ✓ livré
+## ENTITY-CONTRACT-011F, Migrer mvc/entities/relations.json ✓ livré
 
 ### Objectif
 
@@ -924,10 +924,10 @@ Convertir `mvc/entities/relations.json` (vide, `format_version: 1`) vers
 ### Résultat
 
 - `mvc/entities/relations.json` migré : `format_version: 1` → `schema_version: "1.0"` + `$schema`.
-- Aucune relation présente — liste `relations: []` conservée intacte.
-- `entity:validate` : `valid: true, errors_count: 0` — dépôt entièrement propre.
+- Aucune relation présente, liste `relations: []` conservée intacte.
+- `entity:validate` : `valid: true, errors_count: 0`, dépôt entièrement propre.
 - `build:model` : fonctionne via correction minimale de `_validate_relations_root()` dans
-  `relations.py` — détecte `schema_version: "1.0"` et ne requiert plus `format_version`.
+  `relations.py`, détecte `schema_version: "1.0"` et ne requiert plus `format_version`.
   (Déviation documentée : le ticket interdisait de modifier `relations.py`, mais l'exigence
   "build:model continue à fonctionner" l'imposait. Correction en 4 lignes, même pattern que 011C.)
 - 14 tests dans `tests/test_relations_entity_canonical.py` (14/14 passent).
@@ -935,7 +935,7 @@ Convertir `mvc/entities/relations.json` (vide, `format_version: 1`) vers
 
 ---
 
-## ENTITY-CONTRACT-011G — Brancher entity:validate dans build:model (reprise de 011) ✓ livré
+## ENTITY-CONTRACT-011G, Brancher entity:validate dans build:model (reprise de 011) ✓ livré
 
 ### Objectif
 
@@ -952,15 +952,15 @@ Conseil : lancez forge entity:validate pour obtenir le détail.
 
 **Fichiers modifiés :**
 
-- `cli/entities/entity_validate.py` — ajout de `collect_entity_validation_results(entities_root)` : valide uniquement les entités canoniques (`schema_version: "1.0"`) ; dégradation douce si `jsonschema` absent ; retourne `dict` avec `errors`, `warnings`, `files_checked`, `files_valid`.
-- `cli/entities/model.py` — ajout de `_assert_contracts_valid(entities_root)` ; appel en tête de `build_model()` avant `_validate_model_or_raise()`.
-- `tests/test_media_entity_canonical.py`, `tests/test_relations_entity_canonical.py` — retrait d'imports `pytest` inutilisés détectés par ruff.
+- `cli/entities/entity_validate.py`, ajout de `collect_entity_validation_results(entities_root)` : valide uniquement les entités canoniques (`schema_version: "1.0"`) ; dégradation douce si `jsonschema` absent ; retourne `dict` avec `errors`, `warnings`, `files_checked`, `files_valid`.
+- `cli/entities/model.py`, ajout de `_assert_contracts_valid(entities_root)` ; appel en tête de `build_model()` avant `_validate_model_or_raise()`.
+- `tests/test_media_entity_canonical.py`, `tests/test_relations_entity_canonical.py`, retrait d'imports `pytest` inutilisés détectés par ruff.
 
 **Fichiers créés :**
 
-- `tests/test_build_model_entity_validation.py` — 11 tests : projet valide génère, projet invalide lève `ModelValidationError`, aucun fichier généré, message court avec conseil `entity:validate`, pas de traceback Python, API `collect_entity_validation_results()` détaillée, format `--json` inchangé, non-régression sur dépôt réel.
+- `tests/test_build_model_entity_validation.py`, 11 tests : projet valide génère, projet invalide lève `ModelValidationError`, aucun fichier généré, message court avec conseil `entity:validate`, pas de traceback Python, API `collect_entity_validation_results()` détaillée, format `--json` inchangé, non-régression sur dépôt réel.
 
-**Décision clé — filtre canonique dans le garde :**
+**Décision clé, filtre canonique dans le garde :**
 
 `collect_entity_validation_results()` ignore les entités au format legacy (`format_version: 1`) : elles sont validées par `_validate_model_or_raise()` à l'étape suivante. Ce filtre était nécessaire pour ne pas bloquer les tests meta qui utilisent des fixtures legacy en `tmp_path`.
 
@@ -968,7 +968,7 @@ Conseil : lancez forge entity:validate pour obtenir le détail.
 
 ---
 
-## ENTITY-CONTRACT-012 — Brancher la validation dans `forge make:crud` ✓ livré
+## ENTITY-CONTRACT-012, Brancher la validation dans `forge make:crud` ✓ livré
 
 ### Objectif
 
@@ -999,23 +999,23 @@ forge.py → command == "make:crud" → cmd_make_crud_main()
 
 **Fichiers modifiés :**
 
-- `cli/entities/make_crud.py` — ajout du garde `collect_entity_validation_results()` en tête de `make_crud()` ; ajout de la normalisation canonique avant `validate_entity_definition()` (même pattern que `model.py:_load_all_entity_sources`).
+- `cli/entities/make_crud.py`, ajout du garde `collect_entity_validation_results()` en tête de `make_crud()` ; ajout de la normalisation canonique avant `validate_entity_definition()` (même pattern que `model.py:_load_all_entity_sources`).
 
 **Fichiers créés :**
 
-- `tests/test_make_crud_entity_validation.py` — 14 tests : projet valide génère contrôleur/modèle/formulaire, entité invalide lève SystemExit, aucun fichier généré, message court avec conseil `entity:validate`, pas de traceback Python, relations invalides bloquent, API `collect_entity_validation_results()` détaillée préservée, format `--json` inchangé.
+- `tests/test_make_crud_entity_validation.py`, 14 tests : projet valide génère contrôleur/modèle/formulaire, entité invalide lève SystemExit, aucun fichier généré, message court avec conseil `entity:validate`, pas de traceback Python, relations invalides bloquent, API `collect_entity_validation_results()` détaillée préservée, format `--json` inchangé.
 
-**Décision clé — normalisation canonique dans `make_crud()` :**
+**Décision clé, normalisation canonique dans `make_crud()` :**
 
-`validate_entity_definition()` n’acceptait que le format legacy. Sans normalisation, les entités canoniques valides échouaient à l’étape 2 du flux. Ajout de 3 lignes identiques au pattern de `model.py`. Ce n’est pas une refonte — c’est la correction minimale requise pour que le cas valide canonical fonctionne.
+`validate_entity_definition()` n’acceptait que le format legacy. Sans normalisation, les entités canoniques valides échouaient à l’étape 2 du flux. Ajout de 3 lignes identiques au pattern de `model.py`. Ce n’est pas une refonte, c’est la correction minimale requise pour que le cas valide canonical fonctionne.
 
-**Note :** `_load_crud_many_to_one_relations()` utilisait déjà `load_entity_definitions()` (dans `relations.py`) qui supporte canonical depuis 011B — aucun changement nécessaire pour les relations.
+**Note :** `_load_crud_many_to_one_relations()` utilisait déjà `load_entity_definitions()` (dans `relations.py`) qui supporte canonical depuis 011B, aucun changement nécessaire pour les relations.
 
 **Résultat :** 14 tests passés.
 
 ---
 
-## ENTITY-CONTRACT-013 — Brancher la validation dans les migrations ✓ livré
+## ENTITY-CONTRACT-013, Brancher la validation dans les migrations ✓ livré
 
 ### Objectif
 
@@ -1035,7 +1035,7 @@ Aucune migration générée depuis un contrat invalide.
 
 ### Rapport de livraison
 
-**Audit des commandes — décisions :**
+**Audit des commandes, décisions :**
 
 | Commande | Lit JSON entité | Garde branché | Justification |
 |---|---|---|---|
@@ -1050,17 +1050,17 @@ Aucune migration générée depuis un contrat invalide.
 
 **Fichiers modifiés :**
 
-- `cli/entities/migrations.py` — ajout `normalize_canonical_entity_for_model_build` dans `load_entity_definition()` (normalisation canonical) ; ajout `_assert_migration_contracts_valid()` ; appels dans `_run_diff_command()` et `_run_make_command()` quand `from_diff is not None`.
+- `cli/entities/migrations.py`, ajout `normalize_canonical_entity_for_model_build` dans `load_entity_definition()` (normalisation canonical) ; ajout `_assert_migration_contracts_valid()` ; appels dans `_run_diff_command()` et `_run_make_command()` quand `from_diff is not None`.
 
 **Fichiers créés :**
 
-- `tests/test_migration_entity_validation.py` — 14 tests : commandes protégées + entité invalide → SystemExit, message court, conseil `entity:validate`, aucun fichier généré, pas de traceback ; commandes non protégées (`migration:make` blank) non bloquées ; `collect_entity_validation_results()` et `--json` préservés.
+- `tests/test_migration_entity_validation.py`, 14 tests : commandes protégées + entité invalide → SystemExit, message court, conseil `entity:validate`, aucun fichier généré, pas de traceback ; commandes non protégées (`migration:make` blank) non bloquées ; `collect_entity_validation_results()` et `--json` préservés.
 
 **Résultat :** 14 tests passés.
 
 ---
 
-## ENTITY-CONTRACT-014 — Adapter les générateurs d’entités ✓ livré
+## ENTITY-CONTRACT-014, Adapter les générateurs d’entités ✓ livré
 
 ### Objectif
 
@@ -1079,9 +1079,9 @@ Les entités générées doivent contenir :
 
 ---
 
-# Bloc 4 — Relations et pivots
+# Bloc 4, Relations et pivots
 
-## ENTITY-CONTRACT-015 — Verrouiller la génération `many_to_one` ✓ livré après correctif 015-FIX
+## ENTITY-CONTRACT-015, Verrouiller la génération `many_to_one` ✓ livré après correctif 015-FIX
 
 ### Objectif
 
@@ -1098,7 +1098,7 @@ Garantir que `many_to_one` génère une FK claire et valide.
 
 ---
 
-## ENTITY-CONTRACT-015-FIX — Suppression du skip silencieux des relations canoniques ✓ livré
+## ENTITY-CONTRACT-015-FIX, Suppression du skip silencieux des relations canoniques ✓ livré
 
 ### Objectif
 
@@ -1125,11 +1125,11 @@ empêchant la génération SQL FK.
 - Ce ticket ne migre pas les starters.
 - Ce ticket ne supprime pas le support legacy.
 - La chaîne CRUD pouvait lever un `KeyError` si la FK n'était pas déclarée comme champ
-  dans l'entité source — corrigé par `ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O`.
+  dans l'entité source, corrigé par `ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O`.
 
 ---
 
-## ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O — `make:crud` compatible avec `many_to_one` canonique sans FK déclarée ✓ livré
+## ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O, `make:crud` compatible avec `many_to_one` canonique sans FK déclarée ✓ livré
 
 ### Objectif
 
@@ -1149,7 +1149,7 @@ métier dans l'entité source.
 ### Limites restantes
 
 - Si la FK n'est pas déclarée comme champ dans l'entité, `build_form` ne génère pas
-  de `RelationField` pour cette FK (comportement attendu — FK technique invisible du formulaire).
+  de `RelationField` pour cette FK (comportement attendu, FK technique invisible du formulaire).
 - Ce ticket ne traite pas `many_to_many`.
 - Ce ticket ne migre pas les starters.
 
@@ -1157,7 +1157,7 @@ métier dans l'entité source.
 
 ---
 
-## ENTITY-CONTRACT-016 — Générer les relations `many_to_many` canoniques ✓ livré
+## ENTITY-CONTRACT-016, Générer les relations `many_to_many` canoniques ✓ livré
 
 ### Objectif
 
@@ -1191,7 +1191,7 @@ le SQL correspondant.
 
 ---
 
-## ENTITY-CONTRACT-017 — Attributs de pivot contrôlés ✓ livré
+## ENTITY-CONTRACT-017, Attributs de pivot contrôlés ✓ livré
 
 ### Objectif
 
@@ -1227,7 +1227,7 @@ protection des clés techniques.
 
 ---
 
-## ENTITY-CONTRACT-018 — Tests d'intégration des pivots many_to_many ✓ livré
+## ENTITY-CONTRACT-018, Tests d'intégration des pivots many_to_many ✓ livré
 
 ### Objectif
 
@@ -1256,9 +1256,9 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 
 ---
 
-# Bloc 5 — Documentation officielle des contrats JSON
+# Bloc 5, Documentation officielle des contrats JSON
 
-## ENTITY-CONTRACT-DOC-001 — Documenter le rôle du JSON canonique
+## ENTITY-CONTRACT-DOC-001, Documenter le rôle du JSON canonique
 
 **Statut : LIVRÉ**
 
@@ -1293,7 +1293,7 @@ docs/entities/json-canonique.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-002 — Documenter `entity.schema.json`
+## ENTITY-CONTRACT-DOC-002, Documenter `entity.schema.json`
 
 **Statut : LIVRÉ**
 
@@ -1328,7 +1328,7 @@ docs/entities/entity-schema.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-003 — Documenter `relations.schema.json`
+## ENTITY-CONTRACT-DOC-003, Documenter `relations.schema.json`
 
 **Statut : LIVRÉ**
 
@@ -1364,7 +1364,7 @@ docs/entities/relations-schema.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-004 — Documenter les tables pivot many-to-many
+## ENTITY-CONTRACT-DOC-004, Documenter les tables pivot many-to-many
 
 **Statut : LIVRÉ**
 
@@ -1395,7 +1395,7 @@ docs/entities/pivots-many-to-many.md
 
 ### Note d'audit
 
-L'exemple SQL de la spec proposait `BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY` — la projection réelle de Forge utilise `INT NOT NULL AUTO_INCREMENT` avec `PRIMARY KEY (id)` séparé. La documentation reflète la réalité du générateur.
+L'exemple SQL de la spec proposait `BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY`, la projection réelle de Forge utilise `INT NOT NULL AUTO_INCREMENT` avec `PRIMARY KEY (id)` séparé. La documentation reflète la réalité du générateur.
 
 ### Garde-fous
 
@@ -1404,7 +1404,7 @@ L'exemple SQL de la spec proposait `BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY` 
 
 ---
 
-## ENTITY-CONTRACT-DOC-005 — Documenter le mapping types Forge → MariaDB
+## ENTITY-CONTRACT-DOC-005, Documenter le mapping types Forge → MariaDB
 
 **Statut : LIVRÉ**
 
@@ -1430,7 +1430,7 @@ docs/entities/types-forge-mariadb.md
 | `big_integer` | `BIGINT` | |
 | `float` | `DOUBLE` | |
 | `decimal` | `DECIMAL(p,s)` | `precision` et `scale` obligatoires |
-| `boolean` | `BOOLEAN` | **correction** : la roadmap indiquait `TINYINT(1)` — le code utilise `BOOLEAN` |
+| `boolean` | `BOOLEAN` | **correction** : la roadmap indiquait `TINYINT(1)`, le code utilise `BOOLEAN` |
 | `date` | `DATE` | |
 | `datetime` | `DATETIME` | |
 | `email` | `VARCHAR(255)` | longueur fixe |
@@ -1456,7 +1456,7 @@ docs/entities/types-forge-mariadb.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-006 — Documenter `forge entity:validate`
+## ENTITY-CONTRACT-DOC-006, Documenter `forge entity:validate`
 
 **Statut : LIVRÉ**
 
@@ -1492,7 +1492,7 @@ docs/entities/entity-validate.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-007 — Documenter l’autocomplétion VS Code ✓ livré
+## ENTITY-CONTRACT-DOC-007, Documenter l’autocomplétion VS Code ✓ livré
 
 ### Objectif
 
@@ -1519,7 +1519,7 @@ docs/entities/vscode-json-schema.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-008 — Documenter les limites assumées ✓ livré
+## ENTITY-CONTRACT-DOC-008, Documenter les limites assumées ✓ livré
 
 ### Objectif
 
@@ -1557,9 +1557,9 @@ Cette roadmap ne couvre pas (hors périmètre permanent) :
 
 ---
 
-# Bloc 6 — Expérience développeur et tests
+# Bloc 6, Expérience développeur et tests
 
-## ENTITY-CONTRACT-019 — Ajouter les fixtures canoniques ✓ livré
+## ENTITY-CONTRACT-019, Ajouter les fixtures canoniques ✓ livré
 
 ### Objectif
 
@@ -1580,12 +1580,12 @@ tests/fixtures/entities/canonical/
 
 Tests : `tests/test_canonical_fixtures.py` (39 tests).
 
-Note : `user/user.json` existe comme vestige neutre (`{}`) — non utilisé par les tests.
+Note : `user/user.json` existe comme vestige neutre (`{}`), non utilisé par les tests.
 `"User"` est un mot réservé SQL/MariaDB : la fixture a été remplacée par `account/account.json`.
 
 ---
 
-## ENTITY-CONTRACT-020 — Vérifier les exemples documentaires ✓ livré
+## ENTITY-CONTRACT-020, Vérifier les exemples documentaires ✓ livré
 
 ### Objectif
 
@@ -1609,12 +1609,12 @@ Tout exemple JSON important présent dans la documentation doit exister comme fi
   - Absence de clés legacy dans les exemples canoniques.
   - Exemples VS Code : $schema, json.schemas, blocs JSON valides.
   - Vérification que `.vscode/settings.json` n'existe pas dans le dépôt.
-  - Exemples d'erreur non validés (ils ne portent pas `schema_version: "1.0"` — classification automatique).
+  - Exemples d'erreur non validés (ils ne portent pas `schema_version: "1.0"`, classification automatique).
 - `tests/meta/test_pytest_core_only_contract_001.py` : `jsonschema` et `referencing` ajoutés à `CORE_DEPS`.
 
 ---
 
-## ENTITY-CONTRACT-021 — Ajouter `forge schema:list` ✓ livré
+## ENTITY-CONTRACT-021, Ajouter `forge schema:list` ✓ livré
 
 ### Objectif
 
@@ -1622,7 +1622,7 @@ Lister les schémas disponibles.
 
 ### Ce qui a été livré
 
-- `cli/schemas/__init__.py` + `cli/schemas/schema_list.py` — module `schema:list`.
+- `cli/schemas/__init__.py` + `cli/schemas/schema_list.py`, module `schema:list`.
 - Lit `schemas/forge.schema.index.json` (registre local), affiche nom, chemin et statut.
 - Sortie humaine : liste alignée avec `OK` / `MANQUANT` + total.
 - Option `--json` : sortie machine avec `valid`, `registry`, `schema_version`, `count`, `schemas[]`.
@@ -1654,7 +1654,7 @@ Total : 5 schéma(s)
 
 ---
 
-## ENTITY-CONTRACT-022 — Ajouter `forge schema:doctor`
+## ENTITY-CONTRACT-022, Ajouter `forge schema:doctor`
 
 **Statut : livré**
 
@@ -1677,12 +1677,12 @@ Optionnel mais utile avant publication.
 
 ### Livraison
 
-- **`cli/schemas/schema_doctor.py`** — commande `schema_doctor_main()` avec 5 contrôles par schéma
+- **`cli/schemas/schema_doctor.py`**, commande `schema_doctor_main()` avec 5 contrôles par schéma
   (existence, JSON valide, `$schema` Draft 2020-12, `$id`, `$ref` locaux résolus)
-- **`tests/test_schema_doctor_command.py`** — 42 tests (sortie humaine, sortie `--json`,
+- **`tests/test_schema_doctor_command.py`**, 42 tests (sortie humaine, sortie `--json`,
   gestion d'erreurs, non-régression)
-- **`forge.py`** — dispatch `schema:doctor` ajouté
-- **`cli/_support/help.py`** — section « Schémas JSON » complétée avec `schema:doctor`
+- **`forge.py`**, dispatch `schema:doctor` ajouté
+- **`cli/_support/help.py`**, section « Schémas JSON » complétée avec `schema:doctor`
 - Suite complète : 11 440 tests passent, 6 skipped, 0 régression
 
 Exemple de sortie :
@@ -1710,9 +1710,9 @@ Résultat : OK — 5 schéma(s), 0 erreur.
 
 ---
 
-# Bloc 7 — Clôture
+# Bloc 7, Clôture
 
-## ENTITY-CONTRACT-023 — Clôturer la roadmap Contrats JSON Schema
+## ENTITY-CONTRACT-023, Clôturer la roadmap Contrats JSON Schema
 
 **Statut : livré**
 
@@ -1759,13 +1759,13 @@ La roadmap Contrats JSON Schema est clôturée après livraison de ENTITY-CONTRA
 
 | Phase | Statut |
 |---|---|
-| Phase 1 — Schémas JSON | terminée |
-| Phase 2 — Validation Forge | terminée |
-| Phase 3 — Générateurs | terminée |
-| Phase 4 — Relations et pivots | terminée |
-| Phase 5 — Documentation officielle | terminée |
-| Phase 6 — Expérience développeur et tests | terminée |
-| Phase 7 — Clôture | terminée |
+| Phase 1, Schémas JSON | terminée |
+| Phase 2, Validation Forge | terminée |
+| Phase 3, Générateurs | terminée |
+| Phase 4, Relations et pivots | terminée |
+| Phase 5, Documentation officielle | terminée |
+| Phase 6, Expérience développeur et tests | terminée |
+| Phase 7, Clôture | terminée |
 
 ### Résumé de livraison
 
@@ -1897,12 +1897,12 @@ Cette séparation permet de garder Forge Core autonome et Forge Design optionnel
 
 Ordre de démarrage recommandé :
 
-1. `ENTITY-CONTRACT-001` — `common.schema.json`
-2. `ENTITY-CONTRACT-002` — `field.schema.json`
-3. `ENTITY-CONTRACT-003` — `entity.schema.json`
-4. `ENTITY-CONTRACT-005` — `relations.schema.json`
-5. `ENTITY-CONTRACT-007` — `forge entity:validate`
-6. `ENTITY-CONTRACT-DOC-001` — rôle du JSON canonique
+1. `ENTITY-CONTRACT-001`, `common.schema.json`
+2. `ENTITY-CONTRACT-002`, `field.schema.json`
+3. `ENTITY-CONTRACT-003`, `entity.schema.json`
+4. `ENTITY-CONTRACT-005`, `relations.schema.json`
+5. `ENTITY-CONTRACT-007`, `forge entity:validate`
+6. `ENTITY-CONTRACT-DOC-001`, rôle du JSON canonique
 
 Les tickets optionnels `schema:list` et `schema:doctor` peuvent attendre.
 

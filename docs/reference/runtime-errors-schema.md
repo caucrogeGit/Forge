@@ -59,14 +59,14 @@ Tous les événements doivent contenir ces champs :
 | Champ | Type | Rôle |
 |---|---|---|
 | `schema_version` | `string` | Version du schéma (`"1.0"`) |
-| `id` | `string` | Identifiant unique — format `err_YYYYMMDD_HHMMSS_xxxx` |
+| `id` | `string` | Identifiant unique, format `err_YYYYMMDD_HHMMSS_xxxx` |
 | `timestamp` | `string` | Date ISO 8601 avec fuseau (`datetime.now(timezone.utc).isoformat()`) |
 | `environment` | `string` | Environnement courant (`"dev"` ou `"prod"`) |
-| `level` | `string` | Niveau d'erreur — voir section Niveaux |
-| `category` | `string` | Catégorie fonctionnelle — voir section Catégories |
+| `level` | `string` | Niveau d'erreur, voir section Niveaux |
+| `category` | `string` | Catégorie fonctionnelle, voir section Catégories |
 | `exception_type` | `string` | Nom du type d'exception Python (`"RuntimeError"`, `"TemplateNotFound"`, …) |
 | `message` | `string` | Message court de l'erreur |
-| `safe_for_display` | `boolean` | `true` si le message peut être montré au visiteur — `false` par défaut |
+| `safe_for_display` | `boolean` | `true` si le message peut être montré au visiteur, `false` par défaut |
 
 ---
 
@@ -76,9 +76,9 @@ Ces champs sont recommandés quand l'information est disponible :
 
 | Champ | Type | Rôle |
 |---|---|---|
-| `request` | `object` | Informations de requête filtrées — voir [Objet request](#objet-request) |
+| `request` | `object` | Informations de requête filtrées, voir [Objet request](#objet-request) |
 | `location` | `object` | Dernier frame de la pile (`file`, `line`, `function`) |
-| `traceback` | `array` | Pile d'appels simplifiée — liste de frames |
+| `traceback` | `array` | Pile d'appels simplifiée, liste de frames |
 | `hint` | `string` | Piste de correction pour le développeur |
 | `route` | `string` | Nom ou chemin de route si disponible |
 | `controller` | `string` | Contrôleur concerné si identifiable |
@@ -143,7 +143,7 @@ Chaque frame contient : `file` (chemin relatif au projet), `line`, `function`.
 
 | Niveau | Usage |
 |---|---|
-| `ERROR` | Erreur non gérée interceptée par le dispatcher — utilisé par défaut |
+| `ERROR` | Erreur non gérée interceptée par le dispatcher, utilisé par défaut |
 | `WARNING` | Comportement anormal mais non bloquant |
 | `INFO` | Événement informatif (ex : démarrage, rechargement) |
 | `CRITICAL` | Erreur fatale empêchant le serveur de fonctionner |
@@ -253,7 +253,7 @@ except RuntimeError as exc:
 
 ---
 
-## Collecteur — core/errors/runtime_error_logger.py
+## Collecteur, core/errors/runtime_error_logger.py
 
 Le collecteur est dans `core/errors/runtime_error_logger.py`. Il est branché sur `core/app/application.py`.
 
@@ -282,7 +282,7 @@ except RuntimeError as exc:
 
 ---
 
-## Rendu Markdown — core/errors/runtime_error_markdown.py
+## Rendu Markdown, core/errors/runtime_error_markdown.py
 
 Le rendu Markdown est dans `core/errors/runtime_error_markdown.py`. Il est déclenché automatiquement après chaque écriture JSONL.
 

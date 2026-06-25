@@ -4,7 +4,7 @@
 Relations déclaratives, pivot enrichi, relations ordonnées, CRUD serveur enrichi
 et amélioration HTMX optionnelle. Forge reste SQL visible, pas d'ORM.
 
-### Relations — `many_to_many`
+### Relations, `many_to_many`
 
 Une relation `many_to_many` se déclare dans `mvc/entities/relations.json`. Forge
 génère la table pivot SQL via `forge sync:relations` et le CRUD via `forge make:crud`
@@ -37,9 +37,9 @@ Exemple minimal :
 `make:crud Article` génère un `<select multiple>` côté source, les fonctions
 d'ajout/synchronisation pivot et l'affichage des libellés liés dans list/show.
 Le CRUD `Tag` ne reçoit pas de champ inverse automatique. Le SQL généré est
-toujours lisible et explicite — Forge ne crée pas d'ORM.
+toujours lisible et explicite, Forge ne crée pas d'ORM.
 
-### Relations — Pivot enrichi (`pivot_fields`)
+### Relations, Pivot enrichi (`pivot_fields`)
 
 Des colonnes supplémentaires peuvent être ajoutées à la table pivot via
 `pivot_fields`. Forge les inclut dans le `CREATE TABLE` généré par
@@ -64,7 +64,7 @@ Les champs pivot ne font pas partie de la clé primaire composite. Forge ne cré
 pas d'index automatique sur eux. La saisie et l'édition de ces valeurs en
 formulaire CRUD ne sont pas encore générées automatiquement.
 
-### Relations — Relations ordonnées hors média (`order_column`)
+### Relations, Relations ordonnées hors média (`order_column`)
 
 `order_column` est un champ optionnel sur une relation `many_to_many`. Quand il
 est déclaré, les requêtes `list` et `show` générées par `make:crud` trient les
@@ -100,7 +100,7 @@ Règles :
 Les médias disposent de leur propre mécanisme de position et ne sont pas
 concernés par cette convention.
 
-### CRUD — Recherche, filtres, tri et pagination
+### CRUD, Recherche, filtres, tri et pagination
 
 Le CRUD enrichi reste **serveur d'abord** :
 
@@ -120,7 +120,7 @@ requête HTTP → contrôleur généré → SQL explicite → rendu Jinja → HT
   `q`, `filters`, `sort`, `direction` conservés dans les liens de pagination
   → voir `### Listes CRUD générées : recherche et pagination`
 
-### CRUD — États vides contextuels
+### CRUD, États vides contextuels
 
 Les listes générées distinguent quatre états selon les paramètres actifs :
 
@@ -133,7 +133,7 @@ Les listes générées distinguent quatre états selon les paramètres actifs :
 
 → voir `### Listes CRUD générées : états vides contextuels`
 
-### CRUD — HTMX optionnel
+### CRUD, HTMX optionnel
 
 HTMX est une amélioration **optionnelle et progressive**. Le CRUD HTML classique
 reste fonctionnel sans JavaScript.
@@ -150,7 +150,7 @@ reste fonctionnel sans JavaScript.
 
 ### Limites actuelles
 
-- Pas d'ORM — le SQL reste explicite et visible dans le code généré ;
+- Pas d'ORM, le SQL reste explicite et visible dans le code généré ;
 - pas de saisie/édition des valeurs `pivot_fields` dans les formulaires CRUD
   (colonne présente en base, non liée aux formulaires générés) ;
 - pas de drag-and-drop pour les relations ordonnées ;

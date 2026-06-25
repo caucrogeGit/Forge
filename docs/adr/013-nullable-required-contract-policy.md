@@ -1,8 +1,8 @@
-# ADR-013 — Politique nullable / required dans les contrats JSON Forge
+# ADR-013, Politique nullable / required dans les contrats JSON Forge
 
 ## Statut
 
-Acceptée — Forge 1.x (ticket `NULLABLE-CONTRACT-002-DECIDE-NULLABLE-REQUIRED-RULE`).
+Acceptée, Forge 1.x (ticket `NULLABLE-CONTRACT-002-DECIDE-NULLABLE-REQUIRED-RULE`).
 
 ---
 
@@ -97,7 +97,7 @@ if field.get("required") is True:
   La règle retenue respecte ce défaut.
 - **Cohérence entre entité et pivot** : les deux contextes partagent `field.schema.json`.
   La règle doit être identique.
-- **`required` comme signal SQL** : `required: true` signifie "obligatoire" — ce qui implique
+- **`required` comme signal SQL** : `required: true` signifie "obligatoire", ce qui implique
   `NOT NULL`. Le laisser contredire par `nullable: true` est contre-intuitif.
 - **Optionnel par défaut** : un champ non marqué `required` ou `nullable: false` est
   naturellement optionnel (`NULL`).
@@ -111,7 +111,7 @@ Les correctifs futurs seraient imprévisibles. Rejetée.
 Imposerait de modifier le schéma. Rejetée.
 
 **Option D partielle (nullable gagne sur required)** : laisser `nullable: true` écraser
-`required: true` est surprenant — un champ obligatoire en formulaire peut accepter NULL
+`required: true` est surprenant, un champ obligatoire en formulaire peut accepter NULL
 en base. Rejetée.
 
 ---
@@ -133,7 +133,7 @@ La correction sera apportée dans **NULLABLE-CONTRACT-003**.
 
 ### Sur la documentation (non corrigée dans ce ticket)
 
-- `entity-schema.md` dit `nullable: défaut true` — c'est correct selon la règle retenue,
+- `entity-schema.md` dit `nullable: défaut true`, c'est correct selon la règle retenue,
   mais le comportement runtime actuel est `False`. À corriger dans **NULLABLE-DOC-FIX-001**
   pour préciser l'écart temporaire.
 - `pivots-many-to-many.md` ne précise pas la priorité de `required`. À corriger dans
@@ -154,7 +154,7 @@ concernés. Aucun impact attendu sur les starters existants lors de la correctio
 
 ## Hors périmètre de ce ticket
 
-- Modifier `canonical_model_normalizer.py` — voir `NULLABLE-CONTRACT-003`.
+- Modifier `canonical_model_normalizer.py`, voir `NULLABLE-CONTRACT-003`.
 - Modifier `relations.py` (comportement pivot déjà conforme à la règle retenue).
 - Modifier les schémas JSON.
 - Modifier les fixtures de tests.

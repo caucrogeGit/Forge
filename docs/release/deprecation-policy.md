@@ -5,9 +5,9 @@ les fonctionnalités obsolètes, remplacées ou incompatibles.
 
 Il complète :
 
-- [Politique de release](release-policy.md) — quand incrémenter MAJOR/MINOR/PATCH
-- [Contrat de stabilité](stability-contract.md) — ce qui est stable, interne, expérimental
-- [Procédure de release](release.md) — checklist avant chaque tag
+- [Politique de release](release-policy.md), quand incrémenter MAJOR/MINOR/PATCH
+- [Contrat de stabilité](stability-contract.md), ce qui est stable, interne, expérimental
+- [Procédure de release](release.md), checklist avant chaque tag
 
 ---
 
@@ -258,7 +258,7 @@ anciens fichiers deviennent incompatibles :
 - Indiquer explicitement **ce qui est déprécié**.
 - Indiquer **l'alternative recommandée**.
 - Indiquer la **version de retrait prévue**.
-- Ne pas bloquer l'exécution — la fonctionnalité dépréciée continue de fonctionner.
+- Ne pas bloquer l'exécution, la fonctionnalité dépréciée continue de fonctionner.
 
 ---
 
@@ -318,14 +318,14 @@ Dans ce cas :
 
 ## Exemples
 
-### Exemple 1 — Suppression de cmd/ (CMD-LEGACY-REMOVE-001, fait pendant le développement pré-1.0)
+### Exemple 1, Suppression de cmd/ (CMD-LEGACY-REMOVE-001, fait pendant le développement pré-1.0)
 
 - **Déprécié pendant** : le développement pré-1.0 (migration vers la CLI officielle `forge`).
 - **Supprimé pendant** : le développement pré-1.0 (suppression directe sans shim, convention pré-1.0).
 - **Alternative** : `forge make:entity`, `forge make:crud`, etc.
 - **Référence** : ticket `CMD-LEGACY-REMOVE-001`.
 
-### Exemple 2 — Dépréciation de core.security.hashing
+### Exemple 2, Dépréciation de core.security.hashing
 
 - **Déprécié pendant** : le développement pré-1.0 (frontier API `core.auth` vs `core.security`).
 - **Alternative** : `core.auth.password` (Argon2id).
@@ -334,7 +334,7 @@ Dans ce cas :
 - **Retrait prévu** : Forge 1.x stable.
 - **Référence** : ticket `AUTH-LEGACY-BOUNDARY-001`.
 
-### Exemple 3 — Dépréciation de @require_auth (legacy decorator)
+### Exemple 3, Dépréciation de @require_auth (legacy decorator)
 
 - **Déprécié pendant** : le développement pré-1.0.
 - **Alternative** : `core.auth.session.login_required`.
@@ -358,10 +358,10 @@ Dans ce cas :
 ## Voir aussi
 
 - [Vue d'ensemble Release et compatibilité](release-and-compatibility.md)
-- [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Guide de migration](../features/migration-guide.md) — gérer les dépréciations lors d'une migration
-- [Contrat de stabilité](stability-contract.md) — ce qui peut et ne peut pas changer
+- [Politique de release](release-policy.md), règles MAJOR/MINOR/PATCH
+- [Guide de migration](../features/migration-guide.md), gérer les dépréciations lors d'une migration
+- [Contrat de stabilité](stability-contract.md), ce qui peut et ne peut pas changer
 
 ---
 
-*Guide défini lors de RELEASE-DEPRECATION-001 (Phase 8 — Release et compatibilité).*
+*Guide défini lors de RELEASE-DEPRECATION-001 (Phase 8, Release et compatibilité).*

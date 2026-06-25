@@ -41,7 +41,7 @@ forge run --no-reload
 ```
 
 En production (`APP_ENV=prod`), `forge run` refuse de démarrer le
-serveur intégré et affiche la stratégie WSGI recommandée — voir
+serveur intégré et affiche la stratégie WSGI recommandée, voir
 [Déploiement WSGI minimal](../deployment/wsgi-deployment.md).
 
 Une fois le serveur démarré, ouvrez `https://localhost:8000/welcome`
@@ -155,7 +155,7 @@ Cette progression met en jeu les briques DX livrées depuis la phase beta 11 :
 
 | Brique | Rôle |
 |---|---|
-| `forge run` | Point d'entrée officiel — autoreload par défaut en dev |
+| `forge run` | Point d'entrée officiel, autoreload par défaut en dev |
 | `Request` inspectable | Accesseurs nommés (`param`, `form`, `json`, `header`, …) |
 | `Response.text(...)` | Réponse `text/plain; charset=utf-8` |
 | `Response.html(...)` | Réponse `text/html; charset=utf-8` |
@@ -176,7 +176,7 @@ Une fois ce premier contact assimilé :
 | Parcours guidé avec MariaDB | [Guide de démarrage](guide.md) |
 | Première application complète | [Application complète](app-complete-tutorial.md) |
 | Catalogue des starters | [Vue d'ensemble des starters](../starters/index.md) |
-| Détails du starter `welcome` | [Bonjour Forge — starter](../starters/welcome-forge/debutant/welcome.md) |
+| Détails du starter `welcome` | [Bonjour Forge, starter](../starters/welcome-forge/debutant/welcome.md) |
 | Référence HTTP complète | [Convention HTTP inspectable](../reference/http.md) |
 | Toutes les commandes CLI | [Commandes CLI](../reference/cli-commands.md) |
 
@@ -184,7 +184,7 @@ Une fois ce premier contact assimilé :
     Le starter `Contacts CRUD` est l'**étape 9** d'une progression de
     neuf paliers. Plusieurs notions intermédiaires (vue Jinja2, route
     dynamique, formulaire POST, validation, SQL) méritent leurs propres
-    starters — voir la
+    starters, voir la
     [progression recommandée](../starters/index.md#progression-recommandee).
 
 ---
@@ -192,6 +192,6 @@ Une fois ce premier contact assimilé :
 ## Voir aussi
 
 - [API Forge complète](../reference/api.md)
-- [Roadmap Forge](../roadmap/forge-roadmap.md) — tickets DX livrés depuis la phase beta 11
-- [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
-- [Release et compatibilité](../release/release-and-compatibility.md) — versions supportées
+- [Roadmap Forge](../roadmap/forge-roadmap.md), tickets DX livrés depuis la phase beta 11
+- [Contrat de stabilité](../release/stability-contract.md), fichiers garantis préservés
+- [Release et compatibilité](../release/release-and-compatibility.md), versions supportées

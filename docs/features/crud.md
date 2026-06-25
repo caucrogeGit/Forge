@@ -1,4 +1,4 @@
-# CRUD explicite — Forge
+# CRUD explicite, Forge
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -14,7 +14,7 @@ Forge génère un squelette CRUD lisible et modifiable à partir d'une entité J
 - Le SQL reste visible dans le modèle applicatif
 - Le code généré est lisible et modifiable
 - Les fichiers existants ne sont jamais écrasés
-- `mvc/routes.py` reste un fichier manuel — Forge ne l'écrit pas
+- `mvc/routes.py` reste un fichier manuel, Forge ne l'écrit pas
 - Forge ne génère pas de repository magique ni d'ORM implicite
 
 ---
@@ -99,7 +99,7 @@ with router.group("/contact") as g:
 ```
 
 !!! warning "Ordre obligatoire"
-    `/new` doit être déclaré avant `/{id}`. Le routeur parcourt les routes dans l'ordre — sinon `new` est capturé comme identifiant.
+    `/new` doit être déclaré avant `/{id}`. Le routeur parcourt les routes dans l'ordre, sinon `new` est capturé comme identifiant.
 
 Par défaut, un groupe de routes sans `public=True` est protégé par les middlewares d'authentification.
 
@@ -250,7 +250,7 @@ def add_contact(data):
 
 Règles appliquées :
 - Noms de table et colonnes issus du JSON canonique
-- Paramètres `?` — jamais d'interpolation directe
+- Paramètres `?`, jamais d'interpolation directe
 - La clé primaire auto-incrémentée est exclue des `INSERT`
 - `INSERT`, `UPDATE`, `DELETE` font un `commit()` explicite
 - Connexion et curseur fermés dans un `finally`
@@ -274,10 +274,10 @@ def find_contacts_paginated(q=None, sort=None, direction="asc", limit=10, offset
     ...
 ```
 
-- **`_SEARCH_COLS`** — colonnes `VARCHAR`/`CHAR`/`TEXT` ; la recherche est ignorée si la liste est vide.
-- **`_ALLOWED_SORT`** — seuls les champs déclarés dans le JSON sont acceptés comme clé de tri. Toute valeur inconnue revient au tri par défaut.
+- **`_SEARCH_COLS`**, colonnes `VARCHAR`/`CHAR`/`TEXT` ; la recherche est ignorée si la liste est vide.
+- **`_ALLOWED_SORT`**, seuls les champs déclarés dans le JSON sont acceptés comme clé de tri. Toute valeur inconnue revient au tri par défaut.
 - Le tri est construit par concaténation de chaînes whitelistées (`sort_col` et `sort_dir`), jamais par interpolation de valeurs utilisateur.
-- La recherche utilise des `?` paramétrés (`LIKE ?`) — pas d'injection possible.
+- La recherche utilise des `?` paramétrés (`LIKE ?`), pas d'injection possible.
 
 Le contrôleur généré lit les paramètres GET `page`, `q`, `sort`, `direction` et passe un dictionnaire `pagination` à la vue.
 
@@ -314,7 +314,7 @@ Le champ CSRF est inclus dans tous les formulaires `POST` :
 
 ## 7. Personnalisation après génération
 
-Les fichiers générés sont des points de départ — ils sont lisibles et à adapter librement.
+Les fichiers générés sont des points de départ, ils sont lisibles et à adapter librement.
 
 | Fichier | Adaptations typiques |
 |---|---|
@@ -339,7 +339,7 @@ Si `mvc/entities/relations.json` déclare une relation `many_to_one` dont l'enti
 - le champ FK devient un `ChoiceField` ;
 - la vue `form.html` génère un `<select>` avec les options de la table cible ;
 - le contrôleur fournit les choix via une fonction dédiée ;
-- le modèle ajoute `get_{cible}_choices()` — requête SQL visible et explicite.
+- le modèle ajoute `get_{cible}_choices()`, requête SQL visible et explicite.
 
 ### Ce que `forge make:crud` ne génère pas encore
 

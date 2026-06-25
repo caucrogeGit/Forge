@@ -212,7 +212,7 @@ Avec détails de validation :
 | Erreur de validation | 422 |
 | Erreur serveur | 500 |
 
-### Exemple — HTML
+### Exemple, HTML
 
 ```python
 from core.http.helpers import html
@@ -221,7 +221,7 @@ def dashboard(request):
     return html("dashboard/index.html", context={"title": "Tableau de bord"})
 ```
 
-### Exemple — JSON simple
+### Exemple, JSON simple
 
 ```python
 from core.http import json_response
@@ -230,7 +230,7 @@ def status(request):
     return json_response({"status": "ok", "service": "forge"})
 ```
 
-### Exemple — JSON structuré
+### Exemple, JSON structuré
 
 ```python
 from core.http import api_success, api_error
@@ -313,7 +313,7 @@ Réponse si token valide :
 - Pas de parsing automatique du body JSON entrant (voir `request.json_body`).
 - Pas de pagination avancée.
 - Pas de validation de payload.
-- Auth API par token statique uniquement — pas de JWT, pas d'OAuth.
+- Auth API par token statique uniquement, pas de JWT, pas d'OAuth.
 
 </details>
 
@@ -324,7 +324,7 @@ Réponse si token valide :
 
 | API | Signature | Description |
 |---|---|---|
-| `require_api_token` | `require_api_token(func)` | Décorateur — protège une route API par token Bearer. |
+| `require_api_token` | `require_api_token(func)` | Décorateur, protège une route API par token Bearer. |
 | `get_api_token_from_request` | `get_api_token_from_request(request) -> str \| None` | Extrait le token du header `Authorization`. Retourne `None` si absent ou format invalide. |
 | `is_valid_api_token` | `is_valid_api_token(request) -> bool` | Retourne `True` si le token correspond à `API_TOKEN`. |
 
@@ -364,7 +364,7 @@ Le décorateur s'applique directement sur la fonction handler. Il n'interfère p
 
 ### Limites
 
-- Token statique unique — pas de multi-token, pas de scopes.
+- Token statique unique, pas de multi-token, pas de scopes.
 - Pas de JWT ni d'OAuth.
 - Pas de rate limiting (ticket `API-RATE-LIMIT-001` futur).
 - Ne pas utiliser en production sans HTTPS.
@@ -384,7 +384,7 @@ Comportement :
 
 | Situation | Résultat |
 |---|---|
-| Module absent | Retour silencieux — aucune erreur |
+| Module absent | Retour silencieux, aucune erreur |
 | Module présent, `register_api_routes` définie | Routes ajoutées au routeur |
 | Module présent, sans `register_api_routes` | Avertissement loggé, aucune route ajoutée |
 | Module présent, erreur Python | `ImportError` levé avec message explicite |
@@ -535,7 +535,7 @@ template_manager.register(Jinja2Renderer(get("views_dir")))
 <details markdown="1" id="coresecurity">
 <summary><code>core.security</code> - Sessions, auth, CSRF et mots de passe</summary>
 
-Pour l'authentification des nouveaux projets, utiliser `core.auth`. Les modules `core.security` historiques restent présents pour les briques transversales officielles (`core.security.session`, `core.security.csrf`). Voir [docs/auth.md — Frontière API](../features/auth.md#api-officielle-et-compatibilite-legacy).
+Pour l'authentification des nouveaux projets, utiliser `core.auth`. Les modules `core.security` historiques restent présents pour les briques transversales officielles (`core.security.session`, `core.security.csrf`). Voir [docs/auth.md, Frontière API](../features/auth.md#api-officielle-et-compatibilite-legacy).
 
 ### Sessions mémoire
 
@@ -553,7 +553,7 @@ Pour l'authentification des nouveaux projets, utiliser `core.auth`. Les modules 
 | `set_flash(session_id, message, level="success")` | Stocke un message flash. |
 | `get_flash(session_id)` | Lit et consomme le flash. |
 
-Le stockage de session délègue au backend actif via `core.sessions.get_session_store()`. Le backend par défaut est `MemorySessionStore` (dict Python en mémoire, thread-safe). Il convient au développement et aux petites applications mono-processus derrière Nginx. Les sessions sont perdues au redémarrage, ne sont pas partagées entre workers et ne conviennent pas au scaling horizontal. Voir [ADR-002 — Stratégie de session](../adr/002-session-strategy.md) et la [section sessions mémoire du guide de déploiement](../deployment/deployment.md#9-limite-importante-sessions-memoire).
+Le stockage de session délègue au backend actif via `core.sessions.get_session_store()`. Le backend par défaut est `MemorySessionStore` (dict Python en mémoire, thread-safe). Il convient au développement et aux petites applications mono-processus derrière Nginx. Les sessions sont perdues au redémarrage, ne sont pas partagées entre workers et ne conviennent pas au scaling horizontal. Voir [ADR-002, Stratégie de session](../adr/002-session-strategy.md) et la [section sessions mémoire du guide de déploiement](../deployment/deployment.md#9-limite-importante-sessions-memoire).
 
 Le package `core.sessions` expose le contrat de backend :
 
@@ -565,9 +565,9 @@ Le package `core.sessions` expose le contrat de backend :
 | `MariaDbSessionStore` | Backend MariaDB (sessions partagées entre processus) |
 | `get_session_store()` | Retourne le backend actif (MemorySessionStore par défaut) |
 
-`FileSessionStore(sessions_dir="storage/sessions", ttl=3600)` — persistance entre redémarrages, sans dépendance externe. Ne supporte pas le multi-worker concurrent.
+`FileSessionStore(sessions_dir="storage/sessions", ttl=3600)`, persistance entre redémarrages, sans dépendance externe. Ne supporte pas le multi-worker concurrent.
 
-`MariaDbSessionStore(fetch_one=None, execute=None, ttl=3600)` — sessions partagées via la table `forge_sessions` (voir `mvc/models/sql/forge_sessions.sql`). Prépare les déploiements multi-processus. Doit être configuré explicitement.
+`MariaDbSessionStore(fetch_one=None, execute=None, ttl=3600)`, sessions partagées via la table `forge_sessions` (voir `mvc/models/sql/forge_sessions.sql`). Prépare les déploiements multi-processus. Doit être configuré explicitement.
 
 ### Middleware et décorateurs
 
@@ -582,12 +582,12 @@ Le package `core.sessions` expose le contrat de backend :
 ### Mots de passe et limitation
 
 Pour créer de nouveaux hashes, utiliser `core.auth.password.hash_password` (Argon2id, API officielle).
-`core.security.hashing` est désormais **lecture seule** — vérification des hashes PBKDF2 legacy uniquement.
+`core.security.hashing` est désormais **lecture seule**, vérification des hashes PBKDF2 legacy uniquement.
 
 | API | Description |
 |---|---|
 | `verifier_mot_de_passe(password, stored)` | Vérifie un hash PBKDF2 existant (format versionné et format legacy). |
-| `pbkdf2_needs_rehash(stored)` | Retourne toujours `True` — tout hash PBKDF2 doit migrer vers Argon2id. |
+| `pbkdf2_needs_rehash(stored)` | Retourne toujours `True`, tout hash PBKDF2 doit migrer vers Argon2id. |
 | `update_password_hash(id, hash)` | Met à jour le `PasswordHash` de l'utilisateur (`auth_model`). |
 | `enregistrer_tentative(ip)` | Enregistre une tentative par IP. |
 | `est_limite(ip)` | Limite après `5` tentatives dans une fenêtre de `60` secondes. |
@@ -641,8 +641,8 @@ Dans un template Jinja :
 | `generate_nonce()` | Génère un nonce URL-safe 128 bits (`secrets.token_urlsafe(16)`). |
 | `set_request_nonce(nonce)` | Stocke le nonce de la requête courante (thread-local). |
 | `get_request_nonce()` | Retourne le nonce courant ou `None`. |
-| `build_csp_header(nonce=None)` | Construit l'en-tête CSP — avec ou sans nonce, jamais `unsafe-inline`. |
-| `csp_nonce()` | Helper Jinja — retourne le nonce ou `""` si désactivé. |
+| `build_csp_header(nonce=None)` | Construit l'en-tête CSP, avec ou sans nonce, jamais `unsafe-inline`. |
+| `csp_nonce()` | Helper Jinja, retourne le nonce ou `""` si désactivé. |
 
 Comportement CSP selon la configuration :
 
@@ -718,13 +718,13 @@ if form.is_valid():
 
 `DecimalField` retourne un `Decimal`. Les CRUD générés gardent la doctrine Forge actuelle : les champs JSON de type Python `float` restent convertis en `float`.
 
-### Champs de formulaire avancés — notes d'usage
+### Champs de formulaire avancés, notes d'usage
 
-- **`FileField` / `ImageField`** — valident uniquement les métadonnées (extension, taille, MIME). Ils ne sauvegardent rien et ne créent aucune entrée en base. La persistance est assurée par `save_upload` + `attach_media_to_entity` appelés depuis le contrôleur généré par `make:crud`.
-- **`RelationField`** — hérite de `ChoiceField`. Ne fait aucune requête SQL ; la liste de choix est fournie par le contrôleur ou le formulaire via `options`.
-- **`DateField` / `DateTimeField`** — retournent des objets Python typés (`datetime.date` / `datetime.datetime`). `make:crud` génère ces champs directement pour les colonnes `DATE` / `DATETIME`.
-- **`SlugField`** — valide le format slug, ne slugifie pas automatiquement. Les caractères accentués, majuscules et underscores sont refusés.
-- **`TextAreaField`** — fournit un helper `render()` pour générer une balise `<textarea>` avec échappement XSS. Le rendu principal reste assuré par les templates Jinja2.
+- **`FileField` / `ImageField`**, valident uniquement les métadonnées (extension, taille, MIME). Ils ne sauvegardent rien et ne créent aucune entrée en base. La persistance est assurée par `save_upload` + `attach_media_to_entity` appelés depuis le contrôleur généré par `make:crud`.
+- **`RelationField`**, hérite de `ChoiceField`. Ne fait aucune requête SQL ; la liste de choix est fournie par le contrôleur ou le formulaire via `options`.
+- **`DateField` / `DateTimeField`**, retournent des objets Python typés (`datetime.date` / `datetime.datetime`). `make:crud` génère ces champs directement pour les colonnes `DATE` / `DATETIME`.
+- **`SlugField`**, valide le format slug, ne slugifie pas automatiquement. Les caractères accentués, majuscules et underscores sont refusés.
+- **`TextAreaField`**, fournit un helper `render()` pour générer une balise `<textarea>` avec échappement XSS. Le rendu principal reste assuré par les templates Jinja2.
 
 </details>
 
@@ -768,11 +768,11 @@ module devait être supprimé à terme.
 | `set_flash` | `set_flash(request, message, level="success")` | `core.security.session.set_flash`, `get_session_id` |
 | `csrf_token` | `csrf_token(request)` | `core.security.session.get_session_id`, `get_session` |
 
-### Méthode legacy — à ne pas utiliser
+### Méthode legacy, à ne pas utiliser
 
 | Méthode | Signature | Statut |
 |---|---|---|
-| `current_user` | `current_user(request)` | **LEGACY** — appelle `core.security.session.get_user()` qui émet un `DeprecationWarning`. Absente de tous les starters post-9.1. |
+| `current_user` | `current_user(request)` | **LEGACY**, appelle `core.security.session.get_user()` qui émet un `DeprecationWarning`. Absente de tous les starters post-9.1. |
 
 Alternative canonique :
 
@@ -946,7 +946,7 @@ Tout accès SQL applicatif passe par `core.database.db`. Ces quatre fonctions co
 
 Sans transaction explicite, chaque helper gère connexion, commit et rollback automatiquement.
 
-### Cas avancés — connexion directe
+### Cas avancés, connexion directe
 
 Pour les transactions multi-statement ou les opérations en bulk, utiliser `core.database.transaction` :
 
@@ -960,7 +960,7 @@ with transaction() as tx:
         execute("INSERT INTO pivot VALUES (?, ?)", (source_id, target_id), tx=tx)
 ```
 
-`get_connection()` / `close_connection()` de `core.database.connection` sont une API interne — ne pas les utiliser directement dans le code applicatif.
+`get_connection()` / `close_connection()` de `core.database.connection` sont une API interne, ne pas les utiliser directement dans le code applicatif.
 
 ### Transactions
 
@@ -1182,7 +1182,7 @@ L'interface officielle est la commande `forge`.
 | `forge project:audit` | Produit un rapport d'audit détaillé non destructif (structure, config, entités, routes, templates, modules, migrations, docs, tests). |
 | `forge help` | Affiche l'aide. |
 
-### forge project:check — vérification structurelle
+### forge project:check, vérification structurelle
 
 `forge project:check` vérifie qu'un projet Forge respecte les conventions contractuelles de Forge 1.x. Elle est plus stricte que `forge doctor` et peut être utilisée avant un commit, avant une release locale ou dans une CI.
 
@@ -1201,19 +1201,19 @@ L'interface officielle est la commande `forge`.
 
 | Famille | FAIL si… | WARN si… |
 |---|---|---|
-| Structure | `app.py`, `config.py`, `mvc/`, `mvc/routes.py`, `mvc/controllers/`, `mvc/views/`, `mvc/entities/` absent | — |
+| Structure | `app.py`, `config.py`, `mvc/`, `mvc/routes.py`, `mvc/controllers/`, `mvc/views/`, `mvc/entities/` absent |, |
 | Configuration | `env/example` absent | `env/dev` absent |
-| Entités | `relations.json` absent ou invalide, JSON d'entité absent ou invalide | — |
+| Entités | `relations.json` absent ou invalide, JSON d'entité absent ou invalide |, |
 | Routes | `mvc/routes.py` absent, erreur de syntaxe Python | `mvc/routes.py` vide |
 | Templates | `mvc/views/` absent | aucun `.html` trouvé |
-| Modules | `forge_modules.json` invalide, source déclarée absente | — |
-| Migrations | — | noms non conformes, fichiers vides |
+| Modules | `forge_modules.json` invalide, source déclarée absente |, |
+| Migrations |, | noms non conformes, fichiers vides |
 
 `forge project:check` doit être lancé depuis la racine d'un projet Forge. Si `app.py` et `mvc/` sont absents, la commande échoue immédiatement avec un message explicite.
 
 Code de sortie : `0` si aucun FAIL, `1` si au moins un FAIL. Les WARN n'influencent pas le code de sortie.
 
-### forge project:audit — rapport d'audit détaillé
+### forge project:audit, rapport d'audit détaillé
 
 `forge project:audit` produit un rapport d'audit complet d'un projet Forge. Contrairement à `project:check` (strict, CI-ready), `project:audit` est informatif et distingue les problèmes bloquants, les avertissements et les observations neutres (INFO).
 
@@ -1245,7 +1245,7 @@ Code de sortie : `0` si aucun FAIL (même avec des WARN ou INFO), `1` si au moin
 
 `forge project:audit` ne modifie aucun fichier. Il ne corrige rien automatiquement.
 
-### forge doctor — détails
+### forge doctor, détails
 
 `forge doctor` est une commande de lecture seule. Elle ne modifie aucun fichier.
 
@@ -1530,13 +1530,13 @@ suppression de média côté public et ne remplace pas le CRUD admin.
 `forge make:public-list` et `forge make:public-show` intègrent les médias
 déclarés dans la clé `media` de la définition JSON d'une entité.
 
-**Comportement liste** — si au moins un média `field: image` est déclaré, la
+**Comportement liste**, si au moins un média `field: image` est déclaré, la
 liste générée ajoute une colonne miniature. Le SELECT inclut `pk AS _entity_id`.
 Le contrôleur enrichit chaque ligne avec `get_cover_media(snake, row["_entity_id"], role=...)`.
 Les entités sans déclaration `media` ou avec uniquement des fichiers ne reçoivent
 aucune colonne supplémentaire.
 
-**Comportement fiche** — chaque entrée `media` produit une section d'affichage :
+**Comportement fiche**, chaque entrée `media` produit une section d'affichage :
 
 | Type | Rendu |
 |---|---|
@@ -1550,7 +1550,7 @@ Le contrôleur appelle `get_cover_media` pour les éléments uniques et
 ajoutés automatiquement pour les helpers applicatifs. La génération est non destructive : un
 contrôleur existant est complété, jamais écrasé.
 
-**Limites strictes** — aucun upload public, aucune suppression publique, aucune
+**Limites strictes**, aucun upload public, aucune suppression publique, aucune
 réorganisation, aucun carrousel JavaScript, aucune lightbox, aucun HTMX, aucun
 Alpine.js. Ces fonctionnalités restent réservées au CRUD admin ou à des tickets
 dédiés.
@@ -1572,25 +1572,25 @@ Exemple : `forge make:public-form DemandeSejour` génère :
 - `mvc/controllers/public_demandes_sejours_controller.py`
 - Routes : `GET /demande_sejours/new` et `POST /demande_sejours`
 
-**Champs inclus** — les champs non sensibles de l'entité (hors clé primaire,
+**Champs inclus**, les champs non sensibles de l'entité (hors clé primaire,
 clés étrangères `_id`, `created_at`, `updated_at`, `password*`, `token*`,
 `secret*`, `is_admin`, `is_active`, `email_verified_at`, `last_login_at`).
 
-**Types d'input détectés automatiquement** — `textarea` (sql TEXT), `checkbox`
+**Types d'input détectés automatiquement**, `textarea` (sql TEXT), `checkbox`
 (bool), `number` (int/float), `date`, `datetime-local`, `email` (nom contenant
 `email`), `url` (nom contenant `url`, `website` ou `site`), `tel` (nom contenant
 `phone`), `text` par défaut.
 
-**Validation serveur** — chaque champ non nullable est marqué `required`. En cas
+**Validation serveur**, chaque champ non nullable est marqué `required`. En cas
 d'erreur, le formulaire est ré-affiché avec les messages d'erreur et les valeurs
 saisies. En cas de succès, un INSERT SQL visible est exécuté et l'utilisateur est
 redirigé vers le formulaire vide avec un message flash.
 
-**Non destructif** — si le contrôleur public existe déjà, les méthodes `new()` et
+**Non destructif**, si le contrôleur public existe déjà, les méthodes `new()` et
 `create()` ainsi que les constantes `INSERT_PUBLIC_FORM` et `FORM_FIELDS` sont
 ajoutées sans toucher aux méthodes existantes.
 
-**Limites strictes** — pas d'envoi d'email, pas de captcha, pas de workflow,
+**Limites strictes**, pas d'envoi d'email, pas de captcha, pas de workflow,
 pas d'upload, pas de HTMX, pas d'Alpine.js, pas d'exposition de routes admin,
 pas de pagination, pas d'i18n.
 
@@ -1607,7 +1607,7 @@ mvc/routes.py
 La route générée est `GET /contact`. La méthode `contact()` est ajoutée à
 `PublicPagesController` (le même contrôleur que `make:public-page`). Le template
 contient un titre, une introduction, un bloc coordonnées (lien mailto + téléphone)
-et un bloc adresse — tous avec des valeurs placeholder à remplacer manuellement.
+et un bloc adresse, tous avec des valeurs placeholder à remplacer manuellement.
 
 La commande est non destructive et idempotente : elle ne recrée pas la page si
 elle existe déjà, n'ajoute pas la route si elle est déjà présente, et ne modifie
@@ -1758,7 +1758,7 @@ ORDER BY Id DESC
 LIMIT ? OFFSET ?
 ```
 
-### Intégration HTMX CRUD — vue d'ensemble
+### Intégration HTMX CRUD, vue d'ensemble
 
 HTMX est une **amélioration progressive** dans les CRUD générés par Forge. Chaque action reste utilisable sans HTMX ; la bibliothèque améliore seulement l'expérience en remplaçant partiellement la page.
 
@@ -1772,7 +1772,7 @@ Tous les éléments HTMX de la liste pointent vers la même cible :
 </div>
 ```
 
-La zone `#crud-results` contient `_table.html` + `_pagination.html`. Quand HTMX intercepte une action, il remplace uniquement l'intérieur de cette div — sans rechargement complet.
+La zone `#crud-results` contient `_table.html` + `_pagination.html`. Quand HTMX intercepte une action, il remplace uniquement l'intérieur de cette div, sans rechargement complet.
 
 **Tableau de cohérence**
 
@@ -1788,9 +1788,9 @@ La zone `#crud-results` contient `_table.html` + `_pagination.html`. Quand HTMX 
 **Convention HTMX cohérente**
 
 Tous les éléments utilisent :
-- `hx-target="#crud-results"` — cible unique
-- `hx-swap="innerHTML"` — remplacement du contenu
-- `hx-push-url="true"` — mise à jour de l'URL (sauf suppression unitaire qui ne pousse pas l'URL)
+- `hx-target="#crud-results"`, cible unique
+- `hx-swap="innerHTML"`, remplacement du contenu
+- `hx-push-url="true"`, mise à jour de l'URL (sauf suppression unitaire qui ne pousse pas l'URL)
 
 **Fragment `_results.html`**
 
@@ -1800,7 +1800,7 @@ Le contrôleur généré renvoie `_results.html` pour les requêtes HTMX et `ind
 template = "contact/_results.html" if _is_hx_request(request) else "contact/index.html"
 ```
 
-`_results.html` n'a pas de `{% extends %}` — c'est un fragment pur.
+`_results.html` n'a pas de `{% extends %}`, c'est un fragment pur.
 
 **Conservation des paramètres**
 
@@ -1808,14 +1808,14 @@ template = "contact/_results.html" if _is_hx_request(request) else "contact/inde
 |---|---|---|---|
 | `q` | ✅ conservé | ✅ conservé | ✗ effacé |
 | filtres | ✅ conservés | ✅ conservés | ✗ effacés |
-| `sort` + `direction` | ✅ conservés | — | ✗ effacés |
-| `page` | — | ✗ réinitialisé (retour p.1) | ✗ effacée |
+| `sort` + `direction` | ✅ conservés |, | ✗ effacés |
+| `page` |, | ✗ réinitialisé (retour p.1) | ✗ effacée |
 
 **Pas de JavaScript personnalisé**
 
 Aucun `<script>`, `keyup`, `debounce`, `oninput` ou recherche live n'est généré. Le formulaire de recherche est soumis manuellement (bouton ou touche Entrée).
 
-**Suppression groupée — HTML classique intentionnel**
+**Suppression groupée, HTML classique intentionnel**
 
 Le formulaire `bulk-delete-form` est un `POST` classique, sans attributs HTMX. La page de confirmation est une navigation complète. Ce comportement est intentionnel : la suppression groupée est une action lourde qui ne bénéficie pas d'un remplacement partiel.
 
@@ -1832,7 +1832,7 @@ Le formulaire `bulk-delete-form` est un `POST` classique, sans attributs HTMX. L
 
 **Convention**
 
-Toutes les colonnes non-PK déclarées dans `entity.json` sont triables. Aucune annotation `list.sort: true` n'est nécessaire — la whitelist est construite automatiquement à la génération.
+Toutes les colonnes non-PK déclarées dans `entity.json` sont triables. Aucune annotation `list.sort: true` n'est nécessaire, la whitelist est construite automatiquement à la génération.
 
 **Paramètres GET**
 
@@ -1857,7 +1857,7 @@ _ALLOWED_SORT = {
 _DEFAULT_SORT = "contact.Id"
 ```
 
-Le SQL utilise toujours `_ALLOWED_SORT.get(sort, _DEFAULT_SORT)` — jamais la valeur brute du paramètre `sort`.
+Le SQL utilise toujours `_ALLOWED_SORT.get(sort, _DEFAULT_SORT)`, jamais la valeur brute du paramètre `sort`.
 
 **SQL générée**
 
@@ -1921,7 +1921,7 @@ g.add("POST", "/bulk-delete",         ContactController.bulk_delete,         nam
 g.add("POST", "/bulk-delete-confirm", ContactController.bulk_delete_confirm,  name="contact-bulk_delete_confirm")
 ```
 
-**HTML — attribut `form` HTML5**
+**HTML, attribut `form` HTML5**
 
 Les cases à cocher sont dans le `<tbody>` du tableau ; le formulaire `bulk-delete-form` est déclaré en dehors du tableau pour éviter l'imbrication invalide de `<form>` :
 
@@ -1986,7 +1986,7 @@ La suppression groupée n'utilise ni `<script>`, ni attributs `hx-*`. Elle fonct
 g.add("GET", "/export-csv", ContactController.export_csv, name="contact-export_csv")
 ```
 
-**Modèle — `_EXPORT_LIMIT` et `find_{plural}_for_export`**
+**Modèle, `_EXPORT_LIMIT` et `find_{plural}_for_export`**
 
 ```python
 _EXPORT_LIMIT = 1000
@@ -2046,7 +2046,7 @@ Le lien d'export est un `<a href>` classique, sans attributs HTMX, placé entre 
 </div>
 ```
 
-Le lien conserve `q`, `sort`, `direction` et les filtres actifs. Il ne conserve pas `page` — l'export couvre l'ensemble filtré sans limite de pagination.
+Le lien conserve `q`, `sort`, `direction` et les filtres actifs. Il ne conserve pas `page`, l'export couvre l'ensemble filtré sans limite de pagination.
 
 **Pas de HTMX sur l'export**
 
@@ -2167,7 +2167,7 @@ LIMIT ? OFFSET ?
 
 Toutes les valeurs sont paramétrées (aucune concaténation directe).
 
-**Sécurité — whitelist de colonnes filtrées**
+**Sécurité, whitelist de colonnes filtrées**
 
 Les noms de colonnes ne peuvent pas être passés comme paramètres SQL `?`. Pour éviter toute injection de colonne, le modèle généré crée une allowlist explicite :
 
@@ -2308,7 +2308,7 @@ La validation vérifie aussi la cohérence avec `sql_type` :
 
 **Priorités** : `RelationField` (défini via `relations.json`) est toujours prioritaire sur `form.field`. En l'absence de `form.field`, `make:crud` déduit le champ depuis `python_type` (comportement par défaut inchangé).
 
-**`file` et `image` dans `form.field`** : ces valeurs sont refusées à la validation de `fields[].form.field`. Les médias doivent être déclarés via la clé `"media"` à la racine de l'entité — voir la section *Métadonnée `media`* ci-dessous.
+**`file` et `image` dans `form.field`** : ces valeurs sont refusées à la validation de `fields[].form.field`. Les médias doivent être déclarés via la clé `"media"` à la racine de l'entité, voir la section *Métadonnée `media`* ci-dessous.
 
 ### Métadonnée `media` (déclaration des médias liés)
 
@@ -2338,13 +2338,13 @@ Les médias sont stockés dans la table `media` distincte via `media.entity_name
 
 | Clé | Obligatoire | Valeurs | Défaut |
 |---|---|---|---|
-| `name` | oui | chaîne non vide, unique | — |
-| `field` | oui | `"image"`, `"file"` | — |
-| `role` | oui | chaîne non vide, unique | — |
+| `name` | oui | chaîne non vide, unique |, |
+| `field` | oui | `"image"`, `"file"` |, |
+| `role` | oui | chaîne non vide, unique |, |
 | `variants` | non | `bool` | `false` |
 | `multiple` | non | `bool` | `false` |
 | `required` | non | `bool` | `false` |
-| `label` | non | chaîne | — |
+| `label` | non | chaîne |, |
 
 **Règles** : `variants=true` est autorisé uniquement avec `field="image"`. Les doublons `name` et `role` dans une même entité sont refusés à la validation. Voir docs/media.md pour les détails et la convention de rôles.
 
@@ -2391,6 +2391,6 @@ La clé optionnelle `"rbac"` dans `entity.json` déclare les permissions requise
 
 Actions acceptées : `index`, `show`, `create` (→ méthode `new`), `store` (→ méthode `create`), `edit`, `update`, `delete` (→ méthode `destroy`). Toute action inconnue déclenche une erreur à la génération. Sans clé `rbac`, le contrôleur est identique à celui généré sans RBAC.
 
-Documentation complète : RBAC — Contrôle d'accès.
+Documentation complète : RBAC, Contrôle d'accès.
 
 </details>

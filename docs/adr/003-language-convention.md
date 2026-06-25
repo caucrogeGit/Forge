@@ -1,4 +1,4 @@
-# ADR-003 — Convention de langue pour l'API publique
+# ADR-003, Convention de langue pour l'API publique
 
 ## Statut
 
@@ -45,7 +45,7 @@ Concrètement :
    `core.*` doivent avoir des noms en anglais dans Forge 1.0.
 
 2. Les noms de variables internes, les commentaires et la documentation
-   (docs Markdown) restent en français — langue de travail de l'équipe et
+   (docs Markdown) restent en français, langue de travail de l'équipe et
    des apprenants visés par Forge.
 
 3. Les noms de colonnes SQL générés par Forge (dans les entités applicatives)
@@ -53,7 +53,7 @@ Concrètement :
    de langue pour les colonnes SQL applicatives.
 
 4. Les noms de clés de session (`authentifie`, `utilisateur`) sont des
-   détails d'implémentation internes — leur migration fera l'objet d'un
+   détails d'implémentation internes, leur migration fera l'objet d'un
    ticket séparé.
 
 5. La migration effective des noms est planifiée dans `LANG-MIGRATION-001`
@@ -70,7 +70,7 @@ Concrètement :
   pendant la période de transition selon la règle C de la charte.
 - Les starters et la documentation seront mis à jour en parallèle.
 - Les développeurs ayant du code Forge 1.x appelant les APIs françaises devront
-  migrer — le guide de migration `MIGRATION-GUIDE-001` les documentera.
+  migrer, le guide de migration `MIGRATION-GUIDE-001` les documentera.
 
 ---
 

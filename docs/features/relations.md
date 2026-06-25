@@ -421,7 +421,7 @@ Le système de relations ne supporte pas encore directement :
 - saisie, édition ou affichage des champs `pivot_fields` dans le CRUD ;
 - attach/detach applicatif dédié aux pivots enrichis.
 
-Depuis Forge 1.2.0, `forge make:crud` génère automatiquement un `<select>` pour les champs FK déclarés dans `relations.json` — voir la section *Exploitation dans le CRUD généré* ci-dessous.
+Depuis Forge 1.2.0, `forge make:crud` génère automatiquement un `<select>` pour les champs FK déclarés dans `relations.json`, voir la section *Exploitation dans le CRUD généré* ci-dessous.
 
 ## Pivot explicite
 

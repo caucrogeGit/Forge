@@ -5,10 +5,10 @@ et définit les conditions à remplir avant qu'une telle version puisse être d�
 
 Il complète :
 
-- [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Politique de dépréciation](deprecation-policy.md) — cycle annonce → retrait
-- [Matrice de compatibilité](compatibility.md) — Python, MariaDB, Node.js
-- [Guide de migration](../features/migration-guide.md) — passer d'une version à l'autre
+- [Politique de release](release-policy.md), règles MAJOR/MINOR/PATCH
+- [Politique de dépréciation](deprecation-policy.md), cycle annonce → retrait
+- [Matrice de compatibilité](compatibility.md), Python, MariaDB, Node.js
+- [Guide de migration](../features/migration-guide.md), passer d'une version à l'autre
 
 ---
 
@@ -33,7 +33,7 @@ Elle implique un engagement explicite sur :
 - les types de corrections incluses (sécurité, bugs critiques) ;
 - les types de changements exclus (nouvelles fonctionnalités, refactoring) ;
 - la compatibilité maintenue pendant toute la durée du support ;
-- la procédure de fin de support (EOL — End of Life) ;
+- la procédure de fin de support (EOL, End of Life) ;
 - la communication proactive des corrections.
 
 ### Exemples de LTS connues
@@ -145,10 +145,10 @@ promesse de maturité.
 
 Quatre tickets de sécurité identifiés lors des audits restent ouverts :
 
-- `SECURITY-CACHE-001` — `Cache-Control: no-store` absent sur les pages auth
-- `CRUD-RBAC-UI-001` — boutons Modifier/Supprimer sans guard `{% if can() %}`
-- `E2E-UPLOAD-HTTP-001` — tests upload HTTP réels pas encore créés
-- `SECURITY-UPLOAD-RATE-LIMIT-001` — rate limit sur les uploads absent
+- `SECURITY-CACHE-001`, `Cache-Control: no-store` absent sur les pages auth
+- `CRUD-RBAC-UI-001`, boutons Modifier/Supprimer sans guard `{% if can() %}`
+- `E2E-UPLOAD-HTTP-001`, tests upload HTTP réels pas encore créés
+- `SECURITY-UPLOAD-RATE-LIMIT-001`, rate limit sur les uploads absent
 
 Ces dettes, même mineures, ne devraient pas faire partie d'une promesse LTS
 sans être d'abord corrigées.
@@ -174,7 +174,7 @@ figée serait prématuré à ce stade.
 
 ## Scénarios possibles
 
-### Scénario A — Pas de LTS maintenant (recommandé)
+### Scénario A, Pas de LTS maintenant (recommandé)
 
 Forge continue en série 1.x sans promesse LTS.
 
@@ -195,7 +195,7 @@ des garanties claires sur les API publiques en 1.x, sans aller jusqu'à une LTS.
 
 ---
 
-### Scénario B — LTS candidate après une mineure 1.x (ex. 1.2.0 ou 1.3.0)
+### Scénario B, LTS candidate après une mineure 1.x (ex. 1.2.0 ou 1.3.0)
 
 Une version future pourrait devenir candidate LTS après :
 
@@ -216,7 +216,7 @@ Une version future pourrait devenir candidate LTS après :
 
 ---
 
-### Scénario C — LTS après stabilisation de Forge 1.0.0
+### Scénario C, LTS après stabilisation de Forge 1.0.0
 
 Forge attend la stabilisation de `1.0.0` pour déclarer sa première LTS.
 
@@ -302,11 +302,11 @@ Sur la base de cette évaluation :
 Les raisons principales :
 
 1. Les dettes de sécurité identifiées doivent être corrigées avant tout engagement LTS.
-2. L'API JSON légère n'est pas encore créée — promettre une LTS sans API JSON
+2. L'API JSON légère n'est pas encore créée, promettre une LTS sans API JSON
    gèlerait une version incomplète.
-3. La documentation avancée n'est pas structurée — les utilisateurs d'une LTS
+3. La documentation avancée n'est pas structurée, les utilisateurs d'une LTS
    ont besoin d'une documentation pédagogique complète.
-4. Les tests E2E MariaDB ne sont pas automatisés — une LTS sans CI MariaDB
+4. Les tests E2E MariaDB ne sont pas automatisés, une LTS sans CI MariaDB
    réelle est une promesse fragile.
 5. La capacité humaine de maintenance LTS n'a pas été évaluée formellement.
 
@@ -334,7 +334,7 @@ La LTS candidate la plus réaliste serait une version `1.0.0` stable ou une vers
 | Ticket | Domaine |
 |---|---|
 | `DOC-STRUCTURE-001` | Documentation par parcours |
-| `DOC-15MIN-001` | Tutoriel d'entrée Forge (devenu « Bonjour Forge » — voir `docs/bonjour-forge.md`) |
+| `DOC-15MIN-001` | Tutoriel d'entrée Forge (devenu « Bonjour Forge », voir `docs/bonjour-forge.md`) |
 | `DOC-APP-COMPLETE-001` | Tutoriel application complète |
 | `DOC-CONTRIBUTE-001` | Guide contribuer |
 | `API-JSON-001` à `API-DOC-001` | API JSON légère |
@@ -351,11 +351,11 @@ La LTS candidate la plus réaliste serait une version `1.0.0` stable ou une vers
 ## Voir aussi
 
 - [Vue d'ensemble Release et compatibilité](release-and-compatibility.md)
-- [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Politique de dépréciation](deprecation-policy.md) — cycle annonce → retrait
-- [Contrat de stabilité](stability-contract.md) — garanties Forge 1.x
-- [Matrice de compatibilité](compatibility.md) — Python, MariaDB, Node.js
+- [Politique de release](release-policy.md), règles MAJOR/MINOR/PATCH
+- [Politique de dépréciation](deprecation-policy.md), cycle annonce → retrait
+- [Contrat de stabilité](stability-contract.md), garanties Forge 1.x
+- [Matrice de compatibilité](compatibility.md), Python, MariaDB, Node.js
 
 ---
 
-*Guide défini lors de RELEASE-LTS-001 (Phase 8 — Release et compatibilité).*
+*Guide défini lors de RELEASE-LTS-001 (Phase 8, Release et compatibilité).*

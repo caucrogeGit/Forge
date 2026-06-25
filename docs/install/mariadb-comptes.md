@@ -7,9 +7,9 @@ initialisation) en détaillant la **séparation des comptes**.
 L'objectif est de ne pas utiliser `root` comme utilisateur applicatif, ni même
 comme compte courant dans `env/dev`. Forge distingue clairement :
 
-- `root` — administration serveur MariaDB, secours uniquement ;
-- `forge_admin` — administration du projet Forge ;
-- `forge_app` — utilisateur applicatif utilisé par l'application au runtime.
+- `root`, administration serveur MariaDB, secours uniquement ;
+- `forge_admin`, administration du projet Forge ;
+- `forge_app`, utilisateur applicatif utilisé par l'application au runtime.
 
 Cette séparation évite de donner à l'application des droits trop larges, et
 correspond au check **Sécurité prod** de [`forge doctor`](../deployment/production-checklist.md).
@@ -140,7 +140,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'forge_admin'@'localhost' WITH GRANT OPTION;
 ```
 
 Cette commande est trop large : elle donne à `forge_admin` un pouvoir proche
-de `root`. Pour Forge, ce n'est pas nécessaire — `forge_admin` doit administrer
+de `root`. Pour Forge, ce n'est pas nécessaire, `forge_admin` doit administrer
 la base du projet, pas tout le serveur MariaDB.
 
 ---
@@ -243,7 +243,7 @@ Mettre ensuite `env/dev` à jour.
 
 ## 12. Supprimer proprement les comptes d'un projet
 
-À utiliser seulement si le projet doit être détruit — **supprime la base et
+À utiliser seulement si le projet doit être détruit, **supprime la base et
 les comptes** :
 
 ```sql

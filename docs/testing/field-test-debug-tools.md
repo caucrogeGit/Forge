@@ -1,4 +1,4 @@
-# Tests terrain — Outils de diagnostic
+# Tests terrain, Outils de diagnostic
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -73,7 +73,7 @@ forge project:check
 
 **Ce que le testeur doit copier :** les lignes `[OK]`, `[WARN]` et `[ERREUR]` pertinentes.
 
-**À ne pas faire :** confondre avec `project:check` — les deux sont complémentaires.
+**À ne pas faire :** confondre avec `project:check`, les deux sont complémentaires.
 
 ```bash
 forge project:audit
@@ -105,7 +105,7 @@ forge routes:list
 
 **Ce que le testeur doit copier :** la sortie complète, en particulier les lignes `ERROR` ou `WARNING`.
 
-**À ne pas faire :** ignorer les avertissements — en mode `--strict`, un warning est une erreur.
+**À ne pas faire :** ignorer les avertissements, en mode `--strict`, un warning est une erreur.
 
 ```bash
 mkdocs build --strict
@@ -115,7 +115,7 @@ mkdocs build --strict
 
 ### `git status`
 
-**Objectif :** affiche l'état du dépôt — fichiers modifiés, non suivis, en attente de commit.
+**Objectif :** affiche l'état du dépôt, fichiers modifiés, non suivis, en attente de commit.
 
 **Quand l'utiliser :** avant et après une étape de ticket qui crée ou modifie des fichiers.
 
@@ -182,7 +182,7 @@ storage/logs/errors.dev.md      — vue lisible générée depuis le JSONL
 
 **Où regarder :** ouvrir `storage/logs/errors.dev.md` pour une lecture rapide, ou `storage/logs/errors.dev.jsonl` pour le détail technique.
 
-**Quoi copier :** les lignes correspondant à l'erreur observée — champ `message`, `exception_type`, `path`, `traceback`.
+**Quoi copier :** les lignes correspondant à l'erreur observée, champ `message`, `exception_type`, `path`, `traceback`.
 
 **Quoi ne pas publier :** les champs qui pourraient contenir des secrets (mots de passe, tokens, clés API). Vérifier le champ `message` avant de le copier dans un retour public.
 

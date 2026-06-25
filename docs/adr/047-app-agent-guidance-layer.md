@@ -1,8 +1,8 @@
-# ADR-047 — Couche de guidance agent IA dans les applications Forge
+# ADR-047, Couche de guidance agent IA dans les applications Forge
 
 ## Statut
 
-Accepté — bêta publique 1.0 (`1.0.0-beta.x`).
+Accepté, bêta publique 1.0 (`1.0.0-beta.x`).
 Décision prise ; mise en œuvre par les tickets `AGENTS-*` listés plus bas.
 
 ---

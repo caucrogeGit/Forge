@@ -1,4 +1,4 @@
-# Spec d'exécution — `REMOVE-MEDIA-PKG-001` (ticket 7, ADR-018)
+# Spec d'exécution, `REMOVE-MEDIA-PKG-001` (ticket 7, ADR-018)
 
 > **Statut : préparé, en attente.** Ce document est un **brouillon de spec**
 > (page hors-nav). Il décrit l'exécution du dernier ticket de l'extraction
@@ -49,18 +49,18 @@ Tant que ce n'est pas fait :
 
 ### A. Code
 
-- `cli/optins/catalog.py` — entrée `"media"` → `"images"`
+- `cli/optins/catalog.py`, entrée `"media"` → `"images"`
   (`"images", "forge-mvc-images", "forge_mvc_images", KIND_LIBRARY, "…"`).
-- `packages/forge-mvc-media/` — **suppression du dossier entier** (incl.
+- `packages/forge-mvc-media/`, **suppression du dossier entier** (incl.
   `forge_mvc_media/__init__.py`, `media_repository.py`, `media_gallery.py` qui
   sont des shims depuis `IMAGES-MOVE-APPLICATIVE-001`).
 
 ### B. CI
 
-- `.github/workflows/tests.yml` — retirer `packages/forge-mvc-media` de la
+- `.github/workflows/tests.yml`, retirer `packages/forge-mvc-media` de la
   boucle « Build optional distributions ».
 
-### C. Tests fonctionnels — repointer `forge_mvc_media` → `forge_mvc_images`
+### C. Tests fonctionnels, repointer `forge_mvc_media` → `forge_mvc_images`
 
 - `tests/test_media_attach.py`
 - `tests/test_media_delete.py`
@@ -71,7 +71,7 @@ Tant que ce n'est pas fait :
 Pour chacun : remplacer l'import `forge_mvc_media` par `forge_mvc_images` et la
 garde `pytest.importorskip("forge_mvc_media")` par `importorskip("forge_mvc_images")`.
 
-### D. Contrats opt-in / packaging — remplacer `forge-mvc-media` par `forge-mvc-images`
+### D. Contrats opt-in / packaging, remplacer `forge-mvc-media` par `forge-mvc-images`
 
 - `tests/meta/test_pypi_classifiers_001.py` (table `EXPECTED_CLASSIFIERS`)
 - `tests/meta/test_optin_pypi_publish_prepare_001.py`
@@ -83,18 +83,18 @@ garde `pytest.importorskip("forge_mvc_media")` par `importorskip("forge_mvc_imag
 - `tests/release/test_optin_extras_sync_001.py`
 - `tests/release/test_packaging_multi_dist_001.py`
 - `tests/meta/test_release_current_version_001.py`
-- `tests/test_optin_cli_verbs_001.py` — `optin_names()` attend `images` à la
+- `tests/test_optin_cli_verbs_001.py`, `optin_names()` attend `images` à la
   place de `media` (liste figée).
 - `tests/test_optin_cli_engine_001.py`, `tests/test_optin_kind_adapter_001.py`.
 
-### E. Contrats d'import / sweep — remplacer `forge_mvc_media` par `forge_mvc_images`
+### E. Contrats d'import / sweep, remplacer `forge_mvc_media` par `forge_mvc_images`
 
 - `tests/meta/test_pytest_core_only_contract_001.py` (clé `OPTIN_MODULES`)
 - `tests/meta/test_optin_tests_importorskip_001.py` (set `_OPTIN_MODULES`)
 - `tests/meta/test_docs_imports_validity_sweep_001.py` (`_FRAMEWORK_ROOTS`)
 - `tests/meta/test_docs_python_examples_executable_001.py`
 
-### F. Garde-fous d'ère MEDIA — à réécrire ou retirer
+### F. Garde-fous d'ère MEDIA, à réécrire ou retirer
 
 Ces tests vérifient la structure du paquet `forge-mvc-media` (qui disparaît) ou
 l'invariant « code applicatif dans forge_mvc_media » (déjà inversé par
@@ -111,14 +111,14 @@ l'invariant « code applicatif dans forge_mvc_media » (déjà inversé par
 - Ajouter un **test d'absence** : `assert not Path("packages/forge-mvc-media").exists()`
   (convention de suppression).
 
-### G. Tests générateur — faux positifs à vérifier
+### G. Tests générateur, faux positifs à vérifier
 
 `tests/test_make_crud_media*.py` matchent « media » via les **noms d'entités /
 rôles**, pas la clé opt-in. Vérifier qu'aucun ne référence encore
 `forge_mvc_media` après le repointage du delegate (déjà fait en partie). Les
 faux modules runtime monkeypatchent déjà `forge_mvc_images`.
 
-### H. Documentation (hors `history/`) — `forge-mvc-media` → `forge-mvc-images`
+### H. Documentation (hors `history/`), `forge-mvc-media` → `forge-mvc-images`
 
 - `README.md` (table des paquets, lien PyPI)
 - `docs/install/core-dev.md`, `docs/install/index.md`
@@ -133,9 +133,9 @@ faux modules runtime monkeypatchent déjà `forge_mvc_images`.
 - **Ne pas toucher** `docs/adr/018-image-module-extraction.md` ni `docs/history/**`
   (décrivent l'état historique / la décision).
 
-### I. `CLAUDE.md` (fichier protégé — mainteneur ou hook levé)
+### I. `CLAUDE.md` (fichier protégé, mainteneur ou hook levé)
 
-- §1 / §3 : retirer la ligne « `forge-mvc-media` — shim transitoire … ».
+- §1 / §3 : retirer la ligne « `forge-mvc-media`, shim transitoire … ».
 - §9 : note `packages/` repasse de 8 à 7 sous-dossiers (retrait de
   `forge-mvc-media`).
 
@@ -163,7 +163,7 @@ importeurs, sinon la suite casse en collecte.
 
 ## Validations attendues
 
-- `python -m pytest -x -q` — suite complète, 0 régression.
+- `python -m pytest -x -q`, suite complète, 0 régression.
 - `python -m compileall -q .`
 - `ruff check .`
 - `mkdocs build --strict`
@@ -176,7 +176,7 @@ importeurs, sinon la suite casse en collecte.
 ## Limites restantes après le ticket
 
 - L'historique (`docs/history/**`, `CHANGELOG`) conserve les mentions
-  `forge-mvc-media` (mémoire brute — ne pas réécrire).
+  `forge-mvc-media` (mémoire brute, ne pas réécrire).
 - Les tickets `IMAGES-FEATURE-*` (profils configurables, WebP, crop, qualité…)
   restent à venir, sur la base propre obtenue.
 

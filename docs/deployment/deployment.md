@@ -226,7 +226,7 @@ UPLOAD_MAX_SIZE=5242880
 
 ## 8. Déployer une starter-app comme démonstration
 
-Une starter-app Forge est une application normale — elle se déploie exactement comme tout projet Forge.
+Une starter-app Forge est une application normale, elle se déploie exactement comme tout projet Forge.
 
 **Étapes :**
 
@@ -248,9 +248,9 @@ Une starter-app Forge est une application normale — elle se déploie exactemen
 
 Consultez [la page des starters](../starters/index.md) pour la liste complète et les liens de démo.
 
-## 9. Limite importante — sessions mémoire
+## 9. Limite importante, sessions mémoire
 
-Forge utilise par défaut `MemorySessionStore` — sessions en mémoire processus, perdues au redémarrage. Des backends alternatifs sont disponibles.
+Forge utilise par défaut `MemorySessionStore`, sessions en mémoire processus, perdues au redémarrage. Des backends alternatifs sont disponibles.
 
 **Backends disponibles :**
 
@@ -269,7 +269,7 @@ from core.sessions.file_store import FileSessionStore
 forge.configure(session_store=FileSessionStore(sessions_dir="storage/sessions"))
 ```
 
-Pour activer le backend MariaDB (table `forge_sessions` requise — voir `mvc/models/sql/forge_sessions.sql`) :
+Pour activer le backend MariaDB (table `forge_sessions` requise, voir `mvc/models/sql/forge_sessions.sql`) :
 
 ```python
 import core.forge as forge
@@ -293,7 +293,7 @@ Le backend MariaDB partage les sessions entre tous les workers Gunicorn (et entr
 - les sessions sont partagées entre workers et survivent au redémarrage ;
 - Gunicorn multi-worker est pleinement supporté.
 
-Voir aussi [ADR-002 — Stratégie de session](../adr/002-session-strategy.md).
+Voir aussi [ADR-002, Stratégie de session](../adr/002-session-strategy.md).
 
 ## 10. Serveur HTTPS de développement (TLS)
 
@@ -322,7 +322,7 @@ Puis dans vos templates Jinja :
 ```
 
 Quand `APP_CSP_NONCE_ENABLED=false` (défaut), `csp_nonce()` retourne `""` et
-la CSP reste `script-src 'self'` — aucun `unsafe-inline` n'est ajouté.
+la CSP reste `script-src 'self'`, aucun `unsafe-inline` n'est ajouté.
 
 ## 12. Endpoint de santé
 
@@ -348,8 +348,8 @@ curl -s http://127.0.0.1:8000/health
 
 ## 13. Autres limites actuelles
 
-- **Pas de déploiement automatique** — Forge génère les fichiers de configuration, l'installation sur le serveur reste manuelle.
-- **Pas de HTTPS automatique** — configurer Nginx pour terminer TLS (Let's Encrypt + Certbot recommandé).
-- **Pas de Docker** — non prévu pour l'instant.
-- **Sessions à partager en multi-worker** — Gunicorn multi-worker exige le store partagé `MariaDbSessionStore`. Voir section 9.
-- **Nginx uniquement documenté** — Apache httpd est également un reverse proxy valide mais non documenté ici.
+- **Pas de déploiement automatique**, Forge génère les fichiers de configuration, l'installation sur le serveur reste manuelle.
+- **Pas de HTTPS automatique**, configurer Nginx pour terminer TLS (Let's Encrypt + Certbot recommandé).
+- **Pas de Docker**, non prévu pour l'instant.
+- **Sessions à partager en multi-worker**, Gunicorn multi-worker exige le store partagé `MariaDbSessionStore`. Voir section 9.
+- **Nginx uniquement documenté**, Apache httpd est également un reverse proxy valide mais non documenté ici.

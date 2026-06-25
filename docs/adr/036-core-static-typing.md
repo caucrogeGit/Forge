@@ -1,8 +1,8 @@
-# ADR-036 — Typage statique du cœur, vérifié en CI
+# ADR-036, Typage statique du cœur, vérifié en CI
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.17 (ticket `ADR-CORE-STATIC-TYPING-001`).
+Accepté, Forge 1.0.0-beta.17 (ticket `ADR-CORE-STATIC-TYPING-001`).
 
 Issu d'un retour de tests terrain (ADR-009) : en mode strict, Pylance/Pyright
 noie l'utilisateur sous des `reportUnknown*` sur les symboles du cœur, car
@@ -79,12 +79,12 @@ Le cœur de Forge est **typé et vérifié statiquement en intégration continue
 
 ## Plan (tickets b17)
 
-1. `CORE-TYPING-PYRIGHT-BASELINE-001` — config `[tool.pyright]` (basic),
+1. `CORE-TYPING-PYRIGHT-BASELINE-001`, config `[tool.pyright]` (basic),
    `py.typed` (core + integrations + 12 opt-ins, + package-data), correction des
    41 erreurs basic de `core/`, **gate CI** (job pyright), garde-fou méta.
-2. `CORE-TYPING-STRICT-HTTP-001` — `core/http` en `# pyright: strict`, conteneurs
+2. `CORE-TYPING-STRICT-HTTP-001`, `core/http` en `# pyright: strict`, conteneurs
    paramétrés ; puis retrait de l'override `reportUnknown*` du squelette.
-3. Tickets suivants — cliquet strict sur les autres modules de `core/`
+3. Tickets suivants, cliquet strict sur les autres modules de `core/`
    (`mvc`, `database`, `sessions`, `security`, `forms`, `auth`…).
 
 ---
@@ -99,8 +99,8 @@ Le cœur de Forge est **typé et vérifié statiquement en intégration continue
 
 ## Charte appliquée
 
-- Principe 1 — explicite, testable, durable (types = contrat vérifié).
-- Principe 10 — une API publique est un contrat de complétude.
-- Principe 2 — petits tickets : cliquet module par module, pas de big-bang.
-- Règle A — retirer la cause (cœur non typé), pas seulement le symptôme
+- Principe 1, explicite, testable, durable (types = contrat vérifié).
+- Principe 10, une API publique est un contrat de complétude.
+- Principe 2, petits tickets : cliquet module par module, pas de big-bang.
+- Règle A, retirer la cause (cœur non typé), pas seulement le symptôme
   (override de diagnostics).

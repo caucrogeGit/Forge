@@ -1,8 +1,8 @@
-# ADR-029 — Convention de déclaration des routes (chemin et nom)
+# ADR-029, Convention de déclaration des routes (chemin et nom)
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.15 (ticket `ROUTE-CONVENTION-ADR-029`).
+Accepté, Forge 1.0.0-beta.15 (ticket `ROUTE-CONVENTION-ADR-029`).
 
 Remplace la convention implicite jusqu'ici portée par le générateur `make:crud`
 (`<ressource>_<action>`, chemins REST) et le ticket
@@ -123,13 +123,13 @@ retenu par le mainteneur :
 
 ## Alternatives écartées
 
-### A — Conserver la convention `make:crud` (REST, underscore)
+### A, Conserver la convention `make:crud` (REST, underscore)
 
 Garder `<ressource>_<action>` et les chemins REST (`/notes/{id}/edit`). Écartée
 par le mainteneur : la convention REST n'expose pas mécaniquement la méthode
 cible, et le pluriel diverge du nom de contrôleur.
 
-### B — Aligner uniquement les starters sur `make:crud`
+### B, Aligner uniquement les starters sur `make:crud`
 
 Laisser `make:crud` tel quel et n'aligner que les starters. Écartée : créerait
 deux conventions parallèles (principe 11).

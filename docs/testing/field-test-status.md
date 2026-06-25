@@ -1,4 +1,4 @@
-# Tests terrain — État des parcours
+# Tests terrain, État des parcours
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -82,7 +82,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ## Détail des parcours disponibles
 
-### Parcours — Cadre de campagne (FT-00)
+### Parcours, Cadre de campagne (FT-00)
 
 **Statut :** Prêt à tester (4 tickets rédigés sur 10)
 
@@ -90,10 +90,10 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 **Tickets FT rédigés :**
 
-- [FT-00-TEST-CHARTER-001](tickets/ft-00-test-charter-001.md) — lire et valider la charte de campagne
-- [FT-00-FEEDBACK-TEMPLATE-001](tickets/ft-00-feedback-template-001.md) — remplir un retour d'expérience à blanc
-- [FT-00-DOC-ERROR-PROTOCOL-001](tickets/ft-00-doc-error-protocol-001.md) — appliquer la procédure documentation erronée
-- [FT-00-DEBUG-TOOLS-INTRO-001](tickets/ft-00-debug-tools-intro-001.md) — découvrir les outils de diagnostic Forge
+- [FT-00-TEST-CHARTER-001](tickets/ft-00-test-charter-001.md), lire et valider la charte de campagne
+- [FT-00-FEEDBACK-TEMPLATE-001](tickets/ft-00-feedback-template-001.md), remplir un retour d'expérience à blanc
+- [FT-00-DOC-ERROR-PROTOCOL-001](tickets/ft-00-doc-error-protocol-001.md), appliquer la procédure documentation erronée
+- [FT-00-DEBUG-TOOLS-INTRO-001](tickets/ft-00-debug-tools-intro-001.md), découvrir les outils de diagnostic Forge
 
 **Tickets FT restant à rédiger :** FT-00-SEVERITY-SCALE-001, FT-00-GUIDANCE-LEVELS-001, FT-00-HELP-LEVELS-001, FT-00-TICKET-FORMAT-001, FT-00-TRIAGE-RULES-001, FT-00-ENV-MATRIX-001
 
@@ -103,7 +103,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — Installation avec pipx (FT-01)
+### Parcours, Installation avec pipx (FT-01)
 
 **Statut :** Prêt à tester (2 tickets rédigés sur 9)
 
@@ -111,8 +111,8 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 **Tickets FT rédigés :**
 
-- [FT-01-INSTALL-PIPX-001](tickets/ft-01-install-pipx-001.md) — installer Forge via pipx
-- [FT-01-INSTALL-VERSION-CHECK-001](tickets/ft-01-install-version-check-001.md) — vérifier la version installée
+- [FT-01-INSTALL-PIPX-001](tickets/ft-01-install-pipx-001.md), installer Forge via pipx
+- [FT-01-INSTALL-VERSION-CHECK-001](tickets/ft-01-install-version-check-001.md), vérifier la version installée
 
 **Tickets FT restant à rédiger :** FT-01-INSTALL-VENV-001, FT-01-INSTALL-GITHUB-001, FT-01-INSTALL-DEV-EDITABLE-001, FT-01-INSTALL-WINDOWS-WSL-001, FT-01-INSTALL-DEBIAN-VM-001, FT-01-INSTALL-UNINSTALL-001, FT-01-PHASE-REVIEW-001
 
@@ -122,7 +122,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — Configuration environnement (FT-02)
+### Parcours, Configuration environnement (FT-02)
 
 **Statut :** À préparer
 
@@ -134,7 +134,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — MariaDB (FT-03)
+### Parcours, MariaDB (FT-03)
 
 **Statut :** À préparer
 
@@ -146,7 +146,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — Premier projet (FT-04 à FT-06)
+### Parcours, Premier projet (FT-04 à FT-06)
 
 **Statut :** À préparer
 
@@ -158,7 +158,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — Routes et contrôleurs (FT-07 + FT-08)
+### Parcours, Routes et contrôleurs (FT-07 + FT-08)
 
 **Statut :** À préparer
 
@@ -170,7 +170,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — Templates Jinja (FT-09 + FT-10 + FT-11)
+### Parcours, Templates Jinja (FT-09 + FT-10 + FT-11)
 
 **Statut :** À préparer
 
@@ -182,7 +182,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — CRUD (FT-25 à FT-29)
+### Parcours, CRUD (FT-25 à FT-29)
 
 **Statut :** À préparer
 
@@ -194,7 +194,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — Déploiement (FT-38 + FT-39)
+### Parcours, Déploiement (FT-38 + FT-39)
 
 **Statut :** À préparer
 
@@ -206,7 +206,7 @@ Cette page donne une vue synthétique de l'avancement de la campagne de tests te
 
 ---
 
-### Parcours — Mini-projet guidé et autonomie (FT-41 + FT-42)
+### Parcours, Mini-projet guidé et autonomie (FT-41 + FT-42)
 
 **Statut :** À préparer
 

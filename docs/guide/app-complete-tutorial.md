@@ -1,4 +1,4 @@
-# Tutoriel — Application complète avec Forge
+# Tutoriel, Application complète avec Forge
 
 Ce tutoriel guide le développement d'une petite application Forge de bout en bout.
 Il suppose que Forge est déjà installé et que MariaDB est disponible.
@@ -60,7 +60,7 @@ d'un élément précis ; pour le parcours initial, `build:model` suffit.
 - Forge installé (`forge --version` doit répondre) ;
 - Python {{python_min}} ou plus ;
 - MariaDB installé et démarré (pour `forge db:init`) ;
-- npm installé (optionnel — pour recompiler le CSS Tailwind).
+- npm installé (optionnel, pour recompiler le CSS Tailwind).
 
 ---
 
@@ -126,7 +126,7 @@ Fichiers créés dans `mvc/entities/ville/` (le sous-dossier est en **minuscule*
 | `ville.json` | Source de vérité de l'entité | Non (source) |
 | `ville.sql` | Schéma SQL généré | Oui (`build:model`) |
 | `ville_base.py` | Interface Python générée | Oui (`build:model`) |
-| `ville.py` | Modèle manuel (vide au départ) | **Non — préservé** |
+| `ville.py` | Modèle manuel (vide au départ) | **Non, préservé** |
 
 ### Personnaliser l'entité Ville
 
@@ -256,14 +256,14 @@ forge make:crud Contact
 
 | Fichier | Modifiable ? |
 |---|---|
-| `mvc/controllers/ville_controller.py` | Oui — **préservé** |
-| `mvc/models/ville.py` | Oui — **préservé** |
-| `mvc/forms/ville_form.py` | Oui — **préservé** |
-| `mvc/views/ville/list.html` | Oui — **préservé** |
-| `mvc/views/ville/show.html` | Oui — **préservé** |
-| `mvc/views/ville/create.html` | Oui — **préservé** |
-| `mvc/views/ville/edit.html` | Oui — **préservé** |
-| `mvc/views/ville/delete.html` | Oui — **préservé** |
+| `mvc/controllers/ville_controller.py` | Oui, **préservé** |
+| `mvc/models/ville.py` | Oui, **préservé** |
+| `mvc/forms/ville_form.py` | Oui, **préservé** |
+| `mvc/views/ville/list.html` | Oui, **préservé** |
+| `mvc/views/ville/show.html` | Oui, **préservé** |
+| `mvc/views/ville/create.html` | Oui, **préservé** |
+| `mvc/views/ville/edit.html` | Oui, **préservé** |
+| `mvc/views/ville/delete.html` | Oui, **préservé** |
 
 Les fichiers de `Contact` suivent le même schéma (`contact_controller.py`,
 `contact_form.py`, `mvc/views/contact/*.html`).
@@ -436,11 +436,11 @@ forge run                          # lancer l'application
 
 ## Voir aussi
 
-- [Bonjour Forge](bonjour-forge.md) — premier contact, sans BDD
-- [Guide de démarrage](guide.md) — parcours complet avec MariaDB
-- [Relations entre entités](../features/relations.md) — format `relations.json` complet
-- [Architecture des entités](../features/entity_architecture.md) — rôle de chaque fichier généré
-- [Contrat de stabilité](../release/stability-contract.md) — garanties sur les fichiers préservés
-- [Référence API et CLI](../reference/reference.md) — toutes les commandes, dont les filtres de liste CRUD (`list.filter`)
+- [Bonjour Forge](bonjour-forge.md), premier contact, sans BDD
+- [Guide de démarrage](guide.md), parcours complet avec MariaDB
+- [Relations entre entités](../features/relations.md), format `relations.json` complet
+- [Architecture des entités](../features/entity_architecture.md), rôle de chaque fichier généré
+- [Contrat de stabilité](../release/stability-contract.md), garanties sur les fichiers préservés
+- [Référence API et CLI](../reference/reference.md), toutes les commandes, dont les filtres de liste CRUD (`list.filter`)
 ```
 

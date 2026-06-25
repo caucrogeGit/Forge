@@ -139,7 +139,7 @@
   /* === Alternance de fonds de sections (LANDING-BG-ALT-001) ===
      Une section = .sec-light OU .sec-dark. Le fond, la couleur des titres,
      des cartes (.card) et du texte secondaire (.muted) en découlent par
-     descendance — inverser l'ordre = changer une classe par section.
+     descendance, inverser l'ordre = changer une classe par section.
      Les îlots .landing-panel (showcases, blocs de code) restent sombres
      quelle que soit la section. */
   .sec-light { background-color: #ffffff; color: #0f172a; }

@@ -2,7 +2,7 @@
 
 `schemas/relations.schema.json` verrouille la **structure autorisée** du fichier `mvc/entities/relations.json`.
 
-Ce fichier décrit les relations entre entités Forge : `many_to_one` et `many_to_many`. Les relations sont **séparées** des fichiers d'entités — un seul fichier `relations.json` centralise toutes les déclarations relationnelles du projet.
+Ce fichier décrit les relations entre entités Forge : `many_to_one` et `many_to_many`. Les relations sont **séparées** des fichiers d'entités, un seul fichier `relations.json` centralise toutes les déclarations relationnelles du projet.
 
 ```
 relations.schema.json   →  validation de structure (JSON Schema)
@@ -24,7 +24,7 @@ Le fichier ne décrit pas directement du SQL : Forge dérive les contraintes `FO
 }
 ```
 
-`relations` peut être vide — c'est valide.
+`relations` peut être vide, c'est valide.
 
 ---
 
@@ -70,13 +70,13 @@ Une relation `many_to_one` signifie que l'entité source porte la clé étrangè
 | `on_delete` | non | comportement SQL ON DELETE |
 | `index` | non | créer un index sur la clé étrangère (défaut : `true`) |
 
-La clé étrangère est **technique** — elle n'a pas à être déclarée comme champ métier dans `fields[]` de l'entité source. Forge la génère dans la projection SQL via `relations.sql`.
+La clé étrangère est **technique**, elle n'a pas à être déclarée comme champ métier dans `fields[]` de l'entité source. Forge la génère dans la projection SQL via `relations.sql`.
 
 ---
 
 ## Relation many_to_many
 
-Une relation `many_to_many` passe par une **table pivot** explicite. Les deux entités ne se portent pas mutuellement de clé étrangère — c'est la table pivot qui porte les deux.
+Une relation `many_to_many` passe par une **table pivot** explicite. Les deux entités ne se portent pas mutuellement de clé étrangère, c'est la table pivot qui porte les deux.
 
 ```json
 {
@@ -116,12 +116,12 @@ La table pivot est définie dans le bloc `pivot` d'une relation `many_to_many`.
 | `table` | **oui** | nom de la table pivot en snake_case (`article_tag`) |
 | `from_key` | **oui** | colonne clé étrangère vers l'entité source (`article_id`) |
 | `to_key` | **oui** | colonne clé étrangère vers l'entité cible (`tag_id`) |
-| `id` | **oui** | doit valoir `true` — id technique `AUTO_INCREMENT` toujours présent |
-| `unique_pair` | **oui** | doit valoir `true` — contrainte `UNIQUE (from_key, to_key)` toujours présente |
+| `id` | **oui** | doit valoir `true`, id technique `AUTO_INCREMENT` toujours présent |
+| `unique_pair` | **oui** | doit valoir `true`, contrainte `UNIQUE (from_key, to_key)` toujours présente |
 | `on_delete` | non | comportement SQL ON DELETE appliqué aux deux clés étrangères |
 | `fields` | non | attributs métier supplémentaires sur la table pivot |
 
-`pivot.id` et `pivot.unique_pair` sont contraints à `true` dans le schéma (`const: true`). Ces deux propriétés ne sont pas optionnelles — elles doivent être déclarées et valoir exactement `true`.
+`pivot.id` et `pivot.unique_pair` sont contraints à `true` dans le schéma (`const: true`). Ces deux propriétés ne sont pas optionnelles, elles doivent être déclarées et valoir exactement `true`.
 
 `pivot.fields` peut contenir des champs métier contrôlés (voir [Le JSON canonique](json-canonique.md) pour les exemples). Les noms `id`, `from_key` et `to_key` sont réservés et interdits dans `pivot.fields`.
 
@@ -206,7 +206,7 @@ Les valeurs doivent être en minuscules : `cascade`, `restrict`, `set_null`, `no
 
 **Déclarer une relation vers une entité inexistante :**
 
-Le JSON Schema ne détecte pas cette incohérence — mais `forge entity:validate` la signale avec une erreur sémantique.
+Le JSON Schema ne détecte pas cette incohérence, mais `forge entity:validate` la signale avec une erreur sémantique.
 
 ---
 
@@ -244,4 +244,4 @@ forge entity:validate --json
 
 Sortie machine : JSON structuré avec `valid`, `errors_count`, `errors[]`.
 
-`forge build:model`, `make:crud` et les migrations protégées utilisent ces contrats comme garde-fou — ils refusent de générer si `entity:validate` détecte des erreurs.
+`forge build:model`, `make:crud` et les migrations protégées utilisent ces contrats comme garde-fou, ils refusent de générer si `entity:validate` détecte des erreurs.

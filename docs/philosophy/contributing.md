@@ -9,10 +9,10 @@ durable, en respectant la philosophie et les règles du projet.
 
 Une contribution à Forge doit rendre le framework :
 
-- **plus clair** — le comportement est lisible, pas inféré ;
-- **plus testable** — le nouveau code est couvert et vérifiable ;
-- **plus générique** — les briques restent indépendantes du métier ;
-- **plus maintenable** — un autre développeur peut reprendre là où on s'est arrêté.
+- **plus clair**, le comportement est lisible, pas inféré ;
+- **plus testable**, le nouveau code est couvert et vérifiable ;
+- **plus générique**, les briques restent indépendantes du métier ;
+- **plus maintenable**, un autre développeur peut reprendre là où on s'est arrêté.
 
 Une contribution ne doit pas rendre Forge :
 
@@ -29,13 +29,13 @@ Forge est un framework Python explicite, auditable et durable.
 
 Quelques principes fondamentaux :
 
-- **Un ticket = une responsabilité** — chaque contribution a un périmètre borné.
-- **`main` doit rester stable** — les tests passent en permanence.
-- **Les changements sont testés** — aucune brique sans couverture.
-- **La documentation est mise à jour** — une fonctionnalité non documentée est incomplète.
-- **Les limites restantes sont explicites** — ce qu'on ne couvre pas encore est dit.
-- **Pas de transformation en application métier** — `core/` reste générique.
-- **Pas de magie cachée** — le comportement est traçable dans le code.
+- **Un ticket = une responsabilité**, chaque contribution a un périmètre borné.
+- **`main` doit rester stable**, les tests passent en permanence.
+- **Les changements sont testés**, aucune brique sans couverture.
+- **La documentation est mise à jour**, une fonctionnalité non documentée est incomplète.
+- **Les limites restantes sont explicites**, ce qu'on ne couvre pas encore est dit.
+- **Pas de transformation en application métier**, `core/` reste générique.
+- **Pas de magie cachée**, le comportement est traçable dans le code.
 
 ---
 
@@ -103,12 +103,12 @@ starters/      Données des starters officiels Forge (dans cli/starters/data/).
 
 Guides de référence pour comprendre les contrats :
 
-- [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
-- [Référence API et CLI](../reference/reference.md) — toutes les commandes disponibles
-- [Guide de migration](../features/migration-guide.md) — compatibilité entre versions
-- [Politique de release](../release/release-policy.md) — SemVer adapté à Forge
-- [Politique de dépréciation](../release/deprecation-policy.md) — cycle d'annonce et de retrait
-- [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, dépendances
+- [Contrat de stabilité](../release/stability-contract.md), fichiers garantis préservés
+- [Référence API et CLI](../reference/reference.md), toutes les commandes disponibles
+- [Guide de migration](../features/migration-guide.md), compatibilité entre versions
+- [Politique de release](../release/release-policy.md), SemVer adapté à Forge
+- [Politique de dépréciation](../release/deprecation-policy.md), cycle d'annonce et de retrait
+- [Matrice de compatibilité](../release/compatibility.md), Python, MariaDB, dépendances
 
 ---
 
@@ -116,11 +116,11 @@ Guides de référence pour comprendre les contrats :
 
 Avant de coder :
 
-1. **Prenez un ticket borné** — un seul sujet, un seul périmètre.
-2. **Ne mélangez pas plusieurs sujets** — une correction de bug et une refactorisation sont deux tickets distincts.
-3. **Auditez l'existant** — lisez le code actuel avant de l'écrire.
-4. **Identifiez les fichiers concernés** — notez ce qui sera créé, modifié ou lu.
-5. **Explicitez ce qui est hors périmètre** — ce que le ticket ne fera pas.
+1. **Prenez un ticket borné**, un seul sujet, un seul périmètre.
+2. **Ne mélangez pas plusieurs sujets**, une correction de bug et une refactorisation sont deux tickets distincts.
+3. **Auditez l'existant**, lisez le code actuel avant de l'écrire.
+4. **Identifiez les fichiers concernés**, notez ce qui sera créé, modifié ou lu.
+5. **Explicitez ce qui est hors périmètre**, ce que le ticket ne fera pas.
 
 Un bon ticket indique :
 
@@ -158,12 +158,12 @@ Si la réponse contient "et aussi", c'est probablement deux tickets.
 
 Règles à respecter lors de toute modification :
 
-- **Préserver les fichiers utilisateur** — les fichiers générés marqués comme préservés ne doivent jamais être écrasés sans `--force` explicite.
-- **Ne pas casser les générateurs** — `make:entity`, `make:crud`, `sync:entity` doivent continuer à fonctionner.
-- **Ne pas changer une convention stable** — un changement de convention (nommage, structure JSON, format de fichier) sans ticket de dépréciation est une rupture de contrat.
-- **Ne pas ajouter de dépendance sans nécessité** — les dépendances runtime du core sont limitées à `mariadb`, `jinja2`, `python-dotenv`, `argon2-cffi`, `jsonschema`. Les dépendances des modules optionnels (par exemple le second facteur TOTP ou le traitement d'image) ne font pas partie du core.
-- **Ne pas modifier la version** — la version dans `pyproject.toml` / `forge.py` / `core/__init__.py` n'est modifiée que par un ticket release dédié.
-- **Ne pas créer de tag manuellement** — les tags de version sont créés en suivant la [Procédure de release](../release/release.md).
+- **Préserver les fichiers utilisateur**, les fichiers générés marqués comme préservés ne doivent jamais être écrasés sans `--force` explicite.
+- **Ne pas casser les générateurs**, `make:entity`, `make:crud`, `sync:entity` doivent continuer à fonctionner.
+- **Ne pas changer une convention stable**, un changement de convention (nommage, structure JSON, format de fichier) sans ticket de dépréciation est une rupture de contrat.
+- **Ne pas ajouter de dépendance sans nécessité**, les dépendances runtime du core sont limitées à `mariadb`, `jinja2`, `python-dotenv`, `argon2-cffi`, `jsonschema`. Les dépendances des modules optionnels (par exemple le second facteur TOTP ou le traitement d'image) ne font pas partie du core.
+- **Ne pas modifier la version**, la version dans `pyproject.toml` / `forge.py` / `core/__init__.py` n'est modifiée que par un ticket release dédié.
+- **Ne pas créer de tag manuellement**, les tags de version sont créés en suivant la [Procédure de release](../release/release.md).
 
 ---
 
@@ -199,11 +199,11 @@ documentés dans la [Matrice de compatibilité](../release/compatibility.md).
 
 ### Règles pour les tests
 
-- Chaque test doit être autonome — pas de dépendance entre tests.
+- Chaque test doit être autonome, pas de dépendance entre tests.
 - Les fixtures `tmp_path` et `monkeypatch.chdir` isolent les tests CLI et E2E.
 - `apply_model_sql` est moquée dans les tests E2E starters pour ne pas dépendre de MariaDB.
 - Un test qui modifie `sys.path` ou l'état global doit nettoyer après lui.
-- **Tests méta dans `tests/meta/`** — tout test qui lit principalement des fichiers de documentation, vérifie une roadmap, une version déclarée, un classifier, l'absence d'une chaîne interdite, une frontière d'import ou un invariant textuel doit vivre dans `tests/meta/`, pas à la racine de `tests/`. Chaque fichier `tests/meta/` doit porter `pytestmark = pytest.mark.meta`.
+- **Tests méta dans `tests/meta/`**, tout test qui lit principalement des fichiers de documentation, vérifie une roadmap, une version déclarée, un classifier, l'absence d'une chaîne interdite, une frontière d'import ou un invariant textuel doit vivre dans `tests/meta/`, pas à la racine de `tests/`. Chaque fichier `tests/meta/` doit porter `pytestmark = pytest.mark.meta`.
 
 ### Règle behavior-first
 
@@ -224,17 +224,17 @@ Les tests méta restent adaptés :
 
 Quand un comportement peut être exécuté dans un test unitaire ou avec
 `tmp_path`, il doit l'être. Un test comportemental fort rend son test méta
-complémentaire optionnel — pas l'inverse.
+complémentaire optionnel, pas l'inverse.
 
 **Exemples de tests déjà behavior-first dans Forge :**
 
-- `test_forge_help_safe_flag_001.py` — vérifie via subprocess que `--help` n'exécute
+- `test_forge_help_safe_flag_001.py`, vérifie via subprocess que `--help` n'exécute
   aucune logique métier ;
-- `test_modules_explicit_routes_001.py` — génère réellement des routes dans un
+- `test_modules_explicit_routes_001.py`, génère réellement des routes dans un
   répertoire temporaire ;
-- `test_doctor_mfa_warning_001.py` — appelle `check_mfa_dependency` avec un
+- `test_doctor_mfa_warning_001.py`, appelle `check_mfa_dependency` avec un
   environnement contrôlé et vérifie le message retourné ;
-- `test_module_routes_injection_remove_001.py` — appelle `install_module_manifest`
+- `test_module_routes_injection_remove_001.py`, appelle `install_module_manifest`
   et vérifie que `mvc/routes.py` n'est pas touché.
 
 ### Politique de rotation des tests méta
@@ -269,8 +269,8 @@ Critère : si le fichier a pour objet de vérifier qu'une transformation passée
 
 Ces tests vérifient une version ou un état courant. Ils sont valides mais doivent être mis à jour à chaque release :
 
-- `test_release_current_version_001.py` — cohérence de la version dans tous les fichiers ;
-- `test_pypi_classifiers_001.py` — classifiers PyPI alignés avec le statut réel.
+- `test_release_current_version_001.py`, cohérence de la version dans tous les fichiers ;
+- `test_pypi_classifiers_001.py`, classifiers PyPI alignés avec le statut réel.
 
 La mise à jour est un acte délibéré, pas une anomalie.
 
@@ -303,13 +303,13 @@ Un test méta reste pertinent quand : (a) l'invariant est purement textuel ou do
 ## Sources documentaires et artefacts générés
 
 Forge distingue **trois couches** dans sa documentation. Ne pas les
-confondre — chacune a un rôle strict.
+confondre, chacune a un rôle strict.
 
 | Chemin | Rôle | Suivi Git ? | Modifier à la main ? |
 |---|---|---|---|
-| `docs/` | **Source documentaire canonique** (Markdown + assets) | ✅ Oui | ✅ Oui — c'est la source à éditer |
-| `docs/index.html` | **Landing canonique** publique (ADR-044) | ✅ Oui | ✅ Oui — c'est la source à éditer directement |
-| `site/` | **Artefact MkDocs** généré par `mkdocs build` | ❌ Non (ignoré par `.gitignore`) | ❌ Jamais — supprimable sans perte |
+| `docs/` | **Source documentaire canonique** (Markdown + assets) | ✅ Oui | ✅ Oui, c'est la source à éditer |
+| `docs/index.html` | **Landing canonique** publique (ADR-044) | ✅ Oui | ✅ Oui, c'est la source à éditer directement |
+| `site/` | **Artefact MkDocs** généré par `mkdocs build` | ❌ Non (ignoré par `.gitignore`) | ❌ Jamais, supprimable sans perte |
 
 Depuis l'ADR-044, la landing n'est plus générée : `docs/index.html` est la
 source canonique, éditée directement. La chaîne à suivre quand on la modifie :
@@ -330,7 +330,7 @@ git diff --check
 
 `site/` est **supprimable sans perte** : c'est uniquement la sortie de
 `mkdocs build`, jamais une référence. Si `site/` est suivi par Git par
-erreur (commit accidentel), il faut le retirer de l'index — pas l'inverse.
+erreur (commit accidentel), il faut le retirer de l'index, pas l'inverse.
 
 Le contrat est verrouillé par
 [`tests/meta/test_docs_site_artifact_policy_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/meta/test_docs_site_artifact_policy_001.py).
@@ -364,11 +364,11 @@ observable doit être reflété dans [Référence API et CLI](../reference/refer
 
 Si la fonctionnalité est couverte par un guide existant, mettez-le à jour :
 
-- [Architecture des entités](../features/entity_architecture.md) — nouveaux champs ou générateurs
-- [Relations entre entités](../features/relations.md) — nouvelle syntaxe relationnelle
-- [Auth/User](../features/auth.md) — nouvelles briques d'authentification
-- [Sécurité et RBAC](security.md) — nouveaux mécanismes de sécurité
-- Module média — nouveaux comportements uploads
+- [Architecture des entités](../features/entity_architecture.md), nouveaux champs ou générateurs
+- [Relations entre entités](../features/relations.md), nouvelle syntaxe relationnelle
+- [Auth/User](../features/auth.md), nouvelles briques d'authentification
+- [Sécurité et RBAC](security.md), nouveaux mécanismes de sécurité
+- Module média, nouveaux comportements uploads
 
 ### Quand modifier la roadmap
 
@@ -410,7 +410,7 @@ git diff --check
 |---|---|
 | `pytest` | Suite complète de tests (runtime, générateurs, doc, CLI, sécurité) |
 | `python -m compileall -q .` | Absence d'erreurs de syntaxe Python |
-| `ruff check .` | Lint et style — aucun avertissement toléré |
+| `ruff check .` | Lint et style, aucun avertissement toléré |
 | `mkdocs build --strict` | Build doc sans erreur ni lien brisé |
 | `git diff --check` | Absence d'espaces de fin de ligne ou de marqueurs de conflit |
 
@@ -496,12 +496,12 @@ Les phases sont regroupées par objectif :
 ## Ce qu'il ne faut pas faire
 
 - **Mélanger plusieurs fonctionnalités** dans un seul ticket ou commit
-- **Corriger en silence une dette hors périmètre** — ouvrez un ticket séparé
-- **Casser `main`** — les tests doivent passer en permanence
+- **Corriger en silence une dette hors périmètre**, ouvrez un ticket séparé
+- **Casser `main`**, les tests doivent passer en permanence
 - **Supprimer des fichiers utilisateur** sans vérification de modification
 - **Ajouter une dépendance lourde** au runtime sans discussion et ticket dédié
-- **Créer une abstraction magique** — le comportement doit rester traçable
-- **Promettre une compatibilité non testée** — ne documentez que ce qui est vérifié
+- **Créer une abstraction magique**, le comportement doit rester traçable
+- **Promettre une compatibilité non testée**, ne documentez que ce qui est vérifié
 - **Modifier une politique de release** sans ticket dédié (`RELEASE-POLICY-*`)
 - **Publier une release** sans suivre la [Procédure de release](../release/release.md)
 - **Modifier la version Forge** hors d'un ticket release
@@ -536,7 +536,7 @@ Checklist avant livraison
 
 Voici le déroulé typique d'une contribution à Forge.
 
-**Ticket** : `DOC-MODULE-AUTHOR-001` — guide de création d'un module Forge
+**Ticket** : `DOC-MODULE-AUTHOR-001`, guide de création d'un module Forge
 
 **1. Auditer l'existant**
 
@@ -601,7 +601,7 @@ git commit -m "feat: ajouter le guide de création de modules Forge"
 |---|---|
 | Pas de CI automatique publique | Les validations sont manuelles en local |
 | Tests MariaDB non automatisés en CI | `FORGE_E2E_MARIADB=1` requis, base séparée nécessaire |
-| Pas de contribution externe formalisée | Forge est maintenu par Roger Lequette — toute contribution suit la cession de droits documentée dans `CONTRIBUTING.md` |
+| Pas de contribution externe formalisée | Forge est maintenu par Roger Lequette, toute contribution suit la cession de droits documentée dans `CONTRIBUTING.md` |
 | Pas de bot de review automatique | La review est humaine |
 | Pas de guide de contribution graphique | Forge Design est un projet séparé |
 
@@ -609,13 +609,13 @@ git commit -m "feat: ajouter le guide de création de modules Forge"
 
 ## Voir aussi
 
-- [Dépôt canonique et récupération de commits](../contributing/canonical-repo.md) — checklist pré-ticket et procédure officielle de portage par patchs si des commits ont été créés hors du dépôt canonique
-- [Conventions internes de Forge](../contributing/conventions.md) — patterns opérationnels (audit, tests, code, doc)
-- [Politique de release](../release/release-policy.md) — SemVer adapté, règles de publication
-- [Politique de dépréciation](../release/deprecation-policy.md) — cycle d'annonce et de retrait
-- [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, dépendances
-- [Guide de migration](../features/migration-guide.md) — comment migrer entre versions
-- [Contrat de stabilité](../release/stability-contract.md) — fichiers garantis préservés
-- [Procédure de release](../release/release.md) — étapes de publication d'une version
-- [Validation locale](../release/release-local.md) — checklist de validation avant release
-- [Référence API et CLI](../reference/reference.md) — toutes les commandes Forge
+- [Dépôt canonique et récupération de commits](../contributing/canonical-repo.md), checklist pré-ticket et procédure officielle de portage par patchs si des commits ont été créés hors du dépôt canonique
+- [Conventions internes de Forge](../contributing/conventions.md), patterns opérationnels (audit, tests, code, doc)
+- [Politique de release](../release/release-policy.md), SemVer adapté, règles de publication
+- [Politique de dépréciation](../release/deprecation-policy.md), cycle d'annonce et de retrait
+- [Matrice de compatibilité](../release/compatibility.md), Python, MariaDB, dépendances
+- [Guide de migration](../features/migration-guide.md), comment migrer entre versions
+- [Contrat de stabilité](../release/stability-contract.md), fichiers garantis préservés
+- [Procédure de release](../release/release.md), étapes de publication d'une version
+- [Validation locale](../release/release-local.md), checklist de validation avant release
+- [Référence API et CLI](../reference/reference.md), toutes les commandes Forge

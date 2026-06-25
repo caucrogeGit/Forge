@@ -1,6 +1,6 @@
-# ADR-001 — Stratégie d'authentification Forge 1.x
+# ADR-001, Stratégie d'authentification Forge 1.x
 
-!!! warning "ADR historique — Forge 1.x"
+!!! warning "ADR historique, Forge 1.x"
 
     Cet ADR documente la stratégie d'authentification telle qu'elle a été décidée
     pour Forge 1.x. Son contenu est conservé pour trace décisionnelle et n'est
@@ -8,8 +8,8 @@
 
     Pour l'état actuel, consulter :
 
-    - [`docs/auth.md`](../features/auth.md) — documentation utilisateur d'authentification
-    - [ADR-004 — Périmètre du noyau](004-core-perimeter.md) — séparation core/modules opt-in
+    - [`docs/auth.md`](../features/auth.md), documentation utilisateur d'authentification
+    - [ADR-004, Périmètre du noyau](004-core-perimeter.md), séparation core/modules opt-in
 
     Les références à des modules `core.security.rbac`, `core.auth.mfa`, etc.
     dans cet ADR sont **historiques** (modules extraits en `forge-mvc-rbac`,
@@ -17,7 +17,7 @@
 
 ## Statut
 
-Acceptée (Forge 1.x — historique)
+Acceptée (Forge 1.x, historique)
 
 ---
 
@@ -66,7 +66,7 @@ recommandé pour les projets Forge 1.x.
 
 Les fonctions `hacher_mot_de_passe`, `verifier_mot_de_passe`, `enregistrer_tentative` et
 `est_limite` de `core.security.hashing` restent disponibles sans modification.
-Elles ne sont pas dépréciées au sens technique — aucun warning runtime n'est ajouté dans
+Elles ne sont pas dépréciées au sens technique, aucun warning runtime n'est ajouté dans
 ce ticket.
 
 **4. Les hashes PBKDF2 existants doivent rester vérifiables.**

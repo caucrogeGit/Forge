@@ -1,11 +1,11 @@
-# Sessions — Store de session Forge
+# Sessions, Store de session Forge
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 ## Vue d'ensemble
 
 Forge gère les sessions HTTP via un backend de session (*session store*) configurable.
-Le backend par défaut est `MemorySessionStore` — adapté au développement et aux tests,
+Le backend par défaut est `MemorySessionStore`, adapté au développement et aux tests,
 sans dépendance externe.
 
 Trois backends sont disponibles dans `core.sessions` :
@@ -33,7 +33,7 @@ Comportement garanti par `forge.configure(session_store=...)` :
 - si `session_store` est fourni, Forge l'utilise pour toutes les opérations de session ;
 - si `session_store=None`, Forge revient au `MemorySessionStore` par défaut ;
 - si la valeur ne respecte pas le protocole `SessionStore`, une `TypeError` est levée avec un message explicite ;
-- le store configuré est résolu à chaque opération session — un `configure()` tardif (après import de `core.security.session`) est pris en compte.
+- le store configuré est résolu à chaque opération session, un `configure()` tardif (après import de `core.security.session`) est pris en compte.
 
 ---
 
@@ -78,7 +78,7 @@ Supprime la session. Sans effet si la session n'existe pas.
 
 ### `regenerate(session_id) -> str`
 
-Crée un nouveau `session_id` en conservant les données existantes — protège contre la fixation de session.
+Crée un nouveau `session_id` en conservant les données existantes, protège contre la fixation de session.
 
 - Supprime l'ancienne session
 - Retourne le nouveau `session_id`
@@ -101,7 +101,7 @@ Repousse l'expiration de la session de `ttl_seconds` secondes.
 
 Stocke un message flash dans la session (affiché une seule fois).
 
-- `level` : `"success"`, `"error"`, `"warning"`, `"info"` (la valeur est libre — Forge ne valide pas)
+- `level` : `"success"`, `"error"`, `"warning"`, `"info"` (la valeur est libre, Forge ne valide pas)
 - Retourne `False` si la session n'existe pas
 
 ### `get_flash(session_id) -> dict | None`
@@ -124,10 +124,10 @@ store = MemorySessionStore(ttl=3600)  # TTL en secondes, défaut 3600
 forge.configure(session_store=store)
 ```
 
-- Backend par défaut — utilisé sans appel à `forge.configure()`
+- Backend par défaut, utilisé sans appel à `forge.configure()`
 - Sessions stockées en mémoire Python (dictionnaire)
 - Sessions perdues au redémarrage du processus
-- Thread-safe via `threading.RLock` (reentrant) — voir section [Thread-safety et limites](#thread-safety-et-limites-de-memorysessionstore)
+- Thread-safe via `threading.RLock` (reentrant), voir section [Thread-safety et limites](#thread-safety-et-limites-de-memorysessionstore)
 - **Non adapté au multi-processus** : chaque worker a son propre espace mémoire
 - Nettoyage automatique des sessions expirées à la création (`_cleanup()`)
 
@@ -144,7 +144,7 @@ forge.configure(session_store=store)
 - Persiste entre les redémarrages du processus
 - Thread-safe (RLock interne)
 - **Non adapté au multi-processus concurrent** sur le même dossier sans verrou externe
-- Le format `session_id` est validé (`^[0-9a-f]{64}$`) avant tout accès disque — pas de traversée de chemin possible
+- Le format `session_id` est validé (`^[0-9a-f]{64}$`) avant tout accès disque, pas de traversée de chemin possible
 - Méthode supplémentaire : `cleanup_expired() -> int` (supprime les fichiers expirés, retourne le nombre supprimé)
 - Dossier créé automatiquement si absent
 
@@ -193,8 +193,8 @@ protège l'intégralité de ses dix méthodes publiques (`create`, `get`, `set`,
 Dans un même processus Python, les garanties sont les suivantes :
 
 - deux threads peuvent créer des sessions simultanément sans générer d'IDs dupliqués ;
-- un thread peut lire une session pendant qu'un autre l'écrit — aucun état partiel n'est observable ;
-- la suppression et la régénération sont atomiques — pas de session fantôme, pas de double suppression silencieuse ;
+- un thread peut lire une session pendant qu'un autre l'écrit, aucun état partiel n'est observable ;
+- la suppression et la régénération sont atomiques, pas de session fantôme, pas de double suppression silencieuse ;
 - `create()` peut appeler `_cleanup()` en interne sans deadlock (propriété du `RLock` réentrant).
 
 Ces garanties sont confirmées par `tests/test_concurrency_session_001.py`, qui exécute
@@ -205,10 +205,10 @@ Ces garanties sont confirmées par `tests/test_concurrency_session_001.py`, qui 
 
 Le verrou interne est **intra-processus uniquement**. Il ne couvre pas :
 
-- **le partage entre processus** — chaque worker (Gunicorn, uWSGI) a son propre espace
+- **le partage entre processus**, chaque worker (Gunicorn, uWSGI) a son propre espace
   mémoire ; les sessions créées par un worker ne sont pas visibles des autres ;
-- **la persistance** — les sessions sont perdues au redémarrage du processus ;
-- **la cohérence entre instances** — plusieurs objets `MemorySessionStore` dans le même
+- **la persistance**, les sessions sont perdues au redémarrage du processus ;
+- **la cohérence entre instances**, plusieurs objets `MemorySessionStore` dans le même
   programme ne partagent pas leurs données.
 
 ### Contextes d'usage
@@ -228,9 +228,9 @@ Le verrou interne est **intra-processus uniquement**. Il ne couvre pas :
 Pour un usage persistant ou multi-worker, deux backends sont disponibles sans
 dépendance externe supplémentaire :
 
-- **`FileSessionStore`** — persiste entre les redémarrages, adapté à un seul processus
+- **`FileSessionStore`**, persiste entre les redémarrages, adapté à un seul processus
   ou à un développement persistant local ;
-- **`MariaDbSessionStore`** — sessions partagées entre workers via MariaDB, adapté à la
+- **`MariaDbSessionStore`**, sessions partagées entre workers via MariaDB, adapté à la
   production multi-processus.
 
 ```python
@@ -332,9 +332,9 @@ forge.configure(session_store=DictSessionStore())
 
 ## Limites actuelles
 
-- **Thread-safety mémoire** : voir section [Thread-safety et limites de MemorySessionStore](#thread-safety-et-limites-de-memorysessionstore) — livrée par SESSIONS-MEMORY-THREADSAFE-DOC-001.
+- **Thread-safety mémoire** : voir section [Thread-safety et limites de MemorySessionStore](#thread-safety-et-limites-de-memorysessionstore), livrée par SESSIONS-MEMORY-THREADSAFE-DOC-001.
 - **Double pile auth/session** : `core/security/session.py` (API legacy FR) et `core/auth/session.py` (API moderne EN) coexistent. La déduplication et la décision de l'API canonique sont traitées en Phase 4 (AUTH-SESSION-DEDUP-001).
-- **Production hardening** : `MariaDbSessionStore` est fonctionnel mais sa robustesse production (reconnexion, pool, timeout) dépend de la configuration de `core.database.db` — non documentée dans ce ticket.
+- **Production hardening** : `MariaDbSessionStore` est fonctionnel mais sa robustesse production (reconnexion, pool, timeout) dépend de la configuration de `core.database.db`, non documentée dans ce ticket.
 - **MFA/RBAC** : non concernés par les stores de session directement.
 
 ---
@@ -343,7 +343,7 @@ forge.configure(session_store=DictSessionStore())
 
 | Ticket | Description |
 |---|---|
-| SESSIONS-CONFIGURABLE-STORE-001 | `forge.configure(session_store=...)` — livré en Phase 3.1 |
-| SESSIONS-STORE-CONTRACT-DOC-001 | Ce document — livré en Phase 3.2 |
-| SESSIONS-MEMORY-THREADSAFE-DOC-001 | Documentation thread-safety MemorySessionStore — livré en Phase 3.3 |
-| AUTH-SESSION-DEDUP-001 | Déduplication double pile auth/session — Phase 4 |
+| SESSIONS-CONFIGURABLE-STORE-001 | `forge.configure(session_store=...)`, livré en Phase 3.1 |
+| SESSIONS-STORE-CONTRACT-DOC-001 | Ce document, livré en Phase 3.2 |
+| SESSIONS-MEMORY-THREADSAFE-DOC-001 | Documentation thread-safety MemorySessionStore, livré en Phase 3.3 |
+| AUTH-SESSION-DEDUP-001 | Déduplication double pile auth/session, Phase 4 |

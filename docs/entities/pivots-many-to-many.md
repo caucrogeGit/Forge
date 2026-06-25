@@ -6,14 +6,14 @@ La table pivot est :
 
 - déclarée dans `mvc/entities/relations.json`, dans le bloc `pivot` d'une relation `many_to_many` ;
 - **générée par Forge** dans `relations.sql` via `forge build:model` ;
-- **non déclarée comme entité classique** — elle n'a pas de fichier `<entité>.json` propre ;
+- **non déclarée comme entité classique**, elle n'a pas de fichier `<entité>.json` propre ;
 - extensible avec des attributs métier contrôlés via `pivot.fields[]`.
 
 ---
 
 ## Exemple sans attribut métier
 
-La forme minimale d'un pivot — deux entités reliées sans information supplémentaire :
+La forme minimale d'un pivot, deux entités reliées sans information supplémentaire :
 
 ```json
 {
@@ -33,7 +33,7 @@ La forme minimale d'un pivot — deux entités reliées sans information supplé
 }
 ```
 
-`fields: []` est valide — aucun attribut métier n'est obligatoire.
+`fields: []` est valide, aucun attribut métier n'est obligatoire.
 
 ---
 
@@ -71,7 +71,7 @@ Un pivot peut porter des informations propres à la relation :
 }
 ```
 
-`role` et `joined_at` sont des attributs **de la relation** — pas des champs des entités `User` ou `Project`.
+`role` et `joined_at` sont des attributs **de la relation**, pas des champs des entités `User` ou `Project`.
 
 ---
 
@@ -82,8 +82,8 @@ Un pivot peut porter des informations propres à la relation :
 | `table` | **oui** | nom de la table pivot en snake_case (`article_tag`) |
 | `from_key` | **oui** | colonne clé étrangère vers l'entité `from` (`article_id`) |
 | `to_key` | **oui** | colonne clé étrangère vers l'entité `to` (`tag_id`) |
-| `id` | **oui** | doit valoir `true` — id technique `AUTO_INCREMENT` toujours présent |
-| `unique_pair` | **oui** | doit valoir `true` — contrainte `UNIQUE (from_key, to_key)` toujours présente |
+| `id` | **oui** | doit valoir `true`, id technique `AUTO_INCREMENT` toujours présent |
+| `unique_pair` | **oui** | doit valoir `true`, contrainte `UNIQUE (from_key, to_key)` toujours présente |
 | `on_delete` | non | comportement SQL ON DELETE sur les deux FK (`restrict`, `cascade`, `set_null`, `no_action`) |
 | `fields` | non | attributs métier de la table pivot (types Forge, mêmes règles que `field.schema.json`) |
 
@@ -93,10 +93,10 @@ Un pivot peut porter des informations propres à la relation :
 
 Forge impose un `id INT NOT NULL AUTO_INCREMENT` sur toutes les tables pivot. Ce choix est délibéré :
 
-- **extensibilité** — si la relation doit porter des attributs métier, l'`id` technique est déjà là ;
-- **homogénéité** — toutes les tables générées par Forge ont la même structure de clé primaire ;
-- **références externes** — un `id` stable permet de référencer une ligne pivot depuis d'autres tables ou API ;
-- **évolution sans migration destructive** — transformer un pivot sans attributs en pivot avec attributs ne nécessite pas de changer la clé primaire.
+- **extensibilité**, si la relation doit porter des attributs métier, l'`id` technique est déjà là ;
+- **homogénéité**, toutes les tables générées par Forge ont la même structure de clé primaire ;
+- **références externes**, un `id` stable permet de référencer une ligne pivot depuis d'autres tables ou API ;
+- **évolution sans migration destructive**, transformer un pivot sans attributs en pivot avec attributs ne nécessite pas de changer la clé primaire.
 
 Le couple `from_key / to_key` reste **unique** grâce à `unique_pair: true`. Les deux décisions coexistent et se complètent.
 
@@ -108,7 +108,7 @@ Le couple `from_key / to_key` reste **unique** grâce à `unique_pair: true`. Le
 
 Exemple : un même article ne peut pas être associé deux fois au même tag dans `article_tag`.
 
-Cette contrainte est distincte de l'`id` technique — l'`id` identifie la ligne, la contrainte unique protège la cohérence de la relation.
+Cette contrainte est distincte de l'`id` technique, l'`id` identifie la ligne, la contrainte unique protège la cohérence de la relation.
 
 `unique_pair` est contraint à `true` dans `pivot.schema.json` (`const: true`). Toute autre valeur est invalide.
 
@@ -139,7 +139,7 @@ et est prioritaire sur `nullable: true`.
 
 `pivot.fields[]` ne peut pas redéclarer les colonnes techniques gérées par Forge :
 
-- `id` — clé primaire technique
+- `id`, clé primaire technique
 - la valeur de `from_key` (ex : `article_id`)
 - la valeur de `to_key` (ex : `tag_id`)
 
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS project_user (
 );
 ```
 
-Le SQL est une **projection générée** depuis `relations.json`. Ne pas le modifier manuellement — il sera écrasé à la prochaine exécution de `build:model`.
+Le SQL est une **projection générée** depuis `relations.json`. Ne pas le modifier manuellement, il sera écrasé à la prochaine exécution de `build:model`.
 
 ---
 
@@ -233,13 +233,13 @@ Elle ne modifie pas `make:crud` et ne branche pas automatiquement les routes.
 
 ---
 
-## Pivot advanced — attributs métier complets
+## Pivot advanced, attributs métier complets
 
 Quand un pivot porte des attributs métier significatifs (`position`, `note`,
 `role`…) et que `make:crud` est insuffisant ou bloqué, consultez la
 documentation dédiée :
 
-**Pivot advanced — tables pivot avec attributs**
+**Pivot advanced, tables pivot avec attributs**
 
 Elle couvre la déclaration du contrat, la génération du sous-CRUD avec
 `make:pivot-crud`, l'utilisation de `PivotAdvancedService` et la gestion
@@ -255,6 +255,6 @@ des erreurs UX.
   par la synchronisation d'IDs générée. Pour utiliser ces champs, rendez-les nullable ou
   utilisez un module CRUD pivot dédié (voir ticket `PIVOT-CRUD-004`).
 - Le CRUD avancé pour créer, modifier ou supprimer des lignes pivot avec attributs n'est
-  pas encore couvert par `make:crud` — les vues générées traitent la relation mais pas les
+  pas encore couvert par `make:crud`, les vues générées traitent la relation mais pas les
   attributs supplémentaires.
 - `forge entity:validate` reste la validation officielle avant toute génération.

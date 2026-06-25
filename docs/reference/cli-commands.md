@@ -57,7 +57,7 @@ Tableau synthétique des commandes utilisées quotidiennement.
 
 ## Parcours rapides
 
-Scénarios d'enchaînement des commandes — copiables tels quels.
+Scénarios d'enchaînement des commandes, copiables tels quels.
 
 ### Créer une application minimale
 
@@ -137,7 +137,7 @@ forge new <NomProjet> --profile <profil>
 
 **Options :**
 
-- `--profile <nom>` — profil à utiliser (défaut : `utilisateurs-auth`)
+- `--profile <nom>`, profil à utiliser (défaut : `utilisateurs-auth`)
 
 **Profils disponibles :**
 
@@ -173,13 +173,13 @@ forge run --no-reload
 
 **Comportement :**
 
-- `APP_ENV=dev` (défaut) — superviseur d'autoreload :
+- `APP_ENV=dev` (défaut), superviseur d'autoreload :
   `forge run` spawne `python app.py` comme sous-processus, surveille
   les fichiers du projet (polling `stat()`) et redémarre automatiquement
   le serveur dès qu'un fichier surveillé change.
   Avec `--no-reload` : délégation à `scripts/dev-server.sh` (POSIX) ou
   fallback `python app.py`.
-- `APP_ENV=prod` — refuse le serveur intégré et imprime la stratégie
+- `APP_ENV=prod`, refuse le serveur intégré et imprime la stratégie
   WSGI recommandée (Gunicorn + reverse proxy). Code de sortie non nul.
 
 **Fichiers surveillés (dev, autoreload) :**
@@ -194,9 +194,9 @@ forge run --no-reload
 
 **Options :**
 
-- `--env dev|prod` — force l'environnement (sinon lit `APP_ENV`, défaut `dev`).
-- `--no-reload` — désactive l'autoreload (mode legacy : `dev-server.sh`).
-- `-h`, `--help` — affiche l'aide sans rien exécuter.
+- `--env dev|prod`, force l'environnement (sinon lit `APP_ENV`, défaut `dev`).
+- `--no-reload`, désactive l'autoreload (mode legacy : `dev-server.sh`).
+- `-h`, `--help`, affiche l'aide sans rien exécuter.
 
 **Prérequis :** lancé depuis la racine d'un projet Forge (`app.py` + `mvc/`).
 
@@ -230,25 +230,25 @@ forge update --dry-run  # affiche la commande pip, ne l'exécute pas
 
 **Modes :**
 
-- défaut — lance `pip install --upgrade forge-mvc` via `sys.executable` ;
-- `--pre` — ajoute `--pre` à la commande pip (versions de
+- défaut, lance `pip install --upgrade forge-mvc` via `sys.executable` ;
+- `--pre`, ajoute `--pre` à la commande pip (versions de
   pré-release ; recommandé tant que Forge reste en beta) ;
-- `--check` — mode lecture seule, affiche la version installée et
+- `--check`, mode lecture seule, affiche la version installée et
   la commande qui serait lancée ;
-- `--dry-run` — affiche la commande pip sans l'exécuter.
+- `--dry-run`, affiche la commande pip sans l'exécuter.
 
 **Cas pipx :** si Forge a été installé via `pipx install forge-mvc`,
 `sys.executable` pointe vers `~/.local/share/pipx/venvs/forge-mvc/`.
 Dans ce cas, `forge update` n'exécute **pas** `pip install` (qui ne
-mettrait pas à jour l'install pipx globale) — la commande affiche
+mettrait pas à jour l'install pipx globale), la commande affiche
 le bon `pipx upgrade forge-mvc` à lancer manuellement.
 
 **Options :**
 
-- `--pre` — autorise les versions de pré-release ;
-- `--check` — mode vérification, lecture seule ;
-- `--dry-run` — affiche la commande sans l'exécuter ;
-- `-h`, `--help` — affiche l'aide sans rien exécuter.
+- `--pre`, autorise les versions de pré-release ;
+- `--check`, mode vérification, lecture seule ;
+- `--dry-run`, affiche la commande sans l'exécuter ;
+- `-h`, `--help`, affiche l'aide sans rien exécuter.
 
 **Hors périmètre :** aucune migration projet, aucun fichier `env/*`
 touché, aucun fichier généré sous `mvc/` modifié, aucune mise à jour
@@ -266,7 +266,7 @@ cohérence du projet.
 
 **Rôle :** diagnostic large et tolérant de l'environnement courant (lecture seule).
 
-**Quand l'utiliser :** quotidien — première commande à lancer après `forge new`, et avant un commit.
+**Quand l'utiliser :** quotidien, première commande à lancer après `forge new`, et avant un commit.
 
 ```bash
 forge doctor
@@ -276,17 +276,17 @@ Vérifie : version Python, chargement `.env`, structure `mvc/`, entités, migrat
 
 **À ne pas confondre avec :**
 
-- [`forge project:check`](#forge-projectcheck) — strict (échec si convention violée), pour la CI ;
-- [`forge project:audit`](#forge-projectaudit) — rapport détaillé non destructif.
+- [`forge project:check`](#forge-projectcheck), strict (échec si convention violée), pour la CI ;
+- [`forge project:audit`](#forge-projectaudit), rapport détaillé non destructif.
 
 **Statut :** core.
 
 </details>
 
 <details markdown="1" id="forge-projectcheck">
-<summary><code>forge project:check</code> - contrôle strict des conventions Forge — conçu pour la CI</summary>
+<summary><code>forge project:check</code> - contrôle strict des conventions Forge, conçu pour la CI</summary>
 
-**Rôle :** contrôle strict des conventions Forge — conçu pour la CI.
+**Rôle :** contrôle strict des conventions Forge, conçu pour la CI.
 
 ```bash
 forge project:check
@@ -341,7 +341,7 @@ forge make:entity <NomEntite> --no-input
 
 **Options :**
 
-- `--no-input` — génère un gabarit minimal sans poser de questions
+- `--no-input`, génère un gabarit minimal sans poser de questions
 
 Crée `mvc/entities/<NomEntite>/<nomEntite>.json` et `mvc/entities/<NomEntite>/<nomEntite>.py`.
 
@@ -367,7 +367,7 @@ forge make:crud <NomEntite> --dry-run
 
 **Options :**
 
-- `--dry-run` — affiche les fichiers qui seraient créés sans écrire
+- `--dry-run`, affiche les fichiers qui seraient créés sans écrire
 
 **Exemple :**
 
@@ -381,13 +381,13 @@ forge make:entity Contact && forge make:crud Contact
   `Request`/`Response` et signatures `def <action>(request: Request) -> Response:`
   (DX-TYPED-SKELETONS-001) ;
 - génère les vues HTML associées (liste, fiche, formulaires) ;
-- préserve les fichiers utilisateurs déjà présents (write-if-new — voir charte §9).
+- préserve les fichiers utilisateurs déjà présents (write-if-new, voir charte §9).
 
 **À ne pas confondre avec :**
 
-- [`forge make:entity`](#forge-makeentity) — crée seulement le JSON d'entité, pas le CRUD ;
-- [`forge make:pivot-crud`](#forge-makepivot-crud) — pour les pivots avec attributs ;
-- [`forge build:model`](#forge-buildmodel) — régénère uniquement les modèles Python, pas les contrôleurs/vues.
+- [`forge make:entity`](#forge-makeentity), crée seulement le JSON d'entité, pas le CRUD ;
+- [`forge make:pivot-crud`](#forge-makepivot-crud), pour les pivots avec attributs ;
+- [`forge build:model`](#forge-buildmodel), régénère uniquement les modèles Python, pas les contrôleurs/vues.
 
 **Statut :** core.
 
@@ -742,9 +742,9 @@ forge auth:user:create --email <email> --password-prompt
 
 **Options :**
 
-- `--email <email>` — adresse email (requis)
-- `--password <mdp>` — mot de passe en clair
-- `--password-prompt` — saisie interactive sécurisée
+- `--email <email>`, adresse email (requis)
+- `--password <mdp>`, mot de passe en clair
+- `--password-prompt`, saisie interactive sécurisée
 
 </details>
 
@@ -996,7 +996,7 @@ forge opt-in:remove <nom>
 </details>
 
 <details markdown="1" id="forge-opt-inenable">
-<summary><code>forge opt-in:enable</code> - Branche un module optionnel dans le projet (optins/) — dry-run par défaut</summary>
+<summary><code>forge opt-in:enable</code> - Branche un module optionnel dans le projet (optins/), dry-run par défaut</summary>
 
 Branche un module optionnel dans le projet (couche `optins/<nom>/`).
 Dry-run par défaut ; `--apply` crée réellement les fichiers.
@@ -1009,7 +1009,7 @@ forge opt-in:enable <nom> --apply    # crée réellement la couche projet
 </details>
 
 <details markdown="1" id="forge-opt-indisable">
-<summary><code>forge opt-in:disable</code> - Débranche un module optionnel du projet (retire optins/) — dry-run par défaut</summary>
+<summary><code>forge opt-in:disable</code> - Débranche un module optionnel du projet (retire optins/), dry-run par défaut</summary>
 
 Inverse exact d'`opt-in:enable` : retire la couche projet `optins/<nom>/`.
 Laisse le package installé (voir `opt-in:remove`).

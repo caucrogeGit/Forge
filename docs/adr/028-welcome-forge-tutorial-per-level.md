@@ -1,8 +1,8 @@
-# ADR-028 — welcome-forge : tutoriel continu manuel sur les trois niveaux, un mini-projet par niveau
+# ADR-028, welcome-forge : tutoriel continu manuel sur les trois niveaux, un mini-projet par niveau
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.15 (ticket `WELCOME-FORGE-LEVELS-ADR-028`).
+Accepté, Forge 1.0.0-beta.15 (ticket `WELCOME-FORGE-LEVELS-ADR-028`).
 
 Généralise [ADR-025](025-welcome-forge-continuous-tutorial.md) (qui ne couvrait
 que le niveau débutant) et amende sa décision D3.
@@ -56,26 +56,26 @@ façon officielle de faire chaque chose ») et l'esprit d'ADR-025.
 
 ## Décision
 
-1. **D1 — Formalisme unique sur les trois niveaux.** Les niveaux intermédiaire
+1. **D1, Formalisme unique sur les trois niveaux.** Les niveaux intermédiaire
    et avancé adoptent le **même formalisme** que le débutant : un tutoriel
    continu manuel, où le learner écrit le code à la main, palier après palier.
    Plus aucun `forge starter:build` dans welcome-forge.
-2. **D2 — Un mini-projet distinct par niveau.** Chaque niveau est un **mini-projet
+2. **D2, Un mini-projet distinct par niveau.** Chaque niveau est un **mini-projet
    autonome** : il repart d'un `forge new` propre et grandit palier après palier.
    Un niveau ne continue plus narrativement le projet du niveau précédent ; on
    peut entrer directement en intermédiaire ou en avancé. Chaque niveau établit
    son propre modèle de données dès son premier palier (intermédiaire : une table
    travaillée par lister/filtrer/paginer/modifier/supprimer ; avancé : son propre
    fil conducteur relationnel).
-3. **D3 — Suppression des starters buildables intermédiaire et avancé.** Les
+3. **D3, Suppression des starters buildables intermédiaire et avancé.** Les
    dossiers `cli/starters/data/<palier>/` des paliers intermédiaires (9) et
    avancés (5) de welcome-forge sont retirés. Le contrat public gelé des starters
    décroît d'autant ; les survivants ne sont **pas** renumérotés (ADR-025 D5).
-4. **D4 — Bootstrap par niveau.** Chaque niveau a son préambule de démarrage
+4. **D4, Bootstrap par niveau.** Chaque niveau a son préambule de démarrage
    (création du projet neuf, prérequis, modèle de données initial). La page
    `installation.md` du parcours reste le point d'entrée et oriente vers le
    bootstrap du niveau choisi.
-5. **D5 — Opt-ins inchangés pour l'instant.** Les dix parcours opt-in (iot, video,
+5. **D5, Opt-ins inchangés pour l'instant.** Les dix parcours opt-in (iot, video,
    images, files, audio, mfa, rbac, workflow, stats, mail) et les starters CRUD
    **restent** des starters buildables `forge starter:build`. L'unification de
    leur formalisme est une **question explicitement rouverte plus tard**, hors
@@ -103,7 +103,7 @@ buildables ») et **lève** son point « hors périmètre » sur ces deux niveau
 - Perte de la génération automatique (`forge starter:build`) pour les 14 paliers
   intermédiaires et avancés (assumée : tout se tape à la main).
 - Rupture des contrats de test par palier (contenu figé des contrôleurs/snippets)
-  et des assertions « livré — starter `x` » : tests supprimés ou réécrits en
+  et des assertions « livré, starter `x` » : tests supprimés ou réécrits en
   garde-fous de continuité, comme au pivot débutant.
 - Réécriture documentaire des 14 paliers (du formalisme « starter » vers le
   formalisme « tutoriel continu manuel »), plus le bootstrap de chaque niveau.
@@ -114,14 +114,14 @@ buildables ») et **lève** son point « hors périmètre » sur ces deux niveau
 
 ## Alternatives écartées
 
-### A — Garder intermédiaire/avancé buildables, narrer la continuité par-dessus
+### A, Garder intermédiaire/avancé buildables, narrer la continuité par-dessus
 
 Conserver les 14 starters et raconter une progression manuelle au-dessus. Rejeté
 pour la même raison qu'ADR-025 alternative A : deux réalités parallèles (starter
 buildable vs tutoriel manuel), divergence doc/starter, contraire au principe 11.
 C'est précisément l'état incohérent que cet ADR corrige.
 
-### B — Un seul projet continu sur les trois niveaux
+### B, Un seul projet continu sur les trois niveaux
 
 Un unique projet qui grandit du débutant à l'avancé. Rejeté : impose d'avoir fait
 tout le débutant pour suivre l'intermédiaire, alourdit l'entrée dans les niveaux
@@ -129,7 +129,7 @@ supérieurs, et rend chaque niveau dépendant des précédents. Le mini-projet p
 niveau (D2) offre des scopes auto-contenus, plus adaptés à des publics d'entrée
 différents.
 
-### C — Convertir aussi les parcours opt-in dans le même chantier
+### C, Convertir aussi les parcours opt-in dans le même chantier
 
 Unifier d'un coup welcome-forge et les dix parcours opt-in. Rejeté : périmètre
 trop large pour un seul chantier ; welcome-forge (le cœur) sert de pilote, la

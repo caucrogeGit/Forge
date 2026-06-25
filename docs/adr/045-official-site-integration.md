@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté — bêta publique 1.0 (`1.0.0-beta.x`).
+Accepté, bêta publique 1.0 (`1.0.0-beta.x`).
 
 ---
 
@@ -17,11 +17,11 @@ Accepté — bêta publique 1.0 (`1.0.0-beta.x`).
 La documentation publique de Forge (forgemvc.com) est aujourd'hui publiée par
 **deux** chaînes distinctes :
 
-1. **GitHub Pages** — `.github/workflows/pages.yml` : à chaque push sur `main`,
+1. **GitHub Pages**, `.github/workflows/pages.yml` : à chaque push sur `main`,
    la CI exécute `mkdocs build --strict` et publie `site/`. Entièrement dans le
    dépôt `forge`, automatique.
 
-2. **VM forge-web** (`forgemvc.com` auto-hébergé) — via un dépôt **séparé**,
+2. **VM forge-web** (`forgemvc.com` auto-hébergé), via un dépôt **séparé**,
    `Forge-official-site`. Ce dépôt :
    - **importe** la documentation de Forge dans `docs/forge/`
      (`scripts/import_forge_docs.py`, liste blanche) ;
@@ -57,7 +57,7 @@ intermédiaire ni dérive possible.
    d'exploitation (`docs/` propre : runbook, audits `FW-*`, doc secrets, en
    archive non publiée).
 
-2. **`official-site` construit avec le `mkdocs.yml` CANONIQUE de Forge — plus
+2. **`official-site` construit avec le `mkdocs.yml` CANONIQUE de Forge, plus
    d'import ni de nav propre.** `build-site.sh` lance `mkdocs build --strict`
    sur `forge/mkdocs.yml` (qui agrège déjà `docs/` + les docs « par module »
    d'ADR-043 via `!include`, et passe `--strict`). Sont **supprimés**
@@ -115,12 +115,12 @@ intermédiaire ni dérive possible.
 
 ## Alternatives écartées
 
-### A — Garder le dépôt `Forge-official-site` séparé
+### A, Garder le dépôt `Forge-official-site` séparé
 
 Statu quo. Rejeté : c'est précisément l'intermédiaire (import inter-dépôts +
 dérive + charge manuelle) que cette décision supprime.
 
-### B — Servir le site MkDocs de `forge` directement à la racine
+### B, Servir le site MkDocs de `forge` directement à la racine
 
 Abandonner l'assemblage et le préfixe `/docs/`, servir le `site/` de la build
 `forge` tel quel. Rejeté : casse les URLs publiques existantes (`/docs/forge/…`
@@ -128,7 +128,7 @@ Abandonner l'assemblage et le préfixe `/docs/`, servir le `site/` de la build
 déjà éprouvée. Le rapatriement fidèle (décision 1) préserve l'acquis sans
 rupture.
 
-### C — Publier uniquement via GitHub Pages
+### C, Publier uniquement via GitHub Pages
 
 Abandonner la VM forge-web au profit de GitHub Pages seul. Hors périmètre :
 la VM (domaine, Caddy/Nginx, contrôle d'hébergement) est un choix

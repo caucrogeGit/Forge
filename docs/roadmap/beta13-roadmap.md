@@ -1,11 +1,11 @@
-# Roadmap — `1.0.0-beta.13`
+# Roadmap, `1.0.0-beta.13`
 
-> **Thème** : *dernière beta fonctionnelle* — slugs, gel du contrat public,
+> **Thème** : *dernière beta fonctionnelle*, slugs, gel du contrat public,
 > production-readiness. **Finalité** : `RELEASE-BETA13-001`.
 >
 > **Principe directeur** : finir et **figer** ce qui existe ; une seule vraie
 > feature (slugs). beta.14 sera la beta de *stabilisation* (doc + field-fixes,
-> **zéro feature**) — jalon séparé, hors de cette roadmap.
+> **zéro feature**), jalon séparé, hors de cette roadmap.
 
 ---
 
@@ -29,14 +29,14 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 
 ---
 
-## Phase 0 — Mise à niveau *(immédiat, dé-risque tout)*
+## Phase 0, Mise à niveau *(immédiat, dé-risque tout)*
 
 | Ticket | Type | Objet |
 |---|---|---|
 | `BETA13-EXISTING-AUDIT-001` | 📋 | Cet audit (table ci-dessus). **Fait dans ce document.** |
 | `CHANGELOG-DELTA-B12-B13-001` | 📋 | Section `beta.13` documentant les 65 commits post-beta.12. |
 
-## Phase 1 — Gel du contrat public *(cheap, arrête la valse de renommages)*
+## Phase 1, Gel du contrat public *(cheap, arrête la valse de renommages)*
 
 | Ticket | Type | Objet · ⛓️ |
 |---|---|---|
@@ -44,7 +44,7 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 | `STARTERS-FINAL-CONTRACT-001` | 📋 | Figer les 16 starters (noms, ordre, routes, fichiers). |
 | `DOCS-LINKS-FINAL-AUDIT-001` | 📋 | `mkdocs --strict` + audit liens/ancres après la réorg docs. |
 
-## Phase 2 — Slugs *(la seule vraie feature)* ⛓️ après Phase 0
+## Phase 2, Slugs *(la seule vraie feature)* ⛓️ après Phase 0
 
 | Ticket | Type | Objet |
 |---|---|---|
@@ -55,7 +55,7 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 | `SLUG-ROUTING-001` | 🔨 | `find_by_slug` + route publique `/{ressource}/{slug}`. |
 | `SLUG-DOCS-001` | 📋 | Usage, génération, unicité, route publique, limites. |
 
-## Phase 3 — Production readiness *(surtout durcir/documenter)* — ✅ **complète**
+## Phase 3, Production readiness *(surtout durcir/documenter)*, ✅ **complète**
 
 | Ticket | État | Objet |
 |---|---|---|
@@ -71,31 +71,31 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 > ajoute le check sécurité-prod du doctor, le dry-run des migrations, et la
 > documentation de déploiement.
 
-## Phase 4 — Field test *(dogfooding)* ⛓️ après 2+3 — ✅ **complète**
+## Phase 4, Field test *(dogfooding)* ⛓️ après 2+3, ✅ **complète**
 
 | Ticket | État | Objet |
 |---|---|---|
 | `BETA13-DOGFOOD-001` | ✅ livré | Pipeline slug validé **bout-en-bout contre une vraie MariaDB**, sous forme reproductible : `tests/test_e2e_slug_mariadb.py` (gated `FORGE_E2E_MARIADB`). |
 
 > **Forme retenue** : plutôt qu'une app jetable, un **test e2e committé** qui
-> rejoue le pipeline réel — entité `Article` (`title` + `slug` auto depuis
+> rejoue le pipeline réel, entité `Article` (`title` + `slug` auto depuis
 > `title`) → `build_entity_sql` → `apply_model_sql` sur la base → introspection
 > (`Slug VARCHAR(180)` + `UNIQUE`) → runtime `slugify()`→INSERT→lecture par slug
 > → **rejet du doublon** par la contrainte d'unicité. 7/7 verts sur MariaDB ;
 > SKIPPED proprement sans la base. C'est le **go** : le slug fonctionne en réel.
 
-## Phase 5 — Clôture & release ⛓️ tout vert
+## Phase 5, Clôture & release ⛓️ tout vert
 
 | Ticket | État | Objet |
 |---|---|---|
 | `BETA13-CLOSING-AUDIT-001` | ✅ vert | Batterie complète : `pytest` **16587 passed / 0 échec** + `ruff` + `compileall` + `mkdocs --strict` + `git diff --check` + `sync:landing --check`. |
 | `BETA13-BUMP-001` | ✅ livré | Bump b12→b13 sur **23 fichiers** (7 `pyproject.toml` + `forge.py` + `app.py` + `core/__init__.py` + 6 `__init__.py` opt-in + `package.json`/`package-lock.json` + CHANGELOG daté + roadmap + landing resync), **pins Alpha `==1.0.0b13`** (media, mfa). Cohérence vérifiée (`tests/meta/` **6955 passed**, `forge --version` = `Forge 1.0.0b13`). |
-| `RELEASE-BETA13-001` | ⏸️ en attente | Tag `v1.0.0-beta.13`, build, publication PyPI (`--pre`), sync landing publique. **Action irréversible/sortante — sur autorisation explicite uniquement.** |
+| `RELEASE-BETA13-001` | ⏸️ en attente | Tag `v1.0.0-beta.13`, build, publication PyPI (`--pre`), sync landing publique. **Action irréversible/sortante, sur autorisation explicite uniquement.** |
 | `BETA13-POST-PUBLISH-VERIFY-001` | ⏸️ en attente | Vérif PyPI publique + install propre. |
 
 > **Seuil de release** : le bump est finalisé et toute la cohérence est verte.
 > Le tag git et la publication PyPI (étape `RELEASE-BETA13-001`) ne sont **pas**
-> réalisés — ils relèvent d'une décision explicite (publication = action
+> réalisés, ils relèvent d'une décision explicite (publication = action
 > publique et irréversible).
 
 ---
@@ -119,7 +119,7 @@ Phase 4 (dogfood) = **vrai go/no-go** avant clôture.
 3. Production : doctor/migrations/erreurs/health/update **durcis + checklist déploiement**.
 4. `BETA13-CLOSING-AUDIT-001` **vert**, versions bumpées b13, CHANGELOG complet.
 
-> **Note — opt-in `forge-mvc-video` livré en parallèle.** Hors de la
+> **Note, opt-in `forge-mvc-video` livré en parallèle.** Hors de la
 > définition initiale ci-dessus, l'opt-in `forge-mvc-video` v1 (upload,
 > transcodage MP4 H.264/AAC, lecture HTTP Range, commandes `video:*`) a été
 > développé et mergé sur `main` pendant ce cycle, puis publié avec les autres
@@ -133,7 +133,7 @@ marketplace.
 
 ---
 
-## Annexe — Carte d'implémentation `SLUG-SQL-CRUD-001`
+## Annexe, Carte d'implémentation `SLUG-SQL-CRUD-001`
 
 > Investigation faite ; design figé ; **implémentation reportée** (effort
 > dédié). À reprendre idéalement **avec MariaDB** pour valider le CRUD généré,
@@ -181,7 +181,7 @@ depuis `unique: true`).
 
 - ✅ **Commit A livré** (`af09e7a`) : `type: slug` → `VARCHAR(180)` + `SlugField`
   (saisie manuelle validée). Le type slug est **utilisable dès maintenant**.
-- **Commit B** (auto-génération depuis `source`) — ~6 fichiers : schémas ×2
+- **Commit B** (auto-génération depuis `source`), ~6 fichiers : schémas ×2
   (`source`), normaliseur (propage `source`), `validation.py` (`source` dans
   `ALLOWED_FIELD_KEYS` + règle « réfère un champ texte existant »),
   `crud/utils.py` (helper `_is_generated(f)` = a un `source` ; **`_non_pk_fields`

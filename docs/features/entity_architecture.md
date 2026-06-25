@@ -60,15 +60,15 @@ flowchart TD
 }
 ```
 
-La clé primaire `Id` est générée automatiquement par `build:model` — elle n'est pas déclarée dans `fields[]`.
+La clé primaire `Id` est générée automatiquement par `build:model`, elle n'est pas déclarée dans `fields[]`.
 
 ### Clés racine
 
 | Clé | Obligatoire | Valeur par défaut |
 |---|---|---|
-| `schema_version` | **Oui** | — (doit valoir `"1.0"`) |
-| `name` | **Oui** | — |
-| `fields` | **Oui** | — |
+| `schema_version` | **Oui** |, (doit valoir `"1.0"`) |
+| `name` | **Oui** |, |
+| `fields` | **Oui** |, |
 | `table` | Non | `name` converti en `snake_case` |
 | `description` | Non | `""` |
 
@@ -76,9 +76,9 @@ La clé primaire `Id` est générée automatiquement par `build:model` — elle 
 
 | Clé | Obligatoire | Valeur par défaut |
 |---|---|---|
-| `name` | **Oui** | — |
-| `type` | **Oui** | — (valeurs : `string`, `integer`, `boolean`, `date`, `datetime`, `text`, `password`, `decimal`) |
-| `max_length` | Non (string) | — |
+| `name` | **Oui** |, |
+| `type` | **Oui** |, (valeurs : `string`, `integer`, `boolean`, `date`, `datetime`, `text`, `password`, `decimal`) |
+| `max_length` | Non (string) |, |
 | `nullable` | Non | `false` |
 | `unique` | Non | `false` |
 | `default` | Non | absent |
@@ -107,7 +107,7 @@ La clé `default` accepte uniquement des valeurs simples : `str`, `int`, `float`
 
 ## 3. Les projections générées
 
-### `contact.sql` — projection SQL locale
+### `contact.sql`, projection SQL locale
 
 Contient uniquement la table de l'entité. Pas de clé étrangère.
 
@@ -132,7 +132,7 @@ Règles de formatage :
     Les clés étrangères inter-entités n'apparaissent **jamais** dans un `.sql` d'entité.
     Elles appartiennent exclusivement à `relations.sql`.
 
-### `contact_base.py` — base Python générée
+### `contact_base.py`, base Python générée
 
 Contient le constructeur, les propriétés avec décorateurs de validation, `to_dict()`, `from_dict()` et `__repr__`.
 
@@ -192,7 +192,7 @@ Types Python supportés : `int`, `str`, `float`, `bool`, `date`, `datetime`.
 
 ## 4. Les fichiers manuels
 
-### `contact.py` — classe métier
+### `contact.py`, classe métier
 
 Hérite de `ContactBase`. Créé une seule fois par Forge s'il est absent. Jamais écrasé.
 
@@ -306,7 +306,7 @@ JSON de l'entité pivot (format canonique) :
 }
 ```
 
-La clé `id` et les `sql_type` ne sont pas déclarés dans le JSON canonique — Forge les dérive lors de `build:model`.
+La clé `id` et les `sql_type` ne sont pas déclarés dans le JSON canonique, Forge les dérive lors de `build:model`.
 
 Relations associées dans `relations.json` :
 
@@ -375,9 +375,9 @@ flowchart TD
 | `forge make:entity Contact` | `contact.json`, `contact.sql`, `contact_base.py`, `contact.py`, `__init__.py` | fichiers existants | Création initiale |
 | `forge sync:entity Contact` | `contact.sql`, `contact_base.py` | `contact.py`, `__init__.py` | Resynchronisation d'une entité |
 | `forge make:relation` | `relations.json` | existant | Ajout interactif de relation |
-| `forge sync:relations` | `relations.sql` | — | Resynchronisation des relations |
+| `forge sync:relations` | `relations.sql` |, | Resynchronisation des relations |
 | `forge build:model` | tout le modèle | fichiers manuels | Régénération complète |
-| `forge check:model` | rien | — | Validation sans écriture |
+| `forge check:model` | rien |, | Validation sans écriture |
 
 ### Ordre d'exécution SQL obligatoire
 

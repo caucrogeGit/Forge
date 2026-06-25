@@ -25,8 +25,8 @@ noyau, toutes bâties sur une même base non instanciable :
     mvc/helpers/
     ├── __init__.py     # ré-exporte les façades
     ├── _facade.py      # base commune : namespace non instanciable
-    ├── session.py      # class Session  — le store de session
-    ├── cookies.py      # class Cookies  — cookies applicatifs
-    └── flash.py        # class Flash    — messages flash
+    ├── session.py      # class Session : le store de session
+    ├── cookies.py      # class Cookies : cookies applicatifs
+    └── flash.py        # class Flash : messages flash
 
 [Continuer avec La base Facade](facade-base.md)

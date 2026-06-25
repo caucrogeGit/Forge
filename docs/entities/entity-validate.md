@@ -2,7 +2,7 @@
 
 `forge entity:validate` est la **commande officielle de diagnostic** des fichiers JSON canoniques Forge. Elle vérifie chaque entité et `relations.json` avant toute génération.
 
-Elle ne génère pas de fichiers — elle diagnostique.
+Elle ne génère pas de fichiers, elle diagnostique.
 
 ```
 forge entity:validate
@@ -21,13 +21,13 @@ forge entity:validate
 python forge.py entity:validate
 ```
 
-Sortie humaine — diagnostic lisible par un développeur.
+Sortie humaine, diagnostic lisible par un développeur.
 
 ```bash
 python forge.py entity:validate --json
 ```
 
-Sortie JSON machine — exploitable par un outil, un CI, ou un script.
+Sortie JSON machine, exploitable par un outil, un CI, ou un script.
 
 Dans un projet installé, la commande peut aussi s'invoquer directement avec `forge entity:validate`.
 
@@ -99,7 +99,7 @@ python forge.py entity:validate --json
 
 | Champ | Rôle |
 |---|---|
-| `code` | code stable — préfixé `FORGE_` |
+| `code` | code stable, préfixé `FORGE_` |
 | `file` | chemin relatif du fichier concerné |
 | `path` | chemin JSON vers la valeur en erreur (`$.fields[0].type`) |
 | `message` | message humain de la violation |
@@ -167,7 +167,7 @@ Les codes sont préfixés `FORGE_` et organisés par famille.
 { "name": "Article", "table": "article", "fields": [...] }
 ```
 
-Erreur : `FORGE_ENTITY_SCHEMA_MISSING` — `schema_version` est obligatoire.
+Erreur : `FORGE_ENTITY_SCHEMA_MISSING`, `schema_version` est obligatoire.
 
 ---
 
@@ -177,7 +177,7 @@ Erreur : `FORGE_ENTITY_SCHEMA_MISSING` — `schema_version` est obligatoire.
 { "format_version": 1, ... }
 ```
 
-Le format `format_version: 1` est **refusé** — `build:model` et `make:crud` lèvent une erreur.
+Le format `format_version: 1` est **refusé**, `build:model` et `make:crud` lèvent une erreur.
 Migrer vers le format canonique `schema_version: "1.0"` (voir `docs/entities/migration-legacy-vers-canonique.md`).
 
 ---
@@ -188,7 +188,7 @@ Migrer vers le format canonique `schema_version: "1.0"` (voir `docs/entities/mig
 { "name": "id", "type": "integer" }
 ```
 
-Erreur : `FORGE_ENTITY_SCHEMA_INVALID` — `id` est interdit dans `fields[]`.
+Erreur : `FORGE_ENTITY_SCHEMA_INVALID`, `id` est interdit dans `fields[]`.
 
 ---
 
@@ -198,7 +198,7 @@ Erreur : `FORGE_ENTITY_SCHEMA_INVALID` — `id` est interdit dans `fields[]`.
 { "name": "title", "sql_type": "VARCHAR(255)" }
 ```
 
-Erreur : `FORGE_ENTITY_SCHEMA_INVALID` — clés inconnues interdites (`additionalProperties: false`).
+Erreur : `FORGE_ENTITY_SCHEMA_INVALID`, clés inconnues interdites (`additionalProperties: false`).
 
 ---
 
@@ -208,7 +208,7 @@ Erreur : `FORGE_ENTITY_SCHEMA_INVALID` — clés inconnues interdites (`addition
 { "name": "title", "type": "VARCHAR(255)" }
 ```
 
-Erreur : `FORGE_ENTITY_SCHEMA_INVALID` — `VARCHAR(255)` n'est pas un type Forge.
+Erreur : `FORGE_ENTITY_SCHEMA_INVALID`, `VARCHAR(255)` n'est pas un type Forge.
 
 ---
 
@@ -218,7 +218,7 @@ Erreur : `FORGE_ENTITY_SCHEMA_INVALID` — `VARCHAR(255)` n'est pas un type Forg
 { "type": "many_to_one", "from": "Article", "to": "NonExistant", "name": "ref" }
 ```
 
-Erreur : `FORGE_RELATION_UNKNOWN_ENTITY` — l'entité cible doit être déclarée.
+Erreur : `FORGE_RELATION_UNKNOWN_ENTITY`, l'entité cible doit être déclarée.
 
 ---
 
@@ -228,7 +228,7 @@ Erreur : `FORGE_RELATION_UNKNOWN_ENTITY` — l'entité cible doit être déclar�
 "indexes": [{ "name": "idx_x", "fields": ["nonexistent"] }]
 ```
 
-Erreur : `FORGE_ENTITY_INVALID_INDEX` — le champ ciblé doit exister dans `fields[]`.
+Erreur : `FORGE_ENTITY_INVALID_INDEX`, le champ ciblé doit exister dans `fields[]`.
 
 ---
 
@@ -238,7 +238,7 @@ Erreur : `FORGE_ENTITY_INVALID_INDEX` — le champ ciblé doit exister dans `fie
 "fields": [{ "name": "article_id", "type": "integer" }]
 ```
 
-Erreur : `FORGE_PIVOT_RESERVED_FIELD` — `id`, `from_key` et `to_key` sont réservés.
+Erreur : `FORGE_PIVOT_RESERVED_FIELD`, `id`, `from_key` et `to_key` sont réservés.
 
 ---
 
@@ -248,8 +248,8 @@ Certaines commandes Forge utilisent les contrats JSON comme garde-fou automatiqu
 
 | Commande | Comportement en cas d'erreur |
 |---|---|
-| `forge build:model` | arrêt et message court — lancer `entity:validate` pour le détail |
-| `forge make:crud` | arrêt et message court — lancer `entity:validate` pour le détail |
+| `forge build:model` | arrêt et message court, lancer `entity:validate` pour le détail |
+| `forge make:crud` | arrêt et message court, lancer `entity:validate` pour le détail |
 | `forge migration:diff --entity` | arrêt sur erreur de contrat |
 | `forge migration:make --from-diff` | arrêt sur erreur de contrat |
 
@@ -277,7 +277,7 @@ La sortie JSON peut être exploitée par un outil ou un script pour extraire les
 
 ## Limites
 
-- VS Code peut aider à la saisie via `$schema`, mais ne remplace pas `entity:validate` — les erreurs sémantiques (entités inconnues, collisions, doublons) ne sont pas détectées par l'éditeur.
+- VS Code peut aider à la saisie via `$schema`, mais ne remplace pas `entity:validate`, les erreurs sémantiques (entités inconnues, collisions, doublons) ne sont pas détectées par l'éditeur.
 - Les starters Forge utilisent tous le format canonique `schema_version: "1.0"`. Le format `format_version: 1` est refusé par `build:model` et `make:crud`.
-- `entity:validate` valide les contrats JSON, pas l'état réel d'une base MariaDB déjà déployée — utiliser les commandes de migration pour comparer avec la base.
-- La sortie JSON (`--json`) est un contrat d'outil maintenu par les tests — ne pas la parser manuellement en production sans vérifier la compatibilité de version.
+- `entity:validate` valide les contrats JSON, pas l'état réel d'une base MariaDB déjà déployée, utiliser les commandes de migration pour comparer avec la base.
+- La sortie JSON (`--json`) est un contrat d'outil maintenu par les tests, ne pas la parser manuellement en production sans vérifier la compatibilité de version.

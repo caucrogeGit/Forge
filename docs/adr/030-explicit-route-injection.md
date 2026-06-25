@@ -1,8 +1,8 @@
-# ADR-030 — Injection de routes par commande explicite et règle 4.3
+# ADR-030, Injection de routes par commande explicite et règle 4.3
 
 ## Statut
 
-Proposé — Forge 1.0.0-beta.15 (ticket `ADR-EXPLICIT-ROUTE-INJECTION-001`).
+Proposé, Forge 1.0.0-beta.15 (ticket `ADR-EXPLICIT-ROUTE-INJECTION-001`).
 Révisé en 1.0.0-beta.17 (ticket `ADR-030-REVISION-001`) pour retirer la
 référence à `starter:build`, commande supprimée par l'ADR-035.
 

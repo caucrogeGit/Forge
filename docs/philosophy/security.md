@@ -25,7 +25,7 @@ Le RBAC complet (`Role`, `Permission`, `@require_permission`, `make_can`…) est
 
 ### TLS du serveur de développement
 
-Le serveur HTTPS intégré à Forge impose explicitement **TLS 1.2 minimum** (`ssl.TLSVersion.TLSv1_2`). Il est destiné au développement local, à la pédagogie et aux tests — pas à la production.
+Le serveur HTTPS intégré à Forge impose explicitement **TLS 1.2 minimum** (`ssl.TLSVersion.TLSv1_2`). Il est destiné au développement local, à la pédagogie et aux tests, pas à la production.
 
 **En production, TLS doit être terminé par Nginx** ou un reverse proxy équivalent. Forge écoute en HTTP local derrière Nginx.
 
@@ -47,16 +47,16 @@ APP_CSP_NONCE_ENABLED=true
 
 ## En-têtes de sécurité
 
-Forge applique des en-têtes HTTP de sécurité par défaut sur toutes les réponses (200, 302, 404, fichiers statiques, erreurs). Ces en-têtes sont des garde-fous par défaut — ils ne remplacent pas une configuration de déploiement complète.
+Forge applique des en-têtes HTTP de sécurité par défaut sur toutes les réponses (200, 302, 404, fichiers statiques, erreurs). Ces en-têtes sont des garde-fous par défaut, ils ne remplacent pas une configuration de déploiement complète.
 
 ### Contrat actuel
 
 | En-tête | Rôle | Valeur | Limite |
 |---|---|---|---|
 | `X-Frame-Options` | Protection clickjacking | `DENY` | Complété par `frame-ancestors 'none'` en CSP |
-| `X-Content-Type-Options` | Blocage MIME sniffing | `nosniff` | — |
+| `X-Content-Type-Options` | Blocage MIME sniffing | `nosniff` |, |
 | `Strict-Transport-Security` | Forcer HTTPS (HSTS) | `max-age=31536000; includeSubDomains` | Émis même en HTTP local ; la protection réelle requiert HTTPS côté reverse proxy |
-| `Referrer-Policy` | Contrôle du referrer | `strict-origin-when-cross-origin` | — |
+| `Referrer-Policy` | Contrôle du referrer | `strict-origin-when-cross-origin` |, |
 | `Content-Security-Policy` | Restriction des sources | Voir section CSP | Ne remplace pas une revue des templates |
 | `Permissions-Policy` | Restriction des API navigateur | `camera=(), microphone=(), geolocation=(), payment=()` | Ne couvre pas toutes les API navigateur |
 
@@ -69,7 +69,7 @@ default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:;
 frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'
 ```
 
-`unsafe-inline` et `unsafe-eval` ne sont jamais ajoutés automatiquement. Pour les scripts inline contrôlés, activer le nonce par requête (`APP_CSP_NONCE_ENABLED=true` — voir section Nonce CSP ci-dessus).
+`unsafe-inline` et `unsafe-eval` ne sont jamais ajoutés automatiquement. Pour les scripts inline contrôlés, activer le nonce par requête (`APP_CSP_NONCE_ENABLED=true`, voir section Nonce CSP ci-dessus).
 
 ### HSTS
 
@@ -92,7 +92,7 @@ Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis 
 
 ---
 
-## Service de fichiers — défense symlinks (UPLOADS-SYMLINK-DEFENSE-001)
+## Service de fichiers, défense symlinks (UPLOADS-SYMLINK-DEFENSE-001)
 
 Les fichiers publics servis par Forge (route `/static/...` par `app.py`, route
 `/media/...` servie par le module d'upload optionnel)

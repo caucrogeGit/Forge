@@ -1,4 +1,4 @@
-# Tests terrain — Tickets détaillés
+# Tests terrain, Tickets détaillés
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -48,6 +48,6 @@ Deux options disponibles :
 
 ## Rappel
 
-Ces tickets font partie de la campagne de tests terrain dont la roadmap complète est dans [Roadmap — Tests terrain Forge](../../roadmap/forge-field-test-roadmap.md).
+Ces tickets font partie de la campagne de tests terrain dont la roadmap complète est dans [Roadmap, Tests terrain Forge](../../roadmap/forge-field-test-roadmap.md).
 
 Chaque retour de ticket doit respecter la [charte de campagne](../field-test-charter.md).

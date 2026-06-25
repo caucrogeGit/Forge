@@ -25,7 +25,7 @@ voir et brancher les modules opt-in qu'il active :
 - quelle **documentation locale** existe ;
 - comment ils sont branchés dans `mvc/routes.py`.
 
-C'est l'équivalent Forge — volontairement simple et sans magie — de ce
+C'est l'équivalent Forge, volontairement simple et sans magie, de ce
 que les **bundles** apportent dans Symfony, mais aligné sur la charte
 Forge (pas d'écriture invisible, refus de la magie cachée, une seule
 façon officielle de faire).
@@ -43,7 +43,7 @@ Deux choses distinctes, à ne jamais confondre :
 
 Règle verrouillée : **les packages distribués restent dans
 `packages/forge-mvc-*`**. Le dossier `optins/` côté projet **ne contient
-pas** le code complet du package — il ne fait que le **brancher**.
+pas** le code complet du package, il ne fait que le **brancher**.
 
 ## Pourquoi pas de découverte automatique
 
@@ -218,7 +218,7 @@ clôture IoT](../history/audits/audit-iot-closing.md).
 |---|---|
 | Bundle = package réutilisable | Package opt-in `forge-mvc-*` |
 | `config/bundles.php` liste les bundles actifs | `optins/registry.py` liste les opt-ins branchés |
-| Auto-configuration / compiler passes | **Aucune** auto-config — branchement explicite |
+| Auto-configuration / compiler passes | **Aucune** auto-config, branchement explicite |
 | Recipes Flex modifient le projet | Forge **n'écrit jamais** en invisible (§9) |
 | Bundle découvert par le framework | **Pas de discovery magique** ; appel explicite |
 
@@ -256,21 +256,21 @@ Ce ticket **pose le contrat**. Ne sont **pas** faits ici :
 
 ## Tickets suivants
 
-- `OPTINS-IOT-PROJECT-BRIDGE-001` (**livré**) — applique concrètement
+- `OPTINS-IOT-PROJECT-BRIDGE-001` (**livré**), applique concrètement
   cette structure à Forge IoT : le starter `welcome-optin-iot` génère
   `optins/iot/` et branche l'API via `optins/registry.py`.
-- `OPTINS-CLI-ENABLE-AUDIT-001` (**livré**) — cadre la future commande
+- `OPTINS-CLI-ENABLE-AUDIT-001` (**livré**), cadre la future commande
   `forge optin:enable` : voir l'[audit `forge optin:enable`](optins-cli-enable-audit.md)
   (commande cible, idempotence, dry-run, gestion des conflits, sans
   discovery ni écrasement silencieux).
-- `OPTINS-CLI-ENABLE-IOT-001` (**livré**) — implémente
+- `OPTINS-CLI-ENABLE-IOT-001` (**livré**), implémente
   `forge optin:enable iot` (dry-run par défaut, `--apply`, idempotent).
   Voir la
   [référence CLI](../reference/cli-commands.md#opt-ins-branchement-projet).
-- `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` (**livré**) — `--apply` branche
+- `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` (**livré**), `--apply` branche
   `mvc/routes.py` **si la structure est reconnue** (`router = Router()`),
   sinon `[WARN]` + instruction manuelle (aucune modification).
-- `OPTINS-CLI-LIST-001` (**livré**) — `forge optin:list`, commande
+- `OPTINS-CLI-LIST-001` (**livré**), `forge optin:list`, commande
   **lecture seule** qui affiche l'état local des opt-ins `route` (`absent` /
   `partiel` / `activé` pour `iot`, `video`, `audio`) et liste les opt-ins
   `library` / `crosscutting` avec leur kind, sans rien créer ni modifier.

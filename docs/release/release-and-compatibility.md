@@ -69,15 +69,15 @@ Définit ce qui est stable, interne ou expérimental en Forge :
 
 Ces documents concernent les mainteneurs de Forge :
 
-- [Procédure de release](release.md) — checklist avant chaque tag
-- [Validation locale](release-local.md) — test de la wheel localement
+- [Procédure de release](release.md), checklist avant chaque tag
+- [Validation locale](release-local.md), test de la wheel localement
 
 ---
 
 ## Voir aussi
 
-- [Guide de déploiement](../deployment/deployment.md) — déployer un projet Forge
-- [Sécurité en production](../deployment/production-security.md) — checklist sécurité 30 points
-- [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
+- [Guide de déploiement](../deployment/deployment.md), déployer un projet Forge
+- [Sécurité en production](../deployment/production-security.md), checklist sécurité 30 points
+- [Politique de release](release-policy.md), règles MAJOR/MINOR/PATCH
 
 ---

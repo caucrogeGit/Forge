@@ -22,8 +22,8 @@ noyau minimal (principe §8). Forge en distribue six officiels :
 
 Un opt-in a une **source** :
 
-- **officielle** — livré comme *package* PyPI ;
-- **locale** — un *module* que tu écris dans ton projet.
+- **officielle**, livré comme *package* PyPI ;
+- **locale**, un *module* que tu écris dans ton projet.
 
 Son cycle de vie suit deux axes orthogonaux (quatre verbes) :
 
@@ -46,7 +46,7 @@ Un opt-in activé vit sous `optins/<name>/`, quelle que soit sa source.
 
 Le simple **véhicule de distribution** : un opt-in officiel est *livré comme*
 un package PyPI sous le namespace `forge-mvc-*`, et expose son API depuis le
-namespace Python `forge_mvc_*`. Terme purement technique — on n'« installe pas
+namespace Python `forge_mvc_*`. Terme purement technique, on n'« installe pas
 un package », on **active un opt-in** (qui se trouve livré comme package).
 
 ## module
@@ -56,8 +56,8 @@ applicative que le développeur **écrit lui-même** dans son projet, par
 opposition à une brique officielle qu'il **consomme**. Dans le modèle ADR-016,
 un module local est un opt-in de **source locale**.
 
-Il garde toutefois ses **commandes propres** — `forge module:install` /
-`module:files` / `module:routes` / `module:remove` — et **non** la famille
+Il garde toutefois ses **commandes propres**, `forge module:install` /
+`module:files` / `module:routes` / `module:remove`, et **non** la famille
 `opt-in:*` ([ADR-016, amendement A2](../adr/016-opt-in-unification.md)) :
 son cycle de vie d'**auteur** (déclarer → copier → générer des routes à coller)
 diffère de celui d'un opt-in officiel qu'on *consomme* (`install` affiche /

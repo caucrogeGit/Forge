@@ -1,8 +1,8 @@
-# ADR-035 — Modèle pédagogique unique : parcours réalisés à la main, retrait de la génération
+# ADR-035, Modèle pédagogique unique : parcours réalisés à la main, retrait de la génération
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.16 (ticket `ADR-STARTERS-MANUAL-001`).
+Accepté, Forge 1.0.0-beta.16 (ticket `ADR-STARTERS-MANUAL-001`).
 
 Supersède l'ADR-023 (`forge starter:build` comme façon canonique de construire un
 starter) et clôt le volet `starter:build` laissé ouvert par l'ADR-030.
@@ -143,12 +143,12 @@ lieu avant que la documentation ne soit autosuffisante.** L'ordre est :
 
 ## Charte appliquée
 
-- Principe 3 — refuser la magie cachée (plus d'injection de routes).
-- Principe 9 — pas d'écriture invisible dans le code utilisateur (`mvc/routes.py`
+- Principe 3, refuser la magie cachée (plus d'injection de routes).
+- Principe 9, pas d'écriture invisible dans le code utilisateur (`mvc/routes.py`
   n'est plus réécrit par Forge pour les starters).
-- Principe 11 — une seule façon officielle de faire chaque chose (modèle manuel
+- Principe 11, une seule façon officielle de faire chaque chose (modèle manuel
   unique).
-- Règle A — retirer la cause (la génération), pas le symptôme (les bugs
+- Règle A, retirer la cause (la génération), pas le symptôme (les bugs
   d'injection de routes).
-- Note pré-1.0 — en phase bêta, le retrait se fait sans alias déprécié ni guide
+- Note pré-1.0, en phase bêta, le retrait se fait sans alias déprécié ni guide
   de migration externe.

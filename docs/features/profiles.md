@@ -41,7 +41,7 @@ forge new MonProjet --profile standard
 
 | Profil | Usage | Base |
 |---|---|---|
-| `minimal` | Projet le plus simple, pédagogique | — |
+| `minimal` | Projet le plus simple, pédagogique |, |
 | `standard` | Application classique recommandée | `minimal` + composants standard |
 | `dynamic` | Application avec interactions front légères | `standard` + intention HTMX / Alpine.js |
 | `multilingual` | Application prête pour l'internationalisation | `standard` + intention i18n |
@@ -185,7 +185,7 @@ La Phase 9 a livré l'intégralité du contrat des profils :
 |---|---|
 | `PROFILE-001` | Contrat : `SUPPORTED_PROJECT_PROFILES`, `DEFAULT_PROJECT_PROFILE`, descriptions |
 | `PROFILE-002` | Option `--profile` dans `forge new`, écriture de `forge_profile.txt` |
-| `PROFILE-003` | Tests de génération par profil — les 4 profils validés automatiquement |
+| `PROFILE-003` | Tests de génération par profil, les 4 profils validés automatiquement |
 | `PROFILE-DOC-001` | Documentation finale consolidée |
 
 ---
@@ -201,7 +201,7 @@ Un profil cible une **base technique** ; un starter fournit un **exemple d'appli
 | Projet avec relation many_to_one | `standard` | Carnet de contacts |
 | Projet avec authentification (moderne) | `standard` | Utilisateurs/Auth |
 | Démonstrateur avancé, pages publiques | `standard` | Communes & Séjours |
-| Démonstrateur historique / legacy | — | Suivi pédagogique (non recommandé pour un nouveau projet) |
+| Démonstrateur historique / legacy |, | Suivi pédagogique (non recommandé pour un nouveau projet) |
 
 Les statuts des starters ont été formalisés dans `STARTER-LEGACY-AUDIT-001` et `STARTER-LEGACY-DECISION-001`. Le ticket `STARTER-CS-REPLACE-001` confirme Communes & Séjours comme démonstrateur avancé principal.
 

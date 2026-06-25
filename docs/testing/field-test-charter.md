@@ -1,4 +1,4 @@
-# Tests terrain — Charte de campagne
+# Tests terrain, Charte de campagne
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -238,7 +238,7 @@ git diff --check
 Si le ticket touche un projet de test, il peut demander un commit local de preuve, mais ce n’est pas obligatoire.
 
 
-## 13. Verrou — Documentation officielle erronée pendant un test
+## 13. Verrou, Documentation officielle erronée pendant un test
 
 La documentation officielle fait partie de ce qui est testé.
 

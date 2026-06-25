@@ -1,8 +1,8 @@
-# ADR-015 — Handshake TLS par thread client pour le serveur de développement
+# ADR-015, Handshake TLS par thread client pour le serveur de développement
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.9 (ticket `APP-PY-TLS-HANDSHAKE-PER-THREAD-001`).
+Accepté, Forge 1.0.0-beta.9 (ticket `APP-PY-TLS-HANDSHAKE-PER-THREAD-001`).
 
 ---
 
@@ -38,7 +38,7 @@ handshake TLS à s'exécuter de manière synchrone dans le thread appelant.
 
 Comme `accept()` tourne dans le thread principal de `serve_forever()`, le
 handshake TLS bloque ce thread tant qu'il n'est pas terminé. `ThreadingMixIn`
-ne lance son thread enfant qu'**après** le retour de `get_request()` — donc
+ne lance son thread enfant qu'**après** le retour de `get_request()`, donc
 après le handshake. Le thread-par-requête ne protège donc pas du handshake
 TLS bloquant.
 
@@ -50,7 +50,7 @@ accepté) :
 
 - Après 2 à 6 requêtes navigateur (selon le pre-connect), le serveur se fige
   sans traceback.
-- `ss -tlnp | grep 8000` montre `Recv-Q: 5` — la file d'attente du kernel est
+- `ss -tlnp | grep 8000` montre `Recv-Q: 5`, la file d'attente du kernel est
   saturée.
 - Côté client : `ERR_TIMED_OUT` dans Chrome, `Connection timed out after
   10001 milliseconds` sur curl.
@@ -94,12 +94,12 @@ TCP accept()                       (thread principal — non bloquant)
 - Le serveur dev ne se fige plus après quelques connexions TLS interrompues
   ou refusées.
 - Un client TLS lent, muet, mal configuré, ou parlant le mauvais protocole
-  n'occupe que son propre thread — la boucle d'accept reste disponible.
+  n'occupe que son propre thread, la boucle d'accept reste disponible.
 - Le port 8000 reste utilisable avec VS Code Remote SSH, port forwarding,
   navigateurs distants, et scanners de sécurité agressifs sans dégradation.
 - Le comportement est plus robuste face aux certificats auto-signés non
   encore acceptés par le navigateur.
-- Les handshakes échoués sont visibles dans les logs (`WARNING — Handshake
+- Les handshakes échoués sont visibles dans les logs (`WARNING, Handshake
   TLS échoué depuis <addr> : <message>`).
 
 ### Limites
@@ -111,7 +111,7 @@ TCP accept()                       (thread principal — non bloquant)
   via `config.py` est un ticket de suivi (`APP-TLS-HANDSHAKE-TIMEOUT-CONFIG`,
   hors scope de cet ADR).
 - L'observabilité des handshakes TLS échoués reste limitée au log
-  (`WARNING`). Pas de compteur, pas de métrique exportée — un ticket de
+  (`WARNING`). Pas de compteur, pas de métrique exportée, un ticket de
   suivi optionnel a été suggéré.
 - Le serveur dev reste mono-processus. Le multi-worker (Gunicorn, uWSGI)
   reste l'apanage du déploiement production via WSGI.
@@ -120,7 +120,7 @@ TCP accept()                       (thread principal — non bloquant)
 
 ## Alternatives écartées
 
-### A — Continuer à wrapper le socket d'écoute
+### A, Continuer à wrapper le socket d'écoute
 
 Maintenir `server.socket = ssl_ctx.wrap_socket(server.socket, ...)`.
 
@@ -128,17 +128,17 @@ Rejeté : c'est exactement le code qui produit le blocage. Tout client TLS
 qui ne complète pas son handshake fige toute la boucle d'acceptation. La
 preuve a été reproduite et documentée.
 
-### B — Surcharger uniquement `get_request()` pour wrapper là
+### B, Surcharger uniquement `get_request()` pour wrapper là
 
 Surcharger `BaseServer.get_request()` pour appeler `wrap_socket()` après
 `accept()`.
 
 Rejeté : `get_request()` est appelée par `serve_forever()` dans le thread
 principal, exactement comme `accept()`. Le handshake TLS y est aussi
-bloquant. Cette approche avait été proposée dans un ticket antérieur — c'est
+bloquant. Cette approche avait été proposée dans un ticket antérieur, c'est
 une fausse piste.
 
-### C — Supprimer TLS du serveur de développement
+### C, Supprimer TLS du serveur de développement
 
 Désactiver le mode HTTPS de `app.py`, imposer HTTP en dev.
 
@@ -147,7 +147,7 @@ navigateur, notamment les cookies `Secure`, le contenu mixte HTTPS/HTTP, et
 les en-têtes HSTS. Supprimer ce mode appauvrirait la pédagogie sans
 contrepartie.
 
-### D — Imposer un reverse proxy même en développement
+### D, Imposer un reverse proxy même en développement
 
 Documenter l'usage obligatoire d'un Nginx/Caddy local pour terminer TLS,
 même en dev.
@@ -156,7 +156,7 @@ Rejeté : trop lourd pour un usage pédagogique et quotidien. Forge vise un
 démarrage en quelques minutes (`python app.py`). Imposer un reverse proxy
 en plus contredirait cet objectif.
 
-### E — Utiliser `ThreadingHTTPSServer` (Python 3.14+)
+### E, Utiliser `ThreadingHTTPSServer` (Python 3.14+)
 
 `http.server.ThreadingHTTPSServer` a été ajouté en Python 3.14 et résout
 nativement ce problème.

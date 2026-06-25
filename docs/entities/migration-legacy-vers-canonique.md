@@ -29,13 +29,13 @@ python forge.py entity:validate
 ```
 
 `entity:validate` valide le format canonique (`schema_version: "1.0"`) via JSON Schema.
-Un fichier legacy ne passe pas cette validation — c'est attendu et normal avant migration.
+Un fichier legacy ne passe pas cette validation, c'est attendu et normal avant migration.
 
 ---
 
 ## 2. Migrer une entité
 
-### Avant — format legacy
+### Avant, format legacy
 
 ```json
 {
@@ -72,7 +72,7 @@ Un fichier legacy ne passe pas cette validation — c'est attendu et normal avan
 }
 ```
 
-### Après — format canonique
+### Après, format canonique
 
 ```json
 {
@@ -107,9 +107,9 @@ Un fichier legacy ne passe pas cette validation — c'est attendu et normal avan
 |---|---|
 | `format_version: 1` | `schema_version: "1.0"` |
 | `entity: "Contact"` | `name: "Contact"` |
-| Champ `contact_id` (PK explicite) | **Supprimé** — Forge génère `Id` automatiquement |
+| Champ `contact_id` (PK explicite) | **Supprimé**, Forge génère `Id` automatiquement |
 | `sql_type: "VARCHAR(80)"` | `type: "string"` |
-| `python_type: "str"` | **Supprimé** — dérivé automatiquement |
+| `python_type: "str"` | **Supprimé**, dérivé automatiquement |
 | `primary_key: true` | **Supprimé** |
 | `auto_increment: true` | **Supprimé** |
 | `constraints: { max_length: 80 }` | `max_length: 80` (propriété directe) |
@@ -123,15 +123,15 @@ Un fichier legacy ne passe pas cette validation — c'est attendu et normal avan
 | Legacy (`sql_type`) | Canonique (`type`) | Paramètres supplémentaires |
 |---|---|---|
 | `VARCHAR(n)` | `string` | `max_length: n` |
-| `TEXT` | `text` | — |
-| `INT` / `BIGINT` | `integer` | — |
-| `BOOLEAN` / `TINYINT(1)` | `boolean` | — |
-| `DATE` | `date` | — |
-| `DATETIME` / `TIMESTAMP` | `datetime` | — |
+| `TEXT` | `text` |, |
+| `INT` / `BIGINT` | `integer` |, |
+| `BOOLEAN` / `TINYINT(1)` | `boolean` |, |
+| `DATE` | `date` |, |
+| `DATETIME` / `TIMESTAMP` | `datetime` |, |
 | `DECIMAL(p, s)` | `decimal` | `precision: p, scale: s` |
 | `VARCHAR(n)` (mot de passe) | `password` | `max_length: n` |
 
-Les types `python_type` (`str`, `int`, `bool`, etc.) sont tous supprimés — Forge les dérive
+Les types `python_type` (`str`, `int`, `bool`, etc.) sont tous supprimés, Forge les dérive
 automatiquement du type canonique lors de la génération.
 
 ---
@@ -142,7 +142,7 @@ automatiquement du type canonique lors de la génération.
 
 Dans les anciens projets, la clé primaire était souvent nommée `ContactId`, `UtilisateurId`,
 `VilleId`, etc. Dans le format canonique, Forge génère une colonne technique `Id`
-automatiquement — elle n'est pas à déclarer dans les champs.
+automatiquement, elle n'est pas à déclarer dans les champs.
 
 **Si du code applicatif référence l'ancienne PK, il doit être mis à jour** :
 
@@ -164,7 +164,7 @@ grep -RInE 'row\["\w+Id"\]|utilisateur\["\w+Id"\]|contact\["\w+Id"\]' mvc/
 ### FK métier (`ville_id`, `cours_id`, etc.)
 
 Les colonnes qui sont des **clés étrangères métier** (ex. `ville_id`, `cours_id`) ne sont
-**pas** la PK de l'entité — elles restent dans les champs et ne changent pas de nom.
+**pas** la PK de l'entité, elles restent dans les champs et ne changent pas de nom.
 
 ```json
 { "name": "ville_id", "type": "integer", "nullable": true }
@@ -177,7 +177,7 @@ d'être modifié.
 
 ## 5. Migrer `relations.json`
 
-### Avant — format legacy
+### Avant, format legacy
 
 ```json
 {
@@ -194,7 +194,7 @@ d'être modifié.
 }
 ```
 
-### Après — format canonique
+### Après, format canonique
 
 ```json
 {
@@ -274,7 +274,7 @@ et les éventuels attributs métier dans `fields[]`.
   canonique. Elle doit être supprimée ou transformée en champs métier séparés.
 - **`min` / `max`** : ces contraintes sont validées par le JSON Schema mais ne génèrent
   pas forcément de contrainte `CHECK` SQL dans la version actuelle.
-- **`nullable`** : à vérifier pour chaque champ — la valeur par défaut peut différer
+- **`nullable`** : à vérifier pour chaque champ, la valeur par défaut peut différer
   entre legacy et canonique.
 - **Code applicatif** : les modèles, contrôleurs et vues qui référencent des colonnes
   supprimées (ex. l'ancienne PK) doivent être mis à jour manuellement.

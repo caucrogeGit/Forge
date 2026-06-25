@@ -1,4 +1,4 @@
-# ADR-007 — Adoption formelle de la charte philosophique v2
+# ADR-007, Adoption formelle de la charte philosophique v2
 
 ## Statut
 
@@ -40,19 +40,19 @@ de développement et d'évolution du framework.
 
 La charte v2 ajoute par rapport à la v1 :
 
-- **Principe 8** — Noyau minimal, briques opt-in
-- **Principe 9** — Pas d'écriture invisible dans le code utilisateur
-- **Principe 10** — Une API publique est un contrat de complétude
-- **Principe 11** — Une seule façon officielle de faire chaque chose
-- **Règles d'évolution A-D** — cadre explicite pour gérer les changements
-- **Périmètre du noyau** — définition canonique de ce qui appartient à `core/`
-- **Formule de décision finale** — critère opérationnel pour évaluer toute
+- **Principe 8**, Noyau minimal, briques opt-in
+- **Principe 9**, Pas d'écriture invisible dans le code utilisateur
+- **Principe 10**, Une API publique est un contrat de complétude
+- **Principe 11**, Une seule façon officielle de faire chaque chose
+- **Règles d'évolution A-D**, cadre explicite pour gérer les changements
+- **Périmètre du noyau**, définition canonique de ce qui appartient à `core/`
+- **Formule de décision finale**, critère opérationnel pour évaluer toute
   proposition
 
 La charte v2 est publiée dans `CHARTE_DOC.md` à la racine du dépôt.
 La charte v1 est archivée dans `docs/history/charte-v1.md`.
 
-Toute décision future — ticket, PR, refactoring, extraction de module — doit
+Toute décision future, ticket, PR, refactoring, extraction de module, doit
 pouvoir s'appuyer sur un ou plusieurs principes de la charte v2.
 
 ---
@@ -72,8 +72,8 @@ pouvoir s'appuyer sur un ou plusieurs principes de la charte v2.
 
 ## Ce que cette ADR ne fait pas
 
-- N'applique pas les décisions des autres ADR (003-006) — ce sont des tickets
+- N'applique pas les décisions des autres ADR (003-006), ce sont des tickets
   de la phase 14.3.
-- Ne supprime pas la charte v1 — elle est archivée, pas effacée.
-- Ne définit pas de processus d'amendement de la charte — les amendements
+- Ne supprime pas la charte v1, elle est archivée, pas effacée.
+- Ne définit pas de processus d'amendement de la charte, les amendements
   futurs feront l'objet de nouvelles ADR.

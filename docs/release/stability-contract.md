@@ -81,7 +81,7 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 
 | Domaine | Statut |
 |---|---|
-| `forge module:*` (list, install, files, routes) | Expérimental — interface susceptible d'évoluer |
+| `forge module:*` (list, install, files, routes) | Expérimental, interface susceptible d'évoluer |
 | `forge check:model` | Expérimental |
 | `forge deploy:init`, `forge deploy:check` | Expérimental |
 | Pages publiques (`make:public-*`) | Disponible, interface stable, comportement peut s'affiner |
@@ -95,7 +95,7 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 
 ## Fichiers générés
 
-### Régénérables — Forge peut les écraser
+### Régénérables, Forge peut les écraser
 
 Ces fichiers sont entièrement pilotés par le JSON canonique. Toute modification manuelle sera perdue à la prochaine régénération.
 
@@ -105,14 +105,14 @@ Ces fichiers sont entièrement pilotés par le JSON canonique. Toute modificatio
 | `mvc/entities/<e>/<e>.sql` | `forge build:model`, `forge sync:entity` |
 | `mvc/entities/relations.sql` | `forge sync:relations` |
 
-### Sources canoniques — à éditer, jamais régénérées
+### Sources canoniques, à éditer, jamais régénérées
 
 | Fichier | Règle |
 |---|---|
 | `mvc/entities/<e>/<e>.json` | Source unique de vérité pour l'entité |
 | `mvc/entities/relations.json` | Source unique de vérité pour les relations |
 
-### Générés une fois — Forge ne réécrit pas si le fichier existe
+### Générés une fois, Forge ne réécrit pas si le fichier existe
 
 Ces fichiers sont créés par un générateur lors de la première exécution. Forge vérifie leur existence avant d'écrire et ne les écrase jamais sans action explicite (`--force` si disponible).
 
@@ -234,7 +234,7 @@ Ces commandes et leurs options documentées sont garanties pour Forge 1.x.
 |---|---|
 | `forge help` / `--help` / `-h` | Affiche l'aide groupée sur stdout, code 0. |
 | `forge` (sans argument) | Identique à `forge help`. |
-| Module source de l'aide | `cli/_support/help.py` — `build_help(version: str)` |
+| Module source de l'aide | `cli/_support/help.py`, `build_help(version: str)` |
 
 La distinction entre `forge doctor` (tolérant) et `forge project:check` (strict) est documentée dans l'aide générale.
 
@@ -305,7 +305,7 @@ Les points suivants seront traités dans des tickets dédiés :
 - Garantie sur les modules internes non documentés.
 - Garantie sur les starters (code généré, non versionnés dans les projets utilisateur).
 - Garantie sur les backends de session expérimentaux (FileStore, MariaDbStore).
-- La rétrocompatibilité du module `forge-mvc-mfa` tant qu'il reste Alpha — les API peuvent évoluer avant Beta.
+- La rétrocompatibilité du module `forge-mvc-mfa` tant qu'il reste Alpha, les API peuvent évoluer avant Beta.
 - Les API privées préfixées par `_` peuvent changer entre versions mineures sans notice.
 
 ---

@@ -1,4 +1,4 @@
-# ADR-017 — Type `slug` et module URL-slug canonique
+# ADR-017, Type `slug` et module URL-slug canonique
 
 ## Statut
 
@@ -20,10 +20,10 @@ partageables, SEO-friendly.
 L'audit de l'existant (`BETA13-EXISTING-AUDIT-001`) révèle un terrain
 **partiellement défriché mais incohérent** :
 
-- **`cli/public_page._slugify`** — un **validateur strict** (kebab-case,
+- **`cli/public_page._slugify`**, un **validateur strict** (kebab-case,
   `[a-z0-9-]`) qui **rejette les accents** (`ValueError` sur « Écrire ») ; ce
   n'est **pas** un générateur. 1 seul usage.
-- **`cli/entities/migrations.slugify_migration_name`** — un
+- **`cli/entities/migrations.slugify_migration_name`**, un
   **transformeur snake_case** (`_`) pour les **noms de fichiers de
   migration** : concept **différent** d'une URL slug (format et finalité
   distincts).
@@ -31,14 +31,14 @@ L'audit de l'existant (`BETA13-EXISTING-AUDIT-001`) révèle un terrain
   (`cli/entities/validation.py`) + `SlugField` dans le CRUD, **sans
   logique de génération**.
 
-Trois objets « slug » coexistent donc, avec des contrats divergents — risque
+Trois objets « slug » coexistent donc, avec des contrats divergents, risque
 de duplication (charte §11) si on ajoute naïvement une 4ᵉ fonction.
 
 ---
 
 ## Décision
 
-### D1 — Deux concepts distincts, nommés clairement
+### D1, Deux concepts distincts, nommés clairement
 
 - **URL slug** (kebab-case `-`, pour les URLs publiques) → **un seul module
   canonique `core/http/slug.py`**.
@@ -46,10 +46,10 @@ de duplication (charte §11) si on ajoute naïvement une 4ᵉ fonction.
   `slugify_migration_name`, **séparé**. Ce **n'est pas** une URL slug ; un
   commentaire le précise pour éviter toute fusion future.
 
-### D2 — Module canonique `core/http/slug.py` (runtime, stdlib seul)
+### D2, Module canonique `core/http/slug.py` (runtime, stdlib seul)
 
 Deux fonctions publiques, **dépendances stdlib uniquement** (`unicodedata`,
-`re`) — respect du runtime minimal (charte) :
+`re`), respect du runtime minimal (charte) :
 
 ```python
 def slugify(text: str, *, max_length: int = 180) -> str
@@ -68,7 +68,7 @@ Le runtime (contrôleurs/modèles générés) et le CLI (codegen) importent ce m
 module. `cli/public_page._slugify` est **remplacé** par `core.http.slug`
 (§11 : une seule implémentation URL-slug).
 
-### D3 — Le type `slug` dans le contrat d'entité
+### D3, Le type `slug` dans le contrat d'entité
 
 `slug` est un type de champ de **premier rang** du contrat d'entité JSON
 (au même titre que `string`, `email`…), validé par le contrat (ADR-013) :
@@ -80,14 +80,14 @@ module. `cli/public_page._slugify` est **remplacé** par `core.http.slug`
 Sémantique : identifiant URL-safe d'une ressource. La génération SQL produit
 `VARCHAR(180)` + contrainte `UNIQUE` visible (charte « SQL visible »).
 
-### D4 — Unicité : rejet des doublons (pas de suffixe auto en b13)
+### D4, Unicité : rejet des doublons (pas de suffixe auto en b13)
 
 Le CRUD généré refuse un slug en doublon avec une **erreur claire**. Le
 suffixe automatique (`mon-article-2`) introduit une complexité de
 concurrence (race sur insert) non justifiée en dernière beta → **reporté
 après 1.0**.
 
-### D5 — Périmètre b13
+### D5, Périmètre b13
 
 Inclus : module canonique, validation, type d'entité, génération SQL/CRUD,
 routing public par slug (`SLUG-ROUTING-001`).
@@ -99,7 +99,7 @@ sitemap, slugs multilingues.
 ## Conséquences
 
 - `public_page._slugify` change de comportement : il **translittère** les
-  accents au lieu de les rejeter (plus utile) — ses tests sont ajustés.
+  accents au lieu de les rejeter (plus utile), ses tests sont ajustés.
 - `slugify_migration_name` est **inchangé** mais documenté comme distinct.
 - Le contrat d'entité gagne un type de premier rang `slug` → garde-fou de
   complétude (§10) : SQL, validation, CRUD, doc cohérents.
@@ -110,7 +110,7 @@ sitemap, slugs multilingues.
 ## Alternatives considérées
 
 **Fusionner les 3 « slug » en une fonction.** Écarté : `slugify_migration_name`
-produit du snake_case pour des **noms de fichiers**, pas des URLs — fusionner
+produit du snake_case pour des **noms de fichiers**, pas des URLs, fusionner
 casserait les migrations. Les deux concepts restent séparés (D1).
 
 **Option « slug » comme simple drapeau sur un champ `string`**
@@ -131,6 +131,6 @@ concurrent, complexité non justifiée en dernière beta (D4).
 
 - Charte : §10 (contrat de complétude), §11 (une seule façon), « SQL visible »,
   runtime minimal.
-- [ADR-013](013-nullable-required-contract-policy.md) — politique du contrat
+- [ADR-013](013-nullable-required-contract-policy.md), politique du contrat
   d'entité (nullable/required).
-- [Roadmap beta.13](../roadmap/beta13-roadmap.md) — Phase 2.
+- [Roadmap beta.13](../roadmap/beta13-roadmap.md), Phase 2.

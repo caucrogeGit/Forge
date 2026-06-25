@@ -1,4 +1,4 @@
-# FT-00-DEBUG-TOOLS-INTRO-001 — Découvrir les outils de diagnostic Forge
+# FT-00-DEBUG-TOOLS-INTRO-001, Découvrir les outils de diagnostic Forge
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -8,14 +8,14 @@
 
 | Champ | Valeur |
 |---|---|
-| Phase | FT-00 — Cadre de la campagne terrain |
+| Phase | FT-00, Cadre de la campagne terrain |
 | Ticket | FT-00-DEBUG-TOOLS-INTRO-001 |
-| Niveau de guidage | G0 — Guidé complètement |
+| Niveau de guidage | G0, Guidé complètement |
 | Profil testeur visé | débutant Forge / développeur Python |
 | Durée indicative | courte (20 à 40 minutes) |
 | Environnement cible | tout environnement avec Forge installé |
 | Dépend de | FT-00-TEST-CHARTER-001 (recommandé) |
-| Peut être testé sans base ? | oui — plusieurs commandes ne nécessitent pas MariaDB |
+| Peut être testé sans base ? | oui, plusieurs commandes ne nécessitent pas MariaDB |
 | Peut être testé sans navigateur ? | oui |
 
 ---
@@ -87,7 +87,7 @@ docs/testing/field-test-charter.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues et si elles permettaient de comprendre quoi lancer selon la situation.
 
-### Verrou — documentation erronée
+### Verrou, documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 
@@ -301,7 +301,7 @@ A5 — impossible malgré aide
 
 | Question | Réponse |
 |---|---|
-| Ce ticket peut-il devenir un tutoriel ? | partiellement — la section "quels outils utiliser" peut enrichir un tutoriel de prise en main |
+| Ce ticket peut-il devenir un tutoriel ? | partiellement, la section "quels outils utiliser" peut enrichir un tutoriel de prise en main |
 | Nom proposé de la page tutoriel | `docs/tutorials/diagnostiquer-un-projet-forge.md` |
 | Menu proposé | Tutoriels > Diagnostic > Diagnostiquer un projet Forge |
 | Ticket FT validé par un testeur externe ? | à renseigner |
@@ -332,10 +332,10 @@ Le tutoriel ne doit pas être publié tant que ce ticket FT n'a pas été valid�
 
 À remplir après analyse du retour.
 
-- Problème reproductible : —
-- Problème framework : —
-- Problème documentation : —
-- Problème ergonomie : —
-- Hors périmètre : —
-- Ticket correctif à créer : —
-- Priorité proposée : —
+- Problème reproductible : -
+- Problème framework : -
+- Problème documentation : -
+- Problème ergonomie : -
+- Hors périmètre : -
+- Ticket correctif à créer : -
+- Priorité proposée : -

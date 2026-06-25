@@ -4,10 +4,10 @@ Ce guide explique comment passer d'une version Forge à une autre en toute sécu
 
 Il complète :
 
-- [Politique de release](../release/release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Politique de dépréciation](../release/deprecation-policy.md) — cycle annonce → retrait
-- [Matrice de compatibilité](../release/compatibility.md) — Python, MariaDB, Node.js
-- [Contrat de stabilité](../release/stability-contract.md) — ce qui est stable, interne, expérimental
+- [Politique de release](../release/release-policy.md), règles MAJOR/MINOR/PATCH
+- [Politique de dépréciation](../release/deprecation-policy.md), cycle annonce → retrait
+- [Matrice de compatibilité](../release/compatibility.md), Python, MariaDB, Node.js
+- [Contrat de stabilité](../release/stability-contract.md), ce qui est stable, interne, expérimental
 
 ---
 
@@ -15,10 +15,10 @@ Il complète :
 
 Une migration Forge doit être :
 
-- **explicite** — savoir ce qui change avant de migrer ;
-- **vérifiable** — des commandes confirment que le projet fonctionne après ;
-- **réversible** — un rollback propre doit être possible avant d'appliquer des migrations SQL ;
-- **respectueuse du code utilisateur** — aucun fichier modifié manuellement ne doit être écrasé ;
+- **explicite**, savoir ce qui change avant de migrer ;
+- **vérifiable**, des commandes confirment que le projet fonctionne après ;
+- **réversible**, un rollback propre doit être possible avant d'appliquer des migrations SQL ;
+- **respectueuse du code utilisateur**, aucun fichier modifié manuellement ne doit être écrasé ;
 - **accompagnée par les commandes DX** de Forge.
 
 ---
@@ -489,10 +489,10 @@ Après la migration :
 
 | Domaine | Limite |
 |---|---|
-| Migrations SQL versionnées | Pas de système type Alembic — SQL généré à état courant uniquement |
-| Détection automatique des dépréciations | Pas d'outil de scan automatique — lecture manuelle du CHANGELOG |
-| Tests E2E starters 2, 4, 5 | Partiellement couverts — vérifier `forge project:audit` |
-| Rollback SQL automatique | Pas supporté — sauvegarde manuelle obligatoire |
+| Migrations SQL versionnées | Pas de système type Alembic, SQL généré à état courant uniquement |
+| Détection automatique des dépréciations | Pas d'outil de scan automatique, lecture manuelle du CHANGELOG |
+| Tests E2E starters 2, 4, 5 | Partiellement couverts, vérifier `forge project:audit` |
+| Rollback SQL automatique | Pas supporté, sauvegarde manuelle obligatoire |
 | Guide MAJOR spécifique | À créer lors de la première migration `1.x` → version majeure suivante |
 
 ---
@@ -511,11 +511,11 @@ Après la migration :
 ## Voir aussi
 
 - [Vue d'ensemble Release et compatibilité](../release/release-and-compatibility.md)
-- [Politique de release](../release/release-policy.md) — règles PATCH/MINOR/MAJOR
-- [Politique de dépréciation](../release/deprecation-policy.md) — cycle annonce → retrait
-- [Matrice de compatibilité](../release/compatibility.md) — versions supportées
-- [Sécurité en production](../deployment/production-security.md) — checklist avant déploiement
+- [Politique de release](../release/release-policy.md), règles PATCH/MINOR/MAJOR
+- [Politique de dépréciation](../release/deprecation-policy.md), cycle annonce → retrait
+- [Matrice de compatibilité](../release/compatibility.md), versions supportées
+- [Sécurité en production](../deployment/production-security.md), checklist avant déploiement
 
 ---
 
-*Guide défini lors de RELEASE-MIGRATION-GUIDE-001 (Phase 8 — Release et compatibilité).*
+*Guide défini lors de RELEASE-MIGRATION-GUIDE-001 (Phase 8, Release et compatibilité).*

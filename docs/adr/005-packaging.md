@@ -1,4 +1,4 @@
-# ADR-005 — Packaging hybride monorepo / multi-distributions PyPI
+# ADR-005, Packaging hybride monorepo / multi-distributions PyPI
 
 ## Statut
 

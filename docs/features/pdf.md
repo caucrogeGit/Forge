@@ -25,7 +25,7 @@ Produire un PDF de la documentation Forge à partir des fichiers Markdown exista
 
 ---
 
-## Prérequis — Quarkdown
+## Prérequis, Quarkdown
 
 Quarkdown est un système de typesetting moderne basé sur Markdown. Il requiert **Java 17+**.
 
@@ -96,14 +96,14 @@ Les commentaires Quarkdown utilisent la syntaxe `{{ texte commenté }}`.
 
 ## Limites actuelles
 
-- Les extensions MkDocs Material (admonitions `!!! note`, onglets `=== "Tab"`, blocs `<details>`) ne sont pas rendues par Quarkdown — elles apparaissent comme texte brut dans le PDF.
+- Les extensions MkDocs Material (admonitions `!!! note`, onglets `=== "Tab"`, blocs `<details>`) ne sont pas rendues par Quarkdown, elles apparaissent comme texte brut dans le PDF.
 - Les pages avec beaucoup de ces extensions (reference.md, starter-app-*.md) sont désactivées par défaut dans `forge-documentation.qd`.
 - Le rendu graphique dépend du thème Quarkdown configuré.
 - L'emplacement exact du fichier PDF généré peut varier selon la version de Quarkdown.
 
 ---
 
-## PDF applicatif — prévu
+## PDF applicatif, prévu
 
 La génération de PDF depuis une application Forge (factures, fiches, rapports) est prévue, indépendamment de cette fonctionnalité :
 

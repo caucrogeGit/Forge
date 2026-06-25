@@ -143,6 +143,6 @@ Le core reste générique. Les applications métier restent dans les projets, st
 
 Forge fournit déjà des briques de sécurité, de session et de RBAC. Les starters peuvent démontrer une authentification applicative.
 
-En revanche, la brique Auth/User avancée générique — table `users` optionnelle, login/logout standardisé, reset password, vérification email, MFA, OIDC — appartient à la phase suivante de la roadmap.
+En revanche, la brique Auth/User avancée générique, table `users` optionnelle, login/logout standardisé, reset password, vérification email, MFA, OIDC, appartient à la phase suivante de la roadmap.
 
 Il ne faut donc pas présenter cette brique comme déjà livrée dans le core stable actuel.

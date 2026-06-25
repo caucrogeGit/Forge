@@ -4,7 +4,7 @@
 
 | Profil | Intention | Base | HTMX / Alpine | i18n |
 |---|---|---|---|---|
-| `minimal` | Projet le plus simple, pédagogique | — | non | non |
+| `minimal` | Projet le plus simple, pédagogique |, | non | non |
 | `standard` | Application classique recommandée | `minimal` + composants | non | non |
 | `dynamic` | Interactions front légères | `standard` + intention HTMX/Alpine | oui (préparé) | non |
 | `multilingual` | Prêt pour l'internationalisation | `standard` + intention i18n | non | oui (préparé) |

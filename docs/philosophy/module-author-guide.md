@@ -32,7 +32,7 @@ les supprimer proprement.
 
 Un **starter** crée un projet ou une application de démonstration.
 Un **module** ajoute une fonctionnalité à un projet qui existe déjà.
-Une **application** utilise Forge comme moteur — elle n'est ni un module ni un starter.
+Une **application** utilise Forge comme moteur, elle n'est ni un module ni un starter.
 
 ---
 
@@ -137,7 +137,7 @@ Lors de `forge module:files`, Forge copie les fichiers des briques `entities`,
 `controllers`, `views` et `docs` vers leur destination dans le projet.
 
 Les fichiers `static` et `migrations` sont déclarables dans le manifeste
-mais ne sont pas copiés automatiquement par Forge — leur gestion reste manuelle.
+mais ne sont pas copiés automatiquement par Forge, leur gestion reste manuelle.
 
 **Fichiers ignorés lors de la copie** : `__pycache__/`, `.git/`, `.venv/`,
 fichiers `.env`, `.DS_Store`, `*.pyc`, `*.tmp`, `*.bak`, liens symboliques.
@@ -210,13 +210,13 @@ nettoie le registre.
 
 Pour les routes, **Forge ne supprime pas `mvc/routes_<module>.py`** ni
 les lignes que vous avez ajoutées dans `mvc/routes.py`. Ces fichiers restent
-sur le disque après la suppression — à retirer manuellement.
+sur le disque après la suppression, à retirer manuellement.
 
 !!! note "Compatibilité arrière"
     Si un projet existant contient d'anciens blocs à marqueurs
     (`# forge-module-routes:<nom>:start/end`) dans `mvc/module_routes.py`,
     `forge module:remove` peut les nettoyer. Ce mécanisme est conservé pour
-    compat arrière uniquement — les nouveaux projets utilisent le fichier dédié.
+    compat arrière uniquement, les nouveaux projets utilisent le fichier dédié.
 
 ### Migration depuis l'ancien mécanisme injecté
 
@@ -346,7 +346,7 @@ Concrètement :
 Le registre `forge_modules.json` est nettoyé.
 Les fichiers copiés par `module:files` sont supprimés s'ils n'ont pas été modifiés.
 `mvc/routes_<module>.py` et les lignes ajoutées dans `mvc/routes.py` restent
-sur le disque — à retirer manuellement si souhaité.
+sur le disque, à retirer manuellement si souhaité.
 
 ---
 
@@ -423,14 +423,14 @@ avec `tmp_path` et `monkeypatch.chdir`.
 
 ## Bonnes pratiques
 
-- **Petit et ciblé** — un module ajoute une brique, pas une application entière.
-- **Noms explicites** — `mon_module` (snake_case, sans ambiguïté sur la fonction).
-- **Routes préfixées** — utilisez un préfixe URL pour éviter les conflits avec d'autres routes (`/mon-module/`).
-- **Fichiers tracés** — tout ce que Forge installe est tracé dans `forge_modules.json`.
-- **Pas d'écrasement silencieux** — Forge refuse si un fichier cible existe déjà.
-- **Documentation minimale** — décrivez la fonction du module et ses routes dans `description`.
-- **Tests** — testez au minimum le manifeste et les fichiers sources.
-- **Versionnez le module** — incrémentez `version` à chaque modification significative.
+- **Petit et ciblé**, un module ajoute une brique, pas une application entière.
+- **Noms explicites**, `mon_module` (snake_case, sans ambiguïté sur la fonction).
+- **Routes préfixées**, utilisez un préfixe URL pour éviter les conflits avec d'autres routes (`/mon-module/`).
+- **Fichiers tracés**, tout ce que Forge installe est tracé dans `forge_modules.json`.
+- **Pas d'écrasement silencieux**, Forge refuse si un fichier cible existe déjà.
+- **Documentation minimale**, décrivez la fonction du module et ses routes dans `description`.
+- **Tests**, testez au minimum le manifeste et les fichiers sources.
+- **Versionnez le module**, incrémentez `version` à chaque modification significative.
 
 ---
 
@@ -512,7 +512,7 @@ forge project:audit
 
 ## Voir aussi
 
-- [API et CLI](../reference/reference.md) — liste complète des commandes `forge module:*`
-- [Application complète](../guide/app-complete-tutorial.md) — exemple avec plusieurs entités
-- [Contrat de stabilité](../release/stability-contract.md) — garanties sur les fichiers préservés
-- [Vue d'ensemble des starters](../starters/index.md) — différence module / starter
+- [API et CLI](../reference/reference.md), liste complète des commandes `forge module:*`
+- [Application complète](../guide/app-complete-tutorial.md), exemple avec plusieurs entités
+- [Contrat de stabilité](../release/stability-contract.md), garanties sur les fichiers préservés
+- [Vue d'ensemble des starters](../starters/index.md), différence module / starter

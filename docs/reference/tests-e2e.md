@@ -38,7 +38,7 @@ FORGE_E2E_MARIADB=1 \
 | `FORGE_E2E_MARIADB` | _(absent)_ | Active les tests (`1` pour activer) |
 | `FORGE_E2E_DB_HOST` | `127.0.0.1` | Hôte MariaDB |
 | `FORGE_E2E_DB_PORT` | `3306` | Port MariaDB |
-| `FORGE_E2E_DB_NAME` | _(requis)_ | Nom de la base — **doit commencer par `forge_e2e_`** |
+| `FORGE_E2E_DB_NAME` | _(requis)_ | Nom de la base, **doit commencer par `forge_e2e_`** |
 | `FORGE_E2E_DB_USER` | _(requis)_ | Utilisateur MariaDB |
 | `FORGE_E2E_DB_PASSWORD` | _(vide)_ | Mot de passe |
 
@@ -69,28 +69,28 @@ GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP
 
 ---
 
-## CSRF — Mécanisme et tests quasi-HTTP
+## CSRF, Mécanisme et tests quasi-HTTP
 
 ### Fonctionnement
 
 Forge protège par défaut toutes les méthodes HTTP non sûres (`POST`, `PUT`, `PATCH`, `DELETE`) via un mécanisme CSRF opt-out.
 
-**Modèle opt-out** — `csrf=True` est la valeur par défaut de chaque route. Une route doit déclarer explicitement `csrf=False` pour être exemptée.
+**Modèle opt-out**, `csrf=True` est la valeur par défaut de chaque route. Une route doit déclarer explicitement `csrf=False` pour être exemptée.
 
-**Stockage du token** — `MemorySessionStore.create()` génère un token avec `secrets.token_hex(16)` et le stocke sous la clé `"csrf_token"` dans la session au moment de sa création. Le token est renouvelé lors de l'authentification (`authentifier_session()`).
+**Stockage du token**, `MemorySessionStore.create()` génère un token avec `secrets.token_hex(16)` et le stocke sous la clé `"csrf_token"` dans la session au moment de sa création. Le token est renouvelé lors de l'authentification (`authentifier_session()`).
 
-**Injection dans les templates** — `BaseController.render()` injecte `csrf_token` dans le contexte Jinja2. Les générateurs CRUD (`views_builder.py`) et les formulaires publics (`public_form.py`) incluent systématiquement :
+**Injection dans les templates**, `BaseController.render()` injecte `csrf_token` dans le contexte Jinja2. Les générateurs CRUD (`views_builder.py`) et les formulaires publics (`public_form.py`) incluent systématiquement :
 ```html
 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 ```
 
-**Validation** — `CsrfMiddleware.check()` compare le token de session au token fourni par :
+**Validation**, `CsrfMiddleware.check()` compare le token de session au token fourni par :
 1. le champ de formulaire `csrf_token` (body) ;
 2. l'en-tête HTTP `X-CSRF-Token` (AJAX).
 
 Si aucun token attendu n'existe ou si les tokens ne correspondent pas, la réponse est `403`.
 
-**Ordre** — la validation CSRF est effectuée **avant** les middlewares d'authentification dans `Application.dispatch()`. Un CSRF invalide retourne immédiatement 403 sans appeler les middlewares.
+**Ordre**, la validation CSRF est effectuée **avant** les middlewares d'authentification dans `Application.dispatch()`. Un CSRF invalide retourne immédiatement 403 sans appeler les middlewares.
 
 ### Exemptions
 
@@ -153,7 +153,7 @@ assert resp.status == 200
 ### Limites restantes
 
 - CSRF non testé sur un vrai serveur HTTP réseau (avec port TCP, cookies Set-Cookie réels et transport HTTP/1.1). Les tests utilisent `Application.dispatch()` + `FakeRequest`, ce qui couvre le cycle CSRF complet sans couche réseau.
-- Le starter 5 (Communes & Séjours) est partiellement vérifié — les formulaires présents contiennent le champ, mais il n'y a pas de test de cycle HTTP complet pour ce starter.
+- Le starter 5 (Communes & Séjours) est partiellement vérifié, les formulaires présents contiennent le champ, mais il n'y a pas de test de cycle HTTP complet pour ce starter.
 
 ---
 

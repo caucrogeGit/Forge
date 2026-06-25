@@ -94,7 +94,7 @@ Conséquences de câblage :
    dev-only), `pyproject.toml` minimal.
 2. Brancher : `requirements-dev.txt` + extra `[test]` des opt-ins ; réduire
    `tests/conftest.py` à un repli ; supprimer `tests/fake_request.py`.
-3. Vérifier la racine inchangée (suite complète verte) — le plugin remplace le
+3. Vérifier la racine inchangée (suite complète verte), le plugin remplace le
    conftest sans régression.
 4. Migrer les huit paquets, un par un, en ne déplaçant que les tests
    **réellement propres** (exclure `conftest.py`, vérifier l'absence de
@@ -122,9 +122,9 @@ Conséquences de câblage :
 
 ## Charte appliquée
 
-- Principe 11 — une seule façon officielle (infra de test unique).
-- Principe 8 — noyau minimal (l'infra de test ne va **pas** dans le core).
-- Principe 6 — tester avant d'élargir (racine validée avant de migrer les huit).
+- Principe 11, une seule façon officielle (infra de test unique).
+- Principe 8, noyau minimal (l'infra de test ne va **pas** dans le core).
+- Principe 6, tester avant d'élargir (racine validée avant de migrer les huit).
 
 ---
 

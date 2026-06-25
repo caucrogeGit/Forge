@@ -1,6 +1,6 @@
 # Schéma des entités : entity.schema.json
 
-`schemas/entity.schema.json` verrouille la **structure autorisée** des fichiers d'entités canoniques Forge — c'est-à-dire les fichiers `mvc/entities/<entité>/<entité>.json`.
+`schemas/entity.schema.json` verrouille la **structure autorisée** des fichiers d'entités canoniques Forge, c'est-à-dire les fichiers `mvc/entities/<entité>/<entité>.json`.
 
 Ce schéma valide la **forme** d'un fichier d'entité. Il ne valide pas toute la logique métier : les règles sémantiques (unicité des noms, types cohérents, index sur champs existants…) sont vérifiées par `forge entity:validate`.
 
@@ -62,8 +62,8 @@ Les clés inconnues sont **interdites** (`additionalProperties: false`).
 
 **Formats attendus :**
 
-- `name` — `^[A-Z][A-Za-z0-9]*$` — commence par une majuscule
-- `table` — `^[a-z][a-z0-9_]*$` — snake_case strict
+- `name`, `^[A-Z][A-Za-z0-9]*$`, commence par une majuscule
+- `table`, `^[a-z][a-z0-9_]*$`, snake_case strict
 
 ---
 
@@ -89,20 +89,20 @@ Les clés inconnues sont **interdites** (`additionalProperties: false`).
 | `required` | champ obligatoire en formulaire (défaut : `false`) |
 | `nullable` | colonne SQL accepte NULL (défaut : `true`) |
 | `unique` | contrainte UNIQUE sur la colonne (défaut : `false`) |
-| `max_length` | longueur max — types `string`, `email`, `password` |
-| `precision` | chiffres significatifs — type `decimal` (obligatoire si `decimal`) |
-| `scale` | chiffres après la virgule — type `decimal` (obligatoire si `decimal`) |
-| `min` / `max` | valeur min / max — types numériques |
+| `max_length` | longueur max, types `string`, `email`, `password` |
+| `precision` | chiffres significatifs, type `decimal` (obligatoire si `decimal`) |
+| `scale` | chiffres après la virgule, type `decimal` (obligatoire si `decimal`) |
+| `min` / `max` | valeur min / max, types numériques |
 | `default` | valeur par défaut |
-| `auto_now` | mis à jour à chaque modification — types `date`, `datetime` |
-| `auto_now_add` | initialisé à la création — types `date`, `datetime` |
-| `choices` | valeurs autorisées — génère un `select` dans les formulaires |
+| `auto_now` | mis à jour à chaque modification, types `date`, `datetime` |
+| `auto_now_add` | initialisé à la création, types `date`, `datetime` |
+| `choices` | valeurs autorisées, génère un `select` dans les formulaires |
 | `label` | libellé affiché dans les formulaires et listes |
 | `description` | description longue du champ |
 | `form` | options de rendu dans les formulaires générés |
 | `crud` | visibilité dans les vues CRUD générées |
 
-**Exemple — champ email unique :**
+**Exemple, champ email unique :**
 
 ```json
 {
@@ -113,7 +113,7 @@ Les clés inconnues sont **interdites** (`additionalProperties: false`).
 }
 ```
 
-**Exemple — champ décimal :**
+**Exemple, champ décimal :**
 
 ```json
 {
@@ -127,9 +127,9 @@ Les clés inconnues sont **interdites** (`additionalProperties: false`).
 
 **Rappels :**
 
-- `id` est **interdit** dans `fields[]` — c'est une clé réservée par Forge.
+- `id` est **interdit** dans `fields[]`, c'est une clé réservée par Forge.
 - Les noms de champs sont en `snake_case` : `^[a-z][a-z0-9_]*$`.
-- `sql_type` et `python_type` **ne font pas partie** du format canonique — ils sont dérivés par Forge lors de la génération.
+- `sql_type` et `python_type` **ne font pas partie** du format canonique, ils sont dérivés par Forge lors de la génération.
 
 ---
 
@@ -183,7 +183,7 @@ Chaque entrée d'index accepte :
 ]
 ```
 
-La **cohérence** — vérifier que les champs de l'index existent bien dans `fields[]` — est vérifiée par `forge entity:validate`, pas par le JSON Schema seul.
+La **cohérence**, vérifier que les champs de l'index existent bien dans `fields[]`, est vérifiée par `forge entity:validate`, pas par le JSON Schema seul.
 
 ---
 
@@ -193,11 +193,11 @@ Ces clés appartenaient à l'ancien format (`format_version: 1`) ou sont des pro
 
 | Clé interdite | Explication |
 |---|---|
-| `format_version` | identifiant du format legacy — remplacé par `schema_version` |
+| `format_version` | identifiant du format legacy, remplacé par `schema_version` |
 | `entity` | ancien nom de la clé `name` |
 | `column` | les noms de colonnes sont dérivés automatiquement |
-| `sql_type` | type SQL — projection dérivée, pas une clé canonique |
-| `python_type` | type Python — projection dérivée |
+| `sql_type` | type SQL, projection dérivée, pas une clé canonique |
+| `python_type` | type Python, projection dérivée |
 | `primary_key` | la clé primaire `id` est gérée automatiquement par Forge |
 | `auto_increment` | idem |
 | `constraints` | ancien format des contraintes |
@@ -250,7 +250,7 @@ Ces clés sont des projections de l'ancien format. Elles sont inconnues du sché
 "indexes": [{ "name": "idx_x", "fields": ["nonexistent"] }]
 ```
 
-Le JSON Schema ne détecte pas cette incohérence — mais `forge entity:validate` la signale avec une erreur sémantique.
+Le JSON Schema ne détecte pas cette incohérence, mais `forge entity:validate` la signale avec une erreur sémantique.
 
 ---
 
@@ -284,4 +284,4 @@ forge build:model
 
 Refuse de générer si `entity:validate` détecte des erreurs. `make:crud` et certaines migrations utilisent également ce garde-fou.
 
-La commande `entity:validate` est la **validation officielle** — VS Code aide à écrire, mais ne remplace pas cette étape.
+La commande `entity:validate` est la **validation officielle**, VS Code aide à écrire, mais ne remplace pas cette étape.

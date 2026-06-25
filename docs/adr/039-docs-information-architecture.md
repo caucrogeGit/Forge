@@ -72,27 +72,27 @@ dossier dit sa nature (apprendre / utiliser / référencer / opérer).
 
 Buckets de premier niveau visés pour la nav (cœur) :
 
-1. **Accueil** — `index`.
-2. **Découvrir** — positionnement, « Bonjour Forge », prise en main, concepts,
+1. **Accueil**, `index`.
+2. **Découvrir**, positionnement, « Bonjour Forge », prise en main, concepts,
    FAQ (regroupe `guide/`).
-3. **Installer** — `install/` (inchangé, déjà cohérent).
-4. **Apprendre (parcours)** — parcours cœur uniquement : `welcome-forge`,
+3. **Installer**, `install/` (inchangé, déjà cohérent).
+4. **Apprendre (parcours)**, parcours cœur uniquement : `welcome-forge`,
    `welcome-helpers`, `welcome-markdown`, plus le tutoriel applicatif complet.
    Le hub `starters/index.md` est recentré sur le cœur (les opt-ins ont leur
    propre progression dans leur paquet).
-5. **Guides du cœur** — guides d'usage : auth, CRUD, front, médias, PDF,
+5. **Guides du cœur**, guides d'usage : auth, CRUD, front, médias, PDF,
    profils, migrations (issus de `features/`, dédoublonnés).
-6. **Modèle de données** — unifie `entities/` et les pages data de `features/`
+6. **Modèle de données**, unifie `entities/` et les pages data de `features/`
    (`entity_architecture`, `relations`) en un seul bucket « Entités & relations ».
-7. **Référence** — référence stricte uniquement (`reference/` nettoyé :
+7. **Référence**, référence stricte uniquement (`reference/` nettoyé :
    `markdown.md` part vers « Contribuer / écrire la doc », le doublon `crud.md`
    est supprimé au profit du guide canonique).
-8. **Déploiement** — `deployment/` (inchangé).
-9. **Opt-ins officiels** — tronc unique regroupant les douze `!include`
+8. **Déploiement**, `deployment/` (inchangé).
+9. **Opt-ins officiels**, tronc unique regroupant les douze `!include`
    (referme la dette de l'ADR-038).
-10. **Philosophie & contribution** — `philosophy/`, `contributing/`,
+10. **Philosophie & contribution**, `philosophy/`, `contributing/`,
     `architecture/`.
-11. **Projet** — `release/`, `roadmap/`, `testing/`, `project/`, `history/`.
+11. **Projet**, `release/`, `roadmap/`, `testing/`, `project/`, `history/`.
 
 Dédoublonnages actés :
 
@@ -146,17 +146,17 @@ suivent la nav.
 
 - Beaucoup de `git mv` + recâblage de liens + mise à jour de tests `meta`.
 - Les URLs publiques de plusieurs pages cœur changent (acceptable en bêta,
-  pas d'utilisateurs externes à protéger — note pré-1.0 de la charte).
+  pas d'utilisateurs externes à protéger, note pré-1.0 de la charte).
 - Risque de liens cassés : maîtrisé par `mkdocs build --strict` à chaque étape.
 
 ---
 
 ## Charte appliquée
 
-- Principe 11 — une seule façon officielle (un sujet, un emplacement).
-- Principe 2 — petits tickets (exécution par étapes `DOCS-IA-<n>`).
-- Principe 6 — tester avant d'élargir (`--strict` + suite meta à chaque étape).
-- Règle B — révéler avant de corriger (audit explicite ci-dessus).
+- Principe 11, une seule façon officielle (un sujet, un emplacement).
+- Principe 2, petits tickets (exécution par étapes `DOCS-IA-<n>`).
+- Principe 6, tester avant d'élargir (`--strict` + suite meta à chaque étape).
+- Règle B, révéler avant de corriger (audit explicite ci-dessus).
 
 ---
 

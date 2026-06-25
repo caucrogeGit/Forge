@@ -7,7 +7,7 @@ Deux étapes : installer Forge, puis créer un premier projet.
 
 ---
 
-## Étape 1 — Installer Forge
+## Étape 1, Installer Forge
 
 Choisissez le chemin adapté à votre contexte :
 
@@ -18,7 +18,7 @@ Choisissez le chemin adapté à votre contexte :
 | Version spécifique depuis un tag | [Installation depuis GitHub](../install/github.md) |
 | Préparer la base de données MariaDB | [Préparer MariaDB](../install/mariadb.md) |
 | Contribuer au framework Forge | [Mode développement](../install/core-dev.md) |
-| Développeur Windows 11 (via WSL2) | [Installation Windows](../install/windows.md) — résumé court, ou [Windows + WSL (parcours complet)](../install/windows-wsl.md) pour le pas-à-pas |
+| Développeur Windows 11 (via WSL2) | [Installation Windows](../install/windows.md), résumé court, ou [Windows + WSL (parcours complet)](../install/windows-wsl.md) pour le pas-à-pas |
 
 Liste des paquets opt-in et méthodes d'installation : [Contrat d'installation des opt-ins](../install/opt-ins.md).
 
@@ -32,7 +32,7 @@ python forge.py --version    # script direct (développement)
 
 ---
 
-## Étape 2 — Créer un premier projet
+## Étape 2, Créer un premier projet
 
 Une fois Forge disponible dans votre environnement :
 
@@ -69,7 +69,7 @@ et `core/**/*.py`. Les dossiers `.venv/`, `__pycache__/`, `storage/`, `logs/`,
 `.ruff_cache/` et `.mypy_cache/` sont ignorés.
 
 En production (`APP_ENV=prod`), `forge run` refuse de démarrer le serveur
-intégré et affiche la stratégie WSGI recommandée — voir
+intégré et affiche la stratégie WSGI recommandée, voir
 [Déploiement WSGI minimal](../deployment/wsgi-deployment.md) et
 [Limites de production](../deployment/production-limits.md).
 
@@ -78,7 +78,7 @@ Les contrôleurs générés par Forge sont typés (`request: Request`,
 Code/Pylance fonctionne dès la génération, sans import manuel. Voir
 [Convention HTTP inspectable](../reference/http.md).
 
-Texte brut vs vue template — à ne pas confondre :
+Texte brut vs vue template, à ne pas confondre :
 
 ```python
 return Response.text("Bonjour Forge")                                # texte brut
@@ -92,7 +92,7 @@ alternatives `Response.text(...)` / `Response.debug(...)`. En
 
 ---
 
-## Étape 3 — Continuer
+## Étape 3, Continuer
 
 Pour la liste complète des commandes disponibles : [Référence CLI](../reference/cli-commands.md).
 
@@ -101,6 +101,6 @@ configurer MariaDB, créer une entité, générer le CRUD et lancer l'applicatio
 
 Pour aller plus vite, essayez les tutoriels guidés :
 
-- [Bonjour Forge](bonjour-forge.md) — premier contact : route → contrôleur → `Response.text`/`Response.debug` → `render(...)`
-- [Progression officielle des starters](../starters/index.md#progression-recommandee) — neuf paliers depuis `Bonjour Forge` jusqu'au premier CRUD ; ne sautez pas directement vers Contacts CRUD
-- [Application complète](app-complete-tutorial.md) — CRUD, relations, formulaires
+- [Bonjour Forge](bonjour-forge.md), premier contact : route → contrôleur → `Response.text`/`Response.debug` → `render(...)`
+- [Progression officielle des starters](../starters/index.md#progression-recommandee), neuf paliers depuis `Bonjour Forge` jusqu'au premier CRUD ; ne sautez pas directement vers Contacts CRUD
+- [Application complète](app-complete-tutorial.md), CRUD, relations, formulaires

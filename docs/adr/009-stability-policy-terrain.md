@@ -1,8 +1,8 @@
-# ADR-009 — Politique de stabilité : audits, bêta consolidée, tests terrain et stable
+# ADR-009, Politique de stabilité : audits, bêta consolidée, tests terrain et stable
 
 ## Statut
 
-Acceptée — Forge 1.0.0-beta.1 (ticket `ADR-009-STABILITY-POLICY-TERRAIN-001`).
+Acceptée, Forge 1.0.0-beta.1 (ticket `ADR-009-STABILITY-POLICY-TERRAIN-001`).
 
 ---
 
@@ -131,7 +131,7 @@ pas le T0.
   [`docs/history/audits/findings-tracker.md`](../history/audits/findings-tracker.md)
 - Baseline d'audit :
   [`docs/history/audits/audit-baseline-2026-05-15.md`](../history/audits/audit-baseline-2026-05-15.md)
-- Charte philosophique v2 (principe 6 — tester avant d'élargir) :
+- Charte philosophique v2 (principe 6, tester avant d'élargir) :
   `CHARTE_DOC.md` à la racine du dépôt
 - ADR-005 Packaging :
   [`docs/adr/005-packaging.md`](005-packaging.md)

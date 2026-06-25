@@ -1,8 +1,8 @@
-# ADR-026 — Nommer les accesseurs de Request par leur source : query et route
+# ADR-026, Nommer les accesseurs de Request par leur source : query et route
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.15 (ticket `HTTP-REQUEST-PARAM-RENAME-001`).
+Accepté, Forge 1.0.0-beta.15 (ticket `HTTP-REQUEST-PARAM-RENAME-001`).
 
 ---
 
@@ -88,21 +88,21 @@ La paire obtenue est nue, brève, symétrique et nomme la source :
 
 ## Alternatives écartées
 
-### A — `query_param` / `path_param`
+### A, `query_param` / `path_param`
 
 Terminologie HTTP standard et symétrique, mais suffixée alors que le reste de la
 famille est nu (`form`, `json`, `header`, `file`). Plus verbeuse sans gain de
 clarté décisif. `query` / `route` est plus léger et cohérent avec le vocabulaire
 Forge.
 
-### B — `query` / `path`
+### B, `query` / `path`
 
 Le plus court, mais **`path` entre en collision** avec l'attribut existant
 `request.path` (la chaîne du chemin). Libérer `path()` exigerait de renommer cet
 attribut conventionnel, rupture plus large et sémantiquement trouble (« path »
 le chemin vs « path('id') » un paramètre). Écarté.
 
-### C — `query` / `dynamic`
+### C, `query` / `dynamic`
 
 `dynamic` est libre et fait écho au starter « dynamic-route », mais il nomme une
 *caractéristique* (le segment est variable), pas une *source* (le chemin),

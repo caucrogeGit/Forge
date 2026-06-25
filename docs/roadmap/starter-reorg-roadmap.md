@@ -1,4 +1,4 @@
-# Roadmap — Réorganisation & normalisation des starters
+# Roadmap, Réorganisation & normalisation des starters
 
 > **Document de planification** (ticket `STARTER-REORG-ROADMAP-001`).
 > Cadre la réorganisation des starters Forge : archivage des applications,
@@ -94,8 +94,8 @@ en `1..N` contigus (ordre relatif conservé).
 
 ## Phases
 
-### Phase 0 — Convention de nommage (gouvernance)
-**`STARTER-NAMING-CONVENTION-001`** — *à faire en premier : la règle écrite cadre
+### Phase 0, Convention de nommage (gouvernance)
+**`STARTER-NAMING-CONVENTION-001`**, *à faire en premier : la règle écrite cadre
 tous les renommages.*
 
 - Formaliser les 4 familles de nommage dans
@@ -104,8 +104,8 @@ tous les renommages.*
 - Option : ADR `016-starter-naming-convention.md` + entrée dans l'index ADR.
 - Validation : `mkdocs build --strict`.
 
-### Phase 1 — Archivage des applications (débranchement Forge)
-**`STARTER-ARCHIVE-LEGACY-APPS-001`** — gros ticket.
+### Phase 1, Archivage des applications (débranchement Forge)
+**`STARTER-ARCHIVE-LEGACY-APPS-001`**, gros ticket.
 
 - `git mv docs/starters/{carnet-contacts,communes-sejours,suivi-comportement-eleves}`
   → `docs/starters/old/<id>/` **+ relink** (les pages descendent d'un niveau :
@@ -119,7 +119,7 @@ tous les renommages.*
   e2e, relations, scaffold, navigation séquentielle, reposition).
 - Validation : `mkdocs build --strict`, tests starters ciblés.
 
-### Phase 2 — Renumérotation contiguë
+### Phase 2, Renumérotation contiguë
 **`STARTER-RENUMBER-CONTIGUOUS-001`**
 
 - Compresser les `number` restants en `1..N`.
@@ -127,7 +127,7 @@ tous les renommages.*
   `test_starter_cli`).
 - *Peut être fusionnée avec la Phase 1 (même cause), mais isolée = diff plus lisible.*
 
-### Phase 3 — Renommages (anglais + conventions + dossiers-sujets)
+### Phase 3, Renommages (anglais + conventions + dossiers-sujets)
 Un ticket par renommage. **Cible docs = dossier-sujet** (cf. structure ci-dessus,
 avec `index.md` de sujet) ; **data reste à plat**. Chaque ticket : rename
 `data/<ancien>/` → `data/<nouveau>/` + page `docs/starters/<sujet>/<id>.md`
@@ -144,10 +144,10 @@ avec `index.md` de sujet) ; **data reste à plat**. Chaque ticket : rename
   (docs → `starters/crud/`)
 - **`STARTER-RENAME-FIRST-CRUD-GENERATED-001`** : `contact-simple` → `first-crud-generated`
   (docs → `starters/crud/`) **+ neutralisation de l'entité** (`Contact` → entité neutre
-  alignée sur `first-crud`, pour en faire un starter de *mécanisme* — CRUD généré — et
+  alignée sur `first-crud`, pour en faire un starter de *mécanisme*, CRUD généré, et
   non une app métier).
 
-### Phase 4 — Cohérence finale & garde-fous
+### Phase 4, Cohérence finale & garde-fous
 **`STARTER-REORG-CONSISTENCY-001`**
 
 - Balayer [`index.md`](../starters/index.md),
@@ -163,7 +163,7 @@ avec `index.md` de sujet) ; **data reste à plat**. Chaque ticket : rename
 
 ## Points techniques / risques
 
-- **Relink** (Phase 1) : les pages sous `old/` restent buildées par MkDocs — leurs
+- **Relink** (Phase 1) : les pages sous `old/` restent buildées par MkDocs, leurs
   liens relatifs doivent être recalculés sinon `mkdocs --strict` échoue.
 - **Cascade tests numéros** (Phase 2) : plusieurs `test_starter_*_001` figent un
   numéro (`form-post`, `server-validation`, `first-sql`…).

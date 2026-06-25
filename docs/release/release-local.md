@@ -18,7 +18,7 @@ sans publier.
 - Dépôt sur `main`, état propre (hors `.claude/settings.json` et fichiers
   locaux explicitement exclus de Git).
 - Environnement virtuel dédié.
-- Python 3.12+ (version recommandée : 3.12.13 via pyenv — voir ADR-006).
+- Python 3.12+ (version recommandée : 3.12.13 via pyenv, voir ADR-006).
 - Dépendances de développement installées depuis `requirements-dev.txt`.
 - Aucun accès réseau requis pour la validation une fois les dépendances installées.
 
@@ -75,7 +75,7 @@ bash scripts/release_check.sh --help   # aide
 Le script valide localement, ne publie rien et ne crée aucun tag.
 La publication reste le ticket **2.3 BETA-2-RELEASE-001**.
 
-`tools/check_version_sync.py` n'existe pas encore — la synchronisation des
+`tools/check_version_sync.py` n'existe pas encore, la synchronisation des
 versions entre core et opt-ins est assurée par `tools/release-validate.sh`.
 
 ### Résultats attendus
@@ -99,7 +99,7 @@ Ils sont exclus de Git (`.gitignore`). **Ils ne doivent pas être commités.**
 
 - Cette procédure ne publie rien sur PyPI.
 - Elle ne crée aucun tag.
-- `twine check` valide les métadonnées localement — `twine upload` est
+- `twine check` valide les métadonnées localement, `twine upload` est
   l'opération de publication, réservée au ticket **2.3 BETA-2-RELEASE-001**.
 
 ---
@@ -212,7 +212,7 @@ projet neuf, palier après palier, en suivant la progression documentée.
 Chaque parcours doit être réalisé dans un **projet séparé** : mélanger les
 entités de plusieurs parcours dans le même projet fausse le test.
 
-### Prérequis — renseigner `env/dev` de chaque projet
+### Prérequis, renseigner `env/dev` de chaque projet
 
 Avant `forge db:init`, les variables suivantes doivent être renseignées dans `env/dev` :
 
@@ -381,7 +381,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ### Auth MFA (TOTP)
 
-**Prérequis** : `forge-mvc-mfa` installé (`pip install --pre forge-mvc-mfa` — publié sur PyPI depuis `1.0.0-beta.9`, statut Alpha).
+**Prérequis** : `forge-mvc-mfa` installé (`pip install --pre forge-mvc-mfa`, publié sur PyPI depuis `1.0.0-beta.9`, statut Alpha).
 
 ```bash
 cd ~/Projets
@@ -415,7 +415,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ---
 
-### Premier pas — Bienvenue dans Forge (sans BDD)
+### Premier pas, Bienvenue dans Forge (sans BDD)
 
 Ce parcours ne nécessite aucune base de données. Il se réalise à la main dans le projet courant, en suivant la progression `welcome-forge`.
 
@@ -475,7 +475,7 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 
 ---
 
-## 7. Récapitulatif — validation réussie
+## 7. Récapitulatif, validation réussie
 
 | Étape | Résultat attendu |
 |---|---|

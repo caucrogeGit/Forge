@@ -1,12 +1,12 @@
-# Convention d'inspection — classes HTTP publiques
+# Convention d'inspection, classes HTTP publiques
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Ticket fondateur : **API-INSPECTABLE-OBJECTS-CONVENTION-001**.
 
 Cette page décrit le contrat que Forge applique aux classes API publiques
-manipulées par le développeur : `Request`, `Response`, et — par
-extension — les objets que les tickets suivants amèneront dans le périmètre
+manipulées par le développeur : `Request`, `Response`, et, par
+extension, les objets que les tickets suivants amèneront dans le périmètre
 (`UploadedFile`, `Form`, `Session`, `RouteEntry`).
 
 L'objectif est qu'un développeur qui découvre Forge puisse explorer un objet
@@ -20,25 +20,25 @@ magie, pas de dump brut, pas de fuite de secrets.
 
 Une classe API publique inspectable expose :
 
-1. **Une vue globale `.data`** — un `dict` lisible, stable, masquant les
+1. **Une vue globale `.data`**, un `dict` lisible, stable, masquant les
    champs sensibles (mots de passe, jetons, en-têtes d'authentification,
    cookies). C'est une **représentation publique**, pas un dump brut.
-2. **Des accesseurs ciblés et nommés** — `obj.field(key, default=None)`.
+2. **Des accesseurs ciblés et nommés**, `obj.field(key, default=None)`.
    La forme retournée est scalaire (ou objet métier), pas un conteneur
    intermédiaire (`list[str]` pour `parse_qs`, `HTTPMessage` pour les
    headers…).
-3. **Des annotations utiles à l'autocomplétion** — `str | None`,
+3. **Des annotations utiles à l'autocomplétion**, `str | None`,
    `UploadedFile | None`, etc., pour que les IDE remontent une signature
    claire au survol.
-4. **Un `__repr__` sûr** — ligne courte, pas de dump des attributs
+4. **Un `__repr__` sûr**, ligne courte, pas de dump des attributs
    internes, pas de fuite de header sensible.
-5. **Aucun dump naïf** — `.data` n'est jamais un `self.__dict__`. Les
+5. **Aucun dump naïf**, `.data` n'est jamais un `self.__dict__`. Les
    valeurs binaires (corps de réponse, contenu de fichiers uploadés) ne
-   figurent jamais dans `.data` — uniquement leurs métadonnées.
+   figurent jamais dans `.data`, uniquement leurs métadonnées.
 
 ---
 
-## 2. Champs sensibles — règles de masquage
+## 2. Champs sensibles, règles de masquage
 
 Les valeurs marquées sensibles sont remplacées par la chaîne littérale
 `"[masked]"` dans `.data`. Le contrôle est volontairement large :
@@ -67,7 +67,7 @@ de session).
 
 ---
 
-## 3. `Request` — référence
+## 3. `Request`, référence
 
 ```python
 request.method          # str — "GET", "POST", …
@@ -120,7 +120,7 @@ suffisant pour que Pylance/VS Code fournisse l'autocomplétion sur
 `request.` (query, form, json, file, route, header, data) sans
 import manuel.
 
-### `Response.text` vs `BaseController.render` — quand utiliser quoi
+### `Response.text` vs `BaseController.render`, quand utiliser quoi
 
 `Response.text(...)` retourne du texte brut. `BaseController.render(...)`
 rend une **vue template** existante située dans `mvc/views/`. Confondre
@@ -141,7 +141,7 @@ Si un contrôleur appelle `BaseController.render("bonjour", ...)` et que
 `mvc/views/bonjour` n'existe pas, Forge renvoie en `APP_ENV=dev` un
 message d'erreur explicite (text/plain, statut 500) qui rappelle le rôle
 de `render()` et propose `Response.text(...)` / `Response.debug(...)`.
-En `APP_ENV=prod`, le message reste minimal — pas de fuite du chemin
+En `APP_ENV=prod`, le message reste minimal, pas de fuite du chemin
 demandé ni du dossier `views/` (voir DX-RENDER-ERROR-001).
 
 ### `request.data`
@@ -166,12 +166,12 @@ demandé ni du dossier `views/` (voir DX-RENDER-ERROR-001).
 }
 ```
 
-Le contenu binaire des fichiers uploadés n'est jamais inclus — seuls
+Le contenu binaire des fichiers uploadés n'est jamais inclus, seuls
 `filename`, `size` et `content_type`.
 
 ---
 
-## 4. `Response` — référence
+## 4. `Response`, référence
 
 ```python
 response.status        # int
@@ -205,22 +205,22 @@ En `APP_ENV=dev` (DX-DEBUG-DUMP-HTML-001) :
   `type(obj).__name__` suivi de `repr(obj)` ;
 - masquage automatique des clés sensibles (`Authorization`,
   `Proxy-Authorization`, `Cookie`, `Set-Cookie`, `password`, `passwd`,
-  `secret`, `token`, `csrf`, `api_key`, `apikey`, …) — mêmes règles que
+  `secret`, `token`, `csrf`, `api_key`, `apikey`, …), mêmes règles que
   `request.data` ;
 - échappement HTML systématique des chaînes (les valeurs `<script>…`
   s'affichent comme texte, jamais comme balises) ;
-- profondeur bornée par `MAX_DEPTH` (5) — au-delà, le marqueur
+- profondeur bornée par `MAX_DEPTH` (5), au-delà, le marqueur
   `<max depth reached>` est affiché ;
-- références circulaires détectées (`<cycle detected>`) — aucun risque
+- références circulaires détectées (`<cycle detected>`), aucun risque
   de récursion infinie.
 
 Le renderer est exposé via `core.http.debug_dumper.render_debug_html(obj)`
-pour les tests et les outils de diagnostic — `Response.debug` reste la
+pour les tests et les outils de diagnostic, `Response.debug` reste la
 seule API publique destinée aux contrôleurs.
 
 En `APP_ENV=prod` : refuse, retourne `Response.text("Response.debug() est
 désactivé en production.", status=404)`. Le payload n'est jamais inclus,
-même tronqué — pas d'option pour contourner cette protection.
+même tronqué, pas d'option pour contourner cette protection.
 
 ### Exemple
 
@@ -245,7 +245,7 @@ def debug_request(request):
 ## 5. Audit du périmètre
 
 Forge expose aujourd'hui plusieurs classes publiques utilisables par les
-contrôleurs. Le ticket fondateur ne refactore pas tout en bloc — il
+contrôleurs. Le ticket fondateur ne refactore pas tout en bloc, il
 documente l'état et planifie l'extension.
 
 | Classe | Statut convention | Notes |
@@ -254,7 +254,7 @@ documente l'état et planifie l'extension.
 | `core.http.response.Response` | **conforme** | constructeurs + `.data` + `.cookies` ; voir §4. |
 | `core.http.request.UploadedFile` | partiel | déjà un `dataclass(frozen=True)` lisible (`filename`, `size`, `content_type`) ; pas encore de `.data`. Ticket suivant. |
 | `core.http.router.RouteEntry` | partiel | `method_label`, `pattern`, `name`, `public`, `csrf`, `api` exposés ; pas encore de `.data`. Ticket suivant. |
-| `core.forms.form.Form` | hors-périmètre | API plus large (validation, erreurs, binding) — audit dédié. |
+| `core.forms.form.Form` | hors-périmètre | API plus large (validation, erreurs, binding), audit dédié. |
 | `core.sessions.SessionStore` | hors-périmètre | contrat protocole ; pas une classe pédagogique de premier ordre. |
 
 Les classes marquées « partiel » ou « hors-périmètre » seront traitées par
@@ -272,7 +272,7 @@ terrain. La règle reste celle de la charte : **tester avant d'élargir**.
   vue **debug**, pas une trace d'audit. Pour l'audit auth, voir ADR-008.
 - Ne pas ajouter à `.data` un champ qui n'a pas d'utilité pédagogique
   claire : le but est l'introspection, pas la complétude.
-- Les masquages sont en mémoire seulement — la requête réelle reçue par
+- Les masquages sont en mémoire seulement, la requête réelle reçue par
   l'application reste intacte (`request.headers["Authorization"]` continue
   de fonctionner pour le contrôleur).
 
@@ -297,4 +297,4 @@ terrain. La règle reste celle de la charte : **tester avant d'élargir**.
 - [API Forge complète](api.md)
 - [API JSON légère](api-json.md)
 - [Sessions](sessions.md)
-- [ADR-008 — Audit Auth (architecture du logging)](../adr/008-auth-audit-architecture.md)
+- [ADR-008, Audit Auth (architecture du logging)](../adr/008-auth-audit-architecture.md)

@@ -1,8 +1,8 @@
-# ADR-048 — Parcours d'accueil « welcome-projet » dans le squelette
+# ADR-048, Parcours d'accueil « welcome-projet » dans le squelette
 
 ## Statut
 
-Accepté — bêta publique 1.0 (`1.0.0-beta.x`).
+Accepté, bêta publique 1.0 (`1.0.0-beta.x`).
 Mise en œuvre par les tickets `WELCOME-PROJET-*`.
 
 ---

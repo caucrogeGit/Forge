@@ -15,7 +15,7 @@ Pas de magie cachée, SQL visible, sécurisé par défaut, runtime minimal
 
 ## Statut
 
-Forge **1.0.0-beta.17** — bêta publique.
+Forge **1.0.0-beta.17**, bêta publique.
 
 - Paquet PyPI : [`forge-mvc`](https://pypi.org/project/forge-mvc/)
 - Préversion PEP 440 : installation avec `--pre`
@@ -201,4 +201,4 @@ Voir [LICENSE](LICENSE) pour les conditions complètes.
 
 ## Auteur
 
-Roger Lequette — [forgemvc.com](https://forgemvc.com/)
+Roger Lequette, [forgemvc.com](https://forgemvc.com/)

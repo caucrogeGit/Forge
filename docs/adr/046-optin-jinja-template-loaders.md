@@ -1,8 +1,8 @@
-# ADR-046 — Registre de loaders de templates Jinja pour les opt-ins
+# ADR-046, Registre de loaders de templates Jinja pour les opt-ins
 
 ## Statut
 
-Accepté — bêta publique 1.0 (`1.0.0-beta.x`).
+Accepté, bêta publique 1.0 (`1.0.0-beta.x`).
 Implémenté par `CORE-JINJA-OPTIN-LOADERS-001`.
 Cadrage de l'intégration HTTP de Forge Admin (chantier `ADMIN-*`).
 

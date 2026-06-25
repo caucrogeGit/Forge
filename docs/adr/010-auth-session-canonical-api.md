@@ -1,4 +1,4 @@
-# ADR-010 — API canonique auth/session
+# ADR-010, API canonique auth/session
 
 ## Statut
 
@@ -15,7 +15,7 @@ Acceptée
 Forge dispose de deux piles parallèles pour la gestion des sessions et de
 l'authentification :
 
-**`core.auth.session`** — API moderne, typée, en anglais :
+**`core.auth.session`**, API moderne, typée, en anglais :
 
 | Fonction | Rôle |
 |---|---|
@@ -25,12 +25,12 @@ l'authentification :
 | `get_authenticated_user_id(request)` | Lit l'identifiant utilisateur typé (`int`) |
 | `current_user(request, user_loader)` | Retourne l'`AuthUser` courant |
 | `is_authenticated(request)` | Vérifie la présence de `_auth_user_id` |
-| `@login_required` | Décorateur contrôleur — 401 ou redirect |
+| `@login_required` | Décorateur contrôleur, 401 ou redirect |
 
 Cette pile est compatible avec `AuthUser`, le protocole `SessionStore` (Phase 3)
 et tous les modules opt-in (`forge-mvc-mfa`, `forge-mvc-rbac`).
 
-**`core.security.session`** — API legacy, en français/anglais mixte :
+**`core.security.session`**, API legacy, en français/anglais mixte :
 
 | Fonction | Rôle |
 |---|---|
@@ -115,7 +115,7 @@ La transition se déroule en quatre tickets :
 | Ticket | Responsabilité |
 |---|---|
 | `AUTH-SESSION-CANONICAL-DECISION-001` (ce ticket) | Décision canonique et documentation |
-| `AUTH-SESSION-DEDUP-001` | Alignement et déduplication — migration des imports runtime |
+| `AUTH-SESSION-DEDUP-001` | Alignement et déduplication, migration des imports runtime |
 | `AUTH-SESSION-LEGACY-DEPRECATION-001` | Ajout des `DeprecationWarning` sur les fonctions legacy |
 | `STARTER-AUTH-MODERNIZE-001` | Modernisation du starter auth sur `core.auth.session` |
 | `CORE-AUTH-NO-HARDCODED-FIELDS-001` | Suppression des champs applicatifs codés en dur dans le core |
@@ -135,7 +135,7 @@ l'utiliser directement (via des imports intermédiaires dans le core).
 
 ---
 
-## Amendement — Dépréciations API legacy (4.3)
+## Amendement, Dépréciations API legacy (4.3)
 
 **Ticket** : `AUTH-SESSION-LEGACY-DEPRECATION-001`
 **Date** : 2026-05-16
@@ -152,12 +152,12 @@ Les fonctions legacy suivantes de `core.security.session` émettent désormais u
 
 **Fonctions infrastructure conservées sans warning** : `get_session_id`,
 `get_session`, `delete_session`, `regenerate_session`, `user_has_role`,
-`set_flash`, `get_flash` — pas d'équivalent canonique direct ou utilisées
+`set_flash`, `get_flash`, pas d'équivalent canonique direct ou utilisées
 en interne par le framework.
 
 **Propriétés garanties** :
 - L'import de `core.security.session` n'émet aucun `DeprecationWarning`.
-- Les fonctions dépréciées continuent à fonctionner — la migration est
+- Les fonctions dépréciées continuent à fonctionner, la migration est
   progressive, non cassante.
 - `stacklevel=2` : le warning pointe vers le code appelant.
 - `user_has_role` ne cascade pas le warning de `get_user` (refactorisé
@@ -168,7 +168,7 @@ aux tickets 4.4 (`STARTER-AUTH-MODERNIZE-001`) et suivants.
 
 ---
 
-## Amendement — Pont de compatibilité bidirectionnel (4.2b)
+## Amendement, Pont de compatibilité bidirectionnel (4.2b)
 
 **Ticket** : `AUTH-SESSION-COMPATIBILITY-BRIDGE-001`
 **Date** : 2026-05-16
@@ -186,7 +186,7 @@ si les clés legacy sont absentes mais que `_auth_user_id` est un entier positif
 (session créée par `login_user`), la session est considérée authentifiée.
 
 **Propriétés garanties** :
-- Aucune écriture dans la session à la lecture — pas de pollution de clés.
+- Aucune écriture dans la session à la lecture, pas de pollution de clés.
 - L'expiration est étendue dans les deux cas.
 - Pas d'import circulaire : `core.security.session` utilise la clé littérale
   `"_auth_user_id"` sans importer `core.auth.session`.

@@ -11,7 +11,7 @@ passe par une **release majeure** (charte, règle C). Avant 1.0, le gel sert à
 **arrêter la valse de renommages** et à donner un contrat stable aux premiers
 utilisateurs.
 
-Un garde-fou — `tests/meta/test_public_contract_1_0_001.py` — verrouille
+Un garde-fou, `tests/meta/test_public_contract_1_0_001.py`, verrouille
 mécaniquement les listes ci-dessous : toute dérive casse la suite.
 
 ---
@@ -45,7 +45,7 @@ Le système de **module local** (workflow d'auteur), **exactement 4 commandes** 
 `forge module:routes`.
 
 **Décision finale 1.0** : `module:*` reste **distinct** de `opt-in:*`
-(ADR-016 A2) — il sert à *fabriquer* un module local, pas à *consommer* un
+(ADR-016 A2), il sert à *fabriquer* un module local, pas à *consommer* un
 opt-in officiel. Il n'est pas fusionné. Un nom inconnu passé à `opt-in:*`
 oriente vers `forge module:install`.
 
@@ -69,7 +69,7 @@ commande de génération de starter.
 !!! note "welcome-forge : trois niveaux en tutoriels continus (ADR-025, ADR-028)"
     Les trois niveaux de `welcome-forge` ne sont **plus des starters
     buildables** : chacun est un **tutoriel continu manuel**, un mini-projet
-    écrit à la main palier après palier — débutant (11 paliers, ADR-025),
+    écrit à la main palier après palier, débutant (11 paliers, ADR-025),
     intermédiaire (8 paliers, « Carnet de notes », ADR-028) et avancé (4 paliers,
     « Catalogue d'articles », ADR-028). Ils ne figurent donc plus dans la liste
     gelée ci-dessous.
@@ -83,9 +83,9 @@ modules opt-in sont : `welcome-iot` (`iot-welcome`, …) pour `forge-mvc-iot`,
 enrôlement/challenge/récupération, durcissement), `welcome-rbac`
 (`rbac-welcome`, …) pour `forge-mvc-rbac` (contrat déclaratif, vérification,
 guards, résolution par utilisateur), et `welcome-workflow` (`workflow-welcome`, …)
-pour `forge-mvc-workflow` (statuts, transitions, badges — sans état), et
+pour `forge-mvc-workflow` (statuts, transitions, badges, sans état), et
 `welcome-stats` (`stats-welcome`, …) pour `forge-mvc-stats` (événements, schéma,
-tracking et consultation — SQL visible), et `welcome-mail` (`mail-welcome`, …)
+tracking et consultation, SQL visible), et `welcome-mail` (`mail-welcome`, …)
 pour `forge-mvc-mail` (composition, transports, templates, configuration,
 diagnostic). **Les 10 opt-ins dotés d'un parcours ont chacun leur progression
 `welcome-<module>`.**

@@ -5,9 +5,9 @@ chaque composant de l'environnement d'exécution Forge.
 
 Il complète :
 
-- [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Procédure de release](release.md) — checklist avant chaque tag
-- [Politique de dépréciation](deprecation-policy.md) — cycle annonce → retrait
+- [Politique de release](release-policy.md), règles MAJOR/MINOR/PATCH
+- [Procédure de release](release.md), checklist avant chaque tag
+- [Politique de dépréciation](deprecation-policy.md), cycle annonce → retrait
 
 ---
 
@@ -15,9 +15,9 @@ Il complète :
 
 | Version | Statut |
 |---|---|
-| 3.12 | Supportée — minimum requis, version de développement recommandée |
-| 3.13 | Supportée — testée en CI |
-| 3.14 | Supportée — testée en CI |
+| 3.12 | Supportée, minimum requis, version de développement recommandée |
+| 3.13 | Supportée, testée en CI |
+| 3.14 | Supportée, testée en CI |
 | < 3.12 | Non supportée |
 
 **Version minimum :** Python 3.12 (`requires-python = ">=3.12"` dans `pyproject.toml`).
@@ -35,7 +35,7 @@ via la matrice GitHub Actions (`.github/workflows/tests.yml`).
 |---|---|
 | 10.11 (LTS Debian stable) | Recommandée |
 | 10.6 (LTS) | Compatible |
-| 11.x (latest) | Compatible — non testée systématiquement |
+| 11.x (latest) | Compatible, non testée systématiquement |
 | MySQL | Non supporté |
 | PostgreSQL | Non supporté |
 | SQLite | Non supporté |
@@ -92,7 +92,7 @@ Les projets Forge n'ont pas besoin de Node.js pour servir les fichiers statiques
 | OS | Statut |
 |---|---|
 | Debian 12 (Bookworm) | Recommandé en production |
-| Ubuntu 22.04 / 24.04 | Supporté — CI ubuntu-latest |
+| Ubuntu 22.04 / 24.04 | Supporté, CI ubuntu-latest |
 | macOS | Compatible pour le développement |
 | Windows | Non testé, non supporté officiellement |
 
@@ -115,9 +115,8 @@ Ces dépendances sont installées automatiquement avec Forge via `pip` ou `pipx`
 dépendances fondamentales sont `mariadb`, `jinja2` et `python-dotenv` ;
 `argon2-cffi` n'est utilisée que pour le hachage des mots de passe
 (Auth/User). Toutes sont installées par défaut. Les dépendances spécifiques
-aux modules opt-in ne sont installées que via le bon extra ou le paquet opt-in
-— `pyotp` pour MFA, **`Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`**
-(traitement d'images, retiré du core par l'ADR-018) — voir « Dépendances
+aux modules opt-in ne sont installées que via le bon extra ou le paquet opt-in, `pyotp` pour MFA, **`Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`**
+(traitement d'images, retiré du core par l'ADR-018), voir « Dépendances
 optionnelles » ci-dessous.
 
 ---
@@ -287,10 +286,10 @@ pip-audit
 
 | Domaine | Limite |
 |---|---|
-| MariaDB 11.x | Pas de tests CI systématiques — compatible mais non garanti |
+| MariaDB 11.x | Pas de tests CI systématiques, compatible mais non garanti |
 | Python 3.14 | En CI mais version pre-release pendant la série 1.x |
-| Node.js | Aucune version minimum formelle — 24.17.0 LTS recommandé |
-| Tests E2E | Pas automatisés en CI — lancés manuellement avant release |
+| Node.js | Aucune version minimum formelle, 24.17.0 LTS recommandé |
+| Tests E2E | Pas automatisés en CI, lancés manuellement avant release |
 
 ---
 
@@ -308,10 +307,10 @@ pip-audit
 ## Voir aussi
 
 - [Vue d'ensemble Release et compatibilité](release-and-compatibility.md)
-- [Guide de migration](../features/migration-guide.md) — vérifier la compatibilité avant de migrer
-- [Politique de release](release-policy.md) — règles MAJOR/MINOR/PATCH
-- [Sécurité en production](../deployment/production-security.md) — checklist de déploiement
+- [Guide de migration](../features/migration-guide.md), vérifier la compatibilité avant de migrer
+- [Politique de release](release-policy.md), règles MAJOR/MINOR/PATCH
+- [Sécurité en production](../deployment/production-security.md), checklist de déploiement
 
 ---
 
-*Guide défini lors de RELEASE-COMPAT-001 (Phase 8 — Release et compatibilité).*
+*Guide défini lors de RELEASE-COMPAT-001 (Phase 8, Release et compatibilité).*

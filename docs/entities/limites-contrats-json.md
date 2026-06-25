@@ -61,8 +61,8 @@ détaillée de l'aide à la saisie.
 
 Le format `format_version: 1` n'est plus accepté comme format d'entrée utilisateur.
 
-- `build:model` refuse les entités `format_version: 1` — lève `ModelValidationError`.
-- `make:crud` refuse les entités `format_version: 1` — quitte avec `SystemExit`.
+- `build:model` refuse les entités `format_version: 1`, lève `ModelValidationError`.
+- `make:crud` refuse les entités `format_version: 1`, quitte avec `SystemExit`.
 - `relations.json` avec `format_version: 1` est refusé par `validate_relations_definition`.
 - Les clés legacy (`from_entity`, `to_entity`, `foreign_key_name`) sont refusées.
 
@@ -82,7 +82,7 @@ en base.
 
 **Garde-fou `make:crud` :** si un champ pivot est `required: true` ou
 `nullable: false`, `make:crud` refuse de générer le CRUD et affiche un message
-d'erreur. En effet, `make:crud` synchronise uniquement les identifiants — un
+d'erreur. En effet, `make:crud` synchronise uniquement les identifiants, un
 champ `NOT NULL` sans valeur fournie produirait une erreur d'intégrité à
 l'exécution. Pour lever ce blocage, rendez les champs pivot nullable ou utilisez
 un module CRUD pivot dédié.
@@ -107,7 +107,7 @@ assumées :
 |-----------|---------------------|
 | `min` / `max` | conservés dans la structure interne, **ne génèrent pas de contrainte SQL `CHECK`** |
 | `default` | projeté en SQL `DEFAULT` pour les cas courants |
-| `nullable` | la règle est définie par ADR-013 : `nullable` par défaut (`NULL`), `required: true` prioritaire (`NOT NULL`) — uniforme pour `fields[]` et `pivot.fields[]` |
+| `nullable` | la règle est définie par ADR-013 : `nullable` par défaut (`NULL`), `required: true` prioritaire (`NOT NULL`), uniforme pour `fields[]` et `pivot.fields[]` |
 | `boolean` | projeté en `BOOLEAN` MariaDB |
 
 Le SQL généré est une **projection Forge**, pas un dialecte configurable par
@@ -152,7 +152,7 @@ contrat déclare, sans inférence cachée.
 
 ## Travaux futurs possibles
 
-Ces points ne sont pas des engagements — ce sont des pistes identifiées pendant
+Ces points ne sont pas des engagements, ce sont des pistes identifiées pendant
 la phase bêta :
 
 - harmonisation du comportement `nullable` entre `fields[]` et `pivot.fields[]` ;

@@ -6,7 +6,7 @@ Dans les JSON canoniques Forge, les champs utilisent des **types Forge**, pas de
 { "name": "title", "type": "string", "max_length": 255 }
 ```
 
-`VARCHAR(255)` est une **projection SQL** dérivée par Forge lors de la génération — elle n'apparaît pas dans le JSON canonique. `sql_type` et `python_type` ne sont pas des clés canoniques.
+`VARCHAR(255)` est une **projection SQL** dérivée par Forge lors de la génération, elle n'apparaît pas dans le JSON canonique. `sql_type` et `python_type` ne sont pas des clés canoniques.
 
 ---
 
@@ -32,7 +32,7 @@ Dans les JSON canoniques Forge, les champs utilisent des **types Forge**, pas de
 
 ## Champs système automatiques
 
-Ces champs sont **injectés automatiquement** par Forge — ils ne sont pas déclarés dans `fields[]`.
+Ces champs sont **injectés automatiquement** par Forge, ils ne sont pas déclarés dans `fields[]`.
 
 | Source | SQL MariaDB | Condition |
 |---|---|---|
@@ -159,9 +159,9 @@ Projection dans la table pivot :
 role VARCHAR(50) NOT NULL
 ```
 
-Les contraintes `required`, `nullable`, `unique` et `default` fonctionnent de la même façon — à l'exception du **défaut de nullabilité** mentionné ci-dessus.
+Les contraintes `required`, `nullable`, `unique` et `default` fonctionnent de la même façon, à l'exception du **défaut de nullabilité** mentionné ci-dessus.
 
-`pivot.fields[]` ne peut pas redéclarer `id`, `from_key` ni `to_key` — ces noms sont réservés et détectés par `FORGE_PIVOT_RESERVED_FIELD` dans `forge entity:validate`.
+`pivot.fields[]` ne peut pas redéclarer `id`, `from_key` ni `to_key`, ces noms sont réservés et détectés par `FORGE_PIVOT_RESERVED_FIELD` dans `forge entity:validate`.
 
 ---
 
@@ -185,7 +185,7 @@ Ces éléments appartiennent au SQL généré ou à l'ancien format legacy :
 
 ## Limites
 
-- Cette page décrit le mapping réellement généré par Forge — elle reflète le comportement du code, pas des spécifications théoriques.
+- Cette page décrit le mapping réellement généré par Forge, elle reflète le comportement du code, pas des spécifications théoriques.
 - La nullabilité par défaut diffère entre `fields[]` et `pivot.fields[]` : déclarer explicitement `nullable` ou `required` est recommandé pour les deux cas.
 - `min` et `max` sont préservés dans la structure interne mais ne produisent pas de contrainte SQL `CHECK`.
 - `forge entity:validate` reste la validation officielle avant toute génération.

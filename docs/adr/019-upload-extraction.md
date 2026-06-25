@@ -1,8 +1,8 @@
-# ADR-019 — Extraction de l'upload générique hors du core : `forge-mvc-files`
+# ADR-019, Extraction de l'upload générique hors du core : `forge-mvc-files`
 
 ## Statut
 
-Proposé — Forge 1.0.0-beta.x.
+Proposé, Forge 1.0.0-beta.x.
 
 > Décision validée sur le principe (« sortir complètement l'upload du core »).
 > Périmètre figé ci-dessous ; exécution par étapes (chantier multi-tickets).
@@ -20,16 +20,16 @@ Proposé — Forge 1.0.0-beta.x.
 Le core de Forge embarque aujourd'hui tout le pipeline d'**upload générique** dans
 `core/uploads/` :
 
-- `manager.py` — `save_upload`, `SavedUpload`, `serve_media_file`,
+- `manager.py`, `save_upload`, `SavedUpload`, `serve_media_file`,
   `delete_upload`, `delete_media_file`, `get_upload_path`, `upload_root`,
   `_read_upload` ;
-- `storage.py` — écriture disque uuid/horodatée, anti-traversal
+- `storage.py`, écriture disque uuid/horodatée, anti-traversal
   (`normalize_media_path`, `media_path_to_storage_path`, `is_safe_media_path`,
   `save_bytes`, `delete_file`) ;
-- `validators.py` — `validate_upload_metadata`, `validate_extension`,
+- `validators.py`, `validate_upload_metadata`, `validate_extension`,
   `validate_mime_type`, `validate_size` ;
-- `exceptions.py` — hiérarchie `UploadError` ;
-- `rate_limit.py` — `is_upload_rate_limited`, `record_upload_attempt`.
+- `exceptions.py`, hiérarchie `UploadError` ;
+- `rate_limit.py`, `is_upload_rate_limited`, `record_upload_attempt`.
 
 Après l'extraction du traitement d'image (ADR-018), l'upload **générique** reste
 le dernier gros bloc applicatif logé dans le noyau. Un framework web peut
@@ -44,7 +44,7 @@ façon officielle »).
 - **`core/forms/fields.py` (dans le core)** importe `core.uploads.exceptions`
   (`UploadError`) et `core.uploads.validators` (`validate_extension`,
   `validate_mime_type`, `validate_size`) pour valider `FileField`/`ImageField`.
-  ⚠️ Le core **ne peut pas dépendre d'un opt-in** (ADR-004) — voir la décision.
+  ⚠️ Le core **ne peut pas dépendre d'un opt-in** (ADR-004), voir la décision.
 - **`forge-mvc-images`** dépend de `core.uploads` (`save_upload`, `_read_upload`,
   `validate_upload_metadata`, `SavedUpload`, `storage`) → dépendra de
   `forge-mvc-files` (**inversion de dépendance**).
@@ -58,7 +58,7 @@ façon officielle »).
   `features/media.md`, `deployment/production-limits.md`,
   `deployment/production-security.md`, `philosophy/security.md`,
   `starters/welcome-forge/avance/file-upload.md`, `ADR-004`, `CLAUDE.md` (§3).
-- `forge-mvc-audio` (livré) possède son **propre** stockage — **non impacté**.
+- `forge-mvc-audio` (livré) possède son **propre** stockage, **non impacté**.
 - `rate_limit` d'upload est **upload-spécifique** (l'auth/MFA a son propre
   rate-limit dans `core.security.hashing`) → part sans accroc.
 
@@ -79,7 +79,7 @@ propriétaire de l'upload générique**. Le **pipeline d'I/O** quitte le core :
    **hiérarchie d'exceptions** `UploadError`, **uniquement** parce que
    `core/forms/fields.py` (`FileField`) en dépend et que le core ne peut pas
    dépendre d'un opt-in (ADR-004). Ce sont des contrôles **purs** (chaîne/entier),
-   sans I/O — ils ne contredisent pas le noyau minimal. `forge-mvc-files`
+   sans I/O, ils ne contredisent pas le noyau minimal. `forge-mvc-files`
    **réutilise** ces validators du core.
 
 Le **core** ne fait donc plus **aucune écriture/lecture de fichier uploadé** :
@@ -114,33 +114,33 @@ depuis `forge_mvc_files`.
 ### Coûts / ruptures
 
 - **Toute application qui uploade un fichier devra installer `forge-mvc-files`**
-  (changement de contrat — assumé, philosophie opt-in explicite).
+  (changement de contrat, assumé, philosophie opt-in explicite).
 - **Inversion de dépendance** : `forge-mvc-images` dépendra de `forge-mvc-files`.
 - `make:crud` génère désormais `from forge_mvc_files import save_upload` pour les
   champs fichier ; tests de génération à mettre à jour.
 - ~34 fichiers de tests + ~10 docs à repointer ; `CLAUDE.md` (§3) et `ADR-004`
-  (périmètre) à amender (mainteneur — fichiers protégés par le hook).
+  (périmètre) à amender (mainteneur, fichiers protégés par le hook).
 - Garde-fous packaging/perimètre à inverser (le core ne contient plus d'upload).
 
 ---
 
 ## Plan d'exécution (tickets)
 
-1. `FILES-PKG-SCAFFOLD-001` — squelette `packages/forge-mvc-files`
+1. `FILES-PKG-SCAFFOLD-001`, squelette `packages/forge-mvc-files`
    (`pyproject` + `forge_mvc_files/__init__`), enregistrement opt-in (catalogue,
    classifier, CI, release-policy, contrats de tests).
-2. `FILES-VALIDATORS-KEEP-001` — relocaliser les validators purs + exceptions
+2. `FILES-VALIDATORS-KEEP-001`, relocaliser les validators purs + exceptions
    `UploadError` hors de `core/uploads/` (vers `core/forms/` ou `core/validation`),
    repointer `core/forms/fields.py`. Le core garde la validation, pas l'I/O.
-3. `FILES-MOVE-PIPELINE-001` — déplacer `manager` + `storage` + `rate_limit`
+3. `FILES-MOVE-PIPELINE-001`, déplacer `manager` + `storage` + `rate_limit`
    d'upload vers `forge_mvc_files` ; le core ne réexporte plus l'upload.
-4. `FILES-IMAGES-REPOINT-001` — `forge-mvc-images` dépend de `forge-mvc-files`
+4. `FILES-IMAGES-REPOINT-001`, `forge-mvc-images` dépend de `forge-mvc-files`
    (imports `core.uploads` → `forge_mvc_files`).
-5. `FILES-CLI-RENAME-001` — générateurs `make:crud`/pages publiques +
+5. `FILES-CLI-RENAME-001`, générateurs `make:crud`/pages publiques +
    `cli/assets/uploads.py` + starter `file-upload` → `forge_mvc_files`.
-6. `FILES-DOCS-PERIMETER-001` — docs (`api.md`, `production-*`, `security.md`,
+6. `FILES-DOCS-PERIMETER-001`, docs (`api.md`, `production-*`, `security.md`,
    `file-upload.md`…), **ADR-004 et CLAUDE.md §3** (mainteneur).
-7. `CORE-DROP-UPLOADS-001` — suppression de `core/uploads/`, inversion des
+7. `CORE-DROP-UPLOADS-001`, suppression de `core/uploads/`, inversion des
    garde-fous périmètre + test d'absence.
 
 L'ordre garantit que la suppression de `core/uploads/` (étape 7) vient **après**
@@ -151,18 +151,18 @@ le repointage de tous les importeurs, pour ne jamais casser la collecte.
 ## Alternatives écartées
 
 - **Upload extrait mais `serve_media_file` gardé dans le core** : compromis
-  rejeté — laisse deux endroits pour les fichiers (principe 11 moins net) et
+  rejeté, laisse deux endroits pour les fichiers (principe 11 moins net) et
   garde de l'I/O fichier dans le noyau.
-- **Couche `forge-mvc-files` par-dessus `core.uploads`** : rejeté — laisserait
+- **Couche `forge-mvc-files` par-dessus `core.uploads`** : rejeté, laisserait
   **deux façons** d'uploader (core + opt-in), exactement ce que le principe 11
   proscrit.
-- **Statu quo** : rejeté — l'upload reste un bloc applicatif dans le noyau.
+- **Statu quo** : rejeté, l'upload reste un bloc applicatif dans le noyau.
 
 ---
 
 ## Références
 
 - Charte principes 8 (noyau minimal), 11 (une seule façon officielle).
-- ADR-004 (périmètre du core minimal strict) — **à amender**.
+- ADR-004 (périmètre du core minimal strict), **à amender**.
 - ADR-005 (packaging hybride monorepo + multi-distributions PyPI).
-- ADR-018 (extraction du traitement d'image — même trajectoire).
+- ADR-018 (extraction du traitement d'image, même trajectoire).

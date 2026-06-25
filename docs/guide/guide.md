@@ -18,7 +18,7 @@ Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir
 
 Deux méthodes selon votre situation.
 
-### Cas A — Via `forge new` (recommandé)
+### Cas A, Via `forge new` (recommandé)
 
 ```bash
 forge new MonProjet
@@ -26,13 +26,13 @@ cd MonProjet
 source .venv/bin/activate
 ```
 
-Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic`, `multilingual`) — le profil par défaut est `standard`. Voir [Profils de projet](../features/profiles.md).
+Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic`, `multilingual`), le profil par défaut est `standard`. Voir [Profils de projet](../features/profiles.md).
 
 `forge new` fait tout automatiquement : clonage du squelette, environnement virtuel Python, installation des dépendances, compilation du CSS Tailwind officiel (si npm est présent) et génération des certificats SSL. Un dépôt Git propre est initialisé.
 
 Il reste deux choses manuelles : **renseigner les mots de passe MariaDB** dans `env/dev`, puis lancer `forge db:init`.
 
-### Cas B — Installation manuelle (usage avancé)
+### Cas B, Installation manuelle (usage avancé)
 
 ```bash
 git clone --branch {{forge_tag}} --depth=1 https://github.com/caucrogeGit/Forge.git MonProjet
@@ -149,12 +149,12 @@ Puis éditer le fichier canonique `mvc/entities/contact/contact.json` :
     | Clé | Obligatoire | Description |
     |---|---|---|
     | `schema_version` | **oui** | Toujours `"1.0"` |
-    | `name` | **oui** | Nom PascalCase — devient le nom de la classe Python |
-    | `table` | non | Nom snake_case — déduit de `name` si absent |
+    | `name` | **oui** | Nom PascalCase, devient le nom de la classe Python |
+    | `table` | non | Nom snake_case, déduit de `name` si absent |
     | `description` | non | Texte libre (documentaire) |
     | `fields` | **oui** | Liste des champs |
 
-    La clé primaire `Id` est générée automatiquement — ne pas la déclarer dans `fields[]`.
+    La clé primaire `Id` est générée automatiquement, ne pas la déclarer dans `fields[]`.
 
     **Chaque champ :**
 
@@ -186,7 +186,7 @@ flowchart LR
 ```
 
 !!! danger "Ne pas modifier les fichiers générés"
-    `contact.sql` et `contact_base.py` sont régénérables — ne pas y écrire de logique manuelle.
+    `contact.sql` et `contact_base.py` sont régénérables, ne pas y écrire de logique manuelle.
     La logique métier va dans `contact.py`, qui n'est jamais écrasé par Forge.
 
 ### 6. Générer le CRUD
@@ -218,7 +218,7 @@ Les pages liste générées incluent une recherche GET `q` côté serveur sur le
 
 ### 7. Déclarer les routes
 
-`forge make:crud` affiche le bloc de routes à ajouter dans `mvc/routes.py` — il ne l'écrit jamais automatiquement.
+`forge make:crud` affiche le bloc de routes à ajouter dans `mvc/routes.py`, il ne l'écrit jamais automatiquement.
 
 Copier le bloc affiché dans `mvc/routes.py` :
 

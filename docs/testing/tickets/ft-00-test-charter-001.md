@@ -1,4 +1,4 @@
-# FT-00-TEST-CHARTER-001 — Lire et comprendre la charte de campagne
+# FT-00-TEST-CHARTER-001, Lire et comprendre la charte de campagne
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -8,9 +8,9 @@
 
 | Champ | Valeur |
 |---|---|
-| Phase | FT-00 — Cadre de la campagne terrain |
+| Phase | FT-00, Cadre de la campagne terrain |
 | Ticket | FT-00-TEST-CHARTER-001 |
-| Niveau de guidage | G0 — Guidé complètement |
+| Niveau de guidage | G0, Guidé complètement |
 | Profil testeur visé | tout profil |
 | Durée indicative | courte (30 à 60 minutes) |
 | Environnement cible | tout environnement |
@@ -73,7 +73,7 @@ docs/testing/field-test-feedback-template.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues.
 
-### Verrou — documentation erronée
+### Verrou, documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 
@@ -246,9 +246,9 @@ A5 — impossible malgré aide
 
 | Question | Réponse |
 |---|---|
-| Ce ticket peut-il devenir un tutoriel ? | non — ticket d'amorçage interne |
-| Nom proposé de la page tutoriel | — |
-| Menu proposé | — |
+| Ce ticket peut-il devenir un tutoriel ? | non, ticket d'amorçage interne |
+| Nom proposé de la page tutoriel |, |
+| Menu proposé |, |
 | Ticket FT validé par un testeur externe ? | à renseigner |
 | Conversion autorisée maintenant ? | non |
 
@@ -262,10 +262,10 @@ Le tutoriel ne doit pas être publié tant que le ticket FT correspondant n'a pa
 
 À remplir après analyse du retour.
 
-- Problème reproductible : —
-- Problème framework : —
-- Problème documentation : —
-- Problème ergonomie : —
-- Hors périmètre : —
-- Ticket correctif à créer : —
-- Priorité proposée : —
+- Problème reproductible : -
+- Problème framework : -
+- Problème documentation : -
+- Problème ergonomie : -
+- Hors périmètre : -
+- Ticket correctif à créer : -
+- Priorité proposée : -

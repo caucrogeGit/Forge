@@ -1,4 +1,4 @@
-# Forge — Référence API et CLI
+# Forge, Référence API et CLI
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -61,20 +61,20 @@ flowchart LR
 
 ### API et CLI
 
-- [API Forge complète](api.md) — fonctions, classes, contrats, helpers
-- [CRUD enrichi et relations](crud.md) — relations avancées entre entités
-- [Pages publiques](pages-publiques.md) — génération de pages génériques
-- [Modules Forge](modules.md) — système de modules, cycle de vie, routes
+- [API Forge complète](api.md), fonctions, classes, contrats, helpers
+- [CRUD enrichi et relations](crud.md), relations avancées entre entités
+- [Pages publiques](pages-publiques.md), génération de pages génériques
+- [Modules Forge](modules.md), système de modules, cycle de vie, routes
 
 ### Sécurité et sessions
 
-- [Audit Auth](audit-auth.md) — journalisation, cookies, headers, uploads
-- [Sessions](sessions.md) — concurrence et garanties
+- [Audit Auth](audit-auth.md), journalisation, cookies, headers, uploads
+- [Sessions](sessions.md), concurrence et garanties
 
 ### Outils et infrastructure
 
-- [Profils de projet](profils.md) — environnements et endpoint de santé
-- [Tests E2E](tests-e2e.md) — HTTP, MariaDB, CSRF
+- [Profils de projet](profils.md), environnements et endpoint de santé
+- [Tests E2E](tests-e2e.md), HTTP, MariaDB, CSRF
 
 ---
 

@@ -9,7 +9,7 @@
 > ouvrir un ticket Forge ou à porter des commits faits par erreur dans un
 > autre dépôt.
 >
-> **Origine** : ticket `GIT-RECOVERY-WORKFLOW-GUARD-001` — après la release
+> **Origine** : ticket `GIT-RECOVERY-WORKFLOW-GUARD-001`, après la release
 > `1.0.0-beta.11`, plusieurs tickets ont été commités par erreur dans un
 > projet généré WSL (`~/Projets/forge-test-b11`) avant d'être portés par
 > patchs dans le dépôt canonique. Cette page rend la procédure officielle
@@ -116,7 +116,7 @@ git format-patch <base>..<head> -o /tmp/forge-recovery-patches
 
 Les éventuels changements **non commités** (WIP) doivent être exportés
 séparément (par exemple via `git diff > /tmp/forge-recovery-patches/wip.patch`)
-et **ne pas** être appliqués automatiquement à l'étape 4.6 — ils sont
+et **ne pas** être appliqués automatiquement à l'étape 4.6, ils sont
 revus manuellement.
 
 ### 4.3 Copier les patchs vers la machine canonique
@@ -187,7 +187,7 @@ git merge --ff-only port/recovery-$(date +%Y%m%d)
 
 Le `--ff-only` garantit qu'il n'y a **pas** de commit de merge implicite
 qui obscurcirait l'historique. Si le fast-forward échoue, c'est que
-`main` a divergé pendant le portage — rebaser la branche de portage sur
+`main` a divergé pendant le portage, rebaser la branche de portage sur
 `main` à jour, refaire les validations, puis retenter.
 
 ### 4.9 Pousser
@@ -206,10 +206,10 @@ distant.
 Pendant une récupération, **jamais** :
 
 - merger directement un projet généré dans Forge canonique
-  (`git merge <chemin-vers-projet-généré>`) — la structure ne
+  (`git merge <chemin-vers-projet-généré>`), la structure ne
   correspond pas ;
 - copier-coller un gros diff manuel sans audit patch par patch ;
-- appliquer un patch WIP automatiquement (`git am wip.patch`) — le WIP
+- appliquer un patch WIP automatiquement (`git am wip.patch`), le WIP
   est revu à la main et recoupé en commits explicites ;
 - continuer un ticket si le dépôt courant est ambigu (échec d'un seul
   critère de la section 2) ;
@@ -222,11 +222,11 @@ Pendant une récupération, **jamais** :
 
 ## 6. Pour aller plus loin
 
-- [Conventions internes de Forge](conventions.md) — patterns
+- [Conventions internes de Forge](conventions.md), patterns
   opérationnels (audit avant action, tests, code, doc).
-- [Vue d'ensemble du contributeur](../philosophy/contributing.md) — préparation
+- [Vue d'ensemble du contributeur](../philosophy/contributing.md), préparation
   de l'environnement, sélection du ticket, validations canoniques.
-- [Procédure de release](../release/release.md) — pour les tags officiels,
+- [Procédure de release](../release/release.md), pour les tags officiels,
   qui ne sont **jamais** créés depuis un dépôt secondaire.
-- `CLAUDE.md` (racine du dépôt) — briefing IA, mentionne cette page
+- `CLAUDE.md` (racine du dépôt), briefing IA, mentionne cette page
   comme étape 0 obligatoire avant tout ticket.

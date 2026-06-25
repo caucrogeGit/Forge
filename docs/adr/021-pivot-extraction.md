@@ -1,4 +1,4 @@
-# ADR-021 — Extraction de pivot advanced vers `forge-mvc-pivot`
+# ADR-021, Extraction de pivot advanced vers `forge-mvc-pivot`
 
 ## Statut
 
@@ -20,7 +20,7 @@ encore ? ».
 
 `core/pivot_advanced.py` est l'une d'elles :
 
-- C'est une **fonctionnalité avancée** de données — la persistance
+- C'est une **fonctionnalité avancée** de données, la persistance
   d'associations `many_to_many` **enrichies** (lignes de jointure portant des
   attributs), avec son générateur `forge make:pivot-crud`.
 - Elle n'est **pas** une primitive générale du framework : une application
@@ -62,13 +62,13 @@ sont extraits vers l'opt-in `forge-mvc-pivot`.**
 - Nouveau paquet `packages/forge-mvc-pivot/` (distribution PyPI séparée,
   dépend de `forge-mvc`).
 - Les tests pivot importent `forge_mvc_pivot` et sont protégés par
-  `pytest.importorskip("forge_mvc_pivot")` (core reste autonome — garde-fou
+  `pytest.importorskip("forge_mvc_pivot")` (core reste autonome, garde-fou
   `TESTS-OPTIN-IMPORTORSKIP-001`).
 - Garde-fou d'extraction `PIVOT-EXTRACT-001` : le core ne contient plus
   `pivot_advanced`, le paquet expose l'API publique.
 - Aucun starter gelé ni progression welcome n'est impacté (contrairement à une
   éventuelle extraction de `mail`, qui porte le starter `send-email` de la
-  progression welcome-forge — traitée séparément si décidée).
+  progression welcome-forge, traitée séparément si décidée).
 
 ---
 
@@ -77,7 +77,7 @@ sont extraits vers l'opt-in `forge-mvc-pivot`.**
 Le même test de légitimité désigne deux autres candidats, à traiter par des
 ADR dédiés s'ils sont retenus :
 
-- **`core/mail/`** — autonome, non vital ; extraction plus lourde car elle
+- **`core/mail/`**, autonome, non vital ; extraction plus lourde car elle
   déplace la famille CLI `mail:*` et sort le starter `send-email` de la
   progression welcome-forge gelée (réduction du contrat 1.0).
-- **`core/i18n/`** — autonome mais de faible volume ; gain marginal.
+- **`core/i18n/`**, autonome mais de faible volume ; gain marginal.

@@ -1,4 +1,4 @@
-# ADR-027 — Extraction de l'i18n vers `forge-mvc-i18n`
+# ADR-027, Extraction de l'i18n vers `forge-mvc-i18n`
 
 ## Statut
 
@@ -18,11 +18,11 @@ cette brique du core, une application Forge basique tourne-t-elle encore ? » �
 oui. La traduction est un besoin fréquent mais **n'est pas une primitive
 générale** du framework, et `core/i18n/` est **autonome** (sa seule dépendance
 core est `core.forge` pour les clés de configuration `i18n_default_locale` /
-`i18n_fallback_locale` — disponible via `forge-mvc`).
+`i18n_fallback_locale`, disponible via `forge-mvc`).
 
 Le module relève donc d'un opt-in, comme stats, workflow, pivot ou mail.
 
-**Particularité — le couplage au générateur CRUD.** Contrairement à mail ou
+**Particularité, le couplage au générateur CRUD.** Contrairement à mail ou
 pivot, `trans()` est tissé dans le **générateur CRUD du cœur** : `forge make:crud`
 et les pages publiques émettent des templates qui appellent `{{ trans(...) }}`
 (`crud.edit`, `common.save`, `crud.confirm_delete`…). Aujourd'hui le renderer
@@ -70,12 +70,12 @@ anciens chemins `core.i18n` sont supprimés.
   `forge-mvc`).
 - Garde-fou d'extraction `I18N-EXTRACT-001` : le core ne contient plus `i18n`, le
   paquet expose l'API publique, le renderer garde un repli no-op.
-- Tests i18n protégés par `pytest.importorskip("forge_mvc_i18n")` (core autonome —
+- Tests i18n protégés par `pytest.importorskip("forge_mvc_i18n")` (core autonome,
   garde-fou `TESTS-OPTIN-IMPORTORSKIP-001`).
 - `forge_mvc_i18n` ajouté aux listes opt-in transverses (importorskip,
   core-only-contract, classifiers PyPI, sweep imports docs) + `release-policy.md`.
 - DX : un CRUD généré sans `forge-mvc-i18n` affiche les clés brutes (`crud.edit`)
-  au lieu du libellé traduit — dégradé mais lisible, jamais cassé.
+  au lieu du libellé traduit, dégradé mais lisible, jamais cassé.
 
 ---
 

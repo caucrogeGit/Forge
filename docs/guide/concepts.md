@@ -23,9 +23,9 @@ Une projection est un fichier technique dérivé du modèle canonique par `forge
 
 Exemples :
 
-- `contact.sql` — projection SQL locale de l'entité
-- `contact_base.py` — projection Python générée
-- `relations.sql` — projection SQL globale des relations
+- `contact.sql`, projection SQL locale de l'entité
+- `contact_base.py`, projection Python générée
+- `relations.sql`, projection SQL globale des relations
 
 ## Fichier manuel
 

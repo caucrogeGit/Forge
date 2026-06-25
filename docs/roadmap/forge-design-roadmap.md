@@ -55,7 +55,7 @@ Condition minimale :
 
 ---
 
-## Phase FD-0 — Cadrage de Forge Design
+## Phase FD-0, Cadrage de Forge Design
 
 **État : à venir.**
 
@@ -77,7 +77,7 @@ Forge Design est un outil de production de templates Forge, pas un framework con
 
 ---
 
-## Phase FD-1 — Modèle de page Forge Design
+## Phase FD-1, Modèle de page Forge Design
 
 **État : à venir.**
 
@@ -106,7 +106,7 @@ Exemple de structure visée :
 
 ---
 
-## Phase FD-2 — Lecture d’un projet Forge
+## Phase FD-2, Lecture d’un projet Forge
 
 **État : à venir.**
 
@@ -126,7 +126,7 @@ Interdiction : ne pas modifier le projet pendant cette phase.
 
 ---
 
-## Phase FD-3 — Éditeur visuel de structure
+## Phase FD-3, Éditeur visuel de structure
 
 **État : à venir.**
 
@@ -148,7 +148,7 @@ Règle : l’éditeur manipule une structure Forge Design, pas directement un fi
 
 ---
 
-## Phase FD-4 — Génération HTML/Jinja
+## Phase FD-4, Génération HTML/Jinja
 
 **État : à venir.**
 
@@ -168,7 +168,7 @@ Interdiction : ne pas générer du code opaque ou minifié.
 
 ---
 
-## Phase FD-5 — Tailwind et design visuel
+## Phase FD-5, Tailwind et design visuel
 
 **État : à venir.**
 
@@ -189,7 +189,7 @@ Règle : Tailwind reste lisible. Forge Design ne doit pas produire des chaînes 
 
 ---
 
-## Phase FD-6 — Données Jinja et variables de vue
+## Phase FD-6, Données Jinja et variables de vue
 
 **État : à venir.**
 
@@ -216,7 +216,7 @@ Forge Design doit signaler clairement si `hebergement` n’est pas fourni.
 
 ---
 
-## Phase FD-7 — Formulaires Forge
+## Phase FD-7, Formulaires Forge
 
 **État : à venir.**
 
@@ -238,7 +238,7 @@ Règle : Forge Design ne doit pas contourner la validation serveur Forge.
 
 ---
 
-## Phase FD-8 — HTMX et interactions simples
+## Phase FD-8, HTMX et interactions simples
 
 **État : à venir.**
 
@@ -258,7 +258,7 @@ Interdiction : ne pas transformer Forge Design en SPA.
 
 ---
 
-## Phase FD-9 — Alpine.js et petits états locaux
+## Phase FD-9, Alpine.js et petits états locaux
 
 **État : à venir.**
 
@@ -277,7 +277,7 @@ Règle : Alpine complète le HTML serveur. Il ne remplace pas l’état applicat
 
 ---
 
-## Phase FD-10 — Export vers projet Forge
+## Phase FD-10, Export vers projet Forge
 
 **État : à venir.**
 
@@ -297,7 +297,7 @@ Règle : aucun fichier utilisateur ne doit être écrasé silencieusement.
 
 ---
 
-## Phase FD-11 — Prévisualisation
+## Phase FD-11, Prévisualisation
 
 **État : à venir.**
 
@@ -314,7 +314,7 @@ Objectif : permettre de visualiser le rendu avant export.
 
 ---
 
-## Phase FD-12 — Intégration avec profils Forge
+## Phase FD-12, Intégration avec profils Forge
 
 **État : à venir.**
 
@@ -332,7 +332,7 @@ Forge Design doit s’adapter au profil du projet, pas imposer un profil unique.
 
 ---
 
-## Phase FD-13 — Stabilisation Forge Design 1.0
+## Phase FD-13, Stabilisation Forge Design 1.0
 
 **État : à venir.**
 

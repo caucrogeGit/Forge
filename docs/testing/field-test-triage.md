@@ -1,4 +1,4 @@
-# Tests terrain — Triage et stabilisation
+# Tests terrain, Triage et stabilisation
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -32,7 +32,7 @@ Pour chaque retour, remplir :
 
 ## 3. Règles de décision
 
-### S0 — Bloquant critique
+### S0, Bloquant critique
 
 Créer un ticket correctif immédiat.
 
@@ -44,7 +44,7 @@ Exemples :
 - framework inutilisable ;
 - erreur empêchant tout projet de démarrer.
 
-### S1 — Bloquant fonctionnel
+### S1, Bloquant fonctionnel
 
 Créer un ticket correctif prioritaire avant release candidate.
 
@@ -56,7 +56,7 @@ Exemples :
 - auth annoncée mais non fonctionnelle ;
 - documentation qui mène à une impasse.
 
-### S2 — Friction forte
+### S2, Friction forte
 
 Créer soit :
 
@@ -72,7 +72,7 @@ Exemples :
 - documentation incomplète ;
 - comportement surprenant mais contournable.
 
-### S3 — Friction mineure
+### S3, Friction mineure
 
 Classer backlog ou traiter si simple.
 
@@ -82,7 +82,7 @@ Exemples :
 - commande manquant d’exemple ;
 - petit inconfort non bloquant.
 
-### S4 — Suggestion
+### S4, Suggestion
 
 Backlog post-stable.
 
@@ -93,7 +93,7 @@ Exemples :
 - nouvelle option ;
 - idée pour Forge Design.
 
-### S5 — Hors périmètre
+### S5, Hors périmètre
 
 Classer hors campagne.
 
@@ -106,7 +106,7 @@ Exemples :
 - préférence personnelle non liée à la validation terrain.
 
 
-## 4. Cas spécifique — Documentation officielle erronée
+## 4. Cas spécifique, Documentation officielle erronée
 
 Si un retour signale une documentation officielle fausse, incomplète ou contradictoire, le référent doit vérifier :
 
@@ -259,7 +259,7 @@ Forge peut sortir de bêta uniquement si :
 
 ## 10. Décision finale possible
 
-### Décision A — Stable possible
+### Décision A, Stable possible
 
 Conditions :
 
@@ -269,7 +269,7 @@ Conditions :
 - documentation suffisante ;
 - déploiement validé.
 
-### Décision B — Bêta prolongée
+### Décision B, Bêta prolongée
 
 Conditions :
 
@@ -278,7 +278,7 @@ Conditions :
 - documentation à renforcer ;
 - certains parcours encore trop dépendants du référent Forge.
 
-### Décision C — Consolidation ciblée
+### Décision C, Consolidation ciblée
 
 Conditions :
 
@@ -289,7 +289,7 @@ Conditions :
 - sécurité insuffisante ;
 - déploiement non reproductible.
 
-### Décision D — Refus de stable
+### Décision D, Refus de stable
 
 Conditions :
 

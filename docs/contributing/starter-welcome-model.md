@@ -1,4 +1,4 @@
-# Modèle de starter Forge — la référence « welcome »
+# Modèle de starter Forge, la référence « welcome »
 
 > **Document de référence.** Le starter **Bonjour Forge** (la progression
 > `welcome-forge`) est le **modèle canonique** de tout travail sur les starters
@@ -87,12 +87,12 @@ elle est archivée sous `docs/starters/old/` et retirée du registry.
 
 ---
 
-## 1. Principe directeur — un palier = une responsabilité
+## 1. Principe directeur, un palier = une responsabilité
 
 Chaque palier introduit **une seule notion nouvelle**. Aucune notion qui
 appartient à un palier ultérieur ne doit apparaître avant.
 
-- Le palier 1 (`welcome`) ne montre **que** `Response.text(...)` — pas de
+- Le palier 1 (`welcome`) ne montre **que** `Response.text(...)`, pas de
   `request.query(...)` (c'est le palier 2 `query-params`).
 - Le palier CSRF explique le jeton **sans** traiter le POST (c'est le palier
   `form-post`).
@@ -103,8 +103,7 @@ C'est l'application directe du **principe 2 de la charte** (« petits tickets,
 une responsabilité ») au niveau pédagogique.
 
 **Conséquence pratique** : si en rédigeant un palier vous devez utiliser une
-API non encore introduite, c'est le signe qu'il manque un palier intermédiaire
-— ne la glissez pas « en passant ».
+API non encore introduite, c'est le signe qu'il manque un palier intermédiaire, ne la glissez pas « en passant ».
 
 ---
 
@@ -185,11 +184,11 @@ Ouvrez `https://localhost:8000/<route>` → <résultat attendu>.
 **Règles de forme non négociables :**
 
 - **HTTPS**, jamais `http://`, dans toutes les URL d'exemple.
-- Le **code montré est complet et vérifié** — pas d'extrait partiel, pas de
+- Le **code montré est complet et vérifié**, pas d'extrait partiel, pas de
   `...` à la place d'une ligne réelle. Ce qui est affiché doit fonctionner tel
   quel une fois le starter généré.
 - Liens de référence vers `../../../reference/http.md`, `../../../reference/api.md`,
-  `../../../features/migrations.md` (db) — vérifier l'ancre.
+  `../../../features/migrations.md` (db), vérifier l'ancre.
 - Pas de commande d'installation/création dans la page d'un palier
   (`forge new …`, `forge starter:build …`, `cd …`, `source .venv/...`) : la
   page suppose qu'on est déjà dans un projet généré. Ces commandes vivent dans
@@ -199,7 +198,7 @@ Ouvrez `https://localhost:8000/<route>` → <résultat attendu>.
 
 ---
 
-## 3. Navigation par niveau — palier → bilan du niveau → suite
+## 3. Navigation par niveau, palier → bilan du niveau → suite
 
 La progression est rythmée par niveau. Le chaînage **canonique** (modèle
 `welcome-forge`) est :
@@ -212,7 +211,7 @@ palier 1 → palier 2 → … → dernier palier du niveau → bilan DU niveau
                                        recapitulatif.md (racine du starter)
 ```
 
-**Palier intermédiaire** — lien vers le palier suivant (fichier frère du
+**Palier intermédiaire**, lien vers le palier suivant (fichier frère du
 même niveau) :
 
 ```markdown
@@ -223,7 +222,7 @@ Passez au palier suivant : **<Nom>** — <ce qu'on y apprend>.
 [Continuer avec <Nom>](<slug-suivant>.md)
 ```
 
-**Dernier palier d'un niveau** — lien vers le **bilan du niveau** (page sœur
+**Dernier palier d'un niveau**, lien vers le **bilan du niveau** (page sœur
 `bilan.md`, dans le dossier du niveau) :
 
 ```markdown
@@ -235,7 +234,7 @@ C'est le **dernier palier** du niveau **<niveau>** du starter <Nom>.
 [Bilan du niveau <niveau>](bilan.md)
 ```
 
-**Bilan du niveau** (`<niveau>/bilan.md`) — récapitule ce qui a été validé,
+**Bilan du niveau** (`<niveau>/bilan.md`), récapitule ce qui a été validé,
 puis renvoie au **premier palier du niveau suivant s'il existe**, sinon au
 **récapitulatif** à la racine du starter :
 
@@ -311,7 +310,7 @@ with router.group("", public=True) as public:
 - **SQL visible** (principe 5) : requêtes nommées en constantes de module en
   haut du fichier (`SELECT_ALL = "SELECT …"`), **paramétrées** (`?`), jamais
   concaténées. Pas d'ORM, pas de génération qui masque le SQL.
-- Lecture des entrées — bien distinguer :
+- Lecture des entrées, bien distinguer :
     - `request.query("k", default=…)` → query string (`?k=`) ;
     - `request.route("k")` → segment d'URL (`/x/{k}`) ;
     - `request.form("k", default=…)` → corps d'un POST.
@@ -326,7 +325,7 @@ with router.group("", public=True) as public:
 - Tout formulaire `POST` embarque le champ caché `{{ csrf_token }}`.
 - **Formulaire illustratif** : si le palier n'a **pas** de handler POST (ex.
   palier CSRF), le `<form>` n'a **ni `method="post"` ni `action` ni bouton
-  submit** — sinon l'utilisateur déclenche un `405`. On illustre, on ne
+  submit**, sinon l'utilisateur déclenche un `405`. On illustre, on ne
   soumet pas.
 
 ---
@@ -342,7 +341,7 @@ with router.group("", public=True) as public:
   `docs/starters/welcome-forge/debutant/`). Le `recapitulatif.md` reste à la
   racine du starter.
 - **Périmètre explicite** : chaque palier déclare ce qu'il ne fait pas
-  (principe 8 — noyau minimal, briques opt-in).
+  (principe 8, noyau minimal, briques opt-in).
 - **Sécurité par défaut** (principe 7) : CSRF sur les POST, validation serveur,
   statuts HTTP honnêtes (`422`, `404`).
 
@@ -378,7 +377,7 @@ est un guide, pas un contrat verrouillé par test.
 
 ---
 
-## 7. Checklist — créer un nouveau palier / starter
+## 7. Checklist, créer un nouveau palier / starter
 
 1. **Responsabilité unique** : une seule notion nouvelle ; vérifier qu'aucune
    API d'un palier ultérieur n'est utilisée.
@@ -390,7 +389,7 @@ est un guide, pas un contrat verrouillé par test.
    §2 ; chaîner depuis le palier précédent et vers le suivant ; le dernier
    palier du niveau renvoie au `bilan.md` du niveau (§3).
 5. **Nav + index** : ajouter à `mkdocs.yml` et à la progression de
-   `docs/starters/index.md` (« livré — ticket … »).
+   `docs/starters/index.md` (« livré, ticket … »).
 6. **Garde-fou** : `tests/test_starter_<id>_001.py` (§6) + mise à jour des
    tests transverses.
 7. **Valider** : `python -m pytest -q`, `ruff check .`,

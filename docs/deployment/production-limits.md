@@ -69,8 +69,8 @@ développement et les démonstrations. Il :
 
 ### Sessions
 
-- `MemorySessionStore` (défaut) : **volatile** — toutes les sessions sont
-  perdues au redémarrage. **Mono-processus** — incompatible avec un
+- `MemorySessionStore` (défaut) : **volatile**, toutes les sessions sont
+  perdues au redémarrage. **Mono-processus**, incompatible avec un
   déploiement multi-worker.
 - `FileSessionStore` : persistance basique sur disque. Utilisable en
   mono-worker. En multi-worker, le verrou n'est pas strict ; à éviter
@@ -87,7 +87,7 @@ Sélection explicite via `forge.configure(session_store=...)` ou
   (module d'upload optionnel) stockent leurs compteurs **en mémoire dans le
   processus courant**. Cette implémentation n'est pas configurable dans la
   série 1.0.0.
-- En multi-worker, **les compteurs ne sont pas partagés** — la protection
+- En multi-worker, **les compteurs ne sont pas partagés**, la protection
   reste utile localement mais n'est pas une défense distribuée.
 - Forge n'embarque ni Redis ni autre backend distribué pour ces compteurs.
 - L'anti-rejeu TOTP de `forge-mvc-mfa` (qui empêche de rejouer un code à six
@@ -99,7 +99,7 @@ Sélection explicite via `forge.configure(session_store=...)` ou
 
 `create_configured_wsgi_app()` émet **une fois au démarrage** (et jamais
 par requête) un avertissement si `APP_ENV=prod` avec un session store
-mémoire — voir
+mémoire, voir
 [Déploiement WSGI § warnings](wsgi-deployment.md#6-warnings-production-au-demarrage).
 Cet avertissement signale le risque, il ne le corrige pas.
 
@@ -112,7 +112,7 @@ explicite `APP_TRUSTED_PROXIES`. Règles :
 
 - `APP_TRUSTED_PROXIES` est **vide par défaut** → `X-Real-IP` est ignoré ;
 - liste séparée par virgules, espaces tolérés ;
-- comparaison **IP exacte** — pas de notation CIDR ;
+- comparaison **IP exacte**, pas de notation CIDR ;
 - pas de wildcard ; `0.0.0.0` n'a aucune signification particulière ;
 - `X-Real-IP` invalide → fallback sur l'IP du socket ;
 - **`X-Forwarded-For` n'est pas supporté** dans la série 1.0.0.
@@ -126,7 +126,7 @@ Détail et exemples : [Déploiement WSGI § APP_TRUSTED_PROXIES](wsgi-deployment
 - **Statiques (`/static/...`)** : Forge sait les servir (cf
   `app.py:RequestHandler._serve_static`), mais ce dispatch traverse la pile
   Python complète. En production, faire servir directement par le reverse
-  proxy — plus rapide, plus sûr, et libère Gunicorn pour le métier.
+  proxy, plus rapide, plus sûr, et libère Gunicorn pour le métier.
 - **Médias (`/media/...`)** : Forge expose `serve_media_file` avec des
   garde-fous path traversal. Le périmètre exact reste **à cadrer côté
   application** selon la sensibilité des fichiers (public/privé, droits,
@@ -175,7 +175,7 @@ explicitement** (cf §4).
 - `wsgi.py` et unit systemd Gunicorn générés par `forge deploy:init`, avec un
   parcours documenté : [Mise en production pas à pas](mise-en-production.md).
 
-### Non garanti — à cadrer côté infrastructure ou tickets futurs
+### Non garanti, à cadrer côté infrastructure ou tickets futurs
 
 - rate-limit distribué (Redis / autre backend) ;
 - session store distribué cloud-native ;
@@ -191,8 +191,8 @@ explicitement** (cf §4).
 
 ## Pour aller plus loin
 
-- [Déploiement WSGI minimal](wsgi-deployment.md) — Gunicorn + reverse proxy
-- [Guide de déploiement](deployment.md) — Architecture Nginx/systemd
-- [Sécurité en production](production-security.md) — Cookies, headers, CSRF, uploads
-- [ADR-002 — Stratégie de session](../adr/002-session-strategy.md)
-- [ADR-009 — Politique de stabilité terrain](../adr/009-stability-policy-terrain.md)
+- [Déploiement WSGI minimal](wsgi-deployment.md), Gunicorn + reverse proxy
+- [Guide de déploiement](deployment.md), Architecture Nginx/systemd
+- [Sécurité en production](production-security.md), Cookies, headers, CSRF, uploads
+- [ADR-002, Stratégie de session](../adr/002-session-strategy.md)
+- [ADR-009, Politique de stabilité terrain](../adr/009-stability-policy-terrain.md)

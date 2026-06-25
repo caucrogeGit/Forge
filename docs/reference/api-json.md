@@ -26,8 +26,8 @@ C'est une couche minimale, explicite et testable.
 | Brique | Module | Description |
 |---|---|---|
 | `json_response(data, status=200)` | `core.http` | Réponse JSON brute |
-| `api_success(data, status=200, meta=None)` | `core.http` | Réponse JSON structurée — succès |
-| `api_error(message, status=400, code, details)` | `core.http` | Réponse JSON structurée — erreur |
+| `api_success(data, status=200, meta=None)` | `core.http` | Réponse JSON structurée, succès |
+| `api_error(message, status=400, code, details)` | `core.http` | Réponse JSON structurée, erreur |
 | `mvc/api_routes.py` | convention projet | Fichier optionnel de routes API |
 | `register_api_routes(router)` | convention projet | Fonction d'enregistrement des routes |
 | `@require_api_token` | `core.security.api_auth` | Protection par token Bearer |
@@ -216,7 +216,7 @@ def create(request):
     return api_success({"id": 42}, status=201)
 ```
 
-Pas d'héritage spécifique requis — un contrôleur API est une fonction Python ordinaire.
+Pas d'héritage spécifique requis, un contrôleur API est une fonction Python ordinaire.
 
 ---
 
@@ -242,7 +242,7 @@ def register_api_routes(router):
 Les routes HTML restent dans `mvc/routes.py`. Les deux fichiers partagent
 le même routeur mais sont séparés organisationnellement.
 
-Le flag `api=True` est déclaratif — il identifie les routes API sans modifier
+Le flag `api=True` est déclaratif, il identifie les routes API sans modifier
 leur comportement. Le flag `csrf=False` est recommandé pour les routes API
 qui reçoivent du JSON, car elles utilisent le token Bearer plutôt que le CSRF.
 
@@ -369,11 +369,11 @@ curl -H "Authorization: Bearer changeme-en-production" \
 
 ## Sécurité
 
-- **Utiliser uniquement en HTTPS** — un Bearer token en HTTP clair est interceptable.
-- **Ne pas exposer `API_TOKEN` dans Git** — utilisez `env/prod` hors versionnement.
-- **Ne pas afficher le token dans les logs** — le module `api_auth` ne le logue jamais.
-- **Rotation des tokens** — changer `API_TOKEN` régulièrement en production.
-- **Auth minimale** — cette approche est adaptée aux projets simples. Pour une application
+- **Utiliser uniquement en HTTPS**, un Bearer token en HTTP clair est interceptable.
+- **Ne pas exposer `API_TOKEN` dans Git**, utilisez `env/prod` hors versionnement.
+- **Ne pas afficher le token dans les logs**, le module `api_auth` ne le logue jamais.
+- **Rotation des tokens**, changer `API_TOKEN` régulièrement en production.
+- **Auth minimale**, cette approche est adaptée aux projets simples. Pour une application
   SaaS publique ou multi-utilisateur, envisagez JWT ou OAuth dans un ticket futur.
 
 ---
@@ -382,9 +382,9 @@ curl -H "Authorization: Bearer changeme-en-production" \
 
 | Limite | Statut |
 |---|---|
-| Parsing automatique du body JSON entrant | non — utiliser `request.json_body` |
+| Parsing automatique du body JSON entrant | non, utiliser `request.json_body` |
 | Validation de payload | non |
-| Pagination avancée | non — `meta.count` disponible mais pas de helper de pagination |
+| Pagination avancée | non, `meta.count` disponible mais pas de helper de pagination |
 | Versioning `/api/v1` | non |
 | JWT / OAuth | non |
 | Multi-token / scopes | non |
@@ -408,7 +408,7 @@ curl -H "Authorization: Bearer changeme-en-production" \
 
 ## Voir aussi
 
-- [Référence API et CLI](reference.md) — documentation complète des modules
-- [Sécurité et RBAC](../philosophy/security.md) — sécurité générale Forge
-- [Déploiement avancé](../deployment/deploy-advanced.md) — HTTPS, Nginx, production
-- [Contrat de stabilité](../release/stability-contract.md) — garanties sur les API publiques
+- [Référence API et CLI](reference.md), documentation complète des modules
+- [Sécurité et RBAC](../philosophy/security.md), sécurité générale Forge
+- [Déploiement avancé](../deployment/deploy-advanced.md), HTTPS, Nginx, production
+- [Contrat de stabilité](../release/stability-contract.md), garanties sur les API publiques

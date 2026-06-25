@@ -2,7 +2,7 @@
 
 Dans Forge, les fichiers JSON d'entités et de relations sont la **source canonique**. Ils décrivent le modèle métier. Les générateurs produisent ensuite des projections SQL et Python à partir de ces fichiers.
 
-Modifier les fichiers JSON, c'est faire évoluer le modèle. Modifier les projections générées manuellement n'a pas d'effet durable — elles seront écrasées à la prochaine génération.
+Modifier les fichiers JSON, c'est faire évoluer le modèle. Modifier les projections générées manuellement n'a pas d'effet durable, elles seront écrasées à la prochaine génération.
 
 ---
 
@@ -15,7 +15,7 @@ entity:validate         →  diagnostic officiel
 build:model             →  génération des projections
 ```
 
-Le JSON ne contient pas de `sql_type`, ni de `python_type`, ni de `primary_key`. Ces éléments sont **dérivés par Forge** lors de la génération. Le champ `id` est géré automatiquement — il n'est pas à déclarer dans le JSON canonique.
+Le JSON ne contient pas de `sql_type`, ni de `python_type`, ni de `primary_key`. Ces éléments sont **dérivés par Forge** lors de la génération. Le champ `id` est géré automatiquement, il n'est pas à déclarer dans le JSON canonique.
 
 ---
 
@@ -36,8 +36,8 @@ mvc/
 
 **Règles :**
 
-- `mvc/entities/<nom>/<nom>.json` — un sous-dossier par entité, nom en minuscule.
-- `mvc/entities/relations.json` — à la racine de `entities/`, pas dans un sous-dossier.
+- `mvc/entities/<nom>/<nom>.json`, un sous-dossier par entité, nom en minuscule.
+- `mvc/entities/relations.json`, à la racine de `entities/`, pas dans un sous-dossier.
 - Un fichier JSON placé directement dans `mvc/entities/` (ex : `mvc/entities/article.json`) n'est **pas** reconnu par `build:model`.
 
 Exemples de chemins valides :
@@ -51,7 +51,7 @@ Exemples de chemins valides :
 
 `build:model` parcourt les sous-dossiers de `mvc/entities/`. Pour chaque sous-dossier dont le nom ne commence pas par `__`, il s'attend à trouver un fichier JSON du même nom. Tout sous-dossier sans fichier JSON correspondant déclenche une erreur.
 
-Les dossiers préfixés par `__` (ex : `__media/`) sont ignorés — ils servent à isoler des ressources techniques non-entités.
+Les dossiers préfixés par `__` (ex : `__media/`) sont ignorés, ils servent à isoler des ressources techniques non-entités.
 
 ---
 
@@ -100,11 +100,11 @@ Les schémas JSON Schema verrouillent la **forme autorisée**. Ils ne remplacent
 
 **Clés principales :**
 
-- `schema_version: "1.0"` — active le format canonique
-- `name` — nom de l'entité (PascalCase)
-- `table` — nom de la table SQL (snake_case)
-- `fields` — champs métier (le champ `id` est toujours ajouté automatiquement)
-- `options` — options système (`timestamps`, `soft_delete`)
+- `schema_version: "1.0"`, active le format canonique
+- `name`, nom de l'entité (PascalCase)
+- `table`, nom de la table SQL (snake_case)
+- `fields`, champs métier (le champ `id` est toujours ajouté automatiquement)
+- `options`, options système (`timestamps`, `soft_delete`)
 
 **Types de champs supportés :** `string`, `text`, `integer`, `big_integer`, `float`, `decimal`, `boolean`, `date`, `datetime`, `email`, `password`, `json`.
 
@@ -138,11 +138,11 @@ forge build:model
 
 | Fichier | Nature | Règle |
 |---|---|---|
-| `<entite>.sql` | Projection SQL | Régénérable — ne pas modifier manuellement |
-| `<entite>_base.py` | Base Python | Régénérable — ne pas modifier manuellement |
-| `relations.sql` | SQL des relations | Régénérable — ne pas modifier manuellement |
-| `<entite>.py` | Classe métier | Manuel — jamais écrasé par Forge |
-| `__init__.py` | Export de l'entité | Manuel — jamais écrasé par Forge |
+| `<entite>.sql` | Projection SQL | Régénérable, ne pas modifier manuellement |
+| `<entite>_base.py` | Base Python | Régénérable, ne pas modifier manuellement |
+| `relations.sql` | SQL des relations | Régénérable, ne pas modifier manuellement |
+| `<entite>.py` | Classe métier | Manuel, jamais écrasé par Forge |
+| `__init__.py` | Export de l'entité | Manuel, jamais écrasé par Forge |
 
 Les fichiers manuels ne sont pas écrasés. Forge applique une règle stricte de non-réécriture silencieuse.
 
@@ -160,7 +160,7 @@ Le JSON canonique **n'est pas une copie du SQL**. Il décrit le modèle métier,
 | `"required": true` | `NOT NULL` |
 | `"nullable": true` | `NULL` |
 
-Le champ `id` (clé primaire `AUTO_INCREMENT`) est toujours injecté par Forge — il n'apparaît pas dans les `fields` du JSON canonique.
+Le champ `id` (clé primaire `AUTO_INCREMENT`) est toujours injecté par Forge, il n'apparaît pas dans les `fields` du JSON canonique.
 
 ---
 
@@ -225,7 +225,7 @@ Des champs métier peuvent être ajoutés à la table pivot :
 ]
 ```
 
-Les noms `id`, `from_key` et `to_key` sont réservés — les redéclarer dans `pivot.fields` est interdit et détecté par `entity:validate`.
+Les noms `id`, `from_key` et `to_key` sont réservés, les redéclarer dans `pivot.fields` est interdit et détecté par `entity:validate`.
 
 ---
 
@@ -248,7 +248,7 @@ VS Code aide à écrire, mais `forge entity:validate` reste la **validation offi
 
 ## Limites assumées
 
-- `forge entity:validate` est la validation officielle — VS Code aide mais ne remplace pas.
-- Le format `format_version: 1` est **refusé** — `build:model` et `make:crud` lèvent une erreur si un fichier d'entité ou de relations utilise l'ancien format. Voir le guide de conversion `docs/entities/migration-legacy-vers-canonique.md`.
+- `forge entity:validate` est la validation officielle, VS Code aide mais ne remplace pas.
+- Le format `format_version: 1` est **refusé**, `build:model` et `make:crud` lèvent une erreur si un fichier d'entité ou de relations utilise l'ancien format. Voir le guide de conversion `docs/entities/migration-legacy-vers-canonique.md`.
 - Le **CRUD avancé des attributs pivot** (`pivot.fields`) n'est pas encore couvert par `make:crud`.
 - La documentation détaillée des schémas JSON (`entity.schema.json`, `relations.schema.json`…) sera traitée dans des tickets documentaires dédiés.

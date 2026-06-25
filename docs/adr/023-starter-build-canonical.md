@@ -1,8 +1,8 @@
-# ADR-023 — `forge starter:build` comme seule façon de construire un starter
+# ADR-023, `forge starter:build` comme seule façon de construire un starter
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.13 (ticket `CLI-NEW-DROP-STARTER-001`).
+Accepté, Forge 1.0.0-beta.13 (ticket `CLI-NEW-DROP-STARTER-001`).
 
 ---
 
@@ -71,7 +71,7 @@ forge run
 
 - Une seule façon officielle de construire un starter (charte, principe 11).
 - `forge new` respecte strictement le modèle « projet nu » (principe 8).
-- Suppression d'une duplication de logique (la cause, pas le symptôme —
+- Suppression d'une duplication de logique (la cause, pas le symptôme,
   règle A) : plus de second chemin dégradé à maintenir.
 - Tous les parcours pédagogiques deviennent cohérents : `forge starter:build`
   partout.
@@ -89,21 +89,21 @@ forge run
 
 ## Alternatives écartées
 
-### A — Conserver `forge new --starter` et `forge starter:build`
+### A, Conserver `forge new --starter` et `forge starter:build`
 
 Garder les deux chemins.
 
 Rejeté : viole le principe 11 (une seule façon officielle) et maintient une
 duplication de logique en version dégradée.
 
-### B — Garder `--starter` mais le retirer seulement de la documentation
+### B, Garder `--starter` mais le retirer seulement de la documentation
 
 Laisser le flag dans la CLI, ne plus le documenter.
 
 Rejeté : un flag public non documenté reste une surface publique et une source
 de confusion. Règle A : retirer la cause, pas le symptôme.
 
-### C — Supprimer `forge starter:build`, garder `forge new --starter`
+### C, Supprimer `forge starter:build`, garder `forge new --starter`
 
 Faire l'inverse.
 

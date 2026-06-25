@@ -1,8 +1,8 @@
-# ADR-037 — Agrégation par comptage dans `forge-mvc-stats`
+# ADR-037, Agrégation par comptage dans `forge-mvc-stats`
 
 ## Statut
 
-Accepté — Forge 1.0.0-beta.17 (ticket `STATS-AGGREGATION-001`).
+Accepté, Forge 1.0.0-beta.17 (ticket `STATS-AGGREGATION-001`).
 
 ---
 
@@ -70,6 +70,6 @@ d'une extension ultérieure si le besoin se confirme.
 - **Renommer le périmètre en « journal d'événements »** : honnête et moins
   coûteux, mais le mainteneur a préféré que le module nommé « stats » fournisse
   réellement de l'agrégation.
-- **Agrégation par buckets temporels d'emblée** (jour/heure) : reportée — la
+- **Agrégation par buckets temporels d'emblée** (jour/heure) : reportée, la
   liste blanche de `group_by` se limite pour l'instant aux dimensions
   catégorielles `name`/`category`, plus le filtre `since`.

@@ -1,8 +1,8 @@
-# ADR-014 — Emplacement du contrat RBAC Forge
+# ADR-014, Emplacement du contrat RBAC Forge
 
 ## Statut
 
-Accepté — Forge 1.x (ticket `RBAC-CONTRACT-001-DEFINE-SEPARATE-RBAC-CONTRACT`).
+Accepté, Forge 1.x (ticket `RBAC-CONTRACT-001-DEFINE-SEPARATE-RBAC-CONTRACT`).
 
 ---
 
@@ -23,7 +23,7 @@ Le format interne de génération (`validation.py`) accepte déjà `rbac` comme
 attribut de définition d'entité, permettant à `make:crud` de générer des guards
 `@require_permission` dans les contrôleurs et `{% if can() %}` dans les templates.
 Cette intégration fonctionne et est testée (56 tests passent), mais via le format
-interne uniquement — pas via le format canonique.
+interne uniquement, pas via le format canonique.
 
 La question ouverte après ENTITY-SCHEMA-RBAC-001 : **où doit vivre la configuration
 RBAC dans un projet Forge ?**
@@ -35,7 +35,7 @@ RBAC dans un projet Forge ?**
 1. La configuration RBAC dispersée entité par entité (clé `rbac` dans chaque fichier
    d'entité) couple la définition du modèle de données et les règles d'autorisation.
 
-2. `entity.schema.json` utilise `additionalProperties: false` — il ne peut pas
+2. `entity.schema.json` utilise `additionalProperties: false`, il ne peut pas
    accueillir `rbac` sans modification délibérée.
 
 3. Le module `forge-mvc-rbac` est opt-in. Coupler sa configuration au schéma d'entité
@@ -120,10 +120,10 @@ validé par un JSON Schema ni lu par le runtime Forge.
 
 - `entity.schema.json` reste inchangé (`additionalProperties: false`, pas de `rbac`).
 - Le format interne de génération (`validation.py`) continue d'accepter `rbac` dans
-  les définitions d'entités — il reste un détail d'implémentation du pipeline CLI.
+  les définitions d'entités, il reste un détail d'implémentation du pipeline CLI.
 - `make:crud` continue de lire `rbac` depuis la définition interne, sans changement.
 - Aucun runtime n'est modifié dans ce ticket.
-- Le fichier `mvc/security/rbac.json` n'est pas encore créé ni lu — c'est la
+- Le fichier `mvc/security/rbac.json` n'est pas encore créé ni lu, c'est la
   décision d'architecture, pas l'implémentation.
 
 ---

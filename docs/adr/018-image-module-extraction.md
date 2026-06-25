@@ -1,10 +1,10 @@
-# ADR-018 — Extraction du traitement d'image hors du core : `forge-mvc-images`
+# ADR-018, Extraction du traitement d'image hors du core : `forge-mvc-images`
 
 ## Statut
 
-Proposé — Forge 1.0.0-beta.x (ticket `IMAGES-EXTRACT-RENAME-001`).
+Proposé, Forge 1.0.0-beta.x (ticket `IMAGES-EXTRACT-RENAME-001`).
 
-> Décision validée sur le principe (option « B — renommer + rapatrier »).
+> Décision validée sur le principe (option « B, renommer + rapatrier »).
 > Périmètre figé ci-dessous ; exécution par étapes.
 
 ---
@@ -28,8 +28,7 @@ le **core**, à `core/uploads/image.py`, et **Pillow** est une dépendance runti
 du core.
 
 Depuis l'arrivée de `forge-mvc-video` (qui possède toute la chaîne vidéo :
-ingest, stockage, transcodage, lecture), le nom « media » est devenu **trompeur**
-— un développeur attend de `forge-mvc-media` qu'il gère aussi la vidéo, ce qui
+ingest, stockage, transcodage, lecture), le nom « media » est devenu **trompeur**, un développeur attend de `forge-mvc-media` qu'il gère aussi la vidéo, ce qui
 n'est pas le cas. Par ailleurs, embarquer Pillow et le traitement d'image dans
 le core contredit le principe de **noyau minimal** (charte principe 8, ADR-004) :
 le core devrait fournir l'upload brut sûr, pas le pipeline d'images.
@@ -38,7 +37,7 @@ le core devrait fournir l'upload brut sûr, pas le pipeline d'images.
 
 - `core/uploads/manager.py` : `save_upload(category="images", variants=True)`
   appelle `verify_image_content`, `generate_image_variants`,
-  `image_variant_relative_paths` — le chemin d'upload **générique** du core
+  `image_variant_relative_paths`, le chemin d'upload **générique** du core
   porte donc un comportement **spécifique aux images**.
 - `core/uploads/__init__.py` réexporte l'API image.
 - `forge_mvc_media/media_gallery.py` dépend de `core.uploads.image`
@@ -143,31 +142,31 @@ lieu sans demande. Chaque capacité = un ticket `IMAGES-FEATURE-*` séparé
 
 ## Plan d'exécution (tickets)
 
-1. `IMAGES-PKG-SCAFFOLD-001` — squelette `packages/forge-mvc-images`
+1. `IMAGES-PKG-SCAFFOLD-001`, squelette `packages/forge-mvc-images`
    (`pyproject.toml` avec Pillow, `forge_mvc_images/__init__.py`).
-2. `IMAGES-MOVE-PROCESSING-001` — déplacer le traitement image du core vers
+2. `IMAGES-MOVE-PROCESSING-001`, déplacer le traitement image du core vers
    `forge_mvc_images` ; rendre `core/uploads/save_upload` générique ; exposer un
    chemin image-aware dans le module.
-3. `IMAGES-MOVE-APPLICATIVE-001` — déplacer repository + galerie depuis
+3. `IMAGES-MOVE-APPLICATIVE-001`, déplacer repository + galerie depuis
    `forge-mvc-media` vers `forge_mvc_images`.
-4. `CORE-DROP-PILLOW-001` — retrait de Pillow du core (**pyproject racine :
+4. `CORE-DROP-PILLOW-001`, retrait de Pillow du core (**pyproject racine :
    mainteneur**), `requirements.txt`, inversion des garde-fous packaging.
-5. `CLI-CRUD-IMAGES-RENAME-001` — `controller_builder`, `public_list`,
+5. `CLI-CRUD-IMAGES-RENAME-001`, `controller_builder`, `public_list`,
    `optins/catalog` → `forge_mvc_images` ; mise à jour des tests de génération.
-6. `CI-DOCS-IMAGES-RENAME-001` — matrice CI, README, `docs/reference/api.md`,
+6. `CI-DOCS-IMAGES-RENAME-001`, matrice CI, README, `docs/reference/api.md`,
    `docs/install/core-dev.md`, CONTRIBUTING ; **CLAUDE.md : mainteneur**.
-7. `REMOVE-MEDIA-PKG-001` — suppression de `packages/forge-mvc-media` ; entrée
+7. `REMOVE-MEDIA-PKG-001`, suppression de `packages/forge-mvc-media` ; entrée
    CHANGELOG.
-8. `IMAGES-FEATURE-*` (ultérieur) — extension des fonctionnalités image.
+8. `IMAGES-FEATURE-*` (ultérieur), extension des fonctionnalités image.
 
 ---
 
 ## Alternatives écartées
 
-- **A — renommer seulement** : `media → images` sans bouger le traitement. Rejeté :
+- **A, renommer seulement** : `media → images` sans bouger le traitement. Rejeté :
   le nom « images » resterait un abus de langage tant que le traitement vit dans
   le core, et le couplage `save_upload`/Pillow/core subsisterait.
-- **C — statu quo** : garder `forge-mvc-media` comme couche générique
+- **C, statu quo** : garder `forge-mvc-media` comme couche générique
   d'attachement multi-type. Rejeté : ambiguïté persistante vis-à-vis de
   `forge-mvc-video`, et Pillow reste dans le core.
 

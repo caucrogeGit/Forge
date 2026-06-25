@@ -1,4 +1,4 @@
-# ADR-022 — Extraction de l'email vers `forge-mvc-mail`
+# ADR-022, Extraction de l'email vers `forge-mvc-mail`
 
 ## Statut
 
@@ -18,7 +18,7 @@ journalisation, CLI `mail:*`) **échoue au test de légitimité d'ADR-004** :
 encore ? » → oui. L'email est un besoin fréquent mais **n'est pas une primitive
 générale** du framework, et `core/mail/` est **autonome** (aucun autre module du
 core ne l'importe ; sa seule dépendance core est `core.forge` pour la config et
-`core.database.db` pour le journal — disponibles via `forge-mvc`).
+`core.database.db` pour le journal, disponibles via `forge-mvc`).
 
 Le module relève donc d'un opt-in, comme stats, workflow ou pivot.
 
@@ -57,7 +57,7 @@ anciens chemins `core.mail` et `cli.mail` sont supprimés.
 - Garde-fou d'extraction `MAIL-EXTRACT-001` : le core ne contient plus `mail`, le
   paquet expose l'API publique et la CLI.
 - Tests mail protégés par `pytest.importorskip("forge_mvc_mail")` (core
-  autonome — garde-fou `TESTS-OPTIN-IMPORTORSKIP-001`).
+  autonome, garde-fou `TESTS-OPTIN-IMPORTORSKIP-001`).
 - `forge_mvc_mail` ajouté aux listes opt-in transverses (importorskip,
   core-only-contract, classifiers PyPI, sweep imports docs) + `release-policy.md`.
 
@@ -66,4 +66,4 @@ anciens chemins `core.mail` et `cli.mail` sont supprimés.
 ## Suite
 
 - **`WELCOME-MAIL`** : parcours pédagogique `welcome-mail` (premier envoi,
-  composition, transports, templates, config, diagnostic) — chantier dédié.
+  composition, transports, templates, config, diagnostic), chantier dédié.

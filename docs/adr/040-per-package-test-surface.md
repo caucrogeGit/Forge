@@ -35,7 +35,7 @@ intégration cœur + opt-ins, anti-dérive) et n'appartiennent à aucun paquet.
 
 Modèle **hybride** :
 
-1. **Racine `tests/`** : conserve tout le transversal — méta, documentation,
+1. **Racine `tests/`** : conserve tout le transversal, méta, documentation,
    intégration cœur + opt-ins, anti-dérive, sweeps. Source de vérité du
    monorepo.
 2. **`packages/<paquet>/tests/`** : chaque opt-in porte son propre socle de
@@ -83,10 +83,10 @@ Exécution (décision de câblage) :
 
 ## Charte appliquée
 
-- Principe 8 — noyau minimal, briques opt-in (le paquet devient un citoyen
+- Principe 8, noyau minimal, briques opt-in (le paquet devient un citoyen
   testable de première classe).
-- Principe 6 — tester avant d'élargir (smoke d'abord, unitaire ensuite).
-- Principe 11 — une seule façon officielle (transversal à la racine, propre au
+- Principe 6, tester avant d'élargir (smoke d'abord, unitaire ensuite).
+- Principe 11, une seule façon officielle (transversal à la racine, propre au
   paquet dans le paquet).
 
 ---

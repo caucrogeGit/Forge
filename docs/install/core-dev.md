@@ -1,11 +1,11 @@
-# Mode développement — contribuer au core Forge
+# Mode développement, contribuer au core Forge
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
 Cette page guide un développeur qui veut **modifier Forge lui-même** :
 corriger un bug du noyau, ajouter une commande à la CLI, étendre la
 documentation, faire évoluer la convention HTTP. Ce n'est pas le
-parcours pour créer une application **avec** Forge — voir la
+parcours pour créer une application **avec** Forge, voir la
 distinction ci-dessous.
 
 ---
@@ -35,9 +35,9 @@ Deux parcours **distincts**, qui ne se mélangent pas :
 
 - Python 3.12+ ([ADR-006](../adr/006-python-version.md))
 - Git, `make` (optionnel), `openssl`
-- MariaDB local — uniquement pour les tests E2E
+- MariaDB local, uniquement pour les tests E2E
   (`tests/test_e2e_mariadb.py`), pas pour la suite par défaut
-- Node.js 24.17.0 LTS — uniquement pour recompiler le CSS Tailwind
+- Node.js 24.17.0 LTS, uniquement pour recompiler le CSS Tailwind
   (`static/tailwind.css` est déjà commité, donc pas requis pour les
   tests ni `mkdocs build`)
 
@@ -64,7 +64,7 @@ source .venv/bin/activate
 
 Le `.venv` reste local au dépôt cloné, jamais commité. Si vous
 travaillez sur plusieurs versions de Forge en parallèle, recréez un
-`.venv` par clone — ne réutilisez pas un venv d'un autre clone.
+`.venv` par clone, ne réutilisez pas un venv d'un autre clone.
 
 ---
 
@@ -78,7 +78,7 @@ python -m pip install -r requirements-dev.txt
 `requirements-dev.txt` fait deux choses simultanément :
 
 1. inclut `requirements.txt` (les dépendances runtime du core : `mariadb`,
-   `python-dotenv`, `jinja2`, `argon2-cffi`, `jsonschema` — Pillow a quitté le
+   `python-dotenv`, `jinja2`, `argon2-cffi`, `jsonschema`, Pillow a quitté le
    core, il est désormais déclaré par l'opt-in `forge-mvc-images`, ADR-018) ;
 2. installe les outils de développement (`pytest`, `build`,
    `setuptools`, `twine`, `mkdocs`, `mkdocs-material`,
@@ -117,7 +117,7 @@ collecte sur les tests opt-in. À réserver aux cas spécifiques
 
 ---
 
-## 4. Vérifier l'installation — les 5 validations canoniques
+## 4. Vérifier l'installation, les 5 validations canoniques
 
 Toute contribution Forge doit passer ces 5 validations avant commit :
 
@@ -131,9 +131,9 @@ git diff --check                # pas d'erreur d'espaces / mélange tabs
 
 | Commande | Rôle |
 |---|---|
-| `python -m pytest -x -q` | Suite complète (~14 900 tests) — runtime, générateurs, doc, CLI, sécurité, méta. `-x` s'arrête au premier échec. |
+| `python -m pytest -x -q` | Suite complète (~14 900 tests), runtime, générateurs, doc, CLI, sécurité, méta. `-x` s'arrête au premier échec. |
 | `python -m compileall -q .` | Vérifie que tous les `.py` du dépôt sont syntaxiquement valides. |
-| `ruff check .` | Lint et style — **aucun** avertissement n'est toléré sur `main`. |
+| `ruff check .` | Lint et style, **aucun** avertissement n'est toléré sur `main`. |
 | `mkdocs build --strict` | Construit la doc complète et échoue si un lien est cassé ou si la nav est incohérente. |
 | `git diff --check` | Détecte les espaces en fin de ligne, les marqueurs de conflit oubliés, les mélanges tabs/espaces. |
 
@@ -148,7 +148,7 @@ Voir [Contribuer à Forge](../philosophy/contributing.md) pour le processus comp
 
 ---
 
-## 5. CSS Tailwind — quand le recompiler ?
+## 5. CSS Tailwind, quand le recompiler ?
 
 `static/tailwind.css` est **commité** dans le dépôt. La doc et les
 tests fonctionnent sans Node. Recompiler le CSS n'est nécessaire que
@@ -168,12 +168,12 @@ Le script `build:css` est défini dans `package.json` :
 `npx @tailwindcss/cli -i ./static/src/input.css -o ./static/tailwind.css --minify`.
 
 La version de Node est **imposée** : `.nvmrc` épingle `24.17.0`, `package.json`
-déclare `engines.node >= 24.17.0`, et `.npmrc` active `engine-strict=true` —
+déclare `engines.node >= 24.17.0`, et `.npmrc` active `engine-strict=true`,
 `npm` refuse donc de s'exécuter sous une version de Node inférieure.
 
 ---
 
-## 6. `forge run` dans le dépôt Forge — possible mais limité
+## 6. `forge run` dans le dépôt Forge, possible mais limité
 
 Le dépôt Forge contient lui-même un `app.py` et un dossier `mvc/`
 (squelette de référence utilisé par les tests d'intégration et la
@@ -192,9 +192,9 @@ Ce mode est utile pour :
 
 Ce mode n'est **pas** utile pour :
 
-- développer une application métier — utilisez plutôt un projet
+- développer une application métier, utilisez plutôt un projet
   séparé créé avec `forge new mon-projet` ailleurs sur votre disque ;
-- suivre un parcours pédagogique — réalisez la progression
+- suivre un parcours pédagogique, réalisez la progression
   `welcome-<module>` à la main dans un projet créé avec `forge new`.
 
 !!! note "Différence avec un projet généré"
@@ -272,4 +272,4 @@ Détails complets dans [Contribuer à Forge](../philosophy/contributing.md) (sec
 - [Poste Linux (pipx, utilisateur du framework)](poste-linux.md)
 - [Windows + WSL (parcours complet)](windows-wsl.md)
 - [Démarrer avec Forge](../guide/getting-started.md)
-- [Roadmap Forge](../roadmap/forge-roadmap.md) — ticket `INSTALL-CORE-DEV-DOCS-AUDIT-001`
+- [Roadmap Forge](../roadmap/forge-roadmap.md), ticket `INSTALL-CORE-DEV-DOCS-AUDIT-001`

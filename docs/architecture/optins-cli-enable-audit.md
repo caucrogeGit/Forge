@@ -7,7 +7,7 @@
     [glossaire opt-in](../reference/vocabulaire-opt-in.md) et
     [ADR-016](../adr/016-opt-in-unification.md).
 
-> Ticket : `OPTINS-CLI-ENABLE-AUDIT-001`. **Audit de conception** — ce
+> Ticket : `OPTINS-CLI-ENABLE-AUDIT-001`. **Audit de conception**, ce
 > document **cadre** la future commande `forge optin:enable` sans
 > l'implémenter. Aucun code fonctionnel n'est ajouté : pas de
 > modification de `forge.py`, `cli/`, du starter `welcome-optin-iot`, ni
@@ -53,9 +53,9 @@ potentiellement `optins/`, `mvc/routes.py`, `mvc/migrations/`, un README
 local et des fichiers de configuration. Coder trop vite risquerait
 d'introduire :
 
-- de la **magie cachée** (charte v2 §3) — un branchement deviné plutôt
+- de la **magie cachée** (charte v2 §3), un branchement deviné plutôt
   qu'écrit ;
-- une **écriture invisible** dans le code utilisateur (charte v2 §9) —
+- une **écriture invisible** dans le code utilisateur (charte v2 §9),
   une modification non maîtrisée de `mvc/routes.py` ;
 - des modifications **difficiles à relire ou à annuler**.
 
@@ -146,7 +146,7 @@ la documentation officielle.
 
 ## Fichiers modifiés
 
-Deux fichiers existants peuvent devoir évoluer — traités avec **prudence
+Deux fichiers existants peuvent devoir évoluer, traités avec **prudence
 maximale** :
 
 ### `optins/registry.py`
@@ -162,7 +162,7 @@ réécriture.
 C'est le point le plus sensible (code utilisateur, charte v2 §9).
 Politique **retenue et implémentée** (`OPTINS-CLI-ENABLE-ROUTES-APPLY-001`) :
 
-- **en dry-run** : la commande **n'écrit pas** dans `mvc/routes.py` —
+- **en dry-run** : la commande **n'écrit pas** dans `mvc/routes.py`,
   elle annonce le branchement (`serait branché`) ;
 - **avec `--apply`, si la structure est reconnue** (présence de
   `router = Router()`, même heuristique que `make:public-page`) : elle
@@ -285,5 +285,5 @@ suivant) avec les règles **verrouillées** :
 
 Ce ticket **n'implémente pas** la commande : il ne crée aucun code
 fonctionnel, il fixe seulement le contrat. Prochain ticket :
-`OPTINS-CLI-ENABLE-IOT-001` — implémentation réelle de
+`OPTINS-CLI-ENABLE-IOT-001`, implémentation réelle de
 `forge optin:enable iot`, conforme à ce contrat.

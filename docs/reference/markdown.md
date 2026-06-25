@@ -267,7 +267,7 @@ L'exemple montre un usage courant.
 |---|---|---|
 | `-` | trait d'union (*hyphen*) | porte-clé |
 | `–` | tiret demi-cadratin (*en dash*) | pages 10–20 |
-| `—` | tiret cadratin (*em dash*, à éviter) | un aparté — comme ceci |
+| `—` | tiret cadratin (*em dash*, à éviter) | un aparté, comme ceci |
 | `_` | tiret bas (*underscore*) | nom_de_variable |
 
 ## Guillemets et apostrophes

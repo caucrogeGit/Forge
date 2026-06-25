@@ -31,7 +31,7 @@ flowchart LR
 
 Trois responsabilités sont séparées :
 
-- **Reverse proxy** : TLS, fichiers statiques, `X-Real-IP`, et `Strict-Transport-Security` (HSTS) — voir [§4.1 Headers de sécurité](#41-headers-de-securite-et-hsts) ci-dessous.
+- **Reverse proxy** : TLS, fichiers statiques, `X-Real-IP`, et `Strict-Transport-Security` (HSTS), voir [§4.1 Headers de sécurité](#41-headers-de-securite-et-hsts) ci-dessous.
 - **Gunicorn** : pool de workers Python, gestion du cycle de vie.
 - **Forge** : dispatch des routes via le callable WSGI. Depuis `WSGI-SECURITY-HEADERS-001`, Forge pose lui-même le socle des autres headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Content-Security-Policy`) sur toutes les réponses WSGI.
 
@@ -55,7 +55,7 @@ La factory `create_configured_wsgi_app()` :
   (dont `APP_TRUSTED_PROXIES`) ;
 - enregistre le renderer Jinja2 ;
 - charge le router applicatif depuis `APP_ROUTES_MODULE` ;
-- émet une fois — à la construction — les
+- émet une fois, à la construction, les
   [avertissements production](#6-warnings-production-au-demarrage),
   jamais à chaque requête.
 
@@ -73,7 +73,7 @@ gunicorn wsgi:application --bind 127.0.0.1:8000
 
 Notes :
 
-- Gunicorn écoute uniquement sur la boucle locale (`127.0.0.1`) — le reverse
+- Gunicorn écoute uniquement sur la boucle locale (`127.0.0.1`), le reverse
   proxy s'occupe d'exposer HTTPS publiquement ;
 - pour un démarrage type production, ajouter `--workers <N>` adapté au CPU
   disponible. **Voir la note multi-worker en [§7](#7-limites-actuelles-en-production)**.
@@ -82,7 +82,7 @@ Notes :
     Depuis `APP-PY-PROD-HOST-GUARD-001`, `python app.py` refuse de démarrer
     quand `APP_ENV=prod` ET `APP_HOST` cible une interface publique
     (`0.0.0.0`, `::`, `[::]`). Le serveur direct reste un outil de
-    développement — la production publique doit passer par
+    développement, la production publique doit passer par
     WSGI + Gunicorn + reverse proxy (cette page). Les hôtes locaux
     (`127.0.0.1`, `localhost`, `::1`) restent autorisés en prod pour
     permettre les tests de validation locale.
@@ -118,7 +118,7 @@ server {
 ```
 
 Les fichiers statiques (`/static/...`) et les médias (`/media/...`) peuvent
-être servis directement par le reverse proxy pour soulager Gunicorn — voir
+être servis directement par le reverse proxy pour soulager Gunicorn, voir
 [§7](#7-limites-actuelles-en-production).
 
 ### 4.1 Headers de sécurité et HSTS
@@ -139,11 +139,11 @@ Tous ces headers sont posés en `setdefault` via
 [`core/security/headers.py`](https://github.com/caucrogeGit/Forge/blob/main/core/security/headers.py) :
 une route applicative qui définit explicitement un de ces headers (`response.headers["Content-Security-Policy"] = "..."` par exemple) garde la main.
 
-**HSTS — décision conservatrice WSGI.** Forge ne pose HSTS que lorsque la
+**HSTS, décision conservatrice WSGI.** Forge ne pose HSTS que lorsque la
 requête a réellement atteint Forge en TLS (`wsgi.url_scheme == "https"`).
 Dans le déploiement standard ci-dessus (reverse proxy qui termine TLS,
 Forge écoute en HTTP local sur `127.0.0.1:8000`), `wsgi.url_scheme` vaut
-`http` côté Forge — c'est donc au reverse proxy d'ajouter `Strict-Transport-Security`.
+`http` côté Forge, c'est donc au reverse proxy d'ajouter `Strict-Transport-Security`.
 
 Exemples de configuration :
 
@@ -198,11 +198,11 @@ Règles :
 
 - **vide par défaut** → `X-Real-IP` toujours ignoré ;
 - **liste séparée par virgules**, espaces tolérés ;
-- **comparaison IP exacte** — pas de notation CIDR ;
+- **comparaison IP exacte**, pas de notation CIDR ;
 - **pas de wildcard** ;
 - `0.0.0.0` n'a aucune signification spéciale (il ne couvre que `0.0.0.0`) ;
 - `X-Real-IP` est ignoré si la requête arrive depuis une IP non listée ;
-- une valeur invalide dans `X-Real-IP` est ignorée — Forge retombe sur
+- une valeur invalide dans `X-Real-IP` est ignorée, Forge retombe sur
   l'IP du socket.
 
 Ticket de référence : `HTTP-TRUSTED-PROXY-IP-001`.
@@ -211,8 +211,8 @@ Ticket de référence : `HTTP-TRUSTED-PROXY-IP-001`.
 
 ## 6. Warnings production au démarrage
 
-`create_configured_wsgi_app()` émet — **une seule fois, à la construction
-de l'application, jamais par requête** — un avertissement si Forge est
+`create_configured_wsgi_app()` émet, **une seule fois, à la construction
+de l'application, jamais par requête**, un avertissement si Forge est
 configuré en `APP_ENV=prod` avec un store de session mémoire :
 
 ```
@@ -268,7 +268,7 @@ complète. Les limites suivantes restent à la charge de l'opérateur :
   premier démarrage Gunicorn.
 - **Fichiers statiques (`/static/...`)** : faire servir directement par le
   reverse proxy, plus rapide et plus sûr qu'un dispatch Python.
-- **Médias (`/media/...`)** : à cadrer selon l'application — `app.py`
+- **Médias (`/media/...`)** : à cadrer selon l'application, `app.py`
   fournit `serve_media_file` mais le chemin WSGI minimal ne le gère pas
   automatiquement.
 - **HTTPS** : à terminer **côté reverse proxy**. Le pipeline Gunicorn ↔

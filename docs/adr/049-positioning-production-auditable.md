@@ -1,8 +1,8 @@
-# ADR-049 — Repositionnement : framework de production auditable
+# ADR-049, Repositionnement : framework de production auditable
 
 ## Statut
 
-Accepté — bêta publique 1.0 (`1.0.0-beta.x`).
+Accepté, bêta publique 1.0 (`1.0.0-beta.x`).
 
 ---
 

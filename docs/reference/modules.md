@@ -4,7 +4,7 @@ Un module Forge est un dossier lisible contenant au minimum un fichier
 `module.json`. Il décrit ce qu'il fournit et Forge installe ce contenu
 par étapes explicites et contrôlées.
 
-### Modules — Principe général
+### Modules, Principe général
 
 Un module Forge doit rester lisible, copiable, auditable et modifiable.
 
@@ -18,7 +18,7 @@ Règles fondamentales :
 - aucun écrasement silencieux n'est autorisé ;
 - aucune marketplace ni téléchargement distant n'existe.
 
-### Modules — Structure d'un module
+### Modules, Structure d'un module
 
 Structure minimale :
 
@@ -47,7 +47,7 @@ Règles :
 - seuls les éléments déclarés dans `provides` sont pris en compte par Forge ;
 - les chemins réels vers ces éléments sont définis dans `paths`.
 
-### Modules — Format `module.json`
+### Modules, Format `module.json`
 
 Exemple complet :
 
@@ -74,7 +74,7 @@ Exemple complet :
 }
 ```
 
-### Modules — Champs obligatoires
+### Modules, Champs obligatoires
 
 | Champ | Rôle |
 |---|---|
@@ -89,14 +89,14 @@ Règles de validation :
 - `version` : format `MAJOR.MINOR.PATCH` (ex. `0.1.0`) ;
 - `label` et `description` : sans HTML.
 
-### Modules — Champs optionnels
+### Modules, Champs optionnels
 
 | Champ | Type | Valeur par défaut |
 |---|---|---|
 | `provides` | liste | `[]` |
 | `paths` | dictionnaire | `{}` |
 
-### Modules — `provides`
+### Modules, `provides`
 
 `provides` liste les types de contenu fournis par le module.
 
@@ -114,7 +114,7 @@ Règles de validation :
 `routes` est traité séparément par `forge module:routes`.
 `static` et `migrations` sont réservés pour de futurs tickets.
 
-### Modules — `paths`
+### Modules, `paths`
 
 `paths` associe chaque type déclaré dans `provides` à un chemin relatif à l'intérieur du dossier du module.
 
@@ -135,7 +135,7 @@ Règles de validation :
 - pas de chemin absolu (Unix ou Windows) ;
 - pas d'URL.
 
-### Modules — Registre `forge_modules.json`
+### Modules, Registre `forge_modules.json`
 
 `forge_modules.json` est le registre des modules installés.
 Il est créé ou mis à jour par `forge module:install`.
@@ -171,7 +171,7 @@ Règles du registre :
 - ne doit pas contenir de chemin absolu ;
 - ne doit pas devenir une base de données.
 
-### Modules — Lister les modules
+### Modules, Lister les modules
 
 ```bash
 forge module:list
@@ -208,7 +208,7 @@ Règles :
 - signale les modules invalides sans bloquer l'affichage des valides ;
 - ne crée pas le dossier `modules/` s'il est absent.
 
-### Modules — Installer déclarativement un module
+### Modules, Installer déclarativement un module
 
 ```bash
 forge module:install agenda
@@ -232,7 +232,7 @@ Règles :
 - n'exécute aucun code du module ;
 - `--dry-run` simule sans écrire.
 
-### Modules — Installer les fichiers d'un module
+### Modules, Installer les fichiers d'un module
 
 ```bash
 forge module:files agenda --dry-run
@@ -269,7 +269,7 @@ Règles :
 Après une installation réelle, Forge trace les fichiers copiés dans
 `forge_modules.json` avec la clé `files_installed`.
 
-### Modules — Activer les routes d'un module
+### Modules, Activer les routes d'un module
 
 ```bash
 forge module:routes agenda --dry-run
@@ -318,7 +318,7 @@ Règles :
 - Forge n'importe pas dynamiquement `routes.py` du module pendant la génération ;
 - ne copie aucun fichier d'entité, vue, contrôleur ou doc.
 
-### Modules — Dépendance runtime des routes
+### Modules, Dépendance runtime des routes
 
 Les routes de modules référencent le dossier source du module (`modules/<nom>/`).
 
@@ -331,15 +331,15 @@ Conséquences pratiques :
 
 - un module qui expose des routes doit rester présent dans `modules/<nom>/` tant que ses routes sont utilisées par l'application ;
 - supprimer `modules/<nom>/` après `forge module:routes` provoque une erreur d'import au démarrage de l'application ;
-- `forge module:files` copie les entités, contrôleurs et vues dans `mvc/`, mais pas les routes — c'est délibéré.
+- `forge module:files` copie les entités, contrôleurs et vues dans `mvc/`, mais pas les routes, c'est délibéré.
 
 Raisons de ce choix :
 
 - les fichiers de routes sont du code Python importé, pas des ressources statiques copiables sans précaution ;
-- le dossier `modules/` est déjà une source contrôlée du projet — ce n'est pas un dépôt externe ;
+- le dossier `modules/` est déjà une source contrôlée du projet, ce n'est pas un dépôt externe ;
 - évite de dupliquer du code Python entre `modules/` et `mvc/`, ce qui rendrait les mises à jour de module risquées.
 
-### Modules — Cycle recommandé
+### Modules, Cycle recommandé
 
 ```bash
 forge module:list
@@ -368,7 +368,7 @@ module.json
 Chaque étape est indépendante et explicite. Aucune étape n'en déclenche
 automatiquement une autre.
 
-### Modules — Désinstaller un module
+### Modules, Désinstaller un module
 
 ```bash
 forge module:remove agenda --dry-run
@@ -389,22 +389,22 @@ Comportement par fichier tracé dans `forge_modules.json` :
 | Situation | Action |
 |---|---|
 | Fichier identique à la source | Supprimé |
-| Fichier modifié manuellement | Conservé — signalé |
-| Source introuvable | Conservé — signalé |
+| Fichier modifié manuellement | Conservé, signalé |
+| Source introuvable | Conservé, signalé |
 | Fichier absent (déjà supprimé) | Ignoré |
 
 Comportement sur les routes :
 
 | Situation | Action |
 |---|---|
-| `mvc/routes_<nom>.py` existe | **Conservé** — à retirer manuellement |
+| `mvc/routes_<nom>.py` existe | **Conservé**, à retirer manuellement |
 | Marqueurs `forge-module-routes:<nom>:start/end` présents (anciens projets) | Bloc retiré de `mvc/module_routes.py` (compat arrière) |
-| Marqueurs absents | Nettoyage manuel requis — signalé |
+| Marqueurs absents | Nettoyage manuel requis, signalé |
 | Fichier `mvc/module_routes.py` absent | Ignoré |
 
 > **Contrat explicite :** `forge module:remove` ne supprime pas `mvc/routes_<nom>.py`
 > ni les lignes que vous avez ajoutées dans `mvc/routes.py`.
-> Ces éléments restent sur le disque — à retirer manuellement si souhaité.
+> Ces éléments restent sur le disque, à retirer manuellement si souhaité.
 
 Règles :
 
@@ -421,7 +421,7 @@ Limites :
 - pas de suppression des fichiers modifiés ;
 - pas de suppression des fichiers dont la source est absente.
 
-### Modules — API Python (`core.modules`)
+### Modules, API Python (`core.modules`)
 
 ```python
 from core.modules import (
@@ -461,15 +461,15 @@ from core.modules import (
 )
 ```
 
-### Modules — Sécurité de copie des fichiers
+### Modules, Sécurité de copie des fichiers
 
 `forge module:files` copie uniquement les fichiers déclarés dans les répertoires autorisés. Les garanties suivantes s'appliquent :
 
-- seuls les types `entities`, `controllers`, `views` et `docs` sont copiables par `module:files` — `routes`, `static`, `migrations` sont exclus ;
+- seuls les types `entities`, `controllers`, `views` et `docs` sont copiables par `module:files`, `routes`, `static`, `migrations` sont exclus ;
 - les chemins absolus sont refusés (`/etc/...`, `C:\...`) ;
 - les chemins contenant `..` sont refusés ;
 - les URL sont refusées (`https://`, `ftp://`, `file://`) ;
-- les **liens symboliques sont refusés** — un symlink dans un module entraîne un arrêt immédiat de l'installation, même s'il pointe vers un fichier interne au module ;
+- les **liens symboliques sont refusés**, un symlink dans un module entraîne un arrêt immédiat de l'installation, même s'il pointe vers un fichier interne au module ;
 - les fichiers cachés sensibles sont ignorés : `.env`, `.DS_Store`, `Thumbs.db` ;
 - les caches et fichiers de build sont ignorés : `__pycache__/`, `*.pyc`, `.git/`, `.venv/` ;
 - les fichiers temporaires sont ignorés : `*.tmp`, `*.bak` ;
@@ -488,9 +488,9 @@ Cibles autorisées :
 | `views` | `mvc/views/` |
 | `docs` | `docs/modules/<nom_module>/` |
 
-Si un symlink est détecté, l'installation est refusée entièrement — aucun fichier n'est copié et un message d'erreur explicite est affiché.
+Si un symlink est détecté, l'installation est refusée entièrement, aucun fichier n'est copié et un message d'erreur explicite est affiché.
 
-### Modules — Sécurité et limites actuelles
+### Modules, Sécurité et limites actuelles
 
 Limites fonctionnelles :
 
@@ -510,7 +510,7 @@ Sécurité :
 - les routes de modules restent à clarifier côté dépendance runtime dans `MODULE-ROUTES-RUNTIME-AUDIT-001` ;
 - la sécurité de la copie des fichiers de modules sera auditée dans `MODULE-FILES-SECURITY-001`.
 
-### Modules — Cycle de vie
+### Modules, Cycle de vie
 
 #### Ce qui est supporté
 
@@ -526,11 +526,11 @@ Chaque étape est indépendante, explicite, et dotée d'un mode `--dry-run`. Auc
 
 Garanties lors de l'installation :
 
-- aucun fichier existant n'est écrasé — les conflits sont signalés et stoppent l'opération ;
+- aucun fichier existant n'est écrasé, les conflits sont signalés et stoppent l'opération ;
 - aucun code du module n'est exécuté pendant l'installation ;
 - les chemins absolus, `..` et URL sont refusés à toutes les étapes ;
 - les fichiers copiés sont tracés dans `forge_modules.json` avec la clé `files_installed` ;
-- `forge module:routes` génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes.py` — il ne modifie jamais `mvc/routes.py`.
+- `forge module:routes` génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes.py`, il ne modifie jamais `mvc/routes.py`.
 
 #### Ce qui n'est pas encore supporté
 
@@ -538,14 +538,14 @@ Forge ne fournit pas encore les opérations suivantes :
 
 | Opération | Statut | Ticket prévu |
 |---|---|---|
-| `forge module:remove` — désinstallation contrôlée | **Disponible** (voir section dédiée) | `MODULE-REMOVE-001` ✅ |
-| `forge module:update` — mise à jour contrôlée | Non disponible | `MODULE-UPDATE-001` |
-| Rollback automatique complet | Non disponible | — |
-| Fusion intelligente avec fichiers modifiés | Non disponible | — |
-| Registre distant de modules | Non disponible | — |
-| Gestion de dépendances entre modules | Non disponible | — |
-| Marketplace de modules | Non disponible | — |
-| Copie de `static` et `migrations` par `module:files` | Non disponible | — |
+| `forge module:remove`, désinstallation contrôlée | **Disponible** (voir section dédiée) | `MODULE-REMOVE-001` ✅ |
+| `forge module:update`, mise à jour contrôlée | Non disponible | `MODULE-UPDATE-001` |
+| Rollback automatique complet | Non disponible |, |
+| Fusion intelligente avec fichiers modifiés | Non disponible |, |
+| Registre distant de modules | Non disponible |, |
+| Gestion de dépendances entre modules | Non disponible |, |
+| Marketplace de modules | Non disponible |, |
+| Copie de `static` et `migrations` par `module:files` | Non disponible |, |
 
 #### Risques connus
 
@@ -558,7 +558,7 @@ Si une copie de fichiers échoue en cours d'opération, les fichiers déjà copi
 **Modifications manuelles empêchent la suppression automatique future.**
 Si les fichiers copiés par `forge module:files` sont modifiés après l'installation, une éventuelle commande `forge module:remove` ne pourra pas les supprimer en toute sécurité sans risquer de perdre du code utilisateur.
 
-**Régénération refusée — suppression manuelle requise.**
+**Régénération refusée, suppression manuelle requise.**
 `forge module:routes` refuse de régénérer `mvc/routes_<nom>.py` si le fichier existe déjà. Supprimez-le manuellement pour le régénérer.
 
 #### Bonnes pratiques
@@ -571,23 +571,23 @@ Si les fichiers copiés par `forge module:files` sont modifiés après l'install
 
 #### Tickets futurs
 
-- **`MODULE-UPDATE-001`** — ajouter une mise à jour contrôlée : comparaison des fichiers, signalement des conflits, mise à jour sélective.
+- **`MODULE-UPDATE-001`**, ajouter une mise à jour contrôlée : comparaison des fichiers, signalement des conflits, mise à jour sélective.
 
 ---
 
-## Référence croisée — Modules Forge
+## Référence croisée, Modules Forge
 
 ### Principe général
 
 La Phase 7 regroupe trois briques orthogonales livrées après Forge 1.5.0 :
 
-- **Workflow** — modélisation déclarative des statuts et transitions métier d'une entité ;
-- **Statistiques** — collecte légère d'événements et calcul d'indicateurs agrégés ;
-- **Modules** — système d'empaquetage et d'installation de briques Forge réutilisables.
+- **Workflow**, modélisation déclarative des statuts et transitions métier d'une entité ;
+- **Statistiques**, collecte légère d'événements et calcul d'indicateurs agrégés ;
+- **Modules**, système d'empaquetage et d'installation de briques Forge réutilisables.
 
 Ces trois briques partagent les mêmes principes : pas d'ORM, pas de runtime caché, déclaration explicite, zéro dépendance nouvelle.
 
-### Workflow — Socle livré
+### Workflow, Socle livré
 
 Le workflow Forge permet de gérer les transitions d'état d'une entité sans imposer de machine à états globale.
 
@@ -597,25 +597,25 @@ Briques livrées :
 - validation des transitions autorisées ;
 - helpers Jinja `workflow_status_label()`, `workflow_allowed_transitions()` ;
 - intégration CRUD : boutons de transition dans les vues `show` et `list` ;
-- pas de callbacks automatiques — les hooks sont à écrire dans le contrôleur.
+- pas de callbacks automatiques, les hooks sont à écrire dans le contrôleur.
 
 La documentation complète est dans la section Workflow de cette référence.
 
-### Statistiques — Socle livré
+### Statistiques, Socle livré
 
 Le module statistiques fournit une collecte d'événements bruts et des agrégats calculés à la demande, sans base de données dédiée ni service externe.
 
 Briques livrées :
 
-- `StatsEvent` — enregistrement d'un événement horodaté dans `stats_events` ;
-- `stats_count()`, `stats_sum()`, `stats_average()` — agrégats sur la table des événements ;
-- `stats_by_day()`, `stats_by_month()` — agrégats temporels ;
+- `StatsEvent`, enregistrement d'un événement horodaté dans `stats_events` ;
+- `stats_count()`, `stats_sum()`, `stats_average()`, agrégats sur la table des événements ;
+- `stats_by_day()`, `stats_by_month()`, agrégats temporels ;
 - helpers Jinja pour afficher les indicateurs dans les templates ;
-- pas de dashboard généré automatiquement — les vues sont à créer dans le contrôleur.
+- pas de dashboard généré automatiquement, les vues sont à créer dans le contrôleur.
 
 La documentation complète est dans la section Statistiques de cette référence.
 
-### Modules — Socle livré
+### Modules, Socle livré
 
 Le système de modules permet d'empaqueter des entités, contrôleurs, vues et docs sous forme de dossier autonome et de les installer dans un projet Forge.
 
@@ -624,12 +624,12 @@ Briques livrées :
 | Ticket | Commande / brique |
 |---|---|
 | `MODULE-SYSTEM-001` | Format `module.json`, structure standard d'un module |
-| `MODULE-SYSTEM-002` | `forge module:list` — découverte locale |
-| `MODULE-SYSTEM-003` | `forge module:install` — installation déclarative dans `forge_modules.json` |
-| `MODULE-SYSTEM-004` | `forge module:routes` — génération de `mvc/routes_<nom>.py` et affichage des lignes à ajouter |
-| `MODULE-SYSTEM-005` | `forge module:files` — copie des fichiers dans `mvc/entities`, `mvc/controllers`, `mvc/views`, `docs/modules/` |
+| `MODULE-SYSTEM-002` | `forge module:list`, découverte locale |
+| `MODULE-SYSTEM-003` | `forge module:install`, installation déclarative dans `forge_modules.json` |
+| `MODULE-SYSTEM-004` | `forge module:routes`, génération de `mvc/routes_<nom>.py` et affichage des lignes à ajouter |
+| `MODULE-SYSTEM-005` | `forge module:files`, copie des fichiers dans `mvc/entities`, `mvc/controllers`, `mvc/views`, `docs/modules/` |
 
-Le cycle recommandé est décrit dans la section [Modules Forge — Cycle recommandé](#modules-cycle-recommande) de cette référence.
+Le cycle recommandé est décrit dans la section [Modules Forge, Cycle recommandé](#modules-cycle-recommande) de cette référence.
 
 ### Cycle d'utilisation recommandé
 

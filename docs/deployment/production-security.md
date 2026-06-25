@@ -1,4 +1,4 @@
-# Sécurité en production — Guide Forge
+# Sécurité en production, Guide Forge
 
 Ce guide rassemble les bonnes pratiques de déploiement sécurisé de Forge.
 Il consolide les résultats des audits de sécurité réalisés lors de la Phase 4.5 :
@@ -9,7 +9,7 @@ Voir aussi : [Déploiement](deployment.md) · [Auth/User](../features/auth.md) �
 
 ---
 
-## 1. Architecture de production — HTTPS obligatoire
+## 1. Architecture de production, HTTPS obligatoire
 
 **En production, Forge doit être exécuté derrière un reverse proxy HTTPS.**
 
@@ -23,7 +23,7 @@ flowchart LR
 Forge inclut un serveur HTTPS Python adapté au développement local
 (`APP_SSL_ENABLED=true`, TLS 1.2 minimum). **Ce serveur ne doit pas être exposé
 directement à Internet en production.** En mode `prod`, `APP_SSL_ENABLED=false`
-est le défaut — Forge écoute en HTTP local, Nginx termine TLS.
+est le défaut, Forge écoute en HTTP local, Nginx termine TLS.
 
 La configuration Nginx générée par `forge deploy:init` expose un bloc HTTP :
 ajouter un bloc `listen 443 ssl` avec `ssl_certificate` / `ssl_certificate_key`
@@ -31,8 +31,8 @@ ajouter un bloc `listen 443 ssl` avec `ssl_certificate` / `ssl_certificate_key`
 
 Pourquoi HTTPS est obligatoire pour Forge :
 
-- Les cookies de session portent l'attribut `Secure` — ils ne sont transmis que via HTTPS.
-- HSTS (`Strict-Transport-Security`) est émis sur toutes les réponses — le navigateur
+- Les cookies de session portent l'attribut `Secure`, ils ne sont transmis que via HTTPS.
+- HSTS (`Strict-Transport-Security`) est émis sur toutes les réponses, le navigateur
   refusera les connexions HTTP après la première visite.
 - La CSP, Referrer-Policy et Permissions-Policy ont leur plein effet uniquement sur HTTPS.
 
@@ -67,7 +67,7 @@ si `app_env` est mal configuré.
 - Durée de session : `DUREE_SESSION = 3600` secondes (1 heure), gérée côté serveur.
 - À la déconnexion, `Max-Age=0` invalide le cookie immédiatement.
 - Au login, `authentifier_session()` effectue une **rotation de session** :
-  l'ancien identifiant de session est révoqué et un nouveau est émis — protection
+  l'ancien identifiant de session est révoqué et un nouveau est émis, protection
   contre la fixation de session.
 
 ### Ce qui n'est pas en session
@@ -193,7 +193,7 @@ fetch('/api/action', {
 ### Opt-out explicite
 
 Une route ou un groupe peut désactiver la vérification CSRF avec `csrf=False`.
-Ce paramètre est **explicite** — aucune route n'est exempte sans déclaration.
+Ce paramètre est **explicite**, aucune route n'est exempte sans déclaration.
 
 Les routes `public=True` restent protégées par CSRF sauf si `csrf=False`
 est également spécifié.
@@ -246,7 +246,7 @@ logging.getLogger("forge.auth.audit").addHandler(handler)
 logging.getLogger("forge.auth.audit").setLevel(logging.INFO)
 ```
 
-Les logs d'audit ne sont pas configurés automatiquement par Forge —
+Les logs d'audit ne sont pas configurés automatiquement par Forge,
 la politique de log appartient à l'application.
 
 ### Rate limiting
@@ -260,7 +260,7 @@ Les compteurs sont **isolés** des compteurs de connexion.
 
 ---
 
-## 6. RBAC — Contrôle d'accès
+## 6. RBAC, Contrôle d'accès
 
 Résultats confirmés par SECURITY-RBAC-AUDIT-001.
 
@@ -309,7 +309,7 @@ def delete(request, post_id):
 {% endif %}
 ```
 
-### Limite connue — boutons CRUD sans guard UI
+### Limite connue, boutons CRUD sans guard UI
 
 Les templates CRUD générés par `make:crud` (table partielle, vue show) affichent
 les boutons **Modifier** et **Supprimer** sans `{% if can() %}` conditionnel.
@@ -339,14 +339,14 @@ null bytes, URLs (`https://...`), chemins Windows absolus.
 
 ### Extensions interdites (liste non exhaustive)
 
-`.php`, `.py`, `.html`, `.js`, `.svg`, `.sh`, `.exe`, `.env` — toute extension
+`.php`, `.py`, `.html`, `.js`, `.svg`, `.sh`, `.exe`, `.env`, toute extension
 hors liste blanche est refusée. Liste blanche par défaut : `jpg`, `jpeg`, `png`,
 `webp`, `pdf`.
 
 ### Noms de fichiers
 
 `secure_filename()` retire le chemin (basename uniquement), remplace les
-caractères spéciaux. `generate_unique_filename()` ajoute un UUID hex — impossible
+caractères spéciaux. `generate_unique_filename()` ajoute un UUID hex, impossible
 de prédire le nom du fichier en base ou d'écraser un fichier existant.
 
 ### Route `/media`
@@ -356,7 +356,7 @@ via l'URL est bloqué avant toute lecture. Les fichiers sont servis uniquement
 depuis `storage/uploads/`.
 
 **Ne jamais servir `storage/` directement via Nginx** sans passer par la route
-`/media` de Forge — le filtrage anti-traversal ne s'appliquerait pas.
+`/media` de Forge, le filtrage anti-traversal ne s'appliquerait pas.
 
 ### Rate limiting upload
 
@@ -389,7 +389,7 @@ storage/logs/errors.dev.md      ← rapport lisible par humain
 ```
 
 Ces fichiers sont **réservés au mode développement**. Ils contiennent les
-tracebacks Python complets — **ne jamais les exposer publiquement**.
+tracebacks Python complets, **ne jamais les exposer publiquement**.
 
 En production :
 
@@ -459,14 +459,14 @@ chmod 700 /srv/mon-projet/storage/logs/
 
 ---
 
-## 10. Base de données — principe de moindre privilège
+## 10. Base de données, principe de moindre privilège
 
 Forge utilise deux comptes MariaDB :
 
 | Compte | Variable | Droits requis |
 |---|---|---|
 | Compte applicatif | `DB_APP_LOGIN` / `DB_APP_PWD` | `SELECT`, `INSERT`, `UPDATE`, `DELETE` sur la base applicative uniquement |
-| Compte admin | `DB_ADMIN_LOGIN` / `DB_ADMIN_PWD` | `CREATE TABLE`, `ALTER TABLE`, `DROP TABLE` — migrations uniquement |
+| Compte admin | `DB_ADMIN_LOGIN` / `DB_ADMIN_PWD` | `CREATE TABLE`, `ALTER TABLE`, `DROP TABLE`, migrations uniquement |
 
 Le compte applicatif **ne doit pas avoir de droits DDL** (`CREATE`, `DROP`, `ALTER`).
 Le compte admin n'est utilisé que par `forge db:init` et `forge db:apply`.
@@ -519,10 +519,9 @@ forge db:init
 ```
 
 Une fois `forge db:init` exécuté et le compte applicatif créé, les
-variables `DB_ADMIN_*` ne sont plus nécessaires côté serveur de runtime
-— elles peuvent être absentes ou vides dans `env/prod`. Voir
+variables `DB_ADMIN_*` ne sont plus nécessaires côté serveur de runtime, elles peuvent être absentes ou vides dans `env/prod`. Voir
 [`deploy-advanced.md`](deploy-advanced.md) §138 : « Les credentials
-admin (`DB_ADMIN_*`) servent uniquement lors des migrations — les
+admin (`DB_ADMIN_*`) servent uniquement lors des migrations, les
 supprimer de `env/prod` après `db:init` si vous n'en avez plus besoin. »
 
 Cette politique est verrouillée par
@@ -532,7 +531,7 @@ Cette politique est verrouillée par
 
 Les tests E2E MariaDB (`test_e2e_mariadb.py`) ne s'exécutent que si
 `FORGE_E2E_MARIADB=1` est défini. Le nom de la base **doit commencer par
-`forge_e2e_`** — vérification appliquée pour empêcher l'exécution accidentelle
+`forge_e2e_`**, vérification appliquée pour empêcher l'exécution accidentelle
 sur une base de production.
 
 **Ne jamais pointer les tests E2E vers une base de production.**

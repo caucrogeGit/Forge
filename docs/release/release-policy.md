@@ -10,9 +10,9 @@ Ce document définit comment Forge numérote, prépare, valide, tague et publie 
 
 Il complète :
 
-- [Procédure de release](release.md) — checklist pas à pas avant chaque tag
-- [Validation locale](release-local.md) — procédure de test wheel locale
-- [Contrat de stabilité](stability-contract.md) — ce qui est stable, interne, expérimental
+- [Procédure de release](release.md), checklist pas à pas avant chaque tag
+- [Validation locale](release-local.md), procédure de test wheel locale
+- [Contrat de stabilité](stability-contract.md), ce qui est stable, interne, expérimental
 
 ---
 
@@ -114,7 +114,7 @@ la mise à jour, c'est un MAJOR.
 
 Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la liste complète.
 
-### Stable — garantie 1.x
+### Stable, garantie 1.x
 
 - Commandes CLI documentées dans `docs/reference.md`.
 - Structure projet générée par `forge new`.
@@ -123,14 +123,14 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 - Imports publics de `core.http`, `core.auth`, `core.security` (session, CSRF, RBAC).
 - `GET /health` → `200 {"status":"ok"}`.
 
-### Interne — peut changer entre mineurs
+### Interne, peut changer entre mineurs
 
 - Fonctions et modules internes de `cli/`.
 - Fonctions préfixées `_`.
 - Contenu interne des tests Forge.
 - Format interne des sessions côté serveur.
 
-### Expérimental — stable en usage, interface peut évoluer
+### Expérimental, stable en usage, interface peut évoluer
 
 - `forge module:*`, `forge deploy:*`.
 - Backends de session `FileSessionStore`, `MariaDbSessionStore`.
@@ -145,13 +145,13 @@ chaque package publiable :
 
 | Package | Classifier | Justification |
 |---|---|---|
-| `forge-mvc` (core) | `4 - Beta` | 1.0.0 en bêta — corrections post-audit, tests terrain et RC requis avant stable |
+| `forge-mvc` (core) | `4 - Beta` | 1.0.0 en bêta, corrections post-audit, tests terrain et RC requis avant stable |
 | `forge-mvc-rbac` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-workflow` | `4 - Beta` | API stable et testée, usage production externe encore limité |
 | `forge-mvc-stats` | `4 - Beta` | API stable et testée, usage production externe encore limité |
-| `forge-mvc-mfa` | `3 - Alpha` | Secret TOTP chiffré au repos (Fernet, `MFA-PYPI-READY-001`) — publié sur PyPI depuis `1.0.0-beta.9`, passage Alpha → Beta à venir |
+| `forge-mvc-mfa` | `3 - Alpha` | Secret TOTP chiffré au repos (Fernet, `MFA-PYPI-READY-001`), publié sur PyPI depuis `1.0.0-beta.9`, passage Alpha → Beta à venir |
 | `forge-mvc-images` | `3 - Alpha` | Module image opt-in (traitement Pillow extrait du core, ADR-018) + couche médias applicative ; dépend de `forge-mvc-files`. Publié sur PyPI depuis `1.0.0-beta.13` |
-| `forge-mvc-iot` | `3 - Alpha` | Module IoT opt-in (MQTT → `iot_events` → API HTTP) — publié sur PyPI depuis `1.0.0-beta.12`, API encore en stabilisation |
+| `forge-mvc-iot` | `3 - Alpha` | Module IoT opt-in (MQTT → `iot_events` → API HTTP), publié sur PyPI depuis `1.0.0-beta.12`, API encore en stabilisation |
 | `forge-mvc-video` | `4 - Beta` | Module vidéo opt-in : chaîne complète `video:upload` → `video:process` → lecture HTTP Range, + `video:cleanup` ; transcodage MP4 H.264/AAC. Publié sur PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-audio` | `4 - Beta` | Module audio opt-in **sans état** : upload, sondage (`ffprobe`), transcodage MP3 (`ffmpeg`), lecture HTTP Range, `audio:doctor`. Pas de base de données. Publié sur PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-files` | `3 - Alpha` | Upload générique extrait du core (ADR-019) : écriture sécurisée, storage anti-traversal, service de fichiers, rate-limit. Publié sur PyPI depuis `1.0.0-beta.13` |
@@ -208,13 +208,13 @@ v1.0.0-beta.10
 - Les tags sont annotés (`git tag -a`).
 - Le tag est créé sur le commit de release, après validation complète.
 - **Ne PAS utiliser** la forme PEP 440 pour les tags (`v<major>.<minor>.<patch>bN`
-  est interdit). Le tag suit toujours la forme publique lisible — la
+  est interdit). Le tag suit toujours la forme publique lisible, la
   version PEP 440 reste limitée à `pyproject.toml`, `core/__init__.py`,
   `forge.py` et la publication PyPI. Voir
   `RELEASE-VALIDATE-PEP440-SEMVERSION-001`.
 
 L'utilitaire `tools/release-validate.sh --convert semver <pep440>` produit
-le suffixe SemVer correspondant à la version PEP 440 courante — c'est la
+le suffixe SemVer correspondant à la version PEP 440 courante, c'est la
 source de vérité pour construire le nom de tag depuis la version Python.
 
 ### Immuabilité des tags publiés
@@ -265,7 +265,7 @@ passent en mode **bloquant**. Deux contextes coexistent :
 | Contexte | Outil | Mode | Effet d'une CVE |
 |---|---|---|---|
 | Surveillance hebdomadaire | [`.github/workflows/dependency-audit.yml`](https://github.com/caucrogeGit/Forge/blob/main/.github/workflows/dependency-audit.yml) | **Informatif** (`continue-on-error: true`) | Rapport visible dans l'historique Actions, aucun blocage |
-| Validation release | [`tools/release-validate.sh`](https://github.com/caucrogeGit/Forge/blob/main/tools/release-validate.sh) — sections 8 (`pip-audit`) et 9 (`npm audit --omit=dev`) | **Bloquant** | Échec immédiat, release impossible |
+| Validation release | [`tools/release-validate.sh`](https://github.com/caucrogeGit/Forge/blob/main/tools/release-validate.sh), sections 8 (`pip-audit`) et 9 (`npm audit --omit=dev`) | **Bloquant** | Échec immédiat, release impossible |
 
 Cette séparation évite de bloquer le développement quotidien sur une
 CVE transitoire (typiquement le délai entre la publication d'un avis et
@@ -274,7 +274,7 @@ release Forge ne sort avec un audit dépendances rouge.
 
 Aucun masquage par `|| true` ou `continue-on-error: true` n'est toléré
 dans le chemin de validation release. Si une CVE bloque, le ticket de
-correction dépendance doit être ouvert et résolu avant la release —
+correction dépendance doit être ouvert et résolu avant la release,
 pas contourné.
 
 ---
@@ -364,16 +364,16 @@ Vérifications post-publication :
 ### Publication PyPI
 
 **État Forge {{forge_version}} :** le core `forge-mvc` est **publié sur PyPI** sous `forge-mvc=={{forge_version}}`.
-`{{forge_version}}` est une préversion bêta PEP 440 — l'option `--pre` est nécessaire pour l'installer.
+`{{forge_version}}` est une préversion bêta PEP 440, l'option `--pre` est nécessaire pour l'installer.
 
 | Package | Publication PyPI | Notes |
 |---|---|---|
-| `forge-mvc` (core) | ✅ Publié — `{{forge_version}}` | `pip install --pre forge-mvc` |
-| `forge-mvc-rbac` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-rbac` |
-| `forge-mvc-workflow` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-workflow` |
-| `forge-mvc-stats` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-stats` |
-| `forge-mvc-mfa` | ✅ Publié sur PyPI depuis `1.0.0-beta.9` — version alignée avec le core | `pip install --pre forge-mvc-mfa` (Alpha, `MFA-PYPI-READY-001`) |
-| `forge-mvc-images` | ✅ Publié sur PyPI depuis `1.0.0-beta.13` — version alignée avec le core | `pip install --pre forge-mvc-images` (Alpha, API encore bêta, `MEDIA-PYPI-READY-002`) |
+| `forge-mvc` (core) | ✅ Publié, `{{forge_version}}` | `pip install --pre forge-mvc` |
+| `forge-mvc-rbac` | ✅ Publié sur PyPI, version alignée avec le core | `pip install --pre forge-mvc-rbac` |
+| `forge-mvc-workflow` | ✅ Publié sur PyPI, version alignée avec le core | `pip install --pre forge-mvc-workflow` |
+| `forge-mvc-stats` | ✅ Publié sur PyPI, version alignée avec le core | `pip install --pre forge-mvc-stats` |
+| `forge-mvc-mfa` | ✅ Publié sur PyPI depuis `1.0.0-beta.9`, version alignée avec le core | `pip install --pre forge-mvc-mfa` (Alpha, `MFA-PYPI-READY-001`) |
+| `forge-mvc-images` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-images` (Alpha, API encore bêta, `MEDIA-PYPI-READY-002`) |
 
 Tous les opt-ins officiels sont publiables directement depuis PyPI.
 
@@ -403,11 +403,11 @@ reste manuelle et délibérée.
 
 | Package | Statut PyPI | Règle |
 |---|---|---|
-| `forge-mvc` (core) | ✅ Publié — `{{forge_version}}` | Publié dès `1.0.0-beta.1` |
-| `forge-mvc-rbac` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-rbac` |
-| `forge-mvc-workflow` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-workflow` |
-| `forge-mvc-stats` | ✅ Publié sur PyPI — version alignée avec le core | `pip install --pre forge-mvc-stats` |
-| `forge-mvc-mfa` | ✅ Publié sur PyPI depuis `1.0.0-beta.9` — version alignée avec le core | `pip install --pre forge-mvc-mfa` (statut Alpha, `MFA-PYPI-READY-001`, `SEC-MFA-SECRET-ENCRYPTION-001` livré) |
+| `forge-mvc` (core) | ✅ Publié, `{{forge_version}}` | Publié dès `1.0.0-beta.1` |
+| `forge-mvc-rbac` | ✅ Publié sur PyPI, version alignée avec le core | `pip install --pre forge-mvc-rbac` |
+| `forge-mvc-workflow` | ✅ Publié sur PyPI, version alignée avec le core | `pip install --pre forge-mvc-workflow` |
+| `forge-mvc-stats` | ✅ Publié sur PyPI, version alignée avec le core | `pip install --pre forge-mvc-stats` |
+| `forge-mvc-mfa` | ✅ Publié sur PyPI depuis `1.0.0-beta.9`, version alignée avec le core | `pip install --pre forge-mvc-mfa` (statut Alpha, `MFA-PYPI-READY-001`, `SEC-MFA-SECRET-ENCRYPTION-001` livré) |
 | `forge-mvc-images` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-images` (statut Alpha, API encore bêta ; dépend de `forge-mvc-files` ; voir `production-limits.md`) |
 | `forge-mvc-files` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-files` |
 | `forge-mvc-audio` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-audio` |
@@ -538,7 +538,7 @@ PyPI : les installer directement avec `pip install --pre forge-mvc-<nom>`.
 
 ### Ce qui reste interdit sans ticket de release dédié
 
-- `twine upload` d'un nouveau package non encore publié — interdit sans ticket de release dédié ;
+- `twine upload` d'un nouveau package non encore publié, interdit sans ticket de release dédié ;
 - déclarer `forge-mvc[mfa]`, `forge-mvc[images]` ou un autre opt-in hors `rbac`/`workflow`/`stats` dans les extras PyPI sans décision explicite (ces paquets s'installent directement) ;
 - inclure `forge-mvc-mfa` ou `forge-mvc-images` dans `forge-mvc[all]` : exclusion volontaire (statut Alpha ou API bêta).
 
@@ -601,7 +601,7 @@ Règles :
 - Un ticket livré doit être marqué `**livré**` dans la roadmap.
 - La prochaine priorité doit être indiquée clairement dans la roadmap.
 - Les limites restantes doivent être reportées dans les tickets futurs.
-- Les tickets futurs doivent être bornés — ne pas créer de tickets ouverts sans
+- Les tickets futurs doivent être bornés, ne pas créer de tickets ouverts sans
   critères d'acceptation.
 - La roadmap ne doit pas lister des ambitions non bornées comme des tickets actifs.
 
@@ -611,7 +611,7 @@ Règles :
 
 | Domaine | Ticket futur |
 |---|---|
-| Politique de dépréciation officielle — préavis, cycle de vie des APIs | `RELEASE-DEPRECATION-001` — voir [deprecation-policy.md](deprecation-policy.md) |
+| Politique de dépréciation officielle, préavis, cycle de vie des APIs | `RELEASE-DEPRECATION-001`, voir [deprecation-policy.md](deprecation-policy.md) |
 | Matrice de compatibilité Python / MariaDB / Node | `RELEASE-COMPAT-001` |
 | Guide de migration entre versions majeures | `RELEASE-MIGRATION-GUIDE-001` |
 | Politique LTS (Long Term Support) | `RELEASE-LTS-001` |
@@ -624,11 +624,11 @@ Règles :
 ## Voir aussi
 
 - [Vue d'ensemble Release et compatibilité](release-and-compatibility.md)
-- [Politique de dépréciation](deprecation-policy.md) — cycle annonce → retrait
-- [Matrice de compatibilité](compatibility.md) — Python, MariaDB, Node.js
-- [Guide de migration](../features/migration-guide.md) — passer d'une version à l'autre
-- [Contrat de stabilité](stability-contract.md) — API publique, interne, expérimentale
+- [Politique de dépréciation](deprecation-policy.md), cycle annonce → retrait
+- [Matrice de compatibilité](compatibility.md), Python, MariaDB, Node.js
+- [Guide de migration](../features/migration-guide.md), passer d'une version à l'autre
+- [Contrat de stabilité](stability-contract.md), API publique, interne, expérimentale
 
 ---
 
-*Guide défini lors de RELEASE-POLICY-001 (Phase 8 — Release et compatibilité).*
+*Guide défini lors de RELEASE-POLICY-001 (Phase 8, Release et compatibilité).*

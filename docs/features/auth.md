@@ -5,7 +5,7 @@ utilisateur moderne sans transformer le framework en application metier. Elle
 fournit des contrats Python, des helpers explicites et des SQL visibles que les
 projets peuvent adopter progressivement.
 
-Voir aussi : [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md) · [ADR-002 — Stratégie de session](../adr/002-session-strategy.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
+Voir aussi : [ADR-001, Stratégie d'authentification](../adr/001-auth-strategy.md) · [ADR-002, Stratégie de session](../adr/002-session-strategy.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
 
 Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.py`) s'appuie sur `core.auth.password.verify_password` (Argon2id) pour la vérification des mots de passe. `core.security.hashing` reste disponible en repli pour les hashes PBKDF2 existants (voir ADR-001). Les nouveaux hashes PBKDF2 legacy utilisent désormais 600 000 itérations (format versionné `pbkdf2_sha256$…`) ; les anciens hashes restent vérifiables. Lorsqu'un utilisateur legacy PBKDF2 se connecte avec succès, Forge migre automatiquement son hash vers Argon2id (`auth_model.update_password_hash`). Cette migration est transparente et ne force pas de réinitialisation du mot de passe.
 
@@ -15,34 +15,34 @@ Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.
 
 Depuis les premières versions de Forge, et toujours dans les versions actuelles, l'API officielle pour les nouveaux projets est `core.auth`.
 
-| Domaine | API officielle — `core.auth` | Compatibilité / transversal — `core.security` |
+| Domaine | API officielle, `core.auth` | Compatibilité / transversal, `core.security` |
 |---|---|---|
-| Hash mot de passe | `core.auth.password` — Argon2id | `core.security.hashing` — PBKDF2 **legacy** |
-| Session Auth | `core.auth.session` (`login_user`, `login_required`…) | `core.security.session` — moteur HTTP (officiel) |
-| Décorateur login | `core.auth.session.login_required` | `core.security.decorators.require_auth` — **legacy** |
-| CSRF | — | `core.security.middleware.CsrfMiddleware` + `require_csrf` — officiels |
-| Middleware | — | `core.security.middleware` — officiel |
-| Tokens à usage limité | `core.auth.tokens` | — |
-| Contrat utilisateur | `core.auth.user` | — |
-| Audit / rate limit | `core.auth.audit`, `core.auth.rate_limit` | — |
+| Hash mot de passe | `core.auth.password`, Argon2id | `core.security.hashing`, PBKDF2 **legacy** |
+| Session Auth | `core.auth.session` (`login_user`, `login_required`…) | `core.security.session`, moteur HTTP (officiel) |
+| Décorateur login | `core.auth.session.login_required` | `core.security.decorators.require_auth`, **legacy** |
+| CSRF |, | `core.security.middleware.CsrfMiddleware` + `require_csrf`, officiels |
+| Middleware |, | `core.security.middleware`, officiel |
+| Tokens à usage limité | `core.auth.tokens` |, |
+| Contrat utilisateur | `core.auth.user` |, |
+| Audit / rate limit | `core.auth.audit`, `core.auth.rate_limit` |, |
 
 ### Modules `core.security` encore officiels
 
 Tous les modules `core.security` ne sont pas legacy. Les briques transversales suivantes restent officielles dans Forge actuel :
 
-- `core.security.session` — moteur de session mémoire, utilisé en interne par `core.auth.session` ;
-- `core.security.middleware.CsrfMiddleware` — protection CSRF active ;
-- `core.security.middleware.AuthMiddleware` — middleware de redirection vers `/login`.
+- `core.security.session`, moteur de session mémoire, utilisé en interne par `core.auth.session` ;
+- `core.security.middleware.CsrfMiddleware`, protection CSRF active ;
+- `core.security.middleware.AuthMiddleware`, middleware de redirection vers `/login`.
 
 ### Modules `core.security` dépréciés
 
 Les éléments suivants sont dépréciés en faveur de `core.auth` et seront supprimés dans la trajectoire 1.x stable :
 
-- `core.security.hashing` — PBKDF2 legacy. Reste utilisable pour vérifier d'anciens hashes et effectuer la migration transparente vers Argon2id. Les nouveaux projets doivent utiliser `core.auth.password` (Argon2id) ;
-- `core.security.decorators.require_auth` — remplacé par `core.auth.session.login_required` ;
-- `core.security.decorators.require_role` — déprécié ; le contrôle d'accès fin est délégué à un module de contrôle d'accès optionnel.
+- `core.security.hashing`, PBKDF2 legacy. Reste utilisable pour vérifier d'anciens hashes et effectuer la migration transparente vers Argon2id. Les nouveaux projets doivent utiliser `core.auth.password` (Argon2id) ;
+- `core.security.decorators.require_auth`, remplacé par `core.auth.session.login_required` ;
+- `core.security.decorators.require_role`, déprécié ; le contrôle d'accès fin est délégué à un module de contrôle d'accès optionnel.
 
-Voir [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md) pour la décision d'architecture.
+Voir [ADR-001, Stratégie d'authentification](../adr/001-auth-strategy.md) pour la décision d'architecture.
 
 ---
 
@@ -153,7 +153,7 @@ La session Auth/User stocke uniquement l'identifiant utilisateur local sous une
 cle de session interne. Elle ne stocke ni `email`, ni `password_hash`, ni objet
 `AuthUser` complet.
 
-**Limite importante** : le backend de session par défaut (`MemorySessionStore`) est en mémoire processus — les sessions sont perdues au redémarrage. `FileSessionStore` offre une persistance locale ; `MariaDbSessionStore` offre un stockage partagé entre processus. Les deux sont disponibles dans `core.sessions` et doivent être configurés explicitement. Voir [ADR-002 — Stratégie de session](../adr/002-session-strategy.md).
+**Limite importante** : le backend de session par défaut (`MemorySessionStore`) est en mémoire processus, les sessions sont perdues au redémarrage. `FileSessionStore` offre une persistance locale ; `MariaDbSessionStore` offre un stockage partagé entre processus. Les deux sont disponibles dans `core.sessions` et doivent être configurés explicitement. Voir [ADR-002, Stratégie de session](../adr/002-session-strategy.md).
 
 ```python
 from core.auth import authenticate_user, login_user, logout_user
@@ -208,11 +208,11 @@ __Host-session_id=<token>; Path=/; HttpOnly; SameSite=Strict; Secure
 ### Comportement dev / prod
 
 Le flag `Secure` est **toujours activé**, quel que soit `app_env`. Forge suppose
-que toute configuration de déploiement — y compris le développement local — passe
+que toute configuration de déploiement, y compris le développement local, passe
 par HTTPS ou un reverse-proxy TLS. Il n'existe pas de mode "dev sans Secure".
 
 Ce choix est cohérent avec le header `Strict-Transport-Security` qui est lui aussi
-émis sur toutes les réponses, y compris en dev (voir docs/reference.md — section
+émis sur toutes les réponses, y compris en dev (voir docs/reference.md, section
 "Headers HTTP de sécurité").
 
 Si votre environnement local ne supporte pas HTTPS, configurez un proxy TLS local
@@ -252,7 +252,7 @@ est repoussé à chaque requête authentifiée valide (`est_authentifie()`).
 Seul un identifiant composé de **64 caractères hexadécimaux minuscules** est accepté
 (expression régulière `^[0-9a-f]{64}$`). Toute valeur trop courte, trop longue,
 contenant des caractères non hexadécimaux ou une tentative d'injection (guillemets,
-espaces, séparateurs) est rejetée — `get_session_id()` retourne `None` sans
+espaces, séparateurs) est rejetée, `get_session_id()` retourne `None` sans
 consulter le store.
 
 ### Protection contre la fixation de session
@@ -273,7 +273,7 @@ Cache-Control: no-store
 Ce header interdit au navigateur et aux caches intermédiaires de stocker la
 réponse. Il est ajouté centralement dans `app.py` (`_send_response()`) pour
 toutes les méthodes HTTP (GET et POST) sur ces chemins. Les fichiers statiques
-ne sont pas affectés — ils conservent leur propre `Cache-Control: max-age=…`.
+ne sont pas affectés, ils conservent leur propre `Cache-Control: max-age=…`.
 
 ### Cookie CSRF
 
@@ -291,7 +291,7 @@ Le préfixe `__Host-` impose les contraintes suivantes côté navigateur :
 
 Forge respecte ces contraintes : `Secure`, `Path=/` et absence de `Domain` sont
 garantis sur tous les cookies de session. La constante `SESSION_COOKIE_NAME` dans
-`core/security/session.py` centralise le nom du cookie — toute modification doit
+`core/security/session.py` centralise le nom du cookie, toute modification doit
 passer par cette constante.
 
 ### Limites restantes
@@ -540,9 +540,9 @@ API :
 - `create_auth_audit_event(...)`
 - `sanitize_auth_audit_metadata(metadata)`
 - `log_auth_event(event_type, *, user_id, ip_address, user_agent, metadata)`
-- `safe_log_auth_event(...)` — version resiliente, recommandee pour la plupart des usages
-- `get_audit_failure_count()` — compteur d'echecs de `safe_log_auth_event` (monitoring)
-- `reset_audit_failure_count()` — reinitialise le compteur (tests)
+- `safe_log_auth_event(...)`, version resiliente, recommandee pour la plupart des usages
+- `get_audit_failure_count()`, compteur d'echecs de `safe_log_auth_event` (monitoring)
+- `reset_audit_failure_count()`, reinitialise le compteur (tests)
 
 ### Resilience des appels d'audit
 
@@ -622,7 +622,7 @@ Evenements standards :
 - `mfa.challenge.failed`
 - `mfa.revalidation.success`
 - `mfa.revalidation.failed`
-- `mfa.revalidation.identity_mismatch` — session non authentifiee ou user_id different du user courant
+- `mfa.revalidation.identity_mismatch`, session non authentifiee ou user_id different du user courant
 - `user.disabled`
 - `user.enabled`
 - `user.password_changed`
@@ -664,20 +664,20 @@ CREATE TABLE IF NOT EXISTS auth_audit_log (
 
 Forge ne branche pas automatiquement l'audit dans login/reset/MFA/OIDC/admin.
 
-### Architecture audit — trois briques distinctes
+### Architecture audit, trois briques distinctes
 
 Forge fournit trois briques indépendantes, sans les assembler automatiquement.
 La décision de persistance appartient à l'application (ADR-008).
 
-**Brique 1 — Contrat d'événement** : `AuthAuditEvent`, validation, 20+ types
+**Brique 1, Contrat d'événement** : `AuthAuditEvent`, validation, 20+ types
 normalisés. Format garanti pour tout consommateur.
 
-**Brique 2 — Émission Python** : `safe_log_auth_event()` émet vers le logger
+**Brique 2, Émission Python** : `safe_log_auth_event()` émet vers le logger
 `forge.auth.audit`. Le handler (et donc le destinataire final) est configuré
-par l'application. Par défaut, aucun handler n'est ajouté — les événements
+par l'application. Par défaut, aucun handler n'est ajouté, les événements
 remontent au logging Python standard.
 
-**Brique 3 — Table SQL latente** : `auth_audit_log.sql` fournit un schéma prêt.
+**Brique 3, Table SQL latente** : `auth_audit_log.sql` fournit un schéma prêt.
 **Forge n'écrit pas dans cette table.** C'est une infrastructure optionnelle.
 
 ### Brancher la persistance SQL (exemple applicatif)
@@ -722,7 +722,7 @@ def _insert_audit(event):
 logging.getLogger("forge.auth.audit").addHandler(AuditSqlHandler())
 ```
 
-Ce snippet est documentaire — à adapter au modèle d'accès DB de l'application.
+Ce snippet est documentaire, à adapter au modèle d'accès DB de l'application.
 Voir [ADR-008](../adr/008-auth-audit-architecture.md) pour les approches
 alternatives (wrapper applicatif, stream externe).
 
@@ -932,7 +932,7 @@ politiques metier.
 
 ## Voir aussi
 
-- [Sécurité en production](../deployment/production-security.md) — checklist déploiement, headers, CSRF, secrets
-- [Référence CLI](../reference/reference.md) — toutes les commandes `forge` avec signatures complètes
-- [ADR-001 — Stratégie d'authentification](../adr/001-auth-strategy.md)
-- [ADR-002 — Stratégie de session](../adr/002-session-strategy.md)
+- [Sécurité en production](../deployment/production-security.md), checklist déploiement, headers, CSRF, secrets
+- [Référence CLI](../reference/reference.md), toutes les commandes `forge` avec signatures complètes
+- [ADR-001, Stratégie d'authentification](../adr/001-auth-strategy.md)
+- [ADR-002, Stratégie de session](../adr/002-session-strategy.md)

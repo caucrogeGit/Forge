@@ -2,7 +2,7 @@
 
 .doclang {French}
 
-.doc {Forge — Documentation complète}
+.doc {Forge, Documentation complète}
 
 .author {Roger Lequette}
 
@@ -13,12 +13,12 @@
   Désactiver une page en commentant la ligne .include avec {{...}}.
 
   Limite V1 : les extensions MkDocs (admonitions !!! note, onglets === "Tab",
-  blocs <details>) ne sont pas rendues par Quarkdown — elles apparaissent
+  blocs <details>) ne sont pas rendues par Quarkdown, elles apparaissent
   comme texte brut dans le PDF. Les pages les plus standard sont listées en
   premier ; les pages plus complexes sont désactivées par défaut.
 }}
 
-# Forge — Documentation
+# Forge, Documentation
 
 ## Positionnement et concepts
 
@@ -55,7 +55,7 @@
 .include {../forge-roadmap.md}
 
 {{
-  Pages désactivées en V1 — syntaxe MkDocs trop spécifique pour Quarkdown :
+  Pages désactivées en V1, syntaxe MkDocs trop spécifique pour Quarkdown :
 
   .include {../reference.md}
   .include {../starters/contact-simple/index.md}

@@ -1,6 +1,6 @@
-# ADR-002 — Stratégie de session Forge 1.x
+# ADR-002, Stratégie de session Forge 1.x
 
-!!! warning "ADR historique — Forge 1.x"
+!!! warning "ADR historique, Forge 1.x"
 
     Cet ADR documente la stratégie de session telle qu'elle a été décidée
     pour Forge 1.x. Son contenu est conservé pour trace décisionnelle et n'est
@@ -8,12 +8,12 @@
 
     Pour l'état actuel, consulter :
 
-    - [`docs/auth.md`](../features/auth.md) — documentation utilisateur d'authentification
-    - [ADR-004 — Périmètre du noyau](004-core-perimeter.md) — séparation core/modules opt-in
+    - [`docs/auth.md`](../features/auth.md), documentation utilisateur d'authentification
+    - [ADR-004, Périmètre du noyau](004-core-perimeter.md), séparation core/modules opt-in
 
 ## Statut
 
-Acceptée (Forge 1.x — historique)
+Acceptée (Forge 1.x, historique)
 
 ---
 
@@ -28,8 +28,8 @@ Ce choix est explicitement assumé dans le code source :
 > Limites assumées : sessions perdues au redémarrage, pas de partage entre workers,
 > pas de scaling horizontal. »*
 
-Les deux piles de session — legacy (`core.security.session`) et moderne
-(`core.auth.session`) — partagent ce même backend mémoire. `core/auth/session.py`
+Les deux piles de session, legacy (`core.security.session`) et moderne
+(`core.auth.session`), partagent ce même backend mémoire. `core/auth/session.py`
 délègue la résolution de session à `core.security.session.get_session()` quand l'objet
 `request` ne porte pas directement un dict de session.
 
@@ -87,15 +87,15 @@ toutes les sessions actives. Les utilisateurs connectés sont déconnectés.
 **7. Un contrat de backend de session a été introduit dans `SESSION-STORE-CONTRACT-001`.**
 
 Le package `core/sessions/` expose :
-- `SessionStore` — Protocol complet (`create`, `get`, `set`, `delete`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash`)
-- `MemorySessionStore` — implémentation par défaut (dict Python + RLock, comportement inchangé)
-- `get_session_store()` — retourne le store actif
+- `SessionStore`, Protocol complet (`create`, `get`, `set`, `delete`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash`)
+- `MemorySessionStore`, implémentation par défaut (dict Python + RLock, comportement inchangé)
+- `get_session_store()`, retourne le store actif
 
 `core/security/session.py` délègue toutes ses opérations au store via son API publique.
-Les alias `_sessions` et `_lock` ont été supprimés dans `SESSIONS-CONTRACT-001` — le code
+Les alias `_sessions` et `_lock` ont été supprimés dans `SESSIONS-CONTRACT-001`, le code
 client ne doit pas accéder aux internals du store.
 
-**10. Les trois backends sont effectivement supportés — `SESSIONS-CONTRACT-001`.**
+**10. Les trois backends sont effectivement supportés, `SESSIONS-CONTRACT-001`.**
 
 Le ticket `SESSIONS-CONTRACT-001` a étendu le contrat `SessionStore` et réécrit
 `core/security/session.py` pour ne plus toucher à `_store._sessions` ni `_store._lock`.
@@ -159,8 +159,8 @@ horizontal complet.
 | Multi-worker local (fork, spawn) | **Non supporté par défaut** | Dicts `_sessions` distincts par processus |
 | Gunicorn / uWSGI multi-worker | **Non supporté par défaut** | Backend partagé requis |
 | Plusieurs instances derrière load balancer | **Non supporté par défaut** | Backend partagé requis |
-| Backend fichier mono-machine | **Disponible** | `FileSessionStore` — persistance locale, pas de multi-worker concurrent |
-| Backend MariaDB partagé | **Disponible** | `MariaDbSessionStore` — sessions partagées entre processus Forge |
+| Backend fichier mono-machine | **Disponible** | `FileSessionStore`, persistance locale, pas de multi-worker concurrent |
+| Backend MariaDB partagé | **Disponible** | `MariaDbSessionStore`, sessions partagées entre processus Forge |
 
 ---
 
