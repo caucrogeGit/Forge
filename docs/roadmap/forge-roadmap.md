@@ -91,7 +91,7 @@ Les tickets suivent « un ticket, une responsabilité » (principe 2) ; statut �
 | Chantier | Ticket | Responsabilité unique | Sévérité |
 |---|---|---|---|
 | 1. Tests DB | `TEST-DB-INTEGRATION-CI-001` | Job CI avec service MariaDB et marqueur `@pytest.mark.db` (skippable en local, requis en CI) exerçant le SQL généré, `db:apply`, FK, transactions, type `slug` | Haute |
-| 1bis. Bug transaction | `DB-TRANSACTION-AUTOCOMMIT-FIX-001` | `transaction()` doit garantir un contexte transactionnel (désarmer l'autocommit des connexions du pool, ou émettre `START TRANSACTION`) : le `rollback` est aujourd'hui inopérant contre une vraie MariaDB. Bug révélé par `TEST-DB-INTEGRATION-CI-001` (invisible des tests mockés) | Haute |
+| 1bis. Bug transaction | `DB-TRANSACTION-AUTOCOMMIT-FIX-001` | **Corrigé** (commit `2327fef`) : `transaction()` désarme l'autocommit du pool puis le restaure ; le `rollback` annule désormais réellement (vérifié par le job CI `tests-db`, 6 tests verts). Bug révélé par `TEST-DB-INTEGRATION-CI-001`, invisible des tests mockés | Haute (réglée) |
 | 2. Onboarding | `DOC-CRUD-WORKFLOW-CANONICAL-001` | Trancher un seul workflow CRUD officiel (`sync:*` + `db:init` vs `build:model` + `db:apply`), principe 11 | Haute |
 | 2. Onboarding | `DOC-ONBOARDING-TUTORIAL-FIX-001` | Réparer `app-complete-tutorial.md` (JSON canonique clé `name`, dossier snake_case, `https://`) selon le workflow canonique ; corriger l'URL `http`→`https` de `poste-linux.md` | Haute |
 | 3. Release | `PKG-VERSION-SYNC-CHECK-001` | Créer `tools/check_version_sync.py` (asserter les ~30 emplacements de version) et le brancher sans argument dans les deux scripts de release | Haute |
