@@ -110,11 +110,13 @@ classifiers `Development Status` hétérogènes, tirets cadratins dans les vieux
 
 ---
 
-## Chantier — typage strict de tout le projet (post-audit 2026-06-25)
+## Chantier — typage strict de tout le projet (post-audit 2026-06-25) — TERMINÉ
 
-Le cœur (`core/`) et les 12 opt-ins sont déjà en `# pyright: strict` + `py.typed`.
-Reste à passer en strict l'**outillage** : `cli/` (1690 erreurs strict mesurées),
-`forge.py` (77), `tools/` (39), `integrations/` (31), soit ≈ 1837 erreurs.
+**Terminé** : tout le projet est en `# pyright: strict`. Runtime (`core/` + opt-ins)
+déjà fait ; l'outillage (`cli/`, `forge.py`, `integrations/`, `tools/`) l'est
+désormais aussi, gaté par `test_cli_pyright_clean_001`
+(`pyright cli forge.py integrations tools` = 0 erreur). Hors périmètre :
+`cli/skeleton/data/**` (templates de code généré utilisateur).
 
 Méthode (suite de `TYPING-CLI-STRICT-001`) : **ratchet par fichier**. Le gate
 `test_cli_pyright_clean_001` (`pyright cli` = 0) enforce `# pyright: strict` dès
@@ -142,6 +144,41 @@ nombre d'erreurs.
 Déjà faits par `TYPING-CLI-STRICT-001` : `make_relation`, `i18n`, `public_page`,
 `canonical_model_normalizer` (strict) ; 25 erreurs standard corrigées (dont un bug
 runtime de l'auth admin) ; gate en place.
+
+---
+
+## Chantiers issus de l'audit complet (2026-06-25)
+
+Second audit transversal en six axes (sécurité, architecture/charte, qualité de
+code, tests, documentation/DX, packaging/CI), preuves `file:line`.
+Verdict : base saine, **aucune vulnérabilité critique**, 0 erreur pyright sur tout
+le projet, CI verte. Les deux problèmes les plus impactants sont à coût quasi nul :
+les meilleurs tests d'intégration DB **existent mais ne tournent jamais en CI**, et
+le **parcours d'onboarding DB est cassé**. Le reste = durcissements ciblés et
+dettes de cohérence. Un ticket = une responsabilité (principe 2) ; statut « à faire ».
+
+| Ticket | Responsabilité unique | Sévérité |
+|---|---|---|
+| `TEST-E2E-MARIADB-CI-001` | Brancher les e2e MariaDB **existants** (`test_e2e_mariadb.py` + `test_e2e_slug_mariadb.py`, 19 tests) sur le job CI `tests-db` : les marquer `@pytest.mark.db`, unifier sous `FORGE_REQUIRE_DB`/`FORGE_TEST_DB_*`, retirer le double mécanisme `FORGE_E2E_MARIADB`. Couvre la chaîne entité→SQL→DB sans écrire un test | Critique |
+| `DOC-ONBOARDING-DB-INIT-001` | Réparer les paliers welcome SQL (`first-sql.md`, `list-records.md`, `relations.md`) : ajouter `forge db:init` (crée base + user `DB_APP_*` + table `forge_migrations`) et `forge migration:make` **avant** `migration:apply`, sinon l'app ne démarre pas | Bloquant |
+| `AUTH-LOG-SWALLOWED-EXC-001` | `core/auth/session.py:34,127,181,203` : journaliser (WARNING) les exceptions du `user_loader` / résolution / persistance avant `return None` ; distinguer échec d'auth (attendu) d'erreur d'infrastructure (anormal, aujourd'hui invisible) | Élevé |
+| `CRUD-GEN-ROUTE-ACCESSOR-001` | Le générateur doit émettre `request.route("id", default="0")` (accesseur canonique ADR-026) au lieu de `request.route_params.get("id")` (4× `controller_builder.py`) — sinon Forge génère du code qui contourne sa propre API (principe 11) | Élevé |
+| `SEC-MULTIWORKER-STATE-001` | État sécurité in-memory (rate-limit login, anti-rejeu TOTP, rate-limit upload) non partagé entre workers, alors que le défaut prod = Gunicorn `--workers 4` (5×N tentatives, TOTP rejouable). Documenter l'exigence d'un backend partagé ou le fournir | Élevé |
+| `DOC-STYLE-U2014-CLEANUP-001` | Campagne de remplacement du tiret cadratin U+2014 (228 fichiers `docs/` + `README.md` publié + landing) par virgule/deux-points/trait d'union court, conformément au style FR (CLAUDE.md §2.1) | Élevé |
+| `SEC-RBAC-MISSING-TABLE-DETECT-001` | RBAC `resolver.py:58` : détecter « table absente » par code d'erreur driver, pas par string-matching du message (fragile selon locale/version) ; ou échouer explicitement plutôt que renvoyer 0 permission silencieusement | Moyenne |
+| `SEC-RBAC-CANONICAL-GUARD-001` | Désigner la garde DB (`authorization.require_user_permission`) comme canonique et déprécier/aligner la garde session de `rbac.py:163` (deux `require_permission` coexistent, principe 11) | Moyenne |
+| `SEC-JINJA-AUTOESCAPE-001` | `integrations/jinja2/renderer.py:77` : autoescape par défaut (`default_for_string=True`) ou documenter le risque XSS sur les templates non-`.html` (email/XML/SVG) | Moyenne |
+| `ADMIN-RBAC-FAILCLOSED-001` | Forge Admin `http.py:61` : fail-**closed** (403) quand une permission est déclarée mais `forge-mvc-rbac` absent (actuellement fail-open silencieux), ou warning runtime à chaque appel | Moyenne |
+| `CI-AUDIT-BLOCKING-001` | Ajouter `pip-audit` **bloquant** (même invocation que `release-validate.sh`) dans `tests.yml`, + `bandit` (SAST) et SBOM CycloneDX à la release — aujourd'hui seul un cron hebdo non bloquant existe | Moyenne |
+| `CI-PYRIGHT-ORDER-001` | Réordonner `tests.yml` : exécuter pytest **avant** pyright (ou pyright en `continue-on-error` + step de synthèse) pour qu'un échec de typage ne masque plus jamais la suite (piège historique ADR-044) | Moyenne |
+| `CLI-MODULE-REMOVE-ROUTE-001` | Router `module:remove` dans `forge.py:821` (le code existe dans `cli/deploy/modules.py:323`, les tests le contournent donc le vert masque l'échec utilisateur), ou marquer la doc « non disponible » | Moyenne |
+| `GOV-DOC-COHERENCE-001` | Resync cohérence au prochain tag (fichiers protégés) : CLAUDE.md §9 « 12 packages » → 14 (statut `forge-mvc-admin`/`forge-mvc-testing`), ADR-018/019/020 « Proposé » → « Accepté » (code livré). Complète `DOC-CHARTE-REALIGN-AUDITABLE-001` (charte « pédagogique » → « auditable ») | Moyenne |
+| `TYPING-DEAD-DIRECTIVES-001` | Retirer les ~10 directives `# pyright: reportPrivateUsage=false` **mortes** (retrait + `pyright` = 0 erreur ; ne couvrent aucun accès privé réel) | Faible |
+| `CLI-SHARED-HELPERS-RENAME-001` | Renommer sans préfixe `_` les helpers partagés cross-module (`_split_sql_statements`, `_sql_default_literal`) — le `_` ment sur la portée et impose les directives restantes | Faible |
+| `REFACTOR-BUILD-CONTROLLER-001` | Découper `build_controller` (825 lignes d'un seul tenant, `controller_builder.py:43`) en sous-générateurs par action (`_render_index/create/update/delete`) | Faible |
+| `TEST-TESTING-PKG-SMOKE-001` | `forge-mvc-testing` : ajouter un smoke test (seul des 14 paquets sans test) + trancher py.typed (seul sans py.typed) | Faible |
+| `TEST-META-ROTATION-APPLY-001` | Appliquer la politique de rotation/plafond des meta-tests doc-as-test (`tests/meta/` = 321 fichiers, ~35 % de la suite) : archiver les garde-fous de tickets clos, interdire les nouveaux doc-as-test quand un test comportemental existe | Faible |
+| `DOC-TUTORIAL-ADR029-001` | Aligner `app-complete-tutorial.md:356` sur ADR-029 (chemins `/contrôleur/méthode`, index nu) + uniformiser les incohérences mineures (index CLI `opt-in:*`/`sync:entity`, `forge run` vs `python app.py`) | Faible |
 
 ---
 
