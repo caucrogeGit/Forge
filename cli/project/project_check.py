@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande forge project:check — vérification structurelle d'un projet Forge."""
 
 from __future__ import annotations
@@ -6,6 +7,7 @@ import ast
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 from cli.project.doctor import CheckResult
 
@@ -194,14 +196,14 @@ def check_project_modules(root: Path) -> CheckResult:
         return CheckResult("fail", "Modules",
                            f"forge_modules.json invalide : {exc} — corrige la syntaxe JSON")
 
-    installed = data.get("installed", {})
-    if not isinstance(installed, dict):
+    installed: dict[str, dict[str, Any]] = data.get("installed", {})
+    if not isinstance(installed, dict):  # pyright: ignore[reportUnnecessaryIsInstance]
         return CheckResult("fail", "Modules",
                            'forge_modules.json : clé "installed" invalide — doit être un objet JSON')
 
     missing = [
         name for name, info in installed.items()
-        if isinstance(info, dict) and info.get("source") and not (root / info["source"]).exists()
+        if info.get("source") and not (root / info["source"]).exists()
     ]
     if missing:
         return CheckResult("fail", "Modules",

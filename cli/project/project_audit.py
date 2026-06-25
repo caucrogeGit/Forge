@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande forge project:audit — rapport d'audit détaillé non destructif."""
 
 from __future__ import annotations
@@ -8,7 +9,7 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 _MIGRATION_RE = re.compile(r"^\d{14}_[A-Za-z0-9_]+\.sql$")
 
@@ -85,7 +86,7 @@ def audit_project_config(root: Path) -> list[AuditResult]:
         results.append(AuditResult("ok", family, "env/dev présent"))
 
     try:
-        cfg: dict = {}
+        cfg: dict[str, str | None] = {}
         cfg.update(dotenv_values(example))
         if dev.exists():
             cfg.update(dotenv_values(dev))
@@ -254,8 +255,8 @@ def audit_project_modules(root: Path) -> list[AuditResult]:
         results.append(AuditResult("fail", family, f"forge_modules.json invalide : {exc}"))
         return results
 
-    installed = data.get("installed", {})
-    if not isinstance(installed, dict):
+    installed: dict[str, dict[str, Any]] = data.get("installed", {})
+    if not isinstance(installed, dict):  # pyright: ignore[reportUnnecessaryIsInstance]
         results.append(AuditResult("fail", family,
                                    'clé "installed" invalide dans forge_modules.json'))
         return results
@@ -269,7 +270,7 @@ def audit_project_modules(root: Path) -> list[AuditResult]:
 
     missing_sources = [
         name for name, info in installed.items()
-        if isinstance(info, dict) and info.get("source") and not (root / info["source"]).exists()
+        if info.get("source") and not (root / info["source"]).exists()
     ]
     if missing_sources:
         results.append(AuditResult("fail", family,
@@ -283,7 +284,7 @@ def audit_project_modules(root: Path) -> list[AuditResult]:
         declared_sources = {
             Path(info["source"]).name
             for info in installed.values()
-            if isinstance(info, dict) and info.get("source")
+            if info.get("source")
         }
         undeclared = [
             d.name for d in modules_dir.iterdir()

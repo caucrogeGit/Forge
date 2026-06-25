@@ -1,3 +1,4 @@
+# pyright: strict
 """Chargement explicite de la configuration du projet Forge courant."""
 
 from __future__ import annotations

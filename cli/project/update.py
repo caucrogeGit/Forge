@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande forge update — met à jour Forge dans l'environnement courant.
 
 Ticket : FORGE-UPDATE-COMMAND-001.

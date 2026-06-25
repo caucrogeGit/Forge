@@ -1,3 +1,4 @@
+# pyright: strict
 """Contrat des profils de projet Forge.
 
 Ces constantes définissent les profils officiels et leur description.

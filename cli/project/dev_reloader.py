@@ -1,3 +1,4 @@
+# pyright: strict
 """Superviseur de développement Forge avec autoreload par redémarrage de processus.
 
 Tickets :

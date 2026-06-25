@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande `forge run` — point d'entrée officiel pour lancer Forge.
 
 Tickets :

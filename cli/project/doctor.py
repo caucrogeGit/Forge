@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande forge doctor — diagnostic du projet Forge."""
 
 from __future__ import annotations
@@ -10,7 +11,8 @@ import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from types import ModuleType
+from typing import Any, Literal
 
 _MIGRATION_RE = re.compile(r"^\d{14}_[A-Za-z0-9_]+\.sql$")
 _MFA_IMPORT_RE = re.compile(
@@ -31,7 +33,7 @@ class CheckResult:
     detail: str = ""
 
 
-def load_project_config(root: Path):
+def load_project_config(root: Path) -> "ModuleType | None":
     """Charge config.py depuis root en isolation sans polluer sys.modules.
 
     Ajoute root au sys.path le temps du chargement, le retire ensuite.
@@ -164,7 +166,7 @@ def check_model_entities(root: Path) -> CheckResult:
         return CheckResult("fail", "Entités", first_line)
 
 
-def check_ssl(root: Path, config) -> CheckResult:
+def check_ssl(root: Path, config: "ModuleType | None") -> CheckResult:
     """Vérifie la présence des certificats SSL lus depuis la configuration effective."""
     if config is None:
         return CheckResult("skip", "Certificats SSL", "configuration non disponible")
@@ -187,7 +189,7 @@ def check_node() -> CheckResult:
     return CheckResult("ok", "Node.js / npm", "npm disponible")
 
 
-def check_db(root: Path, config) -> CheckResult:
+def check_db(root: Path, config: "ModuleType | None") -> CheckResult:
     """Tente une connexion MariaDB avec les credentials applicatifs."""
     if config is None:
         return CheckResult("skip", "Base de données", "configuration non disponible")
@@ -197,11 +199,12 @@ def check_db(root: Path, config) -> CheckResult:
                            "env/dev absent — connexion non vérifiable avant configuration")
 
     try:
-        import mariadb  # import paresseux — le driver peut ne pas être installé
+        import mariadb  # pyright: ignore[reportMissingTypeStubs]  # driver sans stubs
     except ImportError:
         return CheckResult("warn", "Base de données",
                            "driver mariadb non installé — pip install mariadb")
 
+    _mariadb: Any = mariadb
     host     = getattr(config, "DB_APP_HOST",  "localhost")
     port     = int(getattr(config, "DB_APP_PORT", 3306))
     user     = getattr(config, "DB_APP_LOGIN", "")
@@ -212,14 +215,14 @@ def check_db(root: Path, config) -> CheckResult:
         return CheckResult("skip", "Base de données", "credentials applicatifs non configurés")
 
     try:
-        conn = mariadb.connect(
+        conn = _mariadb.connect(
             host=host, port=port,
             user=user, password=password,
             database=db_name, connect_timeout=3,
         )
         conn.close()
         return CheckResult("ok", "Base de données", f"connexion OK ({db_name}@{host})")
-    except mariadb.Error as exc:
+    except _mariadb.Error as exc:
         return CheckResult("warn", "Base de données",
                            f"connexion applicative impossible — normal avant forge db:init ({exc})")
 
@@ -301,8 +304,8 @@ def check_modules(root: Path) -> CheckResult:
         return CheckResult("fail", "Modules",
                            f"forge_modules.json illisible : {exc} — corrige la syntaxe JSON")
 
-    installed = data.get("installed", {})
-    if not isinstance(installed, dict):
+    installed: dict[str, dict[str, Any]] = data.get("installed", {})
+    if not isinstance(installed, dict):  # pyright: ignore[reportUnnecessaryIsInstance]
         return CheckResult("fail", "Modules", 'forge_modules.json : clé "installed" invalide')
 
     if not installed:
@@ -310,7 +313,7 @@ def check_modules(root: Path) -> CheckResult:
 
     missing = [
         name for name, info in installed.items()
-        if isinstance(info, dict) and info.get("source") and not (root / info["source"]).exists()
+        if info.get("source") and not (root / info["source"]).exists()
     ]
     if missing:
         return CheckResult("warn", "Modules", f"source(s) absente(s) : {', '.join(missing)}")
@@ -443,7 +446,7 @@ def check_rbac_dependency(root: Path) -> CheckResult:
     )
 
 
-def check_prod_security(root: Path, config) -> CheckResult:
+def check_prod_security(root: Path, config: "ModuleType | None") -> CheckResult:
     """Garde-fous **statiques** de sécurité production (PROD-DOCTOR-001).
 
     Vérifie ce qui est contrôlable sans démarrer l'app : séparation des
