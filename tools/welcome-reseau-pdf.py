@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 import markdown
-import weasyprint  # pyright: ignore[reportMissingTypeStubs]
+import weasyprint  # pyright: ignore[reportMissingImports, reportMissingTypeStubs]
 
 ROOT = Path(__file__).resolve().parent.parent
 STARTER = ROOT / "docs" / "starters-pedagogique" / "welcome-reseau"
