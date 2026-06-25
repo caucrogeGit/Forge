@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pyright: strict
 """
 Ajoute une relation Forge dans mvc/entities/relations.json.
 
@@ -11,7 +12,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Callable, Any
+from typing import Any, Callable, cast
 
 from cli.entities.make_entity import entities_dir, to_snake
 from cli.entities.relations import (
@@ -24,7 +25,7 @@ from cli.entities.validation import EntityDefinitionError
 
 ALLOWED_ACTIONS_CANONICAL = {"restrict", "cascade", "set_null", "no_action"}
 
-_CANONICAL_EMPTY = {"schema_version": "1.0", "relations": []}
+_CANONICAL_EMPTY: dict[str, Any] = {"schema_version": "1.0", "relations": []}
 
 
 def _prompt_text(
@@ -139,7 +140,7 @@ def _load_relations_document(path: Path) -> dict[str, Any]:
         )
     if "schema_version" not in data:
         raise ValueError(f"{path.as_posix()}: schema_version manquant")
-    return data
+    return cast("dict[str, Any]", data)
 
 
 def _build_m2m_relation_interactively(

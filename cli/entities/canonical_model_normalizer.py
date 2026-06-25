@@ -1,3 +1,4 @@
+# pyright: strict
 """Normaliseur canonique → structure interne build:model.
 
 Traduit une entité au format canonique (schema_version: "1.0") en un dict
@@ -162,7 +163,7 @@ def normalize_canonical_entity_for_model_build(entity: dict[str, Any]) -> dict[s
     table = entity.get("table", "")
     description = entity.get("description", "")
     fields_raw = entity.get("fields", [])
-    options = entity.get("options") or {}
+    options: dict[str, Any] = entity.get("options") or {}
 
     fields: list[dict[str, Any]] = [_id_field()]
 

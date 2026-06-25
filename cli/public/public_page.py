@@ -1,3 +1,4 @@
+# pyright: strict
 from __future__ import annotations
 
 import ast
@@ -33,9 +34,9 @@ class MakePublicPageResult:
     template_path: Path
     controller_path: Path
     routes_path: Path
-    created: list[str] = field(default_factory=list)
-    preserved: list[str] = field(default_factory=list)
-    warnings: list[str] = field(default_factory=list)
+    created: list[str] = field(default_factory=list[str])
+    preserved: list[str] = field(default_factory=list[str])
+    warnings: list[str] = field(default_factory=list[str])
 
 
 def _slugify(name: str) -> str:

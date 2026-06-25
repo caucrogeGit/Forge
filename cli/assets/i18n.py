@@ -1,8 +1,10 @@
+# pyright: strict
 from __future__ import annotations
 
 import json
 import sys
 from pathlib import Path
+from typing import Any, cast
 
 from cli._support.output import created, error, info, ok, preserved
 
@@ -93,7 +95,7 @@ def cmd_i18n_check(args: list[str], root: Path | None = None) -> int:
             continue
 
         key_count = 0
-        for k, v in data.items():
+        for k, v in cast("dict[Any, Any]", data).items():
             key_count += 1
 
             if not isinstance(k, str):
