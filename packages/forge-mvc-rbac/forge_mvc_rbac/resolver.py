@@ -41,6 +41,8 @@ ORDER BY p.code
 """
 
 
+_MISSING_TABLE_ERRNO = 1146  # MySQL/MariaDB ER_NO_SUCH_TABLE
+
 _MISSING_TABLE_MARKERS = (
     "doesn't exist",
     "no such table",
@@ -56,6 +58,11 @@ def _default_fetch_all(sql: str, params: tuple[Any, ...]) -> Iterable[dict[str, 
 
 
 def _is_missing_table_error(error: Exception) -> bool:
+    # Détection canonique par code d'erreur du driver (robuste à la locale et à
+    # la version du serveur) : MariaDB/MySQL exposent `errno` sur leurs exceptions.
+    if getattr(error, "errno", None) == _MISSING_TABLE_ERRNO:
+        return True
+    # Repli string-matching pour les drivers sans `errno` ou les erreurs enveloppées.
     message = str(error).lower()
     return any(marker in message for marker in _MISSING_TABLE_MARKERS)
 

@@ -237,3 +237,23 @@ def test_resolver_has_no_jinja_logic():
     source = inspect.getsource(module).lower()
     assert "jinja" not in source
     assert "template" not in source
+
+
+def test_missing_table_detected_by_errno_even_with_localized_message():
+    """SEC-RBAC-MISSING-TABLE-DETECT-001 : détection par code d'erreur driver.
+
+    Une erreur « table absente » dont le message est localisé (donc ne contient
+    aucun marqueur anglais) mais qui porte `errno == 1146` (ER_NO_SUCH_TABLE)
+    doit quand même être reconnue, contrairement au seul string-matching.
+    """
+    class _LocalizedDbError(Exception):
+        def __init__(self):
+            super().__init__("La table « user_roles » est introuvable")
+            self.errno = 1146
+
+    def missing_table_errno(_sql: str, _params: tuple):
+        raise _LocalizedDbError()
+
+    assert get_user_role_ids(42, fetch_all=missing_table_errno) == ()
+    assert get_user_permissions(42, fetch_all=missing_table_errno) == ()
+    assert user_has_permission(42, "articles.view", fetch_all=missing_table_errno) is False
