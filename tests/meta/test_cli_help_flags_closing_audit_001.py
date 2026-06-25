@@ -61,7 +61,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # RBAC
     "rbac:validate", "rbac:audit",
     # Modules
-    "module:list", "module:install", "module:files", "module:routes",
+    "module:list", "module:install", "module:files", "module:routes", "module:remove",
     # Auth
     "auth:init", "auth:doctor", "auth:status", "auth:list-sql",
     "auth:user:create", "auth:user:list", "auth:user:show",
@@ -118,6 +118,7 @@ NATIVE_MANUAL_COMMANDS: frozenset[str] = frozenset({
     "module:install",
     "module:files",
     "module:routes",
+    "module:remove",
 })
 
 
