@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 # pyright: reportUnusedFunction=false
 """Validation et generation des relations globales Forge."""
 

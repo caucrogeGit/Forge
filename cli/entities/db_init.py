@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 """Provisioning MariaDB du projet Forge."""
 
 from __future__ import annotations

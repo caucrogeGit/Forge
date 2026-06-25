@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 """Commande forge entity:validate — validation JSON Schema + sémantique.
 
 Valide les fichiers d'entités et de relations d'un projet Forge en deux passes :

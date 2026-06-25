@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # pyright: strict
-# pyright: reportPrivateUsage=false
 # pyright: reportUnusedFunction=false
 """
 Genere l'arborescence d'une entite Forge.

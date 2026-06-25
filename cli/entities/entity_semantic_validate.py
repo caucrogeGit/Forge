@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 """Validation sémantique Forge des entités et relations JSON canoniques.
 
 Cette couche s'exécute après la validation JSON Schema (structurelle) et

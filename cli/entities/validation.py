@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 """Validation canonique des JSON d'entite Forge."""
 
 from __future__ import annotations

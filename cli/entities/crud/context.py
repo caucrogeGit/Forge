@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 # pyright: reportUnusedFunction=false
 """Constants, dataclasses and permission helper for the CRUD generator."""
 

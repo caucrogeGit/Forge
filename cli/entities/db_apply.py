@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 """Application SQL du modele d'entites Forge."""
 
 from __future__ import annotations
