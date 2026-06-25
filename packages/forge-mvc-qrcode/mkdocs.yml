@@ -5,3 +5,21 @@ site_name: qrcode
 docs_dir: docs
 nav:
   - Présentation: index.md
+  - Progression QR Code:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Premier QR Code: welcome/debutant/qrcode-welcome.md
+          - Sortie PNG: welcome/debutant/qrcode-png.md
+          - Sortie SVG: welcome/debutant/qrcode-svg.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Servir depuis un contrôleur: welcome/intermediaire/qrcode-controller.md
+          - Servir un SVG: welcome/intermediaire/qrcode-svg-response.md
+          - Types MIME: welcome/intermediaire/qrcode-mime.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Gérer les erreurs: welcome/avance/qrcode-errors.md
+          - Options de rendu: welcome/avance/qrcode-options.md
+          - Indépendance du cœur: welcome/avance/qrcode-independance.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md
