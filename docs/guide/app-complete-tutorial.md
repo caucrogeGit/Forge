@@ -1,18 +1,5 @@
 # Tutoriel — Application complète avec Forge
 
-!!! warning "Tutoriel en cours de mise à jour"
-    Les exemples JSON de ce tutoriel utilisent le **format legacy** (avant Forge 1.0 canonique).
-    Les clés `"entity"`, `sql_type`, `primary_key`, `auto_increment` et `constraints`
-    ne sont **plus valides** dans le format actuel.
-
-    Pour créer une entité Forge correctement :
-
-    - La clé racine est `"name"` (et non `"entity"`).
-    - Le fichier se place dans `mvc/entities/<nom>/<nom>.json` (sous-dossier en minuscule).
-    - Le champ `id` est auto-généré — ne pas le déclarer dans `fields`.
-    - Les types de champs utilisent la syntaxe canonique : `"type": "string"`, pas `sql_type`.
-    - Référence : [Le JSON canonique dans Forge](../entities/json-canonique.md).
-
 Ce tutoriel guide le développement d'une petite application Forge de bout en bout.
 Il suppose que Forge est déjà installé et que MariaDB est disponible.
 
@@ -49,11 +36,30 @@ le code généré se distingue du code que vous écrivez.
 
 ---
 
+## Le workflow officiel en un coup d'œil
+
+```text
+forge make:entity   → crée l'entité JSON (vous éditez les champs)
+forge make:relation → déclare les relations dans relations.json
+forge build:model   → régénère TOUT depuis le JSON : SQL, _base.py, relations.sql
+forge db:init       → crée la base et applique le SQL généré
+forge make:crud     → génère contrôleurs, formulaires et vues
+forge run           → lance l'application
+```
+
+`forge build:model` est la commande centrale : elle régénère, pour **toutes** les
+entités, le schéma SQL, l'interface `_base.py` et le `relations.sql`, à partir des
+fichiers JSON. Les variantes ciblées `forge sync:entity <Nom>` (une seule entité)
+et `forge sync:relations` (relations seules) servent à **régénérer après édition**
+d'un élément précis ; pour le parcours initial, `build:model` suffit.
+
+---
+
 ## Prérequis
 
 - Forge installé (`forge --version` doit répondre) ;
 - Python {{python_min}} ou plus ;
-- MariaDB installé et démarré (pour `forge db:init` en fin de tutoriel) ;
+- MariaDB installé et démarré (pour `forge db:init`) ;
 - npm installé (optionnel — pour recompiler le CSS Tailwind).
 
 ---
@@ -94,22 +100,16 @@ carnet_contacts/
 
 ```bash
 forge doctor
-```
-
-`forge doctor` vérifie l'environnement, les migrations, les templates et
-les modules. Un projet neuf doit être sain dès la création.
-
-```bash
 forge project:check
 ```
-
-`forge project:check` vérifie la cohérence structurelle du projet :
-structure de dossiers, configuration, entités, routes, templates et modules.
 
 Ces deux commandes sont complémentaires :
 
 - `forge doctor` : diagnostic de l'environnement d'exécution ;
-- `forge project:check` : cohérence interne du projet Forge.
+- `forge project:check` : cohérence interne du projet Forge (dossiers,
+  configuration, entités, routes, templates, modules).
+
+Un projet neuf doit être sain dès la création.
 
 ---
 
@@ -119,38 +119,36 @@ Ces deux commandes sont complémentaires :
 forge make:entity Ville --no-input
 ```
 
-Fichiers créés dans `mvc/entities/Ville/` :
+Fichiers créés dans `mvc/entities/ville/` (le sous-dossier est en **minuscule**) :
 
 | Fichier | Rôle | Régénérable ? |
 |---|---|---|
-| `Ville.json` | Source de vérité de l'entité | Non (source) |
-| `Ville.sql` | Schéma SQL généré | Oui (`sync:entity`) |
-| `Ville_base.py` | Interface Python générée | Oui (`sync:entity`) |
-| `Ville.py` | Modèle manuel (vide au départ) | **Non — préservé** |
+| `ville.json` | Source de vérité de l'entité | Non (source) |
+| `ville.sql` | Schéma SQL généré | Oui (`build:model`) |
+| `ville_base.py` | Interface Python générée | Oui (`build:model`) |
+| `ville.py` | Modèle manuel (vide au départ) | **Non — préservé** |
 
 ### Personnaliser l'entité Ville
 
-Éditez `mvc/entities/Ville/Ville.json` :
+Éditez `mvc/entities/ville/ville.json` au **format canonique** (clé racine
+`name`, types Forge, pas de champ `id` ni de type SQL brut) :
 
 ```json
 {
-  "entity": "Ville",
+  "schema_version": "1.0",
+  "name": "Ville",
   "table": "villes",
-  "primary_key": "id",
   "fields": [
-    {"name": "id",           "type": "INT",        "nullable": false, "auto_increment": true},
-    {"name": "nom",          "type": "VARCHAR(100)","nullable": false},
-    {"name": "code_postal",  "type": "VARCHAR(10)", "nullable": true}
-  ],
-  "constraints": []
+    {"name": "nom", "type": "string", "max_length": 100, "required": true},
+    {"name": "code_postal", "type": "string", "max_length": 10}
+  ]
 }
 ```
 
-Régénérez le SQL et le `_base.py` :
-
-```bash
-forge sync:entity Ville
-```
+!!! note "Le champ `id` est implicite"
+    Forge génère la clé primaire `id` automatiquement : ne la déclarez pas dans
+    `fields`. Les types sont ceux de Forge (`string`, `integer`, `slug`,
+    `boolean`, `date`, `email`…), jamais du SQL brut comme `VARCHAR(100)`.
 
 ---
 
@@ -160,44 +158,29 @@ forge sync:entity Ville
 forge make:entity Contact --no-input
 ```
 
-Fichiers créés dans `mvc/entities/Contact/` :
-
-| Fichier | Rôle | Régénérable ? |
-|---|---|---|
-| `Contact.json` | Source de vérité de l'entité | Non (source) |
-| `Contact.sql` | Schéma SQL généré | Oui (`sync:entity`) |
-| `Contact_base.py` | Interface Python générée | Oui (`sync:entity`) |
-| `Contact.py` | Modèle manuel (vide au départ) | **Non — préservé** |
+Fichiers créés dans `mvc/entities/contact/`, sur le même modèle que `ville`.
 
 ### Personnaliser l'entité Contact
 
-Éditez `mvc/entities/Contact/Contact.json` :
+Éditez `mvc/entities/contact/contact.json` :
 
 ```json
 {
-  "entity": "Contact",
+  "schema_version": "1.0",
+  "name": "Contact",
   "table": "contacts",
-  "primary_key": "id",
   "fields": [
-    {"name": "id",       "type": "INT",         "nullable": false, "auto_increment": true},
-    {"name": "nom",      "type": "VARCHAR(100)", "nullable": false},
-    {"name": "prenom",   "type": "VARCHAR(100)", "nullable": false},
-    {"name": "email",    "type": "VARCHAR(200)", "nullable": false},
-    {"name": "ville_id", "type": "INT",          "nullable": true}
-  ],
-  "constraints": []
+    {"name": "nom", "type": "string", "max_length": 100, "required": true},
+    {"name": "prenom", "type": "string", "max_length": 100, "required": true},
+    {"name": "email", "type": "email", "required": true},
+    {"name": "ville_id", "type": "integer", "nullable": true}
+  ]
 }
 ```
 
 Le champ `ville_id` est un entier ordinaire dans le JSON de Contact.
 La contrainte de clé étrangère sera déclarée dans `relations.json`, pas dans
 l'entité.
-
-Régénérez le SQL et le `_base.py` :
-
-```bash
-forge sync:entity Contact
-```
 
 ---
 
@@ -240,24 +223,29 @@ Résultat dans `mvc/entities/relations.json` :
 }
 ```
 
-### Régénérer le SQL de relations
+---
+
+## 6. Régénérer le modèle
+
+Après avoir édité les entités et déclaré la relation, régénérez tout d'une
+seule commande :
 
 ```bash
-forge sync:relations
+forge build:model
 ```
 
-`forge sync:relations` génère `mvc/entities/relations.sql` à partir de
-`relations.json`. Ce fichier contient les contraintes `ALTER TABLE` qui
-ajoutent la clé étrangère entre `contacts` et `villes`.
+`forge build:model` relit chaque `*.json` et régénère, pour toutes les entités :
 
-| Fichier | Rôle | Régénérable ? |
-|---|---|---|
-| `relations.json` | Source de vérité des relations | Non (source) |
-| `relations.sql` | Contraintes SQL générées | Oui (`sync:relations`) |
+- le schéma SQL (`ville.sql`, `contact.sql`) ;
+- l'interface Python (`ville_base.py`, `contact_base.py`) ;
+- le fichier global `relations.sql` (contraintes `ALTER TABLE` de la clé étrangère).
+
+Les modèles manuels (`ville.py`, `contact.py`) sont **préservés** : Forge ne les
+réécrit jamais. Vérifiez la cohérence à tout moment avec `forge check:model`.
 
 ---
 
-## 6. Générer les CRUD
+## 7. Générer les CRUD
 
 ```bash
 forge make:crud Ville
@@ -277,18 +265,8 @@ forge make:crud Contact
 | `mvc/views/ville/edit.html` | Oui — **préservé** |
 | `mvc/views/ville/delete.html` | Oui — **préservé** |
 
-### Fichiers créés pour Contact
-
-| Fichier | Modifiable ? |
-|---|---|
-| `mvc/controllers/contact_controller.py` | Oui — **préservé** |
-| `mvc/models/contact.py` | Oui — **préservé** |
-| `mvc/forms/contact_form.py` | Oui — **préservé** |
-| `mvc/views/contact/list.html` | Oui — **préservé** |
-| `mvc/views/contact/show.html` | Oui — **préservé** |
-| `mvc/views/contact/create.html` | Oui — **préservé** |
-| `mvc/views/contact/edit.html` | Oui — **préservé** |
-| `mvc/views/contact/delete.html` | Oui — **préservé** |
+Les fichiers de `Contact` suivent le même schéma (`contact_controller.py`,
+`contact_form.py`, `mvc/views/contact/*.html`).
 
 !!! info "make:crud et les relations"
     Quand `Contact` est la source (`from`) d'une relation `many_to_one`, `forge make:crud`
@@ -304,110 +282,41 @@ Les routes sont ajoutées automatiquement dans `mvc/routes.py`.
 
 ---
 
-## 7. Vérifier la structure
-
-```bash
-forge project:check
-```
-
-Vérifie que les entités, relations, routes, templates et modules sont cohérents
-après la génération.
-
-```bash
-forge project:audit
-```
-
-`forge project:audit` produit un rapport détaillé en 4 niveaux :
-`ok`, `warn`, `fail`, `info`. Un projet avec deux entités CRUD et une relation
-doit passer sans `fail`.
-
-Ces deux commandes sont complémentaires :
-
-| Commande | Ce qu'elle vérifie |
-|---|---|
-| `forge project:check` | Cohérence structurelle : entités, routes, templates |
-| `forge project:audit` | Qualité et diagnostic : avertissements, manques, info |
-
----
-
 ## 8. Comprendre les fichiers générés
 
 ### Architecture des fichiers
 
 ```text
 mvc/entities/
-├── Contact/
-│   ├── Contact.json         ← source de vérité (vous éditez ce fichier)
-│   ├── Contact.sql          ← généré par sync:entity (régénérable)
-│   ├── Contact_base.py      ← généré par sync:entity (régénérable)
-│   └── Contact.py           ← modèle manuel (préservé)
-├── Ville/
-│   ├── Ville.json           ← source de vérité (vous éditez ce fichier)
-│   ├── Ville.sql            ← généré par sync:entity (régénérable)
-│   ├── Ville_base.py        ← généré par sync:entity (régénérable)
-│   └── Ville.py             ← modèle manuel (préservé)
+├── contact/
+│   ├── contact.json         ← source de vérité (vous éditez ce fichier)
+│   ├── contact.sql          ← généré par build:model (régénérable)
+│   ├── contact_base.py      ← généré par build:model (régénérable)
+│   └── contact.py           ← modèle manuel (préservé)
+├── ville/
+│   ├── ville.json           ← source de vérité (vous éditez ce fichier)
+│   ├── ville.sql            ← généré par build:model (régénérable)
+│   ├── ville_base.py        ← généré par build:model (régénérable)
+│   └── ville.py             ← modèle manuel (préservé)
 ├── relations.json           ← source de vérité des relations (vous éditez ce fichier)
-└── relations.sql            ← généré par sync:relations (régénérable)
+└── relations.sql            ← généré par build:model (régénérable)
 ```
-
-### Rôle de chaque fichier
-
-| Fichier | Rôle |
-|---|---|
-| `<Entite>.json` | Déclare les champs, le type SQL, la clé primaire. Source unique. |
-| `<Entite>.sql` | Schéma `CREATE TABLE` généré. Passé à `forge db:init`. |
-| `<Entite>_base.py` | Interface Python minimale générée : accès aux champs, SELECT/INSERT/UPDATE/DELETE. |
-| `<Entite>.py` | Modèle que vous complétez : validations métier, propriétés calculées. |
-| `relations.json` | Déclare les relations globales entre entités. Source unique. |
-| `relations.sql` | Contraintes `ALTER TABLE` générées. Passé à `forge db:init`. |
-| `<entite>_controller.py` | Contrôleur CRUD généré. Vous pouvez le modifier librement. |
-| `<entite>.py` (modèle CRUD) | Modèle CRUD généré. Vous pouvez le modifier librement. |
-| `<entite>_form.py` | Formulaire généré. Vous pouvez le modifier librement. |
-| `mvc/views/<entite>/*.html` | Templates Jinja générés. Vous pouvez les modifier librement. |
-| `mvc/routes.py` | Routes ajoutées automatiquement par `make:crud`. |
-
----
-
-## 9. Comprendre les fichiers préservés
 
 ### La règle centrale
 
 ```text
-JSON      → sync:entity   → SQL + _base.py          (régénérable à tout moment)
-JSON      → sync:relations → relations.sql            (régénérable à tout moment)
-JSON      → make:crud     → controller/model/form/views  (préservé — jamais réécrasé)
+JSON  → build:model → SQL + _base.py + relations.sql   (régénérable à tout moment)
+JSON  → make:crud   → controller / model / form / views (préservé — jamais réécrasé)
 ```
 
-### Ce que Forge régénère librement
-
-| Commande | Fichiers régénérés |
-|---|---|
-| `forge sync:entity Ville` | `Ville.sql`, `Ville_base.py` |
-| `forge sync:entity Contact` | `Contact.sql`, `Contact_base.py` |
-| `forge sync:relations` | `relations.sql` |
-
-Ces fichiers sont des **projections** du JSON. Vous pouvez les régénérer autant
-de fois que nécessaire sans perte.
-
-### Ce que Forge ne touche plus après la création
-
-| Fichier | Commande de création |
-|---|---|
-| `Contact.json`, `Ville.json` | `forge make:entity` |
-| `Contact.py`, `Ville.py` | `forge make:entity` |
-| `relations.json` | `forge make:relation` |
-| `contact_controller.py`, `ville_controller.py` | `forge make:crud` |
-| `contact.py`, `ville.py` (modèles CRUD) | `forge make:crud` |
-| `contact_form.py`, `ville_form.py` | `forge make:crud` |
-| `mvc/views/contact/*.html`, `mvc/views/ville/*.html` | `forge make:crud` |
-| `mvc/routes.py` (entrées ajoutées) | `forge make:crud` |
-
-Ces fichiers sont les vôtres. Forge n'y touche plus après la création.
-Le [Contrat de stabilité](../release/stability-contract.md) garantit formellement cette règle.
+Les fichiers SQL et `_base.py` sont des **projections** du JSON : régénérez-les
+autant de fois que nécessaire, sans perte. Les fichiers de `make:crud` et les
+modèles manuels sont les **vôtres** ; Forge n'y touche plus après la création.
+Le [Contrat de stabilité](../release/stability-contract.md) garantit cette règle.
 
 ---
 
-## 10. Lancer l'application
+## 9. Lancer l'application
 
 ### Configurer `env/dev`
 
@@ -426,8 +335,8 @@ DB_NAME=carnet_contacts
 forge db:init
 ```
 
-Crée la base, l'utilisateur applicatif et les tables issues des fichiers SQL
-des entités (`Ville.sql`, `Contact.sql`) et des relations (`relations.sql`).
+`forge db:init` crée la base, l'utilisateur applicatif et les tables issues des
+fichiers SQL générés (`ville.sql`, `contact.sql`) puis applique `relations.sql`.
 
 !!! warning "Ordre des tables"
     `forge db:init` applique d'abord les fichiers SQL des entités, puis
@@ -437,7 +346,7 @@ des entités (`Ville.sql`, `Contact.sql`) et des relations (`relations.sql`).
 ### Lancer l'application
 
 ```bash
-python app.py
+forge run
 ```
 
 L'application démarre sur `https://localhost:8000` avec HTTPS de développement.
@@ -453,7 +362,7 @@ Les routes disponibles :
 
 ---
 
-## 11. Contrôles finaux
+## 10. Contrôles finaux
 
 ```bash
 forge doctor
@@ -469,50 +378,12 @@ python -m pytest
 python -m compileall -q .
 ```
 
-Les tests Forge valident les générateurs, le runtime et les entités. La
-compilation vérifie l'absence d'erreurs de syntaxe.
+Les tests valident les générateurs, le runtime et les entités. La compilation
+vérifie l'absence d'erreurs de syntaxe.
 
 ---
 
-## 12. Structure finale du projet
-
-```text
-carnet_contacts/
-├── app.py
-├── env/dev
-├── mvc/
-│   ├── routes.py                        # routes Ville et Contact ajoutées
-│   ├── controllers/
-│   │   ├── ville_controller.py          # CRUD Ville (préservé)
-│   │   └── contact_controller.py        # CRUD Contact (préservé)
-│   ├── models/
-│   │   ├── ville.py                     # modèle CRUD Ville (préservé)
-│   │   └── contact.py                   # modèle CRUD Contact (préservé)
-│   ├── forms/
-│   │   ├── ville_form.py                # formulaire Ville (préservé)
-│   │   └── contact_form.py              # formulaire Contact (préservé)
-│   ├── views/
-│   │   ├── ville/                       # 5 templates Ville (préservés)
-│   │   └── contact/                     # 5 templates Contact (préservés)
-│   └── entities/
-│       ├── Ville/
-│       │   ├── Ville.json               # source (modifié)
-│       │   ├── Ville.sql                # régénérable
-│       │   ├── Ville_base.py            # régénérable
-│       │   └── Ville.py                 # préservé
-│       ├── Contact/
-│       │   ├── Contact.json             # source (modifié)
-│       │   ├── Contact.sql              # régénérable
-│       │   ├── Contact_base.py          # régénérable
-│       │   └── Contact.py              # préservé
-│       ├── relations.json               # source (modifié)
-│       └── relations.sql                # régénérable
-└── forge_profile.txt
-```
-
----
-
-## 13. Limites du tutoriel
+## 11. Limites du tutoriel
 
 Ce tutoriel couvre une application simple. Il ne couvre pas :
 
@@ -521,13 +392,8 @@ Ce tutoriel couvre une application simple. Il ne couvre pas :
 | Auth / connexion utilisateur | [Auth/User](../features/auth.md) |
 | Rôles et permissions (RBAC) | [Sécurité et RBAC](../philosophy/security.md), RBAC |
 | Relations `many_to_many` | [Relations entre entités](../features/relations.md) |
-| Envoi de mails | Gestion des mails |
-| Upload de fichiers / médias | Module média |
 | Déploiement en production | [Déploiement](../deployment/deployment.md) |
 | Sécurité en production | [Sécurité en production](../deployment/production-security.md) |
-| API JSON légère | À venir — API-JSON-001 |
-| Pages publiques | Outils — Génération PDF, Module média |
-| Forge Design | Projet compagnon séparé |
 
 `forge make:relation` est interactif. Pour les projets sans terminal interactif,
 éditez directement `mvc/entities/relations.json` selon le format documenté
@@ -536,23 +402,6 @@ dans [Relations entre entités](../features/relations.md).
 `forge db:init` nécessite un MariaDB local configuré. Sans MariaDB, les
 fichiers JSON, SQL, modèles et vues sont générés mais l'application ne peut
 pas démarrer.
-
----
-
-## 14. Aller plus loin
-
-| Étape | Ressource |
-|---|---|
-| Référence complète des commandes | [API et CLI](../reference/reference.md) |
-| Filtres de liste CRUD (`list.filter`) | [API et CLI — Filtres CRUD](../reference/reference.md) |
-| Comprendre les entités et modèles | [Architecture des entités](../features/entity_architecture.md) |
-| Déclarer des relations avancées | [Relations entre entités](../features/relations.md) |
-| Ajouter l'authentification | [Auth/User](../features/auth.md) |
-| Déployer en production | [Guide de déploiement](../deployment/deployment.md) |
-| Sécurité en production | [Sécurité en production](../deployment/production-security.md) |
-| Utiliser un starter complet | [Vue d'ensemble des starters](../starters/index.md) |
-| Passer à une version suivante | [Guide de migration](../features/migration-guide.md) |
-| Garanties sur les fichiers préservés | [Contrat de stabilité](../release/stability-contract.md) |
 
 ---
 
@@ -566,14 +415,12 @@ source .venv/bin/activate
 forge doctor                       # vérifier l'environnement
 forge project:check                # cohérence structurelle
 
-forge make:entity Ville --no-input # créer l'entité Ville
-forge make:entity Contact --no-input  # créer l'entité Contact
-
-forge sync:entity Ville            # régénérer SQL et _base.py pour Ville
-forge sync:entity Contact          # régénérer SQL et _base.py pour Contact
+forge make:entity Ville --no-input    # créer l'entité Ville, puis éditer ville.json
+forge make:entity Contact --no-input  # créer l'entité Contact, puis éditer contact.json
 
 forge make:relation                # déclarer la relation Contact → Ville
-forge sync:relations               # générer relations.sql
+
+forge build:model                  # régénérer SQL + _base.py + relations.sql
 
 forge make:crud Ville              # générer le CRUD Ville
 forge make:crud Contact            # générer le CRUD Contact
@@ -582,7 +429,7 @@ forge project:check                # vérifier après génération
 forge project:audit                # rapport détaillé
 
 forge db:init                      # initialiser la base (MariaDB requis)
-python app.py                      # lancer l'application
+forge run                          # lancer l'application
 ```
 
 ---
@@ -595,3 +442,5 @@ python app.py                      # lancer l'application
 - [Architecture des entités](../features/entity_architecture.md) — rôle de chaque fichier généré
 - [Contrat de stabilité](../release/stability-contract.md) — garanties sur les fichiers préservés
 - [Référence API et CLI](../reference/reference.md) — toutes les commandes
+```
+

@@ -98,7 +98,7 @@ class TestSections:
 
     def test_section_aller_plus_loin(self):
         text = _text().lower()
-        assert "aller plus loin" in text or "ensuite" in text or "suite" in text
+        assert "aller plus loin" in text or "voir aussi" in text or "ensuite" in text
 
 
 # ---------------------------------------------------------------------------
@@ -114,22 +114,22 @@ class TestEntites:
         assert "Contact" in _text()
 
     def test_json_ville_mentionne(self):
-        assert "Ville.json" in _text()
+        assert "ville.json" in _text()
 
     def test_json_contact_mentionne(self):
-        assert "Contact.json" in _text()
+        assert "contact.json" in _text()
 
     def test_sql_ville_mentionne(self):
-        assert "Ville.sql" in _text()
+        assert "ville.sql" in _text()
 
     def test_sql_contact_mentionne(self):
-        assert "Contact.sql" in _text()
+        assert "contact.sql" in _text()
 
     def test_base_py_ville_mentionne(self):
-        assert "Ville_base.py" in _text()
+        assert "ville_base.py" in _text()
 
     def test_base_py_contact_mentionne(self):
-        assert "Contact_base.py" in _text()
+        assert "contact_base.py" in _text()
 
     def test_champ_ville_id_mentionne(self):
         assert "ville_id" in _text()
@@ -194,16 +194,15 @@ class TestCommandesForge:
     def test_forge_make_entity_contact(self):
         assert "forge make:entity Contact" in _text()
 
-    def test_forge_sync_entity_ville(self):
-        assert "forge sync:entity Ville" in _text()
-
-    def test_forge_sync_entity_contact(self):
-        assert "forge sync:entity Contact" in _text()
+    def test_forge_build_model(self):
+        # Workflow canonique (ADR : make:entity -> build:model -> db:init -> make:crud).
+        assert "forge build:model" in _text()
 
     def test_forge_make_relation(self):
         assert "forge make:relation" in _text()
 
-    def test_forge_sync_relations(self):
+    def test_forge_sync_relations_mentionnee(self):
+        # sync:relations reste citée comme variante de régénération ciblée.
         assert "forge sync:relations" in _text()
 
     def test_forge_make_crud_ville(self):
@@ -215,8 +214,8 @@ class TestCommandesForge:
     def test_forge_db_init(self):
         assert "forge db:init" in _text()
 
-    def test_python_app_py(self):
-        assert "python app.py" in _text()
+    def test_forge_run(self):
+        assert "forge run" in _text()
 
     def test_no_input_flag(self):
         assert "--no-input" in _text()

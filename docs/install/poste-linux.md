@@ -988,10 +988,11 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     forge run
     ```
 
-    Ouvrez le projet dans le navigateur en utilisant le port configuré :
+    Ouvrez le projet dans le navigateur en utilisant le port configuré
+    (HTTPS de développement, certificat auto-signé généré par `forge new`) :
 
     ```text
-    http://127.0.0.1:8000
+    https://127.0.0.1:8000
     ```
 
     Si vous avez modifié `APP_PORT`, adaptez l'adresse.
