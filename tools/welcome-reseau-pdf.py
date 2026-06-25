@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pyright: strict
 """Génère des PDF A4 des fichiers TÉLÉCHARGEABLES du starter welcome-réseau.
 
 Support temporaire (2TNE CIEL), sans lien avec le framework Forge — à retirer
@@ -15,11 +16,13 @@ Usage :
 """
 from __future__ import annotations
 
+from typing import Any, cast
+
 import sys
 from pathlib import Path
 
 import markdown
-import weasyprint
+import weasyprint  # pyright: ignore[reportMissingTypeStubs]
 
 ROOT = Path(__file__).resolve().parent.parent
 STARTER = ROOT / "docs" / "starters-pedagogique" / "welcome-reseau"
@@ -62,7 +65,7 @@ def md_to_pdf(md_path: Path) -> Path:
         f"<style>{CSS}</style></head><body>{body}</body></html>"
     )
     pdf_path = md_path.with_suffix(".pdf")
-    weasyprint.HTML(string=html, base_url=str(md_path.parent)).write_pdf(str(pdf_path))
+    cast("Any", weasyprint).HTML(string=html, base_url=str(md_path.parent)).write_pdf(str(pdf_path))
     return pdf_path
 
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+# pyright: strict
 """forge.py — CLI officielle de Forge. Aide : forge help"""
 
+from typing import Any, cast
 import os
 import re
 import sys
@@ -64,7 +66,7 @@ def _print_step(message: str) -> None:
     print(f"  {message}")
 
 
-def _run(args, cwd=None, capture=False, check=False):
+def _run(args: list[str], cwd: str | None = None, capture: bool = False, check: bool = False) -> "subprocess.CompletedProcess[str]":
     result = subprocess.run(
         args,
         cwd=cwd,
@@ -186,7 +188,7 @@ def _setup_python_environment(dest: str) -> None:
 
 
 def _setup_node_environment(dest: str) -> list[str]:
-    warnings = []
+    warnings: list[str] = []
     package_json = os.path.join(dest, "package.json")
     if not os.path.exists(package_json):
         return warnings
@@ -414,16 +416,17 @@ def cmd_routes_list() -> None:
     except Exception as exc:
         sys.exit(f"Erreur : impossible de charger les routes applicatives ({exc}).")
 
-    entries = router.iter_routes()
+    entries = cast("list[Any]", router.iter_routes())
     if not entries:
         print("Aucune route déclarée.")
         return
 
     headers = ["METHOD", "PATH", "NAME", "PUBLIC", "CSRF", "API", "HANDLER"]
-    rows = []
+    rows: list[list[str]] = []
     for entry in entries:
         handler_name = getattr(entry.handler, "__qualname__", repr(entry.handler))
-        methods = entry.method if isinstance(entry.method, list) else [entry.method]
+        method_val = cast("str | list[str]", entry.method)
+        methods: list[str] = method_val if isinstance(method_val, list) else [method_val]
         csrf_required = any(entry.requires_csrf(method) for method in methods)
         rows.append([
             entry.method_label,

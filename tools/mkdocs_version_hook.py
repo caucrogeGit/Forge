@@ -1,3 +1,4 @@
+# pyright: strict
 """Hook mkdocs : injecte la version Forge et le minimum Python depuis
 pyproject.toml dans toutes les pages markdown.
 
@@ -11,12 +12,14 @@ Source de vérité : pyproject.toml racine. Modifier ce fichier suffit
 """
 from __future__ import annotations
 
+from typing import Any
+
 import re
 import tomllib
 from pathlib import Path
 
 
-def _read_pyproject() -> dict:
+def _read_pyproject() -> dict[str, Any]:
     pyproject = Path(__file__).parent.parent / "pyproject.toml"
     return tomllib.loads(pyproject.read_text(encoding="utf-8"))
 
@@ -43,7 +46,7 @@ def _python_min() -> str:
     return m.group(0)
 
 
-def on_page_markdown(markdown: str, page, config, files) -> str:
+def on_page_markdown(markdown: str, page: Any, config: Any, files: Any) -> str:
     """Hook mkdocs appelé pour chaque page avant rendu."""
     substitutions = {
         "{{forge_version}}": _forge_version(),

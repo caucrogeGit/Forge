@@ -1,3 +1,4 @@
+# pyright: strict
 """Outil de détourage par fond uni (chroma key) pour les illustrations de la doc.
 
 Transforme une image à fond vert (ou magenta) uni en PNG **RGBA transparent**,
@@ -22,6 +23,8 @@ Repères de seuils (sur la composante de « clé » = dominance de la couleur de
 Dépend uniquement de Pillow (déjà présent dans l'environnement doc).
 """
 from __future__ import annotations
+
+from typing import Any, cast
 
 import argparse
 import sys
@@ -65,7 +68,7 @@ def chroma_key(
             return 255
         return round(255 * (high - v) / span)
 
-    new_alpha = keyness.point(alpha_map)
+    new_alpha = cast("Any", keyness).point(alpha_map)
     # Ne jamais rendre un pixel plus opaque que dans la source.
     new_alpha = ImageChops.darker(new_alpha, original_alpha)
 

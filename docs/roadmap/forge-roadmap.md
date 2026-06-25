@@ -134,10 +134,10 @@ nombre d'erreurs.
 | 5 | `TYPING-CLI-PUBLIC-001` | **Fait** : tout `cli/public/` strict (page, show, form, list, contact). Schéma d'entité typé `dict[str, Any]`, dataclass `default_factory=list[str]`, `cast` aux itérations isinstance, `reportPrivateUsage=false` pour les helpers intra-paquet, `_pk_field` typé à la source (crud/utils) | ✅ |
 | 6 | `TYPING-CLI-PROJECT-SCHEMAS-OPTINS-001` | **Fait** : `cli/optins/` (registre public, `SUPPORTED_OPTINS` typé), `cli/project/` (config `ModuleType`, `installed: dict[str, dict[str, Any]]`, mariadb aliasé), `cli/schemas/` (loader `tuple[dict[str, Any], …]`, traversée `$ref` castée) — strict | ✅ |
 | 7 | `TYPING-CLI-ASSETS-DEPLOY-001` | **Fait** : `cli/assets/` (front, uploads, i18n), `cli/deploy/` (deploy via `find_spec`), `cli/_support/` — strict | ✅ |
-| 8 | `TYPING-FORGE-PY-001` | `forge.py` (dispatcher racine) | ~77 |
-| 9 | `TYPING-INTEGRATIONS-001` | `integrations/` | ~31 |
-| 10 | `TYPING-TOOLS-001` | `tools/` (scripts de release/checks) | ~39 |
-| Final | `TYPING-STRICT-GATE-FINAL-001` | Tout strict : faire évoluer le gate (pyright en strict pour `cli`, ou ajouter `cli`/`forge.py`/`integrations`/`tools` au `[tool.pyright].include` lors d'une refonte majeure, fichier protégé) ; retirer la nuance « standard » | — |
+| 8 | `TYPING-FORGE-PY-001` | **Fait** : `forge.py` strict (`_run` typé, `entry.method` casté `str \| list[str]`, listes locales annotées) | ✅ |
+| 9 | `TYPING-INTEGRATIONS-001` | **Fait** : `integrations/jinja2/renderer.py` strict (signatures `BaseLoader`, `env_globals` via `cast("Any", env).globals`, `_deny` typé) | ✅ |
+| 10 | `TYPING-TOOLS-001` | **Fait** : `tools/` strict (check_version_sync, mkdocs_version_hook, chroma_key, welcome-reseau-pdf) ; `_toml`/`_read_pyproject -> dict[str, Any]`, frontières weasyprint/Pillow castées `Any` | ✅ |
+| Final | `TYPING-STRICT-GATE-FINAL-001` | **Fait** : gate meta-test étendu à `pyright cli forge.py integrations tools` (0 erreur). Tout l'outillage porte `# pyright: strict` par fichier (hors `cli/skeleton/data/**`, code généré). Le `[tool.pyright].include` du pyproject (protégé) reste sur le runtime ; l'outillage est gaté par le meta-test plutôt que par le pyproject | ✅ |
 
 Déjà faits par `TYPING-CLI-STRICT-001` : `make_relation`, `i18n`, `public_page`,
 `canonical_model_normalizer` (strict) ; 25 erreurs standard corrigées (dont un bug

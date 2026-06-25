@@ -1,3 +1,7 @@
+# pyright: strict
+from collections.abc import Callable
+from typing import Any, cast
+
 from jinja2 import BaseLoader, Environment, FileSystemLoader, TemplateNotFound, select_autoescape
 from core.forge import get as _cfg
 from core.mvc.controller.registry import iter_jinja_template_loaders
@@ -19,10 +23,10 @@ class _OptinAwareLoader(BaseLoader):
     def __init__(self, views_dir: str) -> None:
         self._project = FileSystemLoader(views_dir)
 
-    def _loaders(self):
+    def _loaders(self) -> list[BaseLoader]:
         return [self._project, *iter_jinja_template_loaders()]
 
-    def get_source(self, environment, template):
+    def get_source(self, environment: Environment, template: str) -> "tuple[str, str | None, Callable[[], bool] | None]":
         for loader in self._loaders():
             try:
                 return loader.get_source(environment, template)
@@ -30,9 +34,9 @@ class _OptinAwareLoader(BaseLoader):
                 continue
         raise TemplateNotFound(template)
 
-    def list_templates(self):
-        seen = set()
-        names = []
+    def list_templates(self) -> list[str]:
+        seen: set[str] = set()
+        names: list[str] = []
         for loader in self._loaders():
             try:
                 loader_names = loader.list_templates()
@@ -45,12 +49,16 @@ class _OptinAwareLoader(BaseLoader):
         return names
 
 
+def _deny(_code: str) -> bool:
+    return False
+
+
 def _csp_nonce() -> str:
     """Retourne le nonce CSP de la requête courante, ou une chaîne vide."""
     return _get_nonce() or ""
 
 
-def _default_trans(key, *_args, **_kwargs):
+def _default_trans(key: str, *_args: object, **_kwargs: object) -> str:
     """Repli i18n du noyau : retourne la clé telle quelle.
 
     Le noyau expose toujours un global `trans` pour que les templates générés
@@ -68,26 +76,27 @@ class Jinja2Renderer:
             loader=_OptinAwareLoader(views_dir),
             autoescape=select_autoescape(["html"]),
         )
-        self._env.globals["url_for"] = self._url_for
-        self._env.globals["csp_nonce"] = _csp_nonce
-        self._env.globals["current_user"] = None
-        self._env.globals["is_authenticated"] = False
-        self._env.globals["can"] = lambda _code: False
+        env_globals: dict[str, Any] = cast("Any", self._env).globals
+        env_globals["url_for"] = self._url_for
+        env_globals["csp_nonce"] = _csp_nonce
+        env_globals["current_user"] = None
+        env_globals["is_authenticated"] = False
+        env_globals["can"] = _deny
         # i18n : repli no-op du noyau (retourne la clé) ; l'opt-in
         # forge-mvc-i18n (ADR-027) l'enrichit avec les vrais catalogues.
-        self._env.globals["trans"] = _default_trans
+        env_globals["trans"] = _default_trans
         try:
             from forge_mvc_i18n import trans as _trans
-            self._env.globals["trans"] = _trans
+            env_globals["trans"] = _trans
         except ImportError:
             pass
         try:
             from forge_mvc_workflow.jinja import make_workflow_jinja_helpers
-            self._env.globals.update(make_workflow_jinja_helpers())
+            env_globals.update(make_workflow_jinja_helpers())
         except ImportError:
             pass
 
-    def render(self, template: str, context: dict) -> str:
+    def render(self, template: str, context: dict[str, Any]) -> str:
         try:
             tmpl = self._env.get_template(template)
         except TemplateNotFound as exc:
@@ -98,7 +107,7 @@ class Jinja2Renderer:
         return tmpl.render(context)
 
     @staticmethod
-    def _url_for(name: str, **params) -> str:
+    def _url_for(name: str, **params: Any) -> str:
         router = _cfg("router")
         if router is None:
             raise RuntimeError("Aucun routeur actif pour url_for().")

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pyright: strict
 """tools/check_version_sync.py — cohérence de version sur tout le dépôt.
 
 Ticket PKG-VERSION-SYNC-CHECK-001.
@@ -18,6 +19,8 @@ Autonome (aucun argument) : utilisable en test méta et dans les scripts release
 """
 from __future__ import annotations
 
+from typing import Any
+
 import json
 import re
 import sys
@@ -35,7 +38,7 @@ def pep440_to_semver(version: str) -> str:
     return version
 
 
-def _toml(path: Path) -> dict:
+def _toml(path: Path) -> dict[str, Any]:
     return tomllib.loads(path.read_text(encoding="utf-8"))
 
 
