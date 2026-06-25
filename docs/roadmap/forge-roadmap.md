@@ -159,7 +159,7 @@ dettes de cohérence. Un ticket = une responsabilité (principe 2) ; statut « �
 
 | Ticket | Responsabilité unique | Sévérité |
 |---|---|---|
-| `TEST-E2E-MARIADB-CI-001` | Brancher les e2e MariaDB **existants** (`test_e2e_mariadb.py` + `test_e2e_slug_mariadb.py`, 19 tests) sur le job CI `tests-db` : les marquer `@pytest.mark.db`, unifier sous `FORGE_REQUIRE_DB`/`FORGE_TEST_DB_*`, retirer le double mécanisme `FORGE_E2E_MARIADB`. Couvre la chaîne entité→SQL→DB sans écrire un test | Critique |
+| `TEST-E2E-MARIADB-CI-001` | **Fait** (PR #1, `479d557`) : 19 e2e branchés sur `tests-db` (marqueur `db`, vars `FORGE_TEST_DB_*`, gardes connexion/sécurité). Découverte : tests **périmés** depuis ADR-033 (scaffold sans `DB_ADMIN_*`) — réparé. CI verte, `25 passed` réels (19 e2e + 6 intégration, 0 skip) contre MariaDB. La chaîne entité→SQL→DB est désormais couverte en CI | ✅ |
 | `DOC-ONBOARDING-DB-INIT-001` | Réparer les paliers welcome SQL (`first-sql.md`, `list-records.md`, `relations.md`) : ajouter `forge db:init` (crée base + user `DB_APP_*` + table `forge_migrations`) et `forge migration:make` **avant** `migration:apply`, sinon l'app ne démarre pas | Bloquant |
 | `AUTH-LOG-SWALLOWED-EXC-001` | `core/auth/session.py:34,127,181,203` : journaliser (WARNING) les exceptions du `user_loader` / résolution / persistance avant `return None` ; distinguer échec d'auth (attendu) d'erreur d'infrastructure (anormal, aujourd'hui invisible) | Élevé |
 | `CRUD-GEN-ROUTE-ACCESSOR-001` | **Fait** : générateur émet `request.route("id")` (accesseur canonique ADR-026) au lieu de `request.route_params.get("id")` (4×) ; garde-fou test renforcé (`request.route_params` interdit dans le code généré) | ✅ |
