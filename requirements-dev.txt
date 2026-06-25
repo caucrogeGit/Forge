@@ -34,6 +34,7 @@ pyright>=1.1.400
 -e ./packages/forge-mvc-pivot
 -e ./packages/forge-mvc-mail
 -e ./packages/forge-mvc-i18n
+-e ./packages/forge-mvc-qrcode
 
 # Infrastructure de test partagée (ADR-041) : FakeRequest + plugin pytest
 # (fixtures autouse de configuration du noyau, nettoyage, fake_request). Dev only.
