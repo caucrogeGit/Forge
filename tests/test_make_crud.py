@@ -620,8 +620,8 @@ def test_controller_parse_id_invalides(tmp_path):
     code = build_controller(_CONTACT_JSON)
     assert "def _parse_id(value):" in code
     assert "except (TypeError, ValueError):" in code
-    assert 'request.route_params.get("id")' in code
-    assert 'int(request.route_params["id"])' not in code
+    assert 'request.route("id")' in code  # accesseur canonique ADR-026
+    assert "request.route_params" not in code  # pas d'accès brut au dict (ADR-026)
 
 
 def test_controller_verifie_id_invalide_avant_model(tmp_path):
