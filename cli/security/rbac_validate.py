@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande forge rbac:validate — valide mvc/security/rbac.json.
 
 Vérifie que le contrat RBAC du projet respecte schemas/rbac.schema.json.
@@ -14,6 +15,7 @@ Codes de retour :
 from __future__ import annotations
 
 import json
+from typing import Any, cast
 import sys
 from pathlib import Path
 
@@ -26,7 +28,7 @@ def _schemas_dir() -> Path:
     return Path(__file__).resolve().parent.parent / "schemas"
 
 
-def _build_registry():
+def _build_registry() -> "tuple[Any, Any]":
     try:
         from referencing import Registry, Resource
         from referencing.jsonschema import DRAFT202012
@@ -37,7 +39,7 @@ def _build_registry():
     if not schemas_dir.is_dir():
         return None, None
 
-    resources = []
+    resources: list[Any] = []
     for f in schemas_dir.glob("*.json"):
         try:
             schema = json.loads(f.read_text(encoding="utf-8"))
@@ -49,12 +51,12 @@ def _build_registry():
             pass
 
     try:
-        return Registry().with_resources(resources), DRAFT202012
+        return cast("Any", Registry()).with_resources(resources), DRAFT202012  # pyright: ignore[reportUnknownArgumentType]  # défaut _anchors interne à referencing
     except Exception:
         return None, None
 
 
-def _make_validator(registry):
+def _make_validator(registry: Any) -> Any:
     try:
         from jsonschema import Draft202012Validator
     except ImportError:
@@ -71,8 +73,8 @@ def _make_validator(registry):
     return None
 
 
-def _collect_errors(validator, instance: dict) -> list[dict]:
-    errors = []
+def _collect_errors(validator: Any, instance: dict[str, Any]) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
     for error in sorted(validator.iter_errors(instance), key=lambda e: str(e.absolute_path)):
         path = "$." + ".".join(str(p) for p in error.absolute_path) if error.absolute_path else "$"
         errors.append({"path": path, "message": error.message})

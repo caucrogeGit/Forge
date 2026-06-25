@@ -130,7 +130,7 @@ nombre d'erreurs.
 | 1 | `TYPING-CLI-CRUD-001` | `cli/entities/crud/` (controller_builder 161, views_builder 113, utils 91, model_builder 56, form_builder 51, context, relations_loader) ; controller_builder peut être scindé | ~470 |
 | 2 | `TYPING-CLI-ENTITIES-VALIDATION-001` | `validation.py`, `entity_validate.py`, `entity_semantic_validate.py` | ~302 |
 | 3 | `TYPING-CLI-ENTITIES-MAKE-DB-001` | `make_entity`, `make_crud`, `relations`, `migrations`, `db_init`, `db_apply`, `model` | ~360 |
-| 4 | `TYPING-CLI-SECURITY-001` | `cli/security/` (auth, rbac_audit, rbac_validate) | ~108 |
+| 4 | `TYPING-CLI-SECURITY-001` | **Fait** : `cli/security/` (auth, rbac_audit, rbac_validate) strict ; frontière jsonschema/referencing typée `Any` (+ ignore ciblé sur `Registry()`), traversée RBAC castée, `action: Callable[[], None]` | ✅ |
 | 5 | `TYPING-CLI-PUBLIC-001` | `cli/public/` (public_contact, public_pdf…) | ~117 |
 | 6 | `TYPING-CLI-PROJECT-SCHEMAS-OPTINS-001` | **Fait** : `cli/optins/` (registre public, `SUPPORTED_OPTINS` typé), `cli/project/` (config `ModuleType`, `installed: dict[str, dict[str, Any]]`, mariadb aliasé), `cli/schemas/` (loader `tuple[dict[str, Any], …]`, traversée `$ref` castée) — strict | ✅ |
 | 7 | `TYPING-CLI-ASSETS-DEPLOY-001` | **Fait** : `cli/assets/` (front, uploads, i18n), `cli/deploy/` (deploy via `find_spec`), `cli/_support/` — strict | ✅ |

@@ -1,3 +1,4 @@
+# pyright: strict
 """Commandes CLI Auth/User de Forge.
 
 forge auth:init — crée le SQL optionnel des tables users, auth_tokens, auth_mfa_factors, auth_mfa_recovery_codes, user_roles, auth_audit_log et auth_rate_limit_attempts
@@ -820,7 +821,7 @@ def cmd_auth_doctor(args: list[str], root: Path | None = None) -> None:
     _print_checks("Forge auth:doctor — diagnostic Auth/User", checks)
 
 
-def _run_admin_command(action, *, root: Path | None = None) -> None:
+def _run_admin_command(action: "Callable[[], None]", *, root: Path | None = None) -> None:
     try:
         _load_env_and_configure_forge(root or Path.cwd())
         action()

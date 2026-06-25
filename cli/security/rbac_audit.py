@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande forge rbac:audit — audit de cohérence de mvc/security/rbac.json.
 
 Vérifie la cohérence fonctionnelle du contrat RBAC : rôles sans permissions,
@@ -16,6 +17,7 @@ Codes de retour :
 from __future__ import annotations
 
 import json
+from typing import Any, cast
 import sys
 from pathlib import Path
 
@@ -29,7 +31,7 @@ def _schemas_dir() -> Path:
     return Path(__file__).resolve().parent.parent / "schemas"
 
 
-def _build_registry():
+def _build_registry() -> "tuple[Any, Any]":
     try:
         from referencing import Registry, Resource
         from referencing.jsonschema import DRAFT202012
@@ -40,7 +42,7 @@ def _build_registry():
     if not schemas_dir.is_dir():
         return None, None
 
-    resources = []
+    resources: list[Any] = []
     for f in schemas_dir.glob("*.json"):
         try:
             schema = json.loads(f.read_text(encoding="utf-8"))
@@ -52,12 +54,12 @@ def _build_registry():
             pass
 
     try:
-        return Registry().with_resources(resources), DRAFT202012
+        return cast("Any", Registry()).with_resources(resources), DRAFT202012  # pyright: ignore[reportUnknownArgumentType]  # défaut _anchors interne à referencing
     except Exception:
         return None, None
 
 
-def _make_validator(registry):
+def _make_validator(registry: Any) -> Any:
     try:
         from jsonschema import Draft202012Validator
     except ImportError:
@@ -74,27 +76,27 @@ def _make_validator(registry):
     return None
 
 
-def _collect_schema_errors(validator, instance: dict) -> list[dict]:
-    errors = []
+def _collect_schema_errors(validator: Any, instance: dict[str, Any]) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
     for error in sorted(validator.iter_errors(instance), key=lambda e: str(e.absolute_path)):
         path = "$." + ".".join(str(p) for p in error.absolute_path) if error.absolute_path else "$"
         errors.append({"path": path, "message": error.message})
     return errors
 
 
-def _audit_warnings(instance: dict) -> list[dict]:
+def _audit_warnings(instance: dict[str, Any]) -> list[dict[str, Any]]:
     """Retourne les avertissements de cohérence fonctionnelle du contrat."""
-    warnings: list[dict] = []
+    warnings: list[dict[str, Any]] = []
     roles = instance.get("roles")
     entities = instance.get("entities")
 
-    if not isinstance(roles, dict) or len(roles) == 0:
+    if not isinstance(roles, dict) or len(cast("dict[str, Any]", roles)) == 0:
         warnings.append({
             "code": "missing_roles",
             "message": "Aucun rôle déclaré dans le contrat RBAC.",
         })
 
-    if not isinstance(entities, dict) or len(entities) == 0:
+    if not isinstance(entities, dict) or len(cast("dict[str, Any]", entities)) == 0:
         warnings.append({
             "code": "missing_entities",
             "message": "Aucune entité déclarée dans le contrat RBAC.",
@@ -103,18 +105,18 @@ def _audit_warnings(instance: dict) -> list[dict]:
     # Collect all permissions declared in entities: permission_code → (entity, action)
     declared_permissions: dict[str, tuple[str, str]] = {}
     if isinstance(entities, dict):
-        for entity_name, entity_data in entities.items():
+        for entity_name, entity_data in cast("dict[str, Any]", entities).items():
             if not isinstance(entity_data, dict):
                 continue
-            perms = entity_data.get("permissions", {})
-            if not isinstance(perms, dict) or len(perms) == 0:
+            perms = cast("dict[str, Any]", entity_data).get("permissions", {})
+            if not isinstance(perms, dict) or len(cast("dict[str, Any]", perms)) == 0:
                 warnings.append({
                     "code": "entity_without_permissions",
                     "entity": entity_name,
                     "message": f"L'entité '{entity_name}' n'a aucune permission déclarée.",
                 })
                 continue
-            for action, perm_code in perms.items():
+            for action, perm_code in cast("dict[str, Any]", perms).items():
                 if isinstance(perm_code, str):
                     declared_permissions[perm_code] = (entity_name, action)
             for action in _CRUD_ACTIONS:
@@ -129,15 +131,15 @@ def _audit_warnings(instance: dict) -> list[dict]:
     # Collect permissions assigned to roles
     assigned_permissions: set[str] = set()
     if isinstance(roles, dict):
-        for role_name, role_perms in roles.items():
-            if not isinstance(role_perms, list) or len(role_perms) == 0:
+        for role_name, role_perms in cast("dict[str, Any]", roles).items():
+            if not isinstance(role_perms, list) or len(cast("list[Any]", role_perms)) == 0:
                 warnings.append({
                     "code": "empty_role",
                     "role": role_name,
                     "message": f"Le rôle '{role_name}' n'a aucune permission.",
                 })
                 continue
-            for perm in role_perms:
+            for perm in cast("list[Any]", role_perms):
                 if isinstance(perm, str):
                     assigned_permissions.add(perm)
                     if declared_permissions and perm not in declared_permissions:
@@ -153,13 +155,13 @@ def _audit_warnings(instance: dict) -> list[dict]:
 
     # Check entity permissions not assigned to any role
     if assigned_permissions and isinstance(entities, dict):
-        for entity_name, entity_data in entities.items():
+        for entity_name, entity_data in cast("dict[str, Any]", entities).items():
             if not isinstance(entity_data, dict):
                 continue
-            perms = entity_data.get("permissions", {})
+            perms = cast("dict[str, Any]", entity_data).get("permissions", {})
             if not isinstance(perms, dict):
                 continue
-            for action, perm_code in perms.items():
+            for action, perm_code in cast("dict[str, Any]", perms).items():
                 if isinstance(perm_code, str) and perm_code not in assigned_permissions:
                     warnings.append({
                         "code": "entity_permission_unused",
