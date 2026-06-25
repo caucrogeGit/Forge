@@ -169,6 +169,18 @@ print('INTROUVABLE')
     fi
 fi
 
+# Cohérence GLOBALE et autonome : tous les emplacements de version (sous-paquets,
+# pins forge-mvc, extras, squelette, package.json en SemVer), indépendamment de
+# l'argument de version (PKG-VERSION-SYNC-CHECK-001).
+echo ""
+echo "--- Cohérence de version sur tout le dépôt (check_version_sync.py) ---"
+if CVS_OUT=$("$PYTHON_BIN" tools/check_version_sync.py 2>&1); then
+    _ok "check_version_sync.py : versions cohérentes"
+else
+    _fail "check_version_sync.py : désynchronisation de version"
+    printf '%s\n' "$CVS_OUT" | sed 's/^/         /' || true
+fi
+
 # ── 3. CHANGELOG (format SemVer public) ──────────────────────────────────────
 if [ -n "$PUBLIC_VERSION" ]; then
     if grep -qF "## [$PUBLIC_VERSION]" CHANGELOG.md 2>/dev/null; then
