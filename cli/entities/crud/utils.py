@@ -1,6 +1,7 @@
 """Pure field helpers for the CRUD generator."""
 
 from __future__ import annotations
+from typing import Any
 
 from cli.entities.crud.context import CrudManyToOneRelation
 
@@ -16,7 +17,7 @@ def _humanize(name: str) -> str:
     return name.replace("_", " ").capitalize()
 
 
-def _pk_field(definition: dict) -> dict:
+def _pk_field(definition: dict[str, Any]) -> dict[str, Any]:
     for f in definition["fields"]:
         if f.get("primary_key"):
             return f

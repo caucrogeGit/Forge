@@ -1,3 +1,5 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 import ast
@@ -5,6 +7,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 import cli._support.output as out
 from cli.entities.make_crud import _pk_field, _to_snake
@@ -67,19 +70,19 @@ class PublicFormSpec:
 @dataclass
 class MakePublicFormResult:
     spec: PublicFormSpec
-    created: list[str] = field(default_factory=list)
-    preserved: list[str] = field(default_factory=list)
-    warnings: list[str] = field(default_factory=list)
+    created: list[str] = field(default_factory=list[str])
+    preserved: list[str] = field(default_factory=list[str])
+    warnings: list[str] = field(default_factory=list[str])
 
 
-def _is_form_sensitive(field_def: dict) -> bool:
+def _is_form_sensitive(field_def: dict[str, Any]) -> bool:
     name = field_def["name"].lower()
     if name in _FORM_SENSITIVE_NAMES:
         return True
     return any(part in name for part in _FORM_SENSITIVE_PARTS)
 
 
-def _input_type_for(field_def: dict) -> str:
+def _input_type_for(field_def: dict[str, Any]) -> str:
     sql_type = field_def.get("sql_type", "").upper()
     python_type = field_def.get("python_type", "str")
     name = field_def["name"].lower()
@@ -103,7 +106,7 @@ def _input_type_for(field_def: dict) -> str:
     return "text"
 
 
-def public_form_fields(definition: dict) -> list[PublicFormField]:
+def public_form_fields(definition: dict[str, Any]) -> list[PublicFormField]:
     fields: list[PublicFormField] = []
     for field_def in definition["fields"]:
         if field_def.get("primary_key"):
@@ -130,7 +133,7 @@ def public_form_fields(definition: dict) -> list[PublicFormField]:
     return fields
 
 
-def build_public_form_spec(definition: dict) -> PublicFormSpec:
+def build_public_form_spec(definition: dict[str, Any]) -> PublicFormSpec:
     entity = definition["entity"]
     snake = _to_snake(entity)
     plural = snake + "s"
@@ -428,7 +431,7 @@ def _ensure_form_controller(controller_path: Path, spec: PublicFormSpec) -> tupl
     return True, None
 
 
-def load_public_form_definition(entity_name: str, *, entities_root: Path) -> dict:
+def load_public_form_definition(entity_name: str, *, entities_root: Path) -> dict[str, Any]:
     snake = _to_snake(entity_name)
     json_path = entities_root / snake / f"{snake}.json"
     if not json_path.exists():

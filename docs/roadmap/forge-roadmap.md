@@ -126,12 +126,12 @@ nombre d'erreurs.
 | Ordre | Ticket | Périmètre | Erreurs |
 |---|---|---|---|
 | Fondation | `TYPING-ENTITY-CONTRACT-TYPEDICT-001` | `EntityDefinition`/`FieldDefinition` (TypedDict) + threading via le normaliseur et les générateurs ; cascade construction + sites d'appel | ~298 |
-| Fondation | `TYPING-CLI-PRIVATE-PUBLIC-001` | Rendre publiques les fonctions privées utilisées inter-modules (`_with_permission`, `_ensure_route`, `_ensure_controller_method`…) ; résout `reportPrivateUsage` + `reportUnusedFunction` | ~50 |
+| Fondation | `TYPING-CLI-PRIVATE-PUBLIC-001` | **Tranchée** : ne PAS renommer. Les helpers privés partagés intra-paquet (ex. `cli/entities/crud/utils.py` ≈15 helpers, `cli/public/public_page.py`) sont de l'API package-interne légitime, pas une fuite ; les rendre publics serait sémantiquement faux. Décision : `# pyright: reportPrivateUsage=false` sur les fichiers concernés (Python n'a pas de « package-private »). Appliqué à `cli/public/`, à réappliquer au fil de crud/entities | politique |
 | 1 | `TYPING-CLI-CRUD-001` | `cli/entities/crud/` (controller_builder 161, views_builder 113, utils 91, model_builder 56, form_builder 51, context, relations_loader) ; controller_builder peut être scindé | ~470 |
 | 2 | `TYPING-CLI-ENTITIES-VALIDATION-001` | `validation.py`, `entity_validate.py`, `entity_semantic_validate.py` | ~302 |
 | 3 | `TYPING-CLI-ENTITIES-MAKE-DB-001` | `make_entity`, `make_crud`, `relations`, `migrations`, `db_init`, `db_apply`, `model` | ~360 |
 | 4 | `TYPING-CLI-SECURITY-001` | **Fait** : `cli/security/` (auth, rbac_audit, rbac_validate) strict ; frontière jsonschema/referencing typée `Any` (+ ignore ciblé sur `Registry()`), traversée RBAC castée, `action: Callable[[], None]` | ✅ |
-| 5 | `TYPING-CLI-PUBLIC-001` | `cli/public/` — `public_page` + `public_show` **faits** ; `public_form`/`public_list`/`public_contact` **bloqués par la fondation private/public** (helpers `_to_snake`/`_pk_field`/`_humanize`/`_insert_import` partagés avec `cli/entities` et `cli/optins`) → faire `TYPING-CLI-PRIVATE-PUBLIC-001` d'abord | ~115 restant |
+| 5 | `TYPING-CLI-PUBLIC-001` | **Fait** : tout `cli/public/` strict (page, show, form, list, contact). Schéma d'entité typé `dict[str, Any]`, dataclass `default_factory=list[str]`, `cast` aux itérations isinstance, `reportPrivateUsage=false` pour les helpers intra-paquet, `_pk_field` typé à la source (crud/utils) | ✅ |
 | 6 | `TYPING-CLI-PROJECT-SCHEMAS-OPTINS-001` | **Fait** : `cli/optins/` (registre public, `SUPPORTED_OPTINS` typé), `cli/project/` (config `ModuleType`, `installed: dict[str, dict[str, Any]]`, mariadb aliasé), `cli/schemas/` (loader `tuple[dict[str, Any], …]`, traversée `$ref` castée) — strict | ✅ |
 | 7 | `TYPING-CLI-ASSETS-DEPLOY-001` | **Fait** : `cli/assets/` (front, uploads, i18n), `cli/deploy/` (deploy via `find_spec`), `cli/_support/` — strict | ✅ |
 | 8 | `TYPING-FORGE-PY-001` | `forge.py` (dispatcher racine) | ~77 |

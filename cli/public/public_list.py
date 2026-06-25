@@ -1,3 +1,5 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 import json
@@ -5,6 +7,7 @@ import re
 import ast
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, cast
 
 import cli._support.output as out
 from cli.entities.make_crud import _pk_field, _to_snake
@@ -78,31 +81,31 @@ class PublicListSpec:
 @dataclass
 class MakePublicListResult:
     spec: PublicListSpec
-    created: list[str] = field(default_factory=list)
-    preserved: list[str] = field(default_factory=list)
-    warnings: list[str] = field(default_factory=list)
+    created: list[str] = field(default_factory=list[str])
+    preserved: list[str] = field(default_factory=list[str])
+    warnings: list[str] = field(default_factory=list[str])
 
 
 @dataclass
 class MakePublicShowResult:
     spec: PublicListSpec
-    created: list[str] = field(default_factory=list)
-    preserved: list[str] = field(default_factory=list)
-    warnings: list[str] = field(default_factory=list)
+    created: list[str] = field(default_factory=list[str])
+    preserved: list[str] = field(default_factory=list[str])
+    warnings: list[str] = field(default_factory=list[str])
 
 
 def _humanize(name: str) -> str:
     return name.replace("_", " ").capitalize()
 
 
-def _is_sensitive_field(field: dict) -> bool:
+def _is_sensitive_field(field: dict[str, Any]) -> bool:
     name = field["name"].lower()
     if name in SENSITIVE_FIELD_NAMES:
         return True
     return any(part in name for part in SENSITIVE_FIELD_PARTS)
 
 
-def public_list_fields(definition: dict) -> list[PublicListField]:
+def public_list_fields(definition: dict[str, Any]) -> list[PublicListField]:
     fields: list[PublicListField] = []
     for field_def in definition["fields"]:
         if field_def.get("primary_key"):
@@ -127,11 +130,12 @@ def public_list_fields(definition: dict) -> list[PublicListField]:
     return fields
 
 
-def public_media_entries(definition: dict) -> list[PublicMediaEntry]:
-    entries = []
-    for m in definition.get("media") or []:
+def public_media_entries(definition: dict[str, Any]) -> list[PublicMediaEntry]:
+    entries: list[PublicMediaEntry] = []
+    for m in cast("list[Any]", definition.get("media") or []):
         if not isinstance(m, dict):
             continue
+        m = cast("dict[str, Any]", m)
         field_type = m.get("field", "")
         if field_type not in ("image", "file"):
             continue
@@ -168,14 +172,14 @@ def _media_import_line(spec: PublicListSpec) -> str | None:
 
 def _list_select_columns(spec: PublicListSpec) -> str:
     cover = _list_cover_entry(spec)
-    parts = []
+    parts: list[str] = []
     if cover is not None:
         parts.append(f"{spec.pk_column} AS _entity_id")
     parts += [f"{f.column} AS {f.name}" for f in spec.fields]
     return ", ".join(parts) if parts else f"{spec.pk_column} AS _public_id"
 
 
-def load_public_list_definition(entity_name: str, *, entities_root: Path) -> dict:
+def load_public_list_definition(entity_name: str, *, entities_root: Path) -> dict[str, Any]:
     snake = _to_snake(entity_name)
     json_path = entities_root / snake / f"{snake}.json"
     if not json_path.exists():
@@ -184,7 +188,7 @@ def load_public_list_definition(entity_name: str, *, entities_root: Path) -> dic
     return validate_entity_definition(raw, source=str(json_path))
 
 
-def build_public_list_spec(definition: dict) -> PublicListSpec:
+def build_public_list_spec(definition: dict[str, Any]) -> PublicListSpec:
     entity = definition["entity"]
     snake = _to_snake(entity)
     plural = snake + "s"
