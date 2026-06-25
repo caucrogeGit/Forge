@@ -21,6 +21,10 @@ un en-tête ``Authorization: Bearer <token>`` ; sinon l'API reste ouverte
 (mode local/pédagogique). L'auth vit dans ce module IoT, **jamais** dans
 Forge Core.
 
+Sécuriser par défaut (SEC-IOT-TOKEN-PROD-001) : en ``APP_ENV=prod``,
+``register_iot_routes`` **refuse** le mode ouvert (sans token) et lève une
+erreur actionnable ; le mode ouvert ne vaut que hors production.
+
 Hors périmètre :
 
 - pas de JWT/OAuth/session, pas de RBAC, pas de refresh token ;
@@ -37,6 +41,7 @@ import secrets
 from datetime import UTC, datetime
 from typing import Any
 
+from core.forge import get as _forge_get
 from core.http.response import Response
 
 from forge_mvc_iot.config import IotConfig, load_iot_config
@@ -326,6 +331,17 @@ def register_iot_routes(
         repository = IotEventRepository()
     if config is None:
         config = load_iot_config()
+
+    # Sécuriser par défaut (principe 7) : l'API ouverte (sans token) est réservée
+    # au développement. En production, l'exposer sans Bearer token serait une
+    # fuite de données IoT — on refuse explicitement plutôt que d'exposer.
+    if config.api_token is None and _forge_get("app_env") == "prod":
+        raise RuntimeError(
+            "API IoT ouverte interdite en production : définir FORGE_IOT_API_TOKEN "
+            "pour exiger un Bearer token, ou n'enregistrer les routes IoT qu'en "
+            "environnement de développement (le mode ouvert est local/pédagogique)."
+        )
+
     controller = IotHttpController(repository, api_token=config.api_token)
 
     router.add(

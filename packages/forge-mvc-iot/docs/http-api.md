@@ -200,6 +200,11 @@ parcours pédagogiques. Pour un projet **exposé sur le réseau**, définis
 `FORGE_IOT_API_TOKEN` : les trois routes exigent alors un en-tête
 `Authorization: Bearer <token>`.
 
+En `APP_ENV=prod`, l'API ouverte (sans token) est **refusée** :
+`register_iot_routes` lève une erreur tant que `FORGE_IOT_API_TOKEN` n'est pas
+défini (sécuriser par défaut, SEC-IOT-TOKEN-PROD-001).
+Le mode ouvert ne vaut donc qu'en développement.
+
 ```bash
 export FORGE_IOT_API_TOKEN="change-me"
 

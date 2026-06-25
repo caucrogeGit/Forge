@@ -98,7 +98,7 @@ Les tickets suivent « un ticket, une responsabilité » (principe 2) ; statut �
 | 3. Release | `PKG-OPTIN-LICENSE-FILES-001` | **Faux positif (vérifié par build)** : le LICENSE est déjà embarqué dans les wheels via le glob `license-files` par défaut de setuptools >= 77 (`…dist-info/licenses/LICENSE` présent). Aucune action : le projet s'appuie volontairement sur le glob par défaut (documenté dans `test_optin_license_present_001`) | clôturé |
 | 4. Typage | `TYPING-CLI-STRICT-001` | Mettre `cli/` sous le périmètre pyright strict (ou acter l'exception par ADR) ; `TypedDict` pour le schéma d'entité (49 `dict` nus dans les générateurs CRUD) | Moyenne |
 | 4. Gouvernance | `DOC-CHARTE-REALIGN-AUDITABLE-001` | Réaligner `CHARTE_DOC.md` et `CLAUDE.md` §1 sur « explicite, auditable, testable et durable » (le pédagogique devient bénéfice dérivé, ADR-049), au prochain tag majeur (fichiers protégés) | Moyenne |
-| 5. Sécurité | `SEC-IOT-TOKEN-PROD-001` | Refuser l'API IoT ouverte sans token en `APP_ENV=prod` (insecure default), ou warning bloquant au démarrage | Moyenne |
+| 5. Sécurité | `SEC-IOT-TOKEN-PROD-001` | **Fait** : `register_iot_routes` refuse le mode ouvert (sans token) en `APP_ENV=prod` (lève une erreur actionnable) ; mode ouvert conservé hors prod. Test `test_iot_http_prod_guard_001` + doc `http-api.md` à jour | fait |
 | 5. Sécurité | `SEC-UPLOAD-MIME-MAGIC-001` | Valider les magic bytes pour image/PDF dans `core/forms/upload_validation.py` ; documenter que le `content_type` client ne fait pas autorité | Moyenne |
 
 Points d'hygiène de moindre sévérité relevés par l'audit, à traiter au fil de l'eau
