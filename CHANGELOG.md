@@ -24,7 +24,7 @@
   `fmt="svg"` possible). `QrCodeError` sur entrée vide ou format inconnu. Dépend
   de `segno` (pur Python, sans Pillow), déclaré uniquement dans le paquet. Forge
   Core reste indépendant (aucun import, `segno` absent de ses dépendances,
-  verrouillé par test). Non publié sur PyPI (statut Alpha).
+  verrouillé par test). Non publié sur PyPI (statut Beta).
 - **Parcours d'accueil `welcome-projet` dans le squelette** (ADR-048,
   `WELCOME-PROJET-CONTENT-001`, `WELCOME-PROJET-NAV-001`). `forge new` embarque un
   parcours pédagogique court dans `docs/welcome/` du projet : mise en route, puis

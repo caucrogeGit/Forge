@@ -125,7 +125,7 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 | [`forge-mvc-pivot`](https://pypi.org/project/forge-mvc-pivot/) | Tables pivot avancées extraites du core | Beta |
 | [`forge-mvc-mail`](https://pypi.org/project/forge-mvc-mail/) | Envoi de courriels extrait du core | Beta |
 | `forge-mvc-i18n` | Internationalisation : catalogues JSON, fallback, helper `trans()` (repli no-op du noyau) | Beta (publication à venir) |
-| `forge-mvc-qrcode` | Génération de QR Codes (PNG/SVG) depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur | Alpha (publication à venir) |
+| `forge-mvc-qrcode` | Génération de QR Codes (PNG/SVG) depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur | Beta (publication à venir) |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus
