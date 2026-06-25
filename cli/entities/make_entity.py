@@ -342,7 +342,7 @@ def _write_entity_files(
     return entity_name, snake, created, skipped
 
 
-def _sql_default_literal(field: dict[str, Any]) -> str | None:
+def sql_default_literal(field: dict[str, Any]) -> str | None:
     if "default" not in field:
         return None
     value = field["default"]
@@ -370,7 +370,7 @@ def build_entity_sql(entity_definition: dict[str, Any]) -> str:
         parts.append("NULL" if field["nullable"] else "NOT NULL")
         if field["auto_increment"]:
             parts.append("AUTO_INCREMENT")
-        default_literal = _sql_default_literal(field)
+        default_literal = sql_default_literal(field)
         if default_literal is not None:
             parts.append(f"DEFAULT {default_literal}")
         body_lines.append(" ".join(parts))

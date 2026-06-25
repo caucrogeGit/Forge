@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 """Statut des migrations SQL Forge."""
 
 from __future__ import annotations
@@ -14,8 +13,8 @@ from datetime import datetime
 from pathlib import Path
 
 from cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
-from cli.entities.db_apply import _split_sql_statements
-from cli.entities.make_entity import _sql_default_literal, to_snake, validate_entity_name
+from cli.entities.db_apply import split_sql_statements
+from cli.entities.make_entity import sql_default_literal, to_snake, validate_entity_name
 from cli.entities.validation import validate_entity_definition
 from cli.project.project_config import ProjectConfigError, load_project_config
 
@@ -634,7 +633,7 @@ def _ensure_migrations_can_be_applied(statuses: list[MigrationStatus]) -> None:
 
 def _apply_one_migration(connection: Any, migration: MigrationFile) -> None:
     sql = migration.path.read_text(encoding="utf-8")
-    statements = _split_sql_statements(sql)
+    statements = split_sql_statements(sql)
     start = time.perf_counter()
     cursor = connection.cursor()
     try:
@@ -871,7 +870,7 @@ def _sql_column_definition(field: dict[str, Any]) -> str:
     parts.append("NULL" if field["nullable"] else "NOT NULL")
     if field["auto_increment"]:
         parts.append("AUTO_INCREMENT")
-    default_literal = _sql_default_literal(field)
+    default_literal = sql_default_literal(field)
     if default_literal is not None:
         parts.append(f"DEFAULT {default_literal}")
     return " ".join(parts)

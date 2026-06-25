@@ -48,7 +48,7 @@ def apply_model_sql(entities_root: Path) -> list[Path]:
                 sql = sql_contents[item.path]
                 if not sql.strip():
                     continue
-                for statement in _split_sql_statements(sql):
+                for statement in split_sql_statements(sql):
                     try:
                         cursor.execute(statement)
                     except Exception as exc:
@@ -164,7 +164,7 @@ def _rollback_quietly(connection: Any) -> None:
         pass
 
 
-def _split_sql_statements(sql: str) -> list[str]:
+def split_sql_statements(sql: str) -> list[str]:
     statements: list[str] = []
     current: list[str] = []
     in_single_quote = False
