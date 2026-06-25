@@ -178,7 +178,7 @@ dettes de cohérence. Un ticket = une responsabilité (principe 2) ; statut « �
 | `REFACTOR-BUILD-CONTROLLER-001` | Découper `build_controller` (825 lignes d'un seul tenant, `controller_builder.py:43`) en sous-générateurs par action (`_render_index/create/update/delete`) | Faible |
 | `TEST-TESTING-PKG-SMOKE-001` | **Fait (smoke) ; py.typed tranché = déféré** : smoke test ajouté (import + API `FakeRequest` + plugin pytest), dans `tests/` racine (paquet absent de `testpaths`, pyproject protégé). py.typed NON ajouté : le paquet n'est pas typé strict (~158 err pyright strict, fake_request.py non annoté) → chantier typage dédié, différé (paquet dev-only ADR-041) | ✅ |
 | `TEST-META-ROTATION-APPLY-001` | Appliquer la politique de rotation/plafond des meta-tests doc-as-test (`tests/meta/` = 321 fichiers, ~35 % de la suite) : archiver les garde-fous de tickets clos, interdire les nouveaux doc-as-test quand un test comportemental existe | Faible |
-| `DOC-TUTORIAL-ADR029-001` | Aligner `app-complete-tutorial.md:356` sur ADR-029 (chemins `/contrôleur/méthode`, index nu) + uniformiser les incohérences mineures (index CLI `opt-in:*`/`sync:entity`, `forge run` vs `python app.py`) | Faible |
+| `DOC-TUTORIAL-ADR029-001` | **Fait** : `app-complete-tutorial.md` aligné ADR-029 (slashes finaux d'index retirés : `/ville/`→`/ville`, `/contact/`→`/contact`). NB : l'audit se trompait sur `/ville/new` (route `new` réelle, GET du formulaire, cf. `make:crud`). Sous-items déjà résolus : `sync:entity` est dans l'index cli-commands, `getting-started` n'a pas de « forge run » incohérent | ✅ |
 
 ---
 

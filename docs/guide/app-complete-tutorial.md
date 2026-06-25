@@ -354,9 +354,9 @@ L'application démarre sur `https://localhost:8000` avec HTTPS de développement
 Les routes disponibles :
 
 ```text
-/ville/          → liste des villes
+/ville           → liste des villes
 /ville/new       → créer une ville
-/contact/        → liste des contacts (avec ville affichée)
+/contact         → liste des contacts (avec ville affichée)
 /contact/new     → créer un contact (sélection de ville disponible)
 ```
 
