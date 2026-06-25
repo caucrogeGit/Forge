@@ -818,7 +818,7 @@ def main() -> None:
         deploy_main(args)
         return
 
-    if command in ("module:list", "module:install", "module:files", "module:routes"):
+    if command in ("module:list", "module:install", "module:files", "module:routes", "module:remove"):
         modules_main(args)
         return
 

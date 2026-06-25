@@ -38,7 +38,7 @@ class TestOptInFamilyFrozen:
 # ── Famille module:* (exactement 4 commandes, distincte) ─────────────────────
 
 class TestModuleFamilyFrozen:
-    EXPECTED = {"module:list", "module:install", "module:files", "module:routes"}
+    EXPECTED = {"module:list", "module:install", "module:files", "module:routes", "module:remove"}
 
     def test_module_family_is_exactly_four(self):
         # module:* est routé via un `command in (...)` tuple

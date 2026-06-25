@@ -666,6 +666,20 @@ forge module:routes <nom>
 
 </details>
 
+<details markdown="1" id="forge-moduleremove">
+<summary><code>forge module:remove</code> - Désinstalle un module en retirant ses fichiers inchangés et ses routes marquées</summary>
+
+Désinstalle un module installé par Forge : supprime uniquement les fichiers dont le contenu est identique à la source (les fichiers modifiés sont conservés et signalés), retire les routes marquées et met à jour le registre `forge_modules.json`.
+
+```bash
+forge module:remove <nom>
+forge module:remove <nom> --dry-run
+```
+
+Voir la section dédiée et le contrat explicite dans [Modules](modules.md).
+
+</details>
+
 ## Commandes d'authentification
 
 <details markdown="1" id="forge-authinit">

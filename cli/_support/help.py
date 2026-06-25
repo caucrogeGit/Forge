@@ -57,6 +57,7 @@ Modules
   module:install      Installe un module dans le projet.
   module:files        Copie les fichiers d'un module.
   module:routes       Injecte les routes d'un module.
+  module:remove       Désinstalle un module (fichiers inchangés).
 
 Auth / Sécurité
   auth:init                 Initialise les tables d'authentification.

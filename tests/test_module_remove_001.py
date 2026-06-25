@@ -367,3 +367,22 @@ def test_cli_help_inclut_module_remove():
     with pytest.raises(SystemExit) as exc:
         main([])
     assert exc.value.code == 1
+
+
+def test_forge_main_routes_module_remove(monkeypatch, capsys):
+    """CLI-MODULE-REMOVE-ROUTE-001 : `forge module:remove` est routé par le
+    dispatcher forge.main() lui-même, et non rejeté en « commande inconnue ».
+
+    Les autres tests appellent cli.deploy.modules.main directement, ce qui
+    masquait l'absence de routage côté forge.py (la commande était documentée
+    « Disponible » mais inaccessible à l'utilisateur final).
+    """
+    import forge
+
+    monkeypatch.setattr("sys.argv", ["forge", "module:remove"])
+    with pytest.raises(SystemExit):
+        forge.main()
+    captured = capsys.readouterr()
+    combined = captured.out + captured.err
+    assert "module:remove" in combined
+    assert "commande inconnue" not in combined
