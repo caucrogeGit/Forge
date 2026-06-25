@@ -194,6 +194,13 @@ def require_permission(permission_code: str):
         @require_auth
         @require_permission("posts.edit")
         def edit(request): ...
+
+    Sécurité (SEC-RBAC-CANONICAL-GUARD-001) : cette garde vérifie les permissions
+    **fournies dans la requête ou la session** (`request.permissions` / session
+    RBAC historique), PAS la base. Un changement de rôle en base n'est pris en
+    compte qu'au prochain rafraîchissement de la session. Pour un contrôle
+    **autoritatif** adossé à Auth/User (lookup SQL à chaque requête), utilisez la
+    garde canonique `require_user_permission`.
     """
     validate_permission(permission_code)
     normalized = normalize_permission_code(permission_code)

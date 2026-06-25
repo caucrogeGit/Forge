@@ -65,7 +65,7 @@ Ces deux fonctions conviennent aux cas les plus simples (protéger une route par
 |---|---|
 | Vérifier simplement qu'un utilisateur a un rôle (session) | `user_has_role` — core léger (déprécié) |
 | Protéger une route pour les nouveaux projets | `forge-mvc-rbac` — `require_user_permission` |
-| Permissions fines (`contacts.edit`, `posts.delete`) | `forge-mvc-rbac` — `require_permission` |
+| Permissions fines (`contacts.edit`, `posts.delete`) | `forge-mvc-rbac` — `require_user_permission` (autoritatif, base) |
 | Administrer rôles et permissions | `forge-mvc-rbac` |
 | Affichage conditionnel dans les templates Jinja | `forge-mvc-rbac` — `can(...)` |
 | Relations utilisateurs/rôles complexes | `forge-mvc-rbac` |

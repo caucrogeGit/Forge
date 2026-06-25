@@ -45,7 +45,14 @@ def require_user_permission(
     fetch_all: FetchAll | None = None,
     permission_checker: PermissionChecker | None = None,
 ) -> Callable[..., Any]:
-    """Protege une route avec les permissions RBAC de l'utilisateur Auth/User."""
+    """Protege une route avec les permissions RBAC de l'utilisateur Auth/User.
+
+    Garde **canonique** (SEC-RBAC-CANONICAL-GUARD-001) pour l'intégration
+    Auth/User + RBAC : résout les permissions par lookup SQL
+    (`user_roles -> roles -> permissions`) à CHAQUE requête, donc autoritatif,
+    à l'inverse de `require_permission` qui se fie aux permissions de la
+    requête/session. Les nouveaux projets utilisent cette garde.
+    """
     normalized = normalize_permission_code(permission)
     validate_permission(normalized)
 
