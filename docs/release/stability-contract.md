@@ -95,7 +95,7 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 
 ## Fichiers générés
 
-### Régénérables, Forge peut les écraser
+### Régénérables : Forge peut les écraser
 
 Ces fichiers sont entièrement pilotés par le JSON canonique. Toute modification manuelle sera perdue à la prochaine régénération.
 
@@ -105,14 +105,14 @@ Ces fichiers sont entièrement pilotés par le JSON canonique. Toute modificatio
 | `mvc/entities/<e>/<e>.sql` | `forge build:model`, `forge sync:entity` |
 | `mvc/entities/relations.sql` | `forge sync:relations` |
 
-### Sources canoniques, à éditer, jamais régénérées
+### Sources canoniques : à éditer, jamais régénérées
 
 | Fichier | Règle |
 |---|---|
 | `mvc/entities/<e>/<e>.json` | Source unique de vérité pour l'entité |
 | `mvc/entities/relations.json` | Source unique de vérité pour les relations |
 
-### Générés une fois, Forge ne réécrit pas si le fichier existe
+### Générés une fois : Forge ne réécrit pas si le fichier existe
 
 Ces fichiers sont créés par un générateur lors de la première exécution. Forge vérifie leur existence avant d'écrire et ne les écrase jamais sans action explicite (`--force` si disponible).
 

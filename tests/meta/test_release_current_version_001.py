@@ -178,7 +178,7 @@ class TestChangelogDated:
         semver = _current_semver()
         text = (PROJECT_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
         pattern = re.compile(
-            rf"## \[{re.escape(semver)}\]\s+[—-]\s+(\d{{4}}-\d{{2}}-\d{{2}})"
+            rf"## \[{re.escape(semver)}\]\s+[—\-:]\s+(\d{{4}}-\d{{2}}-\d{{2}})"
         )
         match = pattern.search(text)
         assert match, (
@@ -203,7 +203,7 @@ class TestRoadmapReflectsCurrentVersion:
     """La roadmap annonce la version courante comme ÉTAT COURANT.
 
     Renforcement vs ancien test : on exige explicitement un en-tête
-    '## État actuel — Forge <version>' et 'Tag courant : `v<version>`',
+    '## État actuel : Forge <version>' et 'Tag courant : `v<version>`',
     plus une assertion négative (aucune version antérieure annoncée comme
     État actuel).
     """
@@ -219,11 +219,11 @@ class TestRoadmapReflectsCurrentVersion:
         semver = _current_semver()
         text = self.roadmap_text
         pattern = re.compile(
-            rf"^##\s+État actuel\s*[—-]\s*Forge\s+{re.escape(semver)}\b",
+            rf"^##\s+État actuel\s*[—\-:]\s*Forge\s+{re.escape(semver)}\b",
             re.MULTILINE,
         )
         assert pattern.search(text), (
-            f"Roadmap doit contenir '## État actuel — Forge {semver}' "
+            f"Roadmap doit contenir '## État actuel : Forge {semver}' "
             f"(version courante en forme SemVer)."
         )
 
@@ -242,7 +242,7 @@ class TestRoadmapReflectsCurrentVersion:
         semver = _current_semver()
         text = self.roadmap_text
         pattern = re.compile(
-            r"^##\s+État actuel\s*[—-]\s*Forge\s+([\d.]+(?:-[\w.]+)?)",
+            r"^##\s+État actuel\s*[—\-:]\s*Forge\s+([\d.]+(?:-[\w.]+)?)",
             re.MULTILINE,
         )
         offenders = [

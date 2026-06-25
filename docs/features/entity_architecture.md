@@ -107,7 +107,7 @@ La clé `default` accepte uniquement des valeurs simples : `str`, `int`, `float`
 
 ## 3. Les projections générées
 
-### `contact.sql`, projection SQL locale
+### `contact.sql` : projection SQL locale
 
 Contient uniquement la table de l'entité. Pas de clé étrangère.
 
@@ -132,7 +132,7 @@ Règles de formatage :
     Les clés étrangères inter-entités n'apparaissent **jamais** dans un `.sql` d'entité.
     Elles appartiennent exclusivement à `relations.sql`.
 
-### `contact_base.py`, base Python générée
+### `contact_base.py` : base Python générée
 
 Contient le constructeur, les propriétés avec décorateurs de validation, `to_dict()`, `from_dict()` et `__repr__`.
 
@@ -192,7 +192,7 @@ Types Python supportés : `int`, `str`, `float`, `bool`, `date`, `datetime`.
 
 ## 4. Les fichiers manuels
 
-### `contact.py`, classe métier
+### `contact.py` : classe métier
 
 Hérite de `ContactBase`. Créé une seule fois par Forge s'il est absent. Jamais écrasé.
 

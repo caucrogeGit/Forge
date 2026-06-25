@@ -4,7 +4,7 @@ Un module Forge est un dossier lisible contenant au minimum un fichier
 `module.json`. Il décrit ce qu'il fournit et Forge installe ce contenu
 par étapes explicites et contrôlées.
 
-### Modules, Principe général
+### Modules : Principe général
 
 Un module Forge doit rester lisible, copiable, auditable et modifiable.
 
@@ -18,7 +18,7 @@ Règles fondamentales :
 - aucun écrasement silencieux n'est autorisé ;
 - aucune marketplace ni téléchargement distant n'existe.
 
-### Modules, Structure d'un module
+### Modules : Structure d'un module
 
 Structure minimale :
 
@@ -47,7 +47,7 @@ Règles :
 - seuls les éléments déclarés dans `provides` sont pris en compte par Forge ;
 - les chemins réels vers ces éléments sont définis dans `paths`.
 
-### Modules, Format `module.json`
+### Modules : Format `module.json`
 
 Exemple complet :
 
@@ -74,7 +74,7 @@ Exemple complet :
 }
 ```
 
-### Modules, Champs obligatoires
+### Modules : Champs obligatoires
 
 | Champ | Rôle |
 |---|---|
@@ -89,14 +89,14 @@ Règles de validation :
 - `version` : format `MAJOR.MINOR.PATCH` (ex. `0.1.0`) ;
 - `label` et `description` : sans HTML.
 
-### Modules, Champs optionnels
+### Modules : Champs optionnels
 
 | Champ | Type | Valeur par défaut |
 |---|---|---|
 | `provides` | liste | `[]` |
 | `paths` | dictionnaire | `{}` |
 
-### Modules, `provides`
+### Modules : `provides`
 
 `provides` liste les types de contenu fournis par le module.
 
@@ -114,7 +114,7 @@ Règles de validation :
 `routes` est traité séparément par `forge module:routes`.
 `static` et `migrations` sont réservés pour de futurs tickets.
 
-### Modules, `paths`
+### Modules : `paths`
 
 `paths` associe chaque type déclaré dans `provides` à un chemin relatif à l'intérieur du dossier du module.
 
@@ -135,7 +135,7 @@ Règles de validation :
 - pas de chemin absolu (Unix ou Windows) ;
 - pas d'URL.
 
-### Modules, Registre `forge_modules.json`
+### Modules : Registre `forge_modules.json`
 
 `forge_modules.json` est le registre des modules installés.
 Il est créé ou mis à jour par `forge module:install`.
@@ -171,7 +171,7 @@ Règles du registre :
 - ne doit pas contenir de chemin absolu ;
 - ne doit pas devenir une base de données.
 
-### Modules, Lister les modules
+### Modules : Lister les modules
 
 ```bash
 forge module:list
@@ -208,7 +208,7 @@ Règles :
 - signale les modules invalides sans bloquer l'affichage des valides ;
 - ne crée pas le dossier `modules/` s'il est absent.
 
-### Modules, Installer déclarativement un module
+### Modules : Installer déclarativement un module
 
 ```bash
 forge module:install agenda
@@ -232,7 +232,7 @@ Règles :
 - n'exécute aucun code du module ;
 - `--dry-run` simule sans écrire.
 
-### Modules, Installer les fichiers d'un module
+### Modules : Installer les fichiers d'un module
 
 ```bash
 forge module:files agenda --dry-run
@@ -269,7 +269,7 @@ Règles :
 Après une installation réelle, Forge trace les fichiers copiés dans
 `forge_modules.json` avec la clé `files_installed`.
 
-### Modules, Activer les routes d'un module
+### Modules : Activer les routes d'un module
 
 ```bash
 forge module:routes agenda --dry-run
@@ -318,7 +318,7 @@ Règles :
 - Forge n'importe pas dynamiquement `routes.py` du module pendant la génération ;
 - ne copie aucun fichier d'entité, vue, contrôleur ou doc.
 
-### Modules, Dépendance runtime des routes
+### Modules : Dépendance runtime des routes
 
 Les routes de modules référencent le dossier source du module (`modules/<nom>/`).
 
@@ -339,7 +339,7 @@ Raisons de ce choix :
 - le dossier `modules/` est déjà une source contrôlée du projet, ce n'est pas un dépôt externe ;
 - évite de dupliquer du code Python entre `modules/` et `mvc/`, ce qui rendrait les mises à jour de module risquées.
 
-### Modules, Cycle recommandé
+### Modules : Cycle recommandé
 
 ```bash
 forge module:list
@@ -368,7 +368,7 @@ module.json
 Chaque étape est indépendante et explicite. Aucune étape n'en déclenche
 automatiquement une autre.
 
-### Modules, Désinstaller un module
+### Modules : Désinstaller un module
 
 ```bash
 forge module:remove agenda --dry-run
@@ -421,7 +421,7 @@ Limites :
 - pas de suppression des fichiers modifiés ;
 - pas de suppression des fichiers dont la source est absente.
 
-### Modules, API Python (`core.modules`)
+### Modules : API Python (`core.modules`)
 
 ```python
 from core.modules import (
@@ -461,7 +461,7 @@ from core.modules import (
 )
 ```
 
-### Modules, Sécurité de copie des fichiers
+### Modules : Sécurité de copie des fichiers
 
 `forge module:files` copie uniquement les fichiers déclarés dans les répertoires autorisés. Les garanties suivantes s'appliquent :
 
@@ -490,7 +490,7 @@ Cibles autorisées :
 
 Si un symlink est détecté, l'installation est refusée entièrement, aucun fichier n'est copié et un message d'erreur explicite est affiché.
 
-### Modules, Sécurité et limites actuelles
+### Modules : Sécurité et limites actuelles
 
 Limites fonctionnelles :
 
@@ -510,7 +510,7 @@ Sécurité :
 - les routes de modules restent à clarifier côté dépendance runtime dans `MODULE-ROUTES-RUNTIME-AUDIT-001` ;
 - la sécurité de la copie des fichiers de modules sera auditée dans `MODULE-FILES-SECURITY-001`.
 
-### Modules, Cycle de vie
+### Modules : Cycle de vie
 
 #### Ce qui est supporté
 
@@ -575,7 +575,7 @@ Si les fichiers copiés par `forge module:files` sont modifiés après l'install
 
 ---
 
-## Référence croisée, Modules Forge
+## Référence croisée : Modules Forge
 
 ### Principe général
 
@@ -587,7 +587,7 @@ La Phase 7 regroupe trois briques orthogonales livrées après Forge 1.5.0 :
 
 Ces trois briques partagent les mêmes principes : pas d'ORM, pas de runtime caché, déclaration explicite, zéro dépendance nouvelle.
 
-### Workflow, Socle livré
+### Workflow : Socle livré
 
 Le workflow Forge permet de gérer les transitions d'état d'une entité sans imposer de machine à états globale.
 
@@ -601,7 +601,7 @@ Briques livrées :
 
 La documentation complète est dans la section Workflow de cette référence.
 
-### Statistiques, Socle livré
+### Statistiques : Socle livré
 
 Le module statistiques fournit une collecte d'événements bruts et des agrégats calculés à la demande, sans base de données dédiée ni service externe.
 
@@ -615,7 +615,7 @@ Briques livrées :
 
 La documentation complète est dans la section Statistiques de cette référence.
 
-### Modules, Socle livré
+### Modules : Socle livré
 
 Le système de modules permet d'empaqueter des entités, contrôleurs, vues et docs sous forme de dossier autonome et de les installer dans un projet Forge.
 

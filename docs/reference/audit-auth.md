@@ -1,4 +1,4 @@
-# Audit Auth, Journalisation des événements d'authentification
+# Audit Auth : Journalisation des événements d'authentification
 
 `log_auth_event()` est la fonction centrale pour journaliser les événements d'authentification dans Forge. Elle émet des messages via le logger Python `forge.auth.audit`, sans jamais accéder à la base de données et sans jamais propager d'exception.
 
@@ -38,7 +38,7 @@ logging.getLogger("forge.auth.audit").setLevel(logging.INFO)
 
 `tests/test_auth_audit_controller.py` couvre 33 cas : niveaux INFO/WARNING, absence de données sensibles dans les logs, présence de `user_id` et `ip`, comportement des contrôleurs préservé, silence en cas d'erreur interne.
 
-## Cookies de session, Attributs de sécurité
+## Cookies de session : Attributs de sécurité
 
 Tous les cookies `session_id` émis par Forge portent `HttpOnly`, `SameSite=Strict`, `Secure` et `Path=/`. Le flag `Secure` est toujours actif quelle que soit la valeur de `app_env`.
 
@@ -150,7 +150,7 @@ le flag `Secure` sur les cookies).
 - Headers sur fichiers statiques : 7 tests E2E
 - Valeurs CSP et Referrer-Policy : 5 tests E2E
 
-## Uploads et médias, Sécurité
+## Uploads et médias : Sécurité
 
 ### Architecture
 
@@ -172,7 +172,7 @@ Chemins refusés :
 
 Les chemins encodés `%2e%2e` ne sont **pas** URL-décodés, ils sont traités comme des noms de fichiers littéraux (inaccessibles via le filesystem standard).
 
-### Extensions, liste blanche
+### Extensions : liste blanche
 
 Par défaut : `jpg`, `jpeg`, `png`, `webp`, `pdf`. Refusées (non dans la liste) : `.php`, `.py`, `.html`, `.js`, `.svg`, `.sh`, `.exe`, `.env`, etc.
 

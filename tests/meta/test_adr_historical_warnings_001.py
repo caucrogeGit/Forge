@@ -31,7 +31,7 @@ TITLE_WITH_VERSION_PATTERN = re.compile(
 )
 
 WARNING_PATTERN = re.compile(
-    r'!!!\s*warning\s+"ADR\s+historique\s*[—\-]\s*Forge\s+(\d+\.\d+|\d+\.x)"',
+    r'!!!\s*warning\s+"ADR\s+historique\s*[—\-:]\s*Forge\s+(\d+\.\d+|\d+\.x)"',
 )
 
 

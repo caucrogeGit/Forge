@@ -26,7 +26,7 @@ font de même).
 
 ---
 
-## Étape 1, Installer WSL2 + Ubuntu
+## Étape 1 : Installer WSL2 + Ubuntu
 
 Suivez la procédure officielle Microsoft :
 
@@ -43,7 +43,7 @@ un terminal Ubuntu.
 
 ---
 
-## Étape 2, Installer Forge dans WSL2
+## Étape 2 : Installer Forge dans WSL2
 
 Une fois Ubuntu lancé, les étapes sont identiques à Linux :
 
@@ -69,7 +69,7 @@ forge --version     # doit afficher Forge {{forge_version}}
 
 ---
 
-## Étape 3, Créer un projet
+## Étape 3 : Créer un projet
 
 ```bash
 forge new MonProjet
@@ -111,7 +111,7 @@ Puis suivre [Préparer MariaDB](mariadb.md).
 
 ---
 
-## Frictions connues, Windows natif (sans WSL2)
+## Frictions connues : Windows natif (sans WSL2)
 
 Si vous souhaitez expérimenter Forge nativement sur Windows sans WSL2, les
 frictions suivantes peuvent apparaître :

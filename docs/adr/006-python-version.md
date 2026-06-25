@@ -1,4 +1,4 @@
-# ADR-006, Version Python minimale : 3.12+
+# ADR-006 : Version Python minimale : 3.12+
 
 ## Statut
 

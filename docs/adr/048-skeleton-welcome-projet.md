@@ -1,4 +1,4 @@
-# ADR-048, Parcours d'accueil « welcome-projet » dans le squelette
+# ADR-048 : Parcours d'accueil « welcome-projet » dans le squelette
 
 ## Statut
 

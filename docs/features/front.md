@@ -957,7 +957,7 @@ Forge ne maintient pas officiellement :
 Ces outils peuvent être intégrés manuellement dans une application finale, mais
 ils ne font pas partie du chemin standard maintenu par Forge.
 
-## Statut de la phase 3, Socle front léger
+## Statut de la phase 3 : Socle front léger
 
 La phase 3 est clôturée. Les blocs suivants sont stables :
 

@@ -1,4 +1,4 @@
-# ADR-019, Extraction de l'upload générique hors du core : `forge-mvc-files`
+# ADR-019 : Extraction de l'upload générique hors du core : `forge-mvc-files`
 
 ## Statut
 

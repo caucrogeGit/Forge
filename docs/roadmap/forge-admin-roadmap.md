@@ -167,7 +167,7 @@ L'option hybride est retenue parce qu'elle respecte la charte sans imposer de du
 Le paquet porte ce qui est stable et partagé.
 Le projet porte ce qui est spécifique et doit rester modifiable.
 
-### Couche 1, châssis runtime (dans le paquet)
+### Couche 1 : châssis runtime (dans le paquet)
 
 Le châssis est un runtime mince, installé avec l'opt-in et non modifié par le projet.
 Il fournit la mécanique commune : layout, navigation, helpers de rendu liste et formulaire, mapping des types Forge vers des widgets, garde-fous de sécurité.
@@ -191,7 +191,7 @@ packages/forge-mvc-admin/
 Le châssis reste minimal.
 Il ne contient aucune connaissance des entités d'un projet donné.
 
-### Couche 2, contrôleurs de ressource générés (dans le projet)
+### Couche 2 : contrôleurs de ressource générés (dans le projet)
 
 À l'inverse, ce qui est propre à une entité est **généré** dans le projet, à partir de son contrat JSON, puis possédé par le développeur.
 

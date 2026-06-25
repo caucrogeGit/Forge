@@ -1,4 +1,4 @@
-# Mode développement, contribuer au core Forge
+# Mode développement : contribuer au core Forge
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -117,7 +117,7 @@ collecte sur les tests opt-in. À réserver aux cas spécifiques
 
 ---
 
-## 4. Vérifier l'installation, les 5 validations canoniques
+## 4. Vérifier l'installation : les 5 validations canoniques
 
 Toute contribution Forge doit passer ces 5 validations avant commit :
 
@@ -148,7 +148,7 @@ Voir [Contribuer à Forge](../philosophy/contributing.md) pour le processus comp
 
 ---
 
-## 5. CSS Tailwind, quand le recompiler ?
+## 5. CSS Tailwind : quand le recompiler ?
 
 `static/tailwind.css` est **commité** dans le dépôt. La doc et les
 tests fonctionnent sans Node. Recompiler le CSS n'est nécessaire que
@@ -173,7 +173,7 @@ déclare `engines.node >= 24.17.0`, et `.npmrc` active `engine-strict=true`,
 
 ---
 
-## 6. `forge run` dans le dépôt Forge, possible mais limité
+## 6. `forge run` dans le dépôt Forge : possible mais limité
 
 Le dépôt Forge contient lui-même un `app.py` et un dossier `mvc/`
 (squelette de référence utilisé par les tests d'intégration et la

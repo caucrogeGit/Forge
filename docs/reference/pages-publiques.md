@@ -5,7 +5,7 @@ Pages publiques séparées du CRUD admin, orientées visiteur. Forge génère
 contrôleurs, routes et vues via cinq commandes dédiées. Chaque génération est
 non destructive : les fichiers existants sont préservés.
 
-### Pages publiques, Principe général
+### Pages publiques : Principe général
 
 Les pages publiques et le CRUD admin coexistent dans le même projet mais ne
 partagent ni contrôleurs, ni vues, ni routes. Le flux est serveur d'abord :
@@ -21,7 +21,7 @@ Règles :
 - le HTML classique est la base : HTMX peut améliorer l'expérience sans la remplacer ;
 - aucune logique métier spécifique (réservation, paiement, workflow) dans le core.
 
-### Pages publiques, Commandes disponibles
+### Pages publiques : Commandes disponibles
 
 | Commande | Rôle |
 |---|---|
@@ -34,7 +34,7 @@ Règles :
 Toutes les commandes sont non destructives et idempotentes.
 → Voir les sections détaillées dans `### Pages publiques simples`, `### Listes publiques simples`, `### Fiches publiques simples`, `### Formulaires publics` et `### Page contact publique`.
 
-### Pages publiques, Templates et layout public
+### Pages publiques : Templates et layout public
 
 Convention de fichiers :
 
@@ -48,7 +48,7 @@ Le layout public (`layouts/public.html`) expose les blocs `title`, `content` et
 `scripts`. Il charge Tailwind et reste indépendant de HTMX et Alpine.js. Tous
 les templates générés étendent ce layout.
 
-### Pages publiques, Compatibilité i18n
+### Pages publiques : Compatibilité i18n
 
 Les générateurs utilisent des clés i18n standards si i18n est activé. Clés
 prédéfinies dans `translations/fr.json` :
@@ -71,7 +71,7 @@ prédéfinies dans `translations/fr.json` :
 Pas de traduction automatique, pas de routes traduites, pas de détection de
 langue imposée.
 
-### Pages publiques, Médias publics
+### Pages publiques : Médias publics
 
 Les listes et fiches publiques générées intègrent les médias déclarés dans
 l'entité en lecture seule. Aucun upload, aucune suppression, aucune

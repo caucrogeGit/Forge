@@ -248,7 +248,7 @@ Une starter-app Forge est une application normale, elle se déploie exactement c
 
 Consultez [la page des starters](../starters/index.md) pour la liste complète et les liens de démo.
 
-## 9. Limite importante, sessions mémoire
+## 9. Limite importante : sessions mémoire
 
 Forge utilise par défaut `MemorySessionStore`, sessions en mémoire processus, perdues au redémarrage. Des backends alternatifs sont disponibles.
 

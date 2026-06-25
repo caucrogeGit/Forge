@@ -92,7 +92,7 @@ Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis 
 
 ---
 
-## Service de fichiers, défense symlinks (UPLOADS-SYMLINK-DEFENSE-001)
+## Service de fichiers : défense symlinks (UPLOADS-SYMLINK-DEFENSE-001)
 
 Les fichiers publics servis par Forge (route `/static/...` par `app.py`, route
 `/media/...` servie par le module d'upload optionnel)

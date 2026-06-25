@@ -1,4 +1,4 @@
-# Roadmap, Tests terrain Forge
+# Roadmap : Tests terrain Forge
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -16,7 +16,7 @@
 
 ---
 
-# FT-00, Cadre de la campagne terrain
+# FT-00 : Cadre de la campagne terrain
 
 Objectif : préparer la méthode, les modèles et les règles.
 
@@ -35,7 +35,7 @@ Objectif : préparer la méthode, les modèles et les règles.
 
 ---
 
-# FT-01, Installation de Forge
+# FT-01 : Installation de Forge
 
 Objectif : vérifier les parcours d’installation.
 
@@ -53,7 +53,7 @@ Objectif : vérifier les parcours d’installation.
 
 ---
 
-# FT-02, Configuration de l’environnement
+# FT-02 : Configuration de l’environnement
 
 Objectif : vérifier `.env`, dev/prod, secrets et erreurs de configuration.
 
@@ -72,7 +72,7 @@ Objectif : vérifier `.env`, dev/prod, secrets et erreurs de configuration.
 
 ---
 
-# FT-03, MariaDB système
+# FT-03 : MariaDB système
 
 Objectif : préparer MariaDB sans utiliser root comme compte applicatif.
 
@@ -91,7 +91,7 @@ Objectif : préparer MariaDB sans utiliser root comme compte applicatif.
 
 ---
 
-# FT-04, Connexion Forge à MariaDB
+# FT-04 : Connexion Forge à MariaDB
 
 Objectif : relier Forge à la base et tester les erreurs.
 
@@ -109,7 +109,7 @@ Objectif : relier Forge à la base et tester les erreurs.
 
 ---
 
-# FT-05, Premier projet Forge
+# FT-05 : Premier projet Forge
 
 Objectif : créer, lancer et observer un projet minimal.
 
@@ -126,7 +126,7 @@ Objectif : créer, lancer et observer un projet minimal.
 
 ---
 
-# FT-06, Architecture du projet
+# FT-06 : Architecture du projet
 
 Objectif : distinguer framework, application, fichiers générés et fichiers manuels.
 
@@ -144,7 +144,7 @@ Objectif : distinguer framework, application, fichiers générés et fichiers ma
 
 ---
 
-# FT-07, Routes applicatives
+# FT-07 : Routes applicatives
 
 Objectif : tester le routage minimal.
 
@@ -161,7 +161,7 @@ Objectif : tester le routage minimal.
 
 ---
 
-# FT-08, Contrôleurs
+# FT-08 : Contrôleurs
 
 Objectif : relier une route à une méthode de contrôleur.
 
@@ -178,7 +178,7 @@ Objectif : relier une route à une méthode de contrôleur.
 
 ---
 
-# FT-09, Premier template
+# FT-09 : Premier template
 
 Objectif : passer d’une réponse texte à une vue HTML.
 
@@ -194,7 +194,7 @@ Objectif : passer d’une réponse texte à une vue HTML.
 
 ---
 
-# FT-10, Templates Jinja
+# FT-10 : Templates Jinja
 
 Objectif : tester les mécanismes Jinja utilisés par Forge.
 
@@ -213,7 +213,7 @@ Objectif : tester les mécanismes Jinja utilisés par Forge.
 
 ---
 
-# FT-11, Layout public
+# FT-11 : Layout public
 
 Objectif : construire une structure de page publique propre.
 
@@ -230,7 +230,7 @@ Objectif : construire une structure de page publique propre.
 
 ---
 
-# FT-12, Tailwind
+# FT-12 : Tailwind
 
 Objectif : vérifier l’usage visuel simple sans usine front opaque.
 
@@ -248,7 +248,7 @@ Objectif : vérifier l’usage visuel simple sans usine front opaque.
 
 ---
 
-# FT-13, Formulaire public simple
+# FT-13 : Formulaire public simple
 
 Objectif : traiter une saisie utilisateur sans CRUD.
 
@@ -265,7 +265,7 @@ Objectif : traiter une saisie utilisateur sans CRUD.
 
 ---
 
-# FT-14, CSRF et formulaires sensibles
+# FT-14 : CSRF et formulaires sensibles
 
 Objectif : vérifier la protection CSRF.
 
@@ -281,7 +281,7 @@ Objectif : vérifier la protection CSRF.
 
 ---
 
-# FT-15, HTMX progressif
+# FT-15 : HTMX progressif
 
 Objectif : tester les interactions HTML partielles.
 
@@ -298,7 +298,7 @@ Objectif : tester les interactions HTML partielles.
 
 ---
 
-# FT-16, Alpine.js optionnel
+# FT-16 : Alpine.js optionnel
 
 Objectif : vérifier qu’Alpine peut aider sans devenir obligatoire.
 
@@ -314,7 +314,7 @@ Objectif : vérifier qu’Alpine peut aider sans devenir obligatoire.
 
 ---
 
-# FT-17, Mail en développement
+# FT-17 : Mail en développement
 
 Objectif : tester le mail sans envoi réel involontaire.
 
@@ -330,7 +330,7 @@ Objectif : tester le mail sans envoi réel involontaire.
 
 ---
 
-# FT-18, Découverte de la CLI
+# FT-18 : Découverte de la CLI
 
 Objectif : comprendre la CLI avant génération.
 
@@ -346,7 +346,7 @@ Objectif : comprendre la CLI avant génération.
 
 ---
 
-# FT-19, Diagnostics CLI
+# FT-19 : Diagnostics CLI
 
 Objectif : vérifier que Forge aide à trouver les problèmes.
 
@@ -362,7 +362,7 @@ Objectif : vérifier que Forge aide à trouver les problèmes.
 
 ---
 
-# FT-20, Routes via CLI
+# FT-20 : Routes via CLI
 
 Objectif : vérifier que la CLI aide à comprendre le routage.
 
@@ -377,7 +377,7 @@ Objectif : vérifier que la CLI aide à comprendre le routage.
 
 ---
 
-# FT-21, Entités JSON
+# FT-21 : Entités JSON
 
 Objectif : introduire le modèle de données Forge.
 
@@ -395,7 +395,7 @@ Objectif : introduire le modèle de données Forge.
 
 ---
 
-# FT-22, Modèles générés et fichiers manuels
+# FT-22 : Modèles générés et fichiers manuels
 
 Objectif : vérifier la séparation généré/manuel.
 
@@ -411,7 +411,7 @@ Objectif : vérifier la séparation généré/manuel.
 
 ---
 
-# FT-23, SQL visible
+# FT-23 : SQL visible
 
 Objectif : vérifier que Forge ne cache pas la base.
 
@@ -427,7 +427,7 @@ Objectif : vérifier que Forge ne cache pas la base.
 
 ---
 
-# FT-24, Migrations
+# FT-24 : Migrations
 
 Objectif : tester l’évolution de la base.
 
@@ -444,7 +444,7 @@ Objectif : tester l’évolution de la base.
 
 ---
 
-# FT-25, CRUD : génération
+# FT-25 : CRUD : génération
 
 Objectif : générer un CRUD simple.
 
@@ -460,7 +460,7 @@ Objectif : générer un CRUD simple.
 
 ---
 
-# FT-26, CRUD : utilisation
+# FT-26 : CRUD : utilisation
 
 Objectif : tester les opérations CRUD de base.
 
@@ -477,7 +477,7 @@ Objectif : tester les opérations CRUD de base.
 
 ---
 
-# FT-27, CRUD : validation et erreurs
+# FT-27 : CRUD : validation et erreurs
 
 Objectif : tester les mauvais usages du CRUD.
 
@@ -493,7 +493,7 @@ Objectif : tester les mauvais usages du CRUD.
 
 ---
 
-# FT-28, CRUD enrichi : recherche, tri, pagination
+# FT-28 : CRUD enrichi : recherche, tri, pagination
 
 Objectif : tester l’usage quotidien d’un back-office.
 
@@ -510,7 +510,7 @@ Objectif : tester l’usage quotidien d’un back-office.
 
 ---
 
-# FT-29, CRUD enrichi : filtres et export
+# FT-29 : CRUD enrichi : filtres et export
 
 Objectif : tester filtres et export CSV.
 
@@ -527,7 +527,7 @@ Objectif : tester filtres et export CSV.
 
 ---
 
-# FT-30, Relations simples
+# FT-30 : Relations simples
 
 Objectif : tester les relations entre deux entités.
 
@@ -544,7 +544,7 @@ Objectif : tester les relations entre deux entités.
 
 ---
 
-# FT-31, Relations avancées
+# FT-31 : Relations avancées
 
 Objectif : tester les relations complexes si supportées.
 
@@ -560,7 +560,7 @@ Objectif : tester les relations complexes si supportées.
 
 ---
 
-# FT-32, Médias et uploads
+# FT-32 : Médias et uploads
 
 Objectif : tester les fichiers utilisateurs.
 
@@ -577,7 +577,7 @@ Objectif : tester les fichiers utilisateurs.
 
 ---
 
-# FT-33, Sécurité uploads
+# FT-33 : Sécurité uploads
 
 Objectif : tester les garde-fous des fichiers.
 
@@ -594,7 +594,7 @@ Objectif : tester les garde-fous des fichiers.
 
 ---
 
-# FT-34, Authentification
+# FT-34 : Authentification
 
 Objectif : tester le flux utilisateur connecté.
 
@@ -612,7 +612,7 @@ Objectif : tester le flux utilisateur connecté.
 
 ---
 
-# FT-35, Pages protégées
+# FT-35 : Pages protégées
 
 Objectif : vérifier l’accès privé.
 
@@ -628,7 +628,7 @@ Objectif : vérifier l’accès privé.
 
 ---
 
-# FT-36, RBAC
+# FT-36 : RBAC
 
 Objectif : tester rôles, permissions et autorisation serveur.
 
@@ -645,7 +645,7 @@ Objectif : tester rôles, permissions et autorisation serveur.
 
 ---
 
-# FT-37, Diagnostics d’erreurs applicatives
+# FT-37 : Diagnostics d’erreurs applicatives
 
 Objectif : vérifier que les erreurs sont compréhensibles.
 
@@ -662,7 +662,7 @@ Objectif : vérifier que les erreurs sont compréhensibles.
 
 ---
 
-# FT-38, Mode production local
+# FT-38 : Mode production local
 
 Objectif : préparer le passage hors développement.
 
@@ -678,7 +678,7 @@ Objectif : préparer le passage hors développement.
 
 ---
 
-# FT-39, Déploiement serveur
+# FT-39 : Déploiement serveur
 
 Objectif : vérifier qu’une application Forge peut être déployée.
 
@@ -696,7 +696,7 @@ Objectif : vérifier qu’une application Forge peut être déployée.
 
 ---
 
-# FT-40, Mise à jour et maintenance
+# FT-40 : Mise à jour et maintenance
 
 Objectif : tester l’évolution d’un projet Forge.
 
@@ -712,7 +712,7 @@ Objectif : tester l’évolution d’un projet Forge.
 
 ---
 
-# FT-41, Mini-projet guidé complet
+# FT-41 : Mini-projet guidé complet
 
 Objectif : assembler les briques dans une application cohérente.
 
@@ -732,7 +732,7 @@ Objectif : assembler les briques dans une application cohérente.
 
 ---
 
-# FT-42, Projet autonome
+# FT-42 : Projet autonome
 
 Objectif : vérifier que le testeur peut utiliser Forge sans procédure détaillée.
 
@@ -749,7 +749,7 @@ Objectif : vérifier que le testeur peut utiliser Forge sans procédure détaill
 
 ---
 
-# FT-43, Consolidation des retours terrain
+# FT-43 : Consolidation des retours terrain
 
 Objectif : transformer les retours en décisions exploitables.
 
@@ -767,7 +767,7 @@ Objectif : transformer les retours en décisions exploitables.
 
 ---
 
-# FT-44, Conversion des tickets validés en tutoriels
+# FT-44 : Conversion des tickets validés en tutoriels
 
 Objectif : transformer les tickets FT validés en pages tutoriels utilisables dans la documentation Forge.
 
@@ -789,7 +789,7 @@ Objectif : transformer les tickets FT validés en pages tutoriels utilisables da
 
 ---
 
-# FT-45, Décision bêta ou stable
+# FT-45 : Décision bêta ou stable
 
 Objectif : décider objectivement si Forge peut sortir de bêta.
 

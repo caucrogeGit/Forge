@@ -1,4 +1,4 @@
-# Tests terrain, Modèle de ticket FT
+# Tests terrain : Modèle de ticket FT
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -6,7 +6,7 @@
 
 ---
 
-# FT-XX-NOM-DU-TICKET-001, Titre du ticket
+# FT-XX-NOM-DU-TICKET-001 : Titre du ticket
 
 ## 1. Métadonnées
 
@@ -89,7 +89,7 @@ docs/reference/controllers.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues.
 
-### Verrou, documentation erronée
+### Verrou : documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 

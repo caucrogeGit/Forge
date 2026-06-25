@@ -1,4 +1,4 @@
-# ADR-037, Agrégation par comptage dans `forge-mvc-stats`
+# ADR-037 : Agrégation par comptage dans `forge-mvc-stats`
 
 ## Statut
 

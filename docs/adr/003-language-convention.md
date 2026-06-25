@@ -1,4 +1,4 @@
-# ADR-003, Convention de langue pour l'API publique
+# ADR-003 : Convention de langue pour l'API publique
 
 ## Statut
 

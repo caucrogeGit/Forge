@@ -1,4 +1,4 @@
-# Roadmap, `1.0.0-beta.13`
+# Roadmap : `1.0.0-beta.13`
 
 > **Thème** : *dernière beta fonctionnelle*, slugs, gel du contrat public,
 > production-readiness. **Finalité** : `RELEASE-BETA13-001`.
@@ -29,14 +29,14 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 
 ---
 
-## Phase 0, Mise à niveau *(immédiat, dé-risque tout)*
+## Phase 0 : Mise à niveau *(immédiat, dé-risque tout)*
 
 | Ticket | Type | Objet |
 |---|---|---|
 | `BETA13-EXISTING-AUDIT-001` | 📋 | Cet audit (table ci-dessus). **Fait dans ce document.** |
 | `CHANGELOG-DELTA-B12-B13-001` | 📋 | Section `beta.13` documentant les 65 commits post-beta.12. |
 
-## Phase 1, Gel du contrat public *(cheap, arrête la valse de renommages)*
+## Phase 1 : Gel du contrat public *(cheap, arrête la valse de renommages)*
 
 | Ticket | Type | Objet · ⛓️ |
 |---|---|---|
@@ -44,7 +44,7 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 | `STARTERS-FINAL-CONTRACT-001` | 📋 | Figer les 16 starters (noms, ordre, routes, fichiers). |
 | `DOCS-LINKS-FINAL-AUDIT-001` | 📋 | `mkdocs --strict` + audit liens/ancres après la réorg docs. |
 
-## Phase 2, Slugs *(la seule vraie feature)* ⛓️ après Phase 0
+## Phase 2 : Slugs *(la seule vraie feature)* ⛓️ après Phase 0
 
 | Ticket | Type | Objet |
 |---|---|---|
@@ -55,7 +55,7 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 | `SLUG-ROUTING-001` | 🔨 | `find_by_slug` + route publique `/{ressource}/{slug}`. |
 | `SLUG-DOCS-001` | 📋 | Usage, génération, unicité, route publique, limites. |
 
-## Phase 3, Production readiness *(surtout durcir/documenter)*, ✅ **complète**
+## Phase 3 : Production readiness *(surtout durcir/documenter)* : ✅ **complète**
 
 | Ticket | État | Objet |
 |---|---|---|
@@ -71,7 +71,7 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 > ajoute le check sécurité-prod du doctor, le dry-run des migrations, et la
 > documentation de déploiement.
 
-## Phase 4, Field test *(dogfooding)* ⛓️ après 2+3, ✅ **complète**
+## Phase 4 : Field test *(dogfooding)* ⛓️ après 2+3 : ✅ **complète**
 
 | Ticket | État | Objet |
 |---|---|---|
@@ -84,7 +84,7 @@ audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋
 > → **rejet du doublon** par la contrainte d'unicité. 7/7 verts sur MariaDB ;
 > SKIPPED proprement sans la base. C'est le **go** : le slug fonctionne en réel.
 
-## Phase 5, Clôture & release ⛓️ tout vert
+## Phase 5 : Clôture & release ⛓️ tout vert
 
 | Ticket | État | Objet |
 |---|---|---|
@@ -133,7 +133,7 @@ marketplace.
 
 ---
 
-## Annexe, Carte d'implémentation `SLUG-SQL-CRUD-001`
+## Annexe : Carte d'implémentation `SLUG-SQL-CRUD-001`
 
 > Investigation faite ; design figé ; **implémentation reportée** (effort
 > dédié). À reprendre idéalement **avec MariaDB** pour valider le CRUD généré,

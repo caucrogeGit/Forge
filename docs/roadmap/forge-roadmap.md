@@ -12,7 +12,7 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 ---
 
-## État actuel, Forge 1.0.0-beta.17
+## État actuel : Forge 1.0.0-beta.17
 
 **Tag courant : `v1.0.0-beta.17`**, typage statique de bout en bout. Le cliquet
 ADR-036 s'étend du cœur aux 12 opt-ins : chaque paquet `forge-mvc-*` passe
@@ -110,7 +110,7 @@ classifiers `Development Status` hétérogènes, tirets cadratins dans les vieux
 
 ---
 
-## Chantier, typage strict de tout le projet (post-audit 2026-06-25), TERMINÉ
+## Chantier : typage strict de tout le projet (post-audit 2026-06-25) : TERMINÉ
 
 **Terminé** : tout le projet est en `# pyright: strict`. Runtime (`core/` + opt-ins)
 déjà fait ; l'outillage (`cli/`, `forge.py`, `integrations/`, `tools/`) l'est
@@ -182,7 +182,7 @@ dettes de cohérence. Un ticket = une responsabilité (principe 2) ; statut « �
 
 ---
 
-## Consolidation terrain, journal des retours de tests terrain (post-b16)
+## Consolidation terrain : journal des retours de tests terrain (post-b16)
 
 Journal des incidents et manques remontés par l'**usage réel** d'un projet
 `forge new` (tests terrain, ADR-009), avec leur correctif.
@@ -212,7 +212,7 @@ détail d'erreur n'est exposé qu'en `dev`, jamais en production.
 
 ---
 
-## Phase 0, Baseline d'audit (post-1.0.0-beta.1)
+## Phase 0 : Baseline d'audit (post-1.0.0-beta.1)
 
 **Objectif** : figer officiellement la baseline d'audit avant toute correction
 post-audits. Ce n'est pas une version de release.
@@ -228,7 +228,7 @@ post-audits. Ce n'est pas une version de release.
 
 ---
 
-## Phase 1, Corrections documentaires (post-audit)
+## Phase 1 : Corrections documentaires (post-audit)
 
 **Objectif** : traiter les constats documentaires prioritaires issus du tracker
 post-audit. Aucune modification de runtime, CLI, générateurs ou packaging.
@@ -244,7 +244,7 @@ post-audit. Aucune modification de runtime, CLI, générateurs ou packaging.
 
 ---
 
-## Phase 2, Infrastructure de release (post-audit)
+## Phase 2 : Infrastructure de release (post-audit)
 
 **Objectif** : mettre en place l'infrastructure reproductible de validation et de
 release. Aboutit à la publication de `1.0.0-beta.2`.
@@ -257,7 +257,7 @@ release. Aboutit à la publication de `1.0.0-beta.2`.
 
 ---
 
-## Phase 3, Sessions configurables (post-audit)
+## Phase 3 : Sessions configurables (post-audit)
 
 **Objectif** : rendre le store de session explicitement configurable via
 `forge.configure(session_store=...)`, sans modifier le comportement par défaut.
@@ -270,7 +270,7 @@ release. Aboutit à la publication de `1.0.0-beta.2`.
 
 ---
 
-## Phase 4, Déduplication double pile auth/session (post-audit)
+## Phase 4 : Déduplication double pile auth/session (post-audit)
 
 **Objectif** : supprimer la double pile `core.auth.session` / `core.security.session`
 en formalisant `core.auth.session` comme API canonique, puis en migrant les imports
@@ -287,7 +287,7 @@ legacy et en dépréciant les fonctions `core.security.session`.
 
 ---
 
-## Phase 5, Consolidation sécurité CSRF (post-audit)
+## Phase 5 : Consolidation sécurité CSRF (post-audit)
 
 **Objectif** : consolider la gestion CSRF pour qu'il n'existe qu'un chemin de
 vérification, avec comparaison constant-time.
@@ -299,7 +299,7 @@ vérification, avec comparaison constant-time.
 
 ---
 
-## Phase 6, Modules : branchement explicite des routes (post-audit)
+## Phase 6 : Modules : branchement explicite des routes (post-audit)
 
 **Objectif** : supprimer l'injection automatique de routes modules dans les fichiers
 applicatifs et imposer un branchement explicite par le développeur.
@@ -312,7 +312,7 @@ applicatifs et imposer un branchement explicite par le développeur.
 
 ---
 
-## Phase 7, Périmètre auth, MFA, RBAC (post-audit)
+## Phase 7 : Périmètre auth, MFA, RBAC (post-audit)
 
 **Objectif** : clarifier officiellement le périmètre du vocabulaire d'audit auth,
 les frontières core / opt-ins, et les politiques de publication et de stockage
@@ -328,7 +328,7 @@ des modules opt-in.
 
 ---
 
-## Phase 8, Organisation des tests (post-audit)
+## Phase 8 : Organisation des tests (post-audit)
 
 **Objectif** : clarifier la structure des tests en séparant les tests méta
 (documentaires, roadmap, packaging statique, invariants textuels, frontières
@@ -344,7 +344,7 @@ architecturales) des tests comportementaux.
 
 ---
 
-## Phase 9, Normalisation des frontières linguistiques dans les starters
+## Phase 9 : Normalisation des frontières linguistiques dans les starters
 
 **État : terminée.**
 
@@ -360,7 +360,7 @@ normalisés ; les API dépréciées sont supprimées ; la convention est documen
 
 ---
 
-## Trajectoire officielle, 1.0.0 stable
+## Trajectoire officielle : 1.0.0 stable
 
 Conforme à [`ADR-009`](../adr/009-stability-policy-terrain.md) (politique de stabilité terrain) :
 
@@ -428,7 +428,7 @@ Forge 1.5.0 fournit un socle MVC complet :
 
 ---
 
-## Phase 3, Socle front léger
+## Phase 3 : Socle front léger
 
 **État : validée en Forge 1.5.0.**
 
@@ -451,7 +451,7 @@ Règle : le HTML serveur reste la base. HTMX et Alpine améliorent l’expérien
 
 ---
 
-## Phase 4, Permissions fines / RBAC
+## Phase 4 : Permissions fines / RBAC
 
 **État : validée en Forge 1.5.0.**
 
@@ -468,7 +468,7 @@ Décision structurante : le core RBAC ne crée pas de table `user_roles`. Cette 
 
 ---
 
-## Phase 4.5, Auth/User avancée et sécurité moderne
+## Phase 4.5 : Auth/User avancée et sécurité moderne
 
 **État : validée côté socle post-1.5.0.**
 
@@ -517,7 +517,7 @@ Limites repoussées :
 
 ---
 
-## Phase 5, Relations avancées et CRUD enrichi
+## Phase 5 : Relations avancées et CRUD enrichi
 
 **État : terminée.**
 
@@ -556,7 +556,7 @@ Règle : le CRUD HTML classique reste la base. HTMX est une amélioration option
 
 ---
 
-## Phase 6, Pages publiques génériques
+## Phase 6 : Pages publiques génériques
 
 **État : terminée.**
 
@@ -584,7 +584,7 @@ forge make:public-contact
 
 ---
 
-## Phase 7, Workflow, statistiques et modules
+## Phase 7 : Workflow, statistiques et modules
 
 **État : terminée côté socle générique.**
 
@@ -643,7 +643,7 @@ Règle : un module Forge ne doit pas être une boîte noire. Il doit rester lisi
 
 ---
 
-## Phase 8, Starter Communes & Séjours
+## Phase 8 : Starter Communes & Séjours
 
 **État : terminée.**
 
@@ -696,7 +696,7 @@ Les starters 1 et 3 restent des starters officiels. Le starter 2 est conservé m
 
 ---
 
-## Phase 9, Profils de projet
+## Phase 9 : Profils de projet
 
 **État : terminée.**
 
@@ -725,7 +725,7 @@ forge new MonProjet --profile multilingual
 
 ---
 
-## Phase 9.1, Modernisation des starters historiques
+## Phase 9.1 : Modernisation des starters historiques
 
 **État : terminée.**
 
@@ -754,7 +754,7 @@ Règle : moderniser les starters utiles, conserver les starters simples, marquer
 
 ---
 
-## Phase 9.5, Consolidation Forge avant publication
+## Phase 9.5 : Consolidation Forge avant publication
 
 **État : terminée.**
 
@@ -798,7 +798,7 @@ git diff --check
 
 ---
 
-## Phase 10, Publication Forge 2.0
+## Phase 10 : Publication Forge 2.0
 
 **État : terminée.**
 
@@ -836,7 +836,7 @@ Forge 2.0 ne prétend pas être complet au sens absolu. C’est la première ver
 
 ---
 
-## Projet compagnon, Forge Design
+## Projet compagnon : Forge Design
 
 Forge Design dispose désormais de sa propre roadmap.
 
@@ -853,7 +853,7 @@ Règles :
 
 ---
 
-## Opt-in envisagé, Forge Admin
+## Opt-in envisagé : Forge Admin
 
 Un futur opt-in de back-office applicatif (`forge-mvc-admin`) est en cours de cadrage.
 
@@ -863,11 +863,11 @@ Forge Admin sert l'application, Forge Design sert le développeur, Forge Core re
 
 ---
 
-## Phases post-Forge 2.0, toutes livrées
+## Phases post-Forge 2.0 : toutes livrées
 
 Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 
-### Phase 4.9, Contrat de stabilité et production légère
+### Phase 4.9 : Contrat de stabilité et production légère
 
 | Ticket | État |
 |---|---|
@@ -877,7 +877,7 @@ Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 | SESSION-MARIADB-STORE-001 | **livré** |
 | RELEASE-2.2.0-001 | **livré** |
 
-### Phase 5, Expérience développeur (DX)
+### Phase 5 : Expérience développeur (DX)
 
 | Ticket | État |
 |---|---|
@@ -888,7 +888,7 @@ Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 | DX-HELP-001 | **livré** |
 | DX-RECOVERY-001 | **livré** |
 
-### Phase 5.5, Debug runtime développeur
+### Phase 5.5 : Debug runtime développeur
 
 | Ticket | État |
 |---|---|
@@ -897,7 +897,7 @@ Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 | DX-RUNTIME-ERRORS-JSONL-001 | **livré** |
 | DX-RUNTIME-ERRORS-MD-001 | **livré** |
 
-### Phase 6, E2E / qualité
+### Phase 6 : E2E / qualité
 
 | Ticket | État |
 |---|---|
@@ -908,7 +908,7 @@ Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 | E2E-MARIADB-001 | **livré** |
 | QUALITY-COVERAGE-001 | **livré** |
 
-### Phase 7, Sécurité approfondie
+### Phase 7 : Sécurité approfondie
 
 | Ticket | État |
 |---|---|
@@ -921,7 +921,7 @@ Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 | SECURITY-RBAC-AUDIT-001 | **livré** |
 | DEPLOY-PROD-SECURITY-DOC-001 | **livré** |
 
-### Phase 8, Release et compatibilité
+### Phase 8 : Release et compatibilité
 
 | Ticket | État |
 |---|---|
@@ -931,7 +931,7 @@ Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 | RELEASE-MIGRATION-GUIDE-001 | **livré** |
 | RELEASE-LTS-001 | **livré** |
 
-### Phase 9, Documentation avancée
+### Phase 9 : Documentation avancée
 
 | Ticket | État |
 |---|---|
@@ -943,7 +943,7 @@ Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 | DOC-STARTER-AUTHOR-001 | **livré** |
 | DOC-CONTRIBUTE-001 | **livré** |
 
-### Phase 10, API JSON légère
+### Phase 10 : API JSON légère
 
 | Ticket | État |
 |---|---|
@@ -976,7 +976,7 @@ Ces phases ont été livrées après publication de Forge 2.0 (v2.2.0).
 | CRUD-FILTER-HTMX-001 | **livré** |
 | CRUD-FILTER-DOC-001 | **livré** |
 
-### Clôture Phase 11, Auth avancée / durcissement applicatif
+### Clôture Phase 11 : Auth avancée / durcissement applicatif
 
 La Phase 11 consolide le parcours Auth Forge :
 MFA branché dans le login (session complète seulement après code valide),
@@ -984,7 +984,7 @@ parcours OIDC audité et limites documentées, sessions durcies (validation stri
 du format `session_id`), CLI admin clarifiée avec convention `Erreur:` / `Conseil:`,
 événements d'audit admin ajoutés, documentation Auth/RBAC/MFA/OIDC consolidée.
 
-### Clôture Phase 12, Dettes sécurité et UX applicative
+### Clôture Phase 12 : Dettes sécurité et UX applicative
 
 La Phase 12 ferme les dettes sécurité et UX identifiées après les audits :
 RBAC UI aligné avec les permissions serveur (guards `{% if can() %}` dans les
@@ -996,7 +996,7 @@ rate limiting upload ajouté (`core.uploads.rate_limit`, fenêtre glissante en m
 
 ---
 
-## Phase 12, Dettes sécurité et UX applicative (close)
+## Phase 12 : Dettes sécurité et UX applicative (close)
 
 | Ticket | Sujet | État |
 |---|---|---|
@@ -1009,7 +1009,7 @@ rate limiting upload ajouté (`core.uploads.rate_limit`, fenêtre glissante en m
 
 ---
 
-## Phase 13, CRUD avancé / expérience applicative
+## Phase 13 : CRUD avancé / expérience applicative
 
 | Ticket | Sujet | État |
 |---|---|---|
@@ -1039,7 +1039,7 @@ HTMX dans la première version. Recommande CRUD-BULK-DELETE-001 en premier.
 
 Tous les tickets Phase 13 sont livrés. Phase 13 **close**.
 
-### Clôture Phase 13, CRUD avancé / expérience applicative
+### Clôture Phase 13 : CRUD avancé / expérience applicative
 
 La Phase 13 consolide les CRUD générés Forge : filtres déclaratifs (`list.filter=true`),
 compatibilité HTMX progressive (cible unique `#crud-results`, `hx-push-url`, fallbacks),
@@ -1050,7 +1050,7 @@ et documentation associée dans `docs/reference.md`.
 
 ---
 
-## Phase 14, Refonte vers Forge 3.0
+## Phase 14 : Refonte vers Forge 3.0
 
 **État : terminée, historique (v2.4.0 → v2.10.0 → v3.0.0, puis renommée 1.0.0-beta.1 à la publication PyPI).**
 
@@ -1058,7 +1058,7 @@ Objectif : reconstruire Forge avec un cœur minimal strict, une API publique
 anglophone, un packaging multi-distributions PyPI et des modules officiels
 physiquement extraits du dépôt principal.
 
-### Phase 14.1, Durcissement pré-refonte
+### Phase 14.1 : Durcissement pré-refonte
 
 Tickets de sécurité, sessions, audit et statistiques livrés dans Forge 2.4.0 avant
 le début des extractions.
@@ -1079,7 +1079,7 @@ le début des extractions.
 | SQL-EXAMPLES-CANONICAL-001 | API canonique `core.database.db` dans les modèles applicatifs |
 | OIDC-SCOPE-CLARIFY-001 | OIDC déplacé dans `core.auth.experimental`, shims dépréciés |
 
-### Phase 14.2, Infrastructure Forge 3.0
+### Phase 14.2 : Infrastructure Forge 3.0
 
 Adoption formelle de la charte et mise en place du packaging multi-distributions.
 
@@ -1088,7 +1088,7 @@ Adoption formelle de la charte et mise en place du packaging multi-distributions
 | PACKAGING-MULTI-DIST-001 | infrastructure `packages/`, 5 distributions PyPI indépendantes |
 | CHARTER-V2-ADOPTION-001 | charte philosophique v2 + ADR-003 à 007 |
 
-### Phase 14.3, Reconstruction du cœur minimal
+### Phase 14.3 : Reconstruction du cœur minimal
 
 Extractions physiques, suppressions et reconstruction, de v2.5.0 à v2.10.0.
 
@@ -1109,7 +1109,7 @@ Extractions physiques, suppressions et reconstruction, de v2.5.0 à v2.10.0.
 | TESTS-CLASSIFY-001 | réorganisation tests en `tests/meta/` et `tests/release/` |
 | DOCS-CONSOLIDATE-ROADMAPS-001 | consolidation roadmaps, 3 fichiers archivés (ticket courant) |
 
-### Phase 14.4, Clôture pré-3.0
+### Phase 14.4 : Clôture pré-3.0
 
 *(Phase 14.4 close, tag v3.0.0 livré, renommé 1.0.0-beta.1 à la publication PyPI.)*
 
@@ -1206,7 +1206,7 @@ Une fonctionnalité peut être ambitieuse, mais elle ne doit pas alourdir inutil
 Tickets livrés pendant les phases de stabilisation 3.0 → 3.0.1, avant le
 Scénario C de consolidation 3.0.2.
 
-### Phase G, Architecture et nettoyage
+### Phase G : Architecture et nettoyage
 
 | Ticket | Description courte | État |
 |---|---|---|
@@ -1237,7 +1237,7 @@ Voir `CHANGELOG.md` section [3.0.1] pour le détail.
 
 ---
 
-## Scénario C, Consolidation 3.0.2
+## Scénario C : Consolidation 3.0.2
 
 Cycle de consolidation production-ready basé sur trois audits convergents
 (statique, dynamique, stratégique). Objectif : faire de Forge 3.0.2 une
@@ -1317,7 +1317,7 @@ Tickets livrés pendant les phases de stabilisation (v2.0.0 → v2.2.0), avant l
 
 ---
 
-## Scénario D, Mini-consolidation post-audit ChatGPT 3.0.3
+## Scénario D : Mini-consolidation post-audit ChatGPT 3.0.3
 
 Suite à un retour d'audit externe sur la 3.0.3, 4 anomalies de cohérence
 de release ont été identifiées et seront corrigées en 3.0.4 :
@@ -1335,7 +1335,7 @@ Voir `CHANGELOG.md` section [3.0.4] pour le détail.
 
 ---
 
-## Scénario E, Landing clickable (3.0.5)
+## Scénario E : Landing clickable (3.0.5)
 
 | Ticket | Description | État |
 |---|---|---|
@@ -1347,7 +1347,7 @@ Voir `CHANGELOG.md` section [3.0.5] pour le détail.
 
 ---
 
-## Patch final, Publication PyPI du core
+## Patch final : Publication PyPI du core
 
 | Ticket | Description | État |
 |---|---|---|
@@ -1362,7 +1362,7 @@ Voir `CHANGELOG.md` section [1.0.0-beta.1] pour le détail.
 
 ---
 
-## Phase 10, Documentation et publication BaseController (close)
+## Phase 10 : Documentation et publication BaseController (close)
 
 **Objectif** : auditer, documenter officiellement la surface publique de
 `BaseController`, puis publier beta.4.
@@ -1377,7 +1377,7 @@ Voir `CHANGELOG.md` section [1.0.0-beta.1] pour le détail.
 
 ---
 
-## Phase 11, Extraction du module forge-mvc-media (close)
+## Phase 11 : Extraction du module forge-mvc-media (close)
 
 **Objectif** : extraire le code média applicatif (`media_repository`, `media_gallery`)
 du core vers un module opt-in `forge-mvc-media`, en préservant la compatibilité
@@ -1393,7 +1393,7 @@ du code applicatif existant.
 
 ---
 
-## Phase 12, Sécurité, résilience et préparation PyPI opt-ins (close)
+## Phase 12 : Sécurité, résilience et préparation PyPI opt-ins (close)
 
 | Ticket | Description | État |
 |---|---|---|
@@ -1406,7 +1406,7 @@ du code applicatif existant.
 
 ---
 
-## Phase B9, Corrections post-audit beta.8 → 1.0.0-beta.9
+## Phase B9 : Corrections post-audit beta.8 → 1.0.0-beta.9
 
 **Objectif** : solder les constats de l'[audit post-publication beta.8](../history/audits/audit-post-publication-beta8.md)
 avant d'ouvrir les tests terrain sur une base saine.
@@ -1435,7 +1435,7 @@ avant d'ouvrir les tests terrain sur une base saine.
 > `DOCS-PRODUCTION-LIMITS-001` afin que la documentation de production reflète
 > l'état final de l'intégration WSGI.
 
-### Bloc B9-D, Intégration WSGI production
+### Bloc B9-D : Intégration WSGI production
 
 Ce bloc complète `WSGI-ENTRYPOINT-001` (entrée WSGI minimale déjà livrée)
 pour rendre Forge exploitable derrière un serveur WSGI externe avant
@@ -1450,7 +1450,7 @@ production publique.
 | `WSGI-PRODUCTION-SMOKE-TESTS-001` | Ajouter des tests de cohérence WSGI production (factory + warnings + IP client) | **livré** |
 | `WSGI-DEPLOY-DOCS-001` | Documenter un déploiement WSGI minimal derrière reverse proxy | **livré** |
 
-### Bloc B9-C, Stabilisation CLI / aide développeur
+### Bloc B9-C : Stabilisation CLI / aide développeur
 
 Série menée en parallèle des corrections sécurité, intégrée à B9 pour que
 l'aide `--help` / `-h` de toutes les commandes Forge soit fiable et sans
@@ -1483,7 +1483,7 @@ plus de tickets `CLI-HELP-FLAGS-*` prévus.
 
 ---
 
-## Phase B10, Stabilisation post-beta.9 / pré-release beta.10
+## Phase B10 : Stabilisation post-beta.9 / pré-release beta.10
 
 **Objectif** : phase corrective post-publication `1.0.0-beta.9`. Remettre la
 base en état strictement vert (tests rouges, validateur PEP 440 / SemVer,
@@ -1574,7 +1574,7 @@ sections ci-dessus.
 
 ---
 
-## Phase post-beta.10, Point d'entrée unifié, inspectabilité, DX et premier contact
+## Phase post-beta.10 : Point d'entrée unifié, inspectabilité, DX et premier contact
 
 Petite série de tickets qui remplace les deux entrées historiques
 (`python app.py` et `scripts/dev-server.sh`) par une commande officielle
@@ -1665,7 +1665,7 @@ série.
 
 ---
 
-## Phase beta.13, Consolidation du premier contact (starters)
+## Phase beta.13 : Consolidation du premier contact (starters)
 
 Tickets de consolidation issus du test terrain du parcours « Bonjour Forge »
 (niveau débutant). Objectif : une seule façon officielle de construire un

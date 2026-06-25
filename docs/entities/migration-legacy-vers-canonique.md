@@ -35,7 +35,7 @@ Un fichier legacy ne passe pas cette validation, c'est attendu et normal avant m
 
 ## 2. Migrer une entité
 
-### Avant, format legacy
+### Avant : format legacy
 
 ```json
 {
@@ -72,7 +72,7 @@ Un fichier legacy ne passe pas cette validation, c'est attendu et normal avant m
 }
 ```
 
-### Après, format canonique
+### Après : format canonique
 
 ```json
 {
@@ -177,7 +177,7 @@ d'être modifié.
 
 ## 5. Migrer `relations.json`
 
-### Avant, format legacy
+### Avant : format legacy
 
 ```json
 {
@@ -194,7 +194,7 @@ d'être modifié.
 }
 ```
 
-### Après, format canonique
+### Après : format canonique
 
 ```json
 {

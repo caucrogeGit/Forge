@@ -1,4 +1,4 @@
-# ADR-014, Emplacement du contrat RBAC Forge
+# ADR-014 : Emplacement du contrat RBAC Forge
 
 ## Statut
 

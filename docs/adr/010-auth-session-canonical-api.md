@@ -1,4 +1,4 @@
-# ADR-010, API canonique auth/session
+# ADR-010 : API canonique auth/session
 
 ## Statut
 
@@ -135,7 +135,7 @@ l'utiliser directement (via des imports intermédiaires dans le core).
 
 ---
 
-## Amendement, Dépréciations API legacy (4.3)
+## Amendement : Dépréciations API legacy (4.3)
 
 **Ticket** : `AUTH-SESSION-LEGACY-DEPRECATION-001`
 **Date** : 2026-05-16
@@ -168,7 +168,7 @@ aux tickets 4.4 (`STARTER-AUTH-MODERNIZE-001`) et suivants.
 
 ---
 
-## Amendement, Pont de compatibilité bidirectionnel (4.2b)
+## Amendement : Pont de compatibilité bidirectionnel (4.2b)
 
 **Ticket** : `AUTH-SESSION-COMPATIBILITY-BRIDGE-001`
 **Date** : 2026-05-16

@@ -1,4 +1,4 @@
-# Convention d'inspection, classes HTTP publiques
+# Convention d'inspection : classes HTTP publiques
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -38,7 +38,7 @@ Une classe API publique inspectable expose :
 
 ---
 
-## 2. Champs sensibles, règles de masquage
+## 2. Champs sensibles : règles de masquage
 
 Les valeurs marquées sensibles sont remplacées par la chaîne littérale
 `"[masked]"` dans `.data`. Le contrôle est volontairement large :
@@ -67,7 +67,7 @@ de session).
 
 ---
 
-## 3. `Request`, référence
+## 3. `Request` : référence
 
 ```python
 request.method          # str — "GET", "POST", …
@@ -120,7 +120,7 @@ suffisant pour que Pylance/VS Code fournisse l'autocomplétion sur
 `request.` (query, form, json, file, route, header, data) sans
 import manuel.
 
-### `Response.text` vs `BaseController.render`, quand utiliser quoi
+### `Response.text` vs `BaseController.render` : quand utiliser quoi
 
 `Response.text(...)` retourne du texte brut. `BaseController.render(...)`
 rend une **vue template** existante située dans `mvc/views/`. Confondre
@@ -171,7 +171,7 @@ Le contenu binaire des fichiers uploadés n'est jamais inclus, seuls
 
 ---
 
-## 4. `Response`, référence
+## 4. `Response` : référence
 
 ```python
 response.status        # int

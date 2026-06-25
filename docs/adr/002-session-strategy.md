@@ -1,6 +1,6 @@
-# ADR-002, Stratégie de session Forge 1.x
+# ADR-002 : Stratégie de session Forge 1.x
 
-!!! warning "ADR historique, Forge 1.x"
+!!! warning "ADR historique : Forge 1.x"
 
     Cet ADR documente la stratégie de session telle qu'elle a été décidée
     pour Forge 1.x. Son contenu est conservé pour trace décisionnelle et n'est

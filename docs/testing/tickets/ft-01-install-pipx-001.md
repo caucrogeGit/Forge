@@ -1,4 +1,4 @@
-# FT-01-INSTALL-PIPX-001, Installer Forge via pipx
+# FT-01-INSTALL-PIPX-001 : Installer Forge via pipx
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -80,7 +80,7 @@ docs/getting-started.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues et si elles étaient suffisantes.
 
-### Verrou, documentation erronée
+### Verrou : documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 

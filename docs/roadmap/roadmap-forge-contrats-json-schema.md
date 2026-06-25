@@ -1,4 +1,4 @@
-# Roadmap Forge, Contrats canoniques JSON Schema
+# Roadmap Forge : Contrats canoniques JSON Schema
 
 > Roadmap autonome à ouvrir après la Phase 12 de consolidation Forge.
 >
@@ -312,9 +312,9 @@ Le couple est unique, mais la clé primaire reste id.
 
 ---
 
-# Bloc 1, Socle des schémas JSON
+# Bloc 1 : Socle des schémas JSON
 
-## ENTITY-CONTRACT-001, Créer `schemas/common.schema.json`, **livré**
+## ENTITY-CONTRACT-001 : Créer `schemas/common.schema.json` : **livré**
 
 ### Objectif
 
@@ -349,7 +349,7 @@ git diff --check
 
 ---
 
-## ENTITY-CONTRACT-002, Créer `schemas/field.schema.json`, **livré**
+## ENTITY-CONTRACT-002 : Créer `schemas/field.schema.json` : **livré**
 
 ### Objectif
 
@@ -391,7 +391,7 @@ json
 
 ---
 
-## ENTITY-CONTRACT-003, Créer `schemas/entity.schema.json`, **livré**
+## ENTITY-CONTRACT-003 : Créer `schemas/entity.schema.json` : **livré**
 
 ### Objectif
 
@@ -438,7 +438,7 @@ mvc/entities/*.json
 
 ---
 
-## ENTITY-CONTRACT-004, Créer `schemas/pivot.schema.json`, **livré**
+## ENTITY-CONTRACT-004 : Créer `schemas/pivot.schema.json` : **livré**
 
 ### Objectif
 
@@ -475,7 +475,7 @@ Créer le contrat des tables pivot `many_to_many`.
 
 ---
 
-## ENTITY-CONTRACT-005, Créer `schemas/relations.schema.json`, **livré**
+## ENTITY-CONTRACT-005 : Créer `schemas/relations.schema.json` : **livré**
 
 ### Objectif
 
@@ -537,7 +537,7 @@ many_to_many
 
 ---
 
-## ENTITY-CONTRACT-006, Créer `schemas/forge.schema.index.json`, **livré**
+## ENTITY-CONTRACT-006 : Créer `schemas/forge.schema.index.json` : **livré**
 
 ### Objectif
 
@@ -569,9 +569,9 @@ Ce registre pourra être utilisé par :
 
 ---
 
-# Bloc 2, Validation Forge
+# Bloc 2 : Validation Forge
 
-## ENTITY-CONTRACT-007, Ajouter `forge entity:validate`, **livré**
+## ENTITY-CONTRACT-007 : Ajouter `forge entity:validate` : **livré**
 
 > Dépendance `jsonschema` officialisée dans `pyproject.toml` par ENTITY-CONTRACT-007-FIX-DEPENDENCY.
 
@@ -624,7 +624,7 @@ Supprimez ce champ. Forge génère automatiquement l’identifiant technique.
 
 ---
 
-## ENTITY-CONTRACT-008, Ajouter la validation sémantique Python ✓ livré
+## ENTITY-CONTRACT-008 : Ajouter la validation sémantique Python ✓ livré
 
 ### Objectif
 
@@ -652,7 +652,7 @@ Intégré dans `forge entity:validate` (Passe 2 après JSON Schema).
 
 ---
 
-## ENTITY-CONTRACT-009, Ajouter des codes d’erreur stables ✓ livré
+## ENTITY-CONTRACT-009 : Ajouter des codes d’erreur stables ✓ livré
 
 ### Objectif
 
@@ -699,7 +699,7 @@ Sortie humaine affiche `Code :` pour toutes les erreurs (JSON Schema + sémantiq
 
 ---
 
-## ENTITY-CONTRACT-010, Ajouter `forge entity:validate --json` ✓ livré
+## ENTITY-CONTRACT-010 : Ajouter `forge entity:validate --json` ✓ livré
 
 ### Objectif
 
@@ -743,9 +743,9 @@ Phases : `json`, `schema`, `semantic`, `runtime`.
 
 ---
 
-# Bloc 3, Branchement dans les générateurs
+# Bloc 3 : Branchement dans les générateurs
 
-## ENTITY-CONTRACT-011, Brancher la validation dans `forge build:model` ✓ CLÔTURÉ (011A–011G livrés)
+## ENTITY-CONTRACT-011 : Brancher la validation dans `forge build:model` ✓ CLÔTURÉ (011A–011G livrés)
 
 > **Note de structure** : ENTITY-CONTRACT-011 est le ticket parent.
 > Il a été découpé en sous-tickets 011A–011G pour lever les préconditions une par une.
@@ -806,7 +806,7 @@ Un ticket de migration doit précéder ENTITY-CONTRACT-011. Plan détaillé dans
 
 ---
 
-## ENTITY-CONTRACT-011A, Audit migration build:model vers format canonique ✓ livré
+## ENTITY-CONTRACT-011A : Audit migration build:model vers format canonique ✓ livré
 
 ### Objectif
 
@@ -824,7 +824,7 @@ stratégie recommandée (normaliseur canonique→legacy), 6 tickets proposés.
 
 ---
 
-## ENTITY-CONTRACT-011B, Créer normalize_canonical_to_legacy() ✓ livré
+## ENTITY-CONTRACT-011B : Créer normalize_canonical_to_legacy() ✓ livré
 
 ### Objectif
 
@@ -847,7 +847,7 @@ Créer un traducteur interne `canonical → legacy_normalized` permettant à
 
 ---
 
-## ENTITY-CONTRACT-011C, Adapter build:model pour le format canonique ✓ livré
+## ENTITY-CONTRACT-011C : Adapter build:model pour le format canonique ✓ livré
 
 ### Objectif
 
@@ -866,7 +866,7 @@ Détection automatique du format (`schema_version` vs `format_version`) dans
 
 ---
 
-## ENTITY-CONTRACT-011D, Migrer tests/test_entity_model_cli.py ✓ livré
+## ENTITY-CONTRACT-011D : Migrer tests/test_entity_model_cli.py ✓ livré
 
 ### Objectif
 
@@ -889,7 +889,7 @@ end-to-end avec le nouveau format via le normaliseur.
 
 ---
 
-## ENTITY-CONTRACT-011E, Migrer mvc/entities/media/media.json ✓ livré
+## ENTITY-CONTRACT-011E : Migrer mvc/entities/media/media.json ✓ livré
 
 ### Objectif
 
@@ -914,7 +914,7 @@ le format canonique `schema_version: "1.0"`.
 
 ---
 
-## ENTITY-CONTRACT-011F, Migrer mvc/entities/relations.json ✓ livré
+## ENTITY-CONTRACT-011F : Migrer mvc/entities/relations.json ✓ livré
 
 ### Objectif
 
@@ -935,7 +935,7 @@ Convertir `mvc/entities/relations.json` (vide, `format_version: 1`) vers
 
 ---
 
-## ENTITY-CONTRACT-011G, Brancher entity:validate dans build:model (reprise de 011) ✓ livré
+## ENTITY-CONTRACT-011G : Brancher entity:validate dans build:model (reprise de 011) ✓ livré
 
 ### Objectif
 
@@ -968,7 +968,7 @@ Conseil : lancez forge entity:validate pour obtenir le détail.
 
 ---
 
-## ENTITY-CONTRACT-012, Brancher la validation dans `forge make:crud` ✓ livré
+## ENTITY-CONTRACT-012 : Brancher la validation dans `forge make:crud` ✓ livré
 
 ### Objectif
 
@@ -1015,7 +1015,7 @@ forge.py → command == "make:crud" → cmd_make_crud_main()
 
 ---
 
-## ENTITY-CONTRACT-013, Brancher la validation dans les migrations ✓ livré
+## ENTITY-CONTRACT-013 : Brancher la validation dans les migrations ✓ livré
 
 ### Objectif
 
@@ -1060,7 +1060,7 @@ Aucune migration générée depuis un contrat invalide.
 
 ---
 
-## ENTITY-CONTRACT-014, Adapter les générateurs d’entités ✓ livré
+## ENTITY-CONTRACT-014 : Adapter les générateurs d’entités ✓ livré
 
 ### Objectif
 
@@ -1079,9 +1079,9 @@ Les entités générées doivent contenir :
 
 ---
 
-# Bloc 4, Relations et pivots
+# Bloc 4 : Relations et pivots
 
-## ENTITY-CONTRACT-015, Verrouiller la génération `many_to_one` ✓ livré après correctif 015-FIX
+## ENTITY-CONTRACT-015 : Verrouiller la génération `many_to_one` ✓ livré après correctif 015-FIX
 
 ### Objectif
 
@@ -1098,7 +1098,7 @@ Garantir que `many_to_one` génère une FK claire et valide.
 
 ---
 
-## ENTITY-CONTRACT-015-FIX, Suppression du skip silencieux des relations canoniques ✓ livré
+## ENTITY-CONTRACT-015-FIX : Suppression du skip silencieux des relations canoniques ✓ livré
 
 ### Objectif
 
@@ -1129,7 +1129,7 @@ empêchant la génération SQL FK.
 
 ---
 
-## ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O, `make:crud` compatible avec `many_to_one` canonique sans FK déclarée ✓ livré
+## ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O : `make:crud` compatible avec `many_to_one` canonique sans FK déclarée ✓ livré
 
 ### Objectif
 
@@ -1157,7 +1157,7 @@ métier dans l'entité source.
 
 ---
 
-## ENTITY-CONTRACT-016, Générer les relations `many_to_many` canoniques ✓ livré
+## ENTITY-CONTRACT-016 : Générer les relations `many_to_many` canoniques ✓ livré
 
 ### Objectif
 
@@ -1191,7 +1191,7 @@ le SQL correspondant.
 
 ---
 
-## ENTITY-CONTRACT-017, Attributs de pivot contrôlés ✓ livré
+## ENTITY-CONTRACT-017 : Attributs de pivot contrôlés ✓ livré
 
 ### Objectif
 
@@ -1227,7 +1227,7 @@ protection des clés techniques.
 
 ---
 
-## ENTITY-CONTRACT-018, Tests d'intégration des pivots many_to_many ✓ livré
+## ENTITY-CONTRACT-018 : Tests d'intégration des pivots many_to_many ✓ livré
 
 ### Objectif
 
@@ -1256,9 +1256,9 @@ Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
 
 ---
 
-# Bloc 5, Documentation officielle des contrats JSON
+# Bloc 5 : Documentation officielle des contrats JSON
 
-## ENTITY-CONTRACT-DOC-001, Documenter le rôle du JSON canonique
+## ENTITY-CONTRACT-DOC-001 : Documenter le rôle du JSON canonique
 
 **Statut : LIVRÉ**
 
@@ -1293,7 +1293,7 @@ docs/entities/json-canonique.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-002, Documenter `entity.schema.json`
+## ENTITY-CONTRACT-DOC-002 : Documenter `entity.schema.json`
 
 **Statut : LIVRÉ**
 
@@ -1328,7 +1328,7 @@ docs/entities/entity-schema.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-003, Documenter `relations.schema.json`
+## ENTITY-CONTRACT-DOC-003 : Documenter `relations.schema.json`
 
 **Statut : LIVRÉ**
 
@@ -1364,7 +1364,7 @@ docs/entities/relations-schema.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-004, Documenter les tables pivot many-to-many
+## ENTITY-CONTRACT-DOC-004 : Documenter les tables pivot many-to-many
 
 **Statut : LIVRÉ**
 
@@ -1404,7 +1404,7 @@ L'exemple SQL de la spec proposait `BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY`,
 
 ---
 
-## ENTITY-CONTRACT-DOC-005, Documenter le mapping types Forge → MariaDB
+## ENTITY-CONTRACT-DOC-005 : Documenter le mapping types Forge → MariaDB
 
 **Statut : LIVRÉ**
 
@@ -1456,7 +1456,7 @@ docs/entities/types-forge-mariadb.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-006, Documenter `forge entity:validate`
+## ENTITY-CONTRACT-DOC-006 : Documenter `forge entity:validate`
 
 **Statut : LIVRÉ**
 
@@ -1492,7 +1492,7 @@ docs/entities/entity-validate.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-007, Documenter l’autocomplétion VS Code ✓ livré
+## ENTITY-CONTRACT-DOC-007 : Documenter l’autocomplétion VS Code ✓ livré
 
 ### Objectif
 
@@ -1519,7 +1519,7 @@ docs/entities/vscode-json-schema.md
 
 ---
 
-## ENTITY-CONTRACT-DOC-008, Documenter les limites assumées ✓ livré
+## ENTITY-CONTRACT-DOC-008 : Documenter les limites assumées ✓ livré
 
 ### Objectif
 
@@ -1557,9 +1557,9 @@ Cette roadmap ne couvre pas (hors périmètre permanent) :
 
 ---
 
-# Bloc 6, Expérience développeur et tests
+# Bloc 6 : Expérience développeur et tests
 
-## ENTITY-CONTRACT-019, Ajouter les fixtures canoniques ✓ livré
+## ENTITY-CONTRACT-019 : Ajouter les fixtures canoniques ✓ livré
 
 ### Objectif
 
@@ -1585,7 +1585,7 @@ Note : `user/user.json` existe comme vestige neutre (`{}`), non utilisé par les
 
 ---
 
-## ENTITY-CONTRACT-020, Vérifier les exemples documentaires ✓ livré
+## ENTITY-CONTRACT-020 : Vérifier les exemples documentaires ✓ livré
 
 ### Objectif
 
@@ -1614,7 +1614,7 @@ Tout exemple JSON important présent dans la documentation doit exister comme fi
 
 ---
 
-## ENTITY-CONTRACT-021, Ajouter `forge schema:list` ✓ livré
+## ENTITY-CONTRACT-021 : Ajouter `forge schema:list` ✓ livré
 
 ### Objectif
 
@@ -1654,7 +1654,7 @@ Total : 5 schéma(s)
 
 ---
 
-## ENTITY-CONTRACT-022, Ajouter `forge schema:doctor`
+## ENTITY-CONTRACT-022 : Ajouter `forge schema:doctor`
 
 **Statut : livré**
 
@@ -1710,9 +1710,9 @@ Résultat : OK — 5 schéma(s), 0 erreur.
 
 ---
 
-# Bloc 7, Clôture
+# Bloc 7 : Clôture
 
-## ENTITY-CONTRACT-023, Clôturer la roadmap Contrats JSON Schema
+## ENTITY-CONTRACT-023 : Clôturer la roadmap Contrats JSON Schema
 
 **Statut : livré**
 

@@ -1,4 +1,4 @@
-# Sessions, Store de session Forge
+# Sessions : Store de session Forge
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 

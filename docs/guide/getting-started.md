@@ -7,7 +7,7 @@ Deux étapes : installer Forge, puis créer un premier projet.
 
 ---
 
-## Étape 1, Installer Forge
+## Étape 1 : Installer Forge
 
 Choisissez le chemin adapté à votre contexte :
 
@@ -32,7 +32,7 @@ python forge.py --version    # script direct (développement)
 
 ---
 
-## Étape 2, Créer un premier projet
+## Étape 2 : Créer un premier projet
 
 Une fois Forge disponible dans votre environnement :
 
@@ -92,7 +92,7 @@ alternatives `Response.text(...)` / `Response.debug(...)`. En
 
 ---
 
-## Étape 3, Continuer
+## Étape 3 : Continuer
 
 Pour la liste complète des commandes disponibles : [Référence CLI](../reference/cli-commands.md).
 

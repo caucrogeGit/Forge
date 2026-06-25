@@ -300,12 +300,12 @@ opérationnel, retirez-le temporairement lors d'une migration de domaine.
 
 Forge sert le dossier `static/` par défaut. En production, deux stratégies :
 
-### Stratégie A, Forge sert `static/`
+### Stratégie A : Forge sert `static/`
 
 Aucune configuration supplémentaire. Nginx relaie toutes les requêtes vers Forge.
 Convient aux projets à faible trafic.
 
-### Stratégie B, Nginx sert `static/` directement
+### Stratégie B : Nginx sert `static/` directement
 
 ```nginx
 location /static/ {

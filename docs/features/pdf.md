@@ -25,7 +25,7 @@ Produire un PDF de la documentation Forge à partir des fichiers Markdown exista
 
 ---
 
-## Prérequis, Quarkdown
+## Prérequis : Quarkdown
 
 Quarkdown est un système de typesetting moderne basé sur Markdown. Il requiert **Java 17+**.
 
@@ -103,7 +103,7 @@ Les commentaires Quarkdown utilisent la syntaxe `{{ texte commenté }}`.
 
 ---
 
-## PDF applicatif, prévu
+## PDF applicatif : prévu
 
 La génération de PDF depuis une application Forge (factures, fiches, rapports) est prévue, indépendamment de cette fonctionnalité :
 

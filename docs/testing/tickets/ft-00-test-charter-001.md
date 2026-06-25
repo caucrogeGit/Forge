@@ -1,4 +1,4 @@
-# FT-00-TEST-CHARTER-001, Lire et comprendre la charte de campagne
+# FT-00-TEST-CHARTER-001 : Lire et comprendre la charte de campagne
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -73,7 +73,7 @@ docs/testing/field-test-feedback-template.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues.
 
-### Verrou, documentation erronée
+### Verrou : documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 

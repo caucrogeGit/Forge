@@ -1,4 +1,4 @@
-# ADR-017, Type `slug` et module URL-slug canonique
+# ADR-017 : Type `slug` et module URL-slug canonique
 
 ## Statut
 
@@ -38,7 +38,7 @@ de duplication (charte §11) si on ajoute naïvement une 4ᵉ fonction.
 
 ## Décision
 
-### D1, Deux concepts distincts, nommés clairement
+### D1 : Deux concepts distincts, nommés clairement
 
 - **URL slug** (kebab-case `-`, pour les URLs publiques) → **un seul module
   canonique `core/http/slug.py`**.
@@ -46,7 +46,7 @@ de duplication (charte §11) si on ajoute naïvement une 4ᵉ fonction.
   `slugify_migration_name`, **séparé**. Ce **n'est pas** une URL slug ; un
   commentaire le précise pour éviter toute fusion future.
 
-### D2, Module canonique `core/http/slug.py` (runtime, stdlib seul)
+### D2 : Module canonique `core/http/slug.py` (runtime, stdlib seul)
 
 Deux fonctions publiques, **dépendances stdlib uniquement** (`unicodedata`,
 `re`), respect du runtime minimal (charte) :
@@ -68,7 +68,7 @@ Le runtime (contrôleurs/modèles générés) et le CLI (codegen) importent ce m
 module. `cli/public_page._slugify` est **remplacé** par `core.http.slug`
 (§11 : une seule implémentation URL-slug).
 
-### D3, Le type `slug` dans le contrat d'entité
+### D3 : Le type `slug` dans le contrat d'entité
 
 `slug` est un type de champ de **premier rang** du contrat d'entité JSON
 (au même titre que `string`, `email`…), validé par le contrat (ADR-013) :
@@ -80,14 +80,14 @@ module. `cli/public_page._slugify` est **remplacé** par `core.http.slug`
 Sémantique : identifiant URL-safe d'une ressource. La génération SQL produit
 `VARCHAR(180)` + contrainte `UNIQUE` visible (charte « SQL visible »).
 
-### D4, Unicité : rejet des doublons (pas de suffixe auto en b13)
+### D4 : Unicité : rejet des doublons (pas de suffixe auto en b13)
 
 Le CRUD généré refuse un slug en doublon avec une **erreur claire**. Le
 suffixe automatique (`mon-article-2`) introduit une complexité de
 concurrence (race sur insert) non justifiée en dernière beta → **reporté
 après 1.0**.
 
-### D5, Périmètre b13
+### D5 : Périmètre b13
 
 Inclus : module canonique, validation, type d'entité, génération SQL/CRUD,
 routing public par slug (`SLUG-ROUTING-001`).

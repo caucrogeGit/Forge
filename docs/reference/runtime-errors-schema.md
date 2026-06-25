@@ -253,7 +253,7 @@ except RuntimeError as exc:
 
 ---
 
-## Collecteur, core/errors/runtime_error_logger.py
+## Collecteur : core/errors/runtime_error_logger.py
 
 Le collecteur est dans `core/errors/runtime_error_logger.py`. Il est branché sur `core/app/application.py`.
 
@@ -282,7 +282,7 @@ except RuntimeError as exc:
 
 ---
 
-## Rendu Markdown, core/errors/runtime_error_markdown.py
+## Rendu Markdown : core/errors/runtime_error_markdown.py
 
 Le rendu Markdown est dans `core/errors/runtime_error_markdown.py`. Il est déclenché automatiquement après chaque écriture JSONL.
 

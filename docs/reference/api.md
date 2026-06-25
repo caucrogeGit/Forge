@@ -212,7 +212,7 @@ Avec détails de validation :
 | Erreur de validation | 422 |
 | Erreur serveur | 500 |
 
-### Exemple, HTML
+### Exemple : HTML
 
 ```python
 from core.http.helpers import html
@@ -221,7 +221,7 @@ def dashboard(request):
     return html("dashboard/index.html", context={"title": "Tableau de bord"})
 ```
 
-### Exemple, JSON simple
+### Exemple : JSON simple
 
 ```python
 from core.http import json_response
@@ -230,7 +230,7 @@ def status(request):
     return json_response({"status": "ok", "service": "forge"})
 ```
 
-### Exemple, JSON structuré
+### Exemple : JSON structuré
 
 ```python
 from core.http import api_success, api_error
@@ -718,7 +718,7 @@ if form.is_valid():
 
 `DecimalField` retourne un `Decimal`. Les CRUD générés gardent la doctrine Forge actuelle : les champs JSON de type Python `float` restent convertis en `float`.
 
-### Champs de formulaire avancés, notes d'usage
+### Champs de formulaire avancés : notes d'usage
 
 - **`FileField` / `ImageField`**, valident uniquement les métadonnées (extension, taille, MIME). Ils ne sauvegardent rien et ne créent aucune entrée en base. La persistance est assurée par `save_upload` + `attach_media_to_entity` appelés depuis le contrôleur généré par `make:crud`.
 - **`RelationField`**, hérite de `ChoiceField`. Ne fait aucune requête SQL ; la liste de choix est fournie par le contrôleur ou le formulaire via `options`.
@@ -768,7 +768,7 @@ module devait être supprimé à terme.
 | `set_flash` | `set_flash(request, message, level="success")` | `core.security.session.set_flash`, `get_session_id` |
 | `csrf_token` | `csrf_token(request)` | `core.security.session.get_session_id`, `get_session` |
 
-### Méthode legacy, à ne pas utiliser
+### Méthode legacy : à ne pas utiliser
 
 | Méthode | Signature | Statut |
 |---|---|---|
@@ -946,7 +946,7 @@ Tout accès SQL applicatif passe par `core.database.db`. Ces quatre fonctions co
 
 Sans transaction explicite, chaque helper gère connexion, commit et rollback automatiquement.
 
-### Cas avancés, connexion directe
+### Cas avancés : connexion directe
 
 Pour les transactions multi-statement ou les opérations en bulk, utiliser `core.database.transaction` :
 
@@ -1182,7 +1182,7 @@ L'interface officielle est la commande `forge`.
 | `forge project:audit` | Produit un rapport d'audit détaillé non destructif (structure, config, entités, routes, templates, modules, migrations, docs, tests). |
 | `forge help` | Affiche l'aide. |
 
-### forge project:check, vérification structurelle
+### forge project:check : vérification structurelle
 
 `forge project:check` vérifie qu'un projet Forge respecte les conventions contractuelles de Forge 1.x. Elle est plus stricte que `forge doctor` et peut être utilisée avant un commit, avant une release locale ou dans une CI.
 
@@ -1213,7 +1213,7 @@ L'interface officielle est la commande `forge`.
 
 Code de sortie : `0` si aucun FAIL, `1` si au moins un FAIL. Les WARN n'influencent pas le code de sortie.
 
-### forge project:audit, rapport d'audit détaillé
+### forge project:audit : rapport d'audit détaillé
 
 `forge project:audit` produit un rapport d'audit complet d'un projet Forge. Contrairement à `project:check` (strict, CI-ready), `project:audit` est informatif et distingue les problèmes bloquants, les avertissements et les observations neutres (INFO).
 
@@ -1245,7 +1245,7 @@ Code de sortie : `0` si aucun FAIL (même avec des WARN ou INFO), `1` si au moin
 
 `forge project:audit` ne modifie aucun fichier. Il ne corrige rien automatiquement.
 
-### forge doctor, détails
+### forge doctor : détails
 
 `forge doctor` est une commande de lecture seule. Elle ne modifie aucun fichier.
 
@@ -1758,7 +1758,7 @@ ORDER BY Id DESC
 LIMIT ? OFFSET ?
 ```
 
-### Intégration HTMX CRUD, vue d'ensemble
+### Intégration HTMX CRUD : vue d'ensemble
 
 HTMX est une **amélioration progressive** dans les CRUD générés par Forge. Chaque action reste utilisable sans HTMX ; la bibliothèque améliore seulement l'expérience en remplaçant partiellement la page.
 

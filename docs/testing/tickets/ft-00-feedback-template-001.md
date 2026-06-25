@@ -1,4 +1,4 @@
-# FT-00-FEEDBACK-TEMPLATE-001, Remplir un retour d'expérience de test à blanc
+# FT-00-FEEDBACK-TEMPLATE-001 : Remplir un retour d'expérience de test à blanc
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -77,7 +77,7 @@ docs/testing/field-test-charter.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues.
 
-### Verrou, documentation erronée
+### Verrou : documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 

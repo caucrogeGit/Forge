@@ -1,4 +1,4 @@
-# ADR-035, Modèle pédagogique unique : parcours réalisés à la main, retrait de la génération
+# ADR-035 : Modèle pédagogique unique : parcours réalisés à la main, retrait de la génération
 
 ## Statut
 

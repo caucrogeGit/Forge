@@ -1,4 +1,4 @@
-# ADR-022, Extraction de l'email vers `forge-mvc-mail`
+# ADR-022 : Extraction de l'email vers `forge-mvc-mail`
 
 ## Statut
 

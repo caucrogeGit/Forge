@@ -1,4 +1,4 @@
-# Modèle de starter Forge, la référence « welcome »
+# Modèle de starter Forge : la référence « welcome »
 
 > **Document de référence.** Le starter **Bonjour Forge** (la progression
 > `welcome-forge`) est le **modèle canonique** de tout travail sur les starters
@@ -87,7 +87,7 @@ elle est archivée sous `docs/starters/old/` et retirée du registry.
 
 ---
 
-## 1. Principe directeur, un palier = une responsabilité
+## 1. Principe directeur : un palier = une responsabilité
 
 Chaque palier introduit **une seule notion nouvelle**. Aucune notion qui
 appartient à un palier ultérieur ne doit apparaître avant.
@@ -198,7 +198,7 @@ Ouvrez `https://localhost:8000/<route>` → <résultat attendu>.
 
 ---
 
-## 3. Navigation par niveau, palier → bilan du niveau → suite
+## 3. Navigation par niveau : palier → bilan du niveau → suite
 
 La progression est rythmée par niveau. Le chaînage **canonique** (modèle
 `welcome-forge`) est :
@@ -377,7 +377,7 @@ est un guide, pas un contrat verrouillé par test.
 
 ---
 
-## 7. Checklist, créer un nouveau palier / starter
+## 7. Checklist : créer un nouveau palier / starter
 
 1. **Responsabilité unique** : une seule notion nouvelle ; vérifier qu'aucune
    API d'un palier ultérieur n'est utilisée.

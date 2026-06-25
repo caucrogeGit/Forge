@@ -1,4 +1,4 @@
-# ADR-047, Couche de guidance agent IA dans les applications Forge
+# ADR-047 : Couche de guidance agent IA dans les applications Forge
 
 ## Statut
 

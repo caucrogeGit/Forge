@@ -1,4 +1,4 @@
-# ADR-015, Handshake TLS par thread client pour le serveur de développement
+# ADR-015 : Handshake TLS par thread client pour le serveur de développement
 
 ## Statut
 
@@ -120,7 +120,7 @@ TCP accept()                       (thread principal — non bloquant)
 
 ## Alternatives écartées
 
-### A, Continuer à wrapper le socket d'écoute
+### A : Continuer à wrapper le socket d'écoute
 
 Maintenir `server.socket = ssl_ctx.wrap_socket(server.socket, ...)`.
 
@@ -128,7 +128,7 @@ Rejeté : c'est exactement le code qui produit le blocage. Tout client TLS
 qui ne complète pas son handshake fige toute la boucle d'acceptation. La
 preuve a été reproduite et documentée.
 
-### B, Surcharger uniquement `get_request()` pour wrapper là
+### B : Surcharger uniquement `get_request()` pour wrapper là
 
 Surcharger `BaseServer.get_request()` pour appeler `wrap_socket()` après
 `accept()`.
@@ -138,7 +138,7 @@ principal, exactement comme `accept()`. Le handshake TLS y est aussi
 bloquant. Cette approche avait été proposée dans un ticket antérieur, c'est
 une fausse piste.
 
-### C, Supprimer TLS du serveur de développement
+### C : Supprimer TLS du serveur de développement
 
 Désactiver le mode HTTPS de `app.py`, imposer HTTP en dev.
 
@@ -147,7 +147,7 @@ navigateur, notamment les cookies `Secure`, le contenu mixte HTTPS/HTTP, et
 les en-têtes HSTS. Supprimer ce mode appauvrirait la pédagogie sans
 contrepartie.
 
-### D, Imposer un reverse proxy même en développement
+### D : Imposer un reverse proxy même en développement
 
 Documenter l'usage obligatoire d'un Nginx/Caddy local pour terminer TLS,
 même en dev.
@@ -156,7 +156,7 @@ Rejeté : trop lourd pour un usage pédagogique et quotidien. Forge vise un
 démarrage en quelques minutes (`python app.py`). Imposer un reverse proxy
 en plus contredirait cet objectif.
 
-### E, Utiliser `ThreadingHTTPSServer` (Python 3.14+)
+### E : Utiliser `ThreadingHTTPSServer` (Python 3.14+)
 
 `http.server.ThreadingHTTPSServer` a été ajouté en Python 3.14 et résout
 nativement ce problème.

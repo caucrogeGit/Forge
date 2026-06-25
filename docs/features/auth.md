@@ -664,7 +664,7 @@ CREATE TABLE IF NOT EXISTS auth_audit_log (
 
 Forge ne branche pas automatiquement l'audit dans login/reset/MFA/OIDC/admin.
 
-### Architecture audit, trois briques distinctes
+### Architecture audit : trois briques distinctes
 
 Forge fournit trois briques indépendantes, sans les assembler automatiquement.
 La décision de persistance appartient à l'application (ADR-008).

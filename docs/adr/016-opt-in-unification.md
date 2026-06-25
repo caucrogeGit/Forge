@@ -1,4 +1,4 @@
-# ADR-016, Unification du modèle opt-in : concept unique, cycle install/enable à 4 verbes
+# ADR-016 : Unification du modèle opt-in : concept unique, cycle install/enable à 4 verbes
 
 ## Statut
 
@@ -70,7 +70,7 @@ fenêtre idéale pour unifier sans dette de compatibilité.
 
 ## Décision
 
-### D1, « opt-in » est le concept unique
+### D1 : « opt-in » est le concept unique
 
 « opt-in » devient le **seul** terme désignant une brique optionnelle. Le mot
 « module officiel » est retiré de la documentation, des ADR et des messages
@@ -81,7 +81,7 @@ Le mot « module » reste disponible pour le seul système **local** (code que l
 développeur écrit lui-même), désormais traité comme un opt-in de **source
 locale**, sans recouvrement avec les briques officielles.
 
-### D2, Deux axes orthogonaux, quatre verbes
+### D2 : Deux axes orthogonaux, quatre verbes
 
 Le cycle de vie d'un opt-in se décompose en deux axes indépendants :
 
@@ -103,14 +103,14 @@ Le cycle de vie d'un opt-in se décompose en deux axes indépendants :
 | `forge opt-in:remove <x>` | présence − | `pip uninstall` / `pipx uninject` | suppression de `optins/<x>/` (gardée, voir D6) |
 | `forge opt-in:list` | lecture | source + état (`absent` / `installé` / `activé`) | idem |
 
-### D3, Garanties par construction
+### D3 : Garanties par construction
 
 - `install` **n'active jamais** automatiquement (§3 « refuser la magie
   cachée » garanti par le découpage) ;
 - `disable` **ne désinstalle jamais** (débranchement réversible sans perte de
   code).
 
-### D4, Emplacement unique des opt-ins activés
+### D4 : Emplacement unique des opt-ins activés
 
 Tout opt-in activé vit sous `optins/<name>/`, quelle que soit sa source. Le
 dossier contient deux natures de fichiers selon la source :
@@ -118,7 +118,7 @@ dossier contient deux natures de fichiers selon la source :
 - officiel → câblage mince **généré** (régénérable, write-if-new) ;
 - local → **code utilisateur** (protégé §9, hook `forge-write-if-new.sh`).
 
-### D5, Fusion des moteurs et rupture CLI
+### D5 : Fusion des moteurs et rupture CLI
 
 Les deux moteurs `module:*` et `optin:*` fusionnent en une seule famille
 `opt-in:*`. Les anciennes commandes (`module:install`, `module:remove`,
@@ -127,7 +127,7 @@ Les deux moteurs `module:*` et `optin:*` fusionnent en une seule famille
 retrait par marqueurs existant (`module:remove`, `route_ops`) est réutilisé
 pour `opt-in:disable`.
 
-### D6, `remove` sur source locale est une opération gardée
+### D6 : `remove` sur source locale est une opération gardée
 
 `opt-in:remove` sur une source **officielle** se borne à désinstaller le
 package : aucun fichier utilisateur touché. Sur une source **locale**, il
@@ -138,7 +138,7 @@ supprimerait du code écrit par le développeur ; il est donc :
 - **destructif seulement avec `--force`** + confirmation explicite ;
 - aligné sur le hook `forge-write-if-new.sh` (le CLI ne le contourne pas).
 
-### D7, Squelette neutre
+### D7 : Squelette neutre
 
 `mvc/routes.py` livré par défaut ne contient qu'une route :
 
@@ -155,14 +155,14 @@ with router.group("", public=True) as public:
 Auth, MFA et le starter `welcome` ne sont plus pré-câblés : ils s'ajoutent par
 `opt-in:*` (auth/MFA) ou `starter:build` (welcome).
 
-### D8, Adaptateur trois-formes
+### D8 : Adaptateur trois-formes
 
 Derrière l'interface uniforme `opt-in:*`, un adaptateur résout la forme de
 chaque opt-in (monter des routes / greffer des contrôleurs / pure bibliothèque
 / copie de fichiers locaux). **L'uniformité vit au niveau du contrat, pas de
 l'implémentation** ; l'utilisateur ne voit jamais la différence.
 
-### D9, Les starters restent hors périmètre
+### D9 : Les starters restent hors périmètre
 
 Un starter est une **démo pédagogique**, pas une capacité optionnelle. Les
 commandes `starter:*` restent distinctes de `opt-in:*`.
@@ -219,7 +219,7 @@ brouillerait les deux intentions. Écarté (D9).
 
 ## Amendements
 
-### A1, Câblage opt-in : pattern registre, pas marqueurs (palier 3b)
+### A1 : Câblage opt-in : pattern registre, pas marqueurs (palier 3b)
 
 D2/D4 décrivaient `opt-in:enable` comme « injection marqueurs + register_optins ».
 L'implémentation (palier 3b) a révélé que la couche `optins/` existante utilise
@@ -238,7 +238,7 @@ couche `optins/<name>/` et l'appel `register_optins` si plus aucun opt-in actif)
 `opt-in:enable`/`disable` restent limités à `iot` jusqu'à l'adaptateur 3-formes
 (ticket 4), qui généralise le câblage aux six opt-ins.
 
-### A2, Le système `module:*` local reste distinct (ticket 4b)
+### A2 : Le système `module:*` local reste distinct (ticket 4b)
 
 D5 prévoyait de fusionner les moteurs `module:*` et `optin:*`. L'implémentation
 (palier 4b) a révélé que le système de **module local** a un cycle de vie

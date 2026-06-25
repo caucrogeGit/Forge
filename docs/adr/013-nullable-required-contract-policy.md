@@ -1,4 +1,4 @@
-# ADR-013, Politique nullable / required dans les contrats JSON Forge
+# ADR-013 : Politique nullable / required dans les contrats JSON Forge
 
 ## Statut
 

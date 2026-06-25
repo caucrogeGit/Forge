@@ -1,4 +1,4 @@
-# ADR-027, Extraction de l'i18n vers `forge-mvc-i18n`
+# ADR-027 : Extraction de l'i18n vers `forge-mvc-i18n`
 
 ## Statut
 

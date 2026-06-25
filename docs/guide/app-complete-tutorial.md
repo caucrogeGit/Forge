@@ -1,4 +1,4 @@
-# Tutoriel, Application complète avec Forge
+# Tutoriel : Application complète avec Forge
 
 Ce tutoriel guide le développement d'une petite application Forge de bout en bout.
 Il suppose que Forge est déjà installé et que MariaDB est disponible.

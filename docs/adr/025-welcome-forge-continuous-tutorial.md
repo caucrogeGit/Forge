@@ -1,4 +1,4 @@
-# ADR-025, welcome-forge : tutoriel continu manuel au lieu de starters par palier
+# ADR-025 : welcome-forge : tutoriel continu manuel au lieu de starters par palier
 
 ## Statut
 
@@ -100,20 +100,20 @@ contrôleur, son `routes.py.snippet` et son `starter.json`, applicable par
 
 ## Alternatives écartées
 
-### A, Continuité au niveau de la doc seulement, starters conservés
+### A : Continuité au niveau de la doc seulement, starters conservés
 
 Garder les 11 starters indépendants et narrer la continuité par-dessus. Rejeté :
 deux réalités parallèles (starter buildable vs tutoriel manuel), divergence
 doc/starter, contraire au principe 11.
 
-### B, Un seul contrôleur pour les 11 paliers
+### B : Un seul contrôleur pour les 11 paliers
 
 Tout empiler dans `WelcomeController`. Rejeté : aux paliers SQL le contrôleur
 devient un fourre-tout, en tension avec « un palier = une responsabilité »
 (charte §2). La césure 9/2 enseigne en plus « nouveau domaine = nouveau
 contrôleur ».
 
-### C, Renumérotation dense des starters survivants
+### C : Renumérotation dense des starters survivants
 
 Décrémenter le `number` des ~96 starters restants pour conserver `1..N`. Rejeté :
 ~96 éditions et risque sur des tests de contrat figeant un `number` précis, pour

@@ -1,4 +1,4 @@
-# ADR-012, Politique de dépréciation et suppression du format legacy des entités Forge
+# ADR-012 : Politique de dépréciation et suppression du format legacy des entités Forge
 
 ## Statut
 
@@ -37,7 +37,7 @@ de construction du framework.
 
 ---
 
-## Décision (mise à jour, remplace la décision initiale)
+## Décision (mise à jour : remplace la décision initiale)
 
 **Le format canonique `schema_version: "1.0"` est le seul format d'entrée accepté.**
 

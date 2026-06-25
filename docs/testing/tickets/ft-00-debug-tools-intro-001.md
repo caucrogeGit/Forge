@@ -1,4 +1,4 @@
-# FT-00-DEBUG-TOOLS-INTRO-001, Découvrir les outils de diagnostic Forge
+# FT-00-DEBUG-TOOLS-INTRO-001 : Découvrir les outils de diagnostic Forge
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -87,7 +87,7 @@ docs/testing/field-test-charter.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues et si elles permettaient de comprendre quoi lancer selon la situation.
 
-### Verrou, documentation erronée
+### Verrou : documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 

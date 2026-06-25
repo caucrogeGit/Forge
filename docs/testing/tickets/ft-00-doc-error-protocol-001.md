@@ -1,4 +1,4 @@
-# FT-00-DOC-ERROR-PROTOCOL-001, Appliquer la procédure documentation officielle erronée
+# FT-00-DOC-ERROR-PROTOCOL-001 : Appliquer la procédure documentation officielle erronée
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -87,7 +87,7 @@ docs/testing/field-test-triage.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues.
 
-### Verrou, documentation erronée
+### Verrou : documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 

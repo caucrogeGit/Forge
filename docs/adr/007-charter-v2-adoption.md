@@ -1,4 +1,4 @@
-# ADR-007, Adoption formelle de la charte philosophique v2
+# ADR-007 : Adoption formelle de la charte philosophique v2
 
 ## Statut
 

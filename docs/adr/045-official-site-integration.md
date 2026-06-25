@@ -115,12 +115,12 @@ intermédiaire ni dérive possible.
 
 ## Alternatives écartées
 
-### A, Garder le dépôt `Forge-official-site` séparé
+### A : Garder le dépôt `Forge-official-site` séparé
 
 Statu quo. Rejeté : c'est précisément l'intermédiaire (import inter-dépôts +
 dérive + charge manuelle) que cette décision supprime.
 
-### B, Servir le site MkDocs de `forge` directement à la racine
+### B : Servir le site MkDocs de `forge` directement à la racine
 
 Abandonner l'assemblage et le préfixe `/docs/`, servir le `site/` de la build
 `forge` tel quel. Rejeté : casse les URLs publiques existantes (`/docs/forge/…`
@@ -128,7 +128,7 @@ Abandonner l'assemblage et le préfixe `/docs/`, servir le `site/` de la build
 déjà éprouvée. Le rapatriement fidèle (décision 1) préserve l'acquis sans
 rupture.
 
-### C, Publier uniquement via GitHub Pages
+### C : Publier uniquement via GitHub Pages
 
 Abandonner la VM forge-web au profit de GitHub Pages seul. Hors périmètre :
 la VM (domaine, Caddy/Nginx, contrôle d'hébergement) est un choix

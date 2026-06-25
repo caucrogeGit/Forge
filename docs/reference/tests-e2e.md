@@ -69,7 +69,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP
 
 ---
 
-## CSRF, Mécanisme et tests quasi-HTTP
+## CSRF : Mécanisme et tests quasi-HTTP
 
 ### Fonctionnement
 

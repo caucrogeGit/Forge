@@ -1,4 +1,4 @@
-# ADR-024, Bootstrap par squelette dédié et dépendance core via pip
+# ADR-024 : Bootstrap par squelette dédié et dépendance core via pip
 
 ## Statut
 
@@ -133,7 +133,7 @@ une étape réseau normale, inchangée.
 
 ## Alternatives écartées
 
-### A, Élagage post-clone
+### A : Élagage post-clone
 
 Conserver le `git clone` du dépôt, puis supprimer les chemins non désirés et
 réécrire un `mvc/` minimal.
@@ -142,7 +142,7 @@ Rejeté : on clone toujours tout le dépôt (lent, dépend de git/réseau), et l
 liste d'élagage dérive à chaque évolution du dépôt. Ne traite pas la cause
 (règle A) : le projet importerait encore un `core/` local.
 
-### B, Amincir le `mvc/` racine
+### B : Amincir le `mvc/` racine
 
 Rendre le `mvc/` racine du dépôt minimal et déplacer l'app de démo ailleurs.
 
@@ -150,7 +150,7 @@ Rejeté : le `mvc/` racine est l'application de dogfood référencée par la qua
 totalité de la suite de tests. Le déplacer casse ou déplace des centaines de
 tests, pour un bénéfice qu'un squelette distinct obtient sans risque.
 
-### C, Squelette sur une branche dédiée clonée
+### C : Squelette sur une branche dédiée clonée
 
 `forge new` clonerait une branche `skeleton` au lieu du dépôt entier.
 

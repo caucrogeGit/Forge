@@ -1,4 +1,4 @@
-# ADR-044, Le dépôt Forge ne porte que le framework
+# ADR-044 : Le dépôt Forge ne porte que le framework
 
 ## Statut
 
@@ -145,7 +145,7 @@ donc aucune perte visuelle : il suffit de cesser de la régénérer.
 
 ## Alternatives écartées
 
-### A, Suppression pure de l'application (sans fixture)
+### A : Suppression pure de l'application (sans fixture)
 
 Retirer entièrement l'application et ne s'appuyer que sur le squelette.
 
@@ -156,7 +156,7 @@ reconstruire des fixtures équivalentes, soit de perdre une large couverture
 d'intégration. La relocalisation en `tests/fixtures/app/` est préférée : la
 racine n'a plus d'application, et la couverture est préservée.
 
-### B, Extraire l'app dans un dépôt séparé
+### B : Extraire l'app dans un dépôt séparé
 
 Déplacer l'application vers un dépôt distinct (démo/dogfooding).
 
@@ -165,7 +165,7 @@ phase avec le framework, pour un bénéfice nul par rapport à la suppression. L
 squelette suffit comme référence, et un projet de démonstration peut toujours
 être régénéré par `forge new`.
 
-### C, Conserver la landing générée
+### C : Conserver la landing générée
 
 Garder `sync:landing` et la source `mvc/views/landing/`.
 
@@ -173,7 +173,7 @@ Rejeté : impose de conserver un fragment d'application (`mvc/views/`) et un
 `static/` racine uniquement pour la landing, ce qui contredit la décision. La
 sortie étant déjà committée, la rendre canonique est sans perte.
 
-### D, Remplacer la landing par un `docs/index.md` Material
+### D : Remplacer la landing par un `docs/index.md` Material
 
 Supprimer le HTML marketing au profit d'une page d'accueil Markdown standard.
 

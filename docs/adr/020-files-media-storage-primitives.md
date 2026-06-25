@@ -1,4 +1,4 @@
-# ADR-020, Périmètre de `forge-mvc-files` : primitives de stockage média génériques
+# ADR-020 : Périmètre de `forge-mvc-files` : primitives de stockage média génériques
 
 ## Statut
 

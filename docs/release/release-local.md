@@ -212,7 +212,7 @@ projet neuf, palier après palier, en suivant la progression documentée.
 Chaque parcours doit être réalisé dans un **projet séparé** : mélanger les
 entités de plusieurs parcours dans le même projet fausse le test.
 
-### Prérequis, renseigner `env/dev` de chaque projet
+### Prérequis : renseigner `env/dev` de chaque projet
 
 Avant `forge db:init`, les variables suivantes doivent être renseignées dans `env/dev` :
 
@@ -415,7 +415,7 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ---
 
-### Premier pas, Bienvenue dans Forge (sans BDD)
+### Premier pas : Bienvenue dans Forge (sans BDD)
 
 Ce parcours ne nécessite aucune base de données. Il se réalise à la main dans le projet courant, en suivant la progression `welcome-forge`.
 
@@ -475,7 +475,7 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 
 ---
 
-## 7. Récapitulatif, validation réussie
+## 7. Récapitulatif : validation réussie
 
 | Étape | Résultat attendu |
 |---|---|

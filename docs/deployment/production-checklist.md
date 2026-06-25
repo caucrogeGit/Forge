@@ -6,7 +6,7 @@ bas. Ticket : `PRODUCTION-CHECKLIST-DOCS-001`.
 
 ---
 
-## 1. Avant de déployer, vérifications
+## 1. Avant de déployer : vérifications
 
 Lance ces commandes **depuis le projet**, dans l'environnement cible :
 

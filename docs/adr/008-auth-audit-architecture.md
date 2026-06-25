@@ -1,4 +1,4 @@
-# ADR-008, Architecture de l'audit auth
+# ADR-008 : Architecture de l'audit auth
 
 ## Statut
 
@@ -35,7 +35,7 @@ et ce n'est pas un oubli, c'est une décision.
 
 Forge fournit **trois briques distinctes**, sans les assembler automatiquement :
 
-### Brique 1, Contrat d'événement (`core.auth.audit.AuthAuditEvent`)
+### Brique 1 : Contrat d'événement (`core.auth.audit.AuthAuditEvent`)
 
 Structure validée, 20+ types d'événements normalisés. Garantie de format pour
 tout consommateur d'audit, qu'il soit SQL, fichier, ou agrégateur externe.
@@ -53,7 +53,7 @@ user_role.added        user_role.removed      user.not_found
 oidc.account_linked
 ```
 
-### Brique 2, Émission Python (`safe_log_auth_event`, `log_auth_event`)
+### Brique 2 : Émission Python (`safe_log_auth_event`, `log_auth_event`)
 
 Les événements sont émis vers le logger Python `forge.auth.audit`.
 La configuration du handler, et donc du destinataire final, est **applicative**.
@@ -63,7 +63,7 @@ Par défaut, les événements INFO/WARNING remontent au logging Python standard
 
 Forge ne configure aucun handler. L'application choisit où vont les événements.
 
-### Brique 3, Table SQL latente (`auth_audit_log`)
+### Brique 3 : Table SQL latente (`auth_audit_log`)
 
 Le fichier `mvc/models/sql/auth_audit_log.sql` définit un schéma prêt à
 recevoir des audits persistants.
@@ -87,7 +87,7 @@ Ces choix sont **applicatifs**, pas frameworkiques.
 
 ## Comment une application Forge persiste ses audits
 
-### Approche A, Handler Python logging qui insère en base
+### Approche A : Handler Python logging qui insère en base
 
 L'application configure le logger `forge.auth.audit` avec un handler SQL :
 
@@ -120,7 +120,7 @@ logging.getLogger("forge.auth.audit").addHandler(AuditSqlHandler())
 
 `insert_auth_audit` est une fonction de l'application qui fait l'INSERT.
 
-### Approche B, Wrapper applicatif explicite
+### Approche B : Wrapper applicatif explicite
 
 L'application crée son propre `audit_and_persist(event_type, **kwargs)` qui :
 1. Appelle `safe_log_auth_event(...)` (logging Python)
@@ -130,7 +130,7 @@ Les contrôleurs de l'application utilisent ce wrapper à la place de la fonctio
 Forge directement. Avantage : lisibilité, testabilité, pas de couplage via les
 handlers logging.
 
-### Approche C, Stream externe (Loki, Sentry, Kafka)
+### Approche C : Stream externe (Loki, Sentry, Kafka)
 
 Configurer un handler logging qui pousse les événements vers le système externe.
 La table SQL Forge n'est pas utilisée. Convient aux architectures avec un bus

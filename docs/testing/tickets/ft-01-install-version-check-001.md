@@ -1,4 +1,4 @@
-# FT-01-INSTALL-VERSION-CHECK-001, Vérifier la version Forge installée
+# FT-01-INSTALL-VERSION-CHECK-001 : Vérifier la version Forge installée
 
 [Accueil](../../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -80,7 +80,7 @@ docs/release-and-compatibility.md
 
 Le retour testeur devra indiquer quelles pages ont réellement été lues et si elles permettaient de connaître la version attendue.
 
-### Verrou, documentation erronée
+### Verrou : documentation erronée
 
 Si une documentation indiquée dans ce ticket est fausse, incomplète ou contradictoire :
 

@@ -1,4 +1,4 @@
-# ADR-036, Typage statique du cœur, vérifié en CI
+# ADR-036 : Typage statique du cœur, vérifié en CI
 
 ## Statut
 

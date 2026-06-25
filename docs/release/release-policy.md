@@ -114,7 +114,7 @@ la mise à jour, c'est un MAJOR.
 
 Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la liste complète.
 
-### Stable, garantie 1.x
+### Stable : garantie 1.x
 
 - Commandes CLI documentées dans `docs/reference.md`.
 - Structure projet générée par `forge new`.
@@ -123,14 +123,14 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 - Imports publics de `core.http`, `core.auth`, `core.security` (session, CSRF, RBAC).
 - `GET /health` → `200 {"status":"ok"}`.
 
-### Interne, peut changer entre mineurs
+### Interne : peut changer entre mineurs
 
 - Fonctions et modules internes de `cli/`.
 - Fonctions préfixées `_`.
 - Contenu interne des tests Forge.
 - Format interne des sessions côté serveur.
 
-### Expérimental, stable en usage, interface peut évoluer
+### Expérimental : stable en usage, interface peut évoluer
 
 - `forge module:*`, `forge deploy:*`.
 - Backends de session `FileSessionStore`, `MariaDbSessionStore`.

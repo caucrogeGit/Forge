@@ -1,4 +1,4 @@
-# ADR-021, Extraction de pivot advanced vers `forge-mvc-pivot`
+# ADR-021 : Extraction de pivot advanced vers `forge-mvc-pivot`
 
 ## Statut
 

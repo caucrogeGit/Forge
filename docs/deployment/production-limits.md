@@ -175,7 +175,7 @@ explicitement** (cf §4).
 - `wsgi.py` et unit systemd Gunicorn générés par `forge deploy:init`, avec un
   parcours documenté : [Mise en production pas à pas](mise-en-production.md).
 
-### Non garanti, à cadrer côté infrastructure ou tickets futurs
+### Non garanti : à cadrer côté infrastructure ou tickets futurs
 
 - rate-limit distribué (Redis / autre backend) ;
 - session store distribué cloud-native ;

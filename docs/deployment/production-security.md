@@ -1,4 +1,4 @@
-# Sécurité en production, Guide Forge
+# Sécurité en production : Guide Forge
 
 Ce guide rassemble les bonnes pratiques de déploiement sécurisé de Forge.
 Il consolide les résultats des audits de sécurité réalisés lors de la Phase 4.5 :
@@ -9,7 +9,7 @@ Voir aussi : [Déploiement](deployment.md) · [Auth/User](../features/auth.md) �
 
 ---
 
-## 1. Architecture de production, HTTPS obligatoire
+## 1. Architecture de production : HTTPS obligatoire
 
 **En production, Forge doit être exécuté derrière un reverse proxy HTTPS.**
 
@@ -260,7 +260,7 @@ Les compteurs sont **isolés** des compteurs de connexion.
 
 ---
 
-## 6. RBAC, Contrôle d'accès
+## 6. RBAC : Contrôle d'accès
 
 Résultats confirmés par SECURITY-RBAC-AUDIT-001.
 
@@ -309,7 +309,7 @@ def delete(request, post_id):
 {% endif %}
 ```
 
-### Limite connue, boutons CRUD sans guard UI
+### Limite connue : boutons CRUD sans guard UI
 
 Les templates CRUD générés par `make:crud` (table partielle, vue show) affichent
 les boutons **Modifier** et **Supprimer** sans `{% if can() %}` conditionnel.
@@ -459,7 +459,7 @@ chmod 700 /srv/mon-projet/storage/logs/
 
 ---
 
-## 10. Base de données, principe de moindre privilège
+## 10. Base de données : principe de moindre privilège
 
 Forge utilise deux comptes MariaDB :
 

@@ -1,4 +1,4 @@
-# ADR-028, welcome-forge : tutoriel continu manuel sur les trois niveaux, un mini-projet par niveau
+# ADR-028 : welcome-forge : tutoriel continu manuel sur les trois niveaux, un mini-projet par niveau
 
 ## Statut
 
@@ -114,14 +114,14 @@ buildables ») et **lève** son point « hors périmètre » sur ces deux niveau
 
 ## Alternatives écartées
 
-### A, Garder intermédiaire/avancé buildables, narrer la continuité par-dessus
+### A : Garder intermédiaire/avancé buildables, narrer la continuité par-dessus
 
 Conserver les 14 starters et raconter une progression manuelle au-dessus. Rejeté
 pour la même raison qu'ADR-025 alternative A : deux réalités parallèles (starter
 buildable vs tutoriel manuel), divergence doc/starter, contraire au principe 11.
 C'est précisément l'état incohérent que cet ADR corrige.
 
-### B, Un seul projet continu sur les trois niveaux
+### B : Un seul projet continu sur les trois niveaux
 
 Un unique projet qui grandit du débutant à l'avancé. Rejeté : impose d'avoir fait
 tout le débutant pour suivre l'intermédiaire, alourdit l'entrée dans les niveaux
@@ -129,7 +129,7 @@ supérieurs, et rend chaque niveau dépendant des précédents. Le mini-projet p
 niveau (D2) offre des scopes auto-contenus, plus adaptés à des publics d'entrée
 différents.
 
-### C, Convertir aussi les parcours opt-in dans le même chantier
+### C : Convertir aussi les parcours opt-in dans le même chantier
 
 Unifier d'un coup welcome-forge et les dix parcours opt-in. Rejeté : périmètre
 trop large pour un seul chantier ; welcome-forge (le cœur) sert de pilote, la

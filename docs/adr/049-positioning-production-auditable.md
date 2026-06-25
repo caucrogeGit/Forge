@@ -1,4 +1,4 @@
-# ADR-049, Repositionnement : framework de production auditable
+# ADR-049 : Repositionnement : framework de production auditable
 
 ## Statut
 

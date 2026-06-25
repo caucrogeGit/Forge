@@ -233,7 +233,7 @@ Elle ne modifie pas `make:crud` et ne branche pas automatiquement les routes.
 
 ---
 
-## Pivot advanced, attributs métier complets
+## Pivot advanced : attributs métier complets
 
 Quand un pivot porte des attributs métier significatifs (`position`, `note`,
 `role`…) et que `make:crud` est insuffisant ou bloqué, consultez la

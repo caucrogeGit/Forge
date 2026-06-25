@@ -1,4 +1,4 @@
-# Tests terrain, Modèle de retour testeur
+# Tests terrain : Modèle de retour testeur
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
@@ -20,7 +20,7 @@ Le formulaire reprend tous les champs du modèle ci-dessous. Il permet de soumet
 
 ---
 
-# Retour terrain, [CODE DU TICKET]
+# Retour terrain : [CODE DU TICKET]
 
 ## 1. Identification
 

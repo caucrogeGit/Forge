@@ -18,7 +18,7 @@ Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir
 
 Deux méthodes selon votre situation.
 
-### Cas A, Via `forge new` (recommandé)
+### Cas A : Via `forge new` (recommandé)
 
 ```bash
 forge new MonProjet
@@ -32,7 +32,7 @@ Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic
 
 Il reste deux choses manuelles : **renseigner les mots de passe MariaDB** dans `env/dev`, puis lancer `forge db:init`.
 
-### Cas B, Installation manuelle (usage avancé)
+### Cas B : Installation manuelle (usage avancé)
 
 ```bash
 git clone --branch {{forge_tag}} --depth=1 https://github.com/caucrogeGit/Forge.git MonProjet

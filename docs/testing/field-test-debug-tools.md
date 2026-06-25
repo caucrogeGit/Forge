@@ -1,4 +1,4 @@
-# Tests terrain, Outils de diagnostic
+# Tests terrain : Outils de diagnostic
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 

@@ -1,4 +1,4 @@
-# ADR-046, Registre de loaders de templates Jinja pour les opt-ins
+# ADR-046 : Registre de loaders de templates Jinja pour les opt-ins
 
 ## Statut
 

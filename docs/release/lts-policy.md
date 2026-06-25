@@ -174,7 +174,7 @@ figée serait prématuré à ce stade.
 
 ## Scénarios possibles
 
-### Scénario A, Pas de LTS maintenant (recommandé)
+### Scénario A : Pas de LTS maintenant (recommandé)
 
 Forge continue en série 1.x sans promesse LTS.
 
@@ -195,7 +195,7 @@ des garanties claires sur les API publiques en 1.x, sans aller jusqu'à une LTS.
 
 ---
 
-### Scénario B, LTS candidate après une mineure 1.x (ex. 1.2.0 ou 1.3.0)
+### Scénario B : LTS candidate après une mineure 1.x (ex. 1.2.0 ou 1.3.0)
 
 Une version future pourrait devenir candidate LTS après :
 
@@ -216,7 +216,7 @@ Une version future pourrait devenir candidate LTS après :
 
 ---
 
-### Scénario C, LTS après stabilisation de Forge 1.0.0
+### Scénario C : LTS après stabilisation de Forge 1.0.0
 
 Forge attend la stabilisation de `1.0.0` pour déclarer sa première LTS.
 

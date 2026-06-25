@@ -1,4 +1,4 @@
-# ADR-009, Politique de stabilité : audits, bêta consolidée, tests terrain et stable
+# ADR-009 : Politique de stabilité : audits, bêta consolidée, tests terrain et stable
 
 ## Statut
 

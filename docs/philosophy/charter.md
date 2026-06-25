@@ -1,4 +1,4 @@
-# Forge, Charte philosophique v2
+# Forge : Charte philosophique v2
 
 > **Cette page est un alias.** Le document canonique de la charte v2
 > est `CHARTE_DOC.md` à la racine du dépôt Forge (hors `docs/`,

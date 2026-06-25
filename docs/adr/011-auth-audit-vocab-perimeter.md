@@ -1,4 +1,4 @@
-# ADR-011, Périmètre du vocabulaire d'audit auth dans le core
+# ADR-011 : Périmètre du vocabulaire d'audit auth dans le core
 
 ## Statut
 
@@ -23,7 +23,7 @@ opérationnelle qui distingue **vocabulaire d'audit générique acceptable** et
 
 ## Décision
 
-### Règle 1, Le vocabulaire d'audit MFA/RBAC est assumé dans le core
+### Règle 1 : Le vocabulaire d'audit MFA/RBAC est assumé dans le core
 
 Les constantes de `core/auth/audit.py` sont des **noms d'événements de sécurité**,
 pas des implémentations fonctionnelles. Nommer un événement `mfa.challenge.required`
@@ -55,7 +55,7 @@ user_role.removed
 Ces événements sont acceptés parce qu'ils décrivent des faits de sécurité
 observables sans nécessiter d'importer la logique MFA ou RBAC complète.
 
-### Règle 2, La logique fonctionnelle MFA/RBAC reste hors core
+### Règle 2 : La logique fonctionnelle MFA/RBAC reste hors core
 
 Le core ne doit pas intégrer :
 
@@ -72,7 +72,7 @@ Ces comportements appartiennent aux modules opt-in :
 | MFA TOTP, codes de récupération, revalidation | `forge-mvc-mfa` |
 | Permissions fines, rôles, décorateurs RBAC | `forge-mvc-rbac` |
 
-### Règle 3, Frontière d'import inviolable
+### Règle 3 : Frontière d'import inviolable
 
 **Le core ne doit jamais importer :**
 
@@ -89,7 +89,7 @@ Ces imports sont légitimes dans :
 - `tests/`, tests des modules opt-in (avec `pytest.importorskip`)
 - `docs/`, exemples d'utilisation
 
-### Règle 4, `require_role` est une primitive core légère
+### Règle 4 : `require_role` est une primitive core légère
 
 `core/security/decorators.require_role(role)` est un décorateur basé sur
 `core.security.session.user_has_role()`, il lit le rôle de la session.
@@ -104,7 +104,7 @@ est explicite :
 
 ---
 
-## Rappel, Décisions connexes
+## Rappel : Décisions connexes
 
 | ADR | Décision liée |
 |---|---|

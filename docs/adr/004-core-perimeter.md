@@ -1,4 +1,4 @@
-# ADR-004, Périmètre du `core/` minimal strict
+# ADR-004 : Périmètre du `core/` minimal strict
 
 ## Statut
 
@@ -86,7 +86,7 @@ Ce qui reste dans `core/` après extraction :
 
 ---
 
-## Décision complémentaire, Périmètre de core/auth/ résiduel (AUTH-EXTRA-EXTRACT-001)
+## Décision complémentaire : Périmètre de core/auth/ résiduel (AUTH-EXTRA-EXTRACT-001)
 
 Ticket G2 de la Phase G a évalué si trois sous-modules de `core/auth/` méritaient
 une extraction vers un package opt-in `forge-mvc-auth-extra` :

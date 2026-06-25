@@ -30,7 +30,7 @@ sudo apt install -y \
   openssl
 ```
 
-## 3. Node.js / npm, optionnel
+## 3. Node.js / npm : optionnel
 
 `forge new` utilise npm automatiquement s'il est présent pour installer les
 dépendances front et compiler le CSS Tailwind. Tailwind est le CSS officiel des

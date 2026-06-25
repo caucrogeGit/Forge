@@ -1,4 +1,4 @@
-# Forge, Référence API et CLI
+# Forge : Référence API et CLI
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 

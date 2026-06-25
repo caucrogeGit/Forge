@@ -1,4 +1,4 @@
-# ADR-018, Extraction du traitement d'image hors du core : `forge-mvc-images`
+# ADR-018 : Extraction du traitement d'image hors du core : `forge-mvc-images`
 
 ## Statut
 
