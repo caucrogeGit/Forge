@@ -14,7 +14,7 @@ from core.http.response import Response
 # forge-mvc-files. La validation pure (validators + exceptions) reste dans le
 # core (core/forms), réutilisée ici (le core ne peut pas dépendre de l'opt-in).
 from core.forms.upload_exceptions import UploadStorageError
-from core.forms.upload_validation import validate_upload_metadata
+from core.forms.upload_validation import validate_magic_bytes, validate_upload_metadata
 from forge_mvc_files import storage
 
 
@@ -101,17 +101,21 @@ def _require_image_processing(name: str) -> Any:
 def save_upload(file: object, category: str = "documents") -> SavedUpload:
     """Upload brut **générique** : valide, écrit, retourne un SavedUpload.
 
-    CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : ``save_upload`` ne connaît plus
-    rien des images (ni vérification de contenu, ni variantes). Le chemin
-    image-aware (vérification + variantes) appartient à l'opt-in
-    ``forge-mvc-images`` (``save_image_upload``), qui s'appuie lui-même sur cette
-    primitive générique. ``variants`` renvoyé est toujours vide ici.
+    CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : ``save_upload`` ne décode pas les
+    images (pas de Pillow, pas de variantes). Le chemin image-aware (décodage +
+    variantes) appartient à l'opt-in ``forge-mvc-images`` (``save_image_upload``),
+    qui s'appuie sur cette primitive générique. ``variants`` est toujours vide ici.
+
+    SEC-UPLOAD-MIME-MAGIC-001 : un contrôle **léger** de magic bytes est
+    néanmoins appliqué (générique, sécurité) — pour les types à signature connue
+    (image/PDF), le contenu doit correspondre à l'extension déclarée. C'est un
+    contrôle d'intégrité par premiers octets, pas un décodage d'image.
     """
     if file is None:
         raise UploadStorageError("Aucun fichier reçu.")
 
     filename, mime_type, data = _read_upload(file)
-    validate_upload_metadata(
+    extension = validate_upload_metadata(
         filename=filename,
         size=len(data),
         mime_type=mime_type,
@@ -119,6 +123,10 @@ def save_upload(file: object, category: str = "documents") -> SavedUpload:
         allowed_mime_types=_env_list("UPLOAD_ALLOWED_MIME_TYPES", _DEFAULT_MIME_TYPES),
         max_size=int(_cfg("upload_max_size")),
     )
+    # SEC-UPLOAD-MIME-MAGIC-001 : le contenu doit correspondre à l'extension
+    # déclarée (le content_type client n'est pas fiable). Refus AVANT toute
+    # écriture disque.
+    validate_magic_bytes(data, extension)
     # validate_upload_metadata lève si le nom est absent : filename est ici un str.
     safe_name = cast("str", filename)
     root = upload_root()

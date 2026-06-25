@@ -89,3 +89,47 @@ def validate_upload_metadata(
     validate_size(size, max_size)
     validate_mime_type(mime_type, allowed_mime_types)
     return extension
+
+
+# SEC-UPLOAD-MIME-MAGIC-001 : le `content_type` et l'extension sont fournis par
+# le client et ne sont pas dignes de confiance. Pour les types à signature
+# connue (image/PDF), on vérifie les magic bytes du contenu réel.
+_EXTENSION_TO_TYPE = {
+    "jpg": "jpeg", "jpeg": "jpeg", "png": "png",
+    "gif": "gif", "webp": "webp", "pdf": "pdf",
+}
+
+
+def sniff_content_type(content: bytes) -> str | None:
+    """Retourne le type logique réel d'après les magic bytes, ou None si inconnu."""
+    if content.startswith(b"\xff\xd8\xff"):
+        return "jpeg"
+    if content.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "png"
+    if content.startswith((b"GIF87a", b"GIF89a")):
+        return "gif"
+    if content.startswith(b"%PDF-"):
+        return "pdf"
+    if content[:4] == b"RIFF" and content[8:12] == b"WEBP":
+        return "webp"
+    return None
+
+
+def validate_magic_bytes(content: bytes, extension: str) -> None:
+    """Vérifie que le contenu correspond au type déclaré par l'extension.
+
+    Refuse un fichier dont les magic bytes ne correspondent pas au type attendu
+    (ex. contenu HTML nommé ``.png``). Ne contraint que les extensions à
+    signature connue (image/PDF) ; les autres ne sont pas vérifiées ici.
+    Contrôle léger (premiers octets), distinct d'un décodage d'image complet
+    (qui reste côté ``forge-mvc-images``).
+    """
+    expected = _EXTENSION_TO_TYPE.get(extension.strip().lower())
+    if expected is None:
+        return
+    actual = sniff_content_type(content)
+    if actual != expected:
+        raise UploadInvalidMimeTypeError(
+            f"Contenu incohérent avec l'extension .{extension} : "
+            f"signature {actual or 'inconnue'} (attendu : {expected})."
+        )

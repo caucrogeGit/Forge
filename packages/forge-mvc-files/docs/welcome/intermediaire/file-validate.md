@@ -8,6 +8,13 @@ taille avant d'écrire. Chaque refus lève une exception **précise** de la hié
 `UploadError` (qui vit dans le core, réexportée par files). Ce palier nomme la règle
 qui rejette.
 
+!!! warning "Le `content_type` du client n'est pas digne de confiance"
+    L'extension et le type MIME sont fournis par le client et peuvent mentir.
+    Pour les types à signature connue (image, PDF), `save_upload` vérifie en plus
+    les **magic bytes** du contenu réel : un fichier HTML renommé en `.png` est
+    rejeté (`UploadInvalidMimeTypeError`), avant toute écriture disque
+    (SEC-UPLOAD-MIME-MAGIC-001).
+
 Premier palier du **niveau intermédiaire** de la progression files.
 
 !!! note "Module opt-in"
