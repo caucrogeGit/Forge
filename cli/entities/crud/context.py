@@ -1,3 +1,6 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
+# pyright: reportUnusedFunction=false
 """Constants, dataclasses and permission helper for the CRUD generator."""
 
 from __future__ import annotations
@@ -36,9 +39,9 @@ def _with_permission(block: list[str], code: str | None) -> list[str]:
 
 @dataclass
 class MakeCrudResult:
-    created: list[Path] = dc_field(default_factory=list)
-    preserved: list[Path] = dc_field(default_factory=list)
-    warnings: list[str] = dc_field(default_factory=list)
+    created: list[Path] = dc_field(default_factory=list[Path])
+    preserved: list[Path] = dc_field(default_factory=list[Path])
+    warnings: list[str] = dc_field(default_factory=list[str])
     route_block: str = ""
     dry_run: bool = False
 

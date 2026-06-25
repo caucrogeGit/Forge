@@ -1,6 +1,9 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Model builder for the CRUD generator."""
 
 from __future__ import annotations
+from typing import Any, cast
 
 from cli.entities.crud.context import (
     CrudManyToOneRelation,
@@ -22,7 +25,7 @@ from cli.entities.crud.relations_loader import (
 
 
 def build_model(
-    definition: dict,
+    definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
 ) -> str:
@@ -36,7 +39,7 @@ def build_model(
     non_pk = _non_pk_fields(definition)
     auto_inc = pk.get("auto_increment", False)
     # Champs slug → lookup get_<snake>_by_<slug>() pour le routing public (ADR-017).
-    slug_fields = [f for f in definition["fields"] if (f.get("form") or {}).get("field") == "slug"]
+    slug_fields = [f for f in definition["fields"] if cast("dict[str, Any]", f.get("form") or {}).get("field") == "slug"]
 
     insert_fields = non_pk if auto_inc else definition["fields"]
     insert_cols = ", ".join(f["column"] for f in insert_fields)

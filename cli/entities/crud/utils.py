@@ -1,14 +1,17 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
+# pyright: reportUnusedFunction=false
 """Pure field helpers for the CRUD generator."""
 
 from __future__ import annotations
-from typing import Any
+from typing import Any, cast
 
 from cli.entities.crud.context import CrudManyToOneRelation
 
 # Source unique de _to_snake (principe 11) : re-export depuis validation, qui
 # en porte la définition canonique. Les modules CRUD continuent de l'importer
 # depuis ce module (`from cli.entities.crud.utils import _to_snake`).
-from cli.entities.validation import _to_snake  # noqa: F401
+from cli.entities.validation import _to_snake as _to_snake  # noqa: F401
 
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────
@@ -24,11 +27,11 @@ def _pk_field(definition: dict[str, Any]) -> dict[str, Any]:
     raise ValueError(f"Aucune clé primaire dans l'entité {definition['entity']!r}")
 
 
-def _non_pk_fields(definition: dict) -> list[dict]:
+def _non_pk_fields(definition: dict[str, Any]) -> list[dict[str, Any]]:
     return [f for f in definition["fields"] if not f.get("primary_key")]
 
 
-def _is_generated(field: dict) -> bool:
+def _is_generated(field: dict[str, Any]) -> bool:
     """Champ auto-généré depuis un champ source (slug avec ``source``).
 
     Exclu du formulaire et de l'``UPDATE`` (stable à l'édition) mais conservé
@@ -58,16 +61,16 @@ _HTML_TYPE_FROM_FORM_FIELD: dict[str, str] = {
 }
 
 
-def _is_textarea(f: dict) -> bool:
-    if (f.get("form") or {}).get("field") == "textarea":
+def _is_textarea(f: dict[str, Any]) -> bool:
+    if cast("dict[str, Any]", f.get("form") or {}).get("field") == "textarea":
         return True
     sql = f.get("sql_type", "").upper()
     return any(sql.startswith(p) for p in ("TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT"))
 
 
-def _html_input_type(f: dict) -> str:
+def _html_input_type(f: dict[str, Any]) -> str:
     """Déduit le type d'input HTML depuis le champ d'entité."""
-    form_field = (f.get("form") or {}).get("field")
+    form_field = cast("dict[str, Any]", f.get("form") or {}).get("field")
     if form_field in _HTML_TYPE_FROM_FORM_FIELD:
         return _HTML_TYPE_FROM_FORM_FIELD[form_field]
 
@@ -92,12 +95,12 @@ def _html_input_type(f: dict) -> str:
 
 
 def _text_search_fields(
-    definition: dict,
+    definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Retourne les champs VARCHAR/CHAR/TEXT pertinents pour la recherche LIKE."""
     relation_field_names = set(_relation_by_field(relations))
-    out = []
+    out: list[dict[str, Any]] = []
     for f in _non_pk_fields(definition):
         if f["name"] in relation_field_names:
             continue
@@ -107,7 +110,7 @@ def _text_search_fields(
     return out
 
 
-def _text_label_fields(definition: dict) -> list[dict]:
+def _text_label_fields(definition: dict[str, Any]) -> list[dict[str, Any]]:
     """Retourne les champs texte non-PK utilisables comme libelle relationnel."""
     return _text_search_fields(definition)
 
@@ -117,26 +120,32 @@ def _is_bool_sql(sql_type: str) -> bool:
 
 
 def _filter_fields(
-    definition: dict,
+    definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     relation_field_names = set(_relation_by_field(relations))
-    result = []
+    result: list[dict[str, Any]] = []
     for f in _non_pk_fields(definition):
         if f["name"] in relation_field_names:
             result.append(f)
             continue
-        if (f.get("list") or {}).get("filter") is True:
+        if cast("dict[str, Any]", f.get("list") or {}).get("filter") is True:
             result.append(f)
     return result
 
 
-def _media_form_fields(definition: dict) -> list[dict]:
+def _media_form_fields(definition: dict[str, Any]) -> list[dict[str, Any]]:
     """Retourne les entrées media déclarées dans l'entité (field='image' ou 'file')."""
-    media = definition.get("media") or []
+    media = definition.get("media")
     if not isinstance(media, list):
         return []
-    return [e for e in media if isinstance(e, dict) and e.get("field") in ("image", "file")]
+    result: list[dict[str, Any]] = []
+    for e in cast("list[Any]", media):
+        if isinstance(e, dict):
+            entry = cast("dict[str, Any]", e)
+            if entry.get("field") in ("image", "file"):
+                result.append(entry)
+    return result
 
 
 def _relation_by_field(relations: list[CrudManyToOneRelation] | None) -> dict[str, CrudManyToOneRelation]:

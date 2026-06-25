@@ -1,6 +1,9 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Controller builder for the CRUD generator."""
 
 from __future__ import annotations
+from typing import Any, cast
 
 from cli.entities.crud.context import (
     CrudManyToOneRelation,
@@ -20,7 +23,7 @@ from cli.entities.crud.utils import (
 from cli.entities.crud.context import _with_permission
 
 
-def _media_upload_call(mfield: str, var: str, variants) -> str:
+def _media_upload_call(mfield: str, var: str, variants: object) -> str:
     """Expression d'upload générée pour un champ média.
 
     CORE-SAVEUPLOAD-GENERIC-CLEANUP (ADR-018) : les champs **image** passent par
@@ -38,7 +41,7 @@ from cli.entities.crud.relations_loader import (
 
 
 def build_controller(
-    definition: dict,
+    definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
 ) -> str:
@@ -73,7 +76,7 @@ def build_controller(
     ctrl_media_entries = _media_form_fields(definition)
 
     # RBAC — permissions optionnelles depuis la définition JSON
-    _rbac_raw = (definition.get("rbac") or {}).get("permissions") or {}
+    _rbac_raw: dict[str, Any] = cast("dict[str, Any]", definition.get("rbac") or {}).get("permissions") or {}
     _rbac: dict[str, str] = {}
     if _rbac_raw:
         from forge_mvc_rbac import normalize_permission_code
@@ -132,7 +135,7 @@ def build_controller(
     lines.extend([
         "",
         "",
-        f"def _form_data_from_{snake}(record: dict) -> dict:",
+        f"def _form_data_from_{snake}(record: dict[str, Any]) -> dict[str, Any]:",
         '    """Convertit les colonnes SQL vers les noms de champs du formulaire."""',
         "    return {",
     ])
@@ -163,7 +166,7 @@ def build_controller(
     lines.append("")
     lines.append("")
     _rel_by_field = _relation_by_field(relations)
-    _csv_cols = []
+    _csv_cols: list[tuple[str, str]] = []
     for _f in non_pk:
         _fname = _f["name"]
         _rel = _rel_by_field.get(_fname)

@@ -1,3 +1,6 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
+# pyright: reportUnusedFunction=false
 """Relation loading helpers for the CRUD generator."""
 
 from __future__ import annotations
@@ -38,7 +41,7 @@ def _entity_definition_by_relation_name(entity_map: dict[str, dict[str, Any]], n
 
 
 def _load_crud_many_to_one_relations(
-    definition: dict,
+    definition: dict[str, Any],
     entities_root: Path,
 ) -> list[CrudManyToOneRelation]:
     relations_path = entities_root / "relations.json"
@@ -91,7 +94,7 @@ def _load_crud_many_to_one_relations(
 
 
 def _load_crud_many_to_many_relations(
-    definition: dict,
+    definition: dict[str, Any],
     entities_root: Path,
 ) -> list[CrudManyToManyRelation]:
     relations_path = entities_root / "relations.json"
@@ -180,7 +183,7 @@ def _load_crud_many_to_many_relations(
     return crud_relations
 
 
-def _first_relation_label_field(definition: dict) -> dict:
+def _first_relation_label_field(definition: dict[str, Any]) -> dict[str, Any]:
     """Retourne le champ label de l'entité cible : nom préféré, puis premier texte, puis PK."""
     text_fields = _text_label_fields(definition)
     for preferred in _PREFERRED_LABEL_NAMES:

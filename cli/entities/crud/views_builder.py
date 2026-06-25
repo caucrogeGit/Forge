@@ -1,6 +1,9 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Views builders for the CRUD generator (all build_*_view and build_*_partial functions)."""
 
 from __future__ import annotations
+from typing import Any
 
 from cli.entities.crud.context import (
     CrudManyToOneRelation,
@@ -74,10 +77,10 @@ def build_form_errors_partial() -> str:
 
 
 def build_index_view(
-    definition: dict,
+    definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
-    rbac: dict | None = None,
+    rbac: dict[str, Any] | None = None,
 ) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
@@ -176,7 +179,7 @@ def build_index_view(
     return "\n".join(lines) + "\n"
 
 
-def build_results_partial(definition: dict) -> str:
+def build_results_partial(definition: dict[str, Any]) -> str:
     snake = _to_snake(definition["entity"])
     return "\n".join([
         f'{{% include "{snake}/_table.html" %}}',
@@ -185,10 +188,10 @@ def build_results_partial(definition: dict) -> str:
 
 
 def build_table_partial(
-    definition: dict,
+    definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
-    rbac: dict | None = None,
+    rbac: dict[str, Any] | None = None,
 ) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
@@ -345,7 +348,7 @@ def build_table_partial(
     return "\n".join(lines) + "\n"
 
 
-def build_pagination_partial(definition: dict) -> str:
+def build_pagination_partial(definition: dict[str, Any]) -> str:
     _filters_loop = (
         "{% for key, val in pagination.filters.items() %}"
         "{% if val is not none and val != '' %}"
@@ -386,9 +389,9 @@ def build_pagination_partial(definition: dict) -> str:
 
 
 def build_show_view(
-    definition: dict,
+    definition: dict[str, Any],
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
-    rbac: dict | None = None,
+    rbac: dict[str, Any] | None = None,
 ) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
@@ -514,7 +517,7 @@ def build_show_view(
 
 
 def build_form_view(
-    definition: dict,
+    definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
 ) -> str:
@@ -727,7 +730,7 @@ def build_form_view(
     return "\n".join(lines) + "\n"
 
 
-def build_bulk_delete_confirm_view(definition: dict) -> str:
+def build_bulk_delete_confirm_view(definition: dict[str, Any]) -> str:
     """Génère le template de confirmation de suppression groupée."""
     entity = definition["entity"]
     snake = _to_snake(entity)

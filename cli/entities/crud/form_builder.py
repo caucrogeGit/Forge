@@ -1,6 +1,9 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Form builder for the CRUD generator."""
 
 from __future__ import annotations
+from typing import Any, cast
 
 from cli.entities.crud.context import CrudManyToOneRelation
 from cli.entities.crud.utils import (
@@ -17,7 +20,7 @@ from cli.entities.crud.utils import (
 # ── Mappage SQL → champ de formulaire ─────────────────────────────────────────
 
 def _form_field_code(
-    f: dict,
+    f: dict[str, Any],
     relations_by_field: dict[str, CrudManyToOneRelation] | None = None,
 ) -> tuple[str, str | None]:
     """Retourne (code_du_champ, avertissement_ou_None)."""
@@ -27,7 +30,7 @@ def _form_field_code(
     required = not nullable
     constraints = f.get("constraints", {})
     label = _humanize(f["name"])
-    form_field = (f.get("form") or {}).get("field")
+    form_field = cast("dict[str, Any]", f.get("form") or {}).get("field")
 
     if relation is not None:
         args = [f'label="{label}"', f'target="{relation.target_entity}"', f"required={required}", f'choices_key="{relation.choices_key}"']
@@ -95,9 +98,9 @@ def _form_field_code(
 
 
 def _form_imports(
-    fields: list[dict],
+    fields: list[dict[str, Any]],
     relations: list[CrudManyToOneRelation] | None = None,
-    media_entries: list[dict] | None = None,
+    media_entries: list[dict[str, Any]] | None = None,
 ) -> str:
     classes: set[str] = set()
     relation_fields = set(_relation_by_field(relations))
@@ -105,7 +108,7 @@ def _form_imports(
         if f["name"] in relation_fields:
             classes.add("RelationField")
             continue
-        form_field = (f.get("form") or {}).get("field")
+        form_field = cast("dict[str, Any]", f.get("form") or {}).get("field")
         if form_field is not None:
             classes.add(_FORM_FIELD_CLASS_MAP[form_field])
             continue
@@ -134,7 +137,7 @@ def _form_imports(
 # ── Générateurs de code ───────────────────────────────────────────────────────
 
 def build_form(
-    definition: dict,
+    definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
 ) -> tuple[str, list[str]]:
     """Retourne (code_python, liste_avertissements)."""
