@@ -24,7 +24,7 @@ ALL = ["mfa", "rbac", "workflow", "stats", "images", "iot"]
 def _setup_enabled_iot(root: Path) -> Path:
     """Recrée l'état produit par `enable iot`, sans dépendre du package."""
     from cli.optins.enable import (
-        _REGISTRY,
+        REGISTRY,
         _SHARED_FILES,
         _register_in_registry,
     )
@@ -33,7 +33,7 @@ def _setup_enabled_iot(root: Path) -> Path:
         p = root / rel
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(content, encoding="utf-8")
-    registry, _ = _register_in_registry(_REGISTRY, "iot")
+    registry, _ = _register_in_registry(REGISTRY, "iot")
     (root / "optins" / "registry.py").write_text(registry, encoding="utf-8")
     routes = root / "mvc" / "routes.py"
     routes.parent.mkdir(parents=True, exist_ok=True)

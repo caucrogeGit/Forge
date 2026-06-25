@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge opt-in:list`` — OPTINS-CLI-LIST-001 (renommée OPTIN-CLI-REMOVE-LEGACY-001).
 
 Affiche l'**état local** des opt-ins connus dans un projet Forge.

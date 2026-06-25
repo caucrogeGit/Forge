@@ -1,3 +1,4 @@
+# pyright: strict
 """Catalogue canonique des opt-ins officiels Forge.
 
 Ticket : OPTIN-CLI-VERBS-001 (ADR-016, palier 3a).

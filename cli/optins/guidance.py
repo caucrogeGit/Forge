@@ -1,3 +1,4 @@
+# pyright: strict
 """Conseils d'activation/désactivation selon le kind d'un opt-in.
 
 Ticket : OPTIN-KIND-ADAPTER-001 (ADR-016, palier 4a).

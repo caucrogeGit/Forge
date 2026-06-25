@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge opt-in:remove <name>`` — OPTIN-CLI-ENGINE-001 (ADR-016, 3b).
 
 Axe **présence** (−) : affiche la commande de désinstallation du package d'un

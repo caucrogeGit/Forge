@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge opt-in:enable <name>`` — OPTINS-CLI-ENABLE-IOT-001 (renommée OPTIN-CLI-REMOVE-LEGACY-001).
 
 Branche **localement** un opt-in dans le projet courant en créant la
@@ -28,6 +29,7 @@ import importlib.util
 import re
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 __all__ = [
     "STATUS_OK",
@@ -53,7 +55,7 @@ STATUS_DRYRUN = "[DRY-RUN]"
 # (OPTINS-IOT-PROJECT-BRIDGE-001) : même branchement explicite, mêmes
 # fichiers. Le code métier reste dans le paquet `forge-mvc-iot`.
 
-_OPTINS_INIT = '''\
+OPTINS_INIT = '''\
 """Couche de branchement local des opt-ins de ce projet Forge.
 
 Les paquets opt-in restent distribués (`forge-mvc-*`) ; ce dossier ne
@@ -69,7 +71,7 @@ automatique. Contrat : docs/architecture/optins-project-structure.md.
 _REG_IMPORT_ANCHOR = "# >>> opt-in imports (gérés par forge opt-in:enable / disable)"
 _REG_CALL_ANCHOR = "    # >>> opt-in calls (gérés par forge opt-in:enable / disable)"
 
-_REGISTRY = f'''\
+REGISTRY = f'''\
 """Registre explicite des opt-ins branchés dans ce projet.
 
 Pas de découverte automatique : chaque opt-in actif est importé et appelé
@@ -181,9 +183,9 @@ explicitement.
 # Fichiers PARTAGÉS (communs à tous les opt-ins routiers), gérés à part de
 # la boucle write-if-new : optins/__init__.py et la registry générique.
 _SHARED_FILES: tuple[tuple[str, str], ...] = (
-    ("optins/__init__.py", _OPTINS_INIT),
+    ("optins/__init__.py", OPTINS_INIT),
 )
-_REGISTRY_REL = "optins/registry.py"
+REGISTRY_REL = "optins/registry.py"
 
 # Fichiers PROPRES à un opt-in (optins/<name>/…). La registry n'y est plus.
 _IOT_FILES: tuple[tuple[str, str], ...] = (
@@ -316,7 +318,7 @@ _AUDIO_FILES: tuple[tuple[str, str], ...] = (
 )
 
 
-SUPPORTED_OPTINS: dict[str, dict] = {
+SUPPORTED_OPTINS: dict[str, dict[str, Any]] = {
     "iot": {
         "package_dist": "forge-mvc-iot",
         "package_import": "forge_mvc_iot",
@@ -429,11 +431,11 @@ def _branch_routes(routes_path: Path, *, apply: bool) -> None:
 
 # ── Registre projet : insertion idempotente d'un opt-in (multi-opt-in) ───────
 
-def _registry_import_line(name: str) -> str:
+def registry_import_line(name: str) -> str:
     return f"from optins.{name}.routes import register as register_{name}"
 
 
-def _registry_call_line(name: str) -> str:
+def registry_call_line(name: str) -> str:
     return f"    register_{name}(router)"
 
 
@@ -444,8 +446,8 @@ def _register_in_registry(content: str, name: str) -> tuple[str, str]:
     ``"already"``, ``"unrecognized"``}. Idempotent ; ne touche que les deux
     lignes sous les ancres (jamais d'autre code).
     """
-    import_line = _registry_import_line(name)
-    call_line = _registry_call_line(name)
+    import_line = registry_import_line(name)
+    call_line = registry_call_line(name)
     if import_line in content and call_line in content:
         return content, "already"
     if _REG_IMPORT_ANCHOR not in content or _REG_CALL_ANCHOR not in content:
@@ -465,35 +467,35 @@ def _ensure_registry_registration(project_root: Path, name: str, *, apply: bool)
     ``False`` si la registry existe mais n'est **pas reconnue** (ancres absentes,
     fichier divergent) — l'appelant traite ça comme un conflit bloquant.
     """
-    registry_path = project_root / _REGISTRY_REL
+    registry_path = project_root / REGISTRY_REL
     created = not registry_path.exists()
-    base = _REGISTRY if created else registry_path.read_text(encoding="utf-8")
+    base = REGISTRY if created else registry_path.read_text(encoding="utf-8")
     new_content, status = _register_in_registry(base, name)
 
     if status == "already":
-        print(f"{STATUS_OK} {_REGISTRY_REL} : {name} déjà branché")
+        print(f"{STATUS_OK} {REGISTRY_REL} : {name} déjà branché")
         return True
     if status == "unrecognized":
-        print(f"{STATUS_WARN} {_REGISTRY_REL} existe mais n'est pas reconnu "
+        print(f"{STATUS_WARN} {REGISTRY_REL} existe mais n'est pas reconnu "
               f"(ancres absentes) — aucune modification. Ajoute manuellement "
               f"l'import et l'appel de {name}.")
         return False
 
     if not apply:
         verb = "serait créé + " if created else ""
-        print(f"{STATUS_DRYRUN} {_REGISTRY_REL} {verb}{name} branché")
+        print(f"{STATUS_DRYRUN} {REGISTRY_REL} {verb}{name} branché")
         return True
 
     registry_path.parent.mkdir(parents=True, exist_ok=True)
     registry_path.write_text(new_content, encoding="utf-8")
     suffix = "créé + " if created else ""
-    print(f"{STATUS_OK} {_REGISTRY_REL} {suffix}{name} branché")
+    print(f"{STATUS_OK} {REGISTRY_REL} {suffix}{name} branché")
     return True
 
 
-def _unregister_from_registry(content: str, name: str) -> str:
+def unregister_from_registry(content: str, name: str) -> str:
     """Retire l'import + l'appel de ``name`` de la registry (idempotent)."""
-    targets = {_registry_import_line(name), _registry_call_line(name)}
+    targets = {registry_import_line(name), registry_call_line(name)}
     kept = [
         ln for ln in content.splitlines(keepends=True)
         if ln.rstrip("\n") not in targets
@@ -501,7 +503,7 @@ def _unregister_from_registry(content: str, name: str) -> str:
     return "".join(kept)
 
 
-def _registry_has_registrations(content: str) -> bool:
+def registry_has_registrations(content: str) -> bool:
     """Vrai s'il reste au moins un opt-in branché (ligne d'import de routes)."""
     return re.search(
         r"^from optins\.[a-z0-9_]+\.routes import register as ",

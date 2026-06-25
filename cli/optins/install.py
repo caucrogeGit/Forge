@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge opt-in:install <name>`` — OPTIN-CLI-VERBS-001 (ADR-016, 3a).
 
 Affiche la commande d'installation du package d'un opt-in officiel. **N'exécute

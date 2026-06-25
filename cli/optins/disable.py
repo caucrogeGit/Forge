@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande ``forge opt-in:disable <name>`` — OPTIN-CLI-ENGINE-001 (ADR-016, 3b).
 
 Axe **activation** (−) : inverse exact d'``opt-in:enable``. Retire la couche de
@@ -22,13 +23,13 @@ from cli.optins.enable import (
     STATUS_OK,
     STATUS_WARN,
     SUPPORTED_OPTINS,
-    _OPTINS_INIT,
-    _REGISTRY,
-    _REGISTRY_REL,
-    _registry_call_line,
-    _registry_has_registrations,
-    _registry_import_line,
-    _unregister_from_registry,
+    OPTINS_INIT,
+    REGISTRY,
+    REGISTRY_REL,
+    registry_call_line,
+    registry_has_registrations,
+    registry_import_line,
+    unregister_from_registry,
 )
 
 _ROUTES_REL = "mvc/routes.py"
@@ -66,13 +67,13 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
 
     files = list(spec["files"])
     optin_dir = project_root / "optins" / name
-    registry_path = project_root / _REGISTRY_REL
+    registry_path = project_root / REGISTRY_REL
     registry_content = (
         registry_path.read_text(encoding="utf-8") if registry_path.exists() else ""
     )
     is_registered = (
-        _registry_import_line(name) in registry_content
-        or _registry_call_line(name) in registry_content
+        registry_import_line(name) in registry_content
+        or registry_call_line(name) in registry_content
     )
     present = (
         optin_dir.exists()
@@ -100,34 +101,34 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
 
     # 2. Dé-référencer l'opt-in de la registry partagée.
     new_registry = (
-        _unregister_from_registry(registry_content, name) if registry_content else ""
+        unregister_from_registry(registry_content, name) if registry_content else ""
     )
-    others_remain = _registry_has_registrations(new_registry)
+    others_remain = registry_has_registrations(new_registry)
     # Démontage complet seulement si plus aucun opt-in ET registry générique
     # (un fichier modifié à la main n'est pas démonté agressivement).
     full_teardown = (
-        registry_content != "" and not others_remain and new_registry == _REGISTRY
+        registry_content != "" and not others_remain and new_registry == REGISTRY
     )
 
     if registry_content and new_registry != registry_content:
         if full_teardown:
             if apply:
                 registry_path.unlink()
-                print(f"{STATUS_OK} {_REGISTRY_REL} supprimé (plus d'opt-in branché)")
+                print(f"{STATUS_OK} {REGISTRY_REL} supprimé (plus d'opt-in branché)")
             else:
-                print(f"{STATUS_DRYRUN} {_REGISTRY_REL} serait supprimé")
+                print(f"{STATUS_DRYRUN} {REGISTRY_REL} serait supprimé")
         else:
             if apply:
                 registry_path.write_text(new_registry, encoding="utf-8")
-                print(f"{STATUS_OK} {_REGISTRY_REL} : {name} débranché")
+                print(f"{STATUS_OK} {REGISTRY_REL} : {name} débranché")
             else:
-                print(f"{STATUS_DRYRUN} {name} serait débranché de {_REGISTRY_REL}")
+                print(f"{STATUS_DRYRUN} {name} serait débranché de {REGISTRY_REL}")
 
     # 3. Câblage partagé (optins/__init__.py + mvc/routes.py) : retiré seulement
     #    en démontage complet ; sinon conservé pour les autres opt-ins.
     if full_teardown:
         init_path = project_root / "optins" / "__init__.py"
-        if init_path.exists() and init_path.read_text(encoding="utf-8") == _OPTINS_INIT:
+        if init_path.exists() and init_path.read_text(encoding="utf-8") == OPTINS_INIT:
             if apply:
                 init_path.unlink()
                 print(f"{STATUS_OK} optins/__init__.py supprimé")
@@ -136,7 +137,7 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
         _unbranch_routes(project_root / _ROUTES_REL, apply=apply)
     elif others_remain:
         print(f"{STATUS_INFO} D'autres opt-ins restent branchés — "
-              f"{_REGISTRY_REL} et {_ROUTES_REL} conservés.")
+              f"{REGISTRY_REL} et {_ROUTES_REL} conservés.")
 
     # 4. Répertoires vides.
     if apply:
