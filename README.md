@@ -137,7 +137,8 @@ ne sont pas encore publiés sur PyPI ; ils s'installent en éditable via
 `requirements-dev.txt`.
 Cette exclusion de `[all]` tient soit à
 une dépendance lourde (MQTT `paho-mqtt` pour IoT, binaire système FFmpeg pour
-Video et Audio, Pillow pour Images), soit à une maturité encore Alpha.
+Video et Audio, Pillow pour Images), soit à une maturité encore Alpha
+(`mfa`, `files`), soit à une absence de publication sur PyPI (`i18n`, `qrcode`).
 
 ---
 
