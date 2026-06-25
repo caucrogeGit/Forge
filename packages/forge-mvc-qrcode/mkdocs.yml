@@ -5,6 +5,10 @@ site_name: qrcode
 docs_dir: docs
 nav:
   - Présentation: index.md
+  - Référence (par module):
+      - Génération (generator.py): references/generator.md
+      - Réponse HTTP (response.py): references/response.md
+      - Erreurs (errors.py): references/errors.md
   - Progression QR Code:
       - Installation: welcome/installation.md
       - Débutant:
