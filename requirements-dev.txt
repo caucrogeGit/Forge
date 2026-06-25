@@ -38,3 +38,4 @@ pyright>=1.1.400
 # Infrastructure de test partagée (ADR-041) : FakeRequest + plugin pytest
 # (fixtures autouse de configuration du noyau, nettoyage, fake_request). Dev only.
 -e ./packages/forge-mvc-testing
+bandit>=1.7

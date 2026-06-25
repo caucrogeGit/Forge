@@ -33,10 +33,25 @@ jobs:
           python -m pip install -e .
           python -m pip install -r requirements-dev.txt
 
+      # CI-AUDIT-BLOCKING-001 / CI-PYRIGHT-ORDER-001 :
+      # pip-audit, ruff et pyright sont en `continue-on-error` (avec `id`) pour
+      # qu'ils ne masquent JAMAIS l'exécution de la suite pytest (piège ADR-044).
+      # Un « Quality gate » final (if: always) fait échouer le job si l'un d'eux
+      # a échoué : ils restent donc bloquants, mais sans masquer le reste.
+
+      - name: Audit dépendances Python (pip-audit)
+        id: pipaudit
+        continue-on-error: true
+        run: pip-audit --ignore-vuln PYSEC-2026-217 -r requirements.txt
+
       - name: Ruff
+        id: ruff
+        continue-on-error: true
         run: ruff check .
 
       - name: Type check (pyright)
+        id: pyright
+        continue-on-error: true
         run: pyright
 
       - name: Run tests
@@ -54,6 +69,19 @@ jobs:
 
       - name: Build documentation
         run: mkdocs build --strict
+
+      - name: SAST (bandit, informatif, non bloquant)
+        continue-on-error: true
+        run: bandit -q -ll -r core packages
+
+      - name: Quality gate (pip-audit + ruff + pyright)
+        if: always()
+        run: |
+          fail=0
+          if [ "${{ steps.pipaudit.outcome }}" = "failure" ]; then echo "::error::pip-audit a signale une vulnerabilite"; fail=1; fi
+          if [ "${{ steps.ruff.outcome }}" = "failure" ]; then echo "::error::ruff a echoue"; fail=1; fi
+          if [ "${{ steps.pyright.outcome }}" = "failure" ]; then echo "::error::pyright a echoue"; fail=1; fi
+          exit $fail
 
   tests-db:
     runs-on: ubuntu-latest
