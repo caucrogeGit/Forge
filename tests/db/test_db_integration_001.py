@@ -89,13 +89,6 @@ def test_transaction_commit_persists(real_db: None) -> None:
         db.execute(f"DROP TABLE IF EXISTS {table}")
 
 
-@pytest.mark.xfail(
-    reason="Bug réel révélé par ce test d'intégration : transaction() ne désarme "
-    "pas l'autocommit des connexions du pool mariadb, donc le rollback n'annule "
-    "pas l'insert. À corriger côté cœur (ticket DB-TRANSACTION-AUTOCOMMIT-FIX-001) ; "
-    "ce test repassera au vert une fois le contexte transactionnel garanti.",
-    strict=False,
-)
 def test_transaction_rollback_discards(real_db: None) -> None:
     table = _table("forge_it_rb")
     db.execute(f"CREATE TABLE {table} (id INT PRIMARY KEY)")

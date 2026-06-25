@@ -25,8 +25,15 @@ def transaction() -> Generator["Transaction", None, None]:
 
     Le développeur choisit le périmètre du bloc. Les helpers DB qui reçoivent
     tx réutilisent la connexion et ne commit jamais eux-mêmes.
+
+    Le pool peut fournir des connexions en autocommit (défaut MariaDB) : sans le
+    désarmer, chaque requête serait validée immédiatement et le rollback serait
+    sans effet. On garantit donc un vrai contexte transactionnel le temps du
+    bloc, puis on restaure l'état initial avant de rendre la connexion au pool.
     """
     connection = get_connection()
+    previous_autocommit = connection.autocommit
+    connection.autocommit = False
     tx = Transaction(connection)
     try:
         yield tx
@@ -36,4 +43,5 @@ def transaction() -> Generator["Transaction", None, None]:
     else:
         connection.commit()
     finally:
+        connection.autocommit = previous_autocommit
         close_connection(connection)

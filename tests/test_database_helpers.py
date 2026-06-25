@@ -38,6 +38,7 @@ class FakeConnection:
         self.rollbacks = 0
         self.closed = False
         self.dictionary = None
+        self.autocommit = True  # transaction() lit/écrit cet attribut
 
     def cursor(self, *, dictionary=False):
         self.dictionary = dictionary
