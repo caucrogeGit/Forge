@@ -1,3 +1,5 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Codes d'erreur stables pour forge entity:validate.
 
 Ces codes préfixés FORGE_ sont stables et servent de base pour :

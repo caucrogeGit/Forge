@@ -1,3 +1,5 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Commande forge entity:validate — validation JSON Schema + sémantique.
 
 Valide les fichiers d'entités et de relations d'un projet Forge en deux passes :
@@ -16,7 +18,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Iterator
+from typing import Any, Iterator, cast
 
 
 _ENTITY_SCHEMA_ID = "https://forge-mvc.dev/schemas/entity.schema.json"
@@ -27,7 +29,7 @@ def _schemas_dir() -> Path:
     return Path(__file__).resolve().parent.parent / "schemas"
 
 
-def _build_registry():
+def _build_registry() -> "tuple[Any, Any]":
     try:
         from referencing import Registry, Resource
         from referencing.jsonschema import DRAFT202012
@@ -38,7 +40,7 @@ def _build_registry():
     if not schemas_dir.is_dir():
         return None, None
 
-    resources = []
+    resources: list[Any] = []
     for f in schemas_dir.glob("*.json"):
         try:
             schema = json.loads(f.read_text(encoding="utf-8"))
@@ -49,10 +51,10 @@ def _build_registry():
         except (json.JSONDecodeError, Exception):
             pass
 
-    return Registry().with_resources(resources), DRAFT202012
+    return cast("Any", Registry()).with_resources(resources), DRAFT202012  # pyright: ignore[reportUnknownArgumentType]  # défaut _anchors interne à referencing
 
 
-def _make_validator(schema_id: str, registry):
+def _make_validator(schema_id: str, registry: Any) -> Any:
     from jsonschema import Draft202012Validator
     schemas_dir = _schemas_dir()
     for f in schemas_dir.glob("*.json"):
@@ -65,7 +67,7 @@ def _make_validator(schema_id: str, registry):
     return None
 
 
-def _schema_error_path(error) -> str:
+def _schema_error_path(error: Any) -> str:
     if error.absolute_path:
         return "$." + ".".join(str(p) for p in error.absolute_path)
     return "$"
@@ -81,26 +83,26 @@ def _collect_entity_files(entities_root: Path) -> Iterator[Path]:
 def _collect_results(
     cwd: Path,
     entities_root: Path,
-    entity_validator,
-    relations_validator,
-    validate_semantic,
-    codes: dict,
-) -> dict:
+    entity_validator: Any,
+    relations_validator: Any,
+    validate_semantic: Any,
+    codes: dict[str, Any],
+) -> dict[str, Any]:
     """Exécute les deux passes de validation et retourne les résultats structurés.
 
     Returns:
         dict avec : files_checked, files_valid, errors (liste plate), warnings,
                     human_events (liste ordonnée pour affichage humain).
     """
-    all_errors: list[dict] = []
+    all_errors: list[dict[str, Any]] = []
     warnings: list[str] = []
     # human_events : liste ordonnée d'événements pour l'affichage humain
     # types : "ok", "file_errors", "warning"
-    human_events: list[dict] = []
+    human_events: list[dict[str, Any]] = []
     files_checked = 0
     files_valid = 0
-    valid_entities: list[tuple[str, dict]] = []
-    valid_relations: dict | None = None
+    valid_entities: list[tuple[str, dict[str, Any]]] = []
+    valid_relations: dict[str, Any] | None = None
 
     # ── Passe 1 : validation structurelle JSON Schema ─────────────────────────
 
@@ -222,7 +224,7 @@ def _collect_results(
     }
 
 
-def _print_human(results: dict) -> None:
+def _print_human(results: dict[str, Any]) -> None:
     errors = results["errors"]
     human_events = results["human_events"]
     files_valid = results["files_valid"]
@@ -267,7 +269,7 @@ def _print_human(results: dict) -> None:
         print(f"Validation terminée : {files_valid} fichier{s_f} valide{s_f}, {error_count} erreur{s_e}.")
 
 
-def collect_entity_validation_results(entities_root: Path) -> dict | None:
+def collect_entity_validation_results(entities_root: Path) -> dict[str, Any] | None:
     """Valide les contrats JSON des entités et relations canoniques (schema_version '1.0').
 
     Les entités au format legacy (sans schema_version) sont ignorées — elles sont
@@ -279,7 +281,7 @@ def collect_entity_validation_results(entities_root: Path) -> dict | None:
     if not entities_root.is_dir():
         return None
     try:
-        import jsonschema  # noqa: F401
+        import jsonschema as jsonschema  # noqa: F401
     except ImportError:
         return None
     from cli.entities.entity_validation_errors import (
@@ -294,7 +296,7 @@ def collect_entity_validation_results(entities_root: Path) -> dict | None:
     if entity_validator is None:
         return None
 
-    errors: list[dict] = []
+    errors: list[dict[str, Any]] = []
     files_checked = 0
     files_valid = 0
     cwd = entities_root.parent.parent
@@ -304,7 +306,7 @@ def collect_entity_validation_results(entities_root: Path) -> dict | None:
             data = json.loads(entity_file.read_text(encoding="utf-8"))
         except Exception:
             continue
-        if not isinstance(data, dict) or data.get("schema_version") != "1.0":
+        if not isinstance(data, dict) or cast("dict[str, Any]", data).get("schema_version") != "1.0":
             continue
         files_checked += 1
         rel_str = str(entity_file.relative_to(cwd))
@@ -328,7 +330,7 @@ def collect_entity_validation_results(entities_root: Path) -> dict | None:
             rel_data = json.loads(relations_file.read_text(encoding="utf-8"))
         except Exception:
             rel_data = None
-        if isinstance(rel_data, dict) and rel_data.get("schema_version") == "1.0":
+        if isinstance(rel_data, dict) and cast("dict[str, Any]", rel_data).get("schema_version") == "1.0":
             files_checked += 1
             rel_str = str(relations_file.relative_to(cwd))
             schema_errs = list(relations_validator.iter_errors(rel_data))
@@ -385,7 +387,7 @@ def main(args: list[str] | None = None) -> None:
         sys.exit(1)
 
     try:
-        import jsonschema  # noqa: F401
+        import jsonschema as jsonschema  # noqa: F401
     except ImportError:
         if not use_json:
             print("Erreur : jsonschema n'est pas installé.", file=sys.stderr)

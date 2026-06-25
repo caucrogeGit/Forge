@@ -1,3 +1,5 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Validation canonique des JSON d'entite Forge."""
 
 from __future__ import annotations
@@ -6,7 +8,7 @@ import difflib
 import re
 from datetime import date, datetime
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 
 # Choix V1 explicite : types Python supportes par la source canonique.
@@ -217,6 +219,7 @@ def _validate_root_structure(data: Any, issues: list[EntityDefinitionIssue]) -> 
         _add_issue(issues, "$", "la racine doit etre un objet JSON")
         return
 
+    data = cast("dict[str, Any]", data)
     for key in data:
         if key not in ALLOWED_ROOT_KEYS:
             _add_issue(issues, key, "cle racine non supportee en V1")
@@ -258,6 +261,7 @@ def _validate_rbac_structure(rbac: Any, entity_name: str, issues: list[EntityDef
     if not isinstance(rbac, dict):
         _add_issue(issues, "rbac", "doit etre un objet JSON")
         return
+    rbac = cast("dict[str, Any]", rbac)
     for key in rbac:
         if key != "permissions":
             _add_issue(issues, f"rbac.{key}", "cle rbac non supportee — seule 'permissions' est acceptee")
@@ -267,6 +271,7 @@ def _validate_rbac_structure(rbac: Any, entity_name: str, issues: list[EntityDef
     if not isinstance(perms, dict):
         _add_issue(issues, "rbac.permissions", "doit etre un objet JSON")
         return
+    perms = cast("dict[str, Any]", perms)
     for action, code in perms.items():
         if action not in ALLOWED_RBAC_ACTION_KEYS:
             known = ", ".join(sorted(ALLOWED_RBAC_ACTION_KEYS))
@@ -291,6 +296,7 @@ def _validate_media_structure(media: Any, issues: list[EntityDefinitionIssue]) -
     if not isinstance(media, list):
         _add_issue(issues, "media", "doit etre une liste si present")
         return
+    media = cast("list[Any]", media)
     for index, entry in enumerate(media):
         _validate_media_entry_structure(entry, index, issues)
 
@@ -301,6 +307,7 @@ def _validate_media_entry_structure(entry: Any, index: int, issues: list[EntityD
         _add_issue(issues, path, "doit etre un objet")
         return
 
+    entry = cast("dict[str, Any]", entry)
     for key in entry:
         if key not in ALLOWED_MEDIA_ENTRY_KEYS:
             _add_issue(issues, f"{path}.{key}", "cle media non supportee")
@@ -335,6 +342,7 @@ def _validate_field_structure(field: Any, index: int, issues: list[EntityDefinit
         _add_issue(issues, path, "doit etre un objet")
         return
 
+    field = cast("dict[str, Any]", field)
     required_keys = ["name", "sql_type"]
     for key in required_keys:
         if key not in field:
@@ -365,7 +373,7 @@ def _validate_field_structure(field: Any, index: int, issues: list[EntityDefinit
     if "constraints" in field and not isinstance(constraints, dict):
         _add_issue(issues, f"{path}.constraints", "doit etre un objet")
     elif isinstance(constraints, dict):
-        for key in constraints:
+        for key in cast("dict[str, Any]", constraints):
             if key not in ALLOWED_CONSTRAINT_KEYS:
                 close = difflib.get_close_matches(key, ALLOWED_CONSTRAINT_KEYS, n=1, cutoff=0.6)
                 hint = f" — vouliez-vous dire : {close[0]!r} ?" if close else ""
@@ -376,7 +384,7 @@ def _validate_field_structure(field: Any, index: int, issues: list[EntityDefinit
         if not isinstance(form, dict):
             _add_issue(issues, f"{path}.form", "doit etre un objet si present")
         else:
-            for key in form:
+            for key in cast("dict[str, Any]", form):
                 if key not in ALLOWED_FORM_KEYS:
                     _add_issue(issues, f"{path}.form.{key}", "cle form non supportee")
             if "field" in form and not isinstance(form["field"], str):
@@ -387,7 +395,7 @@ def _validate_field_structure(field: Any, index: int, issues: list[EntityDefinit
         if not isinstance(lst, dict):
             _add_issue(issues, f"{path}.list", "doit etre un objet si present")
         else:
-            for key in lst:
+            for key in cast("dict[str, Any]", lst):
                 if key not in ALLOWED_LIST_KEYS:
                     _add_issue(issues, f"{path}.list.{key}", "cle list non supportee")
             if "filter" in lst and not isinstance(lst["filter"], bool):
@@ -401,13 +409,14 @@ def _normalize_entity_data(
     if not isinstance(data, dict):
         return None
 
+    data = cast("dict[str, Any]", data)
     fields = data.get("fields")
     if not isinstance(fields, list):
         return None
 
     entity = data.get("entity")
     table = data.get("table")
-    normalized = {
+    normalized: dict[str, Any] = {
         "format_version": data.get("format_version", 1),
         "entity": entity,
         "table": table if "table" in data else (_to_snake(entity) if isinstance(entity, str) else ""),
@@ -415,25 +424,24 @@ def _normalize_entity_data(
         "fields": [],
     }
 
-    for index, field in enumerate(fields):
+    for index, field in enumerate(cast("list[Any]", fields)):
         normalized_field = _normalize_field_data(field, index, issues)
         if normalized_field is not None:
             normalized["fields"].append(normalized_field)
 
     raw_media = data.get("media")
     if isinstance(raw_media, list):
-        normalized["media"] = _normalize_media_list(raw_media)
+        normalized["media"] = _normalize_media_list(cast("list[Any]", raw_media))
 
     raw_rbac = data.get("rbac")
     if isinstance(raw_rbac, dict):
-        perms_raw = raw_rbac.get("permissions")
+        perms_raw = cast("dict[str, Any]", raw_rbac).get("permissions")
         if isinstance(perms_raw, dict):
             normalized["rbac"] = {
                 "permissions": {
                     action: code
-                    for action, code in perms_raw.items()
-                    if isinstance(action, str)
-                    and isinstance(code, str)
+                    for action, code in cast("dict[str, Any]", perms_raw).items()
+                    if isinstance(code, str)
                     and code.strip()
                     and action in ALLOWED_RBAC_ACTION_KEYS
                 }
@@ -442,11 +450,12 @@ def _normalize_entity_data(
     return normalized
 
 
-def _normalize_media_list(media: list) -> list:
-    result = []
+def _normalize_media_list(media: list[Any]) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
     for entry in media:
         if not isinstance(entry, dict):
             continue
+        entry = cast("dict[str, Any]", entry)
         normalized_entry: dict[str, Any] = {
             "name": entry.get("name", ""),
             "field": entry.get("field", ""),
@@ -469,6 +478,7 @@ def _normalize_field_data(
     path = f"fields[{index}]"
     if not isinstance(field, dict):
         return None
+    field = cast("dict[str, Any]", field)
 
     name = field.get("name")
     sql_type = field.get("sql_type")
@@ -485,8 +495,9 @@ def _normalize_field_data(
     constraints = field.get("constraints", {})
     if not isinstance(constraints, dict):
         constraints = {}
+    constraints = cast("dict[str, Any]", constraints)
 
-    normalized_field = {
+    normalized_field: dict[str, Any] = {
         "name": name,
         "column": field.get("column", _column_from_field_name(name) if isinstance(name, str) else ""),
         "python_type": python_type,
@@ -494,7 +505,7 @@ def _normalize_field_data(
         "nullable": field.get("nullable", False),
         "primary_key": field.get("primary_key", False),
         "auto_increment": field.get("auto_increment", False),
-        "constraints": dict(constraints),
+        "constraints": dict[str, Any](constraints),
         "unique": field.get("unique", False),
     }
     if "default" in field:
@@ -527,6 +538,7 @@ def _validate_entity_local_consistency(data: dict[str, Any], issues: list[Entity
     fields = data.get("fields")
     if not isinstance(fields, list):
         return
+    fields = cast("list[Any]", fields)
 
     field_names: dict[str, int] = {}
     column_names: dict[str, int] = {}
@@ -535,6 +547,7 @@ def _validate_entity_local_consistency(data: dict[str, Any], issues: list[Entity
     for index, field in enumerate(fields):
         if not isinstance(field, dict):
             continue
+        field = cast("dict[str, Any]", field)
         _validate_field_consistency(field, index, issues)
 
         name = field.get("name")
@@ -572,6 +585,7 @@ def _validate_entity_local_consistency(data: dict[str, Any], issues: list[Entity
     for index, field in enumerate(fields):
         if not isinstance(field, dict):
             continue
+        field = cast("dict[str, Any]", field)
         src = field.get("source")
         if src is None:
             continue
@@ -584,15 +598,16 @@ def _validate_entity_local_consistency(data: dict[str, Any], issues: list[Entity
 
     media = data.get("media")
     if isinstance(media, list):
-        _validate_media_consistency(media, issues)
+        _validate_media_consistency(cast("list[Any]", media), issues)
 
 
-def _validate_media_consistency(media: list, issues: list[EntityDefinitionIssue]) -> None:
+def _validate_media_consistency(media: list[Any], issues: list[EntityDefinitionIssue]) -> None:
     seen_names: dict[str, int] = {}
     seen_roles: dict[str, int] = {}
     for index, entry in enumerate(media):
         if not isinstance(entry, dict):
             continue
+        entry = cast("dict[str, Any]", entry)
         path = f"media[{index}]"
 
         field_val = entry.get("field")
@@ -661,17 +676,17 @@ def _validate_field_consistency(field: dict[str, Any], index: int, issues: list[
             _add_issue(issues, f"{path}.auto_increment", "requiert un sql_type entier compatible")
 
     if isinstance(constraints, dict) and isinstance(python_type, str):
-        _validate_constraints(constraints, python_type, path, issues)
+        _validate_constraints(cast("dict[str, Any]", constraints), python_type, path, issues)
 
     if "default" in field and isinstance(python_type, str):
         _validate_default(field["default"], python_type, nullable, path, issues)
 
     form = field.get("form")
-    if isinstance(form, dict) and isinstance(form.get("field"), str):
-        _validate_form_field(form["field"], sql_type, path, issues)
+    if isinstance(form, dict) and isinstance(cast("dict[str, Any]", form).get("field"), str):
+        _validate_form_field(cast("dict[str, Any]", form)["field"], sql_type, path, issues)
 
     lst = field.get("list")
-    if isinstance(lst, dict) and lst.get("filter") is True and isinstance(sql_type, str):
+    if isinstance(lst, dict) and cast("dict[str, Any]", lst).get("filter") is True and isinstance(sql_type, str):
         _validate_list_filter(sql_type, path, issues)
 
 

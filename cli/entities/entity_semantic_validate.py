@@ -1,3 +1,5 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """Validation sémantique Forge des entités et relations JSON canoniques.
 
 Cette couche s'exécute après la validation JSON Schema (structurelle) et
@@ -23,6 +25,7 @@ Cette couche ne vérifie pas encore :
 """
 
 from __future__ import annotations
+from typing import Any, cast
 
 import keyword
 from dataclasses import dataclass
@@ -52,8 +55,8 @@ class SemanticError:
 
 
 def validate_semantic(
-    valid_entities: list[tuple[str, dict]],
-    valid_relations: dict | None,
+    valid_entities: list[tuple[str, dict[str, Any]]],
+    valid_relations: dict[str, Any] | None,
 ) -> list[SemanticError]:
     """Valide la cohérence sémantique des entités et relations structurellement valides.
 
@@ -67,7 +70,7 @@ def validate_semantic(
     """
     errors: list[SemanticError] = []
 
-    entity_by_name: dict[str, dict] = {}
+    entity_by_name: dict[str, dict[str, Any]] = {}
     table_to_entity: dict[str, str] = {}  # table_name → entity_name
 
     # ── Contrôles par entité ──────────────────────────────────────────────────
@@ -77,7 +80,7 @@ def validate_semantic(
         table = entity.get("table", "")
         fields = entity.get("fields", [])
 
-        field_names = [f.get("name", "") for f in fields if isinstance(f, dict)]
+        field_names = [cast("dict[str, Any]", f).get("name", "") for f in fields if isinstance(f, dict)]
 
         # 1. Doublons de champs
         seen: set[str] = set()
@@ -123,6 +126,7 @@ def validate_semantic(
         for idx_i, index in enumerate(entity.get("indexes", [])):
             if not isinstance(index, dict):
                 continue
+            index = cast("dict[str, Any]", index)
             for col_i, col in enumerate(index.get("fields", [])):
                 if col not in field_name_set:
                     errors.append(SemanticError(
@@ -149,6 +153,7 @@ def validate_semantic(
     for rel_i, relation in enumerate(valid_relations.get("relations", [])):
         if not isinstance(relation, dict):
             continue
+        relation = cast("dict[str, Any]", relation)
 
         rel_type = relation.get("type", "")
         rel_from = relation.get("from", "")
@@ -173,14 +178,14 @@ def validate_semantic(
 
 def _check_many_to_one(
     errors: list[SemanticError],
-    relation: dict,
+    relation: dict[str, Any],
     rel_i: int,
     rel_path: str,
     rel_from: str,
     rel_to: str,
     rel_name: str,
     known_names: set[str],
-    entity_by_name: dict[str, dict],
+    entity_by_name: dict[str, dict[str, Any]],
 ) -> None:
     source = "relations.json"
 
@@ -208,7 +213,7 @@ def _check_many_to_one(
     if rel_from in entity_by_name:
         from_entity = entity_by_name[rel_from]
         existing_fields = {
-            f.get("name", "") for f in from_entity.get("fields", []) if isinstance(f, dict)
+            cast("dict[str, Any]", f).get("name", "") for f in from_entity.get("fields", []) if isinstance(f, dict)
         }
         fk = relation.get("foreign_key") or f"{rel_name}_id"
         if fk in existing_fields:
@@ -241,7 +246,7 @@ def _check_many_to_one(
 
 def _check_many_to_many(
     errors: list[SemanticError],
-    relation: dict,
+    relation: dict[str, Any],
     rel_i: int,
     rel_path: str,
     rel_from: str,
@@ -251,7 +256,7 @@ def _check_many_to_many(
     m2m_pairs: set[frozenset[str]],
 ) -> None:
     source = "relations.json"
-    pivot = relation.get("pivot", {}) if isinstance(relation.get("pivot"), dict) else {}
+    pivot: dict[str, Any] = cast("dict[str, Any]", relation.get("pivot")) if isinstance(relation.get("pivot"), dict) else {}
 
     # 9. from → entité inconnue
     if rel_from and rel_from not in known_names:
@@ -310,10 +315,11 @@ def _check_many_to_many(
         ))
 
     # 14. pivot.fields redéclarant des noms réservés
-    reserved_pivot = {"id"} | ({from_key} if from_key else set()) | ({to_key} if to_key else set())
+    reserved_pivot: set[str] = {"id"} | ({from_key} if from_key else set[str]()) | ({to_key} if to_key else set[str]())
     for fi, pf in enumerate(pivot.get("fields", [])):
         if not isinstance(pf, dict):
             continue
+        pf = cast("dict[str, Any]", pf)
         pf_name = pf.get("name", "")
         if pf_name in reserved_pivot:
             errors.append(SemanticError(
