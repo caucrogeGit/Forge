@@ -60,6 +60,10 @@ def _load_crud_many_to_one_relations(
     crud_relations: list[CrudManyToOneRelation] = []
 
     for relation in validated_relations:
+        # Les relations m2m canoniques n'ont pas de from_field/from_column : on ne
+        # traite ici que les many_to_one (type ValidatedRelation après ce filtre).
+        if isinstance(relation, ValidatedCanonicalManyToManyRelation):
+            continue
         if relation.relation_type != "many_to_one" or relation.from_entity != current_entity:
             continue
 

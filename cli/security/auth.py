@@ -24,6 +24,7 @@ import importlib
 import os
 import sys
 from pathlib import Path
+from collections.abc import Callable
 from typing import Any, Literal
 
 import cli._support.output as out
@@ -54,10 +55,10 @@ class AuthAdminCliError(RuntimeError):
         self.conseil = conseil
 
 
-DbFetchOne = Any
-DbFetchAll = Any
-DbInsert = Any
-DbExecute = Any
+DbFetchOne = Callable[[str, "tuple[Any, ...]"], "dict[str, Any] | None"]
+DbFetchAll = Callable[[str, "tuple[Any, ...]"], "list[dict[str, Any]]"]
+DbInsert = Callable[[str, "tuple[Any, ...]"], int]
+DbExecute = Callable[[str, "tuple[Any, ...]"], int]
 
 
 AUTH_SQL_FILES = (
@@ -337,7 +338,7 @@ def _friendly_db_error(error: Exception) -> AuthAdminCliError:
 
 
 def _default_fetch_one(sql: str, params: tuple[Any, ...]) -> dict[str, Any] | None:
-    import core.database as db
+    from core.database import db
 
     try:
         return db.fetch_one(sql, params)
@@ -346,7 +347,7 @@ def _default_fetch_one(sql: str, params: tuple[Any, ...]) -> dict[str, Any] | No
 
 
 def _default_fetch_all(sql: str, params: tuple[Any, ...]) -> list[dict[str, Any]]:
-    import core.database as db
+    from core.database import db
 
     try:
         rows = db.fetch_all(sql, params)
@@ -356,7 +357,7 @@ def _default_fetch_all(sql: str, params: tuple[Any, ...]) -> list[dict[str, Any]
 
 
 def _default_insert(sql: str, params: tuple[Any, ...]) -> int:
-    import core.database as db
+    from core.database import db
 
     try:
         return int(db.insert(sql, params))
@@ -365,7 +366,7 @@ def _default_insert(sql: str, params: tuple[Any, ...]) -> int:
 
 
 def _default_execute(sql: str, params: tuple[Any, ...]) -> int:
-    import core.database as db
+    from core.database import db
 
     try:
         return int(db.execute(sql, params))

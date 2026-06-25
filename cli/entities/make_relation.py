@@ -292,7 +292,7 @@ def _ensure_no_obvious_duplicates(relations: list[dict[str, Any]], relation: dic
 def main(argv: list[str] | None = None) -> None:
     args = list(sys.argv[1:] if argv is None else argv)
     if args and args[0] in {"-h", "--help"}:
-        print(__doc__.strip())
+        print((__doc__ or "").strip())
         raise SystemExit(0)
     if args:
         print("Usage : forge make:relation")

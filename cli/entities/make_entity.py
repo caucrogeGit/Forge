@@ -287,7 +287,7 @@ def _parse_args(args: list[str]) -> tuple[str | None, bool]:
 
     for arg in args:
         if arg in {"-h", "--help"}:
-            print(__doc__.strip())
+            print((__doc__ or "").strip())
             raise SystemExit(0)
         if arg == "--no-input":
             interactive = False
@@ -298,7 +298,7 @@ def _parse_args(args: list[str]) -> tuple[str | None, bool]:
         if entity_name is None:
             entity_name = arg.strip()
             continue
-        print(__doc__.strip())
+        print((__doc__ or "").strip())
         raise SystemExit(1)
 
     return entity_name, interactive
