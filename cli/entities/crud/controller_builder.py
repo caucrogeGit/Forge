@@ -3,6 +3,7 @@
 """Controller builder for the CRUD generator."""
 
 from __future__ import annotations
+from dataclasses import dataclass
 from typing import Any, cast
 
 from cli.entities.crud.context import (
@@ -38,6 +39,594 @@ from cli.entities.crud.relations_loader import (
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,
 )
+
+
+@dataclass(frozen=True)
+class _ControllerContext:
+    """Locaux partagés du générateur (REFACTOR-BUILD-CONTROLLER-001).
+
+    Calculés une fois par `build_controller`, passés aux sous-générateurs
+    `_render_*(ctx)` qui produisent chacun les lignes d'une partie du contrôleur.
+    """
+    entity: str
+    snake: str
+    plural: str
+    pk_name: str
+    pk_col: str
+    choice_options: list[CrudManyToOneRelation]
+    generated_fields: list[tuple[str, str]]
+    ctrl_media_entries: list[dict[str, Any]]
+    m2m: list[CrudManyToManyRelation]
+    rbac: dict[str, str]
+    allowed_sort_keys_repr: str
+    filter_flds: list[dict[str, Any]]
+    relation_filter_names: set[str]
+
+
+def _render_export_csv(ctx: _ControllerContext) -> list[str]:
+    plural, entity = ctx.plural, ctx.entity
+    allowed_sort_keys_repr = ctx.allowed_sort_keys_repr
+    filter_flds = ctx.filter_flds
+    relation_filter_names = ctx.relation_filter_names
+    export_csv_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def export_csv(request: Request) -> Response:",
+        '        q = _query_param(request, "q").strip()',
+        '        sort = _query_param(request, "sort")',
+        f"        if sort not in {allowed_sort_keys_repr}:",
+        '            sort = ""',
+        '        direction = _query_param(request, "direction", "desc")',
+        '        if direction not in ("asc", "desc"):',
+        '            direction = "asc"',
+    ]
+    if filter_flds:
+        for ff in filter_flds:
+            fname = ff["name"]
+            if fname in relation_filter_names:
+                export_csv_lines += [
+                    f'        {fname}_raw = _query_param(request, "{fname}").strip()',
+                    f'        {fname}_f = ""',
+                    f'        if {fname}_raw:',
+                    "            try:",
+                    f"                {fname}_f = int({fname}_raw)",
+                    "            except (TypeError, ValueError):",
+                    f'                {fname}_f = ""',
+                ]
+            else:
+                export_csv_lines.append(f'        {fname}_f = _query_param(request, "{fname}").strip()')
+        export_csv_lines.append("        _filters = {}")
+        for ff in filter_flds:
+            fname = ff["name"]
+            if _is_bool_sql(ff.get("sql_type", "")):
+                export_csv_lines += [
+                    f'        if {fname}_f in ("0", "1"):',
+                    f'            _filters["{fname}"] = {fname}_f',
+                ]
+            else:
+                export_csv_lines += [
+                    f'        if {fname}_f != "":',
+                    f'            _filters["{fname}"] = {fname}_f',
+                ]
+        export_csv_lines.append(
+            f"        rows = find_{plural}_for_export(q=q or None, sort=sort or None, direction=direction, filters=_filters or None)"
+        )
+    else:
+        export_csv_lines.append(
+            f"        rows = find_{plural}_for_export(q=q or None, sort=sort or None, direction=direction)"
+        )
+    export_csv_lines += [
+        "        output = io.StringIO()",
+        "        writer = csv.writer(output, quoting=csv.QUOTE_ALL)",
+        "        writer.writerow([header for header, _ in _CSV_COLS])",
+        "        for row in rows:",
+        f'            writer.writerow([{entity}Controller._csv_escape(str(row.get(key) or "")) for _, key in _CSV_COLS])',
+        '        content = output.getvalue().encode("utf-8")',
+        "        return Response(",
+        "            200,",
+        "            content,",
+        '            "text/csv; charset=utf-8",',
+        "            headers={",
+        f'                "Content-Disposition": \'attachment; filename="{plural}.csv"\',',
+        '                "Cache-Control": "no-store",',
+        "            },",
+        "        )",
+        "",
+    ]
+    return export_csv_lines
+
+
+def _render_new(ctx: _ControllerContext) -> list[str]:
+    entity, snake, choice_options, many_to_many_relations = ctx.entity, ctx.snake, ctx.choice_options, ctx.m2m
+    new_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def new(request: Request) -> Response:",
+        (
+            f'        form = {entity}Form(**_{snake}_form_options())'
+            if choice_options else
+            f'        form = {entity}Form()'
+        ),
+        f'        return BaseController.render("{snake}/form.html",',
+        '            context={',
+        '                "form": form,',
+        f'                "action": "/{snake}/create",',
+        f'                "titre": "Nouveau {snake}",',
+    ]
+    for relation in many_to_many_relations or []:
+        new_lines.append(f'                "{relation.choices_key}": {relation.choices_function}(),')
+        new_lines.append(f'                "{relation.selected_key}": [],')
+    new_lines += [
+        "            },",
+        "            request=request)",
+    ]
+    return new_lines
+
+
+def _render_destroy(ctx: _ControllerContext) -> list[str]:
+    entity, snake, pk_name, ctrl_media_entries = ctx.entity, ctx.snake, ctx.pk_name, ctx.ctrl_media_entries
+    destroy_lines = [
+        "",
+        "    @staticmethod",
+        "    def destroy(request: Request) -> Response:",
+        f'        {pk_name} = {entity}Controller._parse_id(request.route("id"))',
+        f"        if {pk_name} is None:",
+        "            return BaseController.not_found()",
+    ]
+    if ctrl_media_entries:
+        destroy_lines += [
+            f'        for _m in list_media_for_entity("{snake}", {pk_name}):',
+            '            delete_media(_m["id"], delete_files=True, variants=True)',
+        ]
+    destroy_lines += [
+        f'        delete_{snake}({pk_name})',
+        "        if _is_hx_request(request):",
+        f"            context = {entity}Controller._list_context(request)",
+        f'            return BaseController.render("{snake}/_results.html", context=context, request=request)',
+        f'        return BaseController.redirect_with_flash(request, "/{snake}", "{entity} supprimé.")',
+        "",
+    ]
+    return destroy_lines
+
+
+def _render_bulk_delete(ctx: _ControllerContext) -> list[str]:
+    entity, snake = ctx.entity, ctx.snake
+    bulk_delete_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def bulk_delete(request: Request) -> Response:",
+        f"        ids = {entity}Controller._parse_bulk_ids(request)",
+        "        if not ids:",
+        f'            return BaseController.redirect_with_flash(request, "/{snake}", "Aucun élément sélectionné.")',
+        f'        return BaseController.render("{snake}/bulk_delete_confirm.html",',
+        '            context={"ids": ids, "count": len(ids), "flash_html": render_flash_html(request)},',
+        "            request=request)",
+    ]
+    return bulk_delete_lines
+
+
+def _render_bulk_delete_confirm(ctx: _ControllerContext) -> list[str]:
+    entity, snake, plural = ctx.entity, ctx.snake, ctx.plural
+    bulk_delete_confirm_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def bulk_delete_confirm(request: Request) -> Response:",
+        f"        ids = {entity}Controller._parse_bulk_ids(request)",
+        "        if not ids:",
+        f'            return BaseController.redirect_with_flash(request, "/{snake}", "Aucun élément sélectionné.")',
+        f"        bulk_delete_{plural}(ids)",
+        '        count = len(ids)',
+        '        return BaseController.redirect_with_flash(',
+        f'            request, "/{snake}",',
+        '            f"{count} élément(s) supprimé(s).")',
+        "",
+    ]
+    return bulk_delete_confirm_lines
+
+
+def _render_csv_escape(_ctx: _ControllerContext) -> list[str]:
+    csv_escape_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def _csv_escape(value: str) -> str:",
+        '        if value and value[0] in ("=", "+", "-", "@"):',
+        '            return "\'" + value',
+        "        return value",
+    ]
+    return csv_escape_lines
+
+
+def _render_create(ctx: _ControllerContext) -> list[str]:
+    entity, snake, choice_options, generated_fields, ctrl_media_entries, many_to_many_relations = ctx.entity, ctx.snake, ctx.choice_options, ctx.generated_fields, ctx.ctrl_media_entries, ctx.m2m
+    create_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def create(request: Request) -> Response:",
+        (
+            f'        form = {entity}Form.from_request(request, **_{snake}_form_options())'
+            if choice_options else
+            f'        form = {entity}Form.from_request(request)'
+        ),
+    ]
+    for relation in many_to_many_relations or []:
+        create_lines.append(
+            f'        {relation.field_name} = {entity}Controller._parse_many_ids(request, "{relation.field_name}")'
+        )
+    create_lines += [
+        "        if not form.is_valid():",
+        f'            return BaseController.validation_error("{snake}/form.html",',
+        '                context={',
+        '                    "form": form,',
+        f'                    "action": "/{snake}/create",',
+        f'                    "titre": "Nouveau {snake}",',
+    ]
+    for relation in many_to_many_relations or []:
+        create_lines.append(f'                    "{relation.choices_key}": {relation.choices_function}(),')
+        create_lines.append(f'                    "{relation.selected_key}": {relation.field_name},')
+    create_lines += [
+        "                },",
+        "                request=request)",
+    ]
+    # Slug auto-généré depuis son champ source (stable ensuite ; ADR-017).
+    for _gen_name, _gen_source in generated_fields:
+        create_lines.append(
+            f'        form.cleaned_data["{_gen_name}"] = '
+            f'slugify(form.cleaned_data["{_gen_source}"])'
+        )
+    if ctrl_media_entries:
+        for entry in ctrl_media_entries:
+            if not entry.get("multiple", False):
+                continue
+            mname = entry["name"]
+            create_lines += [
+                f'        _{mname}_files_raw = request.files.get("{mname}", [])',
+                f'        _{mname}_files = _{mname}_files_raw if isinstance(_{mname}_files_raw, list) else ([_{mname}_files_raw] if _{mname}_files_raw else [])',
+                f'        for _{mname}_f in _{mname}_files:',
+                f'            if getattr(_{mname}_f, "filename", ""):',
+                '                try:',
+                f'                    form.fields["{mname}"].validate(_{mname}_f)',
+                f'                except Exception as _{mname}_exc:',
+                f'                    form.add_error("{mname}", getattr(_{mname}_exc, "messages", [str(_{mname}_exc)]))',
+                f'                    return BaseController.validation_error("{snake}/form.html",',
+                '                        context={',
+                '                            "form": form,',
+                f'                            "action": "/{snake}/create",',
+                f'                            "titre": "Nouveau {snake}",',
+            ]
+            for relation in many_to_many_relations or []:
+                create_lines.append(f'                            "{relation.choices_key}": {relation.choices_function}(),')
+                create_lines.append(f'                            "{relation.selected_key}": {relation.field_name},')
+            create_lines += [
+                '                        },',
+                '                        request=request)',
+            ]
+        media_names_repr = "{" + ", ".join(f'"{e["name"]}"' for e in ctrl_media_entries) + "}"
+        create_lines += [
+            f'        _media_keys = {media_names_repr}',
+            '        _sql_data = {k: v for k, v in form.cleaned_data.items() if k not in _media_keys}',
+            f'        created_id = add_{snake}(_sql_data)',
+        ]
+        for entry in ctrl_media_entries:
+            mname = entry["name"]
+            mrole = entry["role"]
+            mfield = entry["field"]
+            variants = entry.get("variants", False)
+            _is_multiple = entry.get("multiple", False)
+            _alt_key = f"_media_alt_{mname}_new" if _is_multiple else f"_media_alt_{mname}"
+            if _is_multiple:
+                create_lines += [
+                    f'        _{mname}_alt = (request.body.get("{_alt_key}", [None])[0] or None)',
+                    f'        for _{mname}_f in _{mname}_files:',
+                    f'            if getattr(_{mname}_f, "filename", ""):',
+                    f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_f", variants)}',
+                    f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id=created_id, role="{mrole}", position=0, alt_text=_{mname}_alt)',
+                ]
+            else:
+                create_lines += [
+                    f'        _{mname}_alt = (request.body.get("{_alt_key}", [None])[0] or None)',
+                    f'        _{mname}_file = form.cleaned_data.get("{mname}")',
+                    f'        if _{mname}_file and getattr(_{mname}_file, "filename", ""):',
+                    f'            _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_file", variants)}',
+                    f'            attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id=created_id, role="{mrole}", position=0, alt_text=_{mname}_alt)',
+                ]
+    else:
+        if many_to_many_relations:
+            create_lines.append(f'        created_id = add_{snake}(form.cleaned_data)')
+        else:
+            create_lines.append(f'        add_{snake}(form.cleaned_data)')
+    for relation in many_to_many_relations or []:
+        create_lines.append(f'        {relation.add_function}(created_id, {relation.field_name})')
+    create_lines.append(
+        f'        return BaseController.redirect_with_flash(request, "/{snake}", "{entity} créé.")'
+    )
+    return create_lines
+
+
+def _render_show(ctx: _ControllerContext) -> list[str]:
+    snake, entity, pk_name, ctrl_media_entries, many_to_many_relations = ctx.snake, ctx.entity, ctx.pk_name, ctx.ctrl_media_entries, ctx.m2m
+    show_singles = [e for e in ctrl_media_entries if not e.get("multiple", False)]
+    show_multiples = [e for e in ctrl_media_entries if e.get("multiple", False)]
+    show_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def show(request: Request) -> Response:",
+        f'        {pk_name} = {entity}Controller._parse_id(request.route("id"))',
+        f"        if {pk_name} is None:",
+        "            return BaseController.not_found()",
+        f'        {snake} = get_{snake}_by_id({pk_name})',
+        f'        if {snake} is None:',
+        "            return BaseController.not_found()",
+    ]
+    for entry in show_singles:
+        mname = entry["name"]
+        mrole = entry["role"]
+        show_lines.append(
+            f'        {mname}_media = get_cover_media("{snake}", {pk_name}, role="{mrole}")'
+        )
+    for entry in show_multiples:
+        mname = entry["name"]
+        mrole = entry["role"]
+        show_lines.append(
+            f'        {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
+        )
+    for relation in many_to_many_relations or []:
+        show_lines.append(f'        {relation.show_context_key} = {relation.show_labels_function}({pk_name})')
+    ctx_items = [f'"{snake}": {snake}', '"flash_html": render_flash_html(request)']
+    ctx_items += [f'"{relation.show_context_key}": {relation.show_context_key}' for relation in many_to_many_relations or []]
+    ctx_items += [f'"{e["name"]}_media": {e["name"]}_media' for e in show_singles]
+    ctx_items += [f'"{e["name"]}_media_list": {e["name"]}_media_list' for e in show_multiples]
+    show_lines += [
+        f'        return BaseController.render("{snake}/show.html",',
+        f'            context={{{", ".join(ctx_items)}}},',
+        "            request=request)",
+    ]
+    return show_lines
+
+
+def _render_edit(ctx: _ControllerContext) -> list[str]:
+    snake, entity, pk_name, choice_options, ctrl_media_entries, many_to_many_relations = ctx.snake, ctx.entity, ctx.pk_name, ctx.choice_options, ctx.ctrl_media_entries, ctx.m2m
+    show_singles = [e for e in ctrl_media_entries if not e.get("multiple", False)]
+    show_multiples = [e for e in ctrl_media_entries if e.get("multiple", False)]
+    edit_singles = show_singles  # same list
+    edit_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def edit(request: Request) -> Response:",
+        f'        {pk_name} = {entity}Controller._parse_id(request.route("id"))',
+        f"        if {pk_name} is None:",
+        "            return BaseController.not_found()",
+        f'        {snake} = get_{snake}_by_id({pk_name})',
+        f'        if {snake} is None:',
+        "            return BaseController.not_found()",
+    ]
+    for entry in edit_singles:
+        mname = entry["name"]
+        mrole = entry["role"]
+        edit_lines.append(
+            f'        {mname}_media = get_cover_media("{snake}", {pk_name}, role="{mrole}")'
+        )
+    for entry in show_multiples:
+        mname = entry["name"]
+        mrole = entry["role"]
+        edit_lines.append(
+            f'        {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
+        )
+    edit_lines += [
+        f'        return BaseController.render("{snake}/form.html",',
+        '            context={',
+        (
+            f'                "form": {entity}Form(_form_data_from_{snake}({snake}), **_{snake}_form_options()),'
+            if choice_options else
+            f'                "form": {entity}Form(_form_data_from_{snake}({snake})),'
+        ),
+        f'                "action": f"/{snake}/update/{{{pk_name}}}",',
+        f'                "titre": "Modifier {snake}",',
+    ]
+    for relation in many_to_many_relations or []:
+        edit_lines.append(f'                "{relation.choices_key}": {relation.choices_function}(),')
+        edit_lines.append(f'                "{relation.selected_key}": {relation.selected_function}({pk_name}),')
+    for entry in edit_singles:
+        mname = entry["name"]
+        edit_lines.append(f'                "{mname}_media": {mname}_media,')
+    for entry in show_multiples:
+        mname = entry["name"]
+        edit_lines.append(f'                "{mname}_media_list": {mname}_media_list,')
+    edit_lines += [
+        "            },",
+        "            request=request)",
+    ]
+    return edit_lines
+
+
+def _render_update(ctx: _ControllerContext) -> list[str]:
+    entity, snake, pk_name, choice_options, ctrl_media_entries, many_to_many_relations = ctx.entity, ctx.snake, ctx.pk_name, ctx.choice_options, ctx.ctrl_media_entries, ctx.m2m
+    show_singles = [e for e in ctrl_media_entries if not e.get("multiple", False)]
+    show_multiples = [e for e in ctrl_media_entries if e.get("multiple", False)]
+    update_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def update(request: Request) -> Response:",
+        f'        {pk_name} = {entity}Controller._parse_id(request.route("id"))',
+        f"        if {pk_name} is None:",
+        "            return BaseController.not_found()",
+        (
+            f'        form = {entity}Form.from_request(request, **_{snake}_form_options())'
+            if choice_options else
+            f'        form = {entity}Form.from_request(request)'
+        ),
+    ]
+    for relation in many_to_many_relations or []:
+        update_lines.append(
+            f'        {relation.field_name} = {entity}Controller._parse_many_ids(request, "{relation.field_name}")'
+        )
+    update_lines += [
+        "        if not form.is_valid():",
+    ]
+    for entry in show_singles:
+        mname = entry["name"]
+        mrole = entry["role"]
+        update_lines.append(
+            f'            {mname}_media = get_cover_media("{snake}", {pk_name}, role="{mrole}")'
+        )
+    for entry in show_multiples:
+        mname = entry["name"]
+        mrole = entry["role"]
+        update_lines.append(
+            f'            {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
+        )
+    update_lines += [
+        f'            return BaseController.validation_error("{snake}/form.html",',
+        "                context={",
+        '                    "form": form,',
+        f'                    "action": f"/{snake}/update/{{{pk_name}}}",',
+        f'                    "titre": "Modifier {snake}",',
+    ]
+    for relation in many_to_many_relations or []:
+        update_lines.append(f'                    "{relation.choices_key}": {relation.choices_function}(),')
+        update_lines.append(f'                    "{relation.selected_key}": {relation.field_name},')
+    for entry in show_singles:
+        mname = entry["name"]
+        update_lines.append(f'                    "{mname}_media": {mname}_media,')
+    for entry in show_multiples:
+        mname = entry["name"]
+        update_lines.append(f'                    "{mname}_media_list": {mname}_media_list,')
+    update_lines += [
+        "                },",
+        "                request=request)",
+    ]
+    for entry in show_multiples:
+        mname = entry["name"]
+        mrole = entry["role"]
+        update_lines += [
+            f'        _{mname}_files_raw = request.files.get("{mname}", [])',
+            f'        _{mname}_files = _{mname}_files_raw if isinstance(_{mname}_files_raw, list) else ([_{mname}_files_raw] if _{mname}_files_raw else [])',
+            f'        for _{mname}_f in _{mname}_files:',
+            f'            if getattr(_{mname}_f, "filename", ""):',
+            '                try:',
+            f'                    form.fields["{mname}"].validate(_{mname}_f)',
+            f'                except Exception as _{mname}_exc:',
+            f'                    form.add_error("{mname}", getattr(_{mname}_exc, "messages", [str(_{mname}_exc)]))',
+        ]
+        for single_entry in show_singles:
+            sname = single_entry["name"]
+            srole = single_entry["role"]
+            update_lines.append(
+                f'                    {sname}_media = get_cover_media("{snake}", {pk_name}, role="{srole}")'
+            )
+        for multi_entry in show_multiples:
+            m2name = multi_entry["name"]
+            m2role = multi_entry["role"]
+            update_lines.append(
+                f'                    {m2name}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{m2role}")'
+            )
+        update_lines += [
+            f'                    return BaseController.validation_error("{snake}/form.html",',
+            '                        context={',
+            '                            "form": form,',
+            f'                            "action": f"/{snake}/update/{{{pk_name}}}",',
+            f'                            "titre": "Modifier {snake}",',
+        ]
+        for relation in many_to_many_relations or []:
+            update_lines.append(f'                            "{relation.choices_key}": {relation.choices_function}(),')
+            update_lines.append(f'                            "{relation.selected_key}": {relation.field_name},')
+        for single_entry in show_singles:
+            sname = single_entry["name"]
+            update_lines.append(f'                            "{sname}_media": {sname}_media,')
+        for multi_entry in show_multiples:
+            m2name = multi_entry["name"]
+            update_lines.append(f'                            "{m2name}_media_list": {m2name}_media_list,')
+        update_lines += [
+            '                        },',
+            '                        request=request)',
+        ]
+    if ctrl_media_entries:
+        media_names_repr = "{" + ", ".join(f'"{e["name"]}"' for e in ctrl_media_entries) + "}"
+        update_lines += [
+            f'        _media_keys = {media_names_repr}',
+            '        _sql_data = {k: v for k, v in form.cleaned_data.items() if k not in _media_keys}',
+            f'        update_{snake}({pk_name}, _sql_data)',
+        ]
+        for entry in ctrl_media_entries:
+            if entry.get("multiple", False):
+                continue
+            mname = entry["name"]
+            mrole = entry["role"]
+            mfield = entry["field"]
+            variants = entry.get("variants", False)
+            del_variants = mfield == "image"
+            update_lines += [
+                f'        _{mname}_alt = (request.body.get("_media_alt_{mname}", [None])[0] or None)',
+                f'        _{mname}_file = form.cleaned_data.get("{mname}")',
+                f'        _{mname}_has_file = bool(_{mname}_file and getattr(_{mname}_file, "filename", ""))',
+                f'        _{mname}_delete = "_delete_media_{mname}" in request.body',
+                f'        if _{mname}_has_file or _{mname}_delete:',
+                f'            for _old in list_media_for_entity("{snake}", {pk_name}, role="{mrole}"):',
+                f'                delete_media(_old["id"], delete_files=True, variants={del_variants})',
+                f'            if _{mname}_has_file:',
+                f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_file", variants)}',
+                f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id={pk_name}, role="{mrole}", position=0, alt_text=_{mname}_alt)',
+                '        else:',
+                f'            for _existing_{mname} in list_media_for_entity("{snake}", {pk_name}, role="{mrole}"):',
+                f'                update_media_alt_text(_existing_{mname}["id"], _{mname}_alt)',
+            ]
+        for entry in ctrl_media_entries:
+            if not entry.get("multiple", False):
+                continue
+            mname = entry["name"]
+            mrole = entry["role"]
+            mfield = entry["field"]
+            variants = entry.get("variants", False)
+            update_lines += [
+                f'        _{mname}_del_ids = request.body.get("_delete_media_{mname}", [])',
+                f'        for _did in _{mname}_del_ids:',
+                '            delete_media(int(_did), delete_files=True, variants=True)',
+                '        for _key in list(request.body.keys()):',
+                f'            if _key.startswith("_media_position_{mname}_"):',
+                '                try:',
+                f'                    _pos_mid = int(_key[len("_media_position_{mname}_"):])',
+                '                    _pval_raw = request.body.get(_key, [])',
+                '                    _pval = int(_pval_raw[0]) if _pval_raw else None',
+                '                    if _pval is not None and _pval >= 0:',
+                '                        update_media_position(_pos_mid, _pval)',
+                '                except (ValueError, IndexError):',
+                '                    pass',
+                '        for _key in list(request.body.keys()):',
+                f'            if _key.startswith("_media_alt_{mname}_"):',
+                '                try:',
+                f'                    _alt_mid = int(_key[len("_media_alt_{mname}_"):])',
+                '                    _alt_raw = request.body.get(_key, [])',
+                '                    _alt_val = (_alt_raw[0] or None) if _alt_raw else None',
+                '                    update_media_alt_text(_alt_mid, _alt_val)',
+                '                except (ValueError, IndexError):',
+                '                    pass',
+                f'        _{mname}_alt_new = (request.body.get("_media_alt_{mname}_new", [None])[0] or None)',
+                f'        for _{mname}_f in _{mname}_files:',
+                f'            if getattr(_{mname}_f, "filename", ""):',
+                f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_f", variants)}',
+                f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id={pk_name}, role="{mrole}", position=0, alt_text=_{mname}_alt_new)',
+            ]
+    else:
+        update_lines.append(f'        update_{snake}({pk_name}, form.cleaned_data)')
+    for relation in many_to_many_relations or []:
+        update_lines.append(f'        {relation.sync_function}({pk_name}, {relation.field_name})')
+    update_lines += [
+        '        return BaseController.redirect_with_flash(',
+        f'            request, f"/{snake}/show/{{{pk_name}}}", "{entity} mis à jour.")',
+    ]
+    return update_lines
+
+
+def _render_index(ctx: _ControllerContext) -> list[str]:
+    entity, snake = ctx.entity, ctx.snake
+    index_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def index(request: Request) -> Response:",
+        f"        context = {entity}Controller._list_context(request)",
+        f'        template = "{snake}/_results.html" if _is_hx_request(request) else "{snake}/index.html"',
+        "        return BaseController.render(template, context=context, request=request)",
+    ]
+    return index_lines
 
 
 def build_controller(
@@ -229,6 +818,13 @@ def build_controller(
     # index
     filter_flds = _filter_fields(definition, relations)
     relation_filter_names = set(_relation_by_field(relations))
+    _ctx = _ControllerContext(
+        entity=entity, snake=snake, plural=plural, pk_name=pk_name, pk_col=pk_col,
+        choice_options=choice_options, generated_fields=generated_fields,
+        ctrl_media_entries=ctrl_media_entries, m2m=many_to_many_relations or [],
+        rbac=_rbac, allowed_sort_keys_repr=allowed_sort_keys_repr,
+        filter_flds=filter_flds, relation_filter_names=relation_filter_names,
+    )
     list_context_lines: list[str] = [
         "",
         "    @staticmethod",
@@ -327,541 +923,26 @@ def build_controller(
     ])
     lines += list_context_lines
 
-    index_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def index(request: Request) -> Response:",
-        f"        context = {entity}Controller._list_context(request)",
-        f'        template = "{snake}/_results.html" if _is_hx_request(request) else "{snake}/index.html"',
-        "        return BaseController.render(template, context=context, request=request)",
-    ]
-    lines += _with_permission(index_lines, _rbac.get("index"))
+    lines += _with_permission(_render_index(_ctx), _rbac.get("index"))
 
-    # new
-    new_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def new(request: Request) -> Response:",
-        (
-            f'        form = {entity}Form(**_{snake}_form_options())'
-            if choice_options else
-            f'        form = {entity}Form()'
-        ),
-        f'        return BaseController.render("{snake}/form.html",',
-        '            context={',
-        '                "form": form,',
-        f'                "action": "/{snake}/create",',
-        f'                "titre": "Nouveau {snake}",',
-    ]
-    for relation in many_to_many_relations or []:
-        new_lines.append(f'                "{relation.choices_key}": {relation.choices_function}(),')
-        new_lines.append(f'                "{relation.selected_key}": [],')
-    new_lines += [
-        "            },",
-        "            request=request)",
-    ]
-    lines += _with_permission(new_lines, _rbac.get("create"))
+    lines += _with_permission(_render_new(_ctx), _rbac.get("create"))
 
-    # create
-    create_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def create(request: Request) -> Response:",
-        (
-            f'        form = {entity}Form.from_request(request, **_{snake}_form_options())'
-            if choice_options else
-            f'        form = {entity}Form.from_request(request)'
-        ),
-    ]
-    for relation in many_to_many_relations or []:
-        create_lines.append(
-            f'        {relation.field_name} = {entity}Controller._parse_many_ids(request, "{relation.field_name}")'
-        )
-    create_lines += [
-        "        if not form.is_valid():",
-        f'            return BaseController.validation_error("{snake}/form.html",',
-        '                context={',
-        '                    "form": form,',
-        f'                    "action": "/{snake}/create",',
-        f'                    "titre": "Nouveau {snake}",',
-    ]
-    for relation in many_to_many_relations or []:
-        create_lines.append(f'                    "{relation.choices_key}": {relation.choices_function}(),')
-        create_lines.append(f'                    "{relation.selected_key}": {relation.field_name},')
-    create_lines += [
-        "                },",
-        "                request=request)",
-    ]
-    # Slug auto-généré depuis son champ source (stable ensuite ; ADR-017).
-    for _gen_name, _gen_source in generated_fields:
-        create_lines.append(
-            f'        form.cleaned_data["{_gen_name}"] = '
-            f'slugify(form.cleaned_data["{_gen_source}"])'
-        )
-    if ctrl_media_entries:
-        for entry in ctrl_media_entries:
-            if not entry.get("multiple", False):
-                continue
-            mname = entry["name"]
-            create_lines += [
-                f'        _{mname}_files_raw = request.files.get("{mname}", [])',
-                f'        _{mname}_files = _{mname}_files_raw if isinstance(_{mname}_files_raw, list) else ([_{mname}_files_raw] if _{mname}_files_raw else [])',
-                f'        for _{mname}_f in _{mname}_files:',
-                f'            if getattr(_{mname}_f, "filename", ""):',
-                '                try:',
-                f'                    form.fields["{mname}"].validate(_{mname}_f)',
-                f'                except Exception as _{mname}_exc:',
-                f'                    form.add_error("{mname}", getattr(_{mname}_exc, "messages", [str(_{mname}_exc)]))',
-                f'                    return BaseController.validation_error("{snake}/form.html",',
-                '                        context={',
-                '                            "form": form,',
-                f'                            "action": "/{snake}/create",',
-                f'                            "titre": "Nouveau {snake}",',
-            ]
-            for relation in many_to_many_relations or []:
-                create_lines.append(f'                            "{relation.choices_key}": {relation.choices_function}(),')
-                create_lines.append(f'                            "{relation.selected_key}": {relation.field_name},')
-            create_lines += [
-                '                        },',
-                '                        request=request)',
-            ]
-        media_names_repr = "{" + ", ".join(f'"{e["name"]}"' for e in ctrl_media_entries) + "}"
-        create_lines += [
-            f'        _media_keys = {media_names_repr}',
-            '        _sql_data = {k: v for k, v in form.cleaned_data.items() if k not in _media_keys}',
-            f'        created_id = add_{snake}(_sql_data)',
-        ]
-        for entry in ctrl_media_entries:
-            mname = entry["name"]
-            mrole = entry["role"]
-            mfield = entry["field"]
-            variants = entry.get("variants", False)
-            _is_multiple = entry.get("multiple", False)
-            _alt_key = f"_media_alt_{mname}_new" if _is_multiple else f"_media_alt_{mname}"
-            if _is_multiple:
-                create_lines += [
-                    f'        _{mname}_alt = (request.body.get("{_alt_key}", [None])[0] or None)',
-                    f'        for _{mname}_f in _{mname}_files:',
-                    f'            if getattr(_{mname}_f, "filename", ""):',
-                    f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_f", variants)}',
-                    f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id=created_id, role="{mrole}", position=0, alt_text=_{mname}_alt)',
-                ]
-            else:
-                create_lines += [
-                    f'        _{mname}_alt = (request.body.get("{_alt_key}", [None])[0] or None)',
-                    f'        _{mname}_file = form.cleaned_data.get("{mname}")',
-                    f'        if _{mname}_file and getattr(_{mname}_file, "filename", ""):',
-                    f'            _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_file", variants)}',
-                    f'            attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id=created_id, role="{mrole}", position=0, alt_text=_{mname}_alt)',
-                ]
-    else:
-        if many_to_many_relations:
-            create_lines.append(f'        created_id = add_{snake}(form.cleaned_data)')
-        else:
-            create_lines.append(f'        add_{snake}(form.cleaned_data)')
-    for relation in many_to_many_relations or []:
-        create_lines.append(f'        {relation.add_function}(created_id, {relation.field_name})')
-    create_lines.append(
-        f'        return BaseController.redirect_with_flash(request, "/{snake}", "{entity} créé.")'
-    )
-    lines += _with_permission(create_lines, _rbac.get("store"))
+    lines += _with_permission(_render_create(_ctx), _rbac.get("store"))
 
-    # show
-    show_singles = [e for e in ctrl_media_entries if not e.get("multiple", False)]
-    show_multiples = [e for e in ctrl_media_entries if e.get("multiple", False)]
-    show_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def show(request: Request) -> Response:",
-        f'        {pk_name} = {entity}Controller._parse_id(request.route("id"))',
-        f"        if {pk_name} is None:",
-        "            return BaseController.not_found()",
-        f'        {snake} = get_{snake}_by_id({pk_name})',
-        f'        if {snake} is None:',
-        "            return BaseController.not_found()",
-    ]
-    for entry in show_singles:
-        mname = entry["name"]
-        mrole = entry["role"]
-        show_lines.append(
-            f'        {mname}_media = get_cover_media("{snake}", {pk_name}, role="{mrole}")'
-        )
-    for entry in show_multiples:
-        mname = entry["name"]
-        mrole = entry["role"]
-        show_lines.append(
-            f'        {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
-        )
-    for relation in many_to_many_relations or []:
-        show_lines.append(f'        {relation.show_context_key} = {relation.show_labels_function}({pk_name})')
-    ctx_items = [f'"{snake}": {snake}', '"flash_html": render_flash_html(request)']
-    ctx_items += [f'"{relation.show_context_key}": {relation.show_context_key}' for relation in many_to_many_relations or []]
-    ctx_items += [f'"{e["name"]}_media": {e["name"]}_media' for e in show_singles]
-    ctx_items += [f'"{e["name"]}_media_list": {e["name"]}_media_list' for e in show_multiples]
-    show_lines += [
-        f'        return BaseController.render("{snake}/show.html",',
-        f'            context={{{", ".join(ctx_items)}}},',
-        "            request=request)",
-    ]
-    lines += _with_permission(show_lines, _rbac.get("show"))
+    lines += _with_permission(_render_show(_ctx), _rbac.get("show"))
 
-    # edit
-    edit_singles = show_singles  # same list
-    edit_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def edit(request: Request) -> Response:",
-        f'        {pk_name} = {entity}Controller._parse_id(request.route("id"))',
-        f"        if {pk_name} is None:",
-        "            return BaseController.not_found()",
-        f'        {snake} = get_{snake}_by_id({pk_name})',
-        f'        if {snake} is None:',
-        "            return BaseController.not_found()",
-    ]
-    for entry in edit_singles:
-        mname = entry["name"]
-        mrole = entry["role"]
-        edit_lines.append(
-            f'        {mname}_media = get_cover_media("{snake}", {pk_name}, role="{mrole}")'
-        )
-    for entry in show_multiples:
-        mname = entry["name"]
-        mrole = entry["role"]
-        edit_lines.append(
-            f'        {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
-        )
-    edit_lines += [
-        f'        return BaseController.render("{snake}/form.html",',
-        '            context={',
-        (
-            f'                "form": {entity}Form(_form_data_from_{snake}({snake}), **_{snake}_form_options()),'
-            if choice_options else
-            f'                "form": {entity}Form(_form_data_from_{snake}({snake})),'
-        ),
-        f'                "action": f"/{snake}/update/{{{pk_name}}}",',
-        f'                "titre": "Modifier {snake}",',
-    ]
-    for relation in many_to_many_relations or []:
-        edit_lines.append(f'                "{relation.choices_key}": {relation.choices_function}(),')
-        edit_lines.append(f'                "{relation.selected_key}": {relation.selected_function}({pk_name}),')
-    for entry in edit_singles:
-        mname = entry["name"]
-        edit_lines.append(f'                "{mname}_media": {mname}_media,')
-    for entry in show_multiples:
-        mname = entry["name"]
-        edit_lines.append(f'                "{mname}_media_list": {mname}_media_list,')
-    edit_lines += [
-        "            },",
-        "            request=request)",
-    ]
-    lines += _with_permission(edit_lines, _rbac.get("edit"))
+    lines += _with_permission(_render_edit(_ctx), _rbac.get("edit"))
 
-    # update
-    update_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def update(request: Request) -> Response:",
-        f'        {pk_name} = {entity}Controller._parse_id(request.route("id"))',
-        f"        if {pk_name} is None:",
-        "            return BaseController.not_found()",
-        (
-            f'        form = {entity}Form.from_request(request, **_{snake}_form_options())'
-            if choice_options else
-            f'        form = {entity}Form.from_request(request)'
-        ),
-    ]
-    for relation in many_to_many_relations or []:
-        update_lines.append(
-            f'        {relation.field_name} = {entity}Controller._parse_many_ids(request, "{relation.field_name}")'
-        )
-    update_lines += [
-        "        if not form.is_valid():",
-    ]
-    for entry in show_singles:
-        mname = entry["name"]
-        mrole = entry["role"]
-        update_lines.append(
-            f'            {mname}_media = get_cover_media("{snake}", {pk_name}, role="{mrole}")'
-        )
-    for entry in show_multiples:
-        mname = entry["name"]
-        mrole = entry["role"]
-        update_lines.append(
-            f'            {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
-        )
-    update_lines += [
-        f'            return BaseController.validation_error("{snake}/form.html",',
-        "                context={",
-        '                    "form": form,',
-        f'                    "action": f"/{snake}/update/{{{pk_name}}}",',
-        f'                    "titre": "Modifier {snake}",',
-    ]
-    for relation in many_to_many_relations or []:
-        update_lines.append(f'                    "{relation.choices_key}": {relation.choices_function}(),')
-        update_lines.append(f'                    "{relation.selected_key}": {relation.field_name},')
-    for entry in show_singles:
-        mname = entry["name"]
-        update_lines.append(f'                    "{mname}_media": {mname}_media,')
-    for entry in show_multiples:
-        mname = entry["name"]
-        update_lines.append(f'                    "{mname}_media_list": {mname}_media_list,')
-    update_lines += [
-        "                },",
-        "                request=request)",
-    ]
-    for entry in show_multiples:
-        mname = entry["name"]
-        mrole = entry["role"]
-        update_lines += [
-            f'        _{mname}_files_raw = request.files.get("{mname}", [])',
-            f'        _{mname}_files = _{mname}_files_raw if isinstance(_{mname}_files_raw, list) else ([_{mname}_files_raw] if _{mname}_files_raw else [])',
-            f'        for _{mname}_f in _{mname}_files:',
-            f'            if getattr(_{mname}_f, "filename", ""):',
-            '                try:',
-            f'                    form.fields["{mname}"].validate(_{mname}_f)',
-            f'                except Exception as _{mname}_exc:',
-            f'                    form.add_error("{mname}", getattr(_{mname}_exc, "messages", [str(_{mname}_exc)]))',
-        ]
-        for single_entry in show_singles:
-            sname = single_entry["name"]
-            srole = single_entry["role"]
-            update_lines.append(
-                f'                    {sname}_media = get_cover_media("{snake}", {pk_name}, role="{srole}")'
-            )
-        for multi_entry in show_multiples:
-            m2name = multi_entry["name"]
-            m2role = multi_entry["role"]
-            update_lines.append(
-                f'                    {m2name}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{m2role}")'
-            )
-        update_lines += [
-            f'                    return BaseController.validation_error("{snake}/form.html",',
-            '                        context={',
-            '                            "form": form,',
-            f'                            "action": f"/{snake}/update/{{{pk_name}}}",',
-            f'                            "titre": "Modifier {snake}",',
-        ]
-        for relation in many_to_many_relations or []:
-            update_lines.append(f'                            "{relation.choices_key}": {relation.choices_function}(),')
-            update_lines.append(f'                            "{relation.selected_key}": {relation.field_name},')
-        for single_entry in show_singles:
-            sname = single_entry["name"]
-            update_lines.append(f'                            "{sname}_media": {sname}_media,')
-        for multi_entry in show_multiples:
-            m2name = multi_entry["name"]
-            update_lines.append(f'                            "{m2name}_media_list": {m2name}_media_list,')
-        update_lines += [
-            '                        },',
-            '                        request=request)',
-        ]
-    if ctrl_media_entries:
-        media_names_repr = "{" + ", ".join(f'"{e["name"]}"' for e in ctrl_media_entries) + "}"
-        update_lines += [
-            f'        _media_keys = {media_names_repr}',
-            '        _sql_data = {k: v for k, v in form.cleaned_data.items() if k not in _media_keys}',
-            f'        update_{snake}({pk_name}, _sql_data)',
-        ]
-        for entry in ctrl_media_entries:
-            if entry.get("multiple", False):
-                continue
-            mname = entry["name"]
-            mrole = entry["role"]
-            mfield = entry["field"]
-            variants = entry.get("variants", False)
-            del_variants = mfield == "image"
-            update_lines += [
-                f'        _{mname}_alt = (request.body.get("_media_alt_{mname}", [None])[0] or None)',
-                f'        _{mname}_file = form.cleaned_data.get("{mname}")',
-                f'        _{mname}_has_file = bool(_{mname}_file and getattr(_{mname}_file, "filename", ""))',
-                f'        _{mname}_delete = "_delete_media_{mname}" in request.body',
-                f'        if _{mname}_has_file or _{mname}_delete:',
-                f'            for _old in list_media_for_entity("{snake}", {pk_name}, role="{mrole}"):',
-                f'                delete_media(_old["id"], delete_files=True, variants={del_variants})',
-                f'            if _{mname}_has_file:',
-                f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_file", variants)}',
-                f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id={pk_name}, role="{mrole}", position=0, alt_text=_{mname}_alt)',
-                '        else:',
-                f'            for _existing_{mname} in list_media_for_entity("{snake}", {pk_name}, role="{mrole}"):',
-                f'                update_media_alt_text(_existing_{mname}["id"], _{mname}_alt)',
-            ]
-        for entry in ctrl_media_entries:
-            if not entry.get("multiple", False):
-                continue
-            mname = entry["name"]
-            mrole = entry["role"]
-            mfield = entry["field"]
-            variants = entry.get("variants", False)
-            update_lines += [
-                f'        _{mname}_del_ids = request.body.get("_delete_media_{mname}", [])',
-                f'        for _did in _{mname}_del_ids:',
-                '            delete_media(int(_did), delete_files=True, variants=True)',
-                '        for _key in list(request.body.keys()):',
-                f'            if _key.startswith("_media_position_{mname}_"):',
-                '                try:',
-                f'                    _pos_mid = int(_key[len("_media_position_{mname}_"):])',
-                '                    _pval_raw = request.body.get(_key, [])',
-                '                    _pval = int(_pval_raw[0]) if _pval_raw else None',
-                '                    if _pval is not None and _pval >= 0:',
-                '                        update_media_position(_pos_mid, _pval)',
-                '                except (ValueError, IndexError):',
-                '                    pass',
-                '        for _key in list(request.body.keys()):',
-                f'            if _key.startswith("_media_alt_{mname}_"):',
-                '                try:',
-                f'                    _alt_mid = int(_key[len("_media_alt_{mname}_"):])',
-                '                    _alt_raw = request.body.get(_key, [])',
-                '                    _alt_val = (_alt_raw[0] or None) if _alt_raw else None',
-                '                    update_media_alt_text(_alt_mid, _alt_val)',
-                '                except (ValueError, IndexError):',
-                '                    pass',
-                f'        _{mname}_alt_new = (request.body.get("_media_alt_{mname}_new", [None])[0] or None)',
-                f'        for _{mname}_f in _{mname}_files:',
-                f'            if getattr(_{mname}_f, "filename", ""):',
-                f'                _saved_{mname} = {_media_upload_call(mfield, f"_{mname}_f", variants)}',
-                f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id={pk_name}, role="{mrole}", position=0, alt_text=_{mname}_alt_new)',
-            ]
-    else:
-        update_lines.append(f'        update_{snake}({pk_name}, form.cleaned_data)')
-    for relation in many_to_many_relations or []:
-        update_lines.append(f'        {relation.sync_function}({pk_name}, {relation.field_name})')
-    update_lines += [
-        '        return BaseController.redirect_with_flash(',
-        f'            request, f"/{snake}/show/{{{pk_name}}}", "{entity} mis à jour.")',
-    ]
-    lines += _with_permission(update_lines, _rbac.get("update"))
+    lines += _with_permission(_render_update(_ctx), _rbac.get("update"))
 
-    # destroy
-    destroy_lines = [
-        "",
-        "    @staticmethod",
-        "    def destroy(request: Request) -> Response:",
-        f'        {pk_name} = {entity}Controller._parse_id(request.route("id"))',
-        f"        if {pk_name} is None:",
-        "            return BaseController.not_found()",
-    ]
-    if ctrl_media_entries:
-        destroy_lines += [
-            f'        for _m in list_media_for_entity("{snake}", {pk_name}):',
-            '            delete_media(_m["id"], delete_files=True, variants=True)',
-        ]
-    destroy_lines += [
-        f'        delete_{snake}({pk_name})',
-        "        if _is_hx_request(request):",
-        f"            context = {entity}Controller._list_context(request)",
-        f'            return BaseController.render("{snake}/_results.html", context=context, request=request)',
-        f'        return BaseController.redirect_with_flash(request, "/{snake}", "{entity} supprimé.")',
-        "",
-    ]
-    lines += _with_permission(destroy_lines, _rbac.get("delete"))
+    lines += _with_permission(_render_destroy(_ctx), _rbac.get("delete"))
 
-    # bulk_delete — affiche la page de confirmation
-    bulk_delete_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def bulk_delete(request: Request) -> Response:",
-        f"        ids = {entity}Controller._parse_bulk_ids(request)",
-        "        if not ids:",
-        f'            return BaseController.redirect_with_flash(request, "/{snake}", "Aucun élément sélectionné.")',
-        f'        return BaseController.render("{snake}/bulk_delete_confirm.html",',
-        '            context={"ids": ids, "count": len(ids), "flash_html": render_flash_html(request)},',
-        "            request=request)",
-    ]
-    lines += _with_permission(bulk_delete_lines, _rbac.get("delete"))
+    lines += _with_permission(_render_bulk_delete(_ctx), _rbac.get("delete"))
 
-    # bulk_delete_confirm — effectue la suppression après confirmation
-    bulk_delete_confirm_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def bulk_delete_confirm(request: Request) -> Response:",
-        f"        ids = {entity}Controller._parse_bulk_ids(request)",
-        "        if not ids:",
-        f'            return BaseController.redirect_with_flash(request, "/{snake}", "Aucun élément sélectionné.")',
-        f"        bulk_delete_{plural}(ids)",
-        '        count = len(ids)',
-        '        return BaseController.redirect_with_flash(',
-        f'            request, "/{snake}",',
-        '            f"{count} élément(s) supprimé(s).")',
-        "",
-    ]
-    lines += _with_permission(bulk_delete_confirm_lines, _rbac.get("delete"))
+    lines += _with_permission(_render_bulk_delete_confirm(_ctx), _rbac.get("delete"))
 
-    # _csv_escape — neutralise l'injection CSV
-    csv_escape_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def _csv_escape(value: str) -> str:",
-        '        if value and value[0] in ("=", "+", "-", "@"):',
-        '            return "\'" + value',
-        "        return value",
-    ]
-    lines += csv_escape_lines
+    lines += _render_csv_escape(_ctx)
 
-    # export_csv — export CSV filtré
-    export_csv_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def export_csv(request: Request) -> Response:",
-        '        q = _query_param(request, "q").strip()',
-        '        sort = _query_param(request, "sort")',
-        f"        if sort not in {allowed_sort_keys_repr}:",
-        '            sort = ""',
-        '        direction = _query_param(request, "direction", "desc")',
-        '        if direction not in ("asc", "desc"):',
-        '            direction = "asc"',
-    ]
-    if filter_flds:
-        for ff in filter_flds:
-            fname = ff["name"]
-            if fname in relation_filter_names:
-                export_csv_lines += [
-                    f'        {fname}_raw = _query_param(request, "{fname}").strip()',
-                    f'        {fname}_f = ""',
-                    f'        if {fname}_raw:',
-                    "            try:",
-                    f"                {fname}_f = int({fname}_raw)",
-                    "            except (TypeError, ValueError):",
-                    f'                {fname}_f = ""',
-                ]
-            else:
-                export_csv_lines.append(f'        {fname}_f = _query_param(request, "{fname}").strip()')
-        export_csv_lines.append("        _filters = {}")
-        for ff in filter_flds:
-            fname = ff["name"]
-            if _is_bool_sql(ff.get("sql_type", "")):
-                export_csv_lines += [
-                    f'        if {fname}_f in ("0", "1"):',
-                    f'            _filters["{fname}"] = {fname}_f',
-                ]
-            else:
-                export_csv_lines += [
-                    f'        if {fname}_f != "":',
-                    f'            _filters["{fname}"] = {fname}_f',
-                ]
-        export_csv_lines.append(
-            f"        rows = find_{plural}_for_export(q=q or None, sort=sort or None, direction=direction, filters=_filters or None)"
-        )
-    else:
-        export_csv_lines.append(
-            f"        rows = find_{plural}_for_export(q=q or None, sort=sort or None, direction=direction)"
-        )
-    export_csv_lines += [
-        "        output = io.StringIO()",
-        "        writer = csv.writer(output, quoting=csv.QUOTE_ALL)",
-        "        writer.writerow([header for header, _ in _CSV_COLS])",
-        "        for row in rows:",
-        f'            writer.writerow([{entity}Controller._csv_escape(str(row.get(key) or "")) for _, key in _CSV_COLS])',
-        '        content = output.getvalue().encode("utf-8")',
-        "        return Response(",
-        "            200,",
-        "            content,",
-        '            "text/csv; charset=utf-8",',
-        "            headers={",
-        f'                "Content-Disposition": \'attachment; filename="{plural}.csv"\',',
-        '                "Cache-Control": "no-store",',
-        "            },",
-        "        )",
-        "",
-    ]
-    lines += _with_permission(export_csv_lines, _rbac.get("index"))
+    lines += _with_permission(_render_export_csv(_ctx), _rbac.get("index"))
 
     return "\n".join(lines)
