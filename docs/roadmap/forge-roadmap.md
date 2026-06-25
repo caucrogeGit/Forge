@@ -110,6 +110,41 @@ classifiers `Development Status` hétérogènes, tirets cadratins dans les vieux
 
 ---
 
+## Chantier — typage strict de tout le projet (post-audit 2026-06-25)
+
+Le cœur (`core/`) et les 12 opt-ins sont déjà en `# pyright: strict` + `py.typed`.
+Reste à passer en strict l'**outillage** : `cli/` (1690 erreurs strict mesurées),
+`forge.py` (77), `tools/` (39), `integrations/` (31), soit ≈ 1837 erreurs.
+
+Méthode (suite de `TYPING-CLI-STRICT-001`) : **ratchet par fichier**. Le gate
+`test_cli_pyright_clean_001` (`pyright cli` = 0) enforce `# pyright: strict` dès
+qu'un fichier le porte ; pas besoin du pyproject (protégé). Faire les deux
+**fondations** en premier (elles débloquent plusieurs fichiers), puis les
+sous-systèmes. Un ticket = une responsabilité (principe 2) ; effort indicatif =
+nombre d'erreurs.
+
+| Ordre | Ticket | Périmètre | Erreurs |
+|---|---|---|---|
+| Fondation | `TYPING-ENTITY-CONTRACT-TYPEDICT-001` | `EntityDefinition`/`FieldDefinition` (TypedDict) + threading via le normaliseur et les générateurs ; cascade construction + sites d'appel | ~298 |
+| Fondation | `TYPING-CLI-PRIVATE-PUBLIC-001` | Rendre publiques les fonctions privées utilisées inter-modules (`_with_permission`, `_ensure_route`, `_ensure_controller_method`…) ; résout `reportPrivateUsage` + `reportUnusedFunction` | ~50 |
+| 1 | `TYPING-CLI-CRUD-001` | `cli/entities/crud/` (controller_builder 161, views_builder 113, utils 91, model_builder 56, form_builder 51, context, relations_loader) ; controller_builder peut être scindé | ~470 |
+| 2 | `TYPING-CLI-ENTITIES-VALIDATION-001` | `validation.py`, `entity_validate.py`, `entity_semantic_validate.py` | ~302 |
+| 3 | `TYPING-CLI-ENTITIES-MAKE-DB-001` | `make_entity`, `make_crud`, `relations`, `migrations`, `db_init`, `db_apply`, `model` | ~360 |
+| 4 | `TYPING-CLI-SECURITY-001` | `cli/security/` (auth, rbac_audit, rbac_validate) | ~108 |
+| 5 | `TYPING-CLI-PUBLIC-001` | `cli/public/` (public_contact, public_pdf…) | ~117 |
+| 6 | `TYPING-CLI-PROJECT-SCHEMAS-OPTINS-001` | `cli/project/`, `cli/schemas/`, `cli/optins/` | ~167 |
+| 7 | `TYPING-CLI-ASSETS-DEPLOY-001` | `cli/assets/`, `cli/deploy/`, `cli/_support/` | ~18 |
+| 8 | `TYPING-FORGE-PY-001` | `forge.py` (dispatcher racine) | ~77 |
+| 9 | `TYPING-INTEGRATIONS-001` | `integrations/` | ~31 |
+| 10 | `TYPING-TOOLS-001` | `tools/` (scripts de release/checks) | ~39 |
+| Final | `TYPING-STRICT-GATE-FINAL-001` | Tout strict : faire évoluer le gate (pyright en strict pour `cli`, ou ajouter `cli`/`forge.py`/`integrations`/`tools` au `[tool.pyright].include` lors d'une refonte majeure, fichier protégé) ; retirer la nuance « standard » | — |
+
+Déjà faits par `TYPING-CLI-STRICT-001` : `make_relation`, `i18n`, `public_page`,
+`canonical_model_normalizer` (strict) ; 25 erreurs standard corrigées (dont un bug
+runtime de l'auth admin) ; gate en place.
+
+---
+
 ## Consolidation terrain — journal des retours de tests terrain (post-b16)
 
 Journal des incidents et manques remontés par l'**usage réel** d'un projet
