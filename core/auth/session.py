@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from functools import wraps
 from typing import Any, cast
@@ -12,6 +13,7 @@ from core.auth.password import verify_password
 from core.auth.user import AuthUser, normalize_auth_user, validate_auth_user_contract
 from core.http.response import Response
 
+logger = logging.getLogger(__name__)
 
 AUTH_USER_ID_SESSION_KEY = "_auth_user_id"
 
@@ -32,6 +34,11 @@ def authenticate_user(
     try:
         raw_user = user_loader(email.strip())
     except Exception:
+        logger.warning(
+            "Le user_loader a levé une exception à l'authentification ; traité comme échec d'auth "
+            "(distinct d'un mot de passe invalide). Vérifiez le loader applicatif / la base.",
+            exc_info=True,
+        )
         return None
 
     if raw_user is None:
@@ -125,6 +132,11 @@ def current_user(request: Any, user_loader: Callable[[int], Any]) -> AuthUser | 
     try:
         raw_user = user_loader(user_id)
     except Exception:
+        logger.warning(
+            "Le user_loader a levé une exception au chargement de l'utilisateur de session ; "
+            "session traitée comme anonyme (distinct d'une session absente).",
+            exc_info=True,
+        )
         return None
 
     if raw_user is None:
@@ -179,6 +191,10 @@ def _resolve_request_session(request: Any) -> dict[str, Any] | None:
         session_id = get_session_id(request)
         return get_session(session_id) if session_id else None
     except Exception:
+        logger.warning(
+            "Résolution de la session impossible (exception) ; session ignorée.",
+            exc_info=True,
+        )
         return None
 
 
@@ -201,4 +217,8 @@ def _persist_request_session(request: Any, data: dict[str, Any]) -> None:
         if session_id:
             get_session_store().replace(session_id, data)
     except Exception:
+        logger.warning(
+            "Persistance de la session impossible (exception) ; non bloquant.",
+            exc_info=True,
+        )
         return
