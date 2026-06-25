@@ -58,13 +58,18 @@ from forge_mvc_files.manager import (
 )
 from tests._malicious_samples import fake_php_shell
 
+# En-têtes binaires valides (magic bytes) — save_upload valide la signature
+# du contenu pour les types image/PDF (SEC-UPLOAD-MIME-MAGIC-001).
+_PNG_BYTES = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
+_JPEG_BYTES = b"\xff\xd8\xff\xe0" + b"\x00" * 64
+
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
 class _FakeFile:
-    def __init__(self, filename: str, content: bytes = b"x", content_type: str = "image/png"):
+    def __init__(self, filename: str, content: bytes = _PNG_BYTES, content_type: str = "image/png"):
         self.filename = filename
         self.content = content
         self.content_type = content_type
@@ -242,17 +247,14 @@ class TestMimeSecurite:
         with pytest.raises(UploadInvalidMimeTypeError):
             validate_mime_type("text/html", ["image/png"])
 
-    def test_limite_mime_spoofing_non_detecte(self, tmp_path, monkeypatch):
-        """
-        Forge valide le Content-Type client, pas la signature binaire du fichier.
-        Un fichier PHP avec content_type=image/jpeg et extension .jpg est accepté
-        si image/jpeg et jpg sont dans la liste blanche.
-        LIMITE CONNUE — corriger nécessite python-magic (hors périmètre).
-        """
+    def test_mime_spoofing_detecte_par_magic_bytes(self, tmp_path, monkeypatch):
+        """SEC-UPLOAD-MIME-MAGIC-001 : un PHP renommé .jpg (content_type menti) est
+        désormais REJETÉ — les magic bytes ne correspondent pas à l'extension jpg.
+        La limite « pas de détection de signature » est corrigée (sans python-magic)."""
         _cfg_forge(tmp_path, monkeypatch)
         fake_php = _FakeFile("malware.jpg", fake_php_shell("phpinfo();"), "image/jpeg")
-        saved = save_upload(fake_php, category="documents")
-        assert saved.mime_type == "image/jpeg"
+        with pytest.raises(UploadInvalidMimeTypeError):
+            save_upload(fake_php, category="documents")
 
 
 # ---------------------------------------------------------------------------
@@ -364,22 +366,22 @@ class TestCheminStocke:
 
     def test_save_upload_retourne_chemin_relatif(self, tmp_path, monkeypatch):
         _cfg_forge(tmp_path, monkeypatch)
-        f = _FakeFile("photo.jpg", b"x" * 100, "image/jpeg")
+        f = _FakeFile("photo.jpg", _JPEG_BYTES, "image/jpeg")
         saved = save_upload(f, category="documents")
         assert not saved.path.startswith("/")
         assert not saved.path.startswith("storage/")
 
     def test_save_upload_path_contient_uuid_pour_eviter_collision(self, tmp_path, monkeypatch):
         _cfg_forge(tmp_path, monkeypatch)
-        f1 = _FakeFile("photo.jpg", b"premier", "image/jpeg")
-        f2 = _FakeFile("photo.jpg", b"second", "image/jpeg")
+        f1 = _FakeFile("photo.jpg", _JPEG_BYTES, "image/jpeg")
+        f2 = _FakeFile("photo.jpg", _JPEG_BYTES, "image/jpeg")
         s1 = save_upload(f1, category="documents")
         s2 = save_upload(f2, category="documents")
         assert s1.path != s2.path
 
     def test_save_upload_path_est_valide_pour_serve(self, tmp_path, monkeypatch):
         _cfg_forge(tmp_path, monkeypatch)
-        f = _FakeFile("photo.jpg", b"x" * 100, "image/jpeg")
+        f = _FakeFile("photo.jpg", _JPEG_BYTES, "image/jpeg")
         saved = save_upload(f, category="documents")
         response = serve_media_file(saved.path, root=tmp_path / "uploads")
         assert response.status == 200
