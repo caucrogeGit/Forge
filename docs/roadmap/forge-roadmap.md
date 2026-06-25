@@ -182,6 +182,37 @@ dettes de cohérence. Un ticket = une responsabilité (principe 2) ; statut « �
 
 ---
 
+## Chantiers issus de l'audit complet (2026-06-26)
+
+Troisième audit transversal en six axes (sécurité, tests/CI, packaging, architecture/charte, documentation, code/typage), preuves `file:line`, après l'ajout de l'opt-in `forge-mvc-qrcode`.
+Verdict : base saine, **aucune vulnérabilité critique ni élevée**, découplage core/opt-ins étanche, gate CI non masquant, `ruff`/`pyright` à 0, `mkdocs --strict` vert.
+Les findings sont surtout de la complétude et de la finition, dont plusieurs sur le code de ce cycle (qrcode, refacto `build_controller`).
+Un ticket = une responsabilité (principe 2) ; statut « à faire ».
+Point à confirmer hors ticket : `authors = "Roger Lequette"` dans les 15 pyproject vs git user « Roger Cauchon » (cohérent partout, donc probablement délibéré, mainteneur à trancher).
+
+| Ticket | Responsabilité unique | Sévérité |
+|---|---|---|
+| `QRCODE-TYPING-SEGNO-STUBS-001` | `segno` **expose des stubs** (`py.typed`, `__init__.pyi`) : retirer les contournements `cast("Any", segno)`, `# pyright: ignore[reportMissingTypeStubs]` et `qr: Any` de `generator.py:12,14,31,45`, typer `qr: segno.QRCode`. Typage strict authentique (le `# pyright: strict` masque aujourd'hui des `Any`) | 🟠 |
+| `DOC-STYLE-U2014-PACKAGES-001` | Étendre le sweep U+2014 aux **docs embarquées des paquets** (`packages/*/docs/`, angle mort du sweep racine) : 596 cadratins de prose dans 143 fichiers (pires : `rbac/docs/reference.md` 35, `iot/docs/doctor.md` 23) ; trancher aussi le séparateur de titre cible (deux-points), aligner les bilans `qrcode` (virgule → deux-points) ; étendre le garde-fou doc-as-test à ce périmètre. `qrcode` (0 cadratin) = référence | 🟠 |
+| `QRCODE-ERROR-CONTRACT-001` | Compléter le contrat d'erreurs de `forge-mvc-qrcode` (principe 10) : `from_text`/`to_png`/`to_svg`/`QrCodeResponse` laissent remonter des exceptions **segno brutes** sur `error` invalide, overflow (>capacité QR), `scale`/`border` négatifs. Valider `error ∈ {l,m,q,h}`, borner `scale≥1`/`border≥0`, mapper en `QrCodeError` ; ajouter les tests edge-cases manquants | 🟠 |
+| `TEST-DB-INIT-MIGRATIONS-001` | Ajouter des tests d'intégration MariaDB (`-m db`, `tests/db/`) pour `db:init` (création comptes/GRANT, mode dégradé `CREATE USER IF NOT EXISTS`) et le **runner de migrations** (apply + rollback réels). Aujourd'hui les 25 tests `db` couvrent `make_entity`/`db:apply`/transactions/FK/slug mais pas ces deux chemins (ADR-033/034), validés en mock seulement | 🟠 |
+| `DOC-README-OPTINS-COMPLETE-001` | Table des opt-ins du `README.md:114-128` incomplète (13 lignes / 15 paquets) : ajouter `forge-mvc-admin` (opt-in applicatif réel), et `forge-mvc-testing` avec mention « dev-only » (ADR-041) ou note d'exclusion explicite | 🟡 |
+| `REFACTOR-CTRLCTX-DEAD-FIELDS-001` | Retirer les 2 champs morts `pk_col` et `rbac` de `_ControllerContext` (`cli/entities/crud/controller_builder.py:55,60`), lus par aucun `_render_*` (reliquat du refacto `REFACTOR-BUILD-CONTROLLER-001`). Vérifier iso-sortie via baseline | 🟡 |
+| `GOV-ADR-STATUS-RESOLVE-001` | Trancher le statut d'ADR appliqués mais encore « Proposé » : ADR-030 (injection de routes, appliqué par `cli/public/*`) et ADR-041 (infra de test partagée, paquet `forge-mvc-testing` distribué) → « Acceptée » ou clarification | 🟡 |
+| `ARCH-USER-CONTROLLER-REWRITE-ADR-001` | Ouvrir l'ADR distinct annoncé par ADR-030 : `cli/public/public_page.py:170` (`_ensure_controller_method`) **réécrit un contrôleur utilisateur in-place** (AST), ce qui touche le principe 4 (préserver le code utilisateur) et n'est couvert par aucun ADR accepté. Trancher : acter le comportement (idempotent, fail-safe) ou re-scoper `make:public-page` en mode « affichage » | 🟡 |
+| `TEST-DOC-AS-TEST-ROTATION-002` | Poursuivre la rotation des tests doc-as-test : 45,6 % des tests sont `meta` (7 499), dont ~2 287 fonctions en pur grep de texte (cassent sur reformulation FR). Cibler en priorité `test_landing_*` et `test_docs_no_stale_versions_*` (les plus volatils) pour conversion en données structurées ou suppression, via `test_meta_tests_rotation_policy_001` | 🟡 |
+| `TEST-DB-COLLECT-GUARD-001` | Fermer le skip silencieux des e2e MariaDB : `import mariadb` saute le module AVANT le check `FORGE_REQUIRE_DB` (`tests/test_e2e_mariadb.py:46-52`) ; le job `tests-db` resterait vert avec 0 test. En présence de `FORGE_REQUIRE_DB=1`, `pytest.fail` au lieu de `skip`, ou assertion « ≥ N tests `db` collectés ». Même esprit pour `importorskip` massif (169 fichiers) hors CI | 🟡 |
+| `DOC-GUNICORN-RATELIMIT-001` | Documenter dans le guide de déploiement Gunicorn (chemin prod officiel) que le rate-limit login (`core/auth/rate_limit.py`) est **en mémoire par worker** : en multi-worker, `N×5` tentatives/fenêtre ; un backend partagé (DB/Redis) est requis pour un rate-limit effectif | 🟡 |
+| `GOV-CLAUDE-MD-OPTINS-RESYNC-001` | Resync `CLAUDE.md` (§1, §3, §9 « 12 sous-dossiers/opt-ins » → 15 : admin, testing, qrcode ; tableau ADR §4 jusqu'à 050). Fichier protégé par le hook → mainteneur, au prochain tag. Complète `GOV-DOC-COHERENCE-001` | ⚪ |
+| `TEST-META-CORE-NO-OPTIN-IMPORT-001` | Ajouter un garde-fou meta **global** : `rglob("core/**/*.py")` asserte l'absence de tout `import forge_mvc_` / `from forge_mvc_`. Aujourd'hui le découplage est propre mais verrouillé seulement par des tests ponctuels (audit.py, doctor.py) | ⚪ |
+| `DOC-U2014-ROADMAP-RESIDUAL-001` | Corriger 2 cadratins de prose résiduels `docs/roadmap/forge-roadmap.md:170-171` (échappés au sweep racine, contredisent l'affirmation « 0 cadratin de prose » de la même page) | ⚪ |
+| `CI-DEPAUDIT-DOC-LINK-001` | Corriger le lien doc cassé dans `.github/workflows/dependency-audit.yml` (commentaire) : `docs/release-policy.md` → `docs/release/release-policy.md` | ⚪ |
+| `REFACTOR-BUILDERS-DECOMPOSE-002` | Finir la décomposition des builders CRUD : extraire `_render_list_context` + `_render_preamble` de `build_controller` (reste 317 l.), puis traiter `build_model` (254 l.), `build_form_view` (212 l.), `build_table_partial` (159 l.) sur le même modèle. Iso-sortie garantie par baseline | ⚪ |
+| `SEC-MFA-DECRYPT-MSG-001` | Aligner `decrypt_totp_secret` (`packages/forge-mvc-mfa/forge_mvc_mfa/secret_crypto.py:186`) sur la discipline du reste du module : ne pas interpoler `{exc}` (message Fernet) dans `MfaSecretInvalidKey`. Pas de fuite réelle (`InvalidToken` vide), incohérence de style | ⚪ |
+| `TEST-STRICT-MARKERS-001` | Ajouter `addopts = --strict-markers` à `pytest.ini` : une faute de frappe dans un futur `@pytest.mark.xxx` échouerait au lieu de passer silencieusement (les 3 marqueurs `meta`/`smoke`/`db` sont déjà déclarés) | ⚪ |
+
+---
+
 ## Consolidation terrain : journal des retours de tests terrain (post-b16)
 
 Journal des incidents et manques remontés par l'**usage réel** d'un projet
