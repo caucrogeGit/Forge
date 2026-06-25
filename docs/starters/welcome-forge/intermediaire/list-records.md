@@ -30,7 +30,23 @@ Voir [Préparer MariaDB](../../../install/mariadb.md) si ce n'est pas déjà fai
     | [Migrations SQL](../../../features/migrations.md) | comment créer la table `notes` et appliquer la migration |
 
 ??? note "Migrations"
-    Créez la migration `mvc/migrations/<timestamp>_create_notes.sql` (remplacez `<timestamp>` par l'horodatage généré par Forge) :
+    Avant la première migration, initialisez la base de données (une seule fois pour ce mini-projet) :
+
+    ```bash
+    forge db:init
+    ```
+
+    `forge db:init` crée la base, l'utilisateur applicatif et la table `forge_migrations` qui enregistre les migrations déjà appliquées.
+    Sans cette étape, `forge migration:apply` n'a ni base ni table de suivi et échoue.
+
+    Générez ensuite le fichier de migration ; Forge l'horodate pour vous :
+
+    ```bash
+    forge migration:make create_notes
+    ```
+
+    Forge crée `mvc/migrations/<timestamp>_create_notes.sql`.
+    Ouvrez ce fichier et placez-y le SQL suivant :
 
     ```sql
     CREATE TABLE IF NOT EXISTS notes (

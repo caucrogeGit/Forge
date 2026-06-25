@@ -30,7 +30,22 @@ Voir [Préparer MariaDB](../../../install/mariadb.md) si ce n'est pas déjà fai
     | [Migrations SQL](../../../features/migrations.md) | créer les tables liées et appliquer la migration |
 
 ??? note "Migrations"
-    Créez la migration `mvc/migrations/<timestamp>_create_catalogue.sql`.
+    Avant la première migration, initialisez la base de données (une seule fois pour ce mini-projet) :
+
+    ```bash
+    forge db:init
+    ```
+
+    `forge db:init` crée la base, l'utilisateur applicatif et la table `forge_migrations` qui enregistre les migrations déjà appliquées.
+    Sans cette étape, `forge migration:apply` n'a ni base ni table de suivi et échoue.
+
+    Générez ensuite le fichier de migration ; Forge l'horodate pour vous :
+
+    ```bash
+    forge migration:make create_catalogue
+    ```
+
+    Forge crée `mvc/migrations/<timestamp>_create_catalogue.sql` ; ouvrez-le et placez-y le SQL suivant.
     La table parente (`categories`) est créée **avant** l'enfant (`articles`) : la contrainte l'exige.
 
     ```sql

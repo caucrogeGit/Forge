@@ -16,7 +16,23 @@ Nous abordons un nouveau domaine, la base de données : selon le principe « nou
     | [Migrations SQL](../../../features/migrations.md) | comment créer une table et appliquer une migration |
 
 ??? note "Migrations"
-    Créez la migration `mvc/migrations/<timestamp>_create_first_sql_messages.sql` (remplacez `<timestamp>` par l'horodatage généré par Forge) :
+    Avant la première migration, initialisez la base de données (une seule fois pour ce mini-projet) :
+
+    ```bash
+    forge db:init
+    ```
+
+    `forge db:init` crée la base, l'utilisateur applicatif et la table `forge_migrations` qui enregistre les migrations déjà appliquées.
+    Sans cette étape, `forge migration:apply` n'a ni base ni table de suivi et échoue.
+
+    Générez ensuite le fichier de migration ; Forge l'horodate pour vous :
+
+    ```bash
+    forge migration:make create_first_sql_messages
+    ```
+
+    Forge crée `mvc/migrations/<timestamp>_create_first_sql_messages.sql`.
+    Ouvrez ce fichier et placez-y le SQL suivant :
 
     ```sql
     CREATE TABLE IF NOT EXISTS first_sql_messages (
@@ -30,7 +46,7 @@ Nous abordons un nouveau domaine, la base de données : selon le principe « nou
     ```
 
     L'`INSERT` est idempotent : il n'ajoute le message « Bonjour SQL » que si la table est vide, donc rejouer la migration ne crée pas de doublon.
-    Appliquez la migration avec `forge migration:apply` avant de tester `/message`.
+    Appliquez enfin la migration avec `forge migration:apply` avant de tester `/message`.
 
 ??? note "Contrôleurs"
     Créez le fichier `mvc/controllers/message_controller.py` :
@@ -97,7 +113,7 @@ Nous abordons un nouveau domaine, la base de données : selon le principe « nou
     | `https://localhost:8000/message` | `Message depuis la base : Bonjour SQL` |
 
 ??? note "À retenir"
-    - Une table se crée par une migration appliquée avec `forge migration:apply`.
+    - La base s'initialise une fois avec `forge db:init`, puis chaque table naît d'une migration générée (`forge migration:make`), éditée, et appliquée (`forge migration:apply`).
     - `fetch_one(...)` lit une ligne avec du SQL écrit à la main.
     - Un nouveau domaine se loge dans son propre contrôleur.
 
