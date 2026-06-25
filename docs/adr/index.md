@@ -56,3 +56,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-047](047-app-agent-guidance-layer.md) | Couche de guidance agent IA dans les applications Forge (accepté) |
 | [ADR-048](048-skeleton-welcome-projet.md) | Parcours d'accueil « welcome-projet » dans le squelette (accepté) |
 | [ADR-049](049-positioning-production-auditable.md) | Repositionnement : framework de production auditable (accepté) |
+| [ADR-050](050-qrcode-optin.md) | Opt-in QR Code `forge-mvc-qrcode` (accepté) |

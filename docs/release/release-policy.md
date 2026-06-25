@@ -159,6 +159,7 @@ chaque package publiable :
 | `forge-mvc-mail` | `4 - Beta` | Email opt-in extrait du core (ADR-022) : composition, transports interchangeables, templates Jinja, CLI `mail:*`. Publié sur PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-i18n` | `4 - Beta` | Internationalisation opt-in extraite du core (ADR-027) : catalogues JSON, locale par défaut et fallback, cache, helper `trans()` Jinja. Le noyau garde un repli no-op renvoyant la clé. Pas encore publié sur PyPI |
 | `forge-mvc-admin` | `1 - Planning` | Back-office applicatif opt-in : CRUD générique sur les entités déclarées, sécurité par défaut (auth + CSRF), RBAC optionnel, `admin:init` / `admin:doctor`. En cours de construction, non publié sur PyPI |
+| `forge-mvc-qrcode` | `3 - Alpha` | Génération de QR Codes opt-in (ADR-050) : PNG et SVG depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur. Dépend de `segno` (pur Python). Non publié sur PyPI |
 
 Critères de passage Beta → Stable d'un module opt-in :
 

@@ -280,6 +280,7 @@ nav:
             - ADR-047 Guidance agent IA dans les apps: adr/047-app-agent-guidance-layer.md
             - ADR-048 Parcours welcome-projet du squelette: adr/048-skeleton-welcome-projet.md
             - ADR-049 Repositionnement production auditable: adr/049-positioning-production-auditable.md
+            - ADR-050 Opt-in QR Code: adr/050-qrcode-optin.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
@@ -363,6 +364,7 @@ nav:
       - Mail: '!include packages/forge-mvc-mail/mkdocs.yml'
       - Pivot: '!include packages/forge-mvc-pivot/mkdocs.yml'
       - i18n: '!include packages/forge-mvc-i18n/mkdocs.yml'
+      - QR Code: '!include packages/forge-mvc-qrcode/mkdocs.yml'
 
 markdown_extensions:
   - admonition

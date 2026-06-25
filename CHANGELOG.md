@@ -17,6 +17,14 @@
 
 ### Ajouté
 
+- **Opt-in `forge-mvc-qrcode`** (ADR-050, `QRCODE-OPTIN-SCAFFOLD-001`). Socle de
+  génération de QR Codes découplé du cœur : `QrCode.from_text(...).to_png()` /
+  `.to_svg()` (octets PNG, document SVG) et `QrCodeResponse.from_text(...)` qui
+  renvoie une `core.http.Response` servable depuis un contrôleur (PNG par défaut,
+  `fmt="svg"` possible). `QrCodeError` sur entrée vide ou format inconnu. Dépend
+  de `segno` (pur Python, sans Pillow), déclaré uniquement dans le paquet. Forge
+  Core reste indépendant (aucun import, `segno` absent de ses dépendances,
+  verrouillé par test). Non publié sur PyPI (statut Alpha).
 - **Parcours d'accueil `welcome-projet` dans le squelette** (ADR-048,
   `WELCOME-PROJET-CONTENT-001`, `WELCOME-PROJET-NAV-001`). `forge new` embarque un
   parcours pédagogique court dans `docs/welcome/` du projet : mise en route, puis
