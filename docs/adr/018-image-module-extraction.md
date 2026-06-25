@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposé, Forge 1.0.0-beta.x (ticket `IMAGES-EXTRACT-RENAME-001`).
+Acceptée, Forge 1.0.0-beta.x (ticket `IMAGES-EXTRACT-RENAME-001`). Extraction livrée : `forge-mvc-images` est publié.
 
 > Décision validée sur le principe (option « B, renommer + rapatrier »).
 > Périmètre figé ci-dessous ; exécution par étapes.

@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposé, Forge 1.0.0-beta.x.
+Acceptée, Forge 1.0.0-beta.x. Primitives de stockage livrées dans `forge-mvc-files`.
 
 > Décision de **direction** (option B ci-dessous). L'ADR fixe le périmètre cible
 > de `forge-mvc-files` ; l'exécution est progressive et **non urgente** (les

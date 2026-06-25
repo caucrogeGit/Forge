@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposé, Forge 1.0.0-beta.x.
+Acceptée, Forge 1.0.0-beta.x. Extraction livrée : `forge-mvc-files` est publié.
 
 > Décision validée sur le principe (« sortir complètement l'upload du core »).
 > Périmètre figé ci-dessous ; exécution par étapes (chantier multi-tickets).
