@@ -1,3 +1,4 @@
+# pyright: strict
 """Helpers standardisés pour les erreurs CLI Forge.
 
 Convention :

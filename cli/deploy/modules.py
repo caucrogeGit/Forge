@@ -1,3 +1,4 @@
+# pyright: strict
 """forge module:* — gestion des modules Forge locaux."""
 
 from __future__ import annotations

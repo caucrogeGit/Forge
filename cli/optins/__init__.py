@@ -1,3 +1,4 @@
+# pyright: strict
 """Outils CLI Forge pour le branchement local des opt-ins (`optins/`).
 
 Voir docs/architecture/optins-project-structure.md (contrat) et

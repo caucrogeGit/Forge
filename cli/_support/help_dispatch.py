@@ -1,3 +1,4 @@
+# pyright: strict
 """
 cli/_support/help_dispatch.py — Interception centrale de `--help` / `-h`.
 

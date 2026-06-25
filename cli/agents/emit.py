@@ -1,3 +1,4 @@
+# pyright: strict
 """Émission des fichiers de guidance agent dans une application Forge (ADR-047).
 
 Écrit `CLAUDE.md`, `AGENTS.md` (même briefing) et `docs/adr/001-adopter-forge.md`

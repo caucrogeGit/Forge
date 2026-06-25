@@ -1,3 +1,4 @@
+# pyright: strict
 """Squelette de projet Forge matérialisé par `forge new` (ADR-024).
 
 `forge new` ne clone plus le dépôt : il copie cet arbre curé

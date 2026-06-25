@@ -1,3 +1,5 @@
+# pyright: strict
+# pyright: reportPrivateUsage=false
 """cli.entities.crud — CRUD generator submodules.
 
 Re-exports all public symbols for backward compatibility.

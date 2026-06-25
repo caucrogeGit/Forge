@@ -1,3 +1,4 @@
+# pyright: strict
 """Réglages Claude Code optionnels pour une application Forge (ADR-047).
 
 `.claude/settings.json` pré-autorise les commandes usuelles du développement

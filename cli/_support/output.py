@@ -1,3 +1,4 @@
+# pyright: strict
 """Formatage centralisé des tags CLI Forge.
 
 Toutes les lignes de statut produites par les commandes de génération

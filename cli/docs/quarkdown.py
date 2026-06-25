@@ -1,3 +1,4 @@
+# pyright: strict
 """forge docs:pdf — génération PDF de la documentation via Quarkdown (optionnel).
 
 Quarkdown est une dépendance externe. Ce module ne l'importe jamais :

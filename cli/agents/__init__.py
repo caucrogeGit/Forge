@@ -1,3 +1,4 @@
+# pyright: strict
 """Guidance agent IA pour les applications Forge (ADR-047).
 
 Ce sous-paquet porte le briefing canonique distillé de l'expérience Forge,

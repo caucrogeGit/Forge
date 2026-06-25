@@ -1,3 +1,4 @@
+# pyright: strict
 """Gabarit canonique du briefing agent pour une application Forge (ADR-047).
 
 Le contenu est volontairement **distillé et actionnable** : il transmet les

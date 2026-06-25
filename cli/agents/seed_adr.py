@@ -1,3 +1,4 @@
+# pyright: strict
 """ADR-001 d'amorçage pour une application Forge (ADR-047).
 
 `forge new` (et `forge agents:init`) écrit ce premier ADR dans

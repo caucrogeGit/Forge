@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande `forge agents:init` — guidance agent IA d'une application (ADR-047).
 
 - sans option : génère la couche guidance (`CLAUDE.md`, `AGENTS.md`, ADR-001) en

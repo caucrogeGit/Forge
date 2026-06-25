@@ -1,3 +1,4 @@
+# pyright: strict
 """Texte d'aide de la CLI Forge, affiché par forge help / forge --help."""
 
 from __future__ import annotations
