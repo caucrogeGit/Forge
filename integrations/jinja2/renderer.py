@@ -74,7 +74,11 @@ class Jinja2Renderer:
         self._views_dir = views_dir
         self._env = Environment(
             loader=_OptinAwareLoader(views_dir),
-            autoescape=select_autoescape(["html"]),
+            # Sécurité (SEC-JINJA-AUTOESCAPE-001) : autoescape pour TOUTES les
+            # extensions et les chaînes, pas seulement .html. Le renderer cœur ne
+            # sert que des vues HTML ; un template sans extension ou .svg/.xml y
+            # serait sinon rendu non échappé (XSS). Le HTML brut voulu passe par |safe.
+            autoescape=select_autoescape(default_for_string=True, default=True),
         )
         env_globals: dict[str, Any] = cast("Any", self._env).globals
         env_globals["url_for"] = self._url_for
