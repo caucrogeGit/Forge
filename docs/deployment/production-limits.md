@@ -43,6 +43,7 @@ Cette page synthétise les limites de production connues de Forge pour la série
 | Sessions par défaut | `MemorySessionStore` non persistant | Éviter en production (warning émis au démarrage) |
 | Sessions persistantes | `FileSessionStore`, `MariaDbSessionStore` | À configurer explicitement |
 | Rate-limits login / upload | Compteurs en mémoire mono-process | Non partagés entre workers |
+| Anti-rejeu MFA (TOTP) | État en mémoire mono-process | Code TOTP rejouable sur un autre worker |
 | Fichiers statiques (`/static/...`) | Servis par Forge | À déléguer au reverse proxy |
 | Médias (`/media/...`) | Servis par Forge avec garde-fous | À cadrer selon l'application |
 | Multi-worker | Compatible côté dispatch WSGI | Stores mémoire non partagés (cf §7) |
@@ -80,7 +81,7 @@ développement et les démonstrations. Il :
 Sélection explicite via `forge.configure(session_store=...)` ou
 [ADR-002](../adr/002-session-strategy.md).
 
-### Rate-limits
+### Rate-limits et anti-rejeu MFA
 
 - Le rate-limit login (`core.auth.rate_limit`) et le rate-limit upload
   (module d'upload optionnel) stockent leurs compteurs **en mémoire dans le
@@ -89,6 +90,10 @@ Sélection explicite via `forge.configure(session_store=...)` ou
 - En multi-worker, **les compteurs ne sont pas partagés** — la protection
   reste utile localement mais n'est pas une défense distribuée.
 - Forge n'embarque ni Redis ni autre backend distribué pour ces compteurs.
+- L'anti-rejeu TOTP de `forge-mvc-mfa` (qui empêche de rejouer un code à six
+  chiffres déjà consommé dans sa fenêtre de validité) stocke aussi son état
+  **en mémoire par processus**. En multi-worker, un code TOTP intercepté peut
+  être rejoué sur un autre worker que celui qui l'a consommé.
 
 ### Avertissement automatique
 
@@ -144,7 +149,9 @@ robustesse** :
 - les sessions seront différentes selon le worker qui répond → comportement
   d'authentification cassé ;
 - les compteurs de rate-limit seront divisés par le nombre de workers en
-  pratique (un attaquant a N tentatives avant d'être bloqué au lieu d'1).
+  pratique (un attaquant a N tentatives avant d'être bloqué au lieu d'1) ;
+- l'anti-rejeu TOTP étant lui aussi par worker, un code MFA intercepté peut
+  être rejoué sur un autre worker que celui qui l'a consommé.
 
 Pour un déploiement multi-worker fiable, **configurer `MariaDbSessionStore`
 explicitement** (cf §4).

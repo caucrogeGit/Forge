@@ -259,6 +259,9 @@ complète. Les limites suivantes restent à la charge de l'opérateur :
 - **Rate-limits login/upload encore en mémoire** : compteurs non partagés
   entre workers Gunicorn. La protection reste utile mais n'est pas
   distribuée.
+- **Anti-rejeu MFA (TOTP) en mémoire** : l'état anti-rejeu de `forge-mvc-mfa`
+  est propre à chaque worker ; un code TOTP intercepté peut être rejoué sur un
+  autre worker. Non distribué dans la série 1.0.0.
 - **Multi-worker** : Forge émet déjà un avertissement supplémentaire au
   démarrage `python app.py` si `WEB_CONCURRENCY > 1` ou si
   `SERVER_SOFTWARE` contient `gunicorn`/`uwsgi`. Lire ce warning au
