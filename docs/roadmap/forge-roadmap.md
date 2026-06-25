@@ -132,7 +132,7 @@ nombre d'erreurs.
 | 3 | `TYPING-CLI-ENTITIES-MAKE-DB-001` | `make_entity`, `make_crud`, `relations`, `migrations`, `db_init`, `db_apply`, `model` | ~360 |
 | 4 | `TYPING-CLI-SECURITY-001` | `cli/security/` (auth, rbac_audit, rbac_validate) | ~108 |
 | 5 | `TYPING-CLI-PUBLIC-001` | `cli/public/` (public_contact, public_pdf…) | ~117 |
-| 6 | `TYPING-CLI-PROJECT-SCHEMAS-OPTINS-001` | `cli/optins/` **fait** (registre public, `SUPPORTED_OPTINS` typé) ; `cli/project/` **fait** (config typée `ModuleType`, `installed: dict[str, dict[str, Any]]`, mariadb aliasé) ; **reste `cli/schemas/`** (~73) | ~73 restant |
+| 6 | `TYPING-CLI-PROJECT-SCHEMAS-OPTINS-001` | **Fait** : `cli/optins/` (registre public, `SUPPORTED_OPTINS` typé), `cli/project/` (config `ModuleType`, `installed: dict[str, dict[str, Any]]`, mariadb aliasé), `cli/schemas/` (loader `tuple[dict[str, Any], …]`, traversée `$ref` castée) — strict | ✅ |
 | 7 | `TYPING-CLI-ASSETS-DEPLOY-001` | **Fait** : `cli/assets/` (front, uploads, i18n), `cli/deploy/` (deploy via `find_spec`), `cli/_support/` — strict | ✅ |
 | 8 | `TYPING-FORGE-PY-001` | `forge.py` (dispatcher racine) | ~77 |
 | 9 | `TYPING-INTEGRATIONS-001` | `integrations/` | ~31 |

@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande forge schema:list — liste les schémas JSON Forge disponibles.
 
 Lit le registre schemas/forge.schema.index.json et affiche chaque schéma
@@ -15,6 +16,7 @@ from __future__ import annotations
 
 import json
 import sys
+from typing import Any
 from pathlib import Path
 
 
@@ -26,7 +28,7 @@ def _registry_path() -> Path:
     return _schemas_dir() / "forge.schema.index.json"
 
 
-def _load_registry() -> tuple[dict, None] | tuple[None, str]:
+def _load_registry() -> tuple[dict[str, Any], None] | tuple[None, str]:
     """Retourne (registre, None) si OK, (None, message_erreur) sinon."""
     path = _registry_path()
     if not path.exists():
@@ -70,7 +72,7 @@ def schema_list_main(args: list[str]) -> None:
     schemas_dict: dict[str, str] = registry["schemas"]
     schema_version: str = registry.get("schema_version", "?")
 
-    entries: list[dict] = []
+    entries: list[dict[str, Any]] = []
     any_missing = False
     for name, relative_path in schemas_dict.items():
         clean = relative_path.lstrip("./")

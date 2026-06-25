@@ -1,3 +1,4 @@
+# pyright: strict
 """Commande forge schema:doctor — diagnostique les schémas JSON Forge.
 
 Vérifie pour chaque schéma référencé dans forge.schema.index.json :
@@ -22,6 +23,7 @@ from __future__ import annotations
 
 import json
 import sys
+from typing import Any, cast
 from pathlib import Path
 
 
@@ -44,7 +46,7 @@ def _collect_local_refs(obj: object, refs: set[str]) -> None:
     'file.schema.json#/$defs/quelquechose'.
     """
     if isinstance(obj, dict):
-        for key, value in obj.items():
+        for key, value in cast("dict[str, object]", obj).items():
             if key == "$ref" and isinstance(value, str):
                 if not value.startswith("#") and not value.startswith("http"):
                     filename = value.split("#")[0]
@@ -53,11 +55,11 @@ def _collect_local_refs(obj: object, refs: set[str]) -> None:
             else:
                 _collect_local_refs(value, refs)
     elif isinstance(obj, list):
-        for item in obj:
+        for item in cast("list[object]", obj):
             _collect_local_refs(item, refs)
 
 
-def _load_registry() -> tuple[dict, None] | tuple[None, str]:
+def _load_registry() -> tuple[dict[str, Any], None] | tuple[None, str]:
     """Retourne (registre, None) si OK, (None, message_erreur) sinon."""
     path = _registry_path()
     if not path.exists():
@@ -108,8 +110,8 @@ def schema_doctor_main(args: list[str]) -> None:
 
     errors: list[str] = []
     warnings: list[str] = []
-    schemas_result: list[dict] = []
-    refs_result: list[dict] = []
+    schemas_result: list[dict[str, Any]] = []
+    refs_result: list[dict[str, Any]] = []
 
     if not isinstance(registry.get("schema_version"), str):
         errors.append("clé 'schema_version' absente ou non textuelle dans le registre")
@@ -119,7 +121,7 @@ def schema_doctor_main(args: list[str]) -> None:
         display_path = f"schemas/{clean}"
         abs_path = schemas_dir / clean
 
-        entry: dict = {
+        entry: dict[str, Any] = {
             "name": name,
             "path": display_path,
             "exists": False,
