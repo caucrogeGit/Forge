@@ -2,18 +2,17 @@
 Tests E2E-MARIADB-001 — Application SQL réelle sur MariaDB.
 
 Activation :
-    FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py
+    pytest -m db        # job CI tests-db (MariaDB réel), ou en local avec FORGE_TEST_DB_*
 
 Variables d'environnement :
-    FORGE_E2E_MARIADB=1                 active les tests (requis)
-    FORGE_E2E_DB_HOST=127.0.0.1         hôte MariaDB (défaut: 127.0.0.1)
-    FORGE_E2E_DB_PORT=3306              port MariaDB (défaut: 3306)
-    FORGE_E2E_DB_NAME=forge_e2e_test    base de test (doit commencer par forge_e2e_)
-    FORGE_E2E_DB_USER=forge_e2e_user    utilisateur MariaDB
-    FORGE_E2E_DB_PASSWORD=              mot de passe
+    FORGE_TEST_DB_HOST=127.0.0.1         hôte MariaDB (défaut: 127.0.0.1)
+    FORGE_TEST_DB_PORT=3306              port MariaDB (défaut: 3306)
+    FORGE_TEST_DB_NAME=forge_e2e_test    base de test (doit commencer par forge_e2e_)
+    FORGE_TEST_DB_USER=forge_e2e_user    utilisateur MariaDB
+    FORGE_TEST_DB_PASSWORD=              mot de passe
 
 Sécurité :
-    Si FORGE_E2E_DB_NAME ne commence pas par "forge_e2e_", les tests refusent
+    Si FORGE_TEST_DB_NAME ne commence pas par "forge_e2e_", les tests refusent
     de s'exécuter pour protéger une base applicative réelle.
     Les tables créées par les tests sont supprimées avant et après le module.
 
@@ -27,7 +26,7 @@ Cycle testé :
     7  insertion simple et lecture simple
     8  nettoyage (DROP TABLE IF EXISTS contact)
 
-Sans FORGE_E2E_MARIADB :
+Sans MariaDB joignable :
     Tous les tests sont ignorés proprement (SKIPPED).
 """
 from __future__ import annotations
@@ -38,14 +37,9 @@ from pathlib import Path
 
 import pytest
 
-# ── Garde : module désactivé par défaut ───────────────────────────────────────
+# ── Marqueur : tests d'intégration DB (job CI tests-db), TEST-E2E-MARIADB-CI-001 ──
 
-if not os.environ.get("FORGE_E2E_MARIADB"):
-    pytest.skip(
-        "FORGE_E2E_MARIADB non défini — tests MariaDB ignorés. "
-        "Lance avec : FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py",
-        allow_module_level=True,
-    )
+pytestmark = pytest.mark.db
 
 # ── Garde : package mariadb requis ────────────────────────────────────────────
 
@@ -57,23 +51,40 @@ except ImportError:
         allow_module_level=True,
     )
 
-# ── Variables E2E ─────────────────────────────────────────────────────────────
+# ── Connexion : mêmes variables que le job CI tests-db (FORGE_TEST_DB_*) ──────
 
-_DB_HOST     = os.environ.get("FORGE_E2E_DB_HOST", "127.0.0.1")
-_DB_PORT     = int(os.environ.get("FORGE_E2E_DB_PORT", "3306"))
-_DB_NAME     = os.environ.get("FORGE_E2E_DB_NAME", "")
-_DB_USER     = os.environ.get("FORGE_E2E_DB_USER", "")
-_DB_PASSWORD = os.environ.get("FORGE_E2E_DB_PASSWORD", "")
-_SAFE_PREFIX = "forge_e2e_"
+_REQUIRE_DB  = os.environ.get("FORGE_REQUIRE_DB") == "1"
+_DB_HOST     = os.environ.get("FORGE_TEST_DB_HOST", "127.0.0.1")
+_DB_PORT     = int(os.environ.get("FORGE_TEST_DB_PORT", "3306"))
+_DB_NAME     = os.environ.get("FORGE_TEST_DB_NAME", "forge_test")
+_DB_USER     = os.environ.get("FORGE_TEST_DB_USER", "root")
+_DB_PASSWORD = os.environ.get("FORGE_TEST_DB_PASSWORD", "")
 
-# ── Garde de sécurité : nom de base réservé aux tests ─────────────────────────
-# Refuse (ValueError → erreur de collection pytest) si la base n'est pas sûre.
+# ── Garde de sécurité : base réservée aux tests (DDL destructif) ──────────────
+# Accepte la base CI `forge_test` ou tout nom dédié `forge_e2e_*`.
 
-if not _DB_NAME.startswith(_SAFE_PREFIX):
+if not (_DB_NAME == "forge_test" or _DB_NAME.startswith("forge_e2e_")):
     raise ValueError(
-        f"Sécurité : FORGE_E2E_DB_NAME='{_DB_NAME}' doit commencer par '{_SAFE_PREFIX}'. "
-        "Définit une base dédiée aux tests E2E (ex : forge_e2e_test). Tests annulés."
+        f"Sécurité : FORGE_TEST_DB_NAME='{_DB_NAME}' doit être 'forge_test' (CI) "
+        "ou commencer par 'forge_e2e_'. Tests E2E annulés pour protéger une base réelle."
     )
+
+# ── Garde : base joignable (skip en local, échec en CI si FORGE_REQUIRE_DB=1) ──
+
+try:
+    _probe = _mariadb_pkg.connect(
+        host=_DB_HOST, port=_DB_PORT, user=_DB_USER,
+        password=_DB_PASSWORD, database=_DB_NAME,
+    )
+    _probe.close()
+except Exception as _conn_err:  # noqa: BLE001 — toute erreur = base indisponible
+    if _REQUIRE_DB:
+        raise
+    pytest.skip(
+        f"MariaDB de test injoignable : {_conn_err} (E2E sauté en local)",
+        allow_module_level=True,
+    )
+
 
 # ── Imports Forge ─────────────────────────────────────────────────────────────
 
@@ -88,17 +99,21 @@ def _write(path: Path, content: str) -> None:
 
 
 def _scaffold_project(root: Path) -> None:
-    """Projet Forge minimal avec config.py lisant les variables FORGE_E2E_*."""
+    """Projet Forge minimal avec config.py lisant les variables FORGE_TEST_DB_*."""
     _write(
         root / "config.py",
         "import os\n"
         "APP_NAME = 'TestForgeMariaDB'\n"
         "APP_ROUTES_MODULE = 'mvc.routes'\n"
-        "DB_APP_HOST = os.environ.get('FORGE_E2E_DB_HOST', '127.0.0.1')\n"
-        "DB_APP_PORT = int(os.environ.get('FORGE_E2E_DB_PORT', '3306'))\n"
-        "DB_APP_LOGIN = os.environ.get('FORGE_E2E_DB_USER', '')\n"
-        "DB_APP_PWD = os.environ.get('FORGE_E2E_DB_PASSWORD', '')\n"
-        "DB_NAME = os.environ.get('FORGE_E2E_DB_NAME', '')\n",
+        "DB_APP_HOST = os.environ.get('FORGE_TEST_DB_HOST', '127.0.0.1')\n"
+        "DB_APP_PORT = int(os.environ.get('FORGE_TEST_DB_PORT', '3306'))\n"
+        "DB_APP_LOGIN = os.environ.get('FORGE_TEST_DB_USER', 'root')\n"
+        "DB_APP_PWD = os.environ.get('FORGE_TEST_DB_PASSWORD', '')\n"
+        "DB_ADMIN_HOST = os.environ.get('FORGE_TEST_DB_HOST', '127.0.0.1')\n"
+        "DB_ADMIN_PORT = int(os.environ.get('FORGE_TEST_DB_PORT', '3306'))\n"
+        "DB_ADMIN_LOGIN = os.environ.get('FORGE_TEST_DB_USER', 'root')\n"
+        "DB_ADMIN_PWD = os.environ.get('FORGE_TEST_DB_PASSWORD', '')\n"
+        "DB_NAME = os.environ.get('FORGE_TEST_DB_NAME', 'forge_test')\n",
     )
     _write(root / "app.py", "# app")
     (root / "mvc" / "controllers").mkdir(parents=True)
