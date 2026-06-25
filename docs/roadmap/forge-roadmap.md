@@ -133,7 +133,7 @@ nombre d'erreurs.
 | 4 | `TYPING-CLI-SECURITY-001` | `cli/security/` (auth, rbac_audit, rbac_validate) | ~108 |
 | 5 | `TYPING-CLI-PUBLIC-001` | `cli/public/` (public_contact, public_pdf…) | ~117 |
 | 6 | `TYPING-CLI-PROJECT-SCHEMAS-OPTINS-001` | `cli/project/`, `cli/schemas/`, `cli/optins/` | ~167 |
-| 7 | `TYPING-CLI-ASSETS-DEPLOY-001` | `cli/assets/`, `cli/deploy/`, `cli/_support/` | ~18 |
+| 7 | `TYPING-CLI-ASSETS-DEPLOY-001` | **Fait** : `cli/assets/` (front, uploads, i18n), `cli/deploy/` (deploy via `find_spec`), `cli/_support/` — strict | ✅ |
 | 8 | `TYPING-FORGE-PY-001` | `forge.py` (dispatcher racine) | ~77 |
 | 9 | `TYPING-INTEGRATIONS-001` | `integrations/` | ~31 |
 | 10 | `TYPING-TOOLS-001` | `tools/` (scripts de release/checks) | ~39 |

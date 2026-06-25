@@ -1,8 +1,10 @@
+# pyright: strict
 from __future__ import annotations
 
 import json
 import shutil
 from pathlib import Path
+from typing import Any
 
 import cli._support.output as out
 
@@ -19,7 +21,7 @@ APP_JS = Path("static") / "js" / "app.js"
 PACKAGE_JSON = Path("package.json")
 
 
-def _read_package_json(path: Path) -> dict:
+def _read_package_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {
             "scripts": {},
@@ -28,7 +30,7 @@ def _read_package_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _write_package_json(path: Path, data: dict) -> None:
+def _write_package_json(path: Path, data: dict[str, Any]) -> None:
     path.write_text(
         json.dumps(data, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",

@@ -1,3 +1,4 @@
+# pyright: strict
 """Commandes forge deploy:init et forge deploy:check."""
 
 from __future__ import annotations
@@ -312,25 +313,22 @@ def _check_results(root: Path) -> list[_Result]:
             "APP_SSL_ENABLED=false — backend HTTP local cohérent avec Nginx",
         ))
 
-    # import mariadb
-    try:
-        import mariadb  # noqa: F401
+    # module mariadb
+    if importlib.util.find_spec("mariadb") is not None:
         results.append(_Result("ok", "Module mariadb", "importable"))
-    except ImportError:
+    else:
         results.append(_Result("error", "Module mariadb", "non installé — pip install mariadb"))
 
-    # import jinja2
-    try:
-        import jinja2  # noqa: F401
+    # module jinja2
+    if importlib.util.find_spec("jinja2") is not None:
         results.append(_Result("ok", "Module jinja2", "importable"))
-    except ImportError:
+    else:
         results.append(_Result("error", "Module jinja2", "non installé — pip install jinja2"))
 
     # serveur WSGI Gunicorn (externe, prod uniquement — avertissement, pas erreur)
-    try:
-        import gunicorn  # noqa: F401
+    if importlib.util.find_spec("gunicorn") is not None:
         results.append(_Result("ok", "Serveur WSGI gunicorn", "importable"))
-    except ImportError:
+    else:
         results.append(_Result(
             "warn",
             "Serveur WSGI gunicorn",
