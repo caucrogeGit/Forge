@@ -32,6 +32,9 @@ ADR-018).
 - `forge-mvc-mail` (envoi d'emails, transports interchangeables ; extrait du core, ADR-022)
 - `forge-mvc-pivot` (tables pivot enrichies `many_to_many` ; extrait du core, ADR-021)
 - `forge-mvc-i18n` (internationalisation par catalogues JSON, helper `trans()` ; extrait du core, ADR-027)
+- `forge-mvc-qrcode` (génération de QR Codes PNG/SVG, réponse HTTP servable depuis un contrôleur ; ADR-050)
+- `forge-mvc-admin` (back-office applicatif opt-in, scaffold ; voir `docs/roadmap/forge-admin-roadmap.md`)
+- `forge-mvc-testing` (infrastructure de test partagée, dev-only : `FakeRequest` et plugin pytest ; ADR-041)
 
 **Python** : 3.12+ minimum (ADR-006).
 
@@ -130,6 +133,9 @@ d'utilisateurs externes ni de code applicatif externe à protéger.
 - `forge-mvc-mail` : envoi d'emails, transports interchangeables (console, SMTP, log), templates Jinja, CLI `mail:*` ; extrait du core (ADR-022)
 - `forge-mvc-pivot` : tables pivot enrichies (`many_to_many` avec attributs), `make:pivot-crud` ; extrait du core (ADR-021)
 - `forge-mvc-i18n` : internationalisation par catalogues JSON, locale et fallback, helper `trans()`, repli no-op du noyau ; extrait du core (ADR-027)
+- `forge-mvc-qrcode` : génération de QR Codes PNG/SVG depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur (ADR-050)
+- `forge-mvc-admin` : back-office applicatif opt-in (scaffold), voir `docs/roadmap/forge-admin-roadmap.md`
+- `forge-mvc-testing` : infrastructure de test partagée réservée au développement (`FakeRequest` et plugin pytest), ADR-041
 
 **Hors scope Forge** (à charge de l'application) :
 
@@ -177,7 +183,28 @@ structurante.
 | ADR-027 | `027-i18n-extraction.md` | Extraction de l'i18n : `forge-mvc-i18n`, repli no-op du noyau |
 | ADR-028 | `028-welcome-forge-tutorial-per-level.md` | welcome-forge : un mini-projet par niveau |
 | ADR-029 | `029-route-naming-convention.md` | Convention de route : chemin `/contrôleur/méthode`, nom `contrôleur-méthode` |
-| ADR-030 | `030-explicit-route-injection.md` | Injection de routes par commande explicite et portée de la règle 4.3 (proposé) |
+| ADR-030 | `030-explicit-route-injection.md` | Injection de routes par commande explicite et portée de la règle 4.3 |
+| ADR-031 | `031-mail-core-decoupling.md` | Découplage complet du mail hors du core ; `forge-mvc-mail` lit sa config de l'environnement |
+| ADR-032 | `032-upload-config-perimeter.md` | Périmètre de la config upload : seul `upload_max_size` reste du core |
+| ADR-033 | `033-migrations-admin-credentials.md` | Migrations appliquées avec `DB_ADMIN_*` ; `forge_app` reste DML strict |
+| ADR-034 | `034-generated-db-identifier-naming.md` | `forge new` génère `DB_NAME`/`DB_APP_LOGIN` sans suffixes `_db`/`_app` |
+| ADR-035 | `035-starters-manual-not-generated.md` | Parcours pédagogiques réalisés à la main ; retrait de `starter:build`/`starter:list` |
+| ADR-036 | `036-core-static-typing.md` | Typage statique du cœur vérifié en CI (Pyright), `py.typed`, strictness par cliquet |
+| ADR-037 | `037-stats-aggregation.md` | Agrégation par comptage dans `forge-mvc-stats` |
+| ADR-038 | `038-optin-docs-embedded-per-package.md` | Doc des opt-ins embarquée par paquet (`packages/<paquet>/docs/`), agrégée au site |
+| ADR-039 | `039-docs-information-architecture.md` | Refonte de l'architecture d'information de `docs/` (cœur) |
+| ADR-040 | `040-per-package-test-surface.md` | Surface de test par paquet opt-in : modèle hybride, `testpaths = tests packages` |
+| ADR-041 | `041-shared-test-support.md` | Infrastructure de test partagée (`forge-mvc-testing` dev-only, plugin pytest + `FakeRequest`) |
+| ADR-042 | `042-doc-core-optins-decoupling.md` | Découpler la doc du cœur et celle des opt-ins |
+| ADR-043 | `043-core-cli-doc-embedding.md` | Doc embarquée du cœur et du CLI ; renommage `forge_cli` vers `cli` |
+| ADR-044 | `044-framework-only-repo.md` | Le dépôt Forge ne porte que le framework ; application racine relocalisée |
+| ADR-045 | `045-official-site-integration.md` | Intégrer la publication du site officiel dans Forge |
+| ADR-046 | `046-optin-jinja-template-loaders.md` | Registre de loaders de templates Jinja pour les opt-ins |
+| ADR-047 | `047-app-agent-guidance-layer.md` | Couche de guidance agent IA dans les applications Forge |
+| ADR-048 | `048-skeleton-welcome-projet.md` | Parcours d'accueil « welcome-projet » dans le squelette |
+| ADR-049 | `049-positioning-production-auditable.md` | Repositionnement : framework de production auditable |
+| ADR-050 | `050-qrcode-optin.md` | Opt-in QR Code `forge-mvc-qrcode` |
+| ADR-051 | `051-public-page-controller-insertion.md` | Insertion d'une méthode dans le contrôleur des pages publiques (`make:public-page`) |
 
 Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format existant.
 
@@ -311,10 +338,11 @@ Les conventions opérationnelles de Forge sont consolidées dans
 - **D. Documentation** : MkDocs strict + liens hors `docs/`,
   `docs/history/` comme mémoire brute, section « Historique » dans la nav
 
-Note sur `packages/` : 12 sous-dossiers maintenus (`forge-mvc-mfa`,
+Note sur `packages/` : 15 sous-dossiers maintenus (`forge-mvc-mfa`,
 `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-files`,
 `forge-mvc-images`, `forge-mvc-iot`, `forge-mvc-video`, `forge-mvc-audio`,
-`forge-mvc-mail` (ADR-022), `forge-mvc-pivot` (ADR-021), `forge-mvc-i18n` (ADR-027)),
+`forge-mvc-mail` (ADR-022), `forge-mvc-pivot` (ADR-021), `forge-mvc-i18n` (ADR-027),
+`forge-mvc-qrcode` (ADR-050), `forge-mvc-admin`, `forge-mvc-testing` (ADR-041)),
 chacun avec son propre `pyproject.toml`. Le paquet `forge-mvc-media` a été
 supprimé ; son shim de compatibilité est réexporté par `forge-mvc-images`
 (ADR-018). Le `pyproject.toml` racine est la source de vérité pour `forge-mvc`
@@ -333,7 +361,7 @@ Les informations volatiles ne sont pas ici — voir section 8.
 
 **Prochaine refonte prévue** : tag majeur 2.0 (ou refonte intermédiaire si
 un changement architectural important le justifie).
-**Dernière refonte** : 2026-05 (resync bêta 1.0, `GOV-CLAUDE-MD-1.0-RESYNC-001`)
+**Dernière refonte** : 2026-06 (resync opt-ins et ADR jusqu'à 051, `GOV-CLAUDE-MD-OPTINS-RESYNC-001`)
 
 ---
 
