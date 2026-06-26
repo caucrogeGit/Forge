@@ -1753,9 +1753,9 @@ Effets:
   - vérifie l'importabilité de chaque module Auth :
       core.auth.user / session / tokens / reset / audit / rate_limit,
       forge_mvc_mfa (+ recovery), forge_mvc_rbac ;
-  - émet un avertissement MFA Pre-Alpha (installée ou pas) : secret
-    TOTP stocké en clair, voir packages/forge-mvc-mfa/docs/reference.md et
-    SEC-MFA-SECRET-ENCRYPTION-001 ;
+  - émet un rappel MFA (Beta, installée ou pas) : secret TOTP chiffré au
+    repos, FORGE_MFA_SECRET_KEY obligatoire, voir
+    packages/forge-mvc-mfa/docs/reference.md ;
   - vérifie la présence des contrats publics (AuthUser, login_user,
     AuthToken, PasswordResetRequest, AuthMfaFactor,
     AuthMfaRecoveryCode, AuthUserRole, user_has_permission,

@@ -1,16 +1,13 @@
 """Garde-fou MFA-SECURITY-CLARIFY-001.
 
-Vérifie que la sécurité MFA est clarifiée visiblement sur 3 surfaces :
-1. docs/reference/auth-mfa.md mentionne Pre-Alpha + stockage en clair
-2. docs/features/auth.md tableau mentionne Pre-Alpha (et plus la dépréciation obsolète)
-3. forge auth:doctor affiche un avertissement Pre-Alpha
+Vérifie que le statut et la sécurité MFA sont clarifiés visiblement sur 3 surfaces :
+1. la référence du paquet MFA documente le statut Beta + le secret chiffré au repos
+2. docs/features/auth.md ne référence plus le paquet MFA opt-in (ADR-042), sans dépréciation obsolète
+3. forge auth:doctor rappelle le statut opt-in de MFA et ses prérequis de sécurité
 
-Origine : audit F14, partiellement adressé par T3/T4/T10. T13 finit
-le travail sur les 3 surfaces restantes.
-
-État positif préservé (NON testé ici, déjà validé en T4) :
+État positif préservé (NON testé ici) :
 - UserWarning runtime dans register_totp_factor()
-- Docstring de la fonction qui mentionne le stockage en clair
+- Secret TOTP chiffré au repos (Fernet, FORGE_MFA_SECRET_KEY obligatoire)
 """
 from __future__ import annotations
 
@@ -40,13 +37,13 @@ AUTH_MFA_REF = PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "docs" / "reference
 AUTH_DOC = PROJECT_ROOT / "docs" / "features" / "auth.md"
 
 
-class TestAuthMfaRefHasPreAlphaWarning:
-    """docs/reference/auth-mfa.md affiche l'avertissement de statut MFA."""
+class TestAuthMfaRefHasStatusWarning:
+    """La référence du paquet MFA affiche le statut et la sécurité MFA."""
 
-    def test_mentions_pre_alpha_or_alpha(self):
+    def test_mentions_beta_status(self):
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
-        assert "Alpha" in text or "Pre-Alpha" in text, (
-            "docs/reference/auth-mfa.md doit mentionner le statut Alpha ou Pre-Alpha."
+        assert "Beta" in text, (
+            "La référence MFA doit mentionner le statut Beta."
         )
 
     def test_mentions_secret_chiffre(self):
@@ -73,8 +70,8 @@ class TestAuthMfaRefHasPreAlphaWarning:
         """L'avertissement de statut MFA apparaît dans les 30 premières lignes."""
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
         first_30_lines = "\n".join(text.splitlines()[:30])
-        assert "Alpha" in first_30_lines or "MFA-PYPI-READY-001" in first_30_lines, (
-            "L'avertissement de statut (Alpha/Pre-Alpha ou ticket MFA-PYPI-READY-001) "
+        assert "Beta" in first_30_lines or "MFA-PYPI-READY-001" in first_30_lines, (
+            "L'avertissement de statut (Beta ou ticket MFA-PYPI-READY-001) "
             "doit être en début de page (dans les 30 premières lignes)."
         )
 
@@ -125,11 +122,11 @@ class TestAuthDocMfaLineUpdated:
                 )
 
 
-class TestAuthDoctorWarnsMfaPreAlpha:
-    """forge auth:doctor affiche un avertissement de statut pour MFA."""
+class TestAuthDoctorWarnsMfaStatus:
+    """forge auth:doctor rappelle le statut opt-in de MFA."""
 
     def test_auth_doctor_warns_about_mfa_status(self):
-        """forge auth:doctor mentionne Alpha, Pre-Alpha ou opt-in pour MFA."""
+        """forge auth:doctor mentionne le statut opt-in (Beta) de MFA."""
         try:
             result = subprocess.run(
                 [sys.executable, str(PROJECT_ROOT / "forge.py"), "auth:doctor"],

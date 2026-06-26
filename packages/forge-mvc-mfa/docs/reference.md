@@ -1,7 +1,8 @@
 # Auth : Challenge MFA à la connexion
 
-!!! info "Module Alpha : opt-in officiel publié sur PyPI depuis 1.0.0-beta.9"
-    `forge-mvc-mfa` est marqué `Development Status :: 3 - Alpha` depuis `MFA-PYPI-READY-001`.
+!!! info "Module Beta : opt-in officiel publié sur PyPI depuis 1.0.0-beta.9"
+    `forge-mvc-mfa` est marqué `Development Status :: 4 - Beta` (publication PyPI
+    préparée par `MFA-PYPI-READY-001`).
 
     Le secret TOTP est **chiffré au repos** via Fernet (`cryptography`) avec la clé
     `FORGE_MFA_SECRET_KEY`. Le chiffrement est obligatoire : démarrer sans cette
@@ -13,13 +14,10 @@
     pip install --pre forge-mvc-mfa
     ```
 
-    `forge-mvc-mfa` n'est **pas inclus dans `forge-mvc[all]`** (les extras core
-    couvrent uniquement RBAC, workflow et stats ; installer le paquet
-    directement). MFA reste opt-in : le core Forge ne dépend pas de
-    `forge-mvc-mfa`.
-
-    Le passage Alpha → Beta reste un ticket futur, indépendant de la
-    publication PyPI déjà effectuée en `1.0.0-beta.9`.
+    `forge-mvc-mfa` n'est **pas inclus dans `forge-mvc[all]`** : activer la MFA est
+    un choix de sécurité explicite de l'application (les extras core couvrent
+    uniquement RBAC, workflow et stats ; installer le paquet directement). MFA
+    reste opt-in : le core Forge ne dépend pas de `forge-mvc-mfa`.
 
 > **Module extrait** : le code MFA vit dans
 > `forge-mvc-mfa`. Voir `packages/forge-mvc-mfa/README.md` pour
@@ -96,7 +94,7 @@ L'API détaillée est documentée page par page, un fichier par module :
 
 ### Statut actuel
 
-`forge-mvc-mfa` est Alpha depuis `MFA-PYPI-READY-001`. Le secret TOTP est
+`forge-mvc-mfa` est en Beta. Le secret TOTP est
 **chiffré au repos** via Fernet (bibliothèque `cryptography`).
 
 Le module est opt-in, non inclus dans `forge-mvc[all]`, et doit être configuré avec
@@ -119,9 +117,9 @@ En développement et en environnement de test isolé :
 
 ### Production
 
-Le module est Alpha. Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`).
-Les exigences de production-ready complètes (rotation, sauvegarde/restauration,
-revue sécurité) ne sont pas encore satisfaites.
+Le module est en Beta. Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`).
+Certaines exigences avancées (rotation de clé, sauvegarde/restauration, revue
+sécurité formelle) restent à la charge de l'application avant un usage critique.
 
 **Protection additionnelle recommandée en production :**
 
@@ -201,16 +199,16 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (s
 
 ### Exigences avant production-ready
 
-`forge-mvc-mfa` a été publié sur PyPI au statut **Alpha** en `1.0.0-beta.9`. Le passage **Alpha → Beta** reste conditionné aux exigences suivantes :
+`forge-mvc-mfa` est en **Beta** (publié sur PyPI depuis `1.0.0-beta.9`). Avant un usage en production critique, l'application doit couvrir les exigences suivantes :
 
 1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : Fernet + `FORGE_MFA_SECRET_KEY`.
 2. **Politique de rotation documentée** : rotation ou invalidation maîtrisée des secrets compromis.
 3. **Documentation de sauvegarde/restauration** : procédure en cas de perte de la clé de chiffrement.
 4. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : `tests/test_mfa_secret_crypto.py`.
 5. **Revue sécurité explicite** : validation que le stockage chiffré est correct.
-6. ~~**Décision explicite de changement de statut Pre-Alpha → Alpha**~~ ✓ livré (`MFA-PYPI-READY-001`).
-7. ~~**Publication PyPI au statut Alpha**~~ ✓ livré en `1.0.0-beta.9`.
-8. **Décision de passage Alpha → Beta** : ticket futur indépendant de la publication PyPI.
+6. ~~**Décision explicite de changement de statut**~~ ✓ livré (`MFA-PYPI-READY-001`).
+7. ~~**Publication PyPI**~~ ✓ livré en `1.0.0-beta.9`.
+8. ~~**Passage en Beta**~~ ✓ acté (tous les opt-ins en Beta).
 
 ### Tickets liés
 
