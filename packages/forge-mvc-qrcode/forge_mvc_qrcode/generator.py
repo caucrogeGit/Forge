@@ -9,9 +9,8 @@ ne touche ni au routeur ni à la base de données.
 from __future__ import annotations
 
 import io
-from typing import Any, cast
 
-import segno  # pyright: ignore[reportMissingTypeStubs]
+import segno
 
 from forge_mvc_qrcode.errors import QrCodeError
 
@@ -28,7 +27,7 @@ class QrCode:
     appeler :meth:`to_png` et :meth:`to_svg` autant de fois que voulu.
     """
 
-    def __init__(self, qr: Any, text: str) -> None:
+    def __init__(self, qr: segno.QRCode, text: str) -> None:
         self._qr = qr
         self.text = text
 
@@ -42,7 +41,7 @@ class QrCode:
         """
         if not text or not text.strip():
             raise QrCodeError("Le texte du QR Code ne peut pas être vide.")
-        qr = cast("Any", segno).make(text, error=error)
+        qr = segno.make(text, error=error)
         return cls(qr, text)
 
     def to_png(self, *, scale: int = 4, border: int = 4) -> bytes:
