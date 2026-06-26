@@ -95,9 +95,9 @@ Une LTS qui n'est pas tenue est pire que pas de LTS du tout.
 
 ## Arguments pour une LTS
 
-### 1. Forge 1.0 (bêta) est une base sérieuse
+### 1. Forge 1.0 (préversion) est une base sérieuse
 
-La série bêta 1.0 (`1.0.0-beta.x`) est livrée, documentée et fortement testée :
+La série de préversion 1.0 (jusqu'à `1.0.0-rc.1`) est livrée, documentée et fortement testée :
 
 - suite complète verte (compteur : voir la source canonique, CLAUDE.md §8) ;
 - 7 audits de sécurité terminés ;

@@ -140,7 +140,7 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 
 ## Stratégie de classification PyPI
 
-> **Note RC** : en `1.0.0rc1` (release candidate), la **version** est une
+> **Note RC** : en `{{forge_version}}` (release candidate), la **version** est une
 > préversion finale, mais le classifier `Development Status` reste `4 - Beta`.
 > PyPI ne propose pas de classifier « Release Candidate » distinct ; le signal
 > RC passe donc par le numéro de version (PEP 440 `rc`), pas par le classifier.
@@ -377,7 +377,7 @@ Vérifications post-publication :
 ### Publication PyPI
 
 **État Forge {{forge_version}} :** le core `forge-mvc` est **publié sur PyPI** sous `forge-mvc=={{forge_version}}`.
-`{{forge_version}}` est une préversion bêta PEP 440, l'option `--pre` est nécessaire pour l'installer.
+`{{forge_version}}` est une préversion PEP 440 (release candidate), l'option `--pre` est nécessaire pour l'installer.
 
 | Package | Publication PyPI | Notes |
 |---|---|---|
