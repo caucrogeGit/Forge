@@ -93,7 +93,7 @@ class TestNoStaleForgeVersionInActiveDocs:
         match = STALE_FORGE_VERSION_PATTERN.search(text)
         assert not match, (
             f"app.py contient une mention obsolète : '{match.group()}'. "
-            f"À remplacer par 'Forge 3.0.1' (T7 — F6)."
+            f"À remplacer par la version courante (voir pyproject.toml)."
         )
 
     def test_no_forge_2_x_in_release_local(self):
@@ -101,7 +101,7 @@ class TestNoStaleForgeVersionInActiveDocs:
         match = STALE_FORGE_VERSION_PATTERN.search(text)
         assert not match, (
             f"docs/release/release-local.md contient une mention obsolète : "
-            f"'{match.group()}'. À remplacer par 'Forge 3.0.1' (T7 — F5)."
+            f"'{match.group()}'. À remplacer par la version courante (voir pyproject.toml)."
         )
 
     def test_no_forge_2_x_in_installation_github(self):
@@ -109,7 +109,7 @@ class TestNoStaleForgeVersionInActiveDocs:
         match = STALE_FORGE_VERSION_PATTERN.search(text)
         assert not match, (
             f"docs/install/github.md contient une mention obsolète : "
-            f"'{match.group()}'. (T7 — F4)."
+            f"'{match.group()}'. (version périmée, voir pyproject.toml)."
         )
 
 
@@ -120,7 +120,7 @@ class TestNoStaleTagV300InActiveDocs:
         match = STALE_TAG_V3_0_0_PATTERN.search(text)
         assert not match, (
             "docs/guide/guide.md référence encore v3.0.0. "
-            "À remplacer par v3.0.1 (T7 — F4)."
+            "À remplacer par la version courante (voir pyproject.toml)."
         )
 
     def test_no_v3_0_0_in_installation_github(self):
@@ -128,7 +128,7 @@ class TestNoStaleTagV300InActiveDocs:
         match = STALE_TAG_V3_0_0_PATTERN.search(text)
         assert not match, (
             "docs/install/github.md référence encore v3.0.0. "
-            "À remplacer par v3.0.1 (T7 — F4)."
+            "À remplacer par la version courante (voir pyproject.toml)."
         )
 
     def test_no_v3_0_0_in_profiles(self):
@@ -136,7 +136,7 @@ class TestNoStaleTagV300InActiveDocs:
         match = STALE_TAG_V3_0_0_PATTERN.search(text)
         assert not match, (
             "docs/features/profiles.md référence encore v3.0.0. "
-            "À remplacer par v3.0.1 (T7 — F4)."
+            "À remplacer par la version courante (voir pyproject.toml)."
         )
 
 
@@ -163,7 +163,7 @@ class TestNoStaleVersionInActiveDocs:
             "Mentions 'Forge 2.x.y' actives détectées :\n  "
             + "\n  ".join(violations[:20])
             + ("\n  ..." if len(violations) > 20 else "")
-            + "\n\nCes mentions doivent être bumpées à 'Forge 3.0.1'."
+            + "\n\nCes mentions doivent être bumpées à la version courante (voir pyproject.toml)."
         )
 
     def test_no_active_v3_0_0_across_docs(self):
@@ -183,7 +183,7 @@ class TestNoStaleVersionInActiveDocs:
             "Références 'v3.0.0' actives détectées :\n  "
             + "\n  ".join(violations[:20])
             + ("\n  ..." if len(violations) > 20 else "")
-            + "\n\nÀ remplacer par 'v3.0.1'."
+            + "\n\nÀ remplacer par la version courante (voir pyproject.toml)."
         )
 
 

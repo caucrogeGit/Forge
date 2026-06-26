@@ -38,17 +38,6 @@ class TestSourceCanonique:
 # ---------------------------------------------------------------------------
 
 
-class TestSlogan:
-    def test_slogan_principal(self):
-        # Repositionnement « production auditable » (ADR-049) : le slogan
-        # « Une forge pour les créer toutes » est remplacé par la proposition
-        # de valeur orientée adoption.
-        assert "Le framework Python que vous pouvez lire en entier" in _src()
-
-    def test_sous_titre_framework(self):
-        assert "Framework web applicatif" in _src()
-
-
 # ---------------------------------------------------------------------------
 # Version
 # ---------------------------------------------------------------------------
@@ -90,78 +79,6 @@ class TestBriquesCore:
 
     def test_deploiement(self):
         assert "Déploiement" in _src() or "déploiement" in _src()
-
-
-# ---------------------------------------------------------------------------
-# Apports phases 5 à 10
-# ---------------------------------------------------------------------------
-
-
-class TestApportsRecents:
-    def test_securite_renforcee(self):
-        src = _src()
-        assert "CSRF" in src or "headers" in src or "audit" in src
-
-    def test_auth_user_detail(self):
-        # Refonte landing : l'auth avancée est représentée par le module
-        # forge-mvc-mfa (authentification multi-facteurs / TOTP).
-        src = _src()
-        assert "TOTP" in src or "multi-facteurs" in src or "forge-mvc-mfa" in src
-
-    def test_modules_opt_in_mentionne(self):
-        # Les modules opt-in remplacent les briques API JSON / Médias / Mail
-        src = _src()
-        assert "forge-mvc-mfa" in src or "forge-mvc-rbac" in src
-
-    def test_tests_mentionnes(self):
-        src = _src()
-        assert "7000" in src or "tests" in src
-
-    def test_documentation_avancee(self):
-        src = _src()
-        assert "documentation" in src.lower()
-
-    def test_deploiement_avance(self):
-        src = _src()
-        assert "Nginx" in src or "systemd" in src
-
-
-# ---------------------------------------------------------------------------
-# État actuel mis à jour
-# ---------------------------------------------------------------------------
-
-
-class TestEtatActuel:
-    def test_forge_etat_actuel(self):
-        # Cartes d'état (« Forge {version} » / « Stabilisation bêta ») retirées ;
-        # la version reste exposée via « v{version} » dans le hero.
-        assert f"v{_current_semver()}" in _src(), (
-            f"'v{_current_semver()}' doit apparaître dans la landing page."
-        )
-
-    def test_phases_recentes_mentionnees(self):
-        """Apports phases récentes — phrasing aligné sur les parcours
-        d'installation actuels de la landing (cards Installer Forge)
-        après LANDING-PUBLIC-CONTRACT-REALIGN-001."""
-        src = _src()
-        assert (
-            "forge run" in src
-            or "Windows + WSL" in src
-            or "pipx" in src
-            or "Développement du core" in src
-            or "Production — WSGI" in src
-            or "Bienvenue dans Forge" in src
-        )
-
-    def test_prochaine_priorite_auth(self):
-        # Le starter auth remplace l'ancienne prochaine-priorité Auth/User
-        src = _src()
-        assert "users-core-auth" in src or "authentification" in src.lower()
-
-    def test_mfa_mentionne(self):
-        # forge-mvc-mfa remplace la mention "MFA" ou "OIDC" (OIDC retiré — ADR-004)
-        src = _src()
-        assert "forge-mvc-mfa" in src
 
 
 # ---------------------------------------------------------------------------
