@@ -11,7 +11,7 @@ name: Dependency Audit
 # où les mêmes commandes `pip-audit` sont BLOQUANTES — aucune publication
 # ne peut être validée tant que les audits ne sont pas verts.
 #
-# Voir `docs/release-policy.md#audits-dependances` pour la politique
+# Voir `docs/release/release-policy.md#audits-dependances` pour la politique
 # complète.
 
 on:
