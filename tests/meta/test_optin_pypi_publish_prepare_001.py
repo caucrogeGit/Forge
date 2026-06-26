@@ -92,16 +92,16 @@ class TestAlphaPreparedPackages:
         text = self._text(pkg)
         assert "Private :: Do Not Upload" not in text, (
             f"{pkg}/pyproject.toml: 'Private :: Do Not Upload' doit etre retire "
-            f"— ce package a ete requalifie Alpha (MFA-PYPI-READY-001 / MEDIA-PYPI-READY-002)."
+            f"— ce package est publiable."
         )
 
-    def test_alpha_status(self, pkg):
+    def test_beta_status(self, pkg):
         import tomllib as _toml
         text = self._text(pkg)
         data = _toml.loads(text)
         classifiers = data.get("project", {}).get("classifiers", [])
-        assert any("3 - Alpha" in c for c in classifiers), (
-            f"{pkg}: doit avoir 'Development Status :: 3 - Alpha'."
+        assert any("4 - Beta" in c for c in classifiers), (
+            f"{pkg}: doit avoir 'Development Status :: 4 - Beta'."
         )
 
 

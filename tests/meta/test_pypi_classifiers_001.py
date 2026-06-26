@@ -19,7 +19,7 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-rbac":     "Development Status :: 4 - Beta",
     "forge-mvc-workflow": "Development Status :: 4 - Beta",
     "forge-mvc-stats":    "Development Status :: 4 - Beta",
-    "forge-mvc-mfa":      "Development Status :: 3 - Alpha",
+    "forge-mvc-mfa":      "Development Status :: 4 - Beta",
     "forge-mvc-images":   "Development Status :: 4 - Beta",
     "forge-mvc-iot":      "Development Status :: 4 - Beta",
     "forge-mvc-video":    "Development Status :: 4 - Beta",

@@ -116,7 +116,7 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 | [`forge-mvc-rbac`](https://pypi.org/project/forge-mvc-rbac/) | Rôles et permissions déclaratives | Beta |
 | [`forge-mvc-workflow`](https://pypi.org/project/forge-mvc-workflow/) | Cycles de vie applicatifs (statuts, transitions) | Beta |
 | [`forge-mvc-stats`](https://pypi.org/project/forge-mvc-stats/) | Agrégats et compteurs d'événements | Beta |
-| [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) | Alpha |
+| [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) | Beta |
 | [`forge-mvc-files`](https://pypi.org/project/forge-mvc-files/) | Upload générique : écriture sécurisée, storage, service de fichiers (HTTP Range) | Beta |
 | [`forge-mvc-images`](https://pypi.org/project/forge-mvc-images/) | Traitement et gestion applicative des images (Pillow), dépend de `forge-mvc-files` | Beta |
 | [`forge-mvc-audio`](https://pypi.org/project/forge-mvc-audio/) | Upload, sondage, transcodage MP3 et lecture en streaming HTTP Range | Beta |
@@ -144,7 +144,7 @@ ou `pip install --pre forge-mvc-images`. `forge-mvc-i18n`, `forge-mvc-qrcode`,
 `requirements-dev.txt`.
 Cette exclusion de `[all]` tient soit à
 une dépendance lourde (MQTT `paho-mqtt` pour IoT, binaire système FFmpeg pour
-Video et Audio, Pillow pour Images), soit à une maturité encore Alpha
+Video et Audio, Pillow pour Images), soit à un choix de sécurité explicite
 (`mfa`), soit à une absence de publication sur PyPI (`i18n`, `qrcode`).
 
 ---
