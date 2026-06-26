@@ -183,5 +183,5 @@ def decrypt_totp_secret(stored: str) -> str:
         return fernet.decrypt(payload.encode()).decode()
     except Exception as exc:
         raise MfaSecretInvalidKey(
-            f"Impossible de déchiffrer le secret TOTP : {exc}"
+            "Impossible de déchiffrer le secret TOTP."
         ) from exc
