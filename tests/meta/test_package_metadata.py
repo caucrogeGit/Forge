@@ -13,7 +13,9 @@ import pytest
 pytestmark = pytest.mark.meta
 
 _VERSION = __import__("tomllib").loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-_VERSION_SEMVER = __import__("re").sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _VERSION)
+_VERSION_SEMVER = __import__("re").sub(r"(\d+\.\d+\.\d+)a(\d+)$", r"\1-alpha.\2", _VERSION)
+_VERSION_SEMVER = __import__("re").sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _VERSION_SEMVER)
+_VERSION_SEMVER = __import__("re").sub(r"(\d+\.\d+\.\d+)rc(\d+)$", r"\1-rc.\2", _VERSION_SEMVER)
 
 
 def test_package_json_author_is_current():

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-testing"
-version = "1.0.0b17"
+version = "1.0.0rc1"
 description = "Forge — infrastructure de test partagée (FakeRequest + plugin pytest), réservée au développement."
 requires-python = ">=3.12"
 authors = [
@@ -13,7 +13,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "testing", "pytest"]
 dependencies = [
-    "forge-mvc>=1.0.0b17,<2",
+    "forge-mvc>=1.0.0rc1,<2",
     "pytest>=7",
 ]
 classifiers = [

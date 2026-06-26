@@ -12,4 +12,4 @@ from __future__ import annotations
 from forge_mvc_testing.fake_request import FakeRequest
 
 __all__ = ["FakeRequest"]
-__version__ = "1.0.0b17"
+__version__ = "1.0.0rc1"

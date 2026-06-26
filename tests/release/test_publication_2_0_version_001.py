@@ -12,7 +12,9 @@ import core
 ROOT = Path(__file__).resolve().parents[2]
 
 _EXPECTED = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-_EXPECTED_SEMVER = re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _EXPECTED)
+_EXPECTED_SEMVER = re.sub(r"(\d+\.\d+\.\d+)a(\d+)$", r"\1-alpha.\2", _EXPECTED)
+_EXPECTED_SEMVER = re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _EXPECTED_SEMVER)
+_EXPECTED_SEMVER = re.sub(r"(\d+\.\d+\.\d+)rc(\d+)$", r"\1-rc.\2", _EXPECTED_SEMVER)
 _EXPECTED_REF = f"v{_EXPECTED_SEMVER}"
 
 

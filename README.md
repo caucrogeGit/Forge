@@ -15,12 +15,12 @@ Pas de magie cachée, SQL visible, sécurisé par défaut, runtime minimal
 
 ## Statut
 
-Forge **1.0.0-beta.17**, bêta publique.
+Forge **1.0.0-rc.1**, release candidate (préversion finale avant 1.0.0 stable).
 
 - Paquet PyPI : [`forge-mvc`](https://pypi.org/project/forge-mvc/)
-- Préversion PEP 440 : installation avec `--pre`
+- Préversion PEP 440 (`1.0.0rc1`) : installation avec `--pre`
 - Python 3.12+
-- API publique en stabilisation
+- API publique gelée pour la 1.0.0
 
 ---
 

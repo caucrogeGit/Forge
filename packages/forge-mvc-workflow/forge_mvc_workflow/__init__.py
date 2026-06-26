@@ -31,7 +31,7 @@ from forge_mvc_workflow.transitions import (
     validate_transitions,
 )
 
-__version__ = "1.0.0b17"
+__version__ = "1.0.0rc1"
 
 __all__ = [
     "WorkflowStatus",

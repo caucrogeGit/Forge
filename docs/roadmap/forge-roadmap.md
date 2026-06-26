@@ -7,29 +7,26 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> Version courante : **Forge 1.0.0-beta.17** (publiée le 2026-06-18).
+> Version courante : **Forge 1.0.0-rc.1** (release candidate, préparée le 2026-06-26).
 > Dernière version publiée sur PyPI : **Forge 1.0.0-beta.17**.
 
 ---
 
-## État actuel : Forge 1.0.0-beta.17
+## État actuel : Forge 1.0.0-rc.1
 
-**Tag courant : `v1.0.0-beta.17`**, typage statique de bout en bout. Le cliquet
-ADR-036 s'étend du cœur aux 12 opt-ins : chaque paquet `forge-mvc-*` passe
-pyright en mode strict (`# pyright: strict` par fichier) et expose `py.typed`
-(PEP 561, inclus au wheel). Le scan pyright en CI couvre désormais le cœur **et**
-les 12 opt-ins (170 fichiers, 0 erreur). Le squelette `forge new` démarre en
-`typeCheckingMode: strict` et son code généré est strict-clean ; les accesseurs
-de `Request` (`query`/`form`/`route`/`header`) exposent des surcharges typées,
-et `Response` / l'enregistrement des routes / `html()` / `render()` valident
-leurs arguments critiques au plus tôt. Cette release embarque aussi les
-correctifs de consolidation terrain post-b16 (squelette, pages d'erreur
-détaillées en `dev`, DX VS Code).
+**Tag courant : `v1.0.0-rc.1`**, première release candidate avant la 1.0.0 stable.
+L'API publique est gelée pour la 1.0. Tous les opt-ins officiels passent en statut
+Beta (`Development Status :: 4 - Beta`). Cinq nouvelles briques opt-in rejoignent
+le catalogue (ADR-052) : `forge-mvc-settings`, `forge-mvc-audit`, `forge-mvc-jobs`,
+`forge-mvc-notifications` et `forge-mvc-import-export`. Le déploiement est extrait
+du cœur dans l'opt-in CLI-only `forge-mvc-deploy` (ADR-053). Le typage strict de
+bout en bout acquis en beta.17 (ADR-036, cœur + opt-ins) est conservé.
 
-Précédent : v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-beta.17 (2026-06-18, typage strict de bout en bout ADR-036), v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-beta.17, release de typage : tout Forge (cœur + 12 opt-ins)
-passe en pyright strict et expose `py.typed`, vérifié en CI. Les acquis de
+**Statut : v1.0.0-rc.1, première release candidate : API publique gelée, tous
+les opt-ins en Beta, nouvelles briques opt-in (ADR-052) et déploiement extrait
+(ADR-053). Les acquis de beta.17 (typage strict de bout en bout ADR-036),
 beta.16 (parcours réalisés à la main ADR-035), beta.15 (i18n ADR-027, convention
 de route ADR-029, refonte `welcome-forge` ADR-025/028) et beta.14 (squelette
 dédié ADR-024) restent en place.**

@@ -1,7 +1,27 @@
 # Changelog
 
 
-## [Non publié]
+## [1.0.0-rc.1] — 2026-06-26
+
+Première release candidate avant la 1.0.0 stable : API publique gelée, tous les
+opt-ins officiels en statut Beta, nouvelles briques opt-in (ADR-052) et
+extraction du déploiement (ADR-053).
+
+### Modifié
+
+- **Tous les opt-ins officiels passent en statut Beta** (`Development Status :: 4 - Beta`).
+  `forge-mvc-mfa` inclus : il reste hors de `forge-mvc[all]` par choix de sécurité
+  explicite, plus par maturité Alpha.
+- **Version `1.0.0rc1`** (PEP 440), affichée `1.0.0-rc.1` (SemVer). API publique
+  gelée pour la 1.0.
+
+### Retiré
+
+- **Dossier `deploy/` à la racine du dépôt** : artefact régénérable par
+  `forge deploy:init`, retiré et ignoré (ADR-044, le dépôt framework ne porte pas
+  d'application déployée).
+- **Support pédagogique temporaire welcome-reseau** (2TNE CIEL, sans lien avec le
+  framework) : retiré de la documentation, de la nav et de la landing.
 
 ### Sécurité
 
@@ -17,6 +37,18 @@
 
 ### Ajouté
 
+- **Opt-in `forge-mvc-deploy`** (ADR-053, `DEPLOY-EXTRACT-001`). Outillage de
+  déploiement extrait du cœur : commandes `forge deploy:init` (gabarits Nginx,
+  systemd, `wsgi.py`) et `forge deploy:check`. Premier opt-in à CLI seule, sans
+  API runtime. `forge.py` dispatche `deploy:*` vers le paquet avec repli explicite
+  si le module n'est pas installé.
+- **Opt-ins applicatifs ADR-052** : `forge-mvc-settings` (paramètres `app_settings`,
+  `get_setting`/`set_setting`), `forge-mvc-audit` (journal `audit_log`,
+  `record_audit`/`get_audit_log`), `forge-mvc-jobs` (file de tâches `jobs`,
+  `enqueue` + worker `drain`/`run_worker`), `forge-mvc-notifications`
+  (`notify`/`get_notifications`/`mark_read`) et `forge-mvc-import-export` (échange
+  CSV : import validé par champ et export `to_csv`). Chacun dépend uniquement du
+  cœur, avec sa commande `*:init`, sa doc embarquée et son parcours welcome.
 - **Opt-in `forge-mvc-qrcode`** (ADR-050, `QRCODE-OPTIN-SCAFFOLD-001`). Socle de
   génération de QR Codes découplé du cœur : `QrCode.from_text(...).to_png()` /
   `.to_svg()` (octets PNG, document SVG) et `QrCodeResponse.from_text(...)` qui

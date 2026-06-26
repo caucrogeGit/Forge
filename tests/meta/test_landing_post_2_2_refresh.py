@@ -12,7 +12,10 @@ DOCS_PATH = pathlib.Path("docs/index.html")
 def _current_semver() -> str:
     import re
     v = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-    return re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", v)
+    v = re.sub(r"(\d+\.\d+\.\d+)a(\d+)$", r"\1-alpha.\2", v)
+    v = re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", v)
+    v = re.sub(r"(\d+\.\d+\.\d+)rc(\d+)$", r"\1-rc.\2", v)
+    return v
 
 
 def _src():

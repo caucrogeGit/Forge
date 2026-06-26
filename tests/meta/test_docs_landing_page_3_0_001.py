@@ -34,7 +34,9 @@ class TestVersionBumped:
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
         self.generated = LANDING_GENERATED.read_text(encoding="utf-8")
         _v = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-        _sv = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _v)
+        _sv = _re.sub(r"(\d+\.\d+\.\d+)a(\d+)$", r"\1-alpha.\2", _v)
+        _sv = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _sv)
+        _sv = _re.sub(r"(\d+\.\d+\.\d+)rc(\d+)$", r"\1-rc.\2", _sv)
         # « Forge {version} » retiré : portait uniquement par les cartes d'état
         # « Forge 1.0.0-beta.13 » / « Stabilisation bêta », supprimées de la landing.
         # La version reste exposée via « v{version} » dans le hero.
@@ -283,7 +285,9 @@ class TestSyncedToDocsIndex:
         import tomllib
         import re as _re
         _v = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-        _sv = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _v)
+        _sv = _re.sub(r"(\d+\.\d+\.\d+)a(\d+)$", r"\1-alpha.\2", _v)
+        _sv = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", _sv)
+        _sv = _re.sub(r"(\d+\.\d+\.\d+)rc(\d+)$", r"\1-rc.\2", _sv)
         tag = f"v{_sv}"
         generated = LANDING_GENERATED.read_text(encoding="utf-8")
         assert tag in generated, (

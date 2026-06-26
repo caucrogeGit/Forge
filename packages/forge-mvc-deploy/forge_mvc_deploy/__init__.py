@@ -14,7 +14,7 @@ from forge_mvc_deploy.cli.deploy import (
     main,
 )
 
-__version__ = "1.0.0b17"
+__version__ = "1.0.0rc1"
 
 __all__ = [
     "cmd_deploy_init",

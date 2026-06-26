@@ -5,7 +5,7 @@
 Ticket PKG-VERSION-SYNC-CHECK-001.
 
 Dérive la version canonique depuis le pyproject racine (`[project].version`, en
-PEP 440, ex. `1.0.0b17`) et vérifie que TOUS les emplacements la reprennent :
+PEP 440, ex. `1.0.0rc1`) et vérifie que TOUS les emplacements la reprennent :
 
 - `version =` des 14 sous-paquets ;
 - les pins `forge-mvc>=` (et `forge-mvc-files>=` pour images) des sous-paquets ;
@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def pep440_to_semver(version: str) -> str:
-    """`1.0.0b17` -> `1.0.0-beta.17` (stable inchangé)."""
+    """`1.0.0rc1` -> `1.0.0-beta.17` (stable inchangé)."""
     version = re.sub(r"rc(\d+)$", r"-rc.\1", version)
     version = re.sub(r"a(\d+)$", r"-alpha.\1", version)
     version = re.sub(r"b(\d+)$", r"-beta.\1", version)

@@ -202,7 +202,9 @@ class TestForgePyVersionConsistency:
     def _current_ref(self) -> str:
         import re as _re
         v = self._current_version()
-        semver = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", v)
+        semver = _re.sub(r"(\d+\.\d+\.\d+)a(\d+)$", r"\1-alpha.\2", v)
+        semver = _re.sub(r"(\d+\.\d+\.\d+)b(\d+)$", r"\1-beta.\2", semver)
+        semver = _re.sub(r"(\d+\.\d+\.\d+)rc(\d+)$", r"\1-rc.\2", semver)
         return f"v{semver}"
 
     def test_forge_version_current(self):

@@ -20,7 +20,7 @@ from forge_mvc_settings.store import (
     set_setting,
 )
 
-__version__ = "1.0.0b17"
+__version__ = "1.0.0rc1"
 
 __all__ = [
     "SettingsError",

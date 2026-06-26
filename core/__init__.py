@@ -1,3 +1,3 @@
 # pyright: strict
-__version__ = "1.0.0b17"
+__version__ = "1.0.0rc1"
 __framework__ = "Forge"

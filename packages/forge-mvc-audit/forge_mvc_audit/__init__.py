@@ -19,7 +19,7 @@ from forge_mvc_audit.store import (
     record_audit,
 )
 
-__version__ = "1.0.0b17"
+__version__ = "1.0.0rc1"
 
 __all__ = [
     "AuditError",
