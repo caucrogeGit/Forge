@@ -36,7 +36,7 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-027](027-i18n-extraction.md) | Extraction de l'i18n vers `forge-mvc-i18n`, repli no-op conservé dans le noyau (accepté) |
 | [ADR-028](028-welcome-forge-tutorial-per-level.md) | welcome-forge : tutoriel continu manuel sur les trois niveaux, un mini-projet par niveau (accepté) |
 | [ADR-029](029-route-naming-convention.md) | Convention de route : chemin `/contrôleur/méthode` (index nu), nom `contrôleur-méthode` (accepté) |
-| [ADR-030](030-explicit-route-injection.md) | Injection de routes dans `mvc/routes.py` par commande explicite et portée de la règle 4.3 (proposé) |
+| [ADR-030](030-explicit-route-injection.md) | Injection de routes dans `mvc/routes.py` par commande explicite et portée de la règle 4.3 (accepté) |
 | [ADR-031](031-mail-core-decoupling.md) | Découplage complet du mail hors de `core.forge` ; `forge-mvc-mail` lit sa config depuis l'environnement (accepté) |
 | [ADR-032](032-upload-config-perimeter.md) | Périmètre de la config upload : seul `upload_max_size` est du core, le reste va aux opt-ins files/images (accepté) |
 | [ADR-033](033-migrations-admin-credentials.md) | `forge db:apply` applique les migrations avec `DB_ADMIN_*` (et non `DB_APP_*`) : `forge_app` reste DML strict (accepté) |
@@ -47,7 +47,7 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-038](038-optin-docs-embedded-per-package.md) | Documentation des opt-ins embarquée par paquet (`packages/<paquet>/docs/`), agrégée dans le site unique ; slug d'URL = nom sans `forge-mvc-` (accepté, pilote stats validé) |
 | [ADR-039](039-docs-information-architecture.md) | Refonte de l'architecture d'information de `docs/` (cœur) : un sujet = un emplacement canonique, tronc « Opt-ins officiels », dédoublonnages (proposé) |
 | [ADR-040](040-per-package-test-surface.md) | Surface de test par paquet opt-in : modèle hybride (transversal à la racine, smoke + unitaire dans le paquet), `testpaths = tests packages`, `importorskip` (accepté) |
-| [ADR-041](041-shared-test-support.md) | Infrastructure de test partagée (`forge-mvc-testing` dev-only, plugin pytest + `FakeRequest`) pour rendre les tests de paquet autonomes (proposé) |
+| [ADR-041](041-shared-test-support.md) | Infrastructure de test partagée (`forge-mvc-testing` dev-only, plugin pytest + `FakeRequest`) pour rendre les tests de paquet autonomes (accepté) |
 | [ADR-042](042-doc-core-optins-decoupling.md) | Découpler la documentation du cœur et celle des opt-ins (accepté) |
 | [ADR-043](043-core-cli-doc-embedding.md) | Documentation embarquée du cœur et du CLI ; renommage `forge_cli` → `cli` (accepté) |
 | [ADR-044](044-framework-only-repo.md) | Le dépôt Forge ne porte que le framework ; application racine relocalisée (accepté) |
