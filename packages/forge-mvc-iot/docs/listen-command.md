@@ -1,4 +1,4 @@
-# Écoute Forge IoT — `forge iot:listen`
+# Écoute Forge IoT : `forge iot:listen`
 
 > **Statut** : commande de **développement / pédagogie**. Elle écoute le
 > broker MQTT configuré et **insère** chaque mesure reçue dans la table
@@ -74,7 +74,7 @@ l'écoute s'est interrompue sur une erreur.
 
 ### Résumé de session
 
-À l'arrêt, un petit résumé récapitule la session — utile en classe et
+À l'arrêt, un petit résumé récapitule la session, utile en classe et
 pour le debug :
 
 ```text
@@ -149,14 +149,14 @@ Exit code 1. Voir [Configuration Forge IoT](configuration.md).
 [ERREUR] Connexion MQTT impossible : [Errno 111] Connection refused
 ```
 
-Exit code 1. Le broker n'est pas démarré ou l'hôte/port est faux —
+Exit code 1. Le broker n'est pas démarré ou l'hôte/port est faux ;
 diagnostique avec `forge iot:doctor --mqtt`. Pour installer et lancer un
 broker local, voir [Mosquitto local](mosquitto-local.md).
 
 ### Erreurs base
 
-La commande **s'arrête au premier échec base** (exit code 1) —
-volontairement simple et pédagogique — et distingue trois cas, message
+La commande **s'arrête au premier échec base** (exit code 1),
+volontairement simple et pédagogique, et distingue trois cas, message
 **sobre** (jamais de stacktrace) :
 
 **Table `iot_events` absente :**
@@ -200,9 +200,9 @@ export FORGE_IOT_MQTT_TLS_CA_FILE="/etc/ssl/certs/mosquitto-ca.crt"
 forge iot:listen
 ```
 
-Sans TLS (défaut), la connexion reste en clair — adapté au
+Sans TLS (défaut), la connexion reste en clair, adapté au
 [Mosquitto local](mosquitto-local.md). Détails :
-[Configuration — TLS MQTT](configuration.md#tls-mqtt).
+[Configuration : TLS MQTT](configuration.md#tls-mqtt).
 
 ## Limites
 
@@ -218,4 +218,4 @@ pédagogie**, pas pour la production. Sont **hors périmètre** :
   [contrat MQTT](mqtt-contract.md).
 
 Pour un déploiement réel, on brancherait `MqttSubscriber` dans un
-processus supervisé de l'application — ce qui dépasse ce ticket.
+processus supervisé de l'application, ce qui dépasse ce ticket.

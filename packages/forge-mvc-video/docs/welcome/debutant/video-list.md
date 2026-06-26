@@ -74,7 +74,7 @@ class VideoListController(BaseController):
 ### Comprendre ce code
 
 - `VideoRepository()` utilise par défaut l'accès base de Forge
-  (`core.database.db`) — aucun branchement manuel.
+  (`core.database.db`), aucun branchement manuel.
 - `list_recent(limit=20)` renvoie les 20 dernières vidéos sous forme de
   dictionnaires, directement sérialisables en JSON.
 - Le `try/except` **ne masque pas un bug** : il traduit l'absence de table en

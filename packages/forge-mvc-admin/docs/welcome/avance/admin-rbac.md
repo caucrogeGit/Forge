@@ -1,4 +1,4 @@
-# Avancé 3 — Exiger une permission
+# Avancé 3 : Exiger une permission
 
 Objectif : réserver le back-office à certains rôles, si le projet utilise RBAC.
 

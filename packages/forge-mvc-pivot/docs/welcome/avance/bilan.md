@@ -1,4 +1,4 @@
-# Bilan — niveau avancé (Pivot)
+# Bilan : niveau avancé (Pivot)
 
 Récapitulatif du **niveau avancé** de la progression *Bonjour Forge Pivot*. Ce
 niveau verrouille l'intégrité et l'UX : contraintes, unicité, erreurs de
@@ -8,9 +8,9 @@ formulaire.
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 — [Contraintes de champ](pivot-constraints.md) | Déclarer `required`/`nullable` (`PivotFieldConstraint`). |
-| 2 — [Unicité de la paire](pivot-unique.md) | Refuser un doublon avant l'`INSERT` (`unique_pair`). |
-| 3 — [Erreurs de formulaire](pivot-form.md) | Traduire une erreur en `PivotFormError` affichable. |
+| 1 : [Contraintes de champ](pivot-constraints.md) | Déclarer `required`/`nullable` (`PivotFieldConstraint`). |
+| 2 : [Unicité de la paire](pivot-unique.md) | Refuser un doublon avant l'`INSERT` (`unique_pair`). |
+| 3 : [Erreurs de formulaire](pivot-form.md) | Traduire une erreur en `PivotFormError` affichable. |
 
 Vous maîtrisez le pivot enrichi : modèle, manipulation, intégrité et UX.
 

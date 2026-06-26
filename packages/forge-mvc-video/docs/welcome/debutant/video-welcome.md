@@ -4,7 +4,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-video` et sa
 configuration.
 
 **Ce que vous allez apprendre :** vérifier que le module vidéo répond, et
-**inspecter sa configuration** avec `load_video_config` — en **masquant le
+**inspecter sa configuration** avec `load_video_config`, en **masquant le
 token**. Aucun ffmpeg, aucune base : on découvre simplement comment Forge Vidéo
 est branché.
 
@@ -79,7 +79,7 @@ class VideoWelcomeController(BaseController):
 ### Comprendre ce code
 
 - `load_video_config()` lit la configuration vidéo (binaires ffmpeg/ffprobe,
-  racine de stockage, limites d'upload/durée) depuis l'environnement Forge —
+  racine de stockage, limites d'upload/durée) depuis l'environnement Forge ;
   comme le reste de la config Forge, elle est **explicite**.
 - On ne renvoie **jamais** le token : `"***" if cfg.api_token else None`. Une
   config exposée masque toujours ses secrets.

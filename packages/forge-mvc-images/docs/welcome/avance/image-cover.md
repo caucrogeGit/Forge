@@ -1,7 +1,7 @@
 # Image de couverture
 
-Objectif : désigner **une** image mise en avant pour une entité — sa couverture
-— et l'afficher.
+Objectif : désigner **une** image mise en avant pour une entité (sa couverture)
+et l'afficher.
 
 **Ce que vous allez apprendre :** Forge distingue les médias par leur **rôle**.
 Une couverture est un média de rôle `cover` (≠ `gallery`). `get_cover_media` la

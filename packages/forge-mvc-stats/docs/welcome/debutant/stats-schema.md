@@ -1,6 +1,6 @@
 # Le schéma SQL
 
-Objectif : lire le **schéma SQL** exact de la table des événements — Forge garde le SQL
+Objectif : lire le **schéma SQL** exact de la table des événements ; Forge garde le SQL
 visible.
 
 **Ce que vous allez apprendre :** `get_stats_events_schema_sql` retourne le

@@ -45,7 +45,7 @@ sont **affichées** (Forge ne réécrit jamais vos routes en silence).
 ### Comprendre ce code
 
 - Le générateur produit un sous-CRUD : lister les tags d'un article, en attacher,
-  modifier l'attribut, détacher — exactement les opérations de pivot.
+  modifier l'attribut, détacher : exactement les opérations de pivot.
 - Le code généré s'appuie sur `PivotAdvancedService`, que vous manipulerez
   directement au niveau intermédiaire.
 - `--dry-run` est la bonne habitude : on lit avant d'écrire.

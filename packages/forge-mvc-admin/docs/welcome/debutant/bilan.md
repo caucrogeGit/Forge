@@ -1,4 +1,4 @@
-# Bilan — niveau débutant
+# Bilan : niveau débutant
 
 Vous savez maintenant :
 

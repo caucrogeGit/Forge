@@ -3,7 +3,7 @@
 > **Statut** : API JSON de **lecture** des événements IoT, avec une
 > protection **optionnelle** par Bearer token (voir
 > [Protection par Bearer token](#protection-par-bearer-token)). L'API
-> d'ingestion (POST) et le dashboard restent **hors périmètre** — voir
+> d'ingestion (POST) et le dashboard restent **hors périmètre**, voir
 > [Architecture Forge IoT](architecture.md#tickets-suivants).
 
 ## Routes
@@ -16,12 +16,12 @@
 
 Toutes les routes sont :
 
-- `public=True` — ouvertes par défaut (parcours local/pédagogique) ;
+- `public=True` : ouvertes par défaut (parcours local/pédagogique) ;
   une protection **optionnelle** par Bearer token s'active via
   `FORGE_IOT_API_TOKEN` (voir
   [Protection par Bearer token](#protection-par-bearer-token)) ;
-- `csrf=False` — méthodes GET, sans état modifié ;
-- `api=True` — marquées comme routes API par Forge.
+- `csrf=False` : méthodes GET, sans état modifié ;
+- `api=True` : marquées comme routes API par Forge.
 
 ## Branchement explicite
 
@@ -136,7 +136,7 @@ convertit en chaîne ISO 8601 UTC avec suffixe `Z` :
 | `datetime(2026, 5, 28, 12, 0, 5, tzinfo=+02:00)` (Paris) | `"2026-05-28T10:00:05Z"` (converti en UTC) |
 | `datetime(2026, 5, 28, 10, 0, 5)` (naïf) | `"2026-05-28T10:00:05Z"` (assumé UTC) |
 
-Tous les autres fuseaux sont **convertis en UTC** avant sérialisation —
+Tous les autres fuseaux sont **convertis en UTC** avant sérialisation :
 la sortie n'expose jamais un offset autre que `Z`. C'est cohérent avec
 le contrat MQTT, qui exige déjà `Z` côté payload.
 
@@ -153,7 +153,7 @@ jamais dans les réponses HTTP :
 
 ## Format des erreurs
 
-### Limit invalide — `400 Bad Request`
+### Limit invalide : `400 Bad Request`
 
 ```json
 {
@@ -168,10 +168,10 @@ Cas couverts :
 - nul ou négatif (`?limit=0`, `?limit=-1`) ;
 - au-dessus de `MAX_LIMIT` (`?limit=1001`).
 
-Le repository n'est pas appelé — la validation est purement côté
+Le repository n'est pas appelé : la validation est purement côté
 contrôleur.
 
-### Erreur DB — `500 Internal Server Error`
+### Erreur DB : `500 Internal Server Error`
 
 ```json
 {"error": "internal_server_error"}
@@ -182,7 +182,7 @@ qui pourrait fuiter de l'information. Le détail est logué côté serveur
 sur le logger `forge_mvc_iot.http` (niveau `ERROR` via
 `logger.exception`).
 
-### Non autorisé — `401 Unauthorized`
+### Non autorisé : `401 Unauthorized`
 
 ```json
 {"error": "unauthorized"}
@@ -195,7 +195,7 @@ renvoie jamais le token.
 
 ## Protection par Bearer token
 
-Par défaut, l'API est **ouverte** — pratique en local et pour les
+Par défaut, l'API est **ouverte**, pratique en local et pour les
 parcours pédagogiques. Pour un projet **exposé sur le réseau**, définis
 `FORGE_IOT_API_TOKEN` : les trois routes exigent alors un en-tête
 `Authorization: Bearer <token>`.
@@ -256,7 +256,7 @@ router.add(
 
 - l'authentification se limite au **Bearer token statique** ci-dessus :
   pas de JWT, OAuth, session, RBAC ni rotation ;
-- pas de POST/ingestion HTTP — l'ingestion se fait par MQTT
+- pas de POST/ingestion HTTP : l'ingestion se fait par MQTT
   (subscriber) ;
 - pas de pagination par offset (`?offset=`) ;
 - pas de filtres temporels (`?since=`, `?until=`) ;

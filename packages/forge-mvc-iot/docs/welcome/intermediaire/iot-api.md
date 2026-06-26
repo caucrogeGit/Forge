@@ -5,7 +5,7 @@ module, sans écrire de code métier.
 
 **Ce que vous allez apprendre :** `register_iot_routes(router)`. Une seule ligne
 branche les trois routes en **lecture seule** de Forge IoT. Le code vit dans le
-paquet `forge-mvc-iot` ; votre application ne fait que le **brancher** — c'est le
+paquet `forge-mvc-iot` ; votre application ne fait que le **brancher** : c'est le
 principe « lock + delegate » de Forge.
 
 Palier 2 du **niveau intermédiaire** de la progression IoT, après
@@ -15,9 +15,9 @@ Palier 2 du **niveau intermédiaire** de la progression IoT, après
 
 - le branchement de l'API officielle avec `register_iot_routes(router)` ;
 - trois routes JSON en lecture seule :
-    - `GET /api/iot/events` — N derniers événements,
-    - `GET /api/iot/events/{site}/{device_id}` — événements d'un capteur,
-    - `GET /api/iot/devices/{site}/{device_id}/count` — compteur ;
+    - `GET /api/iot/events` : N derniers événements,
+    - `GET /api/iot/events/{site}/{device_id}` : événements d'un capteur,
+    - `GET /api/iot/devices/{site}/{device_id}/count` : compteur ;
 - une **authentification Bearer optionnelle** (`FORGE_IOT_API_TOKEN`).
 
 La table `iot_events` est garantie par la migration livrée.
@@ -26,7 +26,7 @@ La table `iot_events` est garantie par la migration livrée.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_iot.register_iot_routes` | Brancher l'API HTTP JSON officielle sur le routeur. | [Forge IoT — API HTTP](../../http-api.md) |
+| `forge_mvc_iot.register_iot_routes` | Brancher l'API HTTP JSON officielle sur le routeur. | [Forge IoT : API HTTP](../../http-api.md) |
 
 ## Tester
 
@@ -67,7 +67,7 @@ chemins sous `/api/iot/…`), pas dans le groupe `public`.
 - `register_iot_routes(router)` enregistre les trois routes officielles d'un
   coup. Vous n'écrivez **aucun** contrôleur : le code métier appartient au
   paquet, l'application le **branche** explicitement (pas de découverte
-  automatique — principe « refuser la magie cachée »).
+  automatique, principe « refuser la magie cachée »).
 - L'authentification est **optionnelle** : pas de token configuré → API ouverte
   (pratique en local) ; token configuré → `Authorization: Bearer <token>` exigé,
   sinon `401`.

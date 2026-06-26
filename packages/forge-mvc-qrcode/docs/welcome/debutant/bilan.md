@@ -1,4 +1,4 @@
-# Bilan, niveau débutant (QR Code)
+# Bilan : niveau débutant (QR Code)
 
 Récapitulatif du **niveau débutant** de la progression *Premier QR Code*.
 Ce niveau pose les bases : construire un QR Code, le rendre en PNG, puis en SVG.

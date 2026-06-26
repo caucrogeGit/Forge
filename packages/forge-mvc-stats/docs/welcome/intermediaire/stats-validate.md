@@ -4,7 +4,7 @@ Objectif : refuser un événement mal formé **avant** de l'écrire en base.
 
 **Ce que vous allez apprendre :** `make_event` valide à la construction et
 `validate_event` re-vérifie un événement existant. Un nom invalide lève
-`StatsEventError` — on refuse avant toute écriture.
+`StatsEventError` : on refuse avant toute écriture.
 
 Troisième palier du **niveau intermédiaire** de la progression stats.
 

@@ -4,8 +4,8 @@ Objectif : **relire** un fichier stocké via `serve_media_file`, sans jamais
 laisser sortir de la racine d'upload.
 
 **Ce que vous allez apprendre :** `serve_media_file` prend un **chemin relatif**,
-vérifie qu'il reste dans la racine d'upload (anti-traversal), et renvoie le fichier
-— ou `404` s'il est absent ou le chemin invalide.
+vérifie qu'il reste dans la racine d'upload (anti-traversal), et renvoie le fichier,
+ou `404` s'il est absent ou le chemin invalide.
 
 Troisième palier du **niveau débutant** de la progression files.
 

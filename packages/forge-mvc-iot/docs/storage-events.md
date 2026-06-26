@@ -1,4 +1,4 @@
-# Stockage des événements IoT — contrat SQL
+# Stockage des événements IoT : contrat SQL
 
 > **Statut** : stockage **livré**. Le module définit la table `iot_events`,
 > l'ordre canonique des colonnes, les fonctions pures qui sérialisent une
@@ -87,7 +87,7 @@ Notes :
   reçue dans le payload. Le consommateur convertit en `DATETIME` quand
   il en a besoin (préserver la valeur d'origine évite les conversions
   silencieuses de fuseau et la perte de microsecondes).
-- `metadata_json` en `TEXT NULL` — JSON sérialisé via
+- `metadata_json` en `TEXT NULL` : JSON sérialisé via
   `json.dumps(..., sort_keys=True, ensure_ascii=False)` ou `NULL`.
 - `received_at` en `DATETIME(6)` côté serveur (microsecondes).
 - Deux index minimaux : couple `(site, device_id)` pour filtrer par
@@ -131,7 +131,7 @@ row = serialize_measurement_for_storage(
 Si `received_at` n'est pas fourni, `datetime.now(UTC)` est utilisé.
 
 Si `measurement.metadata` est `None`, `metadata_json` est `None` (pas
-la chaîne `"null"`) — c'est cette valeur qui sera passée au connecteur
+la chaîne `"null"`) : c'est cette valeur qui sera passée au connecteur
 SQL pour produire un vrai `NULL`.
 
 ### `build_insert_iot_event_sql`
@@ -169,7 +169,7 @@ execute(sql, params)
 - **`received_at` toujours UTC.** Pas de fuseau implicite. `datetime.now(UTC)`
   par défaut, ou injection explicite via le paramètre.
 - **`metadata` → JSON.** Sérialisation déterministe
-  (`sort_keys=True`) — utile pour les tests, le diff, et la
+  (`sort_keys=True`), utile pour les tests, le diff, et la
   réindexation future.
 - **`id` exclu des colonnes.** Généré par la base, jamais inséré
   explicitement.
@@ -202,10 +202,10 @@ avec la migration appliquée.
 ## Repository d'insertion
 
 Le repository est la première couche qui **exécute réellement le SQL**.
-Il ne crée pas la table — il suppose que la migration `iot_events` a
+Il ne crée pas la table ; il suppose que la migration `iot_events` a
 déjà été appliquée.
 
-Module : `forge_mvc_iot.storage.repository` — exporté par
+Module : `forge_mvc_iot.storage.repository`, exporté par
 `forge_mvc_iot.storage`.
 
 ```python
@@ -218,7 +218,7 @@ result = repo.insert(measurement)            # exécute INSERT_IOT_EVENT_SQL via
 ### Adapter injectable
 
 Le repository accepte n'importe quel objet exposant
-`execute(sql, params)`. Par défaut, il utilise `core.database.db` —
+`execute(sql, params)`. Par défaut, il utilise `core.database.db`,
 qui gère le pool de connexions, le commit et le rollback
 automatiquement (voir `core/database/db.py`).
 
@@ -280,9 +280,9 @@ subscriber.handle_message(topic, payload)
 
 ### Comportement
 
-- Les erreurs SQL sont **propagées telles quelles** — le repository
+- Les erreurs SQL sont **propagées telles quelles** ; le repository
   n'intercepte rien silencieusement.
-- Aucun `commit` ou `rollback` manuel — c'est l'adapter (par défaut
+- Aucun `commit` ou `rollback` manuel : c'est l'adapter (par défaut
   Forge) qui s'en charge.
 - Le `id` n'est pas retourné par défaut (puisque `db.execute` renvoie
   `rowcount`). Utiliser le pattern d'adapter ci-dessus pour récupérer
@@ -324,7 +324,7 @@ Notes :
 - `received_at` reste un `datetime` tel que retourné par le connecteur
   MariaDB (UTC). La conversion en chaîne JSON-friendly sera le travail
   de la future API HTTP.
-- L'ordre est `received_at DESC` — les événements les plus récents en
+- L'ordre est `received_at DESC` : les événements les plus récents en
   premier.
 
 ### Limites et validation
@@ -333,7 +333,7 @@ Notes :
   `MAX_LIMIT = 1000`). Hors plage → `ValueError`. Type incorrect →
   `TypeError`. `True`/`False` sont refusés bien qu'ils héritent de
   `int`.
-- Pas de pagination par offset à ce ticket — un appel qui voudrait
+- Pas de pagination par offset à ce ticket : un appel qui voudrait
   paginer au-delà de `MAX_LIMIT` est probablement le signe qu'il faut
   un autre endpoint (agrégat, filtre temporel, etc.).
 - Aucun filtre temporel exposé pour l'instant (`since=`, `until=`).
@@ -356,12 +356,12 @@ Toutes utilisent les placeholders qmark `?` (cohérent avec le reste
 de Forge) et la table `iot_events`.
 
 ## Hors périmètre de ce ticket
-- **Pas d'API HTTP** — lecture JSON par `IOT-HTTP-API-001`.
+- **Pas d'API HTTP** : lecture JSON par `IOT-HTTP-API-001`.
 - **Pas de CLI**, pas de dashboard, pas d'intégration Forge Design.
 - **Pas de rétention long terme**, pas d'agrégation, pas de
   downsampling, pas d'alertes.
 
-Ces points feront chacun l'objet d'un ticket dédié — voir
+Ces points feront chacun l'objet d'un ticket dédié, voir
 [Architecture Forge IoT](architecture.md#tickets-suivants).
 
 ## Découpage rappelé

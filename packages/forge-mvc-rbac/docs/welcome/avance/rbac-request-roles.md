@@ -1,6 +1,6 @@
 # Rôles de la requête
 
-Objectif : inspecter les **rôles et permissions de la requête courante** — ce que
+Objectif : inspecter les **rôles et permissions de la requête courante**, ce que
 RBAC consomme au runtime.
 
 **Ce que vous allez apprendre :** `get_request_roles(request)` retourne les rôles
@@ -62,7 +62,7 @@ class RbacRequestRolesController(BaseController):
 ### Comprendre ce code
 
 - Au runtime, RBAC part des **rôles de la requête** (issus de l'utilisateur connecté),
-  pas de paramètres d'URL — c'est la version réelle des démos précédentes.
+  pas de paramètres d'URL : c'est la version réelle des démos précédentes.
 - `get_request_permissions` combine ces rôles avec le contrat pour donner les
   permissions effectives de la requête.
 - Listes vides sans utilisateur : **aucun droit par défaut**.

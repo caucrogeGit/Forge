@@ -1,7 +1,7 @@
 # Contrat RBAC Forge
 
 > **Usage applicatif** : pour le workflow complet (validation, audit, helpers Python,
-> guards opt-in), voir [RBAC opt-in — Guide d'usage applicatif](usage.md).
+> guards opt-in), voir [RBAC opt-in : guide d'usage applicatif](usage.md).
 
 ## Rôle
 
@@ -63,7 +63,7 @@ mvc/security/rbac.json
 | `entities` | objet | Non | Permissions par entité. Clé = nom d'entité (PascalCase). |
 | `entities.*.permissions` | objet | Oui si `entities` présent | Action → code de permission. Ex : `"list": "article.list"`. |
 | `roles` | objet | Non | Rôles et permissions associées. Clé = nom du rôle. |
-| `roles.*` | tableau de chaînes | — | Liste de codes de permission attribués au rôle. |
+| `roles.*` | tableau de chaînes | - | Liste de codes de permission attribués au rôle. |
 
 ### Propriétés inconnues
 
@@ -107,15 +107,15 @@ python forge.py rbac:audit --json
 
 L'audit vérifie :
 
-- `missing_roles` — aucun rôle déclaré
-- `missing_entities` — aucune entité déclarée
-- `empty_role` — rôle sans permissions
-- `entity_without_permissions` — entité sans permissions déclarées
-- `missing_crud_action` — entité sans les cinq actions CRUD (list, show, create, update, delete)
-- `role_permission_not_declared` — permission d'un rôle absente de toute entité
-- `entity_permission_unused` — permission déclarée dans une entité mais assignée à aucun rôle
+- `missing_roles` : aucun rôle déclaré
+- `missing_entities` : aucune entité déclarée
+- `empty_role` : rôle sans permissions
+- `entity_without_permissions` : entité sans permissions déclarées
+- `missing_crud_action` : entité sans les cinq actions CRUD (list, show, create, update, delete)
+- `role_permission_not_declared` : permission d'un rôle absente de toute entité
+- `entity_permission_unused` : permission déclarée dans une entité mais assignée à aucun rôle
 
-Ces avertissements n'entraînent pas un code de retour 1 — ils sont informatifs.
+Ces avertissements n'entraînent pas un code de retour 1 ; ils sont informatifs.
 Seule une erreur de schéma (contrat invalide) provoque un échec (code 1).
 
 | Situation | Code retour |
@@ -147,7 +147,7 @@ else:
     print("Pas de contrat RBAC — RBAC est opt-in.")
 ```
 
-Ce chargement est **lecture seule** — il ne crée ni ne modifie aucun fichier.
+Ce chargement est **lecture seule** : il ne crée ni ne modifie aucun fichier.
 Il ne branche pas automatiquement les routes.
 Il ne modifie pas `make:crud`.
 Il prépare les futurs services RBAC applicatifs (RBAC-MODULE-004).
@@ -238,10 +238,10 @@ Cette protection :
 
 Ce contrat est non branché au runtime Forge Core (décision RBAC-CONTRACT-004).
 
-- `make:crud` ne lit pas `mvc/security/rbac.json` — il ne génère pas de guards RBAC depuis ce contrat.
+- `make:crud` ne lit pas `mvc/security/rbac.json` : il ne génère pas de guards RBAC depuis ce contrat.
 - `build:model` ignore ce fichier.
 - Aucun guard RBAC n'est généré automatiquement par Forge Core depuis `mvc/security/rbac.json`.
-- La protection des routes est opt-in — à appliquer explicitement via `forge-mvc-rbac`.
+- La protection des routes est opt-in : à appliquer explicitement via `forge-mvc-rbac`.
 
 Voir [les limites détaillées](usage.md#limites-actuelles) dans le guide d'usage.
 
@@ -267,10 +267,10 @@ La configuration RBAC vit exclusivement dans `mvc/security/rbac.json`.
 
 Le bloc contrat RBAC séparé est clôturé après livraison de :
 
-- RBAC-CONTRACT-001 — décision : RBAC hors `entity.schema.json` ;
-- RBAC-CONTRACT-002 — création du schéma RBAC séparé (`rbac.schema.json`) ;
-- RBAC-CONTRACT-003 — validation via `forge rbac:validate` ;
-- RBAC-CONTRACT-004 — décision de non-branchement de `make:crud` au contrat séparé.
+- RBAC-CONTRACT-001 : décision, RBAC hors `entity.schema.json` ;
+- RBAC-CONTRACT-002 : création du schéma RBAC séparé (`rbac.schema.json`) ;
+- RBAC-CONTRACT-003 : validation via `forge rbac:validate` ;
+- RBAC-CONTRACT-004 : décision de non-branchement de `make:crud` au contrat séparé.
 
 État final :
 

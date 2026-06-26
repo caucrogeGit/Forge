@@ -3,13 +3,13 @@
 Récapitulatif des paliers de la progression *Bonjour Forge Pivot* et des API du
 module opt-in `forge-mvc-pivot` introduites à chaque étape.
 
-!!! note "Module opt-in — SQL visible"
+!!! note "Module opt-in : SQL visible"
     `forge-mvc-pivot` est **publié sur PyPI** : `pip install --pre forge-mvc-pivot`. Il
-    expose le **SQL réel** (insert, update, select, delete) — aucun ORM (charte
-    principe 5) — et s'appuie sur des **exécuteurs injectables** (`execute`,
+    expose le **SQL réel** (insert, update, select, delete), aucun ORM (charte
+    principe 5), et s'appuie sur des **exécuteurs injectables** (`execute`,
     `fetch_all`, `fetch_one`), donc testable sans base réelle.
 
-## Niveau débutant — comprendre le pivot enrichi
+## Niveau débutant : comprendre le pivot enrichi
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -17,7 +17,7 @@ module opt-in `forge-mvc-pivot` introduites à chaque étape.
 | 2 | [Générer le sous-CRUD](debutant/pivot-make.md) | Produire le sous-CRUD pivot | `make:pivot-crud`, `--dry-run` |
 | 3 | [Le schéma SQL](debutant/pivot-schema.md) | Clés composites + colonnes d'attributs | `CREATE TABLE article_tag` |
 
-## Niveau intermédiaire — manipuler
+## Niveau intermédiaire : manipuler
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -25,7 +25,7 @@ module opt-in `forge-mvc-pivot` introduites à chaque étape.
 | 2 | [Modifier et détacher](intermediaire/pivot-update.md) | Mettre à jour / supprimer | `update`, `detach` |
 | 3 | [Lister les associations](intermediaire/pivot-list.md) | Lire les `PivotRow` d'une source | `list_for_source`, `PivotRow` |
 
-## Niveau avancé — contraintes et intégrité
+## Niveau avancé : contraintes et intégrité
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|

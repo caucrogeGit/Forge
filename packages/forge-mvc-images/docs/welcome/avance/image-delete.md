@@ -1,6 +1,6 @@
 # Supprimer proprement
 
-Objectif : supprimer une image **sans laisser de trace** — ni ligne en base, ni
+Objectif : supprimer une image **sans laisser de trace** : ni ligne en base, ni
 fichier orphelin, ni variante oubliée.
 
 **Ce que vous allez apprendre :** supprimer une image, c'est supprimer trois
@@ -177,7 +177,7 @@ with router.group("", public=True) as public:
 - Une suppression propre retire **la ligne et les fichiers** (original +
   variantes).
 - `delete_media(delete_files=True)` couvre les trois en une fois.
-- Laisser des fichiers orphelins est une dette silencieuse — Forge l'évite.
+- Laisser des fichiers orphelins est une dette silencieuse ; Forge l'évite.
 
 ## Après ce starter
 

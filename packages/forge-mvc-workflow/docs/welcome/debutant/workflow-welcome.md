@@ -84,7 +84,7 @@ class WorkflowWelcomeController(BaseController):
 ### Comprendre ce code
 
 - Un workflow a **un** statut initial (`is_initial`) et peut avoir des statuts finaux
-  (`is_final`) — `validate_statuses` le vérifie.
+  (`is_final`) : `validate_statuses` le vérifie.
 - Le **nom** est l'identifiant (`snake_case`) ; le **libellé** et la **couleur** sont
   pour l'affichage.
 - Le module est **sans état** : il décrit la machine, l'application stocke le statut

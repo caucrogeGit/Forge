@@ -1,6 +1,6 @@
 # Valider un upload
 
-Objectif : comprendre **pourquoi** un fichier est refusé — la taxonomie des
+Objectif : comprendre **pourquoi** un fichier est refusé : la taxonomie des
 règles de validation.
 
 **Ce que vous allez apprendre :** `save_upload` valide extension, type MIME et

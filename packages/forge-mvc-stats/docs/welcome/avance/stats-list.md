@@ -68,7 +68,7 @@ class StatsListController(BaseController):
 
 - L'injection de `fetch_all` rend la lecture **testable** : vraie fonction en
   production, fausse en démo/test.
-- Les **métadonnées** reviennent en **dict** (désérialisées du JSON stocké) — prêtes à
+- Les **métadonnées** reviennent en **dict** (désérialisées du JSON stocké), prêtes à
   l'usage, sans retraitement côté appelant.
 - En production : `list_stats_events(core.database.db.fetch_all, ...)`.
 

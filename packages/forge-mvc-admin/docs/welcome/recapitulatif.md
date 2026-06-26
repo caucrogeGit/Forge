@@ -1,4 +1,4 @@
-# Récapitulatif — Forge Admin
+# Récapitulatif : Forge Admin
 
 Ce parcours a couvert l'administration complète d'une entité.
 

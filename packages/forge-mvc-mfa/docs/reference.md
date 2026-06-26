@@ -1,10 +1,10 @@
-# Auth — Challenge MFA à la connexion
+# Auth : Challenge MFA à la connexion
 
-!!! info "Module Alpha — opt-in officiel publié sur PyPI depuis 1.0.0-beta.9"
+!!! info "Module Alpha : opt-in officiel publié sur PyPI depuis 1.0.0-beta.9"
     `forge-mvc-mfa` est marqué `Development Status :: 3 - Alpha` depuis `MFA-PYPI-READY-001`.
 
     Le secret TOTP est **chiffré au repos** via Fernet (`cryptography`) avec la clé
-    `FORGE_MFA_SECRET_KEY`. Le chiffrement est obligatoire — démarrer sans cette
+    `FORGE_MFA_SECRET_KEY`. Le chiffrement est obligatoire : démarrer sans cette
     variable d'environnement lève `MfaSecretKeyMissing`.
 
     Installation :
@@ -14,7 +14,7 @@
     ```
 
     `forge-mvc-mfa` n'est **pas inclus dans `forge-mvc[all]`** (les extras core
-    couvrent uniquement RBAC, workflow et stats — installer le paquet
+    couvrent uniquement RBAC, workflow et stats ; installer le paquet
     directement). MFA reste opt-in : le core Forge ne dépend pas de
     `forge-mvc-mfa`.
 
@@ -107,8 +107,8 @@ Le module est opt-in, non inclus dans `forge-mvc[all]`, et doit être configuré
 En développement et en environnement de test isolé :
 
 - le secret TOTP est chiffré dans `auth_mfa_factors.totp_secret` (Fernet, préfixe `enc:`) ;
-- la clé de chiffrement est lue depuis `FORGE_MFA_SECRET_KEY` — requis même en dev ;
-- les codes de récupération sont stockés sous forme hashée (`hash_recovery_code()` — SHA-256 + `secrets.compare_digest`).
+- la clé de chiffrement est lue depuis `FORGE_MFA_SECRET_KEY`, requise même en dev ;
+- les codes de récupération sont stockés sous forme hashée (`hash_recovery_code()`, SHA-256 + `secrets.compare_digest`).
 
 **Conditions requises même en développement :**
 
@@ -157,7 +157,7 @@ Refusé explicitement :
 
 Exceptions levées : `MfaSecretKeyMissing`, `MfaSecretKeyPlaceholder`,
 `MfaSecretInvalidKey`. **Aucun message ne contient la valeur de la clé
-tentée** — pour éviter de fuir un secret dans un log applicatif. Le
+tentée** : pour éviter de fuir un secret dans un log applicatif. Le
 message inclut toujours la commande de génération d'une clé valide :
 
 ```bash
@@ -195,7 +195,7 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (s
 - générés via `secrets.choice()` sur un alphabet sans ambiguïté ;
 - hashés avant stockage via `hash_recovery_code()` (SHA-256) ;
 - vérifiés via `secrets.compare_digest()` (résistant aux timing attacks) ;
-- stockés en base uniquement sous forme de hash — le code brut n'est jamais persisté.
+- stockés en base uniquement sous forme de hash : le code brut n'est jamais persisté.
 
 **Cette conception est conforme pour la production**, à condition que la base elle-même soit protégée. Un hash de code de récupération exposé ne permet pas de retrouver le code brut.
 
@@ -203,14 +203,14 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (s
 
 `forge-mvc-mfa` a été publié sur PyPI au statut **Alpha** en `1.0.0-beta.9`. Le passage **Alpha → Beta** reste conditionné aux exigences suivantes :
 
-1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) — Fernet + `FORGE_MFA_SECRET_KEY`.
-2. **Politique de rotation documentée** — rotation ou invalidation maîtrisée des secrets compromis.
-3. **Documentation de sauvegarde/restauration** — procédure en cas de perte de la clé de chiffrement.
-4. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) — `tests/test_mfa_secret_crypto.py`.
-5. **Revue sécurité explicite** — validation que le stockage chiffré est correct.
+1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : Fernet + `FORGE_MFA_SECRET_KEY`.
+2. **Politique de rotation documentée** : rotation ou invalidation maîtrisée des secrets compromis.
+3. **Documentation de sauvegarde/restauration** : procédure en cas de perte de la clé de chiffrement.
+4. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : `tests/test_mfa_secret_crypto.py`.
+5. **Revue sécurité explicite** : validation que le stockage chiffré est correct.
 6. ~~**Décision explicite de changement de statut Pre-Alpha → Alpha**~~ ✓ livré (`MFA-PYPI-READY-001`).
 7. ~~**Publication PyPI au statut Alpha**~~ ✓ livré en `1.0.0-beta.9`.
-8. **Décision de passage Alpha → Beta** — ticket futur indépendant de la publication PyPI.
+8. **Décision de passage Alpha → Beta** : ticket futur indépendant de la publication PyPI.
 
 ### Tickets liés
 

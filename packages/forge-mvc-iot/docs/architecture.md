@@ -35,8 +35,8 @@ Forge IoT doit rester :
 
 Forge IoT est un **module opt-in** au même titre que `forge-mvc-rbac`,
 `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`,
-`forge-mvc-images`. Voir ADR-004 — Périmètre core
-et ADR-005 — Packaging.
+`forge-mvc-images`. Voir ADR-004 : Périmètre core
+et ADR-005 : Packaging.
 
 ## Architecture générale
 
@@ -90,13 +90,13 @@ Le futur paquet `forge-mvc-iot` (à scaffolder dans le ticket
 - déclare ses propres dépendances runtime (au minimum `paho-mqtt`) ;
 - expose un **subscriber MQTT** qui se branche sur un broker configuré ;
 - définit le **contrat de message** (topics, payload JSON, champs
-  attendus) — voir [IOT-MQTT-CONTRACT-001](#tickets-suivants) ;
+  attendus), voir [IOT-MQTT-CONTRACT-001](#tickets-suivants) ;
 - persiste les événements reçus dans une table dédiée gérée par le
   module (pas dans une table inventée côté Forge Core) ;
 - expose des **routes HTTP JSON** Forge pour lire devices et événements ;
 - fournit éventuellement une commande CLI `forge iot:*` (diagnostics,
   test de connexion broker, etc.) ;
-- s'installe via `pip install forge-mvc-iot` — Forge Core reste
+- s'installe via `pip install forge-mvc-iot` : Forge Core reste
   utilisable sans cette dépendance.
 
 `forge-mvc-iot` dépend de Forge Core, jamais l'inverse.
@@ -109,7 +109,7 @@ Le broker MQTT est le **transport** entre les capteurs et le serveur :
   Raspberry Pi, simulateurs) ;
 - il les distribue aux abonnés (`forge-mvc-iot`, mais aussi tout autre
   client compatible) ;
-- il **ne devient pas la source métier officielle** — c'est-à-dire que
+- il **ne devient pas la source métier officielle** : c'est-à-dire que
   la vérité affichable côté interface n'est pas « ce qu'il y a en ce
   moment sur le broker », mais « ce que Forge a accepté, persisté et
   exposé via son API ».
@@ -148,7 +148,7 @@ Ils ne sont **pas la cible prioritaire** parce que :
 - la doctrine Forge privilégie un poste de travail autonome.
 
 Le module IoT doit fonctionner identiquement avec Mosquitto local ou un
-broker cloud — c'est un contrat de configuration, pas un branchement
+broker cloud : c'est un contrat de configuration, pas un branchement
 spécial.
 
 ## Rôle de Forge Design IoT
@@ -207,7 +207,7 @@ Règles non négociables, à verrouiller par les tickets suivants :
    d'événements et ses requêtes restent lisibles, pas générées
    silencieusement par un ORM.
 8. **Une API publique est un contrat de complétude.**
-   Charte v2 §10 — le contrat MQTT et les routes HTTP IoT seront
+   Charte v2 §10 : le contrat MQTT et les routes HTTP IoT seront
    spécifiés explicitement avant écriture du code.
 
 ## Limites assumées
@@ -215,15 +215,15 @@ Règles non négociables, à verrouiller par les tickets suivants :
 Ce ticket fixe le cadre. Il **n'aborde pas** :
 
 - les protocoles autres que MQTT (CoAP, HTTP direct depuis capteur,
-  LoRaWAN, Modbus, OPC-UA) — peuvent être traités par des modules
+  LoRaWAN, Modbus, OPC-UA), peuvent être traités par des modules
   séparés ultérieurs, hors `forge-mvc-iot` ;
-- la sécurité réseau (TLS, certificats client, ACL Mosquitto) — sera
+- la sécurité réseau (TLS, certificats client, ACL Mosquitto), sera
   spécifiée dans [IOT-CONFIG-001](#tickets-suivants) ;
-- l'agrégation, le downsampling et la rétention long terme — à arbitrer
+- l'agrégation, le downsampling et la rétention long terme, à arbitrer
   après [IOT-STORAGE-EVENTS-001](#tickets-suivants) ;
-- les commandes descendantes (Forge → capteur via MQTT publish) — la
+- les commandes descendantes (Forge → capteur via MQTT publish) ; la
   première itération est en lecture seule (capteurs → Forge) ;
-- les graphiques temps réel côté Forge Design IoT — dépendent de
+- les graphiques temps réel côté Forge Design IoT, dépendent de
   [FORGE-DESIGN-IOT-READ-API-001](#tickets-suivants).
 
 ## Tickets suivants
@@ -238,9 +238,9 @@ La suite logique de cette trajectoire IoT, dans l'ordre recommandé :
 | `IOT-CONFIG-001` | Variables d'environnement (`FORGE_IOT_MQTT_HOST`, TLS, login/mot de passe), schéma `env/example` |
 | `IOT-STORAGE-EVENTS-001` | Table SQL des événements IoT, migration versionnée, modèle applicatif |
 | `IOT-HTTP-API-001` | Routes HTTP JSON Forge : liste devices, lecture événements, filtres |
-| `IOT-DOCTOR-001` | `forge iot:doctor` — vérification config broker, ping, sub test |
+| `IOT-DOCTOR-001` | `forge iot:doctor` : vérification config broker, ping, sub test |
 | `IOT-STARTER-MQTT-HELLO-001` | Starter pédagogique « Hello MQTT » : ESP32 simulé + lecture côté Forge |
-| `FORGE-DESIGN-IOT-READ-API-001` | Forge Design IoT consomme uniquement l'API Forge — pas le broker |
+| `FORGE-DESIGN-IOT-READ-API-001` | Forge Design IoT consomme uniquement l'API Forge ; pas le broker |
 
 Aucun de ces tickets n'est ouvert par le présent document. Ils servent
 de jalons et de garde-fous : tant qu'ils n'ont pas été livrés et

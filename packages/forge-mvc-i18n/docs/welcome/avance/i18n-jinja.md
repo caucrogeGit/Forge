@@ -9,7 +9,7 @@ reste : pas d'injection HTML.
 
 Premier palier du **niveau avancé**.
 
-!!! note "Module opt-in — auto-échappement"
+!!! note "Module opt-in : auto-échappement"
     L'auto-échappement HTML de Jinja s'applique aux traductions : une valeur
     contenant `<` est rendue en `&lt;`, jamais interprétée.
 

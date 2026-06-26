@@ -1,6 +1,6 @@
 # Chemin anti-traversal
 
-Objectif : juger si un **chemin** reste à l'intérieur de la racine d'upload — la
+Objectif : juger si un **chemin** reste à l'intérieur de la racine d'upload : la
 défense contre la traversée de répertoire.
 
 **Ce que vous allez apprendre :** `is_safe_media_path(path)` répond oui/non,

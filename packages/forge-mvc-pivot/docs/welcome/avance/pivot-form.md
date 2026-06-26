@@ -3,7 +3,7 @@
 Objectif : afficher une erreur de pivot dans un formulaire, proprement.
 
 **Ce que vous allez apprendre :** `pivot_error_to_form_error` convertit une
-exception du service en `PivotFormError` — un objet stable (`code`, `message`,
+exception du service en `PivotFormError`, un objet stable (`code`, `message`,
 `field`) prêt à être affiché à côté du bon champ.
 
 Dernier palier du **niveau avancé**.

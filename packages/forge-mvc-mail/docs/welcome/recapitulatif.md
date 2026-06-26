@@ -1,4 +1,4 @@
-# Aide-mémoire — welcome-mail
+# Aide-mémoire : welcome-mail
 
 Le parcours welcome-mail couvre l'opt-in `forge-mvc-mail` :
 

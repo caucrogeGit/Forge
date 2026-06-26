@@ -3,7 +3,7 @@
 Objectif : **enregistrer** un événement, via un exécuteur injectable.
 
 **Ce que vous allez apprendre :** `track_event` prend un **exécuteur** (`execute`)
-plutôt que d'accéder directement à la base — ce qui le rend testable. La démo injecte
+plutôt que d'accéder directement à la base, ce qui le rend testable. La démo injecte
 un exécuteur factice ; en production on passe `core.database.db.execute`.
 
 Deuxième palier du **niveau intermédiaire** de la progression stats.

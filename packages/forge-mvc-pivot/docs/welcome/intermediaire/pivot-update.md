@@ -6,9 +6,9 @@ Objectif : changer les attributs d'une association, puis la supprimer.
 existante (jamais les clés). `detach` supprime l'association. Les deux ciblent la
 paire `(article_id, tag_id)`.
 
-!!! note "Module opt-in — SQL visible"
+!!! note "Module opt-in : SQL visible"
     `update` produit un `UPDATE … WHERE article_id = ? AND tag_id = ?`,
-    `detach` un `DELETE …` — tout paramétré.
+    `detach` un `DELETE …` ; tout paramétré.
 
 ## Classes Forge utilisées
 

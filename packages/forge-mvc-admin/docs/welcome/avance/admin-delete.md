@@ -1,4 +1,4 @@
-# Avancé 1 — Supprimer une ligne
+# Avancé 1 : Supprimer une ligne
 
 Objectif : supprimer un article, sans risque de clic accidentel.
 

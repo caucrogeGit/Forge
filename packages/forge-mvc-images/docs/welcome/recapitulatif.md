@@ -9,7 +9,7 @@ module opt-in `forge-mvc-images` introduites à chaque étape.
     (`pip install --pre forge-mvc-images`, palier « Installation » en tête de
     parcours). Le cœur de Forge reste autonome.
 
-## Niveau débutant — traitement (sans base de données)
+## Niveau débutant : traitement (sans base de données)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -17,7 +17,7 @@ module opt-in `forge-mvc-images` introduites à chaque étape.
 | 2 | [Téléverser une image](debutant/image-upload.md) | Vérifier le contenu avant d'écrire, générer les variantes | `save_image_upload` |
 | 3 | [Miniatures et variantes](debutant/image-variants.md) | Dériver les chemins des variantes et leurs URL | `image_variant_relative_paths`, `media_url` |
 
-## Niveau intermédiaire — couche médias en base
+## Niveau intermédiaire : couche médias en base
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -25,7 +25,7 @@ module opt-in `forge-mvc-images` introduites à chaque étape.
 | 2 | [Afficher la galerie](intermediaire/image-gallery.md) | Lire et afficher les images d'une entité avec variantes | `get_media_gallery` |
 | 3 | [Texte alternatif et ordre](intermediaire/image-alt-order.md) | Éditer accessibilité et ordre d'affichage | `update_media_alt_text`, `update_media_position` |
 
-## Niveau avancé — couverture, suppression, sécurité
+## Niveau avancé : couverture, suppression, sécurité
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|

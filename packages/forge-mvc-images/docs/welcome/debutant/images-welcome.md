@@ -4,7 +4,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-images` et ce
 qu'il sait traiter.
 
 **Ce que vous allez apprendre :** vérifier que le module Images répond, et
-**inspecter ses capacités** — les formats d'image autorisés
+**inspecter ses capacités** : les formats d'image autorisés
 (`ALLOWED_IMAGE_EXTENSIONS`) et les tailles des variantes générées
 (`IMAGE_VARIANT_SIZES`). Aucune base de données, aucun fichier : on découvre
 simplement comment Forge Images est branché.

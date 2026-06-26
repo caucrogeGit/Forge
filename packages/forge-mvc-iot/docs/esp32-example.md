@@ -19,7 +19,7 @@ ESP32  →  MQTT  →  Mosquitto  →  forge iot:listen  →  iot_events  →  /
 
 - une carte **ESP32** (DevKit, WROOM…) ;
 - un câble USB ;
-- optionnel : un capteur de température réel (DHT22, DS18B20…) — sinon
+- optionnel : un capteur de température réel (DHT22, DS18B20…), sinon
   l'exemple publie une valeur fixe.
 
 ## Pré-requis
@@ -27,7 +27,7 @@ ESP32  →  MQTT  →  Mosquitto  →  forge iot:listen  →  iot_events  →  /
 - l'**IDE Arduino** (ou PlatformIO) avec le **coeur ESP32** installé ;
 - la bibliothèque **PubSubClient** (Nick O'Leary) installée via le
   gestionnaire de bibliothèques ;
-- un **broker Mosquitto** joignable sur le réseau local — voir
+- un **broker Mosquitto** joignable sur le réseau local, voir
   [Mosquitto local](mosquitto-local.md) ;
 - un projet **Forge** avec `forge-mvc-iot` installé.
 
@@ -56,14 +56,14 @@ Avec un payload JSON conforme :
 }
 ```
 
-Le `timestamp` est en **UTC**, suffixe `Z` — l'exemple l'obtient par NTP.
+Le `timestamp` est en **UTC**, suffixe `Z` : l'exemple l'obtient par NTP.
 
 ## Code ESP32 minimal
 
 Le sketch complet est ici :
 [`esp32_mqtt_temperature.ino`](examples/esp32_mqtt_temperature.ino).
 
-Extrait — les paramètres à adapter et la publication :
+Extrait : les paramètres à adapter et la publication :
 
 ```cpp
 #include <WiFi.h>
@@ -92,7 +92,7 @@ réseau. L'ESP32 et le PC qui héberge Mosquitto doivent être sur le
 ## Adapter l'adresse du broker MQTT
 
 `MQTT_HOST` doit pointer vers l'**adresse IP** du poste qui fait tourner
-Mosquitto — surtout **pas** `localhost` (qui désignerait l'ESP32
+Mosquitto, surtout **pas** `localhost` (qui désignerait l'ESP32
 lui-même). Trouve l'IP du PC, par exemple :
 
 ```bash
@@ -147,7 +147,7 @@ mosquitto_sub -h localhost -t 'forge/+/+/telemetry' -v
 - **Message rejeté par Forge** : topic hors format
   `forge/{site}/{device_id}/telemetry`, ou payload incomplet
   (`kind`/`value`/`unit`/`timestamp` obligatoires) ;
-- **Timestamp faux** : NTP pas encore synchronisé — attends quelques
+- **Timestamp faux** : NTP pas encore synchronisé, attends quelques
   secondes après la connexion Wi-Fi.
 
 ## Limites
@@ -158,7 +158,7 @@ Cet exemple reste volontairement simple. Sont **hors périmètre** :
 - pas de gestion Wi-Fi avancée (reconnexion fine, économie d'énergie) ;
 - la bibliothèque PubSubClient est utilisée **comme exemple**, ce n'est
   pas une dépendance de Forge ;
-- **Arduino R4 n'est pas couvert ici** (hors périmètre) — ce ticket
+- **Arduino R4 n'est pas couvert ici** (hors périmètre) : ce ticket
   cible l'ESP32, la cible la plus simple et la plus standard pour MQTT.
   Voir l'[évaluation Arduino R4](arduino-r4-assessment.md) pour l'état de
   cette piste.

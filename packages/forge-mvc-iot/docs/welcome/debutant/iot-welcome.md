@@ -4,7 +4,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-iot` et sa
 configuration.
 
 **Ce que vous allez apprendre :** vérifier que le module IoT répond, et
-**inspecter sa configuration MQTT** avec `load_iot_config` — en **masquant le mot
+**inspecter sa configuration MQTT** avec `load_iot_config`, en **masquant le mot
 de passe**. Aucun broker, aucune base : on découvre simplement comment Forge IoT
 est branché.
 
@@ -82,7 +82,7 @@ class IotWelcomeController(BaseController):
 ### Comprendre ce code
 
 - `load_iot_config()` lit la configuration MQTT (hôte, port, topic, identifiants)
-  depuis l'environnement Forge — comme le reste de la config Forge, elle est
+  depuis l'environnement Forge : comme le reste de la config Forge, elle est
   **explicite**.
 - On ne renvoie **jamais** le mot de passe : `"***" if cfg.mqtt_password else
   None`. Une config exposée masque toujours ses secrets.

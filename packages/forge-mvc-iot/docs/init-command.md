@@ -1,9 +1,9 @@
-# Initialisation Forge IoT — `forge iot:init`
+# Initialisation Forge IoT : `forge iot:init`
 
 > **Statut** : commande de **préparation**. Elle copie la migration
 > SQL Forge IoT du package vers `mvc/migrations/` du projet, mais
 > **n'applique pas** le SQL. C'est `forge migration:apply` qui le fait
-> ensuite — séparation volontaire pour rester lisible et relisible.
+> ensuite, séparation volontaire pour rester lisible et relisible.
 
 ## Objectif
 
@@ -48,13 +48,13 @@ Avec ce parcours :
   `mvc/migrations/` du projet. Idempotent.
 - `forge migration:apply` (commande Forge Core existante) crée la
   table.
-- `forge run` démarre le serveur — les routes
+- `forge run` démarre le serveur ; les routes
   `/welcome-optin-iot/events` et `/api/iot/events` peuvent maintenant
   retourner des données réelles.
 
 ## Comportement
 
-### Cas normal — fichier copié
+### Cas normal : fichier copié
 
 ```text
 [OK] Migration IoT copiée : mvc/migrations/20260528120000_create_iot_events.sql
@@ -64,7 +64,7 @@ Avec ce parcours :
 
 Exit code : `0`.
 
-### Cas idempotent — déjà présent, contenu identique
+### Cas idempotent : déjà présent, contenu identique
 
 ```text
 [OK] Migration IoT déjà présente (identique) : mvc/migrations/20260528120000_create_iot_events.sql
@@ -74,14 +74,14 @@ Exit code : `0`.
 
 Exit code : `0`. La commande est sûre à rejouer.
 
-### Cas conflit — fichier présent, contenu différent
+### Cas conflit : fichier présent, contenu différent
 
 ```text
 [WARN] mvc/migrations/20260528120000_create_iot_events.sql existe et diffère — aucune modification.
 ```
 
 Exit code : `0`. **Aucun écrasement** : si l'utilisateur a modifié la
-migration localement, la décision lui revient — la commande ne touche
+migration localement, la décision lui revient ; la commande ne touche
 rien. Pour repartir de la version packagée, supprimer manuellement le
 fichier puis relancer `forge iot:init`.
 
@@ -108,7 +108,7 @@ Exit code : `1`.
 ## Lecture des migrations packagées
 
 La commande utilise `importlib.resources` pour lire les ressources
-embarquées dans le package Python — fonctionne **identiquement** en
+embarquées dans le package Python, fonctionne **identiquement** en
 install éditable (depuis le monorepo) et en install PyPI réelle.
 
 Le ticket
@@ -122,7 +122,7 @@ l'installation.
 
 Sont volontairement **hors périmètre** de cette commande :
 
-- pas de `forge migration:apply` automatique — séparation explicite
+- pas de `forge migration:apply` automatique : séparation explicite
   préparation / exécution ;
 - pas de connexion à MariaDB ;
 - pas de vérification que la table `iot_events` existe déjà ;
@@ -140,11 +140,11 @@ Erreur : module forge-mvc-iot non installé.
 indice : installe le module opt-in : pip install forge-mvc-iot
 ```
 
-Forge Core reste fonctionnel sans le module — l'import est paresseux
+Forge Core reste fonctionnel sans le module : l'import est paresseux
 côté dispatcher (`forge.py`).
 
 ## Voir aussi
 
 - [Architecture Forge IoT](architecture.md)
-- [Diagnostic — `forge iot:doctor`](doctor.md)
+- [Diagnostic : `forge iot:doctor`](doctor.md)
 - [Stockage des événements](storage-events.md)

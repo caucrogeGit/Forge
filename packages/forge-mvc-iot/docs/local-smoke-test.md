@@ -27,7 +27,7 @@ Si chaque étape passe, l'intégration locale est saine.
 
 Ce smoke test suppose :
 
-- **Mosquitto actif** localement — voir
+- **Mosquitto actif** localement, voir
   [Mosquitto local](mosquitto-local.md) :
 
   ```bash

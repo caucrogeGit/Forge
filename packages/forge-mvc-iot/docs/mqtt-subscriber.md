@@ -19,7 +19,7 @@ Le code est volontairement scindé en deux modules :
 
 | Module | Rôle | Dépend de paho-mqtt ? |
 |--------|------|-----------------------|
-| `forge_mvc_iot.mqtt.contract` | parsing et validation pure (topic + payload), construction de `Measurement` | non — testable hors ligne |
+| `forge_mvc_iot.mqtt.contract` | parsing et validation pure (topic + payload), construction de `Measurement` | non, testable hors ligne |
 | `forge_mvc_iot.mqtt.subscriber` | pont vers `paho.mqtt.client.Client`, callbacks, abonnement, cycle de vie | oui |
 
 Cette séparation permet de :
@@ -83,7 +83,7 @@ Exception levée pour toute violation du contrat. Porte un attribut
 | `CODE_PAYLOAD_VALUE_FORMAT` | `"PAYLOAD_VALUE_FORMAT"` |
 
 Ces codes sont identiques à ceux documentés dans
-[Contrat MQTT — Erreurs](mqtt-contract.md#erreurs-de-contrat-taxonomie).
+[Contrat MQTT : Erreurs](mqtt-contract.md#erreurs-de-contrat-taxonomie).
 
 ```python
 from forge_mvc_iot.mqtt.contract import ContractError, parse_message
@@ -118,9 +118,9 @@ sub.loop_forever()
 | Paramètre | Type | Rôle |
 |-----------|------|------|
 | `config` | `IotConfig` | configuration chargée par `load_iot_config` |
-| `on_measurement` | `Callable[[Measurement], None]` | obligatoire — appelé pour chaque mesure valide |
-| `on_contract_error` | `Callable[[ContractError, str, bytes], None] \| None` | optionnel — appelé pour chaque violation de contrat. Si `None`, l'erreur est uniquement loguée. |
-| `client_factory` | `Callable[[IotConfig], Any] \| None` | optionnel — fabrique de client MQTT, utile pour les tests. Par défaut, instancie un `paho.mqtt.client.Client` configuré pour `CallbackAPIVersion.VERSION2`. |
+| `on_measurement` | `Callable[[Measurement], None]` | obligatoire, appelé pour chaque mesure valide |
+| `on_contract_error` | `Callable[[ContractError, str, bytes], None] \| None` | optionnel, appelé pour chaque violation de contrat. Si `None`, l'erreur est uniquement loguée. |
+| `client_factory` | `Callable[[IotConfig], Any] \| None` | optionnel, fabrique de client MQTT, utile pour les tests. Par défaut, instancie un `paho.mqtt.client.Client` configuré pour `CallbackAPIVersion.VERSION2`. |
 
 #### Méthodes de cycle de vie
 
@@ -131,9 +131,9 @@ sub.loop_forever()
 | `loop_forever()` | boucle réseau bloquante |
 | `loop_start()` | boucle réseau en thread séparé |
 | `loop_stop()` | arrête la boucle démarrée par `loop_start` |
-| `handle_message(topic, payload)` | point d'entrée testable — parse + dispatch |
+| `handle_message(topic, payload)` | point d'entrée testable, parse + dispatch |
 
-## Exemple complet — script de réception
+## Exemple complet : script de réception
 
 ```python
 import logging
@@ -233,7 +233,7 @@ Pour chaque message reçu, le subscriber tente
     avec le code d'erreur et le topic en cause ;
   - si `on_contract_error` est fourni, il est appelé avec
     `(exc, topic, payload)` ;
-  - le subscriber **ne se déconnecte pas** — un message invalide ne
+  - le subscriber **ne se déconnecte pas** : un message invalide ne
     casse pas la session MQTT.
 
 Les erreurs de connexion broker (broker injoignable, identifiants
@@ -247,7 +247,7 @@ politique de reconnexion personnalisée) sera abordé dans
 - **`site` et `device_id` viennent du topic.** Tout champ `site` ou
   `device_id` présent dans le payload est ignoré silencieusement
   (couvert par les tests).
-- **Codes d'erreur stables.** La taxonomie est figée — un futur test
+- **Codes d'erreur stables.** La taxonomie est figée : un futur test
   du subscriber peut s'appuyer sur `exc.code == "PAYLOAD_PARSE"` sans
   craindre un renommage.
 - **Pas d'imports paho dans `contract.py`.** La séparation est testée :

@@ -4,7 +4,7 @@ Objectif : calculer les permissions **effectives** d'un utilisateur (ses rôles 
 leurs permissions) depuis la base.
 
 **Ce que vous allez apprendre :** `get_user_permissions` et `user_has_permission`
-font ce calcul via un `fetch_all` **injectable** — testables sans vraie base. On
+font ce calcul via un `fetch_all` **injectable**, testables sans vraie base. On
 injecte ici un `fetch_all` de démonstration.
 
 Deuxième palier du **niveau avancé** de la progression RBAC.

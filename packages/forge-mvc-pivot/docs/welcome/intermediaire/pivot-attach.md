@@ -9,7 +9,7 @@ acceptés.
 
 Premier palier du **niveau intermédiaire**.
 
-!!! note "Module opt-in — SQL visible"
+!!! note "Module opt-in : SQL visible"
     En production, le service délègue à `core.database.db` (`execute`,
     `fetch_one`…). La table `article_tag` doit exister. Pour les tests, ces
     exécuteurs sont **injectables**.
@@ -59,12 +59,12 @@ class PivotAttachController(BaseController):
   position, epingle)` et retourne l'identifiant inséré.
 - Le dictionnaire d'attributs ne peut contenir **que** `position` et `epingle` :
   un champ inconnu lève une erreur (liste blanche).
-- Le SQL produit est un `INSERT` paramétré — aucune valeur n'est concaténée.
+- Le SQL produit est un `INSERT` paramétré : aucune valeur n'est concaténée.
 
 !!! warning "Doublon de paire"
     Tel quel, attacher deux fois la même paire crée deux lignes (ou échoue sur la
     clé primaire SQL). Pour refuser le doublon **avant** l'`INSERT`, on active
-    `unique_pair` — au niveau avancé.
+    `unique_pair`, au niveau avancé.
 
 ## La route
 

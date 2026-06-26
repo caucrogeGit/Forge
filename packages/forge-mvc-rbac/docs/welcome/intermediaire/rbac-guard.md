@@ -69,7 +69,7 @@ class RbacGuardController(BaseController):
 
 - Le pattern est **explicite** : on appelle la garde, et si elle renvoie une réponse,
   on la retourne immédiatement (court-circuit `403`).
-- En production, les **rôles viennent de l'utilisateur connecté**, pas de l'URL —
+- En production, les **rôles viennent de l'utilisateur connecté**, pas de l'URL ;
   ici on les passe en paramètre pour la démonstration.
 - La permission requise est déclarée **une fois**, en tête de l'action.
 

@@ -1,4 +1,4 @@
-# Intermédiaire 3 — Éditer une ligne
+# Intermédiaire 3 : Éditer une ligne
 
 Objectif : modifier un article existant.
 

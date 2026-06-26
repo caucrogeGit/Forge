@@ -10,7 +10,7 @@ clé. Avec l'opt-in et un catalogue, `trans` retourne la traduction.
 Premier palier du **niveau débutant** de la progression i18n
 (vue d'ensemble des starters).
 
-!!! note "Module opt-in — repli no-op"
+!!! note "Module opt-in : repli no-op"
     Si `forge-mvc-i18n` n'est pas installé, `trans("welcome.title")` renvoie
     `"welcome.title"`. L'application ne casse jamais ; elle n'est simplement pas
     traduite.

@@ -3,7 +3,7 @@
 > **Statut** : page pédagogique. Elle explique comment installer, lancer
 > et **tester** un broker Mosquitto **local** pour faire tourner le flux
 > Forge IoT de bout en bout. Le broker est volontairement **en clair sur
-> `localhost:1883`**, sans TLS ni authentification — voir
+> `localhost:1883`**, sans TLS ni authentification ; voir
 > [Limites](#limites).
 
 ## Objectif
@@ -59,7 +59,7 @@ ss -tulpn | grep 1883
 ```
 
 Une ligne contenant `127.0.0.1:1883` (ou `0.0.0.0:1883`) confirme l'écoute.
-Si **rien ne sort**, Mosquitto n'écoute pas — voir
+Si **rien ne sort**, Mosquitto n'écoute pas ; voir
 [Erreurs fréquentes](#erreurs-frequentes).
 
 ## Vérifier Forge IoT avec doctor
@@ -224,10 +224,10 @@ Cette page documente **uniquement** un broker local pédagogique. Les
 sujets suivants sont **hors périmètre** de cette page et feront l'objet
 de tickets ultérieurs :
 
-- **TLS** (chiffrement du transport, port 8883) — non couvert ici, hors périmètre ;
-- **authentification** Mosquitto (utilisateurs, mots de passe, ACL) — non couverte ici, hors périmètre ;
-- brokers **cloud** MQTT, Docker Compose, VPN Tailscale, capteurs ESP32 / Arduino, Forge Design — hors périmètre.
+- **TLS** (chiffrement du transport, port 8883) : non couvert ici, hors périmètre ;
+- **authentification** Mosquitto (utilisateurs, mots de passe, ACL) : non couverte ici, hors périmètre ;
+- brokers **cloud** MQTT, Docker Compose, VPN Tailscale, capteurs ESP32 / Arduino, Forge Design : hors périmètre.
 
-Le broker décrit ici écoute en clair sur `localhost:1883`, sans TLS ni auth ni cloud — adapté à un atelier local, pas à une mise en production.
+Le broker décrit ici écoute en clair sur `localhost:1883`, sans TLS ni auth ni cloud : adapté à un atelier local, pas à une mise en production.
 
-Cette page reste **volontairement sans TLS ni authentification** : le chiffrement TLS et son certificat CA sont **hors périmètre** ici, et restent désactivés par défaut côté Forge ; pour un broker exposé, voir [Configuration Forge IoT — TLS MQTT](configuration.md#tls-mqtt).
+Cette page reste **volontairement sans TLS ni authentification** : le chiffrement TLS et son certificat CA sont **hors périmètre** ici, et restent désactivés par défaut côté Forge ; pour un broker exposé, voir [Configuration Forge IoT : TLS MQTT](configuration.md#tls-mqtt).

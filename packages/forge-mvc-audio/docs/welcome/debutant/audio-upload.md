@@ -1,11 +1,11 @@
 # Téléverser un audio
 
-Objectif : ingérer un fichier audio avec `ingest_audio` — valider et stocker, sans
+Objectif : ingérer un fichier audio avec `ingest_audio` : valider et stocker, sans
 lancer `ffprobe` ni `ffmpeg`.
 
 **Ce que vous allez apprendre :** `ingest_audio` valide (extension, taille) et
 **stocke** le fichier source à un emplacement **uuid-based** (le nom utilisateur
-n'apparaît jamais dans le chemin — anti-traversal par construction). Il retourne un
+n'apparaît jamais dans le chemin, anti-traversal par construction). Il retourne un
 dict `{uuid, title, original_path, size_bytes, mime_type}`.
 
 Deuxième palier du **niveau débutant** de la progression audio.

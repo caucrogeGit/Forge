@@ -45,7 +45,7 @@ class I18nMissingController(BaseController):
 - `trans("page.inexistante")` cherche en `fr`, puis en `en` (secours), puis
   retourne `"page.inexistante"`.
 - Aucune exception : une clé oubliée ne casse pas la page, elle s'affiche en
-  clair — signal visible pour le développeur.
+  clair : signal visible pour le développeur.
 - C'est un choix **délibéré** : la robustesse d'affichage prime sur l'échec dur.
 
 ## La route

@@ -6,7 +6,7 @@ Objectif : lire toutes les associations d'un article, avec leurs attributs.
 à une source. Chaque `PivotRow` porte `source_id`, `target_id` et un dict
 `pivot_data` (les attributs `position`, `epingle`).
 
-!!! note "Module opt-in — SQL visible"
+!!! note "Module opt-in : SQL visible"
     `list_for_source` produit un `SELECT * FROM article_tag WHERE article_id = ?`.
 
 ## Classes Forge utilisées

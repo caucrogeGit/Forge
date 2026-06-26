@@ -3,7 +3,7 @@
 Objectif : recevoir un fichier et le **stocker** proprement avec `save_upload`.
 
 **Ce que vous allez apprendre :** `save_upload` est la **façade document** de
-`forge-mvc-files` — elle valide (extension/MIME/taille), écrit le fichier sur le
+`forge-mvc-files` : elle valide (extension/MIME/taille), écrit le fichier sur le
 disque et retourne un `SavedUpload` décrivant ce qui a été stocké. C'est exactement
 la primitive qu'`forge-mvc-images` réutilise pour son chemin document.
 
@@ -130,7 +130,7 @@ with router.group("", public=True) as public:
 
 - La **catégorie** (`"documents"`) range le fichier dans un sous-dossier dédié de
   la racine d'upload.
-- `SavedUpload` expose `original_name`, `path`, `size`, `mime_type` — tout ce qu'il
+- `SavedUpload` expose `original_name`, `path`, `size`, `mime_type` : tout ce qu'il
   faut pour, plus tard, le servir ou l'enregistrer en base (côté application).
 - La validation est **dans le core** (réexportée par files) : un fichier refusé
   lève `UploadError` avant toute écriture.

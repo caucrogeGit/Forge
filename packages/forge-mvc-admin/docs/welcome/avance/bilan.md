@@ -1,4 +1,4 @@
-# Bilan — niveau avancé
+# Bilan : niveau avancé
 
 Vous savez maintenant :
 

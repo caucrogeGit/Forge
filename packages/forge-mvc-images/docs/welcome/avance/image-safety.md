@@ -1,6 +1,6 @@
 # Garde de sécurité à l'upload
 
-Objectif : comprendre **comment Forge refuse une image piégée** — un fichier
+Objectif : comprendre **comment Forge refuse une image piégée** : un fichier
 déguisé en image, ou une image-bombe conçue pour saturer le serveur.
 
 **Ce que vous allez apprendre :** avant toute écriture, `verify_image_content`

@@ -22,7 +22,7 @@ Palier 2 du **niveau avancé** de la progression vidéo, après
 - le **worker** `forge video:process` (un identifiant, ou `--pending` pour tout) ;
 - l'orchestration `process_video` : sonde + poster + transcodage MP4 ;
 - l'avancée du statut `uploaded → processing → ready` (ou `failed`) ;
-- une route qui **liste les vidéos en attente** et la config ffmpeg — sans rien
+- une route qui **liste les vidéos en attente** et la config ffmpeg, sans rien
   transcoder elle-même.
 
 La table `videos` est garantie par la migration fournie plus bas.
@@ -84,12 +84,12 @@ class VideoTranscodeController(BaseController):
 ### Comprendre ce code
 
 - La route **ne transcode pas** : elle prépare le terrain (liste des vidéos à
-  traiter + config). Lancer ffmpeg dans une requête web la bloquerait — c'est
+  traiter + config). Lancer ffmpeg dans une requête web la bloquerait : c'est
   exactement ce que le modèle worker-CLI **évite**.
 - `process_video` (appelé par `forge video:process`) fait le travail lourd
   **hors HTTP** et écrit le résultat (`mp4_path`, `poster_path`, statut `ready`).
 - En cas d'échec ffmpeg, la vidéo passe à `failed` avec un `error_message`
-  lisible — le diagnostic est le palier suivant.
+  lisible ; le diagnostic est le palier suivant.
 
 ## La vue
 

@@ -5,11 +5,11 @@ Objectif : convertir un fichier audio source en **MP3 standard** avec
 
 **Ce que vous allez apprendre :** `transcode_to_mp3(input, output)` lance `ffmpeg`
 de façon **synchrone**. Forge Audio reste **sobre** : pas de file de jobs, pas de
-table — l'opération attend la fin de `ffmpeg` et lève `FfmpegError` en cas d'échec.
+table ; l'opération attend la fin de `ffmpeg` et lève `FfmpegError` en cas d'échec.
 
 Deuxième palier du **niveau avancé** de la progression audio.
 
-!!! note "Module opt-in — `ffmpeg` requis"
+!!! note "Module opt-in : `ffmpeg` requis"
     Ce starter suppose `forge-mvc-audio` installé (palier « Installation ») et le
     binaire `ffmpeg` présent. Sans lui, la page reste **pédagogique**.
 
@@ -95,7 +95,7 @@ class AudioTranscodeController(BaseController):
 ### Comprendre ce code
 
 - Le transcodage est **synchrone** : la requête HTTP attend `ffmpeg`. En production,
-  on le **déporte** hors de la requête (tâche/worker) — le starter le dit
+  on le **déporte** hors de la requête (tâche/worker) ; le starter le dit
   explicitement.
 - Forge Audio est **sans état** : aucun suivi de job, aucune table. Simplicité
   assumée.

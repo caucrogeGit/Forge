@@ -6,7 +6,7 @@ travailler en local.
 **Ce que vous allez apprendre :** composer une mesure, la **valider contre le
 contrat IoT** (`build_payload` + `parse_message`) puis l'insérer dans
 `iot_events` via `IotEventRepository.insert`. C'est exactement la validation que
-le subscriber MQTT applique en production — on emprunte simplement un autre
+le subscriber MQTT applique en production : on emprunte simplement un autre
 chemin d'entrée, **sans broker**.
 
 Premier palier du **niveau intermédiaire** de la progression IoT, après le
@@ -26,9 +26,9 @@ La table `iot_events` est créée par la migration livrée avec le starter.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `build_topic` / `build_payload` | Composer un topic et un payload conformes. | [Forge IoT — simulateur](../../listen-command.md) |
-| `parse_message` | Valider topic + payload → `Measurement`. | [Forge IoT — contrat](../../storage-events.md) |
-| `IotEventRepository.insert` | Écrire la mesure validée dans `iot_events`. | [Forge IoT — stockage](../../storage-events.md) |
+| `build_topic` / `build_payload` | Composer un topic et un payload conformes. | [Forge IoT : simulateur](../../listen-command.md) |
+| `parse_message` | Valider topic + payload → `Measurement`. | [Forge IoT : contrat](../../storage-events.md) |
+| `IotEventRepository.insert` | Écrire la mesure validée dans `iot_events`. | [Forge IoT : stockage](../../storage-events.md) |
 | `BaseController.csrf_token` / `redirect` | Protéger le POST, rediriger (PRG). | BaseController |
 
 ## Tester
@@ -111,7 +111,7 @@ class IotSimulateController(BaseController):
 
 - `build_payload(...)` produit un payload **conforme** (champs `kind`, `value`,
   `unit`, `timestamp`). `parse_message` le **valide** et renvoie un `Measurement`
-  typé — une `ContractError` est levée si quelque chose ne respecte pas le
+  typé ; une `ContractError` est levée si quelque chose ne respecte pas le
   contrat.
 - `IotEventRepository().insert(measurement)` écrit la mesure validée. C'est le
   **même** repository qu'en lecture.

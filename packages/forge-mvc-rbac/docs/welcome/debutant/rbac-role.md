@@ -1,6 +1,6 @@
 # Rôle et slug
 
-Objectif : comprendre la brique **rôle** — son nom lisible et son slug stable.
+Objectif : comprendre la brique **rôle**, son nom lisible et son slug stable.
 
 **Ce que vous allez apprendre :** un rôle a un **nom** (« Éditeur en chef ») et un
 **slug** identifiant (`editeur-en-chef`). `normalize_role_slug` dérive le slug ;

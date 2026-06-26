@@ -1,4 +1,4 @@
-# Bilan, niveau intermédiaire (QR Code)
+# Bilan : niveau intermédiaire (QR Code)
 
 Récapitulatif du **niveau intermédiaire** de la progression QR Code.
 Ce niveau relie le générateur au web : servir un QR Code en HTTP depuis un

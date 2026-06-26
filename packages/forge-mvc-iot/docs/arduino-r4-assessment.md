@@ -11,7 +11,7 @@
 Décider, **avant** d'écrire un exemple complet, si l'Arduino R4 est une
 cible MQTT fiable pour Forge IoT. On vérifie le modèle exact, la
 connectivité réseau, la compatibilité des bibliothèques MQTT et l'intérêt
-pédagogique — pour éviter de publier une documentation fragile ou fausse
+pédagogique, pour éviter de publier une documentation fragile ou fausse
 selon la variante de carte.
 
 ## Pourquoi ESP32 reste la cible de référence
@@ -36,7 +36,7 @@ précisément la variante :
   connectivité). C'est la seule variante R4 pertinente pour MQTT sans
   matériel additionnel ;
 - **Arduino UNO R4 Minima** (et variantes **sans Wi-Fi**) : pas de
-  connectivité réseau intégrée — inadaptée à MQTT sans shield/module
+  connectivité réseau intégrée, inadaptée à MQTT sans shield/module
   réseau externe.
 
 La distinction est décisive : une bonne partie des « Arduino R4 » en
@@ -94,7 +94,7 @@ avec un payload conforme :
 
 - tester ponctuellement un **UNO R4 WiFi** vers Mosquitto local ;
 - réutiliser le **contrat** et le **flux Forge** identiques à l'ESP32
-  (`forge iot:listen`, `forge iot:doctor --mqtt`, `/api/iot/events`) —
+  (`forge iot:listen`, `forge iot:doctor --mqtt`, `/api/iot/events`) :
   côté serveur, rien ne change selon la carte émettrice.
 
 ## Ce qui est déconseillé

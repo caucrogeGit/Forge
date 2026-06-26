@@ -1,7 +1,7 @@
 # Miniatures et variantes
 
 Objectif : comprendre **où** Forge range les variantes d'une image (`medium`,
-`thumbnail`) et **comment construire leurs URL publiques** — sans rien
+`thumbnail`) et **comment construire leurs URL publiques**, sans rien
 téléverser.
 
 **Ce que vous allez apprendre :** `image_variant_relative_paths(path)` dérive,
@@ -98,7 +98,7 @@ class ImageVariantsController(BaseController):
 
 - `image_variant_relative_paths("images/2026/photo.jpg")` retourne
   `{"original": "images/2026/photo.jpg", "medium": "images/2026/medium/photo.jpg",
-  "thumbnail": "images/2026/thumbnail/photo.jpg"}` — les variantes vivent dans un
+  "thumbnail": "images/2026/thumbnail/photo.jpg"}` ; les variantes vivent dans un
   sous-dossier frère, à côté de l'originale.
 - C'est une **convention de nommage**, pas une lecture de disque : la fonction
   ne touche aucun fichier, elle transforme une chaîne. Pratique pour comprendre

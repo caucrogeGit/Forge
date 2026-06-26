@@ -98,7 +98,7 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Le badge est un `Markup` : Jinja l'affiche **tel quel**, sans rééchapper le HTML —
+- Le badge est un `Markup` : Jinja l'affiche **tel quel**, sans rééchapper le HTML ;
   pas de `| safe` à risque, pas de HTML codé à la main.
 - Couleur et libellé du statut sont déjà intégrés dans le badge.
 - Centraliser le rendu d'un statut garantit la cohérence visuelle partout.

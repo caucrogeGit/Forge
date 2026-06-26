@@ -13,7 +13,7 @@ Palier 2 du **niveau avancé** de la progression IoT, après
 
 !!! note "Infrastructure requise"
     Recevoir de vrais messages demande un **broker MQTT** (par exemple Mosquitto)
-    démarré et atteignable — à votre charge. Ce starter explique et câble le
+    démarré et atteignable, à votre charge. Ce starter explique et câble le
     chemin ; il ne fournit pas le broker.
 
 ## Ce que ce starter montre
@@ -27,9 +27,9 @@ Palier 2 du **niveau avancé** de la progression IoT, après
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_iot.config.load_iot_config` | Lire la configuration broker à vérifier. | [Forge IoT — configuration](../../configuration.md) |
-| `forge iot:listen` (CLI) | Lancer le `MqttSubscriber` sur le broker. | [Forge IoT — listen](../../listen-command.md) |
-| `MqttSubscriber` | Recevoir, valider et stocker chaque message. | [Forge IoT — architecture](../../architecture.md) |
+| `forge_mvc_iot.config.load_iot_config` | Lire la configuration broker à vérifier. | [Forge IoT : configuration](../../configuration.md) |
+| `forge iot:listen` (CLI) | Lancer le `MqttSubscriber` sur le broker. | [Forge IoT : listen](../../listen-command.md) |
+| `MqttSubscriber` | Recevoir, valider et stocker chaque message. | [Forge IoT : architecture](../../architecture.md) |
 
 ## Tester
 
@@ -139,7 +139,7 @@ with router.group("", public=True) as public:
 ## À retenir
 
 - Le temps réel passe par un **broker** + `forge iot:listen` (un `MqttSubscriber`).
-- Le subscriber **valide puis stocke** chaque message — même contrat qu'en
+- Le subscriber **valide puis stocke** chaque message : même contrat qu'en
   simulation.
 - Une route web vérifie la config ; l'écoute continue est une commande CLI.
 

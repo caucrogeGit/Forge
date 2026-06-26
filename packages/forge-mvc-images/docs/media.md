@@ -17,18 +17,18 @@ service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure
 
 ## Frontière upload / opt-in média
 
-**`forge_mvc_files` — upload générique** (opt-in, ADR-019) :
+**`forge_mvc_files`, upload générique** (opt-in, ADR-019) :
 
-- `save_upload` — sauvegarde sécurisée d'un fichier
-- `serve_media_file` — route `/media/...` sécurisée
-- `delete_media_file` — suppression physique d'un fichier
+- `save_upload` : sauvegarde sécurisée d'un fichier
+- `serve_media_file` : route `/media/...` sécurisée
+- `delete_media_file` : suppression physique d'un fichier
 - exceptions (`UploadError`, `UploadStorageError`…)
 - validation MIME, stockage contrôlé, protection path traversal
 - rate limiting upload
 
-**`forge_mvc_images` — traitement d'image et helpers applicatifs** (opt-in `forge-mvc-images`) :
+**`forge_mvc_images`, traitement d'image et helpers applicatifs** (opt-in `forge-mvc-images`) :
 
-- `save_image`, `save_image_upload`, `generate_image_variants`, `verify_image_content` — traitement Pillow
+- `save_image`, `save_image_upload`, `generate_image_variants`, `verify_image_content` : traitement Pillow
 - `attach_media_to_entity`, `create_media_record`, `get_media_record`
 - `list_media_for_entity`, `update_media_alt_text`, `update_media_position`
 - `delete_media`, `delete_media_record`
@@ -133,7 +133,7 @@ media = save_image(
 - **Extensions** : `jpg`, `jpeg`, `png`, `webp`
 - **MIME** : `image/jpeg`, `image/png`, `image/webp`
 
-**GIF refusé par défaut** : le format GIF n'est pas supporté. `ImageField` rejette les fichiers `.gif` / `image/gif` à la validation. Cette limite est intentionnelle — le pipeline de variantes n'est pas conçu pour les GIF animés.
+**GIF refusé par défaut** : le format GIF n'est pas supporté. `ImageField` rejette les fichiers `.gif` / `image/gif` à la validation. Cette limite est intentionnelle : le pipeline de variantes n'est pas conçu pour les GIF animés.
 
 La taille maximale est lue depuis `UPLOAD_MAX_SIZE` (défaut : 5 Mo).
 
@@ -340,8 +340,8 @@ Chaque média peut porter un `alt_text` optionnel (`VARCHAR(255) NULL`). Il sert
 Dans le CRUD généré par `make:crud`, Forge expose automatiquement ce champ :
 
 - **Création** : un champ texte `_media_alt_{name}` (média unique) ou `_media_alt_{name}_new` (galerie) permet de renseigner l'alt_text lors de l'ajout d'un fichier.
-- **Modification — média unique** : si un nouveau fichier est fourni, l'alt_text saisi accompagne l'attachement ; sinon, il est mis à jour sur le média existant via `update_media_alt_text`.
-- **Modification — galerie** : chaque item existant dispose d'un champ `_media_alt_{name}_{id}` ; les valeurs sont mises à jour individuellement. Un nouveau fichier uploadé reçoit l'alt_text du champ `_media_alt_{name}_new`.
+- **Modification, média unique** : si un nouveau fichier est fourni, l'alt_text saisi accompagne l'attachement ; sinon, il est mis à jour sur le média existant via `update_media_alt_text`.
+- **Modification, galerie** : chaque item existant dispose d'un champ `_media_alt_{name}_{id}` ; les valeurs sont mises à jour individuellement. Un nouveau fichier uploadé reçoit l'alt_text du champ `_media_alt_{name}_new`.
 - Une chaîne vide est traitée comme absence de texte alternatif (`None`).
 
 Pour les usages manuels, passer `alt_text` explicitement à `attach_media_to_entity` ou appeler `update_media_alt_text` directement.
@@ -504,13 +504,13 @@ Les médias sont stockés dans la table `media` séparée, liés à l'entité vi
 
 | Clé | Obligatoire | Type | Défaut | Description |
 |---|---|---|---|---|
-| `name` | oui | `str` | — | Identifiant unique dans l'entité |
-| `field` | oui | `"image"` ou `"file"` | — | Type de média |
-| `role` | oui | `str` | — | Rôle sémantique (ex. `"cover"`, `"brochure"`) |
+| `name` | oui | `str` | - | Identifiant unique dans l'entité |
+| `field` | oui | `"image"` ou `"file"` | - | Type de média |
+| `role` | oui | `str` | - | Rôle sémantique (ex. `"cover"`, `"brochure"`) |
 | `variants` | non | `bool` | `false` | Génère des variantes image (`thumbnail`, `medium`) |
 | `multiple` | non | `bool` | `false` | `false` : média unique, remplacement à l'édition. `true` : galerie append-only, multi-upload, suppression individuelle, réorganisation par position |
 | `required` | non | `bool` | `false` | Média obligatoire pour la saisie |
-| `label` | non | `str` | — | Libellé affiché dans les formulaires générés |
+| `label` | non | `str` | - | Libellé affiché dans les formulaires générés |
 
 ### Règles de validation
 
@@ -524,14 +524,14 @@ Les médias sont stockés dans la table `media` séparée, liés à l'entité vi
 | Rôle | Signification | État |
 |---|---|---|
 | `cover` | Image principale de l'entité | Géré par `make:crud` |
-| `gallery` | Galerie d'images | Réservé — non géré comme galerie CRUD |
+| `gallery` | Galerie d'images | Réservé, non géré comme galerie CRUD |
 | `brochure` | Document PDF ou fichier joint | Géré par `make:crud` |
 
 D'autres rôles peuvent être définis librement. Le rôle est une chaîne non vide, unique dans l'entité. `gallery` est réservé par convention à un usage futur de galerie multiple ; `make:crud` traite tout rôle de la même façon pour `multiple=false`.
 
 ### Champs SQL vs médias
 
-Les `fields` d'une entité correspondent à des colonnes SQL dans la table métier (`hebergement.nom`, etc.). Les entrées `media` ne correspondent à **aucune colonne** — elles sont stockées dans la table `media` séparée, liées à l'entité via `entity_name`/`entity_id`. Cette séparation permet d'attacher plusieurs médias à un même enregistrement sans modifier le schéma métier.
+Les `fields` d'une entité correspondent à des colonnes SQL dans la table métier (`hebergement.nom`, etc.). Les entrées `media` ne correspondent à **aucune colonne** : elles sont stockées dans la table `media` séparée, liées à l'entité via `entity_name`/`entity_id`. Cette séparation permet d'attacher plusieurs médias à un même enregistrement sans modifier le schéma métier.
 
 ### Ce que cette déclaration ne fait pas
 
@@ -544,7 +544,7 @@ Depuis Forge 1.3.0, les médias déclarés `multiple=true` peuvent être affich�
 
 **Lecture :** `make:crud` appelle `list_media_for_entity(entity_name, entity_id, role=...)` dans `show()`, `edit()` et `update()` invalide, et transmet la liste sous la variable de contexte `{name}_media_list`. Les templates `show.html` et `form.html` affichent cette liste en lecture seule (miniatures ou liens).
 
-**Ajout (append-only, multi-upload) :** le formulaire `form.html` inclut un `<input type="file" multiple>` pour chaque champ `multiple=true`. Plusieurs fichiers peuvent être sélectionnés en une seule soumission. En `create()` et `update()` valides, chaque fichier soumis est validé individuellement (extension, taille, MIME) avant toute opération en base — un seul fichier invalide bloque la soumission complète. Les fichiers valides sont sauvegardés et attachés à la galerie. Le comportement est **append-only** : Forge ajoute les nouveaux médias sans remplacer ni réordonner les médias existants.
+**Ajout (append-only, multi-upload) :** le formulaire `form.html` inclut un `<input type="file" multiple>` pour chaque champ `multiple=true`. Plusieurs fichiers peuvent être sélectionnés en une seule soumission. En `create()` et `update()` valides, chaque fichier soumis est validé individuellement (extension, taille, MIME) avant toute opération en base : un seul fichier invalide bloque la soumission complète. Les fichiers valides sont sauvegardés et attachés à la galerie. Le comportement est **append-only** : Forge ajoute les nouveaux médias sans remplacer ni réordonner les médias existants.
 
 **Suppression individuelle :** le formulaire `form.html` affiche les miniatures existantes avec une checkbox par item (`name="_delete_media_{name}"`, `value="{{ _m.id }}"`). En `update()` valide, Forge supprime chaque média coché avant l'éventuel ajout. La suppression est irréversible (`delete_files=True`). Les médias non cochés ne sont pas touchés. En cas de formulaire invalide, aucune suppression n'est effectuée.
 
@@ -702,7 +702,7 @@ Les garanties suivantes sont assurées par le storage de `forge-mvc-files`
 | **Null bytes** (`\x00`) | Bloqué | Rejet explicite avant toute opération |
 | **Chemins relatifs hors racine** | Bloqué | `os.path.commonpath` vérifie que la cible reste sous `storage/uploads/` |
 | **Stockage absolu** | Impossible | `normalize_media_path` retourne toujours un chemin relatif |
-| **Suppression accidentelle** | Opt-in uniquement | `delete_media(id, delete_files=False)` par défaut — la suppression fichier est explicite |
+| **Suppression accidentelle** | Opt-in uniquement | `delete_media(id, delete_files=False)` par défaut ; la suppression fichier est explicite |
 | **Validation MIME/extension** | Présente | `core/forms/upload_validation.py` (reste dans le core, ADR-019) valide contre des listes d'extensions et MIME autorisées |
 | **Exposition hors racine** | Impossible | La route `/media/...` refuse tout chemin sortant de `storage/uploads/` |
 | **Double slash / normpath** | Nettoyé | `//` réduits avant normalisation |

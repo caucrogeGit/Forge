@@ -1,4 +1,4 @@
-# Forge Video — parcours complet
+# Forge Video : parcours complet
 
 L'opt-in **`forge-mvc-video`** (Beta) couvre la chaîne vidéo de bout en bout :
 **upload → traitement (transcodage MP4) → lecture en streaming HTTP Range**,
@@ -9,7 +9,7 @@ jamais pendant une requête HTTP.
 
 - `forge-mvc-video` installé (`pip install --pre forge-mvc-video`) ;
 - `ffmpeg` et `ffprobe` disponibles (binaires **système**, pas des dépendances
-  pip) — vérifiables avec `forge video:doctor` ;
+  pip) : vérifiables avec `forge video:doctor` ;
 - une base configurée (`DB_APP_*` dans `env/dev`).
 
 ## 1. Diagnostic

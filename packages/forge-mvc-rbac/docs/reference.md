@@ -1,4 +1,4 @@
-# RBAC — Contrôle d'accès par rôles et permissions
+# RBAC : contrôle d'accès par rôles et permissions
 
 ## Vue d'ensemble
 
@@ -43,18 +43,18 @@ Cette page reste la **vue d'ensemble** : modèle de sécurité, chaîne de confi
 
 Forge distingue deux niveaux d'autorisation :
 
-**RBAC léger core** — primitives dans `core/security/` (dépréciées, héritées du développement pré-1.0) :
+**RBAC léger core** : primitives dans `core/security/` (dépréciées, héritées du développement pré-1.0) :
 
-- `user_has_role(request, role)` — vérifie qu'un rôle est présent dans le champ `roles` de la session Auth/User. Ne consulte pas les tables SQL RBAC.
-- `require_role(role)` — décorateur : redirige vers `/login` si non authentifié, retourne 403 si le rôle est absent de la session.
+- `user_has_role(request, role)` : vérifie qu'un rôle est présent dans le champ `roles` de la session Auth/User. Ne consulte pas les tables SQL RBAC.
+- `require_role(role)` : décorateur qui redirige vers `/login` si non authentifié, retourne 403 si le rôle est absent de la session.
 
 Ces deux fonctions conviennent aux cas les plus simples (protéger une route par un rôle déjà dans la session). Elles ne connaissent pas les permissions fines et ne remplacent pas `forge-mvc-rbac`. Les nouveaux projets utilisent `forge_mvc_rbac.require_user_permission`.
 
-**RBAC complet opt-in** — module `forge-mvc-rbac` :
+**RBAC complet opt-in** : module `forge-mvc-rbac` :
 
 - Modèles `Role`, `Permission` (normalisation, validation)
-- Décorateur `@require_permission(...)` — lit les permissions injectées dans la requête ou la session (RBAC historique, sans accès base) ; la résolution SQL via `roles`, `permissions`, `role_permissions` est faite par `require_user_permission`
-- Helper Jinja `make_can` / `can(...)` — affichage conditionnel dans les templates
+- Décorateur `@require_permission(...)` : lit les permissions injectées dans la requête ou la session (RBAC historique, sans accès base) ; la résolution SQL via `roles`, `permissions`, `role_permissions` est faite par `require_user_permission`
+- Helper Jinja `make_can` / `can(...)` : affichage conditionnel dans les templates
 - Résolution backend `get_user_permissions`, `user_has_permission`
 - Pont Auth/User vers RBAC via la table `user_roles`
 - Administration CLI des associations utilisateurs/rôles
@@ -63,16 +63,16 @@ Ces deux fonctions conviennent aux cas les plus simples (protéger une route par
 
 | Besoin | Choix recommandé |
 |---|---|
-| Vérifier simplement qu'un utilisateur a un rôle (session) | `user_has_role` — core léger (déprécié) |
-| Protéger une route pour les nouveaux projets | `forge-mvc-rbac` — `require_user_permission` |
-| Permissions fines (`contacts.edit`, `posts.delete`) | `forge-mvc-rbac` — `require_user_permission` (autoritatif, base) |
+| Vérifier simplement qu'un utilisateur a un rôle (session) | `user_has_role` (core léger, déprécié) |
+| Protéger une route pour les nouveaux projets | `forge-mvc-rbac`, `require_user_permission` |
+| Permissions fines (`contacts.edit`, `posts.delete`) | `forge-mvc-rbac`, `require_user_permission` (autoritatif, base) |
 | Administrer rôles et permissions | `forge-mvc-rbac` |
-| Affichage conditionnel dans les templates Jinja | `forge-mvc-rbac` — `can(...)` |
+| Affichage conditionnel dans les templates Jinja | `forge-mvc-rbac`, `can(...)` |
 | Relations utilisateurs/rôles complexes | `forge-mvc-rbac` |
 
 ### Frontière d'import
 
-`core/` ne doit pas importer `forge_mvc_rbac`. La dépendance va dans un seul sens : `forge-mvc-rbac` → `core`. `core/auth/audit.py` peut nommer des événements d'audit RBAC génériques — ce vocabulaire est assumé dans le core (ADR-011), il ne représente pas une dépendance fonctionnelle vers le module opt-in.
+`core/` ne doit pas importer `forge_mvc_rbac`. La dépendance va dans un seul sens : `forge-mvc-rbac` → `core`. `core/auth/audit.py` peut nommer des événements d'audit RBAC génériques : ce vocabulaire est assumé dans le core (ADR-011), il ne représente pas une dépendance fonctionnelle vers le module opt-in.
 
 ---
 
@@ -181,7 +181,7 @@ user_id -> user_roles -> roles -> role_permissions -> permissions
 API cote Auth/User :
 
 > ℹ️ Les fonctions ci-dessous sont fournies par le module optionnel
-> `forge-mvc-rbac` (opt-in officiel publié sur PyPI depuis `1.0.0-beta.9` — voir
+> `forge-mvc-rbac` (opt-in officiel publié sur PyPI depuis `1.0.0-beta.9` ; voir
 > contrat d'installation).
 
 ```python
@@ -250,8 +250,8 @@ ok    = has_permission(request, "posts.edit")  # → bool
 
 Ordre de résolution :
 
-1. `request.permissions` — injection directe (pratique pour les tests)
-2. `session["user"]["permissions"]` — depuis la session authentifiée
+1. `request.permissions` : injection directe (pratique pour les tests)
+2. `session["user"]["permissions"]` : depuis la session authentifiée
 3. Ensemble vide si aucune source disponible
 
 Ces deux sources sont **contrôlées côté serveur**. Forge ne lit jamais les
@@ -260,7 +260,7 @@ cookies bruts. Voir [Chaîne de confiance](#chaine-de-confiance).
 
 ---
 
-## `@require_permission` — décorateur serveur
+## `@require_permission` : décorateur serveur
 
 ### Usage
 
@@ -285,7 +285,7 @@ class PostController:
 
 ### Comportement
 
-- **Valide le code à la décoration** — `require_permission("postsedit")` lève
+- **Valide le code à la décoration** : `require_permission("postsedit")` lève
   `RbacValidationError` immédiatement, sans attendre une requête.
 - **Normalise** le code (`"Posts.Edit"` → `"posts.edit"`) avant la vérification.
 - **Retourne 403** si la permission est absente ; laisse passer si elle est présente.
@@ -328,7 +328,7 @@ Forge fournit aussi une strategie serveur explicite pour les projets qui
 utilisent Auth/User et la table optionnelle `user_roles` :
 
 > ℹ️ Cette section utilise des symboles fournis par le module
-> optionnel `forge-mvc-rbac` (opt-in officiel publié sur PyPI depuis `1.0.0-beta.9` — voir
+> optionnel `forge-mvc-rbac` (opt-in officiel publié sur PyPI depuis `1.0.0-beta.9` ; voir
 > contrat d'installation).
 
 ```python
@@ -377,7 +377,7 @@ La definition des roles et permissions reste dans les tables RBAC historiques
 
 ---
 
-## `can(...)` — helper d'affichage Jinja
+## `can(...)` : helper d'affichage Jinja
 
 ### Usage dans les templates
 
@@ -406,7 +406,7 @@ permissions deja presentes dans la requete ou la session.
 `can(...)` reste un helper d'affichage. Il peut masquer un bouton ou un lien,
 mais ne protege jamais une route a lui seul.
 
-### `make_can` — injection manuelle
+### `make_can` : injection manuelle
 
 ```python
 from forge_mvc_rbac import make_can
@@ -439,7 +439,7 @@ def test_menu_admin_visible():
 | Retour | 403 si permission absente | `True` / `False` |
 | Obligatoire pour la sécurité | **Oui** | Non |
 
-> **Avertissement** — Masquer un bouton dans le HTML n'est pas une sécurité
+> **Avertissement** : masquer un bouton dans le HTML n'est pas une sécurité
 > suffisante. La route appelée doit aussi être protégée côté serveur avec
 > `@require_permission(...)` ou `require_user_permission(...)`. Un utilisateur
 > peut appeler la route directement sans passer par le bouton.
@@ -570,18 +570,18 @@ inchangé, compatibilité arrière).
 
 Forge lit les permissions depuis deux sources, dans cet ordre :
 
-1. **`request.permissions`** — injection directe par l'application après authentification
-2. **`session["user"]["permissions"]`** — champ de la session serveur
+1. **`request.permissions`** : injection directe par l'application après authentification
+2. **`session["user"]["permissions"]`** : champ de la session serveur
 
 ### Sources refusées
 
 | Source client | Statut |
 |---|---|
-| Paramètres GET (`?permissions=...`) | **Refusé** — jamais lu |
-| Corps POST / formulaire | **Refusé** — jamais lu |
-| Body JSON (`{"permissions": [...]}`) | **Refusé** — jamais lu |
-| Headers HTTP (`X-Permissions: ...`) | **Refusé** — jamais lu |
-| Cookies bruts (hors `session_id`) | **Refusé** — jamais lu |
+| Paramètres GET (`?permissions=...`) | **Refusé**, jamais lu |
+| Corps POST / formulaire | **Refusé**, jamais lu |
+| Body JSON (`{"permissions": [...]}`) | **Refusé**, jamais lu |
+| Headers HTTP (`X-Permissions: ...`) | **Refusé**, jamais lu |
+| Cookies bruts (hors `session_id`) | **Refusé**, jamais lu |
 
 ### Injecter les permissions correctement
 
@@ -709,25 +709,25 @@ def test_edit_sans_permission():
 | `can(...)` toujours `False` | Template rendu sans `request=request` | Passer `request=request` à `BaseController.render(...)` |
 | `can(...)` toujours `False` | Permissions absentes de la session historique | Ajouter la clé `"permissions"` lors de `authentifier_session` |
 | `can(...)` toujours `False` | Utilisateur Auth/User sans rôle ou tables RBAC absentes | Initialiser les SQL optionnels et associer l'utilisateur via `user_roles` |
-| Code normalisé dans le JSON | `"Contacts.View"` au lieu de `"contacts.view"` | Aucun problème — la normalisation est automatique |
+| Code normalisé dans le JSON | `"Contacts.View"` au lieu de `"contacts.view"` | Aucun problème : la normalisation est automatique |
 | `EntityDefinitionError` à la génération | Action inconnue dans `rbac.permissions` (`"publish"`) | Utiliser uniquement : `index`, `show`, `create`, `store`, `edit`, `update`, `delete` |
 
 ---
 
 ## Limites restantes
 
-- **Jinja n'est pas une protection serveur** — `can(...)` masque ou affiche des
+- **Jinja n'est pas une protection serveur** : `can(...)` masque ou affiche des
   elements d'interface, mais une route sensible doit toujours etre protegee cote
   backend avec `@require_permission(...)` ou une verification equivalente.
-- **Pas de `deny by default` automatique** — une route sans `@require_permission`
+- **Pas de `deny by default` automatique** : une route sans `@require_permission`
   est accessible. La politique de refus par défaut dépend du groupe de routes
   (`router.group(...)`).
-- **Pas d'ORM** — les tables SQL sont lisibles et exécutables directement. Les
+- **Pas d'ORM** : les tables SQL sont lisibles et exécutables directement. Les
   `JOIN` `user ↔ role ↔ permission` restent explicites dans le resolver
   Auth/User -> RBAC.
-- **Deux strategies coexistent** — le RBAC historique et Auth/User + RBAC sont
+- **Deux strategies coexistent** : le RBAC historique et Auth/User + RBAC sont
   separes. Aucun decorateur ne bascule implicitement vers l'autre mode.
-- **Pas de cache distribué** — les permissions peuvent etre resolues depuis les
+- **Pas de cache distribué** : les permissions peuvent etre resolues depuis les
   tables optionnelles RBAC a chaque rendu concerne.
-- **Pas de hiérarchie de rôles** — un rôle `admin` n'hérite pas automatiquement
+- **Pas de hiérarchie de rôles** : un rôle `admin` n'hérite pas automatiquement
   des permissions d'un rôle `editeur`.

@@ -1,4 +1,4 @@
-# Simulateur Forge IoT — `forge iot:simulate`
+# Simulateur Forge IoT : `forge iot:simulate`
 
 > **Statut** : outil **pédagogique**. Il publie des mesures factices
 > mais **conformes au contrat MQTT Forge IoT** vers le broker configuré,
@@ -175,7 +175,7 @@ forge iot:simulate --profile temperature --count 3
 ```
 
 Le chemin du CA n'apparaît jamais dans la sortie. Détails :
-[Configuration — TLS MQTT](configuration.md#tls-mqtt).
+[Configuration : TLS MQTT](configuration.md#tls-mqtt).
 
 ## Codes de sortie
 
@@ -186,7 +186,7 @@ Le chemin du CA n'apparaît jamais dans la sortie. Détails :
 | `1` | Configuration invalide ou échec de connexion / publication. |
 
 En cas d'échec de connexion, le message reste sobre (type d'erreur, pas
-de stacktrace) — lance d'abord `forge iot:doctor --mqtt` pour
+de stacktrace) : lance d'abord `forge iot:doctor --mqtt` pour
 diagnostiquer le broker.
 
 ## Parcours recommandé
@@ -209,7 +209,7 @@ autre terminal : il écoute le broker et insère les mesures reçues dans
   **pas** l'API HTTP ;
 - pas de `retain`, pas de QoS avancé, pas de downlink ;
 - pas de capteur réel, pas de code embarqué ;
-- QoS 0 uniquement — un message peut être perdu si le broker est
+- QoS 0 uniquement : un message peut être perdu si le broker est
   saturé (acceptable pour un simulateur pédagogique).
 
 ## Tickets suivants

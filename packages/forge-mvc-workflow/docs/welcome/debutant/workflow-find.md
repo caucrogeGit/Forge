@@ -3,7 +3,7 @@
 Objectif : localiser un statut **par son nom** dans un jeu de statuts.
 
 **Ce que vous allez apprendre :** `find_status(statuses, name)` retourne le statut
-correspondant, ou `None` s'il n'existe pas — utile avant d'agir sur un objet dont on
+correspondant, ou `None` s'il n'existe pas : utile avant d'agir sur un objet dont on
 connaît le nom de statut courant.
 
 Troisième palier du **niveau débutant** de la progression workflow.

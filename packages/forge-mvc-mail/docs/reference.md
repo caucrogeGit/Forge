@@ -33,11 +33,11 @@ Cette page reste l'**overview** : principe d'architecture, mise en place et bonn
 
 Elle fournit :
 
-- **`MailMessage`** — représentation d'un message (sujet, corps texte, HTML, destinataires) ;
-- **Transports interchangeables** — `null`, `fake`, `console`, `log`, `smtp` ;
-- **`Mailer`** — point d'entrée unique pour envoyer un message via le transport configuré ;
-- **`MailTemplateRenderer`** — rendu Jinja2 de templates de mails ;
-- **`MailLogger`** — journalisation optionnelle des envois dans `mail_log`.
+- **`MailMessage`** : représentation d'un message (sujet, corps texte, HTML, destinataires) ;
+- **Transports interchangeables** : `null`, `fake`, `console`, `log`, `smtp` ;
+- **`Mailer`** : point d'entrée unique pour envoyer un message via le transport configuré ;
+- **`MailTemplateRenderer`** : rendu Jinja2 de templates de mails ;
+- **`MailLogger`** : journalisation optionnelle des envois dans `mail_log`.
 
 Les templates applicatifs (`bienvenue.txt`, `commande_confirmee.txt`, etc.) appartiennent à `mvc/mail/templates/`, pas à `core/`.
 
@@ -171,7 +171,7 @@ Les défauts ci-dessous s'appliquent quand une variable est absente.
 
 | Variable | Défaut | Rôle |
 |---|---|---|
-| `MAIL_ENABLED` | `false` | Active l'envoi réel. `false` force `NullTransport` — aucun mail ne part. |
+| `MAIL_ENABLED` | `false` | Active l'envoi réel. `false` force `NullTransport` : aucun mail ne part. |
 | `MAIL_TRANSPORT` | `log` | Transport actif quand `MAIL_ENABLED=true` : `null`, `fake`, `console`, `log`, `smtp`. |
 | `MAIL_FROM` | _(vide)_ | Adresse expéditeur complète. Prioritaire sur les deux variables suivantes. |
 | `MAIL_FROM_ADDRESS` | `noreply@localhost` | Partie adresse (utilisée si `MAIL_FROM` est vide). |
@@ -304,8 +304,8 @@ CREATE TABLE IF NOT EXISTS mail_log (
 | Statut | Signification |
 |---|---|
 | `sent` | Mail effectivement transmis au transport. |
-| `failed` | Erreur SMTP — `error_message` contient le détail. |
-| `skipped` | `MAIL_ENABLED=false` ou transport `null` — aucun mail parti, événement traçable. |
+| `failed` | Erreur SMTP : `error_message` contient le détail. |
+| `skipped` | `MAIL_ENABLED=false` ou transport `null` : aucun mail parti, événement traçable. |
 
 Le statut `skipped` est intentionnel : il permet de comprendre pourquoi aucun mail n'est parti sans avoir à chercher dans les logs serveur.
 
@@ -363,8 +363,8 @@ Ne commitez jamais de mots de passe SMTP. `env/dev` et `env/prod` sont ignorés 
 
 ## Bonnes pratiques
 
-- `MAIL_ENABLED=false` est la valeur par défaut — un oubli de configuration ne déclenche jamais d'envoi accidentel.
-- `MAIL_TRANSPORT=log` est le transport par défaut — les mails sont lisibles dans `storage/mail/` sans serveur SMTP.
-- `MAIL_LOG_ENABLED=false` est le défaut — pas de table SQL requise pour démarrer.
+- `MAIL_ENABLED=false` est la valeur par défaut : un oubli de configuration ne déclenche jamais d'envoi accidentel.
+- `MAIL_TRANSPORT=log` est le transport par défaut : les mails sont lisibles dans `storage/mail/` sans serveur SMTP.
+- `MAIL_LOG_ENABLED=false` est le défaut : pas de table SQL requise pour démarrer.
 - Le corps du mail n'est jamais stocké dans `mail_log` : seuls le sujet, le destinataire, le transport, le statut et les métadonnées métier sont enregistrés.
-- `forge_mvc_mail/` ne contient aucun template applicatif — placez vos templates dans `mvc/mail/templates/`.
+- `forge_mvc_mail/` ne contient aucun template applicatif : placez vos templates dans `mvc/mail/templates/`.

@@ -6,7 +6,7 @@ transcodage.
 **Ce que vous allez apprendre :** `ingest_video`. Le formulaire envoie un
 fichier ; la fonction le **valide** (taille, conteneur déclaré), le **stocke**
 sous un UUID (jamais le nom de fichier utilisateur) et **insère** une ligne
-`videos` au statut `uploaded` — **sans ffmpeg**. Le transcodage est un worker
+`videos` au statut `uploaded`, **sans ffmpeg**. Le transcodage est un worker
 séparé (niveau avancé) : jamais pendant une requête HTTP.
 
 Premier palier du **niveau intermédiaire** de la progression vidéo, après le
@@ -188,7 +188,7 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- `ingest_video` valide, stocke (sous UUID) et enregistre — **sans ffmpeg**.
+- `ingest_video` valide, stocke (sous UUID) et enregistre, **sans ffmpeg**.
 - L'upload est synchrone ; le transcodage lourd est un **worker séparé**.
 - Le statut démarre à `uploaded` ; il évoluera au niveau avancé.
 

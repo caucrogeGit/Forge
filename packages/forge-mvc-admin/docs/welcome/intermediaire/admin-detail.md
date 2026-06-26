@@ -1,4 +1,4 @@
-# Intermédiaire 1 — La fiche détail
+# Intermédiaire 1 : La fiche détail
 
 Objectif : consulter une ligne précise.
 

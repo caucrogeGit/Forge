@@ -6,7 +6,7 @@ décrit les fichiers à créer et le code à écrire.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir Installer Forge.
-    Pour la décision d'architecture, voir ADR-027 — Extraction i18n.
+    Pour la décision d'architecture, voir ADR-027 : Extraction i18n.
 
 ## Prérequis
 

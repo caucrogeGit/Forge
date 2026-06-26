@@ -8,7 +8,7 @@ opt-in `forge-mvc-mfa` introduites à chaque étape.
     Il exige `FORGE_MFA_SECRET_KEY` (Fernet) pour chiffrer les secrets. Ce parcours
     montre chaque brique MFA **isolée**, pour comprendre chaque API avant de la câbler.
 
-## Niveau débutant — mécaniques TOTP (sans état)
+## Niveau débutant : mécaniques TOTP (sans état)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -16,7 +16,7 @@ opt-in `forge-mvc-mfa` introduites à chaque étape.
 | 2 | [Secret TOTP et QR](debutant/mfa-secret.md) | Générer secret + URI `otpauth://` | `generate_totp_secret`, `totp_provisioning_uri` |
 | 3 | [Vérifier un code TOTP](debutant/mfa-verify.md) | Confronter code et secret | `verify_totp_code` |
 
-## Niveau intermédiaire — enrôlement & flux de connexion (session)
+## Niveau intermédiaire : enrôlement & flux de connexion (session)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -24,7 +24,7 @@ opt-in `forge-mvc-mfa` introduites à chaque étape.
 | 2 | [Challenge de connexion](intermediaire/mfa-challenge.md) | Second facteur au login | `start_mfa_challenge`, `verify_mfa_challenge` |
 | 3 | [Codes de récupération](intermediaire/mfa-recovery.md) | Codes de secours à usage unique | `create_recovery_codes`, `consume_recovery_code` |
 
-## Niveau avancé — durcissement
+## Niveau avancé : durcissement
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|

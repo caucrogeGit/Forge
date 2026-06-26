@@ -1,4 +1,4 @@
-# Bilan — niveau avancé (Audio)
+# Bilan : niveau avancé (Audio)
 
 Récapitulatif du **niveau avancé** de la progression *Bonjour Forge Audio*. Ce
 niveau ajoute le traitement (`ffprobe`/`ffmpeg`) et le diagnostic.
@@ -7,9 +7,9 @@ niveau ajoute le traitement (`ffprobe`/`ffmpeg`) et le diagnostic.
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 — [Sonder un audio](audio-probe.md) | Extraire les métadonnées via `ffprobe` (`probe_audio`). |
-| 2 — [Transcoder en MP3](audio-transcode.md) | Convertir en MP3 via `ffmpeg`, synchrone et sans état (`transcode_to_mp3`). |
-| 3 — [Diagnostiquer le module Audio](audio-doctor.md) | Exposer les contrôles non invasifs de `forge audio:doctor`. |
+| 1 : [Sonder un audio](audio-probe.md) | Extraire les métadonnées via `ffprobe` (`probe_audio`). |
+| 2 : [Transcoder en MP3](audio-transcode.md) | Convertir en MP3 via `ffmpeg`, synchrone et sans état (`transcode_to_mp3`). |
+| 3 : [Diagnostiquer le module Audio](audio-doctor.md) | Exposer les contrôles non invasifs de `forge audio:doctor`. |
 
 Vous maîtrisez la chaîne audio complète : ingestion, lecture, sondage, transcodage,
 diagnostic.

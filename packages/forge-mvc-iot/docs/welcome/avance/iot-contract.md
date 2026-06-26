@@ -9,7 +9,7 @@ le **valide** et renvoie une `Measurement`, ou lève une `ContractError` portant
 **code** d'erreur. C'est exactement la validation que le subscriber applique en
 production : ici on l'exerce à la main, sans broker.
 
-Premier palier du **niveau avancé** de la progression IoT — la bascule vers le
+Premier palier du **niveau avancé** de la progression IoT : la bascule vers le
 **temps réel**. Après le [niveau intermédiaire](../intermediaire/bilan.md).
 
 ## Ce que ce starter montre
@@ -27,8 +27,8 @@ respecter.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_iot.mqtt.contract.parse_message` | Valider topic + payload → `Measurement`. | [Forge IoT — contrat](../../storage-events.md) |
-| `ContractError` | Erreur de contrat, porte un `code` exploitable. | [Forge IoT — contrat](../../storage-events.md) |
+| `forge_mvc_iot.mqtt.contract.parse_message` | Valider topic + payload → `Measurement`. | [Forge IoT : contrat](../../storage-events.md) |
+| `ContractError` | Erreur de contrat, porte un `code` exploitable. | [Forge IoT : contrat](../../storage-events.md) |
 
 ## Tester
 
@@ -108,7 +108,7 @@ class IotContractController(BaseController):
 - `parse_message(topic, payload)` applique **tout** le contrat : forme du topic,
   JSON du payload, champs obligatoires, types, formats (timestamp ISO 8601 UTC…).
 - Une violation lève une `ContractError` avec un `code` (ex. `TOPIC_PATTERN`,
-  `PAYLOAD_PARSE`, `PAYLOAD_FIELD_MISSING`) — exploitable pour logs et tests.
+  `PAYLOAD_PARSE`, `PAYLOAD_FIELD_MISSING`), exploitable pour logs et tests.
 - En production, ce même appel rejette les messages mal formés **avant** tout
   stockage. Vous venez d'exercer la porte d'entrée du système.
 

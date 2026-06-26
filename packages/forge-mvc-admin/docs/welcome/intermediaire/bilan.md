@@ -1,4 +1,4 @@
-# Bilan — niveau intermédiaire
+# Bilan : niveau intermédiaire
 
 Vous savez maintenant :
 

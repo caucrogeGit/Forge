@@ -3,7 +3,7 @@
 Objectif : lister les statuts **atteignables** depuis un statut courant.
 
 **Ce que vous allez apprendre :** `get_available_transitions(transitions, from)` liste
-les passages partant du statut courant — idéal pour générer dynamiquement les
+les passages partant du statut courant : idéal pour générer dynamiquement les
 **boutons d'action** d'une fiche.
 
 Troisième palier du **niveau intermédiaire** de la progression workflow.

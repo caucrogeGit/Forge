@@ -1,4 +1,4 @@
-# Bilan — niveau avancé
+# Bilan : niveau avancé
 
 Vous maîtrisez la chaîne email de Forge : composition, transports, templates, configuration et diagnostic.
 

@@ -5,7 +5,7 @@ Objectif : afficher ou masquer un élément d'interface selon une permission, av
 
 **Ce que vous allez apprendre :** `make_can(request)` retourne un callable
 `can(code) -> bool` lié à la requête. Forge l'expose automatiquement dans les
-templates Jinja sous le nom `can()` — `{% if can("article.create") %}` conditionne
+templates Jinja sous le nom `can()` : `{% if can("article.create") %}` conditionne
 l'UI.
 
 Troisième palier du **niveau intermédiaire** de la progression RBAC.
@@ -110,7 +110,7 @@ with router.group("", public=True) as public:
 
 - `can()` est **auto-enregistré** par `forge-mvc-rbac` dans le contexte Jinja : pas
   besoin de le passer à chaque vue.
-- Conditionner l'UI évite d'afficher des actions impossibles — meilleure expérience
+- Conditionner l'UI évite d'afficher des actions impossibles : meilleure expérience
   **et** défense en profondeur (le guard reste indispensable côté serveur).
 - Sans utilisateur, `can(...)` est `False` : sécurisé par défaut.
 

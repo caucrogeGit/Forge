@@ -25,8 +25,8 @@ Lecture seule, aucun broker.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `request.route` | Lire `site` et `device_id` dans l'URL. | Request |
-| `IotEventRepository.find_by_device` | Événements d'un capteur (ordre du plus récent). | [Forge IoT — stockage](../../storage-events.md) |
-| `IotEventRepository.count_by_device` | Nombre d'événements d'un capteur. | [Forge IoT — stockage](../../storage-events.md) |
+| `IotEventRepository.find_by_device` | Événements d'un capteur (ordre du plus récent). | [Forge IoT : stockage](../../storage-events.md) |
+| `IotEventRepository.count_by_device` | Nombre d'événements d'un capteur. | [Forge IoT : stockage](../../storage-events.md) |
 
 ## Tester
 
@@ -87,7 +87,7 @@ class IotDeviceController(BaseController):
 - `site` et `device_id` viennent de l'**URL** (`route`) : on cible le
   capteur sans query string.
 - `find_by_device(...)` filtre les événements de ce capteur ; `count_by_device`
-  donne le total — deux lectures complémentaires du même repository.
+  donne le total : deux lectures complémentaires du même repository.
 - Comme au palier précédent, l'absence de table devient un `503` pédagogique.
 
 ## La route

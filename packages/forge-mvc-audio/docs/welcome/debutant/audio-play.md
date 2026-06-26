@@ -1,7 +1,7 @@
 # Lire un audio
 
-Objectif : brancher la route de **lecture officielle** de Forge Audio — streaming
-HTTP Range — sans écrire de code métier.
+Objectif : brancher la route de **lecture officielle** de Forge Audio (streaming
+HTTP Range) sans écrire de code métier.
 
 **Ce que vous allez apprendre :** `register_audio_routes(router)` enregistre la
 route `GET /audio/{uuid}` qui sert un fichier audio en **streaming** (support des
@@ -56,7 +56,7 @@ register_audio_routes(router)
 - On ne réimplémente **pas** la lecture : `register_audio_routes` apporte une route
   testée (Range, types MIME, anti-traversal par uuid). C'est la convention Forge
   « le module fournit, l'application branche ».
-- Si un `api_token` est configuré, la route exige un `Authorization: Bearer …` —
+- Si un `api_token` est configuré, la route exige un `Authorization: Bearer …` ;
   rien à coder côté application.
 
 ## À retenir

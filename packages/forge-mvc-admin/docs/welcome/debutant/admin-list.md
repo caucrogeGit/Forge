@@ -1,4 +1,4 @@
-# Débutant 3 — La liste paginée
+# Débutant 3 : La liste paginée
 
 Objectif : consulter les lignes de l'entité depuis le back-office.
 

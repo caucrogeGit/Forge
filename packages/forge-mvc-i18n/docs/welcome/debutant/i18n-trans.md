@@ -47,7 +47,7 @@ class I18nTransController(BaseController):
 - Une **seule** route sert les deux langues : c'est le catalogue qui varie, pas
   le code.
 - La locale vient de l'utilisateur (`?lang=`), mais elle ne désigne qu'un fichier
-  catalogue — jamais un chemin arbitraire.
+  catalogue, jamais un chemin arbitraire.
 
 ## Tester
 

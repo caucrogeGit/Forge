@@ -1,4 +1,4 @@
-# Intermédiaire 2 — Créer une ligne
+# Intermédiaire 2 : Créer une ligne
 
 Objectif : ajouter un article depuis le back-office.
 

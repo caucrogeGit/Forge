@@ -3,12 +3,12 @@
 Récapitulatif des paliers de la progression *Bonjour Forge i18n* et des API du
 module opt-in `forge-mvc-i18n` introduites à chaque étape.
 
-!!! note "Module opt-in — repli no-op"
+!!! note "Module opt-in : repli no-op"
     `forge-mvc-i18n` est **publié sur PyPI** : `pip install --pre forge-mvc-i18n`. Sans
     le module, le noyau fournit un `trans()` **no-op** (retourne la clé) : une
     application sans i18n ne casse pas (ADR-027).
 
-## Niveau débutant — traduire avec un catalogue
+## Niveau débutant : traduire avec un catalogue
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -16,7 +16,7 @@ module opt-in `forge-mvc-i18n` introduites à chaque étape.
 | 2 | [Écrire un catalogue](debutant/i18n-catalog.md) | Structurer et charger des catalogues | `load_catalog` |
 | 3 | [Traduire une clé](debutant/i18n-trans.md) | Servir FR ou EN à la demande | `trans` |
 
-## Niveau intermédiaire — locale et repli
+## Niveau intermédiaire : locale et repli
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -24,7 +24,7 @@ module opt-in `forge-mvc-i18n` introduites à chaque étape.
 | 2 | [Locale de secours](intermediaire/i18n-fallback.md) | Repli sur une langue de secours | `set_fallback_locale`, `get_fallback_locale` |
 | 3 | [Clé manquante](intermediaire/i18n-missing.md) | Clé introuvable → la clé en clair | `trans` |
 
-## Niveau avancé — templates, cache, robustesse
+## Niveau avancé : templates, cache, robustesse
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|

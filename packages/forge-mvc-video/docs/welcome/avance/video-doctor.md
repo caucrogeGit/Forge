@@ -1,12 +1,12 @@
 # Diagnostiquer le module Vidéo
 
-Objectif : vérifier que le module vidéo est **sain** — y compris la présence des
+Objectif : vérifier que le module vidéo est **sain**, y compris la présence des
 binaires de transcodage.
 
 **Ce que vous allez apprendre :** le diagnostic Forge Vidéo. La commande
 `forge video:doctor` vérifie l'ensemble (paquet, config, migration, **ffprobe**,
-**ffmpeg**, base). Ce starter expose en JSON son **sous-ensemble non invasif** —
-les contrôles qui ne touchent pas la base — directement dans l'application.
+**ffmpeg**, base). Ce starter expose en JSON son **sous-ensemble non invasif**
+(les contrôles qui ne touchent pas la base) directement dans l'application.
 
 Dernier palier du **niveau avancé** de la progression vidéo, après
 [Transcoder une vidéo](video-transcode.md).
@@ -14,10 +14,10 @@ Dernier palier du **niveau avancé** de la progression vidéo, après
 ## Ce que ce starter montre
 
 - l'appel des vérifications non invasives du diagnostic :
-    - `check_package_importable` — le paquet est installé,
-    - `check_config_loadable` — la configuration se charge,
-    - `check_migration_present` — la migration `videos` est disponible,
-    - `check_ffprobe_present` / `check_ffmpeg_present` — les **binaires de
+    - `check_package_importable` : le paquet est installé,
+    - `check_config_loadable` : la configuration se charge,
+    - `check_migration_present` : la migration `videos` est disponible,
+    - `check_ffprobe_present` / `check_ffmpeg_present` : les **binaires de
       transcodage** sont localisés ;
 - un statut global `healthy` + le détail de chaque contrôle, en JSON.
 
@@ -39,7 +39,7 @@ forge run
 
 Ouvrez `https://localhost:8000/video-doctor` : la réponse JSON donne `healthy` et
 la liste des contrôles avec leur statut. Si ffmpeg/ffprobe ne sont pas installés,
-les contrôles correspondants le signalent — utile avant de transcoder.
+les contrôles correspondants le signalent, utile avant de transcoder.
 
 Pour le diagnostic complet, en ligne de commande :
 
@@ -95,7 +95,7 @@ class VideoDoctorController(BaseController):
 
 - On n'appelle que les contrôles **sûrs** : aucun ne touche la base, et les checks
   ffprobe/ffmpeg se contentent de **localiser les binaires** (pas de transcodage).
-- Chaque contrôle renvoie un `status`, un `name` et un `detail` — on les expose
+- Chaque contrôle renvoie un `status`, un `name` et un `detail` ; on les expose
   tels quels.
 
 ## La route
@@ -116,7 +116,7 @@ with router.group("", public=True) as public:
   réutilisables en application.
 - Vérifier la **présence de ffmpeg/ffprobe** évite les surprises au transcodage.
 - Un diagnostic sépare le **sûr** (paquet, config, binaires) de l'**invasif**
-  (base) — on n'effleure la base que sur demande.
+  (base) ; on n'effleure la base que sur demande.
 
 ## Après ce starter
 

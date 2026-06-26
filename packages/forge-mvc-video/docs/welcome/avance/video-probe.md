@@ -7,7 +7,7 @@ Objectif : extraire les **métadonnées** d'une vidéo uploadée avec ffprobe.
 dimensions, codecs et conteneur. C'est l'étape qui **précède le transcodage** :
 on inspecte la source avant de la convertir.
 
-Premier palier du **niveau avancé** de la progression vidéo — la bascule vers le
+Premier palier du **niveau avancé** de la progression vidéo, la bascule vers le
 **transcodage réel**. Après le [niveau intermédiaire](../intermediaire/bilan.md).
 
 !!! note "ffprobe requis"
@@ -104,7 +104,7 @@ class VideoProbeController(BaseController):
 ### Comprendre ce code
 
 - On retrouve le **chemin** du fichier via la ligne `videos` (`original_path`,
-  relatif à `storage_root`) — jamais un chemin fourni par le client.
+  relatif à `storage_root`), jamais un chemin fourni par le client.
 - `probe_video(path, config=cfg)` exécute ffprobe en **lecture seule** : il
   n'altère pas le fichier. Une `VideoProbeError` (source illisible, pas une vidéo)
   devient un `502` clair.

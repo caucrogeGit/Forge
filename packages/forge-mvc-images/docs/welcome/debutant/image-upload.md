@@ -1,7 +1,7 @@
 # Téléverser une image
 
 Objectif : recevoir une image, **vérifier que c'en est vraiment une**, l'écrire
-sur le disque et générer ses variantes — le tout avec `save_image_upload`.
+sur le disque et générer ses variantes, le tout avec `save_image_upload`.
 
 **Ce que vous allez apprendre :** un upload d'image n'est pas un upload de
 fichier comme un autre. `forge_mvc_images.save_image_upload` vérifie le
@@ -99,7 +99,7 @@ class ImageUploadController(BaseController):
 - On ne fait **jamais** confiance à l'extension ou au `Content-Type` envoyés :
   c'est le contenu binaire réel qui décide.
 - Toutes les erreurs (extension, MIME, taille, contenu non-image) héritent de
-  `UploadError` — un seul `except` suffit à les présenter proprement.
+  `UploadError` : un seul `except` suffit à les présenter proprement.
 - `saved.variants` est un dictionnaire `{"medium": ..., "thumbnail": ...}` des
   chemins générés.
 
@@ -158,7 +158,7 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- Un upload d'image **vérifie le contenu avant d'écrire** — défense contre les
+- Un upload d'image **vérifie le contenu avant d'écrire** : défense contre les
   fichiers déguisés et les images-bombes.
 - Les variantes (`medium`, `thumbnail`) sont générées **automatiquement**.
 - L'upload brut est dans `forge-mvc-files` ; l'upload image-aware est dans

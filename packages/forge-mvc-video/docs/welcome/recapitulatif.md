@@ -7,7 +7,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
     Toute cette progression suppose `forge-mvc-video` installé
     (`forge opt-in:install video`). Le cœur de Forge reste autonome.
 
-## Niveau débutant — découvrir (lecture, sans ffmpeg)
+## Niveau débutant : découvrir (lecture, sans ffmpeg)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -15,7 +15,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 | 2 | [Lister les vidéos](debutant/video-list.md) | Lire les dernières vidéos, rester pédagogique si la table manque | `VideoRepository.list_recent` |
 | 3 | [Le détail d'une vidéo](debutant/video-detail.md) | Cibler une vidéo par UUID (trouvée / `404` / `503`) | `get_by_uuid` |
 
-## Niveau intermédiaire — alimenter & exposer (sans transcodage)
+## Niveau intermédiaire : alimenter & exposer (sans transcodage)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -23,7 +23,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 | 2 | [Lire une vidéo](intermediaire/video-playback.md) | Servir une vidéo en streaming Range | `register_video_routes` |
 | 3 | [Suivre l'état d'une vidéo](intermediaire/video-status.md) | Observer le cycle de vie par statut | `list_by_status` |
 
-## Niveau avancé — transcodage réel (ffmpeg requis)
+## Niveau avancé : transcodage réel (ffmpeg requis)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|

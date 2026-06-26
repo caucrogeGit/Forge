@@ -1,6 +1,6 @@
 # Contrat MQTT Forge IoT
 
-> **Statut** : contrat **en vigueur** — le subscriber `forge-mvc-iot` est
+> **Statut** : contrat **en vigueur** : le subscriber `forge-mvc-iot` est
 > livré et applique ce format. Cette page fige le format des topics et du
 > payload JSON acceptés (voir
 > [Subscriber MQTT](mqtt-subscriber.md) et
@@ -86,7 +86,7 @@ Pour l'itération 1, le contrat est sans ambiguïté :
 Conséquences :
 
 - un payload qui contient quand même un champ `device_id` ou `site` ne
-  fait pas échouer le message, mais sa valeur **est ignorée** — la
+  fait pas échouer le message, mais sa valeur **est ignorée** : la
   vérité est dans le topic ;
 - si un capteur veut envoyer plusieurs mesures de natures différentes,
   il publie plusieurs messages, pas un payload composite.
@@ -230,10 +230,10 @@ Raison : non parsable.
 }
 ```
 
-Raison : `kind` doit être un slug `[a-z0-9_-]+` — `"Température"`
+Raison : `kind` doit être un slug `[a-z0-9_-]+` ; `"Température"`
 contient des majuscules et des accents.
 
-## Erreurs de contrat — taxonomie
+## Erreurs de contrat : taxonomie
 
 À l'usage du futur subscriber et de ses tests, les violations sont
 classées comme suit :
@@ -248,7 +248,7 @@ classées comme suit :
 
 Les codes ci-dessus sont des **identifiants stables** : ils figureront
 tels quels dans les logs et dans les tests du subscriber. Ils ne sont
-pas exposés publiquement par une API Python à ce stade — c'est un
+pas exposés publiquement par une API Python à ce stade : c'est un
 contrat documentaire.
 
 ## Limites de l'itération 1
@@ -256,16 +256,16 @@ contrat documentaire.
 Sont explicitement **hors périmètre** de cette première version du
 contrat :
 
-- pas de batch — un message MQTT = une seule mesure ;
+- pas de batch : un message MQTT = une seule mesure ;
 - pas de mesures composites (par exemple `{"temperature": …, "humidity":
   …}` dans le même payload) ;
 - pas de topics commandes (downlink Forge → capteur) ;
 - pas de topics de configuration (`forge/{site}/{device_id}/config`) ;
 - pas de topics d'événement (`forge/{site}/{device_id}/event`) ;
-- pas de politique QoS imposée — Forge IoT acceptera ce que le broker
+- pas de politique QoS imposée : Forge IoT acceptera ce que le broker
   délivre ;
 - pas de politique `retain` imposée ;
-- pas de schéma versionné dans le payload (`schema_version`) — l'évolution
+- pas de schéma versionné dans le payload (`schema_version`), l'évolution
   passera par un nouveau ticket de contrat.
 
 Toute extension de ce contrat passera par un ticket
@@ -277,11 +277,11 @@ rupture explicite documentée.
 
 Ce contrat débloque :
 
-- `IOT-MQTT-SUBSCRIBER-001` — implémentation du subscriber `paho-mqtt`
+- `IOT-MQTT-SUBSCRIBER-001` : implémentation du subscriber `paho-mqtt`
   qui consomme exactement ces topics et payloads ;
-- `IOT-CONFIG-001` — variables d'environnement broker (host, port, TLS,
+- `IOT-CONFIG-001` : variables d'environnement broker (host, port, TLS,
   login) ;
-- `IOT-STORAGE-EVENTS-001` — table SQL des événements IoT, dont les
+- `IOT-STORAGE-EVENTS-001` : table SQL des événements IoT, dont les
   colonnes seront alignées sur les champs du contrat.
 
 Voir [Architecture Forge IoT](architecture.md#tickets-suivants) pour

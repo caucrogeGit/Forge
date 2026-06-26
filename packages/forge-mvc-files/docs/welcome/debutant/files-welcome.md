@@ -4,7 +4,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-files`, le
 pipeline d'upload générique de Forge.
 
 **Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa
-politique** — racine de stockage (`upload_root`), extensions, types MIME et taille
+politique** : racine de stockage (`upload_root`), extensions, types MIME et taille
 max autorisés. Aucune base de données : `forge-mvc-files` est sans état.
 
 Premier palier du **niveau débutant** de la progression files
@@ -89,7 +89,7 @@ with router.group("", public=True) as public:
 
 - La politique d'upload (extensions, MIME, taille) vit dans la **config Forge**
   (`core.forge.get`) : elle est explicite et modifiable, pas codée en dur.
-- `upload_root()` donne la racine sous laquelle tout fichier est stocké — tout le
+- `upload_root()` donne la racine sous laquelle tout fichier est stocké : tout le
   reste du parcours s'y rapporte.
 
 ## À retenir

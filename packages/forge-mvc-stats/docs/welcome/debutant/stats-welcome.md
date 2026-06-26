@@ -69,7 +69,7 @@ class StatsWelcomeController(BaseController):
 ### Comprendre ce code
 
 - Un événement est **générique** : un nom, un libellé, une catégorie, et des
-  métadonnées libres (un dict) — pas de table par type d'événement.
+  métadonnées libres (un dict), pas de table par type d'événement.
 - Le stockage est explicite (`STATS_EVENTS_TABLE`, colonnes) : Forge Stats est à
   **SQL visible**, sans ORM.
 - `make_event` valide à la construction (le nom doit être valide).

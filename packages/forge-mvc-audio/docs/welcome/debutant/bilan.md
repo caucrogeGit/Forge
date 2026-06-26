@@ -1,16 +1,16 @@
-# Bilan — niveau débutant (Audio)
+# Bilan : niveau débutant (Audio)
 
 Récapitulatif du **niveau débutant** de la progression *Bonjour Forge Audio*. Ce
-niveau couvre le cycle de base : **découvrir**, **téléverser**, **lire** — sans
+niveau couvre le cycle de base : **découvrir**, **téléverser**, **lire**, sans
 `ffmpeg`.
 
 ## Ce que vous avez validé
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 — [Bonjour Forge Audio](audio-welcome.md) | Inspecter la configuration audio (`load_audio_config`), token masqué. |
-| 2 — [Téléverser un audio](audio-upload.md) | Valider et stocker un audio en uuid-based (`ingest_audio`). |
-| 3 — [Lire un audio](audio-play.md) | Brancher la lecture streaming officielle (`register_audio_routes`). |
+| 1 : [Bonjour Forge Audio](audio-welcome.md) | Inspecter la configuration audio (`load_audio_config`), token masqué. |
+| 2 : [Téléverser un audio](audio-upload.md) | Valider et stocker un audio en uuid-based (`ingest_audio`). |
+| 3 : [Lire un audio](audio-play.md) | Brancher la lecture streaming officielle (`register_audio_routes`). |
 
 Vous savez ingérer et servir un fichier audio, sans dépendre de `ffmpeg`.
 

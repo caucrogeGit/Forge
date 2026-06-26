@@ -1,4 +1,4 @@
-# Avancé 2 — Surcharger un template
+# Avancé 2 : Surcharger un template
 
 Objectif : adapter l'apparence du back-office à votre projet.
 

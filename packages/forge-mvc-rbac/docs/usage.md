@@ -1,4 +1,4 @@
-# RBAC opt-in — Guide d'usage applicatif
+# RBAC opt-in : guide d'usage applicatif
 
 Le RBAC Forge est **opt-in** : le package `forge-mvc-rbac` doit être installé
 et ses helpers appliqués explicitement par le développeur. Aucune route n'est
@@ -15,7 +15,7 @@ Le package `forge-mvc-rbac` doit être installé dans l'environnement Python :
 pip install forge-mvc-rbac
 ```
 
-## Étape 1 — Déclarer le contrat RBAC
+## Étape 1 : déclarer le contrat RBAC
 
 Créez `mvc/security/rbac.json` à la racine de votre projet. Ce fichier est
 **optionnel** : s'il est absent, Forge fonctionne sans RBAC contractuel.
@@ -67,7 +67,7 @@ Ajoutez la clé `$schema` pour l'autocomplétion dans VS Code :
 }
 ```
 
-## Étape 2 — Valider la structure
+## Étape 2 : valider la structure
 
 `rbac:validate` vérifie que `mvc/security/rbac.json` respecte le schéma JSON
 Forge. C'est une vérification **structurelle** (forme du fichier).
@@ -82,7 +82,7 @@ python forge.py rbac:validate --json
 | 0 | Fichier absent (RBAC optionnel) ou fichier valide |
 | 1 | Fichier présent mais invalide |
 
-## Étape 3 — Auditer la cohérence
+## Étape 3 : auditer la cohérence
 
 `rbac:audit` vérifie la cohérence **fonctionnelle** du contrat : rôles sans
 permissions, entités sans actions CRUD, permissions inutilisées, etc.
@@ -105,7 +105,7 @@ Codes d'avertissement :
 | `entity_permission_unused` | Permission déclarée dans une entité mais assignée à aucun rôle |
 
 Les avertissements sont **informatifs** : ils n'entraînent pas un code de retour 1.
-`rbac:audit` est **lecture seule** — il ne modifie aucun fichier.
+`rbac:audit` est **lecture seule** : il ne modifie aucun fichier.
 
 Différence `rbac:validate` / `rbac:audit` :
 
@@ -114,7 +114,7 @@ Différence `rbac:validate` / `rbac:audit` :
 | `rbac:validate` | Structure JSON (conformité au schéma) |
 | `rbac:audit` | Cohérence fonctionnelle (rôles, entités, permissions) |
 
-## Étape 4 — Charger le contrat depuis Python
+## Étape 4 : charger le contrat depuis Python
 
 ```python
 from forge_mvc_rbac import load_rbac_contract
@@ -131,10 +131,10 @@ else:
     print("Pas de contrat RBAC — RBAC est opt-in.")
 ```
 
-Le chargement est **lecture seule** — aucun fichier n'est créé ni modifié.
+Le chargement est **lecture seule** : aucun fichier n'est créé ni modifié.
 Il ne branche pas automatiquement les routes.
 
-## Étape 5 — Vérifier une permission
+## Étape 5 : vérifier une permission
 
 ```python
 from forge_mvc_rbac import load_rbac_contract, has_contract_permission, get_contract_permissions
@@ -154,7 +154,7 @@ perms = get_contract_permissions(contract, ["reader"])
 | `has_contract_permission` | `True` | `False` |
 | `get_contract_permissions` | `set[str]` des permissions | `set()` vide |
 
-## Étape 6 — Protéger une action (helper direct)
+## Étape 6 : protéger une action (helper direct)
 
 ```python
 from forge_mvc_rbac import require_contract_permission_for_request
@@ -177,7 +177,7 @@ Le helper :
 - extrait les rôles depuis `request.roles` ou la session ;
 - retourne `None` si la permission est accordée, `Response(403)` sinon.
 
-## Étape 7 — Protéger une fonction (décorateur)
+## Étape 7 : protéger une fonction (décorateur)
 
 ```python
 from forge_mvc_rbac import contract_permission_required
@@ -188,7 +188,7 @@ def delete(request, article_id):
     # suppression réelle ici
 ```
 
-Le décorateur est équivalent au helper direct — il applique
+Le décorateur est équivalent au helper direct : il applique
 `require_contract_permission_for_request` avant d'appeler la fonction.
 
 | Helper | Retour si accordé | Retour si refusé |
@@ -201,8 +201,8 @@ Le décorateur est équivalent au helper direct — il applique
 Les helpers `require_contract_permission_for_request` et
 `contract_permission_required` extraient les rôles dans cet ordre :
 
-1. `request.roles` — liste injectée directement (tests, middleware applicatif)
-2. Session utilisateur — champ `"roles"` dans la session Forge
+1. `request.roles` : liste injectée directement (tests, middleware applicatif)
+2. Session utilisateur : champ `"roles"` dans la session Forge
 
 Si aucun rôle n'est trouvé (attribut absent, session vide ou invalide),
 l'accès est refusé avec `Response(403)`.
@@ -224,11 +224,11 @@ from forge_mvc_rbac import (
 ## Limites actuelles
 
 - Le RBAC est **opt-in** : le développeur doit appliquer les helpers explicitement.
-- `make:crud` ne génère pas de guards RBAC — les contrôleurs générés sont neutres.
+- `make:crud` ne génère pas de guards RBAC : les contrôleurs générés sont neutres.
 - Les routes ne sont **pas protégées automatiquement** par Forge Core.
-- `rbac:audit` ne corrige rien automatiquement — il signale des avertissements informatifs.
+- `rbac:audit` ne corrige rien automatiquement : il signale des avertissements informatifs.
 - Le contrat est **rechargé à chaque appel** dans l'état actuel. Si les
   performances sont critiques, charger le contrat une fois et réutiliser le
   résultat avec `require_contract_permission`.
-- `entity.schema.json` ne contient pas de propriété RBAC — la configuration RBAC
+- `entity.schema.json` ne contient pas de propriété RBAC : la configuration RBAC
   vit exclusivement dans `mvc/security/rbac.json`.

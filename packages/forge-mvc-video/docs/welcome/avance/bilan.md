@@ -1,4 +1,4 @@
-# Bilan — niveau avancé (Vidéo)
+# Bilan : niveau avancé (Vidéo)
 
 Récapitulatif des compétences acquises au **niveau avancé** de la progression
 *Bonjour Forge Vidéo*. Ce niveau **bascule vers le réel** : sonde ffprobe,
@@ -8,9 +8,9 @@ transcodage ffmpeg, et diagnostic du module.
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 — [Sonder une vidéo](video-probe.md) | Extraire les métadonnées d'un fichier via `probe_video` (ffprobe, lecture seule). |
-| 2 — [Transcoder une vidéo](video-transcode.md) | Lancer le worker `forge video:process` (`process_video`, ffmpeg) : `uploaded → ready`. |
-| 3 — [Diagnostiquer le module Vidéo](video-doctor.md) | Vérifier la santé du module, dont la présence de ffprobe/ffmpeg (`forge video:doctor`). |
+| 1 : [Sonder une vidéo](video-probe.md) | Extraire les métadonnées d'un fichier via `probe_video` (ffprobe, lecture seule). |
+| 2 : [Transcoder une vidéo](video-transcode.md) | Lancer le worker `forge video:process` (`process_video`, ffmpeg) : `uploaded → ready`. |
+| 3 : [Diagnostiquer le module Vidéo](video-doctor.md) | Vérifier la santé du module, dont la présence de ffprobe/ffmpeg (`forge video:doctor`). |
 
 Vous savez maintenant inspecter une source, la transcoder en MP4 via le worker et
 diagnostiquer le module en exploitation.

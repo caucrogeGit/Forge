@@ -7,7 +7,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
     Toute cette progression suppose `forge-mvc-iot` installé
     (`forge opt-in:install iot`). Le cœur de Forge reste autonome.
 
-## Niveau débutant — découvrir (lecture, sans broker)
+## Niveau débutant : découvrir (lecture, sans broker)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -15,7 +15,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 | 2 | [Lire les événements IoT](debutant/iot-events.md) | Lire les derniers événements, rester pédagogique si la table manque | `IotEventRepository.list_recent` |
 | 3 | [Les événements d'un capteur](debutant/iot-device.md) | Cibler un capteur et compter ses événements | `find_by_device`, `count_by_device` |
 
-## Niveau intermédiaire — alimenter & exposer (simulation locale)
+## Niveau intermédiaire : alimenter & exposer (simulation locale)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -23,7 +23,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 | 2 | [Exposer l'API IoT](intermediaire/iot-api.md) | Brancher l'API HTTP JSON officielle (lecture seule, Bearer optionnel) | `register_iot_routes` |
 | 3 | [Tableau de bord IoT](intermediaire/iot-dashboard.md) | Afficher les événements dans une page HTML | `list_recent` + `render` |
 
-## Niveau avancé — temps réel & exploitation (vrai broker)
+## Niveau avancé : temps réel & exploitation (vrai broker)
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|

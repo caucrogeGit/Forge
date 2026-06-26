@@ -55,7 +55,7 @@ réalistes.
 Les **profils** du simulateur (`--profile temperature|humidity|presence|energy`)
 permettent de construire des exercices sans capteur réel : chaque profil
 fournit un `kind`, une `value` et une `unit` cohérents. Voir
-[Simulateur — profils de simulation](simulator.md#profils-de-simulation).
+[Simulateur : profils de simulation](simulator.md#profils-de-simulation).
 
 ```bash
 forge iot:simulate --profile humidity --count 5
@@ -64,7 +64,7 @@ forge iot:simulate --profile humidity --count 5
 ## Rôle de MQTT
 
 MQTT est le **protocole de transport**. Une mesure est publiée sur un
-**topic** — une adresse hiérarchique. Le contrat Forge IoT impose :
+**topic**, une adresse hiérarchique. Le contrat Forge IoT impose :
 
 ```text
 forge/{site}/{device_id}/telemetry
@@ -80,7 +80,7 @@ forge/atelier/esp32-001/telemetry
 
 Mosquitto est le **broker** : il reçoit les messages publiés et les
 redistribue à tous les abonnés du topic. Il ne stocke pas les mesures à
-long terme — il les fait circuler. Installation et démarrage :
+long terme ; il les fait circuler. Installation et démarrage :
 [Mosquitto local](mosquitto-local.md).
 
 ## Rôle de Forge IoT
@@ -107,7 +107,7 @@ La base est la **mémoire** du système.
 
 L'API HTTP `GET /api/iot/events` permet d'**exploiter** les mesures
 stockées (les afficher, les analyser, les visualiser). C'est le point
-d'entrée d'une future interface — sans dépendre du broker directement.
+d'entrée d'une future interface, sans dépendre du broker directement.
 En classe, l'API reste **ouverte** ; pour un projet exposé sur le
 réseau, on peut la protéger par un
 [token Bearer](http-api.md#protection-par-bearer-token)
@@ -155,7 +155,7 @@ Le scénario complet encadré : [smoke test local](local-smoke-test.md).
 
 ## Activités possibles en classe
 
-### Activité 1 — Comprendre le topic MQTT
+### Activité 1 : Comprendre le topic MQTT
 
 À partir du topic `forge/atelier/esp32-001/telemetry`, répondre :
 
@@ -163,7 +163,7 @@ Le scénario complet encadré : [smoke test local](local-smoke-test.md).
 - quel est l'**identifiant du capteur** (`device_id`) ?
 - quel est le **type de message** (dernier niveau) ?
 
-### Activité 2 — Valider un payload JSON
+### Activité 2 : Valider un payload JSON
 
 Parmi ces payloads, lesquels sont **valides** (champs obligatoires
 `kind`, `value`, `unit`, `timestamp` ; `timestamp` en UTC suffixe `Z`) ?
@@ -175,7 +175,7 @@ Parmi ces payloads, lesquels sont **valides** (champs obligatoires
 {"kind":"temperature","value":22.4,"unit":"°C","timestamp":"2026-05-29 10:00:00"}
 ```
 
-### Activité 3 — Simuler une mesure
+### Activité 3 : Simuler une mesure
 
 ```bash
 forge iot:doctor --mqtt
@@ -185,7 +185,7 @@ forge iot:simulate --count 3 --interval 1
 
 Observer les lignes `[OK]` côté `forge iot:listen`.
 
-### Activité 4 — Lire les données via l'API
+### Activité 4 : Lire les données via l'API
 
 ```bash
 curl http://localhost:8000/api/iot/events
@@ -194,7 +194,7 @@ curl http://localhost:8000/api/iot/events
 Faire identifier dans la réponse : `site`, `device_id`, `kind`, `value`,
 `unit`, `timestamp`, `received_at`.
 
-### Activité 5 — Diagnostiquer une panne
+### Activité 5 : Diagnostiquer une panne
 
 Associer chaque panne à la commande utile :
 
@@ -222,10 +222,10 @@ Cette page pose le cadre pédagogique général. Sont **hors périmètre** :
 
 - en classe, on part du simulateur `forge iot:simulate` ; pour un
   capteur réel, voir l'[exemple ESP32](esp32-example.md) ;
-- l'**Arduino R4** n'est pas couvert ici (hors périmètre) — l'exemple cible l'ESP32 ;
+- l'**Arduino R4** n'est pas couvert ici (hors périmètre) : l'exemple cible l'ESP32 ;
 - pas de fiche élève PDF, pas de grille d'évaluation, pas de séquence
-  pédagogique complète — pourront venir plus tard ;
-- pas de cockpit de visualisation (Forge Design) — à venir ;
+  pédagogique complète, pourront venir plus tard ;
+- pas de cockpit de visualisation (Forge Design), à venir ;
 - pas de TLS ni d'authentification MQTT.
 
 Les fiches élèves détaillées feront l'objet de tickets ultérieurs.

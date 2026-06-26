@@ -7,7 +7,7 @@ une autre : deux colonnes de clés (`article_id`, `tag_id`) **plus** les colonne
 d'attributs (`position`, `epingle`). La paire `(article_id, tag_id)` identifie
 l'association ; les attributs décrivent la relation.
 
-!!! note "Module opt-in — SQL visible"
+!!! note "Module opt-in : SQL visible"
     Le module n'invente aucun schéma caché : c'est votre `CREATE TABLE` qui fait foi.
 
 ## Le DDL de la table pivot
@@ -28,14 +28,14 @@ CREATE TABLE IF NOT EXISTS article_tag (
 
 - La **clé primaire composite** `(article_id, tag_id)` garantit qu'une paire
   n'apparaît qu'une fois : un tag n'est attaché qu'une seule fois à un article.
-- `position` et `epingle` sont les **attributs de la relation** — ce qui fait du
+- `position` et `epingle` sont les **attributs de la relation**, ce qui fait du
   pivot un pivot *enrichi*.
 - Les `FOREIGN KEY` ancrent l'intégrité référentielle côté base.
 
 !!! tip "Unicité de la paire"
     La clé primaire composite est la **vraie** garantie d'unicité. Le service
     propose en complément un contrôle applicatif (`unique_pair`), vu au niveau
-    avancé — mais la contrainte SQL reste la défense de fond.
+    avancé, mais la contrainte SQL reste la défense de fond.
 
 ## La correspondance service ↔ table
 

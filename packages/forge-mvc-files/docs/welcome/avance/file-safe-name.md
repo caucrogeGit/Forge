@@ -4,7 +4,7 @@ Objectif : transformer un nom de fichier utilisateur **arbitraire** en un nom
 **sûr**, avec la primitive `secure_filename`.
 
 **Ce que vous allez apprendre :** on entre dans les **primitives** de
-`forge-mvc-files` — la boîte à outils que les opt-ins média composent (ADR-020).
+`forge-mvc-files`, la boîte à outils que les opt-ins média composent (ADR-020).
 `secure_filename` retire toute composante de répertoire et neutralise les caractères
 dangereux : ce qui reste ne peut désigner qu'un fichier.
 
@@ -121,7 +121,7 @@ with router.group("", public=True) as public:
   caractères de contrôle. `secure_filename` le réduit à un nom de fichier inerte.
 - Un nom qui devient **vide** après nettoyage est refusé (`UploadError`) plutôt que
   de produire un fichier sans nom.
-- C'est une brique que `save_upload` utilise en interne — ici on la voit isolée.
+- C'est une brique que `save_upload` utilise en interne ; ici on la voit isolée.
 
 ## À retenir
 

@@ -24,8 +24,8 @@ Aucun broker, aucune écriture.
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_iot.storage.IotEventRepository` | Lire les événements stockés. | [Forge IoT — stockage](../../storage-events.md) |
-| `IotEventRepository.list_recent` | Derniers événements (ordre `received_at` décroissant). | [Forge IoT — stockage](../../storage-events.md) |
+| `forge_mvc_iot.storage.IotEventRepository` | Lire les événements stockés. | [Forge IoT : stockage](../../storage-events.md) |
+| `IotEventRepository.list_recent` | Derniers événements (ordre `received_at` décroissant). | [Forge IoT : stockage](../../storage-events.md) |
 | `Response.json` | Renvoyer les événements (ou l'erreur) en JSON. | Response |
 
 ## Tester
@@ -79,7 +79,7 @@ class IotEventsController(BaseController):
 ### Comprendre ce code
 
 - `IotEventRepository()` utilise par défaut l'accès base de Forge
-  (`core.database.db`) — aucun branchement manuel.
+  (`core.database.db`), aucun branchement manuel.
 - `list_recent(limit=20)` renvoie les 20 derniers événements sous forme de
   dictionnaires, directement sérialisables en JSON.
 - Le `try/except` **ne masque pas un bug** : il traduit l'absence de table en

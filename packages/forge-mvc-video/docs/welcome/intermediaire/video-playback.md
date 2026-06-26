@@ -6,7 +6,7 @@ Objectif : **servir** une vidéo en streaming HTTP, sans écrire de code métier
 ligne branche la route de lecture officielle `GET /videos/{uuid}`, qui sert le
 fichier en **streaming HTTP avec support des requêtes Range** (un lecteur peut se
 positionner dans la vidéo). Le code vit dans le paquet `forge-mvc-video` ; votre
-application ne fait que le **brancher** — principe « lock + delegate ».
+application ne fait que le **brancher** : principe « lock + delegate ».
 
 Palier 2 du **niveau intermédiaire** de la progression vidéo, après
 [Téléverser une vidéo](video-upload.md).
@@ -60,11 +60,11 @@ register_video_routes(router)
 
 - `register_video_routes(router)` enregistre la route officielle d'un coup. Vous
   n'écrivez **aucun** contrôleur : le code métier appartient au paquet,
-  l'application le **branche** explicitement (pas de découverte automatique —
+  l'application le **branche** explicitement (pas de découverte automatique,
   principe « refuser la magie cachée »).
 - La lecture gère le **streaming Range** : indispensable pour qu'un lecteur
   vidéo charge progressivement et se positionne sans tout télécharger.
-- La route sert le fichier référencé par la ligne `videos` — l'UUID, jamais le
+- La route sert le fichier référencé par la ligne `videos` : l'UUID, jamais le
   nom de fichier d'origine.
 
 ## La migration

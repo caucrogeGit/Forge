@@ -5,7 +5,7 @@ ensemble**, miniatures comprises.
 
 **Ce que vous allez apprendre :** `get_media_gallery` renvoie, pour chaque image
 de rôle `gallery` d'une entité, l'URL de l'original **et** celles de ses
-variantes (`medium`, `thumbnail`) — prêtes à poser dans des balises `<img>`.
+variantes (`medium`, `thumbnail`), prêtes à poser dans des balises `<img>`.
 
 Deuxième palier du **niveau intermédiaire** de la progression images.
 

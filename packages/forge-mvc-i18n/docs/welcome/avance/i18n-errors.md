@@ -9,7 +9,7 @@ hors du dossier des catalogues.
 
 Dernier palier du **niveau avancé**.
 
-!!! note "Module opt-in — sécurité"
+!!! note "Module opt-in : sécurité"
     La locale ne sert qu'à composer `<locale>.json`. Tout caractère de chemin est
     rejeté : pas de traversal possible.
 

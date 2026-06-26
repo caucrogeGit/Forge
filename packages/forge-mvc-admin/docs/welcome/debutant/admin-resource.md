@@ -1,4 +1,4 @@
-# Débutant 2 — Déclarer une ressource
+# Débutant 2 : Déclarer une ressource
 
 Objectif : rendre l'entité `Article` administrable.
 

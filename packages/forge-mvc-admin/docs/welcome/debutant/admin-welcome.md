@@ -1,4 +1,4 @@
-# Débutant 1 — Voir le tableau de bord
+# Débutant 1 : Voir le tableau de bord
 
 Objectif : ouvrir le back-office et comprendre ce qu'il affiche au départ.
 

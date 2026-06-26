@@ -3,13 +3,13 @@
 Récapitulatif des paliers de la progression *Bonjour Forge Workflow* et des API du
 module opt-in `forge-mvc-workflow` introduites à chaque étape.
 
-!!! note "Module opt-in — sans état"
+!!! note "Module opt-in : sans état"
     `forge-mvc-workflow` est **publié sur PyPI** : `pip install --pre forge-mvc-workflow`.
     Il fournit des **fonctions pures** (statuts, transitions, badges) ; l'application
     stocke le statut courant de ses objets. Les helpers Jinja **ne sont pas**
     auto-enregistrés (injection explicite).
 
-## Niveau débutant — statuts
+## Niveau débutant : statuts
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -17,7 +17,7 @@ module opt-in `forge-mvc-workflow` introduites à chaque étape.
 | 2 | [Nom de statut](debutant/workflow-status.md) | Normaliser/valider un nom | `normalize_status_name`, `validate_status_name` |
 | 3 | [Retrouver un statut](debutant/workflow-find.md) | Localiser un statut par son nom | `find_status` |
 
-## Niveau intermédiaire — transitions
+## Niveau intermédiaire : transitions
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
@@ -25,7 +25,7 @@ module opt-in `forge-mvc-workflow` introduites à chaque étape.
 | 2 | [Vérifier une transition](intermediaire/workflow-check.md) | Tester un passage | `can_transition` |
 | 3 | [Transitions disponibles](intermediaire/workflow-available.md) | Lister les actions d'un statut | `get_available_transitions` |
 
-## Niveau avancé — affichage
+## Niveau avancé : affichage
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|

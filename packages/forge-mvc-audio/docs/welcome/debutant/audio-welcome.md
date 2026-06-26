@@ -4,8 +4,8 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-audio`, une cha�
 audio **sans état**.
 
 **Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa
-configuration** (`load_audio_config`) — stockage, limites, binaires `ffprobe`/`ffmpeg`
-— avec le **token masqué**. Aucune base de données.
+configuration** (`load_audio_config`), à savoir stockage, limites, binaires `ffprobe`/`ffmpeg`,
+avec le **token masqué**. Aucune base de données.
 
 Premier palier du **niveau débutant** de la progression audio
 (vue d'ensemble des starters).
