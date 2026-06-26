@@ -187,6 +187,114 @@ def build_results_partial(definition: dict[str, Any]) -> str:
     ]) + "\n"
 
 
+def _render_table_headers(
+    non_pk: list[dict[str, Any]],
+    rel_by_field: dict[str, CrudManyToOneRelation],
+    many_to_many_relations: list[CrudManyToManyRelation] | None,
+    filters_loop: str,
+) -> list[str]:
+    """En-têtes de colonnes triables + colonnes many-to-many + actions
+    (REFACTOR-BUILDERS-DECOMPOSE-002). Extrait de `build_table_partial` à iso-sortie.
+    """
+    lines: list[str] = []
+    for f in non_pk:
+        fname = f["name"]
+        relation = rel_by_field.get(fname)
+        label = relation.target_entity if relation else _humanize(fname)
+        _sort_url = (
+            f"?sort={fname}"
+            f"{{% if pagination.sort == '{fname}' %}}"
+            f"&amp;direction={{{{ 'desc' if pagination.direction == 'asc' else 'asc' }}}}"
+            f"{{% else %}}&amp;direction=asc{{% endif %}}"
+            f"{{% if pagination.q %}}&amp;q={{{{ pagination.q | urlencode }}}}{{% endif %}}"
+            + filters_loop
+        )
+        lines.append(
+            f'                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">'
+            f'<a href="{_sort_url}"'
+            f' hx-get="{_sort_url}"'
+            f' hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true">'
+            f"{label}"
+            f"{{% if pagination.sort == '{fname}' %}} {{{{ '↑' if pagination.direction == 'asc' else '↓' }}}}{{% endif %}}"
+            f"</a></th>"
+        )
+    for relation in many_to_many_relations or []:
+        lines.append(
+            f'                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">{_humanize(relation.target_entity)}</th>'
+        )
+    lines.append(
+        "                <th class=\"px-4 py-3 text-right text-sm font-semibold text-gray-600\">{{ trans('crud.actions') }}</th>"
+    )
+    return lines
+
+
+def _render_table_row(
+    snake: str,
+    pk_col: str,
+    non_pk: list[dict[str, Any]],
+    rel_by_field: dict[str, CrudManyToOneRelation],
+    many_to_many_relations: list[CrudManyToManyRelation] | None,
+    edit_perm: str | None,
+    delete_perm: str | None,
+    list_query: str,
+) -> list[str]:
+    """Contenu d'une ligne de table : case de sélection, cellules et actions
+    (REFACTOR-BUILDERS-DECOMPOSE-002). Extrait de `build_table_partial` à iso-sortie.
+    """
+    lines: list[str] = []
+    # Colonne checkbox de sélection groupée (référence le formulaire bulk-delete-form via form=)
+    _checkbox_input = f'<input type="checkbox" name="ids" value="{{{{ {snake}.{pk_col} }}}}" form="bulk-delete-form" class="rounded">'
+    if delete_perm:
+        lines += [
+            f"                {{% if can('{delete_perm}') %}}",
+            f'                <td class="px-4 py-3">{_checkbox_input}</td>',
+            "                {% else %}",
+            '                <td class="px-4 py-3"></td>',
+            "                {% endif %}",
+        ]
+    else:
+        lines.append(f'                <td class="px-4 py-3">{_checkbox_input}</td>')
+    for f in non_pk:
+        fname = f["name"]
+        relation = rel_by_field.get(fname)
+        display_attr = f"{fname}_label" if relation else f["column"]
+        lines.append(
+            f'                <td class="px-4 py-3 text-gray-800">'
+            f"{{{{ {snake}.{display_attr} }}}}</td>"
+        )
+    for relation in many_to_many_relations or []:
+        lines += [
+            f"                {{% set _{relation.field_name}_labels = {relation.list_context_key}.get({snake}.{pk_col}, []) %}}",
+            f'                <td class="px-4 py-3 text-gray-800">{{{{ _{relation.field_name}_labels | join(", ") if _{relation.field_name}_labels else "—" }}}}</td>',
+        ]
+    _edit_link = [
+        f'                    <a href="/{snake}/edit/{{{{ {snake}.{pk_col} }}}}"',
+        "                       class=\"text-sm text-blue-600 hover:underline\">{{ trans('crud.edit') }}</a>",
+    ]
+    if edit_perm:
+        _edit_link = [f"                    {{% if can('{edit_perm}') %}}"] + _edit_link + ["                    {% endif %}"]
+    _delete_form = [
+        f'                    <form method="post" action="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{list_query}"',
+        f'                          hx-post="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{list_query}" hx-target="#crud-results" hx-swap="innerHTML" hx-confirm="{{{{ trans(\'crud.confirm_delete\') }}}}"',
+        '                          style="display:inline" onsubmit="return confirm(\'{{ trans("crud.confirm_delete") }}\')">',
+        '                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
+        '                        <button type="submit"',
+        "                            class=\"text-sm font-medium text-red-600 hover:text-red-800\">{{ trans('crud.delete') }}</button>",
+        "                    </form>",
+    ]
+    if delete_perm:
+        _delete_form = [f"                    {{% if can('{delete_perm}') %}}"] + _delete_form + ["                    {% endif %}"]
+    lines += [
+        '                <td class="px-4 py-3 text-right space-x-2">',
+        f'                    <a href="/{snake}/show/{{{{ {snake}.{pk_col} }}}}"',
+        "                       class=\"text-sm text-blue-600 hover:underline\">{{ trans('crud.show') }}</a>",
+        *_edit_link,
+        *_delete_form,
+        "                </td>",
+    ]
+    return lines
+
+
 def build_table_partial(
     definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
@@ -241,34 +349,7 @@ def build_table_partial(
         "            <tr>",
         '                <th class="px-4 py-3 w-10"></th>',
     ]
-    for f in non_pk:
-        fname = f["name"]
-        relation = rel_by_field.get(fname)
-        label = relation.target_entity if relation else _humanize(fname)
-        _sort_url = (
-            f"?sort={fname}"
-            f"{{% if pagination.sort == '{fname}' %}}"
-            f"&amp;direction={{{{ 'desc' if pagination.direction == 'asc' else 'asc' }}}}"
-            f"{{% else %}}&amp;direction=asc{{% endif %}}"
-            f"{{% if pagination.q %}}&amp;q={{{{ pagination.q | urlencode }}}}{{% endif %}}"
-            + _filters_loop
-        )
-        lines.append(
-            f'                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">'
-            f'<a href="{_sort_url}"'
-            f' hx-get="{_sort_url}"'
-            f' hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true">'
-            f"{label}"
-            f"{{% if pagination.sort == '{fname}' %}} {{{{ '↑' if pagination.direction == 'asc' else '↓' }}}}{{% endif %}}"
-            f"</a></th>"
-        )
-    for relation in many_to_many_relations or []:
-        lines.append(
-            f'                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">{_humanize(relation.target_entity)}</th>'
-        )
-    lines.append(
-        "                <th class=\"px-4 py-3 text-right text-sm font-semibold text-gray-600\">{{ trans('crud.actions') }}</th>"
-    )
+    lines += _render_table_headers(non_pk, rel_by_field, many_to_many_relations, _filters_loop)
     lines += [
         "            </tr>",
         "        </thead>",
@@ -276,55 +357,11 @@ def build_table_partial(
         f"            {{% for {snake} in {plural} %}}",
         "            <tr class=\"hover:bg-gray-50\">",
     ]
-    # Colonne checkbox de sélection groupée (référence le formulaire bulk-delete-form via form=)
-    _checkbox_input = f'<input type="checkbox" name="ids" value="{{{{ {snake}.{pk_col} }}}}" form="bulk-delete-form" class="rounded">'
-    if delete_perm:
-        lines += [
-            f"                {{% if can('{delete_perm}') %}}",
-            f'                <td class="px-4 py-3">{_checkbox_input}</td>',
-            "                {% else %}",
-            '                <td class="px-4 py-3"></td>',
-            "                {% endif %}",
-        ]
-    else:
-        lines.append(f'                <td class="px-4 py-3">{_checkbox_input}</td>')
-    for f in non_pk:
-        fname = f["name"]
-        relation = rel_by_field.get(fname)
-        display_attr = f"{fname}_label" if relation else f["column"]
-        lines.append(
-            f'                <td class="px-4 py-3 text-gray-800">'
-            f"{{{{ {snake}.{display_attr} }}}}</td>"
-        )
-    for relation in many_to_many_relations or []:
-        lines += [
-            f"                {{% set _{relation.field_name}_labels = {relation.list_context_key}.get({snake}.{pk_col}, []) %}}",
-            f'                <td class="px-4 py-3 text-gray-800">{{{{ _{relation.field_name}_labels | join(", ") if _{relation.field_name}_labels else "—" }}}}</td>',
-        ]
-    _edit_link = [
-        f'                    <a href="/{snake}/edit/{{{{ {snake}.{pk_col} }}}}"',
-        "                       class=\"text-sm text-blue-600 hover:underline\">{{ trans('crud.edit') }}</a>",
-    ]
-    if edit_perm:
-        _edit_link = [f"                    {{% if can('{edit_perm}') %}}"] + _edit_link + ["                    {% endif %}"]
-    _delete_form = [
-        f'                    <form method="post" action="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{_list_query}"',
-        f'                          hx-post="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{_list_query}" hx-target="#crud-results" hx-swap="innerHTML" hx-confirm="{{{{ trans(\'crud.confirm_delete\') }}}}"',
-        '                          style="display:inline" onsubmit="return confirm(\'{{ trans("crud.confirm_delete") }}\')">',
-        '                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
-        '                        <button type="submit"',
-        "                            class=\"text-sm font-medium text-red-600 hover:text-red-800\">{{ trans('crud.delete') }}</button>",
-        "                    </form>",
-    ]
-    if delete_perm:
-        _delete_form = [f"                    {{% if can('{delete_perm}') %}}"] + _delete_form + ["                    {% endif %}"]
+    lines += _render_table_row(
+        snake, pk_col, non_pk, rel_by_field, many_to_many_relations,
+        edit_perm, delete_perm, _list_query,
+    )
     lines += [
-        '                <td class="px-4 py-3 text-right space-x-2">',
-        f'                    <a href="/{snake}/show/{{{{ {snake}.{pk_col} }}}}"',
-        "                       class=\"text-sm text-blue-600 hover:underline\">{{ trans('crud.show') }}</a>",
-        *_edit_link,
-        *_delete_form,
-        "                </td>",
         "            </tr>",
         "            {% endfor %}",
         "        </tbody>",
@@ -516,38 +553,14 @@ def build_show_view(
     return "\n".join(lines) + "\n"
 
 
-def build_form_view(
-    definition: dict[str, Any],
-    relations: list[CrudManyToOneRelation] | None = None,
-    many_to_many_relations: list[CrudManyToManyRelation] | None = None,
-) -> str:
-    entity = definition["entity"]
-    snake = _to_snake(entity)
-    non_pk = _non_pk_fields(definition)
-    relations_by_field = _relation_by_field(relations)
-    media_entries = _media_form_fields(definition)
-
-    form_tag = (
-        '    <form method="post" action="{{ action }}" enctype="multipart/form-data" class="space-y-4">'
-        if media_entries else
-        '    <form method="post" action="{{ action }}" class="space-y-4">'
-    )
-
-    lines: list[str] = [
-        '{% extends "layouts/app.html" %}',
-        "{% block content %}",
-        '<div class="flex justify-between items-center mb-6">',
-        '    <h1 class="text-2xl font-bold text-gray-800">{{ titre }}</h1>',
-        f"    <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
-        "</div>",
-        "",
-        '{% include "partials/form_errors.html" %}',
-        "",
-        '<div class="bg-white shadow rounded p-6">',
-        form_tag,
-        '        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
-    ]
-
+def _render_form_fields(
+    non_pk: list[dict[str, Any]],
+    relations_by_field: dict[str, CrudManyToOneRelation],
+) -> list[str]:
+    """Champs du formulaire (select de relation, textarea, case, input)
+    (REFACTOR-BUILDERS-DECOMPOSE-002). Extrait de `build_form_view` à iso-sortie.
+    """
+    lines: list[str] = []
     for f in non_pk:
         fname = f["name"]
         label = _humanize(fname)
@@ -617,7 +630,16 @@ def build_form_view(
                 "            {% endif %}",
                 "        </div>",
             ]
+    return lines
 
+
+def _render_form_m2m(
+    many_to_many_relations: list[CrudManyToManyRelation] | None,
+) -> list[str]:
+    """Selects multiples des relations many-to-many du formulaire
+    (REFACTOR-BUILDERS-DECOMPOSE-002). Extrait de `build_form_view` à iso-sortie.
+    """
+    lines: list[str] = []
     _select_cls = 'class="mt-1 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"'
     for relation in many_to_many_relations or []:
         label = _humanize(relation.target_entity)
@@ -635,7 +657,14 @@ def build_form_view(
             "            </select>",
             "        </div>",
         ]
+    return lines
 
+
+def _render_form_media(media_entries: list[dict[str, Any]]) -> list[str]:
+    """Champs de média (upload simple/galerie, image/fichier) du formulaire
+    (REFACTOR-BUILDERS-DECOMPOSE-002). Extrait de `build_form_view` à iso-sortie.
+    """
+    lines: list[str] = []
     _file_cls = 'class="mt-1 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"'
     for entry in media_entries:
         mname = entry["name"]
@@ -713,6 +742,44 @@ def build_form_view(
             "        </div>",
         ]
         lines += input_lines
+    return lines
+
+
+def build_form_view(
+    definition: dict[str, Any],
+    relations: list[CrudManyToOneRelation] | None = None,
+    many_to_many_relations: list[CrudManyToManyRelation] | None = None,
+) -> str:
+    entity = definition["entity"]
+    snake = _to_snake(entity)
+    non_pk = _non_pk_fields(definition)
+    relations_by_field = _relation_by_field(relations)
+    media_entries = _media_form_fields(definition)
+
+    form_tag = (
+        '    <form method="post" action="{{ action }}" enctype="multipart/form-data" class="space-y-4">'
+        if media_entries else
+        '    <form method="post" action="{{ action }}" class="space-y-4">'
+    )
+
+    lines: list[str] = [
+        '{% extends "layouts/app.html" %}',
+        "{% block content %}",
+        '<div class="flex justify-between items-center mb-6">',
+        '    <h1 class="text-2xl font-bold text-gray-800">{{ titre }}</h1>',
+        f"    <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
+        "</div>",
+        "",
+        '{% include "partials/form_errors.html" %}',
+        "",
+        '<div class="bg-white shadow rounded p-6">',
+        form_tag,
+        '        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
+    ]
+
+    lines += _render_form_fields(non_pk, relations_by_field)
+    lines += _render_form_m2m(many_to_many_relations)
+    lines += _render_form_media(media_entries)
 
     lines += [
         '        <div class="flex gap-4 pt-2">',

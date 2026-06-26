@@ -24,6 +24,189 @@ from cli.entities.crud.relations_loader import (
 )
 
 
+def _render_model_query(
+    definition: dict[str, Any],
+    relations: list[CrudManyToOneRelation] | None,
+    non_pk: list[dict[str, Any]],
+    pk_name: str,
+    pk_col: str,
+    table: str,
+    plural: str,
+) -> list[str]:
+    """Recherche, tri, pagination et export du modèle (REFACTOR-BUILDERS-DECOMPOSE-002).
+
+    Extrait de `build_model` à iso-sortie.
+    """
+    search_fields = _text_search_fields(definition, relations)
+    qualifier = f"{table}." if relations else ""
+    search_cols_repr = repr([qualifier + f["column"] for f in search_fields])
+    sort_items = [(f["name"], qualifier + f["column"]) for f in non_pk]
+    sort_items.append((pk_name, qualifier + pk_col))
+    allowed_sort_repr = "{" + ", ".join(f'"{k}": "{v}"' for k, v in sort_items) + "}"
+    filter_flds_model = _filter_fields(definition, relations)
+    filter_items = [(f["name"], qualifier + f["column"]) for f in filter_flds_model]
+    allowed_filters_repr = "{" + ", ".join(f'"{k}": "{v}"' for k, v in filter_items) + "}"
+
+    lines: list[str] = [
+        "",
+        f"_SEARCH_COLS  = {search_cols_repr}",
+        f"_ALLOWED_SORT = {allowed_sort_repr}",
+        f"_ALLOWED_FILTERS = {allowed_filters_repr}",
+        f'_DEFAULT_SORT = "{qualifier}{pk_col}"',
+        "",
+        "",
+        f"def count_{plural}(q=None, filters=None):",
+        "    clauses = []",
+        "    params = []",
+        "    if q and _SEARCH_COLS:",
+        '        clauses.append("(" + " OR ".join(c + " LIKE ?" for c in _SEARCH_COLS) + ")")',
+        '        params.extend("%" + q + "%" for _ in _SEARCH_COLS)',
+        "    for key, val in (filters or {}).items():",
+        '        if val is not None and val != "":',
+        "            col = _ALLOWED_FILTERS.get(key)",
+        "            if col is None:",
+        '                raise ValueError(f"Filtre interdit : {key}")',
+        '            clauses.append(col + " = ?")',
+        "            params.append(val)",
+        "    if clauses:",
+        f'        sql = "SELECT COUNT(*) AS total FROM {table} WHERE " + " AND ".join(clauses)',
+        "    else:",
+        f'        sql = "SELECT COUNT(*) AS total FROM {table}"',
+        "    row = fetch_one(sql, params)",
+        '    return row["total"] if row else 0',
+        "",
+        "",
+        f'def find_{plural}_paginated(q=None, sort=None, direction="asc", limit=10, offset=0, filters=None):',
+        "    sort_col = _ALLOWED_SORT.get(sort, _DEFAULT_SORT)",
+        '    sort_dir = "DESC" if direction == "desc" else "ASC"',
+        f'    base = "{_build_select_base(table, relations)}"',
+        "    clauses = []",
+        "    params = []",
+        "    if q and _SEARCH_COLS:",
+        '        clauses.append("(" + " OR ".join(c + " LIKE ?" for c in _SEARCH_COLS) + ")")',
+        '        params.extend("%" + q + "%" for _ in _SEARCH_COLS)',
+        "    for key, val in (filters or {}).items():",
+        '        if val is not None and val != "":',
+        "            col = _ALLOWED_FILTERS.get(key)",
+        "            if col is None:",
+        '                raise ValueError(f"Filtre interdit : {key}")',
+        '            clauses.append(col + " = ?")',
+        "            params.append(val)",
+        "    if clauses:",
+        '        sql = base + " WHERE " + " AND ".join(clauses) + " ORDER BY " + sort_col + " " + sort_dir + " LIMIT ? OFFSET ?"',
+        "    else:",
+        '        sql = base + " ORDER BY " + sort_col + " " + sort_dir + " LIMIT ? OFFSET ?"',
+        "    params.extend([limit, offset])",
+        "    return fetch_all(sql, params)",
+        "",
+    ]
+    lines.extend([
+        "",
+        "",
+        "_EXPORT_LIMIT = 1000",
+        "",
+        "",
+        f'def find_{plural}_for_export(q=None, sort=None, direction="asc", filters=None):',
+        f"    return find_{plural}_paginated(",
+        "        q=q, sort=sort, direction=direction,",
+        "        limit=_EXPORT_LIMIT, offset=0, filters=filters,",
+        "    )",
+        "",
+    ])
+    return lines
+
+
+def _render_model_relations(
+    relations: list[CrudManyToOneRelation] | None,
+    many_to_many_relations: list[CrudManyToManyRelation] | None,
+    pk_name: str,
+) -> list[str]:
+    """Fonctions de choix (many-to-one) et de pivot (many-to-many) du modèle
+    (REFACTOR-BUILDERS-DECOMPOSE-002). Extrait de `build_model` à iso-sortie.
+    """
+    lines: list[str] = []
+    for relation in _unique_choice_relations(relations):
+        select_cols = (
+            relation.target_pk_column
+            if relation.target_label_column == relation.target_pk_column else
+            f"{relation.target_pk_column}, {relation.target_label_column}"
+        )
+        lines.extend([
+            "",
+            "",
+            f"def {relation.choices_function}():",
+            f'    rows = fetch_all("SELECT {select_cols} FROM {relation.target_table} ORDER BY {relation.target_label_column}")',
+            f'    return [(row["{relation.target_pk_column}"], row["{relation.target_label_column}"]) for row in rows]',
+        ])
+    for relation in _unique_many_to_many_choice_relations(many_to_many_relations):
+        select_cols = (
+            relation.target_pk_column
+            if relation.target_label_column == relation.target_pk_column else
+            f"{relation.target_pk_column}, {relation.target_label_column}"
+        )
+        lines.extend([
+            "",
+            "",
+            f"def {relation.choices_function}():",
+            f'    rows = fetch_all("SELECT {select_cols} FROM {relation.target_table} ORDER BY {relation.target_label_column}")',
+            f'    return [(row["{relation.target_pk_column}"], row["{relation.target_label_column}"]) for row in rows]',
+        ])
+    for relation in many_to_many_relations or []:
+        lines.extend([
+            "",
+            "",
+            f"def {relation.selected_function}({pk_name}):",
+            f'    rows = fetch_all("SELECT {relation.target_key} FROM {relation.pivot_table} WHERE {relation.source_key} = ?", ({pk_name},))',
+            f'    return [row["{relation.target_key}"] for row in rows]',
+            "",
+            "",
+            f"def {relation.list_labels_function}({pk_name}s):",
+            f"    if not {pk_name}s:",
+            "        return {}",
+            f"    placeholders = \", \".join(\"?\" for _ in {pk_name}s)",
+            "    rows = fetch_all(",
+            f'        "SELECT pivot.{relation.source_key} AS source_id, {relation.target_table}.{relation.target_pk_column} AS target_id, {relation.target_table}.{relation.target_label_column} AS target_label "',
+            f'        "FROM {relation.pivot_table} pivot "',
+            f'        "JOIN {relation.target_table} ON {relation.target_table}.{relation.target_pk_column} = pivot.{relation.target_key} "',
+            f'        "WHERE pivot.{relation.source_key} IN (" + placeholders + ") "',
+            f'        "ORDER BY {"pivot." + relation.order_column if relation.order_column else relation.target_table + "." + relation.target_label_column}",',
+            f"        tuple({pk_name}s),",
+            "    )",
+            "    grouped = {}",
+            "    for row in rows:",
+            '        grouped.setdefault(row["source_id"], []).append(row["target_label"])',
+            "    return grouped",
+            "",
+            "",
+            f"def {relation.show_labels_function}({pk_name}):",
+            "    rows = fetch_all(",
+            f'        "SELECT {relation.target_table}.{relation.target_pk_column} AS target_id, {relation.target_table}.{relation.target_label_column} AS target_label "',
+            f'        "FROM {relation.pivot_table} pivot "',
+            f'        "JOIN {relation.target_table} ON {relation.target_table}.{relation.target_pk_column} = pivot.{relation.target_key} "',
+            f'        "WHERE pivot.{relation.source_key} = ? "',
+            f'        "ORDER BY {"pivot." + relation.order_column if relation.order_column else relation.target_table + "." + relation.target_label_column}",',
+            f"        ({pk_name},),",
+            "    )",
+            '    return [row["target_label"] for row in rows]',
+            "",
+            "",
+            f"def {relation.add_function}({pk_name}, selected_ids):",
+            "    from core.database.transaction import transaction",
+            "    with transaction() as tx:",
+            "        for target_id in selected_ids:",
+            f'            execute("INSERT INTO {relation.pivot_table} ({relation.source_key}, {relation.target_key}) VALUES (?, ?)", ({pk_name}, target_id), tx=tx)',
+            "",
+            "",
+            f"def {relation.sync_function}({pk_name}, selected_ids):",
+            "    from core.database.transaction import transaction",
+            "    with transaction() as tx:",
+            f'        execute("DELETE FROM {relation.pivot_table} WHERE {relation.source_key} = ?", ({pk_name},), tx=tx)',
+            "        for target_id in selected_ids:",
+            f'            execute("INSERT INTO {relation.pivot_table} ({relation.source_key}, {relation.target_key}) VALUES (?, ?)", ({pk_name}, target_id), tx=tx)',
+        ])
+    return lines
+
+
 def build_model(
     definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
@@ -104,162 +287,8 @@ def build_model(
         "",
     ]
 
-    # ── Recherche, tri, pagination ────────────────────────────────────────────
-    search_fields = _text_search_fields(definition, relations)
-    qualifier = f"{table}." if relations else ""
-    search_cols_repr = repr([qualifier + f["column"] for f in search_fields])
-    sort_items = [(f["name"], qualifier + f["column"]) for f in non_pk]
-    sort_items.append((pk_name, qualifier + pk_col))
-    allowed_sort_repr = "{" + ", ".join(f'"{k}": "{v}"' for k, v in sort_items) + "}"
-    filter_flds_model = _filter_fields(definition, relations)
-    filter_items = [(f["name"], qualifier + f["column"]) for f in filter_flds_model]
-    allowed_filters_repr = "{" + ", ".join(f'"{k}": "{v}"' for k, v in filter_items) + "}"
-
-    lines.extend([
-        "",
-        f"_SEARCH_COLS  = {search_cols_repr}",
-        f"_ALLOWED_SORT = {allowed_sort_repr}",
-        f"_ALLOWED_FILTERS = {allowed_filters_repr}",
-        f'_DEFAULT_SORT = "{qualifier}{pk_col}"',
-        "",
-        "",
-        f"def count_{plural}(q=None, filters=None):",
-        "    clauses = []",
-        "    params = []",
-        "    if q and _SEARCH_COLS:",
-        '        clauses.append("(" + " OR ".join(c + " LIKE ?" for c in _SEARCH_COLS) + ")")',
-        '        params.extend("%" + q + "%" for _ in _SEARCH_COLS)',
-        "    for key, val in (filters or {}).items():",
-        '        if val is not None and val != "":',
-        "            col = _ALLOWED_FILTERS.get(key)",
-        "            if col is None:",
-        '                raise ValueError(f"Filtre interdit : {key}")',
-        '            clauses.append(col + " = ?")',
-        "            params.append(val)",
-        "    if clauses:",
-        f'        sql = "SELECT COUNT(*) AS total FROM {table} WHERE " + " AND ".join(clauses)',
-        "    else:",
-        f'        sql = "SELECT COUNT(*) AS total FROM {table}"',
-        "    row = fetch_one(sql, params)",
-        '    return row["total"] if row else 0',
-        "",
-        "",
-        f'def find_{plural}_paginated(q=None, sort=None, direction="asc", limit=10, offset=0, filters=None):',
-        "    sort_col = _ALLOWED_SORT.get(sort, _DEFAULT_SORT)",
-        '    sort_dir = "DESC" if direction == "desc" else "ASC"',
-        f'    base = "{_build_select_base(table, relations)}"',
-        "    clauses = []",
-        "    params = []",
-        "    if q and _SEARCH_COLS:",
-        '        clauses.append("(" + " OR ".join(c + " LIKE ?" for c in _SEARCH_COLS) + ")")',
-        '        params.extend("%" + q + "%" for _ in _SEARCH_COLS)',
-        "    for key, val in (filters or {}).items():",
-        '        if val is not None and val != "":',
-        "            col = _ALLOWED_FILTERS.get(key)",
-        "            if col is None:",
-        '                raise ValueError(f"Filtre interdit : {key}")',
-        '            clauses.append(col + " = ?")',
-        "            params.append(val)",
-        "    if clauses:",
-        '        sql = base + " WHERE " + " AND ".join(clauses) + " ORDER BY " + sort_col + " " + sort_dir + " LIMIT ? OFFSET ?"',
-        "    else:",
-        '        sql = base + " ORDER BY " + sort_col + " " + sort_dir + " LIMIT ? OFFSET ?"',
-        "    params.extend([limit, offset])",
-        "    return fetch_all(sql, params)",
-        "",
-    ])
-    lines.extend([
-        "",
-        "",
-        "_EXPORT_LIMIT = 1000",
-        "",
-        "",
-        f'def find_{plural}_for_export(q=None, sort=None, direction="asc", filters=None):',
-        f"    return find_{plural}_paginated(",
-        "        q=q, sort=sort, direction=direction,",
-        "        limit=_EXPORT_LIMIT, offset=0, filters=filters,",
-        "    )",
-        "",
-    ])
-    for relation in _unique_choice_relations(relations):
-        select_cols = (
-            relation.target_pk_column
-            if relation.target_label_column == relation.target_pk_column else
-            f"{relation.target_pk_column}, {relation.target_label_column}"
-        )
-        lines.extend([
-            "",
-            "",
-            f"def {relation.choices_function}():",
-            f'    rows = fetch_all("SELECT {select_cols} FROM {relation.target_table} ORDER BY {relation.target_label_column}")',
-            f'    return [(row["{relation.target_pk_column}"], row["{relation.target_label_column}"]) for row in rows]',
-        ])
-    for relation in _unique_many_to_many_choice_relations(many_to_many_relations):
-        select_cols = (
-            relation.target_pk_column
-            if relation.target_label_column == relation.target_pk_column else
-            f"{relation.target_pk_column}, {relation.target_label_column}"
-        )
-        lines.extend([
-            "",
-            "",
-            f"def {relation.choices_function}():",
-            f'    rows = fetch_all("SELECT {select_cols} FROM {relation.target_table} ORDER BY {relation.target_label_column}")',
-            f'    return [(row["{relation.target_pk_column}"], row["{relation.target_label_column}"]) for row in rows]',
-        ])
-    for relation in many_to_many_relations or []:
-        lines.extend([
-            "",
-            "",
-            f"def {relation.selected_function}({pk_name}):",
-            f'    rows = fetch_all("SELECT {relation.target_key} FROM {relation.pivot_table} WHERE {relation.source_key} = ?", ({pk_name},))',
-            f'    return [row["{relation.target_key}"] for row in rows]',
-            "",
-            "",
-            f"def {relation.list_labels_function}({pk_name}s):",
-            f"    if not {pk_name}s:",
-            "        return {}",
-            f"    placeholders = \", \".join(\"?\" for _ in {pk_name}s)",
-            "    rows = fetch_all(",
-            f'        "SELECT pivot.{relation.source_key} AS source_id, {relation.target_table}.{relation.target_pk_column} AS target_id, {relation.target_table}.{relation.target_label_column} AS target_label "',
-            f'        "FROM {relation.pivot_table} pivot "',
-            f'        "JOIN {relation.target_table} ON {relation.target_table}.{relation.target_pk_column} = pivot.{relation.target_key} "',
-            f'        "WHERE pivot.{relation.source_key} IN (" + placeholders + ") "',
-            f'        "ORDER BY {"pivot." + relation.order_column if relation.order_column else relation.target_table + "." + relation.target_label_column}",',
-            f"        tuple({pk_name}s),",
-            "    )",
-            "    grouped = {}",
-            "    for row in rows:",
-            '        grouped.setdefault(row["source_id"], []).append(row["target_label"])',
-            "    return grouped",
-            "",
-            "",
-            f"def {relation.show_labels_function}({pk_name}):",
-            "    rows = fetch_all(",
-            f'        "SELECT {relation.target_table}.{relation.target_pk_column} AS target_id, {relation.target_table}.{relation.target_label_column} AS target_label "',
-            f'        "FROM {relation.pivot_table} pivot "',
-            f'        "JOIN {relation.target_table} ON {relation.target_table}.{relation.target_pk_column} = pivot.{relation.target_key} "',
-            f'        "WHERE pivot.{relation.source_key} = ? "',
-            f'        "ORDER BY {"pivot." + relation.order_column if relation.order_column else relation.target_table + "." + relation.target_label_column}",',
-            f"        ({pk_name},),",
-            "    )",
-            '    return [row["target_label"] for row in rows]',
-            "",
-            "",
-            f"def {relation.add_function}({pk_name}, selected_ids):",
-            "    from core.database.transaction import transaction",
-            "    with transaction() as tx:",
-            "        for target_id in selected_ids:",
-            f'            execute("INSERT INTO {relation.pivot_table} ({relation.source_key}, {relation.target_key}) VALUES (?, ?)", ({pk_name}, target_id), tx=tx)',
-            "",
-            "",
-            f"def {relation.sync_function}({pk_name}, selected_ids):",
-            "    from core.database.transaction import transaction",
-            "    with transaction() as tx:",
-            f'        execute("DELETE FROM {relation.pivot_table} WHERE {relation.source_key} = ?", ({pk_name},), tx=tx)',
-            "        for target_id in selected_ids:",
-            f'            execute("INSERT INTO {relation.pivot_table} ({relation.source_key}, {relation.target_key}) VALUES (?, ?)", ({pk_name}, target_id), tx=tx)',
-        ])
+    lines += _render_model_query(definition, relations, non_pk, pk_name, pk_col, table, plural)
+    lines += _render_model_relations(relations, many_to_many_relations, pk_name)
 
     # Lookup par slug : inséré juste après get_<snake>_by_id (routing public).
     if slug_fields:
