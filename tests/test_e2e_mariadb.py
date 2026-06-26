@@ -41,19 +41,24 @@ import pytest
 
 pytestmark = pytest.mark.db
 
+# ── Connexion : mêmes variables que le job CI tests-db (FORGE_TEST_DB_*) ──────
+# _REQUIRE_DB est lu AVANT le garde d'import : en CI (FORGE_REQUIRE_DB=1), un
+# paquet mariadb manquant doit FAIRE ÉCHOUER la collecte (rouge), jamais sauter
+# le module en silence (le job tests-db resterait vert avec 0 test).
+# Voir TEST-DB-COLLECT-GUARD-001.
+
+_REQUIRE_DB  = os.environ.get("FORGE_REQUIRE_DB") == "1"
+
 # ── Garde : package mariadb requis ────────────────────────────────────────────
 
 try:
     import mariadb as _mariadb_pkg  # noqa: F401
-except ImportError:
-    pytest.skip(
-        "Package Python 'mariadb' non installé — tests MariaDB ignorés.",
-        allow_module_level=True,
-    )
+except ImportError as _exc:
+    _msg = "Package Python 'mariadb' non installé — tests MariaDB ignorés."
+    if _REQUIRE_DB:
+        raise RuntimeError(_msg + " (FORGE_REQUIRE_DB=1)") from _exc
+    pytest.skip(_msg, allow_module_level=True)
 
-# ── Connexion : mêmes variables que le job CI tests-db (FORGE_TEST_DB_*) ──────
-
-_REQUIRE_DB  = os.environ.get("FORGE_REQUIRE_DB") == "1"
 _DB_HOST     = os.environ.get("FORGE_TEST_DB_HOST", "127.0.0.1")
 _DB_PORT     = int(os.environ.get("FORGE_TEST_DB_PORT", "3306"))
 _DB_NAME     = os.environ.get("FORGE_TEST_DB_NAME", "forge_test")
