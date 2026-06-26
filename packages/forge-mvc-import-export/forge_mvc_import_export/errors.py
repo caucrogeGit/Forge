@@ -1,5 +1,5 @@
 # pyright: strict
-"""Erreurs du paquet forge-mvc-import."""
+"""Erreurs du paquet forge-mvc-import-export."""
 from __future__ import annotations
 
 

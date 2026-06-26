@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import pytest
 
-forge_mvc_import = pytest.importorskip("forge_mvc_import")
+forge_mvc_import_export = pytest.importorskip("forge_mvc_import_export")
 
-from forge_mvc_import import CsvImportError, parse_csv
+from forge_mvc_import_export import CsvImportError, parse_csv
 
 
 def test_parse_simple() -> None:

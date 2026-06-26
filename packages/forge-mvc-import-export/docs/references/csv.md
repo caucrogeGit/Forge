@@ -2,7 +2,7 @@
 
 Ce document décrit la lecture d'un contenu CSV en lignes de dictionnaires.
 
-Le fichier de code correspondant est `forge_mvc_import/csv_reader.py`.
+Le fichier de code correspondant est `forge_mvc_import_export/csv_reader.py`.
 
 ## 1. `parse_csv`
 
@@ -17,7 +17,7 @@ Les valeurs sont des chaînes : la conversion typée est faite ensuite par le
 moteur d'import.
 
 ```python
-from forge_mvc_import import parse_csv
+from forge_mvc_import_export import parse_csv
 
 rows = parse_csv("nom,age\nAlice,12\nBob,13\n")
 # [{"nom": "Alice", "age": "12"}, {"nom": "Bob", "age": "13"}]

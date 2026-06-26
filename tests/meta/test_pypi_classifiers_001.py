@@ -34,8 +34,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-qrcode":   "Development Status :: 4 - Beta",
     # forge-mvc-settings : paramètres applicatifs, non publié (SETTINGS-OPTIN-SCAFFOLD-001).
     "forge-mvc-settings": "Development Status :: 4 - Beta",
-    # forge-mvc-import : import CSV, non publié (IMPORT-OPTIN-SCAFFOLD-001).
-    "forge-mvc-import":   "Development Status :: 4 - Beta",
+    # forge-mvc-import-export : échange CSV (import + export), non publié (IMPORT-OPTIN-SCAFFOLD-001).
+    "forge-mvc-import-export": "Development Status :: 4 - Beta",
 }
 
 

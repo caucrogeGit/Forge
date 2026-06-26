@@ -1,8 +1,8 @@
 # Les erreurs
 
-Ce document décrit l'erreur levée par `forge_mvc_import`.
+Ce document décrit l'erreur levée par `forge_mvc_import_export`.
 
-Le fichier de code correspondant est `forge_mvc_import/errors.py`.
+Le fichier de code correspondant est `forge_mvc_import_export/errors.py`.
 
 ## 1. `CsvImportError`
 

@@ -10,7 +10,7 @@ from __future__ import annotations
 import csv
 import io
 
-from forge_mvc_import.errors import CsvImportError
+from forge_mvc_import_export.errors import CsvImportError
 
 
 def parse_csv(text: str, *, delimiter: str = ",") -> list[dict[str, str]]:

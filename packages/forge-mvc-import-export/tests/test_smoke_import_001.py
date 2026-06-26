@@ -1,4 +1,4 @@
-"""Smoke test du paquet forge-mvc-import (OPTIN-SMOKE-TESTS-001).
+"""Smoke test du paquet forge-mvc-import-export (OPTIN-SMOKE-TESTS-001).
 
 Vérifie qu'une fois installé, le paquet s'importe, expose son API publique
 et embarque `py.typed` (PEP 561). Skip propre si le paquet n'est pas installé.
@@ -11,7 +11,7 @@ import pytest
 
 pytestmark = pytest.mark.smoke
 
-MODULE = "forge_mvc_import"
+MODULE = "forge_mvc_import_export"
 
 mod = pytest.importorskip(MODULE)
 

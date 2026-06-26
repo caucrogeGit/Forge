@@ -2,7 +2,7 @@
 
 Ce document décrit la validation des lignes et leur insertion.
 
-Le fichier de code correspondant est `forge_mvc_import/engine.py`.
+Le fichier de code correspondant est `forge_mvc_import_export/engine.py`.
 
 ## 1. Décrire les colonnes (`FieldSpec`)
 
@@ -33,7 +33,7 @@ en appelant `insert(record)`.
 (par exemple via la fonction `add_<entite>` de son modèle).
 
 ```python
-from forge_mvc_import import import_rows, FieldSpec, coerce_int
+from forge_mvc_import_export import import_rows, FieldSpec, coerce_int
 
 specs = [FieldSpec("nom"), FieldSpec("age", coerce=coerce_int)]
 report = import_rows(rows, specs, add_eleve)

@@ -1,4 +1,4 @@
-"""Scaffold du paquet forge-mvc-import (IMPORT-OPTIN-SCAFFOLD-001).
+"""Scaffold du paquet forge-mvc-import-export (IMPORT-OPTIN-SCAFFOLD-001).
 
 Garde-fous structurels : indépendance du cœur et dépendances minimales.
 """
@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 
-forge_mvc_import = pytest.importorskip("forge_mvc_import")
+forge_mvc_import_export = pytest.importorskip("forge_mvc_import_export")
 
-PKG_ROOT = Path(forge_mvc_import.__file__).resolve().parent
+PKG_ROOT = Path(forge_mvc_import_export.__file__).resolve().parent
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -19,9 +19,9 @@ def test_core_n_importe_pas_le_paquet_import() -> None:
     offenders: list[str] = []
     for path in core_dir.rglob("*.py"):
         text = path.read_text(encoding="utf-8")
-        if "import forge_mvc_import" in text or "from forge_mvc_import" in text:
+        if "import forge_mvc_import_export" in text or "from forge_mvc_import_export" in text:
             offenders.append(str(path.relative_to(REPO_ROOT)))
-    assert not offenders, f"le cœur ne doit pas importer forge_mvc_import : {offenders}"
+    assert not offenders, f"le cœur ne doit pas importer forge_mvc_import_export : {offenders}"
 
 
 def test_dependances_minimales() -> None:

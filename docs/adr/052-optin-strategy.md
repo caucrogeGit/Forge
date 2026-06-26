@@ -70,8 +70,9 @@ directement une application de gestion :
 
 - **Finir `forge-mvc-admin`** : déjà amorcé, multiplicateur de valeur (back-office
   CRUD lisible). Garder le style « généré mais lisible », ne pas copier EasyAdmin.
-- **`forge-mvc-import`** : import CSV vers entités, validation explicite, rapport
-  d'erreurs. Comble le vrai manque (l'export existe déjà).
+- **`forge-mvc-import-export`** : import CSV (validation explicite, rapport
+  d'erreurs) et export programmatique (`to_csv`). L'export d'entité reste la route
+  CRUD générée ; `to_csv` sert l'export programmatique (script, rapport, hors CRUD).
 - **`forge-mvc-settings`** : table de paramètres applicatifs (nom d'établissement,
   durée d'une session, mode maintenance), pour éviter de tout mettre dans `.env`.
 - **`forge-mvc-audit`** : table d'audit applicatif standard plus helper, **borné**

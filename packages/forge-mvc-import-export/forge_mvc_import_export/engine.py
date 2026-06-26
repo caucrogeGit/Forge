@@ -16,7 +16,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
-from forge_mvc_import.errors import CsvImportError
+from forge_mvc_import_export.errors import CsvImportError
 
 
 @dataclass(frozen=True)
