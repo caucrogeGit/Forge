@@ -42,8 +42,10 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-jobs":     "Development Status :: 4 - Beta",
     # forge-mvc-notifications : notifications in-app, non publié (NOTIFICATIONS-OPTIN-SCAFFOLD-001).
     "forge-mvc-notifications": "Development Status :: 4 - Beta",
-    # forge-mvc-deploy : outillage de déploiement CLI-only, non publié (DEPLOY-EXTRACT-001, ADR-053).
+    # forge-mvc-deploy : outillage de déploiement CLI-only (DEPLOY-EXTRACT-001, ADR-053).
     "forge-mvc-deploy":   "Development Status :: 4 - Beta",
+    # forge-mvc-testing : infra de test partagée, publiée pour l'écosystème (ADR-041).
+    "forge-mvc-testing":  "Development Status :: 4 - Beta",
 }
 
 
@@ -65,9 +67,6 @@ class TestPypiClassifiers:
         """Chaque pyproject.toml doit avoir le classifier prévu."""
         paths = [PROJECT_ROOT / "pyproject.toml"]
         for pkg_dir in (PROJECT_ROOT / "packages").iterdir():
-            # forge-mvc-testing : infra de test dev-only, non distribuée (ADR-041).
-            if pkg_dir.name == "forge-mvc-testing":
-                continue
             if pkg_dir.is_dir() and (pkg_dir / "pyproject.toml").exists():
                 paths.append(pkg_dir / "pyproject.toml")
 

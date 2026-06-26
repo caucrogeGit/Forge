@@ -172,6 +172,7 @@ chaque package publiable :
 | `forge-mvc-jobs` | `4 - Beta` | File de tâches de fond opt-in (ADR-052) : table `jobs`, `enqueue` + worker explicite (`drain`/`run_worker`), réservation atomique. Sans broker ni async, dépend uniquement du cœur. Non publié sur PyPI |
 | `forge-mvc-notifications` | `4 - Beta` | Notifications in-app opt-in (ADR-052) : table `notifications`, `notify`/`get_notifications`/`mark_read`. Stockage in-app, livraison email/push à combiner avec jobs + mail. Dépend uniquement du cœur. Non publié sur PyPI |
 | `forge-mvc-deploy` | `4 - Beta` | Outillage de déploiement opt-in extrait du cœur (ADR-053) : commandes `deploy:init` (gabarits Nginx/systemd/WSGI) et `deploy:check`. Opt-in CLI-only, sans API runtime ni migration. Dépend uniquement du cœur. Non publié sur PyPI |
+| `forge-mvc-testing` | `4 - Beta` | Infrastructure de test partagée (ADR-041) : `FakeRequest` + plugin pytest (fixtures autouse). Pour tester Forge et ses opt-ins, y compris par des tiers ; publiée pour l'écosystème avec la rc.1 |
 
 Critères de passage Beta → Stable d'un module opt-in :
 

@@ -133,7 +133,7 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 | `forge-mvc-notifications` | Notifications in-app (table `notifications`, `notify`/`get_notifications`/`mark_read`) | RC (publication à venir) |
 | `forge-mvc-deploy` | Outillage de déploiement opt-in CLI-only : `deploy:init` (gabarits Nginx/systemd/WSGI) et `deploy:check`, sans API runtime (ADR-053) | RC (publication à venir) |
 | `forge-mvc-admin` | Back-office applicatif : CRUD générique sur les entités déclarées, auth + CSRF, RBAC optionnel (voir la [roadmap Forge Admin](docs/roadmap/forge-admin-roadmap.md)) | RC (non publié) |
-| `forge-mvc-testing` | Infrastructure de test partagée (`FakeRequest` + plugin pytest), réservée au développement (ADR-041) | RC (dev-only) |
+| `forge-mvc-testing` | Infrastructure de test partagée (`FakeRequest` + plugin pytest) pour tester Forge et ses opt-ins, y compris par des tiers (ADR-041) | RC |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus
