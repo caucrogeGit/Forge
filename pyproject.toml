@@ -115,6 +115,7 @@ include = [
     "core",
     "packages/forge-mvc-admin/forge_mvc_admin",
     "packages/forge-mvc-audio/forge_mvc_audio",
+    "packages/forge-mvc-audit/forge_mvc_audit",
     "packages/forge-mvc-files/forge_mvc_files",
     "packages/forge-mvc-i18n/forge_mvc_i18n",
     "packages/forge-mvc-images/forge_mvc_images",
@@ -131,6 +132,7 @@ include = [
 extraPaths = [
     "packages/forge-mvc-admin",
     "packages/forge-mvc-audio",
+    "packages/forge-mvc-audit",
     "packages/forge-mvc-files",
     "packages/forge-mvc-i18n",
     "packages/forge-mvc-images",

@@ -1,0 +1,26 @@
+# Documentation embarquée du paquet forge-mvc-audit (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /audit/.
+site_name: audit
+docs_dir: docs
+nav:
+  - Présentation: index.md
+  - Référence (par module):
+      - Journal d'audit (store.py): references/store.md
+      - Initialisation (audit:init): references/cli.md
+      - Erreurs (errors.py): references/errors.md
+  - Progression Audit:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Première trace: welcome/debutant/audit-welcome.md
+          - Relire les traces: welcome/debutant/audit-read.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Enrichir une trace: welcome/intermediaire/audit-target.md
+          - Filtrer les traces: welcome/intermediaire/audit-filter.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Le périmètre: welcome/avance/audit-perimeter.md
+          - Indépendance du cœur: welcome/avance/audit-independance.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

@@ -162,6 +162,7 @@ chaque package publiable :
 | `forge-mvc-qrcode` | `4 - Beta` | Génération de QR Codes opt-in (ADR-050) : PNG et SVG depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur. Dépend de `segno` (pur Python). Non publié sur PyPI |
 | `forge-mvc-settings` | `4 - Beta` | Paramètres applicatifs opt-in (ADR-052) : table `app_settings` clé/valeur typée, API `get_setting`/`set_setting`, migration fournie via `settings:init`. Dépend uniquement du cœur. Non publié sur PyPI |
 | `forge-mvc-import-export` | `4 - Beta` | Échange CSV opt-in (ADR-052) : import (validation par champ, rapport d'erreurs, insertion via un callback) et export programmatique (`to_csv`). Pur stdlib, dépend uniquement du cœur. Non publié sur PyPI |
+| `forge-mvc-audit` | `4 - Beta` | Journal d'audit applicatif opt-in (ADR-052) : table `audit_log`, `record_audit`/`get_audit_log`, migration via `audit:init`. Borné (pas un SIEM, cohérent ADR-008), dépend uniquement du cœur. Non publié sur PyPI |
 
 Critères de passage Beta → Stable d'un module opt-in :
 

@@ -626,6 +626,19 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "audit:init":
+        try:
+            from forge_mvc_audit.cli.init import main as audit_init_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-audit non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-audit",
+            )
+        rc = audit_init_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command == "iot:doctor":
         try:
             from forge_mvc_iot.cli.doctor import main as iot_doctor_main

@@ -36,6 +36,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-settings": "Development Status :: 4 - Beta",
     # forge-mvc-import-export : échange CSV (import + export), non publié (IMPORT-OPTIN-SCAFFOLD-001).
     "forge-mvc-import-export": "Development Status :: 4 - Beta",
+    # forge-mvc-audit : journal d'audit applicatif, non publié (AUDIT-OPTIN-SCAFFOLD-001).
+    "forge-mvc-audit":    "Development Status :: 4 - Beta",
 }
 
 

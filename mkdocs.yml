@@ -369,6 +369,7 @@ nav:
       - QR Code: '!include packages/forge-mvc-qrcode/mkdocs.yml'
       - Settings: '!include packages/forge-mvc-settings/mkdocs.yml'
       - Import/Export CSV: '!include packages/forge-mvc-import-export/mkdocs.yml'
+      - Audit: '!include packages/forge-mvc-audit/mkdocs.yml'
 
 markdown_extensions:
   - admonition
