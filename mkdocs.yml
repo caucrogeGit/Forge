@@ -283,6 +283,7 @@ nav:
             - ADR-050 Opt-in QR Code: adr/050-qrcode-optin.md
             - ADR-051 Insertion contrôleur pages publiques: adr/051-public-page-controller-insertion.md
             - ADR-052 Stratégie des opt-ins: adr/052-optin-strategy.md
+            - ADR-053 Extraction du déploiement: adr/053-deploy-extraction.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
