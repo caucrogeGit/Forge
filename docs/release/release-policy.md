@@ -140,6 +140,12 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 
 ## Stratégie de classification PyPI
 
+> **Note RC** : en `1.0.0rc1` (release candidate), la **version** est une
+> préversion finale, mais le classifier `Development Status` reste `4 - Beta`.
+> PyPI ne propose pas de classifier « Release Candidate » distinct ; le signal
+> RC passe donc par le numéro de version (PEP 440 `rc`), pas par le classifier.
+> Le passage à `5 - Production/Stable` se fera avec la `1.0.0` stable.
+
 Les classifiers `Development Status` reflètent la maturité réelle de
 chaque package publiable :
 

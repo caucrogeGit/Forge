@@ -121,10 +121,10 @@ def test_message_contient_forge_db_init(monkeypatch, tmp_path, capsys):
     assert "forge db:init" in capsys.readouterr().out
 
 
-def test_message_contient_python_app(monkeypatch, tmp_path, capsys):
+def test_message_contient_forge_run(monkeypatch, tmp_path, capsys):
     _patch_cmd_new(monkeypatch, tmp_path)
     forge.cmd_new("MonProjet")
-    assert "python app.py" in capsys.readouterr().out
+    assert "forge run" in capsys.readouterr().out
 
 
 def test_echec_commit_git_final_conserve_le_projet(monkeypatch, tmp_path, capsys):

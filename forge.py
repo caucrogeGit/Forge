@@ -339,9 +339,10 @@ def cmd_new(
     print(f"    cd {project_name}")
     print(f"    {_venv_activate_hint()}")
     print("    forge doctor")
-    print("    # Ajustez env/dev si nécessaire (DB_ADMIN_PWD, DB_APP_PWD…)")
-    print("    forge db:init")
-    print("    python app.py")
+    print("    forge run")
+    print()
+    print("  Les premiers paliers tournent sans base de données.")
+    print("  Pour ajouter MariaDB : ajustez env/dev (DB_ADMIN_PWD, DB_APP_PWD…) puis forge db:init.")
     print()
 
 

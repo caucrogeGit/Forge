@@ -89,6 +89,12 @@ def collect_mismatches() -> tuple[str, list[str]]:
     package_json = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
     check("package.json version (SemVer)", package_json.get("version"), semver)
 
+    # package-lock.json (SemVer public) : le verrou npm doit suivre package.json.
+    lock = json.loads((ROOT / "package-lock.json").read_text(encoding="utf-8"))
+    check("package-lock.json version (SemVer)", lock.get("version"), semver)
+    root_pkg = lock.get("packages", {}).get("", {})
+    check("package-lock.json packages[''].version (SemVer)", root_pkg.get("version"), semver)
+
     return canonical, mismatches
 
 
