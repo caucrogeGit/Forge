@@ -19,6 +19,9 @@ Elle hérite de `ValueError` : un contrôleur peut la rattraper comme une erreur
 | Cause | Origine |
 |---|---|
 | Texte vide ou composé uniquement d'espaces | `QrCode.from_text` |
+| Niveau de correction `error` inconnu (hors `l`, `m`, `q`, `h`) | `QrCode.from_text` |
+| Texte trop long pour la capacité d'un QR Code | `QrCode.from_text` |
+| `scale` < 1 ou `border` < 0 | `QrCode.to_png`, `QrCode.to_svg` |
 | Format de sortie inconnu (autre que `"png"` ou `"svg"`) | `QrCodeResponse.from_text` |
 
 Le message d'erreur indique la cause de façon explicite.

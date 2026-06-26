@@ -18,9 +18,11 @@ def from_text(cls, text: str, *, error: str = "m") -> QrCode
 ```
 
 `from_text` construit un QR Code depuis `text`.
-`error` est le niveau de correction d'erreur : `"l"`, `"m"` (défaut), `"q"` ou `"h"`, du plus léger au plus robuste.
+`error` est le niveau de correction d'erreur : `"l"`, `"m"` (défaut), `"q"` ou `"h"`, du plus léger au plus robuste (la casse est ignorée).
 
 Un texte vide ou composé uniquement d'espaces lève `QrCodeError`.
+Un niveau `error` inconnu lève `QrCodeError` (et non une exception `segno` brute).
+Un texte trop long pour la capacité d'un QR Code lève `QrCodeError` plutôt que de laisser remonter le dépassement de capacité de `segno`.
 
 ```python
 from forge_mvc_qrcode import QrCode
@@ -37,6 +39,7 @@ def to_png(self, *, scale: int = 4, border: int = 4) -> bytes
 
 `to_png` renvoie les octets bruts du PNG (`bytes`), reconnaissables à leur signature `b"\x89PNG\r\n\x1a\n"`.
 `scale` multiplie la taille de chaque module, `border` règle la marge claire en nombre de modules.
+`scale` doit valoir au moins 1 et `border` au moins 0 : une valeur hors borne lève `QrCodeError`.
 
 ```python
 png = QrCode.from_text("https://forgemvc.com").to_png(scale=8, border=2)
