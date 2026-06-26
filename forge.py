@@ -639,6 +639,19 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "jobs:init":
+        try:
+            from forge_mvc_jobs.cli.init import main as jobs_init_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-jobs non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-jobs",
+            )
+        rc = jobs_init_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command == "iot:doctor":
         try:
             from forge_mvc_iot.cli.doctor import main as iot_doctor_main

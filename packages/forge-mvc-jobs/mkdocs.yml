@@ -1,0 +1,26 @@
+# Documentation embarquée du paquet forge-mvc-jobs (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /jobs/.
+site_name: jobs
+docs_dir: docs
+nav:
+  - Présentation: index.md
+  - Référence (par module):
+      - File de tâches (queue.py): references/queue.md
+      - Initialisation (jobs:init): references/cli.md
+      - Erreurs (errors.py): references/errors.md
+  - Progression Jobs:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Enfiler une tâche: welcome/debutant/jobs-welcome.md
+          - Définir un gestionnaire: welcome/debutant/jobs-handler.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Le process worker: welcome/intermediaire/jobs-worker.md
+          - Reprise sur échec: welcome/intermediaire/jobs-retry.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Le périmètre: welcome/avance/jobs-perimeter.md
+          - Indépendance du cœur: welcome/avance/jobs-independance.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

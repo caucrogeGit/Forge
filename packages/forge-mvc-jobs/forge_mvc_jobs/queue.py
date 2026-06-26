@@ -1,0 +1,234 @@
+# pyright: strict
+"""File de tâches de fond adossée à MariaDB, sans broker ni runtime async.
+
+`forge-mvc-jobs` permet de déporter un travail lourd hors de la requête HTTP
+(envoi d'emails en nombre, transcodage, génération de QR Codes, import massif).
+Le modèle est volontairement simple et fidèle à Forge :
+
+- une table `jobs` sert de file (le SQL reste visible) ;
+- on **enfile** une tâche avec :func:`enqueue` (par exemple depuis un contrôleur) ;
+- un **process worker séparé** la traite avec :func:`drain` ou :func:`run_worker`,
+  en appelant un gestionnaire que l'application a explicitement enregistré.
+
+Aucune dépendance lourde (pas de Celery ni de Redis), aucune boucle async : le
+serveur web reste synchrone (WSGI). La réservation d'une tâche est atomique via
+un `UPDATE ... ORDER BY id LIMIT 1` avec jeton de réservation, donc plusieurs
+workers peuvent tourner sans se marcher dessus.
+
+Limite assumée V1 : pas de reprise automatique d'une tâche restée `running`
+après un crash worker (pas de délai de visibilité). La dépendance va de l'opt-in
+vers le cœur, jamais l'inverse.
+"""
+from __future__ import annotations
+
+import json
+import time
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
+from typing import Any
+from uuid import uuid4
+
+from forge_mvc_jobs.errors import JobError
+
+#: Nom de la table de file.
+TABLE_NAME = "jobs"
+
+#: Un gestionnaire de tâche : reçoit la charge utile (dict) désérialisée.
+JobHandler = Callable[[dict[str, Any]], object]
+
+CREATE_TABLE_SQL = (
+    "CREATE TABLE IF NOT EXISTS jobs (\n"
+    "    id           INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
+    "    queue        VARCHAR(191) NOT NULL DEFAULT 'default',\n"
+    "    task         VARCHAR(191) NOT NULL,\n"
+    "    payload      TEXT NOT NULL,\n"
+    "    status       VARCHAR(16) NOT NULL DEFAULT 'pending',\n"
+    "    attempts     INT NOT NULL DEFAULT 0,\n"
+    "    max_attempts INT NOT NULL DEFAULT 1,\n"
+    "    available_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
+    "    last_error   TEXT NULL,\n"
+    "    claim_token  VARCHAR(64) NULL,\n"
+    "    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
+    "    started_at   DATETIME NULL,\n"
+    "    finished_at  DATETIME NULL,\n"
+    "    KEY idx_jobs_claim (queue, status, available_at)\n"
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+)
+
+_INSERT_SQL = (
+    f"INSERT INTO {TABLE_NAME} (queue, task, payload, max_attempts, available_at) "
+    "VALUES (?, ?, ?, ?, NOW() + INTERVAL ? SECOND)"
+)
+_CLAIM_SQL = (
+    f"UPDATE {TABLE_NAME} SET status='running', claim_token=?, started_at=NOW(), attempts=attempts+1 "
+    "WHERE queue=? AND status='pending' AND available_at <= NOW() "
+    "ORDER BY id LIMIT 1"
+)
+_SELECT_CLAIMED_SQL = (
+    f"SELECT id, task, payload, attempts, max_attempts FROM {TABLE_NAME} "
+    "WHERE claim_token=? AND status='running' LIMIT 1"
+)
+_DONE_SQL = f"UPDATE {TABLE_NAME} SET status='done', finished_at=NOW(), claim_token=NULL WHERE id=?"
+_FAIL_SQL = (
+    f"UPDATE {TABLE_NAME} SET status='failed', last_error=?, finished_at=NOW(), claim_token=NULL WHERE id=?"
+)
+_RETRY_SQL = (
+    f"UPDATE {TABLE_NAME} SET status='pending', claim_token=NULL, started_at=NULL, available_at=NOW() WHERE id=?"
+)
+_PENDING_COUNT_SQL = f"SELECT COUNT(*) AS n FROM {TABLE_NAME} WHERE queue=? AND status='pending'"
+_SELECT_JOB_SQL = (
+    f"SELECT id, queue, task, status, attempts, max_attempts, last_error FROM {TABLE_NAME} WHERE id=? LIMIT 1"
+)
+
+
+@dataclass(frozen=True)
+class Job:
+    """État d'une tâche, pour inspection."""
+
+    id: int
+    queue: str
+    task: str
+    status: str
+    attempts: int
+    max_attempts: int
+    last_error: str | None
+
+
+def _db_module() -> Any:
+    import core.database.db as db  # noqa: PLC0415
+
+    return db
+
+
+def enqueue(
+    task: str,
+    payload: dict[str, Any] | None = None,
+    *,
+    queue: str = "default",
+    max_attempts: int = 1,
+    available_in: int = 0,
+    db: Any = None,
+) -> int:
+    """Enfile une tâche `task` avec sa charge utile et renvoie son identifiant.
+
+    `payload` est sérialisé en JSON. `max_attempts` borne les tentatives (une
+    tâche qui échoue est re-mise en file tant que `attempts < max_attempts`).
+    `available_in` retarde la disponibilité de N secondes (0 = immédiat). Lève
+    :class:`JobError` si `task` est vide, `max_attempts < 1`, ou si `payload`
+    n'est pas sérialisable en JSON.
+    """
+    if not task or not task.strip():
+        raise JobError("Le nom de tâche ne peut pas être vide.")
+    if max_attempts < 1:
+        raise JobError(f"max_attempts doit être >= 1. Reçu : {max_attempts}.")
+    try:
+        payload_json = json.dumps(payload or {})
+    except (TypeError, ValueError) as exc:
+        raise JobError(f"Charge utile non sérialisable en JSON : {exc}") from exc
+    return (db if db is not None else _db_module()).insert(
+        _INSERT_SQL, (queue, task, payload_json, max_attempts, available_in)
+    )
+
+
+def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", db: Any = None) -> bool:
+    """Réserve et exécute une tâche disponible de `queue`. Renvoie `True` si une
+    tâche a été traitée, `False` si la file est vide.
+
+    En cas d'échec du gestionnaire, la tâche est re-mise en file si
+    `attempts < max_attempts`, sinon marquée `failed`. Une tâche sans
+    gestionnaire enregistré est marquée `failed`.
+    """
+    database = db if db is not None else _db_module()
+    token = uuid4().hex
+    if not database.execute(_CLAIM_SQL, (token, queue)):
+        return False
+    row = database.fetch_one(_SELECT_CLAIMED_SQL, (token,))
+    if row is None:
+        return False
+
+    job_id = int(row["id"])
+    task = str(row["task"])
+    attempts = int(row["attempts"])
+    max_attempts = int(row["max_attempts"])
+    payload: dict[str, Any] = json.loads(row["payload"])
+
+    handler = handlers.get(task)
+    if handler is None:
+        database.execute(_FAIL_SQL, (f"tâche inconnue : {task}", job_id))
+        return True
+
+    try:
+        handler(payload)
+    except Exception as exc:  # noqa: BLE001 — toute erreur du gestionnaire est rapportée
+        if attempts < max_attempts:
+            database.execute(_RETRY_SQL, (job_id,))
+        else:
+            database.execute(_FAIL_SQL, (str(exc), job_id))
+        return True
+
+    database.execute(_DONE_SQL, (job_id,))
+    return True
+
+
+def drain(
+    handlers: Mapping[str, JobHandler],
+    *,
+    queue: str = "default",
+    max_jobs: int | None = None,
+    db: Any = None,
+) -> int:
+    """Traite les tâches disponibles de `queue` jusqu'à épuisement (ou `max_jobs`).
+
+    Renvoie le nombre de tâches traitées. C'est une passe unique : pas d'attente.
+    """
+    processed = 0
+    while max_jobs is None or processed < max_jobs:
+        if not process_one(handlers, queue=queue, db=db):
+            break
+        processed += 1
+    return processed
+
+
+def run_worker(
+    handlers: Mapping[str, JobHandler],
+    *,
+    queue: str = "default",
+    poll_interval: float = 1.0,
+    db: Any = None,
+    stop: Callable[[], bool] | None = None,
+) -> None:
+    """Boucle de worker : vide la file, puis attend `poll_interval` si vide.
+
+    L'application lance cette fonction depuis son propre point d'entrée (un
+    script worker), en fournissant ses gestionnaires : le worker est donc une
+    commande explicite, jamais déclenchée par la requête HTTP. `stop` est une
+    condition d'arrêt optionnelle vérifiée à chaque cycle.
+    """
+    while True:
+        if stop is not None and stop():
+            return
+        processed = drain(handlers, queue=queue, db=db)
+        if processed == 0:
+            time.sleep(poll_interval)
+
+
+def pending_count(*, queue: str = "default", db: Any = None) -> int:
+    """Nombre de tâches en attente dans `queue`."""
+    row = (db if db is not None else _db_module()).fetch_one(_PENDING_COUNT_SQL, (queue,))
+    return int(row["n"]) if row else 0
+
+
+def get_job(job_id: int, *, db: Any = None) -> Job | None:
+    """Renvoie l'état d'une tâche par son identifiant, ou `None` si absente."""
+    row = (db if db is not None else _db_module()).fetch_one(_SELECT_JOB_SQL, (job_id,))
+    if row is None:
+        return None
+    return Job(
+        id=int(row["id"]),
+        queue=str(row["queue"]),
+        task=str(row["task"]),
+        status=str(row["status"]),
+        attempts=int(row["attempts"]),
+        max_attempts=int(row["max_attempts"]),
+        last_error=row["last_error"],
+    )

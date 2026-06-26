@@ -38,6 +38,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-import-export": "Development Status :: 4 - Beta",
     # forge-mvc-audit : journal d'audit applicatif, non publié (AUDIT-OPTIN-SCAFFOLD-001).
     "forge-mvc-audit":    "Development Status :: 4 - Beta",
+    # forge-mvc-jobs : file de tâches de fond, non publié (JOBS-OPTIN-SCAFFOLD-001).
+    "forge-mvc-jobs":     "Development Status :: 4 - Beta",
 }
 
 

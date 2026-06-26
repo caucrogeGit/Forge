@@ -370,6 +370,7 @@ nav:
       - Settings: '!include packages/forge-mvc-settings/mkdocs.yml'
       - Import/Export CSV: '!include packages/forge-mvc-import-export/mkdocs.yml'
       - Audit: '!include packages/forge-mvc-audit/mkdocs.yml'
+      - Jobs: '!include packages/forge-mvc-jobs/mkdocs.yml'
 
 markdown_extensions:
   - admonition
