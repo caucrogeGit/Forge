@@ -124,6 +124,12 @@ Déploiement
   deploy:init         Initialise la configuration de déploiement.
   deploy:check        Vérifie la configuration de déploiement.
 
+Opt-ins applicatifs
+  settings:init       Prépare la table des paramètres applicatifs (forge-mvc-settings).
+  audit:init          Prépare le journal d'audit applicatif (forge-mvc-audit).
+  jobs:init           Prépare la file de tâches de fond (forge-mvc-jobs).
+  notifications:init  Prépare les notifications in-app (forge-mvc-notifications).
+
 Version et aide
   --version           Affiche la version de Forge.
   help, --help, -h    Affiche cette aide.

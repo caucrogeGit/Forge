@@ -59,9 +59,7 @@ Audit de `docs/` après l'ADR-038. Problèmes constatés :
 Hors périmètre (ne pas « ranger ») :
 
 - `history/` : archive brute volontaire (conventions D) ;
-- `javascripts/ static/ stylesheets/ logos/` : assets MkDocs ;
-- `starters-pedagogique/welcome-reseau` : support temporaire 2TNE, suppression
-  déjà programmée (2026-06-28).
+- `javascripts/ static/ stylesheets/ logos/` : assets MkDocs.
 
 ---
 

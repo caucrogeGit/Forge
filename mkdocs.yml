@@ -29,14 +29,6 @@ theme:
 nav:
   - Accueil: index.html
 
-  # TEMP welcome-reseau (2TNE CIEL) - retirer ce bloc et docs/starters-pedagogique/ le 2026-06-28, sans lien avec Forge
-  - Welcome Réseau (2TNE CIEL):
-      - Vue d'ensemble: starters-pedagogique/welcome-reseau/index.md
-      - Palier 1 - Câble T568B: starters-pedagogique/welcome-reseau/palier-1/index.md
-      - Palier 2 - Machines virtuelles: starters-pedagogique/welcome-reseau/palier-2/index.md
-      - Palier 3 - Réseau IP: starters-pedagogique/welcome-reseau/palier-3/index.md
-      - Palier 4 - Réseau interne: starters-pedagogique/welcome-reseau/palier-4/index.md
-
 
   - Cœur de Forge:
     - Installation:

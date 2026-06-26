@@ -32,23 +32,6 @@ NAVLESS_FILES: set[str] = {
     # Spec d'exécution du ticket 7 (REMOVE-MEDIA-PKG, ADR-018) — brouillon en
     # attente de la publication PyPI de forge-mvc-images. Hors-nav volontairement.
     "docs/roadmap/ticket-remove-media-pkg.md",
-    # Pages TEMPORAIRES de welcome-reseau (2TNE CIEL, sans lien avec Forge),
-    # sous docs/starters-pedagogique/ : seules les pages index.md des paliers
-    # sont dans la nav (comme les paliers 1/2 en PDF). Le dossier technique et
-    # les sous-pages eleve/ + professeur/ des paliers 3 et 4 sont liés depuis
-    # l'index mais hors nav. À retirer le 2026-06-28 (DOCS-WELCOME-VACANCE-TEMP-001).
-    "docs/starters-pedagogique/welcome-reseau/palier-1/dossier-technique.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-2/dossier-technique.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-3/dossier-technique.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-3/eleve/qcm-palier-3.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-3/eleve/activite-palier-3.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-3/eleve/checklist-palier-3-validation.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-3/professeur/qcm-palier-3-corrige.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-4/dossier-technique.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-4/eleve/qcm-palier-4.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-4/eleve/activite-palier-4.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-4/eleve/checklist-palier-4-validation.md",
-    "docs/starters-pedagogique/welcome-reseau/palier-4/professeur/qcm-palier-4-corrige.md",
 }
 
 
