@@ -117,11 +117,11 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 | [`forge-mvc-workflow`](https://pypi.org/project/forge-mvc-workflow/) | Cycles de vie applicatifs (statuts, transitions) | Beta |
 | [`forge-mvc-stats`](https://pypi.org/project/forge-mvc-stats/) | Agrégats et compteurs d'événements | Beta |
 | [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) | Alpha |
-| [`forge-mvc-files`](https://pypi.org/project/forge-mvc-files/) | Upload générique : écriture sécurisée, storage, service de fichiers (HTTP Range) | Alpha |
-| [`forge-mvc-images`](https://pypi.org/project/forge-mvc-images/) | Traitement et gestion applicative des images (Pillow), dépend de `forge-mvc-files` | Alpha |
+| [`forge-mvc-files`](https://pypi.org/project/forge-mvc-files/) | Upload générique : écriture sécurisée, storage, service de fichiers (HTTP Range) | Beta |
+| [`forge-mvc-images`](https://pypi.org/project/forge-mvc-images/) | Traitement et gestion applicative des images (Pillow), dépend de `forge-mvc-files` | Beta |
 | [`forge-mvc-audio`](https://pypi.org/project/forge-mvc-audio/) | Upload, sondage, transcodage MP3 et lecture en streaming HTTP Range | Beta |
 | [`forge-mvc-video`](https://pypi.org/project/forge-mvc-video/) | Upload, transcodage MP4 (H.264/AAC) et lecture en streaming HTTP Range | Beta |
-| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) | Alpha |
+| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) | Beta |
 | [`forge-mvc-pivot`](https://pypi.org/project/forge-mvc-pivot/) | Tables pivot avancées extraites du core | Beta |
 | [`forge-mvc-mail`](https://pypi.org/project/forge-mvc-mail/) | Envoi de courriels extrait du core | Beta |
 | `forge-mvc-i18n` | Internationalisation : catalogues JSON, fallback, helper `trans()` (repli no-op du noyau) | Beta (publication à venir) |
@@ -145,7 +145,7 @@ ou `pip install --pre forge-mvc-images`. `forge-mvc-i18n`, `forge-mvc-qrcode`,
 Cette exclusion de `[all]` tient soit à
 une dépendance lourde (MQTT `paho-mqtt` pour IoT, binaire système FFmpeg pour
 Video et Audio, Pillow pour Images), soit à une maturité encore Alpha
-(`mfa`, `files`), soit à une absence de publication sur PyPI (`i18n`, `qrcode`).
+(`mfa`), soit à une absence de publication sur PyPI (`i18n`, `qrcode`).
 
 ---
 

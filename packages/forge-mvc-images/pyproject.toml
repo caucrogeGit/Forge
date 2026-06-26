@@ -21,7 +21,7 @@ dependencies = [
     "forge-mvc-files>=1.0.0b17,<2",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
