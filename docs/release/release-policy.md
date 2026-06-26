@@ -164,6 +164,7 @@ chaque package publiable :
 | `forge-mvc-import-export` | `4 - Beta` | Échange CSV opt-in (ADR-052) : import (validation par champ, rapport d'erreurs, insertion via un callback) et export programmatique (`to_csv`). Pur stdlib, dépend uniquement du cœur. Non publié sur PyPI |
 | `forge-mvc-audit` | `4 - Beta` | Journal d'audit applicatif opt-in (ADR-052) : table `audit_log`, `record_audit`/`get_audit_log`, migration via `audit:init`. Borné (pas un SIEM, cohérent ADR-008), dépend uniquement du cœur. Non publié sur PyPI |
 | `forge-mvc-jobs` | `4 - Beta` | File de tâches de fond opt-in (ADR-052) : table `jobs`, `enqueue` + worker explicite (`drain`/`run_worker`), réservation atomique. Sans broker ni async, dépend uniquement du cœur. Non publié sur PyPI |
+| `forge-mvc-notifications` | `4 - Beta` | Notifications in-app opt-in (ADR-052) : table `notifications`, `notify`/`get_notifications`/`mark_read`. Stockage in-app, livraison email/push à combiner avec jobs + mail. Dépend uniquement du cœur. Non publié sur PyPI |
 
 Critères de passage Beta → Stable d'un module opt-in :
 

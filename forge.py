@@ -652,6 +652,19 @@ def main() -> None:
             sys.exit(rc)
         return
 
+    if command == "notifications:init":
+        try:
+            from forge_mvc_notifications.cli.init import main as notifications_init_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-notifications non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-notifications",
+            )
+        rc = notifications_init_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command == "iot:doctor":
         try:
             from forge_mvc_iot.cli.doctor import main as iot_doctor_main

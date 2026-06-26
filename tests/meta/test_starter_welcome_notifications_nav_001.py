@@ -1,0 +1,87 @@
+"""Tests documentaires — STARTER-WELCOME-NOTIFICATIONS-NAV-001.
+
+Verrouille la navigation pédagogique de la progression `welcome-notifications`
+(module opt-in `forge-mvc-notifications`, 3 niveaux) : chaînage, bilans, et
+absence de commande de création de projet (`installation.md` exempté).
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+pytestmark = pytest.mark.meta
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+WELCOME = PROJECT_ROOT / "packages" / "forge-mvc-notifications" / "docs" / "welcome"
+
+FORBIDDEN_COMMANDS = [
+    "forge starter:build",
+    "forge new mon-projet",
+    "cd mon-projet",
+    "source .venv/bin/activate",
+]
+
+
+def _pages() -> list[Path]:
+    return [p for p in WELCOME.rglob("*.md") if p.name != "installation.md"]
+
+
+def _has(page: str, needle: str) -> bool:
+    return needle in (WELCOME / page).read_text(encoding="utf-8")
+
+
+class TestPagesExist:
+    @pytest.mark.parametrize(
+        "page",
+        [
+            "installation.md",
+            "recapitulatif.md",
+            "debutant/notif-welcome.md",
+            "debutant/notif-read.md",
+            "debutant/bilan.md",
+            "intermediaire/notif-mark.md",
+            "intermediaire/notif-data.md",
+            "intermediaire/bilan.md",
+            "avance/notif-delivery.md",
+            "avance/notif-independance.md",
+            "avance/bilan.md",
+        ],
+    )
+    def test_page_exists(self, page: str) -> None:
+        assert (WELCOME / page).is_file(), f"page welcome manquante : {page}"
+
+
+class TestDebutantChain:
+    def test_chain(self) -> None:
+        assert _has("debutant/notif-welcome.md", "(notif-read.md)")
+        assert _has("debutant/notif-read.md", "(bilan.md)")
+
+    def test_bilan_points_to_next_level(self) -> None:
+        assert _has("debutant/bilan.md", "../intermediaire/notif-mark.md")
+
+
+class TestIntermediaireChain:
+    def test_chain(self) -> None:
+        assert _has("intermediaire/notif-mark.md", "(notif-data.md)")
+        assert _has("intermediaire/notif-data.md", "(bilan.md)")
+
+    def test_bilan_points_to_next_level(self) -> None:
+        assert _has("intermediaire/bilan.md", "../avance/notif-delivery.md")
+
+
+class TestAvanceChain:
+    def test_chain(self) -> None:
+        assert _has("avance/notif-delivery.md", "(notif-independance.md)")
+        assert _has("avance/notif-independance.md", "(bilan.md)")
+
+    def test_bilan_closes_parcours(self) -> None:
+        assert _has("avance/bilan.md", "../../references/store.md")
+
+
+class TestNoProjectCreationCommand:
+    @pytest.mark.parametrize("page", _pages(), ids=lambda p: p.name)
+    def test_no_forbidden_command(self, page: Path) -> None:
+        text = page.read_text(encoding="utf-8")
+        offending = [cmd for cmd in FORBIDDEN_COMMANDS if cmd in text]
+        assert not offending, f"{page.name} contient une commande interdite : {offending}"

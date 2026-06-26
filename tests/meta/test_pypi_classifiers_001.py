@@ -40,6 +40,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-audit":    "Development Status :: 4 - Beta",
     # forge-mvc-jobs : file de tâches de fond, non publié (JOBS-OPTIN-SCAFFOLD-001).
     "forge-mvc-jobs":     "Development Status :: 4 - Beta",
+    # forge-mvc-notifications : notifications in-app, non publié (NOTIFICATIONS-OPTIN-SCAFFOLD-001).
+    "forge-mvc-notifications": "Development Status :: 4 - Beta",
 }
 
 

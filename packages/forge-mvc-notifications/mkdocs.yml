@@ -1,0 +1,26 @@
+# Documentation embarquée du paquet forge-mvc-notifications (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /notifications/.
+site_name: notifications
+docs_dir: docs
+nav:
+  - Présentation: index.md
+  - Référence (par module):
+      - Notifications (store.py): references/store.md
+      - Initialisation (notifications:init): references/cli.md
+      - Erreurs (errors.py): references/errors.md
+  - Progression Notifications:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Première notification: welcome/debutant/notif-welcome.md
+          - Lire les notifications: welcome/debutant/notif-read.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Marquer comme lu: welcome/intermediaire/notif-mark.md
+          - Type et données: welcome/intermediaire/notif-data.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Livraison hors application: welcome/avance/notif-delivery.md
+          - Indépendance du cœur: welcome/avance/notif-independance.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md
