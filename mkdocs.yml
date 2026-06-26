@@ -281,6 +281,7 @@ nav:
             - ADR-048 Parcours welcome-projet du squelette: adr/048-skeleton-welcome-projet.md
             - ADR-049 Repositionnement production auditable: adr/049-positioning-production-auditable.md
             - ADR-050 Opt-in QR Code: adr/050-qrcode-optin.md
+            - ADR-051 Insertion contrôleur pages publiques: adr/051-public-page-controller-insertion.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
