@@ -52,12 +52,10 @@ class _ControllerContext:
     snake: str
     plural: str
     pk_name: str
-    pk_col: str
     choice_options: list[CrudManyToOneRelation]
     generated_fields: list[tuple[str, str]]
     ctrl_media_entries: list[dict[str, Any]]
     m2m: list[CrudManyToManyRelation]
-    rbac: dict[str, str]
     allowed_sort_keys_repr: str
     filter_flds: list[dict[str, Any]]
     relation_filter_names: set[str]
@@ -819,10 +817,10 @@ def build_controller(
     filter_flds = _filter_fields(definition, relations)
     relation_filter_names = set(_relation_by_field(relations))
     _ctx = _ControllerContext(
-        entity=entity, snake=snake, plural=plural, pk_name=pk_name, pk_col=pk_col,
+        entity=entity, snake=snake, plural=plural, pk_name=pk_name,
         choice_options=choice_options, generated_fields=generated_fields,
         ctrl_media_entries=ctrl_media_entries, m2m=many_to_many_relations or [],
-        rbac=_rbac, allowed_sort_keys_repr=allowed_sort_keys_repr,
+        allowed_sort_keys_repr=allowed_sort_keys_repr,
         filter_flds=filter_flds, relation_filter_names=relation_filter_names,
     )
     list_context_lines: list[str] = [
