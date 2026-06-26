@@ -4,6 +4,5 @@
 site_name: cli-deploy
 docs_dir: docs
 nav:
-  - Référence CLI déploiement (par module):
-      - Commandes deploy:* (deploy.py): deploy.md
+  - Référence CLI modules locaux (par module):
       - Commandes module:* (modules.py): modules.md

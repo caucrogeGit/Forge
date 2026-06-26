@@ -42,6 +42,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-jobs":     "Development Status :: 4 - Beta",
     # forge-mvc-notifications : notifications in-app, non publié (NOTIFICATIONS-OPTIN-SCAFFOLD-001).
     "forge-mvc-notifications": "Development Status :: 4 - Beta",
+    # forge-mvc-deploy : outillage de déploiement CLI-only, non publié (DEPLOY-EXTRACT-001, ADR-053).
+    "forge-mvc-deploy":   "Development Status :: 4 - Beta",
 }
 
 

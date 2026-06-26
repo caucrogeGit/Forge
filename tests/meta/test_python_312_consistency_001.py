@@ -23,7 +23,7 @@ class TestPython312Consistency:
         Path("docs/release/compatibility.md"),
         Path("docs/release/release-and-compatibility.md"),
         Path("cli/project/doctor.py"),
-        Path("cli/deploy/deploy.py"),
+        Path("packages/forge-mvc-deploy/forge_mvc_deploy/cli/deploy.py"),
         Path(".github/workflows/tests.yml"),
     ]
 

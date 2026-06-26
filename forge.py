@@ -31,7 +31,6 @@ from cli.public.public_show import main as public_show_main
 # branche upload:init/media:init (dépend de l'opt-in forge-mvc-files).
 from cli.assets.front import main as front_main
 from cli.security.auth import main as auth_main
-from cli.deploy.deploy import main as deploy_main
 from cli.assets.i18n import main as i18n_main
 from cli.project.run import main as run_main
 from cli.project.update import main as update_main
@@ -867,6 +866,13 @@ def main() -> None:
         return
 
     if command in ("deploy:init", "deploy:check"):
+        try:
+            from forge_mvc_deploy.cli.deploy import main as deploy_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-deploy non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-deploy",
+            )
         deploy_main(args)
         return
 

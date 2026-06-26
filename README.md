@@ -131,16 +131,17 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 | `forge-mvc-audit` | Journal d'audit applicatif (table `audit_log`, `record_audit`/`get_audit_log`), borné (pas un SIEM) | Beta (publication à venir) |
 | `forge-mvc-jobs` | File de tâches de fond adossée à MariaDB (`enqueue` + worker `drain`/`run_worker`), sans broker ni async | Beta (publication à venir) |
 | `forge-mvc-notifications` | Notifications in-app (table `notifications`, `notify`/`get_notifications`/`mark_read`) | Beta (publication à venir) |
+| `forge-mvc-deploy` | Outillage de déploiement opt-in CLI-only : `deploy:init` (gabarits Nginx/systemd/WSGI) et `deploy:check`, sans API runtime (ADR-053) | Beta (publication à venir) |
 | `forge-mvc-admin` | Back-office applicatif : CRUD générique sur les entités déclarées, auth + CSRF, RBAC optionnel (voir la [roadmap Forge Admin](docs/roadmap/forge-admin-roadmap.md)) | Beta (non publié) |
 | `forge-mvc-testing` | Infrastructure de test partagée (`FakeRequest` + plugin pytest), réservée au développement (ADR-041) | Beta (dev-only) |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus
 dans l'extra `forge-mvc[all]`. Tous les autres opt-ins (`mfa`, `files`,
-`images`, `audio`, `video`, `iot`, `pivot`, `mail`, `i18n`, `qrcode`, `settings`, `import-export`, `audit`, `jobs`, `notifications`) s'installent
+`images`, `audio`, `video`, `iot`, `pivot`, `mail`, `i18n`, `qrcode`, `settings`, `import-export`, `audit`, `jobs`, `notifications`, `deploy`) s'installent
 **explicitement et séparément**, par exemple `pip install --pre forge-mvc-rbac`
 ou `pip install --pre forge-mvc-images`. `forge-mvc-i18n`, `forge-mvc-qrcode`,
-`forge-mvc-settings`, `forge-mvc-import-export`, `forge-mvc-audit`, `forge-mvc-jobs` et `forge-mvc-notifications` ne sont pas encore publiés sur PyPI ; ils s'installent en éditable via
+`forge-mvc-settings`, `forge-mvc-import-export`, `forge-mvc-audit`, `forge-mvc-jobs`, `forge-mvc-notifications` et `forge-mvc-deploy` ne sont pas encore publiés sur PyPI ; ils s'installent en éditable via
 `requirements-dev.txt`.
 Cette exclusion de `[all]` tient soit à
 une dépendance lourde (MQTT `paho-mqtt` pour IoT, binaire système FFmpeg pour

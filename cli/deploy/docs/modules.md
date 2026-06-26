@@ -33,4 +33,4 @@ Chaque sous-commande gère son propre `--help`.
 
 ## 4. Voir aussi
 
-- [Les commandes deploy:init et deploy:check](deploy.md) : configuration de déploiement.
+- Le déploiement (`deploy:init` / `deploy:check`) est désormais fourni par l'opt-in `forge-mvc-deploy` (ADR-053).

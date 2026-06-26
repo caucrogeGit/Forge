@@ -373,6 +373,7 @@ nav:
       - Audit: '!include packages/forge-mvc-audit/mkdocs.yml'
       - Jobs: '!include packages/forge-mvc-jobs/mkdocs.yml'
       - Notifications: '!include packages/forge-mvc-notifications/mkdocs.yml'
+      - Déploiement (opt-in): '!include packages/forge-mvc-deploy/mkdocs.yml'
 
 markdown_extensions:
   - admonition

@@ -74,6 +74,20 @@ Justification au regard de la charte :
 
 ---
 
+## Mise en œuvre (phasage)
+
+L'extraction du code, du paquet, de la dispatch, des tests et de la doc
+embarquée minimale (présentation + référence CLI) est livrée par
+`DEPLOY-EXTRACT-001`.
+
+La migration des sept guides de mise en production (`docs/deployment/`) vers la
+doc embarquée du paquet est différée à un ticket de suivi dédié
+(`DEPLOY-DOCS-MIGRATE-001`). Ces guides sont fortement intriqués : plus de
+quinze liens entrants depuis le reste de `docs/` et plusieurs tests qui codent
+en dur leurs chemins. Les déplacer dans le même ticket que l'extraction du code
+mêlerait deux changements à risques distincts. Dans l'intervalle, le paquet
+référence ces guides, qui restent publiés dans la documentation Forge.
+
 ## Conséquences
 
 - Le cœur du CLI maigrit (730 lignes et leurs gabarits partent dans l'opt-in).

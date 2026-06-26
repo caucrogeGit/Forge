@@ -1,5 +1,11 @@
 # pyright: strict
-"""Commandes forge deploy:init et forge deploy:check."""
+"""Commandes ``forge deploy:init`` et ``forge deploy:check`` (forge-mvc-deploy).
+
+Opt-in CLI-only extrait du cœur (ADR-053). Génère les artefacts de
+déploiement (``wsgi.py``, configuration Nginx, unité systemd, README) et
+vérifie l'environnement de production. Aucune API runtime : l'application
+n'importe jamais ce module à l'exécution.
+"""
 
 from __future__ import annotations
 
@@ -8,7 +14,12 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
-import cli._support.output as out
+_WIDTH = 12
+
+
+def _tag(label: str, message: str) -> str:
+    """Formate une ligne de statut alignée, sans dépendre du cœur CLI."""
+    return f"[{label}]".ljust(_WIDTH) + message
 
 
 class _Result(NamedTuple):
@@ -196,14 +207,14 @@ def cmd_deploy_init(root: Path | None = None) -> None:
     for path, content in files.items():
         rel = path.relative_to(root)
         if _write_if_new(path, content):
-            print(out.created(str(rel)))
+            print(_tag("CRÉÉ", str(rel)))
         else:
-            print(out.preserved(str(rel)))
+            print(_tag("PRÉSERVÉ", str(rel)))
 
     print()
-    print(out.ok("Fichiers de déploiement prêts dans deploy/"))
-    print(out.info("Consulter deploy/README_DEPLOY.md pour les étapes."))
-    print(out.info("Lancer forge deploy:check pour vérifier l'environnement."))
+    print(_tag("OK", "Fichiers de déploiement prêts dans deploy/"))
+    print(_tag("INFO", "Consulter deploy/README_DEPLOY.md pour les étapes."))
+    print(_tag("INFO", "Lancer forge deploy:check pour vérifier l'environnement."))
     print()
 
 
@@ -373,11 +384,11 @@ def cmd_deploy_check(root: Path | None = None) -> None:
         detail_str = f" — {r.detail}" if r.detail else ""
         msg = r.label + detail_str
         if r.status == "ok":
-            print(out.ok(msg))
+            print(_tag("OK", msg))
         elif r.status == "warn":
-            print(out.warn(msg))
+            print(_tag("WARN", msg))
         else:
-            print(out.error(msg))
+            print(_tag("ERREUR", msg))
             has_error = True
 
     errors = sum(1 for r in results if r.status == "error")

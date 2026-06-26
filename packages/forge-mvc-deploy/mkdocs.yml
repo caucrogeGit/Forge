@@ -1,0 +1,24 @@
+# Documentation embarquée du paquet forge-mvc-deploy (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /deploy/.
+site_name: deploy
+docs_dir: docs
+nav:
+  - Présentation: index.md
+  - Référence (par module):
+      - Commandes deploy:* (cli/deploy.py): references/cli.md
+  - Progression Deploy:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Premier déploiement: welcome/debutant/deploy-welcome.md
+          - Générer les fichiers: welcome/debutant/deploy-init.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Vérifier l'environnement: welcome/intermediaire/deploy-check.md
+          - Adapter les gabarits: welcome/intermediaire/deploy-templates.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Opt-in CLI-only: welcome/avance/deploy-optin.md
+          - Indépendance du cœur: welcome/avance/deploy-independance.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

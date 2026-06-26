@@ -1,11 +1,14 @@
-"""Tests pour les commandes forge deploy:init et forge deploy:check."""
+"""Tests pour les commandes forge deploy:init et forge deploy:check (forge-mvc-deploy)."""
 
 from __future__ import annotations
 
 import sys
 
+import pytest
 
-from cli.deploy.deploy import (
+forge_mvc_deploy = pytest.importorskip("forge_mvc_deploy")
+
+from forge_mvc_deploy.cli.deploy import (  # noqa: E402
     _check_results,
     cmd_deploy_check,
     cmd_deploy_init,
