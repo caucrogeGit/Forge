@@ -58,3 +58,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-049](049-positioning-production-auditable.md) | Repositionnement : framework de production auditable (accepté) |
 | [ADR-050](050-qrcode-optin.md) | Opt-in QR Code `forge-mvc-qrcode` (accepté) |
 | [ADR-051](051-public-page-controller-insertion.md) | Insertion d'une méthode dans le contrôleur des pages publiques (`make:public-page`), explicite, idempotente, fail-safe et ciblée (proposé) |
+| [ADR-052](052-optin-strategy.md) | Stratégie et critères des opt-ins : deux filtres d'admission (runtime WSGI, charte), classification des candidats, ordre recommandé (proposé) |

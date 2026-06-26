@@ -282,6 +282,7 @@ nav:
             - ADR-049 Repositionnement production auditable: adr/049-positioning-production-auditable.md
             - ADR-050 Opt-in QR Code: adr/050-qrcode-optin.md
             - ADR-051 Insertion contrôleur pages publiques: adr/051-public-page-controller-insertion.md
+            - ADR-052 Stratégie des opt-ins: adr/052-optin-strategy.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
