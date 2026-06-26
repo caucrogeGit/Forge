@@ -257,8 +257,15 @@ complète. Les limites suivantes restent à la charge de l'opérateur :
   (pas de verrou partagé strict). Pour un déploiement multi-worker fiable,
   privilégier `MariaDbSessionStore`.
 - **Rate-limits login/upload encore en mémoire** : compteurs non partagés
-  entre workers Gunicorn. La protection reste utile mais n'est pas
-  distribuée.
+  entre workers Gunicorn. Chaque worker tient son propre compteur, donc la
+  limite effective est multipliée par le nombre de workers : avec le défaut
+  login de 5 tentatives par fenêtre de 60 s (`core/auth/rate_limit.py`,
+  `LOGIN_MAX_ATTEMPTS`/`LOGIN_RATE_LIMIT_WINDOW`), un déploiement à `N` workers
+  tolère jusqu'à `N × 5` tentatives par fenêtre, l'attaquant étant réparti sur
+  les workers par le proxy. La protection reste utile mais n'est pas
+  distribuée. Pour un rate-limit effectif en multi-worker, brancher un backend
+  partagé (table MariaDB ou Redis) qui centralise le comptage des tentatives ;
+  c'est à la charge de l'application (hors périmètre du noyau, principe 8).
 - **Anti-rejeu MFA (TOTP) en mémoire** : l'état anti-rejeu de `forge-mvc-mfa`
   est propre à chaque worker ; un code TOTP intercepté peut être rejoué sur un
   autre worker. Non distribué dans la série 1.0.0.
