@@ -613,6 +613,19 @@ def main() -> None:
         mail_main(args)
         return
 
+    if command == "settings:init":
+        try:
+            from forge_mvc_settings.cli.init import main as settings_init_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-settings non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-settings",
+            )
+        rc = settings_init_main(args[1:])
+        if rc:
+            sys.exit(rc)
+        return
+
     if command == "iot:doctor":
         try:
             from forge_mvc_iot.cli.doctor import main as iot_doctor_main

@@ -32,6 +32,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-admin":    "Development Status :: 1 - Planning",
     # forge-mvc-qrcode : socle de génération QR Code, non publié (QRCODE-OPTIN-SCAFFOLD-001).
     "forge-mvc-qrcode":   "Development Status :: 4 - Beta",
+    # forge-mvc-settings : paramètres applicatifs, non publié (SETTINGS-OPTIN-SCAFFOLD-001).
+    "forge-mvc-settings": "Development Status :: 4 - Beta",
 }
 
 
