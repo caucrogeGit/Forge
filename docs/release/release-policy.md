@@ -161,6 +161,7 @@ chaque package publiable :
 | `forge-mvc-admin` | `4 - Beta` | Back-office applicatif opt-in : CRUD générique sur les entités déclarées, sécurité par défaut (auth + CSRF), RBAC optionnel, `admin:init` / `admin:doctor`. Chantier clôturé (suite verte), non publié sur PyPI |
 | `forge-mvc-qrcode` | `4 - Beta` | Génération de QR Codes opt-in (ADR-050) : PNG et SVG depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur. Dépend de `segno` (pur Python). Non publié sur PyPI |
 | `forge-mvc-settings` | `4 - Beta` | Paramètres applicatifs opt-in (ADR-052) : table `app_settings` clé/valeur typée, API `get_setting`/`set_setting`, migration fournie via `settings:init`. Dépend uniquement du cœur. Non publié sur PyPI |
+| `forge-mvc-import` | `4 - Beta` | Import CSV opt-in (ADR-052) : lecture, validation par champ, rapport d'erreurs, insertion via un callback de l'application. Pur stdlib, dépend uniquement du cœur. Non publié sur PyPI |
 
 Critères de passage Beta → Stable d'un module opt-in :
 

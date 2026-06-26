@@ -127,16 +127,17 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 | `forge-mvc-i18n` | Internationalisation : catalogues JSON, fallback, helper `trans()` (repli no-op du noyau) | Beta (publication à venir) |
 | `forge-mvc-qrcode` | Génération de QR Codes (PNG/SVG) depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur | Beta (publication à venir) |
 | `forge-mvc-settings` | Paramètres applicatifs persistés en MariaDB (table `app_settings`), API explicite `get_setting`/`set_setting` | Beta (publication à venir) |
+| `forge-mvc-import` | Import CSV : lecture, validation par champ, rapport d'erreurs, insertion via un callback de l'application | Beta (publication à venir) |
 | `forge-mvc-admin` | Back-office applicatif : CRUD générique sur les entités déclarées, auth + CSRF, RBAC optionnel (voir la [roadmap Forge Admin](docs/roadmap/forge-admin-roadmap.md)) | Beta (non publié) |
 | `forge-mvc-testing` | Infrastructure de test partagée (`FakeRequest` + plugin pytest), réservée au développement (ADR-041) | Beta (dev-only) |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus
 dans l'extra `forge-mvc[all]`. Tous les autres opt-ins (`mfa`, `files`,
-`images`, `audio`, `video`, `iot`, `pivot`, `mail`, `i18n`, `qrcode`, `settings`) s'installent
+`images`, `audio`, `video`, `iot`, `pivot`, `mail`, `i18n`, `qrcode`, `settings`, `import`) s'installent
 **explicitement et séparément**, par exemple `pip install --pre forge-mvc-rbac`
-ou `pip install --pre forge-mvc-images`. `forge-mvc-i18n`, `forge-mvc-qrcode` et
-`forge-mvc-settings` ne sont pas encore publiés sur PyPI ; ils s'installent en éditable via
+ou `pip install --pre forge-mvc-images`. `forge-mvc-i18n`, `forge-mvc-qrcode`,
+`forge-mvc-settings` et `forge-mvc-import` ne sont pas encore publiés sur PyPI ; ils s'installent en éditable via
 `requirements-dev.txt`.
 Cette exclusion de `[all]` tient soit à
 une dépendance lourde (MQTT `paho-mqtt` pour IoT, binaire système FFmpeg pour
