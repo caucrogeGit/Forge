@@ -2,7 +2,12 @@
 
 ## Statut
 
-Proposé, Forge 1.0.0-beta.x (ticket `OPTIN-TEST-SUPPORT-001`).
+Acceptée, Forge 1.0.0-beta.17 (ticket `GOV-ADR-STATUS-RESOLVE-001`).
+Proposé en 1.0.0-beta.x (ticket `OPTIN-TEST-SUPPORT-001`).
+
+La décision est appliquée : le paquet `forge-mvc-testing` (`FakeRequest` plus
+plugin pytest) est distribué en dev-only ; le `conftest.py` racine est réduit et
+les paquets opt-in portent leurs tests via ce paquet.
 
 Débloque l'ADR-040 (surface de test par paquet) : quatre paquets ont pu migrer
 leurs tests unitaires (`stats`, `workflow`, `audio`, `mail`), mais les huit
@@ -42,7 +47,7 @@ Tout futur déplacement doit exclure `conftest.py` et tracer l'usage de fixtures
 
 ---
 
-## Décision (proposée)
+## Décision
 
 Extraire l'infrastructure de test partagée dans un **paquet de test-support
 dédié, réservé au développement** : `packages/forge-mvc-testing/`

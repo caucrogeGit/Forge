@@ -2,9 +2,15 @@
 
 ## Statut
 
-Proposé, Forge 1.0.0-beta.15 (ticket `ADR-EXPLICIT-ROUTE-INJECTION-001`).
-Révisé en 1.0.0-beta.17 (ticket `ADR-030-REVISION-001`) pour retirer la
-référence à `starter:build`, commande supprimée par l'ADR-035.
+Acceptée, Forge 1.0.0-beta.17 (ticket `GOV-ADR-STATUS-RESOLVE-001`).
+Proposé en 1.0.0-beta.15 (ticket `ADR-EXPLICIT-ROUTE-INJECTION-001`), révisé en
+1.0.0-beta.17 (ticket `ADR-030-REVISION-001`) pour retirer la référence à
+`starter:build`, commande supprimée par l'ADR-035.
+
+La décision est appliquée dans le code : les `make:public-*` injectent les routes
+selon les quatre conditions, avec détection robuste du marqueur `router`
+(`FIX-PUBLIC-ROUTES-MARKER-001`). La précision du texte de la règle 4.3 de
+`CHARTE_DOC.md` reste un geste mainteneur distinct, non appliqué par cet ADR.
 
 Précise la portée de la règle de génération 4.3 de la charte v2 (« le fichier
 principal de routes applicatives `mvc/routes.py` reste sous le contrôle explicite
