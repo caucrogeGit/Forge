@@ -113,27 +113,27 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 
 | Opt-in | Rôle | Maturité |
 |--------|------|----------|
-| [`forge-mvc-rbac`](https://pypi.org/project/forge-mvc-rbac/) | Rôles et permissions déclaratives | Beta |
-| [`forge-mvc-workflow`](https://pypi.org/project/forge-mvc-workflow/) | Cycles de vie applicatifs (statuts, transitions) | Beta |
-| [`forge-mvc-stats`](https://pypi.org/project/forge-mvc-stats/) | Agrégats et compteurs d'événements | Beta |
-| [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) | Beta |
-| [`forge-mvc-files`](https://pypi.org/project/forge-mvc-files/) | Upload générique : écriture sécurisée, storage, service de fichiers (HTTP Range) | Beta |
-| [`forge-mvc-images`](https://pypi.org/project/forge-mvc-images/) | Traitement et gestion applicative des images (Pillow), dépend de `forge-mvc-files` | Beta |
-| [`forge-mvc-audio`](https://pypi.org/project/forge-mvc-audio/) | Upload, sondage, transcodage MP3 et lecture en streaming HTTP Range | Beta |
-| [`forge-mvc-video`](https://pypi.org/project/forge-mvc-video/) | Upload, transcodage MP4 (H.264/AAC) et lecture en streaming HTTP Range | Beta |
-| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) | Beta |
-| [`forge-mvc-pivot`](https://pypi.org/project/forge-mvc-pivot/) | Tables pivot avancées extraites du core | Beta |
-| [`forge-mvc-mail`](https://pypi.org/project/forge-mvc-mail/) | Envoi de courriels extrait du core | Beta |
-| `forge-mvc-i18n` | Internationalisation : catalogues JSON, fallback, helper `trans()` (repli no-op du noyau) | Beta (publication à venir) |
-| `forge-mvc-qrcode` | Génération de QR Codes (PNG/SVG) depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur | Beta (publication à venir) |
-| `forge-mvc-settings` | Paramètres applicatifs persistés en MariaDB (table `app_settings`), API explicite `get_setting`/`set_setting` | Beta (publication à venir) |
-| `forge-mvc-import-export` | Échange CSV : import (validation par champ, rapport d'erreurs, insertion via un callback) et export programmatique (`to_csv`) | Beta (publication à venir) |
-| `forge-mvc-audit` | Journal d'audit applicatif (table `audit_log`, `record_audit`/`get_audit_log`), borné (pas un SIEM) | Beta (publication à venir) |
-| `forge-mvc-jobs` | File de tâches de fond adossée à MariaDB (`enqueue` + worker `drain`/`run_worker`), sans broker ni async | Beta (publication à venir) |
-| `forge-mvc-notifications` | Notifications in-app (table `notifications`, `notify`/`get_notifications`/`mark_read`) | Beta (publication à venir) |
-| `forge-mvc-deploy` | Outillage de déploiement opt-in CLI-only : `deploy:init` (gabarits Nginx/systemd/WSGI) et `deploy:check`, sans API runtime (ADR-053) | Beta (publication à venir) |
-| `forge-mvc-admin` | Back-office applicatif : CRUD générique sur les entités déclarées, auth + CSRF, RBAC optionnel (voir la [roadmap Forge Admin](docs/roadmap/forge-admin-roadmap.md)) | Beta (non publié) |
-| `forge-mvc-testing` | Infrastructure de test partagée (`FakeRequest` + plugin pytest), réservée au développement (ADR-041) | Beta (dev-only) |
+| [`forge-mvc-rbac`](https://pypi.org/project/forge-mvc-rbac/) | Rôles et permissions déclaratives | RC |
+| [`forge-mvc-workflow`](https://pypi.org/project/forge-mvc-workflow/) | Cycles de vie applicatifs (statuts, transitions) | RC |
+| [`forge-mvc-stats`](https://pypi.org/project/forge-mvc-stats/) | Agrégats et compteurs d'événements | RC |
+| [`forge-mvc-mfa`](https://pypi.org/project/forge-mvc-mfa/) | Authentification multi-facteurs (TOTP) | RC |
+| [`forge-mvc-files`](https://pypi.org/project/forge-mvc-files/) | Upload générique : écriture sécurisée, storage, service de fichiers (HTTP Range) | RC |
+| [`forge-mvc-images`](https://pypi.org/project/forge-mvc-images/) | Traitement et gestion applicative des images (Pillow), dépend de `forge-mvc-files` | RC |
+| [`forge-mvc-audio`](https://pypi.org/project/forge-mvc-audio/) | Upload, sondage, transcodage MP3 et lecture en streaming HTTP Range | RC |
+| [`forge-mvc-video`](https://pypi.org/project/forge-mvc-video/) | Upload, transcodage MP4 (H.264/AAC) et lecture en streaming HTTP Range | RC |
+| [`forge-mvc-iot`](https://pypi.org/project/forge-mvc-iot/) | Réception/exposition de données IoT (MQTT, stockage, API HTTP) | RC |
+| [`forge-mvc-pivot`](https://pypi.org/project/forge-mvc-pivot/) | Tables pivot avancées extraites du core | RC |
+| [`forge-mvc-mail`](https://pypi.org/project/forge-mvc-mail/) | Envoi de courriels extrait du core | RC |
+| `forge-mvc-i18n` | Internationalisation : catalogues JSON, fallback, helper `trans()` (repli no-op du noyau) | RC (publication à venir) |
+| `forge-mvc-qrcode` | Génération de QR Codes (PNG/SVG) depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur | RC (publication à venir) |
+| `forge-mvc-settings` | Paramètres applicatifs persistés en MariaDB (table `app_settings`), API explicite `get_setting`/`set_setting` | RC (publication à venir) |
+| `forge-mvc-import-export` | Échange CSV : import (validation par champ, rapport d'erreurs, insertion via un callback) et export programmatique (`to_csv`) | RC (publication à venir) |
+| `forge-mvc-audit` | Journal d'audit applicatif (table `audit_log`, `record_audit`/`get_audit_log`), borné (pas un SIEM) | RC (publication à venir) |
+| `forge-mvc-jobs` | File de tâches de fond adossée à MariaDB (`enqueue` + worker `drain`/`run_worker`), sans broker ni async | RC (publication à venir) |
+| `forge-mvc-notifications` | Notifications in-app (table `notifications`, `notify`/`get_notifications`/`mark_read`) | RC (publication à venir) |
+| `forge-mvc-deploy` | Outillage de déploiement opt-in CLI-only : `deploy:init` (gabarits Nginx/systemd/WSGI) et `deploy:check`, sans API runtime (ADR-053) | RC (publication à venir) |
+| `forge-mvc-admin` | Back-office applicatif : CRUD générique sur les entités déclarées, auth + CSRF, RBAC optionnel (voir la [roadmap Forge Admin](docs/roadmap/forge-admin-roadmap.md)) | RC (non publié) |
+| `forge-mvc-testing` | Infrastructure de test partagée (`FakeRequest` + plugin pytest), réservée au développement (ADR-041) | RC (dev-only) |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus
@@ -200,7 +200,8 @@ L'usage professionnel, commercial ou institutionnel nécessite un accord
 écrit préalable de Roger Lequette. La lecture, l'étude, l'évaluation
 personnelle et l'usage éducatif non commercial sont autorisés sans accord.
 
-Forge n'est pas open source pendant sa phase bêta. À partir de la version
+Forge n'est pas open source pendant sa phase de préversion (release candidate
+incluse). À partir de la version
 1.0.0 stable, Forge bascule sous licence open source MIT, dès que les critères
 de stabilité sont réunis et au plus tard le 31 décembre 2026 (critères détaillés
 sur la page licence et la roadmap). Jusqu'à cette publication, la licence présente
