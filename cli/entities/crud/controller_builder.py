@@ -627,52 +627,134 @@ def _render_index(ctx: _ControllerContext) -> list[str]:
     return index_lines
 
 
-def build_controller(
-    definition: dict[str, Any],
-    relations: list[CrudManyToOneRelation] | None = None,
-    many_to_many_relations: list[CrudManyToManyRelation] | None = None,
-) -> str:
-    entity = definition["entity"]
-    snake = _to_snake(entity)
-    plural = snake + "s"
-    pk = _pk_field(definition)
-    pk_name = pk["name"]
-    pk_col = pk["column"]
-    non_pk = _non_pk_fields(definition)
-    # Champs slug auto-générés : (nom, champ source) — calculés à la création.
-    generated_fields = [(f["name"], f["source"]) for f in non_pk if _is_generated(f)]
-    allowed_sort_keys = [f["name"] for f in non_pk] + [pk_name]
-    allowed_sort_keys_repr = "{" + ", ".join(f'"{key}"' for key in allowed_sort_keys) + "}"
-    choice_relations = _unique_choice_relations(relations)
-    many_to_many_choice_relations = _unique_many_to_many_choice_relations(many_to_many_relations)
-    choice_imports = [relation.choices_function for relation in choice_relations]
-    for relation in many_to_many_choice_relations:
-        if relation.choices_function not in choice_imports:
-            choice_imports.append(relation.choices_function)
-    many_to_many_imports: list[str] = []
-    for relation in many_to_many_relations or []:
-        many_to_many_imports.extend([
-            relation.selected_function,
-            relation.add_function,
-            relation.sync_function,
-            relation.list_labels_function,
-            relation.show_labels_function,
+def _render_list_context(ctx: _ControllerContext, pk_col: str) -> list[str]:
+    """Méthode `_list_context` du contrôleur (REFACTOR-BUILDERS-DECOMPOSE-002).
+
+    Lecture des paramètres de liste, filtres, pagination et contexte de rendu.
+    Extraite de `build_controller` à iso-sortie.
+    """
+    allowed_sort_keys_repr = ctx.allowed_sort_keys_repr
+    filter_flds = ctx.filter_flds
+    relation_filter_names = ctx.relation_filter_names
+    plural = ctx.plural
+    list_context_lines: list[str] = [
+        "",
+        "    @staticmethod",
+        "    def _list_context(request):",
+        '        q         = _query_param(request, "q").strip()',
+        '        sort      = _query_param(request, "sort")',
+        f"        if sort not in {allowed_sort_keys_repr}:",
+        '            sort = ""',
+        '        direction = _query_param(request, "direction", "desc")',
+        '        if direction not in ("asc", "desc"):',
+        '            direction = "asc"',
+        "        limit  = 20",
+    ]
+    for ff in filter_flds:
+        fname = ff["name"]
+        if fname in relation_filter_names:
+            list_context_lines.append(f'        {fname}_raw = _query_param(request, "{fname}").strip()')
+            list_context_lines.append(f'        {fname}_f = ""')
+            list_context_lines.append(f'        if {fname}_raw:')
+            list_context_lines.append("            try:")
+            list_context_lines.append(f"                {fname}_f = int({fname}_raw)")
+            list_context_lines.append("            except (TypeError, ValueError):")
+            list_context_lines.append(f'                {fname}_f = ""')
+        else:
+            list_context_lines.append(f'        {fname}_f = _query_param(request, "{fname}").strip()')
+    if filter_flds:
+        list_context_lines.append("        relation_filters = {}")
+        filter_names = {ff["name"] for ff in filter_flds}
+        for relation in ctx.choice_options:
+            if relation.field_name in filter_names:
+                list_context_lines.append(
+                    f'        relation_filters["{relation.field_name}"] = {{'
+                    f'"options": [{{"id": value, "label": label}} for value, label in {relation.choices_function}()]'
+                    "}"
+                )
+        list_context_lines.append("        _filters = {}")
+        for ff in filter_flds:
+            fname = ff["name"]
+            if _is_bool_sql(ff.get("sql_type", "")):
+                list_context_lines.append(f'        if {fname}_f in ("0", "1"):')
+                list_context_lines.append(f'            _filters["{fname}"] = {fname}_f')
+            else:
+                list_context_lines.append(f'        if {fname}_f != "":')
+                list_context_lines.append(f'            _filters["{fname}"] = {fname}_f')
+        list_context_lines.extend([
+            f'        total    = count_{plural}(q or None, filters=_filters or None)',
+            "        pagination_state = Pagination(request, total, limit)",
+            "        limit = pagination_state.limit",
+            "        offset = pagination_state.offset",
+            '        empty_context = "search_filters" if q and _filters else ("search" if q else ("filters" if _filters else None))',
+            f'        {plural} = find_{plural}_paginated(',
+            "            q=q or None, sort=sort or None, direction=direction,",
+            "            limit=limit, offset=offset, filters=_filters or None,",
+            "        )",
         ])
-    choice_options = relations or []
+        filters_dict = "{" + ", ".join(f'"{ff["name"]}": {ff["name"]}_f' for ff in filter_flds) + "}"
+        list_context_lines.extend([
+            "        pagination = pagination_state.to_dict()",
+            '        pagination.update({',
+            '            "q": q, "sort": sort, "direction": direction,',
+            f'            "filters": {filters_dict},',
+            "        })",
+        ])
+    else:
+        list_context_lines.extend([
+            "        relation_filters = {}",
+            f'        total    = count_{plural}(q or None)',
+            "        pagination_state = Pagination(request, total, limit)",
+            "        limit = pagination_state.limit",
+            "        offset = pagination_state.offset",
+            '        empty_context = "search" if q else None',
+            f'        {plural} = find_{plural}_paginated(',
+            "            q=q or None, sort=sort or None, direction=direction,",
+            "            limit=limit, offset=offset,",
+            "        )",
+            "        pagination = pagination_state.to_dict()",
+            '        pagination.update({',
+            '            "q": q, "sort": sort, "direction": direction,',
+            '            "filters": {},',
+            "        })",
+        ])
+    list_context_lines.extend([
+        "        return {",
+        f'                "{plural}": {plural},',
+        "                \"pagination\": pagination,",
+        "                \"empty_context\": empty_context,",
+        "                \"relation_filters\": relation_filters,",
+        "                \"flash_html\": render_flash_html(request),",
+    ])
+    for relation in ctx.m2m:
+        list_context_lines.append(
+            f'                "{relation.list_context_key}": {relation.list_labels_function}([row["{pk_col}"] for row in {plural}]),'
+        )
+    list_context_lines.extend([
+        "            }",
+    ])
+    return list_context_lines
 
-    ctrl_media_entries = _media_form_fields(definition)
 
-    # RBAC — permissions optionnelles depuis la définition JSON
-    _rbac_raw: dict[str, Any] = cast("dict[str, Any]", definition.get("rbac") or {}).get("permissions") or {}
-    _rbac: dict[str, str] = {}
-    if _rbac_raw:
-        from forge_mvc_rbac import normalize_permission_code
-        _rbac = {
-            action: normalize_permission_code(code)
-            for action, code in _rbac_raw.items()
-            if isinstance(code, str) and code.strip()
-        }
+def _render_preamble(
+    entity: str,
+    snake: str,
+    plural: str,
+    non_pk: list[dict[str, Any]],
+    generated_fields: list[tuple[str, str]],
+    choice_imports: list[str],
+    many_to_many_imports: list[str],
+    ctrl_media_entries: list[dict[str, Any]],
+    choice_options: list[CrudManyToOneRelation],
+    relations: list[CrudManyToOneRelation] | None,
+    has_rbac: bool,
+) -> list[str]:
+    """Préambule du module contrôleur (REFACTOR-BUILDERS-DECOMPOSE-002).
 
+    Imports, helpers de module (`_form_data_from_*`, `_query_param`,
+    `_is_hx_request`) et constante `_CSV_COLS`, jusqu'avant la classe.
+    Extrait de `build_controller` à iso-sortie.
+    """
     lines: list[str] = [
         "import csv",
         "import io",
@@ -681,7 +763,7 @@ def build_controller(
     ]
     if generated_fields:
         lines.append("from core.http.slug import slugify")
-    if _rbac:
+    if has_rbac:
         lines.append("from forge_mvc_rbac import require_permission")
     lines += [
         "from core.mvc.controller import BaseController",
@@ -763,6 +845,59 @@ def build_controller(
     lines.append(f"_CSV_COLS = {_csv_cols!r}")
     lines.append("")
     lines.append("")
+    return lines
+
+
+def build_controller(
+    definition: dict[str, Any],
+    relations: list[CrudManyToOneRelation] | None = None,
+    many_to_many_relations: list[CrudManyToManyRelation] | None = None,
+) -> str:
+    entity = definition["entity"]
+    snake = _to_snake(entity)
+    plural = snake + "s"
+    pk = _pk_field(definition)
+    pk_name = pk["name"]
+    pk_col = pk["column"]
+    non_pk = _non_pk_fields(definition)
+    # Champs slug auto-générés : (nom, champ source) — calculés à la création.
+    generated_fields = [(f["name"], f["source"]) for f in non_pk if _is_generated(f)]
+    allowed_sort_keys = [f["name"] for f in non_pk] + [pk_name]
+    allowed_sort_keys_repr = "{" + ", ".join(f'"{key}"' for key in allowed_sort_keys) + "}"
+    choice_relations = _unique_choice_relations(relations)
+    many_to_many_choice_relations = _unique_many_to_many_choice_relations(many_to_many_relations)
+    choice_imports = [relation.choices_function for relation in choice_relations]
+    for relation in many_to_many_choice_relations:
+        if relation.choices_function not in choice_imports:
+            choice_imports.append(relation.choices_function)
+    many_to_many_imports: list[str] = []
+    for relation in many_to_many_relations or []:
+        many_to_many_imports.extend([
+            relation.selected_function,
+            relation.add_function,
+            relation.sync_function,
+            relation.list_labels_function,
+            relation.show_labels_function,
+        ])
+    choice_options = relations or []
+
+    ctrl_media_entries = _media_form_fields(definition)
+
+    # RBAC — permissions optionnelles depuis la définition JSON
+    _rbac_raw: dict[str, Any] = cast("dict[str, Any]", definition.get("rbac") or {}).get("permissions") or {}
+    _rbac: dict[str, str] = {}
+    if _rbac_raw:
+        from forge_mvc_rbac import normalize_permission_code
+        _rbac = {
+            action: normalize_permission_code(code)
+            for action, code in _rbac_raw.items()
+            if isinstance(code, str) and code.strip()
+        }
+
+    lines: list[str] = _render_preamble(
+        entity, snake, plural, non_pk, generated_fields, choice_imports,
+        many_to_many_imports, ctrl_media_entries, choice_options, relations, bool(_rbac),
+    )
     lines.append(f"class {entity}Controller(BaseController):")
     lines += [
         "",
@@ -823,103 +958,7 @@ def build_controller(
         allowed_sort_keys_repr=allowed_sort_keys_repr,
         filter_flds=filter_flds, relation_filter_names=relation_filter_names,
     )
-    list_context_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def _list_context(request):",
-        '        q         = _query_param(request, "q").strip()',
-        '        sort      = _query_param(request, "sort")',
-        f"        if sort not in {allowed_sort_keys_repr}:",
-        '            sort = ""',
-        '        direction = _query_param(request, "direction", "desc")',
-        '        if direction not in ("asc", "desc"):',
-        '            direction = "asc"',
-        "        limit  = 20",
-    ]
-    for ff in filter_flds:
-        fname = ff["name"]
-        if fname in relation_filter_names:
-            list_context_lines.append(f'        {fname}_raw = _query_param(request, "{fname}").strip()')
-            list_context_lines.append(f'        {fname}_f = ""')
-            list_context_lines.append(f'        if {fname}_raw:')
-            list_context_lines.append("            try:")
-            list_context_lines.append(f"                {fname}_f = int({fname}_raw)")
-            list_context_lines.append("            except (TypeError, ValueError):")
-            list_context_lines.append(f'                {fname}_f = ""')
-        else:
-            list_context_lines.append(f'        {fname}_f = _query_param(request, "{fname}").strip()')
-    if filter_flds:
-        list_context_lines.append("        relation_filters = {}")
-        filter_names = {ff["name"] for ff in filter_flds}
-        for relation in relations or []:
-            if relation.field_name in filter_names:
-                list_context_lines.append(
-                    f'        relation_filters["{relation.field_name}"] = {{'
-                    f'"options": [{{"id": value, "label": label}} for value, label in {relation.choices_function}()]'
-                    "}"
-                )
-        list_context_lines.append("        _filters = {}")
-        for ff in filter_flds:
-            fname = ff["name"]
-            if _is_bool_sql(ff.get("sql_type", "")):
-                list_context_lines.append(f'        if {fname}_f in ("0", "1"):')
-                list_context_lines.append(f'            _filters["{fname}"] = {fname}_f')
-            else:
-                list_context_lines.append(f'        if {fname}_f != "":')
-                list_context_lines.append(f'            _filters["{fname}"] = {fname}_f')
-        list_context_lines.extend([
-            f'        total    = count_{plural}(q or None, filters=_filters or None)',
-            "        pagination_state = Pagination(request, total, limit)",
-            "        limit = pagination_state.limit",
-            "        offset = pagination_state.offset",
-            '        empty_context = "search_filters" if q and _filters else ("search" if q else ("filters" if _filters else None))',
-            f'        {plural} = find_{plural}_paginated(',
-            "            q=q or None, sort=sort or None, direction=direction,",
-            "            limit=limit, offset=offset, filters=_filters or None,",
-            "        )",
-        ])
-        filters_dict = "{" + ", ".join(f'"{ff["name"]}": {ff["name"]}_f' for ff in filter_flds) + "}"
-        list_context_lines.extend([
-            "        pagination = pagination_state.to_dict()",
-            '        pagination.update({',
-            '            "q": q, "sort": sort, "direction": direction,',
-            f'            "filters": {filters_dict},',
-            "        })",
-        ])
-    else:
-        list_context_lines.extend([
-            "        relation_filters = {}",
-            f'        total    = count_{plural}(q or None)',
-            "        pagination_state = Pagination(request, total, limit)",
-            "        limit = pagination_state.limit",
-            "        offset = pagination_state.offset",
-            '        empty_context = "search" if q else None',
-            f'        {plural} = find_{plural}_paginated(',
-            "            q=q or None, sort=sort or None, direction=direction,",
-            "            limit=limit, offset=offset,",
-            "        )",
-            "        pagination = pagination_state.to_dict()",
-            '        pagination.update({',
-            '            "q": q, "sort": sort, "direction": direction,',
-            '            "filters": {},',
-            "        })",
-        ])
-    list_context_lines.extend([
-        "        return {",
-        f'                "{plural}": {plural},',
-        "                \"pagination\": pagination,",
-        "                \"empty_context\": empty_context,",
-        "                \"relation_filters\": relation_filters,",
-        "                \"flash_html\": render_flash_html(request),",
-    ])
-    for relation in many_to_many_relations or []:
-        list_context_lines.append(
-            f'                "{relation.list_context_key}": {relation.list_labels_function}([row["{pk_col}"] for row in {plural}]),'
-        )
-    list_context_lines.extend([
-        "            }",
-    ])
-    lines += list_context_lines
+    lines += _render_list_context(_ctx, pk_col)
 
     lines += _with_permission(_render_index(_ctx), _rbac.get("index"))
 
