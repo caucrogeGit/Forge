@@ -105,7 +105,7 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-rc.1 : release candidate (API publique gelée, tous les opt-ins en Beta, nouvelles briques opt-in ADR-052, déploiement extrait ADR-053). Les 4 cartes ci-dessous décrivent encore le typage strict de bout en bout (acquis beta.17, ADR-036) : contenu à rafraîchir pour la RC. -->
+<!-- Nouveautés 1.0.0-rc.1 : release candidate (API publique gelée, tous les opt-ins en Beta, nouvelles briques opt-in ADR-052, déploiement extrait ADR-053). -->
 <section id="beta17" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
@@ -115,23 +115,23 @@
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Typage strict de bout en bout</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Du cœur à tous les modules opt-in, tout Forge passe pyright en mode strict et expose ses types via py.typed (PEP 561). La vérification est lancée en CI. Le code de votre application bénéficie de l'autocomplétion et de la vérification de types fournies par Forge, sans configuration (ADR-036).</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">API publique gelée</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Forge entre en release candidate : l'API publique du cœur est gelée pour la 1.0. Le code que vous écrivez aujourd'hui contre la RC reste valide en 1.0.0 stable, sans rupture d'API.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Projets stricts par défaut</h3>
-        <p class="text-white/60 text-sm leading-relaxed">forge new génère un projet qui démarre directement en typeCheckingMode strict. Le code généré est propre en mode strict, et VS Code vérifie les types et auto-importe les classes du cœur dès le premier fichier écrit.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Tous les opt-ins en Beta</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Toutes les briques opt-in officielles passent en statut Beta. Chacune s'installe séparément et le cœur ne dépend d'aucune : votre application n'embarque que ce qu'elle utilise vraiment.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Accesseurs de requête précis</h3>
-        <p class="text-white/60 text-sm leading-relaxed">request.form(), query(), route() et header() exposent des surcharges typées : avec un default texte, le retour est une chaîne, jamais None. Le code idiomatique d'un débutant comme int(request.route("id", default="0")) est sûr en mode strict, sans garde manuelle.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Nouvelles briques applicatives</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Cinq nouveaux opt-ins couvrent des besoins courants, adossés à MariaDB et sans magie : settings (paramètres), audit (journal applicatif), jobs (file de tâches de fond), notifications in-app et import/export CSV.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Validation précoce des arguments</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Response, l'enregistrement des routes et html() / render() valident leurs arguments critiques dès la construction : un statut HTTP correct, un handler réellement appelable. Les erreurs sont détectées tôt et clairement, plutôt que plus loin à l'exécution.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Déploiement en opt-in</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Le déploiement quitte le cœur pour l'opt-in CLI forge-mvc-deploy : forge deploy:init génère une configuration Nginx, systemd et Gunicorn à adapter, forge deploy:check valide l'environnement de production.</p>
       </div>
 
     </div>
