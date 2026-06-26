@@ -10,7 +10,7 @@ Règles vérifiées :
 - La distinction hash (codes de récupération) vs chiffrement (TOTP) est présente.
 - Les exigences avant production-ready sont listées.
 - Aucune affirmation "production-ready" non qualifiée.
-- MFA reste opt-in et Pre-Alpha.
+- MFA reste opt-in (Beta), hors [all] par choix de sécurité explicite.
 - pyotp n'est pas une dépendance runtime du core.
 - forge-mvc-mfa n'est pas dans le core.
 """
@@ -168,12 +168,12 @@ class TestNoUnqualifiedProductionReadyClaim:
 
 
 class TestMfaRemainsOptIn:
-    """MFA reste opt-in et Pre-Alpha."""
+    """MFA reste opt-in (Beta, hors [all] par choix de sécurité explicite)."""
 
-    def test_mfa_alpha_in_pyproject(self):
+    def test_mfa_beta_in_pyproject(self):
         text = MFA_PYPROJECT.read_text(encoding="utf-8")
-        assert "Development Status :: 3 - Alpha" in text, (
-            "forge-mvc-mfa est 'Development Status :: 3 - Alpha' depuis MFA-PYPI-READY-001."
+        assert "Development Status :: 4 - Beta" in text, (
+            "forge-mvc-mfa est 'Development Status :: 4 - Beta' (tous les opt-ins en Beta)."
         )
 
     def test_pyotp_not_in_core_dependencies(self):
@@ -203,7 +203,7 @@ class TestMfaRemainsOptIn:
         for dep in all_deps:
             assert "forge-mvc-mfa" not in dep, (
                 f"forge-mvc-mfa est dans l'extra [all] : {dep!r}. "
-                f"MFA est Pre-Alpha et ne doit pas être dans forge-mvc[all]."
+                f"Activer MFA est un choix de sécurité explicite ; il reste hors de forge-mvc[all]."
             )
 
 

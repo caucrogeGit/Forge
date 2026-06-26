@@ -188,7 +188,7 @@ Troisième audit transversal en six axes (sécurité, tests/CI, packaging, archi
 Verdict : base saine, **aucune vulnérabilité critique ni élevée**, découplage core/opt-ins étanche, gate CI non masquant, `ruff`/`pyright` à 0, `mkdocs --strict` vert.
 Les findings sont surtout de la complétude et de la finition, dont plusieurs sur le code de ce cycle (qrcode, refacto `build_controller`).
 Un ticket = une responsabilité (principe 2) ; statut « à faire ».
-Point à confirmer hors ticket : `authors = "Roger Lequette"` dans les 15 pyproject vs git user « Roger Cauchon » (cohérent partout, donc probablement délibéré, mainteneur à trancher).
+Point à confirmer hors ticket : `authors = "Roger Lequette"` dans les 15 pyproject vs le nom du git user local (cohérent partout, donc probablement délibéré, mainteneur à trancher).
 
 Livrés (les 4 Élevé et 6 Moyen) : `QRCODE-TYPING-SEGNO-STUBS-001` (segno expose bien ses stubs, contournements retirés), `REFACTOR-CTRLCTX-DEAD-FIELDS-001`, `QRCODE-ERROR-CONTRACT-001`, `DOC-STYLE-U2014-PACKAGES-001` (578 cadratins de prose corrigés dans 146 fichiers, garde-fou meta ajouté), `TEST-DB-INIT-MIGRATIONS-001` (9 tests d'intégration MariaDB, validés contre une vraie base), `DOC-README-OPTINS-COMPLETE-001`, `GOV-ADR-STATUS-RESOLVE-001` (ADR-030/041 actés), `ARCH-USER-CONTROLLER-REWRITE-ADR-001` (ADR-051 ouvert, proposé), `TEST-DB-COLLECT-GUARD-001` (garde de session anti-skip-silencieux), `DOC-GUNICORN-RATELIMIT-001`.
 `TEST-DOC-AS-TEST-ROTATION-002` : 1re tranche livrée (suppression de `test_landing_beta12_highlights_001` et des classes de prose de `test_landing_post_2_2_refresh`, messages de `test_docs_no_stale_versions_001` actualisés) ; la rotation reste un chantier continu.

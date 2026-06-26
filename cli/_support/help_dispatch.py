@@ -141,6 +141,11 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Déploiement
     "deploy:init":      "Initialise la configuration de déploiement.",
     "deploy:check":     "Vérifie la configuration de déploiement.",
+    # Opt-ins applicatifs (ADR-052)
+    "settings:init":      "Prépare la table des paramètres applicatifs (forge-mvc-settings).",
+    "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
+    "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
+    "notifications:init": "Prépare les notifications in-app (forge-mvc-notifications).",
 }
 
 
@@ -149,6 +154,90 @@ HELP_DESCRIPTIONS: dict[str, str] = {
 # CLI-HELP-FLAGS-INIT-COMMANDS-001 : décrit usage, rôle, effets,
 # prérequis, limites et rappel que --help n'exécute rien.
 HELP_TEXTS_RICH: dict[str, str] = {
+    "settings:init": """\
+Usage:
+  forge settings:init
+
+Description:
+  Prépare la migration SQL de l'opt-in forge-mvc-settings (table app_settings)
+  dans mvc/migrations/, sans exécuter de SQL.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - copie la migration embarquée du paquet vers mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-settings installé (pip install --pre forge-mvc-settings) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "audit:init": """\
+Usage:
+  forge audit:init
+
+Description:
+  Prépare la migration SQL de l'opt-in forge-mvc-audit (table audit_log)
+  dans mvc/migrations/, sans exécuter de SQL.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - copie la migration embarquée du paquet vers mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-audit installé (pip install --pre forge-mvc-audit) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "jobs:init": """\
+Usage:
+  forge jobs:init
+
+Description:
+  Prépare la migration SQL de l'opt-in forge-mvc-jobs (table jobs)
+  dans mvc/migrations/, sans exécuter de SQL.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - copie la migration embarquée du paquet vers mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-jobs installé (pip install --pre forge-mvc-jobs) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "notifications:init": """\
+Usage:
+  forge notifications:init
+
+Description:
+  Prépare la migration SQL de l'opt-in forge-mvc-notifications (table
+  notifications) dans mvc/migrations/, sans exécuter de SQL.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - copie la migration embarquée du paquet vers mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-notifications installé (pip install --pre forge-mvc-notifications) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
     "iot:init": """\
 Usage:
   forge iot:init

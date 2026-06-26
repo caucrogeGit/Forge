@@ -88,6 +88,8 @@ KNOWN_DOCUMENTED_EXCEPTIONS: set[str] = set()
 OPT_IN_CLI_NAMESPACES = (
     "mail:", "iot:", "video:", "audio:", "i18n:",
     "rbac:", "workflow:", "stats:", "pivot:", "admin:",
+    # Opt-ins ADR-052 : commandes :init documentées dans la doc embarquée du paquet.
+    "settings:", "audit:", "jobs:", "notifications:",
 )
 
 # Commandes dans forge --help intentionnellement non documentées (rare)

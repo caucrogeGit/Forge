@@ -97,6 +97,9 @@ _FRAMEWORK_ROOTS = frozenset({
     "forge_mvc_i18n",
     # forge-mvc-qrcode : génération QR Code opt-in (ADR-050).
     "forge_mvc_qrcode",
+    # Opt-ins ADR-052 et déploiement (ADR-053) : paquets framework officiels.
+    "forge_mvc_settings", "forge_mvc_import_export", "forge_mvc_audit",
+    "forge_mvc_jobs", "forge_mvc_notifications", "forge_mvc_deploy",
     "cli",
     # `integrations/` est dans le repo Forge (Jinja2 renderer, etc.).
     "integrations",
