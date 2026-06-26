@@ -1,6 +1,6 @@
 """Garde-fou LANDING-ARTICLES-CLICKABLE-001.
 
-Vérifie que les 40 cartes de la landing page sont wrappées dans un <a href>
+Vérifie que les 58 cartes de la landing page sont wrappées dans un <a href>
 pointant vers des URLs valides de la documentation.
 """
 from __future__ import annotations
@@ -90,11 +90,11 @@ class TestLandingArticlesClickable:
     def test_landing_file_exists(self):
         assert LANDING.exists()
 
-    def test_40_articles_are_wrapped_in_links(self):
+    def test_58_articles_are_wrapped_in_links(self):
         text = LANDING.read_text(encoding="utf-8")
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
-        assert len(wrapped) == 40, (
-            f"Attendu 40 cartes wrappées dans <a class=\"block group\">, "
+        assert len(wrapped) == 58, (
+            f"Attendu 58 cartes wrappées dans <a class=\"block group\">, "
             f"trouvé {len(wrapped)}."
         )
 
