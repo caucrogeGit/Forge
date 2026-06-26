@@ -28,8 +28,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-pivot":    "Development Status :: 4 - Beta",
     "forge-mvc-mail":     "Development Status :: 4 - Beta",
     "forge-mvc-i18n":     "Development Status :: 4 - Beta",
-    # forge-mvc-admin : opt-in en cours de construction, non publié (statut Planning).
-    "forge-mvc-admin":    "Development Status :: 1 - Planning",
+    # forge-mvc-admin : back-office applicatif, chantier clôturé (suite verte), non publié.
+    "forge-mvc-admin":    "Development Status :: 4 - Beta",
     # forge-mvc-qrcode : socle de génération QR Code, non publié (QRCODE-OPTIN-SCAFFOLD-001).
     "forge-mvc-qrcode":   "Development Status :: 4 - Beta",
     # forge-mvc-settings : paramètres applicatifs, non publié (SETTINGS-OPTIN-SCAFFOLD-001).

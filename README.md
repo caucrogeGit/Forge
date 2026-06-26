@@ -127,7 +127,7 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 | `forge-mvc-i18n` | Internationalisation : catalogues JSON, fallback, helper `trans()` (repli no-op du noyau) | Beta (publication à venir) |
 | `forge-mvc-qrcode` | Génération de QR Codes (PNG/SVG) depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur | Beta (publication à venir) |
 | `forge-mvc-settings` | Paramètres applicatifs persistés en MariaDB (table `app_settings`), API explicite `get_setting`/`set_setting` | Beta (publication à venir) |
-| `forge-mvc-admin` | Back-office applicatif (scaffold ; voir la [roadmap Forge Admin](docs/roadmap/forge-admin-roadmap.md)) | Planning (non publié) |
+| `forge-mvc-admin` | Back-office applicatif : CRUD générique sur les entités déclarées, auth + CSRF, RBAC optionnel (voir la [roadmap Forge Admin](docs/roadmap/forge-admin-roadmap.md)) | Beta (non publié) |
 | `forge-mvc-testing` | Infrastructure de test partagée (`FakeRequest` + plugin pytest), réservée au développement (ADR-041) | Beta (dev-only) |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
