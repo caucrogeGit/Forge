@@ -2,6 +2,10 @@
 .claude/settings.local.json
 .kilo/
 TestForge101/
+# Artefacts de déploiement générés par `forge deploy:init` (ADR-044 : le dépôt
+# framework ne porte pas d'application déployée ; ces fichiers se régénèrent
+# dans le projet utilisateur).
+deploy/
 __pycache__/
 *.pyc
 .pytest_cache/
