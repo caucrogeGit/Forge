@@ -10,3 +10,19 @@ nav:
       - Moteur d'import (engine.py): references/engine.md
       - Export programmatique (csv_writer.py): references/export.md
       - Erreurs (errors.py): references/errors.md
+  - Progression Import/Export:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Lire un CSV: welcome/debutant/import-welcome.md
+          - Détails de la lecture: welcome/debutant/import-read.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Valider et insérer: welcome/intermediaire/import-validate.md
+          - Convertir les valeurs: welcome/intermediaire/import-coerce.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Tout ou rien, ou partiel: welcome/avance/import-partial.md
+          - Export programmatique: welcome/avance/export-tocsv.md
+          - Indépendance du cœur: welcome/avance/import-independance.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

@@ -9,3 +9,18 @@ nav:
       - Paramètres (store.py): references/store.md
       - Initialisation (settings:init): references/cli.md
       - Erreurs (errors.py): references/errors.md
+  - Progression Settings:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Premier paramètre: welcome/debutant/settings-welcome.md
+          - Écrire et lire: welcome/debutant/settings-set-get.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Valeurs typées: welcome/intermediaire/settings-types.md
+          - Lister et supprimer: welcome/intermediaire/settings-all.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Clés et erreurs: welcome/avance/settings-keys.md
+          - Indépendance du cœur: welcome/avance/settings-independance.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md
