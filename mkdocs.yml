@@ -276,6 +276,7 @@ nav:
             - ADR-051 Insertion contrôleur pages publiques: adr/051-public-page-controller-insertion.md
             - ADR-052 Stratégie des opt-ins: adr/052-optin-strategy.md
             - ADR-053 Extraction du déploiement: adr/053-deploy-extraction.md
+            - ADR-054 Cœur agnostique BDD et backends opt-in: adr/054-database-backend-optins.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

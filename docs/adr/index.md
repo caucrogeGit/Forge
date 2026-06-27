@@ -60,3 +60,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-051](051-public-page-controller-insertion.md) | Insertion d'une méthode dans le contrôleur des pages publiques (`make:public-page`), explicite, idempotente, fail-safe et ciblée (proposé) |
 | [ADR-052](052-optin-strategy.md) | Stratégie et critères des opt-ins : deux filtres d'admission (runtime WSGI, charte), classification des candidats, ordre recommandé (proposé) |
 | [ADR-053](053-deploy-extraction.md) | Extraction du déploiement (`deploy:init`/`deploy:check` + gabarits + doc) dans un opt-in CLI-only `forge-mvc-deploy` (proposé) |
+| [ADR-054](054-database-backend-optins.md) | Cœur agnostique BDD : backends (MariaDB, SQLite, PostgreSQL, SQL Server) en opt-ins exclusifs, découverts par entry points (proposé) |
