@@ -127,8 +127,6 @@ GRANT CREATE, ALTER, DROP, INDEX, REFERENCES,
 GRANT SELECT, INSERT, UPDATE, DELETE
   ON forge_db.*
   TO 'forge_app'@'localhost';
-
-FLUSH PRIVILEGES;
 ```
 
 ---
@@ -234,7 +232,6 @@ ERROR 1142 ... CREATE command denied
 ```sql
 ALTER USER 'forge_admin'@'localhost' IDENTIFIED BY 'nouveau_mot_de_passe_admin';
 ALTER USER 'forge_app'@'localhost'   IDENTIFIED BY 'nouveau_mot_de_passe_app';
-FLUSH PRIVILEGES;
 ```
 
 Mettre ensuite `env/dev` à jour.
@@ -250,7 +247,6 @@ les comptes** :
 DROP USER IF EXISTS 'forge_app'@'localhost';
 DROP USER IF EXISTS 'forge_admin'@'localhost';
 DROP DATABASE IF EXISTS forge_db;
-FLUSH PRIVILEGES;
 ```
 
 ---
