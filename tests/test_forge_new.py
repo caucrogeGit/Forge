@@ -430,6 +430,67 @@ def test_env_dev_db_name_correct(tmp_path):
     assert "DB_NAME=test_forge_new\n" in dev  # ADR-034 : sans suffixe _db
 
 
+# ── Convention de normalisation du nom de projet (sans « _ » ajouté) ─────────
+
+@pytest.mark.parametrize(
+    "project_name, expected",
+    [
+        ("ReferenCiel", "referenciel"),  # casse fusionnée, aucun « _ » inséré
+        ("MonProjet", "monprojet"),
+        ("mon_projet", "mon_projet"),    # « _ » réellement saisi conservé
+        ("Mon-Projet", "monprojet"),     # séparateur retiré, pas remplacé par « _ »
+        ("Projet2024", "projet2024"),
+    ],
+)
+def test_normalize_identifier_minuscules_sans_underscore_ajoute(project_name, expected):
+    assert forge._normalize_identifier(project_name) == expected
+
+
+# ── env/example ET env/dev respectent la convention (retour terrain) ─────────
+
+def _materialize_real_example(tmp_path):
+    """Copie le vrai gabarit env/example du squelette dans tmp_path/env."""
+    from cli.skeleton import DATA_DIR
+
+    env_dir = tmp_path / "env"
+    env_dir.mkdir()
+    src = (DATA_DIR / "env" / "example").read_text(encoding="utf-8")
+    (env_dir / "example").write_text(src, encoding="utf-8")
+    return env_dir
+
+
+def test_env_example_identifiants_projet_specifiques(tmp_path):
+    _materialize_real_example(tmp_path)
+    forge._configure_env_files(str(tmp_path), "ReferenCiel", "referenciel")
+    example = (tmp_path / "env" / "example").read_text(encoding="utf-8")
+    assert "APP_NAME=ReferenCiel\n" in example  # libellé : casse d'origine
+    assert "DB_NAME=referenciel\n" in example
+    assert "DB_APP_LOGIN=referenciel\n" in example  # nu, sans suffixe _app
+
+
+def test_env_example_db_admin_login_suffixe(tmp_path):
+    _materialize_real_example(tmp_path)
+    forge._configure_env_files(str(tmp_path), "ReferenCiel", "referenciel")
+    example = (tmp_path / "env" / "example").read_text(encoding="utf-8")
+    # ADR-033 : compte de provisioning distinct du compte applicatif.
+    assert "DB_ADMIN_LOGIN=referenciel_admin\n" in example
+    # Le commentaire d'aide référence le compte admin réel.
+    assert "créez le compte referenciel_admin" in example
+
+
+def test_env_dev_aucun_underscore_insere_a_la_frontiere_de_casse(tmp_path):
+    """Cœur du retour terrain : « ReferenCiel » → « referenciel », jamais
+    « referen_ciel », dans env/example comme dans env/dev."""
+    _materialize_real_example(tmp_path)
+    db_name = forge._normalize_identifier("ReferenCiel")
+    forge._configure_env_files(str(tmp_path), "ReferenCiel", db_name)
+    for fichier in ("example", "dev"):
+        contenu = (tmp_path / "env" / fichier).read_text(encoding="utf-8")
+        assert "DB_NAME=referenciel\n" in contenu
+        assert "DB_APP_LOGIN=referenciel\n" in contenu
+        assert "referen_ciel" not in contenu
+
+
 # ── Message final — mention env/dev (V1.4.2) ─────────────────────────────────
 
 def test_message_mentionne_ajustement_env_dev(monkeypatch, tmp_path, capsys):

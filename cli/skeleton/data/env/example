@@ -19,7 +19,8 @@ DB_ADMIN_PWD=
 
 # Base projet.
 # Convention Forge (ADR-034) : forge new fixe DB_NAME au nom du projet,
-# normalisé en snake_case et sans suffixe _db.
+# normalisé en minuscules, sans séparateur ajouté ni suffixe _db
+# (« ReferenCiel » donne « referenciel »).
 # Hors forge new, mettez ici le nom de votre base.
 DB_NAME=forge_db
 DB_CHARSET=utf8mb4
@@ -27,7 +28,8 @@ DB_COLLATION=utf8mb4_unicode_ci
 
 # Utilisateur applicatif du projet.
 # Convention Forge (ADR-034) : forge new fixe DB_APP_LOGIN au nom du projet,
-# normalisé en snake_case (identique à DB_NAME) et sans suffixe _app.
+# normalisé en minuscules (identique à DB_NAME) et sans suffixe _app.
+# Le compte de provisioning DB_ADMIN_LOGIN reste distinct (suffixe _admin).
 DB_APP_HOST=localhost
 DB_APP_PORT=3306
 DB_APP_LOGIN=forge_app

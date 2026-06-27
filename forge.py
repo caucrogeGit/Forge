@@ -53,12 +53,16 @@ _FORGE_DEFAULT_REF = "v1.0.0-rc.1"
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────
 
-def _to_snake(name: str) -> str:
-    """CamelCase ou kebab-case → snake_case."""
-    name = name.replace("-", "_")
-    name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
-    name = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", name)
-    return name.lower()
+def _normalize_identifier(name: str) -> str:
+    """Nom de projet → identifiant de base de données.
+
+    Convention : tout en minuscules, sans séparateur ajouté. On conserve les
+    « _ » réellement saisis par l'utilisateur et on retire les autres
+    caractères non alphanumériques (ex. « - »). Aucun « _ » n'est inséré à une
+    frontière de casse : « ReferenCiel » devient « referenciel », pas
+    « referen_ciel ».
+    """
+    return re.sub(r"[^a-z0-9_]", "", name.lower())
 
 
 def _print_step(message: str) -> None:
@@ -127,6 +131,13 @@ def _configure_env_files(dest: str, project_name: str, db_name: str) -> None:
     with open(example_path, "r", encoding="utf-8") as file:
         content = file.read()
 
+    # Identifiants dérivés du nom de projet (déjà normalisé via db_name).
+    # ADR-034 : DB_NAME et DB_APP_LOGIN = nom normalisé nu (sans suffixe).
+    # ADR-033 : le compte de provisioning est distinct du compte applicatif ;
+    # seul l'admin porte un suffixe pour rester un login MariaDB séparé.
+    app_login = db_name
+    admin_login = f"{db_name}_admin"
+
     content = re.sub(
         r"^APP_NAME=.*$",
         f"APP_NAME={project_name}",
@@ -139,17 +150,30 @@ def _configure_env_files(dest: str, project_name: str, db_name: str) -> None:
         content,
         flags=re.MULTILINE,
     )
-
-    with open(example_path, "w", encoding="utf-8") as file:
-        file.write(content)
-
-    app_login = _to_snake(project_name)  # ADR-034 : sans suffixe _app
-    dev_content = re.sub(
+    content = re.sub(
         r"^DB_APP_LOGIN=.*$",
         f"DB_APP_LOGIN={app_login}",
         content,
         flags=re.MULTILINE,
     )
+    content = re.sub(
+        r"^DB_ADMIN_LOGIN=.*$",
+        f"DB_ADMIN_LOGIN={admin_login}",
+        content,
+        flags=re.MULTILINE,
+    )
+    # Le commentaire d'aide référence le compte admin réel du projet.
+    content = content.replace(
+        "créez le compte forge_admin",
+        f"créez le compte {admin_login}",
+    )
+
+    with open(example_path, "w", encoding="utf-8") as file:
+        file.write(content)
+
+    # env/dev reprend le même contenu : la convention s'applique aussi à
+    # env/example (identifiants projet-spécifiques dans les deux fichiers).
+    dev_content = content
 
     dev_path = os.path.join(dest, "env", "dev")
     with open(dev_path, "w", encoding="utf-8") as file:
@@ -290,7 +314,7 @@ def cmd_new(
     if os.path.exists(dest):
         sys.exit(f"Erreur : le dossier '{dest}' existe déjà.")
 
-    db_name = _to_snake(project_name)  # ADR-034 : sans suffixe _db
+    db_name = _normalize_identifier(project_name)  # ADR-034 : sans suffixe _db
 
     print(f"\nForge {_FORGE_VERSION} — nouveau projet : {project_name} [profil : {profile}]\n")
 
