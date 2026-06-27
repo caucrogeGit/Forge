@@ -50,9 +50,6 @@ REQUIRED_FILES = [
     "storage/logs/.gitkeep",
     "storage/mail/.gitkeep",
     "storage/uploads/.gitkeep",
-    # Parcours d'accueil welcome-projet (ADR-048).
-    "docs/welcome/installation.md",
-    "docs/welcome/recapitulatif.md",
 ]
 
 REQUIRED_ERROR_PAGES = ["400", "403", "404", "413", "422", "429", "500"]
@@ -87,6 +84,10 @@ FORBIDDEN_PATHS = [
     "mvc/views/landing",
     "mvc/entities/media",
     "mvc/mail",
+    # Le parcours welcome-projet (ex-ADR-048) faisait double emploi avec la
+    # documentation officielle : retiré du squelette.
+    "docs/welcome",
+    "docs",
 ]
 
 

@@ -2,8 +2,30 @@
 
 ## Statut
 
-Accepté, bêta publique 1.0 (`1.0.0-beta.x`).
-Mise en œuvre par les tickets `WELCOME-PROJET-*`.
+**Annulé** (consolidation bêta 1.0).
+Initialement accepté en bêta publique 1.0 (`1.0.0-beta.x`), mis en œuvre par les
+tickets `WELCOME-PROJET-*`.
+
+### Révision : retrait du parcours welcome-projet
+
+Retour terrain : le parcours `docs/welcome/` embarqué faisait double emploi avec
+la documentation officielle (forgemvc.com), que le squelette référence déjà.
+La promesse « court, anti-duplication » de la décision n'a pas tenu à l'usage :
+maintenir un fil conducteur local aligné avec le CLI revenait à dupliquer la doc
+en ligne.
+
+Conséquences du retrait :
+
+- suppression de `cli/skeleton/data/docs/welcome/` (le dossier `docs/` du
+  squelette source disparaît ; un projet généré peut toujours obtenir un `docs/`
+  via la guidance agent ADR-047, mais plus de `docs/welcome/`) ;
+- suppression du garde-fou de navigation `WELCOME-PROJET-NAV-001`
+  (`tests/test_skeleton_welcome_projet_nav_001.py`) ;
+- bascule des garde-fous du squelette en tests d'absence
+  (`test_skeleton_tree_001`, `test_new_core_dep_001`).
+
+L'onboarding humain repose désormais entièrement sur la documentation officielle.
+Les couches ADR-024 (projet nu) et ADR-047 (guidance agent) restent en place.
 
 ---
 

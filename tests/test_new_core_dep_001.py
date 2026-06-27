@@ -8,8 +8,8 @@ projet effectivement produit :
 - il contient le squelette applicatif (app.py, mvc/) ;
 - il ne contient NI le framework (core/, cli/, integrations/), NI les
   paquets/tests du monorepo ;
-- il a son PROPRE `docs/welcome/` (parcours d'accueil, ADR-048), à ne pas
-  confondre avec la doc du monorepo ;
+- il n'embarque plus de parcours `docs/welcome/` (ex-ADR-048) : il faisait
+  double emploi avec la documentation officielle ;
 - son requirements.txt épingle forge-mvc à la version courante (le core vient
   du paquet installé, pas d'un core/ local).
 """
@@ -50,11 +50,13 @@ def test_projet_ne_vendore_pas_le_framework(projet, absent):
     )
 
 
-def test_projet_embarque_le_parcours_welcome(projet):
-    # Onboarding humain propre au projet (ADR-048), pas la doc du monorepo.
-    assert (projet / "docs" / "welcome" / "installation.md").is_file()
-    assert (projet / "docs" / "welcome" / "recapitulatif.md").is_file()
-    # ... et toujours pas de mkdocs.yml ni de doc du framework vendorée.
+def test_projet_sans_parcours_welcome(projet):
+    # Le parcours welcome-projet (ex-ADR-048) faisait double emploi avec la
+    # documentation officielle : il n'est plus matérialisé.
+    # (docs/ peut exister via la guidance agent ADR-047 — docs/adr/ —, mais
+    # plus jamais docs/welcome/.)
+    assert not (projet / "docs" / "welcome").exists()
+    # Et toujours pas de mkdocs.yml ni de doc du framework vendorée.
     assert not (projet / "mkdocs.yml").exists()
 
 
