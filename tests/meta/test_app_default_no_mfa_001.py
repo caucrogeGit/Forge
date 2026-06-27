@@ -147,8 +147,9 @@ class TestRequirementsAreCorePure:
 
     # CORE-DROP-PILLOW-001 (ADR-018) : Pillow a quitté le core (opt-in
     # forge-mvc-images) ; il ne fait plus partie des dépendances core attendues.
+    # DB-BACKEND-MARIADB-EXTRACT-001 (ADR-054) : le cœur est agnostique BDD ;
+    # mariadb a quitté le core (opt-in forge-mvc-mariadb).
     EXPECTED_CORE = {
-        "mariadb",
         "python-dotenv",
         "jinja2",
         "argon2-cffi",

@@ -166,6 +166,16 @@ def test_requirements_epingle_forge_mvc():
     )
 
 
+def test_requirements_epingle_un_backend_bdd():
+    # ADR-054 : le cœur est agnostique BDD ; le projet généré doit poser un
+    # backend, sinon il n'a aucune prise en charge base de données.
+    content = (SKELETON / "requirements.txt").read_text(encoding="utf-8")
+    assert f"forge-mvc-mariadb=={forge._FORGE_VERSION}" in content, (
+        "requirements.txt doit épingler le backend BDD forge-mvc-mariadb à la "
+        f"version courante ({forge._FORGE_VERSION})."
+    )
+
+
 # ADR-044 : l'application racine de dogfooding a été retirée (relocalisée en
 # fixture de test). L'anti-dérive app.py/config.py « racine vs squelette »
 # d'ADR-024 n'a plus d'objet : le squelette est l'unique source.

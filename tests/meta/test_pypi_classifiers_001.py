@@ -46,6 +46,10 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-deploy":   "Development Status :: 4 - Beta",
     # forge-mvc-testing : infra de test partagée, publiée pour l'écosystème (ADR-041).
     "forge-mvc-testing":  "Development Status :: 4 - Beta",
+    # forge-mvc-mariadb : backend BDD MariaDB extrait du cœur (ADR-054).
+    "forge-mvc-mariadb":  "Development Status :: 4 - Beta",
+    # forge-mvc-sqlite : backend BDD SQLite (stdlib), runtime (ADR-054).
+    "forge-mvc-sqlite":   "Development Status :: 4 - Beta",
 }
 
 

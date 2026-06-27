@@ -15,8 +15,8 @@ Le résolveur découvre le backend installé sans configuration : l'application
 « voit » l'opt-in et se câble dessus. Règles (ADR-054) :
 
 - un seul backend autorisé par projet (exclusivité mutuelle) ;
-- aucun backend installé → repli transitoire sur le MariaDB intégré au cœur,
-  tant que l'opt-in `forge-mvc-mariadb` n'a pas été extrait ;
+- aucun backend installé → erreur explicite (le cœur n'a aucune prise en charge
+  BDD par lui-même : il faut installer un opt-in, par exemple forge-mvc-mariadb) ;
 - la variable d'environnement ``DB_BACKEND`` tranche un cas ambigu en nommant
   explicitement le backend voulu (par son nom d'entry point).
 
@@ -56,10 +56,12 @@ _backend: "DatabaseBackend | None" = None
 _lock = threading.Lock()
 
 
-def _fallback_backend() -> "DatabaseBackend":
-    """Repli transitoire (ADR-054) : MariaDB intégré au cœur."""
-    from core.database._mariadb_backend import MariaDBBackend
-    return MariaDBBackend()
+def _no_backend_error() -> "RuntimeError":
+    return RuntimeError(
+        "Aucun backend BDD installé. Le cœur de Forge est agnostique BDD "
+        "(ADR-054) : installez un opt-in de backend, par exemple "
+        "`pip install forge-mvc-mariadb`."
+    )
 
 
 def _discover() -> "DatabaseBackend":
@@ -89,8 +91,7 @@ def _discover() -> "DatabaseBackend":
         logger.debug("Backend BDD résolu via entry point : %s", discovered[0].name)
         return backend
 
-    logger.debug("Aucun opt-in BDD installé : repli sur MariaDB intégré au cœur.")
-    return _fallback_backend()
+    raise _no_backend_error()
 
 
 def get_backend() -> "DatabaseBackend":

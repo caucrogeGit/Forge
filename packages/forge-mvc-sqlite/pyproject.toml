@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc-sqlite"
+version = "1.0.0rc1"
+description = "Forge SQLite — backend BDD SQLite pour Forge (module sqlite3 de la stdlib), découvert par le cœur via entry point (ADR-054). Idéal en développement, tests et démarrage sans installation de serveur."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+authors = [
+    { name = "Roger Lequette" },
+]
+license = "LicenseRef-Forge-Proprietary"
+keywords = ["python", "mvc", "forge", "sqlite", "database", "backend"]
+dependencies = [
+    "forge-mvc>=1.0.0rc1,<2",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.entry-points."forge_mvc.db_backend"]
+sqlite = "forge_mvc_sqlite.backend:SQLiteBackend"
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://forgemvc.com/docs/forge/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forge_mvc_sqlite*"]
+
+[tool.setuptools.package-data]
+"forge_mvc_sqlite" = ["py.typed"]

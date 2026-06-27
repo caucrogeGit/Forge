@@ -8,6 +8,16 @@ for _pkg in sorted(_packages_dir.iterdir()):
         sys.path.insert(0, str(_pkg))
 
 
+# ── Backend BDD déterministe en test (ADR-054) ───────────────────────────────
+# Le monorepo installe PLUSIEURS backends BDD en éditable (forge-mvc-mariadb,
+# forge-mvc-sqlite). En usage réel un projet n'en installe qu'un ; ici le
+# résolveur verrait deux entry points et appliquerait l'exclusivité mutuelle.
+# On fixe donc le backend par défaut sur mariadb (cible des tests d'intégration
+# tests/db). Les tests spécifiques à un autre backend posent DB_BACKEND eux-mêmes
+# (monkeypatch) puis appellent reset_backend().
+os.environ.setdefault("DB_BACKEND", "mariadb")
+
+
 # ── Garde de collecte des tests `db` (TEST-DB-COLLECT-GUARD-001) ──────────────
 # En CI, le job tests-db lance la suite avec FORGE_REQUIRE_DB=1 et une MariaDB
 # réelle : tous les tests marqués `db` DOIVENT s'exécuter. Un skip (module sauté

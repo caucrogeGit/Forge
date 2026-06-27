@@ -138,8 +138,9 @@ class TestNoUnnecessaryDuplication:
     # CORE-DROP-PILLOW-001 (ADR-018) : Pillow n'est plus exclusif au core — il
     # est désormais déclaré par l'opt-in forge-mvc-images. Le retirer d'ici évite
     # de signaler forge-mvc-images comme « dupliquant » une dépendance du core.
+    # DB-BACKEND-MARIADB-EXTRACT-001 (ADR-054) : idem pour mariadb, désormais
+    # déclaré par l'opt-in forge-mvc-mariadb (cœur agnostique BDD).
     CORE_ONLY_DEPS = {
-        "mariadb",
         "python-dotenv",
         "jinja2",
         "argon2-cffi",

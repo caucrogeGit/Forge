@@ -21,6 +21,12 @@ pyright>=1.1.400
 # rbac/workflow/stats (tous les autres opt-ins sont exclus, voir pyproject.toml) :
 # pour le dev on pointe tous les opt-ins vers le monorepo local afin
 # d'exécuter la suite complète.
+# Backends BDD (ADR-054) : le cœur est agnostique, il faut un backend installé
+# pour que la couche base de données fonctionne (entry point forge_mvc.db_backend).
+# Le monorepo installe les deux pour les tester ; le backend par défaut de la
+# suite est fixé via DB_BACKEND=mariadb (voir conftest.py).
+-e ./packages/forge-mvc-mariadb
+-e ./packages/forge-mvc-sqlite
 -e ./packages/forge-mvc-admin
 -e ./packages/forge-mvc-mfa
 -e ./packages/forge-mvc-rbac

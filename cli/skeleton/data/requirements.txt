@@ -1,4 +1,7 @@
 # Dependances du projet Forge.
-# Le framework et ses dependances runtime (MariaDB, python-dotenv, Jinja2,
-# Argon2, jsonschema) sont fournis par le paquet forge-mvc.
+# Le framework et ses dependances runtime (python-dotenv, Jinja2, Argon2,
+# jsonschema) sont fournis par le paquet forge-mvc.
 forge-mvc==1.0.0rc1
+# Backend base de donnees (ADR-054) : le coeur est agnostique BDD, il faut un
+# backend installe. forge-mvc-mariadb fournit MariaDB (et le connecteur).
+forge-mvc-mariadb==1.0.0rc1
