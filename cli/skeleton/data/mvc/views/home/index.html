@@ -1,37 +1,21 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenue sur {{ app_name | default("Forge") }}</title>
-    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/static/tailwind.css">
-</head>
-<body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
+{% extends "layouts/base.html" %}
 
-    <header class="border-b border-gray-800 px-8 py-5">
-        <div class="flex items-center gap-3">
-            <img src="/static/forge-bandeau-1-512.png"
-                alt="{{ app_name | default('Forge') }}"
-                class="h-10 w-auto">
-        </div>
-    </header>
+{% block title %}Bienvenue · {{ app_name }}{% endblock %}
 
-    <section class="max-w-3xl mx-auto px-8 pt-20 pb-10 text-center">
-        <h1 class="text-5xl font-bold mb-5 leading-tight">
-            Votre projet&nbsp;<span class="text-orange-400">Forge</span> tourne
-        </h1>
-        <p class="text-gray-400 text-lg leading-relaxed">
-            Cette page est servie par <code class="text-orange-300">mvc/controllers/home_controller.py</code>
-            via la route <code class="text-orange-300">/</code> déclarée dans
-            <code class="text-orange-300">mvc/routes.py</code>. Modifiez-les pour
-            construire votre application.
-        </p>
-    </section>
-
-    <footer class="border-t border-gray-800 px-8 py-6 text-center text-gray-600 text-xs">
-        Généré avec Forge 1.0.0rc1. Framework MVC Python, sans magie cachée.
-    </footer>
-
-</body>
-</html>
+{% block content %}
+<section class="text-center">
+    <h1 class="text-5xl font-bold mb-5 leading-tight">
+        Votre projet&nbsp;<span class="text-orange-400">Forge</span> tourne
+    </h1>
+    <p class="text-gray-400 text-lg leading-relaxed">
+        Cette page est servie par <code class="text-orange-300">mvc/controllers/home_controller.py</code>
+        via la route <code class="text-orange-300">/</code> déclarée dans
+        <code class="text-orange-300">mvc/routes.py</code>. Modifiez-les pour
+        construire votre application.
+    </p>
+    <p class="text-gray-500 text-sm mt-6">
+        Cette page étend le layout partagé
+        <code class="text-orange-300">mvc/views/layouts/base.html</code>.
+    </p>
+</section>
+{% endblock %}

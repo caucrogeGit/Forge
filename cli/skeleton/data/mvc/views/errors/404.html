@@ -1,24 +1,18 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Page non trouvée</title>
-    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/static/tailwind.css">
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="text-center">
-        <p class="text-8xl font-bold text-blue-700">404</p>
-        <h1 class="text-2xl font-semibold text-gray-800 mt-4">Page non trouvée</h1>
-        <p class="text-gray-500 mt-2">La page que vous recherchez n'existe pas.</p>
-        <a href="/" class="mt-6 inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-            Retour à l'accueil
-        </a>
-        {% if error %}
-        <p class="text-gray-500 text-sm mt-6">Chemin demandé : <code class="text-gray-700">{{ error.path }}</code></p>
-        <p class="text-xs text-gray-400 mt-1">Détail affiché uniquement en mode développement (APP_ENV=dev).</p>
-        {% endif %}
-    </div>
-</body>
-</html>
+{% extends "layouts/base.html" %}
+
+{% block title %}404 · {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="text-center">
+    <p class="text-8xl font-bold text-orange-400">404</p>
+    <h1 class="text-2xl font-semibold mt-4">Page non trouvée</h1>
+    <p class="text-gray-400 mt-2">La page que vous recherchez n'existe pas.</p>
+    <a href="/" class="mt-6 inline-block bg-orange-600 text-white px-6 py-2 rounded hover:bg-orange-700">
+        Retour à l'accueil
+    </a>
+    {% if error %}
+    <p class="text-gray-400 text-sm mt-6">Chemin demandé : <code class="text-orange-300">{{ error.path }}</code></p>
+    <p class="text-xs text-gray-500 mt-1">Détail affiché uniquement en mode développement (APP_ENV=dev).</p>
+    {% endif %}
+</section>
+{% endblock %}

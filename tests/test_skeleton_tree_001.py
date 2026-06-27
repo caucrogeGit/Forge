@@ -41,6 +41,7 @@ REQUIRED_FILES = [
     "static/src/input.css",
     "mvc/routes.py",
     "mvc/controllers/home_controller.py",
+    "mvc/views/layouts/base.html",
     "mvc/views/home/index.html",
     "mvc/forms/__init__.py",
     "mvc/validators/__init__.py",
@@ -141,19 +142,28 @@ def test_home_view_sans_cartes_optin():
     assert "Pour aller plus loin" not in content
 
 
-def test_home_view_affiche_version_courante():
-    """La home indique la version de Forge sur laquelle le squelette est généré.
+def test_layout_base_affiche_version_courante():
+    """Le layout partagé affiche la version de Forge sur laquelle le squelette
+    est généré (pied de page commun à toutes les vues).
 
     La version est figée en littéral (même convention que requirements.txt)
     et tenue synchrone avec forge._FORGE_VERSION par ce garde-fou.
     """
-    content = (SKELETON / "mvc" / "views" / "home" / "index.html").read_text(
+    content = (SKELETON / "mvc" / "views" / "layouts" / "base.html").read_text(
         encoding="utf-8"
     )
     assert f"Forge {forge._FORGE_VERSION}" in content, (
-        "la home doit afficher la version courante "
+        "layouts/base.html doit afficher la version courante "
         f"({forge._FORGE_VERSION})."
     )
+
+
+def test_home_view_etend_le_layout():
+    """La home étend le layout partagé (démontre le pattern, pas de duplication)."""
+    content = (SKELETON / "mvc" / "views" / "home" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    assert '{% extends "layouts/base.html" %}' in content
 
 
 # ── Dépendance core via pip + anti-dérive ────────────────────────────────────
