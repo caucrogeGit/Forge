@@ -41,6 +41,7 @@ def real_db():
     """
     import core.forge as forge
     from core.database import connection
+    from core.database.backend import reset_backend
 
     params = _db_params()
     forge.configure(
@@ -64,10 +65,6 @@ def real_db():
 
     yield
 
-    pool = connection._pool
-    if pool is not None:
-        try:
-            pool.close()
-        except Exception:  # noqa: BLE001 — fermeture best-effort en fin de session
-            pass
-        connection._pool = None
+    # ADR-054 : le pool vit dans le backend actif. reset_backend() le ferme
+    # proprement (close()) et force une nouvelle résolution ensuite.
+    reset_backend()

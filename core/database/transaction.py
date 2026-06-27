@@ -7,7 +7,7 @@ from core.database.connection import get_connection, close_connection
 
 
 class Transaction:
-    """Transaction explicite autour d'une connexion MariaDB."""
+    """Transaction explicite autour d'une connexion du backend BDD actif."""
 
     connection: Any
 
@@ -26,10 +26,10 @@ def transaction() -> Generator["Transaction", None, None]:
     Le développeur choisit le périmètre du bloc. Les helpers DB qui reçoivent
     tx réutilisent la connexion et ne commit jamais eux-mêmes.
 
-    Le pool peut fournir des connexions en autocommit (défaut MariaDB) : sans le
-    désarmer, chaque requête serait validée immédiatement et le rollback serait
-    sans effet. On garantit donc un vrai contexte transactionnel le temps du
-    bloc, puis on restaure l'état initial avant de rendre la connexion au pool.
+    Le backend peut fournir des connexions en autocommit : sans le désarmer,
+    chaque requête serait validée immédiatement et le rollback serait sans
+    effet. On garantit donc un vrai contexte transactionnel le temps du bloc,
+    puis on restaure l'état initial avant de rendre la connexion au backend.
     """
     connection = get_connection()
     previous_autocommit = connection.autocommit

@@ -1,0 +1,79 @@
+# pyright: strict
+# mariadb ne fournit pas de stubs de types (paquet sans py.typed) : on accepte
+# l'absence de stubs pour ce pilote externe et on aliase le module en `Any`
+# localement pour ses accès membres (ConnectionPool, PoolError).
+# pyright: reportMissingTypeStubs=false
+"""
+core/database/_mariadb_backend.py — Backend BDD MariaDB intégré (transition)
+===========================================================================
+Implémentation du contrat `DatabaseBackend` (voir `core.database.backend`)
+pour MariaDB, via un pool de connexions.
+
+Statut transitoire (ADR-054) : ce backend vit encore dans le cœur tant que
+l'opt-in `forge-mvc-mariadb` n'a pas été extrait. Le résolveur de
+`core.database.backend` l'utilise comme repli quand aucun opt-in BDD n'est
+installé. Une fois l'extraction faite, ce module quittera le cœur.
+
+Le pool est créé au premier emprunt de connexion (lazy init). L'import du
+module ne produit aucun effet de bord réseau.
+"""
+import logging
+import threading
+from typing import Any
+
+from core.forge import get as _cfg
+
+logger = logging.getLogger(__name__)
+
+
+class MariaDBBackend:
+    """Backend BDD MariaDB : pool de connexions thread-safe."""
+
+    name = "mariadb"
+
+    def __init__(self) -> None:
+        self._pool: Any = None
+        self._pool_lock = threading.Lock()
+
+    def _get_pool(self) -> Any:
+        if self._pool is None:
+            with self._pool_lock:
+                if self._pool is None:
+                    import mariadb
+                    _mariadb: Any = mariadb
+                    self._pool = _mariadb.ConnectionPool(
+                        host      = _cfg("db_host"),
+                        port      = _cfg("db_port"),
+                        user      = _cfg("db_user"),
+                        password  = _cfg("db_password"),
+                        database  = _cfg("db_name"),
+                        pool_name = _cfg("app_name").lower(),
+                        pool_size = _cfg("db_pool_size"),
+                    )
+                    logger.debug("Pool MariaDB initialisé (%s, taille=%s)",
+                                 _cfg("db_name"), _cfg("db_pool_size"))
+        return self._pool
+
+    def get_connection(self) -> Any:
+        """Emprunte une connexion depuis le pool (créé au premier appel)."""
+        import mariadb
+        _mariadb: Any = mariadb
+        try:
+            return self._get_pool().get_connection()
+        except _mariadb.PoolError as error:
+            logger.exception("Pool épuisé ou connexion impossible : %s", error)
+            raise
+
+    def close_connection(self, connection: Any) -> None:
+        """Restitue la connexion au pool."""
+        if connection is not None:
+            connection.close()
+
+    def close(self) -> None:
+        """Ferme le pool sous-jacent (réinitialisation, fin de session de test)."""
+        if self._pool is not None:
+            try:
+                self._pool.close()
+            except Exception:  # noqa: BLE001 — fermeture best-effort
+                pass
+            self._pool = None
