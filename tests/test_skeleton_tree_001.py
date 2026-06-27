@@ -125,6 +125,36 @@ def test_home_view_sans_contenu_perime():
         )
 
 
+def test_home_view_sans_cartes_optin():
+    """La home nue ne présente plus de cartes d'opt-in (principe 8).
+
+    Les opt-ins se découvrent via la documentation, pas via une vitrine
+    dans la page d'accueil du projet généré.
+    """
+    content = (SKELETON / "mvc" / "views" / "home" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    assert "forgemvc.com/docs/forge/" not in content, (
+        "la home nue ne doit plus lister de cartes d'opt-in."
+    )
+    assert "Pour aller plus loin" not in content
+
+
+def test_home_view_affiche_version_courante():
+    """La home indique la version de Forge sur laquelle le squelette est généré.
+
+    La version est figée en littéral (même convention que requirements.txt)
+    et tenue synchrone avec forge._FORGE_VERSION par ce garde-fou.
+    """
+    content = (SKELETON / "mvc" / "views" / "home" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    assert f"Forge {forge._FORGE_VERSION}" in content, (
+        "la home doit afficher la version courante "
+        f"({forge._FORGE_VERSION})."
+    )
+
+
 # ── Dépendance core via pip + anti-dérive ────────────────────────────────────
 
 def test_requirements_epingle_forge_mvc():
