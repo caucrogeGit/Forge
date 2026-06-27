@@ -885,8 +885,6 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
     GRANT SELECT, INSERT, UPDATE, DELETE
     ON `NOM_BASE`.* TO 'NOM_UTILISATEUR_APP'@'localhost';
-
-    FLUSH PRIVILEGES;
     ```
 
     Quittez ensuite la console :
@@ -902,7 +900,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     * `mot_de_passe_admin_local` doit reprendre exactement la valeur de `DB_ADMIN_PWD` ;
     * `mot_de_passe_app_local` doit reprendre exactement la valeur de `DB_APP_PWD` ;
     * si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` `` ;
-    * si `DB_APP_LOGIN` contient un tiret, gardez les quotes SQL : `'mon-projet'@'localhost'`.
+    * si `DB_APP_LOGIN` contient un tiret, gardez les quotes SQL : `'mon-projet'@'localhost'` ;
+    * le compte admin n'a pas besoin du privilège `RELOAD` : `forge db:init` n'émet pas de `FLUSH PRIVILEGES`, car `CREATE USER` et `GRANT` prennent effet immédiatement en MariaDB.
 
     ---
 

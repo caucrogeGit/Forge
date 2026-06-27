@@ -236,7 +236,6 @@ def test_db_init_creates_missing_database_and_app_user(monkeypatch):
         "GRANT SELECT, INSERT, UPDATE, DELETE ON `gestion_ventes`.* TO 'forge_app'@'localhost'",
         "USE `gestion_ventes`",
         FORGE_MIGRATIONS_SQL,
-        "FLUSH PRIVILEGES",
     ]
     assert connection.committed is True
     assert actions == [
@@ -342,7 +341,6 @@ def test_db_init_reports_existing_database_and_user_then_reapplies_privileges(mo
         "GRANT SELECT, INSERT, UPDATE, DELETE ON `gestion_ventes`.* TO 'forge_app'@'localhost'",
         "USE `gestion_ventes`",
         FORGE_MIGRATIONS_SQL,
-        "FLUSH PRIVILEGES",
     ]
     assert connection.committed is True
     assert actions == [

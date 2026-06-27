@@ -231,15 +231,15 @@ def test_db_init_degraded_mode_without_mysql_user_select(
     app_login = f"app_{harness.uid}"
     harness.track_user(app_login, harness.app_host)
 
-    # Admin restreint : peut créer des comptes et des bases du préfixe forge_it_,
-    # accorder le DML, recharger les privilèges, mais ne peut PAS lire mysql.user
-    # (pas de SELECT global).
+    # Admin restreint : peut créer des comptes et des bases du préfixe forge_it_
+    # et accorder le DML, mais ne peut PAS lire mysql.user (pas de SELECT global)
+    # NI recharger les privilèges (pas de RELOAD). db:init doit réussir sans
+    # RELOAD : il n'émet plus de FLUSH PRIVILEGES (DB-INIT-NO-FLUSH-001).
     setup = harness.connect()
     try:
         cur = setup.cursor()
         cur.execute(f"CREATE USER '{restricted}'@'{harness.app_host}' IDENTIFIED BY 'apwd'")
         cur.execute(f"GRANT CREATE USER ON *.* TO '{restricted}'@'{harness.app_host}'")
-        cur.execute(f"GRANT RELOAD ON *.* TO '{restricted}'@'{harness.app_host}'")
         cur.execute(
             "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE ON `forge_it_%`.* "
             f"TO '{restricted}'@'{harness.app_host}' WITH GRANT OPTION"

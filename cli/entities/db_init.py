@@ -168,7 +168,11 @@ def init_project_database() -> list[str]:
             _create_forge_migrations_table(cursor, cfg.db_name)
             actions.append("Table forge_migrations prête.")
 
-            cursor.execute("FLUSH PRIVILEGES")
+            # Pas de FLUSH PRIVILEGES : CREATE USER et GRANT prennent effet
+            # immédiatement en MariaDB. FLUSH n'est requis qu'après modification
+            # directe des tables mysql.*, ce que db:init ne fait jamais. L'éviter
+            # dispense le compte d'administration du projet du privilège RELOAD
+            # (moindre privilège, charte principe 7).
             connection.commit()
         finally:
             cursor.close()
