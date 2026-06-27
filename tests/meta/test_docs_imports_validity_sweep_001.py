@@ -100,6 +100,8 @@ _FRAMEWORK_ROOTS = frozenset({
     # Opt-ins ADR-052 et déploiement (ADR-053) : paquets framework officiels.
     "forge_mvc_settings", "forge_mvc_import_export", "forge_mvc_audit",
     "forge_mvc_jobs", "forge_mvc_notifications", "forge_mvc_deploy",
+    # forge-mvc-testing : infrastructure de test partagée, dev-only (ADR-041).
+    "forge_mvc_testing",
     "cli",
     # `integrations/` est dans le repo Forge (Jinja2 renderer, etc.).
     "integrations",
