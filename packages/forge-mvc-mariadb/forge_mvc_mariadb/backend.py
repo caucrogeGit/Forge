@@ -4,15 +4,11 @@
 # localement pour ses accès membres (ConnectionPool, PoolError).
 # pyright: reportMissingTypeStubs=false
 """
-core/database/_mariadb_backend.py — Backend BDD MariaDB intégré (transition)
-===========================================================================
-Implémentation du contrat `DatabaseBackend` (voir `core.database.backend`)
-pour MariaDB, via un pool de connexions.
-
-Statut transitoire (ADR-054) : ce backend vit encore dans le cœur tant que
-l'opt-in `forge-mvc-mariadb` n'a pas été extrait. Le résolveur de
-`core.database.backend` l'utilise comme repli quand aucun opt-in BDD n'est
-installé. Une fois l'extraction faite, ce module quittera le cœur.
+forge_mvc_mariadb.backend — Backend BDD MariaDB pour Forge (ADR-054)
+====================================================================
+Implémente le contrat `core.database.backend.DatabaseBackend` pour MariaDB,
+via un pool de connexions. Le cœur découvre ce backend par entry point
+(groupe ``forge_mvc.db_backend``) : il suffit que ce paquet soit installé.
 
 Le pool est créé au premier emprunt de connexion (lazy init). L'import du
 module ne produit aucun effet de bord réseau.
