@@ -1,77 +1,72 @@
 # Cartes, badges et retours
 
-**Objectif** : remplir la page avec des cartes, des chiffres-clés, des pastilles
-de statut et des messages.
+**Objectif** : afficher les données passées par le contrôleur sous forme de
+chiffre-clé et de cartes, avec des pastilles de statut.
 
 **Ce que vous allez apprendre :** les composants de présentation de
-`components/ui.html` : `button`, `card`, `badge`, `stat`, `alert`, `empty_state`.
+`components/ui.html` (`button`, `card`, `badge`, `stat`, `alert`,
+`empty_state`), alimentés par le contexte du contrôleur (`total`, `contacts`).
 
-## Boutons
+## Rappel : ce que le contrôleur passe
 
-Trois variantes, en bouton ou en lien (avec `href`) :
+Au préambule, `index` passe déjà `total` et `contacts`. Nous les consommons ici.
+
+## Chiffre-clé et cartes alimentées par les données
+
+Dans `showcase/index.html`, remplacez le paragraphe par :
 
 ```jinja
-{% from "components/ui.html" import button %}
+{% extends "layouts/base.html" %}
+{% from "components/ui.html" import card, stat, badge, button %}
+
+{% block title %}Annuaire · {{ app_name }}{% endblock %}
+
+{% block content %}
+  <div class="grid grid-cols-3 gap-4 mb-8">
+    {{ stat(total, "contacts") }}
+    {{ stat(contacts | selectattr("statut", "equalto", "actif") | list | length, "actifs") }}
+    {{ button("Nouveau contact", variant="primary", href="/showcase/new", extra="self-center") }}
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    {% for contact in contacts %}
+      {% call card() %}
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold">{{ contact.nom }}</h3>
+          {% if contact.statut == "actif" %}{{ badge("Actif", tone="success") }}
+          {% else %}{{ badge("Archivé", tone="neutral") }}{% endif %}
+        </div>
+        <p class="text-sm text-muted mt-1">{{ contact.email }} · {{ contact.academie }}</p>
+      {% endcall %}
+    {% endfor %}
+  </div>
+{% endblock %}
+```
+
+Le `stat` affiche un compte calculé, et une carte par contact réel boucle sur
+`contacts`. La pastille reflète le statut de chaque enregistrement.
+
+## Boutons et messages
+
+```jinja
+{% from "components/ui.html" import button, alert, empty_state %}
 
 {{ button("Enregistrer", variant="primary") }}
-{{ button("Filtrer", variant="secondary") }}
 {{ button("Annuler", variant="ghost", href="/showcase") }}
-```
-
-## Chiffres-clés et cartes
-
-Ajoutez une bande de statistiques puis une carte, dans le bloc `content` :
-
-```jinja
-{% from "components/ui.html" import card, stat, badge %}
-
-<div class="grid grid-cols-3 gap-4 mb-8">
-  {{ stat("128", "contacts") }}
-  {{ stat("12", "classes") }}
-  {{ stat("98 %", "joignables") }}
-</div>
-
-{% call card() %}
-  <div class="flex items-center justify-between">
-    <h3 class="font-bold">Collège Jean Moulin</h3>
-    {{ badge("Actif", tone="success") }}
-  </div>
-  <p class="text-sm text-muted mt-1">Académie de Paris</p>
-{% endcall %}
-```
-
-## Pastilles de statut
-
-`badge` accepte un `tone` : `success`, `warning`, `danger`, `neutral`.
-
-```jinja
-{{ badge("Actif", tone="success") }}
-{{ badge("En attente", tone="warning") }}
-{{ badge("Archivé", tone="neutral") }}
-```
-
-## Messages et état vide
-
-```jinja
-{% from "components/ui.html" import alert, empty_state %}
 
 {{ alert("Pensez à compléter les coordonnées.", level="info") }}
-
-{{ empty_state("Aucun contact pour l'instant.",
-     hint="Ajoutez-en un avec le bouton Nouveau contact.") }}
 ```
 
-`alert` accepte `success`, `error`, `warning`, `info`. `empty_state` se pose à la
-place d'une liste vide.
+`button` a trois variantes (`primary`, `secondary`, `ghost`). Pour une liste
+vide, `empty_state("Aucun contact.")` remplace l'affichage.
 
 ??? note "À retenir"
-    - `button(label, variant=..., href=...)` : `primary`, `secondary`, `ghost`.
+    - Les composants consomment le **contexte du contrôleur** (`contacts`,
+      `total`), pas des données en dur.
     - `card` s'utilise avec `{% call card() %} ... {% endcall %}`.
-    - `badge(label, tone=...)` et `alert(message, level=...)` partagent la même
-      logique de tons.
-    - `stat(valeur, libellé)` pour un chiffre-clé, `empty_state` pour une liste
-      vide.
+    - `badge(label, tone=...)` reflète une donnée (ici le statut).
+    - `stat`, `alert`, `empty_state` complètent la présentation.
 
-Au palier suivant, nous ajoutons un formulaire de saisie.
+Au palier suivant, nous ajoutons le formulaire d'ajout (route `/showcase/new`).
 
 [Continuer avec Le formulaire](formulaire.md)

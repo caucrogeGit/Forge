@@ -54,6 +54,23 @@ La modale utilise l'élément natif `<dialog>` : un bouton l'ouvre via
 {% endcall %}
 ```
 
+Côté contrôleur, branchez la route de suppression (l'action `<form>` ci-dessus) :
+
+```python
+    @staticmethod
+    def delete(request: Request) -> Response:
+        email = request.form("email", default="")
+        _CONTACTS[:] = [c for c in _CONTACTS if c["email"] != email]
+        return BaseController.redirect("/showcase", request=request, flash="Contact supprimé.")
+```
+
+```python
+public.add("POST", "/showcase/delete", ShowcaseController.delete, name="showcase-delete")
+```
+
+La modale confirme, le formulaire poste vers `/showcase/delete`, et le flash
+« Contact supprimé. » s'affiche au retour (via `flash_messages`).
+
 ??? note "À retenir"
     - `accordion` et `dropdown` reposent sur `<details>` : zéro JavaScript.
     - `modal` repose sur `<dialog>` : ouverture via `showModal()` natif,

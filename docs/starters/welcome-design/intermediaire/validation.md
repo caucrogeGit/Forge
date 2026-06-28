@@ -1,39 +1,68 @@
 # La validation
 
-**Objectif** : afficher proprement les erreurs de saisie, au champ et en
-résumé.
+**Objectif** : valider l'envoi côté contrôleur, réafficher le formulaire avec
+les erreurs, et confirmer le succès par un message flash.
 
-**Ce que vous allez apprendre :** l'état d'erreur des champs (`error=...`), le
-résumé `form_errors`, et le message de succès via `flash_messages`. C'est le
-pendant visuel de la validation serveur de Forge (réponses 422).
+**Ce que vous allez apprendre :** brancher la validation serveur (réponse 422)
+sur les composants visuels : état d'erreur des champs, résumé `form_errors`,
+message `flash_messages`.
 
-## Erreur sur un champ
+## Valider dans le contrôleur
 
-Passez `error` à un champ : il prend la bordure rouge et affiche le message
-sous le champ.
+Faites valider `store` ; en cas d'erreur, il réaffiche `form.html` avec les
+erreurs et les valeurs saisies (statut 422) ; sinon il redirige avec un flash :
 
-```jinja
-{{ field("email", label="Courriel", type="email",
-     value="pas-un-email", error="Adresse électronique invalide.") }}
+```python
+    @staticmethod
+    def store(request: Request) -> Response:
+        nom = request.form("nom", default="").strip()
+        email = request.form("email", default="").strip()
+
+        errors = []
+        if not nom:
+            errors.append("Le nom est obligatoire.")
+        if "@" not in email:
+            errors.append("Le courriel est invalide.")
+
+        if errors:
+            return BaseController.render(
+                "showcase/form.html",
+                status=422,
+                request=request,
+                context={"errors": errors, "values": {"nom": nom, "email": email}},
+            )
+
+        _CONTACTS.append({"nom": nom, "email": email, "academie": "Paris", "statut": "actif"})
+        return BaseController.redirect("/showcase", request=request, flash="Contact ajouté.")
 ```
 
-## Résumé en tête de formulaire
+## Afficher les erreurs dans le formulaire
 
-`form_errors` liste les erreurs en haut du formulaire. Le contrôleur passe la
-liste des messages ; ici, une liste d'exemple :
+Dans `showcase/form.html`, ajoutez le résumé en tête et l'erreur sur le champ :
 
 ```jinja
-{% from "components/forms.html" import form_errors %}
+{% from "components/forms.html" import field, form_errors, submit %}
 
-{{ form_errors(["Le nom est obligatoire.", "Le courriel est invalide."]) }}
+<form method="post" action="/showcase/store">
+  {% include "partials/csrf.html" %}
+
+  {{ form_errors(errors) }}
+
+  {{ field("nom", label="Nom", value=values.get("nom", ""),
+       error="Le nom est obligatoire." if errors and not values.get("nom") else "") }}
+  {{ field("email", label="Courriel", type="email", value=values.get("email", "")) }}
+
+  {{ submit("Enregistrer") }}
+</form>
 ```
 
-Quand la liste est vide, la macro n'affiche rien.
+`form_errors(errors)` n'affiche rien si la liste est vide. `field(..., error=...)`
+passe la bordure en rouge et affiche le message sous le champ.
 
-## Message de succès après envoi
+## Le message de succès
 
-Après un enregistrement réussi, on redirige avec un message flash. La macro
-`flash_messages` le rend (placez-la en haut du contenu) :
+Le préambule lit déjà le flash dans `index` (`get_flash`). Affichez-le en haut
+de `showcase/index.html` :
 
 ```jinja
 {% from "components/ui.html" import flash_messages %}
@@ -41,13 +70,13 @@ Après un enregistrement réussi, on redirige avec un message flash. La macro
 {{ flash_messages(flash) }}
 ```
 
-Côté contrôleur, le flash se pose avec `redirect_with_flash` (voir
-[Messages flash](../../welcome-forge/intermediaire/flash-messages.md) dans le
-parcours Welcome Forge).
+Après un ajout réussi, `store` redirige vers `/showcase` avec le flash
+« Contact ajouté. », et `flash_messages` le rend une seule fois.
 
 ??? note "À retenir"
-    - `field(..., error="message")` : bordure rouge et message au champ.
-    - `form_errors(liste)` : résumé en tête, rien si la liste est vide.
-    - `flash_messages(flash)` : rend le message flash de session, s'il existe.
+    - La validation vit dans le contrôleur ; les composants n'affichent que le
+      résultat.
+    - `form_errors(errors)` pour le résumé, `field(..., error=...)` au champ.
+    - `flash_messages(flash)` pour le succès, via le motif POST-Redirect-GET.
 
 [Voir le bilan du niveau](bilan.md)

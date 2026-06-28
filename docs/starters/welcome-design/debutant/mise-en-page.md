@@ -38,7 +38,7 @@ bouton d'action :
   {{ page_header("Annuaire",
        subtitle="Les contacts de l'établissement.",
        action_label="Nouveau contact",
-       action_href="/showcase") }}
+       action_href="/showcase/new") }}
 {% endblock %}
 ```
 
