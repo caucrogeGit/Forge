@@ -210,6 +210,7 @@ nav:
                 - Tableaux et pagination: starters/welcome-design/avance/tableaux.md
                 - Composants interactifs: starters/welcome-design/avance/interactif.md
                 - Bilan avancé: starters/welcome-design/avance/bilan.md
+            - Récapitulatif des composants: starters/welcome-design/recapitulatif.md
 
     - Déploiement:
         - Mise en production pas à pas: deployment/mise-en-production.md

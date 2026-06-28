@@ -26,6 +26,7 @@ uniquement avec la charte et les composants du squelette.
 
 ## Pour aller plus loin
 
+- [Récapitulatif des composants](../recapitulatif.md) : l'aide-mémoire de toutes les macros.
 - [Front et CSS](../../../features/front.md) : la gestion des assets front.
 - [Parcours Welcome Forge](../../welcome-forge/index.md) : le contrôleur, les
   routes, la base de données qui alimentent ces vues.
