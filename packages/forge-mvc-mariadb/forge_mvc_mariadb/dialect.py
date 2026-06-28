@@ -38,3 +38,18 @@ class MariaDBDialect:
 
     def identity_type(self) -> str:
         return "BIGINT UNSIGNED"
+
+    def auto_increment_column_ddl(self, column: str, sql_type: str) -> str:
+        return f"{column} {sql_type} NOT NULL AUTO_INCREMENT"
+
+    def emits_separate_primary_key(self) -> bool:
+        return True
+
+    def unique_is_column_constraint(self) -> bool:
+        return False
+
+    def unique_constraint_ddl(self, table: str, field_name: str, column: str) -> str:
+        return f"UNIQUE KEY uk_{table}_{field_name} ({column})"
+
+    def table_suffix(self) -> str:
+        return " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"

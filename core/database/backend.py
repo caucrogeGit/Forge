@@ -63,6 +63,39 @@ class Dialect(Protocol):
         """Type colonne de la clé primaire auto-incrémentée `id`."""
         ...
 
+    # ── DDL (CREATE TABLE) ───────────────────────────────────────────────────
+
+    def auto_increment_column_ddl(self, column: str, sql_type: str) -> str:
+        """Définition complète de la colonne PK auto-incrémentée.
+
+        MariaDB : « col TYPE NOT NULL AUTO_INCREMENT » (+ clause PRIMARY KEY
+        séparée). SQLite : « col INTEGER PRIMARY KEY AUTOINCREMENT » (PK inline).
+        """
+        ...
+
+    def emits_separate_primary_key(self) -> bool:
+        """Vrai si la PK s'exprime par une clause `PRIMARY KEY (col)` séparée.
+
+        Faux pour SQLite, qui porte la PK auto-incrémentée sur la colonne.
+        """
+        ...
+
+    def unique_is_column_constraint(self) -> bool:
+        """Vrai si l'unicité s'exprime sur la colonne (« col TYPE ... UNIQUE »).
+
+        SQLite l'exige (les contraintes de table doivent suivre toutes les
+        colonnes) ; MariaDB émet une ligne `UNIQUE KEY ...` séparée (faux).
+        """
+        ...
+
+    def unique_constraint_ddl(self, table: str, field_name: str, column: str) -> str:
+        """Ligne de contrainte d'unicité de table (si non portée par la colonne)."""
+        ...
+
+    def table_suffix(self) -> str:
+        """Suffixe après la parenthèse fermante (moteur, charset...) ou « »."""
+        ...
+
 
 @runtime_checkable
 class DatabaseBackend(Protocol):

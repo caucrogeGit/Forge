@@ -357,6 +357,9 @@ def sql_default_literal(field: dict[str, Any]) -> str | None:
 
 
 def build_entity_sql(entity_definition: dict[str, Any]) -> str:
+    from core.database.backend import get_backend
+
+    dialect = get_backend().dialect
     entity_definition = normalize_entity_definition(entity_definition)
     table = entity_definition["table"]
     fields = entity_definition["fields"]
@@ -366,25 +369,35 @@ def build_entity_sql(entity_definition: dict[str, Any]) -> str:
     primary_key_column = None
 
     for field in fields:
-        parts = [f"    {field['column']} {field['sql_type']}"]
-        parts.append("NULL" if field["nullable"] else "NOT NULL")
         if field["auto_increment"]:
-            parts.append("AUTO_INCREMENT")
-        default_literal = sql_default_literal(field)
-        if default_literal is not None:
-            parts.append(f"DEFAULT {default_literal}")
-        body_lines.append(" ".join(parts))
+            # PK auto-incrémentée : la forme exacte dépend du dialecte
+            # (MariaDB ajoute une clause PRIMARY KEY séparée ; SQLite la porte
+            # sur la colonne).
+            body_lines.append(
+                "    " + dialect.auto_increment_column_ddl(field["column"], field["sql_type"])
+            )
+        else:
+            parts = [f"    {field['column']} {field['sql_type']}"]
+            parts.append("NULL" if field["nullable"] else "NOT NULL")
+            if field.get("unique") is True and dialect.unique_is_column_constraint():
+                parts.append("UNIQUE")
+            default_literal = sql_default_literal(field)
+            if default_literal is not None:
+                parts.append(f"DEFAULT {default_literal}")
+            body_lines.append(" ".join(parts))
 
         if field["primary_key"]:
             primary_key_column = field["column"]
-        if field.get("unique") is True:
-            body_lines.append(f"    UNIQUE KEY uk_{table}_{field['name']} ({field['column']})")
+        if field.get("unique") is True and not dialect.unique_is_column_constraint():
+            body_lines.append(
+                "    " + dialect.unique_constraint_ddl(table, field["name"], field["column"])
+            )
 
-    if primary_key_column is not None:
+    if primary_key_column is not None and dialect.emits_separate_primary_key():
         body_lines.append(f"    PRIMARY KEY ({primary_key_column})")
 
     lines.append(",\n".join(body_lines))
-    lines.append(") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    lines.append(")" + dialect.table_suffix() + ";")
     return "\n".join(lines) + "\n"
 
 

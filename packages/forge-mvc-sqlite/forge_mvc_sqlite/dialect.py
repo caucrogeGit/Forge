@@ -39,3 +39,21 @@ class SQLiteDialect:
     def identity_type(self) -> str:
         # La clé primaire auto-incrémentée SQLite doit être de type INTEGER.
         return "INTEGER"
+
+    def auto_increment_column_ddl(self, column: str, sql_type: str) -> str:
+        # SQLite : la PK auto-incrémentée est portée par la colonne elle-même.
+        return f"{column} {sql_type} PRIMARY KEY AUTOINCREMENT"
+
+    def emits_separate_primary_key(self) -> bool:
+        return False
+
+    def unique_is_column_constraint(self) -> bool:
+        # SQLite : l'unicité est portée par la colonne (contraintes de table
+        # après toutes les colonnes seulement) — voir build_entity_sql.
+        return True
+
+    def unique_constraint_ddl(self, table: str, field_name: str, column: str) -> str:
+        return f"UNIQUE ({column})"
+
+    def table_suffix(self) -> str:
+        return ""
