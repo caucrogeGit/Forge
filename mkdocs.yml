@@ -197,9 +197,19 @@ nav:
                 - Bilan avancé: starters/welcome-markdown/avance/bilan.md
         - Progression système de design (welcome-design):
             - Préambule: starters/welcome-design/installation.md
-            - La charte graphique: starters/welcome-design/charte-graphique.md
-            - La bibliothèque de composants: starters/welcome-design/composants.md
-            - Bilan: starters/welcome-design/bilan.md
+            - Débutant:
+                - La charte graphique: starters/welcome-design/debutant/charte.md
+                - La mise en page: starters/welcome-design/debutant/mise-en-page.md
+                - Bilan débutant: starters/welcome-design/debutant/bilan.md
+            - Intermédiaire:
+                - Cartes, badges et retours: starters/welcome-design/intermediaire/cartes.md
+                - Le formulaire: starters/welcome-design/intermediaire/formulaire.md
+                - La validation: starters/welcome-design/intermediaire/validation.md
+                - Bilan intermédiaire: starters/welcome-design/intermediaire/bilan.md
+            - Avancé:
+                - Tableaux et pagination: starters/welcome-design/avance/tableaux.md
+                - Composants interactifs: starters/welcome-design/avance/interactif.md
+                - Bilan avancé: starters/welcome-design/avance/bilan.md
 
     - Déploiement:
         - Mise en production pas à pas: deployment/mise-en-production.md
