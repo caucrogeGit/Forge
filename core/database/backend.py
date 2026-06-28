@@ -38,10 +38,38 @@ ENV_OVERRIDE = "DB_BACKEND"
 
 
 @runtime_checkable
+class Dialect(Protocol):
+    """Traits SQL propres à un SGBD, consommés par les générateurs (ADR-054).
+
+    Couvre pour l'instant le mapping des types Forge vers les types de colonne
+    SQL (le seul concern dialectal déjà câblé). Les autres traits (quoting des
+    identifiants, mot-clé d'auto-incrément, introspection, provisioning) seront
+    ajoutés au fil des tickets DDL.
+    """
+
+    def string_type(self, max_length: int) -> str:
+        """Type colonne pour `string` (longueur validée par l'appelant)."""
+        ...
+
+    def decimal_type(self, precision: int, scale: int) -> str:
+        """Type colonne pour `decimal` (precision/scale validés par l'appelant)."""
+        ...
+
+    def simple_type(self, forge_type: str) -> str:
+        """Type colonne pour un type Forge simple (text, integer, boolean, ...)."""
+        ...
+
+    def identity_type(self) -> str:
+        """Type colonne de la clé primaire auto-incrémentée `id`."""
+        ...
+
+
+@runtime_checkable
 class DatabaseBackend(Protocol):
     """Contrat qu'un opt-in de backend BDD doit implémenter."""
 
     name: str
+    dialect: Dialect
 
     def get_connection(self) -> Any:
         """Fournit une connexion prête à l'emploi (pool ou directe)."""

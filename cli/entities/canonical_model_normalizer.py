@@ -22,22 +22,32 @@ from __future__ import annotations
 
 from typing import Any
 
+from core.database.backend import Dialect, get_backend
+
 
 _DEFAULT_STRING_LENGTH = 255
 
-_SIMPLE_TYPE_MAP: dict[str, tuple[str, str]] = {
-    "text":        ("TEXT",          "str"),
-    "integer":     ("INT",           "int"),
-    "big_integer": ("BIGINT",        "int"),
-    "float":       ("DOUBLE",        "float"),
-    "boolean":     ("BOOLEAN",       "bool"),
-    "date":        ("DATE",          "date"),
-    "datetime":    ("DATETIME",      "datetime"),
-    "email":       ("VARCHAR(255)",  "str"),
-    "password":    ("VARCHAR(255)",  "str"),
-    "slug":        ("VARCHAR(180)",  "str"),
-    "json":        ("LONGTEXT",      "str"),
+# Type Python (runtime) d'un type Forge simple. Non dialectal : il ne dépend
+# pas du SGBD. Le type SQL correspondant, lui, vient du dialecte du backend
+# actif (ADR-054), via dialect.simple_type().
+_SIMPLE_PYTHON_TYPE: dict[str, str] = {
+    "text":        "str",
+    "integer":     "int",
+    "big_integer": "int",
+    "float":       "float",
+    "boolean":     "bool",
+    "date":        "date",
+    "datetime":    "datetime",
+    "email":       "str",
+    "password":    "str",
+    "slug":        "str",
+    "json":        "str",
 }
+
+
+def _dialect() -> Dialect:
+    """Dialecte SQL du backend BDD actif (ADR-054)."""
+    return get_backend().dialect
 
 # Longueur de colonne d'un slug URL (ADR-017 D3) — alignée avec SlugField.
 _SLUG_MAX_LENGTH = 180
@@ -53,6 +63,7 @@ def _column_from_name(name: str) -> str:
 
 def _build_sql_and_python_type(forge_type: str, field: dict[str, Any]) -> tuple[str, str]:
     field_name = field.get("name", "?")
+    dialect = _dialect()
 
     if forge_type == "string":
         max_length = field.get("max_length", _DEFAULT_STRING_LENGTH)
@@ -60,7 +71,7 @@ def _build_sql_and_python_type(forge_type: str, field: dict[str, Any]) -> tuple[
             raise CanonicalNormalizationError(
                 f"Champ '{field_name}' : max_length doit être un entier positif pour type 'string'."
             )
-        return f"VARCHAR({max_length})", "str"
+        return dialect.string_type(max_length), "str"
 
     if forge_type == "decimal":
         precision = field.get("precision")
@@ -69,10 +80,10 @@ def _build_sql_and_python_type(forge_type: str, field: dict[str, Any]) -> tuple[
             raise CanonicalNormalizationError(
                 f"Champ '{field_name}' : precision et scale sont requis pour type 'decimal'."
             )
-        return f"DECIMAL({precision},{scale})", "float"
+        return dialect.decimal_type(precision, scale), "float"
 
-    if forge_type in _SIMPLE_TYPE_MAP:
-        return _SIMPLE_TYPE_MAP[forge_type]
+    if forge_type in _SIMPLE_PYTHON_TYPE:
+        return dialect.simple_type(forge_type), _SIMPLE_PYTHON_TYPE[forge_type]
 
     raise CanonicalNormalizationError(
         f"Champ '{field_name}' : type Forge inconnu : {forge_type!r}."
@@ -83,7 +94,7 @@ def _id_field() -> dict[str, Any]:
     return {
         "name": "id",
         "column": "Id",
-        "sql_type": "BIGINT UNSIGNED",
+        "sql_type": _dialect().identity_type(),
         "python_type": "int",
         "nullable": False,
         "primary_key": True,
@@ -97,7 +108,7 @@ def _system_datetime_field(name: str, *, nullable: bool) -> dict[str, Any]:
     return {
         "name": name,
         "column": _column_from_name(name),
-        "sql_type": "DATETIME",
+        "sql_type": _dialect().simple_type("datetime"),
         "python_type": "datetime",
         "nullable": nullable,
         "primary_key": False,

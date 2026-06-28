@@ -1,0 +1,40 @@
+# pyright: strict
+"""
+forge_mvc_mariadb.dialect — Traits SQL MariaDB (ADR-054)
+========================================================
+Mapping des types Forge vers les types de colonne MariaDB. Reproduit à
+l'identique le mapping historiquement codé dans le normaliseur du cœur, pour
+ne rien changer au SQL généré tant que le backend est MariaDB.
+"""
+
+# Types Forge « simples » → type de colonne MariaDB.
+# boolean → BOOLEAN (et non TINYINT(1)) : voir la note du normaliseur.
+_SIMPLE_TYPES: dict[str, str] = {
+    "text":        "TEXT",
+    "integer":     "INT",
+    "big_integer": "BIGINT",
+    "float":       "DOUBLE",
+    "boolean":     "BOOLEAN",
+    "date":        "DATE",
+    "datetime":    "DATETIME",
+    "email":       "VARCHAR(255)",
+    "password":    "VARCHAR(255)",
+    "slug":        "VARCHAR(180)",
+    "json":        "LONGTEXT",
+}
+
+
+class MariaDBDialect:
+    """Traits SQL de MariaDB."""
+
+    def string_type(self, max_length: int) -> str:
+        return f"VARCHAR({max_length})"
+
+    def decimal_type(self, precision: int, scale: int) -> str:
+        return f"DECIMAL({precision},{scale})"
+
+    def simple_type(self, forge_type: str) -> str:
+        return _SIMPLE_TYPES[forge_type]
+
+    def identity_type(self) -> str:
+        return "BIGINT UNSIGNED"

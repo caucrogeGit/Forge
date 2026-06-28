@@ -19,6 +19,8 @@ from typing import Any
 
 from core.forge import get as _cfg
 
+from forge_mvc_mariadb.dialect import MariaDBDialect
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,6 +28,7 @@ class MariaDBBackend:
     """Backend BDD MariaDB : pool de connexions thread-safe."""
 
     name = "mariadb"
+    dialect = MariaDBDialect()
 
     def __init__(self) -> None:
         self._pool: Any = None

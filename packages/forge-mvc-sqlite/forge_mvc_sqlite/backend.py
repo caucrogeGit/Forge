@@ -21,6 +21,8 @@ from typing import Any
 
 from core.forge import get as _cfg
 
+from forge_mvc_sqlite.dialect import SQLiteDialect
+
 
 class _SQLiteCursor:
     """Enveloppe d'un curseur sqlite3 : ajoute le mode lignes-dict."""
@@ -94,6 +96,7 @@ class SQLiteBackend:
     """Backend BDD SQLite : une connexion par emprunt (fichier `DB_NAME`)."""
 
     name = "sqlite"
+    dialect = SQLiteDialect()
 
     def get_connection(self) -> Any:
         """Ouvre une connexion SQLite sur le fichier configuré (`DB_NAME`)."""
