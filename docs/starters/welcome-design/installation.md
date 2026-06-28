@@ -22,6 +22,10 @@ avec les composants, et comment un contrôleur passe ses données aux composants
 | `mvc/views/layouts/base.html` | le gabarit partagé qui applique la charte |
 | `mvc/views/components/` | la bibliothèque de composants (macros Jinja) |
 
+Deux références à garder sous la main : la
+[Charte graphique](charte-graphique.md) (palette, typographie, usages) et le
+[Récapitulatif des composants](recapitulatif.md).
+
 ## Le confort : le mode watch
 
 Ouvrez un second terminal :
