@@ -102,6 +102,21 @@ class SQLiteDialect:
             for name, definition in columns
         )
 
+    def named_unique(self, name: str, columns: "list[str]") -> str:
+        # SQLite : contrainte d'unicité sans nom (les noms d'index se déclarent
+        # via CREATE INDEX/UNIQUE INDEX séparés).
+        return f"UNIQUE ({', '.join(columns)})"
+
+    def inline_indexes(self) -> bool:
+        return False
+
+    def index_clause(self, name: str, column: str) -> str:
+        # Non utilisé en SQLite (index hors CREATE TABLE) ; fourni pour le contrat.
+        return f"INDEX {name} ({column})"
+
+    def create_index_sql(self, table: str, name: str, column: str) -> str:
+        return f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({column});"
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

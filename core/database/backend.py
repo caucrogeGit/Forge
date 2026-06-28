@@ -122,6 +122,28 @@ class Dialect(Protocol):
         """
         ...
 
+    def named_unique(self, name: str, columns: "list[str]") -> str:
+        """Contrainte d'unicité de table (composite possible), en ligne.
+
+        MariaDB : `UNIQUE KEY {name} (...)` ; SQLite : `UNIQUE (...)` (sans nom).
+        """
+        ...
+
+    def inline_indexes(self) -> bool:
+        """Vrai si les index se déclarent dans le CREATE TABLE (MariaDB).
+
+        Faux pour SQLite, qui exige des instructions CREATE INDEX séparées.
+        """
+        ...
+
+    def index_clause(self, name: str, column: str) -> str:
+        """Clause d'index en ligne dans le CREATE TABLE (si inline_indexes)."""
+        ...
+
+    def create_index_sql(self, table: str, name: str, column: str) -> str:
+        """Instruction CREATE INDEX autonome (si index non inline)."""
+        ...
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

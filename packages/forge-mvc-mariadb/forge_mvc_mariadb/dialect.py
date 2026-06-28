@@ -105,6 +105,18 @@ class MariaDBDialect:
         ]
         return f"ALTER TABLE {self.quote_identifier(table)}\n" + ",\n".join(defs) + ";\n"
 
+    def named_unique(self, name: str, columns: "list[str]") -> str:
+        return f"UNIQUE KEY {name} ({', '.join(columns)})"
+
+    def inline_indexes(self) -> bool:
+        return True
+
+    def index_clause(self, name: str, column: str) -> str:
+        return f"INDEX {name} ({column})"
+
+    def create_index_sql(self, table: str, name: str, column: str) -> str:
+        return f"CREATE INDEX {name} ON {table} ({column});"
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

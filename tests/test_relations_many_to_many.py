@@ -358,3 +358,49 @@ def test_sync_relations_rejects_legacy_format(tmp_path: Path):
     with pytest.raises(EntityRelationsError) as exc_info:
         sync_relations(entities_root)
     assert "format_version" in str(exc_info.value)
+
+
+def test_canonical_m2m_sql_sqlite_executes(monkeypatch):
+    """Le pivot généré sous SQLite est idiomatique (INTEGER PK, UNIQUE, CREATE
+    INDEX séparés) et s'exécute réellement dans sqlite3."""
+    pytest.importorskip("forge_mvc_sqlite")
+    import sqlite3
+
+    from core.database import backend as backend_module
+    from cli.entities.relations import (
+        ValidatedCanonicalManyToManyRelation,
+        _generate_canonical_m2m_sql,
+    )
+
+    relation = ValidatedCanonicalManyToManyRelation(
+        from_entity="Article",
+        from_table="article",
+        to_entity="Tag",
+        to_table="tag",
+        pivot_table="article_tag",
+        from_key="article_id",
+        to_key="tag_id",
+        on_delete="CASCADE",
+    )
+
+    monkeypatch.setenv("DB_BACKEND", "sqlite")
+    backend_module.reset_backend()
+    try:
+        sql = _generate_canonical_m2m_sql(relation)
+    finally:
+        backend_module.reset_backend()
+
+    assert "INTEGER PRIMARY KEY AUTOINCREMENT" in sql
+    assert "UNIQUE KEY" not in sql  # forme MariaDB absente
+    assert "UNIQUE (article_id, tag_id)" in sql
+    assert "CREATE INDEX IF NOT EXISTS idx_article_tag_article_id ON article_tag (article_id);" in sql
+
+    conn = sqlite3.connect(":memory:")
+    try:
+        conn.execute("CREATE TABLE article (id INTEGER PRIMARY KEY)")
+        conn.execute("CREATE TABLE tag (id INTEGER PRIMARY KEY)")
+        conn.executescript(sql)
+        cols = {row[1] for row in conn.execute("PRAGMA table_info(article_tag)")}
+        assert {"id", "article_id", "tag_id"} <= cols
+    finally:
+        conn.close()

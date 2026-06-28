@@ -219,41 +219,53 @@ def generate_relations_sql(relations: list[ValidatedRelation | ValidatedCanonica
 
 
 def _generate_canonical_m2m_sql(relation: ValidatedCanonicalManyToManyRelation) -> str:
+    from core.database.backend import get_backend
+
+    dialect = get_backend().dialect
     pivot = relation.pivot_table
     fk = relation.from_key
     tk = relation.to_key
     on_delete = relation.on_delete
+    int_type = dialect.simple_type("integer")
 
-    field_lines: list[str] = []
-    unique_key_lines: list[str] = []
+    body: list[str] = ["    " + dialect.auto_increment_column_ddl("id", int_type) + ","]
+    body.append(f"    {fk} {int_type} NOT NULL,")
+    body.append(f"    {tk} {int_type} NOT NULL,")
     for f in relation.pivot_fields:
         null_sql = "NULL" if f.nullable else "NOT NULL"
-        field_lines.append(f"    {f.name} {f.sql_type} {null_sql},")
-        if f.unique:
-            unique_key_lines.append(f"    UNIQUE KEY uq_{pivot}_{f.name} ({f.name}),")
+        body.append(f"    {f.name} {f.sql_type} {null_sql},")
 
-    lines: list[str] = [
-        f"CREATE TABLE IF NOT EXISTS {pivot} (",
-        "    id INT NOT NULL AUTO_INCREMENT,",
-        f"    {fk} INT NOT NULL,",
-        f"    {tk} INT NOT NULL,",
-        *field_lines,
-        "    PRIMARY KEY (id),",
-        f"    UNIQUE KEY uq_{pivot} ({fk}, {tk}),",
-        *unique_key_lines,
-        f"    INDEX idx_{pivot}_{fk} ({fk}),",
-        f"    INDEX idx_{pivot}_{tk} ({tk}),",
-        f"    CONSTRAINT fk_{pivot}_{fk}",
-        f"        FOREIGN KEY ({fk})",
-        f"        REFERENCES {relation.from_table} (id)",
-        f"        ON DELETE {on_delete},",
-        f"    CONSTRAINT fk_{pivot}_{tk}",
-        f"        FOREIGN KEY ({tk})",
-        f"        REFERENCES {relation.to_table} (id)",
-        f"        ON DELETE {on_delete}",
-        ");",
-    ]
-    return "\n".join(lines)
+    if dialect.emits_separate_primary_key():
+        body.append("    PRIMARY KEY (id),")
+
+    body.append("    " + dialect.named_unique(f"uq_{pivot}", [fk, tk]) + ",")
+    for f in relation.pivot_fields:
+        if f.unique:
+            body.append("    " + dialect.named_unique(f"uq_{pivot}_{f.name}", [f.name]) + ",")
+
+    index_specs = [(f"idx_{pivot}_{fk}", fk), (f"idx_{pivot}_{tk}", tk)]
+    if dialect.inline_indexes():
+        for name, column in index_specs:
+            body.append("    " + dialect.index_clause(name, column) + ",")
+
+    body.extend(
+        [
+            f"    CONSTRAINT fk_{pivot}_{fk}",
+            f"        FOREIGN KEY ({fk})",
+            f"        REFERENCES {relation.from_table} (id)",
+            f"        ON DELETE {on_delete},",
+            f"    CONSTRAINT fk_{pivot}_{tk}",
+            f"        FOREIGN KEY ({tk})",
+            f"        REFERENCES {relation.to_table} (id)",
+            f"        ON DELETE {on_delete}",
+        ]
+    )
+
+    sql = "\n".join([f"CREATE TABLE IF NOT EXISTS {pivot} ("] + body + [");"])
+    if not dialect.inline_indexes():
+        for name, column in index_specs:
+            sql += "\n" + dialect.create_index_sql(pivot, name, column)
+    return sql
 
 
 _FORGE_PIVOT_SIMPLE_TYPES: dict[str, str] = {
@@ -278,12 +290,15 @@ def _pivot_field_sql_type(
     field_path: str,
     issues: list[RelationIssue],
 ) -> str | None:
+    from core.database.backend import get_backend
+
+    dialect = get_backend().dialect
     if forge_type == "string":
         max_length = field.get("max_length", 255)
         if not isinstance(max_length, int) or isinstance(max_length, bool) or max_length <= 0:
             _add_issue(issues, f"{field_path}.max_length", "doit etre un entier positif pour le type 'string'")
             return None
-        return f"VARCHAR({max_length})"
+        return dialect.string_type(max_length)
     if forge_type == "decimal":
         precision = field.get("precision")
         scale = field.get("scale")
@@ -293,8 +308,10 @@ def _pivot_field_sql_type(
         if not isinstance(scale, int) or isinstance(scale, bool) or scale < 0:
             _add_issue(issues, f"{field_path}.scale", "requis et entier >= 0 pour le type 'decimal'")
             return None
-        return f"DECIMAL({precision},{scale})"
-    return _FORGE_PIVOT_SIMPLE_TYPES.get(forge_type)
+        return dialect.decimal_type(precision, scale)
+    if forge_type in _FORGE_PIVOT_SIMPLE_TYPES:
+        return dialect.simple_type(forge_type)
+    return None
 
 
 def _validate_canonical_pivot_fields(
