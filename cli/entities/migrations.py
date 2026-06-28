@@ -365,22 +365,27 @@ def load_table_columns(
     db: Any = None,
     database: str | None = None,
 ) -> list[ActualColumn]:
+    from core.database.backend import get_backend
+
+    backend = get_backend()
     connection = db or _connect_db()
     should_close = db is None
-    db_name = database or load_migration_db_config().database
+    # Le nom de base n'est utile qu'aux SGBD serveur (TABLE_SCHEMA) ; un backend
+    # fichier (SQLite) l'ignore.
+    db_name = ""
+    if backend.requires_provisioning:
+        db_name = database or load_migration_db_config().database
 
     try:
-        cursor = connection.cursor()
         try:
-            try:
-                cursor.execute(SELECT_TABLE_COLUMNS_SQL, (db_name, table))
-            except Exception as exc:
-                raise MigrationError(
-                    "Lecture du schéma MariaDB impossible. Vérifiez DB_ADMIN_* / DB_NAME dans env/dev."
-                ) from exc
-            rows = cursor.fetchall()
-        finally:
-            cursor.close()
+            rows = backend.dialect.introspect_columns(connection, table, db_name)
+        except MigrationError:
+            raise
+        except Exception as exc:
+            raise MigrationError(
+                "Lecture du schéma impossible. Vérifiez la configuration BDD "
+                "(DB_ADMIN_* / DB_NAME pour un SGBD serveur)."
+            ) from exc
     finally:
         if should_close:
             connection.close()
@@ -389,8 +394,8 @@ def load_table_columns(
         ActualColumn(
             name=str(row[0]),
             sql_type=str(row[1]),
-            nullable=str(row[2]).upper() == "YES",
-            auto_increment="auto_increment" in str(row[3]).lower(),
+            nullable=bool(row[2]),
+            auto_increment=bool(row[3]),
         )
         for row in rows
     ]
@@ -877,6 +882,17 @@ def _sql_column_definition(field: dict[str, Any]) -> str:
 
 
 def _connect_db():
+    from core.database.backend import get_backend
+
+    backend = get_backend()
+    if not backend.requires_provisioning:
+        # Backend sans serveur (SQLite, ADR-054) : migrations appliquées
+        # directement sur le fichier via le backend actif.
+        from cli.entities.serverless_db import configure_serverless_db
+
+        configure_serverless_db()
+        return backend.get_connection()
+
     import mariadb  # pyright: ignore[reportMissingTypeStubs]
 
     cfg = load_migration_db_config()

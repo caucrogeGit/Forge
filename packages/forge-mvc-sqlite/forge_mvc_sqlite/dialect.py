@@ -6,6 +6,10 @@ Mapping des types Forge vers les affinités de colonne SQLite. SQLite a un
 typage par affinité (TEXT, INTEGER, REAL, NUMERIC) : pas de longueur, pas de
 type booléen ni date/heure natifs (stockés en TEXT ISO ou entier 0/1).
 """
+import re
+from typing import Any
+
+_SAFE_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
 # Types Forge « simples » → affinité SQLite.
 _SIMPLE_TYPES: dict[str, str] = {
@@ -86,3 +90,26 @@ class SQLiteDialect:
             "    UNIQUE (filename)\n"
             ")"
         )
+
+    def introspect_columns(
+        self, connection: Any, table: str, database: str
+    ) -> "list[tuple[str, str, bool, bool]]":
+        # PRAGMA n'accepte pas de paramètre lié : on valide le nom de table.
+        if not _SAFE_IDENTIFIER.fullmatch(table):
+            raise ValueError(f"Nom de table SQLite invalide : {table!r}")
+        cursor = connection.cursor()
+        try:
+            cursor.execute(f"PRAGMA table_info({table})")
+            rows = cursor.fetchall()
+        finally:
+            cursor.close()
+        # row : (cid, name, type, notnull, dflt_value, pk)
+        return [
+            (
+                str(row[1]),
+                str(row[2]),
+                int(row[3]) == 0,
+                bool(row[5]) and str(row[2]).upper() == "INTEGER",
+            )
+            for row in rows
+        ]

@@ -110,6 +110,17 @@ class Dialect(Protocol):
         """DDL de la table technique `forge_migrations`, propre au dialecte."""
         ...
 
+    def introspect_columns(
+        self, connection: Any, table: str, database: str
+    ) -> "list[tuple[str, str, bool, bool]]":
+        """Colonnes existantes de `table` : (nom, type_sql, nullable, auto_increment).
+
+        L'introspection est propre au SGBD (INFORMATION_SCHEMA en MariaDB,
+        PRAGMA en SQLite). `database` est utilisé par les SGBD serveur ; ignoré
+        par les backends fichier.
+        """
+        ...
+
 
 @runtime_checkable
 class DatabaseBackend(Protocol):

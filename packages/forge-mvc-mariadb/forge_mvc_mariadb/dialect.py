@@ -1,4 +1,5 @@
 # pyright: strict
+# pyright: reportMissingTypeStubs=false
 """
 forge_mvc_mariadb.dialect — Traits SQL MariaDB (ADR-054)
 ========================================================
@@ -6,6 +7,7 @@ Mapping des types Forge vers les types de colonne MariaDB. Reproduit à
 l'identique le mapping historiquement codé dans le normaliseur du cœur, pour
 ne rien changer au SQL généré tant que le backend est MariaDB.
 """
+from typing import Any
 
 # Types Forge « simples » → type de colonne MariaDB.
 # boolean → BOOLEAN (et non TINYINT(1)) : voir la note du normaliseur.
@@ -92,3 +94,28 @@ class MariaDBDialect:
             "    UNIQUE KEY uq_forge_migrations_filename (filename)\n"
             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         )
+
+    def introspect_columns(
+        self, connection: Any, table: str, database: str
+    ) -> "list[tuple[str, str, bool, bool]]":
+        cursor = connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, EXTRA "
+                "FROM information_schema.COLUMNS "
+                "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? "
+                "ORDER BY ORDINAL_POSITION",
+                (database, table),
+            )
+            rows = cursor.fetchall()
+        finally:
+            cursor.close()
+        return [
+            (
+                str(row[0]),
+                str(row[1]),
+                str(row[2]).upper() == "YES",
+                "auto_increment" in str(row[3]).lower(),
+            )
+            for row in rows
+        ]
