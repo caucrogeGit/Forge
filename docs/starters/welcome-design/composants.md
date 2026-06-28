@@ -9,12 +9,14 @@ Tailwind dans chaque page.
 On les importe avec `{% from ... import ... %}`, puis on les appelle comme des
 fonctions.
 
-## Deux fichiers
+## Quatre fichiers
 
 | Fichier | Macros |
 |---|---|
-| `components/ui.html` | `button`, `card`, `badge`, `alert` |
-| `components/forms.html` | `field`, `textarea_field`, `select_field`, `checkbox`, `submit` |
+| `components/ui.html` | `button`, `card`, `badge`, `alert`, `flash_messages`, `page_header`, `empty_state`, `stat`, `breadcrumb`, `navbar` |
+| `components/forms.html` | `field`, `textarea_field`, `select_field`, `radio_group`, `file_field`, `search_field`, `checkbox`, `fieldset`, `form_errors`, `submit` |
+| `components/data.html` | `table`, `pagination` |
+| `components/interactive.html` | `accordion`, `dropdown`, `modal` (HTML natif, sans framework JS) |
 
 ## Boutons, cartes, badges
 
@@ -56,19 +58,61 @@ charge (principe : pas de magie cachée).
 </form>
 ```
 
+## Erreurs de validation
+
+Passez `error` à un champ pour afficher la bordure rouge et le message, et
+`form_errors` pour un résumé en tête (réponses 422, validation serveur) :
+
+```jinja
+{% from "components/forms.html" import field, form_errors, submit %}
+
+{{ form_errors(errors) }}
+{{ field("email", label="Courriel", type="email", error="Adresse invalide.") }}
+{{ submit("Réessayer") }}
+```
+
+## Listes et tableaux
+
+```jinja
+{% from "components/data.html" import table, pagination %}
+{% from "components/ui.html" import page_header, empty_state %}
+
+{{ page_header("Contacts", action_label="Nouveau", action_href="/contact/new") }}
+{{ table(["Nom", "Courriel"], lignes) }}
+{{ pagination(page, total_pages, base_url="/contact") }}
+```
+
+Quand la liste est vide : `{{ empty_state("Aucun contact pour l'instant.") }}`.
+
 ## Messages contextuels
 
 ```jinja
-{% from "components/ui.html" import alert %}
+{% from "components/ui.html" import alert, flash_messages %}
 
 {{ alert("Enregistrement réussi.", level="success") }}
-{{ alert("Une erreur est survenue.", level="error") }}
+{{ flash_messages(flash) }}   {# rend le message flash de session, s'il existe #}
+```
+
+## Composants interactifs sans JavaScript
+
+`components/interactive.html` s'appuie sur les éléments natifs `<details>`
+(accordéon, menu) et `<dialog>` (modale), sans framework JS :
+
+```jinja
+{% from "components/interactive.html" import accordion, modal, modal_trigger %}
+
+{% call accordion("Détails") %}Contenu repliable.{% endcall %}
+
+{{ modal_trigger("confirm", "Supprimer") }}
+{% call modal("confirm", "Confirmer la suppression") %}
+  Cette action est définitive.
+{% endcall %}
 ```
 
 !!! tip "Étendre la bibliothèque"
     Ces macros sont **votre code**.
-    Ajoutez vos propres composants (tableau, pagination, fenêtre modale) dans
-    `components/`, en réutilisant les tokens de la charte pour rester cohérent.
+    Ajoutez vos propres composants en réutilisant les tokens de la charte pour
+    rester cohérent.
 
 ??? note "À retenir"
     - Les composants sont des macros Jinja dans `mvc/views/components/`.

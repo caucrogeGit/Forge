@@ -44,6 +44,8 @@ REQUIRED_FILES = [
     "mvc/views/layouts/base.html",
     "mvc/views/components/ui.html",
     "mvc/views/components/forms.html",
+    "mvc/views/components/data.html",
+    "mvc/views/components/interactive.html",
     "mvc/views/home/index.html",
     "mvc/forms/__init__.py",
     "mvc/validators/__init__.py",
@@ -188,12 +190,23 @@ def test_package_json_fournit_watch_css():
 
 
 def test_bibliotheque_de_composants_expose_les_macros():
-    ui = (SKELETON / "mvc" / "views" / "components" / "ui.html").read_text(encoding="utf-8")
-    forms = (SKELETON / "mvc" / "views" / "components" / "forms.html").read_text(encoding="utf-8")
-    for macro in ("macro button", "macro card", "macro badge", "macro alert"):
+    comp = SKELETON / "mvc" / "views" / "components"
+    ui = (comp / "ui.html").read_text(encoding="utf-8")
+    forms = (comp / "forms.html").read_text(encoding="utf-8")
+    data = (comp / "data.html").read_text(encoding="utf-8")
+    interactive = (comp / "interactive.html").read_text(encoding="utf-8")
+    for macro in ("macro button", "macro card", "macro badge", "macro alert",
+                  "macro flash_messages", "macro page_header", "macro empty_state",
+                  "macro stat", "macro breadcrumb", "macro navbar"):
         assert macro in ui, f"components/ui.html doit définir {macro!r}"
-    for macro in ("macro field", "macro select_field", "macro checkbox", "macro submit"):
+    for macro in ("macro field", "macro select_field", "macro radio_group",
+                  "macro file_field", "macro fieldset", "macro form_errors",
+                  "macro checkbox", "macro submit"):
         assert macro in forms, f"components/forms.html doit définir {macro!r}"
+    for macro in ("macro table", "macro pagination"):
+        assert macro in data, f"components/data.html doit définir {macro!r}"
+    for macro in ("macro accordion", "macro dropdown", "macro modal", "macro modal_trigger"):
+        assert macro in interactive, f"components/interactive.html doit définir {macro!r}"
 
 
 # ── Dépendance core via pip + anti-dérive ────────────────────────────────────
