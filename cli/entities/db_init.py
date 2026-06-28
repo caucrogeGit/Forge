@@ -99,7 +99,47 @@ def load_db_init_config() -> DbInitConfig:
     )
 
 
+def _init_serverless(backend: Any) -> list[str]:
+    """Init d'un backend sans serveur (ex. SQLite, ADR-054).
+
+    Aucune base ni aucun compte à provisionner : on garantit la connexion
+    (fichier créé au besoin) et la table technique forge_migrations.
+    """
+    import core.forge as forge
+
+    config = load_project_config()
+    forge.configure(
+        app_name=getattr(config, "APP_NAME", "forge"),
+        db_name=config.DB_NAME,
+    )
+
+    actions: list[str] = []
+    connection = backend.get_connection()
+    try:
+        cursor = connection.cursor()
+        try:
+            cursor.execute(backend.dialect.forge_migrations_ddl())
+            connection.commit()
+            actions.append(f"Base {config.DB_NAME} prête.")
+            actions.append("Table forge_migrations prête.")
+        finally:
+            cursor.close()
+    except Exception as exc:
+        _rollback_quietly(connection)
+        raise DbInitError(f"Initialisation {backend.name} impossible : {exc}") from exc
+    finally:
+        backend.close_connection(connection)
+    return actions
+
+
 def init_project_database() -> list[str]:
+    from core.database.backend import get_backend
+
+    backend = get_backend()
+    if not getattr(backend, "requires_provisioning", True):
+        # Backend sans serveur (SQLite) : ni base ni comptes à créer.
+        return _init_serverless(backend)
+
     cfg = load_db_init_config()
     connection = _connect_admin(cfg)
     actions: list[str] = []

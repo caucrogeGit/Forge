@@ -71,3 +71,18 @@ class SQLiteDialect:
 
     def table_suffix(self) -> str:
         return ""
+
+    def forge_migrations_ddl(self) -> str:
+        return (
+            "CREATE TABLE IF NOT EXISTS forge_migrations (\n"
+            "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+            "    version TEXT NOT NULL,\n"
+            "    name TEXT NOT NULL,\n"
+            "    filename TEXT NOT NULL,\n"
+            "    checksum TEXT NOT NULL,\n"
+            "    applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
+            "    execution_ms INTEGER,\n"
+            "    UNIQUE (version),\n"
+            "    UNIQUE (filename)\n"
+            ")"
+        )

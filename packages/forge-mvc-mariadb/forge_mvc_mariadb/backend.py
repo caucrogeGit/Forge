@@ -29,6 +29,7 @@ class MariaDBBackend:
 
     name = "mariadb"
     dialect = MariaDBDialect()
+    requires_provisioning = True
 
     def __init__(self) -> None:
         self._pool: Any = None

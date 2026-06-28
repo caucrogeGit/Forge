@@ -77,3 +77,18 @@ class MariaDBDialect:
 
     def table_suffix(self) -> str:
         return " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+
+    def forge_migrations_ddl(self) -> str:
+        return (
+            "CREATE TABLE IF NOT EXISTS forge_migrations (\n"
+            "    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
+            "    version VARCHAR(64) NOT NULL,\n"
+            "    name VARCHAR(255) NOT NULL,\n"
+            "    filename VARCHAR(255) NOT NULL,\n"
+            "    checksum CHAR(64) NOT NULL,\n"
+            "    applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
+            "    execution_ms INT NULL,\n"
+            "    UNIQUE KEY uq_forge_migrations_version (version),\n"
+            "    UNIQUE KEY uq_forge_migrations_filename (filename)\n"
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        )

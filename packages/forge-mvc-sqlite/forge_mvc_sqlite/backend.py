@@ -97,6 +97,7 @@ class SQLiteBackend:
 
     name = "sqlite"
     dialect = SQLiteDialect()
+    requires_provisioning = False
 
     def get_connection(self) -> Any:
         """Ouvre une connexion SQLite sur le fichier configuré (`DB_NAME`)."""

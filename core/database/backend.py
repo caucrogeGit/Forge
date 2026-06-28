@@ -106,6 +106,10 @@ class Dialect(Protocol):
         """Suffixe après la parenthèse fermante (moteur, charset...) ou « »."""
         ...
 
+    def forge_migrations_ddl(self) -> str:
+        """DDL de la table technique `forge_migrations`, propre au dialecte."""
+        ...
+
 
 @runtime_checkable
 class DatabaseBackend(Protocol):
@@ -113,6 +117,9 @@ class DatabaseBackend(Protocol):
 
     name: str
     dialect: Dialect
+    # Vrai pour un SGBD serveur à provisionner (base + comptes via db:init,
+    # ex. MariaDB) ; faux pour un backend fichier sans comptes (ex. SQLite).
+    requires_provisioning: bool
 
     def get_connection(self) -> Any:
         """Fournit une connexion prête à l'emploi (pool ou directe)."""
