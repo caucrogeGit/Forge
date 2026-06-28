@@ -40,6 +40,20 @@ class SQLiteDialect:
         # La clé primaire auto-incrémentée SQLite doit être de type INTEGER.
         return "INTEGER"
 
+    def sql_families(self, sql_type: str) -> tuple[str, ...]:
+        # Affinités SQLite : une même affinité couvre plusieurs familles Python
+        # (TEXT stocke aussi dates et JSON ; INTEGER stocke aussi les booléens).
+        n = sql_type.strip().upper()
+        if n == "INTEGER":
+            return ("int", "bool")
+        if n == "REAL":
+            return ("float",)
+        if n == "NUMERIC":
+            return ("float",)
+        if n == "TEXT":
+            return ("str", "date", "datetime")
+        return ()
+
     def auto_increment_column_ddl(self, column: str, sql_type: str) -> str:
         # SQLite : la PK auto-incrémentée est portée par la colonne elle-même.
         return f"{column} {sql_type} PRIMARY KEY AUTOINCREMENT"

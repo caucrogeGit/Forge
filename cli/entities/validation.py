@@ -58,9 +58,6 @@ ALLOWED_ROOT_KEYS = {"format_version", "entity", "table", "description", "fields
 ALLOWED_RBAC_ACTION_KEYS = {"index", "show", "create", "store", "edit", "update", "delete"}
 ALLOWED_MEDIA_FIELD_VALUES = {"image", "file"}
 ALLOWED_MEDIA_ENTRY_KEYS = {"name", "field", "role", "variants", "multiple", "required", "label"}
-INTEGER_SQL_PREFIXES = ("INT", "BIGINT", "SMALLINT", "TINYINT", "MEDIUMINT")
-FLOAT_SQL_PREFIXES = ("FLOAT", "DOUBLE", "REAL", "DECIMAL", "NUMERIC")
-STRING_SQL_PREFIXES = ("CHAR", "VARCHAR", "TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT")
 SQL_RESERVED_WORDS = {
     "add",
     "alter",
@@ -148,28 +145,19 @@ def _column_from_field_name(name: str) -> str:
 
 
 def _sql_family(sql_type: str) -> str | None:
-    normalized = _normalize_sql_type(sql_type)
-    if normalized == "DATE":
-        return "date"
-    if normalized in {"DATETIME", "TIMESTAMP"}:
-        return "datetime"
-    for prefix in INTEGER_SQL_PREFIXES:
-        if normalized.startswith(prefix):
-            return "int"
-    for prefix in FLOAT_SQL_PREFIXES:
-        if normalized.startswith(prefix):
-            return "float"
-    for prefix in STRING_SQL_PREFIXES:
-        if normalized.startswith(prefix):
-            return "str"
-    if normalized in {"BOOL", "BOOLEAN"}:
-        return "bool"
-    return None
+    # ADR-054 : la correspondance sql_type -> famille Python est propre au SGBD.
+    # Le dialecte du backend actif en est l'autorité. On retourne la famille
+    # principale (la première) pour la déduction d'un python_type absent.
+    from core.database.backend import get_backend
+
+    families = get_backend().dialect.sql_families(sql_type)
+    return families[0] if families else None
 
 
 def _python_sql_compatible(python_type: str, sql_type: str) -> bool:
-    family = _sql_family(sql_type)
-    return family == python_type
+    from core.database.backend import get_backend
+
+    return python_type in get_backend().dialect.sql_families(sql_type)
 
 
 def _is_iso_date_string(value: Any) -> bool:

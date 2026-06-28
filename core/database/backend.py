@@ -63,6 +63,16 @@ class Dialect(Protocol):
         """Type colonne de la clé primaire auto-incrémentée `id`."""
         ...
 
+    def sql_families(self, sql_type: str) -> tuple[str, ...]:
+        """Types Python compatibles avec ce type de colonne, dans ce dialecte.
+
+        Sert à valider la cohérence sql_type / python_type d'une entité. En
+        MariaDB chaque type a une famille (ex. DATETIME -> datetime) ; en SQLite
+        une affinité en couvre plusieurs (ex. TEXT -> str, date, datetime).
+        Tuple vide si le type est inconnu.
+        """
+        ...
+
     # ── DDL (CREATE TABLE) ───────────────────────────────────────────────────
 
     def auto_increment_column_ddl(self, column: str, sql_type: str) -> str:

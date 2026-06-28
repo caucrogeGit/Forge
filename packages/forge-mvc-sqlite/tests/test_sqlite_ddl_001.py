@@ -4,11 +4,9 @@ Bout en bout : sous DB_BACKEND=sqlite, build_entity_sql produit un CREATE TABLE
 SQLite idiomatique (INTEGER PRIMARY KEY AUTOINCREMENT, pas d'ENGINE, UNIQUE(...))
 que sqlite3 (stdlib) exécute réellement.
 
-Limite connue (DB-BACKEND-DIALECT-DDL-001) : la *validation* d'entité
-(`_sql_family` dans cli/entities/validation.py) reste MariaDB-centrée et rejette
-encore les types SQLite de date/heure/json/boolean (ex. datetime -> TEXT). Ce
-test reste donc sur des types dont la famille SQL coïncide entre dialectes
-(string, integer). Rendre la validation dialecte-aware est le ticket suivant.
+Depuis DB-DIALECT-VALIDATION-001, la validation d'entité est dialecte-aware :
+les types SQLite de date/heure/booléen (datetime/date -> TEXT, boolean ->
+INTEGER) sont acceptés. Ce test inclut donc des timestamps et un booléen.
 """
 from __future__ import annotations
 
@@ -31,7 +29,9 @@ def _build_create_table() -> str:
         "fields": [
             {"name": "nom", "type": "string", "max_length": 120, "required": True, "unique": True},
             {"name": "age", "type": "integer"},
+            {"name": "actif", "type": "boolean"},
         ],
+        "options": {"timestamps": True},
     }
     return build_entity_sql(normalize_canonical_entity_for_model_build(entity))
 
@@ -65,8 +65,12 @@ def test_ddl_sexecute_dans_sqlite(monkeypatch: pytest.MonkeyPatch) -> None:
     conn = sqlite3.connect(":memory:")
     try:
         conn.executescript(sql)  # lève si la DDL est invalide
-        conn.execute("INSERT INTO contact (Nom, Age) VALUES (?, ?)", ("Ada", 36))
-        cur = conn.execute("SELECT Id, Nom, Age FROM contact")
-        assert cur.fetchone() == (1, "Ada", 36)
+        conn.execute(
+            "INSERT INTO contact (Nom, Age, Actif, CreatedAt, UpdatedAt) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("Ada", 36, 1, "2026-01-01 00:00:00", "2026-01-01 00:00:00"),
+        )
+        cur = conn.execute("SELECT Id, Nom, Age, Actif FROM contact")
+        assert cur.fetchone() == (1, "Ada", 36, 1)
     finally:
         conn.close()

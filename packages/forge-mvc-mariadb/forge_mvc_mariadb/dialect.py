@@ -23,6 +23,11 @@ _SIMPLE_TYPES: dict[str, str] = {
     "json":        "LONGTEXT",
 }
 
+# Préfixes de types SQL MariaDB par famille Python (compatibilité sql/python).
+_INTEGER_PREFIXES = ("INT", "BIGINT", "SMALLINT", "TINYINT", "MEDIUMINT")
+_FLOAT_PREFIXES = ("FLOAT", "DOUBLE", "REAL", "DECIMAL", "NUMERIC")
+_STRING_PREFIXES = ("CHAR", "VARCHAR", "TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT")
+
 
 class MariaDBDialect:
     """Traits SQL de MariaDB."""
@@ -38,6 +43,25 @@ class MariaDBDialect:
 
     def identity_type(self) -> str:
         return "BIGINT UNSIGNED"
+
+    def sql_families(self, sql_type: str) -> tuple[str, ...]:
+        n = sql_type.strip().upper()
+        if n == "DATE":
+            return ("date",)
+        if n in {"DATETIME", "TIMESTAMP"}:
+            return ("datetime",)
+        for prefix in _INTEGER_PREFIXES:
+            if n.startswith(prefix):
+                return ("int",)
+        for prefix in _FLOAT_PREFIXES:
+            if n.startswith(prefix):
+                return ("float",)
+        for prefix in _STRING_PREFIXES:
+            if n.startswith(prefix):
+                return ("str",)
+        if n in {"BOOL", "BOOLEAN"}:
+            return ("bool",)
+        return ()
 
     def auto_increment_column_ddl(self, column: str, sql_type: str) -> str:
         return f"{column} {sql_type} NOT NULL AUTO_INCREMENT"
