@@ -24,8 +24,7 @@ def test_db_init_serverless_cree_forge_migrations(
 
     db_path = tmp_path / "app.db"
     monkeypatch.setattr(
-        db_init,
-        "load_project_config",
+        "cli.project.project_config.load_project_config",
         lambda: types.SimpleNamespace(APP_NAME="demo", DB_NAME=str(db_path)),
     )
 

@@ -105,13 +105,9 @@ def _init_serverless(backend: Any) -> list[str]:
     Aucune base ni aucun compte à provisionner : on garantit la connexion
     (fichier créé au besoin) et la table technique forge_migrations.
     """
-    import core.forge as forge
+    from cli.entities.serverless_db import configure_serverless_db
 
-    config = load_project_config()
-    forge.configure(
-        app_name=getattr(config, "APP_NAME", "forge"),
-        db_name=config.DB_NAME,
-    )
+    config = configure_serverless_db()
 
     actions: list[str] = []
     connection = backend.get_connection()

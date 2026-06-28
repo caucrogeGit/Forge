@@ -274,3 +274,46 @@ def test_apply_model_sql_reports_missing_database_preparation(tmp_path: Path, mo
 
     with pytest.raises(DbApplyError, match="forge db:init"):
         apply_model_sql(root)
+
+
+def test_apply_model_sql_serverless_sqlite(tmp_path: Path, monkeypatch):
+    """db:apply route par le backend pour un projet SQLite et crée les tables."""
+    pytest.importorskip("forge_mvc_sqlite")
+    import sqlite3
+
+    from core.database import backend as backend_module
+
+    root = tmp_path / "mvc" / "entities"
+    _write_entity(
+        root,
+        "contact",
+        _contact(),
+        "CREATE TABLE IF NOT EXISTS contact (Id INTEGER PRIMARY KEY AUTOINCREMENT, Nom TEXT);\n",
+    )
+    _write_relations(root, _relations(), "")
+
+    db_file = tmp_path / "app.db"
+    monkeypatch.setenv("DB_BACKEND", "sqlite")
+    monkeypatch.setattr(
+        "cli.project.project_config.load_project_config",
+        lambda: types.SimpleNamespace(APP_NAME="t", DB_NAME=str(db_file)),
+    )
+
+    backend_module.reset_backend()
+    try:
+        applied = apply_model_sql(root)
+    finally:
+        backend_module.reset_backend()
+
+    assert any(p.name == "contact.sql" for p in applied)
+    assert db_file.exists()
+    conn = sqlite3.connect(str(db_file))
+    try:
+        tables = {
+            r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        }
+        assert "contact" in tables
+        conn.execute("INSERT INTO contact (Nom) VALUES (?)", ("Ada",))
+        conn.commit()
+    finally:
+        conn.close()

@@ -123,6 +123,17 @@ def main(argv: list[str] | None = None) -> None:
 
 
 def _connect_db():
+    from core.database.backend import get_backend
+
+    backend = get_backend()
+    if not backend.requires_provisioning:
+        # Backend sans serveur (SQLite, ADR-054) : pas de comptes admin, on
+        # applique le SQL directement sur le fichier via le backend actif.
+        from cli.entities.serverless_db import configure_serverless_db
+
+        configure_serverless_db()
+        return backend.get_connection()
+
     import mariadb  # pyright: ignore[reportMissingTypeStubs]
 
     cfg = load_db_apply_config()
