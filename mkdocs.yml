@@ -195,6 +195,11 @@ nav:
                 - Infobulles et agrandissement d'image: starters/welcome-markdown/avance/infobulles-et-images.md
                 - Relecture et maths: starters/welcome-markdown/avance/relecture-et-maths.md
                 - Bilan avancé: starters/welcome-markdown/avance/bilan.md
+        - Progression système de design (welcome-design):
+            - Préambule: starters/welcome-design/installation.md
+            - La charte graphique: starters/welcome-design/charte-graphique.md
+            - La bibliothèque de composants: starters/welcome-design/composants.md
+            - Bilan: starters/welcome-design/bilan.md
 
     - Déploiement:
         - Mise en production pas à pas: deployment/mise-en-production.md
