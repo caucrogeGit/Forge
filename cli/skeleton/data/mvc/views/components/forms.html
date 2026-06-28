@@ -1,0 +1,54 @@
+{#
+  Composants de formulaire normalisés (charte « Accessible chaleureux »).
+
+  Usage dans une page (dans un <form> qui inclut partials/csrf.html) :
+    {% from "components/forms.html" import field, select_field, checkbox, submit %}
+    {{ field("email", label="Courriel", type="email", required=True) }}
+    {{ select_field("role", label="Rôle", options=[("admin","Admin"),("user","Membre")]) }}
+    {{ submit("Enregistrer") }}
+
+  Les macros produisent uniquement les champs : la balise <form>, la méthode,
+  l'action et le jeton CSRF restent à la charge de la page (principe 3 : pas de
+  magie cachée).
+#}
+
+{%- set _input_cls = "w-full px-3.5 py-3 text-sm bg-white border border-field rounded-[10px] focus:outline-none focus:border-teal focus:ring-[3px] focus:ring-teal/15 transition" -%}
+{%- set _label_cls = "block text-[12.5px] font-semibold text-subtle mb-1.5" -%}
+
+{% macro field(name, label="", type="text", value="", placeholder="", required=False, help="") %}
+<div class="mb-4">
+  {% if label %}<label for="{{ name }}" class="{{ _label_cls }}">{{ label }}{% if required %} <span class="text-ocre">*</span>{% endif %}</label>{% endif %}
+  <input id="{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value }}" placeholder="{{ placeholder }}"{% if required %} required{% endif %} class="{{ _input_cls }}">
+  {% if help %}<p class="mt-1 text-xs text-faint">{{ help }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro textarea_field(name, label="", value="", rows=4, placeholder="", required=False) %}
+<div class="mb-4">
+  {% if label %}<label for="{{ name }}" class="{{ _label_cls }}">{{ label }}{% if required %} <span class="text-ocre">*</span>{% endif %}</label>{% endif %}
+  <textarea id="{{ name }}" name="{{ name }}" rows="{{ rows }}" placeholder="{{ placeholder }}"{% if required %} required{% endif %} class="{{ _input_cls }}">{{ value }}</textarea>
+</div>
+{% endmacro %}
+
+{# options : liste de couples (valeur, libellé). #}
+{% macro select_field(name, label="", options=[], selected="") %}
+<div class="mb-4">
+  {% if label %}<label for="{{ name }}" class="{{ _label_cls }}">{{ label }}</label>{% endif %}
+  <select id="{{ name }}" name="{{ name }}" class="{{ _input_cls }}">
+    {% for value, text in options %}
+    <option value="{{ value }}"{% if value == selected %} selected{% endif %}>{{ text }}</option>
+    {% endfor %}
+  </select>
+</div>
+{% endmacro %}
+
+{% macro checkbox(name, label, checked=False, value="1") %}
+<label class="flex items-start gap-2.5 mb-4 text-sm text-subtle">
+  <input type="checkbox" id="{{ name }}" name="{{ name }}" value="{{ value }}"{% if checked %} checked{% endif %} class="mt-0.5 w-4 h-4 accent-teal">
+  <span>{{ label }}</span>
+</label>
+{% endmacro %}
+
+{% macro submit(label="Envoyer") %}
+<button type="submit" class="w-full px-6 py-3.5 text-[15px] font-semibold text-white bg-teal hover:bg-teal-dark active:translate-y-px transition rounded-[11px]">{{ label }}</button>
+{% endmacro %}

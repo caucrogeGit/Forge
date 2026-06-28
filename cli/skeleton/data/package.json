@@ -7,7 +7,8 @@
     "node": ">=24.17.0"
   },
   "scripts": {
-    "build:css": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/tailwind.css --minify"
+    "build:css": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/tailwind.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/tailwind.css --watch"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.2.2",

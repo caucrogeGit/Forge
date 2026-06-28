@@ -1,0 +1,48 @@
+{#
+  Composants UI normalisés (charte « Accessible chaleureux »).
+
+  Usage dans une page :
+    {% from "components/ui.html" import button, card, badge, alert %}
+    {{ button("Enregistrer", variant="primary") }}
+    {% call card() %} ... {% endcall %}
+
+  Toutes les classes dérivent des tokens de la charte (static/src/input.css).
+#}
+
+{# Bouton ou lien stylé. variant : primary | secondary | ghost.
+   Passe href pour un lien <a>, sinon un <button type=...>. #}
+{% macro button(label, variant="primary", href=none, type="button", extra="") %}
+{%- set styles = {
+  "primary":   "text-white bg-teal hover:bg-teal-dark active:translate-y-px",
+  "secondary": "text-teal bg-teal-soft border border-teal-border hover:bg-teal-border",
+  "ghost":     "text-ink bg-transparent border border-field hover:border-teal"
+} -%}
+{%- set cls = "inline-flex items-center justify-center font-semibold transition rounded-[10px] px-[21px] py-3 text-sm "
+   ~ (styles.get(variant) or styles["primary"]) ~ " " ~ extra -%}
+{%- if href -%}
+<a href="{{ href }}" class="{{ cls }}">{{ label }}</a>
+{%- else -%}
+<button type="{{ type }}" class="{{ cls }}">{{ label }}</button>
+{%- endif -%}
+{% endmacro %}
+
+{# Carte de contenu. Utiliser avec {% call card() %} ... {% endcall %}. #}
+{% macro card(extra="") %}
+<div class="rounded-card border border-line bg-surface p-7 {{ extra }}">{{ caller() }}</div>
+{% endmacro %}
+
+{# Pastille / étiquette courte. #}
+{% macro badge(label) %}
+<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-teal bg-teal-soft px-3 py-1 rounded-full">{{ label }}</span>
+{% endmacro %}
+
+{# Message contextuel. level : success | error | warning | info. #}
+{% macro alert(message, level="info") %}
+{%- set tones = {
+  "success": "bg-teal-soft text-teal border-teal-border",
+  "error":   "bg-orange-50 text-ocre border-ocre/30",
+  "warning": "bg-orange-50 text-ocre border-ocre/30",
+  "info":    "bg-cream text-subtle border-line"
+} -%}
+<div class="rounded-[10px] border px-4 py-3 text-sm {{ tones.get(level) or tones['info'] }}">{{ message }}</div>
+{% endmacro %}

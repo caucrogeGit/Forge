@@ -42,6 +42,8 @@ REQUIRED_FILES = [
     "mvc/routes.py",
     "mvc/controllers/home_controller.py",
     "mvc/views/layouts/base.html",
+    "mvc/views/components/ui.html",
+    "mvc/views/components/forms.html",
     "mvc/views/home/index.html",
     "mvc/forms/__init__.py",
     "mvc/validators/__init__.py",
@@ -164,6 +166,34 @@ def test_home_view_etend_le_layout():
         encoding="utf-8"
     )
     assert '{% extends "layouts/base.html" %}' in content
+
+
+def test_input_css_porte_la_charte_et_pas_la_landing():
+    """input.css définit la charte (@theme) et n'embarque plus le CSS de la landing."""
+    content = (SKELETON / "static" / "src" / "input.css").read_text(encoding="utf-8")
+    assert "@theme" in content, "input.css doit définir la charte via @theme"
+    assert "--color-teal" in content, "la charte doit définir ses tokens couleur"
+    # Plus aucune trace du CSS de la landing ni de @source vers des fichiers
+    # supprimés (landing/, docs/index.html).
+    assert "landing-" not in content
+    assert ".sec-dark" not in content
+    assert "views/landing" not in content
+
+
+def test_package_json_fournit_watch_css():
+    content = (SKELETON / "package.json").read_text(encoding="utf-8")
+    assert "watch:css" in content, (
+        "package.json doit fournir un script watch:css (rebuild Tailwind continu)."
+    )
+
+
+def test_bibliotheque_de_composants_expose_les_macros():
+    ui = (SKELETON / "mvc" / "views" / "components" / "ui.html").read_text(encoding="utf-8")
+    forms = (SKELETON / "mvc" / "views" / "components" / "forms.html").read_text(encoding="utf-8")
+    for macro in ("macro button", "macro card", "macro badge", "macro alert"):
+        assert macro in ui, f"components/ui.html doit définir {macro!r}"
+    for macro in ("macro field", "macro select_field", "macro checkbox", "macro submit"):
+        assert macro in forms, f"components/forms.html doit définir {macro!r}"
 
 
 # ── Dépendance core via pip + anti-dérive ────────────────────────────────────

@@ -1,14 +1,13 @@
 {% extends "layouts/base.html" %}
+{% from "components/ui.html" import button %}
 
 {% block title %}400 · {{ app_name }}{% endblock %}
 
 {% block content %}
 <section class="text-center">
-    <p class="text-8xl font-bold text-orange-400">400</p>
-    <h1 class="text-2xl font-semibold mt-4">Requête invalide</h1>
-    <p class="text-gray-400 mt-2">La requête envoyée ne peut pas être traitée.</p>
-    <a href="/" class="mt-6 inline-block bg-orange-600 text-white px-6 py-2 rounded hover:bg-orange-700">
-        Retour à l'accueil
-    </a>
+    <p class="text-8xl font-extrabold text-teal">400</p>
+    <h1 class="text-2xl font-bold mt-4">Requête invalide</h1>
+    <p class="text-muted mt-2">La requête envoyée ne peut pas être traitée.</p>
+    <div class="mt-6">{{ button("Retour à l'accueil", variant="primary", href="/") }}</div>
 </section>
 {% endblock %}
