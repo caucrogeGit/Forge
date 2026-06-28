@@ -795,16 +795,18 @@ def entity_diff_migration_sql(
     if not missing_columns:
         raise MigrationNoChange(f"Aucun changement détecté pour l’entité {report.entity}.")
 
+    from core.database.backend import get_backend
+
     fields_by_column = {field["column"]: field for field in definition["fields"]}
-    add_lines = [
-        f"    ADD COLUMN {_quote_sql_identifier(column)} {_sql_column_definition(fields_by_column[column])}"
+    table = _validate_sql_identifier(str(definition["table"]))
+    columns = [
+        (
+            _validate_sql_identifier(column),
+            _sql_column_definition(fields_by_column[column]),
+        )
         for column in missing_columns
     ]
-    return (
-        f"ALTER TABLE {_quote_sql_identifier(definition['table'])}\n"
-        + ",\n".join(add_lines)
-        + ";\n"
-    )
+    return get_backend().dialect.add_columns_sql(table, columns)
 
 
 def entity_sql_file_path(entity_name: str, *, project_root: Path | None = None) -> Path:
@@ -864,10 +866,10 @@ def _column_changes(expected: ExpectedColumn, actual: ActualColumn) -> list[str]
     return changes
 
 
-def _quote_sql_identifier(identifier: str) -> str:
+def _validate_sql_identifier(identifier: str) -> str:
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", identifier):
         raise MigrationError(f"Identifiant SQL invalide : {identifier}")
-    return f"`{identifier}`"
+    return identifier
 
 
 def _sql_column_definition(field: dict[str, Any]) -> str:

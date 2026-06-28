@@ -63,3 +63,25 @@ def test_normaliseur_produit_des_types_sqlite(monkeypatch: pytest.MonkeyPatch) -
         assert by_name["created_at"]["sql_type"] == "TEXT"
     finally:
         backend_module.reset_backend()
+
+
+def test_add_columns_sql_un_alter_par_colonne() -> None:
+    sql = D.add_columns_sql("contact", [("Email", "TEXT"), ("Age", "INTEGER")])
+    assert sql == (
+        'ALTER TABLE "contact" ADD COLUMN "Email" TEXT;\n'
+        'ALTER TABLE "contact" ADD COLUMN "Age" INTEGER;\n'
+    )
+
+
+def test_add_columns_sql_executable() -> None:
+    import sqlite3
+
+    sql = D.add_columns_sql("contact", [("Email", "TEXT"), ("Age", "INTEGER")])
+    conn = sqlite3.connect(":memory:")
+    try:
+        conn.execute("CREATE TABLE contact (Id INTEGER PRIMARY KEY AUTOINCREMENT)")
+        conn.executescript(sql)
+        cols = {row[1] for row in conn.execute("PRAGMA table_info(contact)")}
+        assert {"Id", "Email", "Age"} <= cols
+    finally:
+        conn.close()

@@ -91,6 +91,17 @@ class SQLiteDialect:
             ")"
         )
 
+    def quote_identifier(self, name: str) -> str:
+        return f'"{name}"'
+
+    def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:
+        # SQLite : une seule colonne ajoutée par ALTER TABLE.
+        return "".join(
+            f"ALTER TABLE {self.quote_identifier(table)} "
+            f"ADD COLUMN {self.quote_identifier(name)} {definition};\n"
+            for name, definition in columns
+        )
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

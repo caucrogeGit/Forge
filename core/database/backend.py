@@ -110,6 +110,18 @@ class Dialect(Protocol):
         """DDL de la table technique `forge_migrations`, propre au dialecte."""
         ...
 
+    def quote_identifier(self, name: str) -> str:
+        """Échappe un identifiant SQL (backticks MariaDB, guillemets SQLite)."""
+        ...
+
+    def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:
+        """Migration d'ajout de colonnes. `columns` : (nom, définition SQL).
+
+        MariaDB : un seul ALTER TABLE avec plusieurs ADD COLUMN. SQLite : un
+        ALTER TABLE par colonne (un seul ADD COLUMN par instruction).
+        """
+        ...
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

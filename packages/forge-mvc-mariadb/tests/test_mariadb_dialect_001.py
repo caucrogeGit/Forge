@@ -36,3 +36,19 @@ def test_string_et_decimal() -> None:
 )
 def test_simple_types(forge_type: str, expected: str) -> None:
     assert D.simple_type(forge_type) == expected
+
+
+def test_add_columns_sql_un_seul_alter() -> None:
+    sql = D.add_columns_sql(
+        "contact",
+        [("Email", "VARCHAR(120) NULL"), ("Tel", "VARCHAR(20) NULL")],
+    )
+    assert sql == (
+        "ALTER TABLE `contact`\n"
+        "    ADD COLUMN `Email` VARCHAR(120) NULL,\n"
+        "    ADD COLUMN `Tel` VARCHAR(20) NULL;\n"
+    )
+
+
+def test_quote_identifier_backticks() -> None:
+    assert D.quote_identifier("contact") == "`contact`"

@@ -95,6 +95,16 @@ class MariaDBDialect:
             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         )
 
+    def quote_identifier(self, name: str) -> str:
+        return f"`{name}`"
+
+    def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:
+        defs = [
+            f"    ADD COLUMN {self.quote_identifier(name)} {definition}"
+            for name, definition in columns
+        ]
+        return f"ALTER TABLE {self.quote_identifier(table)}\n" + ",\n".join(defs) + ";\n"
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":
