@@ -5,6 +5,7 @@ site_name: admin
 docs_dir: docs
 nav:
   - Présentation: index.md
+  - Référence: reference.md
   - Contrat de ressource: resources.md
   - Progression Admin:
       - Installation: welcome/installation.md
