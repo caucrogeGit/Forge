@@ -1,7 +1,7 @@
 """Tests — RBAC-CONTRACT-002 : contrat JSON Schema du fichier rbac.json.
 
-Vérifie que rbac.schema.json est conforme, que les deux copies sont identiques,
-et que entity.schema.json ne contient pas de propriété rbac.
+Vérifie que rbac.schema.json (embarqué par l'opt-in forge-mvc-rbac, ADR-056) est
+conforme, et que entity.schema.json (cœur) ne contient pas de propriété rbac.
 """
 from __future__ import annotations
 
@@ -12,8 +12,11 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-SCHEMA_SOURCE = PROJECT_ROOT / "schemas" / "rbac.schema.json"
-SCHEMA_PACKAGED = PROJECT_ROOT / "cli" / "schemas" / "rbac.schema.json"
+# Le schéma RBAC est désormais embarqué par l'opt-in forge-mvc-rbac (ADR-056).
+SCHEMA_SOURCE = (
+    PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "forge_mvc_rbac"
+    / "schemas" / "rbac.schema.json"
+)
 ENTITY_SCHEMA = PROJECT_ROOT / "schemas" / "entity.schema.json"
 
 _DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema"
@@ -53,17 +56,6 @@ def _validate(instance: dict, schema: dict) -> None:
 
 def test_schema_source_existe():
     assert SCHEMA_SOURCE.exists()
-
-
-def test_schema_packaged_existe():
-    assert SCHEMA_PACKAGED.exists()
-
-
-# ── Les deux copies sont identiques ──────────────────────────────────────────
-
-
-def test_schemas_identiques():
-    assert SCHEMA_SOURCE.read_text(encoding="utf-8") == SCHEMA_PACKAGED.read_text(encoding="utf-8")
 
 
 # ── Méta-données du schéma ────────────────────────────────────────────────────

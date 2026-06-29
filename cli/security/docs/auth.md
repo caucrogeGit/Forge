@@ -38,5 +38,4 @@ Les tables couvertes incluent `users`, `auth_tokens`, `auth_mfa_factors`, `auth_
 
 ## 4. Voir aussi
 
-- [La commande rbac:validate](rbac_validate.md) : validation du contrat RBAC.
-- [La commande rbac:audit](rbac_audit.md) : audit de cohérence du contrat RBAC.
+- Les commandes `rbac:validate` et `rbac:audit` sont fournies par l'opt-in `forge-mvc-rbac` (ADR-056) : voir la documentation du paquet.

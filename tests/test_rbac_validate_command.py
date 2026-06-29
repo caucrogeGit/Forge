@@ -14,7 +14,7 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
-from cli.security.rbac_validate import rbac_validate_main
+from forge_mvc_rbac.cli.rbac_validate import rbac_validate_main
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -27,7 +27,7 @@ def _run(args: list[str], *, cwd: Path | None = None) -> tuple[str, str, int]:
     with patch("sys.stdout", out), patch("sys.stderr", err):
         try:
             if cwd is not None:
-                with patch("cli.security.rbac_validate.Path.cwd", return_value=cwd):
+                with patch("forge_mvc_rbac.cli.rbac_validate.Path.cwd", return_value=cwd):
                     rbac_validate_main(args)
             else:
                 rbac_validate_main(args)
@@ -43,7 +43,7 @@ def _run_in(tmp_path: Path, args: list[str]) -> tuple[str, str, int]:
     code = 0
     with patch("sys.stdout", out), patch("sys.stderr", err):
         try:
-            with patch("cli.security.rbac_validate.Path.cwd", return_value=tmp_path):
+            with patch("forge_mvc_rbac.cli.rbac_validate.Path.cwd", return_value=tmp_path):
                 rbac_validate_main(args)
         except SystemExit as exc:
             code = int(exc.code) if exc.code is not None else 0
@@ -79,7 +79,7 @@ _VALID_FULL = {
 
 
 def test_module_importable():
-    from cli.security import rbac_validate  # noqa: F401
+    from forge_mvc_rbac.cli import rbac_validate  # noqa: F401
 
 
 def test_rbac_validate_main_callable():
@@ -283,7 +283,7 @@ def test_ne_cree_pas_rbac_json_automatiquement(tmp_path):
 def test_forge_py_dispatche_rbac_validate(tmp_path, capsys):
     import forge
     with patch("sys.argv", ["forge", "rbac:validate"]), \
-         patch("cli.security.rbac_validate.Path.cwd", return_value=tmp_path):
+         patch("forge_mvc_rbac.cli.rbac_validate.Path.cwd", return_value=tmp_path):
         try:
             forge.main()
         except SystemExit:

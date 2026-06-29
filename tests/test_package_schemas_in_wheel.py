@@ -146,7 +146,6 @@ SCHEMA_FILENAMES = [
     "entity.schema.json",
     "pivot.schema.json",
     "relations.schema.json",
-    "rbac.schema.json",
     "forge.schema.index.json",
 ]
 

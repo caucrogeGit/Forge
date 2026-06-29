@@ -12,8 +12,9 @@
       "type": "string"
     },
     "schema_version": {
-      "$ref": "common.schema.json#/$defs/schemaVersion",
-      "description": "Version du contrat Forge. Doit valoir '1.0'."
+      "description": "Version du contrat Forge. Doit valoir '1.0'.",
+      "type": "string",
+      "enum": ["1.0"]
     },
     "entities": {
       "description": "Permissions par entité Forge. Clé = nom d'entité (PascalCase), valeur = bloc permissions.",

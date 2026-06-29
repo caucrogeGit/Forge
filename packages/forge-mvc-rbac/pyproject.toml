@@ -34,4 +34,4 @@ where = ["."]
 include = ["forge_mvc_rbac*"]
 
 [tool.setuptools.package-data]
-"forge_mvc_rbac" = ["py.typed"]
+"forge_mvc_rbac" = ["py.typed", "schemas/*.json"]

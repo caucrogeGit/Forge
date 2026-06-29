@@ -3,13 +3,16 @@
 Forge maintient trois jeux de schémas JSON, pour trois contextes distincts :
 
 - ``cli/schemas/`` : source **canonique** utilisée par l'outil
-  (``schema:list``, ``schema:doctor``, ``entity:validate``). Inclut ``rbac``.
+  (``schema:list``, ``schema:doctor``, ``entity:validate``).
 - ``schemas/`` (racine du dépôt) : copie « projet » du dépôt lui-même
   (dogfooding), pour la résolution ``$schema`` / l'autocomplétion VS Code sur
   ses propres fichiers d'entités. Doit être **identique** à ``cli/schemas/``.
 - ``cli/skeleton/data/schemas/`` : gabarit copié dans chaque projet généré par
-  ``forge new``. Reprend les schémas de base **byte-identiques**, mais **omet
-  volontairement** ``rbac`` (opt-in) et son entrée dans l'index.
+  ``forge new``. Reprend les schémas de base **byte-identiques**.
+
+``rbac.schema.json`` a été extrait du cœur vers l'opt-in ``forge-mvc-rbac``
+(ADR-056) : il n'est plus dans aucune des trois copies, mais embarqué par le
+paquet.
 
 Ces copies sont recopiées à la main : ce test détecte toute dérive.
 """
@@ -34,8 +37,12 @@ BASE_SCHEMAS = [
     "pivot.schema.json",
     "relations.schema.json",
 ]
-# Différences volontaires côté skeleton (projet de base sans opt-in RBAC).
-SKELETON_OMITS = {"rbac.schema.json"}
+# rbac.schema.json est extrait du cœur vers l'opt-in forge-mvc-rbac (ADR-056) :
+# absent des trois copies, embarqué par le paquet.
+RBAC_SCHEMA = "rbac.schema.json"
+RBAC_PACKAGE_SCHEMA = (
+    ROOT / "packages" / "forge-mvc-rbac" / "forge_mvc_rbac" / "schemas" / RBAC_SCHEMA
+)
 
 
 def _read(p: Path) -> str:
@@ -74,13 +81,14 @@ def test_skeleton_base_identique_a_cli(name: str):
     )
 
 
-def test_skeleton_omet_bien_rbac():
-    """Le skeleton omet volontairement rbac (opt-in, hors squelette de base)."""
-    for omitted in SKELETON_OMITS:
-        assert not (SKELETON_SCHEMAS / omitted).exists(), (
-            f"{omitted} ne doit pas être dans le squelette de base (opt-in) : "
-            f"différence volontaire vs cli/schemas/."
+def test_rbac_schema_extrait_du_coeur():
+    """rbac.schema.json a quitté le cœur (ADR-056) : absent des trois copies,
+    embarqué par l'opt-in forge-mvc-rbac."""
+    for absent_dir in (CLI_SCHEMAS, PROJECT_SCHEMAS, SKELETON_SCHEMAS):
+        assert not (absent_dir / RBAC_SCHEMA).exists(), (
+            f"{RBAC_SCHEMA} ne doit plus être dans {absent_dir} (extrait vers "
+            f"l'opt-in forge-mvc-rbac, ADR-056)."
         )
-        assert (CLI_SCHEMAS / omitted).exists(), (
-            f"{omitted} doit exister dans cli/schemas/ (source canonique)."
-        )
+    assert RBAC_PACKAGE_SCHEMA.exists(), (
+        f"{RBAC_SCHEMA} doit être embarqué par forge-mvc-rbac : {RBAC_PACKAGE_SCHEMA}."
+    )

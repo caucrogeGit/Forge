@@ -32,7 +32,6 @@ _EXPECTED_SCHEMAS = {
     "entity": "./entity.schema.json",
     "pivot": "./pivot.schema.json",
     "relations": "./relations.schema.json",
-    "rbac": "./rbac.schema.json",
 }
 
 _FORBIDDEN_URL_PREFIXES = ("http://", "https://", "ftp://")

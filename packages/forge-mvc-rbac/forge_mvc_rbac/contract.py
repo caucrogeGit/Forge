@@ -60,13 +60,10 @@ class RbacContractResult:
 
 
 def _find_schemas_dir() -> Path | None:
-    try:
-        import cli  # type: ignore[import-untyped]
-        candidate = Path(cli.__file__).resolve().parent / "schemas"
-        if candidate.is_dir():
-            return candidate
-    except ImportError:
-        pass
+    # Le schéma RBAC est embarqué par cet opt-in (ADR-056), plus dans le cœur.
+    candidate = Path(__file__).resolve().parent / "schemas"
+    if candidate.is_dir():
+        return candidate
     return None
 
 

@@ -238,7 +238,7 @@ def rbac_audit_main(args: list[str]) -> None:
 
     validator = _make_validator(registry)
     if validator is None:
-        msg = "Schéma rbac.schema.json introuvable dans cli/schemas/."
+        msg = "Schéma rbac.schema.json introuvable dans forge_mvc_rbac/schemas/."
         if use_json:
             print(json.dumps({"valid": False, "error": msg}, ensure_ascii=False))
         else:

@@ -139,7 +139,7 @@ def rbac_validate_main(args: list[str]) -> None:
 
     validator = _make_validator(registry)
     if validator is None:
-        msg = "Schéma rbac.schema.json introuvable dans cli/schemas/."
+        msg = "Schéma rbac.schema.json introuvable dans forge_mvc_rbac/schemas/."
         if use_json:
             print(json.dumps({"valid": False, "error": msg}, ensure_ascii=False))
         else:
@@ -157,7 +157,7 @@ def rbac_validate_main(args: list[str]) -> None:
             "valid": is_valid,
             "exists": True,
             "path": path_str,
-            "schema": "cli/schemas/rbac.schema.json",
+            "schema": "forge_mvc_rbac/schemas/rbac.schema.json",
             "roles_count": roles_count,
             "entities_count": entities_count,
             "errors_count": len(errors),

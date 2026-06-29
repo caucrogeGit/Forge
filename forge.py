@@ -963,14 +963,15 @@ def main() -> None:
         schema_doctor_main(args[1:])
         return
 
-    if command == "rbac:validate":
-        from cli.security.rbac_validate import rbac_validate_main
-        rbac_validate_main(args[1:])
-        return
-
-    if command == "rbac:audit":
-        from cli.security.rbac_audit import rbac_audit_main
-        rbac_audit_main(args[1:])
+    if command in ("rbac:validate", "rbac:audit"):
+        try:
+            from forge_mvc_rbac.cli import main as rbac_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-rbac non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-rbac",
+            )
+        rbac_main(args)
         return
 
     cli_fail(

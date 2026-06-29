@@ -984,7 +984,7 @@ Usage:
 
 Description:
   Valide mvc/security/rbac.json contre le schéma RBAC Forge
-  (cli/schemas/rbac.schema.json, JSON Schema Draft 2020-12).
+  (forge_mvc_rbac/schemas/rbac.schema.json, JSON Schema Draft 2020-12).
 
 Effets:
   - cherche mvc/security/rbac.json à la racine du projet ;

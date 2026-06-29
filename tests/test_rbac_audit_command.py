@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.security.rbac_audit import rbac_audit_main
+from forge_mvc_rbac.cli.rbac_audit import rbac_audit_main
 
 
 def _write_rbac(tmp_path: Path, content: dict) -> None:

@@ -34,7 +34,7 @@ def enable_guidance(optin: OptIn) -> str:
                 "rbac n'est pas dans le squelette nu (c'est un opt-in), forge-mvc le\n"
                 "fournit :\n"
                 "  1. Copie le schéma dans schemas/ de ton projet :\n"
-                """       python -c "import cli, pathlib, shutil; shutil.copy(pathlib.Path(cli.__file__).parent / 'schemas' / 'rbac.schema.json', 'schemas/rbac.schema.json')"\n"""
+                """       python -c "import forge_mvc_rbac, pathlib, shutil; shutil.copy(pathlib.Path(forge_mvc_rbac.__file__).parent / 'schemas' / 'rbac.schema.json', 'schemas/rbac.schema.json')"\n"""
                 "  2. Ajoute l'association dans .vscode/settings.json (Forge ne modifie\n"
                 "     pas ce fichier), dans le tableau json.schemas existant :\n"
                 """       { "fileMatch": ["/mvc/security/rbac.json"], "url": "./schemas/rbac.schema.json" }"""
