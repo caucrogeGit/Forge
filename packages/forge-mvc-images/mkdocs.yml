@@ -7,6 +7,7 @@ site_name: images
 docs_dir: docs
 nav:
   - Guide média: media.md
+  - Référence: reference.md
   - Référence (par module):
       - Traitement d'image (processing.py): references/processing.md
       - Dépôt de médias (media_repository.py): references/media_repository.md
