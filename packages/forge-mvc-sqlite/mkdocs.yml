@@ -1,0 +1,23 @@
+# Documentation embarquée du paquet forge-mvc-sqlite (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /sqlite/.
+site_name: sqlite
+docs_dir: docs
+nav:
+  - Présentation: index.md
+  - Référence: reference.md
+  - Progression SQLite:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Première base: welcome/debutant/sqlite-welcome.md
+          - Appliquer une entité: welcome/debutant/sqlite-apply.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Faire évoluer le schéma: welcome/intermediaire/sqlite-migrate.md
+          - Inspecter la base: welcome/intermediaire/sqlite-inspect.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Le dialecte SQLite: welcome/avance/sqlite-dialect.md
+          - Quand choisir SQLite: welcome/avance/sqlite-when.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md
