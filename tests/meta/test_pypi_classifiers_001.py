@@ -50,6 +50,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-mariadb":  "Development Status :: 4 - Beta",
     # forge-mvc-sqlite : backend BDD SQLite (stdlib), runtime (ADR-054).
     "forge-mvc-sqlite":   "Development Status :: 4 - Beta",
+    # forge-mvc-postgres : backend BDD PostgreSQL, Alpha (intégration à valider).
+    "forge-mvc-postgres": "Development Status :: 3 - Alpha",
 }
 
 

@@ -175,6 +175,7 @@ chaque package publiable :
 | `forge-mvc-testing` | `4 - Beta` | Infrastructure de test partagée (ADR-041) : `FakeRequest` + plugin pytest (fixtures autouse). Pour tester Forge et ses opt-ins, y compris par des tiers ; publiée pour l'écosystème avec la rc.1 |
 | `forge-mvc-mariadb` | `4 - Beta` | Backend BDD MariaDB extrait du cœur (ADR-054) : pool de connexions, découvert par le cœur via entry point `forge_mvc.db_backend`. Le cœur est agnostique BDD ; ce backend fournit MariaDB (et le connecteur). Non publié sur PyPI |
 | `forge-mvc-sqlite` | `4 - Beta` | Backend BDD SQLite (ADR-054) au-dessus de `sqlite3` (stdlib), sans dépendance externe ni serveur : chemin runtime (adaptateur lignes-dict, `?`, lastrowid). Idéal en développement et tests. Non publié sur PyPI |
+| `forge-mvc-postgres` | `3 - Alpha` | Backend BDD PostgreSQL (ADR-054) au-dessus de `psycopg` : dialecte + traduction des paramètres `?` vers `%s`, testés unitairement. Statut Alpha : intégration serveur et provisioning CLI à valider/câbler. Non publié sur PyPI |
 
 Critères de passage Beta → Stable d'un module opt-in :
 

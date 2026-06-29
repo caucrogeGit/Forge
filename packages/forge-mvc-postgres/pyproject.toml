@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc-postgres"
+version = "1.0.0rc1"
+description = "Forge PostgreSQL — backend BDD PostgreSQL pour Forge (psycopg), découvert par le cœur via entry point (ADR-054). Statut Alpha : logique de dialecte testée, intégration serveur à valider."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+authors = [
+    { name = "Roger Lequette" },
+]
+license = "LicenseRef-Forge-Proprietary"
+keywords = ["python", "mvc", "forge", "postgresql", "postgres", "database", "backend"]
+dependencies = [
+    "forge-mvc>=1.0.0rc1,<2",
+    "psycopg[binary]>=3.1,<4",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.entry-points."forge_mvc.db_backend"]
+postgres = "forge_mvc_postgres.backend:PostgreSQLBackend"
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://forgemvc.com/docs/forge/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forge_mvc_postgres*"]
+
+[tool.setuptools.package-data]
+"forge_mvc_postgres" = ["py.typed"]
