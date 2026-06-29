@@ -5,6 +5,7 @@ site_name: settings
 docs_dir: docs
 nav:
   - Présentation: index.md
+  - Référence: reference.md
   - Référence (par module):
       - Paramètres (store.py): references/store.md
       - Initialisation (settings:init): references/cli.md
