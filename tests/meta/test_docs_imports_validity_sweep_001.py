@@ -102,10 +102,11 @@ _FRAMEWORK_ROOTS = frozenset({
     "forge_mvc_jobs", "forge_mvc_notifications", "forge_mvc_deploy",
     # forge-mvc-testing : infrastructure de test partagée, dev-only (ADR-041).
     "forge_mvc_testing",
-    # forge-mvc-mariadb / forge-mvc-sqlite / forge-mvc-postgres : backends BDD (ADR-054).
+    # forge-mvc-mariadb / -sqlite / -postgres / -mssql : backends BDD (ADR-054).
     "forge_mvc_mariadb",
     "forge_mvc_sqlite",
     "forge_mvc_postgres",
+    "forge_mvc_mssql",
     "cli",
     # `integrations/` est dans le repo Forge (Jinja2 renderer, etc.).
     "integrations",

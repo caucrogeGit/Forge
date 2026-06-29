@@ -106,6 +106,15 @@ class Dialect(Protocol):
         """Suffixe après la parenthèse fermante (moteur, charset...) ou « »."""
         ...
 
+    def create_table_opening(self, table: str) -> str:
+        """Début d'un CREATE TABLE idempotent, jusqu'avant la parenthèse.
+
+        MariaDB/SQLite/PostgreSQL : `CREATE TABLE IF NOT EXISTS {table}`.
+        SQL Server n'a pas IF NOT EXISTS : forme gardée `IF OBJECT_ID(...) IS
+        NULL CREATE TABLE {table}`.
+        """
+        ...
+
     def forge_migrations_ddl(self) -> str:
         """DDL de la table technique `forge_migrations`, propre au dialecte."""
         ...

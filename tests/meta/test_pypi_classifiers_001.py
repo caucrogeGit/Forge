@@ -52,6 +52,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-sqlite":   "Development Status :: 4 - Beta",
     # forge-mvc-postgres : backend BDD PostgreSQL, Alpha (intégration à valider).
     "forge-mvc-postgres": "Development Status :: 3 - Alpha",
+    # forge-mvc-mssql : backend BDD Microsoft SQL Server, Alpha (intégration à valider).
+    "forge-mvc-mssql":    "Development Status :: 3 - Alpha",
 }
 
 

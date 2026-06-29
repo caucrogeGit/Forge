@@ -28,6 +28,7 @@ pyright>=1.1.400
 -e ./packages/forge-mvc-mariadb
 -e ./packages/forge-mvc-sqlite
 -e ./packages/forge-mvc-postgres
+-e ./packages/forge-mvc-mssql
 -e ./packages/forge-mvc-admin
 -e ./packages/forge-mvc-mfa
 -e ./packages/forge-mvc-rbac

@@ -364,7 +364,7 @@ def build_entity_sql(entity_definition: dict[str, Any]) -> str:
     table = entity_definition["table"]
     fields = entity_definition["fields"]
 
-    lines = [f"CREATE TABLE IF NOT EXISTS {table} ("]
+    lines = [f"{dialect.create_table_opening(table)} ("]
     body_lines: list[str] = []
     primary_key_column = None
 

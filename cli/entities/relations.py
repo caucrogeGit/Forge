@@ -261,7 +261,7 @@ def _generate_canonical_m2m_sql(relation: ValidatedCanonicalManyToManyRelation) 
         ]
     )
 
-    sql = "\n".join([f"CREATE TABLE IF NOT EXISTS {pivot} ("] + body + [");"])
+    sql = "\n".join([f"{dialect.create_table_opening(pivot)} ("] + body + [");"])
     if not dialect.inline_indexes():
         for name, column in index_specs:
             sql += "\n" + dialect.create_index_sql(pivot, name, column)

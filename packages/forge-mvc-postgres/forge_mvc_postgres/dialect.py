@@ -83,6 +83,9 @@ class PostgreSQLDialect:
     def table_suffix(self) -> str:
         return ""
 
+    def create_table_opening(self, table: str) -> str:
+        return f"CREATE TABLE IF NOT EXISTS {table}"
+
     def forge_migrations_ddl(self) -> str:
         return (
             "CREATE TABLE IF NOT EXISTS forge_migrations (\n"
