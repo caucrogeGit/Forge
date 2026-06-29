@@ -4,6 +4,7 @@
 site_name: files
 docs_dir: docs
 nav:
+  - Référence: reference.md
   - Référence (par module):
       - Upload générique (manager.py): references/manager.md
       - Primitives de stockage (storage.py): references/storage.md
