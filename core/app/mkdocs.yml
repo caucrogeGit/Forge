@@ -3,7 +3,6 @@ site_name: core-app
 docs_dir: docs
 nav:
   - Référence application (par module):
-      - Registre de configuration (forge.py): forge_config.md
       - L'application (application.py): application.md
       - Fabrique d'application (app_factory.py): app_factory.md
       - Callables WSGI (wsgi.py): wsgi.md

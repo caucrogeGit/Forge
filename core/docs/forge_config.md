@@ -172,6 +172,6 @@ Passer `None` réinitialise au `MemorySessionStore` par défaut.
 
 ## Voir aussi
 
-- [La fabrique d'application (app_factory.py)](app_factory.md) : c'est elle qui appelle `forge.configure(...)`.
-- [L'application (application.py)](application.md) : le cœur du dispatch qui lit la configuration.
-- [Le serveur de développement (dev_server.py)](dev_server.md) : démarrage local.
+- La fabrique d'application `core.app.app_factory` (`apply_forge_config`) : c'est elle qui appelle `forge.configure(...)` à partir de `config.py`.
+- L'application `core.app.application` : le cœur du dispatch qui lit la configuration via `forge.get(...)`.
+- Le contrat de session `core.sessions.contract` (`SessionStore`) : protocole attendu par `forge.configure(session_store=...)`.
