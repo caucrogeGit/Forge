@@ -1,190 +1,174 @@
-# Brique mail générique : référence
+# L'envoi d'emails dans Forge (forge-mvc-mail)
 
-> **En développement, Forge n'envoie pas de vrais mails par défaut.**
->
-> En l'absence de variables `MAIL_*` dans l'environnement, `MAIL_ENABLED` vaut `false`
-> et le transport `log` est utilisé, donc aucune connexion SMTP n'est tentée.
-> Le mail est un opt-in (ADR-031), le squelette nu ne pré-câble pas `MAIL_*`,
-> et vous ajoutez le bloc à `env/dev` pour configurer l'envoi.
+Ce document explique ce que fait l'opt-in `forge-mvc-mail`, ce qu'il expose, et comment on s'en sert.
 
----
+`forge-mvc-mail` compose des messages, les envoie via des transports interchangeables (console, SMTP, log), rend des gabarits Jinja, journalise les envois, et fournit la CLI `mail:*`.
 
-## Référence par module
+Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAIL_*`, ADR-031).
 
-L'API détaillée est documentée page par page, un fichier par module :
+!!! warning "En développement, Forge n'envoie pas de vrais mails"
+    Sans variables `MAIL_*` dans l'environnement, `MAIL_ENABLED` vaut `false` et le transport `log` est utilisé : aucune connexion SMTP n'est tentée.
 
-| Module | Page | Contenu |
+    Le squelette nu ne pré-câble pas `MAIL_*` ; ajoutez le bloc à `env/dev` pour activer l'envoi.
+
+## 1. Rôle du module
+
+Envoyer un email demande de composer un message, de choisir un canal d'envoi, et de tracer le résultat.
+
+L'opt-in sépare ces trois préoccupations : un `MailMessage` (le contenu), un **transport** (le canal), un `Mailer` (l'orchestrateur qui envoie et journalise).
+
+Le **transport est interchangeable** : `console` ou `log` en développement, `smtp` en production, `fake`/`null` en test. Le code applicatif ne change pas.
+
+## 2. Vue d'ensemble rapide
+
+| Élément | Valeur |
+|---|---|
+| Paquet | `forge-mvc-mail` |
+| Module | `forge_mvc_mail` |
+| Catégorie | Communication (ADR-055) |
+| Couche | opt-in (brique optionnelle) |
+| Dépend de | `forge-mvc` (Jinja pour les gabarits) |
+| API publique | `Mailer`, `MailMessage`, transports, `MailTemplateRenderer`, `MailConfig`, `MailLogger` |
+| Transports | `console`, `log` (défaut dev), `smtp`, `fake`, `null` |
+| Configuration | `MAIL_*` (`MailConfig`) |
+| Commandes | `mail:init`, `mail:test`, `mail:render`, `mail:doctor`, `mail:logs` |
+| Journal optionnel | table `mail_log` (`MAIL_LOG_ENABLED=true`) |
+| Exceptions | `MailError` et ses sous-classes |
+| Décisions d'architecture | ADR-022 (extraction), ADR-031 (config via environnement) |
+| Installation | `pip install --pre forge-mvc-mail` |
+
+## 3. Schémas UML
+
+Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
+
+Le diagramme de classe montre le mailer, les transports et le message.
+
+Le diagramme de séquence montre un envoi de bout en bout.
+
+### 3.1 Diagramme de classe
+
+Le diagramme de classe montre que le `Mailer` envoie un `MailMessage` via un `BaseTransport` interchangeable et renvoie un `TransportResult`.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class Mailer {
+        +from_config() Mailer
+        +send(message, message_type, related_entity, related_id) TransportResult
+    }
+
+    class MailMessage {
+        <<dataclass>>
+        +str subject
+        +to
+        +str body_text
+        +str body_html
+        +from_email
+        +cc
+        +bcc
+    }
+
+    class BaseTransport {
+        <<abstract>>
+        +send(message) TransportResult
+    }
+
+    class TransportResult {
+        +bool success
+        +str detail
+    }
+
+    Mailer --> BaseTransport : utilise
+    Mailer --> MailMessage : envoie
+    BaseTransport --> TransportResult : renvoie
+    ConsoleTransport --|> BaseTransport
+    SmtpTransport --|> BaseTransport
+    LogTransport --|> BaseTransport
+    NullTransport --|> BaseTransport
+    FakeTransport --|> BaseTransport
+```
+
+À retenir :
+
+- le `Mailer` orchestre ; le **transport** fait l'envoi réel ;
+- tous les transports partagent l'interface `BaseTransport.send` ;
+- changer de transport ne change pas le code applicatif ;
+- `from_config` construit le `Mailer` depuis `MAIL_*`.
+
+### 3.2 Diagramme de séquence
+
+Le diagramme de séquence montre un envoi via le transport configuré.
+
+```mermaid
+sequenceDiagram
+    participant App as Code applicatif
+    participant Mailer as Mailer
+    participant Transport as Transport (console/smtp/log)
+    participant Log as MailLogger
+
+    App->>Mailer: Mailer.from_config()
+    App->>Mailer: send(MailMessage(...))
+    Mailer->>Transport: send(message)
+    Transport-->>Mailer: TransportResult (succès / détail)
+    Mailer->>Log: journalise (si MAIL_LOG_ENABLED)
+    Mailer-->>App: TransportResult
+```
+
+À retenir :
+
+- l'application compose un `MailMessage` et appelle `send` ;
+- le `Mailer` délègue au transport et journalise ;
+- le résultat est un `TransportResult` (succès et détail) ;
+- en cas d'échec SMTP, `MailSendError` est interceptée en `TransportResult(success=False)`.
+
+## 4. API publique
+
+| Élément | Signature | Rôle |
 |---|---|---|
-| `config.py` | [La configuration](references/config.md) | `MailConfig`, variables `MAIL_*` |
-| `message.py` | [Le message](references/message.md) | `MailMessage` |
-| `transports.py` | [Les transports](references/transports.md) | console, log, SMTP, fake, null |
-| `mailer.py` | [Le mailer](references/mailer.md) | `Mailer`, envoi via transport |
-| `templates.py` | [Le rendu de gabarits](references/templates.md) | `MailTemplateRenderer` |
-| `log.py` | [Le journal des envois](references/log.md) | `mail_log`, `MailLogger` |
-| `exceptions.py` | [Les erreurs](references/exceptions.md) | `MailError` et ses sous-classes |
+| `Mailer` | `Mailer(transport)` / `Mailer.from_config() -> Mailer` | orchestrateur d'envoi |
+| `Mailer.send` | `send(message, *, message_type="", related_entity="", related_id=None) -> TransportResult` | envoie un message |
+| `MailMessage` | dataclass | `subject`, `to`, `body_text`, `body_html`, `from_email`, `cc`, `bcc`, `reply_to` |
+| `MailTemplateRenderer` | classe | rend un message depuis un gabarit Jinja |
+| `MailConfig` | dataclass | configuration lue de `MAIL_*` |
+| transports | `ConsoleTransport`, `SmtpTransport`, `LogTransport`, `NullTransport`, `FakeTransport` | canaux d'envoi |
+| `TransportResult` | dataclass | résultat d'un envoi |
+| `MailLogger`, `MailLogRecord` | classes | journal des envois |
+| exceptions | `MailError`, `MailConfigurationError`, `MailSendError`, `MailTemplateError`, `MailValidationError` | erreurs |
 
-Cette page reste l'**overview** : principe d'architecture, mise en place et bonnes pratiques.
+## 5. Contextes d'utilisation
 
----
+| Besoin | Élément |
+|---|---|
+| Construire un mailer configuré | `Mailer.from_config()` |
+| Composer un message | `MailMessage(subject=..., to=...)` |
+| Envoyer | `mailer.send(message)` |
+| Rendre un gabarit | `MailTemplateRenderer` |
+| Tester sans envoyer | `FakeTransport` / `NullTransport` |
+| Vérifier la configuration | `forge mail:doctor` |
+| Relire les envois | `forge mail:logs` |
 
-## Principe d'architecture
+## 6. Configuration (`MAIL_*`)
 
-`forge_mvc_mail/` est une brique générique du framework. Elle ne contient aucune logique métier, aucun template applicatif, aucun workflow et aucune queue.
+Le mail est lu directement depuis l'environnement (ADR-031), sans passer par le noyau.
 
-Elle fournit :
-
-- **`MailMessage`** : représentation d'un message (sujet, corps texte, HTML, destinataires) ;
-- **Transports interchangeables** : `null`, `fake`, `console`, `log`, `smtp` ;
-- **`Mailer`** : point d'entrée unique pour envoyer un message via le transport configuré ;
-- **`MailTemplateRenderer`** : rendu Jinja2 de templates de mails ;
-- **`MailLogger`** : journalisation optionnelle des envois dans `mail_log`.
-
-Les templates applicatifs (`bienvenue.txt`, `commande_confirmee.txt`, etc.) appartiennent à `mvc/mail/templates/`, pas à `core/`.
-
----
-
-## Initialisation
-
-```bash
-forge mail:init
-```
-
-Crée ou complète la structure nécessaire :
-
-```
-mvc/mail/templates/          ← templates Jinja2 de vos mails
-    test_subject.txt         ← exemple de sujet (préservé si modifié)
-    test_text.txt            ← exemple de corps texte
-    test_html.html           ← exemple de corps HTML
-storage/mail/                ← logs .eml du transport log
-    .gitkeep
-mvc/models/sql/mail_log.sql  ← DDL de la table mail_log (préservé si existant)
-```
-
-Idempotent : les fichiers existants ne sont jamais écrasés. Lance ensuite :
-
-```bash
-forge db:apply               # crée la table mail_log si MAIL_LOG_ENABLED=true
-```
-
----
-
-## Vérification de la configuration
-
-```bash
-forge mail:doctor
-```
-
-Affiche le résultat de chaque contrôle :
-
-```
-Forge mail:doctor
-
-  [WARN]  MAIL_ENABLED — false — aucun mail ne sera envoyé (NullTransport activé)
-  [OK]    MAIL_TRANSPORT — log
-  [OK]    Dossier templates — mvc/mail/templates — 3 fichier(s)
-  [OK]    Stockage mail — storage/mail présent
-  [OK]    MAIL_FROM — Forge <noreply@localhost>
-  [SKIP]  MAIL_LOG_ENABLED — false — journalisation désactivée
-
-1 avertissement(s), 0 erreur(s).
-```
-
-Statuts possibles : `OK`, `WARN`, `FAIL`, `SKIP`. Un `FAIL` provoque un code de retour 1.
-
----
-
-## Test d'envoi
-
-```bash
-forge mail:test --to vous@exemple.com
-```
-
-Crée un message de test et l'envoie via le transport configuré. Affiche le nom du transport utilisé et le statut.
-
-En développement avec `MAIL_TRANSPORT=log` :
-
-```
-[INFO]      Transport    : LogTransport
-[INFO]      MAIL_ENABLED : True
-[OK]        Mail envoyé (ou journalisé).
-```
-
-Le fichier `.eml` est déposé dans `storage/mail/`.
-
----
-
-## Rendu d'un template sans envoi
-
-```bash
-forge mail:render bienvenue
-forge mail:render bienvenue --context ctx.json
-```
-
-Charge le template `bienvenue` depuis `mvc/mail/templates/`, interpole le contexte et affiche le sujet, le corps texte et le corps HTML dans le terminal. Utile pour vérifier l'interpolation Jinja2 avant de connecter un vrai SMTP.
-
-Structure des fichiers pour le template `bienvenue` :
-
-```
-mvc/mail/templates/
-    bienvenue_subject.txt    ← obligatoire
-    bienvenue_text.txt       ← obligatoire
-    bienvenue_html.html      ← optionnel
-```
-
-Le fichier `--context` est un JSON quelconque :
-
-```json
-{
-  "prenom": "Alice",
-  "lien": "https://exemple.com/activer/abc123"
-}
-```
-
----
-
-## Journal des envois
-
-```bash
-forge mail:logs
-forge mail:logs --limit 5
-```
-
-Affiche les derniers enregistrements de `mail_log` (20 par défaut). Nécessite `MAIL_LOG_ENABLED=true` et que la table existe (`forge db:apply`).
-
-```
-ID      DATE                STATUS    TRANSPORT     TO                              SUJET
-1       2026-05-01 10:04:12 [OK]      log           dest@example.com                Test Forge — 2026-05-01
-```
-
-Si `MAIL_LOG_ENABLED=false`, la commande affiche un avertissement et ne tente aucune connexion DB.
-
----
-
-## Configuration
-
-### Variables d'environnement
-
-Le mail est un opt-in (`forge-mvc-mail`, ADR-031), lu directement depuis l'environnement sans passer par le noyau.
-Le squelette nu ne fournit plus ces variables, ajoutez le bloc `MAIL_*` à `env/dev`.
-Les défauts ci-dessous s'appliquent quand une variable est absente.
+Le squelette nu ne fournit pas ces variables ; ajoutez le bloc `MAIL_*` à `env/dev`. Les défauts s'appliquent quand une variable est absente.
 
 | Variable | Défaut | Rôle |
 |---|---|---|
 | `MAIL_ENABLED` | `false` | Active l'envoi réel. `false` force `NullTransport` : aucun mail ne part. |
 | `MAIL_TRANSPORT` | `log` | Transport actif quand `MAIL_ENABLED=true` : `null`, `fake`, `console`, `log`, `smtp`. |
-| `MAIL_FROM` | _(vide)_ | Adresse expéditeur complète. Prioritaire sur les deux variables suivantes. |
-| `MAIL_FROM_ADDRESS` | `noreply@localhost` | Partie adresse (utilisée si `MAIL_FROM` est vide). |
-| `MAIL_FROM_NAME` | `Forge` | Partie nom (utilisée si `MAIL_FROM` est vide). |
+| `MAIL_FROM` | _(vide)_ | Adresse expéditeur complète, prioritaire sur les deux suivantes. |
+| `MAIL_FROM_ADDRESS` | `noreply@localhost` | Partie adresse (si `MAIL_FROM` vide). |
+| `MAIL_FROM_NAME` | `Forge` | Partie nom (si `MAIL_FROM` vide). |
 | `MAIL_HOST` | _(vide)_ | Hôte SMTP (requis si `MAIL_TRANSPORT=smtp`). |
 | `MAIL_PORT` | `587` | Port SMTP. |
-| `MAIL_USERNAME` | _(vide)_ | Identifiant SMTP. |
-| `MAIL_PASSWORD` | _(vide)_ | Mot de passe SMTP. |
+| `MAIL_USERNAME` / `MAIL_PASSWORD` | _(vide)_ | Identifiants SMTP. |
 | `MAIL_USE_TLS` | `false` | Active `STARTTLS`. |
 | `MAIL_USE_SSL` | `false` | Utilise `SMTP_SSL` (port 465). |
-| `MAIL_TIMEOUT` | `10` | Timeout de connexion en secondes. |
-| `MAIL_LOG_DIR` | `storage/mail` | Dossier des fichiers `.eml` du transport `log`. |
-| `MAIL_TEMPLATES_DIR` | `mvc/mail/templates` | Dossier des templates Jinja2. |
+| `MAIL_TIMEOUT` | `10` | Timeout de connexion (secondes). |
+| `MAIL_LOG_DIR` | `storage/mail` | Dossier des `.eml` du transport `log`. |
+| `MAIL_TEMPLATES_DIR` | `mvc/mail/templates` | Dossier des gabarits Jinja. |
 | `MAIL_LOG_ENABLED` | `false` | Active la journalisation SQL dans `mail_log`. |
 
 ### Transports disponibles
@@ -192,28 +176,24 @@ Les défauts ci-dessous s'appliquent quand une variable est absente.
 | Valeur | Comportement |
 |---|---|
 | `null` | Avale silencieusement chaque message. |
-| `fake` | Stocke les messages en mémoire (`FakeTransport.messages`). Idéal pour les tests unitaires. |
+| `fake` | Mémorise les messages (`FakeTransport.messages`). Idéal en test unitaire. |
 | `console` | Affiche le message dans le terminal. |
 | `log` | Écrit un fichier `.eml` dans `storage/mail/`. **Défaut en développement.** |
-| `smtp` | Connexion SMTP réelle via `smtplib`. À n'utiliser qu'avec un vrai serveur SMTP. |
+| `smtp` | Connexion SMTP réelle via `smtplib`. À n'utiliser qu'avec un vrai serveur. |
 
-### Adresse expéditeur par défaut
+## 7. Commandes CLI
 
-Si `MAIL_FROM` est vide, Forge compose l'adresse automatiquement :
+| Commande | Rôle |
+|---|---|
+| `forge mail:init` | crée `mvc/mail/templates/`, `storage/mail/`, la DDL `mail_log` (idempotent) |
+| `forge mail:doctor` | diagnostic de la configuration (statuts `OK`/`WARN`/`FAIL`/`SKIP`) |
+| `forge mail:test --to vous@exemple.com` | envoie un mail de test via le transport configuré |
+| `forge mail:render <template> [--context ctx.json]` | rend un gabarit sans envoi (prévisualisation) |
+| `forge mail:logs [--limit N]` | derniers enregistrements de `mail_log` (si `MAIL_LOG_ENABLED=true`) |
 
-```
-Forge <noreply@localhost>
-```
+Un gabarit `bienvenue` se compose de `bienvenue_subject.txt` et `bienvenue_text.txt` (obligatoires), `bienvenue_html.html` (optionnel), dans `mvc/mail/templates/`.
 
-En production, définissez `MAIL_FROM` explicitement :
-
-```env
-MAIL_FROM=MonApp <noreply@mondomaine.fr>
-```
-
----
-
-## Envoi par code
+## 8. Envoi par code
 
 ### Envoi simple
 
@@ -228,18 +208,18 @@ message = MailMessage(
 result = Mailer.from_config().send(message)
 ```
 
-### Envoi avec template
+### Envoi avec gabarit et journalisation
 
 ```python
 from forge_mvc_mail import Mailer, MailTemplateRenderer
 
 renderer = MailTemplateRenderer()
-message  = renderer.render(
+message = renderer.render(
     "bienvenue",
     {"prenom": "Alice", "lien": "https://exemple.com/activer/abc123"},
     to="alice@example.com",
 )
-result = Mailer.from_config().send(
+Mailer.from_config().send(
     message,
     message_type="bienvenue",
     related_entity="contact",
@@ -247,124 +227,63 @@ result = Mailer.from_config().send(
 )
 ```
 
-### Journalisation
+Les kwargs `message_type`, `related_entity`, `related_id` sont enregistrés dans `mail_log` si `MAIL_LOG_ENABLED=true`. Le corps du message n'est **jamais** stocké dans le journal.
 
-Les kwargs optionnels `message_type`, `related_entity` et `related_id` sont enregistrés dans `mail_log` si `MAIL_LOG_ENABLED=true`. Le corps du message (`body_text`, `body_html`) n'est **jamais** stocké dans le journal.
-
-### Envoi vers plusieurs destinataires
-
-```python
-message = MailMessage(
-    subject="Rappel",
-    to=["alice@example.com", "bob@example.com"],
-    cc="equipe@example.com",
-    bcc="archive@example.com",
-    reply_to="support@example.com",
-    body_text="Message envoyé par Forge.",
-)
-```
-
-### Tests unitaires avec `FakeTransport`
+### Test unitaire avec `FakeTransport`
 
 ```python
 from forge_mvc_mail import Mailer, FakeTransport, MailMessage
 
 transport = FakeTransport()
-mailer    = Mailer(transport)
-mailer.send(MailMessage(subject="Test", to="dest@test.com", body_text="Corps."))
+Mailer(transport).send(MailMessage(subject="Test", to="dest@test.com", body_text="Corps."))
 
 assert transport.sent_count == 1
 assert transport.messages[0].subject == "Test"
 ```
 
----
+!!! tip "Aide-mémoire"
+    Trois objets, une responsabilité chacun :
 
-## Table `mail_log`
+    - `MailMessage` : le contenu ;
+    - un transport : le canal ;
+    - `Mailer` : envoyer et journaliser.
 
-Créée par `forge mail:init` (génère `mvc/models/sql/mail_log.sql`) et appliquée par `forge db:apply`.
+## 9. Journal `mail_log` et exceptions
 
-```sql
-CREATE TABLE IF NOT EXISTS mail_log (
-    id             INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    message_type   VARCHAR(100) NOT NULL DEFAULT '',
-    to_email       VARCHAR(255) NOT NULL DEFAULT '',
-    subject        VARCHAR(500) NOT NULL DEFAULT '',
-    transport      VARCHAR(50)  NOT NULL DEFAULT '',
-    status         ENUM('sent', 'failed', 'skipped') NOT NULL,
-    error_message  TEXT,
-    related_entity VARCHAR(100),
-    related_id     INT,
-    created_at     DATETIME     NOT NULL,
-    sent_at        DATETIME
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
-
-**Statuts :**
+La table `mail_log` (optionnelle, `MAIL_LOG_ENABLED=true`) trace les envois sans stocker le corps : `message_type`, `to_email`, `subject`, `transport`, `status`, métadonnées.
 
 | Statut | Signification |
 |---|---|
-| `sent` | Mail effectivement transmis au transport. |
-| `failed` | Erreur SMTP : `error_message` contient le détail. |
-| `skipped` | `MAIL_ENABLED=false` ou transport `null` : aucun mail parti, événement traçable. |
+| `sent` | mail transmis au transport |
+| `failed` | erreur SMTP (`error_message` détaille) |
+| `skipped` | `MAIL_ENABLED=false` ou transport `null` : rien envoyé, événement traçable |
 
-Le statut `skipped` est intentionnel : il permet de comprendre pourquoi aucun mail n'est parti sans avoir à chercher dans les logs serveur.
+| Exception | Quand |
+|---|---|
+| `MailValidationError` | sujet vide, aucun corps, header invalide |
+| `MailConfigurationError` | transport inconnu, `MAIL_HOST` absent en `smtp` |
+| `MailTemplateError` | gabarit `_subject.txt` / `_text.txt` introuvable |
+| `MailSendError` | erreur `smtplib` (interceptée en `TransportResult(success=False)`) |
 
----
+!!! warning "Configuration via l'environnement"
+    Le module lit `MAIL_*` depuis l'environnement (ADR-031), ne commitez jamais de mot de passe SMTP (`env/dev`, `env/prod` sont ignorés par Git).
 
-## Exceptions
+    `forge mail:init` aide à poser le bloc ; `forge mail:doctor` le vérifie.
 
-| Exception | Levée par | Quand |
-|---|---|---|
-| `MailValidationError` | `MailMessage` | Sujet vide, aucun corps, caractère interdit dans un header. |
-| `MailConfigurationError` | `MailConfig` | Transport inconnu, `MAIL_HOST` absent en mode `smtp`. |
-| `MailTemplateError` | `MailTemplateRenderer` | Template `_subject.txt` ou `_text.txt` introuvable. |
-| `MailSendError` | `SmtpTransport` | Erreur `smtplib`. `Mailer.send()` l'intercepte → `TransportResult(success=False)`. |
+!!! note "Sécurité par défaut"
+    `MAIL_ENABLED=false` par défaut : un oubli de configuration ne déclenche jamais d'envoi accidentel.
 
----
+    Les gabarits applicatifs vivent dans `mvc/mail/templates/`, pas dans l'opt-in.
 
-## Cycle de mise en place
+!!! note "Indépendance du cœur"
+    Le cœur de Forge ne dépend pas de `forge-mvc-mail` (extrait par ADR-022) : la dépendance va de l'opt-in vers le cœur.
 
-```bash
-# 1. Créer les fichiers nécessaires
-forge mail:init
+## Voir aussi
 
-# 2. Vérifier la configuration
-forge mail:doctor
-
-# 3. Tester sans SMTP réel (MAIL_TRANSPORT=log par défaut)
-forge mail:test --to vous@exemple.com
-
-# 4. Vérifier le rendu d'un template
-forge mail:render test --context sample.json
-
-# 5. Si MAIL_LOG_ENABLED=true : créer la table
-forge db:apply
-
-# 6. Consulter les logs
-forge mail:logs --limit 20
-```
-
-Pour activer un SMTP réel en développement, ajoutez dans `env/dev` (non commité) :
-
-```env
-MAIL_ENABLED=true
-MAIL_TRANSPORT=smtp
-MAIL_HOST=smtp.mailtrap.io
-MAIL_PORT=587
-MAIL_USERNAME=votre_identifiant
-MAIL_PASSWORD=votre_mot_de_passe
-MAIL_USE_TLS=true
-MAIL_FROM=MonApp <noreply@exemple.com>
-```
-
-Ne commitez jamais de mots de passe SMTP. `env/dev` et `env/prod` sont ignorés par Git.
-
----
-
-## Bonnes pratiques
-
-- `MAIL_ENABLED=false` est la valeur par défaut : un oubli de configuration ne déclenche jamais d'envoi accidentel.
-- `MAIL_TRANSPORT=log` est le transport par défaut : les mails sont lisibles dans `storage/mail/` sans serveur SMTP.
-- `MAIL_LOG_ENABLED=false` est le défaut : pas de table SQL requise pour démarrer.
-- Le corps du mail n'est jamais stocké dans `mail_log` : seuls le sujet, le destinataire, le transport, le statut et les métadonnées métier sont enregistrés.
-- `forge_mvc_mail/` ne contient aucun template applicatif : placez vos templates dans `mvc/mail/templates/`.
+- [Configuration (config.py)](references/config.md) : `MailConfig`, variables `MAIL_*`.
+- [Message (message.py)](references/message.md) : `MailMessage`.
+- [Transports (transports.py)](references/transports.md) : console, log, SMTP, fake, null.
+- [Mailer (mailer.py)](references/mailer.md) : envoi et journalisation.
+- [Rendu de gabarits (templates.py)](references/templates.md) : `MailTemplateRenderer`.
+- [Journal des envois (log.py)](references/log.md) et [Erreurs (exceptions.py)](references/exceptions.md).
+- [Progression Mail](welcome/installation.md) : apprendre l'opt-in pas à pas.
