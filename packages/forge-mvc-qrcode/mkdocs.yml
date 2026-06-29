@@ -5,6 +5,7 @@ site_name: qrcode
 docs_dir: docs
 nav:
   - Présentation: index.md
+  - Référence: reference.md
   - Référence (par module):
       - Génération (generator.py): references/generator.md
       - Réponse HTTP (response.py): references/response.md
