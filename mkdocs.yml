@@ -392,6 +392,7 @@ nav:
           - MariaDB: '!include packages/forge-mvc-mariadb/mkdocs.yml'
           - SQLite: '!include packages/forge-mvc-sqlite/mkdocs.yml'
           - PostgreSQL (Alpha): '!include packages/forge-mvc-postgres/mkdocs.yml'
+          - SQL Server (Alpha): '!include packages/forge-mvc-mssql/mkdocs.yml'
 
 markdown_extensions:
   - admonition
