@@ -5,6 +5,7 @@ site_name: deploy
 docs_dir: docs
 nav:
   - Présentation: index.md
+  - Référence: reference.md
   - Référence (par module):
       - Commandes deploy:* (cli/deploy.py): references/cli.md
   - Progression Deploy:
