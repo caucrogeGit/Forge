@@ -1,220 +1,250 @@
-# Auth : Challenge MFA à la connexion
+# L'authentification multi-facteurs dans Forge (forge-mvc-mfa)
 
-!!! info "Module Beta : opt-in officiel publié sur PyPI depuis 1.0.0-beta.9"
-    `forge-mvc-mfa` est marqué `Development Status :: 4 - Beta` (publication PyPI
-    préparée par `MFA-PYPI-READY-001`).
+Ce document explique ce que fait l'opt-in `forge-mvc-mfa`, ce qu'il expose, et comment on s'en sert.
 
-    Le secret TOTP est **chiffré au repos** via Fernet (`cryptography`) avec la clé
-    `FORGE_MFA_SECRET_KEY`. Le chiffrement est obligatoire : démarrer sans cette
-    variable d'environnement lève `MfaSecretKeyMissing`.
+`forge-mvc-mfa` ajoute un second facteur d'authentification : TOTP (application d'authentification), codes de récupération, challenge à la connexion, revalidation et protections (anti-rejeu, rate-limit).
 
-    Installation :
+Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où persister les facteurs et quand exiger le second facteur.
 
-    ```bash
-    pip install --pre forge-mvc-mfa
-    ```
+!!! warning "Clé de chiffrement obligatoire"
+    Le secret TOTP est chiffré avec `FORGE_MFA_SECRET_KEY` (Fernet).
 
-    `forge-mvc-mfa` n'est **pas inclus dans `forge-mvc[all]`** : activer la MFA est
-    un choix de sécurité explicite de l'application (les extras core couvrent
-    uniquement RBAC, workflow et stats ; installer le paquet directement). MFA
-    reste opt-in : le core Forge ne dépend pas de `forge-mvc-mfa`.
+    Démarrer sans cette variable lève `MfaSecretKeyMissing` : le chiffrement n'est pas optionnel.
 
-> **Module extrait** : le code MFA vit dans
-> `forge-mvc-mfa`. Voir `packages/forge-mvc-mfa/README.md` pour
-> l'installation et l'API utilisateur. Cette page documente le flux
-> de challenge MFA pour mémoire et référence rapide.
+## 1. Rôle du module
 
+Le mot de passe seul ne suffit pas pour les actions sensibles. L'opt-in ajoute un **second facteur**.
 
-Le challenge MFA s'intercale entre la validation du mot de passe et l'ouverture de la session.
+Il couvre quatre temps :
 
-Flux général :
+- **enrôlement** : générer un secret TOTP, l'afficher en QR Code, confirmer le premier code ;
+- **challenge** : après le mot de passe, exiger un code TOTP avant d'ouvrir la session ;
+- **revalidation** : redemander le facteur avant une action critique (step-up) ;
+- **récupération** : des codes à usage unique si l'appareil TOTP est perdu.
 
-```
-mot de passe correct + MFA désactivé  → session ouverte (comportement inchangé)
-mot de passe correct + MFA activé     → état temporaire créé → /login/mfa
-code MFA valide                        → état temporaire supprimé → session ouverte
-code MFA invalide                      → état temporaire conservé → retour formulaire
-```
+Forge fournit les helpers et les contrats ; la **persistance** des facteurs et des codes reste applicative (ADR-008).
 
-### État temporaire de challenge
+## 2. Vue d'ensemble rapide
 
-| Clé de session | Rôle |
+| Élément | Valeur |
 |---|---|
-| `_auth_mfa_user_id` | Identifiant de l'utilisateur en attente de MFA |
-| `_auth_mfa_started_at` | Timestamp ISO de début (expiration 10 min par défaut) |
+| Paquet | `forge-mvc-mfa` |
+| Module | `forge_mvc_mfa` |
+| Catégorie | Sécurité et accès (ADR-055) |
+| Couche | opt-in (brique optionnelle), transversal au flux d'auth |
+| Dépend de | `forge-mvc`, `pyotp`, `cryptography` (Fernet) |
+| Facteurs | TOTP (`MFA_FACTOR_TOTP`), codes de récupération (`MFA_FACTOR_RECOVERY`) |
+| Chiffrement | secret TOTP chiffré (Fernet), clé `FORGE_MFA_SECRET_KEY` |
+| Protections | anti-rejeu TOTP, rate-limit du challenge et de la revalidation |
+| API publique | enrôlement, challenge, revalidation, codes de récupération, chiffrement |
+| Persistance | applicative (ADR-008) : `AuthMfaFactor`, codes de récupération |
+| Installation | `pip install --pre forge-mvc-mfa` |
 
-L'état temporaire n'est **pas** une session authentifiée. L'utilisateur n'a aucun accès aux routes protégées tant que le code MFA n'est pas validé.
+## 3. Schémas UML
 
-### API `forge_mvc_mfa`
+Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
-| Fonction | Comportement |
+Le diagramme de classe montre les groupes d'API et le secret chiffré.
+
+Le diagramme de séquence montre le challenge MFA à la connexion.
+
+### 3.1 Diagramme de classe
+
+Le diagramme de classe montre les fonctions groupées par rôle, le facteur persisté et le chiffrement du secret.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class enrolment {
+        <<module>>
+        +generate_totp_secret() str
+        +create_totp_factor(...)
+        +confirm_totp_factor(...) AuthMfaFactor
+        +totp_provisioning_uri(...) str
+        +verify_totp_code(...)
+    }
+
+    class challenge {
+        <<module>>
+        +start_mfa_challenge(...)
+        +verify_mfa_challenge(...)
+        +require_recent_mfa(...)
+        +verify_mfa_revalidation(...)
+    }
+
+    class recovery {
+        <<module>>
+        +create_recovery_codes(...)
+        +consume_recovery_code(...)
+    }
+
+    class secret_crypto {
+        <<module>>
+        +encrypt_totp_secret(...)
+        +decrypt_totp_secret(...)
+        +validate_mfa_secret_key_config()
+    }
+
+    class AuthMfaFactor {
+        <<dataclass>>
+        +user_id
+        +type
+        +status
+        +secret_chiffré
+    }
+
+    enrolment --> AuthMfaFactor : produit
+    enrolment --> secret_crypto : chiffre le secret
+    challenge --> AuthMfaFactor : vérifie
+    recovery --> AuthMfaFactor : alternative TOTP
+```
+
+À retenir :
+
+- l'enrôlement produit un `AuthMfaFactor` (secret chiffré) ;
+- le challenge vérifie un code TOTP ou un code de récupération ;
+- la revalidation rejoue le facteur avant une action critique ;
+- le secret n'est jamais stocké en clair (Fernet).
+
+### 3.2 Diagramme de séquence
+
+Le diagramme de séquence montre le challenge à la connexion, après le mot de passe.
+
+```mermaid
+sequenceDiagram
+    actor Utilisateur
+    participant Login as Contrôleur login
+    participant MFA as forge_mvc_mfa
+    participant Session as Session
+
+    Utilisateur->>Login: identifiants (mot de passe OK)
+    Login->>MFA: is_mfa_enabled(user) ?
+    alt MFA actif
+        Login->>MFA: start_mfa_challenge(user)
+        Login-->>Utilisateur: demande le code TOTP
+        Utilisateur->>Login: code à 6 chiffres
+        Login->>MFA: verify_mfa_challenge(code)
+        MFA-->>Login: succès (ou code de récupération)
+        Login->>Session: ouvre la session
+    else MFA inactif
+        Login->>Session: ouvre la session directement
+    end
+```
+
+À retenir :
+
+- le challenge intervient **après** la vérification du mot de passe ;
+- la session n'est ouverte qu'une fois le second facteur validé ;
+- un code de récupération est une alternative au code TOTP ;
+- le challenge est limité en tentatives et en durée (anti-bruteforce).
+
+## 4. API publique
+
+### Secret et chiffrement
+
+| Élément | Rôle |
 |---|---|
-| `start_mfa_challenge(request, user)` | Stocke `user.id` et timestamp en session. Ne connecte pas l'utilisateur. Lève `InvalidAuthUserError` si utilisateur inactif. |
-| `has_pending_mfa_challenge(request, max_age_minutes=10)` | Retourne `True` si challenge en cours et non expiré. |
-| `get_mfa_challenge_user_id(request)` | Retourne l'identifiant en attente ou `None`. |
-| `verify_mfa_challenge(request, code, factors, recovery_codes=None)` | Vérifie code TOTP ou de récupération. Retourne `MfaChallengeResult` ou `None`. Supprime le challenge en cas de succès. |
-| `clear_mfa_challenge(request)` | Supprime les clés de challenge. Idempotent. |
+| `generate_totp_secret() -> str` | génère un secret TOTP |
+| `encrypt_totp_secret` / `decrypt_totp_secret` | chiffre/déchiffre le secret (Fernet) |
+| `validate_mfa_secret_key_config() -> None` | vérifie `FORGE_MFA_SECRET_KEY` au démarrage |
 
-### Exemple d'intégration MVC
+### Enrôlement TOTP
 
-```python
-# Dans le contrôleur de login, après vérification du mot de passe :
-from forge_mvc_mfa import is_mfa_enabled, start_mfa_challenge
-from core.auth.user import AuthUser
+| Élément | Rôle |
+|---|---|
+| `create_totp_factor(...)` | crée un facteur TOTP en attente |
+| `confirm_totp_factor(...) -> AuthMfaFactor` | confirme avec le premier code |
+| `totp_provisioning_uri(...) -> str` | URI `otpauth://` (pour QR Code) |
+| `verify_totp_code(...)` | vérifie un code TOTP |
+| `TotpSetup`, `AuthMfaFactor` | données d'enrôlement et facteur |
 
-mfa_factors = get_active_mfa_factors(user_id)
-if is_mfa_enabled(mfa_factors):
-    auth_user = AuthUser(id=user_id, email=email, password_hash=hash, is_active=True)
-    start_mfa_challenge(request, auth_user)
-    return redirect("/login/mfa")
+### Challenge et revalidation
 
-# Sinon : ouvrir la session directement
-```
-
-### Limites actuelles (AUTH-MFA-004)
-
-Forge ne fournit pas encore dans ce flux : *remember device*, WebAuthn, SMS, email MFA, gestion des codes de récupération dans le formulaire de connexion.
-
----
-
-## Référence par module
-
-L'API détaillée est documentée page par page, un fichier par module :
-
-| Module | Page | Contenu |
-|---|---|---|
-| `mfa.py` | [Le cœur MFA](references/mfa.md) | facteurs, TOTP, challenge, revalidation |
-| `recovery.py` | [Les codes de récupération](references/recovery.md) | génération et vérification des codes de secours |
-| `secret_crypto.py` | [Le chiffrement des secrets](references/secret_crypto.md) | chiffrement Fernet du secret TOTP, validation de la clé |
-| `totp_replay.py` | [La protection anti-rejeu](references/totp_replay.md) | refus de la réutilisation d'un code TOTP |
-
----
-
-## Politique de stockage des secrets MFA
-
-### Statut actuel
-
-`forge-mvc-mfa` est en Beta. Le secret TOTP est
-**chiffré au repos** via Fernet (bibliothèque `cryptography`).
-
-Le module est opt-in, non inclus dans `forge-mvc[all]`, et doit être configuré avec
-`FORGE_MFA_SECRET_KEY` avant tout déploiement.
-
-### Développement et tests
-
-En développement et en environnement de test isolé :
-
-- le secret TOTP est chiffré dans `auth_mfa_factors.totp_secret` (Fernet, préfixe `enc:`) ;
-- la clé de chiffrement est lue depuis `FORGE_MFA_SECRET_KEY`, requise même en dev ;
-- les codes de récupération sont stockés sous forme hashée (`hash_recovery_code()`, SHA-256 + `secrets.compare_digest`).
-
-**Conditions requises même en développement :**
-
-- `FORGE_MFA_SECRET_KEY` positionné dans l'environnement ;
-- accès à la table `auth_mfa_factors` limité à l'utilisateur applicatif ;
-- secrets jamais loggés (`totp_secret` et `recovery_code` sont dans les champs redactés de `sanitize_auth_audit_metadata()`) ;
-- base de données non exposée publiquement.
-
-### Production
-
-Le module est en Beta. Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`).
-Certaines exigences avancées (rotation de clé, sauvegarde/restauration, revue
-sécurité formelle) restent à la charge de l'application avant un usage critique.
-
-**Protection additionnelle recommandée en production :**
-
-- restreindre les droits d'accès à la table `auth_mfa_factors` au strict minimum applicatif ;
-- stocker `FORGE_MFA_SECRET_KEY` dans un gestionnaire de secrets (Vault, AWS Secrets Manager…) ;
-- appeler `validate_mfa_secret_key_config()` au démarrage applicatif (cf.
-  [Validation au démarrage](#validation-au-demarrage) ci-dessous) ;
-- chiffrement du disque de la base de données ;
-- ne pas exporter `auth_mfa_factors` dans des dumps non chiffrés ;
-- documenter la procédure de rotation et de sauvegarde/restauration de la clé.
-
-### Validation au démarrage
-
-`MFA-SECRET-KEY-BOOT-VALIDATION-001` ajoute la fonction
-`validate_mfa_secret_key_config()` qui échoue **tôt** sur une configuration
-dangereuse, plutôt qu'au moment où un utilisateur tente de s'enrôler ou
-de se connecter avec MFA.
-
-```python
-from forge_mvc_mfa import validate_mfa_secret_key_config
-
-# Au démarrage applicatif (app.py, wsgi.py, ou tout bootstrap équivalent).
-validate_mfa_secret_key_config()
-```
-
-Refusé explicitement :
-
-- `FORGE_MFA_SECRET_KEY` absente, vide, ou n'ayant que des espaces ;
-- valeurs placeholder évidentes : `change-me`, `changeme`, `default`,
-  `secret`, `dev`, `development`, `test`, `testing`, `placeholder`,
-  `xxx`, `your-key-here`… (insensible à la casse, strippée) ;
-- clé non Fernet (mauvaise longueur ou base64 invalide).
-
-Exceptions levées : `MfaSecretKeyMissing`, `MfaSecretKeyPlaceholder`,
-`MfaSecretInvalidKey`. **Aucun message ne contient la valeur de la clé
-tentée** : pour éviter de fuir un secret dans un log applicatif. Le
-message inclut toujours la commande de génération d'une clé valide :
-
-```bash
-python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-```
-
-MFA reste opt-in : Forge ne force pas cette validation au niveau du
-core. C'est l'application qui décide de l'appeler.
-
-### Secrets TOTP
-
-Le secret TOTP est une clé partagée utilisée pour calculer les codes TOTP (RFC 6238).
-
-**Pourquoi on ne peut pas simplement hasher le secret TOTP :**
-
-Un hash est à sens unique. Pour vérifier un code TOTP, le serveur doit pouvoir recalculer `TOTP(secret, timestamp)`. Si le secret est hashé, cette opération est impossible.
-
-Le stockage production-ready d'un secret TOTP nécessite :
-
-- un **chiffrement applicatif réversible** (AES-256-GCM ou équivalent avec clé de chiffrement séparée), **ou**
-- un **HSM** (*Hardware Security Module*), **ou**
-- un **gestionnaire de secrets** (Vault, AWS Secrets Manager, ou équivalent).
-
-Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, `forge-mvc-mfa` implémente le chiffrement Fernet
-(`cryptography.fernet.Fernet`, AES-128-CBC + HMAC-SHA256) via la clé `FORGE_MFA_SECRET_KEY`.
-Les valeurs stockées en base sont préfixées `enc:` pour distinguer les secrets chiffrés
-d'éventuelles valeurs legacy.
-
-Pour renforcer davantage, coupler `FORGE_MFA_SECRET_KEY` à un gestionnaire de secrets externe.
+| Élément | Rôle |
+|---|---|
+| `start_mfa_challenge(...)` | démarre le challenge (état en session) |
+| `verify_mfa_challenge(...)` | vérifie le code du challenge |
+| `has_pending_mfa_challenge`, `clear_mfa_challenge` | état du challenge |
+| `require_recent_mfa(...)` | exige une revalidation récente (step-up) |
+| `mark_mfa_revalidated`, `verify_mfa_revalidation` | revalidation |
 
 ### Codes de récupération
 
-Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (série `1.0.0-beta.x`) :
+| Élément | Rôle |
+|---|---|
+| `create_recovery_codes(...)` | génère des codes à usage unique |
+| `consume_recovery_code(...)` | consomme un code (irréversible) |
 
-- générés via `secrets.choice()` sur un alphabet sans ambiguïté ;
-- hashés avant stockage via `hash_recovery_code()` (SHA-256) ;
-- vérifiés via `secrets.compare_digest()` (résistant aux timing attacks) ;
-- stockés en base uniquement sous forme de hash : le code brut n'est jamais persisté.
+### Constantes
 
-**Cette conception est conforme pour la production**, à condition que la base elle-même soit protégée. Un hash de code de récupération exposé ne permet pas de retrouver le code brut.
+`MFA_FACTOR_TOTP`, `MFA_FACTOR_RECOVERY`, `MFA_STATUS_ACTIVE` / `PENDING` / `DISABLED`, fenêtres et tentatives du challenge et de la revalidation.
 
-### Exigences avant production-ready
+## 5. Contextes d'utilisation
 
-`forge-mvc-mfa` est en **Beta** (publié sur PyPI depuis `1.0.0-beta.9`). Avant un usage en production critique, l'application doit couvrir les exigences suivantes :
+| Besoin | Élément |
+|---|---|
+| Vérifier la clé au démarrage | `validate_mfa_secret_key_config()` |
+| Enrôler un utilisateur | `create_totp_factor` + `totp_provisioning_uri` + `confirm_totp_factor` |
+| Exiger le 2e facteur au login | `start_mfa_challenge` + `verify_mfa_challenge` |
+| Protéger une action sensible | `require_recent_mfa(...)` |
+| Fournir un secours | `create_recovery_codes` / `consume_recovery_code` |
 
-1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : Fernet + `FORGE_MFA_SECRET_KEY`.
-2. **Politique de rotation documentée** : rotation ou invalidation maîtrisée des secrets compromis.
-3. **Documentation de sauvegarde/restauration** : procédure en cas de perte de la clé de chiffrement.
-4. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : `tests/test_mfa_secret_crypto.py`.
-5. **Revue sécurité explicite** : validation que le stockage chiffré est correct.
-6. ~~**Décision explicite de changement de statut**~~ ✓ livré (`MFA-PYPI-READY-001`).
-7. ~~**Publication PyPI**~~ ✓ livré en `1.0.0-beta.9`.
-8. ~~**Passage en Beta**~~ ✓ acté (tous les opt-ins en Beta).
+## 6. Exemple : challenge à la connexion
 
-### Tickets liés
+```python
+from forge_mvc_mfa import (
+    is_mfa_enabled, start_mfa_challenge, verify_mfa_challenge,
+)
 
-| Ticket | Description | État |
-|---|---|---|
-| `MFA-SECRET-STORAGE-POLICY-001` | Documenter la politique de stockage | livré |
-| `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif du secret TOTP (Fernet) | livré |
-| `MFA-PYPI-READY-001` | Requalification Alpha (Pre-Alpha → Alpha) | livré |
+# Après vérification du mot de passe :
+if is_mfa_enabled(user):
+    start_mfa_challenge(request, user_id=user["id"])
+    return redirect("/login/mfa")     # demander le code TOTP
+else:
+    open_session(request, user)       # pas de MFA : session directe
 
+# Sur la page de saisie du code :
+if verify_mfa_challenge(request, code=request.form("code")):
+    open_session(request, user)
+else:
+    return Response.text("Code invalide", status=401)
+```
+
+!!! tip "Aide-mémoire"
+    Quatre temps, une clé de chiffrement :
+
+    - enrôler (secret + QR + confirmation) ;
+    - challenger au login ;
+    - revalider avant le sensible ;
+    - récupérer via codes à usage unique.
+
+## 7. Sécurité des secrets
+
+Le secret TOTP est chiffré au repos avec Fernet (`cryptography`) et la clé `FORGE_MFA_SECRET_KEY` ; il n'est jamais stocké en clair.
+
+Appelez `validate_mfa_secret_key_config()` au démarrage (app.py / wsgi.py) : démarrer sans clé valide échoue tôt plutôt qu'à la première écriture.
+
+!!! warning "Codes de récupération à usage unique"
+    Les codes de récupération sont stockés **hachés** et consommés une seule fois (`consume_recovery_code`).
+
+    Présentez-les une fois à l'utilisateur à la génération ; ils ne sont pas réaffichables.
+
+!!! warning "Anti-rejeu et rate-limit"
+    Un code TOTP déjà utilisé est refusé (anti-rejeu) ; le challenge et la revalidation sont limités en tentatives et en fenêtre temporelle.
+
+    Ces protections sont actives par défaut.
+
+!!! note "Persistance applicative"
+    Forge fournit les helpers et les contrats (`AuthMfaFactor`, codes) ; l'application choisit la persistance (table, schéma), cohérent avec ADR-008.
+
+!!! note "Indépendance du cœur"
+    Le cœur de Forge ne dépend pas de `forge-mvc-mfa` : la dépendance va de l'opt-in vers le cœur.
+
+## Voir aussi
+
+- [Cœur MFA (mfa.py)](references/mfa.md) : enrôlement, challenge, revalidation.
+- [Codes de récupération (recovery.py)](references/recovery.md) : génération et consommation.
+- [Chiffrement des secrets (secret_crypto.py)](references/secret_crypto.md) : Fernet, `FORGE_MFA_SECRET_KEY`.
+- [Protection anti-rejeu (totp_replay.py)](references/totp_replay.md).
+- [Progression MFA](welcome/installation.md) : apprendre l'opt-in pas à pas.
