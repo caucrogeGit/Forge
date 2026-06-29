@@ -14,7 +14,10 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
-from forge_mvc_rbac.cli.rbac_validate import rbac_validate_main
+import pytest
+
+pytest.importorskip("forge_mvc_rbac")
+from forge_mvc_rbac.cli.rbac_validate import rbac_validate_main  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -265,7 +268,7 @@ def test_aide_mentionne_rbac_validate():
 
 
 def test_ne_modifie_pas_entity_schema(tmp_path):
-    entity_schema = PROJECT_ROOT / "schemas" / "entity.schema.json"
+    entity_schema = PROJECT_ROOT / "cli" / "schemas" / "entity.schema.json"
     content_before = entity_schema.read_text(encoding="utf-8")
     _run_in(tmp_path, [])
     content_after = entity_schema.read_text(encoding="utf-8")

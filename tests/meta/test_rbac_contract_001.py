@@ -14,7 +14,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ADR = Path("docs/adr/014-rbac-contract-location.md")
-ENTITY_SCHEMA = Path("schemas/entity.schema.json")
+ENTITY_SCHEMA = Path("cli/schemas/entity.schema.json")
 AUDIT_PREV = Path("docs/history/audits/entity-schema-rbac-decision-001.md")
 
 

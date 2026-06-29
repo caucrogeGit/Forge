@@ -135,37 +135,7 @@ def test_manifest_in_covers_schemas():
     assert "cli/schemas" in content and "*.json" in content
 
 
-# ---------------------------------------------------------------------------
-# Anti-dérive : schemas/ ↔ cli/schemas/ doivent être identiques
-# ---------------------------------------------------------------------------
-
-SCHEMA_FILENAMES = [
-    "common.schema.json",
-    "field.schema.json",
-    "entity.schema.json",
-    "relations.schema.json",
-    "forge.schema.index.json",
-]
-
-
-@pytest.mark.parametrize("filename", SCHEMA_FILENAMES)
-def test_schema_copies_are_identical(filename):
-    """schemas/<f> et cli/schemas/<f> doivent être strictement identiques.
-
-    Comparaison JSON normalisée pour tolérer les différences de formatage.
-    """
-    import json
-
-    canonical = Path("schemas") / filename
-    runtime = Path("cli/schemas") / filename
-
-    assert canonical.exists(), f"schemas/{filename} absent"
-    assert runtime.exists(), f"cli/schemas/{filename} absent"
-
-    canonical_obj = json.loads(canonical.read_text(encoding="utf-8"))
-    runtime_obj = json.loads(runtime.read_text(encoding="utf-8"))
-
-    assert canonical_obj == runtime_obj, (
-        f"Dérive détectée : schemas/{filename} ≠ cli/schemas/{filename}\n"
-        "Mettre à jour les deux copies après toute modification de schéma."
-    )
+# Note (ADR-058) : le test de synchro schemas/ (racine) ↔ cli/schemas/ a été
+# retiré : la copie racine est supprimée, cli/schemas/ est la source canonique
+# unique. La synchro des copies dérivées (squelette, embeds opt-in) est gardée
+# par tests/meta/test_schemas_in_sync_001.py.

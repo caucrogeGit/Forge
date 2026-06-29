@@ -23,8 +23,8 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent
-INDEX_PATH = PROJECT_ROOT / "schemas" / "forge.schema.index.json"
-SCHEMAS_DIR = PROJECT_ROOT / "schemas"
+INDEX_PATH = PROJECT_ROOT / "cli" / "schemas" / "forge.schema.index.json"
+SCHEMAS_DIR = PROJECT_ROOT / "cli" / "schemas"
 
 _EXPECTED_SCHEMAS = {
     "common": "./common.schema.json",

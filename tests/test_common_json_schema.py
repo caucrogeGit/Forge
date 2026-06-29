@@ -22,7 +22,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent
-SCHEMA_PATH = PROJECT_ROOT / "schemas" / "common.schema.json"
+SCHEMA_PATH = PROJECT_ROOT / "cli" / "schemas" / "common.schema.json"
 
 _EXPECTED_DEFS = [
     "schemaVersion",

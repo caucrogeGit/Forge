@@ -60,7 +60,6 @@ class TestCrudFormGeneration:
 
 class TestSchemaEnum:
     @pytest.mark.parametrize("rel", [
-        "schemas/field.schema.json",
         "cli/schemas/field.schema.json",
     ])
     def test_slug_in_type_enum(self, rel):

@@ -11,7 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_mvc_rbac.cli.rbac_audit import rbac_audit_main
+pytest.importorskip("forge_mvc_rbac")
+from forge_mvc_rbac.cli.rbac_audit import rbac_audit_main  # noqa: E402
 
 
 def _write_rbac(tmp_path: Path, content: dict) -> None:

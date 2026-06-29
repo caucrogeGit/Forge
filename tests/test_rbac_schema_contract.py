@@ -17,7 +17,7 @@ SCHEMA_SOURCE = (
     PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "forge_mvc_rbac"
     / "schemas" / "rbac.schema.json"
 )
-ENTITY_SCHEMA = PROJECT_ROOT / "schemas" / "entity.schema.json"
+ENTITY_SCHEMA = PROJECT_ROOT / "cli" / "schemas" / "entity.schema.json"
 
 _DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema"
 

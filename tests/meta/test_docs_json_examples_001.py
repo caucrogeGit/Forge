@@ -32,7 +32,7 @@ pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DOCS_ENTITIES = PROJECT_ROOT / "docs" / "entities"
-SCHEMAS_DIR = PROJECT_ROOT / "schemas"
+SCHEMAS_DIR = PROJECT_ROOT / "cli" / "schemas"
 
 LEGACY_KEYS = frozenset(
     [
@@ -67,10 +67,10 @@ DOCS_PAGES = [
 # ---------------------------------------------------------------------------
 
 
-def _load_schema_registry() -> tuple[Registry, dict[str, Any]]:
+def _load_schema_registry(schemas_dir: Path = SCHEMAS_DIR) -> tuple[Registry, dict[str, Any]]:
     resources: list[tuple[str, Resource]] = []
     by_id: dict[str, Any] = {}
-    for sf in SCHEMAS_DIR.glob("*.json"):
+    for sf in schemas_dir.glob("*.json"):
         schema = json.loads(sf.read_text(encoding="utf-8"))
         sid = schema.get("$id")
         if sid:
@@ -133,6 +133,12 @@ def _classify_blocks(page: Path) -> dict[str, list[Any]]:
 
 
 REGISTRY, SCHEMAS_BY_ID = _load_schema_registry()
+# pivot.schema.json est extrait vers l'opt-in forge-mvc-pivot (ADR-057/058) :
+# on valide les exemples pivot des docs contre le schéma embarqué par le paquet.
+PIVOT_SCHEMAS_DIR = (
+    PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "forge_mvc_pivot" / "schemas"
+)
+PIVOT_REGISTRY, PIVOT_SCHEMAS_BY_ID = _load_schema_registry(PIVOT_SCHEMAS_DIR)
 ENTITY_SCHEMA_ID = "https://forge-mvc.dev/schemas/entity.schema.json"
 RELATIONS_SCHEMA_ID = "https://forge-mvc.dev/schemas/relations.schema.json"
 PIVOT_SCHEMA_ID = "https://forge-mvc.dev/schemas/pivot.schema.json"
@@ -275,8 +281,8 @@ _PIVOT_EXAMPLES = _all_pivot_examples()
 @pytest.mark.parametrize("page_name,pivot", _PIVOT_EXAMPLES, ids=[p for p, _ in _PIVOT_EXAMPLES])
 def test_pivot_example_valid_schema(page_name, pivot):
     """Chaque exemple de pivot doit respecter pivot.schema.json."""
-    schema = SCHEMAS_BY_ID[PIVOT_SCHEMA_ID]
-    validator = Draft202012Validator(schema, registry=REGISTRY)
+    schema = PIVOT_SCHEMAS_BY_ID[PIVOT_SCHEMA_ID]
+    validator = Draft202012Validator(schema, registry=PIVOT_REGISTRY)
     errors = list(validator.iter_errors(pivot))
     assert not errors, (
         f"Exemple pivot dans {page_name} invalide selon pivot.schema.json :\n"

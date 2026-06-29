@@ -301,7 +301,7 @@ def test_e2e_make_crud_non_appele(project):
 
 
 def test_e2e_schemas_json_non_modifies():
-    schema = Path("schemas") / "relations.schema.json"
+    schema = Path("cli") / "schemas" / "relations.schema.json"
     data = json.loads(schema.read_text(encoding="utf-8"))
     assert data.get("$id") == "https://forge-mvc.dev/schemas/relations.schema.json"
     # pivot.fields est validé par le schéma existant — pas de modification nécessaire

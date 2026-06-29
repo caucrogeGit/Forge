@@ -325,7 +325,7 @@ def test_make_crud_non_modifie():
 
 
 def test_schemas_non_modifies():
-    schema_path = Path("schemas") / "relations.schema.json"
+    schema_path = Path("cli") / "schemas" / "relations.schema.json"
     assert schema_path.exists()
     data = json.loads(schema_path.read_text(encoding="utf-8"))
     assert data.get("$id") == "https://forge-mvc.dev/schemas/relations.schema.json"

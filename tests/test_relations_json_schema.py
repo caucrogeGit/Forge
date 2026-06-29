@@ -29,7 +29,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent
-SCHEMA_PATH = PROJECT_ROOT / "schemas" / "relations.schema.json"
+SCHEMA_PATH = PROJECT_ROOT / "cli" / "schemas" / "relations.schema.json"
 
 _EXPECTED_ROOT_PROPERTIES = frozenset({"$schema", "schema_version", "relations"})
 _REQUIRED_ROOT = frozenset({"schema_version", "relations"})

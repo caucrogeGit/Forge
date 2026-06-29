@@ -13,7 +13,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 AUDIT = Path("docs/history/audits/entity-schema-rbac-decision-001.md")
-ENTITY_SCHEMA = Path("schemas/entity.schema.json")
+ENTITY_SCHEMA = Path("cli/schemas/entity.schema.json")
 
 
 def _text() -> str:

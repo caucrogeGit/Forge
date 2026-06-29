@@ -29,7 +29,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent
-SCHEMA_PATH = PROJECT_ROOT / "schemas" / "entity.schema.json"
+SCHEMA_PATH = PROJECT_ROOT / "cli" / "schemas" / "entity.schema.json"
 
 _EXPECTED_PROPERTIES = frozenset({
     "$schema", "schema_version", "name", "table",
