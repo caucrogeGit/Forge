@@ -2,7 +2,7 @@
 """Provisioning MariaDB du projet Forge."""
 
 from __future__ import annotations
-from typing import Any, cast
+from typing import Any
 
 from dataclasses import dataclass
 
@@ -240,18 +240,18 @@ def main(argv: list[str] | None = None) -> None:
 
 
 def _connect_admin(cfg: DbInitConfig):
-    import mariadb  # pyright: ignore[reportMissingTypeStubs]
+    from core.database.backend import get_backend
 
     try:
-        return cast("Any", mariadb).connect(
+        return get_backend().get_admin_connection(
             host=cfg.admin_host,
             port=cfg.admin_port,
-            user=cfg.admin_login,
+            login=cfg.admin_login,
             password=cfg.admin_password,
         )
     except Exception as exc:
         raise DbInitError(
-            "Connexion MariaDB admin impossible. "
+            "Connexion d'administration impossible. "
             "Vérifiez DB_ADMIN_* dans env/dev."
         ) from exc
 

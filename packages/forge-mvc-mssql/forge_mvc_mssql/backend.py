@@ -137,6 +137,32 @@ class MSSQLBackend:
         raw: Any = odbc.connect(conn_str)
         return _MsConnection(raw)
 
+    def get_admin_connection(
+        self,
+        *,
+        host: str,
+        port: int,
+        login: str,
+        password: str,
+        database: "str | None" = None,
+    ) -> Any:
+        import pyodbc
+
+        odbc: Any = pyodbc
+        driver = os.environ.get("DB_ODBC_DRIVER", _DEFAULT_ODBC_DRIVER)
+        # `db:init` (database=None) se connecte à la base de maintenance
+        # « master » pour créer la base du projet.
+        db = database or "master"
+        conn_str = (
+            f"DRIVER={{{driver}}};"
+            f"SERVER={host},{port};"
+            f"DATABASE={db};"
+            f"UID={login};PWD={password};"
+            f"TrustServerCertificate=yes"
+        )
+        raw: Any = odbc.connect(conn_str)
+        return _MsConnection(raw)
+
     def close_connection(self, connection: Any) -> None:
         if connection is not None:
             connection.close()

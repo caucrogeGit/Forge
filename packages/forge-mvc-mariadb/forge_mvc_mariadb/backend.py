@@ -64,6 +64,32 @@ class MariaDBBackend:
             logger.exception("Pool épuisé ou connexion impossible : %s", error)
             raise
 
+    def get_admin_connection(
+        self,
+        *,
+        host: str,
+        port: int,
+        login: str,
+        password: str,
+        database: "str | None" = None,
+    ) -> Any:
+        """Connexion d'administration directe (DB_ADMIN_*), hors pool.
+
+        `database=None` pour `db:init` (la base n'existe pas encore) ; renseigné
+        pour `db:apply` et les migrations.
+        """
+        import mariadb
+        _mariadb: Any = mariadb
+        kwargs: dict[str, Any] = {
+            "host": host,
+            "port": port,
+            "user": login,
+            "password": password,
+        }
+        if database is not None:
+            kwargs["database"] = database
+        return _mariadb.connect(**kwargs)
+
     def close_connection(self, connection: Any) -> None:
         """Restitue la connexion au pool."""
         if connection is not None:

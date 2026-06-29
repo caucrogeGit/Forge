@@ -114,6 +114,28 @@ class PostgreSQLBackend:
         raw: Any = pg.connect(conninfo)
         return _PgConnection(raw)
 
+    def get_admin_connection(
+        self,
+        *,
+        host: str,
+        port: int,
+        login: str,
+        password: str,
+        database: "str | None" = None,
+    ) -> Any:
+        import psycopg
+
+        pg: Any = psycopg
+        # `db:init` (database=None) se connecte à la base de maintenance
+        # « postgres » pour créer la base du projet.
+        dbname = database or "postgres"
+        conninfo = (
+            f"host={host} port={port} dbname={dbname} "
+            f"user={login} password={password}"
+        )
+        raw: Any = pg.connect(conninfo)
+        return _PgConnection(raw)
+
     def close_connection(self, connection: Any) -> None:
         if connection is not None:
             connection.close()

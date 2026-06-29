@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 from cli.entities.model import ModelValidationError, check_model
 from cli.project.project_config import ProjectConfigError, load_project_config
@@ -134,20 +134,18 @@ def _connect_db():
         configure_serverless_db()
         return backend.get_connection()
 
-    import mariadb  # pyright: ignore[reportMissingTypeStubs]
-
     cfg = load_db_apply_config()
     try:
-        return cast("Any", mariadb).connect(
+        return backend.get_admin_connection(
             host=cfg.host,
             port=cfg.port,
-            user=cfg.login,
+            login=cfg.login,
             password=cfg.password,
             database=cfg.database,
         )
     except Exception as exc:
         raise DbApplyError(
-            "Connexion MariaDB d'administration impossible. "
+            "Connexion d'administration impossible. "
             "La base du projet n'est peut-être pas préparée. Lancez d'abord `forge db:init` "
             "ou vérifiez DB_ADMIN_* / DB_NAME dans env/dev."
         ) from exc

@@ -895,20 +895,18 @@ def _connect_db():
         configure_serverless_db()
         return backend.get_connection()
 
-    import mariadb  # pyright: ignore[reportMissingTypeStubs]
-
     cfg = load_migration_db_config()
     try:
-        return cast("Any", mariadb).connect(
+        return backend.get_admin_connection(
             host=cfg.host,
             port=cfg.port,
-            user=cfg.login,
+            login=cfg.login,
             password=cfg.password,
             database=cfg.database,
         )
     except Exception as exc:
         raise MigrationError(
-            "Connexion MariaDB admin impossible. "
+            "Connexion d'administration impossible. "
             "Vérifiez DB_ADMIN_* / DB_NAME dans env/dev."
         ) from exc
 

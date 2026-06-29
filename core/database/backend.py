@@ -179,6 +179,24 @@ class DatabaseBackend(Protocol):
         """Fournit une connexion prête à l'emploi (pool ou directe)."""
         ...
 
+    def get_admin_connection(
+        self,
+        *,
+        host: str,
+        port: int,
+        login: str,
+        password: str,
+        database: "str | None" = None,
+    ) -> Any:
+        """Connexion d'administration (DB_ADMIN_*) pour la DDL et le provisioning.
+
+        Utilisée par `db:init` (provisioning, `database=None`), `db:apply` et le
+        moteur de migrations (DDL, `database` renseigné). Réservée aux SGBD
+        serveur ; un backend sans serveur (`requires_provisioning=False`) lève
+        une erreur car il n'a pas de compte d'administration.
+        """
+        ...
+
     def close_connection(self, connection: Any) -> None:
         """Restitue/ferme la connexion empruntée."""
         ...
