@@ -391,6 +391,7 @@ nav:
       - Bases de données (backend, un seul par projet):
           - MariaDB: '!include packages/forge-mvc-mariadb/mkdocs.yml'
           - SQLite: '!include packages/forge-mvc-sqlite/mkdocs.yml'
+          - PostgreSQL (Alpha): '!include packages/forge-mvc-postgres/mkdocs.yml'
 
 markdown_extensions:
   - admonition
