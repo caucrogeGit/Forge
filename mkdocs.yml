@@ -10,10 +10,10 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   language: fr
+  custom_dir: overrides
   favicon: static/favicon.svg
   logo: static/forge-logo.png
   features:
-    - navigation.tabs
     - navigation.sections
     - navigation.top
     - content.code.copy
@@ -452,6 +452,7 @@ extra_css:
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/forge-nav.js
 
 plugins:
   - search:
