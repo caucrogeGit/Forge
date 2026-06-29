@@ -23,32 +23,46 @@
     <div id="nav-links" class="landing-nav-links">
     <a href="/docs/forge/guide/getting-started/"
        target="_blank" rel="noopener noreferrer"
-       class="text-sm font-medium text-white hover:text-white transition-colors">Démarrer</a>
+       class="landing-nav-link">Démarrer</a>
 
-    <a href="/docs/forge/features/crud/"
-       target="_blank" rel="noopener noreferrer"
-       class="text-sm font-medium text-white hover:text-white transition-colors">CRUD</a>
+    <div class="landing-nav-item" data-dropdown>
+      <button type="button" class="landing-nav-link landing-nav-trigger"
+              aria-haspopup="true" aria-expanded="false">
+        Documentation
+        <svg class="landing-nav-chevron" width="12" height="12" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="landing-nav-menu" role="menu">
+        <a href="/docs/forge/guide/getting-started/" target="_blank" rel="noopener noreferrer">Guide de démarrage</a>
+        <a href="/docs/forge/guide/concepts/" target="_blank" rel="noopener noreferrer">Architecture &amp; concepts</a>
+        <a href="/docs/forge/install/poste-linux/" target="_blank" rel="noopener noreferrer">Installation</a>
+        <a href="/docs/forge/reference/reference/" target="_blank" rel="noopener noreferrer">Référence (cœur + CLI)</a>
+        <a href="/docs/forge/reference/cli-commands/" target="_blank" rel="noopener noreferrer">Commandes CLI</a>
+        <a href="/docs/forge/reference/api/" target="_blank" rel="noopener noreferrer">API</a>
+      </div>
+    </div>
 
-    <a href="#api"
-       class="text-sm font-medium text-white hover:text-white transition-colors">API</a>
-
-    <a href="#starters"
-       class="text-sm font-medium text-white hover:text-white transition-colors">Starters</a>
-
-    <a href="/docs/forge/guide/concepts/"
-       target="_blank" rel="noopener noreferrer"
-       class="text-sm font-medium text-white hover:text-white transition-colors">Architecture</a>
-
-    <a href="/docs/forge/reference/reference/"
-       target="_blank" rel="noopener noreferrer"
-       class="text-sm font-medium text-white hover:text-white transition-colors">Référence</a>
+    <div class="landing-nav-item" data-dropdown>
+      <button type="button" class="landing-nav-link landing-nav-trigger"
+              aria-haspopup="true" aria-expanded="false">
+        Modules
+        <svg class="landing-nav-chevron" width="12" height="12" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="landing-nav-menu" role="menu">
+        <a href="#modules">Opt-ins (vue d'ensemble)</a>
+        <a href="/docs/forge/adr/054-database-backend-optins/" target="_blank" rel="noopener noreferrer">Bases de données (backends)</a>
+        <a href="#starters">Parcours &amp; starters</a>
+      </div>
+    </div>
 
     <a href="https://github.com/caucrogeGit/Forge"
        target="_blank" rel="noopener noreferrer"
-       class="text-sm font-medium text-white hover:text-white transition-colors">GitHub</a>
+       class="landing-nav-link">GitHub</a>
 
-    <a href="#contact"
-       class="text-sm font-medium text-white hover:text-white transition-colors">Contact</a>
+    <a href="#contact" class="landing-nav-link">Contact</a>
     </div>
   </div>
 

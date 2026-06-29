@@ -48,6 +48,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ── Nav menus déroulants (desktop : clic + clavier) ─────────────────────────
+  const dropdowns = document.querySelectorAll("[data-dropdown]");
+
+  function closeAllDropdowns() {
+    dropdowns.forEach((d) => {
+      d.classList.remove("is-open");
+      const t = d.querySelector(".landing-nav-trigger");
+      if (t) t.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  dropdowns.forEach((item) => {
+    const trigger = item.querySelector(".landing-nav-trigger");
+    if (!trigger) return;
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      const wasOpen = item.classList.contains("is-open");
+      closeAllDropdowns();
+      if (!wasOpen) {
+        item.classList.add("is-open");
+        trigger.setAttribute("aria-expanded", "true");
+      }
+    });
+  });
+
+  if (dropdowns.length) {
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-dropdown]")) closeAllDropdowns();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeAllDropdowns();
+    });
+  }
+
   // ── Copy buttons ──────────────────────────────────────────────────────────
   document.querySelectorAll("[data-copy]").forEach((btn) => {
     btn.addEventListener("click", () => {

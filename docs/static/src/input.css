@@ -252,4 +252,124 @@
       transition: margin-top 0.3s ease;
     }
   }
+
+  /* === Menus déroulants de la nav (LANDING-NAV-DROPDOWN-001) ===
+     Entrées simples et déclencheurs partagent .landing-nav-link. Sur desktop,
+     un .landing-nav-item ouvre son .landing-nav-menu au survol ou au clic
+     (classe .is-open posée en JS). Sous 1098px, les menus sont dépliés en
+     ligne dans le panneau hamburger (voir l'override @media plus bas). */
+  .landing-nav-link {
+    border-bottom: 2px solid transparent;
+    padding-bottom: 2px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    background: transparent;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .landing-nav-link:hover {
+    border-bottom-color: #E8651A;
+  }
+
+  .landing-nav-item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .landing-nav-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .landing-nav-chevron {
+    transition: transform 0.18s ease;
+  }
+  .landing-nav-item:hover .landing-nav-chevron,
+  .landing-nav-item.is-open .landing-nav-chevron {
+    transform: rotate(180deg);
+  }
+
+  .landing-nav-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.85rem;
+    min-width: 15rem;
+    background: #000;
+    border: 1px solid rgba(232, 101, 26, 0.5);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+    z-index: 60;
+  }
+  .landing-nav-item:hover .landing-nav-menu,
+  .landing-nav-item.is-open .landing-nav-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .landing-nav-menu a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom: none;
+    white-space: nowrap;
+    transition: background 0.12s, color 0.12s;
+  }
+  .landing-nav-menu a:hover {
+    background: rgba(232, 101, 26, 0.15);
+    color: #fff;
+    border-bottom: none;
+  }
+
+  @media (max-width: 1098px) {
+    /* Dans le panneau hamburger : chaque menu devient un groupe déplié, le
+       déclencheur sert d'en-tête (non cliquable) et les liens sont indentés.
+       Tout reste dans le flux, donc le calcul de hauteur (--nav-push) est exact. */
+    .landing-nav-item {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+    }
+    .landing-nav-trigger {
+      pointer-events: none;
+      opacity: 0.6;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .landing-nav-chevron {
+      display: none;
+    }
+    .landing-nav-menu {
+      position: static;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0.4rem 0 0 0.75rem;
+      margin-top: 0.4rem;
+      min-width: 0;
+      gap: 0.5rem;
+      z-index: auto;
+    }
+    .landing-nav-menu a {
+      padding: 0.1rem 0;
+    }
+  }
 }

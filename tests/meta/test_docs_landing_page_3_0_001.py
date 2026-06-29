@@ -149,7 +149,9 @@ class TestNewElementsPresent:
 
 
 class TestNavigationStructure:
-    """La navigation a la structure beta.6 (7 entrées plates, sans dropdowns)."""
+    """La navigation est simplifiée : entrées simples Démarrer/GitHub/Contact
+    plus deux menus déroulants Documentation et Modules (LANDING-NAV-DROPDOWN-001).
+    L'entrée CRUD a été retirée du menu."""
 
     def setup_method(self):
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
@@ -183,19 +185,47 @@ class TestNavigationStructure:
             "La navbar ne devrait plus utiliser min-h-40 — remplacé par h-32 compacte"
         )
 
+    def _nav_section(self):
+        nav_end = self.source.find("</nav>")
+        return self.source[:nav_end] if nav_end != -1 else self.source
+
     @pytest.mark.parametrize("nav_label", [
-        ">Démarrer<",
-        ">CRUD<",
-        ">API<",
-        ">Starters<",
-        ">Architecture<",
-        ">Référence<",
-        ">GitHub<",
+        "Démarrer",
+        "Documentation",
+        "Modules",
+        "GitHub",
+        "Contact",
     ])
     def test_nav_entry_present(self, nav_label):
-        assert nav_label in self.source, (
+        assert nav_label in self._nav_section(), (
             f"La nav devrait contenir l'entrée '{nav_label}' "
-            f"(menu LANDING-BETA9-UPDATE-001)"
+            f"(menu LANDING-NAV-DROPDOWN-001)"
+        )
+
+    def test_nav_has_two_dropdowns(self):
+        """Deux menus déroulants (Documentation, Modules) avec leurs panneaux."""
+        nav = self._nav_section()
+        assert nav.count("data-dropdown") >= 2, (
+            "La nav devrait contenir deux menus déroulants (data-dropdown)"
+        )
+        assert "landing-nav-menu" in nav, (
+            "Les déroulants doivent porter un panneau .landing-nav-menu"
+        )
+
+    @pytest.mark.parametrize("entry", [
+        "Architecture &amp; concepts",
+        "Commandes CLI",
+        "Bases de données (backends)",
+    ])
+    def test_nav_dropdown_entries_present(self, entry):
+        assert entry in self._nav_section(), (
+            f"Le contenu des déroulants devrait inclure '{entry}'"
+        )
+
+    def test_nav_crud_entry_removed(self):
+        """L'option CRUD a disparu de la navigation (LANDING-NAV-DROPDOWN-001)."""
+        assert ">CRUD<" not in self._nav_section(), (
+            "L'entrée CRUD ne doit plus figurer dans la navigation"
         )
 
     def test_no_briques_dropdown_in_nav(self):
