@@ -23,7 +23,7 @@ Le module vidéo a besoin de savoir où trouver `ffmpeg`, où ranger les fichier
 ## 3. Charger la configuration
 
 ```python
-from forge_mvc_video import load_video_config
+from forge_mvc_video.config import load_video_config
 
 config = load_video_config()
 ```

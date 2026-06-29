@@ -12,7 +12,7 @@ La validation profonde (vrai conteneur, durée) appartient au [sondage](probe.md
 ## 2. Ingérer une vidéo
 
 ```python
-from forge_mvc_video import ingest_video, VideoIngestError
+from forge_mvc_video.ingest import ingest_video, VideoIngestError
 
 try:
     record = ingest_video(data, filename="clip.mov", title="Mon clip")

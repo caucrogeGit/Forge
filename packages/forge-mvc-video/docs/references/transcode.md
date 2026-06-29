@@ -14,7 +14,7 @@ Les constructeurs de commande sont **purs** (testables sans `ffmpeg`) ; seule l'
 ## 2. Transcoder et extraire un poster
 
 ```python
-from forge_mvc_video import transcode_to_mp4, generate_poster, FfmpegError
+from forge_mvc_video.transcode import transcode_to_mp4, generate_poster, FfmpegError
 
 try:
     transcode_to_mp4("in.mov", "out.mp4")

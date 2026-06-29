@@ -14,7 +14,7 @@ C'est un **worker** : il est conçu pour tourner en tâche de fond, car le trans
 ## 2. Traiter une vidéo
 
 ```python
-from forge_mvc_video import process_video, VideoProcessError
+from forge_mvc_video.process import process_video, VideoProcessError
 
 try:
     result = process_video(video_id)

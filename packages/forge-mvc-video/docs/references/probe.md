@@ -12,7 +12,7 @@ Il sert aussi de **validation profonde** : un fichier sans flux vidéo, ou que `
 ## 2. Sonder une vidéo
 
 ```python
-from forge_mvc_video import probe_video, VideoProbeError
+from forge_mvc_video.probe import probe_video, VideoProbeError
 
 try:
     meta = probe_video("storage/video/<uuid>.mov")
