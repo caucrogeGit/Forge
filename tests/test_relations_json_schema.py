@@ -305,10 +305,15 @@ class TestManyToMany:
             "manyToMany.inverse_name doit référencer common.schema.json#/$defs/relationName."
         )
 
-    def test_m2m_pivot_refs_pivot_schema(self, m2m):
-        ref = m2m["properties"]["pivot"].get("$ref", "")
-        assert "pivot.schema.json" in ref, (
-            "manyToMany.pivot doit référencer pivot.schema.json."
+    def test_m2m_pivot_est_objet_opaque(self, m2m):
+        # ADR-057 : le cœur ne référence plus pivot.schema.json ; le bloc pivot
+        # enrichi est un objet opaque, validé par l'opt-in forge-mvc-pivot.
+        pivot = m2m["properties"]["pivot"]
+        assert "$ref" not in pivot, (
+            "manyToMany.pivot ne doit plus référencer pivot.schema.json (ADR-057)."
+        )
+        assert pivot.get("type") == "object", (
+            "Le bloc pivot est un objet opaque côté cœur (ADR-057)."
         )
 
     def test_m2m_only_expected_properties(self, m2m):

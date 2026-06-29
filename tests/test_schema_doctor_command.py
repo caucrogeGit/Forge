@@ -89,9 +89,9 @@ def test_human_output_lists_common():
     assert code == 0
 
 
-def test_human_output_lists_all_five_schemas():
+def test_human_output_lists_all_four_schemas():
     stdout, _, _ = _run([])
-    for name in ("common", "field", "entity", "pivot", "relations"):
+    for name in ("common", "field", "entity", "relations"):
         assert name in stdout
 
 
@@ -140,10 +140,10 @@ def test_json_output_valid_true():
     assert code == 0
 
 
-def test_json_output_schemas_checked_five():
+def test_json_output_schemas_checked_four():
     stdout, _, _ = _run(["--json"])
     obj = json.loads(stdout)
-    assert obj["schemas_checked"] == 5
+    assert obj["schemas_checked"] == 4
 
 
 def test_json_output_errors_count_zero():

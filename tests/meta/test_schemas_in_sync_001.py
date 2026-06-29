@@ -34,12 +34,17 @@ BASE_SCHEMAS = [
     "common.schema.json",
     "entity.schema.json",
     "field.schema.json",
-    "pivot.schema.json",
     "relations.schema.json",
 ]
-# rbac.schema.json est extrait du cœur vers l'opt-in forge-mvc-rbac (ADR-056) :
-# absent des trois copies, embarqué par le paquet.
+# Schémas extraits du cœur vers leur opt-in (absents des trois copies du cœur,
+# embarqués par le paquet) :
+#   - rbac.schema.json  -> forge-mvc-rbac  (ADR-056)
+#   - pivot.schema.json -> forge-mvc-pivot (ADR-057)
 RBAC_SCHEMA = "rbac.schema.json"
+PIVOT_SCHEMA = "pivot.schema.json"
+PIVOT_PACKAGE_SCHEMA = (
+    ROOT / "packages" / "forge-mvc-pivot" / "forge_mvc_pivot" / "schemas" / PIVOT_SCHEMA
+)
 RBAC_PACKAGE_SCHEMA = (
     ROOT / "packages" / "forge-mvc-rbac" / "forge_mvc_rbac" / "schemas" / RBAC_SCHEMA
 )
@@ -91,4 +96,17 @@ def test_rbac_schema_extrait_du_coeur():
         )
     assert RBAC_PACKAGE_SCHEMA.exists(), (
         f"{RBAC_SCHEMA} doit être embarqué par forge-mvc-rbac : {RBAC_PACKAGE_SCHEMA}."
+    )
+
+
+def test_pivot_schema_extrait_du_coeur():
+    """pivot.schema.json a quitté le cœur (ADR-057) : absent des trois copies,
+    embarqué par l'opt-in forge-mvc-pivot."""
+    for absent_dir in (CLI_SCHEMAS, PROJECT_SCHEMAS, SKELETON_SCHEMAS):
+        assert not (absent_dir / PIVOT_SCHEMA).exists(), (
+            f"{PIVOT_SCHEMA} ne doit plus être dans {absent_dir} (extrait vers "
+            f"l'opt-in forge-mvc-pivot, ADR-057)."
+        )
+    assert PIVOT_PACKAGE_SCHEMA.exists(), (
+        f"{PIVOT_SCHEMA} doit être embarqué par forge-mvc-pivot : {PIVOT_PACKAGE_SCHEMA}."
     )

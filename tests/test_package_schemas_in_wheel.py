@@ -17,7 +17,6 @@ EXPECTED_SCHEMAS = {
     "cli/schemas/common.schema.json",
     "cli/schemas/field.schema.json",
     "cli/schemas/entity.schema.json",
-    "cli/schemas/pivot.schema.json",
     "cli/schemas/relations.schema.json",
     "cli/schemas/forge.schema.index.json",
 }
@@ -77,7 +76,7 @@ def test_wheel_schema_count():
     with zipfile.ZipFile(wheel) as z:
         names = set(z.namelist())
     found = names & EXPECTED_SCHEMAS
-    assert len(found) == 6, f"Attendus 6, trouvés {len(found)}: {sorted(found)}"
+    assert len(found) == 5, f"Attendus 5, trouvés {len(found)}: {sorted(found)}"
 
 
 # ---------------------------------------------------------------------------
@@ -144,7 +143,6 @@ SCHEMA_FILENAMES = [
     "common.schema.json",
     "field.schema.json",
     "entity.schema.json",
-    "pivot.schema.json",
     "relations.schema.json",
     "forge.schema.index.json",
 ]

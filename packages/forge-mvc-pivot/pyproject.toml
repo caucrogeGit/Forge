@@ -34,4 +34,4 @@ where = ["."]
 include = ["forge_mvc_pivot*"]
 
 [tool.setuptools.package-data]
-"forge_mvc_pivot" = ["py.typed"]
+"forge_mvc_pivot" = ["py.typed", "schemas/*.json"]

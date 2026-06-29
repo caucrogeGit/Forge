@@ -3,7 +3,7 @@
 Vérifie que schemas/forge.schema.index.json :
 - existe et est un JSON valide ;
 - contient schema_version = "1.0" ;
-- contient schemas avec exactement 5 entrées connues ;
+- contient schemas avec exactement 4 entrées connues ;
 - chaque chemin commence par "./" ;
 - chaque chemin pointe vers un fichier existant dans schemas/ ;
 - chaque clé pointe vers le bon fichier attendu ;
@@ -30,7 +30,6 @@ _EXPECTED_SCHEMAS = {
     "common": "./common.schema.json",
     "field": "./field.schema.json",
     "entity": "./entity.schema.json",
-    "pivot": "./pivot.schema.json",
     "relations": "./relations.schema.json",
 }
 

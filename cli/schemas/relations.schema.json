@@ -101,8 +101,8 @@
           "description": "Nom de la relation inverse côté cible (snake_case). Optionnel."
         },
         "pivot": {
-          "$ref": "pivot.schema.json",
-          "description": "Définition de la table pivot. Réutilise pivot.schema.json."
+          "type": "object",
+          "description": "Définition de la table pivot enrichie. La structure détaillée est validée par l'opt-in forge-mvc-pivot (ADR-057) ; le cœur ne valide que la présence d'un objet."
         }
       }
     }

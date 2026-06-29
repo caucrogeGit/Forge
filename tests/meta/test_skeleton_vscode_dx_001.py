@@ -39,11 +39,12 @@ SKELETON_SCHEMAS = SKELETON_DATA / "schemas"
 REFERENCED_SCHEMAS = ["entity.schema.json", "relations.schema.json"]
 
 # Schémas cœur embarqués : entity + relations et leurs dépendances $ref
-# (field, common ; pivot car relations.schema.json référence pivot.schema.json
-# pour les relations many_to_many).
+# (field, common). pivot n'y est plus : relations.schema.json ne référence plus
+# pivot.schema.json (bloc pivot opaque), pivot est extrait vers forge-mvc-pivot
+# (ADR-057).
 SHIPPED_SCHEMAS = [
     "entity.schema.json", "field.schema.json", "common.schema.json",
-    "relations.schema.json", "pivot.schema.json",
+    "relations.schema.json",
 ]
 
 

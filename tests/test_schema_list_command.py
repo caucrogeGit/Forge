@@ -83,11 +83,6 @@ def test_human_output_lists_entity():
     assert "entity" in stdout
 
 
-def test_human_output_lists_pivot():
-    stdout, _, code = _run([])
-    assert "pivot" in stdout
-
-
 def test_human_output_lists_relations():
     stdout, _, code = _run([])
     assert "relations" in stdout
@@ -103,7 +98,7 @@ def test_human_output_shows_ok_for_present_files():
 def test_human_output_shows_total():
     stdout, _, code = _run([])
     assert "Total" in stdout
-    assert "5" in stdout
+    assert "4" in stdout
 
 
 def test_human_output_contains_schema_paths():
@@ -130,10 +125,10 @@ def test_json_output_valid_true():
     assert code == 0
 
 
-def test_json_output_count_equals_five():
+def test_json_output_count_equals_four():
     stdout, _, _ = _run(["--json"])
     obj = json.loads(stdout)
-    assert obj["count"] == 5
+    assert obj["count"] == 4
 
 
 def test_json_output_schema_version():
@@ -152,14 +147,14 @@ def test_json_output_contains_schemas_list():
     stdout, _, _ = _run(["--json"])
     obj = json.loads(stdout)
     assert isinstance(obj["schemas"], list)
-    assert len(obj["schemas"]) == 5
+    assert len(obj["schemas"]) == 4
 
 
 def test_json_output_contains_all_schema_names():
     stdout, _, _ = _run(["--json"])
     obj = json.loads(stdout)
     names = {s["name"] for s in obj["schemas"]}
-    assert names == {"common", "field", "entity", "pivot", "relations"}
+    assert names == {"common", "field", "entity", "relations"}
 
 
 def test_json_output_contains_paths():

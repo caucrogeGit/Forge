@@ -29,7 +29,11 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent
-SCHEMA_PATH = PROJECT_ROOT / "schemas" / "pivot.schema.json"
+# pivot.schema.json est extrait vers l'opt-in forge-mvc-pivot (ADR-057).
+SCHEMA_PATH = (
+    PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "forge_mvc_pivot"
+    / "schemas" / "pivot.schema.json"
+)
 
 _REQUIRED_FIELDS = frozenset({"table", "from_key", "to_key", "id", "unique_pair"})
 
