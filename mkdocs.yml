@@ -297,6 +297,7 @@ nav:
             - ADR-055 Classification des opt-ins par destination: adr/055-optin-categories.md
             - ADR-056 Extraction du contrat et de l'outillage RBAC: adr/056-rbac-contract-tooling-extraction.md
             - ADR-057 Découplage du schéma pivot: adr/057-pivot-schema-decoupling.md
+            - ADR-058 Source unique des schémas JSON: adr/058-schemas-single-source.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

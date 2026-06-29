@@ -64,3 +64,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-055](055-optin-categories.md) | Classification des opt-ins par destination : champ `category` au catalogue, taxonomie unique (CLI + docs), sans renommer les paquets (proposé) |
 | [ADR-056](056-rbac-contract-tooling-extraction.md) | Extraction du contrat (schéma) et de l'outillage RBAC (`rbac:validate`/`rbac:audit`) du cœur vers l'opt-in `forge-mvc-rbac` (proposé) |
 | [ADR-057](057-pivot-schema-decoupling.md) | Découplage du schéma pivot : `relations` (cœur) cesse de référencer `pivot` (bloc opaque), `pivot.schema.json` extrait vers `forge-mvc-pivot` (proposé) |
+| [ADR-058](058-schemas-single-source.md) | Source unique des schémas JSON : `cli/schemas/` canonique, suppression de la copie racine `schemas/`, squelette et embeds opt-in = copies dérivées gardées (proposé) |
