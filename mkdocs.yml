@@ -372,6 +372,7 @@ nav:
 
   # Opt-ins officiels à doc embarquée par paquet (ADR-038), regroupés (ADR-039).
   - Opt-ins officiels:
+      - Vue d'ensemble: optins/index.md
       - Admin: '!include packages/forge-mvc-admin/mkdocs.yml'
       - MFA: '!include packages/forge-mvc-mfa/mkdocs.yml'
       - RBAC: '!include packages/forge-mvc-rbac/mkdocs.yml'
