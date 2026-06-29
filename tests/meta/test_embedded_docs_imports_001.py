@@ -24,7 +24,13 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # Racines de docs embarquées (un sous-paquet = un dossier docs/).
-_DOC_GLOBS = ("core/*/docs/**/*.md", "cli/*/docs/**/*.md", "packages/*/docs/**/*.md")
+_DOC_GLOBS = (
+    "core/*/docs/**/*.md",
+    "core/docs/**/*.md",
+    "cli/*/docs/**/*.md",
+    "integrations/*/docs/**/*.md",
+    "packages/*/docs/**/*.md",
+)
 
 # Racines de projet utilisateur : présentes dans un projet généré, pas dans le
 # dépôt framework. On ne les vérifie pas.

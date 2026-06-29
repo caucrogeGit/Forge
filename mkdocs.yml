@@ -105,6 +105,7 @@ nav:
         - Base de données (cœur, par module): '!include core/database/mkdocs.yml'
         - Validation (cœur, par module): '!include core/validation/mkdocs.yml'
         - Templating (cœur, par module): '!include core/templating/mkdocs.yml'
+        - Intégration Jinja2 (renderer): '!include integrations/jinja2/mkdocs.yml'
         - Erreurs runtime (cœur, par module): '!include core/errors/mkdocs.yml'
         - Application (cœur, par module): '!include core/app/mkdocs.yml'
         - Formulaires (cœur, par module): '!include core/forms/mkdocs.yml'
