@@ -1,0 +1,23 @@
+# Documentation embarquée du paquet forge-mvc-mariadb (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /mariadb/.
+site_name: mariadb
+docs_dir: docs
+nav:
+  - Présentation: index.md
+  - Référence: reference.md
+  - Progression MariaDB:
+      - Installation: welcome/installation.md
+      - Débutant:
+          - Provisionner la base: welcome/debutant/mariadb-welcome.md
+          - Appliquer une entité: welcome/debutant/mariadb-apply.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Faire évoluer le schéma: welcome/intermediaire/mariadb-migrate.md
+          - Les deux comptes: welcome/intermediaire/mariadb-creds.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Le dialecte MariaDB: welcome/avance/mariadb-dialect.md
+          - Vers la production: welcome/avance/mariadb-prod.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md
