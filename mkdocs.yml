@@ -294,6 +294,7 @@ nav:
             - ADR-052 Stratégie des opt-ins: adr/052-optin-strategy.md
             - ADR-053 Extraction du déploiement: adr/053-deploy-extraction.md
             - ADR-054 Cœur agnostique BDD et backends opt-in: adr/054-database-backend-optins.md
+            - ADR-055 Classification des opt-ins par destination: adr/055-optin-categories.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

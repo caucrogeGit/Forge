@@ -61,3 +61,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-052](052-optin-strategy.md) | Stratégie et critères des opt-ins : deux filtres d'admission (runtime WSGI, charte), classification des candidats, ordre recommandé (proposé) |
 | [ADR-053](053-deploy-extraction.md) | Extraction du déploiement (`deploy:init`/`deploy:check` + gabarits + doc) dans un opt-in CLI-only `forge-mvc-deploy` (proposé) |
 | [ADR-054](054-database-backend-optins.md) | Cœur agnostique BDD : backends (MariaDB, SQLite, PostgreSQL, SQL Server) en opt-ins exclusifs, découverts par entry points (proposé) |
+| [ADR-055](055-optin-categories.md) | Classification des opt-ins par destination : champ `category` au catalogue, taxonomie unique (CLI + docs), sans renommer les paquets (proposé) |
