@@ -60,3 +60,52 @@
 .md-typeset p:has(img.center) {
   text-align: center;
 }
+
+/* DOCS-NAV-LANDING-DESIGN-001, Aligner le design de la navigation de la doc sur
+   la barre de la landing (index.html) : accent orange #E8651A, header noir
+   bordé d'orange, onglets soulignés à l'orange au survol et sur l'onglet actif,
+   champ de recherche au même look, lien actif de la sidebar en orange. */
+
+:root {
+  --md-accent-fg-color: #E8651A;
+}
+
+/* Header : bordure orange sous la barre, comme la nav de la landing. */
+.md-header {
+  border-bottom: 2px solid #E8651A;
+  box-shadow: none;
+}
+
+/* Barre d'onglets : fond noir, liens blancs, soulignement orange au survol et
+   sur l'onglet actif (comme les liens de la nav de la landing). */
+.md-tabs {
+  background-color: #000;
+  border-bottom: 1px solid rgba(232, 101, 26, 0.4);
+}
+.md-tabs__link {
+  color: #fff;
+  opacity: 1;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+.md-tabs__link:hover,
+.md-tabs__item--active > .md-tabs__link {
+  color: #fff;
+  border-bottom-color: #E8651A;
+}
+
+/* Champ de recherche : fond translucide et bordure orange, comme la landing. */
+.md-search__form {
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid #E8651A;
+  border-radius: 8px;
+}
+.md-search__form:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Sidebar : page active marquée à l'orange (cohérent avec l'accent). */
+.md-nav__link--active,
+.md-nav__item .md-nav__link--active {
+  color: #E8651A;
+}
