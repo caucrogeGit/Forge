@@ -136,6 +136,20 @@ def init_project_database() -> list[str]:
         # Backend sans serveur (SQLite) : ni base ni comptes à créer.
         return _init_serverless(backend)
 
+    # Le provisioning ci-dessous (CREATE DATABASE / CREATE USER / GRANT) est
+    # spécifique à MariaDB. Pour les autres SGBD serveur (PostgreSQL, SQL
+    # Server), le provisioning automatique n'est pas encore implémenté : on
+    # révèle clairement la limite plutôt que d'exécuter du SQL MariaDB qui
+    # échouerait avec une erreur cryptique (charte, règle B).
+    backend_name = getattr(backend, "name", "")
+    if backend_name != "mariadb":
+        raise DbInitError(
+            f"`forge db:init` ne provisionne pas encore le backend "
+            f"« {backend_name} ». Créez la base et le compte applicatif à la "
+            f"main (voir le README du paquet forge-mvc-{backend_name}), puis "
+            f"lancez `forge db:apply` pour créer les tables."
+        )
+
     cfg = load_db_init_config()
     connection = _connect_admin(cfg)
     actions: list[str] = []
