@@ -1,31 +1,123 @@
 # La commande doctor dans Forge
 
-Ce document décrit la commande `forge doctor`.
+`forge doctor` réalise un diagnostic large et tolérant d'un projet Forge, en lecture seule.
 
-Le fichier de code correspondant est `cli/project/doctor.py`.
+Elle informe et oriente sans jamais bloquer ni modifier le projet.
+Pour un contrôle strict orienté CI, voir `forge project:check`.
 
-## 1. À quoi sert cette commande ?
+## 1. Rôle
 
-`forge doctor` réalise un diagnostic large et tolérant du projet, en lecture seule.
-Elle vérifie l'environnement Python, la configuration, la structure MVC, les entités, le TLS de développement, la présence de Node, et d'autres points.
+`forge doctor` parcourt un ensemble de contrôles unitaires sur le projet courant et affiche un rapport synthétique.
 
-Elle est volontairement tolérante : elle informe et oriente, sans bloquer.
-Pour un contrôle strict orienté CI, voir [`project:check`](project_check.md).
+Elle vérifie la version de Python, la configuration d'environnement, la structure MVC, les entités, les migrations, l'i18n, les templates, le registre de modules, les dépendances de sécurité MFA et RBAC, les certificats TLS de développement, la présence de Node, une connexion base de données, et quelques garde-fous statiques de sécurité production.
 
-## 2. L'API
+Chaque contrôle produit un statut : `ok`, `warn`, `fail` ou `skip`.
+La commande renvoie un code de sortie non nul seulement si au moins un contrôle est en `fail`.
 
-| Symbole | Rôle |
+## 2. Vue d'ensemble rapide
+
+| Élément | Valeur |
 |---|---|
-| `CheckResult` | résultat unitaire d'un contrôle (statut, libellé, détail) |
-| `load_project_config(root)` | charge la configuration du projet |
-| `check_python()`, `check_env(root)`, `check_mvc_structure(root)`, `check_model_entities(root)`, `check_ssl(root, config)`, `check_node()` | contrôles unitaires de diagnostic |
+| Commande forge | `forge doctor` |
+| Module Python | `cli.project.doctor` |
+| Catégorie | commande projet (diagnostic) |
+| Rôle | diagnostiquer un projet de façon tolérante |
+| Entrées | racine du projet courant, `config.py`, `env/`, `mvc/` |
+| Sorties | rapport sur la sortie standard, code de sortie selon les `fail` |
+| Fichiers touchés | aucun (lecture seule) |
+| Mode Forge | lit |
+| Posture | tolérante (informe et oriente) |
 
-## 3. Contextes d'utilisation
+`forge doctor` ne réécrit jamais le projet.
+Elle lit la configuration et la structure, puis restitue des observations.
 
-- **Premier réflexe** : diagnostiquer un projet qui ne démarre pas.
-- **Tour d'horizon** : vérifier l'environnement avant de travailler.
+## 3. Schémas UML
 
-## 4. Voir aussi
+### 3.1 Diagramme de séquence
 
-- [La commande project:check](project_check.md) : contrôle strict CI-ready.
-- [La commande project:audit](project_audit.md) : rapport d'audit détaillé.
+Le diagramme montre comment `forge doctor` enchaîne ses contrôles et calcule son code de sortie.
+
+```mermaid
+sequenceDiagram
+    actor Dev as Développeur
+    participant Doctor as forge doctor
+    participant Config as load_project_config
+    participant Checks as Contrôles unitaires
+
+    Dev->>Doctor: forge doctor
+    Doctor->>Config: charge config.py (isolé)
+    Doctor->>Checks: exécute chaque check dans l'ordre
+    Checks-->>Doctor: CheckResult (ok/warn/fail/skip)
+    Doctor->>Doctor: assemble le rapport
+    Doctor-->>Dev: affiche le rapport
+    alt au moins un fail
+        Doctor-->>Dev: exit 1
+    else aucun fail
+        Doctor-->>Dev: exit 0
+    end
+```
+
+À retenir :
+
+- la configuration est chargée en isolation, sans polluer `sys.modules` ;
+- chaque contrôle est tolérant : une exception inattendue devient un `fail` lisible, pas un crash ;
+- seuls les `fail` font échouer la commande ; les `warn` et `skip` restent informatifs.
+
+## 4. API publique
+
+| Symbole | Signature | Rôle |
+|---|---|---|
+| `CheckResult` | `CheckResult(status, label, detail="")` | résultat unitaire d'un contrôle |
+| `load_project_config` | `load_project_config(root: Path) -> ModuleType \| None` | charge `config.py` en isolation, ou `None` |
+| `run_all` | `run_all(root: Path, version: str) -> list[CheckResult]` | exécute tous les contrôles dans l'ordre |
+| `print_report` | `print_report(results, version) -> None` | affiche le rapport sur la sortie standard |
+| `has_failures` | `has_failures(results) -> bool` | indique si un contrôle est en `fail` |
+
+Contrôles unitaires : `check_python`, `check_env`, `check_mvc_structure`, `check_model_entities`, `check_migrations`, `check_i18n`, `check_templates`, `check_modules`, `check_mfa_dependency`, `check_rbac_dependency`, `check_ssl`, `check_node`, `check_db`, `check_prod_security`.
+
+## 5. Contextes d'utilisation
+
+| Besoin | Commande |
+|---|---|
+| Diagnostiquer un projet qui ne démarre pas | `forge doctor` |
+| Vérifier l'environnement avant de travailler | `forge doctor` |
+| Contrôler strictement avant fusion (CI) | `forge project:check` |
+| Obtenir un panorama détaillé par familles | `forge project:audit` |
+
+## 6. Exemples d'utilisation
+
+Lancer le diagnostic depuis la racine du projet :
+
+```bash
+forge doctor
+```
+
+Extrait de rapport indicatif :
+
+```text
+Forge doctor - 1.0.0bN
+
+  [OK]    Python - 3.12.x - requis >= 3.12
+  [OK]    Structure MVC - mvc/ valide
+  [WARN]  Certificats SSL - Absent : cert.pem - relance openssl pour les generer
+  [SKIP]  MFA (securite) - aucun indice MFA dans ce projet
+
+0 avertissement(s), 0 erreur(s).
+```
+
+## 7. Détails et limites
+
+!!! tip "Tolérance assumée"
+    `forge doctor` privilégie l'orientation : la plupart des manques produisent un `warn` ou un `skip`, pas un `fail`.
+    Un projet vierge, sans entité ni migration, est un état nominal et ne déclenche pas d'erreur.
+
+!!! note "Connexion base de données non bloquante"
+    Le contrôle base de données tente une connexion applicative avec un court délai.
+    Une connexion impossible avant `forge db:init` est attendue et produit un simple avertissement.
+
+## Voir aussi
+
+- [La commande project:check](project_check.md) : contrôle strict prêt pour la CI.
+- [La commande project:audit](project_audit.md) : rapport d'audit détaillé par familles.
+- [Le chargement de configuration projet](project_config.md) : lecture explicite de la configuration.
+- [La commande run](run.md) : lancement de l'application.
