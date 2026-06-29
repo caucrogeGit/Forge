@@ -9,7 +9,9 @@
 Forge est un framework web applicatif Python, MVC et explicite, pour des
 applications de production dont vous comprenez et auditez chaque ligne.
 Pas de magie cachée, SQL visible, sécurisé par défaut, runtime minimal
-(cinq dépendances). HTTPS et Jinja2 intégrés.
+(quatre dépendances). HTTPS et Jinja2 intégrés.
+Le cœur est agnostique de la base de données ; le backend (SQLite, MariaDB,
+PostgreSQL, SQL Server) s'ajoute en opt-in.
 
 ---
 
@@ -57,8 +59,10 @@ forge run
 
 `forge new` prépare tout le projet : squelette, environnement Python avec
 `forge-mvc`, fichier `env/dev`, certificat HTTPS de développement et dépôt Git.
-Les premiers paliers tournent sans base de données ; MariaDB et `forge db:init`
-ne deviennent nécessaires qu'à partir du palier « Première base SQL ».
+Les premiers paliers tournent sans base de données ; un backend SQL
+(`forge-mvc-sqlite`, sans configuration, ou `forge-mvc-mariadb`) et
+`forge db:init` ne deviennent nécessaires qu'à partir du palier
+« Première base SQL ».
 
 Pour construire pas à pas votre première application, suivez le parcours cœur
 Welcome Forge :
@@ -101,6 +105,7 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 
 - MVC serveur explicite, sans magie cachée
 - SQL visible, pas d'ORM imposé
+- Base de données au choix : SQLite, MariaDB, PostgreSQL ou SQL Server (backend opt-in, cœur agnostique)
 - Générateurs prudents : Forge ne réécrit pas votre code
 - Documentation officielle complète
 - Sécurité web par défaut (CSRF, Argon2id, headers, autoescape)
@@ -126,14 +131,28 @@ maintenez des années, sécurisée par défaut et reposant sur un runtime minusc
 | [`forge-mvc-mail`](https://pypi.org/project/forge-mvc-mail/) | Envoi de courriels extrait du core | RC |
 | `forge-mvc-i18n` | Internationalisation : catalogues JSON, fallback, helper `trans()` (repli no-op du noyau) | RC (publication à venir) |
 | `forge-mvc-qrcode` | Génération de QR Codes (PNG/SVG) depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur | RC (publication à venir) |
-| `forge-mvc-settings` | Paramètres applicatifs persistés en MariaDB (table `app_settings`), API explicite `get_setting`/`set_setting` | RC (publication à venir) |
+| `forge-mvc-settings` | Paramètres applicatifs persistés en base SQL (table `app_settings`), API explicite `get_setting`/`set_setting` | RC (publication à venir) |
 | `forge-mvc-import-export` | Échange CSV : import (validation par champ, rapport d'erreurs, insertion via un callback) et export programmatique (`to_csv`) | RC (publication à venir) |
 | `forge-mvc-audit` | Journal d'audit applicatif (table `audit_log`, `record_audit`/`get_audit_log`), borné (pas un SIEM) | RC (publication à venir) |
-| `forge-mvc-jobs` | File de tâches de fond adossée à MariaDB (`enqueue` + worker `drain`/`run_worker`), sans broker ni async | RC (publication à venir) |
+| `forge-mvc-jobs` | File de tâches de fond adossée à la base SQL (`enqueue` + worker `drain`/`run_worker`), sans broker ni async | RC (publication à venir) |
 | `forge-mvc-notifications` | Notifications in-app (table `notifications`, `notify`/`get_notifications`/`mark_read`) | RC (publication à venir) |
 | `forge-mvc-deploy` | Outillage de déploiement opt-in CLI-only : `deploy:init` (gabarits Nginx/systemd/WSGI) et `deploy:check`, sans API runtime (ADR-053) | RC (publication à venir) |
 | `forge-mvc-admin` | Back-office applicatif : CRUD générique sur les entités déclarées, auth + CSRF, RBAC optionnel (voir la [roadmap Forge Admin](docs/roadmap/forge-admin-roadmap.md)) | RC (non publié) |
 | `forge-mvc-testing` | Infrastructure de test partagée (`FakeRequest` + plugin pytest) pour tester Forge et ses opt-ins, y compris par des tiers (ADR-041) | RC |
+
+### Backends de base de données (ADR-054)
+
+Le cœur ne parle pas directement à une base : il choisit un backend, **exclusif**,
+**un seul par projet**, déclaré comme opt-in. La connexion, le dialecte SQL et le
+provisionnement (`db:init`, migrations) passent par ce backend ; le code applicatif
+reste identique quel que soit le moteur.
+
+| Backend | Base de données | Maturité |
+|---------|-----------------|----------|
+| `forge-mvc-mariadb` | MariaDB / MySQL | RC |
+| `forge-mvc-sqlite` | SQLite (sans serveur, idéal pour démarrer et tester) | RC |
+| `forge-mvc-postgres` | PostgreSQL | Alpha |
+| `forge-mvc-mssql` | SQL Server | Alpha |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus
@@ -159,7 +178,8 @@ Toute la documentation est publiée sur
 - Référence de la CLI `forge`
 - Entités, modèles, SQL et migrations
 - Formulaires, validation, CSRF, sessions
-- Modules opt-in (RBAC, workflow, stats, MFA, files, images, audio, IoT, Video, pivot, mail, i18n, QR Code)
+- Backends de base de données (MariaDB, SQLite, PostgreSQL, SQL Server)
+- Modules opt-in (RBAC, workflow, stats, MFA, files, images, audio, vidéo, IoT, pivot, mail, i18n, QR Code, settings, audit, jobs, notifications, import-export, deploy, admin, testing)
 - ADR et charte philosophique
 
 ---
