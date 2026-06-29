@@ -62,3 +62,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-053](053-deploy-extraction.md) | Extraction du déploiement (`deploy:init`/`deploy:check` + gabarits + doc) dans un opt-in CLI-only `forge-mvc-deploy` (proposé) |
 | [ADR-054](054-database-backend-optins.md) | Cœur agnostique BDD : backends (MariaDB, SQLite, PostgreSQL, SQL Server) en opt-ins exclusifs, découverts par entry points (proposé) |
 | [ADR-055](055-optin-categories.md) | Classification des opt-ins par destination : champ `category` au catalogue, taxonomie unique (CLI + docs), sans renommer les paquets (proposé) |
+| [ADR-056](056-rbac-contract-tooling-extraction.md) | Extraction du contrat (schéma) et de l'outillage RBAC (`rbac:validate`/`rbac:audit`) du cœur vers l'opt-in `forge-mvc-rbac` (proposé) |

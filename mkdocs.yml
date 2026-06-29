@@ -295,6 +295,7 @@ nav:
             - ADR-053 Extraction du déploiement: adr/053-deploy-extraction.md
             - ADR-054 Cœur agnostique BDD et backends opt-in: adr/054-database-backend-optins.md
             - ADR-055 Classification des opt-ins par destination: adr/055-optin-categories.md
+            - ADR-056 Extraction du contrat et de l'outillage RBAC: adr/056-rbac-contract-tooling-extraction.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
