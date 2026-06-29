@@ -6,6 +6,7 @@ site_name: video
 docs_dir: docs
 nav:
   - Parcours complet: parcours.md
+  - Référence: reference.md
   - Référence (par module):
       - Configuration (config.py): references/config.md
       - Ingestion (ingest.py): references/ingest.md
