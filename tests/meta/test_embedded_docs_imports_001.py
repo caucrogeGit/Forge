@@ -1,13 +1,14 @@
-"""Garde-fou OPTIN-DOCS-IMPORTS-001.
+"""Garde-fou EMBEDDED-DOCS-IMPORTS-001.
 
-Vérifie que tous les exemples Python des docs embarquées des opt-ins
-(`packages/*/docs/**/*.md` : références ET welcomes) ont des imports du cœur,
-du CLI et des opt-ins qui **résolvent réellement** (module importable + symbole
-présent).
+Vérifie que tous les exemples Python des docs embarquées du dépôt
+(`core/*/docs/**`, `cli/*/docs/**` et `packages/*/docs/**` : références ET
+welcomes) ont des imports du cœur, du CLI et des opt-ins qui **résolvent
+réellement** (module importable + symbole présent).
 
 Complète `test_docs_imports_validity_sweep_001` qui ne couvre que `docs/` et les
-`README.md` des paquets, pas les docs embarquées. Détecte une doc qui référence
-du code déplacé/renommé (ex. un symbole importé depuis le mauvais module).
+`README.md` des paquets, pas les docs embarquées par sous-paquet. Détecte une doc
+qui référence du code déplacé/renommé (ex. un symbole importé depuis le mauvais
+module).
 """
 from __future__ import annotations
 
@@ -21,7 +22,9 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-PACKAGES = PROJECT_ROOT / "packages"
+
+# Racines de docs embarquées (un sous-paquet = un dossier docs/).
+_DOC_GLOBS = ("core/*/docs/**/*.md", "cli/*/docs/**/*.md", "packages/*/docs/**/*.md")
 
 # Racines de projet utilisateur : présentes dans un projet généré, pas dans le
 # dépôt framework. On ne les vérifie pas.
@@ -87,16 +90,23 @@ def _check(module: str, names: list[str], where: str, failures: list[str]) -> No
             failures.append(f"{where}: `{module}` n'a pas le symbole `{name}`")
 
 
-def test_optin_docs_imports_resolvent():
+def _doc_files() -> list[Path]:
+    files: list[Path] = []
+    for pattern in _DOC_GLOBS:
+        files.extend(PROJECT_ROOT.glob(pattern))
+    return sorted(files)
+
+
+def test_embedded_docs_imports_resolvent():
     failures: list[str] = []
-    md_files = sorted(PACKAGES.glob("*/docs/**/*.md"))
-    assert md_files, "Aucune doc opt-in trouvée (packages/*/docs)."
+    md_files = _doc_files()
+    assert md_files, "Aucune doc embarquée trouvée (core/cli/packages */docs)."
     for md in md_files:
         where = str(md.relative_to(PROJECT_ROOT))
         for block in _CODE_BLOCK.findall(md.read_text(encoding="utf-8")):
             for module, names in _iter_imports(block):
                 _check(module, names, where, failures)
     assert not failures, (
-        "Imports cœur/cli/opt-in invalides dans des docs opt-in "
+        "Imports cœur/cli/opt-in invalides dans des docs embarquées "
         f"({len(failures)}) :\n" + "\n".join(f"  - {f}" for f in failures)
     )
