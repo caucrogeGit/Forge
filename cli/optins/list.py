@@ -34,10 +34,15 @@ from __future__ import annotations
 from pathlib import Path
 
 from cli.optins.catalog import (
+    CATEGORY_DATABASE,
+    CATEGORY_LABELS,
+    DB_BACKENDS,
+    KIND_CLI,
     KIND_CROSSCUTTING,
     KIND_LIBRARY,
     KIND_ROUTE,
     OFFICIAL_OPTINS,
+    optins_by_category,
 )
 
 __all__ = [
@@ -131,31 +136,47 @@ def _print_route_optin(name: str, info: dict[str, object]) -> None:
         print(f"            conseil   : forge opt-in:enable {name} --apply")
 
 
-def _print_other_optins() -> None:
-    """Liste les opt-ins non-routiers avec leur kind (OPTIN-KIND-ADAPTER-001).
+_KIND_LABELS = {
+    KIND_LIBRARY: "bibliothèque",
+    KIND_CROSSCUTTING: "transversal",
+    KIND_CLI: "outil CLI",
+}
 
-    Lecture seule, aucun import de paquet opt-in : on ne lit que le catalogue
-    statique (cli), pas les paquets ``forge_mvc_*``.
+
+def _print_kind_optin(name: str, kind: str) -> None:
+    """Ligne d'un opt-in non-routier (bibliothèque / transversal / CLI)."""
+    label = _KIND_LABELS.get(kind, kind)
+    print(f"  {name:<13} {label}")
+
+
+def _print_db_backends() -> None:
+    """Section dédiée aux backends BDD (famille exclusive, ADR-054/055).
+
+    Lecture seule, aucun import de paquet : on ne lit que le catalogue statique.
     """
-    labels = {
-        KIND_LIBRARY: "bibliothèque",
-        KIND_CROSSCUTTING: "transversal",
-    }
-    for opt in OFFICIAL_OPTINS.values():
-        if opt.kind == KIND_ROUTE:
-            continue  # détaillés à part (état projet détecté ci-dessus)
-        label = labels.get(opt.kind, opt.kind)
-        print(f"  {opt.name:<9} {label}")
+    print(CATEGORY_LABELS[CATEGORY_DATABASE])
+    print("            un seul backend par projet ; piloté par forge db:*")
+    for backend in DB_BACKENDS:
+        print(f"  {backend.name:<13} backend")
 
 
 def list_optins(*, project_root: Path) -> int:
-    """Affiche l'état des opt-ins connus. Toujours ``0`` (lecture seule)."""
+    """Affiche l'état des opt-ins connus, groupés par destination (ADR-055).
+
+    Toujours ``0`` (lecture seule). Les opt-ins de kind ``route`` reçoivent en
+    plus leur état projet (couche ``optins/<name>/``).
+    """
     print("Forge opt-ins")
     print("")
-    for name in KNOWN_OPTINS:
-        _print_route_optin(name, detect_optin_state(project_root, name))
+    for category, opts in optins_by_category().items():
+        print(CATEGORY_LABELS[category])
+        for opt in opts:
+            if opt.kind == KIND_ROUTE:
+                _print_route_optin(opt.name, detect_optin_state(project_root, opt.name))
+            else:
+                _print_kind_optin(opt.name, opt.kind)
         print("")
-    _print_other_optins()
+    _print_db_backends()
     print("")
     print("Aucune modification effectuée.")
     return 0

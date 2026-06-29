@@ -24,15 +24,18 @@ FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
 class TestCatalog:
     def test_official_optins(self):
         assert optin_names() == [
-            "audio", "files", "i18n", "images", "iot", "mail",
-            "mfa", "pivot", "rbac", "stats", "video", "workflow",
+            "admin", "audio", "audit", "deploy", "files", "i18n", "images",
+            "import-export", "iot", "jobs", "mail", "mfa", "notifications",
+            "pivot", "qrcode", "rbac", "settings", "stats", "video", "workflow",
         ]
 
-    @pytest.mark.parametrize("name", ["mfa", "rbac", "workflow", "stats", "images", "iot", "video", "audio", "files", "mail", "pivot", "i18n"])
+    @pytest.mark.parametrize("name", optin_names())
     def test_dist_and_import_naming(self, name):
         optin = OFFICIAL_OPTINS[name]
         assert optin.package_dist == f"forge-mvc-{name}"
-        assert optin.package_import == f"forge_mvc_{name}"
+        # Le namespace importable remplace les tirets par des underscores
+        # (ex. import-export -> forge_mvc_import_export).
+        assert optin.package_import == "forge_mvc_" + name.replace("-", "_")
         assert optin.summary
 
     def test_aide_install_liste_le_catalogue_courant(self):
