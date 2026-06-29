@@ -33,6 +33,7 @@ nav:
   - Cœur de Forge:
     - Installation:
         - Installer Forge:
+            - Vue d'ensemble: install/index.md
             - Windows + WSL (parcours complet): install/windows-wsl.md
             - Dépannage serveur dev (WSL2): install/wsl-dev-server.md
             - Poste Linux (parcours complet): install/poste-linux.md
@@ -56,6 +57,7 @@ nav:
 
     - Concepts:
         - Vue d'ensemble: guide/concepts.md
+        - Bases de données (backends): guide/bases-de-donnees.md
         - Positionnement: guide/positioning.md
         - FAQ: guide/faq.md
 
