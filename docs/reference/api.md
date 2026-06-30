@@ -2,6 +2,28 @@
 
 Chaque entrée ci-dessous est repliée par défaut. Ouvrez uniquement la partie utile pour lire le détail de l'API sans quitter l'index.
 
+## Catalogue par module
+
+Chaque module du cœur a sa **page de référence dédiée**. Cet index en reprend l'essentiel ; ouvrez la page d'un module pour le détail complet, les schémas et les exemples.
+
+| Domaine | Pages de référence détaillées |
+|---|---|
+| Configuration | [registre `forge.py`](../core/forge_config.md) |
+| HTTP | [Request](../core-http/request.md), [Response](../core-http/response.md), [Helpers](../core-http/helpers.md), [Router](../core-http/router.md) |
+| Sécurité | [Hashing](../core-security/hashing.md), [CSRF](../core-security/csrf.md), [Session](../core-security/session.md), [Headers](../core-security/headers.md), [Auth API](../core-security/api_auth.md), [Middleware](../core-security/middleware.md) |
+| Sessions | [Manager](../core-sessions/manager.md), [Contrat](../core-sessions/contract.md) |
+| Base de données | [db](../core-database/db.md), [Transaction](../core-database/transaction.md) |
+| Formulaires | [Form](../core-forms/form.md), [Champs](../core-forms/fields.md) |
+| Validation | [Décorateurs](../core-validation/decorators.md) |
+| Templating | [Manager](../core-templating/manager.md) |
+| MVC | [BaseController](#coremvccontroller), [Pagination](../core-mvc/pagination.md), [Validator](../core-mvc/validator.md) |
+| Erreurs runtime | [Erreurs runtime](../core-errors/runtime_errors.md) |
+| Application | [Application](../core-app/application.md) |
+| Modules | [Système de modules](../core-modules/registry.md) |
+| Auth / User | [User](../core-auth/user.md) |
+
+L'index détaillé suit ci-dessous, chaque entrée repliée par défaut.
+
 <details markdown="1" id="coreforge">
 <summary><code>core.forge</code> - Configuration centrale</summary>
 
