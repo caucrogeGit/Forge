@@ -1,6 +1,46 @@
 # Changelog
 
 
+## [Non publié]
+
+Cycle de consolidation post-rc.1 : refonte de la navigation et de plusieurs pages
+de documentation, page d'accueil du squelette, et correctifs issus d'un audit
+multi-axes (qualité, charte, packaging, tests, sécurité, documentation).
+
+### Ajouté
+
+- **Garde-fou anti-tiret cadratin** : `tests/meta/test_no_em_dash_in_live_docs_001.py`
+  échoue si un U+2014 réapparaît dans la doc vivante (DOC-EMDASH-SWEEP-001).
+- **`py.typed` sur `forge-mvc-testing`** : le paquet expose désormais ses types
+  (PEP 561), comme les 24 autres (PKG-TESTING-PYTYPED-001).
+- **Smoke co-localisé pour `forge-mvc-testing`** dans son propre dossier `tests/`
+  (ADR-040, TEST-TESTING-SMOKE-001).
+
+### Modifié
+
+- **Documentation** : barre de navigation universelle (réplique de la landing) sur
+  toutes les pages, sommaire de page déplacé dans la barre de gauche, menu
+  « Documentation » réorganisé (Commandes CLI, API Core, Packages, Starters).
+- **Pages repensées** : « Démarrer » (quick-start et onglets par système), « Référence
+  CLI » (catalogue), « API du cœur » (catalogue par usage), « Starters » (catégorisée
+  par fonctionnalité, comme les Packages).
+- **Parcours d'apprentissage des opt-ins** renommés « Welcome <X> » (au lieu de
+  « Bonjour Forge <X> », réservé au parcours cœur).
+- **Tiret cadratin U+2014 supprimé** de 87 fichiers de doc vivante, remplacé par le
+  trait d'union court (directive de style FR, DOC-EMDASH-SWEEP-001).
+- **Page d'accueil du squelette** : barre de navigation retirée, logo Forge centré
+  en tête du hero (SKEL-HOME-LOGO-001).
+- **Cliquet pyright** étendu aux 4 backends BDD (ADR-054) et à `forge-mvc-testing`
+  (PKG-PYRIGHT-INCLUDE-001).
+- **Statuts ADR formalisés** : 031 et 032 « Acceptée et mise en œuvre » ; 054 et 056
+  « Acceptée » (ADR-STATUS-FORMALIZE-001).
+
+### Retiré
+
+- **Page de référence générale `docs/reference/reference.md`**, devenue superflue ;
+  chaque option du menu Documentation a sa propre page de présentation.
+
+
 ## [1.0.0-rc.1] — 2026-06-26
 
 Première release candidate avant la 1.0.0 stable : API publique gelée, tous les
