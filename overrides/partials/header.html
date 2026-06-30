@@ -2,10 +2,11 @@
   DOCS-NAV-SINGLE-BAR-001
   Barre de navigation unique, façon landing : logo à gauche + onglets de premier
   niveau de la navigation (contextuels : « Cœur de Forge », « Opt-ins officiels »)
-  + recherche à droite, le tout dans une seule barre. L'entrée « Accueil » est
-  omise (le logo y mène). Recherche 100% native Material. Logo et recherche
-  restent visibles en petit écran ; les onglets se replient dans le tiroir latéral
-  (toggle for="__drawer"). Styles dans docs/stylesheets/extra.css.
+  + recherche à droite. L'entrée « Accueil » est omise (le logo y mène).
+  Recherche 100% native Material. En petit écran, logo et recherche restent
+  visibles ; les onglets se replient et s'ouvrent au clic sur le hamburger
+  (#forge-nav-toggle, fermé par défaut). Styles dans docs/stylesheets/extra.css,
+  bascule du hamburger dans docs/javascripts/forge-nav.js.
 -#}
 {%- macro first_url(item) -%}
   {%- if item.children -%}{{- first_url(item.children | first) -}}{%- else -%}{{- item.url -}}{%- endif -%}
@@ -17,7 +18,7 @@
       <img src="{{ 'static/forge-logo.png' | url }}" alt="Forge">
     </a>
 
-    <div class="forge-tabs">
+    <div class="forge-tabs" id="forge-tabs">
       {% for nav_item in nav.items %}
         {% if not nav_item.is_homepage %}
           <a href="{{ first_url(nav_item) | url }}"
@@ -38,11 +39,12 @@
         {% endif %}
       {% endif %}
 
-      <label class="md-header__button md-icon forge-drawer-toggle" for="__drawer"
-             aria-label="{{ lang.t('header.button.menu') }}">
+      <button type="button" class="md-header__button md-icon forge-nav-toggle"
+              id="forge-nav-toggle" aria-label="{{ lang.t('header.button.menu') }}"
+              aria-expanded="false" aria-controls="forge-tabs">
         {% set icon = config.theme.icon.menu or "material/menu" %}
         {% include ".icons/" ~ icon ~ ".svg" %}
-      </label>
+      </button>
     </div>
 
   </nav>
