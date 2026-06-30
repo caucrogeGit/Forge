@@ -2,8 +2,9 @@
 
 ## Statut
 
-Proposé, Forge 1.0.0-rc (ticket `ADR-RBAC-SCHEMA-EXTRACT-001`).
-Décision de périmètre cœur/opt-in ; relève du mainteneur.
+Acceptée, Forge 1.0.0-rc (ticket `ADR-RBAC-SCHEMA-EXTRACT-001`).
+Les commandes RBAC (`rbac:validate`, `rbac:audit`) sont déjà dispatchées vers l'opt-in `forge-mvc-rbac` par import paresseux.
+Reste à réaliser : l'extraction effective du schéma `rbac.schema.json` hors de `cli/schemas/` vers le paquet.
 
 ---
 

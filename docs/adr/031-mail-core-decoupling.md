@@ -2,7 +2,8 @@
 
 ## Statut
 
-Acceptée (mise en œuvre à suivre, ticket `MAIL-DECOUPLE-CORE-001`).
+Acceptée et mise en œuvre (ticket `MAIL-DECOUPLE-CORE-001`).
+Le cœur ne porte plus aucune configuration `mail_*` ; `forge-mvc-mail` lit la sienne depuis l'environnement.
 
 Complète [ADR-022](022-mail-extraction.md) (extraction de l'email vers
 `forge-mvc-mail`) et renforce [ADR-004](004-core-perimeter.md) (périmètre du

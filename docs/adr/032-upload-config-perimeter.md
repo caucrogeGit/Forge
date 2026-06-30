@@ -2,7 +2,8 @@
 
 ## Statut
 
-Acceptée (mise en œuvre à suivre, ticket `UPLOAD-CONFIG-DECOUPLE-001`).
+Acceptée et mise en œuvre (ticket `UPLOAD-CONFIG-DECOUPLE-001`).
+Seul `upload_max_size` reste dans le cœur ; le reste de la config upload est lu par les opt-ins `forge-mvc-files` et `forge-mvc-images` depuis l'environnement.
 
 Complète [ADR-031](031-mail-core-decoupling.md) (même patron de découplage),
 prolonge [ADR-019](019-upload-extraction.md) / [ADR-020](020-files-media-storage-primitives.md)

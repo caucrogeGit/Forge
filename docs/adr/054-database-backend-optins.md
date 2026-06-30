@@ -2,8 +2,9 @@
 
 ## Statut
 
-Proposé, Forge 1.0.0-rc.x (ticket `DB-BACKEND-OPTIN-STRATEGY-001`).
-Décision structurante d'architecture ; relève du mainteneur.
+Acceptée, Forge 1.0.0-rc.x (ticket `DB-BACKEND-OPTIN-STRATEGY-001`).
+Le cœur est agnostique BDD (plus aucun pilote SGBD en dépendance) et découvre les backends par entry points exclusifs.
+Quatre backends sont livrés en opt-in : `forge-mvc-mariadb` et `forge-mvc-sqlite` (complets, bout en bout), `forge-mvc-postgres` et `forge-mvc-mssql` (Alpha, intégration réelle à valider).
 
 ---
 
