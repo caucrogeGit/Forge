@@ -63,10 +63,16 @@ fi
 # de toutes les distributions (core + opt-ins) + twine check. Hors flag,
 # comportement inchangé (on ne rallonge pas chaque run ; la CI build aussi).
 WITH_PACKAGES=false
+# SMOKE-INSTALL-VIERGE-001 — `--with-smoke` (opt-in) ajoute la preuve
+# d'installation en environnement vierge (build wheels + forge new + install
+# résolu via --find-links). Hors flag, comportement inchangé (le smoke est
+# coûteux : venv jetable + forge new complet).
+WITH_SMOKE=false
 _ARGS=()
 for _arg in "$@"; do
     case "$_arg" in
         --with-packages) WITH_PACKAGES=true ;;
+        --with-smoke) WITH_SMOKE=true ;;
         *) _ARGS+=("$_arg") ;;
     esac
 done
@@ -97,6 +103,9 @@ fi
 echo "=== Validation pré-release Forge ${VERSION:-<version non fournie>} ==="
 if $WITH_PACKAGES; then
     echo "Mode : --with-packages (build des distributions core + opt-ins + twine check)"
+fi
+if $WITH_SMOKE; then
+    echo "Mode : --with-smoke (installation vierge : forge new depuis wheels locales)"
 fi
 echo ""
 
@@ -361,6 +370,22 @@ if $WITH_PACKAGES; then
             _fail "twine check : artefact(s) invalide(s)"
             tail -20 /tmp/relval_twine.log | sed 's/^/         /' || true
         fi
+    fi
+fi
+
+# ── 14. Installation en environnement vierge (opt-in : --with-smoke) ─────────
+# SMOKE-INSTALL-VIERGE-001 — preuve que `forge new` -> `pip install -r
+# requirements.txt` aboutit depuis des wheels construites localement, donc
+# indépendamment de la publication PyPI. C'est le garde-fou qui attrape un
+# paquet épinglé mais non installable (cause d'échec du premier contact).
+if $WITH_SMOKE; then
+    echo ""
+    echo "--- Installation en environnement vierge (smoke) ---"
+    if bash tools/smoke-install.sh >/tmp/relval_smoke.log 2>&1; then
+        _ok "Smoke install : forge new s'installe et démarre depuis les wheels locales"
+    else
+        _fail "Smoke install : forge new ne s'installe pas depuis les wheels locales"
+        tail -20 /tmp/relval_smoke.log | sed 's/^/         /' || true
     fi
 fi
 
