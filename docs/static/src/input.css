@@ -5,8 +5,21 @@
 @source "../../mvc/views/errors";
 
 @layer components {
+  /* Barre de navigation : valeurs partagées avec la doc via forge-tokens.css
+     (FORGE-NAV-TOKENS-001). Source unique : docs/static/forge-tokens.css. */
+  .forge-bar {
+    background-color: var(--forge-nav-bg);
+    height: var(--forge-nav-height);
+    border-bottom: 2px solid var(--forge-accent);
+  }
+  .forge-bar-logo {
+    height: var(--forge-nav-height);
+    width: auto;
+    object-fit: contain;
+  }
+
   .tab-active {
-    border-bottom-color: #E8651A !important;
+    border-bottom-color: var(--forge-accent) !important;
     color: #fff !important;
   }
 
@@ -16,11 +29,11 @@
   }
 
   .landing-accent-bg {
-    background: #E8651A;
+    background: var(--forge-accent);
   }
 
   .landing-accent-text {
-    color: #E8651A;
+    color: var(--forge-accent);
   }
 
   .landing-version-strip {
@@ -34,7 +47,7 @@
   }
 
   .landing-logo-glow {
-    filter: drop-shadow(0 0 32px rgba(232, 101, 26, 0.5));
+    filter: drop-shadow(0 0 32px rgba(var(--forge-accent-rgb), 0.5));
   }
 
   .landing-logo-size {
@@ -48,7 +61,7 @@
 
   .landing-icon-chip {
     background: #fff3ea;
-    color: #E8651A;
+    color: var(--forge-accent);
   }
 
   .landing-copy-btn {
@@ -61,7 +74,7 @@
 
   .landing-highlight-note {
     background: #fff3ea;
-    border-color: rgba(232, 101, 26, 0.2);
+    border-color: rgba(var(--forge-accent-rgb), 0.2);
     color: #111;
   }
 
@@ -74,7 +87,7 @@
 
   .landing-search-input {
     background: rgba(255, 255, 255, 0.07);
-    border: 1px solid #E8651A;
+    border: 1px solid var(--forge-accent);
     border-radius: 8px;
     padding: 0.375rem 0.75rem;
     color: white;
@@ -89,14 +102,14 @@
   }
 
   .landing-search-input:focus {
-    border-color: rgba(232, 101, 26, 0.5);
+    border-color: rgba(var(--forge-accent-rgb), 0.5);
   }
 
   .landing-search-btn {
     width: 35px;
     height: 35px;
     background: rgba(255, 255, 255, 0.07);
-    border: 1px solid #E8651A;
+    border: 1px solid var(--forge-accent);
     border-radius: 8px;
     padding: 0;
     color: rgba(255, 255, 255, 0.7);
@@ -201,7 +214,7 @@
   }
 
   .landing-nav-links a:hover {
-    border-bottom-color: #E8651A;
+    border-bottom-color: var(--forge-accent);
   }
 
   .landing-nav-toggle {
@@ -272,7 +285,7 @@
     transition: border-color 0.15s;
   }
   .landing-nav-link:hover {
-    border-bottom-color: #E8651A;
+    border-bottom-color: var(--forge-accent);
   }
 
   .landing-nav-item {
@@ -300,7 +313,7 @@
     margin-top: 0.85rem;
     min-width: 15rem;
     background: #000;
-    border: 1px solid rgba(232, 101, 26, 0.5);
+    border: 1px solid rgba(var(--forge-accent-rgb), 0.5);
     border-radius: 0.5rem;
     padding: 0.5rem;
     display: flex;
@@ -330,7 +343,7 @@
     transition: background 0.12s, color 0.12s;
   }
   .landing-nav-menu a:hover {
-    background: rgba(232, 101, 26, 0.15);
+    background: rgba(var(--forge-accent-rgb), 0.15);
     color: #fff;
     border-bottom: none;
   }

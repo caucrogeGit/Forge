@@ -447,6 +447,7 @@ markdown_extensions:
   - legacy_attrs
 
 extra_css:
+  - static/forge-tokens.css
   - stylesheets/extra.css
 
 extra_javascript:

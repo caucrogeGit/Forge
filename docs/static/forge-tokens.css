@@ -1,0 +1,16 @@
+/* FORGE-NAV-TOKENS-001
+   Source UNIQUE des valeurs de design de la navigation Forge, partagée par la
+   landing (docs/index.html, via tailwind.css) ET la documentation (header Material,
+   via stylesheets/extra.css). Modifier ici met à jour les deux à la fois.
+
+   Chargé par :
+   - la landing : <link rel="stylesheet" href="./static/forge-tokens.css"> ;
+   - la doc : extra_css (avant stylesheets/extra.css) dans mkdocs.yml.
+*/
+:root {
+  --forge-nav-bg: #000000;            /* fond de la barre de navigation (noir pur) */
+  --forge-accent: #E8651A;            /* orange Forge (accent, bordure, survol) */
+  --forge-accent-rgb: 232, 101, 26;   /* même orange en composantes, pour les rgba() */
+  --forge-nav-height: 8rem;           /* hauteur de la barre + du logo (= h-32) */
+  --forge-nav-height-compact: 4rem;   /* hauteur de la barre en petit écran */
+}

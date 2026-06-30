@@ -171,18 +171,23 @@ class TestNavigationStructure:
             "Le texte >Forge< ne devrait plus être dans la nav — remplacé par le logo"
         )
 
-    def test_nav_logo_h32(self):
-        """Le logo de navigation utilise h-32 w-auto object-contain (LANDING-NAV-COMPACT-001)."""
+    def test_nav_logo_tokenise(self):
+        """La barre et le logo de nav utilisent les tokens partagés
+        (.forge-bar / .forge-bar-logo, FORGE-NAV-TOKENS-001) au lieu de tailles
+        et couleurs en dur, pour rester alignés avec le header de la doc."""
         nav_end = self.source.find("</nav>")
         nav_section = self.source[:nav_end] if nav_end != -1 else self.source[:600]
-        assert "h-32" in nav_section, (
-            "Le logo de navigation doit utiliser h-32 (taille lisible)"
+        assert "forge-bar" in nav_section, (
+            "La barre de nav doit porter la classe tokenisée .forge-bar"
+        )
+        assert "forge-bar-logo" in nav_section, (
+            "Le logo de nav doit porter la classe tokenisée .forge-bar-logo"
         )
         assert "h-16" not in nav_section, (
             "La navbar ne devrait plus être en h-16"
         )
         assert "min-h-40" not in nav_section, (
-            "La navbar ne devrait plus utiliser min-h-40 — remplacé par h-32 compacte"
+            "La navbar ne devrait plus utiliser min-h-40"
         )
 
     def _nav_section(self):
