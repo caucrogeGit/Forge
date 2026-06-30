@@ -149,9 +149,9 @@ class TestNewElementsPresent:
 
 
 class TestNavigationStructure:
-    """La navigation est minimale : logo + champ de recherche uniquement
-    (LANDING-NAV-MINIMAL-001). Plus aucun menu ni déroulant ; la navigation des
-    pages passe par la barre latérale de la doc. L'entrée CRUD reste absente."""
+    """La navigation est simplifiée : entrées simples Démarrer/GitHub/Contact
+    plus deux menus déroulants Documentation et Modules (LANDING-NAV-DROPDOWN-001).
+    L'entrée CRUD a été retirée du menu."""
 
     def setup_method(self):
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
@@ -189,25 +189,37 @@ class TestNavigationStructure:
         nav_end = self.source.find("</nav>")
         return self.source[:nav_end] if nav_end != -1 else self.source
 
-    def test_nav_no_menu_items(self):
-        """La nav ne contient plus aucun menu ni déroulant (LANDING-NAV-MINIMAL-001)."""
-        nav = self._nav_section()
-        assert "landing-nav-links" not in nav, (
-            "Le bloc de liens de navigation doit être retiré de la nav"
+    @pytest.mark.parametrize("nav_label", [
+        "Démarrer",
+        "Documentation",
+        "Modules",
+        "GitHub",
+        "Contact",
+    ])
+    def test_nav_entry_present(self, nav_label):
+        assert nav_label in self._nav_section(), (
+            f"La nav devrait contenir l'entrée '{nav_label}' "
+            f"(menu LANDING-NAV-DROPDOWN-001)"
         )
-        assert "data-dropdown" not in nav, (
-            "Il ne doit plus y avoir de menu déroulant dans la nav"
-        )
-        for label in (">Démarrer<", ">GitHub<", ">Contact<"):
-            assert label not in nav, (
-                f"L'entrée {label} ne doit plus figurer dans la nav"
-            )
 
-    def test_nav_has_search(self):
-        """Le champ de recherche reste dans la nav (LANDING-NAV-MINIMAL-001)."""
+    def test_nav_has_two_dropdowns(self):
+        """Deux menus déroulants (Documentation, Modules) avec leurs panneaux."""
         nav = self._nav_section()
-        assert 'role="search"' in nav or "landing-search-input" in nav, (
-            "La nav doit conserver le champ de recherche"
+        assert nav.count("data-dropdown") >= 2, (
+            "La nav devrait contenir deux menus déroulants (data-dropdown)"
+        )
+        assert "landing-nav-menu" in nav, (
+            "Les déroulants doivent porter un panneau .landing-nav-menu"
+        )
+
+    @pytest.mark.parametrize("entry", [
+        "Architecture &amp; concepts",
+        "Commandes CLI",
+        "Bases de données (backends)",
+    ])
+    def test_nav_dropdown_entries_present(self, entry):
+        assert entry in self._nav_section(), (
+            f"Le contenu des déroulants devrait inclure '{entry}'"
         )
 
     def test_nav_crud_entry_removed(self):
