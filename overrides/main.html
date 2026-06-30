@@ -1,0 +1,23 @@
+{#-
+  DOCS-SIDEBAR-TOC-LEFT-001
+  La navigation globale est portée par la barre du haut (menus déroulants) et le
+  fil d'Ariane. La barre de gauche n'affiche donc plus l'arborescence de nav
+  (redondante) mais la TABLE DES MATIÈRES de la page courante ; la barre de droite
+  (TOC) est supprimée.
+-#}
+{% extends "base.html" %}
+
+{% block site_nav %}
+  {% if page and page.toc | first %}
+    {% if page.meta and page.meta.hide %}
+      {% set hidden = "hidden" if "toc" in page.meta.hide %}
+    {% endif %}
+    <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="toc" {{ hidden }}>
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          {% include "partials/toc.html" %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
