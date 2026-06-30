@@ -204,4 +204,3 @@ Seuls `str`, `int`, `bool`, `float` sont stockables ; un autre type lève `Setti
 - [Initialisation (settings:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `SettingsError`.
 - [Progression Settings](welcome/installation.md) : apprendre l'opt-in pas à pas.
-
