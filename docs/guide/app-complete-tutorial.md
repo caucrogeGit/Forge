@@ -441,6 +441,6 @@ forge run                          # lancer l'application
 - [Relations entre entités](../features/relations.md), format `relations.json` complet
 - [Architecture des entités](../features/entity_architecture.md), rôle de chaque fichier généré
 - [Contrat de stabilité](../release/stability-contract.md), garanties sur les fichiers préservés
-- [Référence API et CLI](../reference/reference.md), toutes les commandes, dont les filtres de liste CRUD (`list.filter`)
+- [Référence API et CLI](../reference/api.md), toutes les commandes, dont les filtres de liste CRUD (`list.filter`)
 ```
 

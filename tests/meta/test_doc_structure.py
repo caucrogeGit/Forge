@@ -26,7 +26,9 @@ class TestPagesExistent:
         assert Path("docs/guide/guide.md").exists()
 
     def test_reference_existe(self):
-        assert Path("docs/reference/reference.md").exists()
+        # L'index reference.md a été retiré (la nav Documentation présente CLI / API /
+        # Packages / Starters). La référence API du cœur reste le point d'entrée.
+        assert Path("docs/reference/api.md").exists()
 
     def test_auth_existe(self):
         assert Path("docs/features/auth.md").exists()

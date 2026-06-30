@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = ROOT / "docs" / "release" / "stability-contract.md"
 ROADMAP = ROOT / "docs" / "roadmap" / "forge-roadmap.md"
 MKDOCS = ROOT / "mkdocs.yml"
-REFERENCE = ROOT / "docs" / "reference" / "reference.md"
 
 
 # ── Existence ─────────────────────────────────────────────────────────────────
@@ -99,10 +98,3 @@ def test_stability_contract_dans_mkdocs():
 def test_roadmap_mentionne_app_stability_contract():
     content = ROADMAP.read_text(encoding="utf-8")
     assert "APP-STABILITY-CONTRACT-001" in content
-
-
-# ── Lien depuis reference.md ──────────────────────────────────────────────────
-
-def test_reference_mentionne_stability_contract():
-    content = REFERENCE.read_text(encoding="utf-8")
-    assert "stability-contract" in content or "contrat de stabilité" in content.lower()

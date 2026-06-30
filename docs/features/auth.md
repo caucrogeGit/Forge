@@ -5,7 +5,7 @@ utilisateur moderne sans transformer le framework en application metier. Elle
 fournit des contrats Python, des helpers explicites et des SQL visibles que les
 projets peuvent adopter progressivement.
 
-Voir aussi : [ADR-001, Stratégie d'authentification](../adr/001-auth-strategy.md) · [ADR-002, Stratégie de session](../adr/002-session-strategy.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/reference.md)
+Voir aussi : [ADR-001, Stratégie d'authentification](../adr/001-auth-strategy.md) · [ADR-002, Stratégie de session](../adr/002-session-strategy.md) · [Sécurité en production](../deployment/production-security.md) · [Référence CLI](../reference/api.md)
 
 Le contrôleur d'authentification par défaut (`mvc/controllers/auth_controller.py`) s'appuie sur `core.auth.password.verify_password` (Argon2id) pour la vérification des mots de passe. `core.security.hashing` reste disponible en repli pour les hashes PBKDF2 existants (voir ADR-001). Les nouveaux hashes PBKDF2 legacy utilisent désormais 600 000 itérations (format versionné `pbkdf2_sha256$…`) ; les anciens hashes restent vérifiables. Lorsqu'un utilisateur legacy PBKDF2 se connecte avec succès, Forge migre automatiquement son hash vers Argon2id (`auth_model.update_password_hash`). Cette migration est transparente et ne force pas de réinitialisation du mot de passe.
 
@@ -428,7 +428,7 @@ ecriture DB automatique.
 Les commandes Auth/User disponibles dans cette copie de Forge sont :
 
 Pour les signatures complètes et la description de chaque option, voir le
-[guide de référence](../reference/reference.md).
+[guide de référence](../reference/api.md).
 
 ```bash
 forge auth:init
@@ -933,6 +933,6 @@ politiques metier.
 ## Voir aussi
 
 - [Sécurité en production](../deployment/production-security.md), checklist déploiement, headers, CSRF, secrets
-- [Référence CLI](../reference/reference.md), toutes les commandes `forge` avec signatures complètes
+- [Référence CLI](../reference/api.md), toutes les commandes `forge` avec signatures complètes
 - [ADR-001, Stratégie d'authentification](../adr/001-auth-strategy.md)
 - [ADR-002, Stratégie de session](../adr/002-session-strategy.md)

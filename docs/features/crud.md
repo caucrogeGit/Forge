@@ -364,7 +364,7 @@ Ce qui reste à venir :
 - back-office média intégré ;
 - permissions média (accès contrôlé aux fichiers servis via `/media/...`).
 
-Voir [Référence API et CLI](../reference/reference.md) et Module média pour les détails.
+Voir [Référence API et CLI](../reference/api.md) et Module média pour les détails.
 
 ## Récapitulatif des fonctionnalités du CRUD généré
 

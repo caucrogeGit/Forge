@@ -87,7 +87,6 @@ nav:
         - ImageMagick (logos transparents): features/imagemagick-logos.md
 
     - Référence:
-        - Index: reference/reference.md
         - Commandes CLI: reference/cli-commands.md
         - API Forge complète: reference/api.md
         - Vocabulaire opt-in: reference/vocabulaire-opt-in.md

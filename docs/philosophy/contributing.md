@@ -104,7 +104,7 @@ starters/      Données des starters officiels Forge (dans cli/starters/data/).
 Guides de référence pour comprendre les contrats :
 
 - [Contrat de stabilité](../release/stability-contract.md), fichiers garantis préservés
-- [Référence API et CLI](../reference/reference.md), toutes les commandes disponibles
+- [Référence API et CLI](../reference/api.md), toutes les commandes disponibles
 - [Guide de migration](../features/migration-guide.md), compatibilité entre versions
 - [Politique de release](../release/release-policy.md), SemVer adapté à Forge
 - [Politique de dépréciation](../release/deprecation-policy.md), cycle d'annonce et de retrait
@@ -358,7 +358,7 @@ Une fonctionnalité non documentée est incomplète.
 ### Quand modifier `docs/reference.md`
 
 Toute nouvelle commande CLI, tout nouveau paramètre ou tout changement de comportement
-observable doit être reflété dans [Référence API et CLI](../reference/reference.md).
+observable doit être reflété dans [Référence API et CLI](../reference/api.md).
 
 ### Quand modifier un guide spécifique
 
@@ -618,4 +618,4 @@ git commit -m "feat: ajouter le guide de création de modules Forge"
 - [Contrat de stabilité](../release/stability-contract.md), fichiers garantis préservés
 - [Procédure de release](../release/release.md), étapes de publication d'une version
 - [Validation locale](../release/release-local.md), checklist de validation avant release
-- [Référence API et CLI](../reference/reference.md), toutes les commandes Forge
+- [Référence API et CLI](../reference/api.md), toutes les commandes Forge

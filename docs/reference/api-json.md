@@ -1,6 +1,6 @@
 # API JSON légère Forge
 
-[Accueil](../index.html) · [Référence API et CLI](reference.md)
+[Accueil](../index.html) · [Référence API et CLI](api.md)
 
 ---
 
@@ -408,7 +408,7 @@ curl -H "Authorization: Bearer changeme-en-production" \
 
 ## Voir aussi
 
-- [Référence API et CLI](reference.md), documentation complète des modules
+- [Référence API et CLI](api.md), documentation complète des modules
 - [Sécurité et RBAC](../philosophy/security.md), sécurité générale Forge
 - [Déploiement avancé](../deployment/deploy-advanced.md), HTTPS, Nginx, production
 - [Contrat de stabilité](../release/stability-contract.md), garanties sur les API publiques
