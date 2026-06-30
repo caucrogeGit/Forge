@@ -105,9 +105,10 @@ include = ["core*", "cli*", "integrations*"]
 ]
 
 [tool.pyright]
-# ADR-036 — typage statique vérifié en CI. Le cliquet couvre désormais le cœur
-# ET les 12 opt-ins, tous `# pyright: strict` par fichier (0 erreur en mode
-# "standard" + marqueurs). `extraPaths` rend chaque paquet importable par les
+# ADR-036 - typage statique vérifié en CI. Le cliquet couvre le cœur, tous les
+# opt-ins et les 4 backends BDD (ADR-054), en `# pyright: strict` par fichier.
+# `forge-mvc-testing` (dev-only, ADR-041) est inclus mais vérifié en mode
+# "standard" seulement (annotation stricte complète à faire séparément). `extraPaths` rend chaque paquet importable par les
 # autres (images→files, video→files, etc.) : pyright ne suit pas les installs
 # éditables PEP 660, on lui donne donc les sources directement.
 include = [
@@ -132,6 +133,11 @@ include = [
     "packages/forge-mvc-stats/forge_mvc_stats",
     "packages/forge-mvc-video/forge_mvc_video",
     "packages/forge-mvc-workflow/forge_mvc_workflow",
+    "packages/forge-mvc-mariadb/forge_mvc_mariadb",
+    "packages/forge-mvc-mssql/forge_mvc_mssql",
+    "packages/forge-mvc-postgres/forge_mvc_postgres",
+    "packages/forge-mvc-sqlite/forge_mvc_sqlite",
+    "packages/forge-mvc-testing/forge_mvc_testing",
 ]
 extraPaths = [
     "packages/forge-mvc-admin",
@@ -154,6 +160,11 @@ extraPaths = [
     "packages/forge-mvc-stats",
     "packages/forge-mvc-video",
     "packages/forge-mvc-workflow",
+    "packages/forge-mvc-mariadb",
+    "packages/forge-mvc-mssql",
+    "packages/forge-mvc-postgres",
+    "packages/forge-mvc-sqlite",
+    "packages/forge-mvc-testing",
 ]
 typeCheckingMode = "standard"
 pythonVersion = "3.12"

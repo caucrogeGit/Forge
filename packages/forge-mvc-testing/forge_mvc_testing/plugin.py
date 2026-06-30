@@ -49,9 +49,18 @@ def clear_sessions():
     """Vide le store de sessions entre chaque test."""
     from core.sessions.manager import get_session_store
 
-    get_session_store().purge_all()
+    def _purge() -> None:
+        # `purge_all` est une capacité réservée aux tests, portée par
+        # MemorySessionStore et hors du protocole SessionStore : on l'appelle
+        # uniquement si le store configuré l'expose.
+        store = get_session_store()
+        purge = getattr(store, "purge_all", None)
+        if callable(purge):
+            purge()
+
+    _purge()
     yield
-    get_session_store().purge_all()
+    _purge()
 
 
 @pytest.fixture(autouse=True)

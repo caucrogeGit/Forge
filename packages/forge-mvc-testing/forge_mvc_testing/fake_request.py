@@ -118,7 +118,7 @@ class _FakeHeaders:
         self._headers = dict(headers or {})
         self._headers_lower = {key.lower(): value for key, value in self._headers.items()}
 
-    def get(self, name, default=""):
+    def get(self, name, default: str | None = ""):
         if name in self._headers:
             return self._headers[name]
         if name.lower() in self._headers_lower:
