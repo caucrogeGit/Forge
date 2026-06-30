@@ -3,8 +3,13 @@
 
 {% block title %}Bienvenue · {{ app_name }}{% endblock %}
 
+{# La page d'accueil n'affiche pas la barre de navigation : on neutralise le bloc header du layout. #}
+{% block header %}{% endblock %}
+
 {% block content %}
 <section class="text-center">
+    <img src="/static/forge-bandeau-1-512.png" alt="Forge"
+         class="mx-auto mb-8 w-72 max-w-full h-auto">
     <div class="mb-6">{{ badge("Projet Forge") }}</div>
     <h1 class="text-5xl font-extrabold tracking-tight mb-5 leading-tight">
         Votre projet&nbsp;<span class="text-teal">Forge</span> tourne

@@ -24,6 +24,7 @@
 </head>
 <body class="bg-cream text-ink font-sans min-h-screen flex flex-col">
 
+    {% block header %}
     <header class="bg-surface border-b border-line px-8 py-4">
         <div class="max-w-5xl mx-auto flex items-center justify-between gap-6">
             <a href="/" class="text-lg font-extrabold tracking-tight">{{ app_name }}</a>
@@ -32,6 +33,7 @@
             </nav>
         </div>
     </header>
+    {% endblock %}
 
     <main class="flex-1 w-full max-w-3xl mx-auto px-8 py-16">
         {% block content %}{% endblock %}
