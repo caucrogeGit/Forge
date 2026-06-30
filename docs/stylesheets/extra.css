@@ -70,8 +70,10 @@
   --md-accent-fg-color: #E8651A;
 }
 
-/* Header : bordure orange sous la barre, comme la nav de la landing. */
+/* Header : fond noir PUR (#000) comme la landing (et non le « black » de
+   Material qui tire vers le gris foncé), bordure orange, sans ombre. */
 .md-header {
+  background-color: #000;
   border-bottom: 2px solid #E8651A;
   box-shadow: none;
 }
