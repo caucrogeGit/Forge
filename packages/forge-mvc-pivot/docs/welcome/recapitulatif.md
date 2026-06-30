@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression Pivot
 
-Récapitulatif des paliers de la progression *Bonjour Forge Pivot* et des API du
+Récapitulatif des paliers de la progression *Welcome Pivot* et des API du
 module opt-in `forge-mvc-pivot` introduites à chaque étape.
 
 !!! note "Module opt-in : SQL visible"
@@ -13,7 +13,7 @@ module opt-in `forge-mvc-pivot` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge Pivot](debutant/pivot-welcome.md) | Pivot ordinaire vs enrichi, construire le service | `PivotAdvancedService` |
+| 1 | [Welcome Pivot](debutant/pivot-welcome.md) | Pivot ordinaire vs enrichi, construire le service | `PivotAdvancedService` |
 | 2 | [Générer le sous-CRUD](debutant/pivot-make.md) | Produire le sous-CRUD pivot | `make:pivot-crud`, `--dry-run` |
 | 3 | [Le schéma SQL](debutant/pivot-schema.md) | Clés composites + colonnes d'attributs | `CREATE TABLE article_tag` |
 

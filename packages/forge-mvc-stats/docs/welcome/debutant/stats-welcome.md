@@ -1,4 +1,4 @@
-# Bonjour Forge Stats
+# Welcome Stats
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-stats`.
 
@@ -49,7 +49,7 @@ class StatsWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge Stats")
+        return Response.text("Welcome Stats")
 
     @staticmethod
     def inspect(request: Request) -> Response:

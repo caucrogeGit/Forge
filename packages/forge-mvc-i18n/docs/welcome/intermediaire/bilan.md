@@ -1,7 +1,6 @@
 # Bilan : niveau intermédiaire (i18n)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Bonjour Forge
-i18n*. Ce niveau couvre la locale par défaut, le repli, et le cas de la clé
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome i18n*. Ce niveau couvre la locale par défaut, le repli, et le cas de la clé
 manquante.
 
 ## Ce que vous avez validé

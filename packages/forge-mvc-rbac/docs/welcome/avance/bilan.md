@@ -1,6 +1,6 @@
 # Bilan : niveau avancé (RBAC)
 
-Récapitulatif du **niveau avancé** de la progression *Bonjour Forge RBAC*. Ce niveau
+Récapitulatif du **niveau avancé** de la progression *Welcome RBAC*. Ce niveau
 **relie** rôles et permissions aux utilisateurs réels.
 
 ## Ce que vous avez validé
@@ -16,7 +16,7 @@ utilisateurs.
 
 ## Et ensuite
 
-La progression *Bonjour Forge RBAC* est terminée. En production : déclarez le contrat
+La progression *Welcome RBAC* est terminée. En production : déclarez le contrat
 `mvc/security/rbac.json`, persistez rôles et associations (`rbac`, `user_roles`),
 gardez les routes (`require_*`) et adaptez l'UI (`can()`).
 

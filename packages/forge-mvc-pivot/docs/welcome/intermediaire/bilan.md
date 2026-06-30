@@ -1,7 +1,6 @@
 # Bilan : niveau intermédiaire (Pivot)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Bonjour Forge
-Pivot*. Ce niveau couvre le cycle de vie d'une association : créer, modifier,
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome Pivot*. Ce niveau couvre le cycle de vie d'une association : créer, modifier,
 supprimer, lire.
 
 ## Ce que vous avez validé

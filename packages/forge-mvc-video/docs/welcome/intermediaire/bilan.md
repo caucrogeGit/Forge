@@ -1,7 +1,7 @@
 # Bilan : niveau intermédiaire (Vidéo)
 
 Récapitulatif des compétences acquises au **niveau intermédiaire** de la
-progression *Bonjour Forge Vidéo*. Ce niveau fait passer de la lecture à une
+progression *Welcome Vidéo*. Ce niveau fait passer de la lecture à une
 petite chaîne **alimenter → servir → suivre**, toujours sans transcodage.
 
 ## Ce que vous avez validé

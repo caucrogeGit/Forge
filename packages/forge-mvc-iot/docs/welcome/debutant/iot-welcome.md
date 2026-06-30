@@ -1,4 +1,4 @@
-# Bonjour Forge IoT
+# Welcome IoT
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-iot` et sa
 configuration.
@@ -38,7 +38,7 @@ forge run
 ```
 
 Ouvrez `https://localhost:8000/iot-welcome` : la page affiche
-**« Bonjour Forge IoT »**. Puis `https://localhost:8000/iot-welcome/inspect`
+**« Welcome IoT »**. Puis `https://localhost:8000/iot-welcome/inspect`
 renvoie la configuration MQTT en JSON, le mot de passe remplacé par `***`.
 
 ## Le contrôleur
@@ -71,7 +71,7 @@ class IotWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge IoT")
+        return Response.text("Welcome IoT")
 
     @staticmethod
     def inspect(request: Request) -> Response:

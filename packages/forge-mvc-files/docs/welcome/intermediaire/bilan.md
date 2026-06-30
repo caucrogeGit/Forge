@@ -1,6 +1,6 @@
 # Bilan : niveau intermédiaire (Files)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Bonjour Forge Files*.
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome Files*.
 Ce niveau couvre la **robustesse** : valider finement, limiter les abus, supprimer
 proprement.
 

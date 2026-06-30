@@ -1,4 +1,4 @@
-# Bonjour Forge Audio
+# Welcome Audio
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-audio`, une chaîne
 audio **sans état**.
@@ -34,7 +34,7 @@ Premier palier du **niveau débutant** de la progression audio
 forge run
 ```
 
-Ouvrez `https://localhost:8000/audio-welcome` (« Bonjour Forge Audio »), puis
+Ouvrez `https://localhost:8000/audio-welcome` (« Welcome Audio »), puis
 `/audio-welcome/inspect` pour la configuration en JSON.
 
 ## Le contrôleur
@@ -65,7 +65,7 @@ class AudioWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge Audio")
+        return Response.text("Welcome Audio")
 
     @staticmethod
     def inspect(request: Request) -> Response:

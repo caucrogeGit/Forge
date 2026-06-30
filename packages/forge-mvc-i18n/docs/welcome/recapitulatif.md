@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression i18n
 
-Récapitulatif des paliers de la progression *Bonjour Forge i18n* et des API du
+Récapitulatif des paliers de la progression *Welcome i18n* et des API du
 module opt-in `forge-mvc-i18n` introduites à chaque étape.
 
 !!! note "Module opt-in : repli no-op"
@@ -12,7 +12,7 @@ module opt-in `forge-mvc-i18n` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge i18n](debutant/i18n-welcome.md) | Traduire une clé, repli no-op | `trans` |
+| 1 | [Welcome i18n](debutant/i18n-welcome.md) | Traduire une clé, repli no-op | `trans` |
 | 2 | [Écrire un catalogue](debutant/i18n-catalog.md) | Structurer et charger des catalogues | `load_catalog` |
 | 3 | [Traduire une clé](debutant/i18n-trans.md) | Servir FR ou EN à la demande | `trans` |
 

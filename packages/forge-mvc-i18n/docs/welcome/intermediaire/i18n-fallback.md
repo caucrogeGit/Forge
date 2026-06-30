@@ -22,7 +22,7 @@ présente dans le catalogue de secours, `trans` renvoie la valeur de secours.
 ```json
 // translations/fr.json  (il manque "footer.note")
 {
-  "welcome.title": "Bonjour Forge i18n",
+  "welcome.title": "Welcome i18n",
   "nav.home": "Accueil"
 }
 ```

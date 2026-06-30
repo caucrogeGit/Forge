@@ -1,4 +1,4 @@
-# Bonjour Forge i18n
+# Welcome i18n
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-i18n`.
 
@@ -31,7 +31,7 @@ Premier palier du **niveau débutant** de la progression i18n
 ```json
 // translations/fr.json
 {
-  "welcome.title": "Bonjour Forge i18n"
+  "welcome.title": "Welcome i18n"
 }
 ```
 
@@ -57,7 +57,7 @@ class I18nWelcomeController(BaseController):
 ### Comprendre ce code
 
 - `trans("welcome.title", locale="fr")` lit `translations/fr.json` et retourne
-  `"Bonjour Forge i18n"`.
+  `"Welcome i18n"`.
 - Le catalogue est un simple objet JSON `clé → texte` : rien de magique, le
   stockage est visible et éditable.
 - Sans le module opt-in, la même ligne renverrait `"welcome.title"` (repli no-op).

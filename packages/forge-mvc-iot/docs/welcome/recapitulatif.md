@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression IoT
 
-Récapitulatif des paliers de la progression *Bonjour Forge IoT* et des API du
+Récapitulatif des paliers de la progression *Welcome IoT* et des API du
 module opt-in `forge-mvc-iot` introduites à chaque étape.
 
 !!! note "Module opt-in"
@@ -11,7 +11,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge IoT](debutant/iot-welcome.md) | Vérifier le module, inspecter la config (secret masqué) | `load_iot_config` |
+| 1 | [Welcome IoT](debutant/iot-welcome.md) | Vérifier le module, inspecter la config (secret masqué) | `load_iot_config` |
 | 2 | [Lire les événements IoT](debutant/iot-events.md) | Lire les derniers événements, rester pédagogique si la table manque | `IotEventRepository.list_recent` |
 | 3 | [Les événements d'un capteur](debutant/iot-device.md) | Cibler un capteur et compter ses événements | `find_by_device`, `count_by_device` |
 

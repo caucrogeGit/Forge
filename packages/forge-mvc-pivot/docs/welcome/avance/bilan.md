@@ -1,6 +1,6 @@
 # Bilan : niveau avancé (Pivot)
 
-Récapitulatif du **niveau avancé** de la progression *Bonjour Forge Pivot*. Ce
+Récapitulatif du **niveau avancé** de la progression *Welcome Pivot*. Ce
 niveau verrouille l'intégrité et l'UX : contraintes, unicité, erreurs de
 formulaire.
 

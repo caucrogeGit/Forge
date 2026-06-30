@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression Files
 
-Récapitulatif des paliers de la progression *Bonjour Forge Files* et des API du
+Récapitulatif des paliers de la progression *Welcome Files* et des API du
 module opt-in `forge-mvc-files` introduites à chaque étape.
 
 !!! note "Module opt-in et fondation"
@@ -14,7 +14,7 @@ module opt-in `forge-mvc-files` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge Files](debutant/files-welcome.md) | Inspecter racine et politique d'upload | `upload_root` |
+| 1 | [Welcome Files](debutant/files-welcome.md) | Inspecter racine et politique d'upload | `upload_root` |
 | 2 | [Stocker un document](debutant/file-store.md) | Valider puis écrire (façade document) | `save_upload`, `SavedUpload` |
 | 3 | [Servir un fichier](debutant/file-serve.md) | Relire un fichier, anti-traversal + 404 | `serve_media_file` |
 

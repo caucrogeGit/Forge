@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression RBAC
 
-Récapitulatif des paliers de la progression *Bonjour Forge RBAC* et des API du module
+Récapitulatif des paliers de la progression *Welcome RBAC* et des API du module
 opt-in `forge-mvc-rbac` introduites à chaque étape.
 
 !!! note "Module opt-in"
@@ -12,7 +12,7 @@ opt-in `forge-mvc-rbac` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge RBAC](debutant/rbac-welcome.md) | Charger et inspecter le contrat | `load_rbac_contract` |
+| 1 | [Welcome RBAC](debutant/rbac-welcome.md) | Charger et inspecter le contrat | `load_rbac_contract` |
 | 2 | [Code de permission](debutant/rbac-permission.md) | Normaliser/valider une permission | `normalize_permission_code`, `validate_permission` |
 | 3 | [Rôle et slug](debutant/rbac-role.md) | Dériver/valider un rôle | `normalize_role_slug`, `validate_role` |
 

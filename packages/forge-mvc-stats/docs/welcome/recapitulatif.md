@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression Stats
 
-Récapitulatif des paliers de la progression *Bonjour Forge Stats* et des API du module
+Récapitulatif des paliers de la progression *Welcome Stats* et des API du module
 opt-in `forge-mvc-stats` introduites à chaque étape.
 
 !!! note "Module opt-in : SQL visible"
@@ -13,7 +13,7 @@ opt-in `forge-mvc-stats` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge Stats](debutant/stats-welcome.md) | Créer un événement, inspecter table/colonnes | `make_event`, `STATS_EVENTS_TABLE` |
+| 1 | [Welcome Stats](debutant/stats-welcome.md) | Créer un événement, inspecter table/colonnes | `make_event`, `STATS_EVENTS_TABLE` |
 | 2 | [Nom d'événement](debutant/stats-event.md) | Normaliser/valider un nom | `normalize_event_name`, `validate_event_name` |
 | 3 | [Le schéma SQL](debutant/stats-schema.md) | Lire le `CREATE TABLE` | `get_stats_events_schema_sql` |
 

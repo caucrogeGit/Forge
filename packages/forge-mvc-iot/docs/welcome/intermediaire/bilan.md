@@ -1,7 +1,7 @@
 # Bilan : niveau intermédiaire (IoT)
 
 Récapitulatif des compétences acquises au **niveau intermédiaire** de la
-progression *Bonjour Forge IoT*. Ce niveau fait passer de la lecture à une
+progression *Welcome IoT*. Ce niveau fait passer de la lecture à une
 petite chaîne **alimenter → exposer → afficher**, toujours en simulation locale.
 
 ## Ce que vous avez validé

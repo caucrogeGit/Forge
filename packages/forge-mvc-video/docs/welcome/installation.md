@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge Vidéo »
+# Installation : Progression « Welcome Vidéo »
 
 Ce préambule installe le module **opt-in** `forge-mvc-video` dans un projet
 Forge existant. La progression vidéo se réalise ensuite **à la main** : chaque

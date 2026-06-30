@@ -1,6 +1,6 @@
 # Bilan : niveau intermédiaire (Stats)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Bonjour Forge Stats*. Ce
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome Stats*. Ce
 niveau couvre l'**enregistrement** : voir le SQL, tracker, valider.
 
 ## Ce que vous avez validé

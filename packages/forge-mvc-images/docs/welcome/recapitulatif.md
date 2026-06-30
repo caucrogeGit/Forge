@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression Images
 
-Récapitulatif des paliers de la progression *Bonjour Forge Images* et des API du
+Récapitulatif des paliers de la progression *Welcome Images* et des API du
 module opt-in `forge-mvc-images` introduites à chaque étape.
 
 !!! note "Module opt-in"
@@ -13,7 +13,7 @@ module opt-in `forge-mvc-images` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge Images](debutant/images-welcome.md) | Vérifier le module, inspecter formats et tailles de variantes | `ALLOWED_IMAGE_EXTENSIONS`, `IMAGE_VARIANT_SIZES` |
+| 1 | [Welcome Images](debutant/images-welcome.md) | Vérifier le module, inspecter formats et tailles de variantes | `ALLOWED_IMAGE_EXTENSIONS`, `IMAGE_VARIANT_SIZES` |
 | 2 | [Téléverser une image](debutant/image-upload.md) | Vérifier le contenu avant d'écrire, générer les variantes | `save_image_upload` |
 | 3 | [Miniatures et variantes](debutant/image-variants.md) | Dériver les chemins des variantes et leurs URL | `image_variant_relative_paths`, `media_url` |
 

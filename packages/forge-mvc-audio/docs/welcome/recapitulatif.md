@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression Audio
 
-Récapitulatif des paliers de la progression *Bonjour Forge Audio* et des API du
+Récapitulatif des paliers de la progression *Welcome Audio* et des API du
 module opt-in `forge-mvc-audio` introduites à chaque étape.
 
 !!! note "Module opt-in : sans état"
@@ -13,7 +13,7 @@ module opt-in `forge-mvc-audio` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge Audio](debutant/audio-welcome.md) | Inspecter la config, token masqué | `load_audio_config` |
+| 1 | [Welcome Audio](debutant/audio-welcome.md) | Inspecter la config, token masqué | `load_audio_config` |
 | 2 | [Téléverser un audio](debutant/audio-upload.md) | Valider et stocker en uuid-based | `ingest_audio` |
 | 3 | [Lire un audio](debutant/audio-play.md) | Brancher la lecture streaming officielle | `register_audio_routes` |
 

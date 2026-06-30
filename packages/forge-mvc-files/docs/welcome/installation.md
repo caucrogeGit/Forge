@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge Files »
+# Installation : Progression « Welcome Files »
 
 Ce préambule installe le module **opt-in** `forge-mvc-files` dans un projet
 Forge existant. La progression files se réalise ensuite **à la main** : chaque

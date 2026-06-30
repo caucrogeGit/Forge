@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression Vidéo
 
-Récapitulatif des paliers de la progression *Bonjour Forge Vidéo* et des API du
+Récapitulatif des paliers de la progression *Welcome Vidéo* et des API du
 module opt-in `forge-mvc-video` introduites à chaque étape.
 
 !!! note "Module opt-in"
@@ -11,7 +11,7 @@ module opt-in `forge-mvc-video` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge Vidéo](debutant/video-welcome.md) | Vérifier le module, inspecter la config (secret masqué) | `load_video_config` |
+| 1 | [Welcome Vidéo](debutant/video-welcome.md) | Vérifier le module, inspecter la config (secret masqué) | `load_video_config` |
 | 2 | [Lister les vidéos](debutant/video-list.md) | Lire les dernières vidéos, rester pédagogique si la table manque | `VideoRepository.list_recent` |
 | 3 | [Le détail d'une vidéo](debutant/video-detail.md) | Cibler une vidéo par UUID (trouvée / `404` / `503`) | `get_by_uuid` |
 

@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge MFA »
+# Installation : Progression « Welcome MFA »
 
 Ce préambule installe le module **opt-in** `forge-mvc-mfa` dans un projet Forge
 existant. La progression se réalise ensuite **à la main** : chaque palier décrit

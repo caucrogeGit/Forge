@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge i18n »
+# Installation : Progression « Welcome i18n »
 
 Ce préambule installe le module **opt-in** `forge-mvc-i18n` dans un projet
 Forge existant. La progression se réalise ensuite **à la main** : chaque palier

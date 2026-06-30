@@ -74,7 +74,7 @@ class RbacCheckController(BaseController):
 ## Le contrat
 
 Ce palier s'appuie sur le contrat `mvc/security/rbac.json` introduit au palier
-« Bonjour Forge RBAC ». Si vous démarrez ici, créez-le :
+« Welcome RBAC ». Si vous démarrez ici, créez-le :
 
 ```json
 {

@@ -1,6 +1,6 @@
 # Bilan : niveau avancé (Workflow)
 
-Récapitulatif du **niveau avancé** de la progression *Bonjour Forge Workflow*. Ce
+Récapitulatif du **niveau avancé** de la progression *Welcome Workflow*. Ce
 niveau couvre l'**affichage** des statuts.
 
 ## Ce que vous avez validé
@@ -15,7 +15,7 @@ Vous maîtrisez le workflow de bout en bout : statuts, transitions, affichage.
 
 ## Et ensuite
 
-La progression *Bonjour Forge Workflow* est terminée. `forge-mvc-workflow` décrit la
+La progression *Welcome Workflow* est terminée. `forge-mvc-workflow` décrit la
 machine à états ; l'application **stocke** le statut courant de ses objets (une colonne
 suffit) et applique les transitions validées.
 

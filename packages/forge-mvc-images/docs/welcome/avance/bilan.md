@@ -1,7 +1,7 @@
 # Bilan : niveau avancé (Images)
 
 Récapitulatif des compétences acquises au **niveau avancé** de la progression
-*Bonjour Forge Images*. Ce niveau finalise la maîtrise des médias : couverture,
+*Welcome Images*. Ce niveau finalise la maîtrise des médias : couverture,
 suppression propre et sécurité à l'upload.
 
 ## Ce que vous avez validé
@@ -17,7 +17,7 @@ complète et sécurisée des médias.
 
 ## Et ensuite
 
-La progression *Bonjour Forge Images* est terminée. Pour consolider, parcourez
+La progression *Welcome Images* est terminée. Pour consolider, parcourez
 l'aide-mémoire ou attaquez un vrai projet média.
 
 [Aide-mémoire de la progression Images](../recapitulatif.md)

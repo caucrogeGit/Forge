@@ -1,7 +1,7 @@
 # Bilan : niveau avancé (IoT)
 
 Récapitulatif des compétences acquises au **niveau avancé** de la progression
-*Bonjour Forge IoT*. Ce niveau **bascule vers le réel** : contrat des messages,
+*Welcome IoT*. Ce niveau **bascule vers le réel** : contrat des messages,
 subscriber MQTT branché sur un vrai broker, et diagnostic du module.
 
 ## Ce que vous avez validé

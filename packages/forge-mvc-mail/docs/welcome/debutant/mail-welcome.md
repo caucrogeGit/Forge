@@ -1,4 +1,4 @@
-# Bonjour Forge Mail
+# Welcome Mail
 
 ## Niveau débutant : envoyer un premier email
 

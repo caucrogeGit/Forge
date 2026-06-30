@@ -1,6 +1,6 @@
 # Bilan : niveau avancé (i18n)
 
-Récapitulatif du **niveau avancé** de la progression *Bonjour Forge i18n*. Ce
+Récapitulatif du **niveau avancé** de la progression *Welcome i18n*. Ce
 niveau couvre l'intégration template, le cache et la robustesse.
 
 ## Ce que vous avez validé

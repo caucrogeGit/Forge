@@ -1,4 +1,4 @@
-# Bonjour Forge Workflow
+# Welcome Workflow
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-workflow`, une
 machine à états applicative.
@@ -61,7 +61,7 @@ class WorkflowWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge Workflow")
+        return Response.text("Welcome Workflow")
 
     @staticmethod
     def inspect(request: Request) -> Response:

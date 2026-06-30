@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge Images »
+# Installation : Progression « Welcome Images »
 
 Ce préambule installe le module **opt-in** `forge-mvc-images` dans un projet
 Forge existant. La progression images se réalise ensuite **à la main** : chaque

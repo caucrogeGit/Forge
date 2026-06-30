@@ -1,6 +1,6 @@
 # Bilan : niveau intermédiaire (MFA)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Bonjour Forge MFA*. Ce
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome MFA*. Ce
 niveau couvre le **flux** : enrôler, challenger à la connexion, récupérer.
 
 ## Ce que vous avez validé

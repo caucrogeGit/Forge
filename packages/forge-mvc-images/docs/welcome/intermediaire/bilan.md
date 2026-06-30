@@ -1,7 +1,7 @@
 # Bilan : niveau intermédiaire (Images)
 
 Récapitulatif des compétences acquises au **niveau intermédiaire** de la
-progression *Bonjour Forge Images*. Ce niveau introduit la **couche médias en
+progression *Welcome Images*. Ce niveau introduit la **couche médias en
 base** : relier une image à une entité, l'afficher, la rendre accessible et
 ordonnée.
 

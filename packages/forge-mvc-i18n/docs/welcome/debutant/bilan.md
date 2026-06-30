@@ -1,6 +1,6 @@
 # Bilan : niveau débutant (i18n)
 
-Récapitulatif du **niveau débutant** de la progression *Bonjour Forge i18n*. Ce
+Récapitulatif du **niveau débutant** de la progression *Welcome i18n*. Ce
 niveau pose les bases : le helper `trans`, les catalogues JSON, la traduction à
 la demande.
 
@@ -8,7 +8,7 @@ la demande.
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 : [Bonjour Forge i18n](i18n-welcome.md) | Traduire une clé ; comprendre le repli no-op (`trans`). |
+| 1 : [Welcome i18n](i18n-welcome.md) | Traduire une clé ; comprendre le repli no-op (`trans`). |
 | 2 : [Écrire un catalogue](i18n-catalog.md) | Structurer `fr.json` / `en.json` ; charger (`load_catalog`). |
 | 3 : [Traduire une clé](i18n-trans.md) | Servir FR ou EN selon la locale (`trans`). |
 

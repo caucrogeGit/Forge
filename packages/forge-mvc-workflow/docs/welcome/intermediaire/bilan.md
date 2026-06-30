@@ -1,6 +1,6 @@
 # Bilan : niveau intermédiaire (Workflow)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Bonjour Forge Workflow*.
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome Workflow*.
 Ce niveau couvre les **transitions** : déclarer, vérifier, lister.
 
 ## Ce que vous avez validé

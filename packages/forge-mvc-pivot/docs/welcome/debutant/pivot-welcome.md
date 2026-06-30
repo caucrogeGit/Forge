@@ -1,4 +1,4 @@
-# Bonjour Forge Pivot
+# Welcome Pivot
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-pivot`.
 
@@ -68,7 +68,7 @@ class PivotWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge Pivot")
+        return Response.text("Welcome Pivot")
 
     @staticmethod
     def inspect(request: Request) -> Response:

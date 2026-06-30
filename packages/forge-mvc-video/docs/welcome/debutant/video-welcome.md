@@ -1,4 +1,4 @@
-# Bonjour Forge Vidéo
+# Welcome Vidéo
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-video` et sa
 configuration.
@@ -38,7 +38,7 @@ forge run
 ```
 
 Ouvrez `https://localhost:8000/video-welcome` : la page affiche
-**« Bonjour Forge Vidéo »**. Puis `https://localhost:8000/video-welcome/inspect`
+**« Welcome Vidéo »**. Puis `https://localhost:8000/video-welcome/inspect`
 renvoie la configuration en JSON, le token remplacé par `***`.
 
 ## Le contrôleur
@@ -68,7 +68,7 @@ class VideoWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge Vidéo")
+        return Response.text("Welcome Vidéo")
 
     @staticmethod
     def inspect(request: Request) -> Response:

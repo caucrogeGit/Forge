@@ -9,7 +9,7 @@ en JSON.
 table n'existe pas encore, au lieu de planter.
 
 Palier 2 du **niveau débutant** de la progression IoT, après
-[Bonjour Forge IoT](iot-welcome.md).
+[Welcome IoT](iot-welcome.md).
 
 ## Ce que ce starter montre
 

@@ -43,7 +43,7 @@ class I18nTransController(BaseController):
 ### Comprendre ce code
 
 - `trans("welcome.title", locale="en")` lit `translations/en.json` et renvoie
-  `"Hello Forge i18n"` ; avec `locale="fr"`, `"Bonjour Forge i18n"`.
+  `"Hello Forge i18n"` ; avec `locale="fr"`, `"Welcome i18n"`.
 - Une **seule** route sert les deux langues : c'est le catalogue qui varie, pas
   le code.
 - La locale vient de l'utilisateur (`?lang=`), mais elle ne désigne qu'un fichier

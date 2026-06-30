@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge IoT »
+# Installation : Progression « Welcome IoT »
 
 Ce préambule installe le module **opt-in** `forge-mvc-iot` dans un projet Forge
 existant. La progression IoT se réalise ensuite **à la main** : chaque palier

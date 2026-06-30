@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge Audio »
+# Installation : Progression « Welcome Audio »
 
 Ce préambule installe le module **opt-in** `forge-mvc-audio` dans un projet
 Forge existant. La progression audio se réalise ensuite **à la main** : chaque

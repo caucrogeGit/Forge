@@ -1,6 +1,6 @@
 # Bilan : niveau intermédiaire (RBAC)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Bonjour Forge RBAC*. Ce
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome RBAC*. Ce
 niveau **applique** le contrat : vérifier, protéger, adapter l'UI.
 
 ## Ce que vous avez validé

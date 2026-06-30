@@ -1,6 +1,6 @@
 # Bilan : niveau avancé (Files)
 
-Récapitulatif du **niveau avancé** de la progression *Bonjour Forge Files*. Ce
+Récapitulatif du **niveau avancé** de la progression *Welcome Files*. Ce
 niveau ouvre le capot : les **primitives** de stockage sécurisé que tout le module
 (et les opt-ins média) composent (ADR-020).
 
@@ -17,7 +17,7 @@ les modules média sont bâtis.
 
 ## Et ensuite
 
-La progression *Bonjour Forge Files* est terminée. `forge-mvc-files` est la
+La progression *Welcome Files* est terminée. `forge-mvc-files` est la
 **fondation** de stockage média de Forge : `forge-mvc-images` en est le premier
 client, et les futurs opt-ins média composeront ces mêmes primitives (ADR-020).
 

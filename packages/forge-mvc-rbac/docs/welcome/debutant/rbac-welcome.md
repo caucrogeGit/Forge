@@ -1,4 +1,4 @@
-# Bonjour Forge RBAC
+# Welcome RBAC
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-rbac` et son
 **contrat déclaratif**.
@@ -65,7 +65,7 @@ class RbacWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge RBAC")
+        return Response.text("Welcome RBAC")
 
     @staticmethod
     def inspect(request: Request) -> Response:

@@ -1,7 +1,7 @@
 # Bilan : niveau débutant (Images)
 
 Récapitulatif des compétences acquises au **niveau débutant** de la progression
-*Bonjour Forge Images*. Ce niveau découvre le module opt-in `forge-mvc-images` :
+*Welcome Images*. Ce niveau découvre le module opt-in `forge-mvc-images` :
 ce qu'il accepte, comment téléverser une image en sécurité, et comment ses
 variantes sont nommées, sans base de données.
 
@@ -9,7 +9,7 @@ variantes sont nommées, sans base de données.
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 : [Bonjour Forge Images](images-welcome.md) | Vérifier le module et inspecter ses capacités (`ALLOWED_IMAGE_EXTENSIONS`, `IMAGE_VARIANT_SIZES`). |
+| 1 : [Welcome Images](images-welcome.md) | Vérifier le module et inspecter ses capacités (`ALLOWED_IMAGE_EXTENSIONS`, `IMAGE_VARIANT_SIZES`). |
 | 2 : [Téléverser une image](image-upload.md) | Vérifier le contenu avant d'écrire et générer les variantes via `save_image_upload`. |
 | 3 : [Miniatures et variantes](image-variants.md) | Dériver les chemins des variantes (`image_variant_relative_paths`) et leurs URL (`media_url`). |
 

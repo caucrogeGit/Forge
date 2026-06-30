@@ -1,4 +1,4 @@
-# Bonjour Forge MFA
+# Welcome MFA
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-mfa`.
 
@@ -71,7 +71,7 @@ class MfaWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge MFA")
+        return Response.text("Welcome MFA")
 
     @staticmethod
     def inspect(request: Request) -> Response:

@@ -9,7 +9,7 @@ plus récent). Et un réflexe Forge : rester **pédagogique** quand la table
 n'existe pas encore, au lieu de planter.
 
 Palier 2 du **niveau débutant** de la progression vidéo, après
-[Bonjour Forge Vidéo](video-welcome.md).
+[Welcome Vidéo](video-welcome.md).
 
 ## Ce que ce starter montre
 

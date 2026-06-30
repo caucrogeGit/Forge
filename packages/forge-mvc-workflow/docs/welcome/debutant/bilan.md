@@ -1,13 +1,13 @@
 # Bilan : niveau débutant (Workflow)
 
-Récapitulatif du **niveau débutant** de la progression *Bonjour Forge Workflow*. Ce
+Récapitulatif du **niveau débutant** de la progression *Welcome Workflow*. Ce
 niveau pose les briques : statuts, noms, recherche.
 
 ## Ce que vous avez validé
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 : [Bonjour Forge Workflow](workflow-welcome.md) | Définir et valider un jeu de statuts (`make_status`, `validate_statuses`). |
+| 1 : [Welcome Workflow](workflow-welcome.md) | Définir et valider un jeu de statuts (`make_status`, `validate_statuses`). |
 | 2 : [Nom de statut](workflow-status.md) | Normaliser/valider un nom de statut. |
 | 3 : [Retrouver un statut](workflow-find.md) | Localiser un statut par son nom (`find_status`). |
 

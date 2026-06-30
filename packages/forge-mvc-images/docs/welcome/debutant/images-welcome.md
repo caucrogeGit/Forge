@@ -1,4 +1,4 @@
-# Bonjour Forge Images
+# Welcome Images
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-images` et ce
 qu'il sait traiter.
@@ -43,7 +43,7 @@ forge run
 ```
 
 Ouvrez `https://localhost:8000/images-welcome` : la page affiche
-**« Bonjour Forge Images »**. Puis `https://localhost:8000/images-welcome/inspect`
+**« Welcome Images »**. Puis `https://localhost:8000/images-welcome/inspect`
 renvoie les formats acceptés et les tailles de variantes en JSON.
 
 ## Le contrôleur
@@ -77,7 +77,7 @@ class ImagesWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge Images")
+        return Response.text("Welcome Images")
 
     @staticmethod
     def inspect(request: Request) -> Response:

@@ -1,4 +1,4 @@
-# Installation : parcours « Bonjour Forge Admin »
+# Installation : parcours « Welcome Admin »
 
 Ce préambule installe l'opt-in `forge-mvc-admin` dans un projet Forge existant.
 La progression se réalise ensuite **à la main** : chaque palier décrit les

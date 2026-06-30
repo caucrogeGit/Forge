@@ -1,4 +1,4 @@
-# Bonjour Forge Files
+# Welcome Files
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-files`, le
 pipeline d'upload générique de Forge.
@@ -37,7 +37,7 @@ Premier palier du **niveau débutant** de la progression files
 forge run
 ```
 
-Ouvrez `https://localhost:8000/files-welcome` (« Bonjour Forge Files »), puis
+Ouvrez `https://localhost:8000/files-welcome` (« Welcome Files »), puis
 `/files-welcome/inspect` pour la politique d'upload en JSON.
 
 ## Le contrôleur
@@ -67,7 +67,7 @@ class FilesWelcomeController(BaseController):
 
     @staticmethod
     def index(request: Request) -> Response:
-        return Response.text("Bonjour Forge Files")
+        return Response.text("Welcome Files")
 
     @staticmethod
     def inspect(request: Request) -> Response:

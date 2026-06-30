@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge RBAC »
+# Installation : Progression « Welcome RBAC »
 
 Ce préambule installe le module **opt-in** `forge-mvc-rbac` dans un projet Forge
 existant. La progression se réalise ensuite **à la main** : chaque palier décrit

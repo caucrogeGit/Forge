@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression Workflow
 
-Récapitulatif des paliers de la progression *Bonjour Forge Workflow* et des API du
+Récapitulatif des paliers de la progression *Welcome Workflow* et des API du
 module opt-in `forge-mvc-workflow` introduites à chaque étape.
 
 !!! note "Module opt-in : sans état"
@@ -13,7 +13,7 @@ module opt-in `forge-mvc-workflow` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge Workflow](debutant/workflow-welcome.md) | Définir/valider un jeu de statuts | `make_status`, `validate_statuses` |
+| 1 | [Welcome Workflow](debutant/workflow-welcome.md) | Définir/valider un jeu de statuts | `make_status`, `validate_statuses` |
 | 2 | [Nom de statut](debutant/workflow-status.md) | Normaliser/valider un nom | `normalize_status_name`, `validate_status_name` |
 | 3 | [Retrouver un statut](debutant/workflow-find.md) | Localiser un statut par son nom | `find_status` |
 

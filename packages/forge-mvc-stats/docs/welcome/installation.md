@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge Stats »
+# Installation : Progression « Welcome Stats »
 
 Ce préambule installe le module **opt-in** `forge-mvc-stats` dans un projet
 Forge existant. La progression se réalise ensuite **à la main** : chaque palier

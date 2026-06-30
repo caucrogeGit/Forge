@@ -1,4 +1,4 @@
-# Installation : Progression « Bonjour Forge Pivot »
+# Installation : Progression « Welcome Pivot »
 
 Ce préambule installe le module **opt-in** `forge-mvc-pivot` dans un projet
 Forge existant. La progression se réalise ensuite **à la main** : chaque palier

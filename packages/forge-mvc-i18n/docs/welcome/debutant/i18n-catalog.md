@@ -21,7 +21,7 @@ catalogue (objet JSON de chaînes), puis retourne un dict.
 ```json
 // translations/fr.json
 {
-  "welcome.title": "Bonjour Forge i18n",
+  "welcome.title": "Welcome i18n",
   "welcome.greeting": "Bienvenue",
   "nav.home": "Accueil"
 }

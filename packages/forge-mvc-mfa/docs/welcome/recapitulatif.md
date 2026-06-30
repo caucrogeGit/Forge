@@ -1,6 +1,6 @@
 # Aide-mémoire de la progression MFA
 
-Récapitulatif des paliers de la progression *Bonjour Forge MFA* et des API du module
+Récapitulatif des paliers de la progression *Welcome MFA* et des API du module
 opt-in `forge-mvc-mfa` introduites à chaque étape.
 
 !!! note "Module opt-in"
@@ -12,7 +12,7 @@ opt-in `forge-mvc-mfa` introduites à chaque étape.
 
 | # | Palier | Ce qu'on apprend | API-clé |
 |---|--------|------------------|---------|
-| 1 | [Bonjour Forge MFA](debutant/mfa-welcome.md) | Inspecter facteurs, statuts, clé | `validate_mfa_secret_key_config` |
+| 1 | [Welcome MFA](debutant/mfa-welcome.md) | Inspecter facteurs, statuts, clé | `validate_mfa_secret_key_config` |
 | 2 | [Secret TOTP et QR](debutant/mfa-secret.md) | Générer secret + URI `otpauth://` | `generate_totp_secret`, `totp_provisioning_uri` |
 | 3 | [Vérifier un code TOTP](debutant/mfa-verify.md) | Confronter code et secret | `verify_totp_code` |
 

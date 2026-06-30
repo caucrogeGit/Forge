@@ -1,6 +1,6 @@
 # Bilan : niveau avancé (Audio)
 
-Récapitulatif du **niveau avancé** de la progression *Bonjour Forge Audio*. Ce
+Récapitulatif du **niveau avancé** de la progression *Welcome Audio*. Ce
 niveau ajoute le traitement (`ffprobe`/`ffmpeg`) et le diagnostic.
 
 ## Ce que vous avez validé
@@ -16,7 +16,7 @@ diagnostic.
 
 ## Et ensuite
 
-La progression *Bonjour Forge Audio* est terminée. `forge-mvc-audio` est une chaîne
+La progression *Welcome Audio* est terminée. `forge-mvc-audio` est une chaîne
 audio **sobre et sans état** : opérations synchrones, fichiers repérés par uuid,
 aucune table. Pour les gros volumes, on déporte le transcodage hors de la requête.
 
