@@ -63,6 +63,9 @@ rbac = ["forge-mvc-rbac>=1.0.0rc1,<2"]
 workflow = ["forge-mvc-workflow>=1.0.0rc1,<2"]
 stats = ["forge-mvc-stats>=1.0.0rc1,<2"]
 all = [
+    # Périmètre restreint aux 3 opt-ins sans dépendance lourde ni binaire
+    # système : « all » = base recommandée, pas la totalité des opt-ins.
+    # Les autres s'installent explicitement (rationale détaillée : README).
     "forge-mvc-rbac>=1.0.0rc1,<2",
     "forge-mvc-workflow>=1.0.0rc1,<2",
     "forge-mvc-stats>=1.0.0rc1,<2",
