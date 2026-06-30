@@ -505,16 +505,29 @@ def main() -> None:
             )
         profile = DEFAULT_PROJECT_PROFILE
         remaining = args[2:]
+        # CLI-NEW-UNKNOWN-ARGS-001 : on consomme uniquement `--profile <valeur>`
+        # et on refuse explicitement tout autre argument, plutôt que de l'ignorer
+        # silencieusement (une option mal orthographiée doit échouer, pas passer).
+        consumed: set[int] = set()
         if "--profile" in remaining:
             idx = remaining.index("--profile")
+            consumed.add(idx)
             if idx + 1 < len(remaining):
                 profile = remaining[idx + 1]
+                consumed.add(idx + 1)
             else:
                 cli_fail(
                     "argument manquant pour «forge new».",
                     hint="indique le profil après --profile. Profils disponibles : "
                          + ", ".join(SUPPORTED_PROJECT_PROFILES),
                 )
+        unexpected = [tok for i, tok in enumerate(remaining) if i not in consumed]
+        if unexpected:
+            cli_fail(
+                "argument inconnu pour «forge new» : " + ", ".join(unexpected) + ".",
+                hint="usage : forge new <NomDuProjet> [--profile <profil>]. "
+                     "Profils disponibles : " + ", ".join(SUPPORTED_PROJECT_PROFILES),
+            )
         cmd_new(args[1], profile=profile)
         return
 
