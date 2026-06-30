@@ -70,12 +70,17 @@
   --md-accent-fg-color: #E8651A;
 }
 
-/* Header : fond noir PUR (#000) comme la landing (et non le « black » de
-   Material qui tire vers le gris foncé), bordure orange, sans ombre. */
+/* Header : bordure orange, sans ombre. */
 .md-header {
-  background-color: #000;
   border-bottom: 2px solid #E8651A;
   box-shadow: none;
+}
+/* Fond noir PUR (#000) comme la landing. Material applique, en primaire « black »,
+   `[data-md-color-primary=black] .md-header { background-color: hsla(...,9%) }`
+   (≈ #14151A) avec une spécificité (0,2,0) supérieure à `.md-header`. On surcharge
+   donc avec le MÊME sélecteur : à spécificité égale, extra.css (chargé après) gagne. */
+[data-md-color-primary="black"] .md-header {
+  background-color: #000;
 }
 
 /* === Navigation universelle façon landing (DOCS-NAV-UNIVERSAL-001) ===
