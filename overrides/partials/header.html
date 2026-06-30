@@ -1,0 +1,49 @@
+{#-
+  DOCS-NAV-SINGLE-BAR-001
+  Barre de navigation unique, façon landing : logo à gauche + onglets de premier
+  niveau de la navigation (contextuels : « Cœur de Forge », « Opt-ins officiels »)
+  + recherche à droite, le tout dans une seule barre. L'entrée « Accueil » est
+  omise (le logo y mène). Recherche 100% native Material. Logo et recherche
+  restent visibles en petit écran ; les onglets se replient dans le tiroir latéral
+  (toggle for="__drawer"). Styles dans docs/stylesheets/extra.css.
+-#}
+{%- macro first_url(item) -%}
+  {%- if item.children -%}{{- first_url(item.children | first) -}}{%- else -%}{{- item.url -}}{%- endif -%}
+{%- endmacro -%}
+<header class="md-header" data-md-component="header">
+  <nav class="forge-nav" aria-label="{{ lang.t('header') }}">
+
+    <a href="{{ '/' | url }}" class="forge-nav-logo" aria-label="{{ config.site_name }}">
+      <img src="{{ 'static/forge-logo.png' | url }}" alt="Forge">
+    </a>
+
+    <div class="forge-tabs">
+      {% for nav_item in nav.items %}
+        {% if not nav_item.is_homepage %}
+          <a href="{{ first_url(nav_item) | url }}"
+             class="forge-tab{% if nav_item.active %} forge-tab--active{% endif %}">{{ nav_item.title }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="forge-nav-right">
+      {% if "material/search" in config.plugins %}
+        {% set search = config.plugins["material/search"] | attr("config") %}
+        {% if search.enabled %}
+          <label class="md-header__button md-icon" for="__search">
+            {% set icon = config.theme.icon.search or "material/magnify" %}
+            {% include ".icons/" ~ icon ~ ".svg" %}
+          </label>
+          {% include "partials/search.html" %}
+        {% endif %}
+      {% endif %}
+
+      <label class="md-header__button md-icon forge-drawer-toggle" for="__drawer"
+             aria-label="{{ lang.t('header.button.menu') }}">
+        {% set icon = config.theme.icon.menu or "material/menu" %}
+        {% include ".icons/" ~ icon ~ ".svg" %}
+      </label>
+    </div>
+
+  </nav>
+</header>
