@@ -12,7 +12,9 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-API_DOC = PROJECT_ROOT / "docs" / "reference" / "api.md"
+# Contrat déplacé : la surface BaseController est documentée sur sa page dédiée
+# (DOCS-API-CATALOG-003), api.md n'étant plus qu'un catalogue de liens.
+API_DOC = PROJECT_ROOT / "core" / "mvc" / "docs" / "base_controller.md"
 
 
 @pytest.fixture(scope="module")

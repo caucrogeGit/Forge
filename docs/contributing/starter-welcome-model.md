@@ -144,7 +144,7 @@ Aucune <hors-périmètre 2>.
 |--------|----------------------|-----------|
 | `Request`  | … | [Request](../../../reference/http.md#3-request-reference) |
 | `Response` | … | [Response](../../../reference/http.md#4-response-reference) |
-| `BaseController` | … | [BaseController](../../../reference/api.md#coremvccontroller) |
+| `BaseController` | … | [BaseController](../../../core-mvc/base_controller.md#coremvccontroller) |
 
 ## Tester
 ```bash

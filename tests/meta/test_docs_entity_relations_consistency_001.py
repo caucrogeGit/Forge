@@ -73,8 +73,9 @@ class TestManyToManyConsistency:
         )
 
     def test_api_ref_says_many_to_many_supported(self):
-        """reference/api.md confirme le support de many_to_many."""
-        text = API_REF.read_text(encoding="utf-8")
+        """features/relations.md confirme le support de many_to_many (le détail a
+        quitté api.md, devenu un catalogue de liens, DOCS-API-CATALOG-003)."""
+        text = RELATIONS_MD.read_text(encoding="utf-8")
         assert "many_to_many" in text, (
             "docs/reference/api.md doit mentionner many_to_many."
         )

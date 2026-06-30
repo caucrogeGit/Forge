@@ -224,6 +224,31 @@ class ApiController(BaseController):
     Toutes les opérations de `BaseController` sont statiques.
     On les appelle sur la classe, jamais sur une instance ; les contrôleurs n'ont pas d'état d'instance.
 
+## 8. Statut des méthodes (canoniques, à surveiller, legacy) { #coremvccontroller }
+
+> Ticket : `BASE-CONTROLLER-API-DOC-001`.
+> Audit de surface : `docs/history/audits/base-controller-surface-audit-001.md`.
+
+`BaseController` expose **18 méthodes statiques** : 17 canoniques, 1 legacy (`current_user()`), 2 à surveiller (`set_flash()`, `csrf_token()`).
+
+!!! note "Méthodes À_SURVEILLER"
+    `set_flash` et `csrf_token` sont stables et utilisables, mais dépendent de `core.security.session` (module legacy, non déprécié).
+    Elles seront réévaluées si ce module devait être supprimé à terme.
+
+!!! warning "Méthode legacy : `current_user`"
+    `current_user(request)` est **LEGACY** : elle appelle `core.security.session.get_user()`, qui émet un `DeprecationWarning`.
+    Elle est absente de tous les starters récents ; ne l'utilisez pas dans les nouveaux projets.
+
+    Alternative canonique :
+
+    ```python
+    from core.auth.session import get_authenticated_user_id
+    from mvc.models.auth_model import get_user_by_id
+
+    user_id = get_authenticated_user_id(request)
+    utilisateur = get_user_by_id(user_id) if user_id else None
+    ```
+
 ## Voir aussi
 
 - [Le registre de contexte Jinja](registry.md) : enrichir le contexte de rendu.

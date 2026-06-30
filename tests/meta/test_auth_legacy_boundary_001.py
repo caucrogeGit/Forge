@@ -15,7 +15,9 @@ def _auth_md():
 
 
 def _reference_md():
-    return (ROOT / "docs" / "reference" / "api.md").read_text(encoding="utf-8")
+    # Frontière core.auth / core.security documentée sur la page Auth
+    # (DOCS-API-CATALOG-003) ; api.md n'est plus qu'un catalogue de liens.
+    return (ROOT / "docs" / "features" / "auth.md").read_text(encoding="utf-8")
 
 
 def _readme_md():

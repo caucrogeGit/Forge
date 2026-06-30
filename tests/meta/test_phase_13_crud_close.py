@@ -16,7 +16,9 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
-REFERENCE = pathlib.Path("docs/reference/api.md")
+# Contrat déplacé : le récapitulatif des fonctionnalités CRUD vit dans la page
+# CRUD (DOCS-API-CATALOG-003), api.md n'étant plus qu'un catalogue de liens.
+REFERENCE = pathlib.Path("docs/features/crud.md")
 
 
 def _roadmap() -> str:

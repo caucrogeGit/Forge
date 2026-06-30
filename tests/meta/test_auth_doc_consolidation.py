@@ -250,7 +250,9 @@ class TestLimitesRestantes:
 # ---------------------------------------------------------------------------
 
 class TestReferenceDocumentee:
-    _ref = REFERENCE_MD.read_text(encoding="utf-8")
+    # Commandes auth admin documentées sur la page CLI Sécurité (DOCS-API-CATALOG-003) ;
+    # api.md n'est plus qu'un catalogue de liens.
+    _ref = pathlib.Path("cli/security/docs/auth.md").read_text(encoding="utf-8")
 
     def test_auth_user_disable_dans_reference(self):
         assert "auth:user:disable" in self._ref

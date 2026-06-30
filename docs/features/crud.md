@@ -365,3 +365,17 @@ Ce qui reste à venir :
 - permissions média (accès contrôlé aux fichiers servis via `/media/...`).
 
 Voir [Référence API et CLI](../reference/reference.md) et Module média pour les détails.
+
+## Récapitulatif des fonctionnalités du CRUD généré
+
+Le CRUD produit par `forge make:crud` couvre nativement le filtrage, le tri, les actions groupées et l'export, sans JavaScript lourd.
+
+| Fonctionnalité | Points clés |
+|---|---|
+| Filtrage | recherche et `filter` par colonne, contrôles conservés dans `pagination.filters` |
+| Recherche live (HTMX) | rafraîchit la cible `#crud-results` via HTMX, sans rechargement de page |
+| Tri | colonnes triables bornées par la liste blanche `_ALLOWED_SORT` |
+| Suppression groupée | actions `bulk` (suppression groupée) avec confirmation et jeton CSRF |
+| Export CSV | route `export.csv`, plafond `_EXPORT_LIMIT` (1000 lignes), échappement `_csv_escape` (anti-injection CSV) |
+| En-têtes | `Cache-Control` adapté aux réponses partielles et à l'export |
+| Accès | compatible RBAC (`require_permission`) ; toutes les mutations protégées par CSRF |
