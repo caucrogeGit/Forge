@@ -1,38 +1,72 @@
-/* DOCS-NAV-SINGLE-BAR-001
-   Hamburger de la barre de navigation (petit écran) : ouvre/ferme le panneau des
-   onglets de navigation (Cœur de Forge, Opt-ins officiels). Fermé par défaut ;
-   l'utilisateur l'ouvre au clic. Fermeture au clic sur un lien, au clic extérieur
-   ou à la touche Échap. */
+/* DOCS-NAV-UNIVERSAL-001
+   Comportement de la navigation universelle de la doc (réplique de la landing) :
+   - menus déroulants (Documentation, Modules) : ouverture au clic (survol en CSS) ;
+   - hamburger (petit écran) : ouvre/ferme le menu, FERMÉ par défaut ;
+   - fermeture au clic sur un lien, au clic extérieur et à la touche Échap. */
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.getElementById("forge-nav-toggle");
-  const tabs = document.getElementById("forge-tabs");
-  if (!toggle || !tabs) return;
+  const links = document.getElementById("forge-nav-links");
+  const dropdowns = document.querySelectorAll(".forge-nav [data-dropdown]");
 
-  function close() {
-    tabs.classList.remove("is-open");
-    toggle.setAttribute("aria-expanded", "false");
+  function closeDropdowns() {
+    dropdowns.forEach((d) => {
+      d.classList.remove("is-open");
+      const t = d.querySelector(".forge-nav-trigger");
+      if (t) t.setAttribute("aria-expanded", "false");
+    });
   }
-  function open() {
-    tabs.classList.add("is-open");
-    toggle.setAttribute("aria-expanded", "true");
+  function closeMenu() {
+    if (links) links.classList.remove("is-open");
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
   }
 
-  toggle.addEventListener("click", (event) => {
-    event.stopPropagation();
-    if (tabs.classList.contains("is-open")) close();
-    else open();
+  dropdowns.forEach((item) => {
+    const trigger = item.querySelector(".forge-nav-trigger");
+    if (!trigger) return;
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const wasOpen = item.classList.contains("is-open");
+      closeDropdowns();
+      if (!wasOpen) {
+        item.classList.add("is-open");
+        trigger.setAttribute("aria-expanded", "true");
+      }
+    });
   });
 
-  tabs.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", close);
-  });
+  if (toggle && links) {
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (links.classList.contains("is-open")) {
+        closeMenu();
+      } else {
+        links.classList.add("is-open");
+        toggle.setAttribute("aria-expanded", "true");
+      }
+    });
+    links.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        closeMenu();
+        closeDropdowns();
+      });
+    });
+  }
 
   document.addEventListener("click", (event) => {
-    if (!event.target.closest("#forge-tabs") && !event.target.closest("#forge-nav-toggle")) {
-      close();
+    if (!event.target.closest("[data-dropdown]")) closeDropdowns();
+    if (
+      toggle && links &&
+      !event.target.closest("#forge-nav-links") &&
+      !event.target.closest("#forge-nav-toggle")
+    ) {
+      closeMenu();
     }
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") close();
+    if (event.key === "Escape") {
+      closeDropdowns();
+      closeMenu();
+    }
   });
 });

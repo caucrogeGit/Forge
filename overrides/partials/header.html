@@ -1,12 +1,12 @@
 {#-
-  DOCS-NAV-SINGLE-BAR-001
-  Barre de navigation unique, façon landing : logo à gauche + onglets de premier
-  niveau de la navigation (contextuels : « Cœur de Forge », « Opt-ins officiels »)
-  + recherche à droite. L'entrée « Accueil » est omise (le logo y mène).
-  Recherche 100% native Material. En petit écran, logo et recherche restent
-  visibles ; les onglets se replient et s'ouvrent au clic sur le hamburger
-  (#forge-nav-toggle, fermé par défaut). Styles dans docs/stylesheets/extra.css,
-  bascule du hamburger dans docs/javascripts/forge-nav.js.
+  DOCS-NAV-UNIVERSAL-001
+  Navigation universelle de la documentation : réplique de la barre de la landing
+  (logo + Démarrer + Documentation + Modules + GitHub + Contact + recherche),
+  présente sur toutes les pages de doc. Juste au-dessus de la bordure orange, un
+  fil d'Ariane (icône + chemin depuis page.ancestors) indique où l'on se trouve.
+  Recherche 100% native Material. En petit écran, le menu se replie derrière le
+  hamburger (#forge-nav-toggle, fermé par défaut). Styles : docs/stylesheets/extra.css ;
+  bascules : docs/javascripts/forge-nav.js.
 -#}
 {%- macro first_url(item) -%}
   {%- if item.children -%}{{- first_url(item.children | first) -}}{%- else -%}{{- item.url -}}{%- endif -%}
@@ -18,13 +18,46 @@
       <img src="{{ 'static/forge-logo.png' | url }}" alt="Forge">
     </a>
 
-    <div class="forge-tabs" id="forge-tabs">
-      {% for nav_item in nav.items %}
-        {% if not nav_item.is_homepage %}
-          <a href="{{ first_url(nav_item) | url }}"
-             class="forge-tab{% if nav_item.active %} forge-tab--active{% endif %}">{{ nav_item.title }}</a>
-        {% endif %}
-      {% endfor %}
+    <div class="forge-nav-links" id="forge-nav-links">
+      <a href="/docs/forge/guide/getting-started/" class="forge-nav-link">Démarrer</a>
+
+      <div class="forge-nav-item" data-dropdown>
+        <button type="button" class="forge-nav-link forge-nav-trigger"
+                aria-haspopup="true" aria-expanded="false">
+          Documentation
+          <svg class="forge-nav-chevron" width="12" height="12" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="forge-nav-menu" role="menu">
+          <a href="/docs/forge/guide/getting-started/">Guide de démarrage</a>
+          <a href="/docs/forge/guide/concepts/">Architecture &amp; concepts</a>
+          <a href="/docs/forge/install/">Installation</a>
+          <a href="/docs/forge/reference/reference/">Référence (cœur + CLI)</a>
+          <a href="/docs/forge/reference/cli-commands/">Commandes CLI</a>
+          <a href="/docs/forge/reference/api/">API</a>
+        </div>
+      </div>
+
+      <div class="forge-nav-item" data-dropdown>
+        <button type="button" class="forge-nav-link forge-nav-trigger"
+                aria-haspopup="true" aria-expanded="false">
+          Modules
+          <svg class="forge-nav-chevron" width="12" height="12" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="forge-nav-menu" role="menu">
+          <a href="/docs/forge/optins/">Opt-ins (vue d'ensemble)</a>
+          <a href="/docs/forge/guide/bases-de-donnees/">Bases de données (backends)</a>
+          <a href="/docs/forge/#starters">Parcours &amp; starters</a>
+        </div>
+      </div>
+
+      <a href="https://github.com/caucrogeGit/Forge"
+         target="_blank" rel="noopener noreferrer" class="forge-nav-link">GitHub</a>
+
+      <a href="/docs/forge/#contact" class="forge-nav-link">Contact</a>
     </div>
 
     <div class="forge-nav-right">
@@ -41,11 +74,24 @@
 
       <button type="button" class="md-header__button md-icon forge-nav-toggle"
               id="forge-nav-toggle" aria-label="{{ lang.t('header.button.menu') }}"
-              aria-expanded="false" aria-controls="forge-tabs">
+              aria-expanded="false" aria-controls="forge-nav-links">
         {% set icon = config.theme.icon.menu or "material/menu" %}
         {% include ".icons/" ~ icon ~ ".svg" %}
       </button>
     </div>
 
   </nav>
+
+  {% if page and page.ancestors %}
+  <nav class="forge-crumbs" aria-label="{{ lang.t('nav') }}">
+    <span class="forge-crumbs-icon">{% include ".icons/material/file-tree-outline.svg" %}</span>
+    <a href="{{ '/' | url }}" class="forge-crumb">Accueil</a>
+    {% for nav_item in page.ancestors | reverse %}
+      <span class="forge-crumb-sep">/</span>
+      <a href="{{ first_url(nav_item) | url }}" class="forge-crumb">{{ nav_item.title }}</a>
+    {% endfor %}
+    <span class="forge-crumb-sep">/</span>
+    <span class="forge-crumb forge-crumb--current">{{ page.title }}</span>
+  </nav>
+  {% endif %}
 </header>
