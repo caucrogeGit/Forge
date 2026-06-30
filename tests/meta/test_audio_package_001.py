@@ -113,9 +113,11 @@ class TestApiAndCli:
         assert forge_mvc_audio.__version__
 
     def test_cli_dispatch_in_forge(self):
-        text = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
-        assert 'command == "audio:doctor"' in text
-        assert "forge_mvc_audio.cli.doctor" in text
+        # ADR-059 : audio:doctor est dispatchée via la table opt-in centrale.
+        from cli.commands.optin_dispatch import OPTIN_COMMANDS
+
+        assert "audio:doctor" in OPTIN_COMMANDS
+        assert OPTIN_COMMANDS["audio:doctor"].module == "forge_mvc_audio.cli.doctor"
 
     def test_help_mentions_audio_doctor(self):
         help_text = (PROJECT_ROOT / "cli" / "_support" / "help.py").read_text(encoding="utf-8")

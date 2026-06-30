@@ -41,6 +41,7 @@ from cli.project.project_profiles import (
 )
 from cli._support.errors import cli_fail
 from cli._support.help_dispatch import format_command_help, wants_help
+from cli.commands.optin_dispatch import dispatch_optin
 
 
 _FORGE_VERSION = "1.0.0rc1"
@@ -599,20 +600,6 @@ def main() -> None:
         model_main(args)
         return
 
-    if command in ("upload:init", "media:init"):
-        # FILES-CLI-RENAME-001 (ADR-019) : import lazy — l'upload est un opt-in
-        # (forge-mvc-files). Le core CLI ne le tire qu'à l'invocation de la
-        # commande, et échoue proprement si l'opt-in n'est pas installé.
-        try:
-            from cli.assets.uploads import main as upload_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-files non installé.",
-                hint="installe l'opt-in upload : pip install forge-mvc-files",
-            )
-        upload_main(args)
-        return
-
     if command == "js:init":
         front_main(args)
         return
@@ -637,225 +624,6 @@ def main() -> None:
         "auth:user:roles",
     ):
         auth_main(args)
-        return
-
-    if command in ("mail:init", "mail:test", "mail:render", "mail:doctor", "mail:logs"):
-        try:
-            from forge_mvc_mail.cli import main as mail_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-mail non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-mail",
-            )
-        mail_main(args)
-        return
-
-    if command == "settings:init":
-        try:
-            from forge_mvc_settings.cli.init import main as settings_init_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-settings non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-settings",
-            )
-        rc = settings_init_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "audit:init":
-        try:
-            from forge_mvc_audit.cli.init import main as audit_init_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-audit non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-audit",
-            )
-        rc = audit_init_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "jobs:init":
-        try:
-            from forge_mvc_jobs.cli.init import main as jobs_init_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-jobs non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-jobs",
-            )
-        rc = jobs_init_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "notifications:init":
-        try:
-            from forge_mvc_notifications.cli.init import main as notifications_init_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-notifications non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-notifications",
-            )
-        rc = notifications_init_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "iot:doctor":
-        try:
-            from forge_mvc_iot.cli.doctor import main as iot_doctor_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-iot non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-iot",
-            )
-        rc = iot_doctor_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "iot:init":
-        try:
-            from forge_mvc_iot.cli.init import main as iot_init_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-iot non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-iot",
-            )
-        rc = iot_init_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "iot:simulate":
-        try:
-            from forge_mvc_iot.cli.simulate import main as iot_simulate_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-iot non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-iot",
-            )
-        rc = iot_simulate_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "iot:listen":
-        try:
-            from forge_mvc_iot.cli.listen import main as iot_listen_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-iot non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-iot",
-            )
-        rc = iot_listen_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "audio:doctor":
-        try:
-            from forge_mvc_audio.cli.doctor import main as audio_doctor_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-audio non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-audio",
-            )
-        rc = audio_doctor_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "video:doctor":
-        try:
-            from forge_mvc_video.cli.doctor import main as video_doctor_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-video non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-video",
-            )
-        rc = video_doctor_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "video:init":
-        try:
-            from forge_mvc_video.cli.init import main as video_init_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-video non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-video",
-            )
-        rc = video_init_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "video:process":
-        try:
-            from forge_mvc_video.cli.process import main as video_process_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-video non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-video",
-            )
-        rc = video_process_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "video:upload":
-        try:
-            from forge_mvc_video.cli.upload import main as video_upload_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-video non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-video",
-            )
-        rc = video_upload_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "video:cleanup":
-        try:
-            from forge_mvc_video.cli.cleanup import main as video_cleanup_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-video non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-video",
-            )
-        rc = video_cleanup_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "admin:init":
-        try:
-            from forge_mvc_admin.cli.init import main as admin_init_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-admin non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-admin",
-            )
-        rc = admin_init_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "admin:doctor":
-        try:
-            from forge_mvc_admin.cli.doctor import main as admin_doctor_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-admin non installé.",
-                hint="installe le module opt-in : pip install forge-mvc-admin",
-            )
-        rc = admin_doctor_main(args[1:])
-        if rc:
-            sys.exit(rc)
         return
 
     if command == "agents:init":
@@ -901,17 +669,6 @@ def main() -> None:
         rc = optin_disable_main(args[1:])
         if rc:
             sys.exit(rc)
-        return
-
-    if command in ("deploy:init", "deploy:check"):
-        try:
-            from forge_mvc_deploy.cli.deploy import main as deploy_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-deploy non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-deploy",
-            )
-        deploy_main(args)
         return
 
     if command in ("module:list", "module:install", "module:files", "module:routes", "module:remove"):
@@ -976,15 +733,9 @@ def main() -> None:
         schema_doctor_main(args[1:])
         return
 
-    if command in ("rbac:validate", "rbac:audit"):
-        try:
-            from forge_mvc_rbac.cli import main as rbac_main
-        except ImportError:
-            cli_fail(
-                "module forge-mvc-rbac non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-rbac",
-            )
-        rbac_main(args)
+    # Commandes livrées par les opt-ins (ADR-059) : table de dispatch centrale,
+    # import paresseux, échec propre si l'opt-in n'est pas installé.
+    if dispatch_optin(command, args):
         return
 
     cli_fail(

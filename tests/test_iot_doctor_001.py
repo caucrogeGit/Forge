@@ -234,27 +234,26 @@ class TestMainEntry:
 
 
 class TestForgePyDispatch:
-    """La commande ``iot:doctor`` est branchée dans le dispatcher Forge."""
+    """La commande ``iot:doctor`` est branchée dans le dispatch opt-in (ADR-059)."""
 
     def test_iot_doctor_dispatched_in_forge_py(self):
-        text = FORGE_PY.read_text(encoding="utf-8")
-        assert 'command == "iot:doctor"' in text, (
-            "forge.py doit dispatcher la commande iot:doctor"
+        from cli.commands.optin_dispatch import OPTIN_COMMANDS
+
+        assert "iot:doctor" in OPTIN_COMMANDS, (
+            "iot:doctor doit être enregistrée dans la table de dispatch opt-in"
         )
 
     def test_dispatch_uses_lazy_import_with_graceful_fallback(self):
-        text = FORGE_PY.read_text(encoding="utf-8")
-        # On vérifie que le dispatch protège contre l'absence du module
-        # opt-in : import dans un try/except ImportError.
-        assert "forge_mvc_iot.cli.doctor" in text
-        # Le import est lazy (dans la branche de dispatch, pas en tête
-        # de fichier).
-        assert "from forge_mvc_iot.cli.doctor import" not in text.split(
-            "def main(", 1
-        )[0], (
-            "L'import doit être paresseux pour rester optionnel — "
-            "Forge Core doit fonctionner sans forge-mvc-iot installé"
-        )
+        from cli.commands import optin_dispatch
+        from cli.commands.optin_dispatch import OPTIN_COMMANDS
+
+        assert OPTIN_COMMANDS["iot:doctor"].module == "forge_mvc_iot.cli.doctor"
+        src = Path(optin_dispatch.__file__).read_text(encoding="utf-8")
+        # Import paresseux (importlib) : forge_mvc_iot n'est jamais importé au
+        # niveau module, le coeur fonctionne sans forge-mvc-iot installé.
+        assert "import forge_mvc_iot" not in src and "from forge_mvc_iot" not in src
+        # Repli propre si l'opt-in est absent.
+        assert "non installé" in src
 
     def test_help_text_lists_iot_doctor(self):
         text = HELP_FILE.read_text(encoding="utf-8")

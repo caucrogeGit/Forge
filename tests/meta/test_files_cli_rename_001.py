@@ -50,6 +50,10 @@ def test_forge_py_does_not_import_cli_uploads_at_module_level():
 
 
 def test_forge_py_lazy_imports_cli_uploads_in_branch():
-    # L'import lazy existe bien quelque part (dans la branche de commande).
-    text = FORGE_PY.read_text(encoding="utf-8")
-    assert "from cli.assets.uploads import main" in text
+    # ADR-059 : le dispatch upload est dans la table opt-in, en import paresseux
+    # (importlib), pas en tête de forge.py.
+    from cli.commands.optin_dispatch import OPTIN_COMMANDS
+
+    assert "upload:init" in OPTIN_COMMANDS and "media:init" in OPTIN_COMMANDS
+    assert OPTIN_COMMANDS["upload:init"].module == "cli.assets.uploads"
+    assert "from cli.assets.uploads import" not in FORGE_PY.read_text(encoding="utf-8")
