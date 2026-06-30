@@ -91,6 +91,6 @@ Forge démarre en HTTPS sur `https://localhost:8000` et redémarre automatiqueme
 ## Et après ?
 
 - [Bonjour Forge](bonjour-forge.md) : le premier contact (route, contrôleur, réponse).
-- [Progression des starters](../starters/index.md#progression-recommandee) : neuf paliers, de « Bonjour Forge » au premier CRUD.
+- [Progression officielle des starters](../starters/index.md#progression-recommandee) : les paliers, de « Bonjour Forge » au premier CRUD.
 - [Application complète](app-complete-tutorial.md) : CRUD, relations, formulaires.
 - [Guide de démarrage](guide.md) : configurer MariaDB, créer une entité, générer le CRUD.
