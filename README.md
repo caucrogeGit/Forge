@@ -207,6 +207,17 @@ ruff check .
 mkdocs build --strict
 ```
 
+Prévisualiser la documentation en local :
+
+```bash
+mkdocs serve
+```
+
+Le site est servi sous le préfixe de production : ouvrez
+**http://127.0.0.1:8000/docs/forge/** (et non la racine). La navigation utilise
+des liens absolus `/docs/forge/...`, donc ce préfixe est nécessaire pour que les
+liens fonctionnent.
+
 Voir [`CHARTE_DOC.md`](CHARTE_DOC.md) et [`docs/adr/`](docs/adr/) pour
 les principes et décisions architecturales.
 
