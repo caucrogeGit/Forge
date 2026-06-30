@@ -41,7 +41,7 @@ APP_CSP_NONCE_ENABLED=true
 <script nonce="{{ csp_nonce() }}">/* script inline autorisé */</script>
 ```
 
-`unsafe-inline` n'est jamais ajouté automatiquement. Voir [référence API](../reference/api.md#coresecurity) pour les détails.
+`unsafe-inline` n'est jamais ajouté automatiquement. Voir [la référence CSP](../core-security/csp.md) pour les détails.
 
 ---
 
