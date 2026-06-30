@@ -2,6 +2,9 @@
 
 Ce document explique ce que fait l'opt-in `forge-mvc-workflow`, ce qu'il expose, et comment on s'en sert.
 
+!!! note "Module extrait"
+    Le workflow a été extrait du cœur vers le paquet `forge-mvc-workflow` ; le cœur Forge n'en dépend pas.
+
 `forge-mvc-workflow` décrit une machine à états applicative : des statuts (brouillon, publié, archivé), des transitions autorisées entre eux, et des badges pour les afficher.
 
 Il ne stocke rien lui-même : l'application garde le statut courant sur son entité ; l'opt-in dit quelles transitions sont permises.

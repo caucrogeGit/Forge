@@ -2,6 +2,9 @@
 
 Ce document explique ce que fait l'opt-in `forge-mvc-mfa`, ce qu'il expose, et comment on s'en sert.
 
+!!! note "Module extrait"
+    Le code MFA a été extrait du cœur vers le paquet `forge-mvc-mfa` ; le cœur Forge n'en dépend pas.
+
 `forge-mvc-mfa` ajoute un second facteur d'authentification : TOTP (application d'authentification), codes de récupération, challenge à la connexion, revalidation et protections (anti-rejeu, rate-limit).
 
 Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où persister les facteurs et quand exiger le second facteur.

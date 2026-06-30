@@ -2,6 +2,9 @@
 
 Ce document explique ce que fait l'opt-in `forge-mvc-stats`, ce qu'il expose, et comment on s'en sert.
 
+!!! note "Module extrait"
+    Les statistiques ont été extraites du cœur vers le paquet `forge-mvc-stats` ; le cœur Forge n'en dépend pas.
+
 `forge-mvc-stats` enregistre des événements applicatifs dans une table (`forge_stats_events`), puis permet de les lister et de les agréger par comptage.
 
 Forge ne trace **rien** automatiquement : le développeur appelle `track_event()` quand il le décide, et injecte lui-même l'exécuteur SQL. Aucun cookie visiteur, aucune IP.
