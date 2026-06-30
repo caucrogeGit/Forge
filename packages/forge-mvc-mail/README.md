@@ -20,5 +20,22 @@ optionnelle.
 pip install --pre forge-mvc-mail
 ```
 
+## Usage
+
+```python
+from forge_mvc_mail import Mailer, MailMessage, ConsoleTransport
+
+mailer = Mailer(transport=ConsoleTransport())
+mailer.send(MailMessage(
+    subject="Bienvenue",
+    to="client@example.com",
+    body_text="Merci de votre inscription.",
+))
+```
+
+Le transport est interchangeable : `ConsoleTransport` (développement),
+`SmtpTransport` (SMTP réel), `LogTransport`, `FakeTransport` (tests).
+En production, `MailConfig` lit la configuration SMTP depuis l'environnement.
+
 Le parcours pédagogique `welcome-mail` (documentation `docs/starters/welcome-mail/`)
 montre l'usage pas à pas.
