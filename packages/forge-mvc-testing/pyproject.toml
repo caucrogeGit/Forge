@@ -37,3 +37,6 @@ Repository = "https://github.com/caucrogeGit/Forge"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["forge_mvc_testing*"]
+
+[tool.setuptools.package-data]
+"forge_mvc_testing" = ["py.typed"]
