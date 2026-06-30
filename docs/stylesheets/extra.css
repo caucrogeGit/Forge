@@ -197,7 +197,17 @@
 }
 .forge-nav-toggle {
   display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
   color: #fff;
+  cursor: pointer;
+  padding: 0.4rem;
+}
+.forge-nav-toggle svg {
+  width: 1.4rem;
+  height: 1.4rem;
 }
 
 /* Fil d'Ariane, juste au-dessus de la bordure orange du header. */
