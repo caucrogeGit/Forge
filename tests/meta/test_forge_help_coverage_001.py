@@ -61,7 +61,13 @@ def _get_cli_commands() -> set[str]:
 
 
 def _get_documented_commands() -> set[str]:
-    """Extrait la liste des commandes depuis cli-commands.md."""
+    """Extrait la liste des commandes depuis cli-commands.md.
+
+    Le catalogue concis (DOCS-CLI-COMMANDS-CATALOG-001) liste les commandes
+    dans des tableaux Markdown sous la forme ``| `forge <cmd>` | … |``. On
+    accepte aussi les anciens formats (titre ``### `forge <cmd>` `` et fiche
+    ``<summary><code>forge <cmd></code>``) pour rester robuste.
+    """
     text = CLI_DOC.read_text(encoding="utf-8")
     commands = set()
     for match in re.finditer(r"^### `forge ([a-z][a-z0-9:_-]+)`", text, re.MULTILINE):
@@ -70,6 +76,9 @@ def _get_documented_commands() -> set[str]:
         r"<summary><code>forge ([a-z][a-z0-9:_-]+)</code>",
         text,
     ):
+        commands.add(match.group(1))
+    # Catalogue concis : entrée de tableau « | `forge <cmd>` | … ».
+    for match in re.finditer(r"^\|\s*`forge ([a-z][a-z0-9:_-]+)`", text, re.MULTILINE):
         commands.add(match.group(1))
     return commands
 

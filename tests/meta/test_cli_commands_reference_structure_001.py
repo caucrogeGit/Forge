@@ -1,16 +1,18 @@
-"""Garde-fou DOCS-CLI-COMMANDS-EXAMPLES-RESTRUCTURE-001.
+"""Garde-fou DOCS-CLI-COMMANDS-CATALOG-001.
 
-Verrouille la structure pédagogique de ``docs/reference/cli-commands.md`` :
+Verrouille la structure du **catalogue concis** ``docs/reference/cli-commands.md``
+(refonte DOCS-CLI-COMMANDS-CATALOG-001 : la page n'est plus une référence riche
+à fiches ``<details>`` repliables, mais un catalogue de navigation où chaque
+commande tient sur une ligne de tableau, avec un lien vers sa page dédiée) :
 
-  * vue d'ensemble + tableau des commandes essentielles ;
-  * parcours rapides (scénarios d'enchaînement) ;
-  * référence complète par domaine — sections existantes intactes ;
-  * section dédiée aux modules opt-in (avec rappel qu'ils restent optionnels) ;
-  * index alphabétique en fin de page.
+  * une section « Parcours rapides » en tête, avec des scénarios d'enchaînement ;
+  * des sections de domaine (H2) listant les commandes en tableaux ;
+  * les commandes essentielles du cœur sont présentes ;
+  * chaque commande est listée comme ``| `forge <cmd>` | … |``.
 
 Les assertions visent la **présence des sections** et de **marqueurs
-sémantiques** stables, jamais le texte exact d'un paragraphe — pour
-permettre une réécriture éditoriale future sans casser le garde-fou.
+sémantiques** stables, jamais le texte exact d'un paragraphe, pour permettre
+une réécriture éditoriale future sans casser le garde-fou.
 """
 from __future__ import annotations
 
@@ -41,14 +43,9 @@ def doc_text() -> str:
 
 
 class TestTopLevelStructure:
-    def test_has_vue_d_ensemble(self, doc_text):
-        assert re.search(r"^##\s+Vue d'ensemble", doc_text, re.MULTILINE), (
-            "La page doit ouvrir sur une section « Vue d'ensemble »."
-        )
-
-    def test_has_commandes_essentielles(self, doc_text):
-        assert re.search(r"^##\s+Commandes essentielles", doc_text, re.MULTILINE), (
-            "La page doit contenir une section « Commandes essentielles »."
+    def test_has_title(self, doc_text):
+        assert re.search(r"^#\s+Référence des commandes Forge", doc_text, re.MULTILINE), (
+            "La page doit ouvrir sur le titre « Référence des commandes Forge »."
         )
 
     def test_has_parcours_rapides(self, doc_text):
@@ -56,45 +53,26 @@ class TestTopLevelStructure:
             "La page doit contenir une section « Parcours rapides »."
         )
 
-    # ADR-042 : les sections de commandes opt-in ont été retirées du cœur ;
-    # cli-commands.md ne documente plus que les commandes du core.
-
-    def test_has_index_alphabetique(self, doc_text):
-        assert re.search(r"^##\s+Index alphab[ée]tique", doc_text, re.MULTILINE), (
-            "La page doit se terminer par un index alphabétique des commandes."
+    def test_parcours_appears_before_domain_sections(self, doc_text):
+        """« Parcours rapides » ouvre le catalogue, avant les sections de domaine."""
+        m_parcours = re.search(r"^##\s+Parcours rapides", doc_text, re.MULTILINE)
+        m_projet = re.search(r"^##\s+Projet", doc_text, re.MULTILINE)
+        assert m_parcours is not None and m_projet is not None
+        assert m_parcours.start() < m_projet.start(), (
+            "La section « Parcours rapides » doit précéder les sections de domaine."
         )
 
-    def test_command_reference_uses_api_like_details(self, doc_text):
-        command_cards = re.findall(
-            r"<details markdown=\"1\" id=\"forge-[^\"]+\">\n"
-            r"<summary><code>forge [^<]+</code> - ",
-            doc_text,
-        )
-        assert len(command_cards) >= 40, (
-            "La référence CLI doit présenter les commandes comme l'index API : "
-            f"blocs <details> repliables avec summary. Vu : {len(command_cards)}."
-        )
-
-    def test_sections_appear_in_expected_order(self, doc_text):
-        """Vue d'ensemble → Essentielles → Parcours → … → Index alpha en fin."""
-        order_required = [
-            r"^##\s+Vue d'ensemble",
-            r"^##\s+Commandes essentielles",
-            r"^##\s+Parcours rapides",
-            r"^##\s+Index alphab[ée]tique",
-        ]
-        positions = []
-        for pattern in order_required:
-            match = re.search(pattern, doc_text, re.MULTILINE)
-            assert match is not None, f"Section manquante : {pattern}"
-            positions.append(match.start())
-        assert positions == sorted(positions), (
-            f"Les sections ne sont pas dans l'ordre attendu : positions = {positions}"
+    def test_has_enough_domain_sections(self, doc_text):
+        """Le catalogue regroupe les commandes en au moins 10 sections H2."""
+        h2_count = len(re.findall(r"^## [A-Z]", doc_text, re.MULTILINE))
+        assert h2_count >= 10, (
+            f"cli-commands.md doit avoir au moins 10 sections H2 (groupes de "
+            f"commandes). Trouvé : {h2_count}."
         )
 
 
 # ---------------------------------------------------------------------------
-# Contenu — parcours rapides, exemples, opt-ins
+# Contenu — parcours rapides
 # ---------------------------------------------------------------------------
 
 
@@ -103,23 +81,26 @@ class TestParcoursRapidesContent:
     blocs ``bash``. On ne vérifie pas le texte exact des explications,
     mais la présence d'au moins quelques scénarios concrets avec commandes."""
 
+    def _parcours_section(self, doc_text: str) -> str:
+        m_start = re.search(r"^##\s+Parcours rapides", doc_text, re.MULTILINE)
+        assert m_start is not None, "Section « Parcours rapides » manquante."
+        m_end = re.search(r"^##\s+Projet", doc_text[m_start.end():], re.MULTILINE)
+        assert m_end is not None, (
+            "Une section de domaine doit suivre « Parcours rapides »."
+        )
+        return doc_text[m_start.end(): m_start.end() + m_end.start()]
+
     def test_contains_bash_blocks(self, doc_text):
-        bash_blocks = re.findall(r"```bash\n", doc_text)
-        assert len(bash_blocks) >= 10, (
-            f"La page doit contenir plusieurs blocs `bash` d'exemple, "
-            f"vu : {len(bash_blocks)}."
+        section = self._parcours_section(doc_text)
+        bash_blocks = re.findall(r"```bash\n", section)
+        assert len(bash_blocks) >= 3, (
+            f"La section « Parcours rapides » doit contenir plusieurs blocs "
+            f"`bash` d'exemple, vu : {len(bash_blocks)}."
         )
 
     def test_parcours_section_contains_forge_commands(self, doc_text):
-        """Au moins deux commandes Forge enchaînées dans la section parcours."""
-        m_start = re.search(r"^##\s+Parcours rapides", doc_text, re.MULTILINE)
-        m_end = re.search(
-            r"^##\s+Commandes de projet",
-            doc_text[m_start.end():],
-            re.MULTILINE,
-        )
-        section = doc_text[m_start.end(): m_start.end() + m_end.start()]
-        # Compte des commandes `forge ...` (hors imports / autres).
+        """Au moins cinq commandes Forge enchaînées dans la section parcours."""
+        section = self._parcours_section(doc_text)
         forge_calls = re.findall(r"\bforge\s+[a-z]+(?::[a-z\-]+)*\b", section)
         assert len(forge_calls) >= 5, (
             f"La section « Parcours rapides » doit montrer plusieurs "
@@ -127,85 +108,30 @@ class TestParcoursRapidesContent:
         )
 
 
-# ADR-042 : la section « Modules opt-in » a été retirée de cli-commands.md
-# (les commandes opt-in sont documentées dans leur propre espace). Les tests
-# TestOptInSection correspondants ont été supprimés.
-
-
 # ---------------------------------------------------------------------------
-# Index alphabétique — exhaustivité minimale
+# Catalogue — commandes listées en tableaux
 # ---------------------------------------------------------------------------
 
 
-class TestAlphabeticalIndex:
-    def _index_section(self, doc_text: str) -> str:
-        m = re.search(r"^##\s+Index alphab[ée]tique", doc_text, re.MULTILINE)
-        assert m is not None, "Section Index alphabétique manquante."
-        return doc_text[m.end():]
-
-    def test_index_lists_core_essentials(self, doc_text):
-        section = self._index_section(doc_text)
-        essentials = [
-            "forge new",
-            "forge doctor",
-            "forge project:check",
-            "forge routes:list",
-            "forge make:entity",
-            "forge make:crud",
-            "forge migration:apply",
-        ]
-        for cmd in essentials:
-            assert f"`{cmd}`" in section, (
-                f"L'index alphabétique doit lister `{cmd}`."
-            )
-
-    def test_index_lists_only_core_commands(self, doc_text):
-        """ADR-042 : l'index ne liste plus de commande opt-in (rbac:/mail:/iot:…)."""
-        section = self._index_section(doc_text)
-        for cmd in ("rbac:validate", "rbac:audit", "mail:init", "iot:listen",
-                    "video:doctor", "audio:doctor", "i18n:init"):
-            assert cmd not in section, (
-                f"L'index alphabétique ne doit plus lister la commande opt-in `{cmd}` (ADR-042)."
-            )
-
-
-# ---------------------------------------------------------------------------
-# Fiches de commandes principales — annotations attendues
-# ---------------------------------------------------------------------------
-
-
-class TestPrincipalCommandsHaveStatusAndConfusionNotes:
-    """Les commandes principales doivent annoncer leur statut et lister
-    leurs faux-jumeaux pour éviter les confusions documentées."""
-
-    def _command_block(self, doc_text: str, anchor_command: str) -> str:
-        title_pattern = (
-            r"<details markdown=\"1\" id=\"[^\"]+\">\n"
-            + re.escape(f"<summary><code>{anchor_command}</code>")
-            + r".*?</summary>\n(?P<body>.*?)\n</details>"
+class TestCommandCatalog:
+    def test_commands_listed_as_table_rows(self, doc_text):
+        """Chaque commande tient sur une ligne de tableau « | `forge <cmd>` | … »."""
+        rows = re.findall(r"^\|\s*`forge [a-z][a-z0-9:_-]*`", doc_text, re.MULTILINE)
+        assert len(rows) >= 30, (
+            f"Le catalogue doit lister les commandes en tableaux "
+            f"(« | `forge <cmd>` | … »). Lignes vues : {len(rows)}."
         )
-        match = re.search(title_pattern, doc_text, re.DOTALL)
-        assert match is not None, f"Commande `{anchor_command}` absente."
-        return match.group("body")
 
-    @pytest.mark.parametrize("anchor_command", [
-        "forge make:crud",
+    @pytest.mark.parametrize("command", [
+        "forge new",
         "forge doctor",
         "forge project:check",
-    ])
-    def test_command_card_states_status_core(self, doc_text, anchor_command):
-        block = self._command_block(doc_text, anchor_command)
-        assert "Statut" in block and "core" in block.lower(), (
-            f"La fiche `{anchor_command}` doit mentionner « **Statut :** core »."
-        )
-
-    @pytest.mark.parametrize("anchor_command", [
+        "forge routes:list",
+        "forge make:entity",
         "forge make:crud",
-        "forge doctor",
+        "forge migration:apply",
     ])
-    def test_command_card_lists_confusions(self, doc_text, anchor_command):
-        block = self._command_block(doc_text, anchor_command)
-        assert "confondre" in block.lower(), (
-            f"La fiche `{anchor_command}` doit lister les commandes proches "
-            "via une note « À ne pas confondre avec »."
+    def test_core_essentials_listed(self, doc_text, command):
+        assert f"`{command}`" in doc_text, (
+            f"Le catalogue doit lister la commande essentielle `{command}`."
         )

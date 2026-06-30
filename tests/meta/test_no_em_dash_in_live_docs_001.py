@@ -19,6 +19,8 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.meta
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 EM_DASH = "—"
 

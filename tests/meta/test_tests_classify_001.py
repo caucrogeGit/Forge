@@ -70,7 +70,6 @@ _EXPECTED_IN_META = [
     "test_security_md_001.py",
     "test_security_audit_001.py",
     "test_docs_consolidate_roadmaps_001.py",
-    "test_docs_reference_split_001.py",
     "test_docs_charter_dedup_001.py",
     "test_docs_internal_conventions_001.py",
     "test_getting_started_3_0_001.py",
