@@ -125,6 +125,13 @@ def _known_commands() -> set[str]:
     known |= _dispatch_literals(FORGE_PY)
     for py in FORGE_CLI.rglob("*.py"):
         known |= _dispatch_literals(py)
+    # ADR-059 : les commandes du cœur déléguées et les commandes opt-in sont
+    # dispatchées via des tables (clés de dict), pas via des littéraux `command == …`.
+    from forge import CORE_COMMANDS
+
+    from cli.commands.optin_dispatch import OPTIN_COMMANDS
+
+    known |= set(CORE_COMMANDS) | set(OPTIN_COMMANDS)
     known |= EXTRA_KNOWN
     return known
 

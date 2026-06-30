@@ -250,8 +250,10 @@ class TestScopeGuards:
 
 class TestCliRegistration:
     def test_forge_py_dispatches_optin_enable(self):
-        text = (_REPO_ROOT / "forge.py").read_text(encoding="utf-8")
-        assert 'command == "opt-in:enable"' in text
+        # ADR-059 : opt-in:enable est dispatchée via la table CORE_COMMANDS.
+        from forge import CORE_COMMANDS
+
+        assert "opt-in:enable" in CORE_COMMANDS
 
     def test_help_py_lists_optin_enable(self):
         assert "opt-in:enable" in HELP_FILE.read_text(encoding="utf-8")

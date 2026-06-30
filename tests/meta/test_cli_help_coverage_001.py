@@ -29,11 +29,13 @@ def _commands_in_code() -> set[str]:
     for m in re.finditer(r'command\s+in\s+[\(\{]([^)}]+)[\)\}]', text):
         for s in re.findall(r'["\']([\w:.-]+)["\']', m.group(1)):
             commands.add(s)
-    # ADR-059 : les commandes opt-in sont dispatchées via la table centrale,
-    # plus uniquement par le if-chain de forge.py.
+    # ADR-059 : les commandes opt-in et les commandes du cœur déléguées sont
+    # dispatchées via des tables centrales, plus uniquement par le if-chain.
+    from forge import CORE_COMMANDS
+
     from cli.commands.optin_dispatch import OPTIN_COMMANDS
 
-    commands |= set(OPTIN_COMMANDS)
+    commands |= set(OPTIN_COMMANDS) | set(CORE_COMMANDS)
     return commands
 
 

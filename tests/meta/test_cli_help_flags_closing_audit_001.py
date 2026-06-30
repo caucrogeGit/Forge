@@ -167,11 +167,13 @@ def _commands_referenced_in_forge_py() -> set[str]:
                 and node.left.id == "command":
             for cmp in node.comparators:
                 _add_string_consts(cmp)
-    # ADR-059 : les commandes opt-in sont dispatchées via la table centrale,
-    # plus uniquement par le if-chain de forge.py.
+    # ADR-059 : les commandes opt-in et les commandes du cœur déléguées sont
+    # dispatchées via des tables centrales, plus uniquement par le if-chain.
+    from forge import CORE_COMMANDS
+
     from cli.commands.optin_dispatch import OPTIN_COMMANDS
 
-    found |= set(OPTIN_COMMANDS)
+    found |= set(OPTIN_COMMANDS) | set(CORE_COMMANDS)
     return found
 
 

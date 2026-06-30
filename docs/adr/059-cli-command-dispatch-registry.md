@@ -2,8 +2,9 @@
 
 ## Statut
 
-Accepté (2026-06-30). Premier incrément livré : table de dispatch des
-commandes opt-in.
+Accepté (2026-06-30). Incréments 1 et 2 livrés : table de dispatch des
+commandes opt-in (`cli/commands/optin_dispatch.py`) et table de dispatch des
+commandes du cœur déléguées (`forge.py`, `CORE_COMMANDS`).
 
 ## Contexte
 
@@ -59,32 +60,43 @@ de retour.
 Le registre reste **explicite** (table de données lisible, pas de scan
 d'imports caché), conforme au principe « refuser la magie cachée ».
 
-### Périmètre exact de l'incrément
+### Incrément 1 : table opt-in (`cli/commands/optin_dispatch.py`)
 
-Sont déplacés dans la table : `upload:init`/`media:init`, `mail:*`,
+Sont déplacés dans la table opt-in : `upload:init`/`media:init`, `mail:*`,
 `settings:init`, `audit:init`, `jobs:init`, `notifications:init`, `iot:*`,
 `audio:doctor`, `video:*`, `admin:*`, `deploy:*`, `rbac:*`.
 
-Restent dans `forge.py` (hors périmètre de cet incrément) :
+### Incrément 2 : table des commandes du cœur déléguées (`forge.py`, `CORE_COMMANDS`)
 
-- les commandes du cœur (`new`, `run`, `make:*`, `db:*`, `migration:*`,
-  `doctor`, `project:*`, `routes:list`, `auth:*`, etc.) ;
-- `make:pivot-crud`, qui porte un contrôle d'arguments spécifique avant
-  l'import paresseux ;
-- les commandes qui importent paresseusement un module **du cœur** sans
-  sémantique « opt-in non installé » (`agents:init`, `opt-in:*`, `schema:*`,
-  `docs:pdf`).
+Les commandes du cœur qui ne font que déléguer à un sous-module `cli.*` sont
+décrites dans la table `CORE_COMMANDS` : `run`, `update`, `make:entity`,
+`make:crud`, `make:public-*`, `make:relation`, `entity:validate`,
+`sync:entity`, `js:init`, `i18n:*`, `auth:*`, `agents:init`, `opt-in:*`,
+`module:*`, `docs:pdf`, `sync:relations`/`build:model`/`check:model`,
+`migration:*`, `schema:*`.
+
+**Cette table vit dans `forge.py`, pas sous `cli/commands/`**, et appelle ses
+handlers via une lambda qui les résout dans les globals de `forge.py` au moment
+de l'appel (liaison tardive). Raison : de nombreux tests de routage patchent le
+handler sur le module (`monkeypatch.setattr(forge, "<handler>", fake)`) ; les
+handlers du cœur doivent donc rester des noms patchables du module `forge`. Une
+table dans un module séparé, à capture immédiate, casserait ce contrat de test.
+
+Restent natives dans `forge.py` (hors table) les commandes que `forge.py`
+implémente lui-même ou qui ont une logique propre : `new` (analyse `--profile`),
+`db:init`/`db:apply`, `routes:list`, `doctor`, `project:check`,
+`project:audit`, `make:pivot-crud` (contrôle d'arguments + opt-in).
 
 ## Conséquences
 
-- Ajouter ou retirer une commande opt-in se fait par une ligne de table,
-  sans toucher la chaîne `if/elif` du cœur.
-- `forge.py` rétrécit (suppression d'environ 230 lignes dupliquées) et cesse
-  de grossir à chaque opt-in.
-- Fondation posée pour des incréments ultérieurs (tickets distincts) :
-  registre des commandes du cœur, puis découverte des commandes opt-in par
-  *entry points* (à l'image des backends BDD, ADR-054), pour que chaque opt-in
-  déclare ses commandes sans aucune entrée dans le cœur.
+- Ajouter ou retirer une commande (opt-in ou cœur déléguée) se fait par une
+  ligne de table, sans toucher la chaîne `if/elif`.
+- `main()` de `forge.py` passe d'une chaîne de 46 branches (~520 lignes) à un
+  noyau mince : quelques commandes natives, puis `dispatch_core` et
+  `dispatch_optin`.
+- Fondation posée pour l'incrément ultérieur (ticket distinct) : découverte des
+  commandes opt-in par *entry points* (à l'image des backends BDD, ADR-054),
+  pour que chaque opt-in déclare ses commandes sans aucune entrée dans le cœur.
 
 ## Alternatives écartées
 

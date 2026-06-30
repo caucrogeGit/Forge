@@ -92,7 +92,10 @@ class TestDispatchAndHelp:
         "opt-in:list",
     ])
     def test_command_routed_in_forge_py(self, command):
-        assert f'command == "{command}"' in FORGE_PY, (
+        # ADR-059 : routage via la table CORE_COMMANDS de forge.py.
+        from forge import CORE_COMMANDS
+
+        assert command in CORE_COMMANDS, (
             f"{command} doit être routé dans forge.py."
         )
 

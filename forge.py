@@ -3,6 +3,7 @@
 """forge.py — CLI officielle de Forge. Aide : forge help"""
 
 from typing import Any, cast
+from collections.abc import Callable
 import os
 import re
 import sys
@@ -27,8 +28,6 @@ from cli.public.public_form import main as public_form_main
 from cli.public.public_list import main as public_list_main
 from cli.public.public_page import main as public_page_main
 from cli.public.public_show import main as public_show_main
-# FILES-CLI-RENAME-001 (ADR-019) : cli.assets.uploads importé en lazy dans la
-# branche upload:init/media:init (dépend de l'opt-in forge-mvc-files).
 from cli.assets.front import main as front_main
 from cli.security.auth import main as auth_main
 from cli.assets.i18n import main as i18n_main
@@ -475,6 +474,123 @@ def cmd_routes_list() -> None:
 
 # ── Dispatch ──────────────────────────────────────────────────────────────────
 
+# ── Registre de dispatch des commandes du cœur (ADR-059) ─────────────────────
+# Chaque commande déléguée à un sous-module cli.* est décrite par un lanceur.
+# Le handler est invoqué via une lambda qui le résout dans les globals de
+# forge.py au moment de l'appel : il reste patchable (les tests de routage font
+# monkeypatch.setattr(forge, "<handler>")). Ajouter une commande déléguée se
+# fait par une ligne de table, sans toucher la chaîne de dispatch.
+_CoreRunner = Callable[[list[str]], None]
+_CoreCall = Callable[[list[str]], Any]
+
+
+def _delegate(
+    call: _CoreCall,
+    *,
+    full: bool = False,
+    exit_rc: bool = False,
+    min_args: int = 0,
+    label: str = "",
+    missing_hint: str = "",
+) -> _CoreRunner:
+    def run(args: list[str]) -> None:
+        if min_args and len(args) < min_args:
+            cli_fail(f"argument manquant pour «forge {label}».", hint=missing_hint)
+        rc = call(args if full else args[1:])
+        if exit_rc and rc:
+            sys.exit(rc)
+
+    return run
+
+
+def _lazy(
+    module: str,
+    *,
+    attr: str = "main",
+    full: bool = False,
+    exit_rc: bool = False,
+    no_args: bool = False,
+) -> _CoreRunner:
+    def run(args: list[str]) -> None:
+        handler: Callable[..., Any] = getattr(importlib.import_module(module), attr)
+        if no_args:
+            handler()
+            return
+        rc = handler(args if full else args[1:])
+        if exit_rc and rc:
+            sys.exit(rc)
+
+    return run
+
+
+def _group(commands: tuple[str, ...], runner: _CoreRunner) -> dict[str, _CoreRunner]:
+    return {name: runner for name in commands}
+
+
+_MAKE_ENTITY_HINT = "indique le nom de l'entité. Exemple : forge make:entity Contact"
+_MAKE_CRUD_HINT = "indique le nom de l'entité. Exemple : forge make:crud Contact"
+_AUTH_COMMANDS = (
+    "auth:init", "auth:doctor", "auth:status", "auth:list-sql",
+    "auth:user:create", "auth:user:list", "auth:user:show", "auth:user:disable",
+    "auth:user:enable", "auth:user:password", "auth:user:role:add",
+    "auth:user:role:remove", "auth:user:roles",
+)
+
+CORE_COMMANDS: dict[str, _CoreRunner] = {
+    "run": _delegate(lambda a: run_main(a)),
+    "update": _delegate(lambda a: update_main(a), exit_rc=True),
+    "make:entity": _delegate(
+        lambda a: make_entity_main(a), min_args=2,
+        label="make:entity", missing_hint=_MAKE_ENTITY_HINT,
+    ),
+    "make:crud": _delegate(
+        lambda a: cmd_make_crud_main(a), min_args=2,
+        label="make:crud", missing_hint=_MAKE_CRUD_HINT,
+    ),
+    "make:public-page": _delegate(lambda a: public_page_main(a)),
+    "make:public-list": _delegate(lambda a: public_list_main(a)),
+    "make:public-show": _delegate(lambda a: public_show_main(a)),
+    "make:public-form": _delegate(lambda a: public_form_main(a)),
+    "make:public-contact": _delegate(lambda a: public_contact_main(a)),
+    "make:relation": _delegate(lambda a: make_relation_main(a)),
+    "entity:validate": _delegate(lambda a: entity_validate_main(a)),
+    "sync:entity": _delegate(lambda a: model_main(a), full=True),
+    "js:init": _delegate(lambda a: front_main(a), full=True),
+    **_group(("i18n:init", "i18n:check"), _delegate(lambda a: i18n_main(a), full=True)),
+    **_group(_AUTH_COMMANDS, _delegate(lambda a: auth_main(a), full=True)),
+    "agents:init": _lazy("cli.agents.cli", exit_rc=True),
+    "opt-in:install": _lazy("cli.optins.install", exit_rc=True),
+    "opt-in:enable": _lazy("cli.optins.enable", exit_rc=True),
+    "opt-in:list": _lazy("cli.optins.list", exit_rc=True),
+    "opt-in:remove": _lazy("cli.optins.remove", exit_rc=True),
+    "opt-in:disable": _lazy("cli.optins.disable", exit_rc=True),
+    **_group(
+        ("module:list", "module:install", "module:files", "module:routes", "module:remove"),
+        _delegate(lambda a: modules_main(a), full=True),
+    ),
+    "docs:pdf": _lazy("cli.docs.quarkdown", attr="build_pdf", no_args=True),
+    **_group(
+        ("sync:relations", "build:model", "check:model"),
+        _delegate(lambda a: model_main(a), full=True),
+    ),
+    **_group(
+        ("migration:status", "migration:apply", "migration:make", "migration:diff"),
+        _delegate(lambda a: migrations_main(a), full=True),
+    ),
+    "schema:list": _lazy("cli.schemas.schema_list", attr="schema_list_main"),
+    "schema:doctor": _lazy("cli.schemas.schema_doctor", attr="schema_doctor_main"),
+}
+
+
+def dispatch_core(command: str, args: list[str]) -> bool:
+    """Exécute une commande déléguée du cœur si elle figure dans la table."""
+    runner = CORE_COMMANDS.get(command)
+    if runner is None:
+        return False
+    runner(args)
+    return True
+
+
 def main() -> None:
     args = sys.argv[1:]
 
@@ -532,50 +648,6 @@ def main() -> None:
         cmd_new(args[1], profile=profile)
         return
 
-    if command == "run":
-        run_main(args[1:])
-        return
-
-    if command == "update":
-        rc = update_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "make:entity":
-        if len(args) < 2:
-            cli_fail(
-                "argument manquant pour «forge make:entity».",
-                hint="indique le nom de l'entité. Exemple : forge make:entity Contact",
-            )
-        make_entity_main(args[1:])
-        return
-    if command == "make:crud":
-        if len(args) < 2:
-            cli_fail(
-                "argument manquant pour «forge make:crud».",
-                hint="indique le nom de l'entité. Exemple : forge make:crud Contact",
-            )
-        cmd_make_crud_main(args[1:])
-        return
-    if command == "make:public-page":
-        public_page_main(args[1:])
-        return
-    if command == "make:public-list":
-        public_list_main(args[1:])
-        return
-    if command == "make:public-show":
-        public_show_main(args[1:])
-        return
-    if command == "make:public-form":
-        public_form_main(args[1:])
-        return
-    if command == "make:public-contact":
-        public_contact_main(args[1:])
-        return
-    if command == "make:relation":
-        make_relation_main(args[1:])
-        return
     if command == "make:pivot-crud":
         if len(args) < 3:
             cli_fail(
@@ -592,98 +664,6 @@ def main() -> None:
         cmd_make_pivot_crud_main(args[1:])
         return
 
-    if command == "entity:validate":
-        entity_validate_main(args[1:])
-        return
-
-    if command == "sync:entity":
-        model_main(args)
-        return
-
-    if command == "js:init":
-        front_main(args)
-        return
-
-    if command in ("i18n:init", "i18n:check"):
-        i18n_main(args)
-        return
-
-    if command in (
-        "auth:init",
-        "auth:doctor",
-        "auth:status",
-        "auth:list-sql",
-        "auth:user:create",
-        "auth:user:list",
-        "auth:user:show",
-        "auth:user:disable",
-        "auth:user:enable",
-        "auth:user:password",
-        "auth:user:role:add",
-        "auth:user:role:remove",
-        "auth:user:roles",
-    ):
-        auth_main(args)
-        return
-
-    if command == "agents:init":
-        from cli.agents.cli import main as agents_init_main
-        rc = agents_init_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    # Famille canonique opt-in:* (ADR-016). Les anciennes commandes
-    # optin:enable / optin:list ont été retirées (OPTIN-CLI-REMOVE-LEGACY-001) ;
-    # les moteurs cli/optins/{enable,list}.py restent utilisés ici.
-    if command == "opt-in:install":
-        from cli.optins.install import main as optin_install_main
-        rc = optin_install_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "opt-in:enable":
-        from cli.optins.enable import main as optin_enable_main
-        rc = optin_enable_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "opt-in:list":
-        from cli.optins.list import main as optin_list_main
-        rc = optin_list_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "opt-in:remove":
-        from cli.optins.remove import main as optin_remove_main
-        rc = optin_remove_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command == "opt-in:disable":
-        from cli.optins.disable import main as optin_disable_main
-        rc = optin_disable_main(args[1:])
-        if rc:
-            sys.exit(rc)
-        return
-
-    if command in ("module:list", "module:install", "module:files", "module:routes", "module:remove"):
-        modules_main(args)
-        return
-
-    if command == "docs:pdf":
-        from cli.docs.quarkdown import build_pdf
-        build_pdf()
-        return
-
-    if command in {"sync:relations", "build:model", "check:model"}:
-        model_main(args)
-        return
-
     if command == "db:init":
         db_init_main([command])
         return
@@ -696,10 +676,6 @@ def main() -> None:
             print("Requiert une connexion MariaDB active (voir forge db:init).")
             raise SystemExit(0)
         db_apply_main([command])
-        return
-
-    if command in {"migration:status", "migration:apply", "migration:make", "migration:diff"}:
-        migrations_main(args)
         return
 
     if command == "routes:list":
@@ -723,18 +699,11 @@ def main() -> None:
         cmd_project_audit()
         return
 
-    if command == "schema:list":
-        from cli.schemas.schema_list import schema_list_main
-        schema_list_main(args[1:])
+    # Commandes du cœur déléguées à un sous-module cli.* (ADR-059) : table de
+    # dispatch, puis commandes livrées par les opt-ins.
+    if dispatch_core(command, args):
         return
 
-    if command == "schema:doctor":
-        from cli.schemas.schema_doctor import schema_doctor_main
-        schema_doctor_main(args[1:])
-        return
-
-    # Commandes livrées par les opt-ins (ADR-059) : table de dispatch centrale,
-    # import paresseux, échec propre si l'opt-in n'est pas installé.
     if dispatch_optin(command, args):
         return
 

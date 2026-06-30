@@ -112,7 +112,10 @@ class TestOptInDisable:
 class TestDispatchAndHelp:
     @pytest.mark.parametrize("command", ["opt-in:remove", "opt-in:disable"])
     def test_routed_in_forge_py(self, command):
-        assert f'command == "{command}"' in FORGE_PY
+        # ADR-059 : routage via la table CORE_COMMANDS de forge.py.
+        from forge import CORE_COMMANDS
+
+        assert command in CORE_COMMANDS
 
     @pytest.mark.parametrize("command", ["opt-in:remove", "opt-in:disable"])
     def test_has_description_and_rich(self, command):
