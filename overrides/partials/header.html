@@ -1,11 +1,9 @@
 {#-
   DOCS-NAV-LANDING-REPLICA-001
-  Réplique exacte de la barre de navigation de la landing (docs/index.html) pour
-  toutes les pages de documentation. On conserve la recherche Material (overlay,
-  déclenchée par le faux champ « Rechercher… » via for="__search") et le toggle
-  du tiroir latéral Material (for="__drawer") pour la navigation sur mobile.
-  Styles dans docs/stylesheets/extra.css, comportement des déroulants dans
-  docs/javascripts/forge-nav.js.
+  Barre de navigation de la doc, alignée sur la landing (docs/index.html) :
+  logo + recherche uniquement. La navigation dans les pages se fait par le tiroir
+  latéral Material (toggle for="__drawer", visible sur mobile). Recherche 100%
+  native Material. Styles dans docs/stylesheets/extra.css.
 -#}
 <header class="md-header" data-md-component="header">
   <nav class="forge-nav" aria-label="{{ lang.t('header') }}">
@@ -13,48 +11,6 @@
     <a href="{{ '/' | url }}" class="forge-nav-logo" aria-label="{{ config.site_name }}">
       <img src="{{ 'static/forge-logo.png' | url }}" alt="Forge">
     </a>
-
-    <div class="forge-nav-links" id="forge-nav-links">
-      <a href="/docs/forge/guide/getting-started/" class="forge-nav-link">Démarrer</a>
-
-      <div class="forge-nav-item" data-dropdown>
-        <button type="button" class="forge-nav-link forge-nav-trigger"
-                aria-haspopup="true" aria-expanded="false">
-          Documentation
-          <svg class="forge-nav-chevron" width="12" height="12" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="2.5"
-               stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="forge-nav-menu" role="menu">
-          <a href="/docs/forge/guide/getting-started/">Guide de démarrage</a>
-          <a href="/docs/forge/guide/concepts/">Architecture &amp; concepts</a>
-          <a href="/docs/forge/install/">Installation</a>
-          <a href="/docs/forge/reference/reference/">Référence (cœur + CLI)</a>
-          <a href="/docs/forge/reference/cli-commands/">Commandes CLI</a>
-          <a href="/docs/forge/reference/api/">API</a>
-        </div>
-      </div>
-
-      <div class="forge-nav-item" data-dropdown>
-        <button type="button" class="forge-nav-link forge-nav-trigger"
-                aria-haspopup="true" aria-expanded="false">
-          Modules
-          <svg class="forge-nav-chevron" width="12" height="12" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="2.5"
-               stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="forge-nav-menu" role="menu">
-          <a href="/docs/forge/optins/">Opt-ins (vue d'ensemble)</a>
-          <a href="/docs/forge/guide/bases-de-donnees/">Bases de données (backends)</a>
-          <a href="/docs/forge/#starters">Parcours &amp; starters</a>
-        </div>
-      </div>
-
-      <a href="https://github.com/caucrogeGit/Forge"
-         target="_blank" rel="noopener noreferrer" class="forge-nav-link">GitHub</a>
-
-      <a href="/docs/forge/#contact" class="forge-nav-link">Contact</a>
-    </div>
 
     <div class="forge-nav-right">
       {% if "material/search" in config.plugins %}
