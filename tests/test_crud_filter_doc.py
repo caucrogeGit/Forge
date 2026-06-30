@@ -1,6 +1,6 @@
 """Tests — CRUD-FILTER-DOC-001 : conformité documentaire des filtres CRUD.
 
-Vérifie que docs/reference/reference.md documente :
+Vérifie que docs/reference/crud.md documente :
 
 - la convention list.filter=true ;
 - les types SQL supportés ;
@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import pathlib
 
-REFERENCE = pathlib.Path("docs/reference/api.md")
+REFERENCE = pathlib.Path("docs/reference/crud.md")
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
 TUTORIAL = pathlib.Path("docs/guide/app-complete-tutorial.md")
 

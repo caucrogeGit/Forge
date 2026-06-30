@@ -491,7 +491,8 @@ class TestAucunSecretEnSortie:
 
 class TestDocumentation:
     _auth_md = pathlib.Path("docs/features/auth.md").read_text(encoding="utf-8")
-    _ref_md = pathlib.Path("docs/reference/api.md").read_text(encoding="utf-8")
+    # Référence CLI : catalogue concis listant les commandes (DOCS-CLI-COMMANDS-CATALOG-001).
+    _ref_md = pathlib.Path("docs/reference/cli-commands.md").read_text(encoding="utf-8")
 
     def test_auth_md_contient_disable(self):
         assert "auth:user:disable" in self._auth_md

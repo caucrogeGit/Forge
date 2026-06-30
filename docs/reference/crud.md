@@ -148,6 +148,158 @@ reste fonctionnel sans JavaScript.
 
 → voir `### Partials CRUD générés`
 
+### Listes CRUD générées : filtres simples
+
+En plus de la recherche texte `q`, chaque champ non-PK peut exposer un filtre d'égalité via la métadonnée `"list"`.
+
+```json
+{
+  "name": "statut",
+  "sql_type": "VARCHAR(50)",
+  "python_type": "str",
+  "nullable": false,
+  "constraints": {},
+  "list": { "filter": true }
+}
+```
+
+**Types SQL supportés pour `list.filter=true`** :
+
+| Famille | Exemples |
+|---|---|
+| Chaînes courtes | `VARCHAR(n)`, `CHAR(n)` |
+| Entiers | `INT`, `BIGINT`, `SMALLINT`, `TINYINT`, `MEDIUMINT` |
+| Booléens | `BOOL`, `BOOLEAN` |
+
+Types **non supportés** (erreur à la validation) : `TEXT`, `DATE`, `DATETIME`, `TIMESTAMP`, `DECIMAL`, `FLOAT`, `DOUBLE`.
+
+**Comportement généré**
+
+- Champ `VARCHAR`/`CHAR`/`INT` → `<input type="text">` dans le formulaire de recherche.
+- Champ `BOOL`/`BOOLEAN` → `<select>` avec Tous / Oui / Non.
+- Valeur filtrée transmise en GET : `/contact?statut=actif&actif=1&q=roger&page=2`
+- Filtres conservés dans les liens de tri et de pagination via une boucle Jinja2 générique.
+- `list.filter=false` ou `"list"` absent → comportement actuel inchangé.
+
+**SQL généré**
+
+Recherche `q` et filtres sont combinés avec `AND` ; chaque groupe de LIKE est entre parenthèses :
+
+```sql
+SELECT * FROM contact
+WHERE (Nom LIKE ? OR Email LIKE ?)
+  AND Statut = ?
+ORDER BY Id DESC
+LIMIT ? OFFSET ?
+```
+
+Toutes les valeurs sont paramétrées (aucune concaténation directe).
+
+**Sécurité, whitelist de colonnes filtrées**
+
+Les noms de colonnes ne peuvent pas être passés comme paramètres SQL `?`. Pour éviter toute injection de colonne, le modèle généré crée une allowlist explicite :
+
+```python
+_ALLOWED_FILTERS = {"statut": "Statut", "ville_id": "contact.VilleId"}
+
+for key, val in (filters or {}).items():
+    if val is not None and val != "":
+        col = _ALLOWED_FILTERS.get(key)
+        if col is None:
+            raise ValueError(f"Filtre interdit : {key}")
+        clauses.append(col + " = ?")
+        params.append(val)
+```
+
+Une clé absente de `_ALLOWED_FILTERS` lève `ValueError` immédiatement. Le contrôleur généré ne passe que des clés correspondant aux champs déclarés dans le JSON d'entité ; une clé injectée manuellement depuis une URL GET ne peut jamais atteindre la concaténation SQL.
+
+**Compatibilité HTMX et réinitialisation**
+
+Le formulaire de filtres est un formulaire `GET` standard avec une amélioration HTMX progressive. Sans HTMX, le formulaire recharge la page complète. Avec HTMX, le formulaire remplace uniquement la zone `#crud-results` et pousse l'URL dans l'historique.
+
+Un lien « Réinitialiser » est généré dans le formulaire. Il s'affiche dès que `pagination.q` est non vide **ou** que `pagination.filters` contient au moins un filtre actif. Le lien a un `href` classique (fallback sans JavaScript) et les attributs HTMX pour une navigation fluide.
+
+```html
+{% if pagination.q or pagination.filters %}
+<a href="/contact"
+   hx-get="/contact" hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true">
+  Réinitialiser
+</a>
+{% endif %}
+```
+
+Aucun JavaScript personnalisé, aucune recherche live et aucun `debounce` ne sont générés.
+
+**Limites des filtres CRUD**
+
+Les filtres générés par `list.filter=true` sont des filtres d'égalité simples. Ne sont pas supportés dans cette version :
+
+- opérateurs avancés : `>`, `<`, `BETWEEN`, `IN`, `NOT IN` ;
+- filtres multi-valeurs (checkboxes multiples) ;
+- plages de dates ou de nombres ;
+- filtres relationnels profonds (jointures imbriquées) ;
+- recherche live automatique à la saisie ;
+- debounce ou auto-submit sur changement de valeur ;
+- filtres sauvegardés en session ou en base ;
+- API JSON CRUD avec filtres.
+
+Ces extensions peuvent être ajoutées manuellement dans les fichiers générés.
+
+### Listes CRUD générées : filtres relationnels `many_to_one`
+
+Une relation `many_to_one` déclarée dans `mvc/entities/relations.json` peut aussi être utilisée comme filtre de liste. Aucune nouvelle métadonnée obligatoire n'est nécessaire : la présence de la relation suffit.
+
+Exemple minimal :
+
+```json
+{
+  "name": "hebergement_commune",
+  "type": "many_to_one",
+  "from_entity": "Hebergement",
+  "to_entity": "Commune",
+  "from_field": "commune_id",
+  "to_field": "id",
+  "foreign_key_name": "fk_hebergement_commune",
+  "on_delete": "RESTRICT",
+  "on_update": "CASCADE"
+}
+```
+
+URL :
+
+```text
+/hebergements?commune_id=3
+/hebergements?q=gite&commune_id=3&page=2
+```
+
+Le filtre relationnel est rendu sous forme de `<select>` :
+
+```html
+<select name="commune_id">
+  <option value="">Tous les Commune</option>
+  ...
+</select>
+```
+
+Forge charge les options depuis l'entité liée avec une fonction modèle explicite. Le libellé est déduit du premier champ textuel disponible (`VARCHAR`, `CHAR`, `TEXT`) ; si l'entité liée n'a aucun champ textuel, Forge utilise la clé primaire comme libellé. Les options sont triées par ce libellé, ou par la clé primaire en fallback.
+
+Le contrôleur généré ignore une valeur vide ou non numérique. La valeur valide est passée comme paramètre SQL, puis combinée avec `q`, les filtres simples, la pagination et le tri.
+
+Le formulaire create/edit continue d'utiliser `RelationField`. Les fonctionnalités plus avancées comme l'autocomplete ou la recherche dans les options ne font pas partie de cette première version.
+
+**Contexte de vue**
+
+`pagination.filters` est toujours un dict (vide si aucun filtre actif) :
+
+```python
+pagination = {
+    "page": 1, "nb_pages": 3, "total": 55,
+    "has_prev": False, "has_next": True,
+    "q": "roger", "sort": "", "direction": "desc",
+    "filters": {"statut": "actif", "actif": "1"},
+}
+```
+
 ### Limites actuelles
 
 - Pas d'ORM, le SQL reste explicite et visible dans le code généré ;

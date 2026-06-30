@@ -214,6 +214,41 @@ Le contrat `mvc/security/rbac.json` décrit les rôles et les permissions, sépa
 !!! note "Indépendance du cœur"
     Le cœur de Forge ne dépend pas de `forge-mvc-rbac` ; le provider Jinja `can()` se branche au chargement du paquet (mécanisme de loader, ADR-046).
 
+## 8. RBAC léger core ou RBAC complet opt-in ?
+
+Forge distingue deux niveaux d'autorisation :
+
+**RBAC léger core** : primitives dans `core/security/` (dépréciées, héritées du développement pré-1.0) :
+
+- `user_has_role(request, role)` : vérifie qu'un rôle est présent dans le champ `roles` de la session Auth/User. Ne consulte pas les tables SQL RBAC.
+- `require_role(role)` : décorateur qui redirige vers `/login` si non authentifié, retourne 403 si le rôle est absent de la session.
+
+Ces deux fonctions conviennent aux cas les plus simples (protéger une route par un rôle déjà dans la session). Elles ne connaissent pas les permissions fines et ne remplacent pas `forge-mvc-rbac`. Les nouveaux projets utilisent `forge_mvc_rbac.require_user_permission`.
+
+**RBAC complet opt-in** : module `forge-mvc-rbac` :
+
+- Modèles `Role`, `Permission` (normalisation, validation)
+- Décorateur `@require_permission(...)` : lit les permissions injectées dans la requête ou la session (RBAC historique, sans accès base) ; la résolution SQL via `roles`, `permissions`, `role_permissions` est faite par `require_user_permission`
+- Helper Jinja `make_can` / `can(...)` : affichage conditionnel dans les templates
+- Résolution backend `get_user_permissions`, `user_has_permission`
+- Pont Auth/User vers RBAC via la table `user_roles`
+- Administration CLI des associations utilisateurs/rôles
+
+### Quand utiliser quoi ?
+
+| Besoin | Choix recommandé |
+|---|---|
+| Vérifier simplement qu'un utilisateur a un rôle (session) | `user_has_role` (core léger, déprécié) |
+| Protéger une route pour les nouveaux projets | `forge-mvc-rbac`, `require_user_permission` |
+| Permissions fines (`contacts.edit`, `posts.delete`) | `forge-mvc-rbac`, `require_user_permission` (autoritatif, base) |
+| Administrer rôles et permissions | `forge-mvc-rbac` |
+| Affichage conditionnel dans les templates Jinja | `forge-mvc-rbac`, `can(...)` |
+| Relations utilisateurs/rôles complexes | `forge-mvc-rbac` |
+
+### Frontière d'import
+
+`core/` ne doit pas importer `forge_mvc_rbac`. La dépendance va dans un seul sens : `forge-mvc-rbac` → `core`. `core/auth/audit.py` peut nommer des événements d'audit RBAC génériques : ce vocabulaire est assumé dans le core (ADR-011), il ne représente pas une dépendance fonctionnelle vers le module opt-in.
+
 ## Voir aussi
 
 - [Cœur RBAC (rbac.py)](references/rbac.md) : modèle, primitives, `make_can`.

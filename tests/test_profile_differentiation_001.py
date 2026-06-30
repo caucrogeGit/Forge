@@ -8,7 +8,7 @@ Valide :
 - multilingual inclut l'intention i18n / internationalisation
 - les descriptions sont toutes différentes
 - forge_profile.txt enregistre le nom exact du profil
-- docs/reference/reference.md documente les profils
+- docs/reference/profils.md documente les profils
 """
 from __future__ import annotations
 
@@ -153,11 +153,9 @@ def test_forge_profile_txt_contenu_exact(tmp_path, monkeypatch, profile):
 
 
 def test_reference_md_documente_les_profils():
-    """docs/reference/reference.md (index) ou docs/reference/profils.md mentionne les profils."""
-    index = (ROOT / "docs" / "reference" / "reference.md").read_text(encoding="utf-8")
+    """docs/reference/profils.md mentionne les profils (l'index reference.md a été retiré, DOCS-REFERENCE-INDEX-REMOVE-001)."""
     profils = (ROOT / "docs" / "reference" / "profils.md").read_text(encoding="utf-8")
-    content = index + profils
-    assert "profil" in content.lower() or "profile" in content.lower()
+    assert "profil" in profils.lower() or "profile" in profils.lower()
 
 
 def test_reference_md_mentionne_les_quatre_profils():

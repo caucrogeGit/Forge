@@ -93,13 +93,15 @@ forge routes:list
 | `forge build:model` | génère les modèles Python depuis le JSON | [build:model](../cli-entities/model.md) |
 | `forge sync:entity` | synchronise entité et modèle généré | [modèle](../cli-entities/model.md) |
 | `forge make:relation` | déclare une relation entre entités | [make:relation](../cli-entities/make_relation.md) |
+| `forge check:model` | vérifie la cohérence des modèles | [build:model](../cli-entities/model.md) |
+| `forge sync:relations` | régénère `relations.sql` | [make:relation](../cli-entities/make_relation.md) |
 
 ## CRUD et pages publiques
 
 | Commande | Rôle | Détail |
 |---|---|---|
 | `forge make:crud` | CRUD complet (contrôleur, vues, routes) | [make:crud](../cli-entities/make_crud.md) |
-| `forge make:pivot-crud` | CRUD pour table pivot enrichie (opt-in pivot) | [pivot](../pivot/reference.md) |
+| `forge make:pivot-crud` | CRUD pour table pivot enrichie (opt-in pivot) | [catalogue opt-ins](../optins/index.md) |
 | `forge make:public-page` | page publique simple | [pages publiques](../cli-public/public_page.md) |
 | `forge make:public-list` | liste paginée | [liste publique](../cli-public/public_list.md) |
 | `forge make:public-show` | fiche de détail | [fiche publique](../cli-public/public_show.md) |
@@ -128,6 +130,14 @@ Choix du moteur (SQLite, MariaDB, PostgreSQL, SQL Server) : [Bases de données](
 | `forge auth:user:list` | liste les utilisateurs | [auth](../cli-security/auth.md) |
 | `forge auth:doctor` | diagnostic de l'authentification | [auth](../cli-security/auth.md) |
 | `forge auth:status` | état de la configuration auth | [auth](../cli-security/auth.md) |
+| `forge auth:list-sql` | affiche les fichiers SQL d'authentification | [auth](../cli-security/auth.md) |
+| `forge auth:user:show` | affiche les détails d'un compte utilisateur | [auth](../cli-security/auth.md) |
+| `forge auth:user:disable` | désactive un compte utilisateur | [auth](../cli-security/auth.md) |
+| `forge auth:user:enable` | réactive un compte utilisateur | [auth](../cli-security/auth.md) |
+| `forge auth:user:password` | modifie le mot de passe d'un compte | [auth](../cli-security/auth.md) |
+| `forge auth:user:roles` | affiche les rôles d'un utilisateur | [auth](../cli-security/auth.md) |
+| `forge auth:user:role:add` | assigne un rôle à un utilisateur | [auth](../cli-security/auth.md) |
+| `forge auth:user:role:remove` | retire un rôle d'un utilisateur | [auth](../cli-security/auth.md) |
 
 ## Médias et front
 

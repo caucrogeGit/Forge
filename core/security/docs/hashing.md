@@ -99,7 +99,7 @@ if verify_password_legacy(password, stored_hash):
 ## 7. Limites
 
 !!! warning "Module en sursis"
-    Ce module ne crée plus de nouveaux hashes depuis Forge 2.10.0.
+    Ce module ne crée plus de nouveaux hashes : il ne sert qu'à vérifier les hashes PBKDF2 hérités.
     Il sera supprimé quand tous les hashes PBKDF2 auront migré vers Argon2id.
     Tout nouveau projet doit utiliser directement `core.auth.password`.
 
