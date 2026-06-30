@@ -5,6 +5,10 @@ Ce document explique ce que fait l'opt-in `forge-mvc-mfa`, ce qu'il expose, et c
 !!! note "Module extrait"
     Le code MFA a été extrait du cœur vers le paquet `forge-mvc-mfa` ; le cœur Forge n'en dépend pas.
 
+!!! info "Statut : Beta"
+    `forge-mvc-mfa` est en **Beta** (`Development Status :: 4 - Beta`), publié sur PyPI depuis `1.0.0-beta.9` (`MFA-PYPI-READY-001`).
+    Le secret TOTP est chiffré au repos via Fernet (`SEC-MFA-SECRET-ENCRYPTION-001`).
+
 `forge-mvc-mfa` ajoute un second facteur d'authentification : TOTP (application d'authentification), codes de récupération, challenge à la connexion, revalidation et protections (anti-rejeu, rate-limit).
 
 Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où persister les facteurs et quand exiger le second facteur.
