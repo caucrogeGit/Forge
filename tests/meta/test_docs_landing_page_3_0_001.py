@@ -150,8 +150,8 @@ class TestNewElementsPresent:
 
 class TestNavigationStructure:
     """La navigation est simplifiée : entrées simples Démarrer/GitHub/Contact
-    plus deux menus déroulants Documentation et Modules (LANDING-NAV-DROPDOWN-001).
-    L'entrée CRUD a été retirée du menu."""
+    plus un menu déroulant Documentation (LANDING-NAV-DROPDOWN-001). Le menu Modules
+    a été retiré : Packages et Starters ont rejoint Documentation. L'entrée CRUD est absente."""
 
     def setup_method(self):
         self.source = LANDING_SOURCE.read_text(encoding="utf-8")
@@ -197,7 +197,6 @@ class TestNavigationStructure:
     @pytest.mark.parametrize("nav_label", [
         "Démarrer",
         "Documentation",
-        "Modules",
         "GitHub",
         "Contact",
     ])
@@ -207,20 +206,28 @@ class TestNavigationStructure:
             f"(menu LANDING-NAV-DROPDOWN-001)"
         )
 
-    def test_nav_has_two_dropdowns(self):
-        """Deux menus déroulants (Documentation, Modules) avec leurs panneaux."""
+    def test_nav_has_documentation_dropdown(self):
+        """Un menu déroulant Documentation avec son panneau (le menu Modules a été
+        retiré ; ses entrées Packages/Starters ont rejoint Documentation)."""
         nav = self._nav_section()
-        assert nav.count("data-dropdown") >= 2, (
-            "La nav devrait contenir deux menus déroulants (data-dropdown)"
+        assert nav.count("data-dropdown") >= 1, (
+            "La nav devrait contenir le menu déroulant Documentation (data-dropdown)"
         )
         assert "landing-nav-menu" in nav, (
-            "Les déroulants doivent porter un panneau .landing-nav-menu"
+            "Le déroulant doit porter un panneau .landing-nav-menu"
+        )
+
+    def test_nav_modules_dropdown_removed(self):
+        """Le menu déroulant Modules a été supprimé de la nav."""
+        assert ">Modules<" not in self._nav_section() and "Modules\n" not in self._nav_section(), (
+            "Le menu Modules ne doit plus figurer dans la nav"
         )
 
     @pytest.mark.parametrize("entry", [
         "Architecture &amp; concepts",
         "Commandes CLI",
-        "Bases de données (backends)",
+        "Packages",
+        "Starters",
     ])
     def test_nav_dropdown_entries_present(self, entry):
         assert entry in self._nav_section(), (
