@@ -82,7 +82,7 @@ class StatsValidateController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Valider un événement — Forge</title>
+  <title>Valider un événement - Forge</title>
 </head>
 <body>
   <h1>Valider un événement</h1>

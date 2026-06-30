@@ -80,7 +80,7 @@ class StatsEventController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Nom d'événement — Forge</title>
+  <title>Nom d'événement - Forge</title>
 </head>
 <body>
   <h1>Nom d'événement</h1>
@@ -93,7 +93,7 @@ class StatsEventController(BaseController):
   <ul>
     <li>Entrée : <code>{{ input }}</code></li>
     <li>Normalisé : <code>{{ normalized }}</code></li>
-    <li>Valide : <strong>{% if valid %}oui{% else %}non{% endif %}</strong>{% if error %} — {{ error }}{% endif %}</li>
+    <li>Valide : <strong>{% if valid %}oui{% else %}non{% endif %}</strong>{% if error %} - {{ error }}{% endif %}</li>
   </ul>
 
   <p>Essayez <code>Page View</code> (→ <code>page_view</code>) puis <code>page.view</code>

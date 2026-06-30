@@ -113,7 +113,7 @@ Le contrôleur rend `image_upload/index.html` : créez ce fichier.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Téléverser une image — Forge</title>
+  <title>Téléverser une image - Forge</title>
 </head>
 <body>
   <h1>Téléverser une image</h1>

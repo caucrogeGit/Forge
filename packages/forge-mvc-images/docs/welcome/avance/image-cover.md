@@ -116,7 +116,7 @@ Le contrôleur rend `image_cover/index.html` : créez ce fichier.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Image de couverture — Forge</title>
+  <title>Image de couverture - Forge</title>
 </head>
 <body>
   <h1>Image de couverture</h1>

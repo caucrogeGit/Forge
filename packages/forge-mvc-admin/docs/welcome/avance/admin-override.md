@@ -18,7 +18,7 @@ Pour personnaliser le gabarit de base, créez `mvc/views/admin/layout.html` :
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}Administration{% endblock %} — Mon projet</title>
+  <title>{% block title %}Administration{% endblock %} - Mon projet</title>
   <link rel="stylesheet" href="/static/admin.css">
 </head>
 <body>

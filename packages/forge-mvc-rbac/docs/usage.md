@@ -128,7 +128,7 @@ elif result.exists and not result.valid:
     for err in result.errors:
         print(f"{err.path} : {err.message}")
 else:
-    print("Pas de contrat RBAC — RBAC est opt-in.")
+    print("Pas de contrat RBAC - RBAC est opt-in.")
 ```
 
 Le chargement est **lecture seule** : aucun fichier n'est créé ni modifié.
@@ -213,7 +213,7 @@ l'accès est refusé avec `Response(403)`.
 from forge_mvc_rbac import (
     load_rbac_contract,                       # charge mvc/security/rbac.json
     get_contract_permissions,                  # set[str] des permissions pour des rôles
-    has_contract_permission,                   # bool — la permission est-elle accordée ?
+    has_contract_permission,                   # bool - la permission est-elle accordée ?
     require_contract_permission,               # None ou Response(403), contrat déjà chargé
     get_request_roles,                         # extrait les rôles depuis la requête
     require_contract_permission_for_request,   # helper direct (charge + extrait + vérifie)

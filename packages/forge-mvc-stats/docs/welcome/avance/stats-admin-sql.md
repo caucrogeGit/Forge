@@ -73,7 +73,7 @@ class StatsAdminSqlController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Le SQL de consultation — Forge</title>
+  <title>Le SQL de consultation - Forge</title>
 </head>
 <body>
   <h1>Le SQL de consultation</h1>

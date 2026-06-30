@@ -100,7 +100,7 @@ class ImageAttachController(BaseController):
                 role="gallery",
             )
         except Exception:
-            # Table absente, base inaccessible… — on reste pédagogique.
+            # Table absente, base inaccessible… - on reste pédagogique.
             context["error"] = _TABLE_NOT_READY
             return BaseController.render(
                 "image_attach/index.html", context=context, request=request
@@ -132,7 +132,7 @@ Le contrôleur rend `image_attach/index.html` : créez ce fichier.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Rattacher une image à une entité — Forge</title>
+  <title>Rattacher une image à une entité - Forge</title>
 </head>
 <body>
   <h1>Rattacher une image à une entité</h1>

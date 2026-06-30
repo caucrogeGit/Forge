@@ -76,7 +76,7 @@ class StatsTrackController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Enregistrer un événement — Forge</title>
+  <title>Enregistrer un événement - Forge</title>
 </head>
 <body>
   <h1>Enregistrer un événement</h1>

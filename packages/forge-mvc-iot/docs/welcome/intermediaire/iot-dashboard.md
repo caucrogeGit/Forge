@@ -84,7 +84,7 @@ Créez le gabarit ci-dessous, complet et copiable tel quel.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Tableau de bord IoT — Forge</title>
+  <title>Tableau de bord IoT - Forge</title>
 </head>
 <body>
   <h1>Tableau de bord IoT</h1>

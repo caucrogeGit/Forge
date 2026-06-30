@@ -89,7 +89,7 @@ class FileDeleteController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Supprimer un fichier — Forge</title>
+  <title>Supprimer un fichier - Forge</title>
 </head>
 <body>
   <h1>Supprimer un fichier</h1>

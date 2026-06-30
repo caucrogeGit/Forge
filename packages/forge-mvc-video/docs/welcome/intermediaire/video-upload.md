@@ -107,7 +107,7 @@ class VideoUploadController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Téléverser une vidéo — Forge</title>
+  <title>Téléverser une vidéo - Forge</title>
 </head>
 <body>
   <h1>Téléverser une vidéo</h1>
@@ -127,7 +127,7 @@ class VideoUploadController(BaseController):
   {% if videos %}
   <ul>
     {% for v in videos %}
-    <li>{{ v.title or v.uuid }} — <em>{{ v.status }}</em></li>
+    <li>{{ v.title or v.uuid }} - <em>{{ v.status }}</em></li>
     {% endfor %}
   </ul>
   {% else %}

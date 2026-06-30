@@ -18,7 +18,7 @@ cd MonProjet
 rm -rf .git
 git init
 git add -A
-git commit -m "init: MonProjet — based on Forge {{forge_version}}"
+git commit -m "init: MonProjet - based on Forge {{forge_version}}"
 ```
 
 ## Installer l'environnement local

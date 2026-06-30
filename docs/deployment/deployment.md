@@ -201,7 +201,7 @@ DB_APP_PWD=mot_de_passe_fort
 
 # Compte admin : laissé vide dans env/prod.
 # Les secrets DB_ADMIN_* (provisioning db:init / db:apply) vivent dans
-# env/db-admin.local, non commité — voir production-security.md
+# env/db-admin.local, non commité - voir production-security.md
 # (ENV-PROD-DB-ADMIN-SECRETS-POLICY-001).
 DB_ADMIN_HOST=
 DB_ADMIN_PORT=3306

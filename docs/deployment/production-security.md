@@ -281,13 +281,13 @@ Les deux systèmes sont **étanches** : `request.permissions` n'influence pas
 Il améliore l'ergonomie mais ne remplace pas le décorateur serveur.
 
 ```python
-# ✅ Protection serveur — obligatoire pour la sécurité
+# ✅ Protection serveur - obligatoire pour la sécurité
 @staticmethod
 @require_permission("posts.delete")
 def delete(request, post_id):
     ...
 
-# ✅ Masquage UI — optionnel, améliore l'UX
+# ✅ Masquage UI - optionnel, améliore l'UX
 # {% if can("posts.delete") %}
 #   <button>Supprimer</button>
 # {% endif %}
@@ -303,7 +303,7 @@ def delete(request, post_id):
 - Retourne `False` pour un utilisateur anonyme, un code vide, un code sans point.
 
 ```jinja2
-{# Masquage conditionnel côté UI — n'est pas une protection serveur #}
+{# Masquage conditionnel côté UI - n'est pas une protection serveur #}
 {% if can("posts.edit") %}
   <a href="/posts/{{ post.id }}/edit">Modifier</a>
 {% endif %}
@@ -486,7 +486,7 @@ Le **runtime applicatif Forge** (`app.py`, WSGI, dispatcher) n'utilise
 **que** `DB_APP_*`. La preuve est dans
 [`app.py`](https://github.com/caucrogeGit/Forge/blob/main/app.py) :
 l'import depuis `config` cite `DB_APP_HOST, DB_APP_PORT, DB_NAME,
-DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE` — `DB_ADMIN_*` n'apparaît pas.
+DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE` - `DB_ADMIN_*` n'apparaît pas.
 
 | Variable | Utilisée par | Stockée où en production ? |
 |---|---|---|
@@ -507,7 +507,7 @@ DB_APP_PORT=3306
 DB_APP_LOGIN=app_user
 DB_APP_PWD=<mot_de_passe_applicatif>
 
-# 2. env/db-admin.local (NON commité — pour les opérations de provisioning)
+# 2. env/db-admin.local (NON commité - pour les opérations de provisioning)
 DB_ADMIN_HOST=localhost
 DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=root
@@ -579,7 +579,7 @@ Cookies et sessions
 
 Sécurité applicative
 ─────────────────────
-[ ] CSRF actif (défaut — ne pas désactiver sans raison)
+[ ] CSRF actif (défaut - ne pas désactiver sans raison)
 [ ] Headers sécurité présents sur toutes les réponses (défaut)
 [ ] RBAC : routes protégées par décorateurs serveur (@require_permission)
 [ ] Auth audit : handler de log configuré (forge.auth.audit)

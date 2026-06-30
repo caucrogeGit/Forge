@@ -88,7 +88,7 @@ versions entre core et opt-ins est assurée par `tools/release-validate.sh`.
 | `git diff --check` | Aucune sortie |
 | `python -m build` | `dist/*.whl` et `dist/*.tar.gz` générés |
 | `twine check dist/*` | `PASSED` pour wheel et sdist |
-| `tools/release-validate.sh <VERSION>` | `RÉSULTAT : OK — prêt à releaser.` |
+| `tools/release-validate.sh <VERSION>` | `RÉSULTAT : OK - prêt à releaser.` |
 
 ### Artefacts produits
 

@@ -144,7 +144,7 @@ elif result.exists and not result.valid:
     for err in result.errors:
         print(f"{err.path} : {err.message}")
 else:
-    print("Pas de contrat RBAC — RBAC est opt-in.")
+    print("Pas de contrat RBAC - RBAC est opt-in.")
 ```
 
 Ce chargement est **lecture seule** : il ne crée ni ne modifie aucun fichier.

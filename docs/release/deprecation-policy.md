@@ -114,7 +114,7 @@ Ajouter dans `CHANGELOG.md` sous la section `### Modifié` ou `### Déprécié` 
 Afficher un message clair sur `stderr` quand la commande dépréciée est invoquée :
 
 ```
-AVERTISSEMENT — forge old:command est dépréciée.
+AVERTISSEMENT - forge old:command est dépréciée.
 Utiliser désormais : forge new:command
 Suppression prévue : prochaine version MAJOR.
 ```
@@ -124,7 +124,7 @@ Exemple de pattern :
 ```python
 def _warn_cmd_deprecated() -> None:
     print(
-        "AVERTISSEMENT — cette commande est dépréciée. "
+        "AVERTISSEMENT - cette commande est dépréciée. "
         "Utilisez la CLI officielle `forge`.",
         file=sys.stderr,
     )
@@ -191,7 +191,7 @@ quelle option utiliser à la place, et depuis quelle version.
 Si l'option est passée, afficher un avertissement avant d'exécuter la commande :
 
 ```
-AVERTISSEMENT — L'option --ancien-flag est dépréciée.
+AVERTISSEMENT - L'option --ancien-flag est dépréciée.
 Utiliser --nouveau-flag à la place.
 Suppression prévue : prochaine version MAJOR.
 ```

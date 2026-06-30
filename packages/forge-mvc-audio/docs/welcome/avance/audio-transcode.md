@@ -109,7 +109,7 @@ class AudioTranscodeController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Transcoder en MP3 — Forge</title>
+  <title>Transcoder en MP3 - Forge</title>
 </head>
 <body>
   <h1>Transcoder en MP3</h1>

@@ -72,7 +72,7 @@ class StatsTrackSqlController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Le SQL d'insertion — Forge</title>
+  <title>Le SQL d'insertion - Forge</title>
 </head>
 <body>
   <h1>Le SQL d'insertion</h1>

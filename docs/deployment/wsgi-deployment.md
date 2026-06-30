@@ -216,7 +216,7 @@ de l'application, jamais par requête**, un avertissement si Forge est
 configuré en `APP_ENV=prod` avec un store de session mémoire :
 
 ```
-AVERTISSEMENT-PROD — Forge tourne en APP_ENV=prod avec stockage mémoire.
+AVERTISSEMENT-PROD - Forge tourne en APP_ENV=prod avec stockage mémoire.
   * Sessions : MemorySessionStore est volatile et mono-processus.
   * Rate-limit (login, uploads) : compteurs en mémoire non partagés.
 Tolérée pour développement/test, cette configuration est fragile en

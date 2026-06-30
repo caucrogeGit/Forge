@@ -72,7 +72,7 @@ forge iot:doctor --mqtt   # connexion brève au broker
 Quand Mosquitto tourne :
 
 ```text
-  [OK]    broker MQTT — connexion réussie à localhost:1883
+  [OK]    broker MQTT - connexion réussie à localhost:1883
 ```
 
 Détail : [Diagnostic Forge IoT](doctor.md).

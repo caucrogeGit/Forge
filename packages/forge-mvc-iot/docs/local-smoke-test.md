@@ -92,7 +92,7 @@ Résumé :
 ```
 
 Si un message invalide arrive, il est **ignoré** (`[WARN] Message MQTT
-ignoré — …`) et compté dans `erreurs de contrat` sans arrêter l'écoute.
+ignoré - …`) et compté dans `erreurs de contrat` sans arrêter l'écoute.
 Si la table manque, `forge iot:listen` affiche `Table iot_events
 absente` et renvoie vers `forge iot:init` / `forge migration:apply` ; si
 la base est injoignable, il affiche `Connexion base impossible` et

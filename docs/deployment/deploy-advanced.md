@@ -116,7 +116,7 @@ DB_APP_PWD=<mot_de_passe_fort>
 
 # Base admin : laissée vide dans env/prod.
 # Les secrets DB_ADMIN_* (provisioning db:init / db:apply) vivent dans
-# env/db-admin.local, non commité — voir production-security.md.
+# env/db-admin.local, non commité - voir production-security.md.
 DB_ADMIN_HOST=
 DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=
@@ -194,7 +194,7 @@ Adaptez-le avant installation :
 
 ```ini
 [Unit]
-Description=Forge Application — MonApplication
+Description=Forge Application - MonApplication
 After=network.target mariadb.service
 
 [Service]
@@ -385,7 +385,7 @@ alias `storage/`, retirez-le. Vérifiez avec :
 
 ```bash
 curl -I https://example.com/storage/logs/errors.dev.jsonl
-# Attendu : 404 ou connexion refusée — jamais 200
+# Attendu : 404 ou connexion refusée - jamais 200
 ```
 
 ---

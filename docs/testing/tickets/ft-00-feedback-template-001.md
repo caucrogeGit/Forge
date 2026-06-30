@@ -125,7 +125,7 @@ Ticket testé : FT-99-DEMO-001
 Testeur : Alice D.
 Statut : VALIDÉ AVEC FRICTION
 Gravité : S3
-Aide : A1 — documentation Forge uniquement
+Aide : A1 - documentation Forge uniquement
 
 Résultat attendu : la commande affiche un message de bienvenue.
 Résultat obtenu : la commande affiche le message, mais avec une faute de frappe.
@@ -225,12 +225,12 @@ NON TESTÉ
 ## 17. Gravité du problème éventuel
 
 ```text
-S0 — Bloquant critique
-S1 — Bloquant fonctionnel
-S2 — Friction forte
-S3 — Friction mineure
-S4 — Suggestion
-S5 — Hors périmètre
+S0 - Bloquant critique
+S1 - Bloquant fonctionnel
+S2 - Friction forte
+S3 - Friction mineure
+S4 - Suggestion
+S5 - Hors périmètre
 ```
 
 ---
@@ -238,12 +238,12 @@ S5 — Hors périmètre
 ## 18. Niveau d'aide utilisé
 
 ```text
-A0 — aucune aide
-A1 — documentation Forge uniquement
-A2 — recherche personnelle ou documentation externe
-A3 — aide d'un autre testeur
-A4 — aide du référent Forge
-A5 — impossible malgré aide
+A0 - aucune aide
+A1 - documentation Forge uniquement
+A2 - recherche personnelle ou documentation externe
+A3 - aide d'un autre testeur
+A4 - aide du référent Forge
+A5 - impossible malgré aide
 ```
 
 ---

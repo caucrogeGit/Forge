@@ -100,7 +100,7 @@ rappelle la commande d'écoute.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Le subscriber MQTT — Forge</title>
+  <title>Le subscriber MQTT - Forge</title>
 </head>
 <body>
   <h1>Le subscriber MQTT</h1>

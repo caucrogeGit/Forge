@@ -88,7 +88,7 @@ cli/     Commandes et générateurs Forge : make:entity, make:crud, sync:entity,
 
 mvc/           Squelette applicatif généré par forge new.
                Contient les entités, contrôleurs, modèles, formulaires et vues.
-               Modifiable par l'utilisateur — certains fichiers sont préservés.
+               Modifiable par l'utilisateur - certains fichiers sont préservés.
 
 docs/          Documentation MkDocs complète du framework.
                Chaque fonctionnalité doit être documentée ici.
@@ -433,7 +433,7 @@ va dans `CHANGELOG.md`.
 ### Format attendu
 
 ```text
-Résumé final — <TICKET-ID>
+Résumé final - <TICKET-ID>
 
 Branche        : main
 Commit         : <hash>

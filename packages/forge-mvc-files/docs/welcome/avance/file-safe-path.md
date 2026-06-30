@@ -84,7 +84,7 @@ class FileSafePathController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Chemin anti-traversal — Forge</title>
+  <title>Chemin anti-traversal - Forge</title>
 </head>
 <body>
   <h1>Chemin anti-traversal</h1>

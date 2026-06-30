@@ -148,7 +148,7 @@ log = logging.getLogger("forge-iot-demo")
 
 def on_measurement(m: Measurement) -> None:
     log.info(
-        "%s/%s — %s = %s %s @ %s",
+        "%s/%s - %s = %s %s @ %s",
         m.site, m.device_id, m.kind, m.value, m.unit, m.timestamp,
     )
 
@@ -181,7 +181,7 @@ mosquitto_pub \
 Le script affiche :
 
 ```text
-INFO forge-iot-demo: atelier/esp32-001 — temperature = 22.4 °C @ 2026-05-28T10:00:00Z
+INFO forge-iot-demo: atelier/esp32-001 - temperature = 22.4 °C @ 2026-05-28T10:00:00Z
 ```
 
 ## Tester sans broker

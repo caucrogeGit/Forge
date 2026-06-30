@@ -176,8 +176,8 @@ python -m pytest -x -q
 Forge enregistre les erreurs runtime en mode développement dans :
 
 ```text
-storage/logs/errors.dev.jsonl   — journal JSON Lines (source canonique)
-storage/logs/errors.dev.md      — vue lisible générée depuis le JSONL
+storage/logs/errors.dev.jsonl   - journal JSON Lines (source canonique)
+storage/logs/errors.dev.md      - vue lisible générée depuis le JSONL
 ```
 
 **Où regarder :** ouvrir `storage/logs/errors.dev.md` pour une lecture rapide, ou `storage/logs/errors.dev.jsonl` pour le détail technique.

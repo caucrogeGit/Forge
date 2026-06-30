@@ -105,7 +105,7 @@ class FileValidateController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Valider un upload — Forge</title>
+  <title>Valider un upload - Forge</title>
 </head>
 <body>
   <h1>Valider un upload</h1>
@@ -117,7 +117,7 @@ class FileValidateController(BaseController):
   <p data-level="success">✓ <strong>{{ accepted }}</strong> accepté (toutes les règles passent).</p>
   {% endif %}
   {% if rejected %}
-  <p data-level="error">✗ Rejeté — règle <strong>{{ rejected.rule }}</strong> : {{ rejected.message }}</p>
+  <p data-level="error">✗ Rejeté - règle <strong>{{ rejected.rule }}</strong> : {{ rejected.message }}</p>
   {% endif %}
 
   <form method="post" action="/file-validate" enctype="multipart/form-data">

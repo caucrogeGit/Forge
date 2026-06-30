@@ -125,7 +125,7 @@ Ce ticket ne demande pas de modifier du code. L'exemple ci-dessous illustre la f
 
 ```text
 Statut : VALIDÉ AVEC FRICTION
-Gravité : S3 — Friction mineure
+Gravité : S3 - Friction mineure
 Commentaire : la commande a fonctionné, mais le message d'erreur était peu clair.
 ```
 
@@ -219,12 +219,12 @@ NON TESTÉ
 ## 17. Gravité du problème éventuel
 
 ```text
-S0 — Bloquant critique
-S1 — Bloquant fonctionnel
-S2 — Friction forte
-S3 — Friction mineure
-S4 — Suggestion
-S5 — Hors périmètre
+S0 - Bloquant critique
+S1 - Bloquant fonctionnel
+S2 - Friction forte
+S3 - Friction mineure
+S4 - Suggestion
+S5 - Hors périmètre
 ```
 
 ---
@@ -232,12 +232,12 @@ S5 — Hors périmètre
 ## 18. Niveau d'aide utilisé
 
 ```text
-A0 — aucune aide
-A1 — documentation Forge uniquement
-A2 — recherche personnelle ou documentation externe
-A3 — aide d'un autre testeur
-A4 — aide du référent Forge
-A5 — impossible malgré aide
+A0 - aucune aide
+A1 - documentation Forge uniquement
+A2 - recherche personnelle ou documentation externe
+A3 - aide d'un autre testeur
+A4 - aide du référent Forge
+A5 - impossible malgré aide
 ```
 
 ---

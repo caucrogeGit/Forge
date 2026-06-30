@@ -118,7 +118,7 @@ deux remontées (`../../`) atteignent la vue d'ensemble du starter, trois
 ````markdown
 # <Nom lisible du palier>
 
-Objectif : <une phrase — ce que le palier réalise>.
+Objectif : <une phrase - ce que le palier réalise>.
 
 **Ce que vous allez apprendre :** <2-3 phrases sur la notion ciblée et l'API
 concernée>.
@@ -217,7 +217,7 @@ même niveau) :
 ```markdown
 ## Après ce starter
 
-Passez au palier suivant : **<Nom>** — <ce qu'on y apprend>.
+Passez au palier suivant : **<Nom>** - <ce qu'on y apprend>.
 
 [Continuer avec <Nom>](<slug-suivant>.md)
 ```

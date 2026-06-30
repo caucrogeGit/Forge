@@ -40,7 +40,7 @@ Le log de démarrage le dit explicitement :
 
 ```text
 [INFO-DEV] Serveur en écoute sur https://0.0.0.0:8001
-[INFO-DEV] Attention : le serveur utilise HTTPS — préfixez bien vos URL par https://
+[INFO-DEV] Attention : le serveur utilise HTTPS - préfixez bien vos URL par https://
            (le navigateur affichera un avertissement de certificat auto-signé).
 ```
 

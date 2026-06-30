@@ -59,11 +59,11 @@ forge doctor
 `forge new` crée `env/dev` depuis `env/example` avec `APP_NAME` et `DB_NAME` déjà renseignés. Il reste à renseigner les mots de passe MariaDB :
 
 ```env
-# Compte admin MariaDB — utilisé uniquement par forge db:init
+# Compte admin MariaDB - utilisé uniquement par forge db:init
 DB_ADMIN_LOGIN=root
 DB_ADMIN_PWD=<mot_de_passe_root_mariadb>
 
-# Compte applicatif — utilisé par l'application et forge db:apply
+# Compte applicatif - utilisé par l'application et forge db:apply
 DB_APP_LOGIN=mon_projet_app
 DB_APP_PWD=<mot_de_passe_applicatif>
 ```
@@ -262,10 +262,10 @@ https://localhost:8000/contact
 
 ```text
 MonProjet/
-├── app.py                    # Point d'entrée — serveur HTTPS
+├── app.py                    # Point d'entrée - serveur HTTPS
 ├── config.py                 # Chargement de env/dev
 │
-├── core/                     # Framework Forge — ne pas modifier
+├── core/                     # Framework Forge - ne pas modifier
 │   ├── application.py        # Dispatcher : middlewares + routage
 │   ├── http/                 # Request, Response, Router
 │   ├── security/             # Sessions, CSRF, hashing, décorateurs
@@ -274,7 +274,7 @@ MonProjet/
 │   ├── mvc/                  # BaseController, Pagination
 │   └── templating/           # Contrat Renderer + singleton
 │
-├── mvc/                      # Application — c'est ici que vous travaillez
+├── mvc/                      # Application - c'est ici que vous travaillez
 │   ├── routes.py             # Déclaration des routes (manuel)
 │   ├── entities/             # JSON canoniques + fichiers générés
 │   │   ├── relations.json
@@ -292,7 +292,7 @@ MonProjet/
 │   └── views/
 │
 ├── env/
-│   ├── example               # commité — valeurs par défaut
+│   ├── example               # commité - valeurs par défaut
 │   ├── dev                   # ignoré par git
 │   └── prod                  # ignoré par git
 │

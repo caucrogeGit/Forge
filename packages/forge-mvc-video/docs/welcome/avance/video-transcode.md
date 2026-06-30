@@ -99,7 +99,7 @@ class VideoTranscodeController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Transcoder une vidéo — Forge</title>
+  <title>Transcoder une vidéo - Forge</title>
 </head>
 <body>
   <h1>Transcoder une vidéo</h1>
@@ -110,7 +110,7 @@ class VideoTranscodeController(BaseController):
   {% if pending %}
   <ul>
     {% for v in pending %}
-    <li>#{{ v.id }} — {{ v.title or v.uuid }} <em>({{ v.status }})</em></li>
+    <li>#{{ v.id }} - {{ v.title or v.uuid }} <em>({{ v.status }})</em></li>
     {% endfor %}
   </ul>
   {% else %}

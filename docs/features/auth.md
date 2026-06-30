@@ -594,7 +594,7 @@ Les mots de passe, tokens et codes MFA ne sont jamais inclus dans les logs.
 ```python
 from core.auth.audit import log_auth_event, AUTH_EVENT_LOGIN_SUCCESS
 
-# Appel direct — leve si les parametres sont invalides
+# Appel direct - leve si les parametres sont invalides
 log_auth_event(
     AUTH_EVENT_LOGIN_SUCCESS,
     user_id=utilisateur["UtilisateurId"],

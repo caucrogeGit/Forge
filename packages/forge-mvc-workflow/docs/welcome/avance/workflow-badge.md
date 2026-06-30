@@ -67,7 +67,7 @@ class WorkflowBadgeController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Badge de statut — Forge</title>
+  <title>Badge de statut - Forge</title>
 </head>
 <body>
   <h1>Badge de statut</h1>

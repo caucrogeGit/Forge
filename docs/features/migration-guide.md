@@ -338,7 +338,7 @@ Une fonctionnalité dépréciée peut se signaler de plusieurs façons :
 **Commande CLI dépréciée :**
 
 ```
-AVERTISSEMENT — forge old:command est dépréciée.
+AVERTISSEMENT - forge old:command est dépréciée.
 Utiliser désormais : forge new:command
 Suppression prévue : prochaine version MAJOR.
 ```

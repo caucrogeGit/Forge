@@ -23,8 +23,8 @@ v1.0.0-beta.5
 Elle prépare probablement une ou plusieurs bêtas suivantes, par exemple :
 
 ```text
-v1.0.0-beta.6 — Contrats JSON Schema : schémas + validation
-v1.0.0-beta.7 — Contrats JSON Schema : générateurs + documentation + clôture
+v1.0.0-beta.6 - Contrats JSON Schema : schémas + validation
+v1.0.0-beta.7 - Contrats JSON Schema : générateurs + documentation + clôture
 ```
 
 Le découpage exact en versions sera décidé au moment de l’ouverture de cette roadmap, selon l’état réel du dépôt après Phase 12.
@@ -1705,7 +1705,7 @@ Références locales :
   - schemas/entity.schema.json    ->  field.schema.json     OK
   ...
 
-Résultat : OK — 5 schéma(s), 0 erreur.
+Résultat : OK - 5 schéma(s), 0 erreur.
 ```
 
 ---

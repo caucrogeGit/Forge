@@ -123,8 +123,8 @@ en base. Rejetée.
 Le code actuel dévie de cette règle dans `canonical_model_normalizer.py` :
 
 ```python
-# Actuel — déviant
-nullable = bool(field.get("nullable", False))  # défaut NOT NULL — incorrect
+# Actuel - déviant
+nullable = bool(field.get("nullable", False))  # défaut NOT NULL - incorrect
 if field.get("required") and not field.get("nullable"):
     nullable = False                            # required ne gagne pas si nullable=True
 ```

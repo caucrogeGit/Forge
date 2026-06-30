@@ -74,12 +74,12 @@ class StatsSchemaController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Le schéma SQL — Forge</title>
+  <title>Le schéma SQL - Forge</title>
 </head>
 <body>
   <h1>Le schéma SQL</h1>
 
-  <p>Table : <code>{{ table }}</code> — colonnes : <code>{{ columns | join(', ') }}</code></p>
+  <p>Table : <code>{{ table }}</code> - colonnes : <code>{{ columns | join(', ') }}</code></p>
 
   <p>Le <code>CREATE TABLE</code> exact (SQL visible, aucun ORM) :</p>
   <pre><code>{{ schema_sql }}</code></pre>

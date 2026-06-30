@@ -65,7 +65,7 @@ class WorkflowJinjaController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Helpers Workflow dans Jinja — Forge</title>
+  <title>Helpers Workflow dans Jinja - Forge</title>
 </head>
 <body>
   <h1>Helpers Workflow dans Jinja</h1>

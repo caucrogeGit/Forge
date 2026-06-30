@@ -123,7 +123,7 @@ Créez le gabarit ci-dessous : formulaire de saisie, affichage de la
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Valider un message IoT — Forge</title>
+  <title>Valider un message IoT - Forge</title>
 </head>
 <body>
   <h1>Valider un message IoT</h1>

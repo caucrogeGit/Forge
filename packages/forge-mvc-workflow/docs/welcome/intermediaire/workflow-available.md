@@ -78,7 +78,7 @@ class WorkflowAvailableController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Transitions disponibles — Forge</title>
+  <title>Transitions disponibles - Forge</title>
 </head>
 <body>
   <h1>Transitions disponibles</h1>

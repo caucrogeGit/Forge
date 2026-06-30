@@ -116,7 +116,7 @@ Le contrôleur rend `image_variants/index.html` : créez ce fichier.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Miniatures et variantes — Forge</title>
+  <title>Miniatures et variantes - Forge</title>
 </head>
 <body>
   <h1>Miniatures et variantes</h1>

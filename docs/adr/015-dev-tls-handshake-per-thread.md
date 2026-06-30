@@ -79,7 +79,7 @@ accepté) :
 Flux résultant :
 
 ```
-TCP accept()                       (thread principal — non bloquant)
+TCP accept()                       (thread principal - non bloquant)
   → ThreadingMixIn lance un thread (thread du client)
       → wrap_socket()              (handshake TLS, borné par timeout)
           → RequestHandler         (requête HTTP normale)

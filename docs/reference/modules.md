@@ -187,12 +187,12 @@ Exemple de sortie :
 ```
 Modules Forge disponibles :
 
-  - agenda 0.1.0 — Agenda
-  - patrimoine 0.1.0 — Patrimoine
+  - agenda 0.1.0 - Agenda
+  - patrimoine 0.1.0 - Patrimoine
 
 Modules invalides :
 
-  - broken — label: champ obligatoire manquant
+  - broken - label: champ obligatoire manquant
 ```
 
 Si le dossier n'existe pas :

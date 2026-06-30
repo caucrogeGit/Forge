@@ -1,5 +1,5 @@
 /*
- * esp32_mqtt_temperature.ino — Exemple Forge IoT (IOT-ESP32-EXAMPLE-001)
+ * esp32_mqtt_temperature.ino - Exemple Forge IoT (IOT-ESP32-EXAMPLE-001)
  *
  * Publie une mesure de température conforme au contrat MQTT Forge IoT :
  *

@@ -87,7 +87,7 @@ class FileStoreController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Stocker un document — Forge</title>
+  <title>Stocker un document - Forge</title>
 </head>
 <body>
   <h1>Stocker un document</h1>

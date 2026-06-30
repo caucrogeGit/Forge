@@ -68,9 +68,9 @@ Les outils de diagnostic Forge sont des commandes en lecture seule. Leur rôle e
 Trois niveaux de diagnostic sont disponibles :
 
 ```text
-forge doctor         — diagnostic large et tolérant (recommandé en premier)
-forge project:check  — contrôle strict CI-ready
-forge project:audit  — rapport d'audit détaillé
+forge doctor         - diagnostic large et tolérant (recommandé en premier)
+forge project:check  - contrôle strict CI-ready
+forge project:audit  - rapport d'audit détaillé
 ```
 
 Ces trois commandes ne modifient rien dans le projet. Elles peuvent être lancées à tout moment pendant un ticket, sans risque.
@@ -161,7 +161,7 @@ Note : si aucun projet Forge n'est disponible, `forge doctor` peut être exécut
 L'exemple suivant montre la forme d'une sortie de `forge doctor` pour un projet sain :
 
 ```text
-[OK]  Python 3.12.x — version supportée
+[OK]  Python 3.12.x - version supportée
 [OK]  forge-mvc installé
 [OK]  env/dev présent
 [OK]  mvc/routes.py présent
@@ -274,12 +274,12 @@ NON TESTÉ
 ## 17. Gravité du problème éventuel
 
 ```text
-S0 — Bloquant critique
-S1 — Bloquant fonctionnel
-S2 — Friction forte
-S3 — Friction mineure
-S4 — Suggestion
-S5 — Hors périmètre
+S0 - Bloquant critique
+S1 - Bloquant fonctionnel
+S2 - Friction forte
+S3 - Friction mineure
+S4 - Suggestion
+S5 - Hors périmètre
 ```
 
 ---
@@ -287,12 +287,12 @@ S5 — Hors périmètre
 ## 18. Niveau d'aide utilisé
 
 ```text
-A0 — aucune aide
-A1 — documentation Forge uniquement
-A2 — recherche personnelle ou documentation externe
-A3 — aide d'un autre testeur
-A4 — aide du référent Forge
-A5 — impossible malgré aide
+A0 - aucune aide
+A1 - documentation Forge uniquement
+A2 - recherche personnelle ou documentation externe
+A3 - aide d'un autre testeur
+A4 - aide du référent Forge
+A5 - impossible malgré aide
 ```
 
 ---

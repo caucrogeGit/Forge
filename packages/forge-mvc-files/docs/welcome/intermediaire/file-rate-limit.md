@@ -98,7 +98,7 @@ class FileRateLimitController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Limiter les uploads — Forge</title>
+  <title>Limiter les uploads - Forge</title>
 </head>
 <body>
   <h1>Limiter les uploads</h1>
@@ -106,7 +106,7 @@ class FileRateLimitController(BaseController):
   <p>Quota : <strong>10 uploads par minute et par IP</strong> (fenêtre glissante, en mémoire).</p>
 
   {% if rate_limited %}
-  <p data-level="error"><strong>429 — Trop d'uploads.</strong> Réessayez dans un instant.</p>
+  <p data-level="error"><strong>429 - Trop d'uploads.</strong> Réessayez dans un instant.</p>
   {% endif %}
   {% if error %}
   <p data-level="error"><strong>{{ error }}</strong></p>

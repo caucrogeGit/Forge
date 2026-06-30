@@ -257,7 +257,7 @@ from core.sessions import SessionStore
 
 
 class DictSessionStore:
-    """Store en mémoire minimal — exemple pédagogique."""
+    """Store en mémoire minimal - exemple pédagogique."""
 
     def __init__(self, ttl: int = 3600) -> None:
         self._data: dict[str, dict] = {}

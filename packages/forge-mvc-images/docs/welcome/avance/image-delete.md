@@ -107,7 +107,7 @@ Le contrôleur rend `image_delete/index.html` : créez ce fichier.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Supprimer proprement — Forge</title>
+  <title>Supprimer proprement - Forge</title>
 </head>
 <body>
   <h1>Supprimer proprement</h1>
@@ -124,7 +124,7 @@ Le contrôleur rend `image_delete/index.html` : créez ce fichier.
   <form method="post" action="/image-delete">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="media_id" value="{{ item.id }}">
-    <code>#{{ item.id }} — {{ item.path }}</code>
+    <code>#{{ item.id }} - {{ item.path }}</code>
     <button type="submit">Supprimer</button>
   </form>
   {% endfor %}

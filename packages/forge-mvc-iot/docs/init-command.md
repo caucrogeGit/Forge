@@ -77,7 +77,7 @@ Exit code : `0`. La commande est sûre à rejouer.
 ### Cas conflit : fichier présent, contenu différent
 
 ```text
-[WARN] mvc/migrations/20260528120000_create_iot_events.sql existe et diffère — aucune modification.
+[WARN] mvc/migrations/20260528120000_create_iot_events.sql existe et diffère - aucune modification.
 ```
 
 Exit code : `0`. **Aucun écrasement** : si l'utilisateur a modifié la

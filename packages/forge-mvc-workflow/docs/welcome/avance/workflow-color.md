@@ -91,7 +91,7 @@ class WorkflowColorController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Couleur, libellé, classe — Forge</title>
+  <title>Couleur, libellé, classe - Forge</title>
 </head>
 <body>
   <h1>Couleur, libellé, classe</h1>

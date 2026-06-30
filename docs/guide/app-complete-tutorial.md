@@ -306,7 +306,7 @@ mvc/entities/
 
 ```text
 JSON  → build:model → SQL + _base.py + relations.sql   (régénérable à tout moment)
-JSON  → make:crud   → controller / model / form / views (préservé — jamais réécrasé)
+JSON  → make:crud   → controller / model / form / views (préservé - jamais réécrasé)
 ```
 
 Les fichiers SQL et `_base.py` sont des **projections** du JSON : régénérez-les

@@ -138,7 +138,7 @@ connecter au broker. Une option hors slug est donc rejetée proprement,
 sans ouvrir de socket :
 
 ```text
-[ERREUR] message non conforme au contrat MQTT — Topic invalide : 'forge/Atelier/esp32-001/telemetry' (...)
+[ERREUR] message non conforme au contrat MQTT - Topic invalide : 'forge/Atelier/esp32-001/telemetry' (...)
 ```
 
 C'est volontaire : on ne publie **que** des messages que le subscriber

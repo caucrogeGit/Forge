@@ -446,7 +446,7 @@ Les répertoires `dist/`, `build/` et `*.egg-info/` sont des artefacts de valida
 Ils sont exclus de Git (`.gitignore`) et **ne doivent pas être commités**.
 
 ```bash
-# Validation locale uniquement — ne publie rien
+# Validation locale uniquement - ne publie rien
 python -m build
 twine check dist/*
 ```
@@ -578,7 +578,7 @@ PyPI : les installer directement avec `pip install --pre forge-mvc-<nom>`.
 Chaque release doit avoir une entrée dans `CHANGELOG.md` avec la structure :
 
 ```markdown
-## [X.Y.Z] — YYYY-MM-DD
+## [X.Y.Z] - YYYY-MM-DD
 
 ### Ajouté
 

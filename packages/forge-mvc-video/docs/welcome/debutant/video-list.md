@@ -66,7 +66,7 @@ class VideoListController(BaseController):
         try:
             videos = VideoRepository().list_recent(limit=20)
         except Exception:
-            # Table absente, base inaccessible… — on reste pédagogique.
+            # Table absente, base inaccessible… - on reste pédagogique.
             return Response.json(_STORAGE_NOT_READY, status=503)
         return Response.json({"videos": videos})
 ```

@@ -72,7 +72,7 @@ class FileServeController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Servir un fichier — Forge</title>
+  <title>Servir un fichier - Forge</title>
 </head>
 <body>
   <h1>Servir un fichier</h1>

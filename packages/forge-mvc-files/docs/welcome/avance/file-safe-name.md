@@ -79,7 +79,7 @@ class FileSafeNameController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Assainir un nom de fichier — Forge</title>
+  <title>Assainir un nom de fichier - Forge</title>
 </head>
 <body>
   <h1>Assainir un nom de fichier</h1>

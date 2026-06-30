@@ -146,7 +146,7 @@ Le motif `/mvc/entities/*/*.json` cible les entités dans des sous-dossiers :
 ```
 mvc/entities/article/article.json   ✓
 mvc/entities/media/media.json       ✓
-mvc/entities/relations.json         ✗  (non ciblé — couvert par l'entrée précédente)
+mvc/entities/relations.json         ✗  (non ciblé - couvert par l'entrée précédente)
 ```
 
 Cette configuration est disponible dans `.vscode/settings.json` à la racine du dépôt.

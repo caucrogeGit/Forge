@@ -67,18 +67,18 @@ Le doctor exit 0 dès qu'aucun `fail` n'est remonté ; un `warn` ou un
 ```text
 Forge IoT doctor
 
-  [OK]    package forge-mvc-iot — installé (version {{forge_version}})
-  [OK]    configuration IoT — chargée
+  [OK]    package forge-mvc-iot - installé (version {{forge_version}})
+  [OK]    configuration IoT - chargée
            mqtt_host       : localhost
            mqtt_port       : 1883
            mqtt_topic      : forge/+/+/telemetry
            mqtt_client_id  : forge-iot
            mqtt_username   : (none)
            mqtt_password   : (none)
-  [OK]    migration iot_events — présente (20260528120000_create_iot_events.sql)
-  [OK]    API HTTP IoT — register_iot_routes disponible
-  [SKIP]  broker MQTT — non testé par défaut — passe --mqtt pour vérifier le broker
-  [SKIP]  base iot_events — non testée par défaut — passe --db pour vérifier l'accès à la table
+  [OK]    migration iot_events - présente (20260528120000_create_iot_events.sql)
+  [OK]    API HTTP IoT - register_iot_routes disponible
+  [SKIP]  broker MQTT - non testé par défaut - passe --mqtt pour vérifier le broker
+  [SKIP]  base iot_events - non testée par défaut - passe --db pour vérifier l'accès à la table
 
 0 avertissement(s), 0 erreur(s), 2 info(s).
 ```
@@ -88,8 +88,8 @@ Forge IoT doctor
 Table présente et schéma conforme :
 
 ```text
-  [OK]    base iot_events — table accessible (42 événement(s))
-  [OK]    schéma iot_events — conforme
+  [OK]    base iot_events - table accessible (42 événement(s))
+  [OK]    schéma iot_events - conforme
 ```
 
 Le contrôle de schéma (ligne 7) n'est lancé **que** si la table est
@@ -98,7 +98,7 @@ accessible, voir [Vérification du schéma `iot_events`](#verification-du-schema
 Table absente (migration pas appliquée) :
 
 ```text
-  [WARN]  base iot_events — table absente ou migration non appliquée
+  [WARN]  base iot_events - table absente ou migration non appliquée
            Conseil : lance forge iot:init puis forge migration:apply
 ```
 
@@ -109,7 +109,7 @@ qui manque. Exit code 0.
 Connexion MariaDB impossible :
 
 ```text
-  [FAIL]  base iot_events — connexion MariaDB impossible — OperationalError: Can't connect to MySQL server on 'localhost' (111)
+  [FAIL]  base iot_events - connexion MariaDB impossible - OperationalError: Can't connect to MySQL server on 'localhost' (111)
 ```
 
 Cas typiques : MariaDB pas démarré, mauvais host/port, identifiants
@@ -159,8 +159,8 @@ forge iot:doctor --db
 ```
 
 ```text
-  [OK]    base iot_events — table accessible (0 événement(s))
-  [OK]    schéma iot_events — conforme
+  [OK]    base iot_events - table accessible (0 événement(s))
+  [OK]    schéma iot_events - conforme
 ```
 
 Exit code 0.
@@ -168,14 +168,14 @@ Exit code 0.
 ### Exemple : colonne manquante
 
 ```text
-  [WARN]  schéma iot_events — colonne manquante : metadata_json
+  [WARN]  schéma iot_events - colonne manquante : metadata_json
            Conseil : vérifie la migration Forge IoT ou recrée la table dans un environnement de test.
 ```
 
 ### Exemple : type inattendu
 
 ```text
-  [WARN]  schéma iot_events — type inattendu pour value : attendu DOUBLE, obtenu VARCHAR(255)
+  [WARN]  schéma iot_events - type inattendu pour value : attendu DOUBLE, obtenu VARCHAR(255)
 ```
 
 Une divergence (colonne manquante, type ou nullabilité inattendus, `id`
@@ -200,20 +200,20 @@ qu'un simple `socket` TCP.
 Broker joignable :
 
 ```text
-  [OK]    broker MQTT — connexion réussie à localhost:1883
+  [OK]    broker MQTT - connexion réussie à localhost:1883
 ```
 
 Broker injoignable (Mosquitto pas démarré, mauvais host/port, réseau
 coupé) :
 
 ```text
-  [FAIL]  broker MQTT — connexion impossible à localhost:1883
+  [FAIL]  broker MQTT - connexion impossible à localhost:1883
 ```
 
 Authentification refusée (mauvais username/password) :
 
 ```text
-  [FAIL]  broker MQTT — authentification refusée
+  [FAIL]  broker MQTT - authentification refusée
 ```
 
 Exit code 1 dans les deux cas d'échec. Le mot de passe MQTT n'apparaît
@@ -262,7 +262,7 @@ de deviner ce qui manque.
 Avec un username/password configurés :
 
 ```text
-  [OK]    configuration IoT — chargée
+  [OK]    configuration IoT - chargée
            …
            mqtt_username   : forge
            mqtt_password   : ***
@@ -279,7 +279,7 @@ appliqué uniformément dans le doctor.
 Si `FORGE_IOT_MQTT_HOST` est défini mais vide, par exemple :
 
 ```text
-  [FAIL]  configuration IoT — FORGE_IOT_MQTT_HOST ne peut pas être vide
+  [FAIL]  configuration IoT - FORGE_IOT_MQTT_HOST ne peut pas être vide
 ```
 
 Idem pour un port hors plage, un topic vide, etc. Voir
@@ -297,8 +297,8 @@ Si le doctor ne trouve plus la migration, c'est probablement le signe
 d'une installation cassée :
 
 ```text
-  [FAIL]  migration iot_events — aucun *_create_iot_events.sql sous
-           forge_mvc_iot/migrations/ — vérifier l'installation
+  [FAIL]  migration iot_events - aucun *_create_iot_events.sql sous
+           forge_mvc_iot/migrations/ - vérifier l'installation
            (pip install -e packages/forge-mvc-iot) et
            [tool.setuptools.package-data] dans pyproject.toml
 ```

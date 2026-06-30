@@ -96,7 +96,7 @@ Un message qui ne respecte pas le contrat (topic mal formé, champ
 manquant, type incorrect…) est **ignoré sans arrêter l'écoute** :
 
 ```text
-[WARN] Message MQTT ignoré — PAYLOAD_FIELD_MISSING
+[WARN] Message MQTT ignoré - PAYLOAD_FIELD_MISSING
 ```
 
 Le code affiché (`TOPIC_PATTERN`, `PAYLOAD_PARSE`,

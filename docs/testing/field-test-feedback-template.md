@@ -233,12 +233,12 @@ NON TESTÉ
 ## 15. Gravité proposée
 
 ```text
-S0 — Bloquant critique
-S1 — Bloquant fonctionnel
-S2 — Friction forte
-S3 — Friction mineure
-S4 — Suggestion
-S5 — Hors périmètre
+S0 - Bloquant critique
+S1 - Bloquant fonctionnel
+S2 - Friction forte
+S3 - Friction mineure
+S4 - Suggestion
+S5 - Hors périmètre
 ```
 
 Justification :

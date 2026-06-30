@@ -80,7 +80,7 @@ class WorkflowStatusController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Nom de statut — Forge</title>
+  <title>Nom de statut - Forge</title>
 </head>
 <body>
   <h1>Nom de statut</h1>
@@ -93,7 +93,7 @@ class WorkflowStatusController(BaseController):
   <ul>
     <li>Entrée : <code>{{ input }}</code></li>
     <li>Normalisé : <code>{{ normalized }}</code></li>
-    <li>Valide : <strong>{% if valid %}oui{% else %}non{% endif %}</strong>{% if error %} — {{ error }}{% endif %}</li>
+    <li>Valide : <strong>{% if valid %}oui{% else %}non{% endif %}</strong>{% if error %} - {{ error }}{% endif %}</li>
   </ul>
 
   <p>Le nom <code>snake_case</code> est l'identifiant stable du statut ; le libellé

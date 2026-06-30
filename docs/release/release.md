@@ -131,7 +131,7 @@ Avant de créer le tag, vérifier que la version est uniforme sur tous les fichi
 | `forge.py` | `__version__ = "x.y.z"` |
 | `core/__init__.py` | `__version__ = "x.y.z"` |
 | `README.md` | badge et mentions de version |
-| `CHANGELOG.md` | entrée `## [x.y.z] — YYYY-MM-DD` |
+| `CHANGELOG.md` | entrée `## [x.y.z] - YYYY-MM-DD` |
 | `docs/roadmap/forge-roadmap.md` | tag recommandé et état actuel |
 
 Commande de recherche rapide :
@@ -156,7 +156,7 @@ Adapter `x.y.z` et `vx.y.z` à la version cible (ex. `2\.0\.2` et `v2\.0\.2`).
 Structure attendue pour chaque entrée :
 
 ```markdown
-## [x.y.z] — YYYY-MM-DD
+## [x.y.z] - YYYY-MM-DD
 
 ### Ajouté
 

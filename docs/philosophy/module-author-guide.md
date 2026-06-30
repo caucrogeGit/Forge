@@ -166,7 +166,7 @@ def register_routes(router):
 **sans modifier** `mvc/routes.py` :
 
 ```python
-# mvc/routes_mon_module.py (généré par Forge — régénérable)
+# mvc/routes_mon_module.py (généré par Forge - régénérable)
 """Routes du module Forge "mon_module".
 
 Fichier genere par `forge module:routes mon_module`. Regenerable.

@@ -129,7 +129,7 @@ Créez le gabarit ci-dessous : il porte le formulaire et la liste des derniers
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Simuler une mesure IoT — Forge</title>
+  <title>Simuler une mesure IoT - Forge</title>
 </head>
 <body>
   <h1>Simuler une mesure IoT</h1>
@@ -152,7 +152,7 @@ Créez le gabarit ci-dessous : il porte le formulaire et la liste des derniers
   {% if events %}
   <ul>
     {% for e in events %}
-    <li>{{ e.site }}/{{ e.device_id }} — {{ e.kind }} = {{ e.value }} {{ e.unit }}</li>
+    <li>{{ e.site }}/{{ e.device_id }} - {{ e.kind }} = {{ e.value }} {{ e.unit }}</li>
     {% endfor %}
   </ul>
   {% else %}

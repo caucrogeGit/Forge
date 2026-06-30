@@ -113,7 +113,7 @@ Le contrôleur rend `image_safety/index.html` : créez ce fichier.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Garde de sécurité à l'upload — Forge</title>
+  <title>Garde de sécurité à l'upload - Forge</title>
 </head>
 <body>
   <h1>Garde de sécurité à l'upload</h1>
@@ -128,7 +128,7 @@ Le contrôleur rend `image_safety/index.html` : créez ce fichier.
   <p data-level="error"><strong>{{ error }}</strong></p>
   {% endif %}
   {% if accepted %}
-  <p data-level="success">✓ <strong>{{ accepted }}</strong> est une image valide — acceptée.</p>
+  <p data-level="success">✓ <strong>{{ accepted }}</strong> est une image valide - acceptée.</p>
   {% endif %}
   {% if rejected %}
   <p data-level="error">✗ Fichier rejeté : {{ rejected }}</p>

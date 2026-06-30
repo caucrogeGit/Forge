@@ -80,7 +80,7 @@ class WorkflowCheckController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Vérifier une transition — Forge</title>
+  <title>Vérifier une transition - Forge</title>
 </head>
 <body>
   <h1>Vérifier une transition</h1>

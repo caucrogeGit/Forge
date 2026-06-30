@@ -94,7 +94,7 @@ Le contrôleur rend `image_gallery/index.html` : créez ce fichier.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Galerie d'images — Forge</title>
+  <title>Galerie d'images - Forge</title>
 </head>
 <body>
   <h1>Galerie d'images</h1>

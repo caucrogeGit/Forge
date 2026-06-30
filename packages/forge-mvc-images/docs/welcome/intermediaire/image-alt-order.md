@@ -118,7 +118,7 @@ Le contrôleur rend `image_alt_order/index.html` : créez ce fichier.
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Texte alternatif et ordre — Forge</title>
+  <title>Texte alternatif et ordre - Forge</title>
 </head>
 <body>
   <h1>Texte alternatif et ordre</h1>
@@ -135,7 +135,7 @@ Le contrôleur rend `image_alt_order/index.html` : créez ce fichier.
   <form method="post" action="/image-alt-order">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="media_id" value="{{ item.id }}">
-    <code>#{{ item.id }} — {{ item.path }}</code>
+    <code>#{{ item.id }} - {{ item.path }}</code>
     <label>Texte alternatif
       <input type="text" name="alt_text" value="{{ item.alt_text or '' }}" maxlength="255">
     </label>

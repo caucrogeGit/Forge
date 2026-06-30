@@ -85,7 +85,7 @@ class WorkflowTransitionController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Déclarer les transitions — Forge</title>
+  <title>Déclarer les transitions - Forge</title>
 </head>
 <body>
   <h1>Déclarer les transitions</h1>

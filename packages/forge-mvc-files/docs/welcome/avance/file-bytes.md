@@ -87,7 +87,7 @@ class FileBytesController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Écrire des octets générés — Forge</title>
+  <title>Écrire des octets générés - Forge</title>
 </head>
 <body>
   <h1>Écrire des octets générés</h1>

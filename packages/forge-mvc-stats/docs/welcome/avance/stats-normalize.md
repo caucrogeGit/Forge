@@ -84,7 +84,7 @@ class StatsNormalizeController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Normaliser une ligne — Forge</title>
+  <title>Normaliser une ligne - Forge</title>
 </head>
 <body>
   <h1>Normaliser une ligne</h1>

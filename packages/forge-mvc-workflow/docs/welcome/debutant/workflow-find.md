@@ -85,7 +85,7 @@ class WorkflowFindController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Retrouver un statut — Forge</title>
+  <title>Retrouver un statut - Forge</title>
 </head>
 <body>
   <h1>Retrouver un statut</h1>
@@ -96,7 +96,7 @@ class WorkflowFindController(BaseController):
   </form>
 
   {% if found %}
-  <p data-level="success">Trouvé : <code>{{ name }}</code> — « {{ label }} » (couleur {{ color }}).</p>
+  <p data-level="success">Trouvé : <code>{{ name }}</code> - « {{ label }} » (couleur {{ color }}).</p>
   {% else %}
   <p data-level="error">Statut <code>{{ name }}</code> introuvable dans le jeu de démo.</p>
   {% endif %}

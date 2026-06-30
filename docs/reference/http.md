@@ -70,14 +70,14 @@ de session).
 ## 3. `Request` : référence
 
 ```python
-request.method          # str — "GET", "POST", …
-request.original_method # str — méthode reçue avant override _method
+request.method          # str - "GET", "POST", …
+request.original_method # str - méthode reçue avant override _method
 request.path            # str
 request.ip              # str
 request.headers         # http.client.HTTPMessage (case-insensitive)
-request.params          # dict[str, list[str]]    — query string parsée
-request.body            # dict[str, list[str]]    — formulaire parsé
-request.json_body       # dict | list | ...       — JSON parsé
+request.params          # dict[str, list[str]]    - query string parsée
+request.body            # dict[str, list[str]]    - formulaire parsé
+request.json_body       # dict | list | ...       - JSON parsé
 request.files           # dict[str, UploadedFile]
 request.route_params    # dict[str, str]
 ```
@@ -127,10 +127,10 @@ rend une **vue template** existante située dans `mvc/views/`. Confondre
 les deux est la source d'erreur la plus fréquente pour un débutant :
 
 ```python
-# Texte brut — pas de moteur de template, aucune vue requise.
+# Texte brut - pas de moteur de template, aucune vue requise.
 return Response.text("Bonjour Forge")
 
-# Vue template — Forge cherche mvc/views/welcome/index.html.
+# Vue template - Forge cherche mvc/views/welcome/index.html.
 return BaseController.render("welcome/index.html", request=request)
 
 # Inspection d'un objet en développement.
@@ -178,8 +178,8 @@ response.status        # int
 response.content_type  # str
 response.body          # bytes
 response.headers       # dict[str, str]
-response.cookies       # list[str] — noms uniquement
-response.data          # dict — vue publique masquée
+response.cookies       # list[str] - noms uniquement
+response.data          # dict - vue publique masquée
 ```
 
 ### Constructeurs nommés

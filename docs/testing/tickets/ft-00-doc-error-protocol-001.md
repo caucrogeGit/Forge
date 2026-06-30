@@ -140,10 +140,10 @@ L'exemple suivant montre comment documenter un écart entre documentation et ré
 Page concernée : docs/installation-demo.md
 Passage erroné : "La commande forge init crée le projet dans le répertoire courant."
 Réalité observée : la commande crée un sous-répertoire supplémentaire.
-Étape concernée : étape 3 — initialiser le projet.
+Étape concernée : étape 3 - initialiser le projet.
 Contournement : se déplacer dans le sous-répertoire créé.
 Statut retenu : VALIDÉ AVEC FRICTION
-Gravité : S3 — Friction mineure
+Gravité : S3 - Friction mineure
 ```
 
 Pour ce ticket, le testeur devra produire un exemple similaire basé sur un scénario fictif différent.
@@ -236,12 +236,12 @@ NON TESTÉ
 ## 17. Gravité du problème éventuel
 
 ```text
-S0 — Bloquant critique
-S1 — Bloquant fonctionnel
-S2 — Friction forte
-S3 — Friction mineure
-S4 — Suggestion
-S5 — Hors périmètre
+S0 - Bloquant critique
+S1 - Bloquant fonctionnel
+S2 - Friction forte
+S3 - Friction mineure
+S4 - Suggestion
+S5 - Hors périmètre
 ```
 
 ---
@@ -249,12 +249,12 @@ S5 — Hors périmètre
 ## 18. Niveau d'aide utilisé
 
 ```text
-A0 — aucune aide
-A1 — documentation Forge uniquement
-A2 — recherche personnelle ou documentation externe
-A3 — aide d'un autre testeur
-A4 — aide du référent Forge
-A5 — impossible malgré aide
+A0 - aucune aide
+A1 - documentation Forge uniquement
+A2 - recherche personnelle ou documentation externe
+A3 - aide d'un autre testeur
+A4 - aide du référent Forge
+A5 - impossible malgré aide
 ```
 
 ---

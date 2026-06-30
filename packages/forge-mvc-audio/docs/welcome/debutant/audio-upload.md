@@ -99,7 +99,7 @@ class AudioUploadController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Téléverser un audio — Forge</title>
+  <title>Téléverser un audio - Forge</title>
 </head>
 <body>
   <h1>Téléverser un audio</h1>

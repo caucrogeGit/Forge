@@ -100,7 +100,7 @@ class AudioProbeController(BaseController):
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Sonder un audio — Forge</title>
+  <title>Sonder un audio - Forge</title>
 </head>
 <body>
   <h1>Sonder un audio</h1>
