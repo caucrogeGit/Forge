@@ -67,15 +67,21 @@ class TestInstallDirExists:
         assert path.exists(), f"docs/install/{name} doit exister."
 
 
-class TestIndexRemoved:
-    """L'aiguillage `index.md` a été supprimé : la landing publique route
-    directement vers les pages d'installation (poste-linux, windows-wsl,
-    core-dev), et `opt-ins.md` porte le contrat d'installation des opt-ins."""
+class TestIndexOverview:
+    """`docs/install/index.md` est la page d'ensemble de l'installation
+    (DOC-DATABASES-OVERVIEW-001) : elle rassemble les parcours et est
+    référencée dans la nav mkdocs. `opt-ins.md` porte le contrat
+    d'installation des opt-ins."""
 
-    def test_index_md_absent(self):
-        assert not (INSTALL_DIR / "index.md").exists(), (
-            "docs/install/index.md doit rester supprimé : la landing fait "
-            "l'aiguillage, opt-ins.md porte le contrat opt-ins."
+    def test_index_md_present(self):
+        index = INSTALL_DIR / "index.md"
+        assert index.exists(), (
+            "docs/install/index.md doit exister : page d'ensemble de "
+            "l'installation (DOC-DATABASES-OVERVIEW-001)."
+        )
+        first = index.read_text(encoding="utf-8").splitlines()[0]
+        assert "Installation" in first, (
+            "docs/install/index.md doit ouvrir sur un titre d'installation."
         )
 
     def test_optins_page_porte_le_contrat(self):
@@ -152,8 +158,13 @@ class TestNoBrokenInternalLinks:
             if rel.startswith("docs/starters/"):
                 continue
             text = md.read_text(encoding="utf-8")
-            # Ignore mentions de `install/index.md` (le nouveau chemin).
-            stripped = text.replace("install/index.md", "")
+            # Ignore le nouveau chemin `install/index.md` et les préambules
+            # légitimes `welcome/installation.md` des parcours et backends
+            # (STARTERS-WELCOME-INSTALL-001) : le contrôle ne vise que l'ancien
+            # `docs/installation.md` à plat.
+            stripped = text.replace("install/index.md", "").replace(
+                "welcome/installation.md", ""
+            )
             if self._OLD_INSTALLATION_MD.search(stripped):
                 offenders.append(rel)
         assert not offenders, (

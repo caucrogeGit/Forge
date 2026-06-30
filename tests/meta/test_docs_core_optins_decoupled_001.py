@@ -28,6 +28,15 @@ SLUGS = {
 # Lien markdown [texte](cible) — exclut les images ![...](...).
 LINK = re.compile(r"(?<!\!)\[[^\]]+\]\(([^)]+)\)")
 
+# Pages d'agrégation du cœur : leur rôle EST de cataloguer les opt-ins et de
+# pointer vers leur doc (landing/index de navigation). ADR-042 vise le couplage
+# du *contenu de référence* du cœur à un opt-in, pas ces index de navigation.
+# Ces deux pages sont donc autorisées à lier vers la doc des opt-ins.
+AGGREGATION_PAGES = {
+    "docs/starters/index.md",
+    "docs/optins/index.md",
+}
+
 
 def _combined_pos(md: Path) -> str:
     rel = md.relative_to(PROJECT_ROOT).as_posix()
@@ -64,6 +73,8 @@ def test_aucun_lien_transversal_coeur_optin():
     offenders: list[str] = []
     for md in _md_files():
         src = _combined_pos(md)
+        if src in AGGREGATION_PAGES:
+            continue
         src_space = _space(src)
         for target in LINK.findall(md.read_text(encoding="utf-8")):
             ts = _target_space(src, target)
