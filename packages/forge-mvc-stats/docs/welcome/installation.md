@@ -51,4 +51,4 @@ forge doctor
 Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
 contrôleur, la vue et la route `/stats-welcome`.
 
-[Continuer avec Bonjour Forge Stats](debutant/stats-welcome.md)
+[Continuer sur le starter Welcome Stats](debutant/stats-welcome.md)

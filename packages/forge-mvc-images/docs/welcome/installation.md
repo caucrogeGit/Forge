@@ -70,4 +70,4 @@ Le module `images` doit apparaître comme installé.
 Le module répond : vous pouvez attaquer le premier palier de code, où vous
 créerez vous-même le contrôleur, la vue et la route `/images-welcome`.
 
-[Continuer avec Bonjour Forge Images](debutant/images-welcome.md)
+[Continuer sur le starter Welcome Images](debutant/images-welcome.md)

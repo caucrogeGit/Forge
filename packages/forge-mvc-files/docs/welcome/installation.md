@@ -62,4 +62,4 @@ Le module `files` doit apparaître comme installé.
 Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
 contrôleur, la vue et la route `/files-welcome`.
 
-[Continuer avec Bonjour Forge Files](debutant/files-welcome.md)
+[Continuer sur le starter Welcome Files](debutant/files-welcome.md)

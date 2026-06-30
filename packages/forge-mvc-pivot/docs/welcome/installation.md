@@ -50,4 +50,4 @@ forge doctor
 Vous pouvez attaquer le premier palier, où vous découvrirez **pourquoi** un pivot
 enrichi diffère d'un `many_to_many` ordinaire.
 
-[Continuer avec Bonjour Forge Pivot](debutant/pivot-welcome.md)
+[Continuer sur le starter Welcome Pivot](debutant/pivot-welcome.md)

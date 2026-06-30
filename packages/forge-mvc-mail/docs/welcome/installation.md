@@ -38,4 +38,4 @@ fil des paliers.
 Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
 contrôleur, la vue et la route `/mail-welcome`.
 
-[Continuer avec Bonjour Forge Mail](debutant/mail-welcome.md)
+[Continuer sur le starter Welcome Mail](debutant/mail-welcome.md)

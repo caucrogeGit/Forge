@@ -60,4 +60,4 @@ Elle contrôle le paquet, la configuration et la présence de `ffprobe`/`ffmpeg`
 Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
 contrôleur, la vue et la route `/audio-welcome`.
 
-[Continuer avec Bonjour Forge Audio](debutant/audio-welcome.md)
+[Continuer sur le starter Welcome Audio](debutant/audio-welcome.md)

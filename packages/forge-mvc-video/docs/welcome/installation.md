@@ -61,4 +61,4 @@ configuration, migration, présence de `ffprobe`/`ffmpeg`), sans rien transcoder
 Le module répond : vous pouvez attaquer le premier palier de code, où vous
 créerez vous-même le contrôleur, la vue et la route `/video-welcome`.
 
-[Continuer avec Bonjour Forge Vidéo](debutant/video-welcome.md)
+[Continuer sur le starter Welcome Vidéo](debutant/video-welcome.md)

@@ -49,4 +49,4 @@ forge doctor
 
 Vous pouvez attaquer le premier palier, où vous traduirez votre première chaîne.
 
-[Continuer avec Bonjour Forge i18n](debutant/i18n-welcome.md)
+[Continuer sur le starter Welcome i18n](debutant/i18n-welcome.md)

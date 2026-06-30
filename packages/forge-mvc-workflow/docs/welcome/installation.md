@@ -51,4 +51,4 @@ forge doctor
 Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
 contrôleur, la vue et la route `/workflow-welcome`.
 
-[Continuer avec Bonjour Forge Workflow](debutant/workflow-welcome.md)
+[Continuer sur le starter Welcome Workflow](debutant/workflow-welcome.md)
