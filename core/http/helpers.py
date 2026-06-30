@@ -71,14 +71,26 @@ def html(template: str, status: int = 200, context: "dict[str, Any] | None" = No
             "ou html(template, context={...})."
         )
     if raw:
-        filepath = os.path.join(_cfg("views_dir"), template)
+        views_dir = _cfg("views_dir")
+        filepath = os.path.join(views_dir, template)
+        # Anti-traversal (SEC-HTML-RAW-TRAVERSAL-001) : le chemin résolu doit
+        # rester sous views_dir. Un `template` contenant « ../ » (ou un chemin
+        # absolu) sortirait sinon du dossier des vues et pourrait lire un fichier
+        # arbitraire. On refuse comme un gabarit introuvable, sans rien révéler.
+        base = os.path.realpath(views_dir)
+        target = os.path.realpath(filepath)
+        if target != base and not target.startswith(base + os.sep):
+            return _missing_template_response(
+                template, views_dir,
+                exc=TemplateNotFoundError(template, views_dir),
+            )
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 return Response(status, f.read())
         except FileNotFoundError as exc:
             return _missing_template_response(
-                template, _cfg("views_dir"),
-                exc=TemplateNotFoundError(template, _cfg("views_dir")).with_traceback(exc.__traceback__),
+                template, views_dir,
+                exc=TemplateNotFoundError(template, views_dir).with_traceback(exc.__traceback__),
             )
 
     try:
