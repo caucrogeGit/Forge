@@ -67,7 +67,12 @@ if $UPLOAD; then
 fi
 
 # ── Séquence d'upload ────────────────────────────────────────────────────────
+# On NE s'arrête PAS au premier échec : un 429 sur un NOUVEAU projet ne doit pas
+# empêcher de publier les paquets existants (mise à jour de version, sans 429)
+# situés plus loin. Les échecs sont tracés et rejoués au prochain lancement
+# (--skip-existing).
 i=0
+FAILED=""
 for name in $ORDRE; do
     i=$((i + 1))
     pref="$(_distprefix "$name")"
@@ -75,11 +80,8 @@ for name in $ORDRE; do
     if $UPLOAD; then
         echo "== [$i] upload $name =="
         if ! twine upload --skip-existing "${files[@]}"; then
-            echo ""
-            echo ">>> Échec sur $name (probablement 429 : limite de création de nouveaux projets PyPI)."
-            echo ">>> Attendez puis RELANCEZ 'bash tools/publish.sh --upload' : --skip-existing"
-            echo ">>> sautera les paquets déjà publiés et reprendra à partir de $name."
-            exit 2
+            echo ">>> Échec sur $name (probablement 429 : limite de création de nouveaux projets PyPI). On continue."
+            FAILED="$FAILED $name"
         fi
     else
         echo "[$i] twine upload --skip-existing dist/${pref}-${VERSION}*"
@@ -87,5 +89,13 @@ for name in $ORDRE; do
 done
 
 echo ""
-$UPLOAD && echo "Publication terminée : $i distributions traitées." \
-        || echo "DRY-RUN terminé : $i distributions dans l'ordre ci-dessus. Lancez --upload pour publier."
+if ! $UPLOAD; then
+    echo "DRY-RUN terminé : $i distributions dans l'ordre ci-dessus. Lancez --upload pour publier."
+elif [ -n "$FAILED" ]; then
+    echo "Publication partielle. Échecs (probable 429 sur nouveaux projets) :$FAILED"
+    echo "Attendez (~20-30 min, la fenêtre de création de projets PyPI se réinitialise) puis"
+    echo "RELANCEZ 'bash tools/publish.sh --upload' : --skip-existing saute les publiés et reprend les restants."
+    exit 2
+else
+    echo "Publication terminée : $i distributions traitées, aucune en échec."
+fi
