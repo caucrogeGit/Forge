@@ -6,9 +6,11 @@ du handler, échec propre « module … non installé » si l'opt-in n'est pas
 installé, puis appel avec le bon mode de passage des arguments et de gestion
 du code de retour.
 
-La table est explicite (pas de scan d'imports caché, principe 3 de la charte) :
-ajouter une commande opt-in se fait par une ligne, sans toucher la chaîne de
-dispatch du cœur.
+Les commandes sont **découvertes** via les entry points `forge_mvc.commands`
+(ADR-059, incrément 3) : chaque opt-in les déclare dans son propre
+`pyproject.toml`, le cœur ne les liste plus. La déclaration reste explicite
+(table déclarative dans le paquet, pas de scan d'imports caché, principe 3 de la
+charte). La table statique `OPTIN_COMMANDS` demeure comme fallback vide.
 """
 from __future__ import annotations
 
@@ -45,50 +47,11 @@ class OptinCommand:
         return f"installe le module opt-in : pip install {pre}{self.package}"
 
 
-def _group(commands: tuple[str, ...], spec: OptinCommand) -> dict[str, OptinCommand]:
-    """Associe plusieurs noms de commande à un même descripteur (namespace)."""
-    return {name: spec for name in commands}
-
-
-OPTIN_COMMANDS: dict[str, OptinCommand] = {
-    **_group(
-        ("upload:init", "media:init"),
-        OptinCommand(
-            "cli.assets.uploads", "forge-mvc-files",
-            pass_full_args=True, exit_on_rc=False,
-            hint="installe l'opt-in upload : pip install forge-mvc-files",
-        ),
-    ),
-    **_group(
-        ("mail:init", "mail:test", "mail:render", "mail:doctor", "mail:logs"),
-        OptinCommand("forge_mvc_mail.cli", "forge-mvc-mail",
-                     pip_pre=True, pass_full_args=True, exit_on_rc=False),
-    ),
-    "settings:init": OptinCommand("forge_mvc_settings.cli.init", "forge-mvc-settings", pip_pre=True),
-    "audit:init": OptinCommand("forge_mvc_audit.cli.init", "forge-mvc-audit", pip_pre=True),
-    "jobs:init": OptinCommand("forge_mvc_jobs.cli.init", "forge-mvc-jobs", pip_pre=True),
-    "notifications:init": OptinCommand(
-        "forge_mvc_notifications.cli.init", "forge-mvc-notifications", pip_pre=True
-    ),
-    "audio:doctor": OptinCommand("forge_mvc_audio.cli.doctor", "forge-mvc-audio"),
-    "video:doctor": OptinCommand("forge_mvc_video.cli.doctor", "forge-mvc-video"),
-    "video:init": OptinCommand("forge_mvc_video.cli.init", "forge-mvc-video"),
-    "video:process": OptinCommand("forge_mvc_video.cli.process", "forge-mvc-video"),
-    "video:upload": OptinCommand("forge_mvc_video.cli.upload", "forge-mvc-video"),
-    "video:cleanup": OptinCommand("forge_mvc_video.cli.cleanup", "forge-mvc-video"),
-    "admin:init": OptinCommand("forge_mvc_admin.cli.init", "forge-mvc-admin"),
-    "admin:doctor": OptinCommand("forge_mvc_admin.cli.doctor", "forge-mvc-admin"),
-    **_group(
-        ("deploy:init", "deploy:check"),
-        OptinCommand("forge_mvc_deploy.cli.deploy", "forge-mvc-deploy",
-                     pip_pre=True, pass_full_args=True, exit_on_rc=False),
-    ),
-    **_group(
-        ("rbac:validate", "rbac:audit"),
-        OptinCommand("forge_mvc_rbac.cli", "forge-mvc-rbac",
-                     pip_pre=True, pass_full_args=True, exit_on_rc=False),
-    ),
-}
+# Table statique héritée, vide depuis la migration complète vers les entry
+# points (ADR-059, incrément 3) : plus aucun opt-in n'y est listé, le cœur ne
+# connaît plus les commandes opt-in. Conservée comme point de fallback explicite
+# (résolue avant la découverte) pour un éventuel opt-in non packagé.
+OPTIN_COMMANDS: dict[str, OptinCommand] = {}
 
 
 _discovered_cache: dict[str, OptinCommand] | None = None

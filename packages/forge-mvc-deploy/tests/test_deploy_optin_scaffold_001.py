@@ -33,12 +33,13 @@ def test_code_deploy_retire_du_coeur_cli() -> None:
 
 
 def test_dispatch_deploy_passe_par_l_optin() -> None:
-    # ADR-059 : deploy:* est dispatché via la table opt-in (import paresseux,
-    # repli propre si forge-mvc-deploy n'est pas installé).
-    from cli.commands.optin_dispatch import OPTIN_COMMANDS
+    # ADR-059 : deploy:* est dispatché via la découverte par entry points
+    # (déclaré dans le pyproject de forge-mvc-deploy, import paresseux).
+    from cli.commands.optin_dispatch import all_optin_commands
 
-    assert "deploy:init" in OPTIN_COMMANDS and "deploy:check" in OPTIN_COMMANDS
-    spec = OPTIN_COMMANDS["deploy:init"]
+    commands = all_optin_commands()
+    assert "deploy:init" in commands and "deploy:check" in commands
+    spec = commands["deploy:init"]
     assert spec.module == "forge_mvc_deploy.cli.deploy"
     assert spec.package == "forge-mvc-deploy"
 

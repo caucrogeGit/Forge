@@ -24,6 +24,10 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 
+# ADR-059 : commandes CLI de l'opt-in decouvertes par le coeur (dispatch_optin).
+[project.entry-points."forge_mvc.commands"]
+forge_mvc_admin = "forge_mvc_admin.commands:COMMANDS"
+
 [project.urls]
 Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"

@@ -707,10 +707,16 @@ def main() -> None:
     if dispatch_optin(command, args):
         return
 
-    cli_fail(
-        f"commande inconnue : «{command}».",
-        hint="lancez «forge help» pour afficher les commandes disponibles.",
-    )
+    # ADR-059 : les commandes opt-in sont découvertes par entry points ; une
+    # commande namespacée inconnue provient souvent d'un opt-in non installé.
+    hint = "lancez «forge help» pour afficher les commandes disponibles."
+    if ":" in command:
+        hint = (
+            "lancez «forge help» pour la liste des commandes. Si «" + command
+            + "» provient d'un module opt-in, installez-le "
+            "(voir «forge opt-in:list» ou la doc des opt-ins)."
+        )
+    cli_fail(f"commande inconnue : «{command}».", hint=hint)
 
 
 def cli_entrypoint() -> None:
