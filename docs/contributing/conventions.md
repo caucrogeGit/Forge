@@ -13,18 +13,18 @@
 Quatre sections thématiques :
 
 - **A. Audit avant action**, 5 patterns
-- **B. Tests : conventions et patterns**, 6 patterns
+- **B. Tests : conventions et patterns**, 7 patterns
 - **C. Code : architecture**, 6 patterns
 - **D. Documentation : structure**, 3 patterns
 
-Total : 19 patterns documentés.
+Total : 21 patterns documentés.
 
 Chaque pattern présente son énoncé court, le contexte d'apparition (ticket
 d'origine) et un exemple ou une règle pratique.
 
 Une **annexe « Glossaire »** (en fin de page) fixe le vocabulaire canonique
 de Forge, quel mot pour quel objet, et n'entre pas dans le décompte des
-19 patterns.
+21 patterns.
 
 ---
 
@@ -184,6 +184,37 @@ sed -i 's/\btest_creer_session\b/test_create_session/g' tests/test_*.py
 
 Origine : `LANG-MIGRATION-001` (6 noms de fonctions de tests renommés en
 passant).
+
+### B.7 : Couches de test et sélection par couche
+
+La suite est découpée en couches, pour savoir vite quelle couche a cassé et
+n'exécuter que celle qui compte. Le mécanisme existe déjà (marqueurs `pytest`
+en mode `--strict-markers`, dossiers dédiés) ; voici la carte des couches et
+leur commande de sélection.
+
+| Couche | Périmètre | Sélection |
+|---|---|---|
+| Unitaire | cœur, CLI, générateurs (le gros de `tests/`) | `pytest tests -m "not db" --ignore=tests/meta --ignore=tests/release` |
+| Contrats (meta) | cohérence doc, version, charte, contrats d'API | `pytest tests/meta` |
+| Intégration BDD | tests nécessitant une vraie base (marqueur `db`) | `FORGE_REQUIRE_DB=1 pytest -m db` |
+| Release | garde-fous de publication | `pytest tests/release` |
+| Opt-ins | smoke et tests unitaires des paquets `packages/` | `pytest packages` |
+| Tout | validation complète de release | `pytest` |
+
+Marqueurs canoniques (déclarés dans `pytest.ini`, `--strict-markers` actif, donc
+un marqueur non déclaré échoue) :
+
+- `meta` : test de cohérence projet (doc, version, charte), pas un test fonctionnel ;
+- `smoke` : test de fumée d'un paquet opt-in (import, API publique, `py.typed`) ;
+- `db` : test d'intégration nécessitant MariaDB (sauté en local sans base, requis en CI via `FORGE_REQUIRE_DB=1`).
+
+Règle : tout test appartient à exactement une couche. Un nouveau test de contrat
+doc va sous `tests/meta/` (avec `pytestmark = pytest.mark.meta`) ; un test
+d'intégration base porte `@pytest.mark.db` ; le reste est unitaire dans `tests/`
+à plat.
+
+Origine : point 5 de l'audit d'industrialisation (« savoir rapidement quelle
+couche est cassée, pas juste pytest rouge »).
 
 ---
 
