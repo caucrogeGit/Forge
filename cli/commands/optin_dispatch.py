@@ -1,16 +1,11 @@
 # pyright: strict
-"""Table de dispatch des commandes CLI livrées par les opt-ins (ADR-059).
+"""Dispatch des commandes CLI livrées par les opt-ins (ADR-059).
 
-`forge.py` délègue ici la résolution des commandes opt-in : import paresseux
-du handler, échec propre « module … non installé » si l'opt-in n'est pas
-installé, puis appel avec le bon mode de passage des arguments et de gestion
-du code de retour.
-
-Les commandes sont **découvertes** via les entry points `forge_mvc.commands`
-(ADR-059, incrément 3) : chaque opt-in les déclare dans son propre
-`pyproject.toml`, le cœur ne les liste plus. La déclaration reste explicite
-(table déclarative dans le paquet, pas de scan d'imports caché, principe 3 de la
-charte). La table statique `OPTIN_COMMANDS` demeure comme fallback vide.
+Les commandes sont **découvertes** via les entry points `forge_mvc.commands` :
+chaque opt-in les déclare dans son propre `pyproject.toml` (pointant vers une
+table déclarative légère `<pkg>.commands:COMMANDS`), le cœur ne les liste plus.
+La déclaration reste explicite (pas de scan d'imports caché, principe 3 de la
+charte). Le handler est importé paresseusement à l'invocation.
 """
 from __future__ import annotations
 
@@ -22,9 +17,8 @@ from typing import Any, Callable, cast
 
 from cli._support.errors import cli_fail
 
-# ADR-059 (entry points) : les opt-ins déclarent leurs commandes CLI via ce
-# groupe d'entry points (comme les backends BDD, ADR-054). Le cœur les découvre
-# à l'exécution ; il n'a donc plus besoin de les lister lui-même.
+# Groupe d'entry points par lequel les opt-ins déclarent leurs commandes CLI
+# (à l'image des backends BDD, ADR-054).
 _ENTRY_POINT_GROUP = "forge_mvc.commands"
 
 
@@ -35,23 +29,8 @@ class OptinCommand:
     module: str                   # module à importer paresseusement
     package: str                  # nom PyPI (pour le message « non installé »)
     attr: str = "main"            # attribut appelable dans le module
-    pip_pre: bool = False         # `pip install --pre` (paquets non encore stables)
     pass_full_args: bool = False  # le handler reçoit les args complets (commande incluse)
     exit_on_rc: bool = True       # sys.exit(rc) si le handler renvoie un code non nul
-    hint: str | None = None       # message d'aide personnalisé (sinon généré)
-
-    def install_hint(self) -> str:
-        if self.hint is not None:
-            return self.hint
-        pre = "--pre " if self.pip_pre else ""
-        return f"installe le module opt-in : pip install {pre}{self.package}"
-
-
-# Table statique héritée, vide depuis la migration complète vers les entry
-# points (ADR-059, incrément 3) : plus aucun opt-in n'y est listé, le cœur ne
-# connaît plus les commandes opt-in. Conservée comme point de fallback explicite
-# (résolue avant la découverte) pour un éventuel opt-in non packagé.
-OPTIN_COMMANDS: dict[str, OptinCommand] = {}
 
 
 _discovered_cache: dict[str, OptinCommand] | None = None
@@ -86,28 +65,29 @@ def _discovered_commands() -> dict[str, OptinCommand]:
 
 
 def all_optin_commands() -> dict[str, OptinCommand]:
-    """Toutes les commandes opt-in connues : table statique + découverte.
+    """Toutes les commandes opt-in connues (découvertes par entry points).
 
-    Source unique pour les garde-fous (« telle commande est-elle dispatchée ? »)
-    quel que soit le mode d'enregistrement de l'opt-in (statique ou entry point).
+    Source unique pour les garde-fous (« telle commande est-elle dispatchée ? »).
     """
-    return {**_discovered_commands(), **OPTIN_COMMANDS}
+    return dict(_discovered_commands())
 
 
 def dispatch_optin(command: str, args: list[str]) -> bool:
-    """Exécute une commande opt-in si elle est connue.
+    """Exécute une commande opt-in si elle est découverte (ADR-059).
 
-    Résolution : table statique (opt-ins pas encore migrés), puis découverte par
-    entry points (ADR-059). Renvoie True si la commande a été prise en charge,
-    False sinon. Échoue proprement (cli_fail) si l'opt-in n'est pas installé.
+    Renvoie True si la commande a été prise en charge, False sinon. Échoue
+    proprement (cli_fail) si le module de l'opt-in est introuvable.
     """
-    spec = OPTIN_COMMANDS.get(command) or _discovered_commands().get(command)
+    spec = _discovered_commands().get(command)
     if spec is None:
         return False
     try:
         module = importlib.import_module(spec.module)
     except ImportError:
-        cli_fail(f"module {spec.package} non installé.", hint=spec.install_hint())
+        cli_fail(
+            f"module {spec.package} non installé.",
+            hint=f"installe le module opt-in : pip install {spec.package}",
+        )
     handler: Callable[[list[str]], Any] = getattr(module, spec.attr)
     rc = handler(args if spec.pass_full_args else args[1:])
     if spec.exit_on_rc and rc:
