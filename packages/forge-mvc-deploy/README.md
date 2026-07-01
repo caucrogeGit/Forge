@@ -51,6 +51,6 @@ reste publiée dans la documentation Forge :
 
 ## Compatibilité
 
-Disponible séparément depuis Forge 1.0.0-beta.18 (ADR-053, `DEPLOY-EXTRACT-001`).
+Disponible séparément depuis Forge 1.0.0-rc.1 (ADR-053, `DEPLOY-EXTRACT-001`).
 Avant cette extraction, `deploy:init` et `deploy:check` faisaient partie du cœur
 du CLI.

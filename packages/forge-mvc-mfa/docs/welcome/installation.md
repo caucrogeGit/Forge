@@ -18,7 +18,7 @@ les fichiers à créer et la route à câbler.
 
 ## 1. Installer le module opt-in MFA
 
-`forge-mvc-mfa` est **publié sur PyPI** (statut Alpha) :
+`forge-mvc-mfa` est **publié sur PyPI** (statut Beta) :
 
 ```bash
 pip install --pre forge-mvc-mfa

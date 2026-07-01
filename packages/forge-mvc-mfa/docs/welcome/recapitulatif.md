@@ -4,7 +4,7 @@ Récapitulatif des paliers de la progression *Welcome MFA* et des API du module
 opt-in `forge-mvc-mfa` introduites à chaque étape.
 
 !!! note "Module opt-in"
-    `forge-mvc-mfa` est **publié sur PyPI** (Alpha) : `pip install --pre forge-mvc-mfa`.
+    `forge-mvc-mfa` est **publié sur PyPI** (Beta) : `pip install --pre forge-mvc-mfa`.
     Il exige `FORGE_MFA_SECRET_KEY` (Fernet) pour chiffrer les secrets. Ce parcours
     montre chaque brique MFA **isolée**, pour comprendre chaque API avant de la câbler.
 

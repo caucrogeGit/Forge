@@ -136,16 +136,18 @@ pas installées par défaut. Elles sont tirées via les extras du package
 
 ### Installation
 
-!!! info "Les douze opt-ins officiels sont publiés sur PyPI"
-    `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) ainsi que
-    `forge-mvc-mfa` (Alpha) sont publiés sur PyPI depuis `1.0.0-beta.9` et
-    synchronisés avec le core ; `forge-mvc-iot` depuis `1.0.0-beta.12`, et
-    `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`,
-    `forge-mvc-pivot`, `forge-mvc-mail` depuis `1.0.0-beta.13`.
-    `forge-mvc-i18n` (extrait du core en `1.0.0-beta.15`, ADR-027) complète les
-    douze. La grille de maturité (Stable / Bêta / Alpha) fait foi dans
-    [release-policy.md](release-policy.md) ; `forge-mvc-images` et
-    `forge-mvc-files` y sont au statut Alpha.
+!!! info "Les opt-ins officiels sont distribués séparément sur PyPI"
+    Les modules opt-in (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`,
+    `forge-mvc-mfa`, `forge-mvc-iot`, `forge-mvc-files`, `forge-mvc-images`,
+    `forge-mvc-audio`, `forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail`,
+    `forge-mvc-i18n`, et les briques plus récentes) sont distribués séparément
+    sur PyPI en préversion, synchronisés avec le core.
+
+    La maturité par paquet fait foi dans le classifier `Development Status` de
+    chaque `pyproject.toml` et dans [release-policy.md](release-policy.md) : la
+    plupart des opt-ins sont en Bêta ; les backends `forge-mvc-postgres` et
+    `forge-mvc-mssql` restent en Alpha (dialecte et adaptateur livrés,
+    intégration bout-en-bout à valider).
 
     Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
 
@@ -171,10 +173,9 @@ git clone --branch {{forge_tag}} https://github.com/caucrogeGit/Forge.git
 cd Forge && pip install -e . && pip install -r requirements-dev.txt
 ```
 
-**Note sur MFA** : le module `forge-mvc-mfa` est en statut Alpha
-(`Development Status :: 3 - Alpha`) depuis `MFA-PYPI-READY-001`. Le secret TOTP
-est chiffré au repos via Fernet (`FORGE_MFA_SECRET_KEY`). Publié sur PyPI
-depuis `1.0.0-beta.9`. Le passage Alpha → Beta reste un ticket futur.
+**Note sur MFA** : le module `forge-mvc-mfa` est en statut Beta
+(`Development Status :: 4 - Beta`). Le secret TOTP est chiffré au repos via
+Fernet (`FORGE_MFA_SECRET_KEY`). Publié sur PyPI depuis `1.0.0-beta.9`.
 
 ---
 

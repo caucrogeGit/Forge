@@ -7,7 +7,7 @@ l'expose via une API HTTP JSON en lecture seule.
 
 ## Statut
 
-**Alpha** (`Development Status :: 3 - Alpha`). Le module est fonctionnel
+**Beta** (`Development Status :: 4 - Beta`). Le module est fonctionnel
 de bout en bout pour un usage local et pédagogique. Les briques
 suivantes sont implémentées :
 
@@ -19,7 +19,7 @@ suivantes sont implémentées :
   `iot:simulate` ;
 - TLS MQTT optionnel.
 
-Limites Alpha assumées : pas de JWT/OAuth/RBAC sur l'API (Bearer global
+Limites assumées : pas de JWT/OAuth/RBAC sur l'API (Bearer global
 uniquement), pas de politique de rétention sur `iot_events`, rate-limit
 non distribué. Voir la section « Limites ».
 

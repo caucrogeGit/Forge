@@ -4,7 +4,7 @@ Module **opt-in** propriétaire de tout l'image dans Forge MVC : traitement
 (variantes, miniatures, validation de contenu — Pillow) **et** couche médias
 applicative (repository, galerie, couverture).
 
-## Statut : Alpha (extraction terminée, ADR-018)
+## Statut : Beta (extraction terminée, ADR-018)
 
 `forge-mvc-images` est désormais l'unique propriétaire de tout l'image dans
 Forge. Le traitement (Pillow) et la couche applicative médias ont été rapatriés
@@ -21,8 +21,7 @@ API publique stable :
   `get_cover_media`, `media_url`, `update_media_alt_text`,
   `update_media_position`.
 
-Ce paquet dépend de `forge-mvc-files` (upload générique) et de Pillow. Il cible
-la publication PyPI de la release beta.13.
+Ce paquet dépend de `forge-mvc-files` (upload générique) et de Pillow.
 
 ## Pourquoi ce module (ADR-018)
 

@@ -13,7 +13,6 @@ supprimé du core (`CORE-DROP-UPLOADS-001`). La **validation pure** de fichier
 (extension/MIME/taille + `UploadError`) reste dans le core (`core.forms`),
 réutilisée par ce paquet.
 
-Ce paquet cible la publication PyPI de la release beta.13.
 
 ## Pourquoi ce module (ADR-019)
 
