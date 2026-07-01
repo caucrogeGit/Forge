@@ -4,7 +4,9 @@
 
 Accepté (2026-06-30). Incréments 1 et 2 livrés : table de dispatch des
 commandes opt-in (`cli/commands/optin_dispatch.py`) et table de dispatch des
-commandes du cœur déléguées (`forge.py`, `CORE_COMMANDS`).
+commandes du cœur déléguées (`forge.py`, `CORE_COMMANDS`). Incrément 3 amorcé :
+découverte des commandes opt-in par *entry points* (`forge_mvc.commands`) ;
+`forge-mvc-iot` migré en pilote, le cœur ne le liste plus.
 
 ## Contexte
 
@@ -94,9 +96,22 @@ implémente lui-même ou qui ont une logique propre : `new` (analyse `--profile`
 - `main()` de `forge.py` passe d'une chaîne de 46 branches (~520 lignes) à un
   noyau mince : quelques commandes natives, puis `dispatch_core` et
   `dispatch_optin`.
-- Fondation posée pour l'incrément ultérieur (ticket distinct) : découverte des
-  commandes opt-in par *entry points* (à l'image des backends BDD, ADR-054),
-  pour que chaque opt-in déclare ses commandes sans aucune entrée dans le cœur.
+### Incrément 3 : découverte par *entry points*
+
+Chaque opt-in déclare ses commandes CLI dans son propre `pyproject.toml` via le
+groupe d'entry points `forge_mvc.commands` (à l'image des backends BDD, ADR-054),
+pointant vers une table déclarative légère `<pkg>.commands:COMMANDS` (chaînes :
+module, attr, `full`, `exit_rc`). `dispatch_optin` les découvre à l'exécution
+(`entry_points(group="forge_mvc.commands")`, mémoïsé) et importe le handler
+paresseusement à l'invocation. But final : le cœur ne liste plus aucune commande
+opt-in ; ajouter une commande dans un opt-in ne touche jamais le cœur.
+
+`all_optin_commands()` (union table statique + découverte) est la source unique
+des garde-fous, quel que soit le mode d'enregistrement.
+
+Migration incrémentale : `forge-mvc-iot` migré en pilote (retiré de la table
+statique) ; les autres opt-ins suivent, paquet par paquet, jusqu'au retrait
+complet de la table statique.
 
 ## Alternatives écartées
 

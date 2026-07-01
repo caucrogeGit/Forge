@@ -129,9 +129,9 @@ def _known_commands() -> set[str]:
     # dispatchées via des tables (clés de dict), pas via des littéraux `command == …`.
     from forge import CORE_COMMANDS
 
-    from cli.commands.optin_dispatch import OPTIN_COMMANDS
+    from cli.commands.optin_dispatch import all_optin_commands
 
-    known |= set(CORE_COMMANDS) | set(OPTIN_COMMANDS)
+    known |= set(CORE_COMMANDS) | set(all_optin_commands())
     known |= EXTRA_KNOWN
     return known
 

@@ -285,18 +285,18 @@ class TestNoCoreImportsIot:
 
 class TestForgePyDispatch:
     def test_iot_init_dispatched_in_forge_py(self):
-        from cli.commands.optin_dispatch import OPTIN_COMMANDS
+        from cli.commands.optin_dispatch import all_optin_commands
 
-        assert "iot:init" in OPTIN_COMMANDS
+        assert "iot:init" in all_optin_commands()
 
     def test_dispatch_uses_lazy_import_with_graceful_fallback(self):
         from cli.commands import optin_dispatch
-        from cli.commands.optin_dispatch import OPTIN_COMMANDS
+        from cli.commands.optin_dispatch import all_optin_commands
 
         # ADR-059 : iot:init est dispatchée via la table opt-in, en import
         # paresseux. forge_mvc_iot n'est jamais importé au niveau module : le
         # coeur fonctionne sans forge-mvc-iot installé.
-        assert OPTIN_COMMANDS["iot:init"].module == "forge_mvc_iot.cli.init"
+        assert all_optin_commands()["iot:init"].module == "forge_mvc_iot.cli.init"
         src = Path(optin_dispatch.__file__).read_text(encoding="utf-8")
         assert "import forge_mvc_iot" not in src and "from forge_mvc_iot" not in src
         assert "non installé" in src

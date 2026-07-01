@@ -237,17 +237,17 @@ class TestForgePyDispatch:
     """La commande ``iot:doctor`` est branchée dans le dispatch opt-in (ADR-059)."""
 
     def test_iot_doctor_dispatched_in_forge_py(self):
-        from cli.commands.optin_dispatch import OPTIN_COMMANDS
+        from cli.commands.optin_dispatch import all_optin_commands
 
-        assert "iot:doctor" in OPTIN_COMMANDS, (
+        assert "iot:doctor" in all_optin_commands(), (
             "iot:doctor doit être enregistrée dans la table de dispatch opt-in"
         )
 
     def test_dispatch_uses_lazy_import_with_graceful_fallback(self):
         from cli.commands import optin_dispatch
-        from cli.commands.optin_dispatch import OPTIN_COMMANDS
+        from cli.commands.optin_dispatch import all_optin_commands
 
-        assert OPTIN_COMMANDS["iot:doctor"].module == "forge_mvc_iot.cli.doctor"
+        assert all_optin_commands()["iot:doctor"].module == "forge_mvc_iot.cli.doctor"
         src = Path(optin_dispatch.__file__).read_text(encoding="utf-8")
         # Import paresseux (importlib) : forge_mvc_iot n'est jamais importé au
         # niveau module, le coeur fonctionne sans forge-mvc-iot installé.

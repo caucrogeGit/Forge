@@ -25,6 +25,11 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 
+# ADR-059 : les commandes CLI de l'opt-in sont déclarées ici et découvertes par
+# le cœur (dispatch_optin), sans aucune entrée dans forge.py.
+[project.entry-points."forge_mvc.commands"]
+forge_mvc_iot = "forge_mvc_iot.commands:COMMANDS"
+
 [project.urls]
 Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"

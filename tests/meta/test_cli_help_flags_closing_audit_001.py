@@ -171,9 +171,9 @@ def _commands_referenced_in_forge_py() -> set[str]:
     # dispatchées via des tables centrales, plus uniquement par le if-chain.
     from forge import CORE_COMMANDS
 
-    from cli.commands.optin_dispatch import OPTIN_COMMANDS
+    from cli.commands.optin_dispatch import all_optin_commands
 
-    found |= set(OPTIN_COMMANDS) | set(CORE_COMMANDS)
+    found |= set(all_optin_commands()) | set(CORE_COMMANDS)
     return found
 
 

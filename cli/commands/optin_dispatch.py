@@ -15,9 +15,15 @@ from __future__ import annotations
 import importlib
 import sys
 from dataclasses import dataclass
-from typing import Any, Callable
+from importlib.metadata import entry_points
+from typing import Any, Callable, cast
 
 from cli._support.errors import cli_fail
+
+# ADR-059 (entry points) : les opt-ins déclarent leurs commandes CLI via ce
+# groupe d'entry points (comme les backends BDD, ADR-054). Le cœur les découvre
+# à l'exécution ; il n'a donc plus besoin de les lister lui-même.
+_ENTRY_POINT_GROUP = "forge_mvc.commands"
 
 
 @dataclass(frozen=True)
@@ -64,10 +70,6 @@ OPTIN_COMMANDS: dict[str, OptinCommand] = {
     "notifications:init": OptinCommand(
         "forge_mvc_notifications.cli.init", "forge-mvc-notifications", pip_pre=True
     ),
-    "iot:doctor": OptinCommand("forge_mvc_iot.cli.doctor", "forge-mvc-iot"),
-    "iot:init": OptinCommand("forge_mvc_iot.cli.init", "forge-mvc-iot"),
-    "iot:simulate": OptinCommand("forge_mvc_iot.cli.simulate", "forge-mvc-iot"),
-    "iot:listen": OptinCommand("forge_mvc_iot.cli.listen", "forge-mvc-iot"),
     "audio:doctor": OptinCommand("forge_mvc_audio.cli.doctor", "forge-mvc-audio"),
     "video:doctor": OptinCommand("forge_mvc_video.cli.doctor", "forge-mvc-video"),
     "video:init": OptinCommand("forge_mvc_video.cli.init", "forge-mvc-video"),
@@ -89,14 +91,54 @@ OPTIN_COMMANDS: dict[str, OptinCommand] = {
 }
 
 
-def dispatch_optin(command: str, args: list[str]) -> bool:
-    """Exécute une commande opt-in si elle figure dans la table.
+_discovered_cache: dict[str, OptinCommand] | None = None
 
-    Renvoie True si la commande a été prise en charge (le cœur ne doit alors
-    plus la traiter), False si ce n'est pas une commande opt-in connue.
-    Échoue proprement (cli_fail) si l'opt-in n'est pas installé.
+
+def _discovered_commands() -> dict[str, OptinCommand]:
+    """Commandes découvertes via les entry points ``forge_mvc.commands``.
+
+    Chaque opt-in installé expose une table déclarative légère (chaînes) ; on la
+    charge sans importer le handler (résolu paresseusement à l'invocation).
+    Résultat mémoïsé : la découverte ne lit les métadonnées qu'une fois.
     """
-    spec = OPTIN_COMMANDS.get(command)
+    global _discovered_cache
+    if _discovered_cache is not None:
+        return _discovered_cache
+    discovered: dict[str, OptinCommand] = {}
+    for ep in entry_points(group=_ENTRY_POINT_GROUP):
+        table = cast("dict[str, dict[str, object]]", ep.load())
+        for name, spec in table.items():
+            module = str(spec["module"])
+            # forge_mvc_iot.cli.doctor -> forge-mvc-iot (pour un éventuel message).
+            package = "-".join(module.split(".", 1)[0].split("_"))
+            discovered[name] = OptinCommand(
+                module=module,
+                package=package,
+                attr=str(spec.get("attr", "main")),
+                pass_full_args=bool(spec.get("full", False)),
+                exit_on_rc=bool(spec.get("exit_rc", True)),
+            )
+    _discovered_cache = discovered
+    return _discovered_cache
+
+
+def all_optin_commands() -> dict[str, OptinCommand]:
+    """Toutes les commandes opt-in connues : table statique + découverte.
+
+    Source unique pour les garde-fous (« telle commande est-elle dispatchée ? »)
+    quel que soit le mode d'enregistrement de l'opt-in (statique ou entry point).
+    """
+    return {**_discovered_commands(), **OPTIN_COMMANDS}
+
+
+def dispatch_optin(command: str, args: list[str]) -> bool:
+    """Exécute une commande opt-in si elle est connue.
+
+    Résolution : table statique (opt-ins pas encore migrés), puis découverte par
+    entry points (ADR-059). Renvoie True si la commande a été prise en charge,
+    False sinon. Échoue proprement (cli_fail) si l'opt-in n'est pas installé.
+    """
+    spec = OPTIN_COMMANDS.get(command) or _discovered_commands().get(command)
     if spec is None:
         return False
     try:

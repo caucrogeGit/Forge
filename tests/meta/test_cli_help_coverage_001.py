@@ -33,9 +33,9 @@ def _commands_in_code() -> set[str]:
     # dispatchées via des tables centrales, plus uniquement par le if-chain.
     from forge import CORE_COMMANDS
 
-    from cli.commands.optin_dispatch import OPTIN_COMMANDS
+    from cli.commands.optin_dispatch import all_optin_commands
 
-    commands |= set(OPTIN_COMMANDS) | set(CORE_COMMANDS)
+    commands |= set(all_optin_commands()) | set(CORE_COMMANDS)
     return commands
 
 
