@@ -341,6 +341,7 @@ nav:
         - Pour contribuer:
             - Vue d'ensemble: philosophy/contributing.md
             - Conventions de travail: contributing/conventions.md
+            - Commandes CLI d'un opt-in: contributing/optin-cli-commands.md
             - Convention de route: contributing/route-convention.md
             - Modèle de starter (référence welcome): contributing/starter-welcome-model.md
             - Convention de création d'un palier (Welcome pédagogique): contributing/convention-creation-palier-welcome-pedagogique.md
