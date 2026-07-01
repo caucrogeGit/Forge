@@ -58,7 +58,12 @@ class _DbHarness:
     def __init__(self) -> None:
         self.params = _admin_params()
         self.uid = uuid.uuid4().hex[:10]
-        self.app_host = "127.0.0.1"
+        # Host du GRANT des comptes de test. `%` par défaut : la connexion peut
+        # arriver d'une IP qui n'est pas celle ciblée (en CI, MariaDB tourne dans
+        # un conteneur et voit l'IP du bridge Docker, pas 127.0.0.1, ce qui
+        # rejetait un compte lié à `@127.0.0.1`). Surchargable via
+        # FORGE_TEST_DB_APP_HOST pour restreindre si besoin.
+        self.app_host = os.environ.get("FORGE_TEST_DB_APP_HOST", "%")
         self._dbs: list[str] = []
         self._users: list[tuple[str, str]] = []
 
