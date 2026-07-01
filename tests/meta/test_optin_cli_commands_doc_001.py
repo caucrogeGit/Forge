@@ -1,9 +1,9 @@
 """Garde-fou OPTIN-CLI-COMMANDS-DOC-001 : la doc du dispatch opt-in reste exacte.
 
-La page contributing/optin-cli-commands.md explique comment un opt-in déclare
-ses commandes CLI (entry points `forge_mvc.commands`, table `commands.py`). Ce
-garde-fou la relie au code (`cli/commands/optin_dispatch.py`) pour qu'elle ne
-dérive pas du groupe d'entry points réellement utilisé.
+La doc embarquée `cli/commands/docs/optin_dispatch.md` (ADR-043) explique comment
+un opt-in déclare ses commandes CLI (entry points `forge_mvc.commands`, table
+`commands.py`). Ce garde-fou la relie au code (`cli/commands/optin_dispatch.py`)
+pour qu'elle ne dérive pas du groupe d'entry points réellement utilisé.
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DOC = PROJECT_ROOT / "docs" / "contributing" / "optin-cli-commands.md"
+DOC = PROJECT_ROOT / "cli" / "commands" / "docs" / "optin_dispatch.md"
 
 
 def _doc_text() -> str:
@@ -23,8 +23,8 @@ def _doc_text() -> str:
 
 def test_doc_existe():
     assert DOC.is_file(), (
-        "docs/contributing/optin-cli-commands.md doit exister (doc du dispatch "
-        "des commandes opt-in)."
+        "cli/commands/docs/optin_dispatch.md doit exister (doc embarquée du "
+        "dispatch des commandes opt-in, ADR-043)."
     )
 
 
@@ -41,7 +41,7 @@ def test_doc_documente_le_groupe_entry_point_reel():
     "commands.py",
     "COMMANDS",
     "[project.entry-points",
-    "059-cli-command-dispatch-registry.md",
+    "ADR-059",
 ])
 def test_doc_couvre_les_points_cles(marker: str):
     assert marker in _doc_text(), (

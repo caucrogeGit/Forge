@@ -114,6 +114,7 @@ nav:
         - Auth/User (cœur, par module): '!include core/auth/mkdocs.yml'
         - MVC (cœur, par module): '!include core/mvc/mkdocs.yml'
         - Support CLI (par module): '!include cli/_support/mkdocs.yml'
+        - Registre de dispatch CLI (par module): '!include cli/commands/mkdocs.yml'
         - Schémas CLI (par module): '!include cli/schemas/mkdocs.yml'
         - Déploiement CLI (par module): '!include cli/deploy/mkdocs.yml'
         - Sécurité CLI (par module): '!include cli/security/mkdocs.yml'
@@ -341,7 +342,6 @@ nav:
         - Pour contribuer:
             - Vue d'ensemble: philosophy/contributing.md
             - Conventions de travail: contributing/conventions.md
-            - Commandes CLI d'un opt-in: contributing/optin-cli-commands.md
             - Convention de route: contributing/route-convention.md
             - Modèle de starter (référence welcome): contributing/starter-welcome-model.md
             - Convention de création d'un palier (Welcome pédagogique): contributing/convention-creation-palier-welcome-pedagogique.md
