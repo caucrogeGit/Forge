@@ -88,6 +88,7 @@
     <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-rc.2</a><span class="opacity-40">·</span>
     <a href="https://docs.python.org/3.12/" target="_blank" rel="noopener noreferrer" class="hover:underline">Python 3.12+</a><span class="opacity-40">·</span>
     <a href="https://mariadb.com/kb/en/" target="_blank" rel="noopener noreferrer" class="hover:underline">MariaDB 11.8</a><span class="opacity-40">·</span>
+    <a href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener noreferrer" class="hover:underline">SQLite</a><span class="opacity-40">·</span>
     <a href="https://nodejs.org/docs/latest-v24.x/api/" target="_blank" rel="noopener noreferrer" class="hover:underline">Node.js 24</a><span class="opacity-40">·</span>
     <a href="https://tailwindcss.com/docs" target="_blank" rel="noopener noreferrer" class="hover:underline">Tailwind CSS 4.3</a><span class="opacity-40">·</span>
     <a href="https://jinja.palletsprojects.com/en/3.1.x/" target="_blank" rel="noopener noreferrer" class="hover:underline">Jinja2 3.1</a><span class="opacity-40">·</span>
@@ -124,7 +125,7 @@
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
         <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Nouvelles briques applicatives</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Cinq nouveaux opt-ins couvrent des besoins courants, adossés à MariaDB et sans magie : settings (paramètres), audit (journal applicatif), jobs (file de tâches de fond), notifications in-app et import/export CSV.</p>
+        <p class="text-white/60 text-sm leading-relaxed">Cinq nouveaux opt-ins couvrent des besoins courants, adossés à votre base de données et sans magie : settings (paramètres), audit (journal applicatif), jobs (file de tâches de fond), notifications in-app et import/export CSV.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
@@ -373,7 +374,7 @@
       <a href="/docs/forge/jobs/welcome/installation/" class="block group">
       <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
         <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2 group-hover:landing-accent-text transition-colors">Forge Jobs</h3>
-        <p class="text-sm text-white/60 leading-relaxed">Une file de tâches de fond adossée à MariaDB : enqueue et worker explicite, sans broker ni async.</p>
+        <p class="text-sm text-white/60 leading-relaxed">Une file de tâches de fond adossée à votre base de données : enqueue et worker explicite, sans broker ni async.</p>
       </article>
       </a>
 
@@ -648,9 +649,52 @@
     <!-- Modules officiels opt-in -->
     <div id="modules" class="text-center mt-16 mb-16">
       <h2 class="text-5xl sm:text-7xl font-bold tracking-tight leading-tight mb-4">Modules officiels installables séparément.</h2>
+      <p class="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
+        Chaque brique s'installe à la carte, le cœur ne dépend d'aucune. Il est aussi agnostique de la base de données : vous choisissez un seul backend, SQLite et MariaDB complets, PostgreSQL et SQL Server en Alpha.
+      </p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <a href="/docs/forge/mariadb/reference/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">forge-mvc-mariadb</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Backend MariaDB : moteur par défaut du squelette, connexion admin dédiée et migrations à SQL visible.</p>
+      </article>
+      </a>
+
+      <a href="/docs/forge/sqlite/reference/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">forge-mvc-sqlite</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Backend SQLite : zéro configuration, un seul fichier, idéal en développement et pour les tests.</p>
+      </article>
+      </a>
+
+      <a href="/docs/forge/postgres/reference/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">forge-mvc-postgres</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Backend PostgreSQL (Alpha) : dialecte et adaptateur livrés, intégration bout-en-bout à valider.</p>
+      </article>
+      </a>
+
+      <a href="/docs/forge/mssql/reference/" class="block group">
+      <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
+        <div class="landing-icon-chip w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">forge-mvc-mssql</h3>
+        <p class="text-sm text-white/60 leading-relaxed">Backend SQL Server (Alpha) : dialecte et adaptateur livrés, intégration bout-en-bout à valider.</p>
+      </article>
+      </a>
 
       <a href="/docs/forge/mfa/reference/" class="block group">
       <article class="landing-panel rounded-xl border border-white/10 p-7 hover:border-[#E8651A]/40 transition-all group-hover:border-[#E8651A]/40 cursor-pointer h-full">
@@ -788,7 +832,7 @@
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V15Z"/></svg>
         </div>
         <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">forge-mvc-settings</h3>
-        <p class="text-sm text-white/60 leading-relaxed">Paramètres applicatifs persistés en MariaDB (table app_settings), API explicite get_setting et set_setting.</p>
+        <p class="text-sm text-white/60 leading-relaxed">Paramètres applicatifs persistés en base (table app_settings), API explicite get_setting et set_setting.</p>
       </article>
       </a>
 
@@ -818,7 +862,7 @@
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="16" width="18" height="4" rx="1"/></svg>
         </div>
         <h3 class="font-semibold mb-2 text-[#E8651A] group-hover:landing-accent-text transition-colors">forge-mvc-jobs</h3>
-        <p class="text-sm text-white/60 leading-relaxed">File de tâches de fond adossée à MariaDB : enqueue et worker explicite, sans broker ni async.</p>
+        <p class="text-sm text-white/60 leading-relaxed">File de tâches de fond adossée à votre base de données : enqueue et worker explicite, sans broker ni async.</p>
       </article>
       </a>
 

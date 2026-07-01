@@ -1,6 +1,6 @@
 """Garde-fou LANDING-ARTICLES-CLICKABLE-001.
 
-Vérifie que les 58 cartes de la landing page sont wrappées dans un <a href>
+Vérifie que les 62 cartes de la landing page sont wrappées dans un <a href>
 pointant vers des URLs valides de la documentation.
 """
 from __future__ import annotations
@@ -31,6 +31,11 @@ MIGRATED_DOC_ROOTS = {
     "iot": PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs",
     "video": PROJECT_ROOT / "packages" / "forge-mvc-video" / "docs",
     "rbac": PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "docs",
+    # Backends de base de données (ADR-054), doc embarquée par paquet.
+    "mariadb": PROJECT_ROOT / "packages" / "forge-mvc-mariadb" / "docs",
+    "sqlite": PROJECT_ROOT / "packages" / "forge-mvc-sqlite" / "docs",
+    "postgres": PROJECT_ROOT / "packages" / "forge-mvc-postgres" / "docs",
+    "mssql": PROJECT_ROOT / "packages" / "forge-mvc-mssql" / "docs",
 }
 
 
@@ -61,6 +66,11 @@ EXPECTED_DOC_PATHS = [
     "reference/api-json",
     # Nouveau beta.6 — page spécifique entity-schema
     "entities/entity-schema",
+    # Backends de base de données (4 cartes, ADR-054)
+    "mariadb/reference",
+    "sqlite/reference",
+    "postgres/reference",
+    "mssql/reference",
     # Modules opt-in (11 cartes)
     "mfa/reference",
     "rbac/reference",
@@ -90,11 +100,11 @@ class TestLandingArticlesClickable:
     def test_landing_file_exists(self):
         assert LANDING.exists()
 
-    def test_58_articles_are_wrapped_in_links(self):
+    def test_62_articles_are_wrapped_in_links(self):
         text = LANDING.read_text(encoding="utf-8")
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
-        assert len(wrapped) == 58, (
-            f"Attendu 58 cartes wrappées dans <a class=\"block group\">, "
+        assert len(wrapped) == 62, (
+            f"Attendu 62 cartes wrappées dans <a class=\"block group\">, "
             f"trouvé {len(wrapped)}."
         )
 
