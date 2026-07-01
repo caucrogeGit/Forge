@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-iot"
-version = "1.0.0rc1"
+version = "1.0.0rc2"
 description = "Forge IoT — module opt-in pour la réception et l'exposition de données IoT : subscriber MQTT, stockage iot_events, API HTTP JSON en lecture seule et commandes CLI forge iot:*."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "iot", "mqtt"]
 dependencies = [
-    "forge-mvc>=1.0.0rc1,<2",
+    "forge-mvc>=1.0.0rc2,<2",
     "paho-mqtt>=2.1,<3",
 ]
 classifiers = [

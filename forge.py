@@ -43,12 +43,12 @@ from cli._support.help_dispatch import format_command_help, wants_help
 from cli.commands.optin_dispatch import dispatch_optin
 
 
-_FORGE_VERSION = "1.0.0rc1"
+_FORGE_VERSION = "1.0.0rc2"
 # Tag git de release correspondant à cette version. N'est plus utilisé pour
 # créer un projet (forge new copie un squelette embarqué, ADR-024) ; conservé
 # comme métadonnée de release, ancrée par la gouvernance de version (tests
 # release/meta de cohérence de version).
-_FORGE_DEFAULT_REF = "v1.0.0-rc.1"
+_FORGE_DEFAULT_REF = "v1.0.0-rc.2"
 
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────

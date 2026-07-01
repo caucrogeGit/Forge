@@ -23,7 +23,7 @@ from forge_mvc_jobs.queue import (
     run_worker,
 )
 
-__version__ = "1.0.0rc1"
+__version__ = "1.0.0rc2"
 
 __all__ = [
     "JobError",

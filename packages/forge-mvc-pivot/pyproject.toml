@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-pivot"
-version = "1.0.0rc1"
+version = "1.0.0rc2"
 description = "Forge pivot — tables pivot enrichies (many_to_many avec attributs) et generateur make:pivot-crud."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "pivot", "many-to-many"]
 dependencies = [
-    "forge-mvc>=1.0.0rc1,<2",
+    "forge-mvc>=1.0.0rc2,<2",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

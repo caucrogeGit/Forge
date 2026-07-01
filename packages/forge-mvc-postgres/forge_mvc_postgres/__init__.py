@@ -8,6 +8,6 @@ côté développeur (base client-serveur, voir README).
 """
 from forge_mvc_postgres.backend import PostgreSQLBackend
 
-__version__ = "1.0.0rc1"
+__version__ = "1.0.0rc2"
 
 __all__ = ["PostgreSQLBackend"]

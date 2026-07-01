@@ -6,6 +6,6 @@ L'API publique se réduit au backend lui-même.
 """
 from forge_mvc_sqlite.backend import SQLiteBackend
 
-__version__ = "1.0.0rc1"
+__version__ = "1.0.0rc2"
 
 __all__ = ["SQLiteBackend"]

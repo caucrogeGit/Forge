@@ -1,11 +1,14 @@
 # Changelog
 
 
-## [Non publié]
+## [1.0.0-rc.2] - 2026-07-01
 
-Cycle de consolidation post-rc.1 : refonte de la navigation et de plusieurs pages
-de documentation, page d'accueil du squelette, et correctifs issus d'un audit
-multi-axes (qualité, charte, packaging, tests, sécurité, documentation).
+Deuxième release candidate. Consolidation post-rc.1 : refonte de la navigation et
+de plusieurs pages de documentation, page d'accueil du squelette, correctifs issus
+d'un audit multi-axes, une passe d'industrialisation (smoke d'installation vierge,
+budget de complexité, smoke des profils, couches de test) et une refonte de
+l'architecture de dispatch CLI (ADR-059 : `forge.py` devient un lanceur mince, les
+commandes opt-in sont découvertes par entry points).
 
 ### Ajouté
 
@@ -15,6 +18,24 @@ multi-axes (qualité, charte, packaging, tests, sécurité, documentation).
   (PEP 561), comme les 24 autres (PKG-TESTING-PYTYPED-001).
 - **Smoke co-localisé pour `forge-mvc-testing`** dans son propre dossier `tests/`
   (ADR-040, TEST-TESTING-SMOKE-001).
+- **Registre de dispatch des commandes CLI** (ADR-059) : les commandes du cœur
+  passent par des tables (`CORE_COMMANDS`) et les commandes des opt-ins sont
+  découvertes par entry points (`forge_mvc.commands`), le cœur ne les liste plus.
+  Chaque opt-in déclare ses commandes dans son `pyproject.toml` via une table
+  `<pkg>.commands:COMMANDS`.
+- **Smoke d'installation vierge** : `tools/smoke-install.sh` construit les wheels
+  localement, installe `forge-mvc` dans un venv jetable, lance `forge new` avec
+  résolution `--find-links` et vérifie le projet généré, indépendamment de PyPI ;
+  garde-fou rapide anti-paquet-fantôme et flag `--with-smoke` de
+  `release-validate.sh` (SMOKE-INSTALL-VIERGE-001).
+- **Budget de complexité du lanceur** : plafond de taille de `forge.py`, `main()`
+  et fonctions borné en AST (CLI-COMPLEXITY-BUDGET-001).
+- **Smoke des profils de `forge new`** : les 5 profils génèrent un projet dont tout
+  le Python compile (PROFILES-STARTER-SMOKE-001).
+- **Carte des couches de test** dans `conventions.md` (pattern B.7) et garde-fou de
+  cohérence avec `pytest.ini` (TEST-LAYERS-DOC-001).
+- **Documentation contributeur du dispatch opt-in** : `contributing/optin-cli-commands.md`
+  (OPTIN-CLI-COMMANDS-DOC-001).
 
 ### Modifié
 
@@ -34,6 +55,20 @@ multi-axes (qualité, charte, packaging, tests, sécurité, documentation).
   (PKG-PYRIGHT-INCLUDE-001).
 - **Statuts ADR formalisés** : 031 et 032 « Acceptée et mise en œuvre » ; 054 et 056
   « Acceptée » (ADR-STATUS-FORMALIZE-001).
+- **`forge.py` ramené à un lanceur mince** : `main()` passe d'une chaîne de 46
+  branches à un dispatch par tables + entry points (ADR-059).
+- **`forge new` refuse les options inconnues** au lieu de les ignorer
+  silencieusement (CLI-NEW-UNKNOWN-ARGS-001).
+
+### Corrigé
+
+- **Cohérence documentation ↔ tests méta** après la refonte de la référence en
+  catalogue : contenu de référence restauré depuis l'historique (politique de
+  stockage des secrets MFA, distinction RBAC cœur/opt-in, référence des filtres
+  CRUD, commandes CLI `auth:user:*`/`check:model`/`sync:relations` manquantes) et
+  garde-fous obsolètes repointés.
+- **Mention de version périmée** « Forge 2.10.0 » de `core/security/docs/hashing.md`
+  rendue agnostique.
 
 ### Retiré
 

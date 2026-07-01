@@ -18,7 +18,7 @@ from forge_mvc_admin.http import AdminController, register_admin_routes
 from forge_mvc_admin.registry import AdminRegistry, registry
 from forge_mvc_admin.resources import AdminResource
 
-__version__ = "1.0.0rc1"
+__version__ = "1.0.0rc2"
 
 __all__ = [
     "AdminResource",
