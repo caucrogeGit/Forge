@@ -81,19 +81,26 @@ class TestNewSectionsFor3X:
             f"Le doc doit mentionner au moins 3 modules opt-in (vu : {modules_mentioned})."
         )
 
-    def test_mfa_marked_alpha_or_experimental(self):
+    def test_mfa_marked_with_non_stable_maturity(self):
+        """forge-mvc-mfa affiche sa maturité réelle, pas « Stable ».
+
+        Le statut canonique est le classifier Development Status du pyproject du
+        paquet (aujourd'hui `4 - Beta`, après la requalification Alpha -> Beta) ;
+        le contrat de stabilité doit rester cohérent avec lui.
+        """
         text = STABILITY_DOC.read_text(encoding="utf-8")
         if "forge-mvc-mfa" in text:
             mfa_match = re.search(r"forge-mvc-mfa.{0,300}", text, re.DOTALL)
             assert mfa_match, "Section MFA introuvable"
             context = mfa_match.group(0)
             assert (
-                "Pre-Alpha" in context
+                "Beta" in context
+                or "Bêta" in context
                 or "Alpha" in context
                 or "expérimental" in context
                 or "experimentale" in context.lower()
             ), (
-                f"forge-mvc-mfa doit être marqué Alpha ou expérimental. "
+                f"forge-mvc-mfa doit afficher sa maturité (Beta), pas « Stable ». "
                 f"Contexte : {context[:200]}"
             )
 
