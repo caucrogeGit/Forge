@@ -35,7 +35,7 @@ class TestNeutralSkeletonPresence:
         assert '"GET", "/"' in routes_source
 
     def test_imports_are_minimal(self, routes_source):
-        """Seuls Router et HomeController sont importés au niveau module."""
+        """Router, HomeController et le registre d'opt-ins (ADR-061)."""
         tree = ast.parse(routes_source)
         modules = []
         for node in ast.iter_child_nodes(tree):
@@ -44,6 +44,7 @@ class TestNeutralSkeletonPresence:
         assert modules == [
             "core.http.router",
             "mvc.controllers.home_controller",
+            "optins.registry",
         ], f"Imports inattendus dans le squelette neutre : {modules}"
 
 

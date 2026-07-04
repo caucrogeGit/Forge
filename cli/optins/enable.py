@@ -31,6 +31,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from cli.optins.registry_format import ANCHOR_CALL, ANCHOR_IMPORT, REGISTRY_TEMPLATE
+
 __all__ = [
     "STATUS_OK",
     "STATUS_INFO",
@@ -65,33 +67,14 @@ automatique. Contrat : docs/architecture/optins-project-structure.md.
 """
 '''
 
-# Ancres d'insertion dans optins/registry.py (génériques, multi-opt-in).
-# `forge opt-in:enable <name>` insère une ligne d'import sous la 1re ancre et
-# une ligne d'appel sous la 2de ; `disable` les retire. Aucune découverte.
-_REG_IMPORT_ANCHOR = "# >>> opt-in imports (gérés par forge opt-in:enable / disable)"
-_REG_CALL_ANCHOR = "    # >>> opt-in calls (gérés par forge opt-in:enable / disable)"
+# Ancres d'insertion dans optins/registry.py (ADR-061, source unique dans
+# cli.optins.registry_format). `forge opt-in:enable <name>` insère une ligne
+# d'import sous ANCHOR_IMPORT et une ligne d'appel sous ANCHOR_CALL ; `disable`
+# les retire. Aucune découverte automatique.
+_REG_IMPORT_ANCHOR = ANCHOR_IMPORT
+_REG_CALL_ANCHOR = ANCHOR_CALL
 
-REGISTRY = f'''\
-"""Registre explicite des opt-ins branchés dans ce projet.
-
-Pas de découverte automatique : chaque opt-in actif est importé et appelé
-explicitement dans `register_optins`. Appelé depuis `mvc/routes.py` :
-
-    from optins.registry import register_optins
-
-    register_optins(router)
-"""
-
-from __future__ import annotations
-
-{_REG_IMPORT_ANCHOR}
-
-
-def register_optins(router) -> None:
-    """Branche les routes des opt-ins activés dans ce projet."""
-{_REG_CALL_ANCHOR}
-    return None
-'''
+REGISTRY = REGISTRY_TEMPLATE
 
 _IOT_INIT = '''\
 """Branchement local de l'opt-in Forge IoT (paquet `forge-mvc-iot`).

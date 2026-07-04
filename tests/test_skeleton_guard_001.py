@@ -31,7 +31,9 @@ OPTIN_CODE_TOKENS = [
     "register_mfa_routes",
     "register_rbac_routes",
     "register_iot_routes",
-    "register_optins",
+    # register_optins n'est PAS interdit (ADR-061) : c'est le hook générique du
+    # registre d'opt-ins, toujours présent et vide par défaut, pas du code
+    # d'opt-in spécifique.
     "forge_mvc_",  # tout import d'un paquet opt-in
     "forge-starter:",
 ]
@@ -48,7 +50,7 @@ def test_routes_home_sur_racine(routes_source):
 
 
 def test_routes_imports_minimaux(routes_source):
-    """Seuls Router et HomeController sont importés au niveau module."""
+    """Router, HomeController et le registre d'opt-ins (ADR-061) au niveau module."""
     tree = ast.parse(routes_source)
     modules = [
         node.module or ""
@@ -58,6 +60,7 @@ def test_routes_imports_minimaux(routes_source):
     assert modules == [
         "core.http.router",
         "mvc.controllers.home_controller",
+        "optins.registry",
     ], f"Imports inattendus dans le routes.py du squelette : {modules}"
 
 
