@@ -164,6 +164,16 @@ def _setup_python_environment(dest: str) -> None:
     _print_step("Mise à jour de pip...")
     _run([venv_python, "-m", "pip", "install", "--upgrade", "pip", "-q"], cwd=dest, check=True)
 
+    # Mode dev (retour terrain) : si FORGE_DEV_SRC pointe vers un dépôt source
+    # Forge, on installe forge-mvc en ÉDITABLE depuis ce dépôt au lieu de la
+    # version PyPI épinglée par requirements.txt. Le projet généré exécute alors
+    # le working tree, pas la version publiée. Explicite et opt-in (principe 3).
+    dev_src = os.environ.get("FORGE_DEV_SRC")
+    if dev_src and os.path.isdir(dev_src):
+        _print_step(f"Mode dev : forge-mvc en éditable depuis {dev_src}...")
+        _run([venv_python, "-m", "pip", "install", "-e", dev_src, "-q"], cwd=dest, check=True)
+        return
+
     requirements_path = os.path.join(dest, "requirements.txt")
     if os.path.exists(requirements_path):
         _print_step("Installation des dépendances Python...")
@@ -327,6 +337,13 @@ def cmd_new(
     print("  Pour la base de données : installez un backend (ex. pip install forge-mvc-sqlite),")
     print("  configurez son environnement dans env/dev, puis forge db:init.")
     print()
+
+    dev_src = os.environ.get("FORGE_DEV_SRC")
+    if dev_src and os.path.isdir(dev_src):
+        print(f"  Mode dev (FORGE_DEV_SRC={dev_src}) : forge-mvc installé en éditable.")
+        print("  Pour tester aussi un backend sur le working tree, installez-le en éditable :")
+        print(f"    pip install -e {dev_src}/packages/forge-mvc-<backend>")
+        print()
 
 
 # ── Commande : help ───────────────────────────────────────────────────────────

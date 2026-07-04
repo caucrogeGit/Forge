@@ -488,3 +488,35 @@ def test_emet_la_guidance_agent(monkeypatch, tmp_path):
     assert (proj / "CLAUDE.md").is_file()
     assert (proj / "AGENTS.md").is_file()
     assert (proj / "docs" / "adr" / "001-adopter-forge.md").is_file()
+
+
+# ── Mode dev : FORGE_DEV_SRC installe forge-mvc en éditable ───────────────────
+
+class _RunRecorder:
+    def __init__(self):
+        self.calls = []
+    def __call__(self, args, **kwargs):
+        self.calls.append(list(args))
+        return type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+
+def test_dev_src_installe_forge_mvc_editable(tmp_path, monkeypatch):
+    rec = _RunRecorder()
+    monkeypatch.setattr(forge, "_run", rec)
+    monkeypatch.setattr(forge, "_venv_python", lambda dest: "PY")
+    monkeypatch.setenv("FORGE_DEV_SRC", str(tmp_path))  # existe -> isdir vrai
+    forge._setup_python_environment(str(tmp_path))
+    # forge-mvc installé en éditable depuis FORGE_DEV_SRC, requirements ignoré.
+    assert any(a[:5] == ["PY", "-m", "pip", "install", "-e"] for a in rec.calls)
+    assert not any("requirements.txt" in " ".join(a) for a in rec.calls)
+
+
+def test_sans_dev_src_installe_requirements(tmp_path, monkeypatch):
+    rec = _RunRecorder()
+    monkeypatch.setattr(forge, "_run", rec)
+    monkeypatch.setattr(forge, "_venv_python", lambda dest: "PY")
+    monkeypatch.delenv("FORGE_DEV_SRC", raising=False)
+    (tmp_path / "requirements.txt").write_text("forge-mvc==1.0.0rc2\n", encoding="utf-8")
+    forge._setup_python_environment(str(tmp_path))
+    assert any("requirements.txt" in " ".join(a) for a in rec.calls)
+    assert not any(a[:5] == ["PY", "-m", "pip", "install", "-e"] for a in rec.calls)
