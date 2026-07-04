@@ -1,6 +1,4 @@
-# Installer Forge sur Linux et créer un projet
-
-[Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
+# Préparation d'une machine Linux et création d'un projet Forge
 
 Cette page décrit le parcours complet pour préparer un poste Linux puis créer un nouveau projet Forge.
 
