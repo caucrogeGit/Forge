@@ -24,6 +24,7 @@ Aller d'un poste Linux propre à un projet Forge qui démarre en développement 
 * des outils système nécessaires ;
 * de Forge installé avec `pipx` ;
 * de Git configuré sur le poste ;
+* de Node.js 24 installé pour la compilation du CSS ;
 * de MariaDB installé et démarré ;
 * d'un nouveau projet Forge créé ;
 * du backend `forge-mvc-mariadb` installé dans le projet ;
@@ -44,7 +45,7 @@ Elle se fait une seule fois sur une machine neuve.
 La seconde crée et configure un projet Forge.
 Elle se refait pour chaque nouveau projet.
 
-Si Forge, Git, `pipx` et MariaDB sont déjà installés sur votre poste, vous pouvez aller directement à la partie **Créer et configurer un projet Forge**.
+Si Forge, Git, `pipx`, Node.js 24 et MariaDB sont déjà installés sur votre poste, vous pouvez aller directement à la partie **Créer et configurer un projet Forge**.
 
 ---
 
@@ -52,7 +53,7 @@ Si Forge, Git, `pipx` et MariaDB sont déjà installés sur votre poste, vous po
 
 | Partie | Domaine | À refaire ? |
 |---|---|---|
-| Préparer le poste Linux | système, `pipx`, Forge, Git global, MariaDB Server | une fois par machine |
+| Préparer le poste Linux | système, `pipx`, Forge, Git global, Node.js 24, MariaDB Server | une fois par machine |
 | Créer et configurer un projet Forge | `forge new`, backend `forge-mvc-mariadb`, `env/dev`, Git local, GitHub, base MariaDB, migrations, `forge run` | à chaque nouveau projet |
 
 Les pages [Préparer MariaDB](mariadb.md) et [Comptes MariaDB d'un projet](mariadb-comptes.md) restent des références pour approfondir ou dépanner.
@@ -101,7 +102,7 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
         `sudo apt update` et `sudo apt upgrade -y` se terminent sans erreur bloquante.
 
 ??? info "2. Installer les paquets nécessaires"
-    **Objectif :** Installer les outils système nécessaires à Python, Git, pipx et au connecteur MariaDB.
+    **Objectif :** Installer les outils système nécessaires à Python, Git, pipx, au connecteur MariaDB et à la compilation du CSS (Node.js).
 
     !!! note "Paquets propres au backend MariaDB"
         `libmariadb-dev`, `pkg-config`, `build-essential` et `python3-dev` ne servent qu'à compiler le connecteur Python du backend **MariaDB**.
@@ -117,6 +118,7 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
       python3-pip \
       pipx \
       git \
+      curl \
       openssl \
       build-essential \
       python3-dev \
@@ -133,10 +135,36 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
 
     Si cette commande échoue, l'installation de Forge peut échouer avec une erreur du type `mariadb_config not found`.
 
+    **Node.js 24 (compilation du CSS)**
+
+    Le squelette Forge compile ses styles avec Tailwind CSS via npm.
+    À la création du projet, `forge new` lance `npm install` puis `npm run build:css`.
+    Le squelette exige **Node.js 24.17.0 ou plus récent** (`.nvmrc` et `engines` du `package.json`, avec `engine-strict`).
+
+    Le paquet `nodejs` d'`apt` est souvent trop ancien.
+    Installez Node.js 24 depuis le dépôt officiel NodeSource :
+
+    ```bash
+    curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+    sudo apt install -y nodejs
+    ```
+
+    Vérifiez la version installée :
+
+    ```bash
+    node --version
+    npm --version
+    ```
+
+    `node --version` doit afficher une version `v24.x` ou plus récente.
+
+    !!! note "Alternative : nvm"
+        Si vous préférez gérer plusieurs versions de Node par utilisateur, installez [nvm](https://github.com/nvm-sh/nvm), puis, dans le dossier du projet, `nvm install` lira le fichier `.nvmrc` (24.17.0) et posera la bonne version automatiquement.
+
     ---
 
     !!! success "Validation attendue"
-        `mariadb_config --version` répond. Si ce n'est pas le cas, le connecteur Python MariaDB risque d'échouer.
+        `mariadb_config --version` répond et `node --version` affiche une version `v24.x` ou plus récente.
 
 ??? info "3. Activer pipx"
     **Objectif :** Rendre la commande `pipx` disponible dans le terminal courant.
@@ -289,6 +317,8 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     forge --version
     pipx --version
     git --version
+    node --version
+    npm --version
     mariadb_config --version
     systemctl status mariadb --no-pager
     ```
@@ -298,13 +328,13 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     ---
 
     !!! success "Validation attendue"
-        Les commandes `forge`, `pipx`, `git`, `mariadb_config` et `systemctl status mariadb` répondent.
+        Les commandes `forge`, `pipx`, `git`, `node`, `npm`, `mariadb_config` et `systemctl status mariadb` répondent.
 
 ## Partie 2 - Créer et configurer un projet Forge
 
 Cette partie se refait pour chaque nouveau projet Forge.
 
-Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` et MariaDB sont installés.
+Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, Node.js 24 et MariaDB sont installés.
 
 ??? info "1. Créer un nouveau projet Forge et installer son backend BDD"
     **Objectif :** Créer un nouveau projet Forge, entrer dans son environnement Python et y installer le backend base de données.
