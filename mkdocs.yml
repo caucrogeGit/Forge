@@ -303,6 +303,8 @@ nav:
             - ADR-057 Découplage du schéma pivot: adr/057-pivot-schema-decoupling.md
             - ADR-058 Source unique des schémas JSON: adr/058-schemas-single-source.md
             - ADR-059 Registre de dispatch des commandes CLI: adr/059-cli-command-dispatch-registry.md
+            - ADR-060 Squelette livré sans backend BDD: adr/060-backend-free-skeleton.md
+            - ADR-061 Registre d'opt-ins visible et unifié: adr/061-optin-project-registry.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

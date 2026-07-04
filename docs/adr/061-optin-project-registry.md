@@ -78,7 +78,7 @@ C'est le point le plus invisible aujourd'hui ; l'y faire figurer répond directe
 Forme illustrative (le format exact relève du ticket) :
 
 ```python
-# optins/registry.py — registre des opt-ins du projet.
+# optins/registry.py : registre des opt-ins du projet.
 # Écrit et maintenu par « forge opt-in:enable / disable ». Édition manuelle possible.
 
 BACKEND = "sqlite"          # forge-mvc-sqlite (ADR-054/060)
