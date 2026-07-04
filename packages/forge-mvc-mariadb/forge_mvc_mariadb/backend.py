@@ -14,6 +14,7 @@ Le pool est créé au premier emprunt de connexion (lazy init). L'import du
 module ne produit aucun effet de bord réseau.
 """
 import logging
+import os
 import threading
 from typing import Any
 
@@ -64,27 +65,20 @@ class MariaDBBackend:
             logger.exception("Pool épuisé ou connexion impossible : %s", error)
             raise
 
-    def get_admin_connection(
-        self,
-        *,
-        host: str,
-        port: int,
-        login: str,
-        password: str,
-        database: "str | None" = None,
-    ) -> Any:
-        """Connexion d'administration directe (DB_ADMIN_*), hors pool.
+    def get_admin_connection(self, *, database: "str | None" = None) -> Any:
+        """Connexion d'administration directe, hors pool.
 
-        `database=None` pour `db:init` (la base n'existe pas encore) ; renseigné
-        pour `db:apply` et les migrations.
+        Les identifiants d'administration sont lus dans l'environnement
+        (`DB_ADMIN_HOST/PORT/LOGIN/PWD`, ADR-060). `database=None` pour `db:init`
+        (la base n'existe pas encore) ; renseigné pour `db:apply` et les migrations.
         """
         import mariadb
         _mariadb: Any = mariadb
         kwargs: dict[str, Any] = {
-            "host": host,
-            "port": port,
-            "user": login,
-            "password": password,
+            "host": os.environ.get("DB_ADMIN_HOST", "localhost"),
+            "port": int(os.environ.get("DB_ADMIN_PORT", "3306")),
+            "user": os.environ.get("DB_ADMIN_LOGIN", ""),
+            "password": os.environ.get("DB_ADMIN_PWD", ""),
         }
         if database is not None:
             kwargs["database"] = database

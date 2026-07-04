@@ -101,6 +101,11 @@ def _install_fake_modules(monkeypatch, connection: FakeConnection):
 
     fake_mariadb = types.SimpleNamespace(connect=connect)
     _patch_db_apply_config(monkeypatch, fake_config)
+    # ADR-060 : le backend lit les identifiants d'administration dans l'env.
+    monkeypatch.setenv("DB_ADMIN_HOST", fake_config.DB_ADMIN_HOST)
+    monkeypatch.setenv("DB_ADMIN_PORT", str(fake_config.DB_ADMIN_PORT))
+    monkeypatch.setenv("DB_ADMIN_LOGIN", fake_config.DB_ADMIN_LOGIN)
+    monkeypatch.setenv("DB_ADMIN_PWD", fake_config.DB_ADMIN_PWD)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
     return captured_kwargs
 
@@ -109,13 +114,7 @@ def _patch_db_apply_config(monkeypatch, fake_config: types.SimpleNamespace) -> N
     monkeypatch.setattr(
         db_apply,
         "load_db_apply_config",
-        lambda: db_apply.DbApplyConfig(
-            host=fake_config.DB_ADMIN_HOST,
-            port=fake_config.DB_ADMIN_PORT,
-            login=fake_config.DB_ADMIN_LOGIN,
-            password=fake_config.DB_ADMIN_PWD,
-            database=fake_config.DB_NAME,
-        ),
+        lambda: db_apply.DbApplyConfig(database=fake_config.DB_NAME),
     )
 
 
@@ -203,9 +202,9 @@ def test_apply_model_sql_rolls_back_on_first_sql_error(tmp_path: Path, monkeypat
     assert connection.rolled_back is True
 
 
-def test_load_db_apply_config_uses_admin_credentials(monkeypatch, tmp_path):
-    # ADR-033 : db:apply applique du DDL (SQL des entités) et se connecte donc
-    # en DB_ADMIN_*, comme migration:apply, pas en DB_APP_* (DML strict).
+def test_load_db_apply_config_returns_db_name(monkeypatch, tmp_path):
+    # ADR-060 : les identifiants d'administration sont lus par le backend depuis
+    # DB_ADMIN_* ; le loader ne porte plus que le nom de la base cible (DB_NAME).
     fake_config = types.SimpleNamespace(
         DB_ADMIN_HOST="admin-host",
         DB_ADMIN_PORT=3310,
@@ -218,11 +217,9 @@ def test_load_db_apply_config_uses_admin_credentials(monkeypatch, tmp_path):
 
     cfg = load_db_apply_config()
 
-    assert cfg.host == "admin-host"
-    assert cfg.port == 3310
-    assert cfg.login == "admin-user"
-    assert cfg.password == "admin-pwd"
     assert cfg.database == "app-db"
+    for absent in ("host", "port", "login", "password"):
+        assert not hasattr(cfg, absent)
 
 
 def test_load_db_apply_config_uses_current_working_directory(monkeypatch, tmp_path):

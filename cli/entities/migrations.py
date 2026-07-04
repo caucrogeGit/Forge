@@ -49,10 +49,8 @@ class MigrationNoChange(Exception):
 
 @dataclass(frozen=True)
 class MigrationDbConfig:
-    host: str
-    port: int
-    login: str
-    password: str
+    # ADR-060 : identifiants d'administration lus par le backend depuis
+    # l'environnement ; seul le nom de la base cible reste porté ici.
     database: str
 
 
@@ -897,13 +895,7 @@ def _connect_db():
 
     cfg = load_migration_db_config()
     try:
-        return backend.get_admin_connection(
-            host=cfg.host,
-            port=cfg.port,
-            login=cfg.login,
-            password=cfg.password,
-            database=cfg.database,
-        )
+        return backend.get_admin_connection(database=cfg.database)
     except Exception as exc:
         raise MigrationError(
             "Connexion d'administration impossible. "
@@ -912,18 +904,14 @@ def _connect_db():
 
 
 def load_migration_db_config() -> MigrationDbConfig:
+    # load_project_config() charge l'environnement (load_dotenv) : indispensable
+    # pour que le backend lise ensuite DB_ADMIN_* dans os.environ (ADR-060).
     config = load_project_config()
 
     # ADR-033 : les migrations sont des changements de structure ; elles
-    # utilisent le compte d'administration du projet (DB_ADMIN_*), pas le compte
-    # runtime DB_APP_* qui reste en DML strict.
-    return MigrationDbConfig(
-        host=config.DB_ADMIN_HOST,
-        port=config.DB_ADMIN_PORT,
-        login=config.DB_ADMIN_LOGIN,
-        password=config.DB_ADMIN_PWD,
-        database=config.DB_NAME,
-    )
+    # empruntent le compte d'administration, lu par le backend depuis DB_ADMIN_*.
+    # Seul le nom de la base cible reste fourni ici (DB_NAME).
+    return MigrationDbConfig(database=config.DB_NAME)
 
 
 def _rollback_quietly(connection: Any) -> None:

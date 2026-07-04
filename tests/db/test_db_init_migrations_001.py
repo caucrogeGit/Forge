@@ -115,13 +115,16 @@ def harness() -> Any:
         h.cleanup()
 
 
-def _db_init_config(h: _DbHarness, *, admin_login: str, admin_password: str,
+def _db_init_config(h: _DbHarness, monkeypatch: pytest.MonkeyPatch, *,
+                    admin_login: str, admin_password: str,
                     db_name: str, app_login: str, app_password: str) -> db_init.DbInitConfig:
+    # ADR-060 : le backend lit les identifiants d'administration dans l'env ;
+    # host/port viennent du harness, login/mot de passe du cas de test.
+    monkeypatch.setenv("DB_ADMIN_HOST", str(h.params["host"]))
+    monkeypatch.setenv("DB_ADMIN_PORT", str(h.params["port"]))
+    monkeypatch.setenv("DB_ADMIN_LOGIN", str(admin_login))
+    monkeypatch.setenv("DB_ADMIN_PWD", str(admin_password))
     return db_init.DbInitConfig(
-        admin_host=h.params["host"],
-        admin_port=h.params["port"],
-        admin_login=admin_login,
-        admin_password=admin_password,
         db_name=db_name,
         db_charset="utf8mb4",
         db_collation="utf8mb4_unicode_ci",
@@ -145,7 +148,7 @@ def test_db_init_creates_database_user_and_grants(
     app_login = f"app_{harness.uid}"
     harness.track_user(app_login, harness.app_host)
     cfg = _db_init_config(
-        harness, admin_login=harness.params["user"], admin_password=harness.params["password"],
+        harness, monkeypatch, admin_login=harness.params["user"], admin_password=harness.params["password"],
         db_name=db_name, app_login=app_login, app_password="s3cret",
     )
     monkeypatch.setattr(db_init, "load_db_init_config", lambda: cfg)
@@ -185,7 +188,7 @@ def test_db_init_app_user_has_dml_only(
     app_login = f"app_{harness.uid}"
     harness.track_user(app_login, harness.app_host)
     cfg = _db_init_config(
-        harness, admin_login=harness.params["user"], admin_password=harness.params["password"],
+        harness, monkeypatch, admin_login=harness.params["user"], admin_password=harness.params["password"],
         db_name=db_name, app_login=app_login, app_password="s3cret",
     )
     monkeypatch.setattr(db_init, "load_db_init_config", lambda: cfg)
@@ -214,7 +217,7 @@ def test_db_init_is_idempotent(
     app_login = f"app_{harness.uid}"
     harness.track_user(app_login, harness.app_host)
     cfg = _db_init_config(
-        harness, admin_login=harness.params["user"], admin_password=harness.params["password"],
+        harness, monkeypatch, admin_login=harness.params["user"], admin_password=harness.params["password"],
         db_name=db_name, app_login=app_login, app_password="s3cret",
     )
     monkeypatch.setattr(db_init, "load_db_init_config", lambda: cfg)
@@ -255,7 +258,7 @@ def test_db_init_degraded_mode_without_mysql_user_select(
         setup.close()
 
     cfg = _db_init_config(
-        harness, admin_login=restricted, admin_password="apwd",
+        harness, monkeypatch, admin_login=restricted, admin_password="apwd",
         db_name=db_name, app_login=app_login, app_password="s3cret",
     )
     monkeypatch.setattr(db_init, "load_db_init_config", lambda: cfg)

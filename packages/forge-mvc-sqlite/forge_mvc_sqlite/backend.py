@@ -105,15 +105,7 @@ class SQLiteBackend:
         raw = sqlite3.connect(database, check_same_thread=False)
         return _SQLiteConnection(raw)
 
-    def get_admin_connection(
-        self,
-        *,
-        host: str,
-        port: int,
-        login: str,
-        password: str,
-        database: "str | None" = None,
-    ) -> Any:
+    def get_admin_connection(self, *, database: "str | None" = None) -> Any:
         """SQLite est sans serveur : aucune connexion d'administration.
 
         Ce chemin n'est jamais emprunté (`requires_provisioning=False` aiguille

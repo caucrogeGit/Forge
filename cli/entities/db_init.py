@@ -44,10 +44,9 @@ class DbInitError(ValueError):
 
 @dataclass(frozen=True)
 class DbInitConfig:
-    admin_host: str
-    admin_port: int
-    admin_login: str
-    admin_password: str
+    # ADR-060 : les identifiants d'administration (connexion) sont lus par le
+    # backend depuis l'environnement (DB_ADMIN_*). Ne restent ici que les
+    # paramètres de provisionnement : base à créer et compte applicatif à poser.
     db_name: str
     db_charset: str
     db_collation: str
@@ -84,10 +83,6 @@ def load_db_init_config() -> DbInitConfig:
     app_privileges = _parse_app_privileges(raw_privileges) if raw_privileges is not None else DEFAULT_APP_PRIVILEGES
 
     return DbInitConfig(
-        admin_host=config.DB_ADMIN_HOST,
-        admin_port=config.DB_ADMIN_PORT,
-        admin_login=config.DB_ADMIN_LOGIN,
-        admin_password=config.DB_ADMIN_PWD,
         db_name=config.DB_NAME,
         db_charset=config.DB_CHARSET,
         db_collation=config.DB_COLLATION,
@@ -151,7 +146,7 @@ def init_project_database() -> list[str]:
         )
 
     cfg = load_db_init_config()
-    connection = _connect_admin(cfg)
+    connection = _connect_admin()
     actions: list[str] = []
 
     try:
@@ -253,16 +248,13 @@ def main(argv: list[str] | None = None) -> None:
         raise SystemExit(1)
 
 
-def _connect_admin(cfg: DbInitConfig):
+def _connect_admin():
     from core.database.backend import get_backend
 
     try:
-        return get_backend().get_admin_connection(
-            host=cfg.admin_host,
-            port=cfg.admin_port,
-            login=cfg.admin_login,
-            password=cfg.admin_password,
-        )
+        # ADR-060 : le backend lit DB_ADMIN_* dans l'environnement ; database=None
+        # cible la base de maintenance du serveur pour créer la base du projet.
+        return get_backend().get_admin_connection()
     except Exception as exc:
         raise DbInitError(
             "Connexion d'administration impossible. "

@@ -13,7 +13,10 @@ import pytest
 _SKELETON_ENV = Path(__file__).parent.parent / "cli" / "skeleton" / "data" / "env" / "example"
 
 
-def test_load_migration_db_config_uses_admin(monkeypatch):
+def test_load_migration_db_config_ne_porte_que_la_base(monkeypatch):
+    # ADR-060 : les identifiants d'administration sont lus par le backend depuis
+    # DB_ADMIN_*. Le loader ne porte plus que le nom de la base cible ; il
+    # n'expose aucun identifiant (ni admin ni app).
     from cli.entities import migrations
 
     fake = types.SimpleNamespace(
@@ -27,19 +30,13 @@ def test_load_migration_db_config_uses_admin(monkeypatch):
 
     cfg = migrations.load_migration_db_config()
 
-    assert cfg.login == "forge_admin", "les migrations doivent se connecter en DB_ADMIN_*"
-    assert cfg.host == "adminhost"
-    assert cfg.port == 1
-    assert cfg.password == "adminpwd"
     assert cfg.database == "projet_db"
+    for absent in ("host", "port", "login", "password"):
+        assert not hasattr(cfg, absent), f"le loader ne doit plus exposer {absent}"
 
 
-def test_load_db_apply_config_uses_admin(monkeypatch):
-    """db:apply applique le SQL des entités (DDL) : il se connecte en DB_ADMIN_*.
-
-    Garde-fou DB-APPLY-ADMIN-CREDS-FIX-001 : sans lui, db:apply restait en
-    DB_APP_* et echouait sur CREATE TABLE des que forge_app etait DML strict.
-    """
+def test_load_db_apply_config_ne_porte_que_la_base(monkeypatch):
+    # ADR-060 : idem db:apply, le loader ne porte plus que la base cible.
     from cli.entities import db_apply
 
     fake = types.SimpleNamespace(
@@ -53,11 +50,21 @@ def test_load_db_apply_config_uses_admin(monkeypatch):
 
     cfg = db_apply.load_db_apply_config()
 
-    assert cfg.login == "forge_admin", "db:apply doit se connecter en DB_ADMIN_*"
-    assert cfg.host == "adminhost"
-    assert cfg.port == 1
-    assert cfg.password == "adminpwd"
     assert cfg.database == "projet_db"
+    for absent in ("host", "port", "login", "password"):
+        assert not hasattr(cfg, absent), f"le loader ne doit plus exposer {absent}"
+
+
+def test_db_apply_et_migrations_passent_par_admin_connection():
+    """Garde-fou ADR-033/ADR-060 : le DDL emprunte la connexion d'administration
+    (get_admin_connection, qui lit DB_ADMIN_*), jamais get_connection (DB_APP_*)."""
+    from cli.entities import db_apply, migrations
+
+    for module in (db_apply, migrations):
+        src = Path(module.__file__).read_text(encoding="utf-8")
+        assert "get_admin_connection(" in src, (
+            f"{module.__name__} doit se connecter via get_admin_connection (DDL en DB_ADMIN_*)"
+        )
 
 
 def test_db_init_default_app_privileges_dml_only():
@@ -72,11 +79,11 @@ def test_db_init_default_app_privileges_dml_only():
 
 
 def test_db_init_still_connects_as_admin():
-    """db:init reste en DB_ADMIN_* (inchangé)."""
+    """db:init reste en connexion d'administration (get_admin_connection lit DB_ADMIN_*)."""
     from cli.entities import db_init
 
     src = Path(db_init.__file__).read_text(encoding="utf-8")
-    assert "admin_host" in src and "admin_login" in src
+    assert "get_admin_connection(" in src
 
 
 @pytest.mark.parametrize("var", ["DB_APP_PRIVILEGES"])

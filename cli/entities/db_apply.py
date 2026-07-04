@@ -23,10 +23,8 @@ class DbApplyError(ValueError):
 
 @dataclass(frozen=True)
 class DbApplyConfig:
-    host: str
-    port: int
-    login: str
-    password: str
+    # ADR-060 : les identifiants d'administration sont lus par le backend depuis
+    # l'environnement ; seul le nom de la base cible reste porté ici.
     database: str
 
 
@@ -136,13 +134,7 @@ def _connect_db():
 
     cfg = load_db_apply_config()
     try:
-        return backend.get_admin_connection(
-            host=cfg.host,
-            port=cfg.port,
-            login=cfg.login,
-            password=cfg.password,
-            database=cfg.database,
-        )
+        return backend.get_admin_connection(database=cfg.database)
     except Exception as exc:
         raise DbApplyError(
             "Connexion d'administration impossible. "
@@ -152,18 +144,14 @@ def _connect_db():
 
 
 def load_db_apply_config() -> DbApplyConfig:
+    # load_project_config() charge l'environnement (load_dotenv) : indispensable
+    # pour que le backend lise ensuite DB_ADMIN_* dans os.environ (ADR-060).
     config = load_project_config()
 
     # ADR-033 : le SQL des entités crée et modifie des tables (DDL) ; db:apply
-    # utilise donc le compte d'administration du projet (DB_ADMIN_*), comme
-    # migration:apply, et non le compte runtime DB_APP_* resté en DML strict.
-    return DbApplyConfig(
-        host=config.DB_ADMIN_HOST,
-        port=config.DB_ADMIN_PORT,
-        login=config.DB_ADMIN_LOGIN,
-        password=config.DB_ADMIN_PWD,
-        database=config.DB_NAME,
-    )
+    # emprunte le compte d'administration, lu par le backend depuis DB_ADMIN_*.
+    # Seul le nom de la base cible reste fourni ici (DB_NAME).
+    return DbApplyConfig(database=config.DB_NAME)
 
 
 def _rollback_quietly(connection: Any) -> None:

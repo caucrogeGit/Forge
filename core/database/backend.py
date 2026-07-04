@@ -179,21 +179,15 @@ class DatabaseBackend(Protocol):
         """Fournit une connexion prête à l'emploi (pool ou directe)."""
         ...
 
-    def get_admin_connection(
-        self,
-        *,
-        host: str,
-        port: int,
-        login: str,
-        password: str,
-        database: "str | None" = None,
-    ) -> Any:
-        """Connexion d'administration (DB_ADMIN_*) pour la DDL et le provisioning.
+    def get_admin_connection(self, *, database: "str | None" = None) -> Any:
+        """Connexion d'administration pour la DDL et le provisioning.
 
-        Utilisée par `db:init` (provisioning, `database=None`), `db:apply` et le
-        moteur de migrations (DDL, `database` renseigné). Réservée aux SGBD
-        serveur ; un backend sans serveur (`requires_provisioning=False`) lève
-        une erreur car il n'a pas de compte d'administration.
+        Le backend lit lui-même ses identifiants d'administration dans
+        l'environnement (`DB_ADMIN_HOST/PORT/LOGIN/PWD`, ADR-060). `database=None`
+        cible la base de maintenance du serveur (provisioning via `db:init`) ; un
+        nom cible la base du projet (`db:apply`, migrations). Réservée aux SGBD
+        serveur ; un backend sans serveur (`requires_provisioning=False`) lève une
+        erreur car il n'a pas de compte d'administration.
         """
         ...
 

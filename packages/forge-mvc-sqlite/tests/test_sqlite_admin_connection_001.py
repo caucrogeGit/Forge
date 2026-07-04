@@ -17,6 +17,4 @@ def test_pas_de_provisioning() -> None:
 
 def test_get_admin_connection_leve() -> None:
     with pytest.raises(RuntimeError, match="sans serveur"):
-        SQLiteBackend().get_admin_connection(
-            host="x", port=0, login="x", password="x"
-        )
+        SQLiteBackend().get_admin_connection()

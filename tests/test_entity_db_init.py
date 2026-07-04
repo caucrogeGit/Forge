@@ -105,14 +105,15 @@ def _patch_db_init_config(monkeypatch, fake_config: types.SimpleNamespace) -> No
         if raw_privileges is not None
         else db_init.DEFAULT_APP_PRIVILEGES
     )
+    # ADR-060 : le backend lit les identifiants d'administration dans l'env.
+    monkeypatch.setenv("DB_ADMIN_HOST", str(getattr(fake_config, "DB_ADMIN_HOST", "localhost")))
+    monkeypatch.setenv("DB_ADMIN_PORT", str(getattr(fake_config, "DB_ADMIN_PORT", 3306)))
+    monkeypatch.setenv("DB_ADMIN_LOGIN", str(getattr(fake_config, "DB_ADMIN_LOGIN", "")))
+    monkeypatch.setenv("DB_ADMIN_PWD", str(getattr(fake_config, "DB_ADMIN_PWD", "")))
     monkeypatch.setattr(
         db_init,
         "load_db_init_config",
         lambda: db_init.DbInitConfig(
-            admin_host=fake_config.DB_ADMIN_HOST,
-            admin_port=fake_config.DB_ADMIN_PORT,
-            admin_login=fake_config.DB_ADMIN_LOGIN,
-            admin_password=fake_config.DB_ADMIN_PWD,
             db_name=fake_config.DB_NAME,
             db_charset=fake_config.DB_CHARSET,
             db_collation=fake_config.DB_COLLATION,
@@ -145,17 +146,18 @@ def _write_config(path, fake_config: types.SimpleNamespace) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def test_load_db_init_config_reads_admin_and_app_separately(monkeypatch, tmp_path):
+def test_load_db_init_config_reads_provisioning_and_app(monkeypatch, tmp_path):
+    # ADR-060 : les identifiants d'administration (connexion) sont lus par le
+    # backend depuis DB_ADMIN_* ; le loader ne porte plus que les paramètres de
+    # provisionnement (base, jeu de caractères, compte applicatif).
     fake_config = _fake_config()
     _write_config(tmp_path / "config.py", fake_config)
     monkeypatch.chdir(tmp_path)
 
     cfg = load_db_init_config()
 
-    assert cfg.admin_host == "admin-host"
-    assert cfg.admin_port == 3307
-    assert cfg.admin_login == "admin-user"
-    assert cfg.admin_password == "admin-pwd"
+    for absent in ("admin_host", "admin_port", "admin_login", "admin_password"):
+        assert not hasattr(cfg, absent), f"DbInitConfig ne doit plus porter {absent}"
     assert cfg.db_name == "gestion_ventes"
     assert cfg.db_charset == "utf8mb4"
     assert cfg.db_collation == "utf8mb4_unicode_ci"

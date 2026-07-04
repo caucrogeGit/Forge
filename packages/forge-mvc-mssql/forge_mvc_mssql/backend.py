@@ -137,19 +137,16 @@ class MSSQLBackend:
         raw: Any = odbc.connect(conn_str)
         return _MsConnection(raw)
 
-    def get_admin_connection(
-        self,
-        *,
-        host: str,
-        port: int,
-        login: str,
-        password: str,
-        database: "str | None" = None,
-    ) -> Any:
+    def get_admin_connection(self, *, database: "str | None" = None) -> Any:
         import pyodbc
 
         odbc: Any = pyodbc
         driver = os.environ.get("DB_ODBC_DRIVER", _DEFAULT_ODBC_DRIVER)
+        # Identifiants d'administration lus dans l'environnement (ADR-060).
+        host = os.environ.get("DB_ADMIN_HOST", "localhost")
+        port = int(os.environ.get("DB_ADMIN_PORT", "1433"))
+        login = os.environ.get("DB_ADMIN_LOGIN", "")
+        password = os.environ.get("DB_ADMIN_PWD", "")
         # `db:init` (database=None) se connecte à la base de maintenance
         # « master » pour créer la base du projet.
         db = database or "master"
