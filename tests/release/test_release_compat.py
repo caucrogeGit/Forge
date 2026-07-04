@@ -288,12 +288,12 @@ class TestMkdocs:
         mkdocs = Path("mkdocs.yml").read_text(encoding="utf-8")
         assert "compatibility.md" in mkdocs
 
-    def test_mkdocs_build_strict(self):
+    def test_mkdocs_build_strict(self, tmp_path):
         """Vérifie que mkdocs build --strict passe (test documentaire)."""
         import subprocess
 
         result = subprocess.run(
-            ["mkdocs", "build", "--strict"],
+            ["mkdocs", "build", "--strict", "-d", str(tmp_path / "site")],
             capture_output=True,
             text=True,
         )

@@ -238,11 +238,11 @@ class TestFutursTicketsDoc:
 
 
 class TestMkdocsBuild:
-    def test_mkdocs_build_strict(self):
+    def test_mkdocs_build_strict(self, tmp_path):
         import subprocess
 
         result = subprocess.run(
-            ["mkdocs", "build", "--strict"],
+            ["mkdocs", "build", "--strict", "-d", str(tmp_path / "site")],
             capture_output=True,
             text=True,
         )
