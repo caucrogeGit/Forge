@@ -11,25 +11,24 @@ Pour les autres distributions, le principe reste le même, seuls les noms de paq
 
 ## Objectif
 
-Aller d'un poste Linux propre à un projet Forge qui démarre en développement avec le backend MariaDB.
+Aller d'un poste Linux propre à un projet Forge qui démarre en développement, avec le backend base de données de votre choix.
 
 !!! note "Forge est agnostique en base de données"
     Le cœur de Forge ne dépend d'aucun SGBD (ADR-054).
     La base est fournie par un **backend opt-in** que vous choisissez et installez : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres` ou `forge-mvc-mssql`.
-    Ce guide utilise **MariaDB**, un serveur robuste et courant.
-    Pour un démarrage sans aucun serveur à installer, le backend `forge-mvc-sqlite` (une base dans un simple fichier) est une alternative plus légère : installez `forge-mvc-sqlite` au lieu de `forge-mvc-mariadb` et sautez toutes les étapes propres à MariaDB.
+    Pour un démarrage sans aucun serveur à installer, le backend `forge-mvc-sqlite` (une base dans un simple fichier) est l'option la plus légère : installez `forge-mvc-sqlite` et sautez toutes les étapes propres à MariaDB.
 
-À la fin de ce parcours, vous disposez :
+Ce guide déroule le parcours avec le backend **MariaDB**, un serveur robuste et courant.
+À la fin, vous disposez :
 
 * des outils système nécessaires ;
 * de Forge installé avec `pipx` ;
 * de Git configuré sur le poste ;
 * de Node.js 24 installé pour la compilation du CSS ;
-* de MariaDB installé et démarré ;
 * d'un nouveau projet Forge créé ;
-* du backend `forge-mvc-mariadb` installé dans le projet ;
+* du backend base de données choisi installé dans le projet (ici `forge-mvc-mariadb`) ;
 * d'un dépôt Git local versionné et poussé sur GitHub ;
-* d'`env/dev` configuré et cohérent avec MariaDB ;
+* de la base configurée pour ce backend (ici MariaDB : serveur, `env/dev`, comptes) ;
 * de la base initialisée et des migrations appliquées ;
 * du serveur de développement lancé.
 
