@@ -61,15 +61,6 @@ def _minimal_config(tmp_path: Path, **extra) -> types.SimpleNamespace:
     return cfg
 
 
-def _apply_db_env(monkeypatch, cfg) -> None:
-    """ADR-060 : check_db lit la config BDD dans l'environnement (config.py sans
-    bloc BDD). On reflète les attributs du cfg de test dans os.environ."""
-    for name in ("DB_APP_HOST", "DB_APP_PORT", "DB_APP_LOGIN", "DB_APP_PWD",
-                 "DB_NAME", "DB_ADMIN_LOGIN"):
-        if hasattr(cfg, name):
-            monkeypatch.setenv(name, str(getattr(cfg, name)))
-
-
 def _write_entity(entities_root: Path, folder: str) -> None:
     d = entities_root / folder
     d.mkdir(parents=True, exist_ok=True)
@@ -159,6 +150,17 @@ def test_check_env_ok(tmp_path):
     _full_env(tmp_path)
     r = check_env(tmp_path)
     assert r.status == "ok"
+
+
+def test_check_env_ok_sans_bloc_bdd(tmp_path):
+    # ADR-060 : l'env neutre du squelette (aucune variable DB_*) doit passer.
+    # Régression : check_env exigeait DB_NAME/DB_APP_*/DB_ADMIN_* et échouait.
+    env = ("APP_NAME=Demo\nAPP_ROUTES_MODULE=mvc.routes\n"
+           "SSL_CERTFILE=cert.pem\nSSL_KEYFILE=key.pem\n")
+    _write(tmp_path / "env" / "example", env)
+    _write(tmp_path / "env" / "dev", env)
+    r = check_env(tmp_path)
+    assert r.status == "ok", r.detail
 
 
 def test_check_env_accepte_pwd_vide(tmp_path):
@@ -332,48 +334,50 @@ def test_check_db_dev_absent(tmp_path):
     assert "env/dev" in r.detail
 
 
-def test_check_db_mariadb_absent(tmp_path, monkeypatch):
+def _fake_backend(name="sqlite", conn_error=None):
+    """Backend factice pour check_db (ADR-054/060) : agnostique, sans mariadb."""
+    def get_connection():
+        if conn_error is not None:
+            raise conn_error
+        return object()
+    return types.SimpleNamespace(
+        name=name,
+        get_connection=get_connection,
+        close_connection=lambda c: None,
+    )
+
+
+def _patch_backend(monkeypatch, resolver):
+    import core.database.backend as backend_mod
+    monkeypatch.setattr(backend_mod, "reset_backend", lambda: None)
+    monkeypatch.setattr(backend_mod, "get_backend", resolver)
+
+
+def test_check_db_backend_non_resolu_warn(tmp_path, monkeypatch):
+    # Aucun backend (ou plusieurs sans DB_BACKEND) : avertissement, pas blocage.
     _write(tmp_path / "env" / "dev", "")
-    cfg = _minimal_config(tmp_path)
-    monkeypatch.setitem(sys.modules, "mariadb", None)
-    r = check_db(tmp_path, cfg)
+    def _boom():
+        raise RuntimeError("Aucun backend BDD installé")
+    _patch_backend(monkeypatch, _boom)
+    r = check_db(tmp_path, _minimal_config(tmp_path))
     assert r.status == "warn"
-    assert "mariadb" in r.detail.lower()
+    assert "backend" in r.detail.lower()
 
 
 def test_check_db_connexion_impossible(tmp_path, monkeypatch):
     _write(tmp_path / "env" / "dev", "")
-    cfg = _minimal_config(tmp_path)
-    _apply_db_env(monkeypatch, cfg)
-
-    fake_mariadb = types.ModuleType("mariadb")
-    fake_mariadb.Error = Exception
-
-    def fake_connect(**_kw):
-        raise fake_mariadb.Error("Access denied")
-
-    fake_mariadb.connect = fake_connect
-    monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
-
-    r = check_db(tmp_path, cfg)
+    _patch_backend(monkeypatch, lambda: _fake_backend(conn_error=RuntimeError("Access denied")))
+    r = check_db(tmp_path, _minimal_config(tmp_path))
     assert r.status == "warn"
     assert "impossible" in r.detail
 
 
 def test_check_db_ok(tmp_path, monkeypatch):
     _write(tmp_path / "env" / "dev", "")
-    cfg = _minimal_config(tmp_path)
-    _apply_db_env(monkeypatch, cfg)
-
-    fake_conn = types.SimpleNamespace(close=lambda: None)
-    fake_mariadb = types.ModuleType("mariadb")
-    fake_mariadb.Error = Exception
-    fake_mariadb.connect = lambda **_kw: fake_conn
-    monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
-
-    r = check_db(tmp_path, cfg)
+    _patch_backend(monkeypatch, lambda: _fake_backend(name="sqlite"))
+    r = check_db(tmp_path, _minimal_config(tmp_path))
     assert r.status == "ok"
-    assert "forge_db" in r.detail
+    assert "sqlite" in r.detail
 
 
 # ── has_failures & codes de sortie ────────────────────────────────────────────

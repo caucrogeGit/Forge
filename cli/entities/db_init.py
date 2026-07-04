@@ -267,7 +267,7 @@ def main(argv: list[str] | None = None) -> None:
 
     try:
         actions = init_project_database()
-        print("[OK] Environnement MariaDB du projet prêt.")
+        print("[OK] Base de données du projet prête.")
         for action in actions:
             print(f"[FAIT] {action}")
     except (DbInitError, ProjectConfigError, ValueError) as exc:

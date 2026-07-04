@@ -100,13 +100,14 @@ def check_env(root: Path) -> CheckResult:
         return CheckResult("warn", "Environnement",
                            "env/dev absent — seules les valeurs par défaut de env/example sont actives")
 
+    # ADR-060 : le squelette est agnostique BDD ; les clés DB_* appartiennent au
+    # backend installé (elles ne figurent plus dans l'env par défaut). Seules les
+    # clés transverses du cadre sont exigées ici.
     must_exist = [
         "APP_NAME", "APP_ROUTES_MODULE",
-        "DB_NAME", "DB_APP_HOST", "DB_APP_PORT", "DB_APP_LOGIN", "DB_APP_PWD",
-        "DB_ADMIN_HOST", "DB_ADMIN_PORT", "DB_ADMIN_LOGIN", "DB_ADMIN_PWD",
         "SSL_CERTFILE", "SSL_KEYFILE",
     ]
-    can_be_empty = {"DB_APP_PWD", "DB_ADMIN_PWD"}
+    can_be_empty: set[str] = set()
 
     missing = [k for k in must_exist if k not in cfg]
     if missing:
@@ -189,44 +190,39 @@ def check_node() -> CheckResult:
     return CheckResult("ok", "Node.js / npm", "npm disponible")
 
 
-def check_db(root: Path, config: "ModuleType | None") -> CheckResult:
-    """Tente une connexion MariaDB avec les credentials applicatifs."""
-    if config is None:
-        return CheckResult("skip", "Base de données", "configuration non disponible")
+def check_db(root: Path, _config: "ModuleType | None") -> CheckResult:
+    """Vérifie la base via le backend actif (ADR-054/060), sans supposer de SGBD.
 
+    Le cœur est agnostique : la connexion passe par le backend opt-in installé.
+    Aucun backend ou plusieurs backends non départagés donnent un avertissement,
+    pas un blocage.
+    """
     if not (root / "env" / "dev").exists():
         return CheckResult("skip", "Base de données",
                            "env/dev absent — connexion non vérifiable avant configuration")
 
     try:
-        import mariadb  # pyright: ignore[reportMissingTypeStubs]  # driver sans stubs
-    except ImportError:
-        return CheckResult("warn", "Base de données",
-                           "driver mariadb non installé — pip install mariadb")
-
-    _mariadb: Any = mariadb
-    # ADR-060 : la config de connexion est lue dans l'environnement (config.py
-    # ne porte plus de bloc BDD). L'env a été chargé au chargement du projet.
-    host     = os.environ.get("DB_APP_HOST", "localhost")
-    port     = int(os.environ.get("DB_APP_PORT", "3306"))
-    user     = os.environ.get("DB_APP_LOGIN", "")
-    password = os.environ.get("DB_APP_PWD", "")
-    db_name  = os.environ.get("DB_NAME", "")
-
-    if not user or not db_name:
-        return CheckResult("skip", "Base de données", "credentials applicatifs non configurés")
+        from core.database.backend import get_backend, reset_backend
+    except Exception:  # noqa: BLE001 — cœur base de données indisponible
+        return CheckResult("skip", "Base de données", "cœur base de données indisponible")
 
     try:
-        conn = _mariadb.connect(
-            host=host, port=port,
-            user=user, password=password,
-            database=db_name, connect_timeout=3,
-        )
-        conn.close()
-        return CheckResult("ok", "Base de données", f"connexion OK ({db_name}@{host})")
-    except _mariadb.Error as exc:
+        reset_backend()
+        backend = get_backend()
+    except Exception as exc:  # noqa: BLE001 — aucun backend, ou plusieurs sans DB_BACKEND
         return CheckResult("warn", "Base de données",
-                           f"connexion applicative impossible — normal avant forge db:init ({exc})")
+                           f"backend non résolu — installez un backend BDD "
+                           f"(forge-mvc-sqlite, forge-mvc-mariadb, ...) ; {exc}")
+
+    name = getattr(backend, "name", "?")
+    try:
+        conn = backend.get_connection()
+        backend.close_connection(conn)
+        return CheckResult("ok", "Base de données", f"connexion OK (backend {name})")
+    except Exception as exc:  # noqa: BLE001 — connexion non établie
+        return CheckResult("warn", "Base de données",
+                           f"connexion via le backend {name} impossible — "
+                           f"normal avant configuration ou db:init ({exc})")
 
 
 def check_migrations(root: Path) -> CheckResult:
