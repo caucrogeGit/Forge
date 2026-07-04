@@ -53,18 +53,6 @@ _FORGE_DEFAULT_REF = "v1.0.0-rc.2"
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────
 
-def _normalize_identifier(name: str) -> str:
-    """Nom de projet → identifiant de base de données.
-
-    Convention : tout en minuscules, sans séparateur ajouté. On conserve les
-    « _ » réellement saisis par l'utilisateur et on retire les autres
-    caractères non alphanumériques (ex. « - »). Aucun « _ » n'est inséré à une
-    frontière de casse : « ReferenCiel » devient « referenciel », pas
-    « referen_ciel ».
-    """
-    return re.sub(r"[^a-z0-9_]", "", name.lower())
-
-
 def _print_step(message: str) -> None:
     print(f"  {message}")
 
@@ -121,7 +109,7 @@ def _materialize_skeleton(dest: str) -> None:
     materialize(dest)
 
 
-def _configure_env_files(dest: str, project_name: str, db_name: str) -> None:
+def _configure_env_files(dest: str, project_name: str) -> None:
     _print_step("Configuration des fichiers d'environnement...")
 
     example_path = os.path.join(dest, "env", "example")
@@ -131,48 +119,20 @@ def _configure_env_files(dest: str, project_name: str, db_name: str) -> None:
     with open(example_path, "r", encoding="utf-8") as file:
         content = file.read()
 
-    # Identifiants dérivés du nom de projet (déjà normalisé via db_name).
-    # ADR-034 : DB_NAME et DB_APP_LOGIN = nom normalisé nu (sans suffixe).
-    # ADR-033 : le compte de provisioning est distinct du compte applicatif ;
-    # seul l'admin porte un suffixe pour rester un login MariaDB séparé.
-    app_login = db_name
-    admin_login = f"{db_name}_admin"
-
+    # ADR-060 : le squelette est livré sans backend BDD ; la configuration de
+    # connexion appartient au backend installé et n'est plus injectée ici.
+    # forge new ne renseigne que le nom applicatif.
     content = re.sub(
         r"^APP_NAME=.*$",
         f"APP_NAME={project_name}",
         content,
         flags=re.MULTILINE,
     )
-    content = re.sub(
-        r"^DB_NAME=.*$",
-        f"DB_NAME={db_name}",
-        content,
-        flags=re.MULTILINE,
-    )
-    content = re.sub(
-        r"^DB_APP_LOGIN=.*$",
-        f"DB_APP_LOGIN={app_login}",
-        content,
-        flags=re.MULTILINE,
-    )
-    content = re.sub(
-        r"^DB_ADMIN_LOGIN=.*$",
-        f"DB_ADMIN_LOGIN={admin_login}",
-        content,
-        flags=re.MULTILINE,
-    )
-    # Le commentaire d'aide référence le compte admin réel du projet.
-    content = content.replace(
-        "créez le compte forge_admin",
-        f"créez le compte {admin_login}",
-    )
 
     with open(example_path, "w", encoding="utf-8") as file:
         file.write(content)
 
-    # env/dev reprend le même contenu : la convention s'applique aussi à
-    # env/example (identifiants projet-spécifiques dans les deux fichiers).
+    # env/dev reprend le même contenu qu'env/example (nom applicatif substitué).
     dev_content = content
 
     dev_path = os.path.join(dest, "env", "dev")
@@ -314,15 +274,13 @@ def cmd_new(
     if os.path.exists(dest):
         sys.exit(f"Erreur : le dossier '{dest}' existe déjà.")
 
-    db_name = _normalize_identifier(project_name)  # ADR-034 : sans suffixe _db
-
     print(f"\nForge {_FORGE_VERSION} — nouveau projet : {project_name} [profil : {profile}]\n")
 
     node_warnings = []
     agent_files: list[str] = []
     try:
         _materialize_skeleton(dest)
-        _configure_env_files(dest, project_name, db_name)
+        _configure_env_files(dest, project_name)
         _setup_python_environment(dest)
         node_warnings = _setup_node_environment(dest)
         _generate_certificates(dest)

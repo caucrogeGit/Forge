@@ -21,7 +21,7 @@ import forge
 def _run_cmd_new_real_materialize(monkeypatch, tmp_path, name="MonProjet"):
     """Lance cmd_new avec _materialize_skeleton RÉEL et le reste neutralisé."""
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
-    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, n, db: None)
+    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, n: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
     monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)

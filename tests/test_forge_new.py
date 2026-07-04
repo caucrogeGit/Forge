@@ -34,7 +34,7 @@ def _patch_cmd_new(monkeypatch, tmp_path):
 
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
     monkeypatch.setattr(forge, "_materialize_skeleton", lambda dest: os.makedirs(dest, exist_ok=True))
-    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
+    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
     monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)
@@ -136,7 +136,7 @@ def test_echec_commit_git_final_conserve_le_projet(monkeypatch, tmp_path, capsys
 
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
     monkeypatch.setattr(forge, "_materialize_skeleton", create_dest)
-    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
+    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
     monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)
@@ -181,7 +181,7 @@ def test_openssl_echec_nettoie_dossier(monkeypatch, tmp_path):
 
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
     monkeypatch.setattr(forge, "_materialize_skeleton", create_dest)
-    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
+    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
     monkeypatch.setattr(forge, "_generate_certificates", fail_certificates)
@@ -239,7 +239,7 @@ def test_cmd_new_materialise_sans_cloner(monkeypatch, tmp_path):
 
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
     monkeypatch.setattr(forge, "_materialize_skeleton", spy_materialize)
-    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name, db: None)
+    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
     monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)
@@ -303,30 +303,18 @@ def test_openssl_ignoree_si_certs_existent(monkeypatch, tmp_path):
     )
 
 
-# ── env/dev complet et DB_APP_LOGIN projet-spécifique (V1.4.2) ───────────────
+# ── env/dev et env/prod dérivés d'env/example (ADR-060) ──────────────────────
+#
+# ADR-060 : le squelette est livré sans backend BDD ; la configuration de
+# connexion appartient au backend installé. forge new ne renseigne donc plus
+# aucune variable DB_*, il ne substitue que le nom applicatif (APP_NAME).
 
 _EXAMPLE_CONTENT = """\
 # Application
 APP_NAME=Forge
 APP_ROUTES_MODULE=mvc.routes
 
-# Administration MariaDB globale
-DB_ADMIN_HOST=localhost
-DB_ADMIN_PORT=3306
-DB_ADMIN_LOGIN=root
-DB_ADMIN_PWD=
-
-# Base projet
-DB_NAME=forge_db
-DB_CHARSET=utf8mb4
-DB_COLLATION=utf8mb4_unicode_ci
-
-# Utilisateur applicatif du projet
-DB_APP_HOST=localhost
-DB_APP_PORT=3306
-DB_APP_LOGIN=forge
-DB_APP_PWD=
-DB_POOL_SIZE=5
+# Base de données : installez un backend et renseignez ses variables ici.
 
 # Serveur
 APP_HOST=127.0.0.1
@@ -345,108 +333,65 @@ def _make_env_dir(tmp_path):
     return env_dir
 
 
-def test_env_dev_contient_db_app_login_projet(tmp_path):
-    _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
-    dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
-    # ADR-034 : sans suffixe _app (fin de ligne exacte pour exclure ..._app)
-    assert "DB_APP_LOGIN=test_forge_new\n" in dev
-
-
-def test_env_dev_ne_contient_pas_root_comme_app_login(tmp_path):
-    _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
-    dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
-    assert "DB_APP_LOGIN=root" not in dev
+def _lignes_de_dependance(contenu):
+    """Lignes de variables (hors commentaires et vides) d'un fichier d'env."""
+    return [
+        ligne.strip()
+        for ligne in contenu.splitlines()
+        if ligne.strip() and not ligne.lstrip().startswith("#")
+    ]
 
 
 def test_env_prod_est_cree(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew")
     assert (tmp_path / "env" / "prod").is_file()
-
-
-def test_env_prod_contient_db_app_login_projet(tmp_path):
-    _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
-    prod = (tmp_path / "env" / "prod").read_text(encoding="utf-8")
-    assert "DB_APP_LOGIN=test_forge_new\n" in prod
 
 
 def test_env_prod_desactive_ssl(tmp_path):
     # Prod derrière Nginx : Forge écoute en HTTP local, TLS terminé par le proxy.
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew")
     prod = (tmp_path / "env" / "prod").read_text(encoding="utf-8")
     assert "APP_SSL_ENABLED=false" in prod
 
 
-def test_env_dev_contient_db_admin_login(tmp_path):
-    _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
-    dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
-    assert "DB_ADMIN_LOGIN=" in dev
-
-
-def test_env_dev_contient_db_app_host(tmp_path):
-    _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
-    dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
-    assert "DB_APP_HOST=" in dev
-
-
-def test_env_dev_contient_db_app_port(tmp_path):
-    _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
-    dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
-    assert "DB_APP_PORT=" in dev
-
-
 def test_env_dev_contient_ssl_certfile(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "SSL_CERTFILE=" in dev
 
 
 def test_env_dev_contient_ssl_keyfile(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "SSL_KEYFILE=" in dev
 
 
 def test_env_dev_app_name_correct(tmp_path):
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
+    forge._configure_env_files(str(tmp_path), "TestForgeNew")
     dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
     assert "APP_NAME=TestForgeNew" in dev
 
 
-def test_env_dev_db_name_correct(tmp_path):
+def test_env_ne_contient_aucune_config_bdd(tmp_path):
+    # ADR-060 : forge new n'injecte plus de configuration BDD ; les variables
+    # DB_* appartiennent au backend installé, pas au squelette.
     _make_env_dir(tmp_path)
-    forge._configure_env_files(str(tmp_path), "TestForgeNew", "test_forge_new")
-    dev = (tmp_path / "env" / "dev").read_text(encoding="utf-8")
-    assert "DB_NAME=test_forge_new\n" in dev  # ADR-034 : sans suffixe _db
+    forge._configure_env_files(str(tmp_path), "TestForgeNew")
+    for fichier in ("example", "dev", "prod"):
+        contenu = (tmp_path / "env" / fichier).read_text(encoding="utf-8")
+        lignes = _lignes_de_dependance(contenu)
+        for prefixe in ("DB_ADMIN_", "DB_APP_", "DB_NAME", "DB_CHARSET"):
+            assert not any(ligne.startswith(prefixe) for ligne in lignes), (
+                f"env/{fichier} ne doit déclarer aucune config BDD ({prefixe})."
+            )
 
 
-# ── Convention de normalisation du nom de projet (sans « _ » ajouté) ─────────
-
-@pytest.mark.parametrize(
-    "project_name, expected",
-    [
-        ("ReferenCiel", "referenciel"),  # casse fusionnée, aucun « _ » inséré
-        ("MonProjet", "monprojet"),
-        ("mon_projet", "mon_projet"),    # « _ » réellement saisi conservé
-        ("Mon-Projet", "monprojet"),     # séparateur retiré, pas remplacé par « _ »
-        ("Projet2024", "projet2024"),
-    ],
-)
-def test_normalize_identifier_minuscules_sans_underscore_ajoute(project_name, expected):
-    assert forge._normalize_identifier(project_name) == expected
-
-
-# ── env/example ET env/dev respectent la convention (retour terrain) ─────────
+# ── env/example réel : APP_NAME substitué, aucune config BDD (ADR-060) ───────
 
 def _materialize_real_example(tmp_path):
     """Copie le vrai gabarit env/example du squelette dans tmp_path/env."""
@@ -459,36 +404,26 @@ def _materialize_real_example(tmp_path):
     return env_dir
 
 
-def test_env_example_identifiants_projet_specifiques(tmp_path):
+def test_env_example_reel_app_name_projet_specifique(tmp_path):
     _materialize_real_example(tmp_path)
-    forge._configure_env_files(str(tmp_path), "ReferenCiel", "referenciel")
-    example = (tmp_path / "env" / "example").read_text(encoding="utf-8")
-    assert "APP_NAME=ReferenCiel\n" in example  # libellé : casse d'origine
-    assert "DB_NAME=referenciel\n" in example
-    assert "DB_APP_LOGIN=referenciel\n" in example  # nu, sans suffixe _app
-
-
-def test_env_example_db_admin_login_suffixe(tmp_path):
-    _materialize_real_example(tmp_path)
-    forge._configure_env_files(str(tmp_path), "ReferenCiel", "referenciel")
-    example = (tmp_path / "env" / "example").read_text(encoding="utf-8")
-    # ADR-033 : compte de provisioning distinct du compte applicatif.
-    assert "DB_ADMIN_LOGIN=referenciel_admin\n" in example
-    # Le commentaire d'aide référence le compte admin réel.
-    assert "créez le compte referenciel_admin" in example
-
-
-def test_env_dev_aucun_underscore_insere_a_la_frontiere_de_casse(tmp_path):
-    """Cœur du retour terrain : « ReferenCiel » → « referenciel », jamais
-    « referen_ciel », dans env/example comme dans env/dev."""
-    _materialize_real_example(tmp_path)
-    db_name = forge._normalize_identifier("ReferenCiel")
-    forge._configure_env_files(str(tmp_path), "ReferenCiel", db_name)
+    forge._configure_env_files(str(tmp_path), "ReferenCiel")
     for fichier in ("example", "dev"):
         contenu = (tmp_path / "env" / fichier).read_text(encoding="utf-8")
-        assert "DB_NAME=referenciel\n" in contenu
-        assert "DB_APP_LOGIN=referenciel\n" in contenu
-        assert "referen_ciel" not in contenu
+        assert "APP_NAME=ReferenCiel\n" in contenu  # libellé : casse d'origine
+
+
+def test_env_example_reel_sans_config_bdd(tmp_path):
+    # ADR-060 : le vrai gabarit ne porte plus de bloc de connexion BDD ;
+    # forge new ne l'injecte pas davantage.
+    _materialize_real_example(tmp_path)
+    forge._configure_env_files(str(tmp_path), "ReferenCiel")
+    for fichier in ("example", "dev", "prod"):
+        contenu = (tmp_path / "env" / fichier).read_text(encoding="utf-8")
+        lignes = _lignes_de_dependance(contenu)
+        for prefixe in ("DB_ADMIN_", "DB_APP_", "DB_NAME", "DB_CHARSET"):
+            assert not any(ligne.startswith(prefixe) for ligne in lignes), (
+                f"env/{fichier} ne doit déclarer aucune config BDD ({prefixe})."
+            )
 
 
 # ── Message final — mention env/dev (V1.4.2) ─────────────────────────────────

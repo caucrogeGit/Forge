@@ -2,39 +2,15 @@
 APP_NAME=Forge
 APP_ROUTES_MODULE=mvc.routes
 
-# Administration MariaDB du projet.
-# Politique Forge (ENV-PROD-DB-ADMIN-SECRETS-POLICY-001) :
-#   - DB_ADMIN_* est réservé aux commandes CLI de provisioning,
-#     comme forge db:init. Le runtime applicatif n'utilise que DB_APP_*.
-#   - En production, ne jamais stocker un mot de passe admin réel dans
-#     env/prod. Utiliser env/db-admin.local ou des variables
-#     d'environnement du shell de provisioning.
-#   - En développement local, créez le compte forge_admin avant
-#     forge db:init. Sur Debian, le compte root MariaDB utilise souvent
-#     l'authentification unix_socket et échoue en connexion TCP.
-DB_ADMIN_HOST=localhost
-DB_ADMIN_PORT=3306
-DB_ADMIN_LOGIN=forge_admin
-DB_ADMIN_PWD=
-
-# Base projet.
-# Convention Forge (ADR-034) : forge new fixe DB_NAME au nom du projet,
-# normalisé en minuscules, sans séparateur ajouté ni suffixe _db
-# (« ReferenCiel » donne « referenciel »).
-# Hors forge new, mettez ici le nom de votre base.
-DB_NAME=forge_db
-DB_CHARSET=utf8mb4
-DB_COLLATION=utf8mb4_unicode_ci
-
-# Utilisateur applicatif du projet.
-# Convention Forge (ADR-034) : forge new fixe DB_APP_LOGIN au nom du projet,
-# normalisé en minuscules (identique à DB_NAME) et sans suffixe _app.
-# Le compte de provisioning DB_ADMIN_LOGIN reste distinct (suffixe _admin).
-DB_APP_HOST=localhost
-DB_APP_PORT=3306
-DB_APP_LOGIN=forge_app
-DB_APP_PWD=
-DB_POOL_SIZE=5
+# Base de données.
+# Le cœur est agnostique BDD (ADR-054) et le squelette est livré SANS backend
+# (ADR-060). Choisissez un backend, installez-le, puis renseignez ici ses
+# variables de connexion selon sa documentation. Exemples :
+#   - forge-mvc-sqlite  : un chemin de fichier, sans serveur ni comptes ;
+#   - forge-mvc-mariadb : hôte, port, comptes d'administration (DB_ADMIN_*)
+#     et applicatif (DB_APP_*), base, jeu de caractères (voir sa doc).
+# forge new ne pré-remplit aucune de ces variables : elles appartiennent au
+# backend, pas au squelette.
 
 # Upload
 # Le noyau ne garde que le plafond de corps multipart (ADR-032).

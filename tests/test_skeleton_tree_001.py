@@ -236,6 +236,21 @@ def test_requirements_ne_pin_aucun_backend_bdd():
         )
 
 
+def test_env_example_sans_config_bdd():
+    # ADR-060 : le gabarit env/example ne porte plus de bloc de connexion BDD.
+    # Ces variables appartiennent au backend installé, pas au squelette.
+    content = (SKELETON / "env" / "example").read_text(encoding="utf-8")
+    lignes = [
+        ligne.strip()
+        for ligne in content.splitlines()
+        if ligne.strip() and not ligne.lstrip().startswith("#")
+    ]
+    for prefixe in ("DB_ADMIN_", "DB_APP_", "DB_NAME", "DB_CHARSET", "DB_COLLATION", "DB_POOL_SIZE"):
+        assert not any(ligne.startswith(prefixe) for ligne in lignes), (
+            f"env/example ne doit plus déclarer {prefixe} (ADR-060)."
+        )
+
+
 # ADR-044 : l'application racine de dogfooding a été retirée (relocalisée en
 # fixture de test). L'anti-dérive app.py/config.py « racine vs squelette »
 # d'ADR-024 n'a plus d'objet : le squelette est l'unique source.

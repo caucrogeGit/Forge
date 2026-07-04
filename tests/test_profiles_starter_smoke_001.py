@@ -28,7 +28,7 @@ from cli.project.project_profiles import SUPPORTED_PROJECT_PROFILES
 def _neutralize_heavy_io(monkeypatch: pytest.MonkeyPatch) -> None:
     """Neutralise les I/O lourdes de cmd_new (comme test_new_core_dep_001)."""
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
-    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, n, db: None)
+    monkeypatch.setattr(forge, "_configure_env_files", lambda dest, n: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
     monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)
