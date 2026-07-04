@@ -270,7 +270,9 @@ def test_description_valide_acceptee():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("value", ALLOWED_PROVIDES)
+# sorted() : ALLOWED_PROVIDES est un set ; un ordre stable est requis pour une
+# collecte déterministe sous pytest-xdist (workers parallèles).
+@pytest.mark.parametrize("value", sorted(ALLOWED_PROVIDES))
 def test_provides_valeur_connue_acceptee(value):
     data = _valid_data(provides=[value])
     if value == "routes":

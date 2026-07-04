@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 
 from cli.optins import enable, list as optin_list
 from cli.optins.registry_format import REGISTRY_TEMPLATE

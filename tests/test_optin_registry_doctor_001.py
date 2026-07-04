@@ -8,7 +8,6 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-import pytest
 
 from cli.optins.registry_format import REGISTRY_TEMPLATE, add_optin_entry, set_backend
 from cli.project.doctor import check_optin_registry
