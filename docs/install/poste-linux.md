@@ -11,7 +11,13 @@ Pour les autres distributions, le principe reste le même, seuls les noms de paq
 
 ## Objectif
 
-Aller d'un poste Linux propre à un projet Forge qui démarre en développement avec MariaDB.
+Aller d'un poste Linux propre à un projet Forge qui démarre en développement avec le backend MariaDB.
+
+!!! note "Forge est agnostique en base de données"
+    Le cœur de Forge ne dépend d'aucun SGBD (ADR-054).
+    La base est fournie par un **backend opt-in** que vous choisissez et installez : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres` ou `forge-mvc-mssql`.
+    Ce guide utilise **MariaDB**, un serveur robuste et courant.
+    Pour un démarrage sans aucun serveur à installer, le backend `forge-mvc-sqlite` (une base dans un simple fichier) est une alternative plus légère : installez `forge-mvc-sqlite` au lieu de `forge-mvc-mariadb` et sautez toutes les étapes propres à MariaDB.
 
 À la fin de ce parcours, vous disposez :
 
@@ -20,6 +26,7 @@ Aller d'un poste Linux propre à un projet Forge qui démarre en développement 
 * de Git configuré sur le poste ;
 * de MariaDB installé et démarré ;
 * d'un nouveau projet Forge créé ;
+* du backend `forge-mvc-mariadb` installé dans le projet ;
 * d'un dépôt Git local versionné et poussé sur GitHub ;
 * d'`env/dev` configuré et cohérent avec MariaDB ;
 * de la base initialisée et des migrations appliquées ;
@@ -46,7 +53,7 @@ Si Forge, Git, `pipx` et MariaDB sont déjà installés sur votre poste, vous po
 | Partie | Domaine | À refaire ? |
 |---|---|---|
 | Préparer le poste Linux | système, `pipx`, Forge, Git global, MariaDB Server | une fois par machine |
-| Créer et configurer un projet Forge | `forge new`, `env/dev`, Git local, GitHub, base MariaDB, migrations, `forge run` | à chaque nouveau projet |
+| Créer et configurer un projet Forge | `forge new`, backend `forge-mvc-mariadb`, `env/dev`, Git local, GitHub, base MariaDB, migrations, `forge run` | à chaque nouveau projet |
 
 Les pages [Préparer MariaDB](mariadb.md) et [Comptes MariaDB d'un projet](mariadb-comptes.md) restent des références pour approfondir ou dépanner.
 Vous n'avez pas besoin d'y aller pour terminer une installation standard.
@@ -96,8 +103,12 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
 ??? info "2. Installer les paquets nécessaires"
     **Objectif :** Installer les outils système nécessaires à Python, Git, pipx et au connecteur MariaDB.
 
+    !!! note "Paquets propres au backend MariaDB"
+        `libmariadb-dev`, `pkg-config`, `build-essential` et `python3-dev` ne servent qu'à compiler le connecteur Python du backend **MariaDB**.
+        Si vous utilisez le backend `forge-mvc-sqlite`, aucun de ces paquets n'est nécessaire : SQLite est fourni par la bibliothèque standard de Python.
+
     !!! warning "Attention"
-        Le paquet `libmariadb-dev` est important : sans lui, l'installation du connecteur Python `mariadb` peut échouer.
+        Pour le backend MariaDB, le paquet `libmariadb-dev` est important : sans lui, l'installation du connecteur Python `mariadb` peut échouer.
 
     ```bash
     sudo apt install -y \
@@ -295,8 +306,8 @@ Cette partie se refait pour chaque nouveau projet Forge.
 
 Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` et MariaDB sont installés.
 
-??? info "1. Créer un nouveau projet Forge"
-    **Objectif :** Créer un nouveau projet Forge et entrer dans son environnement Python.
+??? info "1. Créer un nouveau projet Forge et installer son backend BDD"
+    **Objectif :** Créer un nouveau projet Forge, entrer dans son environnement Python et y installer le backend base de données.
 
     Choisissez un nom de projet.
     Remplacez `NOM_PROJET` par votre nom réel, par exemple `boutique`, `blog`, `welcome-forge` ou `gestion-stock`.
@@ -307,6 +318,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     ```
 
     `forge new` prépare un projet complet : squelette, environnement Python, certificat de développement, puis un dépôt Git avec un commit initial.
+    Le projet créé est **agnostique en base de données** : il ne contient aucun backend tant que vous n'en installez pas un.
 
     Activez l'environnement Python du projet :
 
@@ -314,16 +326,24 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     source .venv/bin/activate
     ```
 
+    Installez ensuite le backend base de données dans l'environnement du projet.
+    Ce guide utilise MariaDB :
+
+    ```bash
+    pip install --pre forge-mvc-mariadb
+    ```
+
+    !!! note "Autre backend"
+        Pour une base sans serveur, installez `forge-mvc-sqlite` à la place, et sautez les étapes propres à MariaDB (installation du serveur, création de la base et des comptes).
+        Les backends `forge-mvc-postgres` et `forge-mvc-mssql` existent aussi ; consultez la documentation du backend choisi pour ses variables d'environnement.
+
     ---
 
     !!! success "Validation attendue"
-        Le dossier du projet existe, l'environnement `.venv` est activable et le terminal se trouve dans le projet.
+        Le dossier du projet existe, l'environnement `.venv` est activable, le terminal se trouve dans le projet et `pip show forge-mvc-mariadb` affiche le backend installé.
 
 ??? info "2. Lire le fichier env/dev généré"
-    **Objectif :** Lire les valeurs réelles générées dans `env/dev` avant toute création de base ou de compte MariaDB.
-
-    !!! warning "Attention"
-        Ne recopiez pas les valeurs d'un ancien projet. Chaque projet Forge peut avoir ses propres noms de base et de comptes.
+    **Objectif :** Lire le fichier `env/dev` généré et comprendre qu'il ne contient pas encore de configuration base de données.
 
     `forge new` a généré le fichier de configuration de développement :
 
@@ -331,18 +351,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     env/dev
     ```
 
-    Ce fichier contient les valeurs réelles de votre projet.
-
-    Ne déduisez pas les noms MariaDB à partir d'un exemple.
-    Lisez directement les valeurs générées dans `env/dev`, en particulier :
-
-    * `DB_NAME` ;
-    * `DB_APP_LOGIN` ;
-    * `DB_ADMIN_LOGIN`.
-
-    Ces valeurs dépendent du projet créé par `forge new` et doivent être reprises exactement dans les commandes MariaDB.
-
-    `APP_NAME` indique le nom applicatif du projet.
+    Comme le squelette est agnostique en base de données (ADR-060), `env/dev` ne contient **aucune variable `DB_*`** juste après la création.
+    Il porte le nom applicatif, le module de routes, le serveur, l'upload et les certificats.
 
     Exemple générique, juste après la création :
 
@@ -350,39 +360,23 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     APP_NAME=NOM_PROJET
     APP_ROUTES_MODULE=mvc.routes
 
-    DB_ADMIN_HOST=localhost
-    DB_ADMIN_PORT=3306
-    DB_ADMIN_LOGIN=forge_admin
-    DB_ADMIN_PWD=
+    # Base de données : aucune variable ici au départ.
+    # Le backend installé (ici forge-mvc-mariadb) lit sa configuration dans
+    # l'environnement. Vous ajoutez le bloc DB_* à l'étape « Compléter env/dev ».
 
-    DB_NAME=NOM_BASE
-    DB_CHARSET=utf8mb4
-    DB_COLLATION=utf8mb4_unicode_ci
+    UPLOAD_MAX_SIZE=5242880
 
-    DB_APP_HOST=localhost
-    DB_APP_PORT=3306
-    DB_APP_LOGIN=NOM_UTILISATEUR_APP
-    DB_APP_PWD=
-    DB_POOL_SIZE=5
+    APP_HOST=127.0.0.1
+    APP_PORT=8000
     ```
 
-    Points importants :
-
-    * `DB_ADMIN_LOGIN` est le compte d'administration utilisé par les commandes CLI de provisioning.
-    * `DB_ADMIN_PWD` est vide au départ et doit être complété.
-    * `DB_NAME` dépend du projet généré.
-    * `DB_APP_LOGIN` peut reprendre le nom du projet, mais la valeur exacte à utiliser est celle présente dans `env/dev`.
-    * `DB_APP_PWD` est vide au départ et doit être complété.
-    * Les comptes MariaDB créés plus loin doivent correspondre exactement à ce fichier.
-
-    ```text
-    Ne copiez pas un nom de projet d'exemple sans vérifier votre propre env/dev.
-    ```
+    C'est vous qui ajoutez ensuite les variables de connexion attendues par le backend MariaDB (`DB_ADMIN_*`, `DB_APP_*`, `DB_NAME`).
+    Vous choisissez donc librement le nom de la base et des comptes ; retenez ces valeurs, elles devront être identiques dans `env/dev` et dans les commandes MariaDB.
 
     ---
 
     !!! success "Validation attendue"
-        Les valeurs `DB_NAME`, `DB_APP_LOGIN` et `DB_ADMIN_LOGIN` sont identifiées dans votre propre `env/dev`.
+        `env/dev` existe et contient au moins `APP_NAME` et `APP_ROUTES_MODULE`, sans bloc `DB_*`.
 
 ??? info "3. Vérifier le dépôt Git local du projet"
     **Objectif :** Vérifier que le projet possède un dépôt Git local et un premier commit.
@@ -782,8 +776,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     !!! success "Validation attendue"
         Le dépôt local est relié à GitHub, `origin` pointe vers le bon dépôt et `main` suit `origin/main`.
 
-??? info "5. Compléter env/dev"
-    **Objectif :** Renseigner la configuration MariaDB du projet avant de créer la base et les comptes.
+??? info "5. Ajouter la configuration MariaDB à env/dev"
+    **Objectif :** Ajouter à `env/dev` le bloc de configuration du backend MariaDB, avant de créer la base et les comptes.
 
     !!! warning "Attention"
         `env/dev` contient des secrets de développement. Il ne doit pas être publié tel quel si votre projet le considère comme local.
@@ -791,13 +785,16 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     Cette étape appartient au projet.
     Elle se refait pour chaque nouveau projet Forge, car chaque projet possède sa propre base et son propre compte applicatif.
 
+    Comme le squelette est agnostique en base de données, `env/dev` ne contient pas encore ces variables : c'est le backend MariaDB installé à l'étape 1 qui les lit dans l'environnement.
+    Vous les ajoutez donc ici.
+
     Ouvrez le fichier `env/dev` :
 
     ```bash
     nano env/dev
     ```
 
-    Complétez ou vérifiez les variables MariaDB suivantes :
+    Ajoutez le bloc de variables MariaDB suivant :
 
     ```env
     DB_ADMIN_HOST=localhost
@@ -934,10 +931,20 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
     Cette commande prépare la base du projet et crée la table technique `forge_migrations`, qui mémorise les migrations déjà appliquées.
 
-    Si la commande s'arrête sur :
+    Si la commande s'arrête sur un message du type :
 
     ```text
-    [ERREUR] Connexion MariaDB admin impossible. Vérifiez DB_ADMIN_* dans env/dev.
+    Aucun backend BDD installé. Le cœur de Forge est agnostique BDD (ADR-054) :
+    installez un opt-in de backend, par exemple pip install forge-mvc-mariadb.
+    ```
+
+    C'est que le backend n'a pas été installé dans l'environnement du projet.
+    Reprenez l'étape 1 et lancez `pip install --pre forge-mvc-mariadb` avec le `.venv` du projet activé.
+
+    Si la commande s'arrête plutôt sur :
+
+    ```text
+    Connexion d'administration impossible. Vérifiez DB_ADMIN_* dans env/dev.
     ```
 
     Forge n'a pas pu se connecter avec le compte indiqué dans `DB_ADMIN_LOGIN`.
