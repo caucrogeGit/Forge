@@ -291,6 +291,9 @@ def test_apply_model_sql_serverless_sqlite(tmp_path: Path, monkeypatch):
 
     db_file = tmp_path / "app.db"
     monkeypatch.setenv("DB_BACKEND", "sqlite")
+    # ADR-060 : le backend lit le chemin du fichier dans DB_NAME (env) ; ici
+    # load_project_config est mocké, on pose donc DB_NAME explicitement.
+    monkeypatch.setenv("DB_NAME", str(db_file))
     monkeypatch.setattr(
         "cli.project.project_config.load_project_config",
         lambda: types.SimpleNamespace(APP_NAME="t", DB_NAME=str(db_file)),

@@ -34,13 +34,12 @@ def _forge_config_kwargs() -> dict[str, Any]:
     # absent du dépôt framework). Chargé dynamiquement et typé `Any` : l'analyse
     # statique du framework ne peut pas le résoudre, et ce n'est pas son rôle.
     config: Any = importlib.import_module("config")
+    # ADR-060 : la config de connexion BDD n'est plus poussée dans le cœur ; le
+    # backend installé la lit dans l'environnement (DB_APP_*, DB_NAME, …).
     kwargs = dict(
         app_name=config.APP_NAME, app_env=config.APP_ENV,
         views_dir=config.VIEWS_DIR, sql_dir=config.SQL_DIR,
         upload_max_size=config.UPLOAD_MAX_SIZE,
-        db_host=config.DB_APP_HOST, db_port=config.DB_APP_PORT, db_name=config.DB_NAME,
-        db_user=config.DB_APP_LOGIN, db_password=config.DB_APP_PWD,
-        db_pool_size=config.DB_POOL_SIZE,
         trusted_proxies=config.APP_TRUSTED_PROXIES,
     )
     return kwargs

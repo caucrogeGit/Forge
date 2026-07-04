@@ -23,9 +23,8 @@ def configure_serverless_db() -> Any:
     import core.forge as forge
     from cli.project.project_config import load_project_config
 
+    # load_project_config() charge l'environnement (load_dotenv) : le backend
+    # sans serveur lit ensuite DB_NAME (chemin du fichier) dans os.environ (ADR-060).
     config = load_project_config()
-    forge.configure(
-        app_name=getattr(config, "APP_NAME", "forge"),
-        db_name=config.DB_NAME,
-    )
+    forge.configure(app_name=getattr(config, "APP_NAME", "forge"))
     return config

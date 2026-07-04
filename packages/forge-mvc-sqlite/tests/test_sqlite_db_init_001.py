@@ -23,6 +23,10 @@ def test_db_init_serverless_cree_forge_migrations(
     from cli.entities import db_init
 
     db_path = tmp_path / "app.db"
+    # ADR-060 : le backend lit le chemin du fichier dans DB_NAME (env). En réel,
+    # load_project_config charge l'env (load_dotenv) ; ici il est mocké, on pose
+    # donc DB_NAME explicitement.
+    monkeypatch.setenv("DB_NAME", str(db_path))
     monkeypatch.setattr(
         "cli.project.project_config.load_project_config",
         lambda: types.SimpleNamespace(APP_NAME="demo", DB_NAME=str(db_path)),

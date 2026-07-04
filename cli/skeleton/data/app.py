@@ -84,7 +84,6 @@ from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFI
                     APP_ENV, APP_NAME, APP_ROUTES_MODULE,
                     VIEWS_DIR, SQL_DIR,
                     UPLOAD_MAX_SIZE,
-                    DB_APP_HOST, DB_APP_PORT, DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE,
                     APP_CSP_NONCE_ENABLED, APP_TRUSTED_PROXIES)
 import core.security.csp as _csp
 from core.security.headers import apply_security_headers
@@ -101,12 +100,6 @@ forge.configure(
     views_dir    = VIEWS_DIR,
     sql_dir      = SQL_DIR,
     upload_max_size = UPLOAD_MAX_SIZE,
-    db_host      = DB_APP_HOST,
-    db_port      = DB_APP_PORT,
-    db_name      = DB_NAME,
-    db_user      = DB_APP_LOGIN,
-    db_password  = DB_APP_PWD,
-    db_pool_size = DB_POOL_SIZE,
     trusted_proxies = APP_TRUSTED_PROXIES,
 )
 from core.http.request import Request, RequestEntityTooLarge

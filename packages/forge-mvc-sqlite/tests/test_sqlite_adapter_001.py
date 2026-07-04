@@ -16,20 +16,14 @@ import core.forge as forge  # noqa: E402
 from forge_mvc_sqlite.backend import SQLiteBackend  # noqa: E402
 
 
-def _configure(tmp_path: Path) -> None:
-    forge.configure(
-        app_name="forge_sqlite_test",
-        db_host="",
-        db_port=0,
-        db_user="",
-        db_password="",
-        db_name=str(tmp_path / "app.db"),
-        db_pool_size=1,
-    )
+def _configure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # ADR-060 : le backend SQLite lit le chemin du fichier dans DB_NAME (env).
+    forge.configure(app_name="forge_sqlite_test")
+    monkeypatch.setenv("DB_NAME", str(tmp_path / "app.db"))
 
 
-def test_adapter_roundtrip_dict_et_lastrowid(tmp_path: Path) -> None:
-    _configure(tmp_path)
+def test_adapter_roundtrip_dict_et_lastrowid(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    _configure(tmp_path, monkeypatch)
     backend = SQLiteBackend()
     connection = backend.get_connection()
     try:
@@ -54,7 +48,7 @@ def test_adapter_roundtrip_dict_et_lastrowid(tmp_path: Path) -> None:
 
 def test_core_db_facade_sur_sqlite(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """La façade core.database.db fonctionne en résolvant le backend SQLite."""
-    _configure(tmp_path)
+    _configure(tmp_path, monkeypatch)
     monkeypatch.setenv("DB_BACKEND", "sqlite")
     from core.database import backend as backend_module
     from core.database import db

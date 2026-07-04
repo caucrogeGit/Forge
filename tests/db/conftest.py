@@ -44,15 +44,14 @@ def real_db():
     from core.database.backend import reset_backend
 
     params = _db_params()
-    forge.configure(
-        app_name="forge_test",
-        db_host=params["host"],
-        db_port=params["port"],
-        db_user=params["user"],
-        db_password=params["password"],
-        db_name=params["name"],
-        db_pool_size=2,
-    )
+    # ADR-060 : le backend lit la config de connexion runtime dans l'environnement.
+    os.environ["DB_APP_HOST"] = str(params["host"])
+    os.environ["DB_APP_PORT"] = str(params["port"])
+    os.environ["DB_APP_LOGIN"] = str(params["user"])
+    os.environ["DB_APP_PWD"] = str(params["password"])
+    os.environ["DB_NAME"] = str(params["name"])
+    os.environ["DB_POOL_SIZE"] = "2"
+    forge.configure(app_name="forge_test")
 
     try:
         probe = connection.get_connection()  # crée le pool nommé une fois

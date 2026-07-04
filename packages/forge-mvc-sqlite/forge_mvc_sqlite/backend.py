@@ -16,10 +16,9 @@ Une connexion neuve est ouverte à chaque emprunt (SQLite est léger ; pas de
 pool). Les requêtes générées par Forge utilisent déjà des paramètres ``?``,
 nativement supportés par SQLite.
 """
+import os
 import sqlite3
 from typing import Any
-
-from core.forge import get as _cfg
 
 from forge_mvc_sqlite.dialect import SQLiteDialect
 
@@ -100,8 +99,11 @@ class SQLiteBackend:
     requires_provisioning = False
 
     def get_connection(self) -> Any:
-        """Ouvre une connexion SQLite sur le fichier configuré (`DB_NAME`)."""
-        database = str(_cfg("db_name"))
+        """Ouvre une connexion SQLite sur le fichier configuré (`DB_NAME`).
+
+        ADR-060 : le chemin du fichier est lu dans l'environnement (DB_NAME).
+        """
+        database = os.environ.get("DB_NAME", "")
         raw = sqlite3.connect(database, check_same_thread=False)
         return _SQLiteConnection(raw)
 

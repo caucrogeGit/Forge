@@ -24,8 +24,6 @@ import logging
 import os
 from typing import Any
 
-from core.forge import get as _cfg
-
 from forge_mvc_postgres.dialect import PostgreSQLDialect
 from forge_mvc_postgres.translate import translate_placeholders
 
@@ -107,10 +105,16 @@ class PostgreSQLBackend:
         import psycopg
 
         pg: Any = psycopg
+        # ADR-060 : config de connexion runtime lue dans l'environnement.
+        host = os.environ.get("DB_APP_HOST", "localhost")
+        port = int(os.environ.get("DB_APP_PORT", "5432"))
+        dbname = os.environ.get("DB_NAME", "")
+        user = os.environ.get("DB_APP_LOGIN", "")
+        password = os.environ.get("DB_APP_PWD", "")
         conninfo = (
-            f"host={_cfg('db_host')} port={_cfg('db_port')} "
-            f"dbname={_cfg('db_name')} user={_cfg('db_user')} "
-            f"password={_cfg('db_password')}"
+            f"host={host} port={port} "
+            f"dbname={dbname} user={user} "
+            f"password={password}"
         )
         raw: Any = pg.connect(conninfo)
         return _PgConnection(raw)

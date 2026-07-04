@@ -22,7 +22,6 @@ import argparse
 import getpass
 from dataclasses import dataclass
 import importlib
-import os
 import sys
 from pathlib import Path
 from collections.abc import Callable
@@ -300,23 +299,15 @@ def _import_has_attr(module_name: str, attr_name: str) -> bool:
 
 
 def _load_env_and_configure_forge(root: Path) -> None:
+    # ADR-060 : load_project_config charge l'environnement (load_dotenv) ; le
+    # backend BDD lit ensuite lui-même DB_APP_*/DB_NAME dans os.environ. Le cœur
+    # ne porte plus de config de connexion à pousser ici.
     from cli.project.project_config import ProjectConfigError, load_project_config
 
     try:
         load_project_config(root)
     except ProjectConfigError as exc:
         raise AuthAdminCliError(str(exc)) from exc
-
-    import core.forge as forge
-
-    forge.configure(
-        db_host=os.getenv("DB_APP_HOST", os.getenv("DB_HOST", "localhost")),
-        db_port=int(os.getenv("DB_APP_PORT") or os.getenv("DB_PORT") or "3306"),
-        db_name=os.getenv("DB_NAME", "forge_db"),
-        db_user=os.getenv("DB_APP_LOGIN", os.getenv("DB_USER_LOGIN", "forge")),
-        db_password=os.getenv("DB_APP_PWD", os.getenv("DB_USER_PWD", "")),
-        db_pool_size=int(os.getenv("DB_POOL_SIZE") or "5"),
-    )
 
 
 def _friendly_db_error(error: Exception) -> AuthAdminCliError:

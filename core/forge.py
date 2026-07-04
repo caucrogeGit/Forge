@@ -40,13 +40,9 @@ _cfg: dict[str, Any] = {
     # Mail : aucun slot ici. Le mail est un opt-in (forge-mvc-mail, ADR-022)
     # qui lit sa configuration directement depuis l'environnement (ADR-031).
     # Le noyau ne connaît pas le mail.
-    # Base de données
-    "db_host":     "localhost",
-    "db_port":     3306,
-    "db_name":     "forge_db",
-    "db_user":     "root",
-    "db_password": "",
-    "db_pool_size": 5,
+    # Base de données : aucun slot ici. Le cœur est agnostique BDD (ADR-054) ;
+    # la configuration de connexion appartient au backend installé, qui la lit
+    # dans l'environnement (DB_APP_*, DB_NAME, DB_POOL_SIZE ; ADR-060).
     # Classes CSS utilisées par les helpers du framework (pagination…)
     # Modifiables via forge.configure(css_visible="visible", css_hidden="invisible")
     "css_visible": "block",

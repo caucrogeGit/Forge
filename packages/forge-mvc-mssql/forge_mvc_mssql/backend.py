@@ -28,8 +28,6 @@ import logging
 import os
 from typing import Any
 
-from core.forge import get as _cfg
-
 from forge_mvc_mssql.dialect import MSSQLDialect
 
 logger = logging.getLogger(__name__)
@@ -127,11 +125,17 @@ class MSSQLBackend:
 
         odbc: Any = pyodbc
         driver = os.environ.get("DB_ODBC_DRIVER", _DEFAULT_ODBC_DRIVER)
+        # ADR-060 : config de connexion runtime lue dans l'environnement.
+        host = os.environ.get("DB_APP_HOST", "localhost")
+        port = int(os.environ.get("DB_APP_PORT", "1433"))
+        dbname = os.environ.get("DB_NAME", "")
+        user = os.environ.get("DB_APP_LOGIN", "")
+        password = os.environ.get("DB_APP_PWD", "")
         conn_str = (
             f"DRIVER={{{driver}}};"
-            f"SERVER={_cfg('db_host')},{_cfg('db_port')};"
-            f"DATABASE={_cfg('db_name')};"
-            f"UID={_cfg('db_user')};PWD={_cfg('db_password')};"
+            f"SERVER={host},{port};"
+            f"DATABASE={dbname};"
+            f"UID={user};PWD={password};"
             f"TrustServerCertificate=yes"
         )
         raw: Any = odbc.connect(conn_str)

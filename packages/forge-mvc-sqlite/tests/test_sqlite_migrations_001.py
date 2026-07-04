@@ -17,6 +17,8 @@ pytest.importorskip("forge_mvc_sqlite")
 
 def _use_sqlite(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("DB_BACKEND", "sqlite")
+    # ADR-060 : le backend lit le chemin du fichier dans DB_NAME (env).
+    monkeypatch.setenv("DB_NAME", str(tmp_path / "app.db"))
     monkeypatch.setattr(
         "cli.project.project_config.load_project_config",
         lambda: types.SimpleNamespace(APP_NAME="t", DB_NAME=str(tmp_path / "app.db")),

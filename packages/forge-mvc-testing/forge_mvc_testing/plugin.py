@@ -23,17 +23,14 @@ def configure_forge_kernel(tmp_path_factory):
     """Configure le noyau Forge pour tous les tests — vues et SQL dans tmp_path."""
     views_dir = tmp_path_factory.mktemp("views")
     sql_dir = tmp_path_factory.mktemp("sql")
+    # ADR-060 : le cœur ne porte plus de config de connexion BDD ; un backend la
+    # lit dans l'environnement. Les tests qui touchent la base posent eux-mêmes
+    # les variables DB_* (voir test_sqlite_adapter_001).
     forge.configure(
         app_name="TestForge",
         app_env="dev",
         views_dir=str(views_dir),
         sql_dir=str(sql_dir),
-        db_host="localhost",
-        db_port=3306,
-        db_name="test_db",
-        db_user="root",
-        db_password="",
-        db_pool_size=1,
     )
     # ADR-032 : UPLOAD_ROOT est lu depuis l'environnement par forge-mvc-files.
     # Filet de sécurité : un défaut pointant vers un tmp, pour qu'aucun test ne

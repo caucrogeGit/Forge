@@ -42,17 +42,21 @@ class MariaDBBackend:
                 if self._pool is None:
                     import mariadb
                     _mariadb: Any = mariadb
+                    # ADR-060 : la config de connexion runtime est lue dans
+                    # l'environnement (DB_APP_*, DB_NAME, DB_POOL_SIZE).
+                    db_name = os.environ.get("DB_NAME", "")
+                    pool_size = int(os.environ.get("DB_POOL_SIZE", "5"))
                     self._pool = _mariadb.ConnectionPool(
-                        host      = _cfg("db_host"),
-                        port      = _cfg("db_port"),
-                        user      = _cfg("db_user"),
-                        password  = _cfg("db_password"),
-                        database  = _cfg("db_name"),
-                        pool_name = _cfg("app_name").lower(),
-                        pool_size = _cfg("db_pool_size"),
+                        host      = os.environ.get("DB_APP_HOST", "localhost"),
+                        port      = int(os.environ.get("DB_APP_PORT", "3306")),
+                        user      = os.environ.get("DB_APP_LOGIN", ""),
+                        password  = os.environ.get("DB_APP_PWD", ""),
+                        database  = db_name,
+                        pool_name = str(_cfg("app_name")).lower(),
+                        pool_size = pool_size,
                     )
                     logger.debug("Pool MariaDB initialisé (%s, taille=%s)",
-                                 _cfg("db_name"), _cfg("db_pool_size"))
+                                 db_name, pool_size)
         return self._pool
 
     def get_connection(self) -> Any:
