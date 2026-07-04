@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% from "components/ui.html" import card, button, badge %}
+{% from "components/ui.html" import card, button %}
 
 {% block title %}Bienvenue · {{ app_name }}{% endblock %}
 
@@ -10,7 +10,6 @@
 <section class="text-center">
     <img src="/static/forge-bandeau-1-512.png" alt="Forge"
          class="mx-auto mb-8 w-72 max-w-full h-auto">
-    <div class="mb-6">{{ badge("Projet Forge") }}</div>
     <h1 class="text-5xl font-extrabold tracking-tight mb-5 leading-tight">
         Votre projet&nbsp;<span class="text-forge">Forge</span> tourne
     </h1>
