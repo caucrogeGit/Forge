@@ -44,6 +44,7 @@ from cli.optins.catalog import (
     OFFICIAL_OPTINS,
     optins_by_category,
 )
+from cli.optins.registry_format import read_backend, read_enabled_optins
 
 __all__ = [
     "STATE_ABSENT",
@@ -143,21 +144,44 @@ _KIND_LABELS = {
 }
 
 
-def _print_kind_optin(name: str, kind: str) -> None:
-    """Ligne d'un opt-in non-routier (bibliothèque / transversal / CLI)."""
+def _read_registry(project_root: Path) -> tuple[dict[str, str], str | None]:
+    """Lit `ENABLED_OPTINS` et `BACKEND` du registre du projet (texte, sans import).
+
+    Registre absent ou illisible : projet sans opt-in inscrit (dict vide, None).
+    """
+    registry_py = project_root / "optins" / "registry.py"
+    if not registry_py.exists():
+        return {}, None
+    try:
+        text = registry_py.read_text(encoding="utf-8", errors="replace")
+        return read_enabled_optins(text), read_backend(text)
+    except (OSError, SyntaxError, ValueError):
+        return {}, None
+
+
+def _print_kind_optin(name: str, kind: str, *, registered: bool) -> None:
+    """Ligne d'un opt-in non-routier (bibliothèque / transversal / CLI).
+
+    ADR-061 : l'état est lu dans `optins/registry.py` (inscrit / absent).
+    """
     label = _KIND_LABELS.get(kind, kind)
-    print(f"  {name:<13} {label}")
+    state = "inscrit" if registered else STATE_ABSENT
+    print(f"  {name:<13} {label:<12} {state}")
+    if not registered:
+        print(f"            conseil   : forge opt-in:enable {name} --apply")
 
 
-def _print_db_backends() -> None:
+def _print_db_backends(active: str | None) -> None:
     """Section dédiée aux backends BDD (famille exclusive, ADR-054/055).
 
-    Lecture seule, aucun import de paquet : on ne lit que le catalogue statique.
+    Lecture seule, aucun import de paquet : catalogue statique + `BACKEND` du
+    registre (ADR-060/061) pour marquer le backend choisi.
     """
     print(CATEGORY_LABELS[CATEGORY_DATABASE])
     print("            un seul backend par projet ; piloté par forge db:*")
     for backend in DB_BACKENDS:
-        print(f"  {backend.name:<13} backend")
+        marker = "  <- choisi (registry)" if backend.name == active else ""
+        print(f"  {backend.name:<13} backend{marker}")
 
 
 def list_optins(*, project_root: Path) -> int:
@@ -166,6 +190,7 @@ def list_optins(*, project_root: Path) -> int:
     Toujours ``0`` (lecture seule). Les opt-ins de kind ``route`` reçoivent en
     plus leur état projet (couche ``optins/<name>/``).
     """
+    enabled, backend = _read_registry(project_root)
     print("Forge opt-ins")
     print("")
     for category, opts in optins_by_category().items():
@@ -174,9 +199,9 @@ def list_optins(*, project_root: Path) -> int:
             if opt.kind == KIND_ROUTE:
                 _print_route_optin(opt.name, detect_optin_state(project_root, opt.name))
             else:
-                _print_kind_optin(opt.name, opt.kind)
+                _print_kind_optin(opt.name, opt.kind, registered=opt.name in enabled)
         print("")
-    _print_db_backends()
+    _print_db_backends(backend)
     print("")
     print("Aucune modification effectuée.")
     return 0
