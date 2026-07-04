@@ -20,6 +20,7 @@ Ce module est la **source unique** du gabarit :
 from __future__ import annotations
 
 import ast
+import re
 from typing import cast
 
 # Ancres d'insertion (gérées par forge opt-in:enable / disable, forge db:*).
@@ -103,3 +104,32 @@ def read_enabled_optins(text: str) -> dict[str, str]:
                 items = cast("dict[object, object]", value)
                 return {str(k): str(v) for k, v in items.items()}
     return {}
+
+
+# ── Écriture d'une entrée ENABLED_OPTINS (gérée par enable / disable) ─────────
+
+def registry_entry_line(name: str, kind: str) -> str:
+    """Ligne déclarative d'un opt-in dans ENABLED_OPTINS (indentée dans le dict)."""
+    return f'    "{name}": "{kind}",'
+
+
+def add_optin_entry(text: str, name: str, kind: str) -> tuple[str, str]:
+    """Insère l'entrée `name: kind` sous ANCHOR_REGISTRY (idempotent).
+
+    Retourne `(nouveau_texte, statut)`, `statut` ∈ {"inserted", "already",
+    "unrecognized"}. N'insère que la ligne d'entrée, jamais d'autre code.
+    """
+    if name in read_enabled_optins(text):
+        return text, "already"
+    if ANCHOR_REGISTRY not in text:
+        return text, "unrecognized"
+    line = registry_entry_line(name, kind)
+    new = text.replace(ANCHOR_REGISTRY, ANCHOR_REGISTRY + "\n" + line, 1)
+    return new, "inserted"
+
+
+def remove_optin_entry(text: str, name: str) -> str:
+    """Retire l'entrée de `name` de ENABLED_OPTINS (idempotent)."""
+    pattern = re.compile(rf'^\s*"{re.escape(name)}"\s*:\s*".*",?\s*$')
+    kept = [ln for ln in text.splitlines(keepends=True) if not pattern.match(ln)]
+    return "".join(kept)

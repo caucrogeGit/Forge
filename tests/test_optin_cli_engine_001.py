@@ -83,10 +83,15 @@ class TestOptInDisable:
         routes = _setup_enabled_iot(tmp_path)
         rc = disable.disable_optin("iot", apply=True, project_root=tmp_path)
         assert rc == 0
-        assert not (tmp_path / "optins").exists()
+        # ADR-061 : le registre est permanent — seul optins/iot/ et le câblage
+        # iot sont retirés ; optins/registry.py et le hook routes.py restent.
+        assert not (tmp_path / "optins" / "iot").exists()
+        assert (tmp_path / "optins" / "registry.py").exists()
         content = routes.read_text(encoding="utf-8")
-        assert "register_optins" not in content
-        assert "router = Router()" in content  # code utilisateur préservé
+        assert "register_optins(router)" in content  # hook générique conservé
+        assert "router = Router()" in content        # code utilisateur préservé
+        reg = (tmp_path / "optins" / "registry.py").read_text(encoding="utf-8")
+        assert "optins.iot.routes" not in reg        # câblage iot retiré
 
     def test_idempotent_when_absent(self, tmp_path):
         assert disable.disable_optin("iot", apply=True, project_root=tmp_path) == 0

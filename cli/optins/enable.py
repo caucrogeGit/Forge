@@ -31,7 +31,12 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from cli.optins.registry_format import ANCHOR_CALL, ANCHOR_IMPORT, REGISTRY_TEMPLATE
+from cli.optins.registry_format import (
+    ANCHOR_CALL,
+    ANCHOR_IMPORT,
+    REGISTRY_TEMPLATE,
+    add_optin_entry,
+)
 
 __all__ = [
     "STATUS_OK",
@@ -443,36 +448,45 @@ def _register_in_registry(content: str, name: str) -> tuple[str, str]:
     return new, "inserted"
 
 
-def _ensure_registry_registration(project_root: Path, name: str, *, apply: bool) -> bool:
-    """Crée ``optins/registry.py`` (générique) si absent, puis y branche ``name``.
+def _ensure_registry_registration(
+    project_root: Path, name: str, kind: str, *, apply: bool, wire_routes: bool
+) -> bool:
+    """Crée ``optins/registry.py`` (générique) si absent, puis y inscrit ``name``.
 
-    Retourne ``True`` si le branchement est OK (créé / inséré / déjà présent),
-    ``False`` si la registry existe mais n'est **pas reconnue** (ancres absentes,
-    fichier divergent) — l'appelant traite ça comme un conflit bloquant.
+    ADR-061 : tout opt-in est inscrit dans ``ENABLED_OPTINS`` (nom -> kind),
+    quel que soit son kind. Les opt-ins ``route`` reçoivent en plus le câblage
+    (import + appel dans ``register_optins``) quand ``wire_routes`` est vrai.
+
+    Retourne ``True`` si l'inscription est OK (créé / inséré / déjà présent),
+    ``False`` si la registry existe mais n'est **pas reconnue** (ancres absentes).
     """
     registry_path = project_root / REGISTRY_REL
     created = not registry_path.exists()
     base = REGISTRY if created else registry_path.read_text(encoding="utf-8")
-    new_content, status = _register_in_registry(base, name)
 
-    if status == "already":
-        print(f"{STATUS_OK} {REGISTRY_REL} : {name} déjà branché")
-        return True
-    if status == "unrecognized":
+    text, entry_status = add_optin_entry(base, name, kind)
+    wire_status = "already"
+    if wire_routes:
+        text, wire_status = _register_in_registry(text, name)
+
+    statuses = {entry_status, wire_status}
+    if "unrecognized" in statuses:
         print(f"{STATUS_WARN} {REGISTRY_REL} existe mais n'est pas reconnu "
-              f"(ancres absentes) — aucune modification. Ajoute manuellement "
-              f"l'import et l'appel de {name}.")
+              f"(ancres absentes) — aucune modification. Inscris {name} à la main.")
         return False
+    if statuses == {"already"}:
+        print(f"{STATUS_OK} {REGISTRY_REL} : {name} déjà inscrit")
+        return True
 
     if not apply:
         verb = "serait créé + " if created else ""
-        print(f"{STATUS_DRYRUN} {REGISTRY_REL} {verb}{name} branché")
+        print(f"{STATUS_DRYRUN} {REGISTRY_REL} {verb}{name} inscrit")
         return True
 
     registry_path.parent.mkdir(parents=True, exist_ok=True)
-    registry_path.write_text(new_content, encoding="utf-8")
+    registry_path.write_text(text, encoding="utf-8")
     suffix = "créé + " if created else ""
-    print(f"{STATUS_OK} {REGISTRY_REL} {suffix}{name} branché")
+    print(f"{STATUS_OK} {REGISTRY_REL} {suffix}{name} inscrit")
     return True
 
 
@@ -557,9 +571,12 @@ def enable_optin(
         else:
             print(f"{STATUS_DRYRUN} {rel} serait créé")
 
-    # Registre partagé : créer (générique) si absent puis brancher cet opt-in.
-    # Une registry existante non reconnue (divergente) bloque (conflit).
-    if not _ensure_registry_registration(project_root, name, apply=apply):
+    # Registre partagé : créer (générique) si absent puis inscrire cet opt-in
+    # (entrée ENABLED_OPTINS + câblage de route). Une registry existante non
+    # reconnue (divergente) bloque (conflit).
+    if not _ensure_registry_registration(
+        project_root, name, "route", apply=apply, wire_routes=True
+    ):
         conflict = True
 
     print("")
@@ -618,6 +635,12 @@ def main(args: list[str] | None = None) -> int:
     if optin.kind == KIND_ROUTE:
         return enable_optin(name, apply=apply, project_root=Path.cwd())
 
+    # ADR-061 : les opt-ins non-route sont inscrits au registre (documentaire,
+    # sans câblage) puis on affiche le conseil d'utilisation.
+    ok = _ensure_registry_registration(
+        Path.cwd(), name, optin.kind, apply=apply, wire_routes=False
+    )
+    print("")
     from cli.optins.guidance import enable_guidance
     print(enable_guidance(optin))
-    return 0
+    return 0 if ok else 1

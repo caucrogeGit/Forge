@@ -23,39 +23,14 @@ from cli.optins.enable import (
     STATUS_OK,
     STATUS_WARN,
     SUPPORTED_OPTINS,
-    OPTINS_INIT,
-    REGISTRY,
     REGISTRY_REL,
     registry_call_line,
-    registry_has_registrations,
     registry_import_line,
     unregister_from_registry,
 )
+from cli.optins.registry_format import read_enabled_optins, remove_optin_entry
 
 _ROUTES_REL = "mvc/routes.py"
-_ROUTES_IMPORT = "from optins.registry import register_optins"
-_ROUTES_CALL = "register_optins(router)"
-
-
-def _unbranch_routes(routes_path: Path, *, apply: bool) -> None:
-    """Retire l'import et l'appel ``register_optins`` injectés par ``enable``.
-
-    Ne touche **que** ces deux lignes (jamais d'autre code utilisateur).
-    """
-    if not routes_path.exists():
-        return
-    content = routes_path.read_text(encoding="utf-8")
-    if _ROUTES_CALL not in content and _ROUTES_IMPORT not in content:
-        return
-    kept = [
-        line for line in content.splitlines(keepends=True)
-        if line.strip() not in (_ROUTES_IMPORT, _ROUTES_CALL)
-    ]
-    if apply:
-        routes_path.write_text("".join(kept), encoding="utf-8")
-        print(f"{STATUS_OK} {_ROUTES_REL} débranché (import + {_ROUTES_CALL} retirés)")
-    else:
-        print(f"{STATUS_DRYRUN} {_ROUTES_REL} serait débranché")
 
 
 def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
@@ -74,6 +49,7 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
     is_registered = (
         registry_import_line(name) in registry_content
         or registry_call_line(name) in registry_content
+        or name in read_enabled_optins(registry_content)
     )
     present = (
         optin_dir.exists()
@@ -99,52 +75,24 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
         else:
             print(f"{STATUS_DRYRUN} {rel} serait supprimé")
 
-    # 2. Dé-référencer l'opt-in de la registry partagée.
-    new_registry = (
-        unregister_from_registry(registry_content, name) if registry_content else ""
-    )
-    others_remain = registry_has_registrations(new_registry)
-    # Démontage complet seulement si plus aucun opt-in ET registry générique
-    # (un fichier modifié à la main n'est pas démonté agressivement).
-    full_teardown = (
-        registry_content != "" and not others_remain and new_registry == REGISTRY
-    )
-
+    # 2. Retirer l'opt-in du registre partagé : entrée ENABLED_OPTINS + câblage
+    #    de route. Le registre (optins/registry.py, optins/__init__.py) et le
+    #    câblage de mvc/routes.py restent des fichiers permanents du squelette
+    #    (ADR-061) : jamais supprimés, même quand plus aucun opt-in n'est inscrit.
+    new_registry = registry_content
+    if registry_content:
+        new_registry = unregister_from_registry(new_registry, name)
+        new_registry = remove_optin_entry(new_registry, name)
     if registry_content and new_registry != registry_content:
-        if full_teardown:
-            if apply:
-                registry_path.unlink()
-                print(f"{STATUS_OK} {REGISTRY_REL} supprimé (plus d'opt-in branché)")
-            else:
-                print(f"{STATUS_DRYRUN} {REGISTRY_REL} serait supprimé")
+        if apply:
+            registry_path.write_text(new_registry, encoding="utf-8")
+            print(f"{STATUS_OK} {REGISTRY_REL} : {name} retiré")
         else:
-            if apply:
-                registry_path.write_text(new_registry, encoding="utf-8")
-                print(f"{STATUS_OK} {REGISTRY_REL} : {name} débranché")
-            else:
-                print(f"{STATUS_DRYRUN} {name} serait débranché de {REGISTRY_REL}")
+            print(f"{STATUS_DRYRUN} {name} serait retiré de {REGISTRY_REL}")
 
-    # 3. Câblage partagé (optins/__init__.py + mvc/routes.py) : retiré seulement
-    #    en démontage complet ; sinon conservé pour les autres opt-ins.
-    if full_teardown:
-        init_path = project_root / "optins" / "__init__.py"
-        if init_path.exists() and init_path.read_text(encoding="utf-8") == OPTINS_INIT:
-            if apply:
-                init_path.unlink()
-                print(f"{STATUS_OK} optins/__init__.py supprimé")
-            else:
-                print(f"{STATUS_DRYRUN} optins/__init__.py serait supprimé")
-        _unbranch_routes(project_root / _ROUTES_REL, apply=apply)
-    elif others_remain:
-        print(f"{STATUS_INFO} D'autres opt-ins restent branchés — "
-              f"{REGISTRY_REL} et {_ROUTES_REL} conservés.")
-
-    # 4. Répertoires vides.
+    # 3. Répertoire propre à l'opt-in (optins/<name>/), retiré s'il est vide.
     if apply:
-        dirs = [optin_dir / "migrations", optin_dir]
-        if full_teardown:
-            dirs.append(project_root / "optins")
-        for d in dirs:
+        for d in (optin_dir / "migrations", optin_dir):
             if d.is_dir() and not any(d.iterdir()):
                 d.rmdir()
                 print(f"{STATUS_OK} {d.relative_to(project_root)}/ retiré (vide)")
@@ -187,6 +135,27 @@ def main(args: list[str] | None = None) -> int:
     if optin.kind == KIND_ROUTE:
         return disable_optin(name, apply=apply, project_root=Path.cwd())
 
+    # ADR-061 : retirer l'entrée ENABLED_OPTINS de l'opt-in non-route, puis
+    # afficher le conseil de retrait. Le registre n'est jamais supprimé.
+    _remove_registry_entry(Path.cwd(), name, apply=apply)
+    print("")
     from cli.optins.guidance import disable_guidance
     print(disable_guidance(optin))
     return 0
+
+
+def _remove_registry_entry(project_root: Path, name: str, *, apply: bool) -> None:
+    """Retire l'entrée ENABLED_OPTINS de ``name`` du registre (idempotent)."""
+    registry_path = project_root / REGISTRY_REL
+    if not registry_path.exists():
+        return
+    content = registry_path.read_text(encoding="utf-8")
+    new_content = remove_optin_entry(content, name)
+    if new_content == content:
+        print(f"{STATUS_OK} {REGISTRY_REL} : {name} déjà retiré")
+        return
+    if apply:
+        registry_path.write_text(new_content, encoding="utf-8")
+        print(f"{STATUS_OK} {REGISTRY_REL} : {name} retiré")
+    else:
+        print(f"{STATUS_DRYRUN} {name} serait retiré de {REGISTRY_REL}")
