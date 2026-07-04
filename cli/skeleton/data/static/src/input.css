@@ -9,14 +9,15 @@
    --------------------------------------------------------------------------
    Source unique des couleurs, polices et rayons. Pour reskinner toute
    l'application, modifiez UNIQUEMENT ce bloc : les utilitaires Tailwind
-   (bg-teal, text-ink, border-line, rounded-card, font-sans...) en découlent.
+   (bg-forge, text-ink, border-line, rounded-card, font-sans...) en découlent.
    ========================================================================== */
 @theme {
-  /* Couleur primaire et ses variantes */
-  --color-teal:        #0f7d6d;
-  --color-teal-dark:   #0a5d51;
-  --color-teal-soft:   #e7f1ee;
-  --color-teal-border: #cfe5e0;
+  /* Couleur primaire : orange Forge (signature de la marque, voir
+     site/static/forge-tokens.css --forge-accent). Actions, liens, éléments actifs. */
+  --color-forge:        #E8651A;
+  --color-forge-dark:   #c2540f;
+  --color-forge-soft:   #fff3ea;
+  --color-forge-border: #f6d3bf;
 
   /* Accent secondaire */
   --color-ocre:        #d98a2b;

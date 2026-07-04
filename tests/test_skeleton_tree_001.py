@@ -174,7 +174,8 @@ def test_input_css_porte_la_charte_et_pas_la_landing():
     """input.css définit la charte (@theme) et n'embarque plus le CSS de la landing."""
     content = (SKELETON / "static" / "src" / "input.css").read_text(encoding="utf-8")
     assert "@theme" in content, "input.css doit définir la charte via @theme"
-    assert "--color-teal" in content, "la charte doit définir ses tokens couleur"
+    # Primaire = orange Forge (signature de la marque, forge-tokens.css --forge-accent).
+    assert "--color-forge" in content, "la charte doit définir ses tokens couleur (primaire orange Forge)"
     # Plus aucune trace du CSS de la landing ni de @source vers des fichiers
     # supprimés (landing/, docs/index.html).
     assert "landing-" not in content

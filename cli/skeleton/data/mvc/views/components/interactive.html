@@ -24,7 +24,7 @@
 {# Menu déroulant (zéro JS). Usage : {% call dropdown("Actions") %} <a ...>...</a> {% endcall %} #}
 {% macro dropdown(label) %}
 <details class="relative inline-block">
-  <summary class="cursor-pointer select-none inline-flex items-center gap-1.5 rounded-[10px] border border-field px-[19px] py-2.5 text-sm font-semibold text-ink hover:border-teal transition">
+  <summary class="cursor-pointer select-none inline-flex items-center gap-1.5 rounded-[10px] border border-field px-[19px] py-2.5 text-sm font-semibold text-ink hover:border-forge transition">
     {{ label }} <span class="text-faint">v</span>
   </summary>
   <div class="absolute right-0 mt-2 w-48 rounded-card border border-line bg-surface shadow-lg py-1.5 z-10 text-sm">
@@ -35,15 +35,15 @@
 
 {# Lien de menu pour dropdown(). #}
 {% macro menu_item(label, href="#") %}
-<a href="{{ href }}" class="block px-4 py-2 text-subtle hover:bg-cream hover:text-teal transition">{{ label }}</a>
+<a href="{{ href }}" class="block px-4 py-2 text-subtle hover:bg-cream hover:text-forge transition">{{ label }}</a>
 {% endmacro %}
 
 {# Bouton qui ouvre la modale d'identifiant id (showModal natif). #}
 {% macro modal_trigger(id, label, variant="primary") %}
 {%- set styles = {
-  "primary":   "text-white bg-teal hover:bg-teal-dark",
-  "secondary": "text-teal bg-teal-soft border border-teal-border hover:bg-teal-border",
-  "ghost":     "text-ink bg-transparent border border-field hover:border-teal"
+  "primary":   "text-white bg-forge hover:bg-forge-dark",
+  "secondary": "text-forge bg-forge-soft border border-forge-border hover:bg-forge-border",
+  "ghost":     "text-ink bg-transparent border border-field hover:border-forge"
 } -%}
 <button type="button" onclick="document.getElementById('{{ id }}').showModal()" class="inline-flex items-center justify-center font-semibold transition rounded-[10px] px-[21px] py-3 text-sm {{ styles.get(variant) or styles['primary'] }}">{{ label }}</button>
 {% endmacro %}

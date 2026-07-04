@@ -10,8 +10,9 @@ Pour apprendre à modifier la charte pas à pas, voir le palier
 ## Esprit
 
 Une interface **chaleureuse et lisible** : fonds crème plutôt que blanc pur,
-une couleur primaire sobre (teal), un accent ocre ponctuel, et une hiérarchie de
-texte nette. L'objectif est un service clair, à fort contraste, sans surcharge.
+la couleur primaire **orange Forge** (signature de la marque), un accent ocre
+ponctuel, et une hiérarchie de texte nette. L'objectif est un service clair, à
+fort contraste, sans surcharge.
 
 ## Palette
 
@@ -22,10 +23,10 @@ Chaque couleur est un token `--color-<nom>` qui génère les utilitaires Tailwin
 
 | Aperçu | Token | Hex | Rôle |
 |---|---|---|---|
-| <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#0f7d6d;border:1px solid #0003"></span> | `teal` | `#0f7d6d` | couleur primaire : actions, liens, éléments actifs |
-| <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#0a5d51;border:1px solid #0003"></span> | `teal-dark` | `#0a5d51` | survol et état pressé de la primaire |
-| <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#e7f1ee;border:1px solid #0003"></span> | `teal-soft` | `#e7f1ee` | fonds doux : badges, boutons secondaires |
-| <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#cfe5e0;border:1px solid #0003"></span> | `teal-border` | `#cfe5e0` | bordures douces sur fond teal-soft |
+| <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#E8651A;border:1px solid #0003"></span> | `forge` | `#E8651A` | couleur primaire, orange Forge : actions, liens, éléments actifs |
+| <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#c2540f;border:1px solid #0003"></span> | `forge-dark` | `#c2540f` | survol et état pressé de la primaire |
+| <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#fff3ea;border:1px solid #0003"></span> | `forge-soft` | `#fff3ea` | fonds doux : badges, boutons secondaires |
+| <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#f6d3bf;border:1px solid #0003"></span> | `forge-border` | `#f6d3bf` | bordures douces sur fond forge-soft |
 | <span style="display:inline-block;width:1.1rem;height:1.1rem;border-radius:4px;background:#d98a2b;border:1px solid #0003"></span> | `ocre` | `#d98a2b` | accent ponctuel : indicateur requis, avertissements |
 
 ### Texte
@@ -69,7 +70,7 @@ contraster avec les cartes.
 
 ## Règles d'usage
 
-- **Primaire avec parcimonie** : `teal` signale l'action principale et les liens.
+- **Primaire avec parcimonie** : `forge` (orange Forge) signale l'action principale et les liens.
   Évitez de le multiplier sur une même vue.
 - **Ocre = accent, pas décor** : réservé aux signaux (champ requis, attention).
 - **Hiérarchie du texte** : `ink` pour le contenu fort, `muted` pour le

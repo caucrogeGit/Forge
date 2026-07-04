@@ -13,9 +13,9 @@
    Passe href pour un lien <a>, sinon un <button type=...>. #}
 {% macro button(label, variant="primary", href=none, type="button", extra="") %}
 {%- set styles = {
-  "primary":   "text-white bg-teal hover:bg-teal-dark active:translate-y-px",
-  "secondary": "text-teal bg-teal-soft border border-teal-border hover:bg-teal-border",
-  "ghost":     "text-ink bg-transparent border border-field hover:border-teal"
+  "primary":   "text-white bg-forge hover:bg-forge-dark active:translate-y-px",
+  "secondary": "text-forge bg-forge-soft border border-forge-border hover:bg-forge-border",
+  "ghost":     "text-ink bg-transparent border border-field hover:border-forge"
 } -%}
 {%- set cls = "inline-flex items-center justify-center font-semibold transition rounded-[10px] px-[21px] py-3 text-sm "
    ~ (styles.get(variant) or styles["primary"]) ~ " " ~ extra -%}
@@ -31,22 +31,22 @@
 <div class="rounded-card border border-line bg-surface p-7 {{ extra }}">{{ caller() }}</div>
 {% endmacro %}
 
-{# Pastille / étiquette courte. tone : teal | success | warning | danger | neutral. #}
-{% macro badge(label, tone="teal") %}
+{# Pastille / étiquette courte. tone : forge | success | warning | danger | neutral. #}
+{% macro badge(label, tone="forge") %}
 {%- set tones = {
-  "teal":    "text-teal bg-teal-soft",
-  "success": "text-teal bg-teal-soft",
+  "forge":    "text-forge bg-forge-soft",
+  "success": "text-forge bg-forge-soft",
   "warning": "text-ocre bg-orange-50",
   "danger":  "text-red-700 bg-red-50",
   "neutral": "text-subtle bg-cream"
 } -%}
-<span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full {{ tones.get(tone) or tones['teal'] }}">{{ label }}</span>
+<span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full {{ tones.get(tone) or tones['forge'] }}">{{ label }}</span>
 {% endmacro %}
 
 {# Message contextuel. level : success | error | warning | info. #}
 {% macro alert(message, level="info") %}
 {%- set tones = {
-  "success": "bg-teal-soft text-teal border-teal-border",
+  "success": "bg-forge-soft text-forge border-forge-border",
   "error":   "bg-red-50 text-red-700 border-red-200",
   "warning": "bg-orange-50 text-ocre border-ocre/30",
   "info":    "bg-cream text-subtle border-line"
@@ -82,7 +82,7 @@
 {# Chiffre-clé. #}
 {% macro stat(value, label) %}
 <div class="text-center">
-  <div class="text-[32px] font-extrabold text-teal leading-none">{{ value }}</div>
+  <div class="text-[32px] font-extrabold text-forge leading-none">{{ value }}</div>
   <div class="mt-1.5 text-[13.5px] font-medium text-muted">{{ label }}</div>
 </div>
 {% endmacro %}
@@ -92,7 +92,7 @@
 {% macro breadcrumb(items) %}
 <nav class="mb-6 text-sm text-muted" aria-label="Fil d'Ariane">
   {% for label, href in items %}
-    {%- if href and not loop.last %}<a href="{{ href }}" class="hover:text-teal">{{ label }}</a>
+    {%- if href and not loop.last %}<a href="{{ href }}" class="hover:text-forge">{{ label }}</a>
     <span class="mx-2 text-faint">/</span>
     {%- else %}<span class="font-semibold text-ink">{{ label }}</span>{% endif %}
   {% endfor %}
@@ -103,6 +103,6 @@
    href de la page active (surlignée). À placer dans le bloc nav du layout. #}
 {% macro navbar(links, current="") %}
 {% for label, href in links %}
-<a href="{{ href }}" class="{% if href == current %}text-teal font-semibold{% else %}text-muted hover:text-teal{% endif %} transition-colors">{{ label }}</a>
+<a href="{{ href }}" class="{% if href == current %}text-forge font-semibold{% else %}text-muted hover:text-forge{% endif %} transition-colors">{{ label }}</a>
 {% endfor %}
 {% endmacro %}

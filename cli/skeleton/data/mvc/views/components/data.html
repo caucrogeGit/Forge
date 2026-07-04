@@ -37,7 +37,7 @@
    pages. base_url : chemin de la liste (les liens ajoutent ?page=N). #}
 {% macro pagination(page, total_pages, base_url="") %}
 {% if total_pages > 1 %}
-{%- set prev_cls = "px-3 py-2 text-sm font-semibold rounded-[8px] border border-field text-ink hover:border-teal transition" -%}
+{%- set prev_cls = "px-3 py-2 text-sm font-semibold rounded-[8px] border border-field text-ink hover:border-forge transition" -%}
 {%- set off_cls = "px-3 py-2 text-sm font-semibold rounded-[8px] border border-line text-faint cursor-not-allowed" -%}
 <nav class="flex items-center justify-between gap-3 mt-6" aria-label="Pagination">
   {% if page > 1 %}<a href="{{ base_url }}?page={{ page - 1 }}" class="{{ prev_cls }}">Précédent</a>
