@@ -137,15 +137,17 @@ def _scaffold_project(root: Path) -> None:
         "import os\n"
         "APP_NAME = 'TestForgeSlugMariaDB'\n"
         "APP_ROUTES_MODULE = 'mvc.routes'\n"
-        "DB_APP_HOST = os.environ.get('FORGE_TEST_DB_HOST', '127.0.0.1')\n"
-        "DB_APP_PORT = int(os.environ.get('FORGE_TEST_DB_PORT', '3306'))\n"
-        "DB_APP_LOGIN = os.environ.get('FORGE_TEST_DB_USER', 'root')\n"
-        "DB_APP_PWD = os.environ.get('FORGE_TEST_DB_PASSWORD', '')\n"
-        "DB_ADMIN_HOST = os.environ.get('FORGE_TEST_DB_HOST', '127.0.0.1')\n"
-        "DB_ADMIN_PORT = int(os.environ.get('FORGE_TEST_DB_PORT', '3306'))\n"
-        "DB_ADMIN_LOGIN = os.environ.get('FORGE_TEST_DB_USER', 'root')\n"
-        "DB_ADMIN_PWD = os.environ.get('FORGE_TEST_DB_PASSWORD', '')\n"
-        "DB_NAME = os.environ.get('FORGE_TEST_DB_NAME', 'forge_test')\n",
+        "# ADR-060 : le backend lit la config BDD dans l'environnement. On mappe\n"
+        "# les variables FORGE_TEST_DB_* vers DB_* dans os.environ.\n"
+        "os.environ['DB_APP_HOST'] = os.environ.get('FORGE_TEST_DB_HOST', '127.0.0.1')\n"
+        "os.environ['DB_APP_PORT'] = os.environ.get('FORGE_TEST_DB_PORT', '3306')\n"
+        "os.environ['DB_APP_LOGIN'] = os.environ.get('FORGE_TEST_DB_USER', 'root')\n"
+        "os.environ['DB_APP_PWD'] = os.environ.get('FORGE_TEST_DB_PASSWORD', '')\n"
+        "os.environ['DB_ADMIN_HOST'] = os.environ.get('FORGE_TEST_DB_HOST', '127.0.0.1')\n"
+        "os.environ['DB_ADMIN_PORT'] = os.environ.get('FORGE_TEST_DB_PORT', '3306')\n"
+        "os.environ['DB_ADMIN_LOGIN'] = os.environ.get('FORGE_TEST_DB_USER', 'root')\n"
+        "os.environ['DB_ADMIN_PWD'] = os.environ.get('FORGE_TEST_DB_PASSWORD', '')\n"
+        "os.environ['DB_NAME'] = os.environ.get('FORGE_TEST_DB_NAME', 'forge_test')\n",
     )
     _write(root / "app.py", "# app")
     (root / "mvc" / "controllers").mkdir(parents=True)
