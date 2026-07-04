@@ -176,11 +176,16 @@ class TestForgeRunInCoreRepo:
             or "pytest`, `ruff`," in normalized
         )
 
-    def test_dogfood_explique(self):
-        """Le fait que le dépôt contient `app.py` + `mvc/` (dogfooding)
-        doit être expliqué pour ne pas surprendre."""
+    def test_repo_framework_only_explique(self):
+        """ADR-044 : le dépôt ne porte que le framework, `app.py`/`mvc/`
+        ne sont plus à la racine (relocalisés en fixture de test). La
+        page doit l'expliquer et orienter vers `forge new` pour tester
+        un serveur HTTP, sans induire en erreur."""
         text = _text()
+        normalized = " ".join(text.split())
         assert "app.py" in text and "mvc/" in text
+        assert "044-framework-only-repo" in text or "ADR-044" in normalized
+        assert "forge new" in text
 
 
 # ---------------------------------------------------------------------------
@@ -282,11 +287,11 @@ class TestRoadmap:
 
 
 class TestMkdocsBuild:
-    def test_mkdocs_build_strict(self):
+    def test_mkdocs_build_strict(self, tmp_path):
         import subprocess
 
         result = subprocess.run(
-            ["mkdocs", "build", "--strict"],
+            ["mkdocs", "build", "--strict", "-d", str(tmp_path / "site")],
             capture_output=True,
             text=True,
         )
