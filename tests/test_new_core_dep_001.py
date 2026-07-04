@@ -68,6 +68,26 @@ def test_requirements_epingle_forge_mvc(projet):
     )
 
 
+@pytest.mark.parametrize(
+    "backend",
+    ["forge-mvc-mariadb", "forge-mvc-sqlite", "forge-mvc-postgres", "forge-mvc-mssql"],
+)
+def test_requirements_ne_pin_aucun_backend(projet, backend):
+    # NEW-DB-BARE-REQS-001 (ADR-060) : le squelette est livre SANS backend BDD.
+    # Le coeur est agnostique (ADR-054) ; l'utilisateur choisit et installe son
+    # backend. Aucune ligne de dependance ne doit epingler un backend.
+    content = (projet / "requirements.txt").read_text(encoding="utf-8")
+    lignes_dep = [
+        ligne.strip()
+        for ligne in content.splitlines()
+        if ligne.strip() and not ligne.lstrip().startswith("#")
+    ]
+    assert not any(ligne.startswith(backend) for ligne in lignes_dep), (
+        f"Le squelette ne doit pas epingler {backend} (ADR-060) ; "
+        "il est mentionne en commentaire, pas en dependance."
+    )
+
+
 def test_projet_ecrit_forge_profile(projet):
     assert (projet / "forge_profile.txt").is_file()
 

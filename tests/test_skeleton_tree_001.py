@@ -219,14 +219,21 @@ def test_requirements_epingle_forge_mvc():
     )
 
 
-def test_requirements_epingle_un_backend_bdd():
-    # ADR-054 : le cœur est agnostique BDD ; le projet généré doit poser un
-    # backend, sinon il n'a aucune prise en charge base de données.
+def test_requirements_ne_pin_aucun_backend_bdd():
+    # ADR-060 : révise la trajectoire d'ADR-054. Le squelette est livré SANS
+    # backend BDD ; l'utilisateur choisit et installe le sien. Aucune ligne de
+    # dépendance ne doit épingler un backend (ils restent en commentaire).
     content = (SKELETON / "requirements.txt").read_text(encoding="utf-8")
-    assert f"forge-mvc-mariadb=={forge._FORGE_VERSION}" in content, (
-        "requirements.txt doit épingler le backend BDD forge-mvc-mariadb à la "
-        f"version courante ({forge._FORGE_VERSION})."
-    )
+    lignes_dep = [
+        ligne.strip()
+        for ligne in content.splitlines()
+        if ligne.strip() and not ligne.lstrip().startswith("#")
+    ]
+    for backend in ("forge-mvc-mariadb", "forge-mvc-sqlite", "forge-mvc-postgres", "forge-mvc-mssql"):
+        assert not any(ligne.startswith(backend) for ligne in lignes_dep), (
+            f"Le squelette ne doit pas épingler {backend} (ADR-060) : "
+            "le backend est un choix de l'utilisateur, mentionné en commentaire."
+        )
 
 
 # ADR-044 : l'application racine de dogfooding a été retirée (relocalisée en
