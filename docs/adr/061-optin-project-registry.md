@@ -2,9 +2,8 @@
 
 ## Statut
 
-Proposée, Forge 1.0.0-rc.x (ticket `OPTIN-PROJECT-REGISTRY-001`).
-Direction retenue ; deux questions de design restent ouvertes et sont tranchées dans la Décision ci-dessous.
-S'appuie sur l'existant (`optins/registry.py`, `forge opt-in:enable`) et se lie à ADR-060 (le backend BDD devient un opt-in choisi par l'utilisateur).
+Acceptée, Forge 1.0.0-rc.x (ticket `OPTIN-PROJECT-REGISTRY-001`).
+Implémentée : le registre `optins/registry.py` est livré par le squelette (toujours présent), `forge opt-in:enable`/`disable` inscrivent tous les kind, `forge opt-in:list` lit le registre, `forge db:init` inscrit le backend, `forge doctor` signale les divergences registre vs `.venv`. Décision d'emplacement retenue : registre dans le squelette (toujours présent). S'appuie sur l'existant (`forge opt-in:enable`) et se lie à ADR-060 (le backend BDD devient un opt-in choisi par l'utilisateur).
 
 ---
 

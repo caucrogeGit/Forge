@@ -67,4 +67,4 @@ structurante (`docs/adr/<numéro>-<sujet>.md`).
 | [ADR-058](058-schemas-single-source.md) | Source unique des schémas JSON : `cli/schemas/` canonique, suppression de la copie racine `schemas/`, squelette et embeds opt-in = copies dérivées gardées (proposé) |
 | [ADR-059](059-cli-command-dispatch-registry.md) | Registre de dispatch des commandes CLI : tables de dispatch opt-in et cœur, découverte par entry points `forge_mvc.commands` (accepté) |
 | [ADR-060](060-backend-free-skeleton.md) | Squelette livré sans backend BDD : `requirements.txt` ne pin que `forge-mvc`, la config BDD quitte le squelette pour le backend installé (accepté) |
-| [ADR-061](061-optin-project-registry.md) | Registre d'opt-ins visible et unifié (`optins/registry.py`, à la `config/bundles.php` de Symfony) : une ligne par opt-in utilisé, tous `kind` + backend, code toujours dans le `.venv` (proposé) |
+| [ADR-061](061-optin-project-registry.md) | Registre d'opt-ins visible et unifié (`optins/registry.py`, à la `config/bundles.php` de Symfony) : une ligne par opt-in utilisé, tous `kind` + backend, code toujours dans le `.venv` (accepté) |

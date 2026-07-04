@@ -7,6 +7,15 @@
     [glossaire opt-in](../reference/vocabulaire-opt-in.md) et
     [ADR-016](../adr/016-opt-in-unification.md).
 
+!!! note "Registre unifié (ADR-061)"
+    Depuis [ADR-061](../adr/061-optin-project-registry.md), `optins/registry.py`
+    est livré par le squelette (**toujours présent**) et devient la **vue unique**
+    des opt-ins du projet : le backend base de données choisi (`BACKEND`) et
+    **tous** les opt-ins utilisés (`ENABLED_OPTINS`, nom vers catégorie), pas
+    seulement les opt-ins `route`. `forge opt-in:enable`/`disable` y inscrivent et
+    retirent les entrées, `forge opt-in:list` le lit pour afficher l'état, et
+    `forge doctor` signale les divergences avec les paquets installés.
+
 > Ticket : `OPTINS-PROJECT-STRUCTURE-001`. Ce document **pose le contrat**
 > d'une convention de branchement local des opt-ins dans une application
 > Forge générée. Il est **architecture + documentation uniquement** :
@@ -87,11 +96,14 @@ optins/
     └── README.md
 ```
 
-!!! note "Seuls les opt-ins `route` apparaissent ici"
-    `optins/` ne reçoit que les opt-ins de type `route` (`iot`, `video`,
-    `audio`), qui exposent leurs propres routes HTTP. Les opt-ins `library`
-    et `crosscutting` (`mfa`, `rbac`, `workflow`…) ne se branchent pas par
-    cette couche : ils s'utilisent par import direct ou par décorateurs.
+!!! note "Sous-dossier `optins/<name>/` : seulement pour les opt-ins `route`"
+    Seuls les opt-ins de type `route` (`iot`, `video`, `audio`), qui exposent
+    leurs propres routes HTTP, reçoivent un sous-dossier de câblage
+    `optins/<name>/`. Les opt-ins `library` et `crosscutting` (`mfa`, `rbac`,
+    `workflow`…) s'utilisent par import direct ou par décorateurs et n'ont pas de
+    sous-dossier. En revanche, depuis [ADR-061](../adr/061-optin-project-registry.md),
+    **tous** les opt-ins utilisés figurent dans `ENABLED_OPTINS` de
+    `optins/registry.py`, quel que soit leur kind.
 
 Chaque sous-dossier `optins/<module>/` est le **point de branchement
 local** d'un package opt-in installé. Il reste **mince** : il référence
@@ -99,17 +111,33 @@ le package, il ne le duplique pas.
 
 ## `optins/registry.py`
 
-Le registre central énumère, **de façon lisible et explicite**, les
-opt-ins branchés du projet :
+Le registre central est la **vue unique** des opt-ins du projet (ADR-061),
+livrée par le squelette et toujours présente. Il porte trois choses :
+
+- `BACKEND` : le backend base de données choisi (ADR-054/060), ou `None` ;
+- `ENABLED_OPTINS` : **tous** les opt-ins utilisés, par nom vers catégorie
+  (`route`, `library`, `crosscutting`, `cli`) ;
+- `register_optins(router)` : câble les routes des opt-ins `route` activés.
 
 ```python
-def register_optins(router):
+"""Registre des opt-ins de ce projet (ADR-061)."""
+
+BACKEND: str | None = "sqlite"
+
+ENABLED_OPTINS: dict[str, str] = {
+    "qrcode": "library",
+    "iot": "route",
+}
+
+
+def register_optins(router) -> None:
     from optins.iot.routes import register as register_iot
 
     register_iot(router)
 ```
 
-Et le projet l'appelle explicitement dans `mvc/routes.py` :
+Le projet appelle `register_optins` explicitement dans `mvc/routes.py`
+(toujours présent, sans effet tant qu'aucun opt-in `route` n'est activé) :
 
 ```python
 from optins.registry import register_optins
@@ -117,8 +145,10 @@ from optins.registry import register_optins
 register_optins(router)
 ```
 
-Pas de décorateur magique, pas d'auto-import : on **lit** dans
-`registry.py` la liste exacte des opt-ins actifs.
+Pas de décorateur magique, pas d'auto-import ni de scan du `.venv` : on **lit**
+dans `registry.py` la liste exacte des opt-ins du projet. Les entrées sont
+gérées par `forge opt-in:enable`/`disable` (pour tous les kind) ; le backend est
+inscrit par `forge db:init`. Le code des opt-ins, lui, reste dans le `.venv`.
 
 ## `optins/<module>/routes.py`
 
