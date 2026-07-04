@@ -1067,9 +1067,7 @@ Commencer le parcours : [Welcome Forge](../starters/welcome-forge/index.md)
 
 Après le parcours Welcome Forge, vous pourrez revenir vers les pages techniques selon vos besoins :
 
-* [Préparer MariaDB](mariadb.md) : installation détaillée et dépannage.
-* [Comptes MariaDB d'un projet](mariadb-comptes.md) : comptes, droits et vérifications.
-* [Migrations SQL](../features/migrations.md) : cycle des migrations Forge.
+* [Bases de données (backends)](../guide/bases-de-donnees.md) : choisir et configurer un backend (MariaDB, SQLite, PostgreSQL, SQL Server), `db:init`, comptes et migrations.
 * [Installer les opt-ins Forge](opt-ins.md) : extensions officielles du framework.
 * [Préparer un déploiement en production](production.md) : serveur, WSGI et reverse proxy.
 * [Installer Forge depuis les sources GitHub](github.md) : contribuer ou travailler depuis le dépôt source.
