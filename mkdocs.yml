@@ -11,7 +11,7 @@ theme:
   name: material
   language: fr
   custom_dir: overrides
-  favicon: static/favicon.svg
+  favicon: static/favicon.png
   logo: static/forge-logo.png
   features:
     - navigation.sections
@@ -84,7 +84,7 @@ nav:
         - Profils de projet: features/profiles.md
         - Guidance agent IA: features/agents.md
         - Génération PDF: features/pdf.md
-        - ImageMagick (logos transparents): features/imagemagick-logos.md
+        - ImageMagick (guide complet): features/imagemagick-logos.md
 
     - Référence:
         - Commandes CLI: reference/cli-commands.md
