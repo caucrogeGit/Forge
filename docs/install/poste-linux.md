@@ -11,13 +11,7 @@ Pour les autres distributions, le principe reste le même, seuls les noms de paq
 
 ## Objectif
 
-Aller d'un poste Linux propre à un projet Forge qui démarre en développement, avec le backend base de données de votre choix.
-
-!!! note "Forge est agnostique en base de données"
-    Le cœur de Forge ne dépend d'aucun SGBD (ADR-054).
-    La base est fournie par un **backend opt-in** que vous choisissez et installez : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres` ou `forge-mvc-mssql`.
-    Ce guide prépare le poste et le projet **sans supposer de backend particulier**.
-    La configuration propre à chaque backend (variables de connexion, serveur, comptes, provisionnement) est décrite sur la page [Bases de données (backends)](../guide/bases-de-donnees.md).
+Installer un projet Forge minimal, qui démarre en développement, sur une distribution Debian ou dérivée.
 
 À la fin de ce parcours, vous disposez :
 
@@ -26,9 +20,7 @@ Aller d'un poste Linux propre à un projet Forge qui démarre en développement,
 * de Git configuré sur le poste ;
 * de Node.js 24 installé pour la compilation du CSS ;
 * d'un nouveau projet Forge créé ;
-* du backend base de données de votre choix installé dans le projet ;
 * d'un dépôt Git local versionné et poussé sur GitHub ;
-* de la base initialisée avec `forge db:init` selon la configuration de votre backend ;
 * du serveur de développement lancé.
 
 ---
@@ -52,10 +44,7 @@ Si Forge, Git, `pipx` et Node.js 24 sont déjà installés sur votre poste, vous
 | Partie | Domaine | À refaire ? |
 |---|---|---|
 | Préparer le poste Linux | système, `pipx`, Forge, Git global, Node.js 24 | une fois par machine |
-| Créer et configurer un projet Forge | `forge new`, backend BDD au choix, `env/dev`, Git local, GitHub, `db:init`, `forge run` | à chaque nouveau projet |
-
-La page [Bases de données (backends)](../guide/bases-de-donnees.md) décrit comment choisir et configurer votre backend (installation, variables de connexion, serveur et comptes le cas échéant).
-Vous vous y référez au moment d'installer le backend et d'initialiser la base.
+| Créer et configurer un projet Forge | `forge new`, `env/dev`, Git local, GitHub, `forge run` | à chaque nouveau projet |
 
 ---
 
@@ -112,11 +101,6 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
       curl \
       openssl
     ```
-
-    !!! note "Paquets système propres à un backend"
-        Certains backends base de données ont besoin de paquets système supplémentaires (par exemple le connecteur MariaDB requiert `libmariadb-dev`, `pkg-config`, `build-essential` et `python3-dev`).
-        Le backend `forge-mvc-sqlite` n'en demande aucun : SQLite est fourni par la bibliothèque standard de Python.
-        Reportez-vous à la page [Bases de données (backends)](../guide/bases-de-donnees.md) pour les prérequis du backend que vous choisirez.
 
     **Node.js 24 (compilation du CSS)**
 
@@ -259,8 +243,8 @@ Cette partie se refait pour chaque nouveau projet Forge.
 
 Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` et Node.js 24 sont installés.
 
-??? info "1. Créer un nouveau projet Forge et installer son backend BDD"
-    **Objectif :** Créer un nouveau projet Forge, entrer dans son environnement Python et y installer le backend base de données de votre choix.
+??? info "1. Créer un nouveau projet Forge"
+    **Objectif :** Créer un nouveau projet Forge et entrer dans son environnement Python.
 
     Choisissez un nom de projet.
     Remplacez `NOM_PROJET` par votre nom réel, par exemple `boutique`, `blog`, `welcome-forge` ou `gestion-stock`.
@@ -271,7 +255,6 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     ```
 
     `forge new` prépare un projet complet : squelette, environnement Python, certificat de développement, puis un dépôt Git avec un commit initial.
-    Le projet créé est **agnostique en base de données** : il ne contient aucun backend tant que vous n'en installez pas un.
 
     Activez l'environnement Python du projet :
 
@@ -279,22 +262,13 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     source .venv/bin/activate
     ```
 
-    Installez ensuite le backend base de données dans l'environnement du projet.
-    Choisissez-le selon vos besoins ; la page [Bases de données (backends)](../guide/bases-de-donnees.md) présente les quatre backends officiels et leurs prérequis.
-
-    ```bash
-    pip install --pre forge-mvc-<backend>
-    ```
-
-    Remplacez `<backend>` par le nom du backend choisi, par exemple `sqlite` (sans serveur, idéal pour démarrer), `mariadb`, `postgres` ou `mssql`.
-
     ---
 
     !!! success "Validation attendue"
-        Le dossier du projet existe, l'environnement `.venv` est activable, le terminal se trouve dans le projet et `pip show forge-mvc-<backend>` affiche le backend installé.
+        Le dossier du projet existe, l'environnement `.venv` est activable et le terminal se trouve dans le projet.
 
 ??? info "2. Lire le fichier env/dev généré"
-    **Objectif :** Lire le fichier `env/dev` généré et comprendre qu'il ne contient pas encore de configuration base de données.
+    **Objectif :** Lire le fichier `env/dev` généré et repérer les variables du projet.
 
     `forge new` a généré le fichier de configuration de développement :
 
@@ -302,7 +276,6 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     env/dev
     ```
 
-    Comme le squelette est agnostique en base de données (ADR-060), `env/dev` ne contient **aucune variable `DB_*`** juste après la création.
     Il porte le nom applicatif, le module de routes, le serveur, l'upload et les certificats.
 
     Exemple générique, juste après la création :
@@ -311,23 +284,18 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     APP_NAME=NOM_PROJET
     APP_ROUTES_MODULE=mvc.routes
 
-    # Base de données : aucune variable ici au départ.
-    # Le backend installé lit sa configuration dans l'environnement.
-    # Vous ajoutez le bloc DB_* à l'étape « Configurer le backend ».
-
     UPLOAD_MAX_SIZE=5242880
 
     APP_HOST=127.0.0.1
     APP_PORT=8000
     ```
 
-    C'est vous qui ajoutez ensuite les variables de connexion attendues par votre backend.
-    Chaque backend documente ses variables ; la page [Bases de données (backends)](../guide/bases-de-donnees.md) les récapitule.
+    C'est ici que vous ajusterez plus tard la configuration du projet, par exemple le port du serveur.
 
     ---
 
     !!! success "Validation attendue"
-        `env/dev` existe et contient au moins `APP_NAME` et `APP_ROUTES_MODULE`, sans bloc `DB_*`.
+        `env/dev` existe et contient au moins `APP_NAME` et `APP_ROUTES_MODULE`.
 
 ??? info "3. Vérifier le dépôt Git local du projet"
     **Objectif :** Vérifier que le projet possède un dépôt Git local et un premier commit.
@@ -727,84 +695,25 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     !!! success "Validation attendue"
         Le dépôt local est relié à GitHub, `origin` pointe vers le bon dépôt et `main` suit `origin/main`.
 
-??? info "5. Configurer le backend base de données dans env/dev"
-    **Objectif :** Ajouter à `env/dev` les variables de connexion attendues par le backend installé, et provisionner la base si le backend le requiert.
-
-    !!! warning "Attention"
-        `env/dev` contient des secrets de développement. Il ne doit pas être publié tel quel si votre projet le considère comme local.
-
-    Le squelette est agnostique : `env/dev` ne contient pas de configuration base de données à la création.
-    Chaque backend lit ses propres variables dans l'environnement ; vous les ajoutez ici selon la documentation du backend choisi.
-
-    Ouvrez le fichier `env/dev` :
-
-    ```bash
-    nano env/dev
-    ```
-
-    La page [Bases de données (backends)](../guide/bases-de-donnees.md) décrit, pour chaque backend :
-
-    * les variables `DB_*` à renseigner dans `env/dev` ;
-    * le provisionnement éventuel (serveur, base, comptes) ;
-    * les particularités du dialecte.
-
-    !!! note "Backend sans serveur"
-        Avec `forge-mvc-sqlite`, il n'y a ni serveur ni compte : la base est un fichier, dont le chemin est donné par `DB_NAME`.
-        Vous renseignez `DB_NAME` puis passez directement à l'initialisation.
-
-    ---
-
-    !!! success "Validation attendue"
-        `env/dev` contient les variables de connexion attendues par votre backend, et la base est provisionnée si le backend l'exige.
-
-??? info "6. Vérifier le projet avec forge doctor"
-    **Objectif :** Diagnostiquer le projet avec `forge doctor` avant l'initialisation de la base.
+??? info "5. Vérifier le projet avec forge doctor"
+    **Objectif :** Diagnostiquer le projet avec `forge doctor`.
 
     ```bash
     forge doctor
     ```
 
-    Cette commande diagnostique le projet et signale les points à corriger avant l'initialisation.
+    Cette commande diagnostique le projet et signale les points à corriger.
+
+    !!! note "Avertissement base de données"
+        Sur un projet minimal sans base, `forge doctor` peut afficher un avertissement « base de données » : c'est normal tant qu'aucun backend n'est installé.
+        Pour ajouter une base plus tard, voir [Bases de données (backends)](../guide/bases-de-donnees.md).
 
     ---
 
     !!! success "Validation attendue"
-        `forge doctor` ne signale plus de blocage avant l'initialisation de la base.
+        `forge doctor` ne signale aucun blocage. Les avertissements ne sont pas bloquants.
 
-??? info "7. Initialiser la base avec forge db:init"
-    **Objectif :** Initialiser la base Forge et préparer la table technique des migrations.
-
-    ```bash
-    forge db:init
-    ```
-
-    Cette commande passe par le backend actif : elle prépare la base du projet et crée la table technique `forge_migrations`, qui mémorise les migrations déjà appliquées.
-
-    Si la commande s'arrête sur un message du type :
-
-    ```text
-    Aucun backend BDD installé. Le cœur de Forge est agnostique BDD (ADR-054) :
-    installez un opt-in de backend, par exemple pip install forge-mvc-sqlite.
-    ```
-
-    C'est que le backend n'a pas été installé dans l'environnement du projet.
-    Reprenez l'étape 1 et lancez `pip install --pre forge-mvc-<backend>` avec le `.venv` du projet activé.
-
-    Si la commande s'arrête plutôt sur :
-
-    ```text
-    Connexion d'administration impossible. Vérifiez DB_ADMIN_* dans env/dev.
-    ```
-
-    Le backend n'a pas pu se connecter à la base.
-    Vérifiez la configuration de connexion dans `env/dev` et le provisionnement de la base ; la page [Bases de données (backends)](../guide/bases-de-donnees.md) détaille ces points pour chaque backend.
-
-    ---
-
-    !!! success "Validation attendue"
-        `forge db:init` se termine sans erreur et la table technique des migrations est prête.
-
-??? info "8. Lancer le serveur de développement"
+??? info "6. Lancer le serveur de développement"
     Objectif : démarrer le serveur Forge en mode développement et ouvrir le projet dans le navigateur.
 
     Avant de lancer le serveur, vérifiez le port configuré dans `env/dev`.
