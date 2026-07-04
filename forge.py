@@ -366,7 +366,8 @@ def cmd_new(
     print("    forge run")
     print()
     print("  Les premiers paliers tournent sans base de données.")
-    print("  Pour ajouter MariaDB : ajustez env/dev (DB_ADMIN_PWD, DB_APP_PWD…) puis forge db:init.")
+    print("  Pour la base de données : installez un backend (ex. pip install forge-mvc-sqlite),")
+    print("  configurez son environnement dans env/dev, puis forge db:init.")
     print()
 
 
@@ -673,7 +674,7 @@ def main() -> None:
             print("Usage : forge db:apply")
             print()
             print("Applique le SQL de toutes les entités du projet (mvc/entities/) à la base.")
-            print("Requiert une connexion MariaDB active (voir forge db:init).")
+            print("Requiert un backend BDD installé et une base configurée (voir forge db:init).")
             raise SystemExit(0)
         db_apply_main([command])
         return
