@@ -133,3 +133,17 @@ def remove_optin_entry(text: str, name: str) -> str:
     pattern = re.compile(rf'^\s*"{re.escape(name)}"\s*:\s*".*",?\s*$')
     kept = [ln for ln in text.splitlines(keepends=True) if not pattern.match(ln)]
     return "".join(kept)
+
+
+_BACKEND_ASSIGN = re.compile(r"^(BACKEND\s*(?::[^=]+)?=\s*).*$", re.MULTILINE)
+
+
+def set_backend(text: str, name: str | None) -> str:
+    """Fixe la valeur de `BACKEND` dans le texte du registre (idempotent).
+
+    `name=None` remet à None. Ne touche que la ligne d'affectation de BACKEND ;
+    laisse le texte inchangé si aucune affectation n'est trouvée.
+    """
+    literal = "None" if name is None else f'"{name}"'
+    new, count = _BACKEND_ASSIGN.subn(lambda m: m.group(1) + literal, text, count=1)
+    return new if count else text

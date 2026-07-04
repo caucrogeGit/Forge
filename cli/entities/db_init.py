@@ -6,6 +6,7 @@ from typing import Any
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
 from cli.project.project_config import ProjectConfigError, load_project_config
 
@@ -127,10 +128,32 @@ def _init_serverless(backend: Any) -> list[str]:
     return actions
 
 
+def _record_backend_in_registry(project_root: Path, name: str) -> None:
+    """Inscrit le backend actif dans optins/registry.py (ADR-061, best-effort).
+
+    Silencieux si le registre est absent ou illisible : la commande db:init ne
+    doit pas échouer à cause d'un fichier de registre (le squelette le porte
+    toujours, mais un projet ancien peut ne pas l'avoir).
+    """
+    registry_path = project_root / "optins" / "registry.py"
+    if not name or not registry_path.exists():
+        return
+    try:
+        from cli.optins.registry_format import set_backend
+
+        content = registry_path.read_text(encoding="utf-8")
+        new_content = set_backend(content, name)
+        if new_content != content:
+            registry_path.write_text(new_content, encoding="utf-8")
+    except OSError:
+        return
+
+
 def init_project_database() -> list[str]:
     from core.database.backend import get_backend
 
     backend = get_backend()
+    _record_backend_in_registry(Path.cwd(), getattr(backend, "name", ""))
     if not getattr(backend, "requires_provisioning", True):
         # Backend sans serveur (SQLite) : ni base ni comptes à créer.
         return _init_serverless(backend)
