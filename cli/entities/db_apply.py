@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -145,13 +146,13 @@ def _connect_db():
 
 def load_db_apply_config() -> DbApplyConfig:
     # load_project_config() charge l'environnement (load_dotenv) : indispensable
-    # pour que le backend lise ensuite DB_ADMIN_* dans os.environ (ADR-060).
-    config = load_project_config()
+    # pour que le backend lise ensuite DB_ADMIN_* et DB_NAME dans os.environ (ADR-060).
+    load_project_config()
 
     # ADR-033 : le SQL des entités crée et modifie des tables (DDL) ; db:apply
     # emprunte le compte d'administration, lu par le backend depuis DB_ADMIN_*.
-    # Seul le nom de la base cible reste fourni ici (DB_NAME).
-    return DbApplyConfig(database=config.DB_NAME)
+    # Seul le nom de la base cible reste fourni ici (DB_NAME, lu dans l'env).
+    return DbApplyConfig(database=os.environ.get("DB_NAME", ""))
 
 
 def _rollback_quietly(connection: Any) -> None:

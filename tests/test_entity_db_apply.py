@@ -213,6 +213,7 @@ def test_load_db_apply_config_returns_db_name(monkeypatch, tmp_path):
         DB_NAME="app-db",
     )
     _write_config(tmp_path / "config.py", fake_config)
+    monkeypatch.setenv("DB_NAME", fake_config.DB_NAME)  # ADR-060 : DB_NAME lu dans l'env
     monkeypatch.chdir(tmp_path)
 
     cfg = load_db_apply_config()
@@ -231,6 +232,7 @@ def test_load_db_apply_config_uses_current_working_directory(monkeypatch, tmp_pa
         DB_NAME="cwd_apply_db",
     )
     _write_config(tmp_path / "config.py", fake_config)
+    monkeypatch.setenv("DB_NAME", fake_config.DB_NAME)  # ADR-060 : DB_NAME lu dans l'env
     monkeypatch.chdir(tmp_path)
 
     cfg = load_db_apply_config()

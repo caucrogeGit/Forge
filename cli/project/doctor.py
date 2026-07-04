@@ -205,11 +205,13 @@ def check_db(root: Path, config: "ModuleType | None") -> CheckResult:
                            "driver mariadb non installé — pip install mariadb")
 
     _mariadb: Any = mariadb
-    host     = getattr(config, "DB_APP_HOST",  "localhost")
-    port     = int(getattr(config, "DB_APP_PORT", 3306))
-    user     = getattr(config, "DB_APP_LOGIN", "")
-    password = getattr(config, "DB_APP_PWD",   "")
-    db_name  = getattr(config, "DB_NAME",      "")
+    # ADR-060 : la config de connexion est lue dans l'environnement (config.py
+    # ne porte plus de bloc BDD). L'env a été chargé au chargement du projet.
+    host     = os.environ.get("DB_APP_HOST", "localhost")
+    port     = int(os.environ.get("DB_APP_PORT", "3306"))
+    user     = os.environ.get("DB_APP_LOGIN", "")
+    password = os.environ.get("DB_APP_PWD", "")
+    db_name  = os.environ.get("DB_NAME", "")
 
     if not user or not db_name:
         return CheckResult("skip", "Base de données", "credentials applicatifs non configurés")
@@ -460,8 +462,9 @@ def check_prod_security(root: Path, config: "ModuleType | None") -> CheckResult:
 
     risks: list[str] = []
 
-    app_login = getattr(config, "DB_APP_LOGIN", "")
-    admin_login = getattr(config, "DB_ADMIN_LOGIN", "")
+    # ADR-060 : identifiants lus dans l'environnement (config.py sans bloc BDD).
+    app_login = os.environ.get("DB_APP_LOGIN", "")
+    admin_login = os.environ.get("DB_ADMIN_LOGIN", "")
     if app_login and admin_login and app_login == admin_login:
         risks.append("l'app utilise le compte DB admin (séparer DB_APP_LOGIN de DB_ADMIN_LOGIN)")
 

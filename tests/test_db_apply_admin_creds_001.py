@@ -27,6 +27,7 @@ def test_load_migration_db_config_ne_porte_que_la_base(monkeypatch):
         DB_NAME="projet_db",
     )
     monkeypatch.setattr(migrations, "load_project_config", lambda: fake)
+    monkeypatch.setenv("DB_NAME", "projet_db")  # ADR-060 : DB_NAME lu dans l'env
 
     cfg = migrations.load_migration_db_config()
 
@@ -47,6 +48,7 @@ def test_load_db_apply_config_ne_porte_que_la_base(monkeypatch):
         DB_NAME="projet_db",
     )
     monkeypatch.setattr(db_apply, "load_project_config", lambda: fake)
+    monkeypatch.setenv("DB_NAME", "projet_db")  # ADR-060 : DB_NAME lu dans l'env
 
     cfg = db_apply.load_db_apply_config()
 

@@ -61,6 +61,15 @@ def _minimal_config(tmp_path: Path, **extra) -> types.SimpleNamespace:
     return cfg
 
 
+def _apply_db_env(monkeypatch, cfg) -> None:
+    """ADR-060 : check_db lit la config BDD dans l'environnement (config.py sans
+    bloc BDD). On reflète les attributs du cfg de test dans os.environ."""
+    for name in ("DB_APP_HOST", "DB_APP_PORT", "DB_APP_LOGIN", "DB_APP_PWD",
+                 "DB_NAME", "DB_ADMIN_LOGIN"):
+        if hasattr(cfg, name):
+            monkeypatch.setenv(name, str(getattr(cfg, name)))
+
+
 def _write_entity(entities_root: Path, folder: str) -> None:
     d = entities_root / folder
     d.mkdir(parents=True, exist_ok=True)
@@ -335,6 +344,7 @@ def test_check_db_mariadb_absent(tmp_path, monkeypatch):
 def test_check_db_connexion_impossible(tmp_path, monkeypatch):
     _write(tmp_path / "env" / "dev", "")
     cfg = _minimal_config(tmp_path)
+    _apply_db_env(monkeypatch, cfg)
 
     fake_mariadb = types.ModuleType("mariadb")
     fake_mariadb.Error = Exception
@@ -353,6 +363,7 @@ def test_check_db_connexion_impossible(tmp_path, monkeypatch):
 def test_check_db_ok(tmp_path, monkeypatch):
     _write(tmp_path / "env" / "dev", "")
     cfg = _minimal_config(tmp_path)
+    _apply_db_env(monkeypatch, cfg)
 
     fake_conn = types.SimpleNamespace(close=lambda: None)
     fake_mariadb = types.ModuleType("mariadb")

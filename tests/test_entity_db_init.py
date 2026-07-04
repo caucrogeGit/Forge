@@ -98,6 +98,19 @@ def _fake_config() -> types.SimpleNamespace:
     )
 
 
+def _apply_db_env(monkeypatch, fake_config: types.SimpleNamespace) -> None:
+    """ADR-060 : les loaders lisent la config BDD dans l'environnement, plus dans
+    les attributs de config.py. On reflète le fake_config dans os.environ."""
+    for name in (
+        "DB_ADMIN_HOST", "DB_ADMIN_PORT", "DB_ADMIN_LOGIN", "DB_ADMIN_PWD",
+        "DB_NAME", "DB_CHARSET", "DB_COLLATION",
+        "DB_APP_HOST", "DB_APP_PORT", "DB_APP_LOGIN", "DB_APP_PWD",
+        "DB_APP_PRIVILEGES",
+    ):
+        if hasattr(fake_config, name):
+            monkeypatch.setenv(name, str(getattr(fake_config, name)))
+
+
 def _patch_db_init_config(monkeypatch, fake_config: types.SimpleNamespace) -> None:
     raw_privileges = getattr(fake_config, "DB_APP_PRIVILEGES", None)
     privileges = (
@@ -152,6 +165,7 @@ def test_load_db_init_config_reads_provisioning_and_app(monkeypatch, tmp_path):
     # provisionnement (base, jeu de caractères, compte applicatif).
     fake_config = _fake_config()
     _write_config(tmp_path / "config.py", fake_config)
+    _apply_db_env(monkeypatch, fake_config)
     monkeypatch.chdir(tmp_path)
 
     cfg = load_db_init_config()
@@ -172,6 +186,7 @@ def test_load_db_init_config_uses_current_working_directory(monkeypatch, tmp_pat
     fake_config = _fake_config()
     fake_config.DB_NAME = "cwd_db"
     _write_config(tmp_path / "config.py", fake_config)
+    _apply_db_env(monkeypatch, fake_config)
     monkeypatch.chdir(tmp_path)
 
     cfg = load_db_init_config()
@@ -483,6 +498,7 @@ def test_load_db_init_config_reads_custom_db_app_privileges(monkeypatch, tmp_pat
     fake_config = _fake_config()
     fake_config.DB_APP_PRIVILEGES = "SELECT,INSERT,UPDATE"
     _write_config(tmp_path / "config.py", fake_config)
+    _apply_db_env(monkeypatch, fake_config)
     monkeypatch.chdir(tmp_path)
 
     cfg = load_db_init_config()
@@ -496,6 +512,7 @@ def test_load_db_init_config_rejects_invalid_privilege(monkeypatch, tmp_path):
     fake_config = _fake_config()
     fake_config.DB_APP_PRIVILEGES = "SELECT,TRUNCATE"
     _write_config(tmp_path / "config.py", fake_config)
+    _apply_db_env(monkeypatch, fake_config)
     monkeypatch.chdir(tmp_path)
 
     with pytest.raises(DbInitError, match="TRUNCATE"):

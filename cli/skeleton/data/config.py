@@ -35,26 +35,11 @@ load_dotenv(f"env/{APP_ENV}", override=True) # surcharge avec l'environnement ch
 
 # ── Variables de configuration ─────────────────────────────────────────────────
 
-DB_ADMIN_HOST  = os.getenv("DB_ADMIN_HOST", "localhost")
-DB_ADMIN_PORT  = int(os.getenv("DB_ADMIN_PORT", 3306))
-DB_ADMIN_LOGIN = os.getenv("DB_ADMIN_LOGIN", "forge_admin")
-DB_ADMIN_PWD   = os.getenv("DB_ADMIN_PWD", "")
-
-DB_NAME        = os.getenv("DB_NAME", "forge_db")
-DB_CHARSET     = os.getenv("DB_CHARSET", "utf8mb4")
-DB_COLLATION   = os.getenv("DB_COLLATION", "utf8mb4_unicode_ci")
-
-DB_APP_HOST    = os.getenv("DB_APP_HOST", "localhost")
-DB_APP_PORT    = int(os.getenv("DB_APP_PORT", 3306))
-DB_APP_LOGIN   = os.getenv("DB_APP_LOGIN", "forge_app")
-DB_APP_PWD     = os.getenv("DB_APP_PWD", "")
-DB_POOL_SIZE   = int(os.getenv("DB_POOL_SIZE", 5))
-
-# Alias de compatibilité interne — le fonctionnement applicatif normal repose sur DB_APP_*.
-DB_HOST        = DB_APP_HOST
-DB_PORT        = DB_APP_PORT
-DB_USER_LOGIN  = DB_APP_LOGIN
-DB_USER_PWD    = DB_APP_PWD
+# Base de données : aucune configuration ici (ADR-060). Le cœur est agnostique
+# BDD (ADR-054) et le backend installé lit lui-même ses variables (DB_APP_*,
+# DB_ADMIN_*, DB_NAME, ...) directement dans l'environnement. Installez un
+# backend (forge-mvc-sqlite, forge-mvc-mariadb, ...) et renseignez ses variables
+# dans env/dev selon sa documentation.
 
 APP_NAME          = os.getenv("APP_NAME",          "Forge")
 APP_ROUTES_MODULE = os.getenv("APP_ROUTES_MODULE", "mvc.routes")

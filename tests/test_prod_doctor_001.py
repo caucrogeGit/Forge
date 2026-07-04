@@ -43,7 +43,10 @@ class TestProdSecurity:
             "privilèges DB séparés et uploads bornés"
         )
 
-    def test_db_no_separation_warns(self):
+    def test_db_no_separation_warns(self, monkeypatch):
+        # ADR-060 : check_prod_security lit les logins DB dans l'environnement.
+        monkeypatch.setenv("DB_APP_LOGIN", "forge_admin")
+        monkeypatch.setenv("DB_ADMIN_LOGIN", "forge_admin")
         r = check_prod_security(ROOT, _cfg(DB_APP_LOGIN="forge_admin"))
         assert r.status == "warn"
         assert "admin" in r.detail.lower()

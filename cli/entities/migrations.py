@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import hashlib
 import json
+import os
 import re
 import time
 from dataclasses import dataclass
@@ -905,13 +906,13 @@ def _connect_db():
 
 def load_migration_db_config() -> MigrationDbConfig:
     # load_project_config() charge l'environnement (load_dotenv) : indispensable
-    # pour que le backend lise ensuite DB_ADMIN_* dans os.environ (ADR-060).
-    config = load_project_config()
+    # pour que le backend lise ensuite DB_ADMIN_* et DB_NAME dans os.environ (ADR-060).
+    load_project_config()
 
     # ADR-033 : les migrations sont des changements de structure ; elles
     # empruntent le compte d'administration, lu par le backend depuis DB_ADMIN_*.
-    # Seul le nom de la base cible reste fourni ici (DB_NAME).
-    return MigrationDbConfig(database=config.DB_NAME)
+    # Seul le nom de la base cible reste fourni ici (DB_NAME, lu dans l'env).
+    return MigrationDbConfig(database=os.environ.get("DB_NAME", ""))
 
 
 def _rollback_quietly(connection: Any) -> None:

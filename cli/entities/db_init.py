@@ -4,6 +4,7 @@
 from __future__ import annotations
 from typing import Any
 
+import os
 from dataclasses import dataclass
 
 from cli.project.project_config import ProjectConfigError, load_project_config
@@ -77,19 +78,22 @@ def _parse_app_privileges(raw: object) -> tuple[str, ...]:
 
 
 def load_db_init_config() -> DbInitConfig:
-    config = load_project_config()
+    # ADR-060 : load_project_config charge l'environnement (load_dotenv) ; les
+    # paramètres de provisionnement sont ensuite lus dans os.environ, plus dans
+    # les attributs de config.py (qui ne porte plus de bloc BDD).
+    load_project_config()
 
-    raw_privileges = getattr(config, "DB_APP_PRIVILEGES", None)
+    raw_privileges = os.environ.get("DB_APP_PRIVILEGES")
     app_privileges = _parse_app_privileges(raw_privileges) if raw_privileges is not None else DEFAULT_APP_PRIVILEGES
 
     return DbInitConfig(
-        db_name=config.DB_NAME,
-        db_charset=config.DB_CHARSET,
-        db_collation=config.DB_COLLATION,
-        app_host=config.DB_APP_HOST,
-        app_port=config.DB_APP_PORT,
-        app_login=config.DB_APP_LOGIN,
-        app_password=config.DB_APP_PWD,
+        db_name=os.environ.get("DB_NAME", ""),
+        db_charset=os.environ.get("DB_CHARSET", "utf8mb4"),
+        db_collation=os.environ.get("DB_COLLATION", "utf8mb4_unicode_ci"),
+        app_host=os.environ.get("DB_APP_HOST", "localhost"),
+        app_port=int(os.environ.get("DB_APP_PORT", "3306")),
+        app_login=os.environ.get("DB_APP_LOGIN", ""),
+        app_password=os.environ.get("DB_APP_PWD", ""),
         app_privileges=app_privileges,
     )
 
@@ -102,7 +106,7 @@ def _init_serverless(backend: Any) -> list[str]:
     """
     from cli.entities.serverless_db import configure_serverless_db
 
-    config = configure_serverless_db()
+    configure_serverless_db()
 
     actions: list[str] = []
     connection = backend.get_connection()
@@ -111,7 +115,7 @@ def _init_serverless(backend: Any) -> list[str]:
         try:
             cursor.execute(backend.dialect.forge_migrations_ddl())
             connection.commit()
-            actions.append(f"Base {config.DB_NAME} prête.")
+            actions.append(f"Base {os.environ.get('DB_NAME', '')} prête.")
             actions.append("Table forge_migrations prête.")
         finally:
             cursor.close()
