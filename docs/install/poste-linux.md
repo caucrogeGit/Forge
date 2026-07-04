@@ -16,20 +16,19 @@ Aller d'un poste Linux propre à un projet Forge qui démarre en développement,
 !!! note "Forge est agnostique en base de données"
     Le cœur de Forge ne dépend d'aucun SGBD (ADR-054).
     La base est fournie par un **backend opt-in** que vous choisissez et installez : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres` ou `forge-mvc-mssql`.
-    Pour un démarrage sans aucun serveur à installer, le backend `forge-mvc-sqlite` (une base dans un simple fichier) est l'option la plus légère : installez `forge-mvc-sqlite` et sautez toutes les étapes propres à MariaDB.
+    Ce guide prépare le poste et le projet **sans supposer de backend particulier**.
+    La configuration propre à chaque backend (variables de connexion, serveur, comptes, provisionnement) est décrite sur la page [Bases de données (backends)](../guide/bases-de-donnees.md).
 
-Ce guide déroule le parcours avec le backend **MariaDB**, un serveur robuste et courant.
-À la fin, vous disposez :
+À la fin de ce parcours, vous disposez :
 
 * des outils système nécessaires ;
 * de Forge installé avec `pipx` ;
 * de Git configuré sur le poste ;
 * de Node.js 24 installé pour la compilation du CSS ;
 * d'un nouveau projet Forge créé ;
-* du backend base de données choisi installé dans le projet (ici `forge-mvc-mariadb`) ;
+* du backend base de données de votre choix installé dans le projet ;
 * d'un dépôt Git local versionné et poussé sur GitHub ;
-* de la base configurée pour ce backend (ici MariaDB : serveur, `env/dev`, comptes) ;
-* de la base initialisée et des migrations appliquées ;
+* de la base initialisée avec `forge db:init` selon la configuration de votre backend ;
 * du serveur de développement lancé.
 
 ---
@@ -44,7 +43,7 @@ Elle se fait une seule fois sur une machine neuve.
 La seconde crée et configure un projet Forge.
 Elle se refait pour chaque nouveau projet.
 
-Si Forge, Git, `pipx`, Node.js 24 et MariaDB sont déjà installés sur votre poste, vous pouvez aller directement à la partie **Créer et configurer un projet Forge**.
+Si Forge, Git, `pipx` et Node.js 24 sont déjà installés sur votre poste, vous pouvez aller directement à la partie **Créer et configurer un projet Forge**.
 
 ---
 
@@ -52,11 +51,11 @@ Si Forge, Git, `pipx`, Node.js 24 et MariaDB sont déjà installés sur votre po
 
 | Partie | Domaine | À refaire ? |
 |---|---|---|
-| Préparer le poste Linux | système, `pipx`, Forge, Git global, Node.js 24, MariaDB Server | une fois par machine |
-| Créer et configurer un projet Forge | `forge new`, backend `forge-mvc-mariadb`, `env/dev`, Git local, GitHub, base MariaDB, migrations, `forge run` | à chaque nouveau projet |
+| Préparer le poste Linux | système, `pipx`, Forge, Git global, Node.js 24 | une fois par machine |
+| Créer et configurer un projet Forge | `forge new`, backend BDD au choix, `env/dev`, Git local, GitHub, `db:init`, `forge run` | à chaque nouveau projet |
 
-Les pages [Préparer MariaDB](mariadb.md) et [Comptes MariaDB d'un projet](mariadb-comptes.md) restent des références pour approfondir ou dépanner.
-Vous n'avez pas besoin d'y aller pour terminer une installation standard.
+La page [Bases de données (backends)](../guide/bases-de-donnees.md) décrit comment choisir et configurer votre backend (installation, variables de connexion, serveur et comptes le cas échéant).
+Vous vous y référez au moment d'installer le backend et d'initialiser la base.
 
 ---
 
@@ -101,14 +100,7 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
         `sudo apt update` et `sudo apt upgrade -y` se terminent sans erreur bloquante.
 
 ??? info "2. Installer les paquets nécessaires"
-    **Objectif :** Installer les outils système nécessaires à Python, Git, pipx, au connecteur MariaDB et à la compilation du CSS (Node.js).
-
-    !!! note "Paquets propres au backend MariaDB"
-        `libmariadb-dev`, `pkg-config`, `build-essential` et `python3-dev` ne servent qu'à compiler le connecteur Python du backend **MariaDB**.
-        Si vous utilisez le backend `forge-mvc-sqlite`, aucun de ces paquets n'est nécessaire : SQLite est fourni par la bibliothèque standard de Python.
-
-    !!! warning "Attention"
-        Pour le backend MariaDB, le paquet `libmariadb-dev` est important : sans lui, l'installation du connecteur Python `mariadb` peut échouer.
+    **Objectif :** Installer les outils système nécessaires à Python, Git, pipx et à la compilation du CSS (Node.js).
 
     ```bash
     sudo apt install -y \
@@ -118,21 +110,13 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
       pipx \
       git \
       curl \
-      openssl \
-      build-essential \
-      python3-dev \
-      libmariadb-dev \
-      pkg-config
+      openssl
     ```
 
-    Le paquet `libmariadb-dev` fournit `mariadb_config`, requis par le connecteur Python `mariadb`.
-    Vérifiez sa présence :
-
-    ```bash
-    mariadb_config --version
-    ```
-
-    Si cette commande échoue, l'installation de Forge peut échouer avec une erreur du type `mariadb_config not found`.
+    !!! note "Paquets système propres à un backend"
+        Certains backends base de données ont besoin de paquets système supplémentaires (par exemple le connecteur MariaDB requiert `libmariadb-dev`, `pkg-config`, `build-essential` et `python3-dev`).
+        Le backend `forge-mvc-sqlite` n'en demande aucun : SQLite est fourni par la bibliothèque standard de Python.
+        Reportez-vous à la page [Bases de données (backends)](../guide/bases-de-donnees.md) pour les prérequis du backend que vous choisirez.
 
     **Node.js 24 (compilation du CSS)**
 
@@ -163,7 +147,7 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     ---
 
     !!! success "Validation attendue"
-        `mariadb_config --version` répond et `node --version` affiche une version `v24.x` ou plus récente.
+        `node --version` affiche une version `v24.x` ou plus récente et `npm --version` répond.
 
 ??? info "3. Activer pipx"
     **Objectif :** Rendre la commande `pipx` disponible dans le terminal courant.
@@ -249,65 +233,7 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     !!! success "Validation attendue"
         `git config --global --list` affiche au moins `user.name`, `user.email` et `init.defaultBranch=main`.
 
-??? info "6. Installer et démarrer MariaDB"
-    **Objectif :** Installer MariaDB Server sur le poste et démarrer le service.
-
-    MariaDB Server appartient à la préparation du poste.
-    Il n'a pas besoin d'être réinstallé à chaque projet.
-
-    ```bash
-    sudo apt install -y \
-      mariadb-server \
-      mariadb-client
-    ```
-
-    Démarrez MariaDB et activez-le au démarrage de la machine :
-
-    ```bash
-    sudo systemctl enable --now mariadb
-    ```
-
-    Vérifiez que le service est actif :
-
-    ```bash
-    systemctl status mariadb --no-pager
-    ```
-
-    ---
-
-    !!! success "Validation attendue"
-        `systemctl status mariadb --no-pager` indique que le service MariaDB est actif.
-
-??? info "7. Vérifier l'accès administrateur MariaDB local"
-    **Objectif :** Vérifier que l'administration locale MariaDB fonctionne avec `sudo mariadb`.
-
-    Sur Debian, Ubuntu et leurs dérivées, l'administration locale se fait souvent avec le compte système `root`, via `sudo`.
-
-    ```bash
-    sudo mariadb
-    ```
-
-    Vous devez obtenir une invite :
-
-    ```text
-    MariaDB [(none)]>
-    ```
-
-    Quittez ensuite la console :
-
-    ```sql
-    exit;
-    ```
-
-    Le compte `root` MariaDB sert uniquement à l'administration locale via `sudo mariadb`.
-    Il ne sert pas à faire tourner l'application.
-
-    ---
-
-    !!! success "Validation attendue"
-        La console `MariaDB [(none)]>` s'ouvre avec `sudo mariadb`.
-
-??? info "8. Vérifier que le poste est prêt"
+??? info "6. Vérifier que le poste est prêt"
     **Objectif :** Contrôler que le poste Linux est prêt pour créer un projet Forge.
 
     Sur le poste, ces commandes doivent répondre :
@@ -318,8 +244,6 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     git --version
     node --version
     npm --version
-    mariadb_config --version
-    systemctl status mariadb --no-pager
     ```
 
     Si ces commandes fonctionnent, le poste est prêt pour créer des projets Forge.
@@ -327,16 +251,16 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     ---
 
     !!! success "Validation attendue"
-        Les commandes `forge`, `pipx`, `git`, `node`, `npm`, `mariadb_config` et `systemctl status mariadb` répondent.
+        Les commandes `forge`, `pipx`, `git`, `node` et `npm` répondent.
 
 ## Partie 2 - Créer et configurer un projet Forge
 
 Cette partie se refait pour chaque nouveau projet Forge.
 
-Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, Node.js 24 et MariaDB sont installés.
+Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` et Node.js 24 sont installés.
 
 ??? info "1. Créer un nouveau projet Forge et installer son backend BDD"
-    **Objectif :** Créer un nouveau projet Forge, entrer dans son environnement Python et y installer le backend base de données.
+    **Objectif :** Créer un nouveau projet Forge, entrer dans son environnement Python et y installer le backend base de données de votre choix.
 
     Choisissez un nom de projet.
     Remplacez `NOM_PROJET` par votre nom réel, par exemple `boutique`, `blog`, `welcome-forge` ou `gestion-stock`.
@@ -356,20 +280,18 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, 
     ```
 
     Installez ensuite le backend base de données dans l'environnement du projet.
-    Ce guide utilise MariaDB :
+    Choisissez-le selon vos besoins ; la page [Bases de données (backends)](../guide/bases-de-donnees.md) présente les quatre backends officiels et leurs prérequis.
 
     ```bash
-    pip install --pre forge-mvc-mariadb
+    pip install --pre forge-mvc-<backend>
     ```
 
-    !!! note "Autre backend"
-        Pour une base sans serveur, installez `forge-mvc-sqlite` à la place, et sautez les étapes propres à MariaDB (installation du serveur, création de la base et des comptes).
-        Les backends `forge-mvc-postgres` et `forge-mvc-mssql` existent aussi ; consultez la documentation du backend choisi pour ses variables d'environnement.
+    Remplacez `<backend>` par le nom du backend choisi, par exemple `sqlite` (sans serveur, idéal pour démarrer), `mariadb`, `postgres` ou `mssql`.
 
     ---
 
     !!! success "Validation attendue"
-        Le dossier du projet existe, l'environnement `.venv` est activable, le terminal se trouve dans le projet et `pip show forge-mvc-mariadb` affiche le backend installé.
+        Le dossier du projet existe, l'environnement `.venv` est activable, le terminal se trouve dans le projet et `pip show forge-mvc-<backend>` affiche le backend installé.
 
 ??? info "2. Lire le fichier env/dev généré"
     **Objectif :** Lire le fichier `env/dev` généré et comprendre qu'il ne contient pas encore de configuration base de données.
@@ -390,8 +312,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, 
     APP_ROUTES_MODULE=mvc.routes
 
     # Base de données : aucune variable ici au départ.
-    # Le backend installé (ici forge-mvc-mariadb) lit sa configuration dans
-    # l'environnement. Vous ajoutez le bloc DB_* à l'étape « Compléter env/dev ».
+    # Le backend installé lit sa configuration dans l'environnement.
+    # Vous ajoutez le bloc DB_* à l'étape « Configurer le backend ».
 
     UPLOAD_MAX_SIZE=5242880
 
@@ -399,8 +321,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, 
     APP_PORT=8000
     ```
 
-    C'est vous qui ajoutez ensuite les variables de connexion attendues par le backend MariaDB (`DB_ADMIN_*`, `DB_APP_*`, `DB_NAME`).
-    Vous choisissez donc librement le nom de la base et des comptes ; retenez ces valeurs, elles devront être identiques dans `env/dev` et dans les commandes MariaDB.
+    C'est vous qui ajoutez ensuite les variables de connexion attendues par votre backend.
+    Chaque backend documente ses variables ; la page [Bases de données (backends)](../guide/bases-de-donnees.md) les récapitule.
 
     ---
 
@@ -805,17 +727,14 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, 
     !!! success "Validation attendue"
         Le dépôt local est relié à GitHub, `origin` pointe vers le bon dépôt et `main` suit `origin/main`.
 
-??? info "5. Ajouter la configuration MariaDB à env/dev"
-    **Objectif :** Ajouter à `env/dev` le bloc de configuration du backend MariaDB, avant de créer la base et les comptes.
+??? info "5. Configurer le backend base de données dans env/dev"
+    **Objectif :** Ajouter à `env/dev` les variables de connexion attendues par le backend installé, et provisionner la base si le backend le requiert.
 
     !!! warning "Attention"
         `env/dev` contient des secrets de développement. Il ne doit pas être publié tel quel si votre projet le considère comme local.
 
-    Cette étape appartient au projet.
-    Elle se refait pour chaque nouveau projet Forge, car chaque projet possède sa propre base et son propre compte applicatif.
-
-    Comme le squelette est agnostique en base de données, `env/dev` ne contient pas encore ces variables : c'est le backend MariaDB installé à l'étape 1 qui les lit dans l'environnement.
-    Vous les ajoutez donc ici.
+    Le squelette est agnostique : `env/dev` ne contient pas de configuration base de données à la création.
+    Chaque backend lit ses propres variables dans l'environnement ; vous les ajoutez ici selon la documentation du backend choisi.
 
     Ouvrez le fichier `env/dev` :
 
@@ -823,118 +742,22 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, 
     nano env/dev
     ```
 
-    Ajoutez le bloc de variables MariaDB suivant :
+    La page [Bases de données (backends)](../guide/bases-de-donnees.md) décrit, pour chaque backend :
 
-    ```env
-    DB_ADMIN_HOST=localhost
-    DB_ADMIN_PORT=3306
-    DB_ADMIN_LOGIN=forge_admin
-    DB_ADMIN_PWD=mot_de_passe_admin_local
+    * les variables `DB_*` à renseigner dans `env/dev` ;
+    * le provisionnement éventuel (serveur, base, comptes) ;
+    * les particularités du dialecte.
 
-    DB_NAME=NOM_BASE
-    DB_CHARSET=utf8mb4
-    DB_COLLATION=utf8mb4_unicode_ci
-
-    DB_APP_HOST=localhost
-    DB_APP_PORT=3306
-    DB_APP_LOGIN=NOM_UTILISATEUR_APP
-    DB_APP_PWD=mot_de_passe_app_local
-    DB_POOL_SIZE=5
-    ```
-
-    Remplacez :
-
-    * `NOM_BASE` par le nom réel de la base du projet ;
-    * `NOM_UTILISATEUR_APP` par le nom réel du compte applicatif ;
-    * `mot_de_passe_admin_local` par le mot de passe local du compte `forge_admin` ;
-    * `mot_de_passe_app_local` par le mot de passe local du compte applicatif.
-
-    Le nom de la base et le nom du compte applicatif peuvent reprendre le nom du projet, à condition de rester cohérents dans toute la procédure.
-
-    À partir de maintenant, les valeurs de `env/dev` sont la référence.
-    L'étape suivante crée la base et les comptes MariaDB à partir de ces valeurs.
+    !!! note "Backend sans serveur"
+        Avec `forge-mvc-sqlite`, il n'y a ni serveur ni compte : la base est un fichier, dont le chemin est donné par `DB_NAME`.
+        Vous renseignez `DB_NAME` puis passez directement à l'initialisation.
 
     ---
 
     !!! success "Validation attendue"
-        `env/dev` contient les valeurs définitives de `DB_NAME`, `DB_ADMIN_LOGIN`, `DB_ADMIN_PWD`, `DB_APP_LOGIN` et `DB_APP_PWD`.
+        `env/dev` contient les variables de connexion attendues par votre backend, et la base est provisionnée si le backend l'exige.
 
-??? info "6. Créer la base et les comptes MariaDB du projet"
-    **Objectif :** Créer dans MariaDB la base et les comptes déclarés dans `env/dev`.
-
-    !!! warning "Attention"
-        Les valeurs utilisées dans MariaDB doivent correspondre exactement aux valeurs renseignées dans `env/dev`.
-
-    Forge sépare trois niveaux d'accès :
-
-    ```text
-    root                -> administration locale du serveur, avec sudo
-    forge_admin         -> préparation de la base et application des migrations
-    DB_APP_LOGIN        -> accès applicatif au runtime, en lecture/écriture
-    ```
-
-    `forge db:init` se connecte avec le compte indiqué dans `DB_ADMIN_LOGIN`.
-    Ce compte doit déjà exister : Forge ne le crée pas.
-    Le compte recommandé est `forge_admin`.
-
-    Relisez d'abord les valeurs du projet :
-
-    ```bash
-    grep -E '^(DB_NAME|DB_ADMIN_LOGIN|DB_APP_LOGIN)=' env/dev
-    ```
-
-    Ouvrez ensuite une console MariaDB administrateur :
-
-    ```bash
-    sudo mariadb
-    ```
-
-    Exécutez les commandes SQL suivantes en remplaçant les valeurs par celles de `env/dev` :
-
-    ```sql
-    CREATE DATABASE IF NOT EXISTS `NOM_BASE`
-      CHARACTER SET utf8mb4
-      COLLATE utf8mb4_unicode_ci;
-
-    CREATE USER IF NOT EXISTS 'forge_admin'@'localhost'
-      IDENTIFIED BY 'mot_de_passe_admin_local';
-
-    CREATE USER IF NOT EXISTS 'NOM_UTILISATEUR_APP'@'localhost'
-      IDENTIFIED BY 'mot_de_passe_app_local';
-
-    GRANT CREATE USER ON *.* TO 'forge_admin'@'localhost';
-
-    GRANT CREATE, ALTER, DROP, INDEX, REFERENCES,
-          SELECT, INSERT, UPDATE, DELETE
-    ON `NOM_BASE`.* TO 'forge_admin'@'localhost'
-    WITH GRANT OPTION;
-
-    GRANT SELECT, INSERT, UPDATE, DELETE
-    ON `NOM_BASE`.* TO 'NOM_UTILISATEUR_APP'@'localhost';
-    ```
-
-    Quittez ensuite la console :
-
-    ```sql
-    exit;
-    ```
-
-    Précisions :
-
-    * `NOM_BASE` doit reprendre exactement la valeur de `DB_NAME` ;
-    * `NOM_UTILISATEUR_APP` doit reprendre exactement la valeur de `DB_APP_LOGIN` ;
-    * `mot_de_passe_admin_local` doit reprendre exactement la valeur de `DB_ADMIN_PWD` ;
-    * `mot_de_passe_app_local` doit reprendre exactement la valeur de `DB_APP_PWD` ;
-    * si `DB_NAME` contient un tiret, les backticks sont indispensables : `` `mon-projet` `` ;
-    * si `DB_APP_LOGIN` contient un tiret, gardez les quotes SQL : `'mon-projet'@'localhost'` ;
-    * le compte admin n'a pas besoin du privilège `RELOAD` : `forge db:init` n'émet pas de `FLUSH PRIVILEGES`, car `CREATE USER` et `GRANT` prennent effet immédiatement en MariaDB.
-
-    ---
-
-    !!! success "Validation attendue"
-        La base, le compte `forge_admin` et le compte applicatif existent dans MariaDB, avec les mêmes valeurs que celles déclarées dans `env/dev`.
-
-??? info "7. Vérifier le projet avec forge doctor"
+??? info "6. Vérifier le projet avec forge doctor"
     **Objectif :** Diagnostiquer le projet avec `forge doctor` avant l'initialisation de la base.
 
     ```bash
@@ -948,27 +771,24 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, 
     !!! success "Validation attendue"
         `forge doctor` ne signale plus de blocage avant l'initialisation de la base.
 
-??? info "8. Initialiser la base avec forge db:init"
+??? info "7. Initialiser la base avec forge db:init"
     **Objectif :** Initialiser la base Forge et préparer la table technique des migrations.
-
-    !!! warning "Attention"
-        Sur Debian, Ubuntu et dérivées, le compte `root` MariaDB utilise souvent `unix_socket`. Le compte recommandé pour Forge reste `forge_admin`.
 
     ```bash
     forge db:init
     ```
 
-    Cette commande prépare la base du projet et crée la table technique `forge_migrations`, qui mémorise les migrations déjà appliquées.
+    Cette commande passe par le backend actif : elle prépare la base du projet et crée la table technique `forge_migrations`, qui mémorise les migrations déjà appliquées.
 
     Si la commande s'arrête sur un message du type :
 
     ```text
     Aucun backend BDD installé. Le cœur de Forge est agnostique BDD (ADR-054) :
-    installez un opt-in de backend, par exemple pip install forge-mvc-mariadb.
+    installez un opt-in de backend, par exemple pip install forge-mvc-sqlite.
     ```
 
     C'est que le backend n'a pas été installé dans l'environnement du projet.
-    Reprenez l'étape 1 et lancez `pip install --pre forge-mvc-mariadb` avec le `.venv` du projet activé.
+    Reprenez l'étape 1 et lancez `pip install --pre forge-mvc-<backend>` avec le `.venv` du projet activé.
 
     Si la commande s'arrête plutôt sur :
 
@@ -976,25 +796,15 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx`, 
     Connexion d'administration impossible. Vérifiez DB_ADMIN_* dans env/dev.
     ```
 
-    Forge n'a pas pu se connecter avec le compte indiqué dans `DB_ADMIN_LOGIN`.
-    À vérifier :
-
-    * le compte existe dans MariaDB ;
-    * le mot de passe correspond à `DB_ADMIN_PWD` ;
-    * `DB_ADMIN_HOST` est correct, généralement `localhost` ;
-    * `DB_ADMIN_PORT` est correct, généralement `3306` ;
-    * le compte a été créé avec le même hôte que celui utilisé par Forge ;
-    * `DB_ADMIN_PWD` n'est pas resté vide dans `env/dev`.
-
-    Sur Debian, Ubuntu et leurs dérivées, le compte `root` MariaDB utilise souvent l'authentification `unix_socket`, ce qui peut échouer en connexion TCP.
-    Le parcours recommandé reste donc de créer un compte `forge_admin`.
+    Le backend n'a pas pu se connecter à la base.
+    Vérifiez la configuration de connexion dans `env/dev` et le provisionnement de la base ; la page [Bases de données (backends)](../guide/bases-de-donnees.md) détaille ces points pour chaque backend.
 
     ---
 
     !!! success "Validation attendue"
         `forge db:init` se termine sans erreur et la table technique des migrations est prête.
 
-??? info "9. Lancer le serveur de développement"
+??? info "8. Lancer le serveur de développement"
     Objectif : démarrer le serveur Forge en mode développement et ouvrir le projet dans le navigateur.
 
     Avant de lancer le serveur, vérifiez le port configuré dans `env/dev`.
