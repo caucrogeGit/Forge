@@ -151,6 +151,12 @@ class TestHtmlHelper:
         (self.tmp / "t.html").write_text("{{ titre }}")
         assert html("t.html", context={"titre": "Forge"}).body == b"Forge"
 
+    def test_forge_version_injecte(self):
+        """Le manager injecte forge_version (version du paquet forge-mvc) partout."""
+        import importlib.metadata as md
+        (self.tmp / "t.html").write_text("v{{ forge_version }}")
+        assert html("t.html").body.decode() == f"v{md.version('forge-mvc')}"
+
     def test_body_encode_utf8(self):
         (self.tmp / "t.html").write_text("{{ msg }}")
         assert html("t.html", context={"msg": "éàü"}).body == "éàü".encode("utf-8")

@@ -14,7 +14,8 @@ Ensuite, chaque appel à `render(...)` produit la chaîne HTML correspondante.
 
 Le gestionnaire injecte automatiquement la variable `app_name` (lue dans la configuration `APP_NAME`) dans tout contexte de rendu.
 Ainsi, le nom de l'application est disponible partout : layout partagé, pages, pages d'erreur.
-L'injection se fait avec `setdefault`, donc un contrôleur peut toujours surcharger cette valeur.
+Il injecte de la même façon `forge_version`, la version du paquet `forge-mvc` installé (chaîne vide si le paquet est introuvable), disponible dans tout template.
+L'injection se fait avec `setdefault`, donc un contrôleur peut toujours surcharger ces valeurs.
 
 En pratique, le rendu est généralement appelé via `BaseController.render(...)`, qui s'appuie sur l'instance partagée `template_manager`.
 
