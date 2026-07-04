@@ -488,6 +488,54 @@ def check_prod_security(root: Path, config: "ModuleType | None") -> CheckResult:
     return CheckResult("ok", "Sécurité prod", "privilèges DB séparés et uploads bornés")
 
 
+def check_optin_registry(root: Path) -> CheckResult:
+    """Cohérence du registre d'opt-ins (ADR-061) vs les paquets installés.
+
+    Signale les opt-ins (ou le backend BDD) inscrits dans optins/registry.py mais
+    absents du .venv. Lecture seule : analyse le texte du registre et interroge
+    importlib, sans importer de paquet opt-in.
+    """
+    import importlib.util
+
+    registry_path = root / "optins" / "registry.py"
+    if not registry_path.exists():
+        return CheckResult("skip", "Registre opt-ins", "optins/registry.py absent")
+
+    from cli.optins.catalog import DB_BACKENDS, OFFICIAL_OPTINS
+    from cli.optins.registry_format import read_backend, read_enabled_optins
+
+    try:
+        text = registry_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return CheckResult("warn", "Registre opt-ins", f"illisible : {exc}")
+
+    imports: dict[str, str] = {}
+    for name in read_enabled_optins(text):
+        opt = OFFICIAL_OPTINS.get(name)
+        if opt is not None:
+            imports[name] = opt.package_import
+    backend = read_backend(text)
+    if backend is not None:
+        for b in DB_BACKENDS:
+            if b.name == backend:
+                imports[f"backend {backend}"] = b.package_import
+
+    if not imports:
+        return CheckResult("ok", "Registre opt-ins", "aucun opt-in inscrit")
+
+    missing = sorted(
+        label for label, imp in imports.items()
+        if importlib.util.find_spec(imp) is None
+    )
+    if missing:
+        return CheckResult(
+            "warn", "Registre opt-ins",
+            f"inscrit(s) mais non installé(s) : {', '.join(missing)} "
+            "(installer le paquet ou retirer du registre)",
+        )
+    return CheckResult("ok", "Registre opt-ins", f"{len(imports)} inscrit(s), tous installés")
+
+
 def run_all(root: Path, version: str) -> list[CheckResult]:
     """Exécute tous les checks dans l'ordre et retourne la liste des résultats."""
     config = load_project_config(root)
@@ -500,6 +548,7 @@ def run_all(root: Path, version: str) -> list[CheckResult]:
         lambda: check_i18n(root),
         lambda: check_templates(root),
         lambda: check_modules(root),
+        lambda: check_optin_registry(root),
         lambda: check_mfa_dependency(root),
         lambda: check_rbac_dependency(root),
         lambda: check_ssl(root, config),
