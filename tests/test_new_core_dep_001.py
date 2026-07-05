@@ -57,8 +57,6 @@ def test_projet_sans_parcours_welcome(projet):
     # (docs/ peut exister via la guidance agent ADR-047 — docs/adr/ —, mais
     # plus jamais docs/welcome/.)
     assert not (projet / "docs" / "welcome").exists()
-    # Et toujours pas de mkdocs.yml ni de doc du framework vendorée.
-    assert not (projet / "mkdocs.yml").exists()
 
 
 def test_requirements_epingle_forge_mvc(projet):

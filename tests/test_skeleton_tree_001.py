@@ -34,9 +34,12 @@ REQUIRED_FILES = [
     "pyproject.toml",
     "requirements.txt",
     "requirements-dev.txt",
+    "requirements-docs.txt",
     "pytest.ini",
+    "mkdocs.yml",
     "tests/conftest.py",
     "tests/test_smoke_001.py",
+    "docs/index.md",
     "package.json",
     ".gitignore",
     "env/example",
@@ -83,7 +86,6 @@ FORBIDDEN_PATHS = [
     "cli",
     "integrations",
     "packages",
-    "mkdocs.yml",
     "conftest.py",
     "mvc/controllers/auth_controller.py",
     "mvc/controllers/mfa_challenge_controller.py",
@@ -93,10 +95,9 @@ FORBIDDEN_PATHS = [
     "mvc/views/landing",
     "mvc/entities/media",
     "mvc/mail",
-    # Le parcours welcome-projet (ex-ADR-048) faisait double emploi avec la
-    # documentation officielle : retiré du squelette.
+    # docs/ est livré (chaîne MkDocs, ADR-063), mais le parcours welcome-projet
+    # (ex-ADR-048) faisait double emploi avec la documentation officielle.
     "docs/welcome",
-    "docs",
 ]
 
 
