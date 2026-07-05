@@ -89,7 +89,7 @@ class TestApply:
     def test_registry_branches_iot(self, tmp_path):
         enable_optin("iot", apply=True, project_root=tmp_path, package_check=_PKG_OK)
         registry = (tmp_path / "optins" / "registry.py").read_text(encoding="utf-8")
-        assert "def register_optins(router)" in registry
+        assert "def register_optins(router: Router) -> None:" in registry
         assert "from optins.iot.routes import register" in registry
 
     def test_iot_routes_calls_register_iot_routes(self, tmp_path):

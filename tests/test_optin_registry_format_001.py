@@ -14,6 +14,7 @@ from cli.optins.registry_format import (
     ANCHOR_IMPORT,
     ANCHOR_REGISTRY,
     REGISTRY_TEMPLATE,
+    add_optin_entry,
     read_backend,
     read_enabled_optins,
 )
@@ -54,7 +55,7 @@ def test_template_porte_les_trois_ancres():
 def test_template_expose_backend_et_enabled_optins():
     assert "BACKEND" in REGISTRY_TEMPLATE
     assert "ENABLED_OPTINS" in REGISTRY_TEMPLATE
-    assert "def register_optins(router)" in REGISTRY_TEMPLATE
+    assert "def register_optins(router: Router) -> None:" in REGISTRY_TEMPLATE
 
 
 # ── Lecteurs (analyse de texte, sans import du module projet) ─────────────────
@@ -91,3 +92,21 @@ def test_register_optins_est_un_noop_sur_gabarit_vierge():
 
     assert namespace["register_optins"](_Router()) is None  # type: ignore[operator]
     assert calls == []
+
+
+# ── F6 : l'insertion d'un opt-in préserve les éditions manuelles ──────────────
+# (SKELETON-STANDARDS-CONFORMANCE-001, charte principes 4/9). L'écriture est
+# chirurgicale par ancres : elle n'insère qu'une ligne d'entrée et ne réécrit
+# jamais le reste du fichier, donc un marqueur `# pyright: strict` ajouté en
+# tête et la signature typée `register_optins(router: Router)` subsistent.
+
+def test_add_optin_entry_preserve_les_editions_manuelles():
+    edited = "# pyright: strict\n" + REGISTRY_TEMPLATE
+    new_text, status = add_optin_entry(edited, "qrcode", "library")
+
+    assert status == "inserted"
+    assert new_text.startswith("# pyright: strict\n")
+    assert "def register_optins(router: Router) -> None:" in new_text
+    assert "if TYPE_CHECKING:" in new_text
+    assert read_enabled_optins(new_text) == {"qrcode": "library"}
+    ast.parse(new_text)  # le fichier reste du Python valide
