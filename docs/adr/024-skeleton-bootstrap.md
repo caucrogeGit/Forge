@@ -3,6 +3,7 @@
 ## Statut
 
 Accepté, Forge 1.0.0-beta.13 (ticket `BOOTSTRAP-SKELETON-ADR-024`).
+Portée révisée par ADR-063 : « nu » qualifie le noyau applicatif (pas de code métier échafaudé), pas l'apparat qualité, désormais livré par défaut.
 
 ---
 
