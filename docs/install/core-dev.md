@@ -8,18 +8,17 @@ distinction ci-dessous.
 
 ---
 
-## Utilisateur du framework vs développeur du core
+## Public : le développeur du cœur, pas l'utilisateur du framework
 
-Deux parcours **distincts**, qui ne se mélangent pas :
+Cette page ne couvre **pas** l'installation d'un projet Forge classique.
+Si votre but est de créer une application **avec** Forge, vous êtes un
+**utilisateur du framework** : suivez plutôt
+[Poste Linux](poste-linux.md), cette page n'est pas pour vous.
 
-| | **Utilisateur du framework** | **Développeur du core (cette page)** |
-|---|---|---|
-| But | Créer une application avec Forge | Modifier Forge lui-même |
-| Installation | `pipx install --pip-args="--pre" forge-mvc` | `git clone` du dépôt + `pip install -e .` |
-| Point d'entrée projet | `forge new mon-app` | `cd Forge` (le dépôt cloné) |
-| Fichiers modifiés | `mvc/`, `env/`, `mvc/entities/...` | `core/`, `cli/`, `tests/`, `docs/`, `packages/` |
-| Lancement | `forge run` dans le projet généré | `python -m pytest` + outils de dev |
-| Référence | [Poste Linux (pipx)](poste-linux.md) | cette page + [Contribuer](../philosophy/contributing.md) |
+Le **développeur du core** (le public de cette page) ne crée pas
+d'application : il clone le dépôt et l'installe en mode éditable pour
+**modifier Forge lui-même** (`core/`, `cli/`, `tests/`, `docs/`,
+`packages/`), au moyen des étapes ci-dessous.
 
 !!! warning "Ne pas utiliser `pipx` pour développer le core"
     `pipx` installe Forge dans un environnement isolé, en lecture seule
