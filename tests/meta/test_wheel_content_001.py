@@ -112,9 +112,13 @@ class TestSdistContent:
     """
 
     def test_sdist_excludes_tests(self, fresh_sdist):
+        # Le socle de test livré PAR le squelette (`cli/skeleton/data/tests`, ADR-063)
+        # est une donnée matérialisée par `forge new`, pas la suite du framework :
+        # il doit rester dans le sdist. Seule la suite Forge est exclue.
         offenders = [
             n for n in fresh_sdist
-            if "/tests/" in n or n.split("/")[1:2] == ["tests"]
+            if ("/tests/" in n or n.split("/")[1:2] == ["tests"])
+            and "/cli/skeleton/data/" not in n
         ]
         assert not offenders, (
             f"Le sdist embarque {len(offenders)} fichier(s) de tests "
