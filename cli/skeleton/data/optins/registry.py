@@ -1,3 +1,4 @@
+# pyright: strict
 """Registre des opt-ins de ce projet (ADR-061).
 
 Vue unique et explicite des opt-ins utilisés par ce projet. Aucun code d'opt-in

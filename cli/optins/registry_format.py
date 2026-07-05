@@ -29,6 +29,7 @@ ANCHOR_IMPORT = "# >>> opt-in imports (gérés par forge opt-in:enable / disable
 ANCHOR_CALL = "    # >>> opt-in calls (gérés par forge opt-in:enable / disable)"
 
 REGISTRY_TEMPLATE = f'''\
+# pyright: strict
 """Registre des opt-ins de ce projet (ADR-061).
 
 Vue unique et explicite des opt-ins utilisés par ce projet. Aucun code d'opt-in

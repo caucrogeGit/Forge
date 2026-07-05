@@ -1,3 +1,4 @@
+# pyright: strict
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController

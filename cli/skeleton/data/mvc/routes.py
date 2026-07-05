@@ -1,3 +1,4 @@
+# pyright: strict
 from core.http.router import Router
 from mvc.controllers.home_controller import HomeController
 from optins.registry import register_optins

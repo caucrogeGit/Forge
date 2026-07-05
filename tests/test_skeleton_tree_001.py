@@ -31,6 +31,7 @@ SKELETON = REPO_ROOT / "cli" / "skeleton" / "data"
 REQUIRED_FILES = [
     "app.py",
     "config.py",
+    "pyproject.toml",
     "requirements.txt",
     "package.json",
     ".gitignore",
@@ -80,7 +81,6 @@ FORBIDDEN_PATHS = [
     "packages",
     "tests",
     "mkdocs.yml",
-    "pyproject.toml",
     "conftest.py",
     "mvc/controllers/auth_controller.py",
     "mvc/controllers/mfa_challenge_controller.py",
