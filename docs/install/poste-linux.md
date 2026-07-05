@@ -816,3 +816,4 @@ Après le parcours Welcome Forge, vous pourrez revenir vers les pages techniques
 * [Bases de données (backends)](../guide/bases-de-donnees.md) : choisir et configurer un backend (MariaDB, SQLite, PostgreSQL, SQL Server), `db:init`, comptes et migrations.
 * [Opt-ins officiels de Forge](../optins/index.md) : les extensions du framework, installées et activées à la carte.
 * [Parcours Welcome](../starters/index.md) : les parcours d'apprentissage pour prendre en main Forge pas à pas.
+* [Contribuer au cœur de Forge](core-dev.md) : installer un projet pour modifier Forge lui-même (clone du dépôt, installation éditable, validations).
