@@ -110,7 +110,7 @@ class TestCardLinks:
 
 
 class TestOptInModules:
-    """Les 11 modules opt-in sont présents avec leurs cartes."""
+    """Les modules opt-in listés sur la landing sont présents avec leurs cartes."""
 
     @pytest.mark.parametrize("module", [
         "forge-mvc-mfa",

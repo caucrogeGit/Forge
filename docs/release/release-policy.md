@@ -438,7 +438,7 @@ reste manuelle et délibérée.
 ### Règles de version
 
 - **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était bumped à chaque release. Les opt-ins source-only conservaient leur version interne.
-- Depuis `1.0.0-beta.9`, les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont publiés sur PyPI et strictement synchronisés avec la version du core ; `iot` les a rejoints en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`, et `i18n` (extrait en `1.0.0-beta.15`) ensuite. **Les douze opt-ins officiels** sont désormais publiés et synchronisés.
+- Depuis `1.0.0-beta.9`, les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont publiés sur PyPI et strictement synchronisés avec la version du core ; `iot` les a rejoints en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`, et `i18n` (extrait en `1.0.0-beta.15`) ensuite. **Les opt-ins officiels** sont désormais publiés et synchronisés.
 
 ### Artefacts de build
 
@@ -466,10 +466,10 @@ Aucune automatisation ne déclenche la publication.
 ### État actuel
 
 `forge-mvc` (core) est publié sur PyPI depuis `1.0.0-beta.1`.
-**Les douze opt-ins officiels** (`forge-mvc-rbac`,
-`-workflow`, `-stats`, `-mfa`, `-files`, `-images`, `-audio`, `-iot`,
-`-video`, `-pivot`, `-mail`, `-i18n`) sont publiés sur PyPI et synchronisés avec
-le core. Les règles applicables à chaque package restent documentées ici.
+**Les opt-ins officiels** (voir `packages/` pour la liste à jour) sont publiés
+sur PyPI et synchronisés avec le core, de même que les backends de base de
+données (`forge-mvc-mariadb`, `-sqlite`, `-postgres`, `-mssql`).
+Les règles applicables à chaque package restent documentées ici.
 
 Cette politique est livrée par le ticket `OPTIN-PACKAGES-PUBLICATION-POLICY-001`.
 
@@ -480,7 +480,7 @@ Il est le point d'entrée officiel du framework.
 
 ### Opt-ins publiés sur PyPI
 
-Les douze opt-ins officiels sont publiés sur PyPI :
+Les opt-ins officiels ont été publiés sur PyPI au fil des bêtas :
 
 - `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) : publication
   initiale en `1.0.0-beta.5` ;
@@ -506,9 +506,8 @@ Avant leur publication PyPI, les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` 
 
 ### Opt-ins publiés et synchronisés
 
-Les douze opt-ins officiels sont publiés sur PyPI avec une version
-synchronisée avec le core (`forge-mvc-i18n`, extrait en `1.0.0-beta.15`,
-complète l'ensemble) :
+Les opt-ins officiels sont publiés sur PyPI avec une version
+synchronisée avec le core :
 
 | Package | Publication | Statut | Prérequis |
 |---|---|---|---|
@@ -552,7 +551,7 @@ PyPI : les installer directement avec `pip install --pre forge-mvc-<nom>`.
 ### Règles de version
 
 - **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était versionné à chaque release.
-- Depuis `1.0.0-beta.9`, le core et les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont strictement synchronisés sur la même version PEP 440 ; `forge-mvc-iot` a rejoint cette synchronisation en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`, et `i18n` ensuite (douze opt-ins au total).
+- Depuis `1.0.0-beta.9`, le core et les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont strictement synchronisés sur la même version PEP 440 ; `forge-mvc-iot` a rejoint cette synchronisation en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`, et `i18n` ensuite (l'ensemble des opt-ins officiels).
 
 ### Ce qui reste interdit sans ticket de release dédié
 
@@ -565,7 +564,7 @@ PyPI : les installer directement avec `pip install --pre forge-mvc-<nom>`.
 | Ticket | Description | État |
 |---|---|---|
 | `OPTIN-PACKAGES-PUBLICATION-POLICY-001` | Documenter la politique de publication des opt-ins | livré |
-| `OPTIN-PYPI-NAMES-CHECK-001` | Vérifier la disponibilité des noms PyPI pour les 5 opt-ins | livré |
+| `OPTIN-PYPI-NAMES-CHECK-001` | Vérifier la disponibilité des noms PyPI des opt-ins | livré |
 | `OPTIN-PYPI-PUBLISH-PREPARE-001` | Préparer rbac/workflow/stats pour publication (dépendances relâchées, `Private :: Do Not Upload` retiré) | livré |
 | `OPTIN-PYPI-PUBLISH-001` | Publication coordonnée des opt-ins publiables | historique / livré selon version cible |
 | `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement Fernet des secrets TOTP | livré |

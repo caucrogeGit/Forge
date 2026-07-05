@@ -520,7 +520,7 @@ déplacé sauf cas exceptionnel et explicitement justifié.
 Une release doit vérifier :
 
 - la version dans le code ;
-- la version dans `pyproject.toml` (racine + 6 opt-ins) ;
+- la version dans `pyproject.toml` (racine et chaque paquet du monorepo) ;
 - la version dans la documentation (via `{{forge_version}}`) ;
 - le changelog daté ;
 - la construction des wheels (toutes les distributions) ;
