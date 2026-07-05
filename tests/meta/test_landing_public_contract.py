@@ -152,3 +152,35 @@ class TestNoForge3xTraces:
             f"Trace interne '{forbidden}' présente dans la landing publique "
             f"(LANDING-CARDS-LINKS-ORDER-001)."
         )
+
+
+# ---------------------------------------------------------------------------
+# Parcours welcome : chaque paquet qui en a un est lié depuis la landing
+# ---------------------------------------------------------------------------
+
+PACKAGES_DIR = PROJECT_ROOT / "packages"
+
+
+def _packages_with_welcome() -> list[str]:
+    """Slugs (nom sans le préfixe forge-mvc-) des paquets dotés d'un parcours
+    welcome, hors infrastructure de test (dev-only, absente de la landing)."""
+    slugs = []
+    for pkg in sorted(PACKAGES_DIR.iterdir()):
+        if pkg.name == "forge-mvc-testing":
+            continue
+        if (pkg / "docs" / "welcome").is_dir():
+            slugs.append(pkg.name.removeprefix("forge-mvc-"))
+    return slugs
+
+
+@pytest.mark.parametrize("slug", _packages_with_welcome())
+def test_parcours_welcome_lie_depuis_la_landing(slug: str):
+    """Tout paquet doté d'un parcours welcome (opt-in fonctionnel ou backend
+    BDD) doit être présenté dans la section Starters de la landing. Dérivé de
+    packages/, donc drift-proof : un nouveau parcours non lié fait échouer ce
+    test (c'est ce qui manquait pour les backends BDD)."""
+    text = LANDING.read_text(encoding="utf-8")
+    assert f"/docs/forge/{slug}/welcome/" in text, (
+        f"Le parcours welcome de forge-mvc-{slug} n'est pas lié depuis la "
+        f"landing (section Starters). Attendu : /docs/forge/{slug}/welcome/..."
+    )
