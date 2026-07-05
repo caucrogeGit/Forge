@@ -5,9 +5,10 @@ tests exercent `forge.cmd_new` avec une matérialisation RÉELLE (seules les I/O
 lourdes — venv, pip, npm, certs, git — sont neutralisées) et inspectent le
 projet effectivement produit :
 
-- il contient le squelette applicatif (app.py, mvc/) ;
+- il contient le squelette applicatif (app.py, mvc/) et son propre socle de
+  test (tests/, ADR-063) ;
 - il ne contient NI le framework (core/, cli/, integrations/), NI les
-  paquets/tests du monorepo ;
+  paquets du monorepo ;
 - il n'embarque plus de parcours `docs/welcome/` (ex-ADR-048) : il faisait
   double emploi avec la documentation officielle ;
 - son requirements.txt épingle forge-mvc à la version courante (le core vient
@@ -43,7 +44,7 @@ def test_projet_contient_le_squelette_applicatif(projet):
     assert (projet / "mvc" / "controllers" / "home_controller.py").is_file()
 
 
-@pytest.mark.parametrize("absent", ["core", "cli", "integrations", "packages", "tests"])
+@pytest.mark.parametrize("absent", ["core", "cli", "integrations", "packages"])
 def test_projet_ne_vendore_pas_le_framework(projet, absent):
     assert not (projet / absent).exists(), (
         f"Un projet nu ne doit pas embarquer {absent}/ (il vient du paquet forge-mvc)."

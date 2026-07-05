@@ -84,6 +84,9 @@ def collect_mismatches() -> tuple[str, list[str]]:
     check("cli/skeleton/data/requirements.txt forge-mvc==",
           _first_match(ROOT / "cli/skeleton/data/requirements.txt", r"forge-mvc==([0-9][^,\s]*)"),
           canonical)
+    check("cli/skeleton/data/requirements-dev.txt forge-mvc-testing==",
+          _first_match(ROOT / "cli/skeleton/data/requirements-dev.txt", r"forge-mvc-testing==([0-9][^,\s]*)"),
+          canonical)
 
     # package.json (SemVer public).
     package_json = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
