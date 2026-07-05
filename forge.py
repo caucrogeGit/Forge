@@ -7,16 +7,15 @@ from collections.abc import Callable
 import os
 import re
 import sys
-import json
 import shutil
 import subprocess
 import importlib
-import importlib.metadata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
+from cli.project.install_source import forge_mvc_git_spec, pin_forge_mvc_to_git
 from cli.entities.db_apply import main as db_apply_main
 from cli.entities.db_init import main as db_init_main
 from cli.entities.migrations import main as migrations_main
@@ -157,66 +156,6 @@ def _configure_env_files(dest: str, project_name: str) -> None:
         file.write(prod_content)
 
 
-def _forge_mvc_git_spec() -> str | None:
-    """Retourne un spec `forge-mvc @ git+<url>@<commit>` si le paquet forge-mvc
-    dont provient ce CLI a été installé depuis un dépôt Git (ADR-062).
-
-    S'appuie sur `direct_url.json` (PEP 610) : le champ `vcs_info` n'est présent
-    que pour une installation VCS. Retourne None pour une installation PyPI ou
-    éditable locale. Lecture purement locale, sans accès réseau.
-    """
-    try:
-        raw = importlib.metadata.distribution("forge-mvc").read_text("direct_url.json")
-    except Exception:
-        return None
-    if not raw:
-        return None
-    try:
-        parsed = json.loads(raw)
-    except (ValueError, TypeError):
-        return None
-    if not isinstance(parsed, dict):
-        return None
-    data = cast("dict[str, Any]", parsed)
-    vcs_raw = data.get("vcs_info")
-    url = data.get("url")
-    if not isinstance(vcs_raw, dict) or not url:
-        return None
-    vcs = cast("dict[str, Any]", vcs_raw)
-    ref = vcs.get("commit_id") or vcs.get("requested_revision")
-    if not ref:
-        return None
-    return f"forge-mvc @ git+{url}@{ref}"
-
-
-def _pin_forge_mvc_to_git(requirements_path: str, git_spec: str) -> bool:
-    """Réécrit la ligne `forge-mvc` du requirements.txt généré vers `git_spec`.
-
-    S'exécute pendant la génération du projet (fichier neuf, write-if-new) :
-    aucune réécriture d'un fichier applicatif existant (principe 9). Retourne
-    True si une ligne a été remplacée.
-    """
-    if not os.path.exists(requirements_path):
-        return False
-    with open(requirements_path, encoding="utf-8") as file:
-        lines = file.read().splitlines()
-    replaced = False
-    out: list[str] = []
-    for line in lines:
-        stripped = line.strip()
-        if not replaced and (
-            stripped.startswith("forge-mvc==") or stripped.startswith("forge-mvc @")
-        ):
-            out.append(git_spec)
-            replaced = True
-        else:
-            out.append(line)
-    if replaced:
-        with open(requirements_path, "w", encoding="utf-8") as file:
-            file.write("\n".join(out) + "\n")
-    return replaced
-
-
 def _setup_python_environment(dest: str) -> None:
     _print_step("Création de l'environnement virtuel Python...")
     _run([sys.executable, "-m", "venv", ".venv"], cwd=dest, check=True)
@@ -241,9 +180,9 @@ def _setup_python_environment(dest: str) -> None:
     # Version avant-garde (ADR-062) : si ce CLI a été installé depuis GitHub,
     # le projet généré doit dépendre de la MÊME source git (souvent une version
     # non publiée sur PyPI), pas du pin PyPI. On aligne le requirements.txt.
-    git_spec = _forge_mvc_git_spec()
+    git_spec = forge_mvc_git_spec()
     if git_spec:
-        _pin_forge_mvc_to_git(requirements_path, git_spec)
+        pin_forge_mvc_to_git(requirements_path, git_spec)
         _print_step(f"Version GitHub : forge-mvc épinglé sur {git_spec}...")
 
     if os.path.exists(requirements_path):
@@ -415,7 +354,7 @@ def cmd_new(
         print("  Pour tester aussi un backend sur le working tree, installez-le en éditable :")
         print(f"    pip install -e {dev_src}/packages/forge-mvc-<backend>")
         print()
-    elif (git_spec := _forge_mvc_git_spec()):
+    elif (git_spec := forge_mvc_git_spec()):
         print(f"  Version GitHub (ADR-062) : forge-mvc suit {git_spec}.")
         print("  Le projet suit la dernière version poussée sur GitHub, épinglée au commit installé.")
         print()

@@ -5,12 +5,13 @@
 - installation depuis Git : `forge-mvc @ git+<url>@<commit>` ;
 - sinon PyPI : pin `forge-mvc==<version>` (défaut).
 
-Ces tests couvrent la détection (`_forge_mvc_git_spec`) et la réécriture du
-requirements.txt généré (`_pin_forge_mvc_to_git`), par mock des métadonnées.
+Ces tests couvrent la détection (`forge_mvc_git_spec`) et la réécriture du
+requirements.txt généré (`pin_forge_mvc_to_git`), dans `cli/project/install_source.py`,
+par mock des métadonnées.
 """
 import json
 
-import forge
+from cli.project.install_source import forge_mvc_git_spec, pin_forge_mvc_to_git
 
 
 class _FakeDist:
@@ -39,7 +40,7 @@ def test_git_spec_detecte_vcs_commit(monkeypatch):
         "vcs_info": {"vcs": "git", "commit_id": "abc123", "requested_revision": "main"},
     })
     _patch_dist(monkeypatch, payload)
-    assert forge._forge_mvc_git_spec() == (
+    assert forge_mvc_git_spec() == (
         "forge-mvc @ git+https://github.com/caucrogeGit/Forge.git@abc123"
     )
 
@@ -50,7 +51,7 @@ def test_git_spec_fallback_sur_requested_revision(monkeypatch):
         "vcs_info": {"vcs": "git", "requested_revision": "main"},
     })
     _patch_dist(monkeypatch, payload)
-    assert forge._forge_mvc_git_spec() == (
+    assert forge_mvc_git_spec() == (
         "forge-mvc @ git+https://github.com/caucrogeGit/Forge.git@main"
     )
 
@@ -58,14 +59,14 @@ def test_git_spec_fallback_sur_requested_revision(monkeypatch):
 def test_git_spec_none_pour_pypi(monkeypatch):
     # Installation PyPI classique : pas de direct_url.json.
     _patch_dist(monkeypatch, None)
-    assert forge._forge_mvc_git_spec() is None
+    assert forge_mvc_git_spec() is None
 
 
 def test_git_spec_none_pour_editable_local(monkeypatch):
     # Éditable local (dir_info), pas de vcs_info : ce n'est pas le cas Git.
     payload = json.dumps({"url": "file:///home/x/Forge", "dir_info": {"editable": True}})
     _patch_dist(monkeypatch, payload)
-    assert forge._forge_mvc_git_spec() is None
+    assert forge_mvc_git_spec() is None
 
 
 def test_git_spec_none_si_distribution_absente(monkeypatch):
@@ -75,7 +76,7 @@ def test_git_spec_none_si_distribution_absente(monkeypatch):
         raise ilm.PackageNotFoundError(name)
 
     monkeypatch.setattr("importlib.metadata.distribution", boom)
-    assert forge._forge_mvc_git_spec() is None
+    assert forge_mvc_git_spec() is None
 
 
 # ── Réécriture du requirements.txt généré ────────────────────────────────────
@@ -87,7 +88,7 @@ def test_pin_remplace_la_ligne_forge_mvc(tmp_path):
         encoding="utf-8",
     )
     spec = "forge-mvc @ git+https://github.com/caucrogeGit/Forge.git@abc123"
-    assert forge._pin_forge_mvc_to_git(str(req), spec) is True
+    assert pin_forge_mvc_to_git(str(req), spec) is True
     content = req.read_text(encoding="utf-8")
     assert spec in content
     assert "forge-mvc==1.0.0rc2" not in content
@@ -100,11 +101,11 @@ def test_pin_ne_touche_qu_une_ligne(tmp_path):
     req = tmp_path / "requirements.txt"
     req.write_text("forge-mvc==1.0.0rc2\nautre-paquet==1.0\n", encoding="utf-8")
     spec = "forge-mvc @ git+https://github.com/x/Forge.git@sha"
-    forge._pin_forge_mvc_to_git(str(req), spec)
+    pin_forge_mvc_to_git(str(req), spec)
     content = req.read_text(encoding="utf-8")
     assert "autre-paquet==1.0" in content
     assert content.count("forge-mvc") == 1
 
 
 def test_pin_sans_fichier_retourne_false(tmp_path):
-    assert forge._pin_forge_mvc_to_git(str(tmp_path / "absent.txt"), "x") is False
+    assert pin_forge_mvc_to_git(str(tmp_path / "absent.txt"), "x") is False
