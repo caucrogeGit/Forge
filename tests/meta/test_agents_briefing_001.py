@@ -39,9 +39,12 @@ def test_cible_une_application_pas_le_framework():
         "_base.py",          # règle de préservation du code utilisateur
         "write-if-new",
         "python -m pytest",
+        "make check",        # point d'entrée de validation (ADR-063)
         "forgemvc.com",
         "docs/adr/",         # discipline ADR transmise (ADR-047)
         "ADR",
+        "ADR-063",           # pointeurs vers les ADR fondateurs (F7, ADR-063)
+        "ADR-061",
     ],
 )
 def test_conventions_cles_presentes(needle: str):

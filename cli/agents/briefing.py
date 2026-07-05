@@ -94,8 +94,23 @@ Forge a été construit avec une discipline que tu gagnes à reprendre dans ton 
 - Désactiver CSRF, l'authentification ou la validation pour aller plus vite.
 - Mettre des secrets dans le dépôt (utilise `env/`).
 
+## Sur quoi ce projet se fonde (ADR de Forge)
+
+Ton projet démarre déjà conforme à des décisions du framework : le *pourquoi*
+est à côté du *quoi*. Les principales :
+
+- **ADR-024 / ADR-063** : noyau applicatif minimal, mais apparat qualité complet
+  livré (typage strict, tests, documentation, CI). D'où `make check`.
+- **ADR-036** : typage `# pyright: strict` par fichier sur le code éditable.
+- **ADR-041** : socle de test partagé (`forge-mvc-testing`, `requirements-dev.txt`).
+- **ADR-054 / ADR-060** : cœur agnostique base de données, backend en opt-in.
+- **ADR-061** : registre d'opt-ins visible (`optins/registry.py`).
+
+Ces ADR sont publiés avec la documentation de Forge (voir « Aller plus loin »).
+
 ## Valider avant de livrer
 
+- `make check` : lint, typage, tests et documentation en une commande.
 - `python -m pytest` : la suite de tests.
 - `forge doctor` : diagnostic du projet (structure, base, sécurité).
 - `ruff check .` : style et erreurs.
