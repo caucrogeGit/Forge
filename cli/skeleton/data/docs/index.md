@@ -8,6 +8,7 @@ Elle est générée avec MkDocs et le thème Material.
 - Lancer le serveur de développement : `python app.py`
 - Lancer les tests : `pytest`
 - Servir cette documentation en local : `mkdocs serve`
+- Valider tout le projet (lint, typage, tests, doc) : `make check`
 
 ## Décisions d'architecture
 

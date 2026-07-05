@@ -37,6 +37,8 @@ REQUIRED_FILES = [
     "requirements-docs.txt",
     "pytest.ini",
     "mkdocs.yml",
+    "Makefile",
+    ".github/workflows/quality.yml",
     "tests/conftest.py",
     "tests/test_smoke_001.py",
     "docs/index.md",
