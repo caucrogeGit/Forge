@@ -117,7 +117,7 @@ def test_cmd_new_ecrit_forge_profile_txt(tmp_path, monkeypatch):
 
     dest = tmp_path / "TestProjet"
 
-    def fake_materialize(d):
+    def fake_materialize(d, *, bare=False):
         import pathlib
         pathlib.Path(d).mkdir(parents=True, exist_ok=True)
 
@@ -173,7 +173,7 @@ def test_dispatch_parse_profile_option():
 
     calls = []
 
-    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE):
+    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE, bare=False):
         calls.append({"name": name, "profile": profile})
 
     with (
@@ -192,7 +192,7 @@ def test_dispatch_profile_defaut_si_absent():
 
     calls = []
 
-    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE):
+    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE, bare=False):
         calls.append({"profile": profile})
 
     with (
@@ -206,7 +206,7 @@ def test_dispatch_profile_defaut_si_absent():
 
 # ── PROFILE-003 : génération par profil ───────────────────────────────────────
 
-def _fake_clone(d):
+def _fake_clone(d, *, bare=False):
     """Simule _materialize_skeleton en créant uniquement le dossier destination."""
     pathlib.Path(d).mkdir(parents=True, exist_ok=True)
 

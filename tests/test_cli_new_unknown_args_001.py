@@ -65,3 +65,17 @@ def test_new_accepte_arguments_valides(argv, expected_profile):
     cmd_new.assert_called_once()
     if expected_profile is not None:
         assert cmd_new.call_args.kwargs.get("profile") == expected_profile
+
+
+@pytest.mark.parametrize("argv", [
+    ["new", "Demo", "--bare"],
+    ["new", "Demo", "--profile", "minimal", "--bare"],
+    ["new", "Demo", "--bare", "--profile", "minimal"],
+])
+def test_new_accepte_bare(argv):
+    """`--bare` est accepté et transmis à cmd_new (ADR-063)."""
+    forge = _import_forge()
+    with patch.object(forge, "cmd_new") as cmd_new:
+        _run_main(forge, argv)
+    cmd_new.assert_called_once()
+    assert cmd_new.call_args.kwargs.get("bare") is True

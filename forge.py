@@ -98,16 +98,17 @@ def _safe_remove_git(dest: str) -> None:
 
 # ── Étapes d'initialisation ───────────────────────────────────────────────────
 
-def _materialize_skeleton(dest: str) -> None:
-    """Matérialise le squelette de projet nu (ADR-024).
+def _materialize_skeleton(dest: str, *, bare: bool = False) -> None:
+    """Matérialise le squelette de projet (ADR-024).
 
     Copie l'arbre curé `cli/skeleton/data/` dans le projet — plus de
     clone du dépôt. Le `core` du projet vient ensuite du paquet `forge-mvc`
-    (voir requirements.txt du squelette).
+    (voir requirements.txt du squelette). `bare=True` omet l'apparat qualité
+    (ADR-063 : config, tests, doc, CI, hygiène).
     """
     _print_step("Création du projet à partir du squelette Forge...")
     from cli.skeleton import materialize
-    materialize(dest)
+    materialize(dest, bare=bare)
 
 
 def _configure_env_files(dest: str, project_name: str) -> None:
@@ -273,6 +274,7 @@ def _warn_initial_git_failed(exc: Exception) -> None:
 def cmd_new(
     project_name: str,
     profile: str = DEFAULT_PROJECT_PROFILE,
+    bare: bool = False,
 ) -> None:
     if not re.match(r"^[A-Za-z][A-Za-z0-9_-]*$", project_name):
         sys.exit(
@@ -294,12 +296,12 @@ def cmd_new(
     if os.path.exists(dest):
         sys.exit(f"Erreur : le dossier '{dest}' existe déjà.")
 
-    print(f"\nForge {_FORGE_VERSION} — nouveau projet : {project_name} [profil : {profile}]\n")
+    print(f"\nForge {_FORGE_VERSION} — nouveau projet : {project_name} [profil : {profile}]{' [bare]' if bare else ''}\n")
 
     node_warnings = []
     agent_files: list[str] = []
     try:
-        _materialize_skeleton(dest)
+        _materialize_skeleton(dest, bare=bare)
         _configure_env_files(dest, project_name)
         _setup_python_environment(dest)
         node_warnings = _setup_node_environment(dest)
@@ -616,6 +618,9 @@ def main() -> None:
         # et on refuse explicitement tout autre argument, plutôt que de l'ignorer
         # silencieusement (une option mal orthographiée doit échouer, pas passer).
         consumed: set[int] = set()
+        bare = "--bare" in remaining
+        if bare:
+            consumed.add(remaining.index("--bare"))
         if "--profile" in remaining:
             idx = remaining.index("--profile")
             consumed.add(idx)
@@ -632,10 +637,10 @@ def main() -> None:
         if unexpected:
             cli_fail(
                 "argument inconnu pour «forge new» : " + ", ".join(unexpected) + ".",
-                hint="usage : forge new <NomDuProjet> [--profile <profil>]. "
+                hint="usage : forge new <NomDuProjet> [--profile <profil>] [--bare]. "
                      "Profils disponibles : " + ", ".join(SUPPORTED_PROJECT_PROFILES),
             )
-        cmd_new(args[1], profile=profile)
+        cmd_new(args[1], profile=profile, bare=bare)
         return
 
     if command == "make:pivot-crud":

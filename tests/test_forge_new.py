@@ -33,7 +33,7 @@ def _patch_cmd_new(monkeypatch, tmp_path):
     forge_init = _Recorder(return_value=[])
 
     monkeypatch.setattr(forge, "_require_command", lambda cmd, label=None: None)
-    monkeypatch.setattr(forge, "_materialize_skeleton", lambda dest: os.makedirs(dest, exist_ok=True))
+    monkeypatch.setattr(forge, "_materialize_skeleton", lambda dest, *, bare=False: os.makedirs(dest, exist_ok=True))
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
     monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
@@ -128,7 +128,7 @@ def test_message_contient_forge_run(monkeypatch, tmp_path, capsys):
 
 
 def test_echec_commit_git_final_conserve_le_projet(monkeypatch, tmp_path, capsys):
-    def create_dest(dest):
+    def create_dest(dest, *, bare=False):
         os.makedirs(dest, exist_ok=True)
 
     def fail_git(dest, project_name):
@@ -173,7 +173,7 @@ def test_openssl_appele_avec_capture_true(monkeypatch, tmp_path):
 
 def test_openssl_echec_nettoie_dossier(monkeypatch, tmp_path):
     """Si la génération SSL échoue, cmd_new nettoie le dossier projet."""
-    def create_dest(dest):
+    def create_dest(dest, *, bare=False):
         os.makedirs(dest, exist_ok=True)
 
     def fail_certificates(dest):
@@ -213,7 +213,7 @@ def test_materialize_skeleton_copie_le_squelette(monkeypatch, tmp_path):
     """_materialize_skeleton délègue à cli.skeleton.materialize."""
     called = {}
 
-    def spy_materialize(dest):
+    def spy_materialize(dest, *, bare=False):
         called["dest"] = dest
         os.makedirs(dest, exist_ok=True)
 
@@ -227,7 +227,7 @@ def test_cmd_new_materialise_sans_cloner(monkeypatch, tmp_path):
     """cmd_new appelle _materialize_skeleton et ne lance aucun git clone."""
     materialized = {}
 
-    def spy_materialize(dest):
+    def spy_materialize(dest, *, bare=False):
         materialized["dest"] = dest
         os.makedirs(dest, exist_ok=True)
 
@@ -258,7 +258,7 @@ def test_dispatch_new_sans_ref(monkeypatch, tmp_path):
     """forge new MonProjet appelle cmd_new sans paramètre ref."""
     received = {}
 
-    def spy_cmd_new(name, profile="standard"):
+    def spy_cmd_new(name, profile="standard", bare=False):
         received["name"] = name
         received["profile"] = profile
 

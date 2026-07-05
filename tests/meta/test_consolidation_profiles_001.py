@@ -29,7 +29,7 @@ def _import_forge():
     return mod
 
 
-def _fake_clone(d):
+def _fake_clone(d, *, bare=False):
     pathlib.Path(d).mkdir(parents=True, exist_ok=True)
 
 
