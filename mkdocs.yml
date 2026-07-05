@@ -38,6 +38,7 @@ nav:
             - Dépannage serveur dev (WSL2): install/wsl-dev-server.md
             - Poste Linux (parcours complet): install/poste-linux.md
             - Mode développement: install/core-dev.md
+            - Dernière version GitHub (avant-garde): install/github-latest.md
             - VM Debian vierge: install/vm-debian.md
             - Depuis GitHub: install/github.md
             - Windows (résumé court): install/windows.md

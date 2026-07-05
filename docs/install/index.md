@@ -27,6 +27,7 @@ forge run
 |-------|-------|
 | Windows + WSL | [Windows + WSL (parcours complet)](windows-wsl.md) |
 | Poste Linux | [Poste Linux (parcours complet)](poste-linux.md) |
+| Dernière version GitHub (avant-garde) | [Créer un projet sur la dernière version GitHub](github-latest.md) |
 | VM Debian vierge | [VM Debian vierge](vm-debian.md) |
 | Depuis GitHub (framework) | [Depuis GitHub](github.md) |
 | Windows (résumé court) | [Windows](windows.md) |
