@@ -2,9 +2,9 @@
 
 ## Statut
 
-Acceptée (décision), Forge 1.0.0-rc.x (ticket `SKELETON-STANDARDS-CONFORMANCE-001`).
-L'implémentation est étagée en tickets (F2 à F5, F7, plus A1, A2, A4 à A7 ci-dessous).
-La partie F1 (typage de `register_optins`) et F6 (préservation des éditions manuelles du registre) est déjà livrée indépendamment.
+Acceptée, Forge 1.0.0-rc.x (ticket `SKELETON-STANDARDS-CONFORMANCE-001`).
+Décision actée et **implémentation livrée** : F1 et F6 (registre), T1 (config pyright/ruff), T2 (socle test), T3 (chaîne documentaire), T4 (CI et `make check`), T5 (scaffold ADR, `.editorconfig`, `CHANGELOG`, pointeurs ADR de F7) et T6 (`forge new --bare`).
+Les deux installations sont vérifiées de bout en bout : le défaut passe `make check` (lint, typage strict, tests, documentation), la variante `--bare` reste dépouillée mais fonctionnelle.
 
 Cet ADR **révise la portée d'ADR-024** : « projet nu » ne signifie plus « dépouillé de tout », mais « noyau applicatif minimal, apparat qualité maximal ».
 
