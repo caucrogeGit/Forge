@@ -125,10 +125,10 @@ class MSSQLBackend:
         ("DB_NAME", ""),
         ("DB_HOST", "127.0.0.1"),
         ("DB_PORT", "1433"),
-        ("DB_APP_LOGIN", ""),
-        ("DB_APP_PWD", ""),
         ("DB_ADMIN_LOGIN", ""),
         ("DB_ADMIN_PWD", ""),
+        ("DB_APP_LOGIN", ""),
+        ("DB_APP_PWD", ""),
         ("DB_ODBC_DRIVER", "ODBC Driver 18 for SQL Server"),
     ]
 

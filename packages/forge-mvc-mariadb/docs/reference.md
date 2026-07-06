@@ -39,10 +39,10 @@ Renseignez ensuite les valeurs dans `env/dev` (et `env/prod`) :
 DB_NAME=mon_projet
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_APP_LOGIN=mon_projet
-DB_APP_PWD=...
 DB_ADMIN_LOGIN=root
 DB_ADMIN_PWD=...
+DB_APP_LOGIN=mon_projet
+DB_APP_PWD=...
 ```
 
 `DB_ADMIN_*` sert au provisioning et à la DDL ; `DB_APP_*` au runtime (DML).

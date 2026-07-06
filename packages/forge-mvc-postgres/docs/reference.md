@@ -46,10 +46,10 @@ Renseignez ensuite les valeurs dans `env/dev` (et `env/prod`) :
 DB_NAME=mon_projet
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_APP_LOGIN=mon_projet
-DB_APP_PWD=...
 DB_ADMIN_LOGIN=postgres
 DB_ADMIN_PWD=...
+DB_APP_LOGIN=mon_projet
+DB_APP_PWD=...
 ```
 
 `forge doctor` confirme le backend résolu (`postgres`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=postgres`.

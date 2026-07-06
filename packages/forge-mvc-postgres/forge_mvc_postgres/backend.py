@@ -106,10 +106,10 @@ class PostgreSQLBackend:
         ("DB_NAME", ""),
         ("DB_HOST", "127.0.0.1"),
         ("DB_PORT", "5432"),
-        ("DB_APP_LOGIN", ""),
-        ("DB_APP_PWD", ""),
         ("DB_ADMIN_LOGIN", ""),
         ("DB_ADMIN_PWD", ""),
+        ("DB_APP_LOGIN", ""),
+        ("DB_APP_PWD", ""),
     ]
 
     def get_connection(self) -> Any:
