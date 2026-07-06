@@ -14,7 +14,29 @@ L'opt-in stocke ces traces dans une table SQL (`audit_log`) et expose deux fonct
 
 Son périmètre est **borné** : c'est un audit applicatif, pas un SIEM de cybersécurité (cohérent avec ADR-008, la décision de tracer reste applicative).
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-audit
+forge opt-in:enable audit
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install audit` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable audit
+pip uninstall forge-mvc-audit
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove audit` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -30,7 +52,7 @@ Son périmètre est **borné** : c'est un audit applicatif, pas un SIEM de cyber
 | Cadre | ADR-008 (Forge fournit la table et le helper) |
 | Installation | `pip install --pre forge-mvc-audit` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -38,7 +60,7 @@ Le diagramme de classe montre l'API, l'entrée renvoyée et la table.
 
 Le diagramme de séquence montre l'écriture puis la relecture d'une trace.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le module écrit dans la table `audit_log` au travers d'un exécuteur **injecté** et renvoie des `AuditEntry` typés.
 
@@ -96,7 +118,7 @@ classDiagram
 - `get_audit_log` renvoie des `AuditEntry` typés ;
 - le module n'ouvre jamais de connexion : il reçoit un exécuteur.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre un `record_audit` suivi d'un `get_audit_log` filtré.
 
@@ -125,7 +147,7 @@ sequenceDiagram
 - les filtres (`actor`, `action`, `target_type`, `target_id`) sont optionnels ;
 - `limit` est plafonné à `MAX_LIMIT`.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -141,7 +163,7 @@ Le paramètre `action` est obligatoire : c'est une chaîne applicative (par exem
 
 Le paramètre `db` est l'exécuteur de base de données ; omis, il utilise le backend BDD actif.
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -153,9 +175,9 @@ Le paramètre `db` est l'exécuteur de base de données ; omis, il utilise le ba
 | Filtrer le journal | `actor=`, `action=`, `target_type=`, `target_id=` |
 | Créer la table | `CREATE_TABLE_SQL` ou `forge audit:init` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Tracer une action
+### 7.1 Tracer une action
 
 ```python
 from forge_mvc_audit import record_audit
@@ -169,7 +191,7 @@ record_audit(
 )
 ```
 
-### 6.2 Relire et filtrer le journal
+### 7.2 Relire et filtrer le journal
 
 ```python
 from forge_mvc_audit import get_audit_log
@@ -189,7 +211,7 @@ for entry in sur_les_notes:
     - `record_audit` pour écrire une trace ;
     - `get_audit_log` pour relire, avec des filtres optionnels.
 
-## 7. Périmètre, validation et injection
+## 8. Périmètre, validation et injection
 
 L'action est obligatoire et non vide ; sinon `record_audit` lève `AuditError`.
 

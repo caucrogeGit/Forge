@@ -14,7 +14,29 @@ L'opt-in décompose ce flux : `parse_csv` lit, `import_rows` valide selon des `F
 
 Pour l'export, `to_csv` rend des lignes en texte CSV, l'inverse de `parse_csv`, pour un script ou un rapport.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-import-export
+forge opt-in:enable import-export
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install import-export` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable import-export
+pip uninstall forge-mvc-import-export
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove import-export` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -29,7 +51,7 @@ Pour l'export, `to_csv` rend des lignes en texte CSV, l'inverse de `parse_csv`, 
 | Exception | `CsvImportError` |
 | Installation | `pip install --pre forge-mvc-import-export` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -37,7 +59,7 @@ Le diagramme de classe montre les fonctions, les specs et le rapport.
 
 Le diagramme de séquence montre un import validé ligne par ligne.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que `import_rows` valide selon des `FieldSpec`, insère via une fonction **fournie**, et renvoie un `ImportReport`.
 
@@ -91,7 +113,7 @@ classDiagram
 - les lignes fautives deviennent des `RowError` (numéro, champ, message) ;
 - le résultat est un `ImportReport` (importées + erreurs).
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre un import CSV de bout en bout.
 
@@ -122,7 +144,7 @@ sequenceDiagram
 - l'insertion réelle est déléguée à l'application (le SQL lui appartient) ;
 - `partial=True` permet d'insérer les valides même s'il y a des erreurs.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -137,7 +159,7 @@ sequenceDiagram
 
 `insert` est une fonction `dict -> object` fournie par l'application (elle exécute le SQL d'insertion de votre modèle).
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -148,9 +170,9 @@ sequenceDiagram
 | Exporter des données | `to_csv(rows, columns)` |
 | Coercer des valeurs | `coerce_int`, `coerce_float`, `coerce_bool` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Importer un CSV
+### 7.1 Importer un CSV
 
 ```python
 from forge_mvc_import_export import parse_csv, import_rows, FieldSpec, coerce_int
@@ -170,7 +192,7 @@ print(report.imported, "lignes importées,", len(report.errors), "erreurs")
 
 Le SQL d'insertion vit dans votre code ; l'opt-in valide et orchestre.
 
-### 6.2 Exporter en CSV
+### 7.2 Exporter en CSV
 
 ```python
 from forge_mvc_import_export import to_csv
@@ -184,7 +206,7 @@ csv_text = to_csv(rows, columns=["nom", "age"])
     - import : `parse_csv` puis `import_rows(specs, insert)` -> `ImportReport` ;
     - export : `to_csv(rows, columns)`.
 
-## 7. Validation, rapport et frontière
+## 8. Validation, rapport et frontière
 
 La validation est par champ (`FieldSpec`) : champ requis manquant ou coercition impossible produit un `RowError` précis (numéro de ligne, champ, message).
 

@@ -14,7 +14,7 @@ Le cœur génère le SQL et pilote `db:init` / `db:apply` / `migration:*`, mais 
 
 MariaDB est **client-serveur** : un serveur doit être joignable. C'est un choix éprouvé pour la production.
 
-## 2. Installation
+## 2. Installation et désinstallation
 
 MariaDB est client-serveur : un serveur doit être joignable (local, conteneur ou distant).
 Le pilote `mariadb` est installé avec l'opt-in.
@@ -48,6 +48,15 @@ Vérifiez avec `forge doctor`, qui indique le backend résolu et l'état de la c
 Provisionnez enfin la base et les comptes avec `forge db:init`.
 
 La progression guidée, pas à pas : [Installation de forge-mvc-mariadb](welcome/installation.md).
+
+### Désinstallation
+
+```bash
+pip uninstall forge-mvc-mariadb
+```
+
+Un backend n'a pas de commande `disable` : il est découvert par entry point (ADR-054), donc retirer le paquet suffit à ce que le cœur ne le voie plus.
+Pensez aussi à retirer les variables `DB_*` d'`env/dev` et `env/prod`, et, si besoin, à supprimer la base et le compte créés par `db:init`.
 
 ## 3. Vue d'ensemble rapide
 

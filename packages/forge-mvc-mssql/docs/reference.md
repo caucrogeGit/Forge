@@ -19,7 +19,7 @@ Le cœur génère le SQL et pilote les commandes BDD ; un backend les fait parle
 
 Bonne nouvelle côté paramètres : `pyodbc` utilise nativement les `?` de Forge, donc aucune traduction.
 
-## 2. Installation
+## 2. Installation et désinstallation
 
 !!! warning "Backend Alpha"
     SQL Server est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider. À réserver aux essais, pas encore à la production.
@@ -52,6 +52,15 @@ DB_ODBC_DRIVER=ODBC Driver 18 for SQL Server
 `forge doctor` confirme le backend résolu (`mssql`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mssql`.
 
 La progression guidée, pas à pas : [Installation de forge-mvc-mssql](welcome/installation.md).
+
+### Désinstallation
+
+```bash
+pip uninstall forge-mvc-mssql
+```
+
+Un backend n'a pas de commande `disable` : il est découvert par entry point (ADR-054), donc retirer le paquet suffit à ce que le cœur ne le voie plus.
+Pensez aussi à retirer les variables `DB_*` d'`env/dev` et `env/prod`, et, si besoin, à supprimer la base et le compte créés par `db:init`.
 
 ## 3. Vue d'ensemble rapide
 

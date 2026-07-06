@@ -14,7 +14,29 @@ Il branche ses **routes** de lecture sur le routeur du projet via `register_audi
 
 Sa sobriété est un choix : pas de table SQL, pas de suivi de jobs ; tout est synchrone et le service retrouve les fichiers par `uuid`.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-audio
+forge opt-in:enable audio
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
+`forge opt-in:install audio` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable audio
+pip uninstall forge-mvc-audio
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
+`forge opt-in:remove audio` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -32,7 +54,7 @@ Sa sobriété est un choix : pas de table SQL, pas de suivi de jobs ; tout est s
 | Exceptions | `AudioIngestError`, `AudioProbeError`, `FfmpegError` |
 | Installation | `pip install --pre forge-mvc-audio` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -40,7 +62,7 @@ Le diagramme de classe montre les modules, les objets et les dépendances extern
 
 Le diagramme de séquence montre l'ingestion, le transcodage et la lecture.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre une chaîne sans base de données : les fichiers vivent sur disque sous un `uuid`, et `ffmpeg` / `ffprobe` font le travail média.
 
@@ -96,7 +118,7 @@ classDiagram
 - `probe_audio` renvoie un `AudioMetadata` typé ;
 - la lecture sert le fichier par son `uuid`, en streaming.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre une ingestion suivie d'un transcodage, puis la lecture.
 
@@ -128,7 +150,7 @@ sequenceDiagram
 - la lecture honore l'en-tête `Range` ;
 - rien n'est suivi en base : l'application gère ses propres références d'`uuid`.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -147,7 +169,7 @@ sequenceDiagram
 |---|---|
 | `forge audio:doctor` | diagnostic (paquet, config, `ffmpeg`/`ffprobe`) |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -158,9 +180,9 @@ sequenceDiagram
 | Brancher la lecture | `register_audio_routes(router)` |
 | Configurer le module | `load_audio_config(...)` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Ingérer puis transcoder
+### 7.1 Ingérer puis transcoder
 
 ```python
 from forge_mvc_audio import ingest_audio, transcode_to_mp3
@@ -171,7 +193,7 @@ transcode_to_mp3(stored["path"], stored["path"].replace(".wav", ".mp3"))
 
 L'ingestion range le fichier sous un `uuid` ; le transcodage est synchrone.
 
-### 6.2 Brancher les routes de lecture
+### 7.2 Brancher les routes de lecture
 
 ```python
 # optins/audio/routes.py (couche optins du projet)
@@ -190,7 +212,7 @@ def register(router) -> None:
     - `transcode_to_mp3` pour convertir ;
     - `register_audio_routes` pour lire.
 
-## 7. Sobriété, uuid et dépendances
+## 8. Sobriété, uuid et dépendances
 
 Le module est **sans état** : pas de table, pas de file de jobs. L'application garde elle-même la trace des `uuid` qu'elle a ingérés.
 

@@ -14,7 +14,29 @@ L'opt-in stocke les traductions dans des **catalogues JSON** (un fichier par loc
 
 Quand une clé manque dans la locale demandée, il bascule sur la **locale de repli** ; si elle manque toujours, il renvoie la clé elle-même (jamais une erreur d'affichage).
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-i18n
+forge opt-in:enable i18n
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install i18n` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable i18n
+pip uninstall forge-mvc-i18n
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove i18n` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -32,7 +54,7 @@ Quand une clé manque dans la locale demandée, il bascule sur la **locale de re
 | Décision d'architecture | ADR-027 (extraction, repli no-op du cœur) |
 | Installation | `pip install --pre forge-mvc-i18n` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -40,7 +62,7 @@ Le diagramme de classe montre le helper, les catalogues et l'exposition Jinja.
 
 Le diagramme de séquence montre la résolution d'une clé avec repli.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que `trans` lit des catalogues JSON (mis en cache) et que le renderer Jinja du cœur l'expose aux templates quand l'opt-in est présent.
 
@@ -86,7 +108,7 @@ classDiagram
 - les catalogues sont mis en cache (`clear_translation_cache` pour vider) ;
 - le helper `trans()` est exposé aux templates par le cœur quand l'opt-in est installé.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre la résolution d'une clé, avec repli sur la locale de fallback.
 
@@ -116,7 +138,7 @@ sequenceDiagram
 - en dernier recours, `trans` renvoie la clé (pas d'erreur d'affichage) ;
 - le chargement passe par un cache pour éviter de relire le fichier.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -136,7 +158,7 @@ sequenceDiagram
 | `forge i18n:init` | initialise les fichiers de traduction |
 | `forge i18n:check` | vérifie la complétude des traductions entre locales |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -148,9 +170,9 @@ sequenceDiagram
 | Vérifier les manques | `forge i18n:check` |
 | Recharger après édition | `clear_translation_cache()` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Catalogue et traduction
+### 7.1 Catalogue et traduction
 
 `translations/fr.json` :
 
@@ -169,7 +191,7 @@ titre = trans("welcome.title")        # "Bienvenue"
 en = trans("welcome.title", locale="en")
 ```
 
-### 6.2 Dans un template Jinja
+### 7.2 Dans un template Jinja
 
 ```html
 <h1>{{ trans("welcome.title") }}</h1>
@@ -185,7 +207,7 @@ en = trans("welcome.title", locale="en")
     - `{{ trans("clé") }}` dans les templates ;
     - `i18n:check` pour repérer les clés manquantes.
 
-## 7. Repli, cache et intégration
+## 8. Repli, cache et intégration
 
 Le repli est en cascade : locale demandée, puis locale de fallback, puis la clé elle-même.
 

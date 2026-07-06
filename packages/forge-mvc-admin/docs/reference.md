@@ -14,7 +14,29 @@ L'opt-in les génère à partir d'une déclaration : un `AdminResource` décrit 
 
 Le câblage reste **explicite** : on enregistre les ressources et on branche les routes soi-même (couche `optins/`), sans découverte magique.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-admin
+forge opt-in:enable admin
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
+`forge opt-in:install admin` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable admin
+pip uninstall forge-mvc-admin
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
+`forge opt-in:remove admin` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -30,7 +52,7 @@ Le câblage reste **explicite** : on enregistre les ressources et on branche les
 | Exceptions | `AdminError`, `AdminResourceError`, `AdminRegistryError` |
 | Installation | `pip install --pre forge-mvc-admin` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -38,7 +60,7 @@ Le diagramme de classe montre la ressource, le registre et le branchement.
 
 Le diagramme de séquence montre l'affichage d'une liste administrée.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que des `AdminResource` sont enregistrées dans un `AdminRegistry`, que `register_admin_routes` lit pour brancher le `AdminController`.
 
@@ -85,7 +107,7 @@ classDiagram
 - `register_admin_routes` branche le contrôleur sur le routeur ;
 - le contrôleur produit les écrans CRUD à partir des ressources.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre l'affichage d'une liste, sécurisé.
 
@@ -112,7 +134,7 @@ sequenceDiagram
 - le contrôleur s'appuie sur la ressource pour savoir quoi afficher ;
 - les templates du back-office sont embarqués (ADR-046).
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -131,7 +153,7 @@ sequenceDiagram
 | `forge admin:init` | prépare la structure `mvc/admin/` (write-if-new) |
 | `forge admin:doctor` | vérifie la cohérence des ressources avec les contrats d'entité (lecture seule) |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -141,9 +163,9 @@ sequenceDiagram
 | Exiger une permission | `register_admin_routes(router, permission="admin.access")` |
 | Vérifier la cohérence | `forge admin:doctor` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Déclarer une ressource et brancher le back-office
+### 7.1 Déclarer une ressource et brancher le back-office
 
 ```python
 # optins/admin/routes.py (couche optins du projet)
@@ -173,7 +195,7 @@ def register(router) -> None:
     - `registry.register` la collecte ;
     - `register_admin_routes` branche les écrans sécurisés.
 
-## 7. Sécurité, templates et cohérence
+## 8. Sécurité, templates et cohérence
 
 Les routes du back-office exigent une session authentifiée et protègent les écritures par CSRF ; une permission RBAC peut être requise via `permission=`.
 

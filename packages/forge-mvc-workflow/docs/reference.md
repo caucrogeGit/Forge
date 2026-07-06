@@ -17,7 +17,29 @@ L'opt-in modélise ce cycle : on déclare les **statuts** et les **transitions**
 
 Il fournit aussi des **helpers Jinja** pour afficher un statut sous forme de badge coloré, sans logique dans le template.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-workflow
+forge opt-in:enable workflow
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install workflow` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable workflow
+pip uninstall forge-mvc-workflow
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove workflow` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -33,7 +55,7 @@ Il fournit aussi des **helpers Jinja** pour afficher un statut sous forme de bad
 | Décision d'architecture | ADR-004 (opt-in officiel) |
 | Installation | `pip install --pre forge-mvc-workflow` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -41,7 +63,7 @@ Le diagramme de classe montre les statuts, les transitions et les helpers.
 
 Le diagramme de séquence montre la vérification d'un changement de statut.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que les transitions relient des statuts, et que les helpers Jinja rendent un statut en badge.
 
@@ -99,7 +121,7 @@ classDiagram
 - `can_transition` répond oui/non avant d'appliquer un changement ;
 - les helpers Jinja affichent un statut sans logique dans le template.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre un changement de statut contrôlé.
 
@@ -128,7 +150,7 @@ sequenceDiagram
 - `get_available_transitions` alimente les boutons/menus de l'UI ;
 - une transition non déclarée est refusée.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -142,7 +164,7 @@ sequenceDiagram
 | helpers Jinja | `workflow_status_badge`, `workflow_status_badge_class`, `workflow_status_color`, `workflow_status_label`, `make_workflow_jinja_helpers` | affichage |
 | `WorkflowStatusError`, `WorkflowTransitionError` | exceptions | nom invalide, transition invalide |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -152,9 +174,9 @@ sequenceDiagram
 | Valider la configuration | `validate_statuses` / `validate_transitions` |
 | Afficher un badge | `workflow_status_badge(...)` (Jinja) |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Déclarer et vérifier
+### 7.1 Déclarer et vérifier
 
 ```python
 from forge_mvc_workflow import make_status, make_transition, can_transition
@@ -173,7 +195,7 @@ if can_transition(TRANSITIONS, "brouillon", "publie"):
     article["status"] = "publie"      # l'application persiste
 ```
 
-### 6.2 Afficher un badge dans un template
+### 7.2 Afficher un badge dans un template
 
 ```html
 {{ workflow_status_badge(STATUSES, article.status) }}
@@ -188,7 +210,7 @@ if can_transition(TRANSITIONS, "brouillon", "publie"):
     - `can_transition` / `get_available_transitions` pour la logique ;
     - les helpers Jinja pour l'affichage.
 
-## 7. Persistance et validation
+## 8. Persistance et validation
 
 L'opt-in ne crée **aucune table** : le statut courant est un simple champ de votre entité, que vous mettez à jour vous-même après un `can_transition` positif.
 

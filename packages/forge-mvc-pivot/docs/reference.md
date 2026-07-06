@@ -14,7 +14,29 @@ L'opt-in modélise cette jonction enrichie : `PivotAdvancedService` lit et écri
 
 Le contrat du bloc pivot est décrit par `pivot.schema.json`, embarqué dans le paquet depuis l'ADR-057.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-pivot
+forge opt-in:enable pivot
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install pivot` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable pivot
+pip uninstall forge-mvc-pivot
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove pivot` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -30,7 +52,7 @@ Le contrat du bloc pivot est décrit par `pivot.schema.json`, embarqué dans le 
 | Décisions d'architecture | ADR-021 (extraction), ADR-057 (schéma) |
 | Installation | `pip install --pre forge-mvc-pivot` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -38,7 +60,7 @@ Le diagramme de classe montre le service, la ligne pivot et les contraintes.
 
 Le diagramme de séquence montre l'attachement d'une association enrichie.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que `PivotAdvancedService` lit et écrit des `PivotRow` via un exécuteur **injecté**, en respectant des `PivotFieldConstraint`.
 
@@ -94,7 +116,7 @@ classDiagram
 - les `PivotFieldConstraint` valident les attributs (requis, nullable) ;
 - l'exécuteur SQL est injecté, jamais ouvert par le module.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre l'attachement d'un cours à un élève avec une note.
 
@@ -122,7 +144,7 @@ sequenceDiagram
 - les lectures renvoient des `PivotRow` typés ;
 - une donnée invalide lève `PivotConstraintError` (convertible en erreur de formulaire).
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -143,7 +165,7 @@ sequenceDiagram
 |---|---|
 | `forge make:pivot-crud` | génère un sous-CRUD dédié pour un pivot avec attributs |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -154,9 +176,9 @@ sequenceDiagram
 | Générer l'écran de gestion | `forge make:pivot-crud` |
 | Afficher une erreur de saisie | `pivot_error_to_form_error(...)` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Configurer le service et attacher
+### 7.1 Configurer le service et attacher
 
 ```python
 import core.database.db as db
@@ -176,7 +198,7 @@ service.attach(eleve_id=1, target_id=7, pivot_data={"note": 14})
 inscriptions = service.list_for_source(1)
 ```
 
-### 6.2 Générer le sous-CRUD
+### 7.2 Générer le sous-CRUD
 
 ```bash
 forge make:pivot-crud
@@ -191,7 +213,7 @@ Le générateur produit les écrans de gestion de la jonction enrichie, à parti
     - `make:pivot-crud` pour générer l'écran ;
     - `unique_pair` pour interdire les doublons.
 
-## 7. Périmètre, contraintes et exécuteur
+## 8. Périmètre, contraintes et exécuteur
 
 L'opt-in gère la jonction **enrichie** ; le `many_to_many` de base (sans attributs) reste géré par le cœur.
 

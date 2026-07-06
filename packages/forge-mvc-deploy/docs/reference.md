@@ -14,7 +14,29 @@ L'opt-in **génère** ces fichiers à partir de gabarits : `wsgi.py`, une config
 
 Il reste un outil de **préparation** : il écrit des fichiers que vous relisez et adaptez, il ne déploie pas à votre place et ne tourne pas dans le serveur.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-deploy
+forge opt-in:enable deploy
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in expose ses commandes CLI).
+`forge opt-in:install deploy` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable deploy
+pip uninstall forge-mvc-deploy
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
+`forge opt-in:remove deploy` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -29,7 +51,7 @@ Il reste un outil de **préparation** : il écrit des fichiers que vous relisez 
 | Décision d'architecture | ADR-053 (extraction, opt-in CLI-only) |
 | Installation | `pip install --pre forge-mvc-deploy` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -37,7 +59,7 @@ Le diagramme de classe montre les commandes et les fichiers générés.
 
 Le diagramme de séquence montre la préparation puis la pile de production servie.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre les deux commandes et les artefacts qu'elles produisent ou vérifient.
 
@@ -77,7 +99,7 @@ classDiagram
 - la pile cible est Nginx devant Gunicorn servant `wsgi:application` ;
 - aucun de ces fichiers n'est importé par l'application au runtime.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre la préparation, puis une requête servie en production.
 
@@ -109,7 +131,7 @@ sequenceDiagram
 - Gunicorn sert le callable `application` de `wsgi.py` ;
 - le serveur de développement (`python app.py`) ne sert pas la production.
 
-## 4. Commandes (API CLI)
+## 5. Commandes (API CLI)
 
 | Commande | Rôle |
 |---|---|
@@ -118,7 +140,7 @@ sequenceDiagram
 
 Le paquet expose aussi `cmd_deploy_init`, `cmd_deploy_check` et `main` pour le dispatch CLI ; ce ne sont pas des points d'entrée applicatifs.
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -128,7 +150,7 @@ Le paquet expose aussi `cmd_deploy_init`, `cmd_deploy_check` et `main` pour le d
 | Mettre derrière un proxy | configuration Nginx générée |
 | Gérer le service | unité systemd générée |
 
-## 6. Exemple d'utilisation
+## 7. Exemple d'utilisation
 
 ```bash
 # 1. Générer les fichiers (ne réécrit pas l'existant)
@@ -149,7 +171,7 @@ Relisez et adaptez les fichiers générés (domaine, chemins, nombre de workers)
     - `deploy:init` génère, `deploy:check` vérifie ;
     - en production, Nginx devant Gunicorn servant `wsgi:application`.
 
-## 7. CLI-only et adaptation
+## 8. CLI-only et adaptation
 
 `forge-mvc-deploy` n'a pas d'API runtime : il sert uniquement à préparer le déploiement. Une application ne l'importe pas à l'exécution.
 

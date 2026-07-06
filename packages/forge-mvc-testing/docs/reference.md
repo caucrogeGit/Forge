@@ -14,7 +14,25 @@ L'opt-in apporte les deux : `FakeRequest` construit une requête factice (métho
 
 Le plugin s'active automatiquement dès que le paquet est installé (point d'entrée `pytest11`).
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+Infrastructure de test réservée au développement (ADR-041), listée dans `requirements-dev.txt` :
+
+```bash
+pip install forge-mvc-testing
+```
+
+Le plugin pytest et `FakeRequest` sont disponibles dès l'installation. Ce n'est pas un opt-in applicatif : il n'y a pas d'`opt-in:enable`.
+
+### Désinstallation
+
+```bash
+pip uninstall forge-mvc-testing
+```
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -29,7 +47,7 @@ Le plugin s'active automatiquement dès que le paquet est installé (point d'ent
 | Portée | **jamais** une dépendance runtime (ADR-041) |
 | Installation | `pip install --pre forge-mvc-testing` (dev) |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires du paquet.
 
@@ -37,7 +55,7 @@ Le diagramme de classe montre `FakeRequest` et le plugin.
 
 Le diagramme de séquence montre une session pytest qui l'utilise.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que `FakeRequest` imite l'objet `Request` du cœur, et que le plugin fournit les fixtures.
 
@@ -78,7 +96,7 @@ classDiagram
 - des fixtures autouse nettoient sessions, rate-limits, etc. entre les tests ;
 - la fixture `fake_request` fabrique des requêtes factices.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre une session pytest avec le plugin actif.
 
@@ -106,7 +124,7 @@ sequenceDiagram
 - chaque test démarre d'un état propre (fixtures autouse) ;
 - on teste un contrôleur en lui passant une `FakeRequest`.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -123,7 +141,7 @@ sequenceDiagram
 
 Le plugin s'active par le point d'entrée `pytest11` : aucune configuration `conftest` n'est requise.
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -133,9 +151,9 @@ Le plugin s'active par le point d'entrée `pytest11` : aucune configuration `con
 | Partir d'un état propre | fixtures autouse (automatiques) |
 | Obtenir une requête prête | fixture `fake_request` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Tester un contrôleur
+### 7.1 Tester un contrôleur
 
 ```python
 from forge_mvc_testing import FakeRequest
@@ -148,7 +166,7 @@ def test_create_article():
     assert response.status == 200
 ```
 
-### 6.2 Via la fixture
+### 7.2 Via la fixture
 
 ```python
 def test_avec_fixture(fake_request):
@@ -164,7 +182,7 @@ Les nettoyages entre tests sont automatiques (fixtures autouse du plugin).
     - `FakeRequest` : une `Request` sans serveur HTTP ;
     - le plugin pytest : noyau configuré + état propre entre tests.
 
-## 7. Dev-only et isolation
+## 8. Dev-only et isolation
 
 Ce paquet ne sert qu'aux tests : il n'est jamais installé en production et n'est pas importé par le runtime (ADR-041).
 

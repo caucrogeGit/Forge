@@ -17,7 +17,29 @@ L'opt-in définit un `StatsEvent` (nom, libellé, catégorie, métadonnées), le
 
 L'agrégation se fait par **comptage** (ADR-037) : `count_stats_events` renvoie des totaux groupés, pas des séries temporelles complexes.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-stats
+forge opt-in:enable stats
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install stats` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable stats
+pip uninstall forge-mvc-stats
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove stats` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -34,7 +56,7 @@ L'agrégation se fait par **comptage** (ADR-037) : `count_stats_events` renvoie 
 | Décision d'architecture | ADR-037 (agrégation par comptage) |
 | Installation | `pip install --pre forge-mvc-stats` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -42,7 +64,7 @@ Le diagramme de classe montre l'événement, les fonctions et l'exécuteur injec
 
 Le diagramme de séquence montre l'enregistrement puis l'agrégation.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que toutes les fonctions reçoivent un exécuteur SQL (un callable), jamais une connexion ouverte par le module.
 
@@ -94,7 +116,7 @@ classDiagram
 - l'exécuteur SQL est passé en argument (`execute` / `fetch_all`) ;
 - rien n'est tracé sans un appel explicite à `track_event`.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre un suivi d'événement puis un comptage par dimension.
 
@@ -122,7 +144,7 @@ sequenceDiagram
 - `count_stats_events` agrège par la dimension demandée (`group_by`) ;
 - les lectures passent par `fetch_all`, fourni par l'application.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -137,7 +159,7 @@ sequenceDiagram
 
 `execute` et `fetch_all` sont des callables fournis par l'application (par exemple `db.execute`, `db.fetch_all`).
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -148,9 +170,9 @@ sequenceDiagram
 | Compter par dimension | `count_stats_events(fetch_all, group_by=...)` |
 | Créer la table | `get_stats_events_schema_sql()` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Tracer un événement
+### 7.1 Tracer un événement
 
 ```python
 import core.database.db as db
@@ -161,7 +183,7 @@ track_event(db.execute, "export.pdf", category="export", metadata={"pages": 12})
 
 L'exécuteur (`db.execute`) est passé explicitement : le module n'ouvre pas de connexion.
 
-### 6.2 Compter par catégorie
+### 7.2 Compter par catégorie
 
 ```python
 import core.database.db as db
@@ -177,7 +199,7 @@ totaux = count_stats_events(db.fetch_all, group_by="category")
     - `track_event` pour écrire ;
     - `list_stats_events` (détail) et `count_stats_events` (agrégat).
 
-## 7. Tracking explicite et exécuteur injecté
+## 8. Tracking explicite et exécuteur injecté
 
 Forge ne trace rien de lui-même : pas de middleware caché, pas de cookie, pas d'IP. Le développeur décide quoi compter avec `track_event`.
 

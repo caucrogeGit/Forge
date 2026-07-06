@@ -14,7 +14,29 @@ L'opt-in enchaîne un **pipeline** : ingérer le fichier, le sonder (`ffprobe`),
 
 Il branche aussi ses **routes** de lecture sur le routeur du projet, via la couche `optins/` (modèle opt-in de type route).
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-video
+forge opt-in:enable video
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
+`forge opt-in:install video` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable video
+pip uninstall forge-mvc-video
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
+`forge opt-in:remove video` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -31,7 +53,7 @@ Il branche aussi ses **routes** de lecture sur le routeur du projet, via la couc
 | Modèle d'exécution | worker-CLI : transcodage hors requête HTTP |
 | Installation | `pip install --pre forge-mvc-video` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -39,7 +61,7 @@ Le diagramme de classe montre le pipeline, les routes et les dépendances extern
 
 Le diagramme de séquence montre l'upload, le traitement différé, puis la lecture.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le pipeline s'appuie sur `ffmpeg` / `ffprobe` et sur `forge-mvc-files`, et que les routes se branchent explicitement sur le routeur.
 
@@ -91,7 +113,7 @@ classDiagram
 - les routes de lecture se branchent via `register_video_routes` ;
 - le stockage et le service viennent de `forge-mvc-files`.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre l'upload, le traitement par un worker, puis la lecture.
 
@@ -120,7 +142,7 @@ sequenceDiagram
 - la lecture honore l'en-tête `Range` (streaming) ;
 - une vidéo n'est lisible qu'une fois `ready`.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -144,7 +166,7 @@ Les fonctions de pipeline sont surtout appelées par les commandes `video:*` (wo
 | `forge video:process` | traite une vidéo (`<id>` ou `--pending`) |
 | `forge video:cleanup` | purge les vidéos `failed` et fichiers orphelins |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -156,9 +178,9 @@ Les fonctions de pipeline sont surtout appelées par les commandes `video:*` (wo
 | Configurer le module | `FORGE_VIDEO_*` / `load_video_config` |
 | Nettoyer | `forge video:cleanup --apply` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Brancher les routes de lecture
+### 7.1 Brancher les routes de lecture
 
 ```python
 # optins/video/routes.py (couche optins du projet)
@@ -171,7 +193,7 @@ def register(router) -> None:
 
 `forge opt-in:enable video --apply` crée cette couche ; le branchement reste explicite.
 
-### 6.2 Traiter les vidéos en attente (worker)
+### 7.2 Traiter les vidéos en attente (worker)
 
 ```bash
 forge video:upload ma_video.mov --title "Cours 1"
@@ -187,7 +209,7 @@ Le transcodage tourne dans la commande, pas dans le serveur web.
     - traiter hors requête (`video:process`) ;
     - lire en streaming (routes branchées par `register_video_routes`).
 
-## 7. Dépendances externes et exécution différée
+## 8. Dépendances externes et exécution différée
 
 `ffmpeg` et `ffprobe` doivent être installés sur la machine ; `forge video:doctor` le vérifie.
 

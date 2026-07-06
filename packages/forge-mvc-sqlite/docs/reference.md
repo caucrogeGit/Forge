@@ -14,7 +14,7 @@ Le cœur sait générer du SQL et piloter `db:init` / `db:apply` / `migration:*`
 
 SQLite est **sans serveur** : la base est un simple fichier (`DB_NAME`). C'est le choix idéal en développement, en test et pour l'onboarding.
 
-## 2. Installation
+## 2. Installation et désinstallation
 
 SQLite est **sans serveur** : la base est un simple fichier local, sans serveur à joindre ni comptes à créer.
 Le module `sqlite3` fait partie de la bibliothèque standard de Python, donc aucune dépendance externe.
@@ -41,6 +41,15 @@ DB_NAME=storage/mon_projet.db
 `forge db:init` crée alors le fichier et la table technique `forge_migrations` : aucun serveur n'est contacté.
 
 La progression guidée, pas à pas : [Installation de forge-mvc-sqlite](welcome/installation.md).
+
+### Désinstallation
+
+```bash
+pip uninstall forge-mvc-sqlite
+```
+
+Un backend n'a pas de commande `disable` : il est découvert par entry point (ADR-054), donc retirer le paquet suffit à ce que le cœur ne le voie plus.
+Pensez aussi à retirer les variables `DB_*` d'`env/dev` et `env/prod`, et, si besoin, à supprimer la base et le compte créés par `db:init`.
 
 ## 3. Vue d'ensemble rapide
 

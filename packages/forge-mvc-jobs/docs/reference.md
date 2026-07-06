@@ -14,7 +14,29 @@ L'opt-in enfile ces actions avec `enqueue` (depuis un contrôleur) et les traite
 
 Il reste fidèle au modèle WSGI synchrone : **pas de broker, pas de Celery/Redis, pas d'async**. La file est une table SQL ; le worker est un simple process Python.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-jobs
+forge opt-in:enable jobs
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install jobs` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable jobs
+pip uninstall forge-mvc-jobs
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove jobs` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -29,7 +51,7 @@ Il reste fidèle au modèle WSGI synchrone : **pas de broker, pas de Celery/Redi
 | Contrainte | runtime synchrone (WSGI), sans broker ni async |
 | Installation | `pip install --pre forge-mvc-jobs` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -37,7 +59,7 @@ Le diagramme de classe montre l'API, l'état d'une tâche et la table.
 
 Le diagramme de séquence montre les deux côtés : l'enfilage dans la requête, le traitement dans le worker.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le module agit sur la table `jobs` au travers d'un exécuteur **injecté**, et que le worker appelle des `JobHandler` fournis par l'application.
 
@@ -99,7 +121,7 @@ classDiagram
 - le traitement appelle un `JobHandler` que l'application a enregistré ;
 - une tâche échouée est ré-essayée jusqu'à `max_attempts`, sinon marquée `failed`.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre l'enfilage côté requête, puis le traitement côté worker.
 
@@ -132,7 +154,7 @@ sequenceDiagram
 - `process_one` traite une tâche, `drain` vide la file, `run_worker` boucle ;
 - un gestionnaire manquant marque la tâche `failed`.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -152,7 +174,7 @@ sequenceDiagram
 
 `db` est l'exécuteur ; omis, il utilise le backend BDD actif.
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -165,9 +187,9 @@ sequenceDiagram
 | Superviser | `pending_count()`, `get_job(id)` |
 | Créer la table | `CREATE_TABLE_SQL` ou `forge jobs:init` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Enfiler depuis un contrôleur
+### 7.1 Enfiler depuis un contrôleur
 
 ```python
 from core.http.request import Request
@@ -182,7 +204,7 @@ def send(request: Request) -> Response:
 
 La requête répond tout de suite ; le travail se fera dans le worker.
 
-### 6.2 Le worker (process séparé)
+### 7.2 Le worker (process séparé)
 
 ```python
 from forge_mvc_jobs import run_worker
@@ -202,7 +224,7 @@ if __name__ == "__main__":
     - côté requête : `enqueue` ;
     - côté worker : `drain` (cron) ou `run_worker` (persistant), avec vos `handlers`.
 
-## 7. Ré-essais, files et injection
+## 8. Ré-essais, files et injection
 
 Une tâche échouée est ré-essayée tant que `attempts < max_attempts`, sinon marquée `failed` (avec `last_error`).
 

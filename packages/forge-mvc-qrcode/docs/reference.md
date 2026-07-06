@@ -17,7 +17,29 @@ L'opt-in fait deux choses, et seulement deux :
 
 Il ne décide jamais de ce qui est encodé ni de la route : c'est le rôle de l'application.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-qrcode
+forge opt-in:enable qrcode
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install qrcode` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable qrcode
+pip uninstall forge-mvc-qrcode
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove qrcode` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -32,7 +54,7 @@ Il ne décide jamais de ce qui est encodé ni de la route : c'est le rôle de l'
 | Décision d'architecture | ADR-050 |
 | Installation | `pip install --pre forge-mvc-qrcode` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -40,7 +62,7 @@ Le diagramme de classe montre les objets exposés et leurs liens.
 
 Le diagramme de séquence montre le déroulement d'une requête servant un QR Code.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que `QrCodeResponse` s'appuie sur `QrCode` pour produire une `Response` du cœur, et que les deux peuvent lever `QrCodeError`.
 
@@ -88,7 +110,7 @@ classDiagram
 - `QrCodeError` signale une entrée invalide ;
 - le contrôleur appelle `QrCodeResponse` et retourne la `Response`.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre le parcours d'une requête qui affiche un QR Code.
 
@@ -117,7 +139,7 @@ sequenceDiagram
 - `QrCodeResponse` construit le `QrCode` puis l'encode dans le format demandé ;
 - la `Response` renvoyée porte le bon `Content-Type` (`image/png` ou `image/svg+xml`).
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -133,7 +155,7 @@ Le paramètre `error` règle le niveau de correction d'erreur (`"l"`, `"m"`, `"q
 
 Le paramètre `fmt` vaut `"png"` (défaut) ou `"svg"`.
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -144,9 +166,9 @@ Le paramètre `fmt` vaut `"png"` (défaut) ou `"svg"`.
 | Ajuster la taille | paramètres `scale` et `border` |
 | Gérer une entrée invalide | intercepter `QrCodeError` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Générer un PNG
+### 7.1 Générer un PNG
 
 ```python
 from forge_mvc_qrcode import QrCode
@@ -155,7 +177,7 @@ qr = QrCode.from_text("https://forgemvc.com")
 png_bytes = qr.to_png(scale=6, border=2)
 ```
 
-### 6.2 Servir un QR Code depuis un contrôleur
+### 7.2 Servir un QR Code depuis un contrôleur
 
 ```python
 from core.http.request import Request
@@ -170,7 +192,7 @@ def show(request: Request) -> Response:
 
 La réponse porte `Content-Type: image/png` et le navigateur affiche l'image.
 
-### 6.3 Servir un SVG
+### 7.3 Servir un SVG
 
 ```python
 def show_svg(request: Request) -> Response:
@@ -183,7 +205,7 @@ def show_svg(request: Request) -> Response:
     - `QrCode` quand vous voulez les octets ou le texte de l'image ;
     - `QrCodeResponse` quand vous voulez une réponse HTTP prête à retourner.
 
-## 7. Options et erreurs
+## 8. Options et erreurs
 
 Les paramètres `scale` (taille d'un module) et `border` (marge) contrôlent le rendu.
 

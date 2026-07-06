@@ -31,7 +31,29 @@ Il couvre quatre temps :
 
 Forge fournit les helpers et les contrats ; la **persistance** des facteurs et des codes reste applicative (ADR-008).
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-mfa
+forge opt-in:enable mfa
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
+`forge opt-in:install mfa` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable mfa
+pip uninstall forge-mvc-mfa
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
+`forge opt-in:remove mfa` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -47,7 +69,7 @@ Forge fournit les helpers et les contrats ; la **persistance** des facteurs et d
 | Persistance | applicative (ADR-008) : `AuthMfaFactor`, codes de récupération |
 | Installation | `pip install --pre forge-mvc-mfa` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -55,7 +77,7 @@ Le diagramme de classe montre les groupes d'API et le secret chiffré.
 
 Le diagramme de séquence montre le challenge MFA à la connexion.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre les fonctions groupées par rôle, le facteur persisté et le chiffrement du secret.
 
@@ -114,7 +136,7 @@ classDiagram
 - la revalidation rejoue le facteur avant une action critique ;
 - le secret n'est jamais stocké en clair (Fernet).
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre le challenge à la connexion, après le mot de passe.
 
@@ -146,7 +168,7 @@ sequenceDiagram
 - un code de récupération est une alternative au code TOTP ;
 - le challenge est limité en tentatives et en durée (anti-bruteforce).
 
-## 4. API publique
+## 5. API publique
 
 ### Secret et chiffrement
 
@@ -187,7 +209,7 @@ sequenceDiagram
 
 `MFA_FACTOR_TOTP`, `MFA_FACTOR_RECOVERY`, `MFA_STATUS_ACTIVE` / `PENDING` / `DISABLED`, fenêtres et tentatives du challenge et de la revalidation.
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -197,7 +219,7 @@ sequenceDiagram
 | Protéger une action sensible | `require_recent_mfa(...)` |
 | Fournir un secours | `create_recovery_codes` / `consume_recovery_code` |
 
-## 6. Exemple : challenge à la connexion
+## 7. Exemple : challenge à la connexion
 
 ```python
 from forge_mvc_mfa import (
@@ -226,7 +248,7 @@ else:
     - revalider avant le sensible ;
     - récupérer via codes à usage unique.
 
-## 7. Sécurité des secrets
+## 8. Sécurité des secrets
 
 Le secret TOTP est chiffré au repos avec Fernet (`cryptography`) et la clé `FORGE_MFA_SECRET_KEY` ; il n'est jamais stocké en clair.
 
@@ -248,7 +270,7 @@ Appelez `validate_mfa_secret_key_config()` au démarrage (app.py / wsgi.py) : d�
 !!! note "Indépendance du cœur"
     Le cœur de Forge ne dépend pas de `forge-mvc-mfa` : la dépendance va de l'opt-in vers le cœur.
 
-## 8. Politique de stockage des secrets MFA
+## 9. Politique de stockage des secrets MFA
 
 ### Statut actuel
 

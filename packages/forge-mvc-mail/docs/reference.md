@@ -19,7 +19,29 @@ L'opt-in sépare ces trois préoccupations : un `MailMessage` (le contenu), un *
 
 Le **transport est interchangeable** : `console` ou `log` en développement, `smtp` en production, `fake`/`null` en test. Le code applicatif ne change pas.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-mail
+forge opt-in:enable mail
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+`forge opt-in:install mail` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable mail
+pip uninstall forge-mvc-mail
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+`forge opt-in:remove mail` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -37,7 +59,7 @@ Le **transport est interchangeable** : `console` ou `log` en développement, `sm
 | Décisions d'architecture | ADR-022 (extraction), ADR-031 (config via environnement) |
 | Installation | `pip install --pre forge-mvc-mail` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -45,7 +67,7 @@ Le diagramme de classe montre le mailer, les transports et le message.
 
 Le diagramme de séquence montre un envoi de bout en bout.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le `Mailer` envoie un `MailMessage` via un `BaseTransport` interchangeable et renvoie un `TransportResult`.
 
@@ -96,7 +118,7 @@ classDiagram
 - changer de transport ne change pas le code applicatif ;
 - `from_config` construit le `Mailer` depuis `MAIL_*`.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre un envoi via le transport configuré.
 
@@ -122,7 +144,7 @@ sequenceDiagram
 - le résultat est un `TransportResult` (succès et détail) ;
 - en cas d'échec SMTP, `MailSendError` est interceptée en `TransportResult(success=False)`.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -136,7 +158,7 @@ sequenceDiagram
 | `MailLogger`, `MailLogRecord` | classes | journal des envois |
 | exceptions | `MailError`, `MailConfigurationError`, `MailSendError`, `MailTemplateError`, `MailValidationError` | erreurs |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -148,7 +170,7 @@ sequenceDiagram
 | Vérifier la configuration | `forge mail:doctor` |
 | Relire les envois | `forge mail:logs` |
 
-## 6. Configuration (`MAIL_*`)
+## 7. Configuration (`MAIL_*`)
 
 Le mail est lu directement depuis l'environnement (ADR-031), sans passer par le noyau.
 
@@ -181,7 +203,7 @@ Le squelette nu ne fournit pas ces variables ; ajoutez le bloc `MAIL_*` à `env/
 | `log` | Écrit un fichier `.eml` dans `storage/mail/`. **Défaut en développement.** |
 | `smtp` | Connexion SMTP réelle via `smtplib`. À n'utiliser qu'avec un vrai serveur. |
 
-## 7. Commandes CLI
+## 8. Commandes CLI
 
 | Commande | Rôle |
 |---|---|
@@ -193,7 +215,7 @@ Le squelette nu ne fournit pas ces variables ; ajoutez le bloc `MAIL_*` à `env/
 
 Un gabarit `bienvenue` se compose de `bienvenue_subject.txt` et `bienvenue_text.txt` (obligatoires), `bienvenue_html.html` (optionnel), dans `mvc/mail/templates/`.
 
-## 8. Envoi par code
+## 9. Envoi par code
 
 ### Envoi simple
 
@@ -248,7 +270,7 @@ assert transport.messages[0].subject == "Test"
     - un transport : le canal ;
     - `Mailer` : envoyer et journaliser.
 
-## 9. Journal `mail_log` et exceptions
+## 10. Journal `mail_log` et exceptions
 
 La table `mail_log` (optionnelle, `MAIL_LOG_ENABLED=true`) trace les envois sans stocker le corps : `message_type`, `to_email`, `subject`, `transport`, `status`, métadonnées.
 

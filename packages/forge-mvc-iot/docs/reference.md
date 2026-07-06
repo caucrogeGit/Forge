@@ -12,7 +12,29 @@ Des capteurs publient des mesures sur un broker MQTT. L'opt-in les **écoute**, 
 
 L'écoute MQTT tourne dans un process séparé (`iot:listen`), pas dans le serveur web ; l'API HTTP, elle, se branche sur le routeur du projet (modèle opt-in de type route).
 
-## 2. Vue d'ensemble rapide
+## 2. Installation et désinstallation
+
+### Installation
+
+```bash
+pip install --pre forge-mvc-iot
+forge opt-in:enable iot
+```
+
+`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
+`forge opt-in:install iot` affiche la commande `pip` sans l'exécuter.
+
+### Désinstallation
+
+```bash
+forge opt-in:disable iot
+pip uninstall forge-mvc-iot
+```
+
+`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
+`forge opt-in:remove iot` affiche la commande `pip uninstall` sans l'exécuter.
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -28,7 +50,7 @@ L'écoute MQTT tourne dans un process séparé (`iot:listen`), pas dans le serve
 | Exposition | API HTTP JSON (`register_iot_routes`) |
 | Installation | `pip install --pre forge-mvc-iot` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -36,7 +58,7 @@ Le diagramme de classe montre le subscriber, le dépôt, l'API et la table.
 
 Le diagramme de séquence montre le trajet d'une mesure, du capteur à l'API.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le `MqttSubscriber` insère via `IotEventRepository`, et que `register_iot_routes` lit ce même dépôt pour l'API.
 
@@ -88,7 +110,7 @@ classDiagram
 - l'API HTTP lit le même dépôt ;
 - la configuration MQTT vient de l'environnement (`IotConfig`).
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre une mesure du capteur jusqu'à l'API.
 
@@ -120,7 +142,7 @@ sequenceDiagram
 - un message non conforme au contrat est rejeté ;
 - l'API HTTP expose les mesures en JSON, sans toucher au broker.
 
-## 4. API publique
+## 5. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -139,7 +161,7 @@ sequenceDiagram
 | `forge iot:simulate` | publie des mesures MQTT factices (sans capteur) |
 | `forge iot:listen` | écoute le broker et insère dans `iot_events` |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -150,9 +172,9 @@ sequenceDiagram
 | Exposer en JSON | `register_iot_routes(router)` |
 | Lire par appareil | `IotEventRepository.find_by_device(...)` |
 
-## 6. Exemples d'utilisation
+## 7. Exemples d'utilisation
 
-### 6.1 Brancher l'API HTTP JSON
+### 7.1 Brancher l'API HTTP JSON
 
 ```python
 # optins/iot/routes.py (couche optins du projet)
@@ -165,7 +187,7 @@ def register(router) -> None:
 
 `forge opt-in:enable iot --apply` crée cette couche ; le branchement reste explicite.
 
-### 6.2 Écouter le broker (process séparé)
+### 7.2 Écouter le broker (process séparé)
 
 ```bash
 forge iot:init && forge db:apply     # crée la table iot_events
@@ -181,7 +203,7 @@ forge iot:listen                     # écoute et stocke
     - réception : `iot:listen` (MQTT vers `iot_events`) ;
     - exposition : `register_iot_routes` (HTTP JSON depuis `iot_events`).
 
-## 7. MQTT, contrat et exécution
+## 8. MQTT, contrat et exécution
 
 Les messages MQTT suivent un **contrat** (site, appareil, métrique, valeur, horodatage) ; un message non conforme est rejeté à la réception.
 

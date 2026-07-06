@@ -19,7 +19,7 @@ Le cœur génère le SQL et pilote les commandes BDD ; un backend les fait parle
 
 Particularité technique : Forge génère des paramètres `?` ; l'adaptateur les **traduit** en `%s` (format psycopg) à l'exécution.
 
-## 2. Installation
+## 2. Installation et désinstallation
 
 !!! warning "Backend Alpha"
     PostgreSQL est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider. À réserver aux essais, pas encore à la production.
@@ -51,6 +51,15 @@ DB_APP_PWD=...
 `forge doctor` confirme le backend résolu (`postgres`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=postgres`.
 
 La progression guidée, pas à pas : [Installation de forge-mvc-postgres](welcome/installation.md).
+
+### Désinstallation
+
+```bash
+pip uninstall forge-mvc-postgres
+```
+
+Un backend n'a pas de commande `disable` : il est découvert par entry point (ADR-054), donc retirer le paquet suffit à ce que le cœur ne le voie plus.
+Pensez aussi à retirer les variables `DB_*` d'`env/dev` et `env/prod`, et, si besoin, à supprimer la base et le compte créés par `db:init`.
 
 ## 3. Vue d'ensemble rapide
 
