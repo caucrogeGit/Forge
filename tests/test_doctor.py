@@ -38,9 +38,8 @@ def _full_env(tmp_path: Path) -> None:
     """Écrit un env/example et env/dev complets pour les tests check_env OK."""
     _write(tmp_path / "env" / "example",
            "APP_NAME=Forge\nAPP_ROUTES_MODULE=mvc.routes\n"
-           "DB_NAME=forge_db\nDB_APP_HOST=localhost\nDB_APP_PORT=3306\n"
+           "DB_NAME=forge_db\nDB_HOST=localhost\nDB_PORT=3306\n"
            "DB_APP_LOGIN=forge\nDB_APP_PWD=\n"
-           "DB_ADMIN_HOST=localhost\nDB_ADMIN_PORT=3306\n"
            "DB_ADMIN_LOGIN=root\nDB_ADMIN_PWD=\n"
            "SSL_CERTFILE=cert.pem\nSSL_KEYFILE=key.pem\n")
     _write(tmp_path / "env" / "dev", "DB_NAME=forge_db\n")
@@ -50,8 +49,8 @@ def _minimal_config(tmp_path: Path, **extra) -> types.SimpleNamespace:
     cfg = types.SimpleNamespace(
         SSL_CERTFILE="cert.pem",
         SSL_KEYFILE="key.pem",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_APP_LOGIN="forge",
         DB_APP_PWD="",
         DB_NAME="forge_db",

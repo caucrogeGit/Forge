@@ -187,8 +187,9 @@ class DatabaseBackend(Protocol):
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:
         """Connexion d'administration pour la DDL et le provisioning.
 
-        Le backend lit lui-même ses identifiants d'administration dans
-        l'environnement (`DB_ADMIN_HOST/PORT/LOGIN/PWD`, ADR-060). `database=None`
+        Le backend lit lui-même sa configuration dans l'environnement : serveur
+        partagé `DB_HOST`/`DB_PORT` et identifiants d'administration
+        `DB_ADMIN_LOGIN`/`DB_ADMIN_PWD` (ADR-060, ADR-066). `database=None`
         cible la base de maintenance du serveur (provisioning via `db:init`) ; un
         nom cible la base du projet (`db:apply`, migrations). Réservée aux SGBD
         serveur ; un backend sans serveur (`requires_provisioning=False`) lève une

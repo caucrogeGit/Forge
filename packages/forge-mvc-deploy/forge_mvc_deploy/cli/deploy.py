@@ -262,11 +262,11 @@ def _check_results(root: Path) -> list[_Result]:
         results.append(_Result("ok", "Fichier env/prod", "présent"))
         try:
             cfg = _parse_env_file(env_prod)
-            missing = [k for k in ("DB_APP_HOST", "DB_NAME", "DB_APP_LOGIN") if not cfg.get(k)]
+            missing = [k for k in ("DB_HOST", "DB_NAME", "DB_APP_LOGIN") if not cfg.get(k)]
             if missing:
                 results.append(_Result("error", "Variables DB", f"manquantes : {', '.join(missing)}"))
             else:
-                results.append(_Result("ok", "Variables DB", "DB_APP_HOST, DB_NAME, DB_APP_LOGIN présentes"))
+                results.append(_Result("ok", "Variables DB", "DB_HOST, DB_NAME, DB_APP_LOGIN présentes"))
             if cfg.get("UPLOAD_ROOT"):
                 results.append(_Result("ok", "Variable UPLOAD_ROOT", cfg["UPLOAD_ROOT"]))
             else:

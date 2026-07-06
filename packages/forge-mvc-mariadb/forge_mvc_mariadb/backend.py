@@ -35,12 +35,10 @@ class MariaDBBackend:
     # `forge db:config` ; aucune valeur sensible ici (exemples ou vide).
     env_template: "list[tuple[str, str]]" = [
         ("DB_NAME", ""),
-        ("DB_APP_HOST", "127.0.0.1"),
-        ("DB_APP_PORT", "3306"),
+        ("DB_HOST", "127.0.0.1"),
+        ("DB_PORT", "3306"),
         ("DB_APP_LOGIN", ""),
         ("DB_APP_PWD", ""),
-        ("DB_ADMIN_HOST", "127.0.0.1"),
-        ("DB_ADMIN_PORT", "3306"),
         ("DB_ADMIN_LOGIN", ""),
         ("DB_ADMIN_PWD", ""),
     ]
@@ -55,13 +53,14 @@ class MariaDBBackend:
                 if self._pool is None:
                     import mariadb
                     _mariadb: Any = mariadb
-                    # ADR-060 : la config de connexion runtime est lue dans
-                    # l'environnement (DB_APP_*, DB_NAME, DB_POOL_SIZE).
+                    # ADR-060/ADR-066 : la config de connexion runtime est lue
+                    # dans l'environnement (DB_HOST/DB_PORT partagés, DB_APP_LOGIN,
+                    # DB_APP_PWD, DB_NAME, DB_POOL_SIZE).
                     db_name = os.environ.get("DB_NAME", "")
                     pool_size = int(os.environ.get("DB_POOL_SIZE", "5"))
                     self._pool = _mariadb.ConnectionPool(
-                        host      = os.environ.get("DB_APP_HOST", "localhost"),
-                        port      = int(os.environ.get("DB_APP_PORT", "3306")),
+                        host      = os.environ.get("DB_HOST", "localhost"),
+                        port      = int(os.environ.get("DB_PORT", "3306")),
                         user      = os.environ.get("DB_APP_LOGIN", ""),
                         password  = os.environ.get("DB_APP_PWD", ""),
                         database  = db_name,
@@ -85,15 +84,17 @@ class MariaDBBackend:
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:
         """Connexion d'administration directe, hors pool.
 
-        Les identifiants d'administration sont lus dans l'environnement
-        (`DB_ADMIN_HOST/PORT/LOGIN/PWD`, ADR-060). `database=None` pour `db:init`
-        (la base n'existe pas encore) ; renseigné pour `db:apply` et les migrations.
+        Le serveur est décrit par `DB_HOST`/`DB_PORT` (partagés avec la connexion
+        applicative, ADR-066) ; seuls les identifiants d'administration
+        (`DB_ADMIN_LOGIN`/`DB_ADMIN_PWD`, ADR-033) sont distincts. `database=None`
+        pour `db:init` (la base n'existe pas encore) ; renseigné pour `db:apply`
+        et les migrations.
         """
         import mariadb
         _mariadb: Any = mariadb
         kwargs: dict[str, Any] = {
-            "host": os.environ.get("DB_ADMIN_HOST", "localhost"),
-            "port": int(os.environ.get("DB_ADMIN_PORT", "3306")),
+            "host": os.environ.get("DB_HOST", "localhost"),
+            "port": int(os.environ.get("DB_PORT", "3306")),
             "user": os.environ.get("DB_ADMIN_LOGIN", ""),
             "password": os.environ.get("DB_ADMIN_PWD", ""),
         }

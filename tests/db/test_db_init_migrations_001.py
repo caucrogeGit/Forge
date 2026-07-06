@@ -118,10 +118,11 @@ def harness() -> Any:
 def _db_init_config(h: _DbHarness, monkeypatch: pytest.MonkeyPatch, *,
                     admin_login: str, admin_password: str,
                     db_name: str, app_login: str, app_password: str) -> db_init.DbInitConfig:
-    # ADR-060 : le backend lit les identifiants d'administration dans l'env ;
-    # host/port viennent du harness, login/mot de passe du cas de test.
-    monkeypatch.setenv("DB_ADMIN_HOST", str(h.params["host"]))
-    monkeypatch.setenv("DB_ADMIN_PORT", str(h.params["port"]))
+    # ADR-060/ADR-066 : le backend lit le serveur partagé (DB_HOST/DB_PORT) et
+    # les identifiants d'administration dans l'env ; host/port viennent du
+    # harness, login/mot de passe du cas de test.
+    monkeypatch.setenv("DB_HOST", str(h.params["host"]))
+    monkeypatch.setenv("DB_PORT", str(h.params["port"]))
     monkeypatch.setenv("DB_ADMIN_LOGIN", str(admin_login))
     monkeypatch.setenv("DB_ADMIN_PWD", str(admin_password))
     return db_init.DbInitConfig(

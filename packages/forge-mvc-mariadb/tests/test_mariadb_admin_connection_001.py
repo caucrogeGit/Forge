@@ -27,8 +27,8 @@ def _fake_mariadb(captured: dict[str, object]) -> types.ModuleType:
 
 
 def _set_admin_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("DB_ADMIN_HOST", "db.local")
-    monkeypatch.setenv("DB_ADMIN_PORT", "3306")
+    monkeypatch.setenv("DB_HOST", "db.local")
+    monkeypatch.setenv("DB_PORT", "3306")
     monkeypatch.setenv("DB_ADMIN_LOGIN", "root")
     monkeypatch.setenv("DB_ADMIN_PWD", "s3cret")
 

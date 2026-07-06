@@ -89,7 +89,7 @@ forge deploy:check
 | Environnement virtuel `.venv` | `[WARN]` |
 | Dossier `env/` | `[WARN]` |
 | Fichier `env/prod` | `[WARN]` |
-| Variables `DB_APP_HOST`, `DB_NAME`, `DB_APP_LOGIN` | `[ERREUR]` |
+| Variables `DB_HOST`, `DB_NAME`, `DB_APP_LOGIN` | `[ERREUR]` |
 | Variable `UPLOAD_ROOT` | `[WARN]` |
 | Dossier `storage/` | `[WARN]` |
 | Dossier `storage/uploads/` | `[WARN]` |
@@ -194,8 +194,8 @@ APP_NAME=MonApplication
 APP_ROUTES_MODULE=mvc.routes
 
 DB_NAME=mon_projet_db
-DB_APP_HOST=localhost
-DB_APP_PORT=3306
+DB_HOST=localhost
+DB_PORT=3306
 DB_APP_LOGIN=utilisateur_app
 DB_APP_PWD=mot_de_passe_fort
 
@@ -203,8 +203,6 @@ DB_APP_PWD=mot_de_passe_fort
 # Les secrets DB_ADMIN_* (provisioning db:init / db:apply) vivent dans
 # env/db-admin.local, non commité - voir production-security.md
 # (ENV-PROD-DB-ADMIN-SECRETS-POLICY-001).
-DB_ADMIN_HOST=
-DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=
 DB_ADMIN_PWD=
 

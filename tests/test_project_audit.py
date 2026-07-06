@@ -36,9 +36,8 @@ def _minimal_project(root: Path) -> None:
     _write(root / "config.py", "APP_NAME = 'Test'\n")
     _write(root / "env" / "example",
            "APP_NAME=Test\nAPP_ROUTES_MODULE=mvc.routes\n"
-           "DB_NAME=test\nDB_APP_HOST=localhost\nDB_APP_PORT=3306\n"
+           "DB_NAME=test\nDB_HOST=localhost\nDB_PORT=3306\n"
            "DB_APP_LOGIN=u\nDB_APP_PWD=\n"
-           "DB_ADMIN_HOST=localhost\nDB_ADMIN_PORT=3306\n"
            "DB_ADMIN_LOGIN=root\nDB_ADMIN_PWD=\n"
            "SSL_CERTFILE=cert.pem\nSSL_KEYFILE=key.pem\n")
     _write(root / "env" / "dev", "DB_NAME=test\n")
@@ -131,7 +130,7 @@ def test_audit_config_example_absent(tmp_path):
 def test_audit_config_dev_absent(tmp_path):
     _write(tmp_path / "env" / "example",
            "APP_NAME=Test\nAPP_ROUTES_MODULE=mvc.routes\n"
-           "DB_NAME=test\nDB_APP_HOST=localhost\n")
+           "DB_NAME=test\nDB_HOST=localhost\n")
     results = audit_project_config(tmp_path)
     assert any(r.status == "warn" and "env/dev" in r.detail for r in results)
 

@@ -72,15 +72,13 @@ APP_ENV=prod
 APP_ROUTES_MODULE=mvc.routes
 
 DB_NAME=mon_app_db
-DB_APP_HOST=localhost
-DB_APP_PORT=3306
+DB_HOST=localhost
+DB_PORT=3306
 DB_APP_LOGIN=mon_app_user
 DB_APP_PWD=<mot_de_passe_applicatif>
 
 # Compte admin : vide ici. Les secrets DB_ADMIN_* vivent dans
 # env/db-admin.local (non commité), réservés au provisioning.
-DB_ADMIN_HOST=
-DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=
 DB_ADMIN_PWD=
 

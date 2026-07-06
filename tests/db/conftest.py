@@ -45,8 +45,8 @@ def real_db():
 
     params = _db_params()
     # ADR-060 : le backend lit la config de connexion runtime dans l'environnement.
-    os.environ["DB_APP_HOST"] = str(params["host"])
-    os.environ["DB_APP_PORT"] = str(params["port"])
+    os.environ["DB_HOST"] = str(params["host"])
+    os.environ["DB_PORT"] = str(params["port"])
     os.environ["DB_APP_LOGIN"] = str(params["user"])
     os.environ["DB_APP_PWD"] = str(params["password"])
     os.environ["DB_NAME"] = str(params["name"])

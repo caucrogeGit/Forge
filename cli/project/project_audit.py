@@ -91,7 +91,7 @@ def audit_project_config(root: Path) -> list[AuditResult]:
         if dev.exists():
             cfg.update(dotenv_values(dev))
 
-        required_keys = ["APP_NAME", "APP_ROUTES_MODULE", "DB_NAME", "DB_APP_HOST"]
+        required_keys = ["APP_NAME", "APP_ROUTES_MODULE", "DB_NAME", "DB_HOST"]
         empty_keys = [k for k in required_keys if not cfg.get(k)]
         if empty_keys:
             results.append(AuditResult("warn", family,

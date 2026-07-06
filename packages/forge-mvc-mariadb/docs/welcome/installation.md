@@ -22,12 +22,10 @@ Dans `env/dev`, renseignez les accès (le squelette ne les pré-câble pas) :
 
 ```env
 DB_NAME=mon_projet
-DB_APP_HOST=127.0.0.1
-DB_APP_PORT=3306
+DB_HOST=127.0.0.1
+DB_PORT=3306
 DB_APP_LOGIN=mon_projet
 DB_APP_PWD=...
-DB_ADMIN_HOST=127.0.0.1
-DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=root
 DB_ADMIN_PWD=...
 ```

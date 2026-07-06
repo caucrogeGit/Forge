@@ -28,7 +28,7 @@ Aucun fichier existant n'est écrasé (principe 9, pas d'écriture invisible).
 |----------|--------|
 | Interpréteur | Python 3.12 ou supérieur. |
 | Environnement | `.venv` présent, dossier `env/` présent. |
-| Fichier de prod | `env/prod` et `DB_APP_HOST`, `DB_NAME`, `DB_APP_LOGIN`, `UPLOAD_ROOT`. |
+| Fichier de prod | `env/prod` et `DB_HOST`, `DB_NAME`, `DB_APP_LOGIN`, `UPLOAD_ROOT`. |
 | Cohérence TLS | HTTP/HTTPS Nginx en accord avec `APP_SSL_ENABLED`. |
 | Modules | `mariadb`, `jinja2`, `gunicorn` importables. |
 | Fichiers | `wsgi.py` et fichiers `deploy/` présents. |

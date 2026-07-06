@@ -185,7 +185,7 @@ forge db:init
 
     * le compte `forge_admin` n’existe pas encore dans MariaDB (voir « Créer les comptes du projet » plus haut) ;
     * le mot de passe `DB_ADMIN_PWD` de `env/dev` ne correspond pas à celui du `CREATE USER 'forge_admin'` ;
-    * `DB_ADMIN_HOST` ou `DB_ADMIN_PORT` ne pointent pas vers le serveur MariaDB local.
+    * `DB_HOST` ou `DB_PORT` ne pointent pas vers le serveur MariaDB local.
 
 Appliquer les migrations disponibles :
 

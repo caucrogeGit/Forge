@@ -70,10 +70,12 @@ Il ne doit **pas** pouvoir : créer des utilisateurs, supprimer des tables, modi
 
 ```env
 # Administration MariaDB du projet
-DB_ADMIN_HOST=localhost
-DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=forge_admin
 DB_ADMIN_PWD=mot_de_passe_long_admin_local
+
+# Serveur BDD, adresse partagée admin + applicatif (ADR-066)
+DB_HOST=localhost
+DB_PORT=3306
 
 # Base projet
 DB_NAME=forge_db
@@ -81,8 +83,6 @@ DB_CHARSET=utf8mb4
 DB_COLLATION=utf8mb4_unicode_ci
 
 # Utilisateur applicatif du projet
-DB_APP_HOST=localhost
-DB_APP_PORT=3306
 DB_APP_LOGIN=forge_app
 DB_APP_PWD=mot_de_passe_long_app_local
 DB_POOL_SIZE=5

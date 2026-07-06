@@ -41,7 +41,7 @@ forge deploy:check
 |----------|----------|
 | Interpréteur | Python 3.12 ou supérieur. |
 | Environnement | présence de `.venv` et du dossier `env/`. |
-| Fichier de prod | `env/prod` et ses variables `DB_APP_HOST`, `DB_NAME`, `DB_APP_LOGIN`, `UPLOAD_ROOT`. |
+| Fichier de prod | `env/prod` et ses variables `DB_HOST`, `DB_NAME`, `DB_APP_LOGIN`, `UPLOAD_ROOT`. |
 | Cohérence TLS | HTTP/HTTPS Nginx en accord avec `APP_SSL_ENABLED`. |
 | Modules | `mariadb`, `jinja2`, `gunicorn` importables. |
 | Fichiers | présence de `wsgi.py` et des fichiers `deploy/`. |

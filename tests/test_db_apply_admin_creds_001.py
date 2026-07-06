@@ -20,9 +20,8 @@ def test_load_migration_db_config_ne_porte_que_la_base(monkeypatch):
     from cli.entities import migrations
 
     fake = types.SimpleNamespace(
-        DB_ADMIN_HOST="adminhost", DB_ADMIN_PORT=1,
+        DB_HOST="dbhost", DB_PORT=1,
         DB_ADMIN_LOGIN="forge_admin", DB_ADMIN_PWD="adminpwd",
-        DB_APP_HOST="apphost", DB_APP_PORT=2,
         DB_APP_LOGIN="forge_app", DB_APP_PWD="apppwd",
         DB_NAME="projet_db",
     )
@@ -41,9 +40,8 @@ def test_load_db_apply_config_ne_porte_que_la_base(monkeypatch):
     from cli.entities import db_apply
 
     fake = types.SimpleNamespace(
-        DB_ADMIN_HOST="adminhost", DB_ADMIN_PORT=1,
+        DB_HOST="dbhost", DB_PORT=1,
         DB_ADMIN_LOGIN="forge_admin", DB_ADMIN_PWD="adminpwd",
-        DB_APP_HOST="apphost", DB_APP_PORT=2,
         DB_APP_LOGIN="forge_app", DB_APP_PWD="apppwd",
         DB_NAME="projet_db",
     )

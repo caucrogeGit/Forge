@@ -43,9 +43,8 @@ def _scaffold_minimal_project(root: Path) -> None:
     _write(
         root / "env" / "example",
         "APP_NAME=TestContact\nAPP_ROUTES_MODULE=mvc.routes\n"
-        "DB_NAME=test_contact_db\nDB_APP_HOST=localhost\nDB_APP_PORT=3306\n"
+        "DB_NAME=test_contact_db\nDB_HOST=localhost\nDB_PORT=3306\n"
         "DB_APP_LOGIN=test_contact_app\nDB_APP_PWD=\n"
-        "DB_ADMIN_HOST=localhost\nDB_ADMIN_PORT=3306\n"
         "DB_ADMIN_LOGIN=root\nDB_ADMIN_PWD=\n"
         "SSL_CERTFILE=cert.pem\nSSL_KEYFILE=key.pem\n",
     )

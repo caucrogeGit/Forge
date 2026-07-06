@@ -107,16 +107,14 @@ APP_ROUTES_MODULE=mvc.routes
 
 # Base applicative
 DB_NAME=mon_app_db
-DB_APP_HOST=localhost
-DB_APP_PORT=3306
+DB_HOST=localhost
+DB_PORT=3306
 DB_APP_LOGIN=mon_app_user
 DB_APP_PWD=<mot_de_passe_fort>
 
 # Base admin : laissée vide dans env/prod.
 # Les secrets DB_ADMIN_* (provisioning db:init / db:apply) vivent dans
 # env/db-admin.local, non commité - voir production-security.md.
-DB_ADMIN_HOST=
-DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=
 DB_ADMIN_PWD=
 

@@ -816,15 +816,15 @@ Description:
 Effets:
   - se connecte à MariaDB en tant que DB_ADMIN_LOGIN ;
   - CREATE DATABASE <DB_NAME> CHARACTER SET <DB_CHARSET> si la base est absente ;
-  - CREATE USER <DB_APP_LOGIN>@<DB_APP_HOST> si l'utilisateur est absent ;
+  - CREATE USER <DB_APP_LOGIN>@<DB_HOST> si l'utilisateur est absent ;
   - GRANT des privilèges DB_APP_PRIVILEGES (défaut : SELECT, INSERT, UPDATE,
     DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES) ;
   - CREATE TABLE IF NOT EXISTS forge_migrations.
 
 Prérequis:
-  - MariaDB joignable sur DB_ADMIN_HOST:DB_ADMIN_PORT ;
+  - MariaDB joignable sur DB_HOST:DB_PORT ;
   - DB_ADMIN_LOGIN avec droits CREATE DATABASE, CREATE USER et GRANT ;
-  - variables DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_APP_HOST définies dans
+  - variables DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_HOST définies dans
     env/dev ou env/prod.
 
 Limites:
@@ -2212,7 +2212,7 @@ Effets:
   - vérifie Python 3.12+ ;
   - vérifie .venv/ ;
   - vérifie env/ et env/prod ;
-  - parse env/prod et contrôle DB_APP_HOST, DB_NAME, DB_APP_LOGIN,
+  - parse env/prod et contrôle DB_HOST, DB_NAME, DB_APP_LOGIN,
     UPLOAD_ROOT ;
   - vérifie storage/ et storage/uploads/ ;
   - vérifie la cohérence APP_SSL_ENABLED vs deploy/nginx/forge-app.conf

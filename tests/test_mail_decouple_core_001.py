@@ -26,7 +26,7 @@ _NON_MAIL_CONFIG = dict(
     UPLOAD_ROOT="storage/uploads", UPLOAD_MAX_SIZE=1024,
     UPLOAD_ALLOWED_EXTENSIONS=frozenset({"png"}),
     UPLOAD_ALLOWED_MIME_TYPES=frozenset({"image/png"}),
-    DB_APP_HOST="localhost", DB_APP_PORT=3306, DB_NAME="t",
+    DB_HOST="localhost", DB_PORT=3306, DB_NAME="t",
     DB_APP_LOGIN="u", DB_APP_PWD="p", DB_POOL_SIZE=2,
     APP_TRUSTED_PROXIES=frozenset(),
 )

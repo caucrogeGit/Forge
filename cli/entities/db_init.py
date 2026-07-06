@@ -91,8 +91,10 @@ def load_db_init_config() -> DbInitConfig:
         db_name=os.environ.get("DB_NAME", ""),
         db_charset=os.environ.get("DB_CHARSET", "utf8mb4"),
         db_collation=os.environ.get("DB_COLLATION", "utf8mb4_unicode_ci"),
-        app_host=os.environ.get("DB_APP_HOST", "localhost"),
-        app_port=int(os.environ.get("DB_APP_PORT", "3306")),
+        # ADR-066 : l'origine du grant applicatif suit DB_HOST (serveur partagé),
+        # ce qui garantit que l'hôte du grant coïncide avec l'hôte de connexion.
+        app_host=os.environ.get("DB_HOST", "localhost"),
+        app_port=int(os.environ.get("DB_PORT", "3306")),
         app_login=os.environ.get("DB_APP_LOGIN", ""),
         app_password=os.environ.get("DB_APP_PWD", ""),
         app_privileges=app_privileges,

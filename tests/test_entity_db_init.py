@@ -84,15 +84,13 @@ class FakeConnection:
 
 def _fake_config() -> types.SimpleNamespace:
     return types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="db-host",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="app-host",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="app-user",
         DB_APP_PWD="app-pwd",
     )
@@ -102,9 +100,9 @@ def _apply_db_env(monkeypatch, fake_config: types.SimpleNamespace) -> None:
     """ADR-060 : les loaders lisent la config BDD dans l'environnement, plus dans
     les attributs de config.py. On reflète le fake_config dans os.environ."""
     for name in (
-        "DB_ADMIN_HOST", "DB_ADMIN_PORT", "DB_ADMIN_LOGIN", "DB_ADMIN_PWD",
+        "DB_HOST", "DB_PORT", "DB_ADMIN_LOGIN", "DB_ADMIN_PWD",
         "DB_NAME", "DB_CHARSET", "DB_COLLATION",
-        "DB_APP_HOST", "DB_APP_PORT", "DB_APP_LOGIN", "DB_APP_PWD",
+        "DB_APP_LOGIN", "DB_APP_PWD",
         "DB_APP_PRIVILEGES",
     ):
         if hasattr(fake_config, name):
@@ -118,9 +116,10 @@ def _patch_db_init_config(monkeypatch, fake_config: types.SimpleNamespace) -> No
         if raw_privileges is not None
         else db_init.DEFAULT_APP_PRIVILEGES
     )
-    # ADR-060 : le backend lit les identifiants d'administration dans l'env.
-    monkeypatch.setenv("DB_ADMIN_HOST", str(getattr(fake_config, "DB_ADMIN_HOST", "localhost")))
-    monkeypatch.setenv("DB_ADMIN_PORT", str(getattr(fake_config, "DB_ADMIN_PORT", 3306)))
+    # ADR-060/ADR-066 : le backend lit le serveur partagé (DB_HOST/DB_PORT) et les
+    # identifiants d'administration dans l'env.
+    monkeypatch.setenv("DB_HOST", str(getattr(fake_config, "DB_HOST", "localhost")))
+    monkeypatch.setenv("DB_PORT", str(getattr(fake_config, "DB_PORT", 3306)))
     monkeypatch.setenv("DB_ADMIN_LOGIN", str(getattr(fake_config, "DB_ADMIN_LOGIN", "")))
     monkeypatch.setenv("DB_ADMIN_PWD", str(getattr(fake_config, "DB_ADMIN_PWD", "")))
     monkeypatch.setattr(
@@ -130,8 +129,8 @@ def _patch_db_init_config(monkeypatch, fake_config: types.SimpleNamespace) -> No
             db_name=fake_config.DB_NAME,
             db_charset=fake_config.DB_CHARSET,
             db_collation=fake_config.DB_COLLATION,
-            app_host=fake_config.DB_APP_HOST,
-            app_port=fake_config.DB_APP_PORT,
+            app_host=fake_config.DB_HOST,
+            app_port=fake_config.DB_PORT,
             app_login=fake_config.DB_APP_LOGIN,
             app_password=fake_config.DB_APP_PWD,
             app_privileges=privileges,
@@ -141,15 +140,13 @@ def _patch_db_init_config(monkeypatch, fake_config: types.SimpleNamespace) -> No
 
 def _write_config(path, fake_config: types.SimpleNamespace) -> None:
     lines = [
-        f"DB_ADMIN_HOST={fake_config.DB_ADMIN_HOST!r}",
-        f"DB_ADMIN_PORT={fake_config.DB_ADMIN_PORT!r}",
+        f"DB_HOST={fake_config.DB_HOST!r}",
+        f"DB_PORT={fake_config.DB_PORT!r}",
         f"DB_ADMIN_LOGIN={fake_config.DB_ADMIN_LOGIN!r}",
         f"DB_ADMIN_PWD={fake_config.DB_ADMIN_PWD!r}",
         f"DB_NAME={fake_config.DB_NAME!r}",
         f"DB_CHARSET={fake_config.DB_CHARSET!r}",
         f"DB_COLLATION={fake_config.DB_COLLATION!r}",
-        f"DB_APP_HOST={fake_config.DB_APP_HOST!r}",
-        f"DB_APP_PORT={fake_config.DB_APP_PORT!r}",
         f"DB_APP_LOGIN={fake_config.DB_APP_LOGIN!r}",
         f"DB_APP_PWD={fake_config.DB_APP_PWD!r}",
     ]
@@ -175,7 +172,7 @@ def test_load_db_init_config_reads_provisioning_and_app(monkeypatch, tmp_path):
     assert cfg.db_name == "gestion_ventes"
     assert cfg.db_charset == "utf8mb4"
     assert cfg.db_collation == "utf8mb4_unicode_ci"
-    assert cfg.app_host == "app-host"
+    assert cfg.app_host == "db-host"
     assert cfg.app_port == 3306
     assert cfg.app_login == "app-user"
     assert cfg.app_password == "app-pwd"
@@ -215,15 +212,13 @@ def test_db_init_creates_missing_database_and_app_user(monkeypatch):
     }
     connection = FakeConnection(state, executed)
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
     )
@@ -240,8 +235,8 @@ def test_db_init_creates_missing_database_and_app_user(monkeypatch):
     actions = init_project_database()
 
     assert captured_kwargs == {
-        "host": "admin-host",
-        "port": 3307,
+        "host": "localhost",
+        "port": 3306,
         "user": "admin-user",
         "password": "admin-pwd",
     }
@@ -280,15 +275,13 @@ def test_db_init_degrades_when_mysql_user_read_denied(monkeypatch):
     }
     connection = FakeConnection(state, executed)
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="forge_admin",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
     )
@@ -330,15 +323,13 @@ def test_db_init_reports_existing_database_and_user_then_reapplies_privileges(mo
     }
     connection = FakeConnection(state, executed)
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
     )
@@ -379,15 +370,13 @@ def test_db_init_requires_manual_verification_for_existing_user_on_other_host(mo
     }
     connection = FakeConnection(state, executed)
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
     )
@@ -419,15 +408,13 @@ def test_db_init_rolls_back_on_sql_error(monkeypatch):
     }
     connection = FakeConnection(state, executed, fail_on="GRANT")
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
     )
@@ -465,15 +452,13 @@ def test_db_init_is_idempotent(monkeypatch):
         FakeConnection(second_state, second_executed),
     ]
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
     )
@@ -529,15 +514,13 @@ def test_db_init_uses_custom_privileges_in_grant(monkeypatch):
     }
     connection = FakeConnection(state, executed)
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
         DB_APP_PRIVILEGES="SELECT,INSERT",
@@ -567,15 +550,13 @@ def test_db_init_creates_forge_migrations_table_idempotently(monkeypatch):
     }
     connection = FakeConnection(state, executed)
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion_ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
     )
@@ -607,15 +588,13 @@ def test_db_init_quotes_database_before_creating_forge_migrations(monkeypatch):
     }
     connection = FakeConnection(state, executed)
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="gestion`ventes",
         DB_CHARSET="utf8mb4",
         DB_COLLATION="utf8mb4_unicode_ci",
-        DB_APP_HOST="localhost",
-        DB_APP_PORT=3306,
         DB_APP_LOGIN="forge_app",
         DB_APP_PWD="secret",
     )

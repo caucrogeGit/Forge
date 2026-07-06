@@ -48,7 +48,7 @@ def test_forge_config_kwargs_garde_max_size_sans_les_autres(monkeypatch):
     for name, value in dict(
         APP_NAME="t", APP_ENV="test", VIEWS_DIR="mvc/views", SQL_DIR="mvc/models/sql",
         UPLOAD_MAX_SIZE=1024,
-        DB_APP_HOST="localhost", DB_APP_PORT=3306, DB_NAME="t",
+        DB_HOST="localhost", DB_PORT=3306, DB_NAME="t",
         DB_APP_LOGIN="u", DB_APP_PWD="p", DB_POOL_SIZE=2,
         APP_TRUSTED_PROXIES=frozenset(),
     ).items():

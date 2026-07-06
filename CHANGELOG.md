@@ -3,15 +3,18 @@
 
 ## [Non publié]
 
-### Corrigé
+### Modifié
 
-- **`env_template` des backends BDD (ADR-064)** aligné sur les variables réellement
-  lues par chaque backend. Les templates amorçaient `DB_HOST`/`DB_PORT` (jamais lus)
-  au lieu de `DB_APP_HOST`/`DB_APP_PORT` (runtime) et `DB_ADMIN_HOST`/`DB_ADMIN_PORT`
-  (administration) ; `forge-mvc-postgres` et `forge-mvc-mssql` omettaient en plus
-  `DB_ADMIN_LOGIN`/`DB_ADMIN_PWD`. `forge db:config` scaffolde désormais l'ensemble
-  des clés utiles pour le provisioning et le runtime. Documentation des trois backends
-  mise à jour en conséquence.
+- **Contrat d'environnement des backends BDD unifié (ADR-066).** L'adresse du
+  serveur est désormais décrite par un seul couple `DB_HOST`/`DB_PORT`, partagé par
+  les connexions applicative et d'administration ; seuls les identifiants restent
+  distingués (`DB_APP_LOGIN`/`DB_APP_PWD` pour le runtime, `DB_ADMIN_LOGIN`/`DB_ADMIN_PWD`
+  pour le provisioning). `DB_APP_HOST`, `DB_APP_PORT`, `DB_ADMIN_HOST` et `DB_ADMIN_PORT`
+  disparaissent du contrat. Concerne `forge-mvc-mariadb`, `forge-mvc-postgres` et
+  `forge-mvc-mssql`, `forge db:config` (`env_template`), `forge db:init`, l'audit projet,
+  `forge-mvc-deploy` et la documentation. Rupture interne assumée en phase bêta : un
+  projet existant remplace `DB_APP_HOST`/`DB_ADMIN_HOST` par `DB_HOST` et les ports
+  correspondants par `DB_PORT`.
 
 
 ## [1.0.0-rc.2] - 2026-07-01

@@ -12,10 +12,12 @@ APP_ROUTES_MODULE=mvc.routes
 #     env/db-admin.local (ignoré par .gitignore via env/*.local) ou
 #     des variables d'environnement du shell de provisioning.
 #   - En développement local, `root` MariaDB reste acceptable.
-DB_ADMIN_HOST=localhost
-DB_ADMIN_PORT=3306
 DB_ADMIN_LOGIN=root
 DB_ADMIN_PWD=
+
+# Serveur BDD, adresse partagée par les comptes admin et applicatif (ADR-066).
+DB_HOST=localhost
+DB_PORT=3306
 
 # Base projet
 DB_NAME=forge_db
@@ -23,8 +25,6 @@ DB_CHARSET=utf8mb4
 DB_COLLATION=utf8mb4_unicode_ci
 
 # Utilisateur applicatif du projet
-DB_APP_HOST=localhost
-DB_APP_PORT=3306
 DB_APP_LOGIN=forge
 DB_APP_PWD=
 DB_POOL_SIZE=5

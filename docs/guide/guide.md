@@ -75,15 +75,13 @@ DB_APP_PWD=<mot_de_passe_applicatif>
     |---|---|---|
     | `APP_NAME` | Nom de l'application (titre, logs) | défini par `forge new` |
     | `APP_ROUTES_MODULE` | Module Python des routes | `mvc.routes` |
-    | `DB_ADMIN_HOST` | Hôte MariaDB admin | `localhost` |
-    | `DB_ADMIN_PORT` | Port MariaDB admin | `3306` |
+    | `DB_HOST` | Hôte du serveur MariaDB (admin + applicatif) | `localhost` |
+    | `DB_PORT` | Port du serveur MariaDB | `3306` |
     | `DB_ADMIN_LOGIN` | Login administrateur MariaDB | `root` |
     | `DB_ADMIN_PWD` | Mot de passe administrateur | **à renseigner** |
     | `DB_NAME` | Nom de la base du projet | défini par `forge new` |
     | `DB_CHARSET` | Jeu de caractères | `utf8mb4` |
     | `DB_COLLATION` | Collation | `utf8mb4_unicode_ci` |
-    | `DB_APP_HOST` | Hôte MariaDB applicatif | `localhost` |
-    | `DB_APP_PORT` | Port MariaDB applicatif | `3306` |
     | `DB_APP_LOGIN` | Login applicatif MariaDB | **à renseigner** |
     | `DB_APP_PWD` | Mot de passe applicatif | **à renseigner** |
     | `DB_POOL_SIZE` | Taille du pool de connexions | `5` |

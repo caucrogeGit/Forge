@@ -142,7 +142,7 @@ def test_deploy_check_ok_avec_env_prod_complet(tmp_path, capsys):
     env_dir = tmp_path / "env"
     env_dir.mkdir()
     (env_dir / "prod").write_text(
-        "DB_APP_HOST=localhost\nDB_NAME=forge_db\nDB_APP_LOGIN=forge\n",
+        "DB_HOST=localhost\nDB_NAME=forge_db\nDB_APP_LOGIN=forge\n",
         encoding="utf-8",
     )
     try:
@@ -197,7 +197,7 @@ def test_deploy_check_warn_upload_root_absent(tmp_path):
     env_dir = tmp_path / "env"
     env_dir.mkdir()
     (env_dir / "prod").write_text(
-        "DB_APP_HOST=localhost\nDB_NAME=forge_db\nDB_APP_LOGIN=forge\n",
+        "DB_HOST=localhost\nDB_NAME=forge_db\nDB_APP_LOGIN=forge\n",
         encoding="utf-8",
     )
 
@@ -212,7 +212,7 @@ def test_deploy_check_warn_si_nginx_http_et_app_ssl_force(tmp_path):
     env_dir = tmp_path / "env"
     env_dir.mkdir()
     (env_dir / "prod").write_text(
-        "DB_APP_HOST=localhost\nDB_NAME=forge_db\nDB_APP_LOGIN=forge\n"
+        "DB_HOST=localhost\nDB_NAME=forge_db\nDB_APP_LOGIN=forge\n"
         "UPLOAD_ROOT=storage/uploads\nAPP_SSL_ENABLED=true\n",
         encoding="utf-8",
     )

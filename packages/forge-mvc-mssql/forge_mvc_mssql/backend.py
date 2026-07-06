@@ -123,12 +123,10 @@ class MSSQLBackend:
     # `forge db:config` ; aucune valeur sensible ici (exemples ou vide).
     env_template: "list[tuple[str, str]]" = [
         ("DB_NAME", ""),
-        ("DB_APP_HOST", "127.0.0.1"),
-        ("DB_APP_PORT", "1433"),
+        ("DB_HOST", "127.0.0.1"),
+        ("DB_PORT", "1433"),
         ("DB_APP_LOGIN", ""),
         ("DB_APP_PWD", ""),
-        ("DB_ADMIN_HOST", "127.0.0.1"),
-        ("DB_ADMIN_PORT", "1433"),
         ("DB_ADMIN_LOGIN", ""),
         ("DB_ADMIN_PWD", ""),
         ("DB_ODBC_DRIVER", "ODBC Driver 18 for SQL Server"),
@@ -139,9 +137,10 @@ class MSSQLBackend:
 
         odbc: Any = pyodbc
         driver = os.environ.get("DB_ODBC_DRIVER", _DEFAULT_ODBC_DRIVER)
-        # ADR-060 : config de connexion runtime lue dans l'environnement.
-        host = os.environ.get("DB_APP_HOST", "localhost")
-        port = int(os.environ.get("DB_APP_PORT", "1433"))
+        # ADR-060/ADR-066 : config de connexion runtime lue dans l'environnement
+        # (DB_HOST/DB_PORT partagés, identifiants applicatifs distincts).
+        host = os.environ.get("DB_HOST", "localhost")
+        port = int(os.environ.get("DB_PORT", "1433"))
         dbname = os.environ.get("DB_NAME", "")
         user = os.environ.get("DB_APP_LOGIN", "")
         password = os.environ.get("DB_APP_PWD", "")
@@ -160,9 +159,10 @@ class MSSQLBackend:
 
         odbc: Any = pyodbc
         driver = os.environ.get("DB_ODBC_DRIVER", _DEFAULT_ODBC_DRIVER)
-        # Identifiants d'administration lus dans l'environnement (ADR-060).
-        host = os.environ.get("DB_ADMIN_HOST", "localhost")
-        port = int(os.environ.get("DB_ADMIN_PORT", "1433"))
+        # Serveur partagé (DB_HOST/DB_PORT) ; seuls les identifiants
+        # d'administration sont distincts (ADR-066).
+        host = os.environ.get("DB_HOST", "localhost")
+        port = int(os.environ.get("DB_PORT", "1433"))
         login = os.environ.get("DB_ADMIN_LOGIN", "")
         password = os.environ.get("DB_ADMIN_PWD", "")
         # `db:init` (database=None) se connecte à la base de maintenance

@@ -23,7 +23,7 @@ Le paquet dépend du cœur `forge-mvc` et de `psycopg` (v3).
 
 ## Configurer l'environnement
 
-Dans `env/dev` : `DB_NAME`, `DB_APP_HOST`, `DB_APP_PORT`, `DB_APP_LOGIN`, `DB_APP_PWD`, et les `DB_ADMIN_*` pour le provisioning.
+Dans `env/dev` : `DB_NAME`, `DB_HOST`, `DB_PORT`, `DB_APP_LOGIN`, `DB_APP_PWD`, et les `DB_ADMIN_*` pour le provisioning.
 
 ## Vérifier
 

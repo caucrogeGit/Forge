@@ -87,8 +87,8 @@ class FakeConnection:
 
 def _install_fake_modules(monkeypatch, connection: FakeConnection):
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3307,
+        DB_HOST="admin-host",
+        DB_PORT=3307,
         DB_ADMIN_LOGIN="admin",
         DB_ADMIN_PWD="admin-secret",
         DB_NAME="forge_db",
@@ -102,8 +102,8 @@ def _install_fake_modules(monkeypatch, connection: FakeConnection):
     fake_mariadb = types.SimpleNamespace(connect=connect)
     _patch_db_apply_config(monkeypatch, fake_config)
     # ADR-060 : le backend lit les identifiants d'administration dans l'env.
-    monkeypatch.setenv("DB_ADMIN_HOST", fake_config.DB_ADMIN_HOST)
-    monkeypatch.setenv("DB_ADMIN_PORT", str(fake_config.DB_ADMIN_PORT))
+    monkeypatch.setenv("DB_HOST", fake_config.DB_HOST)
+    monkeypatch.setenv("DB_PORT", str(fake_config.DB_PORT))
     monkeypatch.setenv("DB_ADMIN_LOGIN", fake_config.DB_ADMIN_LOGIN)
     monkeypatch.setenv("DB_ADMIN_PWD", fake_config.DB_ADMIN_PWD)
     monkeypatch.setitem(sys.modules, "mariadb", fake_mariadb)
@@ -122,8 +122,8 @@ def _write_config(path: Path, fake_config: types.SimpleNamespace) -> None:
     path.write_text(
         "\n".join(
             [
-                f"DB_ADMIN_HOST={fake_config.DB_ADMIN_HOST!r}",
-                f"DB_ADMIN_PORT={fake_config.DB_ADMIN_PORT!r}",
+                f"DB_HOST={fake_config.DB_HOST!r}",
+                f"DB_PORT={fake_config.DB_PORT!r}",
                 f"DB_ADMIN_LOGIN={fake_config.DB_ADMIN_LOGIN!r}",
                 f"DB_ADMIN_PWD={fake_config.DB_ADMIN_PWD!r}",
                 f"DB_NAME={fake_config.DB_NAME!r}",
@@ -206,8 +206,8 @@ def test_load_db_apply_config_returns_db_name(monkeypatch, tmp_path):
     # ADR-060 : les identifiants d'administration sont lus par le backend depuis
     # DB_ADMIN_* ; le loader ne porte plus que le nom de la base cible (DB_NAME).
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="admin-host",
-        DB_ADMIN_PORT=3310,
+        DB_HOST="admin-host",
+        DB_PORT=3310,
         DB_ADMIN_LOGIN="admin-user",
         DB_ADMIN_PWD="admin-pwd",
         DB_NAME="app-db",
@@ -225,8 +225,8 @@ def test_load_db_apply_config_returns_db_name(monkeypatch, tmp_path):
 
 def test_load_db_apply_config_uses_current_working_directory(monkeypatch, tmp_path):
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="localhost",
-        DB_ADMIN_PORT=3306,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="forge_admin",
         DB_ADMIN_PWD="secret",
         DB_NAME="cwd_apply_db",
@@ -257,8 +257,8 @@ def test_apply_model_sql_reports_missing_database_preparation(tmp_path: Path, mo
     _write_relations(root, {"schema_version": "1.0", "relations": []}, "")
 
     fake_config = types.SimpleNamespace(
-        DB_ADMIN_HOST="localhost",
-        DB_ADMIN_PORT=3306,
+        DB_HOST="localhost",
+        DB_PORT=3306,
         DB_ADMIN_LOGIN="forge_admin",
         DB_ADMIN_PWD="secret",
         DB_NAME="forge_db",
