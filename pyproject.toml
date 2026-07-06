@@ -80,14 +80,16 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["core*", "cli*", "integrations*"]
+include = ["core*", "cli*", "integrations*", "skeleton*"]
 
 [tool.setuptools.package-data]
-"cli" = [
-    "skeleton/data/**/*",
-    "skeleton/data/**/.*",
-    "skeleton/data/.*",
-    "skeleton/data/.*/**/*",   # fichiers DANS les dossiers dot (.vscode/…),
+# Le squelette matérialisé par `forge new` est la donnée du paquet `skeleton`
+# (paquet racine, ADR-065). Globs relatifs au paquet.
+"skeleton" = [
+    "data/**/*",
+    "data/**/.*",
+    "data/.*",
+    "data/.*/**/*",   # fichiers DANS les dossiers dot (.vscode/…),
 ]
 # PEP 561 : expose les types du cœur aux projets utilisateurs (ADR-036).
 "core" = ["py.typed"]
@@ -101,10 +103,10 @@ include = ["core*", "cli*", "integrations*"]
     "**/*.pyc",
     "**/*.pyo",
 ]
-"cli" = [
-    "skeleton/data/**/__pycache__/*",
-    "skeleton/data/**/*.pyc",
-    "skeleton/data/**/*.pyo",
+"skeleton" = [
+    "data/**/__pycache__/*",
+    "data/**/*.pyc",
+    "data/**/*.pyo",
 ]
 
 [tool.pyright]

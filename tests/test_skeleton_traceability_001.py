@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-SKELETON = Path(__file__).parent.parent / "cli" / "skeleton" / "data"
+SKELETON = Path(__file__).parent.parent / "skeleton" / "data"
 
 
 # ── Scaffold ADR ─────────────────────────────────────────────────────────────

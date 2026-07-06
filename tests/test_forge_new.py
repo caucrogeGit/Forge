@@ -210,14 +210,14 @@ def test_cmd_new_sans_parametre_ref():
 
 
 def test_materialize_skeleton_copie_le_squelette(monkeypatch, tmp_path):
-    """_materialize_skeleton délègue à cli.skeleton.materialize."""
+    """_materialize_skeleton délègue à skeleton.materialize."""
     called = {}
 
     def spy_materialize(dest, *, bare=False):
         called["dest"] = dest
         os.makedirs(dest, exist_ok=True)
 
-    import cli.skeleton as skeleton
+    import skeleton as skeleton
     monkeypatch.setattr(skeleton, "materialize", spy_materialize)
     forge._materialize_skeleton(str(tmp_path / "proj"))
     assert called["dest"].endswith("proj")
@@ -395,7 +395,7 @@ def test_env_ne_contient_aucune_config_bdd(tmp_path):
 
 def _materialize_real_example(tmp_path):
     """Copie le vrai gabarit env/example du squelette dans tmp_path/env."""
-    from cli.skeleton import DATA_DIR
+    from skeleton import DATA_DIR
 
     env_dir = tmp_path / "env"
     env_dir.mkdir()

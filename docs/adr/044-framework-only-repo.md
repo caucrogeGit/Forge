@@ -31,7 +31,7 @@ pas embarquer une application métier.
 
 ### Ce qui a changé depuis ADR-024
 
-ADR-024 a créé un squelette dédié (`cli/skeleton/data/`) comme source unique de
+ADR-024 a créé un squelette dédié (`skeleton/data/`) comme source unique de
 `forge new`, mais a explicitement **écarté** (alternative B) le retrait du
 `mvc/` racine, au motif qu'il était « référencé par la quasi totalité de la
 suite de tests » et que le déplacer « casserait des centaines de tests ».
@@ -39,7 +39,7 @@ suite de tests » et que le déplacer « casserait des centaines de tests ».
 Cet argument n'est plus valide :
 
 - **Le squelette est désormais l'application de référence complète et curée**
-  (`cli/skeleton/data/` : `app.py`, `config.py`, `mvc/`, `static/`, `storage/`,
+  (`skeleton/data/` : `app.py`, `config.py`, `mvc/`, `static/`, `storage/`,
   `env/`, `schemas/`). `forge new` ne dépend plus du `mvc/` racine.
 - **Le couplage réel des tests au `mvc/` racine est faible.** Sur l'ensemble
   de la suite, seuls **8 fichiers importent réellement le paquet `mvc`** et
@@ -69,7 +69,7 @@ donc aucune perte visuelle : il suffit de cesser de la régénérer.
    `mvc/`, `static/`, `storage/`, `translations/` et le `env/` applicatif
    quittent la racine pour `tests/fixtures/app/`, où ils deviennent une
    **fixture de test explicite**. La racine du dépôt ne présente plus aucune
-   application ; le squelette `cli/skeleton/data/` reste la seule application de
+   application ; le squelette `skeleton/data/` reste la seule application de
    référence produite par `forge new`.
 
    Décision affinée à l'exécution : la suppression *pure* a d'abord été tentée,
@@ -204,4 +204,4 @@ sans cette perte.
 - ADR-043 Documentation embarquée cœur/CLI : `docs/adr/043-core-cli-doc-embedding.md`.
 - Charte : `CHARTE_DOC.md` (principes 1, 8, 11 ; règle A).
 - Code concerné : `cli/assets/sync_landing.py`, `forge.py`, `mkdocs.yml`,
-  `cli/skeleton/data/`, `tests/` (fichiers important `mvc`/`app`/`config`).
+  `skeleton/data/`, `tests/` (fichiers important `mvc`/`app`/`config`).

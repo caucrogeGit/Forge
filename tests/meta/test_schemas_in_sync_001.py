@@ -5,7 +5,7 @@ ADR-058 : `cli/schemas/` est la **source canonique unique** des schémas du cœu
 Les autres présences d'un schéma sont des **copies dérivées**, synchronisées et
 gardées par ce test contre toute dérive :
 
-- ``cli/skeleton/data/schemas/`` : gabarit semé dans chaque projet généré par
+- ``skeleton/data/schemas/`` : gabarit semé dans chaque projet généré par
   ``forge new`` ; ses schémas de base sont byte-identiques au canonique ;
 - schémas de base embarqués par un opt-in pour son autonomie (``field`` et
   ``common`` dans ``forge-mvc-pivot``, ADR-057) : identiques au canonique.
@@ -24,7 +24,7 @@ pytestmark = pytest.mark.meta
 ROOT = Path(__file__).resolve().parents[2]
 CLI_SCHEMAS = ROOT / "cli" / "schemas"
 ROOT_SCHEMAS = ROOT / "schemas"  # supprimé par ADR-058 : doit rester absent
-SKELETON_SCHEMAS = ROOT / "cli" / "skeleton" / "data" / "schemas"
+SKELETON_SCHEMAS = ROOT / "skeleton" / "data" / "schemas"
 
 # Schémas de base du cœur (canonique cli/schemas).
 BASE_SCHEMAS = [
@@ -54,7 +54,7 @@ def _read(p: Path) -> str:
 
 def test_canonique_existe():
     assert CLI_SCHEMAS.is_dir(), "Le canonique cli/schemas/ doit exister."
-    assert SKELETON_SCHEMAS.is_dir(), "Le gabarit cli/skeleton/data/schemas/ doit exister."
+    assert SKELETON_SCHEMAS.is_dir(), "Le gabarit skeleton/data/schemas/ doit exister."
 
 
 def test_pas_de_copie_racine():
@@ -71,9 +71,9 @@ def test_skeleton_base_identique_a_cli(name: str):
     """Les schémas de base du skeleton sont byte-identiques au canonique."""
     cli_f = CLI_SCHEMAS / name
     skel_f = SKELETON_SCHEMAS / name
-    assert skel_f.exists(), f"{name} manquant dans cli/skeleton/data/schemas/"
+    assert skel_f.exists(), f"{name} manquant dans skeleton/data/schemas/"
     assert _read(cli_f) == _read(skel_f), (
-        f"{name} diffère entre cli/schemas/ et cli/skeleton/data/schemas/. "
+        f"{name} diffère entre cli/schemas/ et skeleton/data/schemas/. "
         f"Resynchroniser le gabarit (canonique = cli/schemas/)."
     )
 

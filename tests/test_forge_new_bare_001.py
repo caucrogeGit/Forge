@@ -9,7 +9,7 @@ en --bare.
 from __future__ import annotations
 
 import forge
-from cli.skeleton import iter_skeleton_files, materialize, DATA_DIR
+from skeleton import iter_skeleton_files, materialize, DATA_DIR
 
 # Apparat qualité (livré par défaut, omis en --bare).
 APPARATUS = [

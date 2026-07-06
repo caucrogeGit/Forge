@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ROUTES = PROJECT_ROOT / "cli" / "skeleton" / "data" / "mvc" / "routes.py"
+ROUTES = PROJECT_ROOT / "skeleton" / "data" / "mvc" / "routes.py"
 
 
 @pytest.fixture(scope="module")

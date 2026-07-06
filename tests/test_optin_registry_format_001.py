@@ -19,7 +19,7 @@ from cli.optins.registry_format import (
     read_enabled_optins,
 )
 
-SKELETON = Path(__file__).parent.parent / "cli" / "skeleton" / "data"
+SKELETON = Path(__file__).parent.parent / "skeleton" / "data"
 
 
 # ── Le squelette porte le registre, toujours présent ─────────────────────────

@@ -20,7 +20,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SKELETON_REQ = PROJECT_ROOT / "cli" / "skeleton" / "data" / "requirements.txt"
+SKELETON_REQ = PROJECT_ROOT / "skeleton" / "data" / "requirements.txt"
 ROOT_PYPROJECT = PROJECT_ROOT / "pyproject.toml"
 
 _PIN = re.compile(r"^(forge-mvc(?:-[a-z0-9-]+)?)==([^\s#]+)", re.MULTILINE)

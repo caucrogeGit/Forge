@@ -102,9 +102,10 @@ def test_package_data_inclut_le_squelette():
     # SKELETON-PKGDATA-001 (ADR-024) : le squelette de projet est embarqué
     # (motifs dotfiles inclus pour .gitignore et .gitkeep).
     # ADR-035 : plus de starters/data (génération de starters retirée).
-    for pattern in ("skeleton/data/**/*", "skeleton/data/**/.*", "skeleton/data/.*"):
-        assert pattern in package_data["cli"], (
-            f"package-data cli doit inclure {pattern} (squelette)."
+    # ADR-065 : le squelette est le paquet racine `skeleton` (plus sous `cli`).
+    for pattern in ("data/**/*", "data/**/.*", "data/.*"):
+        assert pattern in package_data["skeleton"], (
+            f"package-data skeleton doit inclure {pattern} (squelette)."
         )
 
 

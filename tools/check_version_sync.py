@@ -11,7 +11,7 @@ PEP 440, ex. `1.0.0rc1`) et vérifie que TOUS les emplacements la reprennent :
 - les pins `forge-mvc>=` (et `forge-mvc-files>=` pour images) des sous-paquets ;
 - les pins des extras du pyproject racine (`rbac`, `workflow`, `stats`, `all`) ;
 - `core/__init__.py` (`__version__`) et `forge.py` (`_FORGE_VERSION`) ;
-- le pin `forge-mvc==` du squelette (`cli/skeleton/data/requirements.txt`) ;
+- le pin `forge-mvc==` du squelette (`skeleton/data/requirements.txt`) ;
 - `package.json`, en forme SemVer publique (ex. `1.0.0-beta.17`).
 
 Sortie : 0 si tout est cohérent, 1 avec le détail des écarts sinon.
@@ -81,11 +81,11 @@ def collect_mismatches() -> tuple[str, list[str]]:
           _first_match(ROOT / "forge.py", r'_FORGE_VERSION\s*=\s*"([^"]+)"'), canonical)
 
     # Squelette (pin == reproductible du projet généré).
-    check("cli/skeleton/data/requirements.txt forge-mvc==",
-          _first_match(ROOT / "cli/skeleton/data/requirements.txt", r"forge-mvc==([0-9][^,\s]*)"),
+    check("skeleton/data/requirements.txt forge-mvc==",
+          _first_match(ROOT / "skeleton/data/requirements.txt", r"forge-mvc==([0-9][^,\s]*)"),
           canonical)
-    check("cli/skeleton/data/requirements-dev.txt forge-mvc-testing==",
-          _first_match(ROOT / "cli/skeleton/data/requirements-dev.txt", r"forge-mvc-testing==([0-9][^,\s]*)"),
+    check("skeleton/data/requirements-dev.txt forge-mvc-testing==",
+          _first_match(ROOT / "skeleton/data/requirements-dev.txt", r"forge-mvc-testing==([0-9][^,\s]*)"),
           canonical)
 
     # package.json (SemVer public).

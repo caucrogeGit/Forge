@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-SKELETON = Path(__file__).parent.parent / "cli" / "skeleton" / "data"
+SKELETON = Path(__file__).parent.parent / "skeleton" / "data"
 
 # Les quatre gardes qualité du framework, attendues côté CI comme côté Makefile.
 GATES = ("ruff check", "pyright", "pytest", "mkdocs build --strict")

@@ -28,7 +28,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-SKELETON_DATA = PROJECT_ROOT / "cli" / "skeleton" / "data"
+SKELETON_DATA = PROJECT_ROOT / "skeleton" / "data"
 SKELETON_VSCODE = SKELETON_DATA / ".vscode" / "settings.json"
 SKELETON_SCHEMAS = SKELETON_DATA / "schemas"
 

@@ -13,14 +13,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-SKELETON = Path(__file__).parent.parent / "cli" / "skeleton" / "data"
+SKELETON = Path(__file__).parent.parent / "skeleton" / "data"
 
 
 # ── pytest.ini : marqueurs stricts et déclarés ───────────────────────────────
 
 def test_squelette_livre_pytest_ini():
     ini = SKELETON / "pytest.ini"
-    assert ini.is_file(), "cli/skeleton/data/pytest.ini attendu (ADR-063)"
+    assert ini.is_file(), "skeleton/data/pytest.ini attendu (ADR-063)"
     content = ini.read_text(encoding="utf-8")
     assert "--strict-markers" in content
     assert "testpaths = tests" in content
@@ -50,7 +50,7 @@ def test_smoke_livre_et_marque():
 
 def test_requirements_dev_livre_outillage():
     reqs = SKELETON / "requirements-dev.txt"
-    assert reqs.is_file(), "cli/skeleton/data/requirements-dev.txt attendu (ADR-063)"
+    assert reqs.is_file(), "skeleton/data/requirements-dev.txt attendu (ADR-063)"
     content = reqs.read_text(encoding="utf-8")
     assert "forge-mvc-testing==" in content, "forge-mvc-testing doit être épinglé (ADR-041)"
     for tool in ("pytest", "ruff", "pyright"):

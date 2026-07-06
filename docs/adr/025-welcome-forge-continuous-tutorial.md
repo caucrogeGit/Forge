@@ -46,7 +46,7 @@ contrôleur, son `routes.py.snippet` et son `starter.json`, applicable par
   starter `first-sql` ne casse aucun starter survivant (dépendance purement
   narrative).
 - Le garde-fou de neutralité du squelette (`tests/test_skeleton_guard_001.py`,
-  ADR-024) interdit tout contenu welcome dans `cli/skeleton/data/` : le
+  ADR-024) interdit tout contenu welcome dans `skeleton/data/` : le
   tutoriel vit dans la **documentation**, pas dans le squelette.
 
 ---

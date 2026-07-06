@@ -118,7 +118,7 @@ classifiers `Development Status` hétérogènes, tirets cadratins dans les vieux
 déjà fait ; l'outillage (`cli/`, `forge.py`, `integrations/`, `tools/`) l'est
 désormais aussi, gaté par `test_cli_pyright_clean_001`
 (`pyright cli forge.py integrations tools` = 0 erreur). Hors périmètre :
-`cli/skeleton/data/**` (templates de code généré utilisateur).
+`skeleton/data/**` (templates de code généré utilisateur).
 
 Méthode (suite de `TYPING-CLI-STRICT-001`) : **ratchet par fichier**. Le gate
 `test_cli_pyright_clean_001` (`pyright cli` = 0) enforce `# pyright: strict` dès
@@ -141,7 +141,7 @@ nombre d'erreurs.
 | 8 | `TYPING-FORGE-PY-001` | **Fait** : `forge.py` strict (`_run` typé, `entry.method` casté `str \| list[str]`, listes locales annotées) | ✅ |
 | 9 | `TYPING-INTEGRATIONS-001` | **Fait** : `integrations/jinja2/renderer.py` strict (signatures `BaseLoader`, `env_globals` via `cast("Any", env).globals`, `_deny` typé) | ✅ |
 | 10 | `TYPING-TOOLS-001` | **Fait** : `tools/` strict (check_version_sync, mkdocs_version_hook, chroma_key) ; `_toml`/`_read_pyproject -> dict[str, Any]`, frontières weasyprint/Pillow castées `Any` | ✅ |
-| Final | `TYPING-STRICT-GATE-FINAL-001` | **Fait** : gate meta-test étendu à `pyright cli forge.py integrations tools` (0 erreur). Tout l'outillage porte `# pyright: strict` par fichier (hors `cli/skeleton/data/**`, code généré). Le `[tool.pyright].include` du pyproject (protégé) reste sur le runtime ; l'outillage est gaté par le meta-test plutôt que par le pyproject | ✅ |
+| Final | `TYPING-STRICT-GATE-FINAL-001` | **Fait** : gate meta-test étendu à `pyright cli forge.py integrations tools` (0 erreur). Tout l'outillage porte `# pyright: strict` par fichier (hors `skeleton/data/**`, code généré). Le `[tool.pyright].include` du pyproject (protégé) reste sur le runtime ; l'outillage est gaté par le meta-test plutôt que par le pyproject | ✅ |
 
 Déjà faits par `TYPING-CLI-STRICT-001` : `make_relation`, `i18n`, `public_page`,
 `canonical_model_normalizer` (strict) ; 25 erreurs standard corrigées (dont un bug

@@ -14,7 +14,7 @@ from pathlib import Path
 
 import yaml
 
-SKELETON = Path(__file__).parent.parent / "cli" / "skeleton" / "data"
+SKELETON = Path(__file__).parent.parent / "skeleton" / "data"
 
 
 def _mkdocs() -> dict[str, object]:
@@ -24,7 +24,7 @@ def _mkdocs() -> dict[str, object]:
 # ── mkdocs.yml : Material, français, nav automatique ─────────────────────────
 
 def test_squelette_livre_mkdocs():
-    assert (SKELETON / "mkdocs.yml").is_file(), "cli/skeleton/data/mkdocs.yml attendu (ADR-063)"
+    assert (SKELETON / "mkdocs.yml").is_file(), "skeleton/data/mkdocs.yml attendu (ADR-063)"
 
 
 def test_mkdocs_material_francais():
@@ -46,7 +46,7 @@ def test_mkdocs_navigation_automatique():
 
 def test_requirements_docs_livre_mkdocs_material():
     reqs = SKELETON / "requirements-docs.txt"
-    assert reqs.is_file(), "cli/skeleton/data/requirements-docs.txt attendu (ADR-063)"
+    assert reqs.is_file(), "skeleton/data/requirements-docs.txt attendu (ADR-063)"
     assert "mkdocs-material" in reqs.read_text(encoding="utf-8")
 
 

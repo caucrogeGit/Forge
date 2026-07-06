@@ -101,13 +101,13 @@ def _safe_remove_git(dest: str) -> None:
 def _materialize_skeleton(dest: str, *, bare: bool = False) -> None:
     """Matérialise le squelette de projet (ADR-024).
 
-    Copie l'arbre curé `cli/skeleton/data/` dans le projet — plus de
+    Copie l'arbre curé `skeleton/data/` dans le projet — plus de
     clone du dépôt. Le `core` du projet vient ensuite du paquet `forge-mvc`
     (voir requirements.txt du squelette). `bare=True` omet l'apparat qualité
     (ADR-063 : config, tests, doc, CI, hygiène).
     """
     _print_step("Création du projet à partir du squelette Forge...")
-    from cli.skeleton import materialize
+    from skeleton import materialize
     materialize(dest, bare=bare)
 
 

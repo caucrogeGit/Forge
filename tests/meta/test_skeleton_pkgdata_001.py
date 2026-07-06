@@ -1,6 +1,6 @@
 """Garde-fou SKELETON-PKGDATA-001 (ADR-024).
 
-Le squelette de projet (cli/skeleton/data/) doit voyager dans le wheel
+Le squelette de projet (skeleton/data/) doit voyager dans le wheel
 ET le sdist, sinon un `forge` installé via pip/pipx ne pourrait pas
 matérialiser un projet (ticket NEW-MATERIALIZE-001). Les dotfiles (.gitignore,
 .gitkeep) doivent être présents ; aucun bytecode (.pyc) ne doit remonter.
@@ -18,7 +18,7 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-SK = "cli/skeleton/data"
+SK = "skeleton/data"
 
 
 def _clean_build_dirs() -> None:

@@ -16,7 +16,7 @@ en ligne.
 
 Conséquences du retrait :
 
-- suppression de `cli/skeleton/data/docs/welcome/` (le dossier `docs/` du
+- suppression de `skeleton/data/docs/welcome/` (le dossier `docs/` du
   squelette source disparaît ; un projet généré peut toujours obtenir un `docs/`
   via la guidance agent ADR-047, mais plus de `docs/welcome/`) ;
 - suppression du garde-fou de navigation `WELCOME-PROJET-NAV-001`
@@ -59,7 +59,7 @@ il est exhaustif et en ligne, pas un point de départ local et court.
 3. **Multi-paliers** : `installation.md`, puis trois niveaux (débutant,
    intermédiaire, avancé) de deux étapes chacun, chaînés par un `bilan.md`, et un
    `recapitulatif.md`.
-4. **Source** : contenu statique sous `cli/skeleton/data/docs/welcome/`, copié
+4. **Source** : contenu statique sous `skeleton/data/docs/welcome/`, copié
    tel quel par `forge new` (couvert par le package-data `skeleton/data/**`).
 5. **Propriété du projet** : le développeur peut adapter ou supprimer ce parcours.
 
@@ -98,7 +98,7 @@ code métier :
 ## Mise en œuvre (tickets `WELCOME-PROJET-*`)
 
 - `WELCOME-PROJET-CONTENT-001` : rédiger le parcours dans
-  `cli/skeleton/data/docs/welcome/` (installation + 3 niveaux + bilans +
+  `skeleton/data/docs/welcome/` (installation + 3 niveaux + bilans +
   récapitulatif), court et renvoyant à forgemvc.com.
 - `WELCOME-PROJET-NAV-001` : garde-fou de chaînage du parcours.
 

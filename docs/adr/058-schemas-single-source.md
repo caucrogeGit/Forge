@@ -23,7 +23,7 @@ trois copies maintenues à la main, plus l'index `forge.schema.index.json` :
   `schema:doctor`, et **packagée** (`MANIFEST.in : recursive-include cli/schemas`).
 - `schemas/` (racine du dépôt) : copie « dogfooding », maintenue **identique** à
   `cli/schemas/` par un test de synchro.
-- `cli/skeleton/data/schemas/` : gabarit copié dans chaque projet généré par
+- `skeleton/data/schemas/` : gabarit copié dans chaque projet généré par
   `forge new` (`shutil.copyfile`).
 
 Cette duplication est volontaire mais coûteuse : chaque modification de contrat
@@ -61,7 +61,7 @@ Le test de synchro racine vers cli disparaît (plus de copie racine).
 
 ### Le squelette reste un gabarit dérivé et gardé
 
-`cli/skeleton/data/schemas/` n'est **pas** une redondance : c'est le gabarit
+`skeleton/data/schemas/` n'est **pas** une redondance : c'est le gabarit
 semé dans les projets générés (les schémas **du projet**, pour la validation IDE
 locale).
 Il reste, mais comme **artefact dérivé** : un test garde sa synchronisation avec

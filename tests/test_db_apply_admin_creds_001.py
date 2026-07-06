@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-_SKELETON_ENV = Path(__file__).parent.parent / "cli" / "skeleton" / "data" / "env" / "example"
+_SKELETON_ENV = Path(__file__).parent.parent / "skeleton" / "data" / "env" / "example"
 
 
 def test_load_migration_db_config_ne_porte_que_la_base(monkeypatch):

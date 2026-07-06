@@ -1,6 +1,6 @@
 """SKELETON-TREE-001 (ADR-024) — squelette de projet dédié et nu.
 
-Le squelette curé vit dans cli/skeleton/data/. Il sert de source à
+Le squelette curé vit dans skeleton/data/. Il sert de source à
 `forge new` (matérialisation locale, ticket NEW-MATERIALIZE-001). Ces tests
 garantissent :
 
@@ -23,7 +23,17 @@ import pytest
 import forge
 
 REPO_ROOT = Path(forge.__file__).resolve().parent
-SKELETON = REPO_ROOT / "cli" / "skeleton" / "data"
+SKELETON = REPO_ROOT / "skeleton" / "data"
+
+
+# ── Emplacement : le squelette vit à la racine (ADR-065) ─────────────────────
+
+def test_squelette_a_la_racine_pas_sous_cli():
+    assert SKELETON.is_dir(), "skeleton/data/ attendu à la racine (ADR-065)"
+    assert not (REPO_ROOT / "cli" / "skeleton").exists(), (
+        "cli/skeleton/ ne doit plus exister : le squelette a été déplacé à la "
+        "racine (skeleton/, ADR-065)."
+    )
 
 
 # ── Inventaire : ce que le squelette DOIT contenir ───────────────────────────

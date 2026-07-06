@@ -89,7 +89,7 @@ tard.
 ### 3. Retirer le pivot du cœur
 
 `pivot.schema.json` est retiré de `cli/schemas/`, de `schemas/` (racine), du
-gabarit `cli/skeleton/data/schemas/`, et de l'entrée `pivot` des deux
+gabarit `skeleton/data/schemas/`, et de l'entrée `pivot` des deux
 `forge.schema.index.json`.
 Le jeu de schémas du cœur passe à quatre : `common`, `field`, `entity`,
 `relations`.

@@ -139,7 +139,7 @@ extraction du déploiement (ADR-053).
   contrôleur/template ; avancé : opt-in, valider/livrer), chaînés par des bilans
   et un récapitulatif. Orienté « votre projet », chaque page renvoie à
   forgemvc.com pour approfondir (sans dupliquer `welcome-forge`). Contenu statique
-  sous `cli/skeleton/data/docs/welcome/`, garde-fou de chaînage
+  sous `skeleton/data/docs/welcome/`, garde-fou de chaînage
   `test_skeleton_welcome_projet_nav_001`. Troisième couche « expérience » d'un
   projet généré, avec la guidance agent (ADR-047), sans code métier (ADR-024).
 
@@ -321,7 +321,7 @@ extraction du déploiement (ADR-053).
   (`SKELETON-VSCODE-STRICT-DEFAULT-001`, `SKELETON-VSCODE-STRICT-NOISE-REMOVE-001`).
   Le cliquet `# pyright: strict` étant terminé sur tout le cœur (`pyright core/`
   à 0 erreur), le cœur n'émet plus de `reportUnknown*` sur ses symboles via
-  `py.typed`. Trois changements dans `cli/skeleton/data` :
+  `py.typed`. Trois changements dans `skeleton/data` :
   1. l'override `python.analysis.diagnosticSeverityOverrides` (qui neutralisait
      les cinq règles `reportUnknown*`) est **retiré** du `.vscode/settings.json` —
      la mitigation provisoire `SKELETON-VSCODE-STRICT-NOISE-001` est remplacée
@@ -909,7 +909,7 @@ extraction du déploiement (ADR-053).
   dépôt Forge (ADR-024, `NEW-MATERIALIZE-001`). Le projet généré ne contient
   plus le framework (`core/`, `cli/`, `packages/`, `tests/`, `docs/`) : il
   dépend de `forge-mvc` et récupère le `core` depuis le paquet installé. Le
-  squelette curé est embarqué dans `cli/skeleton/data/` et distribué en
+  squelette curé est embarqué dans `skeleton/data/` et distribué en
   package-data (`SKELETON-TREE-001`, `SKELETON-PKGDATA-001`,
   `SKELETON-REGISTRY-001`).
 - **`forge new` ne clone plus le dépôt** : le flag `--ref`, la constante

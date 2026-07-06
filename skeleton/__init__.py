@@ -2,7 +2,7 @@
 """Squelette de projet Forge matérialisé par `forge new` (ADR-024).
 
 `forge new` ne clone plus le dépôt : il copie cet arbre curé
-(`cli/skeleton/data/`) dans le projet de l'utilisateur. Le `core` du
+(`skeleton/data/`) dans le projet de l'utilisateur. Le `core` du
 projet provient ensuite du paquet installé `forge-mvc` (voir
 `data/requirements.txt`), pas d'un `core/` local.
 

@@ -96,7 +96,7 @@ buildables ») et **lève** son point « hors périmètre » sur ces deux niveau
 - Chaque niveau est auto-contenu : un learner peut attaquer l'intermédiaire ou
   l'avancé sans rejouer tout le débutant.
 - Le squelette (ADR-024) reste strictement neutre : le tutoriel vit dans la
-  documentation, jamais dans `cli/skeleton/data/`.
+  documentation, jamais dans `skeleton/data/`.
 
 ### Limites / Risques
 

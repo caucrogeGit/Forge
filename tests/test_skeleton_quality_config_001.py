@@ -13,7 +13,7 @@ from __future__ import annotations
 import tomllib
 from pathlib import Path
 
-SKELETON = Path(__file__).parent.parent / "cli" / "skeleton" / "data"
+SKELETON = Path(__file__).parent.parent / "skeleton" / "data"
 PYPROJECT = SKELETON / "pyproject.toml"
 
 # Fichiers générés et destinés à l'édition manuelle : ils doivent arriver
@@ -32,7 +32,7 @@ def _config() -> dict[str, object]:
 # ── Le squelette livre un pyproject.toml d'outillage ─────────────────────────
 
 def test_squelette_livre_pyproject():
-    assert PYPROJECT.exists(), "cli/skeleton/data/pyproject.toml attendu (ADR-063)"
+    assert PYPROJECT.exists(), "skeleton/data/pyproject.toml attendu (ADR-063)"
 
 
 def test_pyproject_est_outillage_pas_paquet():

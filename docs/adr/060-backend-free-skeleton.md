@@ -19,7 +19,7 @@ Révise la trajectoire d'ADR-054 : le squelette ne pose plus de backend BDD, et 
 ADR-054 a rendu le cœur agnostique BDD et a fait de chaque SGBD un opt-in exclusif découvert par entry points.
 Sa trajectoire prévoyait toutefois que « le squelette dépend de `forge-mvc` plus un opt-in de backend, et `forge new` doit poser le bon backend » (ADR-054, Conséquences).
 
-C'est ce qui a été mis en œuvre : le squelette pin `forge-mvc-mariadb` dans `cli/skeleton/data/requirements.txt`, et `forge new` installe MariaDB d'office.
+C'est ce qui a été mis en œuvre : le squelette pin `forge-mvc-mariadb` dans `skeleton/data/requirements.txt`, et `forge new` installe MariaDB d'office.
 
 Deux problèmes en découlent.
 
@@ -28,8 +28,8 @@ Deux problèmes en découlent.
    Cela contredit ADR-024 (`forge new` produit un projet nu) et le principe 8 (noyau minimal, briques opt-in) : un backend est une brique, pas un acquis.
 
 2. **La forme MariaDB est câblée dans le squelette lui-même, pas seulement dans le backend.**
-   `cli/skeleton/data/config.py` lit `DB_ADMIN_*`, `DB_APP_*`, `DB_NAME`, `DB_CHARSET`, `DB_COLLATION` avec des valeurs par défaut MariaDB (port `3306`, `utf8mb4`, split admin/app).
-   `cli/skeleton/data/env/example` est intégralement façonné MariaDB.
+   `skeleton/data/config.py` lit `DB_ADMIN_*`, `DB_APP_*`, `DB_NAME`, `DB_CHARSET`, `DB_COLLATION` avec des valeurs par défaut MariaDB (port `3306`, `utf8mb4`, split admin/app).
+   `skeleton/data/env/example` est intégralement façonné MariaDB.
    Or ces variables n'ont pas de sens pour tous les backends : SQLite n'a ni hôte, ni port, ni charset, ni comptes, seulement un chemin de fichier.
 
 Le squelette n'est donc pas réellement neutre : même en retirant le pin `forge-mvc-mariadb`, `config.py` continue de présupposer MariaDB.

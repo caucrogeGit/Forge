@@ -69,7 +69,7 @@ ni son application de démonstration.
 ## Décision
 
 1. **Squelette dédié et curé.** Le squelette de projet vit dans le dépôt sous
-   `cli/skeleton/data/` (même modèle que `cli/starters/data/`).
+   `skeleton/data/` (même modèle que `cli/starters/data/`).
    Il contient un projet Forge minimal : `app.py`, `config.py`,
    `requirements.txt`, `env/example`, un `mvc/` minimal (route `/`, contrôleur
    d'accueil neutre, vue d'accueil autonome, `views/errors/*`, paquets vides
@@ -82,7 +82,7 @@ ni son application de démonstration.
    `core/`, ni `cli/`, ni `integrations/`, ni `packages/`, ni `tests/`,
    ni `docs/`.
 
-3. **Distribution en package-data.** L'arbre `cli/skeleton/data/` est
+3. **Distribution en package-data.** L'arbre `skeleton/data/` est
    déclaré en `package-data` (`pyproject.toml` + `MANIFEST.in`) afin qu'un
    `forge` installé via `pipx`/`pip` puisse matérialiser un projet **sans
    réseau ni git**. `forge new` **copie** cet arbre (`shutil.copytree`) au lieu
@@ -177,7 +177,7 @@ un `forge` pipx-installé.
   `SKELETON-PKGDATA-001`, `SKELETON-REGISTRY-001`, `NEW-MATERIALIZE-001`,
   `NEW-CORE-DEP-001`, `SKELETON-GUARD-001`, `NEW-CLI-CLEANUP-001`.
 - Code concerné : `forge.py` (`cmd_new`, `_clone_skeleton`),
-  `pyproject.toml`, `MANIFEST.in`, futur `cli/skeleton/`.
+  `pyproject.toml`, `MANIFEST.in`, futur `skeleton/`.
 - ADR-004 Périmètre du core : `docs/adr/004-core-perimeter.md`.
 - ADR-005 Packaging : `docs/adr/005-packaging.md`.
 - ADR-023 `forge starter:build` canonique : `docs/adr/023-starter-build-canonical.md`.
