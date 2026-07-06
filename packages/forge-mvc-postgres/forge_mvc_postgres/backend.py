@@ -103,11 +103,15 @@ class PostgreSQLBackend:
     # Variables d'environnement lues par le backend (ADR-064). Amorcées par
     # `forge db:config` ; aucune valeur sensible ici (exemples ou vide).
     env_template: "list[tuple[str, str]]" = [
-        ("DB_HOST", "127.0.0.1"),
-        ("DB_PORT", "5432"),
         ("DB_NAME", ""),
+        ("DB_APP_HOST", "127.0.0.1"),
+        ("DB_APP_PORT", "5432"),
         ("DB_APP_LOGIN", ""),
         ("DB_APP_PWD", ""),
+        ("DB_ADMIN_HOST", "127.0.0.1"),
+        ("DB_ADMIN_PORT", "5432"),
+        ("DB_ADMIN_LOGIN", ""),
+        ("DB_ADMIN_PWD", ""),
     ]
 
     def get_connection(self) -> Any:

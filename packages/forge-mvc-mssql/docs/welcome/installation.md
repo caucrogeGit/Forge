@@ -23,7 +23,7 @@ Le paquet dépend du cœur `forge-mvc` et de `pyodbc`.
 
 ## Configurer l'environnement
 
-Dans `env/dev` : `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_APP_LOGIN`, `DB_APP_PWD`, et au besoin `DB_ODBC_DRIVER`.
+Dans `env/dev` : `DB_NAME`, `DB_APP_HOST`, `DB_APP_PORT`, `DB_APP_LOGIN`, `DB_APP_PWD`, les `DB_ADMIN_*` pour le provisioning, et au besoin `DB_ODBC_DRIVER`.
 
 ## Vérifier
 

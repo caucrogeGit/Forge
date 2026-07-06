@@ -43,11 +43,15 @@ forge db:config
 Renseignez ensuite les valeurs dans `env/dev` (et `env/prod`) :
 
 ```env
-DB_HOST=127.0.0.1
-DB_PORT=1433
 DB_NAME=mon_projet
+DB_APP_HOST=127.0.0.1
+DB_APP_PORT=1433
 DB_APP_LOGIN=mon_projet
 DB_APP_PWD=...
+DB_ADMIN_HOST=127.0.0.1
+DB_ADMIN_PORT=1433
+DB_ADMIN_LOGIN=sa
+DB_ADMIN_PWD=...
 DB_ODBC_DRIVER=ODBC Driver 18 for SQL Server
 ```
 

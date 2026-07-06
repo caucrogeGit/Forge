@@ -14,7 +14,7 @@ Le plus simple est un conteneur Docker jetable :
 docker run --rm -e POSTGRES_PASSWORD=test -p 5432:5432 postgres
 ```
 
-Configurez `env/dev` pour pointer ce serveur (`DB_HOST=127.0.0.1`, `DB_PORT=5432`, etc.).
+Configurez `env/dev` pour pointer ce serveur (`DB_APP_HOST=127.0.0.1`, `DB_APP_PORT=5432`, etc.).
 
 ## Vérifier la chaîne
 

@@ -1,6 +1,19 @@
 # Changelog
 
 
+## [Non publié]
+
+### Corrigé
+
+- **`env_template` des backends BDD (ADR-064)** aligné sur les variables réellement
+  lues par chaque backend. Les templates amorçaient `DB_HOST`/`DB_PORT` (jamais lus)
+  au lieu de `DB_APP_HOST`/`DB_APP_PORT` (runtime) et `DB_ADMIN_HOST`/`DB_ADMIN_PORT`
+  (administration) ; `forge-mvc-postgres` et `forge-mvc-mssql` omettaient en plus
+  `DB_ADMIN_LOGIN`/`DB_ADMIN_PWD`. `forge db:config` scaffolde désormais l'ensemble
+  des clés utiles pour le provisioning et le runtime. Documentation des trois backends
+  mise à jour en conséquence.
+
+
 ## [1.0.0-rc.2] - 2026-07-01
 
 Deuxième release candidate. Consolidation post-rc.1 : refonte de la navigation et
