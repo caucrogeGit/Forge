@@ -78,7 +78,6 @@ Forge n'impose aucun backend de référence.
     ```
 
     `forge db:init` crée la base et les comptes applicatif et d'administration.
-    La progression guidée, pas à pas : [Installation de forge-mvc-mariadb](welcome/installation.md).
 
     ### Désinstallation
 
